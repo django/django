@@ -1,20 +1,18 @@
-# Persian translation of Django.
-# Copyright (C) 2007 THE Django'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the Django package.
-#
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:23+0100\n"
-"PO-Revision-Date: 2008-09-01 02:00+0430\n"
-"Last-Translator: Reza Mohammadi <reza@zeerak.ir>\n"
-"Language-Team: Persian <farsi@lists.sharif.edu>\n"
+"POT-Creation-Date: 2011-02-28 23:42+0100\n"
+"PO-Revision-Date: 2011-02-22 00:10+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: Persian <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Language: fa\n"
+"Plural-Forms: nplurals=1; plural=0\n"
 
 #: admin.py:12
 msgid "Content"
@@ -25,15 +23,13 @@ msgid "Metadata"
 msgstr "فوق داده"
 
 #: admin.py:42
-#, fuzzy
 msgid "flagged"
 msgid_plural "flagged"
-msgstr[0] "صفحه تخت"
+msgstr[0] ""
 
 #: admin.py:43
-#, fuzzy
 msgid "Flag selected comments"
-msgstr "فعال کردن نظرات"
+msgstr ""
 
 #: admin.py:47
 msgid "approved"
@@ -41,20 +37,17 @@ msgid_plural "approved"
 msgstr[0] ""
 
 #: admin.py:48
-#, fuzzy
 msgid "Approve selected comments"
-msgstr "فعال کردن نظرات"
+msgstr ""
 
 #: admin.py:52
-#, fuzzy
 msgid "removed"
 msgid_plural "removed"
-msgstr[0] "حذف شده است"
+msgstr[0] ""
 
 #: admin.py:53
-#, fuzzy
 msgid "Remove selected comments"
-msgstr "فعال کردن نظرات"
+msgstr ""
 
 #: admin.py:65
 #, python-format
@@ -63,14 +56,14 @@ msgid_plural "%(count)s comments were successfully %(action)s."
 msgstr[0] ""
 
 #: feeds.py:13
-#, fuzzy, python-format
+#, python-format
 msgid "%(site_name)s comments"
-msgstr "فعال کردن نظرات"
+msgstr ""
 
 #: feeds.py:23
-#, fuzzy, python-format
+#, python-format
 msgid "Latest comments on %(site_name)s"
-msgstr "برای حساب کاربریتان در %(site_name)s"
+msgstr ""
 
 #: forms.py:109
 msgid "Name"
@@ -155,9 +148,8 @@ msgid ""
 msgstr ""
 
 #: models.py:77
-#, fuzzy
 msgid "comments"
-msgstr "نظر"
+msgstr ""
 
 #: models.py:119
 msgid ""
@@ -189,29 +181,24 @@ msgstr ""
 "http://%(domain)s%(url)s"
 
 #: models.py:170
-#, fuzzy
 msgid "flag"
-msgstr "صفحه تخت"
+msgstr ""
 
 #: models.py:171
-#, fuzzy
 msgid "date"
-msgstr "هر تاریخی"
+msgstr ""
 
 #: models.py:181
-#, fuzzy
 msgid "comment flag"
-msgstr "نظر"
+msgstr ""
 
 #: models.py:182
-#, fuzzy
 msgid "comment flags"
-msgstr "نظر"
+msgstr ""
 
 #: templates/comments/approve.html:4
-#, fuzzy
 msgid "Approve a comment"
-msgstr "فعال کردن نظرات"
+msgstr ""
 
 #: templates/comments/approve.html:7
 msgid "Really make this comment public?"
@@ -222,9 +209,8 @@ msgid "Approve"
 msgstr ""
 
 #: templates/comments/approved.html:4
-#, fuzzy
 msgid "Thanks for approving"
-msgstr "متشکر از استفادهٔ شما از وبگاه ما"
+msgstr ""
 
 #: templates/comments/approved.html:7 templates/comments/deleted.html:7
 #: templates/comments/flagged.html:7
@@ -233,23 +219,20 @@ msgid ""
 msgstr ""
 
 #: templates/comments/delete.html:4
-#, fuzzy
 msgid "Remove a comment"
-msgstr "فعال کردن نظرات"
+msgstr ""
 
 #: templates/comments/delete.html:7
 msgid "Really remove this comment?"
 msgstr ""
 
 #: templates/comments/delete.html:12
-#, fuzzy
 msgid "Remove"
-msgstr "حذف شده است"
+msgstr ""
 
 #: templates/comments/deleted.html:4
-#, fuzzy
 msgid "Thanks for removing"
-msgstr "متشکر از استفادهٔ شما از وبگاه ما"
+msgstr ""
 
 #: templates/comments/flag.html:4
 msgid "Flag this comment"
@@ -264,19 +247,16 @@ msgid "Flag"
 msgstr ""
 
 #: templates/comments/flagged.html:4
-#, fuzzy
 msgid "Thanks for flagging"
-msgstr "متشکر از استفادهٔ شما از وبگاه ما"
+msgstr ""
 
 #: templates/comments/form.html:17 templates/comments/preview.html:32
-#, fuzzy
 msgid "Post"
-msgstr "اُم"
+msgstr ""
 
 #: templates/comments/form.html:18 templates/comments/preview.html:33
-#, fuzzy
 msgid "Preview"
-msgstr "نمایش:"
+msgstr ""
 
 #: templates/comments/posted.html:4
 msgid "Thanks for commenting"
@@ -291,10 +271,9 @@ msgid "Preview your comment"
 msgstr ""
 
 #: templates/comments/preview.html:11
-#, fuzzy
 msgid "Please correct the error below"
 msgid_plural "Please correct the errors below"
-msgstr[0] "لطفاً خطای زیر را حل کنید."
+msgstr[0] ""
 
 #: templates/comments/preview.html:16
 msgid "and"
@@ -305,6 +284,5 @@ msgid "Post your comment"
 msgstr ""
 
 #: templates/comments/preview.html:16
-#, fuzzy
 msgid "or make changes"
-msgstr "فیلدی تغییر نیافته است."
+msgstr ""

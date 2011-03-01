@@ -1,20 +1,19 @@
-# Django, ukrainian translation.
-# Copyright (C) 2008-2010
-# This file is distributed under the same license as the PACKAGE package.
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:24+0100\n"
-"PO-Revision-Date: 2010-04-06 00:02+0300\n"
-"Last-Translator: Mykola Zamkovoy <nickzam@gmail.com>\n"
-"Language-Team: UK <uk@li.org>\n"
+"POT-Creation-Date: 2011-02-28 23:42+0100\n"
+"PO-Revision-Date: 2011-02-22 00:10+0000\n"
+"Last-Translator: sergikoff <sergikoff88@gmail.com>\n"
+"Language-Team: Ukrainian <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
-"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"Language: uk\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
+"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
 
 #: admin.py:12
 msgid "Content"
@@ -25,43 +24,40 @@ msgid "Metadata"
 msgstr "Мета-дані"
 
 #: admin.py:42
-#, fuzzy
 msgid "flagged"
 msgid_plural "flagged"
-msgstr[0] "проста сторінка"
-msgstr[1] "проста сторінка"
-msgstr[2] "проста сторінка"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: admin.py:43
-#, fuzzy
 msgid "Flag selected comments"
-msgstr "Відмітити цей коментар?"
+msgstr ""
 
 #: admin.py:47
-#, fuzzy
 msgid "approved"
 msgid_plural "approved"
-msgstr[0] "Затвердити"
-msgstr[1] "Затвердити"
-msgstr[2] "Затвердити"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: admin.py:48
-#, fuzzy
 msgid "Approve selected comments"
-msgstr "Затвердіть коментар"
+msgstr ""
 
 #: admin.py:52
-#, fuzzy
 msgid "removed"
 msgid_plural "removed"
-msgstr[0] "видалений"
-msgstr[1] "видалений"
-msgstr[2] "видалений"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: admin.py:53
-#, fuzzy
 msgid "Remove selected comments"
-msgstr "Видалити коментар"
+msgstr ""
 
 #: admin.py:65
 #, python-format
@@ -70,16 +66,17 @@ msgid_plural "%(count)s comments were successfully %(action)s."
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: feeds.py:13
-#, fuzzy, python-format
+#, python-format
 msgid "%(site_name)s comments"
-msgstr "увімкнути коментарі"
+msgstr ""
 
 #: feeds.py:23
-#, fuzzy, python-format
+#, python-format
 msgid "Latest comments on %(site_name)s"
-msgstr "для вашого рахунку користувача на сайті %(site_name)s"
+msgstr ""
 
 #: forms.py:109
 msgid "Name"
@@ -101,9 +98,10 @@ msgstr "Коментар"
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
-msgstr[0] "Слідкуйте за виразами! Слово %s тут заборонено."
-msgstr[1] "Слідкуйте за виразами! Слова %s тут заборонені."
-msgstr[2] "Слідкуйте за виразами! Слова %s тут заборонені."
+msgstr[0] "Слідкуйте за своїм язиком! Тут не дозволено вживати слово %s. "
+msgstr[1] "Слідкуйте за своїм язиком! Тут не дозволено вживати слова %s. "
+msgstr[2] "Слідкуйте за своїм язиком! Тут не дозволено вживати слова %s. "
+msgstr[3] "Слідкуйте за своїм язиком! Тут не дозволено вживати слова %s. "
 
 #: forms.py:198
 msgid ""
@@ -153,7 +151,7 @@ msgstr "публічний"
 #: models.py:62
 msgid ""
 "Uncheck this box to make the comment effectively disappear from the site."
-msgstr "Заберіть галочку звідси, щоб коментар зник з сайту."
+msgstr "Видаліть галочку звідси, щоб коментар зник з сайту."
 
 #: models.py:64
 msgid "is removed"
@@ -203,24 +201,20 @@ msgstr ""
 "http://%(domain)s%(url)s"
 
 #: models.py:170
-#, fuzzy
 msgid "flag"
-msgstr "Відмітити"
+msgstr ""
 
 #: models.py:171
-#, fuzzy
 msgid "date"
-msgstr "Будь-яка дата"
+msgstr ""
 
 #: models.py:181
-#, fuzzy
 msgid "comment flag"
-msgstr "коментар"
+msgstr ""
 
 #: models.py:182
-#, fuzzy
 msgid "comment flags"
-msgstr "коментарі"
+msgstr ""
 
 #: templates/comments/approve.html:4
 msgid "Approve a comment"
@@ -301,9 +295,10 @@ msgstr "Попередній перегляд коментаря"
 #: templates/comments/preview.html:11
 msgid "Please correct the error below"
 msgid_plural "Please correct the errors below"
-msgstr[0] "Будь ласка, виправте помилку, що зазначена нижче"
-msgstr[1] "Будь ласка, виправте помилки, що зазначені нижче"
-msgstr[2] "Будь ласка, виправте помилки, що зазначені нижче"
+msgstr[0] "Будь ласка, виправте помилку зазначену нижче"
+msgstr[1] "Будь ласка, виправте помилки зазначені нижче"
+msgstr[2] "Будь ласка, виправте помилки зазначені нижче"
+msgstr[3] "Будь ласка, виправте помилки зазначені нижче"
 
 #: templates/comments/preview.html:16
 msgid "and"
@@ -315,4 +310,4 @@ msgstr "Опублікуйте коментар"
 
 #: templates/comments/preview.html:16
 msgid "or make changes"
-msgstr "або зробіть зміни."
+msgstr "або зробіть зміни"

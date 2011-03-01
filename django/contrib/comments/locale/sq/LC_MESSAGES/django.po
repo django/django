@@ -4,168 +4,178 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:24+0100\n"
-"PO-Revision-Date: 2010-01-27 23:01+0200\n"
-"Last-Translator: Besnik Bleta <besnik@programeshqip.org>\n"
-"Language-Team: Albanian <sq@li.org>\n"
+"POT-Creation-Date: 2011-02-28 23:42+0100\n"
+"PO-Revision-Date: 2011-02-22 00:10+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: Albanian <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: sq\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: admin.py:12
 msgid "Content"
-msgstr ""
+msgstr "Lëndë"
 
 #: admin.py:15
 msgid "Metadata"
-msgstr ""
+msgstr "Tejtëdhëna"
 
 #: admin.py:42
 msgid "flagged"
 msgid_plural "flagged"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "me shenjë"
+msgstr[1] "me shenjë"
 
 #: admin.py:43
 msgid "Flag selected comments"
-msgstr ""
+msgstr "Vëru shenjë komenteve të përzgjedhura"
 
 #: admin.py:47
 msgid "approved"
 msgid_plural "approved"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "i miratuar"
+msgstr[1] "të miratuar"
 
 #: admin.py:48
 msgid "Approve selected comments"
-msgstr ""
+msgstr "Miratoji komentet e përzgjedhura"
 
 #: admin.py:52
 msgid "removed"
 msgid_plural "removed"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "i hequr"
+msgstr[1] "të hequr"
 
 #: admin.py:53
 msgid "Remove selected comments"
-msgstr ""
+msgstr "Hiqi komentet e përzgjedhur"
 
 #: admin.py:65
 #, python-format
 msgid "1 comment was successfully %(action)s."
 msgid_plural "%(count)s comments were successfully %(action)s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "1 koment %(action)s me sukses."
+msgstr[1] "%(count)s komente %(action)s me sukses."
 
 #: feeds.py:13
 #, python-format
 msgid "%(site_name)s comments"
-msgstr ""
+msgstr "komente te %(site_name)s"
 
 #: feeds.py:23
 #, python-format
 msgid "Latest comments on %(site_name)s"
-msgstr ""
+msgstr "Komentet më të fundit te %(site_name)s"
 
 #: forms.py:109
 msgid "Name"
-msgstr ""
+msgstr "Emër"
 
 #: forms.py:110
 msgid "Email address"
-msgstr ""
+msgstr "Adresë email"
 
 #: forms.py:111
 msgid "URL"
-msgstr ""
+msgstr "URL"
 
 #: forms.py:112
 msgid "Comment"
-msgstr ""
+msgstr "Koment"
 
 #: forms.py:191
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Mbani gojën! Këtu nuk lejohet fjala %s."
+msgstr[1] "Mbani gojën! Këtu nuk lejohen fjalët %s."
 
 #: forms.py:198
 msgid ""
 "If you enter anything in this field your comment will be treated as spam"
 msgstr ""
+"Nëse fusni diçka në këtë fushë komenti juaj do të trajtohet si i pavlerë"
 
 #: models.py:22
 msgid "content type"
-msgstr ""
+msgstr "lloj lënde"
 
 #: models.py:24
 msgid "object ID"
-msgstr ""
+msgstr "ID objekti"
 
 #: models.py:50 models.py:168
 msgid "user"
-msgstr ""
+msgstr "përdorues"
 
 #: models.py:52
 msgid "user's name"
-msgstr ""
+msgstr "emri i përdoruesit"
 
 #: models.py:53
 msgid "user's email address"
-msgstr ""
+msgstr "adresa email e përdoruesit"
 
 #: models.py:54
 msgid "user's URL"
-msgstr ""
+msgstr "URL përdoruesi"
 
 #: models.py:56 models.py:76 models.py:169
 msgid "comment"
-msgstr ""
+msgstr "koment"
 
 #: models.py:59
 msgid "date/time submitted"
-msgstr ""
+msgstr "data/koha e parashtrimit"
 
 #: models.py:60
 msgid "IP address"
-msgstr ""
+msgstr "Adresë IP"
 
 #: models.py:61
 msgid "is public"
-msgstr ""
+msgstr "është publike"
 
 #: models.py:62
 msgid ""
 "Uncheck this box to make the comment effectively disappear from the site."
 msgstr ""
+"Hiqjani shenjën kësaj kutize që ta bëni komentin të zhduket faktikisht prej "
+"site-it."
 
 #: models.py:64
 msgid "is removed"
-msgstr ""
+msgstr "është hequr"
 
 #: models.py:65
 msgid ""
 "Check this box if the comment is inappropriate. A \"This comment has been "
 "removed\" message will be displayed instead."
 msgstr ""
+"I vini shenjë kësaj kutie, nëse komenti është i papërshtatshëm. Në vend të "
+"tij do të shfaqet një mesazh \"Ky koment është hequr\"."
 
 #: models.py:77
 msgid "comments"
-msgstr ""
+msgstr "komente"
 
 #: models.py:119
 msgid ""
 "This comment was posted by an authenticated user and thus the name is read-"
 "only."
 msgstr ""
+"Ky koment u postua nga një përdorues i mirëfilltësuar, ndaj emri është nën "
+"atributin vetëm-lexim."
 
 #: models.py:128
 msgid ""
 "This comment was posted by an authenticated user and thus the email is read-"
 "only."
 msgstr ""
+"Ky koment u postua nga një përdorues i mirëfilltësuar, ndaj email-i është "
+"nën atributin vetëm-lexim."
 
 #: models.py:153
 #, python-format
@@ -176,111 +186,118 @@ msgid ""
 "\n"
 "http://%(domain)s%(url)s"
 msgstr ""
+"Postuar nga %(user)s më %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
 
 #: models.py:170
 msgid "flag"
-msgstr ""
+msgstr "shenjë"
 
 #: models.py:171
 msgid "date"
-msgstr ""
+msgstr "datë"
 
 #: models.py:181
 msgid "comment flag"
-msgstr ""
+msgstr "shenjë komenti"
 
 #: models.py:182
 msgid "comment flags"
-msgstr ""
+msgstr "shenja komenti"
 
 #: templates/comments/approve.html:4
 msgid "Approve a comment"
-msgstr ""
+msgstr "Miratoni një koment"
 
 #: templates/comments/approve.html:7
 msgid "Really make this comment public?"
-msgstr ""
+msgstr "Të bëhet vërtet publik ky koment?"
 
 #: templates/comments/approve.html:12
 msgid "Approve"
-msgstr ""
+msgstr "Miratoje"
 
 #: templates/comments/approved.html:4
 msgid "Thanks for approving"
-msgstr ""
+msgstr "Faleminderit që e miratuat"
 
 #: templates/comments/approved.html:7 templates/comments/deleted.html:7
 #: templates/comments/flagged.html:7
 msgid ""
 "Thanks for taking the time to improve the quality of discussion on our site"
 msgstr ""
+"Faleminderit për kohën e harxhuar për përmirësimin e cilësisë së diskutimit "
+"në site-in tonë."
 
 #: templates/comments/delete.html:4
 msgid "Remove a comment"
-msgstr ""
+msgstr "Hiqni një koment"
 
 #: templates/comments/delete.html:7
 msgid "Really remove this comment?"
-msgstr ""
+msgstr "Të hiqet vërtet ky koment?"
 
 #: templates/comments/delete.html:12
 msgid "Remove"
-msgstr ""
+msgstr "Hiqe"
 
 #: templates/comments/deleted.html:4
 msgid "Thanks for removing"
-msgstr ""
+msgstr "Faleminderit që e hoqët"
 
 #: templates/comments/flag.html:4
 msgid "Flag this comment"
-msgstr ""
+msgstr "I vini shenjë këtij komenti"
 
 #: templates/comments/flag.html:7
 msgid "Really flag this comment?"
-msgstr ""
+msgstr "T'i vihet shenjë vërtet këtij komenti?"
 
 #: templates/comments/flag.html:12
 msgid "Flag"
-msgstr ""
+msgstr "Vëri shenjë"
 
 #: templates/comments/flagged.html:4
 msgid "Thanks for flagging"
-msgstr ""
+msgstr "Faleminderit që i vutë shenjë"
 
 #: templates/comments/form.html:17 templates/comments/preview.html:32
 msgid "Post"
-msgstr ""
+msgstr "Postoje"
 
 #: templates/comments/form.html:18 templates/comments/preview.html:33
 msgid "Preview"
-msgstr ""
+msgstr "Paraparje"
 
 #: templates/comments/posted.html:4
 msgid "Thanks for commenting"
-msgstr ""
+msgstr "Faleminderit që komentuat"
 
 #: templates/comments/posted.html:7
 msgid "Thank you for your comment"
-msgstr ""
+msgstr "Faleminderit për komentin tuaj"
 
 #: templates/comments/preview.html:4 templates/comments/preview.html.py:13
 msgid "Preview your comment"
-msgstr ""
+msgstr "Parashiheni komentin tuaj"
 
 #: templates/comments/preview.html:11
 msgid "Please correct the error below"
 msgid_plural "Please correct the errors below"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Ju lutem, ndreqni gabimin e mëposhtëm"
+msgstr[1] "Ju lutem, ndreqni gabimet e mëposhtme"
 
 #: templates/comments/preview.html:16
 msgid "and"
-msgstr ""
+msgstr " dhe "
 
 #: templates/comments/preview.html:16
 msgid "Post your comment"
-msgstr ""
+msgstr "Postojeni komentin tuaj"
 
 #: templates/comments/preview.html:16
 msgid "or make changes"
-msgstr ""
+msgstr "ose bëni ndryshime"

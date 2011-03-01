@@ -1,12 +1,12 @@
 # This file is distributed under the same license as the Django package.
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:23+0100\n"
-"PO-Revision-Date: 2011-02-06 05:56+0000\n"
-"Last-Translator: AbeEstrada <abraham.estrada@gmail.com>\n"
+"POT-Creation-Date: 2011-02-28 23:42+0100\n"
+"PO-Revision-Date: 2011-02-22 00:10+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
 "Language-Team: Spanish (Mexican) <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -93,7 +93,8 @@ msgstr[0] "¡Controla tu lenguaje! Aquí no admitimos la palabra %s."
 msgstr[1] "¡Controla tu lenguaje! Aquí no admitimos las palabras %s."
 
 #: forms.py:198
-msgid "If you enter anything in this field your comment will be treated as spam"
+msgid ""
+"If you enter anything in this field your comment will be treated as spam"
 msgstr "Si introduce algo en este campo su comentario será tratado como spam"
 
 #: models.py:22
@@ -137,7 +138,8 @@ msgid "is public"
 msgstr "es público"
 
 #: models.py:62
-msgid "Uncheck this box to make the comment effectively disappear from the site."
+msgid ""
+"Uncheck this box to make the comment effectively disappear from the site."
 msgstr "Desactive esta casilla para hacer el comentario desaparezca del sitio."
 
 #: models.py:64
@@ -145,20 +147,32 @@ msgid "is removed"
 msgstr "se ha eliminado"
 
 #: models.py:65
-msgid "Check this box if the comment is inappropriate. A \"This comment has been removed\" message will be displayed instead."
-msgstr "Marque esta casilla si el comentario es inapropiado. En su lugar se mostrará un mensaje \"Este comentario ha sido eliminado\"."
+msgid ""
+"Check this box if the comment is inappropriate. A \"This comment has been "
+"removed\" message will be displayed instead."
+msgstr ""
+"Marque esta casilla si el comentario es inapropiado. En su lugar se mostrará "
+"un mensaje \"Este comentario ha sido eliminado\"."
 
 #: models.py:77
 msgid "comments"
 msgstr "comentarios"
 
 #: models.py:119
-msgid "This comment was posted by an authenticated user and thus the name is read-only."
-msgstr "Este comentario ha sido enviado por un usuario identificado, por lo tanto el nombre no puede modificarse."
+msgid ""
+"This comment was posted by an authenticated user and thus the name is read-"
+"only."
+msgstr ""
+"Este comentario ha sido enviado por un usuario identificado, por lo tanto el "
+"nombre no puede modificarse."
 
 #: models.py:128
-msgid "This comment was posted by an authenticated user and thus the email is read-only."
-msgstr "Este comentario ha sido enviado por un usuario identificado, por lo tanto la dirección de correo electrónico no puede modificarse."
+msgid ""
+"This comment was posted by an authenticated user and thus the email is read-"
+"only."
+msgstr ""
+"Este comentario ha sido enviado por un usuario identificado, por lo tanto la "
+"dirección de correo electrónico no puede modificarse."
 
 #: models.py:153
 #, python-format
@@ -209,8 +223,11 @@ msgstr "Gracias por aprovar"
 
 #: templates/comments/approved.html:7 templates/comments/deleted.html:7
 #: templates/comments/flagged.html:7
-msgid "Thanks for taking the time to improve the quality of discussion on our site"
-msgstr "Gracias por tomarse el tiempo para mejorar la calidad de la  discución en nuestro sitio"
+msgid ""
+"Thanks for taking the time to improve the quality of discussion on our site"
+msgstr ""
+"Gracias por tomarse el tiempo para mejorar la calidad de la  discución en "
+"nuestro sitio"
 
 #: templates/comments/delete.html:4
 msgid "Remove a comment"

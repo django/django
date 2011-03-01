@@ -1,17 +1,18 @@
-# translation of django.po to Macedonian
+# This file is distributed under the same license as the Django package.
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:24+0100\n"
-"PO-Revision-Date: 2010-04-05 15:53+0100\n"
-"Last-Translator: Vasil Vangelovski <vvangelovski@gmail.com>\n"
-"Language-Team: Macedonian <ossm-members@hedona.on.net.mk>\n"
+"POT-Creation-Date: 2011-02-28 23:42+0100\n"
+"PO-Revision-Date: 2011-02-22 00:10+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: English <en@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.11.4\n"
-"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"Language: mk\n"
+"Plural-Forms: nplurals=2; plural=(n % 10 == 1 && n % 100 != 11) ? 0 : 1\n"
 
 #: admin.py:12
 msgid "Content"

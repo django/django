@@ -1,18 +1,18 @@
 # This file is distributed under the same license as the Django package.
 #
-# Urangua <urangua@adsolux.com>, 2010, 2002, 2010.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:24+0100\n"
-"PO-Revision-Date: 2010-03-11 17:23+0800\n"
-"Last-Translator: Urangua <urangua@adsolux.com>\n"
-"Language-Team: mn <translate@opensource.com>\n"
+"POT-Creation-Date: 2011-02-28 23:42+0100\n"
+"PO-Revision-Date: 2011-02-22 00:10+0000\n"
+"Last-Translator: Ankhbayar <l.ankhbayar@gmail.com>\n"
+"Language-Team: Mongolian <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: mn\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: admin.py:12
 msgid "Content"
@@ -23,56 +23,51 @@ msgid "Metadata"
 msgstr "Мета өгөгдөл"
 
 #: admin.py:42
-#, fuzzy
 msgid "flagged"
 msgid_plural "flagged"
-msgstr[0] "өөрчлөлтгүй хуудас"
-msgstr[1] "өөрчлөлтгүй хуудас"
+msgstr[0] "тэгдэглсэн"
+msgstr[1] "тэгдэглсэн"
 
 #: admin.py:43
-#, fuzzy
 msgid "Flag selected comments"
-msgstr "санал сэтгэгдэл үлдээх боломжтой болгох"
+msgstr "Сонгосон сэтгэгдэлүүдийг тэмдэглэ"
 
 #: admin.py:47
 msgid "approved"
 msgid_plural "approved"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "зөвшөөрөх"
+msgstr[1] "зөвшөөрөх"
 
 #: admin.py:48
-#, fuzzy
 msgid "Approve selected comments"
-msgstr "санал сэтгэгдэл үлдээх боломжтой болгох"
+msgstr "Сонгосон сэтгэгдэлүүдийг зөвшөөрөх"
 
 #: admin.py:52
-#, fuzzy
 msgid "removed"
 msgid_plural "removed"
-msgstr[0] "устлаа"
-msgstr[1] "устлаа"
+msgstr[0] "устгасан"
+msgstr[1] "устгасан"
 
 #: admin.py:53
-#, fuzzy
 msgid "Remove selected comments"
-msgstr "санал сэтгэгдэл үлдээх боломжтой болгох"
+msgstr "Сонгосон сэтгэгдэлүүдийг утсгах"
 
 #: admin.py:65
 #, python-format
 msgid "1 comment was successfully %(action)s."
 msgid_plural "%(count)s comments were successfully %(action)s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(count)s сэтгэгдэлийг амжилттай %(action)s."
+msgstr[1] "%(count)s сэтгэгдэлүүдийг амжилттай %(action)s."
 
 #: feeds.py:13
-#, fuzzy, python-format
+#, python-format
 msgid "%(site_name)s comments"
-msgstr "санал сэтгэгдэл үлдээх боломжтой болгох"
+msgstr "%(site_name)s сэтгэгдэлүүд"
 
 #: feeds.py:23
-#, fuzzy, python-format
+#, python-format
 msgid "Latest comments on %(site_name)s"
-msgstr "%(site_name)s гэсэн хэрэглэгчийн бүртгэлд "
+msgstr " %(site_name)s сүүлийн сэтгэгдэлүүд"
 
 #: forms.py:109
 msgid "Name"
@@ -88,21 +83,20 @@ msgstr "URL"
 
 #: forms.py:112
 msgid "Comment"
-msgstr "Санал сэтгэгдэл"
+msgstr "Сэтгэгдэл"
 
 #: forms.py:191
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
-msgstr[0] "Амаа мэдээрэй! %s гэсэн үг оруулах хориотой."
-msgstr[1] "Амаа мэдээрэй! %s гэсэн үг оруулах хориотой."
+msgstr[0] "Соёлтой байна уу! %s гэсэн үг оруулах хориотой."
+msgstr[1] "Соёлтой байна уу! %s гэсэн үгүүд оруулах хориотой."
 
 #: forms.py:198
 msgid ""
 "If you enter anything in this field your comment will be treated as spam"
 msgstr ""
-"Та энэ хэсэгт ямар нэг зүйл оруулбал санал сэтгэгдэлийг тань спам гэж үзэх "
-"болно."
+"Та энэ хэсэгт ямар нэг зүйл оруулбал таний сэтгэгдэлийг  спам гэж үзэх болно."
 
 #: models.py:22
 msgid "content type"
@@ -130,7 +124,7 @@ msgstr "хэрэглэгчийн URL"
 
 #: models.py:56 models.py:76 models.py:169
 msgid "comment"
-msgstr "санал сэтгэгдэл "
+msgstr "сэтгэгдэл"
 
 #: models.py:59
 msgid "date/time submitted"
@@ -165,9 +159,8 @@ msgstr ""
 "бичиг гарч ирнэ."
 
 #: models.py:77
-#, fuzzy
 msgid "comments"
-msgstr "санал сэтгэгдэл "
+msgstr "сэтгэгдэлүүд"
 
 #: models.py:119
 msgid ""
@@ -201,114 +194,101 @@ msgstr ""
 "http://%(domain)s%(url)s"
 
 #: models.py:170
-#, fuzzy
 msgid "flag"
-msgstr "өөрчлөлтгүй хуудас"
+msgstr "тэмдэг"
 
 #: models.py:171
-#, fuzzy
 msgid "date"
-msgstr "Өдөр харгалзахгүй"
+msgstr "огноо"
 
 #: models.py:181
-#, fuzzy
 msgid "comment flag"
-msgstr "санал сэтгэгдэл "
+msgstr "Тайлбарын тэмдэг"
 
 #: models.py:182
-#, fuzzy
 msgid "comment flags"
-msgstr "санал сэтгэгдэл "
+msgstr "тайлбарын тэмдэгүүд"
 
 #: templates/comments/approve.html:4
-#, fuzzy
 msgid "Approve a comment"
-msgstr "санал сэтгэгдэл үлдээх боломжтой болгох"
+msgstr "Сэтгэгдэл зөвшөөрөх"
 
 #: templates/comments/approve.html:7
 msgid "Really make this comment public?"
-msgstr ""
+msgstr "Үнэхээр энэ сэтгэгдэлийн нийтийн болгох гэж байна у?"
 
 #: templates/comments/approve.html:12
 msgid "Approve"
-msgstr ""
+msgstr "Зөвшөөрөх"
 
 #: templates/comments/approved.html:4
-#, fuzzy
 msgid "Thanks for approving"
-msgstr "Манай сайтыг хэрэглэсэнд баярлалаа!"
+msgstr "Зөвшөөрсөнд баяраллаа"
 
 #: templates/comments/approved.html:7 templates/comments/deleted.html:7
 #: templates/comments/flagged.html:7
 msgid ""
 "Thanks for taking the time to improve the quality of discussion on our site"
 msgstr ""
+"Манай сайтанд цаг гаргаж хэлэлцүүлэгийг сонирхолтой болгосонд баяраллаа."
 
 #: templates/comments/delete.html:4
-#, fuzzy
 msgid "Remove a comment"
-msgstr "санал сэтгэгдэл үлдээх боломжтой болгох"
+msgstr "Үнэхээр энэ сэтгэдэлийг"
 
 #: templates/comments/delete.html:7
 msgid "Really remove this comment?"
-msgstr ""
+msgstr "Үнхээр энэ сэтгэдэлийг устгах уу?"
 
 #: templates/comments/delete.html:12
-#, fuzzy
 msgid "Remove"
-msgstr "устлаа"
+msgstr "Устгах"
 
 #: templates/comments/deleted.html:4
-#, fuzzy
 msgid "Thanks for removing"
-msgstr "Манай сайтыг хэрэглэсэнд баярлалаа!"
+msgstr "Устгасанд баяраллаа"
 
 #: templates/comments/flag.html:4
 msgid "Flag this comment"
-msgstr ""
+msgstr "Энэ сэтгэгдэлийг тэмлэглэ"
 
 #: templates/comments/flag.html:7
 msgid "Really flag this comment?"
-msgstr ""
+msgstr "Үнэхээр энэ сэтгэдэлийг тэмдэглэх үү?"
 
 #: templates/comments/flag.html:12
-#, fuzzy
 msgid "Flag"
-msgstr "Малага"
+msgstr "Тэмдэг"
 
 #: templates/comments/flagged.html:4
-#, fuzzy
 msgid "Thanks for flagging"
-msgstr "Манай сайтыг хэрэглэсэнд баярлалаа!"
+msgstr "Тэмдэглсэнд баяраллаа"
 
 #: templates/comments/form.html:17 templates/comments/preview.html:32
-#, fuzzy
 msgid "Post"
-msgstr "-р"
+msgstr "Бичлэг"
 
 #: templates/comments/form.html:18 templates/comments/preview.html:33
-#, fuzzy
 msgid "Preview"
-msgstr "харах:"
+msgstr "Урьдчилан харах"
 
 #: templates/comments/posted.html:4
 msgid "Thanks for commenting"
-msgstr ""
+msgstr "Сэтгэгдэл үлдээсэнд баяраллаа"
 
 #: templates/comments/posted.html:7
 msgid "Thank you for your comment"
-msgstr ""
+msgstr "Сэтгэгдэл үлдээсэн таньд баяраллаа"
 
 #: templates/comments/preview.html:4 templates/comments/preview.html.py:13
 msgid "Preview your comment"
-msgstr ""
+msgstr "Өөрийн сэтгэгдэлээ урьдчилан харах"
 
 #: templates/comments/preview.html:11
-#, fuzzy
 msgid "Please correct the error below"
 msgid_plural "Please correct the errors below"
-msgstr[0] "Доорх алдааг засна уу."
-msgstr[1] "Доорх алдаануудыг засна уу."
+msgstr[0] "Доорх алдааг засна у"
+msgstr[1] "Доорх алдаануудыг засна у"
 
 #: templates/comments/preview.html:16
 msgid "and"
@@ -316,9 +296,8 @@ msgstr "ба"
 
 #: templates/comments/preview.html:16
 msgid "Post your comment"
-msgstr ""
+msgstr "Сэтгэгдэл оруулах"
 
 #: templates/comments/preview.html:16
-#, fuzzy
 msgid "or make changes"
-msgstr "Өөрчилсөн зүйл байхгүй байна."
+msgstr "эсвэл засвар хийх"

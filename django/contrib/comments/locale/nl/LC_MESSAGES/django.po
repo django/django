@@ -1,19 +1,18 @@
-# Dutch translation for Django.
-# Copyright (C) 2008, Django Software Foundation
 # This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:24+0100\n"
-"PO-Revision-Date: 2008-08-28 13:58+0100\n"
-"Last-Translator: Rudolph Froger <rudolphfroger@estrate.nl>\n"
-"Language-Team: \n"
+"POT-Creation-Date: 2011-02-28 23:42+0100\n"
+"PO-Revision-Date: 2011-02-22 00:10+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: Dutch <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: nl\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: admin.py:12
 msgid "Content"
@@ -24,47 +23,41 @@ msgid "Metadata"
 msgstr "Metadata"
 
 #: admin.py:42
-#, fuzzy
 msgid "flagged"
 msgid_plural "flagged"
-msgstr[0] "vlag"
-msgstr[1] "vlag"
+msgstr[0] "gemarkeerd"
+msgstr[1] "gemarkeerd"
 
 #: admin.py:43
-#, fuzzy
 msgid "Flag selected comments"
-msgstr "Vlag deze opmerking"
+msgstr "Markeer geselecteerde commentaren"
 
 #: admin.py:47
-#, fuzzy
 msgid "approved"
 msgid_plural "approved"
-msgstr[0] "Goedkeuren"
-msgstr[1] "Goedkeuren"
+msgstr[0] "goedgekeurd"
+msgstr[1] "goedgekeurd"
 
 #: admin.py:48
-#, fuzzy
 msgid "Approve selected comments"
-msgstr "Een opmerking toestaan"
+msgstr "Keur geselecteerde commentaren goed"
 
 #: admin.py:52
-#, fuzzy
 msgid "removed"
 msgid_plural "removed"
-msgstr[0] "is verwijderd"
-msgstr[1] "is verwijderd"
+msgstr[0] "verwijderd"
+msgstr[1] "verwijderd"
 
 #: admin.py:53
-#, fuzzy
 msgid "Remove selected comments"
-msgstr "Een opmerking verwijderen"
+msgstr "Verwijder geselecteerde commentaren"
 
 #: admin.py:65
 #, python-format
 msgid "1 comment was successfully %(action)s."
 msgid_plural "%(count)s comments were successfully %(action)s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] " %(count)s opmerking werd met succes %(action)s ."
+msgstr[1] " %(count)s opmerkingen werden met succes %(action)s ."
 
 #: feeds.py:13
 #, python-format

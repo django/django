@@ -1,22 +1,22 @@
-# Translation of django.po to Indonesian
 # This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:23+0100\n"
-"PO-Revision-Date: 2010-05-08 18:39+0700\n"
-"Last-Translator: Selwin Ong <selwin@ui.co.id>\n"
-"Language-Team: Indonesian <id@li.org>\n"
+"POT-Creation-Date: 2011-02-28 23:42+0100\n"
+"PO-Revision-Date: 2011-02-22 00:10+0000\n"
+"Last-Translator: rodin <romihardiyanto@gmail.com>\n"
+"Language-Team: Indonesian <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: id\n"
 "Plural-Forms: nplurals=1; plural=0\n"
 
 #: admin.py:12
 msgid "Content"
-msgstr "Konten"
+msgstr "Isi"
 
 #: admin.py:15
 msgid "Metadata"
@@ -29,7 +29,7 @@ msgstr[0] "ditandai"
 
 #: admin.py:43
 msgid "Flag selected comments"
-msgstr "Tandai komentar-komentar terpilih"
+msgstr "Tandai komentar terpilih"
 
 #: admin.py:47
 msgid "approved"
@@ -38,7 +38,7 @@ msgstr[0] "disetujui"
 
 #: admin.py:48
 msgid "Approve selected comments"
-msgstr "Setujui komentar-komentar terpilih"
+msgstr "Setujui komentar terpilih"
 
 #: admin.py:52
 msgid "removed"
@@ -47,23 +47,23 @@ msgstr[0] "dihapus"
 
 #: admin.py:53
 msgid "Remove selected comments"
-msgstr "Hapus komentar-komentar terpilih"
+msgstr "Hapus komentar terpilih"
 
 #: admin.py:65
 #, python-format
 msgid "1 comment was successfully %(action)s."
 msgid_plural "%(count)s comments were successfully %(action)s."
-msgstr[0] "%(count)s komentar berhasil di-%(action)s."
+msgstr[0] "%(count)s komentar berhasil %(action)s."
 
 #: feeds.py:13
 #, python-format
 msgid "%(site_name)s comments"
-msgstr "komentar-komentar di %(site_name)s"
+msgstr "komentar pada %(site_name)s"
 
 #: feeds.py:23
 #, python-format
 msgid "Latest comments on %(site_name)s"
-msgstr "Komentar-komentar terakhir di %(site_name)s"
+msgstr "Komentar terbaru pada %(site_name)s"
 
 #: forms.py:109
 msgid "Name"
@@ -85,13 +85,12 @@ msgstr "Komentar"
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
-msgstr[0] "Awas! Kata %s tidak di-ijinkan di sini."
+msgstr[0] "Awas! Kata %s tidak diizinkan di sini."
 
 #: forms.py:198
 msgid ""
 "If you enter anything in this field your comment will be treated as spam"
-msgstr ""
-"Apabila Anda mengisi field ini komentar Anda akan dianggap sebagai spam"
+msgstr "Jika Anda mengisi bidang ini, komentar Anda akan dianggap sebagai spam"
 
 #: models.py:22
 msgid "content type"
@@ -99,7 +98,7 @@ msgstr "tipe konten"
 
 #: models.py:24
 msgid "object ID"
-msgstr "ID obyek"
+msgstr "ID objek"
 
 #: models.py:50 models.py:168
 msgid "user"
@@ -123,7 +122,7 @@ msgstr "komentar"
 
 #: models.py:59
 msgid "date/time submitted"
-msgstr "tanggal/waktu disimpan"
+msgstr "tanggal/waktu dikirim"
 
 #: models.py:60
 msgid "IP address"
@@ -136,7 +135,8 @@ msgstr "untuk umum"
 #: models.py:62
 msgid ""
 "Uncheck this box to make the comment effectively disappear from the site."
-msgstr "Jangan centang box ini untuk membuat komentar hilang dari situs."
+msgstr ""
+"Hapus centang pada kotak ini agar komentar tidak ditampilkan pada situs."
 
 #: models.py:64
 msgid "is removed"
@@ -147,19 +147,19 @@ msgid ""
 "Check this box if the comment is inappropriate. A \"This comment has been "
 "removed\" message will be displayed instead."
 msgstr ""
-"Centang box ini apabila komentar tidak pantas. Sebuah pesan \"Komentar ini "
-"telah dihapus\" akan ditampilkan sebagai penggantinya."
+"Centang kotak ini jika komentar tidak pantas. Pesan \"Komentar ini telah "
+"dihapus\" akan ditampilkan sebagai penggantinya."
 
 #: models.py:77
 msgid "comments"
-msgstr "komentar-komentar"
+msgstr "komentar"
 
 #: models.py:119
 msgid ""
 "This comment was posted by an authenticated user and thus the name is read-"
 "only."
 msgstr ""
-"Komentar ini dikirim oleh seorang pengguna yang ter-otentikasi sehingga nama "
+"Komentar ini dikirim oleh seorang pengguna terautentikasi sehingga nama "
 "pengguna tidak dapat diubah."
 
 #: models.py:128
@@ -167,8 +167,8 @@ msgid ""
 "This comment was posted by an authenticated user and thus the email is read-"
 "only."
 msgstr ""
-"Komentar ini dikirim oleh seorang pengguna yang ter-otentikasi sehingga "
-"alamat email tidak dapat diubah."
+"Komentar ini dikirim oleh seorang pengguna terautentikasi sehingga alamat "
+"email tidak dapat diubah."
 
 #: models.py:153
 #, python-format
@@ -179,7 +179,7 @@ msgid ""
 "\n"
 "http://%(domain)s%(url)s"
 msgstr ""
-"Dikirim oleh %(user)s pada tanggal %(date)s\n"
+"Dikirim oleh %(user)s pada %(date)s\n"
 "\n"
 "%(comment)s\n"
 "\n"
@@ -199,34 +199,34 @@ msgstr "tanda komentar"
 
 #: models.py:182
 msgid "comment flags"
-msgstr "tanda-tanda komentar"
+msgstr "tanda komentar"
 
 #: templates/comments/approve.html:4
 msgid "Approve a comment"
-msgstr "Perbolehkan sebuah komentar"
+msgstr "Setujui komentar"
 
 #: templates/comments/approve.html:7
 msgid "Really make this comment public?"
-msgstr "Yakin ingin membuka komentar ini untuk umum?"
+msgstr "Yakin ingin menampilkan komentar ini untuk umum?"
 
 #: templates/comments/approve.html:12
 msgid "Approve"
-msgstr "Perbolehkan"
+msgstr "Setujui"
 
 #: templates/comments/approved.html:4
 msgid "Thanks for approving"
-msgstr "Terima kasih telah memperbolehkan"
+msgstr "Terima kasih telah menyetujui komentar"
 
 #: templates/comments/approved.html:7 templates/comments/deleted.html:7
 #: templates/comments/flagged.html:7
 msgid ""
 "Thanks for taking the time to improve the quality of discussion on our site"
 msgstr ""
-"Terima kasih telah membantu meningkatkan kualitas diskusi di situs kami"
+"Terima kasih telah membantu meningkatkan kualitas diskusi pada situs kami"
 
 #: templates/comments/delete.html:4
 msgid "Remove a comment"
-msgstr "Hapus sebuah komentar"
+msgstr "Hapus komentar"
 
 #: templates/comments/delete.html:7
 msgid "Really remove this comment?"
@@ -262,7 +262,7 @@ msgstr "Kirim"
 
 #: templates/comments/form.html:18 templates/comments/preview.html:33
 msgid "Preview"
-msgstr "Preview"
+msgstr "Pratinjau"
 
 #: templates/comments/posted.html:4
 msgid "Thanks for commenting"
@@ -274,7 +274,7 @@ msgstr "Terima kasih atas komentar Anda"
 
 #: templates/comments/preview.html:4 templates/comments/preview.html.py:13
 msgid "Preview your comment"
-msgstr "Preview komentar Anda"
+msgstr "Pratinjau komentar Anda"
 
 #: templates/comments/preview.html:11
 msgid "Please correct the error below"

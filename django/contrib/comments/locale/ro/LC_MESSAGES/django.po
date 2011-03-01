@@ -1,64 +1,60 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:24+0100\n"
-"PO-Revision-Date: 2008-04-25 21:44+0200\n"
-"Last-Translator: \n"
-"Language-Team: Romanian <ro@li.org>\n"
+"POT-Creation-Date: 2011-02-28 23:42+0100\n"
+"PO-Revision-Date: 2011-02-22 00:10+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: Romanian <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: ro\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < "
+"20)) ? 1 : 2)\n"
 
 #: admin.py:12
-#, fuzzy
 msgid "Content"
-msgstr "conţinut"
+msgstr ""
 
 #: admin.py:15
 msgid "Metadata"
 msgstr ""
 
 #: admin.py:42
-#, fuzzy
 msgid "flagged"
 msgid_plural "flagged"
-msgstr[0] "data marcării"
-msgstr[1] "data marcării"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: admin.py:43
-#, fuzzy
 msgid "Flag selected comments"
-msgstr "permite comentarii"
+msgstr ""
 
 #: admin.py:47
-#, fuzzy
 msgid "approved"
 msgid_plural "approved"
-msgstr[0] "aprobat de echipă"
-msgstr[1] "aprobat de echipă"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: admin.py:48
-#, fuzzy
 msgid "Approve selected comments"
-msgstr "permite comentarii fara înregistrare"
+msgstr ""
 
 #: admin.py:52
-#, fuzzy
 msgid "removed"
 msgid_plural "removed"
-msgstr[0] "șters"
-msgstr[1] "șters"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: admin.py:53
-#, fuzzy
 msgid "Remove selected comments"
-msgstr "permite comentarii"
+msgstr ""
 
 #: admin.py:65
 #, python-format
@@ -66,42 +62,41 @@ msgid "1 comment was successfully %(action)s."
 msgid_plural "%(count)s comments were successfully %(action)s."
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 #: feeds.py:13
-#, fuzzy, python-format
+#, python-format
 msgid "%(site_name)s comments"
-msgstr "permite comentarii"
+msgstr ""
 
 #: feeds.py:23
-#, fuzzy, python-format
+#, python-format
 msgid "Latest comments on %(site_name)s"
-msgstr "pentru contul tău la %(site_name)s"
+msgstr ""
 
 #: forms.py:109
-#, fuzzy
 msgid "Name"
-msgstr "nume"
+msgstr ""
 
 #: forms.py:110
-#, fuzzy
 msgid "Email address"
-msgstr "Adresa email"
+msgstr ""
 
 #: forms.py:111
 msgid "URL"
 msgstr "URL"
 
 #: forms.py:112
-#, fuzzy
 msgid "Comment"
-msgstr "Comentariu:"
+msgstr ""
 
 #: forms.py:191
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
-msgstr[0] "Îngrijiţi-vă limbajul! Cuvântul %s nu este permis aici."
-msgstr[1] "Îngrijiţi-vă limbajul! Cuvintele %s nu sunt permise aici."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: forms.py:198
 msgid ""
@@ -121,19 +116,16 @@ msgid "user"
 msgstr "utilizator"
 
 #: models.py:52
-#, fuzzy
 msgid "user's name"
-msgstr "nume utilizator"
+msgstr ""
 
 #: models.py:53
-#, fuzzy
 msgid "user's email address"
-msgstr "adresă email"
+msgstr ""
 
 #: models.py:54
-#, fuzzy
 msgid "user's URL"
-msgstr "utilizatori"
+msgstr ""
 
 #: models.py:56 models.py:76 models.py:169
 msgid "comment"
@@ -173,24 +165,16 @@ msgid "comments"
 msgstr "comentarii"
 
 #: models.py:119
-#, fuzzy
 msgid ""
 "This comment was posted by an authenticated user and thus the name is read-"
 "only."
 msgstr ""
-"Acest comentariu a fost postat de un utilizator neordonat:\n"
-"\n"
-"%(text)s"
 
 #: models.py:128
-#, fuzzy
 msgid ""
 "This comment was posted by an authenticated user and thus the email is read-"
 "only."
 msgstr ""
-"Acest comentariu a fost postat de un utilizator neordonat:\n"
-"\n"
-"%(text)s"
 
 #: models.py:153
 #, python-format
@@ -208,29 +192,24 @@ msgstr ""
 "http://%(domain)s%(url)s"
 
 #: models.py:170
-#, fuzzy
 msgid "flag"
-msgstr "data marcării"
+msgstr ""
 
 #: models.py:171
-#, fuzzy
 msgid "date"
-msgstr "orice data"
+msgstr ""
 
 #: models.py:181
-#, fuzzy
 msgid "comment flag"
-msgstr "comentariu"
+msgstr ""
 
 #: models.py:182
-#, fuzzy
 msgid "comment flags"
-msgstr "comentarii"
+msgstr ""
 
 #: templates/comments/approve.html:4
-#, fuzzy
 msgid "Approve a comment"
-msgstr "permite comentariu fara înregistrare"
+msgstr ""
 
 #: templates/comments/approve.html:7
 msgid "Really make this comment public?"
@@ -241,9 +220,8 @@ msgid "Approve"
 msgstr ""
 
 #: templates/comments/approved.html:4
-#, fuzzy
 msgid "Thanks for approving"
-msgstr "Mulţumesc pentru folosirea sitului nostru!"
+msgstr ""
 
 #: templates/comments/approved.html:7 templates/comments/deleted.html:7
 #: templates/comments/flagged.html:7
@@ -252,23 +230,20 @@ msgid ""
 msgstr ""
 
 #: templates/comments/delete.html:4
-#, fuzzy
 msgid "Remove a comment"
-msgstr "permite comentariu fara înregistrare"
+msgstr ""
 
 #: templates/comments/delete.html:7
 msgid "Really remove this comment?"
 msgstr ""
 
 #: templates/comments/delete.html:12
-#, fuzzy
 msgid "Remove"
-msgstr "șters"
+msgstr ""
 
 #: templates/comments/deleted.html:4
-#, fuzzy
 msgid "Thanks for removing"
-msgstr "Mulţumesc pentru folosirea sitului nostru!"
+msgstr ""
 
 #: templates/comments/flag.html:4
 msgid "Flag this comment"
@@ -279,56 +254,48 @@ msgid "Really flag this comment?"
 msgstr ""
 
 #: templates/comments/flag.html:12
-#, fuzzy
 msgid "Flag"
-msgstr "Malaga"
+msgstr ""
 
 #: templates/comments/flagged.html:4
-#, fuzzy
 msgid "Thanks for flagging"
-msgstr "Mulţumesc pentru folosirea sitului nostru!"
+msgstr ""
 
 #: templates/comments/form.html:17 templates/comments/preview.html:32
-#, fuzzy
 msgid "Post"
-msgstr "ul"
+msgstr ""
 
 #: templates/comments/form.html:18 templates/comments/preview.html:33
-#, fuzzy
 msgid "Preview"
-msgstr "view:"
+msgstr ""
 
 #: templates/comments/posted.html:4
-#, fuzzy
 msgid "Thanks for commenting"
-msgstr "permite comentariu fara înregistrare"
+msgstr ""
 
 #: templates/comments/posted.html:7
 msgid "Thank you for your comment"
 msgstr ""
 
 #: templates/comments/preview.html:4 templates/comments/preview.html.py:13
-#, fuzzy
 msgid "Preview your comment"
-msgstr "Previzualizare comentariu"
+msgstr ""
 
 #: templates/comments/preview.html:11
-#, fuzzy
 msgid "Please correct the error below"
 msgid_plural "Please correct the errors below"
-msgstr[0] "Vă rugăm să corectați eroarea de mai jos"
-msgstr[1] "Vă rugăm să corectați erorile de mai jos"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: templates/comments/preview.html:16
 msgid "and"
 msgstr "și"
 
 #: templates/comments/preview.html:16
-#, fuzzy
 msgid "Post your comment"
-msgstr "Previzualizare comentariu"
+msgstr ""
 
 #: templates/comments/preview.html:16
-#, fuzzy
 msgid "or make changes"
-msgstr "Nici-un câmp nu a fost schimbat."
+msgstr ""

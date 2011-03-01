@@ -1,20 +1,20 @@
-# This file is distributed under the same license as the django package.
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:24+0100\n"
-"PO-Revision-Date: 2007-04-05 01:32+1000\n"
-"Last-Translator: Terry Huang <terryh.tp@gmail.com>\n"
-"Language-Team: Terry Huang <terryh.tp@gmail.com>\n"
+"POT-Creation-Date: 2011-02-28 23:42+0100\n"
+"PO-Revision-Date: 2011-02-22 00:10+0000\n"
+"Last-Translator: tcc <tcchou@tcchou.org>\n"
+"Language-Team: Chinese (Taiwan) <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Language: zh_TW\n"
+"Plural-Forms: nplurals=1; plural=0\n"
 
 #: admin.py:12
-#, fuzzy
 msgid "Content"
 msgstr "內容"
 
@@ -23,60 +23,53 @@ msgid "Metadata"
 msgstr "元資料"
 
 #: admin.py:42
-#, fuzzy
 msgid "flagged"
 msgid_plural "flagged"
-msgstr[0] "簡平頁面"
+msgstr[0] "已標記"
 
 #: admin.py:43
-#, fuzzy
 msgid "Flag selected comments"
-msgstr "啟用評論"
+msgstr "標記已選評論"
 
 #: admin.py:47
 msgid "approved"
 msgid_plural "approved"
-msgstr[0] ""
+msgstr[0] "已核可"
 
 #: admin.py:48
-#, fuzzy
 msgid "Approve selected comments"
-msgstr "啟用評論"
+msgstr "核可已選評論"
 
 #: admin.py:52
-#, fuzzy
 msgid "removed"
 msgid_plural "removed"
-msgstr[0] "已刪除"
+msgstr[0] "已移除"
 
 #: admin.py:53
-#, fuzzy
 msgid "Remove selected comments"
-msgstr "啟用評論"
+msgstr "移除已選評論"
 
 #: admin.py:65
 #, python-format
 msgid "1 comment was successfully %(action)s."
 msgid_plural "%(count)s comments were successfully %(action)s."
-msgstr[0] ""
+msgstr[0] "%(count)s 個評論已成功完成%(action)s。"
 
 #: feeds.py:13
-#, fuzzy, python-format
+#, python-format
 msgid "%(site_name)s comments"
-msgstr "啟用評論"
+msgstr "%(site_name)s 評論"
 
 #: feeds.py:23
-#, fuzzy, python-format
+#, python-format
 msgid "Latest comments on %(site_name)s"
-msgstr "你在 %(site_name)s 裡的使用者帳號"
+msgstr "最新評論在 %(site_name)s"
 
 #: forms.py:109
-#, fuzzy
 msgid "Name"
 msgstr "名稱"
 
 #: forms.py:110
-#, fuzzy
 msgid "Email address"
 msgstr "電子郵件地址"
 
@@ -85,7 +78,6 @@ msgid "URL"
 msgstr "URL"
 
 #: forms.py:112
-#, fuzzy
 msgid "Comment"
 msgstr "評論"
 
@@ -113,19 +105,16 @@ msgid "user"
 msgstr "使用者"
 
 #: models.py:52
-#, fuzzy
 msgid "user's name"
 msgstr "使用者名稱"
 
 #: models.py:53
-#, fuzzy
 msgid "user's email address"
-msgstr "使用者電子郵件地址"
+msgstr "使用者電子郵件"
 
 #: models.py:54
-#, fuzzy
 msgid "user's URL"
-msgstr "使用者的網址"
+msgstr "使用者 URL"
 
 #: models.py:56 models.py:76 models.py:169
 msgid "comment"
@@ -146,7 +135,7 @@ msgstr "公開"
 #: models.py:62
 msgid ""
 "Uncheck this box to make the comment effectively disappear from the site."
-msgstr ""
+msgstr "取消這個選項可讓評論立刻在網站消失。"
 
 #: models.py:64
 msgid "is removed"
@@ -159,23 +148,20 @@ msgid ""
 msgstr "如果此評論不恰當則選取這個檢查框，其將以 \"此評論已被移除\" 訊息取代。"
 
 #: models.py:77
-#, fuzzy
 msgid "comments"
 msgstr "評論"
 
 #: models.py:119
-#, fuzzy
 msgid ""
 "This comment was posted by an authenticated user and thus the name is read-"
 "only."
-msgstr "此評論由一位已驗證的使用者發佈，該名稱是唯讀的。"
+msgstr "這個評論由認證的使用者張貼, 因此名稱是唯讀的。"
 
 #: models.py:128
-#, fuzzy
 msgid ""
 "This comment was posted by an authenticated user and thus the email is read-"
 "only."
-msgstr "此評論由一位已驗證的使用者發佈，該 email 是唯讀的。"
+msgstr "這個評論由認證的使用者張貼, 因此名稱是唯讀的。"
 
 #: models.py:153
 #, python-format
@@ -193,113 +179,99 @@ msgstr ""
 "http://%(domain)s%(url)s"
 
 #: models.py:170
-#, fuzzy
 msgid "flag"
-msgstr "簡平頁面"
+msgstr "標記"
 
 #: models.py:171
-#, fuzzy
 msgid "date"
-msgstr "任何日期"
+msgstr "日期"
 
 #: models.py:181
-#, fuzzy
 msgid "comment flag"
-msgstr "評論"
+msgstr "標記評論"
 
 #: models.py:182
-#, fuzzy
 msgid "comment flags"
-msgstr "評論"
+msgstr "評論標記"
 
 #: templates/comments/approve.html:4
-#, fuzzy
 msgid "Approve a comment"
-msgstr "啟用評論"
+msgstr "審核一個評論"
 
 #: templates/comments/approve.html:7
 msgid "Really make this comment public?"
-msgstr ""
+msgstr "真的要讓這個評論公開?"
 
 #: templates/comments/approve.html:12
 msgid "Approve"
-msgstr ""
+msgstr "核可"
 
 #: templates/comments/approved.html:4
-#, fuzzy
 msgid "Thanks for approving"
-msgstr "感謝使用本網站！"
+msgstr "感謝進行審核"
 
 #: templates/comments/approved.html:7 templates/comments/deleted.html:7
 #: templates/comments/flagged.html:7
 msgid ""
 "Thanks for taking the time to improve the quality of discussion on our site"
-msgstr ""
+msgstr "感謝花費時間增進網站討論的品質"
 
 #: templates/comments/delete.html:4
-#, fuzzy
 msgid "Remove a comment"
-msgstr "啟用評論"
+msgstr "移除一個評論"
 
 #: templates/comments/delete.html:7
 msgid "Really remove this comment?"
-msgstr ""
+msgstr "真的要移除這個評論?"
 
 #: templates/comments/delete.html:12
-#, fuzzy
 msgid "Remove"
-msgstr "已刪除"
+msgstr "移除"
 
 #: templates/comments/deleted.html:4
-#, fuzzy
 msgid "Thanks for removing"
-msgstr "感謝使用本網站！"
+msgstr "感謝移除"
 
 #: templates/comments/flag.html:4
 msgid "Flag this comment"
-msgstr ""
+msgstr "標記這個評論"
 
 #: templates/comments/flag.html:7
 msgid "Really flag this comment?"
-msgstr ""
+msgstr "真的要標記這個評論?"
 
 #: templates/comments/flag.html:12
-#, fuzzy
 msgid "Flag"
-msgstr "左賀"
+msgstr "標記"
 
 #: templates/comments/flagged.html:4
-#, fuzzy
 msgid "Thanks for flagging"
-msgstr "感謝使用本網站！"
+msgstr "感謝標記"
 
 #: templates/comments/form.html:17 templates/comments/preview.html:32
-#, fuzzy
 msgid "Post"
-msgstr "st"
+msgstr "張貼"
 
 #: templates/comments/form.html:18 templates/comments/preview.html:33
-#, fuzzy
 msgid "Preview"
-msgstr "視圖："
+msgstr "預覽"
 
 #: templates/comments/posted.html:4
 msgid "Thanks for commenting"
-msgstr ""
+msgstr "感謝寫下評論"
 
 #: templates/comments/posted.html:7
 msgid "Thank you for your comment"
-msgstr ""
+msgstr "謝謝你的評論"
 
 #: templates/comments/preview.html:4 templates/comments/preview.html.py:13
 msgid "Preview your comment"
-msgstr ""
+msgstr "預覽你的評論"
 
 #: templates/comments/preview.html:11
-#, fuzzy
 msgid "Please correct the error below"
 msgid_plural "Please correct the errors below"
-msgstr[0] "请更正下面的錯誤。"
+msgstr[0] "請修正下面的錯誤"
 
 #: templates/comments/preview.html:16
 msgid "and"
@@ -307,9 +279,8 @@ msgstr "和"
 
 #: templates/comments/preview.html:16
 msgid "Post your comment"
-msgstr ""
+msgstr "張貼你的評論"
 
 #: templates/comments/preview.html:16
-#, fuzzy
 msgid "or make changes"
-msgstr "沒有欄位被變更。"
+msgstr "或進行變更"

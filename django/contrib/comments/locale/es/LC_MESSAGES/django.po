@@ -1,18 +1,18 @@
-# Spanish translation for the django project
-# Copyright (C) 2008, The Django Project
-# This file is distributed under the same license as the django package.
+# This file is distributed under the same license as the Django package.
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:23+0100\n"
-"PO-Revision-Date: 2009-11-30 11:31+0100\n"
-"Last-Translator: Django Spanish Team, <django-cat@googlegroups.com>\n"
-"Language-Team: Django Spanish Team, <django-cat@googlegroups.com>\n"
+"POT-Creation-Date: 2011-02-28 23:41+0100\n"
+"PO-Revision-Date: 2011-02-22 00:10+0000\n"
+"Last-Translator: garcia_marc <garcia.marc@gmail.com>\n"
+"Language-Team: Spanish (Castilian) <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: es\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: admin.py:12
 msgid "Content"
@@ -23,33 +23,30 @@ msgid "Metadata"
 msgstr "metadatos"
 
 #: admin.py:42
-#, fuzzy
 msgid "flagged"
 msgid_plural "flagged"
 msgstr[0] "marcado"
-msgstr[1] "marcado"
+msgstr[1] "marcados"
 
 #: admin.py:43
 msgid "Flag selected comments"
 msgstr "Marcar los comentarios seleccionados"
 
 #: admin.py:47
-#, fuzzy
 msgid "approved"
 msgid_plural "approved"
 msgstr[0] "aprobado"
-msgstr[1] "aprobado"
+msgstr[1] "aprobados"
 
 #: admin.py:48
 msgid "Approve selected comments"
 msgstr "aprobar los comentarios seleccionados"
 
 #: admin.py:52
-#, fuzzy
 msgid "removed"
 msgid_plural "removed"
 msgstr[0] "eliminado"
-msgstr[1] "eliminado"
+msgstr[1] "eliminados"
 
 #: admin.py:53
 msgid "Remove selected comments"

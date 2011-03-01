@@ -1,66 +1,56 @@
-# translation of django-new.po to tamil
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# PONNUSAMY.A <ponnusamy.simpleman@gmail.com>, 2007.
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:24+0100\n"
-"PO-Revision-Date: 2007-03-15 16:48+0530\n"
-"Last-Translator: PONNUSAMY <ponnusamy.simpleman@gmail.com>\n"
-"Language-Team: tamil <tamilinix@yahoogroups.com>\n"
+"POT-Creation-Date: 2011-02-28 23:42+0100\n"
+"PO-Revision-Date: 2011-02-22 00:10+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: English <en@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.11.4\n"
-"Plural-Forms: nplurals=2; plural=n>1;\n"
+"Language: ta\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: admin.py:12
-#, fuzzy
 msgid "Content"
-msgstr "பொருளடக்கம்"
+msgstr ""
 
 #: admin.py:15
 msgid "Metadata"
 msgstr ""
 
 #: admin.py:42
-#, fuzzy
 msgid "flagged"
 msgid_plural "flagged"
-msgstr[0] "குறியின் தேதி"
-msgstr[1] "குறியின் தேதி"
+msgstr[0] ""
+msgstr[1] ""
 
 #: admin.py:43
-#, fuzzy
 msgid "Flag selected comments"
-msgstr "விமர்சனங்களை செயலாக்கு"
+msgstr ""
 
 #: admin.py:47
-#, fuzzy
 msgid "approved"
 msgid_plural "approved"
-msgstr[0] "பணியாளர்களால் அனுமதிக்கப்பட்டது"
-msgstr[1] "பணியாளர்களால் அனுமதிக்கப்பட்டது"
+msgstr[0] ""
+msgstr[1] ""
 
 #: admin.py:48
-#, fuzzy
 msgid "Approve selected comments"
-msgstr "சுதந்தரமான குறிப்புகள்"
+msgstr ""
 
 #: admin.py:52
-#, fuzzy
 msgid "removed"
 msgid_plural "removed"
-msgstr[0] "நீக்கபட்டது"
-msgstr[1] "நீக்கபட்டது"
+msgstr[0] ""
+msgstr[1] ""
 
 #: admin.py:53
-#, fuzzy
 msgid "Remove selected comments"
-msgstr "விமர்சனங்களை செயலாக்கு"
+msgstr ""
 
 #: admin.py:65
 #, python-format
@@ -70,33 +60,30 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: feeds.py:13
-#, fuzzy, python-format
+#, python-format
 msgid "%(site_name)s comments"
-msgstr "விமர்சனங்களை செயலாக்கு"
+msgstr ""
 
 #: feeds.py:23
-#, fuzzy, python-format
+#, python-format
 msgid "Latest comments on %(site_name)s"
-msgstr "%(site_name)s -இல் உள்ள உங்களது பயனாளர் கணக்கு"
+msgstr ""
 
 #: forms.py:109
-#, fuzzy
 msgid "Name"
-msgstr "பெயர்"
+msgstr ""
 
 #: forms.py:110
-#, fuzzy
 msgid "Email address"
-msgstr "மின் அஞ்சல்"
+msgstr ""
 
 #: forms.py:111
 msgid "URL"
 msgstr "URL"
 
 #: forms.py:112
-#, fuzzy
 msgid "Comment"
-msgstr "விவரம்:"
+msgstr ""
 
 #: forms.py:191
 #, python-format
@@ -123,19 +110,16 @@ msgid "user"
 msgstr "பயனர்"
 
 #: models.py:52
-#, fuzzy
 msgid "user's name"
-msgstr "பயனர் பெயர்"
+msgstr ""
 
 #: models.py:53
-#, fuzzy
 msgid "user's email address"
-msgstr "மின்னஞ்சல் முகவரி"
+msgstr ""
 
 #: models.py:54
-#, fuzzy
 msgid "user's URL"
-msgstr "பயனர்கள்"
+msgstr ""
 
 #: models.py:56 models.py:76 models.py:169
 msgid "comment"
@@ -175,24 +159,16 @@ msgid "comments"
 msgstr "குறிப்பு"
 
 #: models.py:119
-#, fuzzy
 msgid ""
 "This comment was posted by an authenticated user and thus the name is read-"
 "only."
 msgstr ""
-"முழுமையான விவரங்களை அளிக்காத பயனாளரால் கொடுக்கப்பட்டது:\n"
-"\n"
-"%(text)s"
 
 #: models.py:128
-#, fuzzy
 msgid ""
 "This comment was posted by an authenticated user and thus the email is read-"
 "only."
 msgstr ""
-"முழுமையான விவரங்களை அளிக்காத பயனாளரால் கொடுக்கப்பட்டது:\n"
-"\n"
-"%(text)s"
 
 #: models.py:153
 #, python-format
@@ -210,29 +186,24 @@ msgstr ""
 "http://%(domain)s%(url)s"
 
 #: models.py:170
-#, fuzzy
 msgid "flag"
-msgstr "குறியின் தேதி"
+msgstr ""
 
 #: models.py:171
-#, fuzzy
 msgid "date"
-msgstr "எந்த தேதியும்"
+msgstr ""
 
 #: models.py:181
-#, fuzzy
 msgid "comment flag"
-msgstr "குறிப்பு"
+msgstr ""
 
 #: models.py:182
-#, fuzzy
 msgid "comment flags"
-msgstr "குறிப்பு"
+msgstr ""
 
 #: templates/comments/approve.html:4
-#, fuzzy
 msgid "Approve a comment"
-msgstr "சுதந்தரமான குறிப்பு"
+msgstr ""
 
 #: templates/comments/approve.html:7
 msgid "Really make this comment public?"
@@ -243,9 +214,8 @@ msgid "Approve"
 msgstr ""
 
 #: templates/comments/approved.html:4
-#, fuzzy
 msgid "Thanks for approving"
-msgstr "எங்களது வலைத்தளத்தை பயன் படுத்தியதற்கு மிகுந்த நன்றி"
+msgstr ""
 
 #: templates/comments/approved.html:7 templates/comments/deleted.html:7
 #: templates/comments/flagged.html:7
@@ -254,23 +224,20 @@ msgid ""
 msgstr ""
 
 #: templates/comments/delete.html:4
-#, fuzzy
 msgid "Remove a comment"
-msgstr "சுதந்தரமான குறிப்பு"
+msgstr ""
 
 #: templates/comments/delete.html:7
 msgid "Really remove this comment?"
 msgstr ""
 
 #: templates/comments/delete.html:12
-#, fuzzy
 msgid "Remove"
-msgstr "நீக்கபட்டது"
+msgstr ""
 
 #: templates/comments/deleted.html:4
-#, fuzzy
 msgid "Thanks for removing"
-msgstr "எங்களது வலைத்தளத்தை பயன் படுத்தியதற்கு மிகுந்த நன்றி"
+msgstr ""
 
 #: templates/comments/flag.html:4
 msgid "Flag this comment"
@@ -285,50 +252,43 @@ msgid "Flag"
 msgstr ""
 
 #: templates/comments/flagged.html:4
-#, fuzzy
 msgid "Thanks for flagging"
-msgstr "எங்களது வலைத்தளத்தை பயன் படுத்தியதற்கு மிகுந்த நன்றி"
+msgstr ""
 
 #: templates/comments/form.html:17 templates/comments/preview.html:32
 msgid "Post"
 msgstr ""
 
 #: templates/comments/form.html:18 templates/comments/preview.html:33
-#, fuzzy
 msgid "Preview"
-msgstr "நோற்றமிடு:"
+msgstr ""
 
 #: templates/comments/posted.html:4
-#, fuzzy
 msgid "Thanks for commenting"
-msgstr "சுதந்தரமான குறிப்பு"
+msgstr ""
 
 #: templates/comments/posted.html:7
 msgid "Thank you for your comment"
 msgstr ""
 
 #: templates/comments/preview.html:4 templates/comments/preview.html.py:13
-#, fuzzy
 msgid "Preview your comment"
-msgstr "குறிப்பை முன்னேற்றமிடு"
+msgstr ""
 
 #: templates/comments/preview.html:11
-#, fuzzy
 msgid "Please correct the error below"
 msgid_plural "Please correct the errors below"
-msgstr[0] "கீழே உள்ள தவறுயைத் திருத்துக"
-msgstr[1] "கீழே உள்ள தவறுகளைத் திருத்துக"
+msgstr[0] ""
+msgstr[1] ""
 
 #: templates/comments/preview.html:16
 msgid "and"
 msgstr "மற்றும்"
 
 #: templates/comments/preview.html:16
-#, fuzzy
 msgid "Post your comment"
-msgstr "குறிப்பை முன்னேற்றமிடு"
+msgstr ""
 
 #: templates/comments/preview.html:16
-#, fuzzy
 msgid "or make changes"
-msgstr "எந்த புலமும் மாறவில்லை."
+msgstr ""

@@ -1,18 +1,18 @@
-# translation of django.po to Catalan
 # This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:23+0100\n"
-"PO-Revision-Date: 2009-03-24 13:28+0100\n"
-"Last-Translator: Django Catalan Group <django-cat@googlegroups.com>\n"
-"Language-Team: Catalan <ca@li.org>\n"
+"POT-Creation-Date: 2011-02-28 23:41+0100\n"
+"PO-Revision-Date: 2011-02-22 00:10+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: Catalan <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: ca\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: admin.py:12
 msgid "Content"
@@ -22,7 +22,6 @@ msgstr "Contingut"
 msgid "Metadata"
 msgstr "Metadades"
 
-# Context problem... waitting for comments from django-i18n
 #: admin.py:42
 msgid "flagged"
 msgid_plural "flagged"
@@ -195,7 +194,6 @@ msgstr ""
 "\n"
 "http://%(domain)s%(url)s"
 
-# Context problem... waitting for comments from django-i18n
 #: models.py:170
 msgid "flag"
 msgstr "marcar"
@@ -259,7 +257,6 @@ msgstr "Marcar aquest comentari"
 msgid "Really flag this comment?"
 msgstr "Realment voleu marcar aquest comentari?"
 
-# Context problem... waitting for comments from django-i18n
 #: templates/comments/flag.html:12
 msgid "Flag"
 msgstr "Marcar"

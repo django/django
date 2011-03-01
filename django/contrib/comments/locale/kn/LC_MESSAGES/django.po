@@ -1,112 +1,91 @@
-# Kannada translation of Django.
-# Copyright (C) 2007 Translation Team <translation@sampada.info>
 # This file is distributed under the same license as the Django package.
-# Kannada Localization Team <translation@sampada.info>, 2007.
-#
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:24+0100\n"
-"PO-Revision-Date: 2007-01-08 20:22+0530\n"
-"Last-Translator: Kannada Localization Team <translation@sampada.info>\n"
-"Language-Team: Kannada <translation@sampada.info>\n"
+"POT-Creation-Date: 2011-02-28 23:42+0100\n"
+"PO-Revision-Date: 2011-02-22 00:10+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: English <en@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: kn\n"
+"Plural-Forms: nplurals=1; plural=0\n"
 
 #: admin.py:12
-#, fuzzy
 msgid "Content"
-msgstr "ಒಳವಿಷಯ"
+msgstr ""
 
 #: admin.py:15
 msgid "Metadata"
 msgstr ""
 
 #: admin.py:42
-#, fuzzy
 msgid "flagged"
 msgid_plural "flagged"
-msgstr[0] "ಪತಾಕೆ ದಿನಾಂಕ"
-msgstr[1] "ಪತಾಕೆ ದಿನಾಂಕ"
+msgstr[0] ""
 
 #: admin.py:43
-#, fuzzy
 msgid "Flag selected comments"
-msgstr "ಟಿಪ್ಪಣಿಗಳನ್ನು ಸಕ್ರಿಯಗೊಳಿಸಿ"
+msgstr ""
 
 #: admin.py:47
-#, fuzzy
 msgid "approved"
 msgid_plural "approved"
-msgstr[0] "ಸಿಬ್ಬಂದಿಯಿಂದ ಅನುಮೋದನೆ ಪಡೆದಿದೆ"
-msgstr[1] "ಸಿಬ್ಬಂದಿಯಿಂದ ಅನುಮೋದನೆ ಪಡೆದಿದೆ"
+msgstr[0] ""
 
 #: admin.py:48
-#, fuzzy
 msgid "Approve selected comments"
-msgstr "ಉಚಿತ ಟಿಪ್ಪಣಿಗಳು"
+msgstr ""
 
 #: admin.py:52
-#, fuzzy
 msgid "removed"
 msgid_plural "removed"
-msgstr[0] "ತೆಗೆದು ಹಾಕಲಾಗಿದೆ"
-msgstr[1] "ತೆಗೆದು ಹಾಕಲಾಗಿದೆ"
+msgstr[0] ""
 
 #: admin.py:53
-#, fuzzy
 msgid "Remove selected comments"
-msgstr "ಟಿಪ್ಪಣಿಗಳನ್ನು ಸಕ್ರಿಯಗೊಳಿಸಿ"
+msgstr ""
 
 #: admin.py:65
 #, python-format
 msgid "1 comment was successfully %(action)s."
 msgid_plural "%(count)s comments were successfully %(action)s."
 msgstr[0] ""
-msgstr[1] ""
 
 #: feeds.py:13
-#, fuzzy, python-format
+#, python-format
 msgid "%(site_name)s comments"
-msgstr "ಟಿಪ್ಪಣಿಗಳನ್ನು ಸಕ್ರಿಯಗೊಳಿಸಿ"
+msgstr ""
 
 #: feeds.py:23
-#, fuzzy, python-format
+#, python-format
 msgid "Latest comments on %(site_name)s"
-msgstr "%(site_name)s ತಾಣದಲ್ಲಿ ನಿಮ್ಮ ಬಳಕೆದಾರ-ಖಾತೆಗಾಗಿ"
+msgstr ""
 
 #: forms.py:109
-#, fuzzy
 msgid "Name"
-msgstr "ಹೆಸರು"
+msgstr ""
 
 #: forms.py:110
-#, fuzzy
 msgid "Email address"
-msgstr "ವಿ-ಅಂಚೆ ವಿಳಾಸ"
+msgstr ""
 
 #: forms.py:111
 msgid "URL"
 msgstr "URL"
 
 #: forms.py:112
-#, fuzzy
 msgid "Comment"
-msgstr "ಟಿಪ್ಪಣಿ:"
+msgstr ""
 
 #: forms.py:191
-#, fuzzy, python-format
+#, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
 msgstr[0] ""
-"ನಾಲಿಗೆ ಬಿಗಿ ಹಿಡಿಯಿರಿ! %s  ಶಬ್ದವನ್ನು ಇಲ್ಲಿ ಬಳಸುವಂತಿಲ್ಲ.ನಾಲಿಗೆ ಬಿಗಿ ಹಿಡಿಯಿರಿ! %s ಈ "
-"ಶಬ್ದಗಳನ್ನು ಇಲ್ಲಿ ಬಳಸುವಂತಿಲ್ಲ."
-msgstr[1] ""
-"ನಾಲಿಗೆ ಬಿಗಿ ಹಿಡಿಯಿರಿ! %s  ಶಬ್ದವನ್ನು ಇಲ್ಲಿ ಬಳಸುವಂತಿಲ್ಲ.ನಾಲಿಗೆ ಬಿಗಿ ಹಿಡಿಯಿರಿ! %s ಈ "
-"ಶಬ್ದಗಳನ್ನು ಇಲ್ಲಿ ಬಳಸುವಂತಿಲ್ಲ."
 
 #: forms.py:198
 msgid ""
@@ -126,19 +105,16 @@ msgid "user"
 msgstr "ಬಳಕೆದಾರ"
 
 #: models.py:52
-#, fuzzy
 msgid "user's name"
-msgstr "ಬಳಕೆದಾರ-ಹೆಸರು"
+msgstr ""
 
 #: models.py:53
-#, fuzzy
 msgid "user's email address"
-msgstr "ವಿ-ಅಂಚೆ ವಿಳಾಸ"
+msgstr ""
 
 #: models.py:54
-#, fuzzy
 msgid "user's URL"
-msgstr "ಬಳಕೆದಾರರು"
+msgstr ""
 
 #: models.py:56 models.py:76 models.py:169
 msgid "comment"
@@ -178,24 +154,16 @@ msgid "comments"
 msgstr "ಟಿಪ್ಪಣಿಗಳು"
 
 #: models.py:119
-#, fuzzy
 msgid ""
 "This comment was posted by an authenticated user and thus the name is read-"
 "only."
 msgstr ""
-"ಈ ಟಿಪ್ಪಣಿಯನ್ನು ಅಪೂರ್ಣ ಮಾಹಿತಿಯುಳ್ಳ ಬಳಕೆದಾರ :\n"
-"\n"
-" %(text)s ರು ಸಲ್ಲಿಸಿದ್ದಾರೆ"
 
 #: models.py:128
-#, fuzzy
 msgid ""
 "This comment was posted by an authenticated user and thus the email is read-"
 "only."
 msgstr ""
-"ಈ ಟಿಪ್ಪಣಿಯನ್ನು ಅಪೂರ್ಣ ಮಾಹಿತಿಯುಳ್ಳ ಬಳಕೆದಾರ :\n"
-"\n"
-" %(text)s ರು ಸಲ್ಲಿಸಿದ್ದಾರೆ"
 
 #: models.py:153
 #, python-format
@@ -213,29 +181,24 @@ msgstr ""
 "http://%(domain)s%(url)s  ಸಲ್ಲಿಸಿದ್ದು"
 
 #: models.py:170
-#, fuzzy
 msgid "flag"
-msgstr "ಪತಾಕೆ ದಿನಾಂಕ"
+msgstr ""
 
 #: models.py:171
-#, fuzzy
 msgid "date"
-msgstr "ಯಾವುದೇ ದಿನಾಂಕ"
+msgstr ""
 
 #: models.py:181
-#, fuzzy
 msgid "comment flag"
-msgstr "ಟಿಪ್ಪಣಿ"
+msgstr ""
 
 #: models.py:182
-#, fuzzy
 msgid "comment flags"
-msgstr "ಟಿಪ್ಪಣಿಗಳು"
+msgstr ""
 
 #: templates/comments/approve.html:4
-#, fuzzy
 msgid "Approve a comment"
-msgstr "ಉಚಿತ ಟಿಪ್ಪಣಿ"
+msgstr ""
 
 #: templates/comments/approve.html:7
 msgid "Really make this comment public?"
@@ -246,9 +209,8 @@ msgid "Approve"
 msgstr ""
 
 #: templates/comments/approved.html:4
-#, fuzzy
 msgid "Thanks for approving"
-msgstr "ನಮ್ಮ ತಾಣವನ್ನು ಬಳಸಿದ್ದಕ್ದಾಗಿ ಧನ್ಯವಾದಗಳು!"
+msgstr ""
 
 #: templates/comments/approved.html:7 templates/comments/deleted.html:7
 #: templates/comments/flagged.html:7
@@ -257,23 +219,20 @@ msgid ""
 msgstr ""
 
 #: templates/comments/delete.html:4
-#, fuzzy
 msgid "Remove a comment"
-msgstr "ಉಚಿತ ಟಿಪ್ಪಣಿ"
+msgstr ""
 
 #: templates/comments/delete.html:7
 msgid "Really remove this comment?"
 msgstr ""
 
 #: templates/comments/delete.html:12
-#, fuzzy
 msgid "Remove"
-msgstr "ತೆಗೆದು ಹಾಕಲಾಗಿದೆ"
+msgstr ""
 
 #: templates/comments/deleted.html:4
-#, fuzzy
 msgid "Thanks for removing"
-msgstr "ನಮ್ಮ ತಾಣವನ್ನು ಬಳಸಿದ್ದಕ್ದಾಗಿ ಧನ್ಯವಾದಗಳು!"
+msgstr ""
 
 #: templates/comments/flag.html:4
 msgid "Flag this comment"
@@ -288,50 +247,42 @@ msgid "Flag"
 msgstr ""
 
 #: templates/comments/flagged.html:4
-#, fuzzy
 msgid "Thanks for flagging"
-msgstr "ನಮ್ಮ ತಾಣವನ್ನು ಬಳಸಿದ್ದಕ್ದಾಗಿ ಧನ್ಯವಾದಗಳು!"
+msgstr ""
 
 #: templates/comments/form.html:17 templates/comments/preview.html:32
 msgid "Post"
 msgstr ""
 
 #: templates/comments/form.html:18 templates/comments/preview.html:33
-#, fuzzy
 msgid "Preview"
-msgstr "ನೋಟ:"
+msgstr ""
 
 #: templates/comments/posted.html:4
-#, fuzzy
 msgid "Thanks for commenting"
-msgstr "ಉಚಿತ ಟಿಪ್ಪಣಿ"
+msgstr ""
 
 #: templates/comments/posted.html:7
 msgid "Thank you for your comment"
 msgstr ""
 
 #: templates/comments/preview.html:4 templates/comments/preview.html.py:13
-#, fuzzy
 msgid "Preview your comment"
-msgstr "ಟಿಪ್ಪಣಿ ಮುನ್ನೋಟ"
+msgstr ""
 
 #: templates/comments/preview.html:11
-#, fuzzy
 msgid "Please correct the error below"
 msgid_plural "Please correct the errors below"
-msgstr[0] "ದಯಮಾಡಿ ಕೆಳಗಿನ ತಪ್ಪನ್ನು ಸರಿಪಡಿಸಿ ದಯಮಾಡಿ ಕೆಳಗಿನ ತಪ್ಪುಗಳನ್ನು ಸರಿಪಡಿಸಿ. "
-msgstr[1] "ದಯಮಾಡಿ ಕೆಳಗಿನ ತಪ್ಪನ್ನು ಸರಿಪಡಿಸಿ ದಯಮಾಡಿ ಕೆಳಗಿನ ತಪ್ಪುಗಳನ್ನು ಸರಿಪಡಿಸಿ. "
+msgstr[0] ""
 
 #: templates/comments/preview.html:16
 msgid "and"
 msgstr "ಮತ್ತು"
 
 #: templates/comments/preview.html:16
-#, fuzzy
 msgid "Post your comment"
-msgstr "ಟಿಪ್ಪಣಿ ಮುನ್ನೋಟ"
+msgstr ""
 
 #: templates/comments/preview.html:16
-#, fuzzy
 msgid "or make changes"
-msgstr "ಯಾವುದೇ ಅಂಶಗಳು ಬದಲಾಗಲಿಲ್ಲ."
+msgstr ""

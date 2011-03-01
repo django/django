@@ -1,112 +1,102 @@
-# translation of django.po to
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:23+0100\n"
-"PO-Revision-Date: 2010-07-08 12:55+0200\n"
-"Last-Translator: Aitzol Naberan <anaberan@codesyntax.com>\n"
-"Language-Team: Django-i18n <django-i18n@googlegroups.com>\n"
+"POT-Creation-Date: 2011-02-28 23:42+0100\n"
+"PO-Revision-Date: 2011-02-22 00:10+0000\n"
+"Last-Translator: aitzol <anaberan@codesyntax.com>\n"
+"Language-Team: Basque <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: eu\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: admin.py:12
-#, fuzzy
 msgid "Content"
-msgstr "edukia"
+msgstr "Edukia"
 
 #: admin.py:15
 msgid "Metadata"
-msgstr ""
+msgstr "Metada"
 
 #: admin.py:42
-#, fuzzy
 msgid "flagged"
 msgid_plural "flagged"
-msgstr[0] "markatutako eguna"
-msgstr[1] "markatutako eguna"
+msgstr[0] "markaduna"
+msgstr[1] "markadunak"
 
 #: admin.py:43
-#, fuzzy
 msgid "Flag selected comments"
-msgstr "komentarioak onartu"
+msgstr "Markatu aukeratutako iruzkinak"
 
 #: admin.py:47
-#, fuzzy
 msgid "approved"
 msgid_plural "approved"
-msgstr[0] "arduradunek onartua"
-msgstr[1] "arduradunek onartua"
+msgstr[0] "onartua"
+msgstr[1] "onartuak"
 
 #: admin.py:48
-#, fuzzy
 msgid "Approve selected comments"
-msgstr "komentario libreak"
+msgstr "Onartu aukeratutako iruzkinak"
 
 #: admin.py:52
-#, fuzzy
 msgid "removed"
 msgid_plural "removed"
 msgstr[0] "ezabatua"
-msgstr[1] "ezabatua"
+msgstr[1] "ezabatuak"
 
 #: admin.py:53
-#, fuzzy
 msgid "Remove selected comments"
-msgstr "komentarioak onartu"
+msgstr "Ezabatu aukeratutako iruzkinak"
 
 #: admin.py:65
 #, python-format
 msgid "1 comment was successfully %(action)s."
 msgid_plural "%(count)s comments were successfully %(action)s."
-msgstr[0] ""
+msgstr[0] "%(count)s iruzkin ondo %(action)s dira."
 msgstr[1] ""
 
 #: feeds.py:13
-#, fuzzy, python-format
+#, python-format
 msgid "%(site_name)s comments"
-msgstr "komentarioak onartu"
+msgstr "%(site_name)s guneko iruzkinak"
 
 #: feeds.py:23
-#, fuzzy, python-format
+#, python-format
 msgid "Latest comments on %(site_name)s"
-msgstr "%(site_name)s erabiltzaile kontuarentzat"
+msgstr "%(site_name)s guneko azken iruzkinak"
 
 #: forms.py:109
-#, fuzzy
 msgid "Name"
-msgstr "izena"
+msgstr "Izena"
 
 #: forms.py:110
-#, fuzzy
 msgid "Email address"
-msgstr "E-mail helbidea"
+msgstr "Eposta helbidea"
 
 #: forms.py:111
 msgid "URL"
 msgstr "URL"
 
 #: forms.py:112
-#, fuzzy
 msgid "Comment"
-msgstr "Komentarioa:"
+msgstr "Iruzkina"
 
 #: forms.py:191
-#, fuzzy, python-format
+#, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
-msgstr[0] "Kontuz ibili! %s hitza ez dago hemen onartua."
-msgstr[1] ""
+msgstr[0] "Txiiist! %s hitza ez zaigu gustatzen"
+msgstr[1] "Txiiist! %s hitzak ez zaizkigu gustatzen"
 
 #: forms.py:198
 msgid ""
 "If you enter anything in this field your comment will be treated as spam"
 msgstr ""
+"Eremu honetan zerbait idazten baduzu zure iruzkina spam gisa tratatuko da."
 
 #: models.py:22
 msgid "content type"
@@ -121,23 +111,20 @@ msgid "user"
 msgstr "Erabiltzailea"
 
 #: models.py:52
-#, fuzzy
 msgid "user's name"
-msgstr "erabiltzaile izena"
+msgstr "erabiltzailearen izena"
 
 #: models.py:53
-#, fuzzy
 msgid "user's email address"
-msgstr "e-mail helbidea"
+msgstr "erabiltzailearen eposta helbidea"
 
 #: models.py:54
-#, fuzzy
 msgid "user's URL"
-msgstr "Erabiltzaileak"
+msgstr "erabiltzailearen URL"
 
 #: models.py:56 models.py:76 models.py:169
 msgid "comment"
-msgstr "komentarioa"
+msgstr "iruzkina"
 
 #: models.py:59
 msgid "date/time submitted"
@@ -154,7 +141,7 @@ msgstr "publikoa"
 #: models.py:62
 msgid ""
 "Uncheck this box to make the comment effectively disappear from the site."
-msgstr ""
+msgstr "Markatu kutxa hau iruzkina webgunetik desagertarazteko."
 
 #: models.py:64
 msgid "is removed"
@@ -170,27 +157,23 @@ msgstr ""
 
 #: models.py:77
 msgid "comments"
-msgstr "Komentarioak"
+msgstr "iruzkinak"
 
 #: models.py:119
-#, fuzzy
 msgid ""
 "This comment was posted by an authenticated user and thus the name is read-"
 "only."
 msgstr ""
-"Komentario hau behin-behineko erabiltzaile batek bidali du:\n"
-"\n"
-"%(text)s"
+"Iruzkin hau autentikatutako erabiltzaile batek egin du. Hori dela eta, izena "
+"irakurtzeko moduan dago bakarrik. "
 
 #: models.py:128
-#, fuzzy
 msgid ""
 "This comment was posted by an authenticated user and thus the email is read-"
 "only."
 msgstr ""
-"Komentario hau behin-behineko erabiltzaile batek bidali du:\n"
-"\n"
-"%(text)s"
+"Iruzkin hau autentikatutako erabiltzaile batek egin du. Hori dela eta, "
+"eposta irakurtzeko moduan dago bakarrik. "
 
 #: models.py:153
 #, python-format
@@ -201,133 +184,118 @@ msgid ""
 "\n"
 "http://%(domain)s%(url)s"
 msgstr ""
-"%(user)s -k bidalia %(date)s -n\n"
+"%(user)s erabiltzileak bidalia %(date)s datan\n"
 "\n"
 "%(comment)s\n"
 "\n"
 "http://%(domain)s%(url)s"
 
 #: models.py:170
-#, fuzzy
 msgid "flag"
-msgstr "markatutako eguna"
+msgstr "marka"
 
 #: models.py:171
-#, fuzzy
 msgid "date"
-msgstr "Edozein data"
+msgstr "data"
 
 #: models.py:181
-#, fuzzy
 msgid "comment flag"
-msgstr "komentarioa"
+msgstr "iruzkin marka"
 
 #: models.py:182
-#, fuzzy
 msgid "comment flags"
-msgstr "Komentarioak"
+msgstr "iruzkin markak"
 
 #: templates/comments/approve.html:4
-#, fuzzy
 msgid "Approve a comment"
-msgstr "komentario librea"
+msgstr "Onartu iruzkina"
 
 #: templates/comments/approve.html:7
 msgid "Really make this comment public?"
-msgstr ""
+msgstr "Publikatu iruzkina?"
 
 #: templates/comments/approve.html:12
 msgid "Approve"
-msgstr ""
+msgstr "Onartu"
 
 #: templates/comments/approved.html:4
-#, fuzzy
 msgid "Thanks for approving"
-msgstr "Mila esker gure web gunea erabiltzeagatik!"
+msgstr "Eskerrik asko onartzearren"
 
 #: templates/comments/approved.html:7 templates/comments/deleted.html:7
 #: templates/comments/flagged.html:7
 msgid ""
 "Thanks for taking the time to improve the quality of discussion on our site"
 msgstr ""
+"Eskerrik asko webguneko estabaidaren kalitatea hobetzeko hartutako "
+"denboragatik"
 
 #: templates/comments/delete.html:4
-#, fuzzy
 msgid "Remove a comment"
-msgstr "komentario librea"
+msgstr "Ezabatu iruzkina"
 
 #: templates/comments/delete.html:7
 msgid "Really remove this comment?"
-msgstr ""
+msgstr "Ziur iruzkin hau ezabtu nahi duzula?"
 
 #: templates/comments/delete.html:12
-#, fuzzy
 msgid "Remove"
-msgstr "ezabatua"
+msgstr "Ezabatu"
 
 #: templates/comments/deleted.html:4
-#, fuzzy
 msgid "Thanks for removing"
-msgstr "Mila esker gure web gunea erabiltzeagatik!"
+msgstr "Eskerrik asko ezabatzearren"
 
 #: templates/comments/flag.html:4
 msgid "Flag this comment"
-msgstr ""
+msgstr "Markatu iruzkina"
 
 #: templates/comments/flag.html:7
 msgid "Really flag this comment?"
-msgstr ""
+msgstr "Ziur iruzkin hau markatu nahi duzula?"
 
 #: templates/comments/flag.html:12
 msgid "Flag"
-msgstr ""
+msgstr "Marka"
 
 #: templates/comments/flagged.html:4
-#, fuzzy
 msgid "Thanks for flagging"
-msgstr "Mila esker gure web gunea erabiltzeagatik!"
+msgstr "Eskerrik asko markatzearren"
 
 #: templates/comments/form.html:17 templates/comments/preview.html:32
-#, fuzzy
 msgid "Post"
-msgstr "."
+msgstr "Bidali"
 
 #: templates/comments/form.html:18 templates/comments/preview.html:33
-#, fuzzy
 msgid "Preview"
-msgstr "bista:"
+msgstr "Aurreikusi"
 
 #: templates/comments/posted.html:4
-#, fuzzy
 msgid "Thanks for commenting"
-msgstr "komentario librea"
+msgstr "Eskerrik asko iruzkintzearren"
 
 #: templates/comments/posted.html:7
 msgid "Thank you for your comment"
-msgstr ""
+msgstr "Eskerrik asko zure iruzkinagatik"
 
 #: templates/comments/preview.html:4 templates/comments/preview.html.py:13
-#, fuzzy
 msgid "Preview your comment"
-msgstr "Komentarioa aurreikusi"
+msgstr "Aurreikusi zure iruzkina"
 
 #: templates/comments/preview.html:11
-#, fuzzy
 msgid "Please correct the error below"
 msgid_plural "Please correct the errors below"
-msgstr[0] "Arren zuzendu akatsa"
-msgstr[1] "Arren zuzendu akatsak"
+msgstr[0] "Mesedez zuzendu azpiko errorea"
+msgstr[1] "Mesedez zuzendu azpiko erroreak"
 
 #: templates/comments/preview.html:16
 msgid "and"
 msgstr "eta"
 
 #: templates/comments/preview.html:16
-#, fuzzy
 msgid "Post your comment"
-msgstr "Komentarioa aurreikusi"
+msgstr "Bidali zure iruzkina"
 
 #: templates/comments/preview.html:16
-#, fuzzy
 msgid "or make changes"
-msgstr "Ez da eremurik aldatu."
+msgstr "edo egin aldaketak"

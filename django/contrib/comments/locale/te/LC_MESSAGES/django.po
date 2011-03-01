@@ -1,20 +1,18 @@
-# translation of django.po to Telugu
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:24+0100\n"
-"PO-Revision-Date: 2008-09-09 21:24+0530\n"
-"Last-Translator: Thejaswi Puthraya <thejaswi.puthraya@gmail.com>\n"
-"Language-Team: Telugu <indlinux-telugu@lists.sourceforge.net>\n"
+"POT-Creation-Date: 2011-02-28 23:42+0100\n"
+"PO-Revision-Date: 2011-02-22 00:10+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: Telugu <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.11.4\n"
-"Plural-Forms: nplurals=2; plural=n>1;\n"
+"Language: te\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: admin.py:12
 msgid "Content"
@@ -25,35 +23,30 @@ msgid "Metadata"
 msgstr ""
 
 #: admin.py:42
-#, fuzzy
 msgid "flagged"
 msgid_plural "flagged"
-msgstr[0] "ఫ్లాగ్ తేది "
-msgstr[1] "ఫ్లాగ్ తేది "
+msgstr[0] ""
+msgstr[1] ""
 
 #: admin.py:43
-#, fuzzy
 msgid "Flag selected comments"
-msgstr "నిరాటంకము గావ్యాఖ్యానములు"
+msgstr ""
 
 #: admin.py:47
-#, fuzzy
 msgid "approved"
 msgid_plural "approved"
-msgstr[0] " అధికారుల చేత ఆమోదించబడినది"
-msgstr[1] " అధికారుల చేత ఆమోదించబడినది"
+msgstr[0] ""
+msgstr[1] ""
 
 #: admin.py:48
-#, fuzzy
 msgid "Approve selected comments"
-msgstr "నిరాటంకము గావ్యాఖ్యానములు"
+msgstr ""
 
 #: admin.py:52
-#, fuzzy
 msgid "removed"
 msgid_plural "removed"
-msgstr[0] "తీసివేయబడినది"
-msgstr[1] "తీసివేయబడినది"
+msgstr[0] ""
+msgstr[1] ""
 
 #: admin.py:53
 msgid "Remove selected comments"
@@ -67,9 +60,9 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: feeds.py:13
-#, fuzzy, python-format
+#, python-format
 msgid "%(site_name)s comments"
-msgstr "%(site_name)s జట్టు"
+msgstr ""
 
 #: feeds.py:23
 #, python-format
@@ -186,29 +179,24 @@ msgid ""
 msgstr ""
 
 #: models.py:170
-#, fuzzy
 msgid "flag"
-msgstr "ఫ్లాగ్ తేది "
+msgstr ""
 
 #: models.py:171
-#, fuzzy
 msgid "date"
-msgstr "ఏ రోజైన"
+msgstr ""
 
 #: models.py:181
-#, fuzzy
 msgid "comment flag"
-msgstr "వ్యాఖ్యానము"
+msgstr ""
 
 #: models.py:182
-#, fuzzy
 msgid "comment flags"
-msgstr "వ్యాఖ్యానములు"
+msgstr ""
 
 #: templates/comments/approve.html:4
-#, fuzzy
 msgid "Approve a comment"
-msgstr "నిరాటంకమైన వ్యాఖ్యానము"
+msgstr ""
 
 #: templates/comments/approve.html:7
 msgid "Really make this comment public?"
@@ -219,9 +207,8 @@ msgid "Approve"
 msgstr ""
 
 #: templates/comments/approved.html:4
-#, fuzzy
 msgid "Thanks for approving"
-msgstr "మా సైట్  వాడినందుకు ధన్యవాదములు!"
+msgstr ""
 
 #: templates/comments/approved.html:7 templates/comments/deleted.html:7
 #: templates/comments/flagged.html:7
@@ -230,23 +217,20 @@ msgid ""
 msgstr ""
 
 #: templates/comments/delete.html:4
-#, fuzzy
 msgid "Remove a comment"
-msgstr "నిరాటంకమైన వ్యాఖ్యానము"
+msgstr ""
 
 #: templates/comments/delete.html:7
 msgid "Really remove this comment?"
 msgstr ""
 
 #: templates/comments/delete.html:12
-#, fuzzy
 msgid "Remove"
-msgstr "తీసివేయబడినది"
+msgstr ""
 
 #: templates/comments/deleted.html:4
-#, fuzzy
 msgid "Thanks for removing"
-msgstr "మా సైట్  వాడినందుకు ధన్యవాదములు!"
+msgstr ""
 
 #: templates/comments/flag.html:4
 msgid "Flag this comment"
@@ -257,56 +241,47 @@ msgid "Really flag this comment?"
 msgstr ""
 
 #: templates/comments/flag.html:12
-#, fuzzy
 msgid "Flag"
-msgstr "మలగా"
+msgstr ""
 
 #: templates/comments/flagged.html:4
-#, fuzzy
 msgid "Thanks for flagging"
-msgstr "మా సైట్  వాడినందుకు ధన్యవాదములు!"
+msgstr ""
 
 #: templates/comments/form.html:17 templates/comments/preview.html:32
-#, fuzzy
 msgid "Post"
-msgstr "వ"
+msgstr ""
 
 #: templates/comments/form.html:18 templates/comments/preview.html:33
-#, fuzzy
 msgid "Preview"
-msgstr "దర్శనం:"
+msgstr ""
 
 #: templates/comments/posted.html:4
-#, fuzzy
 msgid "Thanks for commenting"
-msgstr "నిరాటంకమైన వ్యాఖ్యానము"
+msgstr ""
 
 #: templates/comments/posted.html:7
 msgid "Thank you for your comment"
 msgstr ""
 
 #: templates/comments/preview.html:4 templates/comments/preview.html.py:13
-#, fuzzy
 msgid "Preview your comment"
-msgstr "వ్యాఖ్యానము ని ప్రివ్యీవ్ చేయండి"
+msgstr ""
 
 #: templates/comments/preview.html:11
-#, fuzzy
 msgid "Please correct the error below"
 msgid_plural "Please correct the errors below"
-msgstr[0] "క్రింద ఉన్న తప్పు  సరిదిద్దుకోండి"
-msgstr[1] "క్రింద ఉన్న తప్పులు  సరిదిద్దుకోండి"
+msgstr[0] ""
+msgstr[1] ""
 
 #: templates/comments/preview.html:16
 msgid "and"
 msgstr "మరియు"
 
 #: templates/comments/preview.html:16
-#, fuzzy
 msgid "Post your comment"
-msgstr "వ్యాఖ్యానము ని ప్రివ్యీవ్ చేయండి"
+msgstr ""
 
 #: templates/comments/preview.html:16
-#, fuzzy
 msgid "or make changes"
-msgstr "క్షేత్రములు  ఏమి మార్చబడలేదు"
+msgstr ""

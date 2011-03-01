@@ -1,22 +1,18 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Django SVN\n"
+"Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:23+0100\n"
-"PO-Revision-Date: 2008-11-12 08:14+0530\n"
-"Last-Translator: Thejaswi Puthraya <thejaswi.puthraya@gmail.com>\n"
-"Language-Team: Hindi <indlinux-hindi@lists.sourceforge.net>\n"
+"POT-Creation-Date: 2011-02-28 23:42+0100\n"
+"PO-Revision-Date: 2011-02-22 00:10+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: English <en@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Poedit-Language: Hindi\n"
-"X-Poedit-Country: INDIA\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: hi\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: admin.py:12
 msgid "Content"
@@ -27,40 +23,34 @@ msgid "Metadata"
 msgstr ""
 
 #: admin.py:42
-#, fuzzy
 msgid "flagged"
 msgid_plural "flagged"
-msgstr[0] "चपटा पृष्ट"
-msgstr[1] "चपटा पृष्ट"
+msgstr[0] ""
+msgstr[1] ""
 
 #: admin.py:43
-#, fuzzy
 msgid "Flag selected comments"
-msgstr "टिप्पनी को फ्लैग करो"
+msgstr ""
 
 #: admin.py:47
-#, fuzzy
 msgid "approved"
 msgid_plural "approved"
-msgstr[0] "पसंद करें"
-msgstr[1] "पसंद करें"
+msgstr[0] ""
+msgstr[1] ""
 
 #: admin.py:48
-#, fuzzy
 msgid "Approve selected comments"
-msgstr "टिप्पणी पसंद करें"
+msgstr ""
 
 #: admin.py:52
-#, fuzzy
 msgid "removed"
 msgid_plural "removed"
-msgstr[0] "हटाया गया"
-msgstr[1] "हटाया गया"
+msgstr[0] ""
+msgstr[1] ""
 
 #: admin.py:53
-#, fuzzy
 msgid "Remove selected comments"
-msgstr "टिप्पणी निकालें"
+msgstr ""
 
 #: admin.py:65
 #, python-format
@@ -70,14 +60,14 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: feeds.py:13
-#, fuzzy, python-format
+#, python-format
 msgid "%(site_name)s comments"
-msgstr "टिप्पणी सक्षम करें"
+msgstr ""
 
 #: feeds.py:23
-#, fuzzy, python-format
+#, python-format
 msgid "Latest comments on %(site_name)s"
-msgstr "%(site_name)s पर आपके प्रवोक्ता खाता के लिए"
+msgstr ""
 
 #: forms.py:109
 msgid "Name"
@@ -163,9 +153,8 @@ msgid ""
 msgstr ""
 
 #: models.py:77
-#, fuzzy
 msgid "comments"
-msgstr "टिप्पणी"
+msgstr ""
 
 #: models.py:119
 msgid ""
@@ -190,24 +179,20 @@ msgid ""
 msgstr ""
 
 #: models.py:170
-#, fuzzy
 msgid "flag"
-msgstr "फ्लैग"
+msgstr ""
 
 #: models.py:171
-#, fuzzy
 msgid "date"
-msgstr "कोई भी तारीख"
+msgstr ""
 
 #: models.py:181
-#, fuzzy
 msgid "comment flag"
-msgstr "टिप्पणी"
+msgstr ""
 
 #: models.py:182
-#, fuzzy
 msgid "comment flags"
-msgstr "टिप्पणी"
+msgstr ""
 
 #: templates/comments/approve.html:4
 msgid "Approve a comment"

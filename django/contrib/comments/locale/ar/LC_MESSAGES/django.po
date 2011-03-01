@@ -1,23 +1,19 @@
-# translation of django.po to Arabic
-# This file is distributed under the same license as the django package.
+# This file is distributed under the same license as the Django package.
 #
-# Ossama M. Khayat <okhayat@yahoo.com>, 2009, 2010.
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:23+0100\n"
-"PO-Revision-Date: 2010-05-12 11:20+0300\n"
-"Last-Translator: Ossama M. Khayat <okhayat@yahoo.com>\n"
-"Language-Team: Arabic <support@arabeyes.org>\n"
+"POT-Creation-Date: 2011-02-28 23:41+0100\n"
+"PO-Revision-Date: 2011-02-22 00:10+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: Arabic <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Lokalize 1.0\n"
-"Plural-Forms: nplurals=4; plural=(n == 1? 0 : (n == 2? 1 : (n <= 10? 2 : "
-"3)))\n"
-"\n"
-"\n"
+"Language: ar\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
+"&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5\n"
 
 #: admin.py:12
 msgid "Content"
@@ -30,10 +26,12 @@ msgstr "ميتاداتا"
 #: admin.py:42
 msgid "flagged"
 msgid_plural "flagged"
-msgstr[0] "مُعلّم"
-msgstr[1] "مُعلّمان"
-msgstr[2] "مُعلّمة"
-msgstr[3] "مُعلّمة"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+msgstr[5] ""
 
 #: admin.py:43
 msgid "Flag selected comments"
@@ -42,10 +40,12 @@ msgstr "تعليم التعليقات المحددة"
 #: admin.py:47
 msgid "approved"
 msgid_plural "approved"
-msgstr[0] "مُعتمد"
-msgstr[1] "مُعتمدان"
-msgstr[2] "مُعتمدة"
-msgstr[3] "مُعتمد"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+msgstr[5] ""
 
 #: admin.py:48
 msgid "Approve selected comments"
@@ -54,10 +54,12 @@ msgstr "اعتماد التعليقات المحددة"
 #: admin.py:52
 msgid "removed"
 msgid_plural "removed"
-msgstr[0] "تم حذفه"
-msgstr[1] "تم حذفهما"
-msgstr[2] "تم حذفها"
-msgstr[3] "تم حذفها"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+msgstr[5] ""
 
 #: admin.py:53
 msgid "Remove selected comments"
@@ -67,10 +69,12 @@ msgstr "احذف التعليقات المحددة"
 #, python-format
 msgid "1 comment was successfully %(action)s."
 msgid_plural "%(count)s comments were successfully %(action)s."
-msgstr[0] "تم %(action)s التعليق بنجاح."
-msgstr[1] "تم %(action)s التعليقين بنجاح."
-msgstr[2] "%(count)s تعليقات تم %(action)s بنجاح."
-msgstr[3] "%(count)s تعليق تم %(action)s بنجاح."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+msgstr[5] ""
 
 #: feeds.py:13
 #, python-format
@@ -102,10 +106,12 @@ msgstr "تعليق"
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
-msgstr[0] "انتبه إلى ما تقول! الكلمة %s غير مسموح بها هنا."
-msgstr[1] "انتبه إلى ما تقول! الكلمتان %s غير مسموح بهما هنا."
-msgstr[2] "انتبه إلى ما تقول! الكلمات %s غير مسموح بها هنا."
-msgstr[3] "انتبه إلى ما تقول! الكلمات %s غير مسموح بها هنا."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+msgstr[5] ""
 
 #: forms.py:198
 msgid ""
@@ -294,10 +300,12 @@ msgstr "عاين تعليقك"
 #: templates/comments/preview.html:11
 msgid "Please correct the error below"
 msgid_plural "Please correct the errors below"
-msgstr[0] "رجاءً صحّح الخطأ التالي."
-msgstr[1] "رجاءً صحّح الخطأين التاليين."
-msgstr[2] "رجاءً صحّح الأخطاء التالية."
-msgstr[3] "رجاءً صحّح الأخطاء التالية."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+msgstr[5] ""
 
 #: templates/comments/preview.html:16
 msgid "and"

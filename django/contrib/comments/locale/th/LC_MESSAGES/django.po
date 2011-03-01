@@ -2,20 +2,17 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Django-1.1-rc-1\n"
+"Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:24+0100\n"
-"PO-Revision-Date: 2009-07-28 22:31+0700\n"
-"Last-Translator: Kowit Charoenratchatabhan <kowito@felspar.com>\n"
-"Language-Team: Kowit Charoenratchatabhan<kowito@felspar.com>,Kadsarin "
-"Sanjek, Felspar,Theppitak Karoonboonyanan <thep@linux.thai.net>\n"
+"POT-Creation-Date: 2011-02-28 23:42+0100\n"
+"PO-Revision-Date: 2011-02-22 00:10+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: Thai <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Poedit-Language: Thai\n"
-"X-Poedit-Country: THAILAND\n"
-"X-Poedit-SourceCharset: utf-8\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Language: th\n"
+"Plural-Forms: nplurals=1; plural=0\n"
 
 #: admin.py:12
 msgid "Content"
@@ -26,15 +23,13 @@ msgid "Metadata"
 msgstr "Metadata"
 
 #: admin.py:42
-#, fuzzy
 msgid "flagged"
 msgid_plural "flagged"
-msgstr[0] "flat page"
+msgstr[0] ""
 
 #: admin.py:43
-#, fuzzy
 msgid "Flag selected comments"
-msgstr "ใช้งานข้อติชม"
+msgstr ""
 
 #: admin.py:47
 msgid "approved"
@@ -42,20 +37,17 @@ msgid_plural "approved"
 msgstr[0] ""
 
 #: admin.py:48
-#, fuzzy
 msgid "Approve selected comments"
-msgstr "ใช้งานข้อติชม"
+msgstr ""
 
 #: admin.py:52
-#, fuzzy
 msgid "removed"
 msgid_plural "removed"
-msgstr[0] "ถอดออกแล้ว"
+msgstr[0] ""
 
 #: admin.py:53
-#, fuzzy
 msgid "Remove selected comments"
-msgstr "ใช้งานข้อติชม"
+msgstr ""
 
 #: admin.py:65
 #, python-format
@@ -64,14 +56,14 @@ msgid_plural "%(count)s comments were successfully %(action)s."
 msgstr[0] ""
 
 #: feeds.py:13
-#, fuzzy, python-format
+#, python-format
 msgid "%(site_name)s comments"
-msgstr "ใช้งานข้อติชม"
+msgstr ""
 
 #: feeds.py:23
-#, fuzzy, python-format
+#, python-format
 msgid "Latest comments on %(site_name)s"
-msgstr "สำหรับบัญชีการใช้งานของคุณที่ %(site_name)s "
+msgstr ""
 
 #: forms.py:109
 msgid "Name"
@@ -157,9 +149,8 @@ msgstr ""
 "เลือกเมื่อเห็นว่าข้อคิดเห็นไหนไม่เหมาะสม เมื่อข้อคิดเห็นนี้ได้ถูกลบแล้ว ข้อมูลอื่นจะถูกแสดงขึ้นแทน"
 
 #: models.py:77
-#, fuzzy
 msgid "comments"
-msgstr "ข้อคิดเห็น"
+msgstr ""
 
 #: models.py:119
 msgid ""
@@ -189,29 +180,24 @@ msgstr ""
 "http://%(domain)s%(url)s"
 
 #: models.py:170
-#, fuzzy
 msgid "flag"
-msgstr "flat page"
+msgstr ""
 
 #: models.py:171
-#, fuzzy
 msgid "date"
-msgstr "วันไหนก็ได้"
+msgstr ""
 
 #: models.py:181
-#, fuzzy
 msgid "comment flag"
-msgstr "ข้อคิดเห็น"
+msgstr ""
 
 #: models.py:182
-#, fuzzy
 msgid "comment flags"
-msgstr "ข้อคิดเห็น"
+msgstr ""
 
 #: templates/comments/approve.html:4
-#, fuzzy
 msgid "Approve a comment"
-msgstr "ใช้งานข้อติชม"
+msgstr ""
 
 #: templates/comments/approve.html:7
 msgid "Really make this comment public?"
@@ -222,9 +208,8 @@ msgid "Approve"
 msgstr ""
 
 #: templates/comments/approved.html:4
-#, fuzzy
 msgid "Thanks for approving"
-msgstr "ขอบคุณสำหรับการใช้งานเว็บไซต์ของเรา"
+msgstr ""
 
 #: templates/comments/approved.html:7 templates/comments/deleted.html:7
 #: templates/comments/flagged.html:7
@@ -233,23 +218,20 @@ msgid ""
 msgstr ""
 
 #: templates/comments/delete.html:4
-#, fuzzy
 msgid "Remove a comment"
-msgstr "ใช้งานข้อติชม"
+msgstr ""
 
 #: templates/comments/delete.html:7
 msgid "Really remove this comment?"
 msgstr ""
 
 #: templates/comments/delete.html:12
-#, fuzzy
 msgid "Remove"
-msgstr "ถอดออกแล้ว"
+msgstr ""
 
 #: templates/comments/deleted.html:4
-#, fuzzy
 msgid "Thanks for removing"
-msgstr "ขอบคุณสำหรับการใช้งานเว็บไซต์ของเรา"
+msgstr ""
 
 #: templates/comments/flag.html:4
 msgid "Flag this comment"
@@ -260,24 +242,20 @@ msgid "Really flag this comment?"
 msgstr ""
 
 #: templates/comments/flag.html:12
-#, fuzzy
 msgid "Flag"
-msgstr "มายอกา"
+msgstr ""
 
 #: templates/comments/flagged.html:4
-#, fuzzy
 msgid "Thanks for flagging"
-msgstr "ขอบคุณสำหรับการใช้งานเว็บไซต์ของเรา"
+msgstr ""
 
 #: templates/comments/form.html:17 templates/comments/preview.html:32
-#, fuzzy
 msgid "Post"
-msgstr "st"
+msgstr ""
 
 #: templates/comments/form.html:18 templates/comments/preview.html:33
-#, fuzzy
 msgid "Preview"
-msgstr "ดู:"
+msgstr ""
 
 #: templates/comments/posted.html:4
 msgid "Thanks for commenting"
@@ -292,10 +270,9 @@ msgid "Preview your comment"
 msgstr ""
 
 #: templates/comments/preview.html:11
-#, fuzzy
 msgid "Please correct the error below"
 msgid_plural "Please correct the errors below"
-msgstr[0] "โปรดแก้ไขข้อผิดพลาดด้านล่าง"
+msgstr[0] ""
 
 #: templates/comments/preview.html:16
 msgid "and"
@@ -306,6 +283,5 @@ msgid "Post your comment"
 msgstr ""
 
 #: templates/comments/preview.html:16
-#, fuzzy
 msgid "or make changes"
-msgstr "ไม่มีฟิลด์ใดถูกเปลี่ยน"
+msgstr ""

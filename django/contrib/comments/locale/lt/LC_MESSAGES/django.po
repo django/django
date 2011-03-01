@@ -1,67 +1,60 @@
-# Lithuanian translation of Django.
-# Copyright (C) 2008 The Django Software Foundation
 # This file is distributed under the same license as the Django package.
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:24+0100\n"
-"PO-Revision-Date: 2008-06-18 22:37+0200\n"
-"Last-Translator: Rapolas Kaselis <rapolas@gmail.com>\n"
-"Language-Team: Django-i18n <django-i18n@googlegroups.com>\n"
+"POT-Creation-Date: 2011-02-28 23:42+0100\n"
+"PO-Revision-Date: 2011-02-22 00:10+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: English <en@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: lt\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n%"
-"100<10 || n%100>=20) ? 1 : 2);\n"
+"100<10 || n%100>=20) ? 1 : 2)\n"
 
 #: admin.py:12
-#, fuzzy
 msgid "Content"
-msgstr "turinys"
+msgstr ""
 
 #: admin.py:15
 msgid "Metadata"
 msgstr ""
 
 #: admin.py:42
-#, fuzzy
 msgid "flagged"
 msgid_plural "flagged"
-msgstr[0] "pažymėjimo data"
-msgstr[1] "pažymėjimo data"
-msgstr[2] "pažymėjimo data"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: admin.py:43
-#, fuzzy
 msgid "Flag selected comments"
-msgstr "įjungti komentavimą"
+msgstr ""
 
 #: admin.py:47
-#, fuzzy
 msgid "approved"
 msgid_plural "approved"
-msgstr[0] "patvirtinta personalo"
-msgstr[1] "patvirtinta personalo"
-msgstr[2] "patvirtinta personalo"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: admin.py:48
-#, fuzzy
 msgid "Approve selected comments"
-msgstr "laisvi komentarai"
+msgstr ""
 
 #: admin.py:52
-#, fuzzy
 msgid "removed"
 msgid_plural "removed"
-msgstr[0] "pašalintas"
-msgstr[1] "pašalintas"
-msgstr[2] "pašalintas"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: admin.py:53
-#, fuzzy
 msgid "Remove selected comments"
-msgstr "įjungti komentavimą"
+msgstr ""
 
 #: admin.py:65
 #, python-format
@@ -72,40 +65,37 @@ msgstr[1] ""
 msgstr[2] ""
 
 #: feeds.py:13
-#, fuzzy, python-format
+#, python-format
 msgid "%(site_name)s comments"
-msgstr "įjungti komentavimą"
+msgstr ""
 
 #: feeds.py:23
-#, fuzzy, python-format
+#, python-format
 msgid "Latest comments on %(site_name)s"
-msgstr "Jūsų vartotojui %(site_name)s saite"
+msgstr ""
 
 #: forms.py:109
-#, fuzzy
 msgid "Name"
-msgstr "vardas"
+msgstr ""
 
 #: forms.py:110
-#, fuzzy
 msgid "Email address"
-msgstr "E-mailo adresas"
+msgstr ""
 
 #: forms.py:111
 msgid "URL"
 msgstr "URL"
 
 #: forms.py:112
-#, fuzzy
 msgid "Comment"
-msgstr "Komentaras:"
+msgstr ""
 
 #: forms.py:191
-#, fuzzy, python-format
+#, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
-msgstr[0] "Kontroliuok liežuvį! %s neleidžiamas."
-msgstr[1] "Kontroliuok liežuvį! %s neleidžiami."
+msgstr[0] ""
+msgstr[1] ""
 msgstr[2] ""
 
 #: forms.py:198
@@ -126,19 +116,16 @@ msgid "user"
 msgstr "vartotojas"
 
 #: models.py:52
-#, fuzzy
 msgid "user's name"
-msgstr "vartotojo vardas"
+msgstr ""
 
 #: models.py:53
-#, fuzzy
 msgid "user's email address"
-msgstr "e-mailo adresas"
+msgstr ""
 
 #: models.py:54
-#, fuzzy
 msgid "user's URL"
-msgstr "vartotojai"
+msgstr ""
 
 #: models.py:56 models.py:76 models.py:169
 msgid "comment"
@@ -178,24 +165,16 @@ msgid "comments"
 msgstr "komentarai"
 
 #: models.py:119
-#, fuzzy
 msgid ""
 "This comment was posted by an authenticated user and thus the name is read-"
 "only."
 msgstr ""
-"Šis komentaras buvo paskelbtas nerimto vartotojo:\n"
-"\n"
-"%(text)s"
 
 #: models.py:128
-#, fuzzy
 msgid ""
 "This comment was posted by an authenticated user and thus the email is read-"
 "only."
 msgstr ""
-"Šis komentaras buvo paskelbtas nerimto vartotojo:\n"
-"\n"
-"%(text)s"
 
 #: models.py:153
 #, python-format
@@ -213,29 +192,24 @@ msgstr ""
 "http://%(domain)s%(url)s"
 
 #: models.py:170
-#, fuzzy
 msgid "flag"
-msgstr "pažymėjimo data"
+msgstr ""
 
 #: models.py:171
-#, fuzzy
 msgid "date"
-msgstr "Betkokia data"
+msgstr ""
 
 #: models.py:181
-#, fuzzy
 msgid "comment flag"
-msgstr "komentaras"
+msgstr ""
 
 #: models.py:182
-#, fuzzy
 msgid "comment flags"
-msgstr "komentarai"
+msgstr ""
 
 #: templates/comments/approve.html:4
-#, fuzzy
 msgid "Approve a comment"
-msgstr "laisvas komentaras"
+msgstr ""
 
 #: templates/comments/approve.html:7
 msgid "Really make this comment public?"
@@ -246,9 +220,8 @@ msgid "Approve"
 msgstr ""
 
 #: templates/comments/approved.html:4
-#, fuzzy
 msgid "Thanks for approving"
-msgstr "Dėkui, kad naudojatės mūsų saitu!"
+msgstr ""
 
 #: templates/comments/approved.html:7 templates/comments/deleted.html:7
 #: templates/comments/flagged.html:7
@@ -257,23 +230,20 @@ msgid ""
 msgstr ""
 
 #: templates/comments/delete.html:4
-#, fuzzy
 msgid "Remove a comment"
-msgstr "laisvas komentaras"
+msgstr ""
 
 #: templates/comments/delete.html:7
 msgid "Really remove this comment?"
 msgstr ""
 
 #: templates/comments/delete.html:12
-#, fuzzy
 msgid "Remove"
-msgstr "pašalintas"
+msgstr ""
 
 #: templates/comments/deleted.html:4
-#, fuzzy
 msgid "Thanks for removing"
-msgstr "Dėkui, kad naudojatės mūsų saitu!"
+msgstr ""
 
 #: templates/comments/flag.html:4
 msgid "Flag this comment"
@@ -288,40 +258,34 @@ msgid "Flag"
 msgstr ""
 
 #: templates/comments/flagged.html:4
-#, fuzzy
 msgid "Thanks for flagging"
-msgstr "Dėkui, kad naudojatės mūsų saitu!"
+msgstr ""
 
 #: templates/comments/form.html:17 templates/comments/preview.html:32
-#, fuzzy
 msgid "Post"
-msgstr "st"
+msgstr ""
 
 #: templates/comments/form.html:18 templates/comments/preview.html:33
-#, fuzzy
 msgid "Preview"
-msgstr "vaizdas:"
+msgstr ""
 
 #: templates/comments/posted.html:4
-#, fuzzy
 msgid "Thanks for commenting"
-msgstr "laisvas komentaras"
+msgstr ""
 
 #: templates/comments/posted.html:7
 msgid "Thank you for your comment"
 msgstr ""
 
 #: templates/comments/preview.html:4 templates/comments/preview.html.py:13
-#, fuzzy
 msgid "Preview your comment"
-msgstr "Peržiūrėti komentarą"
+msgstr ""
 
 #: templates/comments/preview.html:11
-#, fuzzy
 msgid "Please correct the error below"
 msgid_plural "Please correct the errors below"
-msgstr[0] "Ištaisykite klaidą žemiau"
-msgstr[1] "Ištaisykite klaidas žemiau"
+msgstr[0] ""
+msgstr[1] ""
 msgstr[2] ""
 
 #: templates/comments/preview.html:16
@@ -329,11 +293,9 @@ msgid "and"
 msgstr "ir"
 
 #: templates/comments/preview.html:16
-#, fuzzy
 msgid "Post your comment"
-msgstr "Peržiūrėti komentarą"
+msgstr ""
 
 #: templates/comments/preview.html:16
-#, fuzzy
 msgid "or make changes"
-msgstr "Nei vienas laukas nepakeistas"
+msgstr ""
