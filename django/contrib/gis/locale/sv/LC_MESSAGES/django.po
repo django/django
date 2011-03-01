@@ -1,54 +1,50 @@
-# Swedish translation of Django
-# Copyright (C) 2005-2007
 # This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:27+0100\n"
-"PO-Revision-Date: 2008-05-26 11:15+0200\n"
-"Last-Translator: Mikko Hellsing <mikko@aino.se>\n"
-"Language-Team: Django I18N <Django-I18N@googlegroups.com>\n"
+"POT-Creation-Date: 2011-03-01 00:20+0100\n"
+"PO-Revision-Date: 2011-02-22 00:12+0000\n"
+"Last-Translator: andreaspelme <andreas@pelme.se>\n"
+"Language-Team: Swedish <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
-"X-Poedit-Language: Swedish\n"
-"X-Poedit-Country: SWEDEN\n"
+"Language: sv\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: db/models/fields.py:50
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
-msgstr ""
+msgstr "Grundläggande GIS-fält -- motsvarar ett OpenGIS-geometrifält."
 
 #: db/models/fields.py:270
-#, fuzzy
 msgid "Point"
-msgstr "Skicka"
+msgstr "Punkt"
 
 #: db/models/fields.py:274
 msgid "Line string"
-msgstr ""
+msgstr "Linjesegment"
 
 #: db/models/fields.py:278
 msgid "Polygon"
-msgstr ""
+msgstr "Polygon"
 
 #: db/models/fields.py:282
 msgid "Multi-point"
-msgstr ""
+msgstr "Multipunkt"
 
 #: db/models/fields.py:286
 msgid "Multi-line string"
-msgstr ""
+msgstr "Multilinjesegment"
 
 #: db/models/fields.py:290
 msgid "Multi polygon"
-msgstr ""
+msgstr "Multipolygon"
 
 #: db/models/fields.py:294
 msgid "Geometry collection"
-msgstr ""
+msgstr "Geometrisamling"
 
 #: forms/fields.py:17
 msgid "No geometry value provided."

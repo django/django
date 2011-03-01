@@ -1,29 +1,26 @@
-# Kannada translation of Django.
-# Copyright (C) 2007 Translation Team <translation@sampada.info>
 # This file is distributed under the same license as the Django package.
-# Kannada Localization Team <translation@sampada.info>, 2007.
-#
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:26+0100\n"
-"PO-Revision-Date: 2007-01-08 20:22+0530\n"
-"Last-Translator: Kannada Localization Team <translation@sampada.info>\n"
-"Language-Team: Kannada <translation@sampada.info>\n"
+"POT-Creation-Date: 2011-03-01 00:19+0100\n"
+"PO-Revision-Date: 2011-02-28 23:18+0000\n"
+"Last-Translator: Django team\n"
+"Language-Team: English <en@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: kn\n"
+"Plural-Forms: nplurals=1; plural=0\n"
 
 #: db/models/fields.py:50
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
 msgstr ""
 
 #: db/models/fields.py:270
-#, fuzzy
 msgid "Point"
-msgstr "ತಿಂಗಳು"
+msgstr ""
 
 #: db/models/fields.py:274
 msgid "Line string"
@@ -54,14 +51,12 @@ msgid "No geometry value provided."
 msgstr ""
 
 #: forms/fields.py:18
-#, fuzzy
 msgid "Invalid geometry value."
-msgstr "ತಪ್ಪು ಟಿಪ್ಪಣಿ ಐಡಿ"
+msgstr ""
 
 #: forms/fields.py:19
-#, fuzzy
 msgid "Invalid geometry type."
-msgstr "ತಪ್ಪು ಟಿಪ್ಪಣಿ ಐಡಿ"
+msgstr ""
 
 #: forms/fields.py:20
 msgid ""

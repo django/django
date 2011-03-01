@@ -1,12 +1,12 @@
 # This file is distributed under the same license as the Django package.
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:25+0100\n"
-"PO-Revision-Date: 2011-02-06 05:56+0000\n"
-"Last-Translator: AbeEstrada <abraham.estrada@gmail.com>\n"
+"POT-Creation-Date: 2011-03-01 00:19+0100\n"
+"PO-Revision-Date: 2011-02-22 00:12+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
 "Language-Team: Spanish (Mexican) <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -16,7 +16,9 @@ msgstr ""
 
 #: db/models/fields.py:50
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
-msgstr "El campo GIS base -- corresponde al tipo Geometry de la especificación OpenGIS."
+msgstr ""
+"El campo GIS base -- corresponde al tipo Geometry de la especificación "
+"OpenGIS."
 
 #: db/models/fields.py:270
 msgid "Point"
@@ -59,5 +61,9 @@ msgid "Invalid geometry type."
 msgstr "Tipo de geometría no válido."
 
 #: forms/fields.py:20
-msgid "An error occurred when transforming the geometry to the SRID of the geometry form field."
-msgstr "Ha ocurrido un error mientras se transformaba la geometría al SRID del campo de formulario de la misma."
+msgid ""
+"An error occurred when transforming the geometry to the SRID of the geometry "
+"form field."
+msgstr ""
+"Ha ocurrido un error mientras se transformaba la geometría al SRID del campo "
+"de formulario de la misma."

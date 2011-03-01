@@ -1,19 +1,17 @@
-# Django Korean Translation
-# Copyright (C) 2009
-# This file is distributed under the same license as the django package.
-# Hyun Mi Ae, Joongi Kim (me@daybreaker.info), Sung-Jin Hong (serialx.net@gmail.com)
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:26+0100\n"
-"PO-Revision-Date: 2007-04-06 11:04+0900\n"
-"Last-Translator: Joongi Kim (me@daybreaker.info)\n"
-"Language-Team: Korean\n"
+"POT-Creation-Date: 2011-03-01 00:19+0100\n"
+"PO-Revision-Date: 2011-02-22 00:12+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: English <en@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: ko\n"
 "Plural-Forms: nplurals=1; plural=0\n"
 
 #: db/models/fields.py:50

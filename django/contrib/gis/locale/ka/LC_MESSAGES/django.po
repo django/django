@@ -1,52 +1,50 @@
-# translation of django.po to Georgian
-# Django translation to Georgian language.
-# This file is distributed under the same license as the PACKAGE package.
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:26+0100\n"
-"PO-Revision-Date: 2008-10-05 14:34+0400\n"
-"Last-Translator: David Avsajanishvili <avsd05@gmail.com>\n"
-"Language-Team: Georgian <ka@li.org>\n"
+"POT-Creation-Date: 2011-03-01 00:19+0100\n"
+"PO-Revision-Date: 2011-02-22 00:12+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: Georgian <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: ka\n"
 "Plural-Forms: nplurals=1; plural=0\n"
 
 #: db/models/fields.py:50
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
-msgstr ""
+msgstr "GIS-ის ბაზური ველი -- შეესაბამება OpenGIS სპეციფიკაციის Geometry ტიპს."
 
 #: db/models/fields.py:270
-#, fuzzy
 msgid "Point"
-msgstr "გაგზავნა"
+msgstr "წერტილი"
 
 #: db/models/fields.py:274
 msgid "Line string"
-msgstr ""
+msgstr "ხაზის მასივი"
 
 #: db/models/fields.py:278
 msgid "Polygon"
-msgstr ""
+msgstr "მრავალკუთხედი"
 
 #: db/models/fields.py:282
 msgid "Multi-point"
-msgstr ""
+msgstr "წერტილების სიმრავლე"
 
 #: db/models/fields.py:286
 msgid "Multi-line string"
-msgstr ""
+msgstr "ხაზების სიმრავლის მასივი"
 
 #: db/models/fields.py:290
 msgid "Multi polygon"
-msgstr ""
+msgstr "მრავალკუთხედების სიმრავლე"
 
 #: db/models/fields.py:294
 msgid "Geometry collection"
-msgstr ""
+msgstr "გეომეტრიული კოლექცია"
 
 #: forms/fields.py:17
 msgid "No geometry value provided."
@@ -64,4 +62,4 @@ msgstr "გეომეტრიის ტიპი არასწორია.
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."
-msgstr ""
+msgstr "ველიდან გეომეტრიის SRID-ში გადაყვანისას მოხდა შეცდომა."

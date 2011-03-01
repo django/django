@@ -1,28 +1,26 @@
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:26+0100\n"
-"PO-Revision-Date: 2007-08-10 00:21+0900\n"
-"Last-Translator: Chay Sengtha <sengtha@e-khmer.com>\n"
-"Language-Team: Chay Sengtha <sengtha@e-khmer.com>\n"
+"POT-Creation-Date: 2011-03-01 00:19+0100\n"
+"PO-Revision-Date: 2011-02-28 23:17+0000\n"
+"Last-Translator: Django team\n"
+"Language-Team: English <en@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Language: km\n"
+"Plural-Forms: nplurals=1; plural=0\n"
 
 #: db/models/fields.py:50
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
 msgstr ""
 
 #: db/models/fields.py:270
-#, fuzzy
 msgid "Point"
-msgstr "ពិនិត្យចូល"
+msgstr ""
 
 #: db/models/fields.py:274
 msgid "Line string"
@@ -41,9 +39,8 @@ msgid "Multi-line string"
 msgstr ""
 
 #: db/models/fields.py:290
-#, fuzzy
 msgid "Multi polygon"
-msgstr "ទាញយកឯកសារ"
+msgstr ""
 
 #: db/models/fields.py:294
 msgid "Geometry collection"
@@ -54,14 +51,12 @@ msgid "No geometry value provided."
 msgstr ""
 
 #: forms/fields.py:18
-#, fuzzy
 msgid "Invalid geometry value."
-msgstr "លេខ​សំគាល់​មតិ​យោបល់​មិន​ត្រឹម​ត្រូវ"
+msgstr ""
 
 #: forms/fields.py:19
-#, fuzzy
 msgid "Invalid geometry type."
-msgstr "លេខ​សំគាល់​មតិ​យោបល់​មិន​ត្រឹម​ត្រូវ"
+msgstr ""
 
 #: forms/fields.py:20
 msgid ""
