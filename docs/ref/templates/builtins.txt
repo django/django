@@ -678,12 +678,9 @@ See :doc:`Custom tag and filter libraries </howto/custom-template-tags>` for mor
 now
 ~~~
 
-Display the current date and/or time, according to the given string.
-
-Given format can be one of the predefined ones ``DATE_FORMAT``,
-``DATETIME_FORMAT``, ``SHORT_DATE_FORMAT`` or ``SHORT_DATETIME_FORMAT``,
-or a custom format, same as the :tfilter:`date` filter. Note that predefined
-formats may vary depending on the current locale.
+Display the current date and/or time, using a format according to the given
+string. Such string can contain format specifiers characters as described
+in the :tfilter:`date` filter section.
 
 Example::
 
