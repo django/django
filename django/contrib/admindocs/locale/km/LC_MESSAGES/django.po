@@ -1,19 +1,18 @@
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:22+0100\n"
-"PO-Revision-Date: 2007-08-10 00:21+0900\n"
-"Last-Translator: Chay Sengtha <sengtha@e-khmer.com>\n"
-"Language-Team: Chay Sengtha <sengtha@e-khmer.com>\n"
+"POT-Creation-Date: 2011-02-28 23:30+0100\n"
+"PO-Revision-Date: 2011-02-22 00:07+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: English <en@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Language: km\n"
+"Plural-Forms: nplurals=1; plural=0\n"
 
 #: views.py:63 views.py:65 views.py:67
 msgid "tag:"
@@ -33,14 +32,14 @@ msgid "App %r not found"
 msgstr "ស្វែងរក App %r មិនឃើញ ។"
 
 #: views.py:201
-#, fuzzy, python-format
+#, python-format
 msgid "Model %(model_name)r not found in app %(app_label)r"
-msgstr "Model %r រកមិនឃើញនៅក្នុង app %r"
+msgstr ""
 
 #: views.py:213
-#, fuzzy, python-format
+#, python-format
 msgid "the related `%(app_label)s.%(data_type)s` object"
-msgstr " `%s.%s` object ដែលពាក់ព័ន្ធ"
+msgstr ""
 
 #: views.py:213 views.py:232 views.py:237 views.py:251 views.py:265
 #: views.py:270
@@ -48,9 +47,9 @@ msgid "model:"
 msgstr "model:"
 
 #: views.py:228 views.py:260
-#, fuzzy, python-format
+#, python-format
 msgid "related `%(app_label)s.%(object_name)s` objects"
-msgstr "ជាប់​ទាក់ទង​ជាមួយ​នឹងកម្មវិធី​  `%s.%s` "
+msgstr ""
 
 #: views.py:232 views.py:265
 #, python-format

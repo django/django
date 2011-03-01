@@ -4,9 +4,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:22+0100\n"
-"PO-Revision-Date: 2011-02-06 05:55+0000\n"
-"Last-Translator: AbeEstrada <abraham.estrada@gmail.com>\n"
+"POT-Creation-Date: 2011-02-28 23:30+0100\n"
+"PO-Revision-Date: 2011-02-22 00:07+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
 "Language-Team: Spanish (Mexican) <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -96,23 +96,37 @@ msgid ""
 "bookmarklets require you to be viewing the site from a computer designated\n"
 "as \"internal\" (talk to your system administrator if you aren't sure if\n"
 "your computer is \"internal\").</p>\n"
-msgstr "\n<p class=\"help\">Para instalar bookmarklets, arrastre el enlace a su barra de favoritos, o pulse con el botón derecho el enlace y añádalo a sus favoritos. Ahora puede seleccionar el bookmarklet desde cualquier página en el sitio. Tenga en cuenta que algunos de estos bookmarklets necesitan que esté viendo el sitio desde un equipo señalado como \"interno\" (hable con su administrador de sistemas si no está seguro de si el suyo lo es).</p>\n"
+msgstr ""
+"\n"
+"<p class=\"help\">Para instalar bookmarklets, arrastre el enlace a su barra "
+"de favoritos, o pulse con el botón derecho el enlace y añádalo a sus "
+"favoritos. Ahora puede seleccionar el bookmarklet desde cualquier página en "
+"el sitio. Tenga en cuenta que algunos de estos bookmarklets necesitan que "
+"esté viendo el sitio desde un equipo señalado como \"interno\" (hable con su "
+"administrador de sistemas si no está seguro de si el suyo lo es).</p>\n"
 
 #: templates/admin_doc/bookmarklets.html:18
 msgid "Documentation for this page"
 msgstr "Documentación de esta página"
 
 #: templates/admin_doc/bookmarklets.html:19
-msgid "Jumps you from any page to the documentation for the view that generates that page."
-msgstr "Le lleva desde cualquier página a la documentación de la vista que la genera."
+msgid ""
+"Jumps you from any page to the documentation for the view that generates "
+"that page."
+msgstr ""
+"Le lleva desde cualquier página a la documentación de la vista que la genera."
 
 #: templates/admin_doc/bookmarklets.html:21
 msgid "Show object ID"
 msgstr "Mostrar ID de objeto"
 
 #: templates/admin_doc/bookmarklets.html:22
-msgid "Shows the content-type and unique ID for pages that represent a single object."
-msgstr "Muestra el tipo de contenido e ID único de las páginas que representan un único objeto."
+msgid ""
+"Shows the content-type and unique ID for pages that represent a single "
+"object."
+msgstr ""
+"Muestra el tipo de contenido e ID único de las páginas que representan un "
+"único objeto."
 
 #: templates/admin_doc/bookmarklets.html:24
 msgid "Edit this object (current window)"
@@ -120,7 +134,9 @@ msgstr "Editar este objeto (ventana actual)"
 
 #: templates/admin_doc/bookmarklets.html:25
 msgid "Jumps to the admin page for pages that represent a single object."
-msgstr "Le lleva a la página de administración de páginas que representan un único objeto."
+msgstr ""
+"Le lleva a la página de administración de páginas que representan un único "
+"objeto."
 
 #: templates/admin_doc/bookmarklets.html:27
 msgid "Edit this object (new window)"
@@ -128,4 +144,5 @@ msgstr "Editar este objeto (nueva ventana)"
 
 #: templates/admin_doc/bookmarklets.html:28
 msgid "As above, but opens the admin page in a new window."
-msgstr "Como el anterior, pero abre la página de administración en una ventana nueva"
+msgstr ""
+"Como el anterior, pero abre la página de administración en una ventana nueva"

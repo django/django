@@ -1,17 +1,17 @@
-# Translation of django.po to Indonesian
 # This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:22+0100\n"
-"PO-Revision-Date: 2010-05-08 18:39+0700\n"
-"Last-Translator: Selwin Ong <selwin@ui.co.id>\n"
-"Language-Team: Indonesian <id@li.org>\n"
+"POT-Creation-Date: 2011-02-28 23:30+0100\n"
+"PO-Revision-Date: 2011-02-22 00:07+0000\n"
+"Last-Translator: rodin <romihardiyanto@gmail.com>\n"
+"Language-Team: Indonesian <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: id\n"
 "Plural-Forms: nplurals=1; plural=0\n"
 
 #: views.py:63 views.py:65 views.py:67
@@ -34,12 +34,12 @@ msgstr "Aplikasi %r tidak ditemukan"
 #: views.py:201
 #, python-format
 msgid "Model %(model_name)r not found in app %(app_label)r"
-msgstr "Model %(model_name)r tidak ada di aplikasi %(app_label)r"
+msgstr "Model %(model_name)r tidak ditemukan di aplikasi %(app_label)r"
 
 #: views.py:213
 #, python-format
 msgid "the related `%(app_label)s.%(data_type)s` object"
-msgstr "obyek `%(app_label)s.%(data_type)s` yang berhubungan"
+msgstr "objek `%(app_label)s.%(data_type)s` yang terkait"
 
 #: views.py:213 views.py:232 views.py:237 views.py:251 views.py:265
 #: views.py:270
@@ -49,7 +49,7 @@ msgstr "model:"
 #: views.py:228 views.py:260
 #, python-format
 msgid "related `%(app_label)s.%(object_name)s` objects"
-msgstr "obyek-obyek `%(app_label)s.%(object_name)s` yang berhubungan"
+msgstr "obyek `%(app_label)s.%(object_name)s` yang terkait"
 
 #: views.py:232 views.py:265
 #, python-format
@@ -64,16 +64,16 @@ msgstr "jumlah %s"
 #: views.py:275
 #, python-format
 msgid "Fields on %s objects"
-msgstr "Field-field dalam %s obyek"
+msgstr "Bidang dalam objek %s"
 
 #: views.py:365
 #, python-format
 msgid "%s does not appear to be a urlpattern object"
-msgstr "%s bukan berupa obyek urlpattern"
+msgstr "%s bukan berupa objek urlpattern"
 
 #: templates/admin_doc/bookmarklets.html:3
 msgid "Home"
-msgstr "Halaman Utama"
+msgstr "Beranda"
 
 #: templates/admin_doc/bookmarklets.html:3
 msgid "Documentation"
@@ -81,7 +81,7 @@ msgstr "Dokumentasi"
 
 #: templates/admin_doc/bookmarklets.html:3
 msgid "Bookmarklets"
-msgstr "Bookmarklets"
+msgstr "Bookmarklet"
 
 #: templates/admin_doc/bookmarklets.html:4
 msgid "Documentation bookmarklets"
@@ -98,53 +98,50 @@ msgid ""
 "your computer is \"internal\").</p>\n"
 msgstr ""
 "\n"
-"<p class=\"help\">Untuk menginstal bookmarklet, drag tautan ini ke toolbar\n"
-"bookmark Anda atau klik kanan di pautan tersebut dan tambahkan ke bookmark "
-"Anda. Kini Anda dapat\n"
-"memilih bookmarklet dari halaman apapun di situs. Jangan lupa beberapa\n"
-"bookmarklet ini hanya bisa digunakan dari komputer yang terdaftar \n"
-"sebagai \"internal\" (hubungi administrator sistem Anda apabila tidak yakin "
-"apakah\n"
-"komputer Anda termasuk \"internal\").</p>\n"
+"<p class=\"help\">Untuk memasang bookmarklet, seret tautan ini ke bilah\n"
+"markah Anda atau klik kanan pada tautan tersebut kemudian tambahkan ke\n"
+"markah Anda. Setelah itu Anda dapat memilih bookmarklet dari laman apapun\n"
+"pada situs. Jangan lupa, beberapa bookmarklet ini hanya bisa digunakan\n"
+"dari komputer yang terdaftar sebagai \"internal\" (hubungi administrator\n"
+"sistem Anda apabila tidak yakin apakah komputer Anda termasuk komputer\n"
+"\"internal\").</p>\n"
 
 #: templates/admin_doc/bookmarklets.html:18
 msgid "Documentation for this page"
-msgstr "Dokumentasi untuk halaman ini"
+msgstr "Dokumentasi untuk laman ini"
 
 #: templates/admin_doc/bookmarklets.html:19
 msgid ""
 "Jumps you from any page to the documentation for the view that generates "
 "that page."
 msgstr ""
-"Membawa Anda ke halaman dokumentasi untuk view yang menghasilkan halaman "
-"tersebut."
+"Buka dari laman apa saja ke laman dokumentasi untuk view yang menghasilkan "
+"laman tersebut."
 
 #: templates/admin_doc/bookmarklets.html:21
 msgid "Show object ID"
-msgstr "Perlihatkan ID obyek"
+msgstr "Tampilkan ID objek"
 
 #: templates/admin_doc/bookmarklets.html:22
 msgid ""
 "Shows the content-type and unique ID for pages that represent a single "
 "object."
 msgstr ""
-"Perlihatkan content-type dan ID unik untuk halaman-halaman yang mewakili "
-"sebuah obyek tunggal."
+"Tampilkan tipe-konten dan ID unik untuk laman yang mewakili sebuah objek "
+"tunggal."
 
 #: templates/admin_doc/bookmarklets.html:24
 msgid "Edit this object (current window)"
-msgstr "Ubah obyek ini (di jendela ini)"
+msgstr "Edit objek ini (pada jendela ini)"
 
 #: templates/admin_doc/bookmarklets.html:25
 msgid "Jumps to the admin page for pages that represent a single object."
-msgstr ""
-"Loncat ke halaman admin untuk halaman-halaman yang mewakili sebuah obyek "
-"tunggal."
+msgstr "Buka laman admin pada laman yang mewakili sebuah objek tunggal."
 
 #: templates/admin_doc/bookmarklets.html:27
 msgid "Edit this object (new window)"
-msgstr "Ubah obyek ini (di jendela baru)"
+msgstr "Edit objek ini (pada jendela baru)"
 
 #: templates/admin_doc/bookmarklets.html:28
 msgid "As above, but opens the admin page in a new window."
-msgstr "Seperti di atas, tetapi membuka halaman admin di jendela baru."
+msgstr "Sama seperti di atas, tetapi laman halaman admin di jendela baru."

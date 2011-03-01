@@ -1,20 +1,18 @@
-# translation of django.po to el
-# Copyright (C) 2006 and beyond
-# This file is distributed under the same license as the DJANGO package.
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:22+0100\n"
-"PO-Revision-Date: 2007-09-03 04:19+0100\n"
-"Last-Translator: Dimitris Glezos <dimitris@glezos.com>\n"
-"Language-Team: el <fedora-trans-el@redhat.com>\n"
+"POT-Creation-Date: 2011-02-28 23:30+0100\n"
+"PO-Revision-Date: 2011-02-22 00:07+0000\n"
+"Last-Translator: glezos <glezos@indifex.com>\n"
+"Language-Team: Greek <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.11.4\n"
-"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
+"Language: el\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: views.py:63 views.py:65 views.py:67
 msgid "tag:"
@@ -29,19 +27,19 @@ msgid "view:"
 msgstr "προβολή:"
 
 #: views.py:194
-#, fuzzy, python-format
+#, python-format
 msgid "App %r not found"
-msgstr "Η σελίδα δε βρέθηκε"
+msgstr "Δε βρέθηκε η εφαρμογή %r"
 
 #: views.py:201
-#, fuzzy, python-format
+#, python-format
 msgid "Model %(model_name)r not found in app %(app_label)r"
-msgstr "όνομα"
+msgstr ""
 
 #: views.py:213
-#, fuzzy, python-format
+#, python-format
 msgid "the related `%(app_label)s.%(data_type)s` object"
-msgstr "όνομα"
+msgstr ""
 
 #: views.py:213 views.py:232 views.py:237 views.py:251 views.py:265
 #: views.py:270
@@ -49,9 +47,9 @@ msgid "model:"
 msgstr "μοντέλο:"
 
 #: views.py:228 views.py:260
-#, fuzzy, python-format
+#, python-format
 msgid "related `%(app_label)s.%(object_name)s` objects"
-msgstr "όνομα"
+msgstr ""
 
 #: views.py:232 views.py:265
 #, python-format
@@ -90,7 +88,6 @@ msgid "Documentation bookmarklets"
 msgstr "Σελιδοδείκτες τεκμηρίωσης"
 
 #: templates/admin_doc/bookmarklets.html:8
-#, fuzzy
 msgid ""
 "\n"
 "<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
@@ -100,47 +97,44 @@ msgid ""
 "as \"internal\" (talk to your system administrator if you aren't sure if\n"
 "your computer is \"internal\").</p>\n"
 msgstr ""
-"\n"
-"<p class=\"help\"> δεσμός ή δεξιά δεσμός και αύξηση Τώρα υποφαινόμενο από "
-"κάθε σελίδα μέσα site Σημείωση από υποφαινόμενο site από a σύστημα "
-"υποφαινόμενο t είναι</p> n"
 
 #: templates/admin_doc/bookmarklets.html:18
 msgid "Documentation for this page"
 msgstr "Τεκμηρίωση για αυτήν τη σελίδα"
 
 #: templates/admin_doc/bookmarklets.html:19
-#, fuzzy
 msgid ""
 "Jumps you from any page to the documentation for the view that generates "
 "that page."
-msgstr "Άλματα υποφαινόμενο από κάθε σελίδα τεκμηρίωση για σελίδα."
+msgstr ""
+"Μεταπήδηση από οποιαδήποτε σελίδα στην τεκμηρίωση για το view που "
+"δημιούργησε τη σελίδα αυτή."
 
 #: templates/admin_doc/bookmarklets.html:21
 msgid "Show object ID"
 msgstr "Εμφάνιση ID αντικειμένου"
 
 #: templates/admin_doc/bookmarklets.html:22
-#, fuzzy
 msgid ""
 "Shows the content-type and unique ID for pages that represent a single "
 "object."
-msgstr "Περιεχόμενο τύπος και μοναδικό ID για σελίδες a single αντικείμενο."
+msgstr ""
+"Εμφάνιση του content-type και του μοναδικού αναγνωριστικού για τις σελίδες "
+"που αντιπροσωπεύουν ένα μοναδικό αντικείμενο."
 
 #: templates/admin_doc/bookmarklets.html:24
 msgid "Edit this object (current window)"
 msgstr "Επεξεργασία αυτού του αντικειμένου (τρέχον παράθυρο)"
 
 #: templates/admin_doc/bookmarklets.html:25
-#, fuzzy
 msgid "Jumps to the admin page for pages that represent a single object."
-msgstr "Άλματα σελίδα για σελίδες a single αντικείμενο."
+msgstr ""
 
 #: templates/admin_doc/bookmarklets.html:27
 msgid "Edit this object (new window)"
 msgstr "Επεξεργασία αυτού του αντικειμένου (νέο παράθυρο)"
 
 #: templates/admin_doc/bookmarklets.html:28
-#, fuzzy
 msgid "As above, but opens the admin page in a new window."
-msgstr "σελίδα μέσα a νέο παράθυρο."
+msgstr ""
+"Όπως και παραπάνω, αλλά άνοιγμα της σελίδας διαχείρισης σε νέο παράθυρο."

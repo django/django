@@ -1,18 +1,18 @@
-# Estonian translation for the Django Project.
-# Copyright (C) 2008, Django Project
-# This file is distributed under the same license as the django package.
+# This file is distributed under the same license as the Django package.
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:22+0100\n"
-"PO-Revision-Date: 2008-09-03 00:35+0200\n"
-"Last-Translator: Erik Allik <removethis-eallik_at_gmail-com>\n"
-"Language-Team: Django-i18n <django-i18n@googlegroups.com>\n"
+"POT-Creation-Date: 2011-02-28 23:30+0100\n"
+"PO-Revision-Date: 2011-02-22 00:07+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: Estonian <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: et\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: views.py:63 views.py:65 views.py:67
 msgid "tag:"

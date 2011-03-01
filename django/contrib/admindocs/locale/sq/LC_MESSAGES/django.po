@@ -4,87 +4,88 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:23+0100\n"
-"PO-Revision-Date: 2010-01-27 23:01+0200\n"
-"Last-Translator: Besnik Bleta <besnik@programeshqip.org>\n"
-"Language-Team: Albanian <sq@li.org>\n"
+"POT-Creation-Date: 2011-02-28 23:30+0100\n"
+"PO-Revision-Date: 2011-02-22 00:07+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: Albanian <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: sq\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: views.py:63 views.py:65 views.py:67
 msgid "tag:"
-msgstr ""
+msgstr "etiketë:"
 
 #: views.py:98 views.py:100 views.py:102
 msgid "filter:"
-msgstr ""
+msgstr "filtër:"
 
 #: views.py:162 views.py:164 views.py:166
 msgid "view:"
-msgstr ""
+msgstr "parje:"
 
 #: views.py:194
 #, python-format
 msgid "App %r not found"
-msgstr ""
+msgstr "Nuk u gjet zbatimi %r"
 
 #: views.py:201
 #, python-format
 msgid "Model %(model_name)r not found in app %(app_label)r"
-msgstr ""
+msgstr "Nuk u gjet modeli %(model_name)r në zbatimin %(app_label)r"
 
 #: views.py:213
 #, python-format
 msgid "the related `%(app_label)s.%(data_type)s` object"
-msgstr ""
+msgstr "objekti i afërt `%(app_label)s.%(data_type)s`"
 
 #: views.py:213 views.py:232 views.py:237 views.py:251 views.py:265
 #: views.py:270
 msgid "model:"
-msgstr ""
+msgstr "model:"
 
 #: views.py:228 views.py:260
 #, python-format
 msgid "related `%(app_label)s.%(object_name)s` objects"
-msgstr ""
+msgstr "objektet e afërta `%(app_label)s.%(object_name)s`"
 
 #: views.py:232 views.py:265
 #, python-format
 msgid "all %s"
-msgstr ""
+msgstr "krejt %s"
 
 #: views.py:237 views.py:270
 #, python-format
 msgid "number of %s"
-msgstr ""
+msgstr "numër i %s"
 
 #: views.py:275
 #, python-format
 msgid "Fields on %s objects"
-msgstr ""
+msgstr "Fusha te objektet %s"
 
 #: views.py:365
 #, python-format
 msgid "%s does not appear to be a urlpattern object"
-msgstr ""
+msgstr "%s nuk duket të jetë një objekt urlpattern"
 
 #: templates/admin_doc/bookmarklets.html:3
 msgid "Home"
-msgstr ""
+msgstr "Hyrje"
 
 #: templates/admin_doc/bookmarklets.html:3
 msgid "Documentation"
-msgstr ""
+msgstr "Dokumentim"
 
 #: templates/admin_doc/bookmarklets.html:3
 msgid "Bookmarklets"
-msgstr ""
+msgstr "\"Bookmarklet\"-e"
 
 #: templates/admin_doc/bookmarklets.html:4
 msgid "Documentation bookmarklets"
-msgstr ""
+msgstr "\"Bookmarklet\"-e Dokumentimi"
 
 #: templates/admin_doc/bookmarklets.html:8
 msgid ""
@@ -96,39 +97,54 @@ msgid ""
 "as \"internal\" (talk to your system administrator if you aren't sure if\n"
 "your computer is \"internal\").</p>\n"
 msgstr ""
+"\n"
+"<p class=\"help\">Për instalim \"bookmarklet\"-esh, tërhiqeni lidhjen te "
+"paneli juaj\n"
+"i faqerojtësve, ose djathtas-klikoni dhe shtojeni te faqerojtësit tuaj. Tani "
+"mundeni\n"
+"të përzgjidhni \"bookmarklet\" nga cilado faqe e \"site\"-it.  Kini parasysh "
+"që disa prej\n"
+"\"bookmarklet\"-eve kërkojnë që ju ta shihni \"site\"-in prej një kompjuteri "
+"të specifikuar\n"
+"si \"i brendshëm\" (sqarojeni me përgjegjësin e sistemit nëse nuk jeni i "
+"sigurt\n"
+"në është a jo \"i brendshëm\" kompjuteri juaj).</p>\n"
 
 #: templates/admin_doc/bookmarklets.html:18
 msgid "Documentation for this page"
-msgstr ""
+msgstr "Dokumentim për këtë faqe"
 
 #: templates/admin_doc/bookmarklets.html:19
 msgid ""
 "Jumps you from any page to the documentation for the view that generates "
 "that page."
 msgstr ""
+"Ju kalon nga cilado faqe te dokumenti që prodhon atë faqe, për ta parë."
 
 #: templates/admin_doc/bookmarklets.html:21
 msgid "Show object ID"
-msgstr ""
+msgstr "Shfaq ID objekti"
 
 #: templates/admin_doc/bookmarklets.html:22
 msgid ""
 "Shows the content-type and unique ID for pages that represent a single "
 "object."
 msgstr ""
+"Shfaq lloj lënde dhe ID unike për faqet që përfaqësojnë një objekt të vetëm."
 
 #: templates/admin_doc/bookmarklets.html:24
 msgid "Edit this object (current window)"
-msgstr ""
+msgstr "Përpunojeni këtë objekt (dritarja e tanishme)"
 
 #: templates/admin_doc/bookmarklets.html:25
 msgid "Jumps to the admin page for pages that represent a single object."
 msgstr ""
+"Kalon te faqja e përgjegjësit për faqet që përfaqësojnë një objekt të vetëm."
 
 #: templates/admin_doc/bookmarklets.html:27
 msgid "Edit this object (new window)"
-msgstr ""
+msgstr "Përpunojeni këtë objekt (dritare e re)"
 
 #: templates/admin_doc/bookmarklets.html:28
 msgid "As above, but opens the admin page in a new window."
-msgstr ""
+msgstr "Si më sipër, por hap faqen e përgjegjësit në një dritare të re."

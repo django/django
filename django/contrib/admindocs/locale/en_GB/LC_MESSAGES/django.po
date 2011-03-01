@@ -4,86 +4,88 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:22+0100\n"
-"PO-Revision-Date: 2010-03-25 08:00+1000\n"
-"Last-Translator: Simon Meers <DrMeers@gmail.com>\n"
-"Language-Team: \n"
+"POT-Creation-Date: 2011-02-28 23:30+0100\n"
+"PO-Revision-Date: 2011-02-22 00:07+0000\n"
+"Last-Translator: jon_atkinson <jon@jonatkinson.co.uk>\n"
+"Language-Team: English (United Kingdom) <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: en_GB\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: views.py:63 views.py:65 views.py:67
 msgid "tag:"
-msgstr ""
+msgstr "tag:"
 
 #: views.py:98 views.py:100 views.py:102
 msgid "filter:"
-msgstr ""
+msgstr "filter:"
 
 #: views.py:162 views.py:164 views.py:166
 msgid "view:"
-msgstr ""
+msgstr "view:"
 
 #: views.py:194
 #, python-format
 msgid "App %r not found"
-msgstr ""
+msgstr "App %r not found"
 
 #: views.py:201
 #, python-format
 msgid "Model %(model_name)r not found in app %(app_label)r"
-msgstr ""
+msgstr "Model %(model_name)r not found in app %(app_label)r"
 
 #: views.py:213
 #, python-format
 msgid "the related `%(app_label)s.%(data_type)s` object"
-msgstr ""
+msgstr "the related `%(app_label)s.%(data_type)s` object"
 
 #: views.py:213 views.py:232 views.py:237 views.py:251 views.py:265
 #: views.py:270
 msgid "model:"
-msgstr ""
+msgstr "model:"
 
 #: views.py:228 views.py:260
 #, python-format
 msgid "related `%(app_label)s.%(object_name)s` objects"
-msgstr ""
+msgstr "related `%(app_label)s.%(object_name)s` objects"
 
 #: views.py:232 views.py:265
 #, python-format
 msgid "all %s"
-msgstr ""
+msgstr "all %s"
 
 #: views.py:237 views.py:270
 #, python-format
 msgid "number of %s"
-msgstr ""
+msgstr "number of %s"
 
 #: views.py:275
 #, python-format
 msgid "Fields on %s objects"
-msgstr ""
+msgstr "Fields on %s objects"
 
 #: views.py:365
 #, python-format
 msgid "%s does not appear to be a urlpattern object"
-msgstr ""
+msgstr "%s does not appear to be a urlpattern object"
 
 #: templates/admin_doc/bookmarklets.html:3
 msgid "Home"
-msgstr ""
+msgstr "Home"
 
 #: templates/admin_doc/bookmarklets.html:3
 msgid "Documentation"
-msgstr ""
+msgstr "Documentation"
 
 #: templates/admin_doc/bookmarklets.html:3
 msgid "Bookmarklets"
-msgstr ""
+msgstr "Bookmarklets"
 
 #: templates/admin_doc/bookmarklets.html:4
 msgid "Documentation bookmarklets"
-msgstr ""
+msgstr "Documentation bookmarklets"
 
 #: templates/admin_doc/bookmarklets.html:8
 msgid ""
@@ -95,39 +97,50 @@ msgid ""
 "as \"internal\" (talk to your system administrator if you aren't sure if\n"
 "your computer is \"internal\").</p>\n"
 msgstr ""
+"\n"
+"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
+"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
+"select the bookmarklet from any page in the site.  Note that some of these\n"
+"bookmarklets require you to be viewing the site from a computer designated\n"
+"as \"internal\" (talk to your system administrator if you aren't sure if\n"
+"your computer is \"internal\").</p>\n"
 
 #: templates/admin_doc/bookmarklets.html:18
 msgid "Documentation for this page"
-msgstr ""
+msgstr "Documentation for this page"
 
 #: templates/admin_doc/bookmarklets.html:19
 msgid ""
 "Jumps you from any page to the documentation for the view that generates "
 "that page."
 msgstr ""
+"Jumps you from any page to the documentation for the view that generates "
+"that page."
 
 #: templates/admin_doc/bookmarklets.html:21
 msgid "Show object ID"
-msgstr ""
+msgstr "Show object ID"
 
 #: templates/admin_doc/bookmarklets.html:22
 msgid ""
 "Shows the content-type and unique ID for pages that represent a single "
 "object."
 msgstr ""
+"Shows the content-type and unique ID for pages that represent a single "
+"object."
 
 #: templates/admin_doc/bookmarklets.html:24
 msgid "Edit this object (current window)"
-msgstr ""
+msgstr "Edit this object (current window)"
 
 #: templates/admin_doc/bookmarklets.html:25
 msgid "Jumps to the admin page for pages that represent a single object."
-msgstr ""
+msgstr "Jumps to the admin page for pages that represent a single object."
 
 #: templates/admin_doc/bookmarklets.html:27
 msgid "Edit this object (new window)"
-msgstr ""
+msgstr "Edit this object (new window)"
 
 #: templates/admin_doc/bookmarklets.html:28
 msgid "As above, but opens the admin page in a new window."
-msgstr ""
+msgstr "As above, but opens the admin page in a new window."

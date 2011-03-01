@@ -1,20 +1,18 @@
-# Translation of Django to Welsh.
-# Copyright (C) 2005 Django.
 # This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:22+0100\n"
-"PO-Revision-Date: 2005-11-05 HO:MI+ZONE\n"
-"Last-Translator: Jason Davies <jason@jasondavies.com>\n"
-"Language-Team: Cymraeg <cy@li.org>\n"
+"POT-Creation-Date: 2011-02-28 23:30+0100\n"
+"PO-Revision-Date: 2011-02-22 00:07+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: English <en@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=4; plural= (n==1) ? 0 : (n==2) ? 1 : (n != 8 && n != "
-"11) ? 2 : 3;\n"
+"Language: cy\n"
+"Plural-Forms: nplurals=4; plural=(n==2) ? 1 : 0\n"
 
 #: views.py:63 views.py:65 views.py:67
 msgid "tag:"
@@ -25,14 +23,13 @@ msgid "filter:"
 msgstr ""
 
 #: views.py:162 views.py:164 views.py:166
-#, fuzzy
 msgid "view:"
-msgstr "Amser:"
+msgstr ""
 
 #: views.py:194
-#, fuzzy, python-format
+#, python-format
 msgid "App %r not found"
-msgstr "Tudalen heb ei ddarganfod"
+msgstr ""
 
 #: views.py:201
 #, python-format

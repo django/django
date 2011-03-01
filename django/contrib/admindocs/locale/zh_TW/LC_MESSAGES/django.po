@@ -1,17 +1,18 @@
-# This file is distributed under the same license as the django package.
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:23+0100\n"
-"PO-Revision-Date: 2007-04-05 01:32+1000\n"
-"Last-Translator: Terry Huang <terryh.tp@gmail.com>\n"
-"Language-Team: Terry Huang <terryh.tp@gmail.com>\n"
+"POT-Creation-Date: 2011-02-28 23:30+0100\n"
+"PO-Revision-Date: 2011-02-22 00:07+0000\n"
+"Last-Translator: quantum9876 <quantum9876@gmail.com>\n"
+"Language-Team: Chinese (Taiwan) <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Language: zh_TW\n"
+"Plural-Forms: nplurals=1; plural=0\n"
 
 #: views.py:63 views.py:65 views.py:67
 msgid "tag:"
@@ -31,14 +32,14 @@ msgid "App %r not found"
 msgstr "應用程式 %r 没有找到"
 
 #: views.py:201
-#, fuzzy, python-format
+#, python-format
 msgid "Model %(model_name)r not found in app %(app_label)r"
-msgstr "在應用程式 %(label)r 裡找不到模型 %(name)r"
+msgstr "未在%(app_label)r 找到模組 %(model_name)r "
 
 #: views.py:213
-#, fuzzy, python-format
+#, python-format
 msgid "the related `%(app_label)s.%(data_type)s` object"
-msgstr "相關的 `%(app_label)s.%(data_type)s` 物件"
+msgstr "有關 `%(app_label)s.%(data_type)s` 的物件"
 
 #: views.py:213 views.py:232 views.py:237 views.py:251 views.py:265
 #: views.py:270
@@ -46,9 +47,9 @@ msgid "model:"
 msgstr "模型："
 
 #: views.py:228 views.py:260
-#, fuzzy, python-format
+#, python-format
 msgid "related `%(app_label)s.%(object_name)s` objects"
-msgstr "相關的 `%(app_label)s.%(object_name)s` 物件"
+msgstr "有關 `%(app_label)s.%(object_name)s` 的物件"
 
 #: views.py:232 views.py:265
 #, python-format
