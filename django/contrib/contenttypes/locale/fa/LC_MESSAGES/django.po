@@ -1,20 +1,18 @@
-# Persian translation of Django.
-# Copyright (C) 2007 THE Django'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the Django package.
-#
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:24+0100\n"
-"PO-Revision-Date: 2008-09-01 02:00+0430\n"
-"Last-Translator: Reza Mohammadi <reza@zeerak.ir>\n"
-"Language-Team: Persian <farsi@lists.sharif.edu>\n"
+"POT-Creation-Date: 2011-03-01 00:01+0100\n"
+"PO-Revision-Date: 2011-02-22 00:06+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: Persian <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Language: fa\n"
+"Plural-Forms: nplurals=1; plural=0\n"
 
 #: models.py:77
 msgid "python model class name"

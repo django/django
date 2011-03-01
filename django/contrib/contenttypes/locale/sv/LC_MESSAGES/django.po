@@ -1,21 +1,18 @@
-# Swedish translation of Django
-# Copyright (C) 2005-2007
 # This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:24+0100\n"
-"PO-Revision-Date: 2008-05-26 11:15+0200\n"
-"Last-Translator: Mikko Hellsing <mikko@aino.se>\n"
-"Language-Team: Django I18N <Django-I18N@googlegroups.com>\n"
+"POT-Creation-Date: 2011-03-01 00:02+0100\n"
+"PO-Revision-Date: 2011-02-22 00:06+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: Swedish <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
-"X-Poedit-Language: Swedish\n"
-"X-Poedit-Country: SWEDEN\n"
+"Language: sv\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: models.py:77
 msgid "python model class name"

@@ -1,18 +1,17 @@
-# translation of django.po to Georgian
-# Django translation to Georgian language.
-# This file is distributed under the same license as the PACKAGE package.
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:24+0100\n"
-"PO-Revision-Date: 2008-10-05 14:34+0400\n"
-"Last-Translator: David Avsajanishvili <avsd05@gmail.com>\n"
-"Language-Team: Georgian <ka@li.org>\n"
+"POT-Creation-Date: 2011-03-01 00:01+0100\n"
+"PO-Revision-Date: 2011-02-22 00:06+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: Georgian <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: ka\n"
 "Plural-Forms: nplurals=1; plural=0\n"
 
 #: models.py:77

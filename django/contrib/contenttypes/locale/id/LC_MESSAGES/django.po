@@ -1,22 +1,22 @@
-# Translation of django.po to Indonesian
 # This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:24+0100\n"
-"PO-Revision-Date: 2010-05-08 18:39+0700\n"
-"Last-Translator: Selwin Ong <selwin@ui.co.id>\n"
-"Language-Team: Indonesian <id@li.org>\n"
+"POT-Creation-Date: 2011-03-01 00:01+0100\n"
+"PO-Revision-Date: 2011-02-22 00:06+0000\n"
+"Last-Translator: rodin <romihardiyanto@gmail.com>\n"
+"Language-Team: Indonesian <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: id\n"
 "Plural-Forms: nplurals=1; plural=0\n"
 
 #: models.py:77
 msgid "python model class name"
-msgstr "nama class model python"
+msgstr "nama kelas model python"
 
 #: models.py:81
 msgid "content type"
@@ -24,4 +24,4 @@ msgstr "tipe konten"
 
 #: models.py:82
 msgid "content types"
-msgstr "tipe-tipe konten"
+msgstr "tipe konten"
