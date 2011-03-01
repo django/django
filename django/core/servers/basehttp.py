@@ -19,6 +19,7 @@ from django.core.management.color import color_style
 from django.utils.http import http_date
 from django.utils._os import safe_join
 from django.views import static
+from django.views.static import FileWrapper # for backwards compatibility, #15281
 
 from django.contrib.staticfiles import handlers
 
@@ -31,30 +32,6 @@ software_version = server_version + ' ' + sys_version
 
 class WSGIServerException(Exception):
     pass
-
-class FileWrapper(object):
-    """Wrapper to convert file-like objects to iterables"""
-
-    def __init__(self, filelike, blksize=8192):
-        self.filelike = filelike
-        self.blksize = blksize
-        if hasattr(filelike,'close'):
-            self.close = filelike.close
-
-    def __getitem__(self,key):
-        data = self.filelike.read(self.blksize)
-        if data:
-            return data
-        raise IndexError
-
-    def __iter__(self):
-        return self
-
-    def next(self):
-        data = self.filelike.read(self.blksize)
-        if data:
-            return data
-        raise StopIteration
 
 # Regular expression that matches `special' characters in parameters, the
 # existence of which force quoting of the parameter value.

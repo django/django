@@ -7,13 +7,40 @@ import mimetypes
 import os
 import posixpath
 import re
-import stat
 import urllib
 
 from django.template import loader
 from django.http import Http404, HttpResponse, HttpResponseRedirect, HttpResponseNotModified
+
 from django.template import Template, Context, TemplateDoesNotExist
 from django.utils.http import http_date, parse_http_date
+
+
+class FileWrapper(object):
+    """
+    Wrapper to convert file-like objects to iterables
+    """
+    def __init__(self, filelike, blksize=8192):
+        self.filelike = filelike
+        self.blksize = blksize
+        if hasattr(filelike,'close'):
+            self.close = filelike.close
+
+    def __getitem__(self,key):
+        data = self.filelike.read(self.blksize)
+        if data:
+            return data
+        raise IndexError
+
+    def __iter__(self):
+        return self
+
+    def next(self):
+        data = self.filelike.read(self.blksize)
+        if data:
+            return data
+        raise StopIteration
+
 
 def serve(request, path, document_root=None, show_indexes=False):
     """
@@ -56,12 +83,11 @@ def serve(request, path, document_root=None, show_indexes=False):
     mimetype, encoding = mimetypes.guess_type(fullpath)
     mimetype = mimetype or 'application/octet-stream'
     if not was_modified_since(request.META.get('HTTP_IF_MODIFIED_SINCE'),
-                              statobj[stat.ST_MTIME], statobj[stat.ST_SIZE]):
+                              statobj.st_mtime, statobj.st_size):
         return HttpResponseNotModified(mimetype=mimetype)
-    contents = open(fullpath, 'rb').read()
-    response = HttpResponse(contents, mimetype=mimetype)
-    response["Last-Modified"] = http_date(statobj[stat.ST_MTIME])
-    response["Content-Length"] = len(contents)
+    response = HttpResponse(FileWrapper(open(fullpath, 'rb')), mimetype=mimetype)
+    response["Last-Modified"] = http_date(statobj.st_mtime)
+    response["Content-Length"] = statobj.st_size
     if encoding:
         response["Content-Encoding"] = encoding
     return response
