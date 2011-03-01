@@ -236,7 +236,9 @@ class LoginTest(AuthViewsTestCase):
                          '/view?param=ftp://exampel.com',
                          'view/?param=//example.com',
                          'https:///',
-                         '//testserver/'):
+                         '//testserver/',
+                         '/url%20with%20spaces/', # see ticket #12534
+                         ):
             safe_url = '%(url)s?%(next)s=%(good_url)s' % {
                 'url': login_url,
                 'next': REDIRECT_FIELD_NAME,
@@ -250,6 +252,7 @@ class LoginTest(AuthViewsTestCase):
             self.assertEquals(response.status_code, 302)
             self.assertTrue(good_url in response['Location'],
                             "%s should be allowed" % good_url)
+
 
 class LoginURLSettings(AuthViewsTestCase):
     urls = 'django.contrib.auth.tests.urls'

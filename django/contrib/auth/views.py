@@ -34,11 +34,11 @@ def login(request, template_name='registration/login.html',
         if form.is_valid():
             netloc = urlparse.urlparse(redirect_to)[1]
 
-            # Light security check -- make sure redirect_to isn't garbage.
-            if not redirect_to or ' ' in redirect_to:
+            # Use default setting if redirect_to is empty
+            if not redirect_to:
                 redirect_to = settings.LOGIN_REDIRECT_URL
 
-            # Heavier security check -- don't allow redirection to a different
+            # Security check -- don't allow redirection to a different
             # host.
             elif netloc and netloc != request.get_host():
                 redirect_to = settings.LOGIN_REDIRECT_URL
