@@ -24,7 +24,7 @@ IS_POPUP_VAR = 'pop'
 ERROR_FLAG = 'e'
 
 # Text to display within change-list table cells if the value is blank.
-EMPTY_CHANGELIST_VALUE = '(None)'
+EMPTY_CHANGELIST_VALUE = ugettext('(None)')
 
 class ChangeList(object):
     def __init__(self, request, model, list_display, list_display_links, list_filter, date_hierarchy, search_fields, list_select_related, list_per_page, list_editable, model_admin):
