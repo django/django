@@ -1,19 +1,18 @@
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:23+0100\n"
-"PO-Revision-Date: 2007-08-10 00:21+0900\n"
-"Last-Translator: Chay Sengtha <sengtha@e-khmer.com>\n"
-"Language-Team: Chay Sengtha <sengtha@e-khmer.com>\n"
+"POT-Creation-Date: 2011-02-28 23:37+0100\n"
+"PO-Revision-Date: 2011-02-22 00:09+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: English <en@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Language: km\n"
+"Plural-Forms: nplurals=1; plural=0\n"
 
 #: admin.py:28
 msgid "Personal info"
@@ -32,46 +31,41 @@ msgid "Groups"
 msgstr "ក្រុម"
 
 #: admin.py:113
-#, fuzzy
 msgid "Password changed successfully."
-msgstr "ពាក្យសំងាត់បានផ្លាស់ប្តូរដោយជោគជ័យ"
+msgstr ""
 
 #: admin.py:123
-#, fuzzy, python-format
+#, python-format
 msgid "Change password: %s"
-msgstr "ផ្លាស់ប្តូរពាក្យសំងាត់"
+msgstr ""
 
 #: forms.py:14 forms.py:48 forms.py:66
 msgid "Username"
 msgstr "ឈ្មោះជាសមាជិក"
 
 #: forms.py:15 forms.py:49
-#, fuzzy
 msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr "ត្រូចវបំពេញអក្សរឡាតាំងចំនួន៣០ ឬ តិចជាងនេះ (អក្សរ លេខ ឬ សញ្ញា _)។"
+msgstr ""
 
 #: forms.py:16 forms.py:50
-#, fuzzy
 msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
-msgstr "ត្រូវបំពេញតែអក្សរឡាតាំង ចំនួនលេខ និង សញ្ញា _"
+msgstr ""
 
 #: forms.py:17 forms.py:67 forms.py:193
 msgid "Password"
 msgstr "ពាក្យសំងាត់"
 
 #: forms.py:18
-#, fuzzy
 msgid "Password confirmation"
-msgstr "ផ្លាស់ប្តូរពាក្យសំងាត់"
+msgstr ""
 
 #: forms.py:19
 msgid "Enter the same password as above, for verification."
 msgstr "សូមបំពេញពាក្យសំងាត់ដូចខាងលើ ដើម្បីត្រួតពិនិត្យ។ "
 
 #: forms.py:31
-#, fuzzy
 msgid "A user with that username already exists."
-msgstr "%(optname)s ជាមួយឈ្មោះ %(fieldname)s នេះមានរួចរាល់ហើយ។"
+msgstr ""
 
 #: forms.py:37 forms.py:163 forms.py:205
 msgid "The two password fields didn't match."
@@ -96,9 +90,8 @@ msgstr ""
 "កម្មវិធីសំរាប់មើលគេហទំព័រទទួល​យក គុគី ដើម្បីពិនិត្យចូល ។"
 
 #: forms.py:108
-#, fuzzy
 msgid "E-mail"
-msgstr "អ៊ីម៉ែល"
+msgstr ""
 
 #: forms.py:117
 msgid ""
@@ -107,29 +100,25 @@ msgid ""
 msgstr "អ៊ីមែល នេះ មិនមាន​នៅក្នុង​ទិន្នន័យ​របស់​យើង​ខ្ញុំ​ទេ។"
 
 #: forms.py:143
-#, fuzzy, python-format
+#, python-format
 msgid "Password reset on %s"
-msgstr "ពាក្យសំងាត់បានកំណត់សារជាថ្មី"
+msgstr ""
 
 #: forms.py:151
-#, fuzzy
 msgid "New password"
-msgstr "ពាក្យសំងាត់ថ្មី"
+msgstr ""
 
 #: forms.py:152
-#, fuzzy
 msgid "New password confirmation"
-msgstr "ពាក្យសំងាត់ថ្មី"
+msgstr ""
 
 #: forms.py:177
-#, fuzzy
 msgid "Old password"
-msgstr "ពាក្សំងាត់ចាស់"
+msgstr ""
 
 #: forms.py:185
-#, fuzzy
 msgid "Your old password was entered incorrectly. Please enter it again."
-msgstr "ឈ្មោះជាសមាជិក​ ឬ ពាក្យសំងាត់ មិនត្រឹមត្រូវ។ សូមសាកល្បងម្តងទៀត។ "
+msgstr ""
 
 #: forms.py:194
 msgid "Password (again)"
@@ -164,10 +153,9 @@ msgid "username"
 msgstr "ឈ្មោះជាសមាជិក"
 
 #: models.py:206
-#, fuzzy
 msgid ""
 "Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
-msgstr "ត្រូចវបំពេញអក្សរឡាតាំងចំនួន៣០ ឬ តិចជាងនេះ (អក្សរ លេខ ឬ សញ្ញា _)។"
+msgstr ""
 
 #: models.py:207
 msgid "first name"
@@ -204,11 +192,10 @@ msgid "active"
 msgstr "សកម្ម"
 
 #: models.py:212
-#, fuzzy
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
-msgstr "កំណត់ថាតើសមាជិកអាច​ពិនិត្យចូលមកប្រើទំព័រគ្រប់គ្រង។ មិនជ្រើសរើស ជាជាងលប់ចោល។"
+msgstr ""
 
 #: models.py:213
 msgid "superuser status"

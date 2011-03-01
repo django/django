@@ -1,20 +1,18 @@
-# translation of django.po to el
-# Copyright (C) 2006 and beyond
-# This file is distributed under the same license as the DJANGO package.
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:23+0100\n"
-"PO-Revision-Date: 2007-09-03 04:19+0100\n"
-"Last-Translator: Dimitris Glezos <dimitris@glezos.com>\n"
-"Language-Team: el <fedora-trans-el@redhat.com>\n"
+"POT-Creation-Date: 2011-02-28 23:36+0100\n"
+"PO-Revision-Date: 2011-02-22 00:09+0000\n"
+"Last-Translator: glogiotatidis <seadog@sealabs.net>\n"
+"Language-Team: Greek <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.11.4\n"
-"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
+"Language: el\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: admin.py:28
 msgid "Personal info"
@@ -46,24 +44,23 @@ msgid "Username"
 msgstr "Όνομα χρήστη"
 
 #: forms.py:15 forms.py:49
-#, fuzzy
 msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr "Απαραίτητο."
+msgstr ""
+"Απαραίτητα. 30 ή λιγότεροι χαρακτήρες. Μόνο γράμματα, αριθμοί και @/./+/-/_."
 
 #: forms.py:16 forms.py:50
-#, fuzzy
 msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
 msgstr ""
-"Αυτή η τιμή πρέπει να περιέχει μόνο γράμματα, αριθμούς και υπογεγραμμένες."
+"Αυτή η τιμή μπορεί να περιέχει μόνο γράμματα, αριθμούς και τους χαρακτήρες "
+"@/./+/-/_."
 
 #: forms.py:17 forms.py:67 forms.py:193
 msgid "Password"
 msgstr "Συνθηματικό"
 
 #: forms.py:18
-#, fuzzy
 msgid "Password confirmation"
-msgstr "Αλλαγή συνθηματικού"
+msgstr "Επιβεβαίωσης συνθηματικού"
 
 #: forms.py:19
 msgid "Enter the same password as above, for verification."
@@ -98,41 +95,37 @@ msgstr ""
 "αρχεία cookie απαιτούνται για να συνδεθείτε."
 
 #: forms.py:108
-#, fuzzy
 msgid "E-mail"
-msgstr "Ηλεκτρονική διεύθυνση"
+msgstr "E-mail"
 
 #: forms.py:117
-#, fuzzy
 msgid ""
 "That e-mail address doesn't have an associated user account. Are you sure "
 "you've registered?"
-msgstr "χρήστης?"
+msgstr ""
+"Αυτή η διεύθυνση e-mail δεν αντιστοιχεί σε κάποιον λογαριασμό χρήστη. Είστε "
+"σίγουρος ότι έχετε γραφτεί;"
 
 #: forms.py:143
-#, fuzzy, python-format
+#, python-format
 msgid "Password reset on %s"
-msgstr "Επαναφορά συνθηματικού"
+msgstr ""
 
 #: forms.py:151
-#, fuzzy
 msgid "New password"
-msgstr "Νέο συνθηματικό:"
+msgstr "Νέο συνθηματικό"
 
 #: forms.py:152
-#, fuzzy
 msgid "New password confirmation"
-msgstr "Νέο συνθηματικό:"
+msgstr "Επιβεβαίωση νέου συνθηματικού"
 
 #: forms.py:177
-#, fuzzy
 msgid "Old password"
-msgstr "Παλιό συνθηματικό:"
+msgstr "Παλιό συνθηματικό"
 
 #: forms.py:185
-#, fuzzy
 msgid "Your old password was entered incorrectly. Please enter it again."
-msgstr "συνθηματικό."
+msgstr "Το παλιό συνθηματικό σας δόθηκε λανθασμένα. Παρακαλώ δοκιμάστε ξανά."
 
 #: forms.py:194
 msgid "Password (again)"
@@ -167,10 +160,11 @@ msgid "username"
 msgstr "όνομα χρήστη"
 
 #: models.py:206
-#, fuzzy
 msgid ""
 "Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
-msgstr "Απαραίτητο."
+msgstr ""
+"Απαραίτητα. 30 ή λιγότεροι χαρακτήρες. Γράμματα, αριθμοί και οι χαρακτήρες "
+"@/./+/-/_."
 
 #: models.py:207
 msgid "first name"
@@ -189,11 +183,10 @@ msgid "password"
 msgstr "συνθηματικό"
 
 #: models.py:210
-#, fuzzy
 msgid ""
 "Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
 "password form</a>."
-msgstr "<a href=\"password/\"> συνθηματικό</a>."
+msgstr ""
 
 #: models.py:211
 msgid "staff status"
@@ -208,22 +201,20 @@ msgid "active"
 msgstr "ενεργό"
 
 #: models.py:212
-#, fuzzy
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
-msgstr "Ορίζει αν ο χρήστης μπορεί να συνδεθεί στο χώρο διαχείρισης."
+msgstr ""
 
 #: models.py:213
 msgid "superuser status"
 msgstr "κατάσταση υπερχρήστη"
 
 #: models.py:213
-#, fuzzy
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
-msgstr "χρήστης διακαιώματα."
+msgstr ""
 
 #: models.py:214
 msgid "last login"
@@ -234,12 +225,10 @@ msgid "date joined"
 msgstr "ημερομηνία σύνδεσης"
 
 #: models.py:217
-#, fuzzy
 msgid ""
 "In addition to the permissions manually assigned, this user will also get "
 "all permissions granted to each group he/she is in."
 msgstr ""
-"Μέσα διακαιώματα χειρωνακτικά χρήστης get όλα διακαιώματα ομάδα είναι μέσα."
 
 #: models.py:218
 msgid "user permissions"

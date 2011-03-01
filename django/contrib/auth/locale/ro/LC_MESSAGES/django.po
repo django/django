@@ -1,19 +1,19 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:23+0100\n"
-"PO-Revision-Date: 2008-04-25 21:44+0200\n"
-"Last-Translator: \n"
-"Language-Team: Romanian <ro@li.org>\n"
+"POT-Creation-Date: 2011-02-28 23:37+0100\n"
+"PO-Revision-Date: 2011-02-22 00:09+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: Romanian <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: ro\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < "
+"20)) ? 1 : 2)\n"
 
 #: admin.py:28
 msgid "Personal info"
@@ -45,27 +45,20 @@ msgid "Username"
 msgstr "Utilizator"
 
 #: forms.py:15 forms.py:49
-#, fuzzy
 msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
-"Necesar. 30 de caractere sau mai puțin. Doar caractere alfanumerice (litere, "
-"cifre, liniuțe de subliniere)."
 
 #: forms.py:16 forms.py:50
-#, fuzzy
 msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
 msgstr ""
-"Această valoare trebuie să conţină numai litere, numere şi liniuţe de "
-"subliniere."
 
 #: forms.py:17 forms.py:67 forms.py:193
 msgid "Password"
 msgstr "Parolă"
 
 #: forms.py:18
-#, fuzzy
 msgid "Password confirmation"
-msgstr "Schimbă parola"
+msgstr ""
 
 #: forms.py:19
 msgid "Enter the same password as above, for verification."
@@ -100,9 +93,8 @@ msgstr ""
 "browser care suporta cookies ca să vă logati."
 
 #: forms.py:108
-#, fuzzy
 msgid "E-mail"
-msgstr "Adresa email"
+msgstr ""
 
 #: forms.py:117
 msgid ""
@@ -118,19 +110,16 @@ msgid "Password reset on %s"
 msgstr "Parola resetată pe %s"
 
 #: forms.py:151
-#, fuzzy
 msgid "New password"
-msgstr "Noua parolă:"
+msgstr ""
 
 #: forms.py:152
-#, fuzzy
 msgid "New password confirmation"
-msgstr "Noua parolă:"
+msgstr ""
 
 #: forms.py:177
-#, fuzzy
 msgid "Old password"
-msgstr "Vechea parolă:"
+msgstr ""
 
 #: forms.py:185
 msgid "Your old password was entered incorrectly. Please enter it again."
@@ -171,12 +160,9 @@ msgid "username"
 msgstr "nume utilizator"
 
 #: models.py:206
-#, fuzzy
 msgid ""
 "Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
 msgstr ""
-"Necesar. 30 de caractere sau mai puțin. Doar caractere alfanumerice (litere, "
-"cifre, liniuțe de subliniere)."
 
 #: models.py:207
 msgid "first name"

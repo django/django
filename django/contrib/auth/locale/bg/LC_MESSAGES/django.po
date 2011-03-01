@@ -1,17 +1,18 @@
-# translation of django.po to Bulgarian
-#
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:23+0100\n"
-"PO-Revision-Date: 2008-03-12 13:01+0200\n"
-"Last-Translator: Vladislav <vladislav.mitov@gmail.com>\n"
-"Language-Team: \n"
+"POT-Creation-Date: 2011-02-28 23:36+0100\n"
+"PO-Revision-Date: 2011-02-22 00:09+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: English <en@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: bg\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: admin.py:28
 msgid "Personal info"
@@ -43,23 +44,20 @@ msgid "Username"
 msgstr "Потребител"
 
 #: forms.py:15 forms.py:49
-#, fuzzy
 msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr "Въведете не-повече от 30 символа (само букви, цифри, и подчертавка)"
+msgstr ""
 
 #: forms.py:16 forms.py:50
-#, fuzzy
 msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
-msgstr "Тази стойност може да съдържа само букви, цифри и подчертавки.  "
+msgstr ""
 
 #: forms.py:17 forms.py:67 forms.py:193
 msgid "Password"
 msgstr "Парола"
 
 #: forms.py:18
-#, fuzzy
 msgid "Password confirmation"
-msgstr "Промяна на парола"
+msgstr ""
 
 #: forms.py:19
 msgid "Enter the same password as above, for verification."
@@ -94,9 +92,8 @@ msgstr ""
 "можете да се логнете.  "
 
 #: forms.py:108
-#, fuzzy
 msgid "E-mail"
-msgstr "E-mail адрес"
+msgstr ""
 
 #: forms.py:117
 msgid ""
@@ -112,19 +109,16 @@ msgid "Password reset on %s"
 msgstr "Паролата се сменя на %s"
 
 #: forms.py:151
-#, fuzzy
 msgid "New password"
-msgstr "Нова парола:"
+msgstr ""
 
 #: forms.py:152
-#, fuzzy
 msgid "New password confirmation"
-msgstr "Нова парола:"
+msgstr ""
 
 #: forms.py:177
-#, fuzzy
 msgid "Old password"
-msgstr "Стара парола:"
+msgstr ""
 
 #: forms.py:185
 msgid "Your old password was entered incorrectly. Please enter it again."
@@ -163,10 +157,9 @@ msgid "username"
 msgstr "потребител"
 
 #: models.py:206
-#, fuzzy
 msgid ""
 "Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
-msgstr "Въведете не-повече от 30 символа (само букви, цифри, и подчертавка)"
+msgstr ""
 
 #: models.py:207
 msgid "first name"
@@ -205,13 +198,10 @@ msgid "active"
 msgstr "активен"
 
 #: models.py:212
-#, fuzzy
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
 msgstr ""
-"Указва дали този потребител може да влезе в административния панел .  "
-"Премахнете тази маркировка вместо да изтривате акаунти.  "
 
 #: models.py:213
 msgid "superuser status"

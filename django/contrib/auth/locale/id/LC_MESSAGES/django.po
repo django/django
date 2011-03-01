@@ -1,17 +1,17 @@
-# Translation of django.po to Indonesian
 # This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:23+0100\n"
-"PO-Revision-Date: 2010-05-08 18:39+0700\n"
-"Last-Translator: Selwin Ong <selwin@ui.co.id>\n"
-"Language-Team: Indonesian <id@li.org>\n"
+"POT-Creation-Date: 2011-02-28 23:37+0100\n"
+"PO-Revision-Date: 2011-02-22 00:09+0000\n"
+"Last-Translator: rodin <romihardiyanto@gmail.com>\n"
+"Language-Team: Indonesian <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: id\n"
 "Plural-Forms: nplurals=1; plural=0\n"
 
 #: admin.py:28
@@ -20,11 +20,11 @@ msgstr "Informasi pribadi"
 
 #: admin.py:29
 msgid "Permissions"
-msgstr "Ijin akses"
+msgstr "Hak akses"
 
 #: admin.py:30
 msgid "Important dates"
-msgstr "Tanggal-tanggal penting"
+msgstr "Tanggal penting"
 
 #: admin.py:31
 msgid "Groups"
@@ -46,12 +46,12 @@ msgstr "Username"
 #: forms.py:15 forms.py:49
 msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
-"Wajib. 30 karakter atau kurang dalam kombinasi huruf, angka dan @/./+/-/_ ."
+"Wajib. 30 karakter atau kurang dalam kombinasi huruf, angka, dan karakter "
+"@/./+/-/_ ."
 
 #: forms.py:16 forms.py:50
 msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
-msgstr ""
-"Nilai ini hanya boleh berisi huruf, angka dan karakter-karakter @/./+/-/_ ."
+msgstr "Nilai ini hanya boleh berisi huruf, angka, dan karakter @/./+/-/_ ."
 
 #: forms.py:17 forms.py:67 forms.py:193
 msgid "Password"
@@ -67,18 +67,19 @@ msgstr "Masukkan sandi yang sama dengan di atas, untuk verifikasi."
 
 #: forms.py:31
 msgid "A user with that username already exists."
-msgstr "Pengguna dengan username tersebut sudah ada."
+msgstr "Seorang pengguna dengan nama pengguna tersebut sudah ada."
 
 #: forms.py:37 forms.py:163 forms.py:205
 msgid "The two password fields didn't match."
-msgstr "Dua field sandi tidak sama."
+msgstr "Dua bidang sandi tidak cocok."
 
 #: forms.py:87
 msgid ""
 "Please enter a correct username and password. Note that both fields are case-"
 "sensitive."
 msgstr ""
-"Mohon masukkan nama dan sandi yang benar. Kedua field ini case-sensitive."
+"Masukkan nama pengguna dan sandi yang benar. Huruf besar/kecil pada bidang "
+"ini berpengaruh."
 
 #: forms.py:89
 msgid "This account is inactive."
@@ -89,25 +90,25 @@ msgid ""
 "Your Web browser doesn't appear to have cookies enabled. Cookies are "
 "required for logging in."
 msgstr ""
-"Tampaknya peramban Anda tidak menerima cookies. Cookies diperlukan untuk log "
-"in."
+"Tampaknya peramban Anda disetel untuk tidak menerima kuki. Kuki diperlukan "
+"untuk proses masuk."
 
 #: forms.py:108
 msgid "E-mail"
-msgstr "E-mail"
+msgstr "Email"
 
 #: forms.py:117
 msgid ""
 "That e-mail address doesn't have an associated user account. Are you sure "
 "you've registered?"
 msgstr ""
-"Alamat e-mail tersebut tidak terhubung dengan akun apapun. Apakah Anda yakin "
-"telah terdaftar?"
+"Alamat email tersebut tidak terkait dengan akun apapun. Anda yakin sudah "
+"terdaftar?"
 
 #: forms.py:143
 #, python-format
 msgid "Password reset on %s"
-msgstr "Reset sandi di %s"
+msgstr "Setel ulang sandi di %s"
 
 #: forms.py:151
 msgid "New password"
@@ -123,7 +124,7 @@ msgstr "Sandi lama"
 
 #: forms.py:185
 msgid "Your old password was entered incorrectly. Please enter it again."
-msgstr "Sandi lama Anda tidak benar. Mohon masukkan sekali lagi."
+msgstr "Sandi lama Anda yang dimasukkan salah. Masukkan sekali lagi."
 
 #: forms.py:194
 msgid "Password (again)"
@@ -139,11 +140,11 @@ msgstr "namasandi"
 
 #: models.py:82
 msgid "permission"
-msgstr "ijin"
+msgstr "hak akses"
 
 #: models.py:83 models.py:105
 msgid "permissions"
-msgstr "ijin"
+msgstr "hak akses"
 
 #: models.py:108
 msgid "group"
@@ -155,13 +156,13 @@ msgstr "grup"
 
 #: models.py:206
 msgid "username"
-msgstr "username"
+msgstr "nama pengguna"
 
 #: models.py:206
 msgid ""
 "Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
 msgstr ""
-"Wajib. 30 karakter atau kurang dalam kombinasi huruf, angka dan karakter @/./"
+"Wajib. 30 karakter atau kurang dalam kombinasi huruf, angka, karakter @/./"
 "+/-/_ "
 
 #: models.py:207
@@ -174,7 +175,7 @@ msgstr "nama belakang"
 
 #: models.py:209
 msgid "e-mail address"
-msgstr "alamat e-mail"
+msgstr "alamat email"
 
 #: models.py:210
 msgid "password"
@@ -190,7 +191,7 @@ msgstr ""
 
 #: models.py:211
 msgid "staff status"
-msgstr "status staff"
+msgstr "status staf"
 
 #: models.py:211
 msgid "Designates whether the user can log into this admin site."
@@ -206,7 +207,7 @@ msgid ""
 "instead of deleting accounts."
 msgstr ""
 "Menentukan apakah pengguna dianggap aktif. Hapus pilihan ini tanpa perlu "
-"menghapus akun apapun."
+"menghapus akunnya."
 
 #: models.py:213
 msgid "superuser status"
@@ -217,12 +218,12 @@ msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
 msgstr ""
-"Menentukan apakah pengguna memiliki semua ijin tanpa perlu diberikan secara "
-"manual."
+"Menentukan apakah pengguna memiliki semua hak akses tanpa perlu diberikan "
+"secara manual."
 
 #: models.py:214
 msgid "last login"
-msgstr "login terakhir"
+msgstr "masuk terakhir"
 
 #: models.py:215
 msgid "date joined"
@@ -233,12 +234,13 @@ msgid ""
 "In addition to the permissions manually assigned, this user will also get "
 "all permissions granted to each group he/she is in."
 msgstr ""
-"Selain ijin-ijin yang diberikan secara manual, pengguna ini juga akan "
-"mendapatkan ijin yang diberikan kepada semua grup di mana ia berada."
+"Selain hak akses yang diberikan secara manual, pengguna ini juga akan "
+"mendapatkan hak akses yang diberikan kepada semua grup tempat dia menjadi "
+"anggotanya."
 
 #: models.py:218
 msgid "user permissions"
-msgstr "ijin pengguna"
+msgstr "hak akses pengguna"
 
 #: models.py:222
 msgid "user"
@@ -246,7 +248,7 @@ msgstr "pengguna"
 
 #: models.py:223
 msgid "users"
-msgstr "pengguna-pengguna"
+msgstr "pengguna"
 
 #: models.py:406
 msgid "message"
@@ -254,8 +256,8 @@ msgstr "pesan"
 
 #: views.py:86
 msgid "Logged out"
-msgstr "Logged out"
+msgstr "Keluar"
 
 #: management/commands/createsuperuser.py:23
 msgid "Enter a valid e-mail address."
-msgstr "Masukkan alamat e-mail yang benar."
+msgstr "Masukkan alamat email yang valid."

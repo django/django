@@ -1,18 +1,18 @@
 # This file is distributed under the same license as the Django package.
 #
-# Urangua <urangua@adsolux.com>, 2010, 2002, 2010.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:23+0100\n"
-"PO-Revision-Date: 2010-03-11 17:23+0800\n"
-"Last-Translator: Urangua <urangua@adsolux.com>\n"
-"Language-Team: mn <translate@opensource.com>\n"
+"POT-Creation-Date: 2011-02-28 23:37+0100\n"
+"PO-Revision-Date: 2011-02-22 00:09+0000\n"
+"Last-Translator: Ankhbayar <l.ankhbayar@gmail.com>\n"
+"Language-Team: Mongolian <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: mn\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: admin.py:28
 msgid "Personal info"
@@ -20,7 +20,7 @@ msgstr "Хувийн мэдээлэл"
 
 #: admin.py:29
 msgid "Permissions"
-msgstr "Зөвшөөрөл"
+msgstr "Эрхүүд"
 
 #: admin.py:30
 msgid "Important dates"
@@ -44,16 +44,14 @@ msgid "Username"
 msgstr "Хэрэглэгчийн нэр"
 
 #: forms.py:15 forms.py:49
-#, fuzzy
 msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
-"Зайлшгүй. 30 буюу түүнээс цөөн тэмдэгт. Зөвхөн стандарт тэмдэгт хэрэглэнэ "
-"(үсэг, тоо, нэмэлт тэмдэг)"
+"Заавал. 30 ба түүнээс бага үсэгтэй. Зөвхөн латин үсэг, тоо болон @/./+/-/_ "
+"тэмдэгтүүдийг зөвшөөрнө."
 
 #: forms.py:16 forms.py:50
-#, fuzzy
 msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
-msgstr "Энэ нь зөвхөн үсэг, тоо, нэмэлт тэмдэгүүдийг л агуулсан байх хэрэгтэй."
+msgstr "Энэ утга дотор зөвхөн үсэг, тоо болон @/./+/-/_ тэмдэгтүүд байж болно."
 
 #: forms.py:17 forms.py:67 forms.py:193
 msgid "Password"
@@ -161,12 +159,11 @@ msgid "username"
 msgstr "хэрэглэгчийн нэр"
 
 #: models.py:206
-#, fuzzy
 msgid ""
 "Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
 msgstr ""
-"Зайлшгүй. 30 буюу түүнээс цөөн тэмдэгт. Зөвхөн стандарт тэмдэгт хэрэглэнэ "
-"(үсэг, тоо, нэмэлт тэмдэг)"
+"Заавал. 30 болон түүнээс бага тэмдэгт. Үсэг, тоо болон @/./+/-/_ тэмдэгтүүд "
+"ашиглана уу."
 
 #: models.py:207
 msgid "first name"
@@ -189,8 +186,8 @@ msgid ""
 "Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
 "password form</a>."
 msgstr ""
-"Нууц үгийнхээ хэлбэр-ийг өөрчлөхдөө '[algo]$[salt]$[hexdigest]' буюу <a href="
-"\"password/\">хэрэглэнэ үү</a>."
+"Формат нь '[algo]$[salt]$[hexdigest]' эсвэл <a href=\"password/\">нууц үг "
+"солих цонх </a> хэрэглэнэ үү."
 
 #: models.py:211
 msgid "staff status"
@@ -241,7 +238,7 @@ msgstr ""
 
 #: models.py:218
 msgid "user permissions"
-msgstr "хэрэглэгчийн зөвшөөрөл"
+msgstr "хэрэглэгчийн эрхүүд"
 
 #: models.py:222
 msgid "user"

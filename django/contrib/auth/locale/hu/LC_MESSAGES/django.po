@@ -1,18 +1,18 @@
-# translation of django.po to Hungarian
-# This file is distributed under the same license as the django package.
+# This file is distributed under the same license as the Django package.
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:23+0100\n"
-"PO-Revision-Date: 2008-08-30 01:11+0200\n"
-"Last-Translator: Szilveszter Farkas <szilveszter.farkas@gmail.com>\n"
-"Language-Team: Hungarian <hu@li.org>\n"
+"POT-Creation-Date: 2011-02-28 23:37+0100\n"
+"PO-Revision-Date: 2011-02-22 00:09+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: Hungarian <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.11.4\n"
-"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
+"Language: hu\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: admin.py:28
 msgid "Personal info"
@@ -44,16 +44,12 @@ msgid "Username"
 msgstr "Felhasználó"
 
 #: forms.py:15 forms.py:49
-#, fuzzy
 msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
-"Kötelező. Legfeljebb 30 karakter. Csak alfanumerikus karaktereket "
-"tartalmazhat (betűk, számok és aláhúzás)."
 
 #: forms.py:16 forms.py:50
-#, fuzzy
 msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
-msgstr "Az érték csak betűket, számokat és aláhúzást tartalmazhat."
+msgstr ""
 
 #: forms.py:17 forms.py:67 forms.py:193
 msgid "Password"
@@ -161,12 +157,9 @@ msgid "username"
 msgstr "felhasználónév"
 
 #: models.py:206
-#, fuzzy
 msgid ""
 "Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
 msgstr ""
-"Kötelező. Legfeljebb 30 karakter. Csak alfanumerikus karaktereket "
-"tartalmazhat (betűk, számok és aláhúzás)."
 
 #: models.py:207
 msgid "first name"

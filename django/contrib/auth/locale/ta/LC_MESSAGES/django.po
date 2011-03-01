@@ -1,21 +1,18 @@
-# translation of django-new.po to tamil
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# PONNUSAMY.A <ponnusamy.simpleman@gmail.com>, 2007.
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:23+0100\n"
-"PO-Revision-Date: 2007-03-15 16:48+0530\n"
-"Last-Translator: PONNUSAMY <ponnusamy.simpleman@gmail.com>\n"
-"Language-Team: tamil <tamilinix@yahoogroups.com>\n"
+"POT-Creation-Date: 2011-02-28 23:37+0100\n"
+"PO-Revision-Date: 2011-02-22 00:09+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: English <en@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.11.4\n"
-"Plural-Forms: nplurals=2; plural=n>1;\n"
+"Language: ta\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: admin.py:28
 msgid "Personal info"
@@ -34,48 +31,41 @@ msgid "Groups"
 msgstr "குழுக்கள்"
 
 #: admin.py:113
-#, fuzzy
 msgid "Password changed successfully."
-msgstr "வெற்றிகரமாக கடவுச்சொல் மாற்றபட்டது"
+msgstr ""
 
 #: admin.py:123
-#, fuzzy, python-format
+#, python-format
 msgid "Change password: %s"
-msgstr "கடவுச்சொல்லை மாற்று"
+msgstr ""
 
 #: forms.py:14 forms.py:48 forms.py:66
 msgid "Username"
 msgstr "பயனர்ப்பெயர்"
 
 #: forms.py:15 forms.py:49
-#, fuzzy
 msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
-"தேவை. 30 எழுத்துகள் அல்லது கொஞ்சம். அகர வரிசை எழுத்துக்கள் மட்டுமே ( எழுத்துகள்,எண்கள்,"
-"அன்டர்ஸ்கோர்). "
 
 #: forms.py:16 forms.py:50
-#, fuzzy
 msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
-msgstr "இந்த மதிப்பு எழுத்துகள், எண்கள் மேலும் அன்டர்ஸ்கோர் உள்ளடக்க வேண்டும். "
+msgstr ""
 
 #: forms.py:17 forms.py:67 forms.py:193
 msgid "Password"
 msgstr "கடவுச்சொல்"
 
 #: forms.py:18
-#, fuzzy
 msgid "Password confirmation"
-msgstr "கடவுச்சொல் மாற்று"
+msgstr ""
 
 #: forms.py:19
 msgid "Enter the same password as above, for verification."
 msgstr "மேலே அதே கடவுச்சொல்லை உள்ளிடவும், சரிபார்ப்பதற்காக ."
 
 #: forms.py:31
-#, fuzzy
 msgid "A user with that username already exists."
-msgstr "%(fieldname)s உடன் உள்ள %(optname)s ஏற்கனவே உள்ளது"
+msgstr ""
 
 #: forms.py:37 forms.py:163 forms.py:205
 msgid "The two password fields didn't match."
@@ -101,9 +91,8 @@ msgstr ""
 " உங்கள் இணைய உலாவியில்  குக்கிகள்  செயலாக்கம் பெறவில்லை. உள்நுழைவதற்கு குக்கிகள் அவசியம்."
 
 #: forms.py:108
-#, fuzzy
 msgid "E-mail"
-msgstr "மின் அஞ்சல்"
+msgstr ""
 
 #: forms.py:117
 msgid ""
@@ -112,24 +101,21 @@ msgid ""
 msgstr ""
 
 #: forms.py:143
-#, fuzzy, python-format
+#, python-format
 msgid "Password reset on %s"
-msgstr "கடவுச்சொல்லை மாற்றியமை"
+msgstr ""
 
 #: forms.py:151
-#, fuzzy
 msgid "New password"
-msgstr "புதிய கடவுச்சொல்:"
+msgstr ""
 
 #: forms.py:152
-#, fuzzy
 msgid "New password confirmation"
-msgstr "புதிய கடவுச்சொல்:"
+msgstr ""
 
 #: forms.py:177
-#, fuzzy
 msgid "Old password"
-msgstr "பழைய கடவுச்சொல் :"
+msgstr ""
 
 #: forms.py:185
 msgid "Your old password was entered incorrectly. Please enter it again."
@@ -168,12 +154,9 @@ msgid "username"
 msgstr "பயனர் பெயர்"
 
 #: models.py:206
-#, fuzzy
 msgid ""
 "Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
 msgstr ""
-"தேவை. 30 எழுத்துகள் அல்லது கொஞ்சம். அகர வரிசை எழுத்துக்கள் மட்டுமே ( எழுத்துகள்,எண்கள்,"
-"அன்டர்ஸ்கோர்). "
 
 #: models.py:207
 msgid "first name"
@@ -210,13 +193,10 @@ msgid "active"
 msgstr "செயல்படும்"
 
 #: models.py:212
-#, fuzzy
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
 msgstr ""
-"பயனர்,டிஜாங்ஙோ 'மேலாளலர்' பக்கத்தில் நுழைவதை முடிவு செய்கிறது . இதை தேர்வு செய்யப்படாத "
-"கணக்கு உடனடியாகஅழிக்கப்படும்"
 
 #: models.py:213
 msgid "superuser status"

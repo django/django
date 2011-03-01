@@ -1,20 +1,18 @@
-# Translation of Django to Welsh.
-# Copyright (C) 2005 Django.
 # This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:23+0100\n"
-"PO-Revision-Date: 2005-11-05 HO:MI+ZONE\n"
-"Last-Translator: Jason Davies <jason@jasondavies.com>\n"
-"Language-Team: Cymraeg <cy@li.org>\n"
+"POT-Creation-Date: 2011-02-28 23:36+0100\n"
+"PO-Revision-Date: 2011-02-22 00:09+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: English <en@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=4; plural= (n==1) ? 0 : (n==2) ? 1 : (n != 8 && n != "
-"11) ? 2 : 3;\n"
+"Language: cy\n"
+"Plural-Forms: nplurals=4; plural=(n==2) ? 1 : 0\n"
 
 #: admin.py:28
 msgid "Personal info"
@@ -33,38 +31,33 @@ msgid "Groups"
 msgstr "Grwpiau"
 
 #: admin.py:113
-#, fuzzy
 msgid "Password changed successfully."
-msgstr "Newid cyfrinair yn lwyddianus"
+msgstr ""
 
 #: admin.py:123
-#, fuzzy, python-format
+#, python-format
 msgid "Change password: %s"
-msgstr "Newid cyfrinair"
+msgstr ""
 
 #: forms.py:14 forms.py:48 forms.py:66
-#, fuzzy
 msgid "Username"
-msgstr "Enw defnyddiwr:"
+msgstr ""
 
 #: forms.py:15 forms.py:49
 msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
 
 #: forms.py:16 forms.py:50
-#, fuzzy
 msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
-msgstr "Rhaid i'r werth yma cynnwys lythrennau, rhifau ac tanlinellau yn unig."
+msgstr ""
 
 #: forms.py:17 forms.py:67 forms.py:193
-#, fuzzy
 msgid "Password"
-msgstr "Cyfrinair:"
+msgstr ""
 
 #: forms.py:18
-#, fuzzy
 msgid "Password confirmation"
-msgstr "Newid cyfrinair"
+msgstr ""
 
 #: forms.py:19
 msgid "Enter the same password as above, for verification."
@@ -95,9 +88,8 @@ msgid ""
 msgstr ""
 
 #: forms.py:108
-#, fuzzy
 msgid "E-mail"
-msgstr "Cyfeiriad e-bost"
+msgstr ""
 
 #: forms.py:117
 msgid ""
@@ -106,33 +98,29 @@ msgid ""
 msgstr ""
 
 #: forms.py:143
-#, fuzzy, python-format
+#, python-format
 msgid "Password reset on %s"
-msgstr "Ailosod cyfrinair"
+msgstr ""
 
 #: forms.py:151
-#, fuzzy
 msgid "New password"
-msgstr "Cyfrinair newydd:"
+msgstr ""
 
 #: forms.py:152
-#, fuzzy
 msgid "New password confirmation"
-msgstr "Cyfrinair newydd:"
+msgstr ""
 
 #: forms.py:177
-#, fuzzy
 msgid "Old password"
-msgstr "Cyfrinair hen:"
+msgstr ""
 
 #: forms.py:185
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr ""
 
 #: forms.py:194
-#, fuzzy
 msgid "Password (again)"
-msgstr "Newid cyfrinair"
+msgstr ""
 
 #: models.py:76 models.py:104
 msgid "name"
@@ -143,24 +131,20 @@ msgid "codename"
 msgstr "enw arwyddol"
 
 #: models.py:82
-#, fuzzy
 msgid "permission"
-msgstr "Hawl"
+msgstr ""
 
 #: models.py:83 models.py:105
-#, fuzzy
 msgid "permissions"
-msgstr "Hawliau"
+msgstr ""
 
 #: models.py:108
-#, fuzzy
 msgid "group"
-msgstr "Grŵp"
+msgstr ""
 
 #: models.py:109 models.py:216
-#, fuzzy
 msgid "groups"
-msgstr "Grwpiau"
+msgstr ""
 
 #: models.py:206
 msgid "username"
@@ -238,29 +222,24 @@ msgstr ""
 "yn cael y cwbl hawliau a addefwyd i pob grŵp mae o/hi mewn."
 
 #: models.py:218
-#, fuzzy
 msgid "user permissions"
-msgstr "Hawliau"
+msgstr ""
 
 #: models.py:222
-#, fuzzy
 msgid "user"
-msgstr "Defnyddiwr"
+msgstr ""
 
 #: models.py:223
-#, fuzzy
 msgid "users"
-msgstr "Defnyddwyr"
+msgstr ""
 
 #: models.py:406
-#, fuzzy
 msgid "message"
-msgstr "Neges"
+msgstr ""
 
 #: views.py:86
-#, fuzzy
 msgid "Logged out"
-msgstr "Allgofnodi"
+msgstr ""
 
 #: management/commands/createsuperuser.py:23
 msgid "Enter a valid e-mail address."
