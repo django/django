@@ -1,19 +1,18 @@
-# translation of django.po to
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:24+0100\n"
-"PO-Revision-Date: 2010-07-08 12:55+0200\n"
-"Last-Translator: Aitzol Naberan <anaberan@codesyntax.com>\n"
-"Language-Team: Django-i18n <django-i18n@googlegroups.com>\n"
+"POT-Creation-Date: 2011-03-01 00:09+0100\n"
+"PO-Revision-Date: 2011-02-22 00:12+0000\n"
+"Last-Translator: aitzol <anaberan@codesyntax.com>\n"
+"Language-Team: Basque <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: eu\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: admin.py:8 models.py:7
 msgid "URL"
@@ -27,17 +26,16 @@ msgstr ""
 "bukaeran dagoela."
 
 #: admin.py:11
-#, fuzzy
 msgid ""
 "This value must contain only letters, numbers, dots, underscores, dashes, "
 "slashes or tildes."
 msgstr ""
-"Balore honek, letrak, zenbakia eta  '_', '/','-' karakterak bakarrik eduki "
-"ditzazke."
+"Eremu honetan soilik hizki, zenbaki, puntu, azpimarra, gidoi, / edo ~ egon "
+"daitezke."
 
 #: admin.py:22
 msgid "Advanced options"
-msgstr ""
+msgstr "Aukera aurreratuak"
 
 #: models.py:8
 msgid "title"

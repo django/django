@@ -1,20 +1,18 @@
-# translation of django.po to Telugu
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:24+0100\n"
-"PO-Revision-Date: 2008-09-09 21:24+0530\n"
-"Last-Translator: Thejaswi Puthraya <thejaswi.puthraya@gmail.com>\n"
-"Language-Team: Telugu <indlinux-telugu@lists.sourceforge.net>\n"
+"POT-Creation-Date: 2011-03-01 00:09+0100\n"
+"PO-Revision-Date: 2011-02-22 00:12+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: Telugu <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.11.4\n"
-"Plural-Forms: nplurals=2; plural=n>1;\n"
+"Language: te\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: admin.py:8 models.py:7
 msgid "URL"
@@ -26,11 +24,10 @@ msgid ""
 msgstr ""
 
 #: admin.py:11
-#, fuzzy
 msgid ""
 "This value must contain only letters, numbers, dots, underscores, dashes, "
 "slashes or tildes."
-msgstr "ఈ విలువ   లో అక్షరాలు, అంకెలు , అండర్ స్కోర్లు ,డాష్ లు లేక స్లాష్ లు ఉందాలి"
+msgstr ""
 
 #: admin.py:22
 msgid "Advanced options"

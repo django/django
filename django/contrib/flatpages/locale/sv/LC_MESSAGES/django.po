@@ -1,21 +1,18 @@
-# Swedish translation of Django
-# Copyright (C) 2005-2007
 # This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:24+0100\n"
-"PO-Revision-Date: 2008-05-26 11:15+0200\n"
-"Last-Translator: Mikko Hellsing <mikko@aino.se>\n"
-"Language-Team: Django I18N <Django-I18N@googlegroups.com>\n"
+"POT-Creation-Date: 2011-03-01 00:09+0100\n"
+"PO-Revision-Date: 2011-02-22 00:12+0000\n"
+"Last-Translator: andreaspelme <andreas@pelme.se>\n"
+"Language-Team: Swedish <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
-"X-Poedit-Language: Swedish\n"
-"X-Poedit-Country: SWEDEN\n"
+"Language: sv\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: admin.py:8 models.py:7
 msgid "URL"
@@ -28,13 +25,12 @@ msgstr ""
 "Exempel: '/om/kontakt/'. Se till att ha inledande och avslutande snedstreck."
 
 #: admin.py:11
-#, fuzzy
 msgid ""
 "This value must contain only letters, numbers, dots, underscores, dashes, "
 "slashes or tildes."
 msgstr ""
-"Detta värde får endast innehålla bokstäver, siffror, understreck, "
-"bindestreck eller snedstreck."
+"Detta värde får endast innehålla bokstäver, siffror, punkter, understreck, "
+"bindestreck, snedstreck och tilde."
 
 #: admin.py:22
 msgid "Advanced options"

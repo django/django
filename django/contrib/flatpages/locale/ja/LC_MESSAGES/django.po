@@ -1,16 +1,18 @@
-# Translation of django.po to japanese.
+# This file is distributed under the same license as the Django package.
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:24+0100\n"
-"PO-Revision-Date: 2010-05-09 12:41+0900\n"
-"Last-Translator: Takashi Matsuo <matsuo.takashi@gmail.com>\n"
-"Language-Team: Japanese <django-ja@googlegroups.com>\n"
+"POT-Creation-Date: 2011-03-01 00:09+0100\n"
+"PO-Revision-Date: 2011-02-22 00:12+0000\n"
+"Last-Translator: t2y <tetsuya.morimoto@gmail.com>\n"
+"Language-Team: Japanese <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Language: ja\n"
+"Plural-Forms: nplurals=1; plural=0\n"
 
 #: admin.py:8 models.py:7
 msgid "URL"
@@ -23,12 +25,12 @@ msgstr ""
 "例: '/about/contact/'. 先頭と最後にスラッシュがあるか確認してください。"
 
 #: admin.py:11
-#, fuzzy
 msgid ""
 "This value must contain only letters, numbers, dots, underscores, dashes, "
 "slashes or tildes."
 msgstr ""
-"半角の英数字、アンダースコア、ダッシュ、スラッシュ以外は使用できません。"
+"この値は文字、数字、ドット、アンダースコア、ダッシュ、スラッシュかチルダのみ"
+"でなければいけません。"
 
 #: admin.py:22
 msgid "Advanced options"

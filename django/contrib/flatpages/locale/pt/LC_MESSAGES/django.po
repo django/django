@@ -1,18 +1,18 @@
-# Portuguese translation of Django.
-# This file is distributed under the same license as the PACKAGE package.
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:24+0100\n"
-"PO-Revision-Date: 2010-03-09 10:45+0000\n"
-"Last-Translator: Nuno Mariz <nmariz@gmail.com>\n"
-"Language-Team: pt_PT <nmariz@gmail.com>\n"
+"POT-Creation-Date: 2011-03-01 00:09+0100\n"
+"PO-Revision-Date: 2011-02-22 00:12+0000\n"
+"Last-Translator: nmariz <nmariz@gmail.com>\n"
+"Language-Team: Portuguese <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: pt\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: admin.py:8 models.py:7
 msgid "URL"
@@ -25,13 +25,12 @@ msgstr ""
 "Exemplo: '/about/contact/'. Verifique se possui as barras no inicio e no fim."
 
 #: admin.py:11
-#, fuzzy
 msgid ""
 "This value must contain only letters, numbers, dots, underscores, dashes, "
 "slashes or tildes."
 msgstr ""
-"Este valor apenas poderá conter letras, números, underscores, hífens ou "
-"barras."
+"Este valor apenas poderá conter letras, números, pontos, underscores, "
+"hífenes, barras ou tils."
 
 #: admin.py:22
 msgid "Advanced options"
@@ -39,7 +38,7 @@ msgstr "Opções avançadas"
 
 #: models.py:8
 msgid "title"
-msgstr "titulo"
+msgstr "título"
 
 #: models.py:9
 msgid "content"
@@ -68,7 +67,7 @@ msgstr "é necessário registo"
 #: models.py:13
 msgid "If this is checked, only logged-in users will be able to view the page."
 msgstr ""
-"Se estiver seleccionado, apenas utilizadores autenticados poderão ver esta "
+"Se estiver selecionado, apenas utilizadores autenticados poderão ver esta "
 "página."
 
 #: models.py:18

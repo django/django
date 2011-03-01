@@ -1,19 +1,19 @@
-# Português do Brasil translation of django.
-# This file is distributed under the same license as the django package.
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:24+0100\n"
-"PO-Revision-Date: 2010-03-19 17:58-0300\n"
-"Last-Translator: Guilherme Gondim <semente@taurinus.org>\n"
-"Language-Team: Grupo de Localização para o Português <django-l10n-"
-"portuguese@googlegroups.com>\n"
+"POT-Creation-Date: 2011-03-01 00:09+0100\n"
+"PO-Revision-Date: 2011-02-22 00:12+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: Portuguese (Brazilian) <django-l10n-portuguese@googlegroups."
+"com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Language: pt_BR\n"
+"Plural-Forms: nplurals=2; plural=(n > 1)\n"
 
 #: admin.py:8 models.py:7
 msgid "URL"
@@ -25,13 +25,12 @@ msgid ""
 msgstr "Exemplo: '/sobre/contato/'. Lembre-se das barras no começo e no final."
 
 #: admin.py:11
-#, fuzzy
 msgid ""
 "This value must contain only letters, numbers, dots, underscores, dashes, "
 "slashes or tildes."
 msgstr ""
-"Este valor deve conter apenas letras, números, sublinhados (_), travessões "
-"ou barras (/)."
+"Este valor deve conter apenas letras, números, pontos, sublinhados, traços, "
+"barras ou til."
 
 #: admin.py:22
 msgid "Advanced options"

@@ -1,21 +1,18 @@
-# translation of Django.
-# Copyright (C) 2008 The Django Project
 # This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:24+0100\n"
-"PO-Revision-Date: 2010-05-09 15:10-0500\n"
+"POT-Creation-Date: 2011-03-01 00:09+0100\n"
+"PO-Revision-Date: 2011-02-22 00:12+0000\n"
 "Last-Translator: Alex <alex.gaynor@gmail.com>\n"
-"Language-Team: Django-i18n <django-i18n@googlegroups.com>\n"
+"Language-Team: Hebrew <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Poedit-Bookmarks: -1,988,-1,-1,-1,-1,-1,-1,-1,-1\n"
-"X-Generator: Lokalize 1.0\n"
+"Language: he\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: admin.py:8 models.py:7
 msgid "URL"
@@ -28,11 +25,12 @@ msgstr ""
 "לדוגמא: '/about/contact/'. יש לוודא הימצאות הקווים הנטויים בהתחלה ובסוף."
 
 #: admin.py:11
-#, fuzzy
 msgid ""
 "This value must contain only letters, numbers, dots, underscores, dashes, "
 "slashes or tildes."
-msgstr "ערך זה חייב להכיל אותיות, ספרות, מקפים, קווים תחתונים ונטויים בלבד."
+msgstr ""
+"הערך הזאת חייב להכיל רק אותיות, מספרים, נקודות, מקפים, קווים תחתונים, חתכים "
+"או סימני טילדה בלבד."
 
 #: admin.py:22
 msgid "Advanced options"

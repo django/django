@@ -1,20 +1,18 @@
-# translation of django.po to el
-# Copyright (C) 2006 and beyond
-# This file is distributed under the same license as the DJANGO package.
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:24+0100\n"
-"PO-Revision-Date: 2007-09-03 04:19+0100\n"
-"Last-Translator: Dimitris Glezos <dimitris@glezos.com>\n"
-"Language-Team: el <fedora-trans-el@redhat.com>\n"
+"POT-Creation-Date: 2011-03-01 00:09+0100\n"
+"PO-Revision-Date: 2011-02-22 00:12+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: Greek <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.11.4\n"
-"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
+"Language: el\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: admin.py:8 models.py:7
 msgid "URL"
@@ -28,17 +26,16 @@ msgstr ""
 "και το τέλος."
 
 #: admin.py:11
-#, fuzzy
 msgid ""
 "This value must contain only letters, numbers, dots, underscores, dashes, "
 "slashes or tildes."
 msgstr ""
-"Αυτή η τιμή πρέπει να περιέχει μόνο γράμματα, αριθμούς, υπογεγραμμένες, "
-"παύλες ή καθέτους."
+"Η τιμή αυτή πρέπει να περιέχει μόνο γράμματα, αριθμούς, τελείες, παύλες, "
+"κάτω παύλες, καθέτους ή περισπωμένες."
 
 #: admin.py:22
 msgid "Advanced options"
-msgstr ""
+msgstr "Προχωρημένες επιλογές"
 
 #: models.py:8
 msgid "title"
@@ -69,9 +66,9 @@ msgid "registration required"
 msgstr "απαιτείται εγγραφή"
 
 #: models.py:13
-#, fuzzy
 msgid "If this is checked, only logged-in users will be able to view the page."
-msgstr "είναι μέσα χρήστες σελίδα."
+msgstr ""
+"Εάν επιλεγεί, μόνο συνδεδεμένοι χρήστες θα μπορούν να βλέπουν τη σελίδα."
 
 #: models.py:18
 msgid "flat page"

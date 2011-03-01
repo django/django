@@ -1,22 +1,18 @@
-# Finnish translation of Django
-# Copyright (C) 2006-2007
 # This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:24+0100\n"
-"PO-Revision-Date: 2007-09-15 00:34+0300\n"
-"Last-Translator: Aku Kotkavuo <aku.kotkavuo@norfello.com>\n"
-"Language-Team: Django I18N <Django-I18N@googlegroups.com>\n"
+"POT-Creation-Date: 2011-03-01 00:09+0100\n"
+"PO-Revision-Date: 2011-02-22 00:12+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: Finnish <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
-"X-Poedit-Language: Finnish\n"
-"X-Poedit-Country: FINLAND\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: fi\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: admin.py:8 models.py:7
 msgid "URL"
@@ -30,13 +26,12 @@ msgstr ""
 "on kauttaviiva."
 
 #: admin.py:11
-#, fuzzy
 msgid ""
 "This value must contain only letters, numbers, dots, underscores, dashes, "
 "slashes or tildes."
 msgstr ""
-"Tässä voidaan käyttää vain kirjaimia (a-z, A-Z), numeroita (0-9) sekä ala-, "
-"tavu- ja kauttaviivoja (_ - /)."
+"Tämä arvo saa sisältää vain kirjaimia, numeroita, pisteitä sekä ala-, tavu-, "
+"kautta- ja aaltoviivoja."
 
 #: admin.py:22
 msgid "Advanced options"
