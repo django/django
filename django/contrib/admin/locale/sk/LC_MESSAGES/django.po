@@ -1,30 +1,30 @@
-# Slovak translation of Django
 # This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-20 16:12+0100\n"
-"PO-Revision-Date: 2010-05-08 16:32+0200\n"
-"Last-Translator: Martin Kosír <martin@martinkosir.net>\n"
-"Language-Team: Slovak <>\n"
+"POT-Creation-Date: 2011-02-28 18:47+0100\n"
+"PO-Revision-Date: 2011-02-22 00:12+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: Slovak <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=n==1 ? 0 : n>1 && n<5 ? 1 : 2;\n"
+"Language: sk\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2\n"
 
 #: actions.py:49
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "Úspešne zmazaných %(count)d %(items)s."
 
-#: actions.py:61 options.py:1199
+#: actions.py:61 options.py:1220
 #, python-format
 msgid "Cannot delete %(name)s"
-msgstr ""
+msgstr "Nedá sa vymazať %(name)s"
 
-#: actions.py:63 options.py:1201
+#: actions.py:63 options.py:1222
 msgid "Are you sure?"
 msgstr "Ste si istý?"
 
@@ -42,39 +42,39 @@ msgstr ""
 "<h3>Od %s:</h3>\n"
 "<ul>\n"
 
-#: filterspecs.py:91 filterspecs.py:113 filterspecs.py:175 filterspecs.py:213
+#: filterspecs.py:104 filterspecs.py:136 filterspecs.py:205 filterspecs.py:257
 msgid "All"
 msgstr "Všetko"
 
-#: filterspecs.py:137
+#: filterspecs.py:164
 msgid "Any date"
 msgstr "Ľubovoľný dátum"
 
-#: filterspecs.py:138
+#: filterspecs.py:165
 msgid "Today"
 msgstr "Dnes"
 
-#: filterspecs.py:141
+#: filterspecs.py:168
 msgid "Past 7 days"
 msgstr "Posledných 7 dní"
 
-#: filterspecs.py:144
+#: filterspecs.py:171
 msgid "This month"
 msgstr "Tento mesiac"
 
-#: filterspecs.py:146
+#: filterspecs.py:173
 msgid "This year"
 msgstr "Tento rok"
 
-#: filterspecs.py:175
+#: filterspecs.py:205
 msgid "Yes"
 msgstr "Áno"
 
-#: filterspecs.py:175
+#: filterspecs.py:205
 msgid "No"
 msgstr "Nie"
 
-#: filterspecs.py:182
+#: filterspecs.py:216
 msgid "Unknown"
 msgstr "Neznámy"
 
@@ -133,54 +133,54 @@ msgstr "položky záznamu"
 msgid "None"
 msgstr "Žiadne"
 
-#: options.py:620
+#: options.py:628
 #, python-format
 msgid "Changed %s."
 msgstr "Zmenené %s."
 
-#: options.py:620 options.py:630
+#: options.py:628 options.py:638
 msgid "and"
 msgstr "a"
 
-#: options.py:625
+#: options.py:633
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "Pridaný %(name)s \"%(object)s\"."
 
-#: options.py:629
+#: options.py:637
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "Zmenený %(list)s pre %(name)s \"%(object)s\"."
 
-#: options.py:634
+#: options.py:642
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "Zmazaný %(name)s \"%(object)s\"."
 
-#: options.py:638
+#: options.py:646
 msgid "No fields changed."
 msgstr "Polia nezmenené."
 
-#: options.py:710
+#: options.py:718
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "Objekt %(name)s \"%(obj)s\" bol úspešne pridaný."
 
-#: options.py:714 options.py:747
+#: options.py:722 options.py:762
 msgid "You may edit it again below."
 msgstr "Nižšie môžete znova robiť úpravy."
 
-#: options.py:724 options.py:757
+#: options.py:732 options.py:772
 #, python-format
 msgid "You may add another %s below."
 msgstr "Nižšie môžete pridať ďalšie %s."
 
-#: options.py:745
+#: options.py:760
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "Objekt %(name)s \"%(obj)s\" bol úspešne zmenený."
 
-#: options.py:753
+#: options.py:768
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
@@ -188,7 +188,7 @@ msgstr ""
 "Objekt %(name)s \"%(obj)s\" bol úspešne pridaný. Ďalšie zmeny môžete urobiť "
 "nižšie."
 
-#: options.py:807 options.py:1065
+#: options.py:828 options.py:1086
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
@@ -196,30 +196,30 @@ msgstr ""
 "Položky musia byť vybrané, ak chcete na nich vykonať akcie. Neboli vybrané "
 "žiadne položky."
 
-#: options.py:826
+#: options.py:847
 msgid "No action selected."
 msgstr "Nebola vybraná žiadna akcia."
 
-#: options.py:907
+#: options.py:928
 #, python-format
 msgid "Add %s"
 msgstr "Pridať %s"
 
-#: options.py:933 options.py:1174
+#: options.py:954 options.py:1195
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "Objekt %(name)s s primárnym kľúčom %(key)r neexistuje."
 
-#: options.py:998
+#: options.py:1019
 #, python-format
 msgid "Change %s"
 msgstr "Zmeniť %s"
 
-#: options.py:1045
+#: options.py:1066
 msgid "Database error"
 msgstr "Chyba databázy"
 
-#: options.py:1107
+#: options.py:1128
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
@@ -227,7 +227,7 @@ msgstr[0] "%(count)s %(name)s bola úspešne zmenená."
 msgstr[1] "%(count)s %(name)s boli úspešne zmenené."
 msgstr[2] "%(count)s %(name)s bolo úspešne zmenených."
 
-#: options.py:1134
+#: options.py:1155
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
@@ -235,32 +235,32 @@ msgstr[0] "%(total_count)s vybraná"
 msgstr[1] "Všetky %(total_count)s vybrané"
 msgstr[2] "Všetkých %(total_count)s vybraných"
 
-#: options.py:1139
+#: options.py:1160
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "0 z %(cnt)s vybraných"
 
-#: options.py:1190
+#: options.py:1211
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "Objekt %(name)s \"%(obj)s\" bol úspešne vymazaný."
 
-#: options.py:1235
+#: options.py:1256
 #, python-format
 msgid "Change history: %s"
 msgstr "Zmeniť históriu: %s"
 
-#: sites.py:312 templates/admin/login.html:42
+#: sites.py:319 templates/admin/login.html:42
 #: templates/registration/password_reset_complete.html:14
 #: views/decorators.py:29
 msgid "Log in"
 msgstr "Prihlásenie"
 
-#: sites.py:368
+#: sites.py:375
 msgid "Site administration"
 msgstr "Správa stránky"
 
-#: sites.py:412
+#: sites.py:419
 #, python-format
 msgid "%s administration"
 msgstr "%s správa"
@@ -273,11 +273,11 @@ msgstr "Dátum:"
 msgid "Time:"
 msgstr "Čas:"
 
-#: widgets.py:121
+#: widgets.py:140
 msgid "Lookup"
 msgstr "Vyhľadanie"
 
-#: widgets.py:237
+#: widgets.py:246
 msgid "Add Another"
 msgstr "Pridať ďalší"
 
@@ -434,14 +434,13 @@ msgstr ""
 "odstránenie nasledujúcich typov objektov:"
 
 #: templates/admin/delete_confirmation.html:25
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
 "following protected related objects:"
 msgstr ""
-"Odstránenie objektu %(object_name)s '%(escaped_object)s' by malo za následok "
-"aj odstránenie súvisiacich objektov. Váš účet však nemá oprávnenie na "
-"odstránenie nasledujúcich typov objektov:"
+"Vymazanie %(object_name)s '%(escaped_object)s' vyžaduje vymazanie "
+"nasledovných súvisiacich chránených objektov:"
 
 #: templates/admin/delete_confirmation.html:33
 #, python-format
@@ -462,34 +461,33 @@ msgid "Delete multiple objects"
 msgstr "Zmazať viacero objektov"
 
 #: templates/admin/delete_selected_confirmation.html:16
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would result in deleting related "
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
 msgstr ""
-"Odstránenie objektu %(object_name)s by malo za následok aj odstránenie "
-"súvisiacich objektov, Váš účet však nemá oprávnenie na odstránenie "
-"nasledujúcich typov objektov:"
+"Vymazanie označených %(objects_name)s by spôsobilo vymazanie súvisiacich "
+"objektov, ale váš účet nemá oprávnenie na vymazanie nasledujúcich typov "
+"objektov:"
 
 #: templates/admin/delete_selected_confirmation.html:24
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would require deleting the following "
 "protected related objects:"
 msgstr ""
-"Odstránenie objektu %(object_name)s by malo za následok aj odstránenie "
-"súvisiacich objektov, Váš účet však nemá oprávnenie na odstránenie "
-"nasledujúcich typov objektov:"
+"Vymazanie označených %(objects_name)s vyžaduje vymazanie nasledujúcich "
+"chránených súvisiacich objektov:"
 
 #: templates/admin/delete_selected_confirmation.html:32
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Are you sure you want to delete the selected %(objects_name)s? All of the "
 "following objects and their related items will be deleted:"
 msgstr ""
-"Ste si istý, že chcete odstrániť objekty %(object_name)s? Budú odstránené "
-"nasledujúce objekty a položky s nimi súvisiace:"
+"Ste si isty, že chcete vymazať označené %(objects_name)s? Vymažú sa všetky "
+"nasledujúce objekty a ich súvisiace položky:"
 
 #: templates/admin/filter.html:2
 #, python-format
@@ -576,12 +574,12 @@ msgid "Search"
 msgstr "Vyhľadávanie"
 
 #: templates/admin/search_form.html:10
-#, fuzzy, python-format
+#, python-format
 msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
-msgstr[0] "%(total_count)s vybraná"
-msgstr[1] "Všetky %(total_count)s vybrané"
-msgstr[2] "Všetkých %(total_count)s vybraných"
+msgstr[0] "%(counter)s výsledok"
+msgstr[1] "%(counter)s výsledky"
+msgstr[2] "%(counter)s výsledkov"
 
 #: templates/admin/search_form.html:10
 #, python-format
@@ -609,9 +607,8 @@ msgstr ""
 "používateľských nastavení."
 
 #: templates/admin/auth/user/add_form.html:8
-#, fuzzy
 msgid "Enter a username and password."
-msgstr "Zadajte nové heslo"
+msgstr "Zadajte používateľské meno a heslo."
 
 #: templates/admin/auth/user/change_password.html:29
 #, python-format
@@ -758,27 +755,25 @@ msgstr ""
 "by ste ho zakrátko dostať."
 
 #: templates/registration/password_reset_email.html:2
-msgid "You're receiving this e-mail because you requested a password reset"
+#, fuzzy, python-format
+msgid ""
+"You're receiving this e-mail because you requested a password reset for your "
+"user account at %(site_name)s."
 msgstr "Obdržali ste tento e-mail, pretože ste si vyžiadali obnovenie hesla."
 
-#: templates/registration/password_reset_email.html:3
-#, python-format
-msgid "for your user account at %(site_name)s"
-msgstr "pre váš používateľský účet na %(site_name)s"
-
-#: templates/registration/password_reset_email.html:5
+#: templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
 msgstr "Prosím, choďte na túto stránku a zvoľte si nové heslo:"
 
-#: templates/registration/password_reset_email.html:9
+#: templates/registration/password_reset_email.html:8
 msgid "Your username, in case you've forgotten:"
 msgstr "Vaše používateľské meno, pre prípad, že ste ho zabudli:"
 
-#: templates/registration/password_reset_email.html:11
+#: templates/registration/password_reset_email.html:10
 msgid "Thanks for using our site!"
 msgstr "Ďakujeme, že používate našu stránku!"
 
-#: templates/registration/password_reset_email.html:13
+#: templates/registration/password_reset_email.html:12
 #, python-format
 msgid "The %(site_name)s team"
 msgstr "Tím %(site_name)s"
@@ -799,16 +794,16 @@ msgstr "E-mailová adresa:"
 msgid "Reset my password"
 msgstr "Obnova môjho hesla"
 
-#: templatetags/admin_list.py:273
+#: templatetags/admin_list.py:288
 msgid "All dates"
 msgstr "Všetky dátumy"
 
-#: views/main.py:68
+#: views/main.py:66
 #, python-format
 msgid "Select %s"
 msgstr "Vybrať %s"
 
-#: views/main.py:68
+#: views/main.py:66
 #, python-format
 msgid "Select %s to change"
 msgstr "Vybrať \"%s\" na úpravu"

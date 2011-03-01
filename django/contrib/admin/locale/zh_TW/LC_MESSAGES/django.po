@@ -1,36 +1,37 @@
-# This file is distributed under the same license as the django package.
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-20 16:12+0100\n"
-"PO-Revision-Date: 2007-04-05 01:32+1000\n"
-"Last-Translator: Terry Huang <terryh.tp@gmail.com>\n"
-"Language-Team: Terry Huang <terryh.tp@gmail.com>\n"
+"POT-Creation-Date: 2011-02-28 18:48+0100\n"
+"PO-Revision-Date: 2011-02-22 00:12+0000\n"
+"Last-Translator: tcc <tcchou@tcchou.org>\n"
+"Language-Team: Chinese (Taiwan) <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Language: zh_TW\n"
+"Plural-Forms: nplurals=1; plural=0\n"
 
 #: actions.py:49
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
-msgstr ""
+msgstr "成功的刪除了 %(count)d 個 %(items)s."
 
-#: actions.py:61 options.py:1199
+#: actions.py:61 options.py:1220
 #, python-format
 msgid "Cannot delete %(name)s"
-msgstr ""
+msgstr "無法刪除 %(name)s"
 
-#: actions.py:63 options.py:1201
+#: actions.py:63 options.py:1222
 msgid "Are you sure?"
 msgstr "你確定嗎？"
 
 #: actions.py:85
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
-msgstr ""
+msgstr "刪除所選的 %(verbose_name_plural)s"
 
 #: filterspecs.py:54
 #, python-format
@@ -41,39 +42,39 @@ msgstr ""
 "<h3>以 %s:</h3>\n"
 "<ul>\n"
 
-#: filterspecs.py:91 filterspecs.py:113 filterspecs.py:175 filterspecs.py:213
+#: filterspecs.py:104 filterspecs.py:136 filterspecs.py:205 filterspecs.py:257
 msgid "All"
 msgstr "全部"
 
-#: filterspecs.py:137
+#: filterspecs.py:164
 msgid "Any date"
 msgstr "任何日期"
 
-#: filterspecs.py:138
+#: filterspecs.py:165
 msgid "Today"
 msgstr "今天"
 
-#: filterspecs.py:141
+#: filterspecs.py:168
 msgid "Past 7 days"
 msgstr "過去 7 天"
 
-#: filterspecs.py:144
+#: filterspecs.py:171
 msgid "This month"
 msgstr "本月"
 
-#: filterspecs.py:146
+#: filterspecs.py:173
 msgid "This year"
 msgstr "今年"
 
-#: filterspecs.py:175
+#: filterspecs.py:205
 msgid "Yes"
 msgstr "是"
 
-#: filterspecs.py:175
+#: filterspecs.py:205
 msgid "No"
 msgstr "否"
 
-#: filterspecs.py:182
+#: filterspecs.py:216
 msgid "Unknown"
 msgstr "未知"
 
@@ -84,9 +85,8 @@ msgid ""
 msgstr "請輸入有效的使用者名稱與密碼。請注意兩個欄位都有分大小寫"
 
 #: forms.py:18
-#, fuzzy
 msgid "Please log in again, because your session has expired."
-msgstr "請再登入一次，因為你的 session 已經到期。不必擔心: 你的提交已被儲存。"
+msgstr "請重新登入, 因為你的 session 已過期。"
 
 #: forms.py:37
 #, python-format
@@ -94,9 +94,8 @@ msgid "Your e-mail address is not your username. Try '%s' instead."
 msgstr "你的電子郵件地址不是你的使用者名稱。試著改用 '%s'。"
 
 #: helpers.py:19
-#, fuzzy
 msgid "Action:"
-msgstr "動作"
+msgstr "動作:"
 
 #: models.py:19
 msgid "action time"
@@ -127,132 +126,130 @@ msgid "log entries"
 msgstr "紀錄項目"
 
 #: options.py:148 options.py:163
-#, fuzzy
 msgid "None"
-msgstr "無"
+msgstr "None"
 
-#: options.py:620
+#: options.py:628
 #, python-format
 msgid "Changed %s."
 msgstr "%s 已變更。"
 
-#: options.py:620 options.py:630
+#: options.py:628 options.py:638
 msgid "and"
 msgstr "和"
 
-#: options.py:625
-#, fuzzy, python-format
+#: options.py:633
+#, python-format
 msgid "Added %(name)s \"%(object)s\"."
-msgstr "新增 %(name)s"
+msgstr "%(name)s \"%(object)s\" 以新增。"
 
-#: options.py:629
-#, fuzzy, python-format
+#: options.py:637
+#, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr "已變更 %(list)s for %(name)s \"%(object)s\"."
+msgstr "%(name)s \"%(object)s\" 的 %(list)s 已變更。"
 
-#: options.py:634
-#, fuzzy, python-format
+#: options.py:642
+#, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
-msgstr "已删除 %(name)s \"%(object)s\"."
+msgstr "%(name)s \"%(object)s\" 已刪除。"
 
-#: options.py:638
+#: options.py:646
 msgid "No fields changed."
 msgstr "沒有欄位被變更。"
 
-#: options.py:710
+#: options.py:718
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" 已成功新增。"
 
-#: options.py:714 options.py:747
+#: options.py:722 options.py:762
 msgid "You may edit it again below."
 msgstr "你可以在下面再次編輯。"
 
-#: options.py:724 options.py:757
+#: options.py:732 options.py:772
 #, python-format
 msgid "You may add another %s below."
 msgstr "你可以在下面新增另一個 %s。"
 
-#: options.py:745
+#: options.py:760
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" 已成功變更。"
 
-#: options.py:753
+#: options.py:768
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr "%(name)s \"%(obj)s\" 新增成功。你可以在下面再次编輯它。"
+msgstr "%(name)s \"%(obj)s\" 新增成功。你可以在下面再次編輯它。"
 
-#: options.py:807 options.py:1065
+#: options.py:828 options.py:1086
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
-msgstr ""
+msgstr "必須要有項目被選到才能對它們進行動作。沒有項目變更。"
 
-#: options.py:826
-#, fuzzy
+#: options.py:847
 msgid "No action selected."
-msgstr "動作時間"
+msgstr "沒有動作被選。"
 
-#: options.py:907
+#: options.py:928
 #, python-format
 msgid "Add %s"
 msgstr "新增 %s"
 
-#: options.py:933 options.py:1174
+#: options.py:954 options.py:1195
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
+msgstr "主鍵 %(key)r 的 %(name)s 物件不存在。"
 
-#: options.py:998
+#: options.py:1019
 #, python-format
 msgid "Change %s"
 msgstr "變更 %s"
 
-#: options.py:1045
+#: options.py:1066
 msgid "Database error"
 msgstr "資料庫錯誤"
 
-#: options.py:1107
-#, fuzzy, python-format
+#: options.py:1128
+#, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
-msgstr[0] "%(name)s \"%(obj)s\" 已成功變更。"
+msgstr[0] "共 %(count)s %(name)s 已變更成功。"
 
-#: options.py:1134
+#: options.py:1155
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
-msgstr[0] ""
+msgstr[0] "全部 %(total_count)s 個被選"
 
-#: options.py:1139
+#: options.py:1160
 #, python-format
 msgid "0 of %(cnt)s selected"
-msgstr ""
+msgstr "%(cnt)s 中 0 個被選"
 
-#: options.py:1190
+#: options.py:1211
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" 已成功刪除。"
 
-#: options.py:1235
+#: options.py:1256
 #, python-format
 msgid "Change history: %s"
 msgstr "變更歷史: %s"
 
-#: sites.py:312 templates/admin/login.html:42
+#: sites.py:319 templates/admin/login.html:42
 #: templates/registration/password_reset_complete.html:14
 #: views/decorators.py:29
 msgid "Log in"
 msgstr "登入"
 
-#: sites.py:368
+#: sites.py:375
 msgid "Site administration"
 msgstr "網站管理"
 
-#: sites.py:412
-#, fuzzy, python-format
+#: sites.py:419
+#, python-format
 msgid "%s administration"
 msgstr "%s 管理"
 
@@ -264,15 +261,13 @@ msgstr "日期"
 msgid "Time:"
 msgstr "時間"
 
-#: widgets.py:121
-#, fuzzy
+#: widgets.py:140
 msgid "Lookup"
 msgstr "查詢"
 
-#: widgets.py:237
-#, fuzzy
+#: widgets.py:246
 msgid "Add Another"
-msgstr "增加另一個"
+msgstr "新增其它"
 
 #: templates/admin/404.html:4 templates/admin/404.html.py:8
 msgid "Page not found"
@@ -321,7 +316,7 @@ msgstr ""
 
 #: templates/admin/actions.html:4
 msgid "Run the selected action"
-msgstr ""
+msgstr "執行選擇的動作"
 
 #: templates/admin/actions.html:4
 msgid "Go"
@@ -329,16 +324,16 @@ msgstr "去"
 
 #: templates/admin/actions.html:11
 msgid "Click here to select the objects across all pages"
-msgstr ""
+msgstr "點選這裡可選取全部頁面的物件"
 
 #: templates/admin/actions.html:11
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
-msgstr ""
+msgstr "選擇全部 %(total_count)s %(module_name)s"
 
 #: templates/admin/actions.html:13
 msgid "Clear selection"
-msgstr ""
+msgstr "清除選擇"
 
 #: templates/admin/app_index.html:10 templates/admin/index.html:19
 #, python-format
@@ -397,7 +392,7 @@ msgstr "在網站上檢視"
 #: templates/registration/password_change_form.html:16
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
-msgstr[0] "请更正下面的錯誤。"
+msgstr[0] "請更正下面的錯誤。"
 
 #: templates/admin/change_list.html:64
 #, python-format
@@ -424,13 +419,12 @@ msgstr ""
 "並沒有刪除以下型態物件的權限:"
 
 #: templates/admin/delete_confirmation.html:25
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
 "following protected related objects:"
 msgstr ""
-"刪除 %(object_name)s '%(escaped_object)s' 會把相關的物件也刪除，不過你的帳號"
-"並沒有刪除以下型態物件的權限:"
+"要刪除 %(object_name)s '%(escaped_object)s', 將要求刪除下面受保護的相關物件:"
 
 #: templates/admin/delete_confirmation.html:33
 #, python-format
@@ -447,37 +441,33 @@ msgid "Yes, I'm sure"
 msgstr "是的，我確定"
 
 #: templates/admin/delete_selected_confirmation.html:9
-#, fuzzy
 msgid "Delete multiple objects"
-msgstr "已删除 %(name)s \"%(object)s\"."
+msgstr "刪除多個物件"
 
 #: templates/admin/delete_selected_confirmation.html:16
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would result in deleting related "
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
 msgstr ""
-"刪除 %(object_name)s '%(escaped_object)s' 會把相關的物件也刪除，不過你的帳號"
-"並沒有刪除以下型態物件的權限:"
+"要刪除所選的 %(objects_name)s, 結果會刪除相關物件, 但你的帳號無權刪除下面物件"
+"型態:"
 
 #: templates/admin/delete_selected_confirmation.html:24
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would require deleting the following "
 "protected related objects:"
-msgstr ""
-"刪除 %(object_name)s '%(escaped_object)s' 會把相關的物件也刪除，不過你的帳號"
-"並沒有刪除以下型態物件的權限:"
+msgstr "要刪除所選的 %(objects_name)s, 將要求刪除下面受保護的相關物件:"
 
 #: templates/admin/delete_selected_confirmation.html:32
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Are you sure you want to delete the selected %(objects_name)s? All of the "
 "following objects and their related items will be deleted:"
 msgstr ""
-"你確定想要刪除 %(object_name)s \"%(escaped_object)s\"？以下所有的相關項目都會"
-"被刪除:"
+"你是否確定要刪除已選的 %(objects_name)s? 下面全部物件及其相關項目都將被刪除:"
 
 #: templates/admin/filter.html:2
 #, python-format
@@ -510,9 +500,8 @@ msgid "None available"
 msgstr "無可用的"
 
 #: templates/admin/index.html:72
-#, fuzzy
 msgid "Unknown content"
-msgstr "未知"
+msgstr "未知內容"
 
 #: templates/admin/invalid_setup.html:7
 msgid ""
@@ -558,15 +547,14 @@ msgid "Save"
 msgstr "儲存"
 
 #: templates/admin/search_form.html:8
-#, fuzzy
 msgid "Search"
-msgstr "三月"
+msgstr "搜尋"
 
 #: templates/admin/search_form.html:10
 #, python-format
 msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
-msgstr[0] ""
+msgstr[0] "%(counter)s 結果"
 
 #: templates/admin/search_form.html:10
 #, python-format
@@ -592,14 +580,13 @@ msgid ""
 msgstr "首先，輸入一個使用者名稱和密碼。然後你可以編輯更多使用者選項。"
 
 #: templates/admin/auth/user/add_form.html:8
-#, fuzzy
 msgid "Enter a username and password."
-msgstr "輸入新密碼"
+msgstr "輸入一個使用者名稱和密碼。"
 
 #: templates/admin/auth/user/change_password.html:29
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
-msgstr "為使用者<strong>%(username)s</strong>输入一個新的密碼。"
+msgstr "為使用者<strong>%(username)s</strong>輸入一個新的密碼。"
 
 #: templates/admin/auth/user/change_password.html:36
 msgid "Password"
@@ -616,18 +603,16 @@ msgstr "為檢查用，請輸入與上面相同的密碼。"
 
 #: templates/admin/edit_inline/stacked.html:67
 #: templates/admin/edit_inline/tabular.html:113
-#, fuzzy, python-format
+#, python-format
 msgid "Add another %(verbose_name)s"
-msgstr "%(verbose_name)s 已被删除。"
+msgstr "新增其它 %(verbose_name)s"
 
 #: templates/admin/edit_inline/stacked.html:70
 #: templates/admin/edit_inline/tabular.html:116
-#, fuzzy
 msgid "Remove"
-msgstr "已刪除"
+msgstr "移除"
 
 #: templates/admin/edit_inline/tabular.html:15
-#, fuzzy
 msgid "Delete?"
 msgstr "刪除？"
 
@@ -664,14 +649,12 @@ msgstr ""
 "入。"
 
 #: templates/registration/password_change_form.html:28
-#, fuzzy
 msgid "Old password"
-msgstr "舊密碼"
+msgstr "舊的密碼"
 
 #: templates/registration/password_change_form.html:33
-#, fuzzy
 msgid "New password"
-msgstr "新密碼"
+msgstr "新的密碼"
 
 #: templates/registration/password_change_form.html:44
 #: templates/registration/password_reset_confirm.html:21
@@ -689,30 +672,26 @@ msgstr "密碼重設"
 
 #: templates/registration/password_reset_complete.html:6
 #: templates/registration/password_reset_complete.html:10
-#, fuzzy
 msgid "Password reset complete"
-msgstr "完成密碼重設"
+msgstr "密碼重設成功"
 
 #: templates/registration/password_reset_complete.html:12
 msgid "Your password has been set.  You may go ahead and log in now."
 msgstr "你的密碼已設置，現在可以繼續登入。"
 
 #: templates/registration/password_reset_confirm.html:4
-#, fuzzy
 msgid "Password reset confirmation"
 msgstr "密碼重設確認"
 
 #: templates/registration/password_reset_confirm.html:12
-#, fuzzy
 msgid "Enter new password"
-msgstr "輸入新密碼"
+msgstr "輸入新的密碼"
 
 #: templates/registration/password_reset_confirm.html:14
-#, fuzzy
 msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
-msgstr "請輸入你的舊密碼，再輸入新密碼兩次，讓我們核驗你已正確地輸入。"
+msgstr "請輸入你的新密碼兩次, 這樣我們才能檢查你的輸入是否正確。"
 
 #: templates/registration/password_reset_confirm.html:18
 msgid "New password:"
@@ -723,7 +702,6 @@ msgid "Confirm password:"
 msgstr "確認密碼："
 
 #: templates/registration/password_reset_confirm.html:26
-#, fuzzy
 msgid "Password reset unsuccessful"
 msgstr "密碼重設失敗"
 
@@ -739,46 +717,43 @@ msgid "Password reset successful"
 msgstr "密碼成功地重設"
 
 #: templates/registration/password_reset_done.html:12
-#, fuzzy
 msgid ""
 "We've e-mailed you instructions for setting your password to the e-mail "
 "address you submitted. You should be receiving it shortly."
-msgstr "我們已經把新的密碼寄到你送出的電子郵件地址。你應該不久就能收到。"
+msgstr ""
+"我們已經寄出設定你的密碼操作指示到你提供的電子郵件位址。請你儘快收取信件。"
 
 #: templates/registration/password_reset_email.html:2
-msgid "You're receiving this e-mail because you requested a password reset"
+#, fuzzy, python-format
+msgid ""
+"You're receiving this e-mail because you requested a password reset for your "
+"user account at %(site_name)s."
 msgstr "因為你要求重設密碼，所以收到了這封電子郵件"
 
-#: templates/registration/password_reset_email.html:3
-#, python-format
-msgid "for your user account at %(site_name)s"
-msgstr "你在 %(site_name)s 裡的使用者帳號"
-
-#: templates/registration/password_reset_email.html:5
+#: templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
 msgstr "請到該頁面選擇一個新的密碼："
 
-#: templates/registration/password_reset_email.html:9
+#: templates/registration/password_reset_email.html:8
 msgid "Your username, in case you've forgotten:"
 msgstr "你的使用者名稱，萬一你已經忘記的話:"
 
-#: templates/registration/password_reset_email.html:11
+#: templates/registration/password_reset_email.html:10
 msgid "Thanks for using our site!"
 msgstr "感謝使用本網站！"
 
-#: templates/registration/password_reset_email.html:13
+#: templates/registration/password_reset_email.html:12
 #, python-format
 msgid "The %(site_name)s team"
 msgstr "%(site_name)s 團隊"
 
 #: templates/registration/password_reset_form.html:12
-#, fuzzy
 msgid ""
 "Forgotten your password? Enter your e-mail address below, and we'll e-mail "
 "instructions for setting a new one."
 msgstr ""
-"忘記你的密碼了？在下面輸入你的電子郵件地址，我們就會重設你的密碼並把新的用電"
-"子郵件寄給你。"
+"忘記你的密碼? 請在下面輸入你的電子郵件位址, 然後我們會寄出設定新密碼的操作指"
+"示。"
 
 #: templates/registration/password_reset_form.html:16
 msgid "E-mail address:"
@@ -788,16 +763,16 @@ msgstr "電子郵件地址:"
 msgid "Reset my password"
 msgstr "重設我的密碼"
 
-#: templatetags/admin_list.py:273
+#: templatetags/admin_list.py:288
 msgid "All dates"
 msgstr "所有日期"
 
-#: views/main.py:68
+#: views/main.py:66
 #, python-format
 msgid "Select %s"
 msgstr "選擇 %s"
 
-#: views/main.py:68
+#: views/main.py:66
 #, python-format
 msgid "Select %s to change"
 msgstr "選擇 %s 來變更"

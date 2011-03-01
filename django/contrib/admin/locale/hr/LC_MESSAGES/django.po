@@ -1,29 +1,31 @@
+# This file is distributed under the same license as the Django package.
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-20 16:11+0100\n"
-"PO-Revision-Date: 2010-05-10 18:56+0200\n"
-"Last-Translator: Aljosa Mohorovic <aljosa.mohorovic@gmail.com>\n"
-"Language-Team: Django i18n team <django-i18n@googlegroups.com>\n"
+"POT-Creation-Date: 2011-02-28 18:47+0100\n"
+"PO-Revision-Date: 2011-02-22 00:12+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: Croatian <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms:  nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || "
-"n%100==4 ? 2 : 3);\n"
-"X-Generator: Lokalize 1.0\n"
+"Language: hr\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
+"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
 
 #: actions.py:49
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "Uspješno izbrisano %(count)d %(items)s."
 
-#: actions.py:61 options.py:1199
+#: actions.py:61 options.py:1220
 #, python-format
 msgid "Cannot delete %(name)s"
-msgstr ""
+msgstr "Nije moguće izbrisati %(name)s"
 
-#: actions.py:63 options.py:1201
+#: actions.py:63 options.py:1222
 msgid "Are you sure?"
 msgstr "Jeste li sigurni?"
 
@@ -41,39 +43,39 @@ msgstr ""
 "<h3>Po %s:</h3>\n"
 "<ul>\n"
 
-#: filterspecs.py:91 filterspecs.py:113 filterspecs.py:175 filterspecs.py:213
+#: filterspecs.py:104 filterspecs.py:136 filterspecs.py:205 filterspecs.py:257
 msgid "All"
 msgstr "Svi"
 
-#: filterspecs.py:137
+#: filterspecs.py:164
 msgid "Any date"
 msgstr "Bilo koji datum"
 
-#: filterspecs.py:138
+#: filterspecs.py:165
 msgid "Today"
 msgstr "Danas"
 
-#: filterspecs.py:141
+#: filterspecs.py:168
 msgid "Past 7 days"
 msgstr "Prošlih 7 dana"
 
-#: filterspecs.py:144
+#: filterspecs.py:171
 msgid "This month"
 msgstr "Ovaj mjesec"
 
-#: filterspecs.py:146
+#: filterspecs.py:173
 msgid "This year"
 msgstr "Ova godina"
 
-#: filterspecs.py:175
+#: filterspecs.py:205
 msgid "Yes"
 msgstr "Da"
 
-#: filterspecs.py:175
+#: filterspecs.py:205
 msgid "No"
 msgstr "Ne"
 
-#: filterspecs.py:182
+#: filterspecs.py:216
 msgid "Unknown"
 msgstr "Nepoznat pojam"
 
@@ -130,60 +132,60 @@ msgstr "zapisi"
 msgid "None"
 msgstr "Nijedan"
 
-#: options.py:620
+#: options.py:628
 #, python-format
 msgid "Changed %s."
 msgstr "Promijenjeno %s."
 
-#: options.py:620 options.py:630
+#: options.py:628 options.py:638
 msgid "and"
 msgstr "i"
 
-#: options.py:625
+#: options.py:633
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "Dodano %(name)s \"%(object)s\"."
 
-#: options.py:629
+#: options.py:637
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "Promijeni %(list)s za %(name)s \"%(object)s\"."
 
-#: options.py:634
+#: options.py:642
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "Izbrisani %(name)s \"%(object)s\"."
 
-#: options.py:638
+#: options.py:646
 msgid "No fields changed."
 msgstr "Nije bilo promjena polja."
 
-#: options.py:710
+#: options.py:718
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" uspješno je dodano."
 
-#: options.py:714 options.py:747
+#: options.py:722 options.py:762
 msgid "You may edit it again below."
 msgstr "Možete ponovo urediti unos dolje."
 
-#: options.py:724 options.py:757
+#: options.py:732 options.py:772
 #, python-format
 msgid "You may add another %s below."
 msgstr "Možete dodati još jedan %s ispod."
 
-#: options.py:745
+#: options.py:760
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" uspješno promijenjeno."
 
-#: options.py:753
+#: options.py:768
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr "%(name)s \"%(obj)s\" uspješno dodan. Možete ponovo urediti unos dolje."
 
-#: options.py:807 options.py:1065
+#: options.py:828 options.py:1086
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
@@ -191,30 +193,30 @@ msgstr ""
 "Unosi moraju biti odabrani da bi se nad njima mogle izvršiti akcije. Nijedan "
 "unos nije promijenjen."
 
-#: options.py:826
+#: options.py:847
 msgid "No action selected."
 msgstr "Nije odabrana akcija."
 
-#: options.py:907
+#: options.py:928
 #, python-format
 msgid "Add %s"
 msgstr "Novi unos (%s)"
 
-#: options.py:933 options.py:1174
+#: options.py:954 options.py:1195
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "Unos %(name)s sa primarnim ključem %(key)r ne postoji."
 
-#: options.py:998
+#: options.py:1019
 #, python-format
 msgid "Change %s"
 msgstr "Promijeni %s"
 
-#: options.py:1045
+#: options.py:1066
 msgid "Database error"
 msgstr "Pogreška u bazi"
 
-#: options.py:1107
+#: options.py:1128
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
@@ -223,7 +225,7 @@ msgstr[1] "%(count)s %(name)s uspješno promijenjeno."
 msgstr[2] "%(count)s %(name)s uspješno promijenjeno."
 msgstr[3] "%(count)s %(name)s uspješno promijenjeno."
 
-#: options.py:1134
+#: options.py:1155
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
@@ -232,32 +234,32 @@ msgstr[1] "Svih %(total_count)s odabrano"
 msgstr[2] "Svih %(total_count)s odabrano"
 msgstr[3] "Svih %(total_count)s odabrano"
 
-#: options.py:1139
+#: options.py:1160
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "0 od %(cnt)s odabrano"
 
-#: options.py:1190
+#: options.py:1211
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" uspješno izbrisan."
 
-#: options.py:1235
+#: options.py:1256
 #, python-format
 msgid "Change history: %s"
 msgstr "Promijeni povijest: %s"
 
-#: sites.py:312 templates/admin/login.html:42
+#: sites.py:319 templates/admin/login.html:42
 #: templates/registration/password_reset_complete.html:14
 #: views/decorators.py:29
 msgid "Log in"
 msgstr "Prijavi se"
 
-#: sites.py:368
+#: sites.py:375
 msgid "Site administration"
 msgstr "Administracija stranica"
 
-#: sites.py:412
+#: sites.py:419
 #, python-format
 msgid "%s administration"
 msgstr "%s administracija"
@@ -270,11 +272,11 @@ msgstr "Datum:"
 msgid "Time:"
 msgstr "Vrijeme:"
 
-#: widgets.py:121
+#: widgets.py:140
 msgid "Lookup"
 msgstr "Potraži"
 
-#: widgets.py:237
+#: widgets.py:246
 msgid "Add Another"
 msgstr "Unesi još"
 
@@ -431,13 +433,13 @@ msgstr ""
 "povezanih objekta, ali vi nemate privilegije za brisanje navedenih objekta: "
 
 #: templates/admin/delete_confirmation.html:25
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
 "following protected related objects:"
 msgstr ""
-"Brisanje %(object_name)s '%(escaped_object)s' rezultiralo bi brisanjem "
-"povezanih objekta, ali vi nemate privilegije za brisanje navedenih objekta: "
+"Brisanje %(object_name)s '%(escaped_object)s' bi zahtijevalo i brisanje "
+"sljedećih zaštićenih povezanih objekata:"
 
 #: templates/admin/delete_confirmation.html:33
 #, python-format
@@ -458,32 +460,33 @@ msgid "Delete multiple objects"
 msgstr "Izbriši više unosa."
 
 #: templates/admin/delete_selected_confirmation.html:16
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would result in deleting related "
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
 msgstr ""
-"Brisanje %(object_name)s rezultiralo bi brisanjem povezanih objekta, ali vi "
-"nemate privilegije za brisanje navedenih objekta: "
+"Brisanje odabranog %(objects_name)s  rezultiralo bi brisanjem povezanih "
+"objekta, ali vaš korisnički račun nema dozvolu za brisanje sljedeće vrste "
+"objekata:"
 
 #: templates/admin/delete_selected_confirmation.html:24
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would require deleting the following "
 "protected related objects:"
 msgstr ""
-"Brisanje %(object_name)s rezultiralo bi brisanjem povezanih objekta, ali vi "
-"nemate privilegije za brisanje navedenih objekta: "
+"Brisanje odabranog %(objects_name)s  će zahtijevati brisanje sljedećih "
+"zaštićenih povezanih objekata:"
 
 #: templates/admin/delete_selected_confirmation.html:32
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Are you sure you want to delete the selected %(objects_name)s? All of the "
 "following objects and their related items will be deleted:"
 msgstr ""
-"Jeste li sigurni da želite izbrisati odabrane %(object_name)s? Svi navedeni "
-"objekti i povezani unosi biti će izbrisani:"
+"Jeste li sigurni da želite izbrisati odabrane %(objects_name)s ? Svi "
+"sljedeći objekti i povezane stavke će biti izbrisani:"
 
 #: templates/admin/filter.html:2
 #, python-format
@@ -569,13 +572,13 @@ msgid "Search"
 msgstr "Traži"
 
 #: templates/admin/search_form.html:10
-#, fuzzy, python-format
+#, python-format
 msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
-msgstr[0] "%(total_count)s odabrano"
-msgstr[1] "Svih %(total_count)s odabrano"
-msgstr[2] "Svih %(total_count)s odabrano"
-msgstr[3] "Svih %(total_count)s odabrano"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: templates/admin/search_form.html:10
 #, python-format
@@ -603,9 +606,8 @@ msgstr ""
 "postavki korisnika."
 
 #: templates/admin/auth/user/add_form.html:8
-#, fuzzy
 msgid "Enter a username and password."
-msgstr "Unesite novu lozinku"
+msgstr "Unesite korisničko ime i lozinku."
 
 #: templates/admin/auth/user/change_password.html:29
 #, python-format
@@ -753,27 +755,25 @@ msgstr ""
 "unijeli. Trebali bi je uskoro primiti."
 
 #: templates/registration/password_reset_email.html:2
-msgid "You're receiving this e-mail because you requested a password reset"
+#, fuzzy, python-format
+msgid ""
+"You're receiving this e-mail because you requested a password reset for your "
+"user account at %(site_name)s."
 msgstr "Dobili ste ovaj e-mail jer ste zatražili resetiranje lozinke"
 
-#: templates/registration/password_reset_email.html:3
-#, python-format
-msgid "for your user account at %(site_name)s"
-msgstr "za vaš korisnički račun na %(site_name)s"
-
-#: templates/registration/password_reset_email.html:5
+#: templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
 msgstr "Molimo otiđite do sljedeće stranice i odaberite novu lozinku:"
 
-#: templates/registration/password_reset_email.html:9
+#: templates/registration/password_reset_email.html:8
 msgid "Your username, in case you've forgotten:"
 msgstr "Vaše korisničko ime, u slučaju da ste zaboravili:"
 
-#: templates/registration/password_reset_email.html:11
+#: templates/registration/password_reset_email.html:10
 msgid "Thanks for using our site!"
 msgstr "Hvala šta koristite naše stranice!"
 
-#: templates/registration/password_reset_email.html:13
+#: templates/registration/password_reset_email.html:12
 #, python-format
 msgid "The %(site_name)s team"
 msgstr "%(site_name)s tim"
@@ -794,16 +794,16 @@ msgstr "E-mail adresa:"
 msgid "Reset my password"
 msgstr "Resetiraj moju lozinku"
 
-#: templatetags/admin_list.py:273
+#: templatetags/admin_list.py:288
 msgid "All dates"
 msgstr "Svi datumi"
 
-#: views/main.py:68
+#: views/main.py:66
 #, python-format
 msgid "Select %s"
 msgstr "Odaberi %s"
 
-#: views/main.py:68
+#: views/main.py:66
 #, python-format
 msgid "Select %s to change"
 msgstr "Odaberi za promjenu - %s"

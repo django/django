@@ -1,60 +1,61 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 20:56+0100\n"
-"PO-Revision-Date: 2010-05-11 16:27+0300\n"
-"Last-Translator: alexey boriskin <sun.void@gmail.com>\n"
-"Language-Team: Dialcom Service <greg@dial.com.ru>\n"
+"POT-Creation-Date: 2011-02-28 23:20+0100\n"
+"PO-Revision-Date: 2011-02-22 00:01+0000\n"
+"Last-Translator: Dimmus <dmitri.chudinov@gmail.com>\n"
+"Language-Team: Russian <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
-"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Poedit-Language: Russian\n"
-"X-Poedit-Country: RUSSIAN FEDERATION\n"
+"Language: ru\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
+"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
 
-#: media/js/SelectFilter2.js:37
+#: media/js/SelectFilter2.js:45
 #, perl-format
 msgid "Available %s"
 msgstr "Доступные %s"
 
-#: media/js/SelectFilter2.js:45
+#: media/js/SelectFilter2.js:52
+msgid "Filter"
+msgstr ""
+
+#: media/js/SelectFilter2.js:59
 msgid "Choose all"
 msgstr "Выбрать все"
 
-#: media/js/SelectFilter2.js:50
+#: media/js/SelectFilter2.js:64
 msgid "Add"
 msgstr "Добавить"
 
-#: media/js/SelectFilter2.js:52
+#: media/js/SelectFilter2.js:66
 msgid "Remove"
 msgstr "Удалить"
 
-#: media/js/SelectFilter2.js:57
+#: media/js/SelectFilter2.js:71
 #, perl-format
 msgid "Chosen %s"
 msgstr "Выбранные %s"
 
-#: media/js/SelectFilter2.js:58
+#: media/js/SelectFilter2.js:72
 msgid "Select your choice(s) and click "
 msgstr "Выберите и нажмите "
 
-#: media/js/SelectFilter2.js:63
+#: media/js/SelectFilter2.js:77
 msgid "Clear all"
 msgstr "Очистить всё"
 
 #: media/js/actions.js:18 media/js/actions.min.js:1
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
-msgstr[0] "Выбран %(sel)s объект из %(cnt)s"
-msgstr[1] "Выбрано %(sel)s объекта из %(cnt)s"
-msgstr[2] "Выбрано %(sel)s объектов из %(cnt)s"
+msgstr[0] "Выбран %(sel)s из %(cnt)s"
+msgstr[1] "Выбрано %(sel)s из %(cnt)s"
+msgstr[2] "Выбрано %(sel)s из %(cnt)s"
+msgstr[3] "Выбрано %(sel)s из %(cnt)s"
 
 #: media/js/actions.js:109 media/js/actions.min.js:5
 msgid ""

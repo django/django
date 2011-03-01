@@ -1,49 +1,50 @@
-# Translation of djangojs.po to Czech
-# Copyright (C) 2005 THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the DJANGO package.
-# Radek Svarz <translate@svarz.cz>, 2005,
-# Vlada Macek <macek@sandbox.cz>, 2010.
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 20:56+0100\n"
-"PO-Revision-Date: 2010-08-06 18:34+0100\n"
-"Last-Translator: Vlada Macek <macek@sandbox.cz>\n"
-"Language-Team: Czech\n"
+"POT-Creation-Date: 2011-02-28 23:20+0100\n"
+"PO-Revision-Date: 2011-02-22 00:01+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: Czech <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=n==1 ? 0 : n>1 && n<5 ? 1 : 2;\n"
+"Language: cs\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2\n"
 
-#: media/js/SelectFilter2.js:37
+#: media/js/SelectFilter2.js:45
 #, perl-format
 msgid "Available %s"
 msgstr "Dostupné položky: %s"
 
-#: media/js/SelectFilter2.js:45
+#: media/js/SelectFilter2.js:52
+msgid "Filter"
+msgstr ""
+
+#: media/js/SelectFilter2.js:59
 msgid "Choose all"
 msgstr "Vybrat vše"
 
-#: media/js/SelectFilter2.js:50
+#: media/js/SelectFilter2.js:64
 msgid "Add"
 msgstr "Přidat"
 
-#: media/js/SelectFilter2.js:52
+#: media/js/SelectFilter2.js:66
 msgid "Remove"
 msgstr "Odebrat"
 
-#: media/js/SelectFilter2.js:57
+#: media/js/SelectFilter2.js:71
 #, perl-format
 msgid "Chosen %s"
 msgstr "Vybrané položky: %s"
 
-#: media/js/SelectFilter2.js:58
+#: media/js/SelectFilter2.js:72
 msgid "Select your choice(s) and click "
 msgstr "Vyberte si a klikněte "
 
-#: media/js/SelectFilter2.js:63
+#: media/js/SelectFilter2.js:77
 msgid "Clear all"
 msgstr "Odebrat vše"
 

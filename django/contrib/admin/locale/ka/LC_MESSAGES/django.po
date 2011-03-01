@@ -1,38 +1,37 @@
-# translation of django.po to Georgian
-# Django translation to Georgian language.
-# This file is distributed under the same license as the PACKAGE package.
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-20 16:11+0100\n"
-"PO-Revision-Date: 2008-10-05 14:34+0400\n"
-"Last-Translator: David Avsajanishvili <avsd05@gmail.com>\n"
-"Language-Team: Georgian <ka@li.org>\n"
+"POT-Creation-Date: 2011-02-28 18:47+0100\n"
+"PO-Revision-Date: 2011-02-22 00:12+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: Georgian <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: ka\n"
 "Plural-Forms: nplurals=1; plural=0\n"
 
 #: actions.py:49
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
-msgstr ""
+msgstr "%(count)d %(items)s წარმატებით წაიშალა."
 
-#: actions.py:61 options.py:1199
+#: actions.py:61 options.py:1220
 #, python-format
 msgid "Cannot delete %(name)s"
-msgstr ""
+msgstr "%(name)s ვერ იშლება"
 
-#: actions.py:63 options.py:1201
+#: actions.py:63 options.py:1222
 msgid "Are you sure?"
 msgstr "დარწმუნებული ხართ?"
 
 #: actions.py:85
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
-msgstr ""
+msgstr "არჩეული %(verbose_name_plural)s-ის წაშლა"
 
 #: filterspecs.py:54
 #, python-format
@@ -43,39 +42,39 @@ msgstr ""
 "<h3>%s-ს მიერ:</h3>\n"
 "<ul>\n"
 
-#: filterspecs.py:91 filterspecs.py:113 filterspecs.py:175 filterspecs.py:213
+#: filterspecs.py:104 filterspecs.py:136 filterspecs.py:205 filterspecs.py:257
 msgid "All"
 msgstr "ყველა"
 
-#: filterspecs.py:137
+#: filterspecs.py:164
 msgid "Any date"
 msgstr "ნებისმიერი თარიღი"
 
-#: filterspecs.py:138
+#: filterspecs.py:165
 msgid "Today"
 msgstr "დღეს"
 
-#: filterspecs.py:141
+#: filterspecs.py:168
 msgid "Past 7 days"
 msgstr "ბოლო 7 დღე"
 
-#: filterspecs.py:144
+#: filterspecs.py:171
 msgid "This month"
 msgstr "მიმდინარე თვე"
 
-#: filterspecs.py:146
+#: filterspecs.py:173
 msgid "This year"
 msgstr "მიმდინარე წელი"
 
-#: filterspecs.py:175
+#: filterspecs.py:205
 msgid "Yes"
 msgstr "კი"
 
-#: filterspecs.py:175
+#: filterspecs.py:205
 msgid "No"
 msgstr "არა"
 
-#: filterspecs.py:182
+#: filterspecs.py:216
 msgid "Unknown"
 msgstr "გაურკვეველი"
 
@@ -99,9 +98,8 @@ msgstr ""
 "ნაცვლად."
 
 #: helpers.py:19
-#, fuzzy
 msgid "Action:"
-msgstr "მოქმედება"
+msgstr "მოქმედება:"
 
 #: models.py:19
 msgid "action time"
@@ -135,54 +133,54 @@ msgstr "ლოგის ერთეულები"
 msgid "None"
 msgstr "არცერთი"
 
-#: options.py:620
+#: options.py:628
 #, python-format
 msgid "Changed %s."
 msgstr "%s შეცვლილია."
 
-#: options.py:620 options.py:630
+#: options.py:628 options.py:638
 msgid "and"
 msgstr "და"
 
-#: options.py:625
+#: options.py:633
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "დამატებულია %(name)s \"%(object)s\"."
 
-#: options.py:629
+#: options.py:637
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "შეცვლილია %(list)s for %(name)s \"%(object)s\"."
 
-#: options.py:634
+#: options.py:642
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "წაშლილია %(name)s \"%(object)s\"."
 
-#: options.py:638
+#: options.py:646
 msgid "No fields changed."
 msgstr "არცერთი ველი არ შეცვლილა."
 
-#: options.py:710
+#: options.py:718
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" წარმატებით დაემატა."
 
-#: options.py:714 options.py:747
+#: options.py:722 options.py:762
 msgid "You may edit it again below."
 msgstr "თქვენ შეგიძლიათ შეცვალოთ იგი."
 
-#: options.py:724 options.py:757
+#: options.py:732 options.py:772
 #, python-format
 msgid "You may add another %s below."
 msgstr "შეგიძლიათ დაამატოთ კიდევ ერთი %s."
 
-#: options.py:745
+#: options.py:760
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" წარმატებით შეიცვალა."
 
-#: options.py:753
+#: options.py:768
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
@@ -190,74 +188,75 @@ msgstr ""
 "%(name)s \"%(obj)s\" წარმატებით დაემატა. შეგიძლიათ განაგრძოთ მისი "
 "რედაქტირება."
 
-#: options.py:807 options.py:1065
+#: options.py:828 options.py:1086
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr ""
+"ობიექტებზე მოქმედებების შესასრულებლად ისინი არჩეული უნდა იყოს. არცერთი "
+"ობიექტი არჩეული არ არის."
 
-#: options.py:826
-#, fuzzy
+#: options.py:847
 msgid "No action selected."
-msgstr "მოქმედების დრო"
+msgstr "მოქმედება არჩეული არ არის."
 
-#: options.py:907
+#: options.py:928
 #, python-format
 msgid "Add %s"
 msgstr "დავამატოთ %s"
 
-#: options.py:933 options.py:1174
+#: options.py:954 options.py:1195
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
+msgstr "%(name)s-ის ობიექტი პირველადი გასაღებით %(key)r არ არსებობს."
 
-#: options.py:998
+#: options.py:1019
 #, python-format
 msgid "Change %s"
 msgstr "შევცვალოთ %s"
 
-#: options.py:1045
+#: options.py:1066
 msgid "Database error"
 msgstr "მონაცემთა ბაზის შეცდომა"
 
-#: options.py:1107
-#, fuzzy, python-format
+#: options.py:1128
+#, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
-msgstr[0] "%(name)s \"%(obj)s\" წარმატებით შეიცვალა."
+msgstr[0] "%(count)s %(name)s წარმატებით შეიცვალა."
 
-#: options.py:1134
+#: options.py:1155
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
-msgstr[0] ""
+msgstr[0] "%(total_count)s-ია არჩეული"
 
-#: options.py:1139
+#: options.py:1160
 #, python-format
 msgid "0 of %(cnt)s selected"
-msgstr ""
+msgstr "%(cnt)s-დან არცერთი არჩეული არ არის"
 
-#: options.py:1190
+#: options.py:1211
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" წარმატებით წაიშალა."
 
-#: options.py:1235
+#: options.py:1256
 #, python-format
 msgid "Change history: %s"
 msgstr "ცვლილებების ისტორია: %s"
 
-#: sites.py:312 templates/admin/login.html:42
+#: sites.py:319 templates/admin/login.html:42
 #: templates/registration/password_reset_complete.html:14
 #: views/decorators.py:29
 msgid "Log in"
 msgstr "შესვლა"
 
-#: sites.py:368
+#: sites.py:375
 msgid "Site administration"
 msgstr "საიტის ადმინისტრირება"
 
-#: sites.py:412
+#: sites.py:419
 #, python-format
 msgid "%s administration"
 msgstr "%s ადმინისტრირება"
@@ -270,11 +269,11 @@ msgstr "თარიღი;"
 msgid "Time:"
 msgstr "დრო:"
 
-#: widgets.py:121
+#: widgets.py:140
 msgid "Lookup"
 msgstr "ძიება"
 
-#: widgets.py:237
+#: widgets.py:246
 msgid "Add Another"
 msgstr "ახლის დამატება"
 
@@ -325,24 +324,24 @@ msgstr ""
 
 #: templates/admin/actions.html:4
 msgid "Run the selected action"
-msgstr ""
+msgstr "არჩეული მოქმედების შესრულება"
 
 #: templates/admin/actions.html:4
 msgid "Go"
-msgstr "ძებნა"
+msgstr "გადასვლა"
 
 #: templates/admin/actions.html:11
 msgid "Click here to select the objects across all pages"
-msgstr ""
+msgstr "ყველა გვერდზე არსებული ობიექტის მოსანიშნად დააწკაპეთ აქ"
 
 #: templates/admin/actions.html:11
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
-msgstr ""
+msgstr "ყველა %(total_count)s %(module_name)s-ის მონიშვნა"
 
 #: templates/admin/actions.html:13
 msgid "Clear selection"
-msgstr ""
+msgstr "მონიშვნის გასუფთავება"
 
 #: templates/admin/app_index.html:10 templates/admin/index.html:19
 #, python-format
@@ -399,10 +398,9 @@ msgstr "წარმოდგენა საიტზე"
 #: templates/admin/login.html:17
 #: templates/admin/auth/user/change_password.html:25
 #: templates/registration/password_change_form.html:16
-#, fuzzy
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
-msgstr[0] "გთხოვთ, გაასწორეთ ქვემოთ მოყვანილი შეცდომა."
+msgstr[0] "გთხოვთ, გაასწოროთ შეცდომები."
 
 #: templates/admin/change_list.html:64
 #, python-format
@@ -430,14 +428,13 @@ msgstr ""
 "ობიექტების წაშლის უფლება:"
 
 #: templates/admin/delete_confirmation.html:25
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
 "following protected related objects:"
 msgstr ""
-"ობიექტების წაშლა: %(object_name)s '%(escaped_object)s' გამოიწვევს "
-"დაკავშირებული ობიექტების წაშლას, მაგრამ თქვენ არა გაქვთ შემდეგი ტიპების "
-"ობიექტების წაშლის უფლება:"
+"%(object_name)s ტიპის '%(escaped_object)s' ობიექტის წაშლა მოითხოვს ასევე "
+"შემდეგი დაკავშირებული ობიექტების წაშლას:"
 
 #: templates/admin/delete_confirmation.html:33
 #, python-format
@@ -454,39 +451,36 @@ msgid "Yes, I'm sure"
 msgstr "კი, ნამდვილად"
 
 #: templates/admin/delete_selected_confirmation.html:9
-#, fuzzy
 msgid "Delete multiple objects"
-msgstr "წაშლილია %(name)s \"%(object)s\"."
+msgstr "რამდენიმე ობიექტის წაშლა"
 
 #: templates/admin/delete_selected_confirmation.html:16
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would result in deleting related "
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
 msgstr ""
-"ობიექტების წაშლა: %(object_name)s '%(escaped_object)s' გამოიწვევს "
-"დაკავშირებული ობიექტების წაშლას, მაგრამ თქვენ არა გაქვთ შემდეგი ტიპების "
-"ობიექტების წაშლის უფლება:"
+"%(objects_name)s ტიპის ობიექტის წაშლა ითხოვს ასევე შემდეგი ობიექტების "
+"წაშლას, მაგრამ თქვენ არ გაქვთ ამის ნებართვა:"
 
 #: templates/admin/delete_selected_confirmation.html:24
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would require deleting the following "
 "protected related objects:"
 msgstr ""
-"ობიექტების წაშლა: %(object_name)s '%(escaped_object)s' გამოიწვევს "
-"დაკავშირებული ობიექტების წაშლას, მაგრამ თქვენ არა გაქვთ შემდეგი ტიპების "
-"ობიექტების წაშლის უფლება:"
+"არჩეული %(objects_name)s ობიექტის წაშლა მოითხოვს ასევე შემდეგი დაცული "
+"დაკავშირეული ობიექტების წაშლას:"
 
 #: templates/admin/delete_selected_confirmation.html:32
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Are you sure you want to delete the selected %(objects_name)s? All of the "
 "following objects and their related items will be deleted:"
 msgstr ""
-"ნამდვილად გსურთ, წაშალოთ %(object_name)s \"%(escaped_object)s\"? ყველა "
-"ქვემოთ მოყვანილი დაკავშირებული ობიექტი წაშლილი იქნება:"
+"დარწმუნებული ხართ, რომ გსურთ %(objects_name)s ობიექტის წაშლა? ყველა შემდეგი "
+"ობიექტი, და მათზე დამოკიდებული ჩანაწერები წაშლილი იქნება:"
 
 #: templates/admin/filter.html:2
 #, python-format
@@ -519,9 +513,8 @@ msgid "None available"
 msgstr "არ არის მისაწვდომი"
 
 #: templates/admin/index.html:72
-#, fuzzy
 msgid "Unknown content"
-msgstr "გაურკვეველი"
+msgstr "უცნობი შიგთავსი"
 
 #: templates/admin/invalid_setup.html:7
 msgid ""
@@ -570,15 +563,14 @@ msgid "Save"
 msgstr "შევინახოთ"
 
 #: templates/admin/search_form.html:8
-#, fuzzy
 msgid "Search"
-msgstr "მარტი"
+msgstr "ძებნა"
 
 #: templates/admin/search_form.html:10
 #, python-format
 msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
-msgstr[0] ""
+msgstr[0] "%(counter)s შედეგი"
 
 #: templates/admin/search_form.html:10
 #, python-format
@@ -606,9 +598,8 @@ msgstr ""
 "მომხმარებლის სხვა ოპციების რედაქტირების შესაძლებლობა."
 
 #: templates/admin/auth/user/add_form.html:8
-#, fuzzy
 msgid "Enter a username and password."
-msgstr "შეიყვანეთ ახალი პაროლი:"
+msgstr "შეიყვანეთ მომხმარებლის სახელი და პაროლი"
 
 #: templates/admin/auth/user/change_password.html:29
 #, python-format
@@ -631,9 +622,9 @@ msgstr "შეიყვანეთ იგივე პაროლი, და�
 
 #: templates/admin/edit_inline/stacked.html:67
 #: templates/admin/edit_inline/tabular.html:113
-#, fuzzy, python-format
+#, python-format
 msgid "Add another %(verbose_name)s"
-msgstr "%(verbose_name)s წაიშალა."
+msgstr "კიდევ ერთი %(verbose_name)s-ის დამატება"
 
 #: templates/admin/edit_inline/stacked.html:70
 #: templates/admin/edit_inline/tabular.html:116
@@ -759,27 +750,25 @@ msgstr ""
 "უნდა დააყენოთ თქვენი პაროლი. წერილი მალე უნდა მიიღოთ."
 
 #: templates/registration/password_reset_email.html:2
-msgid "You're receiving this e-mail because you requested a password reset"
+#, fuzzy, python-format
+msgid ""
+"You're receiving this e-mail because you requested a password reset for your "
+"user account at %(site_name)s."
 msgstr "თქვენ მიიღეთ ეს წერილი, რადგანაც მოითხოვეთ პაროლის აღდგენა"
 
-#: templates/registration/password_reset_email.html:3
-#, python-format
-msgid "for your user account at %(site_name)s"
-msgstr "თქვენი მომხმარებლის ანგარიშისათვის %(site_name)s-საიტზე"
-
-#: templates/registration/password_reset_email.html:5
+#: templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
 msgstr "გთხოვთ, გადახვიდეთ შემდეგ გვერდზე და აირჩიოთ ახალი პაროლი:"
 
-#: templates/registration/password_reset_email.html:9
+#: templates/registration/password_reset_email.html:8
 msgid "Your username, in case you've forgotten:"
 msgstr "თქვენი მომხმარებლის სახელი (თუ დაგავიწყდათ):"
 
-#: templates/registration/password_reset_email.html:11
+#: templates/registration/password_reset_email.html:10
 msgid "Thanks for using our site!"
 msgstr "გმადლობთ, რომ იყენებთ ჩვენს საიტს!"
 
-#: templates/registration/password_reset_email.html:13
+#: templates/registration/password_reset_email.html:12
 #, python-format
 msgid "The %(site_name)s team"
 msgstr "%(site_name)s საიტის გუნდი"
@@ -800,16 +789,16 @@ msgstr "ელ. ფოსტა:"
 msgid "Reset my password"
 msgstr "აღვადგინოთ ჩემი პაროლი"
 
-#: templatetags/admin_list.py:273
+#: templatetags/admin_list.py:288
 msgid "All dates"
 msgstr "ყველა თარიღი"
 
-#: views/main.py:68
+#: views/main.py:66
 #, python-format
 msgid "Select %s"
 msgstr "ავირჩიოთ %s"
 
-#: views/main.py:68
+#: views/main.py:66
 #, python-format
 msgid "Select %s to change"
 msgstr "აირჩიეთ %s შესაცვლელად"

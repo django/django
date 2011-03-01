@@ -4,27 +4,28 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-20 16:11+0100\n"
-"PO-Revision-Date: 2010-05-07 17:33+0100\n"
-"Last-Translator: Michael Thornhill <michael@maithu.com>\n"
-"Language-Team: Irish <gaeilge-gnulinux@lists.sourceforge.net>\n"
+"POT-Creation-Date: 2011-02-28 18:47+0100\n"
+"PO-Revision-Date: 2011-02-22 00:12+0000\n"
+"Last-Translator: mick <michael@maithu.com>\n"
+"Language-Team: Irish <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=5; plural=n==1 ? 0 : n==2 ? 1 : n<7 ? 2 : n < 11 ? "
-"3 : 4;\n"
+"Language: ga\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n==2 ? 1 : n<7 ? 2 : n<11 ? 3 : "
+"4)\n"
 
 #: actions.py:49
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "D'éirigh le scriosadh %(count)d %(items)s."
 
-#: actions.py:61 options.py:1199
+#: actions.py:61 options.py:1220
 #, python-format
 msgid "Cannot delete %(name)s"
-msgstr ""
+msgstr "Ní féidir scriosadh %(name)s "
 
-#: actions.py:63 options.py:1201
+#: actions.py:63 options.py:1222
 msgid "Are you sure?"
 msgstr "An bhfuil tú cinnte?"
 
@@ -42,39 +43,39 @@ msgstr ""
 "<h3>Trí %s:</h3>\n"
 "<ul>\n"
 
-#: filterspecs.py:91 filterspecs.py:113 filterspecs.py:175 filterspecs.py:213
+#: filterspecs.py:104 filterspecs.py:136 filterspecs.py:205 filterspecs.py:257
 msgid "All"
 msgstr "Gach"
 
-#: filterspecs.py:137
+#: filterspecs.py:164
 msgid "Any date"
 msgstr "Aon dáta"
 
-#: filterspecs.py:138
+#: filterspecs.py:165
 msgid "Today"
 msgstr "Inniu"
 
-#: filterspecs.py:141
+#: filterspecs.py:168
 msgid "Past 7 days"
 msgstr "7 lá a chuaigh thart"
 
-#: filterspecs.py:144
+#: filterspecs.py:171
 msgid "This month"
 msgstr "Táim cinnte"
 
-#: filterspecs.py:146
+#: filterspecs.py:173
 msgid "This year"
 msgstr "An blian seo"
 
-#: filterspecs.py:175
+#: filterspecs.py:205
 msgid "Yes"
 msgstr "Tá"
 
-#: filterspecs.py:175
+#: filterspecs.py:205
 msgid "No"
 msgstr "Níl"
 
-#: filterspecs.py:182
+#: filterspecs.py:216
 msgid "Unknown"
 msgstr "Gan aithne"
 
@@ -131,54 +132,54 @@ msgstr "loga iontrálacha"
 msgid "None"
 msgstr "Dada"
 
-#: options.py:620
+#: options.py:628
 #, python-format
 msgid "Changed %s."
 msgstr "Athraithe %s"
 
-#: options.py:620 options.py:630
+#: options.py:628 options.py:638
 msgid "and"
 msgstr "agus"
 
-#: options.py:625
+#: options.py:633
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "Suimithe %(name)s \"%(object)s\"."
 
-#: options.py:629
+#: options.py:637
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "Athraithe %(list)s le %(name)s \"%(object)s\"."
 
-#: options.py:634
+#: options.py:642
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "Scriosaithe %(name)s \"%(object)s\"."
 
-#: options.py:638
+#: options.py:646
 msgid "No fields changed."
 msgstr "Dada réimse aithraithe"
 
-#: options.py:710
+#: options.py:718
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "Bhí  %(name)s \"%(obj)s\" breisithe go rathúil"
 
-#: options.py:714 options.py:747
+#: options.py:722 options.py:762
 msgid "You may edit it again below."
 msgstr "Is féidir leat é a cuir in eagar thíos."
 
-#: options.py:724 options.py:757
+#: options.py:732 options.py:772
 #, python-format
 msgid "You may add another %s below."
 msgstr "Is féidir le ceann eile %s a cuir le thíos."
 
-#: options.py:745
+#: options.py:760
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "Bhí an %(name)s \"%(obj)s\" aithraithe to rathúil"
 
-#: options.py:753
+#: options.py:768
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
@@ -186,7 +187,7 @@ msgstr ""
 "Chuir an %(name)s·\"%(obj)s\"·go rathúil.·Is féidir leat é a cuir in eagar "
 "thíos."
 
-#: options.py:807 options.py:1065
+#: options.py:828 options.py:1086
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
@@ -194,75 +195,71 @@ msgstr ""
 "Ní mór Míreanna a roghnú chun caingne a dhéanamh orthu. Níl aon mhíreanna a "
 "athrú."
 
-#: options.py:826
+#: options.py:847
 msgid "No action selected."
 msgstr "Uimh gníomh roghnaithe."
 
-#: options.py:907
+#: options.py:928
 #, python-format
 msgid "Add %s"
 msgstr "Cuir %s le"
 
-#: options.py:933 options.py:1174
+#: options.py:954 options.py:1195
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "Níl réad le hainm %(name)s agus eochair %(key)r ann."
 
-#: options.py:998
+#: options.py:1019
 #, python-format
 msgid "Change %s"
 msgstr "Aithrigh %s"
 
-#: options.py:1045
+#: options.py:1066
 msgid "Database error"
 msgstr "Botún bunachar sonraí"
 
-#: options.py:1107
+#: options.py:1128
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
-msgstr[0] "Bhí  %(count)s %(name)s aithraithe go rathúil."
-msgstr[1] "Bhí  %(count)s %(name)s aithraithe to rathúil"
-msgstr[2] "Bhí  %(count)s %(name)s aithraithe to rathúil"
-msgstr[3] "Bhí  %(count)s %(name)s aithraithe to rathúil"
-msgstr[4] "Bhí  %(count)s %(name)s aithraithe to rathúil"
+msgstr[0] "Bhí %(count)s %(name)s athrú go rathúil."
+msgstr[1] "Bhí %(count)s %(name)s athrú go rathúil."
+msgstr[2] "Bhí %(count)s %(name)s athrú go rathúil."
 
-#: options.py:1134
+#: options.py:1155
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
-msgstr[0] "Gach %(total_count)s roghnaithe"
+msgstr[0] "%(total_count)s roghnaithe"
 msgstr[1] "Gach %(total_count)s roghnaithe"
 msgstr[2] "Gach %(total_count)s roghnaithe"
-msgstr[3] "Gach %(total_count)s roghnaithe"
-msgstr[4] "Gach %(total_count)s roghnaithe"
 
-#: options.py:1139
+#: options.py:1160
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "0 as %(cnt)s roghnaithe."
 
-#: options.py:1190
+#: options.py:1211
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "Bhí %(name)s \"%(obj)s\" scrioste go rathúil."
 
-#: options.py:1235
+#: options.py:1256
 #, python-format
 msgid "Change history: %s"
 msgstr "Athraigh stáir %s"
 
-#: sites.py:312 templates/admin/login.html:42
+#: sites.py:319 templates/admin/login.html:42
 #: templates/registration/password_reset_complete.html:14
 #: views/decorators.py:29
 msgid "Log in"
 msgstr "Logáil isteach"
 
-#: sites.py:368
+#: sites.py:375
 msgid "Site administration"
 msgstr "Riaracháin an suíomh"
 
-#: sites.py:412
+#: sites.py:419
 #, python-format
 msgid "%s administration"
 msgstr "%s riaracháin"
@@ -275,11 +272,11 @@ msgstr "Dáta:"
 msgid "Time:"
 msgstr "Am:"
 
-#: widgets.py:121
+#: widgets.py:140
 msgid "Lookup"
 msgstr "Cuardach"
 
-#: widgets.py:237
+#: widgets.py:246
 msgid "Add Another"
 msgstr "Cuir le"
 
@@ -407,11 +404,9 @@ msgstr "Breath ar suíomh"
 #: templates/registration/password_change_form.html:16
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
-msgstr[0] "Le do thoil ceartaigh an botún thíos."
-msgstr[1] "Le do thoil ceartaigh na botúin thíos."
-msgstr[2] "Le do thoil ceartaigh na botúin thíos."
-msgstr[3] "Le do thoil ceartaigh na botúin thíos."
-msgstr[4] "Le do thoil ceartaigh na botúin thíos."
+msgstr[0] "Ceart le do thoil an botún thíos."
+msgstr[1] "Ceart le do thoil na botúin thíos."
+msgstr[2] "Ceart le do thoil na botúin thíos."
 
 #: templates/admin/change_list.html:64
 #, python-format
@@ -438,13 +433,13 @@ msgstr ""
 "gaolta. Ach níl cead ag do cuntas na oibiacht a leanúint a scriosadh:"
 
 #: templates/admin/delete_confirmation.html:25
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
 "following protected related objects:"
 msgstr ""
-"Má scriossan tú  %(object_name)s '%(escaped_object)s' scriosfaidh oibiachtí "
-"gaolta. Ach níl cead ag do cuntas na oibiacht a leanúint a scriosadh:"
+"Bheadh Scriosadh an %(object_name)s  '%(escaped_object)s' a cheangal ar an "
+"méid seo a leanas a scriosadh nithe cosanta a bhaineann le:"
 
 #: templates/admin/delete_confirmation.html:33
 #, python-format
@@ -465,32 +460,33 @@ msgid "Delete multiple objects"
 msgstr "Scrios na réadanna"
 
 #: templates/admin/delete_selected_confirmation.html:16
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would result in deleting related "
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
 msgstr ""
-"Má scriossan tú  %(object_name)s scriosfaidh oibiachtí gaolta. Ach níl cead "
-"ag do cuntas na oibiacht a leanúint a scriosadh:"
+"Scriosadh an roghnaithe %(objects_name)s a bheadh mar thoradh ar na nithe "
+"gaolmhara a scriosadh, ach níl cead do chuntas a scriosadh na cineálacha seo "
+"a leanas na cuspóirí:"
 
 #: templates/admin/delete_selected_confirmation.html:24
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would require deleting the following "
 "protected related objects:"
 msgstr ""
-"Má scriossan tú  %(object_name)s scriosfaidh oibiachtí gaolta. Ach níl cead "
-"ag do cuntas na oibiacht a leanúint a scriosadh:"
+"Teastaíonn scriosadh na %(objects_name)s roghnaithe  scriosadh na hoibiacht "
+"gaolta cosainte a leanúint:"
 
 #: templates/admin/delete_selected_confirmation.html:32
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Are you sure you want to delete the selected %(objects_name)s? All of the "
 "following objects and their related items will be deleted:"
 msgstr ""
-"An bhfuil tú cinnte na  %(object_name)s a scroiseadh? Beidh gach oibiacht a "
-"leanúint agus na oibiachta gaolta scroiste freisin:"
+"An bhfuil tú cinnte gur mian leat a scriosadh %(objects_name)s roghnaithe? "
+"Beidh gach ceann de na nithe seo a leanas agus a n-ítimí gaolta scroiste:"
 
 #: templates/admin/filter.html:2
 #, python-format
@@ -577,14 +573,12 @@ msgid "Search"
 msgstr "Cuardach"
 
 #: templates/admin/search_form.html:10
-#, fuzzy, python-format
+#, python-format
 msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
-msgstr[0] "Gach %(total_count)s roghnaithe"
-msgstr[1] "Gach %(total_count)s roghnaithe"
-msgstr[2] "Gach %(total_count)s roghnaithe"
-msgstr[3] "Gach %(total_count)s roghnaithe"
-msgstr[4] "Gach %(total_count)s roghnaithe"
+msgstr[0] "%(counter)s toradh"
+msgstr[1] "%(counter)s torthaí"
+msgstr[2] "%(counter)s torthaí"
 
 #: templates/admin/search_form.html:10
 #, python-format
@@ -612,9 +606,8 @@ msgstr ""
 "cuir in eagar níos mó roghaí úsaideoira."
 
 #: templates/admin/auth/user/add_form.html:8
-#, fuzzy
 msgid "Enter a username and password."
-msgstr "Cuir isteach focal faire nua"
+msgstr "Cuir isteach ainm úsáideora agus focal faire."
 
 #: templates/admin/auth/user/change_password.html:29
 #, python-format
@@ -765,30 +758,28 @@ msgstr ""
 "Gheobaidh tú an r-phost i gceann tamallín."
 
 #: templates/registration/password_reset_email.html:2
-msgid "You're receiving this e-mail because you requested a password reset"
+#, fuzzy, python-format
+msgid ""
+"You're receiving this e-mail because you requested a password reset for your "
+"user account at %(site_name)s."
 msgstr ""
 "Tá tú ag fáil an r-phost seo mar iarr tú ar athshocraigh an focal faire."
 
-#: templates/registration/password_reset_email.html:3
-#, python-format
-msgid "for your user account at %(site_name)s"
-msgstr "Le do cuntas úsaideor ar %(site_name)s"
-
-#: templates/registration/password_reset_email.html:5
+#: templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
 msgstr ""
 "Le do thoil té go dtí an leathanach a leanúint agus roghmaigh focal faire "
 "nua:"
 
-#: templates/registration/password_reset_email.html:9
+#: templates/registration/password_reset_email.html:8
 msgid "Your username, in case you've forgotten:"
 msgstr "Do ainm úsaideoir, má tá dearmad déanta agat."
 
-#: templates/registration/password_reset_email.html:11
+#: templates/registration/password_reset_email.html:10
 msgid "Thanks for using our site!"
 msgstr "Go raibh maith agat le hadhaigh do cuairt!"
 
-#: templates/registration/password_reset_email.html:13
+#: templates/registration/password_reset_email.html:12
 #, python-format
 msgid "The %(site_name)s team"
 msgstr "Foireann an %(site_name)s"
@@ -809,16 +800,16 @@ msgstr "R-phost:"
 msgid "Reset my password"
 msgstr "Athsocraigh mo focal faire"
 
-#: templatetags/admin_list.py:273
+#: templatetags/admin_list.py:288
 msgid "All dates"
 msgstr "Gach dáta"
 
-#: views/main.py:68
+#: views/main.py:66
 #, python-format
 msgid "Select %s"
 msgstr "Roghnaigh %s"
 
-#: views/main.py:68
+#: views/main.py:66
 #, python-format
 msgid "Select %s to change"
 msgstr "Roghnaigh %s a athrú"

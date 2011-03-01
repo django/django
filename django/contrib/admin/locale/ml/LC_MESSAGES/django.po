@@ -1,34 +1,30 @@
-# Translation of Django to Malayalam.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# RAJEESH R NAIR <rajeeshrnair@gmail.com>, 2010.
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Django SVN\n"
+"Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-20 16:11+0100\n"
-"PO-Revision-Date: 2010-05-28 15:09+0530\n"
-"Last-Translator: Rajeesh Nair <rajeeshrnair@gmail.com>\n"
-"Language-Team: MALAYALAM <ML@li.org>\n"
+"POT-Creation-Date: 2011-02-28 18:47+0100\n"
+"PO-Revision-Date: 2011-02-22 00:12+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: Malayalam <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Poedit-Language: Malayalam\n"
-"X-Poedit-Country: INDIA\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: ml\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: actions.py:49
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "%(count)d %(items)s വിജയകരമായി ഡിലീറ്റ് ചെയ്തു."
 
-#: actions.py:61 options.py:1199
+#: actions.py:61 options.py:1220
 #, python-format
 msgid "Cannot delete %(name)s"
-msgstr ""
+msgstr "Cannot delete %(name)s"
 
-#: actions.py:63 options.py:1201
+#: actions.py:63 options.py:1222
 msgid "Are you sure?"
 msgstr "തീര്‍ച്ചയാണോ?"
 
@@ -46,39 +42,39 @@ msgstr ""
 "<h3>By %s:</h3>\n"
 "<ul>\n"
 
-#: filterspecs.py:91 filterspecs.py:113 filterspecs.py:175 filterspecs.py:213
+#: filterspecs.py:104 filterspecs.py:136 filterspecs.py:205 filterspecs.py:257
 msgid "All"
 msgstr "എല്ലാം"
 
-#: filterspecs.py:137
+#: filterspecs.py:164
 msgid "Any date"
 msgstr "ഏതെങ്കിലും തീയതി"
 
-#: filterspecs.py:138
+#: filterspecs.py:165
 msgid "Today"
 msgstr "ഇന്ന്"
 
-#: filterspecs.py:141
+#: filterspecs.py:168
 msgid "Past 7 days"
 msgstr "കഴിഞ്ഞ ഏഴു ദിവസം"
 
-#: filterspecs.py:144
+#: filterspecs.py:171
 msgid "This month"
 msgstr "ഈ മാസം"
 
-#: filterspecs.py:146
+#: filterspecs.py:173
 msgid "This year"
 msgstr "ഈ വര്‍ഷം"
 
-#: filterspecs.py:175
+#: filterspecs.py:205
 msgid "Yes"
 msgstr "അതെ"
 
-#: filterspecs.py:175
+#: filterspecs.py:205
 msgid "No"
 msgstr "അല്ല"
 
-#: filterspecs.py:182
+#: filterspecs.py:216
 msgid "Unknown"
 msgstr "അജ്ഞാതം"
 
@@ -135,128 +131,128 @@ msgstr "ലോഗ് എന്ട്രികള്‍"
 msgid "None"
 msgstr "ഒന്നുമില്ല"
 
-#: options.py:620
+#: options.py:628
 #, python-format
 msgid "Changed %s."
 msgstr "%s മാറ്റി."
 
-#: options.py:620 options.py:630
+#: options.py:628 options.py:638
 msgid "and"
 msgstr "ഉം"
 
-#: options.py:625
+#: options.py:633
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" ചേര്‍ത്തു."
 
-#: options.py:629
+#: options.py:637
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" ന്റെ %(list)s മാറ്റി."
 
-#: options.py:634
+#: options.py:642
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" ഡിലീറ്റ് ചെയ്തു."
 
-#: options.py:638
+#: options.py:646
 msgid "No fields changed."
 msgstr "ഒരു മാറ്റവുമില്ല."
 
-#: options.py:710
+#: options.py:718
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" വിജയകരമായി കൂട്ടിച്ചേര്ത്തു."
 
-#: options.py:714 options.py:747
+#: options.py:722 options.py:762
 msgid "You may edit it again below."
 msgstr "താഴെ നിന്ന് വീണ്ടും മാറ്റം വരുത്താം"
 
-#: options.py:724 options.py:757
+#: options.py:732 options.py:772
 #, python-format
 msgid "You may add another %s below."
 msgstr "%s ഒന്നു കൂടി ചേര്‍ക്കാം"
 
-#: options.py:745
+#: options.py:760
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" ല്‍ മാറ്റം വരുത്തി."
 
-#: options.py:753
+#: options.py:768
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr "%(name)s \"%(obj)s\" കൂട്ടി ചേര്‍ത്തു. താഴെ നിന്നും മാറ്റം വരുത്താം."
 
-#: options.py:807 options.py:1065
+#: options.py:828 options.py:1086
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr "ആക്ഷന്‍ നടപ്പിലാക്കേണ്ട വകകള്‍ തെരഞ്ഞെടുക്കണം. ഒന്നും മാറ്റിയിട്ടില്ല."
 
-#: options.py:826
+#: options.py:847
 msgid "No action selected."
 msgstr "ആക്ഷനൊന്നും തെരഞ്ഞെടുത്തില്ല."
 
-#: options.py:907
+#: options.py:928
 #, python-format
 msgid "Add %s"
 msgstr "%s ചേര്‍ക്കുക"
 
-#: options.py:933 options.py:1174
+#: options.py:954 options.py:1195
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "%(key)r എന്ന പ്രാഥമിക കീ ഉള്ള %(name)s വസ്തു ഒന്നും നിലവിലില്ല."
 
-#: options.py:998
+#: options.py:1019
 #, python-format
 msgid "Change %s"
 msgstr "%s മാറ്റാം"
 
-#: options.py:1045
+#: options.py:1066
 msgid "Database error"
 msgstr "ഡേറ്റാബേസ് തകരാറാണ്."
 
-#: options.py:1107
+#: options.py:1128
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s ല്‍ മാറ്റം വരുത്തി."
 msgstr[1] "%(count)s %(name)s ല്‍ മാറ്റം വരുത്തി."
 
-#: options.py:1134
+#: options.py:1155
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "%(total_count)s തെരഞ്ഞെടുത്തു."
 msgstr[1] "%(total_count)sഉം തെരഞ്ഞെടുത്തു."
 
-#: options.py:1139
+#: options.py:1160
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "%(cnt)s ല്‍ ഒന്നും തെരഞ്ഞെടുത്തില്ല."
 
-#: options.py:1190
+#: options.py:1211
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" ഡിലീറ്റ് ചെയ്തു."
 
-#: options.py:1235
+#: options.py:1256
 #, python-format
 msgid "Change history: %s"
 msgstr "%s ലെ മാറ്റങ്ങള്‍."
 
-#: sites.py:312 templates/admin/login.html:42
+#: sites.py:319 templates/admin/login.html:42
 #: templates/registration/password_reset_complete.html:14
 #: views/decorators.py:29
 msgid "Log in"
 msgstr "ലോഗ്-ഇന്‍"
 
-#: sites.py:368
+#: sites.py:375
 msgid "Site administration"
 msgstr "സൈറ്റ് ഭരണം"
 
-#: sites.py:412
+#: sites.py:419
 #, python-format
 msgid "%s administration"
 msgstr "%s ഭരണം"
@@ -269,11 +265,11 @@ msgstr "തീയതി:"
 msgid "Time:"
 msgstr "സമയം:"
 
-#: widgets.py:121
+#: widgets.py:140
 msgid "Lookup"
 msgstr "തിരയുക"
 
-#: widgets.py:237
+#: widgets.py:246
 msgid "Add Another"
 msgstr "ഒന്നു കൂടി ചേര്‍ക്കുക"
 
@@ -328,7 +324,7 @@ msgstr "തെരഞ്ഞെടുത്ത ആക്ഷന്‍ നടപ്�
 
 #: templates/admin/actions.html:4
 msgid "Go"
-msgstr ""
+msgstr "Go"
 
 #: templates/admin/actions.html:11
 msgid "Click here to select the objects across all pages"
@@ -346,7 +342,7 @@ msgstr "തെരഞ്ഞെടുത്തത് റദ്ദാക്കു�
 #: templates/admin/app_index.html:10 templates/admin/index.html:19
 #, python-format
 msgid "%(name)s"
-msgstr ""
+msgstr "%(name)s"
 
 #: templates/admin/base.html:28
 msgid "Welcome,"
@@ -382,7 +378,7 @@ msgstr "ജാംഗോ ഭരണം"
 
 #: templates/admin/change_form.html:22 templates/admin/index.html:29
 msgid "Add"
-msgstr ""
+msgstr "Add"
 
 #: templates/admin/change_form.html:31 templates/admin/object_history.html:10
 msgid "History"
@@ -392,7 +388,7 @@ msgstr "ചരിത്രം"
 #: templates/admin/edit_inline/stacked.html:9
 #: templates/admin/edit_inline/tabular.html:28
 msgid "View on site"
-msgstr ""
+msgstr "View on site"
 
 #: templates/admin/change_form.html:43 templates/admin/change_list.html:73
 #: templates/admin/login.html:17
@@ -406,16 +402,16 @@ msgstr[1] "ദയവായി താഴെയുള്ള തെറ്റുക�
 #: templates/admin/change_list.html:64
 #, python-format
 msgid "Add %(name)s"
-msgstr ""
+msgstr "Add %(name)s"
 
 #: templates/admin/change_list.html:84
 msgid "Filter"
-msgstr ""
+msgstr "Filter"
 
 #: templates/admin/delete_confirmation.html:10
 #: templates/admin/submit_line.html:4
 msgid "Delete"
-msgstr ""
+msgstr "Delete"
 
 #: templates/admin/delete_confirmation.html:17
 #, python-format
@@ -429,14 +425,13 @@ msgstr ""
 "ഇല്ല:"
 
 #: templates/admin/delete_confirmation.html:25
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
 "following protected related objects:"
 msgstr ""
-"%(object_name)s '%(escaped_object)s ഡിലീറ്റ് ചെയ്യുമ്പോള്‍ അതുമായി ബന്ധമുള്ള "
-"വസ്തുക്കളുംഡിലീറ്റ് ആവും. പക്ഷേ നിങ്ങള്‍ക്ക് താഴെ പറഞ്ഞ തരം വസ്തുക്കള്‍ ഡിലീറ്റ് ചെയ്യാനുള്ള അനുമതി "
-"ഇല്ല:"
+"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"following protected related objects:"
 
 #: templates/admin/delete_confirmation.html:33
 #, python-format
@@ -457,42 +452,43 @@ msgid "Delete multiple objects"
 msgstr "ഒന്നിലേറെ വസ്തുക്കള്‍ ഡിലീറ്റ് ചെയ്തോളൂ"
 
 #: templates/admin/delete_selected_confirmation.html:16
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would result in deleting related "
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
 msgstr ""
-"%(object_name)s ഡിലീറ്റ് ചെയ്യുമ്പോള്‍ അതുമായി ബന്ധമുള്ള വസ്തുക്കളുംഡിലീറ്റ് ആവും. പക്ഷേ "
-"നിങ്ങള്‍ക്ക് താഴെ പറഞ്ഞ തരം വസ്തുക്കള്‍ ഡിലീറ്റ് ചെയ്യാനുള്ള അനുമതി ഇല്ല:"
+"Deleting the selected %(objects_name)s would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
 
 #: templates/admin/delete_selected_confirmation.html:24
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would require deleting the following "
 "protected related objects:"
 msgstr ""
-"%(object_name)s ഡിലീറ്റ് ചെയ്യുമ്പോള്‍ അതുമായി ബന്ധമുള്ള വസ്തുക്കളുംഡിലീറ്റ് ആവും. പക്ഷേ "
-"നിങ്ങള്‍ക്ക് താഴെ പറഞ്ഞ തരം വസ്തുക്കള്‍ ഡിലീറ്റ് ചെയ്യാനുള്ള അനുമതി ഇല്ല:"
+"Deleting the selected %(objects_name)s would require deleting the following "
+"protected related objects:"
 
 #: templates/admin/delete_selected_confirmation.html:32
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Are you sure you want to delete the selected %(objects_name)s? All of the "
 "following objects and their related items will be deleted:"
 msgstr ""
-"തെരഞ്ഞെടുത്ത %(object_name)s എല്ലാം ഡിലീറ്റ് ചെയ്യണമെന്ന് തീര്‍ച്ചയാണോ?താഴെപ്പറയുന്ന "
-"വസ്തുക്കളും അതുമായി ബന്ധമുള്ളതെല്ലാം ഡിലീറ്റ് ആവും:"
+"Are you sure you want to delete the selected %(objects_name)s? All of the "
+"following objects and their related items will be deleted:"
 
 #: templates/admin/filter.html:2
 #, python-format
 msgid " By %(filter_title)s "
-msgstr ""
+msgstr " By %(filter_title)s "
 
 #: templates/admin/index.html:18
 #, python-format
 msgid "Models available in the %(name)s application."
-msgstr ""
+msgstr "Models available in the %(name)s application."
 
 #: templates/admin/index.html:35
 msgid "Change"
@@ -568,11 +564,11 @@ msgid "Search"
 msgstr "പരതുക"
 
 #: templates/admin/search_form.html:10
-#, fuzzy, python-format
+#, python-format
 msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
-msgstr[0] "%(total_count)s തെരഞ്ഞെടുത്തു."
-msgstr[1] "%(total_count)sഉം തെരഞ്ഞെടുത്തു."
+msgstr[0] "%(counter)s results"
+msgstr[1] "%(counter)s results"
 
 #: templates/admin/search_form.html:10
 #, python-format
@@ -598,9 +594,8 @@ msgid ""
 msgstr "ആദ്യം, യൂസര്‍ നാമവും പാസ് വേര്‍ഡും നല്കണം. പിന്നെ, കൂടുതല്‍ കാര്യങ്ങള്‍ മാറ്റാവുന്നതാണ്."
 
 #: templates/admin/auth/user/add_form.html:8
-#, fuzzy
 msgid "Enter a username and password."
-msgstr "പുതിയ പാസ് വേര്‍ഡ് നല്കൂ"
+msgstr "Enter a username and password."
 
 #: templates/admin/auth/user/change_password.html:29
 #, python-format
@@ -748,31 +743,29 @@ msgstr ""
 "നല്കിയവിലാസത്തില്‍ അയച്ചിട്ടുണ്ട്. അത് നിങ്ങള്‍ക്ക് ഉടന്‍ ലഭിക്കേണ്ടതാണ്."
 
 #: templates/registration/password_reset_email.html:2
-msgid "You're receiving this e-mail because you requested a password reset"
+#, fuzzy, python-format
+msgid ""
+"You're receiving this e-mail because you requested a password reset for your "
+"user account at %(site_name)s."
 msgstr ""
 "നിങ്ങള്‍ പാസ് വേര്‍ഡ് പുനസ്ഥാപിക്കാന്‍ അപേക്ഷിച്ചതു കൊണ്ടാണ് ഈ ഇ-മെയില്‍ നിങ്ങള്‍ക്ക് ലഭിക്കുന്നത്."
 
-#: templates/registration/password_reset_email.html:3
-#, python-format
-msgid "for your user account at %(site_name)s"
-msgstr "നിങ്ങളുടെ %(site_name)s എന്ന സൈറ്റിലെ അക്കൗണ്ടിനു വേണ്ടി."
-
-#: templates/registration/password_reset_email.html:5
+#: templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
 msgstr "ദയവായി താഴെ പറയുന്ന പേജ് സന്ദര്‍ശിച്ച് പുതിയ പാസ് വേര്‍ഡ് തെരഞ്ഞെടുക്കുക:"
 
-#: templates/registration/password_reset_email.html:9
+#: templates/registration/password_reset_email.html:8
 msgid "Your username, in case you've forgotten:"
 msgstr "നിങ്ങള്‍ മറന്നെങ്കില്‍, നിങ്ങളുടെ യൂസര്‍ നാമം, :"
 
-#: templates/registration/password_reset_email.html:11
+#: templates/registration/password_reset_email.html:10
 msgid "Thanks for using our site!"
 msgstr "ഞങ്ങളുടെ സൈറ്റ് ഉപയോഗിച്ചതിന് നന്ദി!"
 
-#: templates/registration/password_reset_email.html:13
+#: templates/registration/password_reset_email.html:12
 #, python-format
 msgid "The %(site_name)s team"
-msgstr ""
+msgstr "The %(site_name)s team"
 
 #: templates/registration/password_reset_form.html:12
 msgid ""
@@ -790,16 +783,16 @@ msgstr "ഇ-മെയില്‍ വിലാസം:"
 msgid "Reset my password"
 msgstr "എന്റെ പാസ് വേര്‍ഡ് പുനസ്ഥാപിക്കൂ"
 
-#: templatetags/admin_list.py:273
+#: templatetags/admin_list.py:288
 msgid "All dates"
 msgstr "എല്ലാ തീയതികളും"
 
-#: views/main.py:68
+#: views/main.py:66
 #, python-format
 msgid "Select %s"
 msgstr "%s തെരഞ്ഞെടുക്കൂ"
 
-#: views/main.py:68
+#: views/main.py:66
 #, python-format
 msgid "Select %s to change"
 msgstr "മാറ്റാനുള്ള %s തെരഞ്ഞെടുക്കൂ"

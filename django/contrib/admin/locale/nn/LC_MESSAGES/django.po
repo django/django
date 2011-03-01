@@ -1,31 +1,30 @@
-# translation of django.po to norwegian nynorsk
-# Copyright (C) 2005 and beyond
 # This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-20 16:11+0100\n"
-"PO-Revision-Date: 2010-03-04 12:13+0200\n"
-"Last-Translator: Håvard Grimelid\n"
-"Language-Team: Norsk nynorsk <nn@li.org>\n"
+"POT-Creation-Date: 2011-02-28 18:47+0100\n"
+"PO-Revision-Date: 2011-02-22 00:12+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: Norwegian Nynorsk <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: nn\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: actions.py:49
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "Sletta %(count)d %(items)s."
 
-#: actions.py:61 options.py:1199
+#: actions.py:61 options.py:1220
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr ""
 
-#: actions.py:63 options.py:1201
+#: actions.py:63 options.py:1222
 msgid "Are you sure?"
 msgstr "Er du sikker?"
 
@@ -43,39 +42,39 @@ msgstr ""
 "<h3>Etter %s:</h3>\n"
 "<ul>\n"
 
-#: filterspecs.py:91 filterspecs.py:113 filterspecs.py:175 filterspecs.py:213
+#: filterspecs.py:104 filterspecs.py:136 filterspecs.py:205 filterspecs.py:257
 msgid "All"
 msgstr "Alle"
 
-#: filterspecs.py:137
+#: filterspecs.py:164
 msgid "Any date"
 msgstr "Når som helst"
 
-#: filterspecs.py:138
+#: filterspecs.py:165
 msgid "Today"
 msgstr "I dag"
 
-#: filterspecs.py:141
+#: filterspecs.py:168
 msgid "Past 7 days"
 msgstr "Siste sju dager"
 
-#: filterspecs.py:144
+#: filterspecs.py:171
 msgid "This month"
 msgstr "Denne månaden"
 
-#: filterspecs.py:146
+#: filterspecs.py:173
 msgid "This year"
 msgstr "I år"
 
-#: filterspecs.py:175
+#: filterspecs.py:205
 msgid "Yes"
 msgstr "Ja"
 
-#: filterspecs.py:175
+#: filterspecs.py:205
 msgid "No"
 msgstr "Nei"
 
-#: filterspecs.py:182
+#: filterspecs.py:216
 msgid "Unknown"
 msgstr "Ukjend"
 
@@ -132,60 +131,60 @@ msgstr "logginnlegg"
 msgid "None"
 msgstr "Ingen"
 
-#: options.py:620
+#: options.py:628
 #, python-format
 msgid "Changed %s."
 msgstr "Endra %s."
 
-#: options.py:620 options.py:630
+#: options.py:628 options.py:638
 msgid "and"
 msgstr "og"
 
-#: options.py:625
+#: options.py:633
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "Oppretta %(name)s \"%(object)s\"."
 
-#: options.py:629
+#: options.py:637
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "Endra %(list)s for %(name)s \"%(object)s\"."
 
-#: options.py:634
+#: options.py:642
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "Sletta %(name)s \"%(object)s\"."
 
-#: options.py:638
+#: options.py:646
 msgid "No fields changed."
 msgstr "Ingen felt endra."
 
-#: options.py:710
+#: options.py:718
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" vart oppretta."
 
-#: options.py:714 options.py:747
+#: options.py:722 options.py:762
 msgid "You may edit it again below."
 msgstr "Du kan redigere vidare nedanfor."
 
-#: options.py:724 options.py:757
+#: options.py:732 options.py:772
 #, python-format
 msgid "You may add another %s below."
 msgstr "Du kan opprette ny %s nedanfor."
 
-#: options.py:745
+#: options.py:760
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" vart endra."
 
-#: options.py:753
+#: options.py:768
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr "%(name)s \"%(obj)s\" vart endra Du kan redigere vidare nedanfor."
 
-#: options.py:807 options.py:1065
+#: options.py:828 options.py:1086
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
@@ -193,69 +192,69 @@ msgstr ""
 "Objekt må vere valde for at dei skal kunne utførast handlingar på. Ingen "
 "object er endra."
 
-#: options.py:826
+#: options.py:847
 msgid "No action selected."
 msgstr "Inga valt handling."
 
-#: options.py:907
+#: options.py:928
 #, python-format
 msgid "Add %s"
 msgstr "Opprett %s"
 
-#: options.py:933 options.py:1174
+#: options.py:954 options.py:1195
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "%(name)s-objekt med primærnøkkelen %(key)r eksisterer ikkje."
 
-#: options.py:998
+#: options.py:1019
 #, python-format
 msgid "Change %s"
 msgstr "Rediger %s"
 
-#: options.py:1045
+#: options.py:1066
 msgid "Database error"
 msgstr "Databasefeil"
 
-#: options.py:1107
+#: options.py:1128
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s vart endra."
 msgstr[1] "%(count)s %(name)s vart endra."
 
-#: options.py:1134
+#: options.py:1155
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "%(total_count)s valde"
 msgstr[1] "Alle %(total_count)s valde"
 
-#: options.py:1139
+#: options.py:1160
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "Ingen av %(cnt)s valde"
 
-#: options.py:1190
+#: options.py:1211
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" vart sletta."
 
-#: options.py:1235
+#: options.py:1256
 #, python-format
 msgid "Change history: %s"
 msgstr "Endringshistorikk: %s"
 
-#: sites.py:312 templates/admin/login.html:42
+#: sites.py:319 templates/admin/login.html:42
 #: templates/registration/password_reset_complete.html:14
 #: views/decorators.py:29
 msgid "Log in"
 msgstr "Logg inn"
 
-#: sites.py:368
+#: sites.py:375
 msgid "Site administration"
 msgstr "Nettstadsadministrasjon"
 
-#: sites.py:412
+#: sites.py:419
 #, python-format
 msgid "%s administration"
 msgstr "%s-administrasjon"
@@ -268,11 +267,11 @@ msgstr "Dato:"
 msgid "Time:"
 msgstr "Tid:"
 
-#: widgets.py:121
+#: widgets.py:140
 msgid "Lookup"
 msgstr "Oppslag"
 
-#: widgets.py:237
+#: widgets.py:246
 msgid "Add Another"
 msgstr "Legg til ny"
 
@@ -427,13 +426,11 @@ msgstr ""
 "relaterte objekt, men du har ikkje løyve til å slette følgande objekttypar:"
 
 #: templates/admin/delete_confirmation.html:25
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
 "following protected related objects:"
 msgstr ""
-"Dersom du slettar %(object_name)s '%(escaped_object)s', vil også slette "
-"relaterte objekt, men du har ikkje løyve til å slette følgande objekttypar:"
 
 #: templates/admin/delete_confirmation.html:33
 #, python-format
@@ -454,32 +451,26 @@ msgid "Delete multiple objects"
 msgstr "Slett fleire objekt"
 
 #: templates/admin/delete_selected_confirmation.html:16
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would result in deleting related "
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
 msgstr ""
-"Sletting av %(object_name)s vil også slette relaterte objekt, men du har "
-"ikkje løyve til å slette følgjande objekttypar:"
 
 #: templates/admin/delete_selected_confirmation.html:24
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would require deleting the following "
 "protected related objects:"
 msgstr ""
-"Sletting av %(object_name)s vil også slette relaterte objekt, men du har "
-"ikkje løyve til å slette følgjande objekttypar:"
 
 #: templates/admin/delete_selected_confirmation.html:32
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Are you sure you want to delete the selected %(objects_name)s? All of the "
 "following objects and their related items will be deleted:"
 msgstr ""
-"Er du sikker på at du vil slette desse %(object_name)s-objekta? Dei "
-"følgjande objekta og deira relaterte objekt vil bli sletta:"
 
 #: templates/admin/filter.html:2
 #, python-format
@@ -565,11 +556,11 @@ msgid "Search"
 msgstr "Søk"
 
 #: templates/admin/search_form.html:10
-#, fuzzy, python-format
+#, python-format
 msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
-msgstr[0] "%(total_count)s valde"
-msgstr[1] "Alle %(total_count)s valde"
+msgstr[0] ""
+msgstr[1] ""
 
 #: templates/admin/search_form.html:10
 #, python-format
@@ -746,29 +737,27 @@ msgstr ""
 "Du bør motta den om kort tid."
 
 #: templates/registration/password_reset_email.html:2
-msgid "You're receiving this e-mail because you requested a password reset"
+#, fuzzy, python-format
+msgid ""
+"You're receiving this e-mail because you requested a password reset for your "
+"user account at %(site_name)s."
 msgstr ""
 "Du har mottatt denne e-posten fordi du har bedt om nullstilling av passordet "
 "ditt"
 
-#: templates/registration/password_reset_email.html:3
-#, python-format
-msgid "for your user account at %(site_name)s"
-msgstr "for kontoen din på %(site_name)s"
-
-#: templates/registration/password_reset_email.html:5
+#: templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
 msgstr "Gå til følgjande side og velg eit nytt passord:"
 
-#: templates/registration/password_reset_email.html:9
+#: templates/registration/password_reset_email.html:8
 msgid "Your username, in case you've forgotten:"
 msgstr "Brukarnamnet ditt, i tilfelle du har gløymt det:"
 
-#: templates/registration/password_reset_email.html:11
+#: templates/registration/password_reset_email.html:10
 msgid "Thanks for using our site!"
 msgstr "Takk for at du brukar sida vår!"
 
-#: templates/registration/password_reset_email.html:13
+#: templates/registration/password_reset_email.html:12
 #, python-format
 msgid "The %(site_name)s team"
 msgstr "Helsing %(site_name)s"
@@ -789,16 +778,16 @@ msgstr "E-postadresse:"
 msgid "Reset my password"
 msgstr "Nullstill passordet"
 
-#: templatetags/admin_list.py:273
+#: templatetags/admin_list.py:288
 msgid "All dates"
 msgstr "Alle datoar"
 
-#: views/main.py:68
+#: views/main.py:66
 #, python-format
 msgid "Select %s"
 msgstr "Velg %s"
 
-#: views/main.py:68
+#: views/main.py:66
 #, python-format
 msgid "Select %s to change"
 msgstr "Velg %s du ønskar å redigere"

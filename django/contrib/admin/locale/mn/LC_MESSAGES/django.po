@@ -1,37 +1,37 @@
 # This file is distributed under the same license as the Django package.
 #
-# Urangua <urangua@adsolux.com>, 2010, 2002, 2010.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-20 16:11+0100\n"
-"PO-Revision-Date: 2010-03-11 17:23+0800\n"
-"Last-Translator: Urangua <urangua@adsolux.com>\n"
-"Language-Team: mn <translate@opensource.com>\n"
+"POT-Creation-Date: 2011-02-28 18:47+0100\n"
+"PO-Revision-Date: 2011-02-25 07:22+0000\n"
+"Last-Translator: jargalan <jargalanch@gmail.com>\n"
+"Language-Team: Mongolian <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: mn\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: actions.py:49
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
-msgstr ""
+msgstr "%(items)s ээс   %(count)d-ийг амжилттай устгалаа."
 
-#: actions.py:61 options.py:1199
+#: actions.py:61 options.py:1220
 #, python-format
 msgid "Cannot delete %(name)s"
-msgstr ""
+msgstr "%(name)s устгаж чадахгүй."
 
-#: actions.py:63 options.py:1201
+#: actions.py:63 options.py:1222
 msgid "Are you sure?"
 msgstr "Итгэлтэй байна уу?"
 
 #: actions.py:85
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
-msgstr ""
+msgstr "Сонгосон %(verbose_name_plural)s-ийг устга"
 
 #: filterspecs.py:54
 #, python-format
@@ -39,42 +39,42 @@ msgid ""
 "<h3>By %s:</h3>\n"
 "<ul>\n"
 msgstr ""
-"<h3>-аар %s:</h3>\n"
+"<h3>%s :</h3>\n"
 "<ul>\n"
 
-#: filterspecs.py:91 filterspecs.py:113 filterspecs.py:175 filterspecs.py:213
+#: filterspecs.py:104 filterspecs.py:136 filterspecs.py:205 filterspecs.py:257
 msgid "All"
 msgstr "Бүх "
 
-#: filterspecs.py:137
+#: filterspecs.py:164
 msgid "Any date"
-msgstr "Өдөр харгалзахгүй"
+msgstr "Бүх өдөр"
 
-#: filterspecs.py:138
+#: filterspecs.py:165
 msgid "Today"
 msgstr "Өнөөдөр"
 
-#: filterspecs.py:141
+#: filterspecs.py:168
 msgid "Past 7 days"
 msgstr "Өнгөрсөн долоо хоног"
 
-#: filterspecs.py:144
+#: filterspecs.py:171
 msgid "This month"
 msgstr "Энэ сар"
 
-#: filterspecs.py:146
+#: filterspecs.py:173
 msgid "This year"
 msgstr "Энэ жил"
 
-#: filterspecs.py:175
+#: filterspecs.py:205
 msgid "Yes"
 msgstr "Тийм"
 
-#: filterspecs.py:175
+#: filterspecs.py:205
 msgid "No"
 msgstr "Үгүй"
 
-#: filterspecs.py:182
+#: filterspecs.py:216
 msgid "Unknown"
 msgstr "Тодорхойгүй"
 
@@ -83,8 +83,8 @@ msgid ""
 "Please enter a correct username and password. Note that both fields are case-"
 "sensitive."
 msgstr ""
-"Хэрэглэгчийн нэр, нууц үгээ зөв оруулна уу. Том жижиг үсгийн ялгааг гаргах "
-"хэрэгтэй."
+"Хэрэглэгчийн нэр, нууц үгээ зөв оруулна уу. Том жижиг үсэг ялгаатайг "
+"анхаарна уу."
 
 #: forms.py:18
 msgid "Please log in again, because your session has expired."
@@ -97,9 +97,8 @@ msgstr ""
 "Цахим шуудангийн хаяг хэрэглэгчийн нэр биш. Оронд нь '%s' -ийг оруулна уу."
 
 #: helpers.py:19
-#, fuzzy
 msgid "Action:"
-msgstr "Үйлдэл"
+msgstr "Үйлдэл:"
 
 #: models.py:19
 msgid "action time"
@@ -107,80 +106,80 @@ msgstr "үйлдлийн хугацаа"
 
 #: models.py:22
 msgid "object id"
-msgstr ""
+msgstr "обектийн id"
 
 #: models.py:23
 msgid "object repr"
-msgstr ""
+msgstr "обектийн хамаарал"
 
 #: models.py:24
 msgid "action flag"
-msgstr ""
+msgstr "үйлдэлийн тэмдэг"
 
 #: models.py:25
 msgid "change message"
-msgstr ""
+msgstr "өөрчилсөн мэдээлэл"
 
 #: models.py:28
 msgid "log entry"
-msgstr ""
+msgstr "лог өгөгдөл"
 
 #: models.py:29
 msgid "log entries"
-msgstr ""
+msgstr "лог өгөгдөлүүд"
 
 #: options.py:148 options.py:163
 msgid "None"
-msgstr ""
+msgstr "Хоосон"
 
-#: options.py:620
+#: options.py:628
 #, python-format
 msgid "Changed %s."
 msgstr "Өөрчлөгдсөн %s."
 
-#: options.py:620 options.py:630
+#: options.py:628 options.py:638
 msgid "and"
 msgstr "ба"
 
-#: options.py:625
+#: options.py:633
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "Нэмэгдсэн %(name)s \"%(object)s\"."
 
-#: options.py:629
+#: options.py:637
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\"-ийн өөрчлөгдсөн %(list)s"
 
-#: options.py:634
+#: options.py:642
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "Устгасан %(name)s \"%(object)s\"."
 
-#: options.py:638
+#: options.py:646
 msgid "No fields changed."
-msgstr "Өөрчилсөн зүйл байхгүй байна."
+msgstr "Өөрчилсөн талбар алга байна."
 
-#: options.py:710
+#: options.py:718
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr " %(name)s \"%(obj)s\" амжилттай нэмэгдлээ."
 
-#: options.py:714 options.py:747
+#: options.py:722 options.py:762
 msgid "You may edit it again below."
 msgstr "Доорх хэсэгт үүнийг ахин засварлах боломжтой."
 
-#: options.py:724 options.py:757
+#: options.py:732 options.py:772
 #, python-format
 msgid "You may add another %s below."
 msgstr "Доорх хэсэгт өөр %s нэмэх боломжтой."
 
-#: options.py:745
+#: options.py:760
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr " %(name)s \"%(obj)s\" амжилттай өөрчлөгдлөө. "
 
-#: options.py:753
+#: options.py:768
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
@@ -188,76 +187,76 @@ msgstr ""
 "%(name)s \"%(obj)s\" амжилттай нэмэгдлээ. Доорх хэсэгт үүнийг ахин засварлах "
 "боломжтой."
 
-#: options.py:807 options.py:1065
+#: options.py:828 options.py:1086
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr ""
+"Үйлдэл хийхийн тулд Та ядаж 1-ийг сонгох хэрэгтэй. Өөрчилөлт хийгдсэнгүй."
 
-#: options.py:826
-#, fuzzy
+#: options.py:847
 msgid "No action selected."
-msgstr "үйлдлийн хугацаа"
+msgstr "Үйлдэл сонгоогүй."
 
-#: options.py:907
+#: options.py:928
 #, python-format
 msgid "Add %s"
 msgstr "%s-ийг нэмэх"
 
-#: options.py:933 options.py:1174
+#: options.py:954 options.py:1195
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
+msgstr "%(name)s обектийн үндсэн түлхүүр %(key)r олдохгүй байна."
 
-#: options.py:998
+#: options.py:1019
 #, python-format
 msgid "Change %s"
 msgstr "%s-ийг өөрчлөх"
 
-#: options.py:1045
+#: options.py:1066
 msgid "Database error"
 msgstr "Өгөгдлийн сангийн алдаа"
 
-#: options.py:1107
-#, fuzzy, python-format
+#: options.py:1128
+#, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
-msgstr[0] " %(name)s \"%(obj)s\" амжилттай өөрчлөгдлөө. "
-msgstr[1] " %(name)s \"%(obj)s\" амжилттай өөрчлөгдлөө. "
+msgstr[0] "%(count)s %(name)s-ийг амжилттай өөрчиллөө."
+msgstr[1] "%(count)s %(name)s-ийг амжилттай өөрчиллөө."
 
-#: options.py:1134
+#: options.py:1155
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Бүгд %(total_count)s сонгогдсон"
+msgstr[1] "Бүгд %(total_count)s сонгогдсон"
 
-#: options.py:1139
+#: options.py:1160
 #, python-format
 msgid "0 of %(cnt)s selected"
-msgstr ""
+msgstr "%(cnt)s оос 0 сонгосон"
 
-#: options.py:1190
+#: options.py:1211
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr " %(name)s \"%(obj)s\" амжилттай устгагдлаа."
 
-#: options.py:1235
+#: options.py:1256
 #, python-format
 msgid "Change history: %s"
 msgstr "Өөрчлөлтийн түүх: %s"
 
-#: sites.py:312 templates/admin/login.html:42
+#: sites.py:319 templates/admin/login.html:42
 #: templates/registration/password_reset_complete.html:14
 #: views/decorators.py:29
 msgid "Log in"
 msgstr "Нэвтрэх"
 
-#: sites.py:368
+#: sites.py:375
 msgid "Site administration"
 msgstr "Сайтын удирдлага"
 
-#: sites.py:412
+#: sites.py:419
 #, python-format
 msgid "%s administration"
 msgstr "%s  удирдлага"
@@ -270,13 +269,13 @@ msgstr "Огноо:"
 msgid "Time:"
 msgstr "Цаг:"
 
-#: widgets.py:121
+#: widgets.py:140
 msgid "Lookup"
 msgstr "Хайх"
 
-#: widgets.py:237
+#: widgets.py:246
 msgid "Add Another"
-msgstr "Ахиад нэмэх:"
+msgstr "Ахиад нэмэх"
 
 #: templates/admin/404.html:4 templates/admin/404.html.py:8
 msgid "Page not found"
@@ -325,24 +324,24 @@ msgstr ""
 
 #: templates/admin/actions.html:4
 msgid "Run the selected action"
-msgstr ""
+msgstr "Сонгосон үйлдэлийг ажилуулах"
 
 #: templates/admin/actions.html:4
 msgid "Go"
-msgstr "Очих"
+msgstr "Гүйцэтгэх"
 
 #: templates/admin/actions.html:11
 msgid "Click here to select the objects across all pages"
-msgstr ""
+msgstr "Бүх хуудаснууд дээрх объектуудыг сонгох"
 
 #: templates/admin/actions.html:11
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
-msgstr ""
+msgstr "Бүгдийг сонгох %(total_count)s %(module_name)s"
 
 #: templates/admin/actions.html:13
 msgid "Clear selection"
-msgstr ""
+msgstr "Сонгосонг цэвэрлэх"
 
 #: templates/admin/app_index.html:10 templates/admin/index.html:19
 #, python-format
@@ -375,11 +374,11 @@ msgstr "Гарах"
 
 #: templates/admin/base_site.html:4
 msgid "Django site admin"
-msgstr "Жанго сайтын удирдлага"
+msgstr "Сайтын удирдлага"
 
 #: templates/admin/base_site.html:7
 msgid "Django administration"
-msgstr "Жанго удирдлага"
+msgstr "Удирдлага"
 
 #: templates/admin/change_form.html:22 templates/admin/index.html:29
 msgid "Add"
@@ -429,13 +428,13 @@ msgstr ""
 "ч бүртгэл тань дараах төрлийн объектуудийг устгах зөвшөөрөлгүй байна:"
 
 #: templates/admin/delete_confirmation.html:25
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
 "following protected related objects:"
 msgstr ""
-"%(object_name)s '%(escaped_object)s'-ийг устгавал холбогдох объект нь устах "
-"ч бүртгэл тань дараах төрлийн объектуудийг устгах зөвшөөрөлгүй байна:"
+" %(object_name)s обектийг устгаж байна. '%(escaped_object)s' холбоотой "
+"хамгаалагдсан обектуудыг заавал утсгах хэрэгтэй :"
 
 #: templates/admin/delete_confirmation.html:33
 #, python-format
@@ -452,37 +451,36 @@ msgid "Yes, I'm sure"
 msgstr "Тийм, итгэлтэй байна."
 
 #: templates/admin/delete_selected_confirmation.html:9
-#, fuzzy
 msgid "Delete multiple objects"
-msgstr "Устгасан %(name)s \"%(object)s\"."
+msgstr "Олон обектууд устгах"
 
 #: templates/admin/delete_selected_confirmation.html:16
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would result in deleting related "
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
 msgstr ""
-"%(object_name)s '%(escaped_object)s'-ийг устгавал холбогдох объект нь устах "
-"ч бүртгэл тань дараах төрлийн объектуудийг устгах зөвшөөрөлгүй байна:"
+"Сонгосон %(objects_name)s обектуудыг устгасанаар хамаатай бүх обкетууд устах "
+"болно. Гэхдээ таньд эрх эдгээр төрлийн обектуудыг утсгах эрх байхгүй байна: "
 
 #: templates/admin/delete_selected_confirmation.html:24
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would require deleting the following "
 "protected related objects:"
 msgstr ""
-"%(object_name)s '%(escaped_object)s'-ийг устгавал холбогдох объект нь устах "
-"ч бүртгэл тань дараах төрлийн объектуудийг устгах зөвшөөрөлгүй байна:"
+"%(objects_name)s обектуудыг утсгаж байна дараах холбоотой хамгаалагдсан "
+"обектуудыг устгах шаардлагатай:"
 
 #: templates/admin/delete_selected_confirmation.html:32
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Are you sure you want to delete the selected %(objects_name)s? All of the "
 "following objects and their related items will be deleted:"
 msgstr ""
-"Та %(object_name)s \"%(escaped_object)s\"-ийг устгахдаа итгэлтэй байна уу? "
-"Үүнийг устгавал дараах холбогдох зүйлс нь бүгд устана:"
+"Та %(objects_name)s ийг устгах гэж байна итгэлтэй байна? Дараах обектууд "
+"болон холбоотой зүйлс хамт устагдах болно:"
 
 #: templates/admin/filter.html:2
 #, python-format
@@ -512,12 +510,11 @@ msgstr "Миний үйлдлүүд"
 
 #: templates/admin/index.html:58
 msgid "None available"
-msgstr "Болохгүй байна"
+msgstr "Үйлдэл алга"
 
 #: templates/admin/index.html:72
-#, fuzzy
 msgid "Unknown content"
-msgstr "Тодорхойгүй"
+msgstr "Тодорхойгүй агуулга"
 
 #: templates/admin/invalid_setup.html:7
 msgid ""
@@ -539,7 +536,7 @@ msgstr "Нууц үг:"
 
 #: templates/admin/object_history.html:22
 msgid "Date/time"
-msgstr "Огноо/хугацаа"
+msgstr "Огноо/цаг"
 
 #: templates/admin/object_history.html:23
 msgid "User"
@@ -566,16 +563,15 @@ msgid "Save"
 msgstr "Хадгалах"
 
 #: templates/admin/search_form.html:8
-#, fuzzy
 msgid "Search"
-msgstr "3-р сар"
+msgstr "Хайлт"
 
 #: templates/admin/search_form.html:10
 #, python-format
 msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(counter)s үр дүн"
+msgstr[1] "%(counter)s үр дүн"
 
 #: templates/admin/search_form.html:10
 #, python-format
@@ -603,9 +599,8 @@ msgstr ""
 "сонголтыг нэмж засварлах боломжтой болно. "
 
 #: templates/admin/auth/user/add_form.html:8
-#, fuzzy
 msgid "Enter a username and password."
-msgstr "Шинэ нууц үг оруулах"
+msgstr "Хэрэглэгчийн нэр ба нууц үгээ оруулна."
 
 #: templates/admin/auth/user/change_password.html:29
 #, python-format
@@ -627,15 +622,14 @@ msgstr "Батлахын тулд дээрх нууц үгээ ахин хийн
 
 #: templates/admin/edit_inline/stacked.html:67
 #: templates/admin/edit_inline/tabular.html:113
-#, fuzzy, python-format
+#, python-format
 msgid "Add another %(verbose_name)s"
-msgstr "%(verbose_name)s устлаа."
+msgstr "Өөр %(verbose_name)s  нэмэх "
 
 #: templates/admin/edit_inline/stacked.html:70
 #: templates/admin/edit_inline/tabular.html:116
-#, fuzzy
 msgid "Remove"
-msgstr "устлаа"
+msgstr "Хасах"
 
 #: templates/admin/edit_inline/tabular.html:15
 msgid "Delete?"
@@ -693,12 +687,12 @@ msgstr "Нууц үгээ  солих"
 #: templates/registration/password_reset_form.html:6
 #: templates/registration/password_reset_form.html:10
 msgid "Password reset"
-msgstr "Нууц үг авах"
+msgstr "Нууц үг шинэчилэх"
 
 #: templates/registration/password_reset_complete.html:6
 #: templates/registration/password_reset_complete.html:10
 msgid "Password reset complete"
-msgstr "Нууц үг авах явц дууслаа"
+msgstr "Нууц үг шинэчилэх явц дууслаа"
 
 #: templates/registration/password_reset_complete.html:12
 msgid "Your password has been set.  You may go ahead and log in now."
@@ -706,7 +700,7 @@ msgstr "Та нууц үгтэй боллоо. Одоо бүртгэлд нэв�
 
 #: templates/registration/password_reset_confirm.html:4
 msgid "Password reset confirmation"
-msgstr "Нууц үг авахаа баталгаажуулах"
+msgstr "Нууц үг шинэчилэхийг баталгаажуулах"
 
 #: templates/registration/password_reset_confirm.html:12
 msgid "Enter new password"
@@ -730,7 +724,7 @@ msgstr "Нууц үгээ батлах:"
 
 #: templates/registration/password_reset_confirm.html:26
 msgid "Password reset unsuccessful"
-msgstr "Нууц үг авах амжилтгүй"
+msgstr "Нууц үг шинэчилэх амжилтгүй боллоо"
 
 #: templates/registration/password_reset_confirm.html:28
 msgid ""
@@ -743,7 +737,7 @@ msgstr ""
 #: templates/registration/password_reset_done.html:6
 #: templates/registration/password_reset_done.html:10
 msgid "Password reset successful"
-msgstr "Нууц үг авах амжилттай"
+msgstr "Нууц үг шинэчилэх амжилттай боллоо"
 
 #: templates/registration/password_reset_done.html:12
 msgid ""
@@ -751,30 +745,28 @@ msgid ""
 "address you submitted. You should be receiving it shortly."
 msgstr ""
 "Таны оруулсан цахим шуудангийн хаягаар нууц үг авах зааварчилгааг илгээлээ. "
-"Энэ зааварчилгаа танд шууд очих болно. "
+"Энэ зааварчилгаа танд удахгүй очих болно. "
 
 #: templates/registration/password_reset_email.html:2
-msgid "You're receiving this e-mail because you requested a password reset"
-msgstr "Та нууц үг авахаар хүсэлт гаргасан тул уг цахим шууданг илгээлээ."
+#, fuzzy, python-format
+msgid ""
+"You're receiving this e-mail because you requested a password reset for your "
+"user account at %(site_name)s."
+msgstr "Та нууц үг шинэчилэхээр хүсэлт гаргасан тул уг цахим шууданг илгээлээ."
 
-#: templates/registration/password_reset_email.html:3
-#, python-format
-msgid "for your user account at %(site_name)s"
-msgstr "%(site_name)s гэсэн хэрэглэгчийн бүртгэлд "
-
-#: templates/registration/password_reset_email.html:5
+#: templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
 msgstr "Дараах хуудас руу орон шинэ нууц үг сонгоно уу:"
 
-#: templates/registration/password_reset_email.html:9
+#: templates/registration/password_reset_email.html:8
 msgid "Your username, in case you've forgotten:"
-msgstr "Мартсан тохиолдолд хийх хэрэглэгчийн нэр:"
+msgstr "Хэрэглэгчийн нэрээ мартсан бол :"
 
-#: templates/registration/password_reset_email.html:11
+#: templates/registration/password_reset_email.html:10
 msgid "Thanks for using our site!"
 msgstr "Манай сайтыг хэрэглэсэнд баярлалаа!"
 
-#: templates/registration/password_reset_email.html:13
+#: templates/registration/password_reset_email.html:12
 #, python-format
 msgid "The %(site_name)s team"
 msgstr "%(site_name)s баг"
@@ -795,16 +787,16 @@ msgstr "Цахим шуудангийн хаяг:"
 msgid "Reset my password"
 msgstr "Нууц үгээ шинэчлэх"
 
-#: templatetags/admin_list.py:273
+#: templatetags/admin_list.py:288
 msgid "All dates"
 msgstr "Бүх огноо"
 
-#: views/main.py:68
+#: views/main.py:66
 #, python-format
 msgid "Select %s"
-msgstr "%s-ийг сонго"
+msgstr "%s-г сонго"
 
-#: views/main.py:68
+#: views/main.py:66
 #, python-format
 msgid "Select %s to change"
-msgstr "%s-ийг өөрчлөхөөр сонго"
+msgstr "Өөрчлөх %s-г сонгоно уу"

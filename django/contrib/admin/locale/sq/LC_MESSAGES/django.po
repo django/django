@@ -4,33 +4,34 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-20 16:12+0100\n"
-"PO-Revision-Date: 2010-01-27 23:01+0200\n"
-"Last-Translator: Besnik Bleta <besnik@programeshqip.org>\n"
-"Language-Team: Albanian <sq@li.org>\n"
+"POT-Creation-Date: 2011-02-28 18:48+0100\n"
+"PO-Revision-Date: 2011-02-22 00:12+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: Albanian <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: sq\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: actions.py:49
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
-msgstr ""
+msgstr "U fshinë me sukses %(count)d %(items)s."
 
-#: actions.py:61 options.py:1199
+#: actions.py:61 options.py:1220
 #, python-format
 msgid "Cannot delete %(name)s"
-msgstr ""
+msgstr "S'mund të fshijë %(name)s"
 
-#: actions.py:63 options.py:1201
+#: actions.py:63 options.py:1222
 msgid "Are you sure?"
-msgstr ""
+msgstr "Jeni i sigurt?"
 
 #: actions.py:85
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
-msgstr ""
+msgstr "Fshiji %(verbose_name_plural)s e përzgjdhur"
 
 #: filterspecs.py:54
 #, python-format
@@ -38,69 +39,75 @@ msgid ""
 "<h3>By %s:</h3>\n"
 "<ul>\n"
 msgstr ""
+"<h3>Nga %s:</h3>\n"
+"<ul>\n"
 
-#: filterspecs.py:91 filterspecs.py:113 filterspecs.py:175 filterspecs.py:213
+#: filterspecs.py:104 filterspecs.py:136 filterspecs.py:205 filterspecs.py:257
 msgid "All"
-msgstr ""
+msgstr "Krejt"
 
-#: filterspecs.py:137
+#: filterspecs.py:164
 msgid "Any date"
-msgstr ""
+msgstr "Çfarëdo date"
 
-#: filterspecs.py:138
+#: filterspecs.py:165
 msgid "Today"
-msgstr ""
+msgstr "Sot"
 
-#: filterspecs.py:141
+#: filterspecs.py:168
 msgid "Past 7 days"
-msgstr ""
+msgstr "7 ditët e shkuara"
 
-#: filterspecs.py:144
+#: filterspecs.py:171
 msgid "This month"
-msgstr ""
+msgstr "Këtë muaj"
 
-#: filterspecs.py:146
+#: filterspecs.py:173
 msgid "This year"
-msgstr ""
+msgstr "Këtë vit"
 
-#: filterspecs.py:175
+#: filterspecs.py:205
 msgid "Yes"
-msgstr ""
+msgstr "Po"
 
-#: filterspecs.py:175
+#: filterspecs.py:205
 msgid "No"
-msgstr ""
+msgstr "Jo"
 
-#: filterspecs.py:182
+#: filterspecs.py:216
 msgid "Unknown"
-msgstr ""
+msgstr "E panjohur"
 
 #: forms.py:9
 msgid ""
 "Please enter a correct username and password. Note that both fields are case-"
 "sensitive."
 msgstr ""
+"Ju lutem, jepni një emër përdoruesi dhe një fjalëkalim të saktë. Mbani "
+"parasysh që në të dyja fushat ka ndryshim mes shkronjash të mëdha dhe "
+"shkronjash të vogla."
 
 #: forms.py:18
 msgid "Please log in again, because your session has expired."
-msgstr ""
+msgstr "Ju lutem, hyni sërish, sepse sesioni juaj ka skaduar."
 
 #: forms.py:37
 #, python-format
 msgid "Your e-mail address is not your username. Try '%s' instead."
 msgstr ""
+"Adresa juaj e-mail nuk është emri juaj i përdoruesit. Provoni '%s' më mirë."
 
 #: helpers.py:19
 msgid "Action:"
-msgstr ""
+msgstr "Veprim:"
 
 #: models.py:19
 msgid "action time"
-msgstr ""
+msgstr "kohë veprimi"
 
 #: models.py:22
 msgid "object id"
-msgstr ""
+msgstr "id objekti"
 
 #: models.py:23
 msgid "object repr"
@@ -108,173 +115,176 @@ msgstr ""
 
 #: models.py:24
 msgid "action flag"
-msgstr ""
+msgstr "shenjë veprimi"
 
 #: models.py:25
 msgid "change message"
-msgstr ""
+msgstr "mesazh ndryshimi"
 
 #: models.py:28
 msgid "log entry"
-msgstr ""
+msgstr "zë regjistrimi"
 
 #: models.py:29
 msgid "log entries"
-msgstr ""
+msgstr "zëra regjistrimi"
 
 #: options.py:148 options.py:163
 msgid "None"
-msgstr ""
+msgstr "Asnjë"
 
-#: options.py:620
+#: options.py:628
 #, python-format
 msgid "Changed %s."
-msgstr ""
+msgstr "Ndryshoi %s."
 
-#: options.py:620 options.py:630
+#: options.py:628 options.py:638
 msgid "and"
-msgstr ""
+msgstr " dhe "
 
-#: options.py:625
+#: options.py:633
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
-msgstr ""
+msgstr "U shtua %(name)s \"%(object)s\"."
 
-#: options.py:629
+#: options.py:637
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr ""
+msgstr "U ndryshua %(list)s për %(name)s \"%(object)s\"."
 
-#: options.py:634
+#: options.py:642
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
-msgstr ""
+msgstr "U fshi %(name)s \"%(object)s\"."
 
-#: options.py:638
+#: options.py:646
 msgid "No fields changed."
-msgstr ""
+msgstr "Nuk u ndryshuan fusha."
 
-#: options.py:710
+#: options.py:718
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr ""
+msgstr "%(name)s \"%(obj)s\" u shtua me sukses."
 
-#: options.py:714 options.py:747
+#: options.py:722 options.py:762
 msgid "You may edit it again below."
-msgstr ""
+msgstr "Mund ta përpunoni sërish më poshtë."
 
-#: options.py:724 options.py:757
+#: options.py:732 options.py:772
 #, python-format
 msgid "You may add another %s below."
-msgstr ""
+msgstr "Mund të shtoni një tjetër %s më poshtë."
 
-#: options.py:745
+#: options.py:760
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr ""
+msgstr "%(name)s \"%(obj)s\" u ndryshua me sukses."
 
-#: options.py:753
+#: options.py:768
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr ""
+"%(name)s \"%(obj)s\" u shtua me sukses. Mund ta përpunoni sërish më poshtë."
 
-#: options.py:807 options.py:1065
+#: options.py:828 options.py:1086
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr ""
+"Duhen përzgjedhur objekte që të kryhen veprime mbi ta. Nuk u ndryshua ndonjë "
+"objekt."
 
-#: options.py:826
+#: options.py:847
 msgid "No action selected."
-msgstr ""
+msgstr "Pa përzgjedhje veprimi."
 
-#: options.py:907
+#: options.py:928
 #, python-format
 msgid "Add %s"
-msgstr ""
+msgstr "Shtoni %s"
 
-#: options.py:933 options.py:1174
+#: options.py:954 options.py:1195
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
+msgstr "Objekti %(name)s me kyç parësor %(key)r nuk ekziston."
 
-#: options.py:998
+#: options.py:1019
 #, python-format
 msgid "Change %s"
-msgstr ""
+msgstr "Ndrysho %s"
 
-#: options.py:1045
+#: options.py:1066
 msgid "Database error"
-msgstr ""
+msgstr "Gabimi baze të dhënash"
 
-#: options.py:1107
+#: options.py:1128
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(count)s %(name)s u ndryshua me sukses."
+msgstr[1] "%(count)s %(name)s u ndryshuan me sukses."
 
-#: options.py:1134
+#: options.py:1155
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(total_count)s të përzgjedhur"
+msgstr[1] "Krejt %(total_count)s të përzgjedhurat"
 
-#: options.py:1139
+#: options.py:1160
 #, python-format
 msgid "0 of %(cnt)s selected"
-msgstr ""
+msgstr "0 nga %(cnt)s të përzgjedhur"
 
-#: options.py:1190
+#: options.py:1211
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr ""
+msgstr "%(name)s \"%(obj)s\" u fshi me sukses."
 
-#: options.py:1235
+#: options.py:1256
 #, python-format
 msgid "Change history: %s"
-msgstr ""
+msgstr "Ndryshoni historikun: %s"
 
-#: sites.py:312 templates/admin/login.html:42
+#: sites.py:319 templates/admin/login.html:42
 #: templates/registration/password_reset_complete.html:14
 #: views/decorators.py:29
 msgid "Log in"
-msgstr ""
+msgstr "Hyni"
 
-#: sites.py:368
+#: sites.py:375
 msgid "Site administration"
-msgstr ""
+msgstr "Administrim site-i"
 
-#: sites.py:412
+#: sites.py:419
 #, python-format
 msgid "%s administration"
-msgstr ""
+msgstr "Administrim i %s"
 
 #: widgets.py:75
 msgid "Date:"
-msgstr ""
+msgstr "Datë:"
 
 #: widgets.py:75
 msgid "Time:"
-msgstr ""
+msgstr "Kohë:"
 
-#: widgets.py:121
+#: widgets.py:140
 msgid "Lookup"
-msgstr ""
+msgstr "Kërkim"
 
-#: widgets.py:237
+#: widgets.py:246
 msgid "Add Another"
-msgstr ""
+msgstr "Shtoni Një Tjetër"
 
 #: templates/admin/404.html:4 templates/admin/404.html.py:8
 msgid "Page not found"
-msgstr ""
+msgstr "Nuk u gjet faqe"
 
 #: templates/admin/404.html:10
 msgid "We're sorry, but the requested page could not be found."
-msgstr ""
+msgstr "Na ndjeni, por faqja e kërkuar nuk gjendet dot."
 
 #: templates/admin/500.html:4 templates/admin/app_index.html:8
 #: templates/admin/base.html:55 templates/admin/change_form.html:19
@@ -291,61 +301,63 @@ msgstr ""
 #: templates/registration/password_reset_done.html:4
 #: templates/registration/password_reset_form.html:4
 msgid "Home"
-msgstr ""
+msgstr "Hyrje"
 
 #: templates/admin/500.html:4
 msgid "Server error"
-msgstr ""
+msgstr "Gabim shërbyesi"
 
 #: templates/admin/500.html:6
 msgid "Server error (500)"
-msgstr ""
+msgstr "Gabim shërbyesi (500)"
 
 #: templates/admin/500.html:9
 msgid "Server Error <em>(500)</em>"
-msgstr ""
+msgstr "Gabim Shërbyesi <em>(500)</em>"
 
 #: templates/admin/500.html:10
 msgid ""
 "There's been an error. It's been reported to the site administrators via e-"
 "mail and should be fixed shortly. Thanks for your patience."
 msgstr ""
+"Pati një gabim. U është njoftuar përgjegjësve të site-it përmes e-mail-it "
+"dhe do të duhej të ndreqej shpejt. Faleminderit për durimin."
 
 #: templates/admin/actions.html:4
 msgid "Run the selected action"
-msgstr ""
+msgstr "Xhironi veprimin e përzgjedhur"
 
 #: templates/admin/actions.html:4
 msgid "Go"
-msgstr ""
+msgstr "Shko tek"
 
 #: templates/admin/actions.html:11
 msgid "Click here to select the objects across all pages"
-msgstr ""
+msgstr "Klikoni këtu që të përzgjidhni objektet nëpër krejt faqet"
 
 #: templates/admin/actions.html:11
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
-msgstr ""
+msgstr "Përzgjidhni krejt %(total_count)s %(module_name)s"
 
 #: templates/admin/actions.html:13
 msgid "Clear selection"
-msgstr ""
+msgstr "Pastroje përzgjedhjen"
 
 #: templates/admin/app_index.html:10 templates/admin/index.html:19
 #, python-format
 msgid "%(name)s"
-msgstr ""
+msgstr "%(name)s"
 
 #: templates/admin/base.html:28
 msgid "Welcome,"
-msgstr ""
+msgstr "Mirë se vini,"
 
 #: templates/admin/base.html:33
 #: templates/registration/password_change_done.html:4
 #: templates/registration/password_change_form.html:5
 msgid "Documentation"
-msgstr ""
+msgstr "Dokumentim"
 
 #: templates/admin/base.html:41
 #: templates/admin/auth/user/change_password.html:16
@@ -353,35 +365,35 @@ msgstr ""
 #: templates/registration/password_change_done.html:4
 #: templates/registration/password_change_form.html:5
 msgid "Change password"
-msgstr ""
+msgstr "Ndryshoni fjalëkalimin"
 
 #: templates/admin/base.html:48
 #: templates/registration/password_change_done.html:4
 #: templates/registration/password_change_form.html:5
 msgid "Log out"
-msgstr ""
+msgstr "Dilni"
 
 #: templates/admin/base_site.html:4
 msgid "Django site admin"
-msgstr ""
+msgstr "Përgjegjësi i site-it Django"
 
 #: templates/admin/base_site.html:7
 msgid "Django administration"
-msgstr ""
+msgstr "Administrim i Django-s"
 
 #: templates/admin/change_form.html:22 templates/admin/index.html:29
 msgid "Add"
-msgstr ""
+msgstr "Shtoni"
 
 #: templates/admin/change_form.html:31 templates/admin/object_history.html:10
 msgid "History"
-msgstr ""
+msgstr "Historik"
 
 #: templates/admin/change_form.html:32
 #: templates/admin/edit_inline/stacked.html:9
 #: templates/admin/edit_inline/tabular.html:28
 msgid "View on site"
-msgstr ""
+msgstr "Shiheni në site"
 
 #: templates/admin/change_form.html:43 templates/admin/change_list.html:73
 #: templates/admin/login.html:17
@@ -389,22 +401,22 @@ msgstr ""
 #: templates/registration/password_change_form.html:16
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Ju lutem, ndreqni gabimin e mëposhtëm."
+msgstr[1] "Ju lutem, ndreqini gabimet e mëposhtme."
 
 #: templates/admin/change_list.html:64
 #, python-format
 msgid "Add %(name)s"
-msgstr ""
+msgstr "Shto %(name)s"
 
 #: templates/admin/change_list.html:84
 msgid "Filter"
-msgstr ""
+msgstr "Filtër"
 
 #: templates/admin/delete_confirmation.html:10
 #: templates/admin/submit_line.html:4
 msgid "Delete"
-msgstr ""
+msgstr "Fshije"
 
 #: templates/admin/delete_confirmation.html:17
 #, python-format
@@ -413,6 +425,9 @@ msgid ""
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
+"Fshirja e %(object_name)s '%(escaped_object)s' do të shpinte në fshirjen e "
+"objekteve të lidhur me të, por llogaria juaj nuk ka leje për fshirje të "
+"objekteve të llojeve të mëposhtëm:"
 
 #: templates/admin/delete_confirmation.html:25
 #, python-format
@@ -420,6 +435,8 @@ msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
 "following protected related objects:"
 msgstr ""
+"Fshirja e %(object_name)s '%(escaped_object)s' do të kërkonte fshirjen e "
+"objekteve vijues, të mbrojtur, të lidhur me të:"
 
 #: templates/admin/delete_confirmation.html:33
 #, python-format
@@ -427,15 +444,17 @@ msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
 "All of the following related items will be deleted:"
 msgstr ""
+"Jeni i sigurt se doni të fshihet %(object_name)s \"%(escaped_object)s\"? "
+"Krejt objektet vijues të lidhur me të do të fshihen:"
 
 #: templates/admin/delete_confirmation.html:38
 #: templates/admin/delete_selected_confirmation.html:43
 msgid "Yes, I'm sure"
-msgstr ""
+msgstr "Po, jam i sigurt"
 
 #: templates/admin/delete_selected_confirmation.html:9
 msgid "Delete multiple objects"
-msgstr ""
+msgstr "Fshini disa objekte njëherësh"
 
 #: templates/admin/delete_selected_confirmation.html:16
 #, python-format
@@ -444,6 +463,9 @@ msgid ""
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
 msgstr ""
+"Fshirja e %(objects_name)s të përzgjedhur do të shpjerë në fshirjen e "
+"objekteve të lidhur me të, por llogaria juaj nuk ka leje të fshijë llojet "
+"vijuese të objekteve:"
 
 #: templates/admin/delete_selected_confirmation.html:24
 #, python-format
@@ -451,6 +473,8 @@ msgid ""
 "Deleting the selected %(objects_name)s would require deleting the following "
 "protected related objects:"
 msgstr ""
+"Fshirja e %(objects_name)s të përzgjedhur do të kërkonte fshirjen e "
+"objekteve vijues, të mbrojtur, të lidhur me të:"
 
 #: templates/admin/delete_selected_confirmation.html:32
 #, python-format
@@ -458,40 +482,42 @@ msgid ""
 "Are you sure you want to delete the selected %(objects_name)s? All of the "
 "following objects and their related items will be deleted:"
 msgstr ""
+"Jeni i sigurt se doni të fshihen e %(objects_name)s përzgjedhur? Krejt "
+"objektet vijues dhe gjëra të lidhura me ta do të fshihen:"
 
 #: templates/admin/filter.html:2
 #, python-format
 msgid " By %(filter_title)s "
-msgstr ""
+msgstr "Nga %(filter_title)s "
 
 #: templates/admin/index.html:18
 #, python-format
 msgid "Models available in the %(name)s application."
-msgstr ""
+msgstr "Modele të mundshme te zbatimi %(name)s."
 
 #: templates/admin/index.html:35
 msgid "Change"
-msgstr ""
+msgstr "Ndryshoje"
 
 #: templates/admin/index.html:45
 msgid "You don't have permission to edit anything."
-msgstr ""
+msgstr "Nuk keni leje për të përpunuar ndonjë gjë."
 
 #: templates/admin/index.html:53
 msgid "Recent Actions"
-msgstr ""
+msgstr "Veprime Së Fundi"
 
 #: templates/admin/index.html:54
 msgid "My Actions"
-msgstr ""
+msgstr "Veprimet e Mia"
 
 #: templates/admin/index.html:58
 msgid "None available"
-msgstr ""
+msgstr "Asnjë i passhëm"
 
 #: templates/admin/index.html:72
 msgid "Unknown content"
-msgstr ""
+msgstr "Lëndë e panjohur"
 
 #: templates/admin/invalid_setup.html:7
 msgid ""
@@ -499,154 +525,165 @@ msgid ""
 "database tables have been created, and make sure the database is readable by "
 "the appropriate user."
 msgstr ""
+"Ka diçka që nuk shkon me instalimin e bazës suaj të të dhënave. Sigurohuni "
+"që janë krijuar tabelat e duhura të bazës së të dhënave, dhe që baza e të "
+"dhënave është e lexueshme nga përdoruesi i duhur."
 
 #: templates/admin/login.html:33
 msgid "Username:"
-msgstr ""
+msgstr "Emër përdoruesi:"
 
 #: templates/admin/login.html:37
 msgid "Password:"
-msgstr ""
+msgstr "Fjalëkalim:"
 
 #: templates/admin/object_history.html:22
 msgid "Date/time"
-msgstr ""
+msgstr "Datë/kohë"
 
 #: templates/admin/object_history.html:23
 msgid "User"
-msgstr ""
+msgstr "Përdorues"
 
 #: templates/admin/object_history.html:24
 msgid "Action"
-msgstr ""
+msgstr "Veprim"
 
 #: templates/admin/object_history.html:38
 msgid ""
 "This object doesn't have a change history. It probably wasn't added via this "
 "admin site."
 msgstr ""
+"Ky objekt nuk ka historik ndryshimesh. Ndoshta nuk qe shtuar përmes këtij "
+"site-i administrimi."
 
 #: templates/admin/pagination.html:10
 msgid "Show all"
-msgstr ""
+msgstr "Shfaqi krejt"
 
 #: templates/admin/pagination.html:11 templates/admin/submit_line.html:3
 msgid "Save"
-msgstr ""
+msgstr "Ruaje"
 
 #: templates/admin/search_form.html:8
 msgid "Search"
-msgstr ""
+msgstr "Kërko"
 
 #: templates/admin/search_form.html:10
 #, python-format
 msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(counter)s përfundim"
+msgstr[1] "%(counter)s përfundime"
 
 #: templates/admin/search_form.html:10
 #, python-format
 msgid "%(full_result_count)s total"
-msgstr ""
+msgstr "%(full_result_count)s gjithsej"
 
 #: templates/admin/submit_line.html:5
 msgid "Save as new"
-msgstr ""
+msgstr "Ruaje si të ri"
 
 #: templates/admin/submit_line.html:6
 msgid "Save and add another"
-msgstr ""
+msgstr "Ruajeni dhe shtoni një tjetër"
 
 #: templates/admin/submit_line.html:7
 msgid "Save and continue editing"
-msgstr ""
+msgstr "Ruajeni dhe vazhdoni përpunimin"
 
 #: templates/admin/auth/user/add_form.html:6
 msgid ""
 "First, enter a username and password. Then, you'll be able to edit more user "
 "options."
 msgstr ""
+"Së pari, jepni një emër përdoruesi dhe fjalëkalim. Mandej, do të jeni në "
+"gjendje të përpunoni më tepër mundësi përdoruesi."
 
 #: templates/admin/auth/user/add_form.html:8
 msgid "Enter a username and password."
-msgstr ""
+msgstr "Jepni emër përdoruesi dhe fjalëkalim."
 
 #: templates/admin/auth/user/change_password.html:29
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr ""
+"Jepni një fjalëkalim të ri për përdoruesin <strong>%(username)s</strong>."
 
 #: templates/admin/auth/user/change_password.html:36
 msgid "Password"
-msgstr ""
+msgstr "Fjalëkalim"
 
 #: templates/admin/auth/user/change_password.html:42
 #: templates/registration/password_change_form.html:38
 msgid "Password (again)"
-msgstr ""
+msgstr "Fjalëkalim (sërish)"
 
 #: templates/admin/auth/user/change_password.html:43
 msgid "Enter the same password as above, for verification."
-msgstr ""
+msgstr "Jepni, për verifikim, të njëjtin fjalëkalim si më sipër."
 
 #: templates/admin/edit_inline/stacked.html:67
 #: templates/admin/edit_inline/tabular.html:113
 #, python-format
 msgid "Add another %(verbose_name)s"
-msgstr ""
+msgstr "Shtoni një tjetër %(verbose_name)s"
 
 #: templates/admin/edit_inline/stacked.html:70
 #: templates/admin/edit_inline/tabular.html:116
 msgid "Remove"
-msgstr ""
+msgstr "Hiqe"
 
 #: templates/admin/edit_inline/tabular.html:15
 msgid "Delete?"
-msgstr ""
+msgstr "Të fshihet?"
 
 #: templates/registration/logged_out.html:8
 msgid "Thanks for spending some quality time with the Web site today."
-msgstr ""
+msgstr "Faleminderit që shpenzoni pak kohë të çmuar me site-in Web sot."
 
 #: templates/registration/logged_out.html:10
 msgid "Log in again"
-msgstr ""
+msgstr "Hyni sërish"
 
 #: templates/registration/password_change_done.html:5
 #: templates/registration/password_change_form.html:6
 #: templates/registration/password_change_form.html:8
 #: templates/registration/password_change_form.html:20
 msgid "Password change"
-msgstr ""
+msgstr "Ndryshim fjalëkalimi"
 
 #: templates/registration/password_change_done.html:7
 #: templates/registration/password_change_done.html:11
 msgid "Password change successful"
-msgstr ""
+msgstr "Ndryshim i sukseshëm fjalëkalimi"
 
 #: templates/registration/password_change_done.html:13
 msgid "Your password was changed."
-msgstr ""
+msgstr "Fjalëkalimi juaj u ndryshua."
 
 #: templates/registration/password_change_form.html:22
 msgid ""
 "Please enter your old password, for security's sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
 msgstr ""
+"Ju lutem, jepni fjalëkalimin tuaj të vjetër, për hir të sigurisë, dhe mandej "
+"jepni dy herë fjalëkalimin tuaj të ri, që kështu të mund të verifikojmë se e "
+"shtypët saktë."
 
 #: templates/registration/password_change_form.html:28
 msgid "Old password"
-msgstr ""
+msgstr "Fjalëkalim i vjetër"
 
 #: templates/registration/password_change_form.html:33
 msgid "New password"
-msgstr ""
+msgstr "Fjalëkalim i ri"
 
 #: templates/registration/password_change_form.html:44
 #: templates/registration/password_reset_confirm.html:21
 msgid "Change my password"
-msgstr ""
+msgstr "Ndrysho fjalëkalimin tim"
 
 #: templates/registration/password_reset_complete.html:4
 #: templates/registration/password_reset_confirm.html:6
@@ -655,110 +692,117 @@ msgstr ""
 #: templates/registration/password_reset_form.html:6
 #: templates/registration/password_reset_form.html:10
 msgid "Password reset"
-msgstr ""
+msgstr "Ricaktim fjalëkalimi"
 
 #: templates/registration/password_reset_complete.html:6
 #: templates/registration/password_reset_complete.html:10
 msgid "Password reset complete"
-msgstr ""
+msgstr "Ricaktim fjalëkalimi i plotësuar"
 
 #: templates/registration/password_reset_complete.html:12
 msgid "Your password has been set.  You may go ahead and log in now."
 msgstr ""
+"Fjakalimi juaj u caktua. Mund të vazhdoni më tej dhe të bëni hyrjen tani."
 
 #: templates/registration/password_reset_confirm.html:4
 msgid "Password reset confirmation"
-msgstr ""
+msgstr "Ripohim ricaktimi fjalëkalimi"
 
 #: templates/registration/password_reset_confirm.html:12
 msgid "Enter new password"
-msgstr ""
+msgstr "Jepni fjalëkalim të ri"
 
 #: templates/registration/password_reset_confirm.html:14
 msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
 msgstr ""
+"Ju lutem, jepeni fjalëkalimin tuaj dy herë, që kështu të mund të verifikojmë "
+"që e shtypët saktë."
 
 #: templates/registration/password_reset_confirm.html:18
 msgid "New password:"
-msgstr ""
+msgstr "Fjalëkalim i ri:"
 
 #: templates/registration/password_reset_confirm.html:20
 msgid "Confirm password:"
-msgstr ""
+msgstr "Ripohoni fjalëkalimin:"
 
 #: templates/registration/password_reset_confirm.html:26
 msgid "Password reset unsuccessful"
-msgstr ""
+msgstr "Fjalëkalimi nuk u ricaktua me sukses"
 
 #: templates/registration/password_reset_confirm.html:28
 msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
 msgstr ""
+"Lidhja për ricaktimin e fjalëkalimit qe e pavlefshme, ndoshta ngaqë është "
+"përdorur tashmë një herë. Ju lutem, kërkoni një ricaktim të ri fjalëkalimi."
 
 #: templates/registration/password_reset_done.html:6
 #: templates/registration/password_reset_done.html:10
 msgid "Password reset successful"
-msgstr ""
+msgstr "Ndryshim i sukseshëm fjalëkalimi"
 
 #: templates/registration/password_reset_done.html:12
 msgid ""
 "We've e-mailed you instructions for setting your password to the e-mail "
 "address you submitted. You should be receiving it shortly."
 msgstr ""
+"Ju dërguam me e-mail udhëzimet për rregullimin e fjalëkalimit tuaj, te "
+"adresa e-mail që keni dhënë. Do të duhej t'ju vinte pas pak."
 
 #: templates/registration/password_reset_email.html:2
-msgid "You're receiving this e-mail because you requested a password reset"
-msgstr ""
+#, fuzzy, python-format
+msgid ""
+"You're receiving this e-mail because you requested a password reset for your "
+"user account at %(site_name)s."
+msgstr "Këtë e-mail po e merrni ngaqë kërkuat ricaktim fjalëkalimi"
 
-#: templates/registration/password_reset_email.html:3
-#, python-format
-msgid "for your user account at %(site_name)s"
-msgstr ""
-
-#: templates/registration/password_reset_email.html:5
+#: templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
-msgstr ""
+msgstr "Ju lutem, shkoni te faqja vijuese dhe zgjidhni një fjalëkalim të ri:"
 
-#: templates/registration/password_reset_email.html:9
+#: templates/registration/password_reset_email.html:8
 msgid "Your username, in case you've forgotten:"
-msgstr ""
+msgstr "Emri juaj i përdoruesit, në rast se e keni harruar:"
 
-#: templates/registration/password_reset_email.html:11
+#: templates/registration/password_reset_email.html:10
 msgid "Thanks for using our site!"
-msgstr ""
+msgstr "Faleminderit që përdorni site-in tonë!"
 
-#: templates/registration/password_reset_email.html:13
+#: templates/registration/password_reset_email.html:12
 #, python-format
 msgid "The %(site_name)s team"
-msgstr ""
+msgstr "Ekipi i %(site_name)s"
 
 #: templates/registration/password_reset_form.html:12
 msgid ""
 "Forgotten your password? Enter your e-mail address below, and we'll e-mail "
 "instructions for setting a new one."
 msgstr ""
+"Harruat fjalëkalimin tuaj? Jepni më poshtë adresën tuaj e-mail, dhe do t'ju "
+"dërgojmë në të udhëzimet për të caktuar një të ri."
 
 #: templates/registration/password_reset_form.html:16
 msgid "E-mail address:"
-msgstr ""
+msgstr "Adresë e-mail:"
 
 #: templates/registration/password_reset_form.html:16
 msgid "Reset my password"
-msgstr ""
+msgstr "Ricakto fjalëkalimin tim"
 
-#: templatetags/admin_list.py:273
+#: templatetags/admin_list.py:288
 msgid "All dates"
-msgstr ""
+msgstr "Krejt datat"
 
-#: views/main.py:68
+#: views/main.py:66
 #, python-format
 msgid "Select %s"
-msgstr ""
+msgstr "Përzgjidhni %s"
 
-#: views/main.py:68
+#: views/main.py:66
 #, python-format
 msgid "Select %s to change"
-msgstr ""
+msgstr "Përzgjidhni %s për ta ndryshuar"

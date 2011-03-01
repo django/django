@@ -1,32 +1,30 @@
-# Kannada translation of Django.
-# Copyright (C) 2007 Translation Team <translation@sampada.info>
 # This file is distributed under the same license as the Django package.
-# Kannada Localization Team <translation@sampada.info>, 2007.
-#
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-20 16:11+0100\n"
-"PO-Revision-Date: 2007-01-08 20:22+0530\n"
-"Last-Translator: Kannada Localization Team <translation@sampada.info>\n"
-"Language-Team: Kannada <translation@sampada.info>\n"
+"POT-Creation-Date: 2011-02-28 18:47+0100\n"
+"PO-Revision-Date: 2011-02-22 00:12+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: English <en@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: kn\n"
+"Plural-Forms: nplurals=1; plural=0\n"
 
 #: actions.py:49
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr ""
 
-#: actions.py:61 options.py:1199
+#: actions.py:61 options.py:1220
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr ""
 
-#: actions.py:63 options.py:1201
+#: actions.py:63 options.py:1222
 msgid "Are you sure?"
 msgstr "ಖಚಿತಪಡಿಸುವಿರಾ? "
 
@@ -44,39 +42,39 @@ msgstr ""
 "<h3>%s ಇಂದ :</h3>\n"
 "<ul>\n"
 
-#: filterspecs.py:91 filterspecs.py:113 filterspecs.py:175 filterspecs.py:213
+#: filterspecs.py:104 filterspecs.py:136 filterspecs.py:205 filterspecs.py:257
 msgid "All"
 msgstr "ಎಲ್ಲಾ"
 
-#: filterspecs.py:137
+#: filterspecs.py:164
 msgid "Any date"
 msgstr "ಯಾವುದೇ ದಿನಾಂಕ"
 
-#: filterspecs.py:138
+#: filterspecs.py:165
 msgid "Today"
 msgstr "ಈದಿನ"
 
-#: filterspecs.py:141
+#: filterspecs.py:168
 msgid "Past 7 days"
 msgstr "ಕಳೆದ ೭ ದಿನಗಳು"
 
-#: filterspecs.py:144
+#: filterspecs.py:171
 msgid "This month"
 msgstr "ಈ ತಿಂಗಳು"
 
-#: filterspecs.py:146
+#: filterspecs.py:173
 msgid "This year"
 msgstr "ಈ ವರ್ಷ"
 
-#: filterspecs.py:175
+#: filterspecs.py:205
 msgid "Yes"
 msgstr "ಹೌದು"
 
-#: filterspecs.py:175
+#: filterspecs.py:205
 msgid "No"
 msgstr "ಇಲ್ಲ"
 
-#: filterspecs.py:182
+#: filterspecs.py:216
 msgid "Unknown"
 msgstr "ಗೊತ್ತಿಲ್ಲ(ದ/ದ್ದು)"
 
@@ -89,11 +87,8 @@ msgstr ""
 "ದೊಡ್ಡ ಅಕ್ಷರ ಸಂವೇದಿ  ಎಂಬುದನ್ನು ಗಮನದಲ್ಲಿಡಿ"
 
 #: forms.py:18
-#, fuzzy
 msgid "Please log in again, because your session has expired."
 msgstr ""
-"ದಯವಿಟ್ಟು ಇನ್ನೊಮ್ಮೆ ಒಳಬನ್ನಿ (ಲಾಗಿನ್ ಮಾಡಿ) . ನಿಮ್ಮ ಅಧಿವೇಶನ ಕೊನೆಗೊಂಡಿದೆ. ಚಿಂತಿಸಬೇಡಿ:"
-"ನಿಮ್ಮ ಸಲ್ಲಿಕೆಯನ್ನು ಉಳಿಸಲಾಗಿದೆ."
 
 #: forms.py:37
 #, python-format
@@ -101,9 +96,8 @@ msgid "Your e-mail address is not your username. Try '%s' instead."
 msgstr "ನಿಮ್ಮ ವಿ-ಅಂಚೆ ವಿಳಾಸವು ನಿಮ್ಮ ಬಳಕೆದಾರ-ಹೆಸರಲ್ಲ; ಬದಲಾಗಿ '%s'  ಪ್ರಯತ್ನಿಸಿ."
 
 #: helpers.py:19
-#, fuzzy
 msgid "Action:"
-msgstr "ಕ್ರಮ(ಕ್ರಿಯೆ)"
+msgstr ""
 
 #: models.py:19
 msgid "action time"
@@ -134,58 +128,57 @@ msgid "log entries"
 msgstr "ಲಾಗ್ ದಾಖಲೆಗಳು"
 
 #: options.py:148 options.py:163
-#, fuzzy
 msgid "None"
-msgstr "ಇಲ್ಲ"
+msgstr ""
 
-#: options.py:620
+#: options.py:628
 #, python-format
 msgid "Changed %s."
 msgstr "%s ಬದಲಾಯಿಸಲಾಯಿತು."
 
-#: options.py:620 options.py:630
+#: options.py:628 options.py:638
 msgid "and"
 msgstr "ಮತ್ತು"
 
-#: options.py:625
-#, fuzzy, python-format
+#: options.py:633
+#, python-format
 msgid "Added %(name)s \"%(object)s\"."
-msgstr "%(name)s ಸೇರಿಸಿ"
+msgstr ""
 
-#: options.py:629
+#: options.py:637
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr ""
 
-#: options.py:634
-#, fuzzy, python-format
+#: options.py:642
+#, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
-msgstr "ಸಂಬಂಧಿಸಿದ `%s.%s` ವಸ್ತುಗಳು"
+msgstr ""
 
-#: options.py:638
+#: options.py:646
 msgid "No fields changed."
 msgstr "ಯಾವುದೇ ಅಂಶಗಳು ಬದಲಾಗಲಿಲ್ಲ."
 
-#: options.py:710
+#: options.py:718
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr " %(name)s \"%(obj)s\" ಅನ್ನು ಯಶಸ್ವಿಯಾಗಿ ಸೇರಿಸಲಾಯಿತು."
 
-#: options.py:714 options.py:747
+#: options.py:722 options.py:762
 msgid "You may edit it again below."
 msgstr "ನೀವು ಅದನ್ನು ಕೆಳಗೆ ಮತ್ತೆ ಬದಲಾಯಿಸಬಹುದು."
 
-#: options.py:724 options.py:757
+#: options.py:732 options.py:772
 #, python-format
 msgid "You may add another %s below."
 msgstr "ನೀವು ಕೆಳಗೆ ಇನ್ನೊಂದು %s ಸೇರಿಸಬಹುದು."
 
-#: options.py:745
+#: options.py:760
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" ಸಫಲವಾಗಿ ಬದಲಾಯಿಸಲಾಯಿತು."
 
-#: options.py:753
+#: options.py:768
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
@@ -193,79 +186,76 @@ msgstr ""
 "%(name)s \"%(obj)s\" ಅನ್ನು  ಯಶಸ್ವಿಯಾಗಿ ಸೇರಿಸಲಾಯಿತು. ನೀವು ಕೆಳಗೆ ಅದನ್ನು ಮತ್ತೆ "
 "ಬದಲಾಯಿಸಬಹುದು."
 
-#: options.py:807 options.py:1065
+#: options.py:828 options.py:1086
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr ""
 
-#: options.py:826
-#, fuzzy
+#: options.py:847
 msgid "No action selected."
-msgstr "ಕ್ರಮದ(ಕ್ರಿಯೆಯ) ಸಮಯ"
+msgstr ""
 
-#: options.py:907
+#: options.py:928
 #, python-format
 msgid "Add %s"
 msgstr "%s ಸೇರಿಸಿ"
 
-#: options.py:933 options.py:1174
+#: options.py:954 options.py:1195
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr ""
 
-#: options.py:998
+#: options.py:1019
 #, python-format
 msgid "Change %s"
 msgstr "%s ಅನ್ನು ಬದಲಿಸು"
 
-#: options.py:1045
+#: options.py:1066
 msgid "Database error"
 msgstr "ದತ್ತಸಂಚಯದ ದೋಷ"
 
-#: options.py:1107
-#, fuzzy, python-format
+#: options.py:1128
+#, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
-msgstr[0] "%(name)s \"%(obj)s\" ಸಫಲವಾಗಿ ಬದಲಾಯಿಸಲಾಯಿತು."
-msgstr[1] "%(name)s \"%(obj)s\" ಸಫಲವಾಗಿ ಬದಲಾಯಿಸಲಾಯಿತು."
+msgstr[0] ""
 
-#: options.py:1134
+#: options.py:1155
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] ""
-msgstr[1] ""
 
-#: options.py:1139
+#: options.py:1160
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr ""
 
-#: options.py:1190
+#: options.py:1211
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" ಯಶಸ್ವಿಯಾಗಿ ಅಳಿಸಲಾಯಿತು."
 
-#: options.py:1235
+#: options.py:1256
 #, python-format
 msgid "Change history: %s"
 msgstr "ಬದಲಾವಣೆಗಳ ಇತಿಹಾಸ: %s"
 
-#: sites.py:312 templates/admin/login.html:42
+#: sites.py:319 templates/admin/login.html:42
 #: templates/registration/password_reset_complete.html:14
 #: views/decorators.py:29
 msgid "Log in"
 msgstr "ಒಳಗೆ ಬನ್ನಿ"
 
-#: sites.py:368
+#: sites.py:375
 msgid "Site administration"
 msgstr "ತಾಣ ನಿರ್ವಹಣೆ"
 
-#: sites.py:412
-#, fuzzy, python-format
+#: sites.py:419
+#, python-format
 msgid "%s administration"
-msgstr "ತಾಣ ನಿರ್ವಹಣೆ"
+msgstr ""
 
 #: widgets.py:75
 msgid "Date:"
@@ -275,15 +265,13 @@ msgstr "ದಿನಾಂಕ:"
 msgid "Time:"
 msgstr "ಸಮಯ:"
 
-#: widgets.py:121
-#, fuzzy
+#: widgets.py:140
 msgid "Lookup"
-msgstr "ಹೊರಕ್ಕೆ ಹೋಗಿ"
+msgstr ""
 
-#: widgets.py:237
-#, fuzzy
+#: widgets.py:246
 msgid "Add Another"
-msgstr "ಬಳಕೆದಾರನನ್ನು ಸೇರಿಸಿ"
+msgstr ""
 
 #: templates/admin/404.html:4 templates/admin/404.html.py:8
 msgid "Page not found"
@@ -348,9 +336,8 @@ msgid "Select all %(total_count)s %(module_name)s"
 msgstr ""
 
 #: templates/admin/actions.html:13
-#, fuzzy
 msgid "Clear selection"
-msgstr "ನಿಯಂತ್ರಕರು ಅಳಿಸಿದ್ದು"
+msgstr ""
 
 #: templates/admin/app_index.html:10 templates/admin/index.html:19
 #, python-format
@@ -407,11 +394,9 @@ msgstr "ತಾಣದಲ್ಲಿ ನೋಡಿ"
 #: templates/admin/login.html:17
 #: templates/admin/auth/user/change_password.html:25
 #: templates/registration/password_change_form.html:16
-#, fuzzy
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
-msgstr[0] "ದಯಮಾಡಿ ಕೆಳಗಿನ ತಪ್ಪನ್ನು ಸರಿಪಡಿಸಿ ದಯಮಾಡಿ ಕೆಳಗಿನ ತಪ್ಪುಗಳನ್ನು ಸರಿಪಡಿಸಿ. "
-msgstr[1] "ದಯಮಾಡಿ ಕೆಳಗಿನ ತಪ್ಪನ್ನು ಸರಿಪಡಿಸಿ ದಯಮಾಡಿ ಕೆಳಗಿನ ತಪ್ಪುಗಳನ್ನು ಸರಿಪಡಿಸಿ. "
+msgstr[0] ""
 
 #: templates/admin/change_list.html:64
 #, python-format
@@ -439,23 +424,18 @@ msgstr ""
 "ಅನುಮತಿಯಿಲ್ಲ."
 
 #: templates/admin/delete_confirmation.html:25
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
 "following protected related objects:"
 msgstr ""
-"'%(escaped_object)s'  %(object_name)s ಅನ್ನು ತೆಗೆದುಹಾಕುವುದರಿಂದ ಸಂಬಂಧಿತ ವಸ್ತುಗಳೂ "
-"ಕಳೆದುಹೋಗುತ್ತವೆ. ಆದರೆ ನಿಮ್ಮ ಖಾತೆಗೆ ಕೆಳಕಂಡ ಬಗೆಗಳ ವಸ್ತುಗಳನ್ನು ತೆಗೆದುಹಾಕಲು "
-"ಅನುಮತಿಯಿಲ್ಲ."
 
 #: templates/admin/delete_confirmation.html:33
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
 "All of the following related items will be deleted:"
 msgstr ""
-"ದಿಟವಾಗಿಯೂ, ನೀವು %(object_name)s  \"%(escaped_object)ಗಳನ್ನು\"? "
-"ತೆಗೆದುಹಾಕಬಯಸಿದ್ದೀರಾ? ಸಂಬಂಧಪಟ್ಟ ಕೆಳಕಂಡ ಎಲ್ಲವನ್ನೂ ತೆಗೆದುಹಾಕಲಾಗುತ್ತದೆ:"
 
 #: templates/admin/delete_confirmation.html:38
 #: templates/admin/delete_selected_confirmation.html:43
@@ -467,34 +447,26 @@ msgid "Delete multiple objects"
 msgstr ""
 
 #: templates/admin/delete_selected_confirmation.html:16
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would result in deleting related "
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
 msgstr ""
-"'%(escaped_object)s'  %(object_name)s ಅನ್ನು ತೆಗೆದುಹಾಕುವುದರಿಂದ ಸಂಬಂಧಿತ ವಸ್ತುಗಳೂ "
-"ಕಳೆದುಹೋಗುತ್ತವೆ. ಆದರೆ ನಿಮ್ಮ ಖಾತೆಗೆ ಕೆಳಕಂಡ ಬಗೆಗಳ ವಸ್ತುಗಳನ್ನು ತೆಗೆದುಹಾಕಲು "
-"ಅನುಮತಿಯಿಲ್ಲ."
 
 #: templates/admin/delete_selected_confirmation.html:24
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would require deleting the following "
 "protected related objects:"
 msgstr ""
-"'%(escaped_object)s'  %(object_name)s ಅನ್ನು ತೆಗೆದುಹಾಕುವುದರಿಂದ ಸಂಬಂಧಿತ ವಸ್ತುಗಳೂ "
-"ಕಳೆದುಹೋಗುತ್ತವೆ. ಆದರೆ ನಿಮ್ಮ ಖಾತೆಗೆ ಕೆಳಕಂಡ ಬಗೆಗಳ ವಸ್ತುಗಳನ್ನು ತೆಗೆದುಹಾಕಲು "
-"ಅನುಮತಿಯಿಲ್ಲ."
 
 #: templates/admin/delete_selected_confirmation.html:32
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Are you sure you want to delete the selected %(objects_name)s? All of the "
 "following objects and their related items will be deleted:"
 msgstr ""
-"ದಿಟವಾಗಿಯೂ, ನೀವು %(object_name)s  \"%(escaped_object)ಗಳನ್ನು\"? "
-"ತೆಗೆದುಹಾಕಬಯಸಿದ್ದೀರಾ? ಸಂಬಂಧಪಟ್ಟ ಕೆಳಕಂಡ ಎಲ್ಲವನ್ನೂ ತೆಗೆದುಹಾಕಲಾಗುತ್ತದೆ:"
 
 #: templates/admin/filter.html:2
 #, python-format
@@ -527,9 +499,8 @@ msgid "None available"
 msgstr "ಯಾವುದೂ ಲಭ್ಯವಿಲ್ಲ"
 
 #: templates/admin/index.html:72
-#, fuzzy
 msgid "Unknown content"
-msgstr "ಗೊತ್ತಿಲ್ಲ(ದ/ದ್ದು)"
+msgstr ""
 
 #: templates/admin/invalid_setup.html:7
 msgid ""
@@ -576,16 +547,14 @@ msgid "Save"
 msgstr "ಉಳಿಸಿ"
 
 #: templates/admin/search_form.html:8
-#, fuzzy
 msgid "Search"
-msgstr "ಮಾರ್ಚ್"
+msgstr ""
 
 #: templates/admin/search_form.html:10
 #, python-format
 msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
 msgstr[0] ""
-msgstr[1] ""
 
 #: templates/admin/search_form.html:10
 #, python-format
@@ -636,20 +605,18 @@ msgstr "ಖಚಿತಗೊಳಿಸಲು ಮೇಲಿನ ಪ್ರವೇಶಪ�
 
 #: templates/admin/edit_inline/stacked.html:67
 #: templates/admin/edit_inline/tabular.html:113
-#, fuzzy, python-format
+#, python-format
 msgid "Add another %(verbose_name)s"
-msgstr " %(verbose_name)s ಅನ್ನು ತೆಗೆದುಹಾಕಲಾಯಿತು"
+msgstr ""
 
 #: templates/admin/edit_inline/stacked.html:70
 #: templates/admin/edit_inline/tabular.html:116
-#, fuzzy
 msgid "Remove"
-msgstr "ತೆಗೆದು ಹಾಕಲಾಗಿದೆ"
+msgstr ""
 
 #: templates/admin/edit_inline/tabular.html:15
-#, fuzzy
 msgid "Delete?"
-msgstr "ಅಳಿಸಿಹಾಕಿ"
+msgstr ""
 
 #: templates/registration/logged_out.html:8
 msgid "Thanks for spending some quality time with the Web site today."
@@ -684,14 +651,12 @@ msgstr ""
 "ಬರೆದಿದ್ದೀರೆಂದು ನಾವು ಖಚಿತಪಡಿಸಿಕೊಳ್ಳಲು   ಹೊಸ ಪ್ರವೇಶಪದವನ್ನು ಎರಡು ಬಾರಿ ಬರೆಯಿರಿ."
 
 #: templates/registration/password_change_form.html:28
-#, fuzzy
 msgid "Old password"
-msgstr "ಹಳೆಯ ಪ್ರವೇಶಪದ:"
+msgstr ""
 
 #: templates/registration/password_change_form.html:33
-#, fuzzy
 msgid "New password"
-msgstr "ಹೊಸ ಪ್ರವೇಶಪದ:"
+msgstr ""
 
 #: templates/registration/password_change_form.html:44
 #: templates/registration/password_reset_confirm.html:21
@@ -709,32 +674,26 @@ msgstr "ಪ್ರವೇಶಪದವನ್ನು ಬದಲಿಸುವಿಕೆ"
 
 #: templates/registration/password_reset_complete.html:6
 #: templates/registration/password_reset_complete.html:10
-#, fuzzy
 msgid "Password reset complete"
-msgstr "ಪ್ರವೇಶಪದವನ್ನು ಬದಲಿಸುವಿಕೆ"
+msgstr ""
 
 #: templates/registration/password_reset_complete.html:12
 msgid "Your password has been set.  You may go ahead and log in now."
 msgstr ""
 
 #: templates/registration/password_reset_confirm.html:4
-#, fuzzy
 msgid "Password reset confirmation"
-msgstr "ಪ್ರವೇಶಪದವನ್ನು ಬದಲಿಸುವಿಕೆ"
+msgstr ""
 
 #: templates/registration/password_reset_confirm.html:12
-#, fuzzy
 msgid "Enter new password"
-msgstr "ಹೊಸ ಪ್ರವೇಶಪದ:"
+msgstr ""
 
 #: templates/registration/password_reset_confirm.html:14
-#, fuzzy
 msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
 msgstr ""
-"ಭದ್ರತೆಯ ದೃಷ್ಟಿಯಿಂದ ದಯವಿಟ್ಟು ನಿಮ್ಮ ಹಳೆಯ ಪ್ರವೇಶಪದವನ್ನು ಸೂಚಿಸಿರಿ. ಆನಂತರ ನೀವು ಸರಿಯಾಗಿ "
-"ಬರೆದಿದ್ದೀರೆಂದು ನಾವು ಖಚಿತಪಡಿಸಿಕೊಳ್ಳಲು   ಹೊಸ ಪ್ರವೇಶಪದವನ್ನು ಎರಡು ಬಾರಿ ಬರೆಯಿರಿ."
 
 #: templates/registration/password_reset_confirm.html:18
 msgid "New password:"
@@ -745,9 +704,8 @@ msgid "Confirm password:"
 msgstr "ಪ್ರವೇಶಪದವನ್ನು ಖಚಿತಪಡಿಸಿ:"
 
 #: templates/registration/password_reset_confirm.html:26
-#, fuzzy
 msgid "Password reset unsuccessful"
-msgstr "ಪ್ರವೇಶಪದದ ಮರುನಿರ್ಧಾರ ಸಾಧ್ಯವಾಗಿದೆ"
+msgstr ""
 
 #: templates/registration/password_reset_confirm.html:28
 msgid ""
@@ -761,48 +719,40 @@ msgid "Password reset successful"
 msgstr "ಪ್ರವೇಶಪದದ ಮರುನಿರ್ಧಾರ ಸಾಧ್ಯವಾಗಿದೆ"
 
 #: templates/registration/password_reset_done.html:12
-#, fuzzy
 msgid ""
 "We've e-mailed you instructions for setting your password to the e-mail "
 "address you submitted. You should be receiving it shortly."
 msgstr ""
-"ನಾವು ಹೊಸ ಪ್ರವೇಶಪದವನ್ನು ನಿಮ್ಮ ವಿ-ಅಂಚೆಗೆ ಕಳಿಸಿದ್ದೇವೆ. ಕೆಲವೇ ಕ್ಷಣಗಳಲ್ಲಿ ನೀವದನ್ನು "
-"ಪಡೆಯಲಿದ್ದೀರಿ."
 
 #: templates/registration/password_reset_email.html:2
-msgid "You're receiving this e-mail because you requested a password reset"
+#, fuzzy, python-format
+msgid ""
+"You're receiving this e-mail because you requested a password reset for your "
+"user account at %(site_name)s."
 msgstr "ಪ್ರವೇಶಪದದ ಮರುನಿರ್ಧಾರವನ್ನು ನೀವು ಕೇಳಿದುದರಿಂದ ಈ ವಿ-ಅಂಚೆಯನ್ನು ಪಡೆಯುತ್ತಿದ್ದೀರಿ."
 
-#: templates/registration/password_reset_email.html:3
-#, python-format
-msgid "for your user account at %(site_name)s"
-msgstr "%(site_name)s ತಾಣದಲ್ಲಿ ನಿಮ್ಮ ಬಳಕೆದಾರ-ಖಾತೆಗಾಗಿ"
-
-#: templates/registration/password_reset_email.html:5
+#: templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
 msgstr ""
 
-#: templates/registration/password_reset_email.html:9
+#: templates/registration/password_reset_email.html:8
 msgid "Your username, in case you've forgotten:"
 msgstr "ನೀವು ಮರೆತಿದ್ದಲ್ಲಿ , ನಿಮ್ಮ ಬಳಕೆದಾರ-ಹೆಸರು"
 
-#: templates/registration/password_reset_email.html:11
+#: templates/registration/password_reset_email.html:10
 msgid "Thanks for using our site!"
 msgstr "ನಮ್ಮ ತಾಣವನ್ನು ಬಳಸಿದ್ದಕ್ದಾಗಿ ಧನ್ಯವಾದಗಳು!"
 
-#: templates/registration/password_reset_email.html:13
+#: templates/registration/password_reset_email.html:12
 #, python-format
 msgid "The %(site_name)s team"
 msgstr "%(site_name)s ತಂಡ"
 
 #: templates/registration/password_reset_form.html:12
-#, fuzzy
 msgid ""
 "Forgotten your password? Enter your e-mail address below, and we'll e-mail "
 "instructions for setting a new one."
 msgstr ""
-"ಪ್ರವೇಶಪದವನ್ನು ಮರೆತಿದ್ದೀರಾ? ನಿಮ್ಮ ವಿ-ಅಂಚೆಯ ವಿಳಾಸವನ್ನು ಕೆಳಗೆ ಸೂಚಿಸಿರಿ, ನಾವು ನಿಮ್ಮ "
-"ಪ್ರವೇಶಪದವನ್ನು ಬದಲಾಯಿಸಿ ಅದನ್ನು ರವಾನಿಸುತ್ತೇವೆ."
 
 #: templates/registration/password_reset_form.html:16
 msgid "E-mail address:"
@@ -812,16 +762,16 @@ msgstr "ವಿ-ಅಂಚೆ ವಿಳಾಸ:"
 msgid "Reset my password"
 msgstr "ನನ್ನ ಪ್ರವೇಶಪದವನ್ನು ಮತ್ತೆ ನಿರ್ಧರಿಸಿ "
 
-#: templatetags/admin_list.py:273
+#: templatetags/admin_list.py:288
 msgid "All dates"
 msgstr "ಎಲ್ಲಾ ದಿನಾಂಕಗಳು"
 
-#: views/main.py:68
+#: views/main.py:66
 #, python-format
 msgid "Select %s"
 msgstr "%s ಆಯ್ದುಕೊಳ್ಳಿ"
 
-#: views/main.py:68
+#: views/main.py:66
 #, python-format
 msgid "Select %s to change"
 msgstr "ಬದಲಾಯಿಸಲು %s ಆಯ್ದುಕೊಳ್ಳಿ"

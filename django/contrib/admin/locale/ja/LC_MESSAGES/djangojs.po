@@ -1,44 +1,50 @@
-# Japanese translation for js.
+# This file is distributed under the same license as the Django package.
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 20:56+0100\n"
-"PO-Revision-Date: 2010-05-09 12:50+0900\n"
-"Last-Translator: Takashi Matsuo <matsuo.takashi@gmail.com>\n"
-"Language-Team: Japanese <django-ja@googlegroups.com>\n"
+"POT-Creation-Date: 2011-02-28 23:20+0100\n"
+"PO-Revision-Date: 2011-02-22 00:01+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: Japanese <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: ja\n"
 "Plural-Forms: nplurals=1; plural=0\n"
 
-#: media/js/SelectFilter2.js:37
+#: media/js/SelectFilter2.js:45
 #, perl-format
 msgid "Available %s"
 msgstr "利用可能 %s"
 
-#: media/js/SelectFilter2.js:45
+#: media/js/SelectFilter2.js:52
+msgid "Filter"
+msgstr ""
+
+#: media/js/SelectFilter2.js:59
 msgid "Choose all"
 msgstr "全て選択"
 
-#: media/js/SelectFilter2.js:50
+#: media/js/SelectFilter2.js:64
 msgid "Add"
 msgstr "追加"
 
-#: media/js/SelectFilter2.js:52
+#: media/js/SelectFilter2.js:66
 msgid "Remove"
 msgstr "削除"
 
-#: media/js/SelectFilter2.js:57
+#: media/js/SelectFilter2.js:71
 #, perl-format
 msgid "Chosen %s"
 msgstr "選択された %s"
 
-#: media/js/SelectFilter2.js:58
+#: media/js/SelectFilter2.js:72
 msgid "Select your choice(s) and click "
 msgstr "選択してクリック"
 
-#: media/js/SelectFilter2.js:63
+#: media/js/SelectFilter2.js:77
 msgid "Clear all"
 msgstr "全てクリア"
 

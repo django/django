@@ -1,62 +1,66 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 20:56+0100\n"
-"PO-Revision-Date: 2010-01-27 22:39-0800\n"
-"Last-Translator: Besnik Bleta <besnik@programeshqip.org>\n"
-"Language-Team: Albanian <sq@li.org>\n"
+"POT-Creation-Date: 2011-02-28 23:20+0100\n"
+"PO-Revision-Date: 2011-02-22 00:01+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: Albanian <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
-
-#: media/js/SelectFilter2.js:37
-#, perl-format
-msgid "Available %s"
-msgstr ""
+"Language: sq\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: media/js/SelectFilter2.js:45
-msgid "Choose all"
-msgstr ""
-
-#: media/js/SelectFilter2.js:50
-msgid "Add"
-msgstr ""
+#, perl-format
+msgid "Available %s"
+msgstr "I mundshëm %s"
 
 #: media/js/SelectFilter2.js:52
-msgid "Remove"
+msgid "Filter"
 msgstr ""
 
-#: media/js/SelectFilter2.js:57
+#: media/js/SelectFilter2.js:59
+msgid "Choose all"
+msgstr "Zgjidheni krejt"
+
+#: media/js/SelectFilter2.js:64
+msgid "Add"
+msgstr "Shtoni"
+
+#: media/js/SelectFilter2.js:66
+msgid "Remove"
+msgstr "Hiq"
+
+#: media/js/SelectFilter2.js:71
 #, perl-format
 msgid "Chosen %s"
-msgstr ""
+msgstr "U zgjodh %s"
 
-#: media/js/SelectFilter2.js:58
+#: media/js/SelectFilter2.js:72
 msgid "Select your choice(s) and click "
-msgstr ""
+msgstr "Përzgjidhni zgjedhjen(t) tuaj(a) dhe klikoni"
 
-#: media/js/SelectFilter2.js:63
+#: media/js/SelectFilter2.js:77
 msgid "Clear all"
-msgstr ""
+msgstr "Pastroje krejt"
 
 #: media/js/actions.js:18 media/js/actions.min.js:1
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "U përzgjodh %(sel)s nga %(cnt)s"
+msgstr[1] "U përzgjodhën %(sel)s nga %(cnt)s"
 
 #: media/js/actions.js:109 media/js/actions.min.js:5
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
 "action, your unsaved changes will be lost."
 msgstr ""
+"Keni ndryshime të paruajtura te fusha individuale të ndryshueshme. Nëse "
+"kryeni një veprim, ndryshimet e paruajtura do të humbin."
 
 #: media/js/actions.js:121 media/js/actions.min.js:6
 msgid ""
@@ -64,6 +68,9 @@ msgid ""
 "individual fields yet. Please click OK to save. You'll need to re-run the "
 "action."
 msgstr ""
+"Keni përzgjedhur një veprim, por nuk keni ruajtur ende ndryshimet që bëtë te "
+"fusha individuale. Ju lutem, klikoni OK që të bëhet ruajtja. Do t'ju duhet "
+"ta ribëni veprimin."
 
 #: media/js/actions.js:123 media/js/actions.min.js:6
 msgid ""
@@ -71,73 +78,79 @@ msgid ""
 "fields. You're probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
+"You have selected an action, and you haven't made any changes on individual "
+"fields. You're probably looking for the Go button rather than the Save "
+"button.Keni përzgjedhur një veprim, dhe nuk keni bërë ndonjë ndryshim te "
+"fusha individuale. Ndoshta po kërkonit për butonin Shko, në vend se të "
+"butonit Ruaje."
 
 #: media/js/calendar.js:24 media/js/dateparse.js:32
 msgid ""
 "January February March April May June July August September October November "
 "December"
 msgstr ""
+"Janar Shkurt Mars Prill Maj Qershor Korrik Gusht Shtator Tetor Nëntor Dhjetor"
 
 #: media/js/calendar.js:25
 msgid "S M T W T F S"
-msgstr ""
+msgstr "D H M M E P S"
 
 #: media/js/collapse.js:9 media/js/collapse.js.py:21
 #: media/js/collapse.min.js:1
 msgid "Show"
-msgstr ""
+msgstr "Shfaqe"
 
 #: media/js/collapse.js:16 media/js/collapse.min.js:1
 msgid "Hide"
-msgstr ""
+msgstr "Fshihe"
 
 #: media/js/dateparse.js:33
 msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
-msgstr ""
+msgstr "E dielë E hënë E martë E mërkurë E enjte E premte E shtunë"
 
 #: media/js/admin/DateTimeShortcuts.js:49
 #: media/js/admin/DateTimeShortcuts.js:84
 msgid "Now"
-msgstr ""
+msgstr "Tani"
 
 #: media/js/admin/DateTimeShortcuts.js:53
 msgid "Clock"
-msgstr ""
+msgstr "Orë"
 
 #: media/js/admin/DateTimeShortcuts.js:80
 msgid "Choose a time"
-msgstr ""
+msgstr "Zgjidhni një kohë"
 
 #: media/js/admin/DateTimeShortcuts.js:85
 msgid "Midnight"
-msgstr ""
+msgstr "Mesnatë"
 
 #: media/js/admin/DateTimeShortcuts.js:86
 msgid "6 a.m."
-msgstr ""
+msgstr "6 a.m."
 
 #: media/js/admin/DateTimeShortcuts.js:87
 msgid "Noon"
-msgstr ""
+msgstr "Mesditë"
 
 #: media/js/admin/DateTimeShortcuts.js:91
 #: media/js/admin/DateTimeShortcuts.js:188
 msgid "Cancel"
-msgstr ""
+msgstr "Anuloje"
 
 #: media/js/admin/DateTimeShortcuts.js:133
 #: media/js/admin/DateTimeShortcuts.js:182
 msgid "Today"
-msgstr ""
+msgstr "Sot"
 
 #: media/js/admin/DateTimeShortcuts.js:137
 msgid "Calendar"
-msgstr ""
+msgstr "Kalendar"
 
 #: media/js/admin/DateTimeShortcuts.js:180
 msgid "Yesterday"
-msgstr ""
+msgstr "Dje"
 
 #: media/js/admin/DateTimeShortcuts.js:184
 msgid "Tomorrow"
-msgstr ""
+msgstr "Nesër"

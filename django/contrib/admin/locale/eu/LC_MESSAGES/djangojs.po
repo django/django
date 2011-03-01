@@ -1,61 +1,66 @@
-# Spanish translation for the django-admin JS files.
-# Copyright (C)
-# This file is distributed under the same license as the PACKAGE package.
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 20:56+0100\n"
-"PO-Revision-Date: 2007-07-14 13:41-0500\n"
-"Last-Translator: Jorge Gajon <gajon@gajon.org>\n"
-"Language-Team: Django-i18n <django-i18n@googlegroups.com>\n"
+"POT-Creation-Date: 2011-02-28 23:20+0100\n"
+"PO-Revision-Date: 2011-02-22 00:01+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: Basque <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: eu\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
-#: media/js/SelectFilter2.js:37
+#: media/js/SelectFilter2.js:45
 #, perl-format
 msgid "Available %s"
 msgstr "%s Erabilgarri"
 
-#: media/js/SelectFilter2.js:45
+#: media/js/SelectFilter2.js:52
+msgid "Filter"
+msgstr ""
+
+#: media/js/SelectFilter2.js:59
 msgid "Choose all"
 msgstr "Denak aukeratu"
 
-#: media/js/SelectFilter2.js:50
+#: media/js/SelectFilter2.js:64
 msgid "Add"
 msgstr "Gehitu"
 
-#: media/js/SelectFilter2.js:52
+#: media/js/SelectFilter2.js:66
 msgid "Remove"
 msgstr "Ezabatu"
 
-#: media/js/SelectFilter2.js:57
+#: media/js/SelectFilter2.js:71
 #, perl-format
 msgid "Chosen %s"
 msgstr "%s Aukeratuak"
 
-#: media/js/SelectFilter2.js:58
+#: media/js/SelectFilter2.js:72
 msgid "Select your choice(s) and click "
 msgstr "Egin zure aukerak eta click egin "
 
-#: media/js/SelectFilter2.js:63
+#: media/js/SelectFilter2.js:77
 msgid "Clear all"
 msgstr "Denak garbitu"
 
 #: media/js/actions.js:18 media/js/actions.min.js:1
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(cnt)s-etik %(sel)s aukeratuta"
+msgstr[1] "%(cnt)s-etik %(sel)s aukeratuta"
 
 #: media/js/actions.js:109 media/js/actions.min.js:5
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
 "action, your unsaved changes will be lost."
 msgstr ""
+"Gorde gabeko aldaketak dauzkazu eremuetan. Ekintza bat exekutatzen baduzu, "
+"gorde gabeko aldaketak galduko dira."
 
 #: media/js/actions.js:121 media/js/actions.min.js:6
 msgid ""
@@ -63,6 +68,8 @@ msgid ""
 "individual fields yet. Please click OK to save. You'll need to re-run the "
 "action."
 msgstr ""
+"Ekintza bat aukeratu duzu, baina oraindik ez duzu eremuetako aldaketak "
+"gorde. Mesedez, sakatu OK gordetzeko. Ekintza berriro exekutatu beharko duzu."
 
 #: media/js/actions.js:123 media/js/actions.min.js:6
 msgid ""
@@ -70,6 +77,8 @@ msgid ""
 "fields. You're probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
+"Ekintza bat aukeratu duzu, baina ez duzu inongo aldaketarik egin eremuetan. "
+"Litekeena da, Gorde botoia beharrean Aurrera botoiaren bila aritzea."
 
 #: media/js/calendar.js:24 media/js/dateparse.js:32
 msgid ""

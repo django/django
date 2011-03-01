@@ -1,12 +1,12 @@
 # This file is distributed under the same license as the Django package.
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 20:56+0100\n"
-"PO-Revision-Date: 2011-02-06 05:55+0000\n"
-"Last-Translator: AbeEstrada <abraham.estrada@gmail.com>\n"
+"POT-Creation-Date: 2011-02-28 23:20+0100\n"
+"PO-Revision-Date: 2011-02-22 00:01+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
 "Language-Team: Spanish (Mexican) <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -14,33 +14,37 @@ msgstr ""
 "Language: es_MX\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
-#: media/js/SelectFilter2.js:37
+#: media/js/SelectFilter2.js:45
 #, perl-format
 msgid "Available %s"
 msgstr "Disponible %s"
 
-#: media/js/SelectFilter2.js:45
+#: media/js/SelectFilter2.js:52
+msgid "Filter"
+msgstr ""
+
+#: media/js/SelectFilter2.js:59
 msgid "Choose all"
 msgstr "Seleccionar todo"
 
-#: media/js/SelectFilter2.js:50
+#: media/js/SelectFilter2.js:64
 msgid "Add"
 msgstr "Agregar"
 
-#: media/js/SelectFilter2.js:52
+#: media/js/SelectFilter2.js:66
 msgid "Remove"
 msgstr "Quitar"
 
-#: media/js/SelectFilter2.js:57
+#: media/js/SelectFilter2.js:71
 #, perl-format
 msgid "Chosen %s"
 msgstr "Seleccionados %s"
 
-#: media/js/SelectFilter2.js:58
+#: media/js/SelectFilter2.js:72
 msgid "Select your choice(s) and click "
 msgstr "Seleccione sus opcion(es) y de click"
 
-#: media/js/SelectFilter2.js:63
+#: media/js/SelectFilter2.js:77
 msgid "Clear all"
 msgstr "Eliminar todos"
 
@@ -51,20 +55,40 @@ msgstr[0] "%(sel)s de %(cnt)s seleccionado/a"
 msgstr[1] "%(sel)s de %(cnt)s seleccionados/as"
 
 #: media/js/actions.js:109 media/js/actions.min.js:5
-msgid "You have unsaved changes on individual editable fields. If you run an action, your unsaved changes will be lost."
-msgstr "Tiene modificaciones sin guardar en campos modificables individuales. Si ejecuta una acción las mismas se perderán."
+msgid ""
+"You have unsaved changes on individual editable fields. If you run an "
+"action, your unsaved changes will be lost."
+msgstr ""
+"Tiene modificaciones sin guardar en campos modificables individuales. Si "
+"ejecuta una acción las mismas se perderán."
 
 #: media/js/actions.js:121 media/js/actions.min.js:6
-msgid "You have selected an action, but you haven't saved your changes to individual fields yet. Please click OK to save. You'll need to re-run the action."
-msgstr "Ha seleccionado una acción, pero todavía no ha grabado las modificaciones que ha realizado en campos individuales. Por favor haga click en Aceptar para grabarlas. Necesitará ejecutar la acción nuevamente."
+msgid ""
+"You have selected an action, but you haven't saved your changes to "
+"individual fields yet. Please click OK to save. You'll need to re-run the "
+"action."
+msgstr ""
+"Ha seleccionado una acción, pero todavía no ha grabado las modificaciones "
+"que ha realizado en campos individuales. Por favor haga click en Aceptar "
+"para grabarlas. Necesitará ejecutar la acción nuevamente."
 
 #: media/js/actions.js:123 media/js/actions.min.js:6
-msgid "You have selected an action, and you haven't made any changes on individual fields. You're probably looking for the Go button rather than the Save button."
-msgstr "Ha seleccionado una acción pero no ha realizado ninguna modificación en campos individuales. Es probable que lo que necesite usar en realidad sea el botón Ejecutar y no el botón Guardar."
+msgid ""
+"You have selected an action, and you haven't made any changes on individual "
+"fields. You're probably looking for the Go button rather than the Save "
+"button."
+msgstr ""
+"Ha seleccionado una acción pero no ha realizado ninguna modificación en "
+"campos individuales. Es probable que lo que necesite usar en realidad sea el "
+"botón Ejecutar y no el botón Guardar."
 
 #: media/js/calendar.js:24 media/js/dateparse.js:32
-msgid "January February March April May June July August September October November December"
-msgstr "Enero Febrero Marzo Abril Mayo Junio Julio Agosto Setiembre Octubre Noviembre Diciembre"
+msgid ""
+"January February March April May June July August September October November "
+"December"
+msgstr ""
+"Enero Febrero Marzo Abril Mayo Junio Julio Agosto Setiembre Octubre "
+"Noviembre Diciembre"
 
 #: media/js/calendar.js:25
 msgid "S M T W T F S"

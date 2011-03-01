@@ -1,33 +1,30 @@
-# Translation of django.po to Czech
-# This file is distributed under the same license as the DJANGO package.
-# Radek Svarz <translate@svarz.cz>, 2005,
-# Tomáš Ehrlich <tomas.ehrlich@gmail.com>, 2009,
-# Vlada Macek <macek@sandbox.cz>, 2010.
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-20 16:11+0100\n"
-"PO-Revision-Date: 2010-08-06 18:33+0100\n"
-"Last-Translator: Vlada Macek <macek@sandbox.cz>\n"
-"Language-Team: Czech\n"
+"POT-Creation-Date: 2011-02-28 18:47+0100\n"
+"PO-Revision-Date: 2011-02-22 00:12+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: Czech <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=n==1 ? 0 : n>1 && n<5 ? 1 : 2;\n"
+"Language: cs\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2\n"
 
 #: actions.py:49
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "Úspěšně odstraněno: %(count)d %(items)s."
 
-#: actions.py:61 options.py:1199
+#: actions.py:61 options.py:1220
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr ""
 
-#: actions.py:63 options.py:1201
+#: actions.py:63 options.py:1222
 msgid "Are you sure?"
 msgstr "Jste si jisti?"
 
@@ -45,39 +42,39 @@ msgstr ""
 "<h3>%s:</h3>\n"
 "<ul>\n"
 
-#: filterspecs.py:91 filterspecs.py:113 filterspecs.py:175 filterspecs.py:213
+#: filterspecs.py:104 filterspecs.py:136 filterspecs.py:205 filterspecs.py:257
 msgid "All"
 msgstr "Vše"
 
-#: filterspecs.py:137
+#: filterspecs.py:164
 msgid "Any date"
 msgstr "Libovolné datum"
 
-#: filterspecs.py:138
+#: filterspecs.py:165
 msgid "Today"
 msgstr "Dnes"
 
-#: filterspecs.py:141
+#: filterspecs.py:168
 msgid "Past 7 days"
 msgstr "Posledních 7 dní"
 
-#: filterspecs.py:144
+#: filterspecs.py:171
 msgid "This month"
 msgstr "Tento měsíc"
 
-#: filterspecs.py:146
+#: filterspecs.py:173
 msgid "This year"
 msgstr "Tento rok"
 
-#: filterspecs.py:175
+#: filterspecs.py:205
 msgid "Yes"
 msgstr "Ano"
 
-#: filterspecs.py:175
+#: filterspecs.py:205
 msgid "No"
 msgstr "Ne"
 
-#: filterspecs.py:182
+#: filterspecs.py:216
 msgid "Unknown"
 msgstr "Neznámé"
 
@@ -135,55 +132,55 @@ msgstr "položky protokolu"
 msgid "None"
 msgstr "Žádný"
 
-#: options.py:620
+#: options.py:628
 #, python-format
 msgid "Changed %s."
 msgstr "Změněno: %s"
 
-#: options.py:620 options.py:630
+#: options.py:628 options.py:638
 msgid "and"
 msgstr "a"
 
-#: options.py:625
+#: options.py:633
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "Položka \"%(object)s\" typu %(name)s byla přidána."
 
-#: options.py:629
+#: options.py:637
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr ""
 "Pole \"%(list)s\" pro položku \"%(object)s\" typu %(name)s změněno/změněna."
 
-#: options.py:634
+#: options.py:642
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "Položka \"%(object)s\" typu %(name)s byla odstraněna."
 
-#: options.py:638
+#: options.py:646
 msgid "No fields changed."
 msgstr "Nebyla změněna žádná pole."
 
-#: options.py:710
+#: options.py:718
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "Položka \"%(obj)s\" typu %(name)s byla úspěšně přidána."
 
-#: options.py:714 options.py:747
+#: options.py:722 options.py:762
 msgid "You may edit it again below."
 msgstr "V úpravách můžete pokračovat níže."
 
-#: options.py:724 options.py:757
+#: options.py:732 options.py:772
 #, python-format
 msgid "You may add another %s below."
 msgstr "Níže můžete přidat další položku typu %s."
 
-#: options.py:745
+#: options.py:760
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "Položka \"%(obj)s\" typu %(name)s byla úspěšně změněna."
 
-#: options.py:753
+#: options.py:768
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
@@ -191,7 +188,7 @@ msgstr ""
 "Položka \"%(obj)s\" typu %(name)s byla úspěšně přidána. Níže můžete v "
 "úpravách pokračovat."
 
-#: options.py:807 options.py:1065
+#: options.py:828 options.py:1086
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
@@ -199,30 +196,30 @@ msgstr ""
 "K provedení hromadných operací je třeba vybrat nějaké položky. Nedošlo k "
 "žádným změnám."
 
-#: options.py:826
+#: options.py:847
 msgid "No action selected."
 msgstr "Nebyla vybrána žádná operace."
 
-#: options.py:907
+#: options.py:928
 #, python-format
 msgid "Add %s"
 msgstr "%s: přidat"
 
-#: options.py:933 options.py:1174
+#: options.py:954 options.py:1195
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "Položka \"%(name)s\" s primárním klíčem \"%(key)r\" neexistuje."
 
-#: options.py:998
+#: options.py:1019
 #, python-format
 msgid "Change %s"
 msgstr "%s: změnit"
 
-#: options.py:1045
+#: options.py:1066
 msgid "Database error"
 msgstr "Chyba databáze"
 
-#: options.py:1107
+#: options.py:1128
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
@@ -230,7 +227,7 @@ msgstr[0] "Položka %(name)s byla úspěšně změněna."
 msgstr[1] "%(count)s položky %(name)s byly úspěšně změněny."
 msgstr[2] "%(count)s položek %(name)s bylo úspěšně změněno."
 
-#: options.py:1134
+#: options.py:1155
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
@@ -238,32 +235,32 @@ msgstr[0] "%(total_count)s položka vybrána."
 msgstr[1] "Všechny %(total_count)s položky vybrány."
 msgstr[2] "Vybráno všech %(total_count)s položek."
 
-#: options.py:1139
+#: options.py:1160
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "Vybraných je 0 položek z celkem %(cnt)s."
 
-#: options.py:1190
+#: options.py:1211
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "Položka \"%(obj)s\" typu %(name)s byla úspěšně odstraněna."
 
-#: options.py:1235
+#: options.py:1256
 #, python-format
 msgid "Change history: %s"
 msgstr "Historie změn: %s"
 
-#: sites.py:312 templates/admin/login.html:42
+#: sites.py:319 templates/admin/login.html:42
 #: templates/registration/password_reset_complete.html:14
 #: views/decorators.py:29
 msgid "Log in"
 msgstr "Přihlášení"
 
-#: sites.py:368
+#: sites.py:375
 msgid "Site administration"
 msgstr "Správa webu"
 
-#: sites.py:412
+#: sites.py:419
 #, python-format
 msgid "%s administration"
 msgstr "Správa aplikace %s"
@@ -276,11 +273,11 @@ msgstr "Datum:"
 msgid "Time:"
 msgstr "Čas:"
 
-#: widgets.py:121
+#: widgets.py:140
 msgid "Lookup"
 msgstr "Hledat"
 
-#: widgets.py:237
+#: widgets.py:246
 msgid "Add Another"
 msgstr "Přidat další"
 
@@ -437,14 +434,11 @@ msgstr ""
 "následujících typů:"
 
 #: templates/admin/delete_confirmation.html:25
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
 "following protected related objects:"
 msgstr ""
-"Odstranění položky \"%(escaped_object)s\" typu %(object_name)s by vyústilo v "
-"odstranění souvisejících položek. Nemáte však oprávnění k odstranění položek "
-"následujících typů:"
 
 #: templates/admin/delete_confirmation.html:33
 #, python-format
@@ -465,34 +459,26 @@ msgid "Delete multiple objects"
 msgstr "Odstranit vybrané položky"
 
 #: templates/admin/delete_selected_confirmation.html:16
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would result in deleting related "
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
 msgstr ""
-"Odstranění položky \"%(object_name)s\" by vyústilo v odstranění "
-"souvisejících položek. Nemáte však oprávnění k odstranění položek "
-"následujících typů:"
 
 #: templates/admin/delete_selected_confirmation.html:24
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would require deleting the following "
 "protected related objects:"
 msgstr ""
-"Odstranění položky \"%(object_name)s\" by vyústilo v odstranění "
-"souvisejících položek. Nemáte však oprávnění k odstranění položek "
-"následujících typů:"
 
 #: templates/admin/delete_selected_confirmation.html:32
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Are you sure you want to delete the selected %(objects_name)s? All of the "
 "following objects and their related items will be deleted:"
 msgstr ""
-"Opravdu mají být odstraněny vybrané položky typu %(object_name)s? "
-"Následující položky a položky s nimi související budou všechny odstraněny:"
 
 #: templates/admin/filter.html:2
 #, python-format
@@ -579,12 +565,12 @@ msgid "Search"
 msgstr "Hledat"
 
 #: templates/admin/search_form.html:10
-#, fuzzy, python-format
+#, python-format
 msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
-msgstr[0] "%(total_count)s položka vybrána."
-msgstr[1] "Všechny %(total_count)s položky vybrány."
-msgstr[2] "Vybráno všech %(total_count)s položek."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: templates/admin/search_form.html:10
 #, python-format
@@ -759,27 +745,25 @@ msgstr ""
 "mailovou adresu. Za chvíli by měly dorazit do vaší schránky."
 
 #: templates/registration/password_reset_email.html:2
-msgid "You're receiving this e-mail because you requested a password reset"
+#, fuzzy, python-format
+msgid ""
+"You're receiving this e-mail because you requested a password reset for your "
+"user account at %(site_name)s."
 msgstr "Tento e-mail vám byl doručen, protože jste požádal(a) o obnovení hesla"
 
-#: templates/registration/password_reset_email.html:3
-#, python-format
-msgid "for your user account at %(site_name)s"
-msgstr "k vašemu uživatelskému účtu v systému %(site_name)s"
-
-#: templates/registration/password_reset_email.html:5
+#: templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
 msgstr "Přejděte na následující stránku a zadejte nové heslo:"
 
-#: templates/registration/password_reset_email.html:9
+#: templates/registration/password_reset_email.html:8
 msgid "Your username, in case you've forgotten:"
 msgstr "Pro jistotu vaše uživatelské jméno:"
 
-#: templates/registration/password_reset_email.html:11
+#: templates/registration/password_reset_email.html:10
 msgid "Thanks for using our site!"
 msgstr "Děkujeme za používání našeho webu!"
 
-#: templates/registration/password_reset_email.html:13
+#: templates/registration/password_reset_email.html:12
 #, python-format
 msgid "The %(site_name)s team"
 msgstr "Tým aplikace %(site_name)s"
@@ -800,16 +784,16 @@ msgstr "E-mailová adresa:"
 msgid "Reset my password"
 msgstr "Obnovit heslo"
 
-#: templatetags/admin_list.py:273
+#: templatetags/admin_list.py:288
 msgid "All dates"
 msgstr "Všechna data"
 
-#: views/main.py:68
+#: views/main.py:66
 #, python-format
 msgid "Select %s"
 msgstr "%s: vybrat"
 
-#: views/main.py:68
+#: views/main.py:66
 #, python-format
 msgid "Select %s to change"
 msgstr "Vyberte položku %s ke změně"

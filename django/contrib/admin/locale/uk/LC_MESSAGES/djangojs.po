@@ -1,63 +1,69 @@
-# Django, ukrainian translation.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 20:56+0100\n"
-"PO-Revision-Date: 2008-11-16 04:00+0200\n"
-"Last-Translator: Mykola Zamkovoy <nickzam@gmail.com>\n"
-"Language-Team: UK <uk@li.org>\n"
+"POT-Creation-Date: 2011-02-28 23:20+0100\n"
+"PO-Revision-Date: 2011-02-22 00:01+0000\n"
+"Last-Translator: sergikoff <sergikoff88@gmail.com>\n"
+"Language-Team: Ukrainian <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
-"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"Language: uk\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
+"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
 
-#: media/js/SelectFilter2.js:37
+#: media/js/SelectFilter2.js:45
 #, perl-format
 msgid "Available %s"
 msgstr "В наявності %s"
 
-#: media/js/SelectFilter2.js:45
+#: media/js/SelectFilter2.js:52
+msgid "Filter"
+msgstr ""
+
+#: media/js/SelectFilter2.js:59
 msgid "Choose all"
 msgstr "Обрати всі"
 
-#: media/js/SelectFilter2.js:50
+#: media/js/SelectFilter2.js:64
 msgid "Add"
 msgstr "Додати"
 
-#: media/js/SelectFilter2.js:52
+#: media/js/SelectFilter2.js:66
 msgid "Remove"
 msgstr "Видалити"
 
-#: media/js/SelectFilter2.js:57
+#: media/js/SelectFilter2.js:71
 #, perl-format
 msgid "Chosen %s"
 msgstr "Обрано %s"
 
-#: media/js/SelectFilter2.js:58
+#: media/js/SelectFilter2.js:72
 msgid "Select your choice(s) and click "
 msgstr "Зробіть ваш вибір та клікніть "
 
-#: media/js/SelectFilter2.js:63
+#: media/js/SelectFilter2.js:77
 msgid "Clear all"
 msgstr "Очистити все"
 
 #: media/js/actions.js:18 media/js/actions.min.js:1
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Обрано %(sel)s з %(cnt)s"
+msgstr[1] "Обрано %(sel)s з %(cnt)s"
+msgstr[2] "Обрано %(sel)s з %(cnt)s"
+msgstr[3] "Обрано %(sel)s з %(cnt)s"
 
 #: media/js/actions.js:109 media/js/actions.min.js:5
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
 "action, your unsaved changes will be lost."
 msgstr ""
+"Ви зробили якісь зміни у деяких полях. Якщо Ви виконаєте цю дію, всі "
+"незбережені зміни буде втрачено."
 
 #: media/js/actions.js:121 media/js/actions.min.js:6
 msgid ""
@@ -65,6 +71,8 @@ msgid ""
 "individual fields yet. Please click OK to save. You'll need to re-run the "
 "action."
 msgstr ""
+"Ви обрали дію, але не зберегли зміни в окремих полях. Будь ласка, натисніть "
+"ОК, щоб зберегти. Вам доведеться повторно запустити дію."
 
 #: media/js/actions.js:123 media/js/actions.min.js:6
 msgid ""
@@ -72,6 +80,8 @@ msgid ""
 "fields. You're probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
+"Ви обрали дію і не зробили жодних змін у полях. Ви, напевно, шукаєте кнопку "
+"\"Виконати\", а не \"Зберегти\"."
 
 #: media/js/calendar.js:24 media/js/dateparse.js:32
 msgid ""

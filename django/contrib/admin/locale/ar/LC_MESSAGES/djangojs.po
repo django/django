@@ -1,64 +1,71 @@
-# translation of djangojs.po to Arabic
-# This file is distributed under the same license as the django package.
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: djangojs\n"
+"Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 20:56+0100\n"
-"PO-Revision-Date: 2008-09-02 00:53+0300\n"
-"Last-Translator: Ossama M. Khayat <okhayat@yahoo.com>\n"
-"Language-Team: Arabic <support@arabeyes.org>\n"
+"POT-Creation-Date: 2011-02-28 23:20+0100\n"
+"PO-Revision-Date: 2011-02-25 10:31+0000\n"
+"Last-Translator: okhayat <okhayat@gmail.com>\n"
+"Language-Team: Arabic <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.11.4\n"
-"Plural-Forms: nplurals=4; plural=(n == 1? 0 : (n == 2? 1 : (n <= 10? 2 : "
-"3)))\n"
+"Language: ar\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
+"&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5\n"
 
-#: media/js/SelectFilter2.js:37
+#: media/js/SelectFilter2.js:45
 #, perl-format
 msgid "Available %s"
 msgstr "%s المتوفرة"
 
-#: media/js/SelectFilter2.js:45
+#: media/js/SelectFilter2.js:52
+msgid "Filter"
+msgstr ""
+
+#: media/js/SelectFilter2.js:59
 msgid "Choose all"
 msgstr "اختر الكل"
 
-#: media/js/SelectFilter2.js:50
+#: media/js/SelectFilter2.js:64
 msgid "Add"
 msgstr "أضف"
 
-#: media/js/SelectFilter2.js:52
+#: media/js/SelectFilter2.js:66
 msgid "Remove"
 msgstr "احذف"
 
-#: media/js/SelectFilter2.js:57
+#: media/js/SelectFilter2.js:71
 #, perl-format
 msgid "Chosen %s"
 msgstr "%s المُختارة"
 
-#: media/js/SelectFilter2.js:58
+#: media/js/SelectFilter2.js:72
 msgid "Select your choice(s) and click "
 msgstr "حدد خياراتك واضغط"
 
-#: media/js/SelectFilter2.js:63
+#: media/js/SelectFilter2.js:77
 msgid "Clear all"
 msgstr "امسح الكل"
 
 #: media/js/actions.js:18 media/js/actions.min.js:1
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "لا شي محدد"
+msgstr[1] "%(sel)s من %(cnt)s محدد"
+msgstr[2] "%(sel)s من %(cnt)s محدد"
+msgstr[3] "%(sel)s من %(cnt)s محددة"
+msgstr[4] "%(sel)s من %(cnt)s محدد"
+msgstr[5] "%(sel)s من %(cnt)s محدد"
 
 #: media/js/actions.js:109 media/js/actions.min.js:5
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
 "action, your unsaved changes will be lost."
 msgstr ""
+"لديك تعديلات غير محفوظة على بعض الحقول القابلة للتعديل. إن نفذت أي إجراء "
+"فسوف تخسر تعديلاتك."
 
 #: media/js/actions.js:121 media/js/actions.min.js:6
 msgid ""
@@ -66,13 +73,15 @@ msgid ""
 "individual fields yet. Please click OK to save. You'll need to re-run the "
 "action."
 msgstr ""
+"اخترت إجراءً لكن دون أن تحفظ تغييرات التي قمت بها. رجاء اضغط زر الموافقة "
+"لتحفظ تعديلاتك. ستحتاج إلى إعادة تنفيذ الإجراء."
 
 #: media/js/actions.js:123 media/js/actions.min.js:6
 msgid ""
 "You have selected an action, and you haven't made any changes on individual "
 "fields. You're probably looking for the Go button rather than the Save "
 "button."
-msgstr ""
+msgstr "اخترت إجراءً دون تغيير أي حقل. لعلك تريد زر التنفيذ بدلاً من زر الحفظ."
 
 #: media/js/calendar.js:24 media/js/dateparse.js:32
 msgid ""

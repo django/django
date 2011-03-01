@@ -1,33 +1,30 @@
-# translation of django-new.po to tamil
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# PONNUSAMY.A <ponnusamy.simpleman@gmail.com>, 2007.
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-20 16:12+0100\n"
-"PO-Revision-Date: 2007-03-15 16:48+0530\n"
-"Last-Translator: PONNUSAMY <ponnusamy.simpleman@gmail.com>\n"
-"Language-Team: tamil <tamilinix@yahoogroups.com>\n"
+"POT-Creation-Date: 2011-02-28 18:48+0100\n"
+"PO-Revision-Date: 2011-02-22 00:12+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: English <en@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.11.4\n"
-"Plural-Forms: nplurals=2; plural=n>1;\n"
+"Language: ta\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: actions.py:49
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr ""
 
-#: actions.py:61 options.py:1199
+#: actions.py:61 options.py:1220
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr ""
 
-#: actions.py:63 options.py:1201
+#: actions.py:63 options.py:1222
 msgid "Are you sure?"
 msgstr "உறுதியாக சொல்கிறீர்களா?"
 
@@ -45,39 +42,39 @@ msgstr ""
 "<h3> %s ஆல்:</h3>\n"
 "<ul>\n"
 
-#: filterspecs.py:91 filterspecs.py:113 filterspecs.py:175 filterspecs.py:213
+#: filterspecs.py:104 filterspecs.py:136 filterspecs.py:205 filterspecs.py:257
 msgid "All"
 msgstr "அனைத்தும்"
 
-#: filterspecs.py:137
+#: filterspecs.py:164
 msgid "Any date"
 msgstr "எந்த தேதியும்"
 
-#: filterspecs.py:138
+#: filterspecs.py:165
 msgid "Today"
 msgstr "இன்று"
 
-#: filterspecs.py:141
+#: filterspecs.py:168
 msgid "Past 7 days"
 msgstr "கடந்த 7 நாட்களில்"
 
-#: filterspecs.py:144
+#: filterspecs.py:171
 msgid "This month"
 msgstr "இந்த மாதம்"
 
-#: filterspecs.py:146
+#: filterspecs.py:173
 msgid "This year"
 msgstr "இந்த வருடம்"
 
-#: filterspecs.py:175
+#: filterspecs.py:205
 msgid "Yes"
 msgstr "ஆம்"
 
-#: filterspecs.py:175
+#: filterspecs.py:205
 msgid "No"
 msgstr "இல்லை"
 
-#: filterspecs.py:182
+#: filterspecs.py:216
 msgid "Unknown"
 msgstr "தெரியாத"
 
@@ -90,11 +87,8 @@ msgstr ""
 "சார்ந்தது."
 
 #: forms.py:18
-#, fuzzy
 msgid "Please log in again, because your session has expired."
 msgstr ""
-"தயவுசெய்து மறுபடியும் புகுபதிவு செய்க. ஏனென்றால் காலம் முடிவடைந்தது. கவலை படவேண்டாம்: "
-"உங்களுடைய அனுப்புதல் சேமிக்கப்பட்டுள்ளது."
 
 #: forms.py:37
 #, python-format
@@ -102,9 +96,8 @@ msgid "Your e-mail address is not your username. Try '%s' instead."
 msgstr "உங்கள் மின் அஞ்சல் முகவரி உங்கள் பயனர் பெயராக இல்லை. '%s'யை முயற்சி செய்யவும்."
 
 #: helpers.py:19
-#, fuzzy
 msgid "Action:"
-msgstr "செயல்"
+msgstr ""
 
 #: models.py:19
 msgid "action time"
@@ -135,137 +128,135 @@ msgid "log entries"
 msgstr "புகுபதிவு உள்ளீடுகள்"
 
 #: options.py:148 options.py:163
-#, fuzzy
 msgid "None"
-msgstr "இல்லை"
+msgstr ""
 
-#: options.py:620
+#: options.py:628
 #, python-format
 msgid "Changed %s."
 msgstr "%s மாற்றபட்டுள்ளது."
 
-#: options.py:620 options.py:630
+#: options.py:628 options.py:638
 msgid "and"
 msgstr "மற்றும்"
 
-#: options.py:625
-#, fuzzy, python-format
+#: options.py:633
+#, python-format
 msgid "Added %(name)s \"%(object)s\"."
-msgstr "%(name)s சேர்க்க"
+msgstr ""
 
-#: options.py:629
+#: options.py:637
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr ""
 
-#: options.py:634
-#, fuzzy, python-format
+#: options.py:642
+#, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
-msgstr "மாதரி %s பக்கம் %s ல் இல்லை"
+msgstr ""
 
-#: options.py:638
+#: options.py:646
 msgid "No fields changed."
 msgstr "எந்த புலமும் மாறவில்லை."
 
-#: options.py:710
+#: options.py:718
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" வெற்றிகரமாகச் சேர்க்கப்பட்டது."
 
-#: options.py:714 options.py:747
+#: options.py:722 options.py:762
 msgid "You may edit it again below."
 msgstr "நீங்கள் மறுபடியும் தொகுக்க முடியும். "
 
-#: options.py:724 options.py:757
+#: options.py:732 options.py:772
 #, python-format
 msgid "You may add another %s below."
 msgstr "நீங்கள் மற்ற %s யை கீழே சேர்க்க முடியும்."
 
-#: options.py:745
+#: options.py:760
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" வெற்றிகரமாக மாற்றப்பட்டது."
 
-#: options.py:753
+#: options.py:768
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr ""
 "%(name)s \"%(obj)s\" வெற்றிகரமாக சேர்க்கப்பட்டுள்ளது. நீங்கள் கீழே தொகுக்க முடியும்."
 
-#: options.py:807 options.py:1065
+#: options.py:828 options.py:1086
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr ""
 
-#: options.py:826
-#, fuzzy
+#: options.py:847
 msgid "No action selected."
-msgstr "செயல் நேரம்"
+msgstr ""
 
-#: options.py:907
+#: options.py:928
 #, python-format
 msgid "Add %s"
 msgstr "%s யை சேர்க்க"
 
-#: options.py:933 options.py:1174
+#: options.py:954 options.py:1195
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr ""
 
-#: options.py:998
+#: options.py:1019
 #, python-format
 msgid "Change %s"
 msgstr "%s யை மாற்று"
 
-#: options.py:1045
+#: options.py:1066
 msgid "Database error"
 msgstr "தகவல்சேமிப்பு  பிழை"
 
-#: options.py:1107
-#, fuzzy, python-format
+#: options.py:1128
+#, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
-msgstr[0] "%(name)s \"%(obj)s\" வெற்றிகரமாக மாற்றப்பட்டது."
-msgstr[1] "%(name)s \"%(obj)s\" வெற்றிகரமாக மாற்றப்பட்டது."
+msgstr[0] ""
+msgstr[1] ""
 
-#: options.py:1134
+#: options.py:1155
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] ""
 msgstr[1] ""
 
-#: options.py:1139
+#: options.py:1160
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr ""
 
-#: options.py:1190
+#: options.py:1211
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" வெற்றிகரமாக அழிக்கப்பட்டுள்ளது."
 
-#: options.py:1235
+#: options.py:1256
 #, python-format
 msgid "Change history: %s"
 msgstr "வரலாற்றை மாற்று: %s"
 
-#: sites.py:312 templates/admin/login.html:42
+#: sites.py:319 templates/admin/login.html:42
 #: templates/registration/password_reset_complete.html:14
 #: views/decorators.py:29
 msgid "Log in"
 msgstr "உள்ளே போ"
 
-#: sites.py:368
+#: sites.py:375
 msgid "Site administration"
 msgstr "இணைய மேலான்மை"
 
-#: sites.py:412
-#, fuzzy, python-format
+#: sites.py:419
+#, python-format
 msgid "%s administration"
-msgstr "இணைய மேலான்மை"
+msgstr ""
 
 #: widgets.py:75
 msgid "Date:"
@@ -275,15 +266,13 @@ msgstr "தேதி:"
 msgid "Time:"
 msgstr "நேரம்:"
 
-#: widgets.py:121
-#, fuzzy
+#: widgets.py:140
 msgid "Lookup"
-msgstr "வெளியேறு"
+msgstr ""
 
-#: widgets.py:237
-#, fuzzy
+#: widgets.py:246
 msgid "Add Another"
-msgstr "புதிய பயனர்"
+msgstr ""
 
 #: templates/admin/404.html:4 templates/admin/404.html.py:8
 msgid "Page not found"
@@ -348,9 +337,8 @@ msgid "Select all %(total_count)s %(module_name)s"
 msgstr ""
 
 #: templates/admin/actions.html:13
-#, fuzzy
 msgid "Clear selection"
-msgstr "மட்டொறுத்தால் நீக்கப்பட்டது"
+msgstr ""
 
 #: templates/admin/app_index.html:10 templates/admin/index.html:19
 #, python-format
@@ -437,13 +425,11 @@ msgstr ""
 "ஆனால்  அதை நீக்குவதற்குரிய  உரிமை  உங்களுக்கு  இல்லை"
 
 #: templates/admin/delete_confirmation.html:25
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
 "following protected related objects:"
 msgstr ""
-"நீக்கும் '%(escaped_object)s' ஆனது %(object_name)s தொடர்புடைய மற்றவற்றையும் நீக்கும். "
-"ஆனால்  அதை நீக்குவதற்குரிய  உரிமை  உங்களுக்கு  இல்லை"
 
 #: templates/admin/delete_confirmation.html:33
 #, python-format
@@ -464,32 +450,26 @@ msgid "Delete multiple objects"
 msgstr ""
 
 #: templates/admin/delete_selected_confirmation.html:16
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would result in deleting related "
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
 msgstr ""
-"நீக்கும் '%(escaped_object)s' ஆனது %(object_name)s தொடர்புடைய மற்றவற்றையும் நீக்கும். "
-"ஆனால்  அதை நீக்குவதற்குரிய  உரிமை  உங்களுக்கு  இல்லை"
 
 #: templates/admin/delete_selected_confirmation.html:24
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would require deleting the following "
 "protected related objects:"
 msgstr ""
-"நீக்கும் '%(escaped_object)s' ஆனது %(object_name)s தொடர்புடைய மற்றவற்றையும் நீக்கும். "
-"ஆனால்  அதை நீக்குவதற்குரிய  உரிமை  உங்களுக்கு  இல்லை"
 
 #: templates/admin/delete_selected_confirmation.html:32
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Are you sure you want to delete the selected %(objects_name)s? All of the "
 "following objects and their related items will be deleted:"
 msgstr ""
-"நீங்கள் இந்த \"%(escaped_object)s\" %(object_name)s நீக்குவதில் நிச்சயமா?தொடர்புடைய "
-"மற்றவையும் நீக்கப்படும். "
 
 #: templates/admin/filter.html:2
 #, python-format
@@ -522,9 +502,8 @@ msgid "None available"
 msgstr "எதுவும் கிடைக்கவில்லை"
 
 #: templates/admin/index.html:72
-#, fuzzy
 msgid "Unknown content"
-msgstr "தெரியாத"
+msgstr ""
 
 #: templates/admin/invalid_setup.html:7
 msgid ""
@@ -572,9 +551,8 @@ msgid "Save"
 msgstr "சேமிக்க"
 
 #: templates/admin/search_form.html:8
-#, fuzzy
 msgid "Search"
-msgstr "மார்ச்"
+msgstr ""
 
 #: templates/admin/search_form.html:10
 #, python-format
@@ -632,20 +610,18 @@ msgstr "மேலே அதே கடவுச்சொல்லை உள்ள
 
 #: templates/admin/edit_inline/stacked.html:67
 #: templates/admin/edit_inline/tabular.html:113
-#, fuzzy, python-format
+#, python-format
 msgid "Add another %(verbose_name)s"
-msgstr "%(verbose_name)s நீக்கப்பட்டுள்ளது"
+msgstr ""
 
 #: templates/admin/edit_inline/stacked.html:70
 #: templates/admin/edit_inline/tabular.html:116
-#, fuzzy
 msgid "Remove"
-msgstr "நீக்கபட்டது"
+msgstr ""
 
 #: templates/admin/edit_inline/tabular.html:15
-#, fuzzy
 msgid "Delete?"
-msgstr "நீக்குக"
+msgstr ""
 
 #: templates/registration/logged_out.html:8
 msgid "Thanks for spending some quality time with the Web site today."
@@ -680,14 +656,12 @@ msgstr ""
 "புதிய கடவுச்சொல்லை இரு முறை உள்ளிடுக.  இது உங்களது உள்ளிடுதலை சரிபார்க்க உதவும். "
 
 #: templates/registration/password_change_form.html:28
-#, fuzzy
 msgid "Old password"
-msgstr "பழைய கடவுச்சொல் :"
+msgstr ""
 
 #: templates/registration/password_change_form.html:33
-#, fuzzy
 msgid "New password"
-msgstr "புதிய கடவுச்சொல்:"
+msgstr ""
 
 #: templates/registration/password_change_form.html:44
 #: templates/registration/password_reset_confirm.html:21
@@ -705,32 +679,26 @@ msgstr "கடவுச்சொல்லை மாற்றியமை"
 
 #: templates/registration/password_reset_complete.html:6
 #: templates/registration/password_reset_complete.html:10
-#, fuzzy
 msgid "Password reset complete"
-msgstr "கடவுச்சொல்லை மாற்றியமை"
+msgstr ""
 
 #: templates/registration/password_reset_complete.html:12
 msgid "Your password has been set.  You may go ahead and log in now."
 msgstr ""
 
 #: templates/registration/password_reset_confirm.html:4
-#, fuzzy
 msgid "Password reset confirmation"
-msgstr "கடவுச்சொல்லை மாற்றியமை"
+msgstr ""
 
 #: templates/registration/password_reset_confirm.html:12
-#, fuzzy
 msgid "Enter new password"
-msgstr "புதிய கடவுச்சொல்:"
+msgstr ""
 
 #: templates/registration/password_reset_confirm.html:14
-#, fuzzy
 msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
 msgstr ""
-"பாதுகாப்பு காரணங்களுக்காக , முதலில் உங்களது பழைய கடவுச்சொல்லை உள்ளிடுக. அதன் பிறகு "
-"புதிய கடவுச்சொல்லை இரு முறை உள்ளிடுக.  இது உங்களது உள்ளிடுதலை சரிபார்க்க உதவும். "
 
 #: templates/registration/password_reset_confirm.html:18
 msgid "New password:"
@@ -741,9 +709,8 @@ msgid "Confirm password:"
 msgstr "கடவுச்சொலின் மாற்றத்தை உறுதிப்படுத்து:"
 
 #: templates/registration/password_reset_confirm.html:26
-#, fuzzy
 msgid "Password reset unsuccessful"
-msgstr "கடவுச்சொல் மாற்றியமைத்தல் வெற்றி"
+msgstr ""
 
 #: templates/registration/password_reset_confirm.html:28
 msgid ""
@@ -757,49 +724,41 @@ msgid "Password reset successful"
 msgstr "கடவுச்சொல் மாற்றியமைத்தல் வெற்றி"
 
 #: templates/registration/password_reset_done.html:12
-#, fuzzy
 msgid ""
 "We've e-mailed you instructions for setting your password to the e-mail "
 "address you submitted. You should be receiving it shortly."
 msgstr ""
-"கடவுச்சொல்லை  மறந்து விட்டால் உங்களது மின்னஞ்சல்  முகவரியை உள்ளிடுக புதிய கடவுச்சொல்  "
-"உங்களது மின்னஞ்சல்  முகவரிக்கு அனுப்பப்பட்டுள்ளது. விரைவில் அது உங்களுக்கு கிடைக்கும்"
 
 #: templates/registration/password_reset_email.html:2
-msgid "You're receiving this e-mail because you requested a password reset"
+#, fuzzy, python-format
+msgid ""
+"You're receiving this e-mail because you requested a password reset for your "
+"user account at %(site_name)s."
 msgstr ""
 "கடவுச்சொல்லை மாற்றியமைக்க நீங்கள் கேட்டதனால் உங்களுக்கு இந்த மின்னஞ்சல் அனுப்பப்பட்டுள்ளது"
 
-#: templates/registration/password_reset_email.html:3
-#, python-format
-msgid "for your user account at %(site_name)s"
-msgstr "%(site_name)s -இல் உள்ள உங்களது பயனாளர் கணக்கு"
-
-#: templates/registration/password_reset_email.html:5
+#: templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
 msgstr ""
 
-#: templates/registration/password_reset_email.html:9
+#: templates/registration/password_reset_email.html:8
 msgid "Your username, in case you've forgotten:"
 msgstr "உங்களது பயனாளர் பெயர், நீங்கள் மறந்திருந்தால்:"
 
-#: templates/registration/password_reset_email.html:11
+#: templates/registration/password_reset_email.html:10
 msgid "Thanks for using our site!"
 msgstr "எங்களது வலைத்தளத்தை பயன் படுத்தியதற்கு மிகுந்த நன்றி"
 
-#: templates/registration/password_reset_email.html:13
+#: templates/registration/password_reset_email.html:12
 #, python-format
 msgid "The %(site_name)s team"
 msgstr "இந்த %(site_name)s -இன்  குழு"
 
 #: templates/registration/password_reset_form.html:12
-#, fuzzy
 msgid ""
 "Forgotten your password? Enter your e-mail address below, and we'll e-mail "
 "instructions for setting a new one."
 msgstr ""
-"கடவுச்சொல்லை மறந்துவிட்டீரா? உங்களது மின்னஞ்சல்  முகவரியை உள்ளிடுக,அதன் பிறகு உங்கள் "
-"கடவுச்சொல் மாற்றியமைக்கப்பட்டு உங்களது மின்னஞ்சல்  முகவரிக்கு அனுப்பப்படும்"
 
 #: templates/registration/password_reset_form.html:16
 msgid "E-mail address:"
@@ -809,16 +768,16 @@ msgstr "மின்அஞ்சல் முகவரி:"
 msgid "Reset my password"
 msgstr "எனது கடவுச்சொல்லை மாற்றியமை"
 
-#: templatetags/admin_list.py:273
+#: templatetags/admin_list.py:288
 msgid "All dates"
 msgstr "அனைத்து தேதியும்"
 
-#: views/main.py:68
+#: views/main.py:66
 #, python-format
 msgid "Select %s"
 msgstr "%s யை தேர்ந்தெடு"
 
-#: views/main.py:68
+#: views/main.py:66
 #, python-format
 msgid "Select %s to change"
 msgstr "%s யை மாற்ற தேர்ந்தெடு"

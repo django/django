@@ -1,45 +1,50 @@
 # This file is distributed under the same license as the Django package.
-# Metin Amiroff <amiroff@gmail.com>, 2010.
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 20:56+0100\n"
-"PO-Revision-Date: 2010-05-02 01:13+0300\n"
-"Last-Translator: Metin Amiroff <amiroff@gmail.com>\n"
-"Language-Team: Bahadır Kandemir <bahadir@pardus.org.tr>\n"
+"POT-Creation-Date: 2011-02-28 23:20+0100\n"
+"PO-Revision-Date: 2011-02-22 00:01+0000\n"
+"Last-Translator: amiroff <amiroff@gmail.com>\n"
+"Language-Team: Turkish <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Language: tr\n"
+"Plural-Forms: nplurals=1; plural=0\n"
 
-#: media/js/SelectFilter2.js:37
+#: media/js/SelectFilter2.js:45
 #, perl-format
 msgid "Available %s"
 msgstr "Toplam %s"
 
-#: media/js/SelectFilter2.js:45
+#: media/js/SelectFilter2.js:52
+msgid "Filter"
+msgstr ""
+
+#: media/js/SelectFilter2.js:59
 msgid "Choose all"
 msgstr "Hepsini seç"
 
-#: media/js/SelectFilter2.js:50
+#: media/js/SelectFilter2.js:64
 msgid "Add"
 msgstr "Ekle"
 
-#: media/js/SelectFilter2.js:52
+#: media/js/SelectFilter2.js:66
 msgid "Remove"
 msgstr "Kaldır"
 
-#: media/js/SelectFilter2.js:57
+#: media/js/SelectFilter2.js:71
 #, perl-format
 msgid "Chosen %s"
 msgstr "Seçilen %s"
 
-#: media/js/SelectFilter2.js:58
+#: media/js/SelectFilter2.js:72
 msgid "Select your choice(s) and click "
 msgstr "Seçiminizi yapın ve yandaki düğmenin aynısına tıklayın "
 
-#: media/js/SelectFilter2.js:63
+#: media/js/SelectFilter2.js:77
 msgid "Clear all"
 msgstr "Hepsini temizle"
 
@@ -53,6 +58,8 @@ msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
 "action, your unsaved changes will be lost."
 msgstr ""
+"Alanlara girilmiş ve henüz kaydedilmemiş değişiklikler mevcut. Eğer devam "
+"ederseniz, kaydedilmemiş değişiklikleriniz yitirilecektir."
 
 #: media/js/actions.js:121 media/js/actions.min.js:6
 msgid ""
@@ -60,6 +67,9 @@ msgid ""
 "individual fields yet. Please click OK to save. You'll need to re-run the "
 "action."
 msgstr ""
+"Bir işlem seçtiniz, fakat bazı alanlardaki değişiklikleri henüz "
+"kaydetmediniz. Kaydetmek için lütfen Tamam düğmesine tıklayınız. İşlemi "
+"tekrarlamanız gerekecektir."
 
 #: media/js/actions.js:123 media/js/actions.min.js:6
 msgid ""
@@ -67,6 +77,8 @@ msgid ""
 "fields. You're probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
+"Bir işlem seçtiniz, fakat hiçbir alan üzerinde değişiklik yapmadınız. Bu "
+"durumda Kaydet düğmesi yerine Git düğmesini kullanmanız önerilir."
 
 #: media/js/calendar.js:24 media/js/dateparse.js:32
 msgid ""

@@ -1,30 +1,30 @@
-# translation of django.po to Catalan
 # This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-20 16:11+0100\n"
-"PO-Revision-Date: 2009-03-24 13:28+0100\n"
-"Last-Translator: Django Catalan Group <django-cat@googlegroups.com>\n"
-"Language-Team: Catalan <ca@li.org>\n"
+"POT-Creation-Date: 2011-02-28 18:47+0100\n"
+"PO-Revision-Date: 2011-02-22 00:12+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: Catalan <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: ca\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: actions.py:49
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "Eliminat/s %(count)d %(items)s satisfactòriament."
 
-#: actions.py:61 options.py:1199
+#: actions.py:61 options.py:1220
 #, python-format
 msgid "Cannot delete %(name)s"
-msgstr ""
+msgstr "No es pot esborrar %(name)s"
 
-#: actions.py:63 options.py:1201
+#: actions.py:63 options.py:1222
 msgid "Are you sure?"
 msgstr "N'esteu segur?"
 
@@ -42,39 +42,39 @@ msgstr ""
 "<h3>Per %s:</h3>\n"
 "<ul>\n"
 
-#: filterspecs.py:91 filterspecs.py:113 filterspecs.py:175 filterspecs.py:213
+#: filterspecs.py:104 filterspecs.py:136 filterspecs.py:205 filterspecs.py:257
 msgid "All"
 msgstr "Tots"
 
-#: filterspecs.py:137
+#: filterspecs.py:164
 msgid "Any date"
 msgstr "Qualsevol data"
 
-#: filterspecs.py:138
+#: filterspecs.py:165
 msgid "Today"
 msgstr "Avui"
 
-#: filterspecs.py:141
+#: filterspecs.py:168
 msgid "Past 7 days"
 msgstr "Últims 7 dies"
 
-#: filterspecs.py:144
+#: filterspecs.py:171
 msgid "This month"
 msgstr "Aquest mes"
 
-#: filterspecs.py:146
+#: filterspecs.py:173
 msgid "This year"
 msgstr "Aquest any"
 
-#: filterspecs.py:175
+#: filterspecs.py:205
 msgid "Yes"
 msgstr "Sí"
 
-#: filterspecs.py:175
+#: filterspecs.py:205
 msgid "No"
 msgstr "No"
 
-#: filterspecs.py:182
+#: filterspecs.py:216
 msgid "Unknown"
 msgstr "Desconegut"
 
@@ -133,61 +133,61 @@ msgstr "entrades del registre"
 msgid "None"
 msgstr "cap"
 
-#: options.py:620
+#: options.py:628
 #, python-format
 msgid "Changed %s."
 msgstr "Modificat %s."
 
-#: options.py:620 options.py:630
+#: options.py:628 options.py:638
 msgid "and"
 msgstr "i"
 
-#: options.py:625
+#: options.py:633
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "Afegit %(name)s \"%(object)s\""
 
-#: options.py:629
+#: options.py:637
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "Modificat %(list)s per a %(name)s \"%(object)s\"."
 
-#: options.py:634
+#: options.py:642
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "Eliminat %(name)s \"%(object)s\"."
 
-#: options.py:638
+#: options.py:646
 msgid "No fields changed."
 msgstr "Cap camp modificat."
 
-#: options.py:710
+#: options.py:718
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "El/la %(name)s \"%(obj)s\" ha estat afegit/da amb èxit."
 
-#: options.py:714 options.py:747
+#: options.py:722 options.py:762
 msgid "You may edit it again below."
 msgstr "Podeu editar-lo de nou a sota."
 
-#: options.py:724 options.py:757
+#: options.py:732 options.py:772
 #, python-format
 msgid "You may add another %s below."
 msgstr "Podeu afegir un altre %s a sota."
 
-#: options.py:745
+#: options.py:760
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "S'ha modificat amb èxit el/la %(name)s \"%(obj)s."
 
-#: options.py:753
+#: options.py:768
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr ""
 "S'ha afegit amb èxit el/la %(name)s \"%(obj)s\". Pot editar-lo de nou a sota."
 
-#: options.py:807 options.py:1065
+#: options.py:828 options.py:1086
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
@@ -195,69 +195,69 @@ msgstr ""
 "Heu de seleccionar els elements per poder realitzar-hi accions. No heu "
 "seleccionat cap element."
 
-#: options.py:826
+#: options.py:847
 msgid "No action selected."
 msgstr "no heu seleccionat cap acció"
 
-#: options.py:907
+#: options.py:928
 #, python-format
 msgid "Add %s"
 msgstr "Afegir %s"
 
-#: options.py:933 options.py:1174
+#: options.py:954 options.py:1195
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "No existeix cap objecte %(name)s amb la clau primària %(key)r."
 
-#: options.py:998
+#: options.py:1019
 #, python-format
 msgid "Change %s"
 msgstr "Modificar %s"
 
-#: options.py:1045
+#: options.py:1066
 msgid "Database error"
 msgstr "Error de base de dades"
 
-#: options.py:1107
+#: options.py:1128
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s s'ha modificat amb èxit."
 msgstr[1] "%(count)s %(name)s s'han modificat amb èxit."
 
-#: options.py:1134
+#: options.py:1155
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "%(total_count)s seleccionat(s)"
 msgstr[1] "Tots %(total_count)s seleccionat(s)"
 
-#: options.py:1139
+#: options.py:1160
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "0 de %(cnt)s seleccionats"
 
-#: options.py:1190
+#: options.py:1211
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "El/la %(name)s \"%(obj)s\" s'ha eliminat amb èxit."
 
-#: options.py:1235
+#: options.py:1256
 #, python-format
 msgid "Change history: %s"
 msgstr "Modificar històric: %s"
 
-#: sites.py:312 templates/admin/login.html:42
+#: sites.py:319 templates/admin/login.html:42
 #: templates/registration/password_reset_complete.html:14
 #: views/decorators.py:29
 msgid "Log in"
 msgstr "Iniciar sessió"
 
-#: sites.py:368
+#: sites.py:375
 msgid "Site administration"
 msgstr "Administració del lloc"
 
-#: sites.py:412
+#: sites.py:419
 #, python-format
 msgid "%s administration"
 msgstr "Administració de %s"
@@ -270,11 +270,11 @@ msgstr "Data:"
 msgid "Time:"
 msgstr "Hora:"
 
-#: widgets.py:121
+#: widgets.py:140
 msgid "Lookup"
 msgstr "Cercar"
 
-#: widgets.py:237
+#: widgets.py:246
 msgid "Add Another"
 msgstr "Afegir-ne un altre"
 
@@ -431,14 +431,13 @@ msgstr ""
 "els tipus d'objecte següents:"
 
 #: templates/admin/delete_confirmation.html:25
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
 "following protected related objects:"
 msgstr ""
-"Eliminar el/la %(object_name)s '%(escaped_object)s' provocaria l'eliminació "
-"d'objectes relacionats, però el vostre compte no te permisos per esborrar "
-"els tipus d'objecte següents:"
+"Esborrar %(object_name)s '%(escaped_object)s' requeriria esborrar els "
+"següents objectes relacionats protegits:"
 
 #: templates/admin/delete_confirmation.html:33
 #, python-format
@@ -459,34 +458,33 @@ msgid "Delete multiple objects"
 msgstr "Eliminar múltiples objectes"
 
 #: templates/admin/delete_selected_confirmation.html:16
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would result in deleting related "
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
 msgstr ""
-"Eliminar el/la %(object_name)s provocaria l'eliminació d'objectes "
-"relacionats, però el vostre compte no te permisos per esborrar els tipus "
-"d'objecte següents:"
+"Esborrar els %(objects_name)s seleccionats faria que s'esborréssin objectes "
+"relacionats, però el vostre compte no té permisos per esborrar els següents "
+"tipus d'objectes:"
 
 #: templates/admin/delete_selected_confirmation.html:24
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would require deleting the following "
 "protected related objects:"
 msgstr ""
-"Eliminar el/la %(object_name)s provocaria l'eliminació d'objectes "
-"relacionats, però el vostre compte no te permisos per esborrar els tipus "
-"d'objecte següents:"
+"Esborrar els %(objects_name)s seleccionats requeriria esborrar els següents "
+"objectes relacionats protegits:"
 
 #: templates/admin/delete_selected_confirmation.html:32
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Are you sure you want to delete the selected %(objects_name)s? All of the "
 "following objects and their related items will be deleted:"
 msgstr ""
-"Esteu segur de voler esborrar els/les %(object_name)s seleccionats? Tots "
-"aquests objectes i els seus elements relacionats s'esborraran:"
+"N'esteu segur de voler esborrar els %(objects_name)s seleccionats? "
+"S'esborraran tots els objects següents i els seus elements relacionats:"
 
 #: templates/admin/filter.html:2
 #, python-format
@@ -573,11 +571,11 @@ msgid "Search"
 msgstr "Cerca"
 
 #: templates/admin/search_form.html:10
-#, fuzzy, python-format
+#, python-format
 msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
-msgstr[0] "%(total_count)s seleccionat(s)"
-msgstr[1] "Tots %(total_count)s seleccionat(s)"
+msgstr[0] "%(counter)s resultat"
+msgstr[1] "%(counter)s resultats"
 
 #: templates/admin/search_form.html:10
 #, python-format
@@ -605,9 +603,8 @@ msgstr ""
 "opcions de l'usuari."
 
 #: templates/admin/auth/user/add_form.html:8
-#, fuzzy
 msgid "Enter a username and password."
-msgstr "Introduïu la nova contrasenya"
+msgstr "Introduïu un nom d'usuari i contrasenya."
 
 #: templates/admin/auth/user/change_password.html:29
 #, python-format
@@ -757,29 +754,27 @@ msgstr ""
 "de correu electrònic que ens heu indicat. L'hauríeu de rebre en breu."
 
 #: templates/registration/password_reset_email.html:2
-msgid "You're receiving this e-mail because you requested a password reset"
+#, fuzzy, python-format
+msgid ""
+"You're receiving this e-mail because you requested a password reset for your "
+"user account at %(site_name)s."
 msgstr ""
 "Esteu rebent aquest missatge perquè vau sol·licitar un restabliment de "
 "contrasenya."
 
-#: templates/registration/password_reset_email.html:3
-#, python-format
-msgid "for your user account at %(site_name)s"
-msgstr "del vostre compte d'usuari a %(site_name)s."
-
-#: templates/registration/password_reset_email.html:5
+#: templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
 msgstr "Si us plau, aneu a la pàgina següent i escolliu una nova contrasenya:"
 
-#: templates/registration/password_reset_email.html:9
+#: templates/registration/password_reset_email.html:8
 msgid "Your username, in case you've forgotten:"
 msgstr "El vostre nom d'usuari, en cas que l'hagueu oblidat:"
 
-#: templates/registration/password_reset_email.html:11
+#: templates/registration/password_reset_email.html:10
 msgid "Thanks for using our site!"
 msgstr "Gràcies per fer ús del nostre lloc!"
 
-#: templates/registration/password_reset_email.html:13
+#: templates/registration/password_reset_email.html:12
 #, python-format
 msgid "The %(site_name)s team"
 msgstr "L'equip de %(site_name)s"
@@ -800,16 +795,16 @@ msgstr "Adreça de correu electrònic:"
 msgid "Reset my password"
 msgstr "Restablir la meva contrasenya"
 
-#: templatetags/admin_list.py:273
+#: templatetags/admin_list.py:288
 msgid "All dates"
 msgstr "Totes les dates"
 
-#: views/main.py:68
+#: views/main.py:66
 #, python-format
 msgid "Select %s"
 msgstr "Seleccioneu %s"
 
-#: views/main.py:68
+#: views/main.py:66
 #, python-format
 msgid "Select %s to change"
 msgstr "Seleccioneu %s per modificar"

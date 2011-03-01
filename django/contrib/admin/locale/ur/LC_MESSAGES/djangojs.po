@@ -1,0 +1,152 @@
+# This file is distributed under the same license as the Django package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-02-28 23:20+0100\n"
+"PO-Revision-Date: 2011-02-23 06:00+0000\n"
+"Last-Translator: Mansoorulhaq <mansoorulhaq1986@gmail.com>\n"
+"Language-Team: Urdu <None>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ur\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+
+#: media/js/SelectFilter2.js:45
+#, perl-format
+msgid "Available %s"
+msgstr "دستیاب %s"
+
+#: media/js/SelectFilter2.js:52
+msgid "Filter"
+msgstr ""
+
+#: media/js/SelectFilter2.js:59
+msgid "Choose all"
+msgstr "سب منتخب کریں"
+
+#: media/js/SelectFilter2.js:64
+msgid "Add"
+msgstr "اضافہ کریں"
+
+#: media/js/SelectFilter2.js:66
+msgid "Remove"
+msgstr "خارج کریں"
+
+#: media/js/SelectFilter2.js:71
+#, perl-format
+msgid "Chosen %s"
+msgstr "منتخب شدہ %s"
+
+#: media/js/SelectFilter2.js:72
+msgid "Select your choice(s) and click "
+msgstr "اپنا انتخاب چنیں اور کلک کریں"
+
+#: media/js/SelectFilter2.js:77
+msgid "Clear all"
+msgstr "تمام صاف کریں"
+
+#: media/js/actions.js:18 media/js/actions.min.js:1
+msgid "%(sel)s of %(cnt)s selected"
+msgid_plural "%(sel)s of %(cnt)s selected"
+msgstr[0] "%(cnt)s میں سے %(sel)s منتخب کیا گیا"
+msgstr[1] "%(cnt)s میں سے %(sel)s منتخب کیے گئے"
+
+#: media/js/actions.js:109 media/js/actions.min.js:5
+msgid ""
+"You have unsaved changes on individual editable fields. If you run an "
+"action, your unsaved changes will be lost."
+msgstr ""
+"آپ کے پاس ذاتی قابل تدوین خانوں میں غیر محفوظ تبدیلیاں موجود ھیں۔ اگر آپ "
+"کوئی کاروائی کریں گے تو آپ کی غیر محفوظ تبدیلیاں ضائع ھو جائیں گی۔"
+
+#: media/js/actions.js:121 media/js/actions.min.js:6
+msgid ""
+"You have selected an action, but you haven't saved your changes to "
+"individual fields yet. Please click OK to save. You'll need to re-run the "
+"action."
+msgstr ""
+"آپ نے ایک کاروائی منتخب کی ھے لیکن ابھی تک آپ نے ذاتی خانوں میں اپنی "
+"تبدیلیاں محفوظ نہیں کی ہیں براہ مھربانی محفوط کرنے کے لئے OK پر کلک کریں۔ آپ "
+"کاوائی دوبارہ چلانے کی ضرورت ھوگی۔"
+
+#: media/js/actions.js:123 media/js/actions.min.js:6
+msgid ""
+"You have selected an action, and you haven't made any changes on individual "
+"fields. You're probably looking for the Go button rather than the Save "
+"button."
+msgstr ""
+"آپ نے ایک کاروائی منتخب کی ھے، اور آپ نے ذاتی خانوں میں کوئی تبدیلی نہیں کی "
+"غالباً آپ 'جاؤ' بٹن تلاش کر رھے ھیں بجائے 'مخفوظ کریں' بٹن کے۔"
+
+#: media/js/calendar.js:24 media/js/dateparse.js:32
+msgid ""
+"January February March April May June July August September October November "
+"December"
+msgstr "جنوری فروری مارچ اپریل مئی جون جولائی اگست ستمبر اکتوبر نومبر دسمبر"
+
+#: media/js/calendar.js:25
+msgid "S M T W T F S"
+msgstr "ا س م ب ج جمعہ ھ"
+
+#: media/js/collapse.js:9 media/js/collapse.js.py:21
+#: media/js/collapse.min.js:1
+msgid "Show"
+msgstr "دکھائیں"
+
+#: media/js/collapse.js:16 media/js/collapse.min.js:1
+msgid "Hide"
+msgstr "چھپائیں"
+
+#: media/js/dateparse.js:33
+msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
+msgstr "اتوار سوموار منگل بدھ جمعرات جمعہ ھفتہ"
+
+#: media/js/admin/DateTimeShortcuts.js:49
+#: media/js/admin/DateTimeShortcuts.js:84
+msgid "Now"
+msgstr "اب"
+
+#: media/js/admin/DateTimeShortcuts.js:53
+msgid "Clock"
+msgstr "گھڑی"
+
+#: media/js/admin/DateTimeShortcuts.js:80
+msgid "Choose a time"
+msgstr "وقت منتخب کریں"
+
+#: media/js/admin/DateTimeShortcuts.js:85
+msgid "Midnight"
+msgstr "نصف رات"
+
+#: media/js/admin/DateTimeShortcuts.js:86
+msgid "6 a.m."
+msgstr "6 ص"
+
+#: media/js/admin/DateTimeShortcuts.js:87
+msgid "Noon"
+msgstr "دوپھر"
+
+#: media/js/admin/DateTimeShortcuts.js:91
+#: media/js/admin/DateTimeShortcuts.js:188
+msgid "Cancel"
+msgstr "منسوخ کریں"
+
+#: media/js/admin/DateTimeShortcuts.js:133
+#: media/js/admin/DateTimeShortcuts.js:182
+msgid "Today"
+msgstr "آج"
+
+#: media/js/admin/DateTimeShortcuts.js:137
+msgid "Calendar"
+msgstr "تقویم"
+
+#: media/js/admin/DateTimeShortcuts.js:180
+msgid "Yesterday"
+msgstr "گزشتہ کل"
+
+#: media/js/admin/DateTimeShortcuts.js:184
+msgid "Tomorrow"
+msgstr "آئندہ کل"

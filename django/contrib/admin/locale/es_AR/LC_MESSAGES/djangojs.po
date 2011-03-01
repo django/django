@@ -1,50 +1,50 @@
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 20:56+0100\n"
-"PO-Revision-Date: 2010-08-06 15:52-0300\n"
-"Last-Translator: Ramiro Morales <rm0@gmx.net>\n"
-"Language-Team: Django-I18N <django-i18n@googlegroups.com>\n"
+"POT-Creation-Date: 2011-02-28 23:20+0100\n"
+"PO-Revision-Date: 2011-02-22 00:01+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: Spanish (Argentinian) <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: es_AR\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Pootle 2.0.1\n"
-
-#: media/js/SelectFilter2.js:37
-#, perl-format
-msgid "Available %s"
-msgstr ""
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: media/js/SelectFilter2.js:45
-#, fuzzy
-msgid "Choose all"
-msgstr "Elija una hora"
-
-#: media/js/SelectFilter2.js:50
-msgid "Add"
-msgstr ""
+#, perl-format
+msgid "Available %s"
+msgstr "%s disponibles"
 
 #: media/js/SelectFilter2.js:52
-msgid "Remove"
+msgid "Filter"
 msgstr ""
 
-#: media/js/SelectFilter2.js:57
+#: media/js/SelectFilter2.js:59
+msgid "Choose all"
+msgstr "Seleccionar todos/as"
+
+#: media/js/SelectFilter2.js:64
+msgid "Add"
+msgstr "Agregar"
+
+#: media/js/SelectFilter2.js:66
+msgid "Remove"
+msgstr "Eliminar"
+
+#: media/js/SelectFilter2.js:71
 #, perl-format
 msgid "Chosen %s"
-msgstr ""
+msgstr "%s seleccionados"
 
-#: media/js/SelectFilter2.js:58
+#: media/js/SelectFilter2.js:72
 msgid "Select your choice(s) and click "
-msgstr ""
+msgstr "Seleccione la opción u opcione que desee elegir y haga click en"
 
-#: media/js/SelectFilter2.js:63
+#: media/js/SelectFilter2.js:77
 msgid "Clear all"
 msgstr "Eliminar todos"
 

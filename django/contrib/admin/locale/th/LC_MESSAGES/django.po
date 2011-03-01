@@ -2,39 +2,36 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Django-1.1-rc-1\n"
+"Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-20 16:12+0100\n"
-"PO-Revision-Date: 2009-07-28 22:31+0700\n"
-"Last-Translator: Kowit Charoenratchatabhan <kowito@felspar.com>\n"
-"Language-Team: Kowit Charoenratchatabhan<kowito@felspar.com>,Kadsarin "
-"Sanjek, Felspar,Theppitak Karoonboonyanan <thep@linux.thai.net>\n"
+"POT-Creation-Date: 2011-02-28 18:48+0100\n"
+"PO-Revision-Date: 2011-02-22 00:12+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: Thai <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Poedit-Language: Thai\n"
-"X-Poedit-Country: THAILAND\n"
-"X-Poedit-SourceCharset: utf-8\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Language: th\n"
+"Plural-Forms: nplurals=1; plural=0\n"
 
 #: actions.py:49
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
-msgstr ""
+msgstr "%(count)d %(items)s ถูกลบเรียบร้อยแล้ว"
 
-#: actions.py:61 options.py:1199
+#: actions.py:61 options.py:1220
 #, python-format
 msgid "Cannot delete %(name)s"
-msgstr ""
+msgstr "ไม่สามารถลบ %(name)s"
 
-#: actions.py:63 options.py:1201
+#: actions.py:63 options.py:1222
 msgid "Are you sure?"
 msgstr "แน่ใจหรือ"
 
 #: actions.py:85
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
-msgstr ""
+msgstr "ลบ %(verbose_name_plural)s ที่เลือก"
 
 #: filterspecs.py:54
 #, python-format
@@ -45,39 +42,39 @@ msgstr ""
 "<h3>โดย %s:</h3>\n"
 "<ul>\n"
 
-#: filterspecs.py:91 filterspecs.py:113 filterspecs.py:175 filterspecs.py:213
+#: filterspecs.py:104 filterspecs.py:136 filterspecs.py:205 filterspecs.py:257
 msgid "All"
 msgstr "ทั้งหมด"
 
-#: filterspecs.py:137
+#: filterspecs.py:164
 msgid "Any date"
 msgstr "วันไหนก็ได้"
 
-#: filterspecs.py:138
+#: filterspecs.py:165
 msgid "Today"
 msgstr "วันนี้"
 
-#: filterspecs.py:141
+#: filterspecs.py:168
 msgid "Past 7 days"
 msgstr "สัปดาห์ที่แล้ว"
 
-#: filterspecs.py:144
+#: filterspecs.py:171
 msgid "This month"
 msgstr "เดือนนี้"
 
-#: filterspecs.py:146
+#: filterspecs.py:173
 msgid "This year"
 msgstr "ปีนี้"
 
-#: filterspecs.py:175
+#: filterspecs.py:205
 msgid "Yes"
 msgstr "ใช่"
 
-#: filterspecs.py:175
+#: filterspecs.py:205
 msgid "No"
 msgstr "ไม่ใช่"
 
-#: filterspecs.py:182
+#: filterspecs.py:216
 msgid "Unknown"
 msgstr "ไม่รู้"
 
@@ -97,7 +94,6 @@ msgid "Your e-mail address is not your username. Try '%s' instead."
 msgstr "ที่อยู่อีเมลไม่ใช่ชื่อผู้ใช้ของคุณ ลองใช้ '%s' แทน"
 
 #: helpers.py:19
-#, fuzzy
 msgid "Action:"
 msgstr "คำสั่ง"
 
@@ -133,127 +129,128 @@ msgstr "log entries"
 msgid "None"
 msgstr "ไม่มี"
 
-#: options.py:620
+#: options.py:628
 #, python-format
 msgid "Changed %s."
 msgstr "%s เปลี่ยนแล้ว"
 
-#: options.py:620 options.py:630
+#: options.py:628 options.py:638
 msgid "and"
 msgstr "และ"
 
-#: options.py:625
+#: options.py:633
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "เพิ่ม %(name)s \"%(object)s\" แล้ว"
 
-#: options.py:629
+#: options.py:637
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "เปลี่ยน %(list)s สำหรับ %(name)s \"%(object)s\" แล้ว"
 
-#: options.py:634
+#: options.py:642
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "ลบ %(name)s \"%(object)s\" แล้ว"
 
-#: options.py:638
+#: options.py:646
 msgid "No fields changed."
 msgstr "ไม่มีฟิลด์ใดถูกเปลี่ยน"
 
-#: options.py:710
+#: options.py:718
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "เพิ่ม %(name)s \"%(obj)s\" เรียบร้อยแล้ว"
 
-#: options.py:714 options.py:747
+#: options.py:722 options.py:762
 msgid "You may edit it again below."
 msgstr "สามารถแก้ไขเพิ่มเติมได้ที่ด้านล่าง"
 
-#: options.py:724 options.py:757
+#: options.py:732 options.py:772
 #, python-format
 msgid "You may add another %s below."
 msgstr "คุณสามารถเพิ่ม %s ได้อีกที่ด้านล่าง"
 
-#: options.py:745
+#: options.py:760
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "เปลี่ยนแปลง %(name)s \"%(obj)s\" เรียบร้อยแล้ว"
 
-#: options.py:753
+#: options.py:768
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr "เพิ่ม %(name)s \"%(obj)s\" เรียบร้อยแล้ว แก้ไขได้อีกที่ด้านล่าง"
 
-#: options.py:807 options.py:1065
+#: options.py:828 options.py:1086
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr ""
+"ไม่มีรายการใดถูกเปลี่ยน\n"
+"รายการจะต้องถูกเลือกก่อนเพื่อที่จะทำตามคำสั่งได้"
 
-#: options.py:826
-#, fuzzy
+#: options.py:847
 msgid "No action selected."
-msgstr "เวลาลงมือ"
+msgstr "ไม่มีคำสั่งที่ถูกเลือก"
 
-#: options.py:907
+#: options.py:928
 #, python-format
 msgid "Add %s"
 msgstr "เพิ่ม %s"
 
-#: options.py:933 options.py:1174
+#: options.py:954 options.py:1195
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
+msgstr "Primary key %(key)r ของอ็อบเจ็กต์ %(name)s ไม่มีอยู่"
 
-#: options.py:998
+#: options.py:1019
 #, python-format
 msgid "Change %s"
 msgstr "เปลี่ยน %s"
 
-#: options.py:1045
+#: options.py:1066
 msgid "Database error"
 msgstr "เกิดความผิดพลาดที่ฐานข้อมูล"
 
-#: options.py:1107
-#, fuzzy, python-format
+#: options.py:1128
+#, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
-msgstr[0] "เปลี่ยนแปลง %(name)s \"%(obj)s\" เรียบร้อยแล้ว"
+msgstr[0] ""
 
-#: options.py:1134
+#: options.py:1155
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] ""
 
-#: options.py:1139
+#: options.py:1160
 #, python-format
 msgid "0 of %(cnt)s selected"
-msgstr ""
+msgstr "เลือก 0 จาก %(cnt)s"
 
-#: options.py:1190
+#: options.py:1211
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "ลบ %(name)s \"%(obj)s\" เรียบร้อยแล้ว"
 
-#: options.py:1235
+#: options.py:1256
 #, python-format
 msgid "Change history: %s"
 msgstr "เปลี่ยนแปลงประวัติ: %s"
 
-#: sites.py:312 templates/admin/login.html:42
+#: sites.py:319 templates/admin/login.html:42
 #: templates/registration/password_reset_complete.html:14
 #: views/decorators.py:29
 msgid "Log in"
 msgstr "เข้าสู่ระบบ"
 
-#: sites.py:368
+#: sites.py:375
 msgid "Site administration"
 msgstr "การจัดการไซต์"
 
-#: sites.py:412
+#: sites.py:419
 #, python-format
 msgid "%s administration"
 msgstr "%s การจัดการ"
@@ -266,11 +263,11 @@ msgstr "วันที่ :"
 msgid "Time:"
 msgstr "เวลา :"
 
-#: widgets.py:121
+#: widgets.py:140
 msgid "Lookup"
 msgstr "ดูที่"
 
-#: widgets.py:237
+#: widgets.py:246
 msgid "Add Another"
 msgstr "เพิ่มอีก"
 
@@ -317,11 +314,11 @@ msgid ""
 "mail and should be fixed shortly. Thanks for your patience."
 msgstr ""
 "เกิดเหตุขัดข้องขี้น ทางเราได้รายงานไปยังผู้ดูแลระบบแล้ว และจะดำเนินการแก้ไขอย่างเร่งด่วน "
-"ขอบคุณที่ราบงานความผิดพลาด"
+"ขอบคุณที่รายงานความผิดพลาด"
 
 #: templates/admin/actions.html:4
 msgid "Run the selected action"
-msgstr ""
+msgstr "รันคำสั่งที่ถูกเลือก"
 
 #: templates/admin/actions.html:4
 msgid "Go"
@@ -329,16 +326,16 @@ msgstr "ไป"
 
 #: templates/admin/actions.html:11
 msgid "Click here to select the objects across all pages"
-msgstr ""
+msgstr "คลิกที่นี่เพื่อเลือกอ็อบเจ็กต์จากหน้าทั้งหมด"
 
 #: templates/admin/actions.html:11
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
-msgstr ""
+msgstr "เลือกทั้งหมด %(total_count)s %(module_name)s"
 
 #: templates/admin/actions.html:13
 msgid "Clear selection"
-msgstr ""
+msgstr "เคลียร์ตัวเลือก"
 
 #: templates/admin/app_index.html:10 templates/admin/index.html:19
 #, python-format
@@ -424,13 +421,12 @@ msgstr ""
 "แต่บัญชีของคุณไม่สามารถทำการลบข้อมูลชนิดนี้ได้"
 
 #: templates/admin/delete_confirmation.html:25
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
 "following protected related objects:"
 msgstr ""
-"กำลังดำเนินการลบ %(object_name)s '%(escaped_object)s'และจะแสดงผลการลบ "
-"แต่บัญชีของคุณไม่สามารถทำการลบข้อมูลชนิดนี้ได้"
+"การลบ %(object_name)s '%(escaped_object)s' จำเป็นจะต้องลบอ็อบเจ็กต์ที่เกี่ยวข้องต่อไปนี้:"
 
 #: templates/admin/delete_confirmation.html:33
 #, python-format
@@ -447,37 +443,34 @@ msgid "Yes, I'm sure"
 msgstr "ใช่, ฉันแน่ใจ"
 
 #: templates/admin/delete_selected_confirmation.html:9
-#, fuzzy
 msgid "Delete multiple objects"
-msgstr "ลบ %(name)s \"%(object)s\" แล้ว"
+msgstr "ลบหลายอ็อบเจ็กต์"
 
 #: templates/admin/delete_selected_confirmation.html:16
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would result in deleting related "
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
 msgstr ""
-"กำลังดำเนินการลบ %(object_name)s '%(escaped_object)s'และจะแสดงผลการลบ "
-"แต่บัญชีของคุณไม่สามารถทำการลบข้อมูลชนิดนี้ได้"
+"การลบ %(objects_name)s ที่เลือก จะทำให้อ็อบเจ็กต์ที่เกี่ยวข้องถูกลบไปด้วย "
+"แต่บัญชีของคุณไม่มีสิทธิ์ที่จะลบอ็อบเจ็กต์ชนิดนี้"
 
 #: templates/admin/delete_selected_confirmation.html:24
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would require deleting the following "
 "protected related objects:"
-msgstr ""
-"กำลังดำเนินการลบ %(object_name)s '%(escaped_object)s'และจะแสดงผลการลบ "
-"แต่บัญชีของคุณไม่สามารถทำการลบข้อมูลชนิดนี้ได้"
+msgstr "การลบ %(objects_name)s ที่ถูกเลือก จำเป็นจะต้องลบอ็อบเจ็กต์ที่เกี่ยวข้องต่อไปนี้:"
 
 #: templates/admin/delete_selected_confirmation.html:32
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Are you sure you want to delete the selected %(objects_name)s? All of the "
 "following objects and their related items will be deleted:"
 msgstr ""
-"คุณแน่ใจหรือที่จะลบ %(object_name)s \"%(escaped_object)s\"?"
-"ข้อมูลที่เกี่ยวข้องทั้งหมดจะถูกลบไปด้วย:"
+"คุณแน่ใจหรือว่า ต้องการลบ %(objects_name)s ที่ถูกเลือก? เนื่องจากอ็อบเจ็กต์ "
+"และรายการที่เกี่ยวข้องทั้งหมดต่อไปนี้จะถูกลบด้วย"
 
 #: templates/admin/filter.html:2
 #, python-format
@@ -510,9 +503,8 @@ msgid "None available"
 msgstr "ไม่ว่าง"
 
 #: templates/admin/index.html:72
-#, fuzzy
 msgid "Unknown content"
-msgstr "ไม่รู้"
+msgstr "ไม่ทราบเนื้อหา"
 
 #: templates/admin/invalid_setup.html:7
 msgid ""
@@ -558,9 +550,8 @@ msgid "Save"
 msgstr "บันทึก"
 
 #: templates/admin/search_form.html:8
-#, fuzzy
 msgid "Search"
-msgstr "มีนาคม"
+msgstr "ค้นหา"
 
 #: templates/admin/search_form.html:10
 #, python-format
@@ -592,9 +583,8 @@ msgid ""
 msgstr "ขั้นตอนแรก ใส่ชื่อผู้ใช้และรหัสผ่าน หลังจากนั้นคุณจะสามารถแก้ไขข้อมูลผู้ใช้ได้มากขึ้น"
 
 #: templates/admin/auth/user/add_form.html:8
-#, fuzzy
 msgid "Enter a username and password."
-msgstr "ใส่รหัสผ่านใหม่"
+msgstr "กรุณาใส่ชื่อผู้ใช้และรหัสผ่าน"
 
 #: templates/admin/auth/user/change_password.html:29
 #, python-format
@@ -616,15 +606,14 @@ msgstr "ใส่รหัสผ่านเหมือนด้านบน �
 
 #: templates/admin/edit_inline/stacked.html:67
 #: templates/admin/edit_inline/tabular.html:113
-#, fuzzy, python-format
+#, python-format
 msgid "Add another %(verbose_name)s"
-msgstr "%(verbose_name)s ได้ถูกลบเรียบร้อยแล้ว"
+msgstr "เพิ่ม %(verbose_name)s อีก"
 
 #: templates/admin/edit_inline/stacked.html:70
 #: templates/admin/edit_inline/tabular.html:116
-#, fuzzy
 msgid "Remove"
-msgstr "ถอดออกแล้ว"
+msgstr "ถอดออก"
 
 #: templates/admin/edit_inline/tabular.html:15
 msgid "Delete?"
@@ -738,27 +727,25 @@ msgid ""
 msgstr "เราได้ส่งอีเมลวิธีการตั้งรหัสผ่าน ไปที่อีเมลที่คุณให้ไว้เรียบร้อยแล้ว และคุณจะได้รับเร็วๆ นี้"
 
 #: templates/registration/password_reset_email.html:2
-msgid "You're receiving this e-mail because you requested a password reset"
+#, fuzzy, python-format
+msgid ""
+"You're receiving this e-mail because you requested a password reset for your "
+"user account at %(site_name)s."
 msgstr "คุณได้รับอีเมลนี้เพราะว่าคุณได้ทำการขอรหัสผ่านใหม่"
 
-#: templates/registration/password_reset_email.html:3
-#, python-format
-msgid "for your user account at %(site_name)s"
-msgstr "สำหรับบัญชีการใช้งานของคุณที่ %(site_name)s "
-
-#: templates/registration/password_reset_email.html:5
+#: templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
 msgstr "กรุณาไปที่หน้านี้และเลือกรหัสผ่านใหม่:"
 
-#: templates/registration/password_reset_email.html:9
+#: templates/registration/password_reset_email.html:8
 msgid "Your username, in case you've forgotten:"
 msgstr "ชื่อผู้ใช้ของคุณ ในกรณีที่คุณถูกลืม:"
 
-#: templates/registration/password_reset_email.html:11
+#: templates/registration/password_reset_email.html:10
 msgid "Thanks for using our site!"
 msgstr "ขอบคุณสำหรับการใช้งานเว็บไซต์ของเรา"
 
-#: templates/registration/password_reset_email.html:13
+#: templates/registration/password_reset_email.html:12
 #, python-format
 msgid "The %(site_name)s team"
 msgstr "%(site_name)s ทีม"
@@ -777,16 +764,16 @@ msgstr "อีเมลของคุณ"
 msgid "Reset my password"
 msgstr "ตั้งรหัสผ่านของฉันใหม่"
 
-#: templatetags/admin_list.py:273
+#: templatetags/admin_list.py:288
 msgid "All dates"
 msgstr "ทุกวัน"
 
-#: views/main.py:68
+#: views/main.py:66
 #, python-format
 msgid "Select %s"
 msgstr "เลือก %s"
 
-#: views/main.py:68
+#: views/main.py:66
 #, python-format
 msgid "Select %s to change"
 msgstr "เลือก %s เพื่อเปลี่ยนแปลง"

@@ -1,30 +1,30 @@
-# Icelandic translation of Django.
 # This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-20 16:11+0100\n"
-"PO-Revision-Date: 2008-09-09 16:34-0000\n"
-"Last-Translator: Jökull Sólberg Auðunsson <jokullsolberg@gmail.com>\n"
-"Language-Team:  <dagurp@gmail.com>\n"
+"POT-Creation-Date: 2011-02-28 18:47+0100\n"
+"PO-Revision-Date: 2011-02-22 00:12+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: English <en@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=n != 1\n"
+"Language: is\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: actions.py:49
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr ""
 
-#: actions.py:61 options.py:1199
+#: actions.py:61 options.py:1220
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr ""
 
-#: actions.py:63 options.py:1201
+#: actions.py:63 options.py:1222
 msgid "Are you sure?"
 msgstr "Ertu viss?"
 
@@ -42,39 +42,39 @@ msgstr ""
 "<h3>Höfundur: %s:</h3>\n"
 "<ul>\n"
 
-#: filterspecs.py:91 filterspecs.py:113 filterspecs.py:175 filterspecs.py:213
+#: filterspecs.py:104 filterspecs.py:136 filterspecs.py:205 filterspecs.py:257
 msgid "All"
 msgstr "Allt"
 
-#: filterspecs.py:137
+#: filterspecs.py:164
 msgid "Any date"
 msgstr "Allar dagsetningar"
 
-#: filterspecs.py:138
+#: filterspecs.py:165
 msgid "Today"
 msgstr "Dagurinn í dag"
 
-#: filterspecs.py:141
+#: filterspecs.py:168
 msgid "Past 7 days"
 msgstr "Síðustu 7 dagar"
 
-#: filterspecs.py:144
+#: filterspecs.py:171
 msgid "This month"
 msgstr "Þessi mánuður"
 
-#: filterspecs.py:146
+#: filterspecs.py:173
 msgid "This year"
 msgstr "Þetta ár"
 
-#: filterspecs.py:175
+#: filterspecs.py:205
 msgid "Yes"
 msgstr "Já"
 
-#: filterspecs.py:175
+#: filterspecs.py:205
 msgid "No"
 msgstr "Nei"
 
-#: filterspecs.py:182
+#: filterspecs.py:216
 msgid "Unknown"
 msgstr "Óþekkt"
 
@@ -97,9 +97,8 @@ msgstr ""
 "Tölvupóstfangið þitt er ekki notandanafnið þitt. Prófaðu '%s' í staðinn."
 
 #: helpers.py:19
-#, fuzzy
 msgid "Action:"
-msgstr "Aðgerð"
+msgstr ""
 
 #: models.py:19
 msgid "action time"
@@ -133,130 +132,129 @@ msgstr "kladdafærslur"
 msgid "None"
 msgstr "Ekkert"
 
-#: options.py:620
+#: options.py:628
 #, python-format
 msgid "Changed %s."
 msgstr "Breytti %s."
 
-#: options.py:620 options.py:630
+#: options.py:628 options.py:638
 msgid "and"
 msgstr "og"
 
-#: options.py:625
+#: options.py:633
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "Bætti við %(name)s \"%(object)s\"."
 
-#: options.py:629
+#: options.py:637
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "Breytti %(list)s fyrir %(name)s \"%(object)s\"."
 
-#: options.py:634
+#: options.py:642
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "Eyddi %(name)s \"%(object)s\"."
 
-#: options.py:638
+#: options.py:646
 msgid "No fields changed."
 msgstr "Engum reitum breytt."
 
-#: options.py:710
+#: options.py:718
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s „%(obj)s“ var bætt við."
 
-#: options.py:714 options.py:747
+#: options.py:722 options.py:762
 msgid "You may edit it again below."
 msgstr "Þú getur breytt því aftur að neðan."
 
-#: options.py:724 options.py:757
+#: options.py:732 options.py:772
 #, python-format
 msgid "You may add another %s below."
 msgstr "Þú getur bætt öðru %s við að neðan."
 
-#: options.py:745
+#: options.py:760
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s „%(obj)s“ hefur verið breytt."
 
-#: options.py:753
+#: options.py:768
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr ""
 "%(name)s „%(obj)s“ hefur verið bætt við. Þú getur breytt því aftur að neðan."
 
-#: options.py:807 options.py:1065
+#: options.py:828 options.py:1086
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr ""
 
-#: options.py:826
-#, fuzzy
+#: options.py:847
 msgid "No action selected."
-msgstr "tími aðgerðar"
+msgstr ""
 
-#: options.py:907
+#: options.py:928
 #, python-format
 msgid "Add %s"
 msgstr "Bæta við %s"
 
-#: options.py:933 options.py:1174
+#: options.py:954 options.py:1195
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr ""
 
-#: options.py:998
+#: options.py:1019
 #, python-format
 msgid "Change %s"
 msgstr "Breyta %s"
 
-#: options.py:1045
+#: options.py:1066
 msgid "Database error"
 msgstr "Gagnagrunnsvilla"
 
-#: options.py:1107
-#, fuzzy, python-format
+#: options.py:1128
+#, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
-msgstr[0] "%(name)s „%(obj)s“ hefur verið breytt."
-msgstr[1] "%(name)s „%(obj)s“ hefur verið breytt."
+msgstr[0] ""
+msgstr[1] ""
 
-#: options.py:1134
+#: options.py:1155
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] ""
 msgstr[1] ""
 
-#: options.py:1139
+#: options.py:1160
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr ""
 
-#: options.py:1190
+#: options.py:1211
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s „%(obj)s“ var eytt."
 
-#: options.py:1235
+#: options.py:1256
 #, python-format
 msgid "Change history: %s"
 msgstr "Breytingarsaga: %s"
 
-#: sites.py:312 templates/admin/login.html:42
+#: sites.py:319 templates/admin/login.html:42
 #: templates/registration/password_reset_complete.html:14
 #: views/decorators.py:29
 msgid "Log in"
 msgstr "Skrá inn"
 
-#: sites.py:368
+#: sites.py:375
 msgid "Site administration"
 msgstr "Vefstjóri"
 
-#: sites.py:412
+#: sites.py:419
 #, python-format
 msgid "%s administration"
 msgstr "%s vefstjórn"
@@ -269,11 +267,11 @@ msgstr "Dagsetning:"
 msgid "Time:"
 msgstr "Tími:"
 
-#: widgets.py:121
+#: widgets.py:140
 msgid "Lookup"
 msgstr "Fletta upp"
 
-#: widgets.py:237
+#: widgets.py:246
 msgid "Add Another"
 msgstr "Bæta við öðru"
 
@@ -340,9 +338,8 @@ msgid "Select all %(total_count)s %(module_name)s"
 msgstr ""
 
 #: templates/admin/actions.html:13
-#, fuzzy
 msgid "Clear selection"
-msgstr "eytt af umsjónarmanni"
+msgstr ""
 
 #: templates/admin/app_index.html:10 templates/admin/index.html:19
 #, python-format
@@ -429,13 +426,11 @@ msgstr ""
 "tengdum hlutum en þú hefur ekki réttindi til að eyða eftirfarandi hlutum:"
 
 #: templates/admin/delete_confirmation.html:25
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
 "following protected related objects:"
 msgstr ""
-"Eyðing á %(object_name)s „%(escaped_object)s“ hefði í för með sér eyðingu á "
-"tengdum hlutum en þú hefur ekki réttindi til að eyða eftirfarandi hlutum:"
 
 #: templates/admin/delete_confirmation.html:33
 #, python-format
@@ -452,37 +447,30 @@ msgid "Yes, I'm sure"
 msgstr "Já ég er viss."
 
 #: templates/admin/delete_selected_confirmation.html:9
-#, fuzzy
 msgid "Delete multiple objects"
-msgstr "Eyddi %(name)s \"%(object)s\"."
+msgstr ""
 
 #: templates/admin/delete_selected_confirmation.html:16
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would result in deleting related "
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
 msgstr ""
-"Eyðing á %(object_name)s „%(escaped_object)s“ hefði í för með sér eyðingu á "
-"tengdum hlutum en þú hefur ekki réttindi til að eyða eftirfarandi hlutum:"
 
 #: templates/admin/delete_selected_confirmation.html:24
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would require deleting the following "
 "protected related objects:"
 msgstr ""
-"Eyðing á %(object_name)s „%(escaped_object)s“ hefði í för með sér eyðingu á "
-"tengdum hlutum en þú hefur ekki réttindi til að eyða eftirfarandi hlutum:"
 
 #: templates/admin/delete_selected_confirmation.html:32
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Are you sure you want to delete the selected %(objects_name)s? All of the "
 "following objects and their related items will be deleted:"
 msgstr ""
-"Ertu viss um að þú viljir eyða %(object_name)s „%(escaped_object)s“? Öllu "
-"eftirfarandi verður eytt:"
 
 #: templates/admin/filter.html:2
 #, python-format
@@ -515,9 +503,8 @@ msgid "None available"
 msgstr "Engin fáanleg"
 
 #: templates/admin/index.html:72
-#, fuzzy
 msgid "Unknown content"
-msgstr "Óþekkt"
+msgstr ""
 
 #: templates/admin/invalid_setup.html:7
 msgid ""
@@ -565,9 +552,8 @@ msgid "Save"
 msgstr "Vista"
 
 #: templates/admin/search_form.html:8
-#, fuzzy
 msgid "Search"
-msgstr "mars"
+msgstr ""
 
 #: templates/admin/search_form.html:10
 #, python-format
@@ -602,9 +588,8 @@ msgstr ""
 "notendamöguleikum."
 
 #: templates/admin/auth/user/add_form.html:8
-#, fuzzy
 msgid "Enter a username and password."
-msgstr "Settu inn nýtt lykilorð"
+msgstr ""
 
 #: templates/admin/auth/user/change_password.html:29
 #, python-format
@@ -626,15 +611,14 @@ msgstr "Settu inn sama lykilorðið aftur til staðfestingar."
 
 #: templates/admin/edit_inline/stacked.html:67
 #: templates/admin/edit_inline/tabular.html:113
-#, fuzzy, python-format
+#, python-format
 msgid "Add another %(verbose_name)s"
-msgstr "%(verbose_name)s var eytt."
+msgstr ""
 
 #: templates/admin/edit_inline/stacked.html:70
 #: templates/admin/edit_inline/tabular.html:116
-#, fuzzy
 msgid "Remove"
-msgstr "hefur verið fjarlægt"
+msgstr ""
 
 #: templates/admin/edit_inline/tabular.html:15
 msgid "Delete?"
@@ -754,29 +738,27 @@ msgstr ""
 "Leiðbeiningarnar ættu að berast til þín í tölvupósti fljótlega."
 
 #: templates/registration/password_reset_email.html:2
-msgid "You're receiving this e-mail because you requested a password reset"
+#, fuzzy, python-format
+msgid ""
+"You're receiving this e-mail because you requested a password reset for your "
+"user account at %(site_name)s."
 msgstr ""
 "Þú fékkst þennan tölvupóst vegna þess að þú baðst um endurstillingu á "
 "lykilorðinu þínu"
 
-#: templates/registration/password_reset_email.html:3
-#, python-format
-msgid "for your user account at %(site_name)s"
-msgstr "fyrir notandareikning þinn á %(site_name)s"
-
-#: templates/registration/password_reset_email.html:5
+#: templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
 msgstr "Vinsamlegast farðu á eftirfarandi síðu og veldu nýtt lykilorð:"
 
-#: templates/registration/password_reset_email.html:9
+#: templates/registration/password_reset_email.html:8
 msgid "Your username, in case you've forgotten:"
 msgstr "Notandanafnið þitt ef þú skyldir hafa gleymt því:"
 
-#: templates/registration/password_reset_email.html:11
+#: templates/registration/password_reset_email.html:10
 msgid "Thanks for using our site!"
 msgstr "Takk fyrir að nota vefinn okkar!"
 
-#: templates/registration/password_reset_email.html:13
+#: templates/registration/password_reset_email.html:12
 #, python-format
 msgid "The %(site_name)s team"
 msgstr "%(site_name)s hópurinn"
@@ -797,16 +779,16 @@ msgstr "Tölvupóstfang:"
 msgid "Reset my password"
 msgstr "Endursstilla lykilorðið mitt"
 
-#: templatetags/admin_list.py:273
+#: templatetags/admin_list.py:288
 msgid "All dates"
 msgstr "Allar dagsetningar"
 
-#: views/main.py:68
+#: views/main.py:66
 #, python-format
 msgid "Select %s"
 msgstr "Veldu %s"
 
-#: views/main.py:68
+#: views/main.py:66
 #, python-format
 msgid "Select %s to change"
 msgstr "Veldu %s til að breyta"

@@ -1,62 +1,65 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 20:56+0100\n"
-"PO-Revision-Date: 2010-05-04 19:01+0800\n"
-"Last-Translator: Urangua <urangua@adsolux.com>\n"
-"Language-Team: mn <translate@opensource.com>\n"
+"POT-Creation-Date: 2011-02-28 23:20+0100\n"
+"PO-Revision-Date: 2011-02-22 00:01+0000\n"
+"Last-Translator: ganzo <ganzo.bp@gmail.com>\n"
+"Language-Team: Mongolian <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
-
-#: media/js/SelectFilter2.js:37
-#, perl-format
-msgid "Available %s"
-msgstr ""
+"Language: mn\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: media/js/SelectFilter2.js:45
-msgid "Choose all"
-msgstr ""
-
-#: media/js/SelectFilter2.js:50
-msgid "Add"
-msgstr ""
+#, perl-format
+msgid "Available %s"
+msgstr "Боломжтой %s"
 
 #: media/js/SelectFilter2.js:52
-msgid "Remove"
+msgid "Filter"
 msgstr ""
 
-#: media/js/SelectFilter2.js:57
+#: media/js/SelectFilter2.js:59
+msgid "Choose all"
+msgstr "Бүгдийг сонго"
+
+#: media/js/SelectFilter2.js:64
+msgid "Add"
+msgstr "Нэм"
+
+#: media/js/SelectFilter2.js:66
+msgid "Remove"
+msgstr "Хас"
+
+#: media/js/SelectFilter2.js:71
 #, perl-format
 msgid "Chosen %s"
-msgstr ""
+msgstr "Сонгогдсон %s"
 
-#: media/js/SelectFilter2.js:58
+#: media/js/SelectFilter2.js:72
 msgid "Select your choice(s) and click "
-msgstr ""
+msgstr "Сонголтуудаас сонгоод дарна уу "
 
-#: media/js/SelectFilter2.js:63
+#: media/js/SelectFilter2.js:77
 msgid "Clear all"
-msgstr ""
+msgstr "Бүгдийг цэвэрлэ"
 
 #: media/js/actions.js:18 media/js/actions.min.js:1
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(sel)s ээс %(cnt)s сонгосон"
+msgstr[1] "%(sel)s ээс %(cnt)s сонгосон"
 
 #: media/js/actions.js:109 media/js/actions.min.js:5
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
 "action, your unsaved changes will be lost."
 msgstr ""
+"Хадгалаагүй өөрчлөлтүүд байна. Энэ үйлдэлийг хийвэл өөрчлөлтүүд устах болно."
 
 #: media/js/actions.js:121 media/js/actions.min.js:6
 msgid ""
@@ -64,6 +67,9 @@ msgid ""
 "individual fields yet. Please click OK to save. You'll need to re-run the "
 "action."
 msgstr ""
+"Та 1 үйлдлийг сонгосон байна, гэвч та өөрийн өөрчлөлтүүдээ тодорхой "
+"талбаруудад нь оруулагүй байна. OK дарж сануулна уу. Энэ үйлдлийг та дахин "
+"хийх шаардлагатай."
 
 #: media/js/actions.js:123 media/js/actions.min.js:6
 msgid ""
@@ -71,73 +77,75 @@ msgid ""
 "fields. You're probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
+"Та 1 үйлдлийг сонгосон байна бас та ямарваа өөрчлөлт оруулсангүй. Та Save "
+"товчлуур биш Go товчлуурыг хайж байгаа бололтой."
 
 #: media/js/calendar.js:24 media/js/dateparse.js:32
 msgid ""
 "January February March April May June July August September October November "
 "December"
-msgstr ""
+msgstr "Хулгана Үхэр Бар Туулай Луу Могой Морь Хонь Бич Тахиа Нохой Гахай"
 
 #: media/js/calendar.js:25
 msgid "S M T W T F S"
-msgstr ""
+msgstr "Ня Да Мя Лх Пү Ба Бя"
 
 #: media/js/collapse.js:9 media/js/collapse.js.py:21
 #: media/js/collapse.min.js:1
 msgid "Show"
-msgstr ""
+msgstr "Үзэх"
 
 #: media/js/collapse.js:16 media/js/collapse.min.js:1
 msgid "Hide"
-msgstr ""
+msgstr "Нуух"
 
 #: media/js/dateparse.js:33
 msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
-msgstr ""
+msgstr "Ням Даваа Мягмар Лхагва Пүрэв Баасан Бямба"
 
 #: media/js/admin/DateTimeShortcuts.js:49
 #: media/js/admin/DateTimeShortcuts.js:84
 msgid "Now"
-msgstr ""
+msgstr "Одоо"
 
 #: media/js/admin/DateTimeShortcuts.js:53
 msgid "Clock"
-msgstr ""
+msgstr "Цаг"
 
 #: media/js/admin/DateTimeShortcuts.js:80
 msgid "Choose a time"
-msgstr ""
+msgstr "Цаг сонгох"
 
 #: media/js/admin/DateTimeShortcuts.js:85
 msgid "Midnight"
-msgstr ""
+msgstr "Шөнө дунд"
 
 #: media/js/admin/DateTimeShortcuts.js:86
 msgid "6 a.m."
-msgstr ""
+msgstr "6 цаг"
 
 #: media/js/admin/DateTimeShortcuts.js:87
 msgid "Noon"
-msgstr ""
+msgstr "Үд дунд"
 
 #: media/js/admin/DateTimeShortcuts.js:91
 #: media/js/admin/DateTimeShortcuts.js:188
 msgid "Cancel"
-msgstr ""
+msgstr "Болих"
 
 #: media/js/admin/DateTimeShortcuts.js:133
 #: media/js/admin/DateTimeShortcuts.js:182
 msgid "Today"
-msgstr ""
+msgstr "Өнөөдөр"
 
 #: media/js/admin/DateTimeShortcuts.js:137
 msgid "Calendar"
-msgstr ""
+msgstr "Хуанли"
 
 #: media/js/admin/DateTimeShortcuts.js:180
 msgid "Yesterday"
-msgstr ""
+msgstr "Өчигдөр"
 
 #: media/js/admin/DateTimeShortcuts.js:184
 msgid "Tomorrow"
-msgstr ""
+msgstr "Маргааш"

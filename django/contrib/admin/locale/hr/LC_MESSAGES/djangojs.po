@@ -1,47 +1,51 @@
-# translation of djangojs.po to Hrvatski jezik
-# This file is distributed under the same license as the Django package.mmmoj testmmmoj test
+# This file is distributed under the same license as the Django package.
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 20:56+0100\n"
-"PO-Revision-Date: 2009-04-13 15:43+0200\n"
-"Last-Translator: Aljosa Mohorovic <aljosa.mohorovic@gmail.com>\n"
-"Language-Team: Hrvatski Jezik <Django-i18n <django-i18n@googlegroups.com>>\n"
+"POT-Creation-Date: 2011-02-28 23:20+0100\n"
+"PO-Revision-Date: 2011-02-22 00:01+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: Croatian <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Vim 7.2\n"
-"Plural-Forms:  nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || "
-"n%100==4 ? 2 : 3);\n"
+"Language: hr\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
+"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
 
-#: media/js/SelectFilter2.js:37
+#: media/js/SelectFilter2.js:45
 #, perl-format
 msgid "Available %s"
 msgstr "Dostupno %s"
 
-#: media/js/SelectFilter2.js:45
+#: media/js/SelectFilter2.js:52
+msgid "Filter"
+msgstr ""
+
+#: media/js/SelectFilter2.js:59
 msgid "Choose all"
 msgstr "Odaberi sve"
 
-#: media/js/SelectFilter2.js:50
+#: media/js/SelectFilter2.js:64
 msgid "Add"
 msgstr "Dodaj"
 
-#: media/js/SelectFilter2.js:52
+#: media/js/SelectFilter2.js:66
 msgid "Remove"
 msgstr "Ukloni"
 
-#: media/js/SelectFilter2.js:57
+#: media/js/SelectFilter2.js:71
 #, perl-format
 msgid "Chosen %s"
 msgstr "Odabrano %s"
 
-#: media/js/SelectFilter2.js:58
+#: media/js/SelectFilter2.js:72
 msgid "Select your choice(s) and click "
 msgstr "Odaberi iz izbora i klikni "
 
-#: media/js/SelectFilter2.js:63
+#: media/js/SelectFilter2.js:77
 msgid "Clear all"
 msgstr "Očisti sve"
 
@@ -58,6 +62,8 @@ msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
 "action, your unsaved changes will be lost."
 msgstr ""
+"Neke promjene nisu spremljene na pojedinim polja za uređivanje. Ako "
+"pokrenete akciju, nespremljene promjene će biti izgubljene."
 
 #: media/js/actions.js:121 media/js/actions.min.js:6
 msgid ""
@@ -65,6 +71,8 @@ msgid ""
 "individual fields yet. Please click OK to save. You'll need to re-run the "
 "action."
 msgstr ""
+"Odabrali ste akciju, ali niste još spremili promjene na pojedinim polja. "
+"Molimo kliknite OK za spremanje. Morat ćete ponovno pokrenuti akciju."
 
 #: media/js/actions.js:123 media/js/actions.min.js:6
 msgid ""
@@ -72,6 +80,8 @@ msgid ""
 "fields. You're probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
+"Odabrali ste akciju, a niste napravili nikakve izmjene na pojedinim poljima. "
+"Vjerojatno tražite gumb Idi umjesto gumb Spremi."
 
 #: media/js/calendar.js:24 media/js/dateparse.js:32
 msgid ""

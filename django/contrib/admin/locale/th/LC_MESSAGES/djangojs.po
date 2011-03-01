@@ -2,50 +2,51 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Django-1.1-rc-1\n"
+"Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 20:56+0100\n"
-"PO-Revision-Date: 2009-07-27 21:47+0700\n"
-"Last-Translator: Kowit Charoenratchatabhan <kowito@felspar.com>\n"
-"Language-Team: Kowit Charoenratchatabhan,Kadsarin Sanjek, Felspar "
-"<kowito@felspar.com>\n"
+"POT-Creation-Date: 2011-02-28 23:20+0100\n"
+"PO-Revision-Date: 2011-02-22 00:01+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: Thai <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Poedit-Language: Thai\n"
-"X-Poedit-Country: THAILAND\n"
-"X-Poedit-SourceCharset: utf-8\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Language: th\n"
+"Plural-Forms: nplurals=1; plural=0\n"
 
-#: media/js/SelectFilter2.js:37
+#: media/js/SelectFilter2.js:45
 #, perl-format
 msgid "Available %s"
 msgstr "%sที่มีอยู่"
 
-#: media/js/SelectFilter2.js:45
+#: media/js/SelectFilter2.js:52
+msgid "Filter"
+msgstr ""
+
+#: media/js/SelectFilter2.js:59
 msgid "Choose all"
 msgstr "เลือกทั้งหมด"
 
-#: media/js/SelectFilter2.js:50
+#: media/js/SelectFilter2.js:64
 msgid "Add"
 msgstr "เพิ่ม"
 
-#: media/js/SelectFilter2.js:52
+#: media/js/SelectFilter2.js:66
 msgid "Remove"
 msgstr "ลบออก"
 
-#: media/js/SelectFilter2.js:57
+#: media/js/SelectFilter2.js:71
 #, perl-format
 msgid "Chosen %s"
 msgstr "%sที่ถูกเลือก"
 
-#: media/js/SelectFilter2.js:58
+#: media/js/SelectFilter2.js:72
 msgid "Select your choice(s) and click "
 msgstr "เลือกและคลิก"
 
-#: media/js/SelectFilter2.js:63
+#: media/js/SelectFilter2.js:77
 msgid "Clear all"
-msgstr "ลบทั้งหมด"
+msgstr "ล้างทั้งหมด"
 
 #: media/js/actions.js:18 media/js/actions.min.js:1
 msgid "%(sel)s of %(cnt)s selected"
@@ -57,6 +58,8 @@ msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
 "action, your unsaved changes will be lost."
 msgstr ""
+"คุณยังไม่ได้บันทึกการเปลี่ยนแปลงในแต่ละฟิลด์ ถ้าคุณเรียกใช้คำสั่ง "
+"ข้อมูลที่ไม่ได้บันทึกการเปลี่ยนแปลงของคุณจะหายไป"
 
 #: media/js/actions.js:121 media/js/actions.min.js:6
 msgid ""
@@ -64,6 +67,8 @@ msgid ""
 "individual fields yet. Please click OK to save. You'll need to re-run the "
 "action."
 msgstr ""
+"คุณได้เลือกคำสั่ง แต่คุณยังไม่ได้บันทึกการเปลี่ยนแปลงของคุณไปยังฟิลด์ กรุณาคลิก OK เพื่อบันทึก "
+"คุณจะต้องเรียกใช้คำสั่งใหม่อีกครั้ง"
 
 #: media/js/actions.js:123 media/js/actions.min.js:6
 msgid ""
@@ -71,6 +76,7 @@ msgid ""
 "fields. You're probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
+"คุณได้เลือกคำสั่งและคุณยังไม่ได้ทำการเปลี่ยนแปลงใด ๆ ในฟิลด์ คุณอาจมองหาปุ่มไปมากกว่าปุ่มบันทึก"
 
 #: media/js/calendar.js:24 media/js/dateparse.js:32
 msgid ""

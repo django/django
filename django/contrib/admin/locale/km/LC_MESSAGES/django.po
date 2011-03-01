@@ -1,31 +1,30 @@
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-20 16:11+0100\n"
-"PO-Revision-Date: 2007-08-10 00:21+0900\n"
-"Last-Translator: Chay Sengtha <sengtha@e-khmer.com>\n"
-"Language-Team: Chay Sengtha <sengtha@e-khmer.com>\n"
+"POT-Creation-Date: 2011-02-28 18:47+0100\n"
+"PO-Revision-Date: 2011-02-22 00:12+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: English <en@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Language: km\n"
+"Plural-Forms: nplurals=1; plural=0\n"
 
 #: actions.py:49
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr ""
 
-#: actions.py:61 options.py:1199
+#: actions.py:61 options.py:1220
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr ""
 
-#: actions.py:63 options.py:1201
+#: actions.py:63 options.py:1222
 msgid "Are you sure?"
 msgstr "តើលោកអ្នកប្រាកដទេ?"
 
@@ -43,39 +42,39 @@ msgstr ""
 "<h3>ដោយ %s:</h3>\n"
 "<ul>\n"
 
-#: filterspecs.py:91 filterspecs.py:113 filterspecs.py:175 filterspecs.py:213
+#: filterspecs.py:104 filterspecs.py:136 filterspecs.py:205 filterspecs.py:257
 msgid "All"
 msgstr "ទាំងអស់"
 
-#: filterspecs.py:137
+#: filterspecs.py:164
 msgid "Any date"
 msgstr "កាល​បរិច្ឆេទណាមួយ"
 
-#: filterspecs.py:138
+#: filterspecs.py:165
 msgid "Today"
 msgstr "ថ្ងៃនេះ"
 
-#: filterspecs.py:141
+#: filterspecs.py:168
 msgid "Past 7 days"
 msgstr "៧​ថ្ងៃ​កន្លង​មក"
 
-#: filterspecs.py:144
+#: filterspecs.py:171
 msgid "This month"
 msgstr "ខែ​នេះ"
 
-#: filterspecs.py:146
+#: filterspecs.py:173
 msgid "This year"
 msgstr "ឆ្នាំ​នេះ"
 
-#: filterspecs.py:175
+#: filterspecs.py:205
 msgid "Yes"
 msgstr "យល់ព្រម"
 
-#: filterspecs.py:175
+#: filterspecs.py:205
 msgid "No"
 msgstr "មិនយល់ព្រម"
 
-#: filterspecs.py:182
+#: filterspecs.py:216
 msgid "Unknown"
 msgstr "មិន​ដឹង"
 
@@ -86,9 +85,8 @@ msgid ""
 msgstr "សូមបំពេញ ឈ្មោះសមាជិក និង ពាក្យសំងាត់ ។ "
 
 #: forms.py:18
-#, fuzzy
 msgid "Please log in again, because your session has expired."
-msgstr "សូមពិនិត្យចូលម្តងទៀត ។"
+msgstr ""
 
 #: forms.py:37
 #, python-format
@@ -96,9 +94,8 @@ msgid "Your e-mail address is not your username. Try '%s' instead."
 msgstr "អ៊ីមែលរបស់លោកអ្នក មិនអាចធ្វើជា ឈ្មោះសមាជិកបានទេ ។ សូមសាកល្បងជាមួយ '%s'។"
 
 #: helpers.py:19
-#, fuzzy
 msgid "Action:"
-msgstr "សកម្មភាព"
+msgstr ""
 
 #: models.py:19
 msgid "action time"
@@ -129,58 +126,57 @@ msgid "log entries"
 msgstr "កំណត់ហេតុ"
 
 #: options.py:148 options.py:163
-#, fuzzy
 msgid "None"
-msgstr "មិនយល់ព្រម"
+msgstr ""
 
-#: options.py:620
+#: options.py:628
 #, python-format
 msgid "Changed %s."
 msgstr "បានផ្លាស់ប្តូរ %s"
 
-#: options.py:620 options.py:630
+#: options.py:628 options.py:638
 msgid "and"
 msgstr "និង"
 
-#: options.py:625
-#, fuzzy, python-format
+#: options.py:633
+#, python-format
 msgid "Added %(name)s \"%(object)s\"."
-msgstr "បន្ថែម %(name)s"
+msgstr ""
 
-#: options.py:629
+#: options.py:637
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr ""
 
-#: options.py:634
-#, fuzzy, python-format
+#: options.py:642
+#, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
-msgstr "ជាប់​ទាក់ទង​ជាមួយ​នឹងកម្មវិធី​  `%s.%s` "
+msgstr ""
 
-#: options.py:638
+#: options.py:646
 msgid "No fields changed."
 msgstr "ពុំមានទិន្នន័យត្រូវបានផ្លាស់ប្តូរ។"
 
-#: options.py:710
+#: options.py:718
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "ឈ្មោះកម្មវិធី %(name)s \"%(obj)s\" បានបញ្ជូលដោយជោគជ័យ​។"
 
-#: options.py:714 options.py:747
+#: options.py:722 options.py:762
 msgid "You may edit it again below."
 msgstr "សូមសាកល្បងកែប្រែម្តងទៀត។"
 
-#: options.py:724 options.py:757
+#: options.py:732 options.py:772
 #, python-format
 msgid "You may add another %s below."
 msgstr "លោកអ្នកអាចបន្ថែម  %s ផ្សេងទៀតដូចខាងក្រោម។"
 
-#: options.py:745
+#: options.py:760
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "កម្មវិធីឈ្មោះ %(name)s \"%(obj)s\" ត្រូវបានផ្លាស់ប្តូរដោយជោគជ័យ។"
 
-#: options.py:753
+#: options.py:768
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
@@ -188,77 +184,76 @@ msgstr ""
 "ឈ្មោះកម្មវីធី %(name)s \"%(obj)s\" "
 "ត្រូវបានបន្ថែមដោយជោគជ័យ។ លោកអ្នកអាចផ្លាស់ប្តូរម្តងទៀតនៅខាងក្រោម។"
 
-#: options.py:807 options.py:1065
+#: options.py:828 options.py:1086
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr ""
 
-#: options.py:826
-#, fuzzy
+#: options.py:847
 msgid "No action selected."
-msgstr "ពេលវេលាប្រតិបត្តិការ"
+msgstr ""
 
-#: options.py:907
+#: options.py:928
 #, python-format
 msgid "Add %s"
 msgstr "បន្ថែម %s"
 
-#: options.py:933 options.py:1174
+#: options.py:954 options.py:1195
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr ""
 
-#: options.py:998
+#: options.py:1019
 #, python-format
 msgid "Change %s"
 msgstr "ផ្លាស់ប្តូរ %s"
 
-#: options.py:1045
+#: options.py:1066
 msgid "Database error"
 msgstr "ទិន្នន័យមូលដ្ឋានមានបញ្ហា"
 
-#: options.py:1107
-#, fuzzy, python-format
+#: options.py:1128
+#, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
-msgstr[0] "កម្មវិធីឈ្មោះ %(name)s \"%(obj)s\" ត្រូវបានផ្លាស់ប្តូរដោយជោគជ័យ។"
+msgstr[0] ""
 
-#: options.py:1134
+#: options.py:1155
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] ""
 
-#: options.py:1139
+#: options.py:1160
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr ""
 
-#: options.py:1190
+#: options.py:1211
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "ឈ្មោះកម្មវិធី %(name)s \"%(obj)s\" ត្រូវបានលប់ដោយជោគជ័យ។"
 
-#: options.py:1235
+#: options.py:1256
 #, python-format
 msgid "Change history: %s"
 msgstr "សកម្មភាពផ្លាស់ប្តូរកន្លងមក : %s"
 
-#: sites.py:312 templates/admin/login.html:42
+#: sites.py:319 templates/admin/login.html:42
 #: templates/registration/password_reset_complete.html:14
 #: views/decorators.py:29
 msgid "Log in"
 msgstr "ពិនិត្យចូល"
 
-#: sites.py:368
+#: sites.py:375
 msgid "Site administration"
 msgstr "ទំព័រគ្រប់គ្រង"
 
-#: sites.py:412
-#, fuzzy, python-format
+#: sites.py:419
+#, python-format
 msgid "%s administration"
-msgstr "ទំព័រគ្រប់គ្រង"
+msgstr ""
 
 #: widgets.py:75
 msgid "Date:"
@@ -268,15 +263,13 @@ msgstr "កាលបរិច្ឆេទ"
 msgid "Time:"
 msgstr "ម៉ោង"
 
-#: widgets.py:121
-#, fuzzy
+#: widgets.py:140
 msgid "Lookup"
-msgstr "ចាកចេញ"
+msgstr ""
 
-#: widgets.py:237
-#, fuzzy
+#: widgets.py:246
 msgid "Add Another"
-msgstr "បន្ថែមសមាជិក"
+msgstr ""
 
 #: templates/admin/404.html:4 templates/admin/404.html.py:8
 msgid "Page not found"
@@ -339,9 +332,8 @@ msgid "Select all %(total_count)s %(module_name)s"
 msgstr ""
 
 #: templates/admin/actions.html:13
-#, fuzzy
 msgid "Clear selection"
-msgstr "ការ​លប់​ដោយអ្នក​គ្រប់គ្រង"
+msgstr ""
 
 #: templates/admin/app_index.html:10 templates/admin/index.html:19
 #, python-format
@@ -398,10 +390,9 @@ msgstr "មើលនៅលើគេហទំព័រដោយផ្ទាល់
 #: templates/admin/login.html:17
 #: templates/admin/auth/user/change_password.html:25
 #: templates/registration/password_change_form.html:16
-#, fuzzy
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
-msgstr[0] "សូមកែប្រែកំហុសខាងក្រោម ។"
+msgstr[0] ""
 
 #: templates/admin/change_list.html:64
 #, python-format
@@ -428,13 +419,11 @@ msgstr ""
 "ព័ន្ធបាត់បង់ ។ ក៏ប៉ន្តែលោកអ្នក​ពុំមាន​សិទ្ធិលប់​កម្មវិធី​ប្រភេទនេះទេ។"
 
 #: templates/admin/delete_confirmation.html:25
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
 "following protected related objects:"
 msgstr ""
-"ការលប់ %(object_name)s '%(escaped_object)s' អាចធ្វើអោយ​កម្មវិធីដែលពាក់​"
-"ព័ន្ធបាត់បង់ ។ ក៏ប៉ន្តែលោកអ្នក​ពុំមាន​សិទ្ធិលប់​កម្មវិធី​ប្រភេទនេះទេ។"
 
 #: templates/admin/delete_confirmation.html:33
 #, python-format
@@ -455,32 +444,26 @@ msgid "Delete multiple objects"
 msgstr ""
 
 #: templates/admin/delete_selected_confirmation.html:16
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would result in deleting related "
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
 msgstr ""
-"ការលប់ %(object_name)s '%(escaped_object)s' អាចធ្វើអោយ​កម្មវិធីដែលពាក់​"
-"ព័ន្ធបាត់បង់ ។ ក៏ប៉ន្តែលោកអ្នក​ពុំមាន​សិទ្ធិលប់​កម្មវិធី​ប្រភេទនេះទេ។"
 
 #: templates/admin/delete_selected_confirmation.html:24
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would require deleting the following "
 "protected related objects:"
 msgstr ""
-"ការលប់ %(object_name)s '%(escaped_object)s' អាចធ្វើអោយ​កម្មវិធីដែលពាក់​"
-"ព័ន្ធបាត់បង់ ។ ក៏ប៉ន្តែលោកអ្នក​ពុំមាន​សិទ្ធិលប់​កម្មវិធី​ប្រភេទនេះទេ។"
 
 #: templates/admin/delete_selected_confirmation.html:32
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Are you sure you want to delete the selected %(objects_name)s? All of the "
 "following objects and their related items will be deleted:"
 msgstr ""
-"តើលោកអ្នកប្រាកដជាចង់លប់ %(object_name)s \"%(escaped_object)s\"? ការលប់ %"
-"(object_name)s '%(escaped_object)s' អាចធ្វើអោយ​កម្មវិធីដែលពាក់​ព័ន្ធបាត់បង់។"
 
 #: templates/admin/filter.html:2
 #, python-format
@@ -513,9 +496,8 @@ msgid "None available"
 msgstr "គ្មាន"
 
 #: templates/admin/index.html:72
-#, fuzzy
 msgid "Unknown content"
-msgstr "មិន​ដឹង"
+msgstr ""
 
 #: templates/admin/invalid_setup.html:7
 msgid ""
@@ -562,9 +544,8 @@ msgid "Save"
 msgstr "រក្សាទុក"
 
 #: templates/admin/search_form.html:8
-#, fuzzy
 msgid "Search"
-msgstr "មិនា"
+msgstr ""
 
 #: templates/admin/search_form.html:10
 #, python-format
@@ -620,20 +601,18 @@ msgstr "សូមបំពេញពាក្យសំងាត់ដូចខា
 
 #: templates/admin/edit_inline/stacked.html:67
 #: templates/admin/edit_inline/tabular.html:113
-#, fuzzy, python-format
+#, python-format
 msgid "Add another %(verbose_name)s"
-msgstr "The %(verbose_name)s​ បានលប់។ "
+msgstr ""
 
 #: templates/admin/edit_inline/stacked.html:70
 #: templates/admin/edit_inline/tabular.html:116
-#, fuzzy
 msgid "Remove"
-msgstr "ព្រឹត្តិការណ៍ និង ផលិតផលថ្មីៗ"
+msgstr ""
 
 #: templates/admin/edit_inline/tabular.html:15
-#, fuzzy
 msgid "Delete?"
-msgstr "លប់"
+msgstr ""
 
 #: templates/registration/logged_out.html:8
 msgid "Thanks for spending some quality time with the Web site today."
@@ -666,14 +645,12 @@ msgid ""
 msgstr "សូមបំពេញពាក្យសំងាត់ចាស់របស់លោកអ្នក។ ដើម្បីសុវត្ថភាព សូមបំពេញពាក្យសំងាត់ថ្មីខាងក្រោមពីរដង។"
 
 #: templates/registration/password_change_form.html:28
-#, fuzzy
 msgid "Old password"
-msgstr "ពាក្សំងាត់ចាស់"
+msgstr ""
 
 #: templates/registration/password_change_form.html:33
-#, fuzzy
 msgid "New password"
-msgstr "ពាក្យសំងាត់ថ្មី"
+msgstr ""
 
 #: templates/registration/password_change_form.html:44
 #: templates/registration/password_reset_confirm.html:21
@@ -691,30 +668,26 @@ msgstr "ពាក្យសំងាត់បានកំណត់សារជា
 
 #: templates/registration/password_reset_complete.html:6
 #: templates/registration/password_reset_complete.html:10
-#, fuzzy
 msgid "Password reset complete"
-msgstr "ពាក្យសំងាត់បានកំណត់សារជាថ្មី"
+msgstr ""
 
 #: templates/registration/password_reset_complete.html:12
 msgid "Your password has been set.  You may go ahead and log in now."
 msgstr ""
 
 #: templates/registration/password_reset_confirm.html:4
-#, fuzzy
 msgid "Password reset confirmation"
-msgstr "ពាក្យសំងាត់បានកំណត់សារជាថ្មី"
+msgstr ""
 
 #: templates/registration/password_reset_confirm.html:12
-#, fuzzy
 msgid "Enter new password"
-msgstr "ពាក្យសំងាត់ថ្មី"
+msgstr ""
 
 #: templates/registration/password_reset_confirm.html:14
-#, fuzzy
 msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
-msgstr "សូមបំពេញពាក្យសំងាត់ចាស់របស់លោកអ្នក។ ដើម្បីសុវត្ថភាព សូមបំពេញពាក្យសំងាត់ថ្មីខាងក្រោមពីរដង។"
+msgstr ""
 
 #: templates/registration/password_reset_confirm.html:18
 msgid "New password:"
@@ -725,9 +698,8 @@ msgid "Confirm password:"
 msgstr "បំពេញពាក្យសំងាត់ថ្មីម្តងទៀត"
 
 #: templates/registration/password_reset_confirm.html:26
-#, fuzzy
 msgid "Password reset unsuccessful"
-msgstr "ពាក្យសំងាត់បានផ្លាស់ប្តូរដោយជោគជ័យ"
+msgstr ""
 
 #: templates/registration/password_reset_confirm.html:28
 msgid ""
@@ -741,45 +713,40 @@ msgid "Password reset successful"
 msgstr "ពាក្យសំងាត់បានផ្លាស់ប្តូរដោយជោគជ័យ"
 
 #: templates/registration/password_reset_done.html:12
-#, fuzzy
 msgid ""
 "We've e-mailed you instructions for setting your password to the e-mail "
 "address you submitted. You should be receiving it shortly."
 msgstr ""
-"យើងខ្ញុំបានបញ្ជូន​ពាក្យសំងាត់ទៅកាន់​អ៊ីម៉ែលរបស់លោកអ្នករួចហើយ។ លោកអ្នកនឹងបានទទួលនៅពេលបន្តិចទៀតនេះ។"
 
 #: templates/registration/password_reset_email.html:2
-msgid "You're receiving this e-mail because you requested a password reset"
+#, fuzzy, python-format
+msgid ""
+"You're receiving this e-mail because you requested a password reset for your "
+"user account at %(site_name)s."
 msgstr "លោកអ្នកទទួលអ៊ីម៉ែលនេះដោយសារលោកអ្នកកំណត់ពាក្យសំងាត់នេះសារជាថ្មី"
 
-#: templates/registration/password_reset_email.html:3
-#, python-format
-msgid "for your user account at %(site_name)s"
-msgstr "សំរាប់សមាជិកនៅឯគេហទំព័រ %(site_name)s"
-
-#: templates/registration/password_reset_email.html:5
+#: templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
 msgstr ""
 
-#: templates/registration/password_reset_email.html:9
+#: templates/registration/password_reset_email.html:8
 msgid "Your username, in case you've forgotten:"
 msgstr "ឈ្មោះជាសមាជិកក្នុងករណីភ្លេច:"
 
-#: templates/registration/password_reset_email.html:11
+#: templates/registration/password_reset_email.html:10
 msgid "Thanks for using our site!"
 msgstr "សូមអរគុណដែលបានប្រើប្រាស់សេវាកម្មរបស់យើងខ្ញុំ"
 
-#: templates/registration/password_reset_email.html:13
+#: templates/registration/password_reset_email.html:12
 #, python-format
 msgid "The %(site_name)s team"
 msgstr "ក្រុមរបស់គេហទំព័រ %(site_name)s"
 
 #: templates/registration/password_reset_form.html:12
-#, fuzzy
 msgid ""
 "Forgotten your password? Enter your e-mail address below, and we'll e-mail "
 "instructions for setting a new one."
-msgstr "តើលោកអ្នកភ្លេចពាក្យសំងាត់រឺ? សូមបំពេញអ៊ីម៉ែលខាងក្រោម យើងខ្ញុំនឹងកំណត់ពាក្យសំងាត់របស់លោកអ្នកសារឡើងវិញ ហើយបញ្ជូនទៅកាន់អ៊ីម៉ែលរបស់លោកអ្នក។"
+msgstr ""
 
 #: templates/registration/password_reset_form.html:16
 msgid "E-mail address:"
@@ -789,16 +756,16 @@ msgstr "អ៊ីមែល"
 msgid "Reset my password"
 msgstr "កំណត់ពាក្យសំងាត់សារជាថ្មី"
 
-#: templatetags/admin_list.py:273
+#: templatetags/admin_list.py:288
 msgid "All dates"
 msgstr "កាលបរិច្ឆេទទាំងអស់"
 
-#: views/main.py:68
+#: views/main.py:66
 #, python-format
 msgid "Select %s"
 msgstr "ជ្រើសរើស %s"
 
-#: views/main.py:68
+#: views/main.py:66
 #, python-format
 msgid "Select %s to change"
 msgstr "ជ្រើសរើស %s ដើម្បីផ្លាស់ប្តូរ"

@@ -1,59 +1,66 @@
-# Spanish translation for the django-admin JS files.
-# Copyright (C) 2008, The Django Project
-# This file is distributed under the same license as the django package.
+# This file is distributed under the same license as the Django package.
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 20:56+0100\n"
-"PO-Revision-Date: 2008-03-30 00:54+0100\n"
-"Last-Translator: Django Spanish Group <django-i18n@googlegroups.com>\n"
-"Language-Team: Spanish <django-i18n@googlegroups.com>\n"
+"POT-Creation-Date: 2011-02-28 23:20+0100\n"
+"PO-Revision-Date: 2011-02-22 00:01+0000\n"
+"Last-Translator: aaloy <antoni.aloy@trespams.com>\n"
+"Language-Team: Spanish (Castilian) <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: es\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
-#: media/js/SelectFilter2.js:37
+#: media/js/SelectFilter2.js:45
 #, perl-format
 msgid "Available %s"
 msgstr "%s Disponibles"
 
-#: media/js/SelectFilter2.js:45
+#: media/js/SelectFilter2.js:52
+msgid "Filter"
+msgstr ""
+
+#: media/js/SelectFilter2.js:59
 msgid "Choose all"
 msgstr "Selecciona todos"
 
-#: media/js/SelectFilter2.js:50
+#: media/js/SelectFilter2.js:64
 msgid "Add"
 msgstr "Agregar"
 
-#: media/js/SelectFilter2.js:52
+#: media/js/SelectFilter2.js:66
 msgid "Remove"
 msgstr "Remover"
 
-#: media/js/SelectFilter2.js:57
+#: media/js/SelectFilter2.js:71
 #, perl-format
 msgid "Chosen %s"
 msgstr "%s Elegidos"
 
-#: media/js/SelectFilter2.js:58
+#: media/js/SelectFilter2.js:72
 msgid "Select your choice(s) and click "
 msgstr "Haz tus elecciones y da click en "
 
-#: media/js/SelectFilter2.js:63
+#: media/js/SelectFilter2.js:77
 msgid "Clear all"
 msgstr "Elimina todos"
 
 #: media/js/actions.js:18 media/js/actions.min.js:1
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "one: %(sel)s de %(cnt)s seleccionado"
+msgstr[1] "other: %(sel)s de  %(cnt)s seleccionados"
 
 #: media/js/actions.js:109 media/js/actions.min.js:5
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
 "action, your unsaved changes will be lost."
 msgstr ""
+"Tienes cambios sin guardar en campos editables individuales. Si ejecutas una "
+"acción, los cambios no guardados se perderán."
 
 #: media/js/actions.js:121 media/js/actions.min.js:6
 msgid ""
@@ -61,6 +68,9 @@ msgid ""
 "individual fields yet. Please click OK to save. You'll need to re-run the "
 "action."
 msgstr ""
+"Has seleccionado una acción, pero no has guardado los cambios en los campos "
+"individuales todavía. Pulsa OK para guardar. Tendrás que volver a ejecutar "
+"la acción."
 
 #: media/js/actions.js:123 media/js/actions.min.js:6
 msgid ""
@@ -68,6 +78,9 @@ msgid ""
 "fields. You're probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
+"Has seleccionado una acción y no has hecho ningún cambio en campos "
+"individuales. Probablemente estés buscando el botón Ejecutar en lugar del "
+"botón Guardar."
 
 #: media/js/calendar.js:24 media/js/dateparse.js:32
 msgid ""
