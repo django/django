@@ -254,12 +254,15 @@ class ChangeList(object):
                 return "%s__icontains" % field_name
 
         if self.search_fields and self.query:
+            orm_lookups = [construct_search(str(search_field))
+                           for search_field in self.search_fields]
             for bit in self.query.split():
-                or_queries = [models.Q(**{construct_search(str(field_name)): bit}) for field_name in self.search_fields]
+                or_queries = [models.Q(**{orm_lookup: bit})
+                              for orm_lookup in orm_lookups]
                 qs = qs.filter(reduce(operator.or_, or_queries))
             if not use_distinct:
-                for search_field in self.search_fields:
-                    field_name = search_field.split('__', 1)[0]
+                for search_spec in orm_lookups:
+                    field_name = search_spec.split('__', 1)[0]
                     f = self.lookup_opts.get_field_by_name(field_name)[0]
                     if hasattr(f, 'rel') and isinstance(f.rel, models.ManyToManyRel):
                         use_distinct = True

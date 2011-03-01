@@ -1288,11 +1288,11 @@ class SecureViewTests(TestCase):
         user_ctype = ContentType.objects.get_for_model(User)
         user = User.objects.get(username='super')
         shortcut_url = "/test_admin/admin/r/%s/%s/" % (user_ctype.pk, user.pk)
-        
+
         # Not logged in: we should see the login page.
         response = self.client.get(shortcut_url, follow=False)
         self.assertTemplateUsed(response, 'admin/login.html')
-        
+
         # Logged in? Redirect.
         self.client.login(username='super', password='secret')
         response = self.client.get(shortcut_url, follow=False)
@@ -1470,7 +1470,7 @@ class AdminViewListEditable(TestCase):
 
             "_save": "Save",
         }
-        self.client.post('/test_admin/admin/admin_views/person/?q=mauchly', data)
+        self.client.post('/test_admin/admin/admin_views/person/?q=john', data)
 
         self.assertEqual(Person.objects.get(name="John Mauchly").alive, False)
 
@@ -1680,7 +1680,8 @@ class AdminViewListEditable(TestCase):
 
 
 class AdminSearchTest(TestCase):
-    fixtures = ['admin-views-users','multiple-child-classes']
+    fixtures = ['admin-views-users', 'multiple-child-classes',
+                'admin-views-person']
 
     def setUp(self):
         self.client.login(username='super', password='secret')
@@ -1702,6 +1703,26 @@ class AdminSearchTest(TestCase):
         response = self.client.get('/test_admin/admin/auth/user/?q=joe&%s=username' % TO_FIELD_VAR)
         self.assertContains(response, "\n1 user\n")
         self.assertContains(response, '<input type="hidden" name="t" value="username"/>')
+
+    def test_exact_matches(self):
+        response = self.client.get('/test_admin/admin/admin_views/recommendation/?q=bar')
+        # confirm the search returned one object
+        self.assertContains(response, "\n1 recommendation\n")
+
+        response = self.client.get('/test_admin/admin/admin_views/recommendation/?q=ba')
+        # confirm the search returned zero objects
+        self.assertContains(response, "\n0 recommendations\n")
+
+    def test_beginning_matches(self):
+        response = self.client.get('/test_admin/admin/admin_views/person/?q=Gui')
+        # confirm the search returned one object
+        self.assertContains(response, "\n1 person\n")
+        self.assertContains(response, "Guido")
+
+        response = self.client.get('/test_admin/admin/admin_views/person/?q=uido')
+        # confirm the search returned zero objects
+        self.assertContains(response, "\n0 persons\n")
+        self.assertNotContains(response, "Guido")
 
 
 class AdminInheritedInlinesTest(TestCase):

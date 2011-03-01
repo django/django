@@ -258,7 +258,7 @@ class PersonAdmin(admin.ModelAdmin):
     list_display = ('name', 'gender', 'alive')
     list_editable = ('gender', 'alive')
     list_filter = ('gender',)
-    search_fields = (u'name',)
+    search_fields = ('^name',)
     ordering = ["id"]
     save_as = True
 
@@ -445,7 +445,7 @@ class Recommendation(Title):
     recommender = models.ForeignKey(Recommender)
 
 class RecommendationAdmin(admin.ModelAdmin):
-    search_fields = ('titletranslation__text', 'recommender__titletranslation__text',)
+    search_fields = ('=titletranslation__text', '=recommender__titletranslation__text',)
 
 class Collector(models.Model):
     name = models.CharField(max_length=100)
