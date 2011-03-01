@@ -3,6 +3,7 @@
 from django.conf import settings
 from django.http import HttpRequest
 from django.middleware.common import CommonMiddleware
+from django.middleware.http import ConditionalGetMiddleware
 from django.test import TestCase
 
 
@@ -247,3 +248,89 @@ class CommonMiddlewareTest(TestCase):
       self.assertEquals(r.status_code, 301)
       self.assertEquals(r['Location'],
                         'http://www.testserver/middleware/customurlconf/slash/')
+
+class ConditionalGetMiddlewareTest(TestCase):
+    urls = 'regressiontests.middleware.cond_get_urls'
+    def setUp(self):
+        self.req = HttpRequest()
+        self.req.META = {
+            'SERVER_NAME': 'testserver',
+            'SERVER_PORT': 80,
+        }
+        self.req.path = self.req.path_info = "/"
+        self.resp = self.client.get(self.req.path)
+
+    # Tests for the Date header
+
+    def test_date_header_added(self):
+        self.assertFalse('Date' in self.resp)
+        self.resp = ConditionalGetMiddleware().process_response(self.req, self.resp)
+        self.assertTrue('Date' in self.resp)
+
+    # Tests for the Content-Length header
+
+    def test_content_length_header_added(self):
+        content_length = len(self.resp.content)
+        self.assertFalse('Content-Length' in self.resp)
+        self.resp = ConditionalGetMiddleware().process_response(self.req, self.resp)
+        self.assertTrue('Content-Length' in self.resp)
+        self.assertEqual(int(self.resp['Content-Length']), content_length)
+
+    def test_content_length_header_not_changed(self):
+        bad_content_length = len(self.resp.content) + 10
+        self.resp['Content-Length'] = bad_content_length
+        self.resp = ConditionalGetMiddleware().process_response(self.req, self.resp)
+        self.assertEqual(int(self.resp['Content-Length']), bad_content_length)
+
+    # Tests for the ETag header
+
+    def test_if_none_match_and_no_etag(self):
+        self.req.META['HTTP_IF_NONE_MATCH'] = 'spam'
+        self.resp = ConditionalGetMiddleware().process_response(self.req, self.resp)
+        self.assertEquals(self.resp.status_code, 200)
+
+    def test_no_if_none_match_and_etag(self):
+        self.resp['ETag'] = 'eggs'
+        self.resp = ConditionalGetMiddleware().process_response(self.req, self.resp)
+        self.assertEquals(self.resp.status_code, 200)
+
+    def test_if_none_match_and_same_etag(self):
+        self.req.META['HTTP_IF_NONE_MATCH'] = self.resp['ETag'] = 'spam'
+        self.resp = ConditionalGetMiddleware().process_response(self.req, self.resp)
+        self.assertEquals(self.resp.status_code, 304)
+
+    def test_if_none_match_and_different_etag(self):
+        self.req.META['HTTP_IF_NONE_MATCH'] = 'spam'
+        self.resp['ETag'] = 'eggs'
+        self.resp = ConditionalGetMiddleware().process_response(self.req, self.resp)
+        self.assertEquals(self.resp.status_code, 200)
+
+    # Tests for the Last-Modified header
+
+    def test_if_modified_since_and_no_last_modified(self):
+        self.req.META['HTTP_IF_MODIFIED_SINCE'] = 'Sat, 12 Feb 2011 17:38:44 GMT'
+        self.resp = ConditionalGetMiddleware().process_response(self.req, self.resp)
+        self.assertEquals(self.resp.status_code, 200)
+
+    def test_no_if_modified_since_and_last_modified(self):
+        self.resp['Last-Modified'] = 'Sat, 12 Feb 2011 17:38:44 GMT'
+        self.resp = ConditionalGetMiddleware().process_response(self.req, self.resp)
+        self.assertEquals(self.resp.status_code, 200)
+
+    def test_if_modified_since_and_same_last_modified(self):
+        self.req.META['HTTP_IF_MODIFIED_SINCE'] = 'Sat, 12 Feb 2011 17:38:44 GMT'
+        self.resp['Last-Modified'] = 'Sat, 12 Feb 2011 17:38:44 GMT'
+        self.resp = ConditionalGetMiddleware().process_response(self.req, self.resp)
+        self.assertEquals(self.resp.status_code, 304)
+
+    def test_if_modified_since_and_last_modified_in_the_past(self):
+        self.req.META['HTTP_IF_MODIFIED_SINCE'] = 'Sat, 12 Feb 2011 17:38:44 GMT'
+        self.resp['Last-Modified'] = 'Sat, 12 Feb 2011 17:35:44 GMT'
+        self.resp = ConditionalGetMiddleware().process_response(self.req, self.resp)
+        self.assertEquals(self.resp.status_code, 304)
+
+    def test_if_modified_since_and_last_modified_in_the_future(self):
+        self.req.META['HTTP_IF_MODIFIED_SINCE'] = 'Sat, 12 Feb 2011 17:38:44 GMT'
+        self.resp['Last-Modified'] = 'Sat, 12 Feb 2011 17:41:44 GMT'
+        self.resp = ConditionalGetMiddleware().process_response(self.req, self.resp)
+        self.assertEquals(self.resp.status_code, 200)

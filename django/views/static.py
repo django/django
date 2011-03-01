@@ -9,12 +9,11 @@ import posixpath
 import re
 import stat
 import urllib
-from email.Utils import parsedate_tz, mktime_tz
 
 from django.template import loader
 from django.http import Http404, HttpResponse, HttpResponseRedirect, HttpResponseNotModified
 from django.template import Template, Context, TemplateDoesNotExist
-from django.utils.http import http_date
+from django.utils.http import http_date, parse_http_date
 
 def serve(request, path, document_root=None, show_indexes=False):
     """
@@ -128,10 +127,7 @@ def was_modified_since(header=None, mtime=0, size=0):
             raise ValueError
         matches = re.match(r"^([^;]+)(; length=([0-9]+))?$", header,
                            re.IGNORECASE)
-        header_date = parsedate_tz(matches.group(1))
-        if header_date is None:
-            raise ValueError
-        header_mtime = mktime_tz(header_date)
+        header_mtime = parse_http_date(matches.group(1))
         header_len = matches.group(3)
         if header_len and int(header_len) != size:
             raise ValueError
