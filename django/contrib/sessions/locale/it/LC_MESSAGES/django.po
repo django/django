@@ -1,20 +1,18 @@
-# translation of django.po to Italian
-# Italian translation of Django.
-# Copyright (C) 2006 the Lawrence Journal-World
 # This file is distributed under the same license as the Django package.
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:30+0100\n"
-"PO-Revision-Date: 2010-05-10 14:44+0200\n"
-"Last-Translator: Nicola Larosa <nico@tekNico.net>\n"
-"Language-Team: Italian <django-it@googlegroups.com>\n"
+"POT-Creation-Date: 2011-03-01 00:48+0100\n"
+"PO-Revision-Date: 2011-02-22 00:12+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: Italian <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
-"X-Generator: KBabel 1.11.4\n"
+"Language: it\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: models.py:41
 msgid "session key"

@@ -1,21 +1,19 @@
-# Django Latvian translation.
-# Copyright (C) 2008 THE Django'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the Django package.
-#
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:30+0100\n"
-"PO-Revision-Date: 2010-05-10 20:18+0200\n"
-"Last-Translator: Reinis Veips <reinis.veips@wot.lv>\n"
-"Language-Team: Latvian translators' team <reinis.veips@wot.lv>\n"
+"POT-Creation-Date: 2011-03-01 00:48+0100\n"
+"PO-Revision-Date: 2011-02-22 00:12+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: Latvian <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: lv\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : "
-"2);\n"
+"2)\n"
 
 #: models.py:41
 msgid "session key"
