@@ -1,24 +1,19 @@
-# Translation of django.po to German
-#
-# Copyright (C) 2005-2009,
-# This file is distributed under the same license as the django package.
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:29+0100\n"
-"PO-Revision-Date: 2010-10-10 00:58+0200\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: \n"
+"POT-Creation-Date: 2011-03-01 00:42+0100\n"
+"PO-Revision-Date: 2011-02-22 00:10+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: German <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Poedit-Language: German\n"
-"X-Poedit-Country: GERMANY\n"
-"X-Poedit-SourceCharset: utf-8\n"
+"Language: de\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
-#: tests/base.py:114
+#: tests/base.py:117
 msgid "lazy message"
 msgstr "Lazy Nachricht"

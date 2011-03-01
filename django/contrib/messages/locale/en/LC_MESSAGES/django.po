@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:29+0100\n"
+"POT-Creation-Date: 2011-03-01 00:42+0100\n"
 "PO-Revision-Date: 2010-05-13 15:35+0200\n"
 "Last-Translator: Django team\n"
 "Language-Team: English <en@li.org>\n"
@@ -12,6 +12,6 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: tests/base.py:114
+#: tests/base.py:117
 msgid "lazy message"
 msgstr ""

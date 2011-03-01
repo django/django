@@ -1,11 +1,11 @@
 # This file is distributed under the same license as the Django package.
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:29+0100\n"
-"PO-Revision-Date: 2011-02-06 05:56+0000\n"
+"POT-Creation-Date: 2011-03-01 00:42+0100\n"
+"PO-Revision-Date: 2011-02-22 00:10+0000\n"
 "Last-Translator: AbeEstrada <abraham.estrada@gmail.com>\n"
 "Language-Team: Spanish (Mexican) <None>\n"
 "MIME-Version: 1.0\n"
@@ -14,6 +14,6 @@ msgstr ""
 "Language: es_MX\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
-#: tests/base.py:114
+#: tests/base.py:117
 msgid "lazy message"
-msgstr "mensaje de flojos"
+msgstr "mensaje flojo"

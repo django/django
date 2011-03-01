@@ -1,23 +1,19 @@
-# Translation of django.po to Galego
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:29+0100\n"
-"PO-Revision-Date: 2007-05-28 17:29+0200\n"
-"Last-Translator: Afonso Fernández Nogueira <fonzzo.django@gmail.com>\n"
-"Language-Team: Galego\n"
+"POT-Creation-Date: 2011-03-01 00:42+0100\n"
+"PO-Revision-Date: 2011-02-28 23:41+0000\n"
+"Last-Translator: Django team\n"
+"Language-Team: English <en@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Poedit-Language: Galician\n"
-"X-Poedit-SourceCharset: utf-8\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: gl\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
-#: tests/base.py:114
-#, fuzzy
+#: tests/base.py:117
 msgid "lazy message"
-msgstr "mensaxe"
+msgstr ""

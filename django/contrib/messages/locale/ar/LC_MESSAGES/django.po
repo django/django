@@ -1,24 +1,20 @@
-# translation of django.po to Arabic
-# This file is distributed under the same license as the django package.
+# This file is distributed under the same license as the Django package.
 #
-# Ossama M. Khayat <okhayat@yahoo.com>, 2009, 2010.
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:29+0100\n"
-"PO-Revision-Date: 2010-05-12 11:20+0300\n"
-"Last-Translator: Ossama M. Khayat <okhayat@yahoo.com>\n"
-"Language-Team: Arabic <support@arabeyes.org>\n"
+"POT-Creation-Date: 2011-03-01 00:42+0100\n"
+"PO-Revision-Date: 2011-02-25 23:42+0000\n"
+"Last-Translator: okhayat <okhayat@gmail.com>\n"
+"Language-Team: Arabic <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Lokalize 1.0\n"
-"Plural-Forms: nplurals=4; plural=(n == 1? 0 : (n == 2? 1 : (n <= 10? 2 : "
-"3)))\n"
-"\n"
-"\n"
+"Language: ar\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
+"&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5\n"
 
-#: tests/base.py:114
+#: tests/base.py:117
 msgid "lazy message"
-msgstr ""
+msgstr "رسالة فارغة"

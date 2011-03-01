@@ -1,20 +1,19 @@
-# translation of django.po to Hungarian
-# This file is distributed under the same license as the django package.
+# This file is distributed under the same license as the Django package.
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:29+0100\n"
-"PO-Revision-Date: 2008-08-30 01:11+0200\n"
-"Last-Translator: Szilveszter Farkas <szilveszter.farkas@gmail.com>\n"
-"Language-Team: Hungarian <hu@li.org>\n"
+"POT-Creation-Date: 2011-03-01 00:42+0100\n"
+"PO-Revision-Date: 2011-02-28 23:42+0000\n"
+"Last-Translator: Django team\n"
+"Language-Team: Hungarian <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.11.4\n"
-"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
+"Language: hu\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
-#: tests/base.py:114
-#, fuzzy
+#: tests/base.py:117
 msgid "lazy message"
-msgstr "üzenet"
+msgstr ""
