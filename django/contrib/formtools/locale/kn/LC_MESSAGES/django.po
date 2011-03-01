@@ -1,22 +1,20 @@
-# Kannada translation of Django.
-# Copyright (C) 2007 Translation Team <translation@sampada.info>
 # This file is distributed under the same license as the Django package.
-# Kannada Localization Team <translation@sampada.info>, 2007.
-#
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:24+0100\n"
-"PO-Revision-Date: 2007-01-08 20:22+0530\n"
-"Last-Translator: Kannada Localization Team <translation@sampada.info>\n"
-"Language-Team: Kannada <translation@sampada.info>\n"
+"POT-Creation-Date: 2011-03-01 00:13+0100\n"
+"PO-Revision-Date: 2011-02-28 23:12+0000\n"
+"Last-Translator: Django team\n"
+"Language-Team: English <en@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: kn\n"
+"Plural-Forms: nplurals=1; plural=0\n"
 
-#: wizard.py:172
+#: wizard.py:176
 msgid ""
 "We apologize, but your form has expired. Please continue filling out the "
 "form from this page."

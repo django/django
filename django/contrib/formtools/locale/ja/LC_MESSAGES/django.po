@@ -1,18 +1,20 @@
-# Translation of django.po to japanese.
+# This file is distributed under the same license as the Django package.
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:24+0100\n"
-"PO-Revision-Date: 2010-05-09 12:41+0900\n"
-"Last-Translator: Takashi Matsuo <matsuo.takashi@gmail.com>\n"
-"Language-Team: Japanese <django-ja@googlegroups.com>\n"
+"POT-Creation-Date: 2011-03-01 00:13+0100\n"
+"PO-Revision-Date: 2011-02-22 00:12+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: Japanese <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Language: ja\n"
+"Plural-Forms: nplurals=1; plural=0\n"
 
-#: wizard.py:172
+#: wizard.py:176
 msgid ""
 "We apologize, but your form has expired. Please continue filling out the "
 "form from this page."
