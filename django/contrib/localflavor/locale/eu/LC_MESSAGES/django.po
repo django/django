@@ -1,19 +1,18 @@
-# translation of django.po to
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:28+0100\n"
-"PO-Revision-Date: 2010-07-08 12:55+0200\n"
-"Last-Translator: Aitzol Naberan <anaberan@codesyntax.com>\n"
-"Language-Team: Django-i18n <django-i18n@googlegroups.com>\n"
+"POT-Creation-Date: 2011-03-01 00:32+0100\n"
+"PO-Revision-Date: 2011-02-22 00:10+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: Basque <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: eu\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: ar/forms.py:28
 msgid "Enter a postal code in the format NNNN or ANNNNAAA."
@@ -56,9 +55,8 @@ msgid "Salzburg"
 msgstr ""
 
 #: at/at_states.py:10
-#, fuzzy
 msgid "Styria"
-msgstr "Serbiera"
+msgstr ""
 
 #: at/at_states.py:11
 msgid "Tyrol"
@@ -77,10 +75,8 @@ msgid "Enter a zip code in the format XXXX."
 msgstr "zip kodea XXXX formatoan idatzi."
 
 #: at/forms.py:50
-#, fuzzy
 msgid "Enter a valid Austrian Social Security Number in XXXX XXXXXX format."
 msgstr ""
-"Sartu Kanadako segurtasun sozialeko zenbaki zuzen bat XXX-XXX-XXX formatoan."
 
 #: au/forms.py:17
 msgid "Enter a 4 digit post code."
@@ -91,9 +87,8 @@ msgid "Antwerp"
 msgstr ""
 
 #: be/be_provinces.py:6
-#, fuzzy
 msgid "Brussels"
-msgstr "Erabiltzaileak"
+msgstr ""
 
 #: be/be_provinces.py:7
 msgid "East Flanders"
@@ -104,9 +99,8 @@ msgid "Flemish Brabant"
 msgstr ""
 
 #: be/be_provinces.py:9
-#, fuzzy
 msgid "Hainaut"
-msgstr "minutu"
+msgstr ""
 
 #: be/be_provinces.py:10
 msgid "Liege"
@@ -141,14 +135,12 @@ msgid "Flemish Region"
 msgstr ""
 
 #: be/be_regions.py:7
-#, fuzzy
 msgid "Wallonia"
-msgstr "Katalunia"
+msgstr ""
 
 #: be/forms.py:23
-#, fuzzy
 msgid "Enter a valid postal code in the range and format 1XXX - 9XXX."
-msgstr "Kode postal bat idatzi hurrengo formato eta tartearekin: 01XXX - 52XXX"
+msgstr ""
 
 #: be/forms.py:46
 msgid ""
@@ -379,25 +371,20 @@ msgid "Enter a postal code in the format XXXXX or XXX XX."
 msgstr ""
 
 #: cz/forms.py:48
-#, fuzzy
 msgid "Enter a birth number in the format XXXXXX/XXXX or XXXXXXXXXX."
 msgstr ""
-"Telefono zenbaki bat idatzi hurrengo formato batekin: 6XXXXXXXX, 8XXXXXXXX "
-"edo 9XXXXXXXX"
 
 #: cz/forms.py:49
 msgid "Invalid optional parameter Gender, valid values are 'f' and 'm'"
 msgstr ""
 
 #: cz/forms.py:50
-#, fuzzy
 msgid "Enter a valid birth number."
-msgstr "Ordu zuzen bat idatzi."
+msgstr ""
 
 #: cz/forms.py:111
-#, fuzzy
 msgid "Enter a valid IC number."
-msgstr "Ordu zuzen bat idatzi."
+msgstr ""
 
 #: de/de_states.py:5
 msgid "Baden-Wuerttemberg"
@@ -785,47 +772,40 @@ msgid "Enter a valid Finnish social security number."
 msgstr ""
 
 #: fr/forms.py:31
-#, fuzzy
 msgid "Phone numbers must be in 0X XX XX XX XX format."
-msgstr "Telefono zenbakiak XX-XXXX-XXXX formatoa behar dute."
+msgstr ""
 
 #: id/forms.py:28
-#, fuzzy
 msgid "Enter a valid post code"
-msgstr "4 zenbakiko posta kodea idatzi."
+msgstr ""
 
 #: id/forms.py:68 nl/forms.py:53
 msgid "Enter a valid phone number"
 msgstr ""
 
 #: id/forms.py:107
-#, fuzzy
 msgid "Enter a valid vehicle license plate number"
-msgstr "Idatzi fitxategi izen zuzen bat."
+msgstr ""
 
 #: id/forms.py:170
-#, fuzzy
 msgid "Enter a valid NIK/KTP number"
-msgstr "Ordu zuzen bat idatzi."
+msgstr ""
 
 #: id/id_choices.py:15
 msgid "Aceh"
 msgstr ""
 
 #: id/id_choices.py:16 id/id_choices.py:79
-#, fuzzy
 msgid "Bali"
-msgstr "Bengalera"
+msgstr ""
 
 #: id/id_choices.py:17 id/id_choices.py:51
-#, fuzzy
 msgid "Banten"
-msgstr "edukia"
+msgstr ""
 
 #: id/id_choices.py:18 id/id_choices.py:60
-#, fuzzy
 msgid "Bengkulu"
-msgstr "Bengalera"
+msgstr ""
 
 #: id/id_choices.py:19 id/id_choices.py:53
 msgid "Yogyakarta"
@@ -840,9 +820,8 @@ msgid "Gorontalo"
 msgstr ""
 
 #: id/id_choices.py:22 id/id_choices.py:63
-#, fuzzy
 msgid "Jambi"
-msgstr "Tamilera"
+msgstr ""
 
 #: id/id_choices.py:23
 msgid "Jawa Barat"
@@ -881,9 +860,8 @@ msgid "Kepulauan Riau"
 msgstr ""
 
 #: id/id_choices.py:32 id/id_choices.py:61
-#, fuzzy
 msgid "Lampung"
-msgstr "abu"
+msgstr ""
 
 #: id/id_choices.py:33 id/id_choices.py:76
 msgid "Maluku"
@@ -954,9 +932,8 @@ msgid "Surakarta - Solo"
 msgstr ""
 
 #: id/id_choices.py:55
-#, fuzzy
 msgid "Madiun"
-msgstr "Mazedoniera"
+msgstr ""
 
 #: id/id_choices.py:56
 msgid "Kediri"
@@ -983,9 +960,8 @@ msgid "Corps Diplomatic"
 msgstr ""
 
 #: id/id_choices.py:71
-#, fuzzy
 msgid "Bandung"
-msgstr "eta"
+msgstr ""
 
 #: id/id_choices.py:73
 msgid "Sulawesi Utara Daratan"
@@ -1032,33 +1008,28 @@ msgid "Pekalongan"
 msgstr ""
 
 #: id/id_choices.py:92
-#, fuzzy
 msgid "Semarang"
-msgstr "Serbiera"
+msgstr ""
 
 #: id/id_choices.py:93
-#, fuzzy
 msgid "Pati"
-msgstr "Aktiboa"
+msgstr ""
 
 #: id/id_choices.py:97
-#, fuzzy
 msgid "Surabaya"
-msgstr "Larunbata"
+msgstr ""
 
 #: id/id_choices.py:98
 msgid "Madura"
 msgstr ""
 
 #: id/id_choices.py:99
-#, fuzzy
 msgid "Malang"
-msgstr "Katalana"
+msgstr ""
 
 #: id/id_choices.py:100
-#, fuzzy
 msgid "Jember"
-msgstr "Azaroa"
+msgstr ""
 
 #: id/id_choices.py:101
 msgid "Banyumas"
@@ -1097,28 +1068,24 @@ msgid "Carlow"
 msgstr ""
 
 #: ie/ie_counties.py:11
-#, fuzzy
 msgid "Cavan"
-msgstr "Katalana"
+msgstr ""
 
 #: ie/ie_counties.py:12
 msgid "Clare"
 msgstr ""
 
 #: ie/ie_counties.py:13
-#, fuzzy
 msgid "Cork"
-msgstr "edo"
+msgstr ""
 
 #: ie/ie_counties.py:14
-#, fuzzy
 msgid "Derry"
-msgstr "Otsaila"
+msgstr ""
 
 #: ie/ie_counties.py:15
-#, fuzzy
 msgid "Donegal"
-msgstr "bat"
+msgstr ""
 
 #: ie/ie_counties.py:16
 msgid "Down"
@@ -1129,18 +1096,16 @@ msgid "Dublin"
 msgstr ""
 
 #: ie/ie_counties.py:18
-#, fuzzy
 msgid "Fermanagh"
-msgstr "Alemaniera"
+msgstr ""
 
 #: ie/ie_counties.py:19
 msgid "Galway"
 msgstr ""
 
 #: ie/ie_counties.py:20
-#, fuzzy
 msgid "Kerry"
-msgstr "Otsaila"
+msgstr ""
 
 #: ie/ie_counties.py:21
 msgid "Kildare"
@@ -1167,33 +1132,28 @@ msgid "Longford"
 msgstr ""
 
 #: ie/ie_counties.py:27
-#, fuzzy
 msgid "Louth"
-msgstr "Atera"
+msgstr ""
 
 #: ie/ie_counties.py:28
-#, fuzzy
 msgid "Mayo"
-msgstr "Maiatza"
+msgstr ""
 
 #: ie/ie_counties.py:29
-#, fuzzy
 msgid "Meath"
-msgstr "Martxoa"
+msgstr ""
 
 #: ie/ie_counties.py:30
-#, fuzzy
 msgid "Monaghan"
-msgstr "Sartu berriro"
+msgstr ""
 
 #: ie/ie_counties.py:31
 msgid "Offaly"
 msgstr ""
 
 #: ie/ie_counties.py:32
-#, fuzzy
 msgid "Roscommon"
-msgstr "komentarioa"
+msgstr ""
 
 #: ie/ie_counties.py:33
 msgid "Sligo"
@@ -1204,9 +1164,8 @@ msgid "Tipperary"
 msgstr ""
 
 #: ie/ie_counties.py:35
-#, fuzzy
 msgid "Tyrone"
-msgstr "bat"
+msgstr ""
 
 #: ie/ie_counties.py:36
 msgid "Waterford"
@@ -1217,23 +1176,20 @@ msgid "Westmeath"
 msgstr ""
 
 #: ie/ie_counties.py:38
-#, fuzzy
 msgid "Wexford"
-msgstr "Az"
+msgstr ""
 
 #: ie/ie_counties.py:39
 msgid "Wicklow"
 msgstr ""
 
 #: il/forms.py:31
-#, fuzzy
 msgid "Enter a postal code in the format XXXXX"
-msgstr "Posta kodea idatzi XXX XXX formatoan."
+msgstr ""
 
 #: il/forms.py:50
-#, fuzzy
 msgid "Enter a valid ID number."
-msgstr "Ordu zuzen bat idatzi."
+msgstr ""
 
 #: in_/forms.py:15
 msgid "Enter a zip code in the format XXXXXXX."
@@ -1453,9 +1409,8 @@ msgid "Okinawa"
 msgstr ""
 
 #: kw/forms.py:25
-#, fuzzy
 msgid "Enter a valid Kuwaiti Civil ID number"
-msgstr "Ordu zuzen bat idatzi."
+msgstr ""
 
 #: mx/mx_states.py:12
 msgid "Aguascalientes"
@@ -1594,9 +1549,8 @@ msgid "Enter a valid SoFi number"
 msgstr ""
 
 #: nl/nl_provinces.py:4
-#, fuzzy
 msgid "Drenthe"
-msgstr "Frantzesa"
+msgstr ""
 
 #: nl/nl_provinces.py:5
 msgid "Flevoland"
@@ -1744,58 +1698,48 @@ msgid "West Pomerania"
 msgstr ""
 
 #: pt/forms.py:17
-#, fuzzy
 msgid "Enter a zip code in the format XXXX-XXX."
-msgstr "XXXXX-XXX formatoan zip kodea idatzi."
+msgstr ""
 
 #: pt/forms.py:37
 msgid "Phone numbers must have 9 digits, or start by + or 00."
 msgstr ""
 
 #: ro/forms.py:19
-#, fuzzy
 msgid "Enter a valid CIF."
-msgstr "URL zuzen bat idatzi."
+msgstr ""
 
 #: ro/forms.py:56
-#, fuzzy
 msgid "Enter a valid CNP."
-msgstr "URL zuzen bat idatzi."
+msgstr ""
 
 #: ro/forms.py:143
-#, fuzzy
 msgid "Enter a valid IBAN in ROXX-XXXX-XXXX-XXXX-XXXX-XXXX format"
-msgstr "CUIT zuzena idatzi XX-XXXXXXXX-X edo XXXXXXXXXXXX formatoan."
+msgstr ""
 
 #: ro/forms.py:175
-#, fuzzy
 msgid "Phone numbers must be in XXXX-XXXXXX format."
-msgstr "Telefono zenbakiak XX-XXXX-XXXX formatoa behar dute."
+msgstr ""
 
 #: ro/forms.py:200
-#, fuzzy
 msgid "Enter a valid postal code in the format XXXXXX"
-msgstr "Posta kodea idatzi XXX XXX formatoan."
+msgstr ""
 
 #: se/forms.py:50
-#, fuzzy
 msgid "Enter a valid Swedish organisation number."
-msgstr "Data/Ordu zuzen bat idatzi."
+msgstr ""
 
 #: se/forms.py:107
-#, fuzzy
 msgid "Enter a valid Swedish personal identity number."
-msgstr "Idatzi zenbaki erreal zuzena."
+msgstr ""
 
 #: se/forms.py:108
-#, fuzzy
 msgid "Co-ordination numbers are not allowed."
-msgstr "Errepikatutako balioak ez dira onartzen."
+msgstr ""
 
 #: se/forms.py:150
-#, fuzzy
 msgid "Enter a Swedish postal code in the format XXXXX."
-msgstr "Posta kodea idatzi XXX XXX formatoan."
+msgstr ""
 
 #: se/se_counties.py:15
 msgid "Stockholm"
@@ -1830,14 +1774,12 @@ msgid "Kronoberg"
 msgstr ""
 
 #: se/se_counties.py:23
-#, fuzzy
 msgid "Kalmar"
-msgstr "mar"
+msgstr ""
 
 #: se/se_counties.py:24
-#, fuzzy
 msgid "Gotland"
-msgstr "eta"
+msgstr ""
 
 #: se/se_counties.py:25
 msgid "Blekinge"
@@ -1848,9 +1790,8 @@ msgid "Skåne"
 msgstr ""
 
 #: se/se_counties.py:27
-#, fuzzy
 msgid "Halland"
-msgstr "eta"
+msgstr ""
 
 #: se/se_counties.py:28
 msgid "Västra Götaland"
@@ -2233,19 +2174,16 @@ msgid "Zilina region"
 msgstr ""
 
 #: tr/forms.py:16
-#, fuzzy
 msgid "Enter a postal code in the format XXXXX."
-msgstr "Posta kodea idatzi XXX XXX formatoan."
+msgstr ""
 
 #: tr/forms.py:37
-#, fuzzy
 msgid "Phone numbers must be in 0XXX XXX XXXX format."
-msgstr "Telefono zenbakiak XX-XXXX-XXXX formatoa behar dute."
+msgstr ""
 
 #: tr/forms.py:64
-#, fuzzy
 msgid "Enter a valid Turkish Identification number."
-msgstr "Idatzi fitxategi izen zuzen bat."
+msgstr ""
 
 #: tr/forms.py:65
 msgid "Turkish Identification number must be 11 digits."
@@ -2540,41 +2478,36 @@ msgid "Enter a zip code in the format XXXXX or XXXXX-XXXX."
 msgstr ""
 
 #: us/forms.py:26
-#, fuzzy
 msgid "Phone numbers must be in XXX-XXX-XXXX format."
-msgstr "Telefono zenbakiak XX-XXXX-XXXX formatoa behar dute."
+msgstr ""
 
 #: us/forms.py:55
 msgid "Enter a valid U.S. Social Security number in XXX-XX-XXXX format."
 msgstr ""
 
 #: us/forms.py:88
-#, fuzzy
 msgid "Enter a U.S. state or territory."
-msgstr "AEB estatu laburpen zuzen bat idatzi."
+msgstr ""
 
 #: us/models.py:9
 msgid "U.S. state (two uppercase letters)"
 msgstr "AEB estatua (bi letra maiuskula)"
 
 #: us/models.py:18
-#, fuzzy
 msgid "U.S. postal code (two uppercase letters)"
-msgstr "AEB estatua (bi letra maiuskula)"
+msgstr ""
 
 #: us/models.py:27
 msgid "Phone number"
 msgstr "Telefono zenbakia"
 
 #: uy/forms.py:28
-#, fuzzy
 msgid "Enter a valid CI number in X.XXX.XXX-X,XXXXXXX-X or XXXXXXXX format."
-msgstr "CUIT zuzena idatzi XX-XXXXXXXX-X edo XXXXXXXXXXXX formatoan."
+msgstr ""
 
 #: uy/forms.py:30
-#, fuzzy
 msgid "Enter a valid CI number."
-msgstr "Ordu zuzen bat idatzi."
+msgstr ""
 
 #: za/forms.py:21
 msgid "Enter a valid South African ID number"

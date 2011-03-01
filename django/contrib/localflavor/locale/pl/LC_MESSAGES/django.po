@@ -1,20 +1,19 @@
-# translation of django.po to Polish
-# Polish .po file.
-# This file is distributed under the same license as the django package.
+# This file is distributed under the same license as the Django package.
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:28+0100\n"
-"PO-Revision-Date: 2008-02-25 15:53+0100\n"
-"Last-Translator: Jarek Zgoda <jarek.zgoda@gmail.com>\n"
-"Language-Team: PL <pl@li.org>\n"
+"POT-Creation-Date: 2011-03-01 00:33+0100\n"
+"PO-Revision-Date: 2011-02-22 00:10+0000\n"
+"Last-Translator: angularcircle <angular.circle@gmail.com>\n"
+"Language-Team: Polish <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: \n"
-"Plural-Forms:  nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%"
-"100<10 || n%100>=20) ? 1 : 2);\n"
+"Language: pl\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
+"|| n%100>=20) ? 1 : 2)\n"
 
 #: ar/forms.py:28
 msgid "Enter a postal code in the format NNNN or ANNNNAAA."
@@ -803,55 +802,55 @@ msgstr "Wpisz poprawny numer NIK/KTP."
 
 #: id/id_choices.py:15
 msgid "Aceh"
-msgstr ""
+msgstr "Aceh"
 
 #: id/id_choices.py:16 id/id_choices.py:79
 msgid "Bali"
-msgstr ""
+msgstr "Bali"
 
 #: id/id_choices.py:17 id/id_choices.py:51
 msgid "Banten"
-msgstr ""
+msgstr "Banten"
 
 #: id/id_choices.py:18 id/id_choices.py:60
 msgid "Bengkulu"
-msgstr ""
+msgstr "Bengkulu"
 
 #: id/id_choices.py:19 id/id_choices.py:53
 msgid "Yogyakarta"
-msgstr ""
+msgstr "Yogyakarta"
 
 #: id/id_choices.py:20 id/id_choices.py:57
 msgid "Jakarta"
-msgstr ""
+msgstr "Dżakarta"
 
 #: id/id_choices.py:21 id/id_choices.py:81
 msgid "Gorontalo"
-msgstr ""
+msgstr "Gorontalo"
 
 #: id/id_choices.py:22 id/id_choices.py:63
 msgid "Jambi"
-msgstr ""
+msgstr "Jambi"
 
 #: id/id_choices.py:23
 msgid "Jawa Barat"
-msgstr ""
+msgstr "Jawa Barat"
 
 #: id/id_choices.py:24
 msgid "Jawa Tengah"
-msgstr ""
+msgstr "Jawa Tengah"
 
 #: id/id_choices.py:25
 msgid "Jawa Timur"
-msgstr ""
+msgstr "Jawa Timur"
 
 #: id/id_choices.py:26 id/id_choices.py:94
 msgid "Kalimantan Barat"
-msgstr ""
+msgstr "Kalimantan Barat"
 
 #: id/id_choices.py:27 id/id_choices.py:72
 msgid "Kalimantan Selatan"
-msgstr ""
+msgstr "Kalimantan Selatan"
 
 #: id/id_choices.py:28 id/id_choices.py:95
 msgid "Kalimantan Tengah"
@@ -859,15 +858,15 @@ msgstr ""
 
 #: id/id_choices.py:29 id/id_choices.py:96
 msgid "Kalimantan Timur"
-msgstr ""
+msgstr "Kalimantan Timur"
 
 #: id/id_choices.py:30
 msgid "Kepulauan Bangka-Belitung"
-msgstr ""
+msgstr "Kepulauan Bangka-Belitung"
 
 #: id/id_choices.py:31 id/id_choices.py:68
 msgid "Kepulauan Riau"
-msgstr ""
+msgstr "Kepulauan Riau"
 
 #: id/id_choices.py:32 id/id_choices.py:61
 msgid "Lampung"
@@ -875,31 +874,31 @@ msgstr ""
 
 #: id/id_choices.py:33 id/id_choices.py:76
 msgid "Maluku"
-msgstr ""
+msgstr "Maluku"
 
 #: id/id_choices.py:34 id/id_choices.py:77
 msgid "Maluku Utara"
-msgstr ""
+msgstr "Maluku Utara"
 
 #: id/id_choices.py:35
 msgid "Nusa Tenggara Barat"
-msgstr ""
+msgstr "Barat Tenggara Nusa"
 
 #: id/id_choices.py:36
 msgid "Nusa Tenggara Timur"
-msgstr ""
+msgstr "Nusa Tenggara Timur"
 
 #: id/id_choices.py:37
 msgid "Papua"
-msgstr ""
+msgstr "Papua"
 
 #: id/id_choices.py:38
 msgid "Papua Barat"
-msgstr ""
+msgstr "Papua Zachodnia"
 
 #: id/id_choices.py:39 id/id_choices.py:66
 msgid "Riau"
-msgstr ""
+msgstr "Riau"
 
 #: id/id_choices.py:40 id/id_choices.py:74
 msgid "Sulawesi Barat"
@@ -979,7 +978,7 @@ msgstr ""
 
 #: id/id_choices.py:78
 msgid "NTT - Timor"
-msgstr ""
+msgstr "NTT - Timor"
 
 #: id/id_choices.py:80
 msgid "Sulawesi Utara Kepulauan"
@@ -995,103 +994,103 @@ msgstr ""
 
 #: id/id_choices.py:86
 msgid "Cirebon"
-msgstr ""
+msgstr "Cirebon"
 
 #: id/id_choices.py:87
 msgid "NTB - Sumbawa"
-msgstr ""
+msgstr "NTB - Sumbawa"
 
 #: id/id_choices.py:88
 msgid "NTT - Flores"
-msgstr ""
+msgstr "NTT - Flores"
 
 #: id/id_choices.py:89
 msgid "NTT - Sumba"
-msgstr ""
+msgstr "NTT - Sumba"
 
 #: id/id_choices.py:90
 msgid "Bogor"
-msgstr ""
+msgstr "Bogor"
 
 #: id/id_choices.py:91
 msgid "Pekalongan"
-msgstr ""
+msgstr "Pekalongan"
 
 #: id/id_choices.py:92
 msgid "Semarang"
-msgstr ""
+msgstr "Semarang"
 
 #: id/id_choices.py:93
 msgid "Pati"
-msgstr ""
+msgstr "Pati"
 
 #: id/id_choices.py:97
 msgid "Surabaya"
-msgstr ""
+msgstr "Surabaya"
 
 #: id/id_choices.py:98
 msgid "Madura"
-msgstr ""
+msgstr "Madura"
 
 #: id/id_choices.py:99
 msgid "Malang"
-msgstr ""
+msgstr "Malang"
 
 #: id/id_choices.py:100
 msgid "Jember"
-msgstr ""
+msgstr "Jember"
 
 #: id/id_choices.py:101
 msgid "Banyumas"
-msgstr ""
+msgstr "Banyumas"
 
 #: id/id_choices.py:102
 msgid "Federal Government"
-msgstr ""
+msgstr "Rząd Federalny"
 
 #: id/id_choices.py:103
 msgid "Bojonegoro"
-msgstr ""
+msgstr "Bojonegoro"
 
 #: id/id_choices.py:104
 msgid "Purwakarta"
-msgstr ""
+msgstr "Purwakarta"
 
 #: id/id_choices.py:105
 msgid "Sidoarjo"
-msgstr ""
+msgstr "Sidoarjo"
 
 #: id/id_choices.py:106
 msgid "Garut"
-msgstr ""
+msgstr "Garut"
 
 #: ie/ie_counties.py:8
 msgid "Antrim"
-msgstr ""
+msgstr "Antrim"
 
 #: ie/ie_counties.py:9
 msgid "Armagh"
-msgstr ""
+msgstr "Armagh"
 
 #: ie/ie_counties.py:10
 msgid "Carlow"
-msgstr ""
+msgstr "Carlow"
 
 #: ie/ie_counties.py:11
 msgid "Cavan"
-msgstr ""
+msgstr "Cavan"
 
 #: ie/ie_counties.py:12
 msgid "Clare"
-msgstr ""
+msgstr "Clare"
 
 #: ie/ie_counties.py:13
 msgid "Cork"
-msgstr ""
+msgstr "Cork"
 
 #: ie/ie_counties.py:14
 msgid "Derry"
-msgstr ""
+msgstr "Derry"
 
 #: ie/ie_counties.py:15
 msgid "Donegal"
@@ -1103,7 +1102,7 @@ msgstr ""
 
 #: ie/ie_counties.py:17
 msgid "Dublin"
-msgstr ""
+msgstr "Dublin"
 
 #: ie/ie_counties.py:18
 msgid "Fermanagh"
@@ -2505,9 +2504,8 @@ msgid "U.S. state (two uppercase letters)"
 msgstr "Stan USA (dwie duże litery)"
 
 #: us/models.py:18
-#, fuzzy
 msgid "U.S. postal code (two uppercase letters)"
-msgstr "Stan USA (dwie duże litery)"
+msgstr ""
 
 #: us/models.py:27
 msgid "Phone number"

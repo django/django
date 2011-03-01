@@ -1,22 +1,18 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Django SVN\n"
+"Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:28+0100\n"
-"PO-Revision-Date: 2008-11-12 08:14+0530\n"
-"Last-Translator: Thejaswi Puthraya <thejaswi.puthraya@gmail.com>\n"
-"Language-Team: Hindi <indlinux-hindi@lists.sourceforge.net>\n"
+"POT-Creation-Date: 2011-03-01 00:32+0100\n"
+"PO-Revision-Date: 2011-02-22 00:10+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: English <en@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Poedit-Language: Hindi\n"
-"X-Poedit-Country: INDIA\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: hi\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: ar/forms.py:28
 msgid "Enter a postal code in the format NNNN or ANNNNAAA."
@@ -91,23 +87,20 @@ msgid "Antwerp"
 msgstr ""
 
 #: be/be_provinces.py:6
-#, fuzzy
 msgid "Brussels"
-msgstr "उपभोक्ताऐं"
+msgstr ""
 
 #: be/be_provinces.py:7
-#, fuzzy
 msgid "East Flanders"
-msgstr "पश्चिमी मिडलान्ड"
+msgstr ""
 
 #: be/be_provinces.py:8
 msgid "Flemish Brabant"
 msgstr ""
 
 #: be/be_provinces.py:9
-#, fuzzy
 msgid "Hainaut"
-msgstr "मिनट"
+msgstr ""
 
 #: be/be_provinces.py:10
 msgid "Liege"
@@ -118,43 +111,36 @@ msgid "Limburg"
 msgstr "लिम्बर्ग"
 
 #: be/be_provinces.py:12
-#, fuzzy
 msgid "Luxembourg"
-msgstr "लिम्बर्ग"
+msgstr ""
 
 #: be/be_provinces.py:13
-#, fuzzy
 msgid "Namur"
-msgstr "नाम"
+msgstr ""
 
 #: be/be_provinces.py:14
-#, fuzzy
 msgid "Walloon Brabant"
-msgstr "नूर्ड-ब्राबान्ट"
+msgstr ""
 
 #: be/be_provinces.py:15
-#, fuzzy
 msgid "West Flanders"
-msgstr "पश्चिमी मिडलान्ड"
+msgstr ""
 
 #: be/be_regions.py:5
-#, fuzzy
 msgid "Brussels Capital Region"
-msgstr "ब्राटिस्लावा प्रान्त"
+msgstr ""
 
 #: be/be_regions.py:6
 msgid "Flemish Region"
 msgstr ""
 
 #: be/be_regions.py:7
-#, fuzzy
 msgid "Wallonia"
-msgstr "कटलोनिया"
+msgstr ""
 
 #: be/forms.py:23
-#, fuzzy
 msgid "Enter a valid postal code in the range and format 1XXX - 9XXX."
-msgstr "मान्य डाक संहिता को 01XXX - 52XXX के श्रेणी और प्ततिरूप में भरें ।"
+msgstr ""
 
 #: be/forms.py:46
 msgid ""
@@ -326,9 +312,8 @@ msgid "The Chilean RUT is not valid."
 msgstr "यह चिली का RUT अमान्य है ।"
 
 #: cz/cz_regions.py:8
-#, fuzzy
 msgid "Prague"
-msgstr "पुर्तगाली"
+msgstr ""
 
 #: cz/cz_regions.py:9
 msgid "Central Bohemian Region"
@@ -339,38 +324,32 @@ msgid "South Bohemian Region"
 msgstr ""
 
 #: cz/cz_regions.py:11
-#, fuzzy
 msgid "Pilsen Region"
-msgstr "जिलिना प्रान्त"
+msgstr ""
 
 #: cz/cz_regions.py:12
 msgid "Carlsbad Region"
 msgstr ""
 
 #: cz/cz_regions.py:13
-#, fuzzy
 msgid "Usti Region"
-msgstr "कोसिस प्रान्त"
+msgstr ""
 
 #: cz/cz_regions.py:14
-#, fuzzy
 msgid "Liberec Region"
-msgstr "ट्रेन्किन प्रान्त"
+msgstr ""
 
 #: cz/cz_regions.py:15
-#, fuzzy
 msgid "Hradec Region"
-msgstr "ट्रेन्किन प्रान्त"
+msgstr ""
 
 #: cz/cz_regions.py:16
-#, fuzzy
 msgid "Pardubice Region"
-msgstr "कोसिस प्रान्त"
+msgstr ""
 
 #: cz/cz_regions.py:17
-#, fuzzy
 msgid "Vysocina Region"
-msgstr "जिलिना प्रान्त"
+msgstr ""
 
 #: cz/cz_regions.py:18
 msgid "South Moravian Region"
@@ -381,9 +360,8 @@ msgid "Olomouc Region"
 msgstr ""
 
 #: cz/cz_regions.py:20
-#, fuzzy
 msgid "Zlin Region"
-msgstr "जिलिना प्रान्त"
+msgstr ""
 
 #: cz/cz_regions.py:21
 msgid "Moravian-Silesian Region"
@@ -394,23 +372,20 @@ msgid "Enter a postal code in the format XXXXX or XXX XX."
 msgstr "डाक संहिता को XXXXX अथवा XXX XX प्रतिरूप में भरें ।"
 
 #: cz/forms.py:48
-#, fuzzy
 msgid "Enter a birth number in the format XXXXXX/XXXX or XXXXXXXXXX."
-msgstr "कर संख्या क्षेत्र (NIP) को XXX-XXX-XX-XX अथवा XX-XX-XXX-XXX प्रतोरूप में भरें ।"
+msgstr ""
 
 #: cz/forms.py:49
 msgid "Invalid optional parameter Gender, valid values are 'f' and 'm'"
 msgstr ""
 
 #: cz/forms.py:50
-#, fuzzy
 msgid "Enter a valid birth number."
-msgstr "मान्य VAT संख्या भरें ।"
+msgstr ""
 
 #: cz/forms.py:111
-#, fuzzy
 msgid "Enter a valid IC number."
-msgstr "मान्य VAT संख्या भरें ।"
+msgstr ""
 
 #: de/de_states.py:5
 msgid "Baden-Wuerttemberg"
@@ -797,48 +772,40 @@ msgid "Enter a valid Finnish social security number."
 msgstr "मान्य फिन्निश सोशल सेक्यूरिटी संख्या भरें ।"
 
 #: fr/forms.py:31
-#, fuzzy
 msgid "Phone numbers must be in 0X XX XX XX XX format."
-msgstr "टेलिफोन संख्या को XXXX-XXXXXX प्रतिरूप में भरें ।"
+msgstr ""
 
 #: id/forms.py:28
-#, fuzzy
 msgid "Enter a valid post code"
-msgstr "मान्य डाक संहिता भरें"
+msgstr ""
 
 #: id/forms.py:68 nl/forms.py:53
 msgid "Enter a valid phone number"
 msgstr "मान्य टेलिफोन संख्या भरें"
 
 #: id/forms.py:107
-#, fuzzy
 msgid "Enter a valid vehicle license plate number"
-msgstr "मान्य टेलिफोन संख्या भरें"
+msgstr ""
 
 #: id/forms.py:170
-#, fuzzy
 msgid "Enter a valid NIK/KTP number"
-msgstr "मान्य VAT संख्या भरें ।"
+msgstr ""
 
 #: id/id_choices.py:15
-#, fuzzy
 msgid "Aceh"
-msgstr "ऐची"
+msgstr ""
 
 #: id/id_choices.py:16 id/id_choices.py:79
-#, fuzzy
 msgid "Bali"
-msgstr "बंगाली"
+msgstr ""
 
 #: id/id_choices.py:17 id/id_choices.py:51
-#, fuzzy
 msgid "Banten"
-msgstr "विषय सूची"
+msgstr ""
 
 #: id/id_choices.py:18 id/id_choices.py:60
-#, fuzzy
 msgid "Bengkulu"
-msgstr "बंगाली"
+msgstr ""
 
 #: id/id_choices.py:19 id/id_choices.py:53
 msgid "Yogyakarta"
@@ -849,14 +816,12 @@ msgid "Jakarta"
 msgstr ""
 
 #: id/id_choices.py:21 id/id_choices.py:81
-#, fuzzy
 msgid "Gorontalo"
-msgstr "गिरोना"
+msgstr ""
 
 #: id/id_choices.py:22 id/id_choices.py:63
-#, fuzzy
 msgid "Jambi"
-msgstr "तमिल"
+msgstr ""
 
 #: id/id_choices.py:23
 msgid "Jawa Barat"
@@ -895,14 +860,12 @@ msgid "Kepulauan Riau"
 msgstr ""
 
 #: id/id_choices.py:32 id/id_choices.py:61
-#, fuzzy
 msgid "Lampung"
-msgstr "अग"
+msgstr ""
 
 #: id/id_choices.py:33 id/id_choices.py:76
-#, fuzzy
 msgid "Maluku"
-msgstr "मलाकी"
+msgstr ""
 
 #: id/id_choices.py:34 id/id_choices.py:77
 msgid "Maluku Utara"
@@ -961,27 +924,24 @@ msgid "Sumatera Utara"
 msgstr ""
 
 #: id/id_choices.py:52
-#, fuzzy
 msgid "Magelang"
-msgstr "मलगा"
+msgstr ""
 
 #: id/id_choices.py:54
 msgid "Surakarta - Solo"
 msgstr ""
 
 #: id/id_choices.py:55
-#, fuzzy
 msgid "Madiun"
-msgstr "माड्रिड"
+msgstr ""
 
 #: id/id_choices.py:56
 msgid "Kediri"
 msgstr ""
 
 #: id/id_choices.py:59
-#, fuzzy
 msgid "Tapanuli"
-msgstr "टमौलिपास"
+msgstr ""
 
 #: id/id_choices.py:65
 msgid "Nanggroe Aceh Darussalam"
@@ -1000,9 +960,8 @@ msgid "Corps Diplomatic"
 msgstr ""
 
 #: id/id_choices.py:71
-#, fuzzy
 msgid "Bandung"
-msgstr "ब्रान्डेनबर्ग"
+msgstr ""
 
 #: id/id_choices.py:73
 msgid "Sulawesi Utara Daratan"
@@ -1025,9 +984,8 @@ msgid "Papua dan Papua Barat"
 msgstr ""
 
 #: id/id_choices.py:86
-#, fuzzy
 msgid "Cirebon"
-msgstr "गिरोना"
+msgstr ""
 
 #: id/id_choices.py:87
 msgid "NTB - Sumbawa"
@@ -1042,43 +1000,36 @@ msgid "NTT - Sumba"
 msgstr ""
 
 #: id/id_choices.py:90
-#, fuzzy
 msgid "Bogor"
-msgstr "ह्योगो"
+msgstr ""
 
 #: id/id_choices.py:91
 msgid "Pekalongan"
 msgstr ""
 
 #: id/id_choices.py:92
-#, fuzzy
 msgid "Semarang"
-msgstr "सर्बियन"
+msgstr ""
 
 #: id/id_choices.py:93
-#, fuzzy
 msgid "Pati"
-msgstr "सक्रिय"
+msgstr ""
 
 #: id/id_choices.py:97
-#, fuzzy
 msgid "Surabaya"
-msgstr "शनिवार"
+msgstr ""
 
 #: id/id_choices.py:98
-#, fuzzy
 msgid "Madura"
-msgstr "माड्रिड"
+msgstr ""
 
 #: id/id_choices.py:99
-#, fuzzy
 msgid "Malang"
-msgstr "मलगा"
+msgstr ""
 
 #: id/id_choices.py:100
-#, fuzzy
 msgid "Jember"
-msgstr "नवमबर"
+msgstr ""
 
 #: id/id_choices.py:101
 msgid "Banyumas"
@@ -1101,73 +1052,60 @@ msgid "Sidoarjo"
 msgstr ""
 
 #: id/id_choices.py:106
-#, fuzzy
 msgid "Garut"
-msgstr "ग्लारस"
+msgstr ""
 
 #: ie/ie_counties.py:8
-#, fuzzy
 msgid "Antrim"
-msgstr "कौन्टी आन्ट्रिम"
+msgstr ""
 
 #: ie/ie_counties.py:9
-#, fuzzy
 msgid "Armagh"
-msgstr "आरगोन"
+msgstr ""
 
 #: ie/ie_counties.py:10
 msgid "Carlow"
 msgstr ""
 
 #: ie/ie_counties.py:11
-#, fuzzy
 msgid "Cavan"
-msgstr "कटलान"
+msgstr ""
 
 #: ie/ie_counties.py:12
-#, fuzzy
 msgid "Clare"
-msgstr "कासेरेस"
+msgstr ""
 
 #: ie/ie_counties.py:13
-#, fuzzy
 msgid "Cork"
-msgstr "अथवा"
+msgstr ""
 
 #: ie/ie_counties.py:14
-#, fuzzy
 msgid "Derry"
-msgstr "फ़रवरी"
+msgstr ""
 
 #: ie/ie_counties.py:15
-#, fuzzy
 msgid "Donegal"
-msgstr "एक"
+msgstr ""
 
 #: ie/ie_counties.py:16
-#, fuzzy
 msgid "Down"
-msgstr "डेवोन"
+msgstr ""
 
 #: ie/ie_counties.py:17
-#, fuzzy
 msgid "Dublin"
-msgstr "लब्लिन"
+msgstr ""
 
 #: ie/ie_counties.py:18
-#, fuzzy
 msgid "Fermanagh"
-msgstr "कौन्टी फर्मानाघ"
+msgstr ""
 
 #: ie/ie_counties.py:19
-#, fuzzy
 msgid "Galway"
-msgstr "गलीशिया"
+msgstr ""
 
 #: ie/ie_counties.py:20
-#, fuzzy
 msgid "Kerry"
-msgstr "फ़रवरी"
+msgstr ""
 
 #: ie/ie_counties.py:21
 msgid "Kildare"
@@ -1194,75 +1132,64 @@ msgid "Longford"
 msgstr ""
 
 #: ie/ie_counties.py:27
-#, fuzzy
 msgid "Louth"
-msgstr "लॉग आउट"
+msgstr ""
 
 #: ie/ie_counties.py:28
-#, fuzzy
 msgid "Mayo"
-msgstr "मई"
+msgstr ""
 
 #: ie/ie_counties.py:29
-#, fuzzy
 msgid "Meath"
-msgstr "मार्च"
+msgstr ""
 
 #: ie/ie_counties.py:30
-#, fuzzy
 msgid "Monaghan"
-msgstr "फिर से लॉगिन कीजिए"
+msgstr ""
 
 #: ie/ie_counties.py:31
 msgid "Offaly"
 msgstr ""
 
 #: ie/ie_counties.py:32
-#, fuzzy
 msgid "Roscommon"
-msgstr "टिप्पणी"
+msgstr ""
 
 #: ie/ie_counties.py:33
-#, fuzzy
 msgid "Sligo"
-msgstr "शिगा"
+msgstr ""
 
 #: ie/ie_counties.py:34
 msgid "Tipperary"
 msgstr ""
 
 #: ie/ie_counties.py:35
-#, fuzzy
 msgid "Tyrone"
-msgstr "टैराल"
+msgstr ""
 
 #: ie/ie_counties.py:36
 msgid "Waterford"
 msgstr ""
 
 #: ie/ie_counties.py:37
-#, fuzzy
 msgid "Westmeath"
-msgstr "पश्चिम पोमेरानिया"
+msgstr ""
 
 #: ie/ie_counties.py:38
-#, fuzzy
 msgid "Wexford"
-msgstr "बुध"
+msgstr ""
 
 #: ie/ie_counties.py:39
 msgid "Wicklow"
 msgstr ""
 
 #: il/forms.py:31
-#, fuzzy
 msgid "Enter a postal code in the format XXXXX"
-msgstr "डाक संहिता को XX-XXX प्रतिरूप में भरें ।"
+msgstr ""
 
 #: il/forms.py:50
-#, fuzzy
 msgid "Enter a valid ID number."
-msgstr "मान्य VAT संख्या भरें ।"
+msgstr ""
 
 #: in_/forms.py:15
 msgid "Enter a zip code in the format XXXXXXX."
@@ -1482,9 +1409,8 @@ msgid "Okinawa"
 msgstr "ओकिनावा"
 
 #: kw/forms.py:25
-#, fuzzy
 msgid "Enter a valid Kuwaiti Civil ID number"
-msgstr "मान्य दक्षिणि आफ्रिकी आइ.डि संख्या भरें"
+msgstr ""
 
 #: mx/mx_states.py:12
 msgid "Aguascalientes"
@@ -1696,9 +1622,8 @@ msgid "Wrong checksum for the Tax Number (NIP)."
 msgstr "कर संख्या के लिए गलत जाँच योग ।"
 
 #: pl/forms.py:114
-#, fuzzy
 msgid "National Business Register Number (REGON) consists of 9 or 14 digits."
-msgstr "राष्ट्रीय पहचान संख्या में 11 अंक भरें ।"
+msgstr ""
 
 #: pl/forms.py:115
 msgid "Wrong checksum for the National Business Register Number (REGON)."
@@ -1773,9 +1698,8 @@ msgid "West Pomerania"
 msgstr "पश्चिम पोमेरानिया"
 
 #: pt/forms.py:17
-#, fuzzy
 msgid "Enter a zip code in the format XXXX-XXX."
-msgstr "डाक संहिता को XXXXX-XXX के प्रतिरूप में दर्ज करें ।"
+msgstr ""
 
 #: pt/forms.py:37
 msgid "Phone numbers must have 9 digits, or start by + or 00."
@@ -1802,23 +1726,20 @@ msgid "Enter a valid postal code in the format XXXXXX"
 msgstr "मान्य डाक संहिता को XXXXXX प्रतिरूप में भरें ।"
 
 #: se/forms.py:50
-#, fuzzy
 msgid "Enter a valid Swedish organisation number."
-msgstr "मान्य SoFi संख्या भरें"
+msgstr ""
 
 #: se/forms.py:107
-#, fuzzy
 msgid "Enter a valid Swedish personal identity number."
-msgstr "मान्य फिन्निश सोशल सेक्यूरिटी संख्या भरें ।"
+msgstr ""
 
 #: se/forms.py:108
 msgid "Co-ordination numbers are not allowed."
 msgstr ""
 
 #: se/forms.py:150
-#, fuzzy
 msgid "Enter a Swedish postal code in the format XXXXX."
-msgstr "डाक संहिता को XX-XXX प्रतिरूप में भरें ।"
+msgstr ""
 
 #: se/se_counties.py:15
 msgid "Stockholm"
@@ -1837,9 +1758,8 @@ msgid "Uppsala"
 msgstr ""
 
 #: se/se_counties.py:19
-#, fuzzy
 msgid "Södermanland"
-msgstr "जेल्डेर्लान्ड"
+msgstr ""
 
 #: se/se_counties.py:20
 msgid "Östergötland"
@@ -1854,28 +1774,24 @@ msgid "Kronoberg"
 msgstr ""
 
 #: se/se_counties.py:23
-#, fuzzy
 msgid "Kalmar"
-msgstr "मा"
+msgstr ""
 
 #: se/se_counties.py:24
-#, fuzzy
 msgid "Gotland"
-msgstr "स्काटलान्ड"
+msgstr ""
 
 #: se/se_counties.py:25
-#, fuzzy
 msgid "Blekinge"
-msgstr "बर्न"
+msgstr ""
 
 #: se/se_counties.py:26
 msgid "Skåne"
 msgstr ""
 
 #: se/se_counties.py:27
-#, fuzzy
 msgid "Halland"
-msgstr "सारलान्ड"
+msgstr ""
 
 #: se/se_counties.py:28
 msgid "Västra Götaland"
@@ -1894,9 +1810,8 @@ msgid "Västmanland"
 msgstr ""
 
 #: se/se_counties.py:32
-#, fuzzy
 msgid "Dalarna"
-msgstr "गलान्टा"
+msgstr ""
 
 #: se/se_counties.py:33
 msgid "Gävleborg"
@@ -2259,24 +2174,20 @@ msgid "Zilina region"
 msgstr "जिलिना प्रान्त"
 
 #: tr/forms.py:16
-#, fuzzy
 msgid "Enter a postal code in the format XXXXX."
-msgstr "डाक संहिता को XX-XXX प्रतिरूप में भरें ।"
+msgstr ""
 
 #: tr/forms.py:37
-#, fuzzy
 msgid "Phone numbers must be in 0XXX XXX XXXX format."
-msgstr "टेलिफोन संख्या को XXXX-XXXXXX प्रतिरूप में भरें ।"
+msgstr ""
 
 #: tr/forms.py:64
-#, fuzzy
 msgid "Enter a valid Turkish Identification number."
-msgstr "मान्य दक्षिणि आफ्रिकी आइ.डि संख्या भरें"
+msgstr ""
 
 #: tr/forms.py:65
-#, fuzzy
 msgid "Turkish Identification number must be 11 digits."
-msgstr "राष्ट्रीय पहचान संख्या में 11 अंक भरें ।"
+msgstr ""
 
 #: uk/forms.py:21
 msgid "Enter a valid postcode."
@@ -2567,9 +2478,8 @@ msgid "Enter a zip code in the format XXXXX or XXXXX-XXXX."
 msgstr "डाक संहिता को XXXXX अथवा XXXXX-XXXX प्रतिरूप में भरें ।"
 
 #: us/forms.py:26
-#, fuzzy
 msgid "Phone numbers must be in XXX-XXX-XXXX format."
-msgstr "टेलिफ़ोन संख्या XX-XXXX-XXXX प्रतिरूप में होनी चाहिए ।"
+msgstr ""
 
 #: us/forms.py:55
 msgid "Enter a valid U.S. Social Security number in XXX-XX-XXXX format."
@@ -2584,23 +2494,20 @@ msgid "U.S. state (two uppercase letters)"
 msgstr "अमेरिकी राज्य (दो अपरकेस अक्षर)"
 
 #: us/models.py:18
-#, fuzzy
 msgid "U.S. postal code (two uppercase letters)"
-msgstr "अमेरिकी राज्य (दो अपरकेस अक्षर)"
+msgstr ""
 
 #: us/models.py:27
 msgid "Phone number"
 msgstr "टेलिफोन संख्या"
 
 #: uy/forms.py:28
-#, fuzzy
 msgid "Enter a valid CI number in X.XXX.XXX-X,XXXXXXX-X or XXXXXXXX format."
-msgstr "मान्य CUIT XX-XXXXXXXX-X अथवा XXXXXXXXXXXX प्रतिरूप में गर्ज करें ।"
+msgstr ""
 
 #: uy/forms.py:30
-#, fuzzy
 msgid "Enter a valid CI number."
-msgstr "मान्य VAT संख्या भरें ।"
+msgstr ""
 
 #: za/forms.py:21
 msgid "Enter a valid South African ID number"

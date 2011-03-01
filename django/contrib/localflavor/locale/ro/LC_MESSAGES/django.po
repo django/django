@@ -1,19 +1,19 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:28+0100\n"
-"PO-Revision-Date: 2008-04-25 21:44+0200\n"
-"Last-Translator: \n"
-"Language-Team: Romanian <ro@li.org>\n"
+"POT-Creation-Date: 2011-03-01 00:33+0100\n"
+"PO-Revision-Date: 2011-02-22 00:10+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: Romanian <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: ro\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < "
+"20)) ? 1 : 2)\n"
 
 #: ar/forms.py:28
 msgid "Enter a postal code in the format NNNN or ANNNNAAA."
@@ -36,38 +36,32 @@ msgid "Invalid CUIT."
 msgstr "CUIT invalid."
 
 #: at/at_states.py:5
-#, fuzzy
 msgid "Burgenland"
-msgstr "Frizia"
+msgstr ""
 
 #: at/at_states.py:6
-#, fuzzy
 msgid "Carinthia"
-msgstr "Cantabria"
+msgstr ""
 
 #: at/at_states.py:7
-#, fuzzy
 msgid "Lower Austria"
-msgstr "Silezia Inferioară"
+msgstr ""
 
 #: at/at_states.py:8
 msgid "Upper Austria"
 msgstr ""
 
 #: at/at_states.py:9
-#, fuzzy
 msgid "Salzburg"
-msgstr "Hamburg"
+msgstr ""
 
 #: at/at_states.py:10
-#, fuzzy
 msgid "Styria"
-msgstr "Soria"
+msgstr ""
 
 #: at/at_states.py:11
-#, fuzzy
 msgid "Tyrol"
-msgstr "Tokyo"
+msgstr ""
 
 #: at/at_states.py:12
 msgid "Vorarlberg"
@@ -82,10 +76,8 @@ msgid "Enter a zip code in the format XXXX."
 msgstr "Introduceți un cod poștal de forma XXXX."
 
 #: at/forms.py:50
-#, fuzzy
 msgid "Enter a valid Austrian Social Security Number in XXXX XXXXXX format."
 msgstr ""
-"Introduceți un număr SUA de Securitate Sociala de forma XXX-XX-XXXX format."
 
 #: au/forms.py:17
 msgid "Enter a 4 digit post code."
@@ -96,23 +88,20 @@ msgid "Antwerp"
 msgstr ""
 
 #: be/be_provinces.py:6
-#, fuzzy
 msgid "Brussels"
-msgstr "utilizatori"
+msgstr ""
 
 #: be/be_provinces.py:7
-#, fuzzy
 msgid "East Flanders"
-msgstr "West Midlands"
+msgstr ""
 
 #: be/be_provinces.py:8
 msgid "Flemish Brabant"
 msgstr ""
 
 #: be/be_provinces.py:9
-#, fuzzy
 msgid "Hainaut"
-msgstr "minut"
+msgstr ""
 
 #: be/be_provinces.py:10
 msgid "Liege"
@@ -123,44 +112,36 @@ msgid "Limburg"
 msgstr "Limburg"
 
 #: be/be_provinces.py:12
-#, fuzzy
 msgid "Luxembourg"
-msgstr "Limburg"
+msgstr ""
 
 #: be/be_provinces.py:13
-#, fuzzy
 msgid "Namur"
-msgstr "Hamburg"
+msgstr ""
 
 #: be/be_provinces.py:14
-#, fuzzy
 msgid "Walloon Brabant"
-msgstr "Brabantul de Nord"
+msgstr ""
 
 #: be/be_provinces.py:15
-#, fuzzy
 msgid "West Flanders"
-msgstr "West Midlands"
+msgstr ""
 
 #: be/be_regions.py:5
-#, fuzzy
 msgid "Brussels Capital Region"
-msgstr "Regiunea Bratislava"
+msgstr ""
 
 #: be/be_regions.py:6
 msgid "Flemish Region"
 msgstr ""
 
 #: be/be_regions.py:7
-#, fuzzy
 msgid "Wallonia"
-msgstr "Catalonia"
+msgstr ""
 
 #: be/forms.py:23
-#, fuzzy
 msgid "Enter a valid postal code in the range and format 1XXX - 9XXX."
 msgstr ""
-"Introduceți un cod poștal valid în intervalul și de forma 01XXX - 52XXX."
 
 #: be/forms.py:46
 msgid ""
@@ -348,38 +329,32 @@ msgid "South Bohemian Region"
 msgstr ""
 
 #: cz/cz_regions.py:11
-#, fuzzy
 msgid "Pilsen Region"
-msgstr "Regiunea Zilina"
+msgstr ""
 
 #: cz/cz_regions.py:12
 msgid "Carlsbad Region"
 msgstr ""
 
 #: cz/cz_regions.py:13
-#, fuzzy
 msgid "Usti Region"
-msgstr "Regiunea Kosice"
+msgstr ""
 
 #: cz/cz_regions.py:14
-#, fuzzy
 msgid "Liberec Region"
-msgstr "Regiunea Trencin"
+msgstr ""
 
 #: cz/cz_regions.py:15
-#, fuzzy
 msgid "Hradec Region"
-msgstr "Regiunea Trencin"
+msgstr ""
 
 #: cz/cz_regions.py:16
-#, fuzzy
 msgid "Pardubice Region"
-msgstr "Regiunea Kosice"
+msgstr ""
 
 #: cz/cz_regions.py:17
-#, fuzzy
 msgid "Vysocina Region"
-msgstr "Regiunea Zilina"
+msgstr ""
 
 #: cz/cz_regions.py:18
 msgid "South Moravian Region"
@@ -390,9 +365,8 @@ msgid "Olomouc Region"
 msgstr ""
 
 #: cz/cz_regions.py:20
-#, fuzzy
 msgid "Zlin Region"
-msgstr "Regiunea Zilina"
+msgstr ""
 
 #: cz/cz_regions.py:21
 msgid "Moravian-Silesian Region"
@@ -403,24 +377,20 @@ msgid "Enter a postal code in the format XXXXX or XXX XX."
 msgstr "Introduceți un cod poștal de forma XXXXX or XXX XX."
 
 #: cz/forms.py:48
-#, fuzzy
 msgid "Enter a birth number in the format XXXXXX/XXXX or XXXXXXXXXX."
 msgstr ""
-"Introduceți un număr de taxă(NIP) de forma XXX-XXX-XX-XX sau XX-XX-XXX-XXX."
 
 #: cz/forms.py:49
 msgid "Invalid optional parameter Gender, valid values are 'f' and 'm'"
 msgstr ""
 
 #: cz/forms.py:50
-#, fuzzy
 msgid "Enter a valid birth number."
-msgstr "Introduceți un număr TVA valid."
+msgstr ""
 
 #: cz/forms.py:111
-#, fuzzy
 msgid "Enter a valid IC number."
-msgstr "Introduceți un număr TVA valid."
+msgstr ""
 
 #: de/de_states.py:5
 msgid "Baden-Wuerttemberg"
@@ -810,48 +780,40 @@ msgid "Enter a valid Finnish social security number."
 msgstr "Introduceți un număr finlandez de securitate socială valid."
 
 #: fr/forms.py:31
-#, fuzzy
 msgid "Phone numbers must be in 0X XX XX XX XX format."
-msgstr "Numerele de telefon trebuie să fie în format XXX-XXX-XXXX."
+msgstr ""
 
 #: id/forms.py:28
-#, fuzzy
 msgid "Enter a valid post code"
-msgstr "Introduceți un cod poștal valid"
+msgstr ""
 
 #: id/forms.py:68 nl/forms.py:53
 msgid "Enter a valid phone number"
 msgstr "Introduceţi un număr de telefon valid"
 
 #: id/forms.py:107
-#, fuzzy
 msgid "Enter a valid vehicle license plate number"
-msgstr "Introduceţi un număr de telefon valid"
+msgstr ""
 
 #: id/forms.py:170
-#, fuzzy
 msgid "Enter a valid NIK/KTP number"
-msgstr "Introduceți un număr TVA valid."
+msgstr ""
 
 #: id/id_choices.py:15
-#, fuzzy
 msgid "Aceh"
-msgstr "Aichi"
+msgstr ""
 
 #: id/id_choices.py:16 id/id_choices.py:79
-#, fuzzy
 msgid "Bali"
-msgstr "Bengaleză"
+msgstr ""
 
 #: id/id_choices.py:17 id/id_choices.py:51
-#, fuzzy
 msgid "Banten"
-msgstr "conţinut"
+msgstr ""
 
 #: id/id_choices.py:18 id/id_choices.py:60
-#, fuzzy
 msgid "Bengkulu"
-msgstr "Bengaleză"
+msgstr ""
 
 #: id/id_choices.py:19 id/id_choices.py:53
 msgid "Yogyakarta"
@@ -862,14 +824,12 @@ msgid "Jakarta"
 msgstr ""
 
 #: id/id_choices.py:21 id/id_choices.py:81
-#, fuzzy
 msgid "Gorontalo"
-msgstr "Girona"
+msgstr ""
 
 #: id/id_choices.py:22 id/id_choices.py:63
-#, fuzzy
 msgid "Jambi"
-msgstr "Limba tamila"
+msgstr ""
 
 #: id/id_choices.py:23
 msgid "Jawa Barat"
@@ -908,14 +868,12 @@ msgid "Kepulauan Riau"
 msgstr ""
 
 #: id/id_choices.py:32 id/id_choices.py:61
-#, fuzzy
 msgid "Lampung"
-msgstr "aug"
+msgstr ""
 
 #: id/id_choices.py:33 id/id_choices.py:76
-#, fuzzy
 msgid "Maluku"
-msgstr "Malacky"
+msgstr ""
 
 #: id/id_choices.py:34 id/id_choices.py:77
 msgid "Maluku Utara"
@@ -974,27 +932,24 @@ msgid "Sumatera Utara"
 msgstr ""
 
 #: id/id_choices.py:52
-#, fuzzy
 msgid "Magelang"
-msgstr "Malaga"
+msgstr ""
 
 #: id/id_choices.py:54
 msgid "Surakarta - Solo"
 msgstr ""
 
 #: id/id_choices.py:55
-#, fuzzy
 msgid "Madiun"
-msgstr "Madrid"
+msgstr ""
 
 #: id/id_choices.py:56
 msgid "Kediri"
 msgstr ""
 
 #: id/id_choices.py:59
-#, fuzzy
 msgid "Tapanuli"
-msgstr "Tamaulipas"
+msgstr ""
 
 #: id/id_choices.py:65
 msgid "Nanggroe Aceh Darussalam"
@@ -1013,9 +968,8 @@ msgid "Corps Diplomatic"
 msgstr ""
 
 #: id/id_choices.py:71
-#, fuzzy
 msgid "Bandung"
-msgstr "Brandenburg"
+msgstr ""
 
 #: id/id_choices.py:73
 msgid "Sulawesi Utara Daratan"
@@ -1038,9 +992,8 @@ msgid "Papua dan Papua Barat"
 msgstr ""
 
 #: id/id_choices.py:86
-#, fuzzy
 msgid "Cirebon"
-msgstr "Girona"
+msgstr ""
 
 #: id/id_choices.py:87
 msgid "NTB - Sumbawa"
@@ -1055,43 +1008,36 @@ msgid "NTT - Sumba"
 msgstr ""
 
 #: id/id_choices.py:90
-#, fuzzy
 msgid "Bogor"
-msgstr "Hyogo"
+msgstr ""
 
 #: id/id_choices.py:91
 msgid "Pekalongan"
 msgstr ""
 
 #: id/id_choices.py:92
-#, fuzzy
 msgid "Semarang"
-msgstr "Sârbă"
+msgstr ""
 
 #: id/id_choices.py:93
-#, fuzzy
 msgid "Pati"
-msgstr "activ"
+msgstr ""
 
 #: id/id_choices.py:97
-#, fuzzy
 msgid "Surabaya"
-msgstr "Sâmbătă"
+msgstr ""
 
 #: id/id_choices.py:98
-#, fuzzy
 msgid "Madura"
-msgstr "Madrid"
+msgstr ""
 
 #: id/id_choices.py:99
-#, fuzzy
 msgid "Malang"
-msgstr "Malaga"
+msgstr ""
 
 #: id/id_choices.py:100
-#, fuzzy
 msgid "Jember"
-msgstr "Noiembrie"
+msgstr ""
 
 #: id/id_choices.py:101
 msgid "Banyumas"
@@ -1114,73 +1060,60 @@ msgid "Sidoarjo"
 msgstr ""
 
 #: id/id_choices.py:106
-#, fuzzy
 msgid "Garut"
-msgstr "Glarus"
+msgstr ""
 
 #: ie/ie_counties.py:8
-#, fuzzy
 msgid "Antrim"
-msgstr "Comitatul Antrim"
+msgstr ""
 
 #: ie/ie_counties.py:9
-#, fuzzy
 msgid "Armagh"
-msgstr "Aragon"
+msgstr ""
 
 #: ie/ie_counties.py:10
 msgid "Carlow"
 msgstr ""
 
 #: ie/ie_counties.py:11
-#, fuzzy
 msgid "Cavan"
-msgstr "Catalană"
+msgstr ""
 
 #: ie/ie_counties.py:12
-#, fuzzy
 msgid "Clare"
-msgstr "Caceres"
+msgstr ""
 
 #: ie/ie_counties.py:13
-#, fuzzy
 msgid "Cork"
-msgstr "sau"
+msgstr ""
 
 #: ie/ie_counties.py:14
-#, fuzzy
 msgid "Derry"
-msgstr "Februarie"
+msgstr ""
 
 #: ie/ie_counties.py:15
-#, fuzzy
 msgid "Donegal"
-msgstr "unu"
+msgstr ""
 
 #: ie/ie_counties.py:16
-#, fuzzy
 msgid "Down"
-msgstr "Devon"
+msgstr ""
 
 #: ie/ie_counties.py:17
-#, fuzzy
 msgid "Dublin"
-msgstr "Lublin"
+msgstr ""
 
 #: ie/ie_counties.py:18
-#, fuzzy
 msgid "Fermanagh"
-msgstr "Comitatul Fermanagh"
+msgstr ""
 
 #: ie/ie_counties.py:19
-#, fuzzy
 msgid "Galway"
-msgstr "Galicia"
+msgstr ""
 
 #: ie/ie_counties.py:20
-#, fuzzy
 msgid "Kerry"
-msgstr "Februarie"
+msgstr ""
 
 #: ie/ie_counties.py:21
 msgid "Kildare"
@@ -1207,75 +1140,64 @@ msgid "Longford"
 msgstr ""
 
 #: ie/ie_counties.py:27
-#, fuzzy
 msgid "Louth"
-msgstr "Deautentificare"
+msgstr ""
 
 #: ie/ie_counties.py:28
-#, fuzzy
 msgid "Mayo"
-msgstr "Mai"
+msgstr ""
 
 #: ie/ie_counties.py:29
-#, fuzzy
 msgid "Meath"
-msgstr "Martie"
+msgstr ""
 
 #: ie/ie_counties.py:30
-#, fuzzy
 msgid "Monaghan"
-msgstr "Relogare"
+msgstr ""
 
 #: ie/ie_counties.py:31
 msgid "Offaly"
 msgstr ""
 
 #: ie/ie_counties.py:32
-#, fuzzy
 msgid "Roscommon"
-msgstr "comentariu"
+msgstr ""
 
 #: ie/ie_counties.py:33
-#, fuzzy
 msgid "Sligo"
-msgstr "Shiga"
+msgstr ""
 
 #: ie/ie_counties.py:34
 msgid "Tipperary"
 msgstr ""
 
 #: ie/ie_counties.py:35
-#, fuzzy
 msgid "Tyrone"
-msgstr "unu"
+msgstr ""
 
 #: ie/ie_counties.py:36
 msgid "Waterford"
 msgstr ""
 
 #: ie/ie_counties.py:37
-#, fuzzy
 msgid "Westmeath"
-msgstr "Pomerania Occidentală"
+msgstr ""
 
 #: ie/ie_counties.py:38
-#, fuzzy
 msgid "Wexford"
-msgstr "Mie"
+msgstr ""
 
 #: ie/ie_counties.py:39
 msgid "Wicklow"
 msgstr ""
 
 #: il/forms.py:31
-#, fuzzy
 msgid "Enter a postal code in the format XXXXX"
-msgstr "Introduceți un cod poștal de forma XX-XXX."
+msgstr ""
 
 #: il/forms.py:50
-#, fuzzy
 msgid "Enter a valid ID number."
-msgstr "Introduceți un număr TVA valid."
+msgstr ""
 
 #: in_/forms.py:15
 msgid "Enter a zip code in the format XXXXXXX."
@@ -1497,9 +1419,8 @@ msgid "Okinawa"
 msgstr "Okinawa"
 
 #: kw/forms.py:25
-#, fuzzy
 msgid "Enter a valid Kuwaiti Civil ID number"
-msgstr "Introduceți un ID sud african valid"
+msgstr ""
 
 #: mx/mx_states.py:12
 msgid "Aguascalientes"
@@ -1558,14 +1479,12 @@ msgid "Jalisco"
 msgstr "Jalisco"
 
 #: mx/mx_states.py:26
-#, fuzzy
 msgid "Estado de México"
-msgstr "Statul Mexico"
+msgstr ""
 
 #: mx/mx_states.py:27
-#, fuzzy
 msgid "Michoacán"
-msgstr "MichoacÃ¡n"
+msgstr ""
 
 #: mx/mx_states.py:28
 msgid "Morelos"
@@ -1576,9 +1495,8 @@ msgid "Nayarit"
 msgstr "Nayarit"
 
 #: mx/mx_states.py:30
-#, fuzzy
 msgid "Nuevo León"
-msgstr "Nuevo LeÃ³n"
+msgstr ""
 
 #: mx/mx_states.py:31
 msgid "Oaxaca"
@@ -1589,9 +1507,8 @@ msgid "Puebla"
 msgstr "Puebla"
 
 #: mx/mx_states.py:33
-#, fuzzy
 msgid "Querétaro"
-msgstr "QuerÃ©taro"
+msgstr ""
 
 #: mx/mx_states.py:34
 msgid "Quintana Roo"
@@ -1602,9 +1519,8 @@ msgid "Sinaloa"
 msgstr "Sinaloa"
 
 #: mx/mx_states.py:36
-#, fuzzy
 msgid "San Luis Potosí"
-msgstr "San Luis PotosÃ­"
+msgstr ""
 
 #: mx/mx_states.py:37
 msgid "Sonora"
@@ -1627,9 +1543,8 @@ msgid "Veracruz"
 msgstr "Veracruz"
 
 #: mx/mx_states.py:42
-#, fuzzy
 msgid "Yucatán"
-msgstr "Yucatan"
+msgstr ""
 
 #: mx/mx_states.py:43
 msgid "Zacatecas"
@@ -1644,9 +1559,8 @@ msgid "Enter a valid SoFi number"
 msgstr "Introduceți un număr SoFi valid"
 
 #: nl/nl_provinces.py:4
-#, fuzzy
 msgid "Drenthe"
-msgstr "Drente"
+msgstr ""
 
 #: nl/nl_provinces.py:5
 msgid "Flevoland"
@@ -1719,10 +1633,8 @@ msgid "Wrong checksum for the Tax Number (NIP)."
 msgstr "Sumă de control greșită pentru Numărul de Taxa (NIP)."
 
 #: pl/forms.py:114
-#, fuzzy
 msgid "National Business Register Number (REGON) consists of 9 or 14 digits."
 msgstr ""
-"Numărul National din Registrul pentru Afaceri (REGON) contine 7 sau 9 cifre."
 
 #: pl/forms.py:115
 msgid "Wrong checksum for the National Business Register Number (REGON)."
@@ -1799,58 +1711,48 @@ msgid "West Pomerania"
 msgstr "Pomerania Occidentală"
 
 #: pt/forms.py:17
-#, fuzzy
 msgid "Enter a zip code in the format XXXX-XXX."
-msgstr "Adăugați un cod poștal de forma XXXXX-XXX."
+msgstr ""
 
 #: pt/forms.py:37
 msgid "Phone numbers must have 9 digits, or start by + or 00."
 msgstr ""
 
 #: ro/forms.py:19
-#, fuzzy
 msgid "Enter a valid CIF."
-msgstr "Introduceți un URL valid."
+msgstr ""
 
 #: ro/forms.py:56
-#, fuzzy
 msgid "Enter a valid CNP."
-msgstr "Introduceți un URL valid."
+msgstr ""
 
 #: ro/forms.py:143
-#, fuzzy
 msgid "Enter a valid IBAN in ROXX-XXXX-XXXX-XXXX-XXXX-XXXX format"
-msgstr "Introduceți un CUIT valid de forma XX-XXXXXXXX-X sau XXXXXXXXXXXX."
+msgstr ""
 
 #: ro/forms.py:175
-#, fuzzy
 msgid "Phone numbers must be in XXXX-XXXXXX format."
-msgstr "Numerele de telefon trebuie să fie în format XXX-XXX-XXXX."
+msgstr ""
 
 #: ro/forms.py:200
-#, fuzzy
 msgid "Enter a valid postal code in the format XXXXXX"
-msgstr "Introduceți un cod poștal de forma XXX XXX."
+msgstr ""
 
 #: se/forms.py:50
-#, fuzzy
 msgid "Enter a valid Swedish organisation number."
-msgstr "Introduceți un număr SoFi valid"
+msgstr ""
 
 #: se/forms.py:107
-#, fuzzy
 msgid "Enter a valid Swedish personal identity number."
-msgstr "Introduceți un număr finlandez de securitate socială valid."
+msgstr ""
 
 #: se/forms.py:108
-#, fuzzy
 msgid "Co-ordination numbers are not allowed."
-msgstr "Valorile duplicate nu sunt permise."
+msgstr ""
 
 #: se/forms.py:150
-#, fuzzy
 msgid "Enter a Swedish postal code in the format XXXXX."
-msgstr "Introduceți un cod poștal de forma XX-XXX."
+msgstr ""
 
 #: se/se_counties.py:15
 msgid "Stockholm"
@@ -1869,9 +1771,8 @@ msgid "Uppsala"
 msgstr ""
 
 #: se/se_counties.py:19
-#, fuzzy
 msgid "Södermanland"
-msgstr "Gelderland"
+msgstr ""
 
 #: se/se_counties.py:20
 msgid "Östergötland"
@@ -1886,28 +1787,24 @@ msgid "Kronoberg"
 msgstr ""
 
 #: se/se_counties.py:23
-#, fuzzy
 msgid "Kalmar"
-msgstr "mar"
+msgstr ""
 
 #: se/se_counties.py:24
-#, fuzzy
 msgid "Gotland"
-msgstr "Scotia"
+msgstr ""
 
 #: se/se_counties.py:25
-#, fuzzy
 msgid "Blekinge"
-msgstr "Berna"
+msgstr ""
 
 #: se/se_counties.py:26
 msgid "Skåne"
 msgstr ""
 
 #: se/se_counties.py:27
-#, fuzzy
 msgid "Halland"
-msgstr "Saarland"
+msgstr ""
 
 #: se/se_counties.py:28
 msgid "Västra Götaland"
@@ -1926,9 +1823,8 @@ msgid "Västmanland"
 msgstr ""
 
 #: se/se_counties.py:32
-#, fuzzy
 msgid "Dalarna"
-msgstr "Galanta"
+msgstr ""
 
 #: se/se_counties.py:33
 msgid "Gävleborg"
@@ -2291,24 +2187,20 @@ msgid "Zilina region"
 msgstr "Regiunea Zilina"
 
 #: tr/forms.py:16
-#, fuzzy
 msgid "Enter a postal code in the format XXXXX."
-msgstr "Introduceți un cod poștal de forma XX-XXX."
+msgstr ""
 
 #: tr/forms.py:37
-#, fuzzy
 msgid "Phone numbers must be in 0XXX XXX XXXX format."
-msgstr "Numerele de telefon trebuie să fie în format XXX-XXX-XXXX."
+msgstr ""
 
 #: tr/forms.py:64
-#, fuzzy
 msgid "Enter a valid Turkish Identification number."
-msgstr "Introduceți un ID sud african valid"
+msgstr ""
 
 #: tr/forms.py:65
-#, fuzzy
 msgid "Turkish Identification number must be 11 digits."
-msgstr "Numărul Național de Identificare conține 11 cifre."
+msgstr ""
 
 #: uk/forms.py:21
 msgid "Enter a valid postcode."
@@ -2599,9 +2491,8 @@ msgid "Enter a zip code in the format XXXXX or XXXXX-XXXX."
 msgstr "Introduceți un cod poștal de forma XXXXX or XXXXX-XXXX."
 
 #: us/forms.py:26
-#, fuzzy
 msgid "Phone numbers must be in XXX-XXX-XXXX format."
-msgstr "Numerele de telefon trebuie să fie în format XXX-XXX-XXXX."
+msgstr ""
 
 #: us/forms.py:55
 msgid "Enter a valid U.S. Social Security number in XXX-XX-XXXX format."
@@ -2609,32 +2500,28 @@ msgstr ""
 "Introduceți un număr SUA de Securitate Sociala de forma XXX-XX-XXXX format."
 
 #: us/forms.py:88
-#, fuzzy
 msgid "Enter a U.S. state or territory."
-msgstr "Introduceţi o abreviere validă în U.S."
+msgstr ""
 
 #: us/models.py:9
 msgid "U.S. state (two uppercase letters)"
 msgstr "Stat SUA (doua litere mari)"
 
 #: us/models.py:18
-#, fuzzy
 msgid "U.S. postal code (two uppercase letters)"
-msgstr "Stat SUA (doua litere mari)"
+msgstr ""
 
 #: us/models.py:27
 msgid "Phone number"
 msgstr "Număr de telefon"
 
 #: uy/forms.py:28
-#, fuzzy
 msgid "Enter a valid CI number in X.XXX.XXX-X,XXXXXXX-X or XXXXXXXX format."
-msgstr "Introduceți un CUIT valid de forma XX-XXXXXXXX-X sau XXXXXXXXXXXX."
+msgstr ""
 
 #: uy/forms.py:30
-#, fuzzy
 msgid "Enter a valid CI number."
-msgstr "Introduceți un număr TVA valid."
+msgstr ""
 
 #: za/forms.py:21
 msgid "Enter a valid South African ID number"

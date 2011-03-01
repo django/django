@@ -1,21 +1,19 @@
-# Django Latvian translation.
-# Copyright (C) 2008 THE Django'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the Django package.
-#
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:28+0100\n"
-"PO-Revision-Date: 2010-05-10 20:18+0200\n"
-"Last-Translator: Reinis Veips <reinis.veips@wot.lv>\n"
-"Language-Team: Latvian translators' team <reinis.veips@wot.lv>\n"
+"POT-Creation-Date: 2011-03-01 00:33+0100\n"
+"PO-Revision-Date: 2011-02-22 00:10+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: Latvian <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: lv\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : "
-"2);\n"
+"2)\n"
 
 #: ar/forms.py:28
 msgid "Enter a postal code in the format NNNN or ANNNNAAA."
@@ -91,9 +89,8 @@ msgid "Antwerp"
 msgstr ""
 
 #: be/be_provinces.py:6
-#, fuzzy
 msgid "Brussels"
-msgstr "lietotāji"
+msgstr ""
 
 #: be/be_provinces.py:7
 msgid "East Flanders"
@@ -104,9 +101,8 @@ msgid "Flemish Brabant"
 msgstr ""
 
 #: be/be_provinces.py:9
-#, fuzzy
 msgid "Hainaut"
-msgstr "minūte"
+msgstr ""
 
 #: be/be_provinces.py:10
 msgid "Liege"
@@ -117,19 +113,16 @@ msgid "Limburg"
 msgstr "Limburga"
 
 #: be/be_provinces.py:12
-#, fuzzy
 msgid "Luxembourg"
-msgstr "Limburga"
+msgstr ""
 
 #: be/be_provinces.py:13
-#, fuzzy
 msgid "Namur"
-msgstr "Vārds"
+msgstr ""
 
 #: be/be_provinces.py:14
-#, fuzzy
 msgid "Walloon Brabant"
-msgstr "Ziemeļbrabante"
+msgstr ""
 
 #: be/be_provinces.py:15
 msgid "West Flanders"
@@ -140,20 +133,16 @@ msgid "Brussels Capital Region"
 msgstr ""
 
 #: be/be_regions.py:6
-#, fuzzy
 msgid "Flemish Region"
-msgstr "Pilzenes reģions"
+msgstr ""
 
 #: be/be_regions.py:7
-#, fuzzy
 msgid "Wallonia"
-msgstr "Katalonija"
+msgstr ""
 
 #: be/forms.py:23
-#, fuzzy
 msgid "Enter a valid postal code in the range and format 1XXX - 9XXX."
 msgstr ""
-"Ievadiet korektu pasta indeksu sekojošajā formātā un robežās 01XXX - 52XXX"
 
 #: be/forms.py:46
 msgid ""
@@ -1203,14 +1192,12 @@ msgid "Wicklow"
 msgstr ""
 
 #: il/forms.py:31
-#, fuzzy
 msgid "Enter a postal code in the format XXXXX"
-msgstr "Ievadiet pasta indeksu formātā XX-XXX."
+msgstr ""
 
 #: il/forms.py:50
-#, fuzzy
 msgid "Enter a valid ID number."
-msgstr "Ievadiet korektu IC numuru."
+msgstr ""
 
 #: in_/forms.py:15
 msgid "Enter a zip code in the format XXXXXXX."
@@ -2197,24 +2184,20 @@ msgid "Zilina region"
 msgstr ""
 
 #: tr/forms.py:16
-#, fuzzy
 msgid "Enter a postal code in the format XXXXX."
-msgstr "Ievadiet pasta indeksu formātā XX-XXX."
+msgstr ""
 
 #: tr/forms.py:37
-#, fuzzy
 msgid "Phone numbers must be in 0XXX XXX XXXX format."
-msgstr "Telefona numuriem jābūt  0X XX XX XX XX formātā."
+msgstr ""
 
 #: tr/forms.py:64
-#, fuzzy
 msgid "Enter a valid Turkish Identification number."
-msgstr "Ievadiet korektu Zviedrijas organizācijas numuru."
+msgstr ""
 
 #: tr/forms.py:65
-#, fuzzy
 msgid "Turkish Identification number must be 11 digits."
-msgstr "Nacionālais identifikācijas numurs sastāv no 11 cipariem."
+msgstr ""
 
 #: uk/forms.py:21
 msgid "Enter a valid postcode."
@@ -2522,9 +2505,8 @@ msgid "U.S. state (two uppercase letters)"
 msgstr "ASV štats (divi augšējā reģistra burti)"
 
 #: us/models.py:18
-#, fuzzy
 msgid "U.S. postal code (two uppercase letters)"
-msgstr "ASV štats (divi augšējā reģistra burti)"
+msgstr ""
 
 #: us/models.py:27
 msgid "Phone number"

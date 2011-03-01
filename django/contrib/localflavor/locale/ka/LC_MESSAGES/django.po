@@ -1,18 +1,17 @@
-# translation of django.po to Georgian
-# Django translation to Georgian language.
-# This file is distributed under the same license as the PACKAGE package.
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:28+0100\n"
-"PO-Revision-Date: 2008-10-05 14:34+0400\n"
-"Last-Translator: David Avsajanishvili <avsd05@gmail.com>\n"
-"Language-Team: Georgian <ka@li.org>\n"
+"POT-Creation-Date: 2011-03-01 00:32+0100\n"
+"PO-Revision-Date: 2011-02-22 00:10+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: Georgian <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: ka\n"
 "Plural-Forms: nplurals=1; plural=0\n"
 
 #: ar/forms.py:28
@@ -86,74 +85,63 @@ msgstr "შეიყვანეთ ოთხთანრიგიანი ს�
 
 #: be/be_provinces.py:5
 msgid "Antwerp"
-msgstr ""
+msgstr "ანტვერპი"
 
 #: be/be_provinces.py:6
-#, fuzzy
 msgid "Brussels"
-msgstr "მომხმარებლები"
+msgstr "ბრიუსელი"
 
 #: be/be_provinces.py:7
-#, fuzzy
 msgid "East Flanders"
-msgstr "დასავლეთ მიდლენდსი"
+msgstr "აღმ. ფლანდრები"
 
 #: be/be_provinces.py:8
 msgid "Flemish Brabant"
-msgstr ""
+msgstr "ფლამანდიური ბრაბანტი"
 
 #: be/be_provinces.py:9
-#, fuzzy
 msgid "Hainaut"
-msgstr "წუთი"
+msgstr "ჰაინაუტი"
 
 #: be/be_provinces.py:10
 msgid "Liege"
-msgstr ""
+msgstr "ლიჯი"
 
 #: be/be_provinces.py:11 nl/nl_provinces.py:9
 msgid "Limburg"
 msgstr "ლიმბურგი"
 
 #: be/be_provinces.py:12
-#, fuzzy
 msgid "Luxembourg"
-msgstr "ლიმბურგი"
+msgstr "ლუქსემბურგი"
 
 #: be/be_provinces.py:13
-#, fuzzy
 msgid "Namur"
-msgstr "სახელი"
+msgstr "ნამური"
 
 #: be/be_provinces.py:14
-#, fuzzy
 msgid "Walloon Brabant"
-msgstr "ჩრდილოეთ ბრაბანტი"
+msgstr "ვალონიური ბრაბანტი"
 
 #: be/be_provinces.py:15
-#, fuzzy
 msgid "West Flanders"
-msgstr "დასავლეთ მიდლენდსი"
+msgstr "დას. ფლანდრები"
 
 #: be/be_regions.py:5
-#, fuzzy
 msgid "Brussels Capital Region"
-msgstr "ბრატისლავას რაიონი"
+msgstr "ბრიუსელი-დედაქალაქი"
 
 #: be/be_regions.py:6
 msgid "Flemish Region"
-msgstr ""
+msgstr "ფლემიური რაიონი"
 
 #: be/be_regions.py:7
-#, fuzzy
 msgid "Wallonia"
-msgstr "კატალონია"
+msgstr "ვალონია"
 
 #: be/forms.py:23
-#, fuzzy
 msgid "Enter a valid postal code in the range and format 1XXX - 9XXX."
-msgstr ""
-"შეიყვანეთ სწორი საფოსტო კოდი შემდეგ ინტერვალში და ფორმატში: 01XXX - 52XXX."
+msgstr "შეიყვანეთ სწორი საფოსტო კოდი ფორმატში 1XXX - 9XXX."
 
 #: be/forms.py:46
 msgid ""
@@ -161,6 +149,9 @@ msgid ""
 "04xx xx xx xx, 0x/xxx.xx.xx, 0xx/xx.xx.xx, 04xx/xx.xx.xx, 0x.xxx.xx.xx, 0xx."
 "xx.xx.xx, 04xx.xx.xx.xx, 0xxxxxxxx or 04xxxxxxxx."
 msgstr ""
+"შეიყვანეთ ტელეფონის ნომერი დასაშვებ ფორმატში: 0x xxx xx xx, 0xx xx xx xx, "
+"04xx xx xx xx, 0x/xxx.xx.xx, 0xx/xx.xx.xx, 04xx/xx.xx.xx, 0x.xxx.xx.xx, 0xx."
+"xx.xx.xx, 04xx.xx.xx.xx, 0xxxxxxxx or 04xxxxxxxx."
 
 #: br/forms.py:17
 msgid "Enter a zip code in the format XXXXX-XXX."
@@ -328,91 +319,79 @@ msgstr "ჩილიური RUT არასწორია."
 
 #: cz/cz_regions.py:8
 msgid "Prague"
-msgstr ""
+msgstr "პრაღა"
 
 #: cz/cz_regions.py:9
 msgid "Central Bohemian Region"
-msgstr ""
+msgstr "ცენტრალური ბოჰემიის რაიონი"
 
 #: cz/cz_regions.py:10
 msgid "South Bohemian Region"
-msgstr ""
+msgstr "სამხრეთ ბოჰემიის რაიონი"
 
 #: cz/cz_regions.py:11
-#, fuzzy
 msgid "Pilsen Region"
-msgstr "ზილინას რაიონი"
+msgstr "პილსენის რაიონი"
 
 #: cz/cz_regions.py:12
 msgid "Carlsbad Region"
-msgstr ""
+msgstr "კარლსბადის რაიონი"
 
 #: cz/cz_regions.py:13
-#, fuzzy
 msgid "Usti Region"
-msgstr "კოშიცეს რაიონი"
+msgstr "იუსტის რაიონი"
 
 #: cz/cz_regions.py:14
-#, fuzzy
 msgid "Liberec Region"
-msgstr "ტრენჩინის რაიონი"
+msgstr "ლიბერეცის რაიონი"
 
 #: cz/cz_regions.py:15
-#, fuzzy
 msgid "Hradec Region"
-msgstr "ტრენჩინის რაიონი"
+msgstr "ჰრადეცის რაიონი"
 
 #: cz/cz_regions.py:16
-#, fuzzy
 msgid "Pardubice Region"
-msgstr "კოშიცეს რაიონი"
+msgstr "პარდუბიცეს რაიონი"
 
 #: cz/cz_regions.py:17
-#, fuzzy
 msgid "Vysocina Region"
-msgstr "ზილინას რაიონი"
+msgstr "ვისოჩინას რაიონი"
 
 #: cz/cz_regions.py:18
 msgid "South Moravian Region"
-msgstr ""
+msgstr "სამხრეთ მორავიის რაიონი"
 
 #: cz/cz_regions.py:19
 msgid "Olomouc Region"
-msgstr ""
+msgstr "ოლომუცის რაიონი"
 
 #: cz/cz_regions.py:20
-#, fuzzy
 msgid "Zlin Region"
-msgstr "ზილინას რაიონი"
+msgstr "ზლინის რაიონი"
 
 #: cz/cz_regions.py:21
 msgid "Moravian-Silesian Region"
-msgstr ""
+msgstr "მორავია-სილესიის რაიონ"
 
 #: cz/forms.py:28 sk/forms.py:30
 msgid "Enter a postal code in the format XXXXX or XXX XX."
 msgstr "შეიყვანეთ საფოსტო კოდი ფორმატში XXXXX or XXX XX."
 
 #: cz/forms.py:48
-#, fuzzy
 msgid "Enter a birth number in the format XXXXXX/XXXX or XXXXXXXXXX."
 msgstr ""
-"შეიყვანეთ საგადასახადოს ნომერი (NIP) ფორმატში: XXX-XXX-XX-XX or XX-XX-XXX-"
-"XXX."
 
 #: cz/forms.py:49
 msgid "Invalid optional parameter Gender, valid values are 'f' and 'm'"
 msgstr ""
 
 #: cz/forms.py:50
-#, fuzzy
 msgid "Enter a valid birth number."
-msgstr "შეიყვანეთ სწორი დღგ-ს ნომერი."
+msgstr ""
 
 #: cz/forms.py:111
-#, fuzzy
 msgid "Enter a valid IC number."
-msgstr "შეიყვანეთ სწორი დღგ-ს ნომერი."
+msgstr ""
 
 #: de/de_states.py:5
 msgid "Baden-Wuerttemberg"
@@ -803,48 +782,40 @@ msgid "Enter a valid Finnish social security number."
 msgstr "შეიყვანეთ სწორი ფინური პირადი ნომერი."
 
 #: fr/forms.py:31
-#, fuzzy
 msgid "Phone numbers must be in 0X XX XX XX XX format."
-msgstr "ტელეფონის ნომრები უნდა იყოს XX-XXXX-XXXX ფორმატში."
+msgstr ""
 
 #: id/forms.py:28
-#, fuzzy
 msgid "Enter a valid post code"
-msgstr "შეიყვანეთ სწორი საფოსტო კოდი"
+msgstr ""
 
 #: id/forms.py:68 nl/forms.py:53
 msgid "Enter a valid phone number"
 msgstr "შეიყვანეთ სწორი ტელეფონის ნომერი"
 
 #: id/forms.py:107
-#, fuzzy
 msgid "Enter a valid vehicle license plate number"
-msgstr "შეიყვანეთ სწორი ტელეფონის ნომერი"
+msgstr ""
 
 #: id/forms.py:170
-#, fuzzy
 msgid "Enter a valid NIK/KTP number"
-msgstr "შეიყვანეთ სწორი დღგ-ს ნომერი."
+msgstr ""
 
 #: id/id_choices.py:15
-#, fuzzy
 msgid "Aceh"
-msgstr "აიჩი"
+msgstr ""
 
 #: id/id_choices.py:16 id/id_choices.py:79
-#, fuzzy
 msgid "Bali"
-msgstr "ბენგალიური"
+msgstr ""
 
 #: id/id_choices.py:17 id/id_choices.py:51
-#, fuzzy
 msgid "Banten"
-msgstr "კონტენტი"
+msgstr ""
 
 #: id/id_choices.py:18 id/id_choices.py:60
-#, fuzzy
 msgid "Bengkulu"
-msgstr "ბენგალიური"
+msgstr ""
 
 #: id/id_choices.py:19 id/id_choices.py:53
 msgid "Yogyakarta"
@@ -855,14 +826,12 @@ msgid "Jakarta"
 msgstr ""
 
 #: id/id_choices.py:21 id/id_choices.py:81
-#, fuzzy
 msgid "Gorontalo"
-msgstr "გირონა"
+msgstr ""
 
 #: id/id_choices.py:22 id/id_choices.py:63
-#, fuzzy
 msgid "Jambi"
-msgstr "თამილური"
+msgstr ""
 
 #: id/id_choices.py:23
 msgid "Jawa Barat"
@@ -901,14 +870,12 @@ msgid "Kepulauan Riau"
 msgstr ""
 
 #: id/id_choices.py:32 id/id_choices.py:61
-#, fuzzy
 msgid "Lampung"
-msgstr "აგვ"
+msgstr ""
 
 #: id/id_choices.py:33 id/id_choices.py:76
-#, fuzzy
 msgid "Maluku"
-msgstr "მალაცკი"
+msgstr ""
 
 #: id/id_choices.py:34 id/id_choices.py:77
 msgid "Maluku Utara"
@@ -967,27 +934,24 @@ msgid "Sumatera Utara"
 msgstr ""
 
 #: id/id_choices.py:52
-#, fuzzy
 msgid "Magelang"
-msgstr "მალაგა"
+msgstr ""
 
 #: id/id_choices.py:54
 msgid "Surakarta - Solo"
 msgstr ""
 
 #: id/id_choices.py:55
-#, fuzzy
 msgid "Madiun"
-msgstr "მადრიდი"
+msgstr ""
 
 #: id/id_choices.py:56
 msgid "Kediri"
 msgstr ""
 
 #: id/id_choices.py:59
-#, fuzzy
 msgid "Tapanuli"
-msgstr "ტამაულიპასი"
+msgstr ""
 
 #: id/id_choices.py:65
 msgid "Nanggroe Aceh Darussalam"
@@ -1006,9 +970,8 @@ msgid "Corps Diplomatic"
 msgstr ""
 
 #: id/id_choices.py:71
-#, fuzzy
 msgid "Bandung"
-msgstr "ბრანდენბურგი"
+msgstr ""
 
 #: id/id_choices.py:73
 msgid "Sulawesi Utara Daratan"
@@ -1031,9 +994,8 @@ msgid "Papua dan Papua Barat"
 msgstr ""
 
 #: id/id_choices.py:86
-#, fuzzy
 msgid "Cirebon"
-msgstr "გირონა"
+msgstr ""
 
 #: id/id_choices.py:87
 msgid "NTB - Sumbawa"
@@ -1048,43 +1010,36 @@ msgid "NTT - Sumba"
 msgstr ""
 
 #: id/id_choices.py:90
-#, fuzzy
 msgid "Bogor"
-msgstr "ჰიოგო"
+msgstr ""
 
 #: id/id_choices.py:91
 msgid "Pekalongan"
 msgstr ""
 
 #: id/id_choices.py:92
-#, fuzzy
 msgid "Semarang"
-msgstr "სერბული"
+msgstr ""
 
 #: id/id_choices.py:93
-#, fuzzy
 msgid "Pati"
-msgstr "აქტიურია"
+msgstr ""
 
 #: id/id_choices.py:97
-#, fuzzy
 msgid "Surabaya"
-msgstr "შაბათი"
+msgstr ""
 
 #: id/id_choices.py:98
-#, fuzzy
 msgid "Madura"
-msgstr "მადრიდი"
+msgstr ""
 
 #: id/id_choices.py:99
-#, fuzzy
 msgid "Malang"
-msgstr "მალაგა"
+msgstr ""
 
 #: id/id_choices.py:100
-#, fuzzy
 msgid "Jember"
-msgstr "ნოემბერი"
+msgstr ""
 
 #: id/id_choices.py:101
 msgid "Banyumas"
@@ -1107,73 +1062,60 @@ msgid "Sidoarjo"
 msgstr ""
 
 #: id/id_choices.py:106
-#, fuzzy
 msgid "Garut"
-msgstr "გლარუსი"
+msgstr ""
 
 #: ie/ie_counties.py:8
-#, fuzzy
 msgid "Antrim"
-msgstr "ანტრიმის ქვეყანა"
+msgstr ""
 
 #: ie/ie_counties.py:9
-#, fuzzy
 msgid "Armagh"
-msgstr "არაგონ"
+msgstr ""
 
 #: ie/ie_counties.py:10
 msgid "Carlow"
 msgstr ""
 
 #: ie/ie_counties.py:11
-#, fuzzy
 msgid "Cavan"
-msgstr "კატალანური"
+msgstr ""
 
 #: ie/ie_counties.py:12
-#, fuzzy
 msgid "Clare"
-msgstr "კასერესი"
+msgstr ""
 
 #: ie/ie_counties.py:13
-#, fuzzy
 msgid "Cork"
-msgstr "ან"
+msgstr ""
 
 #: ie/ie_counties.py:14
-#, fuzzy
 msgid "Derry"
-msgstr "თებერვალი"
+msgstr ""
 
 #: ie/ie_counties.py:15
-#, fuzzy
 msgid "Donegal"
-msgstr "ერთი"
+msgstr ""
 
 #: ie/ie_counties.py:16
-#, fuzzy
 msgid "Down"
-msgstr "დევონი"
+msgstr ""
 
 #: ie/ie_counties.py:17
-#, fuzzy
 msgid "Dublin"
-msgstr "ლუბლინი"
+msgstr ""
 
 #: ie/ie_counties.py:18
-#, fuzzy
 msgid "Fermanagh"
-msgstr "ფერმანაგის ქვეყანა"
+msgstr ""
 
 #: ie/ie_counties.py:19
-#, fuzzy
 msgid "Galway"
-msgstr "გალიცია"
+msgstr ""
 
 #: ie/ie_counties.py:20
-#, fuzzy
 msgid "Kerry"
-msgstr "თებერვალი"
+msgstr ""
 
 #: ie/ie_counties.py:21
 msgid "Kildare"
@@ -1200,75 +1142,64 @@ msgid "Longford"
 msgstr ""
 
 #: ie/ie_counties.py:27
-#, fuzzy
 msgid "Louth"
-msgstr "გამოსვლა"
+msgstr ""
 
 #: ie/ie_counties.py:28
-#, fuzzy
 msgid "Mayo"
-msgstr "მაისი"
+msgstr ""
 
 #: ie/ie_counties.py:29
-#, fuzzy
 msgid "Meath"
-msgstr "მეტა-მონაცემები"
+msgstr ""
 
 #: ie/ie_counties.py:30
-#, fuzzy
 msgid "Monaghan"
-msgstr "ხელახლა შესვლა"
+msgstr ""
 
 #: ie/ie_counties.py:31
 msgid "Offaly"
 msgstr ""
 
 #: ie/ie_counties.py:32
-#, fuzzy
 msgid "Roscommon"
-msgstr "კომენტარი"
+msgstr ""
 
 #: ie/ie_counties.py:33
-#, fuzzy
 msgid "Sligo"
-msgstr "შიგა"
+msgstr ""
 
 #: ie/ie_counties.py:34
 msgid "Tipperary"
 msgstr ""
 
 #: ie/ie_counties.py:35
-#, fuzzy
 msgid "Tyrone"
-msgstr "ტიროლი"
+msgstr ""
 
 #: ie/ie_counties.py:36
 msgid "Waterford"
 msgstr ""
 
 #: ie/ie_counties.py:37
-#, fuzzy
 msgid "Westmeath"
-msgstr "დასავლეთ პომერანია"
+msgstr ""
 
 #: ie/ie_counties.py:38
-#, fuzzy
 msgid "Wexford"
-msgstr "ოთხ"
+msgstr ""
 
 #: ie/ie_counties.py:39
 msgid "Wicklow"
 msgstr ""
 
 #: il/forms.py:31
-#, fuzzy
 msgid "Enter a postal code in the format XXXXX"
-msgstr "შეიყვანეთ საფოსტო კოდი ფორმატში XX-XXX."
+msgstr ""
 
 #: il/forms.py:50
-#, fuzzy
 msgid "Enter a valid ID number."
-msgstr "შეიყვანეთ სწორი დღგ-ს ნომერი."
+msgstr ""
 
 #: in_/forms.py:15
 msgid "Enter a zip code in the format XXXXXXX."
@@ -1489,9 +1420,8 @@ msgid "Okinawa"
 msgstr "ოკინავა"
 
 #: kw/forms.py:25
-#, fuzzy
 msgid "Enter a valid Kuwaiti Civil ID number"
-msgstr "შეიყვანეთ სწორი სამხრეთ-აფრიკული ID ნომერი"
+msgstr ""
 
 #: mx/mx_states.py:12
 msgid "Aguascalientes"
@@ -1705,10 +1635,8 @@ msgid "Wrong checksum for the Tax Number (NIP)."
 msgstr "არასწორი საკონტროლო ჯამი საგადასახადო ნომრისათვის (NIP)."
 
 #: pl/forms.py:114
-#, fuzzy
 msgid "National Business Register Number (REGON) consists of 9 or 14 digits."
 msgstr ""
-"საწარმოოს ეროვნული სარეგისტრაციო ნომერი (REGON) შედგება 7 ან 9 თანრიგისაგან."
 
 #: pl/forms.py:115
 msgid "Wrong checksum for the National Business Register Number (REGON)."
@@ -1784,9 +1712,8 @@ msgid "West Pomerania"
 msgstr "დასავლეთ პომერანია"
 
 #: pt/forms.py:17
-#, fuzzy
 msgid "Enter a zip code in the format XXXX-XXX."
-msgstr "შეიყვანეთ zip-კოდი ფორმატში: XXXXX-XXX."
+msgstr ""
 
 #: pt/forms.py:37
 msgid "Phone numbers must have 9 digits, or start by + or 00."
@@ -1814,23 +1741,20 @@ msgid "Enter a valid postal code in the format XXXXXX"
 msgstr "შეიყვანეთ საფოსტო კოდი ფორმატში: XXX XXX."
 
 #: se/forms.py:50
-#, fuzzy
 msgid "Enter a valid Swedish organisation number."
-msgstr "შეიყვანეთ სწორი SoFi ნომერი"
+msgstr ""
 
 #: se/forms.py:107
-#, fuzzy
 msgid "Enter a valid Swedish personal identity number."
-msgstr "შეიყვანეთ სწორი ფინური პირადი ნომერი."
+msgstr ""
 
 #: se/forms.py:108
 msgid "Co-ordination numbers are not allowed."
 msgstr ""
 
 #: se/forms.py:150
-#, fuzzy
 msgid "Enter a Swedish postal code in the format XXXXX."
-msgstr "შეიყვანეთ საფოსტო კოდი ფორმატში XX-XXX."
+msgstr ""
 
 #: se/se_counties.py:15
 msgid "Stockholm"
@@ -1849,9 +1773,8 @@ msgid "Uppsala"
 msgstr ""
 
 #: se/se_counties.py:19
-#, fuzzy
 msgid "Södermanland"
-msgstr "გელდერლანდი"
+msgstr ""
 
 #: se/se_counties.py:20
 msgid "Östergötland"
@@ -1866,28 +1789,24 @@ msgid "Kronoberg"
 msgstr ""
 
 #: se/se_counties.py:23
-#, fuzzy
 msgid "Kalmar"
-msgstr "მარ"
+msgstr ""
 
 #: se/se_counties.py:24
-#, fuzzy
 msgid "Gotland"
-msgstr "შოტლანდია"
+msgstr ""
 
 #: se/se_counties.py:25
-#, fuzzy
 msgid "Blekinge"
-msgstr "ბერნი"
+msgstr ""
 
 #: se/se_counties.py:26
 msgid "Skåne"
 msgstr ""
 
 #: se/se_counties.py:27
-#, fuzzy
 msgid "Halland"
-msgstr "ზაარლანდი"
+msgstr ""
 
 #: se/se_counties.py:28
 msgid "Västra Götaland"
@@ -1906,9 +1825,8 @@ msgid "Västmanland"
 msgstr ""
 
 #: se/se_counties.py:32
-#, fuzzy
 msgid "Dalarna"
-msgstr "გალანტა"
+msgstr ""
 
 #: se/se_counties.py:33
 msgid "Gävleborg"
@@ -2271,24 +2189,20 @@ msgid "Zilina region"
 msgstr "ზილინას რაიონი"
 
 #: tr/forms.py:16
-#, fuzzy
 msgid "Enter a postal code in the format XXXXX."
-msgstr "შეიყვანეთ საფოსტო კოდი ფორმატში XX-XXX."
+msgstr ""
 
 #: tr/forms.py:37
-#, fuzzy
 msgid "Phone numbers must be in 0XXX XXX XXXX format."
-msgstr "ტელეფონის ნომრები უნდა იყოს XX-XXXX-XXXX ფორმატში."
+msgstr ""
 
 #: tr/forms.py:64
-#, fuzzy
 msgid "Enter a valid Turkish Identification number."
-msgstr "შეიყვანეთ სწორი სამხრეთ-აფრიკული ID ნომერი"
+msgstr ""
 
 #: tr/forms.py:65
-#, fuzzy
 msgid "Turkish Identification number must be 11 digits."
-msgstr "ეროვნული საიდენტიფიკაციო ნომერი შედგება 11 თანრიგისაგან."
+msgstr ""
 
 #: uk/forms.py:21
 msgid "Enter a valid postcode."
@@ -2579,9 +2493,8 @@ msgid "Enter a zip code in the format XXXXX or XXXXX-XXXX."
 msgstr "შეიყვანეთ zip-კოდი ფორმატში XXXXX ან XXXXX-XXXX."
 
 #: us/forms.py:26
-#, fuzzy
 msgid "Phone numbers must be in XXX-XXX-XXXX format."
-msgstr "ტელეფონის ნომრები უნდა იყოს XX-XXXX-XXXX ფორმატში."
+msgstr ""
 
 #: us/forms.py:55
 msgid "Enter a valid U.S. Social Security number in XXX-XX-XXXX format."
@@ -2596,24 +2509,20 @@ msgid "U.S. state (two uppercase letters)"
 msgstr "აშშ შტატი (ორი ასომთავრული)"
 
 #: us/models.py:18
-#, fuzzy
 msgid "U.S. postal code (two uppercase letters)"
-msgstr "აშშ შტატი (ორი ასომთავრული)"
+msgstr ""
 
 #: us/models.py:27
 msgid "Phone number"
 msgstr "ტელეფონის ნომერი"
 
 #: uy/forms.py:28
-#, fuzzy
 msgid "Enter a valid CI number in X.XXX.XXX-X,XXXXXXX-X or XXXXXXXX format."
 msgstr ""
-"შეიყვანეთ დასაშვები CUIT ერთ-ერთ ფორმატში: XX-XXXXXXXX-X ან XXXXXXXXXXXX."
 
 #: uy/forms.py:30
-#, fuzzy
 msgid "Enter a valid CI number."
-msgstr "შეიყვანეთ სწორი დღგ-ს ნომერი."
+msgstr ""
 
 #: za/forms.py:21
 msgid "Enter a valid South African ID number"

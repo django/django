@@ -1,21 +1,18 @@
-# translation of Django.
-# Copyright (C) 2008 The Django Project
 # This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:28+0100\n"
-"PO-Revision-Date: 2010-05-09 15:10-0500\n"
+"POT-Creation-Date: 2011-03-01 00:32+0100\n"
+"PO-Revision-Date: 2011-02-22 00:10+0000\n"
 "Last-Translator: Alex <alex.gaynor@gmail.com>\n"
-"Language-Team: Django-i18n <django-i18n@googlegroups.com>\n"
+"Language-Team: Hebrew <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Poedit-Bookmarks: -1,988,-1,-1,-1,-1,-1,-1,-1,-1\n"
-"X-Generator: Lokalize 1.0\n"
+"Language: he\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: ar/forms.py:28
 msgid "Enter a postal code in the format NNNN or ANNNNAAA."
@@ -86,76 +83,64 @@ msgid "Enter a 4 digit post code."
 msgstr "יש להזין קוד דואר בן 4 ספרות."
 
 #: be/be_provinces.py:5
-#, fuzzy
 msgid "Antwerp"
-msgstr "אנטרים"
+msgstr "אנטוורפן"
 
 #: be/be_provinces.py:6
-#, fuzzy
 msgid "Brussels"
-msgstr "משתמשים"
+msgstr "בריסל"
 
 #: be/be_provinces.py:7
-#, fuzzy
 msgid "East Flanders"
-msgstr "מערב המידלנדס"
+msgstr "מזרח פלנדריה"
 
 #: be/be_provinces.py:8
 msgid "Flemish Brabant"
-msgstr ""
+msgstr "ברבנט הפלמית"
 
 #: be/be_provinces.py:9
-#, fuzzy
 msgid "Hainaut"
-msgstr "דקה"
+msgstr "היינאוט"
 
 #: be/be_provinces.py:10
 msgid "Liege"
-msgstr ""
+msgstr "לייז'"
 
 #: be/be_provinces.py:11 nl/nl_provinces.py:9
 msgid "Limburg"
 msgstr "לימבורג"
 
 #: be/be_provinces.py:12
-#, fuzzy
 msgid "Luxembourg"
-msgstr "לימבורג"
+msgstr "לוקסמבורג"
 
 #: be/be_provinces.py:13
-#, fuzzy
 msgid "Namur"
-msgstr "שם"
+msgstr "נאמור"
 
 #: be/be_provinces.py:14
-#, fuzzy
 msgid "Walloon Brabant"
-msgstr "צפון בראבנט"
+msgstr "ברבנט הוולונית"
 
 #: be/be_provinces.py:15
-#, fuzzy
 msgid "West Flanders"
-msgstr "מערב המידלנדס"
+msgstr "פלנדריה המערבית"
 
 #: be/be_regions.py:5
-#, fuzzy
 msgid "Brussels Capital Region"
-msgstr "מחוז ברטיסלבה"
+msgstr ""
 
 #: be/be_regions.py:6
-#, fuzzy
 msgid "Flemish Region"
-msgstr "מחוז זלין"
+msgstr "אזור פלמי"
 
 #: be/be_regions.py:7
-#, fuzzy
 msgid "Wallonia"
-msgstr "קאטלוניה"
+msgstr "ולוניה"
 
 #: be/forms.py:23
-#, fuzzy
 msgid "Enter a valid postal code in the range and format 1XXX - 9XXX."
-msgstr "נא להזין מיקוד חוקי בתחום ובתבנית 01XXX - 52XXX."
+msgstr ""
 
 #: be/forms.py:46
 msgid ""
@@ -163,6 +148,9 @@ msgid ""
 "04xx xx xx xx, 0x/xxx.xx.xx, 0xx/xx.xx.xx, 04xx/xx.xx.xx, 0x.xxx.xx.xx, 0xx."
 "xx.xx.xx, 04xx.xx.xx.xx, 0xxxxxxxx or 04xxxxxxxx."
 msgstr ""
+"יש להזין מספר טלפון חוקי באחד מהפורמטים 0x xxx xx xx, 0xx xx xx xx, 04xx xx "
+"xx xx, 0x/xxx.xx.xx, 0xx/xx.xx.xx, 04xx/xx.xx.xx, 0x.xxx.xx.xx, 0xx.xx.xx."
+"xx, 04xx.xx.xx.xx, 0xxxxxxxx or 04xxxxxxxx."
 
 #: br/forms.py:17
 msgid "Enter a zip code in the format XXXXX-XXX."
@@ -803,9 +791,8 @@ msgid "Enter a valid NIK/KTP number"
 msgstr "הזן מספר NIK/KTP חוקי."
 
 #: id/id_choices.py:15
-#, fuzzy
 msgid "Aceh"
-msgstr "אייצ'י"
+msgstr "אצ 'ה"
 
 #: id/id_choices.py:16 id/id_choices.py:79
 msgid "Bali"
@@ -1196,14 +1183,12 @@ msgid "Wicklow"
 msgstr "ויקלו"
 
 #: il/forms.py:31
-#, fuzzy
 msgid "Enter a postal code in the format XXXXX"
-msgstr "נא להזין מיקוד בתבנית XX-XXX."
+msgstr ""
 
 #: il/forms.py:50
-#, fuzzy
 msgid "Enter a valid ID number."
-msgstr "הזן מספר IC חוקי."
+msgstr "יש להזין מספר זיהות תקף."
 
 #: in_/forms.py:15
 msgid "Enter a zip code in the format XXXXXXX."
@@ -2188,24 +2173,20 @@ msgid "Zilina region"
 msgstr "מחוז ז'ילינה"
 
 #: tr/forms.py:16
-#, fuzzy
 msgid "Enter a postal code in the format XXXXX."
-msgstr "נא להזין מיקוד בתבנית XX-XXX."
+msgstr ""
 
 #: tr/forms.py:37
-#, fuzzy
 msgid "Phone numbers must be in 0XXX XXX XXXX format."
-msgstr "מספרי טלפון חייבים  להיות בתבנית 0X XX XX XX XX."
+msgstr "מספרי טלפון חייבים להיות בפורמט 0XXX XXX XXXX."
 
 #: tr/forms.py:64
-#, fuzzy
 msgid "Enter a valid Turkish Identification number."
-msgstr "הזן מספר ארגון שוודי חוקי."
+msgstr "יש להזין מספר זיהות טורקי תקף."
 
 #: tr/forms.py:65
-#, fuzzy
 msgid "Turkish Identification number must be 11 digits."
-msgstr "מספר זיהוי לאומי מורכב מ-11 ספרות"
+msgstr "מספר זיהות טורקי חייב להיות 11 מספרים."
 
 #: uk/forms.py:21
 msgid "Enter a valid postcode."
@@ -2512,9 +2493,8 @@ msgid "U.S. state (two uppercase letters)"
 msgstr "מדינה בארה\"ב (שתי אותיות גדולות)"
 
 #: us/models.py:18
-#, fuzzy
 msgid "U.S. postal code (two uppercase letters)"
-msgstr "מדינה בארה\"ב (שתי אותיות גדולות)"
+msgstr ""
 
 #: us/models.py:27
 msgid "Phone number"

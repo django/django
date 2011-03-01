@@ -1,45 +1,39 @@
-# Lithuanian translation of Django.
-# Copyright (C) 2008 The Django Software Foundation
 # This file is distributed under the same license as the Django package.
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:28+0100\n"
-"PO-Revision-Date: 2008-06-18 22:37+0200\n"
-"Last-Translator: Rapolas Kaselis <rapolas@gmail.com>\n"
-"Language-Team: Django-i18n <django-i18n@googlegroups.com>\n"
+"POT-Creation-Date: 2011-03-01 00:33+0100\n"
+"PO-Revision-Date: 2011-02-22 00:10+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: English <en@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: lt\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n%"
-"100<10 || n%100>=20) ? 1 : 2);\n"
+"100<10 || n%100>=20) ? 1 : 2)\n"
 
 #: ar/forms.py:28
-#, fuzzy
 msgid "Enter a postal code in the format NNNN or ANNNNAAA."
-msgstr "Įveskite pašto kodą XXXXXXX arba XXX-XXXX formatu."
+msgstr ""
 
 #: ar/forms.py:50 br/forms.py:92 br/forms.py:131 pe/forms.py:24 pe/forms.py:52
 msgid "This field requires only numbers."
 msgstr "Šis laukas priima tik skaičius."
 
 #: ar/forms.py:51
-#, fuzzy
 msgid "This field requires 7 or 8 digits."
-msgstr "Šis laukas reikalauja mažiausiai 14 skaitmenų."
+msgstr ""
 
 #: ar/forms.py:80
-#, fuzzy
 msgid "Enter a valid CUIT in XX-XXXXXXXX-X or XXXXXXXXXXXX format."
 msgstr ""
-"Įveskite tinkamą Vokiško asmens id numerį XXXXXXXXXXX-XXXXXXX-XXXXXXX-X "
-"formatu."
 
 #: ar/forms.py:81
-#, fuzzy
 msgid "Invalid CUIT."
-msgstr "Netinkamas URL: %s"
+msgstr ""
 
 #: at/at_states.py:5
 msgid "Burgenland"
@@ -58,19 +52,16 @@ msgid "Upper Austria"
 msgstr ""
 
 #: at/at_states.py:9
-#, fuzzy
 msgid "Salzburg"
-msgstr "Hamburgas"
+msgstr ""
 
 #: at/at_states.py:10
-#, fuzzy
 msgid "Styria"
-msgstr "Serbų"
+msgstr ""
 
 #: at/at_states.py:11
-#, fuzzy
 msgid "Tyrol"
-msgstr "Tokijas"
+msgstr ""
 
 #: at/at_states.py:12
 msgid "Vorarlberg"
@@ -85,9 +76,8 @@ msgid "Enter a zip code in the format XXXX."
 msgstr "Įveskite pašto kodą XXXX formatu."
 
 #: at/forms.py:50
-#, fuzzy
 msgid "Enter a valid Austrian Social Security Number in XXXX XXXXXX format."
-msgstr "Įveskite tinkamą JAV socialinio draudimo numerį."
+msgstr ""
 
 #: au/forms.py:17
 msgid "Enter a 4 digit post code."
@@ -98,9 +88,8 @@ msgid "Antwerp"
 msgstr ""
 
 #: be/be_provinces.py:6
-#, fuzzy
 msgid "Brussels"
-msgstr "vartotojai"
+msgstr ""
 
 #: be/be_provinces.py:7
 msgid "East Flanders"
@@ -111,27 +100,24 @@ msgid "Flemish Brabant"
 msgstr ""
 
 #: be/be_provinces.py:9
-#, fuzzy
 msgid "Hainaut"
-msgstr "minutė"
+msgstr ""
 
 #: be/be_provinces.py:10
 msgid "Liege"
 msgstr ""
 
 #: be/be_provinces.py:11 nl/nl_provinces.py:9
-#, fuzzy
 msgid "Limburg"
-msgstr "Hamburgas"
+msgstr ""
 
 #: be/be_provinces.py:12
 msgid "Luxembourg"
 msgstr ""
 
 #: be/be_provinces.py:13
-#, fuzzy
 msgid "Namur"
-msgstr "Hamburgas"
+msgstr ""
 
 #: be/be_provinces.py:14
 msgid "Walloon Brabant"
@@ -154,9 +140,8 @@ msgid "Wallonia"
 msgstr ""
 
 #: be/forms.py:23
-#, fuzzy
 msgid "Enter a valid postal code in the range and format 1XXX - 9XXX."
-msgstr "Įveskite pašto kodą XXXXXXX arba XXX-XXXX formatu."
+msgstr ""
 
 #: be/forms.py:46
 msgid ""
@@ -174,11 +159,10 @@ msgid "Phone numbers must be in XX-XXXX-XXXX format."
 msgstr "Telefonas turi būti XXX-XXXX-XXXX formatu."
 
 #: br/forms.py:54
-#, fuzzy
 msgid ""
 "Select a valid brazilian state. That state is not one of the available "
 "states."
-msgstr "Pasirink tinkamą. Tas pasirinkimas nėra iš galimų."
+msgstr ""
 
 #: br/forms.py:90
 msgid "Invalid CPF number."
@@ -197,14 +181,12 @@ msgid "This field requires at least 14 digits"
 msgstr "Šis laukas reikalauja mažiausiai 14 skaitmenų."
 
 #: ca/forms.py:25
-#, fuzzy
 msgid "Enter a postal code in the format XXX XXX."
-msgstr "Įveskite pašto kodą XXXXX formatu."
+msgstr ""
 
 #: ca/forms.py:96
-#, fuzzy
 msgid "Enter a valid Canadian Social Insurance number in XXX-XXX-XXX format."
-msgstr "Įveskite tinkamą JAV socialinio draudimo numerį."
+msgstr ""
 
 #: ch/ch_states.py:5
 msgid "Aargau"
@@ -319,19 +301,16 @@ msgstr ""
 "1234567890 formatu."
 
 #: cl/forms.py:30
-#, fuzzy
 msgid "Enter a valid Chilean RUT."
-msgstr "Įveskite tinkamą Čilės RUT"
+msgstr ""
 
 #: cl/forms.py:31
-#, fuzzy
 msgid "Enter a valid Chilean RUT. The format is XX.XXX.XXX-X."
-msgstr "Įveskite tinkamą Čilės RUT XX.XXX.XXX-X formatu."
+msgstr ""
 
 #: cl/forms.py:32
-#, fuzzy
 msgid "The Chilean RUT is not valid."
-msgstr "Šis laukas yra netinkamas."
+msgstr ""
 
 #: cz/cz_regions.py:8
 msgid "Prague"
@@ -390,28 +369,24 @@ msgid "Moravian-Silesian Region"
 msgstr ""
 
 #: cz/forms.py:28 sk/forms.py:30
-#, fuzzy
 msgid "Enter a postal code in the format XXXXX or XXX XX."
-msgstr "Įveskite pašto kodą XXXXXXX arba XXX-XXXX formatu."
+msgstr ""
 
 #: cz/forms.py:48
-#, fuzzy
 msgid "Enter a birth number in the format XXXXXX/XXXX or XXXXXXXXXX."
-msgstr "Įveskite pašto kodą XXXXX arba XXXXX-XXXX formatu."
+msgstr ""
 
 #: cz/forms.py:49
 msgid "Invalid optional parameter Gender, valid values are 'f' and 'm'"
 msgstr ""
 
 #: cz/forms.py:50
-#, fuzzy
 msgid "Enter a valid birth number."
-msgstr "Įveskite tinkamą PVM numerį"
+msgstr ""
 
 #: cz/forms.py:111
-#, fuzzy
 msgid "Enter a valid IC number."
-msgstr "Įveskite tinkamą PVM numerį"
+msgstr ""
 
 #: de/de_states.py:5
 msgid "Baden-Wuerttemberg"
@@ -438,9 +413,8 @@ msgid "Hamburg"
 msgstr "Hamburgas"
 
 #: de/de_states.py:11
-#, fuzzy
 msgid "Hessen"
-msgstr "Hesenas"
+msgstr ""
 
 #: de/de_states.py:12
 msgid "Mecklenburg-Western Pomerania"
@@ -507,9 +481,8 @@ msgid "Almeria"
 msgstr ""
 
 #: es/es_provinces.py:9
-#, fuzzy
 msgid "Avila"
-msgstr "Balandis"
+msgstr ""
 
 #: es/es_provinces.py:10
 msgid "Badajoz"
@@ -520,9 +493,8 @@ msgid "Illes Balears"
 msgstr ""
 
 #: es/es_provinces.py:12
-#, fuzzy
 msgid "Barcelona"
-msgstr "Makedonų"
+msgstr ""
 
 #: es/es_provinces.py:13
 msgid "Burgos"
@@ -561,9 +533,8 @@ msgid "Girona"
 msgstr ""
 
 #: es/es_provinces.py:22
-#, fuzzy
 msgid "Granada"
-msgstr "Dravidų"
+msgstr ""
 
 #: es/es_provinces.py:23
 msgid "Guadalajara"
@@ -578,19 +549,16 @@ msgid "Huelva"
 msgstr ""
 
 #: es/es_provinces.py:26
-#, fuzzy
 msgid "Huesca"
-msgstr "Antradienis"
+msgstr ""
 
 #: es/es_provinces.py:27
-#, fuzzy
 msgid "Jaen"
-msgstr "Sau."
+msgstr ""
 
 #: es/es_provinces.py:28
-#, fuzzy
 msgid "Leon"
-msgstr "Prisijungti"
+msgstr ""
 
 #: es/es_provinces.py:29
 msgid "Lleida"
@@ -629,9 +597,8 @@ msgid "Asturias"
 msgstr ""
 
 #: es/es_provinces.py:38
-#, fuzzy
 msgid "Palencia"
-msgstr "Galų"
+msgstr ""
 
 #: es/es_provinces.py:39
 msgid "Las Palmas"
@@ -650,23 +617,20 @@ msgid "Santa Cruz de Tenerife"
 msgstr ""
 
 #: es/es_provinces.py:43 es/es_regions.py:11
-#, fuzzy
 msgid "Cantabria"
-msgstr "Katalonų"
+msgstr ""
 
 #: es/es_provinces.py:44
-#, fuzzy
 msgid "Segovia"
-msgstr "Slovėnų"
+msgstr ""
 
 #: es/es_provinces.py:45
 msgid "Seville"
 msgstr ""
 
 #: es/es_provinces.py:46
-#, fuzzy
 msgid "Soria"
-msgstr "Serbų"
+msgstr ""
 
 #: es/es_provinces.py:47
 msgid "Tarragona"
@@ -681,9 +645,8 @@ msgid "Toledo"
 msgstr ""
 
 #: es/es_provinces.py:50
-#, fuzzy
 msgid "Valencia"
-msgstr "Galų"
+msgstr ""
 
 #: es/es_provinces.py:51
 msgid "Valladolid"
@@ -742,18 +705,16 @@ msgid "Castile and Leon"
 msgstr ""
 
 #: es/es_regions.py:14
-#, fuzzy
 msgid "Catalonia"
-msgstr "Katalonų"
+msgstr ""
 
 #: es/es_regions.py:15
 msgid "Extremadura"
 msgstr ""
 
 #: es/es_regions.py:16
-#, fuzzy
 msgid "Galicia"
-msgstr "Galų"
+msgstr ""
 
 #: es/es_regions.py:19
 msgid "Region of Murcia"
@@ -768,26 +729,22 @@ msgid "Valencian Community"
 msgstr ""
 
 #: es/forms.py:20
-#, fuzzy
 msgid "Enter a valid postal code in the range and format 01XXX - 52XXX."
-msgstr "Įveskite pašto kodą XXXXXXX arba XXX-XXXX formatu."
+msgstr ""
 
 #: es/forms.py:40
-#, fuzzy
 msgid ""
 "Enter a valid phone number in one of the formats 6XXXXXXXX, 8XXXXXXXX or "
 "9XXXXXXXX."
-msgstr "Įveskite pašto kodą XXXXXXX arba XXX-XXXX formatu."
+msgstr ""
 
 #: es/forms.py:67
-#, fuzzy
 msgid "Please enter a valid NIF, NIE, or CIF."
-msgstr "Įveskt tinkamą IP adresą."
+msgstr ""
 
 #: es/forms.py:68
-#, fuzzy
 msgid "Please enter a valid NIF or NIE."
-msgstr "Įveskite tinkamą %s"
+msgstr ""
 
 #: es/forms.py:69
 msgid "Invalid checksum for NIF."
@@ -802,12 +759,9 @@ msgid "Invalid checksum for CIF."
 msgstr ""
 
 #: es/forms.py:143
-#, fuzzy
 msgid ""
 "Please enter a valid bank account number in format XXXX-XXXX-XX-XXXXXXXXXX."
 msgstr ""
-"Įveskite tinkamą Vokiško asmens id numerį XXXXXXXXXXX-XXXXXXX-XXXXXXX-X "
-"formatu."
 
 #: es/forms.py:144
 msgid "Invalid checksum for bank account number."
@@ -818,48 +772,40 @@ msgid "Enter a valid Finnish social security number."
 msgstr "Įveskite tinkamą suomišką socialinio draudimo numerį."
 
 #: fr/forms.py:31
-#, fuzzy
 msgid "Phone numbers must be in 0X XX XX XX XX format."
-msgstr "Telefonas turi būti XXX-XXXX-XXXX formatu."
+msgstr ""
 
 #: id/forms.py:28
-#, fuzzy
 msgid "Enter a valid post code"
-msgstr "Įveskite tinkamą pašto kodą."
+msgstr ""
 
 #: id/forms.py:68 nl/forms.py:53
-#, fuzzy
 msgid "Enter a valid phone number"
-msgstr "Įveskite tinkamą PVM numerį"
+msgstr ""
 
 #: id/forms.py:107
-#, fuzzy
 msgid "Enter a valid vehicle license plate number"
-msgstr "Įveskite tinkamą socialinio draudimo numerį."
+msgstr ""
 
 #: id/forms.py:170
-#, fuzzy
 msgid "Enter a valid NIK/KTP number"
-msgstr "Įveskite tinkamą PVM numerį"
+msgstr ""
 
 #: id/id_choices.py:15
 msgid "Aceh"
 msgstr ""
 
 #: id/id_choices.py:16 id/id_choices.py:79
-#, fuzzy
 msgid "Bali"
-msgstr "Bengalų"
+msgstr ""
 
 #: id/id_choices.py:17 id/id_choices.py:51
-#, fuzzy
 msgid "Banten"
-msgstr "turinys"
+msgstr ""
 
 #: id/id_choices.py:18 id/id_choices.py:60
-#, fuzzy
 msgid "Bengkulu"
-msgstr "Bengalų"
+msgstr ""
 
 #: id/id_choices.py:19 id/id_choices.py:53
 msgid "Yogyakarta"
@@ -874,9 +820,8 @@ msgid "Gorontalo"
 msgstr ""
 
 #: id/id_choices.py:22 id/id_choices.py:63
-#, fuzzy
 msgid "Jambi"
-msgstr "Tamilų"
+msgstr ""
 
 #: id/id_choices.py:23
 msgid "Jawa Barat"
@@ -915,9 +860,8 @@ msgid "Kepulauan Riau"
 msgstr ""
 
 #: id/id_choices.py:32 id/id_choices.py:61
-#, fuzzy
 msgid "Lampung"
-msgstr "rugp"
+msgstr ""
 
 #: id/id_choices.py:33 id/id_choices.py:76
 msgid "Maluku"
@@ -988,9 +932,8 @@ msgid "Surakarta - Solo"
 msgstr ""
 
 #: id/id_choices.py:55
-#, fuzzy
 msgid "Madiun"
-msgstr "Makedonų"
+msgstr ""
 
 #: id/id_choices.py:56
 msgid "Kediri"
@@ -1017,9 +960,8 @@ msgid "Corps Diplomatic"
 msgstr ""
 
 #: id/id_choices.py:71
-#, fuzzy
 msgid "Bandung"
-msgstr "Brandenburgas"
+msgstr ""
 
 #: id/id_choices.py:73
 msgid "Sulawesi Utara Daratan"
@@ -1066,33 +1008,28 @@ msgid "Pekalongan"
 msgstr ""
 
 #: id/id_choices.py:92
-#, fuzzy
 msgid "Semarang"
-msgstr "Serbų"
+msgstr ""
 
 #: id/id_choices.py:93
-#, fuzzy
 msgid "Pati"
-msgstr "aktyvus"
+msgstr ""
 
 #: id/id_choices.py:97
-#, fuzzy
 msgid "Surabaya"
-msgstr "Šeštadienis"
+msgstr ""
 
 #: id/id_choices.py:98
 msgid "Madura"
 msgstr ""
 
 #: id/id_choices.py:99
-#, fuzzy
 msgid "Malang"
-msgstr "Katalonų"
+msgstr ""
 
 #: id/id_choices.py:100
-#, fuzzy
 msgid "Jember"
-msgstr "Lapkritis"
+msgstr ""
 
 #: id/id_choices.py:101
 msgid "Banyumas"
@@ -1131,9 +1068,8 @@ msgid "Carlow"
 msgstr ""
 
 #: ie/ie_counties.py:11
-#, fuzzy
 msgid "Cavan"
-msgstr "Katalonų"
+msgstr ""
 
 #: ie/ie_counties.py:12
 msgid "Clare"
@@ -1144,14 +1080,12 @@ msgid "Cork"
 msgstr ""
 
 #: ie/ie_counties.py:14
-#, fuzzy
 msgid "Derry"
-msgstr "Vasaris"
+msgstr ""
 
 #: ie/ie_counties.py:15
-#, fuzzy
 msgid "Donegal"
-msgstr "vienas"
+msgstr ""
 
 #: ie/ie_counties.py:16
 msgid "Down"
@@ -1162,18 +1096,16 @@ msgid "Dublin"
 msgstr ""
 
 #: ie/ie_counties.py:18
-#, fuzzy
 msgid "Fermanagh"
-msgstr "Vokiečių"
+msgstr ""
 
 #: ie/ie_counties.py:19
 msgid "Galway"
 msgstr ""
 
 #: ie/ie_counties.py:20
-#, fuzzy
 msgid "Kerry"
-msgstr "Vasaris"
+msgstr ""
 
 #: ie/ie_counties.py:21
 msgid "Kildare"
@@ -1200,33 +1132,28 @@ msgid "Longford"
 msgstr ""
 
 #: ie/ie_counties.py:27
-#, fuzzy
 msgid "Louth"
-msgstr "Atsijungti"
+msgstr ""
 
 #: ie/ie_counties.py:28
-#, fuzzy
 msgid "Mayo"
-msgstr "Gegužė"
+msgstr ""
 
 #: ie/ie_counties.py:29
-#, fuzzy
 msgid "Meath"
-msgstr "Kovas"
+msgstr ""
 
 #: ie/ie_counties.py:30
-#, fuzzy
 msgid "Monaghan"
-msgstr "Prisijungti dar kartą"
+msgstr ""
 
 #: ie/ie_counties.py:31
 msgid "Offaly"
 msgstr ""
 
 #: ie/ie_counties.py:32
-#, fuzzy
 msgid "Roscommon"
-msgstr "komentaras"
+msgstr ""
 
 #: ie/ie_counties.py:33
 msgid "Sligo"
@@ -1237,9 +1164,8 @@ msgid "Tipperary"
 msgstr ""
 
 #: ie/ie_counties.py:35
-#, fuzzy
 msgid "Tyrone"
-msgstr "vienas"
+msgstr ""
 
 #: ie/ie_counties.py:36
 msgid "Waterford"
@@ -1258,19 +1184,16 @@ msgid "Wicklow"
 msgstr ""
 
 #: il/forms.py:31
-#, fuzzy
 msgid "Enter a postal code in the format XXXXX"
-msgstr "Įveskite pašto kodą XXXXX formatu."
+msgstr ""
 
 #: il/forms.py:50
-#, fuzzy
 msgid "Enter a valid ID number."
-msgstr "Įveskite tinkamą PVM numerį"
+msgstr ""
 
 #: in_/forms.py:15
-#, fuzzy
 msgid "Enter a zip code in the format XXXXXXX."
-msgstr "Įveskite pašto kodą XXXXX-XXX formatu."
+msgstr ""
 
 #: is_/forms.py:18
 msgid ""
@@ -1486,9 +1409,8 @@ msgid "Okinawa"
 msgstr "Okinava"
 
 #: kw/forms.py:25
-#, fuzzy
 msgid "Enter a valid Kuwaiti Civil ID number"
-msgstr "Įveskite tinkamą PVM numerį"
+msgstr ""
 
 #: mx/mx_states.py:12
 msgid "Aguascalientes"
@@ -1503,9 +1425,8 @@ msgid "Baja California Sur"
 msgstr ""
 
 #: mx/mx_states.py:15
-#, fuzzy
 msgid "Campeche"
-msgstr "Čekų"
+msgstr ""
 
 #: mx/mx_states.py:16
 msgid "Chihuahua"
@@ -1532,9 +1453,8 @@ msgid "Durango"
 msgstr ""
 
 #: mx/mx_states.py:22
-#, fuzzy
 msgid "Guerrero"
-msgstr "Serverio klaida"
+msgstr ""
 
 #: mx/mx_states.py:23
 msgid "Guanajuato"
@@ -1585,9 +1505,8 @@ msgid "Quintana Roo"
 msgstr ""
 
 #: mx/mx_states.py:35
-#, fuzzy
 msgid "Sinaloa"
-msgstr "Slovakų"
+msgstr ""
 
 #: mx/mx_states.py:36
 msgid "San Luis Potosí"
@@ -1622,19 +1541,16 @@ msgid "Zacatecas"
 msgstr ""
 
 #: nl/forms.py:22
-#, fuzzy
 msgid "Enter a valid postal code"
-msgstr "Įveskite tinkamą pašto kodą."
+msgstr ""
 
 #: nl/forms.py:79
-#, fuzzy
 msgid "Enter a valid SoFi number"
-msgstr "Įveskite tinkamą PVM numerį"
+msgstr ""
 
 #: nl/nl_provinces.py:4
-#, fuzzy
 msgid "Drenthe"
-msgstr "Prancūzų"
+msgstr ""
 
 #: nl/nl_provinces.py:5
 msgid "Flevoland"
@@ -1645,14 +1561,12 @@ msgid "Friesland"
 msgstr ""
 
 #: nl/nl_provinces.py:7
-#, fuzzy
 msgid "Gelderland"
-msgstr "Vokiečių"
+msgstr ""
 
 #: nl/nl_provinces.py:8
-#, fuzzy
 msgid "Groningen"
-msgstr "devyni"
+msgstr ""
 
 #: nl/nl_provinces.py:10
 msgid "Noord-Brabant"
@@ -1667,14 +1581,12 @@ msgid "Overijssel"
 msgstr ""
 
 #: nl/nl_provinces.py:13
-#, fuzzy
 msgid "Utrecht"
-msgstr "Prancūzų"
+msgstr ""
 
 #: nl/nl_provinces.py:14
-#, fuzzy
 msgid "Zeeland"
-msgstr "Islandų"
+msgstr ""
 
 #: nl/nl_provinces.py:15
 msgid "Zuid-Holland"
@@ -1685,14 +1597,12 @@ msgid "Enter a valid Norwegian social security number."
 msgstr "Įveskite tinkamą norvegiška socialinio draudimo numerį."
 
 #: pe/forms.py:25
-#, fuzzy
 msgid "This field requires 8 digits."
-msgstr "Šis laukas reikalauja mažiausiai 14 skaitmenų."
+msgstr ""
 
 #: pe/forms.py:53
-#, fuzzy
 msgid "This field requires 11 digits."
-msgstr "Šis laukas reikalauja mažiausiai 14 skaitmenų."
+msgstr ""
 
 #: pl/forms.py:39
 msgid "National Identification Number consists of 11 digits."
@@ -1703,10 +1613,9 @@ msgid "Wrong checksum for the National Identification Number."
 msgstr ""
 
 #: pl/forms.py:74
-#, fuzzy
 msgid ""
 "Enter a tax number field (NIP) in the format XXX-XXX-XX-XX or XX-XX-XXX-XXX."
-msgstr "Įveskite pašto kodą XXXXXXX arba XXX-XXXX formatu."
+msgstr ""
 
 #: pl/forms.py:75
 msgid "Wrong checksum for the Tax Number (NIP)."
@@ -1721,9 +1630,8 @@ msgid "Wrong checksum for the National Business Register Number (REGON)."
 msgstr ""
 
 #: pl/forms.py:155
-#, fuzzy
 msgid "Enter a postal code in the format XX-XXX."
-msgstr "Įveskite pašto kodą XXXXX formatu."
+msgstr ""
 
 #: pl/pl_voivodeships.py:8
 msgid "Lower Silesia"
@@ -1754,9 +1662,8 @@ msgid "Masovia"
 msgstr ""
 
 #: pl/pl_voivodeships.py:15
-#, fuzzy
 msgid "Opole"
-msgstr "Neprivalomas"
+msgstr ""
 
 #: pl/pl_voivodeships.py:16
 msgid "Subcarpatia"
@@ -1767,14 +1674,12 @@ msgid "Podlasie"
 msgstr ""
 
 #: pl/pl_voivodeships.py:18
-#, fuzzy
 msgid "Pomerania"
-msgstr "Rumunų"
+msgstr ""
 
 #: pl/pl_voivodeships.py:19
-#, fuzzy
 msgid "Silesia"
-msgstr "Slovėnų"
+msgstr ""
 
 #: pl/pl_voivodeships.py:20
 msgid "Swietokrzyskie"
@@ -1793,60 +1698,48 @@ msgid "West Pomerania"
 msgstr ""
 
 #: pt/forms.py:17
-#, fuzzy
 msgid "Enter a zip code in the format XXXX-XXX."
-msgstr "Įveskite pašto kodą XXXXX-XXX formatu."
+msgstr ""
 
 #: pt/forms.py:37
 msgid "Phone numbers must have 9 digits, or start by + or 00."
 msgstr ""
 
 #: ro/forms.py:19
-#, fuzzy
 msgid "Enter a valid CIF."
-msgstr "Įvesk tinkamą URL."
+msgstr ""
 
 #: ro/forms.py:56
-#, fuzzy
 msgid "Enter a valid CNP."
-msgstr "Įvesk tinkamą URL."
+msgstr ""
 
 #: ro/forms.py:143
-#, fuzzy
 msgid "Enter a valid IBAN in ROXX-XXXX-XXXX-XXXX-XXXX-XXXX format"
 msgstr ""
-"Įveskite tinkamą Vokiško asmens id numerį XXXXXXXXXXX-XXXXXXX-XXXXXXX-X "
-"formatu."
 
 #: ro/forms.py:175
-#, fuzzy
 msgid "Phone numbers must be in XXXX-XXXXXX format."
-msgstr "Telefonas turi būti XXX-XXXX-XXXX formatu."
+msgstr ""
 
 #: ro/forms.py:200
-#, fuzzy
 msgid "Enter a valid postal code in the format XXXXXX"
-msgstr "Įveskite pašto kodą XXXXX formatu."
+msgstr ""
 
 #: se/forms.py:50
-#, fuzzy
 msgid "Enter a valid Swedish organisation number."
-msgstr "Įveskite tinkamą socialinio draudimo numerį."
+msgstr ""
 
 #: se/forms.py:107
-#, fuzzy
 msgid "Enter a valid Swedish personal identity number."
-msgstr "Įveskite tinkamą suomišką socialinio draudimo numerį."
+msgstr ""
 
 #: se/forms.py:108
-#, fuzzy
 msgid "Co-ordination numbers are not allowed."
-msgstr "Vienodos reikšmės neleidžiamos."
+msgstr ""
 
 #: se/forms.py:150
-#, fuzzy
 msgid "Enter a Swedish postal code in the format XXXXX."
-msgstr "Įveskite pašto kodą XXXXX formatu."
+msgstr ""
 
 #: se/se_counties.py:15
 msgid "Stockholm"
@@ -1881,14 +1774,12 @@ msgid "Kronoberg"
 msgstr ""
 
 #: se/se_counties.py:23
-#, fuzzy
 msgid "Kalmar"
-msgstr "kov"
+msgstr ""
 
 #: se/se_counties.py:24
-#, fuzzy
 msgid "Gotland"
-msgstr "ir"
+msgstr ""
 
 #: se/se_counties.py:25
 msgid "Blekinge"
@@ -1899,9 +1790,8 @@ msgid "Skåne"
 msgstr ""
 
 #: se/se_counties.py:27
-#, fuzzy
 msgid "Halland"
-msgstr "ir"
+msgstr ""
 
 #: se/se_counties.py:28
 msgid "Västra Götaland"
@@ -1952,9 +1842,8 @@ msgid "Banovce nad Bebravou"
 msgstr ""
 
 #: sk/sk_districts.py:12
-#, fuzzy
 msgid "Brezno"
-msgstr "Bremenas"
+msgstr ""
 
 #: sk/sk_districts.py:13
 msgid "Bratislava I"
@@ -1997,14 +1886,12 @@ msgid "Dunajska Streda"
 msgstr ""
 
 #: sk/sk_districts.py:23
-#, fuzzy
 msgid "Galanta"
-msgstr "Galų"
+msgstr ""
 
 #: sk/sk_districts.py:24
-#, fuzzy
 msgid "Gelnica"
-msgstr "Galų"
+msgstr ""
 
 #: sk/sk_districts.py:25
 msgid "Hlohovec"
@@ -2023,9 +1910,8 @@ msgid "Kezmarok"
 msgstr ""
 
 #: sk/sk_districts.py:29
-#, fuzzy
 msgid "Komarno"
-msgstr "Korėjiečių"
+msgstr ""
 
 #: sk/sk_districts.py:30
 msgid "Kosice I"
@@ -2072,14 +1958,12 @@ msgid "Lucenec"
 msgstr ""
 
 #: sk/sk_districts.py:41
-#, fuzzy
 msgid "Malacky"
-msgstr "Gegužė"
+msgstr ""
 
 #: sk/sk_districts.py:42
-#, fuzzy
 msgid "Martin"
-msgstr "Latvių"
+msgstr ""
 
 #: sk/sk_districts.py:43
 msgid "Medzilaborce"
@@ -2162,28 +2046,24 @@ msgid "Ruzomberok"
 msgstr ""
 
 #: sk/sk_districts.py:63
-#, fuzzy
 msgid "Sabinov"
-msgstr "lap"
+msgstr ""
 
 #: sk/sk_districts.py:64
 msgid "Senec"
 msgstr ""
 
 #: sk/sk_districts.py:65
-#, fuzzy
 msgid "Senica"
-msgstr "Slovėnų"
+msgstr ""
 
 #: sk/sk_districts.py:66
-#, fuzzy
 msgid "Skalica"
-msgstr "Galų"
+msgstr ""
 
 #: sk/sk_districts.py:67
-#, fuzzy
 msgid "Snina"
-msgstr "devyni"
+msgstr ""
 
 #: sk/sk_districts.py:68
 msgid "Sobrance"
@@ -2206,9 +2086,8 @@ msgid "Svidnik"
 msgstr ""
 
 #: sk/sk_districts.py:73
-#, fuzzy
 msgid "Sala"
-msgstr "Slovakų"
+msgstr ""
 
 #: sk/sk_districts.py:74
 msgid "Topolcany"
@@ -2219,9 +2098,8 @@ msgid "Trebisov"
 msgstr ""
 
 #: sk/sk_districts.py:76
-#, fuzzy
 msgid "Trencin"
-msgstr "Prancūzų"
+msgstr ""
 
 #: sk/sk_districts.py:77
 msgid "Trnava"
@@ -2296,29 +2174,24 @@ msgid "Zilina region"
 msgstr ""
 
 #: tr/forms.py:16
-#, fuzzy
 msgid "Enter a postal code in the format XXXXX."
-msgstr "Įveskite pašto kodą XXXXX formatu."
+msgstr ""
 
 #: tr/forms.py:37
-#, fuzzy
 msgid "Phone numbers must be in 0XXX XXX XXXX format."
-msgstr "Telefonas turi būti XXX-XXXX-XXXX formatu."
+msgstr ""
 
 #: tr/forms.py:64
-#, fuzzy
 msgid "Enter a valid Turkish Identification number."
-msgstr "Įveskite tinkamą socialinio draudimo numerį."
+msgstr ""
 
 #: tr/forms.py:65
-#, fuzzy
 msgid "Turkish Identification number must be 11 digits."
-msgstr "Islandiškas asmend id yra netinkamas."
+msgstr ""
 
 #: uk/forms.py:21
-#, fuzzy
 msgid "Enter a valid postcode."
-msgstr "Įveskite tinkamą pašto kodą."
+msgstr ""
 
 #: uk/uk_regions.py:11
 msgid "Bedfordshire"
@@ -2345,9 +2218,8 @@ msgid "Derbyshire"
 msgstr ""
 
 #: uk/uk_regions.py:18
-#, fuzzy
 msgid "Devon"
-msgstr "septyni"
+msgstr ""
 
 #: uk/uk_regions.py:19
 msgid "Dorset"
@@ -2386,9 +2258,8 @@ msgid "Hertfordshire"
 msgstr ""
 
 #: uk/uk_regions.py:28
-#, fuzzy
 msgid "Kent"
-msgstr "Korėjiečių"
+msgstr ""
 
 #: uk/uk_regions.py:29
 msgid "Lancashire"
@@ -2451,9 +2322,8 @@ msgid "Suffolk"
 msgstr ""
 
 #: uk/uk_regions.py:44
-#, fuzzy
 msgid "Surrey"
-msgstr "Dabartinis:"
+msgstr ""
 
 #: uk/uk_regions.py:45
 msgid "Tyne and Wear"
@@ -2540,9 +2410,8 @@ msgid "West Glamorgan"
 msgstr ""
 
 #: uk/uk_regions.py:75
-#, fuzzy
 msgid "Borders"
-msgstr "Rūšiuoti:"
+msgstr ""
 
 #: uk/uk_regions.py:76
 msgid "Central Scotland"
@@ -2553,23 +2422,20 @@ msgid "Dumfries and Galloway"
 msgstr ""
 
 #: uk/uk_regions.py:78
-#, fuzzy
 msgid "Fife"
-msgstr "Filtras"
+msgstr ""
 
 #: uk/uk_regions.py:79
-#, fuzzy
 msgid "Grampian"
-msgstr "Vokiečių"
+msgstr ""
 
 #: uk/uk_regions.py:80
 msgid "Highland"
 msgstr ""
 
 #: uk/uk_regions.py:81
-#, fuzzy
 msgid "Lothian"
-msgstr "Latvių"
+msgstr ""
 
 #: uk/uk_regions.py:82
 msgid "Orkney Islands"
@@ -2592,9 +2458,8 @@ msgid "Western Isles"
 msgstr ""
 
 #: uk/uk_regions.py:90
-#, fuzzy
 msgid "England"
-msgstr "ir"
+msgstr ""
 
 #: uk/uk_regions.py:91
 msgid "Northern Ireland"
@@ -2605,77 +2470,64 @@ msgid "Scotland"
 msgstr ""
 
 #: uk/uk_regions.py:93
-#, fuzzy
 msgid "Wales"
-msgstr "Velso"
+msgstr ""
 
 #: us/forms.py:17
 msgid "Enter a zip code in the format XXXXX or XXXXX-XXXX."
 msgstr "Įveskite pašto kodą XXXXX arba XXXXX-XXXX formatu."
 
 #: us/forms.py:26
-#, fuzzy
 msgid "Phone numbers must be in XXX-XXX-XXXX format."
-msgstr "Telefonas turi būti XXX-XXXX-XXXX formatu."
+msgstr ""
 
 #: us/forms.py:55
 msgid "Enter a valid U.S. Social Security number in XXX-XX-XXXX format."
 msgstr "Įveskite tinkamą JAV socialinio draudimo numerį."
 
 #: us/forms.py:88
-#, fuzzy
 msgid "Enter a U.S. state or territory."
-msgstr "Įvesk tinkamą JAV valstijos sutrumpinimą."
+msgstr ""
 
 #: us/models.py:9
 msgid "U.S. state (two uppercase letters)"
 msgstr "JAV valstija (dvi didžiosios raidės)"
 
 #: us/models.py:18
-#, fuzzy
 msgid "U.S. postal code (two uppercase letters)"
-msgstr "JAV valstija (dvi didžiosios raidės)"
+msgstr ""
 
 #: us/models.py:27
 msgid "Phone number"
 msgstr "Telefono numeris"
 
 #: uy/forms.py:28
-#, fuzzy
 msgid "Enter a valid CI number in X.XXX.XXX-X,XXXXXXX-X or XXXXXXXX format."
 msgstr ""
-"Įveskite tinkamą Vokiško asmens id numerį XXXXXXXXXXX-XXXXXXX-XXXXXXX-X "
-"formatu."
 
 #: uy/forms.py:30
-#, fuzzy
 msgid "Enter a valid CI number."
-msgstr "Įveskite tinkamą PVM numerį"
+msgstr ""
 
 #: za/forms.py:21
-#, fuzzy
 msgid "Enter a valid South African ID number"
-msgstr "Įveskite tinkamą PVM numerį"
+msgstr ""
 
 #: za/forms.py:55
-#, fuzzy
 msgid "Enter a valid South African postal code"
-msgstr "Įveskite tinkamą pašto kodą."
+msgstr ""
 
 #: za/za_provinces.py:4
-#, fuzzy
 msgid "Eastern Cape"
-msgstr "Vartotojo vardas"
+msgstr ""
 
 #: za/za_provinces.py:5
-#, fuzzy
 msgid "Free State"
-msgstr "rezultato data"
+msgstr ""
 
 #: za/za_provinces.py:6
-#, fuzzy
 msgid "Gauteng"
-msgstr "rugp"
+msgstr ""
 
 #: za/za_provinces.py:7
 msgid "KwaZulu-Natal"
@@ -2698,6 +2550,5 @@ msgid "North West"
 msgstr ""
 
 #: za/za_provinces.py:12
-#, fuzzy
 msgid "Western Cape"
-msgstr "Vartotojo vardas"
+msgstr ""

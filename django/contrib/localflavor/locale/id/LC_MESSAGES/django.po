@@ -1,17 +1,17 @@
-# Translation of django.po to Indonesian
 # This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:28+0100\n"
-"PO-Revision-Date: 2010-05-08 18:39+0700\n"
-"Last-Translator: Selwin Ong <selwin@ui.co.id>\n"
-"Language-Team: Indonesian <id@li.org>\n"
+"POT-Creation-Date: 2011-03-01 00:32+0100\n"
+"PO-Revision-Date: 2011-02-22 00:10+0000\n"
+"Last-Translator: rodin <romihardiyanto@gmail.com>\n"
+"Language-Team: Indonesian <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: id\n"
 "Plural-Forms: nplurals=1; plural=0\n"
 
 #: ar/forms.py:28
@@ -20,15 +20,15 @@ msgstr "Masukkan kode pos dalam format NNNN atau ANNNNAAA."
 
 #: ar/forms.py:50 br/forms.py:92 br/forms.py:131 pe/forms.py:24 pe/forms.py:52
 msgid "This field requires only numbers."
-msgstr "Field ini hanya terdiri dari angka."
+msgstr "Bidang ini hanya membutuhkan isian angka."
 
 #: ar/forms.py:51
 msgid "This field requires 7 or 8 digits."
-msgstr "Field ini membutuhkan 7 atau 8 angka."
+msgstr "Bidang ini membutuhkan isian sebanyak 7 atau 8 angka."
 
 #: ar/forms.py:80
 msgid "Enter a valid CUIT in XX-XXXXXXXX-X or XXXXXXXXXXXX format."
-msgstr "Masukkan CUIT yang benar dalam format XX-XXXXXXXX-X atau XXXXXXXXXXXX."
+msgstr "Masukkan CUIT yang valid dalam format XX-XXXXXXXX-X atau XXXXXXXXXXXX."
 
 #: ar/forms.py:81
 msgid "Invalid CUIT."
@@ -68,7 +68,7 @@ msgstr "Vorarlberg"
 
 #: at/at_states.py:13
 msgid "Vienna"
-msgstr "Vienna"
+msgstr "Wina"
 
 #: at/forms.py:22 ch/forms.py:17 no/forms.py:13
 msgid "Enter a zip code in the format XXXX."
@@ -77,83 +77,72 @@ msgstr "Masukkan kode pos dalam format XXXX."
 #: at/forms.py:50
 msgid "Enter a valid Austrian Social Security Number in XXXX XXXXXX format."
 msgstr ""
-"Masukkan nomor identifikasi Austria yang benar dalam format XXXX XXXXXX."
+"Masukkan Nomor Identifikasi Sosial Austria yang valid dalam format XXXX "
+"XXXXXX."
 
 #: au/forms.py:17
 msgid "Enter a 4 digit post code."
 msgstr "Masukkan kode pos 4 angka."
 
 #: be/be_provinces.py:5
-#, fuzzy
 msgid "Antwerp"
-msgstr "Antrim"
+msgstr "Antwerp"
 
 #: be/be_provinces.py:6
-#, fuzzy
 msgid "Brussels"
-msgstr "pengguna-pengguna"
+msgstr "Brussels"
 
 #: be/be_provinces.py:7
-#, fuzzy
 msgid "East Flanders"
-msgstr "West Midlands"
+msgstr "East Flanders"
 
 #: be/be_provinces.py:8
 msgid "Flemish Brabant"
-msgstr ""
+msgstr "Flemish Brabant"
 
 #: be/be_provinces.py:9
-#, fuzzy
 msgid "Hainaut"
-msgstr "menit"
+msgstr "Hainaut"
 
 #: be/be_provinces.py:10
 msgid "Liege"
-msgstr ""
+msgstr "Liege"
 
 #: be/be_provinces.py:11 nl/nl_provinces.py:9
 msgid "Limburg"
 msgstr "Limburg"
 
 #: be/be_provinces.py:12
-#, fuzzy
 msgid "Luxembourg"
-msgstr "Limburg"
+msgstr "Luksemburg"
 
 #: be/be_provinces.py:13
-#, fuzzy
 msgid "Namur"
-msgstr "Nama"
+msgstr "Namur"
 
 #: be/be_provinces.py:14
-#, fuzzy
 msgid "Walloon Brabant"
-msgstr "Noord-Brabant"
+msgstr "Walloon Brabant"
 
 #: be/be_provinces.py:15
-#, fuzzy
 msgid "West Flanders"
-msgstr "West Midlands"
+msgstr "West Flanders"
 
 #: be/be_regions.py:5
-#, fuzzy
 msgid "Brussels Capital Region"
-msgstr "Daerah Brastilava"
+msgstr "Brussels Capital Region"
 
 #: be/be_regions.py:6
-#, fuzzy
 msgid "Flemish Region"
-msgstr "Daerah Zlin"
+msgstr "Flemish Region"
 
 #: be/be_regions.py:7
-#, fuzzy
 msgid "Wallonia"
-msgstr "Catalonia"
+msgstr "Wallonia"
 
 #: be/forms.py:23
-#, fuzzy
 msgid "Enter a valid postal code in the range and format 1XXX - 9XXX."
-msgstr "Masukkan kode pos yang benar dalam format 01XXX - 52XXX"
+msgstr "Masukkan kode pos yang valid dalam rentang dan format 1XXX - 9XXX."
 
 #: be/forms.py:46
 msgid ""
@@ -161,6 +150,10 @@ msgid ""
 "04xx xx xx xx, 0x/xxx.xx.xx, 0xx/xx.xx.xx, 04xx/xx.xx.xx, 0x.xxx.xx.xx, 0xx."
 "xx.xx.xx, 04xx.xx.xx.xx, 0xxxxxxxx or 04xxxxxxxx."
 msgstr ""
+"Masukkan nomor telepon yang valid dalam salah satu format sebagai berikut: "
+"0x xxx xx xx, 0xx xx xx xx, 04xx xx xx xx, 0x/xxx.xx.xx, 0xx/xx.xx.xx, 04xx/"
+"xx.xx.xx, 0x.xxx.xx.xx, 0xx.xx.xx.xx, 04xx.xx.xx.xx, 0xxxxxxxx, atau "
+"04xxxxxxxx."
 
 #: br/forms.py:17
 msgid "Enter a zip code in the format XXXXX-XXX."
@@ -175,8 +168,8 @@ msgid ""
 "Select a valid brazilian state. That state is not one of the available "
 "states."
 msgstr ""
-"Pilih propinsi Brazil yang benar. Propinsi ini tidak termasuk dalam daftar "
-"propinsi."
+"Pilih negara bagian Brazil yang valid. Provinsi ini tidak termasuk dalam "
+"daftar negara bagian."
 
 #: br/forms.py:90
 msgid "Invalid CPF number."
@@ -184,7 +177,8 @@ msgstr "Nomor CPF salah."
 
 #: br/forms.py:91
 msgid "This field requires at most 11 digits or 14 characters."
-msgstr "Field ini membutuhkan paling banyak 11 angka atau 14 huruf."
+msgstr ""
+"Bidang ini hanya membutuhkan isian paling banyak 11 angka atau 14 huruf."
 
 #: br/forms.py:130
 msgid "Invalid CNPJ number."
@@ -192,7 +186,7 @@ msgstr "Nomor CNPJ salah."
 
 #: br/forms.py:132
 msgid "This field requires at least 14 digits"
-msgstr "Field ini membutuhkan sedikitnya 14 angka"
+msgstr "Bidang ini membutuhkan sedikitnya 14 angka"
 
 #: ca/forms.py:25
 msgid "Enter a postal code in the format XXX XXX."
@@ -200,7 +194,8 @@ msgstr "Masukkan kode pos dalam format XXX XXX."
 
 #: ca/forms.py:96
 msgid "Enter a valid Canadian Social Insurance number in XXX-XXX-XXX format."
-msgstr "Masukkan nomor asuransi Kanada yang benar dalam format XXX-XXX-XXX."
+msgstr ""
+"Masukkan nomor Asuransi Sosial Kanada yang valid dalam format XXX-XXX-XXX."
 
 #: ch/ch_states.py:5
 msgid "Aargau"
@@ -311,20 +306,20 @@ msgid ""
 "Enter a valid Swiss identity or passport card number in X1234567<0 or "
 "1234567890 format."
 msgstr ""
-"Masukkan identitas atau nomor paspor Swiss yang benar dalam bentuk "
+"Masukkan identitas atau nomor paspor Swiss yang valid dalam bentuk "
 "X1234567<0 atau 1234567890."
 
 #: cl/forms.py:30
 msgid "Enter a valid Chilean RUT."
-msgstr "Masukkan RUT Chile yang benar."
+msgstr "Masukkan RUT Chile yang valid."
 
 #: cl/forms.py:31
 msgid "Enter a valid Chilean RUT. The format is XX.XXX.XXX-X."
-msgstr "Masukkan RUT Chile yang benar. Formatnya adalah XX.XXX.XXX-X."
+msgstr "Masukkan RUT Chile yang valid. Formatnya adalah XX.XXX.XXX-X."
 
 #: cl/forms.py:32
 msgid "The Chilean RUT is not valid."
-msgstr "RUT Chile tidak valid."
+msgstr "RUT Chile salah."
 
 #: cz/cz_regions.py:8
 msgid "Prague"
@@ -392,15 +387,15 @@ msgstr "Masukkan tanggal lahir dalam format XXXXXX/XXXX atau XXXXXXXXXX."
 
 #: cz/forms.py:49
 msgid "Invalid optional parameter Gender, valid values are 'f' and 'm'"
-msgstr "Parameter opsional jenis kelamin tidak benar, pilih 'f' atau 'm'"
+msgstr "Parameter opsional jenis kelamin salah, pilih 'f' atau 'm'"
 
 #: cz/forms.py:50
 msgid "Enter a valid birth number."
-msgstr "Masukkan tanggal lahir yang benar."
+msgstr "Masukkan tanggal lahir yang valid."
 
 #: cz/forms.py:111
 msgid "Enter a valid IC number."
-msgstr "Masukkan nomor pengenal yang benar."
+msgstr "Masukkan nomor IC yang valid."
 
 #: de/de_states.py:5
 msgid "Baden-Wuerttemberg"
@@ -475,7 +470,7 @@ msgid ""
 "Enter a valid German identity card number in XXXXXXXXXXX-XXXXXXX-XXXXXXX-X "
 "format."
 msgstr ""
-"Masukkan nomor kartu identitas Jerman yang benar dalam format XXXXXXXXXXX-"
+"Masukkan nomor kartu identitas Jerman yang valid dalam format XXXXXXXXXXX-"
 "XXXXXXX-XXXXXXX-X."
 
 #: es/es_provinces.py:5
@@ -744,23 +739,23 @@ msgstr "Valencian Community"
 
 #: es/forms.py:20
 msgid "Enter a valid postal code in the range and format 01XXX - 52XXX."
-msgstr "Masukkan kode pos yang benar dalam format 01XXX - 52XXX"
+msgstr "Masukkan kode pos yang valid dalam format 01XXX - 52XXX"
 
 #: es/forms.py:40
 msgid ""
 "Enter a valid phone number in one of the formats 6XXXXXXXX, 8XXXXXXXX or "
 "9XXXXXXXX."
 msgstr ""
-"Masukkan nomor telepon yang benar dalam format 6XXXXXXXX, 8XXXXXXXX atau "
+"Masukkan nomor telepon yang valid dalam format 6XXXXXXXX, 8XXXXXXXX atau "
 "9XXXXXXXX."
 
 #: es/forms.py:67
 msgid "Please enter a valid NIF, NIE, or CIF."
-msgstr "Mohon masukkan NIF, NIE atau CIF yang benar."
+msgstr "Mohon masukkan NIF, NIE atau CIF yang valid."
 
 #: es/forms.py:68
 msgid "Please enter a valid NIF or NIE."
-msgstr "Mohon masukkan NIF atau NIE yang benar."
+msgstr "Mohon masukkan NIF atau NIE yang valid."
 
 #: es/forms.py:69
 msgid "Invalid checksum for NIF."
@@ -778,7 +773,7 @@ msgstr "Checksum untuk CIF salah."
 msgid ""
 "Please enter a valid bank account number in format XXXX-XXXX-XX-XXXXXXXXXX."
 msgstr ""
-"Masukkan nomor akun bank yang benar dalam format XXXX-XXXX-XX-XXXXXXXXXX."
+"Masukkan nomor akun bank yang valid dalam format XXXX-XXXX-XX-XXXXXXXXXX."
 
 #: es/forms.py:144
 msgid "Invalid checksum for bank account number."
@@ -786,7 +781,7 @@ msgstr "Checksum untuk nomor akun bank salah."
 
 #: fi/forms.py:29
 msgid "Enter a valid Finnish social security number."
-msgstr "Masukkan nomor identitas Finlandia yang benar."
+msgstr "Masukkan nomor identitas Finlandia yang valid."
 
 #: fr/forms.py:31
 msgid "Phone numbers must be in 0X XX XX XX XX format."
@@ -794,24 +789,23 @@ msgstr "Nomor telepon harus dalam format 0X XX XX XX XX."
 
 #: id/forms.py:28
 msgid "Enter a valid post code"
-msgstr "Masukkan kode pos yang benar"
+msgstr "Masukkan kode pos yang valid"
 
 #: id/forms.py:68 nl/forms.py:53
 msgid "Enter a valid phone number"
-msgstr "Masukkan nomor telepon yang benar"
+msgstr "Masukkan nomor telepon yang valid"
 
 #: id/forms.py:107
 msgid "Enter a valid vehicle license plate number"
-msgstr "Masukkan nomor polisi kendaraan yang benar"
+msgstr "Masukkan nomor polisi kendaraan yang valid"
 
 #: id/forms.py:170
 msgid "Enter a valid NIK/KTP number"
-msgstr "Masukkan nomor NIK/KTP yang benar"
+msgstr "Masukkan nomor NIK/KTP yang valid"
 
 #: id/id_choices.py:15
-#, fuzzy
 msgid "Aceh"
-msgstr "Aichi"
+msgstr "Aceh"
 
 #: id/id_choices.py:16 id/id_choices.py:79
 msgid "Bali"
@@ -971,11 +965,11 @@ msgstr "Kepulauan Bangka Belitung"
 
 #: id/id_choices.py:69
 msgid "Corps Consulate"
-msgstr "Corps Consulate"
+msgstr "Korps Konsulat"
 
 #: id/id_choices.py:70
 msgid "Corps Diplomatic"
-msgstr "Corps Diplomatic"
+msgstr "Korps Diplomatik"
 
 #: id/id_choices.py:71
 msgid "Bandung"
@@ -1055,7 +1049,7 @@ msgstr "Banyumas"
 
 #: id/id_choices.py:102
 msgid "Federal Government"
-msgstr "Federal Government"
+msgstr "Pemerintahan Federal"
 
 #: id/id_choices.py:103
 msgid "Bojonegoro"
@@ -1202,14 +1196,12 @@ msgid "Wicklow"
 msgstr "Wicklow"
 
 #: il/forms.py:31
-#, fuzzy
 msgid "Enter a postal code in the format XXXXX"
-msgstr "Masukkan kode pos dalam format XX-XXX."
+msgstr "Masukkan kode pos dalam format XXXXX"
 
 #: il/forms.py:50
-#, fuzzy
 msgid "Enter a valid ID number."
-msgstr "Masukkan nomor pengenal yang benar."
+msgstr "Masukkan nomor ID yang valid."
 
 #: in_/forms.py:15
 msgid "Enter a zip code in the format XXXXXXX."
@@ -1219,23 +1211,24 @@ msgstr "Masukkan kode pos dalam format XXXXXXX."
 msgid ""
 "Enter a valid Icelandic identification number. The format is XXXXXX-XXXX."
 msgstr ""
-"Masukkan nomor identifikasi Iceland yang benar. Formatnya adalah XXXXXX-XXXX."
+"Masukkan nomor identifikasi Islandia yang valid. Formatnya adalah XXXXXX-"
+"XXXX."
 
 #: is_/forms.py:19
 msgid "The Icelandic identification number is not valid."
-msgstr "Nomor identifikasi Iceland tidak benar."
+msgstr "Nomor identifikasi Islandia salah."
 
 #: it/forms.py:15
 msgid "Enter a valid zip code."
-msgstr "Masukkan kode pos yang benar."
+msgstr "Masukkan kode pos yang valid."
 
 #: it/forms.py:44
 msgid "Enter a valid Social Security number."
-msgstr "Masukkan nomor identifikasi yang benar."
+msgstr "Masukkan nomor Jaminan Sosial yang valid."
 
 #: it/forms.py:69
 msgid "Enter a valid VAT number."
-msgstr "Masukkan nomor VAT yang benar."
+msgstr "Masukkan nomor VAT yang valid."
 
 #: jp/forms.py:16
 msgid "Enter a postal code in the format XXXXXXX or XXX-XXXX."
@@ -1431,7 +1424,7 @@ msgstr "Okinawa"
 
 #: kw/forms.py:25
 msgid "Enter a valid Kuwaiti Civil ID number"
-msgstr "Masukkan nomor ID Kuwait yang benar"
+msgstr "Masukkan nomor ID Warga Kuwait yang valid"
 
 #: mx/mx_states.py:12
 msgid "Aguascalientes"
@@ -1563,11 +1556,11 @@ msgstr "Zacatecas"
 
 #: nl/forms.py:22
 msgid "Enter a valid postal code"
-msgstr "Masukkan kode pos yang benar"
+msgstr "Masukkan kode pos yang valid"
 
 #: nl/forms.py:79
 msgid "Enter a valid SoFi number"
-msgstr "Masukkan nomor SoFi yang benar"
+msgstr "Masukkan nomor SoFi yang valid"
 
 #: nl/nl_provinces.py:4
 msgid "Drenthe"
@@ -1615,23 +1608,23 @@ msgstr "Zuid-Holland"
 
 #: no/forms.py:34
 msgid "Enter a valid Norwegian social security number."
-msgstr "Masukkan nomor identifikasi Norwegia yang benar."
+msgstr "Masukkan nomor jaminan sosial Norwegia yang valid."
 
 #: pe/forms.py:25
 msgid "This field requires 8 digits."
-msgstr "Field ini membutuhkan 8 angka."
+msgstr "Bidang ini membutuhkan isian 8 angka."
 
 #: pe/forms.py:53
 msgid "This field requires 11 digits."
-msgstr "Field ini membutuhkan 11 angka."
+msgstr "Bidang ini membutuhkan isian 11 angka."
 
 #: pl/forms.py:39
 msgid "National Identification Number consists of 11 digits."
-msgstr "Nomor identifikasi nasional terdiri dari 11 angka."
+msgstr "Nomor Identifikasi Nasional terdiri dari 11 angka."
 
 #: pl/forms.py:40
 msgid "Wrong checksum for the National Identification Number."
-msgstr "Checksum untuk nomor identifikasi nasional salah."
+msgstr "Checksum untuk Nomor Identifikasi Nasional salah."
 
 #: pl/forms.py:74
 msgid ""
@@ -1641,7 +1634,7 @@ msgstr ""
 
 #: pl/forms.py:75
 msgid "Wrong checksum for the Tax Number (NIP)."
-msgstr "Checksum untuk nomor pajak (NIP) salah."
+msgstr "Checksum untuk Nomor Pajak (NIP) salah."
 
 #: pl/forms.py:114
 msgid "National Business Register Number (REGON) consists of 9 or 14 digits."
@@ -1729,15 +1722,15 @@ msgstr "Nomor telepon harus memiliki 9 angka, atau dimulai dari + atau 00."
 
 #: ro/forms.py:19
 msgid "Enter a valid CIF."
-msgstr "Masukkan CIF yang benar."
+msgstr "Masukkan CIF yang valid."
 
 #: ro/forms.py:56
 msgid "Enter a valid CNP."
-msgstr "Masukkan CNP yang benar."
+msgstr "Masukkan CNP yang valid."
 
 #: ro/forms.py:143
 msgid "Enter a valid IBAN in ROXX-XXXX-XXXX-XXXX-XXXX-XXXX format"
-msgstr "Masukkan IBAN yang benar dalam format ROXX-XXXX-XXXX-XXXX-XXXX-XXXX"
+msgstr "Masukkan IBAN yang valid dalam format ROXX-XXXX-XXXX-XXXX-XXXX-XXXX"
 
 #: ro/forms.py:175
 msgid "Phone numbers must be in XXXX-XXXXXX format."
@@ -1745,15 +1738,15 @@ msgstr "Nomor telepon harus dalam format XXXX-XXXXXX."
 
 #: ro/forms.py:200
 msgid "Enter a valid postal code in the format XXXXXX"
-msgstr "Masukkan kode pos yang benar dalam format XXXXXX"
+msgstr "Masukkan kode pos yang valid dalam format XXXXXX"
 
 #: se/forms.py:50
 msgid "Enter a valid Swedish organisation number."
-msgstr "Masukkan nomor organisasi Swedia yang benar."
+msgstr "Masukkan nomor organisasi Swedia yang valid."
 
 #: se/forms.py:107
 msgid "Enter a valid Swedish personal identity number."
-msgstr "Masukkan nomor identifikasi pribadi Swedia yang benar."
+msgstr "Masukkan nomor identifikasi pribadi Swedia yang valid."
 
 #: se/forms.py:108
 msgid "Co-ordination numbers are not allowed."
@@ -2196,28 +2189,24 @@ msgid "Zilina region"
 msgstr "Daerah Zilina"
 
 #: tr/forms.py:16
-#, fuzzy
 msgid "Enter a postal code in the format XXXXX."
-msgstr "Masukkan kode pos dalam format XX-XXX."
+msgstr "Masukkan kode pos dalam format XXXXX."
 
 #: tr/forms.py:37
-#, fuzzy
 msgid "Phone numbers must be in 0XXX XXX XXXX format."
-msgstr "Nomor telepon harus dalam format 0X XX XX XX XX."
+msgstr "Nomor telepon harus dalam format 0XXX XXX XXXX."
 
 #: tr/forms.py:64
-#, fuzzy
 msgid "Enter a valid Turkish Identification number."
-msgstr "Masukkan nomor organisasi Swedia yang benar."
+msgstr "Masukkan nomor Identifikasi Turki yang valid."
 
 #: tr/forms.py:65
-#, fuzzy
 msgid "Turkish Identification number must be 11 digits."
-msgstr "Nomor identifikasi nasional terdiri dari 11 angka."
+msgstr "Jumlah angka pada Nomor Identifikasi Turki harus sebanyak 11 angka."
 
 #: uk/forms.py:21
 msgid "Enter a valid postcode."
-msgstr "Masukkan kode pos yang benar."
+msgstr "Masukkan kode pos yang valid."
 
 #: uk/uk_regions.py:11
 msgid "Bedfordshire"
@@ -2509,20 +2498,20 @@ msgstr "Nomor telepon harus dalam format XXX-XXX-XXXX."
 
 #: us/forms.py:55
 msgid "Enter a valid U.S. Social Security number in XXX-XX-XXXX format."
-msgstr "Masukkan nomor identifikasi A.S. yang benar dalam format XXX-XX-XXXX."
+msgstr ""
+"Masukkan nomor Jaminan Sosial A.S. yang valid dalam format XXX-XX-XXXX."
 
 #: us/forms.py:88
 msgid "Enter a U.S. state or territory."
-msgstr "Masukkan sebuah propinsi atau teritori A.S."
+msgstr "Masukkan negara bagian atau teritori A.S."
 
 #: us/models.py:9
 msgid "U.S. state (two uppercase letters)"
-msgstr "Propinsi A.S (dua huruf besar)"
+msgstr "Negara bagian A.S. (dua huruf besar)"
 
 #: us/models.py:18
-#, fuzzy
 msgid "U.S. postal code (two uppercase letters)"
-msgstr "Propinsi A.S (dua huruf besar)"
+msgstr "Kode pos A.S. (dua huruf besar)"
 
 #: us/models.py:27
 msgid "Phone number"
@@ -2531,20 +2520,20 @@ msgstr "Nomor telepon"
 #: uy/forms.py:28
 msgid "Enter a valid CI number in X.XXX.XXX-X,XXXXXXX-X or XXXXXXXX format."
 msgstr ""
-"Masukkan nomor CI yang benar dalam format X.XXX.XXX-X,XXXXXXX-X atau "
+"Masukkan nomor CI yang valid dalam format X.XXX.XXX-X,XXXXXXX-X atau "
 "XXXXXXXX."
 
 #: uy/forms.py:30
 msgid "Enter a valid CI number."
-msgstr "Masukkan nomor CI yang benar."
+msgstr "Masukkan nomor CI yang valid."
 
 #: za/forms.py:21
 msgid "Enter a valid South African ID number"
-msgstr "Masukkan nomor ID Afrika Selatan yang benar"
+msgstr "Masukkan nomor ID Afrika Selatan yang valid"
 
 #: za/forms.py:55
 msgid "Enter a valid South African postal code"
-msgstr "Masukkan kode pos Afrika Selatan yang benar"
+msgstr "Masukkan kode pos Afrika Selatan yang valid"
 
 #: za/za_provinces.py:4
 msgid "Eastern Cape"

@@ -1,16 +1,18 @@
-# Translation of django.po to japanese.
+# This file is distributed under the same license as the Django package.
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:28+0100\n"
-"PO-Revision-Date: 2010-05-09 12:41+0900\n"
-"Last-Translator: Takashi Matsuo <matsuo.takashi@gmail.com>\n"
-"Language-Team: Japanese <django-ja@googlegroups.com>\n"
+"POT-Creation-Date: 2011-03-01 00:32+0100\n"
+"PO-Revision-Date: 2011-02-22 00:10+0000\n"
+"Last-Translator: t2y <tetsuya.morimoto@gmail.com>\n"
+"Language-Team: Japanese <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Language: ja\n"
+"Plural-Forms: nplurals=1; plural=0\n"
 
 #: ar/forms.py:28
 msgid "Enter a postal code in the format NNNN or ANNNNAAA."
@@ -84,74 +86,63 @@ msgstr "4桁でポストコードを入力してください。"
 
 #: be/be_provinces.py:5
 msgid "Antwerp"
-msgstr ""
+msgstr "アントワープ"
 
 #: be/be_provinces.py:6
-#, fuzzy
 msgid "Brussels"
-msgstr "ユーザ"
+msgstr "ブリュッセル"
 
 #: be/be_provinces.py:7
-#, fuzzy
 msgid "East Flanders"
-msgstr "West Midlands"
+msgstr "東フランドル"
 
 #: be/be_provinces.py:8
 msgid "Flemish Brabant"
-msgstr ""
+msgstr "フランダースブラバント"
 
 #: be/be_provinces.py:9
-#, fuzzy
 msgid "Hainaut"
-msgstr "分"
+msgstr "エノー州"
 
 #: be/be_provinces.py:10
 msgid "Liege"
-msgstr ""
+msgstr "リエージュ"
 
 #: be/be_provinces.py:11 nl/nl_provinces.py:9
 msgid "Limburg"
 msgstr "Limburg"
 
 #: be/be_provinces.py:12
-#, fuzzy
 msgid "Luxembourg"
-msgstr "Limburg"
+msgstr "ルクセンブルグ"
 
 #: be/be_provinces.py:13
-#, fuzzy
 msgid "Namur"
-msgstr "名前"
+msgstr "ナミュール"
 
 #: be/be_provinces.py:14
-#, fuzzy
 msgid "Walloon Brabant"
-msgstr "Noord-Brabant"
+msgstr "ブラバンワロン州"
 
 #: be/be_provinces.py:15
-#, fuzzy
 msgid "West Flanders"
-msgstr "West Midlands"
+msgstr "西フランドル"
 
 #: be/be_regions.py:5
-#, fuzzy
 msgid "Brussels Capital Region"
-msgstr "Bratislava region"
+msgstr "ブリュッセル首都圏"
 
 #: be/be_regions.py:6
-#, fuzzy
 msgid "Flemish Region"
-msgstr "ズリーン州"
+msgstr "フランダース地方"
 
 #: be/be_regions.py:7
-#, fuzzy
 msgid "Wallonia"
-msgstr "Catalonia"
+msgstr "ワロン地域"
 
 #: be/forms.py:23
-#, fuzzy
 msgid "Enter a valid postal code in the range and format 1XXX - 9XXX."
-msgstr "01XXX から 52XXXの形式で郵便番号を入力してください。"
+msgstr "郵便番号の範囲を 1XXX - 9XXX の形式で入力してください。"
 
 #: be/forms.py:46
 msgid ""
@@ -159,6 +150,9 @@ msgid ""
 "04xx xx xx xx, 0x/xxx.xx.xx, 0xx/xx.xx.xx, 04xx/xx.xx.xx, 0x.xxx.xx.xx, 0xx."
 "xx.xx.xx, 04xx.xx.xx.xx, 0xxxxxxxx or 04xxxxxxxx."
 msgstr ""
+"電話番号を次の形式のうちどれかを選択して入力してください: 0x xxx xx xx, 0xx "
+"xx xx xx, 04xx xx xx xx, 0x/xxx.xx.xx, 0xx/xx.xx.xx, 04xx/xx.xx.xx, 0x.xxx."
+"xx.xx, 0xx.xx.xx.xx, 04xx.xx.xx.xx, 0xxxxxxxx or 04xxxxxxxx."
 
 #: br/forms.py:17
 msgid "Enter a zip code in the format XXXXX-XXX."
@@ -807,407 +801,404 @@ msgid "Enter a valid NIK/KTP number"
 msgstr "NIK/KTP番号を正しく入力してください。"
 
 #: id/id_choices.py:15
-#, fuzzy
 msgid "Aceh"
-msgstr "愛知県"
+msgstr "アチェ"
 
 #: id/id_choices.py:16 id/id_choices.py:79
 msgid "Bali"
-msgstr ""
+msgstr "バリ"
 
 #: id/id_choices.py:17 id/id_choices.py:51
 msgid "Banten"
-msgstr ""
+msgstr "バンテン"
 
 #: id/id_choices.py:18 id/id_choices.py:60
 msgid "Bengkulu"
-msgstr ""
+msgstr "ベンクルー州"
 
 #: id/id_choices.py:19 id/id_choices.py:53
 msgid "Yogyakarta"
-msgstr ""
+msgstr "ジョクジャカルタ"
 
 #: id/id_choices.py:20 id/id_choices.py:57
 msgid "Jakarta"
-msgstr ""
+msgstr "ジャカルタ"
 
 #: id/id_choices.py:21 id/id_choices.py:81
 msgid "Gorontalo"
-msgstr ""
+msgstr "ゴロンタロ"
 
 #: id/id_choices.py:22 id/id_choices.py:63
 msgid "Jambi"
-msgstr ""
+msgstr "ジャンビ"
 
 #: id/id_choices.py:23
 msgid "Jawa Barat"
-msgstr ""
+msgstr "ジャワバラット州"
 
 #: id/id_choices.py:24
 msgid "Jawa Tengah"
-msgstr ""
+msgstr "ジャワトゥンガ州"
 
 #: id/id_choices.py:25
 msgid "Jawa Timur"
-msgstr ""
+msgstr "ジャワティムール州"
 
 #: id/id_choices.py:26 id/id_choices.py:94
 msgid "Kalimantan Barat"
-msgstr ""
+msgstr "カリマンタンバラット州"
 
 #: id/id_choices.py:27 id/id_choices.py:72
 msgid "Kalimantan Selatan"
-msgstr ""
+msgstr "カリマンタンスラタン州"
 
 #: id/id_choices.py:28 id/id_choices.py:95
 msgid "Kalimantan Tengah"
-msgstr ""
+msgstr "カリマンタントゥンガ州"
 
 #: id/id_choices.py:29 id/id_choices.py:96
 msgid "Kalimantan Timur"
-msgstr ""
+msgstr "カリマンタンティムール州"
 
 #: id/id_choices.py:30
 msgid "Kepulauan Bangka-Belitung"
-msgstr ""
+msgstr "バンカ-ビリトン諸島"
 
 #: id/id_choices.py:31 id/id_choices.py:68
 msgid "Kepulauan Riau"
-msgstr ""
+msgstr "リアオ諸島"
 
 #: id/id_choices.py:32 id/id_choices.py:61
 msgid "Lampung"
-msgstr ""
+msgstr "ランプン州"
 
 #: id/id_choices.py:33 id/id_choices.py:76
 msgid "Maluku"
-msgstr ""
+msgstr "マルク州"
 
 #: id/id_choices.py:34 id/id_choices.py:77
 msgid "Maluku Utara"
-msgstr ""
+msgstr "マルクウタラ"
 
 #: id/id_choices.py:35
 msgid "Nusa Tenggara Barat"
-msgstr ""
+msgstr "ヌサトゥンガラバラット"
 
 #: id/id_choices.py:36
 msgid "Nusa Tenggara Timur"
-msgstr ""
+msgstr "ヌサトゥンガラティムール州"
 
 #: id/id_choices.py:37
 msgid "Papua"
-msgstr ""
+msgstr "パプア"
 
 #: id/id_choices.py:38
 msgid "Papua Barat"
-msgstr ""
+msgstr "パプアバラット"
 
 #: id/id_choices.py:39 id/id_choices.py:66
 msgid "Riau"
-msgstr ""
+msgstr "リアウ州"
 
 #: id/id_choices.py:40 id/id_choices.py:74
 msgid "Sulawesi Barat"
-msgstr ""
+msgstr "スラウェシバラット"
 
 #: id/id_choices.py:41 id/id_choices.py:75
 msgid "Sulawesi Selatan"
-msgstr ""
+msgstr "スラウェシスラタン州"
 
 #: id/id_choices.py:42 id/id_choices.py:82
 msgid "Sulawesi Tengah"
-msgstr ""
+msgstr "スラウェシトゥンガ州"
 
 #: id/id_choices.py:43 id/id_choices.py:85
 msgid "Sulawesi Tenggara"
-msgstr ""
+msgstr "スラウェシトゥンガラ州"
 
 #: id/id_choices.py:44
 msgid "Sulawesi Utara"
-msgstr ""
+msgstr "スラウェシウタラ州"
 
 #: id/id_choices.py:45 id/id_choices.py:58
 msgid "Sumatera Barat"
-msgstr ""
+msgstr "スマトラバラット州"
 
 #: id/id_choices.py:46 id/id_choices.py:62
 msgid "Sumatera Selatan"
-msgstr ""
+msgstr "スマトラスラタン州"
 
 #: id/id_choices.py:47 id/id_choices.py:64
 msgid "Sumatera Utara"
-msgstr ""
+msgstr "スマトラウタラ州"
 
 #: id/id_choices.py:52
 msgid "Magelang"
-msgstr ""
+msgstr "マグラン"
 
 #: id/id_choices.py:54
 msgid "Surakarta - Solo"
-msgstr ""
+msgstr "スラカルタ - ソロ"
 
 #: id/id_choices.py:55
 msgid "Madiun"
-msgstr ""
+msgstr "マディウン"
 
 #: id/id_choices.py:56
 msgid "Kediri"
-msgstr ""
+msgstr "クディリ"
 
 #: id/id_choices.py:59
 msgid "Tapanuli"
-msgstr ""
+msgstr "タパヌリ"
 
 #: id/id_choices.py:65
 msgid "Nanggroe Aceh Darussalam"
-msgstr ""
+msgstr "ナングロアチェダルサラーム"
 
 #: id/id_choices.py:67
 msgid "Kepulauan Bangka Belitung"
-msgstr ""
+msgstr "バンカビリトン諸島"
 
 #: id/id_choices.py:69
 msgid "Corps Consulate"
-msgstr ""
+msgstr "領事館部隊"
 
 #: id/id_choices.py:70
 msgid "Corps Diplomatic"
-msgstr ""
+msgstr "外交部隊"
 
 #: id/id_choices.py:71
 msgid "Bandung"
-msgstr ""
+msgstr "バンドン"
 
 #: id/id_choices.py:73
 msgid "Sulawesi Utara Daratan"
-msgstr ""
+msgstr "スラウェシウタラダラタン"
 
 #: id/id_choices.py:78
 msgid "NTT - Timor"
-msgstr ""
+msgstr "株式会社 NTT - 東ティモール"
 
 #: id/id_choices.py:80
 msgid "Sulawesi Utara Kepulauan"
-msgstr ""
+msgstr "スラウェシウタラ諸島"
 
 #: id/id_choices.py:83
 msgid "NTB - Lombok"
-msgstr ""
+msgstr "NTB - ロンボク"
 
 #: id/id_choices.py:84
 msgid "Papua dan Papua Barat"
-msgstr ""
+msgstr "パプアダンパプアバラット"
 
 #: id/id_choices.py:86
 msgid "Cirebon"
-msgstr ""
+msgstr "チルボン"
 
 #: id/id_choices.py:87
 msgid "NTB - Sumbawa"
-msgstr ""
+msgstr "NTB - スンバワ"
 
 #: id/id_choices.py:88
 msgid "NTT - Flores"
-msgstr ""
+msgstr "株式会社 NTT - フローリーズ"
 
 #: id/id_choices.py:89
 msgid "NTT - Sumba"
-msgstr ""
+msgstr "株式会社NTT - スンバ"
 
 #: id/id_choices.py:90
 msgid "Bogor"
-msgstr ""
+msgstr "ボゴール"
 
 #: id/id_choices.py:91
 msgid "Pekalongan"
-msgstr ""
+msgstr "プカロンガン"
 
 #: id/id_choices.py:92
 msgid "Semarang"
-msgstr ""
+msgstr "スマラン"
 
 #: id/id_choices.py:93
 msgid "Pati"
-msgstr ""
+msgstr "パティ"
 
 #: id/id_choices.py:97
 msgid "Surabaya"
-msgstr ""
+msgstr "スラバヤ"
 
 #: id/id_choices.py:98
 msgid "Madura"
-msgstr ""
+msgstr "マドゥラ"
 
 #: id/id_choices.py:99
 msgid "Malang"
-msgstr ""
+msgstr "マラン"
 
 #: id/id_choices.py:100
 msgid "Jember"
-msgstr ""
+msgstr "ジェンバー"
 
 #: id/id_choices.py:101
 msgid "Banyumas"
-msgstr ""
+msgstr "バニュマス"
 
 #: id/id_choices.py:102
 msgid "Federal Government"
-msgstr ""
+msgstr "連邦政府"
 
 #: id/id_choices.py:103
 msgid "Bojonegoro"
-msgstr ""
+msgstr "ボジョネゴロ"
 
 #: id/id_choices.py:104
 msgid "Purwakarta"
-msgstr ""
+msgstr "プルワカルタ"
 
 #: id/id_choices.py:105
 msgid "Sidoarjo"
-msgstr ""
+msgstr "シドアルジョ"
 
 #: id/id_choices.py:106
 msgid "Garut"
-msgstr ""
+msgstr "ガルト"
 
 #: ie/ie_counties.py:8
 msgid "Antrim"
-msgstr ""
+msgstr "アントリム"
 
 #: ie/ie_counties.py:9
 msgid "Armagh"
-msgstr ""
+msgstr "アルマー"
 
 #: ie/ie_counties.py:10
 msgid "Carlow"
-msgstr ""
+msgstr "カーロー"
 
 #: ie/ie_counties.py:11
 msgid "Cavan"
-msgstr ""
+msgstr "カバン"
 
 #: ie/ie_counties.py:12
 msgid "Clare"
-msgstr ""
+msgstr "クレア"
 
 #: ie/ie_counties.py:13
 msgid "Cork"
-msgstr ""
+msgstr "コーク"
 
 #: ie/ie_counties.py:14
 msgid "Derry"
-msgstr ""
+msgstr "デリー"
 
 #: ie/ie_counties.py:15
 msgid "Donegal"
-msgstr ""
+msgstr "ドニゴール"
 
 #: ie/ie_counties.py:16
 msgid "Down"
-msgstr ""
+msgstr "ダウン"
 
 #: ie/ie_counties.py:17
 msgid "Dublin"
-msgstr ""
+msgstr "ダブリン"
 
 #: ie/ie_counties.py:18
 msgid "Fermanagh"
-msgstr ""
+msgstr "ファーマナ州"
 
 #: ie/ie_counties.py:19
 msgid "Galway"
-msgstr ""
+msgstr "ゴールウェイ"
 
 #: ie/ie_counties.py:20
 msgid "Kerry"
-msgstr ""
+msgstr "ケリー"
 
 #: ie/ie_counties.py:21
 msgid "Kildare"
-msgstr ""
+msgstr "キルデア"
 
 #: ie/ie_counties.py:22
 msgid "Kilkenny"
-msgstr ""
+msgstr "キルケニー"
 
 #: ie/ie_counties.py:23
 msgid "Laois"
-msgstr ""
+msgstr "リーシュ"
 
 #: ie/ie_counties.py:24
 msgid "Leitrim"
-msgstr ""
+msgstr "リートリム"
 
 #: ie/ie_counties.py:25
 msgid "Limerick"
-msgstr ""
+msgstr "リマリック"
 
 #: ie/ie_counties.py:26
 msgid "Longford"
-msgstr ""
+msgstr "ロングフォード"
 
 #: ie/ie_counties.py:27
 msgid "Louth"
-msgstr ""
+msgstr "ラウス"
 
 #: ie/ie_counties.py:28
 msgid "Mayo"
-msgstr ""
+msgstr "メイヨー"
 
 #: ie/ie_counties.py:29
 msgid "Meath"
-msgstr ""
+msgstr "ミーズ"
 
 #: ie/ie_counties.py:30
 msgid "Monaghan"
-msgstr ""
+msgstr "モナハン"
 
 #: ie/ie_counties.py:31
 msgid "Offaly"
-msgstr ""
+msgstr "オファリー"
 
 #: ie/ie_counties.py:32
 msgid "Roscommon"
-msgstr ""
+msgstr "ロスコモン"
 
 #: ie/ie_counties.py:33
 msgid "Sligo"
-msgstr ""
+msgstr "スライゴ"
 
 #: ie/ie_counties.py:34
 msgid "Tipperary"
-msgstr ""
+msgstr "ティペラリー"
 
 #: ie/ie_counties.py:35
 msgid "Tyrone"
-msgstr ""
+msgstr "タイローン"
 
 #: ie/ie_counties.py:36
 msgid "Waterford"
-msgstr ""
+msgstr "ウォーターフォード"
 
 #: ie/ie_counties.py:37
 msgid "Westmeath"
-msgstr ""
+msgstr "ウェストミーズ"
 
 #: ie/ie_counties.py:38
 msgid "Wexford"
-msgstr ""
+msgstr "ウェクスフォード"
 
 #: ie/ie_counties.py:39
 msgid "Wicklow"
-msgstr ""
+msgstr "ウィックロー"
 
 #: il/forms.py:31
-#, fuzzy
 msgid "Enter a postal code in the format XXXXX"
-msgstr "XX-XXXの形式で郵便番号を入力してください。"
+msgstr "郵便番号を XXXXX 形式で入力してください"
 
 #: il/forms.py:50
-#, fuzzy
 msgid "Enter a valid ID number."
-msgstr "IC番号を正しく入力してください。"
+msgstr "ID 番号を入力してください。"
 
 #: in_/forms.py:15
 msgid "Enter a zip code in the format XXXXXXX."
@@ -1753,7 +1744,7 @@ msgstr "スウェーデン個人識別番号を正しく入力してください
 
 #: se/forms.py:108
 msgid "Co-ordination numbers are not allowed."
-msgstr ""
+msgstr "コーディネーション番号は許可されていません。"
 
 #: se/forms.py:150
 msgid "Enter a Swedish postal code in the format XXXXX."
@@ -1761,87 +1752,87 @@ msgstr "XXXXXの形式で郵便番号を入力してください。"
 
 #: se/se_counties.py:15
 msgid "Stockholm"
-msgstr ""
+msgstr "ストックホルム"
 
 #: se/se_counties.py:16
 msgid "Västerbotten"
-msgstr ""
+msgstr "ベステルボッテン"
 
 #: se/se_counties.py:17
 msgid "Norrbotten"
-msgstr ""
+msgstr "ノルボッテン"
 
 #: se/se_counties.py:18
 msgid "Uppsala"
-msgstr ""
+msgstr "ウプサラ"
 
 #: se/se_counties.py:19
 msgid "Södermanland"
-msgstr ""
+msgstr "セーデルマンランド"
 
 #: se/se_counties.py:20
 msgid "Östergötland"
-msgstr ""
+msgstr "エステルイェトランド"
 
 #: se/se_counties.py:21
 msgid "Jönköping"
-msgstr ""
+msgstr "ヨンショーピン"
 
 #: se/se_counties.py:22
 msgid "Kronoberg"
-msgstr ""
+msgstr "クルーヌベリ"
 
 #: se/se_counties.py:23
 msgid "Kalmar"
-msgstr ""
+msgstr "カルマル"
 
 #: se/se_counties.py:24
 msgid "Gotland"
-msgstr ""
+msgstr "ゴトランド"
 
 #: se/se_counties.py:25
 msgid "Blekinge"
-msgstr ""
+msgstr "ブレーキンゲ"
 
 #: se/se_counties.py:26
 msgid "Skåne"
-msgstr ""
+msgstr "スコーネ"
 
 #: se/se_counties.py:27
 msgid "Halland"
-msgstr ""
+msgstr "ハランド"
 
 #: se/se_counties.py:28
 msgid "Västra Götaland"
-msgstr ""
+msgstr "ヴィストライェータランド"
 
 #: se/se_counties.py:29
 msgid "Värmland"
-msgstr ""
+msgstr "ヴェルムランド"
 
 #: se/se_counties.py:30
 msgid "Örebro"
-msgstr ""
+msgstr "オレブロ"
 
 #: se/se_counties.py:31
 msgid "Västmanland"
-msgstr ""
+msgstr "ベストマンランド"
 
 #: se/se_counties.py:32
 msgid "Dalarna"
-msgstr ""
+msgstr "ダーラルナ"
 
 #: se/se_counties.py:33
 msgid "Gävleborg"
-msgstr ""
+msgstr "イェブレボリ"
 
 #: se/se_counties.py:34
 msgid "Västernorrland"
-msgstr ""
+msgstr "ベステルノルランド"
 
 #: se/se_counties.py:35
 msgid "Jämtland"
-msgstr ""
+msgstr "イェムトランド"
 
 #: sk/sk_districts.py:8
 msgid "Banska Bystrica"
@@ -2192,24 +2183,20 @@ msgid "Zilina region"
 msgstr "Zilina region"
 
 #: tr/forms.py:16
-#, fuzzy
 msgid "Enter a postal code in the format XXXXX."
-msgstr "XX-XXXの形式で郵便番号を入力してください。"
+msgstr "郵便番号を XXXXX 形式で入力してください。"
 
 #: tr/forms.py:37
-#, fuzzy
 msgid "Phone numbers must be in 0XXX XXX XXXX format."
-msgstr "電話番号は 0X XX XX XX XX 形式で入力してください。"
+msgstr "電話番号は 0XXX XXX XXXX 形式でなければいけません。"
 
 #: tr/forms.py:64
-#, fuzzy
 msgid "Enter a valid Turkish Identification number."
-msgstr "スウェーデン組織番号を正しく入力してください。"
+msgstr "トルコ国民番号を入力してください。"
 
 #: tr/forms.py:65
-#, fuzzy
 msgid "Turkish Identification number must be 11 digits."
-msgstr "国民識別番号は11文字で入力して下さい。"
+msgstr "トルコ国民番号は11桁でなければいけません。"
 
 #: uk/forms.py:21
 msgid "Enter a valid postcode."
@@ -2516,9 +2503,8 @@ msgid "U.S. state (two uppercase letters)"
 msgstr "アメリカの州 (大文字二文字で)"
 
 #: us/models.py:18
-#, fuzzy
 msgid "U.S. postal code (two uppercase letters)"
-msgstr "アメリカの州 (大文字二文字で)"
+msgstr "米国郵便番号(大文字で2文字)"
 
 #: us/models.py:27
 msgid "Phone number"

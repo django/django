@@ -4,15 +4,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:28+0100\n"
-"PO-Revision-Date: 2010-05-07 17:33+0100\n"
-"Last-Translator: Michael Thornhill <michael@maithu.com>\n"
-"Language-Team: Irish <gaeilge-gnulinux@lists.sourceforge.net>\n"
+"POT-Creation-Date: 2011-03-01 00:32+0100\n"
+"PO-Revision-Date: 2011-02-22 00:10+0000\n"
+"Last-Translator: mick <michael@maithu.com>\n"
+"Language-Team: Irish <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=5; plural=n==1 ? 0 : n==2 ? 1 : n<7 ? 2 : n < 11 ? "
-"3 : 4;\n"
+"Language: ga\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n==2 ? 1 : n<7 ? 2 : n<11 ? 3 : "
+"4)\n"
 
 #: ar/forms.py:28
 msgid "Enter a postal code in the format NNNN or ANNNNAAA."
@@ -84,76 +85,64 @@ msgid "Enter a 4 digit post code."
 msgstr "Iontráil cód poist 4 dhigit."
 
 #: be/be_provinces.py:5
-#, fuzzy
 msgid "Antwerp"
-msgstr "Aontroim"
+msgstr "Antwerp"
 
 #: be/be_provinces.py:6
-#, fuzzy
 msgid "Brussels"
-msgstr "úsáideora"
+msgstr "An Bhruiséil"
 
 #: be/be_provinces.py:7
-#, fuzzy
 msgid "East Flanders"
-msgstr "West Midlands"
+msgstr "Flóndras Oirthear"
 
 #: be/be_provinces.py:8
 msgid "Flemish Brabant"
-msgstr ""
+msgstr "Brabant Pléimeannach"
 
 #: be/be_provinces.py:9
-#, fuzzy
 msgid "Hainaut"
-msgstr "nóiméad"
+msgstr "Hainaut"
 
 #: be/be_provinces.py:10
 msgid "Liege"
-msgstr ""
+msgstr "Liege"
 
 #: be/be_provinces.py:11 nl/nl_provinces.py:9
 msgid "Limburg"
 msgstr "Limburg"
 
 #: be/be_provinces.py:12
-#, fuzzy
 msgid "Luxembourg"
-msgstr "Limburg"
+msgstr "Lucsamburg"
 
 #: be/be_provinces.py:13
-#, fuzzy
 msgid "Namur"
-msgstr "Ainm"
+msgstr "Namur"
 
 #: be/be_provinces.py:14
-#, fuzzy
 msgid "Walloon Brabant"
-msgstr "Noord-Brabant"
+msgstr "Walloon Brabant"
 
 #: be/be_provinces.py:15
-#, fuzzy
 msgid "West Flanders"
-msgstr "West Midlands"
+msgstr "West Flanders"
 
 #: be/be_regions.py:5
-#, fuzzy
 msgid "Brussels Capital Region"
-msgstr "An Bhratasláiv réigiún"
+msgstr "Caipitil Réigiún na Bhruiséil"
 
 #: be/be_regions.py:6
-#, fuzzy
 msgid "Flemish Region"
-msgstr "Réigiún Zlin"
+msgstr "Réigiún Pléimeannach"
 
 #: be/be_regions.py:7
-#, fuzzy
 msgid "Wallonia"
-msgstr "An Chatalóin"
+msgstr "Wallonia"
 
 #: be/forms.py:23
-#, fuzzy
 msgid "Enter a valid postal code in the range and format 1XXX - 9XXX."
-msgstr "Iontráil cód poist bailí i raon agus formáid 01XXX - 52XXX."
+msgstr "Cuir isteach cód poist bailí sa raon agus formáid 1XXX - 9XXX."
 
 #: be/forms.py:46
 msgid ""
@@ -161,6 +150,9 @@ msgid ""
 "04xx xx xx xx, 0x/xxx.xx.xx, 0xx/xx.xx.xx, 04xx/xx.xx.xx, 0x.xxx.xx.xx, 0xx."
 "xx.xx.xx, 04xx.xx.xx.xx, 0xxxxxxxx or 04xxxxxxxx."
 msgstr ""
+"Cuir isteach uimhir theileafóin bailí i gceann de na formáidí 0x xxx xx xx, "
+"0xx xx xx xx, 04xx xx xx xx, 0x/xxx.xx.xx, 0xx/xx.xx.xx, 04xx/xx.xx.xx, 0x."
+"xxx.xx.xx, 0xx.xx.xx.xx, 04xx.xx.xx.xx, 0xxxxxxxx nó 04xxxxxxxx."
 
 #: br/forms.py:17
 msgid "Enter a zip code in the format XXXXX-XXX."
@@ -813,9 +805,8 @@ msgid "Enter a valid NIK/KTP number"
 msgstr "Cuir isteach uimhir NIK/KTP bailí"
 
 #: id/id_choices.py:15
-#, fuzzy
 msgid "Aceh"
-msgstr "Aichi"
+msgstr "Aceh"
 
 #: id/id_choices.py:16 id/id_choices.py:79
 msgid "Bali"
@@ -1206,14 +1197,12 @@ msgid "Wicklow"
 msgstr "Cill Mhantáin"
 
 #: il/forms.py:31
-#, fuzzy
 msgid "Enter a postal code in the format XXXXX"
-msgstr "Iontráil cód poist i bhformáid XX-XXX."
+msgstr "Cuir isteach cód poist san fhormáid XXXXX"
 
 #: il/forms.py:50
-#, fuzzy
 msgid "Enter a valid ID number."
-msgstr "Cuir isteach uimhir IC bailí."
+msgstr "Cuir isteach uimhir aitheantais bailí."
 
 #: in_/forms.py:15
 msgid "Enter a zip code in the format XXXXXXX."
@@ -2202,24 +2191,20 @@ msgid "Zilina region"
 msgstr "Zilina réigiún"
 
 #: tr/forms.py:16
-#, fuzzy
 msgid "Enter a postal code in the format XXXXX."
-msgstr "Iontráil cód poist i bhformáid XX-XXX."
+msgstr "Cuir isteach cód poist san fhormáid XXXXX."
 
 #: tr/forms.py:37
-#, fuzzy
 msgid "Phone numbers must be in 0XXX XXX XXXX format."
-msgstr "Ní mór Uimhreacha teileafóin a chur i bhformáid 0X XX XX XX XX."
+msgstr "Ní mór líon Fón a bheith i bhformáid 0XXX XXX XXXX."
 
 #: tr/forms.py:64
-#, fuzzy
 msgid "Enter a valid Turkish Identification number."
-msgstr "Cuir isteach uimhir eagraíochta bailí Sualainnis."
+msgstr "Iontráil uimhir aitheantais bailí Tuircis."
 
 #: tr/forms.py:65
-#, fuzzy
 msgid "Turkish Identification number must be 11 digits."
-msgstr "Náisiúnta Uimhir Aitheantais comhdhéanta de 11 digití."
+msgstr "Ní mór a aithint Tuircis uimhir 11 digití."
 
 #: uk/forms.py:21
 msgid "Enter a valid postcode."
@@ -2526,9 +2511,8 @@ msgid "U.S. state (two uppercase letters)"
 msgstr "U.S. stát (dhá litreacha móra)"
 
 #: us/models.py:18
-#, fuzzy
 msgid "U.S. postal code (two uppercase letters)"
-msgstr "U.S. stát (dhá litreacha móra)"
+msgstr "US cód poist (dhá litreacha móra)"
 
 #: us/models.py:27
 msgid "Phone number"

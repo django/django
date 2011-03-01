@@ -1,18 +1,18 @@
-# Portuguese translation of Django.
-# This file is distributed under the same license as the PACKAGE package.
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:28+0100\n"
-"PO-Revision-Date: 2010-03-09 10:45+0000\n"
-"Last-Translator: Nuno Mariz <nmariz@gmail.com>\n"
-"Language-Team: pt_PT <nmariz@gmail.com>\n"
+"POT-Creation-Date: 2011-03-01 00:33+0100\n"
+"PO-Revision-Date: 2011-02-22 00:10+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: Portuguese <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: pt\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: ar/forms.py:28
 msgid "Enter a postal code in the format NNNN or ANNNNAAA."
@@ -89,9 +89,8 @@ msgid "Antwerp"
 msgstr ""
 
 #: be/be_provinces.py:6
-#, fuzzy
 msgid "Brussels"
-msgstr "utilizadores"
+msgstr ""
 
 #: be/be_provinces.py:7
 msgid "East Flanders"
@@ -102,9 +101,8 @@ msgid "Flemish Brabant"
 msgstr ""
 
 #: be/be_provinces.py:9
-#, fuzzy
 msgid "Hainaut"
-msgstr "minuto"
+msgstr ""
 
 #: be/be_provinces.py:10
 msgid "Liege"
@@ -119,9 +117,8 @@ msgid "Luxembourg"
 msgstr ""
 
 #: be/be_provinces.py:13
-#, fuzzy
 msgid "Namur"
-msgstr "Nome"
+msgstr ""
 
 #: be/be_provinces.py:14
 msgid "Walloon Brabant"
@@ -144,9 +141,8 @@ msgid "Wallonia"
 msgstr ""
 
 #: be/forms.py:23
-#, fuzzy
 msgid "Enter a valid postal code in the range and format 1XXX - 9XXX."
-msgstr "Instruduza um código postal válido no formato 01XXX - 52XXX."
+msgstr ""
 
 #: be/forms.py:46
 msgid ""
@@ -1199,14 +1195,12 @@ msgid "Wicklow"
 msgstr ""
 
 #: il/forms.py:31
-#, fuzzy
 msgid "Enter a postal code in the format XXXXX"
-msgstr "Introduza um código postal no formato XX-XXX."
+msgstr ""
 
 #: il/forms.py:50
-#, fuzzy
 msgid "Enter a valid ID number."
-msgstr "Introduza um número de IC válido."
+msgstr ""
 
 #: in_/forms.py:15
 msgid "Enter a zip code in the format XXXXXXX."
@@ -2196,24 +2190,20 @@ msgid "Zilina region"
 msgstr ""
 
 #: tr/forms.py:16
-#, fuzzy
 msgid "Enter a postal code in the format XXXXX."
-msgstr "Introduza um código postal no formato XX-XXX."
+msgstr ""
 
 #: tr/forms.py:37
-#, fuzzy
 msgid "Phone numbers must be in 0XXX XXX XXXX format."
-msgstr "Os números de telefone deverão ser no formato 0X XX XX XX XX."
+msgstr ""
 
 #: tr/forms.py:64
-#, fuzzy
 msgid "Enter a valid Turkish Identification number."
-msgstr "Introduza um número de organização Sueco válido."
+msgstr ""
 
 #: tr/forms.py:65
-#, fuzzy
 msgid "Turkish Identification number must be 11 digits."
-msgstr "O número de identificação nacional consiste em 11 dígitos."
+msgstr ""
 
 #: uk/forms.py:21
 msgid "Enter a valid postcode."
@@ -2521,9 +2511,8 @@ msgid "U.S. state (two uppercase letters)"
 msgstr "Estado dos E.U.A (duas letras em maiúsculas)"
 
 #: us/models.py:18
-#, fuzzy
 msgid "U.S. postal code (two uppercase letters)"
-msgstr "Estado dos E.U.A (duas letras em maiúsculas)"
+msgstr ""
 
 #: us/models.py:27
 msgid "Phone number"

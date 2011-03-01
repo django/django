@@ -4,14 +4,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:28+0100\n"
-"PO-Revision-Date: 2010-01-27 22:36-0700\n"
-"Last-Translator: Wim Benes <fryskefirefox@gmail.com>\n"
-"Language-Team: FRISIAN <LL@li.org>\n"
+"POT-Creation-Date: 2011-03-01 00:32+0100\n"
+"PO-Revision-Date: 2011-02-28 23:30+0000\n"
+"Last-Translator: Django team\n"
+"Language-Team: English <en@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: fy_NL\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: ar/forms.py:28
 msgid "Enter a postal code in the format NNNN or ANNNNAAA."
@@ -1178,14 +1179,12 @@ msgid "Wicklow"
 msgstr ""
 
 #: il/forms.py:31
-#, fuzzy
 msgid "Enter a postal code in the format XXXXX"
-msgstr "Jou in falide daum yn JJJJ-MM-DD-formaat."
+msgstr ""
 
 #: il/forms.py:50
-#, fuzzy
 msgid "Enter a valid ID number."
-msgstr "Jou in falide tiid."
+msgstr ""
 
 #: in_/forms.py:15
 msgid "Enter a zip code in the format XXXXXXX."
@@ -2170,18 +2169,16 @@ msgid "Zilina region"
 msgstr ""
 
 #: tr/forms.py:16
-#, fuzzy
 msgid "Enter a postal code in the format XXXXX."
-msgstr "Jou in falide daum yn JJJJ-MM-DD-formaat."
+msgstr ""
 
 #: tr/forms.py:37
 msgid "Phone numbers must be in 0XXX XXX XXXX format."
 msgstr ""
 
 #: tr/forms.py:64
-#, fuzzy
 msgid "Enter a valid Turkish Identification number."
-msgstr "Jou in falide datum.tiid."
+msgstr ""
 
 #: tr/forms.py:65
 msgid "Turkish Identification number must be 11 digits."

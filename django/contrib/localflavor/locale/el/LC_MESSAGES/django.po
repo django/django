@@ -1,45 +1,38 @@
-# translation of django.po to el
-# Copyright (C) 2006 and beyond
-# This file is distributed under the same license as the DJANGO package.
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:27+0100\n"
-"PO-Revision-Date: 2007-09-03 04:19+0100\n"
-"Last-Translator: Dimitris Glezos <dimitris@glezos.com>\n"
-"Language-Team: el <fedora-trans-el@redhat.com>\n"
+"POT-Creation-Date: 2011-03-01 00:32+0100\n"
+"PO-Revision-Date: 2011-02-22 00:10+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: Greek <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.11.4\n"
-"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
+"Language: el\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: ar/forms.py:28
-#, fuzzy
 msgid "Enter a postal code in the format NNNN or ANNNNAAA."
-msgstr "Εισάγετε μία έγκυρη ώρα στη μορφή ΩΩ-ΛΛ."
+msgstr ""
 
 #: ar/forms.py:50 br/forms.py:92 br/forms.py:131 pe/forms.py:24 pe/forms.py:52
-#, fuzzy
 msgid "This field requires only numbers."
-msgstr "Αυτό το πεδίο είναι απαραίτητο."
+msgstr ""
 
 #: ar/forms.py:51
-#, fuzzy
 msgid "This field requires 7 or 8 digits."
-msgstr "Αυτό το πεδίο είναι απαραίτητο."
+msgstr ""
 
 #: ar/forms.py:80
-#, fuzzy
 msgid "Enter a valid CUIT in XX-XXXXXXXX-X or XXXXXXXXXXXX format."
-msgstr "Γερμανικά"
+msgstr ""
 
 #: ar/forms.py:81
-#, fuzzy
 msgid "Invalid CUIT."
-msgstr "Μη έγκυρο URL: %s"
+msgstr ""
 
 #: at/at_states.py:5
 msgid "Burgenland"
@@ -58,19 +51,16 @@ msgid "Upper Austria"
 msgstr ""
 
 #: at/at_states.py:9
-#, fuzzy
 msgid "Salzburg"
-msgstr "Αύγ"
+msgstr ""
 
 #: at/at_states.py:10
-#, fuzzy
 msgid "Styria"
-msgstr "Σερβικά"
+msgstr ""
 
 #: at/at_states.py:11
-#, fuzzy
 msgid "Tyrol"
-msgstr "Σήμερα"
+msgstr ""
 
 #: at/at_states.py:12
 msgid "Vorarlberg"
@@ -81,28 +71,24 @@ msgid "Vienna"
 msgstr ""
 
 #: at/forms.py:22 ch/forms.py:17 no/forms.py:13
-#, fuzzy
 msgid "Enter a zip code in the format XXXX."
-msgstr "Εισάγετε μία έγκυρη ώρα στη μορφή ΩΩ-ΛΛ."
+msgstr ""
 
 #: at/forms.py:50
-#, fuzzy
 msgid "Enter a valid Austrian Social Security Number in XXXX XXXXXX format."
-msgstr "Παρακαλούμε εισάγετε έναν έγκυρο δεκαδικό αριθμό."
+msgstr ""
 
 #: au/forms.py:17
-#, fuzzy
 msgid "Enter a 4 digit post code."
-msgstr "Εισάγετε ένα έγκυρο όνομα αρχείου."
+msgstr ""
 
 #: be/be_provinces.py:5
 msgid "Antwerp"
 msgstr ""
 
 #: be/be_provinces.py:6
-#, fuzzy
 msgid "Brussels"
-msgstr "χρήστες"
+msgstr ""
 
 #: be/be_provinces.py:7
 msgid "East Flanders"
@@ -113,27 +99,24 @@ msgid "Flemish Brabant"
 msgstr ""
 
 #: be/be_provinces.py:9
-#, fuzzy
 msgid "Hainaut"
-msgstr "λεπτό"
+msgstr ""
 
 #: be/be_provinces.py:10
 msgid "Liege"
 msgstr ""
 
 #: be/be_provinces.py:11 nl/nl_provinces.py:9
-#, fuzzy
 msgid "Limburg"
-msgstr "Αύγ"
+msgstr ""
 
 #: be/be_provinces.py:12
 msgid "Luxembourg"
 msgstr ""
 
 #: be/be_provinces.py:13
-#, fuzzy
 msgid "Namur"
-msgstr "Αύγ"
+msgstr ""
 
 #: be/be_provinces.py:14
 msgid "Walloon Brabant"
@@ -156,9 +139,8 @@ msgid "Wallonia"
 msgstr ""
 
 #: be/forms.py:23
-#, fuzzy
 msgid "Enter a valid postal code in the range and format 1XXX - 9XXX."
-msgstr "Εισάγετε μία έγκυρη ώρα στη μορφή ΩΩ-ΛΛ."
+msgstr ""
 
 #: be/forms.py:46
 msgid ""
@@ -168,49 +150,42 @@ msgid ""
 msgstr ""
 
 #: br/forms.py:17
-#, fuzzy
 msgid "Enter a zip code in the format XXXXX-XXX."
-msgstr "Εισάγετε μία έγκυρη ώρα στη μορφή ΩΩ-ΛΛ."
+msgstr ""
 
 #: br/forms.py:26
-#, fuzzy
 msgid "Phone numbers must be in XX-XXXX-XXXX format."
-msgstr "Τηλέφωνο μέσα είναι."
+msgstr ""
 
 #: br/forms.py:54
-#, fuzzy
 msgid ""
 "Select a valid brazilian state. That state is not one of the available "
 "states."
-msgstr "Επιλέξτε μια έγκυρη επιλογή; Το '%(data)s' δεν είναι στα %(choices)s."
+msgstr ""
 
 #: br/forms.py:90
 msgid "Invalid CPF number."
 msgstr ""
 
 #: br/forms.py:91
-#, fuzzy
 msgid "This field requires at most 11 digits or 14 characters."
-msgstr "Βεβαιωθείτε ότι το κείμενο σας έχει μέγεθος το πολύ %d χαρακτήρες."
+msgstr ""
 
 #: br/forms.py:130
 msgid "Invalid CNPJ number."
 msgstr ""
 
 #: br/forms.py:132
-#, fuzzy
 msgid "This field requires at least 14 digits"
-msgstr "Αυτό το πεδίο είναι απαραίτητο."
+msgstr ""
 
 #: ca/forms.py:25
-#, fuzzy
 msgid "Enter a postal code in the format XXX XXX."
-msgstr "Εισάγετε μία έγκυρη ώρα στη μορφή ΩΩ-ΛΛ."
+msgstr ""
 
 #: ca/forms.py:96
-#, fuzzy
 msgid "Enter a valid Canadian Social Insurance number in XXX-XXX-XXX format."
-msgstr "Γερμανικά"
+msgstr ""
 
 #: ch/ch_states.py:5
 msgid "Aargau"
@@ -233,9 +208,8 @@ msgid "Basel-Land"
 msgstr ""
 
 #: ch/ch_states.py:10
-#, fuzzy
 msgid "Berne"
-msgstr "Βραζιλιάνικα"
+msgstr ""
 
 #: ch/ch_states.py:11
 msgid "Fribourg"
@@ -246,9 +220,8 @@ msgid "Geneva"
 msgstr ""
 
 #: ch/ch_states.py:13
-#, fuzzy
 msgid "Glarus"
-msgstr "Ομάδες"
+msgstr ""
 
 #: ch/ch_states.py:14
 msgid "Graubuenden"
@@ -259,9 +232,8 @@ msgid "Jura"
 msgstr ""
 
 #: ch/ch_states.py:16
-#, fuzzy
 msgid "Lucerne"
-msgstr "όνομα χρήστη"
+msgstr ""
 
 #: ch/ch_states.py:17
 msgid "Neuchatel"
@@ -292,9 +264,8 @@ msgid "St. Gallen"
 msgstr ""
 
 #: ch/ch_states.py:24
-#, fuzzy
 msgid "Thurgau"
-msgstr "Πέμπτη"
+msgstr ""
 
 #: ch/ch_states.py:25
 msgid "Ticino"
@@ -313,14 +284,12 @@ msgid "Vaud"
 msgstr ""
 
 #: ch/ch_states.py:29
-#, fuzzy
 msgid "Zug"
-msgstr "Αύγ"
+msgstr ""
 
 #: ch/ch_states.py:30
-#, fuzzy
 msgid "Zurich"
-msgstr "Τουρκικά"
+msgstr ""
 
 #: ch/forms.py:65
 msgid ""
@@ -329,19 +298,16 @@ msgid ""
 msgstr ""
 
 #: cl/forms.py:30
-#, fuzzy
 msgid "Enter a valid Chilean RUT."
-msgstr "Εισάγετε ένα έγκυρο όνομα αρχείου."
+msgstr ""
 
 #: cl/forms.py:31
-#, fuzzy
 msgid "Enter a valid Chilean RUT. The format is XX.XXX.XXX-X."
-msgstr "Εισάγετε μία έγκυρη ώρα στη μορφή ΩΩ-ΛΛ."
+msgstr ""
 
 #: cl/forms.py:32
-#, fuzzy
 msgid "The Chilean RUT is not valid."
-msgstr "Αυτό το πεδίο είναι μη έγκυρο."
+msgstr ""
 
 #: cz/cz_regions.py:8
 msgid "Prague"
@@ -400,28 +366,24 @@ msgid "Moravian-Silesian Region"
 msgstr ""
 
 #: cz/forms.py:28 sk/forms.py:30
-#, fuzzy
 msgid "Enter a postal code in the format XXXXX or XXX XX."
-msgstr "Εισάγετε μία έγκυρη ώρα στη μορφή ΩΩ-ΛΛ."
+msgstr ""
 
 #: cz/forms.py:48
-#, fuzzy
 msgid "Enter a birth number in the format XXXXXX/XXXX or XXXXXXXXXX."
-msgstr "Εισάγετε μία έγκυρη ώρα στη μορφή ΩΩ-ΛΛ."
+msgstr ""
 
 #: cz/forms.py:49
 msgid "Invalid optional parameter Gender, valid values are 'f' and 'm'"
 msgstr ""
 
 #: cz/forms.py:50
-#, fuzzy
 msgid "Enter a valid birth number."
-msgstr "Εισάγετε μια έγκυρη ώρα."
+msgstr ""
 
 #: cz/forms.py:111
-#, fuzzy
 msgid "Enter a valid IC number."
-msgstr "Εισάγετε μια έγκυρη ώρα."
+msgstr ""
 
 #: de/de_states.py:5
 msgid "Baden-Wuerttemberg"
@@ -432,9 +394,8 @@ msgid "Bavaria"
 msgstr ""
 
 #: de/de_states.py:7
-#, fuzzy
 msgid "Berlin"
-msgstr "Βραζιλιάνικα"
+msgstr ""
 
 #: de/de_states.py:8
 msgid "Brandenburg"
@@ -445,14 +406,12 @@ msgid "Bremen"
 msgstr ""
 
 #: de/de_states.py:10
-#, fuzzy
 msgid "Hamburg"
-msgstr "Αύγ"
+msgstr ""
 
 #: de/de_states.py:11
-#, fuzzy
 msgid "Hessen"
-msgstr "μήνυμα"
+msgstr ""
 
 #: de/de_states.py:12
 msgid "Mecklenburg-Western Pomerania"
@@ -491,16 +450,14 @@ msgid "Thuringia"
 msgstr ""
 
 #: de/forms.py:15 fi/forms.py:13 fr/forms.py:16
-#, fuzzy
 msgid "Enter a zip code in the format XXXXX."
-msgstr "Εισάγετε μία έγκυρη ώρα στη μορφή ΩΩ-ΛΛ."
+msgstr ""
 
 #: de/forms.py:42
-#, fuzzy
 msgid ""
 "Enter a valid German identity card number in XXXXXXXXXXX-XXXXXXX-XXXXXXX-X "
 "format."
-msgstr "Γερμανικά"
+msgstr ""
 
 #: es/es_provinces.py:5
 msgid "Arava"
@@ -519,9 +476,8 @@ msgid "Almeria"
 msgstr ""
 
 #: es/es_provinces.py:9
-#, fuzzy
 msgid "Avila"
-msgstr "Απρίλιος"
+msgstr ""
 
 #: es/es_provinces.py:10
 msgid "Badajoz"
@@ -532,9 +488,8 @@ msgid "Illes Balears"
 msgstr ""
 
 #: es/es_provinces.py:12
-#, fuzzy
 msgid "Barcelona"
-msgstr "Μακεδονικά"
+msgstr ""
 
 #: es/es_provinces.py:13
 msgid "Burgos"
@@ -573,9 +528,8 @@ msgid "Girona"
 msgstr ""
 
 #: es/es_provinces.py:22
-#, fuzzy
 msgid "Granada"
-msgstr "Γερμανικά"
+msgstr ""
 
 #: es/es_provinces.py:23
 msgid "Guadalajara"
@@ -590,19 +544,16 @@ msgid "Huelva"
 msgstr ""
 
 #: es/es_provinces.py:26
-#, fuzzy
 msgid "Huesca"
-msgstr "Τρίτη"
+msgstr ""
 
 #: es/es_provinces.py:27
-#, fuzzy
 msgid "Jaen"
-msgstr "Ιάν."
+msgstr ""
 
 #: es/es_provinces.py:28
-#, fuzzy
 msgid "Leon"
-msgstr "Σύνδεση"
+msgstr ""
 
 #: es/es_provinces.py:29
 msgid "Lleida"
@@ -661,23 +612,20 @@ msgid "Santa Cruz de Tenerife"
 msgstr ""
 
 #: es/es_provinces.py:43 es/es_regions.py:11
-#, fuzzy
 msgid "Cantabria"
-msgstr "Καταλανικά"
+msgstr ""
 
 #: es/es_provinces.py:44
-#, fuzzy
 msgid "Segovia"
-msgstr "Σλοβενικά"
+msgstr ""
 
 #: es/es_provinces.py:45
 msgid "Seville"
 msgstr ""
 
 #: es/es_provinces.py:46
-#, fuzzy
 msgid "Soria"
-msgstr "Σερβικά"
+msgstr ""
 
 #: es/es_provinces.py:47
 msgid "Tarragona"
@@ -752,9 +700,8 @@ msgid "Castile and Leon"
 msgstr ""
 
 #: es/es_regions.py:14
-#, fuzzy
 msgid "Catalonia"
-msgstr "Καταλανικά"
+msgstr ""
 
 #: es/es_regions.py:15
 msgid "Extremadura"
@@ -777,26 +724,22 @@ msgid "Valencian Community"
 msgstr ""
 
 #: es/forms.py:20
-#, fuzzy
 msgid "Enter a valid postal code in the range and format 01XXX - 52XXX."
-msgstr "Εισάγετε μία έγκυρη ώρα στη μορφή ΩΩ-ΛΛ."
+msgstr ""
 
 #: es/forms.py:40
-#, fuzzy
 msgid ""
 "Enter a valid phone number in one of the formats 6XXXXXXXX, 8XXXXXXXX or "
 "9XXXXXXXX."
-msgstr "Γερμανικά"
+msgstr ""
 
 #: es/forms.py:67
-#, fuzzy
 msgid "Please enter a valid NIF, NIE, or CIF."
-msgstr "Παρακαλούμε εισάγετε μια έγκυρη διεύθυνση IP."
+msgstr ""
 
 #: es/forms.py:68
-#, fuzzy
 msgid "Please enter a valid NIF or NIE."
-msgstr "Παρακαλούμε εισάγετε ένα έγκυρο %s."
+msgstr ""
 
 #: es/forms.py:69
 msgid "Invalid checksum for NIF."
@@ -811,63 +754,53 @@ msgid "Invalid checksum for CIF."
 msgstr ""
 
 #: es/forms.py:143
-#, fuzzy
 msgid ""
 "Please enter a valid bank account number in format XXXX-XXXX-XX-XXXXXXXXXX."
-msgstr "Γερμανικά"
+msgstr ""
 
 #: es/forms.py:144
 msgid "Invalid checksum for bank account number."
 msgstr ""
 
 #: fi/forms.py:29
-#, fuzzy
 msgid "Enter a valid Finnish social security number."
-msgstr "Εισάγετε ένα έγκυρο όνομα αρχείου."
+msgstr ""
 
 #: fr/forms.py:31
-#, fuzzy
 msgid "Phone numbers must be in 0X XX XX XX XX format."
-msgstr "Τηλέφωνο μέσα είναι."
+msgstr ""
 
 #: id/forms.py:28
-#, fuzzy
 msgid "Enter a valid post code"
-msgstr "Εισάγετε μια έγκυρη ημερομηνία."
+msgstr ""
 
 #: id/forms.py:68 nl/forms.py:53
-#, fuzzy
 msgid "Enter a valid phone number"
-msgstr "Εισάγετε έναν ακέραιο αριθμό."
+msgstr ""
 
 #: id/forms.py:107
-#, fuzzy
 msgid "Enter a valid vehicle license plate number"
-msgstr "Παρακαλούμε εισάγετε έναν έγκυρο δεκαδικό αριθμό."
+msgstr ""
 
 #: id/forms.py:170
-#, fuzzy
 msgid "Enter a valid NIK/KTP number"
-msgstr "Εισάγετε μια έγκυρη ώρα."
+msgstr ""
 
 #: id/id_choices.py:15
 msgid "Aceh"
 msgstr ""
 
 #: id/id_choices.py:16 id/id_choices.py:79
-#, fuzzy
 msgid "Bali"
-msgstr "Μπενγκάλι"
+msgstr ""
 
 #: id/id_choices.py:17 id/id_choices.py:51
-#, fuzzy
 msgid "Banten"
-msgstr "περιεχόμενο"
+msgstr ""
 
 #: id/id_choices.py:18 id/id_choices.py:60
-#, fuzzy
 msgid "Bengkulu"
-msgstr "Μπενγκάλι"
+msgstr ""
 
 #: id/id_choices.py:19 id/id_choices.py:53
 msgid "Yogyakarta"
@@ -882,9 +815,8 @@ msgid "Gorontalo"
 msgstr ""
 
 #: id/id_choices.py:22 id/id_choices.py:63
-#, fuzzy
 msgid "Jambi"
-msgstr "Ταμιλικά"
+msgstr ""
 
 #: id/id_choices.py:23
 msgid "Jawa Barat"
@@ -923,9 +855,8 @@ msgid "Kepulauan Riau"
 msgstr ""
 
 #: id/id_choices.py:32 id/id_choices.py:61
-#, fuzzy
 msgid "Lampung"
-msgstr "Αύγ"
+msgstr ""
 
 #: id/id_choices.py:33 id/id_choices.py:76
 msgid "Maluku"
@@ -996,9 +927,8 @@ msgid "Surakarta - Solo"
 msgstr ""
 
 #: id/id_choices.py:55
-#, fuzzy
 msgid "Madiun"
-msgstr "Μακεδονικά"
+msgstr ""
 
 #: id/id_choices.py:56
 msgid "Kediri"
@@ -1025,9 +955,8 @@ msgid "Corps Diplomatic"
 msgstr ""
 
 #: id/id_choices.py:71
-#, fuzzy
 msgid "Bandung"
-msgstr "και"
+msgstr ""
 
 #: id/id_choices.py:73
 msgid "Sulawesi Utara Daratan"
@@ -1074,33 +1003,28 @@ msgid "Pekalongan"
 msgstr ""
 
 #: id/id_choices.py:92
-#, fuzzy
 msgid "Semarang"
-msgstr "Σερβικά"
+msgstr ""
 
 #: id/id_choices.py:93
-#, fuzzy
 msgid "Pati"
-msgstr "ενεργό"
+msgstr ""
 
 #: id/id_choices.py:97
-#, fuzzy
 msgid "Surabaya"
-msgstr "Σάββατο"
+msgstr ""
 
 #: id/id_choices.py:98
 msgid "Madura"
 msgstr ""
 
 #: id/id_choices.py:99
-#, fuzzy
 msgid "Malang"
-msgstr "Καταλανικά"
+msgstr ""
 
 #: id/id_choices.py:100
-#, fuzzy
 msgid "Jember"
-msgstr "Νοέμβριος"
+msgstr ""
 
 #: id/id_choices.py:101
 msgid "Banyumas"
@@ -1139,9 +1063,8 @@ msgid "Carlow"
 msgstr ""
 
 #: ie/ie_counties.py:11
-#, fuzzy
 msgid "Cavan"
-msgstr "Καταλανικά"
+msgstr ""
 
 #: ie/ie_counties.py:12
 msgid "Clare"
@@ -1152,14 +1075,12 @@ msgid "Cork"
 msgstr ""
 
 #: ie/ie_counties.py:14
-#, fuzzy
 msgid "Derry"
-msgstr "Φεβρουάριος"
+msgstr ""
 
 #: ie/ie_counties.py:15
-#, fuzzy
 msgid "Donegal"
-msgstr "ένα"
+msgstr ""
 
 #: ie/ie_counties.py:16
 msgid "Down"
@@ -1170,18 +1091,16 @@ msgid "Dublin"
 msgstr ""
 
 #: ie/ie_counties.py:18
-#, fuzzy
 msgid "Fermanagh"
-msgstr "Γερμανικά"
+msgstr ""
 
 #: ie/ie_counties.py:19
 msgid "Galway"
 msgstr ""
 
 #: ie/ie_counties.py:20
-#, fuzzy
 msgid "Kerry"
-msgstr "Φεβρουάριος"
+msgstr ""
 
 #: ie/ie_counties.py:21
 msgid "Kildare"
@@ -1208,33 +1127,28 @@ msgid "Longford"
 msgstr ""
 
 #: ie/ie_counties.py:27
-#, fuzzy
 msgid "Louth"
-msgstr "Αποσύνδεση"
+msgstr ""
 
 #: ie/ie_counties.py:28
-#, fuzzy
 msgid "Mayo"
-msgstr "Μάιος"
+msgstr ""
 
 #: ie/ie_counties.py:29
-#, fuzzy
 msgid "Meath"
-msgstr "Μάρτιος"
+msgstr ""
 
 #: ie/ie_counties.py:30
-#, fuzzy
 msgid "Monaghan"
-msgstr "Σύνδεση ξανά"
+msgstr ""
 
 #: ie/ie_counties.py:31
 msgid "Offaly"
 msgstr ""
 
 #: ie/ie_counties.py:32
-#, fuzzy
 msgid "Roscommon"
-msgstr "σχόλιο"
+msgstr ""
 
 #: ie/ie_counties.py:33
 msgid "Sligo"
@@ -1245,9 +1159,8 @@ msgid "Tipperary"
 msgstr ""
 
 #: ie/ie_counties.py:35
-#, fuzzy
 msgid "Tyrone"
-msgstr "ένα"
+msgstr ""
 
 #: ie/ie_counties.py:36
 msgid "Waterford"
@@ -1266,44 +1179,37 @@ msgid "Wicklow"
 msgstr ""
 
 #: il/forms.py:31
-#, fuzzy
 msgid "Enter a postal code in the format XXXXX"
-msgstr "Εισάγετε μία έγκυρη ώρα στη μορφή ΩΩ-ΛΛ."
+msgstr ""
 
 #: il/forms.py:50
-#, fuzzy
 msgid "Enter a valid ID number."
-msgstr "Εισάγετε μια έγκυρη ώρα."
+msgstr ""
 
 #: in_/forms.py:15
-#, fuzzy
 msgid "Enter a zip code in the format XXXXXXX."
-msgstr "Εισάγετε μία έγκυρη ώρα στη μορφή ΩΩ-ΛΛ."
+msgstr ""
 
 #: is_/forms.py:18
-#, fuzzy
 msgid ""
 "Enter a valid Icelandic identification number. The format is XXXXXX-XXXX."
-msgstr "Εισάγετε μία έγκυρη ώρα στη μορφή ΩΩ-ΛΛ."
+msgstr ""
 
 #: is_/forms.py:19
 msgid "The Icelandic identification number is not valid."
 msgstr ""
 
 #: it/forms.py:15
-#, fuzzy
 msgid "Enter a valid zip code."
-msgstr "Εισάγετε μια έγκυρη ημερομηνία."
+msgstr ""
 
 #: it/forms.py:44
-#, fuzzy
 msgid "Enter a valid Social Security number."
-msgstr "Εισάγετε ένα έγκυρο όνομα αρχείου."
+msgstr ""
 
 #: it/forms.py:69
-#, fuzzy
 msgid "Enter a valid VAT number."
-msgstr "Εισάγετε μια έγκυρη ώρα."
+msgstr ""
 
 #: jp/forms.py:16
 msgid "Enter a postal code in the format XXXXXXX or XXX-XXXX."
@@ -1318,9 +1224,8 @@ msgid "Aomori"
 msgstr ""
 
 #: jp/jp_prefectures.py:6
-#, fuzzy
 msgid "Iwate"
-msgstr "Ημ/νία:"
+msgstr ""
 
 #: jp/jp_prefectures.py:7
 msgid "Miyagi"
@@ -1359,9 +1264,8 @@ msgid "Chiba"
 msgstr ""
 
 #: jp/jp_prefectures.py:16
-#, fuzzy
 msgid "Tokyo"
-msgstr "Σήμερα"
+msgstr ""
 
 #: jp/jp_prefectures.py:17
 msgid "Kanagawa"
@@ -1500,9 +1404,8 @@ msgid "Okinawa"
 msgstr ""
 
 #: kw/forms.py:25
-#, fuzzy
 msgid "Enter a valid Kuwaiti Civil ID number"
-msgstr "Εισάγετε ένα έγκυρο όνομα αρχείου."
+msgstr ""
 
 #: mx/mx_states.py:12
 msgid "Aguascalientes"
@@ -1517,9 +1420,8 @@ msgid "Baja California Sur"
 msgstr ""
 
 #: mx/mx_states.py:15
-#, fuzzy
 msgid "Campeche"
-msgstr "Τσέχικα"
+msgstr ""
 
 #: mx/mx_states.py:16
 msgid "Chihuahua"
@@ -1546,9 +1448,8 @@ msgid "Durango"
 msgstr ""
 
 #: mx/mx_states.py:22
-#, fuzzy
 msgid "Guerrero"
-msgstr "Σφάλμα εξυπηρετητή"
+msgstr ""
 
 #: mx/mx_states.py:23
 msgid "Guanajuato"
@@ -1599,9 +1500,8 @@ msgid "Quintana Roo"
 msgstr ""
 
 #: mx/mx_states.py:35
-#, fuzzy
 msgid "Sinaloa"
-msgstr "Σλοβακικά"
+msgstr ""
 
 #: mx/mx_states.py:36
 msgid "San Luis Potosí"
@@ -1636,19 +1536,16 @@ msgid "Zacatecas"
 msgstr ""
 
 #: nl/forms.py:22
-#, fuzzy
 msgid "Enter a valid postal code"
-msgstr "Εισάγετε μια έγκυρη τιμή."
+msgstr ""
 
 #: nl/forms.py:79
-#, fuzzy
 msgid "Enter a valid SoFi number"
-msgstr "Εισάγετε μια έγκυρη ώρα."
+msgstr ""
 
 #: nl/nl_provinces.py:4
-#, fuzzy
 msgid "Drenthe"
-msgstr "Γαλλικά"
+msgstr ""
 
 #: nl/nl_provinces.py:5
 msgid "Flevoland"
@@ -1659,14 +1556,12 @@ msgid "Friesland"
 msgstr ""
 
 #: nl/nl_provinces.py:7
-#, fuzzy
 msgid "Gelderland"
-msgstr "Γερμανικά"
+msgstr ""
 
 #: nl/nl_provinces.py:8
-#, fuzzy
 msgid "Groningen"
-msgstr "εννιά"
+msgstr ""
 
 #: nl/nl_provinces.py:10
 msgid "Noord-Brabant"
@@ -1681,33 +1576,28 @@ msgid "Overijssel"
 msgstr ""
 
 #: nl/nl_provinces.py:13
-#, fuzzy
 msgid "Utrecht"
-msgstr "Γαλλικά"
+msgstr ""
 
 #: nl/nl_provinces.py:14
-#, fuzzy
 msgid "Zeeland"
-msgstr "Ισλανδικά"
+msgstr ""
 
 #: nl/nl_provinces.py:15
 msgid "Zuid-Holland"
 msgstr ""
 
 #: no/forms.py:34
-#, fuzzy
 msgid "Enter a valid Norwegian social security number."
-msgstr "Παρακαλούμε εισάγετε έναν έγκυρο δεκαδικό αριθμό."
+msgstr ""
 
 #: pe/forms.py:25
-#, fuzzy
 msgid "This field requires 8 digits."
-msgstr "Αυτό το πεδίο είναι απαραίτητο."
+msgstr ""
 
 #: pe/forms.py:53
-#, fuzzy
 msgid "This field requires 11 digits."
-msgstr "Αυτό το πεδίο είναι απαραίτητο."
+msgstr ""
 
 #: pl/forms.py:39
 msgid "National Identification Number consists of 11 digits."
@@ -1735,9 +1625,8 @@ msgid "Wrong checksum for the National Business Register Number (REGON)."
 msgstr ""
 
 #: pl/forms.py:155
-#, fuzzy
 msgid "Enter a postal code in the format XX-XXX."
-msgstr "Εισάγετε μία έγκυρη ώρα στη μορφή ΩΩ-ΛΛ."
+msgstr ""
 
 #: pl/pl_voivodeships.py:8
 msgid "Lower Silesia"
@@ -1768,9 +1657,8 @@ msgid "Masovia"
 msgstr ""
 
 #: pl/pl_voivodeships.py:15
-#, fuzzy
 msgid "Opole"
-msgstr "Προαιρετικό"
+msgstr ""
 
 #: pl/pl_voivodeships.py:16
 msgid "Subcarpatia"
@@ -1781,14 +1669,12 @@ msgid "Podlasie"
 msgstr ""
 
 #: pl/pl_voivodeships.py:18
-#, fuzzy
 msgid "Pomerania"
-msgstr "Ρουμανικά"
+msgstr ""
 
 #: pl/pl_voivodeships.py:19
-#, fuzzy
 msgid "Silesia"
-msgstr "Σλοβενικά"
+msgstr ""
 
 #: pl/pl_voivodeships.py:20
 msgid "Swietokrzyskie"
@@ -1807,58 +1693,48 @@ msgid "West Pomerania"
 msgstr ""
 
 #: pt/forms.py:17
-#, fuzzy
 msgid "Enter a zip code in the format XXXX-XXX."
-msgstr "Εισάγετε μία έγκυρη ώρα στη μορφή ΩΩ-ΛΛ."
+msgstr ""
 
 #: pt/forms.py:37
 msgid "Phone numbers must have 9 digits, or start by + or 00."
 msgstr ""
 
 #: ro/forms.py:19
-#, fuzzy
 msgid "Enter a valid CIF."
-msgstr "Εισάγετε ένα έγκυρο URL."
+msgstr ""
 
 #: ro/forms.py:56
-#, fuzzy
 msgid "Enter a valid CNP."
-msgstr "Εισάγετε ένα έγκυρο URL."
+msgstr ""
 
 #: ro/forms.py:143
-#, fuzzy
 msgid "Enter a valid IBAN in ROXX-XXXX-XXXX-XXXX-XXXX-XXXX format"
-msgstr "Γερμανικά"
+msgstr ""
 
 #: ro/forms.py:175
-#, fuzzy
 msgid "Phone numbers must be in XXXX-XXXXXX format."
-msgstr "Τηλέφωνο μέσα είναι."
+msgstr ""
 
 #: ro/forms.py:200
-#, fuzzy
 msgid "Enter a valid postal code in the format XXXXXX"
-msgstr "Εισάγετε μία έγκυρη ώρα στη μορφή ΩΩ-ΛΛ."
+msgstr ""
 
 #: se/forms.py:50
-#, fuzzy
 msgid "Enter a valid Swedish organisation number."
-msgstr "Εισάγετε ένα έγκυρο όνομα αρχείου."
+msgstr ""
 
 #: se/forms.py:107
-#, fuzzy
 msgid "Enter a valid Swedish personal identity number."
-msgstr "Εισάγετε ένα έγκυρο όνομα αρχείου."
+msgstr ""
 
 #: se/forms.py:108
-#, fuzzy
 msgid "Co-ordination numbers are not allowed."
-msgstr "Δεν επιτρέπονται διπλές τιμές."
+msgstr ""
 
 #: se/forms.py:150
-#, fuzzy
 msgid "Enter a Swedish postal code in the format XXXXX."
-msgstr "Εισάγετε μία έγκυρη ώρα στη μορφή ΩΩ-ΛΛ."
+msgstr ""
 
 #: se/se_counties.py:15
 msgid "Stockholm"
@@ -1893,14 +1769,12 @@ msgid "Kronoberg"
 msgstr ""
 
 #: se/se_counties.py:23
-#, fuzzy
 msgid "Kalmar"
-msgstr "Μάρ"
+msgstr ""
 
 #: se/se_counties.py:24
-#, fuzzy
 msgid "Gotland"
-msgstr "και"
+msgstr ""
 
 #: se/se_counties.py:25
 msgid "Blekinge"
@@ -1911,9 +1785,8 @@ msgid "Skåne"
 msgstr ""
 
 #: se/se_counties.py:27
-#, fuzzy
 msgid "Halland"
-msgstr "και"
+msgstr ""
 
 #: se/se_counties.py:28
 msgid "Västra Götaland"
@@ -2012,9 +1885,8 @@ msgid "Galanta"
 msgstr ""
 
 #: sk/sk_districts.py:24
-#, fuzzy
 msgid "Gelnica"
-msgstr "Ισλανδικά"
+msgstr ""
 
 #: sk/sk_districts.py:25
 msgid "Hlohovec"
@@ -2033,9 +1905,8 @@ msgid "Kezmarok"
 msgstr ""
 
 #: sk/sk_districts.py:29
-#, fuzzy
 msgid "Komarno"
-msgstr "Μάρ"
+msgstr ""
 
 #: sk/sk_districts.py:30
 msgid "Kosice I"
@@ -2082,14 +1953,12 @@ msgid "Lucenec"
 msgstr ""
 
 #: sk/sk_districts.py:41
-#, fuzzy
 msgid "Malacky"
-msgstr "Μάιος"
+msgstr ""
 
 #: sk/sk_districts.py:42
-#, fuzzy
 msgid "Martin"
-msgstr "Βαθμολογίες"
+msgstr ""
 
 #: sk/sk_districts.py:43
 msgid "Medzilaborce"
@@ -2172,27 +2041,24 @@ msgid "Ruzomberok"
 msgstr ""
 
 #: sk/sk_districts.py:63
-#, fuzzy
 msgid "Sabinov"
-msgstr "Νοέ"
+msgstr ""
 
 #: sk/sk_districts.py:64
 msgid "Senec"
 msgstr ""
 
 #: sk/sk_districts.py:65
-#, fuzzy
 msgid "Senica"
-msgstr "Σλοβενικά"
+msgstr ""
 
 #: sk/sk_districts.py:66
 msgid "Skalica"
 msgstr ""
 
 #: sk/sk_districts.py:67
-#, fuzzy
 msgid "Snina"
-msgstr "εννιά"
+msgstr ""
 
 #: sk/sk_districts.py:68
 msgid "Sobrance"
@@ -2215,9 +2081,8 @@ msgid "Svidnik"
 msgstr ""
 
 #: sk/sk_districts.py:73
-#, fuzzy
 msgid "Sala"
-msgstr "Σλοβακικά"
+msgstr ""
 
 #: sk/sk_districts.py:74
 msgid "Topolcany"
@@ -2228,9 +2093,8 @@ msgid "Trebisov"
 msgstr ""
 
 #: sk/sk_districts.py:76
-#, fuzzy
 msgid "Trencin"
-msgstr "Γαλλικά"
+msgstr ""
 
 #: sk/sk_districts.py:77
 msgid "Trnava"
@@ -2305,28 +2169,24 @@ msgid "Zilina region"
 msgstr ""
 
 #: tr/forms.py:16
-#, fuzzy
 msgid "Enter a postal code in the format XXXXX."
-msgstr "Εισάγετε μία έγκυρη ώρα στη μορφή ΩΩ-ΛΛ."
+msgstr ""
 
 #: tr/forms.py:37
-#, fuzzy
 msgid "Phone numbers must be in 0XXX XXX XXXX format."
-msgstr "Τηλέφωνο μέσα είναι."
+msgstr ""
 
 #: tr/forms.py:64
-#, fuzzy
 msgid "Enter a valid Turkish Identification number."
-msgstr "Εισάγετε ένα έγκυρο όνομα αρχείου."
+msgstr ""
 
 #: tr/forms.py:65
 msgid "Turkish Identification number must be 11 digits."
 msgstr ""
 
 #: uk/forms.py:21
-#, fuzzy
 msgid "Enter a valid postcode."
-msgstr "Εισάγετε μια έγκυρη ημερομηνία."
+msgstr ""
 
 #: uk/uk_regions.py:11
 msgid "Bedfordshire"
@@ -2353,9 +2213,8 @@ msgid "Derbyshire"
 msgstr ""
 
 #: uk/uk_regions.py:18
-#, fuzzy
 msgid "Devon"
-msgstr "εφτά"
+msgstr ""
 
 #: uk/uk_regions.py:19
 msgid "Dorset"
@@ -2458,9 +2317,8 @@ msgid "Suffolk"
 msgstr ""
 
 #: uk/uk_regions.py:44
-#, fuzzy
 msgid "Surrey"
-msgstr "Τρέχουσα:"
+msgstr ""
 
 #: uk/uk_regions.py:45
 msgid "Tyne and Wear"
@@ -2547,9 +2405,8 @@ msgid "West Glamorgan"
 msgstr ""
 
 #: uk/uk_regions.py:75
-#, fuzzy
 msgid "Borders"
-msgstr "Ταξινόμηση:"
+msgstr ""
 
 #: uk/uk_regions.py:76
 msgid "Central Scotland"
@@ -2560,23 +2417,20 @@ msgid "Dumfries and Galloway"
 msgstr ""
 
 #: uk/uk_regions.py:78
-#, fuzzy
 msgid "Fife"
-msgstr "Φίλτρο"
+msgstr ""
 
 #: uk/uk_regions.py:79
-#, fuzzy
 msgid "Grampian"
-msgstr "Γερμανικά"
+msgstr ""
 
 #: uk/uk_regions.py:80
 msgid "Highland"
 msgstr ""
 
 #: uk/uk_regions.py:81
-#, fuzzy
 msgid "Lothian"
-msgstr "Σύνδεση"
+msgstr ""
 
 #: uk/uk_regions.py:82
 msgid "Orkney Islands"
@@ -2599,9 +2453,8 @@ msgid "Western Isles"
 msgstr ""
 
 #: uk/uk_regions.py:90
-#, fuzzy
 msgid "England"
-msgstr "και"
+msgstr ""
 
 #: uk/uk_regions.py:91
 msgid "Northern Ireland"
@@ -2612,75 +2465,64 @@ msgid "Scotland"
 msgstr ""
 
 #: uk/uk_regions.py:93
-#, fuzzy
 msgid "Wales"
-msgstr "Ουαλικά"
+msgstr ""
 
 #: us/forms.py:17
 msgid "Enter a zip code in the format XXXXX or XXXXX-XXXX."
 msgstr ""
 
 #: us/forms.py:26
-#, fuzzy
 msgid "Phone numbers must be in XXX-XXX-XXXX format."
-msgstr "Τηλέφωνο μέσα είναι."
+msgstr ""
 
 #: us/forms.py:55
 msgid "Enter a valid U.S. Social Security number in XXX-XX-XXXX format."
 msgstr ""
 
 #: us/forms.py:88
-#, fuzzy
 msgid "Enter a U.S. state or territory."
-msgstr "a U συντομογραφία."
+msgstr ""
 
 #: us/models.py:9
 msgid "U.S. state (two uppercase letters)"
 msgstr "Πολιτεία ΗΠΑ. (δύο κεφαλαία γράμματα)"
 
 #: us/models.py:18
-#, fuzzy
 msgid "U.S. postal code (two uppercase letters)"
-msgstr "Πολιτεία ΗΠΑ. (δύο κεφαλαία γράμματα)"
+msgstr ""
 
 #: us/models.py:27
 msgid "Phone number"
 msgstr "Αριθμός τηλεφώνου"
 
 #: uy/forms.py:28
-#, fuzzy
 msgid "Enter a valid CI number in X.XXX.XXX-X,XXXXXXX-X or XXXXXXXX format."
-msgstr "Γερμανικά"
+msgstr ""
 
 #: uy/forms.py:30
-#, fuzzy
 msgid "Enter a valid CI number."
-msgstr "Εισάγετε μια έγκυρη ώρα."
+msgstr ""
 
 #: za/forms.py:21
-#, fuzzy
 msgid "Enter a valid South African ID number"
-msgstr "Παρακαλούμε εισάγετε έναν έγκυρο δεκαδικό αριθμό."
+msgstr ""
 
 #: za/forms.py:55
-#, fuzzy
 msgid "Enter a valid South African postal code"
-msgstr "Εισάγετε ένα έγκυρο όνομα αρχείου."
+msgstr ""
 
 #: za/za_provinces.py:4
-#, fuzzy
 msgid "Eastern Cape"
-msgstr "όνομα χρήστη"
+msgstr ""
 
 #: za/za_provinces.py:5
-#, fuzzy
 msgid "Free State"
-msgstr "ημερομηνία βαθμολόγησης"
+msgstr ""
 
 #: za/za_provinces.py:6
-#, fuzzy
 msgid "Gauteng"
-msgstr "Αύγ"
+msgstr ""
 
 #: za/za_provinces.py:7
 msgid "KwaZulu-Natal"
@@ -2703,6 +2545,5 @@ msgid "North West"
 msgstr ""
 
 #: za/za_provinces.py:12
-#, fuzzy
 msgid "Western Cape"
-msgstr "όνομα χρήστη"
+msgstr ""

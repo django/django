@@ -1,43 +1,38 @@
-# Kannada translation of Django.
-# Copyright (C) 2007 Translation Team <translation@sampada.info>
 # This file is distributed under the same license as the Django package.
-# Kannada Localization Team <translation@sampada.info>, 2007.
-#
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:28+0100\n"
-"PO-Revision-Date: 2007-01-08 20:22+0530\n"
-"Last-Translator: Kannada Localization Team <translation@sampada.info>\n"
-"Language-Team: Kannada <translation@sampada.info>\n"
+"POT-Creation-Date: 2011-03-01 00:33+0100\n"
+"PO-Revision-Date: 2011-02-22 00:10+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: English <en@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: kn\n"
+"Plural-Forms: nplurals=1; plural=0\n"
 
 #: ar/forms.py:28
 msgid "Enter a postal code in the format NNNN or ANNNNAAA."
 msgstr ""
 
 #: ar/forms.py:50 br/forms.py:92 br/forms.py:131 pe/forms.py:24 pe/forms.py:52
-#, fuzzy
 msgid "This field requires only numbers."
-msgstr "ಈ ಅಂಶ ಅಗತ್ಯ."
+msgstr ""
 
 #: ar/forms.py:51
-#, fuzzy
 msgid "This field requires 7 or 8 digits."
-msgstr "ಈ ಅಂಶ ಅಗತ್ಯ."
+msgstr ""
 
 #: ar/forms.py:80
 msgid "Enter a valid CUIT in XX-XXXXXXXX-X or XXXXXXXXXXXX format."
 msgstr ""
 
 #: ar/forms.py:81
-#, fuzzy
 msgid "Invalid CUIT."
-msgstr "ತಪ್ಪು URL: %s"
+msgstr ""
 
 #: at/at_states.py:5
 msgid "Burgenland"
@@ -60,9 +55,8 @@ msgid "Salzburg"
 msgstr ""
 
 #: at/at_states.py:10
-#, fuzzy
 msgid "Styria"
-msgstr "ಸೆರ್ಬಿಯನ್"
+msgstr ""
 
 #: at/at_states.py:11
 msgid "Tyrol"
@@ -77,27 +71,24 @@ msgid "Vienna"
 msgstr ""
 
 #: at/forms.py:22 ch/forms.py:17 no/forms.py:13
-#, fuzzy
 msgid "Enter a zip code in the format XXXX."
-msgstr "HH:MM ರೂಪದಲ್ಲಿ  ಸರಿಯಾದ ಸಮಯವನ್ನು ಬರೆಯಿರಿ"
+msgstr ""
 
 #: at/forms.py:50
 msgid "Enter a valid Austrian Social Security Number in XXXX XXXXXX format."
 msgstr ""
 
 #: au/forms.py:17
-#, fuzzy
 msgid "Enter a 4 digit post code."
-msgstr "ಧನಾತ್ಮಕ ಸಂಖ್ಯೆ ಕೊಡಿ."
+msgstr ""
 
 #: be/be_provinces.py:5
 msgid "Antwerp"
 msgstr ""
 
 #: be/be_provinces.py:6
-#, fuzzy
 msgid "Brussels"
-msgstr "ಬಳಕೆದಾರರು"
+msgstr ""
 
 #: be/be_provinces.py:7
 msgid "East Flanders"
@@ -108,9 +99,8 @@ msgid "Flemish Brabant"
 msgstr ""
 
 #: be/be_provinces.py:9
-#, fuzzy
 msgid "Hainaut"
-msgstr "ನಿಮಿಷ"
+msgstr ""
 
 #: be/be_provinces.py:10
 msgid "Liege"
@@ -160,14 +150,12 @@ msgid ""
 msgstr ""
 
 #: br/forms.py:17
-#, fuzzy
 msgid "Enter a zip code in the format XXXXX-XXX."
-msgstr "HH:MM ರೂಪದಲ್ಲಿ  ಸರಿಯಾದ ಸಮಯವನ್ನು ಬರೆಯಿರಿ"
+msgstr ""
 
 #: br/forms.py:26
-#, fuzzy
 msgid "Phone numbers must be in XX-XXXX-XXXX format."
-msgstr "ದೂರವಾಣಿ ಅಂಕೆಗಳು XXX-XXX-XXXX ರೀತಿಯಲ್ಲಿರಬೇಕು. \"%s\" ತಪ್ಪಾಗಿರುತ್ತದೆ."
+msgstr ""
 
 #: br/forms.py:54
 msgid ""
@@ -188,14 +176,12 @@ msgid "Invalid CNPJ number."
 msgstr ""
 
 #: br/forms.py:132
-#, fuzzy
 msgid "This field requires at least 14 digits"
-msgstr "ಈ ಅಂಶ ಅಗತ್ಯ."
+msgstr ""
 
 #: ca/forms.py:25
-#, fuzzy
 msgid "Enter a postal code in the format XXX XXX."
-msgstr "HH:MM ರೂಪದಲ್ಲಿ  ಸರಿಯಾದ ಸಮಯವನ್ನು ಬರೆಯಿರಿ"
+msgstr ""
 
 #: ca/forms.py:96
 msgid "Enter a valid Canadian Social Insurance number in XXX-XXX-XXX format."
@@ -222,9 +208,8 @@ msgid "Basel-Land"
 msgstr ""
 
 #: ch/ch_states.py:10
-#, fuzzy
 msgid "Berne"
-msgstr "ಬಳಕೆದಾರ-ಹೆಸರು"
+msgstr ""
 
 #: ch/ch_states.py:11
 msgid "Fribourg"
@@ -235,9 +220,8 @@ msgid "Geneva"
 msgstr ""
 
 #: ch/ch_states.py:13
-#, fuzzy
 msgid "Glarus"
-msgstr "ಗುಂಪುಗಳು"
+msgstr ""
 
 #: ch/ch_states.py:14
 msgid "Graubuenden"
@@ -248,9 +232,8 @@ msgid "Jura"
 msgstr ""
 
 #: ch/ch_states.py:16
-#, fuzzy
 msgid "Lucerne"
-msgstr "ಬಳಕೆದಾರ-ಹೆಸರು"
+msgstr ""
 
 #: ch/ch_states.py:17
 msgid "Neuchatel"
@@ -281,9 +264,8 @@ msgid "St. Gallen"
 msgstr ""
 
 #: ch/ch_states.py:24
-#, fuzzy
 msgid "Thurgau"
-msgstr "ಗುರುವಾರ"
+msgstr ""
 
 #: ch/ch_states.py:25
 msgid "Ticino"
@@ -302,14 +284,12 @@ msgid "Vaud"
 msgstr ""
 
 #: ch/ch_states.py:29
-#, fuzzy
 msgid "Zug"
-msgstr "ಆಗಸ್ಟ್"
+msgstr ""
 
 #: ch/ch_states.py:30
-#, fuzzy
 msgid "Zurich"
-msgstr "ಟರ್ಕಿಶ್"
+msgstr ""
 
 #: ch/forms.py:65
 msgid ""
@@ -318,18 +298,16 @@ msgid ""
 msgstr ""
 
 #: cl/forms.py:30
-#, fuzzy
 msgid "Enter a valid Chilean RUT."
-msgstr "ಸರಿಯಾದ ಕಡತದ ಹೆಸರನ್ನು ಬರೆಯಿರಿ"
+msgstr ""
 
 #: cl/forms.py:31
 msgid "Enter a valid Chilean RUT. The format is XX.XXX.XXX-X."
 msgstr ""
 
 #: cl/forms.py:32
-#, fuzzy
 msgid "The Chilean RUT is not valid."
-msgstr "ಈ ಅಂಶವು ತಪ್ಪಾಗಿದೆ"
+msgstr ""
 
 #: cz/cz_regions.py:8
 msgid "Prague"
@@ -400,14 +378,12 @@ msgid "Invalid optional parameter Gender, valid values are 'f' and 'm'"
 msgstr ""
 
 #: cz/forms.py:50
-#, fuzzy
 msgid "Enter a valid birth number."
-msgstr "ಸರಿಯಾದ ಕಡತದ ಹೆಸರನ್ನು ಬರೆಯಿರಿ"
+msgstr ""
 
 #: cz/forms.py:111
-#, fuzzy
 msgid "Enter a valid IC number."
-msgstr "ಸರಿಯಾದ ಕಡತದ ಹೆಸರನ್ನು ಬರೆಯಿರಿ"
+msgstr ""
 
 #: de/de_states.py:5
 msgid "Baden-Wuerttemberg"
@@ -418,9 +394,8 @@ msgid "Bavaria"
 msgstr ""
 
 #: de/de_states.py:7
-#, fuzzy
 msgid "Berlin"
-msgstr "ಬ್ರಾಝಿಲಿಯನ್"
+msgstr ""
 
 #: de/de_states.py:8
 msgid "Brandenburg"
@@ -431,14 +406,12 @@ msgid "Bremen"
 msgstr ""
 
 #: de/de_states.py:10
-#, fuzzy
 msgid "Hamburg"
-msgstr "ಆಗಸ್ಟ್"
+msgstr ""
 
 #: de/de_states.py:11
-#, fuzzy
 msgid "Hessen"
-msgstr "ಸಂದೇಶ"
+msgstr ""
 
 #: de/de_states.py:12
 msgid "Mecklenburg-Western Pomerania"
@@ -477,9 +450,8 @@ msgid "Thuringia"
 msgstr ""
 
 #: de/forms.py:15 fi/forms.py:13 fr/forms.py:16
-#, fuzzy
 msgid "Enter a zip code in the format XXXXX."
-msgstr "HH:MM ರೂಪದಲ್ಲಿ  ಸರಿಯಾದ ಸಮಯವನ್ನು ಬರೆಯಿರಿ"
+msgstr ""
 
 #: de/forms.py:42
 msgid ""
@@ -504,9 +476,8 @@ msgid "Almeria"
 msgstr ""
 
 #: es/es_provinces.py:9
-#, fuzzy
 msgid "Avila"
-msgstr "ಎಪ್ರಿಲ್"
+msgstr ""
 
 #: es/es_provinces.py:10
 msgid "Badajoz"
@@ -557,9 +528,8 @@ msgid "Girona"
 msgstr ""
 
 #: es/es_provinces.py:22
-#, fuzzy
 msgid "Granada"
-msgstr "ಜರ್ಮನ್"
+msgstr ""
 
 #: es/es_provinces.py:23
 msgid "Guadalajara"
@@ -574,19 +544,16 @@ msgid "Huelva"
 msgstr ""
 
 #: es/es_provinces.py:26
-#, fuzzy
 msgid "Huesca"
-msgstr "ಮಂಗಳವಾರ"
+msgstr ""
 
 #: es/es_provinces.py:27
-#, fuzzy
 msgid "Jaen"
-msgstr "ಜನವರಿ."
+msgstr ""
 
 #: es/es_provinces.py:28
-#, fuzzy
 msgid "Leon"
-msgstr "ಒಳಗೆ ಬನ್ನಿ"
+msgstr ""
 
 #: es/es_provinces.py:29
 msgid "Lleida"
@@ -625,9 +592,8 @@ msgid "Asturias"
 msgstr ""
 
 #: es/es_provinces.py:38
-#, fuzzy
 msgid "Palencia"
-msgstr "ಗ್ಯಾಲಿಶಿಯನ್"
+msgstr ""
 
 #: es/es_provinces.py:39
 msgid "Las Palmas"
@@ -650,18 +616,16 @@ msgid "Cantabria"
 msgstr ""
 
 #: es/es_provinces.py:44
-#, fuzzy
 msgid "Segovia"
-msgstr "ಸ್ಲೋವೇನಿಯನ್"
+msgstr ""
 
 #: es/es_provinces.py:45
 msgid "Seville"
 msgstr ""
 
 #: es/es_provinces.py:46
-#, fuzzy
 msgid "Soria"
-msgstr "ಸೆರ್ಬಿಯನ್"
+msgstr ""
 
 #: es/es_provinces.py:47
 msgid "Tarragona"
@@ -676,9 +640,8 @@ msgid "Toledo"
 msgstr ""
 
 #: es/es_provinces.py:50
-#, fuzzy
 msgid "Valencia"
-msgstr "ಗ್ಯಾಲಿಶಿಯನ್"
+msgstr ""
 
 #: es/es_provinces.py:51
 msgid "Valladolid"
@@ -737,18 +700,16 @@ msgid "Castile and Leon"
 msgstr ""
 
 #: es/es_regions.py:14
-#, fuzzy
 msgid "Catalonia"
-msgstr "ಇಟಾಲಿಯನ್"
+msgstr ""
 
 #: es/es_regions.py:15
 msgid "Extremadura"
 msgstr ""
 
 #: es/es_regions.py:16
-#, fuzzy
 msgid "Galicia"
-msgstr "ಗ್ಯಾಲಿಶಿಯನ್"
+msgstr ""
 
 #: es/es_regions.py:19
 msgid "Region of Murcia"
@@ -773,14 +734,12 @@ msgid ""
 msgstr ""
 
 #: es/forms.py:67
-#, fuzzy
 msgid "Please enter a valid NIF, NIE, or CIF."
-msgstr "ಸರಿಯಾದ  IP ವಿಳಾಸ ಬರೆಯಿರಿ"
+msgstr ""
 
 #: es/forms.py:68
-#, fuzzy
 msgid "Please enter a valid NIF or NIE."
-msgstr "ಸರಿಯಾದ %s ಅನ್ನು ಬರೆಯಿರಿ ."
+msgstr ""
 
 #: es/forms.py:69
 msgid "Invalid checksum for NIF."
@@ -804,53 +763,44 @@ msgid "Invalid checksum for bank account number."
 msgstr ""
 
 #: fi/forms.py:29
-#, fuzzy
 msgid "Enter a valid Finnish social security number."
-msgstr "ಸರಿಯಾದ ಕಡತದ ಹೆಸರನ್ನು ಬರೆಯಿರಿ"
+msgstr ""
 
 #: fr/forms.py:31
-#, fuzzy
 msgid "Phone numbers must be in 0X XX XX XX XX format."
-msgstr "ದೂರವಾಣಿ ಅಂಕೆಗಳು XXX-XXX-XXXX ರೀತಿಯಲ್ಲಿರಬೇಕು. \"%s\" ತಪ್ಪಾಗಿರುತ್ತದೆ."
+msgstr ""
 
 #: id/forms.py:28
-#, fuzzy
 msgid "Enter a valid post code"
-msgstr "ಕ್ರಮಬದ್ಧ ವಿ-ವಿಳಾಸವೊಂದನ್ನು ಇಲ್ಲಿ ಬರೆಯಿರಿ"
+msgstr ""
 
 #: id/forms.py:68 nl/forms.py:53
-#, fuzzy
 msgid "Enter a valid phone number"
-msgstr "ಪೂರ್ಣಾಂಕವೊಂದನ್ನು ಬರೆಯಿರಿ"
+msgstr ""
 
 #: id/forms.py:107
-#, fuzzy
 msgid "Enter a valid vehicle license plate number"
-msgstr "ಸರಿಯಾದ ಕಡತದ ಹೆಸರನ್ನು ಬರೆಯಿರಿ"
+msgstr ""
 
 #: id/forms.py:170
-#, fuzzy
 msgid "Enter a valid NIK/KTP number"
-msgstr "ಸರಿಯಾದ ಕಡತದ ಹೆಸರನ್ನು ಬರೆಯಿರಿ"
+msgstr ""
 
 #: id/id_choices.py:15
 msgid "Aceh"
 msgstr ""
 
 #: id/id_choices.py:16 id/id_choices.py:79
-#, fuzzy
 msgid "Bali"
-msgstr "ಬೆಂಗಾಲಿ"
+msgstr ""
 
 #: id/id_choices.py:17 id/id_choices.py:51
-#, fuzzy
 msgid "Banten"
-msgstr "ಒಳವಿಷಯ"
+msgstr ""
 
 #: id/id_choices.py:18 id/id_choices.py:60
-#, fuzzy
 msgid "Bengkulu"
-msgstr "ಬೆಂಗಾಲಿ"
+msgstr ""
 
 #: id/id_choices.py:19 id/id_choices.py:53
 msgid "Yogyakarta"
@@ -865,9 +815,8 @@ msgid "Gorontalo"
 msgstr ""
 
 #: id/id_choices.py:22 id/id_choices.py:63
-#, fuzzy
 msgid "Jambi"
-msgstr "ತಮಿಳು"
+msgstr ""
 
 #: id/id_choices.py:23
 msgid "Jawa Barat"
@@ -906,9 +855,8 @@ msgid "Kepulauan Riau"
 msgstr ""
 
 #: id/id_choices.py:32 id/id_choices.py:61
-#, fuzzy
 msgid "Lampung"
-msgstr "ಆಗಸ್ಟ್"
+msgstr ""
 
 #: id/id_choices.py:33 id/id_choices.py:76
 msgid "Maluku"
@@ -1007,9 +955,8 @@ msgid "Corps Diplomatic"
 msgstr ""
 
 #: id/id_choices.py:71
-#, fuzzy
 msgid "Bandung"
-msgstr "ಮತ್ತು"
+msgstr ""
 
 #: id/id_choices.py:73
 msgid "Sulawesi Utara Daratan"
@@ -1056,33 +1003,28 @@ msgid "Pekalongan"
 msgstr ""
 
 #: id/id_choices.py:92
-#, fuzzy
 msgid "Semarang"
-msgstr "ಸೆರ್ಬಿಯನ್"
+msgstr ""
 
 #: id/id_choices.py:93
-#, fuzzy
 msgid "Pati"
-msgstr "ಸಕ್ರಿಯ"
+msgstr ""
 
 #: id/id_choices.py:97
-#, fuzzy
 msgid "Surabaya"
-msgstr "ಶನಿವಾರ"
+msgstr ""
 
 #: id/id_choices.py:98
 msgid "Madura"
 msgstr ""
 
 #: id/id_choices.py:99
-#, fuzzy
 msgid "Malang"
-msgstr "ಇಟಾಲಿಯನ್"
+msgstr ""
 
 #: id/id_choices.py:100
-#, fuzzy
 msgid "Jember"
-msgstr "ನವೆಂಬರ್"
+msgstr ""
 
 #: id/id_choices.py:101
 msgid "Banyumas"
@@ -1133,9 +1075,8 @@ msgid "Cork"
 msgstr ""
 
 #: ie/ie_counties.py:14
-#, fuzzy
 msgid "Derry"
-msgstr "ಫೆಬ್ರುವರಿ"
+msgstr ""
 
 #: ie/ie_counties.py:15
 msgid "Donegal"
@@ -1150,18 +1091,16 @@ msgid "Dublin"
 msgstr ""
 
 #: ie/ie_counties.py:18
-#, fuzzy
 msgid "Fermanagh"
-msgstr "ಜರ್ಮನ್"
+msgstr ""
 
 #: ie/ie_counties.py:19
 msgid "Galway"
 msgstr ""
 
 #: ie/ie_counties.py:20
-#, fuzzy
 msgid "Kerry"
-msgstr "ಫೆಬ್ರುವರಿ"
+msgstr ""
 
 #: ie/ie_counties.py:21
 msgid "Kildare"
@@ -1188,33 +1127,28 @@ msgid "Longford"
 msgstr ""
 
 #: ie/ie_counties.py:27
-#, fuzzy
 msgid "Louth"
-msgstr "ಹೊರಕ್ಕೆ ಹೋಗಿ"
+msgstr ""
 
 #: ie/ie_counties.py:28
-#, fuzzy
 msgid "Mayo"
-msgstr "ಮೇ"
+msgstr ""
 
 #: ie/ie_counties.py:29
-#, fuzzy
 msgid "Meath"
-msgstr "ಮಾರ್ಚ್"
+msgstr ""
 
 #: ie/ie_counties.py:30
-#, fuzzy
 msgid "Monaghan"
-msgstr "ಮತ್ತೆ ಒಳಬನ್ನಿ"
+msgstr ""
 
 #: ie/ie_counties.py:31
 msgid "Offaly"
 msgstr ""
 
 #: ie/ie_counties.py:32
-#, fuzzy
 msgid "Roscommon"
-msgstr "ಟಿಪ್ಪಣಿ"
+msgstr ""
 
 #: ie/ie_counties.py:33
 msgid "Sligo"
@@ -1245,19 +1179,16 @@ msgid "Wicklow"
 msgstr ""
 
 #: il/forms.py:31
-#, fuzzy
 msgid "Enter a postal code in the format XXXXX"
-msgstr "HH:MM ರೂಪದಲ್ಲಿ  ಸರಿಯಾದ ಸಮಯವನ್ನು ಬರೆಯಿರಿ"
+msgstr ""
 
 #: il/forms.py:50
-#, fuzzy
 msgid "Enter a valid ID number."
-msgstr "ಸರಿಯಾದ ಕಡತದ ಹೆಸರನ್ನು ಬರೆಯಿರಿ"
+msgstr ""
 
 #: in_/forms.py:15
-#, fuzzy
 msgid "Enter a zip code in the format XXXXXXX."
-msgstr "HH:MM ರೂಪದಲ್ಲಿ  ಸರಿಯಾದ ಸಮಯವನ್ನು ಬರೆಯಿರಿ"
+msgstr ""
 
 #: is_/forms.py:18
 msgid ""
@@ -1269,19 +1200,16 @@ msgid "The Icelandic identification number is not valid."
 msgstr ""
 
 #: it/forms.py:15
-#, fuzzy
 msgid "Enter a valid zip code."
-msgstr "ಸರಿಯಾದ ಕಡತದ ಹೆಸರನ್ನು ಬರೆಯಿರಿ"
+msgstr ""
 
 #: it/forms.py:44
-#, fuzzy
 msgid "Enter a valid Social Security number."
-msgstr "ಸರಿಯಾದ ಕಡತದ ಹೆಸರನ್ನು ಬರೆಯಿರಿ"
+msgstr ""
 
 #: it/forms.py:69
-#, fuzzy
 msgid "Enter a valid VAT number."
-msgstr "ಸರಿಯಾದ ಕಡತದ ಹೆಸರನ್ನು ಬರೆಯಿರಿ"
+msgstr ""
 
 #: jp/forms.py:16
 msgid "Enter a postal code in the format XXXXXXX or XXX-XXXX."
@@ -1296,9 +1224,8 @@ msgid "Aomori"
 msgstr ""
 
 #: jp/jp_prefectures.py:6
-#, fuzzy
 msgid "Iwate"
-msgstr "ದಿನಾಂಕ:"
+msgstr ""
 
 #: jp/jp_prefectures.py:7
 msgid "Miyagi"
@@ -1337,9 +1264,8 @@ msgid "Chiba"
 msgstr ""
 
 #: jp/jp_prefectures.py:16
-#, fuzzy
 msgid "Tokyo"
-msgstr "ಈದಿನ"
+msgstr ""
 
 #: jp/jp_prefectures.py:17
 msgid "Kanagawa"
@@ -1414,9 +1340,8 @@ msgid "Tottori"
 msgstr ""
 
 #: jp/jp_prefectures.py:35
-#, fuzzy
 msgid "Shimane"
-msgstr "ಬದಲಿಸಿ/ಬದಲಾವಣೆ"
+msgstr ""
 
 #: jp/jp_prefectures.py:36
 msgid "Okayama"
@@ -1439,9 +1364,8 @@ msgid "Kagawa"
 msgstr ""
 
 #: jp/jp_prefectures.py:41
-#, fuzzy
 msgid "Ehime"
-msgstr "ಸಮಯ"
+msgstr ""
 
 #: jp/jp_prefectures.py:42
 msgid "Kochi"
@@ -1480,9 +1404,8 @@ msgid "Okinawa"
 msgstr ""
 
 #: kw/forms.py:25
-#, fuzzy
 msgid "Enter a valid Kuwaiti Civil ID number"
-msgstr "ಸರಿಯಾದ ಕಡತದ ಹೆಸರನ್ನು ಬರೆಯಿರಿ"
+msgstr ""
 
 #: mx/mx_states.py:12
 msgid "Aguascalientes"
@@ -1497,9 +1420,8 @@ msgid "Baja California Sur"
 msgstr ""
 
 #: mx/mx_states.py:15
-#, fuzzy
 msgid "Campeche"
-msgstr "ಝೆಕ್"
+msgstr ""
 
 #: mx/mx_states.py:16
 msgid "Chihuahua"
@@ -1526,9 +1448,8 @@ msgid "Durango"
 msgstr ""
 
 #: mx/mx_states.py:22
-#, fuzzy
 msgid "Guerrero"
-msgstr "ಸರ್ವರ್ ದೋಷ"
+msgstr ""
 
 #: mx/mx_states.py:23
 msgid "Guanajuato"
@@ -1579,9 +1500,8 @@ msgid "Quintana Roo"
 msgstr ""
 
 #: mx/mx_states.py:35
-#, fuzzy
 msgid "Sinaloa"
-msgstr "ಸ್ಲೋವಾಕ್"
+msgstr ""
 
 #: mx/mx_states.py:36
 msgid "San Luis Potosí"
@@ -1616,19 +1536,16 @@ msgid "Zacatecas"
 msgstr ""
 
 #: nl/forms.py:22
-#, fuzzy
 msgid "Enter a valid postal code"
-msgstr "ಕ್ರಮಬದ್ಧ ವಿ-ವಿಳಾಸವೊಂದನ್ನು ಇಲ್ಲಿ ಬರೆಯಿರಿ"
+msgstr ""
 
 #: nl/forms.py:79
-#, fuzzy
 msgid "Enter a valid SoFi number"
-msgstr "ಸರಿಯಾದ ಕಡತದ ಹೆಸರನ್ನು ಬರೆಯಿರಿ"
+msgstr ""
 
 #: nl/nl_provinces.py:4
-#, fuzzy
 msgid "Drenthe"
-msgstr "ಅಳಿಸಿಹಾಕಿ"
+msgstr ""
 
 #: nl/nl_provinces.py:5
 msgid "Flevoland"
@@ -1639,9 +1556,8 @@ msgid "Friesland"
 msgstr ""
 
 #: nl/nl_provinces.py:7
-#, fuzzy
 msgid "Gelderland"
-msgstr "ಜರ್ಮನ್"
+msgstr ""
 
 #: nl/nl_provinces.py:8
 msgid "Groningen"
@@ -1660,33 +1576,28 @@ msgid "Overijssel"
 msgstr ""
 
 #: nl/nl_provinces.py:13
-#, fuzzy
 msgid "Utrecht"
-msgstr "ಫ್ರೆಂಚ್"
+msgstr ""
 
 #: nl/nl_provinces.py:14
-#, fuzzy
 msgid "Zeeland"
-msgstr "ಐಸ್‍ಲ್ಯಾಂಡಿಕ್"
+msgstr ""
 
 #: nl/nl_provinces.py:15
 msgid "Zuid-Holland"
 msgstr ""
 
 #: no/forms.py:34
-#, fuzzy
 msgid "Enter a valid Norwegian social security number."
-msgstr "ದಯವಿಟ್ಟು ಸರಿಯಾದ ದಶಮಾನ ಸಂಖ್ಯೆ ಬರೆಯಿರಿ"
+msgstr ""
 
 #: pe/forms.py:25
-#, fuzzy
 msgid "This field requires 8 digits."
-msgstr "ಈ ಅಂಶ ಅಗತ್ಯ."
+msgstr ""
 
 #: pe/forms.py:53
-#, fuzzy
 msgid "This field requires 11 digits."
-msgstr "ಈ ಅಂಶ ಅಗತ್ಯ."
+msgstr ""
 
 #: pl/forms.py:39
 msgid "National Identification Number consists of 11 digits."
@@ -1714,9 +1625,8 @@ msgid "Wrong checksum for the National Business Register Number (REGON)."
 msgstr ""
 
 #: pl/forms.py:155
-#, fuzzy
 msgid "Enter a postal code in the format XX-XXX."
-msgstr "HH:MM ರೂಪದಲ್ಲಿ  ಸರಿಯಾದ ಸಮಯವನ್ನು ಬರೆಯಿರಿ"
+msgstr ""
 
 #: pl/pl_voivodeships.py:8
 msgid "Lower Silesia"
@@ -1747,9 +1657,8 @@ msgid "Masovia"
 msgstr ""
 
 #: pl/pl_voivodeships.py:15
-#, fuzzy
 msgid "Opole"
-msgstr "ಐಚ್ಛಿಕ"
+msgstr ""
 
 #: pl/pl_voivodeships.py:16
 msgid "Subcarpatia"
@@ -1760,14 +1669,12 @@ msgid "Podlasie"
 msgstr ""
 
 #: pl/pl_voivodeships.py:18
-#, fuzzy
 msgid "Pomerania"
-msgstr "ರೋಮೇನಿಯನ್"
+msgstr ""
 
 #: pl/pl_voivodeships.py:19
-#, fuzzy
 msgid "Silesia"
-msgstr "ಸ್ಲೋವೇನಿಯನ್"
+msgstr ""
 
 #: pl/pl_voivodeships.py:20
 msgid "Swietokrzyskie"
@@ -1786,52 +1693,44 @@ msgid "West Pomerania"
 msgstr ""
 
 #: pt/forms.py:17
-#, fuzzy
 msgid "Enter a zip code in the format XXXX-XXX."
-msgstr "HH:MM ರೂಪದಲ್ಲಿ  ಸರಿಯಾದ ಸಮಯವನ್ನು ಬರೆಯಿರಿ"
+msgstr ""
 
 #: pt/forms.py:37
 msgid "Phone numbers must have 9 digits, or start by + or 00."
 msgstr ""
 
 #: ro/forms.py:19
-#, fuzzy
 msgid "Enter a valid CIF."
-msgstr "ಸರಿಯಾದ ಕಡತದ ಹೆಸರನ್ನು ಬರೆಯಿರಿ"
+msgstr ""
 
 #: ro/forms.py:56
-#, fuzzy
 msgid "Enter a valid CNP."
-msgstr "ಸರಿಯಾದ ಕಡತದ ಹೆಸರನ್ನು ಬರೆಯಿರಿ"
+msgstr ""
 
 #: ro/forms.py:143
 msgid "Enter a valid IBAN in ROXX-XXXX-XXXX-XXXX-XXXX-XXXX format"
 msgstr ""
 
 #: ro/forms.py:175
-#, fuzzy
 msgid "Phone numbers must be in XXXX-XXXXXX format."
-msgstr "ದೂರವಾಣಿ ಅಂಕೆಗಳು XXX-XXX-XXXX ರೀತಿಯಲ್ಲಿರಬೇಕು. \"%s\" ತಪ್ಪಾಗಿರುತ್ತದೆ."
+msgstr ""
 
 #: ro/forms.py:200
-#, fuzzy
 msgid "Enter a valid postal code in the format XXXXXX"
-msgstr "HH:MM ರೂಪದಲ್ಲಿ  ಸರಿಯಾದ ಸಮಯವನ್ನು ಬರೆಯಿರಿ"
+msgstr ""
 
 #: se/forms.py:50
-#, fuzzy
 msgid "Enter a valid Swedish organisation number."
-msgstr " ಅಮೇರಿಕೆಯ ಸಂಯುಕ್ತ ಸಂಸ್ಥಾನದ ರಾಜ್ಯದ ಸರಿಯಾದ ಸಂಕ್ಷಿಪ್ತರೂಪವನ್ನು ಕೊಡಿ."
+msgstr ""
 
 #: se/forms.py:107
-#, fuzzy
 msgid "Enter a valid Swedish personal identity number."
-msgstr "ಪೂರ್ಣಾಂಕವೊಂದನ್ನು ಬರೆಯಿರಿ"
+msgstr ""
 
 #: se/forms.py:108
-#, fuzzy
 msgid "Co-ordination numbers are not allowed."
-msgstr "ಪಡಿಯಚ್ಚುಬೆಲೆಗಳಿಗೆ ಅನುಮತಿಯಿಲ್ಲ"
+msgstr ""
 
 #: se/forms.py:150
 msgid "Enter a Swedish postal code in the format XXXXX."
@@ -1870,14 +1769,12 @@ msgid "Kronoberg"
 msgstr ""
 
 #: se/se_counties.py:23
-#, fuzzy
 msgid "Kalmar"
-msgstr "ಮಾರ್ಚ್"
+msgstr ""
 
 #: se/se_counties.py:24
-#, fuzzy
 msgid "Gotland"
-msgstr "ಮತ್ತು"
+msgstr ""
 
 #: se/se_counties.py:25
 msgid "Blekinge"
@@ -1888,9 +1785,8 @@ msgid "Skåne"
 msgstr ""
 
 #: se/se_counties.py:27
-#, fuzzy
 msgid "Halland"
-msgstr "ಮತ್ತು"
+msgstr ""
 
 #: se/se_counties.py:28
 msgid "Västra Götaland"
@@ -1985,14 +1881,12 @@ msgid "Dunajska Streda"
 msgstr ""
 
 #: sk/sk_districts.py:23
-#, fuzzy
 msgid "Galanta"
-msgstr "ಗ್ಯಾಲಿಶಿಯನ್"
+msgstr ""
 
 #: sk/sk_districts.py:24
-#, fuzzy
 msgid "Gelnica"
-msgstr "ಗ್ಯಾಲಿಶಿಯನ್"
+msgstr ""
 
 #: sk/sk_districts.py:25
 msgid "Hlohovec"
@@ -2011,9 +1905,8 @@ msgid "Kezmarok"
 msgstr ""
 
 #: sk/sk_districts.py:29
-#, fuzzy
 msgid "Komarno"
-msgstr "ಮಾರ್ಚ್"
+msgstr ""
 
 #: sk/sk_districts.py:30
 msgid "Kosice I"
@@ -2060,14 +1953,12 @@ msgid "Lucenec"
 msgstr ""
 
 #: sk/sk_districts.py:41
-#, fuzzy
 msgid "Malacky"
-msgstr "ಮೇ"
+msgstr ""
 
 #: sk/sk_districts.py:42
-#, fuzzy
 msgid "Martin"
-msgstr "ಕ್ರಮಾಂಕಗಳು"
+msgstr ""
 
 #: sk/sk_districts.py:43
 msgid "Medzilaborce"
@@ -2150,23 +2041,20 @@ msgid "Ruzomberok"
 msgstr ""
 
 #: sk/sk_districts.py:63
-#, fuzzy
 msgid "Sabinov"
-msgstr "ನವೆಂಬರ್"
+msgstr ""
 
 #: sk/sk_districts.py:64
 msgid "Senec"
 msgstr ""
 
 #: sk/sk_districts.py:65
-#, fuzzy
 msgid "Senica"
-msgstr "ಸ್ಲೋವೇನಿಯನ್"
+msgstr ""
 
 #: sk/sk_districts.py:66
-#, fuzzy
 msgid "Skalica"
-msgstr "ಗ್ಯಾಲಿಶಿಯನ್"
+msgstr ""
 
 #: sk/sk_districts.py:67
 msgid "Snina"
@@ -2193,9 +2081,8 @@ msgid "Svidnik"
 msgstr ""
 
 #: sk/sk_districts.py:73
-#, fuzzy
 msgid "Sala"
-msgstr "ಸ್ಲೋವಾಕ್"
+msgstr ""
 
 #: sk/sk_districts.py:74
 msgid "Topolcany"
@@ -2206,9 +2093,8 @@ msgid "Trebisov"
 msgstr ""
 
 #: sk/sk_districts.py:76
-#, fuzzy
 msgid "Trencin"
-msgstr "ಫ್ರೆಂಚ್"
+msgstr ""
 
 #: sk/sk_districts.py:77
 msgid "Trnava"
@@ -2283,28 +2169,24 @@ msgid "Zilina region"
 msgstr ""
 
 #: tr/forms.py:16
-#, fuzzy
 msgid "Enter a postal code in the format XXXXX."
-msgstr "HH:MM ರೂಪದಲ್ಲಿ  ಸರಿಯಾದ ಸಮಯವನ್ನು ಬರೆಯಿರಿ"
+msgstr ""
 
 #: tr/forms.py:37
-#, fuzzy
 msgid "Phone numbers must be in 0XXX XXX XXXX format."
-msgstr "ದೂರವಾಣಿ ಅಂಕೆಗಳು XXX-XXX-XXXX ರೀತಿಯಲ್ಲಿರಬೇಕು. \"%s\" ತಪ್ಪಾಗಿರುತ್ತದೆ."
+msgstr ""
 
 #: tr/forms.py:64
-#, fuzzy
 msgid "Enter a valid Turkish Identification number."
-msgstr "ಸರಿಯಾದ ಕಡತದ ಹೆಸರನ್ನು ಬರೆಯಿರಿ"
+msgstr ""
 
 #: tr/forms.py:65
 msgid "Turkish Identification number must be 11 digits."
 msgstr ""
 
 #: uk/forms.py:21
-#, fuzzy
 msgid "Enter a valid postcode."
-msgstr "ಸರಿಯಾದ ಕಡತದ ಹೆಸರನ್ನು ಬರೆಯಿರಿ"
+msgstr ""
 
 #: uk/uk_regions.py:11
 msgid "Bedfordshire"
@@ -2435,9 +2317,8 @@ msgid "Suffolk"
 msgstr ""
 
 #: uk/uk_regions.py:44
-#, fuzzy
 msgid "Surrey"
-msgstr "ಈಗ:"
+msgstr ""
 
 #: uk/uk_regions.py:45
 msgid "Tyne and Wear"
@@ -2524,9 +2405,8 @@ msgid "West Glamorgan"
 msgstr ""
 
 #: uk/uk_regions.py:75
-#, fuzzy
 msgid "Borders"
-msgstr "ಅನುಕ್ರಮ:"
+msgstr ""
 
 #: uk/uk_regions.py:76
 msgid "Central Scotland"
@@ -2537,23 +2417,20 @@ msgid "Dumfries and Galloway"
 msgstr ""
 
 #: uk/uk_regions.py:78
-#, fuzzy
 msgid "Fife"
-msgstr "ಸೋಸಕ"
+msgstr ""
 
 #: uk/uk_regions.py:79
-#, fuzzy
 msgid "Grampian"
-msgstr "ಜರ್ಮನ್"
+msgstr ""
 
 #: uk/uk_regions.py:80
 msgid "Highland"
 msgstr ""
 
 #: uk/uk_regions.py:81
-#, fuzzy
 msgid "Lothian"
-msgstr "ಒಳಗೆ ಬನ್ನಿ"
+msgstr ""
 
 #: uk/uk_regions.py:82
 msgid "Orkney Islands"
@@ -2576,9 +2453,8 @@ msgid "Western Isles"
 msgstr ""
 
 #: uk/uk_regions.py:90
-#, fuzzy
 msgid "England"
-msgstr "ಮತ್ತು"
+msgstr ""
 
 #: uk/uk_regions.py:91
 msgid "Northern Ireland"
@@ -2589,36 +2465,32 @@ msgid "Scotland"
 msgstr ""
 
 #: uk/uk_regions.py:93
-#, fuzzy
 msgid "Wales"
-msgstr "ವೆಲ್ಷ್"
+msgstr ""
 
 #: us/forms.py:17
 msgid "Enter a zip code in the format XXXXX or XXXXX-XXXX."
 msgstr ""
 
 #: us/forms.py:26
-#, fuzzy
 msgid "Phone numbers must be in XXX-XXX-XXXX format."
-msgstr "ದೂರವಾಣಿ ಅಂಕೆಗಳು XXX-XXX-XXXX ರೀತಿಯಲ್ಲಿರಬೇಕು. \"%s\" ತಪ್ಪಾಗಿರುತ್ತದೆ."
+msgstr ""
 
 #: us/forms.py:55
 msgid "Enter a valid U.S. Social Security number in XXX-XX-XXXX format."
 msgstr ""
 
 #: us/forms.py:88
-#, fuzzy
 msgid "Enter a U.S. state or territory."
-msgstr " ಅಮೇರಿಕೆಯ ಸಂಯುಕ್ತ ಸಂಸ್ಥಾನದ ರಾಜ್ಯದ ಸರಿಯಾದ ಸಂಕ್ಷಿಪ್ತರೂಪವನ್ನು ಕೊಡಿ."
+msgstr ""
 
 #: us/models.py:9
 msgid "U.S. state (two uppercase letters)"
 msgstr "ಅಮೇರಿಕಾ ಸಂಯುಕ್ತ ಸಂಸ್ಥಾನದ ರಾಜ್ಯ ( ಎರಡು ಇಂಗ್ಲೀಷ್ ದೊಡ್ಡಕ್ಷರಗಳು)"
 
 #: us/models.py:18
-#, fuzzy
 msgid "U.S. postal code (two uppercase letters)"
-msgstr "ಅಮೇರಿಕಾ ಸಂಯುಕ್ತ ಸಂಸ್ಥಾನದ ರಾಜ್ಯ ( ಎರಡು ಇಂಗ್ಲೀಷ್ ದೊಡ್ಡಕ್ಷರಗಳು)"
+msgstr ""
 
 #: us/models.py:27
 msgid "Phone number"
@@ -2629,34 +2501,28 @@ msgid "Enter a valid CI number in X.XXX.XXX-X,XXXXXXX-X or XXXXXXXX format."
 msgstr ""
 
 #: uy/forms.py:30
-#, fuzzy
 msgid "Enter a valid CI number."
-msgstr "ಸರಿಯಾದ ಕಡತದ ಹೆಸರನ್ನು ಬರೆಯಿರಿ"
+msgstr ""
 
 #: za/forms.py:21
-#, fuzzy
 msgid "Enter a valid South African ID number"
-msgstr "ಸರಿಯಾದ ಕಡತದ ಹೆಸರನ್ನು ಬರೆಯಿರಿ"
+msgstr ""
 
 #: za/forms.py:55
-#, fuzzy
 msgid "Enter a valid South African postal code"
-msgstr "ಸರಿಯಾದ ಕಡತದ ಹೆಸರನ್ನು ಬರೆಯಿರಿ"
+msgstr ""
 
 #: za/za_provinces.py:4
-#, fuzzy
 msgid "Eastern Cape"
-msgstr "ಬಳಕೆದಾರ-ಹೆಸರು"
+msgstr ""
 
 #: za/za_provinces.py:5
-#, fuzzy
 msgid "Free State"
-msgstr "ಅಂಕದ ದಿನಾಂಕ"
+msgstr ""
 
 #: za/za_provinces.py:6
-#, fuzzy
 msgid "Gauteng"
-msgstr "ಆಗಸ್ಟ್"
+msgstr ""
 
 #: za/za_provinces.py:7
 msgid "KwaZulu-Natal"
@@ -2679,6 +2545,5 @@ msgid "North West"
 msgstr ""
 
 #: za/za_provinces.py:12
-#, fuzzy
 msgid "Western Cape"
-msgstr "ಬಳಕೆದಾರ-ಹೆಸರು"
+msgstr ""

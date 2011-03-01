@@ -1,21 +1,19 @@
-# translation of django.po to Slovenian
-# Gasper Zejn <zejn@kiberpipa.org>, 2010.
-# Jure Cuhalev <gandalf@owca.info>, 2010.
 # This file is distributed under the same license as the Django package.
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:29+0100\n"
-"PO-Revision-Date: 2010-05-08 13:47+0100\n"
-"Last-Translator: Jure Cuhalev <gandalf@owca.info>\n"
-"Language-Team:  <sl@li.org>\n"
+"POT-Creation-Date: 2011-03-01 00:33+0100\n"
+"PO-Revision-Date: 2011-02-22 00:10+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: Slovenian <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.11.4\n"
+"Language: sl\n"
 "Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n"
-"%100==4 ? 2 : 3);\n"
+"%100==4 ? 2 : 3)\n"
 
 #: ar/forms.py:28
 msgid "Enter a postal code in the format NNNN or ANNNNAAA."
@@ -88,76 +86,64 @@ msgid "Enter a 4 digit post code."
 msgstr "Vnesite 4-mestno poštno številko."
 
 #: be/be_provinces.py:5
-#, fuzzy
 msgid "Antwerp"
-msgstr "Antrim"
+msgstr "Antwerpen"
 
 #: be/be_provinces.py:6
-#, fuzzy
 msgid "Brussels"
-msgstr "uporabniki"
+msgstr "Bruselj"
 
 #: be/be_provinces.py:7
-#, fuzzy
 msgid "East Flanders"
-msgstr "West Midlands"
+msgstr "vzhodna Flanska"
 
 #: be/be_provinces.py:8
 msgid "Flemish Brabant"
-msgstr ""
+msgstr "Flemish Brabant"
 
 #: be/be_provinces.py:9
-#, fuzzy
 msgid "Hainaut"
-msgstr "minuta"
+msgstr "Hengavsko"
 
 #: be/be_provinces.py:10
 msgid "Liege"
-msgstr ""
+msgstr "Liège"
 
 #: be/be_provinces.py:11 nl/nl_provinces.py:9
 msgid "Limburg"
 msgstr "Limburg"
 
 #: be/be_provinces.py:12
-#, fuzzy
 msgid "Luxembourg"
-msgstr "Limburg"
+msgstr "Luksemburg"
 
 #: be/be_provinces.py:13
-#, fuzzy
 msgid "Namur"
-msgstr "Ime"
+msgstr "Namur"
 
 #: be/be_provinces.py:14
-#, fuzzy
 msgid "Walloon Brabant"
-msgstr "Noord-Brabant"
+msgstr "Walloon Brabant"
 
 #: be/be_provinces.py:15
-#, fuzzy
 msgid "West Flanders"
-msgstr "West Midlands"
+msgstr "zahodna Flamska"
 
 #: be/be_regions.py:5
-#, fuzzy
 msgid "Brussels Capital Region"
-msgstr "Bratislavska regija"
+msgstr "Bruseljska regija"
 
 #: be/be_regions.py:6
-#, fuzzy
 msgid "Flemish Region"
-msgstr "Zlin Region"
+msgstr "Flemska regija"
 
 #: be/be_regions.py:7
-#, fuzzy
 msgid "Wallonia"
-msgstr "Catalonia"
+msgstr "Valonija"
 
 #: be/forms.py:23
-#, fuzzy
 msgid "Enter a valid postal code in the range and format 1XXX - 9XXX."
-msgstr "Vpišite veljavno poštno številko v obsegu in zapisu od 01XXX do 52XXX."
+msgstr "Vnesi veljavno poštno številko v obliki 1XXX - 9XXX."
 
 #: be/forms.py:46
 msgid ""
@@ -165,6 +151,9 @@ msgid ""
 "04xx xx xx xx, 0x/xxx.xx.xx, 0xx/xx.xx.xx, 04xx/xx.xx.xx, 0x.xxx.xx.xx, 0xx."
 "xx.xx.xx, 04xx.xx.xx.xx, 0xxxxxxxx or 04xxxxxxxx."
 msgstr ""
+"Vnesite veljavno telefonsko številko v eni od naslednjih oblik: 0x xxx xx "
+"xx, 0xx xx xx xx, 04xx xx xx xx, 0x/xxx.xx.xx, 0xx/xx.xx.xx, 04xx/xx.xx.xx, "
+"0x.xxx.xx.xx, 0xx.xx.xx.xx, 04xx.xx.xx.xx, 0xxxxxxxx ali 04xxxxxxxx."
 
 #: br/forms.py:17
 msgid "Enter a zip code in the format XXXXX-XXX."
@@ -814,9 +803,8 @@ msgid "Enter a valid NIK/KTP number"
 msgstr "Vnesite veljavno NIK/KTP številko."
 
 #: id/id_choices.py:15
-#, fuzzy
 msgid "Aceh"
-msgstr "Aichi"
+msgstr "Aceh"
 
 #: id/id_choices.py:16 id/id_choices.py:79
 msgid "Bali"
@@ -1207,14 +1195,12 @@ msgid "Wicklow"
 msgstr "Wicklow"
 
 #: il/forms.py:31
-#, fuzzy
 msgid "Enter a postal code in the format XXXXX"
-msgstr "Vnesite veljavno poštno številko v obliki XX-XXX."
+msgstr "Vnesi poštno številko v obliki XXXXX"
 
 #: il/forms.py:50
-#, fuzzy
 msgid "Enter a valid ID number."
-msgstr "Vnesite veljavno IC številko."
+msgstr "Vnesi veljavno ID številko."
 
 #: in_/forms.py:15
 msgid "Enter a zip code in the format XXXXXXX."
@@ -2206,24 +2192,20 @@ msgid "Zilina region"
 msgstr "Regija Zilina"
 
 #: tr/forms.py:16
-#, fuzzy
 msgid "Enter a postal code in the format XXXXX."
-msgstr "Vnesite veljavno poštno številko v obliki XX-XXX."
+msgstr "Vnesi poštno številko v formatu XXXXX."
 
 #: tr/forms.py:37
-#, fuzzy
 msgid "Phone numbers must be in 0XXX XXX XXXX format."
-msgstr "Telefonska številka mora biti v zapisu 0X XX XX XX XX."
+msgstr "Telefonske številke morajo biti v obliki 0XXX XXX XXXX."
 
 #: tr/forms.py:64
-#, fuzzy
 msgid "Enter a valid Turkish Identification number."
-msgstr "Vnesite veljavno švedsko številko organizacije."
+msgstr "Vnesi veljavno turško identifikacijsko številko."
 
 #: tr/forms.py:65
-#, fuzzy
 msgid "Turkish Identification number must be 11 digits."
-msgstr "Nacionalna identifikacijska številka je sestavljena iz 11 števk."
+msgstr "Turška identifikacijska številka mora biti dolga 11 znakov."
 
 #: uk/forms.py:21
 msgid "Enter a valid postcode."
@@ -2532,9 +2514,8 @@ msgid "U.S. state (two uppercase letters)"
 msgstr "Koda ameriške zvezne države (dve veliki črki)"
 
 #: us/models.py:18
-#, fuzzy
 msgid "U.S. postal code (two uppercase letters)"
-msgstr "Koda ameriške zvezne države (dve veliki črki)"
+msgstr "ZDA poštna številka (dve veliki črki)"
 
 #: us/models.py:27
 msgid "Phone number"
