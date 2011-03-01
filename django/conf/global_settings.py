@@ -42,6 +42,7 @@ LANGUAGE_CODE = 'en-us'
 # should be the utf-8 encoded local name for the language.
 LANGUAGES = (
     ('ar', gettext_noop('Arabic')),
+    ('az', gettext_noop('Azerbaijani')),
     ('bg', gettext_noop('Bulgarian')),
     ('bn', gettext_noop('Bengali')),
     ('bs', gettext_noop('Bosnian')),
@@ -102,6 +103,7 @@ LANGUAGES = (
     ('th', gettext_noop('Thai')),
     ('tr', gettext_noop('Turkish')),
     ('uk', gettext_noop('Ukrainian')),
+    ('ur', gettext_noop('Urdu')),
     ('vi', gettext_noop('Vietnamese')),
     ('zh-cn', gettext_noop('Simplified Chinese')),
     ('zh-tw', gettext_noop('Traditional Chinese')),
