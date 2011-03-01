@@ -1,21 +1,18 @@
-# translation of Django.
-# Copyright (C) 2008 The Django Project
 # This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-21 22:58+0100\n"
-"PO-Revision-Date: 2010-05-09 15:10-0500\n"
+"POT-Creation-Date: 2011-02-28 17:34+0100\n"
+"PO-Revision-Date: 2011-02-22 00:09+0000\n"
 "Last-Translator: Alex <alex.gaynor@gmail.com>\n"
-"Language-Team: Django-i18n <django-i18n@googlegroups.com>\n"
+"Language-Team: Hebrew <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Poedit-Bookmarks: -1,988,-1,-1,-1,-1,-1,-1,-1,-1\n"
-"X-Generator: Lokalize 1.0\n"
+"Language: he\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: conf/global_settings.py:44
 msgid "Arabic"
@@ -70,253 +67,259 @@ msgid "Spanish"
 msgstr "ספרדית"
 
 #: conf/global_settings.py:57
-#, fuzzy
 msgid "Argentinian Spanish"
-msgstr "ספרדית ארגנטינאית"
+msgstr "ספרדית ארגנטינית"
 
 #: conf/global_settings.py:58
+#, fuzzy
+msgid "Mexican Spanish"
+msgstr "ספרדית ארגנטינית"
+
+#: conf/global_settings.py:59
 msgid "Estonian"
 msgstr "אסטונית"
 
-#: conf/global_settings.py:59
+#: conf/global_settings.py:60
 msgid "Basque"
 msgstr "בסקית"
 
-#: conf/global_settings.py:60
+#: conf/global_settings.py:61
 msgid "Persian"
 msgstr "פרסית"
 
-#: conf/global_settings.py:61
+#: conf/global_settings.py:62
 msgid "Finnish"
 msgstr "פינית"
 
-#: conf/global_settings.py:62
+#: conf/global_settings.py:63
 msgid "French"
 msgstr "צרפתית"
 
-#: conf/global_settings.py:63
+#: conf/global_settings.py:64
 msgid "Frisian"
 msgstr "פריזית"
 
-#: conf/global_settings.py:64
+#: conf/global_settings.py:65
 msgid "Irish"
 msgstr "אירית"
 
-#: conf/global_settings.py:65
+#: conf/global_settings.py:66
 msgid "Galician"
 msgstr "גאליציאנית"
 
-#: conf/global_settings.py:66
+#: conf/global_settings.py:67
 msgid "Hebrew"
 msgstr "עברית"
 
-#: conf/global_settings.py:67
+#: conf/global_settings.py:68
 msgid "Hindi"
 msgstr "הינדי"
 
-#: conf/global_settings.py:68
+#: conf/global_settings.py:69
 msgid "Croatian"
 msgstr "קרואטית"
 
-#: conf/global_settings.py:69
+#: conf/global_settings.py:70
 msgid "Hungarian"
 msgstr "הונגרית"
 
-#: conf/global_settings.py:70
+#: conf/global_settings.py:71
 msgid "Indonesian"
 msgstr "אינדונזית"
 
-#: conf/global_settings.py:71
+#: conf/global_settings.py:72
 msgid "Icelandic"
 msgstr "איסלנדית"
 
-#: conf/global_settings.py:72
+#: conf/global_settings.py:73
 msgid "Italian"
 msgstr "איטלקית"
 
-#: conf/global_settings.py:73
+#: conf/global_settings.py:74
 msgid "Japanese"
 msgstr "יפנית"
 
-#: conf/global_settings.py:74
+#: conf/global_settings.py:75
 msgid "Georgian"
 msgstr "גיאורגית"
 
-#: conf/global_settings.py:75
+#: conf/global_settings.py:76
 msgid "Khmer"
 msgstr "חמר"
 
-# זו שפה הודית, אין קשר לקנדה המדינה
-#: conf/global_settings.py:76
+#: conf/global_settings.py:77
 msgid "Kannada"
 msgstr "קאנאדה"
 
-#: conf/global_settings.py:77
+#: conf/global_settings.py:78
 msgid "Korean"
 msgstr "קוריאנית"
 
-#: conf/global_settings.py:78
+#: conf/global_settings.py:79
 msgid "Lithuanian"
 msgstr "ליטאית"
 
-#: conf/global_settings.py:79
+#: conf/global_settings.py:80
 msgid "Latvian"
 msgstr "לטבית"
 
-#: conf/global_settings.py:80
+#: conf/global_settings.py:81
 msgid "Macedonian"
 msgstr "מקדונית"
 
-#: conf/global_settings.py:81
-#, fuzzy
-msgid "Malayalam"
-msgstr "מאלאגה"
-
 #: conf/global_settings.py:82
+msgid "Malayalam"
+msgstr ""
+
+#: conf/global_settings.py:83
 msgid "Mongolian"
 msgstr "מונגולי"
 
-#: conf/global_settings.py:83
+#: conf/global_settings.py:84
 msgid "Dutch"
 msgstr "הולנדית"
 
-#: conf/global_settings.py:84
+#: conf/global_settings.py:85
 msgid "Norwegian"
 msgstr "נורווגית"
 
-#: conf/global_settings.py:85
+#: conf/global_settings.py:86
 msgid "Norwegian Bokmal"
 msgstr "נורבגית ספרותית"
 
-#: conf/global_settings.py:86
+#: conf/global_settings.py:87
 msgid "Norwegian Nynorsk"
 msgstr "נורבגית חדשה"
 
-#: conf/global_settings.py:87
+#: conf/global_settings.py:88
 msgid "Punjabi"
 msgstr ""
 
-#: conf/global_settings.py:88
+#: conf/global_settings.py:89
 msgid "Polish"
 msgstr "פולנית"
 
-#: conf/global_settings.py:89
+#: conf/global_settings.py:90
 msgid "Portuguese"
 msgstr "פורטוגזית"
 
-#: conf/global_settings.py:90
+#: conf/global_settings.py:91
 msgid "Brazilian Portuguese"
 msgstr "פורטוגזית ברזילאית"
 
-#: conf/global_settings.py:91
+#: conf/global_settings.py:92
 msgid "Romanian"
 msgstr "רומנית"
 
-#: conf/global_settings.py:92
+#: conf/global_settings.py:93
 msgid "Russian"
 msgstr "רוסית"
 
-#: conf/global_settings.py:93
+#: conf/global_settings.py:94
 msgid "Slovak"
 msgstr "סלובקית"
 
-#: conf/global_settings.py:94
+#: conf/global_settings.py:95
 msgid "Slovenian"
 msgstr "סלובנית"
 
-#: conf/global_settings.py:95
+#: conf/global_settings.py:96
 msgid "Albanian"
 msgstr "אלבנית"
 
-#: conf/global_settings.py:96
+#: conf/global_settings.py:97
 msgid "Serbian"
 msgstr "סרבית"
 
-#: conf/global_settings.py:97
+#: conf/global_settings.py:98
 msgid "Serbian Latin"
 msgstr "סרבית לטינית"
 
-#: conf/global_settings.py:98
+#: conf/global_settings.py:99
 msgid "Swedish"
 msgstr "שוודית"
 
-#: conf/global_settings.py:99
+#: conf/global_settings.py:100
 msgid "Tamil"
 msgstr "טמילית"
 
-#: conf/global_settings.py:100
+#: conf/global_settings.py:101
 msgid "Telugu"
 msgstr "טלגו"
 
-#: conf/global_settings.py:101
+#: conf/global_settings.py:102
 msgid "Thai"
 msgstr "תאילנדית"
 
-#: conf/global_settings.py:102
+#: conf/global_settings.py:103
 msgid "Turkish"
 msgstr "טורקית"
 
-#: conf/global_settings.py:103
+#: conf/global_settings.py:104
 msgid "Ukrainian"
 msgstr "אוקראינית"
 
-#: conf/global_settings.py:104
+#: conf/global_settings.py:105
+msgid "Urdu"
+msgstr ""
+
+#: conf/global_settings.py:106
 msgid "Vietnamese"
 msgstr "וייטנאמית"
 
-#: conf/global_settings.py:105
+#: conf/global_settings.py:107
 msgid "Simplified Chinese"
 msgstr "סינית פשוטה"
 
-#: conf/global_settings.py:106
+#: conf/global_settings.py:108
 msgid "Traditional Chinese"
 msgstr "סינית מסורתית"
 
-#: core/validators.py:20 forms/fields.py:67
+#: core/validators.py:21 forms/fields.py:67
 msgid "Enter a valid value."
 msgstr "יש להזין ערך חוקי."
-
-#: core/validators.py:87 forms/fields.py:574
-msgid "Enter a valid URL."
-msgstr "יש להזין URL חוקי."
 
 #: core/validators.py:89 forms/fields.py:575
 msgid "This URL appears to be a broken link."
 msgstr "ה־URL הזה נראה כקישור שבור."
 
-#: core/validators.py:120 forms/fields.py:449
+#: core/validators.py:94 forms/fields.py:574
+msgid "Enter a valid URL."
+msgstr "יש להזין URL חוקי."
+
+#: core/validators.py:138 forms/fields.py:449
 msgid "Enter a valid e-mail address."
 msgstr "יש להזין כתובת דוא\"ל חוקית."
 
-#: core/validators.py:123 forms/fields.py:958
+#: core/validators.py:141 forms/fields.py:958
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr "יש להזין ערך המכיל אותיות, ספרות, קווים תחתונים ומקפים בלבד."
 
-#: core/validators.py:126 forms/fields.py:951
+#: core/validators.py:144 forms/fields.py:951
 msgid "Enter a valid IPv4 address."
 msgstr "יש להזין כתובת IPv4 חוקית."
 
-#: core/validators.py:129 db/models/fields/__init__.py:575
+#: core/validators.py:147 db/models/fields/__init__.py:575
 msgid "Enter only digits separated by commas."
 msgstr "יש להזין רק ספרות מופרדות בפסיקים."
 
-#: core/validators.py:135
+#: core/validators.py:153
 #, python-format
 msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
 msgstr "יש לוודא שערך זה הינו %(limit_value)s (כרגע %(show_value)s)."
 
-#: core/validators.py:153 forms/fields.py:222 forms/fields.py:275
+#: core/validators.py:171 forms/fields.py:222 forms/fields.py:275
 #, python-format
 msgid "Ensure this value is less than or equal to %(limit_value)s."
 msgstr "יש לוודא שערך זה פחות מ או שווה ל־%(limit_value)s ."
 
-#: core/validators.py:158 forms/fields.py:223 forms/fields.py:276
+#: core/validators.py:176 forms/fields.py:223 forms/fields.py:276
 #, python-format
 msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr "יש לוודא שהערך גדול מ או שווה ל־%(limit_value)s."
 
-#: core/validators.py:164
+#: core/validators.py:182
 #, python-format
 msgid ""
 "Ensure this value has at least %(limit_value)d characters (it has %"
@@ -324,7 +327,7 @@ msgid ""
 msgstr ""
 "יש לוודא שערך זה מכיל לפחות %(limit_value)d תווים (מכיל %(show_value)d)."
 
-#: core/validators.py:170
+#: core/validators.py:188
 #, python-format
 msgid ""
 "Ensure this value has at most %(limit_value)d characters (it has %"
@@ -332,17 +335,17 @@ msgid ""
 msgstr ""
 "יש לוודא שערך זה מכיל %(limit_value)d תווים לכל היותר (מכיל %(show_value)d)."
 
-#: db/models/base.py:767
+#: db/models/base.py:769
 #, python-format
 msgid "%(field_name)s must be unique for %(date_field)s %(lookup)s."
 msgstr "%(field_name)s חייב להיות ייחודי ל%(lookup)s של ה־%(date_field)s"
 
-#: db/models/base.py:782 db/models/base.py:790
+#: db/models/base.py:784 db/models/base.py:792
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(model_name)s·עם·%(field_label)s·זה קיימת כבר."
 
-#: db/models/base.py:789 forms/models.py:581
+#: db/models/base.py:791 forms/models.py:560
 msgid "and"
 msgstr "ו"
 
@@ -425,7 +428,7 @@ msgid "E-mail address"
 msgstr "כתובת דוא\"ל"
 
 #: db/models/fields/__init__.py:818 db/models/fields/files.py:220
-#: db/models/fields/files.py:339
+#: db/models/fields/files.py:326
 msgid "File path"
 msgstr "נתיב קובץ"
 
@@ -473,24 +476,24 @@ msgstr "URL"
 msgid "XML text"
 msgstr "טקסט XML"
 
-#: db/models/fields/related.py:804
+#: db/models/fields/related.py:815
 #, python-format
 msgid "Model %(model)s with pk %(pk)r does not exist."
 msgstr "מודל %(model)s עם מפתח ראשי %(pk)r אינו קיים."
 
-#: db/models/fields/related.py:806
+#: db/models/fields/related.py:817
 msgid "Foreign Key (type determined by related field)"
 msgstr "Foreign Key (הסוג נקבע לפי השדה המקושר)"
 
-#: db/models/fields/related.py:928
+#: db/models/fields/related.py:941
 msgid "One-to-one relationship"
 msgstr "יחס של אחד לאחד"
 
-#: db/models/fields/related.py:990
+#: db/models/fields/related.py:1003
 msgid "Many-to-many relationship"
 msgstr "יחס של רבים לרבים"
 
-#: db/models/fields/related.py:1010
+#: db/models/fields/related.py:1023
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
@@ -555,7 +558,7 @@ msgstr "על שם הקובץ להיות לא יותר מ־%(max)d תווים (י
 
 #: forms/fields.py:464
 msgid "Please either submit a file or check the clear checkbox, not both."
-msgstr ""
+msgstr "נא לשים קובץ או סימן את התיבה לניקוי, לא שניהם."
 
 #: forms/fields.py:518
 msgid ""
@@ -568,29 +571,29 @@ msgstr "נא להעלות תמונה חוקית. הקובץ שהעלת אינו 
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr "יש לבחור אפשרות חוקית. %(value)s אינו בין האפשרויות הזמינות."
 
-#: forms/fields.py:726 forms/fields.py:814 forms/models.py:1018
+#: forms/fields.py:726 forms/fields.py:814 forms/models.py:983
 msgid "Enter a list of values."
 msgstr "יש להזין רשימת ערכים"
 
-#: forms/formsets.py:308 forms/formsets.py:310
+#: forms/formsets.py:305 forms/formsets.py:307
 msgid "Order"
 msgstr "מיון"
 
-#: forms/formsets.py:312
+#: forms/formsets.py:309
 msgid "Delete"
 msgstr "מחיקה"
 
-#: forms/models.py:575
+#: forms/models.py:554
 #, python-format
 msgid "Please correct the duplicate data for %(field)s."
 msgstr "נא לתקן את הערכים הכפולים ל%(field)s."
 
-#: forms/models.py:579
+#: forms/models.py:558
 #, python-format
 msgid "Please correct the duplicate data for %(field)s, which must be unique."
 msgstr "נא לתקן את הערכים הכפולים ל%(field)s, שערכים בו חייבים להיות ייחודיים."
 
-#: forms/models.py:585
+#: forms/models.py:564
 #, python-format
 msgid ""
 "Please correct the duplicate data for %(field_name)s which must be unique "
@@ -599,89 +602,87 @@ msgstr ""
 "נא לתקן את הערכים הכפולים %(field_name)s, שחייבים להיות ייחודיים ל%(lookup)s "
 "של %(date_field)s."
 
-#: forms/models.py:593
+#: forms/models.py:572
 msgid "Please correct the duplicate values below."
 msgstr "נא לתקן את הערכים הכפולים למטה."
 
-#: forms/models.py:868
+#: forms/models.py:833
 msgid "The inline foreign key did not match the parent instance primary key."
 msgstr "המפתח הזר ה־inline לא התאים למפתח הראשי של האב."
 
-#: forms/models.py:929
+#: forms/models.py:894
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "יש לבחור אפשרות חוקית; אפשרות זו אינה אחת מהזמינות."
 
-#: forms/models.py:1019
+#: forms/models.py:984
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "יש לבחור אפשרות חוקית. %s אינו בין האפשרויות הזמינות."
 
-#: forms/models.py:1021
+#: forms/models.py:986
 #, python-format
 msgid "\"%s\" is not a valid value for a primary key."
 msgstr "\"%s\" איננו חוקי כמפתח ראשי."
 
 #: forms/widgets.py:299
-#, fuzzy
 msgid "Currently"
-msgstr "הנוכחי:"
+msgstr "עכשיו"
 
 #: forms/widgets.py:300
 msgid "Change"
 msgstr "שינוי"
 
 #: forms/widgets.py:301
-#, fuzzy
 msgid "Clear"
-msgstr "קלייר"
+msgstr "לסלק"
 
-#: forms/widgets.py:547
+#: forms/widgets.py:548
 msgid "Unknown"
 msgstr "לא ידוע"
 
-#: forms/widgets.py:547
+#: forms/widgets.py:548
 msgid "Yes"
 msgstr "כן"
 
-#: forms/widgets.py:547
+#: forms/widgets.py:548
 msgid "No"
 msgstr "לא"
 
-#: template/defaultfilters.py:774
+#: template/defaultfilters.py:767
 msgid "yes,no,maybe"
 msgstr "כן,לא,אולי"
 
-#: template/defaultfilters.py:805
+#: template/defaultfilters.py:795 template/defaultfilters.py:800
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "בית %(size)d "
 msgstr[1] "%(size)d בתים"
 
-#: template/defaultfilters.py:807
+#: template/defaultfilters.py:802
 #, python-format
 msgid "%s KB"
-msgstr "%s KB"
+msgstr "%s ק\"ב"
+
+#: template/defaultfilters.py:804
+#, python-format
+msgid "%s MB"
+msgstr "%s מ\"ב"
+
+#: template/defaultfilters.py:806
+#, python-format
+msgid "%s GB"
+msgstr "%s ג\"ב"
+
+#: template/defaultfilters.py:808
+#, python-format
+msgid "%s TB"
+msgstr "%s ט\"ב"
 
 #: template/defaultfilters.py:809
 #, python-format
-msgid "%s MB"
-msgstr "%s MB"
-
-#: template/defaultfilters.py:811
-#, python-format
-msgid "%s GB"
-msgstr "%s GB"
-
-#: template/defaultfilters.py:813
-#, fuzzy, python-format
-msgid "%s TB"
-msgstr "%s KB"
-
-#: template/defaultfilters.py:814
-#, fuzzy, python-format
 msgid "%s PB"
-msgstr "%s KB"
+msgstr "%s פ\"ב"
 
 #: utils/dateformat.py:42
 msgid "p.m."
@@ -862,22 +863,22 @@ msgstr "דצמ"
 #: utils/dates.py:31
 msgctxt "abbrev. month"
 msgid "Jan."
-msgstr "ינו'"
+msgstr ""
 
 #: utils/dates.py:32
 msgctxt "abbrev. month"
 msgid "Feb."
-msgstr "פבר'"
+msgstr ""
 
 #: utils/dates.py:33
 msgctxt "abbrev. month"
 msgid "March"
-msgstr "מרס"
+msgstr "מרץ"
 
 #: utils/dates.py:34
 msgctxt "abbrev. month"
 msgid "April"
-msgstr "אפריל"
+msgstr ""
 
 #: utils/dates.py:35
 msgctxt "abbrev. month"
@@ -897,96 +898,84 @@ msgstr "יולי"
 #: utils/dates.py:38
 msgctxt "abbrev. month"
 msgid "Aug."
-msgstr "אוג'"
+msgstr ""
 
 #: utils/dates.py:39
 msgctxt "abbrev. month"
 msgid "Sept."
-msgstr "ספט'"
+msgstr ""
 
 #: utils/dates.py:40
 msgctxt "abbrev. month"
 msgid "Oct."
-msgstr "אוק'"
+msgstr ""
 
 #: utils/dates.py:41
 msgctxt "abbrev. month"
 msgid "Nov."
-msgstr "נוב'"
+msgstr ""
 
 #: utils/dates.py:42
 msgctxt "abbrev. month"
 msgid "Dec."
-msgstr "דצמ'"
+msgstr ""
 
 #: utils/dates.py:45
-#, fuzzy
 msgctxt "alt. month"
 msgid "January"
 msgstr "ינואר"
 
 #: utils/dates.py:46
-#, fuzzy
 msgctxt "alt. month"
 msgid "February"
 msgstr "פברואר"
 
 #: utils/dates.py:47
-#, fuzzy
 msgctxt "alt. month"
 msgid "March"
-msgstr "מרס"
+msgstr "מרץ"
 
 #: utils/dates.py:48
-#, fuzzy
 msgctxt "alt. month"
 msgid "April"
 msgstr "אפריל"
 
 #: utils/dates.py:49
-#, fuzzy
 msgctxt "alt. month"
 msgid "May"
 msgstr "מאי"
 
 #: utils/dates.py:50
-#, fuzzy
 msgctxt "alt. month"
 msgid "June"
 msgstr "יוני"
 
 #: utils/dates.py:51
-#, fuzzy
 msgctxt "alt. month"
 msgid "July"
 msgstr "יולי"
 
 #: utils/dates.py:52
-#, fuzzy
 msgctxt "alt. month"
 msgid "August"
 msgstr "אוגוסט"
 
 #: utils/dates.py:53
-#, fuzzy
 msgctxt "alt. month"
 msgid "September"
 msgstr "ספטמבר"
 
 #: utils/dates.py:54
-#, fuzzy
 msgctxt "alt. month"
 msgid "October"
 msgstr "אוקטובר"
 
 #: utils/dates.py:55
-#, fuzzy
 msgctxt "alt. month"
 msgid "November"
 msgstr "נובמבר"
 
 #: utils/dates.py:56
-#, fuzzy
 msgctxt "alt. month"
 msgid "December"
 msgstr "דצמבר"
@@ -998,7 +987,7 @@ msgstr "או"
 #. Translators: This string is used as a separator between list elements
 #: utils/text.py:153
 msgid ", "
-msgstr ""
+msgstr ", "
 
 #: utils/timesince.py:21
 msgid "year"
@@ -1050,23 +1039,23 @@ msgstr "%(number)d %(type)s"
 msgid ", %(number)d %(type)s"
 msgstr ", %(number)d %(type)s"
 
-#: utils/translation/trans_real.py:562
+#: utils/translation/trans_real.py:568
 msgid "DATE_FORMAT"
 msgstr "d.m.Y"
 
-#: utils/translation/trans_real.py:563
+#: utils/translation/trans_real.py:569
 msgid "DATETIME_FORMAT"
 msgstr "d.m.‏Y H:i:s"
 
-#: utils/translation/trans_real.py:564
+#: utils/translation/trans_real.py:570
 msgid "TIME_FORMAT"
 msgstr "H:i:s"
 
-#: utils/translation/trans_real.py:585
+#: utils/translation/trans_real.py:591
 msgid "YEAR_MONTH_FORMAT"
 msgstr "m.Y"
 
-#: utils/translation/trans_real.py:586
+#: utils/translation/trans_real.py:592
 msgid "MONTH_DAY_FORMAT"
 msgstr "d.m"
 
@@ -1084,3 +1073,55 @@ msgstr "ה־%(verbose_name)s עודכן בהצלחה."
 #, python-format
 msgid "The %(verbose_name)s was deleted."
 msgstr "ה־%(verbose_name)s נמחק."
+
+#: views/generic/dates.py:33
+msgid "No year specified"
+msgstr ""
+
+#: views/generic/dates.py:58
+msgid "No month specified"
+msgstr ""
+
+#: views/generic/dates.py:99
+msgid "No day specified"
+msgstr ""
+
+#: views/generic/dates.py:138
+msgid "No week specified"
+msgstr ""
+
+#: views/generic/dates.py:198 views/generic/dates.py:214
+#, fuzzy, python-format
+msgid "No %(verbose_name_plural)s available"
+msgstr "ה־%(verbose_name)s נמחק."
+
+#: views/generic/dates.py:466
+#, python-format
+msgid ""
+"Future %(verbose_name_plural)s not available because %(class_name)s."
+"allow_future is False."
+msgstr ""
+
+#: views/generic/dates.py:500
+#, python-format
+msgid "Invalid date string '%(datestr)s' given format '%(format)s'"
+msgstr ""
+
+#: views/generic/detail.py:51
+#, fuzzy, python-format
+msgid "No %(verbose_name)s found matching the query"
+msgstr "ה־%(verbose_name)s עודכן בהצלחה."
+
+#: views/generic/list.py:47
+msgid "Page is not 'last', nor can it be converted to an int."
+msgstr ""
+
+#: views/generic/list.py:52
+#, python-format
+msgid "Invalid page (%(page_number)s)"
+msgstr ""
+
+#: views/generic/list.py:119
+#, python-format
+msgid "Empty list and '%(class_name)s.allow_empty' is False."
+msgstr ""

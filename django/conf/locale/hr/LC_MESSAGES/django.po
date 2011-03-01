@@ -1,17 +1,19 @@
+# This file is distributed under the same license as the Django package.
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-21 22:58+0100\n"
-"PO-Revision-Date: 2010-05-10 18:56+0200\n"
-"Last-Translator: Aljosa Mohorovic <aljosa.mohorovic@gmail.com>\n"
-"Language-Team: Django i18n team <django-i18n@googlegroups.com>\n"
+"POT-Creation-Date: 2011-02-28 17:35+0100\n"
+"PO-Revision-Date: 2011-02-22 00:09+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: Croatian <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms:  nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || "
-"n%100==4 ? 2 : 3);\n"
-"X-Generator: Lokalize 1.0\n"
+"Language: hr\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
+"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
 
 #: conf/global_settings.py:44
 msgid "Arabic"
@@ -66,256 +68,263 @@ msgid "Spanish"
 msgstr "Španjolski"
 
 #: conf/global_settings.py:57
-#, fuzzy
 msgid "Argentinian Spanish"
 msgstr "Argentinski španjolski"
 
 #: conf/global_settings.py:58
+#, fuzzy
+msgid "Mexican Spanish"
+msgstr "Argentinski španjolski"
+
+#: conf/global_settings.py:59
 msgid "Estonian"
 msgstr "Estonski"
 
-#: conf/global_settings.py:59
+#: conf/global_settings.py:60
 msgid "Basque"
 msgstr "Baskijski"
 
-#: conf/global_settings.py:60
+#: conf/global_settings.py:61
 msgid "Persian"
 msgstr "Perzijski"
 
-#: conf/global_settings.py:61
+#: conf/global_settings.py:62
 msgid "Finnish"
 msgstr "Finski"
 
-#: conf/global_settings.py:62
+#: conf/global_settings.py:63
 msgid "French"
 msgstr "Francuski"
 
-#: conf/global_settings.py:63
+#: conf/global_settings.py:64
 msgid "Frisian"
 msgstr "Frizijski"
 
-#: conf/global_settings.py:64
+#: conf/global_settings.py:65
 msgid "Irish"
 msgstr "Irski"
 
-#: conf/global_settings.py:65
+#: conf/global_settings.py:66
 msgid "Galician"
 msgstr "Galičanski"
 
-#: conf/global_settings.py:66
+#: conf/global_settings.py:67
 msgid "Hebrew"
 msgstr "Hebrejski"
 
-#: conf/global_settings.py:67
+#: conf/global_settings.py:68
 msgid "Hindi"
 msgstr "Hindi"
 
-#: conf/global_settings.py:68
+#: conf/global_settings.py:69
 msgid "Croatian"
 msgstr "Hrvatski"
 
-#: conf/global_settings.py:69
+#: conf/global_settings.py:70
 msgid "Hungarian"
 msgstr "Mađarski"
 
-#: conf/global_settings.py:70
+#: conf/global_settings.py:71
 msgid "Indonesian"
 msgstr "Indonezijski"
 
-#: conf/global_settings.py:71
+#: conf/global_settings.py:72
 msgid "Icelandic"
 msgstr "Islandski"
 
-#: conf/global_settings.py:72
+#: conf/global_settings.py:73
 msgid "Italian"
 msgstr "Talijanski"
 
-#: conf/global_settings.py:73
+#: conf/global_settings.py:74
 msgid "Japanese"
 msgstr "Japanski"
 
-#: conf/global_settings.py:74
+#: conf/global_settings.py:75
 msgid "Georgian"
 msgstr "Gruzijski"
 
-#: conf/global_settings.py:75
+#: conf/global_settings.py:76
 msgid "Khmer"
 msgstr "Kambođanski"
 
-#: conf/global_settings.py:76
+#: conf/global_settings.py:77
 msgid "Kannada"
 msgstr "Kannada"
 
-#: conf/global_settings.py:77
+#: conf/global_settings.py:78
 msgid "Korean"
 msgstr "Koreanski"
 
-#: conf/global_settings.py:78
+#: conf/global_settings.py:79
 msgid "Lithuanian"
 msgstr "Litvanski"
 
-#: conf/global_settings.py:79
+#: conf/global_settings.py:80
 msgid "Latvian"
 msgstr "Latvijski"
 
-#: conf/global_settings.py:80
+#: conf/global_settings.py:81
 msgid "Macedonian"
 msgstr "Makedonski"
 
-#: conf/global_settings.py:81
-#, fuzzy
-msgid "Malayalam"
-msgstr "Malaga"
-
 #: conf/global_settings.py:82
+msgid "Malayalam"
+msgstr ""
+
+#: conf/global_settings.py:83
 msgid "Mongolian"
 msgstr "Mongolski"
 
-#: conf/global_settings.py:83
+#: conf/global_settings.py:84
 msgid "Dutch"
 msgstr "Nizozemski"
 
-#: conf/global_settings.py:84
+#: conf/global_settings.py:85
 msgid "Norwegian"
 msgstr "Norveški"
 
-#: conf/global_settings.py:85
+#: conf/global_settings.py:86
 msgid "Norwegian Bokmal"
 msgstr "Norveški Bokmal"
 
-#: conf/global_settings.py:86
+#: conf/global_settings.py:87
 msgid "Norwegian Nynorsk"
 msgstr "Norveški Nynorsk"
 
-#: conf/global_settings.py:87
+#: conf/global_settings.py:88
 msgid "Punjabi"
 msgstr ""
 
-#: conf/global_settings.py:88
+#: conf/global_settings.py:89
 msgid "Polish"
 msgstr "Poljski"
 
-#: conf/global_settings.py:89
+#: conf/global_settings.py:90
 msgid "Portuguese"
 msgstr "Portugalski"
 
-#: conf/global_settings.py:90
+#: conf/global_settings.py:91
 msgid "Brazilian Portuguese"
 msgstr "Brazilski portugalski"
 
-#: conf/global_settings.py:91
+#: conf/global_settings.py:92
 msgid "Romanian"
 msgstr "Rumunjski"
 
-#: conf/global_settings.py:92
+#: conf/global_settings.py:93
 msgid "Russian"
 msgstr "Ruski"
 
-#: conf/global_settings.py:93
+#: conf/global_settings.py:94
 msgid "Slovak"
 msgstr "Slovački"
 
-#: conf/global_settings.py:94
+#: conf/global_settings.py:95
 msgid "Slovenian"
 msgstr "Slovenski"
 
-#: conf/global_settings.py:95
+#: conf/global_settings.py:96
 msgid "Albanian"
 msgstr "Albanski"
 
-#: conf/global_settings.py:96
+#: conf/global_settings.py:97
 msgid "Serbian"
 msgstr "Srpski"
 
-#: conf/global_settings.py:97
+#: conf/global_settings.py:98
 msgid "Serbian Latin"
 msgstr "Latinski srpski"
 
-#: conf/global_settings.py:98
+#: conf/global_settings.py:99
 msgid "Swedish"
 msgstr "Švedski"
 
-#: conf/global_settings.py:99
+#: conf/global_settings.py:100
 msgid "Tamil"
 msgstr "Tamilski"
 
-#: conf/global_settings.py:100
+#: conf/global_settings.py:101
 msgid "Telugu"
 msgstr "Teluški"
 
-#: conf/global_settings.py:101
+#: conf/global_settings.py:102
 msgid "Thai"
 msgstr "Thai (tajlandski)"
 
-#: conf/global_settings.py:102
+#: conf/global_settings.py:103
 msgid "Turkish"
 msgstr "Turski"
 
-#: conf/global_settings.py:103
+#: conf/global_settings.py:104
 msgid "Ukrainian"
 msgstr "Ukrajinski"
 
-#: conf/global_settings.py:104
+#: conf/global_settings.py:105
+msgid "Urdu"
+msgstr ""
+
+#: conf/global_settings.py:106
 msgid "Vietnamese"
 msgstr "Vijetnamski"
 
-#: conf/global_settings.py:105
+#: conf/global_settings.py:107
 msgid "Simplified Chinese"
 msgstr "Pojednostavljeni kineski"
 
-#: conf/global_settings.py:106
+#: conf/global_settings.py:108
 msgid "Traditional Chinese"
 msgstr "Tradicionalni kineski"
 
-#: core/validators.py:20 forms/fields.py:67
+#: core/validators.py:21 forms/fields.py:67
 msgid "Enter a valid value."
 msgstr "Unesite ispravnu vrijednost."
-
-#: core/validators.py:87 forms/fields.py:574
-msgid "Enter a valid URL."
-msgstr "Unesite ispravan URL."
 
 #: core/validators.py:89 forms/fields.py:575
 msgid "This URL appears to be a broken link."
 msgstr "Izgleda da je URL neispravan."
 
-#: core/validators.py:120 forms/fields.py:449
+#: core/validators.py:94 forms/fields.py:574
+msgid "Enter a valid URL."
+msgstr "Unesite ispravan URL."
+
+#: core/validators.py:138 forms/fields.py:449
 msgid "Enter a valid e-mail address."
 msgstr "Unesite ispravnu e-mail adresu."
 
-#: core/validators.py:123 forms/fields.py:958
+#: core/validators.py:141 forms/fields.py:958
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
 "Unesite ispravan 'slug' koji se sastoji samo od slova, brojeva, povlaka ili "
 "crtica."
 
-#: core/validators.py:126 forms/fields.py:951
+#: core/validators.py:144 forms/fields.py:951
 msgid "Enter a valid IPv4 address."
 msgstr "Unesite ispravnu IPv4 adresu."
 
-#: core/validators.py:129 db/models/fields/__init__.py:575
+#: core/validators.py:147 db/models/fields/__init__.py:575
 msgid "Enter only digits separated by commas."
 msgstr "Unesite samo brojeve razdvojene zarezom."
 
-#: core/validators.py:135
+#: core/validators.py:153
 #, python-format
 msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
 msgstr ""
 "Osigurajte da ova vrijednost ima %(limit_value)s (trenutno je %(show_value)"
 "s)."
 
-#: core/validators.py:153 forms/fields.py:222 forms/fields.py:275
+#: core/validators.py:171 forms/fields.py:222 forms/fields.py:275
 #, python-format
 msgid "Ensure this value is less than or equal to %(limit_value)s."
 msgstr "Osigurajte da je ova vrijednost manja ili jednaka %(limit_value)s."
 
-#: core/validators.py:158 forms/fields.py:223 forms/fields.py:276
+#: core/validators.py:176 forms/fields.py:223 forms/fields.py:276
 #, python-format
 msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr "Osigurajte da je ova vrijednost veća ili jednaka %(limit_value)s."
 
-#: core/validators.py:164
+#: core/validators.py:182
 #, python-format
 msgid ""
 "Ensure this value has at least %(limit_value)d characters (it has %"
@@ -324,7 +333,7 @@ msgstr ""
 "Osigurajte da ova vrijednost ima najmanje %(limit_value)d znakova (ima %"
 "(show_value)d)."
 
-#: core/validators.py:170
+#: core/validators.py:188
 #, python-format
 msgid ""
 "Ensure this value has at most %(limit_value)d characters (it has %"
@@ -333,18 +342,18 @@ msgstr ""
 "Osigurajte da ova vrijednost ima najviše %(limit_value)d znakova (ima %"
 "(show_value)d)."
 
-#: db/models/base.py:767
+#: db/models/base.py:769
 #, python-format
 msgid "%(field_name)s must be unique for %(date_field)s %(lookup)s."
 msgstr ""
 "%(field_name)s mora biti jedinstven pojam za %(date_field)s %(lookup)s."
 
-#: db/models/base.py:782 db/models/base.py:790
+#: db/models/base.py:784 db/models/base.py:792
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(model_name)s sa navedenim %(field_label)s već postoji."
 
-#: db/models/base.py:789 forms/models.py:581
+#: db/models/base.py:791 forms/models.py:560
 msgid "and"
 msgstr "i"
 
@@ -428,7 +437,7 @@ msgid "E-mail address"
 msgstr "E-mail adresa"
 
 #: db/models/fields/__init__.py:818 db/models/fields/files.py:220
-#: db/models/fields/files.py:339
+#: db/models/fields/files.py:326
 msgid "File path"
 msgstr "Put do datoteke"
 
@@ -476,24 +485,24 @@ msgstr "URL"
 msgid "XML text"
 msgstr "XML tekst"
 
-#: db/models/fields/related.py:804
+#: db/models/fields/related.py:815
 #, python-format
 msgid "Model %(model)s with pk %(pk)r does not exist."
 msgstr "Model %(model)s sa pk %(pk)r ne postoji."
 
-#: db/models/fields/related.py:806
+#: db/models/fields/related.py:817
 msgid "Foreign Key (type determined by related field)"
 msgstr "Foreign Key (type determined by related field)"
 
-#: db/models/fields/related.py:928
+#: db/models/fields/related.py:941
 msgid "One-to-one relationship"
 msgstr "One-to-one relationship"
 
-#: db/models/fields/related.py:990
+#: db/models/fields/related.py:1003
 msgid "Many-to-many relationship"
 msgstr "Many-to-many relationship"
 
-#: db/models/fields/related.py:1010
+#: db/models/fields/related.py:1023
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
@@ -578,31 +587,31 @@ msgstr ""
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr "Odaberite iz ponuđenog. %(value)s nije ponuđen kao opcija."
 
-#: forms/fields.py:726 forms/fields.py:814 forms/models.py:1018
+#: forms/fields.py:726 forms/fields.py:814 forms/models.py:983
 msgid "Enter a list of values."
 msgstr "Unesite listu vrijednosti."
 
-#: forms/formsets.py:308 forms/formsets.py:310
+#: forms/formsets.py:305 forms/formsets.py:307
 msgid "Order"
 msgstr "Redoslijed:"
 
-#: forms/formsets.py:312
+#: forms/formsets.py:309
 msgid "Delete"
 msgstr "Izbriši"
 
-#: forms/models.py:575
+#: forms/models.py:554
 #, python-format
 msgid "Please correct the duplicate data for %(field)s."
 msgstr "Ispravite duplicirane podatke za %(field)s."
 
-#: forms/models.py:579
+#: forms/models.py:558
 #, python-format
 msgid "Please correct the duplicate data for %(field)s, which must be unique."
 msgstr ""
 "Molimo ispravite duplicirane podatke za %(field)s, koji moraju biti "
 "jedinstveni."
 
-#: forms/models.py:585
+#: forms/models.py:564
 #, python-format
 msgid ""
 "Please correct the duplicate data for %(field_name)s which must be unique "
@@ -611,59 +620,57 @@ msgstr ""
 "Molimo ispravite duplicirane podatke za %(field_name)s koji moraju biti "
 "jedinstveni za %(lookup)s u %(date_field)s."
 
-#: forms/models.py:593
+#: forms/models.py:572
 msgid "Please correct the duplicate values below."
 msgstr "Molimo ispravite duplicirane vrijednosti ispod."
 
-#: forms/models.py:868
+#: forms/models.py:833
 msgid "The inline foreign key did not match the parent instance primary key."
 msgstr "The inline foreign key did not match the parent instance primary key."
 
-#: forms/models.py:929
+#: forms/models.py:894
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "Izaberite ispravnu opciju. Ta opcija nije jedna od dostupnih opcija."
 
-#: forms/models.py:1019
+#: forms/models.py:984
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "Odaberite iz ponuđenog. %s nije ponuđen kao opcija."
 
-#: forms/models.py:1021
+#: forms/models.py:986
 #, python-format
 msgid "\"%s\" is not a valid value for a primary key."
 msgstr "\"%s\" nije ispravna vrijednost za primarni kluč."
 
 #: forms/widgets.py:299
-#, fuzzy
 msgid "Currently"
-msgstr "Trenutno:"
+msgstr "Trenutno"
 
 #: forms/widgets.py:300
 msgid "Change"
 msgstr "Promijeni"
 
 #: forms/widgets.py:301
-#, fuzzy
 msgid "Clear"
-msgstr "Clare"
+msgstr ""
 
-#: forms/widgets.py:547
+#: forms/widgets.py:548
 msgid "Unknown"
 msgstr "Nepoznat pojam"
 
-#: forms/widgets.py:547
+#: forms/widgets.py:548
 msgid "Yes"
 msgstr "Da"
 
-#: forms/widgets.py:547
+#: forms/widgets.py:548
 msgid "No"
 msgstr "Ne"
 
-#: template/defaultfilters.py:774
+#: template/defaultfilters.py:767
 msgid "yes,no,maybe"
 msgstr "da,ne,možda"
 
-#: template/defaultfilters.py:805
+#: template/defaultfilters.py:795 template/defaultfilters.py:800
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
@@ -672,30 +679,30 @@ msgstr[1] "%(size)d byte-a"
 msgstr[2] "%(size)d byte-a"
 msgstr[3] "%(size)d byte-a"
 
-#: template/defaultfilters.py:807
+#: template/defaultfilters.py:802
 #, python-format
 msgid "%s KB"
-msgstr "%s KB"
+msgstr ""
+
+#: template/defaultfilters.py:804
+#, python-format
+msgid "%s MB"
+msgstr ""
+
+#: template/defaultfilters.py:806
+#, python-format
+msgid "%s GB"
+msgstr ""
+
+#: template/defaultfilters.py:808
+#, python-format
+msgid "%s TB"
+msgstr ""
 
 #: template/defaultfilters.py:809
 #, python-format
-msgid "%s MB"
-msgstr "%s MB"
-
-#: template/defaultfilters.py:811
-#, python-format
-msgid "%s GB"
-msgstr "%s GB"
-
-#: template/defaultfilters.py:813
-#, fuzzy, python-format
-msgid "%s TB"
-msgstr "%s KB"
-
-#: template/defaultfilters.py:814
-#, fuzzy, python-format
 msgid "%s PB"
-msgstr "%s KB"
+msgstr ""
 
 #: utils/dateformat.py:42
 msgid "p.m."
@@ -886,27 +893,27 @@ msgstr "Velj."
 #: utils/dates.py:33
 msgctxt "abbrev. month"
 msgid "March"
-msgstr "Ožujak"
+msgstr "Ožu."
 
 #: utils/dates.py:34
 msgctxt "abbrev. month"
 msgid "April"
-msgstr "Travanj"
+msgstr "Tra."
 
 #: utils/dates.py:35
 msgctxt "abbrev. month"
 msgid "May"
-msgstr "Svibanj"
+msgstr "Svi."
 
 #: utils/dates.py:36
 msgctxt "abbrev. month"
 msgid "June"
-msgstr "Lipanj"
+msgstr "Lip."
 
 #: utils/dates.py:37
 msgctxt "abbrev. month"
 msgid "July"
-msgstr "Srpanj"
+msgstr "Srp."
 
 #: utils/dates.py:38
 msgctxt "abbrev. month"
@@ -1064,23 +1071,23 @@ msgstr "%(number)d %(type)s"
 msgid ", %(number)d %(type)s"
 msgstr ", %(number)d %(type)s"
 
-#: utils/translation/trans_real.py:562
+#: utils/translation/trans_real.py:568
 msgid "DATE_FORMAT"
 msgstr "j. N Y."
 
-#: utils/translation/trans_real.py:563
+#: utils/translation/trans_real.py:569
 msgid "DATETIME_FORMAT"
 msgstr "j. N Y. G:i T"
 
-#: utils/translation/trans_real.py:564
+#: utils/translation/trans_real.py:570
 msgid "TIME_FORMAT"
 msgstr "G:i"
 
-#: utils/translation/trans_real.py:585
+#: utils/translation/trans_real.py:591
 msgid "YEAR_MONTH_FORMAT"
 msgstr "F Y."
 
-#: utils/translation/trans_real.py:586
+#: utils/translation/trans_real.py:592
 msgid "MONTH_DAY_FORMAT"
 msgstr "j. F"
 
@@ -1098,3 +1105,55 @@ msgstr "%(verbose_name)s je uspješno promijenjeno."
 #, python-format
 msgid "The %(verbose_name)s was deleted."
 msgstr "%(verbose_name)s je izbrisano."
+
+#: views/generic/dates.py:33
+msgid "No year specified"
+msgstr ""
+
+#: views/generic/dates.py:58
+msgid "No month specified"
+msgstr ""
+
+#: views/generic/dates.py:99
+msgid "No day specified"
+msgstr ""
+
+#: views/generic/dates.py:138
+msgid "No week specified"
+msgstr ""
+
+#: views/generic/dates.py:198 views/generic/dates.py:214
+#, fuzzy, python-format
+msgid "No %(verbose_name_plural)s available"
+msgstr "%(verbose_name)s je izbrisano."
+
+#: views/generic/dates.py:466
+#, python-format
+msgid ""
+"Future %(verbose_name_plural)s not available because %(class_name)s."
+"allow_future is False."
+msgstr ""
+
+#: views/generic/dates.py:500
+#, python-format
+msgid "Invalid date string '%(datestr)s' given format '%(format)s'"
+msgstr ""
+
+#: views/generic/detail.py:51
+#, fuzzy, python-format
+msgid "No %(verbose_name)s found matching the query"
+msgstr "%(verbose_name)s je uspješno promijenjeno."
+
+#: views/generic/list.py:47
+msgid "Page is not 'last', nor can it be converted to an int."
+msgstr ""
+
+#: views/generic/list.py:52
+#, python-format
+msgid "Invalid page (%(page_number)s)"
+msgstr ""
+
+#: views/generic/list.py:119
+#, python-format
+msgid "Empty list and '%(class_name)s.allow_empty' is False."
+msgstr ""

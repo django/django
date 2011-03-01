@@ -1,20 +1,19 @@
-# Django, ukrainian translation.
-# Copyright (C) 2008-2010
-# This file is distributed under the same license as the PACKAGE package.
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-21 23:02+0100\n"
-"PO-Revision-Date: 2010-04-06 00:02+0300\n"
-"Last-Translator: Mykola Zamkovoy <nickzam@gmail.com>\n"
-"Language-Team: UK <uk@li.org>\n"
+"POT-Creation-Date: 2011-02-28 17:38+0100\n"
+"PO-Revision-Date: 2011-02-22 00:09+0000\n"
+"Last-Translator: sergikoff <sergikoff88@gmail.com>\n"
+"Language-Team: Ukrainian <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
-"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"Language: uk\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
+"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
 
 #: conf/global_settings.py:44
 msgid "Arabic"
@@ -29,9 +28,8 @@ msgid "Bengali"
 msgstr "Бенгальська"
 
 #: conf/global_settings.py:47
-#, fuzzy
 msgid "Bosnian"
-msgstr "Румунська"
+msgstr "Боснійська"
 
 #: conf/global_settings.py:48
 msgid "Catalan"
@@ -62,322 +60,319 @@ msgid "English"
 msgstr "Англійська"
 
 #: conf/global_settings.py:55
-#, fuzzy
 msgid "British English"
-msgstr "Англійська"
+msgstr "Англійська (Великобританія)"
 
 #: conf/global_settings.py:56
 msgid "Spanish"
 msgstr "Іспанська"
 
 #: conf/global_settings.py:57
-#, fuzzy
 msgid "Argentinian Spanish"
-msgstr "Аргентинська іспанська"
+msgstr "Іспанська (Аргентина)"
 
 #: conf/global_settings.py:58
+#, fuzzy
+msgid "Mexican Spanish"
+msgstr "Іспанська (Аргентина)"
+
+#: conf/global_settings.py:59
 msgid "Estonian"
 msgstr "Румунська"
 
-#: conf/global_settings.py:59
-msgid "Basque"
-msgstr "Баскський"
-
 #: conf/global_settings.py:60
+msgid "Basque"
+msgstr "Баскська"
+
+#: conf/global_settings.py:61
 msgid "Persian"
 msgstr "Перська"
 
-#: conf/global_settings.py:61
+#: conf/global_settings.py:62
 msgid "Finnish"
 msgstr "Фінська"
 
-#: conf/global_settings.py:62
+#: conf/global_settings.py:63
 msgid "French"
 msgstr "Французька"
 
-#: conf/global_settings.py:63
-#, fuzzy
-msgid "Frisian"
-msgstr "Фризляндія"
-
 #: conf/global_settings.py:64
+msgid "Frisian"
+msgstr "Фризька"
+
+#: conf/global_settings.py:65
 msgid "Irish"
 msgstr "Ірландська"
 
-#: conf/global_settings.py:65
+#: conf/global_settings.py:66
 msgid "Galician"
 msgstr "Галіційська"
 
-#: conf/global_settings.py:66
+#: conf/global_settings.py:67
 msgid "Hebrew"
 msgstr "Іврит"
 
-#: conf/global_settings.py:67
+#: conf/global_settings.py:68
 msgid "Hindi"
 msgstr "Хінді"
 
-#: conf/global_settings.py:68
+#: conf/global_settings.py:69
 msgid "Croatian"
 msgstr "Хорватська"
 
-#: conf/global_settings.py:69
+#: conf/global_settings.py:70
 msgid "Hungarian"
 msgstr "Угорська"
 
-#: conf/global_settings.py:70
-#, fuzzy
-msgid "Indonesian"
-msgstr "Македонська"
-
 #: conf/global_settings.py:71
+msgid "Indonesian"
+msgstr "Індонезійська"
+
+#: conf/global_settings.py:72
 msgid "Icelandic"
 msgstr "Ісландська"
 
-#: conf/global_settings.py:72
+#: conf/global_settings.py:73
 msgid "Italian"
 msgstr "Італійська"
 
-#: conf/global_settings.py:73
+#: conf/global_settings.py:74
 msgid "Japanese"
 msgstr "Японська"
 
-#: conf/global_settings.py:74
+#: conf/global_settings.py:75
 msgid "Georgian"
 msgstr "Грузинська"
 
-#: conf/global_settings.py:75
+#: conf/global_settings.py:76
 msgid "Khmer"
 msgstr "Кхмерська"
 
-#: conf/global_settings.py:76
+#: conf/global_settings.py:77
 msgid "Kannada"
 msgstr "Канадська"
 
-#: conf/global_settings.py:77
+#: conf/global_settings.py:78
 msgid "Korean"
 msgstr "Корейська"
 
-#: conf/global_settings.py:78
+#: conf/global_settings.py:79
 msgid "Lithuanian"
 msgstr "Литовська"
 
-#: conf/global_settings.py:79
+#: conf/global_settings.py:80
 msgid "Latvian"
 msgstr "Латвійська"
 
-#: conf/global_settings.py:80
+#: conf/global_settings.py:81
 msgid "Macedonian"
 msgstr "Македонська"
 
-#: conf/global_settings.py:81
-#, fuzzy
-msgid "Malayalam"
-msgstr "Малага"
-
 #: conf/global_settings.py:82
-#, fuzzy
-msgid "Mongolian"
-msgstr "Македонська"
+msgid "Malayalam"
+msgstr "Малаялам"
 
 #: conf/global_settings.py:83
+msgid "Mongolian"
+msgstr "Монгольська"
+
+#: conf/global_settings.py:84
 msgid "Dutch"
 msgstr "Голландська"
 
-#: conf/global_settings.py:84
+#: conf/global_settings.py:85
 msgid "Norwegian"
 msgstr "Норвезька"
 
-#: conf/global_settings.py:85
-#, fuzzy
-msgid "Norwegian Bokmal"
-msgstr "Норвезька"
-
 #: conf/global_settings.py:86
-#, fuzzy
-msgid "Norwegian Nynorsk"
-msgstr "Норвезька"
+msgid "Norwegian Bokmal"
+msgstr "Норвезька (Букмол)"
 
 #: conf/global_settings.py:87
-msgid "Punjabi"
-msgstr ""
+msgid "Norwegian Nynorsk"
+msgstr "Норвезька (Нюнорськ)"
 
 #: conf/global_settings.py:88
+msgid "Punjabi"
+msgstr "Панджабі"
+
+#: conf/global_settings.py:89
 msgid "Polish"
 msgstr "Польська"
 
-#: conf/global_settings.py:89
+#: conf/global_settings.py:90
 msgid "Portuguese"
 msgstr "Португальська"
 
-#: conf/global_settings.py:90
+#: conf/global_settings.py:91
 msgid "Brazilian Portuguese"
 msgstr "Бразильска"
 
-#: conf/global_settings.py:91
+#: conf/global_settings.py:92
 msgid "Romanian"
 msgstr "Румунська"
 
-#: conf/global_settings.py:92
+#: conf/global_settings.py:93
 msgid "Russian"
 msgstr "Російська"
 
-#: conf/global_settings.py:93
+#: conf/global_settings.py:94
 msgid "Slovak"
 msgstr "Словацька"
 
-#: conf/global_settings.py:94
+#: conf/global_settings.py:95
 msgid "Slovenian"
 msgstr "Словенська"
 
-#: conf/global_settings.py:95
-#, fuzzy
-msgid "Albanian"
-msgstr "Аліканте"
-
 #: conf/global_settings.py:96
+msgid "Albanian"
+msgstr "Албанська"
+
+#: conf/global_settings.py:97
 msgid "Serbian"
 msgstr "Сербська"
 
-#: conf/global_settings.py:97
-#, fuzzy
-msgid "Serbian Latin"
-msgstr "Сербська"
-
 #: conf/global_settings.py:98
+msgid "Serbian Latin"
+msgstr "Сербська (латинка)"
+
+#: conf/global_settings.py:99
 msgid "Swedish"
 msgstr "Шведська"
 
-#: conf/global_settings.py:99
+#: conf/global_settings.py:100
 msgid "Tamil"
 msgstr "Тамільська"
 
-#: conf/global_settings.py:100
+#: conf/global_settings.py:101
 msgid "Telugu"
 msgstr "Телугу"
 
-#: conf/global_settings.py:101
+#: conf/global_settings.py:102
 msgid "Thai"
 msgstr "Тайська"
 
-#: conf/global_settings.py:102
+#: conf/global_settings.py:103
 msgid "Turkish"
 msgstr "Турецька"
 
-#: conf/global_settings.py:103
+#: conf/global_settings.py:104
 msgid "Ukrainian"
 msgstr "Українська"
 
-#: conf/global_settings.py:104
-#, fuzzy
-msgid "Vietnamese"
-msgstr "Відень"
-
 #: conf/global_settings.py:105
+msgid "Urdu"
+msgstr ""
+
+#: conf/global_settings.py:106
+msgid "Vietnamese"
+msgstr "В'єтнамський"
+
+#: conf/global_settings.py:107
 msgid "Simplified Chinese"
 msgstr "Китайська спрощена"
 
-#: conf/global_settings.py:106
+#: conf/global_settings.py:108
 msgid "Traditional Chinese"
 msgstr "Китайська традиційна"
 
-#: core/validators.py:20 forms/fields.py:67
+#: core/validators.py:21 forms/fields.py:67
 msgid "Enter a valid value."
 msgstr "Уведіть коректне значення."
-
-#: core/validators.py:87 forms/fields.py:574
-msgid "Enter a valid URL."
-msgstr "Уведіть коректний URL."
 
 #: core/validators.py:89 forms/fields.py:575
 msgid "This URL appears to be a broken link."
 msgstr "URL %s є пошкодженим посиланням."
 
-#: core/validators.py:120 forms/fields.py:449
+#: core/validators.py:94 forms/fields.py:574
+msgid "Enter a valid URL."
+msgstr "Уведіть коректний URL."
+
+#: core/validators.py:138 forms/fields.py:449
 msgid "Enter a valid e-mail address."
 msgstr "Уведіть коректну e-mail адресу."
 
-#: core/validators.py:123 forms/fields.py:958
+#: core/validators.py:141 forms/fields.py:958
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
 "Введіть коректне значення 'slug' (короткого заголовку), що може містити "
 "тільки літери, числа, символи підкреслювання та дефіси."
 
-#: core/validators.py:126 forms/fields.py:951
+#: core/validators.py:144 forms/fields.py:951
 msgid "Enter a valid IPv4 address."
 msgstr "Введіть коректну IPv4 адресу."
 
-#: core/validators.py:129 db/models/fields/__init__.py:575
+#: core/validators.py:147 db/models/fields/__init__.py:575
 msgid "Enter only digits separated by commas."
 msgstr "Введіть тільки цифри, що розділені комами."
 
-#: core/validators.py:135
-#, fuzzy, python-format
+#: core/validators.py:153
+#, python-format
 msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
 msgstr ""
-"Переконайтеся, що це значення має не менще %(min)d символів (зараз %(length)"
-"d)."
+"Переконайтеся, що це значення дорівнює %(limit_value)s (зараз %(show_value)"
+"s)."
 
-#: core/validators.py:153 forms/fields.py:222 forms/fields.py:275
-#, fuzzy, python-format
+#: core/validators.py:171 forms/fields.py:222 forms/fields.py:275
+#, python-format
 msgid "Ensure this value is less than or equal to %(limit_value)s."
-msgstr "Переконайтеся, що це значення менше або дорівнює %s."
+msgstr "Переконайтеся, що це значення менше чи дорівнює %(limit_value)s."
 
-#: core/validators.py:158 forms/fields.py:223 forms/fields.py:276
-#, fuzzy, python-format
+#: core/validators.py:176 forms/fields.py:223 forms/fields.py:276
+#, python-format
 msgid "Ensure this value is greater than or equal to %(limit_value)s."
-msgstr "Переконайтеся, що це значення більше або дорівнює %s."
+msgstr "Переконайтеся, що це значення більше чи дорівнює %(limit_value)s."
 
-#: core/validators.py:164
-#, fuzzy, python-format
+#: core/validators.py:182
+#, python-format
 msgid ""
 "Ensure this value has at least %(limit_value)d characters (it has %"
 "(show_value)d)."
 msgstr ""
-"Переконайтеся, що це значення має не менще %(min)d символів (зараз %(length)"
-"d)."
+"Переконайтеся, що це значення має щонайменше %(limit_value)d символів (зараз "
+"%(show_value)d)."
 
-#: core/validators.py:170
-#, fuzzy, python-format
+#: core/validators.py:188
+#, python-format
 msgid ""
 "Ensure this value has at most %(limit_value)d characters (it has %"
 "(show_value)d)."
 msgstr ""
-"Переконайтеся, що це значення має не більше %(max)d символів (зараз %(length)"
-"d)."
+"Переконайтеся, що це значення має щонайбільше %(limit_value)d символів "
+"(зараз %(show_value)d)."
 
-#: db/models/base.py:767
-#, fuzzy, python-format
+#: db/models/base.py:769
+#, python-format
 msgid "%(field_name)s must be unique for %(date_field)s %(lookup)s."
-msgstr "Це поле повинно бути заданим, у разі якщо %(field)s є %(value)s"
+msgstr "%(field_name)s має бути унікальним для %(date_field)s %(lookup)s."
 
-#: db/models/base.py:782 db/models/base.py:790
+#: db/models/base.py:784 db/models/base.py:792
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(model_name)s з таким %(field_label)s вже існує."
 
-#: db/models/base.py:789 forms/models.py:581
+#: db/models/base.py:791 forms/models.py:560
 msgid "and"
 msgstr "та"
 
 #: db/models/fields/__init__.py:63
 #, python-format
 msgid "Value %r is not a valid choice."
-msgstr ""
+msgstr "Значення %r не є дозволеним вибором."
 
 #: db/models/fields/__init__.py:64
 msgid "This field cannot be null."
 msgstr "Це поле не може бути пустим."
 
 #: db/models/fields/__init__.py:65
-#, fuzzy
 msgid "This field cannot be blank."
-msgstr "Це поле не може бути пустим."
+msgstr "Це поле не може бути порожнім."
 
 #: db/models/fields/__init__.py:70
 #, python-format
 msgid "Field of type: %(field_type)s"
-msgstr ""
+msgstr "Тип поля: %(field_type)s"
 
 #: db/models/fields/__init__.py:451 db/models/fields/__init__.py:871
 #: db/models/fields/__init__.py:980 db/models/fields/__init__.py:991
@@ -398,9 +393,9 @@ msgid "Boolean (Either True or False)"
 msgstr "Булеве значення (True або False)"
 
 #: db/models/fields/__init__.py:542 db/models/fields/__init__.py:1001
-#, fuzzy, python-format
+#, python-format
 msgid "String (up to %(max_length)s)"
-msgstr "Рядок (до %(maxlength)s символів)"
+msgstr "Рядок (до %(max_length)s)"
 
 #: db/models/fields/__init__.py:570
 msgid "Comma-separated integers"
@@ -440,14 +435,13 @@ msgid "E-mail address"
 msgstr "E-mail адреса"
 
 #: db/models/fields/__init__.py:818 db/models/fields/files.py:220
-#: db/models/fields/files.py:339
+#: db/models/fields/files.py:326
 msgid "File path"
 msgstr "Шлях до файла"
 
 #: db/models/fields/__init__.py:841
-#, fuzzy
 msgid "This value must be a float."
-msgstr "Це значення повинно бути, принаймні %s."
+msgstr "Це значення має бути дійсним числом."
 
 #: db/models/fields/__init__.py:843
 msgid "Floating point number"
@@ -455,7 +449,7 @@ msgstr "Число з плаваючою комою"
 
 #: db/models/fields/__init__.py:902
 msgid "Big (8 byte) integer"
-msgstr ""
+msgstr "Велике (8 байтів) ціле число"
 
 #: db/models/fields/__init__.py:915
 msgid "IP address"
@@ -489,24 +483,24 @@ msgstr "URL"
 msgid "XML text"
 msgstr "текст XML"
 
-#: db/models/fields/related.py:804
-#, fuzzy, python-format
+#: db/models/fields/related.py:815
+#, python-format
 msgid "Model %(model)s with pk %(pk)r does not exist."
-msgstr "%(name)s об'єкт з первинним ключем %(key)r не існує."
+msgstr "Моделі %(model)s з ключем %(pk)r не існує."
 
-#: db/models/fields/related.py:806
+#: db/models/fields/related.py:817
 msgid "Foreign Key (type determined by related field)"
-msgstr ""
+msgstr "Зовнішній ключ (тип визначається відповідно поля)"
 
-#: db/models/fields/related.py:928
+#: db/models/fields/related.py:941
 msgid "One-to-one relationship"
-msgstr ""
+msgstr "Один-до-одного"
 
-#: db/models/fields/related.py:990
+#: db/models/fields/related.py:1003
 msgid "Many-to-many relationship"
-msgstr ""
+msgstr "Багато-до-багатьох"
 
-#: db/models/fields/related.py:1010
+#: db/models/fields/related.py:1023
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
@@ -565,16 +559,18 @@ msgid "The submitted file is empty."
 msgstr "Переданий файл порожній."
 
 #: forms/fields.py:463
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Ensure this filename has at most %(max)d characters (it has %(length)d)."
 msgstr ""
-"Переконайтеся, що це значення має не більше %(max)d символів (зараз %(length)"
-"d)."
+"Переконайтеся, що ім'я файлу містить щонайбільше %(max)d символів (зараз %"
+"(length)d)."
 
 #: forms/fields.py:464
 msgid "Please either submit a file or check the clear checkbox, not both."
 msgstr ""
+"Будь ласка, або завантажте файл, або відмітьте прапорець очищення, а не "
+"обидва варіанти одразу"
 
 #: forms/fields.py:518
 msgid ""
@@ -589,122 +585,124 @@ msgstr ""
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr "Зробить коректний вибір, %(value)s немає серед варіантів вибору."
 
-#: forms/fields.py:726 forms/fields.py:814 forms/models.py:1018
+#: forms/fields.py:726 forms/fields.py:814 forms/models.py:983
 msgid "Enter a list of values."
 msgstr "Введіть список значень."
 
-#: forms/formsets.py:308 forms/formsets.py:310
+#: forms/formsets.py:305 forms/formsets.py:307
 msgid "Order"
 msgstr "Послідовність"
 
-#: forms/formsets.py:312
+#: forms/formsets.py:309
 msgid "Delete"
 msgstr "Видалити"
 
-#: forms/models.py:575
-#, fuzzy, python-format
+#: forms/models.py:554
+#, python-format
 msgid "Please correct the duplicate data for %(field)s."
-msgstr "Будь ласка, виправте помилку, що зазначена нижче"
+msgstr "Будь ласка, виправте повторювані дані для поля %(field)s."
 
-#: forms/models.py:579
+#: forms/models.py:558
 #, python-format
 msgid "Please correct the duplicate data for %(field)s, which must be unique."
 msgstr ""
+"Будь ласка, виправте повторювані дані для поля %(field)s, яке має бути "
+"унікальним."
 
-#: forms/models.py:585
+#: forms/models.py:564
 #, python-format
 msgid ""
 "Please correct the duplicate data for %(field_name)s which must be unique "
 "for the %(lookup)s in %(date_field)s."
 msgstr ""
+"Будь ласка, виправте повторювані дані для поля %(field_name)s, яке має бути "
+"унікальним для вибірки %(lookup)s на %(date_field)s."
 
-#: forms/models.py:593
-#, fuzzy
+#: forms/models.py:572
 msgid "Please correct the duplicate values below."
-msgstr "Будь ласка, виправте помилку, що зазначена нижче"
+msgstr "Будь ласка, виправте повторювані значення нижче."
 
-#: forms/models.py:868
+#: forms/models.py:833
 msgid "The inline foreign key did not match the parent instance primary key."
 msgstr ""
 "Зв'язаний зовнішній ключ не відповідає первісному ключу батьківського "
 "екземпляру."
 
-#: forms/models.py:929
+#: forms/models.py:894
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "Зробить коректний вибір. Такого варіанту нема серед доступних."
 
-#: forms/models.py:1019
+#: forms/models.py:984
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "Зробить коректний вибір. Такого варіанту %s нема серед доступних."
 
-#: forms/models.py:1021
+#: forms/models.py:986
 #, python-format
 msgid "\"%s\" is not a valid value for a primary key."
-msgstr ""
+msgstr "\"%s\" не є допустимим значенням для первинного ключа."
 
 #: forms/widgets.py:299
-#, fuzzy
 msgid "Currently"
-msgstr "Зараз:"
+msgstr "Наразі"
 
 #: forms/widgets.py:300
 msgid "Change"
 msgstr "Змінити"
 
 #: forms/widgets.py:301
-#, fuzzy
 msgid "Clear"
-msgstr "рік"
+msgstr "Очистити"
 
-#: forms/widgets.py:547
+#: forms/widgets.py:548
 msgid "Unknown"
 msgstr "Невідомо"
 
-#: forms/widgets.py:547
+#: forms/widgets.py:548
 msgid "Yes"
 msgstr "Так"
 
-#: forms/widgets.py:547
+#: forms/widgets.py:548
 msgid "No"
 msgstr "Ні"
 
-#: template/defaultfilters.py:774
+#: template/defaultfilters.py:767
 msgid "yes,no,maybe"
 msgstr "так,ні,можливо"
 
-#: template/defaultfilters.py:805
+#: template/defaultfilters.py:795 template/defaultfilters.py:800
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d байт"
 msgstr[1] "%(size)d байти"
 msgstr[2] "%(size)d байтів"
+msgstr[3] "%(size)d байтів"
 
-#: template/defaultfilters.py:807
+#: template/defaultfilters.py:802
 #, python-format
 msgid "%s KB"
-msgstr "%s КБ"
+msgstr "%s Кб"
+
+#: template/defaultfilters.py:804
+#, python-format
+msgid "%s MB"
+msgstr "%s Мб"
+
+#: template/defaultfilters.py:806
+#, python-format
+msgid "%s GB"
+msgstr "%s Гб"
+
+#: template/defaultfilters.py:808
+#, python-format
+msgid "%s TB"
+msgstr "%s Тб"
 
 #: template/defaultfilters.py:809
 #, python-format
-msgid "%s MB"
-msgstr "%s МБ"
-
-#: template/defaultfilters.py:811
-#, python-format
-msgid "%s GB"
-msgstr "%s ГБ"
-
-#: template/defaultfilters.py:813
-#, fuzzy, python-format
-msgid "%s TB"
-msgstr "%s КБ"
-
-#: template/defaultfilters.py:814
-#, fuzzy, python-format
 msgid "%s PB"
-msgstr "%s КБ"
+msgstr "%s Пб"
 
 #: utils/dateformat.py:42
 msgid "p.m."
@@ -940,7 +938,7 @@ msgstr "Лис."
 #: utils/dates.py:42
 msgctxt "abbrev. month"
 msgid "Dec."
-msgstr "Груд."
+msgstr "Гру."
 
 #: utils/dates.py:45
 msgctxt "alt. month"
@@ -1009,7 +1007,7 @@ msgstr "або"
 #. Translators: This string is used as a separator between list elements
 #: utils/text.py:153
 msgid ", "
-msgstr ""
+msgstr ", "
 
 #: utils/timesince.py:21
 msgid "year"
@@ -1017,6 +1015,7 @@ msgid_plural "years"
 msgstr[0] "рік"
 msgstr[1] "роки"
 msgstr[2] "років"
+msgstr[3] "років"
 
 #: utils/timesince.py:22
 msgid "month"
@@ -1024,6 +1023,7 @@ msgid_plural "months"
 msgstr[0] "місяць"
 msgstr[1] "місяці"
 msgstr[2] "місяців"
+msgstr[3] "місяців"
 
 #: utils/timesince.py:23
 msgid "week"
@@ -1031,6 +1031,7 @@ msgid_plural "weeks"
 msgstr[0] "тиждень"
 msgstr[1] "тижні"
 msgstr[2] "тижнів"
+msgstr[3] "тижнів"
 
 #: utils/timesince.py:24
 msgid "day"
@@ -1038,6 +1039,7 @@ msgid_plural "days"
 msgstr[0] "день"
 msgstr[1] "дні"
 msgstr[2] "днів"
+msgstr[3] "днів"
 
 #: utils/timesince.py:25
 msgid "hour"
@@ -1045,6 +1047,7 @@ msgid_plural "hours"
 msgstr[0] "година"
 msgstr[1] "години"
 msgstr[2] "годин"
+msgstr[3] "годин"
 
 #: utils/timesince.py:26
 msgid "minute"
@@ -1052,6 +1055,7 @@ msgid_plural "minutes"
 msgstr[0] "хвилина"
 msgstr[1] "хвилини"
 msgstr[2] "хвилин"
+msgstr[3] "хвилин"
 
 #: utils/timesince.py:45
 msgid "minutes"
@@ -1067,23 +1071,23 @@ msgstr "%(number)d %(type)s"
 msgid ", %(number)d %(type)s"
 msgstr ", %(number)d %(type)s"
 
-#: utils/translation/trans_real.py:562
+#: utils/translation/trans_real.py:568
 msgid "DATE_FORMAT"
 msgstr "d.m.Y"
 
-#: utils/translation/trans_real.py:563
+#: utils/translation/trans_real.py:569
 msgid "DATETIME_FORMAT"
 msgstr "d.m.Y H:i"
 
-#: utils/translation/trans_real.py:564
+#: utils/translation/trans_real.py:570
 msgid "TIME_FORMAT"
 msgstr "H:i"
 
-#: utils/translation/trans_real.py:585
+#: utils/translation/trans_real.py:591
 msgid "YEAR_MONTH_FORMAT"
 msgstr "d.m.Y"
 
-#: utils/translation/trans_real.py:586
+#: utils/translation/trans_real.py:592
 msgid "MONTH_DAY_FORMAT"
 msgstr "d.m.Y"
 
@@ -1101,3 +1105,55 @@ msgstr "Об'єкт %(verbose_name)s був успішно змінений."
 #, python-format
 msgid "The %(verbose_name)s was deleted."
 msgstr "Об'єкт %(verbose_name)s був успішно видалений."
+
+#: views/generic/dates.py:33
+msgid "No year specified"
+msgstr ""
+
+#: views/generic/dates.py:58
+msgid "No month specified"
+msgstr ""
+
+#: views/generic/dates.py:99
+msgid "No day specified"
+msgstr ""
+
+#: views/generic/dates.py:138
+msgid "No week specified"
+msgstr ""
+
+#: views/generic/dates.py:198 views/generic/dates.py:214
+#, fuzzy, python-format
+msgid "No %(verbose_name_plural)s available"
+msgstr "Об'єкт %(verbose_name)s був успішно видалений."
+
+#: views/generic/dates.py:466
+#, python-format
+msgid ""
+"Future %(verbose_name_plural)s not available because %(class_name)s."
+"allow_future is False."
+msgstr ""
+
+#: views/generic/dates.py:500
+#, python-format
+msgid "Invalid date string '%(datestr)s' given format '%(format)s'"
+msgstr ""
+
+#: views/generic/detail.py:51
+#, fuzzy, python-format
+msgid "No %(verbose_name)s found matching the query"
+msgstr "Об'єкт %(verbose_name)s був успішно змінений."
+
+#: views/generic/list.py:47
+msgid "Page is not 'last', nor can it be converted to an int."
+msgstr ""
+
+#: views/generic/list.py:52
+#, python-format
+msgid "Invalid page (%(page_number)s)"
+msgstr ""
+
+#: views/generic/list.py:119
+#, python-format
+msgid "Empty list and '%(class_name)s.allow_empty' is False."
+msgstr ""

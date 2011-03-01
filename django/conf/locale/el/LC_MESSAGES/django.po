@@ -1,38 +1,34 @@
-# translation of django.po to el
-# Copyright (C) 2006 and beyond
-# This file is distributed under the same license as the DJANGO package.
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-21 22:57+0100\n"
-"PO-Revision-Date: 2007-09-03 04:19+0100\n"
-"Last-Translator: Dimitris Glezos <dimitris@glezos.com>\n"
-"Language-Team: el <fedora-trans-el@redhat.com>\n"
+"POT-Creation-Date: 2011-02-28 17:33+0100\n"
+"PO-Revision-Date: 2011-02-22 00:09+0000\n"
+"Last-Translator: glezos <glezos@indifex.com>\n"
+"Language-Team: Greek <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.11.4\n"
-"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
+"Language: el\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: conf/global_settings.py:44
 msgid "Arabic"
 msgstr "Αραβικά"
 
 #: conf/global_settings.py:45
-#, fuzzy
 msgid "Bulgarian"
-msgstr "Ουγγρικά"
+msgstr "Βουλγαρικά"
 
 #: conf/global_settings.py:46
 msgid "Bengali"
 msgstr "Μπενγκάλι"
 
 #: conf/global_settings.py:47
-#, fuzzy
 msgid "Bosnian"
-msgstr "Ρουμανικά"
+msgstr "Βοσνιακά"
 
 #: conf/global_settings.py:48
 msgid "Catalan"
@@ -63,322 +59,307 @@ msgid "English"
 msgstr "Αγγλικά"
 
 #: conf/global_settings.py:55
-#, fuzzy
 msgid "British English"
-msgstr "Αγγλικά"
+msgstr "Αγγλικά Βρετανίας"
 
 #: conf/global_settings.py:56
 msgid "Spanish"
 msgstr "Ισπανικά"
 
 #: conf/global_settings.py:57
-#, fuzzy
 msgid "Argentinian Spanish"
 msgstr "Ισπανικά Αργεντινής"
 
 #: conf/global_settings.py:58
 #, fuzzy
-msgid "Estonian"
-msgstr "Ρουμανικά"
+msgid "Mexican Spanish"
+msgstr "Ισπανικά Αργεντινής"
 
 #: conf/global_settings.py:59
+msgid "Estonian"
+msgstr "Εσθονικά"
+
+#: conf/global_settings.py:60
 msgid "Basque"
 msgstr ""
 
-#: conf/global_settings.py:60
-#, fuzzy
-msgid "Persian"
-msgstr "Σερβικά"
-
 #: conf/global_settings.py:61
+msgid "Persian"
+msgstr "Περσικά"
+
+#: conf/global_settings.py:62
 msgid "Finnish"
 msgstr "Φινλανδικά"
 
-#: conf/global_settings.py:62
+#: conf/global_settings.py:63
 msgid "French"
 msgstr "Γαλλικά"
 
-#: conf/global_settings.py:63
-#, fuzzy
-msgid "Frisian"
-msgstr "Βραζιλιάνικα"
-
 #: conf/global_settings.py:64
-#, fuzzy
-msgid "Irish"
-msgstr "Τουρκικά"
+msgid "Frisian"
+msgstr ""
 
 #: conf/global_settings.py:65
+msgid "Irish"
+msgstr "Ιρλανδικά"
+
+#: conf/global_settings.py:66
 msgid "Galician"
 msgstr ""
 
-#: conf/global_settings.py:66
+#: conf/global_settings.py:67
 msgid "Hebrew"
 msgstr "Εβραϊκά"
 
-#: conf/global_settings.py:67
-msgid "Hindi"
-msgstr ""
-
 #: conf/global_settings.py:68
-#, fuzzy
-msgid "Croatian"
-msgstr "Καταλανικά"
+msgid "Hindi"
+msgstr "Ινδικά"
 
 #: conf/global_settings.py:69
+msgid "Croatian"
+msgstr "Κροατικά"
+
+#: conf/global_settings.py:70
 msgid "Hungarian"
 msgstr "Ουγγρικά"
 
-#: conf/global_settings.py:70
-#, fuzzy
-msgid "Indonesian"
-msgstr "Μακεδονικά"
-
 #: conf/global_settings.py:71
+msgid "Indonesian"
+msgstr ""
+
+#: conf/global_settings.py:72
 msgid "Icelandic"
 msgstr "Ισλανδικά"
 
-#: conf/global_settings.py:72
+#: conf/global_settings.py:73
 msgid "Italian"
 msgstr "Ιταλικά"
 
-#: conf/global_settings.py:73
+#: conf/global_settings.py:74
 msgid "Japanese"
 msgstr "Γιαπωνέζικα"
 
-#: conf/global_settings.py:74
-#, fuzzy
-msgid "Georgian"
-msgstr "Γερμανικά"
-
 #: conf/global_settings.py:75
-msgid "Khmer"
+msgid "Georgian"
 msgstr ""
 
 #: conf/global_settings.py:76
-msgid "Kannada"
+msgid "Khmer"
 msgstr ""
 
 #: conf/global_settings.py:77
-#, fuzzy
-msgid "Korean"
-msgstr "Νορβηγικά"
+msgid "Kannada"
+msgstr "Κανάντα"
 
 #: conf/global_settings.py:78
+msgid "Korean"
+msgstr "Κορεάτικα"
+
+#: conf/global_settings.py:79
 msgid "Lithuanian"
 msgstr ""
 
-#: conf/global_settings.py:79
+#: conf/global_settings.py:80
 msgid "Latvian"
 msgstr ""
 
-#: conf/global_settings.py:80
+#: conf/global_settings.py:81
 msgid "Macedonian"
 msgstr "Μακεδονικά"
 
-#: conf/global_settings.py:81
+#: conf/global_settings.py:82
 msgid "Malayalam"
 msgstr ""
 
-#: conf/global_settings.py:82
-#, fuzzy
-msgid "Mongolian"
-msgstr "Μακεδονικά"
-
 #: conf/global_settings.py:83
+msgid "Mongolian"
+msgstr ""
+
+#: conf/global_settings.py:84
 msgid "Dutch"
 msgstr "Ολλανδικά"
 
-#: conf/global_settings.py:84
+#: conf/global_settings.py:85
 msgid "Norwegian"
 msgstr "Νορβηγικά"
 
-#: conf/global_settings.py:85
-#, fuzzy
-msgid "Norwegian Bokmal"
-msgstr "Νορβηγικά"
-
 #: conf/global_settings.py:86
-#, fuzzy
-msgid "Norwegian Nynorsk"
-msgstr "Νορβηγικά"
+msgid "Norwegian Bokmal"
+msgstr ""
 
 #: conf/global_settings.py:87
-msgid "Punjabi"
+msgid "Norwegian Nynorsk"
 msgstr ""
 
 #: conf/global_settings.py:88
+msgid "Punjabi"
+msgstr "Πουντζάμπι"
+
+#: conf/global_settings.py:89
 msgid "Polish"
 msgstr "Πολωνικά"
 
-#: conf/global_settings.py:89
-#, fuzzy
+#: conf/global_settings.py:90
 msgid "Portuguese"
 msgstr "Πορτογαλικά"
 
-#: conf/global_settings.py:90
-#, fuzzy
-msgid "Brazilian Portuguese"
-msgstr "Πορτογαλικά"
-
 #: conf/global_settings.py:91
+msgid "Brazilian Portuguese"
+msgstr ""
+
+#: conf/global_settings.py:92
 msgid "Romanian"
 msgstr "Ρουμανικά"
 
-#: conf/global_settings.py:92
+#: conf/global_settings.py:93
 msgid "Russian"
 msgstr "Ρωσικά"
 
-#: conf/global_settings.py:93
+#: conf/global_settings.py:94
 msgid "Slovak"
 msgstr "Σλοβακικά"
 
-#: conf/global_settings.py:94
+#: conf/global_settings.py:95
 msgid "Slovenian"
 msgstr "Σλοβενικά"
 
-#: conf/global_settings.py:95
-#, fuzzy
-msgid "Albanian"
-msgstr "Ρουμανικά"
-
 #: conf/global_settings.py:96
+msgid "Albanian"
+msgstr ""
+
+#: conf/global_settings.py:97
 msgid "Serbian"
 msgstr "Σερβικά"
 
-#: conf/global_settings.py:97
-#, fuzzy
-msgid "Serbian Latin"
-msgstr "Σερβικά"
-
 #: conf/global_settings.py:98
+msgid "Serbian Latin"
+msgstr ""
+
+#: conf/global_settings.py:99
 msgid "Swedish"
 msgstr "Σουηδικά"
 
-#: conf/global_settings.py:99
+#: conf/global_settings.py:100
 msgid "Tamil"
 msgstr "Ταμιλικά"
 
-#: conf/global_settings.py:100
+#: conf/global_settings.py:101
 msgid "Telugu"
 msgstr ""
 
-#: conf/global_settings.py:101
-#, fuzzy
-msgid "Thai"
-msgstr "Ταμιλικά"
-
 #: conf/global_settings.py:102
+msgid "Thai"
+msgstr ""
+
+#: conf/global_settings.py:103
 msgid "Turkish"
 msgstr "Τουρκικά"
 
-#: conf/global_settings.py:103
+#: conf/global_settings.py:104
 msgid "Ukrainian"
 msgstr "Ουκρανικά"
 
-#: conf/global_settings.py:104
-#, fuzzy
-msgid "Vietnamese"
-msgstr "όνομα"
-
 #: conf/global_settings.py:105
+msgid "Urdu"
+msgstr ""
+
+#: conf/global_settings.py:106
+msgid "Vietnamese"
+msgstr ""
+
+#: conf/global_settings.py:107
 msgid "Simplified Chinese"
 msgstr "Απλοποιημένα Κινέζικα"
 
-#: conf/global_settings.py:106
+#: conf/global_settings.py:108
 msgid "Traditional Chinese"
 msgstr "Παραδοσιακά Κινέζικα"
 
-#: core/validators.py:20 forms/fields.py:67
+#: core/validators.py:21 forms/fields.py:67
 msgid "Enter a valid value."
 msgstr "Εισάγετε μια έγκυρη τιμή."
 
-#: core/validators.py:87 forms/fields.py:574
+#: core/validators.py:89 forms/fields.py:575
+msgid "This URL appears to be a broken link."
+msgstr "Αυτό το URL φαίνεται να είναι ένας χαλασμένος σύνδεσμος."
+
+#: core/validators.py:94 forms/fields.py:574
 msgid "Enter a valid URL."
 msgstr "Εισάγετε ένα έγκυρο URL."
 
-#: core/validators.py:89 forms/fields.py:575
-#, fuzzy
-msgid "This URL appears to be a broken link."
-msgstr "Το URL %s είναι χαλασμένος σύνδεσμος."
-
-#: core/validators.py:120 forms/fields.py:449
+#: core/validators.py:138 forms/fields.py:449
 msgid "Enter a valid e-mail address."
 msgstr "Εισάγετε μια έγκυρη διεύθυνση ηλ. ταχυδρομείου."
 
-#: core/validators.py:123 forms/fields.py:958
-#, fuzzy
+#: core/validators.py:141 forms/fields.py:958
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
-"Αυτή η τιμή πρέπει να περιέχει μόνο γράμματα, αριθμούς, υπογεγραμμένες, "
-"παύλες ή καθέτους."
+"Ένα έγκυρο 'slug' αποτελείται από γράμματα, αριθμούς, παύλες ή κάτω παύλες."
 
-#: core/validators.py:126 forms/fields.py:951
-#, fuzzy
+#: core/validators.py:144 forms/fields.py:951
 msgid "Enter a valid IPv4 address."
-msgstr "Εισάγετε μια έγκυρη διεύθυνση ηλ. ταχυδρομείου."
+msgstr "Εισάγετε μια έγκυρη διεύθυνση IPv4."
 
-#: core/validators.py:129 db/models/fields/__init__.py:575
+#: core/validators.py:147 db/models/fields/__init__.py:575
 msgid "Enter only digits separated by commas."
 msgstr "Εισάγετε μόνο ψηφία χωρισμένα με κόμματα."
 
-#: core/validators.py:135
-#, fuzzy, python-format
+#: core/validators.py:153
+#, python-format
 msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
-msgstr "Βεβαιωθείτε ότι το κείμενο σας έχει μέγεθος τουλάχιστον %d χαρακτήρες."
+msgstr ""
 
-#: core/validators.py:153 forms/fields.py:222 forms/fields.py:275
-#, fuzzy, python-format
+#: core/validators.py:171 forms/fields.py:222 forms/fields.py:275
+#, python-format
 msgid "Ensure this value is less than or equal to %(limit_value)s."
-msgstr "τιμή a από."
+msgstr ""
 
-#: core/validators.py:158 forms/fields.py:223 forms/fields.py:276
-#, fuzzy, python-format
+#: core/validators.py:176 forms/fields.py:223 forms/fields.py:276
+#, python-format
 msgid "Ensure this value is greater than or equal to %(limit_value)s."
-msgstr "τιμή a από."
+msgstr ""
 
-#: core/validators.py:164
-#, fuzzy, python-format
+#: core/validators.py:182
+#, python-format
 msgid ""
 "Ensure this value has at least %(limit_value)d characters (it has %"
 "(show_value)d)."
-msgstr "Βεβαιωθείτε ότι το κείμενο σας έχει μέγεθος τουλάχιστον %d χαρακτήρες."
+msgstr ""
 
-#: core/validators.py:170
-#, fuzzy, python-format
+#: core/validators.py:188
+#, python-format
 msgid ""
 "Ensure this value has at most %(limit_value)d characters (it has %"
 "(show_value)d)."
-msgstr "Βεβαιωθείτε ότι το κείμενο σας έχει μέγεθος το πολύ %d χαρακτήρες."
+msgstr ""
 
-#: db/models/base.py:767
-#, fuzzy, python-format
+#: db/models/base.py:769
+#, python-format
 msgid "%(field_name)s must be unique for %(date_field)s %(lookup)s."
-msgstr "πεδίο πεδίο είναι τιμή"
+msgstr ""
 
-#: db/models/base.py:782 db/models/base.py:790
-#, fuzzy, python-format
+#: db/models/base.py:784 db/models/base.py:792
+#, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
-msgstr "με."
+msgstr ""
 
-#: db/models/base.py:789 forms/models.py:581
+#: db/models/base.py:791 forms/models.py:560
 msgid "and"
 msgstr "και"
 
 #: db/models/fields/__init__.py:63
 #, python-format
 msgid "Value %r is not a valid choice."
-msgstr ""
+msgstr "Η τιμή %r δεν είναι έγκυρη επιλογή."
 
 #: db/models/fields/__init__.py:64
 msgid "This field cannot be null."
 msgstr "Αυτό το πεδίο δεν μπορεί να είναι κενό (null)."
 
 #: db/models/fields/__init__.py:65
-#, fuzzy
 msgid "This field cannot be blank."
-msgstr "Αυτό το πεδίο δεν μπορεί να είναι κενό (null)."
+msgstr "Το πεδίο αυτό δεν μπορεί να είναι κενό."
 
 #: db/models/fields/__init__.py:70
 #, python-format
@@ -404,9 +385,9 @@ msgid "Boolean (Either True or False)"
 msgstr "Boolean (Είτε Αληθές ή Ψευδές)"
 
 #: db/models/fields/__init__.py:542 db/models/fields/__init__.py:1001
-#, fuzzy, python-format
+#, python-format
 msgid "String (up to %(max_length)s)"
-msgstr "Συμβολοσειρά (μέχρι %(maxlength)s χαρακτήρες)"
+msgstr "Συμβολοσειρά (μέχρι %(max_length)s)"
 
 #: db/models/fields/__init__.py:570
 msgid "Comma-separated integers"
@@ -421,23 +402,21 @@ msgid "Enter a valid date in YYYY-MM-DD format."
 msgstr "Εισάγετε μία έγκυρη ημερομηνία στη μορφή ΧΧΧΧ-MM-ΗΗ."
 
 #: db/models/fields/__init__.py:589
-#, fuzzy, python-format
+#, python-format
 msgid "Invalid date: %s"
-msgstr "Μη έγκυρο URL: %s"
+msgstr "Άκυρη ημερομηνία: %s"
 
 #: db/models/fields/__init__.py:670
-#, fuzzy
 msgid "Enter a valid date/time in YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format."
-msgstr "Εισάγετε μία έγκυρη ημερομηνία/ώρα στη μορφή ΧΧΧΧ-MM-ΗΗ ΩΩ:ΛΛ."
+msgstr ""
 
 #: db/models/fields/__init__.py:672
 msgid "Date (with time)"
 msgstr "Ημερομηνία (με την ώρα)"
 
 #: db/models/fields/__init__.py:746
-#, fuzzy
 msgid "This value must be a decimal number."
-msgstr "Αυτή η τιμή πρέπει να είναι ένας ακέραιος."
+msgstr "Η τιμή αυτή πρέπει να είναι δεκαδικός αριθμός."
 
 #: db/models/fields/__init__.py:748
 msgid "Decimal number"
@@ -448,18 +427,17 @@ msgid "E-mail address"
 msgstr "Ηλεκτρονική διεύθυνση"
 
 #: db/models/fields/__init__.py:818 db/models/fields/files.py:220
-#: db/models/fields/files.py:339
+#: db/models/fields/files.py:326
 msgid "File path"
 msgstr "Τοποθεσία αρχείου"
 
 #: db/models/fields/__init__.py:841
-#, fuzzy
 msgid "This value must be a float."
-msgstr "Αυτή η τιμή πρέπει να είναι τουλάχιστον %s."
+msgstr "Η τιμή αυτή πρέπει να είναι αριθμός κινητής υποδιαστολής."
 
 #: db/models/fields/__init__.py:843
 msgid "Floating point number"
-msgstr ""
+msgstr "Αριθμός κινητής υποδιαστολής"
 
 #: db/models/fields/__init__.py:902
 msgid "Big (8 byte) integer"
@@ -470,9 +448,8 @@ msgid "IP address"
 msgstr "διεύθυνση IP"
 
 #: db/models/fields/__init__.py:931
-#, fuzzy
 msgid "This value must be either None, True or False."
-msgstr "Αυτή η τιμή πρέπει να είναι Αληθές ή Ψευδές."
+msgstr ""
 
 #: db/models/fields/__init__.py:933
 msgid "Boolean (Either True, False or None)"
@@ -487,9 +464,8 @@ msgid "Time"
 msgstr "Ώρα"
 
 #: db/models/fields/__init__.py:1044
-#, fuzzy
 msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
-msgstr "Εισάγετε μία έγκυρη ώρα στη μορφή ΩΩ-ΛΛ."
+msgstr ""
 
 #: db/models/fields/__init__.py:1120
 msgid "URL"
@@ -499,28 +475,27 @@ msgstr "URL"
 msgid "XML text"
 msgstr "Κείμενο XML"
 
-#: db/models/fields/related.py:804
+#: db/models/fields/related.py:815
 #, python-format
 msgid "Model %(model)s with pk %(pk)r does not exist."
 msgstr ""
 
-#: db/models/fields/related.py:806
+#: db/models/fields/related.py:817
 msgid "Foreign Key (type determined by related field)"
 msgstr ""
 
-#: db/models/fields/related.py:928
+#: db/models/fields/related.py:941
 msgid "One-to-one relationship"
-msgstr ""
+msgstr "Σχέση ένα-προς-ένα"
 
-#: db/models/fields/related.py:990
+#: db/models/fields/related.py:1003
 msgid "Many-to-many relationship"
-msgstr ""
+msgstr "Σχέση πολλά-προς-πολλά"
 
-#: db/models/fields/related.py:1010
-#, fuzzy
+#: db/models/fields/related.py:1023
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
-msgstr "Αναμονή Έλεγχος ή Εντολή ενεργό a επιλογή περισσότερα ένα."
+msgstr ""
 
 #: forms/fields.py:66
 msgid "This field is required."
@@ -531,9 +506,8 @@ msgid "Enter a whole number."
 msgstr "Εισάγετε έναν ακέραιο αριθμό."
 
 #: forms/fields.py:253 forms/fields.py:274
-#, fuzzy
 msgid "Enter a number."
-msgstr "Εισάγετε έναν ακέραιο αριθμό."
+msgstr "Εισάγετε έναν αριθμό."
 
 #: forms/fields.py:277
 #, python-format
@@ -565,153 +539,147 @@ msgstr "Εισάγετε μια έγκυρη ημερομηνία/ώρα."
 #: forms/fields.py:460
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr ""
+"Δεν έχει υποβληθεί κάποιο αρχείο. Ελέγξτε τον τύπο κωδικοποίησης στη φόρμα."
 
 #: forms/fields.py:461
 msgid "No file was submitted."
-msgstr ""
+msgstr "Δεν έχει υποβληθεί κάποιο αρχείο."
 
 #: forms/fields.py:462
 msgid "The submitted file is empty."
 msgstr "Το αρχείο που υποβλήθηκε είναι κενό."
 
 #: forms/fields.py:463
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Ensure this filename has at most %(max)d characters (it has %(length)d)."
-msgstr "Βεβαιωθείτε ότι το κείμενο σας έχει μέγεθος το πολύ %d χαρακτήρες."
+msgstr ""
 
 #: forms/fields.py:464
 msgid "Please either submit a file or check the clear checkbox, not both."
 msgstr ""
 
 #: forms/fields.py:518
-#, fuzzy
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
-msgstr "a εικόνα αρχείο υποφαινόμενο όχι εικόνα ή a εικόνα."
+msgstr ""
 
 #: forms/fields.py:650 forms/fields.py:725
-#, fuzzy, python-format
+#, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
-msgstr "Επιλέξτε μια έγκυρη επιλογή; Το '%(data)s' δεν είναι στα %(choices)s."
+msgstr ""
 
-#: forms/fields.py:726 forms/fields.py:814 forms/models.py:1018
-#, fuzzy
+#: forms/fields.py:726 forms/fields.py:814 forms/models.py:983
 msgid "Enter a list of values."
-msgstr "Εισάγετε ένα έγκυρο όνομα αρχείου."
+msgstr "Εισάγετε μια λίστα τιμών."
 
-#: forms/formsets.py:308 forms/formsets.py:310
-#, fuzzy
+#: forms/formsets.py:305 forms/formsets.py:307
 msgid "Order"
-msgstr "Ταξινόμηση:"
+msgstr "Ταξινόμηση"
 
-#: forms/formsets.py:312
+#: forms/formsets.py:309
 msgid "Delete"
 msgstr "Διαγραφή"
 
-#: forms/models.py:575
-#, fuzzy, python-format
+#: forms/models.py:554
+#, python-format
 msgid "Please correct the duplicate data for %(field)s."
-msgstr "Παρακαλούμε διορθώστε το παρακάτω λάθος."
+msgstr ""
 
-#: forms/models.py:579
+#: forms/models.py:558
 #, python-format
 msgid "Please correct the duplicate data for %(field)s, which must be unique."
 msgstr ""
 
-#: forms/models.py:585
+#: forms/models.py:564
 #, python-format
 msgid ""
 "Please correct the duplicate data for %(field_name)s which must be unique "
 "for the %(lookup)s in %(date_field)s."
 msgstr ""
 
-#: forms/models.py:593
-#, fuzzy
+#: forms/models.py:572
 msgid "Please correct the duplicate values below."
-msgstr "Παρακαλούμε διορθώστε το παρακάτω λάθος."
+msgstr ""
 
-#: forms/models.py:868
+#: forms/models.py:833
 msgid "The inline foreign key did not match the parent instance primary key."
 msgstr ""
 
-#: forms/models.py:929
-#, fuzzy
+#: forms/models.py:894
 msgid "Select a valid choice. That choice is not one of the available choices."
-msgstr "Επιλέξτε μια έγκυρη επιλογή; Το '%(data)s' δεν είναι στα %(choices)s."
+msgstr ""
 
-#: forms/models.py:1019
-#, fuzzy, python-format
+#: forms/models.py:984
+#, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
-msgstr "Επιλέξτε μια έγκυρη επιλογή; Το '%(data)s' δεν είναι στα %(choices)s."
+msgstr ""
 
-#: forms/models.py:1021
+#: forms/models.py:986
 #, python-format
 msgid "\"%s\" is not a valid value for a primary key."
 msgstr ""
 
 #: forms/widgets.py:299
-#, fuzzy
 msgid "Currently"
-msgstr "Τρέχουσα:"
+msgstr ""
 
 #: forms/widgets.py:300
 msgid "Change"
 msgstr "Επεξεργασία"
 
 #: forms/widgets.py:301
-#, fuzzy
 msgid "Clear"
-msgstr "χρόνος"
+msgstr ""
 
-#: forms/widgets.py:547
+#: forms/widgets.py:548
 msgid "Unknown"
 msgstr "Άγνωστο"
 
-#: forms/widgets.py:547
+#: forms/widgets.py:548
 msgid "Yes"
 msgstr "Ναι"
 
-#: forms/widgets.py:547
+#: forms/widgets.py:548
 msgid "No"
 msgstr "Όχι"
 
-#: template/defaultfilters.py:774
+#: template/defaultfilters.py:767
 msgid "yes,no,maybe"
 msgstr "ναι,όχι,ίσως"
 
-#: template/defaultfilters.py:805
+#: template/defaultfilters.py:795 template/defaultfilters.py:800
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] ""
 msgstr[1] ""
 
-#: template/defaultfilters.py:807
+#: template/defaultfilters.py:802
 #, python-format
 msgid "%s KB"
-msgstr ""
+msgstr "%s KB"
+
+#: template/defaultfilters.py:804
+#, python-format
+msgid "%s MB"
+msgstr "%s MB"
+
+#: template/defaultfilters.py:806
+#, python-format
+msgid "%s GB"
+msgstr "%s GB"
+
+#: template/defaultfilters.py:808
+#, python-format
+msgid "%s TB"
+msgstr "%s TB"
 
 #: template/defaultfilters.py:809
 #, python-format
-msgid "%s MB"
-msgstr ""
-
-#: template/defaultfilters.py:811
-#, python-format
-msgid "%s GB"
-msgstr ""
-
-#: template/defaultfilters.py:813
-#, python-format
-msgid "%s TB"
-msgstr ""
-
-#: template/defaultfilters.py:814
-#, python-format
 msgid "%s PB"
-msgstr ""
+msgstr "%s PB"
 
 #: utils/dateformat.py:42
 msgid "p.m."
@@ -766,36 +734,32 @@ msgid "Sunday"
 msgstr "Κυριακή"
 
 #: utils/dates.py:10
-#, fuzzy
 msgid "Mon"
-msgstr "Δευτέρα"
+msgstr "Δευ"
 
 #: utils/dates.py:10
-#, fuzzy
 msgid "Tue"
-msgstr "Τρίτη"
+msgstr "Τρί"
 
 #: utils/dates.py:10
 msgid "Wed"
-msgstr ""
+msgstr "Τετ"
 
 #: utils/dates.py:10
 msgid "Thu"
-msgstr ""
+msgstr "Πέμ"
 
 #: utils/dates.py:10
-#, fuzzy
 msgid "Fri"
-msgstr "Παρασκευή"
+msgstr "Παρ"
 
 #: utils/dates.py:11
 msgid "Sat"
-msgstr ""
+msgstr "Σαβ"
 
 #: utils/dates.py:11
-#, fuzzy
 msgid "Sun"
-msgstr "Κυριακή"
+msgstr "Κυρ"
 
 #: utils/dates.py:18
 msgid "January"
@@ -896,7 +860,7 @@ msgstr "Δεκ"
 #: utils/dates.py:31
 msgctxt "abbrev. month"
 msgid "Jan."
-msgstr "Ιάν."
+msgstr "Ιαν."
 
 #: utils/dates.py:32
 msgctxt "abbrev. month"
@@ -911,7 +875,7 @@ msgstr "Μάρτιος"
 #: utils/dates.py:34
 msgctxt "abbrev. month"
 msgid "April"
-msgstr "Απρίλιος"
+msgstr "Απρίλ."
 
 #: utils/dates.py:35
 msgctxt "abbrev. month"
@@ -921,12 +885,12 @@ msgstr "Μάιος"
 #: utils/dates.py:36
 msgctxt "abbrev. month"
 msgid "June"
-msgstr "Ιούνιος"
+msgstr "Ιούν."
 
 #: utils/dates.py:37
 msgctxt "abbrev. month"
 msgid "July"
-msgstr "Ιούλιος"
+msgstr "Ιούλ."
 
 #: utils/dates.py:38
 msgctxt "abbrev. month"
@@ -946,7 +910,7 @@ msgstr "Οκτ."
 #: utils/dates.py:41
 msgctxt "abbrev. month"
 msgid "Nov."
-msgstr "Νοέ."
+msgstr "Νοέμ."
 
 #: utils/dates.py:42
 msgctxt "abbrev. month"
@@ -1014,14 +978,13 @@ msgid "December"
 msgstr "Δεκεμβρίου"
 
 #: utils/text.py:136
-#, fuzzy
 msgid "or"
-msgstr "ώρα"
+msgstr "ή"
 
 #. Translators: This string is used as a separator between list elements
 #: utils/text.py:153
 msgid ", "
-msgstr ""
+msgstr ", "
 
 #: utils/timesince.py:21
 msgid "year"
@@ -1060,9 +1023,8 @@ msgstr[0] "λεπτό"
 msgstr[1] "λεπτά"
 
 #: utils/timesince.py:45
-#, fuzzy
 msgid "minutes"
-msgstr "λεπτό"
+msgstr "λεπτά"
 
 #: utils/timesince.py:50
 #, python-format
@@ -1074,37 +1036,89 @@ msgstr ""
 msgid ", %(number)d %(type)s"
 msgstr ""
 
-#: utils/translation/trans_real.py:562
+#: utils/translation/trans_real.py:568
 msgid "DATE_FORMAT"
 msgstr "j N Y"
 
-#: utils/translation/trans_real.py:563
+#: utils/translation/trans_real.py:569
 msgid "DATETIME_FORMAT"
 msgstr "j N Y, P"
 
-#: utils/translation/trans_real.py:564
+#: utils/translation/trans_real.py:570
 msgid "TIME_FORMAT"
 msgstr "P"
 
-#: utils/translation/trans_real.py:585
+#: utils/translation/trans_real.py:591
 msgid "YEAR_MONTH_FORMAT"
 msgstr "F Y"
 
-#: utils/translation/trans_real.py:586
+#: utils/translation/trans_real.py:592
 msgid "MONTH_DAY_FORMAT"
 msgstr "j F"
 
 #: views/generic/create_update.py:121
-#, fuzzy, python-format
+#, python-format
 msgid "The %(verbose_name)s was created successfully."
-msgstr "Το %(name)s \"%(obj)s\" αλλάχτηκε με επιτυχία."
+msgstr ""
 
 #: views/generic/create_update.py:164
-#, fuzzy, python-format
+#, python-format
 msgid "The %(verbose_name)s was updated successfully."
-msgstr "Το %(name)s \"%(obj)s\" διαγράφηκε με επιτυχία."
+msgstr ""
 
 #: views/generic/create_update.py:207
-#, fuzzy, python-format
+#, python-format
 msgid "The %(verbose_name)s was deleted."
-msgstr "Το %(name)s \"%(obj)s\" διαγράφηκε με επιτυχία."
+msgstr ""
+
+#: views/generic/dates.py:33
+msgid "No year specified"
+msgstr ""
+
+#: views/generic/dates.py:58
+msgid "No month specified"
+msgstr ""
+
+#: views/generic/dates.py:99
+msgid "No day specified"
+msgstr ""
+
+#: views/generic/dates.py:138
+msgid "No week specified"
+msgstr ""
+
+#: views/generic/dates.py:198 views/generic/dates.py:214
+#, python-format
+msgid "No %(verbose_name_plural)s available"
+msgstr ""
+
+#: views/generic/dates.py:466
+#, python-format
+msgid ""
+"Future %(verbose_name_plural)s not available because %(class_name)s."
+"allow_future is False."
+msgstr ""
+
+#: views/generic/dates.py:500
+#, python-format
+msgid "Invalid date string '%(datestr)s' given format '%(format)s'"
+msgstr ""
+
+#: views/generic/detail.py:51
+#, python-format
+msgid "No %(verbose_name)s found matching the query"
+msgstr ""
+
+#: views/generic/list.py:47
+msgid "Page is not 'last', nor can it be converted to an int."
+msgstr ""
+
+#: views/generic/list.py:52
+#, python-format
+msgid "Invalid page (%(page_number)s)"
+msgstr ""
+
+#: views/generic/list.py:119
+#, python-format
+msgid "Empty list and '%(class_name)s.allow_empty' is False."
+msgstr ""

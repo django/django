@@ -1,22 +1,18 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Django SVN\n"
+"Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-21 22:58+0100\n"
-"PO-Revision-Date: 2008-11-12 08:14+0530\n"
-"Last-Translator: Thejaswi Puthraya <thejaswi.puthraya@gmail.com>\n"
-"Language-Team: Hindi <indlinux-hindi@lists.sourceforge.net>\n"
+"POT-Creation-Date: 2011-02-28 17:34+0100\n"
+"PO-Revision-Date: 2011-02-22 00:09+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: English <en@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Poedit-Language: Hindi\n"
-"X-Poedit-Country: INDIA\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: hi\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: conf/global_settings.py:44
 msgid "Arabic"
@@ -31,9 +27,8 @@ msgid "Bengali"
 msgstr "बंगाली"
 
 #: conf/global_settings.py:47
-#, fuzzy
 msgid "Bosnian"
-msgstr "एस्टोनियन"
+msgstr ""
 
 #: conf/global_settings.py:48
 msgid "Catalan"
@@ -64,296 +59,291 @@ msgid "English"
 msgstr "अंग्रेज़ी "
 
 #: conf/global_settings.py:55
-#, fuzzy
 msgid "British English"
-msgstr "अंग्रेज़ी "
+msgstr ""
 
 #: conf/global_settings.py:56
 msgid "Spanish"
 msgstr "स्पानिश"
 
 #: conf/global_settings.py:57
-#, fuzzy
 msgid "Argentinian Spanish"
-msgstr "अर्जेंटीनी स्पानिश"
+msgstr ""
 
 #: conf/global_settings.py:58
+#, fuzzy
+msgid "Mexican Spanish"
+msgstr "स्पानिश"
+
+#: conf/global_settings.py:59
 msgid "Estonian"
 msgstr "एस्टोनियन"
 
-#: conf/global_settings.py:59
+#: conf/global_settings.py:60
 msgid "Basque"
 msgstr "बास्क"
 
-#: conf/global_settings.py:60
+#: conf/global_settings.py:61
 msgid "Persian"
 msgstr "पारसी"
 
-#: conf/global_settings.py:61
+#: conf/global_settings.py:62
 msgid "Finnish"
 msgstr "फ़िन्निश"
 
-#: conf/global_settings.py:62
+#: conf/global_settings.py:63
 msgid "French"
 msgstr "फ्रेंच"
 
-#: conf/global_settings.py:63
-#, fuzzy
-msgid "Frisian"
-msgstr "फ्रैस्लान्ड"
-
 #: conf/global_settings.py:64
+msgid "Frisian"
+msgstr ""
+
+#: conf/global_settings.py:65
 msgid "Irish"
 msgstr "आयरिश"
 
-#: conf/global_settings.py:65
+#: conf/global_settings.py:66
 msgid "Galician"
 msgstr "गलिशियन"
 
-#: conf/global_settings.py:66
+#: conf/global_settings.py:67
 msgid "Hebrew"
 msgstr "हि‍ब्रू"
 
-#: conf/global_settings.py:67
-#, fuzzy
-msgid "Hindi"
-msgstr "हैलान्ड"
-
 #: conf/global_settings.py:68
+msgid "Hindi"
+msgstr ""
+
+#: conf/global_settings.py:69
 msgid "Croatian"
 msgstr "क्रोयेशियन"
 
-#: conf/global_settings.py:69
+#: conf/global_settings.py:70
 msgid "Hungarian"
 msgstr "हंगेरियन"
 
-#: conf/global_settings.py:70
-#, fuzzy
-msgid "Indonesian"
-msgstr "मेसिडोनियन"
-
 #: conf/global_settings.py:71
+msgid "Indonesian"
+msgstr ""
+
+#: conf/global_settings.py:72
 msgid "Icelandic"
 msgstr "आयिस्लान्डिक"
 
-#: conf/global_settings.py:72
+#: conf/global_settings.py:73
 msgid "Italian"
 msgstr "इटैलियन"
 
-#: conf/global_settings.py:73
+#: conf/global_settings.py:74
 msgid "Japanese"
 msgstr "जपानी"
 
-#: conf/global_settings.py:74
+#: conf/global_settings.py:75
 msgid "Georgian"
 msgstr "ज्योर्जियन"
 
-#: conf/global_settings.py:75
+#: conf/global_settings.py:76
 msgid "Khmer"
 msgstr "ख्मेर"
 
-#: conf/global_settings.py:76
+#: conf/global_settings.py:77
 msgid "Kannada"
 msgstr "कन्‍नड़"
 
-#: conf/global_settings.py:77
+#: conf/global_settings.py:78
 msgid "Korean"
 msgstr "कोरियन"
 
-#: conf/global_settings.py:78
+#: conf/global_settings.py:79
 msgid "Lithuanian"
 msgstr "लिथुवेनियन"
 
-#: conf/global_settings.py:79
+#: conf/global_settings.py:80
 msgid "Latvian"
 msgstr "लात्वियन"
 
-#: conf/global_settings.py:80
+#: conf/global_settings.py:81
 msgid "Macedonian"
 msgstr "मेसिडोनियन"
 
-#: conf/global_settings.py:81
-#, fuzzy
-msgid "Malayalam"
-msgstr "मलगा"
-
 #: conf/global_settings.py:82
-#, fuzzy
-msgid "Mongolian"
-msgstr "मेसिडोनियन"
+msgid "Malayalam"
+msgstr ""
 
 #: conf/global_settings.py:83
+msgid "Mongolian"
+msgstr ""
+
+#: conf/global_settings.py:84
 msgid "Dutch"
 msgstr "डच"
 
-#: conf/global_settings.py:84
+#: conf/global_settings.py:85
 msgid "Norwegian"
 msgstr "नार्वेजियन"
 
-#: conf/global_settings.py:85
-#, fuzzy
-msgid "Norwegian Bokmal"
-msgstr "नार्वेजियन"
-
 #: conf/global_settings.py:86
-#, fuzzy
-msgid "Norwegian Nynorsk"
-msgstr "नार्वेजियन"
+msgid "Norwegian Bokmal"
+msgstr ""
 
 #: conf/global_settings.py:87
-msgid "Punjabi"
+msgid "Norwegian Nynorsk"
 msgstr ""
 
 #: conf/global_settings.py:88
+msgid "Punjabi"
+msgstr ""
+
+#: conf/global_settings.py:89
 msgid "Polish"
 msgstr "पोलिश"
 
-#: conf/global_settings.py:89
-#, fuzzy
-msgid "Portuguese"
-msgstr "पुर्तगाली"
-
 #: conf/global_settings.py:90
+msgid "Portuguese"
+msgstr ""
+
+#: conf/global_settings.py:91
 msgid "Brazilian Portuguese"
 msgstr "ब्रजिलियन पुर्तगाली"
 
-#: conf/global_settings.py:91
+#: conf/global_settings.py:92
 msgid "Romanian"
 msgstr "रोमानियन"
 
-#: conf/global_settings.py:92
+#: conf/global_settings.py:93
 msgid "Russian"
 msgstr "रूसी"
 
-#: conf/global_settings.py:93
+#: conf/global_settings.py:94
 msgid "Slovak"
 msgstr "स्लोवाक"
 
-#: conf/global_settings.py:94
+#: conf/global_settings.py:95
 msgid "Slovenian"
 msgstr "स्लोवेनियन"
 
-#: conf/global_settings.py:95
-#, fuzzy
-msgid "Albanian"
-msgstr "अलाकान्ट"
-
 #: conf/global_settings.py:96
+msgid "Albanian"
+msgstr ""
+
+#: conf/global_settings.py:97
 msgid "Serbian"
 msgstr "सर्बियन"
 
-#: conf/global_settings.py:97
-#, fuzzy
-msgid "Serbian Latin"
-msgstr "सर्बियन"
-
 #: conf/global_settings.py:98
+msgid "Serbian Latin"
+msgstr ""
+
+#: conf/global_settings.py:99
 msgid "Swedish"
 msgstr "स्वीडिश"
 
-#: conf/global_settings.py:99
+#: conf/global_settings.py:100
 msgid "Tamil"
 msgstr "तमिल"
 
-#: conf/global_settings.py:100
+#: conf/global_settings.py:101
 msgid "Telugu"
 msgstr "तेलुगु"
 
-#: conf/global_settings.py:101
-#, fuzzy
-msgid "Thai"
-msgstr "तमिल"
-
 #: conf/global_settings.py:102
+msgid "Thai"
+msgstr ""
+
+#: conf/global_settings.py:103
 msgid "Turkish"
 msgstr "तुर्किश"
 
-#: conf/global_settings.py:103
+#: conf/global_settings.py:104
 msgid "Ukrainian"
 msgstr "यूक्रानियन"
 
-#: conf/global_settings.py:104
-#, fuzzy
-msgid "Vietnamese"
-msgstr "वियेन्ना"
-
 #: conf/global_settings.py:105
+msgid "Urdu"
+msgstr ""
+
+#: conf/global_settings.py:106
+msgid "Vietnamese"
+msgstr ""
+
+#: conf/global_settings.py:107
 msgid "Simplified Chinese"
 msgstr "सरल चीनी"
 
-#: conf/global_settings.py:106
+#: conf/global_settings.py:108
 msgid "Traditional Chinese"
 msgstr "पारम्परिक चीनी"
 
-#: core/validators.py:20 forms/fields.py:67
+#: core/validators.py:21 forms/fields.py:67
 msgid "Enter a valid value."
 msgstr "एक मान्य मूल्य दर्ज करें"
-
-#: core/validators.py:87 forms/fields.py:574
-msgid "Enter a valid URL."
-msgstr "वैध यू.आर.एल भरें ।"
 
 #: core/validators.py:89 forms/fields.py:575
 msgid "This URL appears to be a broken link."
 msgstr ""
 
-#: core/validators.py:120 forms/fields.py:449
+#: core/validators.py:94 forms/fields.py:574
+msgid "Enter a valid URL."
+msgstr "वैध यू.आर.एल भरें ।"
+
+#: core/validators.py:138 forms/fields.py:449
 msgid "Enter a valid e-mail address."
 msgstr "मान्य ईमेल पता भरें"
 
-#: core/validators.py:123 forms/fields.py:958
+#: core/validators.py:141 forms/fields.py:958
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
 
-#: core/validators.py:126 forms/fields.py:951
+#: core/validators.py:144 forms/fields.py:951
 msgid "Enter a valid IPv4 address."
 msgstr "वैध आइ.पि वी 4 पता भरें ।"
 
-#: core/validators.py:129 db/models/fields/__init__.py:575
+#: core/validators.py:147 db/models/fields/__init__.py:575
 msgid "Enter only digits separated by commas."
 msgstr "अल्पविराम अंक मात्र ही भरें ।"
 
-#: core/validators.py:135
+#: core/validators.py:153
 #, python-format
 msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
 msgstr ""
 
-#: core/validators.py:153 forms/fields.py:222 forms/fields.py:275
+#: core/validators.py:171 forms/fields.py:222 forms/fields.py:275
 #, python-format
 msgid "Ensure this value is less than or equal to %(limit_value)s."
 msgstr ""
 
-#: core/validators.py:158 forms/fields.py:223 forms/fields.py:276
+#: core/validators.py:176 forms/fields.py:223 forms/fields.py:276
 #, python-format
 msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr ""
 
-#: core/validators.py:164
+#: core/validators.py:182
 #, python-format
 msgid ""
 "Ensure this value has at least %(limit_value)d characters (it has %"
 "(show_value)d)."
 msgstr ""
 
-#: core/validators.py:170
+#: core/validators.py:188
 #, python-format
 msgid ""
 "Ensure this value has at most %(limit_value)d characters (it has %"
 "(show_value)d)."
 msgstr ""
 
-#: db/models/base.py:767
+#: db/models/base.py:769
 #, python-format
 msgid "%(field_name)s must be unique for %(date_field)s %(lookup)s."
 msgstr ""
 
-#: db/models/base.py:782 db/models/base.py:790
+#: db/models/base.py:784 db/models/base.py:792
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "इस %(field_label)s के साथ एक %(model_name)s पहले से ही उपस्थित है ।"
 
-#: db/models/base.py:789 forms/models.py:581
+#: db/models/base.py:791 forms/models.py:560
 msgid "and"
 msgstr "और"
 
@@ -367,9 +357,8 @@ msgid "This field cannot be null."
 msgstr "यह मूल्य खाली नहीं हो सकता ।"
 
 #: db/models/fields/__init__.py:65
-#, fuzzy
 msgid "This field cannot be blank."
-msgstr "यह मूल्य खाली नहीं हो सकता ।"
+msgstr ""
 
 #: db/models/fields/__init__.py:70
 #, python-format
@@ -437,14 +426,13 @@ msgid "E-mail address"
 msgstr "ईमेल पता"
 
 #: db/models/fields/__init__.py:818 db/models/fields/files.py:220
-#: db/models/fields/files.py:339
+#: db/models/fields/files.py:326
 msgid "File path"
 msgstr "संचिका पथ"
 
 #: db/models/fields/__init__.py:841
-#, fuzzy
 msgid "This value must be a float."
-msgstr "यह मूल्य पूर्णांक होना चाहिए ।"
+msgstr ""
 
 #: db/models/fields/__init__.py:843
 msgid "Floating point number"
@@ -486,24 +474,24 @@ msgstr "यू.आर.एल"
 msgid "XML text"
 msgstr "एक्स.एम.एल पाठ"
 
-#: db/models/fields/related.py:804
+#: db/models/fields/related.py:815
 #, python-format
 msgid "Model %(model)s with pk %(pk)r does not exist."
 msgstr ""
 
-#: db/models/fields/related.py:806
+#: db/models/fields/related.py:817
 msgid "Foreign Key (type determined by related field)"
 msgstr ""
 
-#: db/models/fields/related.py:928
+#: db/models/fields/related.py:941
 msgid "One-to-one relationship"
 msgstr ""
 
-#: db/models/fields/related.py:990
+#: db/models/fields/related.py:1003
 msgid "Many-to-many relationship"
 msgstr ""
 
-#: db/models/fields/related.py:1010
+#: db/models/fields/related.py:1023
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
@@ -580,119 +568,116 @@ msgstr "वैध चित्र निवेदन करें । आप क
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr "मान्य इच्छा चयन करें । %(value)s लभ्य इच्छाओं में उप्लब्ध नहीं हैं ।"
 
-#: forms/fields.py:726 forms/fields.py:814 forms/models.py:1018
+#: forms/fields.py:726 forms/fields.py:814 forms/models.py:983
 msgid "Enter a list of values."
 msgstr "मूल्य सूची दर्ज करें ।"
 
-#: forms/formsets.py:308 forms/formsets.py:310
+#: forms/formsets.py:305 forms/formsets.py:307
 msgid "Order"
 msgstr "छाटें"
 
-#: forms/formsets.py:312
+#: forms/formsets.py:309
 msgid "Delete"
 msgstr "मिटाएँ"
 
-#: forms/models.py:575
-#, fuzzy, python-format
+#: forms/models.py:554
+#, python-format
 msgid "Please correct the duplicate data for %(field)s."
-msgstr "कृपया नीचे पायी गयी गलती ठीक करें ।"
+msgstr ""
 
-#: forms/models.py:579
+#: forms/models.py:558
 #, python-format
 msgid "Please correct the duplicate data for %(field)s, which must be unique."
 msgstr ""
 
-#: forms/models.py:585
+#: forms/models.py:564
 #, python-format
 msgid ""
 "Please correct the duplicate data for %(field_name)s which must be unique "
 "for the %(lookup)s in %(date_field)s."
 msgstr ""
 
-#: forms/models.py:593
-#, fuzzy
+#: forms/models.py:572
 msgid "Please correct the duplicate values below."
-msgstr "कृपया नीचे पायी गयी गलती ठीक करें ।"
+msgstr ""
 
-#: forms/models.py:868
+#: forms/models.py:833
 msgid "The inline foreign key did not match the parent instance primary key."
 msgstr ""
 
-#: forms/models.py:929
+#: forms/models.py:894
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "मान्य विकल्प चयन करें । यह विकल्प उपस्थित विकल्पों में नहीं है ।"
 
-#: forms/models.py:1019
+#: forms/models.py:984
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "मान्य विकल्प चयन करें । %s उपस्थित विकल्पों में नहीं है ।"
 
-#: forms/models.py:1021
+#: forms/models.py:986
 #, python-format
 msgid "\"%s\" is not a valid value for a primary key."
 msgstr ""
 
 #: forms/widgets.py:299
-#, fuzzy
 msgid "Currently"
-msgstr "प्रचलित रूप में:"
+msgstr ""
 
 #: forms/widgets.py:300
 msgid "Change"
 msgstr "बदलें"
 
 #: forms/widgets.py:301
-#, fuzzy
 msgid "Clear"
-msgstr "साल"
+msgstr ""
 
-#: forms/widgets.py:547
+#: forms/widgets.py:548
 msgid "Unknown"
 msgstr "अनजान"
 
-#: forms/widgets.py:547
+#: forms/widgets.py:548
 msgid "Yes"
 msgstr "हाँ"
 
-#: forms/widgets.py:547
+#: forms/widgets.py:548
 msgid "No"
 msgstr "नहीं"
 
-#: template/defaultfilters.py:774
+#: template/defaultfilters.py:767
 msgid "yes,no,maybe"
 msgstr "हाँ, नहीं, शायद"
 
-#: template/defaultfilters.py:805
+#: template/defaultfilters.py:795 template/defaultfilters.py:800
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d बाइट"
 msgstr[1] "%(size)d बाइट"
 
-#: template/defaultfilters.py:807
+#: template/defaultfilters.py:802
 #, python-format
 msgid "%s KB"
-msgstr "%s के.बी"
+msgstr ""
+
+#: template/defaultfilters.py:804
+#, python-format
+msgid "%s MB"
+msgstr ""
+
+#: template/defaultfilters.py:806
+#, python-format
+msgid "%s GB"
+msgstr ""
+
+#: template/defaultfilters.py:808
+#, python-format
+msgid "%s TB"
+msgstr ""
 
 #: template/defaultfilters.py:809
 #, python-format
-msgid "%s MB"
-msgstr "%s एम.बी"
-
-#: template/defaultfilters.py:811
-#, python-format
-msgid "%s GB"
-msgstr "%s जी.बी"
-
-#: template/defaultfilters.py:813
-#, fuzzy, python-format
-msgid "%s TB"
-msgstr "%s के.बी"
-
-#: template/defaultfilters.py:814
-#, fuzzy, python-format
 msgid "%s PB"
-msgstr "%s के.बी"
+msgstr ""
 
 #: utils/dateformat.py:42
 msgid "p.m."
@@ -873,134 +858,122 @@ msgstr "दिस्"
 #: utils/dates.py:31
 msgctxt "abbrev. month"
 msgid "Jan."
-msgstr "जन."
+msgstr ""
 
 #: utils/dates.py:32
 msgctxt "abbrev. month"
 msgid "Feb."
-msgstr "फ़र."
+msgstr ""
 
 #: utils/dates.py:33
 msgctxt "abbrev. month"
 msgid "March"
-msgstr "मार्च"
+msgstr ""
 
 #: utils/dates.py:34
 msgctxt "abbrev. month"
 msgid "April"
-msgstr "अप्रैल"
+msgstr ""
 
 #: utils/dates.py:35
 msgctxt "abbrev. month"
 msgid "May"
-msgstr "मई"
+msgstr ""
 
 #: utils/dates.py:36
 msgctxt "abbrev. month"
 msgid "June"
-msgstr "जून"
+msgstr ""
 
 #: utils/dates.py:37
 msgctxt "abbrev. month"
 msgid "July"
-msgstr "जुलाई"
+msgstr ""
 
 #: utils/dates.py:38
 msgctxt "abbrev. month"
 msgid "Aug."
-msgstr "अग."
+msgstr ""
 
 #: utils/dates.py:39
 msgctxt "abbrev. month"
 msgid "Sept."
-msgstr "सितम्."
+msgstr ""
 
 #: utils/dates.py:40
 msgctxt "abbrev. month"
 msgid "Oct."
-msgstr "अक्ट."
+msgstr ""
 
 #: utils/dates.py:41
 msgctxt "abbrev. month"
 msgid "Nov."
-msgstr "नव."
+msgstr ""
 
 #: utils/dates.py:42
 msgctxt "abbrev. month"
 msgid "Dec."
-msgstr "दिस्."
+msgstr ""
 
 #: utils/dates.py:45
-#, fuzzy
 msgctxt "alt. month"
 msgid "January"
-msgstr "जनवरी"
+msgstr ""
 
 #: utils/dates.py:46
-#, fuzzy
 msgctxt "alt. month"
 msgid "February"
-msgstr "फ़रवरी"
+msgstr ""
 
 #: utils/dates.py:47
-#, fuzzy
 msgctxt "alt. month"
 msgid "March"
-msgstr "मार्च"
+msgstr ""
 
 #: utils/dates.py:48
-#, fuzzy
 msgctxt "alt. month"
 msgid "April"
-msgstr "अप्रैल"
+msgstr ""
 
 #: utils/dates.py:49
-#, fuzzy
 msgctxt "alt. month"
 msgid "May"
-msgstr "मई"
+msgstr ""
 
 #: utils/dates.py:50
-#, fuzzy
 msgctxt "alt. month"
 msgid "June"
-msgstr "जून"
+msgstr ""
 
 #: utils/dates.py:51
-#, fuzzy
 msgctxt "alt. month"
 msgid "July"
-msgstr "जुलाई"
+msgstr ""
 
 #: utils/dates.py:52
-#, fuzzy
 msgctxt "alt. month"
 msgid "August"
-msgstr "अगस्त"
+msgstr ""
 
 #: utils/dates.py:53
-#, fuzzy
 msgctxt "alt. month"
 msgid "September"
-msgstr "सितमबर"
+msgstr ""
 
 #: utils/dates.py:54
-#, fuzzy
 msgctxt "alt. month"
 msgid "October"
-msgstr "अक्टूबर"
+msgstr ""
 
 #: utils/dates.py:55
-#, fuzzy
 msgctxt "alt. month"
 msgid "November"
-msgstr "नवमबर"
+msgstr ""
 
 #: utils/dates.py:56
-#, fuzzy
 msgctxt "alt. month"
 msgid "December"
-msgstr "दिसमबर"
+msgstr ""
 
 #: utils/text.py:136
 msgid "or"
@@ -1061,23 +1034,23 @@ msgstr "%(number)d %(type)s"
 msgid ", %(number)d %(type)s"
 msgstr ", %(number)d %(type)s"
 
-#: utils/translation/trans_real.py:562
+#: utils/translation/trans_real.py:568
 msgid "DATE_FORMAT"
 msgstr "तिथि_प्रारूप"
 
-#: utils/translation/trans_real.py:563
+#: utils/translation/trans_real.py:569
 msgid "DATETIME_FORMAT"
 msgstr "तिथिसमय_प्रारूप"
 
-#: utils/translation/trans_real.py:564
+#: utils/translation/trans_real.py:570
 msgid "TIME_FORMAT"
 msgstr "समय_प्रारूप"
 
-#: utils/translation/trans_real.py:585
+#: utils/translation/trans_real.py:591
 msgid "YEAR_MONTH_FORMAT"
 msgstr "वर्ष_महीना_प्रारूप"
 
-#: utils/translation/trans_real.py:586
+#: utils/translation/trans_real.py:592
 msgid "MONTH_DAY_FORMAT"
 msgstr "महीना_दिन_प्रारूप"
 
@@ -1095,3 +1068,55 @@ msgstr "%(verbose_name)s को कामयाबी से अद्यतन 
 #, python-format
 msgid "The %(verbose_name)s was deleted."
 msgstr "%(verbose_name)s को मिटाया गया हैं ।"
+
+#: views/generic/dates.py:33
+msgid "No year specified"
+msgstr ""
+
+#: views/generic/dates.py:58
+msgid "No month specified"
+msgstr ""
+
+#: views/generic/dates.py:99
+msgid "No day specified"
+msgstr ""
+
+#: views/generic/dates.py:138
+msgid "No week specified"
+msgstr ""
+
+#: views/generic/dates.py:198 views/generic/dates.py:214
+#, fuzzy, python-format
+msgid "No %(verbose_name_plural)s available"
+msgstr "%(verbose_name)s को मिटाया गया हैं ।"
+
+#: views/generic/dates.py:466
+#, python-format
+msgid ""
+"Future %(verbose_name_plural)s not available because %(class_name)s."
+"allow_future is False."
+msgstr ""
+
+#: views/generic/dates.py:500
+#, python-format
+msgid "Invalid date string '%(datestr)s' given format '%(format)s'"
+msgstr ""
+
+#: views/generic/detail.py:51
+#, fuzzy, python-format
+msgid "No %(verbose_name)s found matching the query"
+msgstr "%(verbose_name)s को कामयाबी से अद्यतन किया गया हैं ।"
+
+#: views/generic/list.py:47
+msgid "Page is not 'last', nor can it be converted to an int."
+msgstr ""
+
+#: views/generic/list.py:52
+#, python-format
+msgid "Invalid page (%(page_number)s)"
+msgstr ""
+
+#: views/generic/list.py:119
+#, python-format
+msgid "Empty list and '%(class_name)s.allow_empty' is False."
+msgstr ""

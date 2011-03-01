@@ -1,26 +1,22 @@
-# Translation of Django to Malayalam.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# RAJEESH R NAIR <rajeeshrnair@gmail.com>, 2010.
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Django SVN\n"
+"Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-21 22:59+0100\n"
-"PO-Revision-Date: 2010-05-28 15:09+0530\n"
-"Last-Translator: Rajeesh Nair <rajeeshrnair@gmail.com>\n"
-"Language-Team: MALAYALAM <ML@li.org>\n"
+"POT-Creation-Date: 2011-02-28 17:36+0100\n"
+"PO-Revision-Date: 2011-02-22 00:09+0000\n"
+"Last-Translator: rajeesh <rajeeshrnair@gmail.com>\n"
+"Language-Team: Malayalam <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Poedit-Language: Malayalam\n"
-"X-Poedit-Country: INDIA\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: ml\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: conf/global_settings.py:44
 msgid "Arabic"
-msgstr "അറബി"
+msgstr "അറബിക്"
 
 #: conf/global_settings.py:45
 msgid "Bulgarian"
@@ -71,251 +67,259 @@ msgid "Spanish"
 msgstr "സ്പാനിഷ്"
 
 #: conf/global_settings.py:57
-#, fuzzy
 msgid "Argentinian Spanish"
 msgstr "അര്‍ജന്റീനിയന്‍ സ്പാനിഷ്"
 
 #: conf/global_settings.py:58
+#, fuzzy
+msgid "Mexican Spanish"
+msgstr "അര്‍ജന്റീനിയന്‍ സ്പാനിഷ്"
+
+#: conf/global_settings.py:59
 msgid "Estonian"
 msgstr "എസ്ടോണിയന്‍ സ്പാനിഷ്"
 
-#: conf/global_settings.py:59
+#: conf/global_settings.py:60
 msgid "Basque"
 msgstr "ബാസ്ക്യു"
 
-#: conf/global_settings.py:60
+#: conf/global_settings.py:61
 msgid "Persian"
 msgstr "പേര്‍ഷ്യന്‍"
 
-#: conf/global_settings.py:61
+#: conf/global_settings.py:62
 msgid "Finnish"
 msgstr "ഫിന്നിഷ്"
 
-#: conf/global_settings.py:62
+#: conf/global_settings.py:63
 msgid "French"
 msgstr "ഫ്രെഞ്ച്"
 
-#: conf/global_settings.py:63
+#: conf/global_settings.py:64
 msgid "Frisian"
 msgstr "ഫ്രിസിയന്‍"
 
-#: conf/global_settings.py:64
+#: conf/global_settings.py:65
 msgid "Irish"
 msgstr "ഐറിഷ്"
 
-#: conf/global_settings.py:65
+#: conf/global_settings.py:66
 msgid "Galician"
 msgstr "ഗലിഷ്യന്‍"
 
-#: conf/global_settings.py:66
+#: conf/global_settings.py:67
 msgid "Hebrew"
 msgstr "ഹീബ്റു"
 
-#: conf/global_settings.py:67
+#: conf/global_settings.py:68
 msgid "Hindi"
 msgstr "ഹിന്ദി"
 
-#: conf/global_settings.py:68
+#: conf/global_settings.py:69
 msgid "Croatian"
 msgstr "ക്രൊയേഷ്യന്‍"
 
-#: conf/global_settings.py:69
+#: conf/global_settings.py:70
 msgid "Hungarian"
 msgstr "ഹംഗേറിയന്‍"
 
-#: conf/global_settings.py:70
-msgid "Indonesian"
-msgstr "ഇന്‍ദൊനേഷ്യന്‍"
-
 #: conf/global_settings.py:71
+msgid "Indonesian"
+msgstr "ഇന്തൊനേഷ്യന്‍"
+
+#: conf/global_settings.py:72
 msgid "Icelandic"
 msgstr "ഐസ്ലാന്‍ഡിക്"
 
-#: conf/global_settings.py:72
+#: conf/global_settings.py:73
 msgid "Italian"
 msgstr "ഇറ്റാലിയന്‍"
 
-#: conf/global_settings.py:73
+#: conf/global_settings.py:74
 msgid "Japanese"
 msgstr "ജാപ്പനീസ്"
 
-#: conf/global_settings.py:74
+#: conf/global_settings.py:75
 msgid "Georgian"
 msgstr "ജോര്‍ജിയന്‍"
 
-#: conf/global_settings.py:75
-msgid "Khmer"
-msgstr ""
-
 #: conf/global_settings.py:76
+msgid "Khmer"
+msgstr "ഖ്മേര്‍"
+
+#: conf/global_settings.py:77
 msgid "Kannada"
 msgstr "കന്നഡ"
 
-#: conf/global_settings.py:77
+#: conf/global_settings.py:78
 msgid "Korean"
 msgstr "കൊറിയന്‍"
 
-#: conf/global_settings.py:78
+#: conf/global_settings.py:79
 msgid "Lithuanian"
 msgstr "ലിത്വാനിയന്‍"
 
-#: conf/global_settings.py:79
+#: conf/global_settings.py:80
 msgid "Latvian"
 msgstr "ലാറ്റ്വിയന്‍"
 
-#: conf/global_settings.py:80
+#: conf/global_settings.py:81
 msgid "Macedonian"
 msgstr "മാസിഡോണിയന്‍"
 
-#: conf/global_settings.py:81
-msgid "Malayalam"
-msgstr ""
-
 #: conf/global_settings.py:82
+msgid "Malayalam"
+msgstr "മലയാളം"
+
+#: conf/global_settings.py:83
 msgid "Mongolian"
 msgstr "മംഗോളിയന്‍"
 
-#: conf/global_settings.py:83
+#: conf/global_settings.py:84
 msgid "Dutch"
 msgstr "ഡച്ച്"
 
-#: conf/global_settings.py:84
-msgid "Norwegian"
-msgstr ""
-
 #: conf/global_settings.py:85
-msgid "Norwegian Bokmal"
-msgstr ""
+msgid "Norwegian"
+msgstr "നോര്‍വീജിയന്‍"
 
 #: conf/global_settings.py:86
-msgid "Norwegian Nynorsk"
-msgstr ""
+msgid "Norwegian Bokmal"
+msgstr "നോര്‍വീജിയന്‍ ബൊക്മാല്‍"
 
 #: conf/global_settings.py:87
-msgid "Punjabi"
-msgstr ""
+msgid "Norwegian Nynorsk"
+msgstr "നോര്‍വീജിയന്‍ നിനോഷ്ക്"
 
 #: conf/global_settings.py:88
-msgid "Polish"
-msgstr ""
+msgid "Punjabi"
+msgstr "പഞ്ചാബി"
 
 #: conf/global_settings.py:89
-msgid "Portuguese"
-msgstr ""
+msgid "Polish"
+msgstr "പോളിഷ്"
 
 #: conf/global_settings.py:90
-msgid "Brazilian Portuguese"
-msgstr ""
+msgid "Portuguese"
+msgstr "പോര്‍ചുഗീസ്"
 
 #: conf/global_settings.py:91
-msgid "Romanian"
-msgstr ""
+msgid "Brazilian Portuguese"
+msgstr "ബ്റസീലിയന്‍ പോര്‍ചുഗീസ്"
 
 #: conf/global_settings.py:92
-msgid "Russian"
-msgstr ""
+msgid "Romanian"
+msgstr "റൊമാനിയന്‍"
 
 #: conf/global_settings.py:93
-msgid "Slovak"
-msgstr ""
+msgid "Russian"
+msgstr "റഷ്യന്‍"
 
 #: conf/global_settings.py:94
-msgid "Slovenian"
-msgstr ""
+msgid "Slovak"
+msgstr "സ്ളൊവാക്"
 
 #: conf/global_settings.py:95
-msgid "Albanian"
-msgstr ""
+msgid "Slovenian"
+msgstr "സ്ളൊവേനിയന്‍"
 
 #: conf/global_settings.py:96
-msgid "Serbian"
-msgstr ""
+msgid "Albanian"
+msgstr "അല്‍ബേനിയന്‍"
 
 #: conf/global_settings.py:97
-msgid "Serbian Latin"
-msgstr ""
+msgid "Serbian"
+msgstr "സെര്‍ബിയന്‍"
 
 #: conf/global_settings.py:98
-msgid "Swedish"
-msgstr ""
+msgid "Serbian Latin"
+msgstr "സെര്‍ബിയന്‍ ലാറ്റിന്‍"
 
 #: conf/global_settings.py:99
-msgid "Tamil"
-msgstr ""
+msgid "Swedish"
+msgstr "സ്വീഡിഷ്"
 
 #: conf/global_settings.py:100
-msgid "Telugu"
-msgstr ""
+msgid "Tamil"
+msgstr "തമിഴ്"
 
 #: conf/global_settings.py:101
-msgid "Thai"
-msgstr ""
+msgid "Telugu"
+msgstr "തെലുങ്ക്"
 
 #: conf/global_settings.py:102
-msgid "Turkish"
-msgstr ""
+msgid "Thai"
+msgstr "തായ്"
 
 #: conf/global_settings.py:103
-msgid "Ukrainian"
-msgstr ""
+msgid "Turkish"
+msgstr "ടര്‍ക്കിഷ്"
 
 #: conf/global_settings.py:104
-msgid "Vietnamese"
-msgstr ""
+msgid "Ukrainian"
+msgstr "യുക്രേനിയന്‍"
 
 #: conf/global_settings.py:105
-msgid "Simplified Chinese"
+msgid "Urdu"
 msgstr ""
 
 #: conf/global_settings.py:106
-msgid "Traditional Chinese"
-msgstr ""
+msgid "Vietnamese"
+msgstr "വിയറ്റ്നാമീസ്"
 
-#: core/validators.py:20 forms/fields.py:67
+#: conf/global_settings.py:107
+msgid "Simplified Chinese"
+msgstr "ലഘു ചൈനീസ്"
+
+#: conf/global_settings.py:108
+msgid "Traditional Chinese"
+msgstr "പരമ്പരാഗത ചൈനീസ്"
+
+#: core/validators.py:21 forms/fields.py:67
 msgid "Enter a valid value."
 msgstr "ശരിയായ മൂല്യം നല്കണം."
-
-#: core/validators.py:87 forms/fields.py:574
-msgid "Enter a valid URL."
-msgstr "ശരിയായ URL നല്കണം."
 
 #: core/validators.py:89 forms/fields.py:575
 msgid "This URL appears to be a broken link."
 msgstr "ഈ URL നിലവില്ലാത്ത വിലാസമാണ് കാണിക്കുന്നത്."
 
-#: core/validators.py:120 forms/fields.py:449
+#: core/validators.py:94 forms/fields.py:574
+msgid "Enter a valid URL."
+msgstr "ശരിയായ URL നല്കണം."
+
+#: core/validators.py:138 forms/fields.py:449
 msgid "Enter a valid e-mail address."
 msgstr "ശരിയായ ഇ-മെയില്‍ വിലാസം നല്കുക."
 
-#: core/validators.py:123 forms/fields.py:958
+#: core/validators.py:141 forms/fields.py:958
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr "ശരിയായ സ്ളഗ് നല്കുക (അക്ഷരങ്ങള്‍, അക്കങ്ങള്‍, അണ്ടര്‍സ്കോര്‍, ഹൈഫന്‍ എന്നിവ മാത്രം ചേര്‍ന്നത്)."
 
-#: core/validators.py:126 forms/fields.py:951
+#: core/validators.py:144 forms/fields.py:951
 msgid "Enter a valid IPv4 address."
 msgstr "ശരിയായ IPv4 വിലാസം നല്കണം"
 
-#: core/validators.py:129 db/models/fields/__init__.py:575
+#: core/validators.py:147 db/models/fields/__init__.py:575
 msgid "Enter only digits separated by commas."
 msgstr "അക്കങ്ങള്‍ മാത്രം (കോമയിട്ടു വേര്‍തിരിച്ചത്)"
 
-#: core/validators.py:135
+#: core/validators.py:153
 #, python-format
 msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
 msgstr "ഇത് %(limit_value)s ആവണം. (ഇപ്പോള്‍ %(show_value)s)."
 
-#: core/validators.py:153 forms/fields.py:222 forms/fields.py:275
+#: core/validators.py:171 forms/fields.py:222 forms/fields.py:275
 #, python-format
 msgid "Ensure this value is less than or equal to %(limit_value)s."
 msgstr "ഇത് %(limit_value)s-ഓ അതില്‍ കുറവോ ആവണം"
 
-#: core/validators.py:158 forms/fields.py:223 forms/fields.py:276
+#: core/validators.py:176 forms/fields.py:223 forms/fields.py:276
 #, python-format
 msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr "ഇത് %(limit_value)s-ഓ അതില്‍ കൂടുതലോ ആവണം"
 
-#: core/validators.py:164
+#: core/validators.py:182
 #, python-format
 msgid ""
 "Ensure this value has at least %(limit_value)d characters (it has %"
@@ -324,7 +328,7 @@ msgstr ""
 "ഇതിനു ഏറ്റവും കുറഞ്ഞത് %(limit_value)d അക്ഷരങ്ങള്‍ വേണം. (ഇപ്പോള്‍ %(show_value)d "
 "അക്ഷരങ്ങളുണ്ട്.)"
 
-#: core/validators.py:170
+#: core/validators.py:188
 #, python-format
 msgid ""
 "Ensure this value has at most %(limit_value)d characters (it has %"
@@ -333,17 +337,17 @@ msgstr ""
 "ഇതിനു പരമാവധി %(limit_value)d അക്ഷരങ്ങളേ ഉള്ളൂ എന്നു ഉറപ്പാക്കുക. (ഇപ്പോള്‍ %(show_value)"
 "d അക്ഷരങ്ങളുണ്ട്.)"
 
-#: db/models/base.py:767
+#: db/models/base.py:769
 #, python-format
 msgid "%(field_name)s must be unique for %(date_field)s %(lookup)s."
 msgstr "%(date_field)s %(lookup)s-നു %(field_name)s ആവര്‍ത്തിക്കാന്‍ പാടില്ല."
 
-#: db/models/base.py:782 db/models/base.py:790
+#: db/models/base.py:784 db/models/base.py:792
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(field_label)s-ഓടു കൂടിയ %(model_name)s നിലവിലുണ്ട്."
 
-#: db/models/base.py:789 forms/models.py:581
+#: db/models/base.py:791 forms/models.py:560
 msgid "and"
 msgstr "ഉം"
 
@@ -354,16 +358,16 @@ msgstr "%r അനുയോജ്യമല്ല."
 
 #: db/models/fields/__init__.py:64
 msgid "This field cannot be null."
-msgstr "ഈ കള്ളി ഒഴിച്ചിടരുത്."
+msgstr "ഈ കളം (ഫീല്‍ഡ്) ഒഴിച്ചിടരുത്."
 
 #: db/models/fields/__init__.py:65
 msgid "This field cannot be blank."
-msgstr "ഈ കള്ളി ഒഴിച്ചിടരുത്."
+msgstr "ഈ കളം (ഫീല്‍ഡ്) ഒഴിച്ചിടരുത്."
 
 #: db/models/fields/__init__.py:70
 #, python-format
 msgid "Field of type: %(field_type)s"
-msgstr ""
+msgstr "%(field_type)s എന്ന തരത്തിലുള്ള കളം (ഫീല്‍ഡ്)"
 
 #: db/models/fields/__init__.py:451 db/models/fields/__init__.py:871
 #: db/models/fields/__init__.py:980 db/models/fields/__init__.py:991
@@ -381,12 +385,12 @@ msgstr "ശരിയോ തെറ്റോ എന്നു മാത്രം"
 
 #: db/models/fields/__init__.py:495
 msgid "Boolean (Either True or False)"
-msgstr "ശരിയോ തെറ്റോ എന്നു മാത്രം"
+msgstr "ശരിയോ തെറ്റോ (True അഥവാ False)"
 
 #: db/models/fields/__init__.py:542 db/models/fields/__init__.py:1001
 #, python-format
 msgid "String (up to %(max_length)s)"
-msgstr ""
+msgstr "സ്ട്രിങ്ങ് (%(max_length)s വരെ നീളമുള്ളത്)"
 
 #: db/models/fields/__init__.py:570
 msgid "Comma-separated integers"
@@ -426,7 +430,7 @@ msgid "E-mail address"
 msgstr "ഇ-മെയില്‍ വിലാസം"
 
 #: db/models/fields/__init__.py:818 db/models/fields/files.py:220
-#: db/models/fields/files.py:339
+#: db/models/fields/files.py:326
 msgid "File path"
 msgstr "ഫയല്‍ സ്ഥാനം"
 
@@ -452,7 +456,7 @@ msgstr "ഈ മൂല്യം None, True, False എന്നിവയില്�
 
 #: db/models/fields/__init__.py:933
 msgid "Boolean (Either True, False or None)"
-msgstr "ശരിയോ തെറ്റോ എന്നു മാത്രം"
+msgstr "ശരിയോ തെറ്റോ എന്നു മാത്രം (True, False, None എന്നിവയില്‍ ഏതെങ്കിലും ഒന്ന്)"
 
 #: db/models/fields/__init__.py:1024
 msgid "Text"
@@ -472,33 +476,33 @@ msgstr "URL(വെബ്-വിലാസം)"
 
 #: db/models/fields/__init__.py:1136
 msgid "XML text"
-msgstr ""
+msgstr "XML ടെക്സ്റ്റ്"
 
-#: db/models/fields/related.py:804
+#: db/models/fields/related.py:815
 #, python-format
 msgid "Model %(model)s with pk %(pk)r does not exist."
-msgstr ""
+msgstr "%(pk)r എന്ന pk ഉള്ള %(model)s എന്ന മോഡല്‍ നിലവിലില്ല."
 
-#: db/models/fields/related.py:806
+#: db/models/fields/related.py:817
 msgid "Foreign Key (type determined by related field)"
-msgstr ""
+msgstr "ഫോറിന്‍ കീ (ടൈപ്പ് ബന്ധപ്പെട്ട ഫീല്‍ഡില്‍ നിന്നും നിര്‍ണ്ണയിക്കുന്നതാണ്)"
 
-#: db/models/fields/related.py:928
+#: db/models/fields/related.py:941
 msgid "One-to-one relationship"
-msgstr ""
+msgstr "വണ്‍-ടു-വണ്‍ ബന്ധം"
 
-#: db/models/fields/related.py:990
+#: db/models/fields/related.py:1003
 msgid "Many-to-many relationship"
-msgstr ""
+msgstr "മെനി-ടു-മെനി ബന്ധം"
 
-#: db/models/fields/related.py:1010
+#: db/models/fields/related.py:1023
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr "\"Control\" എന്ന കീ അമര്‍ത്തിപ്പിടിക്കുക. (Macലാണെങ്കില്‍  \"Command\")."
 
 #: forms/fields.py:66
 msgid "This field is required."
-msgstr "ഈ കള്ളി നിര്‍ബന്ധമാണ്."
+msgstr "ഈ കള്ളി(ഫീല്‍ഡ്) നിര്‍ബന്ധമാണ്."
 
 #: forms/fields.py:221
 msgid "Enter a whole number."
@@ -537,11 +541,11 @@ msgstr "ശരിയായ തീയതിയും സമയവും നല്
 
 #: forms/fields.py:460
 msgid "No file was submitted. Check the encoding type on the form."
-msgstr "ഫയലൊന്നും ലഭിച്ചില്ല. ഫോമിലെ എന്‍-കോഡിംഗ് പരിശോധിക്കുക."
+msgstr "ഫയലൊന്നും ലഭിച്ചിട്ടില്ല. ഫോമിലെ എന്‍-കോഡിംഗ് പരിശോധിക്കുക."
 
 #: forms/fields.py:461
 msgid "No file was submitted."
-msgstr "ഫയലൊന്നും ലഭിച്ചില്ല."
+msgstr "ഫയലൊന്നും ലഭിച്ചിട്ടില്ല."
 
 #: forms/fields.py:462
 msgid "The submitted file is empty."
@@ -558,6 +562,8 @@ msgstr ""
 #: forms/fields.py:464
 msgid "Please either submit a file or check the clear checkbox, not both."
 msgstr ""
+"ഒന്നുകില്‍ ഫയല്‍ സമര്‍പ്പിക്കണം, അല്ലെങ്കില്‍ ക്ളിയര്‍ എന്ന ചെക്ബോക്സ് ടിക് ചെയ്യണം. ദയവായി രണ്ടും "
+"കൂടി ചെയ്യരുത്."
 
 #: forms/fields.py:518
 msgid ""
@@ -572,29 +578,29 @@ msgstr ""
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr "യോഗ്യമായത് തെരഞ്ഞെടുക്കുക. %(value)s ലഭ്യമായവയില്‍ ഉള്‍പ്പെടുന്നില്ല."
 
-#: forms/fields.py:726 forms/fields.py:814 forms/models.py:1018
+#: forms/fields.py:726 forms/fields.py:814 forms/models.py:983
 msgid "Enter a list of values."
 msgstr "മൂല്യങ്ങളുടെ പട്ടിക(ലിസ്റ്റ്) നല്കുക."
 
-#: forms/formsets.py:308 forms/formsets.py:310
+#: forms/formsets.py:305 forms/formsets.py:307
 msgid "Order"
 msgstr "ക്രമം"
 
-#: forms/formsets.py:312
+#: forms/formsets.py:309
 msgid "Delete"
-msgstr ""
+msgstr "ഡിലീറ്റ്"
 
-#: forms/models.py:575
+#: forms/models.py:554
 #, python-format
 msgid "Please correct the duplicate data for %(field)s."
 msgstr "%(field)s-നായി നല്കുന്ന വിവരം ആവര്‍ത്തിച്ചത് ദയവായി തിരുത്തുക."
 
-#: forms/models.py:579
+#: forms/models.py:558
 #, python-format
 msgid "Please correct the duplicate data for %(field)s, which must be unique."
 msgstr "%(field)s-നായി നല്കുന്ന വിവരം ആവര്‍ത്തിക്കാന്‍ പാടില്ല. ദയവായി തിരുത്തുക."
 
-#: forms/models.py:585
+#: forms/models.py:564
 #, python-format
 msgid ""
 "Please correct the duplicate data for %(field_name)s which must be unique "
@@ -603,104 +609,103 @@ msgstr ""
 "%(date_field)s ലെ %(lookup)s നു വേണ്ടി %(field_name)s നു നല്കുന്ന വിവരം ആവര്‍ത്തിക്കാന്‍ "
 "പാടില്ല. ദയവായി തിരുത്തുക."
 
-#: forms/models.py:593
+#: forms/models.py:572
 msgid "Please correct the duplicate values below."
 msgstr "താഴെ കൊടുത്തവയില്‍ ആവര്‍ത്തനം ഒഴിവാക്കുക."
 
-#: forms/models.py:868
+#: forms/models.py:833
 msgid "The inline foreign key did not match the parent instance primary key."
-msgstr ""
+msgstr "ഇന്‍ലൈനായി നല്കിയ ഫോറിന്‍ കീ മാത്രു വസ്തുവിന്റെ പ്രാഥമിക കീയുമായി യോജിക്കുന്നില്ല."
 
-#: forms/models.py:929
+#: forms/models.py:894
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "യോഗ്യമായത് തെരഞ്ഞെടുക്കുക. നിങ്ങള്‍ നല്കിയത് ലഭ്യമായവയില്‍ ഉള്‍പ്പെടുന്നില്ല."
 
-#: forms/models.py:1019
+#: forms/models.py:984
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "യോഗ്യമായത് തെരഞ്ഞെടുക്കുക. %s തന്നിരിക്കുന്നവയില്‍ ഉള്‍പ്പെടുന്നില്ല."
 
-#: forms/models.py:1021
+#: forms/models.py:986
 #, python-format
 msgid "\"%s\" is not a valid value for a primary key."
 msgstr "\"%s\" പ്രാഥമിക കീ ആവാന്‍ അനുയോജ്യമായ മൂല്യമല്ല."
 
 #: forms/widgets.py:299
 msgid "Currently"
-msgstr ""
+msgstr "നിലവിലുള്ളത്"
 
 #: forms/widgets.py:300
 msgid "Change"
 msgstr "മാറ്റുക"
 
 #: forms/widgets.py:301
-#, fuzzy
 msgid "Clear"
-msgstr "വര്‍ഷം"
+msgstr "കാലിയാക്കുക"
 
-#: forms/widgets.py:547
+#: forms/widgets.py:548
 msgid "Unknown"
 msgstr "അജ്ഞാതം"
 
-#: forms/widgets.py:547
+#: forms/widgets.py:548
 msgid "Yes"
 msgstr "അതെ"
 
-#: forms/widgets.py:547
+#: forms/widgets.py:548
 msgid "No"
 msgstr "അല്ല"
 
-#: template/defaultfilters.py:774
+#: template/defaultfilters.py:767
 msgid "yes,no,maybe"
-msgstr "ഉണ്ട്, ഇല്ല, ഉണ്ടാവാം"
+msgstr "ഉണ്ട്, ഇല്ല, ഉണ്ടായേക്കാം"
 
-#: template/defaultfilters.py:805
+#: template/defaultfilters.py:795 template/defaultfilters.py:800
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(size)d ബൈറ്റ്"
+msgstr[1] "%(size)d ബൈറ്റുകള്‍"
 
-#: template/defaultfilters.py:807
+#: template/defaultfilters.py:802
 #, python-format
 msgid "%s KB"
-msgstr ""
+msgstr "%s കെ.ബി"
+
+#: template/defaultfilters.py:804
+#, python-format
+msgid "%s MB"
+msgstr "%s എം.ബി"
+
+#: template/defaultfilters.py:806
+#, python-format
+msgid "%s GB"
+msgstr "%s ജി.ബി"
+
+#: template/defaultfilters.py:808
+#, python-format
+msgid "%s TB"
+msgstr "%s ടി.ബി"
 
 #: template/defaultfilters.py:809
 #, python-format
-msgid "%s MB"
-msgstr ""
-
-#: template/defaultfilters.py:811
-#, python-format
-msgid "%s GB"
-msgstr ""
-
-#: template/defaultfilters.py:813
-#, python-format
-msgid "%s TB"
-msgstr ""
-
-#: template/defaultfilters.py:814
-#, python-format
 msgid "%s PB"
-msgstr ""
+msgstr "%s പി.ബി"
 
 #: utils/dateformat.py:42
 msgid "p.m."
-msgstr ""
+msgstr "പി. എം (ഉച്ചയ്ക്കു ശേഷം) "
 
 #: utils/dateformat.py:43
 msgid "a.m."
-msgstr ""
+msgstr "എ. എം (ഉച്ചയ്ക്കു മുമ്പ്)"
 
 #: utils/dateformat.py:48
 msgid "PM"
-msgstr "PM"
+msgstr "പി. എം (ഉച്ചയ്ക്കു ശേഷം) "
 
 #: utils/dateformat.py:49
 msgid "AM"
-msgstr "AM"
+msgstr "എ. എം (ഉച്ചയ്ക്കു മുമ്പ്)"
 
 #: utils/dateformat.py:98
 msgid "midnight"
@@ -900,12 +905,12 @@ msgstr "ജൂലൈ"
 #: utils/dates.py:38
 msgctxt "abbrev. month"
 msgid "Aug."
-msgstr "ആഗസ്ത്"
+msgstr "ആഗ."
 
 #: utils/dates.py:39
 msgctxt "abbrev. month"
 msgid "Sept."
-msgstr "സെപ്ടം."
+msgstr "സെപ്തം."
 
 #: utils/dates.py:40
 msgctxt "abbrev. month"
@@ -923,73 +928,61 @@ msgid "Dec."
 msgstr "ഡിസം."
 
 #: utils/dates.py:45
-#, fuzzy
 msgctxt "alt. month"
 msgid "January"
 msgstr "ജനുവരി"
 
 #: utils/dates.py:46
-#, fuzzy
 msgctxt "alt. month"
 msgid "February"
 msgstr "ഫെബ്രുവരി"
 
 #: utils/dates.py:47
-#, fuzzy
 msgctxt "alt. month"
 msgid "March"
 msgstr "മാര്‍ച്ച്"
 
 #: utils/dates.py:48
-#, fuzzy
 msgctxt "alt. month"
 msgid "April"
 msgstr "ഏപ്രില്‍"
 
 #: utils/dates.py:49
-#, fuzzy
 msgctxt "alt. month"
 msgid "May"
 msgstr "മേയ്"
 
 #: utils/dates.py:50
-#, fuzzy
 msgctxt "alt. month"
 msgid "June"
 msgstr "ജൂണ്‍"
 
 #: utils/dates.py:51
-#, fuzzy
 msgctxt "alt. month"
 msgid "July"
 msgstr "ജൂലൈ"
 
 #: utils/dates.py:52
-#, fuzzy
 msgctxt "alt. month"
 msgid "August"
 msgstr "ആഗസ്ത്"
 
 #: utils/dates.py:53
-#, fuzzy
 msgctxt "alt. month"
 msgid "September"
 msgstr "സെപ്തംബര്‍"
 
 #: utils/dates.py:54
-#, fuzzy
 msgctxt "alt. month"
 msgid "October"
 msgstr "ഒക്ടോബര്‍"
 
 #: utils/dates.py:55
-#, fuzzy
 msgctxt "alt. month"
 msgid "November"
 msgstr "നവംബര്‍"
 
 #: utils/dates.py:56
-#, fuzzy
 msgctxt "alt. month"
 msgid "December"
 msgstr "ഡിസംബര്‍"
@@ -1001,7 +994,7 @@ msgstr "അഥവാ"
 #. Translators: This string is used as a separator between list elements
 #: utils/text.py:153
 msgid ", "
-msgstr ""
+msgstr ", "
 
 #: utils/timesince.py:21
 msgid "year"
@@ -1046,32 +1039,32 @@ msgstr "മിനുട്ടുകള്‍"
 #: utils/timesince.py:50
 #, python-format
 msgid "%(number)d %(type)s"
-msgstr ""
+msgstr "%(number)d %(type)s"
 
 #: utils/timesince.py:56
 #, python-format
 msgid ", %(number)d %(type)s"
-msgstr ""
+msgstr ", %(number)d %(type)s"
 
-#: utils/translation/trans_real.py:562
+#: utils/translation/trans_real.py:568
 msgid "DATE_FORMAT"
-msgstr ""
+msgstr "തീയതിയുടെ മാത്രുക"
 
-#: utils/translation/trans_real.py:563
+#: utils/translation/trans_real.py:569
 msgid "DATETIME_FORMAT"
-msgstr ""
+msgstr "തീയതിയും സമയവും ചേര്‍ന്ന മാത്രുക"
 
-#: utils/translation/trans_real.py:564
+#: utils/translation/trans_real.py:570
 msgid "TIME_FORMAT"
-msgstr ""
+msgstr "സമയത്തിന്റെ മാത്രുക"
 
-#: utils/translation/trans_real.py:585
+#: utils/translation/trans_real.py:591
 msgid "YEAR_MONTH_FORMAT"
-msgstr ""
+msgstr "വര്‍ഷം-മാസം എന്ന മാത്രുക"
 
-#: utils/translation/trans_real.py:586
+#: utils/translation/trans_real.py:592
 msgid "MONTH_DAY_FORMAT"
-msgstr ""
+msgstr "മാസം-ദിവസം എന്ന മാത്രുക"
 
 #: views/generic/create_update.py:121
 #, python-format
@@ -1087,3 +1080,55 @@ msgstr "%(verbose_name)s നെ മെച്ചപ്പെടുത്തി."
 #, python-format
 msgid "The %(verbose_name)s was deleted."
 msgstr "%(verbose_name)s ഡിലീറ്റ് ചെയ്യപ്പെട്ടു."
+
+#: views/generic/dates.py:33
+msgid "No year specified"
+msgstr ""
+
+#: views/generic/dates.py:58
+msgid "No month specified"
+msgstr ""
+
+#: views/generic/dates.py:99
+msgid "No day specified"
+msgstr ""
+
+#: views/generic/dates.py:138
+msgid "No week specified"
+msgstr ""
+
+#: views/generic/dates.py:198 views/generic/dates.py:214
+#, fuzzy, python-format
+msgid "No %(verbose_name_plural)s available"
+msgstr "%(verbose_name)s ഡിലീറ്റ് ചെയ്യപ്പെട്ടു."
+
+#: views/generic/dates.py:466
+#, python-format
+msgid ""
+"Future %(verbose_name_plural)s not available because %(class_name)s."
+"allow_future is False."
+msgstr ""
+
+#: views/generic/dates.py:500
+#, python-format
+msgid "Invalid date string '%(datestr)s' given format '%(format)s'"
+msgstr ""
+
+#: views/generic/detail.py:51
+#, fuzzy, python-format
+msgid "No %(verbose_name)s found matching the query"
+msgstr "%(verbose_name)s നെ മെച്ചപ്പെടുത്തി."
+
+#: views/generic/list.py:47
+msgid "Page is not 'last', nor can it be converted to an int."
+msgstr ""
+
+#: views/generic/list.py:52
+#, python-format
+msgid "Invalid page (%(page_number)s)"
+msgstr ""
+
+#: views/generic/list.py:119
+#, python-format
+msgid "Empty list and '%(class_name)s.allow_empty' is False."
+msgstr ""

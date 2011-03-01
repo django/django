@@ -1,18 +1,17 @@
-# translation of django.po to Georgian
-# Django translation to Georgian language.
-# This file is distributed under the same license as the PACKAGE package.
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-21 22:59+0100\n"
-"PO-Revision-Date: 2008-10-05 14:34+0400\n"
-"Last-Translator: David Avsajanishvili <avsd05@gmail.com>\n"
-"Language-Team: Georgian <ka@li.org>\n"
+"POT-Creation-Date: 2011-02-28 17:35+0100\n"
+"PO-Revision-Date: 2011-02-22 00:09+0000\n"
+"Last-Translator: avsd05 <avsd05@gmail.com>\n"
+"Language-Team: Georgian <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: ka\n"
 "Plural-Forms: nplurals=1; plural=0\n"
 
 #: conf/global_settings.py:44
@@ -28,9 +27,8 @@ msgid "Bengali"
 msgstr "ბენგალიური"
 
 #: conf/global_settings.py:47
-#, fuzzy
 msgid "Bosnian"
-msgstr "ესტონური"
+msgstr "ბოსნიური"
 
 #: conf/global_settings.py:48
 msgid "Catalan"
@@ -61,325 +59,317 @@ msgid "English"
 msgstr "ინგლისური"
 
 #: conf/global_settings.py:55
-#, fuzzy
 msgid "British English"
-msgstr "ინგლისური"
+msgstr "ბრიტანეთის ინგლისური"
 
 #: conf/global_settings.py:56
 msgid "Spanish"
 msgstr "ესპანური"
 
 #: conf/global_settings.py:57
-#, fuzzy
 msgid "Argentinian Spanish"
 msgstr "არგენტინის ესპანური"
 
 #: conf/global_settings.py:58
+#, fuzzy
+msgid "Mexican Spanish"
+msgstr "არგენტინის ესპანური"
+
+#: conf/global_settings.py:59
 msgid "Estonian"
 msgstr "ესტონური"
 
-#: conf/global_settings.py:59
+#: conf/global_settings.py:60
 msgid "Basque"
 msgstr "ბასკური"
 
-#: conf/global_settings.py:60
+#: conf/global_settings.py:61
 msgid "Persian"
 msgstr "სპარსული"
 
-#: conf/global_settings.py:61
+#: conf/global_settings.py:62
 msgid "Finnish"
 msgstr "ფინური"
 
-#: conf/global_settings.py:62
+#: conf/global_settings.py:63
 msgid "French"
 msgstr "ფრანგული"
 
-#: conf/global_settings.py:63
-#, fuzzy
-msgid "Frisian"
-msgstr "ფრისლანდია"
-
 #: conf/global_settings.py:64
+msgid "Frisian"
+msgstr "ფრისიული"
+
+#: conf/global_settings.py:65
 msgid "Irish"
 msgstr "ირლანდიური"
 
-#: conf/global_settings.py:65
+#: conf/global_settings.py:66
 msgid "Galician"
 msgstr "გალიციური"
 
-#: conf/global_settings.py:66
+#: conf/global_settings.py:67
 msgid "Hebrew"
 msgstr "ებრაული"
 
-#: conf/global_settings.py:67
-#, fuzzy
-msgid "Hindi"
-msgstr "ჰაილენდი"
-
 #: conf/global_settings.py:68
+msgid "Hindi"
+msgstr "ჰინდი"
+
+#: conf/global_settings.py:69
 msgid "Croatian"
 msgstr "ხორვატიული"
 
-#: conf/global_settings.py:69
+#: conf/global_settings.py:70
 msgid "Hungarian"
 msgstr "უნგრული"
 
-#: conf/global_settings.py:70
-#, fuzzy
-msgid "Indonesian"
-msgstr "მაკედონიური"
-
 #: conf/global_settings.py:71
+msgid "Indonesian"
+msgstr "ინდონეზიური"
+
+#: conf/global_settings.py:72
 msgid "Icelandic"
 msgstr "ისლანდიური"
 
-#: conf/global_settings.py:72
+#: conf/global_settings.py:73
 msgid "Italian"
 msgstr "იტალიური"
 
-#: conf/global_settings.py:73
+#: conf/global_settings.py:74
 msgid "Japanese"
 msgstr "იაპონური"
 
-#: conf/global_settings.py:74
+#: conf/global_settings.py:75
 msgid "Georgian"
 msgstr "ქართული"
 
-#: conf/global_settings.py:75
+#: conf/global_settings.py:76
 msgid "Khmer"
 msgstr "ხმერული"
 
-#: conf/global_settings.py:76
+#: conf/global_settings.py:77
 msgid "Kannada"
 msgstr "კანნადა"
 
-#: conf/global_settings.py:77
+#: conf/global_settings.py:78
 msgid "Korean"
 msgstr "კორეული"
 
-#: conf/global_settings.py:78
+#: conf/global_settings.py:79
 msgid "Lithuanian"
 msgstr "ლიტვური"
 
-#: conf/global_settings.py:79
+#: conf/global_settings.py:80
 msgid "Latvian"
 msgstr "ლატვიური"
 
-#: conf/global_settings.py:80
+#: conf/global_settings.py:81
 msgid "Macedonian"
 msgstr "მაკედონიური"
 
-#: conf/global_settings.py:81
-#, fuzzy
-msgid "Malayalam"
-msgstr "მალაგა"
-
 #: conf/global_settings.py:82
-#, fuzzy
-msgid "Mongolian"
-msgstr "მაკედონიური"
+msgid "Malayalam"
+msgstr "მალაიზიური"
 
 #: conf/global_settings.py:83
+msgid "Mongolian"
+msgstr "მონღოლური"
+
+#: conf/global_settings.py:84
 msgid "Dutch"
 msgstr "ჰოლანდიური"
 
-#: conf/global_settings.py:84
+#: conf/global_settings.py:85
 msgid "Norwegian"
 msgstr "ნორვეგიული"
 
-#: conf/global_settings.py:85
-#, fuzzy
-msgid "Norwegian Bokmal"
-msgstr "ნორვეგიული"
-
 #: conf/global_settings.py:86
-#, fuzzy
-msgid "Norwegian Nynorsk"
-msgstr "ნორვეგიული"
+msgid "Norwegian Bokmal"
+msgstr "ნორვეგიული-ბოკმალი"
 
 #: conf/global_settings.py:87
-msgid "Punjabi"
-msgstr ""
+msgid "Norwegian Nynorsk"
+msgstr "ნორვეგიული-ნინორსკი"
 
 #: conf/global_settings.py:88
+msgid "Punjabi"
+msgstr "პუნჯაბი"
+
+#: conf/global_settings.py:89
 msgid "Polish"
 msgstr "პოლონური"
 
-#: conf/global_settings.py:89
-#, fuzzy
+#: conf/global_settings.py:90
 msgid "Portuguese"
 msgstr "პორტუგალიური"
 
-#: conf/global_settings.py:90
+#: conf/global_settings.py:91
 msgid "Brazilian Portuguese"
 msgstr "ბრაზილიური პორტუგალიური"
 
-#: conf/global_settings.py:91
+#: conf/global_settings.py:92
 msgid "Romanian"
 msgstr "რუმინული"
 
-#: conf/global_settings.py:92
+#: conf/global_settings.py:93
 msgid "Russian"
 msgstr "რუსული"
 
-#: conf/global_settings.py:93
+#: conf/global_settings.py:94
 msgid "Slovak"
 msgstr "სლოვაკური"
 
-#: conf/global_settings.py:94
+#: conf/global_settings.py:95
 msgid "Slovenian"
 msgstr "სლოვენიური"
 
-#: conf/global_settings.py:95
-#, fuzzy
-msgid "Albanian"
-msgstr "ალასანტი"
-
 #: conf/global_settings.py:96
+msgid "Albanian"
+msgstr "ალბანური"
+
+#: conf/global_settings.py:97
 msgid "Serbian"
 msgstr "სერბული"
 
-#: conf/global_settings.py:97
-#, fuzzy
-msgid "Serbian Latin"
-msgstr "სერბული"
-
 #: conf/global_settings.py:98
+msgid "Serbian Latin"
+msgstr "სერბული (ლათინური)"
+
+#: conf/global_settings.py:99
 msgid "Swedish"
 msgstr "შვედური"
 
-#: conf/global_settings.py:99
+#: conf/global_settings.py:100
 msgid "Tamil"
 msgstr "თამილური"
 
-#: conf/global_settings.py:100
+#: conf/global_settings.py:101
 msgid "Telugu"
 msgstr "ტელუგუ"
 
-#: conf/global_settings.py:101
-#, fuzzy
-msgid "Thai"
-msgstr "თამილური"
-
 #: conf/global_settings.py:102
+msgid "Thai"
+msgstr "ტაი"
+
+#: conf/global_settings.py:103
 msgid "Turkish"
 msgstr "თურქული"
 
-#: conf/global_settings.py:103
+#: conf/global_settings.py:104
 msgid "Ukrainian"
 msgstr "უკრაინული"
 
-#: conf/global_settings.py:104
-#, fuzzy
-msgid "Vietnamese"
-msgstr "ვენა"
-
 #: conf/global_settings.py:105
+msgid "Urdu"
+msgstr ""
+
+#: conf/global_settings.py:106
+msgid "Vietnamese"
+msgstr "ვიეტნამური"
+
+#: conf/global_settings.py:107
 msgid "Simplified Chinese"
 msgstr "გამარტივებული ჩინური"
 
-#: conf/global_settings.py:106
+#: conf/global_settings.py:108
 msgid "Traditional Chinese"
 msgstr "ტრადიციული ჩინური"
 
-#: core/validators.py:20 forms/fields.py:67
+#: core/validators.py:21 forms/fields.py:67
 msgid "Enter a valid value."
 msgstr "შეიყვანეთ სწორი მნიშვნელობა."
-
-#: core/validators.py:87 forms/fields.py:574
-msgid "Enter a valid URL."
-msgstr "შეიყვანეთ სწორი URL."
 
 #: core/validators.py:89 forms/fields.py:575
 msgid "This URL appears to be a broken link."
 msgstr "როგორც ჩანს, URL არის გაწყვეტილი ბმული."
 
-#: core/validators.py:120 forms/fields.py:449
+#: core/validators.py:94 forms/fields.py:574
+msgid "Enter a valid URL."
+msgstr "შეიყვანეთ სწორი URL."
+
+#: core/validators.py:138 forms/fields.py:449
 msgid "Enter a valid e-mail address."
 msgstr "შეიყვანეთ სწორი ელ. ფოსტის მისამართი."
 
-#: core/validators.py:123 forms/fields.py:958
+#: core/validators.py:141 forms/fields.py:958
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
 "შეიყვანეთ სწორი 'slug'-მნიშვნელობა, რომელიც შეიცავს მხოლოდ ასოებს, ციფრებს, "
 "ხაზგასმის ნიშნებს და დეფისებს."
 
-#: core/validators.py:126 forms/fields.py:951
+#: core/validators.py:144 forms/fields.py:951
 msgid "Enter a valid IPv4 address."
 msgstr "შეიყვანეთ სწორი IPv4 მისამართი."
 
-#: core/validators.py:129 db/models/fields/__init__.py:575
+#: core/validators.py:147 db/models/fields/__init__.py:575
 msgid "Enter only digits separated by commas."
 msgstr "შეიყვანეთ მხოლოდ მძიმეებით გამოყოფილი ციფრები."
 
-#: core/validators.py:135
-#, fuzzy, python-format
+#: core/validators.py:153
+#, python-format
 msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
-msgstr ""
-"დარწმუნდით, რომ მნიშვნელობა შედგება არანაკლებ %(min)d სიმბოლოსაგან (ახლა "
-"მისი სიგრძეა %(length)d)."
+msgstr "მნიშვნელობა უნდა იყოს %(limit_value)s (იგი არის %(show_value)s)."
 
-#: core/validators.py:153 forms/fields.py:222 forms/fields.py:275
-#, fuzzy, python-format
+#: core/validators.py:171 forms/fields.py:222 forms/fields.py:275
+#, python-format
 msgid "Ensure this value is less than or equal to %(limit_value)s."
-msgstr "დარწმუნდით, რომ მნიშვნელობა ნაკლებია ან ტოლია %s-ზე."
+msgstr "მნიშვნელობა უნდა იყოს %(limit_value)s-ზე ნაკლები ან ტოლი."
 
-#: core/validators.py:158 forms/fields.py:223 forms/fields.py:276
-#, fuzzy, python-format
+#: core/validators.py:176 forms/fields.py:223 forms/fields.py:276
+#, python-format
 msgid "Ensure this value is greater than or equal to %(limit_value)s."
-msgstr "დარწმუნდით, რომ მნიშვნელობა მეტია ან ტოლია %s-ზე."
+msgstr "მნიშვნელობა უნდა იყოს %(limit_value)s-ზე მეტი ან ტოლი."
 
-#: core/validators.py:164
-#, fuzzy, python-format
+#: core/validators.py:182
+#, python-format
 msgid ""
 "Ensure this value has at least %(limit_value)d characters (it has %"
 "(show_value)d)."
 msgstr ""
-"დარწმუნდით, რომ მნიშვნელობა შედგება არანაკლებ %(min)d სიმბოლოსაგან (ახლა "
-"მისი სიგრძეა %(length)d)."
+"მნიშვნელობა უნდა შეიცავდეს სულ მცირე %(limit_value)d სიმბოლოს (იგი შეიცავს %"
+"(show_value)d-ს)."
 
-#: core/validators.py:170
-#, fuzzy, python-format
+#: core/validators.py:188
+#, python-format
 msgid ""
 "Ensure this value has at most %(limit_value)d characters (it has %"
 "(show_value)d)."
 msgstr ""
-"დარწმუნდით, რომ მნიშვნელობა შედგება არაუმეტეს %(max)d სიმბოლოსაგან (ახლა "
-"მისი სიგრძეა %(length)d)."
+"მნიშვნელობა უნდა შეიცავდეს არაუმეტეს %(limit_value)d სიმბოლოს (იგი შეიცავს %"
+"(show_value)d-ს)."
 
-#: db/models/base.py:767
+#: db/models/base.py:769
 #, python-format
 msgid "%(field_name)s must be unique for %(date_field)s %(lookup)s."
-msgstr ""
+msgstr "%(field_name)s უნიკალური უნდა იყოს %(date_field)s-თვის %(lookup)s-ზე."
 
-#: db/models/base.py:782 db/models/base.py:790
+#: db/models/base.py:784 db/models/base.py:792
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(model_name)s მოცემული %(field_label)s-ით უკვე არსებობს."
 
-#: db/models/base.py:789 forms/models.py:581
+#: db/models/base.py:791 forms/models.py:560
 msgid "and"
 msgstr "და"
 
 #: db/models/fields/__init__.py:63
 #, python-format
 msgid "Value %r is not a valid choice."
-msgstr ""
+msgstr "მნიშვნელობა %r არ არის დასაშვები."
 
 #: db/models/fields/__init__.py:64
 msgid "This field cannot be null."
-msgstr "ეს მნიშვნელობა არ შეიძლება იყოს null."
+msgstr "ეს ველი არ შეიძლება იყოს null."
 
 #: db/models/fields/__init__.py:65
-#, fuzzy
 msgid "This field cannot be blank."
-msgstr "ეს მნიშვნელობა არ შეიძლება იყოს null."
+msgstr "ეს ველი არ შეიძლება იყოს ცარიელი."
 
 #: db/models/fields/__init__.py:70
 #, python-format
 msgid "Field of type: %(field_type)s"
-msgstr ""
+msgstr "ველის ტიპი: %(field_type)s"
 
 #: db/models/fields/__init__.py:451 db/models/fields/__init__.py:871
 #: db/models/fields/__init__.py:980 db/models/fields/__init__.py:991
@@ -442,14 +432,13 @@ msgid "E-mail address"
 msgstr "ელ. ფოსტის მისამართი"
 
 #: db/models/fields/__init__.py:818 db/models/fields/files.py:220
-#: db/models/fields/files.py:339
+#: db/models/fields/files.py:326
 msgid "File path"
 msgstr "გზა ფაილისაკენ"
 
 #: db/models/fields/__init__.py:841
-#, fuzzy
 msgid "This value must be a float."
-msgstr "ეს მნიშვნელობა უნდა იყოს მთელი."
+msgstr "მნიშვნელობა უნდა იყოს ნატურალური რიცხვი"
 
 #: db/models/fields/__init__.py:843
 msgid "Floating point number"
@@ -457,7 +446,7 @@ msgstr "რიცხვი მცოცავი წერტილით"
 
 #: db/models/fields/__init__.py:902
 msgid "Big (8 byte) integer"
-msgstr ""
+msgstr "დიდი მთელი (8-ბაიტიანი)"
 
 #: db/models/fields/__init__.py:915
 msgid "IP address"
@@ -491,24 +480,24 @@ msgstr "URL"
 msgid "XML text"
 msgstr "XML ტექსტი"
 
-#: db/models/fields/related.py:804
+#: db/models/fields/related.py:815
 #, python-format
 msgid "Model %(model)s with pk %(pk)r does not exist."
-msgstr ""
+msgstr "მოდელი %(model)s პირველადი გასაღებით %(pk)r არ არსებობს."
 
-#: db/models/fields/related.py:806
+#: db/models/fields/related.py:817
 msgid "Foreign Key (type determined by related field)"
-msgstr ""
+msgstr "გარე გასაღები (ტიპი განისაზღვრება დაკავშირებული ველის ტიპით)"
 
-#: db/models/fields/related.py:928
+#: db/models/fields/related.py:941
 msgid "One-to-one relationship"
-msgstr ""
+msgstr "კავშირი ერთი-ერთტან"
 
-#: db/models/fields/related.py:990
+#: db/models/fields/related.py:1003
 msgid "Many-to-many relationship"
-msgstr ""
+msgstr "კავშირი მრავალი-მრავალთან"
 
-#: db/models/fields/related.py:1010
+#: db/models/fields/related.py:1023
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
@@ -568,16 +557,16 @@ msgid "The submitted file is empty."
 msgstr "გამოგზავნილი ფაილი ცარიელია."
 
 #: forms/fields.py:463
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Ensure this filename has at most %(max)d characters (it has %(length)d)."
 msgstr ""
-"დარწმუნდით, რომ მნიშვნელობა შედგება არაუმეტეს %(max)d სიმბოლოსაგან (ახლა "
-"მისი სიგრძეა %(length)d)."
+"ფაილის სახელი უნდა შედგებოდეს არაუმეტეს %(max)d სიმბოლოსაგან (იგი შეიცავს %"
+"(length)d-ს)."
 
 #: forms/fields.py:464
 msgid "Please either submit a file or check the clear checkbox, not both."
-msgstr ""
+msgstr "ან გამოგზავნეთ ფაილი, ან მონიშნეთ \"წაშლის\" დროშა."
 
 #: forms/fields.py:518
 msgid ""
@@ -592,118 +581,119 @@ msgstr ""
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr "აირჩიეთ დასაშვები მნიშვნელობა. %(value)s დასაშვები არ არის."
 
-#: forms/fields.py:726 forms/fields.py:814 forms/models.py:1018
+#: forms/fields.py:726 forms/fields.py:814 forms/models.py:983
 msgid "Enter a list of values."
 msgstr "შეიყვანეთ მნიშვნელობების სია."
 
-#: forms/formsets.py:308 forms/formsets.py:310
+#: forms/formsets.py:305 forms/formsets.py:307
 msgid "Order"
 msgstr "დალაგება"
 
-#: forms/formsets.py:312
+#: forms/formsets.py:309
 msgid "Delete"
 msgstr "წავშალოთ"
 
-#: forms/models.py:575
-#, fuzzy, python-format
+#: forms/models.py:554
+#, python-format
 msgid "Please correct the duplicate data for %(field)s."
-msgstr "გთხოვთ, გაასწორეთ ქვემოთ მოყვანილი შეცდომა."
+msgstr "გთხოვთ, შეასწოროთ დუბლირებული მონაცემები %(field)s-თვის."
 
-#: forms/models.py:579
+#: forms/models.py:558
 #, python-format
 msgid "Please correct the duplicate data for %(field)s, which must be unique."
 msgstr ""
+"გთხოვთ, შეასწოროთ დუბლირებული მნიშვნელობა %(field)s ველისთვის, რომელიც უნდა "
+"იყოს უნიკალური."
 
-#: forms/models.py:585
+#: forms/models.py:564
 #, python-format
 msgid ""
 "Please correct the duplicate data for %(field_name)s which must be unique "
 "for the %(lookup)s in %(date_field)s."
 msgstr ""
+"გთხოვთ, შეასწოროთ დუბლირებული მნიშვნელობა %(field_name)s ველისთვის, რომელიც "
+"უნდა იყოს უნიკალური %(lookup)s-ზე, %(date_field)s-თვის."
 
-#: forms/models.py:593
-#, fuzzy
+#: forms/models.py:572
 msgid "Please correct the duplicate values below."
-msgstr "გთხოვთ, გაასწორეთ ქვემოთ მოყვანილი შეცდომა."
+msgstr "გთხოვთ, შეასწოროთ დუბლირებული მნიშვნელობები."
 
-#: forms/models.py:868
+#: forms/models.py:833
 msgid "The inline foreign key did not match the parent instance primary key."
-msgstr ""
+msgstr "გარე გასაღების მნიშვნელობა მშობლის პირველად გასაღებს არ ემთხვევა."
 
-#: forms/models.py:929
+#: forms/models.py:894
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "აირჩიეთ დასაშვები მნიშვნელობა. ეს არჩევანი დასაშვები არ არის."
 
-#: forms/models.py:1019
+#: forms/models.py:984
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "აირჩიეთ დასაშვები მნიშვნელობა. %s დასაშვები არ არის."
 
-#: forms/models.py:1021
+#: forms/models.py:986
 #, python-format
 msgid "\"%s\" is not a valid value for a primary key."
-msgstr ""
+msgstr "\"%s\" არ არის დასაშვები მნიშვნელობა პირველადი გასაღებისათვის."
 
 #: forms/widgets.py:299
-#, fuzzy
 msgid "Currently"
-msgstr "მიმდინარე:"
+msgstr "ამჟამად"
 
 #: forms/widgets.py:300
 msgid "Change"
 msgstr "შეცვლა"
 
 #: forms/widgets.py:301
-#, fuzzy
 msgid "Clear"
-msgstr "წელი"
+msgstr "წაშლა"
 
-#: forms/widgets.py:547
+#: forms/widgets.py:548
 msgid "Unknown"
 msgstr "გაურკვეველი"
 
-#: forms/widgets.py:547
+#: forms/widgets.py:548
 msgid "Yes"
 msgstr "კი"
 
-#: forms/widgets.py:547
+#: forms/widgets.py:548
 msgid "No"
 msgstr "არა"
 
-#: template/defaultfilters.py:774
+#: template/defaultfilters.py:767
 msgid "yes,no,maybe"
 msgstr "კი,არა,შესაძლოა"
 
-#: template/defaultfilters.py:805
+#: template/defaultfilters.py:795 template/defaultfilters.py:800
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d ბაიტი"
 
-#: template/defaultfilters.py:807
+#: template/defaultfilters.py:802
 #, python-format
 msgid "%s KB"
-msgstr "%s კბაიტი"
+msgstr "%s კბ"
+
+#: template/defaultfilters.py:804
+#, python-format
+msgid "%s MB"
+msgstr "%s მბ"
+
+#: template/defaultfilters.py:806
+#, python-format
+msgid "%s GB"
+msgstr "%s გბ"
+
+#: template/defaultfilters.py:808
+#, python-format
+msgid "%s TB"
+msgstr "%s ტბ"
 
 #: template/defaultfilters.py:809
 #, python-format
-msgid "%s MB"
-msgstr "%s მბაიტი"
-
-#: template/defaultfilters.py:811
-#, python-format
-msgid "%s GB"
-msgstr "%s გბაიტი"
-
-#: template/defaultfilters.py:813
-#, fuzzy, python-format
-msgid "%s TB"
-msgstr "%s კბაიტი"
-
-#: template/defaultfilters.py:814
-#, fuzzy, python-format
 msgid "%s PB"
-msgstr "%s კბაიტი"
+msgstr "%s პბ"
 
 #: utils/dateformat.py:42
 msgid "p.m."
@@ -894,27 +884,27 @@ msgstr "თებ."
 #: utils/dates.py:33
 msgctxt "abbrev. month"
 msgid "March"
-msgstr "მარტი"
+msgstr "მარ."
 
 #: utils/dates.py:34
 msgctxt "abbrev. month"
 msgid "April"
-msgstr "აპრილი"
+msgstr "აპრ."
 
 #: utils/dates.py:35
 msgctxt "abbrev. month"
 msgid "May"
-msgstr "მაისი"
+msgstr "მაი"
 
 #: utils/dates.py:36
 msgctxt "abbrev. month"
 msgid "June"
-msgstr "ივნისი"
+msgstr "ივნ."
 
 #: utils/dates.py:37
 msgctxt "abbrev. month"
 msgid "July"
-msgstr "ივლისი"
+msgstr "ივლ."
 
 #: utils/dates.py:38
 msgctxt "abbrev. month"
@@ -942,73 +932,61 @@ msgid "Dec."
 msgstr "დეკ."
 
 #: utils/dates.py:45
-#, fuzzy
 msgctxt "alt. month"
 msgid "January"
 msgstr "იანვარი"
 
 #: utils/dates.py:46
-#, fuzzy
 msgctxt "alt. month"
 msgid "February"
 msgstr "თებერვალი"
 
 #: utils/dates.py:47
-#, fuzzy
 msgctxt "alt. month"
 msgid "March"
 msgstr "მარტი"
 
 #: utils/dates.py:48
-#, fuzzy
 msgctxt "alt. month"
 msgid "April"
 msgstr "აპრილი"
 
 #: utils/dates.py:49
-#, fuzzy
 msgctxt "alt. month"
 msgid "May"
 msgstr "მაისი"
 
 #: utils/dates.py:50
-#, fuzzy
 msgctxt "alt. month"
 msgid "June"
 msgstr "ივნისი"
 
 #: utils/dates.py:51
-#, fuzzy
 msgctxt "alt. month"
 msgid "July"
 msgstr "ივლისი"
 
 #: utils/dates.py:52
-#, fuzzy
 msgctxt "alt. month"
 msgid "August"
 msgstr "აგვისტო"
 
 #: utils/dates.py:53
-#, fuzzy
 msgctxt "alt. month"
 msgid "September"
 msgstr "სექტემბერი"
 
 #: utils/dates.py:54
-#, fuzzy
 msgctxt "alt. month"
 msgid "October"
 msgstr "ოქტომბერი"
 
 #: utils/dates.py:55
-#, fuzzy
 msgctxt "alt. month"
 msgid "November"
 msgstr "ნოემბერი"
 
 #: utils/dates.py:56
-#, fuzzy
 msgctxt "alt. month"
 msgid "December"
 msgstr "დეკემბერი"
@@ -1020,7 +998,7 @@ msgstr "ან"
 #. Translators: This string is used as a separator between list elements
 #: utils/text.py:153
 msgid ", "
-msgstr ""
+msgstr ", "
 
 #: utils/timesince.py:21
 msgid "year"
@@ -1066,23 +1044,23 @@ msgstr "%(number)d %(type)s"
 msgid ", %(number)d %(type)s"
 msgstr ", %(number)d %(type)s"
 
-#: utils/translation/trans_real.py:562
+#: utils/translation/trans_real.py:568
 msgid "DATE_FORMAT"
 msgstr "d.m.Y"
 
-#: utils/translation/trans_real.py:563
+#: utils/translation/trans_real.py:569
 msgid "DATETIME_FORMAT"
 msgstr "d.m.Y H:i"
 
-#: utils/translation/trans_real.py:564
+#: utils/translation/trans_real.py:570
 msgid "TIME_FORMAT"
 msgstr "H:i"
 
-#: utils/translation/trans_real.py:585
+#: utils/translation/trans_real.py:591
 msgid "YEAR_MONTH_FORMAT"
 msgstr "d.m.Y"
 
-#: utils/translation/trans_real.py:586
+#: utils/translation/trans_real.py:592
 msgid "MONTH_DAY_FORMAT"
 msgstr "d.m.Y"
 
@@ -1100,3 +1078,55 @@ msgstr "%(verbose_name)s წარმატებით შეიცვალა
 #, python-format
 msgid "The %(verbose_name)s was deleted."
 msgstr "%(verbose_name)s წაიშალა."
+
+#: views/generic/dates.py:33
+msgid "No year specified"
+msgstr ""
+
+#: views/generic/dates.py:58
+msgid "No month specified"
+msgstr ""
+
+#: views/generic/dates.py:99
+msgid "No day specified"
+msgstr ""
+
+#: views/generic/dates.py:138
+msgid "No week specified"
+msgstr ""
+
+#: views/generic/dates.py:198 views/generic/dates.py:214
+#, fuzzy, python-format
+msgid "No %(verbose_name_plural)s available"
+msgstr "%(verbose_name)s წაიშალა."
+
+#: views/generic/dates.py:466
+#, python-format
+msgid ""
+"Future %(verbose_name_plural)s not available because %(class_name)s."
+"allow_future is False."
+msgstr ""
+
+#: views/generic/dates.py:500
+#, python-format
+msgid "Invalid date string '%(datestr)s' given format '%(format)s'"
+msgstr ""
+
+#: views/generic/detail.py:51
+#, fuzzy, python-format
+msgid "No %(verbose_name)s found matching the query"
+msgstr "%(verbose_name)s წარმატებით შეიცვალა."
+
+#: views/generic/list.py:47
+msgid "Page is not 'last', nor can it be converted to an int."
+msgstr ""
+
+#: views/generic/list.py:52
+#, python-format
+msgid "Invalid page (%(page_number)s)"
+msgstr ""
+
+#: views/generic/list.py:119
+#, python-format
+msgid "Empty list and '%(class_name)s.allow_empty' is False."
+msgstr ""

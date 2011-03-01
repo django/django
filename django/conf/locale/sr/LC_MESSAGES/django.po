@@ -4,18 +4,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-21 23:01+0100\n"
-"PO-Revision-Date: 2010-08-06 19:47+0100\n"
-"Last-Translator: Janos Guljas <janos@janos.in.rs>\n"
-"Language-Team: Branko Vukelic <bg.branko@gmail.com> & Janos Guljas "
-"<janos@janos.in.rs> & Nesh <djnesh@gmail.com> & Petar <petar.maric@gmail."
-"com>\n"
+"POT-Creation-Date: 2011-02-28 17:37+0100\n"
+"PO-Revision-Date: 2011-02-22 00:09+0000\n"
+"Last-Translator: janos <janos@resenje.org>\n"
+"Language-Team: Serbian <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: \n"
-"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
-"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"Language: sr\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
+"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
 
 #: conf/global_settings.py:44
 msgid "Arabic"
@@ -74,248 +72,257 @@ msgid "Argentinian Spanish"
 msgstr "аргентински шпански"
 
 #: conf/global_settings.py:58
+#, fuzzy
+msgid "Mexican Spanish"
+msgstr "аргентински шпански"
+
+#: conf/global_settings.py:59
 msgid "Estonian"
 msgstr "естонски"
 
-#: conf/global_settings.py:59
+#: conf/global_settings.py:60
 msgid "Basque"
 msgstr "баскијски"
 
-#: conf/global_settings.py:60
+#: conf/global_settings.py:61
 msgid "Persian"
 msgstr "персијски"
 
-#: conf/global_settings.py:61
+#: conf/global_settings.py:62
 msgid "Finnish"
 msgstr "фински"
 
-#: conf/global_settings.py:62
+#: conf/global_settings.py:63
 msgid "French"
 msgstr "француски"
 
-#: conf/global_settings.py:63
+#: conf/global_settings.py:64
 msgid "Frisian"
 msgstr "фризијски"
 
-#: conf/global_settings.py:64
+#: conf/global_settings.py:65
 msgid "Irish"
 msgstr "ирски"
 
-#: conf/global_settings.py:65
+#: conf/global_settings.py:66
 msgid "Galician"
 msgstr "галски"
 
-#: conf/global_settings.py:66
+#: conf/global_settings.py:67
 msgid "Hebrew"
 msgstr "хебрејски"
 
-#: conf/global_settings.py:67
+#: conf/global_settings.py:68
 msgid "Hindi"
 msgstr "хинду"
 
-#: conf/global_settings.py:68
+#: conf/global_settings.py:69
 msgid "Croatian"
 msgstr "хрватски"
 
-#: conf/global_settings.py:69
+#: conf/global_settings.py:70
 msgid "Hungarian"
 msgstr "мађарски"
 
-#: conf/global_settings.py:70
+#: conf/global_settings.py:71
 msgid "Indonesian"
 msgstr "индонежански"
 
-#: conf/global_settings.py:71
+#: conf/global_settings.py:72
 msgid "Icelandic"
 msgstr "исландски"
 
-#: conf/global_settings.py:72
+#: conf/global_settings.py:73
 msgid "Italian"
 msgstr "италијански"
 
-#: conf/global_settings.py:73
+#: conf/global_settings.py:74
 msgid "Japanese"
 msgstr "јапански"
 
-#: conf/global_settings.py:74
+#: conf/global_settings.py:75
 msgid "Georgian"
 msgstr "грузијски"
 
-#: conf/global_settings.py:75
+#: conf/global_settings.py:76
 msgid "Khmer"
 msgstr "камбодијски"
 
-#: conf/global_settings.py:76
+#: conf/global_settings.py:77
 msgid "Kannada"
 msgstr "канада"
 
-#: conf/global_settings.py:77
+#: conf/global_settings.py:78
 msgid "Korean"
 msgstr "корејски"
 
-#: conf/global_settings.py:78
+#: conf/global_settings.py:79
 msgid "Lithuanian"
 msgstr "литвански"
 
-#: conf/global_settings.py:79
+#: conf/global_settings.py:80
 msgid "Latvian"
 msgstr "латвијски"
 
-#: conf/global_settings.py:80
+#: conf/global_settings.py:81
 msgid "Macedonian"
 msgstr "македонски"
 
-#: conf/global_settings.py:81
+#: conf/global_settings.py:82
 msgid "Malayalam"
 msgstr "малајаламски"
 
-#: conf/global_settings.py:82
+#: conf/global_settings.py:83
 msgid "Mongolian"
 msgstr "монголски"
 
-#: conf/global_settings.py:83
+#: conf/global_settings.py:84
 msgid "Dutch"
 msgstr "холандски"
 
-#: conf/global_settings.py:84
+#: conf/global_settings.py:85
 msgid "Norwegian"
 msgstr "норвешки"
 
-#: conf/global_settings.py:85
+#: conf/global_settings.py:86
 msgid "Norwegian Bokmal"
 msgstr "норвешки кнјжевни"
 
-#: conf/global_settings.py:86
+#: conf/global_settings.py:87
 msgid "Norwegian Nynorsk"
 msgstr "норвешки нови"
 
-#: conf/global_settings.py:87
-msgid "Punjabi"
-msgstr ""
-
 #: conf/global_settings.py:88
+msgid "Punjabi"
+msgstr "Панџаби"
+
+#: conf/global_settings.py:89
 msgid "Polish"
 msgstr "пољски"
 
-#: conf/global_settings.py:89
+#: conf/global_settings.py:90
 msgid "Portuguese"
 msgstr "португалски"
 
-#: conf/global_settings.py:90
+#: conf/global_settings.py:91
 msgid "Brazilian Portuguese"
 msgstr "бразилски португалски"
 
-#: conf/global_settings.py:91
+#: conf/global_settings.py:92
 msgid "Romanian"
 msgstr "румунски"
 
-#: conf/global_settings.py:92
+#: conf/global_settings.py:93
 msgid "Russian"
 msgstr "руски"
 
-#: conf/global_settings.py:93
+#: conf/global_settings.py:94
 msgid "Slovak"
 msgstr "словачки"
 
-#: conf/global_settings.py:94
+#: conf/global_settings.py:95
 msgid "Slovenian"
 msgstr "словеначки"
 
-#: conf/global_settings.py:95
+#: conf/global_settings.py:96
 msgid "Albanian"
 msgstr "албански"
 
-#: conf/global_settings.py:96
+#: conf/global_settings.py:97
 msgid "Serbian"
 msgstr "српски"
 
-#: conf/global_settings.py:97
+#: conf/global_settings.py:98
 msgid "Serbian Latin"
 msgstr "српски (латиница)"
 
-#: conf/global_settings.py:98
+#: conf/global_settings.py:99
 msgid "Swedish"
 msgstr "шведски"
 
-#: conf/global_settings.py:99
+#: conf/global_settings.py:100
 msgid "Tamil"
 msgstr "тамилски"
 
-#: conf/global_settings.py:100
+#: conf/global_settings.py:101
 msgid "Telugu"
 msgstr "телугу"
 
-#: conf/global_settings.py:101
+#: conf/global_settings.py:102
 msgid "Thai"
 msgstr "тајландски"
 
-#: conf/global_settings.py:102
+#: conf/global_settings.py:103
 msgid "Turkish"
 msgstr "турски"
 
-#: conf/global_settings.py:103
+#: conf/global_settings.py:104
 msgid "Ukrainian"
 msgstr "украјински"
 
-#: conf/global_settings.py:104
+#: conf/global_settings.py:105
+msgid "Urdu"
+msgstr ""
+
+#: conf/global_settings.py:106
 msgid "Vietnamese"
 msgstr "вијетнамски"
 
-#: conf/global_settings.py:105
+#: conf/global_settings.py:107
 msgid "Simplified Chinese"
 msgstr "новокинески"
 
-#: conf/global_settings.py:106
+#: conf/global_settings.py:108
 msgid "Traditional Chinese"
 msgstr "старокинески"
 
-#: core/validators.py:20 forms/fields.py:67
+#: core/validators.py:21 forms/fields.py:67
 msgid "Enter a valid value."
 msgstr "Унесите исправну вредност."
-
-#: core/validators.py:87 forms/fields.py:574
-msgid "Enter a valid URL."
-msgstr "Унесите исправан URL."
 
 #: core/validators.py:89 forms/fields.py:575
 msgid "This URL appears to be a broken link."
 msgstr "Овај URL изгледа не води никуда."
 
-#: core/validators.py:120 forms/fields.py:449
+#: core/validators.py:94 forms/fields.py:574
+msgid "Enter a valid URL."
+msgstr "Унесите исправан URL."
+
+#: core/validators.py:138 forms/fields.py:449
 msgid "Enter a valid e-mail address."
 msgstr "Унесите важећу имејл адресу."
 
-#: core/validators.py:123 forms/fields.py:958
+#: core/validators.py:141 forms/fields.py:958
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
 "Унесите исрпаван „слаг“, који се састоји од слова, бројки, доњих црта или "
 "циртица."
 
-#: core/validators.py:126 forms/fields.py:951
+#: core/validators.py:144 forms/fields.py:951
 msgid "Enter a valid IPv4 address."
 msgstr "Унесите исправну IPv4 адресу."
 
-#: core/validators.py:129 db/models/fields/__init__.py:575
+#: core/validators.py:147 db/models/fields/__init__.py:575
 msgid "Enter only digits separated by commas."
 msgstr "Унесите само бројке раздвојене запетама."
 
-#: core/validators.py:135
+#: core/validators.py:153
 #, python-format
 msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
 msgstr "Ово поље мора да буде %(limit_value)s (тренутно има %(show_value)s)."
 
-#: core/validators.py:153 forms/fields.py:222 forms/fields.py:275
+#: core/validators.py:171 forms/fields.py:222 forms/fields.py:275
 #, python-format
 msgid "Ensure this value is less than or equal to %(limit_value)s."
 msgstr "Ова вредност мора да буде мања од %(limit_value)s. или тачно толико."
 
-#: core/validators.py:158 forms/fields.py:223 forms/fields.py:276
+#: core/validators.py:176 forms/fields.py:223 forms/fields.py:276
 #, python-format
 msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr "Ова вредност мора бити већа од %(limit_value)s или тачно толико."
 
-#: core/validators.py:164
+#: core/validators.py:182
 #, python-format
 msgid ""
 "Ensure this value has at least %(limit_value)d characters (it has %"
@@ -324,7 +331,7 @@ msgstr ""
 "Ово поље мора да садржи најмање %(limit_value)d словних места (тренутно има %"
 "(show_value)d)."
 
-#: core/validators.py:170
+#: core/validators.py:188
 #, python-format
 msgid ""
 "Ensure this value has at most %(limit_value)d characters (it has %"
@@ -333,17 +340,17 @@ msgstr ""
 "Ово поље мора да садржи највише %(limit_value)d словних места (тренутно има %"
 "(show_value)d)."
 
-#: db/models/base.py:767
+#: db/models/base.py:769
 #, python-format
 msgid "%(field_name)s must be unique for %(date_field)s %(lookup)s."
 msgstr "%(field_name)s мора да буде јединствен за %(date_field)s %(lookup)s."
 
-#: db/models/base.py:782 db/models/base.py:790
+#: db/models/base.py:784 db/models/base.py:792
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(model_name)s са овом вредношћу %(field_label)s већ постоји."
 
-#: db/models/base.py:789 forms/models.py:581
+#: db/models/base.py:791 forms/models.py:560
 msgid "and"
 msgstr "и"
 
@@ -426,7 +433,7 @@ msgid "E-mail address"
 msgstr "Имејл адреса"
 
 #: db/models/fields/__init__.py:818 db/models/fields/files.py:220
-#: db/models/fields/files.py:339
+#: db/models/fields/files.py:326
 msgid "File path"
 msgstr "Путања фајла"
 
@@ -474,24 +481,24 @@ msgstr "URL"
 msgid "XML text"
 msgstr "XML текст"
 
-#: db/models/fields/related.py:804
+#: db/models/fields/related.py:815
 #, python-format
 msgid "Model %(model)s with pk %(pk)r does not exist."
 msgstr "Објекат класе %(model)s са примарним кључем %(pk)r не постоји."
 
-#: db/models/fields/related.py:806
+#: db/models/fields/related.py:817
 msgid "Foreign Key (type determined by related field)"
 msgstr "Страни кључ (тип одређује референтно поље)"
 
-#: db/models/fields/related.py:928
+#: db/models/fields/related.py:941
 msgid "One-to-one relationship"
 msgstr "Релација један на један"
 
-#: db/models/fields/related.py:990
+#: db/models/fields/related.py:1003
 msgid "Many-to-many relationship"
 msgstr "Релација више на више"
 
-#: db/models/fields/related.py:1010
+#: db/models/fields/related.py:1023
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
@@ -559,7 +566,7 @@ msgstr ""
 
 #: forms/fields.py:464
 msgid "Please either submit a file or check the clear checkbox, not both."
-msgstr ""
+msgstr "Може се само послати фајл или избрисати, не оба."
 
 #: forms/fields.py:518
 msgid ""
@@ -575,30 +582,30 @@ msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr ""
 "%(value)s није међу понуђеним вредностима. Одаберите једну од понуђених."
 
-#: forms/fields.py:726 forms/fields.py:814 forms/models.py:1018
+#: forms/fields.py:726 forms/fields.py:814 forms/models.py:983
 msgid "Enter a list of values."
 msgstr "Унесите листу вредности."
 
-#: forms/formsets.py:308 forms/formsets.py:310
+#: forms/formsets.py:305 forms/formsets.py:307
 msgid "Order"
 msgstr "Редослед"
 
-#: forms/formsets.py:312
+#: forms/formsets.py:309
 msgid "Delete"
 msgstr "Обриши"
 
-#: forms/models.py:575
+#: forms/models.py:554
 #, python-format
 msgid "Please correct the duplicate data for %(field)s."
 msgstr "Исправите дуплиран садржај за поља: %(field)s."
 
-#: forms/models.py:579
+#: forms/models.py:558
 #, python-format
 msgid "Please correct the duplicate data for %(field)s, which must be unique."
 msgstr ""
 "Исправите дуплиран садржај за поља: %(field)s, који мора да буде јединствен."
 
-#: forms/models.py:585
+#: forms/models.py:564
 #, python-format
 msgid ""
 "Please correct the duplicate data for %(field_name)s which must be unique "
@@ -607,90 +614,89 @@ msgstr ""
 "Исправите дуплиран садржај за поља: %(field_name)s, који мора да буде "
 "јединствен за %(lookup)s у %(date_field)s."
 
-#: forms/models.py:593
+#: forms/models.py:572
 msgid "Please correct the duplicate values below."
 msgstr "Исправите дуплиране вредности доле."
 
-#: forms/models.py:868
+#: forms/models.py:833
 msgid "The inline foreign key did not match the parent instance primary key."
 msgstr "Страни кључ се није поклопио са инстанцом родитељског кључа."
 
-#: forms/models.py:929
+#: forms/models.py:894
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "Одабрана вредност није међу понуђенима. Одаберите једну од понуђених."
 
-#: forms/models.py:1019
+#: forms/models.py:984
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "%s није међу понуђеним вредностима. Одаберите једну од понуђених."
 
-#: forms/models.py:1021
+#: forms/models.py:986
 #, python-format
 msgid "\"%s\" is not a valid value for a primary key."
 msgstr "„%s“ није исправна вредност за примарни кључ."
 
 #: forms/widgets.py:299
-#, fuzzy
 msgid "Currently"
-msgstr "Тренутно:"
+msgstr "Тренутно"
 
 #: forms/widgets.py:300
 msgid "Change"
 msgstr "Измени"
 
 #: forms/widgets.py:301
-#, fuzzy
 msgid "Clear"
-msgstr "година"
+msgstr "Очисти"
 
-#: forms/widgets.py:547
+#: forms/widgets.py:548
 msgid "Unknown"
 msgstr "Непознато"
 
-#: forms/widgets.py:547
+#: forms/widgets.py:548
 msgid "Yes"
 msgstr "Да"
 
-#: forms/widgets.py:547
+#: forms/widgets.py:548
 msgid "No"
 msgstr "Не"
 
-#: template/defaultfilters.py:774
+#: template/defaultfilters.py:767
 msgid "yes,no,maybe"
 msgstr "да,не,можда"
 
-#: template/defaultfilters.py:805
+#: template/defaultfilters.py:795 template/defaultfilters.py:800
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d бајт"
 msgstr[1] "%(size)d бајта"
 msgstr[2] "%(size)d бајтова"
+msgstr[3] "%(size)d бајтова"
 
-#: template/defaultfilters.py:807
+#: template/defaultfilters.py:802
 #, python-format
 msgid "%s KB"
 msgstr "%s KB"
 
-#: template/defaultfilters.py:809
+#: template/defaultfilters.py:804
 #, python-format
 msgid "%s MB"
 msgstr "%s MB"
 
-#: template/defaultfilters.py:811
+#: template/defaultfilters.py:806
 #, python-format
 msgid "%s GB"
 msgstr "%s GB"
 
-#: template/defaultfilters.py:813
-#, fuzzy, python-format
+#: template/defaultfilters.py:808
+#, python-format
 msgid "%s TB"
-msgstr "%s KB"
+msgstr "%s TB"
 
-#: template/defaultfilters.py:814
-#, fuzzy, python-format
+#: template/defaultfilters.py:809
+#, python-format
 msgid "%s PB"
-msgstr "%s KB"
+msgstr "%s PB"
 
 #: utils/dateformat.py:42
 msgid "p.m."
@@ -871,134 +877,122 @@ msgstr "дец."
 #: utils/dates.py:31
 msgctxt "abbrev. month"
 msgid "Jan."
-msgstr "јан."
+msgstr "Јан."
 
 #: utils/dates.py:32
 msgctxt "abbrev. month"
 msgid "Feb."
-msgstr "беб."
+msgstr "Феб."
 
 #: utils/dates.py:33
 msgctxt "abbrev. month"
 msgid "March"
-msgstr "март"
+msgstr "Март"
 
 #: utils/dates.py:34
 msgctxt "abbrev. month"
 msgid "April"
-msgstr "април"
+msgstr "Април"
 
 #: utils/dates.py:35
 msgctxt "abbrev. month"
 msgid "May"
-msgstr "мај"
+msgstr "Мај"
 
 #: utils/dates.py:36
 msgctxt "abbrev. month"
 msgid "June"
-msgstr "јун"
+msgstr "Јун"
 
 #: utils/dates.py:37
 msgctxt "abbrev. month"
 msgid "July"
-msgstr "јул"
+msgstr "Јул"
 
 #: utils/dates.py:38
 msgctxt "abbrev. month"
 msgid "Aug."
-msgstr "ауг."
+msgstr "Авг."
 
 #: utils/dates.py:39
 msgctxt "abbrev. month"
 msgid "Sept."
-msgstr "септ."
+msgstr "Септ."
 
 #: utils/dates.py:40
 msgctxt "abbrev. month"
 msgid "Oct."
-msgstr "окт."
+msgstr "Окт."
 
 #: utils/dates.py:41
 msgctxt "abbrev. month"
 msgid "Nov."
-msgstr "нов."
+msgstr "Нов."
 
 #: utils/dates.py:42
 msgctxt "abbrev. month"
 msgid "Dec."
-msgstr "дец."
+msgstr "Дец."
 
 #: utils/dates.py:45
-#, fuzzy
 msgctxt "alt. month"
 msgid "January"
-msgstr "јануар"
+msgstr "Јануар"
 
 #: utils/dates.py:46
-#, fuzzy
 msgctxt "alt. month"
 msgid "February"
-msgstr "фебруар"
+msgstr "Фебруар"
 
 #: utils/dates.py:47
-#, fuzzy
 msgctxt "alt. month"
 msgid "March"
-msgstr "март"
+msgstr "Март"
 
 #: utils/dates.py:48
-#, fuzzy
 msgctxt "alt. month"
 msgid "April"
-msgstr "април"
+msgstr "Април"
 
 #: utils/dates.py:49
-#, fuzzy
 msgctxt "alt. month"
 msgid "May"
-msgstr "мај"
+msgstr "Мај"
 
 #: utils/dates.py:50
-#, fuzzy
 msgctxt "alt. month"
 msgid "June"
-msgstr "јун"
+msgstr "Јун"
 
 #: utils/dates.py:51
-#, fuzzy
 msgctxt "alt. month"
 msgid "July"
-msgstr "јул"
+msgstr "Јул"
 
 #: utils/dates.py:52
-#, fuzzy
 msgctxt "alt. month"
 msgid "August"
-msgstr "август"
+msgstr "Август"
 
 #: utils/dates.py:53
-#, fuzzy
 msgctxt "alt. month"
 msgid "September"
-msgstr "септембар"
+msgstr "Септембар"
 
 #: utils/dates.py:54
-#, fuzzy
 msgctxt "alt. month"
 msgid "October"
-msgstr "октобар"
+msgstr "Октобар"
 
 #: utils/dates.py:55
-#, fuzzy
 msgctxt "alt. month"
 msgid "November"
-msgstr "новембар"
+msgstr "Новембар"
 
 #: utils/dates.py:56
-#, fuzzy
 msgctxt "alt. month"
 msgid "December"
-msgstr "децембар"
+msgstr "Децембар"
 
 #: utils/text.py:136
 msgid "or"
@@ -1007,7 +1001,7 @@ msgstr "или"
 #. Translators: This string is used as a separator between list elements
 #: utils/text.py:153
 msgid ", "
-msgstr ""
+msgstr ","
 
 #: utils/timesince.py:21
 msgid "year"
@@ -1015,6 +1009,7 @@ msgid_plural "years"
 msgstr[0] "година"
 msgstr[1] "године"
 msgstr[2] "година"
+msgstr[3] "година"
 
 #: utils/timesince.py:22
 msgid "month"
@@ -1022,6 +1017,7 @@ msgid_plural "months"
 msgstr[0] "месец"
 msgstr[1] "месеца"
 msgstr[2] "месеци"
+msgstr[3] "месеци"
 
 #: utils/timesince.py:23
 msgid "week"
@@ -1029,6 +1025,7 @@ msgid_plural "weeks"
 msgstr[0] "недеља"
 msgstr[1] "недеље"
 msgstr[2] "недеља"
+msgstr[3] "недеља"
 
 #: utils/timesince.py:24
 msgid "day"
@@ -1036,6 +1033,7 @@ msgid_plural "days"
 msgstr[0] "дан"
 msgstr[1] "дана"
 msgstr[2] "дана"
+msgstr[3] "дана"
 
 #: utils/timesince.py:25
 msgid "hour"
@@ -1043,6 +1041,7 @@ msgid_plural "hours"
 msgstr[0] "сат"
 msgstr[1] "сата"
 msgstr[2] "сати"
+msgstr[3] "сати"
 
 #: utils/timesince.py:26
 msgid "minute"
@@ -1050,6 +1049,7 @@ msgid_plural "minutes"
 msgstr[0] "минут"
 msgstr[1] "минута"
 msgstr[2] "минута"
+msgstr[3] "минута"
 
 #: utils/timesince.py:45
 msgid "minutes"
@@ -1065,23 +1065,23 @@ msgstr "%(number)d %(type)s"
 msgid ", %(number)d %(type)s"
 msgstr ", %(number)d %(type)s"
 
-#: utils/translation/trans_real.py:562
+#: utils/translation/trans_real.py:568
 msgid "DATE_FORMAT"
 msgstr "j. F Y."
 
-#: utils/translation/trans_real.py:563
+#: utils/translation/trans_real.py:569
 msgid "DATETIME_FORMAT"
 msgstr "j. F Y. H:i Т"
 
-#: utils/translation/trans_real.py:564
+#: utils/translation/trans_real.py:570
 msgid "TIME_FORMAT"
 msgstr "G:i"
 
-#: utils/translation/trans_real.py:585
+#: utils/translation/trans_real.py:591
 msgid "YEAR_MONTH_FORMAT"
 msgstr "F Y."
 
-#: utils/translation/trans_real.py:586
+#: utils/translation/trans_real.py:592
 msgid "MONTH_DAY_FORMAT"
 msgstr "j. F"
 
@@ -1099,3 +1099,55 @@ msgstr "%(verbose_name)s је успешно ажуриран."
 #, python-format
 msgid "The %(verbose_name)s was deleted."
 msgstr "%(verbose_name)s је обрисан."
+
+#: views/generic/dates.py:33
+msgid "No year specified"
+msgstr ""
+
+#: views/generic/dates.py:58
+msgid "No month specified"
+msgstr ""
+
+#: views/generic/dates.py:99
+msgid "No day specified"
+msgstr ""
+
+#: views/generic/dates.py:138
+msgid "No week specified"
+msgstr ""
+
+#: views/generic/dates.py:198 views/generic/dates.py:214
+#, fuzzy, python-format
+msgid "No %(verbose_name_plural)s available"
+msgstr "%(verbose_name)s је обрисан."
+
+#: views/generic/dates.py:466
+#, python-format
+msgid ""
+"Future %(verbose_name_plural)s not available because %(class_name)s."
+"allow_future is False."
+msgstr ""
+
+#: views/generic/dates.py:500
+#, python-format
+msgid "Invalid date string '%(datestr)s' given format '%(format)s'"
+msgstr ""
+
+#: views/generic/detail.py:51
+#, fuzzy, python-format
+msgid "No %(verbose_name)s found matching the query"
+msgstr "%(verbose_name)s је успешно ажуриран."
+
+#: views/generic/list.py:47
+msgid "Page is not 'last', nor can it be converted to an int."
+msgstr ""
+
+#: views/generic/list.py:52
+#, python-format
+msgid "Invalid page (%(page_number)s)"
+msgstr ""
+
+#: views/generic/list.py:119
+#, python-format
+msgid "Empty list and '%(class_name)s.allow_empty' is False."
+msgstr ""

@@ -1,24 +1,24 @@
-# This file is distributed under the same license as the django package.
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-21 23:02+0100\n"
-"PO-Revision-Date: 2007-04-05 01:32+1000\n"
-"Last-Translator: Terry Huang <terryh.tp@gmail.com>\n"
-"Language-Team: Terry Huang <terryh.tp@gmail.com>\n"
+"POT-Creation-Date: 2011-02-28 17:38+0100\n"
+"PO-Revision-Date: 2011-02-22 00:09+0000\n"
+"Last-Translator: tcc <tcchou@tcchou.org>\n"
+"Language-Team: Chinese (Taiwan) <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Language: zh_TW\n"
+"Plural-Forms: nplurals=1; plural=0\n"
 
 #: conf/global_settings.py:44
 msgid "Arabic"
 msgstr "阿拉伯語"
 
 #: conf/global_settings.py:45
-#, fuzzy
 msgid "Bulgarian"
 msgstr "保加利亞語"
 
@@ -27,9 +27,8 @@ msgid "Bengali"
 msgstr "孟加拉語"
 
 #: conf/global_settings.py:47
-#, fuzzy
 msgid "Bosnian"
-msgstr "羅馬尼亞語"
+msgstr "波士尼亞語"
 
 #: conf/global_settings.py:48
 msgid "Catalan"
@@ -60,326 +59,314 @@ msgid "English"
 msgstr "英語"
 
 #: conf/global_settings.py:55
-#, fuzzy
 msgid "British English"
-msgstr "英語"
+msgstr "英國英語"
 
 #: conf/global_settings.py:56
 msgid "Spanish"
 msgstr "西班牙語"
 
 #: conf/global_settings.py:57
-#, fuzzy
 msgid "Argentinian Spanish"
-msgstr "阿根廷的西班牙語"
+msgstr "阿根廷西班牙語"
 
 #: conf/global_settings.py:58
 #, fuzzy
-msgid "Estonian"
-msgstr "羅馬尼亞語"
+msgid "Mexican Spanish"
+msgstr "阿根廷西班牙語"
 
 #: conf/global_settings.py:59
+msgid "Estonian"
+msgstr "愛沙尼亞語"
+
+#: conf/global_settings.py:60
 msgid "Basque"
 msgstr "巴斯克語"
 
-#: conf/global_settings.py:60
-#, fuzzy
+#: conf/global_settings.py:61
 msgid "Persian"
 msgstr "波斯語"
 
-#: conf/global_settings.py:61
+#: conf/global_settings.py:62
 msgid "Finnish"
 msgstr "芬蘭語"
 
-#: conf/global_settings.py:62
+#: conf/global_settings.py:63
 msgid "French"
 msgstr "法語"
 
-#: conf/global_settings.py:63
-#, fuzzy
-msgid "Frisian"
-msgstr "弗里斯蘭"
-
 #: conf/global_settings.py:64
-#, fuzzy
+msgid "Frisian"
+msgstr "弗里斯蘭語"
+
+#: conf/global_settings.py:65
 msgid "Irish"
 msgstr "愛爾蘭語"
 
-#: conf/global_settings.py:65
+#: conf/global_settings.py:66
 msgid "Galician"
 msgstr "加里西亞語"
 
-#: conf/global_settings.py:66
+#: conf/global_settings.py:67
 msgid "Hebrew"
 msgstr "希伯來語"
 
-#: conf/global_settings.py:67
-msgid "Hindi"
-msgstr ""
-
 #: conf/global_settings.py:68
-#, fuzzy
-msgid "Croatian"
-msgstr "嘉泰羅尼亞語"
+msgid "Hindi"
+msgstr "印度語"
 
 #: conf/global_settings.py:69
+msgid "Croatian"
+msgstr "克羅埃西亞語"
+
+#: conf/global_settings.py:70
 msgid "Hungarian"
 msgstr "匈牙利語"
 
-#: conf/global_settings.py:70
-#, fuzzy
-msgid "Indonesian"
-msgstr "馬其頓語"
-
 #: conf/global_settings.py:71
+msgid "Indonesian"
+msgstr "印尼語"
+
+#: conf/global_settings.py:72
 msgid "Icelandic"
 msgstr "冰島語"
 
-#: conf/global_settings.py:72
+#: conf/global_settings.py:73
 msgid "Italian"
 msgstr "義大利語"
 
-#: conf/global_settings.py:73
+#: conf/global_settings.py:74
 msgid "Japanese"
 msgstr "日語"
 
-#: conf/global_settings.py:74
-#, fuzzy
-msgid "Georgian"
-msgstr "德語"
-
 #: conf/global_settings.py:75
-#, fuzzy
+msgid "Georgian"
+msgstr "喬治亞語"
+
+#: conf/global_settings.py:76
 msgid "Khmer"
 msgstr "高棉語"
 
-#: conf/global_settings.py:76
+#: conf/global_settings.py:77
 msgid "Kannada"
 msgstr "坎那達語"
 
-#: conf/global_settings.py:77
-#, fuzzy
-msgid "Korean"
-msgstr "挪威語"
-
 #: conf/global_settings.py:78
+msgid "Korean"
+msgstr "韓語"
+
+#: conf/global_settings.py:79
 msgid "Lithuanian"
 msgstr "立陶宛語"
 
-#: conf/global_settings.py:79
+#: conf/global_settings.py:80
 msgid "Latvian"
 msgstr "拉脫維亞語"
 
-#: conf/global_settings.py:80
+#: conf/global_settings.py:81
 msgid "Macedonian"
 msgstr "馬其頓語"
 
-#: conf/global_settings.py:81
-#, fuzzy
-msgid "Malayalam"
-msgstr "左賀"
-
 #: conf/global_settings.py:82
-#, fuzzy
-msgid "Mongolian"
-msgstr "馬其頓語"
+msgid "Malayalam"
+msgstr "馬來亞拉姆語"
 
 #: conf/global_settings.py:83
+msgid "Mongolian"
+msgstr "蒙古語"
+
+#: conf/global_settings.py:84
 msgid "Dutch"
 msgstr "荷蘭語"
 
-#: conf/global_settings.py:84
+#: conf/global_settings.py:85
 msgid "Norwegian"
 msgstr "挪威語"
 
-#: conf/global_settings.py:85
-#, fuzzy
-msgid "Norwegian Bokmal"
-msgstr "挪威語"
-
 #: conf/global_settings.py:86
-#, fuzzy
-msgid "Norwegian Nynorsk"
-msgstr "挪威語"
+msgid "Norwegian Bokmal"
+msgstr "挪威語（波克默爾）"
 
 #: conf/global_settings.py:87
-msgid "Punjabi"
-msgstr ""
+msgid "Norwegian Nynorsk"
+msgstr "挪威語（尼諾斯克）"
 
 #: conf/global_settings.py:88
+msgid "Punjabi"
+msgstr "旁遮普語"
+
+#: conf/global_settings.py:89
 msgid "Polish"
 msgstr "波蘭嶼"
 
-#: conf/global_settings.py:89
-#, fuzzy
+#: conf/global_settings.py:90
 msgid "Portuguese"
 msgstr "葡萄牙語"
 
-#: conf/global_settings.py:90
-#, fuzzy
+#: conf/global_settings.py:91
 msgid "Brazilian Portuguese"
 msgstr "巴西葡萄牙語"
 
-#: conf/global_settings.py:91
+#: conf/global_settings.py:92
 msgid "Romanian"
 msgstr "羅馬尼亞語"
 
-#: conf/global_settings.py:92
+#: conf/global_settings.py:93
 msgid "Russian"
 msgstr "俄語"
 
-#: conf/global_settings.py:93
+#: conf/global_settings.py:94
 msgid "Slovak"
 msgstr "斯洛伐克語"
 
-#: conf/global_settings.py:94
+#: conf/global_settings.py:95
 msgid "Slovenian"
 msgstr "斯洛維尼亞語"
 
-#: conf/global_settings.py:95
-#, fuzzy
-msgid "Albanian"
-msgstr "阿利坎特"
-
 #: conf/global_settings.py:96
+msgid "Albanian"
+msgstr "阿爾巴尼亞語"
+
+#: conf/global_settings.py:97
 msgid "Serbian"
 msgstr "塞爾維亞語"
 
-#: conf/global_settings.py:97
-#, fuzzy
-msgid "Serbian Latin"
-msgstr "塞爾維亞語"
-
 #: conf/global_settings.py:98
+msgid "Serbian Latin"
+msgstr "塞爾維亞拉丁語"
+
+#: conf/global_settings.py:99
 msgid "Swedish"
 msgstr "瑞典語"
 
-#: conf/global_settings.py:99
+#: conf/global_settings.py:100
 msgid "Tamil"
 msgstr "坦米爾語"
 
-#: conf/global_settings.py:100
+#: conf/global_settings.py:101
 msgid "Telugu"
 msgstr "泰盧固語"
 
-#: conf/global_settings.py:101
-#, fuzzy
-msgid "Thai"
-msgstr "坦米爾語"
-
 #: conf/global_settings.py:102
+msgid "Thai"
+msgstr "泰語"
+
+#: conf/global_settings.py:103
 msgid "Turkish"
 msgstr "土耳其語"
 
-#: conf/global_settings.py:103
+#: conf/global_settings.py:104
 msgid "Ukrainian"
 msgstr "烏克蘭語"
 
-#: conf/global_settings.py:104
-#, fuzzy
-msgid "Vietnamese"
-msgstr "維也納州"
-
 #: conf/global_settings.py:105
+msgid "Urdu"
+msgstr ""
+
+#: conf/global_settings.py:106
+msgid "Vietnamese"
+msgstr "越南語"
+
+#: conf/global_settings.py:107
 msgid "Simplified Chinese"
 msgstr "簡體中文"
 
-#: conf/global_settings.py:106
+#: conf/global_settings.py:108
 msgid "Traditional Chinese"
 msgstr "繁體中文"
 
-#: core/validators.py:20 forms/fields.py:67
+#: core/validators.py:21 forms/fields.py:67
 msgid "Enter a valid value."
 msgstr "輸入有效的值"
-
-#: core/validators.py:87 forms/fields.py:574
-msgid "Enter a valid URL."
-msgstr "輸入有效的URL"
 
 #: core/validators.py:89 forms/fields.py:575
 msgid "This URL appears to be a broken link."
 msgstr "URL %s 似乎是是斷掉的連結。"
 
-#: core/validators.py:120 forms/fields.py:449
+#: core/validators.py:94 forms/fields.py:574
+msgid "Enter a valid URL."
+msgstr "輸入有效的URL"
+
+#: core/validators.py:138 forms/fields.py:449
 msgid "Enter a valid e-mail address."
 msgstr "輸入有效的電子郵件地址。"
 
-#: core/validators.py:123 forms/fields.py:958
-#, fuzzy
+#: core/validators.py:141 forms/fields.py:958
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr "輸入一個有效的 'slug'，由字母、數字、底線與連字號組成。"
 
-#: core/validators.py:126 forms/fields.py:951
-#, fuzzy
+#: core/validators.py:144 forms/fields.py:951
 msgid "Enter a valid IPv4 address."
-msgstr "輸入有效的 IPv4 地址。"
+msgstr "輸入有效的 IPv4 位址。"
 
-#: core/validators.py:129 db/models/fields/__init__.py:575
+#: core/validators.py:147 db/models/fields/__init__.py:575
 msgid "Enter only digits separated by commas."
 msgstr "輸入以逗號分隔的數字。"
 
-#: core/validators.py:135
-#, fuzzy, python-format
+#: core/validators.py:153
+#, python-format
 msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
-msgstr "確定你輸入的值最少為 %(min)d 個字(其長度為 %(length)d)。"
+msgstr "確認這個是否為 %(limit_value)s (目前是 %(show_value)s)."
 
-#: core/validators.py:153 forms/fields.py:222 forms/fields.py:275
-#, fuzzy, python-format
+#: core/validators.py:171 forms/fields.py:222 forms/fields.py:275
+#, python-format
 msgid "Ensure this value is less than or equal to %(limit_value)s."
-msgstr "這個值必须小於或等於 %s。"
+msgstr "確認這個數值是否小於或等於 %(limit_value)s。"
 
-#: core/validators.py:158 forms/fields.py:223 forms/fields.py:276
-#, fuzzy, python-format
+#: core/validators.py:176 forms/fields.py:223 forms/fields.py:276
+#, python-format
 msgid "Ensure this value is greater than or equal to %(limit_value)s."
-msgstr "這個值必须大於或等於 %s。"
+msgstr "確認這個數值是否大於或等於 %(limit_value)s。"
 
-#: core/validators.py:164
-#, fuzzy, python-format
+#: core/validators.py:182
+#, python-format
 msgid ""
 "Ensure this value has at least %(limit_value)d characters (it has %"
 "(show_value)d)."
-msgstr "確定你輸入的值最少為 %(min)d 個字(其長度為 %(length)d)。"
+msgstr ""
+"請確認這個內容至少要 %(limit_value)d 個字元 (目前有 %(show_value)d 個字)。"
 
-#: core/validators.py:170
-#, fuzzy, python-format
+#: core/validators.py:188
+#, python-format
 msgid ""
 "Ensure this value has at most %(limit_value)d characters (it has %"
 "(show_value)d)."
-msgstr "確定你輸入的值最多為 %(max)d 個字(其長度為 %(length)d)。"
+msgstr ""
+"請確認這個內容最多只能有 %(limit_value)d 個字元 (目前有 %(show_value)d 個"
+"字)。"
 
-#: db/models/base.py:767
+#: db/models/base.py:769
 #, python-format
 msgid "%(field_name)s must be unique for %(date_field)s %(lookup)s."
-msgstr ""
+msgstr "%(date_field)s 的 %(lookup)s 在 %(field_name)s 必須是唯一的。"
 
-#: db/models/base.py:782 db/models/base.py:790
-#, fuzzy, python-format
+#: db/models/base.py:784 db/models/base.py:792
+#, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
-msgstr "%(model_name)s 有 %(field_label)s 已經存在。"
+msgstr "這個 %(field_label)s 在 %(model_name)s 已經存在。"
 
-#: db/models/base.py:789 forms/models.py:581
+#: db/models/base.py:791 forms/models.py:560
 msgid "and"
 msgstr "和"
 
 #: db/models/fields/__init__.py:63
 #, python-format
 msgid "Value %r is not a valid choice."
-msgstr ""
+msgstr "數值 %r 並非是一個有效的選擇"
 
 #: db/models/fields/__init__.py:64
 msgid "This field cannot be null."
 msgstr "這個值不能是 null。"
 
 #: db/models/fields/__init__.py:65
-#, fuzzy
 msgid "This field cannot be blank."
-msgstr "這個值不能是 null。"
+msgstr "這個欄位不能留白"
 
 #: db/models/fields/__init__.py:70
 #, python-format
 msgid "Field of type: %(field_type)s"
-msgstr ""
+msgstr "欄位型態： %(field_type)s"
 
 #: db/models/fields/__init__.py:451 db/models/fields/__init__.py:871
 #: db/models/fields/__init__.py:980 db/models/fields/__init__.py:991
@@ -400,9 +387,9 @@ msgid "Boolean (Either True or False)"
 msgstr "布林值 (True 或 False)"
 
 #: db/models/fields/__init__.py:542 db/models/fields/__init__.py:1001
-#, fuzzy, python-format
+#, python-format
 msgid "String (up to %(max_length)s)"
-msgstr "字串(最長 %(max_length)s)"
+msgstr "字串 (最長到 %(max_length)s 個字)"
 
 #: db/models/fields/__init__.py:570
 msgid "Comma-separated integers"
@@ -422,7 +409,6 @@ msgid "Invalid date: %s"
 msgstr "無效的日期: %s"
 
 #: db/models/fields/__init__.py:670
-#, fuzzy
 msgid "Enter a valid date/time in YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format."
 msgstr "輸入一個 YYYY-MM-DD HH:MM[:ss[.uuuuuu]] 格式的有效日期/時間。"
 
@@ -431,27 +417,25 @@ msgid "Date (with time)"
 msgstr "日期 (包括時間)"
 
 #: db/models/fields/__init__.py:746
-#, fuzzy
 msgid "This value must be a decimal number."
-msgstr "這個值必須是小數。"
+msgstr "這資料必須是十進位數。"
 
 #: db/models/fields/__init__.py:748
 msgid "Decimal number"
-msgstr "小數"
+msgstr "十進位數(小數可)"
 
 #: db/models/fields/__init__.py:803
 msgid "E-mail address"
 msgstr "電子郵件地址"
 
 #: db/models/fields/__init__.py:818 db/models/fields/files.py:220
-#: db/models/fields/files.py:339
+#: db/models/fields/files.py:326
 msgid "File path"
 msgstr "檔案路徑"
 
 #: db/models/fields/__init__.py:841
-#, fuzzy
 msgid "This value must be a float."
-msgstr "這個值必須是整數。"
+msgstr "這個值必須是一個浮點數。"
 
 #: db/models/fields/__init__.py:843
 msgid "Floating point number"
@@ -459,7 +443,7 @@ msgstr "浮點數"
 
 #: db/models/fields/__init__.py:902
 msgid "Big (8 byte) integer"
-msgstr ""
+msgstr "大整數(8位元組)"
 
 #: db/models/fields/__init__.py:915
 msgid "IP address"
@@ -482,9 +466,8 @@ msgid "Time"
 msgstr "時間"
 
 #: db/models/fields/__init__.py:1044
-#, fuzzy
 msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
-msgstr "輸入 HH:MM[:ss[.uuuuuu]] 格式的有效時間格式。"
+msgstr "輸入一個 HH:MM[:ss[.uuuuuu]] 格式的有效時間。"
 
 #: db/models/fields/__init__.py:1120
 msgid "URL"
@@ -494,24 +477,24 @@ msgstr "URL"
 msgid "XML text"
 msgstr "XML 文件"
 
-#: db/models/fields/related.py:804
+#: db/models/fields/related.py:815
 #, python-format
 msgid "Model %(model)s with pk %(pk)r does not exist."
-msgstr ""
+msgstr "PK 為 %(pk)r 的 Model %(model)s 不存在。"
 
-#: db/models/fields/related.py:806
+#: db/models/fields/related.py:817
 msgid "Foreign Key (type determined by related field)"
-msgstr ""
+msgstr "外鍵 (型態由關連欄位決定)"
 
-#: db/models/fields/related.py:928
+#: db/models/fields/related.py:941
 msgid "One-to-one relationship"
-msgstr ""
+msgstr "一對一關連"
 
-#: db/models/fields/related.py:990
+#: db/models/fields/related.py:1003
 msgid "Many-to-many relationship"
-msgstr ""
+msgstr "多對多關連"
 
-#: db/models/fields/related.py:1010
+#: db/models/fields/related.py:1023
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr "按住 \"Control\", 或者在 Mac 上按 \"Command\", 以選取更多值"
@@ -525,7 +508,6 @@ msgid "Enter a whole number."
 msgstr "輸入整數"
 
 #: forms/fields.py:253 forms/fields.py:274
-#, fuzzy
 msgid "Enter a number."
 msgstr "輸入一個數字"
 
@@ -558,7 +540,7 @@ msgstr "輸入有效的日期/時間"
 
 #: forms/fields.py:460
 msgid "No file was submitted. Check the encoding type on the form."
-msgstr "没有檔案被送出。請檢查表單的編碼類型。"
+msgstr "沒有檔案被送出。請檢查表單的編碼類型。"
 
 #: forms/fields.py:461
 msgid "No file was submitted."
@@ -569,14 +551,14 @@ msgid "The submitted file is empty."
 msgstr "送出的檔案是空的。"
 
 #: forms/fields.py:463
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Ensure this filename has at most %(max)d characters (it has %(length)d)."
-msgstr "確定你輸入的值最多為 %(max)d 個字(其長度為 %(length)d)。"
+msgstr "請確認這個檔名最多只能有 %(max)d 個字元 (它現在是 %(length)d 個字)。"
 
 #: forms/fields.py:464
 msgid "Please either submit a file or check the clear checkbox, not both."
-msgstr ""
+msgstr "請提交一個檔案或確認清除核可項, 不能兩者都做。"
 
 #: forms/fields.py:518
 msgid ""
@@ -585,65 +567,63 @@ msgid ""
 msgstr "上傳一個有效的圖片。你上傳的檔案不是圖片，否則就是壞掉的圖。"
 
 #: forms/fields.py:650 forms/fields.py:725
-#, fuzzy, python-format
+#, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
-msgstr "選擇一個有效的選項： '%(value)s' 不在可用的選項中。"
+msgstr "請選擇有效的項目, %(value)s 不是一個可用的選擇。"
 
-#: forms/fields.py:726 forms/fields.py:814 forms/models.py:1018
+#: forms/fields.py:726 forms/fields.py:814 forms/models.py:983
 msgid "Enter a list of values."
 msgstr "輸入一個列表的值"
 
-#: forms/formsets.py:308 forms/formsets.py:310
-#, fuzzy
+#: forms/formsets.py:305 forms/formsets.py:307
 msgid "Order"
 msgstr "排序"
 
-#: forms/formsets.py:312
+#: forms/formsets.py:309
 msgid "Delete"
 msgstr "刪除"
 
-#: forms/models.py:575
-#, fuzzy, python-format
+#: forms/models.py:554
+#, python-format
 msgid "Please correct the duplicate data for %(field)s."
-msgstr "请更正下面的錯誤。"
+msgstr "請修正 %(field)s 的重覆資料"
 
-#: forms/models.py:579
+#: forms/models.py:558
 #, python-format
 msgid "Please correct the duplicate data for %(field)s, which must be unique."
-msgstr ""
+msgstr "請修正 %(field)s 的重覆資料, 必須為唯一值"
 
-#: forms/models.py:585
+#: forms/models.py:564
 #, python-format
 msgid ""
 "Please correct the duplicate data for %(field_name)s which must be unique "
 "for the %(lookup)s in %(date_field)s."
 msgstr ""
+"請修正 %(field_name)s 重複資料, %(date_field)s 的 %(lookup)s 必須是唯一值。"
 
-#: forms/models.py:593
-#, fuzzy
+#: forms/models.py:572
 msgid "Please correct the duplicate values below."
-msgstr "请更正下面的錯誤。"
+msgstr "請修正下方重覆的數值"
 
-#: forms/models.py:868
+#: forms/models.py:833
 msgid "The inline foreign key did not match the parent instance primary key."
-msgstr ""
+msgstr "內含的外鍵無法連接到對應的上層實體主鍵。"
 
-#: forms/models.py:929
+#: forms/models.py:894
 msgid "Select a valid choice. That choice is not one of the available choices."
-msgstr "選擇有效的選項： 此選擇不在可用的选项中。"
+msgstr "選擇有效的選項： 此選擇不在可用的選項中。"
 
-#: forms/models.py:1019
+#: forms/models.py:984
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "選擇一個有效的選項： '%s' 不在可用的選項中。"
 
-#: forms/models.py:1021
+#: forms/models.py:986
 #, python-format
 msgid "\"%s\" is not a valid value for a primary key."
-msgstr ""
+msgstr "\"%s\" 不是一個主鍵的有效資料。"
 
 #: forms/widgets.py:299
-#, fuzzy
 msgid "Currently"
 msgstr "目前"
 
@@ -652,72 +632,71 @@ msgid "Change"
 msgstr "變更"
 
 #: forms/widgets.py:301
-#, fuzzy
 msgid "Clear"
-msgstr "年"
+msgstr "清除"
 
-#: forms/widgets.py:547
+#: forms/widgets.py:548
 msgid "Unknown"
 msgstr "未知"
 
-#: forms/widgets.py:547
+#: forms/widgets.py:548
 msgid "Yes"
 msgstr "是"
 
-#: forms/widgets.py:547
+#: forms/widgets.py:548
 msgid "No"
 msgstr "否"
 
-#: template/defaultfilters.py:774
+#: template/defaultfilters.py:767
 msgid "yes,no,maybe"
 msgstr "是、否、也許"
 
-#: template/defaultfilters.py:805
+#: template/defaultfilters.py:795 template/defaultfilters.py:800
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
-msgstr[0] ""
+msgstr[0] "%(size)d 位元組"
 
-#: template/defaultfilters.py:807
+#: template/defaultfilters.py:802
 #, python-format
 msgid "%s KB"
-msgstr ""
+msgstr "%s KB"
+
+#: template/defaultfilters.py:804
+#, python-format
+msgid "%s MB"
+msgstr "%s MB"
+
+#: template/defaultfilters.py:806
+#, python-format
+msgid "%s GB"
+msgstr "%s GB"
+
+#: template/defaultfilters.py:808
+#, python-format
+msgid "%s TB"
+msgstr "%s TB"
 
 #: template/defaultfilters.py:809
 #, python-format
-msgid "%s MB"
-msgstr ""
-
-#: template/defaultfilters.py:811
-#, python-format
-msgid "%s GB"
-msgstr ""
-
-#: template/defaultfilters.py:813
-#, python-format
-msgid "%s TB"
-msgstr ""
-
-#: template/defaultfilters.py:814
-#, python-format
 msgid "%s PB"
-msgstr ""
+msgstr "%s PB"
 
 #: utils/dateformat.py:42
 msgid "p.m."
-msgstr ""
+msgstr "p.m."
 
 #: utils/dateformat.py:43
 msgid "a.m."
-msgstr ""
+msgstr "a.m."
 
 #: utils/dateformat.py:48
 msgid "PM"
-msgstr ""
+msgstr "PM"
 
 #: utils/dateformat.py:49
 msgid "AM"
-msgstr ""
+msgstr "AM"
 
 #: utils/dateformat.py:98
 msgid "midnight"
@@ -756,12 +735,10 @@ msgid "Sunday"
 msgstr "星期日"
 
 #: utils/dates.py:10
-#, fuzzy
 msgid "Mon"
 msgstr "星期一"
 
 #: utils/dates.py:10
-#, fuzzy
 msgid "Tue"
 msgstr "星期二"
 
@@ -774,17 +751,14 @@ msgid "Thu"
 msgstr "星期四"
 
 #: utils/dates.py:10
-#, fuzzy
 msgid "Fri"
 msgstr "星期五"
 
 #: utils/dates.py:11
-#, fuzzy
 msgid "Sat"
 msgstr "星期六"
 
 #: utils/dates.py:11
-#, fuzzy
 msgid "Sun"
 msgstr "星期日"
 
@@ -945,86 +919,73 @@ msgid "Dec."
 msgstr "十二月"
 
 #: utils/dates.py:45
-#, fuzzy
 msgctxt "alt. month"
 msgid "January"
 msgstr "一月"
 
 #: utils/dates.py:46
-#, fuzzy
 msgctxt "alt. month"
 msgid "February"
 msgstr "二月"
 
 #: utils/dates.py:47
-#, fuzzy
 msgctxt "alt. month"
 msgid "March"
 msgstr "三月"
 
 #: utils/dates.py:48
-#, fuzzy
 msgctxt "alt. month"
 msgid "April"
 msgstr "四月"
 
 #: utils/dates.py:49
-#, fuzzy
 msgctxt "alt. month"
 msgid "May"
 msgstr "五月"
 
 #: utils/dates.py:50
-#, fuzzy
 msgctxt "alt. month"
 msgid "June"
 msgstr "六月"
 
 #: utils/dates.py:51
-#, fuzzy
 msgctxt "alt. month"
 msgid "July"
 msgstr "七月"
 
 #: utils/dates.py:52
-#, fuzzy
 msgctxt "alt. month"
 msgid "August"
 msgstr "八月"
 
 #: utils/dates.py:53
-#, fuzzy
 msgctxt "alt. month"
 msgid "September"
 msgstr "九月"
 
 #: utils/dates.py:54
-#, fuzzy
 msgctxt "alt. month"
 msgid "October"
 msgstr "十月"
 
 #: utils/dates.py:55
-#, fuzzy
 msgctxt "alt. month"
 msgid "November"
 msgstr "十一月"
 
 #: utils/dates.py:56
-#, fuzzy
 msgctxt "alt. month"
 msgid "December"
 msgstr "十二月"
 
 #: utils/text.py:136
-#, fuzzy
 msgid "or"
 msgstr "或"
 
 #. Translators: This string is used as a separator between list elements
 #: utils/text.py:153
 msgid ", "
-msgstr ""
+msgstr ", "
 
 #: utils/timesince.py:21
 msgid "year"
@@ -1057,7 +1018,6 @@ msgid_plural "minutes"
 msgstr[0] "分鐘"
 
 #: utils/timesince.py:45
-#, fuzzy
 msgid "minutes"
 msgstr "分鐘"
 
@@ -1071,23 +1031,23 @@ msgstr "%(number)d %(type)s"
 msgid ", %(number)d %(type)s"
 msgstr ", %(number)d %(type)s"
 
-#: utils/translation/trans_real.py:562
+#: utils/translation/trans_real.py:568
 msgid "DATE_FORMAT"
 msgstr "Y-m-d"
 
-#: utils/translation/trans_real.py:563
+#: utils/translation/trans_real.py:569
 msgid "DATETIME_FORMAT"
 msgstr "Y-m-d H:i:s"
 
-#: utils/translation/trans_real.py:564
+#: utils/translation/trans_real.py:570
 msgid "TIME_FORMAT"
 msgstr "H:i:s"
 
-#: utils/translation/trans_real.py:585
+#: utils/translation/trans_real.py:591
 msgid "YEAR_MONTH_FORMAT"
 msgstr "Y-m"
 
-#: utils/translation/trans_real.py:586
+#: utils/translation/trans_real.py:592
 msgid "MONTH_DAY_FORMAT"
 msgstr "m-d"
 
@@ -1104,4 +1064,56 @@ msgstr "%(verbose_name)s 變更成功。"
 #: views/generic/create_update.py:207
 #, python-format
 msgid "The %(verbose_name)s was deleted."
-msgstr "%(verbose_name)s 已被删除。"
+msgstr "%(verbose_name)s 已被刪除。"
+
+#: views/generic/dates.py:33
+msgid "No year specified"
+msgstr ""
+
+#: views/generic/dates.py:58
+msgid "No month specified"
+msgstr ""
+
+#: views/generic/dates.py:99
+msgid "No day specified"
+msgstr ""
+
+#: views/generic/dates.py:138
+msgid "No week specified"
+msgstr ""
+
+#: views/generic/dates.py:198 views/generic/dates.py:214
+#, fuzzy, python-format
+msgid "No %(verbose_name_plural)s available"
+msgstr "%(verbose_name)s 已被刪除。"
+
+#: views/generic/dates.py:466
+#, python-format
+msgid ""
+"Future %(verbose_name_plural)s not available because %(class_name)s."
+"allow_future is False."
+msgstr ""
+
+#: views/generic/dates.py:500
+#, python-format
+msgid "Invalid date string '%(datestr)s' given format '%(format)s'"
+msgstr ""
+
+#: views/generic/detail.py:51
+#, fuzzy, python-format
+msgid "No %(verbose_name)s found matching the query"
+msgstr "%(verbose_name)s 變更成功。"
+
+#: views/generic/list.py:47
+msgid "Page is not 'last', nor can it be converted to an int."
+msgstr ""
+
+#: views/generic/list.py:52
+#, python-format
+msgid "Invalid page (%(page_number)s)"
+msgstr ""
+
+#: views/generic/list.py:119
+#, python-format
+msgid "Empty list and '%(class_name)s.allow_empty' is False."
+msgstr ""

@@ -1,19 +1,18 @@
-# translation of django.po to
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-21 22:57+0100\n"
-"PO-Revision-Date: 2010-07-08 12:55+0200\n"
-"Last-Translator: Aitzol Naberan <anaberan@codesyntax.com>\n"
-"Language-Team: Django-i18n <django-i18n@googlegroups.com>\n"
+"POT-Creation-Date: 2011-02-28 17:34+0100\n"
+"PO-Revision-Date: 2011-02-22 00:09+0000\n"
+"Last-Translator: aitzol <anaberan@codesyntax.com>\n"
+"Language-Team: Basque <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: eu\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: conf/global_settings.py:44
 msgid "Arabic"
@@ -28,9 +27,8 @@ msgid "Bengali"
 msgstr "Bengalera"
 
 #: conf/global_settings.py:47
-#, fuzzy
 msgid "Bosnian"
-msgstr "Errumaniera"
+msgstr ""
 
 #: conf/global_settings.py:48
 msgid "Catalan"
@@ -61,7 +59,6 @@ msgid "English"
 msgstr "Ingelesa"
 
 #: conf/global_settings.py:55
-#, fuzzy
 msgid "British English"
 msgstr "Ingelesa"
 
@@ -70,320 +67,311 @@ msgid "Spanish"
 msgstr "Espainola"
 
 #: conf/global_settings.py:57
-#, fuzzy
 msgid "Argentinian Spanish"
-msgstr "Argentinako espainola"
+msgstr "Espainola (Argentina)"
 
 #: conf/global_settings.py:58
 #, fuzzy
-msgid "Estonian"
-msgstr "Errumaniera"
+msgid "Mexican Spanish"
+msgstr "Espainola (Argentina)"
 
 #: conf/global_settings.py:59
-#, fuzzy
-msgid "Basque"
-msgstr "Euskal Herria"
+msgid "Estonian"
+msgstr ""
 
 #: conf/global_settings.py:60
+msgid "Basque"
+msgstr "Euskara"
+
+#: conf/global_settings.py:61
 msgid "Persian"
 msgstr "Persiera"
 
-#: conf/global_settings.py:61
+#: conf/global_settings.py:62
 msgid "Finnish"
 msgstr "Finlandiera"
 
-#: conf/global_settings.py:62
+#: conf/global_settings.py:63
 msgid "French"
 msgstr "Frantzesa"
 
-#: conf/global_settings.py:63
-#, fuzzy
-msgid "Frisian"
-msgstr "Persiera"
-
 #: conf/global_settings.py:64
-#, fuzzy
-msgid "Irish"
-msgstr "Turkiera"
+msgid "Frisian"
+msgstr ""
 
 #: conf/global_settings.py:65
+msgid "Irish"
+msgstr ""
+
+#: conf/global_settings.py:66
 msgid "Galician"
 msgstr "Galiziera"
 
-#: conf/global_settings.py:66
+#: conf/global_settings.py:67
 msgid "Hebrew"
 msgstr "Hebreera"
 
-#: conf/global_settings.py:67
+#: conf/global_settings.py:68
 msgid "Hindi"
 msgstr ""
 
-#: conf/global_settings.py:68
+#: conf/global_settings.py:69
 msgid "Croatian"
 msgstr "Kroaziarra"
 
-#: conf/global_settings.py:69
+#: conf/global_settings.py:70
 msgid "Hungarian"
 msgstr "Hungariera"
 
-#: conf/global_settings.py:70
-#, fuzzy
-msgid "Indonesian"
-msgstr "Mazedoniera"
-
 #: conf/global_settings.py:71
+msgid "Indonesian"
+msgstr ""
+
+#: conf/global_settings.py:72
 msgid "Icelandic"
 msgstr "Islandiera"
 
-#: conf/global_settings.py:72
+#: conf/global_settings.py:73
 msgid "Italian"
 msgstr "Italiera"
 
-#: conf/global_settings.py:73
+#: conf/global_settings.py:74
 msgid "Japanese"
 msgstr "Japoniera"
 
-#: conf/global_settings.py:74
-#, fuzzy
-msgid "Georgian"
-msgstr "Alemaniera"
-
 #: conf/global_settings.py:75
+msgid "Georgian"
+msgstr ""
+
+#: conf/global_settings.py:76
 msgid "Khmer"
 msgstr "khemerera"
 
-#: conf/global_settings.py:76
+#: conf/global_settings.py:77
 msgid "Kannada"
 msgstr "Kanadiera"
 
-#: conf/global_settings.py:77
+#: conf/global_settings.py:78
 msgid "Korean"
 msgstr "Koreera"
 
-#: conf/global_settings.py:78
+#: conf/global_settings.py:79
 msgid "Lithuanian"
 msgstr ""
 
-#: conf/global_settings.py:79
+#: conf/global_settings.py:80
 msgid "Latvian"
 msgstr "Lituaniera"
 
-#: conf/global_settings.py:80
+#: conf/global_settings.py:81
 msgid "Macedonian"
 msgstr "Mazedoniera"
 
-#: conf/global_settings.py:81
+#: conf/global_settings.py:82
 msgid "Malayalam"
 msgstr ""
 
-#: conf/global_settings.py:82
-#, fuzzy
-msgid "Mongolian"
-msgstr "Mazedoniera"
-
 #: conf/global_settings.py:83
+msgid "Mongolian"
+msgstr ""
+
+#: conf/global_settings.py:84
 msgid "Dutch"
 msgstr "Holandera"
 
-#: conf/global_settings.py:84
+#: conf/global_settings.py:85
 msgid "Norwegian"
 msgstr "Norvegiera"
 
-#: conf/global_settings.py:85
-#, fuzzy
-msgid "Norwegian Bokmal"
-msgstr "Norvegiera"
-
 #: conf/global_settings.py:86
-#, fuzzy
-msgid "Norwegian Nynorsk"
-msgstr "Norvegiera"
+msgid "Norwegian Bokmal"
+msgstr ""
 
 #: conf/global_settings.py:87
-msgid "Punjabi"
+msgid "Norwegian Nynorsk"
 msgstr ""
 
 #: conf/global_settings.py:88
+msgid "Punjabi"
+msgstr ""
+
+#: conf/global_settings.py:89
 msgid "Polish"
 msgstr "Poloniera"
 
-#: conf/global_settings.py:89
-#, fuzzy
+#: conf/global_settings.py:90
 msgid "Portuguese"
 msgstr "Portugalera"
 
-#: conf/global_settings.py:90
-#, fuzzy
-msgid "Brazilian Portuguese"
-msgstr "Portugalera"
-
 #: conf/global_settings.py:91
+msgid "Brazilian Portuguese"
+msgstr "Portugalera (Brazil)"
+
+#: conf/global_settings.py:92
 msgid "Romanian"
 msgstr "Errumaniera"
 
-#: conf/global_settings.py:92
+#: conf/global_settings.py:93
 msgid "Russian"
 msgstr "Errusiera"
 
-#: conf/global_settings.py:93
+#: conf/global_settings.py:94
 msgid "Slovak"
 msgstr "Eslovakiera"
 
-#: conf/global_settings.py:94
+#: conf/global_settings.py:95
 msgid "Slovenian"
 msgstr "Esloveniera"
 
-#: conf/global_settings.py:95
-#, fuzzy
-msgid "Albanian"
-msgstr "Errumaniera"
-
 #: conf/global_settings.py:96
+msgid "Albanian"
+msgstr ""
+
+#: conf/global_settings.py:97
 msgid "Serbian"
 msgstr "Serbiera"
 
-#: conf/global_settings.py:97
-#, fuzzy
-msgid "Serbian Latin"
-msgstr "Serbiera"
-
 #: conf/global_settings.py:98
+msgid "Serbian Latin"
+msgstr ""
+
+#: conf/global_settings.py:99
 msgid "Swedish"
 msgstr "Suediera"
 
-#: conf/global_settings.py:99
+#: conf/global_settings.py:100
 msgid "Tamil"
 msgstr "Tamilera"
 
-#: conf/global_settings.py:100
+#: conf/global_settings.py:101
 msgid "Telugu"
 msgstr "Telegu hizkuntza"
 
-#: conf/global_settings.py:101
-#, fuzzy
-msgid "Thai"
-msgstr "Tamilera"
-
 #: conf/global_settings.py:102
+msgid "Thai"
+msgstr ""
+
+#: conf/global_settings.py:103
 msgid "Turkish"
 msgstr "Turkiera"
 
-#: conf/global_settings.py:103
+#: conf/global_settings.py:104
 msgid "Ukrainian"
 msgstr "Ukrainera"
 
-#: conf/global_settings.py:104
-#, fuzzy
-msgid "Vietnamese"
-msgstr "izena"
-
 #: conf/global_settings.py:105
+msgid "Urdu"
+msgstr ""
+
+#: conf/global_settings.py:106
+msgid "Vietnamese"
+msgstr ""
+
+#: conf/global_settings.py:107
 msgid "Simplified Chinese"
 msgstr "Txinera (sinpletua)"
 
-#: conf/global_settings.py:106
+#: conf/global_settings.py:108
 msgid "Traditional Chinese"
 msgstr "Txinera (tradizionala)"
 
-#: core/validators.py:20 forms/fields.py:67
+#: core/validators.py:21 forms/fields.py:67
 msgid "Enter a valid value."
 msgstr "Idatzi balio zuzena."
-
-#: core/validators.py:87 forms/fields.py:574
-msgid "Enter a valid URL."
-msgstr "URL zuzen bat idatzi."
 
 #: core/validators.py:89 forms/fields.py:575
 msgid "This URL appears to be a broken link."
 msgstr "URL hau ez dago ondo."
 
-#: core/validators.py:120 forms/fields.py:449
+#: core/validators.py:94 forms/fields.py:574
+msgid "Enter a valid URL."
+msgstr "URL zuzen bat idatzi."
+
+#: core/validators.py:138 forms/fields.py:449
 msgid "Enter a valid e-mail address."
 msgstr "e-mail helbide zuzena idatzi."
 
-#: core/validators.py:123 forms/fields.py:958
-#, fuzzy
+#: core/validators.py:141 forms/fields.py:958
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
-"Balore honek letrak, zenbakiak eta '_','-' karatereak bakarrik izan ditzazke."
+"Hizki, zenbaki, azpimarra edo marratxoz osatutako baleko 'slug' bat sartu."
 
-#: core/validators.py:126 forms/fields.py:951
+#: core/validators.py:144 forms/fields.py:951
 msgid "Enter a valid IPv4 address."
 msgstr "IPv4 zuzen bat idatzi."
 
-#: core/validators.py:129 db/models/fields/__init__.py:575
+#: core/validators.py:147 db/models/fields/__init__.py:575
 msgid "Enter only digits separated by commas."
 msgstr "Komaz bereiztutako digitoak bakarrik idatzi."
 
-#: core/validators.py:135
-#, fuzzy, python-format
+#: core/validators.py:153
+#, python-format
 msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
 msgstr ""
-"Ziurta zaitez balio honek gutxienez %(min)d karaktere dituela ,%(length)d "
-"ditu orain."
+"Ziurtatu balioak %(limit_value)s karraktere dituela gutxienez  (orain %"
+"(show_value)s dauzka)."
 
-#: core/validators.py:153 forms/fields.py:222 forms/fields.py:275
-#, fuzzy, python-format
+#: core/validators.py:171 forms/fields.py:222 forms/fields.py:275
+#, python-format
 msgid "Ensure this value is less than or equal to %(limit_value)s."
-msgstr "Ziurta zaitez balio hau %s baino txikiagoa edo berdina dela."
+msgstr ""
+"Ziurta zaitez balio hau %(limit_value)s baino txikiago edo berdina dela."
 
-#: core/validators.py:158 forms/fields.py:223 forms/fields.py:276
-#, fuzzy, python-format
+#: core/validators.py:176 forms/fields.py:223 forms/fields.py:276
+#, python-format
 msgid "Ensure this value is greater than or equal to %(limit_value)s."
-msgstr "Ziurta zaitez balio hau %s baino handiagoa edo berdina dela."
+msgstr ""
+"Ziurta zaitez balio hau %(limit_value)s baino handiago edo berdina dela."
 
-#: core/validators.py:164
-#, fuzzy, python-format
+#: core/validators.py:182
+#, python-format
 msgid ""
 "Ensure this value has at least %(limit_value)d characters (it has %"
 "(show_value)d)."
 msgstr ""
-"Ziurta zaitez balio honek gutxienez %(min)d karaktere dituela ,%(length)d "
-"ditu orain."
+"Ziurtatu gutxienez %(limit_value)d karaktere dauzkala (orain %(show_value)d "
+"dauzka)."
 
-#: core/validators.py:170
-#, fuzzy, python-format
+#: core/validators.py:188
+#, python-format
 msgid ""
 "Ensure this value has at most %(limit_value)d characters (it has %"
 "(show_value)d)."
 msgstr ""
-"Ziurta zaitez balio honek gehienez %(max)d karaktere dituela, %(length)d "
-"ditu orain."
+"Ziurtatu gehienez %(limit_value)d dauzkala (orain %(show_value)d dauzka)."
 
-#: db/models/base.py:767
-#, fuzzy, python-format
+#: db/models/base.py:769
+#, python-format
 msgid "%(field_name)s must be unique for %(date_field)s %(lookup)s."
 msgstr ""
-"%(field)s eremuak %(value)s balioa baldin badauka, eremu hau bete behar da."
 
-#: db/models/base.py:782 db/models/base.py:790
-#, fuzzy, python-format
+#: db/models/base.py:784 db/models/base.py:792
+#, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
-msgstr "Badago %(optname)s izenarekin %(fieldname)s-n."
+msgstr ""
 
-#: db/models/base.py:789 forms/models.py:581
+#: db/models/base.py:791 forms/models.py:560
 msgid "and"
 msgstr "eta"
 
 #: db/models/fields/__init__.py:63
 #, python-format
 msgid "Value %r is not a valid choice."
-msgstr ""
+msgstr "%r balioa ez da balekoa"
 
 #: db/models/fields/__init__.py:64
 msgid "This field cannot be null."
 msgstr "Eremu hau ezin daiteke hutsa izan (null)."
 
 #: db/models/fields/__init__.py:65
-#, fuzzy
 msgid "This field cannot be blank."
-msgstr "Eremu hau ezin daiteke hutsa izan (null)."
+msgstr "Eremu hau ezin da hutsik egon."
 
 #: db/models/fields/__init__.py:70
 #, python-format
 msgid "Field of type: %(field_type)s"
-msgstr ""
+msgstr "Eremuaren mota: %(field_type)s"
 
 #: db/models/fields/__init__.py:451 db/models/fields/__init__.py:871
 #: db/models/fields/__init__.py:980 db/models/fields/__init__.py:991
@@ -426,9 +414,8 @@ msgid "Invalid date: %s"
 msgstr "Data okerra: %s"
 
 #: db/models/fields/__init__.py:670
-#, fuzzy
 msgid "Enter a valid date/time in YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format."
-msgstr "Idatzi data/ordua zuzena YYYY-MM-DD HH:MM formatoan."
+msgstr "Idatzi data/ordu zuzena UUUU-HH-EE OO:MM[:ss[.uuuuu]] formatoan."
 
 #: db/models/fields/__init__.py:672
 msgid "Date (with time)"
@@ -447,14 +434,13 @@ msgid "E-mail address"
 msgstr "E-mail helbidea"
 
 #: db/models/fields/__init__.py:818 db/models/fields/files.py:220
-#: db/models/fields/files.py:339
+#: db/models/fields/files.py:326
 msgid "File path"
 msgstr "Fitxegi bidea"
 
 #: db/models/fields/__init__.py:841
-#, fuzzy
 msgid "This value must be a float."
-msgstr "Gutxienez  %s izan behar da."
+msgstr "Hemen zenbaki hamartar bat behar da."
 
 #: db/models/fields/__init__.py:843
 msgid "Floating point number"
@@ -462,7 +448,7 @@ msgstr "Zenbaki erreala (float)"
 
 #: db/models/fields/__init__.py:902
 msgid "Big (8 byte) integer"
-msgstr ""
+msgstr "Zenbaki osoa (handia 8 byte)."
 
 #: db/models/fields/__init__.py:915
 msgid "IP address"
@@ -485,9 +471,8 @@ msgid "Time"
 msgstr "Ordua"
 
 #: db/models/fields/__init__.py:1044
-#, fuzzy
 msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
-msgstr "Ordu zuzena idatzi HH:MM formatoan."
+msgstr "Idatzi ordua OO:MM[:ss[.uuuuu]] formatoan."
 
 #: db/models/fields/__init__.py:1120
 msgid "URL"
@@ -497,24 +482,24 @@ msgstr "URL"
 msgid "XML text"
 msgstr "XML testua"
 
-#: db/models/fields/related.py:804
+#: db/models/fields/related.py:815
 #, python-format
 msgid "Model %(model)s with pk %(pk)r does not exist."
-msgstr ""
+msgstr "%(pk)r pk duen %(model)s modeloa ez da existitzen."
 
-#: db/models/fields/related.py:806
+#: db/models/fields/related.py:817
 msgid "Foreign Key (type determined by related field)"
 msgstr ""
 
-#: db/models/fields/related.py:928
+#: db/models/fields/related.py:941
 msgid "One-to-one relationship"
-msgstr ""
+msgstr "Bat-bat erlazioa"
 
-#: db/models/fields/related.py:990
+#: db/models/fields/related.py:1003
 msgid "Many-to-many relationship"
 msgstr ""
 
-#: db/models/fields/related.py:1010
+#: db/models/fields/related.py:1023
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
@@ -575,16 +560,14 @@ msgid "The submitted file is empty."
 msgstr "Bidalitako fitxategia hutsik dago."
 
 #: forms/fields.py:463
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Ensure this filename has at most %(max)d characters (it has %(length)d)."
 msgstr ""
-"Ziurta zaitez balio honek gehienez %(max)d karaktere dituela, %(length)d "
-"ditu orain."
 
 #: forms/fields.py:464
 msgid "Please either submit a file or check the clear checkbox, not both."
-msgstr ""
+msgstr "Mesedez, igo fitxategi bat edo klikatu garbitu botoia, ez biak."
 
 #: forms/fields.py:518
 msgid ""
@@ -599,120 +582,116 @@ msgstr ""
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr "Aukeratu aukera zuzen bat. %(value)s ez da zuzena."
 
-#: forms/fields.py:726 forms/fields.py:814 forms/models.py:1018
+#: forms/fields.py:726 forms/fields.py:814 forms/models.py:983
 msgid "Enter a list of values."
 msgstr "Balio zerrenda bat idatzi ezazu."
 
-#: forms/formsets.py:308 forms/formsets.py:310
-#, fuzzy
+#: forms/formsets.py:305 forms/formsets.py:307
 msgid "Order"
-msgstr "Ordena:"
+msgstr "Ordena"
 
-#: forms/formsets.py:312
+#: forms/formsets.py:309
 msgid "Delete"
 msgstr "Ezabatu"
 
-#: forms/models.py:575
-#, fuzzy, python-format
+#: forms/models.py:554
+#, python-format
 msgid "Please correct the duplicate data for %(field)s."
-msgstr "Arren zuzendu akatsa"
+msgstr "Mesedez zuzendu bikoiztketa %(field)s eremuan."
 
-#: forms/models.py:579
+#: forms/models.py:558
 #, python-format
 msgid "Please correct the duplicate data for %(field)s, which must be unique."
-msgstr ""
+msgstr "Mesedez zuzendu bikoizketa %(field)s eremuan. Bakarra izan behar da."
 
-#: forms/models.py:585
+#: forms/models.py:564
 #, python-format
 msgid ""
 "Please correct the duplicate data for %(field_name)s which must be unique "
 "for the %(lookup)s in %(date_field)s."
 msgstr ""
 
-#: forms/models.py:593
-#, fuzzy
+#: forms/models.py:572
 msgid "Please correct the duplicate values below."
-msgstr "Arren zuzendu akatsa"
+msgstr "Mesedez zuzendu hurrengo balio bikoiztuak."
 
-#: forms/models.py:868
+#: forms/models.py:833
 msgid "The inline foreign key did not match the parent instance primary key."
 msgstr ""
 
-#: forms/models.py:929
+#: forms/models.py:894
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "Aukera zuzen bat aukeratu. Aukeratutakoa ez da zuzena."
 
-#: forms/models.py:1019
+#: forms/models.py:984
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "Aukera zuzena aukeratu. %s ez da aukeretako bat."
 
-#: forms/models.py:1021
+#: forms/models.py:986
 #, python-format
 msgid "\"%s\" is not a valid value for a primary key."
-msgstr ""
+msgstr "\"%s\" ez da balekoa gako nagusi gisa."
 
 #: forms/widgets.py:299
-#, fuzzy
 msgid "Currently"
-msgstr "Orain:"
+msgstr "Orain"
 
 #: forms/widgets.py:300
 msgid "Change"
 msgstr "Aldatu"
 
 #: forms/widgets.py:301
-#, fuzzy
 msgid "Clear"
-msgstr "urtea"
+msgstr "Garbitu"
 
-#: forms/widgets.py:547
+#: forms/widgets.py:548
 msgid "Unknown"
 msgstr "Ezezaguna"
 
-#: forms/widgets.py:547
+#: forms/widgets.py:548
 msgid "Yes"
 msgstr "Bai"
 
-#: forms/widgets.py:547
+#: forms/widgets.py:548
 msgid "No"
 msgstr "Ez"
 
-#: template/defaultfilters.py:774
+#: template/defaultfilters.py:767
 msgid "yes,no,maybe"
 msgstr "bai,ez,agian"
 
-#: template/defaultfilters.py:805
-#, fuzzy, python-format
+#: template/defaultfilters.py:795 template/defaultfilters.py:800
+#, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
-msgstr[0] "%(size)d byte"
-msgstr[1] ""
+msgstr[0] "byte %(size)d "
+msgstr[1] "%(size)d byte"
 
-#: template/defaultfilters.py:807
+#: template/defaultfilters.py:802
 #, python-format
 msgid "%s KB"
 msgstr "%s KB"
 
-#: template/defaultfilters.py:809
+#: template/defaultfilters.py:804
 #, python-format
 msgid "%s MB"
 msgstr "%s MB"
 
-#: template/defaultfilters.py:811
+#: template/defaultfilters.py:806
 #, python-format
 msgid "%s GB"
 msgstr "%s GB"
 
-#: template/defaultfilters.py:813
-#, fuzzy, python-format
+#: template/defaultfilters.py:808
+#, python-format
 msgid "%s TB"
-msgstr "%s KB"
+msgstr "%s TB"
 
-#: template/defaultfilters.py:814
-#, fuzzy, python-format
+#: template/defaultfilters.py:809
+#, python-format
 msgid "%s PB"
-msgstr "%s KB"
+msgstr "%s PB"
 
 #: utils/dateformat.py:42
 msgid "p.m."
@@ -903,27 +882,27 @@ msgstr "Ots."
 #: utils/dates.py:33
 msgctxt "abbrev. month"
 msgid "March"
-msgstr "Martxoa"
+msgstr "Mar."
 
 #: utils/dates.py:34
 msgctxt "abbrev. month"
 msgid "April"
-msgstr "Apirila"
+msgstr "Api."
 
 #: utils/dates.py:35
 msgctxt "abbrev. month"
 msgid "May"
-msgstr "Maiatza"
+msgstr "Mai."
 
 #: utils/dates.py:36
 msgctxt "abbrev. month"
 msgid "June"
-msgstr "Ekaina"
+msgstr "Eka."
 
 #: utils/dates.py:37
 msgctxt "abbrev. month"
 msgid "July"
-msgstr "Uztaila"
+msgstr "Uzt."
 
 #: utils/dates.py:38
 msgctxt "abbrev. month"
@@ -951,73 +930,61 @@ msgid "Dec."
 msgstr "Abe."
 
 #: utils/dates.py:45
-#, fuzzy
 msgctxt "alt. month"
 msgid "January"
 msgstr "Urtarrila"
 
 #: utils/dates.py:46
-#, fuzzy
 msgctxt "alt. month"
 msgid "February"
 msgstr "Otsaila"
 
 #: utils/dates.py:47
-#, fuzzy
 msgctxt "alt. month"
 msgid "March"
 msgstr "Martxoa"
 
 #: utils/dates.py:48
-#, fuzzy
 msgctxt "alt. month"
 msgid "April"
 msgstr "Apirila"
 
 #: utils/dates.py:49
-#, fuzzy
 msgctxt "alt. month"
 msgid "May"
 msgstr "Maiatza"
 
 #: utils/dates.py:50
-#, fuzzy
 msgctxt "alt. month"
 msgid "June"
 msgstr "Ekaina"
 
 #: utils/dates.py:51
-#, fuzzy
 msgctxt "alt. month"
 msgid "July"
 msgstr "Uztaila"
 
 #: utils/dates.py:52
-#, fuzzy
 msgctxt "alt. month"
 msgid "August"
 msgstr "Abuztua"
 
 #: utils/dates.py:53
-#, fuzzy
 msgctxt "alt. month"
 msgid "September"
 msgstr "Iraila"
 
 #: utils/dates.py:54
-#, fuzzy
 msgctxt "alt. month"
 msgid "October"
 msgstr "Urria"
 
 #: utils/dates.py:55
-#, fuzzy
 msgctxt "alt. month"
 msgid "November"
 msgstr "Azaroa"
 
 #: utils/dates.py:56
-#, fuzzy
 msgctxt "alt. month"
 msgid "December"
 msgstr "Abendua"
@@ -1029,7 +996,7 @@ msgstr "edo"
 #. Translators: This string is used as a separator between list elements
 #: utils/text.py:153
 msgid ", "
-msgstr ""
+msgstr ", "
 
 #: utils/timesince.py:21
 msgid "year"
@@ -1081,23 +1048,23 @@ msgstr "%(number)d %(type)s"
 msgid ", %(number)d %(type)s"
 msgstr ", %(number)d %(type)s"
 
-#: utils/translation/trans_real.py:562
+#: utils/translation/trans_real.py:568
 msgid "DATE_FORMAT"
 msgstr "DATE_FORMAT"
 
-#: utils/translation/trans_real.py:563
+#: utils/translation/trans_real.py:569
 msgid "DATETIME_FORMAT"
 msgstr "DATETIME_FORMAT"
 
-#: utils/translation/trans_real.py:564
+#: utils/translation/trans_real.py:570
 msgid "TIME_FORMAT"
 msgstr "TIME_FORMAT"
 
-#: utils/translation/trans_real.py:585
+#: utils/translation/trans_real.py:591
 msgid "YEAR_MONTH_FORMAT"
 msgstr "YEAR_MONTH_FORMAT"
 
-#: utils/translation/trans_real.py:586
+#: utils/translation/trans_real.py:592
 msgid "MONTH_DAY_FORMAT"
 msgstr "MONTH_DAY_FORMAT"
 
@@ -1115,3 +1082,55 @@ msgstr "%(verbose_name)s arazorik gabe eguneratu da."
 #, python-format
 msgid "The %(verbose_name)s was deleted."
 msgstr "%(verbose_name)s ezabatu da."
+
+#: views/generic/dates.py:33
+msgid "No year specified"
+msgstr ""
+
+#: views/generic/dates.py:58
+msgid "No month specified"
+msgstr ""
+
+#: views/generic/dates.py:99
+msgid "No day specified"
+msgstr ""
+
+#: views/generic/dates.py:138
+msgid "No week specified"
+msgstr ""
+
+#: views/generic/dates.py:198 views/generic/dates.py:214
+#, fuzzy, python-format
+msgid "No %(verbose_name_plural)s available"
+msgstr "%(verbose_name)s ezabatu da."
+
+#: views/generic/dates.py:466
+#, python-format
+msgid ""
+"Future %(verbose_name_plural)s not available because %(class_name)s."
+"allow_future is False."
+msgstr ""
+
+#: views/generic/dates.py:500
+#, python-format
+msgid "Invalid date string '%(datestr)s' given format '%(format)s'"
+msgstr ""
+
+#: views/generic/detail.py:51
+#, fuzzy, python-format
+msgid "No %(verbose_name)s found matching the query"
+msgstr "%(verbose_name)s arazorik gabe eguneratu da."
+
+#: views/generic/list.py:47
+msgid "Page is not 'last', nor can it be converted to an int."
+msgstr ""
+
+#: views/generic/list.py:52
+#, python-format
+msgid "Invalid page (%(page_number)s)"
+msgstr ""
+
+#: views/generic/list.py:119
+#, python-format
+msgid "Empty list and '%(class_name)s.allow_empty' is False."
+msgstr ""
