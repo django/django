@@ -1,19 +1,18 @@
-# translation of django.po to
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:27+0100\n"
-"PO-Revision-Date: 2010-07-08 12:55+0200\n"
-"Last-Translator: Aitzol Naberan <anaberan@codesyntax.com>\n"
-"Language-Team: Django-i18n <django-i18n@googlegroups.com>\n"
+"POT-Creation-Date: 2011-03-01 00:24+0100\n"
+"PO-Revision-Date: 2011-02-22 00:08+0000\n"
+"Last-Translator: aitzol <anaberan@codesyntax.com>\n"
+"Language-Team: Basque <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: eu\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: templatetags/humanize.py:19
 msgid "th"
@@ -32,25 +31,25 @@ msgid "rd"
 msgstr "garren"
 
 #: templatetags/humanize.py:54
-#, fuzzy, python-format
+#, python-format
 msgid "%(value).1f million"
 msgid_plural "%(value).1f million"
-msgstr[0] "%(value).1f milioi"
-msgstr[1] ""
+msgstr[0] "miloi %(value).1f "
+msgstr[1] "%(value).1f miloi"
 
 #: templatetags/humanize.py:57
-#, fuzzy, python-format
+#, python-format
 msgid "%(value).1f billion"
 msgid_plural "%(value).1f billion"
-msgstr[0] "%(value).1f bilioi"
-msgstr[1] ""
+msgstr[0] "biloi %(value).1f "
+msgstr[1] "%(value).1f biloi"
 
 #: templatetags/humanize.py:60
-#, fuzzy, python-format
+#, python-format
 msgid "%(value).1f trillion"
 msgid_plural "%(value).1f trillion"
-msgstr[0] "%(value).1f trilioi"
-msgstr[1] ""
+msgstr[0] "triloi %(value).1f "
+msgstr[1] "%(value).1f triloi"
 
 #: templatetags/humanize.py:76
 msgid "one"

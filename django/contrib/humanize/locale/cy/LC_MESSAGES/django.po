@@ -1,34 +1,30 @@
-# Translation of Django to Welsh.
-# Copyright (C) 2005 Django.
 # This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:27+0100\n"
-"PO-Revision-Date: 2005-11-05 HO:MI+ZONE\n"
-"Last-Translator: Jason Davies <jason@jasondavies.com>\n"
-"Language-Team: Cymraeg <cy@li.org>\n"
+"POT-Creation-Date: 2011-03-01 00:24+0100\n"
+"PO-Revision-Date: 2011-02-28 23:23+0000\n"
+"Last-Translator: Django team\n"
+"Language-Team: English <en@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=4; plural= (n==1) ? 0 : (n==2) ? 1 : (n != 8 && n != "
-"11) ? 2 : 3;\n"
+"Language: cy\n"
+"Plural-Forms: nplurals=4; plural=(n==2) ? 1 : 0\n"
 
 #: templatetags/humanize.py:19
 msgid "th"
 msgstr ""
 
 #: templatetags/humanize.py:19
-#, fuzzy
 msgid "st"
-msgstr "safle"
+msgstr ""
 
 #: templatetags/humanize.py:19
-#, fuzzy
 msgid "nd"
-msgstr "ac"
+msgstr ""
 
 #: templatetags/humanize.py:19
 msgid "rd"
@@ -62,9 +58,8 @@ msgstr[2] ""
 msgstr[3] ""
 
 #: templatetags/humanize.py:76
-#, fuzzy
 msgid "one"
-msgstr "cynnwys"
+msgstr ""
 
 #: templatetags/humanize.py:76
 msgid "two"
@@ -75,14 +70,12 @@ msgid "three"
 msgstr ""
 
 #: templatetags/humanize.py:76
-#, fuzzy
 msgid "four"
-msgstr "awr"
+msgstr ""
 
 #: templatetags/humanize.py:76
-#, fuzzy
 msgid "five"
-msgstr "gweithredol"
+msgstr ""
 
 #: templatetags/humanize.py:76
 msgid "six"
@@ -97,20 +90,17 @@ msgid "eight"
 msgstr ""
 
 #: templatetags/humanize.py:76
-#, fuzzy
 msgid "nine"
-msgstr "munud"
+msgstr ""
 
 #: templatetags/humanize.py:96
-#, fuzzy
 msgid "today"
-msgstr "Heddiw"
+msgstr ""
 
 #: templatetags/humanize.py:98
 msgid "tomorrow"
 msgstr ""
 
 #: templatetags/humanize.py:100
-#, fuzzy
 msgid "yesterday"
-msgstr "Dydd Mawrth"
+msgstr ""

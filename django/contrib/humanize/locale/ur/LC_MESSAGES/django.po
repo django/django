@@ -1,0 +1,100 @@
+# This file is distributed under the same license as the Django package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-03-01 00:24+0100\n"
+"PO-Revision-Date: 2011-02-25 06:00+0000\n"
+"Last-Translator: Mansoorulhaq <mansoorulhaq1986@gmail.com>\n"
+"Language-Team: Urdu <None>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ur\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+
+#: templatetags/humanize.py:19
+msgid "th"
+msgstr "واں"
+
+#: templatetags/humanize.py:19
+msgid "st"
+msgstr "پہلا"
+
+#: templatetags/humanize.py:19
+msgid "nd"
+msgstr "دوسرا"
+
+#: templatetags/humanize.py:19
+msgid "rd"
+msgstr "تیسرا"
+
+#: templatetags/humanize.py:54
+#, python-format
+msgid "%(value).1f million"
+msgid_plural "%(value).1f million"
+msgstr[0] "%(value).1f ملین"
+msgstr[1] "%(value).1f ملین"
+
+#: templatetags/humanize.py:57
+#, python-format
+msgid "%(value).1f billion"
+msgid_plural "%(value).1f billion"
+msgstr[0] "%(value).1f بلین"
+msgstr[1] "%(value).1f بلین"
+
+#: templatetags/humanize.py:60
+#, python-format
+msgid "%(value).1f trillion"
+msgid_plural "%(value).1f trillion"
+msgstr[0] "%(value).1f ٹریلین"
+msgstr[1] "%(value).1f ٹریلین"
+
+#: templatetags/humanize.py:76
+msgid "one"
+msgstr "ایک"
+
+#: templatetags/humanize.py:76
+msgid "two"
+msgstr "دو"
+
+#: templatetags/humanize.py:76
+msgid "three"
+msgstr "تین"
+
+#: templatetags/humanize.py:76
+msgid "four"
+msgstr "چار"
+
+#: templatetags/humanize.py:76
+msgid "five"
+msgstr "پانچ"
+
+#: templatetags/humanize.py:76
+msgid "six"
+msgstr "چھ"
+
+#: templatetags/humanize.py:76
+msgid "seven"
+msgstr "سات"
+
+#: templatetags/humanize.py:76
+msgid "eight"
+msgstr "آتھ"
+
+#: templatetags/humanize.py:76
+msgid "nine"
+msgstr "نو"
+
+#: templatetags/humanize.py:96
+msgid "today"
+msgstr "آج"
+
+#: templatetags/humanize.py:98
+msgid "tomorrow"
+msgstr "آئندہ کل"
+
+#: templatetags/humanize.py:100
+msgid "yesterday"
+msgstr "گزستہ کل"

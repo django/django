@@ -1,21 +1,18 @@
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:27+0100\n"
-"PO-Revision-Date: 2010-08-11 09:00-0300\n"
-"Last-Translator: Ramiro <rm0@gmx.net>\n"
-"Language-Team: Django-I18N <django-i18n@googlegroups.com>\n"
+"POT-Creation-Date: 2011-03-01 00:24+0100\n"
+"PO-Revision-Date: 2011-02-22 00:08+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: Spanish (Argentinian) <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: es_AR\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Pootle 2.0.1\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: templatetags/humanize.py:19
 msgid "th"

@@ -1,17 +1,18 @@
-# translation of django.po to Bulgarian
-#
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:27+0100\n"
-"PO-Revision-Date: 2008-03-12 13:01+0200\n"
-"Last-Translator: Vladislav <vladislav.mitov@gmail.com>\n"
-"Language-Team: \n"
+"POT-Creation-Date: 2011-03-01 00:24+0100\n"
+"PO-Revision-Date: 2011-02-22 00:08+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
+"Language-Team: English <en@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: bg\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: templatetags/humanize.py:19
 msgid "th"
@@ -30,25 +31,25 @@ msgid "rd"
 msgstr "ти"
 
 #: templatetags/humanize.py:54
-#, fuzzy, python-format
+#, python-format
 msgid "%(value).1f million"
 msgid_plural "%(value).1f million"
-msgstr[0] "%(value).1f милион"
-msgstr[1] "%(value).1f милион"
+msgstr[0] ""
+msgstr[1] ""
 
 #: templatetags/humanize.py:57
-#, fuzzy, python-format
+#, python-format
 msgid "%(value).1f billion"
 msgid_plural "%(value).1f billion"
-msgstr[0] "%(value).1f милиард"
-msgstr[1] "%(value).1f милиард"
+msgstr[0] ""
+msgstr[1] ""
 
 #: templatetags/humanize.py:60
-#, fuzzy, python-format
+#, python-format
 msgid "%(value).1f trillion"
 msgid_plural "%(value).1f trillion"
-msgstr[0] "%(value).1f трилион"
-msgstr[1] "%(value).1f трилион"
+msgstr[0] ""
+msgstr[1] ""
 
 #: templatetags/humanize.py:76
 msgid "one"

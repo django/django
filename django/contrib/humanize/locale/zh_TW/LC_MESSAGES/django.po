@@ -1,17 +1,18 @@
-# This file is distributed under the same license as the django package.
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:27+0100\n"
-"PO-Revision-Date: 2007-04-05 01:32+1000\n"
-"Last-Translator: Terry Huang <terryh.tp@gmail.com>\n"
-"Language-Team: Terry Huang <terryh.tp@gmail.com>\n"
+"POT-Creation-Date: 2011-03-01 00:24+0100\n"
+"PO-Revision-Date: 2011-02-22 00:08+0000\n"
+"Last-Translator: tcc <tcchou@tcchou.org>\n"
+"Language-Team: Chinese (Taiwan) <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Language: zh_TW\n"
+"Plural-Forms: nplurals=1; plural=0\n"
 
 #: templatetags/humanize.py:19
 msgid "th"
@@ -84,7 +85,6 @@ msgid "nine"
 msgstr "九"
 
 #: templatetags/humanize.py:96
-#, fuzzy
 msgid "today"
 msgstr "今天"
 
@@ -93,6 +93,5 @@ msgid "tomorrow"
 msgstr "明天"
 
 #: templatetags/humanize.py:100
-#, fuzzy
 msgid "yesterday"
 msgstr "昨天"

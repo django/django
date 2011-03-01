@@ -4,15 +4,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:27+0100\n"
-"PO-Revision-Date: 2010-05-07 17:33+0100\n"
-"Last-Translator: Michael Thornhill <michael@maithu.com>\n"
-"Language-Team: Irish <gaeilge-gnulinux@lists.sourceforge.net>\n"
+"POT-Creation-Date: 2011-03-01 00:24+0100\n"
+"PO-Revision-Date: 2011-02-22 00:08+0000\n"
+"Last-Translator: mick <michael@maithu.com>\n"
+"Language-Team: Irish <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=5; plural=n==1 ? 0 : n==2 ? 1 : n<7 ? 2 : n < 11 ? "
-"3 : 4;\n"
+"Language: ga\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n==2 ? 1 : n<7 ? 2 : n<11 ? 3 : "
+"4)\n"
 
 #: templatetags/humanize.py:19
 msgid "th"
@@ -37,8 +38,6 @@ msgid_plural "%(value).1f million"
 msgstr[0] "%(value).1f milliún"
 msgstr[1] "%(value).1f milliún"
 msgstr[2] "%(value).1f milliún"
-msgstr[3] "%(value).1f milliún"
-msgstr[4] "%(value).1f milliún"
 
 #: templatetags/humanize.py:57
 #, python-format
@@ -47,8 +46,6 @@ msgid_plural "%(value).1f billion"
 msgstr[0] "%(value).1f billiún"
 msgstr[1] "%(value).1f billiún"
 msgstr[2] "%(value).1f billiún"
-msgstr[3] "%(value).1f billiún"
-msgstr[4] "%(value).1f billiún"
 
 #: templatetags/humanize.py:60
 #, python-format
@@ -57,8 +54,6 @@ msgid_plural "%(value).1f trillion"
 msgstr[0] "%(value).1f trilliún"
 msgstr[1] "%(value).1f trilliún"
 msgstr[2] "%(value).1f trilliún"
-msgstr[3] "%(value).1f trilliún"
-msgstr[4] "%(value).1f trilliún"
 
 #: templatetags/humanize.py:76
 msgid "one"

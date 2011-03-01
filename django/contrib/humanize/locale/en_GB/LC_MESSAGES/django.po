@@ -4,95 +4,97 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:27+0100\n"
-"PO-Revision-Date: 2010-03-25 08:00+1000\n"
-"Last-Translator: Simon Meers <DrMeers@gmail.com>\n"
-"Language-Team: \n"
+"POT-Creation-Date: 2011-03-01 00:24+0100\n"
+"PO-Revision-Date: 2011-02-22 00:08+0000\n"
+"Last-Translator: jon_atkinson <jon@jonatkinson.co.uk>\n"
+"Language-Team: English (United Kingdom) <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: en_GB\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: templatetags/humanize.py:19
 msgid "th"
-msgstr ""
+msgstr "th"
 
 #: templatetags/humanize.py:19
 msgid "st"
-msgstr ""
+msgstr "st"
 
 #: templatetags/humanize.py:19
 msgid "nd"
-msgstr ""
+msgstr "nd"
 
 #: templatetags/humanize.py:19
 msgid "rd"
-msgstr ""
+msgstr "rd"
 
 #: templatetags/humanize.py:54
 #, python-format
 msgid "%(value).1f million"
 msgid_plural "%(value).1f million"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(value).1f million"
+msgstr[1] "%(value).1f million"
 
 #: templatetags/humanize.py:57
 #, python-format
 msgid "%(value).1f billion"
 msgid_plural "%(value).1f billion"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(value).1f billion"
+msgstr[1] "%(value).1f billion"
 
 #: templatetags/humanize.py:60
 #, python-format
 msgid "%(value).1f trillion"
 msgid_plural "%(value).1f trillion"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(value).1f trillion"
+msgstr[1] "%(value).1f trillion"
 
 #: templatetags/humanize.py:76
 msgid "one"
-msgstr ""
+msgstr "one"
 
 #: templatetags/humanize.py:76
 msgid "two"
-msgstr ""
+msgstr "two"
 
 #: templatetags/humanize.py:76
 msgid "three"
-msgstr ""
+msgstr "three"
 
 #: templatetags/humanize.py:76
 msgid "four"
-msgstr ""
+msgstr "four"
 
 #: templatetags/humanize.py:76
 msgid "five"
-msgstr ""
+msgstr "five"
 
 #: templatetags/humanize.py:76
 msgid "six"
-msgstr ""
+msgstr "six"
 
 #: templatetags/humanize.py:76
 msgid "seven"
-msgstr ""
+msgstr "seven"
 
 #: templatetags/humanize.py:76
 msgid "eight"
-msgstr ""
+msgstr "eight"
 
 #: templatetags/humanize.py:76
 msgid "nine"
-msgstr ""
+msgstr "nine"
 
 #: templatetags/humanize.py:96
 msgid "today"
-msgstr ""
+msgstr "today"
 
 #: templatetags/humanize.py:98
 msgid "tomorrow"
-msgstr ""
+msgstr "tomorrow"
 
 #: templatetags/humanize.py:100
 msgid "yesterday"
-msgstr ""
+msgstr "yesterday"

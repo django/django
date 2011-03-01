@@ -1,34 +1,30 @@
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:27+0100\n"
-"PO-Revision-Date: 2007-08-10 00:21+0900\n"
-"Last-Translator: Chay Sengtha <sengtha@e-khmer.com>\n"
-"Language-Team: Chay Sengtha <sengtha@e-khmer.com>\n"
+"POT-Creation-Date: 2011-03-01 00:24+0100\n"
+"PO-Revision-Date: 2011-02-28 23:23+0000\n"
+"Last-Translator: Django team\n"
+"Language-Team: English <en@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Language: km\n"
+"Plural-Forms: nplurals=1; plural=0\n"
 
 #: templatetags/humanize.py:19
-#, fuzzy
 msgid "th"
-msgstr "ការគ្រប់គ្រងសមាជិក"
+msgstr ""
 
 #: templatetags/humanize.py:19
-#, fuzzy
 msgid "st"
-msgstr "គេហទំព័រ"
+msgstr ""
 
 #: templatetags/humanize.py:19
-#, fuzzy
 msgid "nd"
-msgstr "និង"
+msgstr ""
 
 #: templatetags/humanize.py:19
 msgid "rd"
@@ -53,28 +49,24 @@ msgid_plural "%(value).1f trillion"
 msgstr[0] ""
 
 #: templatetags/humanize.py:76
-#, fuzzy
 msgid "one"
-msgstr "អត្ថបទ"
+msgstr ""
 
 #: templatetags/humanize.py:76
 msgid "two"
 msgstr ""
 
 #: templatetags/humanize.py:76
-#, fuzzy
 msgid "three"
-msgstr "ឥតគិតថ្លៃ"
+msgstr ""
 
 #: templatetags/humanize.py:76
-#, fuzzy
 msgid "four"
-msgstr "ម៉ោង"
+msgstr ""
 
 #: templatetags/humanize.py:76
-#, fuzzy
 msgid "five"
-msgstr "សកម្ម"
+msgstr ""
 
 #: templatetags/humanize.py:76
 msgid "six"
@@ -89,20 +81,17 @@ msgid "eight"
 msgstr ""
 
 #: templatetags/humanize.py:76
-#, fuzzy
 msgid "nine"
-msgstr "នាទី"
+msgstr ""
 
 #: templatetags/humanize.py:96
-#, fuzzy
 msgid "today"
-msgstr "ថ្ងៃនេះ"
+msgstr ""
 
 #: templatetags/humanize.py:98
 msgid "tomorrow"
 msgstr ""
 
 #: templatetags/humanize.py:100
-#, fuzzy
 msgid "yesterday"
-msgstr "អង្គារ"
+msgstr ""
