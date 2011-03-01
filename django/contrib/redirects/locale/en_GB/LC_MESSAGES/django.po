@@ -4,38 +4,44 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:29+0100\n"
-"PO-Revision-Date: 2010-03-25 08:00+1000\n"
-"Last-Translator: Simon Meers <DrMeers@gmail.com>\n"
-"Language-Team: \n"
+"POT-Creation-Date: 2011-03-01 00:45+0100\n"
+"PO-Revision-Date: 2011-02-22 00:12+0000\n"
+"Last-Translator: rossp <ross@rossp.org>\n"
+"Language-Team: English (United Kingdom) <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: en_GB\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: models.py:7
 msgid "redirect from"
-msgstr ""
+msgstr "redirect from"
 
 #: models.py:8
 msgid ""
 "This should be an absolute path, excluding the domain name. Example: '/"
 "events/search/'."
 msgstr ""
+"This should be an absolute path, excluding the domain name. Example: '/"
+"events/search/'."
 
 #: models.py:9
 msgid "redirect to"
-msgstr ""
+msgstr "redirect to"
 
 #: models.py:10
 msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
 "'http://'."
 msgstr ""
+"This can be either an absolute path (as above) or a full URL starting with "
+"'http://'."
 
 #: models.py:13
 msgid "redirect"
-msgstr ""
+msgstr "redirect"
 
 #: models.py:14
 msgid "redirects"
-msgstr ""
+msgstr "redirects"

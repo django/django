@@ -1,12 +1,12 @@
 # This file is distributed under the same license as the Django package.
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 00:29+0100\n"
-"PO-Revision-Date: 2011-02-06 05:56+0000\n"
-"Last-Translator: AbeEstrada <abraham.estrada@gmail.com>\n"
+"POT-Creation-Date: 2011-03-01 00:45+0100\n"
+"PO-Revision-Date: 2011-02-22 00:12+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
 "Language-Team: Spanish (Mexican) <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -19,16 +19,24 @@ msgid "redirect from"
 msgstr "redirigir desde"
 
 #: models.py:8
-msgid "This should be an absolute path, excluding the domain name. Example: '/events/search/'."
-msgstr "Esta ruta debe ser absoluta, excluyendo el nombre del dominio. Ejemplo: '/events/search/'."
+msgid ""
+"This should be an absolute path, excluding the domain name. Example: '/"
+"events/search/'."
+msgstr ""
+"Esta ruta debe ser absoluta, excluyendo el nombre del dominio. Ejemplo: '/"
+"events/search/'."
 
 #: models.py:9
 msgid "redirect to"
 msgstr "redirigir a"
 
 #: models.py:10
-msgid "This can be either an absolute path (as above) or a full URL starting with 'http://'."
-msgstr "Esto puede ser bien una ruta absoluta (como arriba) o una URL completa que empiece con 'http://'."
+msgid ""
+"This can be either an absolute path (as above) or a full URL starting with "
+"'http://'."
+msgstr ""
+"Esto puede ser bien una ruta absoluta (como arriba) o una URL completa que "
+"empiece con 'http://'."
 
 #: models.py:13
 msgid "redirect"

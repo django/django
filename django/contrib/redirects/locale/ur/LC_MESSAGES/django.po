@@ -1,0 +1,44 @@
+# This file is distributed under the same license as the Django package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-03-01 00:45+0100\n"
+"PO-Revision-Date: 2011-02-25 05:38+0000\n"
+"Last-Translator: Mansoorulhaq <mansoorulhaq1986@gmail.com>\n"
+"Language-Team: Urdu <None>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ur\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+
+#: models.py:7
+msgid "redirect from"
+msgstr "سے ری ڈائریکٹ"
+
+#: models.py:8
+msgid ""
+"This should be an absolute path, excluding the domain name. Example: '/"
+"events/search/'."
+msgstr "یہ مطلق پاتھ ھونا چاھئے، بغیر ڈومین نام کے۔ مثلاً '/events/search/'"
+
+#: models.py:9
+msgid "redirect to"
+msgstr "ری ڈائریکٹ از طرف"
+
+#: models.py:10
+msgid ""
+"This can be either an absolute path (as above) or a full URL starting with "
+"'http://'."
+msgstr ""
+"یہ مطلق پاتھ ھو سکتا ھے (جیسے اوپر ھے) یا مکمل یو آر ایل (URL) بمع 'http://'۔"
+
+#: models.py:13
+msgid "redirect"
+msgstr "ری ڈائریکٹ"
+
+#: models.py:14
+msgid "redirects"
+msgstr "ری ڈائیکٹس"
