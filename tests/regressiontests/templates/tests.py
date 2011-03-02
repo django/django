@@ -1139,7 +1139,7 @@ class Templates(unittest.TestCase):
             'i18n27': ('{% load i18n %}{% blocktrans count number as counter %}1 result{% plural %}{{ counter }} results{% endblocktrans %}', {'number': 1, 'LANGUAGE_CODE': 'ru'}, u'1 \u0440\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442'),
 
             # blocktrans handling of variables which are not in the context.
-            'i18n34': ('{% load i18n %}{% blocktrans %}{{ missing }}{% endblocktrans %}', {}, u''),
+            'i18n28': ('{% load i18n %}{% blocktrans %}{{ missing }}{% endblocktrans %}', {}, u''),
 
             ### HANDLING OF TEMPLATE_STRING_IF_INVALID ###################################
 
