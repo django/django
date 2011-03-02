@@ -5,7 +5,7 @@ from django.core.exceptions import SuspiciousOperation
 from django.core.paginator import Paginator, InvalidPage
 from django.db import models
 from django.utils.encoding import force_unicode, smart_str
-from django.utils.translation import ugettext
+from django.utils.translation import ugettext, ugettext_lazy
 from django.utils.http import urlencode
 import operator
 
@@ -24,7 +24,7 @@ IS_POPUP_VAR = 'pop'
 ERROR_FLAG = 'e'
 
 # Text to display within change-list table cells if the value is blank.
-EMPTY_CHANGELIST_VALUE = ugettext('(None)')
+EMPTY_CHANGELIST_VALUE = ugettext_lazy('(None)')
 
 class ChangeList(object):
     def __init__(self, request, model, list_display, list_display_links, list_filter, date_hierarchy, search_fields, list_select_related, list_per_page, list_editable, model_admin):
