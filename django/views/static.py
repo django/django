@@ -9,38 +9,9 @@ import posixpath
 import re
 import urllib
 
-from django.template import loader
 from django.http import Http404, HttpResponse, HttpResponseRedirect, HttpResponseNotModified
-
-from django.template import Template, Context, TemplateDoesNotExist
+from django.template import loader, Template, Context, TemplateDoesNotExist
 from django.utils.http import http_date, parse_http_date
-
-
-class FileWrapper(object):
-    """
-    Wrapper to convert file-like objects to iterables
-    """
-    def __init__(self, filelike, blksize=8192):
-        self.filelike = filelike
-        self.blksize = blksize
-        if hasattr(filelike,'close'):
-            self.close = filelike.close
-
-    def __getitem__(self,key):
-        data = self.filelike.read(self.blksize)
-        if data:
-            return data
-        raise IndexError
-
-    def __iter__(self):
-        return self
-
-    def next(self):
-        data = self.filelike.read(self.blksize)
-        if data:
-            return data
-        raise StopIteration
-
 
 def serve(request, path, document_root=None, show_indexes=False):
     """
@@ -85,7 +56,7 @@ def serve(request, path, document_root=None, show_indexes=False):
     if not was_modified_since(request.META.get('HTTP_IF_MODIFIED_SINCE'),
                               statobj.st_mtime, statobj.st_size):
         return HttpResponseNotModified(mimetype=mimetype)
-    response = HttpResponse(FileWrapper(open(fullpath, 'rb')), mimetype=mimetype)
+    response = HttpResponse(open(fullpath, 'rb').read(), mimetype=mimetype)
     response["Last-Modified"] = http_date(statobj.st_mtime)
     response["Content-Length"] = statobj.st_size
     if encoding:
