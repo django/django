@@ -113,7 +113,7 @@ class BlockTranslateNode(Node):
             result = translation.ugettext(singular)
         # Escape all isolated '%' before substituting in the context.
         result = re.sub(u'%(?!\()', u'%%', result)
-        data = dict([(v, _render_value_in_context(context[v], context)) for v in vars])
+        data = dict([(v, _render_value_in_context(context.get(v, ''), context)) for v in vars])
         context.pop()
         return result % data
 

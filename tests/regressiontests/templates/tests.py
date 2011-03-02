@@ -1245,6 +1245,9 @@ class Templates(unittest.TestCase):
             'i18n32': ('{% load i18n %}{{ "hu"|language_name }} {{ "hu"|language_name_local }} {{ "hu"|language_bidi }}', {}, u'Hungarian Magyar False'),
             'i18n33': ('{% load i18n %}{{ langcode|language_name }} {{ langcode|language_name_local }} {{ langcode|language_bidi }}', {'langcode': 'nl'}, u'Dutch Nederlands False'),
 
+            # blocktrans handling of variables which are not in the context.
+            'i18n34': ('{% load i18n %}{% blocktrans %}{{ missing }}{% endblocktrans %}', {}, u''),
+
             ### HANDLING OF TEMPLATE_STRING_IF_INVALID ###################################
 
             'invalidstr01': ('{{ var|default:"Foo" }}', {}, ('Foo','INVALID')),
