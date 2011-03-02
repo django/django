@@ -1,22 +1,24 @@
 import re
+import urlparse
+
 from django.conf import settings
-from django.contrib.auth import REDIRECT_FIELD_NAME
-# Avoid shadowing the login() view below.
-from django.contrib.auth import login as auth_login
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm, PasswordChangeForm
-from django.contrib.auth.tokens import default_token_generator
-from django.views.decorators.csrf import csrf_protect
 from django.core.urlresolvers import reverse
-from django.shortcuts import render_to_response, get_object_or_404
-from django.contrib.sites.models import get_current_site
-from django.http import HttpResponseRedirect, Http404
+from django.http import HttpResponseRedirect
+from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.utils.http import urlquote, base36_to_int
 from django.utils.translation import ugettext as _
-from django.contrib.auth.models import User
 from django.views.decorators.cache import never_cache
+from django.views.decorators.csrf import csrf_protect
+
+# Avoid shadowing the login() and logout() views below.
+from django.contrib.auth import REDIRECT_FIELD_NAME, login as auth_login, logout as auth_logout
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import AuthenticationForm, PasswordResetForm, SetPasswordForm, PasswordChangeForm
+from django.contrib.auth.models import User
+from django.contrib.auth.tokens import default_token_generator
+from django.contrib.sites.models import get_current_site
+
 
 @csrf_protect
 @never_cache
@@ -24,7 +26,6 @@ def login(request, template_name='registration/login.html',
           redirect_field_name=REDIRECT_FIELD_NAME,
           authentication_form=AuthenticationForm):
     """Displays the login form and handles the login action."""
-
     redirect_to = request.REQUEST.get(redirect_field_name, '')
 
     if request.method == "POST":
@@ -65,19 +66,21 @@ def login(request, template_name='registration/login.html',
 
 def logout(request, next_page=None, template_name='registration/logged_out.html', redirect_field_name=REDIRECT_FIELD_NAME):
     "Logs out the user and displays 'You are logged out' message."
-    from django.contrib.auth import logout
-    logout(request)
-    if next_page is None:
-        redirect_to = request.REQUEST.get(redirect_field_name, '')
-        if redirect_to:
+    auth_logout(request)
+    redirect_to = request.REQUEST.get(redirect_field_name, '')
+    if redirect_to:
+        netloc = urlparse.urlparse(redirect_to)[1]
+        # Security check -- don't allow redirection to a different host.
+        if not (netloc and netloc != request.get_host()):
             return HttpResponseRedirect(redirect_to)
-        else:
-            current_site = get_current_site(request)
-            return render_to_response(template_name, {
-                'site': current_site,
-                'site_name': current_site.name,
-                'title': _('Logged out')
-            }, context_instance=RequestContext(request))
+
+    if next_page is None:
+        current_site = get_current_site(request)
+        return render_to_response(template_name, {
+            'site': current_site,
+            'site_name': current_site.name,
+            'title': _('Logged out')
+        }, context_instance=RequestContext(request))
     else:
         # Redirect to this page until the session has been cleared.
         return HttpResponseRedirect(next_page or request.path)
