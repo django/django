@@ -166,7 +166,9 @@ class HttpRequest(object):
         return host
 
     def get_full_path(self):
-        return ''
+        # RFC 3986 requires query string arguments to be in the ASCII range.
+        # Rather than crash if this doesn't happen, we encode defensively.
+        return '%s%s' % (self.path, self.META.get('QUERY_STRING', '') and ('?' + iri_to_uri(self.META.get('QUERY_STRING', ''))) or '')
 
     def build_absolute_uri(self, location=None):
         """

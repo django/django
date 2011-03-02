@@ -169,6 +169,9 @@ Secondly, :ref:`Versioning <cache_versioning>`, :ref:`site-wide
 prefixing <cache_key_prefixing>` and :ref:`transformation
 <cache_key_transformation>` has been added to the cache API.
 
+Thirdly, the :ref:`cache key creation <using-vary-headers>` has been
+updated to take the GET request query string into account.
+
 Lastly, support for pylibmc_ has been added to the memcached cache
 backend.
 

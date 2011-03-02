@@ -962,9 +962,13 @@ mechanism should take into account when building its cache key. For example, if
 the contents of a Web page depend on a user's language preference, the page is
 said to "vary on language."
 
+.. versionchanged:: 1.3
+    In Django 1.3 the full request path -- including the query -- is used
+    to create the cache keys, instead of only the path component in Django 1.2.
+
 By default, Django's cache system creates its cache keys using the requested
-path (e.g., ``"/stories/2005/jun/23/bank_robbed/"``). This means every request
-to that URL will use the same cached version, regardless of user-agent
+path and query -- e.g., ``"/stories/2005/?order_by=author"``. This means every
+request to that URL will use the same cached version, regardless of user-agent
 differences such as cookies or language preferences. However, if this page
 produces different content based on some difference in request headers -- such
 as a cookie, or a language, or a user-agent -- you'll need to use the ``Vary``

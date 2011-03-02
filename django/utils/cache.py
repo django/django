@@ -160,24 +160,24 @@ def _generate_cache_key(request, method, headerlist, key_prefix):
         value = request.META.get(header, None)
         if value is not None:
             ctx.update(value)
-    path = md5_constructor(iri_to_uri(request.path))
+    path = md5_constructor(iri_to_uri(request.get_full_path()))
     cache_key = 'views.decorators.cache.cache_page.%s.%s.%s.%s' % (
         key_prefix, request.method, path.hexdigest(), ctx.hexdigest())
     return _i18n_cache_key_suffix(request, cache_key)
 
 def _generate_cache_header_key(key_prefix, request):
     """Returns a cache key for the header cache."""
-    path = md5_constructor(iri_to_uri(request.path))
+    path = md5_constructor(iri_to_uri(request.get_full_path()))
     cache_key = 'views.decorators.cache.cache_header.%s.%s' % (
         key_prefix, path.hexdigest())
     return _i18n_cache_key_suffix(request, cache_key)
 
 def get_cache_key(request, key_prefix=None, method='GET', cache=None):
     """
-    Returns a cache key based on the request path. It can be used in the
-    request phase because it pulls the list of headers to take into account
-    from the global path registry and uses those to build a cache key to check
-    against.
+    Returns a cache key based on the request path and query. It can be used
+    in the request phase because it pulls the list of headers to take into
+    account from the global path registry and uses those to build a cache key
+    to check against.
 
     If there is no headerlist stored, the page needs to be rebuilt, so this
     function returns None.
@@ -220,7 +220,7 @@ def learn_cache_key(request, response, cache_timeout=None, key_prefix=None, cach
         return _generate_cache_key(request, request.method, headerlist, key_prefix)
     else:
         # if there is no Vary header, we still need a cache key
-        # for the request.path
+        # for the request.get_full_path()
         cache.set(cache_key, [], cache_timeout)
         return _generate_cache_key(request, request.method, [], key_prefix)
 

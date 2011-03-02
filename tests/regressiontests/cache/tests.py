@@ -12,7 +12,7 @@ from django.conf import settings
 from django.core import management
 from django.core.cache import get_cache, DEFAULT_CACHE_ALIAS
 from django.core.cache.backends.base import CacheKeyWarning
-from django.http import HttpResponse, HttpRequest
+from django.http import HttpResponse, HttpRequest, QueryDict
 from django.middleware.cache import FetchFromCacheMiddleware, UpdateCacheMiddleware, CacheMiddleware
 from django.test import RequestFactory
 from django.test.utils import get_warnings_state, restore_warnings_state
@@ -920,9 +920,19 @@ class CacheUtils(unittest.TestCase):
         # Set headers to an empty list.
         learn_cache_key(request, response)
         self.assertEqual(get_cache_key(request), 'views.decorators.cache.cache_page.settingsprefix.GET.a8c87a3d8c44853d7f79474f7ffe4ad5.d41d8cd98f00b204e9800998ecf8427e')
-        # Verify that a specified key_prefix is taken in to account.
+        # Verify that a specified key_prefix is taken into account.
         learn_cache_key(request, response, key_prefix=key_prefix)
         self.assertEqual(get_cache_key(request, key_prefix=key_prefix), 'views.decorators.cache.cache_page.localprefix.GET.a8c87a3d8c44853d7f79474f7ffe4ad5.d41d8cd98f00b204e9800998ecf8427e')
+
+    def test_get_cache_key_with_query(self):
+        request = self._get_request(self.path + '?test=1')
+        response = HttpResponse()
+        # Expect None if no headers have been set yet.
+        self.assertEqual(get_cache_key(request), None)
+        # Set headers to an empty list.
+        learn_cache_key(request, response)
+        # Verify that the querystring is taken into account.
+        self.assertEqual(get_cache_key(request), 'views.decorators.cache.cache_page.settingsprefix.GET.bd889c5a59603af44333ed21504db3cd.d41d8cd98f00b204e9800998ecf8427e')
 
     def test_learn_cache_key(self):
         request = self._get_request(self.path, 'HEAD')
@@ -1039,12 +1049,15 @@ class CacheI18nTest(unittest.TestCase):
         request.path = request.path_info = self.path
         return request
 
-    def _get_request_cache(self):
+    def _get_request_cache(self, query_string=None):
         request = HttpRequest()
         request.META = {
             'SERVER_NAME': 'testserver',
             'SERVER_PORT': 80,
         }
+        if query_string:
+            request.META['QUERY_STRING'] = query_string
+            request.GET = QueryDict(query_string)
         request.path = request.path_info = self.path
         request._cache_update_cache = True
         request.method = 'GET'
@@ -1085,6 +1098,26 @@ class CacheI18nTest(unittest.TestCase):
         }
         settings.USE_ETAGS = True
         settings.USE_I18N = True
+
+        # cache with non empty request.GET
+        request = self._get_request_cache(query_string='foo=bar&other=true')
+        get_cache_data = FetchFromCacheMiddleware().process_request(request)
+        # first access, cache must return None
+        self.assertEqual(get_cache_data, None)
+        response = HttpResponse()
+        content = 'Check for cache with QUERY_STRING'
+        response.content = content
+        UpdateCacheMiddleware().process_response(request, response)
+        get_cache_data = FetchFromCacheMiddleware().process_request(request)
+        # cache must return content
+        self.assertNotEqual(get_cache_data, None)
+        self.assertEqual(get_cache_data.content, content)
+        # different QUERY_STRING, cache must be empty
+        request = self._get_request_cache(query_string='foo=bar&somethingelse=true')
+        get_cache_data = FetchFromCacheMiddleware().process_request(request)
+        self.assertEqual(get_cache_data, None)
+
+        # i18n tests
         en_message ="Hello world!"
         es_message ="Hola mundo!"
 
