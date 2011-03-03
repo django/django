@@ -149,9 +149,19 @@ def floatformat(text, arg=-1):
     if p == 0:
         exp = Decimal(1)
     else:
-        exp = Decimal('1.0') / (Decimal(10) ** abs(p))
+        exp = Decimal(u'1.0') / (Decimal(10) ** abs(p))
     try:
-        return mark_safe(formats.number_format(u'%s' % str(d.quantize(exp, ROUND_HALF_UP)), abs(p)))
+        # Avoid conversion to scientific notation by accessing `sign`, `digits`
+        # and `exponent` from `Decimal.as_tuple()` directly.
+        sign, digits, exponent = d.quantize(exp, ROUND_HALF_UP).as_tuple()
+        digits = [unicode(digit) for digit in reversed(digits)]
+        while len(digits) <= abs(exponent):
+            digits.append(u'0')
+        digits.insert(-exponent, u'.')
+        if sign:
+            digits.append(u'-')
+        number = u''.join(reversed(digits))
+        return mark_safe(formats.number_format(number, abs(p)))
     except InvalidOperation:
         return input_val
 floatformat.is_safe = True
