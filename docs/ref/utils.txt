@@ -229,6 +229,17 @@ SyndicationFeed
 .. class:: SyndicationFeed
 
     Base class for all syndication feeds. Subclasses should provide write().
+    
+    .. method:: __init__(title, link, description, [language=None, author_email=None, author_name=None, author_link=None, subtitle=None, categories=None, feed_url=None, feed_copyright=None, feed_guid=None, ttl=None, **kwargs])
+
+        Initialize the feed with the given dictionary of metadata, which applies
+        to the entire feed.
+        
+        Any extra keyword arguments you pass to ``__init__`` will be stored in
+        ``self.feed``.
+
+        All parameters should be Unicode objects, except ``categories``, which
+        should be a sequence of Unicode objects.
 
     .. method:: add_item(title, link, description, [author_email=None, author_name=None, author_link=None, pubdate=None, comments=None, unique_id=None, enclosure=None, categories=(), item_copyright=None, ttl=None, **kwargs])
 
@@ -241,12 +252,12 @@ SyndicationFeed
     .. method:: root_attributes()
 
         Return extra attributes to place on the root (i.e. feed/channel)
-        element. Called from write().
+        element. Called from ``write()``.
 
     .. method:: add_root_elements(handler)
 
         Add elements in the root (i.e. feed/channel) element.
-        Called from write().
+        Called from ``write()``.
 
     .. method:: item_attributes(item)
 
@@ -289,6 +300,13 @@ Rss201rev2Feed
 .. class:: Rss201rev2Feed(RssFeed)
 
     Spec: http://blogs.law.harvard.edu/tech/rss
+
+RssUserland091Feed
+------------------
+
+.. class:: RssUserland091Feed(RssFeed)
+
+    Spec: http://backend.userland.com/rss091
 
 Atom1Feed
 ---------
