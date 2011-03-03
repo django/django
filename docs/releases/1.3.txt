@@ -843,3 +843,21 @@ migration. In Django 1.3, the ``PermWrapper`` class has also been
 moved to ``django.contrib.auth.context_processors``, along with the
 ``PermLookupDict`` support class. The new classes are functionally
 identical to their old versions; only the module location has changed.
+
+Removal of ``XMLField``
+~~~~~~~~~~~~~~~~~~~~~~~
+
+When Django was first released, Django included an ``XMLField`` that
+performed automatic XML validation for any field input. However, this
+validation function hasn't been performed since the introduction of
+``newforms``, prior to the 1.0 release. As a result, ``XMLField`` as
+currently implemented is functionally indistinguishable from a simple
+``TextField``.
+
+For this reason, Django 1.3 has fast-tracked the deprecation of
+``XMLField`` -- instead of a two-release deprecation, ``XMLField``
+will be removed entirely in Django 1.4.
+
+It's easy to update your code to accommodate this change -- just
+replace all uses of ``XMLField`` with ``TextField``, and remove the
+``schema_path`` keyword argument (if it is specified).

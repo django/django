@@ -41,9 +41,10 @@ their deprecation, as per the :ref:`Django deprecation policy
           removed.
 
         * The ``get_db_prep_save``, ``get_db_prep_value`` and
-          ``get_db_prep_lookup`` methods on Field were modified in 1.2 to support
-          multiple databases. In 1.4, the support functions that allow methods
-          with the old prototype to continue working will be removed.
+          ``get_db_prep_lookup`` methods on Field were modified in 1.2
+          to support multiple databases. In 1.4, the support functions
+          that allow methods with the old prototype to continue
+          working will be removed.
 
         * The ``Message`` model (in ``django.contrib.auth``), its related
           manager in the ``User`` model (``user.message_set``), and the
@@ -104,6 +105,12 @@ their deprecation, as per the :ref:`Django deprecation policy
         * The ``MEDIA_URL`` or ``STATIC_URL`` settings are required to end
           with a trailing slash to ensure there is a consistent way to
           combine paths in templates.
+
+        * ``django.db.models.fields.XMLField`` will be removed. This was
+          deprecated as part of the 1.3 release. An accelerated deprecation
+          schedule has been used because the field hasn't performed any role
+          beyond that of a simple ``TextField`` since the removal of oldforms.
+          All uses of ``XMLField`` can be replaced with ``TextField``.
 
     * 1.5
         * The ``mod_python`` request handler has been deprecated since the 1.3

@@ -79,9 +79,6 @@ class TimeData(models.Model):
 class USStateData(models.Model):
     data = USStateField(null=True)
 
-class XMLData(models.Model):
-    data = models.XMLField(null=True)
-
 class Tag(models.Model):
     """A tag on an item."""
     data = models.SlugField()
@@ -217,9 +214,6 @@ class SmallPKData(models.Model):
 
 class USStatePKData(models.Model):
     data = USStateField(primary_key=True)
-
-# class XMLPKData(models.Model):
-#     data = models.XMLField(primary_key=True)
 
 class ComplexModel(models.Model):
     field1 = models.CharField(max_length=10)

@@ -54,6 +54,8 @@ class LayerMapping(object):
         models.TextField : OFTString,
         models.URLField : OFTString,
         USStateField : OFTString,
+        # This is a reminder that XMLField is deprecated
+        # and this needs to be removed in 1.4
         models.XMLField : OFTString,
         models.SmallIntegerField : (OFTInteger, OFTReal, OFTString),
         models.PositiveSmallIntegerField : (OFTInteger, OFTReal, OFTString),

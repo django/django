@@ -106,9 +106,6 @@ the full list of conversions:
 
     ``URLField``                     ``URLField`` with ``verify_exists`` set
                                      to the model field's ``verify_exists``
-
-    ``XMLField``                     ``CharField`` with
-                                     ``widget=forms.Textarea``
     ===============================  ========================================
 
 .. versionadded:: 1.2

@@ -12,7 +12,7 @@ This document contains all the gory details about all the `field options`_ and
 
 .. seealso::
 
-    If the built-in fields don't do the trick, you can try 
+    If the built-in fields don't do the trick, you can try
     :mod:`django.contrib.localflavor`, which contains assorted pieces of code
     that are useful for particular countries or cultures. Also, you can easily
     :doc:`write your own custom model fields </howto/custom-model-fields>`.
@@ -462,7 +462,7 @@ The admin represents this as an ``<input type="text">`` (a single-line input).
 
     For more information about the differences between the
     :class:`FloatField` and :class:`DecimalField` classes, please
-    see :ref:`FloatField vs. DecimalField <floatfield_vs_decimalfield>`. 
+    see :ref:`FloatField vs. DecimalField <floatfield_vs_decimalfield>`.
 
 ``EmailField``
 --------------
@@ -557,7 +557,7 @@ day. If you upload a file on Jan. 15, 2007, it will be saved in the directory
 
 If you wanted to retrieve the uploaded file's on-disk filename, or the file's
 size, you could use the :attr:`~django.core.files.File.name` and
-:attr:`~django.core.files.File.size` attributes respectively; for more 
+:attr:`~django.core.files.File.size` attributes respectively; for more
 information on the available attributes and methods, see the
 :class:`~django.core.files.File` class reference and the :doc:`/topics/files`
 topic guide.
@@ -836,17 +836,18 @@ Like all :class:`CharField` subclasses, :class:`URLField` takes the optional
 ``XMLField``
 ------------
 
+.. deprecated:: 1.3
+   ``XMLField`` is deprecated. Use TextField instead.
+
 .. class:: XMLField(schema_path=None, [**options])
 
-A :class:`TextField` that checks that the value is valid XML that matches a
-given schema. Takes one required argument:
+A :class:`TextField` that stores XML data and a path to a schema. Takes one
+optional argument:
 
 .. attribute:: schema_path
 
-    The filesystem path to a RelaxNG_ schema against which to validate the
-    field.
+    The filesystem path to a schema for the field.
 
-.. _RelaxNG: http://www.relaxng.org/
 
 Relationship fields
 ===================
