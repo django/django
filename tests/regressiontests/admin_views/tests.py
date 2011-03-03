@@ -31,7 +31,8 @@ from models import (Article, BarAccount, CustomArticle, EmptyModel,
     Person, Persona, Picture, Podcast, Section, Subscriber, Vodcast,
     Language, Collector, Widget, Grommet, DooHickey, FancyDoodad, Whatsit,
     Category, Post, Plot, FunkyTag, WorkHour, Employee, Inquisition,
-    Actor, FoodDelivery, RowLevelChangePermissionModel, Paper, CoverLetter)
+    Actor, FoodDelivery, RowLevelChangePermissionModel, Paper, CoverLetter,
+    Story, OtherStory)
 
 
 class AdminViewBasicTest(TestCase):
@@ -1539,6 +1540,36 @@ class AdminViewListEditable(TestCase):
         self.assertEqual(Person.objects.get(name="Grace Hopper").gender, 2)
 
 
+
+    def test_pk_hidden_fields(self):
+        """ Ensure that hidden pk fields aren't displayed in the table body and
+            that their corresponding human-readable value is displayed instead.
+            Note that the hidden pk fields are in fact be displayed but
+            separately (not in the table), and only once.
+            Refs #12475.
+        """
+        Story.objects.create(title='The adventures of Guido', content='Once upon a time in Djangoland...')
+        Story.objects.create(title='Crouching Tiger, Hidden Python', content='The Python was sneaking into...')
+        response = self.client.get('/test_admin/admin/admin_views/story/')
+        self.assertContains(response, 'id="id_form-0-id"', 1) # Only one hidden field, in a separate place than the table.
+        self.assertContains(response, 'id="id_form-1-id"', 1)
+        self.assertContains(response, '<div class="hiddenfields">\n<input type="hidden" name="form-0-id" value="2" id="id_form-0-id" /><input type="hidden" name="form-1-id" value="1" id="id_form-1-id" />\n</div>')
+        self.assertContains(response, '<td>1</td>', 1)
+        self.assertContains(response, '<td>2</td>', 1)
+
+    def test_pk_hidden_fields_with_list_display_links(self):
+        """ Similarly as test_pk_hidden_fields, but when the hidden pk fields are
+            referenced in list_display_links.
+            Refs #12475.
+        """
+        OtherStory.objects.create(title='The adventures of Guido', content='Once upon a time in Djangoland...')
+        OtherStory.objects.create(title='Crouching Tiger, Hidden Python', content='The Python was sneaking into...')
+        response = self.client.get('/test_admin/admin/admin_views/otherstory/')
+        self.assertContains(response, 'id="id_form-0-id"', 1) # Only one hidden field, in a separate place than the table.
+        self.assertContains(response, 'id="id_form-1-id"', 1)
+        self.assertContains(response, '<div class="hiddenfields">\n<input type="hidden" name="form-0-id" value="2" id="id_form-0-id" /><input type="hidden" name="form-1-id" value="1" id="id_form-1-id" />\n</div>')
+        self.assertContains(response, '<th><a href="1/">1</a></th>', 1)
+        self.assertContains(response, '<th><a href="2/">2</a></th>', 1)
 
 
 class AdminSearchTest(TestCase):
