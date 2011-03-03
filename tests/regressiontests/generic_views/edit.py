@@ -203,6 +203,7 @@ class UpdateViewTests(TestCase):
 
     def test_update_get_object(self):
         a = Author.objects.create(
+            pk=1,
             name='Randall Munroe',
             slug='randall-munroe',
         )
