@@ -665,7 +665,7 @@ class ModelAdmin(BaseModelAdmin):
         """
         obj.save()
 
-    def delete_model(self, requet, obj):
+    def delete_model(self, request, obj):
         """
         Given a model instance delete it from the database.
         """

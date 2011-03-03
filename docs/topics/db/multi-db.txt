@@ -469,7 +469,7 @@ multiple-database support::
             # Tell Django to save objects to the 'other' database.
             obj.save(using=self.using)
 
-        def delete_model(self, requqest, obj):
+        def delete_model(self, request, obj):
             # Tell Django to delete objects from the 'other' database
             obj.delete(using=self.using)
 
