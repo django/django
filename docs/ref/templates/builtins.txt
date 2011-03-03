@@ -665,6 +665,8 @@ registered in ``somelibrary`` and ``otherlibrary``::
 
     {% load somelibrary otherlibrary %}
 
+.. versionchanged:: 1.3
+
 You can also selectively load individual filters or tags from a library, using
 the ``from`` argument. In this example, the template tags/filters named ``foo``
 and ``bar`` will be loaded from ``somelibrary``::
