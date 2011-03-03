@@ -74,12 +74,9 @@ volunteers; you can read all about them over at the :doc:`list of committers
 Which sites use Django?
 -----------------------
 
-The Django wiki features a consistently growing `list of Django-powered sites`_.
-Feel free to add your Django-powered site to the list.
+`DjangoSites.org`_ features a constantly growing list of Django-powered sites.
 
-.. _list of Django-powered sites: http://code.djangoproject.com/wiki/DjangoPoweredSites
-
-.. _mtv:
+.. _DjangoSites.org: http://djangosites.org
 
 Django appears to be a MVC framework, but you call the Controller the "view", and the View the "template". How come you don't use the standard names?
 -----------------------------------------------------------------------------------------------------------------------------------------------------
