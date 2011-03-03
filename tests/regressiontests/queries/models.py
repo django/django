@@ -294,3 +294,26 @@ class Node(models.Model):
 
     def __unicode__(self):
         return u"%s" % self.num
+
+# Bug #12252
+class ObjectA(models.Model):
+    name = models.CharField(max_length=50)
+
+    def __unicode__(self):
+        return self.name
+
+class ObjectB(models.Model):
+    name = models.CharField(max_length=50)
+    objecta = models.ForeignKey(ObjectA)
+    number = models.PositiveSmallIntegerField()
+
+    def __unicode__(self):
+        return self.name
+
+class ObjectC(models.Model):
+    name = models.CharField(max_length=50)
+    objecta = models.ForeignKey(ObjectA)
+    objectb = models.ForeignKey(ObjectB)
+
+    def __unicode__(self):
+       return self.name
