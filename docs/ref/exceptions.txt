@@ -104,6 +104,18 @@ ValidationError
     :ref:`Model Field Validation <validating-objects>` and the
     :doc:`Validator Reference </ref/validators>`.
 
+.. currentmodule:: django.core.urlresolvers
+
+NoReverseMatch
+--------------
+.. exception:: NoReverseMatch
+
+    The :exc:`NoReverseMatch` exception is raised by
+    :mod:`django.core.urlresolvers` when a matching URL in your URLconf
+    cannot be identified based on the parameters supplied.
+
+.. currentmodule:: django.db
+
 Database Exceptions
 ===================
 
@@ -111,6 +123,9 @@ Django wraps the standard database exceptions :exc:`DatabaseError` and
 :exc:`IntegrityError` so that your Django code has a guaranteed common
 implementation of these classes. These database exceptions are
 provided in :mod:`django.db`.
+
+.. exception:: DatabaseError
+.. exception:: IntegrityError
 
 The Django wrappers for database exceptions behave exactly the same as
 the underlying database exceptions. See `PEP 249 - Python Database API
