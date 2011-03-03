@@ -141,12 +141,12 @@ def find_template_source(name, dirs=None):
     # For backward compatibility
     import warnings
     warnings.warn(
-        "`django.template.loaders.find_template_source` is deprecated; use `django.template.loaders.find_template` instead.",
+        "`django.template.loader.find_template_source` is deprecated; use `django.template.loader.find_template` instead.",
         DeprecationWarning
     )
     template, origin = find_template(name, dirs)
     if hasattr(template, 'render'):
-        raise Exception("Found a compiled template that is incompatible with the deprecated `django.template.loaders.find_template_source` function.")
+        raise Exception("Found a compiled template that is incompatible with the deprecated `django.template.loader.find_template_source` function.")
     return template, origin
 
 def get_template(template_name):
