@@ -246,7 +246,7 @@ MySQLdb 1.2.1p2 or 1.2.2, you should still use ``utf8_collation_ci_swedish``
 table (usually called ``django_session``) and the
 :class:`django.contrib.admin.models.LogEntry` table (usually called
 ``django_admin_log``). Those are the two standard tables that use
-:class:`~django.db.model.TextField` internally.
+:class:`~django.db.models.TextField` internally.
 
 .. _fixed in MySQLdb 1.2.2: http://sourceforge.net/tracker/index.php?func=detail&aid=1495765&group_id=22307&atid=374932
 

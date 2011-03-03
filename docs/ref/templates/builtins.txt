@@ -660,8 +660,8 @@ load
 
 Load a custom template tag set.
 
-For example, the following template would load all the tags and filters registered
-in ``somelibrary`` and ``otherlibrary``::
+For example, the following template would load all the tags and filters
+registered in ``somelibrary`` and ``otherlibrary``::
 
     {% load somelibrary otherlibrary %}
 
@@ -671,7 +671,8 @@ and ``bar`` will be loaded from ``somelibrary``::
 
     {% load foo bar from somelibrary %}
 
-See :doc:`Custom tag and filter libraries </howto/custom-template-tags>` for more information.
+See :doc:`Custom tag and filter libraries </howto/custom-template-tags>` for
+more information.
 
 .. templatetag:: now
 
@@ -968,8 +969,8 @@ refer to the name of the pattern in the ``url`` tag instead of using the
 path to the view.
 
 Note that if the URL you're reversing doesn't exist, you'll get an
-:exc:`NoReverseMatch` exception raised, which will cause your site to display an
-error page.
+:exc:`~django.core.urlresolvers.NoReverseMatch` exception raised, which will
+cause your site to display an error page.
 
 If you'd like to retrieve a URL without displaying it, you can use a slightly
 different call::
