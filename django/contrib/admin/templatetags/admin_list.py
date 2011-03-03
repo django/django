@@ -188,7 +188,9 @@ def items_for_result(cl, result, form):
             # By default the fields come from ModelAdmin.list_editable, but if we pull
             # the fields out of the form instead of list_editable custom admins
             # can provide fields on a per request basis
-            if form and field_name in form.fields:
+            if (form and field_name in form.fields and not (
+                    field_name == cl.model._meta.pk.name and
+                        form[cl.model._meta.pk.name].is_hidden)):
                 bf = form[field_name]
                 result_repr = mark_safe(force_unicode(bf.errors) + force_unicode(bf))
             else:

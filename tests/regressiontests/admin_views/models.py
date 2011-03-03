@@ -735,6 +735,28 @@ class CoverLetterAdmin(admin.ModelAdmin):
         #return super(CoverLetterAdmin, self).queryset(request).only('author')
         return super(CoverLetterAdmin, self).queryset(request).defer('date')
 
+class Story(models.Model):
+    title = models.CharField(max_length=100)
+    content = models.TextField()
+
+class StoryForm(forms.ModelForm):
+    class Meta:
+        widgets = {'title': forms.HiddenInput}
+
+class StoryAdmin(admin.ModelAdmin):
+    list_display = ('id', 'title', 'content')
+    list_display_links = ('title',) # 'id' not in list_display_links
+    list_editable = ('content', )
+    form = StoryForm
+
+class OtherStory(models.Model):
+    title = models.CharField(max_length=100)
+    content = models.TextField()
+
+class OtherStoryAdmin(admin.ModelAdmin):
+    list_display = ('id', 'title', 'content')
+    list_display_links = ('title', 'id') # 'id' in list_display_links
+    list_editable = ('content', )
 
 admin.site.register(Article, ArticleAdmin)
 admin.site.register(CustomArticle, CustomArticleAdmin)
@@ -776,6 +798,8 @@ admin.site.register(FoodDelivery, FoodDeliveryAdmin)
 admin.site.register(RowLevelChangePermissionModel, RowLevelChangePermissionModelAdmin)
 admin.site.register(Paper, PaperAdmin)
 admin.site.register(CoverLetter, CoverLetterAdmin)
+admin.site.register(Story, StoryAdmin)
+admin.site.register(OtherStory, OtherStoryAdmin)
 
 # We intentionally register Promo and ChapterXtra1 but not Chapter nor ChapterXtra2.
 # That way we cover all four cases:
