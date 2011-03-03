@@ -25,8 +25,15 @@ def next_redirect(data, default, default_view, **get_kwargs):
     if next is None:
         next = urlresolvers.reverse(default_view)
     if get_kwargs:
+        if '#' in next:
+            tmp = next.rsplit('#', 1)
+            next = tmp[0]
+            anchor = '#' + tmp[1]
+        else:
+            anchor = ''
+
         joiner = ('?' in next) and '&' or '?'
-        next += joiner + urllib.urlencode(get_kwargs)
+        next += joiner + urllib.urlencode(get_kwargs) + anchor
     return HttpResponseRedirect(next)
 
 def confirmation_view(template, doc="Display a confirmation view."):
