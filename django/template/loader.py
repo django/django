@@ -191,12 +191,15 @@ def render_to_string(template_name, dictionary=None, context_instance=None):
 
 def select_template(template_name_list):
     "Given a list of template names, returns the first that can be loaded."
+    not_found = []
     for template_name in template_name_list:
         try:
             return get_template(template_name)
-        except TemplateDoesNotExist:
+        except TemplateDoesNotExist, e:
+            if e.args[0] not in not_found:
+                not_found.append(e.args[0])
             continue
     # If we get here, none of the templates could be loaded
-    raise TemplateDoesNotExist(', '.join(template_name_list))
+    raise TemplateDoesNotExist(', '.join(not_found))
 
 add_to_builtins('django.template.loader_tags')
