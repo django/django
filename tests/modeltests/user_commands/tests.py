@@ -8,13 +8,13 @@ class CommandTests(TestCase):
     def test_command(self):
         out = StringIO()
         management.call_command('dance', stdout=out)
-        self.assertEquals(out.getvalue(),
+        self.assertEqual(out.getvalue(),
             "I don't feel like dancing Rock'n'Roll.")
 
     def test_command_style(self):
         out = StringIO()
         management.call_command('dance', style='Jive', stdout=out)
-        self.assertEquals(out.getvalue(),
+        self.assertEqual(out.getvalue(),
             "I don't feel like dancing Jive.")
 
     def test_explode(self):

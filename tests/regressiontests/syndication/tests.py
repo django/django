@@ -198,7 +198,7 @@ class SyndicationFeedTest(FeedTestCase):
             link = item.getElementsByTagName('link')[0]
             if link.firstChild.wholeText == 'http://example.com/blog/4/':
                 title = item.getElementsByTagName('title')[0]
-                self.assertEquals(title.firstChild.wholeText, u'A &amp; B &lt; C &gt; D')
+                self.assertEqual(title.firstChild.wholeText, u'A &amp; B &lt; C &gt; D')
 
     def test_naive_datetime_conversion(self):
         """
@@ -329,14 +329,14 @@ class DeprecatedSyndicationFeedTest(FeedTestCase):
         Test that an empty feed_dict raises a 404.
         """
         response = self.client.get('/syndication/depr-feeds-empty/aware-dates/')
-        self.assertEquals(response.status_code, 404)
+        self.assertEqual(response.status_code, 404)
 
     def test_nonexistent_slug(self):
         """
         Test that a non-existent slug raises a 404.
         """
         response = self.client.get('/syndication/depr-feeds/foobar/')
-        self.assertEquals(response.status_code, 404)
+        self.assertEqual(response.status_code, 404)
 
     def test_rss_feed(self):
         """
@@ -360,5 +360,5 @@ class DeprecatedSyndicationFeedTest(FeedTestCase):
         exception.
         """
         response = self.client.get('/syndication/depr-feeds/complex/')
-        self.assertEquals(response.status_code, 404)
+        self.assertEqual(response.status_code, 404)
 

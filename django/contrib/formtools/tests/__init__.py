@@ -65,8 +65,8 @@ class PreviewTests(TestCase):
         response = self.client.get('/test1/')
         stage = self.input % 1
         self.assertContains(response, stage, 1)
-        self.assertEquals(response.context['custom_context'], True)
-        self.assertEquals(response.context['form'].initial, {'field1': 'Works!'})
+        self.assertEqual(response.context['custom_context'], True)
+        self.assertEqual(response.context['form'].initial, {'field1': 'Works!'})
 
     def test_form_preview(self):
         """
@@ -291,14 +291,14 @@ class WizardTests(TestCase):
         step should be zero for the first form
         """
         response = self.client.get('/wizard/')
-        self.assertEquals(0, response.context['step0'])
+        self.assertEqual(0, response.context['step0'])
 
     def test_step_increments(self):
         """
         step should be incremented when we go to the next page
         """
         response = self.client.post('/wizard/', {"0-field":"test", "wizard_step":"0"})
-        self.assertEquals(1, response.context['step0'])
+        self.assertEqual(1, response.context['step0'])
 
     def test_bad_hash(self):
         """
@@ -308,7 +308,7 @@ class WizardTests(TestCase):
                                     {"0-field":"test",
                                      "1-field":"test2",
                                      "wizard_step": "1"})
-        self.assertEquals(0, response.context['step0'])
+        self.assertEqual(0, response.context['step0'])
 
     def test_good_hash_django12(self):
         """
@@ -322,7 +322,7 @@ class WizardTests(TestCase):
                 "hash_0": "2fdbefd4c0cad51509478fbacddf8b13",
                 "wizard_step": "1"}
         response = self.client.post('/wizard/', data)
-        self.assertEquals(2, response.context['step0'])
+        self.assertEqual(2, response.context['step0'])
 
     def test_good_hash_django12_subclass(self):
         """
@@ -337,7 +337,7 @@ class WizardTests(TestCase):
                 "hash_0": "2fdbefd4c0cad51509478fbacddf8b13",
                 "wizard_step": "1"}
         response = self.client.post('/wizard2/', data)
-        self.assertEquals(0, response.context['step0'])
+        self.assertEqual(0, response.context['step0'])
 
     def test_good_hash_current(self):
         """
@@ -349,7 +349,7 @@ class WizardTests(TestCase):
                 "hash_0": "7e9cea465f6a10a6fb47fcea65cb9a76350c9a5c",
                 "wizard_step": "1"}
         response = self.client.post('/wizard/', data)
-        self.assertEquals(2, response.context['step0'])
+        self.assertEqual(2, response.context['step0'])
 
     def test_14498(self):
         """

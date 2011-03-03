@@ -22,11 +22,11 @@ class ReverseSingleRelatedTests(TestCase):
                 ["<Source: Source object>"]
         )
 
-        self.assertEquals(public_item.source, public_source)
+        self.assertEqual(public_item.source, public_source)
 
         # Make sure that an item can still access its related source even if the default
         # manager doesn't normally allow it.
-        self.assertEquals(private_item.source, private_source)
+        self.assertEqual(private_item.source, private_source)
 
         # If the manager is marked "use_for_related_fields", it'll get used instead
         # of the "bare" queryset. Usually you'd define this as a property on the class,

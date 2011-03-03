@@ -79,7 +79,7 @@ class ClientTest(TestCase):
         "Check the value of HTTP headers returned in a response"
         response = self.client.get("/test_client/header_view/")
 
-        self.assertEquals(response['X-DJANGO-TEST'], 'Slartibartfast')
+        self.assertEqual(response['X-DJANGO-TEST'], 'Slartibartfast')
 
     def test_raw_post(self):
         "POST raw data (with a content type) to a view"
@@ -140,7 +140,7 @@ class ClientTest(TestCase):
         "A URL that redirects can be followed to termination."
         response = self.client.get('/test_client/double_redirect_view/', follow=True)
         self.assertRedirects(response, 'http://testserver/test_client/get_view/', status_code=302, target_status_code=200)
-        self.assertEquals(len(response.redirect_chain), 2)
+        self.assertEqual(len(response.redirect_chain), 2)
 
     def test_redirect_http(self):
         "GET a URL that redirects to an http URI"
@@ -400,7 +400,7 @@ class ClientTest(TestCase):
         response = self.client.post('/test_client/session_view/')
 
         # Check that the session was modified
-        self.assertEquals(self.client.session['tobacconist'], 'hovercraft')
+        self.assertEqual(self.client.session['tobacconist'], 'hovercraft')
 
     def test_view_with_exception(self):
         "Request a page that is known to throw an error"

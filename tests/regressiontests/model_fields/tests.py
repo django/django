@@ -324,10 +324,10 @@ class TypeCoercionTests(test.TestCase):
 
     """
     def test_lookup_integer_in_charfield(self):
-        self.assertEquals(Post.objects.filter(title=9).count(), 0)
+        self.assertEqual(Post.objects.filter(title=9).count(), 0)
 
     def test_lookup_integer_in_textfield(self):
-        self.assertEquals(Post.objects.filter(body=24).count(), 0)
+        self.assertEqual(Post.objects.filter(body=24).count(), 0)
 
 class FileFieldTests(unittest.TestCase):
     def test_clearable(self):

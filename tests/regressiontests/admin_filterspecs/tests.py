@@ -42,20 +42,20 @@ class FilterSpecsTests(TestCase):
 
         # Make sure the last choice is None and is selected
         filterspec = changelist.get_filters(request)[0][0]
-        self.assertEquals(force_unicode(filterspec.title()), u'year')
+        self.assertEqual(force_unicode(filterspec.title()), u'year')
         choices = list(filterspec.choices(changelist))
-        self.assertEquals(choices[-1]['selected'], True)
-        self.assertEquals(choices[-1]['query_string'], '?year__isnull=True')
+        self.assertEqual(choices[-1]['selected'], True)
+        self.assertEqual(choices[-1]['query_string'], '?year__isnull=True')
 
         request = self.request_factory.get('/', {'year': '2002'})
         changelist = self.get_changelist(request, Book, modeladmin)
 
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][0]
-        self.assertEquals(force_unicode(filterspec.title()), u'year')
+        self.assertEqual(force_unicode(filterspec.title()), u'year')
         choices = list(filterspec.choices(changelist))
-        self.assertEquals(choices[2]['selected'], True)
-        self.assertEquals(choices[2]['query_string'], '?year=2002')
+        self.assertEqual(choices[2]['selected'], True)
+        self.assertEqual(choices[2]['query_string'], '?year=2002')
 
     def test_RelatedFilterSpec_ForeignKey(self):
         modeladmin = BookAdmin(Book, admin.site)
@@ -70,20 +70,20 @@ class FilterSpecsTests(TestCase):
 
         # Make sure the last choice is None and is selected
         filterspec = changelist.get_filters(request)[0][1]
-        self.assertEquals(force_unicode(filterspec.title()), u'author')
+        self.assertEqual(force_unicode(filterspec.title()), u'author')
         choices = list(filterspec.choices(changelist))
-        self.assertEquals(choices[-1]['selected'], True)
-        self.assertEquals(choices[-1]['query_string'], '?author__isnull=True')
+        self.assertEqual(choices[-1]['selected'], True)
+        self.assertEqual(choices[-1]['query_string'], '?author__isnull=True')
 
         request = self.request_factory.get('/', {'author__id__exact': '1'})
         changelist = self.get_changelist(request, Book, modeladmin)
 
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][1]
-        self.assertEquals(force_unicode(filterspec.title()), u'author')
+        self.assertEqual(force_unicode(filterspec.title()), u'author')
         choices = list(filterspec.choices(changelist))
-        self.assertEquals(choices[1]['selected'], True)
-        self.assertEquals(choices[1]['query_string'], '?author__id__exact=1')
+        self.assertEqual(choices[1]['selected'], True)
+        self.assertEqual(choices[1]['query_string'], '?author__id__exact=1')
 
     def test_RelatedFilterSpec_ManyToMany(self):
         modeladmin = BookAdmin(Book, admin.site)
@@ -96,20 +96,20 @@ class FilterSpecsTests(TestCase):
 
         # Make sure the last choice is None and is selected
         filterspec = changelist.get_filters(request)[0][2]
-        self.assertEquals(force_unicode(filterspec.title()), u'user')
+        self.assertEqual(force_unicode(filterspec.title()), u'user')
         choices = list(filterspec.choices(changelist))
-        self.assertEquals(choices[-1]['selected'], True)
-        self.assertEquals(choices[-1]['query_string'], '?contributors__isnull=True')
+        self.assertEqual(choices[-1]['selected'], True)
+        self.assertEqual(choices[-1]['query_string'], '?contributors__isnull=True')
 
         request = self.request_factory.get('/', {'contributors__id__exact': '2'})
         changelist = self.get_changelist(request, Book, modeladmin)
 
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][2]
-        self.assertEquals(force_unicode(filterspec.title()), u'user')
+        self.assertEqual(force_unicode(filterspec.title()), u'user')
         choices = list(filterspec.choices(changelist))
-        self.assertEquals(choices[2]['selected'], True)
-        self.assertEquals(choices[2]['query_string'], '?contributors__id__exact=2')
+        self.assertEqual(choices[2]['selected'], True)
+        self.assertEqual(choices[2]['query_string'], '?contributors__id__exact=2')
 
 
     def test_RelatedFilterSpec_reverse_relationships(self):
@@ -124,20 +124,20 @@ class FilterSpecsTests(TestCase):
 
         # Make sure the last choice is None and is selected
         filterspec = changelist.get_filters(request)[0][0]
-        self.assertEquals(force_unicode(filterspec.title()), u'book')
+        self.assertEqual(force_unicode(filterspec.title()), u'book')
         choices = list(filterspec.choices(changelist))
-        self.assertEquals(choices[-1]['selected'], True)
-        self.assertEquals(choices[-1]['query_string'], '?books_authored__isnull=True')
+        self.assertEqual(choices[-1]['selected'], True)
+        self.assertEqual(choices[-1]['query_string'], '?books_authored__isnull=True')
 
         request = self.request_factory.get('/', {'books_authored__id__exact': '1'})
         changelist = self.get_changelist(request, User, modeladmin)
 
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][0]
-        self.assertEquals(force_unicode(filterspec.title()), u'book')
+        self.assertEqual(force_unicode(filterspec.title()), u'book')
         choices = list(filterspec.choices(changelist))
-        self.assertEquals(choices[1]['selected'], True)
-        self.assertEquals(choices[1]['query_string'], '?books_authored__id__exact=1')
+        self.assertEqual(choices[1]['selected'], True)
+        self.assertEqual(choices[1]['query_string'], '?books_authored__id__exact=1')
 
         # M2M relationship -----
         request = self.request_factory.get('/', {'books_contributed__isnull': 'True'})
@@ -148,20 +148,20 @@ class FilterSpecsTests(TestCase):
 
         # Make sure the last choice is None and is selected
         filterspec = changelist.get_filters(request)[0][1]
-        self.assertEquals(force_unicode(filterspec.title()), u'book')
+        self.assertEqual(force_unicode(filterspec.title()), u'book')
         choices = list(filterspec.choices(changelist))
-        self.assertEquals(choices[-1]['selected'], True)
-        self.assertEquals(choices[-1]['query_string'], '?books_contributed__isnull=True')
+        self.assertEqual(choices[-1]['selected'], True)
+        self.assertEqual(choices[-1]['query_string'], '?books_contributed__isnull=True')
 
         request = self.request_factory.get('/', {'books_contributed__id__exact': '2'})
         changelist = self.get_changelist(request, User, modeladmin)
 
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][1]
-        self.assertEquals(force_unicode(filterspec.title()), u'book')
+        self.assertEqual(force_unicode(filterspec.title()), u'book')
         choices = list(filterspec.choices(changelist))
-        self.assertEquals(choices[2]['selected'], True)
-        self.assertEquals(choices[2]['query_string'], '?books_contributed__id__exact=2')
+        self.assertEqual(choices[2]['selected'], True)
+        self.assertEqual(choices[2]['query_string'], '?books_contributed__id__exact=2')
 
 class CustomUserAdmin(UserAdmin):
     list_filter = ('books_authored', 'books_contributed')

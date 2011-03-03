@@ -767,8 +767,8 @@ class LocMemCacheTests(unittest.TestCase, BaseCacheTests):
         other_cache = get_cache('django.core.cache.backends.locmem.LocMemCache', LOCATION='other')
 
         self.cache.set('value1', 42)
-        self.assertEquals(mirror_cache.get('value1'), 42)
-        self.assertEquals(other_cache.get('value1'), None)
+        self.assertEqual(mirror_cache.get('value1'), 42)
+        self.assertEqual(other_cache.get('value1'), None)
 
 # memcached backend isn't guaranteed to be available.
 # To check the memcached backend, the test settings file will
@@ -824,7 +824,7 @@ class FileBasedCacheTests(unittest.TestCase, BaseCacheTests):
         key = self.cache.make_key("foo")
         keyhash = md5_constructor(key).hexdigest()
         keypath = os.path.join(self.dirname, keyhash[:2], keyhash[2:4], keyhash[4:])
-        self.assert_(os.path.exists(keypath))
+        self.assertTrue(os.path.exists(keypath))
 
     def test_subdirectory_removal(self):
         """
@@ -834,12 +834,12 @@ class FileBasedCacheTests(unittest.TestCase, BaseCacheTests):
         key = self.cache.make_key("foo")
         keyhash = md5_constructor(key).hexdigest()
         keypath = os.path.join(self.dirname, keyhash[:2], keyhash[2:4], keyhash[4:])
-        self.assert_(os.path.exists(keypath))
+        self.assertTrue(os.path.exists(keypath))
 
         self.cache.delete("foo")
-        self.assert_(not os.path.exists(keypath))
-        self.assert_(not os.path.exists(os.path.dirname(keypath)))
-        self.assert_(not os.path.exists(os.path.dirname(os.path.dirname(keypath))))
+        self.assertTrue(not os.path.exists(keypath))
+        self.assertTrue(not os.path.exists(os.path.dirname(keypath)))
+        self.assertTrue(not os.path.exists(os.path.dirname(os.path.dirname(keypath))))
 
     def test_cull(self):
         self.perform_cull_test(50, 29)
@@ -1208,27 +1208,27 @@ class CacheMiddlewareTest(unittest.TestCase):
         middleware = CacheMiddleware()
 
         # Now test object attributes against values defined in setUp above
-        self.assertEquals(middleware.cache_timeout, 30)
-        self.assertEquals(middleware.key_prefix, 'middlewareprefix')
-        self.assertEquals(middleware.cache_alias, 'other')
-        self.assertEquals(middleware.cache_anonymous_only, False)
+        self.assertEqual(middleware.cache_timeout, 30)
+        self.assertEqual(middleware.key_prefix, 'middlewareprefix')
+        self.assertEqual(middleware.cache_alias, 'other')
+        self.assertEqual(middleware.cache_anonymous_only, False)
 
         # If arguments are being passed in construction, it's being used as a decorator.
         # First, test with "defaults":
         as_view_decorator = CacheMiddleware(cache_alias=None, key_prefix=None)
 
-        self.assertEquals(as_view_decorator.cache_timeout, 300) # Timeout value for 'default' cache, i.e. 300
-        self.assertEquals(as_view_decorator.key_prefix, '')
-        self.assertEquals(as_view_decorator.cache_alias, 'default') # Value of DEFAULT_CACHE_ALIAS from django.core.cache
-        self.assertEquals(as_view_decorator.cache_anonymous_only, False)
+        self.assertEqual(as_view_decorator.cache_timeout, 300) # Timeout value for 'default' cache, i.e. 300
+        self.assertEqual(as_view_decorator.key_prefix, '')
+        self.assertEqual(as_view_decorator.cache_alias, 'default') # Value of DEFAULT_CACHE_ALIAS from django.core.cache
+        self.assertEqual(as_view_decorator.cache_anonymous_only, False)
 
         # Next, test with custom values:
         as_view_decorator_with_custom = CacheMiddleware(cache_anonymous_only=True, cache_timeout=60, cache_alias='other', key_prefix='foo')
 
-        self.assertEquals(as_view_decorator_with_custom.cache_timeout, 60)
-        self.assertEquals(as_view_decorator_with_custom.key_prefix, 'foo')
-        self.assertEquals(as_view_decorator_with_custom.cache_alias, 'other')
-        self.assertEquals(as_view_decorator_with_custom.cache_anonymous_only, True)
+        self.assertEqual(as_view_decorator_with_custom.cache_timeout, 60)
+        self.assertEqual(as_view_decorator_with_custom.key_prefix, 'foo')
+        self.assertEqual(as_view_decorator_with_custom.cache_alias, 'other')
+        self.assertEqual(as_view_decorator_with_custom.cache_anonymous_only, True)
 
     def test_middleware(self):
         middleware = CacheMiddleware()
@@ -1239,7 +1239,7 @@ class CacheMiddlewareTest(unittest.TestCase):
 
         # Put the request through the request middleware
         result = middleware.process_request(request)
-        self.assertEquals(result, None)
+        self.assertEqual(result, None)
 
         response = hello_world_view(request, '1')
 
@@ -1249,16 +1249,16 @@ class CacheMiddlewareTest(unittest.TestCase):
         # Repeating the request should result in a cache hit
         result = middleware.process_request(request)
         self.assertNotEquals(result, None)
-        self.assertEquals(result.content, 'Hello World 1')
+        self.assertEqual(result.content, 'Hello World 1')
 
         # The same request through a different middleware won't hit
         result = prefix_middleware.process_request(request)
-        self.assertEquals(result, None)
+        self.assertEqual(result, None)
 
         # The same request with a timeout _will_ hit
         result = timeout_middleware.process_request(request)
         self.assertNotEquals(result, None)
-        self.assertEquals(result.content, 'Hello World 1')
+        self.assertEqual(result.content, 'Hello World 1')
 
     def test_cache_middleware_anonymous_only_wont_cause_session_access(self):
         """ The cache middleware shouldn't cause a session access due to
@@ -1279,7 +1279,7 @@ class CacheMiddlewareTest(unittest.TestCase):
         session_middleware.process_request(request)
         auth_middleware.process_request(request)
         result = middleware.process_request(request)
-        self.assertEquals(result, None)
+        self.assertEqual(result, None)
 
         response = hello_world_view(request, '1')
 
@@ -1327,43 +1327,43 @@ class CacheMiddlewareTest(unittest.TestCase):
 
         # Request the view once
         response = default_view(request, '1')
-        self.assertEquals(response.content, 'Hello World 1')
+        self.assertEqual(response.content, 'Hello World 1')
 
         # Request again -- hit the cache
         response = default_view(request, '2')
-        self.assertEquals(response.content, 'Hello World 1')
+        self.assertEqual(response.content, 'Hello World 1')
 
         # Requesting the same view with the explicit cache should yield the same result
         response = explicit_default_view(request, '3')
-        self.assertEquals(response.content, 'Hello World 1')
+        self.assertEqual(response.content, 'Hello World 1')
 
         # Requesting with a prefix will hit a different cache key
         response = explicit_default_with_prefix_view(request, '4')
-        self.assertEquals(response.content, 'Hello World 4')
+        self.assertEqual(response.content, 'Hello World 4')
 
         # Hitting the same view again gives a cache hit
         response = explicit_default_with_prefix_view(request, '5')
-        self.assertEquals(response.content, 'Hello World 4')
+        self.assertEqual(response.content, 'Hello World 4')
 
         # And going back to the implicit cache will hit the same cache
         response = default_with_prefix_view(request, '6')
-        self.assertEquals(response.content, 'Hello World 4')
+        self.assertEqual(response.content, 'Hello World 4')
 
         # Requesting from an alternate cache won't hit cache
         response = other_view(request, '7')
-        self.assertEquals(response.content, 'Hello World 7')
+        self.assertEqual(response.content, 'Hello World 7')
 
         # But a repeated hit will hit cache
         response = other_view(request, '8')
-        self.assertEquals(response.content, 'Hello World 7')
+        self.assertEqual(response.content, 'Hello World 7')
 
         # And prefixing the alternate cache yields yet another cache entry
         response = other_with_prefix_view(request, '9')
-        self.assertEquals(response.content, 'Hello World 9')
+        self.assertEqual(response.content, 'Hello World 9')
 
         # Request from the alternate cache with a new prefix and a custom timeout
         response = other_with_timeout_view(request, '10')
-        self.assertEquals(response.content, 'Hello World 10')
+        self.assertEqual(response.content, 'Hello World 10')
 
         # But if we wait a couple of seconds...
         time.sleep(2)
@@ -1371,38 +1371,38 @@ class CacheMiddlewareTest(unittest.TestCase):
         # ... the default cache will still hit
         cache = get_cache('default')
         response = default_view(request, '11')
-        self.assertEquals(response.content, 'Hello World 1')
+        self.assertEqual(response.content, 'Hello World 1')
 
         # ... the default cache with a prefix will still hit
         response = default_with_prefix_view(request, '12')
-        self.assertEquals(response.content, 'Hello World 4')
+        self.assertEqual(response.content, 'Hello World 4')
 
         # ... the explicit default cache will still hit
         response = explicit_default_view(request, '13')
-        self.assertEquals(response.content, 'Hello World 1')
+        self.assertEqual(response.content, 'Hello World 1')
 
         # ... the explicit default cache with a prefix will still hit
         response = explicit_default_with_prefix_view(request, '14')
-        self.assertEquals(response.content, 'Hello World 4')
+        self.assertEqual(response.content, 'Hello World 4')
 
         # .. but a rapidly expiring cache won't hit
         response = other_view(request, '15')
-        self.assertEquals(response.content, 'Hello World 15')
+        self.assertEqual(response.content, 'Hello World 15')
 
         # .. even if it has a prefix
         response = other_with_prefix_view(request, '16')
-        self.assertEquals(response.content, 'Hello World 16')
+        self.assertEqual(response.content, 'Hello World 16')
 
         # ... but a view with a custom timeout will still hit
         response = other_with_timeout_view(request, '17')
-        self.assertEquals(response.content, 'Hello World 10')
+        self.assertEqual(response.content, 'Hello World 10')
 
         # And if we wait a few more seconds
         time.sleep(2)
 
         # the custom timeouot cache will miss
         response = other_with_timeout_view(request, '18')
-        self.assertEquals(response.content, 'Hello World 18')
+        self.assertEqual(response.content, 'Hello World 18')
 
 if __name__ == '__main__':
     unittest.main()

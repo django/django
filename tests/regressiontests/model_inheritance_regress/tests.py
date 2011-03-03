@@ -367,7 +367,7 @@ class ModelInheritanceTest(TestCase):
         # from an ABC even when there are one or more intermediate
         # abstract models in the inheritance chain, for consistency with
         # verbose_name.
-        self.assertEquals(
+        self.assertEqual(
                 InternalCertificationAudit._meta.verbose_name_plural,
                 u'Audits'
         )
@@ -394,12 +394,12 @@ class ModelInheritanceTest(TestCase):
         # Regression test for #13987: Primary key is incorrectly determined
         # when more than one model has a concrete->abstract->concrete
         # inheritance hierarchy.
-        self.assertEquals(
+        self.assertEqual(
             len([field for field in BusStation._meta.local_fields
                        if field.primary_key]),
             1
         )
-        self.assertEquals(
+        self.assertEqual(
             len([field for field in TrainStation._meta.local_fields
                        if field.primary_key]),
             1

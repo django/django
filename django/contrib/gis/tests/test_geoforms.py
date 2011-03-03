@@ -26,7 +26,7 @@ class GeometryFieldTest(unittest.TestCase):
         xform_geom = GEOSGeometry('POINT (951640.547328465 4219369.26171664)', srid=32140)
         # The cleaned geometry should be transformed to 32140.
         cleaned_geom = fld.clean('SRID=4326;POINT (-95.363151 29.763374)')
-        self.failUnless(xform_geom.equals_exact(cleaned_geom, tol))
+        self.assertTrue(xform_geom.equals_exact(cleaned_geom, tol))
 
     def test02_null(self):
         "Testing GeometryField's handling of null (None) geometries."

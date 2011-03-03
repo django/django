@@ -46,7 +46,7 @@ class TestUtilsSimpleLazyObject(unittest.TestCase):
         # For debugging, it will really confuse things if there is no clue that
         # SimpleLazyObject is actually a proxy object. So we don't
         # proxy __repr__
-        self.assert_("SimpleLazyObject" in repr(SimpleLazyObject(complex_object)))
+        self.assertTrue("SimpleLazyObject" in repr(SimpleLazyObject(complex_object)))
 
     def test_str(self):
         self.assertEqual("I am _ComplexObject('joe')", str(SimpleLazyObject(complex_object)))

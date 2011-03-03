@@ -125,10 +125,10 @@ class BaseMiddlewareExceptionTest(TestCase):
         except Exception, e:
             if type(extra_error) != type(e):
                 self.fail("Unexpected exception: %s" % e)
-        self.assertEquals(len(self.exceptions), len(errors))
+        self.assertEqual(len(self.exceptions), len(errors))
         for i, error in enumerate(errors):
             exception, value, tb = self.exceptions[i]
-            self.assertEquals(value.args, (error, ))
+            self.assertEqual(value.args, (error, ))
 
     def assert_middleware_usage(self, middleware, request, view, template_response, response, exception):
         self.assertEqual(middleware.process_request_called, request)

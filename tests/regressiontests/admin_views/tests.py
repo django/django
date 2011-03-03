@@ -478,7 +478,7 @@ class SaveAsTests(TestCase):
         initial model.
         """
         response = self.client.get('/test_admin/admin/admin_views/person/1/')
-        self.assert_(response.context['save_as'])
+        self.assertTrue(response.context['save_as'])
         post_data = {'_saveasnew':'', 'name':'John M', 'gender':3, 'alive':'checked'}
         response = self.client.post('/test_admin/admin/admin_views/person/1/', post_data)
         self.assertEqual(response.context['form_url'], '../add/')
@@ -503,32 +503,32 @@ class CustomModelAdminTest(AdminViewBasicTest):
         self.client.logout()
         request = self.client.get('/test_admin/admin2/')
         self.assertTemplateUsed(request, 'custom_admin/login.html')
-        self.assert_('Hello from a custom login template' in request.content)
+        self.assertTrue('Hello from a custom login template' in request.content)
 
     def testCustomAdminSiteLogoutTemplate(self):
         request = self.client.get('/test_admin/admin2/logout/')
         self.assertTemplateUsed(request, 'custom_admin/logout.html')
-        self.assert_('Hello from a custom logout template' in request.content)
+        self.assertTrue('Hello from a custom logout template' in request.content)
 
     def testCustomAdminSiteIndexViewAndTemplate(self):
         request = self.client.get('/test_admin/admin2/')
         self.assertTemplateUsed(request, 'custom_admin/index.html')
-        self.assert_('Hello from a custom index template *bar*' in request.content)
+        self.assertTrue('Hello from a custom index template *bar*' in request.content)
 
     def testCustomAdminSitePasswordChangeTemplate(self):
         request = self.client.get('/test_admin/admin2/password_change/')
         self.assertTemplateUsed(request, 'custom_admin/password_change_form.html')
-        self.assert_('Hello from a custom password change form template' in request.content)
+        self.assertTrue('Hello from a custom password change form template' in request.content)
 
     def testCustomAdminSitePasswordChangeDoneTemplate(self):
         request = self.client.get('/test_admin/admin2/password_change/done/')
         self.assertTemplateUsed(request, 'custom_admin/password_change_done.html')
-        self.assert_('Hello from a custom password change done template' in request.content)
+        self.assertTrue('Hello from a custom password change done template' in request.content)
 
     def testCustomAdminSiteView(self):
         self.client.login(username='super', password='secret')
         response = self.client.get('/test_admin/%s/my_view/' % self.urlbit)
-        self.assert_(response.content == "Django is a magical pony!", response.content)
+        self.assertTrue(response.content == "Django is a magical pony!", response.content)
 
 def get_perm(Model, perm):
     """Return the permission object, for the Model"""
@@ -725,8 +725,8 @@ class AdminViewPermissionsTest(TestCase):
         post = self.client.post('/test_admin/admin/admin_views/article/add/', add_dict)
         self.assertRedirects(post, '/test_admin/admin/')
         self.assertEqual(Article.objects.all().count(), 4)
-        self.assertEquals(len(mail.outbox), 1)
-        self.assertEquals(mail.outbox[0].subject, 'Greetings from a created object')
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].subject, 'Greetings from a created object')
         self.client.get('/test_admin/admin/logout/')
 
         # Super can add too, but is redirected to the change list view
@@ -801,12 +801,12 @@ class AdminViewPermissionsTest(TestCase):
             request = self.client.get('/test_admin/admin/admin_views/rowlevelchangepermissionmodel/1/')
             self.assertEqual(request.status_code, 403)
             request = self.client.post('/test_admin/admin/admin_views/rowlevelchangepermissionmodel/1/', {'name': 'changed'})
-            self.assertEquals(RowLevelChangePermissionModel.objects.get(id=1).name, 'odd id')
+            self.assertEqual(RowLevelChangePermissionModel.objects.get(id=1).name, 'odd id')
             self.assertEqual(request.status_code, 403)
             request = self.client.get('/test_admin/admin/admin_views/rowlevelchangepermissionmodel/2/')
             self.assertEqual(request.status_code, 200)
             request = self.client.post('/test_admin/admin/admin_views/rowlevelchangepermissionmodel/2/', {'name': 'changed'})
-            self.assertEquals(RowLevelChangePermissionModel.objects.get(id=2).name, 'changed')
+            self.assertEqual(RowLevelChangePermissionModel.objects.get(id=2).name, 'changed')
             self.assertRedirects(request, '/test_admin/admin/')
             self.client.get('/test_admin/admin/logout/')
         for login_dict in [self.joepublic_login, self.no_username_login]:
@@ -815,14 +815,14 @@ class AdminViewPermissionsTest(TestCase):
             self.assertEqual(request.status_code, 200)
             self.assertContains(request, 'login-form')
             request = self.client.post('/test_admin/admin/admin_views/rowlevelchangepermissionmodel/1/', {'name': 'changed'})
-            self.assertEquals(RowLevelChangePermissionModel.objects.get(id=1).name, 'odd id')
+            self.assertEqual(RowLevelChangePermissionModel.objects.get(id=1).name, 'odd id')
             self.assertEqual(request.status_code, 200)
             self.assertContains(request, 'login-form')
             request = self.client.get('/test_admin/admin/admin_views/rowlevelchangepermissionmodel/2/')
             self.assertEqual(request.status_code, 200)
             self.assertContains(request, 'login-form')
             request = self.client.post('/test_admin/admin/admin_views/rowlevelchangepermissionmodel/2/', {'name': 'changed again'})
-            self.assertEquals(RowLevelChangePermissionModel.objects.get(id=2).name, 'changed')
+            self.assertEqual(RowLevelChangePermissionModel.objects.get(id=2).name, 'changed')
             self.assertEqual(request.status_code, 200)
             self.assertContains(request, 'login-form')
             self.client.get('/test_admin/admin/logout/')
@@ -856,7 +856,7 @@ class AdminViewPermissionsTest(TestCase):
         # Test custom change list template with custom extra context
         request = self.client.get('/test_admin/admin/admin_views/customarticle/')
         self.assertEqual(request.status_code, 200)
-        self.assert_("var hello = 'Hello!';" in request.content)
+        self.assertTrue("var hello = 'Hello!';" in request.content)
         self.assertTemplateUsed(request, 'custom_admin/change_list.html')
 
         # Test custom add form template
@@ -916,8 +916,8 @@ class AdminViewPermissionsTest(TestCase):
         post = self.client.post('/test_admin/admin/admin_views/article/1/delete/', delete_dict)
         self.assertRedirects(post, '/test_admin/admin/')
         self.assertEqual(Article.objects.all().count(), 2)
-        self.assertEquals(len(mail.outbox), 1)
-        self.assertEquals(mail.outbox[0].subject, 'Greetings from a deleted object')
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].subject, 'Greetings from a deleted object')
         article_ct = ContentType.objects.get_for_model(Article)
         logged = LogEntry.objects.get(content_type=article_ct, action_flag=DELETION)
         self.assertEqual(logged.object_id, u'1')
@@ -1108,7 +1108,7 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         counted_presence_before = response.content.count(should_contain)
         response = self.client.get('/test_admin/admin/')
         counted_presence_after = response.content.count(should_contain)
-        self.assertEquals(counted_presence_before - 1,
+        self.assertEqual(counted_presence_before - 1,
                           counted_presence_after)
 
     def test_deleteconfirmation_link(self):
@@ -1568,7 +1568,7 @@ class AdminViewListEditable(TestCase):
         }
         response = self.client.post('/test_admin/admin/admin_views/person/', data)
         non_form_errors = response.context['cl'].formset.non_form_errors()
-        self.assert_(isinstance(non_form_errors, ErrorList))
+        self.assertTrue(isinstance(non_form_errors, ErrorList))
         self.assertEqual(str(non_form_errors), str(ErrorList(["Grace is not a Zombie"])))
 
     def test_list_editable_ordering(self):
@@ -1853,8 +1853,8 @@ class AdminActionsTest(TestCase):
             'index': 0,
         }
         response = self.client.post('/test_admin/admin/admin_views/subscriber/', action_data)
-        self.assertEquals(len(mail.outbox), 1)
-        self.assertEquals(mail.outbox[0].subject, 'Greetings from a ModelAdmin action')
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].subject, 'Greetings from a ModelAdmin action')
 
     def test_model_admin_default_delete_action(self):
         "Tests the default delete action defined as a ModelAdmin method"
@@ -1927,8 +1927,8 @@ class AdminActionsTest(TestCase):
             'index': 0,
         }
         response = self.client.post('/test_admin/admin/admin_views/externalsubscriber/', action_data)
-        self.assertEquals(len(mail.outbox), 1)
-        self.assertEquals(mail.outbox[0].subject, 'Greetings from a function action')
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].subject, 'Greetings from a function action')
 
     def test_custom_function_action_with_redirect(self):
         "Tests a custom action defined in a function"
@@ -1958,19 +1958,19 @@ class AdminActionsTest(TestCase):
     def test_model_without_action(self):
         "Tests a ModelAdmin without any action"
         response = self.client.get('/test_admin/admin/admin_views/oldsubscriber/')
-        self.assertEquals(response.context["action_form"], None)
-        self.assert_(
+        self.assertEqual(response.context["action_form"], None)
+        self.assertTrue(
             '<input type="checkbox" class="action-select"' not in response.content,
             "Found an unexpected action toggle checkboxbox in response"
         )
-        self.assert_('action-checkbox-column' not in response.content,
+        self.assertTrue('action-checkbox-column' not in response.content,
             "Found unexpected action-checkbox-column class in response")
 
     def test_model_without_action_still_has_jquery(self):
         "Tests that a ModelAdmin without any actions still gets jQuery included in page"
         response = self.client.get('/test_admin/admin/admin_views/oldsubscriber/')
-        self.assertEquals(response.context["action_form"], None)
-        self.assert_('jquery.min.js' in response.content,
+        self.assertEqual(response.context["action_form"], None)
+        self.assertTrue('jquery.min.js' in response.content,
             "jQuery missing from admin pages for model with no admin actions"
         )
 
@@ -1978,7 +1978,7 @@ class AdminActionsTest(TestCase):
         "Tests that the checkbox column class is present in the response"
         response = self.client.get('/test_admin/admin/admin_views/subscriber/')
         self.assertNotEqual(response.context["action_form"], None)
-        self.assert_('action-checkbox-column' in response.content,
+        self.assertTrue('action-checkbox-column' in response.content,
             "Expected an action-checkbox-column in response")
 
     def test_multiple_actions_form(self):
@@ -1995,8 +1995,8 @@ class AdminActionsTest(TestCase):
         response = self.client.post('/test_admin/admin/admin_views/externalsubscriber/', action_data)
 
         # Send mail, don't delete.
-        self.assertEquals(len(mail.outbox), 1)
-        self.assertEquals(mail.outbox[0].subject, 'Greetings from a function action')
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].subject, 'Greetings from a function action')
 
     def test_user_message_on_none_selected(self):
         """
@@ -2039,7 +2039,7 @@ class AdminActionsTest(TestCase):
         self.assertNotEquals(response.context["action_form"], None)
         response = self.client.get(
             '/test_admin/admin/admin_views/subscriber/?%s' % IS_POPUP_VAR)
-        self.assertEquals(response.context["action_form"], None)
+        self.assertEqual(response.context["action_form"], None)
 
 
 class TestCustomChangeList(TestCase):

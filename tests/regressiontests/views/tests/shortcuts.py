@@ -17,49 +17,49 @@ class ShortcutTests(TestCase):
 
     def test_render_to_response(self):
         response = self.client.get('/views/shortcuts/render_to_response/')
-        self.assertEquals(response.status_code, 200)
-        self.assertEquals(response.content, 'FOO.BAR..\n')
-        self.assertEquals(response['Content-Type'], 'text/html; charset=utf-8')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, 'FOO.BAR..\n')
+        self.assertEqual(response['Content-Type'], 'text/html; charset=utf-8')
 
     def test_render_to_response_with_request_context(self):
         response = self.client.get('/views/shortcuts/render_to_response/request_context/')
-        self.assertEquals(response.status_code, 200)
-        self.assertEquals(response.content, 'FOO.BAR../path/to/static/media\n')
-        self.assertEquals(response['Content-Type'], 'text/html; charset=utf-8')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, 'FOO.BAR../path/to/static/media\n')
+        self.assertEqual(response['Content-Type'], 'text/html; charset=utf-8')
 
     def test_render_to_response_with_mimetype(self):
         response = self.client.get('/views/shortcuts/render_to_response/mimetype/')
-        self.assertEquals(response.status_code, 200)
-        self.assertEquals(response.content, 'FOO.BAR..\n')
-        self.assertEquals(response['Content-Type'], 'application/x-rendertest')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, 'FOO.BAR..\n')
+        self.assertEqual(response['Content-Type'], 'application/x-rendertest')
 
     def test_render(self):
         response = self.client.get('/views/shortcuts/render/')
-        self.assertEquals(response.status_code, 200)
-        self.assertEquals(response.content, 'FOO.BAR../path/to/static/media\n')
-        self.assertEquals(response['Content-Type'], 'text/html; charset=utf-8')
-        self.assertEquals(response.context.current_app, None)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, 'FOO.BAR../path/to/static/media\n')
+        self.assertEqual(response['Content-Type'], 'text/html; charset=utf-8')
+        self.assertEqual(response.context.current_app, None)
 
     def test_render_with_base_context(self):
         response = self.client.get('/views/shortcuts/render/base_context/')
-        self.assertEquals(response.status_code, 200)
-        self.assertEquals(response.content, 'FOO.BAR..\n')
-        self.assertEquals(response['Content-Type'], 'text/html; charset=utf-8')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, 'FOO.BAR..\n')
+        self.assertEqual(response['Content-Type'], 'text/html; charset=utf-8')
 
     def test_render_with_content_type(self):
         response = self.client.get('/views/shortcuts/render/content_type/')
-        self.assertEquals(response.status_code, 200)
-        self.assertEquals(response.content, 'FOO.BAR../path/to/static/media\n')
-        self.assertEquals(response['Content-Type'], 'application/x-rendertest')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, 'FOO.BAR../path/to/static/media\n')
+        self.assertEqual(response['Content-Type'], 'application/x-rendertest')
 
     def test_render_with_status(self):
         response = self.client.get('/views/shortcuts/render/status/')
-        self.assertEquals(response.status_code, 403)
-        self.assertEquals(response.content, 'FOO.BAR../path/to/static/media\n')
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.content, 'FOO.BAR../path/to/static/media\n')
 
     def test_render_with_current_app(self):
         response = self.client.get('/views/shortcuts/render/current_app/')
-        self.assertEquals(response.context.current_app, "foobar_app")
+        self.assertEqual(response.context.current_app, "foobar_app")
 
     def test_render_with_current_app_conflict(self):
         self.assertRaises(ValueError, self.client.get, '/views/shortcuts/render/current_app_conflict/')

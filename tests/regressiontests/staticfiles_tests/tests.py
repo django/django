@@ -194,7 +194,7 @@ class TestFindStatic(BuildStaticTestCase, TestDefaults):
             lines = [l.strip() for l in sys.stdout.readlines()]
         finally:
             sys.stdout = _stdout
-        self.assertEquals(len(lines), 3) # three because there is also the "Found <file> here" line
+        self.assertEqual(len(lines), 3) # three because there is also the "Found <file> here" line
         self.assertTrue('project' in lines[1])
         self.assertTrue('apps' in lines[2])
 
@@ -244,7 +244,7 @@ class TestNoFilesCreated(object):
         """
         Make sure no files were create in the destination directory.
         """
-        self.assertEquals(os.listdir(settings.STATIC_ROOT), [])
+        self.assertEqual(os.listdir(settings.STATIC_ROOT), [])
 
 
 class TestBuildStaticDryRun(BuildStaticTestCase, TestNoFilesCreated):
@@ -302,7 +302,7 @@ class TestServeStatic(StaticFilesTestCase):
         self.assertContains(self._response(filepath), text)
 
     def assertFileNotFound(self, filepath):
-        self.assertEquals(self._response(filepath).status_code, 404)
+        self.assertEqual(self._response(filepath).status_code, 404)
 
 
 class TestServeDisabled(TestServeStatic):
@@ -349,11 +349,11 @@ class FinderTestCase(object):
     """
     def test_find_first(self):
         src, dst = self.find_first
-        self.assertEquals(self.finder.find(src), dst)
+        self.assertEqual(self.finder.find(src), dst)
 
     def test_find_all(self):
         src, dst = self.find_all
-        self.assertEquals(self.finder.find(src, all=True), dst)
+        self.assertEqual(self.finder.find(src, all=True), dst)
 
 
 class TestFileSystemFinder(StaticFilesTestCase, FinderTestCase):

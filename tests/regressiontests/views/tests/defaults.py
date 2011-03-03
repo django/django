@@ -25,35 +25,35 @@ class DefaultsTests(TestCase):
         for obj in Article.objects.all():
             short_url = '/views/shortcut/%s/%s/' % (ContentType.objects.get_for_model(Article).id, obj.pk)
             response = self.client.get(short_url)
-            self.assertEquals(response.status_code, 404)
+            self.assertEqual(response.status_code, 404)
 
     def test_wrong_type_pk(self):
         short_url = '/views/shortcut/%s/%s/' % (ContentType.objects.get_for_model(Author).id, 'nobody/expects')
         response = self.client.get(short_url)
-        self.assertEquals(response.status_code, 404)
+        self.assertEqual(response.status_code, 404)
 
     def test_shortcut_bad_pk(self):
         short_url = '/views/shortcut/%s/%s/' % (ContentType.objects.get_for_model(Author).id, '42424242')
         response = self.client.get(short_url)
-        self.assertEquals(response.status_code, 404)
+        self.assertEqual(response.status_code, 404)
 
     def test_nonint_content_type(self):
         an_author = Author.objects.all()[0]
         short_url = '/views/shortcut/%s/%s/' % ('spam', an_author.pk)
         response = self.client.get(short_url)
-        self.assertEquals(response.status_code, 404)
+        self.assertEqual(response.status_code, 404)
 
     def test_bad_content_type(self):
         an_author = Author.objects.all()[0]
         short_url = '/views/shortcut/%s/%s/' % (42424242, an_author.pk)
         response = self.client.get(short_url)
-        self.assertEquals(response.status_code, 404)
+        self.assertEqual(response.status_code, 404)
 
     def test_page_not_found(self):
         "A 404 status is returned by the page_not_found view"
         for url in self.non_existing_urls:
             response = self.client.get(url)
-            self.assertEquals(response.status_code, 404)
+            self.assertEqual(response.status_code, 404)
 
     def test_csrf_token_in_404(self):
         """
@@ -69,7 +69,7 @@ class DefaultsTests(TestCase):
     def test_server_error(self):
         "The server_error view raises a 500 status"
         response = self.client.get('/views/server_error/')
-        self.assertEquals(response.status_code, 500)
+        self.assertEqual(response.status_code, 500)
 
     def test_get_absolute_url_attributes(self):
         "A model can set attributes on the get_absolute_url method"

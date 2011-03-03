@@ -867,7 +867,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
             g1 = g.transform(4326, clone=True)
             self.assertEqual(g1.tuple, g.tuple)
             self.assertEqual(g1.srid, 4326)
-            self.assert_(g1 is not g, "Clone didn't happen")
+            self.assertTrue(g1 is not g, "Clone didn't happen")
 
         old_has_gdal = gdal.HAS_GDAL
         try:
@@ -883,7 +883,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
             g1 = g.transform(4326, clone=True)
             self.assertEqual(g1.tuple, g.tuple)
             self.assertEqual(g1.srid, 4326)
-            self.assert_(g1 is not g, "Clone didn't happen")
+            self.assertTrue(g1 is not g, "Clone didn't happen")
         finally:
             gdal.HAS_GDAL = old_has_gdal
 
@@ -907,7 +907,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
             g = GEOSGeometry('POINT (-104.609 38.255)', srid=None)
             g1 = g.transform(2774, clone=True)
-            self.assert_(g1 is None)
+            self.assertTrue(g1 is None)
 
             g = GEOSGeometry('POINT (-104.609 38.255)', srid=-1)
             g.transform(2774)
@@ -916,7 +916,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
             g = GEOSGeometry('POINT (-104.609 38.255)', srid=-1)
             g1 = g.transform(2774, clone=True)
-            self.assert_(g1 is None)
+            self.assertTrue(g1 is None)
 
         finally:
             warnings.simplefilter('default', UserWarning)
@@ -1032,17 +1032,17 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         if not GEOS_PREPARE: return
 
         g = GEOSGeometry("POINT(0 0)")
-        self.assert_(g.valid)
-        self.assert_(isinstance(g.valid_reason, basestring))
+        self.assertTrue(g.valid)
+        self.assertTrue(isinstance(g.valid_reason, basestring))
         self.assertEqual(g.valid_reason, "Valid Geometry")
 
         print "\nBEGIN - expecting GEOS_NOTICE; safe to ignore.\n"
 
         g = GEOSGeometry("LINESTRING(0 0, 0 0)")
 
-        self.assert_(not g.valid)
-        self.assert_(isinstance(g.valid_reason, basestring))
-        self.assert_(g.valid_reason.startswith("Too few points in geometry component"))
+        self.assertTrue(not g.valid)
+        self.assertTrue(isinstance(g.valid_reason, basestring))
+        self.assertTrue(g.valid_reason.startswith("Too few points in geometry component"))
 
         print "\nEND - expecting GEOS_NOTICE; safe to ignore.\n"
 

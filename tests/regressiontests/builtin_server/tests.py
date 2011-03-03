@@ -41,7 +41,7 @@ class WSGIFileWrapperTests(TestCase):
         err = StringIO()
         handler = FileWrapperHandler(None, StringIO(), err, env)
         handler.run(wsgi_app_file_wrapper)
-        self.assert_(handler._used_sendfile)
+        self.assertTrue(handler._used_sendfile)
 
     def test_file_wrapper_no_sendfile(self):
         env = {'SERVER_PROTOCOL': 'HTTP/1.0'}

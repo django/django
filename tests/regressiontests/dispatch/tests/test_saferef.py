@@ -40,12 +40,12 @@ class Tester(unittest.TestCase):
     def testIn(self):
         """Test the "in" operator for safe references (cmp)"""
         for t in self.ts[:50]:
-            self.assert_(safeRef(t.x) in self.ss)
+            self.assertTrue(safeRef(t.x) in self.ss)
     
     def testValid(self):
         """Test that the references are valid (return instance methods)"""
         for s in self.ss:
-            self.assert_(s())
+            self.assertTrue(s())
     
     def testShortCircuit (self):
         """Test that creation short-circuits to reuse existing references"""
@@ -54,11 +54,11 @@ class Tester(unittest.TestCase):
             sd[s] = 1
         for t in self.ts:
             if hasattr(t, 'x'):
-                self.assert_(sd.has_key(safeRef(t.x)))
-                self.assert_(safeRef(t.x) in sd)
+                self.assertTrue(sd.has_key(safeRef(t.x)))
+                self.assertTrue(safeRef(t.x) in sd)
             else:
-                self.assert_(sd.has_key(safeRef(t)))
-                self.assert_(safeRef(t) in sd)
+                self.assertTrue(sd.has_key(safeRef(t)))
+                self.assertTrue(safeRef(t) in sd)
     
     def testRepresentation (self):
         """Test that the reference object's representation works

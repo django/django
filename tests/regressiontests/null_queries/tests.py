@@ -44,7 +44,7 @@ class NullQueriesTests(TestCase):
 
         # Related managers use __exact=None implicitly if the object hasn't been saved.
         p2 = Poll(question="How?")
-        self.assertEquals(repr(p2.choice_set.all()), '[]')
+        self.assertEqual(repr(p2.choice_set.all()), '[]')
 
     def test_reverse_relations(self):
         """

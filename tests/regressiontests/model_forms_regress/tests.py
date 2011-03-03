@@ -80,7 +80,7 @@ class OverrideCleanTests(TestCase):
         self.assertTrue(form.is_valid())
         # form.instance.left will be None if the instance was not constructed
         # by form.full_clean().
-        self.assertEquals(form.instance.left, 1)
+        self.assertEqual(form.instance.left, 1)
 
 # Regression test for #12960.
 # Make sure the cleaned_data returned from ModelForm.clean() is applied to the
@@ -133,7 +133,7 @@ class ManyToManyCallableInitialTests(TestCase):
         # Create a ModelForm, instantiate it, and check that the output is as expected
         ModelForm = modelform_factory(Article, formfield_callback=formfield_for_dbfield)
         form = ModelForm()
-        self.assertEquals(form.as_ul(), u"""<li><label for="id_headline">Headline:</label> <input id="id_headline" type="text" name="headline" maxlength="100" /></li>
+        self.assertEqual(form.as_ul(), u"""<li><label for="id_headline">Headline:</label> <input id="id_headline" type="text" name="headline" maxlength="100" /></li>
 <li><label for="id_publications">Publications:</label> <select multiple="multiple" name="publications" id="id_publications">
 <option value="1" selected="selected">First Book</option>
 <option value="2" selected="selected">Second Book</option>
@@ -193,7 +193,7 @@ class OneToOneFieldTests(TestCase):
             date_published=date(1991, 8, 22))
         author = Author.objects.create(publication=publication, full_name='John Doe')
         form = AuthorForm({'publication':u'', 'full_name':'John Doe'}, instance=author)
-        self.assert_(form.is_valid())
+        self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data['publication'], None)
         author = form.save()
         # author object returned from form still retains original publication object
@@ -211,7 +211,7 @@ class OneToOneFieldTests(TestCase):
             date_published=date(1991, 8, 22))
         author = Author1.objects.create(publication=publication, full_name='John Doe')
         form = AuthorForm({'publication':u'', 'full_name':'John Doe'}, instance=author)
-        self.assert_(not form.is_valid())
+        self.assertTrue(not form.is_valid())
 
 
 class ModelChoiceForm(forms.Form):
@@ -224,8 +224,8 @@ class TestTicket11183(TestCase):
         field1 = form1.fields['person']
         # To allow the widget to change the queryset of field1.widget.choices correctly,
         # without affecting other forms, the following must hold:
-        self.assert_(field1 is not ModelChoiceForm.base_fields['person'])
-        self.assert_(field1.widget.choices.field is field1)
+        self.assertTrue(field1 is not ModelChoiceForm.base_fields['person'])
+        self.assertTrue(field1.widget.choices.field is field1)
 
 class HomepageForm(forms.ModelForm):
     class Meta:
@@ -253,12 +253,12 @@ class URLFieldTests(TestCase):
         form = HomepageForm({'url': 'example.com'})
         form.is_valid()
         # self.assertTrue(form.is_valid())
-        # self.assertEquals(form.cleaned_data['url'], 'http://example.com/')
+        # self.assertEqual(form.cleaned_data['url'], 'http://example.com/')
 
         form = HomepageForm({'url': 'example.com/test'})
         form.is_valid()
         # self.assertTrue(form.is_valid())
-        # self.assertEquals(form.cleaned_data['url'], 'http://example.com/test')
+        # self.assertEqual(form.cleaned_data['url'], 'http://example.com/test')
 
 
 class FormFieldCallbackTests(TestCase):
@@ -376,14 +376,14 @@ class FileFieldTests(unittest.TestCase):
 
         """
         form = DocumentForm()
-        self.assert_('name="myfile"' in unicode(form))
-        self.assert_('myfile-clear' not in unicode(form))
+        self.assertTrue('name="myfile"' in unicode(form))
+        self.assertTrue('myfile-clear' not in unicode(form))
         form = DocumentForm(files={'myfile': SimpleUploadedFile('something.txt', 'content')})
-        self.assert_(form.is_valid())
+        self.assertTrue(form.is_valid())
         doc = form.save(commit=False)
         self.assertEqual(doc.myfile.name, 'something.txt')
         form = DocumentForm(instance=doc)
-        self.assert_('myfile-clear' in unicode(form))
+        self.assertTrue('myfile-clear' in unicode(form))
         form = DocumentForm(instance=doc, data={'myfile-clear': 'true'})
         doc = form.save(commit=False)
         self.assertEqual(bool(doc.myfile), False)
@@ -396,17 +396,17 @@ class FileFieldTests(unittest.TestCase):
 
         """
         form = DocumentForm(files={'myfile': SimpleUploadedFile('something.txt', 'content')})
-        self.assert_(form.is_valid())
+        self.assertTrue(form.is_valid())
         doc = form.save(commit=False)
         form = DocumentForm(instance=doc,
                             files={'myfile': SimpleUploadedFile('something.txt', 'content')},
                             data={'myfile-clear': 'true'})
-        self.assert_(not form.is_valid())
+        self.assertTrue(not form.is_valid())
         self.assertEqual(form.errors['myfile'],
                          [u'Please either submit a file or check the clear checkbox, not both.'])
         rendered = unicode(form)
-        self.assert_('something.txt' in rendered)
-        self.assert_('myfile-clear' in rendered)
+        self.assertTrue('something.txt' in rendered)
+        self.assertTrue('myfile-clear' in rendered)
 
 class EditionForm(forms.ModelForm):
     author = forms.ModelChoiceField(queryset=Person.objects.all())
@@ -428,13 +428,13 @@ class UniqueErrorsTests(TestCase):
 
     def test_unique_error_message(self):
         form = EditionForm(data={'author': self.author1.pk, 'publication': self.pub2.pk, 'edition': 1, 'isbn': '9783161484100'})
-        self.assertEquals(form.errors, {'isbn': [u'Edition with this Isbn already exists.']})
+        self.assertEqual(form.errors, {'isbn': [u'Edition with this Isbn already exists.']})
 
     def test_unique_together_error_message(self):
         form = EditionForm(data={'author': self.author1.pk, 'publication': self.pub1.pk, 'edition': 2, 'isbn': '9783161489999'})
-        self.assertEquals(form.errors, {'__all__': [u'Edition with this Author and Publication already exists.']})
+        self.assertEqual(form.errors, {'__all__': [u'Edition with this Author and Publication already exists.']})
         form = EditionForm(data={'author': self.author2.pk, 'publication': self.pub1.pk, 'edition': 1, 'isbn': '9783161487777'})
-        self.assertEquals(form.errors, {'__all__': [u'Edition with this Publication and Edition already exists.']})
+        self.assertEqual(form.errors, {'__all__': [u'Edition with this Publication and Edition already exists.']})
 
 
 class EmptyFieldsTestCase(TestCase):

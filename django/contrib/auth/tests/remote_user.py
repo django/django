@@ -30,15 +30,15 @@ class RemoteUserTest(TestCase):
         num_users = User.objects.count()
 
         response = self.client.get('/remote_user/')
-        self.assert_(response.context['user'].is_anonymous())
+        self.assertTrue(response.context['user'].is_anonymous())
         self.assertEqual(User.objects.count(), num_users)
 
         response = self.client.get('/remote_user/', REMOTE_USER=None)
-        self.assert_(response.context['user'].is_anonymous())
+        self.assertTrue(response.context['user'].is_anonymous())
         self.assertEqual(User.objects.count(), num_users)
 
         response = self.client.get('/remote_user/', REMOTE_USER='')
-        self.assert_(response.context['user'].is_anonymous())
+        self.assertTrue(response.context['user'].is_anonymous())
         self.assertEqual(User.objects.count(), num_users)
 
     def test_unknown_user(self):
@@ -115,7 +115,7 @@ class RemoteUserNoCreateTest(RemoteUserTest):
     def test_unknown_user(self):
         num_users = User.objects.count()
         response = self.client.get('/remote_user/', REMOTE_USER='newuser')
-        self.assert_(response.context['user'].is_anonymous())
+        self.assertTrue(response.context['user'].is_anonymous())
         self.assertEqual(User.objects.count(), num_users)
 
 

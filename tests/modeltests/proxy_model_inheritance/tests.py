@@ -32,5 +32,5 @@ class ProxyModelInheritanceTests(TransactionTestCase):
         sys.path = self.old_sys_path
 
     def test_table_exists(self):
-        self.assertEquals(NiceModel.objects.all().count(), 0)
-        self.assertEquals(ProxyModel.objects.all().count(), 0)
+        self.assertEqual(NiceModel.objects.all().count(), 0)
+        self.assertEqual(ProxyModel.objects.all().count(), 0)

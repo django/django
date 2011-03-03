@@ -65,29 +65,29 @@ class CommentUtilsModeratorTests(CommentTestCase):
     def testEmailNotification(self):
         moderator.register(Entry, EntryModerator1)
         self.createSomeComments()
-        self.assertEquals(len(mail.outbox), 2)
+        self.assertEqual(len(mail.outbox), 2)
 
     def testCommentsEnabled(self):
         moderator.register(Entry, EntryModerator2)
         self.createSomeComments()
-        self.assertEquals(Comment.objects.all().count(), 1)
+        self.assertEqual(Comment.objects.all().count(), 1)
 
     def testAutoCloseField(self):
         moderator.register(Entry, EntryModerator3)
         self.createSomeComments()
-        self.assertEquals(Comment.objects.all().count(), 0)
+        self.assertEqual(Comment.objects.all().count(), 0)
 
     def testAutoModerateField(self):
         moderator.register(Entry, EntryModerator4)
         c1, c2 = self.createSomeComments()
-        self.assertEquals(c2.is_public, False)
+        self.assertEqual(c2.is_public, False)
 
     def testAutoModerateFieldImmediate(self):
         moderator.register(Entry, EntryModerator5)
         c1, c2 = self.createSomeComments()
-        self.assertEquals(c2.is_public, False)
+        self.assertEqual(c2.is_public, False)
 
     def testAutoCloseFieldImmediate(self):
         moderator.register(Entry, EntryModerator6)
         c1, c2 = self.createSomeComments()
-        self.assertEquals(Comment.objects.all().count(), 0)
+        self.assertEqual(Comment.objects.all().count(), 0)

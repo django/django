@@ -1402,13 +1402,13 @@ class SubqueryTests(TestCase):
         "Subselects honor any manual ordering"
         try:
             query = DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[0:2])
-            self.assertEquals(set(query.values_list('id', flat=True)), set([2,3]))
+            self.assertEqual(set(query.values_list('id', flat=True)), set([2,3]))
 
             query = DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[:2])
-            self.assertEquals(set(query.values_list('id', flat=True)), set([2,3]))
+            self.assertEqual(set(query.values_list('id', flat=True)), set([2,3]))
 
             query = DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[2:])
-            self.assertEquals(set(query.values_list('id', flat=True)), set([1]))
+            self.assertEqual(set(query.values_list('id', flat=True)), set([1]))
         except DatabaseError:
             # Oracle and MySQL both have problems with sliced subselects.
             # This prevents us from even evaluating this test case at all.
@@ -1419,7 +1419,7 @@ class SubqueryTests(TestCase):
         "Delete queries can safely contain sliced subqueries"
         try:
             DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[0:1]).delete()
-            self.assertEquals(set(DumbCategory.objects.values_list('id', flat=True)), set([1,2]))
+            self.assertEqual(set(DumbCategory.objects.values_list('id', flat=True)), set([1,2]))
         except DatabaseError:
             # Oracle and MySQL both have problems with sliced subselects.
             # This prevents us from even evaluating this test case at all.
@@ -1441,7 +1441,7 @@ class CloneTests(TestCase):
         # Use the note queryset in a query, and evalute
         # that query in a way that involves cloning.
         try:
-            self.assertEquals(ExtraInfo.objects.filter(note__in=n_list)[0].info, 'good')
+            self.assertEqual(ExtraInfo.objects.filter(note__in=n_list)[0].info, 'good')
         except:
             self.fail('Query should be clonable')
 

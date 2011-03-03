@@ -24,7 +24,7 @@ class DebugViewTests(TestCase):
 
     def test_files(self):
         response = self.client.get('/views/raises/')
-        self.assertEquals(response.status_code, 500)
+        self.assertEqual(response.status_code, 500)
 
         data = {
             'file_data.txt': SimpleUploadedFile('file_data.txt', 'haha'),
@@ -35,7 +35,7 @@ class DebugViewTests(TestCase):
 
     def test_404(self):
         response = self.client.get('/views/raises404/')
-        self.assertEquals(response.status_code, 404)
+        self.assertEqual(response.status_code, 404)
 
     def test_view_exceptions(self):
         for n in range(len(except_args)):

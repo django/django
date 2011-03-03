@@ -72,7 +72,7 @@ class DataTypesTestCase(TestCase):
         database should be unicode."""
         d = Donut.objects.create(name=u'Jelly Donut', review=u'Outstanding')
         newd = Donut.objects.get(id=d.id)
-        self.assert_(isinstance(newd.review, unicode))
+        self.assertTrue(isinstance(newd.review, unicode))
 
     @skipIfDBFeature('supports_timezones')
     def test_error_on_timezone(self):
@@ -88,7 +88,7 @@ class DataTypesTestCase(TestCase):
         a Python datetime.date, not a datetime.datetime"""
         b = RumBaba.objects.create()
         # Verify we didn't break DateTimeField behavior
-        self.assert_(isinstance(b.baked_timestamp, datetime.datetime))
+        self.assertTrue(isinstance(b.baked_timestamp, datetime.datetime))
         # We need to test this this way because datetime.datetime inherits
         # from datetime.date:
-        self.assert_(isinstance(b.baked_date, datetime.date) and not isinstance(b.baked_date, datetime.datetime))
+        self.assertTrue(isinstance(b.baked_date, datetime.date) and not isinstance(b.baked_date, datetime.datetime))

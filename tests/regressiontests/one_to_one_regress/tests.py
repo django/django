@@ -50,8 +50,8 @@ class OneToOneRegressionTests(TestCase):
 
         Check that the name of the cache for the reverse object is correct.
         """
-        self.assertEquals(self.p1.restaurant, self.r1)
-        self.assertEquals(self.p1.bar, self.b1)
+        self.assertEqual(self.p1.restaurant, self.r1)
+        self.assertEqual(self.p1.bar, self.b1)
 
     def test_related_object_cache(self):
         """ Regression test for #6886 (the related-object cache) """

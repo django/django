@@ -225,7 +225,7 @@ class SerializersTestBase(object):
 
         serial_str = serializers.serialize(self.serializer_name, [a])
         date_values = self._get_field_values(serial_str, "pub_date")
-        self.assertEquals(date_values[0], "0001-02-03 04:05:06")
+        self.assertEqual(date_values[0], "0001-02-03 04:05:06")
 
     def test_pkless_serialized_strings(self):
         """

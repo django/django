@@ -20,7 +20,7 @@ class CommentFormTests(CommentTestCase):
     def testValidPost(self):
         a = Article.objects.get(pk=1)
         f = CommentForm(a, data=self.getValidData(a))
-        self.assert_(f.is_valid(), f.errors)
+        self.assertTrue(f.is_valid(), f.errors)
         return f
 
     def tamperWithForm(self, **kwargs):
@@ -65,12 +65,12 @@ class CommentFormTests(CommentTestCase):
 
     def testSecurityErrors(self):
         f = self.tamperWithForm(honeypot="I am a robot")
-        self.assert_("honeypot" in f.security_errors())
+        self.assertTrue("honeypot" in f.security_errors())
 
     def testGetCommentObject(self):
         f = self.testValidPost()
         c = f.get_comment_object()
-        self.assert_(isinstance(c, Comment))
+        self.assertTrue(isinstance(c, Comment))
         self.assertEqual(c.content_object, Article.objects.get(pk=1))
         self.assertEqual(c.comment, "This is my comment")
         c.save()

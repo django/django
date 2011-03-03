@@ -133,7 +133,7 @@ class CsrfMiddlewareTest(TestCase):
         self.assertNotEqual(resp_content, resp2.content)
         self._check_token_present(resp2, csrf_cookie.value)
         # Check the Vary header got patched correctly
-        self.assert_('Cookie' in resp2.get('Vary',''))
+        self.assertTrue('Cookie' in resp2.get('Vary',''))
 
     def test_process_response_for_exempt_view(self):
         """
@@ -210,7 +210,7 @@ class CsrfMiddlewareTest(TestCase):
         resp = post_form_response_non_html()
         resp_content = resp.content # needed because process_response modifies resp
         resp2 = CsrfMiddleware().process_response(req, resp)
-        self.assertEquals(resp_content, resp2.content)
+        self.assertEqual(resp_content, resp2.content)
 
     def test_process_response_exempt_view(self):
         """
@@ -223,7 +223,7 @@ class CsrfMiddlewareTest(TestCase):
         resp = view(req)
         resp_content = resp.content
         resp2 = CsrfMiddleware().process_response(req, resp)
-        self.assertEquals(resp_content, resp2.content)
+        self.assertEqual(resp_content, resp2.content)
 
     # Check the request processing
     def test_process_request_no_session_no_csrf_cookie(self):
@@ -233,7 +233,7 @@ class CsrfMiddlewareTest(TestCase):
         """
         req = self._get_POST_no_csrf_cookie_request()
         req2 = CsrfMiddleware().process_view(req, post_form_view, (), {})
-        self.assertEquals(403, req2.status_code)
+        self.assertEqual(403, req2.status_code)
 
     def test_process_request_csrf_cookie_no_token(self):
         """
@@ -242,7 +242,7 @@ class CsrfMiddlewareTest(TestCase):
         """
         req = self._get_POST_csrf_cookie_request()
         req2 = CsrfMiddleware().process_view(req, post_form_view, (), {})
-        self.assertEquals(403, req2.status_code)
+        self.assertEqual(403, req2.status_code)
 
     def test_process_request_csrf_cookie_and_token(self):
         """
@@ -250,7 +250,7 @@ class CsrfMiddlewareTest(TestCase):
         """
         req = self._get_POST_request_with_token()
         req2 = CsrfMiddleware().process_view(req, post_form_view, (), {})
-        self.assertEquals(None, req2)
+        self.assertEqual(None, req2)
 
     def test_process_request_session_cookie_no_csrf_cookie_token(self):
         """
@@ -262,7 +262,7 @@ class CsrfMiddlewareTest(TestCase):
         try:
             req = self._get_POST_session_request_with_token()
             req2 = CsrfMiddleware().process_view(req, post_form_view, (), {})
-            self.assertEquals(None, req2)
+            self.assertEqual(None, req2)
         finally:
             settings.SECRET_KEY = orig_secret_key
 
@@ -273,7 +273,7 @@ class CsrfMiddlewareTest(TestCase):
         """
         req = self._get_POST_session_request_no_token()
         req2 = CsrfMiddleware().process_view(req, post_form_view, (), {})
-        self.assertEquals(403, req2.status_code)
+        self.assertEqual(403, req2.status_code)
 
     def test_process_request_csrf_cookie_no_token_exempt_view(self):
         """
@@ -282,7 +282,7 @@ class CsrfMiddlewareTest(TestCase):
         """
         req = self._get_POST_csrf_cookie_request()
         req2 = CsrfMiddleware().process_view(req, csrf_exempt(post_form_view), (), {})
-        self.assertEquals(None, req2)
+        self.assertEqual(None, req2)
 
     def test_csrf_token_in_header(self):
         """
@@ -291,7 +291,7 @@ class CsrfMiddlewareTest(TestCase):
         req = self._get_POST_csrf_cookie_request()
         req.META['HTTP_X_CSRFTOKEN'] = self._csrf_id
         req2 = CsrfMiddleware().process_view(req, post_form_view, (), {})
-        self.assertEquals(None, req2)
+        self.assertEqual(None, req2)
 
     # Tests for the template tag method
     def test_token_node_no_csrf_cookie(self):
@@ -300,7 +300,7 @@ class CsrfMiddlewareTest(TestCase):
         """
         req = self._get_GET_no_csrf_cookie_request()
         resp = token_view(req)
-        self.assertEquals(u"", resp.content)
+        self.assertEqual(u"", resp.content)
 
     def test_token_node_empty_csrf_cookie(self):
         """
@@ -370,7 +370,7 @@ class CsrfMiddlewareTest(TestCase):
         req.META['HTTP_REFERER'] = 'https://www.evil.org/somepage'
         req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
         self.assertNotEqual(None, req2)
-        self.assertEquals(403, req2.status_code)
+        self.assertEqual(403, req2.status_code)
 
     def test_https_good_referer(self):
         """
@@ -381,4 +381,4 @@ class CsrfMiddlewareTest(TestCase):
         req.META['HTTP_HOST'] = 'www.example.com'
         req.META['HTTP_REFERER'] = 'https://www.example.com/somepage'
         req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
-        self.assertEquals(None, req2)
+        self.assertEqual(None, req2)

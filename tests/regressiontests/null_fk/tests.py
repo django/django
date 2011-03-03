@@ -17,8 +17,8 @@ class NullFkTests(TestCase):
         # that come after the NULLs, or else data that should exist won't). Regression
         # test for #7369.
         c = Comment.objects.select_related().get(id=1)
-        self.assertEquals(c.post, p)
-        self.assertEquals(Comment.objects.select_related().get(id=2).post, None)
+        self.assertEqual(c.post, p)
+        self.assertEqual(Comment.objects.select_related().get(id=2).post, None)
 
         self.assertQuerysetEqual(
             Comment.objects.select_related('post__forum__system_info').all(),

@@ -258,8 +258,8 @@ class AssertRedirectsTests(TestCase):
         self.assertRedirects(response, '/test_client_regress/no_template_view/',
             status_code=301, target_status_code=200)
 
-        self.assertEquals(len(response.redirect_chain), 1)
-        self.assertEquals(response.redirect_chain[0], ('http://testserver/test_client_regress/no_template_view/', 301))
+        self.assertEqual(len(response.redirect_chain), 1)
+        self.assertEqual(response.redirect_chain[0], ('http://testserver/test_client_regress/no_template_view/', 301))
 
     def test_multiple_redirect_chain(self):
         "You can follow a redirect chain of multiple redirects"
@@ -267,10 +267,10 @@ class AssertRedirectsTests(TestCase):
         self.assertRedirects(response, '/test_client_regress/no_template_view/',
             status_code=301, target_status_code=200)
 
-        self.assertEquals(len(response.redirect_chain), 3)
-        self.assertEquals(response.redirect_chain[0], ('http://testserver/test_client_regress/redirects/further/', 301))
-        self.assertEquals(response.redirect_chain[1], ('http://testserver/test_client_regress/redirects/further/more/', 301))
-        self.assertEquals(response.redirect_chain[2], ('http://testserver/test_client_regress/no_template_view/', 301))
+        self.assertEqual(len(response.redirect_chain), 3)
+        self.assertEqual(response.redirect_chain[0], ('http://testserver/test_client_regress/redirects/further/', 301))
+        self.assertEqual(response.redirect_chain[1], ('http://testserver/test_client_regress/redirects/further/more/', 301))
+        self.assertEqual(response.redirect_chain[2], ('http://testserver/test_client_regress/no_template_view/', 301))
 
     def test_redirect_chain_to_non_existent(self):
         "You can follow a chain to a non-existent view"
@@ -284,7 +284,7 @@ class AssertRedirectsTests(TestCase):
         # The chain of redirects stops once the cycle is detected.
         self.assertRedirects(response, '/test_client_regress/redirect_to_self/',
             status_code=301, target_status_code=301)
-        self.assertEquals(len(response.redirect_chain), 2)
+        self.assertEqual(len(response.redirect_chain), 2)
 
     def test_circular_redirect(self):
         "Circular redirect chains are caught and escaped"
@@ -292,7 +292,7 @@ class AssertRedirectsTests(TestCase):
         # The chain of redirects will get back to the starting point, but stop there.
         self.assertRedirects(response, '/test_client_regress/circular_redirect_2/',
             status_code=301, target_status_code=301)
-        self.assertEquals(len(response.redirect_chain), 4)
+        self.assertEqual(len(response.redirect_chain), 4)
 
     def test_redirect_chain_post(self):
         "A redirect chain will be followed from an initial POST post"
@@ -300,7 +300,7 @@ class AssertRedirectsTests(TestCase):
             {'nothing': 'to_send'}, follow=True)
         self.assertRedirects(response,
             '/test_client_regress/no_template_view/', 301, 200)
-        self.assertEquals(len(response.redirect_chain), 3)
+        self.assertEqual(len(response.redirect_chain), 3)
 
     def test_redirect_chain_head(self):
         "A redirect chain will be followed from an initial HEAD request"
@@ -308,7 +308,7 @@ class AssertRedirectsTests(TestCase):
             {'nothing': 'to_send'}, follow=True)
         self.assertRedirects(response,
             '/test_client_regress/no_template_view/', 301, 200)
-        self.assertEquals(len(response.redirect_chain), 3)
+        self.assertEqual(len(response.redirect_chain), 3)
 
     def test_redirect_chain_options(self):
         "A redirect chain will be followed from an initial OPTIONS request"
@@ -316,7 +316,7 @@ class AssertRedirectsTests(TestCase):
             {'nothing': 'to_send'}, follow=True)
         self.assertRedirects(response,
             '/test_client_regress/no_template_view/', 301, 200)
-        self.assertEquals(len(response.redirect_chain), 3)
+        self.assertEqual(len(response.redirect_chain), 3)
 
     def test_redirect_chain_put(self):
         "A redirect chain will be followed from an initial PUT request"
@@ -324,7 +324,7 @@ class AssertRedirectsTests(TestCase):
             {'nothing': 'to_send'}, follow=True)
         self.assertRedirects(response,
             '/test_client_regress/no_template_view/', 301, 200)
-        self.assertEquals(len(response.redirect_chain), 3)
+        self.assertEqual(len(response.redirect_chain), 3)
 
     def test_redirect_chain_delete(self):
         "A redirect chain will be followed from an initial DELETE request"
@@ -332,7 +332,7 @@ class AssertRedirectsTests(TestCase):
             {'nothing': 'to_send'}, follow=True)
         self.assertRedirects(response,
             '/test_client_regress/no_template_view/', 301, 200)
-        self.assertEquals(len(response.redirect_chain), 3)
+        self.assertEqual(len(response.redirect_chain), 3)
 
     def test_redirect_chain_on_non_redirect_page(self):
         "An assertion is raised if the original page couldn't be retrieved as expected"
@@ -605,7 +605,7 @@ class UrlconfSubstitutionTests(TestCase):
     def test_urlconf_was_changed(self):
         "TestCase can enforce a custom URLconf on a per-test basis"
         url = reverse('arg_view', args=['somename'])
-        self.assertEquals(url, '/arg_view/somename/')
+        self.assertEqual(url, '/arg_view/somename/')
 
 # This test needs to run *after* UrlconfSubstitutionTests; the zz prefix in the
 # name is to ensure alphabetical ordering.
@@ -613,7 +613,7 @@ class zzUrlconfSubstitutionTests(TestCase):
     def test_urlconf_was_reverted(self):
         "URLconf is reverted to original value after modification in a TestCase"
         url = reverse('arg_view', args=['somename'])
-        self.assertEquals(url, '/test_client_regress/arg_view/somename/')
+        self.assertEqual(url, '/test_client_regress/arg_view/somename/')
 
 class ContextTests(TestCase):
     fixtures = ['testdata']
@@ -631,7 +631,7 @@ class ContextTests(TestCase):
             response.context['does-not-exist']
             self.fail('Should not be able to retrieve non-existent key')
         except KeyError, e:
-            self.assertEquals(e.args[0], 'does-not-exist')
+            self.assertEqual(e.args[0], 'does-not-exist')
 
     def test_inherited_context(self):
         "Context variables can be retrieved from a list of contexts"
@@ -647,7 +647,7 @@ class ContextTests(TestCase):
             response.context['does-not-exist']
             self.fail('Should not be able to retrieve non-existent key')
         except KeyError, e:
-            self.assertEquals(e.args[0], 'does-not-exist')
+            self.assertEqual(e.args[0], 'does-not-exist')
 
     def test_15368(self):
         # Need to insert a context processor that assumes certain things about
@@ -868,13 +868,13 @@ class RequestHeadersTest(TestCase):
     def test_client_headers(self):
         "A test client can receive custom headers"
         response = self.client.get("/test_client_regress/check_headers/", HTTP_X_ARG_CHECK='Testing 123')
-        self.assertEquals(response.content, "HTTP_X_ARG_CHECK: Testing 123")
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.content, "HTTP_X_ARG_CHECK: Testing 123")
+        self.assertEqual(response.status_code, 200)
 
     def test_client_headers_redirect(self):
         "Test client headers are preserved through redirects"
         response = self.client.get("/test_client_regress/check_headers_redirect/", follow=True, HTTP_X_ARG_CHECK='Testing 123')
-        self.assertEquals(response.content, "HTTP_X_ARG_CHECK: Testing 123")
+        self.assertEqual(response.content, "HTTP_X_ARG_CHECK: Testing 123")
         self.assertRedirects(response, '/test_client_regress/check_headers/',
             status_code=301, target_status_code=200)
 

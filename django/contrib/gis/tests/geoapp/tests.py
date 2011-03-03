@@ -133,11 +133,11 @@ class GeoModelTest(TestCase):
             # No precision parameter for Oracle :-/
             gml_regex = re.compile(r'^<gml:Point srsName="SDO:4326" xmlns:gml="http://www.opengis.net/gml"><gml:coordinates decimal="\." cs="," ts=" ">-104.60925\d+,38.25500\d+ </gml:coordinates></gml:Point>')
             for ptown in [ptown1, ptown2]:
-                self.failUnless(gml_regex.match(ptown.gml))
+                self.assertTrue(gml_regex.match(ptown.gml))
         else:
             gml_regex = re.compile(r'^<gml:Point srsName="EPSG:4326"><gml:coordinates>-104\.60925\d+,38\.255001</gml:coordinates></gml:Point>')
             for ptown in [ptown1, ptown2]:
-                self.failUnless(gml_regex.match(ptown.gml))
+                self.assertTrue(gml_regex.match(ptown.gml))
 
     def test03c_geojson(self):
         "Testing GeoJSON output from the database using GeoQuerySet.geojson()."
@@ -678,15 +678,15 @@ class GeoModelTest(TestCase):
 
         # SELECT AsText(ST_SnapToGrid("geoapp_country"."mpoly", 0.1)) FROM "geoapp_country" WHERE "geoapp_country"."name" = 'San Marino';
         ref = fromstr('MULTIPOLYGON(((12.4 44,12.5 44,12.5 43.9,12.4 43.9,12.4 44)))')
-        self.failUnless(ref.equals_exact(Country.objects.snap_to_grid(0.1).get(name='San Marino').snap_to_grid, tol))
+        self.assertTrue(ref.equals_exact(Country.objects.snap_to_grid(0.1).get(name='San Marino').snap_to_grid, tol))
 
         # SELECT AsText(ST_SnapToGrid("geoapp_country"."mpoly", 0.05, 0.23)) FROM "geoapp_country" WHERE "geoapp_country"."name" = 'San Marino';
         ref = fromstr('MULTIPOLYGON(((12.4 43.93,12.45 43.93,12.5 43.93,12.45 43.93,12.4 43.93)))')
-        self.failUnless(ref.equals_exact(Country.objects.snap_to_grid(0.05, 0.23).get(name='San Marino').snap_to_grid, tol))
+        self.assertTrue(ref.equals_exact(Country.objects.snap_to_grid(0.05, 0.23).get(name='San Marino').snap_to_grid, tol))
 
         # SELECT AsText(ST_SnapToGrid("geoapp_country"."mpoly", 0.5, 0.17, 0.05, 0.23)) FROM "geoapp_country" WHERE "geoapp_country"."name" = 'San Marino';
         ref = fromstr('MULTIPOLYGON(((12.4 43.87,12.45 43.87,12.45 44.1,12.5 44.1,12.5 43.87,12.45 43.87,12.4 43.87)))')
-        self.failUnless(ref.equals_exact(Country.objects.snap_to_grid(0.05, 0.23, 0.5, 0.17).get(name='San Marino').snap_to_grid, tol))
+        self.assertTrue(ref.equals_exact(Country.objects.snap_to_grid(0.05, 0.23, 0.5, 0.17).get(name='San Marino').snap_to_grid, tol))
 
     @no_mysql
     @no_spatialite

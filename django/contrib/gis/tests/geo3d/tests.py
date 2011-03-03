@@ -72,7 +72,7 @@ class Geo3DTest(TestCase):
             pnt = Point(x, y, z, srid=4326)
             City3D.objects.create(name=name, point=pnt)
             city = City3D.objects.get(name=name)
-            self.failUnless(city.point.hasz)
+            self.assertTrue(city.point.hasz)
             self.assertEqual(z, city.point.z)
 
         # Interstate (2D / 3D and Geographic/Projected variants)
@@ -93,7 +93,7 @@ class Geo3DTest(TestCase):
             interstate = Interstate3D.objects.get(name=name)
             interstate_proj = InterstateProj3D.objects.get(name=name)
             for i in [interstate, interstate_proj]:
-                self.failUnless(i.line.hasz)
+                self.assertTrue(i.line.hasz)
                 self.assertEqual(exp_z, tuple(i.line.z))
 
         # Creating 3D Polygon.
@@ -101,7 +101,7 @@ class Geo3DTest(TestCase):
         Polygon2D.objects.create(name='2D BBox', poly=bbox2d)
         Polygon3D.objects.create(name='3D BBox', poly=bbox3d)
         p3d = Polygon3D.objects.get(name='3D BBox')
-        self.failUnless(p3d.poly.hasz)
+        self.assertTrue(p3d.poly.hasz)
         self.assertEqual(bbox3d, p3d.poly)
 
     def test01a_3d_layermapping(self):
@@ -138,7 +138,7 @@ class Geo3DTest(TestCase):
         # KML should be 3D.
         # `SELECT ST_AsKML(point, 6) FROM geo3d_city3d WHERE name = 'Houston';`
         ref_kml_regex = re.compile(r'^<Point><coordinates>-95.363\d+,29.763\d+,18</coordinates></Point>$')
-        self.failUnless(ref_kml_regex.match(h.kml))
+        self.assertTrue(ref_kml_regex.match(h.kml))
 
     def test02b_geojson(self):
         "Test GeoQuerySet.geojson() with Z values."
@@ -146,7 +146,7 @@ class Geo3DTest(TestCase):
         # GeoJSON should be 3D
         # `SELECT ST_AsGeoJSON(point, 6) FROM geo3d_city3d WHERE name='Houston';`
         ref_json_regex = re.compile(r'^{"type":"Point","coordinates":\[-95.363151,29.763374,18(\.0+)?\]}$')
-        self.failUnless(ref_json_regex.match(h.geojson))
+        self.assertTrue(ref_json_regex.match(h.geojson))
 
     def test03a_union(self):
         "Testing the Union aggregate of 3D models."
@@ -155,7 +155,7 @@ class Geo3DTest(TestCase):
         ref_ewkt = 'SRID=4326;MULTIPOINT(-123.305196 48.462611 15,-104.609252 38.255001 1433,-97.521157 34.464642 380,-96.801611 32.782057 147,-95.363151 29.763374 18,-95.23506 38.971823 251,-87.650175 41.850385 181,174.783117 -41.315268 14)'
         ref_union = GEOSGeometry(ref_ewkt)
         union = City3D.objects.aggregate(Union('point'))['point__union']
-        self.failUnless(union.hasz)
+        self.assertTrue(union.hasz)
         self.assertEqual(ref_union, union)
 
     def test03b_extent(self):

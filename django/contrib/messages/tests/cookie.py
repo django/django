@@ -83,7 +83,7 @@ class CookieTest(BaseTest):
         self.assertEqual(cookie_storing, 4)
 
         self.assertEqual(len(unstored_messages), 1)
-        self.assert_(unstored_messages[0].message == '0' * msg_size)
+        self.assertTrue(unstored_messages[0].message == '0' * msg_size)
 
     def test_json_encoder_decoder(self):
         """

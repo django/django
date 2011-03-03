@@ -166,7 +166,7 @@ class SimpleTemplateResponseTest(BaseTemplateResponseTest):
         # When the content is rendered, all the callbacks are invoked, too.
         response.render()
         self.assertEqual('First template\n', response.content)
-        self.assertEquals(post, ['post1','post2'])
+        self.assertEqual(post, ['post1','post2'])
 
 
     def test_pickling(self):
@@ -184,9 +184,9 @@ class SimpleTemplateResponseTest(BaseTemplateResponseTest):
         pickled_response = pickle.dumps(response)
         unpickled_response = pickle.loads(pickled_response)
 
-        self.assertEquals(unpickled_response.content, response.content)
-        self.assertEquals(unpickled_response['content-type'], response['content-type'])
-        self.assertEquals(unpickled_response.status_code, response.status_code)
+        self.assertEqual(unpickled_response.content, response.content)
+        self.assertEqual(unpickled_response['content-type'], response['content-type'])
+        self.assertEqual(unpickled_response.status_code, response.status_code)
 
         # ...and the unpickled reponse doesn't have the
         # template-related attributes, so it can't be re-rendered
@@ -249,9 +249,9 @@ class TemplateResponseTest(BaseTemplateResponseTest):
         pickled_response = pickle.dumps(response)
         unpickled_response = pickle.loads(pickled_response)
 
-        self.assertEquals(unpickled_response.content, response.content)
-        self.assertEquals(unpickled_response['content-type'], response['content-type'])
-        self.assertEquals(unpickled_response.status_code, response.status_code)
+        self.assertEqual(unpickled_response.content, response.content)
+        self.assertEqual(unpickled_response['content-type'], response['content-type'])
+        self.assertEqual(unpickled_response.status_code, response.status_code)
 
         # ...and the unpickled reponse doesn't have the
         # template-related attributes, so it can't be re-rendered

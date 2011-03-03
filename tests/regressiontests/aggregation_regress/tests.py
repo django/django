@@ -480,21 +480,21 @@ class AggregationTests(TestCase):
         # age is a field on Author, so it shouldn't be allowed as an aggregate.
         # But age isn't included in the ValuesQuerySet, so it is.
         results = Author.objects.values('name').annotate(age=Count('book_contact_set')).order_by('name')
-        self.assertEquals(len(results), 9)
-        self.assertEquals(results[0]['name'], u'Adrian Holovaty')
-        self.assertEquals(results[0]['age'], 1)
+        self.assertEqual(len(results), 9)
+        self.assertEqual(results[0]['name'], u'Adrian Holovaty')
+        self.assertEqual(results[0]['age'], 1)
 
         # Same problem, but aggregating over m2m fields
         results = Author.objects.values('name').annotate(age=Avg('friends__age')).order_by('name')
-        self.assertEquals(len(results), 9)
-        self.assertEquals(results[0]['name'], u'Adrian Holovaty')
-        self.assertEquals(results[0]['age'], 32.0)
+        self.assertEqual(len(results), 9)
+        self.assertEqual(results[0]['name'], u'Adrian Holovaty')
+        self.assertEqual(results[0]['age'], 32.0)
 
         # Same problem, but colliding with an m2m field
         results = Author.objects.values('name').annotate(friends=Count('friends')).order_by('name')
-        self.assertEquals(len(results), 9)
-        self.assertEquals(results[0]['name'], u'Adrian Holovaty')
-        self.assertEquals(results[0]['friends'], 2)
+        self.assertEqual(len(results), 9)
+        self.assertEqual(results[0]['name'], u'Adrian Holovaty')
+        self.assertEqual(results[0]['friends'], 2)
 
     def test_reverse_relation_name_conflict(self):
         # Regression for #11256 - providing an aggregate name that conflicts with a reverse-related name on the model raises ValueError

@@ -12,14 +12,14 @@ class SmartIfTests(unittest.TestCase):
     def test_not(self):
         var = IfParser(["not", False]).parse()
         self.assertEqual("(not (literal False))", repr(var))
-        self.assert_(var.eval({}))
+        self.assertTrue(var.eval({}))
 
         self.assertFalse(IfParser(["not", True]).parse().eval({}))
 
     def test_or(self):
         var = IfParser([True, "or", False]).parse()
         self.assertEqual("(or (literal True) (literal False))", repr(var))
-        self.assert_(var.eval({}))
+        self.assertTrue(var.eval({}))
 
     def test_in(self):
         list_ = [1,2,3]

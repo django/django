@@ -40,7 +40,7 @@ class SitemapTests(TestCase):
         # Retrieve the sitemap.
         response = self.client.get('/simple/index.xml')
         # Check for all the important bits:
-        self.assertEquals(response.content, """<?xml version="1.0" encoding="UTF-8"?>
+        self.assertEqual(response.content, """<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <sitemap><loc>%s/simple/sitemap-simple.xml</loc></sitemap>
 </sitemapindex>
@@ -51,7 +51,7 @@ class SitemapTests(TestCase):
         # Retrieve the sitemap.
         response = self.client.get('/simple/custom-index.xml')
         # Check for all the important bits:
-        self.assertEquals(response.content, """<?xml version="1.0" encoding="UTF-8"?>
+        self.assertEqual(response.content, """<?xml version="1.0" encoding="UTF-8"?>
 <!-- This is a customised template -->
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <sitemap><loc>%s/simple/sitemap-simple.xml</loc></sitemap>
@@ -63,7 +63,7 @@ class SitemapTests(TestCase):
         # Retrieve the sitemap.
         response = self.client.get('/simple/sitemap.xml')
         # Check for all the important bits:
-        self.assertEquals(response.content, """<?xml version="1.0" encoding="UTF-8"?>
+        self.assertEqual(response.content, """<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url><loc>%s/location/</loc><lastmod>%s</lastmod><changefreq>never</changefreq><priority>0.5</priority></url>
 </urlset>
@@ -74,7 +74,7 @@ class SitemapTests(TestCase):
         # Retrieve the sitemap.
         response = self.client.get('/simple/custom-sitemap.xml')
         # Check for all the important bits:
-        self.assertEquals(response.content, """<?xml version="1.0" encoding="UTF-8"?>
+        self.assertEqual(response.content, """<?xml version="1.0" encoding="UTF-8"?>
 <!-- This is a customised template -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url><loc>%s/location/</loc><lastmod>%s</lastmod><changefreq>never</changefreq><priority>0.5</priority></url>
@@ -105,7 +105,7 @@ class SitemapTests(TestCase):
         for username in User.objects.values_list("username", flat=True):
             expected += "<url><loc>%s/users/%s/</loc></url>" % (self.base_url, username)
         # Check for all the important bits:
-        self.assertEquals(response.content, """<?xml version="1.0" encoding="UTF-8"?>
+        self.assertEqual(response.content, """<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 %s
 </urlset>
@@ -148,7 +148,7 @@ class SitemapTests(TestCase):
         # Retrieve the sitemap.
         response = self.client.get('/simple/sitemap.xml')
         # Check for all the important bits:
-        self.assertEquals(response.content, """<?xml version="1.0" encoding="UTF-8"?>
+        self.assertEqual(response.content, """<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url><loc>http://testserver/location/</loc><lastmod>%s</lastmod><changefreq>never</changefreq><priority>0.5</priority></url>
 </urlset>

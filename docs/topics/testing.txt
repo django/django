@@ -1079,7 +1079,7 @@ The following is a simple unit test using the request factory::
 
             # Test my_view() as if it were deployed at /customer/details
             response = my_view(request)
-            self.assertEquals(response.status_code, 200)
+            self.assertEqual(response.status_code, 200)
 
 TestCase
 --------

@@ -155,7 +155,7 @@ class CommentViewTests(CommentTestCase):
         # callback
         def receive(sender, **kwargs):
             self.assertEqual(kwargs['comment'].comment, "This is my comment")
-            self.assert_('request' in kwargs)
+            self.assertTrue('request' in kwargs)
             received_signals.append(kwargs.get('signal'))
 
         # Connect signals and keep track of handled ones
@@ -269,7 +269,7 @@ class CommentViewTests(CommentTestCase):
         response = self.client.post("/post/", data)
         location = response["Location"]
         match = re.search(r"^http://testserver/somewhere/else/\?foo=bar&c=\d+#baz$", location)
-        self.failUnless(match != None, "Unexpected redirect location: %s" % location)
+        self.assertTrue(match != None, "Unexpected redirect location: %s" % location)
 
         # Without a query string
         a = Article.objects.get(pk=1)
@@ -279,4 +279,4 @@ class CommentViewTests(CommentTestCase):
         response = self.client.post("/post/", data)
         location = response["Location"]
         match = re.search(r"^http://testserver/somewhere/else/\?c=\d+#baz$", location)
-        self.failUnless(match != None, "Unexpected redirect location: %s" % location)
+        self.assertTrue(match != None, "Unexpected redirect location: %s" % location)

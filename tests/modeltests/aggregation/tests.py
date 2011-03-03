@@ -41,7 +41,7 @@ class BaseAggregateTestCase(TestCase):
 
         vals = Book.objects.aggregate(Sum("publisher__num_awards"))
         self.assertEqual(len(vals), 1)
-        self.assertEquals(vals["publisher__num_awards__sum"], 30)
+        self.assertEqual(vals["publisher__num_awards__sum"], 30)
 
         vals = Publisher.objects.aggregate(Sum("book__price"))
         self.assertEqual(len(vals), 1)

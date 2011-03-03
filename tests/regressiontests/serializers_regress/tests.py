@@ -381,7 +381,7 @@ def serializerTest(format, self):
     # Assert that the number of objects deserialized is the
     # same as the number that was serialized.
     for klass, count in instance_count.items():
-        self.assertEquals(count, klass.objects.count())
+        self.assertEqual(count, klass.objects.count())
 
 def fieldsTest(format, self):
     obj = ComplexModel(field1='first', field2='second', field3='third')

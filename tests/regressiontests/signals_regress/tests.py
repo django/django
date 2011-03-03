@@ -67,19 +67,19 @@ class SignalsRegressTests(TestCase):
                         len(models.signals.pre_delete.receivers),
                         len(models.signals.post_delete.receivers))
 
-        self.assertEquals(self.pre_signals, post_signals)
+        self.assertEqual(self.pre_signals, post_signals)
 
     def test_model_signals(self):
         """ Model saves should throw some signals. """
         a1 = Author(name='Neal Stephenson')
-        self.assertEquals(self.get_signal_output(a1.save), [
+        self.assertEqual(self.get_signal_output(a1.save), [
             "pre_save signal, Neal Stephenson",
             "post_save signal, Neal Stephenson",
             "Is created"
         ])
 
         b1 = Book(name='Snow Crash')
-        self.assertEquals(self.get_signal_output(b1.save), [
+        self.assertEqual(self.get_signal_output(b1.save), [
             "pre_save signal, Snow Crash",
             "post_save signal, Snow Crash",
             "Is created"
@@ -92,5 +92,5 @@ class SignalsRegressTests(TestCase):
         self.get_signal_output(b1.save)
         a1 = Author(name='Neal Stephenson')
         self.get_signal_output(a1.save)
-        self.assertEquals(self.get_signal_output(setattr, b1, 'authors', [a1]), [])
-        self.assertEquals(self.get_signal_output(setattr, b1, 'authors', []), [])
+        self.assertEqual(self.get_signal_output(setattr, b1, 'authors', [a1]), [])
+        self.assertEqual(self.get_signal_output(setattr, b1, 'authors', []), [])

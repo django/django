@@ -13,27 +13,27 @@ class CustomFilterTests(TestCase):
 
 class CustomTagTests(TestCase):
     def verify_tag(self, tag, name):
-        self.assertEquals(tag.__name__, name)
-        self.assertEquals(tag.__doc__, 'Expected %s __doc__' % name)
-        self.assertEquals(tag.__dict__['anything'], 'Expected %s __dict__' % name)
+        self.assertEqual(tag.__name__, name)
+        self.assertEqual(tag.__doc__, 'Expected %s __doc__' % name)
+        self.assertEqual(tag.__dict__['anything'], 'Expected %s __dict__' % name)
 
     def test_simple_tags(self):
         c = template.Context({'value': 42})
 
         t = template.Template('{% load custom %}{% no_params %}')
-        self.assertEquals(t.render(c), u'no_params - Expected result')
+        self.assertEqual(t.render(c), u'no_params - Expected result')
 
         t = template.Template('{% load custom %}{% one_param 37 %}')
-        self.assertEquals(t.render(c), u'one_param - Expected result: 37')
+        self.assertEqual(t.render(c), u'one_param - Expected result: 37')
 
         t = template.Template('{% load custom %}{% explicit_no_context 37 %}')
-        self.assertEquals(t.render(c), u'explicit_no_context - Expected result: 37')
+        self.assertEqual(t.render(c), u'explicit_no_context - Expected result: 37')
 
         t = template.Template('{% load custom %}{% no_params_with_context %}')
-        self.assertEquals(t.render(c), u'no_params_with_context - Expected result (context value: 42)')
+        self.assertEqual(t.render(c), u'no_params_with_context - Expected result (context value: 42)')
 
         t = template.Template('{% load custom %}{% params_and_context 37 %}')
-        self.assertEquals(t.render(c), u'params_and_context - Expected result (context value: 42): 37')
+        self.assertEqual(t.render(c), u'params_and_context - Expected result (context value: 42): 37')
 
     def test_simple_tag_registration(self):
         # Test that the decorators preserve the decorated function's docstring, name and attributes.

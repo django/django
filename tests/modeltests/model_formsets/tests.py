@@ -946,7 +946,7 @@ class ModelFormsetTest(TestCase):
         # default. This is required to ensure the value is tested for change correctly
         # when determine what extra forms have changed to save.
 
-        self.assertEquals(len(formset.forms), 1) # this formset only has one form
+        self.assertEqual(len(formset.forms), 1) # this formset only has one form
         form = formset.forms[0]
         now = form.fields['date_joined'].initial()
         result = form.as_p()

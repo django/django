@@ -141,18 +141,18 @@ def create_simple_test_method(validator, expected, value, num):
 class TestSimpleValidators(TestCase):
     def test_single_message(self):
         v = ValidationError('Not Valid')
-        self.assertEquals(str(v), "[u'Not Valid']")
-        self.assertEquals(repr(v), "ValidationError([u'Not Valid'])")
+        self.assertEqual(str(v), "[u'Not Valid']")
+        self.assertEqual(repr(v), "ValidationError([u'Not Valid'])")
 
     def test_message_list(self):
         v = ValidationError(['First Problem', 'Second Problem'])
-        self.assertEquals(str(v), "[u'First Problem', u'Second Problem']")
-        self.assertEquals(repr(v), "ValidationError([u'First Problem', u'Second Problem'])")
+        self.assertEqual(str(v), "[u'First Problem', u'Second Problem']")
+        self.assertEqual(repr(v), "ValidationError([u'First Problem', u'Second Problem'])")
 
     def test_message_dict(self):
         v = ValidationError({'first': 'First Problem'})
-        self.assertEquals(str(v), "{'first': 'First Problem'}")
-        self.assertEquals(repr(v), "ValidationError({'first': 'First Problem'})")
+        self.assertEqual(str(v), "{'first': 'First Problem'}")
+        self.assertEqual(repr(v), "ValidationError({'first': 'First Problem'})")
 
 test_counter = 0
 for validator, value, expected in TEST_DATA:

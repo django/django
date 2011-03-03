@@ -24,7 +24,7 @@ class NestedObjectsTests(TestCase):
         self.objs = [Count.objects.create(num=i) for i in range(5)]
 
     def _check(self, target):
-        self.assertEquals(self.n.nested(lambda obj: obj.num), target)
+        self.assertEqual(self.n.nested(lambda obj: obj.num), target)
 
     def _connect(self, i, j):
         self.objs[i].parent = self.objs[j]
@@ -146,24 +146,24 @@ class UtilTests(unittest.TestCase):
         """
         Tests for label_for_field
         """
-        self.assertEquals(
+        self.assertEqual(
             label_for_field("title", Article),
             "title"
         )
-        self.assertEquals(
+        self.assertEqual(
             label_for_field("title2", Article),
             "another name"
         )
-        self.assertEquals(
+        self.assertEqual(
             label_for_field("title2", Article, return_attr=True),
             ("another name", None)
         )
 
-        self.assertEquals(
+        self.assertEqual(
             label_for_field("__unicode__", Article),
             "article"
         )
-        self.assertEquals(
+        self.assertEqual(
             label_for_field("__str__", Article),
             "article"
         )
@@ -175,29 +175,29 @@ class UtilTests(unittest.TestCase):
 
         def test_callable(obj):
             return "nothing"
-        self.assertEquals(
+        self.assertEqual(
             label_for_field(test_callable, Article),
             "Test callable"
         )
-        self.assertEquals(
+        self.assertEqual(
             label_for_field(test_callable, Article, return_attr=True),
             ("Test callable", test_callable)
         )
 
-        self.assertEquals(
+        self.assertEqual(
             label_for_field("test_from_model", Article),
             "Test from model"
         )
-        self.assertEquals(
+        self.assertEqual(
             label_for_field("test_from_model", Article, return_attr=True),
             ("Test from model", Article.test_from_model)
         )
-        self.assertEquals(
+        self.assertEqual(
             label_for_field("test_from_model_with_override", Article),
             "not What you Expect"
         )
 
-        self.assertEquals(
+        self.assertEqual(
             label_for_field(lambda x: "nothing", Article),
             "--"
         )
@@ -207,11 +207,11 @@ class UtilTests(unittest.TestCase):
                 return "nothing"
             test_from_model.short_description = "not Really the Model"
 
-        self.assertEquals(
+        self.assertEqual(
             label_for_field("test_from_model", Article, model_admin=MockModelAdmin),
             "not Really the Model"
         )
-        self.assertEquals(
+        self.assertEqual(
             label_for_field("test_from_model", Article,
                 model_admin = MockModelAdmin,
                 return_attr = True
@@ -223,15 +223,15 @@ class UtilTests(unittest.TestCase):
         """
         Regression test for #13963
         """
-        self.assertEquals(
+        self.assertEqual(
             label_for_field('location', Event, return_attr=True),
             ('location', None),
         )
-        self.assertEquals(
+        self.assertEqual(
             label_for_field('event', Location, return_attr=True),
             ('awesome event', None),
         )
-        self.assertEquals(
+        self.assertEqual(
             label_for_field('guest', Event, return_attr=True),
             ('awesome guest', None),
         )

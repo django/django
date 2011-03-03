@@ -11,7 +11,7 @@ class InheritanceSameModelNameTests(TestCase):
 
     def test_inheritance_related_name(self):
         from modeltests.model_inheritance.models import Copy
-        self.assertEquals(
+        self.assertEqual(
             self.title.attached_model_inheritance_copy_set.create(
                 content='Save $ on V1agr@',
                 url='http://v1agra.com/',
@@ -20,7 +20,7 @@ class InheritanceSameModelNameTests(TestCase):
 
     def test_inheritance_with_same_model_name(self):
         from modeltests.model_inheritance_same_model_name.models import Copy
-        self.assertEquals(
+        self.assertEqual(
             self.title.attached_model_inheritance_same_model_name_copy_set.create(
                 content='The Web framework for perfectionists with deadlines.',
                 url='http://www.djangoproject.com/',

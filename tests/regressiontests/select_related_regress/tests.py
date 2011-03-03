@@ -27,16 +27,16 @@ class SelectRelatedRegressTests(TestCase):
         c2=Connection.objects.create(start=port2, end=port3)
 
         connections=Connection.objects.filter(start__device__building=b, end__device__building=b).order_by('id')
-        self.assertEquals([(c.id, unicode(c.start), unicode(c.end)) for c in connections],
+        self.assertEqual([(c.id, unicode(c.start), unicode(c.end)) for c in connections],
             [(1, u'router/4', u'switch/7'), (2, u'switch/7', u'server/1')])
 
         connections=Connection.objects.filter(start__device__building=b, end__device__building=b).select_related().order_by('id')
-        self.assertEquals([(c.id, unicode(c.start), unicode(c.end)) for c in connections],
+        self.assertEqual([(c.id, unicode(c.start), unicode(c.end)) for c in connections],
             [(1, u'router/4', u'switch/7'), (2, u'switch/7', u'server/1')])
 
         # This final query should only join seven tables (port, device and building
         # twice each, plus connection once).
-        self.assertEquals(connections.query.count_active_tables(), 7)
+        self.assertEqual(connections.query.count_active_tables(), 7)
 
 
     def test_regression_8106(self):
@@ -58,8 +58,8 @@ class SelectRelatedRegressTests(TestCase):
         e = Enrollment.objects.create(std=s, cls=c)
 
         e_related = Enrollment.objects.all().select_related()[0]
-        self.assertEquals(e_related.std.person.user.name, u"std")
-        self.assertEquals(e_related.cls.org.person.user.name, u"org")
+        self.assertEqual(e_related.std.person.user.name, u"std")
+        self.assertEqual(e_related.cls.org.person.user.name, u"org")
 
     def test_regression_8036(self):
         """
@@ -75,13 +75,13 @@ class SelectRelatedRegressTests(TestCase):
         active = ClientStatus.objects.create(name='active')
         client = Client.objects.create(name='client', status=active)
 
-        self.assertEquals(client.status, active)
-        self.assertEquals(Client.objects.select_related()[0].status, active)
-        self.assertEquals(Client.objects.select_related('state')[0].status, active)
-        self.assertEquals(Client.objects.select_related('state', 'status')[0].status, active)
-        self.assertEquals(Client.objects.select_related('state__country')[0].status, active)
-        self.assertEquals(Client.objects.select_related('state__country', 'status')[0].status, active)
-        self.assertEquals(Client.objects.select_related('status')[0].status, active)
+        self.assertEqual(client.status, active)
+        self.assertEqual(Client.objects.select_related()[0].status, active)
+        self.assertEqual(Client.objects.select_related('state')[0].status, active)
+        self.assertEqual(Client.objects.select_related('state', 'status')[0].status, active)
+        self.assertEqual(Client.objects.select_related('state__country')[0].status, active)
+        self.assertEqual(Client.objects.select_related('state__country', 'status')[0].status, active)
+        self.assertEqual(Client.objects.select_related('status')[0].status, active)
 
     def test_multi_table_inheritance(self):
         """ Exercising select_related() with multi-table model inheritance. """
@@ -108,27 +108,27 @@ class SelectRelatedRegressTests(TestCase):
         c1 = Client.objects.create(name='Brian Burke', state=wa, status=active)
         burke = Client.objects.select_related('state').defer('state__name').get(name='Brian Burke')
 
-        self.assertEquals(burke.name, u'Brian Burke')
-        self.assertEquals(burke.state.name, u'Western Australia')
+        self.assertEqual(burke.name, u'Brian Burke')
+        self.assertEqual(burke.state.name, u'Western Australia')
 
         # Still works if we're dealing with an inherited class
         sc1 = SpecialClient.objects.create(name='Troy Buswell', state=wa, status=active, value=42)
         troy = SpecialClient.objects.select_related('state').defer('state__name').get(name='Troy Buswell')
 
-        self.assertEquals(troy.name, u'Troy Buswell')
-        self.assertEquals(troy.value, 42)
-        self.assertEquals(troy.state.name, u'Western Australia')
+        self.assertEqual(troy.name, u'Troy Buswell')
+        self.assertEqual(troy.value, 42)
+        self.assertEqual(troy.state.name, u'Western Australia')
 
         # Still works if we defer an attribute on the inherited class
         troy = SpecialClient.objects.select_related('state').defer('value', 'state__name').get(name='Troy Buswell')
 
-        self.assertEquals(troy.name, u'Troy Buswell')
-        self.assertEquals(troy.value, 42)
-        self.assertEquals(troy.state.name, u'Western Australia')
+        self.assertEqual(troy.name, u'Troy Buswell')
+        self.assertEqual(troy.value, 42)
+        self.assertEqual(troy.state.name, u'Western Australia')
 
         # Also works if you use only, rather than defer
         troy = SpecialClient.objects.select_related('state').only('name').get(name='Troy Buswell')
 
-        self.assertEquals(troy.name, u'Troy Buswell')
-        self.assertEquals(troy.value, 42)
-        self.assertEquals(troy.state.name, u'Western Australia')
+        self.assertEqual(troy.name, u'Troy Buswell')
+        self.assertEqual(troy.value, 42)
+        self.assertEqual(troy.state.name, u'Western Australia')

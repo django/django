@@ -47,7 +47,7 @@ class AdminFormfieldForDBFieldTests(TestCase):
             widget = ff.widget
 
         # Check that we got a field of the right type
-        self.assert_(
+        self.assertTrue(
             isinstance(widget, widgetclass),
             "Wrong widget for %s.%s: expected %s, got %s" % \
                 (model.__class__.__name__, fieldname, widgetclass, type(widget))
@@ -127,8 +127,8 @@ class AdminFormfieldForDBFieldWithRequestTests(DjangoTestCase):
         """
         self.client.login(username="super", password="secret")
         response = self.client.get("/widget_admin/admin_widgets/cartire/add/")
-        self.assert_("BMW M3" not in response.content)
-        self.assert_("Volkswagon Passat" in response.content)
+        self.assertTrue("BMW M3" not in response.content)
+        self.assertTrue("Volkswagon Passat" in response.content)
 
 
 class AdminForeignKeyWidgetChangeList(DjangoTestCase):

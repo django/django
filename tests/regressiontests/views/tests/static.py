@@ -26,26 +26,26 @@ class StaticTests(TestCase):
         for filename in media_files:
             response = self.client.get('/views/%s/%s' % (self.prefix, filename))
             file_path = path.join(media_dir, filename)
-            self.assertEquals(open(file_path).read(), response.content)
-            self.assertEquals(len(response.content), int(response['Content-Length']))
-            self.assertEquals(mimetypes.guess_type(file_path)[1], response.get('Content-Encoding', None))
+            self.assertEqual(open(file_path).read(), response.content)
+            self.assertEqual(len(response.content), int(response['Content-Length']))
+            self.assertEqual(mimetypes.guess_type(file_path)[1], response.get('Content-Encoding', None))
 
     def test_unknown_mime_type(self):
         response = self.client.get('/views/%s/file.unknown' % self.prefix)
-        self.assertEquals('application/octet-stream', response['Content-Type'])
+        self.assertEqual('application/octet-stream', response['Content-Type'])
 
     def test_copes_with_empty_path_component(self):
         file_name = 'file.txt'
         response = self.client.get('/views/%s//%s' % (self.prefix, file_name))
         file = open(path.join(media_dir, file_name))
-        self.assertEquals(file.read(), response.content)
+        self.assertEqual(file.read(), response.content)
 
     def test_is_modified_since(self):
         file_name = 'file.txt'
         response = self.client.get('/views/%s/%s' % (self.prefix, file_name),
             HTTP_IF_MODIFIED_SINCE='Thu, 1 Jan 1970 00:00:00 GMT')
         file = open(path.join(media_dir, file_name))
-        self.assertEquals(file.read(), response.content)
+        self.assertEqual(file.read(), response.content)
 
     def test_not_modified_since(self):
         file_name = 'file.txt'
@@ -68,8 +68,8 @@ class StaticTests(TestCase):
         response = self.client.get('/views/%s/%s' % (self.prefix, file_name),
                                    HTTP_IF_MODIFIED_SINCE=invalid_date)
         file = open(path.join(media_dir, file_name))
-        self.assertEquals(file.read(), response.content)
-        self.assertEquals(len(response.content),
+        self.assertEqual(file.read(), response.content)
+        self.assertEqual(len(response.content),
                           int(response['Content-Length']))
 
     def test_invalid_if_modified_since2(self):
@@ -83,8 +83,8 @@ class StaticTests(TestCase):
         response = self.client.get('/views/%s/%s' % (self.prefix, file_name),
                                    HTTP_IF_MODIFIED_SINCE=invalid_date)
         file = open(path.join(media_dir, file_name))
-        self.assertEquals(file.read(), response.content)
-        self.assertEquals(len(response.content),
+        self.assertEqual(file.read(), response.content)
+        self.assertEqual(len(response.content),
                           int(response['Content-Length']))
 
 

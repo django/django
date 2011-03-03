@@ -76,11 +76,11 @@ class DeleteCascadeTests(TestCase):
         award = Award.objects.create(name='Nobel', content_object=person)
         note = AwardNote.objects.create(note='a peace prize',
                                         award=award)
-        self.assertEquals(AwardNote.objects.count(), 1)
+        self.assertEqual(AwardNote.objects.count(), 1)
         person.delete()
-        self.assertEquals(Award.objects.count(), 0)
+        self.assertEqual(Award.objects.count(), 0)
         # first two asserts are just sanity checks, this is the kicker:
-        self.assertEquals(AwardNote.objects.count(), 0)
+        self.assertEqual(AwardNote.objects.count(), 0)
 
     def test_fk_to_m2m_through(self):
         """
@@ -96,11 +96,11 @@ class DeleteCascadeTests(TestCase):
                                            date=datetime.date.today())
         note = PlayedWithNote.objects.create(played=played,
                                              note='the next Jackson Pollock')
-        self.assertEquals(PlayedWithNote.objects.count(), 1)
+        self.assertEqual(PlayedWithNote.objects.count(), 1)
         paints.delete()
-        self.assertEquals(PlayedWith.objects.count(), 0)
+        self.assertEqual(PlayedWith.objects.count(), 0)
         # first two asserts just sanity checks, this is the kicker:
-        self.assertEquals(PlayedWithNote.objects.count(), 0)
+        self.assertEqual(PlayedWithNote.objects.count(), 0)
 
 
 class DeleteCascadeTransactionTests(TransactionTestCase):
@@ -136,4 +136,4 @@ class LargeDeleteTests(TestCase):
         for x in range(300):
             track = Book.objects.create(pagecount=x+100)
         Book.objects.all().delete()
-        self.assertEquals(Book.objects.count(), 0)
+        self.assertEqual(Book.objects.count(), 0)

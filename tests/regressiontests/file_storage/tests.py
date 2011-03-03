@@ -106,7 +106,7 @@ class FileStorageTests(unittest.TestCase):
         f = self.storage.open('storage_test', 'w')
         f.write('storage contents')
         f.close()
-        self.assert_(self.storage.exists('storage_test'))
+        self.assertTrue(self.storage.exists('storage_test'))
 
         f = self.storage.open('storage_test', 'r')
         self.assertEqual(f.read(), 'storage contents')
@@ -179,7 +179,7 @@ class FileStorageTests(unittest.TestCase):
 
         self.assertEqual(storage_f_name, f.name)
 
-        self.assert_(os.path.exists(os.path.join(self.temp_dir, f.name)))
+        self.assertTrue(os.path.exists(os.path.join(self.temp_dir, f.name)))
 
         self.storage.delete(storage_f_name)
 
@@ -229,7 +229,7 @@ class FileStorageTests(unittest.TestCase):
         f = ContentFile('custom contents')
         f_name = self.storage.save('test.file', f)
 
-        self.assert_(isinstance(
+        self.assertTrue(isinstance(
             self.storage.open('test.file', mixin=TestFileMixin),
             TestFileMixin
         ))
@@ -325,8 +325,8 @@ class FileSaveRaceConditionTest(unittest.TestCase):
         self.thread.start()
         name = self.save_file('conflict')
         self.thread.join()
-        self.assert_(self.storage.exists('conflict'))
-        self.assert_(self.storage.exists('conflict_1'))
+        self.assertTrue(self.storage.exists('conflict'))
+        self.assertTrue(self.storage.exists('conflict_1'))
         self.storage.delete('conflict')
         self.storage.delete('conflict_1')
 
@@ -366,8 +366,8 @@ class FileStoragePathParsing(unittest.TestCase):
         self.storage.save('dotted.path/test', ContentFile("2"))
 
         self.assertFalse(os.path.exists(os.path.join(self.storage_dir, 'dotted_.path')))
-        self.assert_(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/test')))
-        self.assert_(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/test_1')))
+        self.assertTrue(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/test')))
+        self.assertTrue(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/test_1')))
 
     def test_first_character_dot(self):
         """
@@ -377,13 +377,13 @@ class FileStoragePathParsing(unittest.TestCase):
         self.storage.save('dotted.path/.test', ContentFile("1"))
         self.storage.save('dotted.path/.test', ContentFile("2"))
 
-        self.assert_(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/.test')))
+        self.assertTrue(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/.test')))
         # Before 2.6, a leading dot was treated as an extension, and so
         # underscore gets added to beginning instead of end.
         if sys.version_info < (2, 6):
-            self.assert_(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/_1.test')))
+            self.assertTrue(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/_1.test')))
         else:
-            self.assert_(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/.test_1')))
+            self.assertTrue(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/.test_1')))
 
 class DimensionClosingBug(unittest.TestCase):
     """
@@ -398,7 +398,7 @@ class DimensionClosingBug(unittest.TestCase):
         try:
             get_image_dimensions(empty_io)
         finally:
-            self.assert_(not empty_io.closed)
+            self.assertTrue(not empty_io.closed)
 
     @unittest.skipUnless(Image, "PIL not installed")
     def test_closing_of_filenames(self):
@@ -430,7 +430,7 @@ class DimensionClosingBug(unittest.TestCase):
             get_image_dimensions(os.path.join(os.path.dirname(__file__), "test1.png"))
         finally:
             del images.open
-        self.assert_(FileWrapper._closed)
+        self.assertTrue(FileWrapper._closed)
 
 class InconsistentGetImageDimensionsBug(unittest.TestCase):
     """

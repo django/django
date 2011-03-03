@@ -17,16 +17,16 @@ EXPIRED_ETAG = '7fae4cd4b0f81e7d2914700043aa8ed6'
 
 class ConditionalGet(TestCase):
     def assertFullResponse(self, response, check_last_modified=True, check_etag=True):
-        self.assertEquals(response.status_code, 200)
-        self.assertEquals(response.content, FULL_RESPONSE)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, FULL_RESPONSE)
         if check_last_modified:
-            self.assertEquals(response['Last-Modified'], LAST_MODIFIED_STR)
+            self.assertEqual(response['Last-Modified'], LAST_MODIFIED_STR)
         if check_etag:
-            self.assertEquals(response['ETag'], '"%s"' % ETAG)
+            self.assertEqual(response['ETag'], '"%s"' % ETAG)
 
     def assertNotModified(self, response):
-        self.assertEquals(response.status_code, 304)
-        self.assertEquals(response.content, '')
+        self.assertEqual(response.status_code, 304)
+        self.assertEqual(response.content, '')
 
     def testWithoutConditions(self):
         response = self.client.get('/condition/')
@@ -62,10 +62,10 @@ class ConditionalGet(TestCase):
     def testIfMatch(self):
         self.client.defaults['HTTP_IF_MATCH'] = '"%s"' % ETAG
         response = self.client.put('/condition/etag/', {'data': ''})
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.client.defaults['HTTP_IF_MATCH'] = '"%s"' % EXPIRED_ETAG
         response = self.client.put('/condition/etag/', {'data': ''})
-        self.assertEquals(response.status_code, 412)
+        self.assertEqual(response.status_code, 412)
 
     def testBothHeaders(self):
         self.client.defaults['HTTP_IF_MODIFIED_SINCE'] = LAST_MODIFIED_STR
@@ -130,11 +130,11 @@ class ConditionalGet(TestCase):
 class ETagProcessing(unittest.TestCase):
     def testParsing(self):
         etags = parse_etags(r'"", "etag", "e\"t\"ag", "e\\tag", W/"weak"')
-        self.assertEquals(etags, ['', 'etag', 'e"t"ag', r'e\tag', 'weak'])
+        self.assertEqual(etags, ['', 'etag', 'e"t"ag', r'e\tag', 'weak'])
 
     def testQuoting(self):
         quoted_etag = quote_etag(r'e\t"ag')
-        self.assertEquals(quoted_etag, r'"e\\t\"ag"')
+        self.assertEqual(quoted_etag, r'"e\\t\"ag"')
 
 
 class HttpDateProcessing(unittest.TestCase):

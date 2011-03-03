@@ -349,7 +349,7 @@ class BaseTest(TestCase):
         self.assertFalse(storage.used)
         # After iterating the storage engine directly, the used flag is set.
         data = list(storage)
-        self.assert_(storage.used)
+        self.assertTrue(storage.used)
         # The data does not disappear because it has been iterated.
         self.assertEqual(data, list(storage))
 
@@ -357,7 +357,7 @@ class BaseTest(TestCase):
         storage = self.get_existing_storage()
         self.assertFalse(storage.added_new)
         storage.add(constants.INFO, 'Test message 3')
-        self.assert_(storage.added_new)
+        self.assertTrue(storage.added_new)
 
     def test_default_level(self):
         # get_level works even with no storage on the request.
@@ -378,7 +378,7 @@ class BaseTest(TestCase):
         storage = self.storage_class(request)
         request._messages = storage
 
-        self.assert_(set_level(request, 5))
+        self.assertTrue(set_level(request, 5))
         self.assertEqual(get_level(request), 5)
 
         add_level_messages(storage)
@@ -389,7 +389,7 @@ class BaseTest(TestCase):
         storage = self.storage_class(request)
         request._messages = storage
 
-        self.assert_(set_level(request, 30))
+        self.assertTrue(set_level(request, 30))
         self.assertEqual(get_level(request), 30)
 
         add_level_messages(storage)

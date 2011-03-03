@@ -23,11 +23,11 @@ class StringLookupTests(TestCase):
         b1 = Bar(name="Bar1", normal=f1, fwd=w1, back=f2)
         b1.save()
 
-        self.assertEquals(b1.normal, f1)
+        self.assertEqual(b1.normal, f1)
 
-        self.assertEquals(b1.fwd, w1)
+        self.assertEqual(b1.fwd, w1)
 
-        self.assertEquals(b1.back, f2)
+        self.assertEqual(b1.back, f2)
 
         base1 = Base(name="Base1")
         base1.save()
@@ -35,7 +35,7 @@ class StringLookupTests(TestCase):
         child1 = Child(name="Child1", parent=base1)
         child1.save()
 
-        self.assertEquals(child1.parent, base1)
+        self.assertEqual(child1.parent, base1)
 
     def test_unicode_chars_in_queries(self):
         """
@@ -48,10 +48,10 @@ class StringLookupTests(TestCase):
 
         fx = Foo(name='Bjorn', friend=u'François')
         fx.save()
-        self.assertEquals(Foo.objects.get(friend__contains=u'\xe7'), fx)
+        self.assertEqual(Foo.objects.get(friend__contains=u'\xe7'), fx)
 
         # We can also do the above query using UTF-8 strings.
-        self.assertEquals(Foo.objects.get(friend__contains='\xc3\xa7'), fx)
+        self.assertEqual(Foo.objects.get(friend__contains='\xc3\xa7'), fx)
 
     def test_queries_on_textfields(self):
         """
@@ -62,9 +62,9 @@ class StringLookupTests(TestCase):
 
         a = Article(name='Test', text='The quick brown fox jumps over the lazy dog.')
         a.save()
-        self.assertEquals(Article.objects.get(text__exact='The quick brown fox jumps over the lazy dog.'), a)
+        self.assertEqual(Article.objects.get(text__exact='The quick brown fox jumps over the lazy dog.'), a)
 
-        self.assertEquals(Article.objects.get(text__contains='quick brown fox'), a)
+        self.assertEqual(Article.objects.get(text__contains='quick brown fox'), a)
 
     def test_ipaddress_on_postgresql(self):
         """
@@ -74,5 +74,5 @@ class StringLookupTests(TestCase):
         """
         a = Article(name='IP test', text='The body', submitted_from='192.0.2.100')
         a.save()
-        self.assertEquals(repr(Article.objects.filter(submitted_from__contains='192.0.2')),
+        self.assertEqual(repr(Article.objects.filter(submitted_from__contains='192.0.2')),
             repr([a]))

@@ -37,7 +37,7 @@ class ModelAdminTests(TestCase):
     def test_default_fields(self):
         ma = ModelAdmin(Band, self.site)
 
-        self.assertEquals(ma.get_form(request).base_fields.keys(),
+        self.assertEqual(ma.get_form(request).base_fields.keys(),
             ['name', 'bio', 'sign_date'])
 
     def test_default_fieldsets(self):

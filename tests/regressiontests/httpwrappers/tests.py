@@ -253,8 +253,8 @@ class CookieTests(unittest.TestCase):
         # That's not the bug this test is looking for, so ignore it.
         c = SimpleCookie()
         c['test'] = "An,awkward;value"
-        self.assert_(";" not in c.output().rstrip(';')) # IE compat
-        self.assert_("," not in c.output().rstrip(';')) # Safari compat
+        self.assertTrue(";" not in c.output().rstrip(';')) # IE compat
+        self.assertTrue("," not in c.output().rstrip(';')) # Safari compat
 
     def test_decode(self):
         """

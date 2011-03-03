@@ -88,8 +88,8 @@ class InvalidModelTestCase(unittest.TestCase):
         unexpected = [err for err in actual if err not in expected]
         missing = [err for err in expected if err not in actual]
 
-        self.assert_(not unexpected, "Unexpected Errors: " + '\n'.join(unexpected))
-        self.assert_(not missing, "Missing Errors: " + '\n'.join(missing))
+        self.assertTrue(not unexpected, "Unexpected Errors: " + '\n'.join(unexpected))
+        self.assertTrue(not missing, "Missing Errors: " + '\n'.join(missing))
 
 def setup(verbosity, test_labels):
     from django.conf import settings

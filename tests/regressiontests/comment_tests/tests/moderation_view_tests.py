@@ -182,14 +182,14 @@ class AdminActionsTests(CommentTestCase):
         comments = self.createSomeComments()
         self.client.login(username="normaluser", password="normaluser")
         response = self.client.get("/admin/comments/comment/")
-        self.assertEquals("approve_comments" in response.content, False)
+        self.assertEqual("approve_comments" in response.content, False)
 
     def testActionsModerator(self):
         comments = self.createSomeComments()
         makeModerator("normaluser")
         self.client.login(username="normaluser", password="normaluser")
         response = self.client.get("/admin/comments/comment/")
-        self.assertEquals("approve_comments" in response.content, True)
+        self.assertEqual("approve_comments" in response.content, True)
 
     def testActionsDisabledDelete(self):
         "Tests a CommentAdmin where 'delete_selected' has been disabled."
@@ -197,7 +197,7 @@ class AdminActionsTests(CommentTestCase):
         self.client.login(username="normaluser", password="normaluser")
         response = self.client.get('/admin2/comments/comment/')
         self.assertEqual(response.status_code, 200)
-        self.assert_(
+        self.assertTrue(
             '<option value="delete_selected">' not in response.content,
             "Found an unexpected delete_selected in response"
         )

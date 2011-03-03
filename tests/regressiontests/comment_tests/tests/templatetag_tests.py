@@ -20,7 +20,7 @@ class CommentTemplateTagTests(CommentTestCase):
         t = "{% load comments %}" + (tag or "{% get_comment_form for comment_tests.article a.id as form %}")
         ctx, out = self.render(t, a=Article.objects.get(pk=1))
         self.assertEqual(out, "")
-        self.assert_(isinstance(ctx["form"], CommentForm))
+        self.assertTrue(isinstance(ctx["form"], CommentForm))
 
     def testGetCommentFormFromLiteral(self):
         self.testGetCommentForm("{% get_comment_form for comment_tests.article 1 as form %}")
@@ -31,8 +31,8 @@ class CommentTemplateTagTests(CommentTestCase):
     def testRenderCommentForm(self, tag=None):
         t = "{% load comments %}" + (tag or "{% render_comment_form for comment_tests.article a.id %}")
         ctx, out = self.render(t, a=Article.objects.get(pk=1))
-        self.assert_(out.strip().startswith("<form action="))
-        self.assert_(out.strip().endswith("</form>"))
+        self.assertTrue(out.strip().startswith("<form action="))
+        self.assertTrue(out.strip().endswith("</form>"))
 
     def testRenderCommentFormFromLiteral(self):
         self.testRenderCommentForm("{% render_comment_form for comment_tests.article 1 %}")
@@ -86,8 +86,8 @@ class CommentTemplateTagTests(CommentTestCase):
     def testRenderCommentList(self, tag=None):
         t = "{% load comments %}" + (tag or "{% render_comment_list for comment_tests.article a.id %}")
         ctx, out = self.render(t, a=Article.objects.get(pk=1))
-        self.assert_(out.strip().startswith("<dl id=\"comments\">"))
-        self.assert_(out.strip().endswith("</dl>"))
+        self.assertTrue(out.strip().startswith("<dl id=\"comments\">"))
+        self.assertTrue(out.strip().endswith("</dl>"))
 
     def testRenderCommentListFromLiteral(self):
         self.testRenderCommentList("{% render_comment_list for comment_tests.article 1 %}")

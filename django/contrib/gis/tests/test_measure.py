@@ -107,7 +107,7 @@ class DistanceTest(unittest.TestCase):
         self.assertEqual(d4.m, 10)
 
         a5 = d1 * D(m=10)
-        self.assert_(isinstance(a5, Area))
+        self.assertTrue(isinstance(a5, Area))
         self.assertEqual(a5.sq_m, 100*10)
 
         try:
@@ -151,9 +151,9 @@ class DistanceTest(unittest.TestCase):
         d2 = D(km=1)
         d3 = D(km=0)
 
-        self.assert_(d2 > d1)
-        self.assert_(d1 == d1)
-        self.assert_(d1 < d2)
+        self.assertTrue(d2 > d1)
+        self.assertTrue(d1 == d1)
+        self.assertTrue(d1 < d2)
         self.failIf(d3)
 
     def testUnitsStr(self):
@@ -309,9 +309,9 @@ class AreaTest(unittest.TestCase):
         a2 = A(sq_km=1)
         a3 = A(sq_km=0)
 
-        self.assert_(a2 > a1)
-        self.assert_(a1 == a1)
-        self.assert_(a1 < a2)
+        self.assertTrue(a2 > a1)
+        self.assertTrue(a1 == a1)
+        self.assertTrue(a1 < a2)
         self.failIf(a3)
 
     def testUnitsStr(self):

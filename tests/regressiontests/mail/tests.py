@@ -332,7 +332,7 @@ class BaseEmailBackendTests(object):
         num_sent = mail.get_connection().send_messages([email1, email2])
         self.assertEqual(num_sent, 2)
         messages = self.get_mailbox_content()
-        self.assertEquals(len(messages), 2)
+        self.assertEqual(len(messages), 2)
         self.assertEqual(messages[0].get_payload(), "Content1")
         self.assertEqual(messages[1].get_payload(), "Content2")
 

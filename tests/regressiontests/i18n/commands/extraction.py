@@ -30,12 +30,12 @@ class ExtractorTests(TestCase):
     def assertMsgId(self, msgid, s, use_quotes=True):
         if use_quotes:
             msgid = '"%s"' % msgid
-        return self.assert_(re.search('^msgid %s' % msgid, s, re.MULTILINE))
+        return self.assertTrue(re.search('^msgid %s' % msgid, s, re.MULTILINE))
 
     def assertNotMsgId(self, msgid, s, use_quotes=True):
         if use_quotes:
             msgid = '"%s"' % msgid
-        return self.assert_(not re.search('^msgid %s' % msgid, s, re.MULTILINE))
+        return self.assertTrue(not re.search('^msgid %s' % msgid, s, re.MULTILINE))
 
 
 class BasicExtractorTests(ExtractorTests):
@@ -43,18 +43,18 @@ class BasicExtractorTests(ExtractorTests):
     def test_comments_extractor(self):
         os.chdir(self.test_dir)
         management.call_command('makemessages', locale=LOCALE, verbosity=0)
-        self.assert_(os.path.exists(self.PO_FILE))
+        self.assertTrue(os.path.exists(self.PO_FILE))
         po_contents = open(self.PO_FILE, 'r').read()
-        self.assert_('#. Translators: This comment should be extracted' in po_contents)
-        self.assert_('This comment should not be extracted' not in po_contents)
+        self.assertTrue('#. Translators: This comment should be extracted' in po_contents)
+        self.assertTrue('This comment should not be extracted' not in po_contents)
         # Comments in templates
-        self.assert_('#. Translators: Django template comment for translators' in po_contents)
-        self.assert_('#. Translators: Django comment block for translators' in po_contents)
+        self.assertTrue('#. Translators: Django template comment for translators' in po_contents)
+        self.assertTrue('#. Translators: Django comment block for translators' in po_contents)
 
     def test_templatize(self):
         os.chdir(self.test_dir)
         management.call_command('makemessages', locale=LOCALE, verbosity=0)
-        self.assert_(os.path.exists(self.PO_FILE))
+        self.assertTrue(os.path.exists(self.PO_FILE))
         po_contents = open(self.PO_FILE, 'r').read()
         self.assertMsgId('I think that 100%% is more that 50%% of anything.', po_contents)
         self.assertMsgId('I think that 100%% is more that 50%% of %\(obj\)s.', po_contents)
@@ -80,7 +80,7 @@ class JavascriptExtractorTests(ExtractorTests):
     def test_javascript_literals(self):
         os.chdir(self.test_dir)
         management.call_command('makemessages', domain='djangojs', locale=LOCALE, verbosity=0)
-        self.assert_(os.path.exists(self.PO_FILE))
+        self.assertTrue(os.path.exists(self.PO_FILE))
         po_contents = open(self.PO_FILE, 'r').read()
         self.assertMsgId('This literal should be included.', po_contents)
         self.assertMsgId('This one as well.', po_contents)
@@ -91,7 +91,7 @@ class IgnoredExtractorTests(ExtractorTests):
     def test_ignore_option(self):
         os.chdir(self.test_dir)
         management.call_command('makemessages', locale=LOCALE, verbosity=0, ignore_patterns=['ignore_dir/*'])
-        self.assert_(os.path.exists(self.PO_FILE))
+        self.assertTrue(os.path.exists(self.PO_FILE))
         po_contents = open(self.PO_FILE, 'r').read()
         self.assertMsgId('This literal should be included.', po_contents)
         self.assertNotMsgId('This should be ignored.', po_contents)
@@ -116,15 +116,15 @@ class SymlinkExtractorTests(ExtractorTests):
     def test_symlink(self):
         if hasattr(os, 'symlink'):
             if os.path.exists(self.symlinked_dir):
-                self.assert_(os.path.islink(self.symlinked_dir))
+                self.assertTrue(os.path.islink(self.symlinked_dir))
             else:
                 os.symlink(os.path.join(self.test_dir, 'templates'), self.symlinked_dir)
             os.chdir(self.test_dir)
             management.call_command('makemessages', locale=LOCALE, verbosity=0, symlinks=True)
-            self.assert_(os.path.exists(self.PO_FILE))
+            self.assertTrue(os.path.exists(self.PO_FILE))
             po_contents = open(self.PO_FILE, 'r').read()
             self.assertMsgId('This literal should be included.', po_contents)
-            self.assert_('templates_symlinked/test.html' in po_contents)
+            self.assertTrue('templates_symlinked/test.html' in po_contents)
 
 
 class CopyPluralFormsExtractorTests(ExtractorTests):
@@ -132,9 +132,9 @@ class CopyPluralFormsExtractorTests(ExtractorTests):
     def test_copy_plural_forms(self):
         os.chdir(self.test_dir)
         management.call_command('makemessages', locale=LOCALE, verbosity=0)
-        self.assert_(os.path.exists(self.PO_FILE))
+        self.assertTrue(os.path.exists(self.PO_FILE))
         po_contents = open(self.PO_FILE, 'r').read()
-        self.assert_('Plural-Forms: nplurals=2; plural=(n != 1)' in po_contents)
+        self.assertTrue('Plural-Forms: nplurals=2; plural=(n != 1)' in po_contents)
 
 
 class NoWrapExtractorTests(ExtractorTests):
@@ -142,13 +142,13 @@ class NoWrapExtractorTests(ExtractorTests):
     def test_no_wrap_enabled(self):
         os.chdir(self.test_dir)
         management.call_command('makemessages', locale=LOCALE, verbosity=0, no_wrap=True)
-        self.assert_(os.path.exists(self.PO_FILE))
+        self.assertTrue(os.path.exists(self.PO_FILE))
         po_contents = open(self.PO_FILE, 'r').read()
         self.assertMsgId('This literal should also be included wrapped or not wrapped depending on the use of the --no-wrap option.', po_contents)
 
     def test_no_wrap_disabled(self):
         os.chdir(self.test_dir)
         management.call_command('makemessages', locale=LOCALE, verbosity=0, no_wrap=False)
-        self.assert_(os.path.exists(self.PO_FILE))
+        self.assertTrue(os.path.exists(self.PO_FILE))
         po_contents = open(self.PO_FILE, 'r').read()
         self.assertMsgId('""\n"This literal should also be included wrapped or not wrapped depending on the "\n"use of the --no-wrap option."', po_contents, use_quotes=False)

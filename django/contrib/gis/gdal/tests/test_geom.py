@@ -49,8 +49,8 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
     def test00b_geomtype_25d(self):
         "Testing OGRGeomType object with 25D types."
         wkb25bit = OGRGeomType.wkb25bit
-        self.failUnless(OGRGeomType(wkb25bit + 1) == 'Point25D')
-        self.failUnless(OGRGeomType('MultiLineString25D') == (5 + wkb25bit))
+        self.assertTrue(OGRGeomType(wkb25bit + 1) == 'Point25D')
+        self.assertTrue(OGRGeomType('MultiLineString25D') == (5 + wkb25bit))
         self.assertEqual('GeometryCollectionField', OGRGeomType('GeometryCollection25D').django)
 
     def test01a_wkt(self):

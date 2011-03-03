@@ -35,7 +35,7 @@ class FlatpageTemplateTagTests(TestCase):
                 "{{ page.title }},"
                 "{% endfor %}"
             ).render(Context())
-        self.assertEquals(out, "A Flatpage,A Nested Flatpage,")
+        self.assertEqual(out, "A Flatpage,A Nested Flatpage,")
 
     def test_get_flatpages_tag_for_anon_user(self):
         "The flatpage template tag retrives unregistered flatpages for an anonymous user"
@@ -48,7 +48,7 @@ class FlatpageTemplateTagTests(TestCase):
             ).render(Context({
                 'anonuser': AnonymousUser()
             }))
-        self.assertEquals(out, "A Flatpage,A Nested Flatpage,")
+        self.assertEqual(out, "A Flatpage,A Nested Flatpage,")
 
     def test_get_flatpages_tag_for_user(self):
         "The flatpage template tag retrives all flatpages for an authenticated user"
@@ -61,7 +61,7 @@ class FlatpageTemplateTagTests(TestCase):
             ).render(Context({
                 'me': self.me
             }))
-        self.assertEquals(out, "A Flatpage,A Nested Flatpage,Sekrit Nested Flatpage,Sekrit Flatpage,")
+        self.assertEqual(out, "A Flatpage,A Nested Flatpage,Sekrit Nested Flatpage,Sekrit Flatpage,")
 
     def test_get_flatpages_with_prefix(self):
         "The flatpage template tag retrives unregistered prefixed flatpages by default"
@@ -72,7 +72,7 @@ class FlatpageTemplateTagTests(TestCase):
                 "{{ page.title }},"
                 "{% endfor %}"
             ).render(Context())
-        self.assertEquals(out, "A Nested Flatpage,")
+        self.assertEqual(out, "A Nested Flatpage,")
 
     def test_get_flatpages_with_prefix_for_anon_user(self):
         "The flatpage template tag retrives unregistered prefixed flatpages for an anonymous user"
@@ -85,7 +85,7 @@ class FlatpageTemplateTagTests(TestCase):
             ).render(Context({
                 'anonuser': AnonymousUser()
             }))
-        self.assertEquals(out, "A Nested Flatpage,")
+        self.assertEqual(out, "A Nested Flatpage,")
 
     def test_get_flatpages_with_prefix_for_user(self):
         "The flatpage template tag retrive prefixed flatpages for an authenticated user"
@@ -98,7 +98,7 @@ class FlatpageTemplateTagTests(TestCase):
             ).render(Context({
                 'me': self.me
             }))
-        self.assertEquals(out, "A Nested Flatpage,Sekrit Nested Flatpage,")
+        self.assertEqual(out, "A Nested Flatpage,Sekrit Nested Flatpage,")
 
     def test_get_flatpages_with_variable_prefix(self):
         "The prefix for the flatpage template tag can be a template variable"
@@ -111,7 +111,7 @@ class FlatpageTemplateTagTests(TestCase):
             ).render(Context({
                 'location_prefix': '/location/'
             }))
-        self.assertEquals(out, "A Nested Flatpage,")
+        self.assertEqual(out, "A Nested Flatpage,")
 
     def test_parsing_errors(self):
         "There are various ways that the flatpages template tag won't parse"

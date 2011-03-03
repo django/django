@@ -122,7 +122,7 @@ class TestTransactionClosing(TransactionTestCase):
         try:
             # Check that the record is in the DB
             obj = Mod.objects.get(pk=1)
-            self.assertEquals(obj.fld, 2)
+            self.assertEqual(obj.fld, 2)
         except Mod.DoesNotExist:
             self.fail("After ending a transaction, cursor use no longer sets dirty")
 

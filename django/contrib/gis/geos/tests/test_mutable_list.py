@@ -362,26 +362,26 @@ class ListMixinTest(unittest.TestCase):
 
         pl, ul = self.lists_of_len()
         self.assertEqual(pl, ul, 'cmp for equal')
-        self.assert_(pl >= ul, 'cmp for gte self')
-        self.assert_(pl <= ul, 'cmp for lte self')
-        self.assert_(ul >= pl, 'cmp for self gte')
-        self.assert_(ul <= pl, 'cmp for self lte')
+        self.assertTrue(pl >= ul, 'cmp for gte self')
+        self.assertTrue(pl <= ul, 'cmp for lte self')
+        self.assertTrue(ul >= pl, 'cmp for self gte')
+        self.assertTrue(ul <= pl, 'cmp for self lte')
 
-        self.assert_(pl + [5] > ul, 'cmp')
-        self.assert_(pl + [5] >= ul, 'cmp')
-        self.assert_(pl < ul + [2], 'cmp')
-        self.assert_(pl <= ul + [2], 'cmp')
-        self.assert_(ul + [5] > pl, 'cmp')
-        self.assert_(ul + [5] >= pl, 'cmp')
-        self.assert_(ul < pl + [2], 'cmp')
-        self.assert_(ul <= pl + [2], 'cmp')
+        self.assertTrue(pl + [5] > ul, 'cmp')
+        self.assertTrue(pl + [5] >= ul, 'cmp')
+        self.assertTrue(pl < ul + [2], 'cmp')
+        self.assertTrue(pl <= ul + [2], 'cmp')
+        self.assertTrue(ul + [5] > pl, 'cmp')
+        self.assertTrue(ul + [5] >= pl, 'cmp')
+        self.assertTrue(ul < pl + [2], 'cmp')
+        self.assertTrue(ul <= pl + [2], 'cmp')
 
         pl[1] = 20
-        self.assert_(pl > ul, 'cmp for gt self')
-        self.assert_(ul < pl, 'cmp for self lt')
+        self.assertTrue(pl > ul, 'cmp for gt self')
+        self.assertTrue(ul < pl, 'cmp for self lt')
         pl[1] = -20
-        self.assert_(pl < ul, 'cmp for lt self')
-        self.assert_(pl < ul, 'cmp for lt self')
+        self.assertTrue(pl < ul, 'cmp for lt self')
+        self.assertTrue(pl < ul, 'cmp for lt self')
 
 class ListMixinTestSingle(ListMixinTest):
     listType = UserListB

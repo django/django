@@ -232,32 +232,32 @@ class RedirectViewTest(unittest.TestCase):
     def test_no_url(self):
         "Without any configuration, returns HTTP 410 GONE"
         response = RedirectView.as_view()(self.rf.get('/foo/'))
-        self.assertEquals(response.status_code, 410)
+        self.assertEqual(response.status_code, 410)
 
     def test_permanaent_redirect(self):
         "Default is a permanent redirect"
         response = RedirectView.as_view(url='/bar/')(self.rf.get('/foo/'))
-        self.assertEquals(response.status_code, 301)
-        self.assertEquals(response['Location'], '/bar/')
+        self.assertEqual(response.status_code, 301)
+        self.assertEqual(response['Location'], '/bar/')
 
     def test_temporary_redirect(self):
         "Permanent redirects are an option"
         response = RedirectView.as_view(url='/bar/', permanent=False)(self.rf.get('/foo/'))
-        self.assertEquals(response.status_code, 302)
-        self.assertEquals(response['Location'], '/bar/')
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['Location'], '/bar/')
 
     def test_include_args(self):
         "GET arguments can be included in the redirected URL"
         response = RedirectView.as_view(url='/bar/')(self.rf.get('/foo/'))
-        self.assertEquals(response.status_code, 301)
-        self.assertEquals(response['Location'], '/bar/')
+        self.assertEqual(response.status_code, 301)
+        self.assertEqual(response['Location'], '/bar/')
 
         response = RedirectView.as_view(url='/bar/', query_string=True)(self.rf.get('/foo/?pork=spam'))
-        self.assertEquals(response.status_code, 301)
-        self.assertEquals(response['Location'], '/bar/?pork=spam')
+        self.assertEqual(response.status_code, 301)
+        self.assertEqual(response['Location'], '/bar/?pork=spam')
 
     def test_parameter_substitution(self):
         "Redirection URLs can be parameterized"
         response = RedirectView.as_view(url='/bar/%(object_id)d/')(self.rf.get('/foo/42/'), object_id=42)
-        self.assertEquals(response.status_code, 301)
-        self.assertEquals(response['Location'], '/bar/42/')
+        self.assertEqual(response.status_code, 301)
+        self.assertEqual(response['Location'], '/bar/42/')
