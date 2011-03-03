@@ -1,7 +1,7 @@
 from django import forms
 from django.conf import settings
-from django.contrib.admin.util import flatten_fieldsets, lookup_field
-from django.contrib.admin.util import display_for_field, label_for_field, help_text_for_field
+from django.contrib.admin.util import (flatten_fieldsets, lookup_field,
+    display_for_field, label_for_field, help_text_for_field)
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.fields.related import ManyToManyRel

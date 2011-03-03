@@ -1,10 +1,9 @@
 from django import forms, template
 from django.forms.formsets import all_valid
-from django.forms.models import modelform_factory, modelformset_factory, inlineformset_factory
-from django.forms.models import BaseInlineFormSet
+from django.forms.models import (modelform_factory, modelformset_factory,
+    inlineformset_factory, BaseInlineFormSet)
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.admin import widgets
-from django.contrib.admin import helpers
+from django.contrib.admin import widgets, helpers
 from django.contrib.admin.util import unquote, flatten_fieldsets, get_deleted_objects, model_format_dict
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_protect

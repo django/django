@@ -9,8 +9,7 @@ from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
 from django.utils.encoding import force_unicode, smart_unicode, smart_str
 from django.utils.translation import ungettext
-from django.core.urlresolvers import reverse, NoReverseMatch
-from django.utils.datastructures import SortedDict
+from django.core.urlresolvers import reverse
 
 
 def quote(s):

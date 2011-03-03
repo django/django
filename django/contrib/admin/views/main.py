@@ -2,7 +2,7 @@ from django.contrib.admin.filterspecs import FilterSpec
 from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.admin.util import quote, get_fields_from_path
 from django.core.exceptions import SuspiciousOperation
-from django.core.paginator import Paginator, InvalidPage
+from django.core.paginator import InvalidPage
 from django.db import models
 from django.utils.encoding import force_unicode, smart_str
 from django.utils.translation import ugettext, ugettext_lazy

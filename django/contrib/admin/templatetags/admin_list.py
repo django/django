@@ -2,8 +2,8 @@ import datetime
 
 from django.conf import settings
 from django.contrib.admin.util import lookup_field, display_for_field, label_for_field
-from django.contrib.admin.views.main import ALL_VAR, EMPTY_CHANGELIST_VALUE
-from django.contrib.admin.views.main import ORDER_VAR, ORDER_TYPE_VAR, PAGE_VAR, SEARCH_VAR
+from django.contrib.admin.views.main import (ALL_VAR, EMPTY_CHANGELIST_VALUE,
+    ORDER_VAR, ORDER_TYPE_VAR, PAGE_VAR, SEARCH_VAR)
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.utils import formats

@@ -1,8 +1,8 @@
 import re
 from django import http, template
 from django.contrib.admin import ModelAdmin, actions
-from django.contrib.admin.forms import AdminAuthenticationForm, ERROR_MESSAGE
-from django.contrib.auth import REDIRECT_FIELD_NAME, authenticate, login
+from django.contrib.admin.forms import AdminAuthenticationForm
+from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.contenttypes import views as contenttype_views
 from django.views.decorators.csrf import csrf_protect
 from django.db.models.base import ModelBase
@@ -12,7 +12,7 @@ from django.shortcuts import render_to_response
 from django.utils.functional import update_wrapper
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
-from django.utils.translation import ugettext_lazy, ugettext as _
+from django.utils.translation import ugettext as _
 from django.views.decorators.cache import never_cache
 from django.conf import settings
 
