@@ -93,20 +93,20 @@ Note:
 
 * The Feed class subclasses :class:`django.contrib.syndication.views.Feed`.
 
-* :attr:`title`, :attr:`link` and :attr:`description` correspond to the
+* ``title``, ``link`` and ``description` correspond to the
   standard RSS ``<title>``, ``<link>`` and ``<description>`` elements,
   respectively.
 
-* :meth:`items()` is, simply, a method that returns a list of objects that
+* ``items()`` is, simply, a method that returns a list of objects that
   should be included in the feed as ``<item>`` elements. Although this
   example returns ``NewsItem`` objects using Django's
-  :doc:`object-relational mapper </ref/models/querysets>`, :meth:`items()`
+  :doc:`object-relational mapper </ref/models/querysets>`, ``items()``
   doesn't have to return model instances. Although you get a few bits of
-  functionality "for free" by using Django models, :meth:`items()` can
+  functionality "for free" by using Django models, ``items()`` can
   return any type of object you want.
 
 * If you're creating an Atom feed, rather than an RSS feed, set the
-  :attr:`subtitle` attribute instead of the :attr:`description` attribute.
+  ``subtitle`` attribute instead of the ``description`` attribute.
   See `Publishing Atom and RSS feeds in tandem`_, later, for an example.
 
 One thing is left to do. In an RSS feed, each ``<item>`` has a ``<title>``,
@@ -114,9 +114,9 @@ One thing is left to do. In an RSS feed, each ``<item>`` has a ``<title>``,
 into those elements.
 
     * For the contents of ``<title>`` and ``<description>``, Django tries
-      calling the methods :meth:`item_title()` and :meth:`item_description()` on
+      calling the methods ``item_title()`` and ``item_description()`` on
       the :class:`~django.contrib.syndication.views.Feed` class. They are passed
-      a single parameter, :attr:`item`, which is the object itself. These are
+      a single parameter, ``item``, which is the object itself. These are
       optional; by default, the unicode representation of the object is used for
       both.
 
@@ -128,7 +128,7 @@ into those elements.
       rendered for each item and are passed two template context variables:
 
          * ``{{ obj }}`` -- The current object (one of whichever objects you
-           returned in :meth:`items()`).
+           returned in ``items()``).
 
          * ``{{ site }}`` -- A :class:`django.contrib.sites.models.Site` object
            representing the current site. This is useful for ``{{ site.domain
@@ -141,15 +141,15 @@ into those elements.
       See `a complex example`_ below that uses a description template.
 
     * To specify the contents of ``<link>``, you have two options. For each item
-      in :meth:`items()`, Django first tries calling the
-      :meth:`item_link()` method on the
+      in ``items()``, Django first tries calling the
+      ``item_link()`` method on the
       :class:`~django.contrib.syndication.views.Feed` class. In a similar way to
       the title and description, it is passed it a single parameter,
-      :attr:`item`. If that method doesn't exist, Django tries executing a
+      ``item``. If that method doesn't exist, Django tries executing a
       ``get_absolute_url()`` method on that object. Both
-      :meth:`get_absolute_url()` and :meth:`item_link()` should return the
+      ``get_absolute_url()`` and ``item_link()`` should return the
       item's URL as a normal Python string. As with ``get_absolute_url()``, the
-      result of :meth:`item_link()` will be included directly in the URL, so you
+      result of ``item_link()`` will be included directly in the URL, so you
       are responsible for doing all necessary URL quoting and conversion to
       ASCII inside the method itself.
 
@@ -177,7 +177,7 @@ These can be matched with a :doc:`URLconf </topics/http/urls>` line such as::
 
     (r'^beats/(?P<beat_id>\d+)/rss/$', BeatFeed()),
 
-Like a view, the arguments in the URL are passed to the :meth:`get_object()`
+Like a view, the arguments in the URL are passed to the ``get_object()``
 method along with the request object.
 
 .. versionchanged:: 1.2
@@ -207,21 +207,21 @@ Here's the code for these beat-specific feeds::
             return Crime.objects.filter(beat=obj).order_by('-crime_date')[:30]
 
 To generate the feed's ``<title>``, ``<link>`` and ``<description>``, Django
-uses the :meth:`title()`, :meth:`link()` and :meth:`description()` methods. In
+uses the ``title()``, ``link()`` and ``description()`` methods. In
 the previous example, they were simple string class attributes, but this example
 illustrates that they can be either strings *or* methods. For each of
-:attr:`title`, :attr:`link` and :attr:`description`, Django follows this
+``title``, ``link`` and ``description``, Django follows this
 algorithm:
 
     * First, it tries to call a method, passing the ``obj`` argument, where
-      ``obj`` is the object returned by :meth:`get_object()`.
+      ``obj`` is the object returned by ``get_object()``.
 
     * Failing that, it tries to call a method with no arguments.
 
     * Failing that, it uses the class attribute.
 
-Also note that :meth:`items()` also follows the same algorithm -- first, it
-tries :meth:`items(obj)`, then :meth:`items()`, then finally an :attr:`items`
+Also note that ``items()`` also follows the same algorithm -- first, it
+tries ``items(obj)``, then ``items()``, then finally an ``items``
 class attribute (which should be a list).
 
 We are using a template for the item descriptions. It can be very simple:
@@ -260,8 +260,8 @@ Enclosures
 ----------
 
 To specify enclosures, such as those used in creating podcast feeds, use the
-:attr:`item_enclosure_url`, :attr:`item_enclosure_length` and
-:attr:`item_enclosure_mime_type` hooks. See the ``ExampleFeed`` class below for
+``item_enclosure_url``, ``item_enclosure_length`` and
+``item_enclosure_mime_type`` hooks. See the ``ExampleFeed`` class below for
 usage examples.
 
 Language
@@ -274,9 +274,9 @@ comes directly from your :setting:`LANGUAGE_CODE` setting.
 URLs
 ----
 
-The :attr:`link` method/attribute can return either an absolute path (e.g.
+The ``link`` method/attribute can return either an absolute path (e.g.
 :file:`"/blog/"`) or a URL with the fully-qualified domain and protocol (e.g.
-``"http://www.example.com/blog/"``). If :attr:`link` doesn't return the domain,
+``"http://www.example.com/blog/"``). If ``link`` doesn't return the domain,
 the syndication framework will insert the domain of the current site, according
 to your :setting:`SITE_ID setting <SITE_ID>`.
 
@@ -290,7 +290,7 @@ Publishing Atom and RSS feeds in tandem
 Some developers like to make available both Atom *and* RSS versions of their
 feeds. That's easy to do with Django: Just create a subclass of your
 :class:`~django.contrib.syndication.views.Feed`
-class and set the :attr:`feed_type` to something different. Then update your
+class and set the ``feed_type`` to something different. Then update your
 URLconf to add the extra versions.
 
 Here's a full example::
@@ -312,18 +312,18 @@ Here's a full example::
         subtitle = RssSiteNewsFeed.description
 
 .. Note::
-    In this example, the RSS feed uses a :attr:`description` while the Atom
-    feed uses a :attr:`subtitle`. That's because Atom feeds don't provide for
+    In this example, the RSS feed uses a ``description`` while the Atom
+    feed uses a ``subtitle``. That's because Atom feeds don't provide for
     a feed-level "description," but they *do* provide for a "subtitle."
 
-    If you provide a :attr:`description` in your
+    If you provide a ``description`` in your
     :class:`~django.contrib.syndication.views.Feed` class, Django will *not*
-    automatically put that into the :attr:`subtitle` element, because a
+    automatically put that into the ``subtitle`` element, because a
     subtitle and description are not necessarily the same thing. Instead, you
-    should define a :attr:`subtitle` attribute.
+    should define a ``subtitle`` attribute.
 
-    In the above example, we simply set the Atom feed's :attr:`subtitle` to the
-    RSS feed's :attr:`description`, because it's quite short already.
+    In the above example, we simply set the Atom feed's ``subtitle`` to the
+    RSS feed's ``description``, because it's quite short already.
 
 And the accompanying URLconf::
 
@@ -781,24 +781,25 @@ You use this framework on your own, for lower-level feed generation. You can
 also create custom feed generator subclasses for use with the ``feed_type``
 ``Feed`` option.
 
+.. currentmodule:: django.utils.feedgenerator
+
 ``SyndicationFeed`` classes
 ---------------------------
 
 The :mod:`~django.utils.feedgenerator` module contains a base class:
 
-.. class:: django.utils.feedgenerator.SyndicationFeed
+  * :class:`django.utils.feedgenerator.SyndicationFeed`
 
 and several subclasses:
 
-.. class:: django.utils.feedgenerator.RssUserland091Feed
-.. class:: django.utils.feedgenerator.Rss201rev2Feed
-.. class:: django.utils.feedgenerator.Atom1Feed
+  * :class:`django.utils.feedgenerator.RssUserland091Feed`
+  * :class:`django.utils.feedgenerator.Rss201rev2Feed`
+  * :class:`django.utils.feedgenerator.Atom1Feed`
 
 Each of these three classes knows how to render a certain type of feed as XML.
 They share this interface:
 
-.. method:: SyndicationFeed.__init__(**kwargs)
-
+:meth:`.SyndicationFeed.__init__`
     Initialize the feed with the given dictionary of metadata, which applies to
     the entire feed. Required keyword arguments are:
 
@@ -825,8 +826,7 @@ They share this interface:
     All parameters should be Unicode objects, except ``categories``, which
     should be a sequence of Unicode objects.
 
-.. method:: SyndicationFeed.add_item(**kwargs)
-
+:meth:`.SyndicationFeed.add_item`
     Add an item to the feed with the given parameters.
 
     Required keyword arguments are:
@@ -856,12 +856,10 @@ They share this interface:
         * ``enclosure`` should be an instance of ``feedgenerator.Enclosure``.
         * ``categories`` should be a sequence of Unicode objects.
 
-.. method:: SyndicationFeed.write(outfile, encoding)
-
+:meth:`.SyndicationFeed.write`
     Outputs the feed in the given encoding to outfile, which is a file-like object.
 
-.. method:: SyndicationFeed.writeString(encoding)
-
+:meth:`.SyndicationFeed.writeString`
     Returns the feed as a string in the given encoding.
 
 For example, to create an Atom 1.0 feed and print it to standard output::
@@ -887,6 +885,8 @@ For example, to create an Atom 1.0 feed and print it to standard output::
 
 .. _django/utils/feedgenerator.py: http://code.djangoproject.com/browser/django/trunk/django/utils/feedgenerator.py
 .. _Python datetime object: http://docs.python.org/library/datetime.html#datetime-objects
+
+.. currentmodule:: django.contrib.syndication
 
 Custom feed generators
 ----------------------

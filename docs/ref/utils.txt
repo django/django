@@ -222,49 +222,58 @@ SyndicationFeed
 
 .. class:: SyndicationFeed
 
-Base class for all syndication feeds. Subclasses should provide write().
+    Base class for all syndication feeds. Subclasses should provide write().
+    
+    .. method:: __init__(title, link, description, [language=None, author_email=None, author_name=None, author_link=None, subtitle=None, categories=None, feed_url=None, feed_copyright=None, feed_guid=None, ttl=None, **kwargs])
 
-Methods
-~~~~~~~
+        Initialize the feed with the given dictionary of metadata, which applies
+        to the entire feed.
+        
+        Any extra keyword arguments you pass to ``__init__`` will be stored in
+        ``self.feed``.
 
-.. method:: add_item(title, link, description, [author_email=None, author_name=None, author_link=None, pubdate=None, comments=None, unique_id=None, enclosure=None, categories=(), item_copyright=None, ttl=None, **kwargs])
+        All parameters should be Unicode objects, except ``categories``, which
+        should be a sequence of Unicode objects.
 
-Adds an item to the feed. All args are expected to be Python ``unicode``
-objects except ``pubdate``, which is a ``datetime.datetime`` object, and
-``enclosure``, which is an instance of the ``Enclosure`` class.
+    .. method:: add_item(title, link, description, [author_email=None, author_name=None, author_link=None, pubdate=None, comments=None, unique_id=None, enclosure=None, categories=(), item_copyright=None, ttl=None, **kwargs])
 
-.. method:: num_items()
+        Adds an item to the feed. All args are expected to be Python ``unicode``
+        objects except ``pubdate``, which is a ``datetime.datetime`` object, and
+        ``enclosure``, which is an instance of the ``Enclosure`` class.
 
-.. method:: root_attributes()
+    .. method:: num_items()
 
-Return extra attributes to place on the root (i.e. feed/channel) element.
-Called from write().
+    .. method:: root_attributes()
 
-.. method:: add_root_elements(handler)
+        Return extra attributes to place on the root (i.e. feed/channel)
+        element. Called from ``write()``.
 
-Add elements in the root (i.e. feed/channel) element. Called from write().
+    .. method:: add_root_elements(handler)
 
-.. method:: item_attributes(item)
+        Add elements in the root (i.e. feed/channel) element. Called from
+        ``write()``.
 
-Return extra attributes to place on each item (i.e. item/entry) element.
+    .. method:: item_attributes(item)
 
-.. method:: add_item_elements(handler, item)
+        Return extra attributes to place on each item (i.e. item/entry) element.
 
-Add elements on each item (i.e. item/entry) element.
+    .. method:: add_item_elements(handler, item)
 
-.. method:: write(outfile, encoding)
+        Add elements on each item (i.e. item/entry) element.
 
-Outputs the feed in the given encoding to ``outfile``, which is a file-like
-object. Subclasses should override this.
+    .. method:: write(outfile, encoding)
 
-.. method:: writeString(encoding)
+        Outputs the feed in the given encoding to ``outfile``, which is a
+        file-like object. Subclasses should override this.
 
-Returns the feed in the given encoding as a string.
+    .. method:: writeString(encoding)
 
-.. method:: latest_post_date()
+        Returns the feed in the given encoding as a string.
 
-Returns the latest item's ``pubdate``. If none of them have a ``pubdate``,
-this returns the current date/time.
+    .. method:: latest_post_date()
+
+        Returns the latest item's ``pubdate``. If none of them have a
+        ``pubdate``, this returns the current date/time.
 
 Enclosure
 ---------
@@ -284,6 +293,13 @@ Rss201rev2Feed
 .. class:: Rss201rev2Feed(RssFeed)
 
 Spec: http://blogs.law.harvard.edu/tech/rss
+
+RssUserland091Feed
+------------------
+
+.. class:: RssUserland091Feed(RssFeed)
+
+    Spec: http://backend.userland.com/rss091
 
 Atom1Feed
 ---------
