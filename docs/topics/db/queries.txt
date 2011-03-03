@@ -679,6 +679,7 @@ collection of keyword arguments. These keyword arguments are specified as in
 
 For example, this ``Q`` object encapsulates a single ``LIKE`` query::
 
+    from django.db.models import Q
     Q(question__startswith='What')
 
 ``Q`` objects can be combined using the ``&`` and ``|`` operators. When an
