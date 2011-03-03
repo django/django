@@ -256,3 +256,27 @@ class CommentViewTests(CommentTestCase):
         broken_location = location + u"\ufffd"
         response = self.client.get(broken_location)
         self.assertEqual(response.status_code, 200)
+
+    def testCommentNextWithQueryStringAndAnchor(self):
+        """
+        The `next` key needs to handle already having an anchor. Refs #13411.
+        """
+        # With a query string also.
+        a = Article.objects.get(pk=1)
+        data = self.getValidData(a)
+        data["next"] = "/somewhere/else/?foo=bar#baz"
+        data["comment"] = "This is another comment"
+        response = self.client.post("/post/", data)
+        location = response["Location"]
+        match = re.search(r"^http://testserver/somewhere/else/\?foo=bar&c=\d+#baz$", location)
+        self.failUnless(match != None, "Unexpected redirect location: %s" % location)
+
+        # Without a query string
+        a = Article.objects.get(pk=1)
+        data = self.getValidData(a)
+        data["next"] = "/somewhere/else/#baz"
+        data["comment"] = "This is another comment"
+        response = self.client.post("/post/", data)
+        location = response["Location"]
+        match = re.search(r"^http://testserver/somewhere/else/\?c=\d+#baz$", location)
+        self.failUnless(match != None, "Unexpected redirect location: %s" % location)
