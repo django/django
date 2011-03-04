@@ -39,6 +39,9 @@ class Category(models.Model):
 class Writer(models.Model):
     name = models.CharField(max_length=50, help_text='Use both first and last names.')
 
+    class Meta:
+        ordering = ('name',)
+
     def __unicode__(self):
         return self.name
 
@@ -546,8 +549,8 @@ fields with the 'choices' attribute are represented by a ChoiceField.
 <tr><th>Pub date:</th><td><input type="text" name="pub_date" /></td></tr>
 <tr><th>Writer:</th><td><select name="writer">
 <option value="" selected="selected">---------</option>
-<option value="...">Mike Royko</option>
 <option value="...">Bob Woodward</option>
+<option value="...">Mike Royko</option>
 </select></td></tr>
 <tr><th>Article:</th><td><textarea rows="10" cols="40" name="article"></textarea></td></tr>
 <tr><th>Status:</th><td><select name="status">
@@ -601,8 +604,8 @@ inserted as 'initial' data in each Field.
 <li>Pub date: <input type="text" name="pub_date" value="1988-01-04" /></li>
 <li>Writer: <select name="writer">
 <option value="">---------</option>
-<option value="..." selected="selected">Mike Royko</option>
 <option value="...">Bob Woodward</option>
+<option value="..." selected="selected">Mike Royko</option>
 </select></li>
 <li>Article: <textarea rows="10" cols="40" name="article">Hello.</textarea></li>
 <li>Status: <select name="status">
@@ -664,8 +667,8 @@ Add some categories and test the many-to-many form output.
 <li>Pub date: <input type="text" name="pub_date" value="1988-01-04" /></li>
 <li>Writer: <select name="writer">
 <option value="">---------</option>
-<option value="..." selected="selected">Mike Royko</option>
 <option value="...">Bob Woodward</option>
+<option value="..." selected="selected">Mike Royko</option>
 </select></li>
 <li>Article: <textarea rows="10" cols="40" name="article">Hello.</textarea></li>
 <li>Status: <select name="status">
@@ -688,8 +691,8 @@ Initial values can be provided for model forms
 <li>Pub date: <input type="text" name="pub_date" /></li>
 <li>Writer: <select name="writer">
 <option value="" selected="selected">---------</option>
-<option value="...">Mike Royko</option>
 <option value="...">Bob Woodward</option>
+<option value="...">Mike Royko</option>
 </select></li>
 <li>Article: <textarea rows="10" cols="40" name="article"></textarea></li>
 <li>Status: <select name="status">
@@ -804,8 +807,8 @@ the data in the database when the form is instantiated.
 <li>Pub date: <input type="text" name="pub_date" /></li>
 <li>Writer: <select name="writer">
 <option value="" selected="selected">---------</option>
-<option value="...">Mike Royko</option>
 <option value="...">Bob Woodward</option>
+<option value="...">Mike Royko</option>
 </select></li>
 <li>Article: <textarea rows="10" cols="40" name="article"></textarea></li>
 <li>Status: <select name="status">
@@ -829,9 +832,9 @@ the data in the database when the form is instantiated.
 <li>Pub date: <input type="text" name="pub_date" /></li>
 <li>Writer: <select name="writer">
 <option value="" selected="selected">---------</option>
-<option value="...">Mike Royko</option>
 <option value="...">Bob Woodward</option>
 <option value="...">Carl Bernstein</option>
+<option value="...">Mike Royko</option>
 </select></li>
 <li>Article: <textarea rows="10" cols="40" name="article"></textarea></li>
 <li>Status: <select name="status">
@@ -1053,10 +1056,10 @@ True
 >>> print form.as_p()
 <p><label for="id_writer">Writer:</label> <select name="writer" id="id_writer">
 <option value="" selected="selected">---------</option>
-<option value="...">Mike Royko</option>
 <option value="...">Bob Woodward</option>
 <option value="...">Carl Bernstein</option>
 <option value="...">Joe Better</option>
+<option value="...">Mike Royko</option>
 </select></p>
 <p><label for="id_age">Age:</label> <input type="text" name="age" id="id_age" /></p>
 
@@ -1073,10 +1076,10 @@ True
 >>> print form.as_p()
 <p><label for="id_writer">Writer:</label> <select name="writer" id="id_writer">
 <option value="">---------</option>
-<option value="...">Mike Royko</option>
 <option value="..." selected="selected">Bob Woodward</option>
 <option value="...">Carl Bernstein</option>
 <option value="...">Joe Better</option>
+<option value="...">Mike Royko</option>
 </select></p>
 <p><label for="id_age">Age:</label> <input type="text" name="age" value="65" id="id_age" /></p>
 
