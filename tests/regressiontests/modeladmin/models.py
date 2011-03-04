@@ -9,6 +9,9 @@ class Band(models.Model):
     bio = models.TextField()
     sign_date = models.DateField()
 
+    class Meta:
+        ordering = ('name',)
+
     def __unicode__(self):
         return self.name
 
