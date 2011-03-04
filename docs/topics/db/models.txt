@@ -284,7 +284,7 @@ relationships: many-to-one, many-to-many and one-to-one.
 Many-to-one relationships
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To define a many-to-one relationship, use :class:`~django.db.models.ForeignKey`.
+To define a many-to-one relationship, use :class:`django.db.models.ForeignKey`.
 You use it just like any other :class:`~django.db.models.Field` type: by
 including it as a class attribute of your model.
 
@@ -318,14 +318,18 @@ whatever you want. For example::
 
 .. seealso::
 
-    See the `Many-to-one relationship model example`_ for a full example.
+    :class:`~django.db.models.ForeignKey` fields accept a number of extra
+    arguments which are explained in :ref:`the model field reference
+    <foreign-key-arguments>`. These options help define how the relationship
+    should work; all are optional.
 
-.. _Many-to-one relationship model example: http://code.djangoproject.com/browser/django/trunk/tests/modeltests/many_to_one/models.py
+    For details on accessing backwards-related objects, see the
+    `Following relationships backward example`_.
+    
+    For sample code, see the `Many-to-one relationship model tests`_.
 
-:class:`~django.db.models.ForeignKey` fields also accept a number of extra
-arguments which are explained in :ref:`the model field reference
-<foreign-key-arguments>`. These options help define how the relationship should
-work; all are optional.
+    .. _Following relationships backward example: http://docs.djangoproject.com/en/dev/topics/db/queries/#backwards-related-objects
+    .. _Many-to-one relationship model tests: http://code.djangoproject.com/browser/django/trunk/tests/modeltests/many_to_one
 
 Many-to-many relationships
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -929,7 +933,7 @@ The second type of model inheritance supported by Django is when each model in
 the hierarchy is a model all by itself. Each model corresponds to its own
 database table and can be queried and created individually. The inheritance
 relationship introduces links between the child model and each of its parents
-(via an automatically-created :class:`~django.db.models.fields.OneToOneField`).
+(via an automatically-created :class:`~django.db.models.OneToOneField`).
 For example::
 
     class Place(models.Model):
@@ -1208,7 +1212,7 @@ Field name "hiding" is not permitted
 
 In normal Python class inheritance, it is permissible for a child class to
 override any attribute from the parent class. In Django, this is not permitted
-for attributes that are :class:`~django.db.models.fields.Field` instances (at
+for attributes that are :class:`~django.db.models.Field` instances (at
 least, not at the moment). If a base class has a field called ``author``, you
 cannot create another model field called ``author`` in any class that inherits
 from that base class.
@@ -1221,7 +1225,7 @@ difference between Django model inheritance and Python class inheritance isn't
 arbitrary.
 
 This restriction only applies to attributes which are
-:class:`~django.db.models.fields.Field` instances. Normal Python attributes
+:class:`~django.db.models.Field` instances. Normal Python attributes
 can be overridden if you wish. It also only applies to the name of the
 attribute as Python sees it: if you are manually specifying the database
 column name, you can have the same column name appearing in both a child and
