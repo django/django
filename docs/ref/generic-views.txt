@@ -8,7 +8,7 @@ abstracted into "generic views" that let you quickly provide common views of
 an object without actually needing to write any Python code.
 
 A general introduction to generic views can be found in the :doc:`topic guide
-</topics/http/generic-views>`.
+</topics/generic-views>`.
 
 This reference contains details of Django's built-in generic views, along with
 a list of all keyword arguments that a generic view expects. Remember that
