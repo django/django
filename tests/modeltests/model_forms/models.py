@@ -169,12 +169,15 @@ class ArticleStatus(models.Model):
     status = models.CharField(max_length=2, choices=ARTICLE_STATUS_CHAR, blank=True, null=True)
 
 class Inventory(models.Model):
-   barcode = models.PositiveIntegerField(unique=True)
-   parent = models.ForeignKey('self', to_field='barcode', blank=True, null=True)
-   name = models.CharField(blank=False, max_length=20)
+    barcode = models.PositiveIntegerField(unique=True)
+    parent = models.ForeignKey('self', to_field='barcode', blank=True, null=True)
+    name = models.CharField(blank=False, max_length=20)
 
-   def __unicode__(self):
-      return self.name
+    class Meta:
+        ordering = ('name',)
+
+    def __unicode__(self):
+        return self.name
 
 class Book(models.Model):
     title = models.CharField(max_length=40)
@@ -1530,8 +1533,8 @@ ValidationError: [u'Select a valid choice. z is not one of the available choices
 ...     print choice
 (u'', u'---------')
 (86, u'Apple')
-(22, u'Pear')
 (87, u'Core')
+(22, u'Pear')
 
 >>> class InventoryForm(ModelForm):
 ...     class Meta:
@@ -1541,8 +1544,8 @@ ValidationError: [u'Select a valid choice. z is not one of the available choices
 <select name="parent" id="id_parent">
 <option value="">---------</option>
 <option value="86" selected="selected">Apple</option>
-<option value="22">Pear</option>
 <option value="87">Core</option>
+<option value="22">Pear</option>
 </select>
 
 >>> data = model_to_dict(core)
@@ -1571,8 +1574,8 @@ ValidationError: [u'Select a valid choice. z is not one of the available choices
 >>> for choice in field.choices:
 ...     print choice
 (86, u'Apple')
-(22, u'Pear')
 (87, u'Core')
+(22, u'Pear')
 >>> field.clean([86])
 [<Inventory: Apple>]
 
@@ -1582,7 +1585,7 @@ ValidationError: [u'Select a valid choice. z is not one of the available choices
 >>> form.is_valid()
 True
 >>> form.cleaned_data
-{'items': [<Inventory: Pear>, <Inventory: Core>]}
+{'items': [<Inventory: Core>, <Inventory: Pear>]}
 
 # Model field that returns None to exclude itself with explicit fields ########
 
