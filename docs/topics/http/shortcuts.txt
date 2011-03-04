@@ -46,7 +46,7 @@ Optional arguments
 ``context_instance``
     The context instance to render the template with. By default, the template
     will be rendered with a ``RequestContext`` instance (filled with values from
-    ``request`` and ```dictionary``).
+    ``request`` and ``dictionary``).
 
 ``content_type``
     The MIME type to use for the resulting document. Defaults to the value of
