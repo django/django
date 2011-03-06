@@ -171,11 +171,6 @@ class BaseCreateView(ModelFormMixin, ProcessFormView):
         self.object = None
         return super(BaseCreateView, self).post(request, *args, **kwargs)
 
-    # PUT is a valid HTTP verb for creating (with a known URL) or editing an
-    # object, note that browsers only support POST for now.
-    def put(self, *args, **kwargs):
-        return self.post(*args, **kwargs)
-
 
 class CreateView(SingleObjectTemplateResponseMixin, BaseCreateView):
     """
@@ -198,11 +193,6 @@ class BaseUpdateView(ModelFormMixin, ProcessFormView):
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
         return super(BaseUpdateView, self).post(request, *args, **kwargs)
-
-    # PUT is a valid HTTP verb for creating (with a known URL) or editing an
-    # object, note that browsers only support POST for now.
-    def put(self, *args, **kwargs):
-        return self.post(*args, **kwargs)
 
 
 class UpdateView(SingleObjectTemplateResponseMixin, BaseUpdateView):
