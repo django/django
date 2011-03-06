@@ -133,6 +133,23 @@ can also add special translator comments in the source.
 For more information, see :ref:`contextual-markers` and
 :ref:`translator-comments`.
 
+Improvements to built-in template tags
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A number of improvements have been made to Django's built-in template tags:
+
+    * The :ttag:`include` tag now accepts a ``with`` option, allowing
+      you to specify context variables to the included template
+
+    * The :ttag:`include` tag now accepts a ``only`` option, allowing
+      you to exclude the current context from the included context
+
+    * The :ttag:`with` tag now allows you to define multiple context
+      variables in a single :ttag:`with` block.
+
+    * The :ttag:`load` tag now accepts a ``from`` argument, allowing
+      you to load a single tag or filter from a library.
+
 TemplateResponse
 ~~~~~~~~~~~~~~~~
 
