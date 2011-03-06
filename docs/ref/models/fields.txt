@@ -838,15 +838,13 @@ Like all :class:`CharField` subclasses, :class:`URLField` takes the optional
 
 .. class:: XMLField(schema_path=None, [**options])
 
-A :class:`TextField` that checks that the value is valid XML that matches a
-given schema. Takes one required argument:
+A :class:`TextField` that stores XML data and a path to a schema. Takes one
+optional argument:
 
 .. attribute:: schema_path
 
-    The filesystem path to a RelaxNG_ schema against which to validate the
-    field.
+    The filesystem path to a schema for the field.
 
-.. _RelaxNG: http://www.relaxng.org/
 
 Relationship fields
 ===================
