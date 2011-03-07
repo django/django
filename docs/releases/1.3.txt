@@ -58,7 +58,7 @@ In previous versions of Django, it was common to place static assets in
 :setting:`MEDIA_URL`. Part of the purpose of introducing the ``staticfiles``
 app is to make it easier to keep static files separate from user-uploaded
 files. Static assets should now go in ``static/`` subdirectories of your apps
-or in "project-wide" static directories listed in :setting:`STATICFILES_DIRS`,
+or in other static assets directories listed in :setting:`STATICFILES_DIRS`,
 and will be served at :setting:`STATIC_URL`.
 
 See the :doc:`reference documentation of the app </ref/contrib/staticfiles>`
