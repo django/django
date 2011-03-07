@@ -31,7 +31,8 @@ class BaseFinder(object):
     def list(self, ignore_patterns=[]):
         """
         Given an optional list of paths to ignore, this should return
-        a three item iterable with path, prefix and a storage instance.
+        a two item iterable consisting of the relative path and storage
+        instance.
         """
         raise NotImplementedError()
 
