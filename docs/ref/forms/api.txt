@@ -657,7 +657,7 @@ those classes as an argument::
 	>>> f['message'].css_classes('foo bar')
 	'foo bar required'
 
-.. method:: BoundField.values()
+.. method:: BoundField.value()
 
    .. versionadded:: 1.3
 
@@ -667,9 +667,9 @@ by a ``Widget``::
     >>> initial = {'subject': 'welcome'}
     >>> unbound_form = ContactForm(initial=initial)
     >>> bound_form = ContactForm(data, initial=initial)
-    >>> print unbound_form['subject'].value
+    >>> print unbound_form['subject'].value()
     welcome
-    >>> print bound_form['subject'].value
+    >>> print bound_form['subject'].value()
     hi
 
 .. _binding-uploaded-files:
