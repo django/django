@@ -1582,7 +1582,7 @@ class UnionTests(unittest.TestCase):
             objectas.append(o)
         b_info = [('un', 1, objectas[0]), ('deux', 2, objectas[0]), ('trois', 3, objectas[2])]
         for name, number, objecta in b_info:
-            o = ObjectB(name=name, number=number, objecta=objecta)
+            o = ObjectB(name=name, num=number, objecta=objecta)
             o.save()
             objectbs.append(o)
         c_info = [('ein', objectas[2], objectbs[2]), ('zwei', objectas[1], objectbs[1])]
@@ -1603,7 +1603,7 @@ class UnionTests(unittest.TestCase):
 
     def test_A_AB2(self):
         Q1 = Q(name='two')
-        Q2 = Q(objectb__name='deux', objectb__number=2)
+        Q2 = Q(objectb__name='deux', objectb__num=2)
         self.check_union(ObjectA, Q1, Q2)
 
     def test_AB_ACB(self):

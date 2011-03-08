@@ -305,7 +305,7 @@ class ObjectA(models.Model):
 class ObjectB(models.Model):
     name = models.CharField(max_length=50)
     objecta = models.ForeignKey(ObjectA)
-    number = models.PositiveSmallIntegerField()
+    num = models.PositiveSmallIntegerField()
 
     def __unicode__(self):
         return self.name
