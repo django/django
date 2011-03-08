@@ -102,11 +102,31 @@ outside of a loop. To do this, just give the ``{% cycle %}`` tag a name, using
 
     {% cycle 'row1' 'row2' as rowcolors %}
 
-From then on, you can insert the current value of the cycle wherever you'd like
-in your template::
+From then on, you can insert the current value of the cycle wherever
+you'd like in your template by referencing the cycle name as a context
+variable. If you want to move the cycle onto the next value, you use
+the cycle tag again, using the name of the variable. So, the following
+template::
 
-    <tr class="{% cycle rowcolors %}">...</tr>
-    <tr class="{% cycle rowcolors %}">...</tr>
+    <tr>
+        <td class="{% cycle 'row1' 'row2' as rowcolors %}">...</td>
+        <td class="{{ rowcolors }}">...</td>
+    </tr>
+    <tr>
+        <td class="{% cycle rowcolors %}">...</td>
+        <td class="{{ rowcolors }}">...</td>
+    </tr>
+
+would output::
+
+    <tr>
+        <td class="row1">...</td>
+        <td class="row1">...</td>
+    </tr>
+    <tr>
+        <td class="row2">...</td>
+        <td class="row2">...</td>
+    </tr>
 
 You can use any number of values in a ``{% cycle %}`` tag, separated by spaces.
 Values enclosed in single (``'``) or double quotes (``"``) are treated as
@@ -144,16 +164,25 @@ use the value in a nested loop or an included template. If you want to
 just declare the cycle, but not output the first value, you can add a
 ``silent`` keyword as the last keyword in the tag. For example::
 
-    {% cycle 'row1' 'row2' as rowcolors silent %}
     {% for obj in some_list %}
-        <tr class="{% cycle rowcolors %}">{{ obj }}</tr>
+        {% cycle 'row1' 'row2' as rowcolors silent %}
+        <tr class="{{ rowcolors }}">{% include "subtemplate.html " %}</tr>
     {% endfor %}
 
 This will output a list of ``<tr>`` elements with ``class``
-alternating between ``row1`` and ``row2``. If the ``silent`` keyword
-were to be omitted, ``row1`` would be emitted as normal text, outside
-the list of ``<tr>`` elements, and the first ``<tr>`` would have a
-class of ``row2``.
+alternating between ``row1`` and ``row2``; the subtemplate will have
+access to ``rowcolors`` in it's context that matches the class of the
+``<tr>`` that encloses it. If the ``silent`` keyword were to be
+omitted, ``row1`` would be emitted as normal text, outside the
+``<tr>`` element.
+
+When the silent keyword is used on a cycle definition, the silence
+automatically applies to all subsequent uses of the cycle tag. In,
+the following template would output *nothing*, even though the second
+call to ``{% cycle %}`` doesn't specify silent::
+
+    {% cycle 'row1' 'row2' as rowcolors silent %}
+    {% cycle rowcolors %}
 
 .. templatetag:: debug
 
