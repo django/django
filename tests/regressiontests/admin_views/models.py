@@ -710,7 +710,7 @@ class Paper(models.Model):
 
 class CoverLetter(models.Model):
     author = models.CharField(max_length=30)
-    date = models.DateField(null=True, blank=True)
+    date_written = models.DateField(null=True, blank=True)
 
     def __unicode__(self):
         return self.author
@@ -733,7 +733,7 @@ class CoverLetterAdmin(admin.ModelAdmin):
 
     def queryset(self, request):
         #return super(CoverLetterAdmin, self).queryset(request).only('author')
-        return super(CoverLetterAdmin, self).queryset(request).defer('date')
+        return super(CoverLetterAdmin, self).queryset(request).defer('date_written')
 
 class Story(models.Model):
     title = models.CharField(max_length=100)
