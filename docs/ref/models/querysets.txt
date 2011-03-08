@@ -2,7 +2,7 @@
 QuerySet API reference
 ======================
 
-.. currentmodule:: django.db.models.QuerySet
+.. currentmodule:: django.db.models.query
 
 This document describes the details of the ``QuerySet`` API. It builds on the
 material presented in the :doc:`model </topics/db/models>` and :doc:`database
@@ -120,12 +120,38 @@ QuerySet API
 ============
 
 Though you usually won't create one manually -- you'll go through a
-:class:`Manager` -- here's the formal declaration of a ``QuerySet``:
+:class:`~django.db.models.Manager` -- here's the formal declaration of a
+``QuerySet``:
 
-.. class:: QuerySet([model=None])
+.. class:: QuerySet([model=None, query=None, using=None])
 
-Usually when you'll interact with a ``QuerySet`` you'll use it by :ref:`chaining
-filters <chaining-filters>`. To make this work, most ``QuerySet`` methods return new querysets.
+    Usually when you'll interact with a ``QuerySet`` you'll use it by
+    :ref:`chaining filters <chaining-filters>`. To make this work, most
+    ``QuerySet`` methods return new querysets. These methods are covered in
+    detail later in this section.
+
+    The ``QuerySet`` class has two public attributes you can use for
+    introspection:
+
+    .. attribute:: ordered
+
+        ``True`` if the ``QuerySet`` is ordered -- i.e. has an order_by()
+        clause or a default ordering on the model. ``False`` otherwise.
+
+    .. attribute:: db
+    
+        The database that will be used if this query is executed now.
+
+    .. note::
+
+        The ``query`` parameter to :class:`QuerySet` exists so that specialized
+        query subclasses such as
+        :class:`~django.contrib.gis.db.models.GeoQuerySet` can reconstruct
+        internal query state. The value of the parameter is an opaque
+        representation of that query state and is not part of a public API.
+        To put it simply: if you need to ask, you don't need to use it.
+
+.. currentmodule:: django.db.models.query.QuerySet
 
 Methods that return new QuerySets
 ---------------------------------
@@ -285,7 +311,7 @@ If you don't want any ordering to be applied to a query, not even the default
 ordering, call ``order_by()`` with no parameters.
 
 You can tell if a query is ordered or not by checking the
-:attr:`QuerySet.ordered` attribute, which will be ``True`` if the
+:attr:`.QuerySet.ordered` attribute, which will be ``True`` if the
 ``QuerySet`` has been ordered in any way.
 
 reverse
@@ -999,9 +1025,9 @@ The :ref:`force_insert <ref-models-force-insert>` parameter is documented
 elsewhere, but all it means is that a new object will always be created.
 Normally you won't need to worry about this. However, if your model contains a
 manual primary key value that you set and if that value already exists in the
-database, a call to ``create()`` will fail with an :exc:`IntegrityError` since
-primary keys must be unique. So remember to be prepared to handle the exception
-if you are using manual primary keys.
+database, a call to ``create()`` will fail with an
+:exc:`~django.db.IntegrityError` since primary keys must be unique. So remember
+to be prepared to handle the exception if you are using manual primary keys.
 
 get_or_create
 ~~~~~~~~~~~~~
@@ -1197,10 +1223,10 @@ exists
 
 .. versionadded:: 1.2
 
-Returns ``True`` if the :class:`QuerySet` contains any results, and ``False``
+Returns ``True`` if the :class:`.QuerySet` contains any results, and ``False``
 if not. This tries to perform the query in the simplest and fastest way
 possible, but it *does* execute nearly the same query. This means that calling
-:meth:`QuerySet.exists()` is faster than ``bool(some_query_set)``, but not by
+:meth:`.QuerySet.exists` is faster than ``bool(some_query_set)``, but not by
 a large degree.  If ``some_query_set`` has not yet been evaluated, but you know
 that it will be at some point, then using ``some_query_set.exists()`` will do
 more overall work (an additional query) than simply using
@@ -1213,10 +1239,10 @@ update
 
 Performs an SQL update query for the specified fields, and returns
 the number of rows affected. The ``update()`` method is applied instantly and
-the only restriction on the :class:`QuerySet` that is updated is that it can
+the only restriction on the :class:`.QuerySet` that is updated is that it can
 only update columns in the model's main table. Filtering based on related
 fields is still possible. You cannot call ``update()`` on a
-:class:`QuerySet` that has had a slice taken or can otherwise no longer be
+:class:`.QuerySet` that has had a slice taken or can otherwise no longer be
 filtered.
 
 For example, if you wanted to update all the entries in a particular blog
@@ -1236,9 +1262,9 @@ delete
 
 .. method:: delete()
 
-Performs an SQL delete query on all rows in the :class:`QuerySet`. The
+Performs an SQL delete query on all rows in the :class:`.QuerySet`. The
 ``delete()`` is applied instantly. You cannot call ``delete()`` on a
-:class:`QuerySet` that has had a slice taken or can otherwise no longer be
+:class:`.QuerySet` that has had a slice taken or can otherwise no longer be
 filtered.
 
 For example, to delete all the entries in a particular blog::

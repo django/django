@@ -24,7 +24,7 @@ introduce controlled coupling for convenience's sake.
 
    :func:`render()` is the same as a call to
    :func:`render_to_response()` with a `context_instance` argument that
-   that forces the use of a :class:`RequestContext`.
+   that forces the use of a :class:`~django.template.RequestContext`.
 
 Required arguments
 ------------------
@@ -220,7 +220,7 @@ will be returned::
 
 .. function:: get_object_or_404(klass, *args, **kwargs)
 
-   Calls :meth:`~django.db.models.QuerySet.get()` on a given model manager,
+   Calls :meth:`~django.db.models.query.QuerySet.get()` on a given model manager,
    but it raises :class:`~django.http.Http404` instead of the model's
    :class:`~django.core.exceptions.DoesNotExist` exception.
 
@@ -229,7 +229,8 @@ Required arguments
 
 ``klass``
     A :class:`~django.db.models.Model`, :class:`~django.db.models.Manager` or
-    :class:`~django.db.models.QuerySet` instance from which to get the object.
+    :class:`~django.db.models.query.QuerySet` instance from which to get the
+    object.
 
 ``**kwargs``
     Lookup parameters, which should be in the format accepted by ``get()`` and
@@ -265,7 +266,7 @@ will be raised if more than one object is found.
 
 .. function:: get_list_or_404(klass, *args, **kwargs)
 
-   Returns the result of :meth:`~django.db.models.QuerySet.filter()` on a
+   Returns the result of :meth:`~django.db.models.query.QuerySet.filter()` on a
    given model manager, raising :class:`~django.http.Http404` if the resulting
    list is empty.
 
