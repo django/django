@@ -7,7 +7,7 @@ from django import forms
 from django.db import models
 from django.forms.models import (_get_foreign_key, inlineformset_factory,
     modelformset_factory, modelformset_factory)
-from django.test import TestCase
+from django.test import TestCase, skipUnlessDBFeature
 
 from modeltests.model_formsets.models import (
     Author, BetterAuthor, Book, BookWithCustomPK, Editor,
@@ -577,10 +577,13 @@ class ModelFormsetTest(TestCase):
         self.assertEqual(book1.title, 'Flowers of Evil')
         self.assertEqual(book1.notes, 'English translation of Les Fleurs du Mal')
 
+    @skipUnlessDBFeature('ignores_nulls_in_unique_constraints')
+    def test_inline_formsets_with_nullable_unique_together(self):
         # Test inline formsets where the inline-edited object has a
         # unique_together constraint with a nullable member
 
         AuthorBooksFormSet4 = inlineformset_factory(Author, BookWithOptionalAltEditor, can_delete=False, extra=2)
+        author = Author.objects.create(pk=1, name='Charles Baudelaire')
 
         data = {
             'bookwithoptionalalteditor_set-TOTAL_FORMS': '2', # the number of forms rendered

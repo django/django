@@ -76,6 +76,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_timezones = False
     supports_bitwise_or = False
     can_defer_constraint_checks = True
+    ignores_nulls_in_unique_constraints = False
 
 class DatabaseOperations(BaseDatabaseOperations):
     compiler_module = "django.db.backends.oracle.compiler"

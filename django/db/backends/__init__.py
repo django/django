@@ -266,6 +266,10 @@ class BaseDatabaseFeatures(object):
     # Does the backend distinguish between '' and None?
     interprets_empty_strings_as_nulls = False
 
+    # Does the backend allow inserting duplicate rows when a unique_together
+    # constraint exists, but one of the unique_together columns is NULL?
+    ignores_nulls_in_unique_constraints = True
+
     can_use_chunked_reads = True
     can_return_id_from_insert = False
     uses_autocommit = False
