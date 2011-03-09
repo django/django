@@ -794,8 +794,8 @@ class AdminViewPermissionsTest(TestCase):
         self.client.get('/test_admin/admin/logout/')
 
         # Test redirection when using row-level change permissions. Refs #11513.
-        RowLevelChangePermissionModel.objects.create(name="odd id")
-        RowLevelChangePermissionModel.objects.create(name="even id")
+        RowLevelChangePermissionModel.objects.create(id=1, name="odd id")
+        RowLevelChangePermissionModel.objects.create(id=2, name="even id")
         for login_dict in [self.super_login, self.changeuser_login, self.adduser_login, self.deleteuser_login]:
             self.client.post('/test_admin/admin/', login_dict)
             request = self.client.get('/test_admin/admin/admin_views/rowlevelchangepermissionmodel/1/')
@@ -871,12 +871,13 @@ class AdminViewPermissionsTest(TestCase):
         })
         self.assertRedirects(post, '/test_admin/admin/admin_views/customarticle/')
         self.assertEqual(CustomArticle.objects.all().count(), 1)
+        article_pk = CustomArticle.objects.all()[0].pk
 
         # Test custom delete, change, and object history templates
         # Test custom change form template
-        request = self.client.get('/test_admin/admin/admin_views/customarticle/1/')
+        request = self.client.get('/test_admin/admin/admin_views/customarticle/%d/' % article_pk)
         self.assertTemplateUsed(request, 'custom_admin/change_form.html')
-        request = self.client.get('/test_admin/admin/admin_views/customarticle/1/delete/')
+        request = self.client.get('/test_admin/admin/admin_views/customarticle/%d/delete/' % article_pk)
         self.assertTemplateUsed(request, 'custom_admin/delete_confirmation.html')
         request = self.client.post('/test_admin/admin/admin_views/customarticle/', data={
                 'index': 0,
@@ -884,7 +885,7 @@ class AdminViewPermissionsTest(TestCase):
                 '_selected_action': ['1'],
             })
         self.assertTemplateUsed(request, 'custom_admin/delete_selected_confirmation.html')
-        request = self.client.get('/test_admin/admin/admin_views/customarticle/1/history/')
+        request = self.client.get('/test_admin/admin/admin_views/customarticle/%d/history/' % article_pk)
         self.assertTemplateUsed(request, 'custom_admin/object_history.html')
 
         self.client.get('/test_admin/admin/logout/')
@@ -1478,27 +1479,27 @@ class AdminViewListEditable(TestCase):
         ''' Ensure that non field errors are displayed for each of the
             forms in the changelist's formset. Refs #13126.
         '''
-        FoodDelivery.objects.create(reference='123', driver='bill', restaurant='thai')
-        FoodDelivery.objects.create(reference='456', driver='bill', restaurant='india')
-        FoodDelivery.objects.create(reference='789', driver='bill', restaurant='pizza')
+        fd1 = FoodDelivery.objects.create(reference='123', driver='bill', restaurant='thai')
+        fd2 = FoodDelivery.objects.create(reference='456', driver='bill', restaurant='india')
+        fd3 = FoodDelivery.objects.create(reference='789', driver='bill', restaurant='pizza')
 
         data = {
             "form-TOTAL_FORMS": "3",
             "form-INITIAL_FORMS": "3",
             "form-MAX_NUM_FORMS": "0",
 
-            "form-0-id": "1",
+            "form-0-id": str(fd1.id),
             "form-0-reference": "123",
             "form-0-driver": "bill",
             "form-0-restaurant": "thai",
 
             # Same data as above: Forbidden because of unique_together!
-            "form-1-id": "2",
+            "form-1-id": str(fd2.id),
             "form-1-reference": "456",
             "form-1-driver": "bill",
             "form-1-restaurant": "thai",
 
-            "form-2-id": "3",
+            "form-2-id": str(fd3.id),
             "form-2-reference": "789",
             "form-2-driver": "bill",
             "form-2-restaurant": "pizza",
@@ -1513,19 +1514,19 @@ class AdminViewListEditable(TestCase):
             "form-INITIAL_FORMS": "3",
             "form-MAX_NUM_FORMS": "0",
 
-            "form-0-id": "1",
+            "form-0-id": str(fd1.id),
             "form-0-reference": "123",
             "form-0-driver": "bill",
             "form-0-restaurant": "thai",
 
             # Same data as above: Forbidden because of unique_together!
-            "form-1-id": "2",
+            "form-1-id": str(fd2.id),
             "form-1-reference": "456",
             "form-1-driver": "bill",
             "form-1-restaurant": "thai",
 
             # Same data also.
-            "form-2-id": "3",
+            "form-2-id": str(fd3.id),
             "form-2-reference": "789",
             "form-2-driver": "bill",
             "form-2-restaurant": "thai",
@@ -1685,28 +1686,28 @@ class AdminViewListEditable(TestCase):
             separately (not in the table), and only once.
             Refs #12475.
         """
-        Story.objects.create(title='The adventures of Guido', content='Once upon a time in Djangoland...')
-        Story.objects.create(title='Crouching Tiger, Hidden Python', content='The Python was sneaking into...')
+        story1 = Story.objects.create(title='The adventures of Guido', content='Once upon a time in Djangoland...')
+        story2 = Story.objects.create(title='Crouching Tiger, Hidden Python', content='The Python was sneaking into...')
         response = self.client.get('/test_admin/admin/admin_views/story/')
         self.assertContains(response, 'id="id_form-0-id"', 1) # Only one hidden field, in a separate place than the table.
         self.assertContains(response, 'id="id_form-1-id"', 1)
-        self.assertContains(response, '<div class="hiddenfields">\n<input type="hidden" name="form-0-id" value="2" id="id_form-0-id" /><input type="hidden" name="form-1-id" value="1" id="id_form-1-id" />\n</div>')
-        self.assertContains(response, '<td>1</td>', 1)
-        self.assertContains(response, '<td>2</td>', 1)
+        self.assertContains(response, '<div class="hiddenfields">\n<input type="hidden" name="form-0-id" value="%d" id="id_form-0-id" /><input type="hidden" name="form-1-id" value="%d" id="id_form-1-id" />\n</div>' % (story2.id, story1.id))
+        self.assertContains(response, '<td>%d</td>' % story1.id, 1)
+        self.assertContains(response, '<td>%d</td>' % story2.id, 1)
 
     def test_pk_hidden_fields_with_list_display_links(self):
         """ Similarly as test_pk_hidden_fields, but when the hidden pk fields are
             referenced in list_display_links.
             Refs #12475.
         """
-        OtherStory.objects.create(title='The adventures of Guido', content='Once upon a time in Djangoland...')
-        OtherStory.objects.create(title='Crouching Tiger, Hidden Python', content='The Python was sneaking into...')
+        story1 = OtherStory.objects.create(title='The adventures of Guido', content='Once upon a time in Djangoland...')
+        story2 = OtherStory.objects.create(title='Crouching Tiger, Hidden Python', content='The Python was sneaking into...')
         response = self.client.get('/test_admin/admin/admin_views/otherstory/')
         self.assertContains(response, 'id="id_form-0-id"', 1) # Only one hidden field, in a separate place than the table.
         self.assertContains(response, 'id="id_form-1-id"', 1)
-        self.assertContains(response, '<div class="hiddenfields">\n<input type="hidden" name="form-0-id" value="2" id="id_form-0-id" /><input type="hidden" name="form-1-id" value="1" id="id_form-1-id" />\n</div>')
-        self.assertContains(response, '<th><a href="1/">1</a></th>', 1)
-        self.assertContains(response, '<th><a href="2/">2</a></th>', 1)
+        self.assertContains(response, '<div class="hiddenfields">\n<input type="hidden" name="form-0-id" value="%d" id="id_form-0-id" /><input type="hidden" name="form-1-id" value="%d" id="id_form-1-id" />\n</div>' % (story2.id, story1.id))
+        self.assertContains(response, '<th><a href="%d/">%d</a></th>' % (story1.id, story1.id), 1)
+        self.assertContains(response, '<th><a href="%d/">%d</a></th>' % (story2.id, story2.id), 1)
 
 
 class AdminSearchTest(TestCase):
@@ -1801,9 +1802,13 @@ class AdminInheritedInlinesTest(TestCase):
         self.assertEqual(BarAccount.objects.all()[0].username, bar_user)
         self.assertEqual(Persona.objects.all()[0].accounts.count(), 2)
 
+        persona_id = Persona.objects.all()[0].id
+        foo_id = FooAccount.objects.all()[0].id
+        bar_id = BarAccount.objects.all()[0].id
+
         # test the edit case
 
-        response = self.client.get('/test_admin/admin/admin_views/persona/1/')
+        response = self.client.get('/test_admin/admin/admin_views/persona/%d/' % persona_id)
         names = name_re.findall(response.content)
         # make sure we have no duplicate HTML names
         self.assertEqual(len(names), len(set(names)))
@@ -1816,18 +1821,18 @@ class AdminInheritedInlinesTest(TestCase):
             "accounts-MAX_NUM_FORMS": u"0",
 
             "accounts-0-username": "%s-1" % foo_user,
-            "accounts-0-account_ptr": "1",
-            "accounts-0-persona": "1",
+            "accounts-0-account_ptr": str(foo_id),
+            "accounts-0-persona": str(persona_id),
 
             "accounts-2-TOTAL_FORMS": u"2",
             "accounts-2-INITIAL_FORMS": u"1",
             "accounts-2-MAX_NUM_FORMS": u"0",
 
             "accounts-2-0-username": "%s-1" % bar_user,
-            "accounts-2-0-account_ptr": "2",
-            "accounts-2-0-persona": "1",
+            "accounts-2-0-account_ptr": str(bar_id),
+            "accounts-2-0-persona": str(persona_id),
         }
-        response = self.client.post('/test_admin/admin/admin_views/persona/1/', post_data)
+        response = self.client.post('/test_admin/admin/admin_views/persona/%d/' % persona_id, post_data)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(Persona.objects.count(), 1)
         self.assertEqual(FooAccount.objects.count(), 1)
@@ -2155,10 +2160,10 @@ class AdminInlineFileUploadTest(TestCase):
         file1.write('a' * (2 ** 21))
         filename = file1.name
         file1.close()
-        g = Gallery(name="Test Gallery")
-        g.save()
-        p = Picture(name="Test Picture", image=filename, gallery=g)
-        p.save()
+        self.gallery = Gallery(name="Test Gallery")
+        self.gallery.save()
+        self.picture = Picture(name="Test Picture", image=filename, gallery=self.gallery)
+        self.picture.save()
 
     def tearDown(self):
         self.client.logout()
@@ -2172,16 +2177,16 @@ class AdminInlineFileUploadTest(TestCase):
             "pictures-TOTAL_FORMS": u"2",
             "pictures-INITIAL_FORMS": u"1",
             "pictures-MAX_NUM_FORMS": u"0",
-            "pictures-0-id": u"1",
-            "pictures-0-gallery": u"1",
+            "pictures-0-id": unicode(self.picture.id),
+            "pictures-0-gallery": unicode(self.gallery.id),
             "pictures-0-name": "Test Picture",
             "pictures-0-image": "",
             "pictures-1-id": "",
-            "pictures-1-gallery": "1",
+            "pictures-1-gallery": str(self.gallery.id),
             "pictures-1-name": "Test Picture 2",
             "pictures-1-image": "",
         }
-        response = self.client.post('/test_admin/%s/admin_views/gallery/1/' % self.urlbit, post_data)
+        response = self.client.post('/test_admin/%s/admin_views/gallery/%d/' % (self.urlbit, self.gallery.id), post_data)
         self.assertTrue(response._container[0].find("Currently:") > -1)
 
 
@@ -2286,29 +2291,31 @@ class AdminInlineTests(TestCase):
         "A simple model can be saved as inlines"
         # First add a new inline
         self.post_data['widget_set-0-name'] = "Widget 1"
-        response = self.client.post('/test_admin/admin/admin_views/collector/1/', self.post_data)
+        collector_url = '/test_admin/admin/admin_views/collector/%d/' % self.collector.pk
+        response = self.client.post(collector_url, self.post_data)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(Widget.objects.count(), 1)
         self.assertEqual(Widget.objects.all()[0].name, "Widget 1")
+        widget_id = Widget.objects.all()[0].id
 
         # Check that the PK link exists on the rendered form
-        response = self.client.get('/test_admin/admin/admin_views/collector/1/')
+        response = self.client.get(collector_url)
         self.assertContains(response, 'name="widget_set-0-id"')
 
         # Now resave that inline
         self.post_data['widget_set-INITIAL_FORMS'] = "1"
-        self.post_data['widget_set-0-id'] = "1"
+        self.post_data['widget_set-0-id'] = str(widget_id)
         self.post_data['widget_set-0-name'] = "Widget 1"
-        response = self.client.post('/test_admin/admin/admin_views/collector/1/', self.post_data)
+        response = self.client.post(collector_url, self.post_data)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(Widget.objects.count(), 1)
         self.assertEqual(Widget.objects.all()[0].name, "Widget 1")
 
         # Now modify that inline
         self.post_data['widget_set-INITIAL_FORMS'] = "1"
-        self.post_data['widget_set-0-id'] = "1"
+        self.post_data['widget_set-0-id'] = str(widget_id)
         self.post_data['widget_set-0-name'] = "Widget 1 Updated"
-        response = self.client.post('/test_admin/admin/admin_views/collector/1/', self.post_data)
+        response = self.client.post(collector_url, self.post_data)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(Widget.objects.count(), 1)
         self.assertEqual(Widget.objects.all()[0].name, "Widget 1 Updated")
@@ -2317,29 +2324,30 @@ class AdminInlineTests(TestCase):
         "A model with an explicit autofield primary key can be saved as inlines. Regression for #8093"
         # First add a new inline
         self.post_data['grommet_set-0-name'] = "Grommet 1"
-        response = self.client.post('/test_admin/admin/admin_views/collector/1/', self.post_data)
+        collector_url = '/test_admin/admin/admin_views/collector/%d/' % self.collector.pk
+        response = self.client.post(collector_url, self.post_data)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(Grommet.objects.count(), 1)
         self.assertEqual(Grommet.objects.all()[0].name, "Grommet 1")
 
         # Check that the PK link exists on the rendered form
-        response = self.client.get('/test_admin/admin/admin_views/collector/1/')
+        response = self.client.get(collector_url)
         self.assertContains(response, 'name="grommet_set-0-code"')
 
         # Now resave that inline
         self.post_data['grommet_set-INITIAL_FORMS'] = "1"
-        self.post_data['grommet_set-0-code'] = "1"
+        self.post_data['grommet_set-0-code'] = str(Grommet.objects.all()[0].code)
         self.post_data['grommet_set-0-name'] = "Grommet 1"
-        response = self.client.post('/test_admin/admin/admin_views/collector/1/', self.post_data)
+        response = self.client.post(collector_url, self.post_data)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(Grommet.objects.count(), 1)
         self.assertEqual(Grommet.objects.all()[0].name, "Grommet 1")
 
         # Now modify that inline
         self.post_data['grommet_set-INITIAL_FORMS'] = "1"
-        self.post_data['grommet_set-0-code'] = "1"
+        self.post_data['grommet_set-0-code'] = str(Grommet.objects.all()[0].code)
         self.post_data['grommet_set-0-name'] = "Grommet 1 Updated"
-        response = self.client.post('/test_admin/admin/admin_views/collector/1/', self.post_data)
+        response = self.client.post(collector_url, self.post_data)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(Grommet.objects.count(), 1)
         self.assertEqual(Grommet.objects.all()[0].name, "Grommet 1 Updated")
@@ -2349,20 +2357,21 @@ class AdminInlineTests(TestCase):
         # First add a new inline
         self.post_data['doohickey_set-0-code'] = "DH1"
         self.post_data['doohickey_set-0-name'] = "Doohickey 1"
-        response = self.client.post('/test_admin/admin/admin_views/collector/1/', self.post_data)
+        collector_url = '/test_admin/admin/admin_views/collector/%d/' % self.collector.pk
+        response = self.client.post(collector_url, self.post_data)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(DooHickey.objects.count(), 1)
         self.assertEqual(DooHickey.objects.all()[0].name, "Doohickey 1")
 
         # Check that the PK link exists on the rendered form
-        response = self.client.get('/test_admin/admin/admin_views/collector/1/')
+        response = self.client.get(collector_url)
         self.assertContains(response, 'name="doohickey_set-0-code"')
 
         # Now resave that inline
         self.post_data['doohickey_set-INITIAL_FORMS'] = "1"
         self.post_data['doohickey_set-0-code'] = "DH1"
         self.post_data['doohickey_set-0-name'] = "Doohickey 1"
-        response = self.client.post('/test_admin/admin/admin_views/collector/1/', self.post_data)
+        response = self.client.post(collector_url, self.post_data)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(DooHickey.objects.count(), 1)
         self.assertEqual(DooHickey.objects.all()[0].name, "Doohickey 1")
@@ -2371,7 +2380,7 @@ class AdminInlineTests(TestCase):
         self.post_data['doohickey_set-INITIAL_FORMS'] = "1"
         self.post_data['doohickey_set-0-code'] = "DH1"
         self.post_data['doohickey_set-0-name'] = "Doohickey 1 Updated"
-        response = self.client.post('/test_admin/admin/admin_views/collector/1/', self.post_data)
+        response = self.client.post(collector_url, self.post_data)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(DooHickey.objects.count(), 1)
         self.assertEqual(DooHickey.objects.all()[0].name, "Doohickey 1 Updated")
@@ -2412,29 +2421,31 @@ class AdminInlineTests(TestCase):
         "An inherited model can be saved as inlines. Regression for #11042"
         # First add a new inline
         self.post_data['fancydoodad_set-0-name'] = "Fancy Doodad 1"
-        response = self.client.post('/test_admin/admin/admin_views/collector/1/', self.post_data)
+        collector_url = '/test_admin/admin/admin_views/collector/%d/' % self.collector.pk
+        response = self.client.post(collector_url, self.post_data)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(FancyDoodad.objects.count(), 1)
         self.assertEqual(FancyDoodad.objects.all()[0].name, "Fancy Doodad 1")
+        doodad_pk = FancyDoodad.objects.all()[0].pk
 
         # Check that the PK link exists on the rendered form
-        response = self.client.get('/test_admin/admin/admin_views/collector/1/')
+        response = self.client.get(collector_url)
         self.assertContains(response, 'name="fancydoodad_set-0-doodad_ptr"')
 
         # Now resave that inline
         self.post_data['fancydoodad_set-INITIAL_FORMS'] = "1"
-        self.post_data['fancydoodad_set-0-doodad_ptr'] = "1"
+        self.post_data['fancydoodad_set-0-doodad_ptr'] = str(doodad_pk)
         self.post_data['fancydoodad_set-0-name'] = "Fancy Doodad 1"
-        response = self.client.post('/test_admin/admin/admin_views/collector/1/', self.post_data)
+        response = self.client.post(collector_url, self.post_data)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(FancyDoodad.objects.count(), 1)
         self.assertEqual(FancyDoodad.objects.all()[0].name, "Fancy Doodad 1")
 
         # Now modify that inline
         self.post_data['fancydoodad_set-INITIAL_FORMS'] = "1"
-        self.post_data['fancydoodad_set-0-doodad_ptr'] = "1"
+        self.post_data['fancydoodad_set-0-doodad_ptr'] = str(doodad_pk)
         self.post_data['fancydoodad_set-0-name'] = "Fancy Doodad 1 Updated"
-        response = self.client.post('/test_admin/admin/admin_views/collector/1/', self.post_data)
+        response = self.client.post(collector_url, self.post_data)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(FancyDoodad.objects.count(), 1)
         self.assertEqual(FancyDoodad.objects.all()[0].name, "Fancy Doodad 1 Updated")
@@ -2952,4 +2963,3 @@ class DateHierarchyTests(TestCase):
             self.assert_non_localized_year(response, 2000)
             self.assert_non_localized_year(response, 2003)
             self.assert_non_localized_year(response, 2005)
-

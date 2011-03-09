@@ -70,7 +70,7 @@ class DeletionTests(TestCase):
             'form-TOTAL_FORMS': u'1',
             'form-INITIAL_FORMS': u'1',
             'form-MAX_NUM_FORMS': u'0',
-            'form-0-id': u'1',
+            'form-0-id': unicode(poet.id),
             'form-0-name': u'x' * 1000,
         }
         formset = PoetFormSet(data, queryset=Poet.objects.all())
@@ -250,9 +250,9 @@ class ModelFormsetTest(TestCase):
             'form-TOTAL_FORMS': '2', # the number of forms rendered
             'form-INITIAL_FORMS': '1', # the number of forms with initial data
             'form-MAX_NUM_FORMS': '', # the max number of forms
-            'form-0-id': '1',
+            'form-0-id': str(meeting.id),
             'form-0-name': '2nd Tuesday of the Week Meeting',
-            'form-0-authors': [2, 1, 3, 4],
+            'form-0-authors': [author2.id, author1.id, author3.id, author4.id],
             'form-1-name': '',
             'form-1-authors': '',
             'form-1-DELETE': '',
@@ -457,7 +457,7 @@ class ModelFormsetTest(TestCase):
             'book_set-TOTAL_FORMS': '3', # the number of forms rendered
             'book_set-INITIAL_FORMS': '1', # the number of forms with initial data
             'book_set-MAX_NUM_FORMS': '', # the max number of forms
-            'book_set-0-id': '1',
+            'book_set-0-id': str(book1.id),
             'book_set-0-title': 'Les Fleurs du Mal',
             'book_set-1-title': 'Les Paradis Artificiels',
             'book_set-2-title': '',
@@ -730,14 +730,15 @@ class ModelFormsetTest(TestCase):
         self.assertTrue(formset.is_valid())
         saved = formset.save()
         self.assertEqual(len(saved), 1)
-        owner, = saved
-        self.assertEqual(owner.name, 'Joe Perry')
-        self.assertEqual(owner.place.name, 'Giordanos')
+        owner1, = saved
+        self.assertEqual(owner1.name, 'Joe Perry')
+        self.assertEqual(owner1.place.name, 'Giordanos')
 
         formset = FormSet(instance=place)
         self.assertEqual(len(formset.forms), 3)
         self.assertEqual(formset.forms[0].as_p(),
-            '<p><label for="id_owner_set-0-name">Name:</label> <input id="id_owner_set-0-name" type="text" name="owner_set-0-name" value="Joe Perry" maxlength="100" /><input type="hidden" name="owner_set-0-place" value="1" id="id_owner_set-0-place" /><input type="hidden" name="owner_set-0-auto_id" value="1" id="id_owner_set-0-auto_id" /></p>')
+            '<p><label for="id_owner_set-0-name">Name:</label> <input id="id_owner_set-0-name" type="text" name="owner_set-0-name" value="Joe Perry" maxlength="100" /><input type="hidden" name="owner_set-0-place" value="1" id="id_owner_set-0-place" /><input type="hidden" name="owner_set-0-auto_id" value="%d" id="id_owner_set-0-auto_id" /></p>'
+            % owner1.auto_id)
         self.assertEqual(formset.forms[1].as_p(),
             '<p><label for="id_owner_set-1-name">Name:</label> <input id="id_owner_set-1-name" type="text" name="owner_set-1-name" maxlength="100" /><input type="hidden" name="owner_set-1-place" value="1" id="id_owner_set-1-place" /><input type="hidden" name="owner_set-1-auto_id" id="id_owner_set-1-auto_id" /></p>')
         self.assertEqual(formset.forms[2].as_p(),
@@ -747,7 +748,7 @@ class ModelFormsetTest(TestCase):
             'owner_set-TOTAL_FORMS': '3',
             'owner_set-INITIAL_FORMS': '1',
             'owner_set-MAX_NUM_FORMS': '',
-            'owner_set-0-auto_id': u'1',
+            'owner_set-0-auto_id': unicode(owner1.auto_id),
             'owner_set-0-name': u'Joe Perry',
             'owner_set-1-auto_id': '',
             'owner_set-1-name': u'Jack Berry',
@@ -758,9 +759,9 @@ class ModelFormsetTest(TestCase):
         self.assertTrue(formset.is_valid())
         saved = formset.save()
         self.assertEqual(len(saved), 1)
-        owner, = saved
-        self.assertEqual(owner.name, 'Jack Berry')
-        self.assertEqual(owner.place.name, 'Giordanos')
+        owner2, = saved
+        self.assertEqual(owner2.name, 'Jack Berry')
+        self.assertEqual(owner2.place.name, 'Giordanos')
 
         # Ensure a custom primary key that is a ForeignKey or OneToOneField get rendered for the user to choose.
 
@@ -769,19 +770,21 @@ class ModelFormsetTest(TestCase):
         self.assertEqual(formset.forms[0].as_p(),
             '<p><label for="id_form-0-owner">Owner:</label> <select name="form-0-owner" id="id_form-0-owner">\n'
             '<option value="" selected="selected">---------</option>\n'
-            '<option value="1">Joe Perry at Giordanos</option>\n'
-            '<option value="2">Jack Berry at Giordanos</option>\n'
+            '<option value="%d">Joe Perry at Giordanos</option>\n'
+            '<option value="%d">Jack Berry at Giordanos</option>\n'
             '</select></p>\n'
-            '<p><label for="id_form-0-age">Age:</label> <input type="text" name="form-0-age" id="id_form-0-age" /></p>')
+            '<p><label for="id_form-0-age">Age:</label> <input type="text" name="form-0-age" id="id_form-0-age" /></p>'
+            % (owner1.auto_id, owner2.auto_id))
 
-        owner = Owner.objects.get(name=u'Joe Perry')
+        owner1 = Owner.objects.get(name=u'Joe Perry')
         FormSet = inlineformset_factory(Owner, OwnerProfile, max_num=1, can_delete=False)
         self.assertEqual(FormSet.max_num, 1)
 
-        formset = FormSet(instance=owner)
+        formset = FormSet(instance=owner1)
         self.assertEqual(len(formset.forms), 1)
         self.assertEqual(formset.forms[0].as_p(),
-            '<p><label for="id_ownerprofile-0-age">Age:</label> <input type="text" name="ownerprofile-0-age" id="id_ownerprofile-0-age" /><input type="hidden" name="ownerprofile-0-owner" value="1" id="id_ownerprofile-0-owner" /></p>')
+            '<p><label for="id_ownerprofile-0-age">Age:</label> <input type="text" name="ownerprofile-0-age" id="id_ownerprofile-0-age" /><input type="hidden" name="ownerprofile-0-owner" value="%d" id="id_ownerprofile-0-owner" /></p>'
+            % owner1.auto_id)
 
         data = {
             'ownerprofile-TOTAL_FORMS': '1',
@@ -790,32 +793,33 @@ class ModelFormsetTest(TestCase):
             'ownerprofile-0-owner': '',
             'ownerprofile-0-age': u'54',
         }
-        formset = FormSet(data, instance=owner)
+        formset = FormSet(data, instance=owner1)
         self.assertTrue(formset.is_valid())
         saved = formset.save()
         self.assertEqual(len(saved), 1)
         profile1, = saved
-        self.assertEqual(profile1.owner, owner)
+        self.assertEqual(profile1.owner, owner1)
         self.assertEqual(profile1.age, 54)
 
-        formset = FormSet(instance=owner)
+        formset = FormSet(instance=owner1)
         self.assertEqual(len(formset.forms), 1)
         self.assertEqual(formset.forms[0].as_p(),
-            '<p><label for="id_ownerprofile-0-age">Age:</label> <input type="text" name="ownerprofile-0-age" value="54" id="id_ownerprofile-0-age" /><input type="hidden" name="ownerprofile-0-owner" value="1" id="id_ownerprofile-0-owner" /></p>')
+            '<p><label for="id_ownerprofile-0-age">Age:</label> <input type="text" name="ownerprofile-0-age" value="54" id="id_ownerprofile-0-age" /><input type="hidden" name="ownerprofile-0-owner" value="%d" id="id_ownerprofile-0-owner" /></p>'
+            % owner1.auto_id)
 
         data = {
             'ownerprofile-TOTAL_FORMS': '1',
             'ownerprofile-INITIAL_FORMS': '1',
             'ownerprofile-MAX_NUM_FORMS': '1',
-            'ownerprofile-0-owner': u'1',
+            'ownerprofile-0-owner': unicode(owner1.auto_id),
             'ownerprofile-0-age': u'55',
         }
-        formset = FormSet(data, instance=owner)
+        formset = FormSet(data, instance=owner1)
         self.assertTrue(formset.is_valid())
         saved = formset.save()
         self.assertEqual(len(saved), 1)
         profile1, = saved
-        self.assertEqual(profile1.owner, owner)
+        self.assertEqual(profile1.owner, owner1)
         self.assertEqual(profile1.age, 55)
 
     def test_unique_true_enforces_max_num_one(self):
@@ -956,7 +960,8 @@ class ModelFormsetTest(TestCase):
         result = re.sub(r'\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(?:\.\d+)?', '__DATETIME__', result)
         self.assertEqual(result,
             '<p><label for="id_membership_set-0-date_joined">Date joined:</label> <input type="text" name="membership_set-0-date_joined" value="__DATETIME__" id="id_membership_set-0-date_joined" /><input type="hidden" name="initial-membership_set-0-date_joined" value="__DATETIME__" id="initial-membership_set-0-id_membership_set-0-date_joined" /></p>\n'
-            '<p><label for="id_membership_set-0-karma">Karma:</label> <input type="text" name="membership_set-0-karma" id="id_membership_set-0-karma" /><input type="hidden" name="membership_set-0-person" value="1" id="id_membership_set-0-person" /><input type="hidden" name="membership_set-0-id" id="id_membership_set-0-id" /></p>')
+            '<p><label for="id_membership_set-0-karma">Karma:</label> <input type="text" name="membership_set-0-karma" id="id_membership_set-0-karma" /><input type="hidden" name="membership_set-0-person" value="%d" id="id_membership_set-0-person" /><input type="hidden" name="membership_set-0-id" id="id_membership_set-0-id" /></p>'
+            % person.id)
 
         # test for validation with callable defaults. Validations rely on hidden fields
 
