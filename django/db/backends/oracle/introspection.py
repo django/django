@@ -83,7 +83,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
         relations = {}
         for row in cursor.fetchall():
-            relations[row[0]] = (row[2], row[1])
+            relations[row[0]] = (row[2], row[1].lower())
         return relations
 
     def get_indexes(self, cursor, table_name):
