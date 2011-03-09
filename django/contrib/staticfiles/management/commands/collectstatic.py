@@ -67,12 +67,12 @@ class Command(NoArgsCommand):
         if options.get('interactive'):
             confirm = raw_input(u"""
 You have requested to collect static files at the destination
-location as specified in your settings file ('%s').
+location as specified in your settings file.
 
 This will overwrite existing files.
 Are you sure you want to do this?
 
-Type 'yes' to continue, or 'no' to cancel: """ % settings.STATIC_ROOT)
+Type 'yes' to continue, or 'no' to cancel: """)
             if confirm != 'yes':
                 raise CommandError("Collecting static files cancelled.")
 
