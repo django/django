@@ -568,12 +568,12 @@ class AggregationTests(TestCase):
         )
 
         publishers = Publisher.objects.filter(id__in=[1, 2])
-        self.assertQuerysetEqual(
-            publishers, [
+        self.assertEqual(
+            sorted(p.name for p in publishers),
+            [
                 "Apress",
                 "Sams"
-            ],
-            lambda p: p.name
+            ]
         )
 
         publishers = publishers.annotate(n_books=Count("book"))
@@ -582,12 +582,12 @@ class AggregationTests(TestCase):
             2
         )
 
-        self.assertQuerysetEqual(
-            publishers, [
+        self.assertEqual(
+            sorted(p.name for p in publishers),
+            [
                 "Apress",
-                "Sams",
-            ],
-            lambda p: p.name
+                "Sams"
+            ]
         )
 
         books = Book.objects.filter(publisher__in=publishers)
@@ -599,12 +599,12 @@ class AggregationTests(TestCase):
             ],
             lambda b: b.name
         )
-        self.assertQuerysetEqual(
-            publishers, [
+        self.assertEqual(
+            sorted(p.name for p in publishers),
+            [
                 "Apress",
-                "Sams",
-            ],
-            lambda p: p.name
+                "Sams"
+            ]
         )
 
         # Regression for 10666 - inherited fields work with annotations and
