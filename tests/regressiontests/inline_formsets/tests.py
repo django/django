@@ -59,13 +59,13 @@ class DeletionTests(TestCase):
         """
         PoemFormSet = inlineformset_factory(Poet, Poem, can_delete=True)
         poet = Poet.objects.create(name='test')
-        poet.poem_set.create(name='test poem')
+        poem = poet.poem_set.create(name='test poem')
         data = {
             'poem_set-TOTAL_FORMS': u'1',
             'poem_set-INITIAL_FORMS': u'1',
             'poem_set-MAX_NUM_FORMS': u'0',
-            'poem_set-0-id': u'1',
-            'poem_set-0-poem': u'1',
+            'poem_set-0-id': unicode(poem.id),
+            'poem_set-0-poem': unicode(poem.id),
             'poem_set-0-name': u'x' * 1000,
         }
         formset = PoemFormSet(data, instance=poet)
