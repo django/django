@@ -28,11 +28,11 @@ class SelectRelatedRegressTests(TestCase):
 
         connections=Connection.objects.filter(start__device__building=b, end__device__building=b).order_by('id')
         self.assertEqual([(c.id, unicode(c.start), unicode(c.end)) for c in connections],
-            [(1, u'router/4', u'switch/7'), (2, u'switch/7', u'server/1')])
+            [(c1.id, u'router/4', u'switch/7'), (c2.id, u'switch/7', u'server/1')])
 
         connections=Connection.objects.filter(start__device__building=b, end__device__building=b).select_related().order_by('id')
         self.assertEqual([(c.id, unicode(c.start), unicode(c.end)) for c in connections],
-            [(1, u'router/4', u'switch/7'), (2, u'switch/7', u'server/1')])
+            [(c1.id, u'router/4', u'switch/7'), (c2.id, u'switch/7', u'server/1')])
 
         # This final query should only join seven tables (port, device and building
         # twice each, plus connection once).

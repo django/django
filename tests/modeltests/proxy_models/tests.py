@@ -39,11 +39,11 @@ class ProxyModelTests(TestCase):
         """
         Creating a Person makes them accessible through the MyPerson proxy.
         """
-        Person.objects.create(name="Foo McBar")
+        person = Person.objects.create(name="Foo McBar")
         self.assertEqual(len(Person.objects.all()), 1)
         self.assertEqual(len(MyPerson.objects.all()), 1)
-        self.assertEqual(MyPerson.objects.get(name="Foo McBar").id, 1)
-        self.assertFalse(MyPerson.objects.get(id=1).has_special_name())
+        self.assertEqual(MyPerson.objects.get(name="Foo McBar").id, person.id)
+        self.assertFalse(MyPerson.objects.get(id=person.id).has_special_name())
 
     def test_no_proxy(self):
         """

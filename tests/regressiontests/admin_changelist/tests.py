@@ -36,7 +36,7 @@ class ChangeListTests(TransactionTestCase):
         template = Template('{% load admin_list %}{% spaceless %}{% result_list cl %}{% endspaceless %}')
         context = Context({'cl': cl})
         table_output = template.render(context)
-        row_html = '<tbody><tr class="row1"><td class="action-checkbox"><input type="checkbox" class="action-select" value="1" name="_selected_action" /></td><th><a href="1/">name</a></th><td class="nowrap">(None)</td></tr></tbody>'
+        row_html = '<tbody><tr class="row1"><td class="action-checkbox"><input type="checkbox" class="action-select" value="%d" name="_selected_action" /></td><th><a href="%d/">name</a></th><td class="nowrap">(None)</td></tr></tbody>' % (new_child.id, new_child.id)
         self.assertFalse(table_output.find(row_html) == -1,
             'Failed to find expected row element: %s' % table_output)
 
@@ -57,7 +57,7 @@ class ChangeListTests(TransactionTestCase):
         template = Template('{% load admin_list %}{% spaceless %}{% result_list cl %}{% endspaceless %}')
         context = Context({'cl': cl})
         table_output = template.render(context)
-        row_html = '<tbody><tr class="row1"><td class="action-checkbox"><input type="checkbox" class="action-select" value="1" name="_selected_action" /></td><th><a href="1/">name</a></th><td class="nowrap">Parent object</td></tr></tbody>'
+        row_html = '<tbody><tr class="row1"><td class="action-checkbox"><input type="checkbox" class="action-select" value="%d" name="_selected_action" /></td><th><a href="%d/">name</a></th><td class="nowrap">Parent object</td></tr></tbody>' % (new_child.id, new_child.id)
         self.assertFalse(table_output.find(row_html) == -1,
             'Failed to find expected row element: %s' % table_output)
 
@@ -88,7 +88,7 @@ class ChangeListTests(TransactionTestCase):
         context = Context({'cl': cl})
         table_output = template.render(context)
         # make sure that hidden fields are in the correct place
-        hiddenfields_div = '<div class="hiddenfields"><input type="hidden" name="form-0-id" value="1" id="id_form-0-id" /></div>'
+        hiddenfields_div = '<div class="hiddenfields"><input type="hidden" name="form-0-id" value="%d" id="id_form-0-id" /></div>' % new_child.id
         self.assertFalse(table_output.find(hiddenfields_div) == -1,
             'Failed to find hidden fields in: %s' % table_output)
         # make sure that list editable fields are rendered in divs correctly
@@ -148,12 +148,12 @@ class ChangeListTests(TransactionTestCase):
         band.genres.add(blues)
 
         m = BandAdmin(Band, admin.site)
-        cl = ChangeList(MockFilteredRequestA(), Band, m.list_display,
+        cl = ChangeList(MockFilteredRequestA(blues.pk), Band, m.list_display,
                 m.list_display_links, m.list_filter, m.date_hierarchy,
                 m.search_fields, m.list_select_related, m.list_per_page,
                 m.list_editable, m)
 
-        cl.get_results(MockFilteredRequestA())
+        cl.get_results(MockFilteredRequestA(blues.pk))
 
         # There's only one Group instance
         self.assertEqual(cl.result_count, 1)
@@ -169,12 +169,12 @@ class ChangeListTests(TransactionTestCase):
         Membership.objects.create(group=band, music=lead, role='bass player')
 
         m = GroupAdmin(Group, admin.site)
-        cl = ChangeList(MockFilteredRequestB(), Group, m.list_display,
+        cl = ChangeList(MockFilteredRequestB(lead.pk), Group, m.list_display,
                 m.list_display_links, m.list_filter, m.date_hierarchy,
                 m.search_fields, m.list_select_related, m.list_per_page,
                 m.list_editable, m)
 
-        cl.get_results(MockFilteredRequestB())
+        cl.get_results(MockFilteredRequestB(lead.pk))
 
         # There's only one Group instance
         self.assertEqual(cl.result_count, 1)
@@ -191,12 +191,12 @@ class ChangeListTests(TransactionTestCase):
         Membership.objects.create(group=four, music=lead, role='guitar player')
 
         m = QuartetAdmin(Quartet, admin.site)
-        cl = ChangeList(MockFilteredRequestB(), Quartet, m.list_display,
+        cl = ChangeList(MockFilteredRequestB(lead.pk), Quartet, m.list_display,
                 m.list_display_links, m.list_filter, m.date_hierarchy,
                 m.search_fields, m.list_select_related, m.list_per_page,
                 m.list_editable, m)
 
-        cl.get_results(MockFilteredRequestB())
+        cl.get_results(MockFilteredRequestB(lead.pk))
 
         # There's only one Quartet instance
         self.assertEqual(cl.result_count, 1)
@@ -213,12 +213,12 @@ class ChangeListTests(TransactionTestCase):
         Invitation.objects.create(band=three, player=lead, instrument='bass')
 
         m = ChordsBandAdmin(ChordsBand, admin.site)
-        cl = ChangeList(MockFilteredRequestB(), ChordsBand, m.list_display,
+        cl = ChangeList(MockFilteredRequestB(lead.pk), ChordsBand, m.list_display,
                 m.list_display_links, m.list_filter, m.date_hierarchy,
                 m.search_fields, m.list_select_related, m.list_per_page,
                 m.list_editable, m)
 
-        cl.get_results(MockFilteredRequestB())
+        cl.get_results(MockFilteredRequestB(lead.pk))
 
         # There's only one ChordsBand instance
         self.assertEqual(cl.result_count, 1)
@@ -289,7 +289,9 @@ class ChordsBandAdmin(admin.ModelAdmin):
     list_filter = ['members']
 
 class MockFilteredRequestA(object):
-    GET = { 'genres': 1 }
+    def __init__(self, pk):
+        self.GET = { 'genres' : pk }
 
 class MockFilteredRequestB(object):
-    GET = { 'members': 1 }
+    def __init__(self, pk):
+        self.GET = { 'members': pk }

@@ -116,8 +116,8 @@ class ForeignKeyTests(test.TestCase):
         bar_b = Bar.objects.create(b='bla', a=b)
         form = BazForm()
         fk_field = str(form['foo'])
-        self.assertEqual(len(re.findall(r'value="2"', fk_field)), 0)
-        self.assertEqual(len(re.findall(r'value="1"', fk_field)), 1)
+        self.assertEqual(len(re.findall(r'value="%d"' % b.pk, fk_field)), 0)
+        self.assertEqual(len(re.findall(r'value="%d"' % a.pk, fk_field)), 1)
 
 class DateTimeFieldTests(unittest.TestCase):
     def test_datetimefield_to_python_usecs(self):

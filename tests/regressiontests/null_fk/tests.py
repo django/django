@@ -16,15 +16,15 @@ class NullFkTests(TestCase):
         # set of fields will properly LEFT JOIN multiple levels of NULLs (and the things
         # that come after the NULLs, or else data that should exist won't). Regression
         # test for #7369.
-        c = Comment.objects.select_related().get(id=1)
+        c = Comment.objects.select_related().get(id=c1.id)
         self.assertEqual(c.post, p)
-        self.assertEqual(Comment.objects.select_related().get(id=2).post, None)
+        self.assertEqual(Comment.objects.select_related().get(id=c2.id).post, None)
 
         self.assertQuerysetEqual(
             Comment.objects.select_related('post__forum__system_info').all(),
             [
-                (1, u'My first comment', '<Post: First Post>'),
-                (2, u'My second comment', 'None')
+                (c1.id, u'My first comment', '<Post: First Post>'),
+                (c2.id, u'My second comment', 'None')
             ],
             transform = lambda c: (c.id, c.comment_text, repr(c.post))
         )
@@ -35,8 +35,8 @@ class NullFkTests(TestCase):
         self.assertQuerysetEqual(
             Comment.objects.select_related('post__forum__system_info__system_details'),
             [
-                (1, u'My first comment', '<Post: First Post>'),
-                (2, u'My second comment', 'None')
+                (c1.id, u'My first comment', '<Post: First Post>'),
+                (c2.id, u'My second comment', 'None')
             ],
             transform = lambda c: (c.id, c.comment_text, repr(c.post))
         )

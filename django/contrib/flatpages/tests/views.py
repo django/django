@@ -68,7 +68,7 @@ class FlatpageViewTests(TestCase):
             enable_comments=False,
             registration_required=False,
         )
-        fp.sites.add(1)
+        fp.sites.add(settings.SITE_ID)
 
         response = self.client.get('/flatpage_root/some.very_special~chars-here/')
         self.assertEqual(response.status_code, 200)

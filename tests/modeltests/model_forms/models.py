@@ -472,8 +472,8 @@ u'entertainment'
 u'Entertainment'
 >>> f.cleaned_data['slug']
 u'entertainment'
->>> obj = f.save()
->>> obj
+>>> c1 = f.save()
+>>> c1
 <Category: Entertainment>
 >>> Category.objects.all()
 [<Category: Entertainment>]
@@ -487,8 +487,8 @@ u'test'
 u"It's a test"
 >>> f.cleaned_data['slug']
 u'its-test'
->>> obj = f.save()
->>> obj
+>>> c2 = f.save()
+>>> c2
 <Category: It's a test>
 >>> Category.objects.order_by('name')
 [<Category: Entertainment>, <Category: It's a test>]
@@ -505,12 +505,12 @@ u'third'
 u'Third test'
 >>> f.cleaned_data['slug']
 u'third-test'
->>> obj = f.save(commit=False)
->>> obj
+>>> c3 = f.save(commit=False)
+>>> c3
 <Category: Third test>
 >>> Category.objects.order_by('name')
 [<Category: Entertainment>, <Category: It's a test>]
->>> obj.save()
+>>> c3.save()
 >>> Category.objects.order_by('name')
 [<Category: Entertainment>, <Category: It's a test>, <Category: Third test>]
 
@@ -563,9 +563,9 @@ fields with the 'choices' attribute are represented by a ChoiceField.
 <option value="3">Live</option>
 </select></td></tr>
 <tr><th>Categories:</th><td><select multiple="multiple" name="categories">
-<option value="1">Entertainment</option>
-<option value="2">It&#39;s a test</option>
-<option value="3">Third test</option>
+<option value="...">Entertainment</option>
+<option value="...">It&#39;s a test</option>
+<option value="...">Third test</option>
 </select><br /><span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></td></tr>
 
 You can restrict a form to a subset of the complete list of fields
@@ -595,8 +595,9 @@ inserted as 'initial' data in each Field.
 
 >>> art = Article(headline='Test article', slug='test-article', pub_date=datetime.date(1988, 1, 4), writer=w, article='Hello.')
 >>> art.save()
->>> art.id
-1
+>>> art_id_1 = art.id
+>>> art_id_1 is not None
+True
 >>> class TestArticleForm(ModelForm):
 ...     class Meta:
 ...         model = Article
@@ -618,9 +619,9 @@ inserted as 'initial' data in each Field.
 <option value="3">Live</option>
 </select></li>
 <li>Categories: <select multiple="multiple" name="categories">
-<option value="1">Entertainment</option>
-<option value="2">It&#39;s a test</option>
-<option value="3">Third test</option>
+<option value="...">Entertainment</option>
+<option value="...">It&#39;s a test</option>
+<option value="...">Third test</option>
 </select> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></li>
 >>> f = TestArticleForm({'headline': u'Test headline', 'slug': 'test-headline', 'pub_date': u'1984-02-06', 'writer': unicode(w_royko.pk), 'article': 'Hello.'}, instance=art)
 >>> f.errors
@@ -628,9 +629,9 @@ inserted as 'initial' data in each Field.
 >>> f.is_valid()
 True
 >>> test_art = f.save()
->>> test_art.id
-1
->>> test_art = Article.objects.get(id=1)
+>>> test_art.id == art_id_1
+True
+>>> test_art = Article.objects.get(id=art_id_1)
 >>> test_art.headline
 u'Test headline'
 
@@ -648,9 +649,9 @@ by specifying a 'fields' argument to form_for_instance.
 >>> f.is_valid()
 True
 >>> new_art = f.save()
->>> new_art.id
-1
->>> new_art = Article.objects.get(id=1)
+>>> new_art.id == art_id_1
+True
+>>> new_art = Article.objects.get(id=art_id_1)
 >>> new_art.headline
 u'New headline'
 
@@ -681,13 +682,13 @@ Add some categories and test the many-to-many form output.
 <option value="3">Live</option>
 </select></li>
 <li>Categories: <select multiple="multiple" name="categories">
-<option value="1" selected="selected">Entertainment</option>
-<option value="2">It&#39;s a test</option>
-<option value="3">Third test</option>
+<option value="..." selected="selected">Entertainment</option>
+<option value="...">It&#39;s a test</option>
+<option value="...">Third test</option>
 </select> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></li>
 
 Initial values can be provided for model forms
->>> f = TestArticleForm(auto_id=False, initial={'headline': 'Your headline here', 'categories': ['1','2']})
+>>> f = TestArticleForm(auto_id=False, initial={'headline': 'Your headline here', 'categories': [str(c1.id), str(c2.id)]})
 >>> print f.as_ul()
 <li>Headline: <input type="text" name="headline" value="Your headline here" maxlength="50" /></li>
 <li>Slug: <input type="text" name="slug" maxlength="50" /></li>
@@ -705,17 +706,17 @@ Initial values can be provided for model forms
 <option value="3">Live</option>
 </select></li>
 <li>Categories: <select multiple="multiple" name="categories">
-<option value="1" selected="selected">Entertainment</option>
-<option value="2" selected="selected">It&#39;s a test</option>
-<option value="3">Third test</option>
+<option value="..." selected="selected">Entertainment</option>
+<option value="..." selected="selected">It&#39;s a test</option>
+<option value="...">Third test</option>
 </select> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></li>
 
 >>> f = TestArticleForm({'headline': u'New headline', 'slug': u'new-headline', 'pub_date': u'1988-01-04',
-...     'writer': unicode(w_royko.pk), 'article': u'Hello.', 'categories': [u'1', u'2']}, instance=new_art)
+...     'writer': unicode(w_royko.pk), 'article': u'Hello.', 'categories': [unicode(c1.id), unicode(c2.id)]}, instance=new_art)
 >>> new_art = f.save()
->>> new_art.id
-1
->>> new_art = Article.objects.get(id=1)
+>>> new_art.id == art_id_1
+True
+>>> new_art = Article.objects.get(id=art_id_1)
 >>> new_art.categories.order_by('name')
 [<Category: Entertainment>, <Category: It's a test>]
 
@@ -723,9 +724,9 @@ Now, submit form data with no categories. This deletes the existing categories.
 >>> f = TestArticleForm({'headline': u'New headline', 'slug': u'new-headline', 'pub_date': u'1988-01-04',
 ...     'writer': unicode(w_royko.pk), 'article': u'Hello.'}, instance=new_art)
 >>> new_art = f.save()
->>> new_art.id
-1
->>> new_art = Article.objects.get(id=1)
+>>> new_art.id == art_id_1
+True
+>>> new_art = Article.objects.get(id=art_id_1)
 >>> new_art.categories.all()
 []
 
@@ -734,11 +735,12 @@ Create a new article, with categories, via the form.
 ...     class Meta:
 ...         model = Article
 >>> f = ArticleForm({'headline': u'The walrus was Paul', 'slug': u'walrus-was-paul', 'pub_date': u'1967-11-01',
-...     'writer': unicode(w_royko.pk), 'article': u'Test.', 'categories': [u'1', u'2']})
+...     'writer': unicode(w_royko.pk), 'article': u'Test.', 'categories': [unicode(c1.id), unicode(c2.id)]})
 >>> new_art = f.save()
->>> new_art.id
-2
->>> new_art = Article.objects.get(id=2)
+>>> art_id_2 = new_art.id
+>>> art_id_2 not in (None, art_id_1)
+True
+>>> new_art = Article.objects.get(id=art_id_2)
 >>> new_art.categories.order_by('name')
 [<Category: Entertainment>, <Category: It's a test>]
 
@@ -749,9 +751,10 @@ Create a new article, with no categories, via the form.
 >>> f = ArticleForm({'headline': u'The walrus was Paul', 'slug': u'walrus-was-paul', 'pub_date': u'1967-11-01',
 ...     'writer': unicode(w_royko.pk), 'article': u'Test.'})
 >>> new_art = f.save()
->>> new_art.id
-3
->>> new_art = Article.objects.get(id=3)
+>>> art_id_3 = new_art.id
+>>> art_id_3 not in (None, art_id_1, art_id_2)
+True
+>>> new_art = Article.objects.get(id=art_id_3)
 >>> new_art.categories.all()
 []
 
@@ -761,16 +764,17 @@ The m2m data won't be saved until save_m2m() is invoked on the form.
 ...     class Meta:
 ...         model = Article
 >>> f = ArticleForm({'headline': u'The walrus was Paul', 'slug': 'walrus-was-paul', 'pub_date': u'1967-11-01',
-...     'writer': unicode(w_royko.pk), 'article': u'Test.', 'categories': [u'1', u'2']})
+...     'writer': unicode(w_royko.pk), 'article': u'Test.', 'categories': [unicode(c1.id), unicode(c2.id)]})
 >>> new_art = f.save(commit=False)
 
 # Manually save the instance
 >>> new_art.save()
->>> new_art.id
-4
+>>> art_id_4 = new_art.id
+>>> art_id_4 not in (None, art_id_1, art_id_2, art_id_3)
+True
 
 # The instance doesn't have m2m data yet
->>> new_art = Article.objects.get(id=4)
+>>> new_art = Article.objects.get(id=art_id_4)
 >>> new_art.categories.all()
 []
 
@@ -789,12 +793,12 @@ existing Category instance.
 >>> cat = Category.objects.get(name='Third test')
 >>> cat
 <Category: Third test>
->>> cat.id
-3
+>>> cat.id == c3.id
+True
 >>> form = ShortCategory({'name': 'Third', 'slug': 'third', 'url': '3rd'}, instance=cat)
 >>> form.save()
 <Category: Third>
->>> Category.objects.get(id=3)
+>>> Category.objects.get(id=c3.id)
 <Category: Third>
 
 Here, we demonstrate that choices for a ForeignKey ChoiceField are determined
@@ -821,11 +825,12 @@ the data in the database when the form is instantiated.
 <option value="3">Live</option>
 </select></li>
 <li>Categories: <select multiple="multiple" name="categories">
-<option value="1">Entertainment</option>
-<option value="2">It&#39;s a test</option>
-<option value="3">Third</option>
+<option value="...">Entertainment</option>
+<option value="...">It&#39;s a test</option>
+<option value="...">Third</option>
 </select> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></li>
->>> Category.objects.create(name='Fourth', url='4th')
+>>> c4 = Category.objects.create(name='Fourth', url='4th')
+>>> c4
 <Category: Fourth>
 >>> Writer.objects.create(name='Carl Bernstein')
 <Writer: Carl Bernstein>
@@ -847,10 +852,10 @@ the data in the database when the form is instantiated.
 <option value="3">Live</option>
 </select></li>
 <li>Categories: <select multiple="multiple" name="categories">
-<option value="1">Entertainment</option>
-<option value="2">It&#39;s a test</option>
-<option value="3">Third</option>
-<option value="4">Fourth</option>
+<option value="...">Entertainment</option>
+<option value="...">It&#39;s a test</option>
+<option value="...">Third</option>
+<option value="...">Fourth</option>
 </select> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></li>
 
 # ModelChoiceField ############################################################
@@ -859,7 +864,7 @@ the data in the database when the form is instantiated.
 
 >>> f = ModelChoiceField(Category.objects.all())
 >>> list(f.choices)
-[(u'', u'---------'), (1, u'Entertainment'), (2, u"It's a test"), (3, u'Third'), (4, u'Fourth')]
+[(u'', u'---------'), (..., u'Entertainment'), (..., u"It's a test"), (..., u'Third'), (..., u'Fourth')]
 >>> f.clean('')
 Traceback (most recent call last):
 ...
@@ -872,33 +877,34 @@ ValidationError: [u'This field is required.']
 Traceback (most recent call last):
 ...
 ValidationError: [u'Select a valid choice. That choice is not one of the available choices.']
->>> f.clean(3)
+>>> f.clean(c3.id)
 <Category: Third>
->>> f.clean(2)
+>>> f.clean(c2.id)
 <Category: It's a test>
 
 # Add a Category object *after* the ModelChoiceField has already been
 # instantiated. This proves clean() checks the database during clean() rather
 # than caching it at time of instantiation.
->>> Category.objects.create(name='Fifth', url='5th')
+>>> c5 = Category.objects.create(name='Fifth', url='5th')
+>>> c5
 <Category: Fifth>
->>> f.clean(5)
+>>> f.clean(c5.id)
 <Category: Fifth>
 
 # Delete a Category object *after* the ModelChoiceField has already been
 # instantiated. This proves clean() checks the database during clean() rather
 # than caching it at time of instantiation.
 >>> Category.objects.get(url='5th').delete()
->>> f.clean(5)
+>>> f.clean(c5.id)
 Traceback (most recent call last):
 ...
 ValidationError: [u'Select a valid choice. That choice is not one of the available choices.']
 
->>> f = ModelChoiceField(Category.objects.filter(pk=1), required=False)
+>>> f = ModelChoiceField(Category.objects.filter(pk=c1.id), required=False)
 >>> print f.clean('')
 None
 >>> f.clean('')
->>> f.clean('1')
+>>> f.clean(str(c1.id))
 <Category: Entertainment>
 >>> f.clean('100')
 Traceback (most recent call last):
@@ -908,10 +914,10 @@ ValidationError: [u'Select a valid choice. That choice is not one of the availab
 # queryset can be changed after the field is created.
 >>> f.queryset = Category.objects.exclude(name='Fourth')
 >>> list(f.choices)
-[(u'', u'---------'), (1, u'Entertainment'), (2, u"It's a test"), (3, u'Third')]
->>> f.clean(3)
+[(u'', u'---------'), (..., u'Entertainment'), (..., u"It's a test"), (..., u'Third')]
+>>> f.clean(c3.id)
 <Category: Third>
->>> f.clean(4)
+>>> f.clean(c4.id)
 Traceback (most recent call last):
 ...
 ValidationError: [u'Select a valid choice. That choice is not one of the available choices.']
@@ -920,21 +926,21 @@ ValidationError: [u'Select a valid choice. That choice is not one of the availab
 >>> gen_one = list(f.choices)
 >>> gen_two = f.choices
 >>> gen_one[2]
-(2L, u"It's a test")
+(..., u"It's a test")
 >>> list(gen_two)
-[(u'', u'---------'), (1L, u'Entertainment'), (2L, u"It's a test"), (3L, u'Third')]
+[(u'', u'---------'), (..., u'Entertainment'), (..., u"It's a test"), (..., u'Third')]
 
 # check that we can override the label_from_instance method to print custom labels (#4620)
 >>> f.queryset = Category.objects.all()
 >>> f.label_from_instance = lambda obj: "category " + str(obj)
 >>> list(f.choices)
-[(u'', u'---------'), (1L, 'category Entertainment'), (2L, "category It's a test"), (3L, 'category Third'), (4L, 'category Fourth')]
+[(u'', u'---------'), (..., 'category Entertainment'), (..., "category It's a test"), (..., 'category Third'), (..., 'category Fourth')]
 
 # ModelMultipleChoiceField ####################################################
 
 >>> f = ModelMultipleChoiceField(Category.objects.all())
 >>> list(f.choices)
-[(1, u'Entertainment'), (2, u"It's a test"), (3, u'Third'), (4, u'Fourth')]
+[(..., u'Entertainment'), (..., u"It's a test"), (..., u'Third'), (..., u'Fourth')]
 >>> f.clean(None)
 Traceback (most recent call last):
 ...
@@ -943,17 +949,17 @@ ValidationError: [u'This field is required.']
 Traceback (most recent call last):
 ...
 ValidationError: [u'This field is required.']
->>> f.clean([1])
+>>> f.clean([c1.id])
 [<Category: Entertainment>]
->>> f.clean([2])
+>>> f.clean([c2.id])
 [<Category: It's a test>]
->>> f.clean(['1'])
+>>> f.clean([str(c1.id)])
 [<Category: Entertainment>]
->>> f.clean(['1', '2'])
+>>> f.clean([str(c1.id), str(c2.id)])
 [<Category: Entertainment>, <Category: It's a test>]
->>> f.clean([1, '2'])
+>>> f.clean([c1.id, str(c2.id)])
 [<Category: Entertainment>, <Category: It's a test>]
->>> f.clean((1, '2'))
+>>> f.clean((c1.id, str(c2.id)))
 [<Category: Entertainment>, <Category: It's a test>]
 >>> f.clean(['100'])
 Traceback (most recent call last):
@@ -971,16 +977,17 @@ ValidationError: [u'"fail" is not a valid value for a primary key.']
 # Add a Category object *after* the ModelMultipleChoiceField has already been
 # instantiated. This proves clean() checks the database during clean() rather
 # than caching it at time of instantiation.
->>> Category.objects.create(id=6, name='Sixth', url='6th')
+>>> c6 = Category.objects.create(id=6, name='Sixth', url='6th')
+>>> c6
 <Category: Sixth>
->>> f.clean([6])
+>>> f.clean([c6.id])
 [<Category: Sixth>]
 
 # Delete a Category object *after* the ModelMultipleChoiceField has already been
 # instantiated. This proves clean() checks the database during clean() rather
 # than caching it at time of instantiation.
 >>> Category.objects.get(url='6th').delete()
->>> f.clean([6])
+>>> f.clean([c6.id])
 Traceback (most recent call last):
 ...
 ValidationError: [u'Select a valid choice. 6 is not one of the available choices.']
@@ -994,11 +1001,11 @@ ValidationError: [u'Select a valid choice. 6 is not one of the available choices
 Traceback (most recent call last):
 ...
 ValidationError: [u'Select a valid choice. 10 is not one of the available choices.']
->>> f.clean(['3', '10'])
+>>> f.clean([str(c3.id), '10'])
 Traceback (most recent call last):
 ...
 ValidationError: [u'Select a valid choice. 10 is not one of the available choices.']
->>> f.clean(['1', '10'])
+>>> f.clean([str(c1.id), '10'])
 Traceback (most recent call last):
 ...
 ValidationError: [u'Select a valid choice. 10 is not one of the available choices.']
@@ -1006,22 +1013,22 @@ ValidationError: [u'Select a valid choice. 10 is not one of the available choice
 # queryset can be changed after the field is created.
 >>> f.queryset = Category.objects.exclude(name='Fourth')
 >>> list(f.choices)
-[(1, u'Entertainment'), (2, u"It's a test"), (3, u'Third')]
->>> f.clean([3])
+[(..., u'Entertainment'), (..., u"It's a test"), (..., u'Third')]
+>>> f.clean([c3.id])
 [<Category: Third>]
->>> f.clean([4])
+>>> f.clean([c4.id])
 Traceback (most recent call last):
 ...
-ValidationError: [u'Select a valid choice. 4 is not one of the available choices.']
->>> f.clean(['3', '4'])
+ValidationError: [u'Select a valid choice. ... is not one of the available choices.']
+>>> f.clean([str(c3.id), str(c4.id)])
 Traceback (most recent call last):
 ...
-ValidationError: [u'Select a valid choice. 4 is not one of the available choices.']
+ValidationError: [u'Select a valid choice. ... is not one of the available choices.']
 
 >>> f.queryset = Category.objects.all()
 >>> f.label_from_instance = lambda obj: "multicategory " + str(obj)
 >>> list(f.choices)
-[(1L, 'multicategory Entertainment'), (2L, "multicategory It's a test"), (3L, 'multicategory Third'), (4L, 'multicategory Fourth')]
+[(..., 'multicategory Entertainment'), (..., "multicategory It's a test"), (..., 'multicategory Third'), (..., 'multicategory Fourth')]
 
 # OneToOneField ###############################################################
 

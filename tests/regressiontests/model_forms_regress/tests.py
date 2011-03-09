@@ -18,11 +18,10 @@ class ModelMultipleChoiceFieldTests(TestCase):
         Test that ModelMultipleChoiceField does O(1) queries instead of
         O(n) (#10156).
         """
-        for i in range(30):
-            Person.objects.create(name="Person %s" % i)
+        persons = [Person.objects.create(name="Person %s" % i) for i in range(30)]
 
         f = forms.ModelMultipleChoiceField(queryset=Person.objects.all())
-        self.assertNumQueries(1, f.clean, [1, 3, 5, 7, 9])
+        self.assertNumQueries(1, f.clean, [p.pk for p in persons[1:11:2]])
 
     def test_model_multiple_choice_run_validators(self):
         """
@@ -126,19 +125,20 @@ class ManyToManyCallableInitialTests(TestCase):
             return db_field.formfield(**kwargs)
 
         # Set up some Publications to use as data
-        Publication(title="First Book", date_published=date(2007,1,1)).save()
-        Publication(title="Second Book", date_published=date(2008,1,1)).save()
-        Publication(title="Third Book", date_published=date(2009,1,1)).save()
+        book1 = Publication.objects.create(title="First Book", date_published=date(2007,1,1))
+        book2 = Publication.objects.create(title="Second Book", date_published=date(2008,1,1))
+        book3 = Publication.objects.create(title="Third Book", date_published=date(2009,1,1))
 
         # Create a ModelForm, instantiate it, and check that the output is as expected
         ModelForm = modelform_factory(Article, formfield_callback=formfield_for_dbfield)
         form = ModelForm()
         self.assertEqual(form.as_ul(), u"""<li><label for="id_headline">Headline:</label> <input id="id_headline" type="text" name="headline" maxlength="100" /></li>
 <li><label for="id_publications">Publications:</label> <select multiple="multiple" name="publications" id="id_publications">
-<option value="1" selected="selected">First Book</option>
-<option value="2" selected="selected">Second Book</option>
-<option value="3">Third Book</option>
-</select> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></li>""")
+<option value="%d" selected="selected">First Book</option>
+<option value="%d" selected="selected">Second Book</option>
+<option value="%d">Third Book</option>
+</select> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></li>"""
+            % (book1.pk, book2.pk, book3.pk))
 
 class CFFForm(forms.ModelForm):
     class Meta:
