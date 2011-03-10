@@ -93,7 +93,7 @@ Note:
 
 * The Feed class subclasses :class:`django.contrib.syndication.views.Feed`.
 
-* ``title``, ``link`` and ``description` correspond to the
+* ``title``, ``link`` and ``description`` correspond to the
   standard RSS ``<title>``, ``<link>`` and ``<description>`` elements,
   respectively.
 
