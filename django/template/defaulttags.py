@@ -482,15 +482,13 @@ class WidthRatioNode(Node):
         return str(int(round(ratio)))
 
 class WithNode(Node):
-    def __init__(self, var, name, nodelist, extra_context=None,
-                 isolated_context=False):
+    def __init__(self, var, name, nodelist, extra_context=None):
         self.nodelist = nodelist
         # var and name are legacy attributes, being left in case they are used
         # by third-party subclasses of this Node.
         self.extra_context = extra_context or {}
         if name:
             self.extra_context[name] = var
-        self.isolated_context = isolated_context
 
     def __repr__(self):
         return "<WithNode>"
@@ -498,8 +496,6 @@ class WithNode(Node):
     def render(self, context):
         values = dict([(key, val.resolve(context)) for key, val in
                        self.extra_context.iteritems()])
-        if self.isolated_context:
-            return self.nodelist.render(Context(values))
         context.update(values)
         output = self.nodelist.render(context)
         context.pop()
