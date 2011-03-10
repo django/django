@@ -349,7 +349,7 @@ class TestFixtures(TestCase):
         """
         stdout = StringIO()
         # Create an instance of the concrete class
-        Widget(name='grommet').save()
+        widget = Widget.objects.create(name='grommet')
         management.call_command(
             'dumpdata',
             'fixtures_regress.widget',
@@ -359,7 +359,8 @@ class TestFixtures(TestCase):
         )
         self.assertEqual(
             stdout.getvalue(),
-            """[{"pk": 1, "model": "fixtures_regress.widget", "fields": {"name": "grommet"}}]"""
+            """[{"pk": %d, "model": "fixtures_regress.widget", "fields": {"name": "grommet"}}]"""
+            % widget.pk
             )
 
 

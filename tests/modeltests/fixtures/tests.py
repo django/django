@@ -3,6 +3,7 @@ import sys
 
 from django.test import TestCase, TransactionTestCase
 from django.conf import settings
+from django.contrib.sites.models import Site
 from django.core import management
 from django.db import DEFAULT_DB_ALIAS
 
@@ -38,6 +39,7 @@ class FixtureLoadingTests(TestCase):
     def test_loading_and_dumping(self):
         new_io = StringIO.StringIO()
 
+        Site.objects.all().delete()
         # Load fixture 1. Single JSON file, with two objects.
         management.call_command('loaddata', 'fixture1.json', verbosity=0, commit=False)
         self.assertQuerysetEqual(Article.objects.all(), [

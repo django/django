@@ -32,7 +32,7 @@ class ChangeListTests(TransactionTestCase):
         template = Template('{% load admin_list %}{% spaceless %}{% result_list cl %}{% endspaceless %}')
         context = Context({'cl': cl})
         table_output = template.render(context)
-        row_html = '<tbody><tr class="row1"><td class="action-checkbox"><input type="checkbox" class="action-select" value="1" name="_selected_action" /></td><th><a href="1/">name</a></th><td class="nowrap">(None)</td></tr></tbody>'
+        row_html = '<tbody><tr class="row1"><td class="action-checkbox"><input type="checkbox" class="action-select" value="%d" name="_selected_action" /></td><th><a href="%d/">name</a></th><td class="nowrap">(None)</td></tr></tbody>' % (new_child.id, new_child.id)
         self.assertFalse(table_output.find(row_html) == -1,
             'Failed to find expected row element: %s' % table_output)
 
@@ -53,7 +53,7 @@ class ChangeListTests(TransactionTestCase):
         template = Template('{% load admin_list %}{% spaceless %}{% result_list cl %}{% endspaceless %}')
         context = Context({'cl': cl})
         table_output = template.render(context)
-        row_html = '<tbody><tr class="row1"><td class="action-checkbox"><input type="checkbox" class="action-select" value="1" name="_selected_action" /></td><th><a href="1/">name</a></th><td class="nowrap">Parent object</td></tr></tbody>'
+        row_html = '<tbody><tr class="row1"><td class="action-checkbox"><input type="checkbox" class="action-select" value="%d" name="_selected_action" /></td><th><a href="%d/">name</a></th><td class="nowrap">Parent object</td></tr></tbody>' % (new_child.id, new_child.id)
         self.assertFalse(table_output.find(row_html) == -1,
             'Failed to find expected row element: %s' % table_output)
 
@@ -84,7 +84,7 @@ class ChangeListTests(TransactionTestCase):
         context = Context({'cl': cl})
         table_output = template.render(context)
         # make sure that hidden fields are in the correct place
-        hiddenfields_div = '<div class="hiddenfields"><input type="hidden" name="form-0-id" value="1" id="id_form-0-id" /></div>'
+        hiddenfields_div = '<div class="hiddenfields"><input type="hidden" name="form-0-id" value="%d" id="id_form-0-id" /></div>' % new_child.id
         self.assertFalse(table_output.find(hiddenfields_div) == -1,
             'Failed to find hidden fields in: %s' % table_output)
         # make sure that list editable fields are rendered in divs correctly
