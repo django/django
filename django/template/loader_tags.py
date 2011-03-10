@@ -136,7 +136,7 @@ class BaseIncludeNode(Node):
         values = dict([(name, var.resolve(context)) for name, var
                        in self.extra_context.iteritems()])
         if self.isolated_context:
-            return template.render(Context(values))
+            return template.render(context.new(values))
         context.update(values)
         output = template.render(context)
         context.pop()

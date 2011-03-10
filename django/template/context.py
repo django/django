@@ -99,6 +99,14 @@ class Context(BaseContext):
         self.dicts.append(other_dict)
         return other_dict
 
+    def new(self, values=None):
+        """
+        Returns a new Context with the same 'autoescape' value etc, but with
+        only the values given in 'values' stored.
+        """
+        return self.__class__(dict_=values, autoescape=self.autoescape,
+                              current_app=self.current_app, use_l10n=self.use_l10n)
+
 class RenderContext(BaseContext):
     """
     A stack container for storing Template state.
