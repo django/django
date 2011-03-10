@@ -29,11 +29,6 @@ class Bar(models.Model):
     b = models.CharField(max_length=10)
     a = models.ForeignKey(Foo, default=get_foo)
 
-class Baz(models.Model):
-    a = models.CharField(max_length=5)
-    #Only Foos related to Bars starting with 'a'
-    foo = models.ForeignKey(Foo, limit_choices_to=models.Q(bar__b__startswith='a'))
-
 class Whiz(models.Model):
     CHOICES = (
         ('Group 1', (
