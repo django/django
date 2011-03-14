@@ -1,6 +1,6 @@
 import os
 import re
-from django.utils.unittest import TestCase
+from unittest import TestCase
 from django.contrib.gis.db.models import Union, Extent3D
 from django.contrib.gis.geos import GEOSGeometry, Point, Polygon
 from django.contrib.gis.utils import LayerMapping, LayerMapError
