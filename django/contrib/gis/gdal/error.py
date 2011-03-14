@@ -37,6 +37,6 @@ def check_err(code):
         return
     elif code in OGRERR_DICT:
         e, msg = OGRERR_DICT[code]
-        raise e, msg
+        raise e(msg)
     else:
         raise OGRException('Unknown error code: "%s"' % code)

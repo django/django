@@ -33,7 +33,7 @@ class BaseQuerysetTest(TestCase):
                 excName = exc.__name__
             else:
                 excName = str(exc)
-            raise AssertionError, "%s not raised" % excName
+            raise AssertionError("%s not raised" % excName)
 
 
 class Queries1Tests(BaseQuerysetTest):

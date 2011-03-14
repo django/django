@@ -380,9 +380,9 @@ class _OutputRedirectingPdb(pdb.Pdb):
 # [XX] Normalize with respect to os.path.pardir?
 def _module_relative_path(module, path):
     if not inspect.ismodule(module):
-        raise TypeError, 'Expected a module: %r' % module
+        raise TypeError('Expected a module: %r' % module)
     if path.startswith('/'):
-        raise ValueError, 'Module-relative files may not have absolute paths'
+        raise ValueError('Module-relative files may not have absolute paths')
 
     # Find the base directory for the path.
     if hasattr(module, '__file__'):

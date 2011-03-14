@@ -389,7 +389,7 @@ class Templates(unittest.TestCase):
             try:
                 return (template_tests[template_name][0] , "test:%s" % template_name)
             except KeyError:
-                raise template.TemplateDoesNotExist, template_name
+                raise template.TemplateDoesNotExist(template_name)
 
         cache_loader = cached.Loader(('test_template_loader',))
         cache_loader._cached_loaders = (test_template_loader,)
