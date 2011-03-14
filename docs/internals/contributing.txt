@@ -7,21 +7,21 @@ it. We're passionate about helping Django users make the jump to contributing
 members of the community, so there are many ways you can help Django's
 development:
 
-    * Blog about Django.  We syndicate all the Django blogs we know about on
+    * Blog about Django. We syndicate all the Django blogs we know about on
       the `community page`_; contact jacob@jacobian.org if you've got a blog
       you'd like to see on that page.
 
-    * Report bugs and request features in our `ticket tracker`_.  Please read
+    * Report bugs and request features in our `ticket tracker`_. Please read
       `Reporting bugs`_, below, for the details on how we like our bug reports
       served up.
 
-    * Submit patches for new and/or fixed behavior.  Please read `Submitting
+    * Submit patches for new and/or fixed behavior. Please read `Submitting
       patches`_, below, for details on how to submit a patch. If you're looking
       for an easy way to start contributing to Django have a look at the
       `easy-pickings`_ tickets.
 
     * Join the `django-developers`_ mailing list and share your ideas for how
-      to improve Django.  We're always open to suggestions, although we're
+      to improve Django. We're always open to suggestions, although we're
       likely to be skeptical of large-scale suggestions without some code to
       back it up.
 
@@ -47,7 +47,7 @@ Reporting bugs
 
 Well-written bug reports are *incredibly* helpful. However, there's a certain
 amount of overhead involved in working with any bug tracking system so your
-help in keeping our ticket tracker as useful as possible is appreciated.  In
+help in keeping our ticket tracker as useful as possible is appreciated. In
 particular:
 
     * **Do** read the :doc:`FAQ </faq/index>` to see if your issue might
@@ -65,7 +65,7 @@ particular:
       A minimal example that illustrates the bug in a nice small test case
       is the best possible bug report.
 
-    * **Don't** use the ticket system to ask support questions.  Use the
+    * **Don't** use the ticket system to ask support questions. Use the
       `django-users`_ list, or the `#django`_ IRC channel for that.
 
     * **Don't** use the ticket system to make large-scale feature requests.
@@ -74,7 +74,7 @@ particular:
 
     * **Don't** reopen issues that have been marked "wontfix". This mark
       means that the decision has been made that we can't or won't fix
-      this particular issue.  If you're not sure why, please ask
+      this particular issue. If you're not sure why, please ask
       on `django-developers`_.
 
     * **Don't** use the ticket tracker for lengthy discussions, because they're
@@ -1010,19 +1010,22 @@ dictionary for the applicable database.
 Running only some of the tests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Django's entire test suite takes a few minutes to run. To run a subset of the
-unit tests, append the names of the test modules to the ``runtests.py``
+Django's entire test suite takes a while to run, and running every single test
+could be redundant if, say, you just added a test to Django that you want to
+run quickly without running everything else. You can run a subset of the unit
+tests by appending the names of the test modules to ``runtests.py`` on the
 command line.
 
-As an example, if you'd like to only run tests for generic relations and
+For example, if you'd like to run tests only for generic relations and
 internationalization, type:
 
 .. code-block:: bash
 
     ./runtests.py --settings=path.to.settings generic_relations i18n
 
-See the list of directories in ``tests/modeltests`` and
-``tests/regressiontests`` for module names.
+How do you find out the names of individual tests? Look in ``tests/modeltests``
+and ``tests/regressiontests`` -- each directory name there is the name of a
+test.
 
 If you just want to run a particular class of tests, you can specify a list of
 paths to individual test classes. For example, to run the ``TranslationTests``
@@ -1032,7 +1035,7 @@ of the ``i18n`` module, type:
 
     ./runtests.py --settings=path.to.settings i18n.TranslationTests
 
-You can specify an individual test like this:
+Going beyond that, you can specify an individual test method like this:
 
 .. code-block:: bash
 
@@ -1052,7 +1055,7 @@ dependencies:
     *  memcached_, plus a :ref:`supported Python binding <memcached>`
     *  gettext_ (:ref:`gettext_on_windows`)
 
-If you want to test the memcached cache backend, you will also need to define
+If you want to test the memcached cache backend, you'll also need to define
 a :setting:`CACHES` setting that points at your memcached instance.
 
 Each of these dependencies is optional. If you're missing any of them, the
@@ -1086,10 +1089,10 @@ Requesting features
 ===================
 
 We're always trying to make Django better, and your feature requests are a key
-part of that. Here are some tips on how to most effectively make a request:
+part of that. Here are some tips on how to make a request most effectively:
 
-    * Request the feature on `django-developers`_, not in the ticket tracker;
-      it'll get read more closely if it's on the mailing list.
+    * Request the feature on `django-developers`_, not in the ticket tracker.
+      It'll get read more closely if it's on the mailing list.
 
     * Describe clearly and concisely what the missing feature is and how you'd
       like to see it implemented. Include example code (non-functional is OK)
@@ -1102,8 +1105,8 @@ part of that. Here are some tips on how to most effectively make a request:
 
 As with most open-source projects, code talks. If you are willing to write the
 code for the feature yourself or if (even better) you've already written it,
-it's much more likely to be accepted.  If it's a large feature that might need
-multiple developers we're always happy to give you an experimental branch in
+it's much more likely to be accepted. If it's a large feature that might need
+multiple developers, we're always happy to give you an experimental branch in
 our repository; see below.
 
 Branch policy
@@ -1289,7 +1292,7 @@ How we make decisions
 Whenever possible, we strive for a rough consensus. To that end, we'll often
 have informal votes on `django-developers`_ about a feature. In these votes we
 follow the voting style invented by Apache and used on Python itself, where
-votes are given as +1, +0, -0, or -1.  Roughly translated, these votes mean:
+votes are given as +1, +0, -0, or -1. Roughly translated, these votes mean:
 
     * +1: "I love the idea and I'm strongly committed to it."
 
