@@ -86,7 +86,7 @@ class Settings(BaseSettings):
         try:
             mod = importlib.import_module(self.SETTINGS_MODULE)
         except ImportError, e:
-            raise ImportError("Could not import settings '%s' (Is it on sys.path? Does it have syntax errors?): %s" % (self.SETTINGS_MODULE, e))
+            raise ImportError("Could not import settings '%s' (Is it on sys.path?): %s" % (self.SETTINGS_MODULE, e))
 
         # Settings that should be converted into tuples if they're mistakenly entered
         # as strings.
