@@ -17,15 +17,13 @@ srlist = (TestSRS('GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,29
                   attr=(('DATUM', 'WGS_1984'), (('SPHEROID', 1), '6378137'),('primem|authority', 'EPSG'),),
                   ),
           TestSRS('PROJCS["NAD83 / Texas South Central",GEOGCS["NAD83",DATUM["North_American_Datum_1983",SPHEROID["GRS 1980",6378137,298.257222101,AUTHORITY["EPSG","7019"]],AUTHORITY["EPSG","6269"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.01745329251994328,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4269"]],PROJECTION["Lambert_Conformal_Conic_2SP"],PARAMETER["standard_parallel_1",30.28333333333333],PARAMETER["standard_parallel_2",28.38333333333333],PARAMETER["latitude_of_origin",27.83333333333333],PARAMETER["central_meridian",-99],PARAMETER["false_easting",600000],PARAMETER["false_northing",4000000],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AUTHORITY["EPSG","32140"]]',
-                  proj='+proj=lcc +lat_1=30.28333333333333 +lat_2=28.38333333333333 +lat_0=27.83333333333333 +lon_0=-99 +x_0=600000 +y_0=4000000 +ellps=GRS80 +datum=NAD83 +units=m +no_defs ',
-                  epsg=32140, projected=True, geographic=False, local=False,
+                  proj=None, epsg=32140, projected=True, geographic=False, local=False,
                   lin_name='metre', ang_name='degree', lin_units=1.0, ang_units=0.0174532925199,
                   auth={'PROJCS' : ('EPSG', '32140'), 'spheroid' : ('EPSG', '7019'), 'unit' : ('EPSG', '9001'),},
                   attr=(('DATUM', 'North_American_Datum_1983'),(('SPHEROID', 2), '298.257222101'),('PROJECTION','Lambert_Conformal_Conic_2SP'),),
                   ),
           TestSRS('PROJCS["NAD_1983_StatePlane_Texas_South_Central_FIPS_4204_Feet",GEOGCS["GCS_North_American_1983",DATUM["North_American_Datum_1983",SPHEROID["GRS_1980",6378137.0,298.257222101]],PRIMEM["Greenwich",0.0],UNIT["Degree",0.0174532925199433]],PROJECTION["Lambert_Conformal_Conic_2SP"],PARAMETER["False_Easting",1968500.0],PARAMETER["False_Northing",13123333.33333333],PARAMETER["Central_Meridian",-99.0],PARAMETER["Standard_Parallel_1",28.38333333333333],PARAMETER["Standard_Parallel_2",30.28333333333334],PARAMETER["Latitude_Of_Origin",27.83333333333333],UNIT["Foot_US",0.3048006096012192]]',
-                  proj='+proj=lcc +lat_1=28.38333333333333 +lat_2=30.28333333333334 +lat_0=27.83333333333333 +lon_0=-99 +x_0=600000 +y_0=3999999.999999999 +ellps=GRS80 +datum=NAD83 +to_meter=0.3048006096012192 +no_defs ',
-                  epsg=None, projected=True, geographic=False, local=False,
+                  proj=None, epsg=None, projected=True, geographic=False, local=False,
                   lin_name='Foot_US', ang_name='Degree', lin_units=0.3048006096012192, ang_units=0.0174532925199,
                   auth={'PROJCS' : (None, None),},
                   attr=(('PROJCS|GeOgCs|spheroid', 'GRS_1980'),(('projcs', 9), 'UNIT'), (('projcs', 11), None),),
@@ -74,7 +72,6 @@ class SpatialRefTest(unittest.TestCase):
 
     def test04_proj(self):
         "Test PROJ.4 import and export."
-
         for s in srlist:
             if s.proj:
                 srs1 = SpatialReference(s.wkt)
@@ -89,7 +86,6 @@ class SpatialRefTest(unittest.TestCase):
                 srs2 = SpatialReference(s.epsg)
                 srs3 = SpatialReference(str(s.epsg))
                 srs4 = SpatialReference('EPSG:%d' % s.epsg)
-                #self.assertEqual(srs1.wkt, srs2.wkt)
                 for srs in (srs1, srs2, srs3, srs4):
                     for attr, expected in s.attr:
                         self.assertEqual(expected, srs[attr])
@@ -158,7 +154,6 @@ class SpatialRefTest(unittest.TestCase):
         self.assertEqual('WGS_1984', s1['DATUM'])
         self.assertEqual('EPSG', s1['AUTHORITY'])
         self.assertEqual(4326, int(s1['AUTHORITY', 1]))
-        #for i in range(7): self.assertEqual(0, int(s1['TOWGS84', i]))
         self.assertEqual(None, s1['FOOBAR'])
 
 def suite():

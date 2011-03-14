@@ -1,4 +1,5 @@
 from django.db import connection
+from django.contrib.gis.gdal import GDAL_VERSION
 from django.contrib.gis.tests.utils import mysql, no_mysql, oracle, postgis, spatialite
 from django.utils import unittest
 
@@ -78,7 +79,8 @@ class SpatialRefSysTest(unittest.TestCase):
             # Testing the SpatialReference object directly.
             if postgis or spatialite:
                 srs = sr.srs
-                self.assertEqual(sd['proj4'], srs.proj4)
+                if GDAL_VERSION <= (1, 8):
+                    self.assertEqual(sd['proj4'], srs.proj4)
                 # No `srtext` field in the `spatial_ref_sys` table in SpatiaLite
                 if not spatialite:
                     if connection.ops.spatial_version >= (1, 4, 0):

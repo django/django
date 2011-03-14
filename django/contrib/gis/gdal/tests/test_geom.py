@@ -1,6 +1,6 @@
 from django.contrib.gis.gdal import OGRGeometry, OGRGeomType, \
     OGRException, OGRIndexError, SpatialReference, CoordTransform, \
-    gdal_version
+    GDAL_VERSION
 from django.utils import unittest
 from django.contrib.gis.geometry.test_data import TestDataMixin
 
@@ -74,7 +74,12 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
         "Testing GML output."
         for g in self.geometries.wkt_out:
             geom = OGRGeometry(g.wkt)
-            self.assertEqual(g.gml, geom.gml)
+            exp_gml = g.gml
+            if GDAL_VERSION >= (1, 8):
+                # In GDAL 1.8, the non-conformant GML tag  <gml:GeometryCollection> was
+                # replaced with <gml:MultiGeometry>.
+                exp_gml = exp_gml.replace('GeometryCollection', 'MultiGeometry')
+            self.assertEqual(exp_gml, geom.gml)
 
     def test01c_hex(self):
         "Testing HEX input/output."
@@ -237,10 +242,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
 
         # Closing the rings -- doesn't work on GDAL versions 1.4.1 and below:
         # http://trac.osgeo.org/gdal/ticket/1673
-        major, minor1, minor2 = gdal_version().split('.')
-        if major == '1':
-            iminor1 = int(minor1)
-            if iminor1 < 4 or (iminor1 == 4 and minor2.startswith('1')): return
+        if GDAL_VERSION <= (1, 4, 1): return
         poly.close_rings()
         self.assertEqual(10, poly.point_count) # Two closing points should've been added
         self.assertEqual(OGRGeometry('POINT(2.5 2.5)'), poly.centroid)
