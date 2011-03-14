@@ -211,7 +211,7 @@ The GeoDjango test suite is now included when
 when using :ref:`spatial database backends <spatial-backends>`.
 
 ``MEDIA_URL`` and ``STATIC_URL`` must end in a slash
-----------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Previously, the ``MEDIA_URL`` setting only required a trailing slash if it
 contained a suffix beyond the domain name.
@@ -555,9 +555,9 @@ test case.
 Changed priority of translation loading
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Work has been done to homogeneize, simplify, rationalize and properly document
-the algorithm used by Django at runtime to build translations from the
-differents translations found on disk, namely:
+Work has been done to simplify, rationalize and properly document the algorithm
+used by Django at runtime to build translations from the differents translations
+found on disk, namely:
 
 For translatable literals found in Python code and templates (``'django'``
 gettext domain):
@@ -592,11 +592,11 @@ domain):
    :ref:`javascript_catalog view <javascript_catalog-view>`.  Paths listed first
    have higher precedence than the ones listed later.
 
- * Translations under the ``locale`` sbdirectory of the *project directory* have
-   never been taken in account for JavaScript translations and remain in the
-   same situation considering the deprecation of such location.
+ * Translations under the ``locale`` subdirectory of the *project directory*
+   have never been taken in account for JavaScript translations and remain in
+   the same situation considering the deprecation of such location.
 
-.. _corresponding deprecated features section: loading_of_translations_from_the_project_directory_
+.. _corresponding deprecated features section: loading_of_project_level_translations_
 
 Transaction management
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -812,16 +812,16 @@ which was a bug-fix wrapper around the standard library ``SimpleCookie``. As the
 fixes are moving upstream, this is now deprecated - you should use ``from
 django.http import SimpleCookie`` instead.
 
-.. _loading_of_translations_from_the_project_directory:
+.. _loading_of_project_level_translations:
 
-Loading of translations from the project directory
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Loading of *project-level* translations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This release of Django starts the deprecation process for inclusion of
-translations located under the *project path* in the translation building
-process performed at runtime. The :setting:`LOCALE_PATHS` setting can be used
-for the same task by including in it the filesystem path to the ``locale``
-directory containing project-level translations.
+translations located under the so-called *project path* in the translation
+building process performed at runtime. The :setting:`LOCALE_PATHS` setting can
+be used for the same task by adding the filesystem path to a ``locale``
+directory containing project-level translations to the value of that setting.
 
 Rationale for this decision:
 
@@ -835,17 +835,17 @@ Rationale for this decision:
    scenario is more complex than the basic one. e.g. it fails when the settings
    module is a directory (ticket #10765).
 
- * Potential for strange development- and deployment-time problems like the
+ * There are potential strange development- and deployment-time problems like the
    fact that the ``project_dir/locale/`` subdir can generate spurious error
-   messages when the project directory is included in the Python path (default
-   behavior of ``manage.py runserver``) and then it clashes with the equally
-   named standard library module, this is a typical warming message::
+   messages when the project directory is added to the Python path (``manage.py
+   runserver`` does this) and then it clashes with the equally named standard
+   library module, this is a typical warning message::
 
-     /usr/lib/python2.6/gettext.py:49: ImportWarning: Not importing directory '/path/to/project/dir/locale': missing __init__.py.
+     /usr/lib/python2.6/gettext.py:49: ImportWarning: Not importing directory '/path/to/project/locale': missing __init__.py.
      import locale, copy, os, re, struct, sys
 
  * This location wasn't included in the translation building process for
-   JavaScript literals.
+   JavaScript literals. This deprecation removes such inconsistency.
 
 ``PermWrapper`` moved to ``django.contrib.auth.context_processors``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
