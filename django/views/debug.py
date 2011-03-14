@@ -756,14 +756,15 @@ Exception Value: {{ exception_value|force_escape }}
   </table>
 
 </div>
-
-<div id="explanation">
-  <p>
-    You're seeing this error because you have <code>DEBUG = True</code> in your
-    Django settings file. Change that to <code>False</code>, and Django will
-    display a standard 500 page.
-  </p>
-</div>
+{% if not is_email %}
+  <div id="explanation">
+    <p>
+      You're seeing this error because you have <code>DEBUG = True</code> in your
+      Django settings file. Change that to <code>False</code>, and Django will
+      display a standard 500 page.
+    </p>
+  </div>
+{% endif %}
 </body>
 </html>
 """
