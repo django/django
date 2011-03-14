@@ -3,7 +3,6 @@ Helper functions for creating Form classes from Django models
 and database field objects.
 """
 
-from django.db import connections
 from django.utils.encoding import smart_unicode, force_unicode
 from django.utils.datastructures import SortedDict
 from django.utils.text import get_text_list, capfirst
@@ -428,6 +427,9 @@ class BaseModelFormSet(BaseFormSet):
 
     def _construct_form(self, i, **kwargs):
         if self.is_bound and i < self.initial_form_count():
+            # Import goes here instead of module-level because importing
+            # django.db has side effects.
+            from django.db import connections
             pk_key = "%s-%s" % (self.add_prefix(i), self.model._meta.pk.name)
             pk = self.data[pk_key]
             pk_field = self.model._meta.pk
