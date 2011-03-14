@@ -397,7 +397,7 @@ class Model(object):
         model = self.__class__
         # The obvious thing to do here is to invoke super().__reduce__()
         # for the non-deferred case. Don't do that.
-        # On Python 2.4, there is something wierd with __reduce__,
+        # On Python 2.4, there is something weird with __reduce__,
         # and as a result, the super call will cause an infinite recursion.
         # See #10547 and #12121.
         defers = []
