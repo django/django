@@ -1,0 +1,17 @@
+==========================
+Django 1.2.6 release notes
+==========================
+
+This page documents release notes for the as-yet-unreleased Django 1.2.6. As
+such, it's tentative and subject to change. It provides up-to-date information
+for those who are following the 1.2.X branch.
+
+Backwards incompatible changes
+==============================
+
+No password reset for inactive users
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In previous versions, inactive users were able to request a password reset
+email and reset their password. In Django 1.2.6 inactive users will receive the
+same message as a nonexistent account.
