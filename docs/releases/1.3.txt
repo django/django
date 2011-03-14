@@ -634,6 +634,13 @@ Django 1.3, this will raise a :class:`TransactionManagementError` because
 the read operation that retrieves the ``MyObject`` instance leaves the
 transaction in a dirty state.
 
+No password reset for inactive users
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Prior to Django 1.3, inactive users were able to request a password reset email
+and reset their password. In Django 1.3 inactive users will receive the same
+message as a nonexistent account.
+
 .. _deprecated-features-1.3:
 
 Features deprecated in 1.3
