@@ -42,6 +42,10 @@ You could then execute custom SQL like so::
     John Smith
     Jane Jones
 
+Of course, this example isn't very exciting -- it's exactly the same as
+running ``Person.objects.all()``. However, ``raw()`` has a bunch of other
+options that make it very powerful.
+
 .. admonition:: Model table names
 
     Where'd the name of the ``Person`` table come from in that example?
@@ -56,9 +60,12 @@ You could then execute custom SQL like so::
     :attr:`~Options.db_table` option, which also lets you manually set the
     database table name.
 
-Of course, this example isn't very exciting -- it's exactly the same as
-running ``Person.objects.all()``. However, ``raw()`` has a bunch of other
-options that make it very powerful.
+.. warning::
+
+    No checking is done on the SQL statement that is passed in to ``.raw()``.
+    Django expects that the statement will return a set of rows from the
+    database, but does nothing to enforce that. If the query does not
+    return rows, a (possibly cryptic) error will result.
 
 Mapping query fields to model fields
 ------------------------------------

@@ -31,7 +31,6 @@ class RawQuery(object):
     """
 
     def __init__(self, sql, using, params=None):
-        self.validate_sql(sql)
         self.params = params or ()
         self.sql = sql
         self.using = using
@@ -61,11 +60,6 @@ class RawQuery(object):
         converter = connections[self.using].introspection.table_name_converter
         return [converter(column_meta[0])
                 for column_meta in self.cursor.description]
-
-    def validate_sql(self, sql):
-        if not sql.lower().strip().startswith('select'):
-            raise InvalidQuery('Raw queries are limited to SELECT queries. Use '
-                               'connection.cursor directly for other types of queries.')
 
     def __iter__(self):
         # Always execute a new query for a new iterator.

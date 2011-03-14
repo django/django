@@ -169,10 +169,6 @@ class RawQueryTests(TestCase):
         authors = Author.objects.all()
         self.assertSuccessfulRawQuery(Author, query, authors, expected_annotations)
 
-    def testInvalidQuery(self):
-        query = "UPDATE raw_query_author SET first_name='thing' WHERE first_name='Joe'"
-        self.assertRaises(InvalidQuery, Author.objects.raw, query)
-
     def testWhiteSpaceQuery(self):
         query = "    SELECT * FROM raw_query_author"
         authors = Author.objects.all()
