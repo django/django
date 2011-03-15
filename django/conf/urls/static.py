@@ -15,12 +15,11 @@ def static(prefix, view='django.views.static.serve', **kwargs):
     ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
     """
-    if not settings.DEBUG:
+    # No-op if not in debug mode or an non-local prefix
+    if not settings.DEBUG or (prefix and '://' in prefix):
         return []
     elif not prefix:
         raise ImproperlyConfigured("Empty static prefix not permitted")
-    elif '://' in prefix:
-        raise ImproperlyConfigured("URL '%s' not allowed as static prefix" % prefix)
     return patterns('',
         url(r'^%s(?P<path>.*)$' % re.escape(prefix.lstrip('/')), view, kwargs=kwargs),
     )

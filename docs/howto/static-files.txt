@@ -297,6 +297,12 @@ development::
         # ... the rest of your URLconf goes here ...
     ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
+.. note::
+
+    The helper function will only be operational in debug mode and if
+    the given prefix is local (e.g. ``/static/``) and not a URL (e.g.
+    ``http://static.example.com/``).
+
 .. _staticfiles-production:
 
 Serving static files in production
