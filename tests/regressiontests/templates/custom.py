@@ -52,3 +52,29 @@ class CustomTagTests(TestCase):
         register = template.Library()
         decorator = register.simple_tag(takes_context=True)
         self.assertRaises(template.TemplateSyntaxError, decorator, a_simple_tag_without_parameters)
+
+    def test_inclusion_tags(self):
+        c = template.Context({'value': 42})
+
+        t = template.Template('{% load custom %}{% inclusion_no_params %}')
+        self.assertEquals(t.render(c), u'inclusion_no_params - Expected result\n')
+
+        t = template.Template('{% load custom %}{% inclusion_one_param 37 %}')
+        self.assertEquals(t.render(c), u'inclusion_one_param - Expected result: 37\n')
+
+        t = template.Template('{% load custom %}{% inclusion_explicit_no_context 37 %}')
+        self.assertEquals(t.render(c), u'inclusion_explicit_no_context - Expected result: 37\n')
+
+        t = template.Template('{% load custom %}{% inclusion_no_params_with_context %}')
+        self.assertEquals(t.render(c), u'inclusion_no_params_with_context - Expected result (context value: 42)\n')
+
+        t = template.Template('{% load custom %}{% inclusion_params_and_context 37 %}')
+        self.assertEquals(t.render(c), u'inclusion_params_and_context - Expected result (context value: 42): 37\n')
+
+    def test_inclusion_tag_registration(self):
+        # Test that the decorators preserve the decorated function's docstring, name and attributes.
+        self.verify_tag(custom.inclusion_no_params, 'inclusion_no_params')
+        self.verify_tag(custom.inclusion_one_param, 'inclusion_one_param')
+        self.verify_tag(custom.inclusion_explicit_no_context, 'inclusion_explicit_no_context')
+        self.verify_tag(custom.inclusion_no_params_with_context, 'inclusion_no_params_with_context')
+        self.verify_tag(custom.inclusion_params_and_context, 'inclusion_params_and_context')

@@ -39,3 +39,33 @@ def params_and_context(context, arg):
     return "params_and_context - Expected result (context value: %s): %s" % (context['value'], arg)
 params_and_context.anything = "Expected params_and_context __dict__"
 
+@register.inclusion_tag('inclusion.html')
+def inclusion_no_params():
+    """Expected inclusion_no_params __doc__"""
+    return {"result" : "inclusion_no_params - Expected result"}
+inclusion_no_params.anything = "Expected inclusion_no_params __dict__"
+
+@register.inclusion_tag('inclusion.html')
+def inclusion_one_param(arg):
+    """Expected inclusion_one_param __doc__"""
+    return {"result" : "inclusion_one_param - Expected result: %s" % arg}
+inclusion_one_param.anything = "Expected inclusion_one_param __dict__"
+
+@register.inclusion_tag('inclusion.html', takes_context=False)
+def inclusion_explicit_no_context(arg):
+    """Expected inclusion_explicit_no_context __doc__"""
+    return {"result" : "inclusion_explicit_no_context - Expected result: %s" % arg}
+inclusion_explicit_no_context.anything = "Expected inclusion_explicit_no_context __dict__"
+
+@register.inclusion_tag('inclusion.html', takes_context=True)
+def inclusion_no_params_with_context(context):
+    """Expected inclusion_no_params_with_context __doc__"""
+    return {"result" : "inclusion_no_params_with_context - Expected result (context value: %s)" % context['value']}
+inclusion_no_params_with_context.anything = "Expected inclusion_no_params_with_context __dict__"
+
+@register.inclusion_tag('inclusion.html', takes_context=True)
+def inclusion_params_and_context(context, arg):
+    """Expected inclusion_params_and_context __doc__"""
+    return {"result" : "inclusion_params_and_context - Expected result (context value: %s): %s" % (context['value'], arg)}
+inclusion_params_and_context.anything = "Expected inclusion_params_and_context __dict__"
+
