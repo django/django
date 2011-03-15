@@ -4,10 +4,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-28 23:42+0100\n"
-"PO-Revision-Date: 2011-02-22 00:10+0000\n"
-"Last-Translator: Jannis <jannis@leidel.info>\n"
-"Language-Team: English <en@li.org>\n"
+"POT-Creation-Date: 2011-03-15 13:15-0400\n"
+"PO-Revision-Date: 2011-03-04 18:43+0000\n"
+"Last-Translator: haffi67 <haffi67@gmail.com>\n"
+"Language-Team: Icelandic <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -25,49 +25,49 @@ msgstr "Hengigögn"
 #: admin.py:42
 msgid "flagged"
 msgid_plural "flagged"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "flaggað"
+msgstr[1] "flaggað"
 
 #: admin.py:43
 msgid "Flag selected comments"
-msgstr ""
+msgstr "Flagga valdar athugasemdir"
 
 #: admin.py:47
 msgid "approved"
 msgid_plural "approved"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "samþykkt"
+msgstr[1] "samþykkt"
 
 #: admin.py:48
 msgid "Approve selected comments"
-msgstr ""
+msgstr "Samþykkja valdar athugasemdir"
 
 #: admin.py:52
 msgid "removed"
 msgid_plural "removed"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "fjarlægð"
+msgstr[1] "fjarlægðar"
 
 #: admin.py:53
 msgid "Remove selected comments"
-msgstr ""
+msgstr "Fjarlægja valdar athugasemdir"
 
 #: admin.py:65
 #, python-format
 msgid "1 comment was successfully %(action)s."
 msgid_plural "%(count)s comments were successfully %(action)s."
-msgstr[0] ""
+msgstr[0] "Það tókst að %(action)s %(count)s athugasemdum."
 msgstr[1] ""
 
 #: feeds.py:13
 #, python-format
 msgid "%(site_name)s comments"
-msgstr ""
+msgstr "%(site_name)s: athugasemdir"
 
 #: feeds.py:23
 #, python-format
 msgid "Latest comments on %(site_name)s"
-msgstr ""
+msgstr "Nýjustu athugasemdir á %(site_name)s"
 
 #: forms.py:109
 msgid "Name"
@@ -193,99 +193,99 @@ msgstr ""
 
 #: models.py:170
 msgid "flag"
-msgstr ""
+msgstr "flagga"
 
 #: models.py:171
 msgid "date"
-msgstr ""
+msgstr "dagsetning"
 
 #: models.py:181
 msgid "comment flag"
-msgstr ""
+msgstr "flagg athugasemdar"
 
 #: models.py:182
 msgid "comment flags"
-msgstr ""
+msgstr "flögg athugasemdar"
 
 #: templates/comments/approve.html:4
 msgid "Approve a comment"
-msgstr ""
+msgstr "Samþykkja athugasemd"
 
 #: templates/comments/approve.html:7
 msgid "Really make this comment public?"
-msgstr ""
+msgstr "Gera þessa athugasemd sýnilega?"
 
 #: templates/comments/approve.html:12
 msgid "Approve"
-msgstr ""
+msgstr "Samþykkja"
 
 #: templates/comments/approved.html:4
 msgid "Thanks for approving"
-msgstr ""
+msgstr "Takk fyrir að samþykkja"
 
 #: templates/comments/approved.html:7 templates/comments/deleted.html:7
 #: templates/comments/flagged.html:7
 msgid ""
 "Thanks for taking the time to improve the quality of discussion on our site"
-msgstr ""
+msgstr "Takk fyrir að gefa þér tíma til að bæta gæði umræðunnar á síðunni."
 
 #: templates/comments/delete.html:4
 msgid "Remove a comment"
-msgstr ""
+msgstr "Fjarlægja athugasemd"
 
 #: templates/comments/delete.html:7
 msgid "Really remove this comment?"
-msgstr ""
+msgstr "Eyða þessari athugasemd?"
 
 #: templates/comments/delete.html:12
 msgid "Remove"
-msgstr ""
+msgstr "Fjarlægja"
 
 #: templates/comments/deleted.html:4
 msgid "Thanks for removing"
-msgstr ""
+msgstr "Takk fyrir að fjarlægja"
 
 #: templates/comments/flag.html:4
 msgid "Flag this comment"
-msgstr ""
+msgstr "Flagga athugasemd"
 
 #: templates/comments/flag.html:7
 msgid "Really flag this comment?"
-msgstr ""
+msgstr "Flagga þesa athugasemd?"
 
 #: templates/comments/flag.html:12
 msgid "Flag"
-msgstr ""
+msgstr "Flagg"
 
 #: templates/comments/flagged.html:4
 msgid "Thanks for flagging"
-msgstr ""
+msgstr "Takk fyrir að flagga"
 
 #: templates/comments/form.html:17 templates/comments/preview.html:32
 msgid "Post"
-msgstr ""
+msgstr "Birta"
 
 #: templates/comments/form.html:18 templates/comments/preview.html:33
 msgid "Preview"
-msgstr ""
+msgstr "Skoða"
 
 #: templates/comments/posted.html:4
 msgid "Thanks for commenting"
-msgstr ""
+msgstr "Takk fyrir að senda athugasemd"
 
 #: templates/comments/posted.html:7
 msgid "Thank you for your comment"
-msgstr ""
+msgstr "Takk fyrir athugasemdina"
 
 #: templates/comments/preview.html:4 templates/comments/preview.html.py:13
 msgid "Preview your comment"
-msgstr ""
+msgstr "Skoða athugasemd"
 
 #: templates/comments/preview.html:11
 msgid "Please correct the error below"
 msgid_plural "Please correct the errors below"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Vinsamlegast lagfærðu villuna fyrir neðan"
+msgstr[1] "Vinsamlegast lagfærðu villurnar fyrir neðan"
 
 #: templates/comments/preview.html:16
 msgid "and"
@@ -293,8 +293,8 @@ msgstr "og"
 
 #: templates/comments/preview.html:16
 msgid "Post your comment"
-msgstr ""
+msgstr "Birta athugasemd"
 
 #: templates/comments/preview.html:16
 msgid "or make changes"
-msgstr ""
+msgstr "eða breyta"

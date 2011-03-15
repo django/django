@@ -4,10 +4,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-28 23:42+0100\n"
-"PO-Revision-Date: 2011-02-22 00:10+0000\n"
-"Last-Translator: Jannis <jannis@leidel.info>\n"
-"Language-Team: English <en@li.org>\n"
+"POT-Creation-Date: 2011-03-15 13:15-0400\n"
+"PO-Revision-Date: 2011-03-10 21:42+0000\n"
+"Last-Translator: greenfire <hongdiepkien@gmail.com>\n"
+"Language-Team: Vietnamese <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -29,25 +29,25 @@ msgstr[0] ""
 
 #: admin.py:43
 msgid "Flag selected comments"
-msgstr ""
+msgstr "Đặt cờ những nhận xét được chọn"
 
 #: admin.py:47
 msgid "approved"
 msgid_plural "approved"
-msgstr[0] ""
+msgstr[0] "phê duyệt"
 
 #: admin.py:48
 msgid "Approve selected comments"
-msgstr ""
+msgstr "Phê duyệt những nhận xét đã chọn"
 
 #: admin.py:52
 msgid "removed"
 msgid_plural "removed"
-msgstr[0] ""
+msgstr[0] "loại bỏ"
 
 #: admin.py:53
 msgid "Remove selected comments"
-msgstr ""
+msgstr "Loại bỏ nhận xét được chọn"
 
 #: admin.py:65
 #, python-format
@@ -63,7 +63,7 @@ msgstr ""
 #: feeds.py:23
 #, python-format
 msgid "Latest comments on %(site_name)s"
-msgstr ""
+msgstr "Nhận xét cuối cùng trên %(site_name)s"
 
 #: forms.py:109
 msgid "Name"
@@ -98,7 +98,7 @@ msgstr "kiểu nội dung"
 
 #: models.py:24
 msgid "object ID"
-msgstr ""
+msgstr "object ID"
 
 #: models.py:50 models.py:168
 msgid "user"
@@ -130,7 +130,7 @@ msgstr "Địa chỉ IP"
 
 #: models.py:61
 msgid "is public"
-msgstr ""
+msgstr "Được phổ biến"
 
 #: models.py:62
 msgid ""
@@ -151,19 +151,23 @@ msgstr ""
 
 #: models.py:77
 msgid "comments"
-msgstr ""
+msgstr "những nhận xét"
 
 #: models.py:119
 msgid ""
 "This comment was posted by an authenticated user and thus the name is read-"
 "only."
 msgstr ""
+"nhận xét này đã được đăng bởi một người dùng xác thực và do đó đặt tên cho "
+"là chỉ đọc."
 
 #: models.py:128
 msgid ""
 "This comment was posted by an authenticated user and thus the email is read-"
 "only."
 msgstr ""
+"nhận xét này đã được đăng bởi một người dùng xác thực và do đó email là chỉ "
+"đọc."
 
 #: models.py:153
 #, python-format
@@ -174,6 +178,9 @@ msgid ""
 "\n"
 "http://%(domain)s%(url)s"
 msgstr ""
+"Gửi bởi %(user)s  vào %(date)s  \n"
+"%(comment)s\n"
+"http://%(domain)s%(url)s "
 
 #: models.py:170
 msgid "flag"
@@ -181,11 +188,11 @@ msgstr ""
 
 #: models.py:171
 msgid "date"
-msgstr ""
+msgstr "ngày"
 
 #: models.py:181
 msgid "comment flag"
-msgstr ""
+msgstr "cờ nhận xét"
 
 #: models.py:182
 msgid "comment flags"
@@ -193,7 +200,7 @@ msgstr ""
 
 #: templates/comments/approve.html:4
 msgid "Approve a comment"
-msgstr ""
+msgstr "Phê duyệt một nhận xét"
 
 #: templates/comments/approve.html:7
 msgid "Really make this comment public?"
@@ -201,33 +208,35 @@ msgstr ""
 
 #: templates/comments/approve.html:12
 msgid "Approve"
-msgstr ""
+msgstr "Chấp thuận"
 
 #: templates/comments/approved.html:4
 msgid "Thanks for approving"
-msgstr ""
+msgstr "Cảm ơn bạn đã phê duyệt"
 
 #: templates/comments/approved.html:7 templates/comments/deleted.html:7
 #: templates/comments/flagged.html:7
 msgid ""
 "Thanks for taking the time to improve the quality of discussion on our site"
 msgstr ""
+"Cảm ơn bạn đã dành thời gian để cải thiện chất lượng cuộc thảo luận trên "
+"trang web của chúng tôi"
 
 #: templates/comments/delete.html:4
 msgid "Remove a comment"
-msgstr ""
+msgstr "Hủy bỏ một nhận xét"
 
 #: templates/comments/delete.html:7
 msgid "Really remove this comment?"
-msgstr ""
+msgstr "Thực sự loại bỏ bình luận này?"
 
 #: templates/comments/delete.html:12
 msgid "Remove"
-msgstr ""
+msgstr "Hủy bỏ"
 
 #: templates/comments/deleted.html:4
 msgid "Thanks for removing"
-msgstr ""
+msgstr "Cảm ơn đã loại bỏ"
 
 #: templates/comments/flag.html:4
 msgid "Flag this comment"
@@ -239,7 +248,7 @@ msgstr ""
 
 #: templates/comments/flag.html:12
 msgid "Flag"
-msgstr ""
+msgstr "Flag"
 
 #: templates/comments/flagged.html:4
 msgid "Thanks for flagging"
@@ -247,28 +256,28 @@ msgstr ""
 
 #: templates/comments/form.html:17 templates/comments/preview.html:32
 msgid "Post"
-msgstr ""
+msgstr "Post"
 
 #: templates/comments/form.html:18 templates/comments/preview.html:33
 msgid "Preview"
-msgstr ""
+msgstr "Xem trước"
 
 #: templates/comments/posted.html:4
 msgid "Thanks for commenting"
-msgstr ""
+msgstr "Cảm ơn đã  bình luận"
 
 #: templates/comments/posted.html:7
 msgid "Thank you for your comment"
-msgstr ""
+msgstr "Cảm ơn vì bình luận của bạn"
 
 #: templates/comments/preview.html:4 templates/comments/preview.html.py:13
 msgid "Preview your comment"
-msgstr ""
+msgstr "Xem trước bình luận của bạn"
 
 #: templates/comments/preview.html:11
 msgid "Please correct the error below"
 msgid_plural "Please correct the errors below"
-msgstr[0] ""
+msgstr[0] "Hãy sửa các lỗi dưới đây"
 
 #: templates/comments/preview.html:16
 msgid "and"
@@ -276,8 +285,8 @@ msgstr "và"
 
 #: templates/comments/preview.html:16
 msgid "Post your comment"
-msgstr ""
+msgstr "Đăng bình luận của bạn"
 
 #: templates/comments/preview.html:16
 msgid "or make changes"
-msgstr ""
+msgstr "hoặc thay đổi"

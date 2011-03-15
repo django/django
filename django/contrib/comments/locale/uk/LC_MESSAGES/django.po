@@ -4,9 +4,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-28 23:42+0100\n"
-"PO-Revision-Date: 2011-02-22 00:10+0000\n"
-"Last-Translator: sergikoff <sergikoff88@gmail.com>\n"
+"POT-Creation-Date: 2011-03-15 13:15-0400\n"
+"PO-Revision-Date: 2011-03-14 21:10+0000\n"
+"Last-Translator: Jannis <jannis@leidel.info>\n"
 "Language-Team: Ukrainian <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -26,57 +26,53 @@ msgstr "Мета-дані"
 #: admin.py:42
 msgid "flagged"
 msgid_plural "flagged"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "позначено"
+msgstr[1] "позначено"
+msgstr[2] "позначено"
 
 #: admin.py:43
 msgid "Flag selected comments"
-msgstr ""
+msgstr "Позначити відзначені коментарі"
 
 #: admin.py:47
 msgid "approved"
 msgid_plural "approved"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "апробовано"
+msgstr[1] "апробовано"
+msgstr[2] "апробовано"
 
 #: admin.py:48
 msgid "Approve selected comments"
-msgstr ""
+msgstr "Апробувати відзначені коментарі"
 
 #: admin.py:52
 msgid "removed"
 msgid_plural "removed"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "видалено"
+msgstr[1] "видалено"
+msgstr[2] "видалено"
 
 #: admin.py:53
 msgid "Remove selected comments"
-msgstr ""
+msgstr "Видалити відзначені коментарі"
 
 #: admin.py:65
 #, python-format
 msgid "1 comment was successfully %(action)s."
 msgid_plural "%(count)s comments were successfully %(action)s."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "%(count)s коментар було %(action)s."
+msgstr[1] "%(count)s коментарі було %(action)s."
+msgstr[2] "%(count)s коментарів було %(action)s."
 
 #: feeds.py:13
 #, python-format
 msgid "%(site_name)s comments"
-msgstr ""
+msgstr "коментарі сайту %(site_name)s"
 
 #: feeds.py:23
 #, python-format
 msgid "Latest comments on %(site_name)s"
-msgstr ""
+msgstr "Останні коментарі на сайті %(site_name)s"
 
 #: forms.py:109
 msgid "Name"
@@ -101,7 +97,6 @@ msgid_plural "Watch your mouth! The words %s are not allowed here."
 msgstr[0] "Слідкуйте за своїм язиком! Тут не дозволено вживати слово %s. "
 msgstr[1] "Слідкуйте за своїм язиком! Тут не дозволено вживати слова %s. "
 msgstr[2] "Слідкуйте за своїм язиком! Тут не дозволено вживати слова %s. "
-msgstr[3] "Слідкуйте за своїм язиком! Тут не дозволено вживати слова %s. "
 
 #: forms.py:198
 msgid ""
@@ -202,19 +197,19 @@ msgstr ""
 
 #: models.py:170
 msgid "flag"
-msgstr ""
+msgstr "позначка"
 
 #: models.py:171
 msgid "date"
-msgstr ""
+msgstr "число"
 
 #: models.py:181
 msgid "comment flag"
-msgstr ""
+msgstr "позначка коментаря"
 
 #: models.py:182
 msgid "comment flags"
-msgstr ""
+msgstr "позначки коментаря"
 
 #: templates/comments/approve.html:4
 msgid "Approve a comment"
@@ -298,7 +293,6 @@ msgid_plural "Please correct the errors below"
 msgstr[0] "Будь ласка, виправте помилку зазначену нижче"
 msgstr[1] "Будь ласка, виправте помилки зазначені нижче"
 msgstr[2] "Будь ласка, виправте помилки зазначені нижче"
-msgstr[3] "Будь ласка, виправте помилки зазначені нижче"
 
 #: templates/comments/preview.html:16
 msgid "and"
@@ -306,8 +300,8 @@ msgstr "та"
 
 #: templates/comments/preview.html:16
 msgid "Post your comment"
-msgstr "Опублікуйте коментар"
+msgstr "Опублікувати коментар"
 
 #: templates/comments/preview.html:16
 msgid "or make changes"
-msgstr "або зробіть зміни"
+msgstr "або зробити зміни"

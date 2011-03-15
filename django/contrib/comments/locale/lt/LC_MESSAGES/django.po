@@ -4,10 +4,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-28 23:42+0100\n"
-"PO-Revision-Date: 2011-02-22 00:10+0000\n"
-"Last-Translator: Jannis <jannis@leidel.info>\n"
-"Language-Team: English <en@li.org>\n"
+"POT-Creation-Date: 2011-03-15 13:15-0400\n"
+"PO-Revision-Date: 2011-03-06 11:09+0000\n"
+"Last-Translator: lauris <lauris@runbox.com>\n"
+"Language-Team: Lithuanian <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -17,91 +17,92 @@ msgstr ""
 
 #: admin.py:12
 msgid "Content"
-msgstr ""
+msgstr "Turinys"
 
 #: admin.py:15
 msgid "Metadata"
-msgstr ""
+msgstr "Meta-duomenys"
 
 #: admin.py:42
 msgid "flagged"
 msgid_plural "flagged"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "pažymėtas"
+msgstr[1] "pažymėti"
+msgstr[2] "pažymėti"
 
 #: admin.py:43
 msgid "Flag selected comments"
-msgstr ""
+msgstr "Žymėti pasirinktus komentarus"
 
 #: admin.py:47
 msgid "approved"
 msgid_plural "approved"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "patvirtintas"
+msgstr[1] "patvirtinti"
+msgstr[2] "patvirtinti"
 
 #: admin.py:48
 msgid "Approve selected comments"
-msgstr ""
+msgstr "Patvirtinti pasirinktus komentarus"
 
 #: admin.py:52
 msgid "removed"
 msgid_plural "removed"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "pašalintas"
+msgstr[1] "pašalinti"
+msgstr[2] "pašalinti"
 
 #: admin.py:53
 msgid "Remove selected comments"
-msgstr ""
+msgstr "Pašalinti pasirinktus įrašus"
 
 #: admin.py:65
 #, python-format
 msgid "1 comment was successfully %(action)s."
 msgid_plural "%(count)s comments were successfully %(action)s."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(count)s komentaras buvo sėkmingai %(action)s."
+msgstr[1] "%(count)s komentarai buvo sėkmingai %(action)s."
+msgstr[2] "%(count)s komentarai buvo sėkmingai %(action)s."
 
 #: feeds.py:13
 #, python-format
 msgid "%(site_name)s comments"
-msgstr ""
+msgstr "%(site_name)s komentarai"
 
 #: feeds.py:23
 #, python-format
 msgid "Latest comments on %(site_name)s"
-msgstr ""
+msgstr "Paskutiniai %(site_name)s komentarai"
 
 #: forms.py:109
 msgid "Name"
-msgstr ""
+msgstr "Vardas"
 
 #: forms.py:110
 msgid "Email address"
-msgstr ""
+msgstr "El. pašto adresas"
 
 #: forms.py:111
 msgid "URL"
-msgstr "URL"
+msgstr "nuoroda"
 
 #: forms.py:112
 msgid "Comment"
-msgstr ""
+msgstr "Komentaras"
 
 #: forms.py:191
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Žiūrėk ką kalbi! Žodis %s yra čia uždraustas."
+msgstr[1] "Žiūrėk ką kalbi! Žodžiai %s yra čia uždrausti."
+msgstr[2] "Žiūrėk ką kalbi! Žodžiai %s yra čia uždrausti."
 
 #: forms.py:198
 msgid ""
 "If you enter anything in this field your comment will be treated as spam"
 msgstr ""
+"Jei ką nors įrašysite į šį laukelį, jūsų komentaras bus laikomas brukalu"
 
 #: models.py:22
 msgid "content type"
@@ -117,15 +118,15 @@ msgstr "vartotojas"
 
 #: models.py:52
 msgid "user's name"
-msgstr ""
+msgstr "vartotojo vardas"
 
 #: models.py:53
 msgid "user's email address"
-msgstr ""
+msgstr "vartotojo el. pašto adresas"
 
 #: models.py:54
 msgid "user's URL"
-msgstr ""
+msgstr "vartotojo nuoroda"
 
 #: models.py:56 models.py:76 models.py:169
 msgid "comment"
@@ -146,7 +147,7 @@ msgstr "viešas"
 #: models.py:62
 msgid ""
 "Uncheck this box to make the comment effectively disappear from the site."
-msgstr ""
+msgstr "Nuimkite šį žymejimą, kad komentaras būtų panaikintas."
 
 #: models.py:64
 msgid "is removed"
@@ -157,8 +158,8 @@ msgid ""
 "Check this box if the comment is inappropriate. A \"This comment has been "
 "removed\" message will be displayed instead."
 msgstr ""
-"Pažymėk šį laukelį, jei komentaras netinkamas. \"Šis komentaras ištrintas\" "
-"bus rodoma."
+"Pažymėkite šį laukelį, jei komentaras netinkamas. \"Šis komentaras ištrintas"
+"\" bus rodoma."
 
 #: models.py:77
 msgid "comments"
@@ -169,12 +170,16 @@ msgid ""
 "This comment was posted by an authenticated user and thus the name is read-"
 "only."
 msgstr ""
+"Šis komentaras buvo paskelbtas neprisijungusio vartotojo, todel vardas yra "
+"neredaguojamas."
 
 #: models.py:128
 msgid ""
 "This comment was posted by an authenticated user and thus the email is read-"
 "only."
 msgstr ""
+"Šis komentaras buvo paskelbtas neprisijungusio vartotojo, todel el. pašto "
+"adresas yra neredaguojamas."
 
 #: models.py:153
 #, python-format
@@ -193,100 +198,100 @@ msgstr ""
 
 #: models.py:170
 msgid "flag"
-msgstr ""
+msgstr "žymė"
 
 #: models.py:171
 msgid "date"
-msgstr ""
+msgstr "Data"
 
 #: models.py:181
 msgid "comment flag"
-msgstr ""
+msgstr "Komentaro žymė"
 
 #: models.py:182
 msgid "comment flags"
-msgstr ""
+msgstr "Komentaro žymės"
 
 #: templates/comments/approve.html:4
 msgid "Approve a comment"
-msgstr ""
+msgstr "Patvirtinti komentarą"
 
 #: templates/comments/approve.html:7
 msgid "Really make this comment public?"
-msgstr ""
+msgstr "Tikrai publikuoti šį komentarą?"
 
 #: templates/comments/approve.html:12
 msgid "Approve"
-msgstr ""
+msgstr "Patvirtinti"
 
 #: templates/comments/approved.html:4
 msgid "Thanks for approving"
-msgstr ""
+msgstr "Ačiū už patvirtinimą"
 
 #: templates/comments/approved.html:7 templates/comments/deleted.html:7
 #: templates/comments/flagged.html:7
 msgid ""
 "Thanks for taking the time to improve the quality of discussion on our site"
-msgstr ""
+msgstr "Ačiū, kad radote laiko pagerinti diskusijų kokybę mūsų svetainėje"
 
 #: templates/comments/delete.html:4
 msgid "Remove a comment"
-msgstr ""
+msgstr "Pašalinti komentarą"
 
 #: templates/comments/delete.html:7
 msgid "Really remove this comment?"
-msgstr ""
+msgstr "Tikrai ištrinti šį komentarą?"
 
 #: templates/comments/delete.html:12
 msgid "Remove"
-msgstr ""
+msgstr "Pašalinti"
 
 #: templates/comments/deleted.html:4
 msgid "Thanks for removing"
-msgstr ""
+msgstr "Ačiū už pašalinimą"
 
 #: templates/comments/flag.html:4
 msgid "Flag this comment"
-msgstr ""
+msgstr "Pažymėti šį komentarą"
 
 #: templates/comments/flag.html:7
 msgid "Really flag this comment?"
-msgstr ""
+msgstr "Tikrai žymėti šį komentarą?"
 
 #: templates/comments/flag.html:12
 msgid "Flag"
-msgstr ""
+msgstr "Žymė"
 
 #: templates/comments/flagged.html:4
 msgid "Thanks for flagging"
-msgstr ""
+msgstr "Ačiū už žymėjimą"
 
 #: templates/comments/form.html:17 templates/comments/preview.html:32
 msgid "Post"
-msgstr ""
+msgstr "Siųsti"
 
 #: templates/comments/form.html:18 templates/comments/preview.html:33
 msgid "Preview"
-msgstr ""
+msgstr "Peržiūra"
 
 #: templates/comments/posted.html:4
 msgid "Thanks for commenting"
-msgstr ""
+msgstr "Ačiū už komentarą"
 
 #: templates/comments/posted.html:7
 msgid "Thank you for your comment"
-msgstr ""
+msgstr "Ačiū už jūsų komentarą"
 
 #: templates/comments/preview.html:4 templates/comments/preview.html.py:13
 msgid "Preview your comment"
-msgstr ""
+msgstr "Peržiūrėti savo komentarą"
 
 #: templates/comments/preview.html:11
 msgid "Please correct the error below"
 msgid_plural "Please correct the errors below"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Prašau ištaisyti žemiau esančią klaidą"
+msgstr[1] "Prašau ištaisyti žemiau esančias klaidas"
+msgstr[2] "Prašau ištaisyti žemiau esančias klaidas"
 
 #: templates/comments/preview.html:16
 msgid "and"
@@ -294,8 +299,8 @@ msgstr "ir"
 
 #: templates/comments/preview.html:16
 msgid "Post your comment"
-msgstr ""
+msgstr "Publikuoti komentarą"
 
 #: templates/comments/preview.html:16
 msgid "or make changes"
-msgstr ""
+msgstr "arba keisti"

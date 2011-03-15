@@ -4,8 +4,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-28 23:42+0100\n"
-"PO-Revision-Date: 2011-02-27 04:16+0000\n"
+"POT-Creation-Date: 2011-03-15 13:15-0400\n"
+"PO-Revision-Date: 2011-03-06 02:50+0000\n"
 "Last-Translator: schemacs <schemacs@gmail.com>\n"
 "Language-Team: Chinese (China) <None>\n"
 "MIME-Version: 1.0\n"
@@ -53,7 +53,7 @@ msgstr "移除选中的评论"
 #, python-format
 msgid "1 comment was successfully %(action)s."
 msgid_plural "%(count)s comments were successfully %(action)s."
-msgstr[0] ""
+msgstr[0] "%(count)s 条评论被成功 %(action)s。"
 
 #: feeds.py:13
 #, python-format
@@ -94,7 +94,7 @@ msgstr "如果你在该字段中输入任何内容，那么你的评论就会被
 
 #: models.py:22
 msgid "content type"
-msgstr ""
+msgstr "内容类型"
 
 #: models.py:24
 msgid "object ID"

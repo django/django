@@ -4,8 +4,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-28 23:42+0100\n"
-"PO-Revision-Date: 2011-02-22 00:10+0000\n"
+"POT-Creation-Date: 2011-03-15 13:15-0400\n"
+"PO-Revision-Date: 2011-03-04 18:43+0000\n"
 "Last-Translator: Jannis <jannis@leidel.info>\n"
 "Language-Team: Serbian <None>\n"
 "MIME-Version: 1.0\n"
@@ -29,7 +29,6 @@ msgid_plural "flagged"
 msgstr[0] "означен"
 msgstr[1] "означена"
 msgstr[2] "означена"
-msgstr[3] "означена"
 
 #: admin.py:43
 msgid "Flag selected comments"
@@ -41,7 +40,6 @@ msgid_plural "approved"
 msgstr[0] "одобрен"
 msgstr[1] "одобрена"
 msgstr[2] "одобрена"
-msgstr[3] "одобрена"
 
 #: admin.py:48
 msgid "Approve selected comments"
@@ -53,7 +51,6 @@ msgid_plural "removed"
 msgstr[0] "избрисан"
 msgstr[1] "избрисана"
 msgstr[2] "избрисана"
-msgstr[3] "избрисана"
 
 #: admin.py:53
 msgid "Remove selected comments"
@@ -66,7 +63,6 @@ msgid_plural "%(count)s comments were successfully %(action)s."
 msgstr[0] "%(count)s коментар је успешно %(action)s."
 msgstr[1] "%(count)s коментара су успешно %(action)s."
 msgstr[2] "%(count)s коментара су успешно %(action)s."
-msgstr[3] "%(count)s коментара су успешно %(action)s."
 
 #: feeds.py:13
 #, python-format
@@ -101,7 +97,6 @@ msgid_plural "Watch your mouth! The words %s are not allowed here."
 msgstr[0] "Пазите шта пишете! Реч %s није дозвољена овде."
 msgstr[1] "Пазите шта пишете! Речи %s нису дозвољене овде."
 msgstr[2] "Пазите шта пишете! Речи %s нису дозвољене овде."
-msgstr[3] "Пазите шта пишете! Речи %s нису дозвољене овде."
 
 #: forms.py:198
 msgid ""
@@ -297,7 +292,6 @@ msgid_plural "Please correct the errors below"
 msgstr[0] "Исправите наведену грешку"
 msgstr[1] "Исправите наведене грешке"
 msgstr[2] "Исправите наведене грешке"
-msgstr[3] "Исправите наведене грешке"
 
 #: templates/comments/preview.html:16
 msgid "and"

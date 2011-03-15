@@ -4,9 +4,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-28 23:42+0100\n"
-"PO-Revision-Date: 2011-02-22 00:10+0000\n"
-"Last-Translator: Jannis <jannis@leidel.info>\n"
+"POT-Creation-Date: 2011-03-15 13:15-0400\n"
+"PO-Revision-Date: 2011-03-05 16:47+0000\n"
+"Last-Translator: szilveszter <szilveszter.farkas@gmail.com>\n"
 "Language-Team: Hungarian <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -25,49 +25,49 @@ msgstr "Metaadat"
 #: admin.py:42
 msgid "flagged"
 msgid_plural "flagged"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "megjelölve"
+msgstr[1] "megjelölve"
 
 #: admin.py:43
 msgid "Flag selected comments"
-msgstr ""
+msgstr "Kiválasztott hozzászólások megjelölése"
 
 #: admin.py:47
 msgid "approved"
 msgid_plural "approved"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "jóváhagyva"
+msgstr[1] "jóváhagyva"
 
 #: admin.py:48
 msgid "Approve selected comments"
-msgstr ""
+msgstr "Kiválasztott hozzászólások jóváhagyása"
 
 #: admin.py:52
 msgid "removed"
 msgid_plural "removed"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "törölve"
+msgstr[1] "törölve"
 
 #: admin.py:53
 msgid "Remove selected comments"
-msgstr ""
+msgstr "Kiválasztott hozzászólások törlése"
 
 #: admin.py:65
 #, python-format
 msgid "1 comment was successfully %(action)s."
 msgid_plural "%(count)s comments were successfully %(action)s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(count)s hozzászólás sikeresen %(action)s."
+msgstr[1] "%(count)s hozzászólás sikeresen %(action)s."
 
 #: feeds.py:13
 #, python-format
 msgid "%(site_name)s comments"
-msgstr ""
+msgstr "%(site_name)s hozzászólások"
 
 #: feeds.py:23
 #, python-format
 msgid "Latest comments on %(site_name)s"
-msgstr ""
+msgstr "%(site_name)s legfrissebb hozzászólásai"
 
 #: forms.py:109
 msgid "Name"
@@ -160,7 +160,7 @@ msgstr ""
 
 #: models.py:77
 msgid "comments"
-msgstr ""
+msgstr "hozzászólások"
 
 #: models.py:119
 msgid ""
@@ -195,99 +195,101 @@ msgstr ""
 
 #: models.py:170
 msgid "flag"
-msgstr ""
+msgstr "megjelölés"
 
 #: models.py:171
 msgid "date"
-msgstr ""
+msgstr "dátum"
 
 #: models.py:181
 msgid "comment flag"
-msgstr ""
+msgstr "hozzászólás megjelölés"
 
 #: models.py:182
 msgid "comment flags"
-msgstr ""
+msgstr "hozzászólás megjelölés"
 
 #: templates/comments/approve.html:4
 msgid "Approve a comment"
-msgstr ""
+msgstr "Hozzászólás jóváhagyása"
 
 #: templates/comments/approve.html:7
 msgid "Really make this comment public?"
-msgstr ""
+msgstr "Biztosan publikálni szeretné ezt a hozzászólást?"
 
 #: templates/comments/approve.html:12
 msgid "Approve"
-msgstr ""
+msgstr "Jóváhagyás"
 
 #: templates/comments/approved.html:4
 msgid "Thanks for approving"
-msgstr ""
+msgstr "Köszönjük a jóváhagyást"
 
 #: templates/comments/approved.html:7 templates/comments/deleted.html:7
 #: templates/comments/flagged.html:7
 msgid ""
 "Thanks for taking the time to improve the quality of discussion on our site"
 msgstr ""
+"Köszönjük, hogy időt szánt az oldalunkon zajló beszélgetések minőségének "
+"javítására"
 
 #: templates/comments/delete.html:4
 msgid "Remove a comment"
-msgstr ""
+msgstr "Hozzászólás törlése"
 
 #: templates/comments/delete.html:7
 msgid "Really remove this comment?"
-msgstr ""
+msgstr "Biztosan törli ezt a hozzászólást?"
 
 #: templates/comments/delete.html:12
 msgid "Remove"
-msgstr ""
+msgstr "Törlés"
 
 #: templates/comments/deleted.html:4
 msgid "Thanks for removing"
-msgstr ""
+msgstr "Köszönjük a törlést"
 
 #: templates/comments/flag.html:4
 msgid "Flag this comment"
-msgstr ""
+msgstr "Hozzászólás megjelölése"
 
 #: templates/comments/flag.html:7
 msgid "Really flag this comment?"
-msgstr ""
+msgstr "Biztosan megjelöli ezt a hozzászólást?"
 
 #: templates/comments/flag.html:12
 msgid "Flag"
-msgstr ""
+msgstr "Megjelölés"
 
 #: templates/comments/flagged.html:4
 msgid "Thanks for flagging"
-msgstr ""
+msgstr "Köszönjük a megjelölést"
 
 #: templates/comments/form.html:17 templates/comments/preview.html:32
 msgid "Post"
-msgstr ""
+msgstr "Elküldés"
 
 #: templates/comments/form.html:18 templates/comments/preview.html:33
 msgid "Preview"
-msgstr ""
+msgstr "Előnézet"
 
 #: templates/comments/posted.html:4
 msgid "Thanks for commenting"
-msgstr ""
+msgstr "Köszönjük a hozzászólást"
 
 #: templates/comments/posted.html:7
 msgid "Thank you for your comment"
-msgstr ""
+msgstr "Köszönjük, hogy hozzászólt"
 
 #: templates/comments/preview.html:4 templates/comments/preview.html.py:13
 msgid "Preview your comment"
-msgstr ""
+msgstr "Hozzászólás előnézetének megtekintése"
 
 #: templates/comments/preview.html:11
 msgid "Please correct the error below"
 msgid_plural "Please correct the errors below"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Javítsa ki az alábbi hibát"
+msgstr[1] "Javítsa ki az alábbi hibákat"
 
 #: templates/comments/preview.html:16
 msgid "and"
@@ -295,8 +297,8 @@ msgstr "és"
 
 #: templates/comments/preview.html:16
 msgid "Post your comment"
-msgstr ""
+msgstr "Hozzászólás elküldése"
 
 #: templates/comments/preview.html:16
 msgid "or make changes"
-msgstr ""
+msgstr "vagy módosítása"

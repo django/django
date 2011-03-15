@@ -4,8 +4,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-04 00:19+0100\n"
-"PO-Revision-Date: 2011-02-22 00:10+0000\n"
+"POT-Creation-Date: 2011-03-15 13:14-0400\n"
+"PO-Revision-Date: 2011-03-04 18:43+0000\n"
 "Last-Translator: Jannis <jannis@leidel.info>\n"
 "Language-Team: Bosnian <None>\n"
 "MIME-Version: 1.0\n"
@@ -29,7 +29,6 @@ msgid_plural "flagged"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
-msgstr[3] ""
 
 #: admin.py:43
 msgid "Flag selected comments"
@@ -41,7 +40,6 @@ msgid_plural "approved"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
-msgstr[3] ""
 
 #: admin.py:48
 msgid "Approve selected comments"
@@ -53,7 +51,6 @@ msgid_plural "removed"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
-msgstr[3] ""
 
 #: admin.py:53
 msgid "Remove selected comments"
@@ -66,7 +63,6 @@ msgid_plural "%(count)s comments were successfully %(action)s."
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
-msgstr[3] ""
 
 #: feeds.py:13
 #, python-format
@@ -101,7 +97,6 @@ msgid_plural "Watch your mouth! The words %s are not allowed here."
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
-msgstr[3] ""
 
 #: forms.py:198
 msgid ""
@@ -298,7 +293,6 @@ msgid_plural "Please correct the errors below"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
-msgstr[3] ""
 
 #: templates/comments/preview.html:16
 msgid "and"

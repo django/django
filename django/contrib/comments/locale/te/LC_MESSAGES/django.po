@@ -4,9 +4,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-28 23:42+0100\n"
-"PO-Revision-Date: 2011-02-22 00:10+0000\n"
-"Last-Translator: Jannis <jannis@leidel.info>\n"
+"POT-Creation-Date: 2011-03-15 13:15-0400\n"
+"PO-Revision-Date: 2011-03-14 15:03+0000\n"
+"Last-Translator: veeven <veeven@gmail.com>\n"
 "Language-Team: Telugu <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -62,7 +62,7 @@ msgstr[1] ""
 #: feeds.py:13
 #, python-format
 msgid "%(site_name)s comments"
-msgstr ""
+msgstr "%(site_name)s వ్యాఖ్యలు"
 
 #: feeds.py:23
 #, python-format
@@ -71,11 +71,11 @@ msgstr ""
 
 #: forms.py:109
 msgid "Name"
-msgstr "నామము"
+msgstr "పేరు"
 
 #: forms.py:110
 msgid "Email address"
-msgstr "ఇటపా "
+msgstr "ఈమెయిలు చిరునామా"
 
 #: forms.py:111
 msgid "URL"
@@ -83,7 +83,7 @@ msgstr "URL"
 
 #: forms.py:112
 msgid "Comment"
-msgstr "వ్యాఖ్యానము"
+msgstr "వ్యాఖ్య"
 
 #: forms.py:191
 #, python-format
@@ -107,31 +107,31 @@ msgstr "వస్తువు ఐడి"
 
 #: models.py:50 models.py:168
 msgid "user"
-msgstr "వినియొగదారి"
+msgstr "వాడుకరి"
 
 #: models.py:52
 msgid "user's name"
-msgstr "వినియొగదారి నామము"
+msgstr "వాడుకరి పేరు"
 
 #: models.py:53
 msgid "user's email address"
-msgstr "వినియోగదారుని ఇటపా "
+msgstr "వాడుకరి ఈమెయిలు చిరునామా"
 
 #: models.py:54
 msgid "user's URL"
-msgstr "వినియొగదారి URL"
+msgstr "వాడుకరి URL"
 
 #: models.py:56 models.py:76 models.py:169
 msgid "comment"
-msgstr "వ్యాఖ్యానము"
+msgstr "వ్యాఖ్య"
 
 #: models.py:59
 msgid "date/time submitted"
-msgstr "తేది /వేళ సమర్పించినది"
+msgstr "సమర్పించిన తేదీ/సమయం"
 
 #: models.py:60
 msgid "IP address"
-msgstr "ఐపి అడ్రస్"
+msgstr "ఐపీ చిరునామా"
 
 #: models.py:61
 msgid "is public"
@@ -154,7 +154,7 @@ msgstr " ఈ వ్యాఖ్యానము సరిగ్గా లేద�
 
 #: models.py:77
 msgid "comments"
-msgstr "వ్యాఖ్యానములు"
+msgstr "వ్యాఖ్యలు"
 
 #: models.py:119
 msgid ""
@@ -184,7 +184,7 @@ msgstr ""
 
 #: models.py:171
 msgid "date"
-msgstr ""
+msgstr "తేదీ"
 
 #: models.py:181
 msgid "comment flag"
@@ -226,7 +226,7 @@ msgstr ""
 
 #: templates/comments/delete.html:12
 msgid "Remove"
-msgstr ""
+msgstr "తొలగించు"
 
 #: templates/comments/deleted.html:4
 msgid "Thanks for removing"
@@ -280,8 +280,8 @@ msgstr "మరియు"
 
 #: templates/comments/preview.html:16
 msgid "Post your comment"
-msgstr ""
+msgstr "మీ వ్యాఖ్యని టపాచేయండి"
 
 #: templates/comments/preview.html:16
 msgid "or make changes"
-msgstr ""
+msgstr "లేదా మార్పులు చేయండి"
