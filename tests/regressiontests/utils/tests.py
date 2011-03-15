@@ -7,6 +7,7 @@ from feedgenerator import *
 from module_loading import *
 from termcolors import *
 from html import *
+from http import *
 from checksums import *
 from text import *
 from simplelazyobject import *

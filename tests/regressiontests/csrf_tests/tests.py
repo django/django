@@ -382,3 +382,16 @@ class CsrfMiddlewareTest(TestCase):
         req.META['HTTP_REFERER'] = 'https://www.example.com/somepage'
         req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
         self.assertEqual(None, req2)
+
+    def test_https_good_referer_2(self):
+        """
+        Test that a POST HTTPS request with a good referer is accepted
+        where the referer contains no trailing slash
+        """
+        # See ticket #15617
+        req = self._get_POST_request_with_token()
+        req._is_secure = True
+        req.META['HTTP_HOST'] = 'www.example.com'
+        req.META['HTTP_REFERER'] = 'https://www.example.com'
+        req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+        self.assertEqual(None, req2)

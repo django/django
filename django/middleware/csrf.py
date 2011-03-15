@@ -13,6 +13,7 @@ from django.conf import settings
 from django.core.urlresolvers import get_callable
 from django.utils.cache import patch_vary_headers
 from django.utils.hashcompat import md5_constructor
+from django.utils.http import same_origin
 from django.utils.log import getLogger
 from django.utils.safestring import mark_safe
 from django.utils.crypto import constant_time_compare
@@ -161,10 +162,9 @@ class CsrfViewMiddleware(object):
                     )
                     return self._reject(request, REASON_NO_REFERER)
 
-                # The following check ensures that the referer is HTTPS,
-                # the domains match and the ports match - the same origin policy.
+                # Note that request.get_host() includes the port
                 good_referer = 'https://%s/' % request.get_host()
-                if not referer.startswith(good_referer):
+                if not same_origin(referer, good_referer):
                     reason = REASON_BAD_REFERER % (referer, good_referer)
                     logger.warning('Forbidden (%s): %s' % (reason, request.path),
                         extra={
