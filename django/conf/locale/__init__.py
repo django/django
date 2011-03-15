@@ -92,7 +92,7 @@ LANG_INFO = {
     'es-mx': {
         'bidi': False,
         'code': 'es-mx',
-        'name': 'Spanish Mexico',
+        'name': 'Mexican Spanish',
         'name_local': u'espa\xf1ol de Mexico',
     },
     'es-ni': {
