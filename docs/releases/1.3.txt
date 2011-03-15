@@ -139,7 +139,7 @@ A number of improvements have been made to Django's built-in template tags:
     * The :ttag:`include` tag now accepts a ``with`` option, allowing
       you to specify context variables to the included template
 
-    * The :ttag:`include` tag now accepts a ``only`` option, allowing
+    * The :ttag:`include` tag now accepts an ``only`` option, allowing
       you to exclude the current context from the included context
 
     * The :ttag:`with` tag now allows you to define multiple context
