@@ -4,8 +4,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-04 00:20+0100\n"
-"PO-Revision-Date: 2011-02-22 00:08+0000\n"
+"POT-Creation-Date: 2011-03-15 13:18-0400\n"
+"PO-Revision-Date: 2011-03-04 18:39+0000\n"
 "Last-Translator: Jannis <jannis@leidel.info>\n"
 "Language-Team: Bosnian <None>\n"
 "MIME-Version: 1.0\n"
@@ -38,7 +38,6 @@ msgid_plural "%(value).1f million"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
-msgstr[3] ""
 
 #: templatetags/humanize.py:57
 #, python-format
@@ -47,7 +46,6 @@ msgid_plural "%(value).1f billion"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
-msgstr[3] ""
 
 #: templatetags/humanize.py:60
 #, python-format
@@ -56,7 +54,6 @@ msgid_plural "%(value).1f trillion"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
-msgstr[3] ""
 
 #: templatetags/humanize.py:76
 msgid "one"

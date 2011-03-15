@@ -4,10 +4,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-01 00:24+0100\n"
-"PO-Revision-Date: 2011-02-22 00:08+0000\n"
-"Last-Translator: Jannis <jannis@leidel.info>\n"
-"Language-Team: English <en@li.org>\n"
+"POT-Creation-Date: 2011-03-15 13:18-0400\n"
+"PO-Revision-Date: 2011-03-06 09:19+0000\n"
+"Last-Translator: lauris <lauris@runbox.com>\n"
+"Language-Team: Lithuanian <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -17,43 +17,43 @@ msgstr ""
 
 #: templatetags/humanize.py:19
 msgid "th"
-msgstr "th"
+msgstr "-as"
 
 #: templatetags/humanize.py:19
 msgid "st"
-msgstr ""
+msgstr "-as"
 
 #: templatetags/humanize.py:19
 msgid "nd"
-msgstr ""
+msgstr "-as"
 
 #: templatetags/humanize.py:19
 msgid "rd"
-msgstr "rd"
+msgstr "-as"
 
 #: templatetags/humanize.py:54
 #, python-format
 msgid "%(value).1f million"
 msgid_plural "%(value).1f million"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(value).1f milijonas"
+msgstr[1] "%(value).1f milijonai"
+msgstr[2] "%(value).1f milijonai"
 
 #: templatetags/humanize.py:57
 #, python-format
 msgid "%(value).1f billion"
 msgid_plural "%(value).1f billion"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(value).1f milijardas"
+msgstr[1] "%(value).1f milijardai"
+msgstr[2] "%(value).1f milijardai"
 
 #: templatetags/humanize.py:60
 #, python-format
 msgid "%(value).1f trillion"
 msgid_plural "%(value).1f trillion"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(value).1f trilijonas"
+msgstr[1] "%(value).1f trilijonai"
+msgstr[2] "%(value).1f trilijonai"
 
 #: templatetags/humanize.py:76
 msgid "one"
@@ -93,12 +93,12 @@ msgstr "devyni"
 
 #: templatetags/humanize.py:96
 msgid "today"
-msgstr ""
+msgstr "šiandien"
 
 #: templatetags/humanize.py:98
 msgid "tomorrow"
-msgstr ""
+msgstr "rytoj"
 
 #: templatetags/humanize.py:100
 msgid "yesterday"
-msgstr ""
+msgstr "vakar"
