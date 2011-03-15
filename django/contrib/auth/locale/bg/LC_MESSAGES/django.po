@@ -4,10 +4,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-28 23:36+0100\n"
-"PO-Revision-Date: 2011-02-22 00:09+0000\n"
-"Last-Translator: Jannis <jannis@leidel.info>\n"
-"Language-Team: English <en@li.org>\n"
+"POT-Creation-Date: 2011-03-15 13:14-0400\n"
+"PO-Revision-Date: 2011-03-10 05:42+0000\n"
+"Last-Translator: tlubenov <tlubenov@gmail.com>\n"
+"Language-Team: Bulgarian <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -45,11 +45,11 @@ msgstr "Потребител"
 
 #: forms.py:15 forms.py:49
 msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr ""
+msgstr "Задължително. 30 знака или по-малко. Букви, цифри и @/./+/-/_ ."
 
 #: forms.py:16 forms.py:50
 msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
-msgstr ""
+msgstr "Тази стойност може да съдържа само букви, цифри и  @/./+/-/_ символи."
 
 #: forms.py:17 forms.py:67 forms.py:193
 msgid "Password"
@@ -57,7 +57,7 @@ msgstr "Парола"
 
 #: forms.py:18
 msgid "Password confirmation"
-msgstr ""
+msgstr "Потвърждение на паролата"
 
 #: forms.py:19
 msgid "Enter the same password as above, for verification."
@@ -93,7 +93,7 @@ msgstr ""
 
 #: forms.py:108
 msgid "E-mail"
-msgstr ""
+msgstr "Е-поща"
 
 #: forms.py:117
 msgid ""
@@ -110,15 +110,15 @@ msgstr "Паролата се сменя на %s"
 
 #: forms.py:151
 msgid "New password"
-msgstr ""
+msgstr "Нова парола"
 
 #: forms.py:152
 msgid "New password confirmation"
-msgstr ""
+msgstr "потвърждение на нова паролата"
 
 #: forms.py:177
 msgid "Old password"
-msgstr ""
+msgstr "Стара парола"
 
 #: forms.py:185
 msgid "Your old password was entered incorrectly. Please enter it again."
@@ -159,7 +159,7 @@ msgstr "потребител"
 #: models.py:206
 msgid ""
 "Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
-msgstr ""
+msgstr "Задължително. 30 знака или по-малко. Букви, цифри и символи @/./+/-/_"
 
 #: models.py:207
 msgid "first name"
@@ -202,6 +202,8 @@ msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
 msgstr ""
+"Означава дали този потребител трябва да се разглежда като активен. "
+"Премахване на избора на това, вместо изтриване на профила."
 
 #: models.py:213
 msgid "superuser status"
@@ -247,7 +249,7 @@ msgstr "потребители"
 msgid "message"
 msgstr "съобщение"
 
-#: views.py:86
+#: views.py:91
 msgid "Logged out"
 msgstr "Извън системата"
 

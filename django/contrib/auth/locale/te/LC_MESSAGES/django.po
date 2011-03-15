@@ -4,9 +4,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-28 23:37+0100\n"
-"PO-Revision-Date: 2011-02-22 00:09+0000\n"
-"Last-Translator: Jannis <jannis@leidel.info>\n"
+"POT-Creation-Date: 2011-03-15 13:14-0400\n"
+"PO-Revision-Date: 2011-03-14 14:58+0000\n"
+"Last-Translator: veeven <veeven@gmail.com>\n"
 "Language-Team: Telugu <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -16,7 +16,7 @@ msgstr ""
 
 #: admin.py:28
 msgid "Personal info"
-msgstr "పర్సనల్ సమాచారం  "
+msgstr "వ్యక్తిగత సమాచారం  "
 
 #: admin.py:29
 msgid "Permissions"
@@ -24,7 +24,7 @@ msgstr "అనుమతులు"
 
 #: admin.py:30
 msgid "Important dates"
-msgstr "ముఖ్యమైన తారీఖులు"
+msgstr "ముఖ్యమైన తేదీలు"
 
 #: admin.py:31
 msgid "Groups"
@@ -32,16 +32,16 @@ msgstr "గుంపులు"
 
 #: admin.py:113
 msgid "Password changed successfully."
-msgstr "అనుమతి పదం మార్పు జయప్రదమైంది "
+msgstr "సంకేతపదాన్ని విజయవంతంగా మార్చారు."
 
 #: admin.py:123
 #, python-format
 msgid "Change password: %s"
-msgstr "అనుమతి  పదం మార్చుకోండి: %s"
+msgstr "సంకేతపదాన్ని మార్చుకోండి: %s"
 
 #: forms.py:14 forms.py:48 forms.py:66
 msgid "Username"
-msgstr "వినియొగదారి నామము"
+msgstr "వాడుకరిపేరు"
 
 #: forms.py:15 forms.py:49
 msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
@@ -53,11 +53,11 @@ msgstr ""
 
 #: forms.py:17 forms.py:67 forms.py:193
 msgid "Password"
-msgstr "అనుమతిపదం"
+msgstr "సంకేతపదం"
 
 #: forms.py:18
 msgid "Password confirmation"
-msgstr "అనుమతి పదం ఖాయం"
+msgstr "సంకేపదపు నిర్ధారణ"
 
 #: forms.py:19
 msgid "Enter the same password as above, for verification."
@@ -104,15 +104,15 @@ msgstr "%sపై అనుమతి పదం తిరిగి మార్చ
 
 #: forms.py:151
 msgid "New password"
-msgstr "కొత్త అనుమతి పదం"
+msgstr "కొత్త సంకేతపదం"
 
 #: forms.py:152
 msgid "New password confirmation"
-msgstr "కొత్త అనుమతి పదం ఖాయం"
+msgstr "కొత్త సంకేతపదపు నిర్ధారణ"
 
 #: forms.py:177
 msgid "Old password"
-msgstr "పాత  అనుమతి పదం"
+msgstr "పాత  సంకేతపదం"
 
 #: forms.py:185
 msgid "Your old password was entered incorrectly. Please enter it again."
@@ -120,11 +120,11 @@ msgstr ""
 
 #: forms.py:194
 msgid "Password (again)"
-msgstr "అనుమతిపదం(మళ్ళీ)"
+msgstr "సంకేతపదం (మళ్ళీ)"
 
 #: models.py:76 models.py:104
 msgid "name"
-msgstr "నామము"
+msgstr "పేరు"
 
 #: models.py:78
 msgid "codename"
@@ -148,7 +148,7 @@ msgstr "గుంపులు"
 
 #: models.py:206
 msgid "username"
-msgstr "వినియొగదారుని నామము"
+msgstr "వాడుకరిపేరు"
 
 #: models.py:206
 msgid ""
@@ -157,7 +157,7 @@ msgstr ""
 
 #: models.py:207
 msgid "first name"
-msgstr "పేరు"
+msgstr "మొదటి పేరు"
 
 #: models.py:208
 msgid "last name"
@@ -169,7 +169,7 @@ msgstr "ఇటపా"
 
 #: models.py:210
 msgid "password"
-msgstr "అనుమతిపదం"
+msgstr "సంకేతపదం"
 
 #: models.py:210
 msgid ""
@@ -187,7 +187,7 @@ msgstr ""
 
 #: models.py:212
 msgid "active"
-msgstr "చురుకు గా"
+msgstr "క్రియాశీలం"
 
 #: models.py:212
 msgid ""
@@ -207,11 +207,11 @@ msgstr ""
 
 #: models.py:214
 msgid "last login"
-msgstr "గత లాగిన్"
+msgstr "చివరి ప్రవేశం"
 
 #: models.py:215
 msgid "date joined"
-msgstr "చేరిన తారీఖు"
+msgstr "చేరిన తేదీ"
 
 #: models.py:217
 msgid ""
@@ -221,23 +221,23 @@ msgstr ""
 
 #: models.py:218
 msgid "user permissions"
-msgstr "వినియొగదారి  అనుమతులు"
+msgstr "వాడుకరి అనుమతులు"
 
 #: models.py:222
 msgid "user"
-msgstr "వినియొగదారి"
+msgstr "వాడుకరి"
 
 #: models.py:223
 msgid "users"
-msgstr "వినియొగదారులు"
+msgstr "వాడుకరులు"
 
 #: models.py:406
 msgid "message"
 msgstr "సందేశం"
 
-#: views.py:86
+#: views.py:91
 msgid "Logged out"
-msgstr "లాగ్గడ్ ఔట్"
+msgstr "నిష్క్రమించారు"
 
 #: management/commands/createsuperuser.py:23
 msgid "Enter a valid e-mail address."

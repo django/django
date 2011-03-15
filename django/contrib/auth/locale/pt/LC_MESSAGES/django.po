@@ -4,9 +4,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-28 23:37+0100\n"
-"PO-Revision-Date: 2011-02-22 00:09+0000\n"
-"Last-Translator: Jannis <jannis@leidel.info>\n"
+"POT-Creation-Date: 2011-03-15 13:14-0400\n"
+"PO-Revision-Date: 2011-03-11 10:43+0000\n"
+"Last-Translator: nmariz <nmariz@gmail.com>\n"
 "Language-Team: Portuguese <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -46,12 +46,11 @@ msgstr "Utilizador"
 #: forms.py:15 forms.py:49
 msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
-"Obrigatório. 30 caracteres ou menos. Apenas letras, dígitos e @/./+/-/_."
+"Obrigatório. 30 carateres ou menos. Apenas letras, dígitos e @/./+/-/_."
 
 #: forms.py:16 forms.py:50
 msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
-msgstr ""
-"Este valor apenas deverá conter letras, números e caracteres @/./+/-/_."
+msgstr "Este valor apenas deverá conter letras, números e carateres @/./+/-/_."
 
 #: forms.py:17 forms.py:67 forms.py:193
 msgid "Password"
@@ -78,8 +77,8 @@ msgid ""
 "Please enter a correct username and password. Note that both fields are case-"
 "sensitive."
 msgstr ""
-"Por favor introduza o utilizador e palavra-passe correctos. Note que ambos "
-"os casos diferenciam maiúsculas e minúsculas."
+"Por favor introduza o utilizador e palavra-passe corretos. Note que ambos os "
+"casos diferenciam maiúsculas e minúsculas."
 
 #: forms.py:89
 msgid "This account is inactive."
@@ -125,7 +124,7 @@ msgstr "Palavra-passe antiga"
 #: forms.py:185
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr ""
-"A sua palavra-passe antiga foi introduzida incorrectamente. Por favor tente "
+"A sua palavra-passe antiga foi introduzida incorretamente. Por favor tente "
 "novamente."
 
 #: forms.py:194
@@ -164,7 +163,7 @@ msgstr "utilizador"
 msgid ""
 "Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
 msgstr ""
-"Obrigatório. 30 caracteres ou menos. Apenas letras, números e caracteres @/./"
+"Obrigatório. 30 carateres ou menos. Apenas letras, números e carateres @/./"
 "+/-/_."
 
 #: models.py:207
@@ -201,15 +200,15 @@ msgstr "Define se o utilizador pode usar a administração do site."
 
 #: models.py:212
 msgid "active"
-msgstr "activo"
+msgstr "ativo"
 
 #: models.py:212
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
 msgstr ""
-"Defina se este utilizador deva ser tratado como activo. Não seleccione em "
-"vez de remover as contas."
+"Defina se este utilizador deva ser tratado como ativo. Não selecione em vez "
+"de remover as contas."
 
 #: models.py:213
 msgid "superuser status"
@@ -237,7 +236,7 @@ msgid ""
 "all permissions granted to each group he/she is in."
 msgstr ""
 "Em adição às permissões definidas manualmente, este utilizador também terá "
-"todas as permissões atribuídas a cada grupo a que partence."
+"todas as permissões atribuídas a cada grupo a que pertence."
 
 #: models.py:218
 msgid "user permissions"
@@ -255,7 +254,7 @@ msgstr "utilizadores"
 msgid "message"
 msgstr "mensagem"
 
-#: views.py:86
+#: views.py:91
 msgid "Logged out"
 msgstr "Saiu"
 

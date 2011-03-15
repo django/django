@@ -4,8 +4,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-28 23:37+0100\n"
-"PO-Revision-Date: 2011-02-22 00:09+0000\n"
+"POT-Creation-Date: 2011-03-15 13:14-0400\n"
+"PO-Revision-Date: 2011-03-04 18:41+0000\n"
 "Last-Translator: Jannis <jannis@leidel.info>\n"
 "Language-Team: Turkish <None>\n"
 "MIME-Version: 1.0\n"
@@ -253,7 +253,7 @@ msgstr "kullanıcılar"
 msgid "message"
 msgstr "mesaj"
 
-#: views.py:86
+#: views.py:91
 msgid "Logged out"
 msgstr "Çıkış yapıldı"
 

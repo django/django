@@ -4,10 +4,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-28 23:37+0100\n"
-"PO-Revision-Date: 2011-02-22 00:09+0000\n"
-"Last-Translator: Jannis <jannis@leidel.info>\n"
-"Language-Team: English <en@li.org>\n"
+"POT-Creation-Date: 2011-03-15 13:14-0400\n"
+"PO-Revision-Date: 2011-03-10 21:56+0000\n"
+"Last-Translator: greenfire <hongdiepkien@gmail.com>\n"
+"Language-Team: Vietnamese <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -20,7 +20,7 @@ msgstr "Thông tin cá nhân"
 
 #: admin.py:29
 msgid "Permissions"
-msgstr ""
+msgstr "Quyền"
 
 #: admin.py:30
 msgid "Important dates"
@@ -45,11 +45,11 @@ msgstr "Tên đăng nhập"
 
 #: forms.py:15 forms.py:49
 msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr ""
+msgstr "Yêu cầu. 30 ký tự hoặc ít hơn. Chỉ là chữ cái, chữ số và @/./+/-/_."
 
 #: forms.py:16 forms.py:50
 msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
-msgstr ""
+msgstr "Giá trị này có thể chứa chữ cái, số và ký tự @/./+/-/_."
 
 #: forms.py:17 forms.py:67 forms.py:193
 msgid "Password"
@@ -86,6 +86,7 @@ msgid ""
 "Your Web browser doesn't appear to have cookies enabled. Cookies are "
 "required for logging in."
 msgstr ""
+"Trình duyệt web của bạn không bật cookie. Cookies được yêu cầu để đăng nhập"
 
 #: forms.py:108
 msgid "E-mail"
@@ -102,7 +103,7 @@ msgstr ""
 #: forms.py:143
 #, python-format
 msgid "Password reset on %s"
-msgstr ""
+msgstr "Đặt lại mật khẩu trên %s"
 
 #: forms.py:151
 msgid "New password"
@@ -130,15 +131,15 @@ msgstr "Tên"
 
 #: models.py:78
 msgid "codename"
-msgstr ""
+msgstr "tên mã"
 
 #: models.py:82
 msgid "permission"
-msgstr ""
+msgstr "cho phép"
 
 #: models.py:83 models.py:105
 msgid "permissions"
-msgstr ""
+msgstr "cho phép"
 
 #: models.py:108
 msgid "group"
@@ -155,7 +156,7 @@ msgstr "Tên đăng nhập"
 #: models.py:206
 msgid ""
 "Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
-msgstr ""
+msgstr "Yêu cầu. 30 ký tự hoặc ít hơn. Chữ cái, số và ký tự @/./+/-/_"
 
 #: models.py:207
 msgid "first name"
@@ -178,10 +179,12 @@ msgid ""
 "Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
 "password form</a>."
 msgstr ""
+"Sử dụng '[algo]$[salt]$[hexdigest]' hoặc sử dụng <a href=\"password/\">thay "
+"đổi form mật khẩu </a> ."
 
 #: models.py:211
 msgid "staff status"
-msgstr ""
+msgstr "tình trạng nhân viên"
 
 #: models.py:211
 msgid "Designates whether the user can log into this admin site."
@@ -233,13 +236,13 @@ msgstr "Người dùng"
 
 #: models.py:223
 msgid "users"
-msgstr ""
+msgstr "người sử dụng"
 
 #: models.py:406
 msgid "message"
 msgstr "Tin nhắn"
 
-#: views.py:86
+#: views.py:91
 msgid "Logged out"
 msgstr "Đã thoát"
 

@@ -4,10 +4,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-28 23:37+0100\n"
-"PO-Revision-Date: 2011-02-22 00:09+0000\n"
-"Last-Translator: Jannis <jannis@leidel.info>\n"
-"Language-Team: English <en@li.org>\n"
+"POT-Creation-Date: 2011-03-15 13:14-0400\n"
+"PO-Revision-Date: 2011-03-06 09:41+0000\n"
+"Last-Translator: lauris <lauris@runbox.com>\n"
+"Language-Team: Lithuanian <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -47,10 +47,12 @@ msgstr "Vartotojo vardas"
 #: forms.py:15 forms.py:49
 msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
+"Privalomas. 30 arba mažiau simbolių. Raidės, skaičiai bei @/./+/-/_ "
+"simboliai."
 
 #: forms.py:16 forms.py:50
 msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
-msgstr ""
+msgstr "Ši reikšmė gali turėti tik raides, skaičius  ir @/./+/-/_ simbolius."
 
 #: forms.py:17 forms.py:67 forms.py:193
 msgid "Password"
@@ -58,7 +60,7 @@ msgstr "Slaptažodis"
 
 #: forms.py:18
 msgid "Password confirmation"
-msgstr ""
+msgstr "Slaptažodžio patvirtinimas"
 
 #: forms.py:19
 msgid "Enter the same password as above, for verification."
@@ -94,7 +96,7 @@ msgstr ""
 
 #: forms.py:108
 msgid "E-mail"
-msgstr ""
+msgstr "El. paštas"
 
 #: forms.py:117
 msgid ""
@@ -107,19 +109,19 @@ msgstr ""
 #: forms.py:143
 #, python-format
 msgid "Password reset on %s"
-msgstr ""
+msgstr "Slaptažodžio %s atstatymas"
 
 #: forms.py:151
 msgid "New password"
-msgstr ""
+msgstr "Naujas slaptažodis"
 
 #: forms.py:152
 msgid "New password confirmation"
-msgstr ""
+msgstr "Naujo slaptažodžio patvirtinimas"
 
 #: forms.py:177
 msgid "Old password"
-msgstr ""
+msgstr "Senas slaptažodis"
 
 #: forms.py:185
 msgid "Your old password was entered incorrectly. Please enter it again."
@@ -161,6 +163,8 @@ msgstr "vartotojo vardas"
 msgid ""
 "Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
 msgstr ""
+"Privalomas. 30 arba mažiau simbolių. Raidės, skaičiai bei @/./+/-/_ "
+"simboliai."
 
 #: models.py:207
 msgid "first name"
@@ -192,7 +196,7 @@ msgstr "personalo statusas"
 
 #: models.py:211
 msgid "Designates whether the user can log into this admin site."
-msgstr "Pažymi ar vartotojas gali prisijungti prie administravimo puslapio."
+msgstr "Nurodo ar vartotojas gali prisijungti prie administravimo puslapio."
 
 #: models.py:212
 msgid "active"
@@ -203,6 +207,8 @@ msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
 msgstr ""
+"Nurodo ar vartotojas yra aktyvuotas. Užuot pašalinę vartotoją, galite nuimti "
+"šią žymę."
 
 #: models.py:213
 msgid "superuser status"
@@ -246,7 +252,7 @@ msgstr "vartotojai"
 msgid "message"
 msgstr "žinutė"
 
-#: views.py:86
+#: views.py:91
 msgid "Logged out"
 msgstr "Atsijungęs"
 

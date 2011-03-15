@@ -4,8 +4,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-28 23:37+0100\n"
-"PO-Revision-Date: 2011-02-22 00:09+0000\n"
+"POT-Creation-Date: 2011-03-15 13:14-0400\n"
+"PO-Revision-Date: 2011-03-04 18:41+0000\n"
 "Last-Translator: sergikoff <sergikoff88@gmail.com>\n"
 "Language-Team: Ukrainian <>\n"
 "MIME-Version: 1.0\n"
@@ -47,14 +47,18 @@ msgstr "Користувач"
 #: forms.py:15 forms.py:49
 msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
+"Обов'язкове поле. 30 або менше символів . Тільки букви, цифри, а також "
+"символи: @/./+/-/_"
 
 #: forms.py:16 forms.py:50
 msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
 msgstr ""
+"Значення цього поля може складатися лише з літер, цифр, а також з символів: "
+"@/./+/-/_"
 
 #: forms.py:17 forms.py:67 forms.py:193
 msgid "Password"
-msgstr "Пароль:"
+msgstr "Пароль"
 
 #: forms.py:18
 msgid "Password confirmation"
@@ -111,7 +115,7 @@ msgstr "Пароль перевстановлено %s"
 
 #: forms.py:151
 msgid "New password"
-msgstr "Новий пароль:"
+msgstr "Новий пароль"
 
 #: forms.py:152
 msgid "New password confirmation"
@@ -119,7 +123,7 @@ msgstr "Новий пароль (підтвердження):"
 
 #: forms.py:177
 msgid "Old password"
-msgstr "Старий пароль:"
+msgstr "Старий пароль"
 
 #: forms.py:185
 msgid "Your old password was entered incorrectly. Please enter it again."
@@ -162,6 +166,9 @@ msgstr "ім'я користувача"
 msgid ""
 "Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
 msgstr ""
+" \n"
+"Обов'язкове поле. 30 або менше символів. Тільки букви, цифри, а також "
+"символи: @/./+/-/_"
 
 #: models.py:207
 msgid "first name"
@@ -189,7 +196,7 @@ msgstr ""
 
 #: models.py:211
 msgid "staff status"
-msgstr "Статус персоналу"
+msgstr "статус персоналу"
 
 #: models.py:211
 msgid "Designates whether the user can log into this admin site."
@@ -197,7 +204,7 @@ msgstr "Визначає, чи може користувач увійти до �
 
 #: models.py:212
 msgid "active"
-msgstr "Активний"
+msgstr "активний"
 
 #: models.py:212
 msgid ""
@@ -209,7 +216,7 @@ msgstr ""
 
 #: models.py:213
 msgid "superuser status"
-msgstr "Статус суперкористувача"
+msgstr "статус суперкористувача"
 
 #: models.py:213
 msgid ""
@@ -219,11 +226,11 @@ msgstr "Визначає, що цей користувач має всі доз�
 
 #: models.py:214
 msgid "last login"
-msgstr "Останній вхід"
+msgstr "останній вхід"
 
 #: models.py:215
 msgid "date joined"
-msgstr "Дата приєднання"
+msgstr "дата приєднання"
 
 #: models.py:217
 msgid ""
@@ -249,7 +256,7 @@ msgstr "користувачі"
 msgid "message"
 msgstr "повідомлення"
 
-#: views.py:86
+#: views.py:91
 msgid "Logged out"
 msgstr "Вихід"
 

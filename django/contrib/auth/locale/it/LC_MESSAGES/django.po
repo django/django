@@ -4,9 +4,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-28 23:37+0100\n"
-"PO-Revision-Date: 2011-02-22 00:09+0000\n"
-"Last-Translator: Jannis <jannis@leidel.info>\n"
+"POT-Creation-Date: 2011-03-15 13:14-0400\n"
+"PO-Revision-Date: 2011-03-08 17:21+0000\n"
+"Last-Translator: teknico <transifex@teknico.net>\n"
 "Language-Team: Italian <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -203,7 +203,7 @@ msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
 msgstr ""
-"Indica se l'utente debba essere considerato attivo. Deseleziona qui, "
+"Stabilisce se l'utente debba essere considerato attivo. Deseleziona qui, "
 "piuttosto che cancellare gli account."
 
 #: models.py:213
@@ -215,8 +215,8 @@ msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
 msgstr ""
-"Indica che l'utente ha tutti i privilegi, senza che siano stati assegnati "
-"esplicitamente."
+"Stabilisce che l'utente ha tutti i privilegi, senza che siano stati "
+"assegnati esplicitamente."
 
 #: models.py:214
 msgid "last login"
@@ -250,7 +250,7 @@ msgstr "utenti"
 msgid "message"
 msgstr "messaggio"
 
-#: views.py:86
+#: views.py:91
 msgid "Logged out"
 msgstr "Accesso annullato"
 

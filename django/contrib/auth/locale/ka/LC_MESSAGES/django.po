@@ -4,8 +4,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-28 23:37+0100\n"
-"PO-Revision-Date: 2011-02-22 00:09+0000\n"
+"POT-Creation-Date: 2011-03-15 13:14-0400\n"
+"PO-Revision-Date: 2011-03-14 21:09+0000\n"
 "Last-Translator: Jannis <jannis@leidel.info>\n"
 "Language-Team: Georgian <None>\n"
 "MIME-Version: 1.0\n"
@@ -52,8 +52,7 @@ msgstr ""
 #: forms.py:16 forms.py:50
 msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
 msgstr ""
-"დასაშვებია მხოლოდ ლათინური ასოები, ციფრები და შემდეგი სიმბოლოები: @/./+/-/"
-"_."
+"დასაშვებია მხოლოდ ლათინური ასოები, ციფრები და შემდეგი სიმბოლოები: @/./+/-/_."
 
 #: forms.py:17 forms.py:67 forms.py:193
 msgid "Password"
@@ -253,7 +252,7 @@ msgstr "მომხმარებლები"
 msgid "message"
 msgstr "შეტყობინება"
 
-#: views.py:86
+#: views.py:91
 msgid "Logged out"
 msgstr "გამოსული ხართ"
 
