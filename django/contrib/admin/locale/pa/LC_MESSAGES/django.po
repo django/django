@@ -4,8 +4,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-28 18:47+0100\n"
-"PO-Revision-Date: 2011-02-22 00:12+0000\n"
+"POT-Creation-Date: 2011-03-15 13:13-0400\n"
+"PO-Revision-Date: 2011-03-04 18:44+0000\n"
 "Last-Translator: Jannis <jannis@leidel.info>\n"
 "Language-Team: Panjabi (Punjabi) <None>\n"
 "MIME-Version: 1.0\n"
@@ -19,12 +19,12 @@ msgstr ""
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "%(count)d %(items)s ਠੀਕ ਤਰ੍ਹਾਂ ਹਟਾਈਆਂ ਗਈਆਂ।"
 
-#: actions.py:61 options.py:1220
+#: actions.py:61 options.py:1219
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr ""
 
-#: actions.py:63 options.py:1222
+#: actions.py:63 options.py:1221
 msgid "Are you sure?"
 msgstr "ਕੀ ਤੁਸੀਂ ਇਹ ਚਾਹੁੰਦੇ ਹੋ?"
 
@@ -126,124 +126,124 @@ msgstr "ਲਾਗ ਐਂਟਰੀ"
 msgid "log entries"
 msgstr "ਲਾਗ ਐਂਟਰੀਆਂ"
 
-#: options.py:148 options.py:163
+#: options.py:147 options.py:162
 msgid "None"
 msgstr "ਕੋਈ ਨਹੀਂ"
 
-#: options.py:628
+#: options.py:627
 #, python-format
 msgid "Changed %s."
 msgstr "%s ਬਦਲਿਆ।"
 
-#: options.py:628 options.py:638
+#: options.py:627 options.py:637
 msgid "and"
 msgstr "ਅਤੇ"
 
-#: options.py:633
+#: options.py:632
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" ਸ਼ਾਮਲ ਕੀਤਾ।"
 
-#: options.py:637
+#: options.py:636
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" ਲਈ %(list)s ਨੂੰ ਬਦਲਿਆ"
 
-#: options.py:642
+#: options.py:641
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" ਹਟਾਇਆ ਗਿਆ।"
 
-#: options.py:646
+#: options.py:645
 msgid "No fields changed."
 msgstr "ਕੋਈ ਖੇਤਰ ਨਹੀਂ ਬਦਲਿਆ।"
 
-#: options.py:718
+#: options.py:717
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" ਠੀਕ ਤਰ੍ਹਾਂ ਹਟਾਇਆ ਗਿਆ ਹੈ।"
 
-#: options.py:722 options.py:762
+#: options.py:721 options.py:761
 msgid "You may edit it again below."
 msgstr "ਤੁਸੀਂ ਇਸ ਨੂੰ ਹੇਠਾਂ ਸੋਧ ਸਕਦੇ ਹੋ।"
 
-#: options.py:732 options.py:772
+#: options.py:731 options.py:771
 #, python-format
 msgid "You may add another %s below."
 msgstr "ਤੁਸੀਂ ਇੱਕ ਹੋਰ %s ਹੇਠਾਂ ਜੋੜ ਸਕਦੇ ਹੋ।"
 
-#: options.py:760
+#: options.py:759
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" ਨੂੰ ਠੀਕ ਤਰ੍ਹਾਂ ਬਦਲਿਆ ਗਿਆ ਸੀ।"
 
-#: options.py:768
+#: options.py:767
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr "%(name)s \"%(obj)s\" ਠੀਕ ਤਰ੍ਹਾਂ ਜੋੜਿਆ ਗਿਆ ਸੀ। ਤੁਸੀਂ ਇਸ ਨੂੰ ਹੇਠਾਂ ਸੋਧ ਸਕਦੇ ਹੋ।"
 
-#: options.py:828 options.py:1086
+#: options.py:827 options.py:1085
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr ""
 
-#: options.py:847
+#: options.py:846
 msgid "No action selected."
 msgstr "ਕੋਈ ਕਾਰਵਾਈ ਨਹੀਂ ਚੁਣੀ ਗਈ।"
 
-#: options.py:928
+#: options.py:927
 #, python-format
 msgid "Add %s"
 msgstr "%s ਸ਼ਾਮਲ"
 
-#: options.py:954 options.py:1195
+#: options.py:953 options.py:1194
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr ""
 
-#: options.py:1019
+#: options.py:1018
 #, python-format
 msgid "Change %s"
 msgstr "%s ਬਦਲੋ"
 
-#: options.py:1066
+#: options.py:1065
 msgid "Database error"
 msgstr "ਡਾਟਾਬੇਸ ਗਲਤੀ"
 
-#: options.py:1128
+#: options.py:1127
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s ਠੀਕ ਤਰ੍ਹਾਂ ਬਦਲਿਆ ਗਿਆ।"
 msgstr[1] "%(count)s %(name)s ਠੀਕ ਤਰ੍ਹਾਂ ਬਦਲੇ ਗਏ ਹਨ।"
 
-#: options.py:1155
+#: options.py:1154
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "%(total_count)s ਚੁਣਿਆ।"
 msgstr[1] "%(total_count)s ਚੁਣੇ"
 
-#: options.py:1160
+#: options.py:1159
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr ""
 
-#: options.py:1211
+#: options.py:1210
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" ਠੀਕ ਤਰ੍ਹਾਂ ਹਟਾਇਆ ਗਿਆ ਹੈ।"
 
-#: options.py:1256
+#: options.py:1255
 #, python-format
 msgid "Change history: %s"
 msgstr "ਅਤੀਤ ਬਦਲੋ: %s"
 
 #: sites.py:319 templates/admin/login.html:42
 #: templates/registration/password_reset_complete.html:14
-#: views/decorators.py:29
+#: views/decorators.py:26
 msgid "Log in"
 msgstr "ਲਾਗ ਇਨ"
 
@@ -719,11 +719,11 @@ msgid ""
 msgstr ""
 
 #: templates/registration/password_reset_email.html:2
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "You're receiving this e-mail because you requested a password reset for your "
 "user account at %(site_name)s."
-msgstr "ਤੁਸੀਂ ਇਹ ਈਮੇਲ ਪ੍ਰਾਪਤ ਕਰ ਰਹੇ ਹੋ, ਕਿਉਂਕਿ ਤੁਸੀਂ ਪਾਸਵਰਡ ਮੁੜ-ਸੈੱਟ ਕਰਨ ਦੀ ਮੰਗ ਕੀਤੀ ਸੀ।"
+msgstr ""
 
 #: templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
@@ -758,9 +758,13 @@ msgstr "ਈਮੇਲ ਐਡਰੈੱਸ:"
 msgid "Reset my password"
 msgstr "ਮੇਰਾ ਪਾਸਵਰਡ ਮੁੜ-ਸੈੱਟ ਕਰੋ"
 
-#: templatetags/admin_list.py:288
+#: templatetags/admin_list.py:290
 msgid "All dates"
 msgstr "ਸਭ ਮਿਤੀਆਂ"
+
+#: views/main.py:27
+msgid "(None)"
+msgstr ""
 
 #: views/main.py:66
 #, python-format

@@ -4,9 +4,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-28 18:47+0100\n"
-"PO-Revision-Date: 2011-02-22 00:12+0000\n"
-"Last-Translator: Jannis <jannis@leidel.info>\n"
+"POT-Creation-Date: 2011-03-15 13:13-0400\n"
+"PO-Revision-Date: 2011-03-04 18:44+0000\n"
+"Last-Translator: jeffrey <jeffrey@noppo.pro>\n"
 "Language-Team: Dutch <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -19,12 +19,12 @@ msgstr ""
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "%(count)d %(items)s succesvol verwijderd."
 
-#: actions.py:61 options.py:1220
+#: actions.py:61 options.py:1219
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr "%(name)s kan niet worden verwijderd "
 
-#: actions.py:63 options.py:1222
+#: actions.py:63 options.py:1221
 msgid "Are you sure?"
 msgstr "Weet u het zeker?"
 
@@ -127,64 +127,64 @@ msgstr "logregistratie"
 msgid "log entries"
 msgstr "logregistraties"
 
-#: options.py:148 options.py:163
+#: options.py:147 options.py:162
 msgid "None"
 msgstr "Geen"
 
-#: options.py:628
+#: options.py:627
 #, python-format
 msgid "Changed %s."
 msgstr "%s gewijzigd."
 
-#: options.py:628 options.py:638
+#: options.py:627 options.py:637
 msgid "and"
 msgstr "en"
 
-#: options.py:633
+#: options.py:632
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" toegevoegd."
 
-#: options.py:637
+#: options.py:636
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "%(list)s aangepast voor %(name)s \"%(object)s\"."
 
-#: options.py:642
+#: options.py:641
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" verwijderd."
 
-#: options.py:646
+#: options.py:645
 msgid "No fields changed."
 msgstr "Geen velden gewijzigd."
 
-#: options.py:718
+#: options.py:717
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "De %(name)s \"%(obj)s\" is toegevoegd."
 
-#: options.py:722 options.py:762
+#: options.py:721 options.py:761
 msgid "You may edit it again below."
 msgstr "U kunt dit hieronder weer bewerken."
 
-#: options.py:732 options.py:772
+#: options.py:731 options.py:771
 #, python-format
 msgid "You may add another %s below."
 msgstr "U kunt hieronder de volgende %s toevoegen."
 
-#: options.py:760
+#: options.py:759
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "Het wijzigen van %(name)s \"%(obj)s\" is geslaagd."
 
-#: options.py:768
+#: options.py:767
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr "De %(name)s \"%(obj)s\" was toegevoegd. U kunt het hieronder wijzigen."
 
-#: options.py:828 options.py:1086
+#: options.py:827 options.py:1085
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
@@ -192,61 +192,61 @@ msgstr ""
 "Er moeten items worden geselecteerd om acties op uit te voeren. Geen items "
 "zijn veranderd."
 
-#: options.py:847
+#: options.py:846
 msgid "No action selected."
 msgstr "Geen actie geselecteerd."
 
-#: options.py:928
+#: options.py:927
 #, python-format
 msgid "Add %s"
 msgstr "Toevoegen %s"
 
-#: options.py:954 options.py:1195
+#: options.py:953 options.py:1194
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "%(name)s object met primaire sleutel %(key)r bestaat niet."
 
-#: options.py:1019
+#: options.py:1018
 #, python-format
 msgid "Change %s"
 msgstr "Wijzig %s"
 
-#: options.py:1066
+#: options.py:1065
 msgid "Database error"
 msgstr "Databasefout"
 
-#: options.py:1128
+#: options.py:1127
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s is succesvol gewijzigd."
 msgstr[1] "%(count)s %(name)s zijn succesvol gewijzigd."
 
-#: options.py:1155
+#: options.py:1154
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "%(total_count)s geselecteerd"
 msgstr[1] "Alle %(total_count)s geselecteerd"
 
-#: options.py:1160
+#: options.py:1159
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "0 van de %(cnt)s geselecteerd"
 
-#: options.py:1211
+#: options.py:1210
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "De verwijdering van %(name)s \"%(obj)s\" is geslaagd."
 
-#: options.py:1256
+#: options.py:1255
 #, python-format
 msgid "Change history: %s"
 msgstr "Wijzigingsgeschiedenis: %s"
 
 #: sites.py:319 templates/admin/login.html:42
 #: templates/registration/password_reset_complete.html:14
-#: views/decorators.py:29
+#: views/decorators.py:26
 msgid "Log in"
 msgstr "Inloggen"
 
@@ -747,11 +747,13 @@ msgstr ""
 "mail gestuurd. U zou dit spoedig moeten ontvangen."
 
 #: templates/registration/password_reset_email.html:2
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "You're receiving this e-mail because you requested a password reset for your "
 "user account at %(site_name)s."
-msgstr "U krijgt deze e-mail omdat u om een nieuw wachtwoord heeft gevraagd"
+msgstr ""
+"U heeft deze email ontvangen, omdat u een wachtwoord reset heeft aangevraagd "
+"voor uw gebruikersaccount op %(site_name)s."
 
 #: templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
@@ -786,9 +788,13 @@ msgstr "E-mailadres:"
 msgid "Reset my password"
 msgstr "Herstel mijn wachtwoord"
 
-#: templatetags/admin_list.py:288
+#: templatetags/admin_list.py:290
 msgid "All dates"
 msgstr "Alle data"
+
+#: views/main.py:27
+msgid "(None)"
+msgstr "(Geen)"
 
 #: views/main.py:66
 #, python-format

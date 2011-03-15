@@ -4,10 +4,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-28 18:47+0100\n"
-"PO-Revision-Date: 2011-02-22 00:12+0000\n"
-"Last-Translator: Jannis <jannis@leidel.info>\n"
-"Language-Team: English <en@li.org>\n"
+"POT-Creation-Date: 2011-03-15 13:12-0400\n"
+"PO-Revision-Date: 2011-03-08 18:29+0000\n"
+"Last-Translator: fonso <fonzzo@gmail.com>\n"
+"Language-Team: Galician <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -17,21 +17,21 @@ msgstr ""
 #: actions.py:49
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
-msgstr ""
+msgstr "Borrado exitosamente %(count)d %(items)s"
 
-#: actions.py:61 options.py:1220
+#: actions.py:61 options.py:1219
 #, python-format
 msgid "Cannot delete %(name)s"
-msgstr ""
+msgstr "Non se pode eliminar %(name)s"
 
-#: actions.py:63 options.py:1222
+#: actions.py:63 options.py:1221
 msgid "Are you sure?"
-msgstr "Está seguro?"
+msgstr "¿Está seguro?"
 
 #: actions.py:85
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
-msgstr ""
+msgstr "Borrar %(verbose_name_plural)s seleccionados."
 
 #: filterspecs.py:54
 #, python-format
@@ -88,7 +88,7 @@ msgstr ""
 
 #: forms.py:18
 msgid "Please log in again, because your session has expired."
-msgstr ""
+msgstr "Por favor ingrese de novo, a súa sesión expirou."
 
 #: forms.py:37
 #, python-format
@@ -99,7 +99,7 @@ msgstr ""
 
 #: helpers.py:19
 msgid "Action:"
-msgstr ""
+msgstr "Acción:"
 
 #: models.py:19
 msgid "action time"
@@ -129,124 +129,126 @@ msgstr "entrada de rexistro"
 msgid "log entries"
 msgstr "entradas de rexistro"
 
-#: options.py:148 options.py:163
+#: options.py:147 options.py:162
 msgid "None"
-msgstr ""
+msgstr "Ningún"
 
-#: options.py:628
+#: options.py:627
 #, python-format
 msgid "Changed %s."
 msgstr "Modificado(s) %s."
 
-#: options.py:628 options.py:638
+#: options.py:627 options.py:637
 msgid "and"
 msgstr "e"
 
-#: options.py:633
+#: options.py:632
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
-msgstr ""
+msgstr "Engadido %(name)s \"%(object)s\""
 
-#: options.py:637
+#: options.py:636
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr ""
+msgstr "Modificáronse %(list)s en %(name)s \"%(object)s\"."
 
-#: options.py:642
+#: options.py:641
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
-msgstr ""
+msgstr "Elimináronse %(name)s \"%(object)s\"."
 
-#: options.py:646
+#: options.py:645
 msgid "No fields changed."
 msgstr "Non se modificou ningún campo."
 
-#: options.py:718
+#: options.py:717
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "Engadiuse correctamente o/a %(name)s  \"%(obj)s\"."
 
-#: options.py:722 options.py:762
+#: options.py:721 options.py:761
 msgid "You may edit it again below."
 msgstr "Pode editalo embaixo."
 
-#: options.py:732 options.py:772
+#: options.py:731 options.py:771
 #, python-format
 msgid "You may add another %s below."
 msgstr "Pode engadir outro/a %s embaixo."
 
-#: options.py:760
+#: options.py:759
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "Modificouse correctamente o/a %(name)s \"%(obj)s\"."
 
-#: options.py:768
+#: options.py:767
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr "Engadiuse correctamente o/a %(name)s \"%(obj)s\" Pode editalo embaixo."
 
-#: options.py:828 options.py:1086
+#: options.py:827 options.py:1085
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr ""
+"Deb seleccionar ítems para poder facer accións con eles. Ningún ítem foi "
+"cambiado."
 
-#: options.py:847
+#: options.py:846
 msgid "No action selected."
-msgstr ""
+msgstr "Non se elixiu ningunha acción."
 
-#: options.py:928
+#: options.py:927
 #, python-format
 msgid "Add %s"
 msgstr "Engadir %s"
 
-#: options.py:954 options.py:1195
+#: options.py:953 options.py:1194
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
+msgstr "O obxecto %(name)s con primary key %(key)r non existe."
 
-#: options.py:1019
+#: options.py:1018
 #, python-format
 msgid "Change %s"
 msgstr "Modificar %s"
 
-#: options.py:1066
+#: options.py:1065
 msgid "Database error"
 msgstr "Erro da base de datos"
 
-#: options.py:1128
+#: options.py:1127
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(count)s %(name)s foi cambiado satisfactoriamente."
+msgstr[1] "%(count)s %(name)s foron cambiados satisfactoriamente."
 
-#: options.py:1155
+#: options.py:1154
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(total_count)s seleccionado."
+msgstr[1] "Tódolos %(total_count)s seleccionados."
 
-#: options.py:1160
+#: options.py:1159
 #, python-format
 msgid "0 of %(cnt)s selected"
-msgstr ""
+msgstr "0 de %(cnt)s seleccionados."
 
-#: options.py:1211
+#: options.py:1210
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "Eliminouse correctamente o/a %(name)s \"%(obj)s\"."
 
-#: options.py:1256
+#: options.py:1255
 #, python-format
 msgid "Change history: %s"
 msgstr "Histórico de cambios: %s"
 
 #: sites.py:319 templates/admin/login.html:42
 #: templates/registration/password_reset_complete.html:14
-#: views/decorators.py:29
+#: views/decorators.py:26
 msgid "Log in"
 msgstr "Iniciar sesión"
 
@@ -257,7 +259,7 @@ msgstr "Administración do sitio web"
 #: sites.py:419
 #, python-format
 msgid "%s administration"
-msgstr ""
+msgstr "%s administración"
 
 #: widgets.py:75
 msgid "Date:"
@@ -269,11 +271,11 @@ msgstr "Hora"
 
 #: widgets.py:140
 msgid "Lookup"
-msgstr ""
+msgstr "Procurar"
 
 #: widgets.py:246
 msgid "Add Another"
-msgstr ""
+msgstr "Engadir outro"
 
 #: templates/admin/404.html:4 templates/admin/404.html.py:8
 msgid "Page not found"
@@ -322,7 +324,7 @@ msgstr ""
 
 #: templates/admin/actions.html:4
 msgid "Run the selected action"
-msgstr ""
+msgstr "Executar a acción seleccionada"
 
 #: templates/admin/actions.html:4
 msgid "Go"
@@ -330,16 +332,16 @@ msgstr "Ir"
 
 #: templates/admin/actions.html:11
 msgid "Click here to select the objects across all pages"
-msgstr ""
+msgstr "Fai clic aquí para seleccionar os obxectos en tódalas páxinas"
 
 #: templates/admin/actions.html:11
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
-msgstr ""
+msgstr "Seleccionar todos os %(total_count)s %(module_name)s"
 
 #: templates/admin/actions.html:13
 msgid "Clear selection"
-msgstr ""
+msgstr "Limpar selección"
 
 #: templates/admin/app_index.html:10 templates/admin/index.html:19
 #, python-format
@@ -432,6 +434,8 @@ msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
 "following protected related objects:"
 msgstr ""
+"Para borrar o obxecto %(object_name)s '%(escaped_object)s' requiriríase "
+"borrar os seguintes obxectos protexidos relacionados:"
 
 #: templates/admin/delete_confirmation.html:33
 #, python-format
@@ -449,7 +453,7 @@ msgstr "Si, estou seguro"
 
 #: templates/admin/delete_selected_confirmation.html:9
 msgid "Delete multiple objects"
-msgstr ""
+msgstr "Eliminar múltiples obxectos"
 
 #: templates/admin/delete_selected_confirmation.html:16
 #, python-format
@@ -458,6 +462,9 @@ msgid ""
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
 msgstr ""
+"Borrar os obxectos %(objects_name)s seleccionados resultaría na eliminación "
+"de obxectos relacionados, pero a súa conta non ten permiso para borrar os "
+"seguintes tipos de obxecto:"
 
 #: templates/admin/delete_selected_confirmation.html:24
 #, python-format
@@ -465,6 +472,8 @@ msgid ""
 "Deleting the selected %(objects_name)s would require deleting the following "
 "protected related objects:"
 msgstr ""
+"Para borrar os obxectos %(objects_name)s relacionados requiriríase eliminar "
+"os seguintes obxectos protexidos relacionados:"
 
 #: templates/admin/delete_selected_confirmation.html:32
 #, python-format
@@ -472,6 +481,9 @@ msgid ""
 "Are you sure you want to delete the selected %(objects_name)s? All of the "
 "following objects and their related items will be deleted:"
 msgstr ""
+"Está seguro de que quere borrar os obxectos %(objects_name)s seleccionados? "
+"Serán eliminados todos os seguintes obxectos e elementos relacionados on "
+"eles:"
 
 #: templates/admin/filter.html:2
 #, python-format
@@ -505,7 +517,7 @@ msgstr "Ningunha dispoñíbel"
 
 #: templates/admin/index.html:72
 msgid "Unknown content"
-msgstr ""
+msgstr "Contenido descoñecido"
 
 #: templates/admin/invalid_setup.html:7
 msgid ""
@@ -555,14 +567,14 @@ msgstr "Gardar"
 
 #: templates/admin/search_form.html:8
 msgid "Search"
-msgstr ""
+msgstr "Busca"
 
 #: templates/admin/search_form.html:10
 #, python-format
 msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(counter)s resultado. "
+msgstr[1] "%(counter)s resultados."
 
 #: templates/admin/search_form.html:10
 #, python-format
@@ -591,7 +603,7 @@ msgstr ""
 
 #: templates/admin/auth/user/add_form.html:8
 msgid "Enter a username and password."
-msgstr ""
+msgstr "Introduza un nome de usuario e contrasinal."
 
 #: templates/admin/auth/user/change_password.html:29
 #, python-format
@@ -616,16 +628,16 @@ msgstr "Insira o mesmo contrasinal ca enriba para verificalo."
 #: templates/admin/edit_inline/tabular.html:113
 #, python-format
 msgid "Add another %(verbose_name)s"
-msgstr ""
+msgstr "Engadir outro %(verbose_name)s"
 
 #: templates/admin/edit_inline/stacked.html:70
 #: templates/admin/edit_inline/tabular.html:116
 msgid "Remove"
-msgstr ""
+msgstr "Eliminar"
 
 #: templates/admin/edit_inline/tabular.html:15
 msgid "Delete?"
-msgstr ""
+msgstr "¿Eliminar?"
 
 #: templates/registration/logged_out.html:8
 msgid "Thanks for spending some quality time with the Web site today."
@@ -661,11 +673,11 @@ msgstr ""
 
 #: templates/registration/password_change_form.html:28
 msgid "Old password"
-msgstr ""
+msgstr "Contrasinal antigo"
 
 #: templates/registration/password_change_form.html:33
 msgid "New password"
-msgstr ""
+msgstr "Contrasinal novo"
 
 #: templates/registration/password_change_form.html:44
 #: templates/registration/password_reset_confirm.html:21
@@ -684,25 +696,29 @@ msgstr "Recuperar o contrasinal"
 #: templates/registration/password_reset_complete.html:6
 #: templates/registration/password_reset_complete.html:10
 msgid "Password reset complete"
-msgstr ""
+msgstr "Reseteo do contrasinal completo"
 
 #: templates/registration/password_reset_complete.html:12
 msgid "Your password has been set.  You may go ahead and log in now."
 msgstr ""
+"A túa clave foi gardada.\n"
+"Xa podes entrar."
 
 #: templates/registration/password_reset_confirm.html:4
 msgid "Password reset confirmation"
-msgstr ""
+msgstr "Confirmación de reseteo da contrasinal"
 
 #: templates/registration/password_reset_confirm.html:12
 msgid "Enter new password"
-msgstr ""
+msgstr "Insira o novo contrasinal"
 
 #: templates/registration/password_reset_confirm.html:14
 msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
 msgstr ""
+"Por favor insira a súa contrasinal dúas veces para que podamos verificar se "
+"a escribiu correctamente."
 
 #: templates/registration/password_reset_confirm.html:18
 msgid "New password:"
@@ -714,13 +730,15 @@ msgstr "Confirmar contrasinal:"
 
 #: templates/registration/password_reset_confirm.html:26
 msgid "Password reset unsuccessful"
-msgstr ""
+msgstr "Reseteo da contrasinal non satisfactorio."
 
 #: templates/registration/password_reset_confirm.html:28
 msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
 msgstr ""
+"A ligazón de reseteo da contrasinal non é válida, posiblemente porque xa foi "
+"usada.  Por favor pida un novo reseteo da contrasinal."
 
 #: templates/registration/password_reset_done.html:6
 #: templates/registration/password_reset_done.html:10
@@ -732,17 +750,21 @@ msgid ""
 "We've e-mailed you instructions for setting your password to the e-mail "
 "address you submitted. You should be receiving it shortly."
 msgstr ""
+"Enviámoslle un correo electrónico con instrucións para configurar a súa "
+"contrasinal á dirección que nos dixo. Debería recibilo en breves."
 
 #: templates/registration/password_reset_email.html:2
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "You're receiving this e-mail because you requested a password reset for your "
 "user account at %(site_name)s."
-msgstr "Recibe esta mensaxe porque solicitou recuperar o contrasinal"
+msgstr ""
+"Recibe esta mensaxe porque solicitou restablecer o contrasinal da súa conta "
+"de usuario en %(site_name)s."
 
 #: templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
-msgstr ""
+msgstr "Por favor vaia á seguinte páxina e elixa una nova contrasinal:"
 
 #: templates/registration/password_reset_email.html:8
 msgid "Your username, in case you've forgotten:"
@@ -762,6 +784,8 @@ msgid ""
 "Forgotten your password? Enter your e-mail address below, and we'll e-mail "
 "instructions for setting a new one."
 msgstr ""
+"¿Olvidou a súa contrasinal? Insira a súa dirección de correo embaixo, e nos "
+"enviarémoslle instrucións para crear una nova."
 
 #: templates/registration/password_reset_form.html:16
 msgid "E-mail address:"
@@ -771,9 +795,13 @@ msgstr "Enderezo de correo electrónico:"
 msgid "Reset my password"
 msgstr "Recuperar o meu contrasinal"
 
-#: templatetags/admin_list.py:288
+#: templatetags/admin_list.py:290
 msgid "All dates"
 msgstr "Todas as datas"
+
+#: views/main.py:27
+msgid "(None)"
+msgstr "(Ningún)"
 
 #: views/main.py:66
 #, python-format

@@ -4,9 +4,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-28 18:48+0100\n"
-"PO-Revision-Date: 2011-02-27 04:36+0000\n"
-"Last-Translator: schemacs <schemacs@gmail.com>\n"
+"POT-Creation-Date: 2011-03-15 13:13-0400\n"
+"PO-Revision-Date: 2011-03-08 14:09+0000\n"
+"Last-Translator: slene <vslene@gmail.com>\n"
 "Language-Team: Chinese (China) <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -17,21 +17,21 @@ msgstr ""
 #: actions.py:49
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
-msgstr "删除了%(count)d的%(items)s"
+msgstr "成功删除了 %(count)d 个 %(items)s"
 
-#: actions.py:61 options.py:1220
+#: actions.py:61 options.py:1219
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr "无法删除 %(name)s"
 
-#: actions.py:63 options.py:1222
+#: actions.py:63 options.py:1221
 msgid "Are you sure?"
-msgstr "你确认吗？"
+msgstr "你确定吗？"
 
 #: actions.py:85
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
-msgstr "删除了选择的%(verbose_name_plural)s"
+msgstr "删除所选的 %(verbose_name_plural)s"
 
 #: filterspecs.py:54
 #, python-format
@@ -56,7 +56,7 @@ msgstr "今天"
 
 #: filterspecs.py:168
 msgid "Past 7 days"
-msgstr "前7天"
+msgstr "过去7天"
 
 #: filterspecs.py:171
 msgid "This month"
@@ -125,122 +125,122 @@ msgstr "日志记录"
 msgid "log entries"
 msgstr "日志记录"
 
-#: options.py:148 options.py:163
+#: options.py:147 options.py:162
 msgid "None"
 msgstr "无"
 
-#: options.py:628
+#: options.py:627
 #, python-format
 msgid "Changed %s."
 msgstr "已修改 %s 。"
 
-#: options.py:628 options.py:638
+#: options.py:627 options.py:637
 msgid "and"
 msgstr "和"
 
-#: options.py:633
+#: options.py:632
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "已添加 %(name)s \"%(object)s\"."
 
-#: options.py:637
+#: options.py:636
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "已变更 %(list)s for %(name)s \"%(object)s\"."
 
-#: options.py:642
+#: options.py:641
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "已删除 %(name)s \"%(object)s\"."
 
-#: options.py:646
+#: options.py:645
 msgid "No fields changed."
 msgstr "没有字段被修改。"
 
-#: options.py:718
+#: options.py:717
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" 添加成功。"
 
-#: options.py:722 options.py:762
+#: options.py:721 options.py:761
 msgid "You may edit it again below."
 msgstr "你可以在下面再次编辑它。"
 
-#: options.py:732 options.py:772
+#: options.py:731 options.py:771
 #, python-format
 msgid "You may add another %s below."
 msgstr "你可以在下面增加另一个 %s 。"
 
-#: options.py:760
+#: options.py:759
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" 修改成功。"
 
-#: options.py:768
+#: options.py:767
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr "%(name)s \"%(obj)s\" 添加成功。你可以在下面再次编辑它。"
 
-#: options.py:828 options.py:1086
+#: options.py:827 options.py:1085
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr "条目必须选中以对其进行操作。没有任何条目被更改。"
 
-#: options.py:847
+#: options.py:846
 msgid "No action selected."
 msgstr "未选择动作"
 
-#: options.py:928
+#: options.py:927
 #, python-format
 msgid "Add %s"
 msgstr "增加 %s"
 
-#: options.py:954 options.py:1195
+#: options.py:953 options.py:1194
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "具有主键 %(key)r 的对象 %(name)s 不存在。"
 
-#: options.py:1019
+#: options.py:1018
 #, python-format
 msgid "Change %s"
 msgstr "修改 %s"
 
-#: options.py:1066
+#: options.py:1065
 msgid "Database error"
 msgstr "数据库错误"
 
-#: options.py:1128
+#: options.py:1127
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
-msgstr[0] ""
+msgstr[0] "总共 %(count)s 个 %(name)s 变更成功。"
 
-#: options.py:1155
+#: options.py:1154
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
-msgstr[0] ""
+msgstr[0] "选中了 %(total_count)s 个"
 
-#: options.py:1160
+#: options.py:1159
 #, python-format
 msgid "0 of %(cnt)s selected"
-msgstr ""
+msgstr "%(cnt)s 个中 0 个被选"
 
-#: options.py:1211
+#: options.py:1210
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" 删除成功。"
 
-#: options.py:1256
+#: options.py:1255
 #, python-format
 msgid "Change history: %s"
 msgstr "变更历史： %s"
 
 #: sites.py:319 templates/admin/login.html:42
 #: templates/registration/password_reset_complete.html:14
-#: views/decorators.py:29
+#: views/decorators.py:26
 msgid "Log in"
 msgstr "登录"
 
@@ -424,6 +424,7 @@ msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
 "following protected related objects:"
 msgstr ""
+"要删除 %(object_name)s '%(escaped_object)s', 将要求删除以下受保护的相关对象:"
 
 #: templates/admin/delete_confirmation.html:33
 #, python-format
@@ -450,13 +451,15 @@ msgid ""
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
 msgstr ""
+"要删除所选的 %(objects_name)s 结果会删除相关对象, 但你的账户没有权限删除这类"
+"对象:"
 
 #: templates/admin/delete_selected_confirmation.html:24
 #, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would require deleting the following "
 "protected related objects:"
-msgstr ""
+msgstr "要删除所选的 %(objects_name)s, 将要求删除以下受保护的相关对象:"
 
 #: templates/admin/delete_selected_confirmation.html:32
 #, python-format
@@ -723,11 +726,11 @@ msgstr ""
 "件。"
 
 #: templates/registration/password_reset_email.html:2
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "You're receiving this e-mail because you requested a password reset for your "
 "user account at %(site_name)s."
-msgstr "之所以收到这封邮件，是因为你请求了密码重设"
+msgstr "因为你要求重置 %(site_name)s 上的账户密码, 所以收到了这封邮件."
 
 #: templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
@@ -762,9 +765,13 @@ msgstr "E-mail 地址："
 msgid "Reset my password"
 msgstr "重设我的密码"
 
-#: templatetags/admin_list.py:288
+#: templatetags/admin_list.py:290
 msgid "All dates"
 msgstr "所有日期"
+
+#: views/main.py:27
+msgid "(None)"
+msgstr "(None)"
 
 #: views/main.py:66
 #, python-format

@@ -4,10 +4,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-28 18:47+0100\n"
-"PO-Revision-Date: 2011-02-22 00:12+0000\n"
-"Last-Translator: Jannis <jannis@leidel.info>\n"
-"Language-Team: English <en@li.org>\n"
+"POT-Creation-Date: 2011-03-15 13:13-0400\n"
+"PO-Revision-Date: 2011-03-05 23:23+0000\n"
+"Last-Translator: lauris <lauris@runbox.com>\n"
+"Language-Team: Lithuanian <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -18,21 +18,21 @@ msgstr ""
 #: actions.py:49
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
-msgstr ""
+msgstr "Sėkmingai ištrinta %(count)d %(items)s."
 
-#: actions.py:61 options.py:1220
+#: actions.py:61 options.py:1219
 #, python-format
 msgid "Cannot delete %(name)s"
-msgstr ""
+msgstr "Ištrinti %(name)s negalima"
 
-#: actions.py:63 options.py:1222
+#: actions.py:63 options.py:1221
 msgid "Are you sure?"
-msgstr "Ar tu tikras?"
+msgstr "Ar esate tikras?"
 
 #: actions.py:85
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
-msgstr ""
+msgstr "Ištrinti pasirinktus %(verbose_name_plural)s "
 
 #: filterspecs.py:54
 #, python-format
@@ -40,6 +40,9 @@ msgid ""
 "<h3>By %s:</h3>\n"
 "<ul>\n"
 msgstr ""
+"<h3>Vartotojas %s:</h3>\n"
+"<ul>\n"
+"\n"
 
 #: filterspecs.py:104 filterspecs.py:136 filterspecs.py:205 filterspecs.py:257
 msgid "All"
@@ -83,11 +86,11 @@ msgid ""
 "sensitive."
 msgstr ""
 "Įveskite teisingą vartotojo vardą ir slaptažodį. Abiejuose laukuose "
-"didžiosios mažosios raidės skiriasi"
+"didžiosios mažosios raidės skiriasi."
 
 #: forms.py:18
 msgid "Please log in again, because your session has expired."
-msgstr ""
+msgstr "Prisijunkite dar kartą, nes sesijos laikas baigėsi."
 
 #: forms.py:37
 #, python-format
@@ -96,7 +99,7 @@ msgstr "E-mailas nėra vartotojo vardas. Pabandyk '%s' vietoj to."
 
 #: helpers.py:19
 msgid "Action:"
-msgstr ""
+msgstr "Veiksmas:"
 
 #: models.py:19
 msgid "action time"
@@ -126,138 +129,140 @@ msgstr "log įrašas"
 msgid "log entries"
 msgstr "log įrašai"
 
-#: options.py:148 options.py:163
+#: options.py:147 options.py:162
 msgid "None"
-msgstr ""
+msgstr "None"
 
-#: options.py:628
+#: options.py:627
 #, python-format
 msgid "Changed %s."
 msgstr "Pakeistas %s."
 
-#: options.py:628 options.py:638
+#: options.py:627 options.py:637
 msgid "and"
 msgstr "ir"
 
-#: options.py:633
+#: options.py:632
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
-msgstr ""
+msgstr "Įrašyta %(name)s \"%(object)s\"."
 
-#: options.py:637
+#: options.py:636
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr ""
+msgstr "Pakeistas %(list)s šiam %(name)s \"%(object)s\"."
 
-#: options.py:642
+#: options.py:641
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
-msgstr ""
+msgstr "Pašalinta %(name)s \"%(object)s\"."
 
-#: options.py:646
+#: options.py:645
 msgid "No fields changed."
 msgstr "Nei vienas laukas nepakeistas"
 
-#: options.py:718
+#: options.py:717
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" pridėtas sėkmingai."
 
-#: options.py:722 options.py:762
+#: options.py:721 options.py:761
 msgid "You may edit it again below."
 msgstr "Gali taisyti dar kartą žemiau."
 
-#: options.py:732 options.py:772
+#: options.py:731 options.py:771
 #, python-format
 msgid "You may add another %s below."
 msgstr "Gali pridėti dar vieną %s žemiau."
 
-#: options.py:760
+#: options.py:759
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" buvo sėkmingai pakeistas."
 
-#: options.py:768
+#: options.py:767
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr ""
 "%(name)s \"%(obj)s\" pridėtas sėkmingai. Gali taisytį jį dar kartą žemiau."
 
-#: options.py:828 options.py:1086
+#: options.py:827 options.py:1085
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr ""
+"Įrašai turi būti pasirinkti, kad būtų galima atlikti veiksmus. Įrašai "
+"pakeisti nebuvo."
 
-#: options.py:847
+#: options.py:846
 msgid "No action selected."
-msgstr ""
+msgstr "Veiksmai atlikti nebuvo."
 
-#: options.py:928
+#: options.py:927
 #, python-format
 msgid "Add %s"
 msgstr "Pridėti %s"
 
-#: options.py:954 options.py:1195
+#: options.py:953 options.py:1194
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
+msgstr "Įrašas %(name)s su pirminiu raktu %(key)r neegzistuoja."
 
-#: options.py:1019
+#: options.py:1018
 #, python-format
 msgid "Change %s"
 msgstr "Pakeisti %s"
 
-#: options.py:1066
+#: options.py:1065
 msgid "Database error"
 msgstr "Duomenų bazės klaida"
 
-#: options.py:1128
+#: options.py:1127
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(count)s %(name)s sėkmingai pakeistas."
+msgstr[1] "%(count)s %(name)s sėkmingai pakeisti."
+msgstr[2] "%(count)s %(name)s "
 
-#: options.py:1155
+#: options.py:1154
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(total_count)s pasirinktas"
+msgstr[1] "%(total_count)s pasirinkti"
+msgstr[2] "Visi %(total_count)s pasirinkti"
 
-#: options.py:1160
+#: options.py:1159
 #, python-format
 msgid "0 of %(cnt)s selected"
-msgstr ""
+msgstr "0 iš %(cnt)s pasirinkta"
 
-#: options.py:1211
+#: options.py:1210
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" sėkmingai ištrintas."
 
-#: options.py:1256
+#: options.py:1255
 #, python-format
 msgid "Change history: %s"
 msgstr "Pakeisti istoriją: %s"
 
 #: sites.py:319 templates/admin/login.html:42
 #: templates/registration/password_reset_complete.html:14
-#: views/decorators.py:29
+#: views/decorators.py:26
 msgid "Log in"
 msgstr "Prisijungti"
 
 #: sites.py:375
 msgid "Site administration"
-msgstr "Saito administracija"
+msgstr "Saito administravimas"
 
 #: sites.py:419
 #, python-format
 msgid "%s administration"
-msgstr ""
+msgstr "%s administravimas"
 
 #: widgets.py:75
 msgid "Date:"
@@ -269,11 +274,11 @@ msgstr "Laikas:"
 
 #: widgets.py:140
 msgid "Lookup"
-msgstr ""
+msgstr "Paieška"
 
 #: widgets.py:246
 msgid "Add Another"
-msgstr ""
+msgstr "Pridėti dar viena"
 
 #: templates/admin/404.html:4 templates/admin/404.html.py:8
 msgid "Page not found"
@@ -322,7 +327,7 @@ msgstr ""
 
 #: templates/admin/actions.html:4
 msgid "Run the selected action"
-msgstr ""
+msgstr "Vykdyti pasirinktus veiksmus"
 
 #: templates/admin/actions.html:4
 msgid "Go"
@@ -330,16 +335,16 @@ msgstr "Eiti!"
 
 #: templates/admin/actions.html:11
 msgid "Click here to select the objects across all pages"
-msgstr ""
+msgstr "Spauskite čia norėdami pasirinkti visus įrašus"
 
 #: templates/admin/actions.html:11
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
-msgstr ""
+msgstr "Pasirinkti visus %(total_count)s %(module_name)s"
 
 #: templates/admin/actions.html:13
 msgid "Clear selection"
-msgstr ""
+msgstr "Atstatyti į pradinę būseną"
 
 #: templates/admin/app_index.html:10 templates/admin/index.html:19
 #, python-format
@@ -398,9 +403,9 @@ msgstr "Matyti saite"
 #: templates/registration/password_change_form.html:16
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Ištaisykite žemiau esancią klaidą."
+msgstr[1] "Ištaisykite žemiau esancias klaidas."
+msgstr[2] "Ištaisykite žemiau esancias klaidas."
 
 #: templates/admin/change_list.html:64
 #, python-format
@@ -432,6 +437,8 @@ msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
 "following protected related objects:"
 msgstr ""
+"Ištrinant %(object_name)s '%(escaped_object)s' būtų ištrinti šie apsaugoti "
+"ir susiję objektai:"
 
 #: templates/admin/delete_confirmation.html:33
 #, python-format
@@ -445,11 +452,11 @@ msgstr ""
 #: templates/admin/delete_confirmation.html:38
 #: templates/admin/delete_selected_confirmation.html:43
 msgid "Yes, I'm sure"
-msgstr "Taip, aš esu tikras"
+msgstr "Taip, esu tikras"
 
 #: templates/admin/delete_selected_confirmation.html:9
 msgid "Delete multiple objects"
-msgstr ""
+msgstr "Ištrinti kelis objektus"
 
 #: templates/admin/delete_selected_confirmation.html:16
 #, python-format
@@ -458,6 +465,8 @@ msgid ""
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
 msgstr ""
+"Ištrinant pasirinktą %(objects_name)s būtų ištrinti susiję objektai, tačiau "
+"jūsų vartotojas neturi reikalingų teisių ištrinti šiuos objektų tipus:"
 
 #: templates/admin/delete_selected_confirmation.html:24
 #, python-format
@@ -465,6 +474,8 @@ msgid ""
 "Deleting the selected %(objects_name)s would require deleting the following "
 "protected related objects:"
 msgstr ""
+"Ištrinant pasirinktus %(objects_name)s būtų ištrinti šie apsaugoti ir susiję "
+"objektai:"
 
 #: templates/admin/delete_selected_confirmation.html:32
 #, python-format
@@ -472,6 +483,8 @@ msgid ""
 "Are you sure you want to delete the selected %(objects_name)s? All of the "
 "following objects and their related items will be deleted:"
 msgstr ""
+"Ar esate tikri, kad norite ištrinti pasirinktus %(objects_name)s? Sekantys "
+"pasirinkti bei susiję objektai bus ištrinti:"
 
 #: templates/admin/filter.html:2
 #, python-format
@@ -489,11 +502,11 @@ msgstr "Pakeisti"
 
 #: templates/admin/index.html:45
 msgid "You don't have permission to edit anything."
-msgstr "Neturi teisių ką nors keistis."
+msgstr "Neturite teisių ką nors keistis."
 
 #: templates/admin/index.html:53
 msgid "Recent Actions"
-msgstr "Neseni veiksmai"
+msgstr "Paskutiniai Veiksmai"
 
 #: templates/admin/index.html:54
 msgid "My Actions"
@@ -505,7 +518,7 @@ msgstr "Nėra prieinamų"
 
 #: templates/admin/index.html:72
 msgid "Unknown content"
-msgstr ""
+msgstr "Nežinomas turinys"
 
 #: templates/admin/invalid_setup.html:7
 msgid ""
@@ -555,15 +568,15 @@ msgstr "Išsaugoti"
 
 #: templates/admin/search_form.html:8
 msgid "Search"
-msgstr ""
+msgstr "Paieška"
 
 #: templates/admin/search_form.html:10
 #, python-format
 msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(counter)s rezultatas"
+msgstr[1] "%(counter)s rezultatai"
+msgstr[2] "%(counter)s rezultatai"
 
 #: templates/admin/search_form.html:10
 #, python-format
@@ -592,7 +605,7 @@ msgstr ""
 
 #: templates/admin/auth/user/add_form.html:8
 msgid "Enter a username and password."
-msgstr ""
+msgstr "Įveskite vartotoją ir slaptažodį."
 
 #: templates/admin/auth/user/change_password.html:29
 #, python-format
@@ -616,16 +629,16 @@ msgstr "Patikrinimui įvesk tokį patį slaptažodį, kaip viršuje."
 #: templates/admin/edit_inline/tabular.html:113
 #, python-format
 msgid "Add another %(verbose_name)s"
-msgstr ""
+msgstr "Pridėti dar viena %(verbose_name)s"
 
 #: templates/admin/edit_inline/stacked.html:70
 #: templates/admin/edit_inline/tabular.html:116
 msgid "Remove"
-msgstr ""
+msgstr "Pašalinti"
 
 #: templates/admin/edit_inline/tabular.html:15
 msgid "Delete?"
-msgstr ""
+msgstr "Ištrinti?"
 
 #: templates/registration/logged_out.html:8
 msgid "Thanks for spending some quality time with the Web site today."
@@ -661,11 +674,11 @@ msgstr ""
 
 #: templates/registration/password_change_form.html:28
 msgid "Old password"
-msgstr ""
+msgstr "Senas slaptažodis"
 
 #: templates/registration/password_change_form.html:33
 msgid "New password"
-msgstr ""
+msgstr "Naujas "
 
 #: templates/registration/password_change_form.html:44
 #: templates/registration/password_reset_confirm.html:21
@@ -679,34 +692,36 @@ msgstr "Pakeisti slaptažodį"
 #: templates/registration/password_reset_form.html:6
 #: templates/registration/password_reset_form.html:10
 msgid "Password reset"
-msgstr "Slaptažodžiu atstatymas(reset)"
+msgstr "Slaptažodžio atstatymas"
 
 #: templates/registration/password_reset_complete.html:6
 #: templates/registration/password_reset_complete.html:10
 msgid "Password reset complete"
-msgstr ""
+msgstr "Slaptažodžio atstatymas baigtas"
 
 #: templates/registration/password_reset_complete.html:12
 msgid "Your password has been set.  You may go ahead and log in now."
-msgstr ""
+msgstr "Jūsų slaptažodis buvo išsaugotas. Dabas galite prisijungti."
 
 #: templates/registration/password_reset_confirm.html:4
 msgid "Password reset confirmation"
-msgstr ""
+msgstr "Slaptažodžio atstatymo patvirtinimas"
 
 #: templates/registration/password_reset_confirm.html:12
 msgid "Enter new password"
-msgstr ""
+msgstr "Įveskite naują slaptažodį"
 
 #: templates/registration/password_reset_confirm.html:14
 msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
 msgstr ""
+"Įveskite naująjį slaptažodį du kartus, taip užtikrinant, jog nesuklydote "
+"rašydami."
 
 #: templates/registration/password_reset_confirm.html:18
 msgid "New password:"
-msgstr "Naujas slaptažodis:"
+msgstr "Naujasis slaptažodis:"
 
 #: templates/registration/password_reset_confirm.html:20
 msgid "Confirm password:"
@@ -714,35 +729,41 @@ msgstr "Slaptažodžio patvirtinimas:"
 
 #: templates/registration/password_reset_confirm.html:26
 msgid "Password reset unsuccessful"
-msgstr ""
+msgstr "Slaptažodžio atstatymas nesėkmingas"
 
 #: templates/registration/password_reset_confirm.html:28
 msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
 msgstr ""
+"Slaptažodžio atstatymo nuoroda buvo negaliojanti, nes ja tikriausiai jau "
+"buvo panaudota. Prašykite naujo slaptažodžio pakeitimo."
 
 #: templates/registration/password_reset_done.html:6
 #: templates/registration/password_reset_done.html:10
 msgid "Password reset successful"
-msgstr "Slaptažodis sėkmingai atsatytas"
+msgstr "Slaptažodis sėkmingai atstatytas"
 
 #: templates/registration/password_reset_done.html:12
 msgid ""
 "We've e-mailed you instructions for setting your password to the e-mail "
 "address you submitted. You should be receiving it shortly."
 msgstr ""
+"Slaptažodžio atstatymo procedūra išsiųsta į jūsų anksčiau nurodytą el. pašto "
+"adresą. Turėtumėte jį neužilgo gauti."
 
 #: templates/registration/password_reset_email.html:2
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "You're receiving this e-mail because you requested a password reset for your "
 "user account at %(site_name)s."
-msgstr "Gavote šį laišką, nes paprašėte atstatyti slaptažodį"
+msgstr ""
+"Jūs gavote šį laišką, nes prašėte slaptažodžio atstatymo šiam vartotojui %"
+"(site_name)s."
 
 #: templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
-msgstr ""
+msgstr "Prašome eiti į šį puslapį ir pasirinkti naują slaptažodį:"
 
 #: templates/registration/password_reset_email.html:8
 msgid "Your username, in case you've forgotten:"
@@ -762,18 +783,24 @@ msgid ""
 "Forgotten your password? Enter your e-mail address below, and we'll e-mail "
 "instructions for setting a new one."
 msgstr ""
+"Pamiršote slaptažodį? Įveskite savo el. pašto adresą žemiau ir mes jums "
+"atsiųsime naują slaptažodį."
 
 #: templates/registration/password_reset_form.html:16
 msgid "E-mail address:"
-msgstr "E-mailo adresas:"
+msgstr "El. pašto adresas:"
 
 #: templates/registration/password_reset_form.html:16
 msgid "Reset my password"
 msgstr "Atstatyti slaptažodį"
 
-#: templatetags/admin_list.py:288
+#: templatetags/admin_list.py:290
 msgid "All dates"
 msgstr "Visos datos"
+
+#: views/main.py:27
+msgid "(None)"
+msgstr "()"
 
 #: views/main.py:66
 #, python-format

@@ -4,10 +4,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-28 18:47+0100\n"
-"PO-Revision-Date: 2011-02-22 00:12+0000\n"
-"Last-Translator: Jannis <jannis@leidel.info>\n"
-"Language-Team: English <en@li.org>\n"
+"POT-Creation-Date: 2011-03-15 13:13-0400\n"
+"PO-Revision-Date: 2011-03-06 03:24+0000\n"
+"Last-Translator: mixe <mixe@korea.com>\n"
+"Language-Team: Korean <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -19,12 +19,12 @@ msgstr ""
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "%(count)d개의 %(items)s (을)를 성공적으로 삭제하였습니다."
 
-#: actions.py:61 options.py:1220
+#: actions.py:61 options.py:1219
 #, python-format
 msgid "Cannot delete %(name)s"
-msgstr ""
+msgstr "%(name)s를 삭제할 수 없습니다."
 
-#: actions.py:63 options.py:1222
+#: actions.py:63 options.py:1221
 msgid "Are you sure?"
 msgstr "확실합니까?"
 
@@ -125,64 +125,64 @@ msgstr "로그 엔트리"
 msgid "log entries"
 msgstr "로그 엔트리"
 
-#: options.py:148 options.py:163
+#: options.py:147 options.py:162
 msgid "None"
 msgstr "없음"
 
-#: options.py:628
+#: options.py:627
 #, python-format
 msgid "Changed %s."
 msgstr "%s (이)가 변경되었습니다."
 
-#: options.py:628 options.py:638
+#: options.py:627 options.py:637
 msgid "and"
 msgstr "또한"
 
-#: options.py:633
+#: options.py:632
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" (을)를 추가하였습니다."
 
-#: options.py:637
+#: options.py:636
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "%(list)s에 대한 %(name)s \"%(object)s\" (을)를 변경하였습니다."
 
-#: options.py:642
+#: options.py:641
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" (을)를 삭제하였습니다."
 
-#: options.py:646
+#: options.py:645
 msgid "No fields changed."
 msgstr "변경된 필드가 없습니다."
 
-#: options.py:718
+#: options.py:717
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" (이)가 추가되었습니다."
 
-#: options.py:722 options.py:762
+#: options.py:721 options.py:761
 msgid "You may edit it again below."
 msgstr "계속해서 편집하실 수 있습니다."
 
-#: options.py:732 options.py:772
+#: options.py:731 options.py:771
 #, python-format
 msgid "You may add another %s below."
 msgstr "계속해서 다른 %s (을)를 추가하세요."
 
-#: options.py:760
+#: options.py:759
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" (이)가 변경되었습니다."
 
-#: options.py:768
+#: options.py:767
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr "%(name)s \"%(obj)s\" (이)가 추가되었습니다. 계속해서 편집하세요."
 
-#: options.py:828 options.py:1086
+#: options.py:827 options.py:1085
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
@@ -190,59 +190,59 @@ msgstr ""
 "항목들에 액션을 적용하기 위해선 먼저 항목들이 선택되어 있어야 합니다. 아무 항"
 "목도 변경되지 않았습니다."
 
-#: options.py:847
+#: options.py:846
 msgid "No action selected."
 msgstr "액션이 선택되지 않았습니다."
 
-#: options.py:928
+#: options.py:927
 #, python-format
 msgid "Add %s"
 msgstr "%s 추가"
 
-#: options.py:954 options.py:1195
+#: options.py:953 options.py:1194
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "Primary key %(key)r에 대한 오브젝트 %(name)s(이)가 존재하지 않습니다."
 
-#: options.py:1019
+#: options.py:1018
 #, python-format
 msgid "Change %s"
 msgstr "%s 변경"
 
-#: options.py:1066
+#: options.py:1065
 msgid "Database error"
 msgstr "데이터베이스 오류"
 
-#: options.py:1128
+#: options.py:1127
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s개의 %(name)s(이)가 변경되었습니다."
 
-#: options.py:1155
+#: options.py:1154
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "모두 %(total_count)s개가 선택되었습니다."
 
-#: options.py:1160
+#: options.py:1159
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "%(cnt)s 중 아무것도 선택되지 않았습니다."
 
-#: options.py:1211
+#: options.py:1210
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\"(이)가 삭제되었습니다."
 
-#: options.py:1256
+#: options.py:1255
 #, python-format
 msgid "Change history: %s"
 msgstr "변경 히스토리: %s"
 
 #: sites.py:319 templates/admin/login.html:42
 #: templates/registration/password_reset_complete.html:14
-#: views/decorators.py:29
+#: views/decorators.py:26
 msgid "Log in"
 msgstr "로그인"
 
@@ -394,7 +394,7 @@ msgstr "사이트에서 보기"
 #: templates/registration/password_change_form.html:16
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
-msgstr[0] ""
+msgstr[0] "아래의 오류를 수정하십시오."
 
 #: templates/admin/change_list.html:64
 #, python-format
@@ -427,6 +427,8 @@ msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
 "following protected related objects:"
 msgstr ""
+"%(object_name)s '%(escaped_object)s'를 삭제하려면 다음 보호상태의 연관 오브젝"
+"트를 삭제해야 합니다."
 
 #: templates/admin/delete_confirmation.html:33
 #, python-format
@@ -453,6 +455,8 @@ msgid ""
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
 msgstr ""
+"연관 오브젝트 삭제로 선택한 %(objects_name)s의 삭제 중, 그러나 당신의 계정은 "
+"다음 오브젝트의 삭제 권한이 없습니다. "
 
 #: templates/admin/delete_selected_confirmation.html:24
 #, python-format
@@ -460,6 +464,7 @@ msgid ""
 "Deleting the selected %(objects_name)s would require deleting the following "
 "protected related objects:"
 msgstr ""
+"%(objects_name)s를 삭제하려면 다음 보호상태의 오브젝트를 삭제해야 합니다."
 
 #: templates/admin/delete_selected_confirmation.html:32
 #, python-format
@@ -467,6 +472,8 @@ msgid ""
 "Are you sure you want to delete the selected %(objects_name)s? All of the "
 "following objects and their related items will be deleted:"
 msgstr ""
+"선택한 %(objects_name)s를 정말 삭제하시겠습니까? 다음의 오브젝트와 연관 아이"
+"템들이 모두 삭제됩니다:"
 
 #: templates/admin/filter.html:2
 #, python-format
@@ -555,7 +562,7 @@ msgstr "검색"
 #, python-format
 msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
-msgstr[0] ""
+msgstr[0] "결과 %(counter)s개 나옴"
 
 #: templates/admin/search_form.html:10
 #, python-format
@@ -583,7 +590,7 @@ msgstr ""
 
 #: templates/admin/auth/user/add_form.html:8
 msgid "Enter a username and password."
-msgstr ""
+msgstr "유저명과 암호를 입력하세요."
 
 #: templates/admin/auth/user/change_password.html:29
 #, python-format
@@ -729,11 +736,12 @@ msgid ""
 msgstr "새로운 비밀번호를 등록하신 이메일로 보내드렸습니다."
 
 #: templates/registration/password_reset_email.html:2
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "You're receiving this e-mail because you requested a password reset for your "
 "user account at %(site_name)s."
-msgstr "비밀번호가 초기화되었음을 알려드립니다."
+msgstr ""
+"당신의 계정 %(site_name)s에 대한 암호 초기화 요구로 본 e-mail을 받으셨습니다."
 
 #: templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
@@ -768,9 +776,13 @@ msgstr "이메일 주소:"
 msgid "Reset my password"
 msgstr "비밀번호 초기화"
 
-#: templatetags/admin_list.py:288
+#: templatetags/admin_list.py:290
 msgid "All dates"
 msgstr "언제나"
+
+#: views/main.py:27
+msgid "(None)"
+msgstr "(없음)"
 
 #: views/main.py:66
 #, python-format

@@ -4,9 +4,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-28 23:20+0100\n"
-"PO-Revision-Date: 2011-02-22 00:01+0000\n"
-"Last-Translator: Jannis <jannis@leidel.info>\n"
+"POT-Creation-Date: 2011-03-15 13:13-0400\n"
+"PO-Revision-Date: 2011-03-11 10:22+0000\n"
+"Last-Translator: nmariz <nmariz@gmail.com>\n"
 "Language-Team: Portuguese <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -21,7 +21,7 @@ msgstr "Disponível %s"
 
 #: media/js/SelectFilter2.js:52
 msgid "Filter"
-msgstr ""
+msgstr "Filtrar"
 
 #: media/js/SelectFilter2.js:59
 msgid "Choose all"
@@ -42,7 +42,7 @@ msgstr "Escolhido %s"
 
 #: media/js/SelectFilter2.js:72
 msgid "Select your choice(s) and click "
-msgstr "Seleccione a(s) sua(s) escolha(s) e clique "
+msgstr "Selecione a(s) sua(s) escolha(s) e clique "
 
 #: media/js/SelectFilter2.js:77
 msgid "Clear all"
@@ -51,14 +51,16 @@ msgstr "Limpar tudo"
 #: media/js/actions.js:18 media/js/actions.min.js:1
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(sel)s de %(cnt)s selecionado"
+msgstr[1] "%(sel)s de %(cnt)s selecionados"
 
 #: media/js/actions.js:109 media/js/actions.min.js:5
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
 "action, your unsaved changes will be lost."
 msgstr ""
+"Tem mudanças por guardar nos campos individuais. Se usar uma ação, as suas "
+"mudanças por guardar serão perdidas."
 
 #: media/js/actions.js:121 media/js/actions.min.js:6
 msgid ""
@@ -66,6 +68,8 @@ msgid ""
 "individual fields yet. Please click OK to save. You'll need to re-run the "
 "action."
 msgstr ""
+"Selecionou uma ação mas ainda não guardou as mudanças dos campos "
+"individuais. Carregue em OK para gravar. Precisará de correr de novo a ação."
 
 #: media/js/actions.js:123 media/js/actions.min.js:6
 msgid ""
@@ -73,6 +77,8 @@ msgid ""
 "fields. You're probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
+"Selecionou uma ação mas ainda não guardou as mudanças dos campos "
+"individuais. Provavelmente quererá o botão Ir ao invés do botão Guardar."
 
 #: media/js/calendar.js:24 media/js/dateparse.js:32
 msgid ""

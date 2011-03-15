@@ -4,10 +4,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-28 23:20+0100\n"
-"PO-Revision-Date: 2011-02-22 00:01+0000\n"
-"Last-Translator: Jannis <jannis@leidel.info>\n"
-"Language-Team: English <en@li.org>\n"
+"POT-Creation-Date: 2011-03-15 13:13-0400\n"
+"PO-Revision-Date: 2011-03-04 18:14+0000\n"
+"Last-Translator: haffi67 <haffi67@gmail.com>\n"
+"Language-Team: Icelandic <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -21,7 +21,7 @@ msgstr "Fáanleg %s"
 
 #: media/js/SelectFilter2.js:52
 msgid "Filter"
-msgstr ""
+msgstr "Sía"
 
 #: media/js/SelectFilter2.js:59
 msgid "Choose all"
@@ -51,14 +51,16 @@ msgstr "Hreinsa öll"
 #: media/js/actions.js:18 media/js/actions.min.js:1
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] " %(sel)s  í %(cnt)s  valin"
+msgstr[1] " %(sel)s  í %(cnt)s  valin"
 
 #: media/js/actions.js:109 media/js/actions.min.js:5
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
 "action, your unsaved changes will be lost."
 msgstr ""
+"Enn eru óvistaðar breytingar í reitum. Ef þú keyrir aðgerð munu breytingar "
+"ekki verða vistaðar."
 
 #: media/js/actions.js:121 media/js/actions.min.js:6
 msgid ""
@@ -66,6 +68,8 @@ msgid ""
 "individual fields yet. Please click OK to save. You'll need to re-run the "
 "action."
 msgstr ""
+"Þú hefur valið aðgerð en hefur ekki vistað breytingar á reitum. Vinsamlegast "
+"veldu 'Í lagi' til að vista. Þú þarft að endurkeyra aðgerðina."
 
 #: media/js/actions.js:123 media/js/actions.min.js:6
 msgid ""
@@ -73,6 +77,8 @@ msgid ""
 "fields. You're probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
+"Þú hefur valið aðgerð en hefur ekki gert breytingar á reitum. Þú ert líklega "
+"að leita að 'Fara' hnappnum frekar en 'Vista' hnappnum."
 
 #: media/js/calendar.js:24 media/js/dateparse.js:32
 msgid ""
@@ -89,11 +95,11 @@ msgstr "S M Þ M F F L"
 #: media/js/collapse.js:9 media/js/collapse.js.py:21
 #: media/js/collapse.min.js:1
 msgid "Show"
-msgstr ""
+msgstr "Sýna"
 
 #: media/js/collapse.js:16 media/js/collapse.min.js:1
 msgid "Hide"
-msgstr ""
+msgstr "Fela"
 
 #: media/js/dateparse.js:33
 msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"

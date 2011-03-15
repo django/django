@@ -4,9 +4,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-28 18:47+0100\n"
-"PO-Revision-Date: 2011-02-22 00:12+0000\n"
-"Last-Translator: glezos <glezos@indifex.com>\n"
+"POT-Creation-Date: 2011-03-15 13:12-0400\n"
+"PO-Revision-Date: 2011-03-04 18:44+0000\n"
+"Last-Translator: pagles <y.pagles@gmail.com>\n"
 "Language-Team: Greek <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -17,21 +17,21 @@ msgstr ""
 #: actions.py:49
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
-msgstr ""
+msgstr "Επιτυχημένη διαγραφή %(count)d %(items)s."
 
-#: actions.py:61 options.py:1220
+#: actions.py:61 options.py:1219
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr "Αδύνατη τη διαγραφή του %(name)s"
 
-#: actions.py:63 options.py:1222
+#: actions.py:63 options.py:1221
 msgid "Are you sure?"
 msgstr "Είστε σίγουροι;"
 
 #: actions.py:85
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
-msgstr ""
+msgstr "Διαγραφη επιλεγμένων %(verbose_name_plural)s"
 
 #: filterspecs.py:54
 #, python-format
@@ -88,7 +88,7 @@ msgstr ""
 
 #: forms.py:18
 msgid "Please log in again, because your session has expired."
-msgstr ""
+msgstr "Η συνεδρία σας έχει λήξει. Παρακαλούμε συνδεθείτε ξανά."
 
 #: forms.py:37
 #, python-format
@@ -107,11 +107,11 @@ msgstr "ώρα ενέργειας"
 
 #: models.py:22
 msgid "object id"
-msgstr "id αντικειμένου"
+msgstr "κωδικός αντικειμένου"
 
 #: models.py:23
 msgid "object repr"
-msgstr "repr αντικειμένου"
+msgstr "αναπαράσταση αντικειμένου"
 
 #: models.py:24
 msgid "action flag"
@@ -129,58 +129,58 @@ msgstr "εγγραφή καταγραφής"
 msgid "log entries"
 msgstr "εγγραφές καταγραφής"
 
-#: options.py:148 options.py:163
+#: options.py:147 options.py:162
 msgid "None"
 msgstr "Κανένα"
 
-#: options.py:628
+#: options.py:627
 #, python-format
 msgid "Changed %s."
 msgstr "Έγινε επεξεργασία του %s."
 
-#: options.py:628 options.py:638
+#: options.py:627 options.py:637
 msgid "and"
 msgstr "και"
 
-#: options.py:633
+#: options.py:632
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "Προστέθηκε %(name)s \"%(object)s\"."
 
-#: options.py:637
+#: options.py:636
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr ""
+msgstr "Έγινε επεξεργασία %(list)s για %(name)s \"%(object)s\"."
 
-#: options.py:642
+#: options.py:641
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "Διαγράφη %(name)s \"%(object)s\"."
 
-#: options.py:646
+#: options.py:645
 msgid "No fields changed."
 msgstr "Κανένα πεδίο δεν άλλαξε."
 
-#: options.py:718
+#: options.py:717
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "Το %(name)s \"%(obj)s\" αποθηκεύτηκε με επιτυχία."
 
-#: options.py:722 options.py:762
+#: options.py:721 options.py:761
 msgid "You may edit it again below."
 msgstr "Μπορείτε να το επεξεργαστείτε ξανά παρακάτω."
 
-#: options.py:732 options.py:772
+#: options.py:731 options.py:771
 #, python-format
 msgid "You may add another %s below."
 msgstr "Μπορείτε να προσθέσετε ακόμα ένα %s παρακάτω."
 
-#: options.py:760
+#: options.py:759
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "Το %(name)s \"%(obj)s\" αλλάχτηκε με επιτυχία."
 
-#: options.py:768
+#: options.py:767
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
@@ -188,67 +188,70 @@ msgstr ""
 "Το %(name)s \"%(obj)s\" αποθηκεύτηκε με επιτυχία. Μπορείτε να το "
 "επεξεργαστείτε πάλι παρακάτω."
 
-#: options.py:828 options.py:1086
+#: options.py:827 options.py:1085
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr ""
+"Καμμία αλλαγή δεν έχει πραγματοποιηθεί ακόμα γιατί δεν έχετε επιλέξει κανένα "
+"αντικείμενο. Πρέπει να επιλέξετε ένα ή περισσότερα αντικείμενα για να "
+"πραγματοποιήσετε ενέργειες σε αυτά."
 
-#: options.py:847
+#: options.py:846
 msgid "No action selected."
 msgstr "Δεν έχει επιλεγεί ενέργεια."
 
-#: options.py:928
+#: options.py:927
 #, python-format
 msgid "Add %s"
 msgstr "Προσθήκη %s"
 
-#: options.py:954 options.py:1195
+#: options.py:953 options.py:1194
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
+msgstr " Το αντικείμενο %(name)s  με πρωτεύον κλειδί %(key)r δεν βρέθηκε."
 
-#: options.py:1019
+#: options.py:1018
 #, python-format
 msgid "Change %s"
 msgstr "Αλλαγή του %s"
 
-#: options.py:1066
+#: options.py:1065
 msgid "Database error"
 msgstr "Σφάλμα βάσης δεδομένων"
 
-#: options.py:1128
+#: options.py:1127
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(count)s %(name)s άλλαξε επιτυχώς."
+msgstr[1] "%(count)s %(name)s άλλαξαν επιτυχώς."
 
-#: options.py:1155
+#: options.py:1154
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Επιλέχθηκε %(total_count)s"
+msgstr[1] "Επιλέχθηκαν και τα %(total_count)s"
 
-#: options.py:1160
+#: options.py:1159
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "Επιλέγησαν 0 από %(cnt)s"
 
-#: options.py:1211
+#: options.py:1210
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "Το %(name)s \"%(obj)s\" διαγράφηκε με επιτυχία."
 
-#: options.py:1256
+#: options.py:1255
 #, python-format
 msgid "Change history: %s"
 msgstr "Ιστορικό αλλαγών: %s"
 
 #: sites.py:319 templates/admin/login.html:42
 #: templates/registration/password_reset_complete.html:14
-#: views/decorators.py:29
+#: views/decorators.py:26
 msgid "Log in"
 msgstr "Σύνδεση"
 
@@ -338,7 +341,7 @@ msgstr "Κάντε κλικ εδώ για να επιλέξετε τα αντι�
 #: templates/admin/actions.html:11
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
-msgstr ""
+msgstr "Επιλέξτε και τα %(total_count)s %(module_name)s"
 
 #: templates/admin/actions.html:13
 msgid "Clear selection"
@@ -425,6 +428,9 @@ msgid ""
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
+"Επιλέξατε την διαγραφή του αντικειμένου '%(escaped_object)s' είδους %"
+"(object_name)s. Αυτό συνεπάγεται την διαγραφή συσχετισμένων αντικειμενων για "
+"τα οποία δεν έχετε δικάιωμα διαγραφής. Τα είδη των αντικειμένων αυτών είναι:"
 
 #: templates/admin/delete_confirmation.html:25
 #, python-format
@@ -432,6 +438,8 @@ msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
 "following protected related objects:"
 msgstr ""
+"Η διαγραφή του %(object_name)s '%(escaped_object)s'  απαιτεί την διαγραφή "
+"των παρακάτω προστατευμένων αντικειμένων:"
 
 #: templates/admin/delete_confirmation.html:33
 #, python-format
@@ -439,6 +447,9 @@ msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
 "All of the following related items will be deleted:"
 msgstr ""
+"Επιβεβαιώστε ότι επιθημείτε την διαγραφή του %(object_name)s \"%"
+"(escaped_object)s\". Αν προχωρήσετε με την διαγραφή όλα τα παρακάτω "
+"συσχετισμένα αντικείμενα θα διαγραφούν επίσης:"
 
 #: templates/admin/delete_confirmation.html:38
 #: templates/admin/delete_selected_confirmation.html:43
@@ -456,6 +467,9 @@ msgid ""
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
 msgstr ""
+"Η διαγραφή των επιλεγμένων %(objects_name)s θα είχε σαν αποτέλεσμα την "
+"διαγραφή συσχετισμένων αντικειμένων για τα οποία δεν έχετε το διακαίωμα "
+"διαγραφής:"
 
 #: templates/admin/delete_selected_confirmation.html:24
 #, python-format
@@ -463,6 +477,8 @@ msgid ""
 "Deleting the selected %(objects_name)s would require deleting the following "
 "protected related objects:"
 msgstr ""
+"Η διαγραφή των επιλεγμένων %(objects_name)s απαιτεί την διαγραφή των "
+"παρακάτω προστατευμένων αντικειμένων:"
 
 #: templates/admin/delete_selected_confirmation.html:32
 #, python-format
@@ -470,6 +486,9 @@ msgid ""
 "Are you sure you want to delete the selected %(objects_name)s? All of the "
 "following objects and their related items will be deleted:"
 msgstr ""
+"Επιβεβαιώστε ότι επιθημείτε την διαγραφή των επιλεγμένων %(objects_name)s . "
+"Αν προχωρήσετε με την διαγραφή όλα τα παρακάτω συσχετισμένα αντικείμενα θα "
+"διαγραφούν επίσης:"
 
 #: templates/admin/filter.html:2
 #, python-format
@@ -511,6 +530,9 @@ msgid ""
 "database tables have been created, and make sure the database is readable by "
 "the appropriate user."
 msgstr ""
+"Φαίνεται να υπάρχει πρόβλημα με την εγκατάσταση της βάσης σας. Θα πρέπει να "
+"βεβαιωθείτε ότι οι απαραίτητοι πίνακες έχουν δημιουργηθεί και ότι η βάση "
+"είναι προσβάσιμη από τον αντίστοιχο χρήστη που έχετε δηλώσει."
 
 #: templates/admin/login.html:33
 msgid "Username:"
@@ -537,6 +559,8 @@ msgid ""
 "This object doesn't have a change history. It probably wasn't added via this "
 "admin site."
 msgstr ""
+"Δεν υπάρχει ιστορικό αλλαγών γι' αυτό το αντικείμενο. Είναι πιθανό η "
+"προσθήκη του να μην πραγματοποιήθηκε χρησιμοποιώντας το διαχειριστικό."
 
 #: templates/admin/pagination.html:10
 msgid "Show all"
@@ -548,14 +572,14 @@ msgstr "Αποθήκευση"
 
 #: templates/admin/search_form.html:8
 msgid "Search"
-msgstr ""
+msgstr "Αναζήτηση"
 
 #: templates/admin/search_form.html:10
 #, python-format
 msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(counter)s αποτέλεσμα"
+msgstr[1] "%(counter)s αποτελέσματα"
 
 #: templates/admin/search_form.html:10
 #, python-format
@@ -579,15 +603,20 @@ msgid ""
 "First, enter a username and password. Then, you'll be able to edit more user "
 "options."
 msgstr ""
+"Αρχικά εισάγετε το όνομα χρήστη και τον κωδικό πρόσβασης. Μετά την "
+"ολοκλήρωση αυτού του βήματος θα έχετε την επιλογή να προσθέσετε όλα τα "
+"υπόλοιπα στοιχεία για τον χρήστη."
 
 #: templates/admin/auth/user/add_form.html:8
 msgid "Enter a username and password."
-msgstr ""
+msgstr "Εισάγετε όνομα χρήστη και κωδικό πρόσβασης."
 
 #: templates/admin/auth/user/change_password.html:29
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr ""
+"Εισάγετε ένα νέο κωδικό πρόσβασης για τον χρήστη <strong>%(username)s</"
+"strong>."
 
 #: templates/admin/auth/user/change_password.html:36
 msgid "Password"
@@ -606,16 +635,16 @@ msgstr "Εισάγετε το ίδιο συνθηματικό όπως παρα�
 #: templates/admin/edit_inline/tabular.html:113
 #, python-format
 msgid "Add another %(verbose_name)s"
-msgstr ""
+msgstr "Προσθήκη νέου %(verbose_name)s"
 
 #: templates/admin/edit_inline/stacked.html:70
 #: templates/admin/edit_inline/tabular.html:116
 msgid "Remove"
-msgstr ""
+msgstr "Αφαίρεση"
 
 #: templates/admin/edit_inline/tabular.html:15
 msgid "Delete?"
-msgstr ""
+msgstr "Θέλετε να πραγματοποιηθεί διαγραφή?"
 
 #: templates/registration/logged_out.html:8
 msgid "Thanks for spending some quality time with the Web site today."
@@ -652,11 +681,11 @@ msgstr ""
 
 #: templates/registration/password_change_form.html:28
 msgid "Old password"
-msgstr ""
+msgstr "Προηγούμενος κωδικός πρόσβασης"
 
 #: templates/registration/password_change_form.html:33
 msgid "New password"
-msgstr ""
+msgstr "Νέος κωδικός πρόσβασης"
 
 #: templates/registration/password_change_form.html:44
 #: templates/registration/password_reset_confirm.html:21
@@ -675,15 +704,17 @@ msgstr "Επαναφορά συνθηματικού"
 #: templates/registration/password_reset_complete.html:6
 #: templates/registration/password_reset_complete.html:10
 msgid "Password reset complete"
-msgstr ""
+msgstr "Ολοκληρώθηκε η επαναφορά του κωδικού πρόσβασης."
 
 #: templates/registration/password_reset_complete.html:12
 msgid "Your password has been set.  You may go ahead and log in now."
 msgstr ""
+"Ορίσατε επιτυχώς έναν κωδικό πρόσβασής. Πλέον έχετε την δυνατότητα να "
+"συνδεθήτε."
 
 #: templates/registration/password_reset_confirm.html:4
 msgid "Password reset confirmation"
-msgstr ""
+msgstr "Επιβεβαίωση επαναφοράς κωδικού πρόσβασης"
 
 #: templates/registration/password_reset_confirm.html:12
 msgid "Enter new password"
@@ -694,6 +725,8 @@ msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
 msgstr ""
+"Παρακαλούμε πληκτρολογήστε το νέο κωδικό πρόσβασης δύο φορές ώστε να "
+"βεβαιωθούμε ότι δεν πληκτρολογήσατε κάποιον χαρακτήρα λανθασμένα."
 
 #: templates/registration/password_reset_confirm.html:18
 msgid "New password:"
@@ -712,6 +745,10 @@ msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
 msgstr ""
+"Ο σύνδεσμος που χρησιμοποιήσατε για την επαναφορά του κωδικού πρόσβασης δεν "
+"είναι πλεόν διαθέσιμος. Πιθανώς έχει ήδη χρησιμοποιηθεί. Θα χρειαστεί να "
+"πραγματοποιήσετε και πάλι την διαδικασία αίτησης επαναφοράς του κωδικού "
+"πρόσβασης."
 
 #: templates/registration/password_reset_done.html:6
 #: templates/registration/password_reset_done.html:10
@@ -723,6 +760,9 @@ msgid ""
 "We've e-mailed you instructions for setting your password to the e-mail "
 "address you submitted. You should be receiving it shortly."
 msgstr ""
+"Σας έχουν σταλεί οδηγίες για την επαναφορά του κωδικού πρόσβασής σας στην "
+"διύεθυνση ηλεκτρονικού ταχυδρομίου που δηλώσατε. Ελέγξτε το ηλεκτρονικό σας "
+"ταχυδρομείο για την παραλαβή τους."
 
 #: templates/registration/password_reset_email.html:2
 #, python-format
@@ -730,14 +770,20 @@ msgid ""
 "You're receiving this e-mail because you requested a password reset for your "
 "user account at %(site_name)s."
 msgstr ""
+"Έχετε λάβει αυτό το μήνυμα επειδή ζητήσατε την επαναφορά του κωδικού "
+"πρόσβασής σας στον ιστότοπο %(site_name)s."
 
 #: templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
 msgstr ""
+"Παρακαλούμε επισκεφθήτε την ακόλουθη σελίδα και επιλέξτε ένα νέο κωδικό "
+"πρόσβασης: "
 
 #: templates/registration/password_reset_email.html:8
 msgid "Your username, in case you've forgotten:"
 msgstr ""
+"Το όνομα χρήστη με το οποίο είστε καταχωρημένος για την περίπτωση στην οποία "
+"το έχετε ξεχάσει:"
 
 #: templates/registration/password_reset_email.html:10
 msgid "Thanks for using our site!"
@@ -746,13 +792,16 @@ msgstr "Ευχαριστούμε που χρησιμοποιήσατε τον ι
 #: templates/registration/password_reset_email.html:12
 #, python-format
 msgid "The %(site_name)s team"
-msgstr ""
+msgstr "Η ομάδα του %(site_name)s"
 
 #: templates/registration/password_reset_form.html:12
 msgid ""
 "Forgotten your password? Enter your e-mail address below, and we'll e-mail "
 "instructions for setting a new one."
 msgstr ""
+"Ξεχάσατε τον κωδικό πρόσβασής? Μπορείτε να εισάγετε την διεύθυνση του "
+"ηλεκτρονικού σας ταχυδρομείου και θα σας στείλουμε οδηγίες για να δηλώσετε "
+"ένα νέο κωδικό."
 
 #: templates/registration/password_reset_form.html:16
 msgid "E-mail address:"
@@ -762,9 +811,13 @@ msgstr "Ηλεκτρονική διεύθυνση:"
 msgid "Reset my password"
 msgstr "Επαναφορά του συνθηματικού μου"
 
-#: templatetags/admin_list.py:288
+#: templatetags/admin_list.py:290
 msgid "All dates"
 msgstr "Όλες οι ημερομηνίες"
+
+#: views/main.py:27
+msgid "(None)"
+msgstr "(Κενό)"
 
 #: views/main.py:66
 #, python-format

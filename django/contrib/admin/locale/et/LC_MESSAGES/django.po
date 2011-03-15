@@ -4,9 +4,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-28 18:47+0100\n"
-"PO-Revision-Date: 2011-02-22 00:12+0000\n"
-"Last-Translator: Jannis <jannis@leidel.info>\n"
+"POT-Creation-Date: 2011-03-15 13:12-0400\n"
+"PO-Revision-Date: 2011-03-07 21:13+0000\n"
+"Last-Translator: eallik <eallik@gmail.com>\n"
 "Language-Team: Estonian <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -19,12 +19,12 @@ msgstr ""
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "%(count)d %(items)s kustutamine õnnestus"
 
-#: actions.py:61 options.py:1220
+#: actions.py:61 options.py:1219
 #, python-format
 msgid "Cannot delete %(name)s"
-msgstr ""
+msgstr "Ei saa kustutada %(name)s"
 
-#: actions.py:63 options.py:1222
+#: actions.py:63 options.py:1221
 msgid "Are you sure?"
 msgstr "Kas olete kindel?"
 
@@ -127,124 +127,126 @@ msgstr "logisissekanne"
 msgid "log entries"
 msgstr "logisissekanded"
 
-#: options.py:148 options.py:163
+#: options.py:147 options.py:162
 msgid "None"
 msgstr "Puudub"
 
-#: options.py:628
+#: options.py:627
 #, python-format
 msgid "Changed %s."
 msgstr "Muutsin %s."
 
-#: options.py:628 options.py:638
+#: options.py:627 options.py:637
 msgid "and"
 msgstr "ja"
 
-#: options.py:633
+#: options.py:632
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "Lisatud %(name)s \"%(object)s\"."
 
-#: options.py:637
+#: options.py:636
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "Muudetud %(list)s objektil %(name)s \"%(object)s\"."
 
-#: options.py:642
+#: options.py:641
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "Kustutatud %(name)s \"%(object)s\"."
 
-#: options.py:646
+#: options.py:645
 msgid "No fields changed."
 msgstr "Ühtegi välja ei muudetud."
 
-#: options.py:718
+#: options.py:717
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" lisamine õnnestus."
 
-#: options.py:722 options.py:762
+#: options.py:721 options.py:761
 msgid "You may edit it again below."
 msgstr "Võite jätkata redigeerimist."
 
-#: options.py:732 options.py:772
+#: options.py:731 options.py:771
 #, python-format
 msgid "You may add another %s below."
 msgstr "Võite jätkata uue %s lisamisega."
 
-#: options.py:760
+#: options.py:759
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" muutmine õnnestus."
 
-#: options.py:768
+#: options.py:767
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr "%(name)s \"%(obj)s\" lisamine õnnestus. Te võite seda muuta."
 
-#: options.py:828 options.py:1086
+#: options.py:827 options.py:1085
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr ""
+"Palun märgistage elemendid, millega soovite toiminguid sooritada. Ühtegi "
+"elementi ei muudetud."
 
-#: options.py:847
+#: options.py:846
 msgid "No action selected."
-msgstr ""
+msgstr "Toiming valimata."
 
-#: options.py:928
+#: options.py:927
 #, python-format
 msgid "Add %s"
 msgstr "Lisa %s"
 
-#: options.py:954 options.py:1195
+#: options.py:953 options.py:1194
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "%(name)s primaarvõtmega %(key)r ei eksisteeri."
+msgstr "%(name)s objekt primaarvõtmega %(key)r ei eksisteeri."
 
-#: options.py:1019
+#: options.py:1018
 #, python-format
 msgid "Change %s"
 msgstr "Muuda %s"
 
-#: options.py:1066
+#: options.py:1065
 msgid "Database error"
 msgstr "Andmebaasi viga"
 
-#: options.py:1128
+#: options.py:1127
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s muutmine õnnestus."
 msgstr[1] "%(count)s %(name)s muutmine õnnestus."
 
-#: options.py:1155
+#: options.py:1154
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(total_count)s valitud"
+msgstr[1] "Kõik %(total_count)s valitud"
 
-#: options.py:1160
+#: options.py:1159
 #, python-format
 msgid "0 of %(cnt)s selected"
-msgstr ""
+msgstr "valitud 0/%(cnt)s"
 
-#: options.py:1211
+#: options.py:1210
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" kustutati."
 
-#: options.py:1256
+#: options.py:1255
 #, python-format
 msgid "Change history: %s"
 msgstr "Muudatuste ajalugu: %s"
 
 #: sites.py:319 templates/admin/login.html:42
 #: templates/registration/password_reset_complete.html:14
-#: views/decorators.py:29
+#: views/decorators.py:26
 msgid "Log in"
 msgstr "Sisene"
 
@@ -329,16 +331,16 @@ msgstr "Mine"
 
 #: templates/admin/actions.html:11
 msgid "Click here to select the objects across all pages"
-msgstr ""
+msgstr "Kliki siin, et märgistada objektid üle kõigi lehekülgede"
 
 #: templates/admin/actions.html:11
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
-msgstr ""
+msgstr "Märgista kõik %(total_count)s %(module_name)s"
 
 #: templates/admin/actions.html:13
 msgid "Clear selection"
-msgstr ""
+msgstr "Tühjenda valik"
 
 #: templates/admin/app_index.html:10 templates/admin/index.html:19
 #, python-format
@@ -389,7 +391,7 @@ msgstr "Ajalugu"
 #: templates/admin/edit_inline/stacked.html:9
 #: templates/admin/edit_inline/tabular.html:28
 msgid "View on site"
-msgstr "Näida lehel"
+msgstr "Näita lehel"
 
 #: templates/admin/change_form.html:43 templates/admin/change_list.html:73
 #: templates/admin/login.html:17
@@ -431,6 +433,8 @@ msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
 "following protected related objects:"
 msgstr ""
+"Et kustutada %(object_name)s '%(escaped_object)s', on vaja kustutada "
+"järgmised kaitstud seotud objektid:"
 
 #: templates/admin/delete_confirmation.html:33
 #, python-format
@@ -458,6 +462,8 @@ msgid ""
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
 msgstr ""
+"Kui kustutada valitud %(objects_name)s, peaks kustutama ka seotud objektid, "
+"aga sinu kasutajakontol pole õigusi järgmiste objektitüüpide kustutamiseks:"
 
 #: templates/admin/delete_selected_confirmation.html:24
 #, python-format
@@ -465,6 +471,8 @@ msgid ""
 "Deleting the selected %(objects_name)s would require deleting the following "
 "protected related objects:"
 msgstr ""
+"Et kustutada valitud %(objects_name)s, on vaja kustutada ka järgmised "
+"kaitstud seotud objektid:"
 
 #: templates/admin/delete_selected_confirmation.html:32
 #, python-format
@@ -472,6 +480,8 @@ msgid ""
 "Are you sure you want to delete the selected %(objects_name)s? All of the "
 "following objects and their related items will be deleted:"
 msgstr ""
+"Kas oled kindel, et soovid kustutada valitud %(objects_name)s? Kõik "
+"järgnevad objektid ja seotud objektid kustutatakse:"
 
 #: templates/admin/filter.html:2
 #, python-format
@@ -561,8 +571,8 @@ msgstr "Otsing"
 #, python-format
 msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(counter)s tulemus"
+msgstr[1] "%(counter)s tulemust"
 
 #: templates/admin/search_form.html:10
 #, python-format
@@ -591,7 +601,7 @@ msgstr ""
 
 #: templates/admin/auth/user/add_form.html:8
 msgid "Enter a username and password."
-msgstr ""
+msgstr "Sisestage kasutajanimi ja salasõna."
 
 #: templates/admin/auth/user/change_password.html:29
 #, python-format
@@ -616,7 +626,7 @@ msgstr ""
 #: templates/admin/edit_inline/tabular.html:113
 #, python-format
 msgid "Add another %(verbose_name)s"
-msgstr ""
+msgstr "Lisa veel üks %(verbose_name)s"
 
 #: templates/admin/edit_inline/stacked.html:70
 #: templates/admin/edit_inline/tabular.html:116
@@ -741,11 +751,13 @@ msgstr ""
 "määramiseks. Kiri peaks kohale jõudma varsti."
 
 #: templates/registration/password_reset_email.html:2
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "You're receiving this e-mail because you requested a password reset for your "
 "user account at %(site_name)s."
-msgstr "See kiri saadeti teile, sest soovisite uut salasõna"
+msgstr ""
+"Oled selle kirja saanud, sest soovisite salasõna algseadistust oma "
+"kasutajakontole saidil %(site_name)s."
 
 #: templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
@@ -780,9 +792,13 @@ msgstr "E-posti aadress:"
 msgid "Reset my password"
 msgstr "Reseti parool"
 
-#: templatetags/admin_list.py:288
+#: templatetags/admin_list.py:290
 msgid "All dates"
 msgstr "Kõik kuupäevad"
+
+#: views/main.py:27
+msgid "(None)"
+msgstr "(Puudub)"
 
 #: views/main.py:66
 #, python-format

@@ -4,25 +4,25 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-28 23:20+0100\n"
-"PO-Revision-Date: 2011-02-22 00:01+0000\n"
-"Last-Translator: Jannis <jannis@leidel.info>\n"
+"POT-Creation-Date: 2011-03-15 13:13-0400\n"
+"PO-Revision-Date: 2011-03-07 10:18+0000\n"
+"Last-Translator: danniel <contact@danniel.net>\n"
 "Language-Team: Romanian <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: ro\n"
-"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < "
-"20)) ? 1 : 2)\n"
+"Plural-Forms: nplurals=3; plural=(n==1?0:(((n%100>19)||((n%100==0)&&(n!=0)))?"
+"2:1))\n"
 
 #: media/js/SelectFilter2.js:45
 #, perl-format
 msgid "Available %s"
-msgstr ""
+msgstr "%s disponibil"
 
 #: media/js/SelectFilter2.js:52
 msgid "Filter"
-msgstr ""
+msgstr "Filtru"
 
 #: media/js/SelectFilter2.js:59
 msgid "Choose all"
@@ -30,37 +30,39 @@ msgstr "Alege toate"
 
 #: media/js/SelectFilter2.js:64
 msgid "Add"
-msgstr "Adauga"
+msgstr "Adaugă"
 
 #: media/js/SelectFilter2.js:66
 msgid "Remove"
-msgstr "Sterge"
+msgstr "Șterge"
 
 #: media/js/SelectFilter2.js:71
 #, perl-format
 msgid "Chosen %s"
-msgstr "%s ales"
+msgstr "%s alese"
 
 #: media/js/SelectFilter2.js:72
 msgid "Select your choice(s) and click "
-msgstr "Selectati-va alegera(ile) si dati click "
+msgstr "Selectați alegerile si dați clic"
 
 #: media/js/SelectFilter2.js:77
 msgid "Clear all"
-msgstr "Elibereaza toate"
+msgstr "Ștergeți tot"
 
 #: media/js/actions.js:18 media/js/actions.min.js:1
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(sel)s din %(cnt)s selectate"
+msgstr[1] "%(sel)s din %(cnt)s selectate"
+msgstr[2] "de %(sel)s din %(cnt)s selectate"
 
 #: media/js/actions.js:109 media/js/actions.min.js:5
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
 "action, your unsaved changes will be lost."
 msgstr ""
+"Aveţi modificări nesalvate în cîmpuri individuale editabile. Dacă executaţi "
+"o acțiune, modificările nesalvate vor fi pierdute."
 
 #: media/js/actions.js:121 media/js/actions.min.js:6
 msgid ""
@@ -68,6 +70,9 @@ msgid ""
 "individual fields yet. Please click OK to save. You'll need to re-run the "
 "action."
 msgstr ""
+"Aţi selectat o acţiune, dar nu aţi salvat încă modificările la câmpuri "
+"individuale. Faceţi clic pe OK pentru a salva. Va trebui să executați "
+"acțiunea din nou."
 
 #: media/js/actions.js:123 media/js/actions.min.js:6
 msgid ""
@@ -75,6 +80,8 @@ msgid ""
 "fields. You're probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
+"Ați selectat o acţiune și nu ațţi făcut modificări în cîmpuri individuale. "
+"Probabil căutați butonul Go, în loc de Salvează."
 
 #: media/js/calendar.js:24 media/js/dateparse.js:32
 msgid ""
@@ -91,7 +98,7 @@ msgstr "D L M M J V S"
 #: media/js/collapse.js:9 media/js/collapse.js.py:21
 #: media/js/collapse.min.js:1
 msgid "Show"
-msgstr "Arata"
+msgstr "Arată"
 
 #: media/js/collapse.js:16 media/js/collapse.min.js:1
 msgid "Hide"
@@ -99,7 +106,7 @@ msgstr "Ascunde"
 
 #: media/js/dateparse.js:33
 msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
-msgstr "Duminica Luni Marti Miercuri Joi Vinery Sambata"
+msgstr "Duminica Luni Marți Miercuri Joi Vineri Sâmbătă"
 
 #: media/js/admin/DateTimeShortcuts.js:49
 #: media/js/admin/DateTimeShortcuts.js:84
@@ -112,11 +119,11 @@ msgstr "Ceas"
 
 #: media/js/admin/DateTimeShortcuts.js:80
 msgid "Choose a time"
-msgstr "Alege o ora"
+msgstr "Alege o oră"
 
 #: media/js/admin/DateTimeShortcuts.js:85
 msgid "Midnight"
-msgstr "Miezul noptii"
+msgstr "Miezul nopții"
 
 #: media/js/admin/DateTimeShortcuts.js:86
 msgid "6 a.m."
@@ -124,17 +131,17 @@ msgstr "6 a.m."
 
 #: media/js/admin/DateTimeShortcuts.js:87
 msgid "Noon"
-msgstr "Amiaza"
+msgstr "Amiază"
 
 #: media/js/admin/DateTimeShortcuts.js:91
 #: media/js/admin/DateTimeShortcuts.js:188
 msgid "Cancel"
-msgstr "Anuleaza"
+msgstr "Anulează"
 
 #: media/js/admin/DateTimeShortcuts.js:133
 #: media/js/admin/DateTimeShortcuts.js:182
 msgid "Today"
-msgstr "Astazi"
+msgstr "Astăzi"
 
 #: media/js/admin/DateTimeShortcuts.js:137
 msgid "Calendar"
@@ -146,4 +153,4 @@ msgstr "Ieri"
 
 #: media/js/admin/DateTimeShortcuts.js:184
 msgid "Tomorrow"
-msgstr "Maine"
+msgstr "Mâine"

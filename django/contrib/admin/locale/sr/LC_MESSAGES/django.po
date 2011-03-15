@@ -4,9 +4,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-28 18:48+0100\n"
-"PO-Revision-Date: 2011-02-22 00:12+0000\n"
-"Last-Translator: Jannis <jannis@leidel.info>\n"
+"POT-Creation-Date: 2011-03-15 13:13-0400\n"
+"PO-Revision-Date: 2011-03-06 21:35+0000\n"
+"Last-Translator: janos <janos@resenje.org>\n"
 "Language-Team: Serbian <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -20,12 +20,12 @@ msgstr ""
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "Успешно обрисано: %(count)d %(items)s."
 
-#: actions.py:61 options.py:1220
+#: actions.py:61 options.py:1219
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr "Несуспело брисање %(name)s"
 
-#: actions.py:63 options.py:1222
+#: actions.py:63 options.py:1221
 msgid "Are you sure?"
 msgstr "Да ли сте сигурни?"
 
@@ -128,58 +128,58 @@ msgstr "запис у логовима"
 msgid "log entries"
 msgstr "записи у логовима"
 
-#: options.py:148 options.py:163
+#: options.py:147 options.py:162
 msgid "None"
 msgstr "Ништа"
 
-#: options.py:628
+#: options.py:627
 #, python-format
 msgid "Changed %s."
 msgstr "Измењена поља %s"
 
-#: options.py:628 options.py:638
+#: options.py:627 options.py:637
 msgid "and"
 msgstr "и"
 
-#: options.py:633
+#: options.py:632
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "Сачуван објекат „%(object)s“ класе %(name)s."
 
-#: options.py:637
+#: options.py:636
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "Измењена поља %(list)s објеката „%(object)s“ класе %(name)s ."
 
-#: options.py:642
+#: options.py:641
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "Обрисан објекат „%(object)s“ класе %(name)s."
 
-#: options.py:646
+#: options.py:645
 msgid "No fields changed."
 msgstr "Без измена у пољима."
 
-#: options.py:718
+#: options.py:717
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "Објекат „%(obj)s“ класе %(name)s сачуван је успешно."
 
-#: options.py:722 options.py:762
+#: options.py:721 options.py:761
 msgid "You may edit it again below."
 msgstr "Доле можете поново да уносите измене."
 
-#: options.py:732 options.py:772
+#: options.py:731 options.py:771
 #, python-format
 msgid "You may add another %s below."
 msgstr "Доле можете да додате нови објекат класе %s"
 
-#: options.py:760
+#: options.py:759
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "Објекат „%(obj)s“ класе %(name)s измењен је успешно."
 
-#: options.py:768
+#: options.py:767
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
@@ -187,7 +187,7 @@ msgstr ""
 "Објекат „%(obj)s“ класе %(name)s додат је успешно. Доле можете унети додатне "
 "измене."
 
-#: options.py:828 options.py:1086
+#: options.py:827 options.py:1085
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
@@ -195,65 +195,63 @@ msgstr ""
 "Потребно је изабрати објекте да би се извршила акција над њима. Ниједан "
 "објекат није промењен."
 
-#: options.py:847
+#: options.py:846
 msgid "No action selected."
 msgstr "Није изабрана ниједна акција."
 
-#: options.py:928
+#: options.py:927
 #, python-format
 msgid "Add %s"
 msgstr "Додај објекат класе %s"
 
-#: options.py:954 options.py:1195
+#: options.py:953 options.py:1194
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "Објекат класе %(name)s са примарним кључем %(key)r не постоји."
 
-#: options.py:1019
+#: options.py:1018
 #, python-format
 msgid "Change %s"
 msgstr "Измени објекат класе %s"
 
-#: options.py:1066
+#: options.py:1065
 msgid "Database error"
 msgstr "Грешка у бази података"
 
-#: options.py:1128
+#: options.py:1127
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "Успешно промењен %(count)s %(name)s."
 msgstr[1] "Успешно промењена %(count)s %(name)s."
 msgstr[2] "Успешно промењених %(count)s %(name)s."
-msgstr[3] "Успешно промењених %(count)s %(name)s."
 
-#: options.py:1155
+#: options.py:1154
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "%(total_count)s изабран"
 msgstr[1] "Сва %(total_count)s изабрана"
 msgstr[2] "Свих %(total_count)s изабраних"
-msgstr[3] "Свих %(total_count)s изабраних"
 
-#: options.py:1160
+#: options.py:1159
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "0 од %(cnt)s изабрано"
 
-#: options.py:1211
+#: options.py:1210
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "Објекат „%(obj)s“ класе %(name)s успешно је обрисан."
 
-#: options.py:1256
+#: options.py:1255
 #, python-format
 msgid "Change history: %s"
 msgstr "Историјат измена: %s"
 
 #: sites.py:319 templates/admin/login.html:42
 #: templates/registration/password_reset_complete.html:14
-#: views/decorators.py:29
+#: views/decorators.py:26
 msgid "Log in"
 msgstr "Пријава"
 
@@ -408,7 +406,6 @@ msgid_plural "Please correct the errors below."
 msgstr[0] "Исправите наведену грешку."
 msgstr[1] "Исправите наведене грешке."
 msgstr[2] "Исправите наведене грешке."
-msgstr[3] "Исправите наведене грешке."
 
 #: templates/admin/change_list.html:64
 #, python-format
@@ -581,7 +578,6 @@ msgid_plural "%(counter)s results"
 msgstr[0] "%(counter)s резултат"
 msgstr[1] "%(counter)s резултата"
 msgstr[2] "%(counter)s резултата"
-msgstr[3] "%(counter)s резултата"
 
 #: templates/admin/search_form.html:10
 #, python-format
@@ -758,11 +754,13 @@ msgstr ""
 "дали. Упутства ћете добити ускоро."
 
 #: templates/registration/password_reset_email.html:2
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "You're receiving this e-mail because you requested a password reset for your "
 "user account at %(site_name)s."
-msgstr "Ову поруку сте примили зато што сте захтевали ресетовање лозинке"
+msgstr ""
+"Овај имејл сте добији јер сте тражили промену лозинке за Ваш налог на сајту %"
+"(site_name)s."
 
 #: templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
@@ -797,9 +795,13 @@ msgstr "Имејл адреса:"
 msgid "Reset my password"
 msgstr "Ресетуј моју лозинку"
 
-#: templatetags/admin_list.py:288
+#: templatetags/admin_list.py:290
 msgid "All dates"
 msgstr "Сви датуми"
+
+#: views/main.py:27
+msgid "(None)"
+msgstr "(Ништа)"
 
 #: views/main.py:66
 #, python-format

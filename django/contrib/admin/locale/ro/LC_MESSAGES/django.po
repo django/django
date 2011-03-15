@@ -4,35 +4,35 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-28 18:47+0100\n"
-"PO-Revision-Date: 2011-02-22 00:12+0000\n"
-"Last-Translator: Jannis <jannis@leidel.info>\n"
+"POT-Creation-Date: 2011-03-15 13:13-0400\n"
+"PO-Revision-Date: 2011-03-07 10:20+0000\n"
+"Last-Translator: danniel <contact@danniel.net>\n"
 "Language-Team: Romanian <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: ro\n"
-"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < "
-"20)) ? 1 : 2)\n"
+"Plural-Forms: nplurals=3; plural=(n==1?0:(((n%100>19)||((n%100==0)&&(n!=0)))?"
+"2:1))\n"
 
 #: actions.py:49
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
-msgstr ""
+msgstr "%(count)d %(items)s eliminate cu succes."
 
-#: actions.py:61 options.py:1220
+#: actions.py:61 options.py:1219
 #, python-format
 msgid "Cannot delete %(name)s"
-msgstr ""
+msgstr "Imposibil de eliminat %(name)s"
 
-#: actions.py:63 options.py:1222
+#: actions.py:63 options.py:1221
 msgid "Are you sure?"
-msgstr "Sunteți sigur?"
+msgstr "Sigur?"
 
 #: actions.py:85
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
-msgstr ""
+msgstr "Elimină %(verbose_name_plural)s selectate"
 
 #: filterspecs.py:54
 #, python-format
@@ -40,16 +40,17 @@ msgid ""
 "<h3>By %s:</h3>\n"
 "<ul>\n"
 msgstr ""
-"<h3>După %s:</h3>\n"
+"<h3>De %s:</h3>\n"
 "<ul>\n"
+"\n"
 
 #: filterspecs.py:104 filterspecs.py:136 filterspecs.py:205 filterspecs.py:257
 msgid "All"
-msgstr "tot"
+msgstr "Toate"
 
 #: filterspecs.py:164
 msgid "Any date"
-msgstr "orice data"
+msgstr "Orice dată"
 
 #: filterspecs.py:165
 msgid "Today"
@@ -89,7 +90,7 @@ msgstr ""
 
 #: forms.py:18
 msgid "Please log in again, because your session has expired."
-msgstr ""
+msgstr "Rugam să va logati din nou, pentru că sesiunea dvs. a expirat."
 
 #: forms.py:37
 #, python-format
@@ -100,7 +101,7 @@ msgstr ""
 
 #: helpers.py:19
 msgid "Action:"
-msgstr ""
+msgstr "Acțiune:"
 
 #: models.py:19
 msgid "action time"
@@ -130,127 +131,129 @@ msgstr "intrare log"
 msgid "log entries"
 msgstr "intrări log"
 
-#: options.py:148 options.py:163
+#: options.py:147 options.py:162
 msgid "None"
-msgstr ""
+msgstr "Nici unul"
 
-#: options.py:628
+#: options.py:627
 #, python-format
 msgid "Changed %s."
 msgstr "Am schimbat %s."
 
-#: options.py:628 options.py:638
+#: options.py:627 options.py:637
 msgid "and"
 msgstr "și"
 
-#: options.py:633
+#: options.py:632
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
-msgstr ""
+msgstr "Adăugat %(name)s \"%(object)s\"."
 
-#: options.py:637
+#: options.py:636
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr ""
+msgstr "%(list)s for %(name)s \"%(object)s\" schimbat."
 
-#: options.py:642
+#: options.py:641
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
-msgstr ""
+msgstr " %(name)s \"%(object)s eliminat."
 
-#: options.py:646
+#: options.py:645
 msgid "No fields changed."
 msgstr "Nici-un câmp nu a fost schimbat."
 
-#: options.py:718
+#: options.py:717
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" a fost inserat cu succes."
 
-#: options.py:722 options.py:762
+#: options.py:721 options.py:761
 msgid "You may edit it again below."
 msgstr "Vă puteți edita datele din nou mai jos."
 
-#: options.py:732 options.py:772
+#: options.py:731 options.py:771
 #, python-format
 msgid "You may add another %s below."
 msgstr "Mai puteți adauga un alt %s mai jos."
 
-#: options.py:760
+#: options.py:759
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" au fost modificate cu succes."
 
-#: options.py:768
+#: options.py:767
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr ""
 "%(name)s \"%(obj)s\" au fost adăugate cu succes. Le puteți edita mai jos."
 
-#: options.py:828 options.py:1086
+#: options.py:827 options.py:1085
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr ""
+"Punctele trebuie să fie selectate în ordinea efectuării acţiunilor pe ele. "
+"Nici un punct nu trebuie să fie schimbat."
 
-#: options.py:847
+#: options.py:846
 msgid "No action selected."
-msgstr ""
+msgstr "Nici o acţiune selectată."
 
-#: options.py:928
+#: options.py:927
 #, python-format
 msgid "Add %s"
 msgstr "Adaugă %s"
 
-#: options.py:954 options.py:1195
+#: options.py:953 options.py:1194
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
+msgstr "Obiectul %(name)s cheia primară %(key)r nu există."
 
-#: options.py:1019
+#: options.py:1018
 #, python-format
 msgid "Change %s"
 msgstr "Schimbă %s"
 
-#: options.py:1066
+#: options.py:1065
 msgid "Database error"
 msgstr "Eroare de bază de date"
 
-#: options.py:1128
+#: options.py:1127
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(count)s %(name)s a fost schimbat cu succes."
+msgstr[1] "%(count)s %(name)s au fost schimbate cu succes"
+msgstr[2] "%(count)s %(name)s au fost schimbați cu succes"
 
-#: options.py:1155
+#: options.py:1154
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(total_count)s selectat"
+msgstr[1] "Toate %(total_count)s selectate"
+msgstr[2] "Toți %(total_count)s selectați"
 
-#: options.py:1160
+#: options.py:1159
 #, python-format
 msgid "0 of %(cnt)s selected"
-msgstr ""
+msgstr "0 din %(cnt)s  selectat"
 
-#: options.py:1211
+#: options.py:1210
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" au fost șterse cu succes."
 
-#: options.py:1256
+#: options.py:1255
 #, python-format
 msgid "Change history: %s"
 msgstr "Schimbări făcute: %s"
 
 #: sites.py:319 templates/admin/login.html:42
 #: templates/registration/password_reset_complete.html:14
-#: views/decorators.py:29
+#: views/decorators.py:26
 msgid "Log in"
 msgstr "Login"
 
@@ -261,7 +264,7 @@ msgstr "Administrare site"
 #: sites.py:419
 #, python-format
 msgid "%s administration"
-msgstr ""
+msgstr "%s administrare"
 
 #: widgets.py:75
 msgid "Date:"
@@ -273,11 +276,11 @@ msgstr "Ora:"
 
 #: widgets.py:140
 msgid "Lookup"
-msgstr ""
+msgstr "Căutare"
 
 #: widgets.py:246
 msgid "Add Another"
-msgstr ""
+msgstr "Adăugaţi altul"
 
 #: templates/admin/404.html:4 templates/admin/404.html.py:8
 msgid "Page not found"
@@ -326,7 +329,7 @@ msgstr ""
 
 #: templates/admin/actions.html:4
 msgid "Run the selected action"
-msgstr ""
+msgstr "Porneşte acțiunea selectată"
 
 #: templates/admin/actions.html:4
 msgid "Go"
@@ -334,16 +337,16 @@ msgstr "Start"
 
 #: templates/admin/actions.html:11
 msgid "Click here to select the objects across all pages"
-msgstr ""
+msgstr "Click aici pentru a selecta oconținutul întregii pagini"
 
 #: templates/admin/actions.html:11
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
-msgstr ""
+msgstr "Selectați tote %(total_count)s %(module_name)s"
 
 #: templates/admin/actions.html:13
 msgid "Clear selection"
-msgstr ""
+msgstr "Deselectați"
 
 #: templates/admin/app_index.html:10 templates/admin/index.html:19
 #, python-format
@@ -402,9 +405,9 @@ msgstr "Vizualizează pe site"
 #: templates/registration/password_change_form.html:16
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Vă rugăm să corectați eroarea de mai jos"
+msgstr[1] "Vă rugăm să corectați erorile de mai jos"
+msgstr[2] "Vă rugăm să corectați erorile de mai jos"
 
 #: templates/admin/change_list.html:64
 #, python-format
@@ -437,6 +440,8 @@ msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
 "following protected related objects:"
 msgstr ""
+"Ştergerea %(object_name)s '%(escaped_object)s' ar putea necesita ştergerea "
+"următoareleor obiecte protejate,legate între ele:"
 
 #: templates/admin/delete_confirmation.html:33
 #, python-format
@@ -454,7 +459,7 @@ msgstr "Da, sunt sigur"
 
 #: templates/admin/delete_selected_confirmation.html:9
 msgid "Delete multiple objects"
-msgstr ""
+msgstr "Ştergeţi obiectele multiple"
 
 #: templates/admin/delete_selected_confirmation.html:16
 #, python-format
@@ -463,6 +468,9 @@ msgid ""
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
 msgstr ""
+"Ştergerea %(objects_name)s selectat ar putea duce la ştergerea obiectelor "
+"legate între ele, dar contul dvs. de utilizator nu are permisiunea de a "
+"şterge următoarele tipuri de obiecte:"
 
 #: templates/admin/delete_selected_confirmation.html:24
 #, python-format
@@ -470,6 +478,8 @@ msgid ""
 "Deleting the selected %(objects_name)s would require deleting the following "
 "protected related objects:"
 msgstr ""
+"Ştergerea %(objects_name)s selectat  ar necesita ştergerea următoarele "
+"obiecte protejate legate între ele:"
 
 #: templates/admin/delete_selected_confirmation.html:32
 #, python-format
@@ -477,6 +487,8 @@ msgid ""
 "Are you sure you want to delete the selected %(objects_name)s? All of the "
 "following objects and their related items will be deleted:"
 msgstr ""
+"Sunteţi sigur că doriţi să ştergeţi %(objects_name)s selectat? Toate "
+"obiectele şi elementele aferente acestora vor fi şterse:"
 
 #: templates/admin/filter.html:2
 #, python-format
@@ -510,7 +522,7 @@ msgstr "Indisponibil"
 
 #: templates/admin/index.html:72
 msgid "Unknown content"
-msgstr ""
+msgstr "Conținut necunoscut"
 
 #: templates/admin/invalid_setup.html:7
 msgid ""
@@ -560,15 +572,15 @@ msgstr "Salvează"
 
 #: templates/admin/search_form.html:8
 msgid "Search"
-msgstr ""
+msgstr "Căutare"
 
 #: templates/admin/search_form.html:10
 #, python-format
 msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(counter)s resultat"
+msgstr[1] "%(counter)s resultate"
+msgstr[2] "%(counter)s resultate"
 
 #: templates/admin/search_form.html:10
 #, python-format
@@ -597,7 +609,7 @@ msgstr ""
 
 #: templates/admin/auth/user/add_form.html:8
 msgid "Enter a username and password."
-msgstr ""
+msgstr "Introduceți numele de utilizator și parola"
 
 #: templates/admin/auth/user/change_password.html:29
 #, python-format
@@ -622,16 +634,16 @@ msgstr "Introduceți parola din nou pentru verificare."
 #: templates/admin/edit_inline/tabular.html:113
 #, python-format
 msgid "Add another %(verbose_name)s"
-msgstr ""
+msgstr "Adăugati un alt %(verbose_name)s"
 
 #: templates/admin/edit_inline/stacked.html:70
 #: templates/admin/edit_inline/tabular.html:116
 msgid "Remove"
-msgstr ""
+msgstr "Elimină"
 
 #: templates/admin/edit_inline/tabular.html:15
 msgid "Delete?"
-msgstr ""
+msgstr "Elimină?"
 
 #: templates/registration/logged_out.html:8
 msgid "Thanks for spending some quality time with the Web site today."
@@ -667,11 +679,11 @@ msgstr ""
 
 #: templates/registration/password_change_form.html:28
 msgid "Old password"
-msgstr ""
+msgstr "Parola veche"
 
 #: templates/registration/password_change_form.html:33
 msgid "New password"
-msgstr ""
+msgstr "Parola nouă"
 
 #: templates/registration/password_change_form.html:44
 #: templates/registration/password_reset_confirm.html:21
@@ -690,25 +702,28 @@ msgstr "Resetează parola"
 #: templates/registration/password_reset_complete.html:6
 #: templates/registration/password_reset_complete.html:10
 msgid "Password reset complete"
-msgstr ""
+msgstr "Resetarea parolei completată"
 
 #: templates/registration/password_reset_complete.html:12
 msgid "Your password has been set.  You may go ahead and log in now."
 msgstr ""
+"Parola voastră a fost setată. Acum puteți să continuați și să vă logați."
 
 #: templates/registration/password_reset_confirm.html:4
 msgid "Password reset confirmation"
-msgstr ""
+msgstr "Confirmarea resetării parolei"
 
 #: templates/registration/password_reset_confirm.html:12
 msgid "Enter new password"
-msgstr ""
+msgstr "Introduceți parola nouă"
 
 #: templates/registration/password_reset_confirm.html:14
 msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
 msgstr ""
+"Vă rugăm să introduceți parola de două ori, ca noi să putem ferifica "
+"corectitudinea scrierii"
 
 #: templates/registration/password_reset_confirm.html:18
 msgid "New password:"
@@ -720,13 +735,15 @@ msgstr "Confirmă parola:"
 
 #: templates/registration/password_reset_confirm.html:26
 msgid "Password reset unsuccessful"
-msgstr ""
+msgstr "Eroare în resetarea parolei"
 
 #: templates/registration/password_reset_confirm.html:28
 msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
 msgstr ""
+"Link-ul de resetare a parolei a fost incorect, posibil, din cauza că acesta "
+"a fost deja utilizat. Vă rugăm să încercati din nou să resetați parola"
 
 #: templates/registration/password_reset_done.html:6
 #: templates/registration/password_reset_done.html:10
@@ -738,17 +755,21 @@ msgid ""
 "We've e-mailed you instructions for setting your password to the e-mail "
 "address you submitted. You should be receiving it shortly."
 msgstr ""
+"V-am trimis instrucția de recuperare a parolei pe adresa de e-mail indicată "
+"de dvs. Ar trebui să o primiți în curînd"
 
 #: templates/registration/password_reset_email.html:2
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "You're receiving this e-mail because you requested a password reset for your "
 "user account at %(site_name)s."
-msgstr "Ai primit acest email pentru că ai cerut o resetare a parolei"
+msgstr ""
+"Primiți acest e-mail, pentru că aţi solicitat resetarea parolei pentru "
+"contul dvs. de utilizator la %(site_name)s."
 
 #: templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
-msgstr ""
+msgstr "Vă rugăm să mergeţi la pagina următoare şi să alegeți o nouă parolă:"
 
 #: templates/registration/password_reset_email.html:8
 msgid "Your username, in case you've forgotten:"
@@ -768,6 +789,8 @@ msgid ""
 "Forgotten your password? Enter your e-mail address below, and we'll e-mail "
 "instructions for setting a new one."
 msgstr ""
+"Ați uitat parola? Introduceți mai jos adresa dvs. electronică și noi vă vom "
+"trimite pe acest e-mail instrucția de instalare a unei parole noi."
 
 #: templates/registration/password_reset_form.html:16
 msgid "E-mail address:"
@@ -777,9 +800,13 @@ msgstr "Adresa email:"
 msgid "Reset my password"
 msgstr "Resetează-mi parola"
 
-#: templatetags/admin_list.py:288
+#: templatetags/admin_list.py:290
 msgid "All dates"
 msgstr "Toate datele"
+
+#: views/main.py:27
+msgid "(None)"
+msgstr "(Nici unul)"
 
 #: views/main.py:66
 #, python-format
