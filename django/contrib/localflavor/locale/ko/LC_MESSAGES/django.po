@@ -4,10 +4,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-01 00:33+0100\n"
-"PO-Revision-Date: 2011-02-22 00:10+0000\n"
-"Last-Translator: Jannis <jannis@leidel.info>\n"
-"Language-Team: English <en@li.org>\n"
+"POT-Creation-Date: 2011-03-15 13:19-0400\n"
+"PO-Revision-Date: 2011-03-06 04:06+0000\n"
+"Last-Translator: mixe <mixe@korea.com>\n"
+"Language-Team: Korean <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -84,27 +84,27 @@ msgstr "4자리 숫자 우편번호를 입력하세요."
 
 #: be/be_provinces.py:5
 msgid "Antwerp"
-msgstr ""
+msgstr "안트위르펜"
 
 #: be/be_provinces.py:6
 msgid "Brussels"
-msgstr ""
+msgstr "브뤼셀"
 
 #: be/be_provinces.py:7
 msgid "East Flanders"
-msgstr ""
+msgstr "동플랑드르"
 
 #: be/be_provinces.py:8
 msgid "Flemish Brabant"
-msgstr ""
+msgstr "플레 미시 브라반트"
 
 #: be/be_provinces.py:9
 msgid "Hainaut"
-msgstr ""
+msgstr "에노"
 
 #: be/be_provinces.py:10
 msgid "Liege"
-msgstr ""
+msgstr "리에주"
 
 #: be/be_provinces.py:11 nl/nl_provinces.py:9
 msgid "Limburg"
@@ -112,35 +112,35 @@ msgstr "림뷔르흐 주"
 
 #: be/be_provinces.py:12
 msgid "Luxembourg"
-msgstr ""
+msgstr "룩셈브르크"
 
 #: be/be_provinces.py:13
 msgid "Namur"
-msgstr ""
+msgstr "나무르"
 
 #: be/be_provinces.py:14
 msgid "Walloon Brabant"
-msgstr ""
+msgstr "왈론 브라반트"
 
 #: be/be_provinces.py:15
 msgid "West Flanders"
-msgstr ""
+msgstr "웨스트 플랑드르"
 
 #: be/be_regions.py:5
 msgid "Brussels Capital Region"
-msgstr ""
+msgstr "브뤼셀 캐피탈 지역"
 
 #: be/be_regions.py:6
 msgid "Flemish Region"
-msgstr ""
+msgstr "플랑드르 지역"
 
 #: be/be_regions.py:7
 msgid "Wallonia"
-msgstr ""
+msgstr "왈로니아"
 
 #: be/forms.py:23
 msgid "Enter a valid postal code in the range and format 1XXX - 9XXX."
-msgstr ""
+msgstr "우편번호를 1XXX-9XXX 형식으로 입력하세요."
 
 #: be/forms.py:46
 msgid ""
@@ -148,6 +148,9 @@ msgid ""
 "04xx xx xx xx, 0x/xxx.xx.xx, 0xx/xx.xx.xx, 04xx/xx.xx.xx, 0x.xxx.xx.xx, 0xx."
 "xx.xx.xx, 04xx.xx.xx.xx, 0xxxxxxxx or 04xxxxxxxx."
 msgstr ""
+"전화번호를 0x xxx xx xx, 0xx xx xx xx, 04xx xx xx xx, 0x/xxx.xx.xx, 0xx/xx."
+"xx.xx, 04xx/xx.xx.xx, 0x.xxx.xx.xx, 0xx.xx.xx.xx, 04xx.xx.xx.xx, 0xxxxxxxx 또"
+"는 04xxxxxxxx 형식중 하나로 입력하세요."
 
 #: br/forms.py:17
 msgid "Enter a zip code in the format XXXXX-XXX."
@@ -791,403 +794,403 @@ msgstr "올바른 NIK/KTP 번호를 입력하세요."
 
 #: id/id_choices.py:15
 msgid "Aceh"
-msgstr ""
+msgstr "아체"
 
 #: id/id_choices.py:16 id/id_choices.py:79
 msgid "Bali"
-msgstr ""
+msgstr "발리"
 
 #: id/id_choices.py:17 id/id_choices.py:51
 msgid "Banten"
-msgstr ""
+msgstr "반텐"
 
 #: id/id_choices.py:18 id/id_choices.py:60
 msgid "Bengkulu"
-msgstr ""
+msgstr "벵쿨루"
 
 #: id/id_choices.py:19 id/id_choices.py:53
 msgid "Yogyakarta"
-msgstr ""
+msgstr "족자 카르타"
 
 #: id/id_choices.py:20 id/id_choices.py:57
 msgid "Jakarta"
-msgstr ""
+msgstr "자카르타"
 
 #: id/id_choices.py:21 id/id_choices.py:81
 msgid "Gorontalo"
-msgstr ""
+msgstr "고론탈로"
 
 #: id/id_choices.py:22 id/id_choices.py:63
 msgid "Jambi"
-msgstr ""
+msgstr "잠비"
 
 #: id/id_choices.py:23
 msgid "Jawa Barat"
-msgstr ""
+msgstr "자와 바라트"
 
 #: id/id_choices.py:24
 msgid "Jawa Tengah"
-msgstr ""
+msgstr "자와 텐가"
 
 #: id/id_choices.py:25
 msgid "Jawa Timur"
-msgstr ""
+msgstr "자와 티무르"
 
 #: id/id_choices.py:26 id/id_choices.py:94
 msgid "Kalimantan Barat"
-msgstr ""
+msgstr "칼리만탄 바라트"
 
 #: id/id_choices.py:27 id/id_choices.py:72
 msgid "Kalimantan Selatan"
-msgstr ""
+msgstr "칼리만탄 슬라탄"
 
 #: id/id_choices.py:28 id/id_choices.py:95
 msgid "Kalimantan Tengah"
-msgstr ""
+msgstr "칼리만탄 텐가"
 
 #: id/id_choices.py:29 id/id_choices.py:96
 msgid "Kalimantan Timur"
-msgstr ""
+msgstr "칼리만탄 티무르"
 
 #: id/id_choices.py:30
 msgid "Kepulauan Bangka-Belitung"
-msgstr ""
+msgstr "케풀라우안 방카-벨리텅"
 
 #: id/id_choices.py:31 id/id_choices.py:68
 msgid "Kepulauan Riau"
-msgstr ""
+msgstr "케풀라우안 리아우"
 
 #: id/id_choices.py:32 id/id_choices.py:61
 msgid "Lampung"
-msgstr ""
+msgstr "렘풍"
 
 #: id/id_choices.py:33 id/id_choices.py:76
 msgid "Maluku"
-msgstr ""
+msgstr "말루쿠"
 
 #: id/id_choices.py:34 id/id_choices.py:77
 msgid "Maluku Utara"
-msgstr ""
+msgstr "말루쿠 우타라"
 
 #: id/id_choices.py:35
 msgid "Nusa Tenggara Barat"
-msgstr ""
+msgstr "누사 텐가라 바라트"
 
 #: id/id_choices.py:36
 msgid "Nusa Tenggara Timur"
-msgstr ""
+msgstr "누사 텐가라 티무르"
 
 #: id/id_choices.py:37
 msgid "Papua"
-msgstr ""
+msgstr "파푸아"
 
 #: id/id_choices.py:38
 msgid "Papua Barat"
-msgstr ""
+msgstr "파푸아 바라트"
 
 #: id/id_choices.py:39 id/id_choices.py:66
 msgid "Riau"
-msgstr ""
+msgstr "리아우"
 
 #: id/id_choices.py:40 id/id_choices.py:74
 msgid "Sulawesi Barat"
-msgstr ""
+msgstr "술라웨시 바라트"
 
 #: id/id_choices.py:41 id/id_choices.py:75
 msgid "Sulawesi Selatan"
-msgstr ""
+msgstr "술라웨시 슬라탄"
 
 #: id/id_choices.py:42 id/id_choices.py:82
 msgid "Sulawesi Tengah"
-msgstr ""
+msgstr "술라웨시 Tengah"
 
 #: id/id_choices.py:43 id/id_choices.py:85
 msgid "Sulawesi Tenggara"
-msgstr ""
+msgstr "술라웨시 Tenggara"
 
 #: id/id_choices.py:44
 msgid "Sulawesi Utara"
-msgstr ""
+msgstr "술라웨시 우타라"
 
 #: id/id_choices.py:45 id/id_choices.py:58
 msgid "Sumatera Barat"
-msgstr ""
+msgstr "수마 테라 바라트"
 
 #: id/id_choices.py:46 id/id_choices.py:62
 msgid "Sumatera Selatan"
-msgstr ""
+msgstr "수마트라 슬라탄"
 
 #: id/id_choices.py:47 id/id_choices.py:64
 msgid "Sumatera Utara"
-msgstr ""
+msgstr "수마트라 우타라"
 
 #: id/id_choices.py:52
 msgid "Magelang"
-msgstr ""
+msgstr "Magelang"
 
 #: id/id_choices.py:54
 msgid "Surakarta - Solo"
-msgstr ""
+msgstr "수라 카르타 - 솔로몬"
 
 #: id/id_choices.py:55
 msgid "Madiun"
-msgstr ""
+msgstr "Madiun"
 
 #: id/id_choices.py:56
 msgid "Kediri"
-msgstr ""
+msgstr "Kediri"
 
 #: id/id_choices.py:59
 msgid "Tapanuli"
-msgstr ""
+msgstr "Tapanuli"
 
 #: id/id_choices.py:65
 msgid "Nanggroe Aceh Darussalam"
-msgstr ""
+msgstr "Nanggroe 아체 Darussalam"
 
 #: id/id_choices.py:67
 msgid "Kepulauan Bangka Belitung"
-msgstr ""
+msgstr "Kepulauan Bangka Belitung"
 
 #: id/id_choices.py:69
 msgid "Corps Consulate"
-msgstr ""
+msgstr "군단 영사관"
 
 #: id/id_choices.py:70
 msgid "Corps Diplomatic"
-msgstr ""
+msgstr "군단 외교"
 
 #: id/id_choices.py:71
 msgid "Bandung"
-msgstr ""
+msgstr "반둥"
 
 #: id/id_choices.py:73
 msgid "Sulawesi Utara Daratan"
-msgstr ""
+msgstr "술라웨시의 우타라 Daratan"
 
 #: id/id_choices.py:78
 msgid "NTT - Timor"
-msgstr ""
+msgstr "NTT - 티모르"
 
 #: id/id_choices.py:80
 msgid "Sulawesi Utara Kepulauan"
-msgstr ""
+msgstr "술라웨시의 우타라 Kepulauan"
 
 #: id/id_choices.py:83
 msgid "NTB - Lombok"
-msgstr ""
+msgstr "NTB - 롬복"
 
 #: id/id_choices.py:84
 msgid "Papua dan Papua Barat"
-msgstr ""
+msgstr "파푸아 댄 파푸아 바라트"
 
 #: id/id_choices.py:86
 msgid "Cirebon"
-msgstr ""
+msgstr "Cirebon"
 
 #: id/id_choices.py:87
 msgid "NTB - Sumbawa"
-msgstr ""
+msgstr "NTB - Sumbawa"
 
 #: id/id_choices.py:88
 msgid "NTT - Flores"
-msgstr ""
+msgstr "NTT - 플로레스"
 
 #: id/id_choices.py:89
 msgid "NTT - Sumba"
-msgstr ""
+msgstr "NTT - Sumba"
 
 #: id/id_choices.py:90
 msgid "Bogor"
-msgstr ""
+msgstr "보고르"
 
 #: id/id_choices.py:91
 msgid "Pekalongan"
-msgstr ""
+msgstr "Pekalongan"
 
 #: id/id_choices.py:92
 msgid "Semarang"
-msgstr ""
+msgstr "세마랑"
 
 #: id/id_choices.py:93
 msgid "Pati"
-msgstr ""
+msgstr "Pati"
 
 #: id/id_choices.py:97
 msgid "Surabaya"
-msgstr ""
+msgstr "수라바야"
 
 #: id/id_choices.py:98
 msgid "Madura"
-msgstr ""
+msgstr "Madura"
 
 #: id/id_choices.py:99
 msgid "Malang"
-msgstr ""
+msgstr "Malang"
 
 #: id/id_choices.py:100
 msgid "Jember"
-msgstr ""
+msgstr "Jember"
 
 #: id/id_choices.py:101
 msgid "Banyumas"
-msgstr ""
+msgstr "Banyumas"
 
 #: id/id_choices.py:102
 msgid "Federal Government"
-msgstr ""
+msgstr "연방 정부"
 
 #: id/id_choices.py:103
 msgid "Bojonegoro"
-msgstr ""
+msgstr "Bojonegoro"
 
 #: id/id_choices.py:104
 msgid "Purwakarta"
-msgstr ""
+msgstr "Purwakarta"
 
 #: id/id_choices.py:105
 msgid "Sidoarjo"
-msgstr ""
+msgstr "Sidoarjo"
 
 #: id/id_choices.py:106
 msgid "Garut"
-msgstr ""
+msgstr "Garut"
 
 #: ie/ie_counties.py:8
 msgid "Antrim"
-msgstr ""
+msgstr "앤트림"
 
 #: ie/ie_counties.py:9
 msgid "Armagh"
-msgstr ""
+msgstr "Armagh"
 
 #: ie/ie_counties.py:10
 msgid "Carlow"
-msgstr ""
+msgstr "Carlow"
 
 #: ie/ie_counties.py:11
 msgid "Cavan"
-msgstr ""
+msgstr "캐번"
 
 #: ie/ie_counties.py:12
 msgid "Clare"
-msgstr ""
+msgstr "클레어"
 
 #: ie/ie_counties.py:13
 msgid "Cork"
-msgstr ""
+msgstr "코르크"
 
 #: ie/ie_counties.py:14
 msgid "Derry"
-msgstr ""
+msgstr "데리"
 
 #: ie/ie_counties.py:15
 msgid "Donegal"
-msgstr ""
+msgstr "도네갈"
 
 #: ie/ie_counties.py:16
 msgid "Down"
-msgstr ""
+msgstr "Down"
 
 #: ie/ie_counties.py:17
 msgid "Dublin"
-msgstr ""
+msgstr "더블린"
 
 #: ie/ie_counties.py:18
 msgid "Fermanagh"
-msgstr ""
+msgstr "Fermanagh"
 
 #: ie/ie_counties.py:19
 msgid "Galway"
-msgstr ""
+msgstr "골웨이"
 
 #: ie/ie_counties.py:20
 msgid "Kerry"
-msgstr ""
+msgstr "케리"
 
 #: ie/ie_counties.py:21
 msgid "Kildare"
-msgstr ""
+msgstr "킬데어"
 
 #: ie/ie_counties.py:22
 msgid "Kilkenny"
-msgstr ""
+msgstr "킬케니"
 
 #: ie/ie_counties.py:23
 msgid "Laois"
-msgstr ""
+msgstr "라오 이스"
 
 #: ie/ie_counties.py:24
 msgid "Leitrim"
-msgstr ""
+msgstr "리트림"
 
 #: ie/ie_counties.py:25
 msgid "Limerick"
-msgstr ""
+msgstr "Limerick"
 
 #: ie/ie_counties.py:26
 msgid "Longford"
-msgstr ""
+msgstr "롱퍼드"
 
 #: ie/ie_counties.py:27
 msgid "Louth"
-msgstr ""
+msgstr "로우쓰"
 
 #: ie/ie_counties.py:28
 msgid "Mayo"
-msgstr ""
+msgstr "메이요"
 
 #: ie/ie_counties.py:29
 msgid "Meath"
-msgstr ""
+msgstr "미스"
 
 #: ie/ie_counties.py:30
 msgid "Monaghan"
-msgstr ""
+msgstr "모나핸"
 
 #: ie/ie_counties.py:31
 msgid "Offaly"
-msgstr ""
+msgstr "오팔리"
 
 #: ie/ie_counties.py:32
 msgid "Roscommon"
-msgstr ""
+msgstr "로스 커먼"
 
 #: ie/ie_counties.py:33
 msgid "Sligo"
-msgstr ""
+msgstr "슬라이고"
 
 #: ie/ie_counties.py:34
 msgid "Tipperary"
-msgstr ""
+msgstr "Tipperary"
 
 #: ie/ie_counties.py:35
 msgid "Tyrone"
-msgstr ""
+msgstr "Tyrone"
 
 #: ie/ie_counties.py:36
 msgid "Waterford"
-msgstr ""
+msgstr "워터 포드"
 
 #: ie/ie_counties.py:37
 msgid "Westmeath"
-msgstr ""
+msgstr "Westmeath"
 
 #: ie/ie_counties.py:38
 msgid "Wexford"
-msgstr ""
+msgstr "웩스포드"
 
 #: ie/ie_counties.py:39
 msgid "Wicklow"
-msgstr ""
+msgstr "위클로"
 
 #: il/forms.py:31
 msgid "Enter a postal code in the format XXXXX"
-msgstr ""
+msgstr "XXXXX형식의 우편 번호를 입력하세요."
 
 #: il/forms.py:50
 msgid "Enter a valid ID number."
-msgstr ""
+msgstr "올바른 ID 번호를 입력하세요."
 
 #: in_/forms.py:15
 msgid "Enter a zip code in the format XXXXXXX."
@@ -1734,7 +1737,7 @@ msgstr "올바른 스웨덴 주민번호를 입력하세요."
 
 #: se/forms.py:108
 msgid "Co-ordination numbers are not allowed."
-msgstr ""
+msgstr "조율 번호는 사용할 수 없습니다."
 
 #: se/forms.py:150
 msgid "Enter a Swedish postal code in the format XXXXX."
@@ -1742,87 +1745,87 @@ msgstr "올바른 스웨덴 우편번호를 입력하세요. (XXXXX 형식)"
 
 #: se/se_counties.py:15
 msgid "Stockholm"
-msgstr ""
+msgstr "스톡홀름"
 
 #: se/se_counties.py:16
 msgid "Västerbotten"
-msgstr ""
+msgstr "Västerbotten"
 
 #: se/se_counties.py:17
 msgid "Norrbotten"
-msgstr ""
+msgstr "노르보텐"
 
 #: se/se_counties.py:18
 msgid "Uppsala"
-msgstr ""
+msgstr "웁살라"
 
 #: se/se_counties.py:19
 msgid "Södermanland"
-msgstr ""
+msgstr "Södermanland"
 
 #: se/se_counties.py:20
 msgid "Östergötland"
-msgstr ""
+msgstr "Östergötland"
 
 #: se/se_counties.py:21
 msgid "Jönköping"
-msgstr ""
+msgstr "Jönköping"
 
 #: se/se_counties.py:22
 msgid "Kronoberg"
-msgstr ""
+msgstr "Kronoberg"
 
 #: se/se_counties.py:23
 msgid "Kalmar"
-msgstr ""
+msgstr "칼마르"
 
 #: se/se_counties.py:24
 msgid "Gotland"
-msgstr ""
+msgstr "고틀랜드"
 
 #: se/se_counties.py:25
 msgid "Blekinge"
-msgstr ""
+msgstr "블레킹예"
 
 #: se/se_counties.py:26
 msgid "Skåne"
-msgstr ""
+msgstr "스코네"
 
 #: se/se_counties.py:27
 msgid "Halland"
-msgstr ""
+msgstr "Halland"
 
 #: se/se_counties.py:28
 msgid "Västra Götaland"
-msgstr ""
+msgstr "베스 Götaland"
 
 #: se/se_counties.py:29
 msgid "Värmland"
-msgstr ""
+msgstr "Värmland"
 
 #: se/se_counties.py:30
 msgid "Örebro"
-msgstr ""
+msgstr "외레브로"
 
 #: se/se_counties.py:31
 msgid "Västmanland"
-msgstr ""
+msgstr "Västmanland"
 
 #: se/se_counties.py:32
 msgid "Dalarna"
-msgstr ""
+msgstr "달라르나"
 
 #: se/se_counties.py:33
 msgid "Gävleborg"
-msgstr ""
+msgstr "Gävleborg"
 
 #: se/se_counties.py:34
 msgid "Västernorrland"
-msgstr ""
+msgstr "Västernorrland"
 
 #: se/se_counties.py:35
 msgid "Jämtland"
-msgstr ""
+msgstr "Jämtland"
 
 #: sk/sk_districts.py:8
 msgid "Banska Bystrica"
@@ -2174,19 +2177,19 @@ msgstr "Zilina region"
 
 #: tr/forms.py:16
 msgid "Enter a postal code in the format XXXXX."
-msgstr ""
+msgstr "XXXXX형식의 우편 번호를 입력하세요."
 
 #: tr/forms.py:37
 msgid "Phone numbers must be in 0XXX XXX XXXX format."
-msgstr ""
+msgstr "전화번호는 0XXX XXX XXXX 형식입니다."
 
 #: tr/forms.py:64
 msgid "Enter a valid Turkish Identification number."
-msgstr ""
+msgstr "올바른 터키계 ID 번호를 입력하세요."
 
 #: tr/forms.py:65
 msgid "Turkish Identification number must be 11 digits."
-msgstr ""
+msgstr "터키계 식별 번호는 11 자리 숫자입니다."
 
 #: uk/forms.py:21
 msgid "Enter a valid postcode."
@@ -2486,7 +2489,7 @@ msgstr "올바른 미국 사회보장번호를 입력하세요. (XXX-XX-XXXX 형
 
 #: us/forms.py:88
 msgid "Enter a U.S. state or territory."
-msgstr ""
+msgstr "미국 주나 지역을 입력하세요."
 
 #: us/models.py:9
 msgid "U.S. state (two uppercase letters)"
@@ -2494,7 +2497,7 @@ msgstr "미국의 주 (두개의 대문자로)"
 
 #: us/models.py:18
 msgid "U.S. postal code (two uppercase letters)"
-msgstr ""
+msgstr "미국 우편번호 (대문자 약어 2자)"
 
 #: us/models.py:27
 msgid "Phone number"

@@ -4,10 +4,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-01 00:32+0100\n"
-"PO-Revision-Date: 2011-02-22 00:10+0000\n"
-"Last-Translator: Jannis <jannis@leidel.info>\n"
-"Language-Team: English <en@li.org>\n"
+"POT-Creation-Date: 2011-03-15 13:19-0400\n"
+"PO-Revision-Date: 2011-03-06 18:54+0000\n"
+"Last-Translator: sandeepsatavlekar <sandysat@gmail.com>\n"
+"Language-Team: Hindi <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -84,15 +84,15 @@ msgstr "चार अंको की डाक संहिता भरें"
 
 #: be/be_provinces.py:5
 msgid "Antwerp"
-msgstr ""
+msgstr "एंटवर्प"
 
 #: be/be_provinces.py:6
 msgid "Brussels"
-msgstr ""
+msgstr "ब्रसेल्स"
 
 #: be/be_provinces.py:7
 msgid "East Flanders"
-msgstr ""
+msgstr "पूरब फ़्लैंडर्स"
 
 #: be/be_provinces.py:8
 msgid "Flemish Brabant"
@@ -100,7 +100,7 @@ msgstr ""
 
 #: be/be_provinces.py:9
 msgid "Hainaut"
-msgstr ""
+msgstr "हैनॉट"
 
 #: be/be_provinces.py:10
 msgid "Liege"
@@ -112,11 +112,11 @@ msgstr "लिम्बर्ग"
 
 #: be/be_provinces.py:12
 msgid "Luxembourg"
-msgstr ""
+msgstr "लक्ज़मबर्ग"
 
 #: be/be_provinces.py:13
 msgid "Namur"
-msgstr ""
+msgstr "नामुर"
 
 #: be/be_provinces.py:14
 msgid "Walloon Brabant"
@@ -124,23 +124,23 @@ msgstr ""
 
 #: be/be_provinces.py:15
 msgid "West Flanders"
-msgstr ""
+msgstr "पश्चिम फ़्लैंडर्स"
 
 #: be/be_regions.py:5
 msgid "Brussels Capital Region"
-msgstr ""
+msgstr "ब्रुसेल्स राजधानी क्षेत्र"
 
 #: be/be_regions.py:6
 msgid "Flemish Region"
-msgstr ""
+msgstr "फ्लेमिश क्षेत्र"
 
 #: be/be_regions.py:7
 msgid "Wallonia"
-msgstr ""
+msgstr "वालोनिया"
 
 #: be/forms.py:23
 msgid "Enter a valid postal code in the range and format 1XXX - 9XXX."
-msgstr ""
+msgstr "1XXX - 9XXX सीमा और प्रारूप  में एक वैध डाक कोड दर्ज करें."
 
 #: be/forms.py:46
 msgid ""
@@ -313,15 +313,15 @@ msgstr "यह चिली का RUT अमान्य है ।"
 
 #: cz/cz_regions.py:8
 msgid "Prague"
-msgstr ""
+msgstr "प्राग"
 
 #: cz/cz_regions.py:9
 msgid "Central Bohemian Region"
-msgstr ""
+msgstr "मध्य बोहेनिया क्षेत्र"
 
 #: cz/cz_regions.py:10
 msgid "South Bohemian Region"
-msgstr ""
+msgstr "दक्षिण बोहेनिया क्षेत्र"
 
 #: cz/cz_regions.py:11
 msgid "Pilsen Region"
@@ -329,27 +329,27 @@ msgstr ""
 
 #: cz/cz_regions.py:12
 msgid "Carlsbad Region"
-msgstr ""
+msgstr "Carlsbad क्षेत्र"
 
 #: cz/cz_regions.py:13
 msgid "Usti Region"
-msgstr ""
+msgstr "Usti क्षेत्र"
 
 #: cz/cz_regions.py:14
 msgid "Liberec Region"
-msgstr ""
+msgstr "Liberec क्षेत्र"
 
 #: cz/cz_regions.py:15
 msgid "Hradec Region"
-msgstr ""
+msgstr "Hradec क्षेत्र"
 
 #: cz/cz_regions.py:16
 msgid "Pardubice Region"
-msgstr ""
+msgstr "Pardubice क्षेत्र"
 
 #: cz/cz_regions.py:17
 msgid "Vysocina Region"
-msgstr ""
+msgstr "Vysocina क्षेत्र"
 
 #: cz/cz_regions.py:18
 msgid "South Moravian Region"

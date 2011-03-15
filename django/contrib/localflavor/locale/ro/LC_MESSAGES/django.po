@@ -4,16 +4,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-01 00:33+0100\n"
-"PO-Revision-Date: 2011-02-22 00:10+0000\n"
-"Last-Translator: Jannis <jannis@leidel.info>\n"
+"POT-Creation-Date: 2011-03-15 13:19-0400\n"
+"PO-Revision-Date: 2011-03-05 23:33+0000\n"
+"Last-Translator: dnx <sinednx@gmail.com>\n"
 "Language-Team: Romanian <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: ro\n"
-"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < "
-"20)) ? 1 : 2)\n"
+"Plural-Forms: nplurals=3; plural=(n==1?0:(((n%100>19)||((n%100==0)&&(n!=0)))?"
+"2:1))\n"
 
 #: ar/forms.py:28
 msgid "Enter a postal code in the format NNNN or ANNNNAAA."
@@ -37,39 +37,39 @@ msgstr "CUIT invalid."
 
 #: at/at_states.py:5
 msgid "Burgenland"
-msgstr ""
+msgstr "Burgenland"
 
 #: at/at_states.py:6
 msgid "Carinthia"
-msgstr ""
+msgstr "Carintia"
 
 #: at/at_states.py:7
 msgid "Lower Austria"
-msgstr ""
+msgstr "Austria Inferioară"
 
 #: at/at_states.py:8
 msgid "Upper Austria"
-msgstr ""
+msgstr "Austria Superioară"
 
 #: at/at_states.py:9
 msgid "Salzburg"
-msgstr ""
+msgstr "Salzburg"
 
 #: at/at_states.py:10
 msgid "Styria"
-msgstr ""
+msgstr "Styria"
 
 #: at/at_states.py:11
 msgid "Tyrol"
-msgstr ""
+msgstr "Tirol"
 
 #: at/at_states.py:12
 msgid "Vorarlberg"
-msgstr ""
+msgstr "Vorarlberg"
 
 #: at/at_states.py:13
 msgid "Vienna"
-msgstr ""
+msgstr "Viena"
 
 #: at/forms.py:22 ch/forms.py:17 no/forms.py:13
 msgid "Enter a zip code in the format XXXX."
@@ -78,6 +78,8 @@ msgstr "Introduceți un cod poștal de forma XXXX."
 #: at/forms.py:50
 msgid "Enter a valid Austrian Social Security Number in XXXX XXXXXX format."
 msgstr ""
+"Introduceţi un Număr de Securitate Socială Austriac valabil în formatul XXXX "
+"XXXXXX."
 
 #: au/forms.py:17
 msgid "Enter a 4 digit post code."
@@ -85,27 +87,27 @@ msgstr "Introduceți un cod poștal de 4 cifre."
 
 #: be/be_provinces.py:5
 msgid "Antwerp"
-msgstr ""
+msgstr "Anvers"
 
 #: be/be_provinces.py:6
 msgid "Brussels"
-msgstr ""
+msgstr "Bruxelles"
 
 #: be/be_provinces.py:7
 msgid "East Flanders"
-msgstr ""
+msgstr "Flanderul de est"
 
 #: be/be_provinces.py:8
 msgid "Flemish Brabant"
-msgstr ""
+msgstr "Flemish Brabant"
 
 #: be/be_provinces.py:9
 msgid "Hainaut"
-msgstr ""
+msgstr "Hainaut"
 
 #: be/be_provinces.py:10
 msgid "Liege"
-msgstr ""
+msgstr "Vasal"
 
 #: be/be_provinces.py:11 nl/nl_provinces.py:9
 msgid "Limburg"
@@ -113,23 +115,23 @@ msgstr "Limburg"
 
 #: be/be_provinces.py:12
 msgid "Luxembourg"
-msgstr ""
+msgstr "Luxemburg"
 
 #: be/be_provinces.py:13
 msgid "Namur"
-msgstr ""
+msgstr "Namur"
 
 #: be/be_provinces.py:14
 msgid "Walloon Brabant"
-msgstr ""
+msgstr "Walloon Brabant"
 
 #: be/be_provinces.py:15
 msgid "West Flanders"
-msgstr ""
+msgstr "Flanders de Vest"
 
 #: be/be_regions.py:5
 msgid "Brussels Capital Region"
-msgstr ""
+msgstr "Regiunea-Capitală din Bruxel"
 
 #: be/be_regions.py:6
 msgid "Flemish Region"
@@ -137,7 +139,7 @@ msgstr ""
 
 #: be/be_regions.py:7
 msgid "Wallonia"
-msgstr ""
+msgstr "Valonia"
 
 #: be/forms.py:23
 msgid "Enter a valid postal code in the range and format 1XXX - 9XXX."
@@ -149,6 +151,9 @@ msgid ""
 "04xx xx xx xx, 0x/xxx.xx.xx, 0xx/xx.xx.xx, 04xx/xx.xx.xx, 0x.xxx.xx.xx, 0xx."
 "xx.xx.xx, 04xx.xx.xx.xx, 0xxxxxxxx or 04xxxxxxxx."
 msgstr ""
+"Introduceți un număr de telefon valabil în unul din următoarele formate: 0x "
+"xxx xx xx, 0xx xx xx xx, 04xx xx xx xx, 0x/xxx.xx.xx, 0xx/xx.xx.xx, 04xx/xx."
+"xx.xx, 0x.xxx.xx.xx, 0xx.xx.xx.xx, 04xx.xx.xx.xx, 0xxxxxxxx or 04xxxxxxxx."
 
 #: br/forms.py:17
 msgid "Enter a zip code in the format XXXXX-XXX."
@@ -318,7 +323,7 @@ msgstr "RUT-ul chilean nu este valid."
 
 #: cz/cz_regions.py:8
 msgid "Prague"
-msgstr ""
+msgstr "Praga"
 
 #: cz/cz_regions.py:9
 msgid "Central Bohemian Region"
@@ -342,27 +347,27 @@ msgstr ""
 
 #: cz/cz_regions.py:14
 msgid "Liberec Region"
-msgstr ""
+msgstr "Regiunea Liberec"
 
 #: cz/cz_regions.py:15
 msgid "Hradec Region"
-msgstr ""
+msgstr "Regiunea Hradec"
 
 #: cz/cz_regions.py:16
 msgid "Pardubice Region"
-msgstr ""
+msgstr "Regiunea Pardubice"
 
 #: cz/cz_regions.py:17
 msgid "Vysocina Region"
-msgstr ""
+msgstr "Regiunea Vysočina"
 
 #: cz/cz_regions.py:18
 msgid "South Moravian Region"
-msgstr ""
+msgstr "Regiunea Moravia de Sud"
 
 #: cz/cz_regions.py:19
 msgid "Olomouc Region"
-msgstr ""
+msgstr "Regiunea Olomouc"
 
 #: cz/cz_regions.py:20
 msgid "Zlin Region"
@@ -378,7 +383,7 @@ msgstr "Introduceți un cod poștal de forma XXXXX or XXX XX."
 
 #: cz/forms.py:48
 msgid "Enter a birth number in the format XXXXXX/XXXX or XXXXXXXXXX."
-msgstr ""
+msgstr "Introduceți data de naștere în formatul XXXXXX/XXXX sau XXXXXXXXXX."
 
 #: cz/forms.py:49
 msgid "Invalid optional parameter Gender, valid values are 'f' and 'm'"
@@ -386,7 +391,7 @@ msgstr ""
 
 #: cz/forms.py:50
 msgid "Enter a valid birth number."
-msgstr ""
+msgstr "Introduceți data de nastere valabilă"
 
 #: cz/forms.py:111
 msgid "Enter a valid IC number."
@@ -781,11 +786,11 @@ msgstr "Introduceți un număr finlandez de securitate socială valid."
 
 #: fr/forms.py:31
 msgid "Phone numbers must be in 0X XX XX XX XX format."
-msgstr ""
+msgstr "Numerele de telefon trebuie să fie în formatul 0X XX XX XX XX."
 
 #: id/forms.py:28
 msgid "Enter a valid post code"
-msgstr ""
+msgstr "Introduceţi un cod poştal valabil"
 
 #: id/forms.py:68 nl/forms.py:53
 msgid "Enter a valid phone number"
@@ -869,7 +874,7 @@ msgstr ""
 
 #: id/id_choices.py:32 id/id_choices.py:61
 msgid "Lampung"
-msgstr ""
+msgstr "Lampung"
 
 #: id/id_choices.py:33 id/id_choices.py:76
 msgid "Maluku"
@@ -889,11 +894,11 @@ msgstr ""
 
 #: id/id_choices.py:37
 msgid "Papua"
-msgstr ""
+msgstr "Papua"
 
 #: id/id_choices.py:38
 msgid "Papua Barat"
-msgstr ""
+msgstr "Papua Barat"
 
 #: id/id_choices.py:39 id/id_choices.py:66
 msgid "Riau"
@@ -1193,7 +1198,7 @@ msgstr ""
 
 #: il/forms.py:31
 msgid "Enter a postal code in the format XXXXX"
-msgstr ""
+msgstr "Introduceți codul poștal în următorul format XXXXX"
 
 #: il/forms.py:50
 msgid "Enter a valid ID number."
@@ -1736,7 +1741,7 @@ msgstr ""
 
 #: ro/forms.py:200
 msgid "Enter a valid postal code in the format XXXXXX"
-msgstr ""
+msgstr "Introduceți un cod poștal valabil în formatul XXXXXX."
 
 #: se/forms.py:50
 msgid "Enter a valid Swedish organisation number."
@@ -2188,11 +2193,11 @@ msgstr "Regiunea Zilina"
 
 #: tr/forms.py:16
 msgid "Enter a postal code in the format XXXXX."
-msgstr ""
+msgstr "Introduceți codul poștal în formatul XXXXX."
 
 #: tr/forms.py:37
 msgid "Phone numbers must be in 0XXX XXX XXXX format."
-msgstr ""
+msgstr "Numărul de telefon trebuie să fie în formatul 0XXX XXX XXXX."
 
 #: tr/forms.py:64
 msgid "Enter a valid Turkish Identification number."
@@ -2492,7 +2497,7 @@ msgstr "Introduceți un cod poștal de forma XXXXX or XXXXX-XXXX."
 
 #: us/forms.py:26
 msgid "Phone numbers must be in XXX-XXX-XXXX format."
-msgstr ""
+msgstr "Numărul de telefon trebuie să fie în formatul XXX-XXX-XXXX."
 
 #: us/forms.py:55
 msgid "Enter a valid U.S. Social Security number in XXX-XX-XXXX format."

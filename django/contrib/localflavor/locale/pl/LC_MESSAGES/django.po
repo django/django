@@ -4,8 +4,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-01 00:33+0100\n"
-"PO-Revision-Date: 2011-02-22 00:10+0000\n"
+"POT-Creation-Date: 2011-03-15 13:19-0400\n"
+"PO-Revision-Date: 2011-03-04 18:43+0000\n"
 "Last-Translator: angularcircle <angular.circle@gmail.com>\n"
 "Language-Team: Polish <>\n"
 "MIME-Version: 1.0\n"
@@ -962,11 +962,11 @@ msgstr ""
 
 #: id/id_choices.py:69
 msgid "Corps Consulate"
-msgstr ""
+msgstr "Konsularne"
 
 #: id/id_choices.py:70
 msgid "Corps Diplomatic"
-msgstr ""
+msgstr "Dyplomatyczne"
 
 #: id/id_choices.py:71
 msgid "Bandung"
@@ -1745,7 +1745,7 @@ msgstr "Wpis poprawny szwedzki numer identyfikacji osobistej."
 
 #: se/forms.py:108
 msgid "Co-ordination numbers are not allowed."
-msgstr ""
+msgstr "Numery tymczasowe nie są dozwolone."
 
 #: se/forms.py:150
 msgid "Enter a Swedish postal code in the format XXXXX."
@@ -2505,7 +2505,7 @@ msgstr "Stan USA (dwie duże litery)"
 
 #: us/models.py:18
 msgid "U.S. postal code (two uppercase letters)"
-msgstr ""
+msgstr "Kod pocztowy USA (dwie duże litery)"
 
 #: us/models.py:27
 msgid "Phone number"

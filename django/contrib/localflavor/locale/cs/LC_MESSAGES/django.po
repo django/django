@@ -4,9 +4,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-01 00:32+0100\n"
-"PO-Revision-Date: 2011-02-22 00:10+0000\n"
-"Last-Translator: Jannis <jannis@leidel.info>\n"
+"POT-Creation-Date: 2011-03-15 13:18-0400\n"
+"PO-Revision-Date: 2011-03-04 18:43+0000\n"
+"Last-Translator: JirkaV <Jirka.Vejrazka@gmail.com>\n"
 "Language-Team: Czech <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -86,27 +86,27 @@ msgstr "Zadejte čtyřmístné poštovní směrovací číslo."
 
 #: be/be_provinces.py:5
 msgid "Antwerp"
-msgstr ""
+msgstr "Antverpy"
 
 #: be/be_provinces.py:6
 msgid "Brussels"
-msgstr ""
+msgstr "Brusel"
 
 #: be/be_provinces.py:7
 msgid "East Flanders"
-msgstr ""
+msgstr "Východní Flandry"
 
 #: be/be_provinces.py:8
 msgid "Flemish Brabant"
-msgstr ""
+msgstr "Vlámský Brabant"
 
 #: be/be_provinces.py:9
 msgid "Hainaut"
-msgstr ""
+msgstr "Henegavsko"
 
 #: be/be_provinces.py:10
 msgid "Liege"
-msgstr ""
+msgstr "Lutych"
 
 #: be/be_provinces.py:11 nl/nl_provinces.py:9
 msgid "Limburg"
@@ -114,35 +114,35 @@ msgstr "Limburk"
 
 #: be/be_provinces.py:12
 msgid "Luxembourg"
-msgstr ""
+msgstr "Lucembursko"
 
 #: be/be_provinces.py:13
 msgid "Namur"
-msgstr ""
+msgstr "Namur"
 
 #: be/be_provinces.py:14
 msgid "Walloon Brabant"
-msgstr ""
+msgstr "Valonský Brabant"
 
 #: be/be_provinces.py:15
 msgid "West Flanders"
-msgstr ""
+msgstr "Západní Flandry"
 
 #: be/be_regions.py:5
 msgid "Brussels Capital Region"
-msgstr ""
+msgstr "Brusel-hlavní město"
 
 #: be/be_regions.py:6
 msgid "Flemish Region"
-msgstr ""
+msgstr "Vlámský region"
 
 #: be/be_regions.py:7
 msgid "Wallonia"
-msgstr ""
+msgstr "Valonsko"
 
 #: be/forms.py:23
 msgid "Enter a valid postal code in the range and format 1XXX - 9XXX."
-msgstr ""
+msgstr "Vložte platné poštovní směrovací číslo v rozsahu a tvaru 1XXX - 9XXX."
 
 #: be/forms.py:46
 msgid ""
@@ -150,6 +150,9 @@ msgid ""
 "04xx xx xx xx, 0x/xxx.xx.xx, 0xx/xx.xx.xx, 04xx/xx.xx.xx, 0x.xxx.xx.xx, 0xx."
 "xx.xx.xx, 04xx.xx.xx.xx, 0xxxxxxxx or 04xxxxxxxx."
 msgstr ""
+"Vložte platné telefonní číslo v jednom z formátů 0x xxx xx xx, 0xx xx xx xx, "
+"04xx xx xx xx, 0x/xxx.xx.xx, 0xx/xx.xx.xx, 04xx/xx.xx.xx, 0x.xxx.xx.xx, 0xx."
+"xx.xx.xx, 04xx.xx.xx.xx, 0xxxxxxxx or 04xxxxxxxx."
 
 #: br/forms.py:17
 msgid "Enter a zip code in the format XXXXX-XXX."
@@ -797,7 +800,7 @@ msgstr "Vložte platné číslo NIK/KTP"
 
 #: id/id_choices.py:15
 msgid "Aceh"
-msgstr ""
+msgstr "Aceh"
 
 #: id/id_choices.py:16 id/id_choices.py:79
 msgid "Bali"
@@ -1189,11 +1192,11 @@ msgstr "Wicklow"
 
 #: il/forms.py:31
 msgid "Enter a postal code in the format XXXXX"
-msgstr ""
+msgstr "Zadejte poštovní směrovací číslo ve tvaru XXXXX"
 
 #: il/forms.py:50
 msgid "Enter a valid ID number."
-msgstr ""
+msgstr "Vložte platné číslo ID"
 
 #: in_/forms.py:15
 msgid "Enter a zip code in the format XXXXXXX."
@@ -2181,19 +2184,19 @@ msgstr "Žilinský kraj"
 
 #: tr/forms.py:16
 msgid "Enter a postal code in the format XXXXX."
-msgstr ""
+msgstr "Zadejte poštovní směrovací číslo ve tvaru XXXXX."
 
 #: tr/forms.py:37
 msgid "Phone numbers must be in 0XXX XXX XXXX format."
-msgstr ""
+msgstr "Telefonní čísla musí být ve formátu 0XXX XXX XXXX."
 
 #: tr/forms.py:64
 msgid "Enter a valid Turkish Identification number."
-msgstr ""
+msgstr "Vložte platné Turecké Identifikační číslo."
 
 #: tr/forms.py:65
 msgid "Turkish Identification number must be 11 digits."
-msgstr ""
+msgstr "Turecké Identifikační číslo musí obsahovat 11 číslic."
 
 #: uk/forms.py:21
 msgid "Enter a valid postcode."
@@ -2501,7 +2504,7 @@ msgstr "Stát v USA (dvě velká písmena)"
 
 #: us/models.py:18
 msgid "U.S. postal code (two uppercase letters)"
-msgstr ""
+msgstr "Poštovní směrovací číslo v USA (dvě velká písmena)"
 
 #: us/models.py:27
 msgid "Phone number"

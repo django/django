@@ -4,9 +4,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-01 00:33+0100\n"
-"PO-Revision-Date: 2011-02-22 00:10+0000\n"
-"Last-Translator: demy <michael.bashkirov@gmail.com>\n"
+"POT-Creation-Date: 2011-03-15 13:19-0400\n"
+"PO-Revision-Date: 2011-03-04 18:43+0000\n"
+"Last-Translator: dnx <sinednx@gmail.com>\n"
 "Language-Team: Russian <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -91,23 +91,23 @@ msgstr "Антверпен"
 
 #: be/be_provinces.py:6
 msgid "Brussels"
-msgstr ""
+msgstr "Брюссель"
 
 #: be/be_provinces.py:7
 msgid "East Flanders"
-msgstr ""
+msgstr "Восточная Фландрия"
 
 #: be/be_provinces.py:8
 msgid "Flemish Brabant"
-msgstr ""
+msgstr "Фламандский Брабант"
 
 #: be/be_provinces.py:9
 msgid "Hainaut"
-msgstr ""
+msgstr "Хаинаут"
 
 #: be/be_provinces.py:10
 msgid "Liege"
-msgstr ""
+msgstr "Льеж"
 
 #: be/be_provinces.py:11 nl/nl_provinces.py:9
 msgid "Limburg"
@@ -115,35 +115,36 @@ msgstr "Лимбург"
 
 #: be/be_provinces.py:12
 msgid "Luxembourg"
-msgstr ""
+msgstr "Люксембург"
 
 #: be/be_provinces.py:13
 msgid "Namur"
-msgstr ""
+msgstr "Намюр"
 
 #: be/be_provinces.py:14
 msgid "Walloon Brabant"
-msgstr ""
+msgstr "Валлонский Брабант"
 
 #: be/be_provinces.py:15
 msgid "West Flanders"
-msgstr ""
+msgstr "Западная Фландрия"
 
 #: be/be_regions.py:5
 msgid "Brussels Capital Region"
-msgstr ""
+msgstr "Брюссельская Капитальная Область"
 
 #: be/be_regions.py:6
 msgid "Flemish Region"
-msgstr ""
+msgstr "Фламандский регион"
 
 #: be/be_regions.py:7
 msgid "Wallonia"
-msgstr ""
+msgstr "Валлония"
 
 #: be/forms.py:23
 msgid "Enter a valid postal code in the range and format 1XXX - 9XXX."
 msgstr ""
+"Введите действительный почтовый индекс в диапазон и формат 1xxx - 9xxx."
 
 #: be/forms.py:46
 msgid ""
@@ -151,6 +152,9 @@ msgid ""
 "04xx xx xx xx, 0x/xxx.xx.xx, 0xx/xx.xx.xx, 04xx/xx.xx.xx, 0x.xxx.xx.xx, 0xx."
 "xx.xx.xx, 04xx.xx.xx.xx, 0xxxxxxxx or 04xxxxxxxx."
 msgstr ""
+"Введите действительный номер телефона в одном из форматов 0x хх хх ххх, 0xx "
+"хх хх хх, 04xx хх хх хх, 0x/xxx.xx.xx, 0xx/xx.xx.xx, 04xx/xx.xx.xx, 0x . xxx."
+"xx.xx, 0xx.xx.xx.xx, 04xx.xx.xx.xx, 0xxxxxxxx или 04xxxxxxxx."
 
 #: br/forms.py:17
 msgid "Enter a zip code in the format XXXXX-XXX."
@@ -804,7 +808,7 @@ msgstr "Введите правильный NIK/KTP номер"
 
 #: id/id_choices.py:15
 msgid "Aceh"
-msgstr ""
+msgstr "Ачех"
 
 #: id/id_choices.py:16 id/id_choices.py:79
 msgid "Bali"
@@ -1196,11 +1200,11 @@ msgstr "Уиклоу"
 
 #: il/forms.py:31
 msgid "Enter a postal code in the format XXXXX"
-msgstr ""
+msgstr "Введите почтовый индекс в формате XXXXX"
 
 #: il/forms.py:50
 msgid "Enter a valid ID number."
-msgstr ""
+msgstr "Введите действительный ID номер."
 
 #: in_/forms.py:15
 msgid "Enter a zip code in the format XXXXXXX."
@@ -2191,19 +2195,19 @@ msgstr "Жилинский край"
 
 #: tr/forms.py:16
 msgid "Enter a postal code in the format XXXXX."
-msgstr ""
+msgstr "Введите почтовый индекс в формате XXXXX."
 
 #: tr/forms.py:37
 msgid "Phone numbers must be in 0XXX XXX XXXX format."
-msgstr ""
+msgstr "Номера телефонов должны быть в формате 0xxx XXX XXXX."
 
 #: tr/forms.py:64
 msgid "Enter a valid Turkish Identification number."
-msgstr ""
+msgstr "Введите действительный турецкий Идентификационный номер."
 
 #: tr/forms.py:65
 msgid "Turkish Identification number must be 11 digits."
-msgstr ""
+msgstr "У турецкого Идентификационного номера должно быть 11 цифр."
 
 #: uk/forms.py:21
 msgid "Enter a valid postcode."
@@ -2512,7 +2516,7 @@ msgstr "Штат США (две заглавные буквы)"
 
 #: us/models.py:18
 msgid "U.S. postal code (two uppercase letters)"
-msgstr ""
+msgstr "Американский индекс (две заглавные буквы)"
 
 #: us/models.py:27
 msgid "Phone number"

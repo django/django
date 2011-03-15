@@ -4,9 +4,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-01 00:33+0100\n"
-"PO-Revision-Date: 2011-02-27 05:25+0000\n"
-"Last-Translator: schemacs <schemacs@gmail.com>\n"
+"POT-Creation-Date: 2011-03-15 13:20-0400\n"
+"PO-Revision-Date: 2011-03-08 14:25+0000\n"
+"Last-Translator: slene <vslene@gmail.com>\n"
 "Language-Team: Chinese (China) <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -120,7 +120,7 @@ msgstr "纳慕尔"
 
 #: be/be_provinces.py:14
 msgid "Walloon Brabant"
-msgstr ""
+msgstr "瓦隆布拉邦"
 
 #: be/be_provinces.py:15
 msgid "West Flanders"
@@ -128,11 +128,11 @@ msgstr "西佛兰德"
 
 #: be/be_regions.py:5
 msgid "Brussels Capital Region"
-msgstr ""
+msgstr "布鲁塞尔首都区域"
 
 #: be/be_regions.py:6
 msgid "Flemish Region"
-msgstr ""
+msgstr "法阑德斯地区"
 
 #: be/be_regions.py:7
 msgid "Wallonia"
@@ -319,55 +319,55 @@ msgstr "布拉格"
 
 #: cz/cz_regions.py:9
 msgid "Central Bohemian Region"
-msgstr ""
+msgstr "波希米亚中部地区"
 
 #: cz/cz_regions.py:10
 msgid "South Bohemian Region"
-msgstr ""
+msgstr "南波希米亚地区"
 
 #: cz/cz_regions.py:11
 msgid "Pilsen Region"
-msgstr ""
+msgstr "比尔森地区"
 
 #: cz/cz_regions.py:12
 msgid "Carlsbad Region"
-msgstr ""
+msgstr "卡尔斯巴德地区"
 
 #: cz/cz_regions.py:13
 msgid "Usti Region"
-msgstr ""
+msgstr "乌斯季地区"
 
 #: cz/cz_regions.py:14
 msgid "Liberec Region"
-msgstr ""
+msgstr "利贝雷茨地区"
 
 #: cz/cz_regions.py:15
 msgid "Hradec Region"
-msgstr ""
+msgstr "赫拉德茨地区"
 
 #: cz/cz_regions.py:16
 msgid "Pardubice Region"
-msgstr ""
+msgstr "帕尔杜比采地区"
 
 #: cz/cz_regions.py:17
 msgid "Vysocina Region"
-msgstr ""
+msgstr "維索基納"
 
 #: cz/cz_regions.py:18
 msgid "South Moravian Region"
-msgstr ""
+msgstr "南摩拉维亚地区"
 
 #: cz/cz_regions.py:19
 msgid "Olomouc Region"
-msgstr ""
+msgstr "奥洛穆茨地区"
 
 #: cz/cz_regions.py:20
 msgid "Zlin Region"
-msgstr ""
+msgstr "兹林地区"
 
 #: cz/cz_regions.py:21
 msgid "Moravian-Silesian Region"
-msgstr ""
+msgstr "摩拉维亚，西里西亚地区"
 
 #: cz/forms.py:28 sk/forms.py:30
 msgid "Enter a postal code in the format XXXXX or XXX XX."
@@ -892,7 +892,7 @@ msgstr "廖内群岛"
 
 #: id/id_choices.py:40 id/id_choices.py:74
 msgid "Sulawesi Barat"
-msgstr ""
+msgstr "苏拉威西巴拉"
 
 #: id/id_choices.py:41 id/id_choices.py:75
 msgid "Sulawesi Selatan"
@@ -2166,7 +2166,7 @@ msgstr "特伦钦地区"
 
 #: sk/sk_regions.py:14
 msgid "Trnava region"
-msgstr "Trnava 地区"
+msgstr "特尔纳瓦地区"
 
 #: sk/sk_regions.py:15
 msgid "Zilina region"

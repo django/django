@@ -4,9 +4,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-01 00:32+0100\n"
-"PO-Revision-Date: 2011-02-22 00:10+0000\n"
-"Last-Translator: Jannis <jannis@leidel.info>\n"
+"POT-Creation-Date: 2011-03-15 13:19-0400\n"
+"PO-Revision-Date: 2011-03-08 20:24+0000\n"
+"Last-Translator: teknico <transifex@teknico.net>\n"
 "Language-Team: Italian <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -40,7 +40,7 @@ msgstr "Burgenland"
 
 #: at/at_states.py:6
 msgid "Carinthia"
-msgstr "Carinthia"
+msgstr "Carinzia"
 
 #: at/at_states.py:7
 msgid "Lower Austria"
@@ -72,7 +72,7 @@ msgstr "Vienna"
 
 #: at/forms.py:22 ch/forms.py:17 no/forms.py:13
 msgid "Enter a zip code in the format XXXX."
-msgstr "Inserisci un codice postale nel formato XXXXX ."
+msgstr "Inserisci un codice postale nel formato XXXX ."
 
 #: at/forms.py:50
 msgid "Enter a valid Austrian Social Security Number in XXXX XXXXXX format."
@@ -86,27 +86,27 @@ msgstr "Inserisci un codice postale di 4 cifre."
 
 #: be/be_provinces.py:5
 msgid "Antwerp"
-msgstr ""
+msgstr "Anversa"
 
 #: be/be_provinces.py:6
 msgid "Brussels"
-msgstr ""
+msgstr "Bruxelles"
 
 #: be/be_provinces.py:7
 msgid "East Flanders"
-msgstr ""
+msgstr "Fiandre Orientali"
 
 #: be/be_provinces.py:8
 msgid "Flemish Brabant"
-msgstr ""
+msgstr "Brabante Fiammingo"
 
 #: be/be_provinces.py:9
 msgid "Hainaut"
-msgstr ""
+msgstr "Hainaut"
 
 #: be/be_provinces.py:10
 msgid "Liege"
-msgstr ""
+msgstr "Liegi"
 
 #: be/be_provinces.py:11 nl/nl_provinces.py:9
 msgid "Limburg"
@@ -114,35 +114,36 @@ msgstr "Limburg"
 
 #: be/be_provinces.py:12
 msgid "Luxembourg"
-msgstr ""
+msgstr "Lussemburgo"
 
 #: be/be_provinces.py:13
 msgid "Namur"
-msgstr ""
+msgstr "Namur"
 
 #: be/be_provinces.py:14
 msgid "Walloon Brabant"
-msgstr ""
+msgstr "Brabante Vallone"
 
 #: be/be_provinces.py:15
 msgid "West Flanders"
-msgstr ""
+msgstr "Fiandre Occidentali"
 
 #: be/be_regions.py:5
 msgid "Brussels Capital Region"
-msgstr ""
+msgstr "Regione di Bruxelles Capitale"
 
 #: be/be_regions.py:6
 msgid "Flemish Region"
-msgstr ""
+msgstr "Regione delle Fiandre"
 
 #: be/be_regions.py:7
 msgid "Wallonia"
-msgstr ""
+msgstr "Vallonia"
 
 #: be/forms.py:23
 msgid "Enter a valid postal code in the range and format 1XXX - 9XXX."
 msgstr ""
+"Inserisci un codice postale valido nell'intervallo e formato 1XXX - 9XXX."
 
 #: be/forms.py:46
 msgid ""
@@ -150,6 +151,9 @@ msgid ""
 "04xx xx xx xx, 0x/xxx.xx.xx, 0xx/xx.xx.xx, 04xx/xx.xx.xx, 0x.xxx.xx.xx, 0xx."
 "xx.xx.xx, 04xx.xx.xx.xx, 0xxxxxxxx or 04xxxxxxxx."
 msgstr ""
+"Inserisci un numero di telefono valido in uno dei formati 0x xx xx xxx, 0xx "
+"xx xx xx, xx xx xx 04xx, 0x/xxx.xx.xx, 0xx/xx.xx.xx, 04xx/xx.xx.xx, 0x . xxx."
+"xx.xx, 0xx.xx.xx.xx, 04xx.xx.xx.xx, 0xxxxxxxx o 04xxxxxxxx."
 
 #: br/forms.py:17
 msgid "Enter a zip code in the format XXXXX-XXX."
@@ -164,7 +168,7 @@ msgid ""
 "Select a valid brazilian state. That state is not one of the available "
 "states."
 msgstr ""
-"Scegliere uno stato brasiliano valido. Questo stato non è uno di quelli "
+"Scegli uno stato brasiliano valido. Questo stato non è uno di quelli "
 "disponibili."
 
 #: br/forms.py:90
@@ -173,7 +177,7 @@ msgstr "Numero CPF non valido."
 
 #: br/forms.py:91
 msgid "This field requires at most 11 digits or 14 characters."
-msgstr "Questo campo richiede non più di 11 cifre, o 14 caratteri."
+msgstr "Questo campo richiede non più di 11 cifre o 14 caratteri."
 
 #: br/forms.py:130
 msgid "Invalid CNPJ number."
@@ -190,8 +194,8 @@ msgstr "Inserisci un codice postale nel formato XXX XXX."
 #: ca/forms.py:96
 msgid "Enter a valid Canadian Social Insurance number in XXX-XXX-XXX format."
 msgstr ""
-"Inserisci un numero di assicurazione sociale canadese valido, nel formato "
-"XXX-XXX-XXX."
+"Inserisci un numero di Assicurazione Sociale Canadese valido nel formato XXX-"
+"XXX-XXX."
 
 #: ch/ch_states.py:5
 msgid "Aargau"
@@ -302,7 +306,7 @@ msgid ""
 "Enter a valid Swiss identity or passport card number in X1234567<0 or "
 "1234567890 format."
 msgstr ""
-"Inserisci un numero di carta d'identità o passaporto svizzeri validi, in "
+"Inserisci un numero di carta d'identità o passaporto svizzeri validi nel "
 "formato X1234567<0 o 1234567890 ."
 
 #: cl/forms.py:30
@@ -592,7 +596,7 @@ msgstr "Murcia"
 
 #: es/es_provinces.py:35
 msgid "Navarre"
-msgstr "Navarre"
+msgstr "Navarra"
 
 #: es/es_provinces.py:36
 msgid "Ourense"
@@ -600,7 +604,7 @@ msgstr "Ourense"
 
 #: es/es_provinces.py:37
 msgid "Asturias"
-msgstr "Asturias"
+msgstr "Asturie"
 
 #: es/es_provinces.py:38
 msgid "Palencia"
@@ -704,11 +708,11 @@ msgstr "Isole Canarie"
 
 #: es/es_regions.py:12
 msgid "Castile-La Mancha"
-msgstr "Castile-La Mancha"
+msgstr "Castiglia-La Mancha"
 
 #: es/es_regions.py:13
 msgid "Castile and Leon"
-msgstr "Castile and Leon"
+msgstr "Castiglia e Leon"
 
 #: es/es_regions.py:14
 msgid "Catalonia"
@@ -749,7 +753,7 @@ msgstr ""
 
 #: es/forms.py:67
 msgid "Please enter a valid NIF, NIE, or CIF."
-msgstr "Inserisci un NIF, NIE, o CIF valido."
+msgstr "Inserisci un NIF, NIE o CIF valido."
 
 #: es/forms.py:68
 msgid "Please enter a valid NIF or NIE."
@@ -804,7 +808,7 @@ msgstr "Inserisci un numero NIK/KTP valido"
 
 #: id/id_choices.py:15
 msgid "Aceh"
-msgstr ""
+msgstr "Aceh"
 
 #: id/id_choices.py:16 id/id_choices.py:79
 msgid "Bali"
@@ -1196,11 +1200,11 @@ msgstr "Wicklow"
 
 #: il/forms.py:31
 msgid "Enter a postal code in the format XXXXX"
-msgstr ""
+msgstr "Inserisci un codice postale nel formato XXXXX"
 
 #: il/forms.py:50
 msgid "Enter a valid ID number."
-msgstr ""
+msgstr "Inserisci un numero di identità valido."
 
 #: in_/forms.py:15
 msgid "Enter a zip code in the format XXXXXXX."
@@ -1223,11 +1227,11 @@ msgstr "Inserisci un codice postale valido."
 
 #: it/forms.py:44
 msgid "Enter a valid Social Security number."
-msgstr "Inserisci un numero di codice fiscale valido."
+msgstr "Inserisci un numero di Assistenza Sociale valido."
 
 #: it/forms.py:69
 msgid "Enter a valid VAT number."
-msgstr "Inserisci una partita IVA valida."
+msgstr "Inserisci un numero di partita IVA valido."
 
 #: jp/forms.py:16
 msgid "Enter a postal code in the format XXXXXXX or XXX-XXXX."
@@ -1435,7 +1439,7 @@ msgstr "Baia California"
 
 #: mx/mx_states.py:14
 msgid "Baja California Sur"
-msgstr "Baia California Sud"
+msgstr "Baia California del Sud"
 
 #: mx/mx_states.py:15
 msgid "Campeche"
@@ -1737,7 +1741,7 @@ msgstr ""
 
 #: ro/forms.py:175
 msgid "Phone numbers must be in XXXX-XXXXXX format."
-msgstr "I numeri di telefono devono essere in formato XXXX-XXXXXX."
+msgstr "I numeri di telefono devono essere nel formato XXXX-XXXXXX."
 
 #: ro/forms.py:200
 msgid "Enter a valid postal code in the format XXXXXX"
@@ -2161,7 +2165,7 @@ msgstr "Zilina"
 
 #: sk/sk_regions.py:8
 msgid "Banska Bystrica region"
-msgstr "Banska Bystrica region"
+msgstr "Regione di Banska Bystrica"
 
 #: sk/sk_regions.py:9
 msgid "Bratislava region"
@@ -2193,19 +2197,19 @@ msgstr "Regione di Zilina"
 
 #: tr/forms.py:16
 msgid "Enter a postal code in the format XXXXX."
-msgstr ""
+msgstr "Inserire un codice postale nel formato XXXXX."
 
 #: tr/forms.py:37
 msgid "Phone numbers must be in 0XXX XXX XXXX format."
-msgstr ""
+msgstr "I numeri di telefono devono essere in formato 0XXX XXX XXXX."
 
 #: tr/forms.py:64
 msgid "Enter a valid Turkish Identification number."
-msgstr ""
+msgstr "Inserisci un numero di identità turco valido."
 
 #: tr/forms.py:65
 msgid "Turkish Identification number must be 11 digits."
-msgstr ""
+msgstr "Il numero di identificazione turco deve essere di 11 cifre."
 
 #: uk/forms.py:21
 msgid "Enter a valid postcode."
@@ -2353,15 +2357,15 @@ msgstr "Warwickshire"
 
 #: uk/uk_regions.py:47
 msgid "West Midlands"
-msgstr "Midland dell'Ovest"
+msgstr "Midland Ovest"
 
 #: uk/uk_regions.py:48
 msgid "West Sussex"
-msgstr "Sussex dell'Ovest"
+msgstr "Sussex Ovest"
 
 #: uk/uk_regions.py:49
 msgid "West Yorkshire"
-msgstr "Yorkshire dell'Ovest"
+msgstr "Yorkshire Ovest"
 
 #: uk/uk_regions.py:50
 msgid "Wiltshire"
@@ -2413,7 +2417,7 @@ msgstr "Gwynedd"
 
 #: uk/uk_regions.py:68
 msgid "Mid Glamorgan"
-msgstr "Glamorgan centrale"
+msgstr "Mid Glamorgan"
 
 #: uk/uk_regions.py:69
 msgid "Powys"
@@ -2515,7 +2519,7 @@ msgstr "Stato USA (due lettere maiuscole)"
 
 #: us/models.py:18
 msgid "U.S. postal code (two uppercase letters)"
-msgstr ""
+msgstr "Codice di avviamento postale degli Stati Uniti (due lettere maiuscole)"
 
 #: us/models.py:27
 msgid "Phone number"

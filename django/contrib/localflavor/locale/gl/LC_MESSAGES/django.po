@@ -4,10 +4,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-01 00:32+0100\n"
-"PO-Revision-Date: 2011-02-22 00:10+0000\n"
-"Last-Translator: Jannis <jannis@leidel.info>\n"
-"Language-Team: English <en@li.org>\n"
+"POT-Creation-Date: 2011-03-15 13:18-0400\n"
+"PO-Revision-Date: 2011-03-15 09:43+0000\n"
+"Last-Translator: fasouto <fsoutomoure@gmail.com>\n"
+"Language-Team: Galician <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -16,7 +16,7 @@ msgstr ""
 
 #: ar/forms.py:28
 msgid "Enter a postal code in the format NNNN or ANNNNAAA."
-msgstr ""
+msgstr "Insira un código postal no formato NNNN ou ANNNNAAA."
 
 #: ar/forms.py:50 br/forms.py:92 br/forms.py:131 pe/forms.py:24 pe/forms.py:52
 msgid "This field requires only numbers."
@@ -24,7 +24,7 @@ msgstr "Este campo soamente admite números."
 
 #: ar/forms.py:51
 msgid "This field requires 7 or 8 digits."
-msgstr ""
+msgstr "Este campo require 7 ou 8 díxitos."
 
 #: ar/forms.py:80
 msgid "Enter a valid CUIT in XX-XXXXXXXX-X or XXXXXXXXXXXX format."
@@ -60,7 +60,7 @@ msgstr ""
 
 #: at/at_states.py:11
 msgid "Tyrol"
-msgstr ""
+msgstr "Tirol"
 
 #: at/at_states.py:12
 msgid "Vorarlberg"
@@ -68,7 +68,7 @@ msgstr ""
 
 #: at/at_states.py:13
 msgid "Vienna"
-msgstr ""
+msgstr "Viena"
 
 #: at/forms.py:22 ch/forms.py:17 no/forms.py:13
 msgid "Enter a zip code in the format XXXX."
@@ -76,7 +76,7 @@ msgstr "Insira un código posttal no formato XXXX."
 
 #: at/forms.py:50
 msgid "Enter a valid Austrian Social Security Number in XXXX XXXXXX format."
-msgstr ""
+msgstr "Insira un código postal Austríaco no formato XXXX XXXXXX."
 
 #: au/forms.py:17
 msgid "Enter a 4 digit post code."
@@ -88,7 +88,7 @@ msgstr ""
 
 #: be/be_provinces.py:6
 msgid "Brussels"
-msgstr ""
+msgstr "Bruxelas"
 
 #: be/be_provinces.py:7
 msgid "East Flanders"
@@ -104,7 +104,7 @@ msgstr ""
 
 #: be/be_provinces.py:10
 msgid "Liege"
-msgstr ""
+msgstr "Liège"
 
 #: be/be_provinces.py:11 nl/nl_provinces.py:9
 msgid "Limburg"
@@ -112,7 +112,7 @@ msgstr ""
 
 #: be/be_provinces.py:12
 msgid "Luxembourg"
-msgstr ""
+msgstr "Luxemburgo"
 
 #: be/be_provinces.py:13
 msgid "Namur"
@@ -140,7 +140,7 @@ msgstr ""
 
 #: be/forms.py:23
 msgid "Enter a valid postal code in the range and format 1XXX - 9XXX."
-msgstr ""
+msgstr "Insira un código postal no rango e formato 1XXX  - 9XXX."
 
 #: be/forms.py:46
 msgid ""
@@ -181,7 +181,7 @@ msgstr "Este campo require polo menos 14 díxitos."
 
 #: ca/forms.py:25
 msgid "Enter a postal code in the format XXX XXX."
-msgstr ""
+msgstr "Insira un código postal no formato XXX XXX."
 
 #: ca/forms.py:96
 msgid "Enter a valid Canadian Social Insurance number in XXX-XXX-XXX format."
@@ -313,7 +313,7 @@ msgstr ""
 
 #: cz/cz_regions.py:8
 msgid "Prague"
-msgstr ""
+msgstr "Praga"
 
 #: cz/cz_regions.py:9
 msgid "Central Bohemian Region"
@@ -325,43 +325,43 @@ msgstr ""
 
 #: cz/cz_regions.py:11
 msgid "Pilsen Region"
-msgstr ""
+msgstr "Rexión Pilsen"
 
 #: cz/cz_regions.py:12
 msgid "Carlsbad Region"
-msgstr ""
+msgstr "Rexión Carlsbad"
 
 #: cz/cz_regions.py:13
 msgid "Usti Region"
-msgstr ""
+msgstr "Rexión Usti"
 
 #: cz/cz_regions.py:14
 msgid "Liberec Region"
-msgstr ""
+msgstr "Rexión Liberec"
 
 #: cz/cz_regions.py:15
 msgid "Hradec Region"
-msgstr ""
+msgstr "Rexión Hradec"
 
 #: cz/cz_regions.py:16
 msgid "Pardubice Region"
-msgstr ""
+msgstr "Rexión Pardubice"
 
 #: cz/cz_regions.py:17
 msgid "Vysocina Region"
-msgstr ""
+msgstr "Rexión Vysocina"
 
 #: cz/cz_regions.py:18
 msgid "South Moravian Region"
-msgstr ""
+msgstr "Rexión Moravia do sur"
 
 #: cz/cz_regions.py:19
 msgid "Olomouc Region"
-msgstr ""
+msgstr "Rexión Olomouc"
 
 #: cz/cz_regions.py:20
 msgid "Zlin Region"
-msgstr ""
+msgstr "Rexión Zlin"
 
 #: cz/cz_regions.py:21
 msgid "Moravian-Silesian Region"
@@ -369,7 +369,7 @@ msgstr ""
 
 #: cz/forms.py:28 sk/forms.py:30
 msgid "Enter a postal code in the format XXXXX or XXX XX."
-msgstr ""
+msgstr "Insira un código postal no formato XXXXX ou XXX XX."
 
 #: cz/forms.py:48
 msgid "Enter a birth number in the format XXXXXX/XXXX or XXXXXXXXXX."
@@ -465,267 +465,267 @@ msgstr ""
 
 #: es/es_provinces.py:5
 msgid "Arava"
-msgstr ""
+msgstr "Álava"
 
 #: es/es_provinces.py:6
 msgid "Albacete"
-msgstr ""
+msgstr "Albacete"
 
 #: es/es_provinces.py:7
 msgid "Alacant"
-msgstr ""
+msgstr "Alicante"
 
 #: es/es_provinces.py:8
 msgid "Almeria"
-msgstr ""
+msgstr "Almería"
 
 #: es/es_provinces.py:9
 msgid "Avila"
-msgstr ""
+msgstr "Ávila"
 
 #: es/es_provinces.py:10
 msgid "Badajoz"
-msgstr ""
+msgstr "Badaxoz"
 
 #: es/es_provinces.py:11
 msgid "Illes Balears"
-msgstr ""
+msgstr "Illas Baleares"
 
 #: es/es_provinces.py:12
 msgid "Barcelona"
-msgstr ""
+msgstr "Barcelona"
 
 #: es/es_provinces.py:13
 msgid "Burgos"
-msgstr ""
+msgstr "Burgos"
 
 #: es/es_provinces.py:14
 msgid "Caceres"
-msgstr ""
+msgstr "Cáceres"
 
 #: es/es_provinces.py:15
 msgid "Cadiz"
-msgstr ""
+msgstr "Cádiz"
 
 #: es/es_provinces.py:16
 msgid "Castello"
-msgstr ""
+msgstr "Castellón"
 
 #: es/es_provinces.py:17
 msgid "Ciudad Real"
-msgstr ""
+msgstr "Cidade Real"
 
 #: es/es_provinces.py:18
 msgid "Cordoba"
-msgstr ""
+msgstr "Córdoba"
 
 #: es/es_provinces.py:19
 msgid "A Coruna"
-msgstr ""
+msgstr "A Coruña"
 
 #: es/es_provinces.py:20
 msgid "Cuenca"
-msgstr ""
+msgstr "Cuenca"
 
 #: es/es_provinces.py:21
 msgid "Girona"
-msgstr ""
+msgstr "Xirona"
 
 #: es/es_provinces.py:22
 msgid "Granada"
-msgstr ""
+msgstr "Granada"
 
 #: es/es_provinces.py:23
 msgid "Guadalajara"
-msgstr ""
+msgstr "Guadalaxara"
 
 #: es/es_provinces.py:24
 msgid "Guipuzkoa"
-msgstr ""
+msgstr "Guipúscoa"
 
 #: es/es_provinces.py:25
 msgid "Huelva"
-msgstr ""
+msgstr "Huelva"
 
 #: es/es_provinces.py:26
 msgid "Huesca"
-msgstr ""
+msgstr "Huesca"
 
 #: es/es_provinces.py:27
 msgid "Jaen"
-msgstr ""
+msgstr "Jaén"
 
 #: es/es_provinces.py:28
 msgid "Leon"
-msgstr ""
+msgstr "León"
 
 #: es/es_provinces.py:29
 msgid "Lleida"
-msgstr ""
+msgstr "Lleida"
 
 #: es/es_provinces.py:30 es/es_regions.py:17
 msgid "La Rioja"
-msgstr ""
+msgstr "A Rioxa"
 
 #: es/es_provinces.py:31
 msgid "Lugo"
-msgstr ""
+msgstr "Lugo"
 
 #: es/es_provinces.py:32 es/es_regions.py:18
 msgid "Madrid"
-msgstr ""
+msgstr "Madrid"
 
 #: es/es_provinces.py:33
 msgid "Malaga"
-msgstr ""
+msgstr "Málaga"
 
 #: es/es_provinces.py:34
 msgid "Murcia"
-msgstr ""
+msgstr "Murcia"
 
 #: es/es_provinces.py:35
 msgid "Navarre"
-msgstr ""
+msgstr "Navarra"
 
 #: es/es_provinces.py:36
 msgid "Ourense"
-msgstr ""
+msgstr "Ourense"
 
 #: es/es_provinces.py:37
 msgid "Asturias"
-msgstr ""
+msgstr "Asturias"
 
 #: es/es_provinces.py:38
 msgid "Palencia"
-msgstr ""
+msgstr "Palencia"
 
 #: es/es_provinces.py:39
 msgid "Las Palmas"
-msgstr ""
+msgstr "As Palmas"
 
 #: es/es_provinces.py:40
 msgid "Pontevedra"
-msgstr ""
+msgstr "Pontevedra"
 
 #: es/es_provinces.py:41
 msgid "Salamanca"
-msgstr ""
+msgstr "Salamanca"
 
 #: es/es_provinces.py:42
 msgid "Santa Cruz de Tenerife"
-msgstr ""
+msgstr "Santa Cruz de Tenerife"
 
 #: es/es_provinces.py:43 es/es_regions.py:11
 msgid "Cantabria"
-msgstr ""
+msgstr "Cantabria"
 
 #: es/es_provinces.py:44
 msgid "Segovia"
-msgstr ""
+msgstr "Segovia"
 
 #: es/es_provinces.py:45
 msgid "Seville"
-msgstr ""
+msgstr "Sevilla"
 
 #: es/es_provinces.py:46
 msgid "Soria"
-msgstr ""
+msgstr "Soria"
 
 #: es/es_provinces.py:47
 msgid "Tarragona"
-msgstr ""
+msgstr "Tarragona"
 
 #: es/es_provinces.py:48
 msgid "Teruel"
-msgstr ""
+msgstr "Teruel"
 
 #: es/es_provinces.py:49
 msgid "Toledo"
-msgstr ""
+msgstr "Toledo"
 
 #: es/es_provinces.py:50
 msgid "Valencia"
-msgstr ""
+msgstr "Valencia"
 
 #: es/es_provinces.py:51
 msgid "Valladolid"
-msgstr ""
+msgstr "Valladolid"
 
 #: es/es_provinces.py:52
 msgid "Bizkaia"
-msgstr ""
+msgstr "Biscaia"
 
 #: es/es_provinces.py:53
 msgid "Zamora"
-msgstr ""
+msgstr "Zamora"
 
 #: es/es_provinces.py:54
 msgid "Zaragoza"
-msgstr ""
+msgstr "Zaragoza"
 
 #: es/es_provinces.py:55
 msgid "Ceuta"
-msgstr ""
+msgstr "Ceuta"
 
 #: es/es_provinces.py:56
 msgid "Melilla"
-msgstr ""
+msgstr "Melilla"
 
 #: es/es_regions.py:5
 msgid "Andalusia"
-msgstr ""
+msgstr "Andalucía"
 
 #: es/es_regions.py:6
 msgid "Aragon"
-msgstr ""
+msgstr "Aragón"
 
 #: es/es_regions.py:7
 msgid "Principality of Asturias"
-msgstr ""
+msgstr "Principado de Asturias"
 
 #: es/es_regions.py:8
 msgid "Balearic Islands"
-msgstr ""
+msgstr "Illas Baleares"
 
 #: es/es_regions.py:9
 msgid "Basque Country"
-msgstr ""
+msgstr "País Vasco"
 
 #: es/es_regions.py:10
 msgid "Canary Islands"
-msgstr ""
+msgstr "Illas Canarias"
 
 #: es/es_regions.py:12
 msgid "Castile-La Mancha"
-msgstr ""
+msgstr "Castela-A Mancha"
 
 #: es/es_regions.py:13
 msgid "Castile and Leon"
-msgstr ""
+msgstr "Castela e León"
 
 #: es/es_regions.py:14
 msgid "Catalonia"
-msgstr ""
+msgstr "Cataluña"
 
 #: es/es_regions.py:15
 msgid "Extremadura"
-msgstr ""
+msgstr "Extremadura"
 
 #: es/es_regions.py:16
 msgid "Galicia"
-msgstr ""
+msgstr "Galicia"
 
 #: es/es_regions.py:19
 msgid "Region of Murcia"
-msgstr ""
+msgstr "Murcia"
 
 #: es/es_regions.py:20
 msgid "Foral Community of Navarre"
-msgstr ""
+msgstr "Comunidade Foral de Navarra"
 
 #: es/es_regions.py:21
 msgid "Valencian Community"
-msgstr ""
+msgstr "Comunidade Valenciana"
 
 #: es/forms.py:20
 msgid "Enter a valid postal code in the range and format 01XXX - 52XXX."
@@ -880,7 +880,7 @@ msgstr ""
 
 #: id/id_choices.py:37
 msgid "Papua"
-msgstr ""
+msgstr "Papúa"
 
 #: id/id_choices.py:38
 msgid "Papua Barat"
@@ -1064,7 +1064,7 @@ msgstr ""
 
 #: ie/ie_counties.py:10
 msgid "Carlow"
-msgstr ""
+msgstr "Carlow"
 
 #: ie/ie_counties.py:11
 msgid "Cavan"
@@ -1076,7 +1076,7 @@ msgstr ""
 
 #: ie/ie_counties.py:13
 msgid "Cork"
-msgstr ""
+msgstr "Cork"
 
 #: ie/ie_counties.py:14
 msgid "Derry"
@@ -1092,7 +1092,7 @@ msgstr ""
 
 #: ie/ie_counties.py:17
 msgid "Dublin"
-msgstr ""
+msgstr "Dublín"
 
 #: ie/ie_counties.py:18
 msgid "Fermanagh"
@@ -1100,11 +1100,11 @@ msgstr ""
 
 #: ie/ie_counties.py:19
 msgid "Galway"
-msgstr ""
+msgstr "Galway"
 
 #: ie/ie_counties.py:20
 msgid "Kerry"
-msgstr ""
+msgstr "Kerry"
 
 #: ie/ie_counties.py:21
 msgid "Kildare"
@@ -1124,7 +1124,7 @@ msgstr ""
 
 #: ie/ie_counties.py:25
 msgid "Limerick"
-msgstr ""
+msgstr "Limerick"
 
 #: ie/ie_counties.py:26
 msgid "Longford"
@@ -1168,11 +1168,11 @@ msgstr ""
 
 #: ie/ie_counties.py:36
 msgid "Waterford"
-msgstr ""
+msgstr "Waterford"
 
 #: ie/ie_counties.py:37
 msgid "Westmeath"
-msgstr ""
+msgstr "Westmeath"
 
 #: ie/ie_counties.py:38
 msgid "Wexford"
@@ -1184,7 +1184,7 @@ msgstr ""
 
 #: il/forms.py:31
 msgid "Enter a postal code in the format XXXXX"
-msgstr ""
+msgstr "Insira un código postal no formato XXXXX"
 
 #: il/forms.py:50
 msgid "Enter a valid ID number."
@@ -1192,7 +1192,7 @@ msgstr ""
 
 #: in_/forms.py:15
 msgid "Enter a zip code in the format XXXXXXX."
-msgstr ""
+msgstr "Insira un código postal no formato XXXXXXX."
 
 #: is_/forms.py:18
 msgid ""
@@ -1426,15 +1426,15 @@ msgstr ""
 
 #: mx/mx_states.py:15
 msgid "Campeche"
-msgstr ""
+msgstr "Campeche"
 
 #: mx/mx_states.py:16
 msgid "Chihuahua"
-msgstr ""
+msgstr "Chihuahua"
 
 #: mx/mx_states.py:17
 msgid "Chiapas"
-msgstr ""
+msgstr "Chiapas"
 
 #: mx/mx_states.py:18
 msgid "Coahuila"
@@ -1442,19 +1442,19 @@ msgstr ""
 
 #: mx/mx_states.py:19
 msgid "Colima"
-msgstr ""
+msgstr "Colima"
 
 #: mx/mx_states.py:20
 msgid "Distrito Federal"
-msgstr ""
+msgstr "Distrito Federal"
 
 #: mx/mx_states.py:21
 msgid "Durango"
-msgstr ""
+msgstr "Durango"
 
 #: mx/mx_states.py:22
 msgid "Guerrero"
-msgstr ""
+msgstr "Guerrero"
 
 #: mx/mx_states.py:23
 msgid "Guanajuato"
@@ -1466,7 +1466,7 @@ msgstr ""
 
 #: mx/mx_states.py:25
 msgid "Jalisco"
-msgstr ""
+msgstr "Jalisco"
 
 #: mx/mx_states.py:26
 msgid "Estado de México"
@@ -1474,7 +1474,7 @@ msgstr ""
 
 #: mx/mx_states.py:27
 msgid "Michoacán"
-msgstr ""
+msgstr "Michoacán"
 
 #: mx/mx_states.py:28
 msgid "Morelos"
@@ -1490,59 +1490,59 @@ msgstr ""
 
 #: mx/mx_states.py:31
 msgid "Oaxaca"
-msgstr ""
+msgstr "Oaxaca"
 
 #: mx/mx_states.py:32
 msgid "Puebla"
-msgstr ""
+msgstr "Puebla"
 
 #: mx/mx_states.py:33
 msgid "Querétaro"
-msgstr ""
+msgstr "Querétaro"
 
 #: mx/mx_states.py:34
 msgid "Quintana Roo"
-msgstr ""
+msgstr "Quintana Roo"
 
 #: mx/mx_states.py:35
 msgid "Sinaloa"
-msgstr ""
+msgstr "Sinaloa"
 
 #: mx/mx_states.py:36
 msgid "San Luis Potosí"
-msgstr ""
+msgstr "San Luis Potosí"
 
 #: mx/mx_states.py:37
 msgid "Sonora"
-msgstr ""
+msgstr "Sonora"
 
 #: mx/mx_states.py:38
 msgid "Tabasco"
-msgstr ""
+msgstr "Tabasco"
 
 #: mx/mx_states.py:39
 msgid "Tamaulipas"
-msgstr ""
+msgstr "Tamaulipas"
 
 #: mx/mx_states.py:40
 msgid "Tlaxcala"
-msgstr ""
+msgstr "Tlaxcala"
 
 #: mx/mx_states.py:41
 msgid "Veracruz"
-msgstr ""
+msgstr "Veracruz"
 
 #: mx/mx_states.py:42
 msgid "Yucatán"
-msgstr ""
+msgstr "Iucatán"
 
 #: mx/mx_states.py:43
 msgid "Zacatecas"
-msgstr ""
+msgstr "Zacatecas"
 
 #: nl/forms.py:22
 msgid "Enter a valid postal code"
-msgstr ""
+msgstr "Insira un código postal válido"
 
 #: nl/forms.py:79
 msgid "Enter a valid SoFi number"
@@ -1631,7 +1631,7 @@ msgstr ""
 
 #: pl/forms.py:155
 msgid "Enter a postal code in the format XX-XXX."
-msgstr ""
+msgstr "Insira un código postal no formato XX-XXX."
 
 #: pl/pl_voivodeships.py:8
 msgid "Lower Silesia"
@@ -1643,7 +1643,7 @@ msgstr ""
 
 #: pl/pl_voivodeships.py:10
 msgid "Lublin"
-msgstr ""
+msgstr "Lublin"
 
 #: pl/pl_voivodeships.py:11
 msgid "Lubusz"
@@ -1651,7 +1651,7 @@ msgstr ""
 
 #: pl/pl_voivodeships.py:12
 msgid "Lodz"
-msgstr ""
+msgstr "Lodz"
 
 #: pl/pl_voivodeships.py:13
 msgid "Lesser Poland"
@@ -1699,7 +1699,7 @@ msgstr ""
 
 #: pt/forms.py:17
 msgid "Enter a zip code in the format XXXX-XXX."
-msgstr ""
+msgstr "Insira un código postal no formato XXXX-XXX."
 
 #: pt/forms.py:37
 msgid "Phone numbers must have 9 digits, or start by + or 00."
@@ -1723,7 +1723,7 @@ msgstr ""
 
 #: ro/forms.py:200
 msgid "Enter a valid postal code in the format XXXXXX"
-msgstr ""
+msgstr "Insira un código postal no formato XXXXXX"
 
 #: se/forms.py:50
 msgid "Enter a valid Swedish organisation number."
@@ -1739,11 +1739,11 @@ msgstr ""
 
 #: se/forms.py:150
 msgid "Enter a Swedish postal code in the format XXXXX."
-msgstr ""
+msgstr "Insira un código postal Sueco no formato XXXXX-XXX."
 
 #: se/se_counties.py:15
 msgid "Stockholm"
-msgstr ""
+msgstr "Estocolmo"
 
 #: se/se_counties.py:16
 msgid "Västerbotten"
@@ -1771,7 +1771,7 @@ msgstr ""
 
 #: se/se_counties.py:22
 msgid "Kronoberg"
-msgstr ""
+msgstr "Kronoberg"
 
 #: se/se_counties.py:23
 msgid "Kalmar"
@@ -1803,7 +1803,7 @@ msgstr ""
 
 #: se/se_counties.py:30
 msgid "Örebro"
-msgstr ""
+msgstr "Örebro"
 
 #: se/se_counties.py:31
 msgid "Västmanland"
@@ -1847,23 +1847,23 @@ msgstr ""
 
 #: sk/sk_districts.py:13
 msgid "Bratislava I"
-msgstr ""
+msgstr "Bratislava I"
 
 #: sk/sk_districts.py:14
 msgid "Bratislava II"
-msgstr ""
+msgstr "Bratislava II"
 
 #: sk/sk_districts.py:15
 msgid "Bratislava III"
-msgstr ""
+msgstr "Bratislava III"
 
 #: sk/sk_districts.py:16
 msgid "Bratislava IV"
-msgstr ""
+msgstr "Bratislava IV"
 
 #: sk/sk_districts.py:17
 msgid "Bratislava V"
-msgstr ""
+msgstr "Bratislava V"
 
 #: sk/sk_districts.py:18
 msgid "Bytca"
@@ -1935,7 +1935,7 @@ msgstr ""
 
 #: sk/sk_districts.py:35
 msgid "Krupina"
-msgstr ""
+msgstr "Krupina"
 
 #: sk/sk_districts.py:36
 msgid "Kysucke Nove Mesto"
@@ -2047,11 +2047,11 @@ msgstr ""
 
 #: sk/sk_districts.py:63
 msgid "Sabinov"
-msgstr ""
+msgstr "Sabinov"
 
 #: sk/sk_districts.py:64
 msgid "Senec"
-msgstr ""
+msgstr "Senec"
 
 #: sk/sk_districts.py:65
 msgid "Senica"
@@ -2059,7 +2059,7 @@ msgstr ""
 
 #: sk/sk_districts.py:66
 msgid "Skalica"
-msgstr ""
+msgstr "Skalica"
 
 #: sk/sk_districts.py:67
 msgid "Snina"
@@ -2083,11 +2083,11 @@ msgstr ""
 
 #: sk/sk_districts.py:72
 msgid "Svidnik"
-msgstr ""
+msgstr "Svidnik"
 
 #: sk/sk_districts.py:73
 msgid "Sala"
-msgstr ""
+msgstr "Sala"
 
 #: sk/sk_districts.py:74
 msgid "Topolcany"
@@ -2123,23 +2123,23 @@ msgstr ""
 
 #: sk/sk_districts.py:82
 msgid "Zlate Moravce"
-msgstr ""
+msgstr "Zlate Moravce"
 
 #: sk/sk_districts.py:83
 msgid "Zvolen"
-msgstr ""
+msgstr "Zvolen"
 
 #: sk/sk_districts.py:84
 msgid "Zarnovica"
-msgstr ""
+msgstr "Zarnovica"
 
 #: sk/sk_districts.py:85
 msgid "Ziar nad Hronom"
-msgstr ""
+msgstr "Ziar nad Hronom"
 
 #: sk/sk_districts.py:86
 msgid "Zilina"
-msgstr ""
+msgstr "Zilina"
 
 #: sk/sk_regions.py:8
 msgid "Banska Bystrica region"
@@ -2175,7 +2175,7 @@ msgstr ""
 
 #: tr/forms.py:16
 msgid "Enter a postal code in the format XXXXX."
-msgstr ""
+msgstr "Insira un código postal válido no formato XXXXX."
 
 #: tr/forms.py:37
 msgid "Phone numbers must be in 0XXX XXX XXXX format."
@@ -2191,19 +2191,19 @@ msgstr ""
 
 #: uk/forms.py:21
 msgid "Enter a valid postcode."
-msgstr ""
+msgstr "Insira un código postal válido."
 
 #: uk/uk_regions.py:11
 msgid "Bedfordshire"
-msgstr ""
+msgstr "Bedfordshire"
 
 #: uk/uk_regions.py:12
 msgid "Buckinghamshire"
-msgstr ""
+msgstr "Buckinghamshire"
 
 #: uk/uk_regions.py:14
 msgid "Cheshire"
-msgstr ""
+msgstr "Cheshire"
 
 #: uk/uk_regions.py:15
 msgid "Cornwall and Isles of Scilly"
@@ -2223,11 +2223,11 @@ msgstr ""
 
 #: uk/uk_regions.py:19
 msgid "Dorset"
-msgstr ""
+msgstr "Dorset"
 
 #: uk/uk_regions.py:20
 msgid "Durham"
-msgstr ""
+msgstr "Durham"
 
 #: uk/uk_regions.py:21
 msgid "East Sussex"
@@ -2235,11 +2235,11 @@ msgstr ""
 
 #: uk/uk_regions.py:22
 msgid "Essex"
-msgstr ""
+msgstr "Essex"
 
 #: uk/uk_regions.py:23
 msgid "Gloucestershire"
-msgstr ""
+msgstr "Gloucestershire"
 
 #: uk/uk_regions.py:24
 msgid "Greater London"
@@ -2251,7 +2251,7 @@ msgstr ""
 
 #: uk/uk_regions.py:26
 msgid "Hampshire"
-msgstr ""
+msgstr "Hampshire"
 
 #: uk/uk_regions.py:27
 msgid "Hertfordshire"
@@ -2259,27 +2259,27 @@ msgstr ""
 
 #: uk/uk_regions.py:28
 msgid "Kent"
-msgstr ""
+msgstr "Kent"
 
 #: uk/uk_regions.py:29
 msgid "Lancashire"
-msgstr ""
+msgstr "Lancashire"
 
 #: uk/uk_regions.py:30
 msgid "Leicestershire"
-msgstr ""
+msgstr "Leicestershire"
 
 #: uk/uk_regions.py:31
 msgid "Lincolnshire"
-msgstr ""
+msgstr "Lincolnshire"
 
 #: uk/uk_regions.py:32
 msgid "Merseyside"
-msgstr ""
+msgstr "Merseyside"
 
 #: uk/uk_regions.py:33
 msgid "Norfolk"
-msgstr ""
+msgstr "Norfolk"
 
 #: uk/uk_regions.py:34
 msgid "North Yorkshire"
@@ -2295,15 +2295,15 @@ msgstr ""
 
 #: uk/uk_regions.py:37
 msgid "Nottinghamshire"
-msgstr ""
+msgstr "Nottinghamshire"
 
 #: uk/uk_regions.py:38
 msgid "Oxfordshire"
-msgstr ""
+msgstr "Oxfordshire"
 
 #: uk/uk_regions.py:39
 msgid "Shropshire"
-msgstr ""
+msgstr "Shropshire"
 
 #: uk/uk_regions.py:40
 msgid "Somerset"
@@ -2315,15 +2315,15 @@ msgstr ""
 
 #: uk/uk_regions.py:42
 msgid "Staffordshire"
-msgstr ""
+msgstr "Staffordshire"
 
 #: uk/uk_regions.py:43
 msgid "Suffolk"
-msgstr ""
+msgstr "Suffolk"
 
 #: uk/uk_regions.py:44
 msgid "Surrey"
-msgstr ""
+msgstr "Surrey"
 
 #: uk/uk_regions.py:45
 msgid "Tyne and Wear"
@@ -2331,7 +2331,7 @@ msgstr ""
 
 #: uk/uk_regions.py:46
 msgid "Warwickshire"
-msgstr ""
+msgstr "Warwickshire"
 
 #: uk/uk_regions.py:47
 msgid "West Midlands"
@@ -2391,7 +2391,7 @@ msgstr ""
 
 #: uk/uk_regions.py:67
 msgid "Gwynedd"
-msgstr ""
+msgstr "Gwynedd"
 
 #: uk/uk_regions.py:68
 msgid "Mid Glamorgan"
@@ -2427,11 +2427,11 @@ msgstr ""
 
 #: uk/uk_regions.py:79
 msgid "Grampian"
-msgstr ""
+msgstr "Grampian"
 
 #: uk/uk_regions.py:80
 msgid "Highland"
-msgstr ""
+msgstr "Highland"
 
 #: uk/uk_regions.py:81
 msgid "Lothian"
@@ -2459,19 +2459,19 @@ msgstr ""
 
 #: uk/uk_regions.py:90
 msgid "England"
-msgstr ""
+msgstr "Inglaterra"
 
 #: uk/uk_regions.py:91
 msgid "Northern Ireland"
-msgstr ""
+msgstr "Irlanda do norte"
 
 #: uk/uk_regions.py:92
 msgid "Scotland"
-msgstr ""
+msgstr "Escocia"
 
 #: uk/uk_regions.py:93
 msgid "Wales"
-msgstr ""
+msgstr "País de Gales"
 
 #: us/forms.py:17
 msgid "Enter a zip code in the format XXXXX or XXXXX-XXXX."
@@ -2489,7 +2489,7 @@ msgstr ""
 
 #: us/forms.py:88
 msgid "Enter a U.S. state or territory."
-msgstr ""
+msgstr "Insira un estado ou territorio dos Estados Unidos."
 
 #: us/models.py:9
 msgid "U.S. state (two uppercase letters)"
@@ -2497,7 +2497,7 @@ msgstr "Estado dos Estados Unidos (dúas letras maiúsculas)"
 
 #: us/models.py:18
 msgid "U.S. postal code (two uppercase letters)"
-msgstr ""
+msgstr "Código postal dos Estados Únidos (dúas letras maiúsculas)"
 
 #: us/models.py:27
 msgid "Phone number"
@@ -2517,7 +2517,7 @@ msgstr ""
 
 #: za/forms.py:55
 msgid "Enter a valid South African postal code"
-msgstr ""
+msgstr "Insira un código postal Sudáfricano válido"
 
 #: za/za_provinces.py:4
 msgid "Eastern Cape"
@@ -2537,7 +2537,7 @@ msgstr ""
 
 #: za/za_provinces.py:8
 msgid "Limpopo"
-msgstr ""
+msgstr "Limpopo"
 
 #: za/za_provinces.py:9
 msgid "Mpumalanga"

@@ -4,10 +4,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-01 00:32+0100\n"
-"PO-Revision-Date: 2011-02-22 00:10+0000\n"
-"Last-Translator: Jannis <jannis@leidel.info>\n"
-"Language-Team: English <en@li.org>\n"
+"POT-Creation-Date: 2011-03-15 13:19-0400\n"
+"PO-Revision-Date: 2011-03-04 18:43+0000\n"
+"Last-Translator: haffi67 <haffi67@gmail.com>\n"
+"Language-Team: Icelandic <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -36,47 +36,47 @@ msgstr "Ógilt CUIT."
 
 #: at/at_states.py:5
 msgid "Burgenland"
-msgstr ""
+msgstr "Burgenland"
 
 #: at/at_states.py:6
 msgid "Carinthia"
-msgstr ""
+msgstr "Karinþía"
 
 #: at/at_states.py:7
 msgid "Lower Austria"
-msgstr ""
+msgstr "Neðra Austurríki"
 
 #: at/at_states.py:8
 msgid "Upper Austria"
-msgstr ""
+msgstr "Efra Austurríki"
 
 #: at/at_states.py:9
 msgid "Salzburg"
-msgstr ""
+msgstr "Salzburg"
 
 #: at/at_states.py:10
 msgid "Styria"
-msgstr ""
+msgstr "Styría"
 
 #: at/at_states.py:11
 msgid "Tyrol"
-msgstr ""
+msgstr "Týról"
 
 #: at/at_states.py:12
 msgid "Vorarlberg"
-msgstr ""
+msgstr "Vorarlberg"
 
 #: at/at_states.py:13
 msgid "Vienna"
-msgstr ""
+msgstr "Vín"
 
 #: at/forms.py:22 ch/forms.py:17 no/forms.py:13
 msgid "Enter a zip code in the format XXXX."
-msgstr ""
+msgstr "Sláðu inn póstnúmer á sniðinu XXXX."
 
 #: at/forms.py:50
 msgid "Enter a valid Austrian Social Security Number in XXXX XXXXXX format."
-msgstr ""
+msgstr "Sláðu inn gilda austurríska kennitölu á forminu XXXX XXXXXX."
 
 #: au/forms.py:17
 msgid "Enter a 4 digit post code."
@@ -84,63 +84,63 @@ msgstr "Sláðu inn 4 stafa póstkóða."
 
 #: be/be_provinces.py:5
 msgid "Antwerp"
-msgstr ""
+msgstr "Antwerpen"
 
 #: be/be_provinces.py:6
 msgid "Brussels"
-msgstr ""
+msgstr "Brussel"
 
 #: be/be_provinces.py:7
 msgid "East Flanders"
-msgstr ""
+msgstr "Austur flæmingjaland"
 
 #: be/be_provinces.py:8
 msgid "Flemish Brabant"
-msgstr ""
+msgstr "Flæmska Brabant"
 
 #: be/be_provinces.py:9
 msgid "Hainaut"
-msgstr ""
+msgstr "Hainaut"
 
 #: be/be_provinces.py:10
 msgid "Liege"
-msgstr ""
+msgstr "Liege"
 
 #: be/be_provinces.py:11 nl/nl_provinces.py:9
 msgid "Limburg"
-msgstr ""
+msgstr "Limaborg"
 
 #: be/be_provinces.py:12
 msgid "Luxembourg"
-msgstr ""
+msgstr "Lúxembúrg"
 
 #: be/be_provinces.py:13
 msgid "Namur"
-msgstr ""
+msgstr "Namúr"
 
 #: be/be_provinces.py:14
 msgid "Walloon Brabant"
-msgstr ""
+msgstr "Vallónska Brabant."
 
 #: be/be_provinces.py:15
 msgid "West Flanders"
-msgstr ""
+msgstr "Vestur flæmingjaland"
 
 #: be/be_regions.py:5
 msgid "Brussels Capital Region"
-msgstr ""
+msgstr "Höfuðborgarsvæðið Brussel"
 
 #: be/be_regions.py:6
 msgid "Flemish Region"
-msgstr ""
+msgstr "Flæmska svæðið"
 
 #: be/be_regions.py:7
 msgid "Wallonia"
-msgstr ""
+msgstr "Vallónía"
 
 #: be/forms.py:23
 msgid "Enter a valid postal code in the range and format 1XXX - 9XXX."
-msgstr ""
+msgstr "Sláðu inn gilt póstnúmer á sniðinu 1XXX-9XXX"
 
 #: be/forms.py:46
 msgid ""
@@ -148,6 +148,9 @@ msgid ""
 "04xx xx xx xx, 0x/xxx.xx.xx, 0xx/xx.xx.xx, 04xx/xx.xx.xx, 0x.xxx.xx.xx, 0xx."
 "xx.xx.xx, 04xx.xx.xx.xx, 0xxxxxxxx or 04xxxxxxxx."
 msgstr ""
+"Sláðu inn gilt símanúmer á einu af eftirfarandi sniðum: 0x xxx xx xx, 0xx xx "
+"xx xx, 04xx xx xx xx, 0x/xxx.xx.xx, 0xx/xx.xx.xx, 04xx/xx.xx.xx, 0x.xxx.xx."
+"xx, 0xx.xx.xx.xx, 04xx.xx.xx.xx, 0xxxxxxxx or 04xxxxxxxx."
 
 #: br/forms.py:17
 msgid "Enter a zip code in the format XXXXX-XXX."
@@ -169,11 +172,11 @@ msgstr "Ógilt CPF númer."
 
 #: br/forms.py:91
 msgid "This field requires at most 11 digits or 14 characters."
-msgstr ""
+msgstr "Í þennan reit má setja inn í mesta lagi 11 tölustafi eða 14 bókstafi."
 
 #: br/forms.py:130
 msgid "Invalid CNPJ number."
-msgstr ""
+msgstr "Ógilt CNPJ númer."
 
 #: br/forms.py:132
 msgid "This field requires at least 14 digits"
@@ -181,7 +184,7 @@ msgstr "Þessi reitur krefst að minnsta kosti 14 tölustafa."
 
 #: ca/forms.py:25
 msgid "Enter a postal code in the format XXX XXX."
-msgstr ""
+msgstr "Sláðu inn póstnúmer á sniðinu XXX XXX."
 
 #: ca/forms.py:96
 msgid "Enter a valid Canadian Social Insurance number in XXX-XXX-XXX format."

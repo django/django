@@ -4,9 +4,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-01 00:32+0100\n"
-"PO-Revision-Date: 2011-02-22 00:10+0000\n"
-"Last-Translator: Jannis <jannis@leidel.info>\n"
+"POT-Creation-Date: 2011-03-15 13:18-0400\n"
+"PO-Revision-Date: 2011-03-07 21:10+0000\n"
+"Last-Translator: madisvain <madisvain@gmail.com>\n"
 "Language-Team: Estonian <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -112,7 +112,7 @@ msgstr "Limburgi provints"
 
 #: be/be_provinces.py:12
 msgid "Luxembourg"
-msgstr ""
+msgstr "Luksenburg"
 
 #: be/be_provinces.py:13
 msgid "Namur"
@@ -140,7 +140,7 @@ msgstr ""
 
 #: be/forms.py:23
 msgid "Enter a valid postal code in the range and format 1XXX - 9XXX."
-msgstr ""
+msgstr "Sisestage kehtiv postiindeks vahemikus ja formaadis 1XXX - 9XXX."
 
 #: be/forms.py:46
 msgid ""
@@ -148,6 +148,9 @@ msgid ""
 "04xx xx xx xx, 0x/xxx.xx.xx, 0xx/xx.xx.xx, 04xx/xx.xx.xx, 0x.xxx.xx.xx, 0xx."
 "xx.xx.xx, 04xx.xx.xx.xx, 0xxxxxxxx or 04xxxxxxxx."
 msgstr ""
+"Sisestage kehtiv telefoninumber ühes järgnevatest formaatidest 0x xxx xx xx, "
+"0XX xx xx xx, 04xx xx xx xx, 0x/xxx.xx.xx, 0xx/xx.xx.xx, 04xx/xx.xx.xx, 0x . "
+"xxx.xx.xx, 0xx.xx.xx.xx, 04xx.xx.xx.xx, 0xxxxxxxx või 04xxxxxxxx."
 
 #: br/forms.py:17
 msgid "Enter a zip code in the format XXXXX-XXX."
@@ -775,11 +778,11 @@ msgstr "Sisesta korrektne Soome sotsiaalturvatunnus."
 
 #: fr/forms.py:31
 msgid "Phone numbers must be in 0X XX XX XX XX format."
-msgstr ""
+msgstr "Telefoninumbrid peavad olema 0X XX XX XX XX formaadis."
 
 #: id/forms.py:28
 msgid "Enter a valid post code"
-msgstr ""
+msgstr "Sisestage kehtiv postiindeks"
 
 #: id/forms.py:68 nl/forms.py:53
 msgid "Enter a valid phone number"
@@ -787,11 +790,11 @@ msgstr "Sisesta kehtiv telefoninumber"
 
 #: id/forms.py:107
 msgid "Enter a valid vehicle license plate number"
-msgstr ""
+msgstr "Sisestage kehtiv sõiduki numbrimärk"
 
 #: id/forms.py:170
 msgid "Enter a valid NIK/KTP number"
-msgstr ""
+msgstr "Sisestage kehtiv NIK / KTP number"
 
 #: id/id_choices.py:15
 msgid "Aceh"
@@ -799,7 +802,7 @@ msgstr ""
 
 #: id/id_choices.py:16 id/id_choices.py:79
 msgid "Bali"
-msgstr ""
+msgstr "Bali"
 
 #: id/id_choices.py:17 id/id_choices.py:51
 msgid "Banten"
@@ -2178,19 +2181,19 @@ msgstr "Žilina regioon"
 
 #: tr/forms.py:16
 msgid "Enter a postal code in the format XXXXX."
-msgstr ""
+msgstr "Sisestage postiindeks XXXXX formaadis."
 
 #: tr/forms.py:37
 msgid "Phone numbers must be in 0XXX XXX XXXX format."
-msgstr ""
+msgstr "Telefoninumbrid peavad olema 0XXX XXX XXXX formaadis."
 
 #: tr/forms.py:64
 msgid "Enter a valid Turkish Identification number."
-msgstr ""
+msgstr "Sisestage kehtiv Türgi identifitseerimisnumber."
 
 #: tr/forms.py:65
 msgid "Turkish Identification number must be 11 digits."
-msgstr ""
+msgstr "Türgi Identifitseerimisnumber peab olema 11 numbrit."
 
 #: uk/forms.py:21
 msgid "Enter a valid postcode."
@@ -2482,7 +2485,7 @@ msgstr "Sisesta postiindeks kujul XXXXX või XXXXX-XXXX."
 
 #: us/forms.py:26
 msgid "Phone numbers must be in XXX-XXX-XXXX format."
-msgstr ""
+msgstr "Telefoninumbrid peavad olema XXX-XXX-XXX formaadis."
 
 #: us/forms.py:55
 msgid "Enter a valid U.S. Social Security number in XXX-XX-XXXX format."
@@ -2490,7 +2493,7 @@ msgstr "Sisesta kehtiv U.S. Social Security number formaadis XXX-XX-XXXX."
 
 #: us/forms.py:88
 msgid "Enter a U.S. state or territory."
-msgstr ""
+msgstr "Sisestage USA osariik või piirkond."
 
 #: us/models.py:9
 msgid "U.S. state (two uppercase letters)"
@@ -2498,7 +2501,7 @@ msgstr "U.S.A. osariik (kaks suurt tähte)"
 
 #: us/models.py:18
 msgid "U.S. postal code (two uppercase letters)"
-msgstr ""
+msgstr "USA postiindeks (kaks suurtähte)"
 
 #: us/models.py:27
 msgid "Phone number"
@@ -2507,10 +2510,11 @@ msgstr "Telefoninumber"
 #: uy/forms.py:28
 msgid "Enter a valid CI number in X.XXX.XXX-X,XXXXXXX-X or XXXXXXXX format."
 msgstr ""
+"Sisestage kehtiv CI number X.XXX.XXX-X, XXXXXXX-X või XXXXXXXX formaadis."
 
 #: uy/forms.py:30
 msgid "Enter a valid CI number."
-msgstr ""
+msgstr "Sisestage kehtiv CI number."
 
 #: za/forms.py:21
 msgid "Enter a valid South African ID number"
