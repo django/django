@@ -4,9 +4,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-01 00:09+0100\n"
-"PO-Revision-Date: 2011-02-22 00:12+0000\n"
-"Last-Translator: Jannis <jannis@leidel.info>\n"
+"POT-Creation-Date: 2011-03-15 13:15-0400\n"
+"PO-Revision-Date: 2011-03-08 17:27+0000\n"
+"Last-Translator: teknico <transifex@teknico.net>\n"
 "Language-Team: Italian <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -30,6 +30,8 @@ msgid ""
 "This value must contain only letters, numbers, dots, underscores, dashes, "
 "slashes or tildes."
 msgstr ""
+"Questo valore deve contenere solo lettere, numeri, punti, underscore, "
+"trattini, barre diagonali o tilde."
 
 #: admin.py:22
 msgid "Advanced options"
@@ -49,7 +51,7 @@ msgstr "abilita commenti"
 
 #: models.py:11
 msgid "template name"
-msgstr "nome modello"
+msgstr "nome template"
 
 #: models.py:12
 msgid ""
@@ -71,8 +73,8 @@ msgstr ""
 
 #: models.py:18
 msgid "flat page"
-msgstr "pagina statica"
+msgstr "flat page"
 
 #: models.py:19
 msgid "flat pages"
-msgstr "pagine statiche"
+msgstr "flat page"
