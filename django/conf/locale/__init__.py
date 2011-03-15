@@ -95,6 +95,12 @@ LANG_INFO = {
         'name': 'Spanish Mexico',
         'name_local': u'espa\xf1ol de Mexico',
     },
+    'es-ni': {
+        'bidi': False,
+        'code': 'es-ni',
+        'name': 'Nicaraguan Spanish',
+        'name_local': u'espa\xf1ol de Nicaragua',
+    },
     'et': {
         'bidi': False,
         'code': 'et',
