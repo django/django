@@ -43,6 +43,9 @@ class ICity1(CityBase):
 class ICity2(ICity1):
     dt_time = models.DateTimeField(auto_now=True)
 
+class Invalid(models.Model):
+    point = models.PointField()
+
 # Mapping dictionaries for the models above.
 co_mapping = {'name' : 'Name',
               'state' : {'name' : 'State'}, # ForeignKey's use another mapping dictionary for the _related_ Model (State in this case).
