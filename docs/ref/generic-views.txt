@@ -62,9 +62,11 @@ which is a dictionary of the parameters captured in the URL.
 
 Given the following URL patterns::
 
-    urlpatterns = patterns('django.views.generic.simple',
-        (r'^foo/$',             'direct_to_template', {'template': 'foo_index.html'}),
-        (r'^foo/(?P<id>\d+)/$', 'direct_to_template', {'template': 'foo_detail.html'}),
+    from django.views.generic.simple import direct_to_template
+
+    urlpatterns = patterns('',
+        (r'^foo/$',             direct_to_template, {'template': 'foo_index.html'}),
+        (r'^foo/(?P<id>\d+)/$', direct_to_template, {'template': 'foo_detail.html'}),
     )
 
 ... a request to ``/foo/`` would render the template ``foo_index.html``, and a
@@ -111,29 +113,37 @@ If the given URL is ``None``, Django will return an ``HttpResponseGone`` (410).
 This example issues a permanent redirect (HTTP status code 301) from
 ``/foo/<id>/`` to ``/bar/<id>/``::
 
-    urlpatterns = patterns('django.views.generic.simple',
-        ('^foo/(?P<id>\d+)/$', 'redirect_to', {'url': '/bar/%(id)s/'}),
+    from django.views.generic.simple import redirect_to
+
+    urlpatterns = patterns('',
+        ('^foo/(?P<id>\d+)/$', redirect_to, {'url': '/bar/%(id)s/'}),
     )
 
 This example issues a non-permanent redirect (HTTP status code 302) from
 ``/foo/<id>/`` to ``/bar/<id>/``::
 
-    urlpatterns = patterns('django.views.generic.simple',
-        ('^foo/(?P<id>\d+)/$', 'redirect_to', {'url': '/bar/%(id)s/', 'permanent': False}),
+    from django.views.generic.simple import redirect_to
+
+    urlpatterns = patterns('',
+        ('^foo/(?P<id>\d+)/$', redirect_to, {'url': '/bar/%(id)s/', 'permanent': False}),
     )
 
 This example returns a 410 HTTP error for requests to ``/bar/``::
 
-    urlpatterns = patterns('django.views.generic.simple',
-        ('^bar/$', 'redirect_to', {'url': None}),
+    from django.views.generic.simple import redirect_to
+
+    urlpatterns = patterns('',
+        ('^bar/$', redirect_to, {'url': None}),
     )
 
 This example shows how ``"%"`` characters must be written in the URL in order
 to avoid confusion with Python's string formatting markers. If the redirect
 string is written as ``"%7Ejacob/"`` (with only a single ``%``), an exception would be raised::
 
-    urlpatterns = patterns('django.views.generic.simple',
-        ('^bar/$', 'redirect_to', {'url': '%%7Ejacob.'}),
+    from django.views.generic.simple import redirect_to
+
+    urlpatterns = patterns('',
+        ('^bar/$', redirect_to, {'url': '%%7Ejacob.'}),
     )
 
 Date-based generic views
