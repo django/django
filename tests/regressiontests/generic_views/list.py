@@ -46,7 +46,7 @@ class ListViewTests(TestCase):
         self.assertIs(res.context['author_list'], res.context['object_list'])
         self.assertEqual(res.context['page_obj'].number, 1)
         self.assertEqual(res.context['paginator'].num_pages, 1)
-        self.assertTrue(res.context['is_paginated'])
+        self.assertFalse(res.context['is_paginated'])
 
     def test_paginated_get_page_by_query_string(self):
         self._make_authors(100)
