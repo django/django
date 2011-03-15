@@ -605,7 +605,7 @@ Methods
           the domains www.lawrence.com, blogs.lawrence.com and
           calendars.lawrence.com. Otherwise, a cookie will only be readable by
           the domain that set it.
-        * Use ``http_only=True`` if you want to prevent client-side
+        * Use ``httponly=True`` if you want to prevent client-side
           JavaScript from having access to the cookie.
 
           HTTPOnly_ is a flag included in a Set-Cookie HTTP response
