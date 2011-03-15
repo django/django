@@ -294,7 +294,10 @@ class LayerMapping(object):
 
             if isinstance(model_field, GeometryField):
                 # Verify OGR geometry.
-                val = self.verify_geom(feat.geom, model_field)
+                try:
+                    val = self.verify_geom(feat.geom, model_field)
+                except OGRException:
+                    raise LayerMapError('Could not retrieve geometry from feature.')
             elif isinstance(model_field, models.base.ModelBase):
                 # The related _model_, not a field was passed in -- indicating
                 # another mapping for the related Model.

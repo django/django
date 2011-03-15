@@ -4,16 +4,19 @@ from decimal import Decimal
 from django.utils.copycompat import copy
 from django.utils.unittest import TestCase
 
-from django.contrib.gis.gdal import DataSource
+from django.contrib.gis.gdal import DataSource, OGRException
 from django.contrib.gis.tests.utils import mysql
 from django.contrib.gis.utils.layermapping import LayerMapping, LayerMapError, InvalidDecimal, MissingForeignKey
 
-from models import City, County, CountyFeat, Interstate, ICity1, ICity2, State, city_mapping, co_mapping, cofeat_mapping, inter_mapping
+from models import \
+    City, County, CountyFeat, Interstate, ICity1, ICity2, Invalid, State, \
+    city_mapping, co_mapping, cofeat_mapping, inter_mapping
 
 shp_path = os.path.realpath(os.path.join(os.path.dirname(__file__), os.pardir, 'data'))
 city_shp = os.path.join(shp_path, 'cities', 'cities.shp')
 co_shp = os.path.join(shp_path, 'counties', 'counties.shp')
 inter_shp = os.path.join(shp_path, 'interstates', 'interstates.shp')
+invalid_shp = os.path.join(shp_path, 'invalid', 'emptypoints.shp')
 
 # Dictionaries to hold what's expected in the county shapefile.
 NAMES  = ['Bexar', 'Galveston', 'Harris', 'Honolulu', 'Pueblo']
@@ -265,3 +268,10 @@ class LayerMapTest(TestCase):
 
         self.assertEqual(6, ICity1.objects.count())
         self.assertEqual(3, ICity2.objects.count())
+
+    def test07_invalid_layer(self):
+        "Tests LayerMapping on invalid geometries.  See #15378."
+        invalid_mapping = {'point': 'POINT'}
+        lm = LayerMapping(Invalid, invalid_shp, invalid_mapping,
+                          source_srs=4326)
+        lm.save(silent=True)
