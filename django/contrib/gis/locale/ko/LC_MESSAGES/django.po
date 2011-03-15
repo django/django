@@ -4,10 +4,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-01 00:19+0100\n"
-"PO-Revision-Date: 2011-02-22 00:12+0000\n"
-"Last-Translator: Jannis <jannis@leidel.info>\n"
-"Language-Team: English <en@li.org>\n"
+"POT-Creation-Date: 2011-03-15 13:17-0400\n"
+"PO-Revision-Date: 2011-03-06 03:18+0000\n"
+"Last-Translator: mixe <mixe@korea.com>\n"
+"Language-Team: Korean <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -20,31 +20,31 @@ msgstr "기본 GIS 필드. OpenGIS Specification의 Geometry type으로 매핑�
 
 #: db/models/fields.py:270
 msgid "Point"
-msgstr ""
+msgstr "위치"
 
 #: db/models/fields.py:274
 msgid "Line string"
-msgstr ""
+msgstr "한줄 문자열"
 
 #: db/models/fields.py:278
 msgid "Polygon"
-msgstr ""
+msgstr "다각형"
 
 #: db/models/fields.py:282
 msgid "Multi-point"
-msgstr ""
+msgstr "복수위치"
 
 #: db/models/fields.py:286
 msgid "Multi-line string"
-msgstr ""
+msgstr "여러줄 문자열"
 
 #: db/models/fields.py:290
 msgid "Multi polygon"
-msgstr ""
+msgstr "복수 다각형"
 
 #: db/models/fields.py:294
 msgid "Geometry collection"
-msgstr ""
+msgstr "지리적 위치 모음"
 
 #: forms/fields.py:17
 msgid "No geometry value provided."

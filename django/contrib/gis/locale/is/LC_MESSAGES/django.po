@@ -4,10 +4,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-01 00:19+0100\n"
-"PO-Revision-Date: 2011-02-22 00:12+0000\n"
-"Last-Translator: Jannis <jannis@leidel.info>\n"
-"Language-Team: English <en@li.org>\n"
+"POT-Creation-Date: 2011-03-15 13:16-0400\n"
+"PO-Revision-Date: 2011-03-04 18:46+0000\n"
+"Last-Translator: haffi67 <haffi67@gmail.com>\n"
+"Language-Team: Icelandic <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -16,35 +16,35 @@ msgstr ""
 
 #: db/models/fields.py:50
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
-msgstr ""
+msgstr "Grunn GIS reitur -- varpast í OpenGIS rúmgerð."
 
 #: db/models/fields.py:270
 msgid "Point"
-msgstr ""
+msgstr "Punktur"
 
 #: db/models/fields.py:274
 msgid "Line string"
-msgstr ""
+msgstr "Lína"
 
 #: db/models/fields.py:278
 msgid "Polygon"
-msgstr ""
+msgstr "Marghyrningur"
 
 #: db/models/fields.py:282
 msgid "Multi-point"
-msgstr ""
+msgstr "Punktar"
 
 #: db/models/fields.py:286
 msgid "Multi-line string"
-msgstr ""
+msgstr "Línur"
 
 #: db/models/fields.py:290
 msgid "Multi polygon"
-msgstr ""
+msgstr "Marghyrningar"
 
 #: db/models/fields.py:294
 msgid "Geometry collection"
-msgstr ""
+msgstr "Rúmsafn"
 
 #: forms/fields.py:17
 msgid "No geometry value provided."
@@ -62,4 +62,4 @@ msgstr "Ógild rúmmálsgerð."
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."
-msgstr ""
+msgstr "Villa kom upp við að varpa rúmgildi í SRID reitsins."
