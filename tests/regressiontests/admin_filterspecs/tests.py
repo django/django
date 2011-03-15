@@ -6,7 +6,7 @@ from django.contrib import admin
 from django.contrib.admin.views.main import ChangeList
 from django.utils.encoding import force_unicode
 
-from models import Book
+from models import Book, BoolTest
 
 def select_by(dictlist, key, value):
     return [x for x in dictlist if x[key] == value][0]
@@ -25,6 +25,10 @@ class FilterSpecsTests(TestCase):
         gipsy_book = Book.objects.create(title='Gipsy guitar for dummies', year=2002)
         gipsy_book.contributors = [self.bob, lisa]
         gipsy_book.save()
+
+        # BoolTests
+        self.trueTest = BoolTest.objects.create(completed=True)
+        self.falseTest = BoolTest.objects.create(completed=False)
 
         self.request_factory = RequestFactory()
 
@@ -167,9 +171,41 @@ class FilterSpecsTests(TestCase):
         self.assertEqual(choice['selected'], True)
         self.assertEqual(choice['query_string'], '?books_contributed__id__exact=%d' % self.django_book.pk)
 
+    def test_BooleanFilterSpec(self):
+        modeladmin = BoolTestAdmin(BoolTest, admin.site)
+
+        request = self.request_factory.get('/')
+        changelist = ChangeList(request, BoolTest, modeladmin.list_display, modeladmin.list_display_links,
+            modeladmin.list_filter, modeladmin.date_hierarchy, modeladmin.search_fields,
+            modeladmin.list_select_related, modeladmin.list_per_page, modeladmin.list_editable, modeladmin)
+
+        # Make sure changelist.get_query_set() does not raise IncorrectLookupParameters
+        queryset = changelist.get_query_set()
+
+        # Make sure the last choice is None and is selected
+        filterspec = changelist.get_filters(request)[0][0]
+        self.assertEqual(force_unicode(filterspec.title()), u'completed')
+        choices = list(filterspec.choices(changelist))
+        self.assertEqual(choices[-1]['selected'], False)
+        self.assertEqual(choices[-1]['query_string'], '?completed__exact=0')
+
+        request = self.request_factory.get('/', {'completed__exact': 1})
+        changelist = self.get_changelist(request, BoolTest, modeladmin)
+
+        # Make sure the correct choice is selected
+        filterspec = changelist.get_filters(request)[0][0]
+        self.assertEqual(force_unicode(filterspec.title()), u'completed')
+        # order of choices depends on User model, which has no order
+        choice = select_by(filterspec.choices(changelist), "display", "Yes")
+        self.assertEqual(choice['selected'], True)
+        self.assertEqual(choice['query_string'], '?completed__exact=1')
+
 class CustomUserAdmin(UserAdmin):
     list_filter = ('books_authored', 'books_contributed')
 
 class BookAdmin(admin.ModelAdmin):
     list_filter = ('year', 'author', 'contributors')
     order_by = '-id'
+
+class BoolTestAdmin(admin.ModelAdmin):
+    list_filter = ('completed',)

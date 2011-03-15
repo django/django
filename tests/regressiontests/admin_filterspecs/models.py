@@ -9,3 +9,15 @@ class Book(models.Model):
 
     def __unicode__(self):
         return self.title
+
+class BoolTest(models.Model):
+    NO = False
+    YES = True
+    YES_NO_CHOICES = (
+        (NO, 'no'),
+        (YES, 'yes')
+    )
+    completed = models.BooleanField(
+        default=NO,
+        choices=YES_NO_CHOICES
+    )

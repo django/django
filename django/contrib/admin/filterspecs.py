@@ -121,6 +121,38 @@ FilterSpec.register(lambda f: (
         hasattr(f, 'rel') and bool(f.rel) or
         isinstance(f, models.related.RelatedObject)), RelatedFilterSpec)
 
+class BooleanFieldFilterSpec(FilterSpec):
+    def __init__(self, f, request, params, model, model_admin,
+                 field_path=None):
+        super(BooleanFieldFilterSpec, self).__init__(f, request, params, model,
+                                                     model_admin,
+                                                     field_path=field_path)
+        self.lookup_kwarg = '%s__exact' % self.field_path
+        self.lookup_kwarg2 = '%s__isnull' % self.field_path
+        self.lookup_val = request.GET.get(self.lookup_kwarg, None)
+        self.lookup_val2 = request.GET.get(self.lookup_kwarg2, None)
+
+    def title(self):
+        return self.field.verbose_name
+
+    def choices(self, cl):
+        for k, v in ((_('All'), None), (_('Yes'), '1'), (_('No'), '0')):
+            yield {'selected': self.lookup_val == v and not self.lookup_val2,
+                   'query_string': cl.get_query_string(
+                                   {self.lookup_kwarg: v},
+                                   [self.lookup_kwarg2]),
+                   'display': k}
+        if isinstance(self.field, models.NullBooleanField):
+            yield {'selected': self.lookup_val2 == 'True',
+                   'query_string': cl.get_query_string(
+                                   {self.lookup_kwarg2: 'True'},
+                                   [self.lookup_kwarg]),
+                   'display': _('Unknown')}
+
+FilterSpec.register(lambda f: isinstance(f, models.BooleanField)
+                              or isinstance(f, models.NullBooleanField),
+                                 BooleanFieldFilterSpec)
+
 class ChoicesFilterSpec(FilterSpec):
     def __init__(self, f, request, params, model, model_admin,
                  field_path=None):
@@ -187,37 +219,6 @@ class DateFieldFilterSpec(FilterSpec):
 FilterSpec.register(lambda f: isinstance(f, models.DateField),
                               DateFieldFilterSpec)
 
-class BooleanFieldFilterSpec(FilterSpec):
-    def __init__(self, f, request, params, model, model_admin,
-                 field_path=None):
-        super(BooleanFieldFilterSpec, self).__init__(f, request, params, model,
-                                                     model_admin,
-                                                     field_path=field_path)
-        self.lookup_kwarg = '%s__exact' % self.field_path
-        self.lookup_kwarg2 = '%s__isnull' % self.field_path
-        self.lookup_val = request.GET.get(self.lookup_kwarg, None)
-        self.lookup_val2 = request.GET.get(self.lookup_kwarg2, None)
-
-    def title(self):
-        return self.field.verbose_name
-
-    def choices(self, cl):
-        for k, v in ((_('All'), None), (_('Yes'), '1'), (_('No'), '0')):
-            yield {'selected': self.lookup_val == v and not self.lookup_val2,
-                   'query_string': cl.get_query_string(
-                                   {self.lookup_kwarg: v},
-                                   [self.lookup_kwarg2]),
-                   'display': k}
-        if isinstance(self.field, models.NullBooleanField):
-            yield {'selected': self.lookup_val2 == 'True',
-                   'query_string': cl.get_query_string(
-                                   {self.lookup_kwarg2: 'True'},
-                                   [self.lookup_kwarg]),
-                   'display': _('Unknown')}
-
-FilterSpec.register(lambda f: isinstance(f, models.BooleanField)
-                              or isinstance(f, models.NullBooleanField),
-                                 BooleanFieldFilterSpec)
 
 # This should be registered last, because it's a last resort. For example,
 # if a field is eligible to use the BooleanFieldFilterSpec, that'd be much
