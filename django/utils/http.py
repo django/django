@@ -3,6 +3,7 @@ import datetime
 import re
 import sys
 import urllib
+import urlparse
 from email.Utils import formatdate
 
 from django.utils.encoding import smart_str, force_unicode
@@ -186,3 +187,20 @@ def quote_etag(etag):
     """
     return '"%s"' % etag.replace('\\', '\\\\').replace('"', '\\"')
 
+if sys.version_info >= (2, 6):
+    def same_origin(url1, url2):
+        """
+        Checks if two URLs are 'same-origin'
+        """
+        p1, p2 = urlparse.urlparse(url1), urlparse.urlparse(url2)
+        return (p1.scheme, p1.hostname, p1.port) == (p2.scheme, p2.hostname, p2.port)
+else:
+    # Python 2.4, 2.5 compatibility. This actually works for Python 2.6 and
+    # above, but the above definition is much more obviously correct and so is
+    # preferred going forward.
+    def same_origin(url1, url2):
+        """
+        Checks if two URLs are 'same-origin'
+        """
+        p1, p2 = urlparse.urlparse(url1), urlparse.urlparse(url2)
+        return p1[0:2] == p2[0:2]
