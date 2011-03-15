@@ -4,10 +4,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-28 17:35+0100\n"
-"PO-Revision-Date: 2011-02-22 00:09+0000\n"
-"Last-Translator: Jannis <jannis@leidel.info>\n"
-"Language-Team: English <en@li.org>\n"
+"POT-Creation-Date: 2011-03-15 13:09-0400\n"
+"PO-Revision-Date: 2011-03-06 03:47+0000\n"
+"Last-Translator: mixe <mixe@korea.com>\n"
+"Language-Team: Korean <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -19,259 +19,262 @@ msgid "Arabic"
 msgstr "아랍어"
 
 #: conf/global_settings.py:45
+msgid "Azerbaijani"
+msgstr "아제르바이잔어"
+
+#: conf/global_settings.py:46
 msgid "Bulgarian"
 msgstr "불가리어"
 
-#: conf/global_settings.py:46
+#: conf/global_settings.py:47
 msgid "Bengali"
 msgstr "방글라데시어"
 
-#: conf/global_settings.py:47
+#: conf/global_settings.py:48
 msgid "Bosnian"
 msgstr "보스니아어"
 
-#: conf/global_settings.py:48
+#: conf/global_settings.py:49
 msgid "Catalan"
 msgstr "카탈로니아어"
 
-#: conf/global_settings.py:49
+#: conf/global_settings.py:50
 msgid "Czech"
 msgstr "체코어"
 
-#: conf/global_settings.py:50
+#: conf/global_settings.py:51
 msgid "Welsh"
 msgstr "웨일즈어"
 
-#: conf/global_settings.py:51
+#: conf/global_settings.py:52
 msgid "Danish"
 msgstr "덴마크어"
 
-#: conf/global_settings.py:52
+#: conf/global_settings.py:53
 msgid "German"
 msgstr "독일어"
 
-#: conf/global_settings.py:53
+#: conf/global_settings.py:54
 msgid "Greek"
 msgstr "그리스어"
 
-#: conf/global_settings.py:54
+#: conf/global_settings.py:55
 msgid "English"
 msgstr "영어"
 
-#: conf/global_settings.py:55
+#: conf/global_settings.py:56
 msgid "British English"
 msgstr "영어 (영국)"
 
-#: conf/global_settings.py:56
+#: conf/global_settings.py:57
 msgid "Spanish"
 msgstr "스페인어"
 
-#: conf/global_settings.py:57
-msgid "Argentinian Spanish"
-msgstr ""
-
 #: conf/global_settings.py:58
-#, fuzzy
-msgid "Mexican Spanish"
-msgstr "스페인어"
+msgid "Argentinian Spanish"
+msgstr "아르헨티나 스페인어"
 
 #: conf/global_settings.py:59
+msgid "Mexican Spanish"
+msgstr "멕시컨 스페인어"
+
+#: conf/global_settings.py:60
 msgid "Estonian"
 msgstr "에스토니아어"
 
-#: conf/global_settings.py:60
+#: conf/global_settings.py:61
 msgid "Basque"
 msgstr "바스크어"
 
-#: conf/global_settings.py:61
+#: conf/global_settings.py:62
 msgid "Persian"
 msgstr "페르시아어"
 
-#: conf/global_settings.py:62
+#: conf/global_settings.py:63
 msgid "Finnish"
 msgstr "핀란드어"
 
-#: conf/global_settings.py:63
+#: conf/global_settings.py:64
 msgid "French"
 msgstr "프랑스어"
 
-#: conf/global_settings.py:64
+#: conf/global_settings.py:65
 msgid "Frisian"
 msgstr "프리슬란트어"
 
-#: conf/global_settings.py:65
+#: conf/global_settings.py:66
 msgid "Irish"
 msgstr "아일랜드어"
 
-#: conf/global_settings.py:66
+#: conf/global_settings.py:67
 msgid "Galician"
 msgstr "갈리시아어"
 
-#: conf/global_settings.py:67
+#: conf/global_settings.py:68
 msgid "Hebrew"
 msgstr "히브리어"
 
-#: conf/global_settings.py:68
+#: conf/global_settings.py:69
 msgid "Hindi"
 msgstr "힌두어"
 
-#: conf/global_settings.py:69
+#: conf/global_settings.py:70
 msgid "Croatian"
 msgstr "크로아티아어"
 
-#: conf/global_settings.py:70
+#: conf/global_settings.py:71
 msgid "Hungarian"
 msgstr "헝가리어"
 
-#: conf/global_settings.py:71
+#: conf/global_settings.py:72
 msgid "Indonesian"
 msgstr "인도네시아어"
 
-#: conf/global_settings.py:72
+#: conf/global_settings.py:73
 msgid "Icelandic"
 msgstr "아이슬란드어"
 
-#: conf/global_settings.py:73
+#: conf/global_settings.py:74
 msgid "Italian"
 msgstr "이탈리아어"
 
-#: conf/global_settings.py:74
+#: conf/global_settings.py:75
 msgid "Japanese"
 msgstr "일본어"
 
-#: conf/global_settings.py:75
+#: conf/global_settings.py:76
 msgid "Georgian"
 msgstr "조지아어"
 
-#: conf/global_settings.py:76
+#: conf/global_settings.py:77
 msgid "Khmer"
 msgstr "크메르어"
 
-#: conf/global_settings.py:77
+#: conf/global_settings.py:78
 msgid "Kannada"
 msgstr "칸나다어"
 
-#: conf/global_settings.py:78
+#: conf/global_settings.py:79
 msgid "Korean"
 msgstr "한국어"
 
-#: conf/global_settings.py:79
+#: conf/global_settings.py:80
 msgid "Lithuanian"
 msgstr "리투아니아어"
 
-#: conf/global_settings.py:80
+#: conf/global_settings.py:81
 msgid "Latvian"
 msgstr "라트비아어"
 
-#: conf/global_settings.py:81
+#: conf/global_settings.py:82
 msgid "Macedonian"
 msgstr "마케도니아어"
 
-#: conf/global_settings.py:82
-msgid "Malayalam"
-msgstr ""
-
 #: conf/global_settings.py:83
+msgid "Malayalam"
+msgstr "말레이지아어"
+
+#: conf/global_settings.py:84
 msgid "Mongolian"
 msgstr "몽고어"
 
-#: conf/global_settings.py:84
+#: conf/global_settings.py:85
 msgid "Dutch"
 msgstr "네덜란드어"
 
-#: conf/global_settings.py:85
+#: conf/global_settings.py:86
 msgid "Norwegian"
 msgstr "노르웨이어"
 
-#: conf/global_settings.py:86
+#: conf/global_settings.py:87
 msgid "Norwegian Bokmal"
 msgstr "노르웨이어 (보크몰)"
 
-#: conf/global_settings.py:87
+#: conf/global_settings.py:88
 msgid "Norwegian Nynorsk"
 msgstr "노르웨이어 (뉘노르스크)"
 
-#: conf/global_settings.py:88
-msgid "Punjabi"
-msgstr ""
-
 #: conf/global_settings.py:89
+msgid "Punjabi"
+msgstr "펀자브어"
+
+#: conf/global_settings.py:90
 msgid "Polish"
 msgstr "폴란드어"
 
-#: conf/global_settings.py:90
+#: conf/global_settings.py:91
 msgid "Portuguese"
 msgstr "포르투갈어"
 
-#: conf/global_settings.py:91
+#: conf/global_settings.py:92
 msgid "Brazilian Portuguese"
 msgstr "브라질 포르투갈어"
 
-#: conf/global_settings.py:92
+#: conf/global_settings.py:93
 msgid "Romanian"
 msgstr "루마니아어"
 
-#: conf/global_settings.py:93
+#: conf/global_settings.py:94
 msgid "Russian"
 msgstr "러시아어"
 
-#: conf/global_settings.py:94
+#: conf/global_settings.py:95
 msgid "Slovak"
 msgstr "슬로바키아어"
 
-#: conf/global_settings.py:95
+#: conf/global_settings.py:96
 msgid "Slovenian"
 msgstr "슬로베니아어"
 
-#: conf/global_settings.py:96
+#: conf/global_settings.py:97
 msgid "Albanian"
 msgstr "알바니아어"
 
-#: conf/global_settings.py:97
+#: conf/global_settings.py:98
 msgid "Serbian"
 msgstr "세르비아어"
 
-#: conf/global_settings.py:98
+#: conf/global_settings.py:99
 msgid "Serbian Latin"
 msgstr "세르비아어"
 
-#: conf/global_settings.py:99
+#: conf/global_settings.py:100
 msgid "Swedish"
 msgstr "스웨덴어"
 
-#: conf/global_settings.py:100
+#: conf/global_settings.py:101
 msgid "Tamil"
 msgstr "타밀어"
 
-#: conf/global_settings.py:101
+#: conf/global_settings.py:102
 msgid "Telugu"
 msgstr "텔루구어"
 
-#: conf/global_settings.py:102
+#: conf/global_settings.py:103
 msgid "Thai"
 msgstr "태국어"
 
-#: conf/global_settings.py:103
+#: conf/global_settings.py:104
 msgid "Turkish"
 msgstr "터키어"
 
-#: conf/global_settings.py:104
+#: conf/global_settings.py:105
 msgid "Ukrainian"
 msgstr "우크라이나어"
 
-#: conf/global_settings.py:105
-msgid "Urdu"
-msgstr ""
-
 #: conf/global_settings.py:106
+msgid "Urdu"
+msgstr "우르드어"
+
+#: conf/global_settings.py:107
 msgid "Vietnamese"
 msgstr "베트남어"
 
-#: conf/global_settings.py:107
+#: conf/global_settings.py:108
 msgid "Simplified Chinese"
 msgstr "중국어 간체"
 
-#: conf/global_settings.py:108
+#: conf/global_settings.py:109
 msgid "Traditional Chinese"
 msgstr "중국어 번체"
 
@@ -350,7 +353,7 @@ msgstr ""
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(model_name)s의 %(field_label)s(은)는 이미 존재합니다."
 
-#: db/models/base.py:791 forms/models.py:560
+#: db/models/base.py:791 forms/models.py:562
 msgid "and"
 msgstr "또한"
 
@@ -566,7 +569,7 @@ msgstr ""
 
 #: forms/fields.py:464
 msgid "Please either submit a file or check the clear checkbox, not both."
-msgstr ""
+msgstr "파일을 보내거나 취소 체크박스를 체크하세요. 또는 둘다 비워두세요."
 
 #: forms/fields.py:518
 msgid ""
@@ -581,7 +584,7 @@ msgstr ""
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr "올바르게 선택해 주세요. %(value)s (이)가 선택가능항목에 없습니다."
 
-#: forms/fields.py:726 forms/fields.py:814 forms/models.py:983
+#: forms/fields.py:726 forms/fields.py:814 forms/models.py:985
 msgid "Enter a list of values."
 msgstr "리스트를 입력하세요."
 
@@ -593,17 +596,17 @@ msgstr "순서:"
 msgid "Delete"
 msgstr "삭제"
 
-#: forms/models.py:554
+#: forms/models.py:556
 #, python-format
 msgid "Please correct the duplicate data for %(field)s."
 msgstr "%(field)s의 중복된 데이터를 고쳐주세요."
 
-#: forms/models.py:558
+#: forms/models.py:560
 #, python-format
 msgid "Please correct the duplicate data for %(field)s, which must be unique."
 msgstr "%(field)s의 중복된 데이터를 고쳐주세요. 유일한 값이어야 합니다."
 
-#: forms/models.py:564
+#: forms/models.py:566
 #, python-format
 msgid ""
 "Please correct the duplicate data for %(field_name)s which must be unique "
@@ -612,31 +615,31 @@ msgstr ""
 "%(field_name)s의 값은 %(date_field)s의 %(lookup)s에 대해 유일해야 합니다. 중"
 "복된 데이터를 고쳐주세요."
 
-#: forms/models.py:572
+#: forms/models.py:574
 msgid "Please correct the duplicate values below."
 msgstr "아래의 중복된 값들을 고쳐주세요."
 
-#: forms/models.py:833
+#: forms/models.py:835
 msgid "The inline foreign key did not match the parent instance primary key."
 msgstr "부모 오브젝트의 primary key와 inline foreign key가 맞지 않습니다."
 
-#: forms/models.py:894
+#: forms/models.py:896
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "올바르게 선택해 주세요. 선택하신 것이 선택가능항목에 없습니다."
 
-#: forms/models.py:984
+#: forms/models.py:986
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "올바르게 선택해 주세요. %s (이)가 선택가능항목에 없습니다."
 
-#: forms/models.py:986
+#: forms/models.py:988
 #, python-format
 msgid "\"%s\" is not a valid value for a primary key."
 msgstr "\"%s\"은 primary key로 적합하지 않습니다."
 
 #: forms/widgets.py:299
 msgid "Currently"
-msgstr ""
+msgstr "현재"
 
 #: forms/widgets.py:300
 msgid "Change"
@@ -644,7 +647,7 @@ msgstr "변경"
 
 #: forms/widgets.py:301
 msgid "Clear"
-msgstr ""
+msgstr "취소"
 
 #: forms/widgets.py:548
 msgid "Unknown"
@@ -658,40 +661,40 @@ msgstr "예"
 msgid "No"
 msgstr "아니오"
 
-#: template/defaultfilters.py:767
+#: template/defaultfilters.py:777
 msgid "yes,no,maybe"
 msgstr "예,아니오,아마도"
 
-#: template/defaultfilters.py:795 template/defaultfilters.py:800
+#: template/defaultfilters.py:805 template/defaultfilters.py:810
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d 바이트"
 
-#: template/defaultfilters.py:802
+#: template/defaultfilters.py:812
 #, python-format
 msgid "%s KB"
-msgstr ""
+msgstr "%s KB"
 
-#: template/defaultfilters.py:804
+#: template/defaultfilters.py:814
 #, python-format
 msgid "%s MB"
-msgstr ""
+msgstr "%s MB"
 
-#: template/defaultfilters.py:806
+#: template/defaultfilters.py:816
 #, python-format
 msgid "%s GB"
-msgstr ""
+msgstr "%s GB"
 
-#: template/defaultfilters.py:808
+#: template/defaultfilters.py:818
 #, python-format
 msgid "%s TB"
-msgstr ""
+msgstr "%s TB"
 
-#: template/defaultfilters.py:809
+#: template/defaultfilters.py:819
 #, python-format
 msgid "%s PB"
-msgstr ""
+msgstr "%s PB"
 
 #: utils/dateformat.py:42
 msgid "p.m."
@@ -872,122 +875,122 @@ msgstr "12월"
 #: utils/dates.py:31
 msgctxt "abbrev. month"
 msgid "Jan."
-msgstr ""
+msgstr "1"
 
 #: utils/dates.py:32
 msgctxt "abbrev. month"
 msgid "Feb."
-msgstr ""
+msgstr "2"
 
 #: utils/dates.py:33
 msgctxt "abbrev. month"
 msgid "March"
-msgstr ""
+msgstr "3"
 
 #: utils/dates.py:34
 msgctxt "abbrev. month"
 msgid "April"
-msgstr ""
+msgstr "4"
 
 #: utils/dates.py:35
 msgctxt "abbrev. month"
 msgid "May"
-msgstr ""
+msgstr "5"
 
 #: utils/dates.py:36
 msgctxt "abbrev. month"
 msgid "June"
-msgstr ""
+msgstr "6"
 
 #: utils/dates.py:37
 msgctxt "abbrev. month"
 msgid "July"
-msgstr ""
+msgstr "7"
 
 #: utils/dates.py:38
 msgctxt "abbrev. month"
 msgid "Aug."
-msgstr ""
+msgstr "8"
 
 #: utils/dates.py:39
 msgctxt "abbrev. month"
 msgid "Sept."
-msgstr ""
+msgstr "9"
 
 #: utils/dates.py:40
 msgctxt "abbrev. month"
 msgid "Oct."
-msgstr ""
+msgstr "10"
 
 #: utils/dates.py:41
 msgctxt "abbrev. month"
 msgid "Nov."
-msgstr ""
+msgstr "11월"
 
 #: utils/dates.py:42
 msgctxt "abbrev. month"
 msgid "Dec."
-msgstr ""
+msgstr "12월"
 
 #: utils/dates.py:45
 msgctxt "alt. month"
 msgid "January"
-msgstr ""
+msgstr "1월"
 
 #: utils/dates.py:46
 msgctxt "alt. month"
 msgid "February"
-msgstr ""
+msgstr "2월"
 
 #: utils/dates.py:47
 msgctxt "alt. month"
 msgid "March"
-msgstr ""
+msgstr "3월"
 
 #: utils/dates.py:48
 msgctxt "alt. month"
 msgid "April"
-msgstr ""
+msgstr "4월"
 
 #: utils/dates.py:49
 msgctxt "alt. month"
 msgid "May"
-msgstr ""
+msgstr "5월"
 
 #: utils/dates.py:50
 msgctxt "alt. month"
 msgid "June"
-msgstr ""
+msgstr "6월"
 
 #: utils/dates.py:51
 msgctxt "alt. month"
 msgid "July"
-msgstr ""
+msgstr "7월"
 
 #: utils/dates.py:52
 msgctxt "alt. month"
 msgid "August"
-msgstr ""
+msgstr "8월"
 
 #: utils/dates.py:53
 msgctxt "alt. month"
 msgid "September"
-msgstr ""
+msgstr "9월"
 
 #: utils/dates.py:54
 msgctxt "alt. month"
 msgid "October"
-msgstr ""
+msgstr "10월"
 
 #: utils/dates.py:55
 msgctxt "alt. month"
 msgid "November"
-msgstr ""
+msgstr "11월"
 
 #: utils/dates.py:56
 msgctxt "alt. month"
 msgid "December"
-msgstr ""
+msgstr "12월"
 
 #: utils/text.py:136
 msgid "or"
@@ -996,7 +999,7 @@ msgstr "또는"
 #. Translators: This string is used as a separator between list elements
 #: utils/text.py:153
 msgid ", "
-msgstr ""
+msgstr ","
 
 #: utils/timesince.py:21
 msgid "year"
@@ -1079,24 +1082,24 @@ msgstr "%(verbose_name)s(이)가 삭제되었습니다."
 
 #: views/generic/dates.py:33
 msgid "No year specified"
-msgstr ""
+msgstr "년도가 없습니다."
 
 #: views/generic/dates.py:58
 msgid "No month specified"
-msgstr ""
+msgstr "월이 없습니다."
 
 #: views/generic/dates.py:99
 msgid "No day specified"
-msgstr ""
+msgstr "날짜가 없습니다."
 
 #: views/generic/dates.py:138
 msgid "No week specified"
-msgstr ""
+msgstr "주가 없습니다."
 
 #: views/generic/dates.py:198 views/generic/dates.py:214
-#, fuzzy, python-format
+#, python-format
 msgid "No %(verbose_name_plural)s available"
-msgstr "%(verbose_name)s(이)가 삭제되었습니다."
+msgstr " %(verbose_name_plural)s를 사용할 수 없습니다."
 
 #: views/generic/dates.py:466
 #, python-format
@@ -1104,27 +1107,29 @@ msgid ""
 "Future %(verbose_name_plural)s not available because %(class_name)s."
 "allow_future is False."
 msgstr ""
+"Future 모듈 %(verbose_name_plural)s을 사용할 수 없습니다. %(class_name)s."
+"allow_future가 False 입니다."
 
 #: views/generic/dates.py:500
 #, python-format
 msgid "Invalid date string '%(datestr)s' given format '%(format)s'"
-msgstr ""
+msgstr "날짜 문자열 '%(datestr)s'이 표준 형식 '%(format)s'과 다릅니다."
 
 #: views/generic/detail.py:51
-#, fuzzy, python-format
+#, python-format
 msgid "No %(verbose_name)s found matching the query"
-msgstr "%(verbose_name)s(이)가 수정되었습니다."
+msgstr "쿼리 결과에 %(verbose_name)s가 없습니다."
 
 #: views/generic/list.py:47
 msgid "Page is not 'last', nor can it be converted to an int."
-msgstr ""
+msgstr "'마지막' 페이지가 아니거나, 정수형으로 변환할 수 없습니다."
 
 #: views/generic/list.py:52
 #, python-format
 msgid "Invalid page (%(page_number)s)"
-msgstr ""
+msgstr "잘못된 페이지 (%(page_number)s)"
 
 #: views/generic/list.py:119
 #, python-format
 msgid "Empty list and '%(class_name)s.allow_empty' is False."
-msgstr ""
+msgstr "빈 리스트이고 '%(class_name)s.allow_empty'가 False입니다."

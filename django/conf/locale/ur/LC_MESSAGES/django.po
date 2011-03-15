@@ -4,8 +4,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-28 17:38+0100\n"
-"PO-Revision-Date: 2011-02-23 04:21+0000\n"
+"POT-Creation-Date: 2011-03-15 13:12-0400\n"
+"PO-Revision-Date: 2011-03-04 18:40+0000\n"
 "Last-Translator: Mansoorulhaq <mansoorulhaq1986@gmail.com>\n"
 "Language-Team: Urdu <None>\n"
 "MIME-Version: 1.0\n"
@@ -19,259 +19,262 @@ msgid "Arabic"
 msgstr "عربی"
 
 #: conf/global_settings.py:45
+msgid "Azerbaijani"
+msgstr ""
+
+#: conf/global_settings.py:46
 msgid "Bulgarian"
 msgstr "بلغاری"
 
-#: conf/global_settings.py:46
+#: conf/global_settings.py:47
 msgid "Bengali"
 msgstr "بنگالی"
 
-#: conf/global_settings.py:47
+#: conf/global_settings.py:48
 msgid "Bosnian"
 msgstr "بوسنیائی"
 
-#: conf/global_settings.py:48
+#: conf/global_settings.py:49
 msgid "Catalan"
 msgstr "کیٹالانی"
 
-#: conf/global_settings.py:49
+#: conf/global_settings.py:50
 msgid "Czech"
 msgstr "زیچ"
 
-#: conf/global_settings.py:50
+#: conf/global_settings.py:51
 msgid "Welsh"
 msgstr "ویلش"
 
-#: conf/global_settings.py:51
+#: conf/global_settings.py:52
 msgid "Danish"
 msgstr "ڈینش"
 
-#: conf/global_settings.py:52
+#: conf/global_settings.py:53
 msgid "German"
 msgstr "جرمن"
 
-#: conf/global_settings.py:53
+#: conf/global_settings.py:54
 msgid "Greek"
 msgstr "گریک"
 
-#: conf/global_settings.py:54
+#: conf/global_settings.py:55
 msgid "English"
 msgstr "انگلش"
 
-#: conf/global_settings.py:55
+#: conf/global_settings.py:56
 msgid "British English"
 msgstr "برطانوی انگلش"
 
-#: conf/global_settings.py:56
+#: conf/global_settings.py:57
 msgid "Spanish"
 msgstr "ھسپانوی"
 
-#: conf/global_settings.py:57
+#: conf/global_settings.py:58
 msgid "Argentinian Spanish"
 msgstr "ارجنٹائنی سپینش"
 
-#: conf/global_settings.py:58
-#, fuzzy
-msgid "Mexican Spanish"
-msgstr "ارجنٹائنی سپینش"
-
 #: conf/global_settings.py:59
+msgid "Mexican Spanish"
+msgstr ""
+
+#: conf/global_settings.py:60
 msgid "Estonian"
 msgstr "اسٹانین"
 
-#: conf/global_settings.py:60
+#: conf/global_settings.py:61
 msgid "Basque"
 msgstr "باسک"
 
-#: conf/global_settings.py:61
+#: conf/global_settings.py:62
 msgid "Persian"
 msgstr "فارسی"
 
-#: conf/global_settings.py:62
+#: conf/global_settings.py:63
 msgid "Finnish"
 msgstr "فنش"
 
-#: conf/global_settings.py:63
+#: conf/global_settings.py:64
 msgid "French"
 msgstr "فرانسیسی"
 
-#: conf/global_settings.py:64
+#: conf/global_settings.py:65
 msgid "Frisian"
 msgstr "فریسی"
 
-#: conf/global_settings.py:65
+#: conf/global_settings.py:66
 msgid "Irish"
 msgstr "آئرش"
 
-#: conf/global_settings.py:66
+#: conf/global_settings.py:67
 msgid "Galician"
 msgstr "گیلیشین"
 
-#: conf/global_settings.py:67
+#: conf/global_settings.py:68
 msgid "Hebrew"
 msgstr "عبرانی"
 
-#: conf/global_settings.py:68
+#: conf/global_settings.py:69
 msgid "Hindi"
 msgstr "ھندی"
 
-#: conf/global_settings.py:69
+#: conf/global_settings.py:70
 msgid "Croatian"
 msgstr "کروشن"
 
-#: conf/global_settings.py:70
+#: conf/global_settings.py:71
 msgid "Hungarian"
 msgstr "ھونگارین"
 
-#: conf/global_settings.py:71
+#: conf/global_settings.py:72
 msgid "Indonesian"
 msgstr "انڈونیشین"
 
-#: conf/global_settings.py:72
+#: conf/global_settings.py:73
 msgid "Icelandic"
 msgstr "آئس لینڈک"
 
-#: conf/global_settings.py:73
+#: conf/global_settings.py:74
 msgid "Italian"
 msgstr "اطالوی"
 
-#: conf/global_settings.py:74
+#: conf/global_settings.py:75
 msgid "Japanese"
 msgstr "جاپانی"
 
-#: conf/global_settings.py:75
+#: conf/global_settings.py:76
 msgid "Georgian"
 msgstr "جارجیائی"
 
-#: conf/global_settings.py:76
+#: conf/global_settings.py:77
 msgid "Khmer"
 msgstr "خمر"
 
-#: conf/global_settings.py:77
+#: conf/global_settings.py:78
 msgid "Kannada"
 msgstr "کناڈا"
 
-#: conf/global_settings.py:78
+#: conf/global_settings.py:79
 msgid "Korean"
 msgstr "کوریائی"
 
-#: conf/global_settings.py:79
+#: conf/global_settings.py:80
 msgid "Lithuanian"
 msgstr "لیتھونیائی"
 
-#: conf/global_settings.py:80
+#: conf/global_settings.py:81
 msgid "Latvian"
 msgstr "لتوینی"
 
-#: conf/global_settings.py:81
+#: conf/global_settings.py:82
 msgid "Macedonian"
 msgstr "میسیڈونین"
 
-#: conf/global_settings.py:82
+#: conf/global_settings.py:83
 msgid "Malayalam"
 msgstr "ملایالم"
 
-#: conf/global_settings.py:83
+#: conf/global_settings.py:84
 msgid "Mongolian"
 msgstr "منگولین"
 
-#: conf/global_settings.py:84
+#: conf/global_settings.py:85
 msgid "Dutch"
 msgstr "ڈچ"
 
-#: conf/global_settings.py:85
+#: conf/global_settings.py:86
 msgid "Norwegian"
 msgstr "نارویائی"
 
-#: conf/global_settings.py:86
+#: conf/global_settings.py:87
 msgid "Norwegian Bokmal"
 msgstr "نارویائی بوکمال"
 
-#: conf/global_settings.py:87
+#: conf/global_settings.py:88
 msgid "Norwegian Nynorsk"
 msgstr "نارویائی نینورسک"
 
-#: conf/global_settings.py:88
+#: conf/global_settings.py:89
 msgid "Punjabi"
 msgstr "پنجابی"
 
-#: conf/global_settings.py:89
+#: conf/global_settings.py:90
 msgid "Polish"
 msgstr "پولش"
 
-#: conf/global_settings.py:90
+#: conf/global_settings.py:91
 msgid "Portuguese"
 msgstr "پورتگیز"
 
-#: conf/global_settings.py:91
+#: conf/global_settings.py:92
 msgid "Brazilian Portuguese"
 msgstr "برازیلی پورتگیز"
 
-#: conf/global_settings.py:92
+#: conf/global_settings.py:93
 msgid "Romanian"
 msgstr "رومانی"
 
-#: conf/global_settings.py:93
+#: conf/global_settings.py:94
 msgid "Russian"
 msgstr "روسی"
 
-#: conf/global_settings.py:94
+#: conf/global_settings.py:95
 msgid "Slovak"
 msgstr "سلووک"
 
-#: conf/global_settings.py:95
+#: conf/global_settings.py:96
 msgid "Slovenian"
 msgstr "سلووینین"
 
-#: conf/global_settings.py:96
+#: conf/global_settings.py:97
 msgid "Albanian"
 msgstr "البانوی"
 
-#: conf/global_settings.py:97
+#: conf/global_settings.py:98
 msgid "Serbian"
 msgstr "سربین"
 
-#: conf/global_settings.py:98
+#: conf/global_settings.py:99
 msgid "Serbian Latin"
 msgstr "سربین لاطینی"
 
-#: conf/global_settings.py:99
+#: conf/global_settings.py:100
 msgid "Swedish"
 msgstr "سویڈش"
 
-#: conf/global_settings.py:100
+#: conf/global_settings.py:101
 msgid "Tamil"
 msgstr "تاملی"
 
-#: conf/global_settings.py:101
+#: conf/global_settings.py:102
 msgid "Telugu"
 msgstr "تیلگو"
 
-#: conf/global_settings.py:102
+#: conf/global_settings.py:103
 msgid "Thai"
 msgstr "تھائی"
 
-#: conf/global_settings.py:103
+#: conf/global_settings.py:104
 msgid "Turkish"
 msgstr "ترکش"
 
-#: conf/global_settings.py:104
+#: conf/global_settings.py:105
 msgid "Ukrainian"
 msgstr "یوکرائنی"
 
-#: conf/global_settings.py:105
+#: conf/global_settings.py:106
 msgid "Urdu"
 msgstr ""
 
-#: conf/global_settings.py:106
+#: conf/global_settings.py:107
 msgid "Vietnamese"
 msgstr "ویتنامی"
 
-#: conf/global_settings.py:107
+#: conf/global_settings.py:108
 msgid "Simplified Chinese"
 msgstr "سادی چینی"
 
-#: conf/global_settings.py:108
+#: conf/global_settings.py:109
 msgid "Traditional Chinese"
 msgstr "روایتی چینی"
 
@@ -354,7 +357,7 @@ msgstr ""
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(model_name)s اس %(field_label)s کے ساتھ پہلے ہی موجود ھے۔"
 
-#: db/models/base.py:791 forms/models.py:560
+#: db/models/base.py:791 forms/models.py:562
 msgid "and"
 msgstr "اور"
 
@@ -585,7 +588,7 @@ msgstr ""
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr "درست انتخاب منتخب کریں۔ %(value)s دستیاب انتخابات میں سے کوئی نہیں۔"
 
-#: forms/fields.py:726 forms/fields.py:814 forms/models.py:983
+#: forms/fields.py:726 forms/fields.py:814 forms/models.py:985
 msgid "Enter a list of values."
 msgstr "قیمتوں (ویلیوز) کی لسٹ درج کریں۔"
 
@@ -597,18 +600,18 @@ msgstr "ترتیب"
 msgid "Delete"
 msgstr "مٹائیں"
 
-#: forms/models.py:554
+#: forms/models.py:556
 #, python-format
 msgid "Please correct the duplicate data for %(field)s."
 msgstr "براہ کرم %(field)s کے لئے دوہرا مواد درست کریں۔"
 
-#: forms/models.py:558
+#: forms/models.py:560
 #, python-format
 msgid "Please correct the duplicate data for %(field)s, which must be unique."
 msgstr ""
 "براہ کرم %(field)s کے لئے دوہرا مواد درست کریں جوکہ منفرد ھونا ضروری ھے۔"
 
-#: forms/models.py:564
+#: forms/models.py:566
 #, python-format
 msgid ""
 "Please correct the duplicate data for %(field_name)s which must be unique "
@@ -617,24 +620,24 @@ msgstr ""
 "براہ کرم %(field_name)s میں دوہرا مواد درست کریں جو کہ %(date_field)s میں %"
 "(lookup)s کے لئے منفرد ھونا ضروری ھے۔"
 
-#: forms/models.py:572
+#: forms/models.py:574
 msgid "Please correct the duplicate values below."
 msgstr "براہ کرم نیچے دوہری قیمتیں (ویلیوز) درست کریں۔"
 
-#: forms/models.py:833
+#: forms/models.py:835
 msgid "The inline foreign key did not match the parent instance primary key."
 msgstr "ان لائن بیرونی کلید (FK) آبائی پرائمری کلید (PK) سے نھیں ملتی۔"
 
-#: forms/models.py:894
+#: forms/models.py:896
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "درست انتخاب منتخب کریں۔ یہ انتخاب دستیاب انتخابات میں سے کوئی نہیں ھے۔"
 
-#: forms/models.py:984
+#: forms/models.py:986
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "درست انتخاب منتخب کریں۔ %s دستیاب انتخابات میں سے کوئی نہیں ھے۔"
 
-#: forms/models.py:986
+#: forms/models.py:988
 #, python-format
 msgid "\"%s\" is not a valid value for a primary key."
 msgstr "\"%s\" پرائمری کلید (PK) کے لئے درست قیمت (ویلیو) نھیں ھے۔"
@@ -663,38 +666,38 @@ msgstr "ھاں"
 msgid "No"
 msgstr "نھیں"
 
-#: template/defaultfilters.py:767
+#: template/defaultfilters.py:777
 msgid "yes,no,maybe"
 msgstr "ھاں،نہیں،ھوسکتاہے"
 
-#: template/defaultfilters.py:795 template/defaultfilters.py:800
+#: template/defaultfilters.py:805 template/defaultfilters.py:810
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d بائٹ"
 msgstr[1] "%(size)d بائٹس"
 
-#: template/defaultfilters.py:802
+#: template/defaultfilters.py:812
 #, python-format
 msgid "%s KB"
 msgstr "%s ک ۔ ب"
 
-#: template/defaultfilters.py:804
+#: template/defaultfilters.py:814
 #, python-format
 msgid "%s MB"
 msgstr "%s م ۔ ب"
 
-#: template/defaultfilters.py:806
+#: template/defaultfilters.py:816
 #, python-format
 msgid "%s GB"
 msgstr "%s ج ۔ ب"
 
-#: template/defaultfilters.py:808
+#: template/defaultfilters.py:818
 #, python-format
 msgid "%s TB"
 msgstr "%s ٹ ۔ ب"
 
-#: template/defaultfilters.py:809
+#: template/defaultfilters.py:819
 #, python-format
 msgid "%s PB"
 msgstr "%s پ ۔ پ"
@@ -1106,9 +1109,9 @@ msgid "No week specified"
 msgstr ""
 
 #: views/generic/dates.py:198 views/generic/dates.py:214
-#, fuzzy, python-format
+#, python-format
 msgid "No %(verbose_name_plural)s available"
-msgstr "%(verbose_name)s مٹا دیا گیا تھا۔"
+msgstr ""
 
 #: views/generic/dates.py:466
 #, python-format
@@ -1123,9 +1126,9 @@ msgid "Invalid date string '%(datestr)s' given format '%(format)s'"
 msgstr ""
 
 #: views/generic/detail.py:51
-#, fuzzy, python-format
+#, python-format
 msgid "No %(verbose_name)s found matching the query"
-msgstr "%(verbose_name)s کامیابی سے تازہ کیا گیا تھا۔"
+msgstr ""
 
 #: views/generic/list.py:47
 msgid "Page is not 'last', nor can it be converted to an int."

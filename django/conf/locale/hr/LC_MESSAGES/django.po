@@ -4,275 +4,278 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-28 17:35+0100\n"
-"PO-Revision-Date: 2011-02-22 00:09+0000\n"
-"Last-Translator: Jannis <jannis@leidel.info>\n"
+"POT-Creation-Date: 2011-03-15 13:08-0400\n"
+"PO-Revision-Date: 2011-03-13 21:27+0000\n"
+"Last-Translator: aljosa <aljosa.mohorovic@gmail.com>\n"
 "Language-Team: Croatian <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: hr\n"
-"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
-"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%\" "
+"\"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2\n"
 
 #: conf/global_settings.py:44
 msgid "Arabic"
 msgstr "Arapski"
 
 #: conf/global_settings.py:45
+msgid "Azerbaijani"
+msgstr "Azarbejdžanac"
+
+#: conf/global_settings.py:46
 msgid "Bulgarian"
 msgstr "Bugarski"
 
-#: conf/global_settings.py:46
+#: conf/global_settings.py:47
 msgid "Bengali"
 msgstr "Bengalski"
 
-#: conf/global_settings.py:47
+#: conf/global_settings.py:48
 msgid "Bosnian"
 msgstr "Bošnjački"
 
-#: conf/global_settings.py:48
+#: conf/global_settings.py:49
 msgid "Catalan"
 msgstr "Katalanski"
 
-#: conf/global_settings.py:49
+#: conf/global_settings.py:50
 msgid "Czech"
 msgstr "Češki"
 
-#: conf/global_settings.py:50
+#: conf/global_settings.py:51
 msgid "Welsh"
 msgstr "Velški"
 
-#: conf/global_settings.py:51
+#: conf/global_settings.py:52
 msgid "Danish"
 msgstr "Danski"
 
-#: conf/global_settings.py:52
+#: conf/global_settings.py:53
 msgid "German"
 msgstr "Njemački"
 
-#: conf/global_settings.py:53
+#: conf/global_settings.py:54
 msgid "Greek"
 msgstr "Grčki"
 
-#: conf/global_settings.py:54
+#: conf/global_settings.py:55
 msgid "English"
 msgstr "Engleski"
 
-#: conf/global_settings.py:55
+#: conf/global_settings.py:56
 msgid "British English"
 msgstr "Britanski engleski"
 
-#: conf/global_settings.py:56
+#: conf/global_settings.py:57
 msgid "Spanish"
 msgstr "Španjolski"
 
-#: conf/global_settings.py:57
+#: conf/global_settings.py:58
 msgid "Argentinian Spanish"
 msgstr "Argentinski španjolski"
 
-#: conf/global_settings.py:58
-#, fuzzy
-msgid "Mexican Spanish"
-msgstr "Argentinski španjolski"
-
 #: conf/global_settings.py:59
+msgid "Mexican Spanish"
+msgstr "Meksički španjolski"
+
+#: conf/global_settings.py:60
 msgid "Estonian"
 msgstr "Estonski"
 
-#: conf/global_settings.py:60
+#: conf/global_settings.py:61
 msgid "Basque"
 msgstr "Baskijski"
 
-#: conf/global_settings.py:61
+#: conf/global_settings.py:62
 msgid "Persian"
 msgstr "Perzijski"
 
-#: conf/global_settings.py:62
+#: conf/global_settings.py:63
 msgid "Finnish"
 msgstr "Finski"
 
-#: conf/global_settings.py:63
+#: conf/global_settings.py:64
 msgid "French"
 msgstr "Francuski"
 
-#: conf/global_settings.py:64
+#: conf/global_settings.py:65
 msgid "Frisian"
 msgstr "Frizijski"
 
-#: conf/global_settings.py:65
+#: conf/global_settings.py:66
 msgid "Irish"
 msgstr "Irski"
 
-#: conf/global_settings.py:66
+#: conf/global_settings.py:67
 msgid "Galician"
 msgstr "Galičanski"
 
-#: conf/global_settings.py:67
+#: conf/global_settings.py:68
 msgid "Hebrew"
 msgstr "Hebrejski"
 
-#: conf/global_settings.py:68
+#: conf/global_settings.py:69
 msgid "Hindi"
 msgstr "Hindi"
 
-#: conf/global_settings.py:69
+#: conf/global_settings.py:70
 msgid "Croatian"
 msgstr "Hrvatski"
 
-#: conf/global_settings.py:70
+#: conf/global_settings.py:71
 msgid "Hungarian"
 msgstr "Mađarski"
 
-#: conf/global_settings.py:71
+#: conf/global_settings.py:72
 msgid "Indonesian"
 msgstr "Indonezijski"
 
-#: conf/global_settings.py:72
+#: conf/global_settings.py:73
 msgid "Icelandic"
 msgstr "Islandski"
 
-#: conf/global_settings.py:73
+#: conf/global_settings.py:74
 msgid "Italian"
 msgstr "Talijanski"
 
-#: conf/global_settings.py:74
+#: conf/global_settings.py:75
 msgid "Japanese"
 msgstr "Japanski"
 
-#: conf/global_settings.py:75
+#: conf/global_settings.py:76
 msgid "Georgian"
 msgstr "Gruzijski"
 
-#: conf/global_settings.py:76
+#: conf/global_settings.py:77
 msgid "Khmer"
 msgstr "Kambođanski"
 
-#: conf/global_settings.py:77
+#: conf/global_settings.py:78
 msgid "Kannada"
 msgstr "Kannada"
 
-#: conf/global_settings.py:78
+#: conf/global_settings.py:79
 msgid "Korean"
 msgstr "Koreanski"
 
-#: conf/global_settings.py:79
+#: conf/global_settings.py:80
 msgid "Lithuanian"
 msgstr "Litvanski"
 
-#: conf/global_settings.py:80
+#: conf/global_settings.py:81
 msgid "Latvian"
 msgstr "Latvijski"
 
-#: conf/global_settings.py:81
+#: conf/global_settings.py:82
 msgid "Macedonian"
 msgstr "Makedonski"
 
-#: conf/global_settings.py:82
-msgid "Malayalam"
-msgstr ""
-
 #: conf/global_settings.py:83
+msgid "Malayalam"
+msgstr "Malayalam"
+
+#: conf/global_settings.py:84
 msgid "Mongolian"
 msgstr "Mongolski"
 
-#: conf/global_settings.py:84
+#: conf/global_settings.py:85
 msgid "Dutch"
 msgstr "Nizozemski"
 
-#: conf/global_settings.py:85
+#: conf/global_settings.py:86
 msgid "Norwegian"
 msgstr "Norveški"
 
-#: conf/global_settings.py:86
+#: conf/global_settings.py:87
 msgid "Norwegian Bokmal"
 msgstr "Norveški Bokmal"
 
-#: conf/global_settings.py:87
+#: conf/global_settings.py:88
 msgid "Norwegian Nynorsk"
 msgstr "Norveški Nynorsk"
 
-#: conf/global_settings.py:88
-msgid "Punjabi"
-msgstr ""
-
 #: conf/global_settings.py:89
+msgid "Punjabi"
+msgstr "Pendžabljanin"
+
+#: conf/global_settings.py:90
 msgid "Polish"
 msgstr "Poljski"
 
-#: conf/global_settings.py:90
+#: conf/global_settings.py:91
 msgid "Portuguese"
 msgstr "Portugalski"
 
-#: conf/global_settings.py:91
+#: conf/global_settings.py:92
 msgid "Brazilian Portuguese"
 msgstr "Brazilski portugalski"
 
-#: conf/global_settings.py:92
+#: conf/global_settings.py:93
 msgid "Romanian"
 msgstr "Rumunjski"
 
-#: conf/global_settings.py:93
+#: conf/global_settings.py:94
 msgid "Russian"
 msgstr "Ruski"
 
-#: conf/global_settings.py:94
+#: conf/global_settings.py:95
 msgid "Slovak"
 msgstr "Slovački"
 
-#: conf/global_settings.py:95
+#: conf/global_settings.py:96
 msgid "Slovenian"
 msgstr "Slovenski"
 
-#: conf/global_settings.py:96
+#: conf/global_settings.py:97
 msgid "Albanian"
 msgstr "Albanski"
 
-#: conf/global_settings.py:97
+#: conf/global_settings.py:98
 msgid "Serbian"
 msgstr "Srpski"
 
-#: conf/global_settings.py:98
+#: conf/global_settings.py:99
 msgid "Serbian Latin"
 msgstr "Latinski srpski"
 
-#: conf/global_settings.py:99
+#: conf/global_settings.py:100
 msgid "Swedish"
 msgstr "Švedski"
 
-#: conf/global_settings.py:100
+#: conf/global_settings.py:101
 msgid "Tamil"
 msgstr "Tamilski"
 
-#: conf/global_settings.py:101
+#: conf/global_settings.py:102
 msgid "Telugu"
 msgstr "Teluški"
 
-#: conf/global_settings.py:102
+#: conf/global_settings.py:103
 msgid "Thai"
 msgstr "Thai (tajlandski)"
 
-#: conf/global_settings.py:103
+#: conf/global_settings.py:104
 msgid "Turkish"
 msgstr "Turski"
 
-#: conf/global_settings.py:104
+#: conf/global_settings.py:105
 msgid "Ukrainian"
 msgstr "Ukrajinski"
 
-#: conf/global_settings.py:105
-msgid "Urdu"
-msgstr ""
-
 #: conf/global_settings.py:106
+msgid "Urdu"
+msgstr "Urdu"
+
+#: conf/global_settings.py:107
 msgid "Vietnamese"
 msgstr "Vijetnamski"
 
-#: conf/global_settings.py:107
+#: conf/global_settings.py:108
 msgid "Simplified Chinese"
 msgstr "Pojednostavljeni kineski"
 
-#: conf/global_settings.py:108
+#: conf/global_settings.py:109
 msgid "Traditional Chinese"
 msgstr "Tradicionalni kineski"
 
@@ -353,7 +356,7 @@ msgstr ""
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(model_name)s sa navedenim %(field_label)s već postoji."
 
-#: db/models/base.py:791 forms/models.py:560
+#: db/models/base.py:791 forms/models.py:562
 msgid "and"
 msgstr "i"
 
@@ -572,7 +575,7 @@ msgstr ""
 
 #: forms/fields.py:464
 msgid "Please either submit a file or check the clear checkbox, not both."
-msgstr ""
+msgstr "Molimo Vas da pošaljete ili datoteku ili označite izbor, a ne oboje."
 
 #: forms/fields.py:518
 msgid ""
@@ -587,7 +590,7 @@ msgstr ""
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr "Odaberite iz ponuđenog. %(value)s nije ponuđen kao opcija."
 
-#: forms/fields.py:726 forms/fields.py:814 forms/models.py:983
+#: forms/fields.py:726 forms/fields.py:814 forms/models.py:985
 msgid "Enter a list of values."
 msgstr "Unesite listu vrijednosti."
 
@@ -599,19 +602,19 @@ msgstr "Redoslijed:"
 msgid "Delete"
 msgstr "Izbriši"
 
-#: forms/models.py:554
+#: forms/models.py:556
 #, python-format
 msgid "Please correct the duplicate data for %(field)s."
 msgstr "Ispravite duplicirane podatke za %(field)s."
 
-#: forms/models.py:558
+#: forms/models.py:560
 #, python-format
 msgid "Please correct the duplicate data for %(field)s, which must be unique."
 msgstr ""
 "Molimo ispravite duplicirane podatke za %(field)s, koji moraju biti "
 "jedinstveni."
 
-#: forms/models.py:564
+#: forms/models.py:566
 #, python-format
 msgid ""
 "Please correct the duplicate data for %(field_name)s which must be unique "
@@ -620,24 +623,24 @@ msgstr ""
 "Molimo ispravite duplicirane podatke za %(field_name)s koji moraju biti "
 "jedinstveni za %(lookup)s u %(date_field)s."
 
-#: forms/models.py:572
+#: forms/models.py:574
 msgid "Please correct the duplicate values below."
 msgstr "Molimo ispravite duplicirane vrijednosti ispod."
 
-#: forms/models.py:833
+#: forms/models.py:835
 msgid "The inline foreign key did not match the parent instance primary key."
 msgstr "The inline foreign key did not match the parent instance primary key."
 
-#: forms/models.py:894
+#: forms/models.py:896
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "Izaberite ispravnu opciju. Ta opcija nije jedna od dostupnih opcija."
 
-#: forms/models.py:984
+#: forms/models.py:986
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "Odaberite iz ponuđenog. %s nije ponuđen kao opcija."
 
-#: forms/models.py:986
+#: forms/models.py:988
 #, python-format
 msgid "\"%s\" is not a valid value for a primary key."
 msgstr "\"%s\" nije ispravna vrijednost za primarni kluč."
@@ -652,7 +655,7 @@ msgstr "Promijeni"
 
 #: forms/widgets.py:301
 msgid "Clear"
-msgstr ""
+msgstr "Isprazni"
 
 #: forms/widgets.py:548
 msgid "Unknown"
@@ -666,43 +669,42 @@ msgstr "Da"
 msgid "No"
 msgstr "Ne"
 
-#: template/defaultfilters.py:767
+#: template/defaultfilters.py:777
 msgid "yes,no,maybe"
 msgstr "da,ne,možda"
 
-#: template/defaultfilters.py:795 template/defaultfilters.py:800
+#: template/defaultfilters.py:805 template/defaultfilters.py:810
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d byte"
 msgstr[1] "%(size)d byte-a"
 msgstr[2] "%(size)d byte-a"
-msgstr[3] "%(size)d byte-a"
 
-#: template/defaultfilters.py:802
+#: template/defaultfilters.py:812
 #, python-format
 msgid "%s KB"
-msgstr ""
+msgstr "%s KB"
 
-#: template/defaultfilters.py:804
+#: template/defaultfilters.py:814
 #, python-format
 msgid "%s MB"
-msgstr ""
+msgstr "%s MB"
 
-#: template/defaultfilters.py:806
+#: template/defaultfilters.py:816
 #, python-format
 msgid "%s GB"
-msgstr ""
+msgstr "%s GB"
 
-#: template/defaultfilters.py:808
+#: template/defaultfilters.py:818
 #, python-format
 msgid "%s TB"
-msgstr ""
+msgstr "%s TB"
 
-#: template/defaultfilters.py:809
+#: template/defaultfilters.py:819
 #, python-format
 msgid "%s PB"
-msgstr ""
+msgstr "%s PB"
 
 #: utils/dateformat.py:42
 msgid "p.m."
@@ -1007,7 +1009,7 @@ msgstr "ili"
 #. Translators: This string is used as a separator between list elements
 #: utils/text.py:153
 msgid ", "
-msgstr ""
+msgstr ","
 
 #: utils/timesince.py:21
 msgid "year"
@@ -1015,7 +1017,6 @@ msgid_plural "years"
 msgstr[0] "godina"
 msgstr[1] "godine"
 msgstr[2] "godine"
-msgstr[3] "godine"
 
 #: utils/timesince.py:22
 msgid "month"
@@ -1023,7 +1024,6 @@ msgid_plural "months"
 msgstr[0] "mjesec"
 msgstr[1] "mjeseci"
 msgstr[2] "mjeseci"
-msgstr[3] "mjeseci"
 
 #: utils/timesince.py:23
 msgid "week"
@@ -1031,7 +1031,6 @@ msgid_plural "weeks"
 msgstr[0] "tjedan"
 msgstr[1] "tjedna"
 msgstr[2] "tjedna"
-msgstr[3] "tjedna"
 
 #: utils/timesince.py:24
 msgid "day"
@@ -1039,7 +1038,6 @@ msgid_plural "days"
 msgstr[0] "dan"
 msgstr[1] "dani"
 msgstr[2] "dana"
-msgstr[3] "dana"
 
 #: utils/timesince.py:25
 msgid "hour"
@@ -1047,7 +1045,6 @@ msgid_plural "hours"
 msgstr[0] "sat"
 msgstr[1] "sati"
 msgstr[2] "sata"
-msgstr[3] "sata"
 
 #: utils/timesince.py:26
 msgid "minute"
@@ -1055,7 +1052,6 @@ msgid_plural "minutes"
 msgstr[0] "minuta"
 msgstr[1] "minute"
 msgstr[2] "minute"
-msgstr[3] "minute"
 
 #: utils/timesince.py:45
 msgid "minutes"
@@ -1108,24 +1104,24 @@ msgstr "%(verbose_name)s je izbrisano."
 
 #: views/generic/dates.py:33
 msgid "No year specified"
-msgstr ""
+msgstr "Nije navedena godina"
 
 #: views/generic/dates.py:58
 msgid "No month specified"
-msgstr ""
+msgstr "Nije naveden mjesec"
 
 #: views/generic/dates.py:99
 msgid "No day specified"
-msgstr ""
+msgstr "Nije naveden dan"
 
 #: views/generic/dates.py:138
 msgid "No week specified"
-msgstr ""
+msgstr "Tjedan nije određen"
 
 #: views/generic/dates.py:198 views/generic/dates.py:214
-#, fuzzy, python-format
+#, python-format
 msgid "No %(verbose_name_plural)s available"
-msgstr "%(verbose_name)s je izbrisano."
+msgstr "Nije dostupno: %(verbose_name_plural)s"
 
 #: views/generic/dates.py:466
 #, python-format
@@ -1133,27 +1129,29 @@ msgid ""
 "Future %(verbose_name_plural)s not available because %(class_name)s."
 "allow_future is False."
 msgstr ""
+"%(verbose_name_plural)s nije dostupno jer je %(class_name)s.allow_future "
+"False."
 
 #: views/generic/dates.py:500
 #, python-format
 msgid "Invalid date string '%(datestr)s' given format '%(format)s'"
-msgstr ""
+msgstr "Neispravan datum '%(datestr)s' za format '%(format)s'"
 
 #: views/generic/detail.py:51
-#, fuzzy, python-format
+#, python-format
 msgid "No %(verbose_name)s found matching the query"
-msgstr "%(verbose_name)s je uspješno promijenjeno."
+msgstr "%(verbose_name)s - pretragom nisu pronađeni rezultati za upit"
 
 #: views/generic/list.py:47
 msgid "Page is not 'last', nor can it be converted to an int."
-msgstr ""
+msgstr "Stranica nije 'zadnja', niti se može pretvoriti u cijeli broj."
 
 #: views/generic/list.py:52
 #, python-format
 msgid "Invalid page (%(page_number)s)"
-msgstr ""
+msgstr "Neispravna stranica (%(page_number)s)"
 
 #: views/generic/list.py:119
 #, python-format
 msgid "Empty list and '%(class_name)s.allow_empty' is False."
-msgstr ""
+msgstr "Prazna lista i '%(class_name)s.allow_empty' je False."

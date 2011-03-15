@@ -4,9 +4,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-28 18:05+0100\n"
-"PO-Revision-Date: 2011-02-22 00:09+0000\n"
-"Last-Translator: amiroff <amiroff@gmail.com>\n"
+"POT-Creation-Date: 2011-03-15 13:06-0400\n"
+"PO-Revision-Date: 2011-03-14 08:20+0000\n"
+"Last-Translator: qaralama <ali@ismailov.info>\n"
 "Language-Team: Azerbaijani <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -19,9 +19,8 @@ msgid "Arabic"
 msgstr "Ərəbcə"
 
 #: conf/global_settings.py:45
-#, fuzzy
 msgid "Azerbaijani"
-msgstr "Serbcə"
+msgstr ""
 
 #: conf/global_settings.py:46
 msgid "Bulgarian"
@@ -41,7 +40,7 @@ msgstr "Katalanca"
 
 #: conf/global_settings.py:50
 msgid "Czech"
-msgstr "Çekcə"
+msgstr "Çexcə"
 
 #: conf/global_settings.py:51
 msgid "Welsh"
@@ -57,7 +56,7 @@ msgstr "Almanca"
 
 #: conf/global_settings.py:54
 msgid "Greek"
-msgstr "Yuncanca"
+msgstr "Yunanca"
 
 #: conf/global_settings.py:55
 msgid "English"
@@ -65,7 +64,7 @@ msgstr "İngiliscə"
 
 #: conf/global_settings.py:56
 msgid "British English"
-msgstr "Britanya İngiliscəsi"
+msgstr "Britaniya İngiliscəsi"
 
 #: conf/global_settings.py:57
 msgid "Spanish"
@@ -76,9 +75,8 @@ msgid "Argentinian Spanish"
 msgstr "Argentina İspancası"
 
 #: conf/global_settings.py:59
-#, fuzzy
 msgid "Mexican Spanish"
-msgstr "Argentina İspancası"
+msgstr ""
 
 #: conf/global_settings.py:60
 msgid "Estonian"
@@ -86,7 +84,7 @@ msgstr "Estonca"
 
 #: conf/global_settings.py:61
 msgid "Basque"
-msgstr "Basqca"
+msgstr "Baskca"
 
 #: conf/global_settings.py:62
 msgid "Persian"
@@ -106,11 +104,11 @@ msgstr "Friscə"
 
 #: conf/global_settings.py:66
 msgid "Irish"
-msgstr "İrlandaca"
+msgstr "İrlandca"
 
 #: conf/global_settings.py:67
 msgid "Galician"
-msgstr "Gallik dili"
+msgstr "Qallik dili"
 
 #: conf/global_settings.py:68
 msgid "Hebrew"
@@ -134,7 +132,7 @@ msgstr "İndonezcə"
 
 #: conf/global_settings.py:73
 msgid "Icelandic"
-msgstr "İslanda dili"
+msgstr "İslandca"
 
 #: conf/global_settings.py:74
 msgid "Italian"
@@ -150,7 +148,7 @@ msgstr "Gürcücə"
 
 #: conf/global_settings.py:77
 msgid "Khmer"
-msgstr "Xmer dili"
+msgstr "Kxmercə"
 
 #: conf/global_settings.py:78
 msgid "Kannada"
@@ -158,7 +156,7 @@ msgstr "Kannada dili"
 
 #: conf/global_settings.py:79
 msgid "Korean"
-msgstr "Koreya dili"
+msgstr "Koreyca"
 
 #: conf/global_settings.py:80
 msgid "Lithuanian"
@@ -182,7 +180,7 @@ msgstr "Monqolca"
 
 #: conf/global_settings.py:85
 msgid "Dutch"
-msgstr "Niderland dili"
+msgstr "Flamandca"
 
 #: conf/global_settings.py:86
 msgid "Norwegian"
@@ -198,11 +196,11 @@ msgstr "Nynorsk Norveçcəsi"
 
 #: conf/global_settings.py:89
 msgid "Punjabi"
-msgstr "Punjabi dili"
+msgstr "Pancabicə"
 
 #: conf/global_settings.py:90
 msgid "Polish"
-msgstr "Polyak dili"
+msgstr "Polyakca"
 
 #: conf/global_settings.py:91
 msgid "Portuguese"
@@ -210,7 +208,7 @@ msgstr "Portuqalca"
 
 #: conf/global_settings.py:92
 msgid "Brazilian Portuguese"
-msgstr "Braziliya Portuqalcasi"
+msgstr "Braziliya Portuqalcası"
 
 #: conf/global_settings.py:93
 msgid "Romanian"
@@ -230,7 +228,7 @@ msgstr "Slovencə"
 
 #: conf/global_settings.py:97
 msgid "Albanian"
-msgstr "Alban Dili"
+msgstr "Albanca"
 
 #: conf/global_settings.py:98
 msgid "Serbian"
@@ -242,7 +240,7 @@ msgstr "Serbcə Latın"
 
 #: conf/global_settings.py:100
 msgid "Swedish"
-msgstr "İsveşcə"
+msgstr "İsveçcə"
 
 #: conf/global_settings.py:101
 msgid "Tamil"
@@ -254,7 +252,7 @@ msgstr "Teluqu dili"
 
 #: conf/global_settings.py:103
 msgid "Thai"
-msgstr "Tay dili"
+msgstr "Tayca"
 
 #: conf/global_settings.py:104
 msgid "Turkish"
@@ -282,47 +280,51 @@ msgstr "Ənənəvi Çincə"
 
 #: core/validators.py:21 forms/fields.py:67
 msgid "Enter a valid value."
-msgstr ""
+msgstr "Düzgün qiymət daxil edin."
 
 #: core/validators.py:89 forms/fields.py:575
 msgid "This URL appears to be a broken link."
-msgstr ""
+msgstr "URL işləmir."
 
 #: core/validators.py:94 forms/fields.py:574
 msgid "Enter a valid URL."
-msgstr ""
+msgstr "Düzgün URL daxil edin."
 
 #: core/validators.py:138 forms/fields.py:449
 msgid "Enter a valid e-mail address."
-msgstr ""
+msgstr "Düzgün e-poçt ünvanı daxil edin."
 
 #: core/validators.py:141 forms/fields.py:958
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
+"Hərflərdən, rəqəmlərdən, alt-xətlərdən və ya defislərdən ibarət düzgün slaq "
+"daxil edin."
 
 #: core/validators.py:144 forms/fields.py:951
 msgid "Enter a valid IPv4 address."
-msgstr ""
+msgstr "Düzgün IPv4 ünvanı daxil edin."
 
 #: core/validators.py:147 db/models/fields/__init__.py:575
 msgid "Enter only digits separated by commas."
-msgstr ""
+msgstr "Vergüllə ayırmaqla yalnız rəqəmlər daxil edin."
 
 #: core/validators.py:153
 #, python-format
 msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
-msgstr ""
+msgstr "Əmin edin ki, bu qiymət %(limit_value)s-dir (bu %(show_value)s-dir)."
 
 #: core/validators.py:171 forms/fields.py:222 forms/fields.py:275
 #, python-format
 msgid "Ensure this value is less than or equal to %(limit_value)s."
 msgstr ""
+"Bu qiymətin %(limit_value)s-ya bərabər və ya ondan kiçik olduğunu yoxlayın."
 
 #: core/validators.py:176 forms/fields.py:223 forms/fields.py:276
 #, python-format
 msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr ""
+"Bu qiymətin %(limit_value)s-ya bərabər və ya ondan böyük olduğunu yoxlayın."
 
 #: core/validators.py:182
 #, python-format
@@ -330,6 +332,8 @@ msgid ""
 "Ensure this value has at least %(limit_value)d characters (it has %"
 "(show_value)d)."
 msgstr ""
+"Bu qiymətin ən azı %(limit_value)d simvoldan ibarət olduğunu yoxlayın (burda "
+"%(show_value)d simvol var)."
 
 #: core/validators.py:188
 #, python-format
@@ -337,103 +341,106 @@ msgid ""
 "Ensure this value has at most %(limit_value)d characters (it has %"
 "(show_value)d)."
 msgstr ""
+"Bu qiymətin ən çoxu %(limit_value)d simvoldan ibarət olduğunu yoxlayın "
+"(burda %(show_value)d simvol var)."
 
 #: db/models/base.py:769
 #, python-format
 msgid "%(field_name)s must be unique for %(date_field)s %(lookup)s."
-msgstr ""
+msgstr "%(field_name)s %(date_field)s %(lookup)s tarixinə görə özəl olmalıdır."
 
 #: db/models/base.py:784 db/models/base.py:792
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
-msgstr ""
+msgstr "%(model_name)s bu %(field_label)s sahə ilə artıq mövcuddur."
 
-#: db/models/base.py:791 forms/models.py:560
+#: db/models/base.py:791 forms/models.py:562
 msgid "and"
-msgstr ""
+msgstr "və"
 
 #: db/models/fields/__init__.py:63
 #, python-format
 msgid "Value %r is not a valid choice."
-msgstr ""
+msgstr "%r qiyməti düzgün seçim deyil."
 
 #: db/models/fields/__init__.py:64
 msgid "This field cannot be null."
-msgstr ""
+msgstr "Bu sahə boş qala bilməz."
 
 #: db/models/fields/__init__.py:65
 msgid "This field cannot be blank."
-msgstr ""
+msgstr "Bu sahə ağ qala bilməz."
 
 #: db/models/fields/__init__.py:70
 #, python-format
 msgid "Field of type: %(field_type)s"
-msgstr ""
+msgstr "Sahənin tipi: %(field_type)s"
 
 #: db/models/fields/__init__.py:451 db/models/fields/__init__.py:871
 #: db/models/fields/__init__.py:980 db/models/fields/__init__.py:991
 #: db/models/fields/__init__.py:1018
 msgid "Integer"
-msgstr ""
+msgstr "Tam ədəd"
 
 #: db/models/fields/__init__.py:455 db/models/fields/__init__.py:869
 msgid "This value must be an integer."
-msgstr ""
+msgstr "Bu qiymət tam ədəd olmalıdır."
 
 #: db/models/fields/__init__.py:493
 msgid "This value must be either True or False."
-msgstr ""
+msgstr "Bu qiymət ya Doğru, ya da Yalan olmalıdır."
 
 #: db/models/fields/__init__.py:495
 msgid "Boolean (Either True or False)"
-msgstr ""
+msgstr "Bul (ya Doğru, ya Yalan)"
 
 #: db/models/fields/__init__.py:542 db/models/fields/__init__.py:1001
 #, python-format
 msgid "String (up to %(max_length)s)"
-msgstr ""
+msgstr "Sətir (%(max_length)s simvola kimi)"
 
 #: db/models/fields/__init__.py:570
 msgid "Comma-separated integers"
-msgstr ""
+msgstr "Vergüllə ayrılmış tam ədədlər"
 
 #: db/models/fields/__init__.py:584
 msgid "Date (without time)"
-msgstr ""
+msgstr "Tarix (saatsız)"
 
 #: db/models/fields/__init__.py:588
 msgid "Enter a valid date in YYYY-MM-DD format."
-msgstr ""
+msgstr "İİİİ-AA-GG formatında düzgün tarix daxil edin."
 
 #: db/models/fields/__init__.py:589
 #, python-format
 msgid "Invalid date: %s"
-msgstr ""
+msgstr "Düzgün tarix deyil: %s"
 
 #: db/models/fields/__init__.py:670
 msgid "Enter a valid date/time in YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format."
 msgstr ""
+"İİİİ-AA-GG SS-DD[:ss[.uuuuuu]] formatında düzgün tarix/vaxt daxil edin."
 
 #: db/models/fields/__init__.py:672
 msgid "Date (with time)"
-msgstr ""
+msgstr "Tarix (vaxt ilə)"
 
 #: db/models/fields/__init__.py:746
 msgid "This value must be a decimal number."
-msgstr ""
+msgstr "Bu rasional ədəd olmalıdır."
 
 #: db/models/fields/__init__.py:748
 msgid "Decimal number"
-msgstr ""
+msgstr "Rasional ədəd"
 
 #: db/models/fields/__init__.py:803
 msgid "E-mail address"
-msgstr ""
+msgstr "E-poçt ünvanı"
 
 #: db/models/fields/__init__.py:818 db/models/fields/files.py:220
 #: db/models/fields/files.py:326
 msgid "File path"
-msgstr ""
+msgstr "Faylın ünvanı"
 
 #: db/models/fields/__init__.py:841
 msgid "This value must be a float."
@@ -573,7 +580,7 @@ msgstr ""
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr ""
 
-#: forms/fields.py:726 forms/fields.py:814 forms/models.py:983
+#: forms/fields.py:726 forms/fields.py:814 forms/models.py:985
 msgid "Enter a list of values."
 msgstr ""
 
@@ -585,41 +592,41 @@ msgstr ""
 msgid "Delete"
 msgstr ""
 
-#: forms/models.py:554
+#: forms/models.py:556
 #, python-format
 msgid "Please correct the duplicate data for %(field)s."
 msgstr ""
 
-#: forms/models.py:558
+#: forms/models.py:560
 #, python-format
 msgid "Please correct the duplicate data for %(field)s, which must be unique."
 msgstr ""
 
-#: forms/models.py:564
+#: forms/models.py:566
 #, python-format
 msgid ""
 "Please correct the duplicate data for %(field_name)s which must be unique "
 "for the %(lookup)s in %(date_field)s."
 msgstr ""
 
-#: forms/models.py:572
+#: forms/models.py:574
 msgid "Please correct the duplicate values below."
 msgstr ""
 
-#: forms/models.py:833
+#: forms/models.py:835
 msgid "The inline foreign key did not match the parent instance primary key."
 msgstr ""
 
-#: forms/models.py:894
+#: forms/models.py:896
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr ""
 
-#: forms/models.py:984
+#: forms/models.py:986
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr ""
 
-#: forms/models.py:986
+#: forms/models.py:988
 #, python-format
 msgid "\"%s\" is not a valid value for a primary key."
 msgstr ""
@@ -648,37 +655,37 @@ msgstr ""
 msgid "No"
 msgstr ""
 
-#: template/defaultfilters.py:767
+#: template/defaultfilters.py:777
 msgid "yes,no,maybe"
 msgstr ""
 
-#: template/defaultfilters.py:795 template/defaultfilters.py:800
+#: template/defaultfilters.py:805 template/defaultfilters.py:810
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] ""
 
-#: template/defaultfilters.py:802
+#: template/defaultfilters.py:812
 #, python-format
 msgid "%s KB"
 msgstr ""
 
-#: template/defaultfilters.py:804
+#: template/defaultfilters.py:814
 #, python-format
 msgid "%s MB"
 msgstr ""
 
-#: template/defaultfilters.py:806
+#: template/defaultfilters.py:816
 #, python-format
 msgid "%s GB"
 msgstr ""
 
-#: template/defaultfilters.py:808
+#: template/defaultfilters.py:818
 #, python-format
 msgid "%s TB"
 msgstr ""
 
-#: template/defaultfilters.py:809
+#: template/defaultfilters.py:819
 #, python-format
 msgid "%s PB"
 msgstr ""
