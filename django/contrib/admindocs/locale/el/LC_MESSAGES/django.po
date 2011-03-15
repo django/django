@@ -4,9 +4,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-28 23:30+0100\n"
-"PO-Revision-Date: 2011-02-22 00:07+0000\n"
-"Last-Translator: glezos <glezos@indifex.com>\n"
+"POT-Creation-Date: 2011-03-15 13:13-0400\n"
+"PO-Revision-Date: 2011-03-04 18:37+0000\n"
+"Last-Translator: pagles <y.pagles@gmail.com>\n"
 "Language-Team: Greek <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -35,11 +35,12 @@ msgstr "Δε βρέθηκε η εφαρμογή %r"
 #, python-format
 msgid "Model %(model_name)r not found in app %(app_label)r"
 msgstr ""
+"Το μοντέλο %(model_name)r δεν μπορεί να βρεθεί στην εφαρμογή %(app_label)r"
 
 #: views.py:213
 #, python-format
 msgid "the related `%(app_label)s.%(data_type)s` object"
-msgstr ""
+msgstr "το συσχετισμένο `%(app_label)s.%(data_type)s`  αντικείμενο"
 
 #: views.py:213 views.py:232 views.py:237 views.py:251 views.py:265
 #: views.py:270
@@ -49,7 +50,7 @@ msgstr "μοντέλο:"
 #: views.py:228 views.py:260
 #, python-format
 msgid "related `%(app_label)s.%(object_name)s` objects"
-msgstr ""
+msgstr "συσχετισμένα `%(app_label)s.%(object_name)s` αντικείμενα"
 
 #: views.py:232 views.py:265
 #, python-format
@@ -59,12 +60,12 @@ msgstr "όλα %s"
 #: views.py:237 views.py:270
 #, python-format
 msgid "number of %s"
-msgstr ""
+msgstr "πλήθος number of %s"
 
 #: views.py:275
 #, python-format
 msgid "Fields on %s objects"
-msgstr ""
+msgstr "Πεδία στα αντικείμενα %s"
 
 #: views.py:365
 #, python-format
@@ -97,6 +98,16 @@ msgid ""
 "as \"internal\" (talk to your system administrator if you aren't sure if\n"
 "your computer is \"internal\").</p>\n"
 msgstr ""
+"\n"
+"<p class=\"help\">Για να εγκαταστήσετε έναν \"bookmarklet\" σύνδεσμο, σύρετε "
+"τον σύνδεσμο στον χώρο με τους αγαπημένους σας ιστότοπους στην γραμμή "
+"εργαλείων σας ή κάντε δεξί κλικ πάνω στον σύνδεσμο και σώστε τον στα "
+"αγαπημένα σας. Πλέον θα μπορείτε να χρησιμοποιείτε  τον σύνδεσμο bookmarklet "
+"από την οποιαδήποτε σελίδα του ιστοτόπου σας. Σας υπενθημίζουμε ότι αυτού "
+"του είδους τα bookmarklets απαιτούν να επισκέπτεστε τον ιστότοπο από έναν "
+"υπολογιστή που να έχει οριστεί σαν \"εσωτερικός\" (\"internal\").  "
+"Απευθυνθείτε στον διαχειριστή σας αν δεν γνωρίζεται αν ο υπολογιστής σας "
+"θερείται \"εσωτερικός\".</p>\n"
 
 #: templates/admin_doc/bookmarklets.html:18
 msgid "Documentation for this page"
@@ -129,6 +140,8 @@ msgstr "Επεξεργασία αυτού του αντικειμένου (τρ�
 #: templates/admin_doc/bookmarklets.html:25
 msgid "Jumps to the admin page for pages that represent a single object."
 msgstr ""
+"Αν η σελίδα αναπαριστά ένα και μοναδικό αντικείμενο τότε οδηγεί στην "
+"αντίστοιχη σελίδα διαχείρισης."
 
 #: templates/admin_doc/bookmarklets.html:27
 msgid "Edit this object (new window)"

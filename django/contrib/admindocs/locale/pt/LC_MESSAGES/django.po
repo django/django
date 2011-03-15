@@ -4,9 +4,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-28 23:30+0100\n"
-"PO-Revision-Date: 2011-02-22 00:07+0000\n"
-"Last-Translator: Jannis <jannis@leidel.info>\n"
+"POT-Creation-Date: 2011-03-15 13:14-0400\n"
+"PO-Revision-Date: 2011-03-11 10:40+0000\n"
+"Last-Translator: nmariz <nmariz@gmail.com>\n"
 "Language-Team: Portuguese <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -34,12 +34,12 @@ msgstr "A aplicação %r não encontrada"
 #: views.py:201
 #, python-format
 msgid "Model %(model_name)r not found in app %(app_label)r"
-msgstr "O Model %(model_name)r não foi encontrado na applicação %(app_label)r"
+msgstr "O Model %(model_name)r não foi encontrado na aplicação %(app_label)r"
 
 #: views.py:213
 #, python-format
 msgid "the related `%(app_label)s.%(data_type)s` object"
-msgstr "o objecto `%(app_label)s.%(data_type)s` relacionado"
+msgstr "o objeto `%(app_label)s.%(data_type)s` relacionado"
 
 #: views.py:213 views.py:232 views.py:237 views.py:251 views.py:265
 #: views.py:270
@@ -49,7 +49,7 @@ msgstr "model:"
 #: views.py:228 views.py:260
 #, python-format
 msgid "related `%(app_label)s.%(object_name)s` objects"
-msgstr "os objectos `%(app_label)s.%(object_name)s` relacionados"
+msgstr "os objetos `%(app_label)s.%(object_name)s` relacionados"
 
 #: views.py:232 views.py:265
 #, python-format
@@ -64,12 +64,12 @@ msgstr "número de %s"
 #: views.py:275
 #, python-format
 msgid "Fields on %s objects"
-msgstr "Campos nos objectos %s"
+msgstr "Campos nos objetos %s"
 
 #: views.py:365
 #, python-format
 msgid "%s does not appear to be a urlpattern object"
-msgstr "%s não parece ser um objecto urlpattern"
+msgstr "%s não parece ser um objeto urlpattern"
 
 #: templates/admin_doc/bookmarklets.html:3
 msgid "Home"
@@ -81,11 +81,11 @@ msgstr "Documentação"
 
 #: templates/admin_doc/bookmarklets.html:3
 msgid "Bookmarklets"
-msgstr "Itens do bookmark"
+msgstr "Bookmarklets"
 
 #: templates/admin_doc/bookmarklets.html:4
 msgid "Documentation bookmarklets"
-msgstr "Documentação dos itens do bookmark"
+msgstr "Documentação dos bookmarklets"
 
 #: templates/admin_doc/bookmarklets.html:8
 msgid ""
@@ -98,15 +98,15 @@ msgid ""
 "your computer is \"internal\").</p>\n"
 msgstr ""
 "\n"
-"<p class=\"help\">Para instalar itens no bookmark, arraste o link para sua "
+"<p class=\"help\">Para instalar bookmarklets, arraste o link para sua "
 "barra \n"
 "de bookmarks, ou clique com o lado direito do rato no link e adicione ao "
 "seus bookmarks. Agora pode \n"
-"seleccionar o link do bookmark de qualquer página no site. Note que alguns "
+"seleccionar o bookmarklet de qualquer página no site. Note que alguns "
 "destes \n"
-"itens do bookmark requerem que visualize o site de um computador designado \n"
+"bookmarklets requerem que visualize o site de um computador designado \n"
 "por \"internal\" (entre em contacto com o seu administrador de sistema se \n"
-"não tiver a certeza se o seu computador é \"internal\".</p>\n"
+"não tiver a certeza se o seu computador é \"internal\").</p>\n"
 
 #: templates/admin_doc/bookmarklets.html:18
 msgid "Documentation for this page"
@@ -121,7 +121,7 @@ msgstr ""
 
 #: templates/admin_doc/bookmarklets.html:21
 msgid "Show object ID"
-msgstr "Mostrar o ID do objecto"
+msgstr "Mostrar o ID do objeto"
 
 #: templates/admin_doc/bookmarklets.html:22
 msgid ""
@@ -129,20 +129,20 @@ msgid ""
 "object."
 msgstr ""
 "Mostra o tipo de conteúdo e o ID único para as páginas que representam um "
-"único objecto."
+"único objeto."
 
 #: templates/admin_doc/bookmarklets.html:24
 msgid "Edit this object (current window)"
-msgstr "Editar este objecto (janela actual)"
+msgstr "Editar este objeto (janela actual)"
 
 #: templates/admin_doc/bookmarklets.html:25
 msgid "Jumps to the admin page for pages that represent a single object."
 msgstr ""
-"Vai para a página de admin para as páginas que representam um único objecto."
+"Vai para a página de admin para as páginas que representam um único objeto."
 
 #: templates/admin_doc/bookmarklets.html:27
 msgid "Edit this object (new window)"
-msgstr "Editar este objecto (nova janela)"
+msgstr "Editar este objeto (nova janela)"
 
 #: templates/admin_doc/bookmarklets.html:28
 msgid "As above, but opens the admin page in a new window."
