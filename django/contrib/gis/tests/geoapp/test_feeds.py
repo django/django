@@ -1,4 +1,6 @@
 from xml.dom import minidom
+from django.conf import settings
+from django.contrib.sites.models import Site
 from django.test import TestCase
 
 from models import City
@@ -7,6 +9,14 @@ from models import City
 class GeoFeedTest(TestCase):
 
     urls = 'django.contrib.gis.tests.geoapp.urls'
+
+    def setUp(self):
+        Site(id=settings.SITE_ID, domain="example.com", name="example.com").save()
+        self.old_Site_meta_installed = Site._meta.installed
+        Site._meta.installed = True
+
+    def tearDown(self):
+        Site._meta.installed = self.old_Site_meta_installed
 
     def assertChildNodes(self, elem, expected):
         "Taken from regressiontests/syndication/tests.py."
