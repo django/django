@@ -113,11 +113,18 @@ class GeoModelAdmin(ModelAdmin):
 
 from django.contrib.gis import gdal
 if gdal.HAS_GDAL:
+    # Use the official spherical mercator projection SRID on versions
+    # of GDAL that support it; otherwise, fallback to 900913.
+    if gdal.GDAL_VERSION >= (1, 7):
+        spherical_mercator_srid = 3857
+    else:
+        spherical_mercator_srid = 900913
+
     class OSMGeoAdmin(GeoModelAdmin):
         map_template = 'gis/admin/osm.html'
         extra_js = ['http://www.openstreetmap.org/openlayers/OpenStreetMap.js']
         num_zoom = 20
-        map_srid = 900913
+        map_srid = spherical_mercator_srid
         max_extent = '-20037508,-20037508,20037508,20037508'
         max_resolution = '156543.0339'
         point_zoom = num_zoom - 6
