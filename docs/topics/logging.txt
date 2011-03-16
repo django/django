@@ -327,7 +327,7 @@ This logging configuration does the following things:
           message to stdout. This handler uses the `simple` output
           format.
 
-        * ``mail_admins``, an AdminEmailHandler, which will email any
+        * ``mail_admins``, an AdminEmailHandler, which will e-mail any
           ``ERROR`` level message to the site admins. This handler uses
           the ``special`` filter.
 
@@ -470,11 +470,11 @@ Python logging module.
 
 .. class:: AdminEmailHandler()
 
-    This handler sends an email to the site admins for each log
+    This handler sends an e-mail to the site admins for each log
     message it receives.
 
     If the log record contains a 'request' attribute, the full details
-    of the request will be included in the email.
+    of the request will be included in the e-mail.
 
     If the log record contains stack trace information, that stack
-    trace will be included in the email.
+    trace will be included in the e-mail.
