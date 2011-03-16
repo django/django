@@ -1,4 +1,5 @@
 {# Author: Justin Bronn, Travis Pinney & Dane Springmeyer #}
+OpenLayers.Projection.addTransform("EPSG:4326", "EPSG:3857", OpenLayers.Layer.SphericalMercator.projectForward);
 {% block vars %}var {{ module }} = {};
 {{ module }}.map = null; {{ module }}.controls = null; {{ module }}.panel = null; {{ module }}.re = new RegExp("^SRID=\d+;(.+)", "i"); {{ module }}.layers = {};
 {{ module }}.modifiable = {{ modifiable|yesno:"true,false" }};
