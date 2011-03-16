@@ -23,7 +23,7 @@ if lib_path:
     lib_names = None
 elif os.name == 'nt':
     # Windows NT libraries
-    lib_names = ['libgeos_c-1']
+    lib_names = ['geos_c', 'libgeos_c-1']
 elif os.name == 'posix':
     # *NIX libraries
     lib_names = ['geos_c', 'GEOS']

@@ -13,8 +13,8 @@ except (AttributeError, EnvironmentError, ImportError):
 if lib_path:
     lib_names = None
 elif os.name == 'nt':
-    # Windows NT shared library
-    lib_names = ['gdal17', 'gdal16', 'gdal15']
+    # Windows NT shared libraries
+    lib_names = ['gdal18', 'gdal17', 'gdal16', 'gdal15']
 elif os.name == 'posix':
     # *NIX library names.
     lib_names = ['gdal', 'GDAL', 'gdal1.7.0', 'gdal1.6.0', 'gdal1.5.0', 'gdal1.4.0']
