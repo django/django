@@ -40,7 +40,7 @@ To enable message functionality, do the following:
 
 The default ``settings.py`` created by ``django-admin.py startproject`` has
 ``MessageMiddleware`` activated and the ``django.contrib.messages`` app
-installed.  Also, the default value for :setting:`TEMPLATE_CONTEXT_PROCESSORS`
+installed. Also, the default value for :setting:`TEMPLATE_CONTEXT_PROCESSORS`
 contains ``'django.contrib.messages.context_processors.messages'``.
 
 If you don't want to use messages, you can remove the
@@ -81,7 +81,7 @@ Four storage classes are included:
     SessionStorage for the messages that could not fit in a single cookie.
 
     Since it is uses SessionStorage, it also requires Django's
-    ``contrib.session`` application.
+    ``contrib.sessions`` application.
 
 ``'django.contrib.messages.storage.user_messages.LegacyFallbackStorage'``
     This is the default temporary storage class.
@@ -103,14 +103,14 @@ LegacyFallbackStorage
 
 The ``LegacyFallbackStorage`` is a temporary tool to facilitate the transition
 from the deprecated ``user.message_set`` API and will be removed in Django 1.4
-according to Django's standard deprecation policy.  For more information, see
+according to Django's standard deprecation policy. For more information, see
 the full :doc:`release process documentation </internals/release-process>`.
 
 In addition to the functionality in the ``FallbackStorage``, it adds a custom,
 read-only storage class that retrieves messages from the user ``Message``
 model. Any messages that were stored in the ``Message`` model (e.g., by code
 that has not yet been updated to use the messages framework) will be retrieved
-first, followed by those stored in a cookie and in the session, if any.  Since
+first, followed by those stored in a cookie and in the session, if any. Since
 messages stored in the ``Message`` model do not have a concept of levels, they
 will be assigned the ``INFO`` level by default.
 
@@ -118,7 +118,7 @@ Message levels
 --------------
 
 The messages framework is based on a configurable level architecture similar
-to that of the Python logging module.  Message levels allow you to group
+to that of the Python logging module. Message levels allow you to group
 messages by type so they can be filtered or displayed differently in views and
 templates.
 
@@ -146,8 +146,8 @@ Message tags
 
 Message tags are a string representation of the message level plus any
 extra tags that were added directly in the view (see
-`Adding extra message tags`_ below for more details).  Tags are stored in a
-string and are separated by spaces.  Typically, message tags
+`Adding extra message tags`_ below for more details). Tags are stored in a
+string and are separated by spaces. Typically, message tags
 are used as CSS classes to customize message style based on message type. By
 default, each level has a single tag that's a lowercase version of its own
 constant:
@@ -222,7 +222,7 @@ level constants and use them to create more customized user feedback, e.g.::
         messages.add_message(request, CRITICAL, 'A serious error occurred.')
 
 When creating custom message levels you should be careful to avoid overloading
-existing levels.  The values for the built-in levels are:
+existing levels. The values for the built-in levels are:
 
 .. _message-level-constants:
 
@@ -304,7 +304,7 @@ message framework is disabled.
 .. note::
    Setting ``fail_silently=True`` only hides the ``MessageFailure`` that would
    otherwise occur when the messages framework disabled and one attempts to
-   use one of the ``add_message`` family of methods.  It does not hide failures
+   use one of the ``add_message`` family of methods. It does not hide failures
    that may occur for other reasons.
 
 Expiration of messages
@@ -326,7 +326,7 @@ Behavior of parallel requests
 
 Due to the way cookies (and hence sessions) work, **the behavior of any
 backends that make use of cookies or sessions is undefined when the same
-client makes multiple requests that set or get messages in parallel**.  For
+client makes multiple requests that set or get messages in parallel**. For
 example, if a client initiates a request that creates a message in one window
 (or tab) and then another that fetches any uniterated messages in another
 window, before the first window redirects, the message may appear in the
@@ -334,7 +334,7 @@ second window instead of the first window where it may be expected.
 
 In short, when multiple simultaneous requests from the same client are
 involved, messages are not guaranteed to be delivered to the same window that
-created them nor, in some cases, at all.  Note that this is typically not a
+created them nor, in some cases, at all. Note that this is typically not a
 problem in most applications and will become a non-issue in HTML5, where each
 window/tab will have its own browsing context.
 
@@ -349,7 +349,7 @@ MESSAGE_LEVEL
 
 Default: ``messages.INFO``
 
-This sets the minimum message that will be saved in the message storage.  See
+This sets the minimum message that will be saved in the message storage. See
 `Message levels`_ above for more details.
 
 .. admonition:: Important
@@ -407,5 +407,15 @@ to override. See `Displaying messages`_ above for more details.
    If desired, you may specify the numeric values for the constants directly
    according to the values in the above :ref:`constants table
    <message-level-constants>`.
+
+SESSION_COOKIE_DOMAIN
+---------------------
+
+Default: ``None``
+
+The storage backends that use cookies -- ``CookieStorage`` and
+``FallbackStorage`` -- use the value of ``SESSION_COOKIE_DOMAIN`` in
+setting their cookies. See the :doc:`settings documentation </ref/settings>`
+for more information on how this works and why you might need to set it.
 
 .. _Django settings: ../settings/

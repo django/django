@@ -72,7 +72,8 @@ class CookieStorage(BaseStorage):
         store, or deletes the cookie.
         """
         if encoded_data:
-            response.set_cookie(self.cookie_name, encoded_data)
+            response.set_cookie(self.cookie_name, encoded_data,
+                domain=settings.SESSION_COOKIE_DOMAIN)
         else:
             response.delete_cookie(self.cookie_name)
 
