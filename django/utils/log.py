@@ -48,7 +48,11 @@ if not logger.handlers:
     logger.addHandler(NullHandler())
 
 class AdminEmailHandler(logging.Handler):
-    """An exception log handler that emails log entries to site admins
+    def __init__(self, include_html=False):
+        logging.Handler.__init__(self)        
+        self.include_html = include_html
+
+    """An exception log handler that e-mails log entries to site admins.
 
     If the request is passed as the first argument to the log record,
     request data will be provided in the
@@ -88,6 +92,6 @@ class AdminEmailHandler(logging.Handler):
 
         message = "%s\n\n%s" % (stack_trace, request_repr)
         reporter = ExceptionReporter(request, is_email=True, *exc_info)
-        html_message = reporter.get_traceback_html()
+        html_message = self.include_html and reporter.get_traceback_html() or None
         mail.mail_admins(subject, message, fail_silently=True,
                          html_message=html_message)

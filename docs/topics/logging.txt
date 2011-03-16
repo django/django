@@ -468,13 +468,38 @@ Handlers
 Django provides one log handler in addition to those provided by the
 Python logging module.
 
-.. class:: AdminEmailHandler()
+.. class:: AdminEmailHandler([include_html=False])
 
     This handler sends an e-mail to the site admins for each log
     message it receives.
 
-    If the log record contains a 'request' attribute, the full details
+    If the log record contains a ``request`` attribute, the full details
     of the request will be included in the e-mail.
 
     If the log record contains stack trace information, that stack
     trace will be included in the e-mail.
+
+    The ``include_html`` argument of ``AdminEmailHandler`` is used to
+    control whether the traceback e-mail includes an HTML attachment
+    containing the full content of the debug Web page that would have been
+    produced if ``DEBUG`` were ``True``. To set this value in your
+    configuration, include it in the handler definition for
+    ``django.utils.log.AdminEmailHandler``, like this::
+
+        'handlers': {
+            'mail_admins': {
+                'level': 'ERROR',
+                'class': 'django.utils.log.AdminEmailHandler',
+                'include_html': True,
+            }
+        },
+
+    Note that this HTML version of the e-mail contains a full traceback,
+    with names and values of local variables at each level of the stack, plus
+    the values of your Django settings. This information is potentially very
+    sensitive, and you may not want to send it over e-mail. Consider using
+    something such as `django-sentry`_ to get the best of both worlds -- the
+    rich information of full tracebacks plus the security of *not* sending the
+    information over e-mail.
+
+.. _django-sentry: http://pypi.python.org/pypi/django-sentry
