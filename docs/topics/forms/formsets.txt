@@ -216,7 +216,7 @@ is where you define your own validation that works at the formset level::
     ...             form = self.forms[i]
     ...             title = form.cleaned_data['title']
     ...             if title in titles:
-    ...                 raise forms.ValidationError, "Articles in a set must have distinct titles."
+    ...                 raise forms.ValidationError("Articles in a set must have distinct titles.")
     ...             titles.append(title)
 
     >>> ArticleFormSet = formset_factory(ArticleForm, formset=BaseArticleFormSet)

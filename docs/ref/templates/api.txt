@@ -170,7 +170,7 @@ straight lookups. Here are some things to keep in mind:
         >>> t = Template("My name is {{ person.first_name }}.")
         >>> class PersonClass3:
         ...     def first_name(self):
-        ...         raise AssertionError, "foo"
+        ...         raise AssertionError("foo")
         >>> p = PersonClass3()
         >>> t.render(Context({"person": p}))
         Traceback (most recent call last):
