@@ -18,7 +18,7 @@
 	$.fn.formset = function(opts) {
 		var options = $.extend({}, $.fn.formset.defaults, opts);
 		var updateElementIndex = function(el, prefix, ndx) {
-			var id_regex = new RegExp("(" + prefix + "-\\d+)");
+			var id_regex = new RegExp("(" + prefix + "-(\\d+|__prefix__))");
 			var replacement = prefix + "-" + ndx;
 			if ($(el).attr("for")) {
 				$(el).attr("for", $(el).attr("for").replace(id_regex, replacement));
@@ -59,31 +59,6 @@
 				row.removeClass(options.emptyCssClass)
 				    .addClass(options.formCssClass)
 				    .attr("id", options.prefix + "-" + nextIndex);
-				nextIndex += 1;
-				row.find("*")
-				    .filter(function() {
-				        var el = $(this);
-				        return el.attr("id") && el.attr("id").search(/__prefix__/) >= 0;
-				    }).each(function() {
-				        var el = $(this);
-				        el.attr("id", el.attr("id").replace(/__prefix__/g, nextIndex));
-				    })
-				    .end()
-				    .filter(function() {
-				        var el = $(this);
-				        return el.attr("name") && el.attr("name").search(/__prefix__/) >= 0;
-				    }).each(function() {
-				        var el = $(this);
-				        el.attr("name", el.attr("name").replace(/__prefix__/g, nextIndex));
-				    })
-				    .end()
-				    .filter(function() {
-				        var el = $(this);
-				        return el.attr("for") && el.attr("for").search(/__prefix__/) >= 0;
-				    }).each(function() {
-				        var el = $(this);
-				        el.attr("for", el.attr("for").replace(/__prefix__/g, nextIndex));
-				    });
 				if (row.is("tr")) {
 					// If the forms are laid out in table rows, insert
 					// the remove button into the last table cell:
@@ -97,13 +72,14 @@
 					// last child element of the form's container:
 					row.children(":first").append('<span><a class="' + options.deleteCssClass + '" href="javascript:void(0)">' + options.deleteText + "</a></span>");
 				}
-				row.find("input,select,textarea,label,a").each(function() {
+				row.find("*").each(function() {
 					updateElementIndex(this, options.prefix, totalForms.val());
 				});
 				// Insert the new form when it has been fully edited
 				row.insertBefore($(template));
 				// Update number of total forms
 				$(totalForms).val(parseInt(totalForms.val()) + 1);
+				nextIndex += 1;
 				// Hide add button in case we've hit the max, except we want to add infinitely
 				if ((maxForms.val() != '') && (maxForms.val()-totalForms.val()) <= 0) {
 					addButton.parent().hide();
@@ -113,6 +89,7 @@
 					// Remove the parent form containing this button:
 					var row = $(this).parents("." + options.formCssClass);
 					row.remove();
+					nextIndex -= 1;
 					// If a post-delete callback was provided, call it with the deleted form:
 					if (options.removed) {
 						options.removed(row);
@@ -128,7 +105,8 @@
 					// so they remain in sequence:
 					for (var i=0, formCount=forms.length; i<formCount; i++)
 					{
-						$(forms.get(i)).find("input,select,textarea,label,a").each(function() {
+						updateElementIndex($(forms).get(i), options.prefix, i);
+						$(forms.get(i)).find("*").each(function() {
 							updateElementIndex(this, options.prefix, i);
 						});
 					}
