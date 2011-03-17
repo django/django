@@ -475,6 +475,11 @@ local flavors:
       has been removed from the province list in favor of the new
       official designation "Aceh (ACE)".
 
+    * Canada (ca) -- The province "Newfoundland and Labrador" has
+      had its province code updated to "NL", rather than the
+      older "NF". In addition, the Yukon Territory has had its
+      province code corrected to "YT", instead of "YK".
+
 FormSet updates
 ~~~~~~~~~~~~~~~
 

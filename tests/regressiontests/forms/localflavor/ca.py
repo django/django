@@ -1,3 +1,5 @@
+import warnings
+
 from django.contrib.localflavor.ca.forms import (CAPostalCodeField,
         CAPhoneNumberField, CAProvinceField, CAProvinceSelect,
         CASocialInsuranceNumberField)
@@ -6,6 +8,17 @@ from utils import LocalFlavorTestCase
 
 
 class CALocalFlavorTests(LocalFlavorTestCase):
+    def setUp(self):
+        self.save_warnings_state()
+        warnings.filterwarnings(
+            "ignore",
+            category=RuntimeWarning,
+            module='django.contrib.localflavor.ca.ca_provinces'
+        )
+
+    def tearDown(self):
+        self.restore_warnings_state()
+
     def test_CAProvinceSelect(self):
         f = CAProvinceSelect()
         out = u'''<select name="province">
@@ -13,7 +26,7 @@ class CALocalFlavorTests(LocalFlavorTestCase):
 <option value="BC">British Columbia</option>
 <option value="MB">Manitoba</option>
 <option value="NB">New Brunswick</option>
-<option value="NF">Newfoundland and Labrador</option>
+<option value="NL">Newfoundland and Labrador</option>
 <option value="NT">Northwest Territories</option>
 <option value="NS">Nova Scotia</option>
 <option value="NU">Nunavut</option>
@@ -21,7 +34,7 @@ class CALocalFlavorTests(LocalFlavorTestCase):
 <option value="PE">Prince Edward Island</option>
 <option value="QC">Quebec</option>
 <option value="SK">Saskatchewan</option>
-<option value="YK">Yukon</option>
+<option value="YT">Yukon</option>
 </select>'''
         self.assertEqual(f.render('province', 'AB'), out)
 
