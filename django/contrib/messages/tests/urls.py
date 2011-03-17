@@ -4,8 +4,10 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render_to_response
 from django.template import RequestContext, Template
+from django.views.decorators.cache import never_cache
 
 
+@never_cache
 def add(request, message_type):
     # don't default to False here, because we want to test that it defaults
     # to False if unspecified
@@ -20,6 +22,7 @@ def add(request, message_type):
     return HttpResponseRedirect(show_url)
 
 
+@never_cache
 def show(request):
     t = Template("""{% if messages %}
 <ul class="messages">

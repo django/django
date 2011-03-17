@@ -2,7 +2,9 @@ from django.conf.urls.defaults import patterns, handler500, handler404
 from django.contrib.auth.urls import urlpatterns
 from django.http import HttpResponse
 from django.template import Template, RequestContext
+from django.views.decorators.cache import never_cache
 
+@never_cache
 def remote_user_auth_view(request):
     "Dummy view for remote user tests"
     t = Template("Username is {{ user }}.")
