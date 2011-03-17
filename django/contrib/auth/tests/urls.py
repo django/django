@@ -4,7 +4,9 @@ from django.contrib.auth.views import password_reset
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.template import Template, RequestContext
+from django.views.decorators.cache import never_cache
 
+@never_cache
 def remote_user_auth_view(request):
     "Dummy view for remote user tests"
     t = Template("Username is {{ user }}.")

@@ -5,6 +5,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render_to_response, redirect
 from django.template import RequestContext, Template
 from django.template.response import TemplateResponse
+from django.views.decorators.cache import never_cache
 
 TEMPLATE = """{% if messages %}
 <ul class="messages">
@@ -17,6 +18,7 @@ TEMPLATE = """{% if messages %}
 {% endif %}
 """
 
+@never_cache
 def add(request, message_type):
     # don't default to False here, because we want to test that it defaults
     # to False if unspecified
@@ -31,6 +33,7 @@ def add(request, message_type):
     show_url = reverse('django.contrib.messages.tests.urls.show')
     return HttpResponseRedirect(show_url)
 
+@never_cache
 def add_template_response(request, message_type):
     for msg in request.POST.getlist('messages'):
         getattr(messages, message_type)(request, msg)
@@ -38,10 +41,12 @@ def add_template_response(request, message_type):
     show_url = reverse('django.contrib.messages.tests.urls.show_template_response')
     return HttpResponseRedirect(show_url)
 
+@never_cache
 def show(request):
     t = Template(TEMPLATE)
     return HttpResponse(t.render(RequestContext(request)))
 
+@never_cache
 def show_template_response(request):
     return TemplateResponse(request, Template(TEMPLATE))
 
