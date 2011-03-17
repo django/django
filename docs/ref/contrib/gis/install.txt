@@ -1093,101 +1093,159 @@ Debian 5.0 . Thus when :ref:`spatialdb_template` either:
 
 .. _windows:
 
-Windows XP
-----------
+Windows
+-------
+
+Proceed through the following sections sequentially in order to install
+GeoDjango on Windows.
+
+.. note::
+
+    These instructions assume that you are using 32-bit versions of
+    all programs.  While 64-bit versions of Python and PostgreSQL 9.0
+    are available, 64-bit versions of spatial libraries, like
+    GEOS and GDAL, are not yet provided by the :ref:`OSGeo4W` installer.
 
 Python
 ^^^^^^
 
-First, download the `Python 2.6 installer`__ from the Python Web site.  Next,
-execute the installer and use defaults, e.g., keep 'Install for all users'
-checked and the installation path set as ``C:\Python26``.
+First, download the latest `Python 2.7 installer`__ from the Python Web site.
+Next, run the installer and keep the defaults -- for example, keep 
+'Install for all users' checked and the installation path set as
+``C:\Python27``.
 
 .. note::
 
     You may already have a version of Python installed in ``C:\python`` as ESRI
     products sometimes install a copy there.  *You should still install a
-    fresh version of Python 2.6.*
+    fresh version of Python 2.7.*
 
-__ http://python.org/ftp/python/2.6.2/python-2.6.2.msi
+__ http://python.org/download/
 
 PostgreSQL
 ^^^^^^^^^^
 
-First, select a mirror and download the latest `PostgreSQL 8.3 installer`__ from
-the EnterpriseDB Web site.
+First, download the latest `PostgreSQL 9.0 installer`__ from the
+`EnterpriseDB`__ Web site.  After downloading, simply run the installer,
+follow the on-screen directions, and keep the default options unless
+you know the consequences of changing them.
 
 .. note::
 
-   PostgreSQL 8.3 is required because PostGIS is not available yet for 8.4.
+    The PostgreSQL installer creates both a new Windows user to be the
+    'postgres service account' and a ``postgres`` database superuser
+    You will be prompted once to set the password for both accounts --
+    make sure to remember it!
 
-After downloading, simply click on the installer, follow the
-on-screen directions, and keep the default options (e.g., keep the installation
-path as ``C:\Program Files\PostgreSQL\8.3``).
+When the installer completes, it will ask to launch the Application Stack
+Builder (ASB) on exit -- keep this checked, as it is necessary to
+install :ref:`postgisasb`.
 
 .. note::
 
-    This PostgreSQL installation process will create both a new windows user to be the
-    'postgres service account' and a special 'postgres superuser' to own the database
-    cluster. You will be prompted to set a password for both users (make sure to write
-    them down!). To see basic details on the 'service user' account right click on
-    'My Computer' and select 'Manage' or go to: Control Panel -> Administrative Tools ->
-    Computer Management -> System Tools -> Local Users and Groups.
+    If installed successfully, the PostgreSQL server will run in the
+    background each time the system as started as a Windows service.
+    A :menuselection:`PostgreSQL 9.0` start menu group will created
+    and contains shortcuts for the ASB as well as the 'SQL Shell',
+    which will launch a ``psql`` command window.
 
-If installed successfully, the PostgreSQL server will run in the background each time
-the system as started as a Windows service.  When finished, the installer should launch
-the Application Stack Builder (ASB) -- use this to install PostGIS, see instructions
-below for more details.  A 'PostgreSQL 8.3' start menu group should be created that
-contains shortcuts for the ASB and 'Command Prompt', which launches a terminal window
-in the PostgreSQL directory.
+__ http://www.enterprisedb.com/products-services-training/pgdownload
+__ http://www.enterprisedb.com
 
-__ http://www.enterprisedb.com/products/pgdownload.do#windows
+.. _postgisasb:
 
 PostGIS
 ^^^^^^^
 
-From the Application Stack Builder (Programs -> PostgreSQL 8.3), select
-'PostgreSQL Database Server 8.3 on port 5432' from the drop down menu.  Next,
-select 'PostGIS 1.3.6 for PostgreSQL 8.3' from the 'Spatial Extensions' tree
-in the list.  Select only the default options during install (do not uncheck
-the option to create a default PostGIS database).
+From within the Application Stack Builder (to run outside of the installer,
+:menuselection:`Start --> Programs --> PostgreSQL 9.0`), select
+:menuselection:`PostgreSQL Database Server 9.0 on port 5432` from the drop down
+menu.  Next, expand the :menuselection:`Categories --> Spatial Extensions` menu
+tree and select :menuselection:`PostGIS 1.5 for PostgreSQL 9.0`.
+
+After clicking next, you will be prompted to select your mirror, PostGIS
+will be downloaded, and the PostGIS installer will begin.  Select only the
+default options during install (e.g., do not uncheck the option to create a 
+default PostGIS database).
 
 .. note::
 
-    You will be prompted to enter your 'postgres superuser' password in the
-    'Database Connection Information' dialog.
+    You will be prompted to enter your ``postgres`` database superuser
+    password in the 'Database Connection Information' dialog.
 
 psycopg2
 ^^^^^^^^
 
 The ``psycopg2`` Python module provides the interface between Python and the
-PostgreSQL database.  Download the `Windows installer`__ (v2.0.10) and run
-using the default settings. [#]_
+PostgreSQL database.  Download the latest `Windows installer`__ for your version
+of Python and PostgreSQL and run using the default settings. [#]_
 
-__ http://www.stickpeople.com/projects/python/win-psycopg/psycopg2-2.0.10.win32-py2.6-pg8.3.7-release.exe
+__ http://www.stickpeople.com/projects/python/win-psycopg/
 
-GeoDjango Installer
-^^^^^^^^^^^^^^^^^^^
+.. _osgeo4w:
 
-Download the `GeoDjango Installer`__; this was created [#]_ to simplify the rest
-of the process for installing GeoDjango on Windows platforms.  The installer
-automatically installs Django 1.1, GDAL 1.6.0, PROJ 4.6.1 (including datum grid
-files), and configures the necessary environment variables.
+OSGeo4W
+^^^^^^^
 
-Once the installer has completed, log out and log back in so that the
-modifications to the system environment variables take effect, and you
-should be good to go.
+The `OSGeo4W installer`_ makes it simple to install the PROJ.4, GDAL, and GEOS
+libraries required by GeoDjango.  First, download the `OSGeo4W installer`_,
+and run it.  Select :menuselection:`Express Web-GIS Install` and click next.
+In the 'Select Packages' list, ensure that GDAL is selected; MapServer and
+Apache are also enabled by default, but are not required by GeoDjango and
+may be unchecked safely.  After clicking next, the packages will be
+automatically downloaded and installed, after which you may exit the
+installer.
+
+.. _OSGeo4W installer: http://trac.osgeo.org/osgeo4w/
+
+Modify Windows Environment
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+In order to use GeoDjango, you will need to add your Python and OSGeo4W
+directories to your Windows system ``Path``, as well as create ``GDAL_DATA``
+and ``PROJ_LIB`` environment variables.  The following set of commands,
+executable with ``cmd.exe``, will set this up::
+
+     set OSGEO4W_ROOT=C:\OSGeo4W
+     set PYTHON_ROOT=C:\Python27
+     set GDAL_DATA=%OSGEO4W_ROOT%\share\gdal
+     set PROJ_LIB=%OSGEO4W_ROOT%\share\proj
+     set PATH=%PATH%;%PYTHON_ROOT%;%OSGEO4W_ROOT%\bin
+     reg ADD "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment" /v Path /t REG_EXPAND_SZ /f /d "%PATH%"
+     reg ADD "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment" /v GDAL_DATA /t REG_EXPAND_SZ /f /d "%GDAL_DATA%"
+     reg ADD "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment" /v PROJ_LIB /t REG_EXPAND_SZ /f /d "%PROJ_LIB%"
+
+For your convenience, these commands are available in the execuatble batch
+script, :download:`geodjango_setup.bat`.  
 
 .. note::
 
-    The installer modifies the system ``Path`` environment variable to
-    include ``C:\Program Files\PostgreSQL\8.3\bin`` and
-    ``C:\Program Files\GeoDjango\bin``.  This is required so that Python
-    may find the GEOS DLL provided by PostGIS and the GDAL DLL provided
-    by the installer. The installer also sets the ``GDAL_DATA`` and
-    ``PROJ_LIB`` environment variables.
+    Administrator privileges are required to execute these commands.
+    To do this, right-click on :download:`geodjango_setup.bat` and select
+    :menuselection:`Run as administrator`. You need to log out and log back in again
+    for the settings to take effect.
 
-__ http://geodjango.org/windows/GeoDjango_Installer.exe
+.. note::
+
+    If you customized the Python or OSGeo4W installation directories,
+    then you will need to modify the ``OSGEO4W_ROOT`` and/or ``PYTHON_ROOT``
+    variables accordingly.
+
+Install Django and Setup Database
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Finally, :ref:`install Django <installing-official-release>` on your system.
+You do not need to create a spatial database template, as one named
+``template_postgis`` is created for you when installing PostGIS.
+
+To administer the database, you can either use the pgAdmin III program
+(:menuselection:`Start --> PostgreSQL 9.0 --> pgAdmin III`) or the
+SQL Shell (:menuselection:`Start --> PostgreSQL 9.0 --> SQL Shell`).
+For example, to create a ``geodjango`` spatial database and user, the following
+may be executed from the SQL Shell as the ``postgres`` user::
+
+    postgres# CREATE USER geodjango PASSWORD 'my_passwd';
+    postgres# CREATE DATABASE geodjango OWNER geodjango TEMPLATE template_postgis ENCODING 'utf8';
 
 .. rubric:: Footnotes
 .. [#] The datum shifting files are needed for converting data to and from certain projections.
@@ -1200,5 +1258,3 @@ __ http://geodjango.org/windows/GeoDjango_Installer.exe
        routine from ``ctypes.util`` to locate shared libraries.
 .. [#] The ``psycopg2`` Windows installers are packaged and maintained by
        `Jason Erickson <http://www.stickpeople.com/projects/python/win-psycopg/>`_.
-.. [#] The source code for the installer is available in the `nsis_installer <http://geodjango.org/hg/nsis_installer/>`_
-       GeoDjango mercurial repository.
