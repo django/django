@@ -22,6 +22,7 @@ class ContentTypesTests(TestCase):
     def tearDown(self):
         settings.DEBUG = self.old_DEBUG
         Site._meta.installed = self.old_Site_meta_installed
+        ContentType.objects.clear_cache()
 
     def test_lookup_cache(self):
         """
