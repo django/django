@@ -41,6 +41,8 @@ def load_backend(backend_name):
                         and not f.startswith('.')]
             except EnvironmentError:
                 available_backends = []
+            if backend_name.startswith('django.db.backends.'):
+                backend_name = backend_name[19:] # See #15621.
             if backend_name not in available_backends:
                 error_msg = ("%r isn't an available database backend. \n" +
                     "Try using django.db.backends.XXX, where XXX is one of:\n    %s\n" +
