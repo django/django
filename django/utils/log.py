@@ -79,7 +79,11 @@ class AdminEmailHandler(logging.Handler):
             )
             request_repr = repr(request)
         except:
-            subject = 'Error: Unknown URL'
+            subject = '%s: %s' % (
+                record.levelname,
+                record.msg
+            )
+
             request = None
             request_repr = "Request repr() unavailable"
 
