@@ -1,3 +1,4 @@
+import unittest as real_unittest
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import get_app, get_apps
@@ -113,7 +114,7 @@ def build_test(label):
             TestClass = getattr(test_module, parts[1], None)
 
     try:
-        if issubclass(TestClass, unittest.TestCase):
+        if issubclass(TestClass, (unittest.TestCase, real_unittest.TestCase)):
             if len(parts) == 2: # label is app.TestClass
                 try:
                     return unittest.TestLoader().loadTestsFromTestCase(TestClass)
