@@ -66,10 +66,10 @@ class StaticFilesTestCase(TestCase):
         # To make sure SVN doesn't hangs itself with the non-ASCII characters
         # during checkout, we actually create one file dynamically.
         self._nonascii_filepath = os.path.join(
-            TEST_ROOT, 'apps', 'test', 'static', 'test', u'fişier.txt')
+            TEST_ROOT, 'apps', 'test', 'static', 'test', u'fi\u015fier.txt')
         f = codecs.open(self._nonascii_filepath, 'w', 'utf-8')
         try:
-            f.write(u"fişier in the app dir")
+            f.write(u"fi\u015fier in the app dir")
         finally:
             f.close()
 
@@ -183,7 +183,8 @@ class TestFindStatic(BuildStaticTestCase, TestDefaults):
             call_command('findstatic', filepath, all=False, verbosity='0')
             sys.stdout.seek(0)
             lines = [l.strip() for l in sys.stdout.readlines()]
-            contents = codecs.open(lines[1].strip(), "r", "utf-8").read()
+            contents = codecs.open(
+                smart_unicode(lines[1].strip()), "r", "utf-8").read()
         finally:
             sys.stdout = _stdout
         return contents
