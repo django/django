@@ -165,6 +165,12 @@ class TestDefaults(object):
         """
         self.assertFileContains(u'test/fişier.txt', u'fişier in the app dir')
 
+    def test_camelcase_filenames(self):
+        """
+        Can find a file with capital letters.
+        """
+        self.assertFileContains(u'test/camelCase.txt', u'camelCase')
+
 
 class TestFindStatic(BuildStaticTestCase, TestDefaults):
     """
