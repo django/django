@@ -51,8 +51,6 @@ class BaseMemcachedCache(BaseCache):
 
     def add(self, key, value, timeout=0, version=None):
         key = self.make_key(key, version=version)
-        if isinstance(value, unicode):
-            value = value.encode('utf-8')
         return self._cache.add(key, value, self._get_memcache_timeout(timeout))
 
     def get(self, key, default=None, version=None):
@@ -118,8 +116,6 @@ class BaseMemcachedCache(BaseCache):
         safe_data = {}
         for key, value in data.items():
             key = self.make_key(key, version=version)
-            if isinstance(value, unicode):
-                value = value.encode('utf-8')
             safe_data[key] = value
         self._cache.set_multi(safe_data, self._get_memcache_timeout(timeout))
 
