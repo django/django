@@ -40,8 +40,6 @@ class CacheClass(BaseCache):
         return timeout
 
     def add(self, key, value, timeout=0):
-        if isinstance(value, unicode):
-            value = value.encode('utf-8')
         return self._cache.add(smart_str(key), value, self._get_memcache_timeout(timeout))
 
     def get(self, key, default=None):
@@ -92,8 +90,6 @@ class CacheClass(BaseCache):
     def set_many(self, data, timeout=0):
         safe_data = {}
         for key, value in data.items():
-            if isinstance(value, unicode):
-                value = value.encode('utf-8')
             safe_data[smart_str(key)] = value
         self._cache.set_multi(safe_data, self._get_memcache_timeout(timeout))
 
