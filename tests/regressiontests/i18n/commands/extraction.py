@@ -49,7 +49,19 @@ class BasicExtractorTests(ExtractorTests):
         self.assertTrue('This comment should not be extracted' not in po_contents)
         # Comments in templates
         self.assertTrue('#. Translators: Django template comment for translators' in po_contents)
-        self.assertTrue('#. Translators: Django comment block for translators' in po_contents)
+        self.assertTrue("#. Translators: Django comment block for translators\n#. string's meaning unveiled" in po_contents)
+
+        self.assertTrue('#. Translators: One-line translator comment #1' in po_contents)
+        self.assertTrue('#. Translators: Two-line translator comment #1\n#. continued here.' in po_contents)
+
+        self.assertTrue('#. Translators: One-line translator comment #2' in po_contents)
+        self.assertTrue('#. Translators: Two-line translator comment #2\n#. continued here.' in po_contents)
+
+        self.assertTrue('#. Translators: One-line translator comment #3' in po_contents)
+        self.assertTrue('#. Translators: Two-line translator comment #3\n#. continued here.' in po_contents)
+
+        self.assertTrue('#. Translators: One-line translator comment #4' in po_contents)
+        self.assertTrue('#. Translators: Two-line translator comment #4\n#. continued here.' in po_contents)
 
     def test_templatize(self):
         os.chdir(self.test_dir)

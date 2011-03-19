@@ -1,8 +1,52 @@
 {% load i18n %}
-{% comment %}Translators: Django comment block for translators {% endcomment %}
+{% comment %}Translators: Django comment block for translators
+string's meaning unveiled
+{% endcomment %}
 {% trans "This literal should be included." %}
 {% trans "This literal should also be included wrapped or not wrapped depending on the use of the --no-wrap option." %}
 
 {# Translators: Django template comment for translators #}
 <p>{% blocktrans %}I think that 100% is more that 50% of anything.{% endblocktrans %}</p>
 {% blocktrans with 'txt' as obj %}I think that 100% is more that 50% of {{ obj }}.{% endblocktrans %}
+
+{% comment %}Some random comment
+Some random comment
+Translators: One-line translator comment #1
+{% endcomment %}
+{% trans "Translatable literal #1a" %}
+
+{% comment %}Some random comment
+Some random comment
+Translators: Two-line translator comment #1
+continued here.
+{% endcomment %}
+{% trans "Translatable literal #1b" %}
+
+{% comment %}Some random comment
+Translators: One-line translator comment #2
+{% endcomment %}
+{% trans "Translatable literal #2a" %}
+
+{% comment %}Some random comment
+Translators: Two-line translator comment #2
+continued here.
+{% endcomment %}
+{% trans "Translatable literal #2b" %}
+
+{% comment %}
+    Translators: One-line translator comment #3
+{% endcomment %}
+{% trans "Translatable literal #3a" %}
+
+{% comment %}
+Translators: Two-line translator comment #3
+continued here.
+{% endcomment %}
+{% trans "Translatable literal #3b" %}
+
+{% comment %} Translators: One-line translator comment #4{% endcomment %}
+{% trans "Translatable literal #4a" %}
+
+{% comment %}  Translators: Two-line translator comment #4
+continued here.{% endcomment %}
+{% trans "Translatable literal #4b" %}
