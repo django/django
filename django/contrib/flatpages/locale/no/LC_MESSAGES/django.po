@@ -29,6 +29,8 @@ msgid ""
 "This value must contain only letters, numbers, dots, underscores, dashes, "
 "slashes or tildes."
 msgstr ""
+"Dette feltet kan kun inneholde bokstaver, nummer, skilletegn, understreker, "
+"bindestreker, skråstreker eller tilder."
 
 #: admin.py:22
 msgid "Advanced options"
