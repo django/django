@@ -4,9 +4,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-15 13:13-0400\n"
-"PO-Revision-Date: 2011-03-10 21:29+0000\n"
-"Last-Translator: greenfire <hongdiepkien@gmail.com>\n"
+"POT-Creation-Date: 2011-03-20 21:03+0100\n"
+"PO-Revision-Date: 2011-03-16 04:22+0000\n"
+"Last-Translator: autalpha <autalpha@gmail.com>\n"
 "Language-Team: Vietnamese <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -31,7 +31,7 @@ msgstr "Bạn có chắc chắn không?"
 #: actions.py:85
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
-msgstr ""
+msgstr "Xóa các %(verbose_name_plural)s đã chọn"
 
 #: filterspecs.py:54
 #, python-format
@@ -42,41 +42,41 @@ msgstr ""
 "<h3>Bởi %s:</h3>\n"
 "<ul>\n"
 
-#: filterspecs.py:104 filterspecs.py:136 filterspecs.py:205 filterspecs.py:257
+#: filterspecs.py:104 filterspecs.py:139 filterspecs.py:168 filterspecs.py:258
 msgid "All"
 msgstr "Tất cả"
 
-#: filterspecs.py:164
-msgid "Any date"
-msgstr "Bất kì ngày nào"
-
-#: filterspecs.py:165
-msgid "Today"
-msgstr "Hôm nay"
-
-#: filterspecs.py:168
-msgid "Past 7 days"
-msgstr "7 ngày trước"
-
-#: filterspecs.py:171
-msgid "This month"
-msgstr "Tháng này"
-
-#: filterspecs.py:173
-msgid "This year"
-msgstr "Năm nay"
-
-#: filterspecs.py:205
+#: filterspecs.py:139
 msgid "Yes"
 msgstr "Có"
 
-#: filterspecs.py:205
+#: filterspecs.py:139
 msgid "No"
 msgstr "Không"
 
-#: filterspecs.py:216
+#: filterspecs.py:150
 msgid "Unknown"
 msgstr "Chưa xác định"
+
+#: filterspecs.py:196
+msgid "Any date"
+msgstr "Bất kì ngày nào"
+
+#: filterspecs.py:197
+msgid "Today"
+msgstr "Hôm nay"
+
+#: filterspecs.py:200
+msgid "Past 7 days"
+msgstr "7 ngày trước"
+
+#: filterspecs.py:203
+msgid "This month"
+msgstr "Tháng này"
+
+#: filterspecs.py:205
+msgid "This year"
+msgstr "Năm nay"
 
 #: forms.py:9
 msgid ""
@@ -107,11 +107,11 @@ msgstr "Mã đối tượng"
 
 #: models.py:23
 msgid "object repr"
-msgstr ""
+msgstr "đối tượng repr"
 
 #: models.py:24
 msgid "action flag"
-msgstr ""
+msgstr "hiệu hành động"
 
 #: models.py:25
 msgid "change message"
@@ -119,11 +119,11 @@ msgstr "thay đổi tin nhắn"
 
 #: models.py:28
 msgid "log entry"
-msgstr ""
+msgstr "đăng nhập"
 
 #: models.py:29
 msgid "log entries"
-msgstr ""
+msgstr "mục đăng nhập"
 
 #: options.py:147 options.py:162
 msgid "None"
@@ -189,6 +189,8 @@ msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr ""
+"Mục tiêu phải được chọn mới có thể thực hiện hành động trên chúng. Không có "
+"mục tiêu nào đã được thay đổi."
 
 #: options.py:846
 msgid "No action selected."
@@ -217,18 +219,18 @@ msgstr "Cơ sở dữ liệu bị lỗi"
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
-msgstr[0] ""
+msgstr[0] " %(count)s  %(name)s đã được thay đổi thành công."
 
 #: options.py:1154
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
-msgstr[0] ""
+msgstr[0] "Tất cả %(total_count)s đã được chọn"
 
 #: options.py:1159
 #, python-format
 msgid "0 of %(cnt)s selected"
-msgstr ""
+msgstr "0 của %(cnt)s được chọn"
 
 #: options.py:1210
 #, python-format
@@ -318,7 +320,7 @@ msgstr ""
 
 #: templates/admin/actions.html:4
 msgid "Run the selected action"
-msgstr ""
+msgstr "Bắt đầu hành động lựa chọn"
 
 #: templates/admin/actions.html:4
 msgid "Go"
@@ -331,7 +333,7 @@ msgstr "Click vào đây để lựa chọn các đối tượng trên tất c�
 #: templates/admin/actions.html:11
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
-msgstr ""
+msgstr "Hãy chọn tất cả %(total_count)s %(module_name)s"
 
 #: templates/admin/actions.html:13
 msgid "Clear selection"
@@ -372,7 +374,7 @@ msgstr "Trang web admin Django"
 
 #: templates/admin/base_site.html:7
 msgid "Django administration"
-msgstr ""
+msgstr "Trang quản trị cho Django"
 
 #: templates/admin/change_form.html:22 templates/admin/index.html:29
 msgid "Add"
@@ -426,6 +428,8 @@ msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
 "following protected related objects:"
 msgstr ""
+"Xóa các %(object_name)s  ' %(escaped_object)s ' sẽ bắt buộc xóa các đối "
+"tượng được bảo vệ sau đây:"
 
 #: templates/admin/delete_confirmation.html:33
 #, python-format
@@ -452,6 +456,8 @@ msgid ""
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
 msgstr ""
+"Xóa các %(objects_name)s sẽ bắt buộc xóa các đối tượng liên quan, nhưng tài "
+"khoản của bạn không có quyền xóa các loại đối tượng sau đây:"
 
 #: templates/admin/delete_selected_confirmation.html:24
 #, python-format
@@ -459,6 +465,8 @@ msgid ""
 "Deleting the selected %(objects_name)s would require deleting the following "
 "protected related objects:"
 msgstr ""
+"Xóa các %(objects_name)s sẽ bắt buộc xóa các đối tượng đã được bảo vệ sau "
+"đây:"
 
 #: templates/admin/delete_selected_confirmation.html:32
 #, python-format
@@ -610,7 +618,7 @@ msgstr "Nhập dãy mật mã trên để xác minh lại"
 #: templates/admin/edit_inline/tabular.html:113
 #, python-format
 msgid "Add another %(verbose_name)s"
-msgstr ""
+msgstr "Thêm một %(verbose_name)s "
 
 #: templates/admin/edit_inline/stacked.html:70
 #: templates/admin/edit_inline/tabular.html:116
@@ -757,7 +765,7 @@ msgstr "Cảm ơn bạn đã sử dụng website của chúng tôi!"
 #: templates/registration/password_reset_email.html:12
 #, python-format
 msgid "The %(site_name)s team"
-msgstr ""
+msgstr "Đội của %(site_name)s"
 
 #: templates/registration/password_reset_form.html:12
 msgid ""

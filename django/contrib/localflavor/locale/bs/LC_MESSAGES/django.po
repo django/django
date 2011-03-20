@@ -4,10 +4,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-15 13:18-0400\n"
-"PO-Revision-Date: 2011-03-04 18:43+0000\n"
-"Last-Translator: Jannis <jannis@leidel.info>\n"
-"Language-Team: Bosnian <None>\n"
+"POT-Creation-Date: 2011-03-20 21:08+0100\n"
+"PO-Revision-Date: 2011-03-20 19:00+0000\n"
+"Last-Translator: fdupanovic <filip.dupanovic@gmail.com>\n"
+"Language-Team: Bosnian <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -21,19 +21,19 @@ msgstr "Unesite poštanski broj u formatu NNNN ili ANNNNAAA."
 
 #: ar/forms.py:50 br/forms.py:92 br/forms.py:131 pe/forms.py:24 pe/forms.py:52
 msgid "This field requires only numbers."
-msgstr "Ovo polje mora sadržati samo brojke."
+msgstr "Ovo polje zahtjeva samo brojeve."
 
 #: ar/forms.py:51
 msgid "This field requires 7 or 8 digits."
-msgstr "Ovo polje mora sadržati 7 ili 8 cifara"
+msgstr "Ovo polje mora da sadrži 7 ili 8 cifara."
 
 #: ar/forms.py:80
 msgid "Enter a valid CUIT in XX-XXXXXXXX-X or XXXXXXXXXXXX format."
-msgstr "Unestie važeći CUIT u formatu XX-XXXXXXXX-X or XXXXXXXXXXXX."
+msgstr "Unesite ispravan CUIT u formatu XX-XXXXXXXX-X or XXXXXXXXXXXX."
 
 #: ar/forms.py:81
 msgid "Invalid CUIT."
-msgstr "Nevažeći CUIT"
+msgstr "Neispravan CUIT."
 
 #: at/at_states.py:5
 msgid "Burgenland"
@@ -86,63 +86,63 @@ msgstr "Unesite četvorocifreni poštanski broj"
 
 #: be/be_provinces.py:5
 msgid "Antwerp"
-msgstr ""
+msgstr "Antwerpen"
 
 #: be/be_provinces.py:6
 msgid "Brussels"
-msgstr ""
+msgstr "Brisel"
 
 #: be/be_provinces.py:7
 msgid "East Flanders"
-msgstr ""
+msgstr "Istočna Flandrija"
 
 #: be/be_provinces.py:8
 msgid "Flemish Brabant"
-msgstr ""
+msgstr "Flamanski Brabant"
 
 #: be/be_provinces.py:9
 msgid "Hainaut"
-msgstr ""
+msgstr "Hainaut"
 
 #: be/be_provinces.py:10
 msgid "Liege"
-msgstr ""
+msgstr "Liege"
 
 #: be/be_provinces.py:11 nl/nl_provinces.py:9
 msgid "Limburg"
-msgstr ""
+msgstr "Limburg"
 
 #: be/be_provinces.py:12
 msgid "Luxembourg"
-msgstr ""
+msgstr "Luksemburg"
 
 #: be/be_provinces.py:13
 msgid "Namur"
-msgstr ""
+msgstr "Namur"
 
 #: be/be_provinces.py:14
 msgid "Walloon Brabant"
-msgstr ""
+msgstr "Valonski Brabant"
 
 #: be/be_provinces.py:15
 msgid "West Flanders"
-msgstr ""
+msgstr "Zapadna Flandrija"
 
 #: be/be_regions.py:5
 msgid "Brussels Capital Region"
-msgstr ""
+msgstr "Regija glavnoga grada Bruxellesa"
 
 #: be/be_regions.py:6
 msgid "Flemish Region"
-msgstr ""
+msgstr "Flamanska regija"
 
 #: be/be_regions.py:7
 msgid "Wallonia"
-msgstr ""
+msgstr "Valonija"
 
 #: be/forms.py:23
 msgid "Enter a valid postal code in the range and format 1XXX - 9XXX."
-msgstr ""
+msgstr "Unesite ispravan poštanski broj u rasponu i formatu 1XXX-9XXX."
 
 #: be/forms.py:46
 msgid ""
@@ -150,24 +150,27 @@ msgid ""
 "04xx xx xx xx, 0x/xxx.xx.xx, 0xx/xx.xx.xx, 04xx/xx.xx.xx, 0x.xxx.xx.xx, 0xx."
 "xx.xx.xx, 04xx.xx.xx.xx, 0xxxxxxxx or 04xxxxxxxx."
 msgstr ""
+"Unesite važeći broj telefona u jednom od formata 0x xxx xx xx, 0xx xx xx xx, "
+"04xx xx xx xx, 0x/xxx.xx.xx, 0xx/xx.xx.xx, 04xx/xx.xx.xx, 0x.xxx.xx.xx, 0xx."
+"xx.xx.xx, 04xx.xx.xx.xx, 0xxxxxxxx ili 04xxxxxxxx."
 
 #: br/forms.py:17
 msgid "Enter a zip code in the format XXXXX-XXX."
-msgstr "Unesite poštanski broj u formatu XXXXX-XXX."
+msgstr "Unesite zip kod u formatu XXXXX-XXX."
 
 #: br/forms.py:26
 msgid "Phone numbers must be in XX-XXXX-XXXX format."
-msgstr "Broj telefona mora biti u formatu XX-XXXX-XXXX."
+msgstr "Telefonski brojevi moraju biti u XX-XXXX-XXXX formatu."
 
 #: br/forms.py:54
 msgid ""
 "Select a valid brazilian state. That state is not one of the available "
 "states."
-msgstr "Odaberite postojeću brazilsku državu. Ta država nije među ponuđenima."
+msgstr "Odaberite ispravnu brazilsku državu. Ta država nije među ponuđenima."
 
 #: br/forms.py:90
 msgid "Invalid CPF number."
-msgstr "Nevažeći CPF broj"
+msgstr "Neispravan CPF broj."
 
 #: br/forms.py:91
 msgid "This field requires at most 11 digits or 14 characters."
@@ -179,7 +182,7 @@ msgstr "Neispravan CNPJ broj."
 
 #: br/forms.py:132
 msgid "This field requires at least 14 digits"
-msgstr "Polje zahtijeva najmanje 14 cifri"
+msgstr "Polje zahtijeva najmanje 14 cifri."
 
 #: ca/forms.py:25
 msgid "Enter a postal code in the format XXX XXX."
@@ -191,115 +194,115 @@ msgstr "Unesite ispravan kanadski Social Insurance broj u XXX-XXX-XXX formatu."
 
 #: ch/ch_states.py:5
 msgid "Aargau"
-msgstr ""
+msgstr "Aargau"
 
 #: ch/ch_states.py:6
 msgid "Appenzell Innerrhoden"
-msgstr ""
+msgstr "Appenzell Innerrhoden"
 
 #: ch/ch_states.py:7
 msgid "Appenzell Ausserrhoden"
-msgstr ""
+msgstr "Appenzell Ausserrhoden"
 
 #: ch/ch_states.py:8
 msgid "Basel-Stadt"
-msgstr ""
+msgstr "Basel-grad"
 
 #: ch/ch_states.py:9
 msgid "Basel-Land"
-msgstr ""
+msgstr "Basel-provincija"
 
 #: ch/ch_states.py:10
 msgid "Berne"
-msgstr ""
+msgstr "Bern"
 
 #: ch/ch_states.py:11
 msgid "Fribourg"
-msgstr ""
+msgstr "Fribourg"
 
 #: ch/ch_states.py:12
 msgid "Geneva"
-msgstr ""
+msgstr "Ženeva"
 
 #: ch/ch_states.py:13
 msgid "Glarus"
-msgstr ""
+msgstr "Glarus"
 
 #: ch/ch_states.py:14
 msgid "Graubuenden"
-msgstr ""
+msgstr "Graubuenden"
 
 #: ch/ch_states.py:15
 msgid "Jura"
-msgstr ""
+msgstr "Jura"
 
 #: ch/ch_states.py:16
 msgid "Lucerne"
-msgstr ""
+msgstr "Lucern"
 
 #: ch/ch_states.py:17
 msgid "Neuchatel"
-msgstr ""
+msgstr "Neuchatel"
 
 #: ch/ch_states.py:18
 msgid "Nidwalden"
-msgstr ""
+msgstr "Nidwalden"
 
 #: ch/ch_states.py:19
 msgid "Obwalden"
-msgstr ""
+msgstr "Obwalden"
 
 #: ch/ch_states.py:20
 msgid "Schaffhausen"
-msgstr ""
+msgstr "Schaffhausen"
 
 #: ch/ch_states.py:21
 msgid "Schwyz"
-msgstr ""
+msgstr "Schwyz"
 
 #: ch/ch_states.py:22
 msgid "Solothurn"
-msgstr ""
+msgstr "Solothurn"
 
 #: ch/ch_states.py:23
 msgid "St. Gallen"
-msgstr ""
+msgstr "St. Gallen"
 
 #: ch/ch_states.py:24
 msgid "Thurgau"
-msgstr ""
+msgstr "Thurgau"
 
 #: ch/ch_states.py:25
 msgid "Ticino"
-msgstr ""
+msgstr "Ticino"
 
 #: ch/ch_states.py:26
 msgid "Uri"
-msgstr ""
+msgstr "Uri"
 
 #: ch/ch_states.py:27
 msgid "Valais"
-msgstr ""
+msgstr "Valais"
 
 #: ch/ch_states.py:28
 msgid "Vaud"
-msgstr ""
+msgstr "Vaud"
 
 #: ch/ch_states.py:29
 msgid "Zug"
-msgstr ""
+msgstr "Zug"
 
 #: ch/ch_states.py:30
 msgid "Zurich"
-msgstr ""
+msgstr "Zurich"
 
 #: ch/forms.py:65
 msgid ""
 "Enter a valid Swiss identity or passport card number in X1234567<0 or "
 "1234567890 format."
 msgstr ""
-"Unesite ispravan broj švicarske lične karte ili pasoša oblika X1234567<0 ili "
-"u 1234567890 formatu."
+"Unesite ispravan broj švicarske lične karte ili pasoša u X1234567<0 ili u "
+"1234567890 formatu."
 
 #: cl/forms.py:30
 msgid "Enter a valid Chilean RUT."
@@ -315,59 +318,59 @@ msgstr "Čileanski RUT nije ispravan."
 
 #: cz/cz_regions.py:8
 msgid "Prague"
-msgstr ""
+msgstr "Prag"
 
 #: cz/cz_regions.py:9
 msgid "Central Bohemian Region"
-msgstr ""
+msgstr "Centralna Češka"
 
 #: cz/cz_regions.py:10
 msgid "South Bohemian Region"
-msgstr ""
+msgstr "Južna Češka"
 
 #: cz/cz_regions.py:11
 msgid "Pilsen Region"
-msgstr ""
+msgstr "Plzenjski kraj"
 
 #: cz/cz_regions.py:12
 msgid "Carlsbad Region"
-msgstr ""
+msgstr "Karlovarski kraj"
 
 #: cz/cz_regions.py:13
 msgid "Usti Region"
-msgstr ""
+msgstr "Ustečki kraj"
 
 #: cz/cz_regions.py:14
 msgid "Liberec Region"
-msgstr ""
+msgstr "Liberečki kraj"
 
 #: cz/cz_regions.py:15
 msgid "Hradec Region"
-msgstr ""
+msgstr "Kralovehradečki kraj"
 
 #: cz/cz_regions.py:16
 msgid "Pardubice Region"
-msgstr ""
+msgstr "Pardubički kraj"
 
 #: cz/cz_regions.py:17
 msgid "Vysocina Region"
-msgstr ""
+msgstr "Visočina kraj"
 
 #: cz/cz_regions.py:18
 msgid "South Moravian Region"
-msgstr ""
+msgstr "Južna Moravska"
 
 #: cz/cz_regions.py:19
 msgid "Olomouc Region"
-msgstr ""
+msgstr "Olomoučki kraj"
 
 #: cz/cz_regions.py:20
 msgid "Zlin Region"
-msgstr ""
+msgstr "Zlinski kraj"
 
 #: cz/cz_regions.py:21
 msgid "Moravian-Silesian Region"
-msgstr ""
+msgstr "Moravsko-seleški kraj"
 
 #: cz/forms.py:28 sk/forms.py:30
 msgid "Enter a postal code in the format XXXXX or XXX XX."

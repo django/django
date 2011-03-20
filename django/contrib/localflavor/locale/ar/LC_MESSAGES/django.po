@@ -4,9 +4,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-15 13:18-0400\n"
-"PO-Revision-Date: 2011-03-04 18:43+0000\n"
-"Last-Translator: Jannis <jannis@leidel.info>\n"
+"POT-Creation-Date: 2011-03-20 21:08+0100\n"
+"PO-Revision-Date: 2011-03-17 18:13+0000\n"
+"Last-Translator: okhayat <okhayat@gmail.com>\n"
 "Language-Team: Arabic <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -57,7 +57,7 @@ msgstr "سالزبورغ"
 
 #: at/at_states.py:10
 msgid "Styria"
-msgstr ""
+msgstr "ستيريا"
 
 #: at/at_states.py:11
 msgid "Tyrol"
@@ -65,7 +65,7 @@ msgstr "تايرُل"
 
 #: at/at_states.py:12
 msgid "Vorarlberg"
-msgstr ""
+msgstr "فورارلبيرغ"
 
 #: at/at_states.py:13
 msgid "Vienna"
@@ -89,7 +89,7 @@ msgstr ""
 
 #: be/be_provinces.py:6
 msgid "Brussels"
-msgstr ""
+msgstr "بروكسل"
 
 #: be/be_provinces.py:7
 msgid "East Flanders"
@@ -113,7 +113,7 @@ msgstr ""
 
 #: be/be_provinces.py:12
 msgid "Luxembourg"
-msgstr ""
+msgstr "لوكسومبورج"
 
 #: be/be_provinces.py:13
 msgid "Namur"
@@ -141,7 +141,7 @@ msgstr ""
 
 #: be/forms.py:23
 msgid "Enter a valid postal code in the range and format 1XXX - 9XXX."
-msgstr ""
+msgstr "أدخل الرمز البريدي بالتسلسل الصحيح ما بين 1XXX - 9XXX."
 
 #: be/forms.py:46
 msgid ""
@@ -149,6 +149,9 @@ msgid ""
 "04xx xx xx xx, 0x/xxx.xx.xx, 0xx/xx.xx.xx, 04xx/xx.xx.xx, 0x.xxx.xx.xx, 0xx."
 "xx.xx.xx, 04xx.xx.xx.xx, 0xxxxxxxx or 04xxxxxxxx."
 msgstr ""
+"أدخل رقم هاتف صحيح بأي من الأنساق التالية 0x xxx xx xx، 0xx xx xx xx، 04xx "
+"xx xx xx، 0x/xxx.xx.xx، 0xx/xx.xx.xx، 04xx/xx.xx.xx، 0x.xxx.xx.xx، 0xx.xx.xx."
+"xx، 04xx.xx.xx.xx، 0xxxxxxxx أو 04xxxxxxxx."
 
 #: br/forms.py:17
 msgid "Enter a zip code in the format XXXXX-XXX."
@@ -464,7 +467,7 @@ msgstr ""
 
 #: es/es_provinces.py:5
 msgid "Arava"
-msgstr ""
+msgstr "أرافا"
 
 #: es/es_provinces.py:6
 msgid "Albacete"
@@ -476,15 +479,15 @@ msgstr ""
 
 #: es/es_provinces.py:8
 msgid "Almeria"
-msgstr ""
+msgstr "ألميريا"
 
 #: es/es_provinces.py:9
 msgid "Avila"
-msgstr ""
+msgstr "أفيلا"
 
 #: es/es_provinces.py:10
 msgid "Badajoz"
-msgstr ""
+msgstr "باداجوز"
 
 #: es/es_provinces.py:11
 msgid "Illes Balears"
@@ -496,7 +499,7 @@ msgstr "برشلونة"
 
 #: es/es_provinces.py:13
 msgid "Burgos"
-msgstr ""
+msgstr "بورجوس"
 
 #: es/es_provinces.py:14
 msgid "Caceres"
@@ -508,7 +511,7 @@ msgstr ""
 
 #: es/es_provinces.py:16
 msgid "Castello"
-msgstr ""
+msgstr "كاستلّو"
 
 #: es/es_provinces.py:17
 msgid "Ciudad Real"
@@ -672,7 +675,7 @@ msgstr ""
 
 #: es/es_regions.py:5
 msgid "Andalusia"
-msgstr ""
+msgstr "الأندلس"
 
 #: es/es_regions.py:6
 msgid "Aragon"
@@ -1183,11 +1186,11 @@ msgstr ""
 
 #: il/forms.py:31
 msgid "Enter a postal code in the format XXXXX"
-msgstr ""
+msgstr "اكتب الرمز البريدي بالنسق XXXXX"
 
 #: il/forms.py:50
 msgid "Enter a valid ID number."
-msgstr ""
+msgstr "أدخل رقم هوية صحيح."
 
 #: in_/forms.py:15
 msgid "Enter a zip code in the format XXXXXXX."
@@ -2033,11 +2036,11 @@ msgstr ""
 
 #: sk/sk_districts.py:60
 msgid "Rimavska Sobota"
-msgstr ""
+msgstr "ريمافسكا سوبوتا"
 
 #: sk/sk_districts.py:61
 msgid "Roznava"
-msgstr ""
+msgstr "روتزنافا"
 
 #: sk/sk_districts.py:62
 msgid "Ruzomberok"
@@ -2173,19 +2176,19 @@ msgstr ""
 
 #: tr/forms.py:16
 msgid "Enter a postal code in the format XXXXX."
-msgstr ""
+msgstr "أدخل الرمز البريدي بالنسق XXXXX."
 
 #: tr/forms.py:37
 msgid "Phone numbers must be in 0XXX XXX XXXX format."
-msgstr ""
+msgstr "أرقام الهواتف يجب أن تكون بالنسق 0XXX XXX XXXX."
 
 #: tr/forms.py:64
 msgid "Enter a valid Turkish Identification number."
-msgstr ""
+msgstr "أدخل رقم هوية تركية صحيح."
 
 #: tr/forms.py:65
 msgid "Turkish Identification number must be 11 digits."
-msgstr ""
+msgstr "رقم الهوية التركي يجب أن يتكون من 11 رقماً."
 
 #: uk/forms.py:21
 msgid "Enter a valid postcode."
@@ -2213,11 +2216,11 @@ msgstr ""
 
 #: uk/uk_regions.py:17
 msgid "Derbyshire"
-msgstr ""
+msgstr "ديربي شاير"
 
 #: uk/uk_regions.py:18
 msgid "Devon"
-msgstr ""
+msgstr "دِفون"
 
 #: uk/uk_regions.py:19
 msgid "Dorset"
@@ -2241,15 +2244,15 @@ msgstr ""
 
 #: uk/uk_regions.py:24
 msgid "Greater London"
-msgstr ""
+msgstr "لندن العظمى"
 
 #: uk/uk_regions.py:25
 msgid "Greater Manchester"
-msgstr ""
+msgstr "مانشستر العظمى"
 
 #: uk/uk_regions.py:26
 msgid "Hampshire"
-msgstr ""
+msgstr "هامشاير"
 
 #: uk/uk_regions.py:27
 msgid "Hertfordshire"
@@ -2257,7 +2260,7 @@ msgstr ""
 
 #: uk/uk_regions.py:28
 msgid "Kent"
-msgstr ""
+msgstr "كِنْت"
 
 #: uk/uk_regions.py:29
 msgid "Lancashire"
@@ -2281,7 +2284,7 @@ msgstr ""
 
 #: uk/uk_regions.py:34
 msgid "North Yorkshire"
-msgstr ""
+msgstr "شمال يورك شاير"
 
 #: uk/uk_regions.py:35
 msgid "Northamptonshire"
@@ -2429,7 +2432,7 @@ msgstr ""
 
 #: uk/uk_regions.py:80
 msgid "Highland"
-msgstr ""
+msgstr "هاي لاند"
 
 #: uk/uk_regions.py:81
 msgid "Lothian"
@@ -2493,7 +2496,7 @@ msgstr "ولاية أمريكية (حرفان كبيران)"
 
 #: us/models.py:18
 msgid "U.S. postal code (two uppercase letters)"
-msgstr ""
+msgstr "رمز بريدي أميركي (حرفان لاتينيان كبيران)"
 
 #: us/models.py:27
 msgid "Phone number"

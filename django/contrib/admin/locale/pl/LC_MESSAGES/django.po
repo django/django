@@ -4,8 +4,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-15 13:13-0400\n"
-"PO-Revision-Date: 2011-03-04 22:32+0000\n"
+"POT-Creation-Date: 2011-03-20 21:03+0100\n"
+"PO-Revision-Date: 2011-03-15 20:39+0000\n"
 "Last-Translator: angularcircle <angular.circle@gmail.com>\n"
 "Language-Team: Polish <>\n"
 "MIME-Version: 1.0\n"
@@ -43,41 +43,41 @@ msgstr ""
 "<h3>Przez %s:</h3>\n"
 "</ul>\n"
 
-#: filterspecs.py:104 filterspecs.py:136 filterspecs.py:205 filterspecs.py:257
+#: filterspecs.py:104 filterspecs.py:139 filterspecs.py:168 filterspecs.py:258
 msgid "All"
 msgstr "Wszystko"
 
-#: filterspecs.py:164
-msgid "Any date"
-msgstr "Dowolna data"
-
-#: filterspecs.py:165
-msgid "Today"
-msgstr "Dzisiaj"
-
-#: filterspecs.py:168
-msgid "Past 7 days"
-msgstr "Ostatnie 7 dni"
-
-#: filterspecs.py:171
-msgid "This month"
-msgstr "Ten miesiąc"
-
-#: filterspecs.py:173
-msgid "This year"
-msgstr "Ten rok"
-
-#: filterspecs.py:205
+#: filterspecs.py:139
 msgid "Yes"
 msgstr "Tak"
 
-#: filterspecs.py:205
+#: filterspecs.py:139
 msgid "No"
 msgstr "Nie"
 
-#: filterspecs.py:216
+#: filterspecs.py:150
 msgid "Unknown"
 msgstr "Nieznany"
+
+#: filterspecs.py:196
+msgid "Any date"
+msgstr "Dowolna data"
+
+#: filterspecs.py:197
+msgid "Today"
+msgstr "Dzisiaj"
+
+#: filterspecs.py:200
+msgid "Past 7 days"
+msgstr "Ostatnie 7 dni"
+
+#: filterspecs.py:203
+msgid "This month"
+msgstr "Ten miesiąc"
+
+#: filterspecs.py:205
+msgid "This year"
+msgstr "Ten rok"
 
 #: forms.py:9
 msgid ""
@@ -755,10 +755,14 @@ msgid ""
 "You're receiving this e-mail because you requested a password reset for your "
 "user account at %(site_name)s."
 msgstr ""
+"Otrzymujesz tę wiadomość w odpowiedzi na prośbę o zresetowanie hasła dla "
+"twojego konta na stronie %(site_name)s."
 
 #: templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
-msgstr "Proszę, idź do podanej strony i wybierz nowe hasło:"
+msgstr ""
+"Aby wprowadzić nowe hasło, proszę przejść na stronę, której adres widnieje "
+"poniżej:"
 
 #: templates/registration/password_reset_email.html:8
 msgid "Your username, in case you've forgotten:"
@@ -766,7 +770,7 @@ msgstr "Twoja nazwa użytkownika:"
 
 #: templates/registration/password_reset_email.html:10
 msgid "Thanks for using our site!"
-msgstr "Dziękujemy za używanie naszej strony!"
+msgstr "Dziękujemy za skorzystanie naszej strony."
 
 #: templates/registration/password_reset_email.html:12
 #, python-format
@@ -795,7 +799,7 @@ msgstr "Wszystkie daty"
 
 #: views/main.py:27
 msgid "(None)"
-msgstr ""
+msgstr "(Brak)"
 
 #: views/main.py:66
 #, python-format

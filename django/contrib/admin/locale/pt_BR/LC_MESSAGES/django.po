@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-15 13:13-0400\n"
+"POT-Creation-Date: 2011-03-20 21:03+0100\n"
 "PO-Revision-Date: 2011-03-04 18:44+0000\n"
 "Last-Translator: eduardocereto <eduardocereto@gmail.com>\n"
 "Language-Team: Portuguese (Brazilian) <django-l10n-portuguese@googlegroups."
@@ -43,41 +43,41 @@ msgstr ""
 "<h3>Por %s</h3>\n"
 "<ul>\n"
 
-#: filterspecs.py:104 filterspecs.py:136 filterspecs.py:205 filterspecs.py:257
+#: filterspecs.py:104 filterspecs.py:139 filterspecs.py:168 filterspecs.py:258
 msgid "All"
 msgstr "Todos"
 
-#: filterspecs.py:164
-msgid "Any date"
-msgstr "Qualquer data"
-
-#: filterspecs.py:165
-msgid "Today"
-msgstr "Hoje"
-
-#: filterspecs.py:168
-msgid "Past 7 days"
-msgstr "Últimos 7 dias"
-
-#: filterspecs.py:171
-msgid "This month"
-msgstr "Este mês"
-
-#: filterspecs.py:173
-msgid "This year"
-msgstr "Este ano"
-
-#: filterspecs.py:205
+#: filterspecs.py:139
 msgid "Yes"
 msgstr "Sim"
 
-#: filterspecs.py:205
+#: filterspecs.py:139
 msgid "No"
 msgstr "Não"
 
-#: filterspecs.py:216
+#: filterspecs.py:150
 msgid "Unknown"
 msgstr "Desconhecido"
+
+#: filterspecs.py:196
+msgid "Any date"
+msgstr "Qualquer data"
+
+#: filterspecs.py:197
+msgid "Today"
+msgstr "Hoje"
+
+#: filterspecs.py:200
+msgid "Past 7 days"
+msgstr "Últimos 7 dias"
+
+#: filterspecs.py:203
+msgid "This month"
+msgstr "Este mês"
+
+#: filterspecs.py:205
+msgid "This year"
+msgstr "Este ano"
 
 #: forms.py:9
 msgid ""

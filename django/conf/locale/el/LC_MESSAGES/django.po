@@ -4,8 +4,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-15 13:07-0400\n"
-"PO-Revision-Date: 2011-03-09 13:33+0000\n"
+"POT-Creation-Date: 2011-03-20 20:57+0100\n"
+"PO-Revision-Date: 2011-03-20 11:41+0000\n"
 "Last-Translator: pagles <y.pagles@gmail.com>\n"
 "Language-Team: Greek <>\n"
 "MIME-Version: 1.0\n"
@@ -79,202 +79,207 @@ msgid "Mexican Spanish"
 msgstr "Μεξικανική διάλεκτος Ισπανικών"
 
 #: conf/global_settings.py:60
+#, fuzzy
+msgid "Nicaraguan Spanish"
+msgstr "Μεξικανική διάλεκτος Ισπανικών"
+
+#: conf/global_settings.py:61
 msgid "Estonian"
 msgstr "Εσθονικά"
 
-#: conf/global_settings.py:61
+#: conf/global_settings.py:62
 msgid "Basque"
 msgstr "Βάσκικα"
 
-#: conf/global_settings.py:62
+#: conf/global_settings.py:63
 msgid "Persian"
 msgstr "Περσικά"
 
-#: conf/global_settings.py:63
+#: conf/global_settings.py:64
 msgid "Finnish"
 msgstr "Φινλανδικά"
 
-#: conf/global_settings.py:64
+#: conf/global_settings.py:65
 msgid "French"
 msgstr "Γαλλικά"
 
-#: conf/global_settings.py:65
+#: conf/global_settings.py:66
 msgid "Frisian"
 msgstr "Frisian"
 
-#: conf/global_settings.py:66
+#: conf/global_settings.py:67
 msgid "Irish"
 msgstr "Ιρλανδικά"
 
-#: conf/global_settings.py:67
+#: conf/global_settings.py:68
 msgid "Galician"
 msgstr "Γαελικά"
 
-#: conf/global_settings.py:68
+#: conf/global_settings.py:69
 msgid "Hebrew"
 msgstr "Εβραϊκά"
 
-#: conf/global_settings.py:69
+#: conf/global_settings.py:70
 msgid "Hindi"
 msgstr "Ινδικά"
 
-#: conf/global_settings.py:70
+#: conf/global_settings.py:71
 msgid "Croatian"
 msgstr "Κροατικά"
 
-#: conf/global_settings.py:71
+#: conf/global_settings.py:72
 msgid "Hungarian"
 msgstr "Ουγγρικά"
 
-#: conf/global_settings.py:72
+#: conf/global_settings.py:73
 msgid "Indonesian"
 msgstr "Ινδονησιακά"
 
-#: conf/global_settings.py:73
+#: conf/global_settings.py:74
 msgid "Icelandic"
 msgstr "Ισλανδικά"
 
-#: conf/global_settings.py:74
+#: conf/global_settings.py:75
 msgid "Italian"
 msgstr "Ιταλικά"
 
-#: conf/global_settings.py:75
+#: conf/global_settings.py:76
 msgid "Japanese"
 msgstr "Γιαπωνέζικα"
 
-#: conf/global_settings.py:76
+#: conf/global_settings.py:77
 msgid "Georgian"
 msgstr "Γεωργιανά"
 
-#: conf/global_settings.py:77
+#: conf/global_settings.py:78
 msgid "Khmer"
 msgstr "Χμερ"
 
-#: conf/global_settings.py:78
+#: conf/global_settings.py:79
 msgid "Kannada"
 msgstr "Κανάντα"
 
-#: conf/global_settings.py:79
+#: conf/global_settings.py:80
 msgid "Korean"
 msgstr "Κορεάτικα"
 
-#: conf/global_settings.py:80
+#: conf/global_settings.py:81
 msgid "Lithuanian"
 msgstr "Λιθουανικά"
 
-#: conf/global_settings.py:81
+#: conf/global_settings.py:82
 msgid "Latvian"
 msgstr "Λεττονικά"
 
-#: conf/global_settings.py:82
+#: conf/global_settings.py:83
 msgid "Macedonian"
 msgstr "Μακεδονικά"
 
-#: conf/global_settings.py:83
+#: conf/global_settings.py:84
 msgid "Malayalam"
 msgstr "Μαλαγιαλάμ"
 
-#: conf/global_settings.py:84
+#: conf/global_settings.py:85
 msgid "Mongolian"
 msgstr "Μογγολικά"
 
-#: conf/global_settings.py:85
+#: conf/global_settings.py:86
 msgid "Dutch"
 msgstr "Ολλανδικά"
 
-#: conf/global_settings.py:86
+#: conf/global_settings.py:87
 msgid "Norwegian"
 msgstr "Νορβηγικά"
 
-#: conf/global_settings.py:87
+#: conf/global_settings.py:88
 msgid "Norwegian Bokmal"
 msgstr "Νορβηγική διάλεκτος Μποκμάλ - \"γλώσσα των βιβλίων\""
 
-#: conf/global_settings.py:88
+#: conf/global_settings.py:89
 msgid "Norwegian Nynorsk"
 msgstr "Νορβηγική διάλεκτος Nynorsk - Νεονορβηγική"
 
-#: conf/global_settings.py:89
+#: conf/global_settings.py:90
 msgid "Punjabi"
 msgstr "Πουντζάμπι"
 
-#: conf/global_settings.py:90
+#: conf/global_settings.py:91
 msgid "Polish"
 msgstr "Πολωνικά"
 
-#: conf/global_settings.py:91
+#: conf/global_settings.py:92
 msgid "Portuguese"
 msgstr "Πορτογαλικά"
 
-#: conf/global_settings.py:92
+#: conf/global_settings.py:93
 msgid "Brazilian Portuguese"
 msgstr "Πορτογαλικά - διάλεκτος Βραζιλίας"
 
-#: conf/global_settings.py:93
+#: conf/global_settings.py:94
 msgid "Romanian"
 msgstr "Ρουμανικά"
 
-#: conf/global_settings.py:94
+#: conf/global_settings.py:95
 msgid "Russian"
 msgstr "Ρωσικά"
 
-#: conf/global_settings.py:95
+#: conf/global_settings.py:96
 msgid "Slovak"
 msgstr "Σλοβακικά"
 
-#: conf/global_settings.py:96
+#: conf/global_settings.py:97
 msgid "Slovenian"
 msgstr "Σλοβενικά"
 
-#: conf/global_settings.py:97
+#: conf/global_settings.py:98
 msgid "Albanian"
 msgstr "Αλβανικά"
 
-#: conf/global_settings.py:98
+#: conf/global_settings.py:99
 msgid "Serbian"
 msgstr "Σερβικά"
 
-#: conf/global_settings.py:99
+#: conf/global_settings.py:100
 msgid "Serbian Latin"
 msgstr "Σέρβικα Λατινικά"
 
-#: conf/global_settings.py:100
+#: conf/global_settings.py:101
 msgid "Swedish"
 msgstr "Σουηδικά"
 
-#: conf/global_settings.py:101
+#: conf/global_settings.py:102
 msgid "Tamil"
 msgstr "Διάλεκτος Ταμίλ"
 
-#: conf/global_settings.py:102
+#: conf/global_settings.py:103
 msgid "Telugu"
 msgstr "Τελούγκου"
 
-#: conf/global_settings.py:103
+#: conf/global_settings.py:104
 msgid "Thai"
 msgstr "Ταϊλάνδης"
 
-#: conf/global_settings.py:104
+#: conf/global_settings.py:105
 msgid "Turkish"
 msgstr "Τουρκικά"
 
-#: conf/global_settings.py:105
+#: conf/global_settings.py:106
 msgid "Ukrainian"
 msgstr "Ουκρανικά"
 
-#: conf/global_settings.py:106
+#: conf/global_settings.py:107
 msgid "Urdu"
 msgstr "Urdu"
 
-#: conf/global_settings.py:107
+#: conf/global_settings.py:108
 msgid "Vietnamese"
 msgstr "Βιετναμέζικα"
 
-#: conf/global_settings.py:108
+#: conf/global_settings.py:109
 msgid "Simplified Chinese"
 msgstr "Απλοποιημένα Κινέζικα"
 
-#: conf/global_settings.py:109
+#: conf/global_settings.py:110
 msgid "Traditional Chinese"
 msgstr "Παραδοσιακά Κινέζικα"
 
@@ -312,7 +317,8 @@ msgstr "Εισάγετε μόνο ψηφία χωρισμένα με κόμμα�
 #, python-format
 msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
 msgstr ""
-"Βεβαιωθείτε ότι η τιμή είναι %(limit_value)s (τώρα είναι %(show_value)s)."
+"Βεβαιωθείτε ότι η τιμή είναι %(limit_value)s (η τιμή που καταχωρήσατε είναι %"
+"(show_value)s)."
 
 #: core/validators.py:171 forms/fields.py:222 forms/fields.py:275
 #, python-format
@@ -331,7 +337,7 @@ msgid ""
 "(show_value)d)."
 msgstr ""
 "Βεβαιωθείτε ότι η τιμή έχει μέγεθος τουλάχιστον %(limit_value)d χαρακτήρες "
-"(τώρα έχει %(show_value)d)."
+"(η τιμή που καταχωρήσατε έχει %(show_value)d χαρακτήρες)."
 
 #: core/validators.py:188
 #, python-format
@@ -339,8 +345,8 @@ msgid ""
 "Ensure this value has at most %(limit_value)d characters (it has %"
 "(show_value)d)."
 msgstr ""
-"Βεβαιωθείτε ότι αυτή η τιμή έχει το πολύ%(limit_value)d χαρακτήρες (έχει %"
-"(show_value)d)."
+"Βεβαιωθείτε ότι η τιμή έχει το πολύ %(limit_value)d χαρακτήρες (η τιμή που "
+"καταχωρήσατε έχει %(show_value)d χαρακτήρες)."
 
 #: db/models/base.py:769
 #, python-format
@@ -1070,23 +1076,23 @@ msgstr "%(number)d %(type)s"
 msgid ", %(number)d %(type)s"
 msgstr ", %(number)d %(type)s"
 
-#: utils/translation/trans_real.py:568
+#: utils/translation/trans_real.py:578
 msgid "DATE_FORMAT"
 msgstr "j N Y"
 
-#: utils/translation/trans_real.py:569
+#: utils/translation/trans_real.py:579
 msgid "DATETIME_FORMAT"
 msgstr "j N Y, P"
 
-#: utils/translation/trans_real.py:570
+#: utils/translation/trans_real.py:580
 msgid "TIME_FORMAT"
 msgstr "P"
 
-#: utils/translation/trans_real.py:591
+#: utils/translation/trans_real.py:601
 msgid "YEAR_MONTH_FORMAT"
 msgstr "F Y"
 
-#: utils/translation/trans_real.py:592
+#: utils/translation/trans_real.py:602
 msgid "MONTH_DAY_FORMAT"
 msgstr "j F"
 

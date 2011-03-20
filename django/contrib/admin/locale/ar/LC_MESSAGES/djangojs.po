@@ -4,8 +4,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-15 13:13-0400\n"
-"PO-Revision-Date: 2011-03-04 18:14+0000\n"
+"POT-Creation-Date: 2011-03-20 21:03+0100\n"
+"PO-Revision-Date: 2011-03-17 15:51+0000\n"
 "Last-Translator: okhayat <okhayat@gmail.com>\n"
 "Language-Team: Arabic <None>\n"
 "MIME-Version: 1.0\n"
@@ -22,7 +22,7 @@ msgstr "%s المتوفرة"
 
 #: media/js/SelectFilter2.js:52
 msgid "Filter"
-msgstr ""
+msgstr "انتقاء"
 
 #: media/js/SelectFilter2.js:59
 msgid "Choose all"

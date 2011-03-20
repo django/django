@@ -4,9 +4,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-15 13:12-0400\n"
-"PO-Revision-Date: 2011-03-04 18:44+0000\n"
-"Last-Translator: Jannis <jannis@leidel.info>\n"
+"POT-Creation-Date: 2011-03-20 21:03+0100\n"
+"PO-Revision-Date: 2011-03-19 10:25+0000\n"
+"Last-Translator: mksoft <meir@mksoft.co.il>\n"
 "Language-Team: Hebrew <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -42,41 +42,41 @@ msgstr ""
 "<h3>ע\"י %s:</h3>\n"
 "<ul>\n"
 
-#: filterspecs.py:104 filterspecs.py:136 filterspecs.py:205 filterspecs.py:257
+#: filterspecs.py:104 filterspecs.py:139 filterspecs.py:168 filterspecs.py:258
 msgid "All"
 msgstr "הכל"
 
-#: filterspecs.py:164
-msgid "Any date"
-msgstr "כל תאריך"
-
-#: filterspecs.py:165
-msgid "Today"
-msgstr "היום"
-
-#: filterspecs.py:168
-msgid "Past 7 days"
-msgstr "בשבוע האחרון"
-
-#: filterspecs.py:171
-msgid "This month"
-msgstr "החודש"
-
-#: filterspecs.py:173
-msgid "This year"
-msgstr "השנה"
-
-#: filterspecs.py:205
+#: filterspecs.py:139
 msgid "Yes"
 msgstr "כן"
 
-#: filterspecs.py:205
+#: filterspecs.py:139
 msgid "No"
 msgstr "לא"
 
-#: filterspecs.py:216
+#: filterspecs.py:150
 msgid "Unknown"
 msgstr "לא ידוע"
+
+#: filterspecs.py:196
+msgid "Any date"
+msgstr "כל תאריך"
+
+#: filterspecs.py:197
+msgid "Today"
+msgstr "היום"
+
+#: filterspecs.py:200
+msgid "Past 7 days"
+msgstr "בשבוע האחרון"
+
+#: filterspecs.py:203
+msgid "This month"
+msgstr "החודש"
+
+#: filterspecs.py:205
+msgid "This year"
+msgstr "השנה"
 
 #: forms.py:9
 msgid ""
@@ -427,6 +427,8 @@ msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
 "following protected related objects:"
 msgstr ""
+"מחיקת ה%(object_name)s '%(escaped_object)s' תדרוש מחיקת האובייקטים הקשורים "
+"והמוגנים הבאים:"
 
 #: templates/admin/delete_confirmation.html:33
 #, python-format
@@ -462,6 +464,8 @@ msgid ""
 "Deleting the selected %(objects_name)s would require deleting the following "
 "protected related objects:"
 msgstr ""
+"מחיקת ה%(objects_name)s אשר סימנת תדרוש מחיקת האובייקטים הקשורים והמוגנים "
+"הבאים:"
 
 #: templates/admin/delete_selected_confirmation.html:32
 #, python-format
@@ -738,6 +742,8 @@ msgid ""
 "You're receiving this e-mail because you requested a password reset for your "
 "user account at %(site_name)s."
 msgstr ""
+"הודעה זו נשלחה אליך עקב בקשתך לאיפוס הסיסמה עבור המשתמש שלך באתר %(site_name)"
+"s."
 
 #: templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
@@ -778,7 +784,7 @@ msgstr "כל התאריכים"
 
 #: views/main.py:27
 msgid "(None)"
-msgstr ""
+msgstr "(אין)"
 
 #: views/main.py:66
 #, python-format

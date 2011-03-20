@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-15 13:08-0400\n"
+"POT-Creation-Date: 2011-03-20 20:59+0100\n"
 "PO-Revision-Date: 2011-03-13 21:27+0000\n"
 "Last-Translator: aljosa <aljosa.mohorovic@gmail.com>\n"
 "Language-Team: Croatian <>\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: hr\n"
-"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n% "
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
 "10<=4 && (n%100<10 || n%100>=20) ? 1 : 2\n"
 
 #: conf/global_settings.py:44
@@ -80,202 +80,207 @@ msgid "Mexican Spanish"
 msgstr "Meksički španjolski"
 
 #: conf/global_settings.py:60
+#, fuzzy
+msgid "Nicaraguan Spanish"
+msgstr "Meksički španjolski"
+
+#: conf/global_settings.py:61
 msgid "Estonian"
 msgstr "Estonski"
 
-#: conf/global_settings.py:61
+#: conf/global_settings.py:62
 msgid "Basque"
 msgstr "Baskijski"
 
-#: conf/global_settings.py:62
+#: conf/global_settings.py:63
 msgid "Persian"
 msgstr "Perzijski"
 
-#: conf/global_settings.py:63
+#: conf/global_settings.py:64
 msgid "Finnish"
 msgstr "Finski"
 
-#: conf/global_settings.py:64
+#: conf/global_settings.py:65
 msgid "French"
 msgstr "Francuski"
 
-#: conf/global_settings.py:65
+#: conf/global_settings.py:66
 msgid "Frisian"
 msgstr "Frizijski"
 
-#: conf/global_settings.py:66
+#: conf/global_settings.py:67
 msgid "Irish"
 msgstr "Irski"
 
-#: conf/global_settings.py:67
+#: conf/global_settings.py:68
 msgid "Galician"
 msgstr "Galičanski"
 
-#: conf/global_settings.py:68
+#: conf/global_settings.py:69
 msgid "Hebrew"
 msgstr "Hebrejski"
 
-#: conf/global_settings.py:69
+#: conf/global_settings.py:70
 msgid "Hindi"
 msgstr "Hindi"
 
-#: conf/global_settings.py:70
+#: conf/global_settings.py:71
 msgid "Croatian"
 msgstr "Hrvatski"
 
-#: conf/global_settings.py:71
+#: conf/global_settings.py:72
 msgid "Hungarian"
 msgstr "Mađarski"
 
-#: conf/global_settings.py:72
+#: conf/global_settings.py:73
 msgid "Indonesian"
 msgstr "Indonezijski"
 
-#: conf/global_settings.py:73
+#: conf/global_settings.py:74
 msgid "Icelandic"
 msgstr "Islandski"
 
-#: conf/global_settings.py:74
+#: conf/global_settings.py:75
 msgid "Italian"
 msgstr "Talijanski"
 
-#: conf/global_settings.py:75
+#: conf/global_settings.py:76
 msgid "Japanese"
 msgstr "Japanski"
 
-#: conf/global_settings.py:76
+#: conf/global_settings.py:77
 msgid "Georgian"
 msgstr "Gruzijski"
 
-#: conf/global_settings.py:77
+#: conf/global_settings.py:78
 msgid "Khmer"
 msgstr "Kambođanski"
 
-#: conf/global_settings.py:78
+#: conf/global_settings.py:79
 msgid "Kannada"
 msgstr "Kannada"
 
-#: conf/global_settings.py:79
+#: conf/global_settings.py:80
 msgid "Korean"
 msgstr "Koreanski"
 
-#: conf/global_settings.py:80
+#: conf/global_settings.py:81
 msgid "Lithuanian"
 msgstr "Litvanski"
 
-#: conf/global_settings.py:81
+#: conf/global_settings.py:82
 msgid "Latvian"
 msgstr "Latvijski"
 
-#: conf/global_settings.py:82
+#: conf/global_settings.py:83
 msgid "Macedonian"
 msgstr "Makedonski"
 
-#: conf/global_settings.py:83
+#: conf/global_settings.py:84
 msgid "Malayalam"
 msgstr "Malayalam"
 
-#: conf/global_settings.py:84
+#: conf/global_settings.py:85
 msgid "Mongolian"
 msgstr "Mongolski"
 
-#: conf/global_settings.py:85
+#: conf/global_settings.py:86
 msgid "Dutch"
 msgstr "Nizozemski"
 
-#: conf/global_settings.py:86
+#: conf/global_settings.py:87
 msgid "Norwegian"
 msgstr "Norveški"
 
-#: conf/global_settings.py:87
+#: conf/global_settings.py:88
 msgid "Norwegian Bokmal"
 msgstr "Norveški Bokmal"
 
-#: conf/global_settings.py:88
+#: conf/global_settings.py:89
 msgid "Norwegian Nynorsk"
 msgstr "Norveški Nynorsk"
 
-#: conf/global_settings.py:89
+#: conf/global_settings.py:90
 msgid "Punjabi"
 msgstr "Pendžabljanin"
 
-#: conf/global_settings.py:90
+#: conf/global_settings.py:91
 msgid "Polish"
 msgstr "Poljski"
 
-#: conf/global_settings.py:91
+#: conf/global_settings.py:92
 msgid "Portuguese"
 msgstr "Portugalski"
 
-#: conf/global_settings.py:92
+#: conf/global_settings.py:93
 msgid "Brazilian Portuguese"
 msgstr "Brazilski portugalski"
 
-#: conf/global_settings.py:93
+#: conf/global_settings.py:94
 msgid "Romanian"
 msgstr "Rumunjski"
 
-#: conf/global_settings.py:94
+#: conf/global_settings.py:95
 msgid "Russian"
 msgstr "Ruski"
 
-#: conf/global_settings.py:95
+#: conf/global_settings.py:96
 msgid "Slovak"
 msgstr "Slovački"
 
-#: conf/global_settings.py:96
+#: conf/global_settings.py:97
 msgid "Slovenian"
 msgstr "Slovenski"
 
-#: conf/global_settings.py:97
+#: conf/global_settings.py:98
 msgid "Albanian"
 msgstr "Albanski"
 
-#: conf/global_settings.py:98
+#: conf/global_settings.py:99
 msgid "Serbian"
 msgstr "Srpski"
 
-#: conf/global_settings.py:99
+#: conf/global_settings.py:100
 msgid "Serbian Latin"
 msgstr "Latinski srpski"
 
-#: conf/global_settings.py:100
+#: conf/global_settings.py:101
 msgid "Swedish"
 msgstr "Švedski"
 
-#: conf/global_settings.py:101
+#: conf/global_settings.py:102
 msgid "Tamil"
 msgstr "Tamilski"
 
-#: conf/global_settings.py:102
+#: conf/global_settings.py:103
 msgid "Telugu"
 msgstr "Teluški"
 
-#: conf/global_settings.py:103
+#: conf/global_settings.py:104
 msgid "Thai"
 msgstr "Thai (tajlandski)"
 
-#: conf/global_settings.py:104
+#: conf/global_settings.py:105
 msgid "Turkish"
 msgstr "Turski"
 
-#: conf/global_settings.py:105
+#: conf/global_settings.py:106
 msgid "Ukrainian"
 msgstr "Ukrajinski"
 
-#: conf/global_settings.py:106
+#: conf/global_settings.py:107
 msgid "Urdu"
 msgstr "Urdu"
 
-#: conf/global_settings.py:107
+#: conf/global_settings.py:108
 msgid "Vietnamese"
 msgstr "Vijetnamski"
 
-#: conf/global_settings.py:108
+#: conf/global_settings.py:109
 msgid "Simplified Chinese"
 msgstr "Pojednostavljeni kineski"
 
-#: conf/global_settings.py:109
+#: conf/global_settings.py:110
 msgid "Traditional Chinese"
 msgstr "Tradicionalni kineski"
 
@@ -1067,23 +1072,23 @@ msgstr "%(number)d %(type)s"
 msgid ", %(number)d %(type)s"
 msgstr ", %(number)d %(type)s"
 
-#: utils/translation/trans_real.py:568
+#: utils/translation/trans_real.py:578
 msgid "DATE_FORMAT"
 msgstr "j. N Y."
 
-#: utils/translation/trans_real.py:569
+#: utils/translation/trans_real.py:579
 msgid "DATETIME_FORMAT"
 msgstr "j. N Y. G:i T"
 
-#: utils/translation/trans_real.py:570
+#: utils/translation/trans_real.py:580
 msgid "TIME_FORMAT"
 msgstr "G:i"
 
-#: utils/translation/trans_real.py:591
+#: utils/translation/trans_real.py:601
 msgid "YEAR_MONTH_FORMAT"
 msgstr "F Y."
 
-#: utils/translation/trans_real.py:592
+#: utils/translation/trans_real.py:602
 msgid "MONTH_DAY_FORMAT"
 msgstr "j. F"
 

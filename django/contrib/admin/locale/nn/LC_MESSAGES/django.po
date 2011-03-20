@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-15 13:13-0400\n"
+"POT-Creation-Date: 2011-03-20 21:03+0100\n"
 "PO-Revision-Date: 2011-03-07 08:34+0000\n"
 "Last-Translator: hgrimelid <havard@grimelid.com>\n"
 "Language-Team: Norwegian Nynorsk <None>\n"
@@ -42,41 +42,41 @@ msgstr ""
 "<h3>Etter %s:</h3>\n"
 "<ul>\n"
 
-#: filterspecs.py:104 filterspecs.py:136 filterspecs.py:205 filterspecs.py:257
+#: filterspecs.py:104 filterspecs.py:139 filterspecs.py:168 filterspecs.py:258
 msgid "All"
 msgstr "Alle"
 
-#: filterspecs.py:164
-msgid "Any date"
-msgstr "Når som helst"
-
-#: filterspecs.py:165
-msgid "Today"
-msgstr "I dag"
-
-#: filterspecs.py:168
-msgid "Past 7 days"
-msgstr "Siste sju dager"
-
-#: filterspecs.py:171
-msgid "This month"
-msgstr "Denne månaden"
-
-#: filterspecs.py:173
-msgid "This year"
-msgstr "I år"
-
-#: filterspecs.py:205
+#: filterspecs.py:139
 msgid "Yes"
 msgstr "Ja"
 
-#: filterspecs.py:205
+#: filterspecs.py:139
 msgid "No"
 msgstr "Nei"
 
-#: filterspecs.py:216
+#: filterspecs.py:150
 msgid "Unknown"
 msgstr "Ukjend"
+
+#: filterspecs.py:196
+msgid "Any date"
+msgstr "Når som helst"
+
+#: filterspecs.py:197
+msgid "Today"
+msgstr "I dag"
+
+#: filterspecs.py:200
+msgid "Past 7 days"
+msgstr "Siste sju dager"
+
+#: filterspecs.py:203
+msgid "This month"
+msgstr "Denne månaden"
+
+#: filterspecs.py:205
+msgid "This year"
+msgstr "I år"
 
 #: forms.py:9
 msgid ""

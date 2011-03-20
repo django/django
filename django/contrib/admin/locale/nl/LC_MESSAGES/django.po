@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-15 13:13-0400\n"
+"POT-Creation-Date: 2011-03-20 21:03+0100\n"
 "PO-Revision-Date: 2011-03-04 18:44+0000\n"
 "Last-Translator: jeffrey <jeffrey@noppo.pro>\n"
 "Language-Team: Dutch <>\n"
@@ -42,41 +42,41 @@ msgstr ""
 "<h3>Op %s:</h3>\n"
 "<ul>\n"
 
-#: filterspecs.py:104 filterspecs.py:136 filterspecs.py:205 filterspecs.py:257
+#: filterspecs.py:104 filterspecs.py:139 filterspecs.py:168 filterspecs.py:258
 msgid "All"
 msgstr "Alle"
 
-#: filterspecs.py:164
-msgid "Any date"
-msgstr "Elke datum"
-
-#: filterspecs.py:165
-msgid "Today"
-msgstr "Vandaag"
-
-#: filterspecs.py:168
-msgid "Past 7 days"
-msgstr "Afgelopen zeven dagen"
-
-#: filterspecs.py:171
-msgid "This month"
-msgstr "Deze maand"
-
-#: filterspecs.py:173
-msgid "This year"
-msgstr "Dit jaar"
-
-#: filterspecs.py:205
+#: filterspecs.py:139
 msgid "Yes"
 msgstr "Ja"
 
-#: filterspecs.py:205
+#: filterspecs.py:139
 msgid "No"
 msgstr "Nee"
 
-#: filterspecs.py:216
+#: filterspecs.py:150
 msgid "Unknown"
 msgstr "Onbekend"
+
+#: filterspecs.py:196
+msgid "Any date"
+msgstr "Elke datum"
+
+#: filterspecs.py:197
+msgid "Today"
+msgstr "Vandaag"
+
+#: filterspecs.py:200
+msgid "Past 7 days"
+msgstr "Afgelopen zeven dagen"
+
+#: filterspecs.py:203
+msgid "This month"
+msgstr "Deze maand"
+
+#: filterspecs.py:205
+msgid "This year"
+msgstr "Dit jaar"
 
 #: forms.py:9
 msgid ""

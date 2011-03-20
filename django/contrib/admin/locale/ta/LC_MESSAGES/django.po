@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-15 13:13-0400\n"
+"POT-Creation-Date: 2011-03-20 21:03+0100\n"
 "PO-Revision-Date: 2011-03-04 18:44+0000\n"
 "Last-Translator: Jannis <jannis@leidel.info>\n"
 "Language-Team: Tamil <None>\n"
@@ -42,41 +42,41 @@ msgstr ""
 "<h3> %s ஆல்:</h3>\n"
 "<ul>\n"
 
-#: filterspecs.py:104 filterspecs.py:136 filterspecs.py:205 filterspecs.py:257
+#: filterspecs.py:104 filterspecs.py:139 filterspecs.py:168 filterspecs.py:258
 msgid "All"
 msgstr "அனைத்தும்"
 
-#: filterspecs.py:164
-msgid "Any date"
-msgstr "எந்த தேதியும்"
-
-#: filterspecs.py:165
-msgid "Today"
-msgstr "இன்று"
-
-#: filterspecs.py:168
-msgid "Past 7 days"
-msgstr "கடந்த 7 நாட்களில்"
-
-#: filterspecs.py:171
-msgid "This month"
-msgstr "இந்த மாதம்"
-
-#: filterspecs.py:173
-msgid "This year"
-msgstr "இந்த வருடம்"
-
-#: filterspecs.py:205
+#: filterspecs.py:139
 msgid "Yes"
 msgstr "ஆம்"
 
-#: filterspecs.py:205
+#: filterspecs.py:139
 msgid "No"
 msgstr "இல்லை"
 
-#: filterspecs.py:216
+#: filterspecs.py:150
 msgid "Unknown"
 msgstr "தெரியாத"
+
+#: filterspecs.py:196
+msgid "Any date"
+msgstr "எந்த தேதியும்"
+
+#: filterspecs.py:197
+msgid "Today"
+msgstr "இன்று"
+
+#: filterspecs.py:200
+msgid "Past 7 days"
+msgstr "கடந்த 7 நாட்களில்"
+
+#: filterspecs.py:203
+msgid "This month"
+msgstr "இந்த மாதம்"
+
+#: filterspecs.py:205
+msgid "This year"
+msgstr "இந்த வருடம்"
 
 #: forms.py:9
 msgid ""

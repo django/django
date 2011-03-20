@@ -4,8 +4,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-15 13:14-0400\n"
-"PO-Revision-Date: 2011-03-04 18:41+0000\n"
+"POT-Creation-Date: 2011-03-20 21:04+0100\n"
+"PO-Revision-Date: 2011-03-20 11:31+0000\n"
 "Last-Translator: pagles <y.pagles@gmail.com>\n"
 "Language-Team: Greek <>\n"
 "MIME-Version: 1.0\n"
@@ -32,12 +32,12 @@ msgstr "Ομάδες"
 
 #: admin.py:113
 msgid "Password changed successfully."
-msgstr "Το συνθηματικό αλλάχτηκε με επιτυχία."
+msgstr "Ο κωδικός πρόσβασης αλλάχτηκε με επιτυχία."
 
 #: admin.py:123
 #, python-format
 msgid "Change password: %s"
-msgstr "Αλλαγή συνθηματικού: %s"
+msgstr "Αλλαγή κωδικού πρόσβασης: %s"
 
 #: forms.py:14 forms.py:48 forms.py:66
 msgid "Username"
@@ -46,7 +46,8 @@ msgstr "Όνομα χρήστη"
 #: forms.py:15 forms.py:49
 msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
-"Απαραίτητα. 30 ή λιγότεροι χαρακτήρες. Μόνο γράμματα, αριθμοί και @/./+/-/_."
+"Απαραίτητο. Πρέπει να αποτελείται από 30 ή λιγότερους χαρακτήρες. Μπορείτε "
+"να χρησιμοποιήσετε μόνο γράμματα, αριθμούς και τους χαρακτήρες @/./+/-/_."
 
 #: forms.py:16 forms.py:50
 msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
@@ -54,32 +55,33 @@ msgstr ""
 "Αυτή η τιμή μπορεί να περιέχει μόνο γράμματα, αριθμούς και τους χαρακτήρες "
 "@/./+/-/_."
 
-#: forms.py:17 forms.py:67 forms.py:193
+#: forms.py:17 forms.py:67 forms.py:196
 msgid "Password"
-msgstr "Συνθηματικό"
+msgstr "Κωδικός χρήστη"
 
 #: forms.py:18
 msgid "Password confirmation"
-msgstr "Επιβεβαίωσης συνθηματικού"
+msgstr "Επιβεβαίωση κωδικού χρήστη"
 
 #: forms.py:19
 msgid "Enter the same password as above, for verification."
-msgstr "Εισάγετε το ίδιο συνθηματικό όπως παραπάνω, για λόγους επιβεβαίωσης."
+msgstr ""
+"Εισάγετε τον ίδιο κωδικό χρήστη όπως παραπάνω, για λόγους επιβεβαίωσης."
 
 #: forms.py:31
 msgid "A user with that username already exists."
-msgstr "Ένας χρήστης με αυτό το όνομα χρήστη υπάρχει ήδη."
+msgstr "Αυτό το όνομα χρήστη χρησιμοποιείται ήδη."
 
-#: forms.py:37 forms.py:163 forms.py:205
+#: forms.py:37 forms.py:166 forms.py:208
 msgid "The two password fields didn't match."
-msgstr "Τα δύο πεδία συνθηματικών δεν ταιριάζουν."
+msgstr "Τα δύο πεδία κωδικού χρήστη δεν ταιριάζουν."
 
 #: forms.py:87
 msgid ""
 "Please enter a correct username and password. Note that both fields are case-"
 "sensitive."
 msgstr ""
-"Παρακαλούμε εισάγετε ένα σωστό όνομα χρήστη και συνθηματικό. Να σημειωθεί "
+"Παρακαλούμε εισάγετε ένα σωστό όνομα χρήστη και κωδικό χρήστη. Να σημειωθεί "
 "ότι και τα δύο πεδία κάνουν διάκριση μεταξύ πεζών και κεφαλαίων."
 
 #: forms.py:89
@@ -98,7 +100,7 @@ msgstr ""
 msgid "E-mail"
 msgstr "E-mail"
 
-#: forms.py:117
+#: forms.py:120
 msgid ""
 "That e-mail address doesn't have an associated user account. Are you sure "
 "you've registered?"
@@ -106,83 +108,83 @@ msgstr ""
 "Αυτή η διεύθυνση e-mail δεν αντιστοιχεί σε κάποιον λογαριασμό χρήστη. Είστε "
 "σίγουρος ότι έχετε γραφτεί;"
 
-#: forms.py:143
+#: forms.py:146
 #, python-format
 msgid "Password reset on %s"
 msgstr "Επαναφορά συνθηματικού για %s"
 
-#: forms.py:151
+#: forms.py:154
 msgid "New password"
 msgstr "Νέο συνθηματικό"
 
-#: forms.py:152
+#: forms.py:155
 msgid "New password confirmation"
 msgstr "Επιβεβαίωση νέου συνθηματικού"
 
-#: forms.py:177
+#: forms.py:180
 msgid "Old password"
 msgstr "Παλιό συνθηματικό"
 
-#: forms.py:185
+#: forms.py:188
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr "Το παλιό συνθηματικό σας δόθηκε λανθασμένα. Παρακαλώ δοκιμάστε ξανά."
 
-#: forms.py:194
+#: forms.py:197
 msgid "Password (again)"
 msgstr "Συνθηματικό (ξανά)"
 
-#: models.py:76 models.py:104
+#: models.py:77 models.py:105
 msgid "name"
 msgstr "όνομα"
 
-#: models.py:78
+#: models.py:79
 msgid "codename"
 msgstr "κωδικό όνομα"
 
-#: models.py:82
+#: models.py:83
 msgid "permission"
 msgstr "δικαίωμα"
 
-#: models.py:83 models.py:105
+#: models.py:84 models.py:106
 msgid "permissions"
 msgstr "διακαιώματα"
 
-#: models.py:108
+#: models.py:109
 msgid "group"
 msgstr "ομάδα"
 
-#: models.py:109 models.py:216
+#: models.py:110 models.py:217
 msgid "groups"
 msgstr "ομάδες"
 
-#: models.py:206
+#: models.py:207
 msgid "username"
 msgstr "όνομα χρήστη"
 
-#: models.py:206
+#: models.py:207
 msgid ""
 "Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
 msgstr ""
 "Απαραίτητα. 30 ή λιγότεροι χαρακτήρες. Γράμματα, αριθμοί και οι χαρακτήρες "
 "@/./+/-/_."
 
-#: models.py:207
+#: models.py:208
 msgid "first name"
 msgstr "όνομα"
 
-#: models.py:208
+#: models.py:209
 msgid "last name"
 msgstr "επώνυμο"
 
-#: models.py:209
+#: models.py:210
 msgid "e-mail address"
 msgstr "ηλεκτρονική διεύθυνση"
 
-#: models.py:210
+#: models.py:211
 msgid "password"
 msgstr "συνθηματικό"
 
-#: models.py:210
+#: models.py:211
 msgid ""
 "Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
 "password form</a>."
@@ -190,19 +192,19 @@ msgstr ""
 "Χρησιμοποιήστε την μορφή '[algo]$[salt]$[hexdigest]' ή εναλλακτικά την <a "
 "href=\"password/\">φόρμα αλλαγής κωδικού πρόσβασης</a>."
 
-#: models.py:211
+#: models.py:212
 msgid "staff status"
 msgstr "Κατάσταση προσωπικού"
 
-#: models.py:211
+#: models.py:212
 msgid "Designates whether the user can log into this admin site."
 msgstr "Ορίζει αν ο χρήστης μπορεί να συνδεθεί στο χώρο διαχείρισης."
 
-#: models.py:212
+#: models.py:213
 msgid "active"
 msgstr "ενεργό"
 
-#: models.py:212
+#: models.py:213
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
@@ -211,27 +213,27 @@ msgstr ""
 "την επεπιλογή αυτής της επιλογής αντί του να πραγματοποιήσετε διαγραφή του "
 "χρήστη."
 
-#: models.py:213
+#: models.py:214
 msgid "superuser status"
 msgstr "κατάσταση υπερχρήστη"
 
-#: models.py:213
+#: models.py:214
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
 msgstr ""
-"Υποσηλώνει ότι ο συγκεκριμένος χρήστης έχει όλα τα δικαιώματα χωρίς να "
+"Υποδηλώνει ότι ο συγκεκριμένος χρήστης έχει όλα τα δικαιώματα χωρίς να "
 "χρειάζεται να τα παραχωρήσετε ξεχωριστά."
 
-#: models.py:214
+#: models.py:215
 msgid "last login"
 msgstr "τελευταία σύνδεση"
 
-#: models.py:215
+#: models.py:216
 msgid "date joined"
 msgstr "ημερομηνία σύνδεσης"
 
-#: models.py:217
+#: models.py:218
 msgid ""
 "In addition to the permissions manually assigned, this user will also get "
 "all permissions granted to each group he/she is in."
@@ -240,19 +242,19 @@ msgstr ""
 "και όλα τα δικαιώμετα που έχουν παραχωρηθεί στην ομάδα χρηστών στην οποία "
 "ανήκει. "
 
-#: models.py:218
+#: models.py:219
 msgid "user permissions"
 msgstr "δικαιώματα χρήστη"
 
-#: models.py:222
+#: models.py:223
 msgid "user"
 msgstr "χρήστης"
 
-#: models.py:223
+#: models.py:224
 msgid "users"
 msgstr "χρήστες"
 
-#: models.py:406
+#: models.py:407
 msgid "message"
 msgstr "μήνυμα"
 

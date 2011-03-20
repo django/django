@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-15 13:12-0400\n"
+"POT-Creation-Date: 2011-03-20 21:03+0100\n"
 "PO-Revision-Date: 2011-03-07 10:10+0000\n"
 "Last-Translator: rodin <romihardiyanto@gmail.com>\n"
 "Language-Team: Indonesian <None>\n"
@@ -42,41 +42,41 @@ msgstr ""
 "<h3>Oleh %s:</h3>\n"
 "<ul>\n"
 
-#: filterspecs.py:104 filterspecs.py:136 filterspecs.py:205 filterspecs.py:257
+#: filterspecs.py:104 filterspecs.py:139 filterspecs.py:168 filterspecs.py:258
 msgid "All"
 msgstr "Semua"
 
-#: filterspecs.py:164
-msgid "Any date"
-msgstr "Kapanpun"
-
-#: filterspecs.py:165
-msgid "Today"
-msgstr "Hari ini"
-
-#: filterspecs.py:168
-msgid "Past 7 days"
-msgstr "Tujuh hari terakhir"
-
-#: filterspecs.py:171
-msgid "This month"
-msgstr "Bulan ini"
-
-#: filterspecs.py:173
-msgid "This year"
-msgstr "Tahun ini"
-
-#: filterspecs.py:205
+#: filterspecs.py:139
 msgid "Yes"
 msgstr "Ya"
 
-#: filterspecs.py:205
+#: filterspecs.py:139
 msgid "No"
 msgstr "Tidak"
 
-#: filterspecs.py:216
+#: filterspecs.py:150
 msgid "Unknown"
 msgstr "Tidak diketahui"
+
+#: filterspecs.py:196
+msgid "Any date"
+msgstr "Kapanpun"
+
+#: filterspecs.py:197
+msgid "Today"
+msgstr "Hari ini"
+
+#: filterspecs.py:200
+msgid "Past 7 days"
+msgstr "Tujuh hari terakhir"
+
+#: filterspecs.py:203
+msgid "This month"
+msgstr "Bulan ini"
+
+#: filterspecs.py:205
+msgid "This year"
+msgstr "Tahun ini"
 
 #: forms.py:9
 msgid ""

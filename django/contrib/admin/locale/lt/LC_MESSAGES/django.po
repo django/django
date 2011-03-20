@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-15 13:13-0400\n"
+"POT-Creation-Date: 2011-03-20 21:03+0100\n"
 "PO-Revision-Date: 2011-03-05 23:23+0000\n"
 "Last-Translator: lauris <lauris@runbox.com>\n"
 "Language-Team: Lithuanian <None>\n"
@@ -44,41 +44,41 @@ msgstr ""
 "<ul>\n"
 "\n"
 
-#: filterspecs.py:104 filterspecs.py:136 filterspecs.py:205 filterspecs.py:257
+#: filterspecs.py:104 filterspecs.py:139 filterspecs.py:168 filterspecs.py:258
 msgid "All"
 msgstr "Visi"
 
-#: filterspecs.py:164
-msgid "Any date"
-msgstr "Betkokia data"
-
-#: filterspecs.py:165
-msgid "Today"
-msgstr "Šiandien"
-
-#: filterspecs.py:168
-msgid "Past 7 days"
-msgstr "Paskutinės 7 dienos"
-
-#: filterspecs.py:171
-msgid "This month"
-msgstr "Šį mėnesį"
-
-#: filterspecs.py:173
-msgid "This year"
-msgstr "Šiais metais"
-
-#: filterspecs.py:205
+#: filterspecs.py:139
 msgid "Yes"
 msgstr "Taip"
 
-#: filterspecs.py:205
+#: filterspecs.py:139
 msgid "No"
 msgstr "Ne"
 
-#: filterspecs.py:216
+#: filterspecs.py:150
 msgid "Unknown"
 msgstr "Nežinomas"
+
+#: filterspecs.py:196
+msgid "Any date"
+msgstr "Betkokia data"
+
+#: filterspecs.py:197
+msgid "Today"
+msgstr "Šiandien"
+
+#: filterspecs.py:200
+msgid "Past 7 days"
+msgstr "Paskutinės 7 dienos"
+
+#: filterspecs.py:203
+msgid "This month"
+msgstr "Šį mėnesį"
+
+#: filterspecs.py:205
+msgid "This year"
+msgstr "Šiais metais"
 
 #: forms.py:9
 msgid ""

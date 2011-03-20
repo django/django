@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-15 13:13-0400\n"
+"POT-Creation-Date: 2011-03-20 21:03+0100\n"
 "PO-Revision-Date: 2011-03-14 02:58+0000\n"
 "Last-Translator: shelldweller <s.kuzmenko@gmail.com>\n"
 "Language-Team: Ukrainian <>\n"
@@ -43,41 +43,41 @@ msgstr ""
 "<h3>За %s:</h3>\n"
 "<ul>\n"
 
-#: filterspecs.py:104 filterspecs.py:136 filterspecs.py:205 filterspecs.py:257
+#: filterspecs.py:104 filterspecs.py:139 filterspecs.py:168 filterspecs.py:258
 msgid "All"
 msgstr "Всі"
 
-#: filterspecs.py:164
-msgid "Any date"
-msgstr "Будь-яка дата"
-
-#: filterspecs.py:165
-msgid "Today"
-msgstr "Сьогодні"
-
-#: filterspecs.py:168
-msgid "Past 7 days"
-msgstr "Останні 7 днів"
-
-#: filterspecs.py:171
-msgid "This month"
-msgstr "Цього місяця"
-
-#: filterspecs.py:173
-msgid "This year"
-msgstr "Цього року"
-
-#: filterspecs.py:205
+#: filterspecs.py:139
 msgid "Yes"
 msgstr "Так"
 
-#: filterspecs.py:205
+#: filterspecs.py:139
 msgid "No"
 msgstr "Ні"
 
-#: filterspecs.py:216
+#: filterspecs.py:150
 msgid "Unknown"
 msgstr "Невідомо"
+
+#: filterspecs.py:196
+msgid "Any date"
+msgstr "Будь-яка дата"
+
+#: filterspecs.py:197
+msgid "Today"
+msgstr "Сьогодні"
+
+#: filterspecs.py:200
+msgid "Past 7 days"
+msgstr "Останні 7 днів"
+
+#: filterspecs.py:203
+msgid "This month"
+msgstr "Цього місяця"
+
+#: filterspecs.py:205
+msgid "This year"
+msgstr "Цього року"
 
 #: forms.py:9
 msgid ""

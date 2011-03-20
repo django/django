@@ -4,9 +4,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-15 13:12-0400\n"
-"PO-Revision-Date: 2011-03-10 17:28+0000\n"
-"Last-Translator: greenfire <hongdiepkien@gmail.com>\n"
+"POT-Creation-Date: 2011-03-20 21:02+0100\n"
+"PO-Revision-Date: 2011-03-19 09:08+0000\n"
+"Last-Translator: vant <vantxm@yahoo.co.uk>\n"
 "Language-Team: Vietnamese <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -79,202 +79,207 @@ msgid "Mexican Spanish"
 msgstr "Mexican Spanish"
 
 #: conf/global_settings.py:60
+#, fuzzy
+msgid "Nicaraguan Spanish"
+msgstr "Mexican Spanish"
+
+#: conf/global_settings.py:61
 msgid "Estonian"
 msgstr "Tiếng Estonia"
 
-#: conf/global_settings.py:61
+#: conf/global_settings.py:62
 msgid "Basque"
 msgstr "Tiếng Baxcơ"
 
-#: conf/global_settings.py:62
+#: conf/global_settings.py:63
 msgid "Persian"
 msgstr "Tiếng Ba Tư"
 
-#: conf/global_settings.py:63
+#: conf/global_settings.py:64
 msgid "Finnish"
 msgstr "Tiếng Phần Lan"
 
-#: conf/global_settings.py:64
+#: conf/global_settings.py:65
 msgid "French"
 msgstr "Tiếng Pháp"
 
-#: conf/global_settings.py:65
+#: conf/global_settings.py:66
 msgid "Frisian"
 msgstr "Tiếng Frisco"
 
-#: conf/global_settings.py:66
+#: conf/global_settings.py:67
 msgid "Irish"
 msgstr "Tiếng Ai-len"
 
-#: conf/global_settings.py:67
+#: conf/global_settings.py:68
 msgid "Galician"
 msgstr "Tiếng Pháp cổ"
 
-#: conf/global_settings.py:68
+#: conf/global_settings.py:69
 msgid "Hebrew"
 msgstr "Tiếng Do Thái cổ"
 
-#: conf/global_settings.py:69
+#: conf/global_settings.py:70
 msgid "Hindi"
 msgstr "Tiếng Hindi"
 
-#: conf/global_settings.py:70
+#: conf/global_settings.py:71
 msgid "Croatian"
 msgstr "Tiếng Croatia"
 
-#: conf/global_settings.py:71
+#: conf/global_settings.py:72
 msgid "Hungarian"
 msgstr "Tiếng Hung-ga-ri"
 
-#: conf/global_settings.py:72
+#: conf/global_settings.py:73
 msgid "Indonesian"
 msgstr "Tiếng In-đô-nê-xi-a"
 
-#: conf/global_settings.py:73
+#: conf/global_settings.py:74
 msgid "Icelandic"
 msgstr "Tiếng Aixơlen"
 
-#: conf/global_settings.py:74
+#: conf/global_settings.py:75
 msgid "Italian"
 msgstr "Tiếng Ý"
 
-#: conf/global_settings.py:75
+#: conf/global_settings.py:76
 msgid "Japanese"
 msgstr "Tiếng Nhật Bản"
 
-#: conf/global_settings.py:76
+#: conf/global_settings.py:77
 msgid "Georgian"
 msgstr "Georgian"
 
-#: conf/global_settings.py:77
+#: conf/global_settings.py:78
 msgid "Khmer"
 msgstr "Tiếng Khơ-me"
 
-#: conf/global_settings.py:78
+#: conf/global_settings.py:79
 msgid "Kannada"
 msgstr "Tiếng Kannada"
 
-#: conf/global_settings.py:79
+#: conf/global_settings.py:80
 msgid "Korean"
 msgstr "Tiếng Hàn Quốc"
 
-#: conf/global_settings.py:80
+#: conf/global_settings.py:81
 msgid "Lithuanian"
 msgstr "Tiếng Lat-vi"
 
-#: conf/global_settings.py:81
+#: conf/global_settings.py:82
 msgid "Latvian"
 msgstr "Ngôn ngữ vùng Bantic"
 
-#: conf/global_settings.py:82
+#: conf/global_settings.py:83
 msgid "Macedonian"
 msgstr "Tiếng Maxêđôni"
 
-#: conf/global_settings.py:83
+#: conf/global_settings.py:84
 msgid "Malayalam"
 msgstr "Tiếng Malayalam"
 
-#: conf/global_settings.py:84
+#: conf/global_settings.py:85
 msgid "Mongolian"
 msgstr "Tiếng Mông Cổ"
 
-#: conf/global_settings.py:85
+#: conf/global_settings.py:86
 msgid "Dutch"
 msgstr "Tiếng Hà Lan"
 
-#: conf/global_settings.py:86
-msgid "Norwegian"
-msgstr "Tiếng Nauy"
-
 #: conf/global_settings.py:87
-msgid "Norwegian Bokmal"
-msgstr ""
+msgid "Norwegian"
+msgstr "Tiếng Na Uy"
 
 #: conf/global_settings.py:88
-msgid "Norwegian Nynorsk"
-msgstr ""
+msgid "Norwegian Bokmal"
+msgstr "Tiếng Na Uy Bokmål"
 
 #: conf/global_settings.py:89
+msgid "Norwegian Nynorsk"
+msgstr "Tiếng Na Uy Nynorsk"
+
+#: conf/global_settings.py:90
 msgid "Punjabi"
 msgstr "Punjabi"
 
-#: conf/global_settings.py:90
+#: conf/global_settings.py:91
 msgid "Polish"
 msgstr "Tiếng Ba lan"
 
-#: conf/global_settings.py:91
+#: conf/global_settings.py:92
 msgid "Portuguese"
 msgstr "Tiếng Bồ Đào Nha"
 
-#: conf/global_settings.py:92
+#: conf/global_settings.py:93
 msgid "Brazilian Portuguese"
 msgstr "Brazilian Portuguese"
 
-#: conf/global_settings.py:93
+#: conf/global_settings.py:94
 msgid "Romanian"
 msgstr "Tiếng Ru-ma-ni"
 
-#: conf/global_settings.py:94
+#: conf/global_settings.py:95
 msgid "Russian"
 msgstr "Tiếng Nga"
 
-#: conf/global_settings.py:95
+#: conf/global_settings.py:96
 msgid "Slovak"
 msgstr "Ngôn ngữ Slô-vac"
 
-#: conf/global_settings.py:96
+#: conf/global_settings.py:97
 msgid "Slovenian"
 msgstr "Tiếng Slôven"
 
-#: conf/global_settings.py:97
+#: conf/global_settings.py:98
 msgid "Albanian"
 msgstr "Tiếng Albania"
 
-#: conf/global_settings.py:98
+#: conf/global_settings.py:99
 msgid "Serbian"
 msgstr "Tiếng Xéc-bi"
 
-#: conf/global_settings.py:99
+#: conf/global_settings.py:100
 msgid "Serbian Latin"
 msgstr "Serbian Latin"
 
-#: conf/global_settings.py:100
+#: conf/global_settings.py:101
 msgid "Swedish"
 msgstr "Tiếng Thụy Điển"
 
-#: conf/global_settings.py:101
+#: conf/global_settings.py:102
 msgid "Tamil"
 msgstr "Tiếng Ta-min"
 
-#: conf/global_settings.py:102
+#: conf/global_settings.py:103
 msgid "Telugu"
 msgstr "Telugu"
 
-#: conf/global_settings.py:103
+#: conf/global_settings.py:104
 msgid "Thai"
 msgstr "Tiếng Thái"
 
-#: conf/global_settings.py:104
+#: conf/global_settings.py:105
 msgid "Turkish"
 msgstr "Tiếng Thổ Nhĩ Kỳ"
 
-#: conf/global_settings.py:105
+#: conf/global_settings.py:106
 msgid "Ukrainian"
 msgstr "Tiếng Ukraina"
 
-#: conf/global_settings.py:106
+#: conf/global_settings.py:107
 msgid "Urdu"
 msgstr "Urdu"
 
-#: conf/global_settings.py:107
+#: conf/global_settings.py:108
 msgid "Vietnamese"
 msgstr "Tiếng Việt Nam"
 
-#: conf/global_settings.py:108
+#: conf/global_settings.py:109
 msgid "Simplified Chinese"
 msgstr "Tiếng Trung Hoa giản thể"
 
-#: conf/global_settings.py:109
+#: conf/global_settings.py:110
 msgid "Traditional Chinese"
 msgstr "Tiếng Trung Hoa truyền thống"
 
@@ -369,7 +374,7 @@ msgstr "Trường này không được để trắng."
 #: db/models/fields/__init__.py:70
 #, python-format
 msgid "Field of type: %(field_type)s"
-msgstr ""
+msgstr "Trường thuộc dạng: %(field_type)s "
 
 #: db/models/fields/__init__.py:451 db/models/fields/__init__.py:871
 #: db/models/fields/__init__.py:980 db/models/fields/__init__.py:991
@@ -618,7 +623,7 @@ msgstr "Hãy sửa các giá trị trùng lặp dưới đây."
 
 #: forms/models.py:835
 msgid "The inline foreign key did not match the parent instance primary key."
-msgstr ""
+msgstr "Khóa ngoại không tương ứng với khóa chính của đối tượng cha."
 
 #: forms/models.py:896
 msgid "Select a valid choice. That choice is not one of the available choices."
@@ -1044,23 +1049,23 @@ msgstr "%(number)d %(type)s"
 msgid ", %(number)d %(type)s"
 msgstr ", %(number)d %(type)s"
 
-#: utils/translation/trans_real.py:568
+#: utils/translation/trans_real.py:578
 msgid "DATE_FORMAT"
 msgstr "N j, Y"
 
-#: utils/translation/trans_real.py:569
+#: utils/translation/trans_real.py:579
 msgid "DATETIME_FORMAT"
 msgstr "N j, Y, P"
 
-#: utils/translation/trans_real.py:570
+#: utils/translation/trans_real.py:580
 msgid "TIME_FORMAT"
 msgstr "P"
 
-#: utils/translation/trans_real.py:591
+#: utils/translation/trans_real.py:601
 msgid "YEAR_MONTH_FORMAT"
 msgstr "F Y"
 
-#: utils/translation/trans_real.py:592
+#: utils/translation/trans_real.py:602
 msgid "MONTH_DAY_FORMAT"
 msgstr "F j"
 
@@ -1106,6 +1111,8 @@ msgid ""
 "Future %(verbose_name_plural)s not available because %(class_name)s."
 "allow_future is False."
 msgstr ""
+"%(verbose_name_plural)s trong tương lai không có sẵn vì %(class_name)s."
+"allow_future là False."
 
 #: views/generic/dates.py:500
 #, python-format
@@ -1120,6 +1127,7 @@ msgstr "Không có %(verbose_name)s tìm thấy phù hợp với truy vấn"
 #: views/generic/list.py:47
 msgid "Page is not 'last', nor can it be converted to an int."
 msgstr ""
+"Trang không phải là 'nhất', và cũng không nó có thể được chuyển đổi sang int."
 
 #: views/generic/list.py:52
 #, python-format

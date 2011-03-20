@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-15 13:13-0400\n"
+"POT-Creation-Date: 2011-03-20 21:03+0100\n"
 "PO-Revision-Date: 2011-03-06 03:24+0000\n"
 "Last-Translator: mixe <mixe@korea.com>\n"
 "Language-Team: Korean <None>\n"
@@ -42,41 +42,41 @@ msgstr ""
 "<h3>%s(으)로:</h3>\n"
 "<ul>\n"
 
-#: filterspecs.py:104 filterspecs.py:136 filterspecs.py:205 filterspecs.py:257
+#: filterspecs.py:104 filterspecs.py:139 filterspecs.py:168 filterspecs.py:258
 msgid "All"
 msgstr "모두"
 
-#: filterspecs.py:164
-msgid "Any date"
-msgstr "언제나"
-
-#: filterspecs.py:165
-msgid "Today"
-msgstr "오늘"
-
-#: filterspecs.py:168
-msgid "Past 7 days"
-msgstr "지난 7일"
-
-#: filterspecs.py:171
-msgid "This month"
-msgstr "이번 달"
-
-#: filterspecs.py:173
-msgid "This year"
-msgstr "이번 해"
-
-#: filterspecs.py:205
+#: filterspecs.py:139
 msgid "Yes"
 msgstr "예"
 
-#: filterspecs.py:205
+#: filterspecs.py:139
 msgid "No"
 msgstr "아니오"
 
-#: filterspecs.py:216
+#: filterspecs.py:150
 msgid "Unknown"
 msgstr "알 수 없습니다."
+
+#: filterspecs.py:196
+msgid "Any date"
+msgstr "언제나"
+
+#: filterspecs.py:197
+msgid "Today"
+msgstr "오늘"
+
+#: filterspecs.py:200
+msgid "Past 7 days"
+msgstr "지난 7일"
+
+#: filterspecs.py:203
+msgid "This month"
+msgstr "이번 달"
+
+#: filterspecs.py:205
+msgid "This year"
+msgstr "이번 해"
 
 #: forms.py:9
 msgid ""

@@ -4,8 +4,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-15 13:19-0400\n"
-"PO-Revision-Date: 2011-03-04 18:43+0000\n"
+"POT-Creation-Date: 2011-03-20 21:09+0100\n"
+"PO-Revision-Date: 2011-03-16 12:09+0000\n"
 "Last-Translator: haffi67 <haffi67@gmail.com>\n"
 "Language-Team: Icelandic <None>\n"
 "MIME-Version: 1.0\n"
@@ -120,7 +120,7 @@ msgstr "Namúr"
 
 #: be/be_provinces.py:14
 msgid "Walloon Brabant"
-msgstr "Vallónska Brabant."
+msgstr "Vallónska Brabant"
 
 #: be/be_provinces.py:15
 msgid "West Flanders"
@@ -188,11 +188,11 @@ msgstr "Sláðu inn póstnúmer á sniðinu XXX XXX."
 
 #: ca/forms.py:96
 msgid "Enter a valid Canadian Social Insurance number in XXX-XXX-XXX format."
-msgstr ""
+msgstr "Sláðu inn gilda kanadíska kennitölu á forminu XXX-XXX-XXX."
 
 #: ch/ch_states.py:5
 msgid "Aargau"
-msgstr ""
+msgstr "Aargau"
 
 #: ch/ch_states.py:6
 msgid "Appenzell Innerrhoden"
@@ -406,15 +406,15 @@ msgstr ""
 
 #: de/de_states.py:9
 msgid "Bremen"
-msgstr ""
+msgstr "Brimarborg"
 
 #: de/de_states.py:10
 msgid "Hamburg"
-msgstr ""
+msgstr "Hamborg"
 
 #: de/de_states.py:11
 msgid "Hessen"
-msgstr ""
+msgstr "Hesson"
 
 #: de/de_states.py:12
 msgid "Mecklenburg-Western Pomerania"
@@ -422,7 +422,7 @@ msgstr ""
 
 #: de/de_states.py:13
 msgid "Lower Saxony"
-msgstr ""
+msgstr "Neðra-Saxland"
 
 #: de/de_states.py:14
 msgid "North Rhine-Westphalia"
@@ -438,15 +438,15 @@ msgstr ""
 
 #: de/de_states.py:17
 msgid "Saxony"
-msgstr ""
+msgstr "Saxland"
 
 #: de/de_states.py:18
 msgid "Saxony-Anhalt"
-msgstr ""
+msgstr "Saxland-Anhalt"
 
 #: de/de_states.py:19
 msgid "Schleswig-Holstein"
-msgstr ""
+msgstr "Slésvík-Holtsetaland"
 
 #: de/de_states.py:20
 msgid "Thuringia"
@@ -454,7 +454,7 @@ msgstr ""
 
 #: de/forms.py:15 fi/forms.py:13 fr/forms.py:16
 msgid "Enter a zip code in the format XXXXX."
-msgstr ""
+msgstr "Sláðu inn póstnúmer á sniðinu XXXXX."
 
 #: de/forms.py:42
 msgid ""

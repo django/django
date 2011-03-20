@@ -4,9 +4,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-15 13:20-0400\n"
-"PO-Revision-Date: 2011-03-08 14:25+0000\n"
-"Last-Translator: slene <vslene@gmail.com>\n"
+"POT-Creation-Date: 2011-03-20 21:10+0100\n"
+"PO-Revision-Date: 2011-03-17 19:00+0000\n"
+"Last-Translator: DaNmarner <DaNmarner@gmail.com>\n"
 "Language-Team: Chinese (China) <None>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -375,19 +375,19 @@ msgstr "以 XXXXX 或 XX XXX 的格式输入一个邮政编码。"
 
 #: cz/forms.py:48
 msgid "Enter a birth number in the format XXXXXX/XXXX or XXXXXXXXXX."
-msgstr ""
+msgstr "以 x"
 
 #: cz/forms.py:49
 msgid "Invalid optional parameter Gender, valid values are 'f' and 'm'"
-msgstr ""
+msgstr "可选参数性别无效，请在'f'（女）和'm'（男）之间选择。"
 
 #: cz/forms.py:50
 msgid "Enter a valid birth number."
-msgstr ""
+msgstr "输入一个有效的出生码。"
 
 #: cz/forms.py:111
 msgid "Enter a valid IC number."
-msgstr ""
+msgstr "输入一个有效的 IC 号码。"
 
 #: de/de_states.py:5
 msgid "Baden-Wuerttemberg"
@@ -772,11 +772,11 @@ msgstr "输入一个有效的芬兰社会保障号码。"
 
 #: fr/forms.py:31
 msgid "Phone numbers must be in 0X XX XX XX XX format."
-msgstr ""
+msgstr "电话号码必须为 XXXX-XXXXXX 格式。"
 
 #: id/forms.py:28
 msgid "Enter a valid post code"
-msgstr ""
+msgstr "输入一个有效的邮政编码"
 
 #: id/forms.py:68 nl/forms.py:53
 msgid "Enter a valid phone number"
@@ -784,15 +784,15 @@ msgstr "输入一个有效的电话号码"
 
 #: id/forms.py:107
 msgid "Enter a valid vehicle license plate number"
-msgstr ""
+msgstr "输入一个有效的车牌号码"
 
 #: id/forms.py:170
 msgid "Enter a valid NIK/KTP number"
-msgstr ""
+msgstr "输入一个有效的 NIK/KTP 号码"
 
 #: id/id_choices.py:15
 msgid "Aceh"
-msgstr ""
+msgstr "亚齐"
 
 #: id/id_choices.py:16 id/id_choices.py:79
 msgid "Bali"
@@ -824,39 +824,39 @@ msgstr "占碑"
 
 #: id/id_choices.py:23
 msgid "Jawa Barat"
-msgstr ""
+msgstr "西爪哇"
 
 #: id/id_choices.py:24
 msgid "Jawa Tengah"
-msgstr ""
+msgstr "中爪哇"
 
 #: id/id_choices.py:25
 msgid "Jawa Timur"
-msgstr ""
+msgstr "爪哇帖木儿"
 
 #: id/id_choices.py:26 id/id_choices.py:94
 msgid "Kalimantan Barat"
-msgstr ""
+msgstr "西加里曼丹"
 
 #: id/id_choices.py:27 id/id_choices.py:72
 msgid "Kalimantan Selatan"
-msgstr ""
+msgstr "南加里曼丹"
 
 #: id/id_choices.py:28 id/id_choices.py:95
 msgid "Kalimantan Tengah"
-msgstr ""
+msgstr "中加里曼丹"
 
 #: id/id_choices.py:29 id/id_choices.py:96
 msgid "Kalimantan Timur"
-msgstr ""
+msgstr "东加里曼丹"
 
 #: id/id_choices.py:30
 msgid "Kepulauan Bangka-Belitung"
-msgstr ""
+msgstr "邦加勿里洞群岛"
 
 #: id/id_choices.py:31 id/id_choices.py:68
 msgid "Kepulauan Riau"
-msgstr ""
+msgstr "廖内群岛"
 
 #: id/id_choices.py:32 id/id_choices.py:61
 msgid "Lampung"
@@ -868,15 +868,15 @@ msgstr "马鲁古群岛"
 
 #: id/id_choices.py:34 id/id_choices.py:77
 msgid "Maluku Utara"
-msgstr ""
+msgstr "北马鲁古"
 
 #: id/id_choices.py:35
 msgid "Nusa Tenggara Barat"
-msgstr ""
+msgstr "西努沙登加拉"
 
 #: id/id_choices.py:36
 msgid "Nusa Tenggara Timur"
-msgstr ""
+msgstr "东努沙登加拉"
 
 #: id/id_choices.py:37
 msgid "Papua"
@@ -1184,11 +1184,11 @@ msgstr "维克罗"
 
 #: il/forms.py:31
 msgid "Enter a postal code in the format XXXXX"
-msgstr ""
+msgstr "以 XXXXX 格式输入一个邮政编码。"
 
 #: il/forms.py:50
 msgid "Enter a valid ID number."
-msgstr ""
+msgstr "输入一个有效的 ID 号码。"
 
 #: in_/forms.py:15
 msgid "Enter a zip code in the format XXXXXXX."
@@ -1698,11 +1698,11 @@ msgstr "西波美拉尼亚"
 
 #: pt/forms.py:17
 msgid "Enter a zip code in the format XXXX-XXX."
-msgstr ""
+msgstr "以 XXXX-XXX 格式输入一个邮政编码。"
 
 #: pt/forms.py:37
 msgid "Phone numbers must have 9 digits, or start by + or 00."
-msgstr ""
+msgstr "电话号码必须是9位数，以 + 或 00 开头。"
 
 #: ro/forms.py:19
 msgid "Enter a valid CIF."
@@ -1726,19 +1726,19 @@ msgstr "以 XXXXXX 的格式输入一个邮政编码"
 
 #: se/forms.py:50
 msgid "Enter a valid Swedish organisation number."
-msgstr ""
+msgstr "输入一个有效的瑞典机构编号。"
 
 #: se/forms.py:107
 msgid "Enter a valid Swedish personal identity number."
-msgstr ""
+msgstr "输入一个瑞典个人身份证号码。"
 
 #: se/forms.py:108
 msgid "Co-ordination numbers are not allowed."
-msgstr ""
+msgstr "统筹号码是不允许的。"
 
 #: se/forms.py:150
 msgid "Enter a Swedish postal code in the format XXXXX."
-msgstr ""
+msgstr "以 XXXXX 格式输入一个瑞典邮政编码。"
 
 #: se/se_counties.py:15
 msgid "Stockholm"
@@ -2174,19 +2174,19 @@ msgstr "日利纳地区"
 
 #: tr/forms.py:16
 msgid "Enter a postal code in the format XXXXX."
-msgstr ""
+msgstr "以 XXXXX 的格式输入一个邮政编码。"
 
 #: tr/forms.py:37
 msgid "Phone numbers must be in 0XXX XXX XXXX format."
-msgstr ""
+msgstr "电话号码的格式必须是 0XXX XXX XXXX 。"
 
 #: tr/forms.py:64
 msgid "Enter a valid Turkish Identification number."
-msgstr ""
+msgstr "输入一个有效的土耳其身份证号码。"
 
 #: tr/forms.py:65
 msgid "Turkish Identification number must be 11 digits."
-msgstr ""
+msgstr "土耳其身份证号码必须为11位数字。"
 
 #: uk/forms.py:21
 msgid "Enter a valid postcode."
@@ -2478,7 +2478,7 @@ msgstr "以 XXXXX 或 XXXXX-XXX 的格式输入一个邮政编码。"
 
 #: us/forms.py:26
 msgid "Phone numbers must be in XXX-XXX-XXXX format."
-msgstr ""
+msgstr "电话号码的格式必须是 XXX-XXX-XXXX。"
 
 #: us/forms.py:55
 msgid "Enter a valid U.S. Social Security number in XXX-XX-XXXX format."
@@ -2486,7 +2486,7 @@ msgstr "以 XXX-XX-XXXX 的格式输入一个有效的美国社会保障号码�
 
 #: us/forms.py:88
 msgid "Enter a U.S. state or territory."
-msgstr ""
+msgstr "输入一个美国州或领地名称。"
 
 #: us/models.py:9
 msgid "U.S. state (two uppercase letters)"
@@ -2494,7 +2494,7 @@ msgstr "美国州名(两个大写字母)"
 
 #: us/models.py:18
 msgid "U.S. postal code (two uppercase letters)"
-msgstr ""
+msgstr "美国邮政编码（两个小写字母）"
 
 #: us/models.py:27
 msgid "Phone number"
@@ -2502,11 +2502,11 @@ msgstr "电话号码"
 
 #: uy/forms.py:28
 msgid "Enter a valid CI number in X.XXX.XXX-X,XXXXXXX-X or XXXXXXXX format."
-msgstr ""
+msgstr "以 X.XXX.XXX-X,XXXXXXX-X 或 XXXXXXXX 格式输入一个有效的 CI 号码"
 
 #: uy/forms.py:30
 msgid "Enter a valid CI number."
-msgstr ""
+msgstr "输入一个有效的 CI 号码"
 
 #: za/forms.py:21
 msgid "Enter a valid South African ID number"
