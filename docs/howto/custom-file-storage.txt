@@ -68,7 +68,7 @@ passed in, but if the storage needs to change the file name return the new name
 instead).
 
 ``get_valid_name(name)``
-------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 Returns a filename suitable for use with the underlying storage system. The
 ``name`` argument passed to this method is the original filename sent to the
@@ -79,7 +79,7 @@ The code provided on ``Storage`` retains only alpha-numeric characters, periods
 and underscores from the original filename, removing everything else.
 
 ``get_available_name(name)``
-----------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Returns a filename that is available in the storage mechanism, possibly taking
 the provided filename into account. The ``name`` argument passed to this method
