@@ -24,11 +24,14 @@ Glossary
         See :doc:`/topics/db/models`.
 
     MTV
-        See :ref:`mtv`.
+        "Model-template-view"; a software pattern, similar in style to MVC, but
+        a better description of the way Django does things.
+
+        See :ref:`the FAQ entry <faq-mtv>`.
 
     MVC
         `Model-view-controller`__; a software pattern. Django :ref:`follows MVC
-        to some extent <mtv>`.
+        to some extent <faq-mtv>`.
 
         __ http://en.wikipedia.org/wiki/Model-view-controller
 

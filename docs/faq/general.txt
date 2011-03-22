@@ -78,6 +78,8 @@ Which sites use Django?
 
 .. _DjangoSites.org: http://djangosites.org
 
+.. _faq-mtv:
+
 Django appears to be a MVC framework, but you call the Controller the "view", and the View the "template". How come you don't use the standard names?
 -----------------------------------------------------------------------------------------------------------------------------------------------------
 
