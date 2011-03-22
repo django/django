@@ -384,7 +384,7 @@ errors. For example, you might want to present required form rows in bold and
 highlight errors in red.
 
 The :class:`Form` class has a couple of hooks you can use to add ``class``
-attributes to required rows or to rows with errors: simple set the
+attributes to required rows or to rows with errors: simply set the
 :attr:`Form.error_css_class` and/or :attr:`Form.required_css_class`
 attributes::
 
