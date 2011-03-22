@@ -2,17 +2,52 @@
 Django 1.3 release notes - UNDER DEVELOPMENT
 ============================================
 
-This page documents release notes for the as-yet-unreleased Django
-1.3. As such, it's tentative and subject to change. It provides
-up-to-date information for those who are following trunk.
+*Insert release date here*
 
-Django 1.3 includes a number of nifty `new features`_, lots of bug
-fixes, some minor `backwards incompatible changes`_ and an easy
-upgrade path from Django 1.2.
+Welcome to Django 1.3!
+
+Nearly a year in the making, Django 1.3 includes quite a few `new
+features`_ and plenty of bug fixes and improvements to existing
+features. These release notes cover the new features in 1.3, as well
+as some `backwards-incompatible changes`_ you'll want to be aware of
+when upgrading from Django 1.2 or older versions.
+
+Overview
+========
+
+Django 1.3's focus has mostly been on resolving smaller, long-standing
+feature requests, but that hasn't prevented a few fairly significant
+new features from landing, including:
+
+* A framework for writing `class-based views`_.
+
+* Built-in support for `using Python's logging facilities`_.
+
+* Contrib support for `easy handling of static files`_.
+
+* Django's testing framework now supports (and ships with a copy of)
+  `the unittest2 library`_.
+
+There's plenty more, of course; see the coverage of `new features`_
+below for a full rundown and details.
+
+Wherever possible, of course, new features are introduced in a
+backwards-compatible manner per :doc:`our API stability policy
+</misc/api-stability>` policy. As a result of this policy, Django 1.3
+`begins the deprecation process for some features`_.
+
+Some changes, unfortunately, are genuinely backwards-incompatible; in
+most cases these are due to security issues or bugs which simply
+couldn't be fixed any other way. Django 1.3 includes a few of these,
+and descriptions of them -- along with the (minor) modifications
+you'll need to make to handle them -- are documented in the list of
+`backwards-incompatible changes`_ below.
 
 .. _new features: `What's new in Django 1.3`_
-
-.. _backwards incompatible changes: backwards-incompatible-changes-1.3_
+.. _backwards-incompatible changes: backwards-incompatible-changes-1.3_
+.. _using Python's logging facilities: `Logging`_
+.. _easy handling of static files: `Extended static files handling`_
+.. _the unittest2 library: `unittest2 support`_
 
 What's new in Django 1.3
 ========================
@@ -30,7 +65,7 @@ provided, along with a completely generic view base class that can be
 used as the basis for reusable applications that can be easily
 extended.
 
-See :doc:`the documentation on Class-based Generic Views</topics/class-based-views>`
+See :doc:`the documentation on class-based generic views</topics/class-based-views>`
 for more details. There is also a document to help you :doc:`convert
 your function-based generic views to class-based
 views</topics/generic-views-migration>`.
@@ -38,49 +73,51 @@ views</topics/generic-views-migration>`.
 Logging
 ~~~~~~~
 
-Django 1.3 adds framework-level support for Python's logging module.
-This means you can now easily configure and control logging as part of
-your Django project. A number of logging handlers and logging calls
-have been added to Django's own code as well -- most notably, the
-error emails sent on a HTTP 500 server error are now handled as a
-logging activity. See :doc:`the documentation on Django's logging
-interface </topics/logging>` for more details.
+Django 1.3 adds framework-level support for Python's ``logging``
+module.  This means you can now easily configure and control logging
+as part of your Django project. A number of logging handlers and
+logging calls have been added to Django's own code as well -- most
+notably, the error emails sent on a HTTP 500 server error are now
+handled as a logging activity. See :doc:`the documentation on Django's
+logging interface </topics/logging>` for more details.
 
 Extended static files handling
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Django 1.3 ships with a new contrib app ``'django.contrib.staticfiles'``
-to help developers handle the static media files (images, CSS, Javascript,
-etc.) that are needed to render a complete web page.
+Django 1.3 ships with a new contrib app --
+``django.contrib.staticfiles`` -- to help developers handle the static
+media files (images, CSS, Javascript, etc.) that are needed to render
+a complete web page.
 
-In previous versions of Django, it was common to place static assets in
-:setting:`MEDIA_ROOT` along with user-uploaded files, and serve them both at
-:setting:`MEDIA_URL`. Part of the purpose of introducing the ``staticfiles``
-app is to make it easier to keep static files separate from user-uploaded
-files. Static assets should now go in ``static/`` subdirectories of your apps
-or in other static assets directories listed in :setting:`STATICFILES_DIRS`,
-and will be served at :setting:`STATIC_URL`.
+In previous versions of Django, it was common to place static assets
+in :setting:`MEDIA_ROOT` along with user-uploaded files, and serve
+them both at :setting:`MEDIA_URL`. Part of the purpose of introducing
+the ``staticfiles`` app is to make it easier to keep static files
+separate from user-uploaded files. Static assets should now go in
+``static/`` subdirectories of your apps or in other static assets
+directories listed in :setting:`STATICFILES_DIRS`, and will be served
+at :setting:`STATIC_URL`.
 
 See the :doc:`reference documentation of the app </ref/contrib/staticfiles>`
 for more details or learn how to :doc:`manage static files
 </howto/static-files>`.
 
-``unittest2`` support
+unittest2 support
 ~~~~~~~~~~~~~~~~~~~~~
 
-Python 2.7 introduced some major changes to the unittest library,
+Python 2.7 introduced some major changes to the ``unittest`` library,
 adding some extremely useful features. To ensure that every Django
-project can benefit from these new features, Django ships with a
-copy of unittest2_, a copy of the Python 2.7 unittest library,
-backported for Python 2.4 compatibility.
+project can benefit from these new features, Django ships with a copy
+of unittest2_, a copy of the Python 2.7 unittest library, backported
+for Python 2.4 compatibility.
 
-To access this library, Django provides the
-``django.utils.unittest`` module alias. If you are using Python
-2.7, or you have installed unittest2 locally, Django will map the
-alias to the installed version of the unittest library. Otherwise,
-Django will use it's own bundled version of unittest2.
+To access this library, Django provides the ``django.utils.unittest``
+module alias. If you are using Python 2.7, or you have installed
+``unittest2`` locally, Django will map the alias to the installed
+version of the unittest library. Otherwise, Django will use its own
+bundled version of unittest2.
 
-To use this alias, simply use::
+To take advantage of this alias, simply use::
 
     from django.utils import unittest
 
@@ -180,14 +217,15 @@ that Django 1.2 introduced support for multiple database connections,
 Django 1.3 allows you to use the new :setting:`CACHES` setting to
 define multiple named cache connections.
 
-Secondly, :ref:`Versioning <cache_versioning>`, :ref:`site-wide
+Secondly, :ref:`versioning <cache_versioning>`, :ref:`site-wide
 prefixing <cache_key_prefixing>` and :ref:`transformation
-<cache_key_transformation>` has been added to the cache API.
+<cache_key_transformation>` have been added to the cache API.
 
-Thirdly, the :ref:`cache key creation <using-vary-headers>` has been
-updated to take the GET request query string into account.
+Thirdly, :ref:`cache key creation <using-vary-headers>` has been
+updated to take the request query string into account on ``GET``
+requests.
 
-Lastly, support for pylibmc_ has been added to the memcached cache
+Finally, support for pylibmc_ has been added to the memcached cache
 backend.
 
 For more details, see the :doc:`documentation on
@@ -198,10 +236,11 @@ caching in Django</topics/cache>`.
 Permissions for inactive users
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you provide a custom auth backend with ``supports_inactive_user`` set to
-``True``, an inactive user model will check the backend for permissions.
-This is useful for further centralizing the permission handling. See the
-:doc:`authentication docs </topics/auth>` for more details.
+If you provide a custom auth backend with ``supports_inactive_user``
+set to ``True``, an inactive ``User`` instance will check the backend
+for permissions.  This is useful for further centralizing the
+permission handling. See the :doc:`authentication docs </topics/auth>`
+for more details.
 
 GeoDjango
 ~~~~~~~~~
@@ -221,10 +260,10 @@ A trailing slash is now *required* for ``MEDIA_URL`` and the new
 a consistent way to combine paths in templates.
 
 Project settings which provide either of both settings without a trailing
-slash will now raise a ``PendingDeprecation`` warning.
+slash will now raise a ``PendingDeprecationWarning``.
 
-In Django 1.4 this same condition will raise an ``ImproperlyConfigured``
-exception.
+In Django 1.4 this same condition will raise ``DeprecationWarning``,
+and in Django 1.5 will raise an ``ImproperlyConfigured`` exception.
 
 Everything else
 ~~~~~~~~~~~~~~~
@@ -239,38 +278,38 @@ To compensate for this, the focus of the Django 1.3 development
 process has been on adding lots of smaller, long standing feature
 requests. These include:
 
-    * Improved tools for accessing and manipulating the current Site.
+* Improved tools for accessing and manipulating the current ``Site``
+  object in :ref:`the sites framework <ref/contrib/sites>`.
 
-    * A :class:`~django.test.client.RequestFactory` for mocking
-      requests in tests.
+* A :class:`~django.test.client.RequestFactory` for mocking requests
+  in tests.
 
-    * A new test assertion --
-      :meth:`~django.test.client.Client.assertNumQueries` -- making it
-      easier to test the database activity associated with a view.
+* A new test assertion --
+  :meth:`~django.test.client.Client.assertNumQueries` -- making it
+  easier to test the database activity associated with a view.
 
-    * Support for lookups spanning relations in admin's ``list_filter``.
+* Support for lookups spanning relations in admin's ``list_filter``.
 
-    * Support for _HTTPOnly cookies.
+* Support for _HTTPOnly cookies.
 
-    * :meth:`mail_admins()` and :meth:`mail_managers()` now support
+* :meth:`mail_admins()` and :meth:`mail_managers()` now support
       easily attaching HTML content to messages.
 
-    * :class:`EmailMessage` now supports CC's.
+* :class:`EmailMessage` now supports CC's.
 
-    * Error emails now include more of the detail and formatting of
-      the debug server error page.
+* Error emails now include more of the detail and formatting of the
+  debug server error page.
 
-    * :meth:`simple_tag` now accepts a :attr:`takes_context` argument,
-      making it easier to write simple template tags that require
-      access to template context.
+* :meth:`simple_tag` now accepts a :attr:`takes_context` argument,
+  making it easier to write simple template tags that require access
+  to template context.
 
-    * A new :meth:`~django.shortcuts.render()` shortcut -- an
-      alternative to :meth:`~django.shortcuts.render_to_response()`
-      providing a :class:`~django.template.RequestContext` by
-      default.
+* A new :meth:`~django.shortcuts.render()` shortcut -- an alternative
+  to :meth:`~django.shortcuts.render_to_response()` providing a
+  :class:`~django.template.RequestContext` by default.
 
-    * Support for combining :ref:`F() expressions <query-expressions>`
-      with timedelta values when retrieving or updating database values.
+* Support for combining :ref:`F() expressions <query-expressions>`
+  with timedelta values when retrieving or updating database values.
 
 .. _HTTPOnly: http://www.owasp.org/index.php/HTTPOnly
 
@@ -279,85 +318,25 @@ requests. These include:
 Backwards-incompatible changes in 1.3
 =====================================
 
-CSRF exception for AJAX requests
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+CSRF validation now applies to AJAX requests
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Django includes a CSRF-protection mechanism, which makes use of a
-token inserted into outgoing forms. Middleware then checks for the
-token's presence on form submission, and validates it.
-
-Prior to Django 1.2.5, our CSRF protection made an exception for AJAX
-requests, on the following basis:
-
-    * Many AJAX toolkits add an X-Requested-With header when using
-      XMLHttpRequest.
-
-    * Browsers have strict same-origin policies regarding
-      XMLHttpRequest.
-
-    * In the context of a browser, the only way that a custom header
-      of this nature can be added is with XMLHttpRequest.
-
-Therefore, for ease of use, we did not apply CSRF checks to requests
-that appeared to be AJAX on the basis of the X-Requested-With header.
-The Ruby on Rails web framework had a similar exemption.
-
-Recently, engineers at Google made members of the Ruby on Rails
-development team aware of a combination of browser plugins and
-redirects which can allow an attacker to provide custom HTTP headers
-on a request to any website. This can allow a forged request to appear
-to be an AJAX request, thereby defeating CSRF protection which trusts
-the same-origin nature of AJAX requests.
-
-Michael Koziarski of the Rails team brought this to our attention, and
-we were able to produce a proof-of-concept demonstrating the same
-vulnerability in Django's CSRF handling.
-
-To remedy this, Django will now apply full CSRF validation to all
-requests, regardless of apparent AJAX origin. This is technically
-backwards-incompatible, but the security risks have been judged to
-outweigh the compatibility concerns in this case.
-
-Additionally, Django will now accept the CSRF token in the custom HTTP
-header X-CSRFTOKEN, as well as in the form submission itself, for ease
-of use with popular JavaScript toolkits which allow insertion of
-custom headers into all AJAX requests.
-
-Please see the :ref:`CSRF docs for example jQuery code <csrf-ajax>`
-that demonstrates this technique, ensuring that you are looking at the
-documentation for your version of Django, as the exact code necessary
-is different for some older versions of Django.
+Prior to Django 1.2.5, Django's CSRF-prevention system exempted AJAX
+requests from CSRF verification; due to `security issues`_ reported to
+us, however, *all* requests are now subjected to CSRF
+verification. Consult :ref:`the Django CSRF documentation
+<ref/contrib/csrf>` for details on how to handle CSRF verification in
+AJAX requests.
 
 Restricted filters in admin interface
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The Django administrative interface, django.contrib.admin, supports
-filtering of displayed lists of objects by fields on the corresponding
-models, including across database-level relationships. This is
-implemented by passing lookup arguments in the querystring portion of
-the URL, and options on the ModelAdmin class allow developers to
-specify particular fields or relationships which will generate
-automatic links for filtering.
-
-One historically-undocumented and -unofficially-supported feature has
-been the ability for a user with sufficient knowledge of a model's
-structure and the format of these lookup arguments to invent useful
-new filters on the fly by manipulating the querystring.
-
-However, it has been demonstrated that this can be abused to gain
-access to information outside of an admin user's permissions; for
-example, an attacker with access to the admin and sufficient knowledge
-of model structure and relations could construct query strings which --
-with repeated use of regular-expression lookups supported by the
-Django database API -- expose sensitive information such as users'
-password hashes.
-
-To remedy this, django.contrib.admin will now validate that
-querystring lookup arguments either specify only fields on the model
-being viewed, or cross relations which have been explicitly
-whitelisted by the application developer using the pre-existing
-mechanism mentioned above. This is backwards-incompatible for any
-users relying on the prior ability to insert arbitrary lookups.
+Prior to Django 1.2.5, the Django administrative interface allowed
+filtering on any model field or relation -- not just those specified
+in ``list_filter`` -- via query string manipulation. Due to `security
+issues`_ reported to us, however, query string lookup arguments in the
+admin must be for fields or relations specified in ``list_filter`` or
+``date_hierarchy``.
 
 FileField no longer deletes files
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -448,10 +427,10 @@ list of profanities, preventing people from submitting comments that
 contained one of those profanities.
 
 Unfortunately, the technique used to implement this profanities list
-was woefully naive, and prone to the `Scunthorpe problem`_. Fixing the
-built in filter to fix this problem would require significant effort,
-and since natural language processing isn't the normal domain of a web
-framework, we have "fixed" the problem by making the list of
+was woefully naive, and prone to the `Scunthorpe problem`_. Improving
+the built-in filter to fix this problem would require significant
+effort, and since natural language processing isn't the normal domain
+of a web framework, we have "fixed" the problem by making the list of
 prohibited words an empty list.
 
 If you want to restore the old behavior, simply put a
@@ -471,14 +450,19 @@ Localflavor changes
 Django 1.3 introduces the following backwards-incompatible changes to
 local flavors:
 
-    * Indonesia (id) -- The province "Nanggroe Aceh Darussalam (NAD)"
-      has been removed from the province list in favor of the new
-      official designation "Aceh (ACE)".
+* Indonesia (id) -- The province "Nanggroe Aceh Darussalam (NAD)" has
+  been removed from the province list in favor of the new official
+  designation "Aceh (ACE)".
 
-    * Canada (ca) -- The province "Newfoundland and Labrador" has
-      had its province code updated to "NL", rather than the
-      older "NF". In addition, the Yukon Territory has had its
-      province code corrected to "YT", instead of "YK".
+* Canada (ca) -- The province "Newfoundland and Labrador" has had its
+  province code updated to "NL", rather than the older "NF". In
+  addition, the Yukon Territory has had its province code corrected to
+  "YT", instead of "YK".
+
+* United States of America (us) -- The list of "states" used by
+  ``USStateField`` has expanded to include Armed Forces postal
+  codes. This is backwards-incompatible if you were relying on
+  ``USStateField`` not including them.
 
 FormSet updates
 ~~~~~~~~~~~~~~~
@@ -695,10 +679,13 @@ As a result of the introduction of class-based generic views, the
 function-based generic views provided by Django have been deprecated.
 The following modules and the views they contain have been deprecated:
 
-      * :mod:`django.views.generic.create_update`
-      * :mod:`django.views.generic.date_based`
-      * :mod:`django.views.generic.list_detail`
-      * :mod:`django.views.generic.simple`
+* :mod:`django.views.generic.create_update`
+
+* :mod:`django.views.generic.date_based`
+
+* :mod:`django.views.generic.list_detail`
+
+* :mod:`django.views.generic.simple`
 
 Test client response ``template`` attribute
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -796,17 +783,19 @@ statements manually.
 GeoDjango
 ~~~~~~~~~
 
-  * The function-based :setting:`TEST_RUNNER` previously used to execute
-    the GeoDjango test suite, :func:`django.contrib.gis.tests.run_gis_tests`,
-    was deprecated for the class-bassed runner,
-    :class:`django.contrib.gis.tests.GeoDjangoTestSuiteRunner`.
+* The function-based :setting:`TEST_RUNNER` previously used to execute
+  the GeoDjango test suite,
+  :func:`django.contrib.gis.tests.run_gis_tests`, was deprecated for
+  the class-based runner,
+  :class:`django.contrib.gis.tests.GeoDjangoTestSuiteRunner`.
 
-  * Previously, calling :meth:`~django.contrib.gis.geos.GEOSGeometry.transform`
-    would silently do nothing when GDAL wasn't available.  Now,
-    a :class:`~django.contrib.gis.geos.GEOSException` is properly raised
-    to indicate possible faulty application code.  A warning is now raised
-    if :meth:`~django.contrib.gis.geos.GEOSGeometry.transform` is called when
-    the SRID of the geometry is less than 0 or ``None``.
+* Previously, calling
+  :meth:`~django.contrib.gis.geos.GEOSGeometry.transform` would
+  silently do nothing when GDAL wasn't available.  Now, a
+  :class:`~django.contrib.gis.geos.GEOSException` is properly raised
+  to indicate possible faulty application code.  A warning is now
+  raised if :meth:`~django.contrib.gis.geos.GEOSGeometry.transform` is
+  called when the SRID of the geometry is less than 0 or ``None``.
 
 ``CZBirthNumberField.clean``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -837,27 +826,29 @@ directory containing project-level translations to the value of that setting.
 
 Rationale for this decision:
 
- * The *project path* has always been a loosely defined concept (actually, the
-   directory used for locating project-level translations is the directory
-   containing the settings module) and there has been a shift in other parts
-   of the framework to stop using it as a reference for location of assets at
-   runtime.
+* The *project path* has always been a loosely defined concept
+  (actually, the directory used for locating project-level
+  translations is the directory containing the settings module) and
+  there has been a shift in other parts of the framework to stop using
+  it as a reference for location of assets at runtime.
 
- * Detection of the ``locale`` subdirectory tends to fail when the deployment
-   scenario is more complex than the basic one. e.g. it fails when the settings
-   module is a directory (ticket #10765).
+* Detection of the ``locale`` subdirectory tends to fail when the
+  deployment scenario is more complex than the basic one. e.g. it
+  fails when the settings module is a directory (ticket #10765).
 
- * There are potential strange development- and deployment-time problems like the
-   fact that the ``project_dir/locale/`` subdir can generate spurious error
-   messages when the project directory is added to the Python path (``manage.py
-   runserver`` does this) and then it clashes with the equally named standard
-   library module, this is a typical warning message::
+* There are potential strange development- and deployment-time
+  problems like the fact that the ``project_dir/locale/`` subdir can
+  generate spurious error messages when the project directory is added
+  to the Python path (``manage.py runserver`` does this) and then it
+  clashes with the equally named standard library module, this is a
+  typical warning message::
 
      /usr/lib/python2.6/gettext.py:49: ImportWarning: Not importing directory '/path/to/project/locale': missing __init__.py.
      import locale, copy, os, re, struct, sys
 
- * This location wasn't included in the translation building process for
-   JavaScript literals. This deprecation removes such inconsistency.
+* This location wasn't included in the translation building process
+  for JavaScript literals. This deprecation removes such
+  inconsistency.
 
 ``PermWrapper`` moved to ``django.contrib.auth.context_processors``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
