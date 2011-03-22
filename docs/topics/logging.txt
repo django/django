@@ -458,7 +458,7 @@ Messages to this logger have the following extra context:
     * ``sql``: The SQL statement that was executed.
     * ``params``: The parameters that were used in the SQL call.
 
-For performance reasons, SQL logging is only occurs when
+For performance reasons, SQL logging is only enabled when
 ``settings.DEBUG`` is set to ``True``, regardless of the logging
 level or handlers that are installed.
 
