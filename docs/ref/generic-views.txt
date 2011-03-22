@@ -29,6 +29,8 @@ Most generic views require the ``queryset`` key, which is a ``QuerySet``
 instance; see :doc:`/topics/db/queries` for more information about ``QuerySet``
 objects.
 
+.. module:: django.views.generic.simple
+
 "Simple" generic views
 ======================
 
@@ -145,6 +147,8 @@ string is written as ``"%7Ejacob/"`` (with only a single ``%``), an exception wo
     urlpatterns = patterns('',
         ('^bar/$', redirect_to, {'url': '%%7Ejacob.'}),
     )
+
+.. module:: django.views.generic.date_based
 
 Date-based generic views
 ========================
@@ -677,6 +681,8 @@ In addition to ``extra_context``, the template's context will be:
       ``template_object_name`` is ``'foo'``, this variable's name will be
       ``foo``.
 
+.. module:: django.views.generic.list_detail
+
 List/detail generic views
 =========================
 
@@ -861,6 +867,8 @@ In addition to ``extra_context``, the template's context will be:
       ``template_object_name`` parameter, which is ``'object'`` by default. If
       ``template_object_name`` is ``'foo'``, this variable's name will be
       ``foo``.
+
+.. module:: django.views.generic.create_update
 
 Create/update/delete generic views
 ==================================

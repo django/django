@@ -197,15 +197,15 @@ additional data into the context.
 However, you can't (easily) modify the content of a basic
 :class:`~django.http.HttpResponse` after it has been constructed. To
 overcome this limitation, Django 1.3 adds a new
-:class:`~django.template.TemplateResponse` class. Unlike basic
+:class:`~django.template.response.TemplateResponse` class. Unlike basic
 :class:`~django.http.HttpResponse` objects,
-:class:`~django.template.TemplateResponse` objects retain the details
+:class:`~django.template.response.TemplateResponse` objects retain the details
 of the template and context that was provided by the view to compute
 the response. The final output of the response is not computed until
 it is needed, later in the response process.
 
 For more details, see the :doc:`documentation </ref/template-response>`
-on the :class:`~django.template.TemplateResponse` class.
+on the :class:`~django.template.response.TemplateResponse` class.
 
 Caching changes
 ~~~~~~~~~~~~~~~
@@ -253,11 +253,11 @@ when using :ref:`spatial database backends <spatial-backends>`.
 ``MEDIA_URL`` and ``STATIC_URL`` must end in a slash
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Previously, the ``MEDIA_URL`` setting only required a trailing slash if it
-contained a suffix beyond the domain name.
+Previously, the :setting:`MEDIA_URL` setting only required a trailing slash if
+it contained a suffix beyond the domain name.
 
-A trailing slash is now *required* for ``MEDIA_URL`` and the new
-``STATIC_URL`` setting as long as it is not blank. This ensures there is
+A trailing slash is now *required* for :setting:`MEDIA_URL` and the new
+:setting:`STATIC_URL` setting as long as it is not blank. This ensures there is
 a consistent way to combine paths in templates.
 
 Project settings which provide either of both settings without a trailing
@@ -279,31 +279,34 @@ To compensate for this, the focus of the Django 1.3 development
 process has been on adding lots of smaller, long standing feature
 requests. These include:
 
-* Improved tools for accessing and manipulating the current ``Site``
-  object in :doc:`the sites framework </ref/contrib/sites>`.
+* Improved tools for accessing and manipulating the current
+  :class:`~django.contrib.sites.models.Site` object in
+  :doc:`the sites framework </ref/contrib/sites>`.
 
 * A :class:`~django.test.client.RequestFactory` for mocking requests
   in tests.
 
 * A new test assertion --
-  :meth:`~django.test.client.Client.assertNumQueries` -- making it
+  :meth:`~django.test.TestCase.assertNumQueries` -- making it
   easier to test the database activity associated with a view.
 
-* Support for lookups spanning relations in admin's ``list_filter``.
+* Support for lookups spanning relations in admin's
+  :attr:`~django.contrib.admin.ModelAdmin.list_filter`.
 
-* Support for _HTTPOnly cookies.
+* Support for HTTPOnly_ cookies.
 
-* :meth:`mail_admins()` and :meth:`mail_managers()` now support
-      easily attaching HTML content to messages.
+* :meth:`~django.core.mail.mail_admins()` and
+  :meth:`~django.core.mail.mail_managers()` now support easily attaching
+  HTML content to messages.
 
-* :class:`EmailMessage` now supports CC's.
+* :class:`~django.core.mail.EmailMessage` now supports CC's.
 
 * Error emails now include more of the detail and formatting of the
   debug server error page.
 
-* :meth:`simple_tag` now accepts a :attr:`takes_context` argument,
-  making it easier to write simple template tags that require access
-  to template context.
+* :meth:`~django.template.Library.simple_tag` now accepts a
+  ``takes_context`` argument, making it easier to write simple
+  template tags that require access to template context.
 
 * A new :meth:`~django.shortcuts.render()` shortcut -- an alternative
   to :meth:`~django.shortcuts.render_to_response()` providing a
@@ -381,10 +384,11 @@ explicitly indicate this. For example::
 Clearable default widget for FileField
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Django 1.3 now includes a ``ClearableFileInput`` form widget in addition to
-``FileInput``. ``ClearableFileInput`` renders with a checkbox to clear the
-field's value (if the field has a value and is not required); ``FileInput``
-provided no means for clearing an existing file from a ``FileField``.
+Django 1.3 now includes a :class:`~django.forms.ClearableFileInput` form widget
+in addition to :class:`~django.forms.FileInput`. ``ClearableFileInput`` renders
+with a checkbox to clear the field's value (if the field has a value and is not
+required); ``FileInput`` provided no means for clearing an existing file from
+a ``FileField``.
 
 ``ClearableFileInput`` is now the default widget for a ``FileField``, so
 existing forms including ``FileField`` without assigning a custom widget will
@@ -437,7 +441,7 @@ of a web framework, we have "fixed" the problem by making the list of
 prohibited words an empty list.
 
 If you want to restore the old behavior, simply put a
-``PROFANITIES_LIST`` setting in your settings file that includes the
+:setting:`PROFANITIES_LIST` setting in your settings file that includes the
 words that you want to prohibit (see the `commit that implemented this
 change`_ if you want to see the list of words that was historically
 prohibited). However, if avoiding profanities is important to you, you
@@ -622,7 +626,8 @@ transactions that are being managed using
           return render_to_response('template', {'object':obj})
 
 Prior to Django 1.3, this would work without error. However, under
-Django 1.3, this will raise a :class:`TransactionManagementError` because
+Django 1.3, this will raise a
+:class:`~django.db.transaction.TransactionManagementError` because
 the read operation that retrieves the ``MyObject`` instance leaves the
 transaction in a dirty state.
 
@@ -868,12 +873,12 @@ identical to their old versions; only the module location has changed.
 Removal of ``XMLField``
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-When Django was first released, Django included an ``XMLField`` that
-performed automatic XML validation for any field input. However, this
-validation function hasn't been performed since the introduction of
-``newforms``, prior to the 1.0 release. As a result, ``XMLField`` as
-currently implemented is functionally indistinguishable from a simple
-``TextField``.
+When Django was first released, Django included an
+:class:`~django.db.models.XMLField` that performed automatic XML validation
+for any field input. However, this validation function hasn't been
+performed since the introduction of ``newforms``, prior to the 1.0 release.
+As a result, ``XMLField`` as currently implemented is functionally
+indistinguishable from a simple :class:`~django.db.models.TextField`.
 
 For this reason, Django 1.3 has fast-tracked the deprecation of
 ``XMLField`` -- instead of a two-release deprecation, ``XMLField``
