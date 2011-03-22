@@ -281,6 +281,23 @@ Honza Král
 
 .. _Whiskey Media: http://www.whiskeymedia.com/
 
+`Idan Gazit`_
+    As a self-professed design geek, Idan was initially attracted to Django
+    sometime between magic-removal and queryset-refactor. Formally trained
+    as a software engineer, Idan straddles the worlds of design and code,
+    jack of two trades and master of none. He is passionate about usability
+    and finding novel ways to extract meaning from data, and is a longtime
+    photographer_.
+
+    Idan previously accepted freelance work under the Pixane_ imprint, but
+    now splits his days between his startup, Skills_, and beautifying all
+    things Django and Python.
+
+.. _Idan Gazit: http://idan.gazit.me
+.. _photographer: http://flickr.com/photos/idangazit
+.. _Pixane: http://pixane.com
+.. _Skills: http://skillsapp.com
+
 Specialists
 -----------
 
