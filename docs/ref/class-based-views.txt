@@ -442,11 +442,11 @@ FormMixin
         Determine the URL to redirect to when the form is successfully
         validated. Returns :attr:`.success_url` by default.
 
-    .. method:: form_valid()
+    .. method:: form_valid(form)
 
         Redirects to :meth:`.get_success_url`.
 
-    .. method:: form_invalid()
+    .. method:: form_invalid(form)
 
         Renders a response, providing the invalid form as context.
 
