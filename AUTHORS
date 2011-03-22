@@ -24,6 +24,7 @@ The PRIMARY AUTHORS are (and/or have been):
     * Ramiro Morales
     * Chris Beaven
     * Honza Král
+    * Idan Gazit
 
 More information on the main contributors to Django can be found in
 docs/internals/committers.txt.
@@ -190,7 +191,6 @@ answer newbie questions, and generally made Django that much better:
     gandalf@owca.info
     Marc Garcia <marc.garcia@accopensys.com>
     Andy Gayton <andy-django@thecablelounge.com>
-    Idan Gazit
     geber@datacollect.com
     Baishampayan Ghose
     Joshua Ginsberg <jag@flowtheory.net>
