@@ -1,8 +1,8 @@
-============================================
-Django 1.3 release notes - UNDER DEVELOPMENT
-============================================
+========================
+Django 1.3 release notes
+========================
 
-*Insert release date here*
+*March 23, 2011*
 
 Welcome to Django 1.3!
 
@@ -49,6 +49,20 @@ you'll need to make to handle them -- are documented in the list of
 .. _easy handling of static files: `Extended static files handling`_
 .. _the unittest2 library: `unittest2 support`_
 .. _begins the deprecation process for some features: `deprecated-features-1.3`_
+
+Python compatibility
+====================
+
+The release of Django 1.2 was notable for having the first shift in
+Django's Python compatibility policy; prior to Django 1.2, Django
+supported any 2.x version of Python from 2.3 up. As of Django 1.2, the
+requirement was raised to Python 2.4.
+
+Django 1.3 continues to support Python 2.4, but will be the final
+Django release series to do so; beginning with Django 1.4, the minimum
+supported Python version will be 2.5. A document outlining our full
+timeline for deprecating Python 2.x and moving to Python 3.x will be
+published shortly after the release of Django 1.3.
 
 What's new in Django 1.3
 ========================
