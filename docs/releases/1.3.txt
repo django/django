@@ -140,7 +140,7 @@ wherever you would have historically used::
 
     import unittest
 
-If you want to continue to use the base unittest libary, you can --
+If you want to continue to use the base unittest library, you can --
 you just won't get any of the nice new unittest2 features.
 
 .. _unittest2: http://pypi.python.org/pypi/unittest2
@@ -566,7 +566,7 @@ Changed priority of translation loading
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Work has been done to simplify, rationalize and properly document the algorithm
-used by Django at runtime to build translations from the differents translations
+used by Django at runtime to build translations from the different translations
 found on disk, namely:
 
 For translatable literals found in Python code and templates (``'django'``
@@ -785,7 +785,7 @@ and ignored the almost identical implementation in the already used auth app.
 A side effect of this duplication was the missing adoption of the changes made
 in r12634_ to support a broader set of characters for usernames.
 
-This release refactores the admin's login mechanism to use a subclass of the
+This release refactors the admin's login mechanism to use a subclass of the
 :class:`~django.contrib.auth.forms.AuthenticationForm` instead of a manual
 form validation. The previously undocumented method
 ``'django.contrib.admin.sites.AdminSite.display_login_form'`` has been removed
