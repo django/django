@@ -56,7 +56,7 @@ Python compatibility
 The release of Django 1.2 was notable for having the first shift in
 Django's Python compatibility policy; prior to Django 1.2, Django
 supported any 2.x version of Python from 2.3 up. As of Django 1.2, the
-requirement was raised to Python 2.4.
+minimum requirement was raised to Python 2.4.
 
 Django 1.3 continues to support Python 2.4, but will be the final
 Django release series to do so; beginning with Django 1.4, the minimum
