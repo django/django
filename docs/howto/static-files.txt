@@ -48,16 +48,24 @@ Here's the basic usage in a nutshell:
        See the documentation for the :setting:`STATICFILES_FINDERS` setting for
        details on how ``staticfiles`` finds your files.
 
-    2. Make sure that ``django.contrib.staticfiles`` is in your
+    2. Set the :setting:`STATIC_URL` setting to the URL you want to use
+       for pointing to your static files, e.g.::
+
+           STATIC_URL = '/static/'
+
+       In projects freshly created with the :djadmin:`startproject`
+       management command this will be preset to ``'/static/'``.
+
+    3. Make sure that ``django.contrib.staticfiles`` is in your
        :setting:`INSTALLED_APPS`.
 
        For :ref:`local development<staticfiles-development>`, if you are using
        :ref:`runserver<staticfiles-runserver>` or adding
        :ref:`staticfiles_urlpatterns<staticfiles-development>` to your URLconf,
        you're done! Your static files will automatically be served at the
-       default :setting:`STATIC_URL` of ``/static/``.
+       :setting:`STATIC_URL` you specified in step 2.
 
-    3. You'll probably need to refer to these files in your templates. The
+    4. You'll probably need to refer to these files in your templates. The
        easiest method is to use the included context processor which will allow
        template code like:
 
