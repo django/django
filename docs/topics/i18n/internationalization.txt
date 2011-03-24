@@ -410,10 +410,11 @@ Using this decorator means you can write your function and assume that the
 input is a proper string, then add support for lazy translation objects at the
 end.
 
-.. versionadded:: 1.3
 
 Localized names of languages
 ============================
+
+.. versionadded:: 1.3
 
 The ``get_language_info()`` function provides detailed information about
 languages::
