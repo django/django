@@ -78,24 +78,20 @@ Here's the basic usage in a nutshell:
 
 When you're ready to move out of local development and deploy your project:
 
-    1. Set the :setting:`STATIC_URL` setting to the public URL for your static
-       files (in some cases, the default value of ``/static/`` may still be
-       fine).
-
-    2. Set the :setting:`STATIC_ROOT` setting to point to where you'd like your
+    1. Set the :setting:`STATIC_ROOT` setting to point to where you'd like your
        static files collected to when you use the :djadmin:`collectstatic`
        management command. For example::
 
             STATIC_ROOT = "/home/jacob/projects/mysite.com/sitestatic"
 
-    3. Run the :djadmin:`collectstatic` management command::
+    2. Run the :djadmin:`collectstatic` management command::
 
             ./manage.py collectstatic
 
        This'll churn through your static file storage and copy them into the
        directory given by :setting:`STATIC_ROOT`.
 
-    4. Deploy those files by configuring your webserver of choice to serve the
+    3. Deploy those files by configuring your webserver of choice to serve the
        files in :setting:`STATIC_ROOT` at :setting:`STATIC_URL`.
 
        :ref:`staticfiles-production` covers some common deployment strategies
