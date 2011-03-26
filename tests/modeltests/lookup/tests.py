@@ -115,7 +115,8 @@ class LookupTests(TestCase):
         self.assertEqual(Article.objects.in_bulk((self.a3.id,)), {self.a3.id: self.a3})
         self.assertEqual(Article.objects.in_bulk([1000]), {})
         self.assertEqual(Article.objects.in_bulk([]), {})
-        self.assertRaises(AssertionError, Article.objects.in_bulk, 'foo')
+        self.assertEqual(Article.objects.in_bulk(iter([self.a1.id])), {self.a1.id: self.a1})
+        self.assertEqual(Article.objects.in_bulk(iter([])), {})
         self.assertRaises(TypeError, Article.objects.in_bulk)
         self.assertRaises(TypeError, Article.objects.in_bulk, headline__startswith='Blah')
 

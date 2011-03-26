@@ -413,8 +413,6 @@ class QuerySet(object):
         """
         assert self.query.can_filter(), \
                 "Cannot use 'limit' or 'offset' with in_bulk"
-        assert isinstance(id_list, (tuple,  list, set, frozenset)), \
-                "in_bulk() must be provided with a list of IDs."
         if not id_list:
             return {}
         qs = self._clone()
