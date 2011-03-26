@@ -365,7 +365,7 @@ class ManagementUtility(object):
                 self.fetch_command(args[2]).print_help(self.prog_name, args[2])
             else:
                 parser.print_lax_help()
-                sys.stderr.write(self.main_help_text() + '\n')
+                sys.stdout.write(self.main_help_text() + '\n')
                 sys.exit(1)
         # Special-cases: We want 'django-admin.py --version' and
         # 'django-admin.py --help' to work, for backwards compatibility.
@@ -374,7 +374,7 @@ class ManagementUtility(object):
             pass
         elif self.argv[1:] in (['--help'], ['-h']):
             parser.print_lax_help()
-            sys.stderr.write(self.main_help_text() + '\n')
+            sys.stdout.write(self.main_help_text() + '\n')
         else:
             self.fetch_command(subcommand).run_from_argv(self.argv)
 
