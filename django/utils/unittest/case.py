@@ -997,8 +997,7 @@ class TestCase(unittest.TestCase):
                 excName = expected_exception.__name__
             else:
                 excName = str(expected_exception)
-            raise self.failureException, "%s not raised" % excName
-
+            raise self.failureException("%s not raised" % excName)
 
     def assertRegexpMatches(self, text, expected_regexp, msg=None):
         """Fail the test unless the text matches the regular expression."""
