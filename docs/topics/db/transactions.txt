@@ -73,7 +73,7 @@ These functions, described in detail below, can be used in two different ways:
 
             from django.db import transaction
 
-            @transaction.commit_on_success()
+            @transaction.commit_on_success
             def viewfunc(request):
                 # ...
                 # this code executes inside a transaction
