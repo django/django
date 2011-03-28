@@ -214,7 +214,7 @@ class MultiValueDictTests(DatastructuresTestCase):
                           ['Developer', 'Simon', 'Willison'])
 
     def test_copy(self):
-        for copy_func in [copy, lambda d: d.copy()]:
+        for copy_func in [copy.copy, lambda d: d.copy()]:
             d1 = MultiValueDict({
                 "developers": ["Carl", "Fred"]
             })
