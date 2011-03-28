@@ -35,8 +35,7 @@ def security_hash(request, form, *args):
     data.extend(args)
     data.append(settings.SECRET_KEY)
 
-    # Use HIGHEST_PROTOCOL because it's the most efficient. It requires
-    # Python 2.3, but Django requires 2.4 anyway, so that's OK.
+    # Use HIGHEST_PROTOCOL because it's the most efficient.
     pickled = pickle.dumps(data, pickle.HIGHEST_PROTOCOL)
 
     return hashlib.md5(pickled).hexdigest()
