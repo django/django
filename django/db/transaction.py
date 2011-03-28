@@ -208,7 +208,7 @@ class Transaction(object):
         @wraps(func)
         def inner(*args, **kwargs):
             with self:
-                func(*args, **kwargs)
+                return func(*args, **kwargs)
         return inner
 
 def _transaction_func(entering, exiting, using):
