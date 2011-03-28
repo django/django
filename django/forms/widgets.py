@@ -1,13 +1,14 @@
 """
 HTML Widget classes
 """
+
+import copy
 import datetime
-from itertools import chain
 import time
+from itertools import chain
 from urlparse import urljoin
 from util import flatatt
 
-import django.utils.copycompat as copy
 from django.conf import settings
 from django.utils.datastructures import MultiValueDict, MergeDict
 from django.utils.html import escape, conditional_escape

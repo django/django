@@ -2,13 +2,9 @@
 Decorators for views based on HTTP headers.
 """
 
-try:
-    from functools import wraps
-except ImportError:
-    from django.utils.functional import wraps  # Python 2.4 fallback.
-
 from calendar import timegm
 from datetime import timedelta
+from functools import wraps
 
 from django.utils.decorators import decorator_from_middleware, available_attrs
 from django.utils.http import http_date, parse_http_date_safe, parse_etags, quote_etag

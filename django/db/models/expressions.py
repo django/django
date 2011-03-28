@@ -1,7 +1,5 @@
 import datetime
-
 from django.utils import tree
-from django.utils.copycompat import deepcopy
 
 class ExpressionNode(tree.Node):
     """

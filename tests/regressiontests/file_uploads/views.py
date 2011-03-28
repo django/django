@@ -1,10 +1,10 @@
+import hashlib
 import os
 from django.core.files.uploadedfile import UploadedFile
 from django.http import HttpResponse, HttpResponseServerError
 from django.utils import simplejson
 from models import FileModel, UPLOAD_TO
 from uploadhandler import QuotaUploadHandler, ErroringUploadHandler
-from django.utils.hashcompat import sha_constructor
 from tests import UNICODE_FILENAME
 
 def file_upload_view(request):
@@ -37,9 +37,9 @@ def file_upload_view_verify(request):
             continue
         submitted_hash = form_data[key + '_hash']
         if isinstance(value, UploadedFile):
-            new_hash = sha_constructor(value.read()).hexdigest()
+            new_hash = hashlib.sha1(value.read()).hexdigest()
         else:
-            new_hash = sha_constructor(value).hexdigest()
+            new_hash = hashlib.sha1(value).hexdigest()
         if new_hash != submitted_hash:
             return HttpResponseServerError()
 

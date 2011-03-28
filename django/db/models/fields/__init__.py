@@ -1,11 +1,10 @@
+import copy
 import datetime
 import decimal
 import re
 import time
 import math
 from itertools import tee
-
-import django.utils.copycompat as copy
 
 from django.db import connection
 from django.db.models.fields.subclassing import LegacyConnection

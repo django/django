@@ -1,11 +1,10 @@
 """
 Django's standard crypto functions and utilities.
 """
+
+import hashlib
 import hmac
-
 from django.conf import settings
-from django.utils.hashcompat import sha_constructor, sha_hmac
-
 
 def salted_hmac(key_salt, value, secret=None):
     """
@@ -20,16 +19,13 @@ def salted_hmac(key_salt, value, secret=None):
     # We need to generate a derived key from our base key.  We can do this by
     # passing the key_salt and our base key through a pseudo-random function and
     # SHA1 works nicely.
-
-    key = sha_constructor(key_salt + secret).digest()
+    key = hashlib.sha1(key_salt + secret).digest()
 
     # If len(key_salt + secret) > sha_constructor().block_size, the above
     # line is redundant and could be replaced by key = key_salt + secret, since
     # the hmac module does the same thing for keys longer than the block size.
     # However, we need to ensure that we *always* do this.
-
-    return hmac.new(key, msg=value, digestmod=sha_hmac)
-
+    return hmac.new(key, msg=value, digestmod=hashlib.sha1)
 
 def constant_time_compare(val1, val2):
     """

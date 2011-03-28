@@ -1,5 +1,7 @@
 #! -*- coding: utf-8 -*-
+
 import errno
+import hashlib
 import os
 import shutil
 from StringIO import StringIO
@@ -10,7 +12,6 @@ from django.http.multipartparser import MultiPartParser
 from django.test import TestCase, client
 from django.utils import simplejson
 from django.utils import unittest
-from django.utils.hashcompat import sha_constructor
 
 from models import FileModel, temp_storage, UPLOAD_TO
 import uploadhandler
@@ -46,10 +47,10 @@ class FileUploadTests(TestCase):
 
         for key in post_data.keys():
             try:
-                post_data[key + '_hash'] = sha_constructor(post_data[key].read()).hexdigest()
+                post_data[key + '_hash'] = hashlib.sha1(post_data[key].read()).hexdigest()
                 post_data[key].seek(0)
             except AttributeError:
-                post_data[key + '_hash'] = sha_constructor(post_data[key]).hexdigest()
+                post_data[key + '_hash'] = hashlib.sha1(post_data[key]).hexdigest()
 
         response = self.client.post('/file_uploads/verify/', post_data)
 

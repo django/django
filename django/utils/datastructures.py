@@ -1,7 +1,5 @@
+import copy
 from types import GeneratorType
-
-from django.utils.copycompat import copy, deepcopy
-
 
 class MergeDict(object):
     """
@@ -127,7 +125,7 @@ class SortedDict(dict):
                     seen.add(key)
 
     def __deepcopy__(self, memo):
-        return self.__class__([(key, deepcopy(value, memo))
+        return self.__class__([(key, copy.deepcopy(value, memo))
                                for key, value in self.iteritems()])
 
     def __setitem__(self, key, value):
@@ -269,7 +267,6 @@ class MultiValueDict(dict):
         ])
 
     def __deepcopy__(self, memo=None):
-        import django.utils.copycompat as copy
         if memo is None:
             memo = {}
         result = self.__class__()
@@ -365,7 +362,7 @@ class MultiValueDict(dict):
 
     def copy(self):
         """Returns a shallow copy of this object."""
-        return copy(self)
+        return copy.copy(self)
 
     def update(self, *args, **kwargs):
         """

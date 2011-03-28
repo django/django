@@ -1,9 +1,6 @@
 "Functions that help with dynamically creating decorators for views."
 
-try:
-    from functools import wraps, update_wrapper, WRAPPER_ASSIGNMENTS
-except ImportError:
-    from django.utils.functional import wraps, update_wrapper, WRAPPER_ASSIGNMENTS  # Python 2.4 fallback.
+from functools import wraps, update_wrapper, WRAPPER_ASSIGNMENTS
 
 class classonlymethod(classmethod):
     def __get__(self, instance, owner):

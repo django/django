@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
+
+import copy
 import datetime
-from decimal import Decimal
 import re
 import time
+from decimal import Decimal
 from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms import *
 from django.forms.widgets import RadioFieldRenderer
-from django.utils import copycompat as copy
 from django.utils import formats
 from django.utils.safestring import mark_safe
 from django.utils.translation import activate, deactivate

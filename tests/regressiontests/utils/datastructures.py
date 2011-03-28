@@ -1,10 +1,11 @@
 """
 Tests for stuff in django.utils.datastructures.
 """
+
+import copy
 import pickle
 import unittest
 
-from django.utils.copycompat import copy
 from django.utils.datastructures import *
 
 

@@ -1,17 +1,16 @@
+from functools import wraps
 from operator import attrgetter
 
 from django.db import connections, transaction, IntegrityError
 from django.db.models import signals, sql
 from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE
 from django.utils.datastructures import SortedDict
-from django.utils.functional import wraps
 
 
 class ProtectedError(IntegrityError):
     def __init__(self, msg, protected_objects):
         self.protected_objects = protected_objects
-        # TODO change this to use super() when we drop Python 2.4
-        IntegrityError.__init__(self, msg, protected_objects)
+        super(ProtectedError, self).__init__(msg, protected_objects)
 
 
 def CASCADE(collector, field, sub_objs, using):

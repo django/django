@@ -3,7 +3,6 @@ from django.core import signals
 from django.core.exceptions import ImproperlyConfigured
 from django.db.utils import ConnectionHandler, ConnectionRouter, load_backend, DEFAULT_DB_ALIAS, \
                             DatabaseError, IntegrityError
-from django.utils.functional import curry
 
 __all__ = ('backend', 'connection', 'connections', 'router', 'DatabaseError',
     'IntegrityError', 'DEFAULT_DB_ALIAS')

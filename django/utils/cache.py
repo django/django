@@ -17,6 +17,7 @@ An example: i18n middleware would need to distinguish caches by the
 "Accept-language" header.
 """
 
+import hashlib
 import re
 import time
 
@@ -24,7 +25,6 @@ from django.conf import settings
 from django.core.cache import get_cache
 from django.utils.encoding import smart_str, iri_to_uri
 from django.utils.http import http_date
-from django.utils.hashcompat import md5_constructor
 from django.utils.translation import get_language
 from django.http import HttpRequest
 
@@ -102,7 +102,7 @@ def patch_response_headers(response, cache_timeout=None):
     if cache_timeout < 0:
         cache_timeout = 0 # Can't have max-age negative
     if settings.USE_ETAGS and not response.has_header('ETag'):
-        response['ETag'] = '"%s"' % md5_constructor(response.content).hexdigest()
+        response['ETag'] = '"%s"' % hashlib.md5(response.content).hexdigest()
     if not response.has_header('Last-Modified'):
         response['Last-Modified'] = http_date()
     if not response.has_header('Expires'):
@@ -155,19 +155,19 @@ def _i18n_cache_key_suffix(request, cache_key):
 
 def _generate_cache_key(request, method, headerlist, key_prefix):
     """Returns a cache key from the headers given in the header list."""
-    ctx = md5_constructor()
+    ctx = hashlib.md5()
     for header in headerlist:
         value = request.META.get(header, None)
         if value is not None:
             ctx.update(value)
-    path = md5_constructor(iri_to_uri(request.get_full_path()))
+    path = hashlib.md5(iri_to_uri(request.get_full_path()))
     cache_key = 'views.decorators.cache.cache_page.%s.%s.%s.%s' % (
         key_prefix, request.method, path.hexdigest(), ctx.hexdigest())
     return _i18n_cache_key_suffix(request, cache_key)
 
 def _generate_cache_header_key(key_prefix, request):
     """Returns a cache key for the header cache."""
-    path = md5_constructor(iri_to_uri(request.get_full_path()))
+    path = hashlib.md5(iri_to_uri(request.get_full_path()))
     cache_key = 'views.decorators.cache.cache_header.%s.%s' % (
         key_prefix, path.hexdigest())
     return _i18n_cache_key_suffix(request, cache_key)

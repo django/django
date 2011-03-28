@@ -7,12 +7,6 @@ from django.test.utils import setup_test_environment, teardown_test_environment
 from django.test.testcases import OutputChecker, DocTestRunner, TestCase
 from django.utils import unittest
 
-try:
-    all
-except NameError:
-    from django.utils.itercompat import all
-
-
 __all__ = ('DjangoTestRunner', 'DjangoTestSuiteRunner', 'run_tests')
 
 # The module name for tests outside models.py

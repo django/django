@@ -5,6 +5,7 @@ This module provides a middleware that implements protection
 against request forgeries from other sites.
 """
 
+import hashlib
 import itertools
 import re
 import random
@@ -12,7 +13,6 @@ import random
 from django.conf import settings
 from django.core.urlresolvers import get_callable
 from django.utils.cache import patch_vary_headers
-from django.utils.hashcompat import md5_constructor
 from django.utils.http import same_origin
 from django.utils.log import getLogger
 from django.utils.safestring import mark_safe
@@ -47,12 +47,11 @@ def _get_failure_view():
 
 
 def _get_new_csrf_key():
-    return md5_constructor("%s%s"
-                % (randrange(0, _MAX_CSRF_KEY), settings.SECRET_KEY)).hexdigest()
+    return hashlib.md5("%s%s" % (randrange(0, _MAX_CSRF_KEY), settings.SECRET_KEY)).hexdigest()
 
 
 def _make_legacy_session_token(session_id):
-    return md5_constructor(settings.SECRET_KEY + session_id).hexdigest()
+    return hashlib.md5(settings.SECRET_KEY + session_id).hexdigest()
 
 
 def get_token(request):

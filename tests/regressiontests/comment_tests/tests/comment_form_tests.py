@@ -1,9 +1,9 @@
+import hashlib
 import time
 
 from django.conf import settings
 from django.contrib.comments.forms import CommentForm
 from django.contrib.comments.models import Comment
-from django.utils.hashcompat import sha_constructor
 
 from regressiontests.comment_tests.models import Article
 from regressiontests.comment_tests.tests import CommentTestCase
@@ -57,7 +57,7 @@ class CommentFormTests(CommentTestCase):
 
         # The Django 1.2 method hard-coded here:
         info = (content_type, object_pk, timestamp, settings.SECRET_KEY)
-        security_hash = sha_constructor("".join(info)).hexdigest()
+        security_hash = hashlib.sha1("".join(info)).hexdigest()
 
         d['security_hash'] = security_hash
         f = CommentForm(a, data=d)

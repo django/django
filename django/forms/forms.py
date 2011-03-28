@@ -2,8 +2,8 @@
 Form classes
 """
 
+import copy
 from django.core.exceptions import ValidationError
-from django.utils.copycompat import deepcopy
 from django.utils.datastructures import SortedDict
 from django.utils.html import conditional_escape
 from django.utils.encoding import StrAndUnicode, smart_unicode, force_unicode
@@ -89,7 +89,7 @@ class BaseForm(StrAndUnicode):
         # alter self.fields, we create self.fields here by copying base_fields.
         # Instances should always modify self.fields; they should not modify
         # self.base_fields.
-        self.fields = deepcopy(self.base_fields)
+        self.fields = copy.deepcopy(self.base_fields)
 
     def __unicode__(self):
         return self.as_table()

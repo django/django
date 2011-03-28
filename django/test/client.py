@@ -1,11 +1,11 @@
 import urllib
-from urlparse import urlparse, urlunparse, urlsplit
 import sys
 import os
 import re
 import mimetypes
 import warnings
 from copy import copy
+from urlparse import urlparse, urlunparse, urlsplit
 try:
     from cStringIO import StringIO
 except ImportError:

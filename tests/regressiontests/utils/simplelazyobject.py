@@ -1,6 +1,6 @@
+import copy
 import unittest
 
-import django.utils.copycompat as copy
 from django.utils.functional import SimpleLazyObject
 
 class _ComplexObject(object):

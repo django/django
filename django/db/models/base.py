@@ -1,5 +1,7 @@
-import types
+import copy
 import sys
+import types
+from functools import update_wrapper
 from itertools import izip
 
 import django.db.models.manager     # Imported to register signal handler.
@@ -17,8 +19,7 @@ from django.db import (connections, router, transaction, DatabaseError,
 from django.db.models import signals
 from django.db.models.loading import register_models, get_model
 from django.utils.translation import ugettext_lazy as _
-import django.utils.copycompat as copy
-from django.utils.functional import curry, update_wrapper
+from django.utils.functional import curry
 from django.utils.encoding import smart_str, force_unicode
 from django.utils.text import get_text_list, capfirst
 from django.conf import settings

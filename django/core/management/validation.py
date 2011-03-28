@@ -4,11 +4,6 @@ from django.contrib.contenttypes.generic import GenericForeignKey, GenericRelati
 from django.core.management.color import color_style
 from django.utils.itercompat import is_iterable
 
-try:
-    any
-except NameError:
-    from django.utils.itercompat import any
-
 class ModelErrorCollection:
     def __init__(self, outfile=sys.stdout):
         self.errors = []

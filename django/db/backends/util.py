@@ -1,8 +1,8 @@
 import datetime
 import decimal
+import hashlib
 from time import time
 
-from django.utils.hashcompat import md5_constructor
 from django.utils.log import getLogger
 
 
@@ -130,9 +130,8 @@ def truncate_name(name, length=None, hash_len=4):
     if length is None or len(name) <= length:
         return name
 
-    hash = md5_constructor(name).hexdigest()[:hash_len]
-
-    return '%s%s' % (name[:length-hash_len], hash)
+    hsh = hashlib.md5(name).hexdigest()[:hash_len]
+    return '%s%s' % (name[:length-hash_len], hsh)
 
 def format_number(value, max_digits, decimal_places):
     """

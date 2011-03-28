@@ -1,12 +1,13 @@
 import imp
 import re
+from functools import partial
 from inspect import getargspec
 
 from django.conf import settings
 from django.template.context import Context, RequestContext, ContextPopException
 from django.utils.importlib import import_module
 from django.utils.itercompat import is_iterable
-from django.utils.functional import curry, Promise
+from django.utils.functional import Promise
 from django.utils.text import smart_split, unescape_string_literal, get_text_list
 from django.utils.encoding import smart_unicode, force_unicode, smart_str
 from django.utils.translation import ugettext_lazy
@@ -884,7 +885,7 @@ class Library(object):
                         func_args = resolved_vars
                     return func(*func_args)
 
-            compile_func = curry(generic_tag_compiler, params, defaults, getattr(func, "_decorated_function", func).__name__, SimpleNode)
+            compile_func = partial(generic_tag_compiler, params, defaults, getattr(func, "_decorated_function", func).__name__, SimpleNode)
             compile_func.__doc__ = func.__doc__
             self.tag(getattr(func, "_decorated_function", func).__name__, compile_func)
             return func
@@ -936,7 +937,7 @@ class Library(object):
                         new_context['csrf_token'] = csrf_token
                     return self.nodelist.render(new_context)
 
-            compile_func = curry(generic_tag_compiler, params, defaults, getattr(func, "_decorated_function", func).__name__, InclusionNode)
+            compile_func = partial(generic_tag_compiler, params, defaults, getattr(func, "_decorated_function", func).__name__, InclusionNode)
             compile_func.__doc__ = func.__doc__
             self.tag(getattr(func, "_decorated_function", func).__name__, compile_func)
             return func

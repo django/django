@@ -2,6 +2,7 @@
 The main QuerySet implementation. This provides the public API for the ORM.
 """
 
+import copy
 from itertools import izip
 
 from django.db import connections, router, transaction, IntegrityError
@@ -11,7 +12,6 @@ from django.db.models.query_utils import (Q, select_related_descend,
     deferred_class_factory, InvalidQuery)
 from django.db.models.deletion import Collector
 from django.db.models import signals, sql
-from django.utils.copycompat import deepcopy
 
 # Used to control how many objects are worked with at once in some cases (e.g.
 # when deleting objects).
@@ -51,7 +51,7 @@ class QuerySet(object):
             if k in ('_iter','_result_cache'):
                 obj.__dict__[k] = None
             else:
-                obj.__dict__[k] = deepcopy(v, memo)
+                obj.__dict__[k] = copy.deepcopy(v, memo)
         return obj
 
     def __getstate__(self):

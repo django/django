@@ -1,9 +1,9 @@
+import hashlib
 from django.template import Library, Node, TemplateSyntaxError, Variable, VariableDoesNotExist
 from django.template import resolve_variable
 from django.core.cache import cache
 from django.utils.encoding import force_unicode
 from django.utils.http import urlquote
-from django.utils.hashcompat import md5_constructor
 
 register = Library()
 
@@ -24,7 +24,7 @@ class CacheNode(Node):
         except (ValueError, TypeError):
             raise TemplateSyntaxError('"cache" tag got a non-integer timeout value: %r' % expire_time)
         # Build a unicode key for this fragment and all vary-on's.
-        args = md5_constructor(u':'.join([urlquote(resolve_variable(var, context)) for var in self.vary_on]))
+        args = hashlib.md5(u':'.join([urlquote(resolve_variable(var, context)) for var in self.vary_on]))
         cache_key = 'template.cache.%s.%s' % (self.fragment_name, args.hexdigest())
         value = cache.get(cache_key)
         if value is None:

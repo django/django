@@ -1,7 +1,7 @@
+from functools import update_wrapper
 from django.conf import settings
 from django.db import connection, DEFAULT_DB_ALIAS
 from django.test import TestCase, skipUnlessDBFeature
-from django.utils import functional
 
 from models import Reporter, Article
 
@@ -23,7 +23,7 @@ def ignore_not_implemented(func):
             return func(*args, **kwargs)
         except NotImplementedError:
             return None
-    functional.update_wrapper(_inner, func)
+    update_wrapper(_inner, func)
     return _inner
 
 class IgnoreNotimplementedError(type):

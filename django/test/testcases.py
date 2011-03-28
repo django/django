@@ -1,5 +1,6 @@
 import re
 import sys
+from functools import wraps
 from urlparse import urlsplit, urlunsplit
 from xml.dom.minidom import parseString, Node
 
@@ -16,20 +17,12 @@ from django.test.client import Client
 from django.test.utils import get_warnings_state, restore_warnings_state
 from django.utils import simplejson, unittest as ut2
 from django.utils.encoding import smart_str
-from django.utils.functional import wraps
 
 __all__ = ('DocTestRunner', 'OutputChecker', 'TestCase', 'TransactionTestCase',
            'skipIfDBFeature', 'skipUnlessDBFeature')
 
-
-try:
-    all
-except NameError:
-    from django.utils.itercompat import all
-
 normalize_long_ints = lambda s: re.sub(r'(?<![\w])(\d+)L(?![\w])', '\\1', s)
 normalize_decimals = lambda s: re.sub(r"Decimal\('(\d+(\.\d*)?)'\)", lambda m: "Decimal(\"%s\")" % m.groups()[0], s)
-
 
 def to_list(value):
     """
@@ -550,11 +543,9 @@ class TransactionTestCase(ut2.TestCase):
 
 def connections_support_transactions():
     """
-    Returns True if all connections support transactions.  This is messy
-    because 2.4 doesn't support any or all.
+    Returns True if all connections support transactions.
     """
-    return all(conn.features.supports_transactions
-        for conn in connections.all())
+    return all(conn.features.supports_transactions for conn in connections.all())
 
 class TestCase(TransactionTestCase):
     """

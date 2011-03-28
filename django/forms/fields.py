@@ -2,6 +2,7 @@
 Field classes.
 """
 
+import copy
 import datetime
 import os
 import re
@@ -16,7 +17,6 @@ except ImportError:
 
 from django.core.exceptions import ValidationError
 from django.core import validators
-import django.utils.copycompat as copy
 from django.utils import formats
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_unicode, smart_str

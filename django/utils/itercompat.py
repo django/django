@@ -31,15 +31,3 @@ def is_iterable(x):
         return False
     else:
         return True
-
-def all(iterable):
-    for item in iterable:
-        if not item:
-            return False
-    return True
-
-def any(iterable):
-    for item in iterable:
-        if item:
-            return True
-    return False

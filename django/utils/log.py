@@ -18,27 +18,7 @@ try:
 except ImportError:
     from django.utils.dictconfig import dictConfig
 
-if sys.version_info < (2, 5):
-    class LoggerCompat(object):
-        def __init__(self, logger):
-            self._logger = logger
-
-        def __getattr__(self, name):
-            val = getattr(self._logger, name)
-            if callable(val):
-                def _wrapper(*args, **kwargs):
-                    # Python 2.4 logging module doesn't support 'extra' parameter to
-                    # methods of Logger
-                    kwargs.pop('extra', None)
-                    return val(*args, **kwargs)
-                return _wrapper
-            else:
-                return val
-
-    def getLogger(name=None):
-        return LoggerCompat(logging.getLogger(name=name))
-else:
-    getLogger = logging.getLogger
+getLogger = logging.getLogger
 
 # Ensure the creation of the Django logger
 # with a null handler. This ensures we don't get any
@@ -49,7 +29,7 @@ if not logger.handlers:
 
 class AdminEmailHandler(logging.Handler):
     def __init__(self, include_html=False):
-        logging.Handler.__init__(self)        
+        logging.Handler.__init__(self)
         self.include_html = include_html
 
     """An exception log handler that e-mails log entries to site admins.
@@ -63,15 +43,7 @@ class AdminEmailHandler(logging.Handler):
         from django.views.debug import ExceptionReporter
 
         try:
-            if sys.version_info < (2,5):
-                # A nasty workaround required because Python 2.4's logging
-                # module doesn't support passing in extra context.
-                # For this handler, the only extra data we need is the
-                # request, and that's in the top stack frame.
-                request = record.exc_info[2].tb_frame.f_locals['request']
-            else:
-                request = record.request
-
+            request = record.request
             subject = '%s (%s IP): %s' % (
                 record.levelname,
                 (request.META.get('REMOTE_ADDR') in settings.INTERNAL_IPS and 'internal' or 'EXTERNAL'),
@@ -97,5 +69,4 @@ class AdminEmailHandler(logging.Handler):
         message = "%s\n\n%s" % (stack_trace, request_repr)
         reporter = ExceptionReporter(request, is_email=True, *exc_info)
         html_message = self.include_html and reporter.get_traceback_html() or None
-        mail.mail_admins(subject, message, fail_silently=True,
-                         html_message=html_message)
+        mail.mail_admins(subject, message, fail_silently=True, html_message=html_message)

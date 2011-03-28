@@ -1,3 +1,4 @@
+import hashlib
 import re
 
 from django.conf import settings
@@ -5,7 +6,6 @@ from django import http
 from django.core.mail import mail_managers
 from django.utils.http import urlquote
 from django.core import urlresolvers
-from django.utils.hashcompat import md5_constructor
 from django.utils.log import getLogger
 
 logger = getLogger('django.request')
@@ -113,7 +113,7 @@ class CommonMiddleware(object):
             if response.has_header('ETag'):
                 etag = response['ETag']
             else:
-                etag = '"%s"' % md5_constructor(response.content).hexdigest()
+                etag = '"%s"' % hashlib.md5(response.content).hexdigest()
             if response.status_code >= 200 and response.status_code < 300 and request.META.get('HTTP_IF_NONE_MATCH') == etag:
                 cookies = response.cookies
                 response = http.HttpResponseNotModified()

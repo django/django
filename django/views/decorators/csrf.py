@@ -1,10 +1,6 @@
 from django.middleware.csrf import CsrfViewMiddleware
 from django.utils.decorators import decorator_from_middleware, available_attrs
-
-try:
-    from functools import wraps
-except ImportError:
-    from django.utils.functional import wraps  # Python 2.4 fallback.
+from functools import wraps
 
 csrf_protect = decorator_from_middleware(CsrfViewMiddleware)
 csrf_protect.__name__ = "csrf_protect"

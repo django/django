@@ -230,7 +230,7 @@ class BoundNonDescriptorMethodWeakref(BoundMethodWeakref):
         if target is not None:
             function = self.weakFunc()
             if function is not None:
-                # Using curry() would be another option, but it erases the
+                # Using partial() would be another option, but it erases the
                 # "signature" of the function. That is, after a function is
                 # curried, the inspect module can't be used to determine how
                 # many arguments the function expects, nor what keyword
