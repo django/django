@@ -262,14 +262,18 @@ class HttpRequest(object):
         if self.method != 'POST':
             self._post, self._files = QueryDict('', encoding=self._encoding), MultiValueDict()
             return
-        if self._read_started:
+        if self._read_started and not hasattr(self, '_raw_post_data'):
             self._mark_post_parse_error()
             return
 
         if self.META.get('CONTENT_TYPE', '').startswith('multipart'):
-            self._raw_post_data = ''
+            if hasattr(self, '_raw_post_data'):
+                # Use already read data
+                data = StringIO(self._raw_post_data)
+            else:
+                data = self
             try:
-                self._post, self._files = self.parse_file_upload(self.META, self)
+                self._post, self._files = self.parse_file_upload(self.META, data)
             except:
                 # An error occured while parsing POST data.  Since when
                 # formatting the error the request handler might access

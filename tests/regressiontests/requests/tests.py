@@ -179,6 +179,66 @@ class RequestsTests(unittest.TestCase):
         self.assertRaises(Exception, lambda: request.raw_post_data)
         self.assertEqual(request.POST, {})
 
+    def test_raw_post_data_after_POST_multipart(self):
+        """
+        Reading raw_post_data after parsing multipart is not allowed
+        """
+        # Because multipart is used for large amounts fo data i.e. file uploads,
+        # we don't want the data held in memory twice, and we don't want to
+        # silence the error by setting raw_post_data = '' either.
+        payload = "\r\n".join([
+                '--boundary',
+                'Content-Disposition: form-data; name="name"',
+                '',
+                'value',
+                '--boundary--'
+                ''])
+        request = WSGIRequest({'REQUEST_METHOD': 'POST',
+                               'CONTENT_TYPE': 'multipart/form-data; boundary=boundary',
+                               'CONTENT_LENGTH': len(payload),
+                               'wsgi.input': StringIO(payload)})
+        self.assertEqual(request.POST, {u'name': [u'value']})
+        self.assertRaises(Exception, lambda: request.raw_post_data)
+
     def test_read_by_lines(self):
         request = WSGIRequest({'REQUEST_METHOD': 'POST', 'wsgi.input': StringIO('name=value')})
         self.assertEqual(list(request), ['name=value'])
+
+    def test_POST_after_raw_post_data_read(self):
+        """
+        POST should be populated even if raw_post_data is read first
+        """
+        request = WSGIRequest({'REQUEST_METHOD': 'POST', 'wsgi.input': StringIO('name=value')})
+        raw_data = request.raw_post_data
+        self.assertEqual(request.POST, {u'name': [u'value']})
+
+    def test_POST_after_raw_post_data_read_and_stream_read(self):
+        """
+        POST should be populated even if raw_post_data is read first, and then
+        the stream is read second.
+        """
+        request = WSGIRequest({'REQUEST_METHOD': 'POST', 'wsgi.input': StringIO('name=value')})
+        raw_data = request.raw_post_data
+        self.assertEqual(request.read(1), u'n')
+        self.assertEqual(request.POST, {u'name': [u'value']})
+
+    def test_POST_after_raw_post_data_read_and_stream_read_multipart(self):
+        """
+        POST should be populated even if raw_post_data is read first, and then
+        the stream is read second. Using multipart/form-data instead of urlencoded.
+        """
+        payload = "\r\n".join([
+                '--boundary',
+                'Content-Disposition: form-data; name="name"',
+                '',
+                'value',
+                '--boundary--'
+                ''])
+        request = WSGIRequest({'REQUEST_METHOD': 'POST',
+                               'CONTENT_TYPE': 'multipart/form-data; boundary=boundary',
+                               'CONTENT_LENGTH': len(payload),
+                               'wsgi.input': StringIO(payload)})
+        raw_data = request.raw_post_data
+        # Consume enough data to mess up the parsing:
+        self.assertEqual(request.read(13), u'--boundary\r\nC')
+        self.assertEqual(request.POST, {u'name': [u'value']})
