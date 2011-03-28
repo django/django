@@ -470,10 +470,6 @@ COMMENTS_SKETCHY_USERS_GROUP = None
 # user. Set this to 0 if you want to disable it.
 COMMENTS_FIRST_FEW = 0
 
-# A tuple of IP addresses that have been banned from participating in various
-# Django-powered features.
-BANNED_IPS = ()
-
 ##################
 # AUTHENTICATION #
 ##################
