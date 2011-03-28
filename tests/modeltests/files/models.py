@@ -16,9 +16,6 @@ from django.core.files.storage import FileSystemStorage
 temp_storage_location = tempfile.mkdtemp()
 temp_storage = FileSystemStorage(location=temp_storage_location)
 
-# Write out a file to be used as default content
-temp_storage.save('tests/default.txt', ContentFile('default content'))
-
 class Storage(models.Model):
     def custom_upload_to(self, filename):
         return 'foo'

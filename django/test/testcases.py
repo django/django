@@ -1,3 +1,5 @@
+from __future__ import with_statement
+
 import re
 import sys
 from functools import wraps
@@ -531,15 +533,8 @@ class TransactionTestCase(ut2.TestCase):
             return context
 
         # Basically emulate the `with` statement here.
-
-        context.__enter__()
-        try:
+        with context:
             func(*args, **kwargs)
-        except:
-            context.__exit__(*sys.exc_info())
-            raise
-        else:
-            context.__exit__(*sys.exc_info())
 
 def connections_support_transactions():
     """
