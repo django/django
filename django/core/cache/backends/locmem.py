@@ -77,12 +77,10 @@ class LocMemCache(BaseCache):
         key = self.make_key(key, version=version)
         self.validate_key(key)
         self._lock.writer_enters()
-        # Python 2.4 doesn't allow combined try-except-finally blocks.
         try:
-            try:
-                self._set(key, pickle.dumps(value), timeout)
-            except pickle.PickleError:
-                pass
+            self._set(key, pickle.dumps(value), timeout)
+        except pickle.PickleError:
+            pass
         finally:
             self._lock.writer_leaves()
 

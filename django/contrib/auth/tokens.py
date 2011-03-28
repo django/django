@@ -1,7 +1,6 @@
 from datetime import date
-
+import hashlib
 from django.conf import settings
-from django.utils.hashcompat import sha_constructor
 from django.utils.http import int_to_base36, base36_to_int
 from django.utils.crypto import constant_time_compare, salted_hmac
 
@@ -67,9 +66,9 @@ class PasswordResetTokenGenerator(object):
     def _make_token_with_timestamp_old(self, user, timestamp):
         # The Django 1.2 method
         ts_b36 = int_to_base36(timestamp)
-        hash = sha_constructor(settings.SECRET_KEY + unicode(user.id) +
-                               user.password + user.last_login.strftime('%Y-%m-%d %H:%M:%S') +
-                               unicode(timestamp)).hexdigest()[::2]
+        hash = hashlib.sha1(settings.SECRET_KEY + unicode(user.id) +
+                           user.password + user.last_login.strftime('%Y-%m-%d %H:%M:%S') +
+                           unicode(timestamp)).hexdigest()[::2]
         return "%s-%s" % (ts_b36, hash)
 
     def _num_days(self, dt):

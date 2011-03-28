@@ -1,7 +1,7 @@
+import copy
 import os
 from decimal import Decimal
 
-from django.utils.copycompat import copy
 from django.utils.unittest import TestCase
 
 from django.contrib.gis.gdal import DataSource, OGRException

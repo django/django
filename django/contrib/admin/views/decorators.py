@@ -1,8 +1,4 @@
-try:
-    from functools import wraps
-except ImportError:
-    from django.utils.functional import wraps  # Python 2.4 fallback.
-
+from functools import wraps
 from django.utils.translation import ugettext as _
 from django.contrib.admin.forms import AdminAuthenticationForm
 from django.contrib.auth.views import login

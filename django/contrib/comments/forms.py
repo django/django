@@ -1,6 +1,6 @@
-import time
 import datetime
-
+import hashlib
+import time
 from django import forms
 from django.forms.util import ErrorDict
 from django.conf import settings
@@ -8,7 +8,6 @@ from django.contrib.contenttypes.models import ContentType
 from models import Comment
 from django.utils.crypto import salted_hmac, constant_time_compare
 from django.utils.encoding import force_unicode
-from django.utils.hashcompat import sha_constructor
 from django.utils.text import get_text_list
 from django.utils.translation import ungettext, ugettext_lazy as _
 
@@ -100,7 +99,7 @@ class CommentSecurityForm(forms.Form):
         """Generate a (SHA1) security hash from the provided info."""
         # Django 1.2 compatibility
         info = (content_type, object_pk, timestamp, settings.SECRET_KEY)
-        return sha_constructor("".join(info)).hexdigest()
+        return hashlib.sha1("".join(info)).hexdigest()
 
 class CommentDetailsForm(CommentSecurityForm):
     """

@@ -58,14 +58,14 @@ class TokenGeneratorTest(TestCase):
         # Hard code in the Django 1.2 algorithm (not the result, as it is time
         # dependent)
         def _make_token(user):
-            from django.utils.hashcompat import sha_constructor
+            import hashlib
             from django.utils.http import int_to_base36
 
             timestamp = (date.today() - date(2001,1,1)).days
             ts_b36 = int_to_base36(timestamp)
-            hash = sha_constructor(settings.SECRET_KEY + unicode(user.id) +
-                                   user.password + user.last_login.strftime('%Y-%m-%d %H:%M:%S') +
-                                   unicode(timestamp)).hexdigest()[::2]
+            hash = hashlib.sha1(settings.SECRET_KEY + unicode(user.id) +
+                               user.password + user.last_login.strftime('%Y-%m-%d %H:%M:%S') +
+                               unicode(timestamp)).hexdigest()[::2]
             return "%s-%s" % (ts_b36, hash)
 
         user = User.objects.create_user('tokentestuser', 'test2@example.com', 'testpw')

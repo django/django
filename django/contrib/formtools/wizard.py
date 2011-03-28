@@ -4,7 +4,10 @@ step and storing the form's state as HTML hidden fields so that no state is
 stored on the server side.
 """
 
-import cPickle as pickle
+try:
+    import cPickle as pickle
+except ImportError:
+    import pickle
 
 from django import forms
 from django.conf import settings
@@ -13,7 +16,6 @@ from django.http import Http404
 from django.shortcuts import render_to_response
 from django.template.context import RequestContext
 from django.utils.crypto import constant_time_compare
-from django.utils.hashcompat import md5_constructor
 from django.utils.translation import ugettext_lazy as _
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect

@@ -2,6 +2,7 @@
 Classes allowing "generic" relations through ContentType and object-id fields.
 """
 
+from functools import partial
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection
 from django.db.models import signals
@@ -11,11 +12,8 @@ from django.db.models.loading import get_model
 from django.forms import ModelForm
 from django.forms.models import BaseModelFormSet, modelformset_factory, save_instance
 from django.contrib.admin.options import InlineModelAdmin, flatten_fieldsets
-from django.utils.encoding import smart_unicode
-from django.utils.functional import curry
-
 from django.contrib.contenttypes.models import ContentType
-
+from django.utils.encoding import smart_unicode
 
 class GenericForeignKey(object):
     """
@@ -414,7 +412,7 @@ class GenericInlineModelAdmin(InlineModelAdmin):
             "ct_field": self.ct_field,
             "fk_field": self.ct_fk_field,
             "form": self.form,
-            "formfield_callback": curry(self.formfield_for_dbfield, request=request),
+            "formfield_callback": partial(self.formfield_for_dbfield, request=request),
             "formset": self.formset,
             "extra": self.extra,
             "can_delete": self.can_delete,

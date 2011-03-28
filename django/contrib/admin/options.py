@@ -1,3 +1,4 @@
+from functools import update_wrapper, partial
 from django import forms, template
 from django.forms.formsets import all_valid
 from django.forms.models import (modelform_factory, modelformset_factory,
@@ -17,10 +18,8 @@ from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render_to_response
 from django.utils.decorators import method_decorator
 from django.utils.datastructures import SortedDict
-from django.utils.functional import update_wrapper
 from django.utils.html import escape, escapejs
 from django.utils.safestring import mark_safe
-from django.utils.functional import curry
 from django.utils.text import capfirst, get_text_list
 from django.utils.translation import ugettext as _
 from django.utils.translation import ungettext
@@ -426,7 +425,7 @@ class ModelAdmin(BaseModelAdmin):
             "form": self.form,
             "fields": fields,
             "exclude": exclude,
-            "formfield_callback": curry(self.formfield_for_dbfield, request=request),
+            "formfield_callback": partial(self.formfield_for_dbfield, request=request),
         }
         defaults.update(kwargs)
         return modelform_factory(self.model, **defaults)
@@ -457,7 +456,7 @@ class ModelAdmin(BaseModelAdmin):
         Returns a Form class for use in the Formset on the changelist page.
         """
         defaults = {
-            "formfield_callback": curry(self.formfield_for_dbfield, request=request),
+            "formfield_callback": partial(self.formfield_for_dbfield, request=request),
         }
         defaults.update(kwargs)
         return modelform_factory(self.model, **defaults)
@@ -468,7 +467,7 @@ class ModelAdmin(BaseModelAdmin):
         is used.
         """
         defaults = {
-            "formfield_callback": curry(self.formfield_for_dbfield, request=request),
+            "formfield_callback": partial(self.formfield_for_dbfield, request=request),
         }
         defaults.update(kwargs)
         return modelformset_factory(self.model,
@@ -1327,7 +1326,7 @@ class InlineModelAdmin(BaseModelAdmin):
             "fk_name": self.fk_name,
             "fields": fields,
             "exclude": exclude,
-            "formfield_callback": curry(self.formfield_for_dbfield, request=request),
+            "formfield_callback": partial(self.formfield_for_dbfield, request=request),
             "extra": self.extra,
             "max_num": self.max_num,
             "can_delete": self.can_delete,
