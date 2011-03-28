@@ -1,8 +1,4 @@
-from sys import version_info
-try:
-    from functools import wraps
-except ImportError:
-    from django.utils.functional import wraps  # Python 2.4 fallback.
+from functools import wraps
 
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from django.contrib.admin.views.decorators import staff_member_required

@@ -590,19 +590,12 @@ class MiscTests(TestCase):
         r.META = {'HTTP_ACCEPT_LANGUAGE': 'es-ar,de'}
         self.assertEqual('es-ar', g(r))
 
-        # Python 2.3 and 2.4 return slightly different results for completely
-        # bogus locales, so we omit this test for that anything below 2.4.
-        # It's relatively harmless in any cases (GIGO). This also means this
-        # won't be executed on Jython currently, but life's like that
-        # sometimes. (On those platforms, passing in a truly bogus locale
-        # will get you the default locale back.)
-        if sys.version_info >= (2, 5):
-            # This test assumes there won't be a Django translation to a US
-            # variation of the Spanish language, a safe assumption. When the
-            # user sets it as the preferred language, the main 'es'
-            # translation should be selected instead.
-            r.META = {'HTTP_ACCEPT_LANGUAGE': 'es-us'}
-            self.assertEqual(g(r), 'es')
+        # This test assumes there won't be a Django translation to a US
+        # variation of the Spanish language, a safe assumption. When the
+        # user sets it as the preferred language, the main 'es'
+        # translation should be selected instead.
+        r.META = {'HTTP_ACCEPT_LANGUAGE': 'es-us'}
+        self.assertEqual(g(r), 'es')
 
         # This tests the following scenario: there isn't a main language (zh)
         # translation of Django but there is a translation to variation (zh_CN)
@@ -631,20 +624,13 @@ class MiscTests(TestCase):
         r.META = {'HTTP_ACCEPT_LANGUAGE': 'de'}
         self.assertEqual('es', g(r))
 
-        # Python 2.3 and 2.4 return slightly different results for completely
-        # bogus locales, so we omit this test for that anything below 2.4.
-        # It's relatively harmless in any cases (GIGO). This also means this
-        # won't be executed on Jython currently, but life's like that
-        # sometimes. (On those platforms, passing in a truly bogus locale
-        # will get you the default locale back.)
-        if sys.version_info >= (2, 5):
-            # This test assumes there won't be a Django translation to a US
-            # variation of the Spanish language, a safe assumption. When the
-            # user sets it as the preferred language, the main 'es'
-            # translation should be selected instead.
-            r.COOKIES = {settings.LANGUAGE_COOKIE_NAME: 'es-us'}
-            r.META = {}
-            self.assertEqual(g(r), 'es')
+        # This test assumes there won't be a Django translation to a US
+        # variation of the Spanish language, a safe assumption. When the
+        # user sets it as the preferred language, the main 'es'
+        # translation should be selected instead.
+        r.COOKIES = {settings.LANGUAGE_COOKIE_NAME: 'es-us'}
+        r.META = {}
+        self.assertEqual(g(r), 'es')
 
         # This tests the following scenario: there isn't a main language (zh)
         # translation of Django but there is a translation to variation (zh_CN)
