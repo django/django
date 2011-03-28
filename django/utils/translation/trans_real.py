@@ -68,13 +68,7 @@ class DjangoTranslation(gettext_module.GNUTranslations):
     """
     def __init__(self, *args, **kw):
         gettext_module.GNUTranslations.__init__(self, *args, **kw)
-        # Starting with Python 2.4, there's a function to define
-        # the output charset. Before 2.4, the output charset is
-        # identical with the translation file charset.
-        try:
-            self.set_output_charset('utf-8')
-        except AttributeError:
-            pass
+        self.set_output_charset('utf-8')
         self.django_output_charset = 'utf-8'
         self.__language = '??'
 
