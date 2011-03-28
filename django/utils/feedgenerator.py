@@ -66,17 +66,11 @@ def get_tag_uri(url, date):
 
     See http://diveintomark.org/archives/2004/05/28/howto-atom-id
     """
-    url_split = urlparse.urlparse(url)
-
-    # Python 2.4 didn't have named attributes on split results or the hostname.
-    hostname = getattr(url_split, 'hostname', url_split[1].split(':')[0])
-    path = url_split[2]
-    fragment = url_split[5]
-
+    bits = urlparse.urlparse(url)
     d = ''
     if date is not None:
         d = ',%s' % datetime_safe.new_datetime(date).strftime('%Y-%m-%d')
-    return u'tag:%s%s:%s/%s' % (hostname, d, path, fragment)
+    return u'tag:%s%s:%s/%s' % (bits.hostname, d, bits.path, bits.fragment)
 
 class SyndicationFeed(object):
     "Base class for all syndication feeds. Subclasses should provide write()"
