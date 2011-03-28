@@ -1,9 +1,7 @@
 """
 SQLite3 backend for django.
 
-Python 2.4 requires pysqlite2 (http://pysqlite.org/).
-
-Python 2.5 and later can use a pysqlite2 module or the sqlite3 module in the
+Works with either the pysqlite2 module or the sqlite3 module in the
 standard library.
 """
 
@@ -25,14 +23,8 @@ try:
     except ImportError, e1:
         from sqlite3 import dbapi2 as Database
 except ImportError, exc:
-    import sys
     from django.core.exceptions import ImproperlyConfigured
-    if sys.version_info < (2, 5, 0):
-        module = 'pysqlite2 module'
-        exc = e1
-    else:
-        module = 'either pysqlite2 or sqlite3 modules (tried in that order)'
-    raise ImproperlyConfigured("Error loading %s: %s" % (module, exc))
+    raise ImproperlyConfigured("Error loading either pysqlite2 or sqlite3 modules (tried in that order): %s" % exc)
 
 
 DatabaseError = Database.DatabaseError
