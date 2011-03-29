@@ -454,7 +454,7 @@ Exposing multiple databases in Django's admin interface
 
 Django's admin doesn't have any explicit support for multiple
 databases. If you want to provide an admin interface for a model on a
-database other than that that specified by your router chain, you'll
+database other than that specified by your router chain, you'll
 need to write custom :class:`~django.contrib.admin.ModelAdmin` classes
 that will direct the admin to use a specific database for content.
 

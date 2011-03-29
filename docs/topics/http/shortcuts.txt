@@ -24,7 +24,7 @@ introduce controlled coupling for convenience's sake.
 
    :func:`render()` is the same as a call to
    :func:`render_to_response()` with a `context_instance` argument that
-   that forces the use of a :class:`~django.template.RequestContext`.
+   forces the use of a :class:`~django.template.RequestContext`.
 
 Required arguments
 ------------------
