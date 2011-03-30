@@ -6,7 +6,6 @@ against request forgeries from other sites.
 """
 
 import hashlib
-import itertools
 import re
 import random
 
@@ -15,13 +14,7 @@ from django.core.urlresolvers import get_callable
 from django.utils.cache import patch_vary_headers
 from django.utils.http import same_origin
 from django.utils.log import getLogger
-from django.utils.safestring import mark_safe
 from django.utils.crypto import constant_time_compare
-
-_POST_FORM_RE = \
-    re.compile(r'(<form\W[^>]*\bmethod\s*=\s*(\'|"|)POST(\'|"|)\b[^>]*>)', re.IGNORECASE)
-
-_HTML_TYPES = ('text/html', 'application/xhtml+xml')
 
 logger = getLogger('django.request')
 
@@ -47,10 +40,6 @@ def _get_failure_view():
 
 def _get_new_csrf_key():
     return hashlib.md5("%s%s" % (randrange(0, _MAX_CSRF_KEY), settings.SECRET_KEY)).hexdigest()
-
-
-def _make_legacy_session_token(session_id):
-    return hashlib.md5(settings.SECRET_KEY + session_id).hexdigest()
 
 
 def get_token(request):
@@ -214,83 +203,3 @@ class CsrfViewMiddleware(object):
         patch_vary_headers(response, ('Cookie',))
         response.csrf_processing_done = True
         return response
-
-
-class CsrfResponseMiddleware(object):
-    """
-    DEPRECATED
-    Middleware that post-processes a response to add a csrfmiddlewaretoken.
-
-    This exists for backwards compatibility and as an interim measure until
-    applications are converted to using use the csrf_token template tag
-    instead. It will be removed in Django 1.4.
-    """
-    def __init__(self):
-        import warnings
-        warnings.warn(
-            "CsrfResponseMiddleware and CsrfMiddleware are deprecated; use CsrfViewMiddleware and the template tag instead (see CSRF documentation).",
-            DeprecationWarning
-        )
-
-    def process_response(self, request, response):
-        if getattr(response, 'csrf_exempt', False):
-            return response
-
-        if response['Content-Type'].split(';')[0] in _HTML_TYPES:
-            csrf_token = get_token(request)
-            # If csrf_token is None, we have no token for this request, which probably
-            # means that this is a response from a request middleware.
-            if csrf_token is None:
-                return response
-
-            # ensure we don't add the 'id' attribute twice (HTML validity)
-            idattributes = itertools.chain(("id='csrfmiddlewaretoken'",),
-                                           itertools.repeat(''))
-            def add_csrf_field(match):
-                """Returns the matched <form> tag plus the added <input> element"""
-                return mark_safe(match.group() + "<div style='display:none;'>" + \
-                "<input type='hidden' " + idattributes.next() + \
-                " name='csrfmiddlewaretoken' value='" + csrf_token + \
-                "' /></div>")
-
-            # Modify any POST forms
-            response.content, n = _POST_FORM_RE.subn(add_csrf_field, response.content)
-            if n > 0:
-                # Content varies with the CSRF cookie, so set the Vary header.
-                patch_vary_headers(response, ('Cookie',))
-
-                # Since the content has been modified, any Etag will now be
-                # incorrect.  We could recalculate, but only if we assume that
-                # the Etag was set by CommonMiddleware. The safest thing is just
-                # to delete. See bug #9163
-                del response['ETag']
-        return response
-
-
-class CsrfMiddleware(object):
-    """
-    Django middleware that adds protection against Cross Site
-    Request Forgeries by adding hidden form fields to POST forms and
-    checking requests for the correct value.
-
-    CsrfMiddleware uses two middleware, CsrfViewMiddleware and
-    CsrfResponseMiddleware, which can be used independently.  It is recommended
-    to use only CsrfViewMiddleware and use the csrf_token template tag in
-    templates for inserting the token.
-    """
-    # We can't just inherit from CsrfViewMiddleware and CsrfResponseMiddleware
-    # because both have process_response methods.
-    def __init__(self):
-        self.response_middleware = CsrfResponseMiddleware()
-        self.view_middleware = CsrfViewMiddleware()
-
-    def process_response(self, request, resp):
-        # We must do the response post-processing first, because that calls
-        # get_token(), which triggers a flag saying that the CSRF cookie needs
-        # to be sent (done in CsrfViewMiddleware.process_response)
-        resp2 = self.response_middleware.process_response(request, resp)
-        return self.view_middleware.process_response(request, resp2)
-
-    def process_view(self, request, callback, callback_args, callback_kwargs):
-        return self.view_middleware.process_view(request, callback, callback_args,
-                                                 callback_kwargs)

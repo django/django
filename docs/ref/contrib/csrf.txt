@@ -17,28 +17,18 @@ The first defense against CSRF attacks is to ensure that GET requests are
 side-effect free.  POST requests can then be protected by following the steps
 below.
 
-.. versionadded:: 1.2
-    The 'contrib' apps, including the admin, use the functionality described
-    here. Because it is security related, a few things have been added to core
-    functionality to allow this to happen without any required upgrade steps.
-
 .. _Cross Site Request Forgeries: http://www.squarefree.com/securitytips/web-developers.html#CSRF
 
 How to use it
 =============
-
-.. versionchanged:: 1.2
-    The template tag functionality (the recommended way to use this) was added
-    in version 1.2. The previous method (still available) is described under
-    `Legacy method`_.
 
 To enable CSRF protection for your views, follow these steps:
 
     1. Add the middleware
        ``'django.middleware.csrf.CsrfViewMiddleware'`` to your list of
        middleware classes, :setting:`MIDDLEWARE_CLASSES`.  (It should come
-       before ``CsrfResponseMiddleware`` if that is being used, and before any
-       view middleware that assume that CSRF attacks have been dealt with.)
+       and before any view middleware that assume that CSRF attacks have
+       been dealt with.)
 
        Alternatively, you can use the decorator
        ``django.views.decorators.csrf.csrf_protect`` on particular views you
@@ -47,7 +37,7 @@ To enable CSRF protection for your views, follow these steps:
     2. In any template that uses a POST form, use the :ttag:`csrf_token` tag inside
        the ``<form>`` element if the form is for an internal URL, e.g.::
 
-           <form action="" method="post">{% csrf_token %}
+           <form action="." method="post">{% csrf_token %}
 
        This should not be done for POST forms that target external URLs, since
        that would cause the CSRF token to be leaked, leading to a vulnerability.
@@ -78,8 +68,8 @@ To enable CSRF protection for your views, follow these steps:
           takes care of this step for you.
 
 The utility script ``extras/csrf_migration_helper.py`` can help to automate the
-finding of code and templates that may need to be upgraded.  It contains full
-help on how to use it.
+finding of code and templates that may need these steps. It contains full help
+on how to use it.
 
 .. _csrf-ajax:
 
@@ -146,144 +136,8 @@ Use of the decorator is **not recommended** by itself, since if you forget to
 use it, you will have a security hole.  The 'belt and braces' strategy of using
 both is fine, and will incur minimal overhead.
 
-Legacy method
--------------
-
-In Django 1.1, the template tag did not exist.  Instead, a post-processing
-middleware that re-wrote POST forms to include the CSRF token was used.  If you
-are upgrading a site from version 1.1 or earlier, please read this section and
-the `Upgrading notes`_ below.  The post-processing middleware is still available
-as ``CsrfResponseMiddleware``, and it can be used by following these steps:
-
-    1. Follow step 1 above to install ``CsrfViewMiddleware``.
-
-    2. Add ``'django.middleware.csrf.CsrfResponseMiddleware'`` to your
-       :setting:`MIDDLEWARE_CLASSES` setting.
-
-       ``CsrfResponseMiddleware`` needs to process the response before things
-       like compression or setting ofETags happen to the response, so it must
-       come after ``GZipMiddleware``, ``CommonMiddleware`` and
-       ``ConditionalGetMiddleware`` in the list. It also must come after
-       ``CsrfViewMiddleware``.
-
-Use of the ``CsrfResponseMiddleware`` is not recommended because of the
-performance hit it imposes, and because of a potential security problem (see
-below).  It can be used as an interim measure until applications have been
-updated to use the :ttag:`csrf_token` tag.  It is deprecated and will be
-removed in Django 1.4.
-
-Django 1.1 and earlier provided a single ``CsrfMiddleware`` class.  This is also
-still available for backwards compatibility.  It combines the functions of the
-two middleware.
-
-Note also that previous versions of these classes depended on the sessions
-framework, but this dependency has now been removed, with backward compatibility
-support so that upgrading will not produce any issues.
-
-Security of legacy method
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The post-processing ``CsrfResponseMiddleware`` adds the CSRF token to all POST
-forms (unless the view has been decorated with ``csrf_response_exempt``).  If
-the POST form has an external untrusted site as its target, rather than an
-internal page, that site will be sent the CSRF token when the form is submitted.
-Armed with this leaked information, that site will then be able to successfully
-launch a CSRF attack on your site against that user.  The
-``@csrf_response_exempt`` decorator can be used to fix this, but only if the
-page doesn't also contain internal forms that require the token.
-
-.. _ref-csrf-upgrading-notes:
-
-Upgrading notes
----------------
-
-When upgrading to version 1.2 or later, you may have applications that rely on
-the old post-processing functionality for CSRF protection, or you may not have
-enabled any CSRF protection.  This section outlines the steps necessary for a
-smooth upgrade, without having to fix all the applications to use the new
-template tag method immediately.
-
-First of all, the location of the middleware and related functions have
-changed.  There are backwards compatible stub files so that old imports will
-continue to work for now, but they are deprecated and will be removed in Django
-1.4.  The following changes have been made:
-
- * Middleware have been moved to ``django.middleware.csrf``
- * Decorators have been moved to ``django.views.decorators.csrf``
-
-======================================================  ==============================================
-   Old                                                       New
-======================================================  ==============================================
-django.contrib.csrf.middleware.CsrfMiddleware           django.middleware.csrf.CsrfMiddleware
-django.contrib.csrf.middleware.CsrfViewMiddleware       django.middleware.csrf.CsrfViewMiddleware
-django.contrib.csrf.middleware.CsrfResponseMiddleware   django.middleware.csrf.CsrfResponseMiddleware
-django.contrib.csrf.middleware.csrf_exempt              django.views.decorators.csrf.csrf_exempt
-django.contrib.csrf.middleware.csrf_view_exempt         django.views.decorators.csrf.csrf_view_exempt
-django.contrib.csrf.middleware.csrf_response_exempt     django.views.decorators.csrf.csrf_response_exempt
-======================================================  ==============================================
-
-You should update any imports, and also the paths in your
-:setting:`MIDDLEWARE_CLASSES`.
-
-If you have ``CsrfMiddleware`` in your :setting:`MIDDLEWARE_CLASSES`, you will now
-have a working installation with CSRF protection.  It is recommended at this
-point that you replace ``CsrfMiddleware`` with its two components,
-``CsrfViewMiddleware`` and ``CsrfResponseMiddleware`` (in that order).
-
-If you do not have any of the middleware in your :setting:`MIDDLEWARE_CLASSES`,
-you will have a working installation but without any CSRF protection for your
-views (just as you had before). It is strongly recommended to install
-``CsrfViewMiddleware`` and ``CsrfResponseMiddleware``, as described above.
-
-Note that contrib apps, such as the admin, have been updated to use the
-``csrf_protect`` decorator, so that they are secured even if you do not add the
-``CsrfViewMiddleware`` to your settings.  However, if you have supplied
-customised templates to any of the view functions of contrib apps (whether
-explicitly via a keyword argument, or by overriding built-in templates), **you
-MUST update them** to include the :ttag:`csrf_token` template tag as described
-above, or they will stop working.  (If you cannot update these templates for
-some reason, you will be forced to use ``CsrfResponseMiddleware`` for these
-views to continue working).
-
-Note also, if you are using the comments app, and you are not going to add
-``CsrfViewMiddleware`` to your settings (not recommended), you will need to add
-the ``csrf_protect`` decorator to any views that include the comment forms and
-target the comment views (usually using the :ttag:`comment_form_target` template
-tag).
-
-Assuming you have followed the above, all views in your Django site will now be
-protected by the ``CsrfViewMiddleware``.  Contrib apps meet the requirements
-imposed by the ``CsrfViewMiddleware`` using the template tag, and other
-applications in your project will meet its requirements by virtue of the
-``CsrfResponseMiddleware``.
-
-The next step is to update all your applications to use the template tag, as
-described in `How to use it`_, steps 2-3.  This can be done as soon as is
-practical. Any applications that are updated will now require Django 1.1.2 or
-later, since they will use the CSRF template tag which was not available in
-earlier versions. (The template tag in 1.1.2 is actually a no-op that exists
-solely to ease the transition to 1.2 — it allows apps to be created that have
-CSRF protection under 1.2 without requiring users of the apps to upgrade to the
-Django 1.2.X series).
-
-The utility script ``extras/csrf_migration_helper.py`` can help to automate the
-finding of code and templates that may need to be upgraded.  It contains full
-help on how to use it.
-
-Finally, once all applications are upgraded, ``CsrfResponseMiddleware`` can be
-removed from your settings.
-
-While ``CsrfResponseMiddleware`` is still in use, the ``csrf_response_exempt``
-decorator, described in `Exceptions`_, may be useful.  The post-processing
-middleware imposes a performance hit and a potential vulnerability, and any
-views that have been upgraded to use the new template tag method no longer need
-it.
-
 Exceptions
 ----------
-
-.. versionchanged:: 1.2
-    Import paths for the decorators below were changed.
 
 To manually exclude a view function from being handled by either of the two CSRF
 middleware, you can use the ``csrf_exempt`` decorator, found in the
@@ -294,13 +148,6 @@ middleware, you can use the ``csrf_exempt`` decorator, found in the
     @csrf_exempt
     def my_view(request):
         return HttpResponse('Hello world')
-
-Like the middleware, the ``csrf_exempt`` decorator is composed of two parts: a
-``csrf_view_exempt`` decorator and a ``csrf_response_exempt`` decorator, found
-in the same module.  These disable the view protection mechanism
-(``CsrfViewMiddleware``) and the response post-processing
-(``CsrfResponseMiddleware``) respectively.  They can be used individually if
-required.
 
 Subdomains
 ----------
@@ -350,8 +197,7 @@ The CSRF protection is based on the following things:
    outgoing POST forms.  The value of this field is the value of the CSRF
    cookie.
 
-   This part is done by the template tag (and with the legacy method, it is done
-   by ``CsrfResponseMiddleware``).
+   This part is done by the template tag.
 
 3. For all incoming POST requests, a CSRF cookie must be present, and the
    'csrfmiddlewaretoken' field must be present and correct. If it isn't, the
@@ -375,22 +221,16 @@ forms). GET requests ought never to have any potentially dangerous side effects
 (see `9.1.1 Safe Methods, HTTP 1.1, RFC 2616`_), and so a CSRF attack with a GET
 request ought to be harmless.
 
-``CsrfResponseMiddleware`` checks the Content-Type before modifying the
-response, and only pages that are served as 'text/html' or
-'application/xml+xhtml' are modified.
-
 .. _9.1.1 Safe Methods, HTTP 1.1, RFC 2616: http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html
 
 Caching
 =======
 
-If the :ttag:`csrf_token` template tag is used by a template (or the ``get_token``
-function is called some other way), ``CsrfViewMiddleware`` will add a cookie and
-a ``Vary: Cookie`` header to the response.  Similarly,
-``CsrfResponseMiddleware`` will send the ``Vary: Cookie`` header if it inserted
-a token.  This means that these middleware will play well with the cache
-middleware if it is used as instructed (``UpdateCacheMiddleware`` goes before
-all other middleware).
+If the :ttag:`csrf_token` template tag is used by a template (or the
+``get_token`` function is called some other way), ``CsrfViewMiddleware`` will
+add a cookie and a ``Vary: Cookie`` header to the response. This means that the
+middleware will play well with the cache middleware if it is used as instructed
+(``UpdateCacheMiddleware`` goes before all other middleware).
 
 However, if you use cache decorators on individual views, the CSRF middleware
 will not yet have been able to set the Vary header.  In this case, on any views
@@ -433,13 +273,6 @@ ensure that subdomains are controlled by trusted users (or, are at least unable
 to set cookies).  Note that even without CSRF, there are other vulnerabilities,
 such as session fixation, that make giving subdomains to untrusted parties a bad
 idea, and these vulnerabilities cannot easily be fixed with current browsers.
-
-If you are using ``CsrfResponseMiddleware`` and your app creates HTML pages and
-forms in some unusual way, (e.g.  it sends fragments of HTML in JavaScript
-document.write statements) you might bypass the filter that adds the hidden
-field to the form, in which case form submission will always fail.  You should
-use the template tag or :meth:`django.middleware.csrf.get_token` to get
-the CSRF token and ensure it is included when your form is submitted.
 
 Contrib and reusable apps
 =========================
