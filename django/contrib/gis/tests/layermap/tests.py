@@ -1,5 +1,5 @@
-import copy
 import os
+from copy import copy
 from decimal import Decimal
 
 from django.utils.unittest import TestCase
