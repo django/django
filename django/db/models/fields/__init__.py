@@ -7,7 +7,6 @@ import math
 from itertools import tee
 
 from django.db import connection
-from django.db.models.fields.subclassing import LegacyConnection
 from django.db.models.query_utils import QueryWrapper
 from django.conf import settings
 from django import forms
@@ -46,7 +45,6 @@ class FieldDoesNotExist(Exception):
 
 class Field(object):
     """Base class for all field types"""
-    __metaclass__ = LegacyConnection
 
     # Designates whether empty strings fundamentally are allowed at the
     # database level.
