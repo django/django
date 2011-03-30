@@ -1,0 +1,23 @@
+============================================
+Django 1.4 release notes - UNDER DEVELOPMENT
+============================================
+
+This page documents release notes for the as-yet-unreleased Django
+1.4. As such, it's tentative and subject to change. It provides
+up-to-date information for those who are following trunk.
+
+Django 1.4 includes various `new features`_ and some minor `backwards
+incompatible changes`_. There are also some features that have been dropped,
+which are detailed in :doc:`our deprecation plan </internals/deprecation>`.
+
+.. _new features: `What's new in Django 1.4`_
+.. _backwards incompatible changes: backwards-incompatible-changes-1.4_
+
+
+What's new in Django 1.4
+========================
+
+.. _backwards-incompatible-changes-1.4:
+
+Backwards incompatible changes in 1.4
+=====================================
