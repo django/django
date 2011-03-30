@@ -6,8 +6,6 @@ from django.http import HttpRequest, HttpResponse
 from django.middleware.csrf import CsrfMiddleware, CsrfViewMiddleware
 from django.views.decorators.csrf import csrf_exempt, csrf_view_exempt, requires_csrf_token
 from django.core.context_processors import csrf
-from django.contrib.sessions.middleware import SessionMiddleware
-from django.utils.importlib import import_module
 from django.conf import settings
 from django.template import RequestContext, Template
 
@@ -62,14 +60,6 @@ class CsrfMiddlewareTest(TestCase):
     _csrf_id_cookie = "<1>\xc2\xa1"
     _csrf_id = "1"
 
-    # This is a valid session token for this ID and secret key.  This was generated using
-    # the old code that we're to be backwards-compatible with.  Don't use the CSRF code
-    # to generate this hash, or we're merely testing the code against itself and not
-    # checking backwards-compatibility.  This is also the output of (echo -n test1 | md5sum).
-    _session_token = "5a105e8b9d40e1329780d62ea2265d8a"
-    _session_id = "1"
-    _secret_key_for_session_test= "test"
-
     def setUp(self):
         self.save_warnings_state()
         warnings.filterwarnings('ignore', category=DeprecationWarning,
@@ -99,17 +89,6 @@ class CsrfMiddlewareTest(TestCase):
     def _get_POST_request_with_token(self):
         req = self._get_POST_csrf_cookie_request()
         req.POST['csrfmiddlewaretoken'] = self._csrf_id
-        return req
-
-    def _get_POST_session_request_with_token(self):
-        req = self._get_POST_no_csrf_cookie_request()
-        req.COOKIES[settings.SESSION_COOKIE_NAME] = self._session_id
-        req.POST['csrfmiddlewaretoken'] = self._session_token
-        return req
-
-    def _get_POST_session_request_no_token(self):
-        req = self._get_POST_no_csrf_cookie_request()
-        req.COOKIES[settings.SESSION_COOKIE_NAME] = self._session_id
         return req
 
     def _check_token_present(self, response, csrf_id=None):
@@ -226,10 +205,10 @@ class CsrfMiddlewareTest(TestCase):
         self.assertEqual(resp_content, resp2.content)
 
     # Check the request processing
-    def test_process_request_no_session_no_csrf_cookie(self):
+    def test_process_request_no_csrf_cookie(self):
         """
-        Check that if neither a CSRF cookie nor a session cookie are present,
-        the middleware rejects the incoming request.  This will stop login CSRF.
+        Check that if no CSRF cookies is present, the middleware rejects the
+        incoming request.  This will stop login CSRF.
         """
         req = self._get_POST_no_csrf_cookie_request()
         req2 = CsrfMiddleware().process_view(req, post_form_view, (), {})
@@ -251,29 +230,6 @@ class CsrfMiddlewareTest(TestCase):
         req = self._get_POST_request_with_token()
         req2 = CsrfMiddleware().process_view(req, post_form_view, (), {})
         self.assertEqual(None, req2)
-
-    def test_process_request_session_cookie_no_csrf_cookie_token(self):
-        """
-        When no CSRF cookie exists, but the user has a session, check that a token
-        using the session cookie as a legacy CSRF cookie is accepted.
-        """
-        orig_secret_key = settings.SECRET_KEY
-        settings.SECRET_KEY = self._secret_key_for_session_test
-        try:
-            req = self._get_POST_session_request_with_token()
-            req2 = CsrfMiddleware().process_view(req, post_form_view, (), {})
-            self.assertEqual(None, req2)
-        finally:
-            settings.SECRET_KEY = orig_secret_key
-
-    def test_process_request_session_cookie_no_csrf_cookie_no_token(self):
-        """
-        Check that if a session cookie is present but no token and no CSRF cookie,
-        the request is rejected.
-        """
-        req = self._get_POST_session_request_no_token()
-        req2 = CsrfMiddleware().process_view(req, post_form_view, (), {})
-        self.assertEqual(403, req2.status_code)
 
     def test_process_request_csrf_cookie_no_token_exempt_view(self):
         """
