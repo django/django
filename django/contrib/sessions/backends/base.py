@@ -105,24 +105,9 @@ class SessionBase(object):
             else:
                 return pickle.loads(pickled)
         except Exception:
-            # ValueError, SuspiciousOperation, unpickling exceptions
-            # Fall back to Django 1.2 method
-            # PendingDeprecationWarning <- here to remind us to
-            # remove this fallback in Django 1.5
-            try:
-                return self._decode_old(session_data)
-            except Exception:
-                # Unpickling can cause a variety of exceptions. If something happens,
-                # just return an empty dictionary (an empty session).
-                return {}
-
-    def _decode_old(self, session_data):
-        encoded_data = base64.decodestring(session_data)
-        pickled, tamper_check = encoded_data[:-32], encoded_data[-32:]
-        if not constant_time_compare(hashlib.md5(pickled + settings.SECRET_KEY).hexdigest(),
-                                     tamper_check):
-            raise SuspiciousOperation("User tampered with session cookie.")
-        return pickle.loads(pickled)
+            # ValueError, SuspiciousOperation, unpickling exceptions. If any of
+            # these happen, just return an empty dictionary (an empty session).
+            return {}
 
     def update(self, dict_):
         self._session.update(dict_)
