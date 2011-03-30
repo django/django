@@ -28,14 +28,6 @@ class TestForm(forms.Form):
     bool1 = forms.BooleanField(required=False)
 
 
-class UserSecuredFormPreview(TestFormPreview):
-    """
-    FormPreview with a custum security_hash method
-    """
-    def security_hash(self, request, form):
-        return "123"
-
-
 class PreviewTests(TestCase):
     urls = 'django.contrib.formtools.tests.urls'
 
@@ -124,36 +116,36 @@ class PreviewTests(TestCase):
         response = self.client.post('/test1/', self.test_data)
         self.assertEqual(response.content, success_string)
 
-    def test_form_submit_django12_hash(self):
+    def test_form_submit_good_hash(self):
         """
-        Test contrib.formtools.preview form submittal, using the hash function
-        used in Django 1.2
+        Test contrib.formtools.preview form submittal, using a correct
+        hash
         """
         # Pass strings for form submittal and add stage variable to
         # show we previously saw first stage of the form.
         self.test_data.update({'stage':2})
         response = self.client.post('/test1/', self.test_data)
         self.assertNotEqual(response.content, success_string)
-        hash = utils.security_hash(None, TestForm(self.test_data))
+        hash = utils.form_hmac(TestForm(self.test_data))
         self.test_data.update({'hash': hash})
         response = self.client.post('/test1/', self.test_data)
         self.assertEqual(response.content, success_string)
 
 
-    def test_form_submit_django12_hash_custom_hash(self):
+    def test_form_submit_bad_hash(self):
         """
-        Test contrib.formtools.preview form submittal, using the hash function
-        used in Django 1.2 and a custom security_hash method.
+        Test contrib.formtools.preview form submittal does not proceed
+        if the hash is incorrect.
         """
         # Pass strings for form submittal and add stage variable to
         # show we previously saw first stage of the form.
         self.test_data.update({'stage':2})
-        response = self.client.post('/test2/', self.test_data)
+        response = self.client.post('/test1/', self.test_data)
         self.assertEqual(response.status_code, 200)
         self.assertNotEqual(response.content, success_string)
-        hash = utils.security_hash(None, TestForm(self.test_data))
+        hash = utils.form_hmac(TestForm(self.test_data)) + "bad"
         self.test_data.update({'hash': hash})
-        response = self.client.post('/test2/', self.test_data)
+        response = self.client.post('/test1/', self.test_data)
         self.assertNotEqual(response.content, success_string)
 
 

@@ -7,7 +7,6 @@ from django.contrib.formtools.tests import *
 
 urlpatterns = patterns('',
                        (r'^test1/', TestFormPreview(TestForm)),
-                       (r'^test2/', UserSecuredFormPreview(TestForm)),
                        (r'^wizard/$', WizardClass([WizardPageOneForm,
                                                    WizardPageTwoForm,
                                                    WizardPageThreeForm])),
