@@ -249,14 +249,6 @@ class WizardClass(wizard.FormWizard):
         return http.HttpResponse(success_string)
 
 
-class UserSecuredWizardClass(WizardClass):
-    """
-    Wizard with a custum security_hash method
-    """
-    def security_hash(self, request, form):
-        return "123"
-
-
 class DummyRequest(http.HttpRequest):
 
     def __init__(self, POST=None):
@@ -310,36 +302,7 @@ class WizardTests(TestCase):
                                      "wizard_step": "1"})
         self.assertEqual(0, response.context['step0'])
 
-    def test_good_hash_django12(self):
-        """
-        Form should advance if the hash is present and good, as calculated using
-        django 1.2 method.
-        """
-        # We are hard-coding a hash value here, but that is OK, since we want to
-        # ensure that we don't accidentally change the algorithm.
-        data = {"0-field": "test",
-                "1-field": "test2",
-                "hash_0": "2fdbefd4c0cad51509478fbacddf8b13",
-                "wizard_step": "1"}
-        response = self.client.post('/wizard/', data)
-        self.assertEqual(2, response.context['step0'])
-
-    def test_good_hash_django12_subclass(self):
-        """
-        The Django 1.2 method of calulating hashes should *not* be used as a
-        fallback if the FormWizard subclass has provided their own method
-        of calculating a hash.
-        """
-        # We are hard-coding a hash value here, but that is OK, since we want to
-        # ensure that we don't accidentally change the algorithm.
-        data = {"0-field": "test",
-                "1-field": "test2",
-                "hash_0": "2fdbefd4c0cad51509478fbacddf8b13",
-                "wizard_step": "1"}
-        response = self.client.post('/wizard2/', data)
-        self.assertEqual(0, response.context['step0'])
-
-    def test_good_hash_current(self):
+    def test_good_hash(self):
         """
         Form should advance if the hash is present and good, as calculated using
         current method.

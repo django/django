@@ -11,7 +11,4 @@ urlpatterns = patterns('',
                        (r'^wizard/$', WizardClass([WizardPageOneForm,
                                                    WizardPageTwoForm,
                                                    WizardPageThreeForm])),
-                       (r'^wizard2/$', UserSecuredWizardClass([WizardPageOneForm,
-                                                               WizardPageTwoForm,
-                                                               WizardPageThreeForm]))
                       )
