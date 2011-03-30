@@ -20,7 +20,7 @@ class Field(GDALBase):
         # Setting the feature pointer and index.
         self._feat = feat
         self._index = index
-        
+
         # Getting the pointer for this field.
         fld_ptr = capi.get_feat_field_defn(feat, index)
         if not fld_ptr:
@@ -33,6 +33,7 @@ class Field(GDALBase):
         # OFTReal with no precision should be an OFTInteger.
         if isinstance(self, OFTReal) and self.precision == 0:
             self.__class__ = OFTInteger
+            self._double = True
 
     def __str__(self):
         "Returns the string representation of the Field."
@@ -95,10 +96,17 @@ class Field(GDALBase):
 
 ### The Field sub-classes for each OGR Field type. ###
 class OFTInteger(Field):
+    _double = False
+
     @property
     def value(self):
         "Returns an integer contained in this field."
-        return self.as_int()
+        if self._double:
+            # If this is really from an OFTReal field with no precision,
+            # read as a double and cast as Python int (to prevent overflow).
+            return int(self.as_double())
+        else:
+            return self.as_int()
 
     @property
     def type(self):
@@ -137,7 +145,7 @@ class OFTDateTime(Field):
         "Returns a Python `datetime` object for this OFTDateTime field."
         # TODO: Adapt timezone information.
         #  See http://lists.maptools.org/pipermail/gdal-dev/2006-February/007990.html
-        #  The `tz` variable has values of: 0=unknown, 1=localtime (ambiguous), 
+        #  The `tz` variable has values of: 0=unknown, 1=localtime (ambiguous),
         #  100=GMT, 104=GMT+1, 80=GMT-5, etc.
         try:
             yy, mm, dd, hh, mn, ss, tz = self.as_datetime()

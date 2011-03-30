@@ -1,7 +1,8 @@
-import os, os.path, unittest
+import os
+import unittest
 from django.contrib.gis.gdal import DataSource, Envelope, OGRGeometry, OGRException, OGRIndexError, GDAL_VERSION
 from django.contrib.gis.gdal.field import OFTReal, OFTInteger, OFTString
-from django.contrib.gis.geometry.test_data import get_ds_file, TestDS
+from django.contrib.gis.geometry.test_data import get_ds_file, TestDS, TEST_DATA
 
 # List of acceptable data sources.
 ds_list = (TestDS('test_point', nfeat=5, nfld=3, geom='POINT', gtype=1, driver='ESRI Shapefile',
@@ -72,7 +73,7 @@ class DataSourceTest(unittest.TestCase):
                 self.assertEqual(source.nfld, len(layer.fields))
 
                 # Testing the layer's extent (an Envelope), and it's properties
-                if source.driver == 'VRT' and (GDAL_VERSION > (1, 7, 0) and GDAL_VERSION < (1, 7, 3)):
+                if source.driver == 'VRT' and (GDAL_VERSION >= (1, 7, 0) and GDAL_VERSION < (1, 7, 3)):
                     # There's a known GDAL regression with retrieving the extent
                     # of a VRT layer in versions 1.7.0-1.7.2:
                     #  http://trac.osgeo.org/gdal/ticket/3783
@@ -216,6 +217,16 @@ class DataSourceTest(unittest.TestCase):
         # should indicate that there are 3 features in the Layer.
         lyr.spatial_filter = None
         self.assertEqual(3, len(lyr))
+
+    def test07_integer_overflow(self):
+        "Testing that OFTReal fields, treated as OFTInteger, do not overflow."
+        # Using *.dbf from Census 2010 TIGER Shapefile for Texas,
+        # which has land area ('ALAND10') stored in a Real field
+        # with no precision.
+        ds = DataSource(os.path.join(TEST_DATA, 'texas.dbf'))
+        feat = ds[0][0]
+        # Reference value obtained using `ogrinfo`.
+        self.assertEqual(676586997978, feat.get('ALAND10'))
 
 def suite():
     s = unittest.TestSuite()
