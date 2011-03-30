@@ -21,17 +21,12 @@ def post_form_view(request):
     return post_form_response()
 
 # Response/views used for template tag tests
-def _token_template():
-    return Template("{% csrf_token %}")
-
-def _render_csrf_token_template(req):
-    context = RequestContext(req, processors=[csrf])
-    template = _token_template()
-    return template.render(context)
 
 def token_view(request):
     """A view that uses {% csrf_token %}"""
-    return HttpResponse(_render_csrf_token_template(request))
+    context = RequestContext(request, processors=[csrf])
+    template = Template("{% csrf_token %}")
+    return HttpResponse(template.render(context))
 
 def non_token_view_using_request_processor(request):
     """
