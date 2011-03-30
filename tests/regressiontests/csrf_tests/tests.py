@@ -4,7 +4,7 @@ import warnings
 from django.test import TestCase
 from django.http import HttpRequest, HttpResponse
 from django.middleware.csrf import CsrfViewMiddleware
-from django.views.decorators.csrf import csrf_exempt, csrf_view_exempt, requires_csrf_token
+from django.views.decorators.csrf import csrf_exempt, requires_csrf_token
 from django.core.context_processors import csrf
 from django.conf import settings
 from django.template import RequestContext, Template
@@ -200,10 +200,10 @@ class CsrfViewMiddlewareTest(TestCase):
 
     def test_get_token_for_exempt_view(self):
         """
-        Check that get_token still works for a view decorated with 'csrf_view_exempt'.
+        Check that get_token still works for a view decorated with 'csrf_exempt'.
         """
         req = self._get_GET_csrf_cookie_request()
-        CsrfViewMiddleware().process_view(req, csrf_view_exempt(token_view), (), {})
+        CsrfViewMiddleware().process_view(req, csrf_exempt(token_view), (), {})
         resp = token_view(req)
         self._check_token_present(resp)
 
