@@ -1,4 +1,4 @@
-from functools import wraps
+from functools import wraps, update_wrapper
 
 
 # You can't trivially replace this `functools.partial` because this binds to
