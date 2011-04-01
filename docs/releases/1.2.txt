@@ -185,7 +185,7 @@ The built-in :class:`~django.contrib.auth.models.User` model's
 of characters, including ``@``, ``+``, ``.`` and ``-`` characters.
 
 Email backends
----------------
+--------------
 
 You can now :ref:`configure the way that Django sends email
 <topic-email-backends>`. Instead of using SMTP to send all email, you

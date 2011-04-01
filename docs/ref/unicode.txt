@@ -305,7 +305,7 @@ A couple of tips to remember when writing your own template tags and filters:
       strings at that point.
 
 Email
-======
+=====
 
 Django's email framework (in ``django.core.mail``) supports Unicode
 transparently. You can use Unicode data in the message bodies and any headers.

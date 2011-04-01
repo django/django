@@ -1,6 +1,6 @@
-==============
+=============
 Sending email
-==============
+=============
 
 .. module:: django.core.mail
    :synopsis: Helpers to easily send email.
@@ -364,8 +364,8 @@ subtype. For example::
 
 .. _topic-email-backends:
 
-E-Mail Backends
-===============
+Email backends
+==============
 
 .. versionadded:: 1.2
 
@@ -384,7 +384,7 @@ The email backend class has the following methods:
       left open after mail has been sent.
 
 Obtaining an instance of an email backend
-------------------------------------------
+-----------------------------------------
 
 The :meth:`get_connection` function in ``django.core.mail`` returns an
 instance of the email backend that you can use.
@@ -506,7 +506,7 @@ convenience that can be used during development.
 .. _topic-custom-email-backend:
 
 Defining a custom email backend
---------------------------------
+-------------------------------
 
 If you need to change how emails are sent you can write your own email
 backend. The ``EMAIL_BACKEND`` setting in your settings file is then the
@@ -524,7 +524,7 @@ implementation.
 .. _topics-sending-multiple-emails:
 
 Sending multiple emails
-------------------------
+-----------------------
 
 Establishing and closing an SMTP connection (or any other network connection,
 for that matter) is an expensive process. If you have a lot of emails to send,
@@ -580,7 +580,7 @@ manually open the connection, you can control when it is closed. For example::
 
 
 Testing email sending
-======================
+=====================
 
 There are times when you do not want Django to send emails at
 all. For example, while developing a Web site, you probably don't want

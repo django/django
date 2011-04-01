@@ -1464,7 +1464,7 @@ cause of an failure in your test suite.
 .. _topics-testing-email:
 
 Email services
----------------
+--------------
 
 If any of your Django views send email using :doc:`Django's email
 functionality </topics/email>`, you probably don't want to send email each time

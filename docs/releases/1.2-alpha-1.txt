@@ -386,7 +386,7 @@ CSRF', where an attacking site tricks a user's browser into logging
 into a site with someone else's credentials, is also covered.
 
 Email Backends
----------------
+--------------
 
 You can now :ref:`configure the way that Django sends email
 <topic-email-backends>`. Instead of using SMTP to send all email, you

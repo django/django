@@ -187,7 +187,7 @@ a look at Django's ``EmailField``::
 
     class EmailField(CharField):
         default_error_messages = {
-            'invalid': _(u'Enter a valid email address.'),
+            'invalid': _(u'Enter a valid e-mail address.'),
         }
         default_validators = [validators.validate_email]
 
@@ -200,7 +200,7 @@ on field definition so::
 is equivalent to::
 
     email = forms.CharField(validators=[validators.validate_email],
-            error_messages={'invalid': _(u'Enter a valid email address.')})
+            error_messages={'invalid': _(u'Enter a valid e-mail address.')})
 
 
 Form field default cleaning

@@ -30,7 +30,7 @@ exception or returns the clean value::
     >>> f.clean('invalid email address')
     Traceback (most recent call last):
     ...
-    ValidationError: [u'Enter a valid email address.']
+    ValidationError: [u'Enter a valid e-mail address.']
 
 Core field arguments
 --------------------
