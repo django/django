@@ -19,7 +19,7 @@ from django.core.mail.message import \
 from django.core.mail.backends.smtp import EmailBackend as _SMTPConnection
 
 def get_connection(backend=None, fail_silently=False, **kwds):
-    """Load an e-mail backend and return an instance of it.
+    """Load an email backend and return an instance of it.
 
     If backend is None (default) settings.EMAIL_BACKEND is used.
 
@@ -65,7 +65,7 @@ def send_mass_mail(datatuple, fail_silently=False, auth_user=None,
                    auth_password=None, connection=None):
     """
     Given a datatuple of (subject, message, from_email, recipient_list), sends
-    each message to each recipient list. Returns the number of e-mails sent.
+    each message to each recipient list. Returns the number of emails sent.
 
     If from_email is None, the DEFAULT_FROM_EMAIL setting is used.
     If auth_user and auth_password are set, they're used to log in.

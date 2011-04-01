@@ -89,11 +89,11 @@ and return a boolean designating whether the data was valid::
 
 Let's try with some invalid data. In this case, ``subject`` is blank (an error,
 because all fields are required by default) and ``sender`` is not a valid
-e-mail address::
+email address::
 
     >>> data = {'subject': '',
     ...         'message': 'Hi there',
-    ...         'sender': 'invalid e-mail address',
+    ...         'sender': 'invalid email address',
     ...         'cc_myself': True}
     >>> f = ContactForm(data)
     >>> f.is_valid()
@@ -105,7 +105,7 @@ Access the :attr:`~Form.errors` attribute to get a dictionary of error
 messages::
 
     >>> f.errors
-    {'sender': [u'Enter a valid e-mail address.'], 'subject': [u'This field is required.']}
+    {'sender': [u'Enter a valid email address.'], 'subject': [u'This field is required.']}
 
 In this dictionary, the keys are the field names, and the values are lists of
 Unicode strings representing the error messages. The error messages are stored
@@ -204,7 +204,7 @@ If your data does *not* validate, your ``Form`` instance will not have a
 
     >>> data = {'subject': '',
     ...         'message': 'Hi there',
-    ...         'sender': 'invalid e-mail address',
+    ...         'sender': 'invalid email address',
     ...         'cc_myself': True}
     >>> f = ContactForm(data)
     >>> f.is_valid()
@@ -531,25 +531,25 @@ method you're using::
 
     >>> data = {'subject': '',
     ...         'message': 'Hi there',
-    ...         'sender': 'invalid e-mail address',
+    ...         'sender': 'invalid email address',
     ...         'cc_myself': True}
     >>> f = ContactForm(data, auto_id=False)
     >>> print f.as_table()
     <tr><th>Subject:</th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="subject" maxlength="100" /></td></tr>
     <tr><th>Message:</th><td><input type="text" name="message" value="Hi there" /></td></tr>
-    <tr><th>Sender:</th><td><ul class="errorlist"><li>Enter a valid e-mail address.</li></ul><input type="text" name="sender" value="invalid e-mail address" /></td></tr>
+    <tr><th>Sender:</th><td><ul class="errorlist"><li>Enter a valid email address.</li></ul><input type="text" name="sender" value="invalid email address" /></td></tr>
     <tr><th>Cc myself:</th><td><input checked="checked" type="checkbox" name="cc_myself" /></td></tr>
     >>> print f.as_ul()
     <li><ul class="errorlist"><li>This field is required.</li></ul>Subject: <input type="text" name="subject" maxlength="100" /></li>
     <li>Message: <input type="text" name="message" value="Hi there" /></li>
-    <li><ul class="errorlist"><li>Enter a valid e-mail address.</li></ul>Sender: <input type="text" name="sender" value="invalid e-mail address" /></li>
+    <li><ul class="errorlist"><li>Enter a valid email address.</li></ul>Sender: <input type="text" name="sender" value="invalid email address" /></li>
     <li>Cc myself: <input checked="checked" type="checkbox" name="cc_myself" /></li>
     >>> print f.as_p()
     <p><ul class="errorlist"><li>This field is required.</li></ul></p>
     <p>Subject: <input type="text" name="subject" maxlength="100" /></p>
     <p>Message: <input type="text" name="message" value="Hi there" /></p>
-    <p><ul class="errorlist"><li>Enter a valid e-mail address.</li></ul></p>
-    <p>Sender: <input type="text" name="sender" value="invalid e-mail address" /></p>
+    <p><ul class="errorlist"><li>Enter a valid email address.</li></ul></p>
+    <p>Sender: <input type="text" name="sender" value="invalid email address" /></p>
     <p>Cc myself: <input checked="checked" type="checkbox" name="cc_myself" /></p>
 
 Customizing the error list format
@@ -571,8 +571,8 @@ pass that in at construction time::
     <div class="errorlist"><div class="error">This field is required.</div></div>
     <p>Subject: <input type="text" name="subject" maxlength="100" /></p>
     <p>Message: <input type="text" name="message" value="Hi there" /></p>
-    <div class="errorlist"><div class="error">Enter a valid e-mail address.</div></div>
-    <p>Sender: <input type="text" name="sender" value="invalid e-mail address" /></p>
+    <div class="errorlist"><div class="error">Enter a valid email address.</div></div>
+    <p>Sender: <input type="text" name="sender" value="invalid email address" /></p>
     <p>Cc myself: <input checked="checked" type="checkbox" name="cc_myself" /></p>
 
 More granular output

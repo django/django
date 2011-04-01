@@ -35,7 +35,7 @@ Here's the basic workflow for how a user would use a wizard:
     3. Step 1 and 2 repeat, for every subsequent form in the wizard.
     4. Once the user has submitted all the forms and all the data has been
        validated, the wizard processes the data -- saving it to the database,
-       sending an e-mail, or whatever the application needs to do.
+       sending an email, or whatever the application needs to do.
 
 Usage
 =====
@@ -67,7 +67,7 @@ convention is to put them in a file called :file:`forms.py` in your
 application.
 
 For example, let's write a "contact form" wizard, where the first page's form
-collects the sender's e-mail address and subject, and the second page collects
+collects the sender's email address and subject, and the second page collects
 the message itself. Here's what the :file:`forms.py` might look like::
 
     from django import forms

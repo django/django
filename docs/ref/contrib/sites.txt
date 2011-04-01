@@ -181,9 +181,9 @@ fallback for cases where it is not installed.
 Getting the current domain for display
 --------------------------------------
 
-LJWorld.com and Lawrence.com both have e-mail alert functionality, which lets
+LJWorld.com and Lawrence.com both have email alert functionality, which lets
 readers sign up to get notifications when news happens. It's pretty basic: A
-reader signs up on a Web form, and he immediately gets an e-mail saying,
+reader signs up on a Web form, and he immediately gets an email saying,
 "Thanks for your subscription."
 
 It'd be inefficient and redundant to implement this signup-processing code
@@ -211,9 +211,9 @@ Here's an example of what the form-handling view looks like::
 
         # ...
 
-On Lawrence.com, this e-mail has the subject line "Thanks for subscribing to
-lawrence.com alerts." On LJWorld.com, the e-mail has the subject "Thanks for
-subscribing to LJWorld.com alerts." Same goes for the e-mail's message body.
+On Lawrence.com, this email has the subject line "Thanks for subscribing to
+lawrence.com alerts." On LJWorld.com, the email has the subject "Thanks for
+subscribing to LJWorld.com alerts." Same goes for the email's message body.
 
 Note that an even more flexible (but more heavyweight) way of doing this would
 be to use Django's template system. Assuming Lawrence.com and LJWorld.com have

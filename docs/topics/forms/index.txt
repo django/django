@@ -36,7 +36,7 @@ The library deals with these concepts:
 
     Field
         A class that is responsible for doing validation, e.g.
-        an ``EmailField`` that makes sure its data is a valid e-mail address.
+        an ``EmailField`` that makes sure its data is a valid email address.
 
     Form
         A collection of fields that knows how to validate itself and
@@ -163,7 +163,7 @@ Extending the above example, here's how the form data could be processed:
         send_mail(subject, message, sender, recipients)
         return HttpResponseRedirect('/thanks/') # Redirect after POST
 
-For more on sending e-mail from Django, see :doc:`/topics/email`.
+For more on sending email from Django, see :doc:`/topics/email`.
 
 Displaying a form using a template
 ----------------------------------
@@ -224,7 +224,7 @@ above example::
         {{ form.non_field_errors }}
         <div class="fieldWrapper">
             {{ form.subject.errors }}
-            <label for="id_subject">E-mail subject:</label>
+            <label for="id_subject">Email subject:</label>
             {{ form.subject }}
         </div>
         <div class="fieldWrapper">
@@ -288,11 +288,11 @@ Within this loop, ``{{ field }}`` is an instance of :class:`BoundField`.
 templates:
 
     ``{{ field.label }}``
-        The label of the field, e.g. ``E-mail address``.
+        The label of the field, e.g. ``Email address``.
 
     ``{{ field.label_tag }}``
         The field's label wrapped in the appropriate HTML ``<label>`` tag,
-        e.g. ``<label for="id_email">E-mail address</label>``
+        e.g. ``<label for="id_email">Email address</label>``
 
     ``{{ field.html_name }}``
         The name of the field that will be used in the input element's name

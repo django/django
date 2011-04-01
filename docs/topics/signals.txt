@@ -184,7 +184,7 @@ registered more than once, and thus called multiples times for a single signal
 event. 
 
 If this behavior is problematic (such as when using signals to
-send an e-mail whenever a model is saved), pass a unique identifier as
+send an email whenever a model is saved), pass a unique identifier as
 the ``dispatch_uid`` argument to identify your receiver function. This
 identifier will usually be a string, although any hashable object will
 suffice. The end result is that your receiver function will only be

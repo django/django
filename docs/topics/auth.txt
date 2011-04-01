@@ -84,7 +84,7 @@ Fields
 
     .. attribute:: models.User.email
 
-        Optional. E-mail address.
+        Optional. Email address.
 
     .. attribute:: models.User.password
 
@@ -263,7 +263,7 @@ Methods
 
     .. method:: models.User.email_user(subject, message, from_email=None)
 
-        Sends an e-mail to the user. If
+        Sends an email to the user. If
         :attr:`~django.contrib.auth.models.User.from_email` is ``None``, Django
         uses the :setting:`DEFAULT_FROM_EMAIL`.
 
@@ -948,7 +948,7 @@ includes a few other useful built-in views located in
 
     Allows a user to reset their password by generating a one-time use link
     that can be used to reset the password, and sending that link to the
-    user's registered e-mail address.
+    user's registered email address.
 
     .. versionchanged:: 1.3
         The ``from_email`` argument was added.
@@ -960,7 +960,7 @@ includes a few other useful built-in views located in
           :file:`registration/password_reset_form.html` if not supplied.
 
         * ``email_template_name``: The full name of a template to use for
-          generating the e-mail with the new password. This will default to
+          generating the email with the new password. This will default to
           :file:`registration/password_reset_email.html` if not supplied.
 
         * ``password_reset_form``: Form that will be used to set the password.
@@ -973,7 +973,7 @@ includes a few other useful built-in views located in
         * ``post_reset_redirect``: The URL to redirect to after a successful
           password change.
 
-        * ``from_email``: A valid e-mail address. By default Django uses
+        * ``from_email``: A valid email address. By default Django uses
           the :setting:`DEFAULT_FROM_EMAIL`.
 
     **Template context:**
@@ -1061,7 +1061,7 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
 
 .. class:: PasswordResetForm
 
-    A form for generating and e-mailing a one-time use link to reset a
+    A form for generating and emailing a one-time use link to reset a
     user's password.
 
 .. class:: SetPasswordForm
@@ -1384,7 +1384,7 @@ example, if the group ``Site editors`` has the permission
 Beyond permissions, groups are a convenient way to categorize users to give
 them some label, or extended functionality. For example, you could create a
 group ``'Special users'``, and you could write code that could, say, give them
-access to a members-only portion of your site, or send them members-only e-mail
+access to a members-only portion of your site, or send them members-only email
 messages.
 
 Messages

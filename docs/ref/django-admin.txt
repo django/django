@@ -1086,7 +1086,7 @@ a password has been manually set for it.
 .. django-admin-option:: --username
 .. django-admin-option:: --email
 
-The username and e-mail address for the new account can be supplied by
+The username and email address for the new account can be supplied by
 using the ``--username`` and ``--email`` arguments on the command
 line. If either of those is not supplied, ``createsuperuser`` will prompt for
 it when running interactively.

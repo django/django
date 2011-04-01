@@ -455,15 +455,15 @@ This example illustrates all possible attributes and methods for a
         def author_email(self, obj):
             """
             Takes the object returned by get_object() and returns the feed's
-            author's e-mail as a normal Python string.
+            author's email as a normal Python string.
             """
 
         def author_email(self):
             """
-            Returns the feed's author's e-mail as a normal Python string.
+            Returns the feed's author's email as a normal Python string.
             """
 
-        author_email = 'test@example.com' # Hard-coded author e-mail.
+        author_email = 'test@example.com' # Hard-coded author email.
 
         # AUTHOR LINK --One of the following three is optional. The framework
         # looks for them in this order. In each case, the URL should include
@@ -637,15 +637,15 @@ This example illustrates all possible attributes and methods for a
         def item_author_email(self, obj):
             """
             Takes an item, as returned by items(), and returns the item's
-            author's e-mail as a normal Python string.
+            author's email as a normal Python string.
             """
 
         def item_author_email(self):
             """
-            Returns the author e-mail for every item in the feed.
+            Returns the author email for every item in the feed.
             """
 
-        item_author_email = 'test@example.com' # Hard-coded author e-mail.
+        item_author_email = 'test@example.com' # Hard-coded author email.
 
         # ITEM AUTHOR LINK -- One of the following three is optional. The
         # framework looks for them in this order. In each case, the URL should

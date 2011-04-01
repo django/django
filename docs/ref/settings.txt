@@ -66,13 +66,13 @@ ADMINS
 Default: ``()`` (Empty tuple)
 
 A tuple that lists people who get code error notifications. When
-``DEBUG=False`` and a view raises an exception, Django will e-mail these people
+``DEBUG=False`` and a view raises an exception, Django will email these people
 with the full exception information. Each member of the tuple should be a tuple
-of (Full name, e-mail address). Example::
+of (Full name, email address). Example::
 
     (('John', 'john@example.com'), ('Mary', 'mary@example.com'))
 
-Note that Django will e-mail *all* of these people whenever an error happens.
+Note that Django will email *all* of these people whenever an error happens.
 See :doc:`/howto/error-reporting` for more information.
 
 .. setting:: ALLOWED_INCLUDE_ROOTS
@@ -756,7 +756,7 @@ DEFAULT_FROM_EMAIL
 
 Default: ``'webmaster@localhost'``
 
-Default e-mail address to use for various automated correspondence from the
+Default email address to use for various automated correspondence from the
 site manager(s).
 
 .. setting:: DEFAULT_INDEX_TABLESPACE
@@ -821,7 +821,7 @@ EMAIL_HOST
 
 Default: ``'localhost'``
 
-The host to use for sending e-mail.
+The host to use for sending email.
 
 See also ``EMAIL_PORT``.
 
@@ -867,7 +867,7 @@ EMAIL_SUBJECT_PREFIX
 
 Default: ``'[Django] '``
 
-Subject-line prefix for e-mail messages sent with ``django.core.mail.mail_admins``
+Subject-line prefix for email messages sent with ``django.core.mail.mail_admins``
 or ``django.core.mail.mail_managers``. You'll probably want to include the
 trailing space.
 
@@ -1028,7 +1028,7 @@ IGNORABLE_404_ENDS
 
 Default: ``('mail.pl', 'mailform.pl', 'mail.cgi', 'mailform.cgi', 'favicon.ico', '.php')``
 
-See also ``IGNORABLE_404_STARTS`` and ``Error reporting via e-mail``.
+See also ``IGNORABLE_404_STARTS`` and ``Error reporting via email``.
 
 .. setting:: IGNORABLE_404_STARTS
 
@@ -1038,7 +1038,7 @@ IGNORABLE_404_STARTS
 Default: ``('/cgi-bin/', '/_vti_bin', '/_vti_inf')``
 
 A tuple of strings that specify beginnings of URLs that should be ignored by
-the 404 e-mailer. See ``SEND_BROKEN_LINK_EMAILS``, ``IGNORABLE_404_ENDS`` and
+the 404 emailer. See ``SEND_BROKEN_LINK_EMAILS``, ``IGNORABLE_404_ENDS`` and
 the :doc:`/howto/error-reporting`.
 
 .. setting:: INSTALLED_APPS
@@ -1433,7 +1433,7 @@ SEND_BROKEN_LINK_EMAILS
 
 Default: ``False``
 
-Whether to send an e-mail to the ``MANAGERS`` each time somebody visits a
+Whether to send an email to the ``MANAGERS`` each time somebody visits a
 Django-powered page that is 404ed with a non-empty referer (i.e., a broken
 link). This is only used if ``CommonMiddleware`` is installed (see
 :doc:`/topics/http/middleware`. See also ``IGNORABLE_404_STARTS``,
@@ -1459,7 +1459,7 @@ SERVER_EMAIL
 
 Default: ``'root@localhost'``
 
-The e-mail address that error messages come from, such as those sent to
+The email address that error messages come from, such as those sent to
 ``ADMINS`` and ``MANAGERS``.
 
 .. setting:: SESSION_COOKIE_AGE

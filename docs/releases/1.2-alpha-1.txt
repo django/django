@@ -202,7 +202,7 @@ deprecated, as described in the :ref:`upgrading notes <ref-csrf-upgrading-notes>
 ------------------
 
 The ``SMTPConnection`` class has been deprecated in favor of a generic
-E-mail backend API. Old code that explicitly instantiated an instance
+Email backend API. Old code that explicitly instantiated an instance
 of an SMTPConnection::
 
     from django.core.mail import SMTPConnection
@@ -211,7 +211,7 @@ of an SMTPConnection::
     connection.send_messages(messages)
 
 should now call :meth:`~django.core.mail.get_connection()` to
-instantiate a generic e-mail connection::
+instantiate a generic email connection::
 
     from django.core.mail import get_connection
     connection = get_connection()
@@ -220,7 +220,7 @@ instantiate a generic e-mail connection::
 
 Depending on the value of the :setting:`EMAIL_BACKEND` setting, this
 may not return an SMTP connection. If you explicitly require an SMTP
-connection with which to send e-mail, you can explicitly request an
+connection with which to send email, you can explicitly request an
 SMTP connection::
 
     from django.core.mail import get_connection
@@ -385,23 +385,23 @@ malicious site in their browser. A related type of attack, 'login
 CSRF', where an attacking site tricks a user's browser into logging
 into a site with someone else's credentials, is also covered.
 
-E-mail Backends
+Email Backends
 ---------------
 
-You can now :ref:`configure the way that Django sends e-mail
-<topic-email-backends>`. Instead of using SMTP to send all e-mail, you
-can now choose a configurable e-mail backend to send messages. If your
+You can now :ref:`configure the way that Django sends email
+<topic-email-backends>`. Instead of using SMTP to send all email, you
+can now choose a configurable email backend to send messages. If your
 hosting provider uses a sandbox or some other non-SMTP technique for
-sending mail, you can now construct an e-mail backend that will allow
+sending mail, you can now construct an email backend that will allow
 Django's standard :doc:`mail sending methods</topics/email>` to use
 those facilities.
 
 This also makes it easier to debug mail sending - Django ships with
-backend implementations that allow you to send e-mail to a
+backend implementations that allow you to send email to a
 :ref:`file<topic-email-file-backend>`, to the
 :ref:`console<topic-email-console-backend>`, or to
 :ref:`memory<topic-email-memory-backend>` - you can even configure all
-e-mail to be :ref:`thrown away<topic-email-dummy-backend>`.
+email to be :ref:`thrown away<topic-email-dummy-backend>`.
 
 Messages Framework
 ------------------

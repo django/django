@@ -45,7 +45,7 @@ of 1.0. This includes these APIs:
     - :doc:`Model definition, managers, querying and transactions
       </topics/db/index>`
 
-    - :doc:`Sending e-mail </topics/email>`.
+    - :doc:`Sending email </topics/email>`.
 
     - :doc:`File handling and storage </topics/files>`
 

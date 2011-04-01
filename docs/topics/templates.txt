@@ -68,7 +68,7 @@ explained later in this document.::
 
     Why use a text-based template instead of an XML-based one (like Zope's
     TAL)? We wanted Django's template language to be usable for more than
-    just XML/HTML templates. At World Online, we use it for e-mails,
+    just XML/HTML templates. At World Online, we use it for emails,
     JavaScript and CSV. You can use the template language for any text-based
     format.
 
@@ -473,7 +473,7 @@ contain data that you *intend* to be rendered as raw HTML, in which case you
 don't want their contents to be escaped. For example, you might store a blob of
 HTML in your database and want to embed that directly into your template. Or,
 you might be using Django's template system to produce text that is *not* HTML
--- like an e-mail message, for instance.
+-- like an email message, for instance.
 
 For individual variables
 ~~~~~~~~~~~~~~~~~~~~~~~~

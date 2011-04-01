@@ -32,7 +32,7 @@ class AdminEmailHandler(logging.Handler):
         logging.Handler.__init__(self)
         self.include_html = include_html
 
-    """An exception log handler that e-mails log entries to site admins.
+    """An exception log handler that emails log entries to site admins.
 
     If the request is passed as the first argument to the log record,
     request data will be provided in the

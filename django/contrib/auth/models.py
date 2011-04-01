@@ -100,7 +100,7 @@ class Group(models.Model):
 
     A user in a group automatically has all the permissions granted to that group. For example, if the group Site editors has the permission can_edit_home_page, any user in that group will have that permission.
 
-    Beyond permissions, groups are a convenient way to categorize users to apply some label, or extended functionality, to them. For example, you could create a group 'Special users', and you could write code that would do special things to those users -- such as giving them access to a members-only portion of your site, or sending them members-only e-mail messages.
+    Beyond permissions, groups are a convenient way to categorize users to apply some label, or extended functionality, to them. For example, you could create a group 'Special users', and you could write code that would do special things to those users -- such as giving them access to a members-only portion of your site, or sending them members-only email messages.
     """
     name = models.CharField(_('name'), max_length=80, unique=True)
     permissions = models.ManyToManyField(Permission, verbose_name=_('permissions'), blank=True)
@@ -115,7 +115,7 @@ class Group(models.Model):
 class UserManager(models.Manager):
     def create_user(self, username, email, password=None):
         """
-        Creates and saves a User with the given username, e-mail and password.
+        Creates and saves a User with the given username, email and password.
         """
         now = datetime.datetime.now()
 
@@ -353,7 +353,7 @@ class User(models.Model):
         return messages
 
     def email_user(self, subject, message, from_email=None):
-        "Sends an e-mail to this User."
+        "Sends an email to this User."
         from django.core.mail import send_mail
         send_mail(subject, message, from_email, [self.email])
 

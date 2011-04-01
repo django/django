@@ -44,7 +44,7 @@ the question on IRC -- visit the `#django IRC channel`_ on the Freenode IRC
 network.
 
 You might notice we have a second mailing list, called django-developers_ --
-but please don't e-mail support questions to this mailing list. This list is
+but please don't email support questions to this mailing list. This list is
 for discussion of the development of Django itself. Asking a tech support
 question there is considered quite impolite.
 

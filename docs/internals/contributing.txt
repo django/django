@@ -113,7 +113,7 @@ following actions:
       security problems immediately.
 
     * Pre-notify everyone we know to be running the affected version(s) of
-      Django. We will send these notifications through private e-mail
+      Django. We will send these notifications through private email
       which will include documentation of the vulnerability, links to the
       relevant patch(es), and a request to keep the vulnerability
       confidential until the official go-public date.
@@ -788,7 +788,7 @@ documentation:
     * **Django** -- when referring to the framework, capitalize Django. It is
       lowercase only in Python code and in the djangoproject.com logo.
 
-    * **e-mail** -- it has a hyphen.
+    * **email** -- no hyphen.
 
     * **MySQL**
 

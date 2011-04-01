@@ -151,7 +151,7 @@ Joseph Kocherhans
 `Gary Wilson`_
     Gary starting contributing patches to Django in 2006 while developing Web
     applications for `The University of Texas`_ (UT).  Since, he has made
-    contributions to the e-mail and forms systems, as well as many other
+    contributions to the email and forms systems, as well as many other
     improvements and code cleanups throughout the code base.
 
     Gary is currently a developer and software engineering graduate student at

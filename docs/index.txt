@@ -159,7 +159,7 @@ The development process
       :doc:`FastCGI/SCGI/AJP <howto/deployment/fastcgi>` |
       :doc:`Apache authentication <howto/apache-auth>` |
       :doc:`Handling static files <howto/static-files>` |
-      :doc:`Tracking code errors by e-mail <howto/error-reporting>`
+      :doc:`Tracking code errors by email <howto/error-reporting>`
 
 Other batteries included
 ========================

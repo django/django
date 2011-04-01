@@ -61,7 +61,7 @@ passing them around at will, because ASCII is a subset of UTF-8.
 Don't be fooled into thinking that if your :setting:`DEFAULT_CHARSET` setting is set
 to something other than ``'utf-8'`` you can use that other encoding in your
 bytestrings! :setting:`DEFAULT_CHARSET` only applies to the strings generated as
-the result of template rendering (and e-mail). Django will always assume UTF-8
+the result of template rendering (and email). Django will always assume UTF-8
 encoding for internal bytestrings. The reason for this is that the
 :setting:`DEFAULT_CHARSET` setting is not actually under your control (if you are the
 application developer). It's under the control of the person installing and
@@ -304,16 +304,16 @@ A couple of tips to remember when writing your own template tags and filters:
       translation objects into strings. It's easier to work solely with Unicode
       strings at that point.
 
-E-mail
+Email
 ======
 
-Django's e-mail framework (in ``django.core.mail``) supports Unicode
+Django's email framework (in ``django.core.mail``) supports Unicode
 transparently. You can use Unicode data in the message bodies and any headers.
-However, you're still obligated to respect the requirements of the e-mail
-specifications, so, for example, e-mail addresses should use only ASCII
+However, you're still obligated to respect the requirements of the email
+specifications, so, for example, email addresses should use only ASCII
 characters.
 
-The following code example demonstrates that everything except e-mail addresses
+The following code example demonstrates that everything except email addresses
 can be non-ASCII::
 
     from django.core.mail import EmailMessage

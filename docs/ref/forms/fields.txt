@@ -27,10 +27,10 @@ exception or returns the clean value::
     u'foo@example.com'
     >>> f.clean(u'foo@example.com')
     u'foo@example.com'
-    >>> f.clean('invalid e-mail address')
+    >>> f.clean('invalid email address')
     Traceback (most recent call last):
     ...
-    ValidationError: [u'Enter a valid e-mail address.']
+    ValidationError: [u'Enter a valid email address.']
 
 Core field arguments
 --------------------
@@ -208,23 +208,23 @@ fields. We've specified ``auto_id=False`` to simplify the output::
     >>> class HelpTextContactForm(forms.Form):
     ...     subject = forms.CharField(max_length=100, help_text='100 characters max.')
     ...     message = forms.CharField()
-    ...     sender = forms.EmailField(help_text='A valid e-mail address, please.')
+    ...     sender = forms.EmailField(help_text='A valid email address, please.')
     ...     cc_myself = forms.BooleanField(required=False)
     >>> f = HelpTextContactForm(auto_id=False)
     >>> print f.as_table()
     <tr><th>Subject:</th><td><input type="text" name="subject" maxlength="100" /><br /><span class="helptext">100 characters max.</span></td></tr>
     <tr><th>Message:</th><td><input type="text" name="message" /></td></tr>
-    <tr><th>Sender:</th><td><input type="text" name="sender" /><br />A valid e-mail address, please.</td></tr>
+    <tr><th>Sender:</th><td><input type="text" name="sender" /><br />A valid email address, please.</td></tr>
     <tr><th>Cc myself:</th><td><input type="checkbox" name="cc_myself" /></td></tr>
     >>> print f.as_ul()
     <li>Subject: <input type="text" name="subject" maxlength="100" /> <span class="helptext">100 characters max.</span></li>
     <li>Message: <input type="text" name="message" /></li>
-    <li>Sender: <input type="text" name="sender" /> A valid e-mail address, please.</li>
+    <li>Sender: <input type="text" name="sender" /> A valid email address, please.</li>
     <li>Cc myself: <input type="checkbox" name="cc_myself" /></li>
     >>> print f.as_p()
     <p>Subject: <input type="text" name="subject" maxlength="100" /> <span class="helptext">100 characters max.</span></p>
     <p>Message: <input type="text" name="message" /></p>
-    <p>Sender: <input type="text" name="sender" /> A valid e-mail address, please.</p>
+    <p>Sender: <input type="text" name="sender" /> A valid email address, please.</p>
     <p>Cc myself: <input type="checkbox" name="cc_myself" /></p>
 
 ``error_messages``
@@ -481,7 +481,7 @@ Takes four optional arguments:
     * Default widget: ``TextInput``
     * Empty value: ``''`` (an empty string)
     * Normalizes to: A Unicode object.
-    * Validates that the given value is a valid e-mail address, using a
+    * Validates that the given value is a valid email address, using a
       moderately complex regular expression.
     * Error message keys: ``required``, ``invalid``
 
@@ -490,7 +490,7 @@ If provided, these arguments ensure that the string is at most or at least the
 given length.
 
 .. versionchanged:: 1.2
-   The EmailField previously did not recognize e-mail addresses as valid that
+   The EmailField previously did not recognize email addresses as valid that
    contained an IDN (Internationalized Domain Name; a domain containing
    unicode characters) domain part. This has now been corrected.
 

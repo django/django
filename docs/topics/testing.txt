@@ -1351,9 +1351,9 @@ Emptying the test outbox
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you use Django's custom ``TestCase`` class, the test runner will clear the
-contents of the test e-mail outbox at the start of each test case.
+contents of the test email outbox at the start of each test case.
 
-For more detail on e-mail services during tests, see `E-mail services`_.
+For more detail on email services during tests, see `Email services`_.
 
 Assertions
 ~~~~~~~~~~
@@ -1463,30 +1463,30 @@ cause of an failure in your test suite.
 
 .. _topics-testing-email:
 
-E-mail services
+Email services
 ---------------
 
-If any of your Django views send e-mail using :doc:`Django's e-mail
-functionality </topics/email>`, you probably don't want to send e-mail each time
+If any of your Django views send email using :doc:`Django's email
+functionality </topics/email>`, you probably don't want to send email each time
 you run a test using that view. For this reason, Django's test runner
-automatically redirects all Django-sent e-mail to a dummy outbox. This lets you
-test every aspect of sending e-mail -- from the number of messages sent to the
+automatically redirects all Django-sent email to a dummy outbox. This lets you
+test every aspect of sending email -- from the number of messages sent to the
 contents of each message -- without actually sending the messages.
 
 The test runner accomplishes this by transparently replacing the normal
 email backend with a testing backend.
-(Don't worry -- this has no effect on any other e-mail senders outside of
+(Don't worry -- this has no effect on any other email senders outside of
 Django, such as your machine's mail server, if you're running one.)
 
 .. currentmodule:: django.core.mail
 
 .. data:: django.core.mail.outbox
 
-During test running, each outgoing e-mail is saved in
+During test running, each outgoing email is saved in
 ``django.core.mail.outbox``. This is a simple list of all
 :class:`~django.core.mail.EmailMessage` instances that have been sent.
 The ``outbox`` attribute is a special attribute that is created *only* when
-the ``locmem`` e-mail backend is used. It doesn't normally exist as part of the
+the ``locmem`` email backend is used. It doesn't normally exist as part of the
 :mod:`django.core.mail` module and you can't import it directly. The code
 below shows how to access this attribute correctly.
 
@@ -1741,7 +1741,7 @@ utility methods in the ``django.test.utils`` module.
 .. function:: teardown_test_environment()
 
     Performs any global post-test teardown, such as removing the black
-    magic hooks into the template system and restoring normal e-mail
+    magic hooks into the template system and restoring normal email
     services.
 
 The creation module of the database backend (``connection.creation``)

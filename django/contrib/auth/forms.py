@@ -109,7 +109,7 @@ class PasswordResetForm(forms.Form):
 
     def clean_email(self):
         """
-        Validates that an active user exists with the given e-mail address.
+        Validates that an active user exists with the given email address.
         """
         email = self.cleaned_data["email"]
         self.users_cache = User.objects.filter(

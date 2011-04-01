@@ -77,7 +77,7 @@ overridden:
     * The Form subclass's ``clean()`` method. This method can perform
       any validation that requires access to multiple fields from the form at
       once. This is where you might put in things to check that if field ``A``
-      is supplied, field ``B`` must contain a valid e-mail address and the
+      is supplied, field ``B`` must contain a valid email address and the
       like. The data that this method returns is the final ``cleaned_data``
       attribute for the form, so don't forget to return the full list of
       cleaned data if you override this method (by default, ``Form.clean()``
@@ -187,12 +187,12 @@ a look at Django's ``EmailField``::
 
     class EmailField(CharField):
         default_error_messages = {
-            'invalid': _(u'Enter a valid e-mail address.'),
+            'invalid': _(u'Enter a valid email address.'),
         }
         default_validators = [validators.validate_email]
 
 As you can see, ``EmailField`` is just a ``CharField`` with customized error
-message and a validator that validates e-mail addresses. This can also be done
+message and a validator that validates email addresses. This can also be done
 on field definition so::
 
     email = forms.EmailField()
@@ -200,14 +200,14 @@ on field definition so::
 is equivalent to::
 
     email = forms.CharField(validators=[validators.validate_email],
-            error_messages={'invalid': _(u'Enter a valid e-mail address.')})
+            error_messages={'invalid': _(u'Enter a valid email address.')})
 
 
 Form field default cleaning
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Let's firstly create a custom form field that validates its input is a string
-containing comma-separated e-mail addresses. The full class looks like this::
+containing comma-separated email addresses. The full class looks like this::
 
     from django import forms
     from django.core.validators import validate_email

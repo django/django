@@ -327,7 +327,7 @@ This logging configuration does the following things:
           message to stdout. This handler uses the `simple` output
           format.
 
-        * ``mail_admins``, an AdminEmailHandler, which will e-mail any
+        * ``mail_admins``, an AdminEmailHandler, which will email any
           ``ERROR`` level message to the site admins. This handler uses
           the ``special`` filter.
 
@@ -347,7 +347,7 @@ This logging configuration does the following things:
           handlers -- the ``console``, and ``mail_admins``. This
           means that all ``INFO`` level messages (or higher) will be
           printed to the console; ``ERROR`` and ``CRITICAL``
-          messages will also be output via e-mail.
+          messages will also be output via email.
 
 .. admonition:: Custom handlers and circular imports
 
@@ -474,17 +474,17 @@ Python logging module.
 
 .. class:: AdminEmailHandler([include_html=False])
 
-    This handler sends an e-mail to the site admins for each log
+    This handler sends an email to the site admins for each log
     message it receives.
 
     If the log record contains a ``request`` attribute, the full details
-    of the request will be included in the e-mail.
+    of the request will be included in the email.
 
     If the log record contains stack trace information, that stack
-    trace will be included in the e-mail.
+    trace will be included in the email.
 
     The ``include_html`` argument of ``AdminEmailHandler`` is used to
-    control whether the traceback e-mail includes an HTML attachment
+    control whether the traceback email includes an HTML attachment
     containing the full content of the debug Web page that would have been
     produced if ``DEBUG`` were ``True``. To set this value in your
     configuration, include it in the handler definition for
@@ -498,12 +498,12 @@ Python logging module.
             }
         },
 
-    Note that this HTML version of the e-mail contains a full traceback,
+    Note that this HTML version of the email contains a full traceback,
     with names and values of local variables at each level of the stack, plus
     the values of your Django settings. This information is potentially very
-    sensitive, and you may not want to send it over e-mail. Consider using
+    sensitive, and you may not want to send it over email. Consider using
     something such as `django-sentry`_ to get the best of both worlds -- the
     rich information of full tracebacks plus the security of *not* sending the
-    information over e-mail.
+    information over email.
 
 .. _django-sentry: http://pypi.python.org/pypi/django-sentry
