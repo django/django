@@ -20,8 +20,6 @@ def add_message(request, level, message, extra_tags='', fail_silently=False):
     """
     if hasattr(request, '_messages'):
         return request._messages.add(level, message, extra_tags)
-    if hasattr(request, 'user') and request.user.is_authenticated():
-        return request.user.message_set.create(message=message)
     if not fail_silently:
         raise MessageFailure('Without the django.contrib.messages '
                                 'middleware, messages can only be added to '

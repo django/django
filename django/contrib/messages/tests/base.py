@@ -60,9 +60,6 @@ class BaseTest(TestCase):
                                               self.storage_class.__name__)
         self.old_TEMPLATE_DIRS = settings.TEMPLATE_DIRS
         settings.TEMPLATE_DIRS = ()
-        self.save_warnings_state()
-        warnings.filterwarnings('ignore', category=DeprecationWarning,
-                                module='django.contrib.auth.models')
 
     def tearDown(self):
         for setting in self.restore_settings:
@@ -74,7 +71,6 @@ class BaseTest(TestCase):
         settings.INSTALLED_APPS = self._installed_apps
         settings.MESSAGE_STORAGE = self._message_storage
         settings.TEMPLATE_DIRS = self.old_TEMPLATE_DIRS
-        self.restore_warnings_state()
 
     def restore_setting(self, setting):
         if setting in self._remembered_settings:
@@ -225,44 +221,6 @@ class BaseTest(TestCase):
         self.assertEqual(list(response.context['messages']), messages)
         for msg in data['messages']:
             self.assertContains(response, msg)
-
-    @skipUnlessAuthIsInstalled
-    def test_middleware_disabled_auth_user(self):
-        """
-        Tests that the messages API successfully falls back to using
-        user.message_set to store messages directly when the middleware is
-        disabled.
-        """
-        settings.MESSAGE_LEVEL = constants.DEBUG
-        user = User.objects.create_user('test', 'test@example.com', 'test')
-        self.client.login(username='test', password='test')
-        settings.INSTALLED_APPS = list(settings.INSTALLED_APPS)
-        settings.INSTALLED_APPS.remove(
-            'django.contrib.messages',
-        )
-        settings.MIDDLEWARE_CLASSES = list(settings.MIDDLEWARE_CLASSES)
-        settings.MIDDLEWARE_CLASSES.remove(
-            'django.contrib.messages.middleware.MessageMiddleware',
-        )
-        settings.TEMPLATE_CONTEXT_PROCESSORS = \
-          list(settings.TEMPLATE_CONTEXT_PROCESSORS)
-        settings.TEMPLATE_CONTEXT_PROCESSORS.remove(
-            'django.contrib.messages.context_processors.messages',
-        )
-        data = {
-            'messages': ['Test message %d' % x for x in xrange(10)],
-        }
-        show_url = reverse('django.contrib.messages.tests.urls.show')
-        for level in ('debug', 'info', 'success', 'warning', 'error'):
-            add_url = reverse('django.contrib.messages.tests.urls.add',
-                              args=(level,))
-            response = self.client.post(add_url, data, follow=True)
-            self.assertRedirects(response, show_url)
-            self.assertTrue('messages' in response.context)
-            context_messages = list(response.context['messages'])
-            for msg in data['messages']:
-                self.assertTrue(msg in context_messages)
-                self.assertContains(response, msg)
 
     def test_middleware_disabled_anon_user(self):
         """

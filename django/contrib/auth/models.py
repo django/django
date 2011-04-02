@@ -345,13 +345,6 @@ class User(models.Model):
 
         return _user_has_module_perms(self, app_label)
 
-    def get_and_delete_messages(self):
-        messages = []
-        for m in self.message_set.all():
-            messages.append(m.message)
-            m.delete()
-        return messages
-
     def email_user(self, subject, message, from_email=None):
         "Sends an email to this User."
         from django.core.mail import send_mail
@@ -386,21 +379,6 @@ class User(models.Model):
                 raise SiteProfileNotAvailable
         return self._profile_cache
 
-
-class Message(models.Model):
-    """
-    The message system is a lightweight way to queue messages for given
-    users. A message is associated with a User instance (so it is only
-    applicable for registered users). There's no concept of expiration or
-    timestamps. Messages are created by the Django admin after successful
-    actions. For example, "The poll Foo was created successfully." is a
-    message.
-    """
-    user = models.ForeignKey(User, related_name='_message_set')
-    message = models.TextField(_('message'))
-
-    def __unicode__(self):
-        return self.message
 
 class AnonymousUser(object):
     id = None

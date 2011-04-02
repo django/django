@@ -83,36 +83,9 @@ Four storage classes are included:
     Since it is uses SessionStorage, it also requires Django's
     ``contrib.sessions`` application.
 
-``'django.contrib.messages.storage.user_messages.LegacyFallbackStorage'``
-    This is the default temporary storage class.
-
-    This class extends FallbackStorage and adds compatibility methods
-    to retrieve any messages stored in the user Message model by code that
-    has not yet been updated to use the new API. This storage is temporary
-    (because it makes use of code that is pending deprecation) and will be
-    removed in Django 1.4. At that time, the default storage will become
-    ``django.contrib.messages.storage.fallback.FallbackStorage``. For more
-    information, see `LegacyFallbackStorage`_ below.
-
 To write your own storage class, subclass the ``BaseStorage`` class in
 ``django.contrib.messages.storage.base`` and implement the ``_get`` and
 ``_store`` methods.
-
-LegacyFallbackStorage
-^^^^^^^^^^^^^^^^^^^^^
-
-The ``LegacyFallbackStorage`` is a temporary tool to facilitate the transition
-from the deprecated ``user.message_set`` API and will be removed in Django 1.4
-according to Django's standard deprecation policy. For more information, see
-the full :doc:`release process documentation </internals/release-process>`.
-
-In addition to the functionality in the ``FallbackStorage``, it adds a custom,
-read-only storage class that retrieves messages from the user ``Message``
-model. Any messages that were stored in the ``Message`` model (e.g., by code
-that has not yet been updated to use the messages framework) will be retrieved
-first, followed by those stored in a cookie and in the session, if any. Since
-messages stored in the ``Message`` model do not have a concept of levels, they
-will be assigned the ``INFO`` level by default.
 
 Message levels
 --------------
@@ -368,14 +341,13 @@ This sets the minimum message that will be saved in the message storage. See
 MESSAGE_STORAGE
 ---------------
 
-Default: ``'django.contrib.messages.storage.user_messages.LegacyFallbackStorage'``
+Default: ``'django.contrib.messages.storage.user_messages.FallbackStorage'``
 
 Controls where Django stores message data. Valid values are:
 
     * ``'django.contrib.messages.storage.fallback.FallbackStorage'``
     * ``'django.contrib.messages.storage.session.SessionStorage'``
     * ``'django.contrib.messages.storage.cookie.CookieStorage'``
-    * ``'django.contrib.messages.storage.user_messages.LegacyFallbackStorage'``
 
 See `Storage backends`_ for more details.
 

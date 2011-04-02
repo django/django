@@ -502,7 +502,7 @@ CSRF_COOKIE_DOMAIN = None
 ############
 
 # Class to use as messges backend
-MESSAGE_STORAGE = 'django.contrib.messages.storage.user_messages.LegacyFallbackStorage'
+MESSAGE_STORAGE = 'django.contrib.messages.storage.fallback.FallbackStorage'
 
 # Default values of MESSAGE_LEVEL and MESSAGE_TAGS are defined within
 # django.contrib.messages to avoid imports in this settings file.
