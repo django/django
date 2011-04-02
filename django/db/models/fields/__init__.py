@@ -1128,14 +1128,3 @@ class URLField(CharField):
         }
         defaults.update(kwargs)
         return super(URLField, self).formfield(**defaults)
-
-class XMLField(TextField):
-    description = _("XML text")
-
-    def __init__(self, verbose_name=None, name=None, schema_path=None, **kwargs):
-        import warnings
-        warnings.warn("Use of XMLField has been deprecated; please use TextField instead.",
-                      DeprecationWarning)
-        self.schema_path = schema_path
-        Field.__init__(self, verbose_name, name, **kwargs)
-
