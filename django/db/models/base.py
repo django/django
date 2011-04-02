@@ -389,7 +389,7 @@ class Model(object):
 
     def __reduce__(self):
         """
-        Provide pickling support. Normally, this just dispatches to Python's
+        Provides pickling support. Normally, this just dispatches to Python's
         standard handling. However, for models with deferred field loading, we
         need to do things manually, as they're dynamically created classes and
         only module-level classes can be pickled by the default path.
