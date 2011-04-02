@@ -128,6 +128,7 @@ class BaseMemcachedCache(BaseCache):
 
 class CacheClass(BaseMemcachedCache):
     def __init__(self, server, params):
+        import warnings
         warnings.warn(
             "memcached.CacheClass has been split into memcached.MemcachedCache and memcached.PyLibMCCache. Please update your cache backend setting.",
             PendingDeprecationWarning
