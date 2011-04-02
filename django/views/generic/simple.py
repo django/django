@@ -5,7 +5,7 @@ from django.utils.log import getLogger
 import warnings
 warnings.warn(
     'Function-based generic views have been deprecated; use class-based views instead.',
-    PendingDeprecationWarning
+    DeprecationWarning
 )
 
 logger = getLogger('django.request')

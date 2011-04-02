@@ -10,7 +10,7 @@ from django.http import Http404, HttpResponse
 import warnings
 warnings.warn(
     'Function-based generic views have been deprecated; use class-based views instead.',
-    PendingDeprecationWarning
+    DeprecationWarning
 )
 
 

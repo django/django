@@ -7,7 +7,7 @@ from django.core.exceptions import ObjectDoesNotExist
 import warnings
 warnings.warn(
     'Function-based generic views have been deprecated; use class-based views instead.',
-    PendingDeprecationWarning
+    DeprecationWarning
 )
 
 

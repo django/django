@@ -11,7 +11,7 @@ from django.contrib import messages
 import warnings
 warnings.warn(
     'Function-based generic views have been deprecated; use class-based views instead.',
-    PendingDeprecationWarning
+    DeprecationWarning
 )
 
 
