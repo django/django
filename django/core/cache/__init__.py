@@ -80,7 +80,7 @@ if not settings.CACHES:
         import warnings
         warnings.warn(
             "settings.CACHE_* is deprecated; use settings.CACHES instead.",
-            PendingDeprecationWarning
+            DeprecationWarning
         )
     else:
         # The default cache setting is put here so that we

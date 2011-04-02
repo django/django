@@ -186,6 +186,12 @@ their deprecation, as per the :ref:`Django deprecation policy
           synonym for ``django.views.decorators.csrf.csrf_exempt``, which should
           be used to replace it.
 
+        * The :class:`~django.core.cache.backends.memcached.CacheClass` backend
+          was split into two in Django 1.3 in order to introduce support for
+          PyLibMC. The historical :class:`~django.core.cache.backends.memcached.CacheClass`
+          is now an alias for :class:`~django.core.cache.backends.memcached.MemcachedCache`.
+          In Django 1.6, the historical alias will be removed.
+
     * 2.0
         * ``django.views.defaults.shortcut()``. This function has been moved
           to ``django.contrib.contenttypes.views.shortcut()`` as part of the
