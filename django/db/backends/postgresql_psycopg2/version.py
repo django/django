@@ -12,6 +12,7 @@ import re
 #   PostgreSQL 8.4beta1
 VERSION_RE = re.compile(r'\S+ (\d+)\.(\d+)\.?(\d+)?')
 
+
 def _parse_version(text):
     "Internal parsing method. Factored out for testing purposes."
     major, major2, minor = VERSION_RE.search(text).groups()

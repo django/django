@@ -1,6 +1,7 @@
 from django.db.backends.creation import BaseDatabaseCreation
 from django.db.backends.util import truncate_name
 
+
 class DatabaseCreation(BaseDatabaseCreation):
     # This dictionary maps Field objects to their associated PostgreSQL column
     # types, as strings. Column-type strings can contain format strings; they'll

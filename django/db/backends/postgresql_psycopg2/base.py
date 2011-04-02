@@ -9,10 +9,10 @@ import sys
 from django.db import utils
 from django.db.backends import *
 from django.db.backends.signals import connection_created
-from django.db.backends.postgresql.operations import DatabaseOperations as PostgresqlDatabaseOperations
-from django.db.backends.postgresql.client import DatabaseClient
-from django.db.backends.postgresql.creation import DatabaseCreation
-from django.db.backends.postgresql.version import get_version
+from django.db.backends.postgresql_psycopg2.operations import DatabaseOperations
+from django.db.backends.postgresql_psycopg2.client import DatabaseClient
+from django.db.backends.postgresql_psycopg2.creation import DatabaseCreation
+from django.db.backends.postgresql_psycopg2.version import get_version
 from django.db.backends.postgresql_psycopg2.introspection import DatabaseIntrospection
 from django.utils.safestring import SafeUnicode, SafeString
 
@@ -70,16 +70,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     requires_rollback_on_dirty_transaction = True
     has_real_datatype = True
     can_defer_constraint_checks = True
-
-class DatabaseOperations(PostgresqlDatabaseOperations):
-    def last_executed_query(self, cursor, sql, params):
-        # With psycopg2, cursor objects have a "query" attribute that is the
-        # exact query sent to the database. See docs here:
-        # http://www.initd.org/tracker/psycopg/wiki/psycopg2_documentation#postgresql-status-message-and-executed-query
-        return cursor.query
-
-    def return_insert_id(self):
-        return "RETURNING %s", ()
 
 class DatabaseWrapper(BaseDatabaseWrapper):
     vendor = 'postgresql'
