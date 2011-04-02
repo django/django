@@ -3,6 +3,7 @@
 Regression tests for the Test Client, especially the customized assertions.
 """
 import os
+import warnings
 
 from django.conf import settings
 from django.core.exceptions import SuspiciousOperation
@@ -883,6 +884,14 @@ class ResponseTemplateDeprecationTests(TestCase):
     Response.template still works backwards-compatibly, but with pending deprecation warning. Refs #12226.
 
     """
+    def setUp(self):
+        self.save_warnings_state()
+        warnings.filterwarnings('ignore', category=DeprecationWarning,
+                                module='django.test.client')
+
+    def tearDown(self):
+        self.restore_warnings_state()
+
     def test_response_template_data(self):
         response = self.client.get("/test_client_regress/request_data/", data={'foo':'whiz'})
         self.assertEqual(response.template.__class__, Template)
