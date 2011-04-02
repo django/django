@@ -55,7 +55,7 @@ class Trans(object):
                     warnings.warn("Translations in the project directory "
                                   "aren't supported anymore. Use the "
                                   "LOCALE_PATHS setting instead.",
-                                  PendingDeprecationWarning)
+                                  DeprecationWarning)
         else:
             from django.utils.translation import trans_null as trans
         setattr(self, real_name, getattr(trans, real_name))

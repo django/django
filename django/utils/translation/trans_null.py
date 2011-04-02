@@ -58,21 +58,3 @@ def to_locale(language):
 
 def get_language_from_request(request):
     return settings.LANGUAGE_CODE
-
-# get_date_formats and get_partial_date_formats aren't used anymore by Django
-# but are kept for backward compatibility.
-def get_date_formats():
-    warnings.warn(
-        '`django.utils.translation.get_date_formats` is deprecated. '
-        'Please update your code to use the new i18n aware formatting.',
-        DeprecationWarning
-    )
-    return settings.DATE_FORMAT, settings.DATETIME_FORMAT, settings.TIME_FORMAT
-
-def get_partial_date_formats():
-    warnings.warn(
-        '`django.utils.translation.get_partial_date_formats` is deprecated. '
-        'Please update your code to use the new i18n aware formatting.',
-        DeprecationWarning
-    )
-    return settings.YEAR_MONTH_FORMAT, settings.MONTH_DAY_FORMAT
