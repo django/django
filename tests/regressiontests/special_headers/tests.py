@@ -1,13 +1,23 @@
+import warnings
+
 from django.test import TestCase
 from django.contrib.auth.models import User
+
 
 class SpecialHeadersTest(TestCase):
     fixtures = ['data.xml']
 
+    def setUp(self):
+        self.save_warnings_state()
+        warnings.filterwarnings('ignore', category=DeprecationWarning,
+                                module='django.views.generic.list_detail')
+
+    def tearDown(self):
+        self.restore_warnings_state()
+
     def test_xheaders(self):
         user = User.objects.get(username='super')
         response = self.client.get('/special_headers/article/1/')
-        # import pdb; pdb.set_trace()
         self.assertFalse('X-Object-Type' in response)
         self.client.login(username='super', password='secret')
         response = self.client.get('/special_headers/article/1/')
