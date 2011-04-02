@@ -886,8 +886,7 @@ class ResponseTemplateDeprecationTests(TestCase):
     """
     def setUp(self):
         self.save_warnings_state()
-        warnings.filterwarnings('ignore', category=DeprecationWarning,
-                                module='django.test.client')
+        warnings.filterwarnings('ignore', category=DeprecationWarning)
 
     def tearDown(self):
         self.restore_warnings_state()
