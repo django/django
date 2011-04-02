@@ -1,9 +1,11 @@
 import os
+import warnings
 
 from django import forms, http
 from django.conf import settings
 from django.contrib.formtools import preview, wizard, utils
 from django.test import TestCase
+from django.test.utils import get_warnings_state, restore_warnings_state
 from django.utils import unittest
 
 
@@ -32,11 +34,18 @@ class PreviewTests(TestCase):
     urls = 'django.contrib.formtools.tests.urls'
 
     def setUp(self):
+        self.save_warnings_state()
+        warnings.filterwarnings('ignore', category=DeprecationWarning,
+                                module='django.contrib.formtools.utils')
+
         # Create a FormPreview instance to share between tests
         self.preview = preview.FormPreview(TestForm)
         input_template = '<input type="hidden" name="%s" value="%s" />'
         self.input = input_template % (self.preview.unused_name('stage'), "%d")
         self.test_data = {'field1':u'foo', 'field1_':u'asdf'}
+
+    def tearDown(self):
+        self.restore_warnings_state()
 
     def test_unused_name(self):
         """
@@ -150,6 +159,13 @@ class PreviewTests(TestCase):
 
 
 class SecurityHashTests(unittest.TestCase):
+    def setUp(self):
+        self._warnings_state = get_warnings_state()
+        warnings.filterwarnings('ignore', category=DeprecationWarning,
+                                module='django.contrib.formtools.utils')
+
+    def tearDown(self):
+        restore_warnings_state(self._warnings_state)
 
     def test_textfield_hash(self):
         """
