@@ -187,12 +187,6 @@ def activate(language):
     language and installs it as the current translation object for the current
     thread.
     """
-    if isinstance(language, basestring) and language == 'no':
-        warnings.warn(
-            "The use of the language code 'no' is deprecated. "
-            "Please use the 'nb' translation instead.",
-            DeprecationWarning
-        )
     _active.value = translation(language)
 
 def deactivate():

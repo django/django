@@ -84,7 +84,6 @@ LANGUAGES = (
     ('ml', gettext_noop('Malayalam')),
     ('mn', gettext_noop('Mongolian')),
     ('nl', gettext_noop('Dutch')),
-    ('no', gettext_noop('Norwegian')),
     ('nb', gettext_noop('Norwegian Bokmal')),
     ('nn', gettext_noop('Norwegian Nynorsk')),
     ('pa', gettext_noop('Punjabi')),
