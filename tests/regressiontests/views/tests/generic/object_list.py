@@ -5,10 +5,12 @@ from django.test import TestCase
 
 class ObjectListTest(TestCase):
     fixtures = ['testdata.json']
+    urls = 'regressiontests.views.generic_urls'
+
     def setUp(self):
         self.save_warnings_state()
         warnings.filterwarnings('ignore', category=DeprecationWarning,
-                                module='django.views.generic.object_list')
+                                module='django.views.generic.list_detail')
 
     def tearDown(self):
         self.restore_warnings_state()
@@ -26,20 +28,20 @@ class ObjectListTest(TestCase):
 
     def test_finds_pages(self):
         # Check page count doesn't start at 0.
-        self.check_pagination('/views/object_list/page0/', 404)
+        self.check_pagination('/object_list/page0/', 404)
 
         # Check basic pages.
-        self.check_pagination('/views/object_list/page/', 200, 2)
-        self.check_pagination('/views/object_list/page1/', 200, 2)
-        self.check_pagination('/views/object_list/page2/', 200, 1)
-        self.check_pagination('/views/object_list/page3/', 404)
+        self.check_pagination('/object_list/page/', 200, 2)
+        self.check_pagination('/object_list/page1/', 200, 2)
+        self.check_pagination('/object_list/page2/', 200, 1)
+        self.check_pagination('/object_list/page3/', 404)
 
         # Check the special "last" page.
-        self.check_pagination('/views/object_list/pagelast/', 200, 1)
-        self.check_pagination('/views/object_list/pagenotlast/', 404)
+        self.check_pagination('/object_list/pagelast/', 200, 1)
+        self.check_pagination('/object_list/pagenotlast/', 404)
 
     def test_no_paginate_by(self):
         # Ensure that the view isn't paginated by default.
-        url = '/views/object_list_no_paginate_by/page1/'
+        url = '/object_list_no_paginate_by/page1/'
         response = self.check_pagination(url, 200)
         self.assertEqual(response.context['is_paginated'], False)

@@ -32,7 +32,7 @@ def custom_create(request):
 
     from django.views.generic.create_update import create_object
     return create_object(request,
-        post_save_redirect='/views/create_update/view/article/%(slug)s/',
+        post_save_redirect='/create_update/view/article/%(slug)s/',
         form_class=SlugChangingArticleForm)
 
 def raises(request):

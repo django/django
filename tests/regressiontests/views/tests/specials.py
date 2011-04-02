@@ -1,11 +1,23 @@
 # coding: utf-8
+import warnings 
+
 from django.test import TestCase
+
 
 class URLHandling(TestCase):
     """
     Tests for URL handling in views and responses.
     """
-    redirect_target = "/views/%E4%B8%AD%E6%96%87/target/"
+    urls = 'regressiontests.views.generic_urls'
+    redirect_target = "/%E4%B8%AD%E6%96%87/target/"
+
+    def setUp(self):
+        self.save_warnings_state()
+        warnings.filterwarnings('ignore', category=DeprecationWarning,
+                                module='django.views.generic.simple')
+
+    def tearDown(self):
+        self.restore_warnings_state()
 
     def test_combining_redirect(self):
         """
@@ -15,14 +27,14 @@ class URLHandling(TestCase):
         characters so this test ensures the creation of the full path with a
         base non-ASCII part is handled correctly.
         """
-        response = self.client.get(u'/views/中文/')
+        response = self.client.get(u'/中文/')
         self.assertRedirects(response, self.redirect_target)
 
     def test_nonascii_redirect(self):
         """
         Tests that a non-ASCII argument to HttpRedirect is handled properly.
         """
-        response = self.client.get('/views/nonascii_redirect/')
+        response = self.client.get('/nonascii_redirect/')
         self.assertRedirects(response, self.redirect_target)
 
     def test_permanent_nonascii_redirect(self):
@@ -30,6 +42,6 @@ class URLHandling(TestCase):
         Tests that a non-ASCII argument to HttpPermanentRedirect is handled
         properly.
         """
-        response = self.client.get('/views/permanent_nonascii_redirect/')
+        response = self.client.get('/permanent_nonascii_redirect/')
         self.assertRedirects(response, self.redirect_target, status_code=301)
 

@@ -1,6 +1,5 @@
 import inspect
 import sys
-import warnings
 
 from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -14,16 +13,6 @@ from regressiontests.views import BrokenException, except_args
 
 class DebugViewTests(TestCase):
     def setUp(self):
-        self.save_warnings_state()
-        warnings.filterwarnings('ignore', category=DeprecationWarning,
-                                module='django.views.generic.simple')
-        warnings.filterwarnings('ignore', category=DeprecationWarning,
-                                module='django.views.generic.create_update')
-        warnings.filterwarnings('ignore', category=DeprecationWarning,
-                                module='django.views.generic.date_based')
-        warnings.filterwarnings('ignore', category=DeprecationWarning,
-                                module='django.views.generic.list_detail')
-
         self.old_debug = settings.DEBUG
         settings.DEBUG = True
         self.old_template_debug = settings.TEMPLATE_DEBUG
@@ -32,7 +21,6 @@ class DebugViewTests(TestCase):
     def tearDown(self):
         settings.DEBUG = self.old_debug
         settings.TEMPLATE_DEBUG = self.old_template_debug
-        self.restore_warnings_state()
 
     def test_files(self):
         response = self.client.get('/views/raises/')
