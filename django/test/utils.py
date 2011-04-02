@@ -67,9 +67,6 @@ def setup_test_environment():
     Template.original_render = Template._render
     Template._render = instrumented_test_render
 
-    mail.original_SMTPConnection = mail.SMTPConnection
-    mail.SMTPConnection = locmem.EmailBackend
-
     mail.original_email_backend = settings.EMAIL_BACKEND
     settings.EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
 
@@ -87,9 +84,6 @@ def teardown_test_environment():
     """
     Template._render = Template.original_render
     del Template.original_render
-
-    mail.SMTPConnection = mail.original_SMTPConnection
-    del mail.original_SMTPConnection
 
     settings.EMAIL_BACKEND = mail.original_email_backend
     del mail.original_email_backend
