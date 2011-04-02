@@ -115,7 +115,7 @@ class CompatCookie(SimpleCookie):
         super(CompatCookie, self).__init__(*args, **kwargs)
         import warnings
         warnings.warn("CompatCookie is deprecated, use django.http.SimpleCookie instead.",
-                      PendingDeprecationWarning)
+                      DeprecationWarning)
 
 from django.utils.datastructures import MultiValueDict, ImmutableList
 from django.utils.encoding import smart_str, iri_to_uri, force_unicode
