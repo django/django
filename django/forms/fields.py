@@ -43,16 +43,6 @@ __all__ = (
     'TypedChoiceField', 'TypedMultipleChoiceField'
 )
 
-def en_format(name):
-    """
-    Helper function to stay backward compatible.
-    """
-    from django.conf.locale.en import formats
-    warnings.warn(
-        "`django.forms.fields.DEFAULT_%s` is deprecated; use `django.utils.formats.get_format('%s')` instead." % (name, name),
-        DeprecationWarning
-    )
-    return getattr(formats, name)
 
 DEFAULT_DATE_INPUT_FORMATS = lazy(lambda: en_format('DATE_INPUT_FORMATS'), tuple, list)()
 DEFAULT_TIME_INPUT_FORMATS = lazy(lambda: en_format('TIME_INPUT_FORMATS'), tuple, list)()
