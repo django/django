@@ -2,12 +2,22 @@
 Tests for django test runner
 """
 import StringIO
+import warnings
 
 from django.core.exceptions import ImproperlyConfigured
 from django.test import simple
+from django.test.utils import get_warnings_state, restore_warnings_state
 from django.utils import unittest
 
+
 class DjangoTestRunnerTests(unittest.TestCase):
+    def setUp(self):
+        self._warnings_state = get_warnings_state()
+        warnings.filterwarnings('ignore', category=DeprecationWarning,
+                                module='django.test.simple')
+
+    def tearDown(self):
+        restore_warnings_state(self._warnings_state)
 
     def test_failfast(self):
         class MockTestOne(unittest.TestCase):
