@@ -102,7 +102,7 @@ def sql_reset(app, style, connection):
     import warnings
     warnings.warn(
         'This command has been deprecated. The command ``sqlflush`` can be used to delete everything. You can also use ALTER TABLE or DROP TABLE statements manually.',
-        PendingDeprecationWarning
+        DeprecationWarning
     )
     return sql_delete(app, style, connection) + sql_all(app, style, connection)
 

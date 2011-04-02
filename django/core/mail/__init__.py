@@ -107,13 +107,3 @@ def mail_managers(subject, message, fail_silently=False, connection=None,
     if html_message:
         mail.attach_alternative(html_message, 'text/html')
     mail.send(fail_silently=fail_silently)
-
-
-class SMTPConnection(_SMTPConnection):
-    def __init__(self, *args, **kwds):
-        import warnings
-        warnings.warn(
-            'mail.SMTPConnection is deprecated; use mail.get_connection() instead.',
-            DeprecationWarning
-        )
-        super(SMTPConnection, self).__init__(*args, **kwds)

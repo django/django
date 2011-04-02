@@ -24,7 +24,7 @@ class Command(AppCommand):
         import warnings
         warnings.warn(
             'This command has been deprecated. The command ``flush`` can be used to delete everything. You can also use ALTER TABLE or DROP TABLE statements manually.',
-            PendingDeprecationWarning
+            DeprecationWarning
         )
         using = options.get('database', DEFAULT_DB_ALIAS)
         connection = connections[using]

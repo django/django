@@ -160,7 +160,7 @@ class ModPythonHandler(BaseHandler):
 
     def __call__(self, req):
         warn(('The mod_python handler is deprecated; use a WSGI or FastCGI server instead.'),
-             PendingDeprecationWarning)
+             DeprecationWarning)
 
         # mod_python fakes the environ, and thus doesn't process SetEnv.  This fixes that
         os.environ.update(req.subprocess_env)

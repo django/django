@@ -23,18 +23,8 @@ class Command(BaseCommand):
         failfast = options.get('failfast', False)
         TestRunner = get_runner(settings)
 
-        if hasattr(TestRunner, 'func_name'):
-            # Pre 1.2 test runners were just functions,
-            # and did not support the 'failfast' option.
-            import warnings
-            warnings.warn(
-                'Function-based test runners are deprecated. Test runners should be classes with a run_tests() method.',
-                DeprecationWarning
-            )
-            failures = TestRunner(test_labels, verbosity=verbosity, interactive=interactive)
-        else:
-            test_runner = TestRunner(verbosity=verbosity, interactive=interactive, failfast=failfast)
-            failures = test_runner.run_tests(test_labels)
+        test_runner = TestRunner(verbosity=verbosity, interactive=interactive, failfast=failfast)
+        failures = test_runner.run_tests(test_labels)
 
         if failures:
             sys.exit(bool(failures))
