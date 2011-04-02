@@ -6,7 +6,6 @@ from django.core.urlresolvers import get_resolver
 from django.shortcuts import render_to_response, render
 from django.template import Context, RequestContext, TemplateDoesNotExist
 from django.views.debug import technical_500_response
-from django.views.generic.create_update import create_object
 
 from regressiontests.views import BrokenException, except_args
 
@@ -31,6 +30,7 @@ def custom_create(request):
             self.instance.slug = 'some-other-slug'
             return super(SlugChangingArticleForm, self).save(*args, **kwargs)
 
+    from django.views.generic.create_update import create_object
     return create_object(request,
         post_save_redirect='/views/create_update/view/article/%(slug)s/',
         form_class=SlugChangingArticleForm)

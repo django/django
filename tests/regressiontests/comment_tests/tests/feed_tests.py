@@ -17,17 +17,3 @@ class CommentFeedTests(CommentTestCase):
         self.assertContains(response, '<title>example.com comments</title>')
         self.assertContains(response, '<link>http://example.com/</link>')
         self.assertContains(response, '</rss>')
-
-
-class LegacyCommentFeedTests(CommentFeedTests):
-    feed_url = '/rss/legacy/comments/'
-
-    def setUp(self):
-        self._warnings_state = get_warnings_state()
-        warnings.filterwarnings("ignore", category=DeprecationWarning,
-                                module='django.contrib.syndication.views')
-        warnings.filterwarnings("ignore", category=DeprecationWarning,
-                                module='django.contrib.syndication.feeds')
-
-    def tearDown(self):
-        restore_warnings_state(self._warnings_state)

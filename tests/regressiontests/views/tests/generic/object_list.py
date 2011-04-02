@@ -1,8 +1,17 @@
+import warnings
+
 from django.test import TestCase
 
 
 class ObjectListTest(TestCase):
     fixtures = ['testdata.json']
+    def setUp(self):
+        self.save_warnings_state()
+        warnings.filterwarnings('ignore', category=DeprecationWarning,
+                                module='django.views.generic.object_list')
+
+    def tearDown(self):
+        self.restore_warnings_state()
 
     def check_pagination(self, url, expected_status_code, object_count=None):
         response = self.client.get(url)

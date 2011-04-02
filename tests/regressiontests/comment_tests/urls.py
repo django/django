@@ -13,6 +13,5 @@ urlpatterns = patterns('regressiontests.comment_tests.custom_comments.views',
 )
 
 urlpatterns += patterns('',
-    (r'^rss/legacy/(?P<url>.*)/$', 'django.contrib.syndication.views.feed', {'feed_dict': feeds}),
     (r'^rss/comments/$', LatestCommentFeed()),
 )

@@ -1,4 +1,5 @@
 import datetime
+import warnings
 
 from django.test import TestCase
 from django.core.exceptions import ImproperlyConfigured
@@ -7,6 +8,14 @@ from regressiontests.views.models import Article, UrlArticle
 class CreateObjectTest(TestCase):
 
     fixtures = ['testdata.json']
+
+    def setUp(self):
+        self.save_warnings_state()
+        warnings.filterwarnings('ignore', category=DeprecationWarning,
+                                module='django.views.generic.create_update')
+
+    def tearDown(self):
+        self.restore_warnings_state()
 
     def test_login_required_view(self):
         """
@@ -69,6 +78,14 @@ class UpdateDeleteObjectTest(TestCase):
 
     fixtures = ['testdata.json']
 
+    def setUp(self):
+        self.save_warnings_state()
+        warnings.filterwarnings('ignore', category=DeprecationWarning,
+                                module='django.views.generic.create_update')
+
+    def tearDown(self):
+        self.restore_warnings_state()
+
     def test_update_object_form_display(self):
         """
         Verifies that the form was created properly and with initial values.
@@ -129,6 +146,14 @@ class PostSaveRedirectTests(TestCase):
     update_redirect = '/views/create_update/view/article/another-article-slug/'
     delete_redirect = '/views/create_update/'
 
+    def setUp(self):
+        self.save_warnings_state()
+        warnings.filterwarnings('ignore', category=DeprecationWarning,
+                                module='django.views.generic.create_update')
+
+    def tearDown(self):
+        self.restore_warnings_state()
+
     def test_create_article(self):
         num_articles = self.article_model.objects.count()
         response = self.client.post(self.create_url, {
@@ -173,6 +198,14 @@ class NoPostSaveNoAbsoluteUrl(PostSaveRedirectTests):
     create_url = '/views/create_update/no_redirect/create/article/'
     update_url = '/views/create_update/no_redirect/update/article/old_article/'
 
+    def setUp(self):
+        self.save_warnings_state()
+        warnings.filterwarnings('ignore', category=DeprecationWarning,
+                                module='django.views.generic.create_update')
+
+    def tearDown(self):
+        self.restore_warnings_state()
+
     def test_create_article(self):
         self.assertRaises(ImproperlyConfigured,
             super(NoPostSaveNoAbsoluteUrl, self).test_create_article)
@@ -202,6 +235,14 @@ class AbsoluteUrlNoPostSave(PostSaveRedirectTests):
 
     create_redirect = '/urlarticles/my-first-article/'
     update_redirect = '/urlarticles/another-article-slug/'
+
+    def setUp(self):
+        self.save_warnings_state()
+        warnings.filterwarnings('ignore', category=DeprecationWarning,
+                                module='django.views.generic.create_update')
+
+    def tearDown(self):
+        self.restore_warnings_state()
 
     def test_delete_article(self):
         """

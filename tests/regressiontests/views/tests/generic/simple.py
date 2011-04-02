@@ -1,8 +1,17 @@
 # coding: utf-8
+import warnings
 
 from django.test import TestCase
 
 class RedirectToTest(TestCase):
+    def setUp(self):
+        self.save_warnings_state()
+        warnings.filterwarnings('ignore', category=DeprecationWarning,
+                                module='django.views.generic.simple')
+
+    def tearDown(self):
+        self.restore_warnings_state()
+
     def test_redirect_to_returns_permanent_redirect(self):
         "simple.redirect_to returns a permanent redirect (301) by default"
         response = self.client.get('/views/simple/redirect_to/')

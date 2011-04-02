@@ -12,7 +12,7 @@ class CZLocalFlavorTests(LocalFlavorTestCase):
         self.save_warnings_state()
         warnings.filterwarnings(
             "ignore",
-            category=PendingDeprecationWarning,
+            category=DeprecationWarning,
             module='django.contrib.localflavor.cz.forms'
         )
 

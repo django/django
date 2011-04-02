@@ -57,33 +57,6 @@ def create_egg(name, resources):
     egg._resources = resources
     sys.modules[name] = egg
 
-class DeprecatedEggLoaderTest(unittest.TestCase):
-    "Test the deprecated load_template_source interface to the egg loader"
-    def setUp(self):
-        pkg_resources._provider_factories[MockLoader] = MockProvider
-
-        self.empty_egg = create_egg("egg_empty", {})
-        self.egg_1 = create_egg("egg_1", {
-            os.path.normcase('templates/y.html') : StringIO.StringIO("y"),
-            os.path.normcase('templates/x.txt') : StringIO.StringIO("x"),
-        })
-        self._old_installed_apps = settings.INSTALLED_APPS
-        settings.INSTALLED_APPS = []
-        self._warnings_state = get_warnings_state()
-        warnings.filterwarnings("ignore", category=DeprecationWarning,
-                                module='django.template.loaders.eggs')
-
-    def tearDown(self):
-        settings.INSTALLED_APPS = self._old_installed_apps
-        restore_warnings_state(self._warnings_state)
-
-    def test_existing(self):
-        "A template can be loaded from an egg"
-        settings.INSTALLED_APPS = ['egg_1']
-        contents, template_name = lts_egg("y.html")
-        self.assertEqual(contents, "y")
-        self.assertEqual(template_name, "egg:egg_1:templates/y.html")
-
 
 class EggLoaderTest(unittest.TestCase):
     def setUp(self):

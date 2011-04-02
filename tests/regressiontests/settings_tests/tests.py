@@ -30,7 +30,7 @@ class TrailingSlashURLTests(unittest.TestCase):
 
     def test_blank(self):
         """
-        If blank, no PendingDeprecationWarning error will be raised, even though it
+        If blank, no DeprecationWarning error will be raised, even though it
         doesn't end in a slash.
         """
         self.settings_module.MEDIA_URL = ''
@@ -49,19 +49,19 @@ class TrailingSlashURLTests(unittest.TestCase):
 
     def test_no_end_slash(self):
         """
-        MEDIA_URL raises an PendingDeprecationWarning error if it doesn't end in a
+        MEDIA_URL raises an DeprecationWarning error if it doesn't end in a
         slash.
         """
         import warnings
-        warnings.filterwarnings('error', 'If set, MEDIA_URL must end with a slash', PendingDeprecationWarning)
+        warnings.filterwarnings('error', 'If set, MEDIA_URL must end with a slash', DeprecationWarning)
 
         def setattr_settings(settings_module, attr, value):
             setattr(settings_module, attr, value)
 
-        self.assertRaises(PendingDeprecationWarning, setattr_settings,
+        self.assertRaises(DeprecationWarning, setattr_settings,
                           self.settings_module, 'MEDIA_URL', '/foo')
 
-        self.assertRaises(PendingDeprecationWarning, setattr_settings,
+        self.assertRaises(DeprecationWarning, setattr_settings,
                           self.settings_module, 'MEDIA_URL',
                           'http://media.foo.com')
 

@@ -50,14 +50,6 @@ class CsrfViewMiddlewareTest(TestCase):
     _csrf_id_cookie = "<1>\xc2\xa1"
     _csrf_id = "1"
 
-    def setUp(self):
-        self.save_warnings_state()
-        warnings.filterwarnings('ignore', category=DeprecationWarning,
-                                module='django.middleware.csrf')
-
-    def tearDown(self):
-        self.restore_warnings_state()
-
     def _get_GET_no_csrf_cookie_request(self):
         return TestingHttpRequest()
 

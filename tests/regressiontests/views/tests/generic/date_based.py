@@ -1,4 +1,6 @@
 # coding: utf-8
+import warnings
+
 from django.test import TestCase
 from datetime import datetime, date
 from datetime import timedelta
@@ -7,10 +9,16 @@ from regressiontests.views.models import Article, Author, DateArticle
 class ObjectDetailTest(TestCase):
     fixtures = ['testdata.json']
     def setUp(self):
+        self.save_warnings_state()
+        warnings.filterwarnings('ignore', category=DeprecationWarning,
+                                module='django.views.generic.date_based')
         # Correct the date for the current article
         current_article = Article.objects.get(title="Current Article")
         current_article.date_created = datetime.now()
         current_article.save()
+
+    def tearDown(self):
+        self.restore_warnings_state()
 
     def test_finds_past(self):
         "date_based.object_detail can view a page in the past"
@@ -37,6 +45,14 @@ class ObjectDetailTest(TestCase):
         self.assertEqual(response.context['object'].title, "Future Article")
 
 class MonthArchiveTest(TestCase):
+    def setUp(self):
+        self.save_warnings_state()
+        warnings.filterwarnings('ignore', category=DeprecationWarning,
+                                module='django.views.generic.date_based')
+
+    def tearDown(self):
+        self.restore_warnings_state()
+
     def test_archive_month_includes_only_month(self):
         "Regression for #3031: Archives around Feburary include only one month"
         author = Author(name="John Smith")
@@ -128,6 +144,15 @@ class MonthArchiveTest(TestCase):
         self.assertEqual(len(response.context['date_list']), 2)
 
 class DayArchiveTests(TestCase):
+    def setUp(self):
+        self.save_warnings_state()
+        warnings.filterwarnings('ignore', category=DeprecationWarning,
+                                module='django.views.generic.date_based')
+        warnings.filterwarnings('ignore', category=DeprecationWarning,
+                                module='django.views.generic.create_update')
+
+    def tearDown(self):
+        self.restore_warnings_state()
 
     def test_year_month_day_format(self):
         """

@@ -5,7 +5,7 @@ import datetime
 from django.core.management.color import no_style
 from django.db import backend, connection, connections, DEFAULT_DB_ALIAS, IntegrityError
 from django.db.backends.signals import connection_created
-from django.db.backends.postgresql import version as pg_version
+from django.db.backends.postgresql_psycopg2 import version as pg_version
 from django.test import TestCase, skipUnlessDBFeature, TransactionTestCase
 from django.utils import unittest
 

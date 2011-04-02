@@ -108,10 +108,12 @@ class AdminScriptTestCase(unittest.TestCase):
         # Build the command line
         executable = sys.executable
         arg_string = ' '.join(['%s' % arg for arg in args])
+        # Silence the DeprecationWarning caused by having a locale directory
+        # in the project directory.
         if ' ' in executable:
-            cmd = '""%s" "%s" %s"' % (executable, script, arg_string)
+            cmd = '""%s" -Wignore:::django.utils.translation "%s" %s"' % (executable, script, arg_string)
         else:
-            cmd = '%s "%s" %s' % (executable, script, arg_string)
+            cmd = '%s -Wignore:::django.utils.translation "%s" %s' % (executable, script, arg_string)
 
         # Move to the test directory and run
         os.chdir(test_dir)

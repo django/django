@@ -3,9 +3,6 @@ from django.db import models
 from django.utils import simplejson as json
 from django.utils.encoding import force_unicode
 
-import warnings
-warnings.filterwarnings("ignore", category=DeprecationWarning, module='django.db.models.fields.subclassing')
-
 class Small(object):
     """
     A simple class to show that non-trivial Python objects can be used as

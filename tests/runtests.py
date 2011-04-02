@@ -188,19 +188,8 @@ def django_tests(verbosity, interactive, failfast, test_labels):
         settings.TEST_RUNNER = 'django.test.simple.DjangoTestSuiteRunner'
     TestRunner = get_runner(settings)
 
-    if hasattr(TestRunner, 'func_name'):
-        # Pre 1.2 test runners were just functions,
-        # and did not support the 'failfast' option.
-        import warnings
-        warnings.warn(
-            'Function-based test runners are deprecated. Test runners should be classes with a run_tests() method.',
-            DeprecationWarning
-        )
-        failures = TestRunner(test_labels, verbosity=verbosity, interactive=interactive,
-            extra_tests=extra_tests)
-    else:
-        test_runner = TestRunner(verbosity=verbosity, interactive=interactive, failfast=failfast)
-        failures = test_runner.run_tests(test_labels, extra_tests=extra_tests)
+    test_runner = TestRunner(verbosity=verbosity, interactive=interactive, failfast=failfast)
+    failures = test_runner.run_tests(test_labels, extra_tests=extra_tests)
 
     teardown(state)
     return failures

@@ -11,12 +11,14 @@ import time
 import os
 import sys
 import traceback
+import warnings
 
 from django import template
 from django.template import base as template_base
 from django.core import urlresolvers
 from django.template import loader
 from django.template.loaders import app_directories, filesystem, cached
+from django.test.utils import get_warnings_state, restore_warnings_state
 from django.utils import unittest
 from django.utils.translation import activate, deactivate, ugettext as _
 from django.utils.safestring import mark_safe
@@ -137,6 +139,10 @@ class UTF8Class:
 
 class Templates(unittest.TestCase):
     def setUp(self):
+        self._warnings_state = get_warnings_state()
+        warnings.filterwarnings('ignore', category=DeprecationWarning,
+                                module='django.template.defaulttags')
+
         self.old_static_url = settings.STATIC_URL
         self.old_media_url = settings.MEDIA_URL
         settings.STATIC_URL = u"/static/"
@@ -145,6 +151,7 @@ class Templates(unittest.TestCase):
     def tearDown(self):
         settings.STATIC_URL = self.old_static_url
         settings.MEDIA_URL = self.old_media_url
+        restore_warnings_state(self._warnings_state)
 
     def test_loaders_security(self):
         ad_loader = app_directories.Loader()
