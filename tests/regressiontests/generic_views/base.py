@@ -261,3 +261,33 @@ class RedirectViewTest(unittest.TestCase):
         response = RedirectView.as_view(url='/bar/%(object_id)d/')(self.rf.get('/foo/42/'), object_id=42)
         self.assertEqual(response.status_code, 301)
         self.assertEqual(response['Location'], '/bar/42/')
+
+    def test_redirect_POST(self):
+        "Default is a permanent redirect"
+        response = RedirectView.as_view(url='/bar/')(self.rf.post('/foo/'))
+        self.assertEqual(response.status_code, 301)
+        self.assertEqual(response['Location'], '/bar/')
+
+    def test_redirect_HEAD(self):
+        "Default is a permanent redirect"
+        response = RedirectView.as_view(url='/bar/')(self.rf.head('/foo/'))
+        self.assertEqual(response.status_code, 301)
+        self.assertEqual(response['Location'], '/bar/')
+
+    def test_redirect_OPTIONS(self):
+        "Default is a permanent redirect"
+        response = RedirectView.as_view(url='/bar/')(self.rf.options('/foo/'))
+        self.assertEqual(response.status_code, 301)
+        self.assertEqual(response['Location'], '/bar/')
+
+    def test_redirect_PUT(self):
+        "Default is a permanent redirect"
+        response = RedirectView.as_view(url='/bar/')(self.rf.put('/foo/'))
+        self.assertEqual(response.status_code, 301)
+        self.assertEqual(response['Location'], '/bar/')
+
+    def test_redirect_DELETE(self):
+        "Default is a permanent redirect"
+        response = RedirectView.as_view(url='/bar/')(self.rf.delete('/foo/'))
+        self.assertEqual(response.status_code, 301)
+        self.assertEqual(response['Location'], '/bar/')
