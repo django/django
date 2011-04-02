@@ -19,7 +19,7 @@ def security_hash(request, form, *args):
     """
     import warnings
     warnings.warn("security_hash is deprecated; use form_hmac instead",
-                  PendingDeprecationWarning)
+                  DeprecationWarning)
     data = []
     for bf in form:
         # Get the value from the form data. If the form allows empty or hasn't
