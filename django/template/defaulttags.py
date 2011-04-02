@@ -989,7 +989,7 @@ def ssi(parser, token):
 
     import warnings
     warnings.warn('The syntax for the ssi template tag is changing. Load the `ssi` tag from the `future` tag library to start using the new behavior.',
-                  category=PendingDeprecationWarning)
+                  category=DeprecationWarning)
 
     bits = token.contents.split()
     parsed = False
@@ -1240,7 +1240,7 @@ def url(parser, token):
 
     import warnings
     warnings.warn('The syntax for the url template tag is changing. Load the `url` tag from the `future` tag library to start using the new behavior.',
-                  category=PendingDeprecationWarning)
+                  category=DeprecationWarning)
 
     bits = token.split_contents()
     if len(bits) < 2:

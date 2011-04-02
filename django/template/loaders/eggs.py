@@ -28,12 +28,3 @@ class Loader(BaseLoader):
         raise TemplateDoesNotExist(template_name)
 
 _loader = Loader()
-
-def load_template_source(template_name, template_dirs=None):
-    import warnings
-    warnings.warn(
-        "'django.template.loaders.eggs.load_template_source' is deprecated; use 'django.template.loaders.eggs.Loader' instead.",
-        DeprecationWarning
-    )
-    return _loader.load_template_source(template_name, template_dirs)
-load_template_source.is_usable = resource_string is not None

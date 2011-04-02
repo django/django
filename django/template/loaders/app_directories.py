@@ -62,13 +62,3 @@ class Loader(BaseLoader):
         raise TemplateDoesNotExist(template_name)
 
 _loader = Loader()
-
-def load_template_source(template_name, template_dirs=None):
-    # For backwards compatibility
-    import warnings
-    warnings.warn(
-        "'django.template.loaders.app_directories.load_template_source' is deprecated; use 'django.template.loaders.app_directories.Loader' instead.",
-        DeprecationWarning
-    )
-    return _loader.load_template_source(template_name, template_dirs)
-load_template_source.is_usable = True
