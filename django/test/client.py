@@ -421,7 +421,7 @@ class Client(RequestFactory):
             # Provide a backwards-compatible (but pending deprecation) response.template
             def _get_template(self):
                 warnings.warn("response.template is deprecated; use response.templates instead (which is always a list)",
-                              PendingDeprecationWarning, stacklevel=2)
+                              DeprecationWarning, stacklevel=2)
                 if not self.templates:
                     return None
                 elif len(self.templates) == 1:
