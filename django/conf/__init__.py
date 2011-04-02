@@ -69,7 +69,7 @@ class BaseSettings(object):
     def __setattr__(self, name, value):
         if name in ("MEDIA_URL", "STATIC_URL") and value and not value.endswith('/'):
             warnings.warn('If set, %s must end with a slash' % name,
-                          PendingDeprecationWarning)
+                          DeprecationWarning)
         object.__setattr__(self, name, value)
 
 
