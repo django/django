@@ -94,6 +94,8 @@ class BadExceptionMiddleware(TestMiddleware):
 
 
 class BaseMiddlewareExceptionTest(TestCase):
+    urls = 'regressiontests.middleware_exceptions.urls'
+
     def setUp(self):
         self.exceptions = []
         got_request_exception.connect(self._on_request_exception)
@@ -768,6 +770,8 @@ class BadMiddlewareTests(BaseMiddlewareExceptionTest):
 
 _missing = object()
 class RootUrlconfTests(TestCase):
+    urls = 'regressiontests.middleware_exceptions.urls'
+
     def test_missing_root_urlconf(self):
         try:
             original_ROOT_URLCONF = settings.ROOT_URLCONF

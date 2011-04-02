@@ -4,12 +4,12 @@ from django.conf.urls.defaults import *
 import views
 
 urlpatterns = patterns('',
-    (r'^view/$', views.normal_view),
-    (r'^not_found/$', views.not_found),
-    (r'^error/$', views.server_error),
-    (r'^null_view/$', views.null_view),
-    (r'^permission_denied/$', views.permission_denied),
+    (r'^middleware_exceptions/view/$', views.normal_view),
+    (r'^middleware_exceptions/not_found/$', views.not_found),
+    (r'^middleware_exceptions/error/$', views.server_error),
+    (r'^middleware_exceptions/null_view/$', views.null_view),
+    (r'^middleware_exceptions/permission_denied/$', views.permission_denied),
 
-    (r'^template_response/$', views.template_response),
-    (r'^template_response_error/$', views.template_response_error),
+    (r'^middleware_exceptions/template_response/$', views.template_response),
+    (r'^middleware_exceptions/template_response_error/$', views.template_response_error),
 )

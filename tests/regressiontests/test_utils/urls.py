@@ -4,5 +4,5 @@ import views
 
 
 urlpatterns = patterns('',
-    (r'^get_person/(\d+)/$', views.get_person),
+    (r'^test_utils/get_person/(\d+)/$', views.get_person),
 )

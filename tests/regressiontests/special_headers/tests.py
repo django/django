@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 
 class SpecialHeadersTest(TestCase):
     fixtures = ['data.xml']
+    urls = 'regressiontests.special_headers.urls'
 
     def setUp(self):
         self.save_warnings_state()

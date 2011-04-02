@@ -30,19 +30,4 @@ urlpatterns = patterns('',
     (r'widget_admin/', include('regressiontests.admin_widgets.urls')),
 
     (r'^utils/', include('regressiontests.utils.urls')),
-
-    # test urlconf for syndication tests
-    (r'^syndication/', include('regressiontests.syndication.urls')),
-
-    # conditional get views
-    (r'condition/', include('regressiontests.conditional_processing.urls')),
-
-    # middleware exceptions tests
-    (r'middleware_exceptions/', include('regressiontests.middleware_exceptions.urls')),
-
-    # special headers views
-    (r'special_headers/', include('regressiontests.special_headers.urls')),
-
-    # test util views
-    (r'test_utils/', include('regressiontests.test_utils.urls')),
 )
