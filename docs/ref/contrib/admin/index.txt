@@ -531,16 +531,18 @@ subclass::
             list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff')
             list_filter = ('is_staff', 'is_superuser')
 
-    Fields in ``list_filter`` can also span relations using the ``__`` lookup::
-
-        class UserAdminWithLookup(UserAdmin):
-            list_filter = ('groups__name')
-
     The above code results in an admin change list page that looks like this:
 
         .. image:: _images/users_changelist.png
 
     (This example also has ``search_fields`` defined. See below.)
+
+    .. versionadded:: 1.3
+
+    Fields in ``list_filter`` can also span relations using the ``__`` lookup::
+
+        class UserAdminWithLookup(UserAdmin):
+            list_filter = ('groups__name')
 
 .. attribute:: ModelAdmin.list_per_page
 
