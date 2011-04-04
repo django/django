@@ -44,7 +44,6 @@ class ContentTypesTests(TestCase):
         # Once we clear the cache, another lookup will again hit the DB
         ContentType.objects.clear_cache()
         ContentType.objects.get_for_model(ContentType)
-        len(db.connection.queries)
         self.assertEqual(2, len(db.connection.queries))
 
     def test_shortcut_view(self):
