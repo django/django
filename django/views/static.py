@@ -5,6 +5,7 @@ during development, and SHOULD NOT be used in a production setting.
 
 import mimetypes
 import os
+import stat
 import posixpath
 import re
 import urllib
@@ -58,7 +59,8 @@ def serve(request, path, document_root=None, show_indexes=False):
         return HttpResponseNotModified(mimetype=mimetype)
     response = HttpResponse(open(fullpath, 'rb').read(), mimetype=mimetype)
     response["Last-Modified"] = http_date(statobj.st_mtime)
-    response["Content-Length"] = statobj.st_size
+    if stat.S_ISREG(statobj.st_mode):
+        response["Content-Length"] = statobj.st_size
     if encoding:
         response["Content-Encoding"] = encoding
     return response
