@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.db.backends.postgresql.creation import DatabaseCreation
+from django.db.backends.postgresql_psycopg2.creation import DatabaseCreation
 
 class PostGISCreation(DatabaseCreation):
     geom_index_type = 'GIST'
