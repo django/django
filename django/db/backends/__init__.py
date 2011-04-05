@@ -388,7 +388,8 @@ class BaseDatabaseOperations(object):
     """
     compiler_module = "django.db.models.sql.compiler"
 
-    def __init__(self):
+    def __init__(self, connection):
+        self.connection = connection
         self._cache = None
 
     def autoinc_sql(self, table, column):

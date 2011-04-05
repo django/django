@@ -110,8 +110,7 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
     geometry_functions.update(distance_functions)
 
     def __init__(self, connection):
-        super(DatabaseOperations, self).__init__()
-        self.connection = connection
+        super(DatabaseOperations, self).__init__(connection)
 
         # Determine the version of the SpatiaLite library.
         try:

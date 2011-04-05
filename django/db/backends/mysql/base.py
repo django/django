@@ -23,7 +23,7 @@ if (version < (1,2,1) or (version[:3] == (1, 2, 1) and
     raise ImproperlyConfigured("MySQLdb-1.2.1p2 or newer is required; you have %s" % Database.__version__)
 
 from MySQLdb.converters import conversions
-from MySQLdb.constants import FIELD_TYPE, FLAG, CLIENT
+from MySQLdb.constants import FIELD_TYPE, CLIENT
 
 from django.db import utils
 from django.db.backends import *
@@ -279,7 +279,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
         self.server_version = None
         self.features = DatabaseFeatures(self)
-        self.ops = DatabaseOperations()
+        self.ops = DatabaseOperations(self)
         self.client = DatabaseClient(self)
         self.creation = DatabaseCreation(self)
         self.introspection = DatabaseIntrospection(self)

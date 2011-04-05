@@ -232,6 +232,12 @@ class BackendTestCase(TestCase):
         self.assertEqual(list(cursor.fetchmany(2)), [(u'Jane', u'Doe'), (u'John', u'Doe')])
         self.assertEqual(list(cursor.fetchall()), [(u'Mary', u'Agnelline'), (u'Peter', u'Parker')])
 
+    def test_database_operations_helper_class(self):
+        # Ticket #13630
+        self.assertTrue(hasattr(connection, 'ops'))
+        self.assertTrue(hasattr(connection.ops, 'connection'))
+        self.assertEqual(connection, connection.ops.connection)
+
 
 # We don't make these tests conditional because that means we would need to
 # check and differentiate between:

@@ -133,8 +133,7 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
     truncate_params = {'relate' : None}
 
     def __init__(self, connection):
-        super(OracleOperations, self).__init__()
-        self.connection = connection
+        super(OracleOperations, self).__init__(connection)
 
     def convert_extent(self, clob):
         if clob:
