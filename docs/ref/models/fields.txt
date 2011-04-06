@@ -59,6 +59,9 @@ string, not ``NULL``.
     coerced for string-based fields that have the empty string as a possible
     value, and the value ``NULL`` will be stored to denote the empty string.
 
+If you want to accept :attr:`~Field.null` values with :class:`BooleanField`,
+use :class:`NullBooleanField` instead.
+
 ``blank``
 ---------
 
@@ -340,6 +343,9 @@ admin represents this as an ``<input type="text">`` (a single-line input).
 A true/false field.
 
 The admin represents this as a checkbox.
+
+If you need to accept :attr:`~Field.null` values then use
+:class:`NullBooleanField` instead.
 
 .. versionchanged:: 1.2
 
