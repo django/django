@@ -25,6 +25,7 @@ notifications:
       :data:`django.db.models.signals.post_delete`
 
       Sent before or after a model's :meth:`~django.db.models.Model.delete`
+      method or queryset's :meth:`~django.db.models.query.QuerySet.delete`
       method is called.
 
     * :data:`django.db.models.signals.m2m_changed`

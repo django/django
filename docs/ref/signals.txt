@@ -151,7 +151,7 @@ pre_delete
    :module:
 
 Sent at the beginning of a model's :meth:`~django.db.models.Model.delete`
-method.
+method and a queryset's :meth:`~django.db.models.query.QuerySet.delete` method.
 
 Arguments sent with this signal:
 
@@ -172,8 +172,9 @@ post_delete
 .. data:: django.db.models.signals.post_delete
    :module:
 
-Like :data:`pre_delete`, but sent at the end of the
-:meth:`~django.db.models.Model.delete` method.
+Like :data:`pre_delete`, but sent at the end of a model's
+:meth:`~django.db.models.Model.delete` method and a queryset's
+:meth:`~django.db.models.query.QuerySet.delete` method.
 
 Arguments sent with this signal:
 
