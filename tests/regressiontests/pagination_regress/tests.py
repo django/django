@@ -154,3 +154,15 @@ class PaginatorTests(TestCase):
         self.assertRaises(EmptyPage, self.check_indexes, ([], 4, 0, False), 1, None)
         self.assertRaises(EmptyPage, self.check_indexes, ([], 4, 1, False), 1, None)
         self.assertRaises(EmptyPage, self.check_indexes, ([], 4, 2, False), 1, None)
+
+    def test_page_sequence(self):
+        """
+        Tests that a paginator page acts like a standard sequence.
+        """
+        eleven = 'abcdefghijk'
+        page2 = Paginator(eleven, per_page=5, orphans=1).page(2)
+        self.assertEqual(len(page2), 6)
+        self.assertTrue('k' in page2)
+        self.assertFalse('a' in page2)
+        self.assertEqual(''.join(page2), 'fghijk')
+        self.assertEqual(''.join(reversed(page2)), 'kjihgf')
