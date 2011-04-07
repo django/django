@@ -10,7 +10,6 @@ from django.contrib.messages.api import MessageFailure
 from django.contrib.messages.storage import default_storage, base
 from django.contrib.messages.storage.base import Message
 from django.core.urlresolvers import reverse
-from django.contrib.auth.models import User
 
 
 def skipUnlessAuthIsInstalled(func):
@@ -222,10 +221,10 @@ class BaseTest(TestCase):
         for msg in data['messages']:
             self.assertContains(response, msg)
 
-    def test_middleware_disabled_anon_user(self):
+    def test_middleware_disabled(self):
         """
-        Tests that, when the middleware is disabled and a user is not logged
-        in, an exception is raised when one attempts to store a message.
+        Tests that, when the middleware is disabled, an exception is raised
+        when one attempts to store a message.
         """
         settings.MESSAGE_LEVEL = constants.DEBUG
         settings.INSTALLED_APPS = list(settings.INSTALLED_APPS)
@@ -251,10 +250,10 @@ class BaseTest(TestCase):
             self.assertRaises(MessageFailure, self.client.post, add_url,
                               data, follow=True)
 
-    def test_middleware_disabled_anon_user_fail_silently(self):
+    def test_middleware_disabled_fail_silently(self):
         """
-        Tests that, when the middleware is disabled and a user is not logged
-        in, an exception is not raised if 'fail_silently' = True
+        Tests that, when the middleware is disabled, an exception is not
+        raised if 'fail_silently' = True
         """
         settings.MESSAGE_LEVEL = constants.DEBUG
         settings.INSTALLED_APPS = list(settings.INSTALLED_APPS)

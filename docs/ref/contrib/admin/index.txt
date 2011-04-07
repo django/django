@@ -14,26 +14,32 @@ Django's admin interface.
 Overview
 ========
 
-There are six steps in activating the Django admin site:
+There are seven steps in activating the Django admin site:
 
     1. Add ``'django.contrib.admin'`` to your :setting:`INSTALLED_APPS`
        setting.
 
-    2. Admin has two dependencies - :mod:`django.contrib.auth` and
-       :mod:`django.contrib.contenttypes`. If these applications are not
-       in your :setting:`INSTALLED_APPS` list, add them.
+    2. Admin has three dependencies - :mod:`django.contrib.auth`,
+       :mod:`django.contrib.contenttypes` and :mod:`django.contrib.messages`.
+       If these applications are not in your :setting:`INSTALLED_APPS` list,
+       add them.
 
-    3. Determine which of your application's models should be editable in the
+    3. Add ``django.contrib.messages.context_processors.messages`` to
+       :setting:`TEMPLATE_CONTEXT_PROCESSORS` and
+       :class:`~django.contrib.messages.middleware.MessageMiddleware` to
+       :setting:`MIDDLEWARE_CLASSES`.
+
+    4. Determine which of your application's models should be editable in the
        admin interface.
 
-    4. For each of those models, optionally create a ``ModelAdmin`` class that
+    5. For each of those models, optionally create a ``ModelAdmin`` class that
        encapsulates the customized admin functionality and options for that
        particular model.
 
-    5. Instantiate an ``AdminSite`` and tell it about each of your models and
+    6. Instantiate an ``AdminSite`` and tell it about each of your models and
        ``ModelAdmin`` classes.
 
-    6. Hook the ``AdminSite`` instance into your URLconf.
+    7. Hook the ``AdminSite`` instance into your URLconf.
 
 Other topics
 ------------

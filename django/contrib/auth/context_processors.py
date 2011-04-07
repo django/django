@@ -1,5 +1,4 @@
 from django.utils.functional import lazy, memoize, SimpleLazyObject
-from django.contrib import messages
 
 # PermWrapper and PermLookupDict proxy the permissions system into objects that
 # the template system can understand.
@@ -55,6 +54,5 @@ def auth(request):
 
     return {
         'user': SimpleLazyObject(get_user),
-        'messages': messages.get_messages(request),
         'perms':  lazy(lambda: PermWrapper(get_user()), PermWrapper)(),
     }

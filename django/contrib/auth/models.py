@@ -445,9 +445,6 @@ class AnonymousUser(object):
     def has_module_perms(self, module):
         return _user_has_module_perms(self, module)
 
-    def get_and_delete_messages(self):
-        return []
-
     def is_anonymous(self):
         return True
 

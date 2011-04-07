@@ -419,9 +419,6 @@ If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
       logged-in user (or an ``AnonymousUser`` instance, if the client isn't
       logged in).
 
-    * ``messages`` -- A list of messages (as strings) that have been set
-      via the :doc:`messages framework </ref/contrib/messages>`.
-
     * ``perms`` -- An instance of
       ``django.contrib.auth.context_processors.PermWrapper``, representing the
       permissions that the currently logged-in user has.
@@ -429,11 +426,6 @@ If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
 .. versionchanged:: 1.2
     This context processor was moved in this release from
     ``django.core.context_processors.auth`` to its current location.
-
-.. versionchanged:: 1.2
-   Prior to version 1.2, the ``messages`` variable was a lazy accessor for
-   ``user.get_and_delete_messages()``. It has been changed to include any
-   messages added via the :doc:`messages framework </ref/contrib/messages>`.
 
 .. versionchanged:: 1.3
     Prior to version 1.3, ``PermWrapper`` was located in

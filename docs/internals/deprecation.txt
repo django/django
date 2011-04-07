@@ -52,7 +52,10 @@ their deprecation, as per the :ref:`Django deprecation policy
           ``user.get_and_delete_messages()``), which have
           been deprecated since the 1.2 release, will be removed.  The
           :doc:`messages framework </ref/contrib/messages>` should be used
-          instead.
+          instead. The related ``messages`` variable returned by the
+          auth context processor will also be removed. Note that this
+          means that the admin application depends on the messages
+          context processor.
 
         * Authentication backends need to support the ``obj`` parameter for
           permission checking. The ``supports_object_permissions`` variable

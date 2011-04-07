@@ -19,10 +19,6 @@ The auth system consists of:
       a certain task.
     * Groups: A generic way of applying labels and permissions to more than one
       user.
-    * Messages: A simple way to queue messages for given users.
-
-.. deprecated:: 1.2
-   The Messages component of the auth system will be removed in Django 1.4.
 
 Installation
 ============
@@ -255,11 +251,6 @@ Methods
         Returns ``True`` if the user has any permissions in the given package
         (the Django app label). If the user is inactive, this method will
         always return ``False``.
-
-    .. method:: models.User.get_and_delete_messages()
-
-        Returns a list of :class:`~django.contrib.auth.models.Message` objects
-        in the user's queue and deletes the messages from the queue.
 
     .. method:: models.User.email_user(subject, message, from_email=None)
 
@@ -1386,70 +1377,6 @@ them some label, or extended functionality. For example, you could create a
 group ``'Special users'``, and you could write code that could, say, give them
 access to a members-only portion of your site, or send them members-only email
 messages.
-
-Messages
-========
-
-.. deprecated:: 1.2
-   This functionality will be removed in Django 1.4.  You should use the
-   :doc:`messages framework </ref/contrib/messages>` for all new projects and
-   begin to update your existing code immediately.
-
-The message system is a lightweight way to queue messages for given users.
-
-A message is associated with a :class:`~django.contrib.auth.models.User`.
-There's no concept of expiration or timestamps.
-
-Messages are used by the Django admin after successful actions. For example,
-``"The poll Foo was created successfully."`` is a message.
-
-The API is simple:
-
-.. method:: models.User.message_set.create(message)
-
-    To create a new message, use
-    ``user_obj.message_set.create(message='message_text')``.
-
-    To retrieve/delete messages, use
-    :meth:`user_obj.get_and_delete_messages() <django.contrib.auth.models.User.get_and_delete_messages>`,
-    which returns a list of ``Message`` objects in the user's queue (if any)
-    and deletes the messages from the queue.
-
-In this example view, the system saves a message for the user after creating
-a playlist::
-
-    def create_playlist(request, songs):
-        # Create the playlist with the given songs.
-        # ...
-        request.user.message_set.create(message="Your playlist was added successfully.")
-        return render_to_response("playlists/create.html",
-            context_instance=RequestContext(request))
-
-When you use :class:`~django.template.context.RequestContext`, the currently
-logged-in user and his/her messages are made available in the
-:doc:`template context </ref/templates/api>` as the template variable
-``{{ messages }}``. Here's an example of template code that displays messages:
-
-.. code-block:: html+django
-
-    {% if messages %}
-    <ul>
-        {% for message in messages %}
-        <li>{{ message }}</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
-
-.. versionchanged:: 1.2
-   The ``messages`` template variable uses a backwards compatible method in the
-   :doc:`messages framework </ref/contrib/messages>` to retrieve messages from
-   both the user ``Message`` model and from the new framework.  Unlike in
-   previous revisions, the messages will not be erased unless they are actually
-   displayed.
-
-Finally, note that this messages framework only works with users in the user
-database. To send messages to anonymous users, use the
-:doc:`messages framework </ref/contrib/messages>`.
 
 .. _authentication-backends:
 
