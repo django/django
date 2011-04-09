@@ -435,8 +435,13 @@ should be aware of:
 
  * All contrib apps use a ``csrf_protect`` decorator to protect the view. This
    requires the use of the ``csrf_token`` template tag in the template. If you
-   have used custom templates for contrib views, you MUST READ THE :ref:`UPGRADE
-   INSTRUCTIONS <ref-csrf-upgrading-notes>` to fix those templates.
+   have used custom templates for contrib views, you MUST READ THE UPGRADE
+   INSTRUCTIONS to fix those templates.
+
+   .. admonition:: Documentation removed
+
+      The upgrade notes have been removed in current Django docs. Please refer
+      to the docs for Django 1.3 or older to find these instructions.
 
  * ``CsrfViewMiddleware`` is included in :setting:`MIDDLEWARE_CLASSES` by
    default. This turns on CSRF protection by default, so views that accept
@@ -861,8 +866,12 @@ functionality of ``CsrfResponseMiddleware`` and
 ``CsrfViewMiddleware``, has likewise been deprecated.
 
 Also, the CSRF module has moved from contrib to core, and the old
-imports are deprecated, as described in the :ref:`upgrading notes
-<ref-csrf-upgrading-notes>`.
+imports are deprecated, as described in the upgrading notes.
+
+.. admonition:: Documentation removed
+
+   The upgrade notes have been removed in current Django docs. Please refer
+   to the docs for Django 1.3 or older to find these instructions.
 
 ``SMTPConnection``
 ------------------
