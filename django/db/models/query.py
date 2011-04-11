@@ -712,7 +712,7 @@ class QuerySet(object):
 
     def using(self, alias):
         """
-        Selects which database this QuerySet should excecute it's query against.
+        Selects which database this QuerySet should excecute its query against.
         """
         clone = self._clone()
         clone._db = alias
