@@ -22,7 +22,7 @@ class Paginator(object):
         "Validates the given 1-based page number."
         try:
             number = int(number)
-        except ValueError:
+        except (TypeError, ValueError):
             raise PageNotAnInteger('That page number is not an integer')
         if number < 1:
             raise EmptyPage('That page number is less than 1')

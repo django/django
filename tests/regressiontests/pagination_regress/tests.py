@@ -1,4 +1,4 @@
-from django.core.paginator import Paginator, EmptyPage
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.utils.unittest import TestCase
 
 class PaginatorTests(TestCase):
@@ -26,6 +26,15 @@ class PaginatorTests(TestCase):
         self.assertEqual(expected, got,
             "For '%s', expected %s but got %s.  Paginator parameters were: %s"
             % (name, expected, got, params))
+
+    def test_invalid_page_number(self):
+        """
+        Tests that invalid page numbers result in the correct exception being
+        raised.
+        """
+        paginator = Paginator([1, 2, 3], 2)
+        self.assertRaises(PageNotAnInteger, paginator.validate_number, None)
+        self.assertRaises(PageNotAnInteger, paginator.validate_number, 'x')
 
     def test_paginator(self):
         """
