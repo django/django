@@ -480,7 +480,7 @@ ModelFormMixin
 
     **Mixins**
 
-        * :class:`django.views.generic.forms.FormMixin`
+        * :class:`django.views.generic.edit.FormMixin`
         * :class:`django.views.generic.detail.SingleObjectMixin`
 
     .. attribute:: success_url
