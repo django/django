@@ -104,19 +104,19 @@ following actions:
       fix is forthcoming. We'll give a rough timeline and ask the reporter
       to keep the issue confidential until we announce it.
 
-    * Halt all other development as long as is needed to develop a fix,
-      including patches against the current and two previous releases.
+    * Focus on developing a fix as quickly as possible and produce patches
+      against the current and two previous releases.
 
     * Determine a go-public date for announcing the vulnerability and the fix.
       To try to mitigate a possible "arms race" between those applying the
       patch and those trying to exploit the hole, we will not announce
       security problems immediately.
 
-    * Pre-notify everyone we know to be running the affected version(s) of
-      Django. We will send these notifications through private e-mail
-      which will include documentation of the vulnerability, links to the
-      relevant patch(es), and a request to keep the vulnerability
-      confidential until the official go-public date.
+    * Pre-notify third-party distributors of Django ("vendors"). We will send
+      these vendor notifications through private email which will include
+      documentation of the vulnerability, links to the relevant patch(es), and a
+      request to keep the vulnerability confidential until the official
+      go-public date.
 
     * Publicly announce the vulnerability and the fix on the pre-determined
       go-public date. This will probably mean a new release of Django, but
