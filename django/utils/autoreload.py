@@ -73,11 +73,12 @@ def code_changed():
 
 def ensure_echo_on():
     if termios:
-        fd = sys.stdin.fileno()
-        attr_list = termios.tcgetattr(fd)
-        if not attr_list[3] & termios.ECHO:
-            attr_list[3] |= termios.ECHO
-            termios.tcsetattr(fd, termios.TCSANOW, attr_list)
+        fd = sys.stdin
+        if fd.isatty():
+            attr_list = termios.tcgetattr(fd)
+            if not attr_list[3] & termios.ECHO:
+                attr_list[3] |= termios.ECHO
+                termios.tcsetattr(fd, termios.TCSANOW, attr_list)
 
 def reloader_thread():
     ensure_echo_on()
