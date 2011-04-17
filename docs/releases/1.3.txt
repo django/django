@@ -353,8 +353,8 @@ Restricted filters in admin interface
 
 Prior to Django 1.2.5, the Django administrative interface allowed
 filtering on any model field or relation -- not just those specified
-in ``list_filter`` -- via query string manipulation. Due to `security
-issues`_ reported to us, however, query string lookup arguments in the
+in ``list_filter`` -- via query string manipulation. Due to security
+issues reported to us, however, query string lookup arguments in the
 admin must be for fields or relations specified in ``list_filter`` or
 ``date_hierarchy``.
 
