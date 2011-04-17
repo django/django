@@ -98,11 +98,11 @@ to distinguish caches by the ``Accept-language`` header.
     cache, this just means that we have to build the response once to get at
     the Vary header and so at the list of headers to use for the cache key.
 
-SortedDict
-==========
+``django.utils.datastructures``
+===============================
 
 .. module:: django.utils.datastructures
-   :synopsis: A dictionary that keeps its keys in the order in which they're inserted.
+   :synopsis: Data structures that aren't in Python's standard library.
 
 .. class:: SortedDict
 
