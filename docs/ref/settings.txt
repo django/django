@@ -394,7 +394,6 @@ Default: ``''`` (Empty string)
 The database backend to use. The built-in database backends are:
 
     * ``'django.db.backends.postgresql_psycopg2'``
-    * ``'django.db.backends.postgresql'``
     * ``'django.db.backends.mysql'``
     * ``'django.db.backends.sqlite3'``
     * ``'django.db.backends.oracle'``
@@ -498,8 +497,8 @@ The character set encoding used to create the test database. The value of this
 string is passed directly through to the database, so its format is
 backend-specific.
 
-Supported for the PostgreSQL_ (``postgresql``, ``postgresql_psycopg2``) and
-MySQL_ (``mysql``) backends.
+Supported for the PostgreSQL_ (``postgresql_psycopg2``) and MySQL_ (``mysql``)
+backends.
 
 .. _PostgreSQL: http://www.postgresql.org/docs/8.2/static/multibyte.html
 .. _MySQL: http://dev.mysql.com/doc/refman/5.0/en/charset-database.html

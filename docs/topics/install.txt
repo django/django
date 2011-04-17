@@ -92,9 +92,7 @@ support channels provided by each 3rd party project.
 In addition to a database backend, you'll need to make sure your Python
 database bindings are installed.
 
-* If you're using PostgreSQL, you'll need the psycopg_ package. Django supports
-  both version 1 and 2. (When you configure Django's database layer, specify
-  either ``postgresql`` [for version 1] or ``postgresql_psycopg2`` [for version 2].)
+* If you're using PostgreSQL, you'll need the ``postgresql_psycopg2`` package.
   You might want to refer to our :ref:`PostgreSQL notes <postgresql-notes>` for
   further technical details specific to this database.
 
