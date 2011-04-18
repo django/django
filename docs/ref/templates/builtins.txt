@@ -666,7 +666,7 @@ including it. This example produces the output ``"Hello, John"``:
 
 You can pass additional context to the template using keyword arguments::
 
-    {% include "name_snippet.html" with person="Jane" greeting="Hello" "%}
+    {% include "name_snippet.html" with person="Jane" greeting="Hello" %}
 
 If you want to only render the context with the variables provided (or even
 no variables at all), use the ``only`` option::
