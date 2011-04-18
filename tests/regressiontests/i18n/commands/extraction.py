@@ -1,3 +1,4 @@
+# -*- encoding: utf-8 -*-
 import os
 import re
 import shutil
@@ -62,6 +63,9 @@ class BasicExtractorTests(ExtractorTests):
 
         self.assertTrue('#. Translators: One-line translator comment #4' in po_contents)
         self.assertTrue('#. Translators: Two-line translator comment #4\n#. continued here.' in po_contents)
+
+        self.assertTrue('#. Translators: One-line translator comment #5 -- with non ASCII characters: áéíóúö' in po_contents)
+        self.assertTrue('#. Translators: Two-line translator comment #5 -- with non ASCII characters: áéíóúö\n#. continued here.' in po_contents)
 
     def test_templatize(self):
         os.chdir(self.test_dir)
