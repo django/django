@@ -692,7 +692,9 @@ class Variable(object):
                                 ):
                             raise VariableDoesNotExist("Failed lookup for key [%s] in %r", (bit, current)) # missing attribute
                 if callable(current):
-                    if getattr(current, 'alters_data', False):
+                    if getattr(current, 'do_not_call_in_templates', False):
+                        pass
+                    elif getattr(current, 'alters_data', False):
                         current = settings.TEMPLATE_STRING_IF_INVALID
                     else:
                         try: # method call (assuming no args required)

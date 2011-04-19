@@ -25,6 +25,7 @@ from django.utils.translation import activate, deactivate, ugettext as _
 from django.utils.safestring import mark_safe
 from django.utils.tzinfo import LocalTimezone
 
+from callables import *
 from context import ContextTests
 from custom import CustomTagTests, CustomFilterTests
 from parser import ParserTests
