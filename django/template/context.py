@@ -92,7 +92,7 @@ class Context(BaseContext):
         super(Context, self).__init__(dict_)
 
     def __copy__(self):
-        duplicate = copy(super(Context, self))
+        duplicate = super(Context, self).__copy__()
         duplicate.render_context = copy(self.render_context)
         return duplicate
 
