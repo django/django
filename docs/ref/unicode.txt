@@ -140,6 +140,8 @@ Normally, you'll only need to use ``smart_unicode()``. Call it as early as
 possible on any input data that might be either Unicode or a bytestring, and
 from then on, you can treat the result as always being Unicode.
 
+.. _uri-and-iri-handling:
+
 URI and IRI handling
 ~~~~~~~~~~~~~~~~~~~~
 
