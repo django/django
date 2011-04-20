@@ -585,11 +585,8 @@ Decorating the class
 --------------------
 
 To decorate every instance of a class-based view, you need to decorate
-the class definition itself. To do this you apply the decorator to one
-of the view-like methods on the class; that is,
-:meth:`~django.views.generic.base.View.dispatch`, or one of the HTTP
-methods (:meth:`~django.views.generic.base.View.get`,
-:meth:`~django.views.generic.base.View.post` etc).
+the class definition itself. To do this you apply the decorator to the
+:meth:`~django.views.generic.base.View.dispatch` method of the class.
 
 A method on a class isn't quite the same as a standalone function, so
 you can't just apply a function decorator to the method -- you need to
