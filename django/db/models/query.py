@@ -435,6 +435,7 @@ class QuerySet(object):
         del_query._for_write = True
 
         # Disable non-supported fields.
+        del_query.query.select_for_update = False
         del_query.query.select_related = False
         del_query.query.clear_ordering()
 
@@ -582,6 +583,18 @@ class QuerySet(object):
             return clone
         else:
             return self._filter_or_exclude(None, **filter_obj)
+
+    def select_for_update(self, **kwargs):
+        """
+        Returns a new QuerySet instance that will select objects with a
+        FOR UPDATE lock.
+        """
+        # Default to false for nowait
+        nowait = kwargs.pop('nowait', False)
+        obj = self._clone()
+        obj.query.select_for_update = True
+        obj.query.select_for_update_nowait = nowait
+        return obj
 
     def select_related(self, *fields, **kwargs):
         """

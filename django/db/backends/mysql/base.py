@@ -124,6 +124,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     allows_group_by_pk = True
     related_fields_match_type = True
     allow_sliced_subqueries = False
+    has_select_for_update = True
+    has_select_for_update_nowait = False
     supports_forward_references = False
     supports_long_model_names = False
     supports_microsecond_precision = False

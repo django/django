@@ -164,6 +164,9 @@ class Manager(object):
     def order_by(self, *args, **kwargs):
         return self.get_query_set().order_by(*args, **kwargs)
 
+    def select_for_update(self, *args, **kwargs):
+        return self.get_query_set().select_for_update(*args, **kwargs)
+
     def select_related(self, *args, **kwargs):
         return self.get_query_set().select_related(*args, **kwargs)
 

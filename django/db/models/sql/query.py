@@ -125,6 +125,8 @@ class Query(object):
         self.order_by = []
         self.low_mark, self.high_mark = 0, None  # Used for offset/limit
         self.distinct = False
+        self.select_for_update = False
+        self.select_for_update_nowait = False
         self.select_related = False
         self.related_select_cols = []
 
@@ -254,6 +256,8 @@ class Query(object):
         obj.order_by = self.order_by[:]
         obj.low_mark, obj.high_mark = self.low_mark, self.high_mark
         obj.distinct = self.distinct
+        obj.select_for_update = self.select_for_update
+        obj.select_for_update_nowait = self.select_for_update_nowait
         obj.select_related = self.select_related
         obj.related_select_cols = []
         obj.aggregates = copy.deepcopy(self.aggregates, memo=memo)
@@ -360,6 +364,7 @@ class Query(object):
 
         query.clear_ordering(True)
         query.clear_limits()
+        query.select_for_update = False
         query.select_related = False
         query.related_select_cols = []
         query.related_select_fields = []

@@ -70,6 +70,9 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     requires_rollback_on_dirty_transaction = True
     has_real_datatype = True
     can_defer_constraint_checks = True
+    has_select_for_update = True
+    has_select_for_update_nowait = True
+
 
 class DatabaseWrapper(BaseDatabaseWrapper):
     vendor = 'postgresql'

@@ -1,11 +1,13 @@
 from django.core.exceptions import FieldError
 from django.db import connections
+from django.db import transaction
 from django.db.backends.util import truncate_name
 from django.db.models.sql.constants import *
 from django.db.models.sql.datastructures import EmptyResultSet
 from django.db.models.sql.expressions import SQLEvaluator
 from django.db.models.sql.query import get_proxied_model, get_order_dir, \
      select_related_descend, Query
+from django.db.utils import DatabaseError
 
 class SQLCompiler(object):
     def __init__(self, query, connection, using):
@@ -116,6 +118,14 @@ class SQLCompiler(object):
                     if val:
                         result.append('LIMIT %d' % val)
                 result.append('OFFSET %d' % self.query.low_mark)
+
+        if self.query.select_for_update and self.connection.features.has_select_for_update:
+            # If we've been asked for a NOWAIT query but the backend does not support it,
+            # raise a DatabaseError otherwise we could get an unexpected deadlock.
+            nowait = self.query.select_for_update_nowait
+            if nowait and not self.connection.features.has_select_for_update_nowait:
+                raise DatabaseError('NOWAIT is not supported on this database backend.')
+            result.append(self.connection.ops.for_update_sql(nowait=nowait))
 
         return ' '.join(result), tuple(params)
 
@@ -677,6 +687,11 @@ class SQLCompiler(object):
         resolve_columns = hasattr(self, 'resolve_columns')
         fields = None
         has_aggregate_select = bool(self.query.aggregate_select)
+        # Set transaction dirty if we're using SELECT FOR UPDATE to ensure
+        # a subsequent commit/rollback is executed, so any database locks
+        # are released.
+        if self.query.select_for_update and transaction.is_managed(self.using):
+            transaction.set_dirty(self.using)
         for rows in self.execute_sql(MULTI):
             for row in rows:
                 if resolve_columns:

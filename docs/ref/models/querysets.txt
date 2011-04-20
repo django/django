@@ -966,6 +966,46 @@ For example::
     # queries the database with the 'backup' alias
     >>> Entry.objects.using('backup')
 
+select_for_update
+~~~~~~~~~~~~~~~~~
+
+.. method:: select_for_update(nowait=False)
+
+.. versionadded:: 1.4
+
+Returns a queryset that will lock rows until the end of the transaction,
+generating a ``SELECT ... FOR UPDATE`` SQL statement on supported databases.
+
+For example::
+
+    entries = Entry.objects.select_for_update().filter(author=request.user)
+
+All matched entries will be locked until the end of the transaction block,
+meaning that other transactions will be prevented from changing or acquiring
+locks on them.
+
+Usually, if another transaction has already acquired a lock on one of the
+selected rows, the query will block until the lock is released. If this is
+not the behaviour you want, call ``select_for_update(nowait=True)``. This will
+make the call non-blocking. If a conflicting lock is already acquired by
+another transaction, ``django.db.utils.DatabaseError`` will be raised when
+the queryset is evaluated.
+
+Note that using ``select_for_update`` will cause the current transaction to be
+set dirty, if under transaction management. This is to ensure that Django issues
+a ``COMMIT`` or ``ROLLBACK``, releasing any locks held by the ``SELECT FOR
+UPDATE``.
+
+Currently, the ``postgresql_psycopg2``, ``oracle``, and ``mysql``
+database backends support ``select_for_update()``. However, MySQL has no
+support for the ``nowait`` argument.
+
+Passing ``nowait=True`` to ``select_for_update`` using database backends that
+do not support ``nowait``, such as MySQL, will cause a ``DatabaseError`` to be
+raised. This is in order to prevent code unexpectedly blocking.
+
+Using ``select_for_update`` on backends which do not support
+``SELECT ... FOR UPDATE`` (such as SQLite) will have no effect.
 
 Methods that do not return QuerySets
 ------------------------------------

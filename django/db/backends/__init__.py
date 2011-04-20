@@ -279,6 +279,8 @@ class BaseDatabaseFeatures(object):
     # integer primary keys.
     related_fields_match_type = False
     allow_sliced_subqueries = True
+    has_select_for_update = False
+    has_select_for_update_nowait = False
 
     # Does the default test database allow multiple connections?
     # Usually an indication that the test database is in-memory
@@ -475,6 +477,15 @@ class BaseDatabaseOperations(object):
         ordering.
         """
         return []
+
+    def for_update_sql(self, nowait=False):
+        """
+        Returns the FOR UPDATE SQL clause to lock rows for an update operation.
+        """
+        if nowait:
+            return 'FOR UPDATE NOWAIT'
+        else:
+            return 'FOR UPDATE'
 
     def fulltext_search_sql(self, field_name):
         """
