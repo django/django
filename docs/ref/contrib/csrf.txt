@@ -170,10 +170,10 @@ usually only be seen when there is a genuine Cross Site Request Forgery, or
 when, due to a programming error, the CSRF token has not been included with a
 POST form.
 
-No logging is done, and the error message is not very friendly, so you may want
-to provide your own page for handling this condition.  To do this, simply set
-the :setting:`CSRF_FAILURE_VIEW` setting to a dotted path to your own view
-function, which should have the following signature::
+The error page, however, is not very friendly, so you may want to provide your
+own view for handling this condition.  To do this, simply set the
+:setting:`CSRF_FAILURE_VIEW` setting to a dotted path to your own view function,
+which should have the following signature::
 
     def csrf_failure(request, reason="")
 
