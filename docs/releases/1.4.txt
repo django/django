@@ -13,9 +13,20 @@ which are detailed in :doc:`our deprecation plan </internals/deprecation>`.
 .. _new features: `What's new in Django 1.4`_
 .. _backwards incompatible changes: backwards-incompatible-changes-1.4_
 
-
 What's new in Django 1.4
 ========================
+
+``SELECT FOR UPDATE`` support
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django 1.4 now includes a :meth:`QuerySet.select_for_update()
+<django.db.models.query.QuerySet.select_for_update>` method which generates a
+``SELECT ... FOR UPDATE`` SQL query. This will lock rows until the end of the
+transaction, meaning that other transactions cannot modify or delete rows
+matched by a ``FOR UPDATE`` query.
+
+For more details, see the documentation for
+:meth:`~django.db.models.query.QuerySet.select_for_update`.
 
 .. _backwards-incompatible-changes-1.4:
 
