@@ -383,14 +383,14 @@ installation will be aborted, and any data installed in the call to
 Database-specific fixtures
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you are in a multi-database setup, you may have fixture data that
+If you're in a multi-database setup, you might have fixture data that
 you want to load onto one database, but not onto another. In this
-situation, you can add database identifier into . If your
-:setting:`DATABASES` setting has a 'master' database defined, you can
-define the fixture ``mydata.master.json`` or
-``mydata.master.json.gz``. This fixture will only be loaded if you
-have specified that you want to load data onto the ``master``
-database.
+situation, you can add database identifier into the names of your fixtures.
+
+For example, if your :setting:`DATABASES` setting has a 'master' database
+defined, name the fixture ``mydata.master.json`` or
+``mydata.master.json.gz`` and the fixture will only be loaded when you
+specify you want to load data into the ``master`` database.
 
 makemessages
 ------------
