@@ -78,3 +78,16 @@ Django instance, and try to submit it to the upgraded Django instance:
 
   * time period: the amount of time you expect user to take filling out
     such forms.
+
+django.contrib.flatpages
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Starting in the 1.4 release the
+:class:`~django.contrib.flatpages.middleware.FlatpageFallbackMiddleware` only
+adds a trailing slash and redirects if the resulting URL refers to an existing
+flatpage. For example, requesting ``/notaflatpageoravalidurl`` in a previous
+version would redirect to ``/notaflatpageoravalidurl/``, which would
+subsequently raise a 404. Requesting ``/notaflatpageoravalidurl`` now will
+immediately raise a 404. Additionally redirects returned by flatpages are now
+permanent (301 status code) to match the behaviour of the
+:class:`~django.middleware.common.CommonMiddleware`.

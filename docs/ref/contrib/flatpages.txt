@@ -77,6 +77,18 @@ does all of the work.
           :class:`~django.template.RequestContext` in rendering the
           template.
 
+    .. versionchanged:: 1.4
+       The middleware will only add a trailing slash and redirect (by looking
+       at the :setting:`APPEND_SLASH` setting) if the resulting URL refers to
+       a valid flatpage. Previously requesting a non-existent flatpage
+       would redirect to the same URL with an apppended slash first and
+       subsequently raise a 404.
+
+    .. versionchanged:: 1.4
+       Redirects by the middlware are permanent (301 status code) instead of
+       temporary (302) to match behaviour of the
+       :class:`~django.middleware.common.CommonMiddleware`.
+
     If it doesn't find a match, the request continues to be processed as usual.
 
     The middleware only gets activated for 404s -- not for 500s or responses

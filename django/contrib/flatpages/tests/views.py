@@ -73,3 +73,65 @@ class FlatpageViewTests(TestCase):
         response = self.client.get('/flatpage_root/some.very_special~chars-here/')
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "<p>Isn't it special!</p>")
+
+
+class FlatpageViewAppendSlashTests(TestCase):
+    fixtures = ['sample_flatpages']
+    urls = 'django.contrib.flatpages.tests.urls'
+
+    def setUp(self):
+        self.old_MIDDLEWARE_CLASSES = settings.MIDDLEWARE_CLASSES
+        flatpage_middleware_class = 'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware'
+        if flatpage_middleware_class in settings.MIDDLEWARE_CLASSES:
+            settings.MIDDLEWARE_CLASSES = tuple(m for m in settings.MIDDLEWARE_CLASSES if m != flatpage_middleware_class)
+        self.old_TEMPLATE_DIRS = settings.TEMPLATE_DIRS
+        settings.TEMPLATE_DIRS = (
+            os.path.join(
+                os.path.dirname(__file__),
+                'templates'
+            ),
+        )
+        self.old_LOGIN_URL = settings.LOGIN_URL
+        settings.LOGIN_URL = '/accounts/login/'
+        self.old_APPEND_SLASH = settings.APPEND_SLASH
+        settings.APPEND_SLASH = True
+
+    def tearDown(self):
+        settings.MIDDLEWARE_CLASSES = self.old_MIDDLEWARE_CLASSES
+        settings.TEMPLATE_DIRS = self.old_TEMPLATE_DIRS
+        settings.LOGIN_URL = self.old_LOGIN_URL
+        settings.APPEND_SLASH = self.old_APPEND_SLASH
+
+    def test_redirect_view_flatpage(self):
+        "A flatpage can be served through a view and should add a slash"
+        response = self.client.get('/flatpage_root/flatpage')
+        self.assertRedirects(response, '/flatpage_root/flatpage/', status_code=301)
+
+    def test_redirect_view_non_existent_flatpage(self):
+        "A non-existent flatpage raises 404 when served through a view and should not add a slash"
+        response = self.client.get('/flatpage_root/no_such_flatpage')
+        self.assertEquals(response.status_code, 404)
+
+    def test_redirect_fallback_flatpage(self):
+        "A fallback flatpage won't be served if the middleware is disabled and should not add a slash"
+        response = self.client.get('/flatpage')
+        self.assertEquals(response.status_code, 404)
+
+    def test_redirect_fallback_non_existent_flatpage(self):
+        "A non-existent flatpage won't be served if the fallback middlware is disabled and should not add a slash"
+        response = self.client.get('/no_such_flatpage')
+        self.assertEquals(response.status_code, 404)
+
+    def test_redirect_view_flatpage_special_chars(self):
+        "A flatpage with special chars in the URL can be served through a view and should add a slash"
+        fp = FlatPage.objects.create(
+            url="/some.very_special~chars-here/",
+            title="A very special page",
+            content="Isn't it special!",
+            enable_comments=False,
+            registration_required=False,
+        )
+        fp.sites.add(1)
+
+        response = self.client.get('/flatpage_root/some.very_special~chars-here')
+        self.assertRedirects(response, '/flatpage_root/some.very_special~chars-here/', status_code=301)

@@ -1,7 +1,7 @@
 from django.contrib.flatpages.models import FlatPage
 from django.template import loader, RequestContext
 from django.shortcuts import get_object_or_404
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import Http404, HttpResponse, HttpResponsePermanentRedirect
 from django.conf import settings
 from django.core.xheaders import populate_xheaders
 from django.utils.safestring import mark_safe
@@ -28,11 +28,19 @@ def flatpage(request, url):
         flatpage
             `flatpages.flatpages` object
     """
-    if not url.endswith('/') and settings.APPEND_SLASH:
-        return HttpResponseRedirect("%s/" % request.path)
     if not url.startswith('/'):
-        url = "/" + url
-    f = get_object_or_404(FlatPage, url__exact=url, sites__id__exact=settings.SITE_ID)
+        url = '/' + url
+    try:
+        f = get_object_or_404(FlatPage,
+            url__exact=url, sites__id__exact=settings.SITE_ID)
+    except Http404:
+        if not url.endswith('/') and settings.APPEND_SLASH:
+            url += '/'
+            f = get_object_or_404(FlatPage,
+                url__exact=url, sites__id__exact=settings.SITE_ID)
+            return HttpResponsePermanentRedirect('%s/' % request.path)
+        else:
+            raise
     return render_flatpage(request, f)
 
 @csrf_protect
