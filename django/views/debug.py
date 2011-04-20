@@ -304,7 +304,7 @@ def empty_urlconf(request):
 #
 
 TECHNICAL_500_TEMPLATE = """
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE HTML>
 <html lang="en">
 <head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
@@ -763,7 +763,7 @@ Exception Value: {{ exception_value|force_escape }}
 """
 
 TECHNICAL_404_TEMPLATE = """
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
@@ -835,7 +835,7 @@ TECHNICAL_404_TEMPLATE = """
 """
 
 EMPTY_URLCONF_TEMPLATE = """
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html>
 <html lang="en"><head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="robots" content="NONE,NOARCHIVE"><title>Welcome to Django</title>

@@ -615,7 +615,7 @@ Web pages::
     200
     >>> response = c.get('/customer/details/')
     >>> response.content
-    '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 ...'
+    '<!DOCTYPE html...'
 
 As this example suggests, you can instantiate ``Client`` from within a session
 of the Python interactive interpreter.

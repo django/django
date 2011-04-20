@@ -170,8 +170,7 @@ Here's a sample :file:`flatpages/default.html` template:
 
 .. code-block:: html+django
 
-    <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
-        "http://www.w3.org/TR/REC-html40/loose.dtd">
+    <!DOCTYPE html>
     <html>
     <head>
     <title>{{ flatpage.title }}</title>
