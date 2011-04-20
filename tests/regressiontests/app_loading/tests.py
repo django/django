@@ -4,7 +4,7 @@ import sys
 import time
 
 from django.conf import Settings
-from django.db.models.loading import cache, load_app
+from django.db.models.loading import cache, load_app, get_model, get_models
 from django.utils.unittest import TestCase
 
 
@@ -81,3 +81,24 @@ class EggLoadingTest(TestCase):
             # Make sure the message is indicating the actual
             # problem in the broken app.
             self.assertTrue("modelz" in e.args[0])
+
+
+class GetModelsTest(TestCase):
+    def setUp(self):
+        import not_installed.models
+        self.not_installed_module = not_installed.models
+
+
+    def test_get_model_only_returns_installed_models(self):
+        self.assertEqual(
+            get_model("not_installed", "NotInstalledModel"), None)
+
+
+    def test_get_models_only_returns_installed_models(self):
+        self.assertFalse(
+            "NotInstalledModel" in
+            [m.__name__ for m in get_models()])
+
+
+    def test_get_models_with_app_label_only_returns_installed_models(self):
+        self.assertEqual(get_models(self.not_installed_module), [])

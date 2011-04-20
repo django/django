@@ -1023,7 +1023,11 @@ class ManageValidate(AdminScriptTestCase):
     def test_app_with_import(self):
         "manage.py validate does not raise errors when an app imports a base class that itself has an abstract base"
         self.write_settings('settings.py',
-            apps=['admin_scripts.app_with_import', 'django.contrib.comments'],
+            apps=['admin_scripts.app_with_import',
+                  'django.contrib.comments',
+                  'django.contrib.auth',
+                  'django.contrib.contenttypes',
+                  'django.contrib.sites'],
             sdict={'DEBUG': True})
         args = ['validate']
         out, err = self.run_manage(args)

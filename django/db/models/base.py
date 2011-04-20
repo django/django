@@ -88,7 +88,8 @@ class ModelBase(type):
                 new_class._base_manager = new_class._base_manager._copy_to_model(new_class)
 
         # Bail out early if we have already created this class.
-        m = get_model(new_class._meta.app_label, name, False)
+        m = get_model(new_class._meta.app_label, name,
+                      seed_cache=False, only_installed=False)
         if m is not None:
             return m
 
@@ -201,7 +202,8 @@ class ModelBase(type):
         # the first time this model tries to register with the framework. There
         # should only be one class for each model, so we always return the
         # registered version.
-        return get_model(new_class._meta.app_label, name, False)
+        return get_model(new_class._meta.app_label, name,
+                         seed_cache=False, only_installed=False)
 
     def copy_managers(cls, base_managers):
         # This is in-place sorting of an Options attribute, but that's fine.
