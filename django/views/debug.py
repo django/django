@@ -304,7 +304,7 @@ def empty_urlconf(request):
 #
 
 TECHNICAL_500_TEMPLATE = """
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
