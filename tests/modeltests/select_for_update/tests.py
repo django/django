@@ -11,17 +11,13 @@ from django.utils import unittest
 
 from models import Person
 
+# Some tests require threading, which might not be available. So create a
+# skip-test decorator for those test functions.
 try:
     import threading
-    def requires_threading(func):
-        return func
 except ImportError:
-    # Note we can't use dummy_threading here, as our tests will actually
-    # block. We just have to skip the test completely.
-    def requires_threading(func):
-        @wraps(func)
-        def wrapped(*args, **kw):
-            raise unittest.SkipTest('threading required')
+    threading = None
+requires_threading = unittest.skipUnless(threading, 'requires threading')
 
 class SelectForUpdateTests(TransactionTestCase):
 
