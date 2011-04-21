@@ -28,6 +28,15 @@ matched by a ``FOR UPDATE`` query.
 For more details, see the documentation for
 :meth:`~django.db.models.query.QuerySet.select_for_update`.
 
+HTML5
+~~~~~
+
+We've switched the admin and other bundled templates to use the HTML5
+doctype. While Django will be careful in its use of HTML5 features, to maintain
+compatibility with old browsers, this change means that you can use any HTML5
+features you need in admin pages without having to lose HTML validity or
+override the provided templates to change the doctype.
+
 .. _backwards-incompatible-changes-1.4:
 
 Backwards incompatible changes in 1.4
