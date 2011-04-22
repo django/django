@@ -213,9 +213,20 @@ fieldset .field-box {
     padding-left: inherit;
     left: 10px;
     right: inherit;
+    float:left;
 }
 
 .inline-related h3 span.delete label {
     margin-left: inherit;
     margin-right: 2px;
+}
+
+/* IE7 specific bug fixes */
+
+div.colM {
+    position: relative;
+}
+
+.submit-row input {
+    float: left;
 }
