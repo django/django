@@ -202,6 +202,21 @@ Australia (``au``)
     A ``Select`` widget that uses a list of Australian states/territories as its
     choices.
 
+.. class:: au.models.AUPhoneNumberField
+
+    A model field that checks that the value is a valid Australian phone
+    number (ten digits).
+
+.. class:: au.models.AUStateField
+
+    A model field that forms represent as a ``forms.AUStateField`` field and
+    stores the three-letter Australian state abbreviation in the database.
+
+.. class:: au.models.AUPostCodeField
+
+    A model field that forms represent as a ``forms.AUPostCodeField`` field
+    and stores the four-digit Australian postcode in the database.
+
 Austria (``at``)
 ================
 
