@@ -9,7 +9,8 @@ from django.views.decorators.csrf import csrf_protect
 from django.db.models.base import ModelBase
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse
-from django.shortcuts import render_to_response
+from django.template.response import TemplateResponse
+from django.utils.functional import update_wrapper
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
 from django.utils.translation import ugettext as _
@@ -377,10 +378,9 @@ class AdminSite(object):
             'root_path': self.root_path,
         }
         context.update(extra_context or {})
-        context_instance = template.RequestContext(request, current_app=self.name)
-        return render_to_response(self.index_template or 'admin/index.html', context,
-            context_instance=context_instance
-        )
+        return TemplateResponse(request, [
+            self.index_template or 'admin/index.html',
+        ], context, current_app=self.name)
 
     def app_index(self, request, app_label, extra_context=None):
         user = request.user
@@ -421,11 +421,11 @@ class AdminSite(object):
             'root_path': self.root_path,
         }
         context.update(extra_context or {})
-        context_instance = template.RequestContext(request, current_app=self.name)
-        return render_to_response(self.app_index_template or ('admin/%s/app_index.html' % app_label,
-            'admin/app_index.html'), context,
-            context_instance=context_instance
-        )
+
+        return TemplateResponse(request, self.app_index_template or [
+            'admin/%s/app_index.html' % app_label,
+            'admin/app_index.html'
+        ], context, current_app=self.name)
 
 # This global object represents the default admin site, for the common case.
 # You can instantiate AdminSite in your own code to create a custom admin site.

@@ -1,5 +1,5 @@
 from functools import update_wrapper, partial
-from django import forms, template
+from django import forms
 from django.forms.formsets import all_valid
 from django.forms.models import (modelform_factory, modelformset_factory,
     inlineformset_factory, BaseInlineFormSet)
@@ -15,7 +15,8 @@ from django.db.models.related import RelatedObject
 from django.db.models.fields import BLANK_CHOICE_DASH, FieldDoesNotExist
 from django.db.models.sql.constants import LOOKUP_SEP, QUERY_TERMS
 from django.http import Http404, HttpResponse, HttpResponseRedirect
-from django.shortcuts import get_object_or_404, render_to_response
+from django.shortcuts import get_object_or_404
+from django.template.response import SimpleTemplateResponse, TemplateResponse
 from django.utils.decorators import method_decorator
 from django.utils.datastructures import SortedDict
 from django.utils.html import escape, escapejs
@@ -708,12 +709,12 @@ class ModelAdmin(BaseModelAdmin):
             form_template = self.add_form_template
         else:
             form_template = self.change_form_template
-        context_instance = template.RequestContext(request, current_app=self.admin_site.name)
-        return render_to_response(form_template or [
+
+        return TemplateResponse(request, form_template or [
             "admin/%s/%s/change_form.html" % (app_label, opts.object_name.lower()),
             "admin/%s/change_form.html" % app_label,
             "admin/change_form.html"
-        ], context, context_instance=context_instance)
+        ], context, current_app=self.admin_site.name)
 
     def response_add(self, request, obj, post_url_continue='../%s/'):
         """
@@ -1074,7 +1075,9 @@ class ModelAdmin(BaseModelAdmin):
             # something is screwed up with the database, so display an error
             # page.
             if ERROR_FLAG in request.GET.keys():
-                return render_to_response('admin/invalid_setup.html', {'title': _('Database error')})
+                return SimpleTemplateResponse('admin/invalid_setup.html', {
+                    'title': _('Database error'),
+                })
             return HttpResponseRedirect(request.path + '?' + ERROR_FLAG + '=1')
 
         # If the request was POSTed, this might be a bulk action or a bulk
@@ -1183,12 +1186,12 @@ class ModelAdmin(BaseModelAdmin):
             'actions_selection_counter': self.actions_selection_counter,
         }
         context.update(extra_context or {})
-        context_instance = template.RequestContext(request, current_app=self.admin_site.name)
-        return render_to_response(self.change_list_template or [
+
+        return TemplateResponse(request, self.change_list_template or [
             'admin/%s/%s/change_list.html' % (app_label, opts.object_name.lower()),
             'admin/%s/change_list.html' % app_label,
             'admin/change_list.html'
-        ], context, context_instance=context_instance)
+        ], context, current_app=self.admin_site.name)
 
     @csrf_protect_m
     @transaction.commit_on_success
@@ -1244,12 +1247,12 @@ class ModelAdmin(BaseModelAdmin):
             "app_label": app_label,
         }
         context.update(extra_context or {})
-        context_instance = template.RequestContext(request, current_app=self.admin_site.name)
-        return render_to_response(self.delete_confirmation_template or [
+
+        return TemplateResponse(request, self.delete_confirmation_template or [
             "admin/%s/%s/delete_confirmation.html" % (app_label, opts.object_name.lower()),
             "admin/%s/delete_confirmation.html" % app_label,
             "admin/delete_confirmation.html"
-        ], context, context_instance=context_instance)
+        ], context, current_app=self.admin_site.name)
 
     def history_view(self, request, object_id, extra_context=None):
         "The 'history' admin view for this model."
@@ -1272,12 +1275,11 @@ class ModelAdmin(BaseModelAdmin):
             'app_label': app_label,
         }
         context.update(extra_context or {})
-        context_instance = template.RequestContext(request, current_app=self.admin_site.name)
-        return render_to_response(self.object_history_template or [
+        return TemplateResponse(request, self.object_history_template or [
             "admin/%s/%s/object_history.html" % (app_label, opts.object_name.lower()),
             "admin/%s/object_history.html" % app_label,
             "admin/object_history.html"
-        ], context, context_instance=context_instance)
+        ], context, current_app=self.admin_site.name)
 
 class InlineModelAdmin(BaseModelAdmin):
     """

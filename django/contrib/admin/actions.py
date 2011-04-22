@@ -2,12 +2,11 @@
 Built-in, globally-available admin actions.
 """
 
-from django import template
 from django.core.exceptions import PermissionDenied
 from django.contrib.admin import helpers
 from django.contrib.admin.util import get_deleted_objects, model_ngettext
 from django.db import router
-from django.shortcuts import render_to_response
+from django.template.response import TemplateResponse
 from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext_lazy, ugettext as _
 
@@ -76,10 +75,10 @@ def delete_selected(modeladmin, request, queryset):
     }
 
     # Display the confirmation page
-    return render_to_response(modeladmin.delete_selected_confirmation_template or [
+    return TemplateResponse(request, modeladmin.delete_selected_confirmation_template or [
         "admin/%s/%s/delete_selected_confirmation.html" % (app_label, opts.object_name.lower()),
         "admin/%s/delete_selected_confirmation.html" % app_label,
         "admin/delete_selected_confirmation.html"
-    ], context, context_instance=template.RequestContext(request))
+    ], context, current_app=modeladmin.admin_site.name)
 
 delete_selected.short_description = ugettext_lazy("Delete selected %(verbose_name_plural)s")

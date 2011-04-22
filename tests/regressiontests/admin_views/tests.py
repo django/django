@@ -20,6 +20,7 @@ from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 from django.contrib.admin.views.main import IS_POPUP_VAR
 from django.forms.util import ErrorList
 import django.template.context
+from django.template.response import TemplateResponse
 from django.test import TestCase
 from django.utils import formats
 from django.utils.cache import get_max_age
@@ -76,6 +77,7 @@ class AdminViewBasicTest(TestCase):
         A smoke test to ensure GET on the add_view works.
         """
         response = self.client.get('/test_admin/%s/admin_views/section/add/' % self.urlbit)
+        self.assertIsInstance(response, TemplateResponse)
         self.assertEqual(response.status_code, 200)
 
     def testAddWithGETArgs(self):
@@ -91,6 +93,7 @@ class AdminViewBasicTest(TestCase):
         A smoke test to ensure GET on the change_view works.
         """
         response = self.client.get('/test_admin/%s/admin_views/section/1/' % self.urlbit)
+        self.assertIsInstance(response, TemplateResponse)
         self.assertEqual(response.status_code, 200)
 
     def testBasicEditGetStringPK(self):
@@ -488,40 +491,47 @@ class CustomModelAdminTest(AdminViewBasicTest):
 
     def testCustomAdminSiteLoginForm(self):
         self.client.logout()
-        request = self.client.get('/test_admin/admin2/')
-        self.assertEqual(request.status_code, 200)
+        response = self.client.get('/test_admin/admin2/')
+        self.assertIsInstance(response, TemplateResponse)
+        self.assertEqual(response.status_code, 200)
         login = self.client.post('/test_admin/admin2/', {
             REDIRECT_FIELD_NAME: '/test_admin/admin2/',
             LOGIN_FORM_KEY: 1,
             'username': 'customform',
             'password': 'secret',
         })
+        self.assertIsInstance(login, TemplateResponse)
         self.assertEqual(login.status_code, 200)
         self.assertContains(login, 'custom form error')
 
     def testCustomAdminSiteLoginTemplate(self):
         self.client.logout()
         request = self.client.get('/test_admin/admin2/')
+        self.assertIsInstance(request, TemplateResponse)
         self.assertTemplateUsed(request, 'custom_admin/login.html')
         self.assertTrue('Hello from a custom login template' in request.content)
 
     def testCustomAdminSiteLogoutTemplate(self):
         request = self.client.get('/test_admin/admin2/logout/')
+        self.assertIsInstance(request, TemplateResponse)
         self.assertTemplateUsed(request, 'custom_admin/logout.html')
         self.assertTrue('Hello from a custom logout template' in request.content)
 
     def testCustomAdminSiteIndexViewAndTemplate(self):
         request = self.client.get('/test_admin/admin2/')
+        self.assertIsInstance(request, TemplateResponse)
         self.assertTemplateUsed(request, 'custom_admin/index.html')
         self.assertTrue('Hello from a custom index template *bar*' in request.content)
 
     def testCustomAdminSitePasswordChangeTemplate(self):
         request = self.client.get('/test_admin/admin2/password_change/')
+        self.assertIsInstance(request, TemplateResponse)
         self.assertTemplateUsed(request, 'custom_admin/password_change_form.html')
         self.assertTrue('Hello from a custom password change form template' in request.content)
 
     def testCustomAdminSitePasswordChangeDoneTemplate(self):
         request = self.client.get('/test_admin/admin2/password_change/done/')
+        self.assertIsInstance(request, TemplateResponse)
         self.assertTemplateUsed(request, 'custom_admin/password_change_done.html')
         self.assertTrue('Hello from a custom password change done template' in request.content)
 
@@ -631,7 +641,7 @@ class AdminViewPermissionsTest(TestCase):
         self.assertFalse(login.context)
         self.client.get('/test_admin/admin/logout/')
 
-        # Test if user enters email address
+        # Test if user enters e-mail address
         request = self.client.get('/test_admin/admin/')
         self.assertEqual(request.status_code, 200)
         login = self.client.post('/test_admin/admin/', self.super_email_login)
@@ -641,7 +651,7 @@ class AdminViewPermissionsTest(TestCase):
         self.assertContains(login, "Please enter a correct username and password.")
         new_user = User(username='jondoe', password='secret', email='super@example.com')
         new_user.save()
-        # check to ensure if there are multiple email addresses a user doesn't get a 500
+        # check to ensure if there are multiple e-mail addresses a user doesn't get a 500
         login = self.client.post('/test_admin/admin/', self.super_email_login)
         self.assertContains(login, "Please enter a correct username and password.")
 
@@ -1227,7 +1237,7 @@ class SecureViewTests(TestCase):
         # make sure the view removes test cookie
         self.assertEqual(self.client.session.test_cookie_worked(), False)
 
-        # Test if user enters email address
+        # Test if user enters e-mail address
         request = self.client.get('/test_admin/admin/secure-view/')
         self.assertEqual(request.status_code, 200)
         login = self.client.post('/test_admin/admin/secure-view/', self.super_email_login)
@@ -1237,7 +1247,7 @@ class SecureViewTests(TestCase):
         self.assertContains(login, "Please enter a correct username and password.")
         new_user = User(username='jondoe', password='secret', email='super@example.com')
         new_user.save()
-        # check to ensure if there are multiple email addresses a user doesn't get a 500
+        # check to ensure if there are multiple e-mail addresses a user doesn't get a 500
         login = self.client.post('/test_admin/admin/secure-view/', self.super_email_login)
         self.assertContains(login, "Please enter a correct username and password.")
 
@@ -1874,7 +1884,8 @@ class AdminActionsTest(TestCase):
             'post': 'yes',
         }
         confirmation = self.client.post('/test_admin/admin/admin_views/subscriber/', action_data)
-        self.assertContains(confirmation, "Are you sure you want to delete the selected subscribers")
+        self.assertIsInstance(confirmation, TemplateResponse)
+        self.assertContains(confirmation, "Are you sure you want to delete the selected subscribers?")
         self.assertTrue(confirmation.content.count(ACTION_CHECKBOX_NAME) == 2)
         response = self.client.post('/test_admin/admin/admin_views/subscriber/', delete_confirmation_data)
         self.assertEqual(Subscriber.objects.count(), 0)
