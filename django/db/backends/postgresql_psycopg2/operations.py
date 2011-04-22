@@ -202,9 +202,8 @@ class DatabaseOperations(BaseDatabaseOperations):
         return 63
 
     def last_executed_query(self, cursor, sql, params):
-        # With psycopg2, cursor objects have a "query" attribute that is the
-        # exact query sent to the database. See docs here:
-        # http://www.initd.org/tracker/psycopg/wiki/psycopg2_documentation#postgresql-status-message-and-executed-query
+        # http://initd.org/psycopg/docs/cursor.html#cursor.query
+        # The query attribute is a Psycopg extension to the DB API 2.0.
         return cursor.query
 
     def return_insert_id(self):

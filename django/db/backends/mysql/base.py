@@ -191,6 +191,12 @@ class DatabaseOperations(BaseDatabaseOperations):
     def fulltext_search_sql(self, field_name):
         return 'MATCH (%s) AGAINST (%%s IN BOOLEAN MODE)' % field_name
 
+    def last_executed_query(self, cursor, sql, params):
+        # With MySQLdb, cursor objects have an (undocumented) "_last_executed"
+        # attribute where the exact query sent to the database is saved.
+        # See MySQLdb/cursors.py in the source distribution.
+        return cursor._last_executed
+
     def no_limit_value(self):
         # 2**64 - 1, as recommended by the MySQL documentation
         return 18446744073709551615L

@@ -465,7 +465,7 @@ itself to versions newer than the ones included with your particular Python
 binary distribution, if needed.
 
 "Database is locked" errors
------------------------------------------------
+---------------------------
 
 SQLite is meant to be a lightweight database, and thus can't support a high
 level of concurrency. ``OperationalError: database is locked`` errors indicate
@@ -505,6 +505,16 @@ If you're getting this error, you can solve it by:
 
 SQLite does not support the ``SELECT ... FOR UPDATE`` syntax. Calling it will
 have no effect.
+
+.. _sqlite-connection-queries:
+
+Parameters not quoted in ``connection.queries``
+-----------------------------------------------
+
+``sqlite3`` does not provide a way to retrieve the SQL after quoting and
+substituting the parameters. Instead, the SQL in ``connection.queries`` is
+rebuilt with a simple string interpolation. It may be incorrect. Make sure
+you add quotes where necessary before copying a query into a SQLite shell.
 
 .. _oracle-notes:
 

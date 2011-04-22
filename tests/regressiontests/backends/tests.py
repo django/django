@@ -2,6 +2,7 @@
 # Unit and doctests for specific database backends.
 import datetime
 
+from django.conf import settings
 from django.core.management.color import no_style
 from django.db import backend, connection, connections, DEFAULT_DB_ALIAS, IntegrityError
 from django.db.backends.signals import connection_created
@@ -85,6 +86,35 @@ class DateQuotingTest(TestCase):
         classes = models.SchoolClass.objects.filter(last_updated__day=20)
         self.assertEqual(len(classes), 1)
 
+class LastExecutedQueryTest(TestCase):
+
+    def setUp(self):
+        # connection.queries will not be filled in without this
+        settings.DEBUG = True
+
+    def tearDown(self):
+        settings.DEBUG = False
+
+    # There are no tests for the sqlite backend because it does not
+    # implement paramater escaping. See #14091.
+
+    @unittest.skipUnless(connection.vendor in ('oracle', 'postgresql'),
+                         "These backends use the standard parameter escaping rules")
+    def test_parameter_escaping(self):
+        # check that both numbers and string are properly quoted
+        list(models.Tag.objects.filter(name="special:\\\"':", object_id=12))
+        sql = connection.queries[-1]['sql']
+        self.assertTrue("= 'special:\\\"'':' " in sql)
+        self.assertTrue("= 12 " in sql)
+
+    @unittest.skipUnless(connection.vendor == 'mysql',
+                         "MySQL uses backslashes to escape parameters.")
+    def test_parameter_escaping(self):
+        list(models.Tag.objects.filter(name="special:\\\"':", object_id=12))
+        sql = connection.queries[-1]['sql']
+        # only this line is different from the test above
+        self.assertTrue("= 'special:\\\\\\\"\\':' " in sql)
+        self.assertTrue("= 12 " in sql)
 
 class ParameterHandlingTest(TestCase):
     def test_bad_parameter_count(self):
