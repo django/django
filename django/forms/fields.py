@@ -26,16 +26,14 @@ from django.utils.functional import lazy
 from django.core.validators import EMPTY_VALUES
 
 from util import ErrorList
-from widgets import TextInput, PasswordInput, HiddenInput, MultipleHiddenInput, \
-        ClearableFileInput, CheckboxInput, Select, NullBooleanSelect, SelectMultiple, \
-        DateInput, DateTimeInput, TimeInput, SplitDateTimeWidget, SplitHiddenDateTimeWidget, \
-        FILE_INPUT_CONTRADICTION
+from widgets import (TextInput, PasswordInput, HiddenInput,
+    MultipleHiddenInput, ClearableFileInput, CheckboxInput, Select,
+    NullBooleanSelect, SelectMultiple, DateInput, DateTimeInput, TimeInput,
+    SplitDateTimeWidget, SplitHiddenDateTimeWidget, FILE_INPUT_CONTRADICTION)
 
 __all__ = (
     'Field', 'CharField', 'IntegerField',
-    'DEFAULT_DATE_INPUT_FORMATS', 'DateField',
-    'DEFAULT_TIME_INPUT_FORMATS', 'TimeField',
-    'DEFAULT_DATETIME_INPUT_FORMATS', 'DateTimeField', 'TimeField',
+    'DateField', 'TimeField', 'DateTimeField', 'TimeField',
     'RegexField', 'EmailField', 'FileField', 'ImageField', 'URLField',
     'BooleanField', 'NullBooleanField', 'ChoiceField', 'MultipleChoiceField',
     'ComboField', 'MultiValueField', 'FloatField', 'DecimalField',
@@ -53,10 +51,6 @@ def en_format(name):
         DeprecationWarning
     )
     return getattr(formats, name)
-
-DEFAULT_DATE_INPUT_FORMATS = lazy(lambda: en_format('DATE_INPUT_FORMATS'), tuple, list)()
-DEFAULT_TIME_INPUT_FORMATS = lazy(lambda: en_format('TIME_INPUT_FORMATS'), tuple, list)()
-DEFAULT_DATETIME_INPUT_FORMATS = lazy(lambda: en_format('DATETIME_INPUT_FORMATS'), tuple, list)()
 
 class Field(object):
     widget = TextInput # Default widget to use when rendering this type of Field.
