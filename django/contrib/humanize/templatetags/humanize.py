@@ -2,7 +2,7 @@ from django.utils.translation import ungettext, ugettext as _
 from django.utils.encoding import force_unicode
 from django import template
 from django.template import defaultfilters
-from datetime import date
+from datetime import date, datetime
 import re
 
 register = template.Library()
@@ -83,7 +83,7 @@ def naturalday(value, arg=None):
     present day returns representing string. Otherwise, returns a string
     formatted according to settings.DATE_FORMAT.
     """
-    try: 
+    try:
         value = date(value.year, value.month, value.day)
     except AttributeError:
         # Passed value wasn't a date object
@@ -100,3 +100,35 @@ def naturalday(value, arg=None):
         return _(u'yesterday')
     return defaultfilters.date(value, arg)
 register.filter(naturalday)
+
+def naturaltime(value, arg=None):
+    """
+    For date and time values shows how many seconds, minutes or hours ago compared to
+    current timestamp returns representing string. Otherwise, returns a string
+    formatted according to settings.DATE_FORMAT
+    """
+    try:
+        value = datetime(value.year, value.month, value.day, value.hour, value.minute, value.second)
+    except AttributeError:
+        return value
+    except ValueError:
+        return value
+
+    delta = datetime.now() - value
+    if delta.days != 0:
+        value = date(value.year, value.month, value.day)
+        return naturalday(value, arg)
+    elif delta.seconds == 0:
+        return _(u'now')
+    elif delta.seconds < 60:
+        return _(u'%s seconds ago' % (delta.seconds))
+    elif delta.seconds / 60 < 2:
+        return _(r'a minute ago')
+    elif delta.seconds / 60 < 60:
+        return _(u'%s minutes ago' % (delta.seconds/60))
+    elif delta.seconds / 60 / 60 < 2:
+        return _(u'an hour ago')
+    elif delta.seconds / 60 / 60 < 24:
+        return _(u'%s hours ago' % (delta.seconds/60/60))
+    return naturalday(value, arg)
+register.filter(naturaltime)

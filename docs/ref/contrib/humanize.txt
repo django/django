@@ -82,6 +82,31 @@ Examples (when 'today' is 17 Feb 2007):
     * Any other day is formatted according to given argument or the
       :setting:`DATE_FORMAT` setting if no argument is given.
 
+.. templatefilter:: naturaltime
+
+naturaltime
+-----------
+
+.. versionadded:: 1.4
+
+For date and time values shows how many seconds, minutes or hours ago compared
+to current timestamp returns representing string. Otherwise, it behaves like
+:tfilter:`naturaldate`, so it can also take string argument for date formating.
+
+**Argument:** Date formatting string as described in the :tfilter:`date` tag.
+
+Examples (when 'now' is 17 Feb 2007 16:30:00):
+
+    * ``17 Feb 2007 16:30:00`` becomes ``now``.
+    * ``17 Feb 2007 16:29:31`` becomes ``29 seconds ago``.
+    * ``17 Feb 2007 16:29:00`` becomes ``a minute ago``.
+    * ``17 Feb 2007 16:25:35`` becomes ``4 minutes ago``.
+    * ``17 Feb 2007 15:30:29`` becomes ``an hours ago``.
+    * ``17 Feb 2007 13:31:29`` becomes ``2 hours ago``.
+    * ``16 Feb 2007 13:31:29`` becomes ``yesterday``.
+    * Any other day is formatted according to given argument or the
+      :setting:`DATE_FORMAT` setting if no argument is given.
+
 .. templatefilter:: ordinal
 
 ordinal
