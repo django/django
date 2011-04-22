@@ -529,6 +529,51 @@ class LinkInline(admin.TabularInline):
     readonly_fields = ("posted",)
 
 
+class PrePopulatedPost(models.Model):
+    title = models.CharField(max_length=100)
+    published = models.BooleanField()
+    slug = models.SlugField()
+
+class PrePopulatedSubPost(models.Model):
+    post = models.ForeignKey(PrePopulatedPost)
+    subtitle = models.CharField(max_length=100)
+    subslug = models.SlugField()
+
+class SubPostInline(admin.TabularInline):
+    model = PrePopulatedSubPost
+
+    prepopulated_fields = {
+        'subslug' : ('subtitle',)
+    }
+
+    def get_readonly_fields(self, request, obj=None):
+        if obj and obj.published:
+            return ('subslug',)
+        return self.readonly_fields
+
+    def get_prepopulated_fields(self, request, obj=None):
+        if obj and obj.published:
+            return {}
+        return self.prepopulated_fields
+
+class PrePopulatedPostAdmin(admin.ModelAdmin):
+    list_display = ['title', 'slug']
+    prepopulated_fields = {
+        'slug' : ('title',)
+    }
+
+    inlines = [SubPostInline]
+
+    def get_readonly_fields(self, request, obj=None):
+        if obj and obj.published:
+            return ('slug',)
+        return self.readonly_fields
+
+    def get_prepopulated_fields(self, request, obj=None):
+        if obj and obj.published:
+            return {}
+        return self.prepopulated_fields
+
 class Post(models.Model):
     title = models.CharField(max_length=100, help_text="Some help text for the title (with unicode ŠĐĆŽćžšđ)")
     content = models.TextField(help_text="Some help text for the content (with unicode ŠĐĆŽćžšđ)")
@@ -818,3 +863,4 @@ admin.site.register(Topping)
 admin.site.register(Album, AlbumAdmin)
 admin.site.register(Question)
 admin.site.register(Answer)
+admin.site.register(PrePopulatedPost, PrePopulatedPostAdmin)

@@ -839,6 +839,15 @@ templates used by the :class:`ModelAdmin` views:
     a ``list`` or ``tuple`` of field names that will be displayed as read-only,
     as described above in the :attr:`ModelAdmin.readonly_fields` section.
 
+.. method:: ModelAdmin.get_prepopulated_fields(self, request, obj=None)
+
+    .. versionadded:: 1.4
+
+    The ``get_prepopulated_fields`` method is given the ``HttpRequest`` and the
+    ``obj`` being edited (or ``None`` on an add form) and is expected to return
+    a ``dictionary``, as described above in the :attr:`ModelAdmin.prepopulated_fields`
+    section.
+
 .. method:: ModelAdmin.get_urls(self)
 
     The ``get_urls`` method on a ``ModelAdmin`` returns the URLs to be used for

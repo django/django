@@ -2579,6 +2579,30 @@ class NeverCacheTests(TestCase):
         self.assertEqual(get_max_age(response), None)
 
 
+class PrePopulatedTest(TestCase):
+    fixtures = ['admin-views-users.xml']
+
+    def setUp(self):
+        self.client.login(username='super', password='secret')
+
+    def tearDown(self):
+        self.client.logout()
+
+    def test_prepopulated_on(self):
+        response = self.client.get('/test_admin/admin/admin_views/prepopulatedpost/add/')
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "id: '#id_slug',")
+        self.assertContains(response, "field['dependency_ids'].push('#id_title');")
+        self.assertContains(response, "id: '#id_prepopulatedsubpost_set-0-subslug',")
+
+    def test_prepopulated_off(self):
+        response = self.client.get('/test_admin/admin/admin_views/prepopulatedpost/1/')
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "A Long Title")
+        self.assertNotContains(response, "id: '#id_slug'")
+        self.assertNotContains(response, "field['dependency_ids'].push('#id_title');")
+        self.assertNotContains(response, "id: '#id_prepopulatedsubpost_set-0-subslug',")
+
 class ReadonlyTest(TestCase):
     fixtures = ['admin-views-users.xml']
 

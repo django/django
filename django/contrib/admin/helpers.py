@@ -193,7 +193,8 @@ class InlineAdminFormSet(object):
     """
     A wrapper around an inline formset for use in the admin system.
     """
-    def __init__(self, inline, formset, fieldsets, readonly_fields=None, model_admin=None):
+    def __init__(self, inline, formset, fieldsets, prepopulated_fields=None,
+            readonly_fields=None, model_admin=None):
         self.opts = inline
         self.formset = formset
         self.fieldsets = fieldsets
@@ -201,18 +202,21 @@ class InlineAdminFormSet(object):
         if readonly_fields is None:
             readonly_fields = ()
         self.readonly_fields = readonly_fields
+        if prepopulated_fields is None:
+            prepopulated_fields = {}
+        self.prepopulated_fields = prepopulated_fields
 
     def __iter__(self):
         for form, original in zip(self.formset.initial_forms, self.formset.get_queryset()):
             yield InlineAdminForm(self.formset, form, self.fieldsets,
-                self.opts.prepopulated_fields, original, self.readonly_fields,
+                self.prepopulated_fields, original, self.readonly_fields,
                 model_admin=self.opts)
         for form in self.formset.extra_forms:
             yield InlineAdminForm(self.formset, form, self.fieldsets,
-                self.opts.prepopulated_fields, None, self.readonly_fields,
+                self.prepopulated_fields, None, self.readonly_fields,
                 model_admin=self.opts)
         yield InlineAdminForm(self.formset, self.formset.empty_form,
-            self.fieldsets, self.opts.prepopulated_fields, None,
+            self.fieldsets, self.prepopulated_fields, None,
             self.readonly_fields, model_admin=self.opts)
 
     def fields(self):

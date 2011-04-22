@@ -189,7 +189,16 @@ class BaseModelAdmin(object):
     declared_fieldsets = property(_declared_fieldsets)
 
     def get_readonly_fields(self, request, obj=None):
+        """
+        Hook for specifying custom readonly fields.
+        """
         return self.readonly_fields
+
+    def get_prepopulated_fields(self, request, obj=None):
+        """
+        Hook for specifying custom prepopulated fields.
+        """
+        return self.prepopulated_fields
 
     def queryset(self, request):
         """
@@ -909,7 +918,8 @@ class ModelAdmin(BaseModelAdmin):
                 formsets.append(formset)
 
         adminForm = helpers.AdminForm(form, list(self.get_fieldsets(request)),
-            self.prepopulated_fields, self.get_readonly_fields(request),
+            self.get_prepopulated_fields(request),
+            self.get_readonly_fields(request),
             model_admin=self)
         media = self.media + adminForm.media
 
@@ -917,8 +927,9 @@ class ModelAdmin(BaseModelAdmin):
         for inline, formset in zip(self.inline_instances, formsets):
             fieldsets = list(inline.get_fieldsets(request))
             readonly = list(inline.get_readonly_fields(request))
+            prepopulated = dict(inline.get_prepopulated_fields(request))
             inline_admin_formset = helpers.InlineAdminFormSet(inline, formset,
-                fieldsets, readonly, model_admin=self)
+                fieldsets, prepopulated, readonly, model_admin=self)
             inline_admin_formsets.append(inline_admin_formset)
             media = media + inline_admin_formset.media
 
@@ -1000,7 +1011,8 @@ class ModelAdmin(BaseModelAdmin):
                 formsets.append(formset)
 
         adminForm = helpers.AdminForm(form, self.get_fieldsets(request, obj),
-            self.prepopulated_fields, self.get_readonly_fields(request, obj),
+            self.get_prepopulated_fields(request, obj),
+            self.get_readonly_fields(request, obj),
             model_admin=self)
         media = self.media + adminForm.media
 
@@ -1008,8 +1020,9 @@ class ModelAdmin(BaseModelAdmin):
         for inline, formset in zip(self.inline_instances, formsets):
             fieldsets = list(inline.get_fieldsets(request, obj))
             readonly = list(inline.get_readonly_fields(request, obj))
+            prepopulated = dict(inline.get_prepopulated_fields(request, obj))
             inline_admin_formset = helpers.InlineAdminFormSet(inline, formset,
-                fieldsets, readonly, model_admin=self)
+                fieldsets, prepopulated, readonly, model_admin=self)
             inline_admin_formsets.append(inline_admin_formset)
             media = media + inline_admin_formset.media
 

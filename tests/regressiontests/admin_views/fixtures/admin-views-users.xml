@@ -88,6 +88,9 @@
         <field type="DateTimeField" name="date">2009-03-18 11:54:58</field>
         <field to="admin_views.section" name="section" rel="ManyToOneRel">1</field>
     </object>
-
-
+    <object pk="1" model="admin_views.prepopulatedpost">
+        <field type="TextField" name="title">A Long Title</field>
+        <field type="BooleanField" name="published">True</field>
+        <field type="SlugField" name="slug">a-long-title</field>
+    </object>
 </django-objects>
