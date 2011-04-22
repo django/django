@@ -17,6 +17,8 @@ from django.template import base as template_base
 from django.core import urlresolvers
 from django.template import loader
 from django.template.loaders import app_directories, filesystem, cached
+from django.test.utils import setup_test_template_loader,\
+    restore_template_loaders
 from django.utils import unittest
 from django.utils.translation import activate, deactivate, ugettext as _
 from django.utils.safestring import mark_safe
@@ -1639,6 +1641,35 @@ class TemplateTagLoading(unittest.TestCase):
         sys.path.append(egg_name)
         settings.INSTALLED_APPS = ('tagsegg',)
         t = template.Template(ttext)
+
+
+class RequestContextTests(BaseTemplateResponseTest):
+
+    def setUp(self):
+        templates = {
+            'child': Template('{{ var|default:"none" }}'),
+        }
+        setup_test_template_loader(templates)
+        self.fake_request = RequestFactory().get('/')
+
+    def tearDown(self):
+        restore_template_loaders()
+
+    def test_include_only(self):
+        """
+        Regression test for #15721, ``{% include %}`` and ``RequestContext``
+        not playing together nicely.
+        """
+        ctx = RequestContext(self.fake_request, {'var': 'parent'})
+        self.assertEqual(
+            template.Template('{% include "child" %}').render(ctx),
+            'parent'
+        )
+        self.assertEqual(
+            template.Template('{% include "child" only %}').render(ctx),
+            'none'
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
