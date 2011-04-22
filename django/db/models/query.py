@@ -403,6 +403,7 @@ class QuerySet(object):
                 "Cannot change a query once a slice has been taken."
         obj = self._clone()
         obj.query.set_limits(high=1)
+        obj.query.clear_ordering()
         obj.query.add_ordering('-%s' % latest_by)
         return obj.get()
 

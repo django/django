@@ -43,6 +43,9 @@ class LatestTests(TestCase):
             a3,
         )
 
+        # Ensure that latest() overrides any other ordering specified on the query. Refs #11283.
+        self.assertEqual(Article.objects.order_by('id').latest(), a4)
+
     def test_latest_manual(self):
         # You can still use latest() with a model that doesn't have
         # "get_latest_by" set -- just pass in the field name manually.
