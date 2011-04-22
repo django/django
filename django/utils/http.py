@@ -6,6 +6,7 @@ import urllib
 import urlparse
 from email.Utils import formatdate
 
+from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import smart_str, force_unicode
 from django.utils.functional import allow_lazy
 
@@ -49,7 +50,9 @@ def urlencode(query, doseq=0):
     unicode strings. The parameters are first case to UTF-8 encoded strings and
     then encoded as per normal.
     """
-    if hasattr(query, 'items'):
+    if isinstance(query, MultiValueDict):
+        query = query.lists()
+    elif hasattr(query, 'items'):
         query = query.items()
     return urllib.urlencode(
         [(smart_str(k),
