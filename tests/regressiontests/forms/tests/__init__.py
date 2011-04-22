@@ -38,6 +38,7 @@ from regressiontests.forms.localflavortests import (
     PLLocalFlavorTests,
     PTLocalFlavorTests,
     ROLocalFlavorTests,
+    RULocalFlavorTests,
     SELocalFlavorTests,
     SKLocalFlavorTests,
     TRLocalFlavorTests,

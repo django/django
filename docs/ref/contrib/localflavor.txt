@@ -63,6 +63,7 @@ Countries currently supported by :mod:`~django.contrib.localflavor` are:
     * Poland_
     * Portugal_
     * Romania_
+    * Russia_
     * Slovakia_
     * `South Africa`_
     * Spain_
@@ -113,6 +114,7 @@ Here's an example of how to use them::
 .. _Poland: `Poland (pl)`_
 .. _Portugal: `Portugal (pt)`_
 .. _Romania: `Romania (ro)`_
+.. _Russia: `Russia (ru)`_
 .. _Slovakia: `Slovakia (sk)`_
 .. _South Africa: `South Africa (za)`_
 .. _Spain: `Spain (es)`_
@@ -189,6 +191,8 @@ Argentina (``ar``)
 
 Australia (``au``)
 =============================================
+
+.. versionadded:: 1.4
 
 .. class:: au.forms.AUPostCodeField
 
@@ -341,6 +345,8 @@ Chile (``cl``)
 
 China (``cn``)
 ==============
+
+.. versionadded:: 1.4
 
 .. class:: cn.forms.CNProvinceSelect
 
@@ -755,6 +761,34 @@ Romania (``ro``)
 .. class:: ro.forms.ROPostalCodeField
 
     A form field that validates Romanian postal codes.
+
+Russia (``ru``)
+===============
+
+.. versionadded:: 1.4
+
+.. class:: ru.forms.RUPostalCodeField
+
+    Russian Postal code field. The valid format is XXXXXX, where X is any
+    digit and the first digit is not zero.
+
+.. class:: ru.forms.RUCountySelect
+
+    A ``Select`` widget that uses a list of Russian Counties as its choices.
+
+.. class:: ru.forms.RURegionSelect
+
+    A ``Select`` widget that uses a list of Russian Regions as its choices.
+
+.. class:: ru.forms.RUPassportNumberField
+
+    Russian internal passport number. The valid format is XXXX XXXXXX, where X
+    is any digit.
+
+.. class:: ru.forms.RUAlienPassportNumberField
+
+    Russian alien's passport number. The valid format is XX XXXXXXX, where X
+    is any digit.
 
 Slovakia (``sk``)
 =================
