@@ -1,6 +1,8 @@
 from django.utils import unittest
 from django.conf import settings
 from django.core.handlers.wsgi import WSGIHandler
+from django.test import RequestFactory
+
 
 class HandlerTests(unittest.TestCase):
 
@@ -23,3 +25,10 @@ class HandlerTests(unittest.TestCase):
         # Reset settings
         settings.MIDDLEWARE_CLASSES = old_middleware_classes
 
+    def test_bad_path_info(self):
+        """Tests for bug #15672 ('request' referenced before assignment)"""
+        environ = RequestFactory().get('/').environ
+        environ['PATH_INFO'] = '\xed'
+        handler = WSGIHandler()
+        response = handler(environ, lambda *a, **k: None)
+        self.assertEqual(response.status_code, 400)
