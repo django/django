@@ -44,6 +44,7 @@ Countries currently supported by :mod:`~django.contrib.localflavor` are:
     * Canada_
     * Chile_
     * China_
+    * Croatia_
     * Czech_
     * Finland_
     * France_
@@ -95,6 +96,7 @@ Here's an example of how to use them::
 .. _Canada: `Canada (ca)`_
 .. _Chile: `Chile (cl)`_
 .. _China: `China (cn)`_
+.. _Croatia: `Croatia (hr)`_
 .. _Czech: `Czech (cz)`_
 .. _Finland: `Finland (fi)`_
 .. _France: `France (fr)`_
@@ -373,6 +375,72 @@ China (``cn``)
     A form field that validates input as a Chinese mobile phone number.
     Valid formats are like 1XXXXXXXXXX, where X is digit.
     The second digit could only be 3, 5 and 8.
+
+Croatia (``hr``)
+==============
+
+.. versionadded:: 1.4
+
+.. class:: hr.forms.HRCountySelect
+
+    A ``Select`` widget that uses a list of counties of Croatia as its choices.
+
+.. class:: hr.forms.HRPhoneNumberPrefixSelect
+
+    A ``Select`` widget that uses a list of phone number prefixes of Croatia as
+    its choices.
+
+.. class:: hr.forms.HRLicensePlatePrefixSelect
+
+    A ``Select`` widget that uses a list of vehicle license plate prefixes of
+    Croatia as its choices.
+
+.. class:: hr.forms.HRPhoneNumberField
+
+    A form field that validates input as a phone number of Croatia.
+    A valid format is a country code or a leading zero, area code prefix, 6 or 7
+    digit number; e.g. +385XXXXXXXX or 0XXXXXXXX
+    Validates fixed, mobile and FGSM numbers. Normalizes to a full number with
+    country code (+385 prefix).
+
+.. class:: hr.forms.HRLicensePlateField
+
+    A form field that validates input as a vehicle license plate of Croatia.
+    Normalizes to the specific format XX YYYY-XX where X is a letter and Y a
+    digit. There can be three or four digits.
+    Suffix is constructed from the shared letters of the Croatian and English
+    alphabets.
+    It is used for standardized license plates only. Special cases like license
+    plates for oldtimers, temporary license plates, government institution
+    license plates and customized license plates are not covered by this field.
+
+.. class:: hr.forms.HRPostalCodeField
+
+    A form field that validates input as a postal code of Croatia.
+    It consists of exactly five digits ranging from 10000 to 59999 inclusive.
+
+.. class:: hr.forms.HROIBField
+
+    A form field that validates input as a Personal Identification Number (OIB)
+    of Croatia.
+    It consists of exactly eleven digits.
+
+.. class:: hr.forms.HRJMBGField
+
+    A form field that validates input as a Unique Master Citizen Number (JMBG).
+    The number is still in use in Croatia, but it is being replaced by OIB.
+    This field works for other ex-Yugoslavia countries as well where the JMBG is
+    still in use.
+    The area segment of the JMBG is not validated because the citizens might
+    have emigrated to another ex-Yugoslavia country.
+    The number consists of exactly thirteen digits.
+
+.. class:: hr.forms.HRJMBAGField
+
+    A form field that validates input as a Unique Master Academic Citizen Number
+    (JMBAG) of Croatia.
+    This number is used by college students and professors in Croatia.
+    The number consists of exactly nineteen digits.
 
 Czech (``cz``)
 ==============

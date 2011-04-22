@@ -13,6 +13,7 @@ from localflavor.es import ESLocalFlavorTests
 from localflavor.fi import FILocalFlavorTests
 from localflavor.fr import FRLocalFlavorTests
 from localflavor.generic import GenericLocalFlavorTests
+from localflavor.hr import HRLocalFlavorTests
 from localflavor.id import IDLocalFlavorTests
 from localflavor.ie import IELocalFlavorTests
 from localflavor.il import ILLocalFlavorTests
