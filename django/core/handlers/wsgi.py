@@ -265,7 +265,6 @@ class WSGIHandler(base.BaseHandler):
                     exc_info=sys.exc_info(),
                     extra={
                         'status_code': 400,
-                        'request': request
                     }
                 )
                 response = http.HttpResponseBadRequest()
