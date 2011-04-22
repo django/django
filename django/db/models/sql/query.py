@@ -74,7 +74,7 @@ class RawQuery(object):
         return iter(result)
 
     def __repr__(self):
-        return "<RawQuery: %r>" % (self.sql % self.params)
+        return "<RawQuery: %r>" % (self.sql % tuple(self.params))
 
     def _execute_query(self):
         self.cursor = connections[self.using].cursor()

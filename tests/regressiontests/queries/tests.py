@@ -1317,6 +1317,23 @@ class Queries6Tests(TestCase):
         self.assertIsNot(q1, q1.all())
 
 
+class RawQueriesTests(TestCase):
+    def setUp(self):
+        n1 = Note.objects.create(note='n1', misc='foo', id=1)
+
+    def test_ticket14729(self):
+        # Test representation of raw query with one or few parameters passed as list
+        query = "SELECT * FROM queries_note WHERE note = %s"
+        params = ['n1']
+        qs = Note.objects.raw(query, params=params)
+        self.assertEqual(repr(qs), "<RawQuerySet: 'SELECT * FROM queries_note WHERE note = n1'>")
+
+        query = "SELECT * FROM queries_note WHERE note = %s and misc = %s"
+        params = ['n1', 'foo']
+        qs = Note.objects.raw(query, params=params)
+        self.assertEqual(repr(qs), "<RawQuerySet: 'SELECT * FROM queries_note WHERE note = n1 and misc = foo'>")
+
+
 class GeneratorExpressionTests(TestCase):
     def test_ticket10432(self):
         # Using an empty generator expression as the rvalue for an "__in"
