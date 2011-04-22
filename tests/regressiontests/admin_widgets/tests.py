@@ -8,7 +8,8 @@ from django.contrib import admin
 from django.contrib.admin import widgets
 from django.contrib.admin.widgets import (FilteredSelectMultiple,
     AdminSplitDateTime, AdminFileWidget, ForeignKeyRawIdWidget, AdminRadioSelect,
-    RelatedFieldWidgetWrapper, ManyToManyRawIdWidget)
+    RelatedFieldWidgetWrapper, ManyToManyRawIdWidget,
+    url_params_from_lookup_dict)
 from django.core.files.storage import default_storage
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db.models import DateField
@@ -179,6 +180,12 @@ class AdminForeignKeyRawIdWidget(DjangoTestCase):
 
             self.assertContains(response,
                 'Select a valid choice. That choice is not one of the available choices.')
+
+    def test_url_params_from_lookup_dict_any_iterable(self):
+        lookup1 = url_params_from_lookup_dict({'color__in': ('red', 'blue')})
+        lookup2 = url_params_from_lookup_dict({'color__in': ['red', 'blue']})
+        self.assertEqual(lookup1, {'color__in': 'red,blue'})
+        self.assertEqual(lookup1, lookup2)
 
 
 class FilteredSelectMultipleWidgetTest(TestCase):

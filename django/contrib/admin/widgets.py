@@ -99,7 +99,7 @@ def url_params_from_lookup_dict(lookups):
     if lookups and hasattr(lookups, 'items'):
         items = []
         for k, v in lookups.items():
-            if isinstance(v, list):
+            if isinstance(v, (tuple, list)):
                 v = u','.join([str(x) for x in v])
             elif isinstance(v, bool):
                 # See django.db.fields.BooleanField.get_prep_lookup
