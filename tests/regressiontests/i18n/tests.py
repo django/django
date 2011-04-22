@@ -171,6 +171,7 @@ class FormattingTests(TestCase):
         settings.USE_THOUSAND_SEPARATOR = False
         self.assertEqual(u'66666.66', nformat(self.n, decimal_sep='.', decimal_pos=2, grouping=3, thousand_sep=','))
         self.assertEqual(u'66666A6', nformat(self.n, decimal_sep='A', decimal_pos=1, grouping=1, thousand_sep='B'))
+        self.assertEqual(u'66666', nformat(self.n, decimal_sep='X', decimal_pos=0, grouping=1, thousand_sep='Y'))
 
         settings.USE_THOUSAND_SEPARATOR = True
         self.assertEqual(u'66,666.66', nformat(self.n, decimal_sep='.', decimal_pos=2, grouping=3, thousand_sep=','))

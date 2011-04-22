@@ -2,7 +2,7 @@ from django.conf import settings
 from django.utils.safestring import mark_safe
 
 
-def format(number, decimal_sep, decimal_pos, grouping=0, thousand_sep=''):
+def format(number, decimal_sep, decimal_pos=None, grouping=0, thousand_sep=''):
     """
     Gets a number (as a number or string), and returns it as a string,
     using formats definied as arguments:
@@ -29,11 +29,11 @@ def format(number, decimal_sep, decimal_pos, grouping=0, thousand_sep=''):
     # decimal part
     if '.' in str_number:
         int_part, dec_part = str_number.split('.')
-        if decimal_pos:
+        if decimal_pos is not None:
             dec_part = dec_part[:decimal_pos]
     else:
         int_part, dec_part = str_number, ''
-    if decimal_pos:
+    if decimal_pos is not None:
         dec_part = dec_part + ('0' * (decimal_pos - len(dec_part)))
     if dec_part: dec_part = decimal_sep + dec_part
     # grouping
