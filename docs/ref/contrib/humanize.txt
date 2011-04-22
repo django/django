@@ -101,7 +101,7 @@ Examples (when 'now' is 17 Feb 2007 16:30:00):
     * ``17 Feb 2007 16:29:31`` becomes ``29 seconds ago``.
     * ``17 Feb 2007 16:29:00`` becomes ``a minute ago``.
     * ``17 Feb 2007 16:25:35`` becomes ``4 minutes ago``.
-    * ``17 Feb 2007 15:30:29`` becomes ``an hours ago``.
+    * ``17 Feb 2007 15:30:29`` becomes ``an hour ago``.
     * ``17 Feb 2007 13:31:29`` becomes ``2 hours ago``.
     * ``16 Feb 2007 13:31:29`` becomes ``yesterday``.
     * Any other day is formatted according to given argument or the

@@ -75,7 +75,7 @@ The ``save()`` method has no return value.
     ``save()`` takes a number of advanced options not described here.
     See the documentation for ``save()`` for complete details.
 
-    To create an object and save it all in one step see the ```create()```
+    To create an object and save it all in one step see the ``create()``
     method.
 
 Saving changes to objects
@@ -572,7 +572,7 @@ issue the query::
 For date and date/time fields, you can add or subtract a ``datetime.timedelta``
 object.  The following would return all entries that were modified more than 3 days
 after they were published::
-   
+
     >>> from datetime import timedelta
     >>> Entry.objects.filter(mod_date__gt=F('pub_date') + timedelta(days=3))
 

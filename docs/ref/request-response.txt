@@ -497,7 +497,7 @@ hard-coded strings. If you use this technique, follow these guidelines:
 
     * The iterator should return strings.
     * If an :class:`HttpResponse` has been initialized with an iterator as its
-      content, you can't use the class:`HttpResponse` instance as a file-like
+      content, you can't use the :class:`HttpResponse` instance as a file-like
       object. Doing so will raise ``Exception``.
 
 Setting headers
