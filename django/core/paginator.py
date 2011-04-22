@@ -13,8 +13,8 @@ class EmptyPage(InvalidPage):
 class Paginator(object):
     def __init__(self, object_list, per_page, orphans=0, allow_empty_first_page=True):
         self.object_list = object_list
-        self.per_page = per_page
-        self.orphans = orphans
+        self.per_page = int(per_page)
+        self.orphans = int(orphans)
         self.allow_empty_first_page = allow_empty_first_page
         self._num_pages = self._count = None
 
