@@ -84,6 +84,7 @@ def naturalday(value, arg=None):
     formatted according to settings.DATE_FORMAT.
     """
     try:
+        tzinfo = getattr(value, 'tzinfo', None)
         value = date(value.year, value.month, value.day)
     except AttributeError:
         # Passed value wasn't a date object
@@ -91,7 +92,8 @@ def naturalday(value, arg=None):
     except ValueError:
         # Date arguments out of range
         return value
-    delta = value - date.today()
+    today = datetime.now(tzinfo).replace(microsecond=0, second=0, minute=0, hour=0)
+    delta = value - today.date()
     if delta.days == 0:
         return _(u'today')
     elif delta.days == 1:

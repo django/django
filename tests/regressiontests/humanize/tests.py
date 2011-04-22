@@ -1,4 +1,4 @@
-from datetime import timedelta, date, datetime
+from datetime import timedelta, date, datetime, tzinfo, timedelta
 
 from django.template import Template, Context, add_to_builtins
 from django.utils import unittest
@@ -7,6 +7,24 @@ from django.utils.translation import ugettext as _
 from django.utils.html import escape
 
 add_to_builtins('django.contrib.humanize.templatetags.humanize')
+
+
+class FixedOffset(tzinfo):
+    """Fixed offset in hours east from UTC."""
+
+    def __init__(self, offset, name):
+        self.__offset = timedelta(hours=offset)
+        self.__name = name
+
+    def utcoffset(self, dt):
+        return self.__offset
+
+    def tzname(self, dt):
+        return self.__name
+
+    def dst(self, dt):
+        return timedelta(0)
+
 
 class HumanizeTests(unittest.TestCase):
 
@@ -97,7 +115,19 @@ class HumanizeTests(unittest.TestCase):
         rendered = t.render(Context(locals())).strip()
         self.assertTrue(u' hours ago' in rendered)
 
+    def test_naturalday_tz(self):
+        from django.contrib.humanize.templatetags.humanize import naturalday
 
-if __name__ == '__main__':
-    unittest.main()
+        today = date.today()
+        tz_one = FixedOffset(-12, 'TzOne')
+        tz_two = FixedOffset(12, 'TzTwo')
 
+        # Can be today or yesterday
+        date_one = datetime(today.year, today.month, today.day, tzinfo=tz_one)
+        naturalday_one = naturalday(date_one)
+        # Can be today or tomorrow
+        date_two = datetime(today.year, today.month, today.day, tzinfo=tz_two)
+        naturalday_two = naturalday(date_two)
+
+        # As 24h of difference they will never be the same
+        self.assertNotEqual(naturalday_one, naturalday_two)
