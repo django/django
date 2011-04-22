@@ -371,7 +371,7 @@ familiar with the mechanics.
 OddForm is now an Article-related thing, because BadForm.Meta overrides
 CategoryForm.Meta.
 >>> OddForm.base_fields.keys()
-['headline', 'slug', 'pub_date', 'writer', 'article', 'status', 'categories']
+['headline', 'slug', 'pub_date', 'writer', 'article', 'categories', 'status']
 
 >>> class ArticleForm(ModelForm):
 ...     class Meta:
@@ -382,7 +382,7 @@ First class with a Meta class wins.
 >>> class BadForm(ArticleForm, CategoryForm):
 ...     pass
 >>> OddForm.base_fields.keys()
-['headline', 'slug', 'pub_date', 'writer', 'article', 'status', 'categories']
+['headline', 'slug', 'pub_date', 'writer', 'article', 'categories', 'status']
 
 Subclassing without specifying a Meta on the class will use the parent's Meta
 (or the first parent in the MRO if there are multiple parent classes).
@@ -556,17 +556,17 @@ fields with the 'choices' attribute are represented by a ChoiceField.
 <option value="...">Mike Royko</option>
 </select></td></tr>
 <tr><th>Article:</th><td><textarea rows="10" cols="40" name="article"></textarea></td></tr>
+<tr><th>Categories:</th><td><select multiple="multiple" name="categories">
+<option value="...">Entertainment</option>
+<option value="...">It&#39;s a test</option>
+<option value="...">Third test</option>
+</select><br /><span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></td></tr>
 <tr><th>Status:</th><td><select name="status">
 <option value="" selected="selected">---------</option>
 <option value="1">Draft</option>
 <option value="2">Pending</option>
 <option value="3">Live</option>
 </select></td></tr>
-<tr><th>Categories:</th><td><select multiple="multiple" name="categories">
-<option value="...">Entertainment</option>
-<option value="...">It&#39;s a test</option>
-<option value="...">Third test</option>
-</select><br /><span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></td></tr>
 
 You can restrict a form to a subset of the complete list of fields
 by providing a 'fields' argument. If you try to save a
@@ -612,17 +612,17 @@ True
 <option value="..." selected="selected">Mike Royko</option>
 </select></li>
 <li>Article: <textarea rows="10" cols="40" name="article">Hello.</textarea></li>
+<li>Categories: <select multiple="multiple" name="categories">
+<option value="...">Entertainment</option>
+<option value="...">It&#39;s a test</option>
+<option value="...">Third test</option>
+</select> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></li>
 <li>Status: <select name="status">
 <option value="" selected="selected">---------</option>
 <option value="1">Draft</option>
 <option value="2">Pending</option>
 <option value="3">Live</option>
 </select></li>
-<li>Categories: <select multiple="multiple" name="categories">
-<option value="...">Entertainment</option>
-<option value="...">It&#39;s a test</option>
-<option value="...">Third test</option>
-</select> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></li>
 >>> f = TestArticleForm({'headline': u'Test headline', 'slug': 'test-headline', 'pub_date': u'1984-02-06', 'writer': unicode(w_royko.pk), 'article': 'Hello.'}, instance=art)
 >>> f.errors
 {}
@@ -675,17 +675,17 @@ Add some categories and test the many-to-many form output.
 <option value="..." selected="selected">Mike Royko</option>
 </select></li>
 <li>Article: <textarea rows="10" cols="40" name="article">Hello.</textarea></li>
+<li>Categories: <select multiple="multiple" name="categories">
+<option value="..." selected="selected">Entertainment</option>
+<option value="...">It&#39;s a test</option>
+<option value="...">Third test</option>
+</select> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></li>
 <li>Status: <select name="status">
 <option value="" selected="selected">---------</option>
 <option value="1">Draft</option>
 <option value="2">Pending</option>
 <option value="3">Live</option>
 </select></li>
-<li>Categories: <select multiple="multiple" name="categories">
-<option value="..." selected="selected">Entertainment</option>
-<option value="...">It&#39;s a test</option>
-<option value="...">Third test</option>
-</select> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></li>
 
 Initial values can be provided for model forms
 >>> f = TestArticleForm(auto_id=False, initial={'headline': 'Your headline here', 'categories': [str(c1.id), str(c2.id)]})
@@ -699,17 +699,17 @@ Initial values can be provided for model forms
 <option value="...">Mike Royko</option>
 </select></li>
 <li>Article: <textarea rows="10" cols="40" name="article"></textarea></li>
+<li>Categories: <select multiple="multiple" name="categories">
+<option value="..." selected="selected">Entertainment</option>
+<option value="..." selected="selected">It&#39;s a test</option>
+<option value="...">Third test</option>
+</select> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></li>
 <li>Status: <select name="status">
 <option value="" selected="selected">---------</option>
 <option value="1">Draft</option>
 <option value="2">Pending</option>
 <option value="3">Live</option>
 </select></li>
-<li>Categories: <select multiple="multiple" name="categories">
-<option value="..." selected="selected">Entertainment</option>
-<option value="..." selected="selected">It&#39;s a test</option>
-<option value="...">Third test</option>
-</select> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></li>
 
 >>> f = TestArticleForm({'headline': u'New headline', 'slug': u'new-headline', 'pub_date': u'1988-01-04',
 ...     'writer': unicode(w_royko.pk), 'article': u'Hello.', 'categories': [unicode(c1.id), unicode(c2.id)]}, instance=new_art)
@@ -818,17 +818,17 @@ the data in the database when the form is instantiated.
 <option value="...">Mike Royko</option>
 </select></li>
 <li>Article: <textarea rows="10" cols="40" name="article"></textarea></li>
+<li>Categories: <select multiple="multiple" name="categories">
+<option value="...">Entertainment</option>
+<option value="...">It&#39;s a test</option>
+<option value="...">Third</option>
+</select> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></li>
 <li>Status: <select name="status">
 <option value="" selected="selected">---------</option>
 <option value="1">Draft</option>
 <option value="2">Pending</option>
 <option value="3">Live</option>
 </select></li>
-<li>Categories: <select multiple="multiple" name="categories">
-<option value="...">Entertainment</option>
-<option value="...">It&#39;s a test</option>
-<option value="...">Third</option>
-</select> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></li>
 >>> c4 = Category.objects.create(name='Fourth', url='4th')
 >>> c4
 <Category: Fourth>
@@ -845,18 +845,18 @@ the data in the database when the form is instantiated.
 <option value="...">Mike Royko</option>
 </select></li>
 <li>Article: <textarea rows="10" cols="40" name="article"></textarea></li>
-<li>Status: <select name="status">
-<option value="" selected="selected">---------</option>
-<option value="1">Draft</option>
-<option value="2">Pending</option>
-<option value="3">Live</option>
-</select></li>
 <li>Categories: <select multiple="multiple" name="categories">
 <option value="...">Entertainment</option>
 <option value="...">It&#39;s a test</option>
 <option value="...">Third</option>
 <option value="...">Fourth</option>
 </select> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></li>
+<li>Status: <select name="status">
+<option value="" selected="selected">---------</option>
+<option value="1">Draft</option>
+<option value="2">Pending</option>
+<option value="3">Live</option>
+</select></li>
 
 # ModelChoiceField ############################################################
 

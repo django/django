@@ -143,7 +143,7 @@ def fields_for_model(model, fields=None, exclude=None, widgets=None, formfield_c
     field_list = []
     ignored = []
     opts = model._meta
-    for f in opts.fields + opts.many_to_many:
+    for f in sorted(opts.fields + opts.many_to_many):
         if not f.editable:
             continue
         if fields is not None and not f.name in fields:
