@@ -503,9 +503,14 @@ given length.
     * Empty value: ``None``
     * Normalizes to: An ``UploadedFile`` object that wraps the file content
       and file name into a single object.
-    * Validates that non-empty file data has been bound to the form.
+    * Can validate that non-empty file data has been bound to the form.
     * Error message keys: ``required``, ``invalid``, ``missing``, ``empty``,
       ``max_length``
+
+Has two optional arguments for validation, ''max_length'' and 
+''allow_empty_file''. If provided, these ensure that the file name is at 
+most the given length, and that validation will succeed even if the file 
+content is empty.
 
 To learn more about the ``UploadedFile`` object, see the :doc:`file uploads
 documentation </topics/http/file-uploads>`.

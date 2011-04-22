@@ -450,6 +450,7 @@ class FileField(Field):
 
     def __init__(self, *args, **kwargs):
         self.max_length = kwargs.pop('max_length', None)
+        self.allow_empty_file = kwargs.pop('allow_empty_file', False)
         super(FileField, self).__init__(*args, **kwargs)
 
     def to_python(self, data):
@@ -468,7 +469,7 @@ class FileField(Field):
             raise ValidationError(self.error_messages['max_length'] % error_values)
         if not file_name:
             raise ValidationError(self.error_messages['invalid'])
-        if not file_size:
+        if not self.allow_empty_file and not file_size:
             raise ValidationError(self.error_messages['empty'])
 
         return data

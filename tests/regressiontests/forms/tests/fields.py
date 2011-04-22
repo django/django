@@ -506,6 +506,11 @@ class FieldsTests(TestCase):
         self.assertEqual('files/test2.pdf', f.clean(None, 'files/test2.pdf'))
         self.assertEqual(SimpleUploadedFile, type(f.clean(SimpleUploadedFile('name', 'Some File Content'))))
 
+    def test_filefield_3(self):
+        f = FileField(allow_empty_file=True)
+        self.assertEqual(SimpleUploadedFile,
+                         type(f.clean(SimpleUploadedFile('name', ''))))
+
     # URLField ##################################################################
 
     def test_urlfield_1(self):
