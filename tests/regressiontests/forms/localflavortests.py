@@ -7,6 +7,7 @@ from localflavor.ca import CALocalFlavorTests
 from localflavor.ch import CHLocalFlavorTests
 from localflavor.cl import CLLocalFlavorTests
 from localflavor.cz import CZLocalFlavorTests
+from localflavor.cn import CNLocalFlavorTests
 from localflavor.de import DELocalFlavorTests
 from localflavor.es import ESLocalFlavorTests
 from localflavor.fi import FILocalFlavorTests

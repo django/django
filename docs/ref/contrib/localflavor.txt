@@ -43,6 +43,7 @@ Countries currently supported by :mod:`~django.contrib.localflavor` are:
     * Brazil_
     * Canada_
     * Chile_
+    * China_
     * Czech_
     * Finland_
     * France_
@@ -92,6 +93,7 @@ Here's an example of how to use them::
 .. _Brazil: `Brazil (br)`_
 .. _Canada: `Canada (ca)`_
 .. _Chile: `Chile (cl)`_
+.. _China: `China (cn)`_
 .. _Czech: `Czech (cz)`_
 .. _Finland: `Finland (fi)`_
 .. _France: `France (fr)`_
@@ -336,6 +338,35 @@ Chile (``cl``)
 
     A ``Select`` widget that uses a list of Chilean regions (Regiones) as its
     choices.
+
+China (``cn``)
+==============
+
+.. class:: cn.forms.CNProvinceSelect
+
+    A ``Select`` widget that uses a list of Chinese regions as its choices.
+
+.. class:: cn.forms.CNPostCodeField
+
+    A form field that validates input as a Chinese post code.
+    Valid formats are XXXXXX where X is digit.
+
+.. class:: cn.forms.CNIDCardField
+
+    A form field that validates input as a Chinese Identification Card Number.
+    Both 1st and 2nd generation ID Card Number are validated.
+
+.. class:: cn.forms.CNPhoneNumberField
+
+    A form field that validates input as a Chinese phone number.
+    Valid formats are 0XX-XXXXXXXX, composed of 3 or 4 digits of region code
+    and 7 or 8 digits of phone number.
+
+.. class:: cn.forms.CNCellNumberField
+
+    A form field that validates input as a Chinese mobile phone number.
+    Valid formats are like 1XXXXXXXXXX, where X is digit.
+    The second digit could only be 3, 5 and 8.
 
 Czech (``cz``)
 ==============
