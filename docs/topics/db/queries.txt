@@ -540,7 +540,7 @@ references can then be used in query filters to compare the values of two
 different fields on the same model instance.
 
 For example, to find a list of all blog entries that have had more comments
-than pingbacks, we construct an ``F()`` object to reference the comment count,
+than pingbacks, we construct an ``F()`` object to reference the pingback count,
 and use that ``F()`` object in the query::
 
     >>> from django.db.models import F
