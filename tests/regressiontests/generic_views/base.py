@@ -101,6 +101,14 @@ class ViewTest(unittest.TestCase):
             self.rf.get('/', REQUEST_METHOD='FAKE')
         ).status_code, 405)
 
+    def test_get_and_head(self):
+        """
+        Test a view which supplies a GET method also responds correctly to HEAD
+        """
+        self._assert_simple(SimpleView.as_view()(self.rf.get('/')))
+        response = SimpleView.as_view()(self.rf.head('/'))
+        self.assertEqual(response.status_code, 200)
+
     def test_get_and_post(self):
         """
         Test a view which only allows both GET and POST.
@@ -166,6 +174,13 @@ class TemplateViewTest(TestCase):
         Test a view that simply renders a template on GET
         """
         self._assert_about(AboutTemplateView.as_view()(self.rf.get('/about/')))
+
+    def test_head(self):
+        """
+        Test a TemplateView responds correctly to HEAD
+        """
+        response = AboutTemplateView.as_view()(self.rf.head('/about/'))
+        self.assertEqual(response.status_code, 200)
 
     def test_get_template_attribute(self):
         """
