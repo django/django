@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.admin.options import IncorrectLookupParameters
-from django.contrib.admin.views.main import ChangeList
+from django.contrib.admin.views.main import ChangeList, SEARCH_VAR
 from django.core.paginator import Paginator
 from django.template import Context, Template
 from django.test import TransactionTestCase
@@ -148,12 +148,14 @@ class ChangeListTests(TransactionTestCase):
         band.genres.add(blues)
 
         m = BandAdmin(Band, admin.site)
-        cl = ChangeList(MockFilteredRequestA(blues.pk), Band, m.list_display,
+        request = MockFilterRequest('genres', blues.pk)
+
+        cl = ChangeList(request, Band, m.list_display,
                 m.list_display_links, m.list_filter, m.date_hierarchy,
                 m.search_fields, m.list_select_related, m.list_per_page,
                 m.list_editable, m)
 
-        cl.get_results(MockFilteredRequestA(blues.pk))
+        cl.get_results(request)
 
         # There's only one Group instance
         self.assertEqual(cl.result_count, 1)
@@ -169,12 +171,14 @@ class ChangeListTests(TransactionTestCase):
         Membership.objects.create(group=band, music=lead, role='bass player')
 
         m = GroupAdmin(Group, admin.site)
-        cl = ChangeList(MockFilteredRequestB(lead.pk), Group, m.list_display,
+        request = MockFilterRequest('members', lead.pk)
+
+        cl = ChangeList(request, Group, m.list_display,
                 m.list_display_links, m.list_filter, m.date_hierarchy,
                 m.search_fields, m.list_select_related, m.list_per_page,
                 m.list_editable, m)
 
-        cl.get_results(MockFilteredRequestB(lead.pk))
+        cl.get_results(request)
 
         # There's only one Group instance
         self.assertEqual(cl.result_count, 1)
@@ -191,12 +195,14 @@ class ChangeListTests(TransactionTestCase):
         Membership.objects.create(group=four, music=lead, role='guitar player')
 
         m = QuartetAdmin(Quartet, admin.site)
-        cl = ChangeList(MockFilteredRequestB(lead.pk), Quartet, m.list_display,
+        request = MockFilterRequest('members', lead.pk)
+
+        cl = ChangeList(request, Quartet, m.list_display,
                 m.list_display_links, m.list_filter, m.date_hierarchy,
                 m.search_fields, m.list_select_related, m.list_per_page,
                 m.list_editable, m)
 
-        cl.get_results(MockFilteredRequestB(lead.pk))
+        cl.get_results(request)
 
         # There's only one Quartet instance
         self.assertEqual(cl.result_count, 1)
@@ -213,15 +219,58 @@ class ChangeListTests(TransactionTestCase):
         Invitation.objects.create(band=three, player=lead, instrument='bass')
 
         m = ChordsBandAdmin(ChordsBand, admin.site)
-        cl = ChangeList(MockFilteredRequestB(lead.pk), ChordsBand, m.list_display,
+        request = MockFilterRequest('members', lead.pk)
+
+        cl = ChangeList(request, ChordsBand, m.list_display,
                 m.list_display_links, m.list_filter, m.date_hierarchy,
                 m.search_fields, m.list_select_related, m.list_per_page,
                 m.list_editable, m)
 
-        cl.get_results(MockFilteredRequestB(lead.pk))
+        cl.get_results(request)
 
         # There's only one ChordsBand instance
         self.assertEqual(cl.result_count, 1)
+
+    def test_distinct_for_non_unique_related_object_in_list_filter(self):
+        """
+        Regressions tests for #15819: If a field listed in list_filters
+        is a non-unique related object, distinct() must be called.
+        """
+        parent = Parent.objects.create(name='Mary')
+        # Two children with the same name
+        Child.objects.create(parent=parent, name='Daniel')
+        Child.objects.create(parent=parent, name='Daniel')
+
+        m = ParentAdmin(Parent, admin.site)
+        request = MockFilterRequest('child__name', 'Daniel')
+
+        cl = ChangeList(request, Parent, m.list_display, m.list_display_links,
+                        m.list_filter, m.date_hierarchy, m.search_fields,
+                        m.list_select_related, m.list_per_page,
+                        m.list_editable, m)
+
+        # Make sure distinct() was called
+        self.assertEqual(cl.query_set.count(), 1)
+
+    def test_distinct_for_non_unique_related_object_in_search_fields(self):
+        """
+        Regressions tests for #15819: If a field listed in search_fields
+        is a non-unique related object, distinct() must be called.
+        """
+        parent = Parent.objects.create(name='Mary')
+        Child.objects.create(parent=parent, name='Danielle')
+        Child.objects.create(parent=parent, name='Daniel')
+
+        m = ParentAdmin(Parent, admin.site)
+        request = MockSearchRequest('daniel')
+
+        cl = ChangeList(request, Parent, m.list_display, m.list_display_links,
+                        m.list_filter, m.date_hierarchy, m.search_fields,
+                        m.list_select_related, m.list_per_page,
+                        m.list_editable, m)
+
+        # Make sure distinct() was called
+        self.assertEqual(cl.query_set.count(), 1)
 
     def test_pagination(self):
         """
@@ -252,6 +301,11 @@ class ChangeListTests(TransactionTestCase):
         self.assertEqual(cl.query_set.count(), 30)
         self.assertEqual(cl.paginator.count, 30)
         self.assertEqual(cl.paginator.page_range, [1, 2, 3])
+
+
+class ParentAdmin(admin.ModelAdmin):
+    list_filter = ['child__name']
+    search_fields = ['child__name']
 
 
 class ChildAdmin(admin.ModelAdmin):
@@ -288,10 +342,10 @@ class QuartetAdmin(admin.ModelAdmin):
 class ChordsBandAdmin(admin.ModelAdmin):
     list_filter = ['members']
 
-class MockFilteredRequestA(object):
-    def __init__(self, pk):
-        self.GET = { 'genres' : pk }
+class MockFilterRequest(object):
+    def __init__(self, filter, q):
+        self.GET = {filter: q}
 
-class MockFilteredRequestB(object):
-    def __init__(self, pk):
-        self.GET = { 'members': pk }
+class MockSearchRequest(object):
+    def __init__(self, q):
+        self.GET = {SEARCH_VAR: q}

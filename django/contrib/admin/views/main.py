@@ -26,6 +26,15 @@ ERROR_FLAG = 'e'
 # Text to display within change-list table cells if the value is blank.
 EMPTY_CHANGELIST_VALUE = ugettext_lazy('(None)')
 
+def field_needs_distinct(field):
+    if ((hasattr(field, 'rel') and
+         isinstance(field.rel, models.ManyToManyRel)) or
+        (isinstance(field, models.related.RelatedObject) and
+         not field.field.unique)):
+         return True
+    return False
+
+
 class ChangeList(object):
     def __init__(self, request, model, list_display, list_display_links, list_filter, date_hierarchy, search_fields, list_select_related, list_per_page, list_editable, model_admin):
         self.model = model
@@ -189,8 +198,7 @@ class ChangeList(object):
                     f = self.lookup_opts.get_field_by_name(field_name)[0]
                 except models.FieldDoesNotExist:
                     raise IncorrectLookupParameters
-                if hasattr(f, 'rel') and isinstance(f.rel, models.ManyToManyRel):
-                    use_distinct = True
+                use_distinct = field_needs_distinct(f)
 
             # if key ends with __in, split parameter into separate values
             if key.endswith('__in'):
@@ -264,7 +272,7 @@ class ChangeList(object):
                 for search_spec in orm_lookups:
                     field_name = search_spec.split('__', 1)[0]
                     f = self.lookup_opts.get_field_by_name(field_name)[0]
-                    if hasattr(f, 'rel') and isinstance(f.rel, models.ManyToManyRel):
+                    if field_needs_distinct(f):
                         use_distinct = True
                         break
 
