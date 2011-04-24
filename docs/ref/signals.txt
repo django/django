@@ -223,17 +223,17 @@ Arguments sent with this signal:
     This can be one of the following:
 
     ``"pre_add"``
-        Sent *before* one or more objects are added to the relation
+        Sent *before* one or more objects are added to the relation.
     ``"post_add"``
-        Sent *after* one or more objects are added to the relation
+        Sent *after* one or more objects are added to the relation.
     ``"pre_remove"``
-        Sent *after* one or more objects are removed from the relation
+        Sent *before* one or more objects are removed from the relation.
     ``"post_remove"``
-        Sent *after* one or more objects are removed from the relation
+        Sent *after* one or more objects are removed from the relation.
     ``"pre_clear"``
-        Sent *before* the relation is cleared
+        Sent *before* the relation is cleared.
     ``"post_clear"``
-        Sent *after* the relation is cleared
+        Sent *after* the relation is cleared.
 
 ``reverse``
     Indicates which side of the relation is updated (i.e., if it is the
