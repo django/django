@@ -225,7 +225,7 @@ Since the loading of settings is one of the first things that Django
 does, you can be certain that loggers are always ready for use in your
 project code.
 
-.. _dictConfig format: http://docs.python.org/library/logging.html#configuration-dictionary-schema
+.. _dictConfig format: http://docs.python.org/library/logging.config.html#configuration-dictionary-schema
 
 .. _a third-party library: http://bitbucket.org/vinay.sajip/dictconfig
 
