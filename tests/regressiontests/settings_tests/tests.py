@@ -1,6 +1,5 @@
 from django.conf import settings
 from django.utils import unittest
-from django.conf import settings, UserSettingsHolder, global_settings
 
 
 class SettingsTests(unittest.TestCase):
