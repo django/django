@@ -10,5 +10,5 @@ def xview(request):
     return HttpResponse()
 
 class XViewClass(View):
-    def get(request):
+    def get(self, request):
         return HttpResponse()
