@@ -122,11 +122,22 @@ class CommentFormNode(BaseCommentNode):
     """Insert a form for the comment model into the context."""
 
     def get_form(self, context):
-        ctype, object_pk = self.get_target_ctype_pk(context)
-        if object_pk:
-            return comments.get_form()(ctype.get_object_for_this_type(pk=object_pk))
+        obj = self.get_object(context)
+        if obj:
+            return comments.get_form()(obj)
         else:
             return None
+
+    def get_object(self, context):
+        if self.object_expr:
+            try:
+                return self.object_expr.resolve(context)
+            except template.VariableDoesNotExist:
+                return None
+        else:
+            object_pk = self.object_pk_expr.resolve(context,
+                    ignore_failures=True)
+            return self.ctype.get_object_for_this_type(pk=object_pk)
 
     def render(self, context):
         context[self.as_varname] = self.get_form(context)

@@ -40,6 +40,11 @@ class CommentTemplateTagTests(CommentTestCase):
     def testRenderCommentFormFromObject(self):
         self.testRenderCommentForm("{% render_comment_form for a %}")
 
+    def testRenderCommentFormFromObjectWithQueryCount(self):
+        def test():
+            self.testRenderCommentFormFromObject()
+        self.assertNumQueries(1, test)
+
     def testGetCommentCount(self, tag=None):
         self.createSomeComments()
         t = "{% load comments %}" + (tag or "{% get_comment_count for comment_tests.article a.id as cc %}") + "{{ cc }}"
