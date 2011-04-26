@@ -6,7 +6,7 @@ test case that is capable of testing the capabilities of
 the serializers. This includes all valid data values, plus
 forward, backwards and self references.
 """
-
+from __future__ import with_statement
 
 import datetime
 import decimal
@@ -17,6 +17,7 @@ except ImportError:
 
 from django.conf import settings
 from django.core import serializers, management
+from django.core.serializers import SerializerDoesNotExist
 from django.db import transaction, DEFAULT_DB_ALIAS, connection
 from django.test import TestCase
 from django.utils.functional import curry
@@ -350,7 +351,28 @@ if connection.features.allows_primary_key_0:
 # Dynamically create serializer tests to ensure that all
 # registered serializers are automatically tested.
 class SerializerTests(TestCase):
-    pass
+    def test_get_unknown_serializer(self):
+        """
+        #15889: get_serializer('nonsense') raises a SerializerDoesNotExist
+        """
+        with self.assertRaises(SerializerDoesNotExist):
+            serializers.get_serializer("nonsense")
+
+        with self.assertRaises(KeyError):
+            serializers.get_serializer("nonsense")
+
+        # SerializerDoesNotExist is instantiated with the nonexistent format
+        with self.assertRaises(SerializerDoesNotExist) as cm:
+            serializers.get_serializer("nonsense")
+        self.assertEqual(cm.exception.args, ("nonsense",))
+
+    def test_unregister_unkown_serializer(self):
+        with self.assertRaises(SerializerDoesNotExist):
+            serializers.unregister_serializer("nonsense")
+
+    def test_get_unkown_deserializer(self):
+        with self.assertRaises(SerializerDoesNotExist):
+            serializers.get_deserializer("nonsense")
 
 def serializerTest(format, self):
 

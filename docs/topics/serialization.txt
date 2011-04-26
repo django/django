@@ -38,6 +38,12 @@ This is useful if you want to serialize data directly to a file-like object
     out = open("file.xml", "w")
     xml_serializer.serialize(SomeModel.objects.all(), stream=out)
 
+.. note::
+
+    Calling :func:`~django.core.serializers.get_serializer` with an unknown
+    :ref:`format <serialization-formats>` will raise a
+    :class:`~django.core.serializers.SerializerDoesNotExist` exception.
+
 Subset of fields
 ~~~~~~~~~~~~~~~~
 

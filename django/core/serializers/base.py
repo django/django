@@ -8,6 +8,10 @@ from django.db import models
 from django.utils.encoding import smart_str, smart_unicode
 from django.utils import datetime_safe
 
+class SerializerDoesNotExist(KeyError):
+    """The requested serializer was not found."""
+    pass
+
 class SerializationError(Exception):
     """Something bad happened during serialization."""
     pass
