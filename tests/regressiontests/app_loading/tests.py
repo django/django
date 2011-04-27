@@ -122,4 +122,4 @@ class NotInstalledModelsTest(TestCase):
         from .not_installed.models import NotInstalledModel
         self.assertEqual(
             set(NotInstalledModel._meta.get_all_field_names()),
-            set(["id", "relatedmodel"]))
+            set(["id", "relatedmodel", "m2mrelatedmodel"]))
