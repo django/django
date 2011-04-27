@@ -12,6 +12,8 @@ from regressiontests.views import BrokenException, except_args
 
 
 class DebugViewTests(TestCase):
+    urls = "regressiontests.views.urls"
+
     def setUp(self):
         self.old_debug = settings.DEBUG
         settings.DEBUG = True
@@ -23,13 +25,13 @@ class DebugViewTests(TestCase):
         settings.TEMPLATE_DEBUG = self.old_template_debug
 
     def test_files(self):
-        response = self.client.get('/views/raises/')
+        response = self.client.get('/raises/')
         self.assertEqual(response.status_code, 500)
 
         data = {
             'file_data.txt': SimpleUploadedFile('file_data.txt', 'haha'),
         }
-        response = self.client.post('/views/raises/', data)
+        response = self.client.post('/raises/', data)
         self.assertTrue('file_data.txt' in response.content)
         self.assertFalse('haha' in response.content)
 
