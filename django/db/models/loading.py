@@ -159,7 +159,8 @@ class AppCache(object):
         return self.app_errors
 
     def get_models(self, app_mod=None,
-                   include_auto_created=False, include_deferred=False):
+                   include_auto_created=False, include_deferred=False,
+                   only_installed=True):
         """
         Given a module containing models, returns a list of the models.
         Otherwise returns a list of all installed models.
@@ -172,7 +173,7 @@ class AppCache(object):
         queries are *not* included in the list of models. However, if
         you specify include_deferred, they will be.
         """
-        cache_key = (app_mod, include_auto_created, include_deferred)
+        cache_key = (app_mod, include_auto_created, include_deferred, only_installed)
         try:
             return self._get_models_cache[cache_key]
         except KeyError:
@@ -185,8 +186,11 @@ class AppCache(object):
             else:
                 app_list = []
         else:
-            app_list = [self.app_models.get(app_label, SortedDict())
-                        for app_label in self.app_labels.iterkeys()]
+            if only_installed:
+                app_list = [self.app_models.get(app_label, SortedDict())
+                            for app_label in self.app_labels.iterkeys()]
+            else:
+                app_list = self.app_models.itervalues()
         model_list = []
         for app in app_list:
             model_list.extend(

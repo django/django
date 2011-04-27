@@ -85,13 +85,20 @@ class EggLoadingTest(TestCase):
 
 class GetModelsTest(TestCase):
     def setUp(self):
-        import not_installed.models
-        self.not_installed_module = not_installed.models
+        from .not_installed import models
+        self.not_installed_module = models
 
 
     def test_get_model_only_returns_installed_models(self):
         self.assertEqual(
             get_model("not_installed", "NotInstalledModel"), None)
+
+
+    def test_get_model_with_not_installed(self):
+        self.assertEqual(
+            get_model(
+                "not_installed", "NotInstalledModel", only_installed=False),
+            self.not_installed_module.NotInstalledModel)
 
 
     def test_get_models_only_returns_installed_models(self):
@@ -102,3 +109,17 @@ class GetModelsTest(TestCase):
 
     def test_get_models_with_app_label_only_returns_installed_models(self):
         self.assertEqual(get_models(self.not_installed_module), [])
+
+
+    def test_get_models_with_not_installed(self):
+        self.assertTrue(
+            "NotInstalledModel" in [
+                m.__name__ for m in get_models(only_installed=False)])
+
+
+class NotInstalledModelsTest(TestCase):
+    def test_related_not_installed_model(self):
+        from .not_installed.models import NotInstalledModel
+        self.assertEqual(
+            set(NotInstalledModel._meta.get_all_field_names()),
+            set(["id", "relatedmodel"]))
