@@ -1,5 +1,5 @@
 from django.contrib.localflavor.pl.forms import (PLProvinceSelect,
-    PLCountySelect, PLPostalCodeField, PLNIPField, PLPESELField, PLREGONField)
+    PLCountySelect, PLPostalCodeField, PLNIPField, PLPESELField, PLNationalIDCardNumberField, PLREGONField)
 
 from utils import LocalFlavorTestCase
 
@@ -26,7 +26,7 @@ class PLLocalFlavorTests(LocalFlavorTestCase):
 <option value="west_pomerania">West Pomerania</option>
 </select>'''
         self.assertEqual(f.render('voivodeships', 'pomerania'), out)
-    
+
     def test_PLCountrySelect(self):
         f = PLCountySelect()
         out = u'''<select name="administrativeunit">
@@ -408,7 +408,7 @@ class PLLocalFlavorTests(LocalFlavorTestCase):
 <option value="walecki">wa\u0142ecki</option>
 </select>'''
         self.assertEqual(f.render('administrativeunit', 'katowice'), out)
-    
+
     def test_PLPostalCodeField(self):
         error_format = [u'Enter a postal code in the format XX-XXX.']
         valid = {
@@ -418,7 +418,7 @@ class PLLocalFlavorTests(LocalFlavorTestCase):
             '43--434': error_format,
         }
         self.assertFieldOutput(PLPostalCodeField, valid, invalid)
-    
+
     def test_PLNIPField(self):
         error_format = [u'Enter a tax number field (NIP) in the format XXX-XXX-XX-XX or XX-XX-XXX-XXX.']
         error_checksum = [u'Wrong checksum for the Tax Number (NIP).']
@@ -431,7 +431,7 @@ class PLLocalFlavorTests(LocalFlavorTestCase):
             '646-241-41-23': error_checksum,
         }
         self.assertFieldOutput(PLNIPField, valid, invalid)
-    
+
     def test_PLPESELField(self):
         error_checksum = [u'Wrong checksum for the National Identification Number.']
         error_format = [u'National Identification Number consists of 11 digits.']
@@ -444,7 +444,22 @@ class PLLocalFlavorTests(LocalFlavorTestCase):
             '800716106AA': error_format,
         }
         self.assertFieldOutput(PLPESELField, valid, invalid)
-    
+
+    def test_PLNationalIDCardNumberField(self):
+        error_checksum = [u'Wrong checksum for the National ID Card Number.']
+        error_format = [u'National ID Card Number consists of 3 letters and 6 digits.']
+        valid = {
+            'ABC123458': 'ABC123458',
+            'abc123458': 'ABC123458',
+        }
+        invalid = {
+            'ABC123457': error_checksum,
+            'abc123457': error_checksum,
+            'a12Aaaaaa': error_format,
+            'AA1234443': error_format,
+        }
+        self.assertFieldOutput(PLNationalIDCardNumberField, valid, invalid)
+
     def test_PLREGONField(self):
         error_checksum = [u'Wrong checksum for the National Business Register Number (REGON).']
         error_format = [u'National Business Register Number (REGON) consists of 9 or 14 digits.']
@@ -459,4 +474,3 @@ class PLLocalFlavorTests(LocalFlavorTestCase):
             '590096': error_format,
         }
         self.assertFieldOutput(PLREGONField, valid, invalid)
-

@@ -759,6 +759,17 @@ Poland (``pl``)
 
 .. _PESEL: http://en.wikipedia.org/wiki/PESEL
 
+.. versionadded:: 1.4
+
+.. class:: pl.forms.PLNationalIDCardNumberField
+
+    A form field that validates input as a Polish National ID Card number. The
+    valid format is AAAXXXXXX, where A is letter (A-Z), X is digit and left-most
+    digit is checksum digit. More information about checksum calculation algorithm
+    see `Polish identity card`_.
+
+.. _`Polish identity card`: http://en.wikipedia.org/wiki/Polish_identity_card
+
 .. class:: pl.forms.PLREGONField
 
     A form field that validates input as a Polish National Official Business
