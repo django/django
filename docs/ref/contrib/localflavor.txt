@@ -121,6 +121,17 @@ Here's an example of how to use them::
 .. _United States of America: `United States of America (us)`_
 .. _Uruguay: `Uruguay (uy)`_
 
+Internationalization of localflavor
+===================================
+
+Localflavor has its own catalog of translations, in the directory
+``django/contrib/localflavor/locale``, and it's not loaded automatically like
+Django's general catalog in ``django/conf/locale``. If you want localflavor's
+texts to be translated, like form fields error messages, you must include
+:mod:`django.contrib.localflavor` in the :setting:`INSTALLED_APPS` setting, so
+the internationalization system can find the catalog, as explained in
+:ref:`using-translations-in-your-own-projects`.
+
 Adding flavors
 ==============
 
