@@ -406,7 +406,7 @@ Generic relations in forms and admin
 ------------------------------------
 
 The :mod:`django.contrib.contenttypes.generic` module provides
-:class:`~django.contrib.contenttypes.generic.GenericInlineFormSet`,
+:class:`~django.contrib.contenttypes.generic.BaseGenericInlineFormSet`,
 :class:`~django.contrib.contenttypes.generic.GenericTabularInline`
 and :class:`~django.contrib.contenttypes.generic.GenericStackedInline`
 (the last two are subclasses of
