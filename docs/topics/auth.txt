@@ -863,6 +863,16 @@ The login_required decorator
     .. _forms documentation: ../forms/
     .. _site framework docs: ../sites/
 
+    .. versionadded:: 1.4
+
+    The :func:`~views.login` view and the :ref:`other-built-in-views` now all
+    return a :class:`~django.template.response.TemplateResponse` instance,
+    which allows you to easily customize the response data before rendering.
+    For more details, see the
+    :doc:`TemplateResponse documentation </ref/template-response>`.
+
+.. _other-built-in-views:
+
 Other built-in views
 --------------------
 
