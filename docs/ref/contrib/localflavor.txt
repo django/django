@@ -388,7 +388,7 @@ China (``cn``)
     The second digit could only be 3, 5 and 8.
 
 Croatia (``hr``)
-==============
+================
 
 .. versionadded:: 1.4
 
