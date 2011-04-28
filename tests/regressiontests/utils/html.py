@@ -121,3 +121,15 @@ class TestUtilsHtml(unittest.TestCase):
         )
         for value, output in items:
             self.check_output(f, value, output)
+
+    def test_clean_html(self):
+        f = html.clean_html
+        items = (
+            (u'<p>I <i>believe</i> in <b>semantic markup</b>!</p>', u'<p>I <em>believe</em> in <strong>semantic markup</strong>!</p>'),
+            (u'I escape & I don\'t <a href="#" target="_blank">target</a>', u'I escape &amp; I don\'t <a href="#" >target</a>'),
+            (u'<p>I kill whitespace</p><br clear="all"><p>&nbsp;</p>', u'<p>I kill whitespace</p>'),
+            # also a regression test for #7267: this used to raise an UnicodeDecodeError
+            (u'<p>* foo</p><p>* bar</p>', u'<ul>\n<li> foo</li><li> bar</li>\n</ul>'),
+        )
+        for value, output in items:
+            self.check_output(f, value, output)

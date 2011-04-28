@@ -13,7 +13,7 @@ LEADING_PUNCTUATION  = ['(', '<', '&lt;']
 TRAILING_PUNCTUATION = ['.', ',', ')', '>', '\n', '&gt;']
 
 # List of possible strings used for bullets in bulleted lists.
-DOTS = ['&middot;', '*', '\xe2\x80\xa2', '&#149;', '&bull;', '&#8226;']
+DOTS = [u'&middot;', u'*', u'\u2022', u'&#149;', u'&bull;', u'&#8226;']
 
 unencoded_ampersands_re = re.compile(r'&(?!(\w+|#\d+);)')
 word_split_re = re.compile(r'(\s+)')
@@ -180,13 +180,13 @@ def clean_html(text):
     text = html_gunk_re.sub('', text)
     # Convert hard-coded bullets into HTML unordered lists.
     def replace_p_tags(match):
-        s = match.group().replace('</p>', '</li>')
+        s = match.group().replace(u'</p>', u'</li>')
         for d in DOTS:
-            s = s.replace('<p>%s' % d, '<li>')
+            s = s.replace(u'<p>%s' % d, u'<li>')
         return u'<ul>\n%s\n</ul>' % s
     text = hard_coded_bullets_re.sub(replace_p_tags, text)
     # Remove stuff like "<p>&nbsp;&nbsp;</p>", but only if it's at the bottom
     # of the text.
-    text = trailing_empty_content_re.sub('', text)
+    text = trailing_empty_content_re.sub(u'', text)
     return text
 clean_html = allow_lazy(clean_html, unicode)
