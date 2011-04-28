@@ -235,3 +235,24 @@ class UtilTests(unittest.TestCase):
             label_for_field('guest', Event, return_attr=True),
             ('awesome guest', None),
         )
+
+    def test_logentry_unicode(self):
+        """
+        Regression test for #15661
+        """
+        log_entry = admin.models.LogEntry()
+
+        log_entry.action_flag = admin.models.ADDITION
+        self.assertTrue(
+            unicode(log_entry).startswith('Added ')
+        )
+
+        log_entry.action_flag = admin.models.CHANGE
+        self.assertTrue(
+            unicode(log_entry).startswith('Changed ')
+        )
+
+        log_entry.action_flag = admin.models.DELETION
+        self.assertTrue(
+            unicode(log_entry).startswith('Deleted ')
+        )

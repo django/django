@@ -33,6 +33,17 @@ class LogEntry(models.Model):
     def __repr__(self):
         return smart_unicode(self.action_time)
 
+    def __unicode__(self):
+
+        if self.action_flag == ADDITION:
+            return _('Added "%(object)s".') % {'object': self.object_repr}
+        elif self.action_flag == CHANGE:
+            return _('Changed "%(object)s" - %(changes)s') % {'object': self.object_repr, 'changes': self.change_message}
+        elif self.action_flag == DELETION:
+            return _('Deleted "%(object)s."') % {'object': self.object_repr}
+
+        return_value = _('LogEntry Object')
+
     def is_addition(self):
         return self.action_flag == ADDITION
 
