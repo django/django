@@ -78,3 +78,27 @@ class CustomTagTests(TestCase):
         self.verify_tag(custom.inclusion_explicit_no_context, 'inclusion_explicit_no_context')
         self.verify_tag(custom.inclusion_no_params_with_context, 'inclusion_no_params_with_context')
         self.verify_tag(custom.inclusion_params_and_context, 'inclusion_params_and_context')
+
+    def test_15070_current_app(self):
+        """
+        Test that inclusion tag passes down `current_app` of context to the
+        Context of the included/rendered template as well.
+        """
+        c = template.Context({})
+        t = template.Template('{% load custom %}{% inclusion_tag_current_app %}')
+        self.assertEquals(t.render(c).strip(), u'None')
+
+        c.current_app = 'advanced'
+        self.assertEquals(t.render(c).strip(), u'advanced')
+
+    def test_15070_use_l10n(self):
+        """
+        Test that inclusion tag passes down `use_l10n` of context to the
+        Context of the included/rendered template as well.
+        """
+        c = template.Context({})
+        t = template.Template('{% load custom %}{% inclusion_tag_use_l10n %}')
+        self.assertEquals(t.render(c).strip(), u'None')
+
+        c.use_l10n = True
+        self.assertEquals(t.render(c).strip(), u'True')

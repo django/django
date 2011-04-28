@@ -930,7 +930,11 @@ class Library(object):
                         else:
                             t = get_template(file_name)
                         self.nodelist = t.nodelist
-                    new_context = context_class(dict, autoescape=context.autoescape)
+                    new_context = context_class(dict, **{
+                        'autoescape': context.autoescape,
+                        'current_app': context.current_app,
+                        'use_l10n': context.use_l10n,
+                    })
                     # Copy across the CSRF token, if present, because inclusion
                     # tags are often used for forms, and we need instructions
                     # for using CSRF protection to be as simple as possible.

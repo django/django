@@ -69,3 +69,18 @@ def inclusion_params_and_context(context, arg):
     return {"result" : "inclusion_params_and_context - Expected result (context value: %s): %s" % (context['value'], arg)}
 inclusion_params_and_context.anything = "Expected inclusion_params_and_context __dict__"
 
+@register.simple_tag(takes_context=True)
+def current_app(context):
+    return "%s" % context.current_app
+
+@register.inclusion_tag('test_incl_tag_current_app.html', takes_context=True)
+def inclusion_tag_current_app(context):
+    return {}
+
+@register.simple_tag(takes_context=True)
+def use_l10n(context):
+    return "%s" % context.use_l10n
+
+@register.inclusion_tag('test_incl_tag_use_l10n.html', takes_context=True)
+def inclusion_tag_use_l10n(context):
+    return {}
