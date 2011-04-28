@@ -48,6 +48,9 @@ require_GET.__doc__ = "Decorator to require that a view only accept the GET meth
 require_POST = require_http_methods(["POST"])
 require_POST.__doc__ = "Decorator to require that a view only accept the POST method."
 
+require_safe = require_http_methods(["GET", "HEAD"])
+require_safe.__doc__ = "Decorator to require that a view only accept safe methods: GET and HEAD."
+
 def condition(etag_func=None, last_modified_func=None):
     """
     Decorator to support conditional retrieval (or change) for a view

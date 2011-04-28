@@ -10,31 +10,47 @@ various HTTP features.
 Allowed HTTP methods
 ====================
 
-The following decorators in :mod:`django.views.decorators.http` can be used to
-restrict access to views based on the request method.
+The decorators in :mod:`django.views.decorators.http` can be used to restrict
+access to views based on the request method.
 
 .. function:: require_http_methods(request_method_list)
 
-This decorator is used to ensure that a view only accepts particular request
-methods. Usage::
+    Decorator to require that a view only accept particular request
+    methods. Usage::
 
-    from django.views.decorators.http import require_http_methods
+        from django.views.decorators.http import require_http_methods
 
-    @require_http_methods(["GET", "POST"])
-    def my_view(request):
-        # I can assume now that only GET or POST requests make it this far
-        # ...
-        pass
+        @require_http_methods(["GET", "POST"])
+        def my_view(request):
+            # I can assume now that only GET or POST requests make it this far
+            # ...
+            pass
 
-Note that request methods should be in uppercase.
+    Note that request methods should be in uppercase.
 
 .. function:: require_GET()
 
-Decorator to require that a view only accept the GET method.
+    Decorator to require that a view only accept the GET method.
 
 .. function:: require_POST()
 
-Decorator to require that a view only accept the POST method.
+    Decorator to require that a view only accept the POST method.
+
+.. function:: require_safe()
+
+    .. versionadded:: 1.4
+
+    Decorator to require that a view only accept the GET and HEAD methods.
+    These methods are commonly considered "safe" because they should not have
+    the significance of taking an action other than retrieving the requested
+    resource.
+
+    .. note::
+        Django will automatically strip the content of responses to HEAD
+        requests while leaving the headers unchanged, so you may handle HEAD
+        requests exactly like GET requests in your views. Since some software,
+        such as link checkers, rely on HEAD requests, you might prefer
+        using ``require_safe`` instead of ``require_GET``.
 
 Conditional view processing
 ===========================
@@ -48,9 +64,9 @@ control caching behavior on particular views.
 
 .. function:: last_modified(last_modified_func)
 
-These decorators can be used to generate ``ETag`` and ``Last-Modified``
-headers; see
-:doc:`conditional view processing </topics/conditional-view-processing>`.
+    These decorators can be used to generate ``ETag`` and ``Last-Modified``
+    headers; see
+    :doc:`conditional view processing </topics/conditional-view-processing>`.
 
 .. module:: django.views.decorators.gzip
 
@@ -62,9 +78,9 @@ compression on a per-view basis.
 
 .. function:: gzip_page()
 
-This decorator compresses content if the browser allows gzip compression.
-It sets the ``Vary`` header accordingly, so that caches will base their
-storage on the ``Accept-Encoding`` header.
+    This decorator compresses content if the browser allows gzip compression.
+    It sets the ``Vary`` header accordingly, so that caches will base their
+    storage on the ``Accept-Encoding`` header.
 
 .. module:: django.views.decorators.vary
 
@@ -78,7 +94,7 @@ caching based on specific request headers.
 
 .. function:: vary_on_headers(*headers)
 
-The ``Vary`` header defines which request headers a cache mechanism should take
-into account when building its cache key.
+    The ``Vary`` header defines which request headers a cache mechanism should take
+    into account when building its cache key.
 
-See :ref:`using vary headers <using-vary-headers>`.
+    See :ref:`using vary headers <using-vary-headers>`.
