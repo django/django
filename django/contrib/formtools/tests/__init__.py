@@ -322,6 +322,38 @@ class WizardTests(TestCase):
         response = self.client.post('/wizard/', data)
         self.assertEqual(2, response.context['step0'])
 
+    def test_11726(self):
+        """
+        Regression test for ticket #11726.
+        Wizard should not raise Http404 when steps are added dynamically.
+        """
+        reached = [False]
+        that = self
+
+        class WizardWithProcessStep(WizardClass):
+            def process_step(self, request, form, step):
+                if step == 0:
+                    if self.num_steps() < 2:
+                        self.form_list.append(WizardPageTwoForm)
+                if step == 1:
+                    that.assertTrue(isinstance(form, WizardPageTwoForm))
+                    reached[0] = True
+
+        wizard = WizardWithProcessStep([WizardPageOneForm])
+        data = {"0-field": "test",
+                "1-field": "test2",
+                "hash_0": "7e9cea465f6a10a6fb47fcea65cb9a76350c9a5c",
+                "wizard_step": "1"}
+        wizard(DummyRequest(POST=data))
+        self.assertTrue(reached[0])
+
+        data = {"0-field": "test",
+                "1-field": "test2",
+                "hash_0": "7e9cea465f6a10a6fb47fcea65cb9a76350c9a5c",
+                "hash_1": "d5b434e3934cc92fee4bd2964c4ebc06f81d362d",
+                "wizard_step": "2"}
+        self.assertRaises(http.Http404, wizard, DummyRequest(POST=data))
+
     def test_14498(self):
         """
         Regression test for ticket #14498.  All previous steps' forms should be

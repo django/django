@@ -47,6 +47,9 @@ class FormWizard(object):
 
     def get_form(self, step, data=None):
         "Helper method that returns the Form instance for the given step."
+        # Sanity check.
+        if step >= self.num_steps():
+            raise Http404('Step %s does not exist' % step)
         return self.form_list[step](data, prefix=self.prefix_for_step(step), initial=self.initial.get(step, None))
 
     def num_steps(self):
@@ -70,10 +73,6 @@ class FormWizard(object):
             self.extra_context.update(kwargs['extra_context'])
         current_step = self.determine_step(request, *args, **kwargs)
         self.parse_params(request, *args, **kwargs)
-
-        # Sanity check.
-        if current_step >= self.num_steps():
-            raise Http404('Step %s does not exist' % current_step)
 
         # Validate and process all the previous forms before instantiating the
         # current step's form in case self.process_step makes changes to
