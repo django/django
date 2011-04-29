@@ -835,7 +835,7 @@ reverse_lazy()
 A lazily evaluated version of `reverse()`_.
 
 It is useful for when you need to use a URL reversal before your project's
-URLConf is loaded. Some common cases where this method is necessary are::
+URLConf is loaded. Some common cases where this method is necessary are:
 
 * providing a reversed URL as the ``url`` attribute of a generic class-based
   view.
