@@ -10,6 +10,7 @@ from django.http import HttpResponseRedirect, HttpResponsePermanentRedirect
 from django.shortcuts import redirect
 from django.test import TestCase
 from django.utils import unittest
+from django.contrib.auth.models import User
 
 import urlconf_outer
 import urlconf_inner
@@ -217,6 +218,21 @@ class ResolverTests(unittest.TestCase):
                             self.assertTrue(t.name is None, 'Expected no URL name but found %s.' % t.name)
                         else:
                             self.assertEqual(t.name, e['name'], 'Wrong URL name.  Expected "%s", got "%s".' % (e['name'], t.name))
+
+class ReverseLazyTest(TestCase):
+    urls = 'regressiontests.urlpatterns_reverse.reverse_lazy_urls'
+
+    def test_redirect_with_lazy_reverse(self):
+        response = self.client.get('/redirect/')
+        self.assertRedirects(response, "/redirected_to/", status_code=301)
+
+    def test_user_permission_with_lazy_reverse(self):
+        user = User.objects.create_user('alfred', 'alfred@example.com', password='testpw')
+        response = self.client.get('/login_required_view/')
+        self.assertRedirects(response, "/login/?next=/login_required_view/", status_code=302)
+        self.client.login(username='alfred', password='testpw')
+        response = self.client.get('/login_required_view/')
+        self.assertEqual(response.status_code, 200)
 
 class ReverseShortcutTests(TestCase):
     urls = 'regressiontests.urlpatterns_reverse.urls'

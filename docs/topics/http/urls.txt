@@ -827,6 +827,26 @@ namespaces into URLs on specific application instances, according to the
     ``urllib.quote``) to the ouput of :meth:`~django.core.urlresolvers.reverse`
     may produce undesirable results.
 
+reverse_lazy()
+--------------
+
+.. versionadded:: 1.4
+
+A lazily evaluated version of `reverse()`_.
+
+It is useful for when you need to use a URL reversal before your project's
+URLConf is loaded. Some common cases where this method is necessary are::
+
+* providing a reversed URL as the ``url`` attribute of a generic class-based
+  view.
+
+* providing a reversed URL to a decorator (such as the ``login_url`` argument
+  for the :func:`django.contrib.auth.decorators.permission_required`
+  decorator).
+
+* providing a reversed URL as a default value for a parameter in a function's
+  signature.
+
 resolve()
 ---------
 

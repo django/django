@@ -37,6 +37,12 @@ compatibility with old browsers, this change means that you can use any HTML5
 features you need in admin pages without having to lose HTML validity or
 override the provided templates to change the doctype.
 
+``reverse_lazy``
+~~~~~~~~~~~~~~~~
+
+A lazily evaluated version of :func:`django.core.urlresolvers.reverse` was
+added to allow using URL reversals before the project's URLConf gets loaded.
+
 .. _backwards-incompatible-changes-1.4:
 
 Backwards incompatible changes in 1.4

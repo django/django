@@ -15,7 +15,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import iri_to_uri, force_unicode, smart_str
-from django.utils.functional import memoize
+from django.utils.functional import memoize, lazy
 from django.utils.importlib import import_module
 from django.utils.regex_helper import normalize
 
@@ -389,6 +389,8 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, prefix=None, current
 
     return iri_to_uri(u'%s%s' % (prefix, resolver.reverse(view,
             *args, **kwargs)))
+
+reverse_lazy = lazy(reverse, str)
 
 def clear_url_caches():
     global _resolver_cache
