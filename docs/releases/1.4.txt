@@ -117,3 +117,45 @@ subsequently raise a 404. Requesting ``/notaflatpageoravalidurl`` now will
 immediately raise a 404. Additionally redirects returned by flatpages are now
 permanent (301 status code) to match the behaviour of the
 :class:`~django.middleware.common.CommonMiddleware`.
+
+`COMMENTS_BANNED_USERS_GROUP` setting
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django's :doc:`comments app </ref/contrib/comments/index>` has historically
+supported excluding the comments of a special user group but never documented
+the feature properly and didn't enforce the exclusion in other parts of the
+app, e.g. the template tags. To fix this problem the code was removed from
+the feed class.
+
+If you rely on the feature and want to restore the old behaviour, simply use
+a custom comment model manager to exclude the user group, e.g.::
+
+    from django.conf import settings
+    from django.contrib.comments.managers import CommentManager
+
+    class BanningCommentManager(CommentManager):
+
+        def get_query_set(self):
+            qs = super(BanningCommentManager, self).get_query_set()
+            if getattr(settings, 'COMMENTS_BANNED_USERS_GROUP', None):
+                where = ['user_id NOT IN (SELECT user_id FROM auth_user_groups WHERE group_id = %s)']
+                params = [settings.COMMENTS_BANNED_USERS_GROUP]
+                qs = qs.extra(where=where, params=params)
+            return qs
+
+Save this model manager in your custom comment app (e.g. in
+``my_comments_app/managers.py``) and add it your
+:ref:`custom comment app model <custom-comment-app-api>`::
+
+    from django.db import models
+    from django.contrib.comments.models import Comment
+
+    from my_comments_app.managers import BanningCommentManager
+
+    class CommentWithTitle(Comment):
+        title = models.CharField(max_length=300)
+
+        objects = BanningCommentManager()
+
+For more details see the docs about
+:doc:`customizing the comments framework </ref/contrib/comments/custom>`.

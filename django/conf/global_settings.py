@@ -453,10 +453,6 @@ COMMENTS_ALLOW_PROFANITIES = False
 # 'hasNoProfanities' validator. All of these should be in lowercase.
 PROFANITIES_LIST = ()
 
-# The group ID that designates which users are banned.
-# Set to None if you're not using it.
-COMMENTS_BANNED_USERS_GROUP = None
-
 ##################
 # AUTHENTICATION #
 ##################
