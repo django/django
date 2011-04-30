@@ -1060,6 +1060,10 @@ restricted subset of the test client API:
       ``follows``. Since this is just a factory for producing
       requests, it's up to you to handle the response.
 
+    * It does not support middleware. Session and authentication
+      attributes must be supplied by the test itself if required
+      for the view to function properly.
+
 Example
 ~~~~~~~
 
