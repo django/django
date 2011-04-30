@@ -108,10 +108,11 @@ class ESLocalFlavorTests(LocalFlavorTestCase):
             '650010101': '650010101',
             '931234567': '931234567',
             '800123123': '800123123',
+            '789789789': '789789789',
         }
         invalid = {
             '555555555': error_invalid,
-            '789789789': error_invalid,
+            '489489489': error_invalid,
             '99123123': error_invalid,
             '9999123123': error_invalid,
         }

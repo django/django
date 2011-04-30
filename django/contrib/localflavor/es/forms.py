@@ -41,7 +41,7 @@ class ESPhoneNumberField(RegexField):
     }
 
     def __init__(self, *args, **kwargs):
-        super(ESPhoneNumberField, self).__init__(r'^(6|8|9)\d{8}$',
+        super(ESPhoneNumberField, self).__init__(r'^(6|7|8|9)\d{8}$',
                 max_length=None, min_length=None, *args, **kwargs)
 
 class ESIdentityCardNumberField(RegexField):
