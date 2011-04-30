@@ -627,13 +627,13 @@ resolve the string passed to it in the current context of the page.
 Shortcut for simple tags
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-Many template tags take a number of arguments -- strings or a template variables
+Many template tags take a number of arguments -- strings or template variables
 -- and return a string after doing some processing based solely on
-the input argument and some external information. For example, the
+the input arguments and some external information. For example, the
 ``current_time`` tag we wrote above is of this variety: we give it a format
 string, it returns the time as a string.
 
-To ease the creation of the types of tags, Django provides a helper function,
+To ease the creation of these types of tags, Django provides a helper function,
 ``simple_tag``. This function, which is a method of
 ``django.template.Library``, takes a function that accepts any number of
 arguments, wraps it in a ``render`` function and the other necessary bits
