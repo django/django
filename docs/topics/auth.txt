@@ -991,25 +991,6 @@ includes a few other useful built-in views located in
           default to :file:`registration/password_reset_done.html` if not
           supplied.
 
-.. function:: redirect_to_login(next[, login_url, redirect_field_name])
-
-    Redirects to the login page, and then back to another URL after a
-    successful login.
-
-    **Required arguments:**
-
-        * ``next``: The URL to redirect to after a successful login.
-
-    **Optional arguments:**
-
-        * ``login_url``: The URL of the login page to redirect to. This will
-          default to :setting:`settings.LOGIN_URL <LOGIN_URL>` if not supplied.
-
-        * ``redirect_field_name``: The name of a ``GET`` field containing the
-          URL to redirect to after log out. Overrides ``next`` if the given
-          ``GET`` parameter is passed.
-
-
 .. function:: password_reset_confirm(request[, uidb36, token, template_name, token_generator, set_password_form, post_reset_redirect])
 
     Presents a form for entering a new password.
@@ -1038,6 +1019,29 @@ includes a few other useful built-in views located in
 
        * ``template_name``: The full name of a template to display the view.
          This will default to :file:`registration/password_reset_complete.html`.
+
+Helper functions
+----------------
+
+.. module:: django.contrib.auth.views
+
+.. function:: redirect_to_login(next[, login_url, redirect_field_name])
+
+    Redirects to the login page, and then back to another URL after a
+    successful login.
+
+    **Required arguments:**
+
+        * ``next``: The URL to redirect to after a successful login.
+
+    **Optional arguments:**
+
+        * ``login_url``: The URL of the login page to redirect to. This will
+          default to :setting:`settings.LOGIN_URL <LOGIN_URL>` if not supplied.
+
+        * ``redirect_field_name``: The name of a ``GET`` field containing the
+          URL to redirect to after log out. Overrides ``next`` if the given
+          ``GET`` parameter is passed.
 
 Built-in forms
 --------------
