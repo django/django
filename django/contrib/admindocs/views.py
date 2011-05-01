@@ -25,11 +25,7 @@ def get_root_path():
     try:
         return urlresolvers.reverse('admin:index')
     except urlresolvers.NoReverseMatch:
-        from django.contrib import admin
-        try:
-            return urlresolvers.reverse(admin.site.root, args=[''])
-        except urlresolvers.NoReverseMatch:
-            return getattr(settings, "ADMIN_SITE_ROOT_URL", "/admin/")
+        return getattr(settings, "ADMIN_SITE_ROOT_URL", "/admin/")
 
 def doc_index(request):
     if not utils.docutils_is_available:
