@@ -11,7 +11,8 @@ Allowed HTTP methods
 ====================
 
 The decorators in :mod:`django.views.decorators.http` can be used to restrict
-access to views based on the request method.
+access to views based on the request method. These decorators will return
+a :class:`django.http.HttpResponseNotAllowed` if the conditions are not met.
 
 .. function:: require_http_methods(request_method_list)
 
