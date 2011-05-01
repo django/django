@@ -2,6 +2,7 @@ from django import template
 
 register = template.Library()
 
+@register.inclusion_tag('admin/prepopulated_fields_js.html', takes_context=True)
 def prepopulated_fields_js(context):
     """
     Creates a list of prepopulated_fields that should render Javascript for
@@ -17,8 +18,8 @@ def prepopulated_fields_js(context):
                     prepopulated_fields.extend(inline_admin_form.prepopulated_fields)
     context.update({'prepopulated_fields': prepopulated_fields})
     return context
-prepopulated_fields_js = register.inclusion_tag('admin/prepopulated_fields_js.html', takes_context=True)(prepopulated_fields_js)
 
+@register.inclusion_tag('admin/submit_line.html', takes_context=True)
 def submit_row(context):
     """
     Displays the row of buttons for delete and save.
@@ -39,8 +40,8 @@ def submit_row(context):
         'is_popup': is_popup,
         'show_save': True
     }
-submit_row = register.inclusion_tag('admin/submit_line.html', takes_context=True)(submit_row)
 
+@register.filter
 def cell_count(inline_admin_form):
     """Returns the number of cells used in a tabular inline"""
     count = 1 # Hidden cell with hidden 'id' field
@@ -53,4 +54,3 @@ def cell_count(inline_admin_form):
         # Delete checkbox
         count += 1
     return count
-cell_count = register.filter(cell_count)

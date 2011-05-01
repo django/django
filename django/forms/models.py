@@ -701,11 +701,10 @@ class BaseInlineFormSet(BaseModelFormSet):
         setattr(form.instance, self.fk.get_attname(), self.instance.pk)
         return form
 
-    #@classmethod
+    @classmethod
     def get_default_prefix(cls):
         from django.db.models.fields.related import RelatedObject
         return RelatedObject(cls.fk.rel.to, cls.model, cls.fk).get_accessor_name().replace('+','')
-    get_default_prefix = classmethod(get_default_prefix)
 
     def save_new(self, form, commit=True):
         # Use commit=False so we can assign the parent key afterwards, then

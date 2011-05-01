@@ -339,13 +339,12 @@ class BaseGenericInlineFormSet(BaseModelFormSet):
             prefix=prefix
         )
 
-    #@classmethod
+    @classmethod
     def get_default_prefix(cls):
         opts = cls.model._meta
         return '-'.join((opts.app_label, opts.object_name.lower(),
                         cls.ct_field.name, cls.ct_fk_field.name,
         ))
-    get_default_prefix = classmethod(get_default_prefix)
 
     def save_new(self, form, commit=True):
         # Avoid a circular import.

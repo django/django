@@ -17,6 +17,7 @@ def memoize(func, cache, num_args):
 
     Only the first num_args are considered when creating the key.
     """
+    @wraps(func)
     def wrapper(*args):
         mem_args = args[:num_args]
         if mem_args in cache:
@@ -24,7 +25,7 @@ def memoize(func, cache, num_args):
         result = func(*args)
         cache[mem_args] = result
         return result
-    return wraps(func)(wrapper)
+    return wrapper
 
 class Promise(object):
     """
@@ -135,11 +136,12 @@ def lazy(func, *resultclasses):
             memo[id(self)] = self
             return self
 
+    @wraps(func)
     def __wrapper__(*args, **kw):
         # Creates the proxy object, instead of the actual value.
         return __proxy__(args, kw)
 
-    return wraps(func)(__wrapper__)
+    return __wrapper__
 
 def _lazy_proxy_unpickle(func, args, kwargs, *resultclasses):
     return lazy(func, *resultclasses)(*args, **kwargs)
@@ -151,6 +153,7 @@ def allow_lazy(func, *resultclasses):
     immediately, otherwise a __proxy__ is returned that will evaluate the
     function when needed.
     """
+    @wraps(func)
     def wrapper(*args, **kwargs):
         for arg in list(args) + kwargs.values():
             if isinstance(arg, Promise):
@@ -158,7 +161,7 @@ def allow_lazy(func, *resultclasses):
         else:
             return func(*args, **kwargs)
         return lazy(func, *resultclasses)(*args, **kwargs)
-    return wraps(func)(wrapper)
+    return wrapper
 
 class LazyObject(object):
     """

@@ -823,7 +823,7 @@ class Library(object):
             # @register.tag()
             return self.tag_function
         elif name != None and compile_function == None:
-            if(callable(name)):
+            if callable(name):
                 # @register.tag
                 return self.tag_function(name)
             else:
@@ -847,7 +847,7 @@ class Library(object):
             # @register.filter()
             return self.filter_function
         elif filter_func == None:
-            if(callable(name)):
+            if callable(name):
                 # @register.filter
                 return self.filter_function(name)
             else:

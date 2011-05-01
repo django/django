@@ -20,7 +20,7 @@ class LoremNode(template.Node):
             paras = ['<p>%s</p>' % p for p in paras]
         return u'\n\n'.join(paras)
 
-#@register.tag
+@register.tag
 def lorem(parser, token):
     """
     Creates random Latin text useful for providing test data in templates.
@@ -64,4 +64,3 @@ def lorem(parser, token):
     if len(bits) != 1:
         raise template.TemplateSyntaxError("Incorrect format for %r tag" % tagname)
     return LoremNode(count, method, common)
-lorem = register.tag(lorem)

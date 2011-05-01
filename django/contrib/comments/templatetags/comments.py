@@ -14,7 +14,7 @@ class BaseCommentNode(template.Node):
     obvious.
     """
 
-    #@classmethod
+    @classmethod
     def handle_token(cls, parser, token):
         """Class method to parse get_comment_list/count/form and return a Node."""
         tokens = token.contents.split()
@@ -43,9 +43,7 @@ class BaseCommentNode(template.Node):
         else:
             raise template.TemplateSyntaxError("%r tag requires 4 or 5 arguments" % tokens[0])
 
-    handle_token = classmethod(handle_token)
-
-    #@staticmethod
+    @staticmethod
     def lookup_content_type(token, tagname):
         try:
             app, model = token.split('.')
@@ -54,7 +52,6 @@ class BaseCommentNode(template.Node):
             raise template.TemplateSyntaxError("Third argument in %r must be in the format 'app.model'" % tagname)
         except ContentType.DoesNotExist:
             raise template.TemplateSyntaxError("%r tag has non-existant content-type: '%s.%s'" % (tagname, app, model))
-    lookup_content_type = staticmethod(lookup_content_type)
 
     def __init__(self, ctype=None, object_pk_expr=None, object_expr=None, as_varname=None, comment=None):
         if ctype is None and object_expr is None:
@@ -146,7 +143,7 @@ class CommentFormNode(BaseCommentNode):
 class RenderCommentFormNode(CommentFormNode):
     """Render the comment form directly"""
 
-    #@classmethod
+    @classmethod
     def handle_token(cls, parser, token):
         """Class method to parse render_comment_form and return a Node."""
         tokens = token.contents.split()
@@ -163,7 +160,6 @@ class RenderCommentFormNode(CommentFormNode):
                 ctype = BaseCommentNode.lookup_content_type(tokens[2], tokens[0]),
                 object_pk_expr = parser.compile_filter(tokens[3])
             )
-    handle_token = classmethod(handle_token)
 
     def render(self, context):
         ctype, object_pk = self.get_target_ctype_pk(context)
@@ -183,7 +179,7 @@ class RenderCommentFormNode(CommentFormNode):
 class RenderCommentListNode(CommentListNode):
     """Render the comment list directly"""
 
-    #@classmethod
+    @classmethod
     def handle_token(cls, parser, token):
         """Class method to parse render_comment_list and return a Node."""
         tokens = token.contents.split()
@@ -200,7 +196,6 @@ class RenderCommentListNode(CommentListNode):
                 ctype = BaseCommentNode.lookup_content_type(tokens[2], tokens[0]),
                 object_pk_expr = parser.compile_filter(tokens[3])
             )
-    handle_token = classmethod(handle_token)
 
     def render(self, context):
         ctype, object_pk = self.get_target_ctype_pk(context)
@@ -224,7 +219,7 @@ class RenderCommentListNode(CommentListNode):
 # the automagic docstrings-into-admin-docs tricks. So each node gets a cute
 # wrapper function that just exists to hold the docstring.
 
-#@register.tag
+@register.tag
 def get_comment_count(parser, token):
     """
     Gets the comment count for the given params and populates the template
@@ -245,7 +240,7 @@ def get_comment_count(parser, token):
     """
     return CommentCountNode.handle_token(parser, token)
 
-#@register.tag
+@register.tag
 def get_comment_list(parser, token):
     """
     Gets the list of comments for the given params and populates the template
@@ -267,7 +262,7 @@ def get_comment_list(parser, token):
     """
     return CommentListNode.handle_token(parser, token)
 
-#@register.tag
+@register.tag
 def render_comment_list(parser, token):
     """
     Render the comment list (as returned by ``{% get_comment_list %}``)
@@ -285,7 +280,7 @@ def render_comment_list(parser, token):
     """
     return RenderCommentListNode.handle_token(parser, token)
 
-#@register.tag
+@register.tag
 def get_comment_form(parser, token):
     """
     Get a (new) form object to post a new comment.
@@ -297,7 +292,7 @@ def get_comment_form(parser, token):
     """
     return CommentFormNode.handle_token(parser, token)
 
-#@register.tag
+@register.tag
 def render_comment_form(parser, token):
     """
     Render the comment form (as returned by ``{% render_comment_form %}``) through
@@ -310,7 +305,7 @@ def render_comment_form(parser, token):
     """
     return RenderCommentFormNode.handle_token(parser, token)
 
-#@register.simple_tag
+@register.simple_tag
 def comment_form_target():
     """
     Get the target URL for the comment form.
@@ -321,7 +316,7 @@ def comment_form_target():
     """
     return comments.get_form_target()
 
-#@register.simple_tag
+@register.simple_tag
 def get_comment_permalink(comment, anchor_pattern=None):
     """
     Get the permalink for a comment, optionally specifying the format of the
@@ -335,10 +330,3 @@ def get_comment_permalink(comment, anchor_pattern=None):
         return comment.get_absolute_url(anchor_pattern)
     return comment.get_absolute_url()
 
-register.tag(get_comment_count)
-register.tag(get_comment_list)
-register.tag(get_comment_form)
-register.tag(render_comment_form)
-register.simple_tag(comment_form_target)
-register.simple_tag(get_comment_permalink)
-register.tag(render_comment_list)

@@ -29,6 +29,7 @@ def require_http_methods(request_method_list):
     Note that request methods should be in uppercase.
     """
     def decorator(func):
+        @wraps(func, assigned=available_attrs(func))
         def inner(request, *args, **kwargs):
             if request.method not in request_method_list:
                 logger.warning('Method Not Allowed (%s): %s' % (request.method, request.path),
@@ -39,7 +40,7 @@ def require_http_methods(request_method_list):
                 )
                 return HttpResponseNotAllowed(request_method_list)
             return func(request, *args, **kwargs)
-        return wraps(func, assigned=available_attrs(func))(inner)
+        return inner
     return decorator
 
 require_GET = require_http_methods(["GET"])

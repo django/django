@@ -173,6 +173,7 @@ class IncludeNode(BaseIncludeNode):
                 raise
             return ''
 
+@register.tag('block')
 def do_block(parser, token):
     """
     Define a block that can be overridden by child templates.
@@ -193,6 +194,7 @@ def do_block(parser, token):
     parser.delete_first_token()
     return BlockNode(block_name, nodelist)
 
+@register.tag('extends')
 def do_extends(parser, token):
     """
     Signal that this template extends a parent template.
@@ -216,6 +218,7 @@ def do_extends(parser, token):
         raise TemplateSyntaxError("'%s' cannot appear more than once in the same template" % bits[0])
     return ExtendsNode(nodelist, parent_name, parent_name_expr)
 
+@register.tag('include')
 def do_include(parser, token):
     """
     Loads a template and renders it with the current context. You can pass
@@ -261,7 +264,3 @@ def do_include(parser, token):
                                    isolated_context=isolated_context)
     return IncludeNode(parser.compile_filter(bits[1]), extra_context=namemap,
                        isolated_context=isolated_context)
-
-register.tag('block', do_block)
-register.tag('extends', do_extends)
-register.tag('include', do_include)

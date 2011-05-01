@@ -77,6 +77,7 @@ def apnumber(value):
 apnumber.is_safe = True
 register.filter(apnumber)
 
+@register.filter
 def naturalday(value, arg=None):
     """
     For date values that are tomorrow, today or yesterday compared to
@@ -101,8 +102,8 @@ def naturalday(value, arg=None):
     elif delta.days == -1:
         return _(u'yesterday')
     return defaultfilters.date(value, arg)
-register.filter(naturalday)
 
+@register.filter
 def naturaltime(value, arg=None):
     """
     For date and time values shows how many seconds, minutes or hours ago compared to
@@ -133,4 +134,3 @@ def naturaltime(value, arg=None):
     elif delta.seconds / 60 / 60 < 24:
         return _(u'%s hours ago' % (delta.seconds/60/60))
     return naturalday(value, arg)
-register.filter(naturaltime)

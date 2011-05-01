@@ -19,6 +19,7 @@ register = Library()
 
 DOT = '.'
 
+@register.simple_tag
 def paginator_number(cl,i):
     """
     Generates an individual page index link in a paginated list.
@@ -29,8 +30,8 @@ def paginator_number(cl,i):
         return mark_safe(u'<span class="this-page">%d</span> ' % (i+1))
     else:
         return mark_safe(u'<a href="%s"%s>%d</a> ' % (escape(cl.get_query_string({PAGE_VAR: i})), (i == cl.paginator.num_pages-1 and ' class="end"' or ''), i+1))
-paginator_number = register.simple_tag(paginator_number)
 
+@register.inclusion_tag('admin/pagination.html')
 def pagination(cl):
     """
     Generates the series of links to the pages in a paginated list.
@@ -75,7 +76,6 @@ def pagination(cl):
         'ALL_VAR': ALL_VAR,
         '1': 1,
     }
-pagination = register.inclusion_tag('admin/pagination.html')(pagination)
 
 def result_headers(cl):
     """
@@ -123,7 +123,8 @@ def result_headers(cl):
 
 def _boolean_icon(field_val):
     BOOLEAN_MAPPING = {True: 'yes', False: 'no', None: 'unknown'}
-    return mark_safe(u'<img src="%simg/admin/icon-%s.gif" alt="%s" />' % (settings.ADMIN_MEDIA_PREFIX, BOOLEAN_MAPPING[field_val], field_val))
+    return mark_safe(u'<img src="%simg/admin/icon-%s.gif" alt="%s" />' %
+        (settings.ADMIN_MEDIA_PREFIX, BOOLEAN_MAPPING[field_val], field_val))
 
 def items_for_result(cl, result, form):
     """
@@ -222,6 +223,7 @@ def result_hidden_fields(cl):
             if form[cl.model._meta.pk.name].is_hidden:
                 yield mark_safe(force_unicode(form[cl.model._meta.pk.name]))
 
+@register.inclusion_tag("admin/change_list_results.html")
 def result_list(cl):
     """
     Displays the headers and data list together
@@ -230,8 +232,8 @@ def result_list(cl):
             'result_hidden_fields': list(result_hidden_fields(cl)),
             'result_headers': list(result_headers(cl)),
             'results': list(results(cl))}
-result_list = register.inclusion_tag("admin/change_list_results.html")(result_list)
 
+@register.inclusion_tag('admin/date_hierarchy.html')
 def date_hierarchy(cl):
     """
     Displays the date hierarchy for date drill-down functionality.
@@ -303,8 +305,8 @@ def date_hierarchy(cl):
                     'title': str(year.year),
                 } for year in years]
             }
-date_hierarchy = register.inclusion_tag('admin/date_hierarchy.html')(date_hierarchy)
 
+@register.inclusion_tag('admin/search_form.html')
 def search_form(cl):
     """
     Displays a search form for searching the list.
@@ -314,12 +316,12 @@ def search_form(cl):
         'show_result_count': cl.result_count != cl.full_result_count,
         'search_var': SEARCH_VAR
     }
-search_form = register.inclusion_tag('admin/search_form.html')(search_form)
 
+@register.inclusion_tag('admin/filter.html')
 def admin_list_filter(cl, spec):
     return {'title': spec.title(), 'choices' : list(spec.choices(cl))}
-admin_list_filter = register.inclusion_tag('admin/filter.html')(admin_list_filter)
 
+@register.inclusion_tag('admin/actions.html', takes_context=True)
 def admin_actions(context):
     """
     Track the number of times the action field has been rendered on the page,
@@ -327,4 +329,3 @@ def admin_actions(context):
     """
     context['action_index'] = context.get('action_index', -1) + 1
     return context
-admin_actions = register.inclusion_tag("admin/actions.html", takes_context=True)(admin_actions)

@@ -20,7 +20,8 @@ class AdminLogNode(template.Node):
             context[self.varname] = LogEntry.objects.filter(user__id__exact=user_id).select_related('content_type', 'user')[:self.limit]
         return ''
 
-class DoGetAdminLog:
+@register.tag
+def get_admin_log(parser, token):
     """
     Populates a template variable with the admin log for the given criteria.
 
@@ -38,20 +39,18 @@ class DoGetAdminLog:
     (user ID) or the name of a template context variable containing the user
     object whose ID you want.
     """
-    def __init__(self, tag_name):
-        self.tag_name = tag_name
-
-    def __call__(self, parser, token):
-        tokens = token.contents.split()
-        if len(tokens) < 4:
-            raise template.TemplateSyntaxError("'%s' statements require two arguments" % self.tag_name)
-        if not tokens[1].isdigit():
-            raise template.TemplateSyntaxError("First argument in '%s' must be an integer" % self.tag_name)
-        if tokens[2] != 'as':
-            raise template.TemplateSyntaxError("Second argument in '%s' must be 'as'" % self.tag_name)
-        if len(tokens) > 4:
-            if tokens[4] != 'for_user':
-                raise template.TemplateSyntaxError("Fourth argument in '%s' must be 'for_user'" % self.tag_name)
-        return AdminLogNode(limit=tokens[1], varname=tokens[3], user=(len(tokens) > 5 and tokens[5] or None))
-
-register.tag('get_admin_log', DoGetAdminLog('get_admin_log'))
+    tokens = token.contents.split()
+    if len(tokens) < 4:
+        raise template.TemplateSyntaxError(
+            "'get_admin_log' statements require two arguments")
+    if not tokens[1].isdigit():
+        raise template.TemplateSyntaxError(
+            "First argument to 'get_admin_log' must be an integer")
+    if tokens[2] != 'as':
+        raise template.TemplateSyntaxError(
+            "Second argument to 'get_admin_log' must be 'as'")
+    if len(tokens) > 4:
+        if tokens[4] != 'for_user':
+            raise template.TemplateSyntaxError(
+                "Fourth argument to 'get_admin_log' must be 'for_user'")
+    return AdminLogNode(limit=tokens[1], varname=tokens[3], user=(len(tokens) > 5 and tokens[5] or None))

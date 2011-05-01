@@ -501,7 +501,7 @@ class WithNode(Node):
         context.pop()
         return output
 
-#@register.tag
+@register.tag
 def autoescape(parser, token):
     """
     Force autoescape behaviour for this block.
@@ -515,18 +515,16 @@ def autoescape(parser, token):
     nodelist = parser.parse(('endautoescape',))
     parser.delete_first_token()
     return AutoEscapeControlNode((arg == 'on'), nodelist)
-autoescape = register.tag(autoescape)
 
-#@register.tag
+@register.tag
 def comment(parser, token):
     """
     Ignores everything between ``{% comment %}`` and ``{% endcomment %}``.
     """
     parser.skip_past('endcomment')
     return CommentNode()
-comment = register.tag(comment)
 
-#@register.tag
+@register.tag
 def cycle(parser, token):
     """
     Cycles among the given strings each time this tag is encountered.
@@ -617,12 +615,12 @@ def cycle(parser, token):
         values = [parser.compile_filter(arg) for arg in args[1:]]
         node = CycleNode(values)
     return node
-cycle = register.tag(cycle)
 
+@register.tag
 def csrf_token(parser, token):
     return CsrfTokenNode()
-register.tag(csrf_token)
 
+@register.tag
 def debug(parser, token):
     """
     Outputs a whole load of debugging information, including the current
@@ -635,9 +633,8 @@ def debug(parser, token):
         </pre>
     """
     return DebugNode()
-debug = register.tag(debug)
 
-#@register.tag(name="filter")
+@register.tag('filter')
 def do_filter(parser, token):
     """
     Filters the contents of the block through variable filters.
@@ -659,9 +656,8 @@ def do_filter(parser, token):
     nodelist = parser.parse(('endfilter',))
     parser.delete_first_token()
     return FilterNode(filter_expr, nodelist)
-do_filter = register.tag("filter", do_filter)
 
-#@register.tag
+@register.tag
 def firstof(parser, token):
     """
     Outputs the first variable passed that is not False, without escaping.
@@ -700,9 +696,8 @@ def firstof(parser, token):
     if len(bits) < 1:
         raise TemplateSyntaxError("'firstof' statement requires at least one argument")
     return FirstOfNode([parser.compile_filter(bit) for bit in bits])
-firstof = register.tag(firstof)
 
-#@register.tag(name="for")
+@register.tag('for')
 def do_for(parser, token):
     """
     Loops over each item in an array.
@@ -792,7 +787,6 @@ def do_for(parser, token):
     else:
         nodelist_empty = None
     return ForNode(loopvars, sequence, is_reversed, nodelist_loop, nodelist_empty)
-do_for = register.tag("for", do_for)
 
 def do_ifequal(parser, token, negate):
     bits = list(token.split_contents())
@@ -810,7 +804,7 @@ def do_ifequal(parser, token, negate):
     val2 = parser.compile_filter(bits[2])
     return IfEqualNode(val1, val2, nodelist_true, nodelist_false, negate)
 
-#@register.tag
+@register.tag
 def ifequal(parser, token):
     """
     Outputs the contents of the block if the two arguments equal each other.
@@ -828,16 +822,14 @@ def ifequal(parser, token):
         {% endifnotequal %}
     """
     return do_ifequal(parser, token, False)
-ifequal = register.tag(ifequal)
 
-#@register.tag
+@register.tag
 def ifnotequal(parser, token):
     """
     Outputs the contents of the block if the two arguments are not equal.
     See ifequal.
     """
     return do_ifequal(parser, token, True)
-ifnotequal = register.tag(ifnotequal)
 
 class TemplateLiteral(Literal):
     def __init__(self, value, text):
@@ -860,7 +852,7 @@ class TemplateIfParser(IfParser):
     def create_var(self, value):
         return TemplateLiteral(self.template_parser.compile_filter(value), value)
 
-#@register.tag(name="if")
+@register.tag('if')
 def do_if(parser, token):
     """
     The ``{% if %}`` tag evaluates a variable, and if that variable is "true"
@@ -927,9 +919,8 @@ def do_if(parser, token):
     else:
         nodelist_false = NodeList()
     return IfNode(var, nodelist_true, nodelist_false)
-do_if = register.tag("if", do_if)
 
-#@register.tag
+@register.tag
 def ifchanged(parser, token):
     """
     Checks if a value has changed from the last iteration of a loop.
@@ -968,9 +959,8 @@ def ifchanged(parser, token):
         nodelist_false = NodeList()
     values = [parser.compile_filter(bit) for bit in bits[1:]]
     return IfChangedNode(nodelist_true, nodelist_false, *values)
-ifchanged = register.tag(ifchanged)
 
-#@register.tag
+@register.tag
 def ssi(parser, token):
     """
     Outputs the contents of a given file into the page.
@@ -1003,9 +993,8 @@ def ssi(parser, token):
             raise TemplateSyntaxError("Second (optional) argument to %s tag"
                                       " must be 'parsed'" % bits[0])
     return SsiNode(bits[1], parsed, legacy_filepath=True)
-ssi = register.tag(ssi)
 
-#@register.tag
+@register.tag
 def load(parser, token):
     """
     Loads a custom template tag set.
@@ -1053,9 +1042,8 @@ def load(parser, token):
                 raise TemplateSyntaxError("'%s' is not a valid tag library: %s" %
                                           (taglib, e))
     return LoadNode()
-load = register.tag(load)
 
-#@register.tag
+@register.tag
 def now(parser, token):
     """
     Displays the date, formatted according to the given string.
@@ -1072,9 +1060,8 @@ def now(parser, token):
         raise TemplateSyntaxError("'now' statement takes one argument")
     format_string = bits[1]
     return NowNode(format_string)
-now = register.tag(now)
 
-#@register.tag
+@register.tag
 def regroup(parser, token):
     """
     Regroups a list of alike objects by a common attribute.
@@ -1136,8 +1123,8 @@ def regroup(parser, token):
 
     var_name = lastbits_reversed[0][::-1]
     return RegroupNode(target, expression, var_name)
-regroup = register.tag(regroup)
 
+@register.tag
 def spaceless(parser, token):
     """
     Removes whitespace between HTML tags, including tab and newline characters.
@@ -1166,9 +1153,8 @@ def spaceless(parser, token):
     nodelist = parser.parse(('endspaceless',))
     parser.delete_first_token()
     return SpacelessNode(nodelist)
-spaceless = register.tag(spaceless)
 
-#@register.tag
+@register.tag
 def templatetag(parser, token):
     """
     Outputs one of the bits used to compose template tags.
@@ -1200,8 +1186,8 @@ def templatetag(parser, token):
                                   " Must be one of: %s" %
                                   (tag, TemplateTagNode.mapping.keys()))
     return TemplateTagNode(tag)
-templatetag = register.tag(templatetag)
 
+@register.tag
 def url(parser, token):
     """
     Returns an absolute URL matching given view with its parameters.
@@ -1299,9 +1285,8 @@ def url(parser, token):
                 args.append(parser.compile_filter(value))
 
     return URLNode(viewname, args, kwargs, asvar, legacy_view_name=True)
-url = register.tag(url)
 
-#@register.tag
+@register.tag
 def widthratio(parser, token):
     """
     For creating bar charts and such, this tag calculates the ratio of a given
@@ -1323,9 +1308,8 @@ def widthratio(parser, token):
     return WidthRatioNode(parser.compile_filter(this_value_expr),
                           parser.compile_filter(max_value_expr),
                           parser.compile_filter(max_width))
-widthratio = register.tag(widthratio)
 
-#@register.tag
+@register.tag('with')
 def do_with(parser, token):
     """
     Adds one or more values to the context (inside of this block) for caching
@@ -1358,4 +1342,3 @@ def do_with(parser, token):
     nodelist = parser.parse(('endwith',))
     parser.delete_first_token()
     return WithNode(None, None, nodelist, extra_context=extra_context)
-do_with = register.tag('with', do_with)

@@ -32,6 +32,7 @@ class CacheNode(Node):
             cache.set(cache_key, value, expire_time)
         return value
 
+@register.tag('cache')
 def do_cache(parser, token):
     """
     This will cache the contents of a template fragment for a given amount
@@ -59,5 +60,3 @@ def do_cache(parser, token):
     if len(tokens) < 3:
         raise TemplateSyntaxError(u"'%r' tag requires at least 2 arguments." % tokens[0])
     return CacheNode(nodelist, tokens[1], tokens[2], tokens[3:])
-
-register.tag('cache', do_cache)

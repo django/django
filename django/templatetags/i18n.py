@@ -117,6 +117,7 @@ class BlockTranslateNode(Node):
         context.pop()
         return result % data
 
+@register.tag("get_available_languages")
 def do_get_available_languages(parser, token):
     """
     This will store a list of available languages
@@ -138,6 +139,7 @@ def do_get_available_languages(parser, token):
         raise TemplateSyntaxError("'get_available_languages' requires 'as variable' (got %r)" % args)
     return GetAvailableLanguagesNode(args[2])
 
+@register.tag("get_language_info")
 def do_get_language_info(parser, token):
     """
     This will store the language information dictionary for the given language
@@ -156,6 +158,7 @@ def do_get_language_info(parser, token):
         raise TemplateSyntaxError("'%s' requires 'for string as variable' (got %r)" % (args[0], args[1:]))
     return GetLanguageInfoNode(args[2], args[4])
 
+@register.tag("get_language_info_list")
 def do_get_language_info_list(parser, token):
     """
     This will store a list of language information dictionaries for the given
@@ -178,15 +181,19 @@ def do_get_language_info_list(parser, token):
         raise TemplateSyntaxError("'%s' requires 'for sequence as variable' (got %r)" % (args[0], args[1:]))
     return GetLanguageInfoListNode(args[2], args[4])
 
+@register.filter
 def language_name(lang_code):
     return translation.get_language_info(lang_code)['name']
 
+@register.filter
 def language_name_local(lang_code):
     return translation.get_language_info(lang_code)['name_local']
 
+@register.filter
 def language_bidi(lang_code):
     return translation.get_language_info(lang_code)['bidi']
 
+@register.tag("get_current_language")
 def do_get_current_language(parser, token):
     """
     This will store the current language in the context.
@@ -204,6 +211,7 @@ def do_get_current_language(parser, token):
         raise TemplateSyntaxError("'get_current_language' requires 'as variable' (got %r)" % args)
     return GetCurrentLanguageNode(args[2])
 
+@register.tag("get_current_language_bidi")
 def do_get_current_language_bidi(parser, token):
     """
     This will store the current language layout in the context.
@@ -221,6 +229,7 @@ def do_get_current_language_bidi(parser, token):
         raise TemplateSyntaxError("'get_current_language_bidi' requires 'as variable' (got %r)" % args)
     return GetCurrentLanguageBidiNode(args[2])
 
+@register.tag("trans")
 def do_translate(parser, token):
     """
     This will mark a string for translation and will
@@ -279,6 +288,7 @@ def do_translate(parser, token):
     value, noop = TranslateParser(token.contents).top()
     return TranslateNode(parser.compile_filter(value), noop)
 
+@register.tag("blocktrans")
 def do_block_translate(parser, token):
     """
     This will translate a block of text with parameters.
@@ -356,15 +366,3 @@ def do_block_translate(parser, token):
 
     return BlockTranslateNode(extra_context, singular, plural, countervar,
             counter)
-
-register.tag('get_available_languages', do_get_available_languages)
-register.tag('get_language_info', do_get_language_info)
-register.tag('get_language_info_list', do_get_language_info_list)
-register.tag('get_current_language', do_get_current_language)
-register.tag('get_current_language_bidi', do_get_current_language_bidi)
-register.tag('trans', do_translate)
-register.tag('blocktrans', do_block_translate)
-
-register.filter(language_name)
-register.filter(language_name_local)
-register.filter(language_bidi)

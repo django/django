@@ -27,22 +27,23 @@ def get_root_path():
     except urlresolvers.NoReverseMatch:
         return getattr(settings, "ADMIN_SITE_ROOT_URL", "/admin/")
 
+@staff_member_required
 def doc_index(request):
     if not utils.docutils_is_available:
         return missing_docutils_page(request)
     return render_to_response('admin_doc/index.html', {
         'root_path': get_root_path(),
     }, context_instance=RequestContext(request))
-doc_index = staff_member_required(doc_index)
 
+@staff_member_required
 def bookmarklets(request):
     admin_root = get_root_path()
     return render_to_response('admin_doc/bookmarklets.html', {
         'root_path': admin_root,
         'admin_url': mark_safe("%s://%s%s" % (request.is_secure() and 'https' or 'http', request.get_host(), admin_root)),
     }, context_instance=RequestContext(request))
-bookmarklets = staff_member_required(bookmarklets)
 
+@staff_member_required
 def template_tag_index(request):
     if not utils.docutils_is_available:
         return missing_docutils_page(request)
@@ -76,8 +77,8 @@ def template_tag_index(request):
         'root_path': get_root_path(),
         'tags': tags
     }, context_instance=RequestContext(request))
-template_tag_index = staff_member_required(template_tag_index)
 
+@staff_member_required
 def template_filter_index(request):
     if not utils.docutils_is_available:
         return missing_docutils_page(request)
@@ -111,8 +112,8 @@ def template_filter_index(request):
         'root_path': get_root_path(),
         'filters': filters
     }, context_instance=RequestContext(request))
-template_filter_index = staff_member_required(template_filter_index)
 
+@staff_member_required
 def view_index(request):
     if not utils.docutils_is_available:
         return missing_docutils_page(request)
@@ -142,8 +143,8 @@ def view_index(request):
         'root_path': get_root_path(),
         'views': views
     }, context_instance=RequestContext(request))
-view_index = staff_member_required(view_index)
 
+@staff_member_required
 def view_detail(request, view):
     if not utils.docutils_is_available:
         return missing_docutils_page(request)
@@ -167,8 +168,8 @@ def view_detail(request, view):
         'body': body,
         'meta': metadata,
     }, context_instance=RequestContext(request))
-view_detail = staff_member_required(view_detail)
 
+@staff_member_required
 def model_index(request):
     if not utils.docutils_is_available:
         return missing_docutils_page(request)
@@ -177,8 +178,8 @@ def model_index(request):
         'root_path': get_root_path(),
         'models': m_list
     }, context_instance=RequestContext(request))
-model_index = staff_member_required(model_index)
 
+@staff_member_required
 def model_detail(request, app_label, model_name):
     if not utils.docutils_is_available:
         return missing_docutils_page(request)
@@ -272,8 +273,8 @@ def model_detail(request, app_label, model_name):
         'description': model.__doc__,
         'fields': fields,
     }, context_instance=RequestContext(request))
-model_detail = staff_member_required(model_detail)
 
+@staff_member_required
 def template_detail(request, template):
     templates = []
     for site_settings_module in settings.ADMIN_FOR:
@@ -297,7 +298,6 @@ def template_detail(request, template):
         'name': template,
         'templates': templates,
     }, context_instance=RequestContext(request))
-template_detail = staff_member_required(template_detail)
 
 ####################
 # Helper functions #

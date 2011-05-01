@@ -38,6 +38,7 @@ class FlatpageNode(template.Node):
         return ''
 
 
+@register.tag
 def get_flatpages(parser, token):
     """
     Retrieves all flatpage objects available for the current site and
@@ -94,5 +95,3 @@ def get_flatpages(parser, token):
         return FlatpageNode(context_name, starts_with=prefix, user=user)
     else:
         raise template.TemplateSyntaxError(syntax_message)
-
-register.tag('get_flatpages', get_flatpages)

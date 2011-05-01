@@ -218,10 +218,9 @@ class BaseFormSet(StrAndUnicode):
         return [self.forms[i[0]] for i in self._ordering]
     ordered_forms = property(_get_ordered_forms)
 
-    #@classmethod
+    @classmethod
     def get_default_prefix(cls):
         return 'form'
-    get_default_prefix = classmethod(get_default_prefix)
 
     def non_form_errors(self):
         """
