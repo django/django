@@ -19,7 +19,7 @@ from django.core.exceptions import ValidationError
 from django.core import validators
 from django.utils import formats
 from django.utils.translation import ugettext_lazy as _
-from django.utils.encoding import smart_unicode, smart_str
+from django.utils.encoding import smart_unicode, smart_str, force_unicode
 from django.utils.functional import lazy
 
 # Provide this import for backwards compatibility.
@@ -320,15 +320,36 @@ class DecimalField(Field):
             raise ValidationError(self.error_messages['max_whole_digits'] % (self.max_digits - self.decimal_places))
         return value
 
-class DateField(Field):
+class BaseTemporalField(Field):
+
+    def __init__(self, input_formats=None, *args, **kwargs):
+        super(BaseTemporalField, self).__init__(*args, **kwargs)
+        if input_formats is not None:
+            self.input_formats = input_formats
+
+    def to_python(self, value):
+        # Try to coerce the value to unicode.
+        unicode_value = force_unicode(value, strings_only=True)
+        if isinstance(unicode_value, unicode):
+            value = unicode_value.strip()
+        # If unicode, try to strptime against each input format.
+        if isinstance(value, unicode):
+            for format in self.input_formats:
+                try:
+                    return self.strptime(value, format)
+                except ValueError:
+                    continue
+        raise ValidationError(self.error_messages['invalid'])
+
+    def strptime(self, value, format):
+        raise NotImplementedError('Subclasses must define this method.')
+
+class DateField(BaseTemporalField):
     widget = DateInput
+    input_formats = formats.get_format_lazy('DATE_INPUT_FORMATS')
     default_error_messages = {
         'invalid': _(u'Enter a valid date.'),
     }
-
-    def __init__(self, input_formats=None, *args, **kwargs):
-        super(DateField, self).__init__(*args, **kwargs)
-        self.input_formats = input_formats
 
     def to_python(self, value):
         """
@@ -341,22 +362,17 @@ class DateField(Field):
             return value.date()
         if isinstance(value, datetime.date):
             return value
-        for format in self.input_formats or formats.get_format('DATE_INPUT_FORMATS'):
-            try:
-                return datetime.date(*time.strptime(value, format)[:3])
-            except ValueError:
-                continue
-        raise ValidationError(self.error_messages['invalid'])
+        return super(DateField, self).to_python(value)
 
-class TimeField(Field):
+    def strptime(self, value, format):
+        return datetime.date(*time.strptime(value, format)[:3])
+
+class TimeField(BaseTemporalField):
     widget = TimeInput
+    input_formats = formats.get_format_lazy('TIME_INPUT_FORMATS')
     default_error_messages = {
         'invalid': _(u'Enter a valid time.')
     }
-
-    def __init__(self, input_formats=None, *args, **kwargs):
-        super(TimeField, self).__init__(*args, **kwargs)
-        self.input_formats = input_formats
 
     def to_python(self, value):
         """
@@ -367,22 +383,17 @@ class TimeField(Field):
             return None
         if isinstance(value, datetime.time):
             return value
-        for format in self.input_formats or formats.get_format('TIME_INPUT_FORMATS'):
-            try:
-                return datetime.time(*time.strptime(value, format)[3:6])
-            except ValueError:
-                continue
-        raise ValidationError(self.error_messages['invalid'])
+        return super(TimeField, self).to_python(value)
 
-class DateTimeField(Field):
+    def strptime(self, value, format):
+        return datetime.time(*time.strptime(value, format)[3:6])
+
+class DateTimeField(BaseTemporalField):
     widget = DateTimeInput
+    input_formats = formats.get_format_lazy('DATETIME_INPUT_FORMATS')
     default_error_messages = {
         'invalid': _(u'Enter a valid date/time.'),
     }
-
-    def __init__(self, input_formats=None, *args, **kwargs):
-        super(DateTimeField, self).__init__(*args, **kwargs)
-        self.input_formats = input_formats
 
     def to_python(self, value):
         """
@@ -403,12 +414,10 @@ class DateTimeField(Field):
             if value[0] in validators.EMPTY_VALUES and value[1] in validators.EMPTY_VALUES:
                 return None
             value = '%s %s' % tuple(value)
-        for format in self.input_formats or formats.get_format('DATETIME_INPUT_FORMATS'):
-            try:
-                return datetime.datetime(*time.strptime(value, format)[:6])
-            except ValueError:
-                continue
-        raise ValidationError(self.error_messages['invalid'])
+        return super(DateTimeField, self).to_python(value)
+
+    def strptime(self, value, format):
+        return datetime.datetime(*time.strptime(value, format)[:6])
 
 class RegexField(CharField):
     def __init__(self, regex, max_length=None, min_length=None, error_message=None, *args, **kwargs):
