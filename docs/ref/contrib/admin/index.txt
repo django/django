@@ -607,15 +607,12 @@ subclass::
                   class AuthDecadeBornListFilter(DecadeBornListFilter):
 
                       def lookups(self, request):
-                          if request.user.is_authenticated():
-                              return (
-                                  ('80s', 'in the eighties'),
-                                  ('other', 'other'),
-                              )
-                          else:
-                              return (
-                                  ('90s', 'in the nineties'),
-                              )
+                          if request.user.is_superuser:
+                              return super(AuthDecadeBornListFilter, self).lookups(request)
+
+                      def queryset(self, request, queryset):
+                          if request.user.is_superuser:
+                              return super(AuthDecadeBornListFilter, self).queryset(request, queryset)
 
         * a tuple, where the first element is a field name and the second
           element is a class inheriting from

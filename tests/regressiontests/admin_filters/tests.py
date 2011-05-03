@@ -43,6 +43,11 @@ class DecadeListFilterWithoutTitle(DecadeListFilter):
 class DecadeListFilterWithoutParameter(DecadeListFilter):
     title = 'publication decade'
 
+class DecadeListFilterWithNoneReturningLookups(DecadeListFilterWithTitleAndParameter):
+
+    def lookups(self, request):
+        pass
+
 class CustomUserAdmin(UserAdmin):
     list_filter = ('books_authored', 'books_contributed')
 
@@ -59,6 +64,9 @@ class DecadeFilterBookAdminWithoutTitle(ModelAdmin):
 
 class DecadeFilterBookAdminWithoutParameter(ModelAdmin):
     list_filter = (DecadeListFilterWithoutParameter,)
+
+class DecadeFilterBookAdminWithNoneReturningLookups(ModelAdmin):
+    list_filter = (DecadeListFilterWithNoneReturningLookups,)
 
 class ListFiltersTests(TestCase):
 
@@ -453,3 +461,14 @@ class ListFiltersTests(TestCase):
         self.assertRaisesRegexp(ImproperlyConfigured,
             "The list filter 'DecadeListFilterWithoutParameter' does not specify a 'parameter_name'.",
             self.get_changelist, request, Book, modeladmin)
+
+    def test_simplelistfilter_with_none_returning_lookups(self):
+        """
+        A SimpleListFilter lookups method can return None but disables the
+        filter completely.
+        """
+        modeladmin = DecadeFilterBookAdminWithNoneReturningLookups(Book, site)
+        request = self.request_factory.get('/', {})
+        changelist = self.get_changelist(request, Book, modeladmin)
+        filterspec = changelist.get_filters(request)[0]
+        self.assertEqual(len(filterspec), 0)
