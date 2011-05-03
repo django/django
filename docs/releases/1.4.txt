@@ -52,6 +52,14 @@ documentation for :attr:`~django.contrib.admin.ModelAdmin.list_filter`.
 A lazily evaluated version of :func:`django.core.urlresolvers.reverse` was
 added to allow using URL reversals before the project's URLConf gets loaded.
 
+Assignment template tags
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+A new helper function,
+:ref:`assignment_tag<howto-custom-template-tags-assignment-tags>`, was added to
+``template.Library`` to ease the creation of template tags that store some
+data in a specified context variable.
+
 .. _backwards-incompatible-changes-1.4:
 
 Backwards incompatible changes in 1.4

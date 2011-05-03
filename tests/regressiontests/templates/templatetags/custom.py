@@ -84,3 +84,33 @@ def use_l10n(context):
 @register.inclusion_tag('test_incl_tag_use_l10n.html', takes_context=True)
 def inclusion_tag_use_l10n(context):
     return {}
+
+@register.assignment_tag
+def assignment_no_params():
+    """Expected assignment_no_params __doc__"""
+    return "assignment_no_params - Expected result"
+assignment_no_params.anything = "Expected assignment_no_params __dict__"
+
+@register.assignment_tag
+def assignment_one_param(arg):
+    """Expected assignment_one_param __doc__"""
+    return "assignment_one_param - Expected result: %s" % arg
+assignment_one_param.anything = "Expected assignment_one_param __dict__"
+
+@register.assignment_tag(takes_context=False)
+def assignment_explicit_no_context(arg):
+    """Expected assignment_explicit_no_context __doc__"""
+    return "assignment_explicit_no_context - Expected result: %s" % arg
+assignment_explicit_no_context.anything = "Expected assignment_explicit_no_context __dict__"
+
+@register.assignment_tag(takes_context=True)
+def assignment_no_params_with_context(context):
+    """Expected assignment_no_params_with_context __doc__"""
+    return "assignment_no_params_with_context - Expected result (context value: %s)" % context['value']
+assignment_no_params_with_context.anything = "Expected assignment_no_params_with_context __dict__"
+
+@register.assignment_tag(takes_context=True)
+def assignment_params_and_context(context, arg):
+    """Expected assignment_params_and_context __doc__"""
+    return "assignment_params_and_context - Expected result (context value: %s): %s" % (context['value'], arg)
+assignment_params_and_context.anything = "Expected assignment_params_and_context __dict__"

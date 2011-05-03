@@ -681,7 +681,70 @@ Or, using decorator syntax::
         return your_get_current_time_method(timezone, format_string)
 
 For more information on how the ``takes_context`` option works, see the section
-on `inclusion tags`_.
+on :ref:`inclusion tags<howto-custom-template-tags-inclusion-tags>`.
+
+.. _howto-custom-template-tags-assignment-tags:
+
+Assignment tags
+~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.4
+
+Another common type of template tag is the type that fetches some data and
+stores it in a context variable. To ease the creation of this type of tags,
+Django provides a helper function, ``assignment_tag``. This function works
+the same way as :ref:`simple_tag<howto-custom-template-tags-simple-tags>`,
+except that it stores the tag's result in a specified context variable instead
+of directly outputting it.
+
+Our earlier ``current_time`` function could thus be written like this:
+
+.. code-block:: python
+
+    def get_current_time(format_string):
+        return datetime.datetime.now().strftime(format_string)
+
+    register.assignment_tag(get_current_time)
+
+The decorator syntax also works:
+
+.. code-block:: python
+
+    @register.assignment_tag
+    def get_current_time(format_string):
+        ...
+
+You may then store the result in a template variable using the ``as`` argument
+followed by the variable name, and output it yourself where you see fit:
+
+.. code-block:: html+django
+
+    {% get_current_time "%Y-%m-%d %I:%M %p" as the_time %}
+    <p>The time is {{ the_time }}.</p>
+
+If your template tag needs to access the current context, you can use the
+``takes_context`` argument when registering your tag:
+
+.. code-block:: python
+
+    # The first argument *must* be called "context" here.
+    def get_current_time(context, format_string):
+        timezone = context['timezone']
+        return your_get_current_time_method(timezone, format_string)
+
+    register.assignment_tag(takes_context=True)(get_current_time)
+
+Or, using decorator syntax:
+
+.. code-block:: python
+
+    @register.assignment_tag(takes_context=True)
+    def get_current_time(context, format_string):
+        timezone = context['timezone']
+        return your_get_current_time_method(timezone, format_string)
+
+For more information on how the ``takes_context`` option works, see the section
+on :ref:`inclusion tags<howto-custom-template-tags-inclusion-tags>`.
 
 .. _howto-custom-template-tags-inclusion-tags:
 

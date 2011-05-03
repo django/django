@@ -1,3 +1,5 @@
+from __future__ import with_statement
+
 from django import template
 from django.utils.unittest import TestCase
 from templatetags import custom
@@ -102,3 +104,54 @@ class CustomTagTests(TestCase):
 
         c.use_l10n = True
         self.assertEquals(t.render(c).strip(), u'True')
+
+    def test_assignment_tags(self):
+        c = template.Context({'value': 42})
+
+        t = template.Template('{% load custom %}{% assignment_no_params as var %}The result is: {{ var }}')
+        self.assertEqual(t.render(c), u'The result is: assignment_no_params - Expected result')
+
+        t = template.Template('{% load custom %}{% assignment_one_param 37 as var %}The result is: {{ var }}')
+        self.assertEqual(t.render(c), u'The result is: assignment_one_param - Expected result: 37')
+
+        t = template.Template('{% load custom %}{% assignment_explicit_no_context 37 as var %}The result is: {{ var }}')
+        self.assertEqual(t.render(c), u'The result is: assignment_explicit_no_context - Expected result: 37')
+
+        t = template.Template('{% load custom %}{% assignment_no_params_with_context as var %}The result is: {{ var }}')
+        self.assertEqual(t.render(c), u'The result is: assignment_no_params_with_context - Expected result (context value: 42)')
+
+        t = template.Template('{% load custom %}{% assignment_params_and_context 37 as var %}The result is: {{ var }}')
+        self.assertEqual(t.render(c), u'The result is: assignment_params_and_context - Expected result (context value: 42): 37')
+
+        self.assertRaisesRegexp(template.TemplateSyntaxError,
+            "'assignment_one_param' tag takes at least 2 arguments and the second last argument must be 'as'",
+            template.Template, '{% load custom %}{% assignment_one_param 37 %}The result is: {{ var }}')
+
+        self.assertRaisesRegexp(template.TemplateSyntaxError,
+            "'assignment_one_param' tag takes at least 2 arguments and the second last argument must be 'as'",
+            template.Template, '{% load custom %}{% assignment_one_param 37 as %}The result is: {{ var }}')
+
+        self.assertRaisesRegexp(template.TemplateSyntaxError,
+            "'assignment_one_param' tag takes at least 2 arguments and the second last argument must be 'as'",
+            template.Template, '{% load custom %}{% assignment_one_param 37 ass var %}The result is: {{ var }}')
+
+    def test_assignment_tag_registration(self):
+        # Test that the decorators preserve the decorated function's docstring, name and attributes.
+        self.verify_tag(custom.assignment_no_params, 'assignment_no_params')
+        self.verify_tag(custom.assignment_one_param, 'assignment_one_param')
+        self.verify_tag(custom.assignment_explicit_no_context, 'assignment_explicit_no_context')
+        self.verify_tag(custom.assignment_no_params_with_context, 'assignment_no_params_with_context')
+        self.verify_tag(custom.assignment_params_and_context, 'assignment_params_and_context')
+
+    def test_assignment_tag_missing_context(self):
+        # That the 'context' parameter must be present when takes_context is True
+        def an_assignment_tag_without_parameters(arg):
+            """Expected __doc__"""
+            return "Expected result"
+
+        register = template.Library()
+        decorator = register.assignment_tag(takes_context=True)
+
+        self.assertRaisesRegexp(template.TemplateSyntaxError,
+            "Any tag function decorated with takes_context=True must have a first argument of 'context'",
+            decorator, an_assignment_tag_without_parameters)
