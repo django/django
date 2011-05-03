@@ -1,10 +1,10 @@
-from django.contrib.localflavor.uk.forms import UKPostcodeField
+from django.contrib.localflavor.gb.forms import GBPostcodeField
 
 from utils import LocalFlavorTestCase
 
 
-class UKLocalFlavorTests(LocalFlavorTestCase):
-    def test_UKPostcodeField(self):
+class GBLocalFlavorTests(LocalFlavorTestCase):
+    def test_GBPostcodeField(self):
         error_invalid = [u'Enter a valid postcode.']
         valid = {
             'BT32 4PX': 'BT32 4PX',
@@ -21,10 +21,10 @@ class UKLocalFlavorTests(LocalFlavorTestCase):
             '1NV4L1D': error_invalid,
             ' b0gUS': error_invalid,
         }
-        self.assertFieldOutput(UKPostcodeField, valid, invalid)
+        self.assertFieldOutput(GBPostcodeField, valid, invalid)
         valid = {}
         invalid = {
             '1NV 4L1D': [u'Enter a bloody postcode!'],
         }
         kwargs = {'error_messages': {'invalid': 'Enter a bloody postcode!'}}
-        self.assertFieldOutput(UKPostcodeField, valid, invalid, field_kwargs=kwargs)
+        self.assertFieldOutput(GBPostcodeField, valid, invalid, field_kwargs=kwargs)

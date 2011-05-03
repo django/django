@@ -123,7 +123,7 @@ Here's an example of how to use them::
 .. _Sweden: `Sweden (se)`_
 .. _Switzerland: `Switzerland (ch)`_
 .. _Turkey: `Turkey (tr)`_
-.. _United Kingdom: `United Kingdom (uk)`_
+.. _United Kingdom: `United Kingdom (gb)`_
 .. _United States of America: `United States of America (us)`_
 .. _Uruguay: `Uruguay (uy)`_
 
@@ -1054,20 +1054,20 @@ Turkey (``tr``)
 
     A ``select`` widget that uses a list of Turkish provinces as its choices.
 
-United Kingdom (``uk``)
+United Kingdom (``gb``)
 =======================
 
-.. class:: uk.forms.UKPostcodeField
+.. class:: gb.forms.GBPostcodeField
 
     A form field that validates input as a UK postcode. The regular
     expression used is sourced from the schema for British Standard BS7666
     address types at http://www.cabinetoffice.gov.uk/media/291293/bs7666-v2-0.xml.
 
-.. class:: uk.forms.UKCountySelect
+.. class:: gb.forms.GBCountySelect
 
     A ``Select`` widget that uses a list of UK counties/regions as its choices.
 
-.. class:: uk.forms.UKNationSelect
+.. class:: gb.forms.GBNationSelect
 
     A ``Select`` widget that uses a list of UK nations as its choices.
 

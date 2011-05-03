@@ -175,7 +175,6 @@ their deprecation, as per the :ref:`Django deprecation policy
           combine paths in templates.
 
     * 1.6
-
         * The compatibility modules ``django.utils.copycompat`` and
           ``django.utils.hashcompat`` as well as the functions
           ``django.utils.itercompat.all`` and ``django.utils.itercompat.any``
@@ -194,6 +193,11 @@ their deprecation, as per the :ref:`Django deprecation policy
           PyLibMC. The historical :class:`~django.core.cache.backends.memcached.CacheClass`
           is now an alias for :class:`~django.core.cache.backends.memcached.MemcachedCache`.
           In Django 1.6, the historical alias will be removed.
+
+        * The UK-prefixed objects of ``django.contrib.localflavor.uk`` will only
+          be accessible through their new GB-prefixed names (GB is the correct
+          ISO 3166 code for United Kingdom). They have been depreacted since the
+          1.4 release.
 
     * 2.0
         * ``django.views.defaults.shortcut()``. This function has been moved
