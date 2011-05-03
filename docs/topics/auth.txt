@@ -1022,7 +1022,7 @@ includes a few other useful built-in views located in
 Helper functions
 ----------------
 
-.. module:: django.contrib.auth.views
+.. currentmodule:: django.contrib.auth.views
 
 .. function:: redirect_to_login(next[, login_url, redirect_field_name])
 
