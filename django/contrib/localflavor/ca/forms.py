@@ -25,9 +25,9 @@ class CAPostalCodeField(RegexField):
         'invalid': _(u'Enter a postal code in the format XXX XXX.'),
     }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, max_length=None, min_length=None, *args, **kwargs):
         super(CAPostalCodeField, self).__init__(r'^[ABCEGHJKLMNPRSTVXY]\d[ABCEGHJKLMNPRSTVWXYZ] \d[ABCEGHJKLMNPRSTVWXYZ]\d$',
-            max_length=None, min_length=None, *args, **kwargs)
+            max_length, min_length, *args, **kwargs)
 
 class CAPhoneNumberField(Field):
     """Canadian phone number field."""

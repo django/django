@@ -16,9 +16,9 @@ class TRPostalCodeField(RegexField):
         'invalid': _(u'Enter a postal code in the format XXXXX.'),
     }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, max_length=5, min_length=5, *args, **kwargs):
         super(TRPostalCodeField, self).__init__(r'^\d{5}$',
-            max_length=5, min_length=5, *args, **kwargs)
+            max_length, min_length, *args, **kwargs)
 
     def clean(self, value):
         value = super(TRPostalCodeField, self).clean(value)

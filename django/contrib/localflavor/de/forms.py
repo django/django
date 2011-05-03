@@ -14,9 +14,9 @@ class DEZipCodeField(RegexField):
     default_error_messages = {
         'invalid': _('Enter a zip code in the format XXXXX.'),
     }
-    def __init__(self, *args, **kwargs):
+    def __init__(self, max_length=None, min_length=None, *args, **kwargs):
         super(DEZipCodeField, self).__init__(r'^\d{5}$',
-            max_length=None, min_length=None, *args, **kwargs)
+            max_length, min_length, *args, **kwargs)
 
 class DEStateSelect(Select):
     """

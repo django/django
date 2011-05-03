@@ -37,9 +37,9 @@ class RUPostalCodeField(RegexField):
     default_error_messages = {
         'invalid': _(u'Enter a postal code in the format XXXXXX.'),
     }
-    def __init__(self, *args, **kwargs):
+    def __init__(self, max_length=None, min_length=None, *args, **kwargs):
         super(RUPostalCodeField, self).__init__(r'^\d{6}$',
-            max_length=None, min_length=None, *args, **kwargs)
+            max_length, min_length, *args, **kwargs)
 
 
 class RUPassportNumberField(RegexField):
@@ -50,9 +50,9 @@ class RUPassportNumberField(RegexField):
     default_error_messages = {
         'invalid': _(u'Enter a passport number in the format XXXX XXXXXX.'),
     }
-    def __init__(self, *args, **kwargs):
+    def __init__(self, max_length=None, min_length=None, *args, **kwargs):
         super(RUPassportNumberField, self).__init__(r'^\d{4} \d{6}$',
-            max_length=None, min_length=None, *args, **kwargs)
+            max_length, min_length, *args, **kwargs)
 
 
 class RUAlienPassportNumberField(RegexField):
@@ -63,6 +63,6 @@ class RUAlienPassportNumberField(RegexField):
     default_error_messages = {
         'invalid': _(u'Enter a passport number in the format XX XXXXXXX.'),
     }
-    def __init__(self, *args, **kwargs):
+    def __init__(self, max_length=None, min_length=None, *args, **kwargs):
         super(RUAlienPassportNumberField, self).__init__(r'^\d{2} \d{7}$',
-            max_length=None, min_length=None, *args, **kwargs)
+            max_length, min_length, *args, **kwargs)

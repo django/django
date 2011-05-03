@@ -40,9 +40,9 @@ class PLPESELField(RegexField):
         'checksum': _(u'Wrong checksum for the National Identification Number.'),
     }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, max_length=None, min_length=None, *args, **kwargs):
         super(PLPESELField, self).__init__(r'^\d{11}$',
-            max_length=None, min_length=None, *args, **kwargs)
+            max_length, min_length, *args, **kwargs)
 
     def clean(self, value):
         super(PLPESELField, self).clean(value)
@@ -77,9 +77,9 @@ class PLNationalIDCardNumberField(RegexField):
         'checksum': _(u'Wrong checksum for the National ID Card Number.'),
     }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, max_length=None, min_length=None, *args, **kwargs):
         super(PLNationalIDCardNumberField, self).__init__(r'^[A-Za-z]{3}\d{6}$',
-            max_length=None, min_length=None, *args, **kwargs)
+            max_length, min_length, *args, **kwargs)
 
     def clean(self,value):
         super(PLNationalIDCardNumberField, self).clean(value)
@@ -129,9 +129,9 @@ class PLNIPField(RegexField):
         'checksum': _(u'Wrong checksum for the Tax Number (NIP).'),
     }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, max_length=None, min_length=None, *args, **kwargs):
         super(PLNIPField, self).__init__(r'^\d{3}-\d{3}-\d{2}-\d{2}$|^\d{2}-\d{2}-\d{3}-\d{3}$',
-            max_length=None, min_length=None, *args, **kwargs)
+            max_length, min_length, *args, **kwargs)
 
     def clean(self,value):
         super(PLNIPField, self).clean(value)
@@ -169,9 +169,9 @@ class PLREGONField(RegexField):
         'checksum': _(u'Wrong checksum for the National Business Register Number (REGON).'),
     }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, max_length=None, min_length=None, *args, **kwargs):
         super(PLREGONField, self).__init__(r'^\d{9,14}$',
-            max_length=None, min_length=None, *args, **kwargs)
+            max_length, min_length, *args, **kwargs)
 
     def clean(self,value):
         super(PLREGONField, self).clean(value)
@@ -209,7 +209,7 @@ class PLPostalCodeField(RegexField):
         'invalid': _(u'Enter a postal code in the format XX-XXX.'),
     }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, max_length=None, min_length=None, *args, **kwargs):
         super(PLPostalCodeField, self).__init__(r'^\d{2}-\d{3}$',
-            max_length=None, min_length=None, *args, **kwargs)
+            max_length, min_length, *args, **kwargs)
 

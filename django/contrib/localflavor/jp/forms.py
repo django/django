@@ -16,9 +16,9 @@ class JPPostalCodeField(RegexField):
         'invalid': _('Enter a postal code in the format XXXXXXX or XXX-XXXX.'),
     }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, max_length=None, min_length=None, *args, **kwargs):
         super(JPPostalCodeField, self).__init__(r'^\d{3}-\d{4}$|^\d{7}$',
-            max_length=None, min_length=None, *args, **kwargs)
+            max_length, min_length, *args, **kwargs)
 
     def clean(self, value):
         """

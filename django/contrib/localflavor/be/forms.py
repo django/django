@@ -23,9 +23,9 @@ class BEPostalCodeField(RegexField):
             'Enter a valid postal code in the range and format 1XXX - 9XXX.'),
     }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, max_length=None, min_length=None, *args, **kwargs):
         super(BEPostalCodeField, self).__init__(r'^[1-9]\d{3}$',
-                max_length=None, min_length=None, *args, **kwargs)
+                max_length, min_length, *args, **kwargs)
 
 class BEPhoneNumberField(RegexField):
     """
@@ -50,9 +50,9 @@ class BEPhoneNumberField(RegexField):
                      '0xxxxxxxx or 04xxxxxxxx.'),
     }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, max_length=None, min_length=None, *args, **kwargs):
         super(BEPhoneNumberField, self).__init__(r'^[0]\d{1}[/. ]?\d{3}[. ]\d{2}[. ]?\d{2}$|^[0]\d{2}[/. ]?\d{2}[. ]?\d{2}[. ]?\d{2}$|^[0][4]\d{2}[/. ]?\d{2}[. ]?\d{2}[. ]?\d{2}$',
-            max_length=None, min_length=None, *args, **kwargs)
+            max_length, min_length, *args, **kwargs)
 
 class BERegionSelect(Select):
     """

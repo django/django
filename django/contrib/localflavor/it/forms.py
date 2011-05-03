@@ -14,9 +14,9 @@ class ITZipCodeField(RegexField):
     default_error_messages = {
         'invalid': _('Enter a valid zip code.'),
     }
-    def __init__(self, *args, **kwargs):
+    def __init__(self, max_length=None, min_length=None, *args, **kwargs):
         super(ITZipCodeField, self).__init__(r'^\d{5}$',
-        max_length=None, min_length=None, *args, **kwargs)
+              max_length, min_length, *args, **kwargs)
 
 class ITRegionSelect(Select):
     """
@@ -44,9 +44,9 @@ class ITSocialSecurityNumberField(RegexField):
         'invalid': _(u'Enter a valid Social Security number.'),
     }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, max_length=None, min_length=None, *args, **kwargs):
         super(ITSocialSecurityNumberField, self).__init__(r'^\w{3}\s*\w{3}\s*\w{5}\s*\w{5}$',
-        max_length=None, min_length=None, *args, **kwargs)
+              max_length, min_length, *args, **kwargs)
 
     def clean(self, value):
         value = super(ITSocialSecurityNumberField, self).clean(value)

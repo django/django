@@ -17,9 +17,9 @@ class PTZipCodeField(RegexField):
         'invalid': _('Enter a zip code in the format XXXX-XXX.'),
     }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, max_length=None, min_length=None, *args, **kwargs):
         super(PTZipCodeField, self).__init__(r'^(\d{4}-\d{3}|\d{7})$',
-            max_length=None, min_length=None, *args, **kwargs)
+            max_length, min_length, *args, **kwargs)
 
     def clean(self,value):
         cleaned = super(PTZipCodeField, self).clean(value)

@@ -13,9 +13,9 @@ class NOZipCodeField(RegexField):
         'invalid': _('Enter a zip code in the format XXXX.'),
     }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, max_length=None, min_length=None, *args, **kwargs):
         super(NOZipCodeField, self).__init__(r'^\d{4}$',
-            max_length=None, min_length=None, *args, **kwargs)
+            max_length, min_length, *args, **kwargs)
 
 class NOMunicipalitySelect(Select):
     """
