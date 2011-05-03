@@ -611,7 +611,7 @@ class Gadget(models.Model):
         return self.name
 
 class CustomChangeList(ChangeList):
-    def get_query_set(self):
+    def get_query_set(self, request):
         return self.root_query_set.filter(pk=9999) # Does not exist
 
 class GadgetAdmin(admin.ModelAdmin):

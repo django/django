@@ -319,7 +319,7 @@ def search_form(cl):
 
 @register.inclusion_tag('admin/filter.html')
 def admin_list_filter(cl, spec):
-    return {'title': spec.title(), 'choices' : list(spec.choices(cl))}
+    return {'title': spec.title, 'choices' : list(spec.choices(cl))}
 
 @register.inclusion_tag('admin/actions.html', takes_context=True)
 def admin_actions(context):

@@ -3,6 +3,7 @@ from django.db import models
 from django.db.models.fields import FieldDoesNotExist
 from django.forms.models import (BaseModelForm, BaseModelFormSet, fields_for_model,
     _get_foreign_key)
+from django.contrib.admin import ListFilter, FieldListFilter
 from django.contrib.admin.util import get_fields_from_path, NotRelationField
 from django.contrib.admin.options import (flatten_fieldsets, BaseModelAdmin,
     HORIZONTAL, VERTICAL)
@@ -54,15 +55,43 @@ def validate(cls, model):
     # list_filter
     if hasattr(cls, 'list_filter'):
         check_isseq(cls, 'list_filter', cls.list_filter)
-        for idx, fpath in enumerate(cls.list_filter):
-            try:
-                get_fields_from_path(model, fpath)
-            except (NotRelationField, FieldDoesNotExist), e:
-                raise ImproperlyConfigured(
-                    "'%s.list_filter[%d]' refers to '%s' which does not refer to a Field." % (
-                        cls.__name__, idx, fpath
-                    )
-                )
+        for idx, item in enumerate(cls.list_filter):
+            # There are three options for specifying a filter:
+            #   1: 'field' - a basic field filter, possibly w/ relationships (eg, 'field__rel')
+            #   2: ('field', SomeFieldListFilter) - a field-based list filter class
+            #   3: SomeListFilter - a non-field list filter class
+            if callable(item) and not isinstance(item, models.Field):
+                # If item is option 3, it should be a ListFilter...
+                if not issubclass(item, ListFilter):
+                    raise ImproperlyConfigured("'%s.list_filter[%d]' is '%s'"
+                            " which is not a descendant of ListFilter."
+                            % (cls.__name__, idx, item.__name__))
+                # ...  but not a FieldListFilter.
+                if issubclass(item, FieldListFilter):
+                    raise ImproperlyConfigured("'%s.list_filter[%d]' is '%s'"
+                            " which is of type FieldListFilter but is not"
+                            " associated with a field name."
+                            % (cls.__name__, idx, item.__name__))
+            else:
+                try:
+                    # Check for option #2 (tuple)
+                    field, list_filter_class = item
+                except (TypeError, ValueError):
+                    # item is option #1
+                    field = item
+                else:
+                    # item is option #2
+                    if not issubclass(list_filter_class, FieldListFilter):
+                        raise ImproperlyConfigured("'%s.list_filter[%d][1]'"
+                            " is '%s' which is not of type FieldListFilter."
+                            % (cls.__name__, idx, list_filter_class.__name__))
+                # Validate the field string
+                try:
+                    get_fields_from_path(model, field)
+                except (NotRelationField, FieldDoesNotExist):
+                    raise ImproperlyConfigured("'%s.list_filter[%d]' refers to '%s'"
+                            " which does not refer to a Field."
+                            % (cls.__name__, idx, field))
 
     # list_per_page = 100
     if hasattr(cls, 'list_per_page') and not isinstance(cls.list_per_page, int):

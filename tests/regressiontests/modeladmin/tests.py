@@ -2,19 +2,21 @@ from datetime import date
 
 from django import forms
 from django.conf import settings
-from django.contrib.admin.options import ModelAdmin, TabularInline, \
-    HORIZONTAL, VERTICAL
+from django.contrib.admin.options import (ModelAdmin, TabularInline,
+    HORIZONTAL, VERTICAL)
 from django.contrib.admin.sites import AdminSite
 from django.contrib.admin.validation import validate
 from django.contrib.admin.widgets import AdminDateWidget, AdminRadioSelect
+from django.contrib.admin import (SimpleListFilter,
+     BooleanFieldListFilter)
 from django.core.exceptions import ImproperlyConfigured
 from django.forms.models import BaseModelFormSet
 from django.forms.widgets import Select
 from django.test import TestCase
 from django.utils import unittest
 
-from models import Band, Concert, ValidationTestModel, \
-    ValidationTestInlineModel
+from models import (Band, Concert, ValidationTestModel,
+    ValidationTestInlineModel)
 
 
 # None of the following tests really depend on the content of the request,
@@ -851,8 +853,65 @@ class ValidationTests(unittest.TestCase):
             ValidationTestModel,
         )
 
+        class RandomClass(object):
+            pass
+
         class ValidationTestModelAdmin(ModelAdmin):
-            list_filter = ('is_active',)
+            list_filter = (RandomClass,)
+
+        self.assertRaisesRegexp(
+            ImproperlyConfigured,
+            "'ValidationTestModelAdmin.list_filter\[0\]' is 'RandomClass' which is not a descendant of ListFilter.",
+            validate,
+            ValidationTestModelAdmin,
+            ValidationTestModel,
+        )
+
+        class ValidationTestModelAdmin(ModelAdmin):
+            list_filter = (('is_active', RandomClass),)
+
+        self.assertRaisesRegexp(
+            ImproperlyConfigured,
+            "'ValidationTestModelAdmin.list_filter\[0\]\[1\]' is 'RandomClass' which is not of type FieldListFilter.",
+            validate,
+            ValidationTestModelAdmin,
+            ValidationTestModel,
+        )
+
+        class AwesomeFilter(SimpleListFilter):
+            def get_title(self):
+                return 'awesomeness'
+            def get_choices(self, request):
+                return (('bit', 'A bit awesome'), ('very', 'Very awesome'), )
+            def get_query_set(self, cl, qs):
+                return qs
+
+        class ValidationTestModelAdmin(ModelAdmin):
+            list_filter = (('is_active', AwesomeFilter),)
+
+        self.assertRaisesRegexp(
+            ImproperlyConfigured,
+            "'ValidationTestModelAdmin.list_filter\[0\]\[1\]' is 'AwesomeFilter' which is not of type FieldListFilter.",
+            validate,
+            ValidationTestModelAdmin,
+            ValidationTestModel,
+        )
+
+        class ValidationTestModelAdmin(ModelAdmin):
+            list_filter = (BooleanFieldListFilter,)
+
+        self.assertRaisesRegexp(
+            ImproperlyConfigured,
+            "'ValidationTestModelAdmin.list_filter\[0\]' is 'BooleanFieldListFilter' which is of type FieldListFilter but is not associated with a field name.",
+            validate,
+            ValidationTestModelAdmin,
+            ValidationTestModel,
+        )
+
+        # Valid declarations below -----------
+
+        class ValidationTestModelAdmin(ModelAdmin):
+            list_filter = ('is_active', AwesomeFilter, ('is_active', BooleanFieldListFilter))
 
         validate(ValidationTestModelAdmin, ValidationTestModel)
 

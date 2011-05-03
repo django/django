@@ -525,30 +525,113 @@ subclass::
 
 .. attribute:: ModelAdmin.list_filter
 
+    .. versionchanged:: 1.4
+
     Set ``list_filter`` to activate filters in the right sidebar of the change
-    list page of the admin. This should be a list of field names, and each
-    specified field should be either a ``BooleanField``, ``CharField``,
-    ``DateField``, ``DateTimeField``, ``IntegerField`` or ``ForeignKey``.
-
-    This example, taken from the ``django.contrib.auth.models.User`` model,
-    shows how both ``list_display`` and ``list_filter`` work::
-
-        class UserAdmin(admin.ModelAdmin):
-            list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff')
-            list_filter = ('is_staff', 'is_superuser')
-
-    The above code results in an admin change list page that looks like this:
+    list page of the admin, as illustrated in the following screenshot:
 
         .. image:: _images/users_changelist.png
 
-    (This example also has ``search_fields`` defined. See below.)
+    ``list_filter`` should be a list of elements, where each element should be
+    of one of the following types:
 
-    .. versionadded:: 1.3
+        * a field name, where the specified field should be either a
+          ``BooleanField``, ``CharField``, ``DateField``, ``DateTimeField``,
+          ``IntegerField``, ``ForeignKey`` or ``ManyToManyField``, for example::
 
-    Fields in ``list_filter`` can also span relations using the ``__`` lookup::
+              class PersonAdmin(ModelAdmin):
+                  list_filter = ('is_staff', 'company')
 
-        class UserAdminWithLookup(UserAdmin):
-            list_filter = ('groups__name')
+          .. versionadded:: 1.3
+
+          Field names in ``list_filter`` can also span relations
+          using the ``__`` lookup, for example::
+
+              class PersonAdmin(UserAdmin):
+                  list_filter = ('company__name',)
+
+        * a class inheriting from :mod:`django.contrib.admin.SimpleListFilter`,
+          which you need to provide the ``title`` and ``parameter_name``
+          attributes to and override the ``lookups`` and ``queryset`` methods,
+          e.g.::
+
+               from django.db.models import Q
+               from django.utils.translation import ugettext_lazy as _
+
+               from django.contrib.admin import SimpleListFilter
+
+               class DecadeBornListFilter(SimpleListFilter):
+                   # Human-readable title which will be displayed in the
+                   # right admin sidebar just above the filter options.
+                   title = _('decade born')
+
+                   # Parameter for the filter that will be used in the URL query.
+                   parameter_name = 'decade'
+
+                   def lookups(self, request):
+                       """
+                       Returns a list of tuples. The first element in each
+                       tuple is the coded value for the option that will
+                       appear in the URL query. The second element is the
+                       human-readable name for the option that will appear
+                       in the right sidebar.
+                       """
+                       return (
+                           ('80s', 'in the eighties'),
+                           ('other', 'other'),
+                       )
+
+                   def queryset(self, request, queryset):
+                       """
+                       Returns the filtered queryset based on the value
+                       provided in the query string and retrievable via
+                       ``value()``.
+                       """
+                       # Compare the requested value (either '80s' or 'other')
+                       # to decide how to filter the queryset.
+                       if self.value() == '80s':
+                           return queryset.filter(birthday__year__gte=1980,
+                                                   birthday__year__lte=1989)
+                       if self.value() == 'other':
+                           return queryset.filter(Q(year__lte=1979) |
+                                                   Q(year__gte=1990))
+
+               class PersonAdmin(ModelAdmin):
+                   list_filter = (DecadeBornListFilter,)
+
+          .. note::
+
+              As a convenience, the ``HttpRequest`` object is passed to the
+              filter's methods, for example::
+
+                  class AuthDecadeBornListFilter(DecadeBornListFilter):
+
+                      def lookups(self, request):
+                          if request.user.is_authenticated():
+                              return (
+                                  ('80s', 'in the eighties'),
+                                  ('other', 'other'),
+                              )
+                          else:
+                              return (
+                                  ('90s', 'in the nineties'),
+                              )
+
+        * a tuple, where the first element is a field name and the second
+          element is a class inheriting from
+          :mod:`django.contrib.admin.FieldListFilter`, for example::
+
+              from django.contrib.admin import BooleanFieldListFilter
+
+              class PersonAdmin(ModelAdmin):
+                  list_filter = (
+                      ('is_staff', BooleanFieldListFilter),
+                  )
+
+          .. note::
+
+              The ``FieldListFilter`` API is currently considered internal
+              and prone to refactoring.
 
 .. attribute:: ModelAdmin.list_per_page
 

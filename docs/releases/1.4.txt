@@ -37,6 +37,15 @@ compatibility with old browsers, this change means that you can use any HTML5
 features you need in admin pages without having to lose HTML validity or
 override the provided templates to change the doctype.
 
+List filters in admin interface
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Prior to Django 1.4, the Django admin app allowed specifying change list
+filters by specifying a field lookup (including spanning relations), and
+not custom filters. This has been rectified with a simple API previously
+known as "FilterSpec" which was used internally. For more details, see the
+documentation for :attr:`~django.contrib.admin.ModelAdmin.list_filter`.
+
 ``reverse_lazy``
 ~~~~~~~~~~~~~~~~
 
