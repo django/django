@@ -605,7 +605,7 @@ class BooleanField(Field):
         # will submit for False. Also check for '0', since this is what
         # RadioSelect will provide. Because bool("True") == bool('1') == True,
         # we don't need to handle that explicitly.
-        if value in ('False', '0'):
+        if isinstance(value, basestring) and value.lower() in ('false', '0'):
             value = False
         else:
             value = bool(value)

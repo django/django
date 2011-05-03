@@ -698,6 +698,8 @@ class FieldsTests(TestCase):
         self.assertEqual(False, f.clean('0'))
         self.assertEqual(True, f.clean('Django rocks'))
         self.assertEqual(False, f.clean('False'))
+        self.assertEqual(False, f.clean('false'))
+        self.assertEqual(False, f.clean('FaLsE'))
 
     # ChoiceField #################################################################
 
