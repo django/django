@@ -48,6 +48,15 @@ class BasicFieldTests(test.TestCase):
         except ValidationError, e:
             self.fail("NullBooleanField failed validation with value of None: %s" % e.messages)
 
+    def test_field_repr(self):
+        """
+        Regression test for #5931: __repr__ of a field also displays its name
+        """
+        f = Foo._meta.get_field('a')
+        self.assertEqual(repr(f), '<django.db.models.fields.CharField: a>')
+        f = models.fields.CharField()
+        self.assertEqual(repr(f), '<django.db.models.fields.CharField>')
+
 class DecimalFieldTests(test.TestCase):
     def test_to_python(self):
         f = models.DecimalField(max_digits=4, decimal_places=2)
