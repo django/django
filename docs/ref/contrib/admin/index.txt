@@ -555,9 +555,7 @@ subclass::
           attributes to and override the ``lookups`` and ``queryset`` methods,
           e.g.::
 
-               from django.db.models import Q
                from django.utils.translation import ugettext_lazy as _
-
                from django.contrib.admin import SimpleListFilter
 
                class DecadeBornListFilter(SimpleListFilter):
@@ -568,7 +566,7 @@ subclass::
                    # Parameter for the filter that will be used in the URL query.
                    parameter_name = 'decade'
 
-                   def lookups(self, request):
+                   def lookups(self, request, model_admin):
                        """
                        Returns a list of tuples. The first element in each
                        tuple is the coded value for the option that will
@@ -577,24 +575,24 @@ subclass::
                        in the right sidebar.
                        """
                        return (
-                           ('80s', 'in the eighties'),
-                           ('other', 'other'),
+                           ('80s', _('in the eighties')),
+                           ('90s', _('in the nineties')),
                        )
 
                    def queryset(self, request, queryset):
                        """
                        Returns the filtered queryset based on the value
                        provided in the query string and retrievable via
-                       ``value()``.
+                       `self.value()`.
                        """
                        # Compare the requested value (either '80s' or 'other')
                        # to decide how to filter the queryset.
                        if self.value() == '80s':
                            return queryset.filter(birthday__year__gte=1980,
                                                    birthday__year__lte=1989)
-                       if self.value() == 'other':
-                           return queryset.filter(Q(year__lte=1979) |
-                                                   Q(year__gte=1990))
+                       if self.value() == '90s':
+                           return queryset.filter(birthday__year__gte=1990,
+                                                  birthday__year__lte=1999)
 
                class PersonAdmin(ModelAdmin):
                    list_filter = (DecadeBornListFilter,)
@@ -602,17 +600,38 @@ subclass::
           .. note::
 
               As a convenience, the ``HttpRequest`` object is passed to the
-              filter's methods, for example::
+              ``lookups`` and ``queryset`` methods, for example::
 
                   class AuthDecadeBornListFilter(DecadeBornListFilter):
 
-                      def lookups(self, request):
+                      def lookups(self, request, model_admin):
                           if request.user.is_superuser:
-                              return super(AuthDecadeBornListFilter, self).lookups(request)
+                              return super(AuthDecadeBornListFilter,
+                                  self).lookups(request, model_admin)
 
                       def queryset(self, request, queryset):
                           if request.user.is_superuser:
-                              return super(AuthDecadeBornListFilter, self).queryset(request, queryset)
+                              return super(AuthDecadeBornListFilter,
+                                  self).queryset(request, queryset)
+
+              Also as a convenience, the ``ModelAdmin`` object is passed to
+              the ``lookups`` method, for example if you want to base the
+              lookups on the available data::
+
+                  class AdvancedDecadeBornListFilter(DecadeBornListFilter):
+
+                      def lookups(self, request, model_admin):
+                          """
+                          Only show the lookups if there actually is
+                          anyone born in the corresponding decades.
+                          """
+                          qs = model_admin.queryset(request)
+                          if qs.filter(birthday__year__gte=1980,
+                                        birthday__year__lte=1989).exists():
+                              yield ('80s', _('in the eighties'))
+                          if qs.filter(birthday__year__gte=1990,
+                                        birthday__year__lte=1999).exists():
+                              yield ('90s', _('in the nineties'))
 
         * a tuple, where the first element is a field name and the second
           element is a class inheriting from

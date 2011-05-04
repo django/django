@@ -19,8 +19,9 @@ def select_by(dictlist, key, value):
 
 class DecadeListFilter(SimpleListFilter):
 
-    def lookups(self, request):
+    def lookups(self, request, model_admin):
         return (
+            ('the 80s', "the 1980's"),
             ('the 90s', "the 1990's"),
             ('the 00s', "the 2000's"),
             ('other', "other decades"),
@@ -28,6 +29,8 @@ class DecadeListFilter(SimpleListFilter):
 
     def queryset(self, request, queryset):
         decade = self.value()
+        if decade == 'the 80s':
+            return queryset.filter(year__gte=1980, year__lte=1989)
         if decade == 'the 90s':
             return queryset.filter(year__gte=1990, year__lte=1999)
         if decade == 'the 00s':
@@ -45,8 +48,19 @@ class DecadeListFilterWithoutParameter(DecadeListFilter):
 
 class DecadeListFilterWithNoneReturningLookups(DecadeListFilterWithTitleAndParameter):
 
-    def lookups(self, request):
+    def lookups(self, request, model_admin):
         pass
+
+class DecadeListFilterWithQuerysetBasedLookups(DecadeListFilterWithTitleAndParameter):
+
+    def lookups(self, request, model_admin):
+        qs = model_admin.queryset(request)
+        if qs.filter(year__gte=1980, year__lte=1989).exists():
+            yield ('the 80s', "the 1980's")
+        if qs.filter(year__gte=1990, year__lte=1999).exists():
+            yield ('the 90s', "the 1990's")
+        if qs.filter(year__gte=2000, year__lte=2009).exists():
+            yield ('the 00s', "the 2000's")
 
 class CustomUserAdmin(UserAdmin):
     list_filter = ('books_authored', 'books_contributed')
@@ -67,6 +81,9 @@ class DecadeFilterBookAdminWithoutParameter(ModelAdmin):
 
 class DecadeFilterBookAdminWithNoneReturningLookups(ModelAdmin):
     list_filter = (DecadeListFilterWithNoneReturningLookups,)
+
+class DecadeFilterBookAdminWithQuerysetBasedLookups(ModelAdmin):
+    list_filter = (DecadeListFilterWithQuerysetBasedLookups,)
 
 class ListFiltersTests(TestCase):
 
@@ -385,6 +402,23 @@ class ListFiltersTests(TestCase):
         self.assertEqual(choices[0]['selected'], True)
         self.assertEqual(choices[0]['query_string'], '?')
 
+        # Look for books in the 1980s ----------------------------------------
+
+        request = self.request_factory.get('/', {'publication-decade': 'the 80s'})
+        changelist = self.get_changelist(request, Book, modeladmin)
+
+        # Make sure the correct queryset is returned
+        queryset = changelist.get_query_set(request)
+        self.assertEqual(list(queryset), [])
+
+        # Make sure the correct choice is selected
+        filterspec = changelist.get_filters(request)[0][1]
+        self.assertEqual(force_unicode(filterspec.title), u'publication decade')
+        choices = list(filterspec.choices(changelist))
+        self.assertEqual(choices[1]['display'], u'the 1980\'s')
+        self.assertEqual(choices[1]['selected'], True)
+        self.assertEqual(choices[1]['query_string'], '?publication-decade=the+80s')
+
         # Look for books in the 1990s ----------------------------------------
 
         request = self.request_factory.get('/', {'publication-decade': 'the 90s'})
@@ -398,9 +432,9 @@ class ListFiltersTests(TestCase):
         filterspec = changelist.get_filters(request)[0][1]
         self.assertEqual(force_unicode(filterspec.title), u'publication decade')
         choices = list(filterspec.choices(changelist))
-        self.assertEqual(choices[1]['display'], u'the 1990\'s')
-        self.assertEqual(choices[1]['selected'], True)
-        self.assertEqual(choices[1]['query_string'], '?publication-decade=the+90s')
+        self.assertEqual(choices[2]['display'], u'the 1990\'s')
+        self.assertEqual(choices[2]['selected'], True)
+        self.assertEqual(choices[2]['query_string'], '?publication-decade=the+90s')
 
         # Look for books in the 2000s ----------------------------------------
 
@@ -415,9 +449,9 @@ class ListFiltersTests(TestCase):
         filterspec = changelist.get_filters(request)[0][1]
         self.assertEqual(force_unicode(filterspec.title), u'publication decade')
         choices = list(filterspec.choices(changelist))
-        self.assertEqual(choices[2]['display'], u'the 2000\'s')
-        self.assertEqual(choices[2]['selected'], True)
-        self.assertEqual(choices[2]['query_string'], '?publication-decade=the+00s')
+        self.assertEqual(choices[3]['display'], u'the 2000\'s')
+        self.assertEqual(choices[3]['selected'], True)
+        self.assertEqual(choices[3]['query_string'], '?publication-decade=the+00s')
 
         # Combine multiple filters -------------------------------------------
 
@@ -432,9 +466,9 @@ class ListFiltersTests(TestCase):
         filterspec = changelist.get_filters(request)[0][1]
         self.assertEqual(force_unicode(filterspec.title), u'publication decade')
         choices = list(filterspec.choices(changelist))
-        self.assertEqual(choices[2]['display'], u'the 2000\'s')
-        self.assertEqual(choices[2]['selected'], True)
-        self.assertEqual(choices[2]['query_string'], '?publication-decade=the+00s&author__id__exact=%s' % self.alfred.pk)
+        self.assertEqual(choices[3]['display'], u'the 2000\'s')
+        self.assertEqual(choices[3]['selected'], True)
+        self.assertEqual(choices[3]['query_string'], '?publication-decade=the+00s&author__id__exact=%s' % self.alfred.pk)
 
         filterspec = changelist.get_filters(request)[0][0]
         self.assertEqual(force_unicode(filterspec.title), u'author')
@@ -472,3 +506,25 @@ class ListFiltersTests(TestCase):
         changelist = self.get_changelist(request, Book, modeladmin)
         filterspec = changelist.get_filters(request)[0]
         self.assertEqual(len(filterspec), 0)
+
+    def test_simplelistfilter_with_queryset_based_lookups(self):
+        modeladmin = DecadeFilterBookAdminWithQuerysetBasedLookups(Book, site)
+        request = self.request_factory.get('/', {})
+        changelist = self.get_changelist(request, Book, modeladmin)
+
+        filterspec = changelist.get_filters(request)[0][0]
+        self.assertEqual(force_unicode(filterspec.title), u'publication decade')
+        choices = list(filterspec.choices(changelist))
+        self.assertEqual(len(choices), 3)
+
+        self.assertEqual(choices[0]['display'], u'All')
+        self.assertEqual(choices[0]['selected'], True)
+        self.assertEqual(choices[0]['query_string'], '?')
+
+        self.assertEqual(choices[1]['display'], u'the 1990\'s')
+        self.assertEqual(choices[1]['selected'], False)
+        self.assertEqual(choices[1]['query_string'], '?publication-decade=the+90s')
+
+        self.assertEqual(choices[2]['display'], u'the 2000\'s')
+        self.assertEqual(choices[2]['selected'], False)
+        self.assertEqual(choices[2]['query_string'], '?publication-decade=the+00s')
