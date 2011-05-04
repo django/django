@@ -42,7 +42,7 @@ class LogEntry(models.Model):
         elif self.action_flag == DELETION:
             return _('Deleted "%(object)s."') % {'object': self.object_repr}
 
-        return_value = _('LogEntry Object')
+        return _('LogEntry Object')
 
     def is_addition(self):
         return self.action_flag == ADDITION
