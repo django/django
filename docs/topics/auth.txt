@@ -467,8 +467,8 @@ profile" -- for this purpose.
 To make use of this feature, define a model with fields for the
 additional information you'd like to store, or additional methods
 you'd like to have available, and also add a
-:class:`~django.db.models.Field.OneToOneField` from your model to the
-:class:`~django.contrib.auth.models.User` model. This will ensure only
+:class:`~django.db.models.Field.OneToOneField` named ``user`` from your model
+to the :class:`~django.contrib.auth.models.User` model. This will ensure only
 one instance of your model can be created for each
 :class:`~django.contrib.auth.models.User`.
 
