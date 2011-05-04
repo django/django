@@ -85,7 +85,7 @@ class Command(BaseCommand):
                     if not username:
                         input_msg = 'Username'
                         if default_username:
-                            input_msg += ' (Leave blank to use %r)' % default_username
+                            input_msg += ' (leave blank to use %r)' % default_username
                         username = raw_input(input_msg + ': ')
                     if default_username and username == '':
                         username = default_username
