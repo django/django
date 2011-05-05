@@ -246,9 +246,17 @@ ALLOWED_INCLUDE_ROOTS = ()
 # is an admin.
 ADMIN_FOR = ()
 
-# 404s that may be ignored.
-IGNORABLE_404_STARTS = ('/cgi-bin/', '/_vti_bin', '/_vti_inf')
-IGNORABLE_404_ENDS = ('mail.pl', 'mailform.pl', 'mail.cgi', 'mailform.cgi', 'favicon.ico', '.php')
+# List of compiled regular expression objects representing URLs that need not
+# be reported when SEND_BROKEN_LINK_EMAILS is True. Here are a few examples:
+#    import re
+#    IGNORABLE_404_URLS = (
+#        re.compile(r'^/apple-touch-icon.*\.png$'),
+#        re.compile(r'^/favicon.ico$),
+#        re.compile(r'^/robots.txt$),
+#        re.compile(r'^/phpmyadmin/),
+#        re.compile(r'\.(cgi|php|pl)$'),
+#    )
+IGNORABLE_404_URLS = ()
 
 # A secret key for this particular Django installation. Used in secret-key
 # hashing algorithms. Set this in your settings, or Django will complain

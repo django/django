@@ -176,3 +176,41 @@ Save this model manager in your custom comment app (e.g. in
 
 For more details see the docs about
 :doc:`customizing the comments framework </ref/contrib/comments/custom>`.
+
+`IGNORABLE_404_STARTS` and `IGNORABLE_404_ENDS` settings
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django can report 404 errors: see :doc:`/howto/error-reporting`.
+Until Django 1.3, it was possible to exclude some URLs from the reporting
+by adding prefixes to :setting:`IGNORABLE_404_STARTS` and suffixes to
+:setting:`IGNORABLE_404_ENDS`.
+
+In Django 1.4, these two settings are superseded by
+:setting:`IGNORABLE_404_URLS`, which is a list of compiled regular expressions.
+Django won't send an email for 404 errors on URLs that match any of them.
+
+Furthermore, the previous settings had some rather arbitrary default values::
+
+    IGNORABLE_404_STARTS = ('/cgi-bin/', '/_vti_bin', '/_vti_inf')
+    IGNORABLE_404_ENDS = ('mail.pl', 'mailform.pl', 'mail.cgi', 'mailform.cgi',
+                          'favicon.ico', '.php')
+
+It's not Django's role to decide if your website has a legacy ``/cgi-bin/``
+section or a ``favicon.ico``. As a consequence, the default values of
+:setting:`IGNORABLE_404_URLS`, :setting:`IGNORABLE_404_STARTS` and
+:setting:`IGNORABLE_404_ENDS` are all now empty.
+
+If you have customized :setting:`IGNORABLE_404_STARTS` or
+:setting:`IGNORABLE_404_ENDS`, or if you want to keep the old default value,
+you should add the following lines in your settings file::
+
+    import re
+    IGNORABLE_404_URLS = (
+        # for each <prefix> in IGNORABLE_404_STARTS
+        re.compile(r'^<prefix>'),
+        # for each <suffix> in IGNORABLE_404_ENDS
+        re.compile(r'<suffix>$'),
+    )
+
+Don't forget to escape characters that have a special meaning in a regular
+expression.

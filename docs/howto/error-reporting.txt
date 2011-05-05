@@ -66,14 +66,28 @@ a referer. (It doesn't bother to email for 404s that don't have a referer --
 those are usually just people typing in broken URLs or broken Web 'bots).
 
 You can tell Django to stop reporting particular 404s by tweaking the
-:setting:`IGNORABLE_404_ENDS` and :setting:`IGNORABLE_404_STARTS` settings. Both
-should be a tuple of strings. For example::
+:setting:`IGNORABLE_404_URLS` setting. It should be a tuple of compiled
+regular expression objects. For example::
 
-    IGNORABLE_404_ENDS = ('.php', '.cgi')
-    IGNORABLE_404_STARTS = ('/phpmyadmin/',)
+    import re
+    IGNORABLE_404_URLS = (
+        re.compile(r'\.(php|cgi)$'),
+        re.compile(r'^/phpmyadmin/'),
+    )
 
 In this example, a 404 to any URL ending with ``.php`` or ``.cgi`` will *not* be
 reported. Neither will any URL starting with ``/phpmyadmin/``.
+
+The following example shows how to exclude some conventional URLs that browsers and
+crawlers often request::
+
+    import re
+    IGNORABLE_404_URLS = (
+        re.compile(r'^/apple-touch-icon.*\.png$'),
+        re.compile(r'^/favicon.ico$),
+        re.compile(r'^/robots.txt$),
+    )
+
 
 The best way to disable this behavior is to set
 :setting:`SEND_BROKEN_LINK_EMAILS` to ``False``.
@@ -93,3 +107,10 @@ The best way to disable this behavior is to set
    records are ignored, but you can use them for error reporting by writing a
    handler and :doc:`configuring logging </topics/logging>` appropriately.
 
+.. seealso::
+
+   .. versionchanged:: 1.4
+
+   Previously, two settings were used to control which URLs not to report:
+   :setting:`IGNORABLE_404_STARTS` and :setting:`IGNORABLE_404_ENDS`. They
+   were replaced by :setting:`IGNORABLE_404_URLS`.

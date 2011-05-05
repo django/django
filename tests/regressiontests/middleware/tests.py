@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 
+import re
+
 from django.conf import settings
+from django.core import mail
 from django.http import HttpRequest
 from django.middleware.common import CommonMiddleware
 from django.middleware.http import ConditionalGetMiddleware
@@ -9,12 +12,16 @@ from django.test import TestCase
 
 class CommonMiddlewareTest(TestCase):
     def setUp(self):
-        self.slash = settings.APPEND_SLASH
-        self.www = settings.PREPEND_WWW
+        self.append_slash = settings.APPEND_SLASH
+        self.prepend_www = settings.PREPEND_WWW
+        self.ignorable_404_urls = settings.IGNORABLE_404_URLS
+        self.send_broken_email_links = settings.SEND_BROKEN_LINK_EMAILS
 
     def tearDown(self):
-        settings.APPEND_SLASH = self.slash
-        settings.PREPEND_WWW = self.www
+        settings.APPEND_SLASH = self.append_slash
+        settings.PREPEND_WWW = self.prepend_www
+        settings.IGNORABLE_404_URLS = self.ignorable_404_urls
+        settings.SEND_BROKEN_LINK_EMAILS = self.send_broken_email_links
 
     def _get_request(self, path):
         request = HttpRequest()
@@ -248,6 +255,36 @@ class CommonMiddlewareTest(TestCase):
       self.assertEqual(r.status_code, 301)
       self.assertEqual(r['Location'],
                         'http://www.testserver/middleware/customurlconf/slash/')
+
+    # Tests for the 404 error reporting via email
+
+    def test_404_error_reporting(self):
+        settings.IGNORABLE_404_URLS = (re.compile(r'foo'),)
+        settings.SEND_BROKEN_LINK_EMAILS = True
+        request = self._get_request('regular_url/that/does/not/exist')
+        request.META['HTTP_REFERER'] = '/another/url/'
+        response = self.client.get(request.path)
+        CommonMiddleware().process_response(request, response)
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn('Broken', mail.outbox[0].subject)
+
+    def test_404_error_reporting_no_referer(self):
+        settings.IGNORABLE_404_URLS = (re.compile(r'foo'),)
+        settings.SEND_BROKEN_LINK_EMAILS = True
+        request = self._get_request('regular_url/that/does/not/exist')
+        response = self.client.get(request.path)
+        CommonMiddleware().process_response(request, response)
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_404_error_reporting_ignored_url(self):
+        settings.IGNORABLE_404_URLS = (re.compile(r'foo'),)
+        settings.SEND_BROKEN_LINK_EMAILS = True
+        request = self._get_request('foo_url/that/does/not/exist/either')
+        request.META['HTTP_REFERER'] = '/another/url/'
+        response = self.client.get(request.path)
+        CommonMiddleware().process_response(request, response)
+        self.assertEqual(len(mail.outbox), 0)
+
 
 class ConditionalGetMiddlewareTest(TestCase):
     urls = 'regressiontests.middleware.cond_get_urls'

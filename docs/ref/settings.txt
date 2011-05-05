@@ -1020,25 +1020,23 @@ Available formats are ``DATE_FORMAT``, ``TIME_FORMAT``, ``DATETIME_FORMAT``,
 ``SHORT_DATETIME_FORMAT``, ``FIRST_DAY_OF_WEEK``, ``DECIMAL_SEPARATOR``,
 ``THOUSAND_SEPARATOR`` and ``NUMBER_GROUPING``.
 
-.. setting:: IGNORABLE_404_ENDS
+.. setting:: IGNORABLE_404_URLS
 
-IGNORABLE_404_ENDS
+IGNORABLE_404_URLS
 ------------------
 
-Default: ``('mail.pl', 'mailform.pl', 'mail.cgi', 'mailform.cgi', 'favicon.ico', '.php')``
+.. versionadded:: 1.4
 
-See also ``IGNORABLE_404_STARTS`` and ``Error reporting via email``.
+Default: ``()``
 
-.. setting:: IGNORABLE_404_STARTS
+List of compiled regular expression objects describing URLs that should be
+ignored when reporting HTTP 404 errors via email (see
+:doc:`/howto/error-reporting`). Use this if your site does not provide a
+commonly requested file such as ``favicon.ico`` or ``robots.txt``, or if it
+gets hammered by script kiddies.
 
-IGNORABLE_404_STARTS
---------------------
-
-Default: ``('/cgi-bin/', '/_vti_bin', '/_vti_inf')``
-
-A tuple of strings that specify beginnings of URLs that should be ignored by
-the 404 emailer. See ``SEND_BROKEN_LINK_EMAILS``, ``IGNORABLE_404_ENDS`` and
-the :doc:`/howto/error-reporting`.
+This is only used if :setting:`SEND_BROKEN_LINK_EMAILS` is set to ``True`` and
+``CommonMiddleware`` is installed (see :doc:`/topics/http/middleware`).
 
 .. setting:: INSTALLED_APPS
 
@@ -1435,8 +1433,8 @@ Default: ``False``
 Whether to send an email to the ``MANAGERS`` each time somebody visits a
 Django-powered page that is 404ed with a non-empty referer (i.e., a broken
 link). This is only used if ``CommonMiddleware`` is installed (see
-:doc:`/topics/http/middleware`. See also ``IGNORABLE_404_STARTS``,
-``IGNORABLE_404_ENDS`` and :doc:`/howto/error-reporting`.
+:doc:`/topics/http/middleware`). See also ``IGNORABLE_404_URLS`` and
+:doc:`/howto/error-reporting`.
 
 .. setting:: SERIALIZATION_MODULES
 
@@ -2045,6 +2043,22 @@ DATABASE_USER
    This setting has been replaced by :setting:`USER` in
    :setting:`DATABASES`.
 
+.. setting:: IGNORABLE_404_ENDS
+
+IGNORABLE_404_ENDS
+------------------
+
+.. deprecated:: 1.4
+   This setting has been superseded by :setting:`IGNORABLE_404_URLS`.
+
+.. setting:: IGNORABLE_404_STARTS
+
+IGNORABLE_404_STARTS
+--------------------
+
+.. deprecated:: 1.4
+   This setting has been superseded by :setting:`IGNORABLE_404_URLS`.
+
 .. setting:: TEST_DATABASE_CHARSET
 
 TEST_DATABASE_CHARSET
@@ -2071,4 +2085,3 @@ TEST_DATABASE_NAME
 .. deprecated:: 1.2
    This setting has been replaced by :setting:`TEST_NAME` in
    :setting:`DATABASES`.
-
