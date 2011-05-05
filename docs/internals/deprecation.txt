@@ -196,7 +196,7 @@ their deprecation, as per the :ref:`Django deprecation policy
 
         * The UK-prefixed objects of ``django.contrib.localflavor.uk`` will only
           be accessible through their new GB-prefixed names (GB is the correct
-          ISO 3166 code for United Kingdom). They have been depreacted since the
+          ISO 3166 code for United Kingdom). They have been deprecated since the
           1.4 release.
 
         * The :setting:`IGNORABLE_404_STARTS` and :setting:`IGNORABLE_404_ENDS`
