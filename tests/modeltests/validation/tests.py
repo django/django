@@ -58,11 +58,11 @@ class BaseModelValidationTests(ValidationTestCase):
         self.assertFieldFailsValidationWithMessage(mtv.full_clean, 'url', [u'This URL appears to be a broken link.'])
 
     def test_correct_url_value_passes(self):
-        mtv = ModelToValidate(number=10, name='Some Name', url='http://www.djangoproject.com/')
+        mtv = ModelToValidate(number=10, name='Some Name', url='http://www.example.com/')
         self.assertEqual(None, mtv.full_clean()) # This will fail if there's no Internet connection
 
     def test_correct_https_url_but_nonexisting(self):
-        mtv = ModelToValidate(number=10, name='Some Name', url='https://www.djangoproject.com/')
+        mtv = ModelToValidate(number=10, name='Some Name', url='https://www.example.com/')
         self.assertFieldFailsValidationWithMessage(mtv.full_clean, 'url', [u'This URL appears to be a broken link.'])
 
     def test_correct_ftp_url_but_nonexisting(self):
