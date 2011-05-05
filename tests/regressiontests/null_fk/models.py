@@ -31,3 +31,16 @@ class Comment(models.Model):
 
     def __unicode__(self):
         return self.comment_text
+
+# Ticket 15823
+
+class Item(models.Model):
+    title = models.CharField(max_length=100)
+
+class PropertyValue(models.Model):
+    label = models.CharField(max_length=100)
+
+class Property(models.Model):
+    item = models.ForeignKey(Item, related_name='props')
+    key = models.CharField(max_length=100)
+    value = models.ForeignKey(PropertyValue, null=True)

@@ -457,7 +457,11 @@ class Query(object):
                 # An unused alias.
                 continue
             promote = (rhs.alias_map[alias][JOIN_TYPE] == self.LOUTER)
-            new_alias = self.join(rhs.rev_join_map[alias],
+            lhs, table, lhs_col, col = rhs.rev_join_map[alias]
+            # If the left side of the join was already relabeled, use the
+            # updated alias.
+            lhs = change_map.get(lhs, lhs)
+            new_alias = self.join((lhs, table, lhs_col, col),
                     (conjunction and not first), used, promote, not conjunction)
             used.add(new_alias)
             change_map[alias] = new_alias
