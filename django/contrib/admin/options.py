@@ -576,9 +576,7 @@ class ModelAdmin(BaseModelAdmin):
         # get_action might have returned None, so filter any of those out.
         actions = filter(None, actions)
 
-        # Convert the actions into a SortedDict keyed by name
-        # and sorted by description.
-        actions.sort(key=lambda k: k[2].lower())
+        # Convert the actions into a SortedDict keyed by name.
         actions = SortedDict([
             (name, (func, name, desc))
             for func, name, desc in actions

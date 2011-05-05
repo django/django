@@ -1971,6 +1971,20 @@ class AdminActionsTest(TestCase):
         response = self.client.post(url, action_data)
         self.assertRedirects(response, url)
 
+    def test_actions_ordering(self):
+        """
+        Ensure that actions are ordered as expected.
+        Refs #15964.
+        """
+        response = self.client.get('/test_admin/admin/admin_views/externalsubscriber/')
+        self.assertTrue('''<label>Action: <select name="action">
+<option value="" selected="selected">---------</option>
+<option value="delete_selected">Delete selected external subscribers</option>
+<option value="redirect_to">Redirect to (Awesome action)</option>
+<option value="external_mail">External mail (Another awesome action)</option>
+</select>'''in response.content,
+        )
+
     def test_model_without_action(self):
         "Tests a ModelAdmin without any action"
         response = self.client.get('/test_admin/admin/admin_views/oldsubscriber/')
