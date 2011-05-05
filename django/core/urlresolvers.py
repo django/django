@@ -131,7 +131,7 @@ class RegexURLPattern(object):
         self.name = name
 
     def __repr__(self):
-        return '<%s %s %s>' % (self.__class__.__name__, self.name, self.regex.pattern)
+        return smart_str(u'<%s %s %s>' % (self.__class__.__name__, self.name, self.regex.pattern))
 
     def add_prefix(self, prefix):
         """
@@ -188,7 +188,7 @@ class RegexURLResolver(object):
         self._app_dict = None
 
     def __repr__(self):
-        return '<%s %s (%s:%s) %s>' % (self.__class__.__name__, self.urlconf_name, self.app_name, self.namespace, self.regex.pattern)
+        return smart_str(u'<%s %s (%s:%s) %s>' % (self.__class__.__name__, self.urlconf_name, self.app_name, self.namespace, self.regex.pattern))
 
     def _populate(self):
         lookups = MultiValueDict()
