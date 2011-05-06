@@ -1,4 +1,5 @@
 # coding: utf-8
+from __future__ import with_statement
 from django.test import TestCase
 
 from django.utils.text import *

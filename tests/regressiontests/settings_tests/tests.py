@@ -1,3 +1,4 @@
+from __future__ import with_statement
 from django.conf import settings
 from django.test import TestCase
 
