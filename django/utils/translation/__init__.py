@@ -102,6 +102,21 @@ def activate(language):
 def deactivate():
     return _trans.deactivate()
 
+class override(object):
+    def __init__(self, language, deactivate=False):
+        self.language = language
+        self.deactivate = deactivate
+        self.old_language = get_language()
+
+    def __enter__(self):
+        activate(self.language)
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        if self.deactivate:
+            deactivate()
+        else:
+            activate(self.old_language)
+
 def get_language():
     return _trans.get_language()
 

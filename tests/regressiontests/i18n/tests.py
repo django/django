@@ -8,6 +8,7 @@ from threading import local
 
 from django.conf import settings
 from django.template import Template, Context
+from django.test import TestCase
 from django.utils.formats import (get_format, date_format, time_format,
     localize, localize_input, iter_format_modules, get_format_modules)
 from django.utils.importlib import import_module
@@ -27,6 +28,13 @@ from commands.tests import *
 from test_warnings import DeprecationWarningTests
 
 class TranslationTests(TestCase):
+
+    def test_override(self):
+        activate('de')
+        with translation.override('pl'):
+            self.assertEqual(get_language(), 'pl')
+        self.assertEqual(get_language(), 'de')
+        deactivate()
 
     def test_lazy_objects(self):
         """
