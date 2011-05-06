@@ -1351,6 +1351,31 @@ For example::
 This test case will flush *all* the test databases before running
 ``testIndexPageView``.
 
+Overriding settings
+~~~~~~~~~~~~~~~~~~~
+
+.. method:: TestCase.settings
+
+.. versionadded:: 1.4
+
+For testing purposes it's often useful to change a setting temporarily
+and revert to the original value after running the testing code. For
+this use case Django provides a standard `Python context manager`_
+:meth:`~django.test.TestCase.settings`, which can be used like this::
+
+    from django.test import TestCase
+
+    class LoginTestCase(TestCase):
+        def test_overriding_settings(self):
+            with self.settings(LOGIN_URL='/other/login/'):
+                response = self.client.get('/sekrit/')
+                self.assertRedirects(response, '/other/login/?next=/sekrit/')
+
+This example will override the :setting:`LOGIN_URL` setting for the code
+in the ``with`` block and reset its value to the previous state afterwards.
+
+.. _`Python context manager`: http://www.python.org/dev/peps/pep-0343/
+
 Emptying the test outbox
 ~~~~~~~~~~~~~~~~~~~~~~~~
 

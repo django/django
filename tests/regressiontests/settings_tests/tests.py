@@ -1,8 +1,31 @@
 from django.conf import settings
-from django.utils import unittest
+from django.test import TestCase
 
+class SettingsTests(TestCase):
 
-class SettingsTests(unittest.TestCase):
+    def test_override(self):
+        settings.TEST = 'test'
+        self.assertEqual('test', settings.TEST)
+        with self.settings(TEST='override'):
+            self.assertEqual('override', settings.TEST)
+        self.assertEqual('test', settings.TEST)
+        del settings.TEST
+
+    def test_override_change(self):
+        settings.TEST = 'test'
+        self.assertEqual('test', settings.TEST)
+        with self.settings(TEST='override'):
+            self.assertEqual('override', settings.TEST)
+            settings.TEST = 'test2'
+        self.assertEqual('test', settings.TEST)
+        del settings.TEST
+
+    def test_override_doesnt_leak(self):
+        self.assertRaises(AttributeError, getattr, settings, 'TEST')
+        with self.settings(TEST='override'):
+            self.assertEqual('override', settings.TEST)
+            settings.TEST = 'test'
+        self.assertRaises(AttributeError, getattr, settings, 'TEST')
 
     #
     # Regression tests for #10130: deleting settings.
@@ -18,7 +41,8 @@ class SettingsTests(unittest.TestCase):
         self.assertRaises(TypeError, delattr, settings, '_wrapped')
 
 
-class TrailingSlashURLTests(unittest.TestCase):
+
+class TrailingSlashURLTests(TestCase):
     settings_module = settings
 
     def setUp(self):
