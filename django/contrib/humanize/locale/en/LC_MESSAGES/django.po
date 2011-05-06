@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-15 13:18-0400\n"
+"POT-Creation-Date: 2011-05-06 14:14+0200\n"
 "PO-Revision-Date: 2010-05-13 15:35+0200\n"
 "Last-Translator: Django team\n"
 "Language-Team: English <en@li.org>\n"
@@ -12,87 +12,135 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: templatetags/humanize.py:19
+#: templatetags/humanize.py:21
 msgid "th"
 msgstr ""
 
-#: templatetags/humanize.py:19
+#: templatetags/humanize.py:21
 msgid "st"
 msgstr ""
 
-#: templatetags/humanize.py:19
+#: templatetags/humanize.py:21
 msgid "nd"
 msgstr ""
 
-#: templatetags/humanize.py:19
+#: templatetags/humanize.py:21
 msgid "rd"
 msgstr ""
 
-#: templatetags/humanize.py:54
+#: templatetags/humanize.py:68
 #, python-format
 msgid "%(value).1f million"
 msgid_plural "%(value).1f million"
 msgstr[0] ""
 msgstr[1] ""
 
-#: templatetags/humanize.py:57
+#: templatetags/humanize.py:69
+#, python-format
+msgid "%(value)s million"
+msgid_plural "%(value)s million"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templatetags/humanize.py:74
 #, python-format
 msgid "%(value).1f billion"
 msgid_plural "%(value).1f billion"
 msgstr[0] ""
 msgstr[1] ""
 
-#: templatetags/humanize.py:60
+#: templatetags/humanize.py:75
+#, python-format
+msgid "%(value)s billion"
+msgid_plural "%(value)s billion"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templatetags/humanize.py:80
 #, python-format
 msgid "%(value).1f trillion"
 msgid_plural "%(value).1f trillion"
 msgstr[0] ""
 msgstr[1] ""
 
-#: templatetags/humanize.py:76
+#: templatetags/humanize.py:81
+#, python-format
+msgid "%(value)s trillion"
+msgid_plural "%(value)s trillion"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templatetags/humanize.py:98
 msgid "one"
 msgstr ""
 
-#: templatetags/humanize.py:76
+#: templatetags/humanize.py:98
 msgid "two"
 msgstr ""
 
-#: templatetags/humanize.py:76
+#: templatetags/humanize.py:98
 msgid "three"
 msgstr ""
 
-#: templatetags/humanize.py:76
+#: templatetags/humanize.py:98
 msgid "four"
 msgstr ""
 
-#: templatetags/humanize.py:76
+#: templatetags/humanize.py:98
 msgid "five"
 msgstr ""
 
-#: templatetags/humanize.py:76
+#: templatetags/humanize.py:98
 msgid "six"
 msgstr ""
 
-#: templatetags/humanize.py:76
+#: templatetags/humanize.py:98
 msgid "seven"
 msgstr ""
 
-#: templatetags/humanize.py:76
+#: templatetags/humanize.py:98
 msgid "eight"
 msgstr ""
 
-#: templatetags/humanize.py:76
+#: templatetags/humanize.py:98
 msgid "nine"
 msgstr ""
 
-#: templatetags/humanize.py:96
+#: templatetags/humanize.py:121
 msgid "today"
 msgstr ""
 
-#: templatetags/humanize.py:98
+#: templatetags/humanize.py:123
 msgid "tomorrow"
 msgstr ""
 
-#: templatetags/humanize.py:100
+#: templatetags/humanize.py:125
 msgid "yesterday"
+msgstr ""
+
+#: templatetags/humanize.py:147
+msgid "now"
+msgstr ""
+
+#: templatetags/humanize.py:149
+#, python-format
+msgid "%s seconds ago"
+msgstr ""
+
+#: templatetags/humanize.py:151
+msgid "a minute ago"
+msgstr ""
+
+#: templatetags/humanize.py:153
+#, python-format
+msgid "%s minutes ago"
+msgstr ""
+
+#: templatetags/humanize.py:155
+msgid "an hour ago"
+msgstr ""
+
+#: templatetags/humanize.py:157
+#, python-format
+msgid "%s hours ago"
 msgstr ""

@@ -28,6 +28,7 @@ ALWAYS_INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.admindocs',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
 ]
 
 def geodjango(settings):
