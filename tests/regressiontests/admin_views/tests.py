@@ -22,12 +22,11 @@ from django.forms.util import ErrorList
 import django.template.context
 from django.template.response import TemplateResponse
 from django.test import TestCase
-from django.utils import formats
+from django.utils import formats, translation
 from django.utils.cache import get_max_age
 from django.utils.encoding import iri_to_uri
 from django.utils.html import escape
 from django.utils.http import urlencode
-from django.utils.translation import activate, deactivate
 from django.utils import unittest
 
 # local test models
@@ -361,42 +360,31 @@ class AdminViewBasicTest(TestCase):
         if the default language is non-English but the selected language
         is English. See #13388 and #3594 for more details.
         """
-        try:
-            settings.LANGUAGE_CODE = 'fr'
-            activate('en-us')
-            response = self.client.get('/test_admin/admin/jsi18n/')
-            self.assertNotContains(response, 'Choisir une heure')
-        finally:
-            deactivate()
+        with self.settings(LANGUAGE_CODE='fr'):
+            with translation.override('en-us'):
+                response = self.client.get('/test_admin/admin/jsi18n/')
+                self.assertNotContains(response, 'Choisir une heure')
 
     def testI18NLanguageNonEnglishFallback(self):
         """
         Makes sure that the fallback language is still working properly
         in cases where the selected language cannot be found.
         """
-        try:
-            settings.LANGUAGE_CODE = 'fr'
-            activate('none')
-            response = self.client.get('/test_admin/admin/jsi18n/')
-            self.assertContains(response, 'Choisir une heure')
-        finally:
-            deactivate()
+        with self.settings(LANGUAGE_CODE='fr'):
+            with translation.override('none'):
+                response = self.client.get('/test_admin/admin/jsi18n/')
+                self.assertContains(response, 'Choisir une heure')
 
     def testL10NDeactivated(self):
         """
         Check if L10N is deactivated, the Javascript i18n view doesn't
         return localized date/time formats. Refs #14824.
         """
-        try:
-            settings.LANGUAGE_CODE = 'ru'
-            settings.USE_L10N = False
-            activate('ru')
-            response = self.client.get('/test_admin/admin/jsi18n/')
-            self.assertNotContains(response, '%d.%m.%Y %H:%M:%S')
-            self.assertContains(response, '%Y-%m-%d %H:%M:%S')
-        finally:
-            deactivate()
-
+        with self.settings(LANGUAGE_CODE='ru', USE_L10N=False):
+            with translation.override('none'):
+                response = self.client.get('/test_admin/admin/jsi18n/')
+                self.assertNotContains(response, '%d.%m.%Y %H:%M:%S')
+                self.assertContains(response, '%Y-%m-%d %H:%M:%S')
 
     def test_disallowed_filtering(self):
         self.assertRaises(SuspiciousOperation,

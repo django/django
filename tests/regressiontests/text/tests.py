@@ -4,7 +4,7 @@ from django.test import TestCase
 from django.utils.text import *
 from django.utils.http import urlquote, urlquote_plus, cookie_date, http_date
 from django.utils.encoding import iri_to_uri
-from django.utils.translation import activate, deactivate
+from django.utils.translation import override
 
 class TextTests(TestCase):
     """
@@ -17,9 +17,8 @@ class TextTests(TestCase):
         self.assertEqual(get_text_list(['a', 'b'], 'and'), u'a and b')
         self.assertEqual(get_text_list(['a']), u'a')
         self.assertEqual(get_text_list([]), u'')
-        activate('ar')
-        self.assertEqual(get_text_list(['a', 'b', 'c']), u"a، b أو c")
-        deactivate()
+        with override('ar'):
+            self.assertEqual(get_text_list(['a', 'b', 'c']), u"a، b أو c")
 
     def test_smart_split(self):
 

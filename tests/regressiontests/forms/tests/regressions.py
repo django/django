@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.forms import *
 from django.utils.unittest import TestCase
-from django.utils.translation import ugettext_lazy, activate, deactivate
+from django.utils.translation import ugettext_lazy, override
 
 from regressiontests.forms.models import Cheese
 
@@ -28,11 +28,10 @@ class FormsRegressionsTestCase(TestCase):
         self.assertEqual(f.as_p(), '<p><label for="id_username">Username:</label> <input id="id_username" type="text" name="username" maxlength="10" /></p>')
 
         # Translations are done at rendering time, so multi-lingual apps can define forms)
-        activate('de')
-        self.assertEqual(f.as_p(), '<p><label for="id_username">Benutzername:</label> <input id="id_username" type="text" name="username" maxlength="10" /></p>')
-        activate('pl')
-        self.assertEqual(f.as_p(), u'<p><label for="id_username">Nazwa u\u017cytkownika:</label> <input id="id_username" type="text" name="username" maxlength="10" /></p>')
-        deactivate()
+        with override('de'):
+            self.assertEqual(f.as_p(), '<p><label for="id_username">Benutzername:</label> <input id="id_username" type="text" name="username" maxlength="10" /></p>')
+        with override('pl', deactivate=True):
+            self.assertEqual(f.as_p(), u'<p><label for="id_username">Nazwa u\u017cytkownika:</label> <input id="id_username" type="text" name="username" maxlength="10" /></p>')
 
     def test_regression_5216(self):
         # There was some problems with form translations in #5216
@@ -61,10 +60,9 @@ class FormsRegressionsTestCase(TestCase):
         self.assertEqual(f.clean('\xd1\x88\xd1\x82.'), u'\u0448\u0442.')
 
         # Translated error messages used to be buggy.
-        activate('ru')
-        f = SomeForm({})
-        self.assertEqual(f.as_p(), u'<ul class="errorlist"><li>\u041e\u0431\u044f\u0437\u0430\u0442\u0435\u043b\u044c\u043d\u043e\u0435 \u043f\u043e\u043b\u0435.</li></ul>\n<p><label for="id_somechoice_0">\xc5\xf8\xdf:</label> <ul>\n<li><label for="id_somechoice_0"><input type="radio" id="id_somechoice_0" value="\xc5" name="somechoice" /> En tied\xe4</label></li>\n<li><label for="id_somechoice_1"><input type="radio" id="id_somechoice_1" value="\xf8" name="somechoice" /> Mies</label></li>\n<li><label for="id_somechoice_2"><input type="radio" id="id_somechoice_2" value="\xdf" name="somechoice" /> Nainen</label></li>\n</ul></p>')
-        deactivate()
+        with override('ru'):
+            f = SomeForm({})
+            self.assertEqual(f.as_p(), u'<ul class="errorlist"><li>\u041e\u0431\u044f\u0437\u0430\u0442\u0435\u043b\u044c\u043d\u043e\u0435 \u043f\u043e\u043b\u0435.</li></ul>\n<p><label for="id_somechoice_0">\xc5\xf8\xdf:</label> <ul>\n<li><label for="id_somechoice_0"><input type="radio" id="id_somechoice_0" value="\xc5" name="somechoice" /> En tied\xe4</label></li>\n<li><label for="id_somechoice_1"><input type="radio" id="id_somechoice_1" value="\xf8" name="somechoice" /> Mies</label></li>\n<li><label for="id_somechoice_2"><input type="radio" id="id_somechoice_2" value="\xdf" name="somechoice" /> Nainen</label></li>\n</ul></p>')
 
         # Deep copying translated text shouldn't raise an error)
         from django.utils.translation import gettext_lazy

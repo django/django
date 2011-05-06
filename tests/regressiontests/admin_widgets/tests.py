@@ -14,8 +14,8 @@ from django.core.files.storage import default_storage
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db.models import DateField
 from django.test import TestCase as DjangoTestCase
+from django.utils import translation
 from django.utils.html import conditional_escape
-from django.utils.translation import activate, deactivate
 from django.utils.unittest import TestCase
 
 import models
@@ -204,7 +204,7 @@ class FilteredSelectMultipleWidgetTest(TestCase):
         )
 
 
-class AdminSplitDateTimeWidgetTest(TestCase):
+class AdminSplitDateTimeWidgetTest(DjangoTestCase):
     def test_render(self):
         w = AdminSplitDateTime()
         self.assertEqual(
@@ -215,18 +215,13 @@ class AdminSplitDateTimeWidgetTest(TestCase):
     def test_localization(self):
         w = AdminSplitDateTime()
 
-        activate('de-at')
-        old_USE_L10N = settings.USE_L10N
-        try:
-            settings.USE_L10N = True
-            w.is_localized = True
-            self.assertEqual(
-                conditional_escape(w.render('test', datetime(2007, 12, 1, 9, 30))),
-                '<p class="datetime">Datum: <input value="01.12.2007" type="text" class="vDateField" name="test_0" size="10" /><br />Zeit: <input value="09:30:00" type="text" class="vTimeField" name="test_1" size="8" /></p>',
-            )
-        finally:
-            deactivate()
-            settings.USE_L10N = old_USE_L10N
+        with self.settings(USE_L10N=True):
+            with translation.override('de-at'):
+                w.is_localized = True
+                self.assertEqual(
+                    conditional_escape(w.render('test', datetime(2007, 12, 1, 9, 30))),
+                    '<p class="datetime">Datum: <input value="01.12.2007" type="text" class="vDateField" name="test_0" size="10" /><br />Zeit: <input value="09:30:00" type="text" class="vTimeField" name="test_1" size="8" /></p>',
+                )
 
 
 class AdminFileWidgetTest(DjangoTestCase):
