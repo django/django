@@ -152,13 +152,9 @@ def naturaltime(value, arg=None):
     elif delta.seconds == 0:
         return _(u'now')
     elif delta.seconds < 60:
-        return _(u'%s seconds ago' % (delta.seconds))
-    elif delta.seconds / 60 < 2:
-        return _(r'a minute ago')
+        return ungettext(u'%s seconds ago', u'%s seconds ago', delta.seconds)
     elif delta.seconds / 60 < 60:
-        return _(u'%s minutes ago' % (delta.seconds/60))
-    elif delta.seconds / 60 / 60 < 2:
-        return _(u'an hour ago')
+        return ungettext(u'a minute ago', u'%s minutes ago', delta.seconds/60)
     elif delta.seconds / 60 / 60 < 24:
-        return _(u'%s hours ago' % (delta.seconds/60/60))
+        return ungettext(u'an hour ago', u'%s hours ago', delta.seconds/60/60)
     return naturalday(value, arg)
