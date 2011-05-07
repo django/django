@@ -127,8 +127,13 @@ test_data = (
     ('kwargs_view', '/arg_view/10/', [], {'arg1':10}),
     ('regressiontests.urlpatterns_reverse.views.absolute_kwargs_view', '/absolute_arg_view/', [], {}),
     ('regressiontests.urlpatterns_reverse.views.absolute_kwargs_view', '/absolute_arg_view/10/', [], {'arg1':10}),
-    ('non_path_include', '/includes/non_path_include/', [], {})
+    ('non_path_include', '/includes/non_path_include/', [], {}),
 
+    # Tests for #13154
+    ('defaults', '/defaults_view1/3/', [], {'arg1': 3, 'arg2': 1}),
+    ('defaults', '/defaults_view2/3/', [], {'arg1': 3, 'arg2': 2}),
+    ('defaults', NoReverseMatch, [], {'arg1': 3, 'arg2': 3}),
+    ('defaults', NoReverseMatch, [], {'arg2': 1}),
 )
 
 class NoURLPatternsTests(TestCase):

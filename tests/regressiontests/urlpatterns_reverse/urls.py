@@ -19,7 +19,7 @@ urlpatterns = patterns('',
     url(r'^people/(?:name/)', empty_view, name="people2"),
     url(r'^people/(?:name/(\w+)/)?', empty_view, name="people2a"),
     url(r'^optional/(?P<name>.*)/(?:.+/)?', empty_view, name="optional"),
-    url(r'^hardcoded/$', 'hardcoded/', empty_view, name="hardcoded"),
+    url(r'^hardcoded/$', empty_view, name="hardcoded"),
     url(r'^hardcoded/doc\.pdf$', empty_view, name="hardcoded2"),
     url(r'^people/(?P<state>\w\w)/(?P<name>\w+)/$', empty_view, name="people3"),
     url(r'^people/(?P<state>\w\w)/(?P<name>\d)/$', empty_view, name="people4"),
@@ -55,7 +55,11 @@ urlpatterns = patterns('',
     url(r'arg_view/(?P<arg1>\d+)/$', 'kwargs_view'),
     url(r'absolute_arg_view/(?P<arg1>\d+)/$', absolute_kwargs_view),
     url(r'absolute_arg_view/$', absolute_kwargs_view),
-    
+
+    # Tests for #13154. Mixed syntax to test both ways of defining URLs.
+    url(r'defaults_view1/(?P<arg1>\d+)/', 'defaults_view', {'arg2': 1}, name='defaults'),
+    (r'defaults_view2/(?P<arg1>\d+)/', 'defaults_view', {'arg2': 2}, 'defaults'),
+
     url('^includes/', include(other_patterns)),
 
 )

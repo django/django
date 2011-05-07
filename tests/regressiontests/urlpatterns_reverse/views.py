@@ -13,6 +13,9 @@ def kwargs_view(request, arg1=1, arg2=2):
 def absolute_kwargs_view(request, arg1=1, arg2=2):
     return HttpResponse('')
 
+def defaults_view(request, arg1, arg2):
+    pass
+
 class ViewClass(object):
     def __call__(self, request, *args, **kwargs):
         return HttpResponse('')

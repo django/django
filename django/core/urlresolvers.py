@@ -206,20 +206,20 @@ class RegexURLResolver(object):
                 else:
                     parent = normalize(pattern.regex.pattern)
                     for name in pattern.reverse_dict:
-                        for matches, pat in pattern.reverse_dict.getlist(name):
+                        for matches, pat, defaults in pattern.reverse_dict.getlist(name):
                             new_matches = []
                             for piece, p_args in parent:
                                 new_matches.extend([(piece + suffix, p_args + args) for (suffix, args) in matches])
-                            lookups.appendlist(name, (new_matches, p_pattern + pat))
+                            lookups.appendlist(name, (new_matches, p_pattern + pat, dict(defaults, **pattern.default_kwargs)))
                     for namespace, (prefix, sub_pattern) in pattern.namespace_dict.items():
                         namespaces[namespace] = (p_pattern + prefix, sub_pattern)
                     for app_name, namespace_list in pattern.app_dict.items():
                         apps.setdefault(app_name, []).extend(namespace_list)
             else:
                 bits = normalize(p_pattern)
-                lookups.appendlist(pattern.callback, (bits, p_pattern))
+                lookups.appendlist(pattern.callback, (bits, p_pattern, pattern.default_args))
                 if pattern.name is not None:
-                    lookups.appendlist(pattern.name, (bits, p_pattern))
+                    lookups.appendlist(pattern.name, (bits, p_pattern, pattern.default_args))
         self._reverse_dict = lookups
         self._namespace_dict = namespaces
         self._app_dict = apps
@@ -310,7 +310,7 @@ class RegexURLResolver(object):
         except (ImportError, AttributeError), e:
             raise NoReverseMatch("Error importing '%s': %s." % (lookup_view, e))
         possibilities = self.reverse_dict.getlist(lookup_view)
-        for possibility, pattern in possibilities:
+        for possibility, pattern, defaults in possibilities:
             for result, params in possibility:
                 if args:
                     if len(args) != len(params):
@@ -318,7 +318,14 @@ class RegexURLResolver(object):
                     unicode_args = [force_unicode(val) for val in args]
                     candidate =  result % dict(zip(params, unicode_args))
                 else:
-                    if set(kwargs.keys()) != set(params):
+                    if set(kwargs.keys() + defaults.keys()) != set(params + defaults.keys()):
+                        continue
+                    matches = True
+                    for k, v in defaults.items():
+                        if kwargs.get(k, v) != v:
+                            matches = False
+                            break
+                    if not matches:
                         continue
                     unicode_kwargs = dict([(k, force_unicode(v)) for (k, v) in kwargs.items()])
                     candidate = result % unicode_kwargs
