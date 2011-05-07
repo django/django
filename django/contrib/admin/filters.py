@@ -110,7 +110,7 @@ class FieldListFilter(ListFilter):
     def __init__(self, field, request, params, model, model_admin, field_path):
         self.field = field
         self.field_path = field_path
-        self.title = field_path
+        self.title = getattr(field, 'verbose_name', field_path)
         super(FieldListFilter, self).__init__(request, params, model, model_admin)
 
     def has_output(self):
