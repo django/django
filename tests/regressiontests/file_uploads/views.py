@@ -85,6 +85,13 @@ def file_upload_echo(request):
     r = dict([(k, f.name) for k, f in request.FILES.items()])
     return HttpResponse(simplejson.dumps(r))
 
+def file_upload_echo_content(request):
+    """
+    Simple view to echo back the content of uploaded files for tests.
+    """
+    r = dict([(k, f.read()) for k, f in request.FILES.items()])
+    return HttpResponse(simplejson.dumps(r))
+
 def file_upload_quota(request):
     """
     Dynamically add in an upload handler.
