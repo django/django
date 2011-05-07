@@ -305,6 +305,7 @@ class FormattingTests(TestCase):
             self.assertEqual(u'10:15:48', Template('{{ t|time:"TIME_FORMAT" }}').render(self.ctxt))
             self.assertEqual(u'31/12/2009', Template('{{ d|date:"SHORT_DATE_FORMAT" }}').render(self.ctxt))
             self.assertEqual(u'31/12/2009 20:50', Template('{{ dt|date:"SHORT_DATETIME_FORMAT" }}').render(self.ctxt))
+            self.assertEqual(date_format(datetime.datetime.now(), "DATE_FORMAT"), Template('{% now "DATE_FORMAT" %}').render(self.ctxt))
 
             form4 = I18nForm({
                 'decimal_field': u'66666,666',

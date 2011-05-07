@@ -21,6 +21,7 @@ from django.template.loaders import app_directories, filesystem, cached
 from django.test.utils import get_warnings_state, restore_warnings_state,\
     setup_test_template_loader, restore_template_loaders
 from django.utils import unittest
+from django.utils.formats import date_format
 from django.utils.translation import activate, deactivate, ugettext as _
 from django.utils.safestring import mark_safe
 from django.utils.tzinfo import LocalTimezone
@@ -1422,6 +1423,8 @@ class Templates(unittest.TestCase):
             'now02': ('{% now "j "n" Y"%}', {}, template.TemplateSyntaxError),
         #    'now03': ('{% now "j \"n\" Y"%}', {}, str(datetime.now().day) + '"' + str(datetime.now().month) + '"' + str(datetime.now().year)),
         #    'now04': ('{% now "j \nn\n Y"%}', {}, str(datetime.now().day) + '\n' + str(datetime.now().month) + '\n' + str(datetime.now().year))
+            # Check parsing of locale strings
+            'now05': ('{% now "DATE_FORMAT" %}', {},  date_format(datetime.now())),
 
             ### URL TAG ########################################################
             # Successes

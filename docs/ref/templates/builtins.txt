@@ -727,6 +727,18 @@ escaped, because it's not a format character::
 
 This would display as "It is the 4th of September".
 
+.. versionchanged:: 1.4
+
+.. note::
+
+    The format passed can also be one of the predefined ones
+    :setting:`DATE_FORMAT`, :setting:`DATETIME_FORMAT`,
+    :setting:`SHORT_DATE_FORMAT` or :setting:`SHORT_DATETIME_FORMAT`.
+    The predefined formats may vary depending on the current locale and
+    if :ref:`format-localization` is enabled, e.g.::
+
+        It is {% now "SHORT_DATETIME_FORMAT" %}
+
 .. templatetag:: regroup
 
 regroup

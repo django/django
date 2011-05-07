@@ -2,12 +2,14 @@
 
 import sys
 import re
+from datetime import datetime
 from itertools import groupby, cycle as itertools_cycle
 
 from django.template.base import Node, NodeList, Template, Context, Variable
 from django.template.base import TemplateSyntaxError, VariableDoesNotExist, BLOCK_TAG_START, BLOCK_TAG_END, VARIABLE_TAG_START, VARIABLE_TAG_END, SINGLE_BRACE_START, SINGLE_BRACE_END, COMMENT_TAG_START, COMMENT_TAG_END
 from django.template.base import get_library, Library, InvalidTemplateLibrary
 from django.template.smartif import IfParser, Literal
+from django.template.defaultfilters import date
 from django.conf import settings
 from django.utils.encoding import smart_str, smart_unicode
 from django.utils.safestring import mark_safe
@@ -380,10 +382,7 @@ class NowNode(Node):
         self.format_string = format_string
 
     def render(self, context):
-        from datetime import datetime
-        from django.utils.dateformat import DateFormat
-        df = DateFormat(datetime.now())
-        return df.format(self.format_string)
+        return date(datetime.now(), self.format_string)
 
 class SpacelessNode(Node):
     def __init__(self, nodelist):
