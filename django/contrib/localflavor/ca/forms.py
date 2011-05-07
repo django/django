@@ -4,7 +4,7 @@ Canada-specific Form helpers
 
 from django.core.validators import EMPTY_VALUES
 from django.forms import ValidationError
-from django.forms.fields import Field, RegexField, Select
+from django.forms.fields import Field, CharField, Select
 from django.utils.encoding import smart_unicode
 from django.utils.translation import ugettext_lazy as _
 import re
@@ -12,7 +12,7 @@ import re
 phone_digits_re = re.compile(r'^(?:1-?)?(\d{3})[-\.]?(\d{3})[-\.]?(\d{4})$')
 sin_re = re.compile(r"^(\d{3})-(\d{3})-(\d{3})$")
 
-class CAPostalCodeField(RegexField):
+class CAPostalCodeField(CharField):
     """
     Canadian postal code field.
 
@@ -25,9 +25,17 @@ class CAPostalCodeField(RegexField):
         'invalid': _(u'Enter a postal code in the format XXX XXX.'),
     }
 
-    def __init__(self, max_length=None, min_length=None, *args, **kwargs):
-        super(CAPostalCodeField, self).__init__(r'^[ABCEGHJKLMNPRSTVXY]\d[ABCEGHJKLMNPRSTVWXYZ] \d[ABCEGHJKLMNPRSTVWXYZ]\d$',
-            max_length, min_length, *args, **kwargs)
+    postcode_regex = re.compile(r'^([ABCEGHJKLMNPRSTVXY]\d[ABCEGHJKLMNPRSTVWXYZ]) *(\d[ABCEGHJKLMNPRSTVWXYZ]\d)$')
+
+    def clean(self, value):
+        value = super(CAPostalCodeField, self).clean(value)
+        if value in EMPTY_VALUES:
+            return u''
+        postcode = value.upper().strip()
+        m = self.postcode_regex.match(postcode)
+        if not m:
+            raise ValidationError(self.default_error_messages['invalid'])
+        return "%s %s" % (m.group(1), m.group(2))
 
 class CAPhoneNumberField(Field):
     """Canadian phone number field."""

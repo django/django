@@ -45,13 +45,17 @@ class CALocalFlavorTests(LocalFlavorTestCase):
             'T2S 2W7': 'T2S 2W7',
             'T2S 2Z7': 'T2S 2Z7',
             'T2Z 2H7': 'T2Z 2H7',
-
+            'T2S2H7' : 'T2S 2H7',
+            't2s 2h7': 'T2S 2H7',
+            't2s2h7' : 'T2S 2H7',
+            't2s            2H7': 'T2S 2H7',
+            '  t2s    2H7  ': 'T2S 2H7',
         }
         invalid = {
-            'T2S2H7' : error_format,
             'T2S 2H' : error_format,
             '2T6 H8I': error_format,
             'T2S2H' : error_format,
+            't2s h8i': error_format,
             90210 : error_format,
             'W2S 2H3': error_format,
             'Z2S 2H3': error_format,
