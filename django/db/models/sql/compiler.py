@@ -493,7 +493,11 @@ class SQLCompiler(object):
                 params.extend(extra_params)
             cols = (group_by + self.query.select +
                 self.query.related_select_cols + extra_selects)
+            seen = set()
             for col in cols:
+                if col in seen:
+                    continue
+                seen.add(col)
                 if isinstance(col, (list, tuple)):
                     result.append('%s.%s' % (qn(col[0]), qn(col[1])))
                 elif hasattr(col, 'as_sql'):
