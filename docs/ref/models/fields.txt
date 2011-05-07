@@ -416,8 +416,7 @@ optional arguments:
     it's not just a default value that you can override.
 
 The admin represents this as an ``<input type="text">`` with a JavaScript
-calendar, and a shortcut for "Today".  The JavaScript calendar will always
-start the week on a Sunday.
+calendar, and a shortcut for "Today".
 
 .. note::
     As currently implemented, setting ``auto_now`` or ``auto_now_add`` to
