@@ -624,6 +624,8 @@ for example::
 Variable resolution will throw a ``VariableDoesNotExist`` exception if it cannot
 resolve the string passed to it in the current context of the page.
 
+.. _howto-custom-template-tags-simple-tags:
+
 Shortcut for simple tags
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
