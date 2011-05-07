@@ -82,7 +82,7 @@ class FlatpageMiddlewareTests(TestCase):
         fp.sites.add(1)
 
         response = self.client.get('/some.very_special~chars-here/')
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertContains(response, "<p>Isn't it special!</p>")
 
 
@@ -121,7 +121,7 @@ class FlatpageMiddlewareAppendSlashTests(TestCase):
     def test_redirect_view_non_existent_flatpage(self):
         "A non-existent flatpage raises 404 when served through a view and should not add a slash"
         response = self.client.get('/flatpage_root/no_such_flatpage')
-        self.assertEquals(response.status_code, 404)
+        self.assertEqual(response.status_code, 404)
 
     def test_redirect_fallback_flatpage(self):
         "A flatpage can be served by the fallback middlware and should add a slash"
@@ -131,7 +131,7 @@ class FlatpageMiddlewareAppendSlashTests(TestCase):
     def test_redirect_fallback_non_existent_flatpage(self):
         "A non-existent flatpage raises a 404 when served by the fallback middlware and should not add a slash"
         response = self.client.get('/no_such_flatpage')
-        self.assertEquals(response.status_code, 404)
+        self.assertEqual(response.status_code, 404)
 
     def test_redirect_fallback_flatpage_special_chars(self):
         "A flatpage with special chars in the URL can be served by the fallback middleware and should add a slash"
@@ -159,7 +159,7 @@ class FlatpageMiddlewareAppendSlashTests(TestCase):
         fp.sites.add(1)
 
         response = self.client.get('/')
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertContains(response, "<p>Root</p>")
 
 

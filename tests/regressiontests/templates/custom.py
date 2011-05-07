@@ -59,19 +59,19 @@ class CustomTagTests(TestCase):
         c = template.Context({'value': 42})
 
         t = template.Template('{% load custom %}{% inclusion_no_params %}')
-        self.assertEquals(t.render(c), u'inclusion_no_params - Expected result\n')
+        self.assertEqual(t.render(c), u'inclusion_no_params - Expected result\n')
 
         t = template.Template('{% load custom %}{% inclusion_one_param 37 %}')
-        self.assertEquals(t.render(c), u'inclusion_one_param - Expected result: 37\n')
+        self.assertEqual(t.render(c), u'inclusion_one_param - Expected result: 37\n')
 
         t = template.Template('{% load custom %}{% inclusion_explicit_no_context 37 %}')
-        self.assertEquals(t.render(c), u'inclusion_explicit_no_context - Expected result: 37\n')
+        self.assertEqual(t.render(c), u'inclusion_explicit_no_context - Expected result: 37\n')
 
         t = template.Template('{% load custom %}{% inclusion_no_params_with_context %}')
-        self.assertEquals(t.render(c), u'inclusion_no_params_with_context - Expected result (context value: 42)\n')
+        self.assertEqual(t.render(c), u'inclusion_no_params_with_context - Expected result (context value: 42)\n')
 
         t = template.Template('{% load custom %}{% inclusion_params_and_context 37 %}')
-        self.assertEquals(t.render(c), u'inclusion_params_and_context - Expected result (context value: 42): 37\n')
+        self.assertEqual(t.render(c), u'inclusion_params_and_context - Expected result (context value: 42): 37\n')
 
     def test_inclusion_tag_registration(self):
         # Test that the decorators preserve the decorated function's docstring, name and attributes.
@@ -88,10 +88,10 @@ class CustomTagTests(TestCase):
         """
         c = template.Context({})
         t = template.Template('{% load custom %}{% inclusion_tag_current_app %}')
-        self.assertEquals(t.render(c).strip(), u'None')
+        self.assertEqual(t.render(c).strip(), u'None')
 
         c.current_app = 'advanced'
-        self.assertEquals(t.render(c).strip(), u'advanced')
+        self.assertEqual(t.render(c).strip(), u'advanced')
 
     def test_15070_use_l10n(self):
         """
@@ -100,10 +100,10 @@ class CustomTagTests(TestCase):
         """
         c = template.Context({})
         t = template.Template('{% load custom %}{% inclusion_tag_use_l10n %}')
-        self.assertEquals(t.render(c).strip(), u'None')
+        self.assertEqual(t.render(c).strip(), u'None')
 
         c.use_l10n = True
-        self.assertEquals(t.render(c).strip(), u'True')
+        self.assertEqual(t.render(c).strip(), u'True')
 
     def test_assignment_tags(self):
         c = template.Context({'value': 42})

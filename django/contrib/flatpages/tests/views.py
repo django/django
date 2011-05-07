@@ -110,17 +110,17 @@ class FlatpageViewAppendSlashTests(TestCase):
     def test_redirect_view_non_existent_flatpage(self):
         "A non-existent flatpage raises 404 when served through a view and should not add a slash"
         response = self.client.get('/flatpage_root/no_such_flatpage')
-        self.assertEquals(response.status_code, 404)
+        self.assertEqual(response.status_code, 404)
 
     def test_redirect_fallback_flatpage(self):
         "A fallback flatpage won't be served if the middleware is disabled and should not add a slash"
         response = self.client.get('/flatpage')
-        self.assertEquals(response.status_code, 404)
+        self.assertEqual(response.status_code, 404)
 
     def test_redirect_fallback_non_existent_flatpage(self):
         "A non-existent flatpage won't be served if the fallback middlware is disabled and should not add a slash"
         response = self.client.get('/no_such_flatpage')
-        self.assertEquals(response.status_code, 404)
+        self.assertEqual(response.status_code, 404)
 
     def test_redirect_view_flatpage_special_chars(self):
         "A flatpage with special chars in the URL can be served through a view and should add a slash"
