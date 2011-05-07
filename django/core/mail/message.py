@@ -21,7 +21,7 @@ except ImportError:
 
 # Don't BASE64-encode UTF-8 messages so that we avoid unwanted attention from
 # some spam filters.
-Charset.add_charset('utf-8', Charset.SHORTEST, Charset.QP, 'utf-8')
+Charset.add_charset('utf-8', Charset.SHORTEST, None, 'utf-8')
 
 # Default MIME type to use on attachments (if it is not explicitly given
 # and cannot be guessed).

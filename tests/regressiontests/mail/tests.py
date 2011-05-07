@@ -120,7 +120,7 @@ class MailTests(TestCase):
         """
         headers = {"date": "Fri, 09 Nov 2001 01:08:47 -0000", "Message-ID": "foo"}
         email = EmailMessage('subject', 'content', 'from@example.com', ['to@example.com'], headers=headers)
-        self.assertEqual(email.message().as_string(), 'Content-Type: text/plain; charset="utf-8"\nMIME-Version: 1.0\nContent-Transfer-Encoding: quoted-printable\nSubject: subject\nFrom: from@example.com\nTo: to@example.com\ndate: Fri, 09 Nov 2001 01:08:47 -0000\nMessage-ID: foo\n\ncontent')
+        self.assertEqual(email.message().as_string(), 'Content-Type: text/plain; charset="utf-8"\nMIME-Version: 1.0\nContent-Transfer-Encoding: 7bit\nSubject: subject\nFrom: from@example.com\nTo: to@example.com\ndate: Fri, 09 Nov 2001 01:08:47 -0000\nMessage-ID: foo\n\ncontent')
 
     def test_from_header(self):
         """
@@ -294,6 +294,30 @@ class MailTests(TestCase):
         email = EmailMessage('Subject', 'From the future', 'bounce@example.com', ['to@example.com'], headers={'From': 'from@example.com'})
         self.assertFalse('>From the future' in email.message().as_string())
 
+    def test_dont_base64_encode(self):
+        # Ticket #3472
+        # Shouldn't use Base64 encoding at all
+        msg = EmailMessage('Subject', 'UTF-8 encoded body', 'bounce@example.com', ['to@example.com'], headers={'From': 'from@example.com'})
+        self.assertFalse('Content-Transfer-Encoding: base64' in msg.message().as_string())
+
+        # Ticket #11212
+        # Shouldn't use quoted printable, should detect it can represent content with 7 bit data
+        msg = EmailMessage('Subject', 'Body with only ASCII characters.', 'bounce@example.com', ['to@example.com'], headers={'From': 'from@example.com'})
+        s = msg.message().as_string()
+        self.assertFalse('Content-Transfer-Encoding: quoted-printable' in s)
+        self.assertTrue('Content-Transfer-Encoding: 7bit' in s)
+
+        # Shouldn't use quoted printable, should detect it can represent content with 8 bit data
+        msg = EmailMessage('Subject', 'Body with latin characters: àáä.', 'bounce@example.com', ['to@example.com'], headers={'From': 'from@example.com'})
+        s = msg.message().as_string()
+        self.assertFalse('Content-Transfer-Encoding: quoted-printable' in s)
+        self.assertTrue('Content-Transfer-Encoding: 8bit' in s)
+
+        msg = EmailMessage('Subject', u'Body with non latin characters: А Б В Г Д Е Ж Ѕ З И І К Л М Н О П.', 'bounce@example.com', ['to@example.com'], headers={'From': 'from@example.com'})
+        s = msg.message().as_string()
+        self.assertFalse('Content-Transfer-Encoding: quoted-printable' in s)
+        self.assertTrue('Content-Transfer-Encoding: 8bit' in s)
+
 
 class BaseEmailBackendTests(object):
     email_backend = None
@@ -415,7 +439,7 @@ class BaseEmailBackendTests(object):
         email = EmailMessage('Subject', 'Content', 'from@example.com', ['to@example.com'], cc=['cc@example.com'])
         mail.get_connection().send_messages([email])
         message = self.get_the_message()
-        self.assertStartsWith(message.as_string(), 'Content-Type: text/plain; charset="utf-8"\nMIME-Version: 1.0\nContent-Transfer-Encoding: quoted-printable\nSubject: Subject\nFrom: from@example.com\nTo: to@example.com\nCc: cc@example.com\nDate: ')
+        self.assertStartsWith(message.as_string(), 'Content-Type: text/plain; charset="utf-8"\nMIME-Version: 1.0\nContent-Transfer-Encoding: 7bit\nSubject: Subject\nFrom: from@example.com\nTo: to@example.com\nCc: cc@example.com\nDate: ')
 
     def test_idn_send(self):
         """
@@ -553,7 +577,7 @@ class ConsoleBackendTests(BaseEmailBackendTests, TestCase):
         s = StringIO()
         connection = mail.get_connection('django.core.mail.backends.console.EmailBackend', stream=s)
         send_mail('Subject', 'Content', 'from@example.com', ['to@example.com'], connection=connection)
-        self.assertTrue(s.getvalue().startswith('Content-Type: text/plain; charset="utf-8"\nMIME-Version: 1.0\nContent-Transfer-Encoding: quoted-printable\nSubject: Subject\nFrom: from@example.com\nTo: to@example.com\nDate: '))
+        self.assertTrue(s.getvalue().startswith('Content-Type: text/plain; charset="utf-8"\nMIME-Version: 1.0\nContent-Transfer-Encoding: 7bit\nSubject: Subject\nFrom: from@example.com\nTo: to@example.com\nDate: '))
 
 
 class FakeSMTPServer(smtpd.SMTPServer, threading.Thread):
