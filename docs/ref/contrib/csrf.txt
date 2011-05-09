@@ -123,6 +123,11 @@ Adding this to a javascript file that is included on your site will ensure that
 AJAX POST requests that are made via jQuery will not be caught by the CSRF
 protection.
 
+The above code could be simplified by using the `jQuery cookie plugin
+<http://plugins.jquery.com/project/Cookie>`_ to replace ``getCookie``, and
+`settings.crossDomain <http://api.jquery.com/jQuery.ajax>`_ in jQuery 1.5 and
+later to replace ``sameOrigin``.
+
 The decorator method
 --------------------
 
