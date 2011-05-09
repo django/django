@@ -284,6 +284,60 @@ to set cookies).  Note that even without CSRF, there are other vulnerabilities,
 such as session fixation, that make giving subdomains to untrusted parties a bad
 idea, and these vulnerabilities cannot easily be fixed with current browsers.
 
+Edge cases
+==========
+
+Certain views can have unusual requirements that mean they don't fit the normal
+pattern envisaged here. A number of utilities can be useful in these
+situations. The scenarios they might be needed in are described in the following
+section.
+
+Utilities
+---------
+
+.. module:: django.views.decorators.csrf
+
+.. function:: requires_csrf_token(view)
+
+    Normally the :ttag:`csrf_token` template tag will not work if
+    ``CsrfViewMiddleware.process_view`` or an equivalent like ``csrf_protect``
+    has not run. The view decorator ``requires_csrf_token`` can be used to
+    ensure the template tag does work. This decorator works similarly to
+    ``csrf_protect``, but never rejects an incoming request.
+
+    Example::
+
+        from django.views.decorators.csrf import requires_csrf_token
+        from django.shortcuts import render
+
+        @requires_csrf_token
+        def my_view(request):
+            c = {}
+            # ...
+            return render(request, "a_template.html", c)
+
+Scenarios
+---------
+
+CsrfViewMiddleware.process_view not used
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+There are cases when may not have run before your view is run - 404 and 500
+handlers, for example - but you still need the CSRF token in a form.
+
+Solution: use ``requires_csrf_token``
+
+
+Unprotected view needs the CSRF token
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+There may be some views that are unprotected and have been exempted by
+``csrf_exempt``, but still need to include the CSRF token.
+
+Solution: use ``csrf_exempt`` followed by ``requires_csrf_token``.
+
+
+
 Contrib and reusable apps
 =========================
 
