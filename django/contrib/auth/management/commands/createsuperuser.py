@@ -7,6 +7,7 @@ import re
 import sys
 from optparse import make_option
 from django.contrib.auth.models import User
+from django.contrib.auth.management import get_default_username
 from django.core import exceptions
 from django.core.management.base import BaseCommand, CommandError
 from django.utils.translation import ugettext as _
@@ -56,28 +57,10 @@ class Command(BaseCommand):
         # If not provided, create the user with an unusable password
         password = None
 
-        # Try to determine the current system user's username to use as a default.
-        try:
-            default_username = getpass.getuser().replace(' ', '').lower()
-        except (ImportError, KeyError):
-            # KeyError will be raised by os.getpwuid() (called by getuser())
-            # if there is no corresponding entry in the /etc/passwd file
-            # (a very restricted chroot environment, for example).
-            default_username = ''
-
-        # Determine whether the default username is taken, so we don't display
-        # it as an option.
-        if default_username:
-            try:
-                User.objects.get(username=default_username)
-            except User.DoesNotExist:
-                pass
-            else:
-                default_username = ''
-
         # Prompt for username/email/password. Enclose this whole thing in a
         # try/except to trap for a keyboard interrupt and exit gracefully.
         if interactive:
+            default_username = get_default_username()
             try:
 
                 # Get a username
