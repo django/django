@@ -164,6 +164,37 @@ class CsrfViewMiddlewareTest(TestCase):
         req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
         self.assertEqual(None, req2)
 
+    def test_put_and_delete_rejected(self):
+        """
+        Tests that HTTP PUT and DELETE methods have protection
+        """
+        req = TestingHttpRequest()
+        req.method = 'PUT'
+        req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+        self.assertEqual(403, req2.status_code)
+
+        req = TestingHttpRequest()
+        req.method = 'DELETE'
+        req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+        self.assertEqual(403, req2.status_code)
+
+    def test_put_and_delete_allowed(self):
+        """
+        Tests that HTTP PUT and DELETE methods can get through with
+        X-CSRFToken and a cookie
+        """
+        req = self._get_GET_csrf_cookie_request()
+        req.method = 'PUT'
+        req.META['HTTP_X_CSRFTOKEN'] = self._csrf_id
+        req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+        self.assertEqual(None, req2)
+
+        req = self._get_GET_csrf_cookie_request()
+        req.method = 'DELETE'
+        req.META['HTTP_X_CSRFTOKEN'] = self._csrf_id
+        req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+        self.assertEqual(None, req2)
+
     # Tests for the template tag method
     def test_token_node_no_csrf_cookie(self):
         """

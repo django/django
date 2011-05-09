@@ -214,3 +214,15 @@ you should add the following lines in your settings file::
 
 Don't forget to escape characters that have a special meaning in a regular
 expression.
+
+CSRF protection extended to PUT and DELETE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Previously, Django's :doc:`CSRF protection </ref/contrib/csrf/>` provided
+protection against only POST requests. Since use of PUT and DELETE methods in
+AJAX applications is becoming more common, we now protect all methods not
+defined as safe by RFC 2616 i.e. we exempt GET, HEAD, OPTIONS and TRACE, and
+enforce protection on everything.
+
+If you using PUT or DELETE methods in AJAX applications, please see the
+:ref:`instructions about using AJAX and CSRF <csrf-ajax>`.

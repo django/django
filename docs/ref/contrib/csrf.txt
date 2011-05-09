@@ -13,11 +13,13 @@ who visits the malicious site in their browser.  A related type of attack,
 'login CSRF', where an attacking site tricks a user's browser into logging into
 a site with someone else's credentials, is also covered.
 
-The first defense against CSRF attacks is to ensure that GET requests are
-side-effect free.  POST requests can then be protected by following the steps
-below.
+The first defense against CSRF attacks is to ensure that GET requests (and other
+'safe' methods, as defined by `9.1.1 Safe Methods, HTTP 1.1, RFC 2616`_) are
+side-effect free.  Requests via 'unsafe' methods, such as POST, PUT and DELETE,
+can then be protected by following the steps below.
 
 .. _Cross Site Request Forgeries: http://www.squarefree.com/securitytips/web-developers.html#CSRF
+.. _9.1.1 Safe Methods, HTTP 1.1, RFC 2616: http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html
 
 How to use it
 =============
@@ -198,9 +200,9 @@ The CSRF protection is based on the following things:
 
    This part is done by the template tag.
 
-3. For all incoming POST requests, a CSRF cookie must be present, and the
-   'csrfmiddlewaretoken' field must be present and correct. If it isn't, the
-   user will get a 403 error.
+3. For all incoming requests that are not using HTTP GET, HEAD, OPTIONS or
+   TRACE, a CSRF cookie must be present, and the 'csrfmiddlewaretoken' field
+   must be present and correct. If it isn't, the user will get a 403 error.
 
    This check is done by ``CsrfViewMiddleware``.
 
@@ -215,12 +217,11 @@ The CSRF protection is based on the following things:
 This ensures that only forms that have originated from your Web site can be used
 to POST data back.
 
-It deliberately only targets HTTP POST requests (and the corresponding POST
-forms). GET requests ought never to have any potentially dangerous side effects
-(see `9.1.1 Safe Methods, HTTP 1.1, RFC 2616`_), and so a CSRF attack with a GET
-request ought to be harmless.
-
-.. _9.1.1 Safe Methods, HTTP 1.1, RFC 2616: http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html
+It deliberately ignores GET requests (and other requests that are defined as
+'safe' by RFC 2616). These requests ought never to have any potentially
+dangerous side effects , and so a CSRF attack with a GET request ought to be
+harmless. RFC 2616 defines POST, PUT and DELETE as 'unsafe', and all other
+methods are assumed to be unsafe, for maximum protection.
 
 Caching
 =======
