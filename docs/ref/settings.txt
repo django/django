@@ -319,10 +319,14 @@ CSRF_COOKIE_DOMAIN
 Default: ``None``
 
 The domain to be used when setting the CSRF cookie.  This can be useful for
-allowing cross-subdomain requests to be exluded from the normal cross site
-request forgery protection.  It should be set to a string such as
+easily allowing cross-subdomain requests to be exluded from the normal cross
+site request forgery protection.  It should be set to a string such as
 ``".lawrence.com"`` to allow a POST request from a form on one subdomain to be
 accepted by accepted by a view served from another subdomain.
+
+Please note that the presence of this setting does not imply that Django's CSRF
+protection is safe from cross-subdomain attacks by default - please see the
+:ref:`CSRF limitations <csrf-limitations>` section.
 
 .. setting:: CSRF_COOKIE_NAME
 
