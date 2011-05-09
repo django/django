@@ -31,8 +31,8 @@ To enable CSRF protection for your views, follow these steps:
        been dealt with.)
 
        Alternatively, you can use the decorator
-       ``django.views.decorators.csrf.csrf_protect`` on particular views you
-       want to protect (see below).
+       :func:`~django.views.decorators.csrf.csrf_protect` on particular views
+       you want to protect (see below).
 
     2. In any template that uses a POST form, use the :ttag:`csrf_token` tag inside
        the ``<form>`` element if the form is for an internal URL, e.g.::
@@ -126,26 +126,32 @@ protection.
 The decorator method
 --------------------
 
+.. module:: django.views.decorators.csrf
+
 Rather than adding ``CsrfViewMiddleware`` as a blanket protection, you can use
 the ``csrf_protect`` decorator, which has exactly the same functionality, on
-particular views that need the protection.  It must be used **both** on views
+particular views that need the protection. It must be used **both** on views
 that insert the CSRF token in the output, and on those that accept the POST form
-data. (These are often the same view function, but not always).  It is used like
-this::
+data. (These are often the same view function, but not always).
 
-    from django.views.decorators.csrf import csrf_protect
-    from django.shortcuts import render
-
-    @csrf_protect
-    def my_view(request):
-        c = {}
-        # ...
-        return render(request, "a_template.html", c)
-
-Use of the decorator is **not recommended** by itself, since if you forget to
-use it, you will have a security hole.  The 'belt and braces' strategy of using
+Use of the decorator by itself is **not recommended**, since if you forget to
+use it, you will have a security hole. The 'belt and braces' strategy of using
 both is fine, and will incur minimal overhead.
 
+.. function:: csrf_protect(view)
+
+    Decorator that provides the protection of ``CsrfViewMiddleware`` to a view.
+
+    Usage::
+
+        from django.views.decorators.csrf import csrf_protect
+        from django.shortcuts import render
+
+        @csrf_protect
+        def my_view(request):
+            c = {}
+            # ...
+            return render(request, "a_template.html", c)
 
 Subdomains
 ----------
@@ -283,8 +289,6 @@ section.
 Utilities
 ---------
 
-.. module:: django.views.decorators.csrf
-
 .. function:: csrf_exempt(view)
 
     This decorator marks a view as being exempt from the protection ensured by
@@ -344,7 +348,29 @@ There may be some views that are unprotected and have been exempted by
 Solution: use :func:`~django.views.decorators.csrf.csrf_exempt` followed by
 :func:`~django.views.decorators.csrf.requires_csrf_token`.
 
+View needs protection for one path
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+A view needs CRSF protection under one set of conditions only, and mustn't have
+it for the rest of the time.
+
+Solution: use :func:`~django.views.decorators.csrf.csrf_exempt` for the whole
+view function, and :func:`~django.views.decorators.csrf.csrf_protect` for the
+path within it that needs protection. Example::
+
+    from django.views.decorators.csrf import csrf_exempt, csrf_protect
+
+    @csrf_exempt
+    def my_view(request):
+
+        @csrf_protect
+        def protected_path(request):
+            do_something()
+
+        if some_condition():
+           return protected_path(request)
+        else:
+           do_something_else()
 
 Contrib and reusable apps
 =========================
