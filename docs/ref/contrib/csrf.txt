@@ -365,7 +365,8 @@ There may be some views that are unprotected and have been exempted by
 ``csrf_exempt``, but still need to include the CSRF token.
 
 Solution: use :func:`~django.views.decorators.csrf.csrf_exempt` followed by
-:func:`~django.views.decorators.csrf.requires_csrf_token`.
+:func:`~django.views.decorators.csrf.requires_csrf_token`. (i.e. ``requires_csrf_token``
+should be the innermost decorator).
 
 View needs protection for one path
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
