@@ -4,7 +4,7 @@ import warnings
 from django.test import TestCase
 from django.http import HttpRequest, HttpResponse
 from django.middleware.csrf import CsrfViewMiddleware
-from django.views.decorators.csrf import csrf_exempt, requires_csrf_token
+from django.views.decorators.csrf import csrf_exempt, requires_csrf_token, ensure_csrf_cookie
 from django.core.context_processors import csrf
 from django.conf import settings
 from django.template import RequestContext, Template
@@ -249,3 +249,35 @@ class CsrfViewMiddlewareTest(TestCase):
         req.META['HTTP_REFERER'] = 'https://www.example.com'
         req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
         self.assertEqual(None, req2)
+
+    def test_ensures_csrf_cookie_no_middleware(self):
+        """
+        Tests that ensures_csrf_cookie decorator fulfils its promise
+        with no middleware
+        """
+        @ensure_csrf_cookie
+        def view(request):
+            # Doesn't insert a token or anything
+            return HttpResponse(content="")
+
+        req = self._get_GET_no_csrf_cookie_request()
+        resp = view(req)
+        self.assertTrue(resp.cookies.get(settings.CSRF_COOKIE_NAME, False))
+        self.assertTrue('Cookie' in resp.get('Vary',''))
+
+    def test_ensures_csrf_cookie_with_middleware(self):
+        """
+        Tests that ensures_csrf_cookie decorator fulfils its promise
+        with the middleware enabled.
+        """
+        @ensure_csrf_cookie
+        def view(request):
+            # Doesn't insert a token or anything
+            return HttpResponse(content="")
+
+        req = self._get_GET_no_csrf_cookie_request()
+        CsrfViewMiddleware().process_view(req, view, (), {})
+        resp = view(req)
+        resp2 = CsrfViewMiddleware().process_response(req, resp)
+        self.assertTrue(resp2.cookies.get(settings.CSRF_COOKIE_NAME, False))
+        self.assertTrue('Cookie' in resp2.get('Vary',''))

@@ -132,6 +132,10 @@ The above code could be simplified by using the `jQuery cookie plugin
 `settings.crossDomain <http://api.jquery.com/jQuery.ajax>`_ in jQuery 1.5 and
 later to replace ``sameOrigin``.
 
+In addition, if the CSRF cookie has not been sent to the client by use of
+:ttag:`csrf_token`, you may need to ensure the client receives the cookie by
+using :func:`~django.views.decorators.csrf.ensure_csrf_cookie`.
+
 The decorator method
 --------------------
 
@@ -328,6 +332,10 @@ Utilities
             # ...
             return render(request, "a_template.html", c)
 
+.. function:: ensure_csrf_cookie(view)
+
+    This decorator forces a view to send the CSRF cookie.
+
 Scenarios
 ---------
 
@@ -380,6 +388,15 @@ path within it that needs protection. Example::
            return protected_path(request)
         else:
            do_something_else()
+
+Page uses AJAX without any HTML form
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A page makes a POST request via AJAX, and the page does not have an HTML form
+with a :ttag:`csrf_token` that would cause the required CSRF cookie to be sent.
+
+Solution: use :func:`~django.views.decorators.csrf.ensure_csrf_cookie` on the
+view that sends the page.
 
 Contrib and reusable apps
 =========================

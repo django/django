@@ -1,6 +1,6 @@
 import warnings
 
-from django.middleware.csrf import CsrfViewMiddleware
+from django.middleware.csrf import CsrfViewMiddleware, get_token
 from django.utils.decorators import decorator_from_middleware, available_attrs
 from functools import wraps
 
@@ -27,6 +27,26 @@ Use this decorator on views that need a correct csrf_token available to
 RequestContext, but without the CSRF protection that csrf_protect
 enforces.
 """
+
+
+class _EnsureCsrfCookie(CsrfViewMiddleware):
+    def _reject(self, request, reason):
+        return None
+
+    def process_view(self, request, callback, callback_args, callback_kwargs):
+        retval = super(_EnsureCsrfCookie, self).process_view(request, callback, callback_args, callback_kwargs)
+        # Forces process_response to send the cookie
+        get_token(request)
+        return retval
+
+
+ensure_csrf_cookie = decorator_from_middleware(_EnsureCsrfCookie)
+ensure_csrf_cookie.__name__ = 'ensure_csrf_cookie'
+ensure_csrf_cookie.__doc__ = """
+Use this decorator to ensure that a view sets a CSRF cookie, whether or not it
+uses the csrf_token template tag, or the CsrfViewMiddleware is used.
+"""
+
 
 def csrf_response_exempt(view_func):
     """
