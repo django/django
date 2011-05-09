@@ -286,7 +286,7 @@ parameter.
 
 Since it can become a bit cumbersome to define this URL pattern, Django
 ships with a small URL helper function
-:func:`~django.conf.urls.static.static` that taks as parameters the prefix
+:func:`~django.conf.urls.static.static` that takes as parameters the prefix
 such as :setting:`MEDIA_URL` and a dotted path to a view, such as
 ``'django.views.static.serve'``. Any other function parameter will be
 transparently passed to the view.
