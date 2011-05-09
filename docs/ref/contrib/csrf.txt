@@ -114,7 +114,11 @@ that allow headers to be set on every request. In jQuery, you can use the
                 // or any other URL that isn't scheme relative or absolute i.e relative.
                 !(/^(\/\/|http:|https:).*/.test(url));
         }
-        if (sameOrigin(settings.url)) {
+        function safeMethod(method) {
+            return (method === 'GET' || method === 'HEAD');
+        }
+
+        if (!safeMethod(settings.type) && sameOrigin(settings.url)) {
             xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
         }
     });
