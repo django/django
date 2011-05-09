@@ -484,9 +484,11 @@ PASSWORD_RESET_TIMEOUT_DAYS = 3
 # rejected by the CSRF middleware.
 CSRF_FAILURE_VIEW = 'django.views.csrf.csrf_failure'
 
-# Name and domain for CSRF cookie.
+# Settings for CSRF cookie.
 CSRF_COOKIE_NAME = 'csrftoken'
 CSRF_COOKIE_DOMAIN = None
+CSRF_COOKIE_PATH = '/'
+CSRF_COOKIE_SECURE = False
 
 ############
 # MESSAGES #

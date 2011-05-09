@@ -423,6 +423,31 @@ Default: ``'csrftoken'``
 The name of the cookie to use for the CSRF authentication token. This can be
 whatever you want.
 
+CSRF_COOKIE_PATH
+----------------
+
+.. versionadded:: 1.4
+
+Default: ``'/'``
+
+The path set on the CSRF cookie. This should either match the URL path of your
+Django installation or be a parent of that path.
+
+This is useful if you have multiple Django instances running under the same
+hostname. They can use different cookie paths, and each instance will only see
+its own CSRF cookie.
+
+CSRF_COOKIE_SECURE
+------------------
+
+.. versionadded:: 1.4
+
+Default: ``False``
+
+Whether to use a secure cookie for the CSRF cookie. If this is set to ``True``,
+the cookie will be marked as "secure," which means browsers may ensure that the
+cookie is only sent under an HTTPS connection.
+
 CSRF_FAILURE_VIEW
 -----------------
 

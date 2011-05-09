@@ -82,13 +82,21 @@ class CsrfViewMiddlewareTest(TestCase):
         patched.
         """
         req = self._get_GET_no_csrf_cookie_request()
-        # token_view calls get_token() indirectly
-        CsrfViewMiddleware().process_view(req, token_view, (), {})
-        resp = token_view(req)
-        resp2 = CsrfViewMiddleware().process_response(req, resp)
 
-        csrf_cookie = resp2.cookies.get(settings.CSRF_COOKIE_NAME, False)
+        # Put tests for CSRF_COOKIE_* settings here
+        with self.settings(CSRF_COOKIE_NAME='myname',
+                           CSRF_COOKIE_DOMAIN='.example.com',
+                           CSRF_COOKIE_PATH='/test/',
+                           CSRF_COOKIE_SECURE=True):
+            # token_view calls get_token() indirectly
+            CsrfViewMiddleware().process_view(req, token_view, (), {})
+            resp = token_view(req)
+            resp2 = CsrfViewMiddleware().process_response(req, resp)
+        csrf_cookie = resp2.cookies.get('myname', False)
         self.assertNotEqual(csrf_cookie, False)
+        self.assertEqual(csrf_cookie['domain'], '.example.com')
+        self.assertEqual(csrf_cookie['secure'], True)
+        self.assertEqual(csrf_cookie['path'], '/test/')
         self.assertTrue('Cookie' in resp2.get('Vary',''))
 
     def test_process_response_get_token_not_used(self):
