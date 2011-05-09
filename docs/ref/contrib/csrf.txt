@@ -125,7 +125,7 @@ that allow headers to be set on every request. In jQuery, you can use the
                 !(/^(\/\/|http:|https:).*/.test(url));
         }
         function safeMethod(method) {
-            return (method === 'GET' || method === 'HEAD');
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
         }
 
         if (!safeMethod(settings.type) && sameOrigin(settings.url)) {
