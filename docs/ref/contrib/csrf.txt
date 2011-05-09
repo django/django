@@ -146,18 +146,6 @@ Use of the decorator is **not recommended** by itself, since if you forget to
 use it, you will have a security hole.  The 'belt and braces' strategy of using
 both is fine, and will incur minimal overhead.
 
-Exceptions
-----------
-
-To manually exclude a view function from being handled by either of the two CSRF
-middleware, you can use the ``csrf_exempt`` decorator, found in the
-``django.views.decorators.csrf`` module. For example::
-
-    from django.views.decorators.csrf import csrf_exempt
-
-    @csrf_exempt
-    def my_view(request):
-        return HttpResponse('Hello world')
 
 Subdomains
 ----------
@@ -297,6 +285,17 @@ Utilities
 
 .. module:: django.views.decorators.csrf
 
+.. function:: csrf_exempt(view)
+
+    This decorator marks a view as being exempt from the protection ensured by
+    the middleware. Example::
+
+        from django.views.decorators.csrf import csrf_exempt
+
+        @csrf_exempt
+        def my_view(request):
+            return HttpResponse('Hello world')
+
 .. function:: requires_csrf_token(view)
 
     Normally the :ttag:`csrf_token` template tag will not work if
@@ -319,14 +318,22 @@ Utilities
 Scenarios
 ---------
 
+CSRF protection should be disabled for just a few views
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Most views requires CSRF protection, but a few do not.
+
+Solution: rather than disabling the middleware and applying ``csrf_protect`` to
+all the views that need it, enable the middleware and use
+:func:`~django.views.decorators.csrf.csrf_exempt`.
+
 CsrfViewMiddleware.process_view not used
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 There are cases when may not have run before your view is run - 404 and 500
 handlers, for example - but you still need the CSRF token in a form.
 
-Solution: use ``requires_csrf_token``
-
+Solution: use :func:`~django.views.decorators.csrf.requires_csrf_token`
 
 Unprotected view needs the CSRF token
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -334,7 +341,8 @@ Unprotected view needs the CSRF token
 There may be some views that are unprotected and have been exempted by
 ``csrf_exempt``, but still need to include the CSRF token.
 
-Solution: use ``csrf_exempt`` followed by ``requires_csrf_token``.
+Solution: use :func:`~django.views.decorators.csrf.csrf_exempt` followed by
+:func:`~django.views.decorators.csrf.requires_csrf_token`.
 
 
 
