@@ -194,6 +194,20 @@ class ConnectionCreatedSignalTest(TestCase):
         self.assertTrue(data == {})
 
 
+class EscapingChecks(TestCase):
+
+    @unittest.skipUnless(connection.vendor == 'sqlite',
+                         "This is a sqlite-specific issue")
+    def test_parameter_escaping(self):
+        #13648: '%s' escaping support for sqlite3
+        cursor = connection.cursor()
+        response = cursor.execute(
+            "select strftime('%%s', date('now'))").fetchall()[0][0]
+        self.assertNotEqual(response, None)
+        # response should be an non-zero integer
+        self.assertTrue(int(response))
+
+
 class BackendTestCase(TestCase):
     def test_cursor_executemany(self):
         #4896: Test cursor.executemany
