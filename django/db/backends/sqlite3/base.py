@@ -212,7 +212,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         if self.settings_dict['NAME'] != ":memory:":
             BaseDatabaseWrapper.close(self)
 
-FORMAT_QMARK_REGEX = re.compile(r'(?![^%])%s')
+FORMAT_QMARK_REGEX = re.compile(r'(?<!%)%s')
 
 class SQLiteCursorWrapper(Database.Cursor):
     """
