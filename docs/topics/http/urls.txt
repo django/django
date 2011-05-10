@@ -824,7 +824,7 @@ namespaces into URLs on specific application instances, according to the
         '.../Orl%C3%A9ans/'
 
     Applying further encoding (such as :meth:`~django.utils.http.urlquote` or
-    ``urllib.quote``) to the ouput of :meth:`~django.core.urlresolvers.reverse`
+    ``urllib.quote``) to the output of :meth:`~django.core.urlresolvers.reverse`
     may produce undesirable results.
 
 reverse_lazy()
