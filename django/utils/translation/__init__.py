@@ -9,13 +9,19 @@ from django.utils.functional import lazy
 from django.utils.importlib import import_module
 
 
-__all__ = ['gettext', 'gettext_noop', 'gettext_lazy', 'ngettext',
-        'ngettext_lazy', 'string_concat', 'activate', 'deactivate',
-        'get_language', 'get_language_bidi', 'get_date_formats',
-        'get_partial_date_formats', 'check_for_language', 'to_locale',
-        'get_language_from_request', 'templatize', 'ugettext', 'ugettext_lazy',
-        'ungettext', 'ungettext_lazy', 'pgettext', 'pgettext_lazy',
-        'npgettext', 'npgettext_lazy', 'deactivate_all', 'get_language_info']
+__all__ = [
+    'activate', 'deactivate', 'override', 'deactivate_all',
+    'get_language',  'get_language_from_request',
+    'get_language_info', 'get_language_bidi',
+    'check_for_language', 'to_locale', 'templatize', 'string_concat',
+    'get_date_formats', 'get_partial_date_formats',
+    'gettext', 'gettext_lazy', 'gettext_noop',
+    'ugettext', 'ugettext_lazy', 'ugettext_noop',
+    'ngettext', 'ngettext_lazy',
+    'ungettext', 'ungettext_lazy',
+    'pgettext', 'pgettext_lazy',
+    'npgettext', 'npgettext_lazy',
+]
 
 # Here be dragons, so a short explanation of the logic won't hurt:
 # We are trying to solve two problems: (1) access settings, in particular
