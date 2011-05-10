@@ -612,9 +612,26 @@ instances on your model, the ``save()`` method is used to persist that file
 data.
 
 Takes two required arguments: ``name`` which is the name of the file, and
-``content`` which is a file-like object containing the file's contents. The
-optional ``save`` argument controls whether or not the instance is saved after
-the file has been altered. Defaults to ``True``.
+``content`` which is an object containing the file's contents.  The
+optional ``save`` argument controls whether or not the instance is
+saved after the file has been altered. Defaults to ``True``.
+
+Note that the ``content`` argument should be an instance of
+:class:`django.core.files.File`, not Python's built-in file object.
+You can construct a :class:`~django.core.files.File` from an existing
+Python file object like this::
+
+    from django.core.files import File
+    # Open an existing file using Python's built-in open()
+    f = open('/tmp/hello.world')
+    myfile = File(f)
+
+Or you can construct one from a Python string like this::
+
+    from django.core.files.base import ContentFile
+    myfile = ContentFile("hello world")
+
+For more information, see :doc:`/topics/files`.
 
 .. method:: FieldFile.delete(save=True)
 
