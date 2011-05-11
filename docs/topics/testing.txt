@@ -36,7 +36,8 @@ two test frameworks that ship in the Python standard library. The two
 frameworks are:
 
     * **Unit tests** -- tests that are expressed as methods on a Python class
-      that subclasses ``unittest.TestCase``. For example::
+      that subclasses ``unittest.TestCase`` or Django's customized
+      :class:`TestCase`. For example::
 
           import unittest
 
@@ -1102,7 +1103,16 @@ Converting a normal ``unittest.TestCase`` to a Django ``TestCase`` is easy:
 just change the base class of your test from ``unittest.TestCase`` to
 ``django.test.TestCase``. All of the standard Python unit test functionality
 will continue to be available, but it will be augmented with some useful
-additions.
+additions, including:
+
+    * Automatic loading of fixtures.
+
+    * Wraps each test in a transaction.
+
+    * Creates a TestClient instance.
+
+    * Django-specific assertions for testing for things
+      like redirection and form errors.
 
 .. class:: TransactionTestCase()
 
