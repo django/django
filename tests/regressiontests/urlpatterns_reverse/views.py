@@ -22,7 +22,7 @@ class ViewClass(object):
 
 view_class_instance = ViewClass()
 
-class LazyRedictView(RedirectView):
+class LazyRedirectView(RedirectView):
     url = reverse_lazy('named-lazy-url-redirected-to')
 
 @user_passes_test(lambda u: u.is_authenticated(), login_url=reverse_lazy('some-login-page'))
