@@ -411,7 +411,11 @@ def setup_environ(settings_mod, original_settings_path=None):
     if original_settings_path:
         os.environ['DJANGO_SETTINGS_MODULE'] = original_settings_path
     else:
-        os.environ['DJANGO_SETTINGS_MODULE'] = '%s.%s' % (project_name, settings_name)
+        # If DJANGO_SETTINGS_MODULE is already set, use it.
+        os.environ['DJANGO_SETTINGS_MODULE'] = os.environ.get(
+            'DJANGO_SETTINGS_MODULE',
+            '%s.%s' % (project_name, settings_name)
+        )
 
     # Import the project module. We add the parent directory to PYTHONPATH to
     # avoid some of the path errors new users can have.

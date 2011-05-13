@@ -1,5 +1,6 @@
 from __future__ import with_statement
-from django.conf import settings
+import os
+from django.conf import settings, global_settings
 from django.test import TestCase
 
 class SettingsTests(TestCase):
@@ -100,3 +101,64 @@ class TrailingSlashURLTests(TestCase):
         self.settings_module.MEDIA_URL = 'http://media.foo.com/stupid//'
         self.assertEqual('http://media.foo.com/stupid//',
                          self.settings_module.MEDIA_URL)
+
+
+class EnvironmentVariableTest(TestCase):
+    """
+    Ensures proper settings file is used in setup_environ if
+    DJANGO_SETTINGS_MODULE is set in the environment.
+    """
+    def setUp(self):
+        self.original_value = os.environ.get('DJANGO_SETTINGS_MODULE')
+
+    def tearDown(self):
+        if self.original_value:
+            os.environ['DJANGO_SETTINGS_MODULE'] = self.original_value
+        elif 'DJANGO_SETTINGS_MODULE' in os.environ:
+            del(os.environ['DJANGO_SETTINGS_MODULE'])
+
+    def test_env_var_used(self):
+        """
+        If the environment variable is set, do not ignore it. However, the
+        kwarg original_settings_path takes precedence.
+
+        This tests both plus the default (neither set).
+        """
+        from django.core.management import setup_environ
+
+        # whatever was already there
+        original_module =  os.environ.get(
+            'DJANGO_SETTINGS_MODULE',
+            'the default'
+        )
+
+        # environment variable set by user
+        user_override = 'custom.settings'
+
+        # optional argument to setup_environ
+        orig_path = 'original.path'
+
+        # expect default
+        setup_environ(global_settings)
+        self.assertEquals(
+            os.environ.get('DJANGO_SETTINGS_MODULE'),
+            original_module
+        )
+
+        # override with environment variable
+        os.environ['DJANGO_SETTINGS_MODULE'] = user_override
+        setup_environ(global_settings)
+
+        self.assertEquals(
+            os.environ.get('DJANGO_SETTINGS_MODULE'),
+            user_override
+        )
+
+        # pass in original_settings_path (should take precedence)
+        os.environ['DJANGO_SETTINGS_MODULE'] = user_override
+        setup_environ(global_settings, original_settings_path = orig_path)
+
+        self.assertEquals(
+            os.environ.get('DJANGO_SETTINGS_MODULE'),
+            orig_path
+        )
