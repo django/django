@@ -493,7 +493,7 @@ for use within the translation block. Examples::
 If you need to bind more than one expression inside a ``blocktrans`` tag,
 separate the pieces with ``and``::
 
-    {% blocktrans with book_t=book|title author_t=author|title %}
+    {% blocktrans with book_t=book|title and author_t=author|title %}
     This is {{ book_t }} by {{ author_t }}
     {% endblocktrans %}
 
