@@ -156,7 +156,7 @@ and handle logging calls on a per-module basis. However, if you have
 some other way of organizing your logging messages, you can provide
 any dot-separated name to identify your logger::
 
-    # Get an instance of a specfic named logger
+    # Get an instance of a specific named logger
     logger = logging.getLogger('project.interesting.stuff')
 
 The dotted paths of logger names define a hierarchy. The

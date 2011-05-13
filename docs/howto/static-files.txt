@@ -137,7 +137,7 @@ A far better way is to use the value of the :setting:`STATIC_URL` setting
 directly in your templates. This means that a switch of static files servers
 only requires changing that single value. Much better!
 
-``staticfiles`` inludes two built-in ways of getting at this setting in your
+``staticfiles`` includes two built-in ways of getting at this setting in your
 templates: a context processor and a template tag.
 
 With a context processor
@@ -170,7 +170,7 @@ As a brief refresher, context processors add variables into the contexts of
 every template. However, context processors require that you use
 :class:`~django.template.RequestContext` when rendering templates. This happens
 automatically if you're using a :doc:`generic view </ref/class-based-views>`,
-but in views written by hand you'll need to explicitally use ``RequestContext``
+but in views written by hand you'll need to explicitly use ``RequestContext``
 To see how that works, and to read more details, check out
 :ref:`subclassing-context-requestcontext`.
 
@@ -439,7 +439,7 @@ For example, if you've written an S3 storage backend in
 
 Once that's done, all you have to do is run :djadmin:`collectstatic` and your
 static files would be pushed through your storage package up to S3. If you
-later needed to swich to a different storage provider, it could be as simple
+later needed to switch to a different storage provider, it could be as simple
 as changing your :setting:`STATICFILES_STORAGE` setting.
 
 For details on how you'd write one of these backends,

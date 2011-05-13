@@ -472,7 +472,7 @@ to do:
     * Then, click the "Join this Team" button to become a member of this team.
       Every team has at least one coordinator who is responsible to review
       your membership request. You can of course also contact the team
-      coordinator to clarify procedual problems and handle the actual
+      coordinator to clarify procedural problems and handle the actual
       translation process.
 
     * Once you are a member of a team choose the translation resource you

@@ -521,7 +521,7 @@ Callables in templates
 Previously, a callable in a template would only be called automatically as part
 of the variable resolution process if it was retrieved via attribute
 lookup. This was an inconsistency that could result in confusing and unhelpful
-behaviour::
+behavior::
 
     >>> Template("{{ user.get_full_name }}").render(Context({'user': user}))
     u'Joe Bloggs'
@@ -529,7 +529,7 @@ behaviour::
     u'&lt;bound method User.get_full_name of &lt;...
 
 This has been resolved in Django 1.3 - the result in both cases will be ``u'Joe
-Bloggs'``. Although the previous behaviour was not useful for a template language
+Bloggs'``. Although the previous behavior was not useful for a template language
 designed for web designers, and was never deliberately supported, it is possible
 that some templates may be broken by this change.
 

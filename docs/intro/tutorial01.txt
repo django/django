@@ -593,7 +593,7 @@ automatically-generated admin.
     Unicode string, and ``str(p)`` will return a normal string, with characters
     encoded as UTF-8.
 
-    If all of this is jibberish to you, just remember to add
+    If all of this is gibberish to you, just remember to add
     :meth:`~django.db.models.Model.__unicode__` methods to your models. With any
     luck, things should Just Work for you.
 

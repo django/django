@@ -829,7 +829,7 @@ Here's how you'd use this new version of the tag:
 .. admonition:: Variable scope in context
 
     Any variable set in the context will only be available in the same ``block``
-    of the template in which it was assigned. This behaviour is intentional;
+    of the template in which it was assigned. This behavior is intentional;
     it provides a scope for variables so that they don't conflict with
     context in other blocks.
 

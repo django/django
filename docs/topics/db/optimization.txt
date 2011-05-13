@@ -93,13 +93,13 @@ caching.
 Use the ``with`` template tag
 -----------------------------
 
-To make use of the caching behaviour of ``QuerySet``, you may need to use the
+To make use of the caching behavior of ``QuerySet``, you may need to use the
 :ttag:`with` template tag.
 
 Use ``iterator()``
 ------------------
 
-When you have a lot of objects, the caching behaviour of the ``QuerySet`` can
+When you have a lot of objects, the caching behavior of the ``QuerySet`` can
 cause a large amount of memory to be used. In this case,
 :meth:`~django.db.models.QuerySet.iterator()` may help.
 
@@ -252,7 +252,7 @@ individual, use a bulk SQL UPDATE statement, via :ref:`QuerySet.update()
 
 Note, however, that these bulk update methods cannot call the ``save()`` or
 ``delete()`` methods of individual instances, which means that any custom
-behaviour you have added for these methods will not be executed, including
+behavior you have added for these methods will not be executed, including
 anything driven from the normal database object :doc:`signals </ref/signals>`.
 
 Use foreign key values directly

@@ -71,7 +71,7 @@ The new custom command can be called using ``python manage.py closepoll
 <poll_id>``.
 
 The ``handle()`` method takes zero or more ``poll_ids`` and sets ``poll.opened``
-to ``False`` for each one. If the user referenced any nonexistant polls, a
+to ``False`` for each one. If the user referenced any nonexistent polls, a
 :class:`CommandError` is raised. The ``poll.opened`` attribute does not exist
 in the :doc:`tutorial</intro/tutorial01>` and was added to
 ``polls.models.Poll`` for this example.

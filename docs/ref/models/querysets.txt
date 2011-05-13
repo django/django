@@ -1084,7 +1084,7 @@ If you have a field named ``defaults`` and want to use it as an exact lookup in
     Foo.objects.get_or_create(defaults__exact='bar', defaults={'defaults': 'baz'})
 
 
-The ``get_or_create()`` method has similar error behaviour to ``create()``
+The ``get_or_create()`` method has similar error behavior to ``create()``
 when you are using manually specified primary keys. If an object needs to be
 created and the key already exists in the database, an ``IntegrityError`` will
 be raised.

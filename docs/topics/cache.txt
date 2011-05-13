@@ -615,7 +615,7 @@ If :setting:`USE_I18N` is set to ``True`` the per-site middleware cache will
 :ref:`respect the active language<i18n-cache-key>`. For the ``cache`` template
 tag you could use one of the
 :ref:`translation-specific variables<template-translation-vars>` available in
-templates to archieve the same result:
+templates to achieve the same result:
 
 .. code-block:: html+django
 
@@ -843,7 +843,7 @@ keys unaffected. Continuing our previous example::
     # Version 2 isn't available, either
     >>> cache.get('my_key', version=2)
     None
-    # But version 3 *is* availble
+    # But version 3 *is* available
     >>> cache.get('my_key', version=3)
     'hello world!'
 

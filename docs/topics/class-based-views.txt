@@ -72,7 +72,7 @@ so we can just subclass it, and override the template name::
 
 Then, we just need to add this new view into our URLconf. As the class-based
 views themselves are classes, we point the URL to the as_view class method
-instead, which is the entrypoint for class-based views::
+instead, which is the entry point for class-based views::
 
     # urls.py
     from django.conf.urls.defaults import *

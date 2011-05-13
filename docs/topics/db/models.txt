@@ -188,7 +188,7 @@ ones:
 
         ::
 
-            >>> p = Person(name="Fred Flinstone", gender="M")
+            >>> p = Person(name="Fred Flintstone", gender="M")
             >>> p.save()
             >>> p.gender
             u'M'
@@ -791,7 +791,7 @@ There are three styles of inheritance that are possible in Django.
  2. If you're subclassing an existing model (perhaps something from another
     application entirely) and want each model to have its own database table,
     :ref:`multi-table-inheritance` is the way to go.
- 3. Finally, if you only want to modify the Python-level behaviour of a model,
+ 3. Finally, if you only want to modify the Python-level behavior of a model,
     without changing the models fields in any way, you can use
     :ref:`proxy-models`.
 
@@ -1218,7 +1218,7 @@ cannot create another model field called ``author`` in any class that inherits
 from that base class.
 
 Overriding fields in a parent model leads to difficulties in areas such as
-initialising new instances (specifying which field is being initialized in
+initializing new instances (specifying which field is being initialized in
 ``Model.__init__``) and serialization. These are features which normal Python
 class inheritance doesn't have to deal with in quite the same way, so the
 difference between Django model inheritance and Python class inheritance isn't

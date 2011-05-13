@@ -361,6 +361,6 @@ considering aren't valid, we must remember to remove them from the
 ``cleaned_data``.
 
 In fact, Django will currently completely wipe out the ``cleaned_data``
-dictionary if there are any errors in the form. However, this behaviour may
+dictionary if there are any errors in the form. However, this behavior may
 change in the future, so it's not a bad idea to clean up after yourself in the
 first place.
