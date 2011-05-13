@@ -106,7 +106,7 @@ must be able to handle those new arguments.
 Connecting receiver functions
 -----------------------------
 
-There are two ways you can connect a receiever to a signal. You can take the
+There are two ways you can connect a receiver to a signal. You can take the
 manual connect route:
 
 .. code-block:: python

@@ -86,7 +86,7 @@ does all of the work.
 
     .. versionchanged:: 1.4
        Redirects by the middlware are permanent (301 status code) instead of
-       temporary (302) to match behaviour of the
+       temporary (302) to match behavior of the
        :class:`~django.middleware.common.CommonMiddleware`.
 
     If it doesn't find a match, the request continues to be processed as usual.

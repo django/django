@@ -20,7 +20,7 @@ their deprecation, as per the :ref:`Django deprecation policy
 
     * 1.4
         * ``CsrfResponseMiddleware``.  This has been deprecated since the 1.2
-          release, in favour of the template tag method for inserting the CSRF
+          release, in favor of the template tag method for inserting the CSRF
           token.  ``CsrfMiddleware``, which combines ``CsrfResponseMiddleware``
           and ``CsrfViewMiddleware``, is also deprecated.
 
@@ -129,7 +129,7 @@ their deprecation, as per the :ref:`Django deprecation policy
 
         * The undocumented function
           :func:`django.contrib.formtools.utils.security_hash`
-          is deprecated, in favour of :func:`django.contrib.formtools.utils.form_hmac`
+          is deprecated, in favor of :func:`django.contrib.formtools.utils.form_hmac`
 
         * The function-based generic views have been deprecated in
           favor of their class-based cousins. The following modules
@@ -161,7 +161,7 @@ their deprecation, as per the :ref:`Django deprecation policy
           a :class:`~django.contrib.gis.geos.GEOSException` when called
           on a geometry with no SRID value.
 
-        * :class:`~django.http.CompatCookie` will be removed in favour of
+        * :class:`~django.http.CompatCookie` will be removed in favor of
           :class:`~django.http.SimpleCookie`.
 
         * :class:`django.core.context_processors.PermWrapper` and

@@ -283,7 +283,7 @@ Manager functions
         The :attr:`~django.contrib.auth.models.User.username` and
         :attr:`~django.contrib.auth.models.User.password` are set as given. The
         domain portion of :attr:`~django.contrib.auth.models.User.email` is
-        automatically convered to lowercase, and the returned
+        automatically converted to lowercase, and the returned
         :class:`~django.contrib.auth.models.User` object will have
         :attr:`~models.User.is_active` set to ``True``.
 
@@ -1244,7 +1244,7 @@ To create custom permissions for a given model object, use the ``permissions``
 :ref:`model Meta attribute <meta-options>`.
 
 This example Task model creates three custom permissions, i.e., actions users
-can or cannot do with Task instances, specific to your appication::
+can or cannot do with Task instances, specific to your application::
 
     class Task(models.Model):
         ...

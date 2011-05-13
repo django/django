@@ -396,7 +396,7 @@ developers of other reusable apps that want the same guarantees also use the
 Settings
 ========
 
-A number of settings can be used to control Django's CSRF behaviour.
+A number of settings can be used to control Django's CSRF behavior.
 
 CSRF_COOKIE_DOMAIN
 ------------------

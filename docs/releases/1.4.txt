@@ -132,7 +132,7 @@ flatpage. For example, requesting ``/notaflatpageoravalidurl`` in a previous
 version would redirect to ``/notaflatpageoravalidurl/``, which would
 subsequently raise a 404. Requesting ``/notaflatpageoravalidurl`` now will
 immediately raise a 404. Additionally redirects returned by flatpages are now
-permanent (301 status code) to match the behaviour of the
+permanent (301 status code) to match the behavior of the
 :class:`~django.middleware.common.CommonMiddleware`.
 
 `COMMENTS_BANNED_USERS_GROUP` setting
@@ -144,7 +144,7 @@ the feature properly and didn't enforce the exclusion in other parts of the
 app, e.g. the template tags. To fix this problem the code was removed from
 the feed class.
 
-If you rely on the feature and want to restore the old behaviour, simply use
+If you rely on the feature and want to restore the old behavior, simply use
 a custom comment model manager to exclude the user group, e.g.::
 
     from django.conf import settings

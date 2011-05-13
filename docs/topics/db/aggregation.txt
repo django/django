@@ -233,7 +233,7 @@ the first query will provide the total number of all books published by the
 publisher; the second query will only include good books in the annotated
 count. In the first query, the annotation precedes the filter, so the
 filter has no effect on the annotation. In the second query, the filter
-preceeds the annotation, and as a result, the filter constrains the objects
+precedes the annotation, and as a result, the filter constrains the objects
 considered when calculating the annotation.
 
 ``order_by()``

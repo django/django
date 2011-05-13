@@ -44,7 +44,7 @@ setting.
    .. versionadded:: 1.3
 
    Server error emails are sent using the logging framework, so you can
-   customize this behaviour by :doc:`customizing your logging configuration
+   customize this behavior by :doc:`customizing your logging configuration
    </topics/logging>`.
 
 404 errors

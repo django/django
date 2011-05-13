@@ -199,7 +199,7 @@ branch ``django/branches/releases/1.0.X`` was created to receive bug
 fixes, and shortly after the release of Django 1.1 the branch
 ``django/branches/releases/1.1.X`` was created.
 
-Prior to the Django 1.0 release, these branches were maintaind within
+Prior to the Django 1.0 release, these branches were maintained within
 the top-level ``django/branches`` directory, and so the following
 branches exist there and provided support for older Django releases:
 
