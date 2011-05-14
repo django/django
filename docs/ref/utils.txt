@@ -229,12 +229,12 @@ SyndicationFeed
 .. class:: SyndicationFeed
 
     Base class for all syndication feeds. Subclasses should provide write().
-    
+
     .. method:: __init__(title, link, description, [language=None, author_email=None, author_name=None, author_link=None, subtitle=None, categories=None, feed_url=None, feed_copyright=None, feed_guid=None, ttl=None, **kwargs])
 
         Initialize the feed with the given dictionary of metadata, which applies
         to the entire feed.
-        
+
         Any extra keyword arguments you pass to ``__init__`` will be stored in
         ``self.feed``.
 
@@ -491,12 +491,6 @@ For a complete discussion on the usage of the following see the
 
      * ``False`` = left-to-right layout
      * ``True`` = right-to-left layout
-
-.. function:: get_date_formats()
-
-    Checks whether translation files provide a translation for some technical
-    message ID to store date and time formats. If it doesn't contain one, the
-    formats provided in the settings will be used.
 
 .. function:: get_language_from_request(request)
 

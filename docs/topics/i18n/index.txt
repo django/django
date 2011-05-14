@@ -88,26 +88,3 @@ way Django does translation:
       that those are as small as possible.
     * Django doesn't use ``xgettext`` alone. It uses Python wrappers around
       ``xgettext`` and ``msgfmt``. This is mostly for convenience.
-
-.. _technical-messages:
-
-Django technical message IDs
-----------------------------
-
-.. versionchanged:: 1.2
-    Starting with Django 1.2, technical message IDs are being replaced by :ref:`format-localization`
-
-Django uses technical message IDs to translate date formats and time formats.
-Technical message IDs are :term:`translation strings <translation string>` and
-can be easily recognized; they're all upper case. You don't translate the
-message ID as with other translation strings, you provide the correct local
-variant on the provided English value. The format is identical to the format
-strings used by the ``now`` template tag.
-
-For example, with ``DATETIME_FORMAT`` (or ``DATE_FORMAT`` or ``TIME_FORMAT``),
-this would be the format string that you want to use in your language. A Django
-contributor localizing it to Spanish probably would provide a ``"j N Y P"``
-"translation" for it in the relevant ``django.po`` file::
-
-    msgid "DATETIME_FORMAT"
-    msgstr "j N Y P"
