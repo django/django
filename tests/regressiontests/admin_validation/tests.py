@@ -201,7 +201,7 @@ class ValidationTestCase(TestCase):
             validate,
             BookAdmin, Book)
 
-    def test_cannon_include_through(self):
+    def test_cannot_include_through(self):
         class FieldsetBookAdmin(admin.ModelAdmin):
             fieldsets = (
                 ('Header 1', {'fields': ('name',)}),
@@ -211,6 +211,11 @@ class ValidationTestCase(TestCase):
             "'FieldsetBookAdmin.fieldsets[1][1]['fields']' can't include the ManyToManyField field 'authors' because 'authors' manually specifies a 'through' model.",
             validate,
             FieldsetBookAdmin, Book)
+
+    def test_nested_fields(self):
+        class NestedFieldsAdmin(admin.ModelAdmin):
+           fields = ('price', ('name', 'subtitle'))
+        validate(NestedFieldsAdmin, Book)
 
     def test_nested_fieldsets(self):
         class NestedFieldsetAdmin(admin.ModelAdmin):

@@ -222,6 +222,40 @@ def validate_inline(cls, parent, parent_model):
     if hasattr(cls, "readonly_fields"):
         check_readonly_fields(cls, cls.model, cls.model._meta)
 
+def validate_fields_spec(cls, model, opts, flds, label):
+    """
+    Validate the fields specification in `flds` from a ModelAdmin subclass
+    `cls` for the `model` model. `opts` is `model`'s Meta inner class.
+    Use `label` for reporting problems to the user.
+
+    The fields specification can be a ``fields`` option or a ``fields``
+    sub-option from a ``fieldsets`` option component.
+    """
+    for fields in flds:
+        # The entry in fields might be a tuple. If it is a standalone
+        # field, make it into a tuple to make processing easier.
+        if type(fields) != tuple:
+            fields = (fields,)
+        for field in fields:
+            if field in cls.readonly_fields:
+                # Stuff can be put in fields that isn't actually a
+                # model field if it's in readonly_fields,
+                # readonly_fields will handle the validation of such
+                # things.
+                continue
+            check_formfield(cls, model, opts, label, field)
+            try:
+                f = opts.get_field(field)
+            except models.FieldDoesNotExist:
+                # If we can't find a field on the model that matches,
+                # it could be an extra field on the form.
+                pass
+            if isinstance(f, models.ManyToManyField) and not f.rel.through._meta.auto_created:
+                raise ImproperlyConfigured("'%s.%s' "
+                    "can't include the ManyToManyField field '%s' because "
+                    "'%s' manually specifies a 'through' model." % (
+                        cls.__name__, label, field, field))
+
 def validate_base(cls, model):
     opts = model._meta
 
@@ -238,23 +272,7 @@ def validate_base(cls, model):
     # fields
     if cls.fields: # default value is None
         check_isseq(cls, 'fields', cls.fields)
-        for field in cls.fields:
-            if field in cls.readonly_fields:
-                # Stuff can be put in fields that isn't actually a model field
-                # if it's in readonly_fields, readonly_fields will handle the
-                # validation of such things.
-                continue
-            check_formfield(cls, model, opts, 'fields', field)
-            try:
-                f = opts.get_field(field)
-            except models.FieldDoesNotExist:
-                # If we can't find a field on the model that matches,
-                # it could be an extra field on the form.
-                continue
-            if isinstance(f, models.ManyToManyField) and not f.rel.through._meta.auto_created:
-                raise ImproperlyConfigured("'%s.fields' can't include the ManyToManyField "
-                    "field '%s' because '%s' manually specifies "
-                    "a 'through' model." % (cls.__name__, field, field))
+        validate_fields_spec(cls, model, opts, cls.fields, 'fields')
         if cls.fieldsets:
             raise ImproperlyConfigured('Both fieldsets and fields are specified in %s.' % cls.__name__)
         if len(cls.fields) > len(set(cls.fields)):
@@ -273,30 +291,7 @@ def validate_base(cls, model):
                 raise ImproperlyConfigured("'fields' key is required in "
                         "%s.fieldsets[%d][1] field options dict."
                         % (cls.__name__, idx))
-            for fields in fieldset[1]['fields']:
-                # The entry in fields might be a tuple. If it is a standalone
-                # field, make it into a tuple to make processing easier.
-                if type(fields) != tuple:
-                    fields = (fields,)
-                for field in fields:
-                    if field in cls.readonly_fields:
-                        # Stuff can be put in fields that isn't actually a
-                        # model field if it's in readonly_fields,
-                        # readonly_fields will handle the validation of such
-                        # things.
-                        continue
-                    check_formfield(cls, model, opts, "fieldsets[%d][1]['fields']" % idx, field)
-                    try:
-                        f = opts.get_field(field)
-                        if isinstance(f, models.ManyToManyField) and not f.rel.through._meta.auto_created:
-                            raise ImproperlyConfigured("'%s.fieldsets[%d][1]['fields']' "
-                                "can't include the ManyToManyField field '%s' because "
-                                "'%s' manually specifies a 'through' model." % (
-                                    cls.__name__, idx, field, field))
-                    except models.FieldDoesNotExist:
-                        # If we can't find a field on the model that matches,
-                        # it could be an extra field on the form.
-                        pass
+            validate_fields_spec(cls, model, opts, fieldset[1]['fields'], "fieldsets[%d][1]['fields']" % idx)
         flattened_fieldsets = flatten_fieldsets(cls.fieldsets)
         if len(flattened_fieldsets) > len(set(flattened_fieldsets)):
             raise ImproperlyConfigured('There are duplicate field(s) in %s.fieldsets' % cls.__name__)

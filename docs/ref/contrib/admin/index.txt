@@ -160,27 +160,45 @@ subclass::
 
 .. attribute:: ModelAdmin.fields
 
-    Use this option as an alternative to ``fieldsets`` if the layout does not
-    matter and if you want to only show a subset of the available fields in the
-    form. For example, you could define a simpler version of the admin form for
-    the ``django.contrib.flatpages.FlatPage`` model as follows::
+    If you need to achieve simple changes in the layout of fields in the forms
+    of the "add" and "change" pages like only showing a subset of the available
+    fields, modifying their order or grouping them in rows you can use the
+    ``fields`` option (for more complex layout needs see the
+    :attr:`~ModelAdmin.fieldsets` option described in the next section). For
+    example, you could define a simpler version of the admin form for the
+    ``django.contrib.flatpages.FlatPage`` model as follows::
 
         class FlatPageAdmin(admin.ModelAdmin):
             fields = ('url', 'title', 'content')
 
-    In the above example, only the fields 'url', 'title' and 'content' will be
-    displayed, sequentially, in the form.
+    In the above example, only the fields ``url``, ``title`` and ``content``
+    will be displayed, sequentially, in the form.
 
     .. versionadded:: 1.2
 
     ``fields`` can contain values defined in :attr:`ModelAdmin.readonly_fields`
     to be displayed as read-only.
 
+    .. versionadded:: 1.4
+
+    To display multiple fields on the same line, wrap those fields in their own
+    tuple. In this example, the ``url`` and ``title`` fields will display on the
+    same line and the ``content`` field will be displayed below them in its
+    own line::
+
+        class FlatPageAdmin(admin.ModelAdmin):
+            fields = (('url', 'title'), 'content')
+
     .. admonition:: Note
 
         This ``fields`` option should not be confused with the ``fields``
-        dictionary key that is within the ``fieldsets`` option, as described in
-        the previous section.
+        dictionary key that is within the :attr:`~ModelAdmin.fieldsets` option,
+        as described in the next section.
+
+    If neither ``fields`` nor :attr:`~ModelAdmin.fieldsets` options are present,
+    Django will default to displaying each field that isn't an ``AutoField`` and
+    has ``editable=True``, in a single fieldset, in the same order as the fields
+    are defined in the model.
 
 .. attribute:: ModelAdmin.fieldsets
 
@@ -213,9 +231,10 @@ subclass::
 
         .. image:: _images/flatfiles_admin.png
 
-    If ``fieldsets`` isn't given, Django will default to displaying each field
-    that isn't an ``AutoField`` and has ``editable=True``, in a single
-    fieldset, in the same order as the fields are defined in the model.
+    If neither ``fieldsets`` nor :attr:`~ModelAdmin.fields` options are present,
+    Django will default to displaying each field that isn't an ``AutoField`` and
+    has ``editable=True``, in a single fieldset, in the same order as the fields
+    are defined in the model.
 
     The ``field_options`` dictionary can have the following keys:
 
@@ -229,9 +248,10 @@ subclass::
                 'fields': ('first_name', 'last_name', 'address', 'city', 'state'),
                 }
 
-            To display multiple fields on the same line, wrap those fields in
-            their own tuple. In this example, the ``first_name`` and
-            ``last_name`` fields will display on the same line::
+            Just like with the :attr:`~ModelAdmin.fields` option, to display
+            multiple fields on the same line, wrap those fields in their own
+            tuple. In this example, the ``first_name`` and ``last_name`` fields
+            will display on the same line::
 
                 {
                 'fields': (('first_name', 'last_name'), 'address', 'city', 'state'),
