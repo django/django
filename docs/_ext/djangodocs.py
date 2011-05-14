@@ -127,6 +127,7 @@ class DjangoHTMLTranslator(SmartyPantsHTMLTranslator):
 
     # Don't use border=1, which docutils does by default.
     def visit_table(self, node):
+        self._table_row_index = 0 # Needed by Sphinx
         self.body.append(self.starttag(node, 'table', CLASS='docutils'))
 
     # <big>? Really?
