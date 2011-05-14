@@ -139,19 +139,18 @@ permanent (301 status code) to match the behavior of the
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Django's :doc:`comments app </ref/contrib/comments/index>` has historically
-supported excluding the comments of a special user group but never documented
-the feature properly and didn't enforce the exclusion in other parts of the
-app, e.g. the template tags. To fix this problem the code was removed from
-the feed class.
+supported excluding the comments of a special user group, but we've never
+documented the feature properly and didn't enforce the exclusion in other parts
+of the app, e.g., the template tags. To fix this problem, we removed the code
+from the feed class.
 
 If you rely on the feature and want to restore the old behavior, simply use
-a custom comment model manager to exclude the user group, e.g.::
+a custom comment model manager to exclude the user group, like this::
 
     from django.conf import settings
     from django.contrib.comments.managers import CommentManager
 
     class BanningCommentManager(CommentManager):
-
         def get_query_set(self):
             qs = super(BanningCommentManager, self).get_query_set()
             if getattr(settings, 'COMMENTS_BANNED_USERS_GROUP', None):
@@ -174,7 +173,7 @@ Save this model manager in your custom comment app (e.g. in
 
         objects = BanningCommentManager()
 
-For more details see the docs about
+For more details, see the documentation about
 :doc:`customizing the comments framework </ref/contrib/comments/custom>`.
 
 `IGNORABLE_404_STARTS` and `IGNORABLE_404_ENDS` settings
