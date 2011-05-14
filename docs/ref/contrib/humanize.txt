@@ -102,9 +102,9 @@ naturaltime
 
 .. versionadded:: 1.4
 
-For date and time values shows how many seconds, minutes or hours ago compared
-to current timestamp returns representing string. Otherwise, it behaves like
-:tfilter:`naturaldate`, so it can also take string argument for date formating.
+For datetime values, returns a string representing how many seconds,
+minutes or hours ago it was -- falling back to a longer date format if the
+value is more than a day old.
 
 **Argument:** Date formatting string as described in the :tfilter:`date` tag.
 
