@@ -553,7 +553,10 @@ class Query(object):
         columns = set()
         orig_opts = self.model._meta
         seen = {}
-        must_include = {self.model: set([orig_opts.pk])}
+        if orig_opts.proxy:
+            must_include = {orig_opts.proxy_for_model: set([orig_opts.pk])}
+        else:
+            must_include = {self.model: set([orig_opts.pk])}
         for field_name in field_names:
             parts = field_name.split(LOOKUP_SEP)
             cur_model = self.model

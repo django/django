@@ -34,3 +34,7 @@ class Leaf(models.Model):
 class ResolveThis(models.Model):
     num = models.FloatField()
     name = models.CharField(max_length=16)
+
+class Proxy(Item):
+    class Meta:
+        proxy = True

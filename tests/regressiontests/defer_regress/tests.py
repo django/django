@@ -7,7 +7,7 @@ from django.db import connection
 from django.db.models.loading import cache
 from django.test import TestCase
 
-from models import ResolveThis, Item, RelatedItem, Child, Leaf
+from models import ResolveThis, Item, RelatedItem, Child, Leaf, Proxy
 
 
 class DeferRegressionTest(TestCase):
@@ -111,6 +111,7 @@ class DeferRegressionTest(TestCase):
                 Child,
                 Item,
                 Leaf,
+                Proxy,
                 RelatedItem,
                 ResolveThis,
             ]
@@ -139,12 +140,28 @@ class DeferRegressionTest(TestCase):
                 "Leaf_Deferred_name_value",
                 "Leaf_Deferred_second_child_value",
                 "Leaf_Deferred_value",
+                "Proxy",
                 "RelatedItem",
                 "RelatedItem_Deferred_",
                 "RelatedItem_Deferred_item_id",
                 "ResolveThis",
             ]
         )
+
+    def test_only_and_defer_usage_on_proxy_models(self):
+        # Regression for #15790 - only() broken for proxy models
+        proxy = Proxy.objects.create(name="proxy", value=42)
+
+        msg = 'QuerySet.only() return bogus results with proxy models'
+        dp = Proxy.objects.only('other_value').get(pk=proxy.pk)
+        self.assertEqual(dp.name, proxy.name, msg=msg)
+        self.assertEqual(dp.value, proxy.value, msg=msg)
+
+        # also test things with .defer()
+        msg = 'QuerySet.defer() return bogus results with proxy models'
+        dp = Proxy.objects.defer('name', 'text', 'value').get(pk=proxy.pk)
+        self.assertEqual(dp.name, proxy.name, msg=msg)
+        self.assertEqual(dp.value, proxy.value, msg=msg)
 
     def test_resolve_columns(self):
         rt = ResolveThis.objects.create(num=5.0, name='Foobar')
