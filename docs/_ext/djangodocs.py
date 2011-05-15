@@ -134,6 +134,7 @@ class DjangoHTMLTranslator(SmartyPantsHTMLTranslator):
     def visit_desc_parameterlist(self, node):
         self.body.append('(')
         self.first_param = 1
+        self.param_separator = node.child_text_separator
 
     def depart_desc_parameterlist(self, node):
         self.body.append(')')
