@@ -308,3 +308,28 @@ Advanced ``FormWizard`` methods
 
         def process_step(self, request, form, step):
             # ...
+
+Providing initial data for the forms
+====================================
+
+.. attribute:: FormWizard.initial
+
+    Initial data for a wizard's :class:`~django.forms.Form` objects can be
+    provided using the optional :attr:`~FormWizard.initial` keyword argument.
+    This argument should be a dictionary mapping a step to a dictionary
+    containing the initial data for that step. The dictionary of initial data
+    will be passed along to the constructor of the step's
+    :class:`~django.forms.Form`::
+
+        >>> from testapp.forms import ContactForm1, ContactForm2, ContactWizard
+        >>> initial = {
+        ...     0: {'subject': 'Hello', 'sender': 'user@example.com'},
+        ...     1: {'message': 'Hi there!'}
+        ... }
+        >>> wiz = ContactWizard([ContactForm1, ContactForm2], initial=initial)
+        >>> form1 = wiz.get_form(0)
+        >>> form2 = wiz.get_form(1)
+        >>> form1.initial
+        {'sender': 'user@example.com', 'subject': 'Hello'}
+        >>> form2.initial
+        {'message': 'Hi there!'}
