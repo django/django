@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-05-07 21:53+0200\n"
+"POT-Creation-Date: 2011-05-16 17:30+0200\n"
 "PO-Revision-Date: 2010-05-13 15:35+0200\n"
 "Last-Translator: Django team\n"
 "Language-Team: English <en@li.org>\n"
@@ -12,133 +12,166 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: templatetags/humanize.py:21
+#: templatetags/humanize.py:25
 msgid "th"
 msgstr ""
 
-#: templatetags/humanize.py:21
+#: templatetags/humanize.py:25
 msgid "st"
 msgstr ""
 
-#: templatetags/humanize.py:21
+#: templatetags/humanize.py:25
 msgid "nd"
 msgstr ""
 
-#: templatetags/humanize.py:21
+#: templatetags/humanize.py:25
 msgid "rd"
 msgstr ""
 
-#: templatetags/humanize.py:74
+#: templatetags/humanize.py:78
 #, python-format
 msgid "%(value).1f million"
 msgid_plural "%(value).1f million"
 msgstr[0] ""
 msgstr[1] ""
 
-#: templatetags/humanize.py:75
+#: templatetags/humanize.py:79
 #, python-format
 msgid "%(value)s million"
 msgid_plural "%(value)s million"
 msgstr[0] ""
 msgstr[1] ""
 
-#: templatetags/humanize.py:80
+#: templatetags/humanize.py:84
 #, python-format
 msgid "%(value).1f billion"
 msgid_plural "%(value).1f billion"
 msgstr[0] ""
 msgstr[1] ""
 
-#: templatetags/humanize.py:81
+#: templatetags/humanize.py:85
 #, python-format
 msgid "%(value)s billion"
 msgid_plural "%(value)s billion"
 msgstr[0] ""
 msgstr[1] ""
 
-#: templatetags/humanize.py:86
+#: templatetags/humanize.py:90
 #, python-format
 msgid "%(value).1f trillion"
 msgid_plural "%(value).1f trillion"
 msgstr[0] ""
 msgstr[1] ""
 
-#: templatetags/humanize.py:87
+#: templatetags/humanize.py:91
 #, python-format
 msgid "%(value)s trillion"
 msgid_plural "%(value)s trillion"
 msgstr[0] ""
 msgstr[1] ""
 
-#: templatetags/humanize.py:104
+#: templatetags/humanize.py:108
 msgid "one"
 msgstr ""
 
-#: templatetags/humanize.py:104
+#: templatetags/humanize.py:108
 msgid "two"
 msgstr ""
 
-#: templatetags/humanize.py:104
+#: templatetags/humanize.py:108
 msgid "three"
 msgstr ""
 
-#: templatetags/humanize.py:104
+#: templatetags/humanize.py:108
 msgid "four"
 msgstr ""
 
-#: templatetags/humanize.py:104
+#: templatetags/humanize.py:108
 msgid "five"
 msgstr ""
 
-#: templatetags/humanize.py:104
+#: templatetags/humanize.py:108
 msgid "six"
 msgstr ""
 
-#: templatetags/humanize.py:104
+#: templatetags/humanize.py:108
 msgid "seven"
 msgstr ""
 
-#: templatetags/humanize.py:104
+#: templatetags/humanize.py:108
 msgid "eight"
 msgstr ""
 
-#: templatetags/humanize.py:104
+#: templatetags/humanize.py:108
 msgid "nine"
 msgstr ""
 
-#: templatetags/humanize.py:127
+#: templatetags/humanize.py:131
 msgid "today"
 msgstr ""
 
-#: templatetags/humanize.py:129
+#: templatetags/humanize.py:133
 msgid "tomorrow"
 msgstr ""
 
-#: templatetags/humanize.py:131
+#: templatetags/humanize.py:135
 msgid "yesterday"
 msgstr ""
 
-#: templatetags/humanize.py:153
+#: templatetags/humanize.py:160
+#, python-format
+msgctxt "naturaltime"
+msgid "%(delta)s ago"
+msgstr ""
+
+#: templatetags/humanize.py:163 templatetags/humanize.py:185
 msgid "now"
 msgstr ""
 
-#: templatetags/humanize.py:155
+#: templatetags/humanize.py:166
 #, python-format
-msgid "%s seconds ago"
-msgid_plural "%s seconds ago"
+msgid "a second ago"
+msgid_plural "%(count)s seconds ago"
 msgstr[0] ""
 msgstr[1] ""
 
-#: templatetags/humanize.py:157
+#: templatetags/humanize.py:171
 #, python-format
 msgid "a minute ago"
-msgid_plural "%s minutes ago"
+msgid_plural "%(count)s minutes ago"
 msgstr[0] ""
 msgstr[1] ""
 
-#: templatetags/humanize.py:159
+#: templatetags/humanize.py:176
 #, python-format
 msgid "an hour ago"
-msgid_plural "%s hours ago"
+msgid_plural "%(count)s hours ago"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templatetags/humanize.py:182
+#, python-format
+msgctxt "naturaltime"
+msgid "%(delta)s from now"
+msgstr ""
+
+#: templatetags/humanize.py:188
+#, python-format
+msgid "a second from now"
+msgid_plural "%(count)s seconds from now"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templatetags/humanize.py:193
+#, python-format
+msgid "a minute from now"
+msgid_plural "%(count)s minutes from now"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templatetags/humanize.py:198
+#, python-format
+msgid "an hour from now"
+msgid_plural "%(count)s hours from now"
 msgstr[0] ""
 msgstr[1] ""

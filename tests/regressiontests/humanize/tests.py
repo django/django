@@ -89,31 +89,6 @@ class HumanizeTests(TestCase):
                        someday_result, u"I'm not a date value", None)
         self.humanize_tester(test_list, result_list, 'naturalday')
 
-    def test_naturaltime(self):
-        from django.template import defaultfilters
-        now = datetime.now()
-        seconds_ago = now - timedelta(seconds=30)
-        a_minute_ago = now - timedelta(minutes=1, seconds=30)
-        minutes_ago = now - timedelta(minutes=2)
-        an_hour_ago = now - timedelta(hours=1, minutes=30, seconds=30)
-        hours_ago = now - timedelta(hours=23, minutes=50, seconds=50)
-
-        test_list = (now, a_minute_ago, an_hour_ago)
-        result_list = (_(u'now'), _(u'a minute ago'), _(u'an hour ago'))
-        self.humanize_tester(test_list, result_list, 'naturaltime')
-
-        t = Template('{{ seconds_ago|%s }}' % 'naturaltime')
-        rendered = t.render(Context(locals())).strip()
-        self.assertTrue(u' seconds ago' in rendered)
-
-        t = Template('{{ minutes_ago|%s }}' % 'naturaltime')
-        rendered = t.render(Context(locals())).strip()
-        self.assertTrue(u' minutes ago' in rendered)
-
-        t = Template('{{ hours_ago|%s }}' % 'naturaltime')
-        rendered = t.render(Context(locals())).strip()
-        self.assertTrue(u' hours ago' in rendered)
-
     def test_naturalday_tz(self):
         from django.contrib.humanize.templatetags.humanize import naturalday
 
@@ -130,3 +105,45 @@ class HumanizeTests(TestCase):
 
         # As 24h of difference they will never be the same
         self.assertNotEqual(naturalday_one, naturalday_two)
+
+    def test_naturaltime(self):
+        now = datetime.now()
+        test_list = [
+            now,
+            now - timedelta(seconds=1),
+            now - timedelta(seconds=30),
+            now - timedelta(minutes=1, seconds=30),
+            now - timedelta(minutes=2),
+            now - timedelta(hours=1, minutes=30, seconds=30),
+            now - timedelta(hours=23, minutes=50, seconds=50),
+            now - timedelta(days=1),
+            now - timedelta(days=500),
+            now + timedelta(seconds=1),
+            now + timedelta(seconds=30),
+            now + timedelta(minutes=1, seconds=30),
+            now + timedelta(minutes=2),
+            now + timedelta(hours=1, minutes=30, seconds=30),
+            now + timedelta(hours=23, minutes=50, seconds=50),
+            now + timedelta(days=1),
+            now + timedelta(days=500),
+        ]
+        result_list = [
+            'now',
+            'a second ago',
+            '30 seconds ago',
+            'a minute ago',
+            '2 minutes ago',
+            'an hour ago',
+            '23 hours ago',
+            '1 day ago',
+            '1 year, 4 months ago',
+            'a second from now',
+            '30 seconds from now',
+            'a minute from now',
+            '2 minutes from now',
+            'an hour from now',
+            '23 hours from now',
+            '1 day from now',
+            '1 year, 4 months from now',
+        ]
+        self.humanize_tester(test_list, result_list, 'naturaltime')
