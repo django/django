@@ -1,3 +1,4 @@
+from django import forms
 from django.contrib.contenttypes.generic import generic_inlineformset_factory
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
@@ -221,3 +222,23 @@ class GenericRelationsTests(TestCase):
         formset = GenericFormSet(instance=lion, prefix='x')
         self.assertEqual(u''.join(form.as_p() for form in formset.forms), u"""<p><label for="id_x-0-tag">Tag:</label> <input id="id_x-0-tag" type="text" name="x-0-tag" maxlength="50" /></p>
 <p><label for="id_x-0-DELETE">Delete:</label> <input type="checkbox" name="x-0-DELETE" id="id_x-0-DELETE" /><input type="hidden" name="x-0-id" id="id_x-0-id" /></p>""")
+
+
+class CustomWidget(forms.CharField):
+    pass
+
+class TaggedItemForm(forms.ModelForm):
+    class Meta:
+        model = TaggedItem
+        widgets = {'tag': CustomWidget}
+
+class GenericInlineFormsetTest(TestCase):
+    """
+    Regression for #14572: Using base forms with widgets
+    defined in Meta should not raise errors.
+    """
+
+    def test_generic_inlineformset_factory(self):
+        Formset = generic_inlineformset_factory(TaggedItem, TaggedItemForm)
+        form = Formset().forms[0]
+        self.assertTrue(isinstance(form['tag'].field.widget, CustomWidget))

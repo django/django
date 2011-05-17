@@ -362,7 +362,7 @@ def generic_inlineformset_factory(model, form=ModelForm,
                                   fields=None, exclude=None,
                                   extra=3, can_order=False, can_delete=True,
                                   max_num=None,
-                                  formfield_callback=lambda f: f.formfield()):
+                                  formfield_callback=None):
     """
     Returns an ``GenericInlineFormSet`` for the given kwargs.
 
