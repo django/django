@@ -89,7 +89,7 @@ This example is equivalent to::
 ``render_to_response``
 ======================
 
-.. function:: render_to_response(template[, dictionary][, context_instance][, mimetype])
+.. function:: render_to_response(template_name[, dictionary][, context_instance][, mimetype])
 
    Renders a given template with a given context dictionary and returns an
    :class:`~django.http.HttpResponse` object with that rendered text.
@@ -97,7 +97,7 @@ This example is equivalent to::
 Required arguments
 ------------------
 
-``template``
+``template_name``
     The full name of a template to use or sequence of template names. If a
     sequence is given, the first template that exists will be used. See the
     :ref:`template loader documentation <ref-templates-api-the-python-api>`
