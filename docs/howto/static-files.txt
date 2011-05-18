@@ -34,85 +34,91 @@ single location that can easily be served in production.
 Using ``django.contrib.staticfiles``
 ====================================
 
-Here's the basic usage in a nutshell:
+Basic usage
+-----------
 
-    1. Put your static files somewhere that ``staticfiles`` will find them.
+1. Put your static files somewhere that ``staticfiles`` will find them.
 
-       By default, this means within ``static/`` subdirectories of apps in your
-       :setting:`INSTALLED_APPS`.
+   By default, this means within ``static/`` subdirectories of apps in your
+   :setting:`INSTALLED_APPS`.
 
-       Many projects will also have static assets that aren't tied to a
-       particular app; you can give ``staticfiles`` additional directories to
-       search via the :setting:`STATICFILES_DIRS` setting .
+   Your project will probably also have static assets that aren't tied to a
+   particular app. The :setting:`STATICFILES_DIRS` setting is a tuple of
+   filesystem directories to check when loading static files. It's a search
+   path that is by default empty. See the :setting:`STATICFILES_DIRS` docs
+   how to extend this list of additional paths.
 
-       See the documentation for the :setting:`STATICFILES_FINDERS` setting for
-       details on how ``staticfiles`` finds your files.
+   Additionally, see the documentation for the :setting:`STATICFILES_FINDERS`
+   setting for details on how ``staticfiles`` finds your files.
 
-    2. Set the :setting:`STATIC_URL` setting to the URL you want to use
-       for pointing to your static files, e.g.::
+2. Make sure that ``django.contrib.staticfiles`` is included in your
+   :setting:`INSTALLED_APPS`.
 
-           STATIC_URL = '/static/'
+   For :ref:`local development<staticfiles-development>`, if you are using
+   :ref:`runserver<staticfiles-runserver>` or adding
+   :ref:`staticfiles_urlpatterns<staticfiles-development>` to your
+   URLconf, you're done with the setup -- your static files will
+   automatically be served at the default (for
+   :djadmin:`newly created<startproject>` projects) :setting:`STATIC_URL`
+   of ``/static/``.
 
-       In projects freshly created with the :djadmin:`startproject`
-       management command this will be preset to ``'/static/'``.
+3. You'll probably need to refer to these files in your templates. The
+   easiest method is to use the included context processor which allows
+   template code like:
 
-    3. Make sure that ``django.contrib.staticfiles`` is in your
-       :setting:`INSTALLED_APPS`.
+   .. code-block:: html+django
 
-       For :ref:`local development<staticfiles-development>`, if you are using
-       :ref:`runserver<staticfiles-runserver>` or adding
-       :ref:`staticfiles_urlpatterns<staticfiles-development>` to your URLconf,
-       you're done! Your static files will automatically be served at the
-       :setting:`STATIC_URL` you specified in step 2.
+       <img src="{{ STATIC_URL }}images/hi.jpg />
 
-    4. You'll probably need to refer to these files in your templates. The
-       easiest method is to use the included context processor which will allow
-       template code like:
+   See :ref:`staticfiles-in-templates` for more details, including an
+   alternate method using a template tag.
 
-          .. code-block:: html+django
-
-               <img src="{{ STATIC_URL }}images/hi.jpg />
-
-       See :ref:`staticfiles-in-templates` for more details, including an
-       alternate method (using a template tag).
+Deploying static files in a nutshell
+------------------------------------
 
 When you're ready to move out of local development and deploy your project:
 
-    1. Set the :setting:`STATIC_ROOT` setting to point to where you'd like your
-       static files collected to when you use the :djadmin:`collectstatic`
-       management command. For example::
+1. Set the :setting:`STATIC_URL` setting to the public URL for your static
+   files (in most cases, the default value of ``/static/`` is just fine).
 
-            STATIC_ROOT = "/home/jacob/projects/mysite.com/sitestatic"
+2. Set the :setting:`STATIC_ROOT` setting to point to the filesystem path
+   you'd like your static files collected to when you use the
+   :djadmin:`collectstatic` management command. For example::
 
-    2. Run the :djadmin:`collectstatic` management command::
+       STATIC_ROOT = "/home/jacob/projects/mysite.com/sitestatic"
 
-            ./manage.py collectstatic
+3. Run the :djadmin:`collectstatic` management command::
 
-       This'll churn through your static file storage and copy them into the
-       directory given by :setting:`STATIC_ROOT`.
+       ./manage.py collectstatic
 
-    3. Deploy those files by configuring your webserver of choice to serve the
-       files in :setting:`STATIC_ROOT` at :setting:`STATIC_URL`.
+   This'll churn through your static file storage and copy them into the
+   directory given by :setting:`STATIC_ROOT`.
 
-       :ref:`staticfiles-production` covers some common deployment strategies
-       for static files.
+4. Deploy those files by configuring your webserver of choice to serve the
+   files in :setting:`STATIC_ROOT` at :setting:`STATIC_URL`.
 
-Those are the basics. For more details on common configuration options, read on;
-for a detailed reference of the settings, commands, and other bits included with
-the framework see :doc:`the staticfiles reference </ref/contrib/staticfiles>`.
+   :ref:`staticfiles-production` covers some common deployment strategies
+   for static files.
+
+Those are the **basics**. For more details on common configuration options,
+read on; for a detailed reference of the settings, commands, and other bits
+included with the framework see
+:doc:`the staticfiles reference </ref/contrib/staticfiles>`.
 
 .. note::
 
    In previous versions of Django, it was common to place static assets in
-   :setting:`MEDIA_ROOT` along with user-uploaded files, and serve them both at
-   :setting:`MEDIA_URL`. Part of the purpose of introducing the ``staticfiles``
-   app is to make it easier to keep static files separate from user-uploaded
-   files. For this reason, you need to make your :setting:`MEDIA_ROOT` and
+   :setting:`MEDIA_ROOT` along with user-uploaded files, and serve them both
+   at :setting:`MEDIA_URL`. Part of the purpose of introducing the
+   ``staticfiles`` app is to make it easier to keep static files separate
+   from user-uploaded files.
+
+   For this reason, you need to make your :setting:`MEDIA_ROOT` and
    :setting:`MEDIA_URL` different from your :setting:`STATIC_ROOT` and
    :setting:`STATIC_URL`. You will need to arrange for serving of files in
    :setting:`MEDIA_ROOT` yourself; ``staticfiles`` does not deal with
    user-uploaded files at all. You can, however, use
-   :func:`~django.views.static.serve` view for serving :setting:`MEDIA_ROOT`
+   :func:`django.views.static.serve` view for serving :setting:`MEDIA_ROOT`
    in development; see :ref:`staticfiles-other-directories`.
 
 .. _staticfiles-in-templates:
@@ -303,7 +309,7 @@ development::
 
 .. note::
 
-    The helper function will only be operational in debug mode and if
+    This helper function will only be operational in debug mode and if
     the given prefix is local (e.g. ``/static/``) and not a URL (e.g.
     ``http://static.example.com/``).
 

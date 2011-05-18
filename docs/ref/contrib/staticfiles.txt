@@ -296,7 +296,7 @@ primary URL configuration::
            url(r'^static/(?P<path>.*)$', 'serve'),
        )
 
-Note, the begin of the pattern (``r'^static/'``) should be your
+Note, the beginning of the pattern (``r'^static/'``) should be your
 :setting:`STATIC_URL` setting.
 
 Since this is a bit finicky, there's also a helper function that'll do this for you:
