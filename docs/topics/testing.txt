@@ -1385,7 +1385,7 @@ this use case Django provides a standard `Python context manager`_
             response = self.client.get('/sekrit/')
             self.assertRedirects(response, '/accounts/login/?next=/sekrit/')
 
-            # Then override the LOGING_URL setting
+            # Then override the LOGIN_URL setting
             with self.settings(LOGIN_URL='/other/login/'):
                 response = self.client.get('/sekrit/')
                 self.assertRedirects(response, '/other/login/?next=/sekrit/')
@@ -1438,10 +1438,10 @@ decorate the class::
 .. note::
 
     When overriding settings make sure to also handle the cases in which
-    Django or your app's code use a cache or another feature that retain
+    Django or your app's code uses a cache or similar feature that retains
     state even if the setting is changed. Django provides the
     :data:`django.test.signals.setting_changed` signal to connect cleanup
-    and other state resetting callbacks to.
+    and other state-resetting callbacks to.
 
 .. _`Python context manager`: http://www.python.org/dev/peps/pep-0343/
 .. _`decorator`: http://www.python.org/dev/peps/pep-0318/
