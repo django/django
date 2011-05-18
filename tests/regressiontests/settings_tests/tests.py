@@ -1,7 +1,22 @@
 from __future__ import with_statement
-import os
+import os, sys
 from django.conf import settings, global_settings
-from django.test import TestCase
+from django.test import TestCase, signals
+from django.test.utils import override_settings
+from django.utils.unittest import skipIf
+
+
+class SettingGetter(object):
+    def __init__(self):
+        self.test = getattr(settings, 'TEST', 'undefined')
+
+testvalue = None
+
+def signal_callback(sender, setting, value, **kwargs):
+    global testvalue
+    testvalue = value
+
+signals.setting_changed.connect(signal_callback, sender='TEST')
 
 class SettingsTests(TestCase):
 
@@ -28,6 +43,43 @@ class SettingsTests(TestCase):
             self.assertEqual('override', settings.TEST)
             settings.TEST = 'test'
         self.assertRaises(AttributeError, getattr, settings, 'TEST')
+
+    @override_settings(TEST='override')
+    def test_decorator(self):
+        self.assertEqual('override', settings.TEST)
+
+    def test_context_manager(self):
+        self.assertRaises(AttributeError, getattr, settings, 'TEST')
+        override = override_settings(TEST='override')
+        self.assertRaises(AttributeError, getattr, settings, 'TEST')
+        override.enable()
+        self.assertEqual('override', settings.TEST)
+        override.disable()
+        self.assertRaises(AttributeError, getattr, settings, 'TEST')
+
+    def test_class_decorator(self):
+        self.assertEqual(SettingGetter().test, 'undefined')
+        DecoratedSettingGetter = override_settings(TEST='override')(SettingGetter)
+        self.assertEqual(DecoratedSettingGetter().test, 'override')
+        self.assertRaises(AttributeError, getattr, settings, 'TEST')
+
+    @skipIf(sys.version_info[:2] < (2, 6), "Python version is lower than 2.6")
+    def test_new_class_decorator(self):
+        self.assertEqual(SettingGetter().test, 'undefined')
+        @override_settings(TEST='override')
+        class DecoratedSettingGetter(SettingGetter):
+            pass
+        self.assertEqual(DecoratedSettingGetter().test, 'override')
+        self.assertRaises(AttributeError, getattr, settings, 'TEST')
+
+    def test_signal_callback_context_manager(self):
+        self.assertRaises(AttributeError, getattr, settings, 'TEST')
+        with self.settings(TEST='override'):
+            self.assertEqual(testvalue, 'override')
+
+    @override_settings(TEST='override')
+    def test_signal_callback_decorator(self):
+        self.assertEqual(testvalue, 'override')
 
     #
     # Regression tests for #10130: deleting settings.

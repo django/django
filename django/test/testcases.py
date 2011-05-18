@@ -2,7 +2,6 @@ from __future__ import with_statement
 
 import re
 import sys
-from contextlib import contextmanager
 from functools import wraps
 from urlparse import urlsplit, urlunsplit
 from xml.dom.minidom import parseString, Node
@@ -17,7 +16,7 @@ from django.db import (transaction, connection, connections, DEFAULT_DB_ALIAS,
 from django.http import QueryDict
 from django.test import _doctest as doctest
 from django.test.client import Client
-from django.test.utils import get_warnings_state, restore_warnings_state
+from django.test.utils import get_warnings_state, restore_warnings_state, override_settings
 from django.utils import simplejson, unittest as ut2
 from django.utils.encoding import smart_str
 
@@ -342,21 +341,12 @@ class TransactionTestCase(ut2.TestCase):
         """
         restore_warnings_state(self._warnings_state)
 
-    @contextmanager
-    def settings(self, **options):
+    def settings(self, **kwargs):
         """
         A context manager that temporarily sets a setting and reverts
         back to the original value when exiting the context.
         """
-        old_wrapped = settings._wrapped
-        override = UserSettingsHolder(settings._wrapped)
-        try:
-            for key, new_value in options.items():
-                setattr(override, key, new_value)
-            settings._wrapped = override
-            yield
-        finally:
-            settings._wrapped = old_wrapped
+        return override_settings(**kwargs)
 
     def assertRedirects(self, response, expected_url, status_code=302,
                         target_status_code=200, host=None, msg_prefix=''):

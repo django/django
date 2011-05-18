@@ -460,6 +460,29 @@ Test signals
 
 Signals only sent when :doc:`running tests </topics/testing>`.
 
+setting_changed
+---------------
+
+.. versionadded:: 1.4
+
+.. data:: django.test.signals.setting_changed
+   :module:
+
+Sent when some :ref:`settings are overridden <overriding-setting>` with the
+:meth:`django.test.TestCase.setting` context manager or the
+:func:`django.test.utils.override_settings` decorator/context manager.
+
+Arguments sent with this signal:
+
+``sender``
+    The setting name (string).
+
+``setting``
+    Same as sender
+
+``value``
+    The new setting value.
+
 template_rendered
 -----------------
 

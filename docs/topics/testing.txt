@@ -1361,6 +1361,8 @@ For example::
 This test case will flush *all* the test databases before running
 ``testIndexPageView``.
 
+.. _overriding-setting:
+
 Overriding settings
 ~~~~~~~~~~~~~~~~~~~
 
@@ -1376,7 +1378,14 @@ this use case Django provides a standard `Python context manager`_
     from django.test import TestCase
 
     class LoginTestCase(TestCase):
-        def test_overriding_settings(self):
+
+        def test_login(self):
+
+            # First check for the default behavior
+            response = self.client.get('/sekrit/')
+            self.assertRedirects(response, '/accounts/login/?next=/sekrit/')
+
+            # Then override the LOGING_URL setting
             with self.settings(LOGIN_URL='/other/login/'):
                 response = self.client.get('/sekrit/')
                 self.assertRedirects(response, '/other/login/?next=/sekrit/')
@@ -1384,7 +1393,58 @@ this use case Django provides a standard `Python context manager`_
 This example will override the :setting:`LOGIN_URL` setting for the code
 in the ``with`` block and reset its value to the previous state afterwards.
 
+.. function:: utils.override_settings
+
+In case you want to override a setting for just one test method or even the
+whole TestCase class, Django provides the
+:func:`django.test.utils.override_settings` decorator_. It's used like this::
+
+    from django.test import TestCase
+    from django.test.utils import override_settings
+
+    class LoginTestCase(TestCase):
+
+        @override_settings(LOGIN_URL='/other/login/')
+        def test_login(self):
+            response = self.client.get('/sekrit/')
+            self.assertRedirects(response, '/other/login/?next=/sekrit/')
+
+The decorator can also be applied to test case classes::
+
+    from django.test import TestCase
+    from django.test.utils import override_settings
+
+    class LoginTestCase(TestCase):
+
+        def test_login(self):
+            response = self.client.get('/sekrit/')
+            self.assertRedirects(response, '/other/login/?next=/sekrit/')
+
+    LoginTestCase = override_settings(LOGIN_URL='/other/login/')(LoginTestCase)
+
+On Python 2.6 and higher you can also use the well known decorator syntax to
+decorate the class::
+
+    from django.test import TestCase
+    from django.test.utils import override_settings
+
+    @override_settings(LOGIN_URL='/other/login/')
+    class LoginTestCase(TestCase):
+
+        def test_login(self):
+            response = self.client.get('/sekrit/')
+            self.assertRedirects(response, '/other/login/?next=/sekrit/')
+
+.. note::
+
+    When overriding settings make sure to also handle the cases in which
+    Django or your app's code use a cache or another feature that retain
+    state even if the setting is changed. Django provides the
+    :data:`django.test.signals.setting_changed` signal to connect cleanup
+    and other state resetting callbacks to.
+
 .. _`Python context manager`: http://www.python.org/dev/peps/pep-0343/
+.. _`decorator`: http://www.python.org/dev/peps/pep-0318/
 
 Emptying the test outbox
 ~~~~~~~~~~~~~~~~~~~~~~~~
