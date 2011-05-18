@@ -8,9 +8,9 @@ of a Web page, or a redirect, or a 404 error, or an XML document, or an image .
 . . or anything, really. The view itself contains whatever arbitrary logic is
 necessary to return that response. This code can live anywhere you want, as long
 as it's on your Python path. There's no other requirement--no "magic," so to
-speak. For the sake of putting the code *somewhere*, let's create a file called
-``views.py`` in the ``mysite`` directory, which you created in the previous
-chapter.
+speak. For the sake of putting the code *somewhere*, the convention is to
+put views in a file called ``views.py``, placed in your project or
+application directory.
 
 A simple view
 =============
@@ -47,7 +47,7 @@ Let's step through this code one line at a time:
       exceptions, but we'll get to those later.)
 
 .. admonition:: Django's Time Zone
-    
+
     Django includes a ``TIME_ZONE`` setting that defaults to
     ``America/Chicago``. This probably isn't where you live, so you might want
     to change it in your settings file.
