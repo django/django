@@ -63,15 +63,6 @@ class SettingsTests(TestCase):
         self.assertEqual(DecoratedSettingGetter().test, 'override')
         self.assertRaises(AttributeError, getattr, settings, 'TEST')
 
-    @skipIf(sys.version_info[:2] < (2, 6), "Python version is lower than 2.6")
-    def test_new_class_decorator(self):
-        self.assertEqual(SettingGetter().test, 'undefined')
-        @override_settings(TEST='override')
-        class DecoratedSettingGetter(SettingGetter):
-            pass
-        self.assertEqual(DecoratedSettingGetter().test, 'override')
-        self.assertRaises(AttributeError, getattr, settings, 'TEST')
-
     def test_signal_callback_context_manager(self):
         self.assertRaises(AttributeError, getattr, settings, 'TEST')
         with self.settings(TEST='override'):
