@@ -44,7 +44,7 @@ Basic usage
 
    Your project will probably also have static assets that aren't tied to a
    particular app. The :setting:`STATICFILES_DIRS` setting is a tuple of
-   filesystem directories to check when loading static files. Iv's a search
+   filesystem directories to check when loading static files. It's a search
    path that is by default empty. See the :setting:`STATICFILES_DIRS` docs
    how to extend this list of additional paths.
 
@@ -59,7 +59,7 @@ Basic usage
    :ref:`staticfiles_urlpatterns<staticfiles-development>` to your
    URLconf, you're done with the setup -- your static files will
    automatically be served at the default (for
-   :djadmin:`newly created<startproject>` projectq) :setting:`STATIC_URL`
+   :djadmin:`newly created<startproject>` projects) :setting:`STATIC_URL`
    of ``/static/``.
 
 3. You'll probably need to refer to these files in your templates. The
