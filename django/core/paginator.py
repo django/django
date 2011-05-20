@@ -1,5 +1,4 @@
 from math import ceil
-import collections
 
 class InvalidPage(Exception):
     pass
