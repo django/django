@@ -62,8 +62,8 @@ page::
 
 .. note::
 
-    Note that you can give ``Paginator`` a list/tuple, a Django ``QuerySet``, or
-    any other object with a ``count()`` or ``__len__()`` method. When
+    Note that you can give ``Paginator`` a list/tuple, a Django ``QuerySet``,
+    or any other object with a ``count()`` or ``__len__()`` method. When
     determining the number of objects contained in the passed object,
     ``Paginator`` will first try calling ``count()``, then fallback to using
     ``len()`` if the passed object has no ``count()`` method. This allows
@@ -185,9 +185,9 @@ Attributes
         When determining the number of objects contained in ``object_list``,
         ``Paginator`` will first try calling ``object_list.count()``. If
         ``object_list`` has no ``count()`` method, then ``Paginator`` will
-        fallback to using ``object_list.__len__()``. This allows objects, such
-        as Django's ``QuerySet``, to use a more efficient ``count()`` method
-        when available.
+        fallback to using ``len(object_list)``. This allows objects, such as
+        Django's ``QuerySet``, to use a more efficient ``count()`` method when
+        available.
 
 .. attribute:: Paginator.num_pages
 
@@ -201,29 +201,36 @@ Attributes
 ``InvalidPage`` exceptions
 ==========================
 
-The ``page()`` method raises ``InvalidPage`` if the requested page is invalid
-(i.e., not an integer) or contains no objects. Generally, it's enough to trap
-the ``InvalidPage`` exception, but if you'd like more granularity, you can trap
-either of the following exceptions:
+.. exception:: InvalidPage
 
-``PageNotAnInteger``
+	A base class for exceptions raised when a paginator is passed an invalid
+	page number.
+
+The :meth:`Paginator.page` method raises an exception if the requested page is
+invalid (i.e., not an integer) or contains no objects. Generally, it's enough
+to trap the ``InvalidPage`` exception, but if you'd like more granularity, you
+can trap either of the following exceptions:
+
+.. exception:: PageNotAnInteger
+
     Raised when ``page()`` is given a value that isn't an integer.
 
-``EmptyPage``
+.. exception:: EmptyPage
+
     Raised when ``page()`` is given a valid value but no objects exist on that
     page.
 
-Both of the exceptions are subclasses of ``InvalidPage``, so you can handle
+Both of the exceptions are subclasses of :exc:`InvalidPage`, so you can handle
 them both with a simple ``except InvalidPage``.
 
 
 ``Page`` objects
 ================
 
-.. class:: Page(object_list, number, paginator)
-
-You usually won't construct :class:`Pages <Page>` by hand -- you'll get them
+You usually won't construct ``Page`` objects by hand -- you'll get them
 using :meth:`Paginator.page`.
+
+.. class:: Page(object_list, number, paginator)
 
 .. versionadded:: 1.4
     A page acts like a sequence of :attr:`Page.object_list` when using
@@ -258,15 +265,15 @@ Methods
 
     Returns the 1-based index of the first object on the page, relative to all
     of the objects in the paginator's list. For example, when paginating a list
-    of 5 objects with 2 objects per page, the second page's :meth:`~Page.start_index`
-    would return ``3``.
+    of 5 objects with 2 objects per page, the second page's
+    :meth:`~Page.start_index` would return ``3``.
 
 .. method:: Page.end_index()
 
-    Returns the 1-based index of the last object on the page, relative to all of
-    the objects in the paginator's list. For example, when paginating a list of
-    5 objects with 2 objects per page, the second page's :meth:`~Page.end_index`
-    would return ``4``.
+    Returns the 1-based index of the last object on the page, relative to all
+    of the objects in the paginator's list. For example, when paginating a list
+    of 5 objects with 2 objects per page, the second page's
+    :meth:`~Page.end_index` would return ``4``.
 
 Attributes
 ----------
@@ -282,4 +289,3 @@ Attributes
 .. attribute:: Page.paginator
 
     The associated :class:`Paginator` object.
-
