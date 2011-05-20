@@ -1072,7 +1072,7 @@ documentation </ref/contrib/syndication>`.
 Technical message IDs
 ---------------------
 
-Up to version 1.1 Django used :ref:`technical message IDs<technical-messages>`
+Up to version 1.1 Django used technical message IDs
 to provide localizers the possibility to translate date and time formats. They
 were translatable :term:`translation strings <translation string>` that could
 be recognized because they were all upper case (for example
