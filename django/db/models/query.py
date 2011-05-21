@@ -1132,6 +1132,14 @@ class EmptyQuerySet(QuerySet):
         """
         return 0
 
+    def aggregate(self, *args, **kwargs):
+        """
+        Return a dict mapping the aggregate names to None
+        """
+        for arg in args:
+            kwargs[arg.default_alias] = arg
+        return dict([(key, None) for key in kwargs])
+
     # EmptyQuerySet is always an empty result in where-clauses (and similar
     # situations).
     value_annotation = False

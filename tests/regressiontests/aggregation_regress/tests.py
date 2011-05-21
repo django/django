@@ -662,6 +662,13 @@ class AggregationTests(TestCase):
             {"pk__count": None}
         )
 
+    def test_none_call_before_aggregate(self):
+        # Regression for #11789
+        self.assertEqual(
+            Author.objects.none().aggregate(Avg('age')),
+            {'age__avg': None}
+        )
+
     def test_annotate_and_join(self):
         self.assertEqual(
             Author.objects.annotate(c=Count("friends__name")).exclude(friends__name="Joe").count(),
