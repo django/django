@@ -46,6 +46,15 @@ not custom filters. This has been rectified with a simple API previously
 known as "FilterSpec" which was used internally. For more details, see the
 documentation for :attr:`~django.contrib.admin.ModelAdmin.list_filter`.
 
+Tools for cryptographic signing
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django 1.4 adds both a low-level API for signing values and a high-level API
+for setting and reading signed cookies, one of the most common uses of
+signing in Web applications.
+
+See :doc:`cryptographic signing </topics/signing>` docs for more information.
+
 ``reverse_lazy``
 ~~~~~~~~~~~~~~~~
 

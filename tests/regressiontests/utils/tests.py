@@ -17,3 +17,4 @@ from timesince import *
 from datastructures import *
 from tzinfo import *
 from datetime_safe import *
+from baseconv import *

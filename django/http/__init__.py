@@ -122,6 +122,7 @@ from django.utils.encoding import smart_str, iri_to_uri, force_unicode
 from django.utils.http import cookie_date
 from django.http.multipartparser import MultiPartParser
 from django.conf import settings
+from django.core import signing
 from django.core.files import uploadhandler
 from utils import *
 
@@ -131,6 +132,8 @@ absolute_http_url_re = re.compile(r"^https?://", re.I)
 
 class Http404(Exception):
     pass
+
+RAISE_ERROR = object()
 
 class HttpRequest(object):
     """A basic HTTP request."""
@@ -169,6 +172,29 @@ class HttpRequest(object):
         # RFC 3986 requires query string arguments to be in the ASCII range.
         # Rather than crash if this doesn't happen, we encode defensively.
         return '%s%s' % (self.path, self.META.get('QUERY_STRING', '') and ('?' + iri_to_uri(self.META.get('QUERY_STRING', ''))) or '')
+
+    def get_signed_cookie(self, key, default=RAISE_ERROR, salt='', max_age=None):
+        """
+        Attempts to return a signed cookie. If the signature fails or the
+        cookie has expired, raises an exception... unless you provide the
+        default argument in which case that value will be returned instead.
+        """
+        try:
+            cookie_value = self.COOKIES[key].encode('utf-8')
+        except KeyError:
+            if default is not RAISE_ERROR:
+                return default
+            else:
+                raise
+        try:
+            value = signing.get_cookie_signer(salt=key + salt).unsign(
+                cookie_value, max_age=max_age)
+        except signing.BadSignature:
+            if default is not RAISE_ERROR:
+                return default
+            else:
+                raise
+        return value
 
     def build_absolute_uri(self, location=None):
         """
@@ -583,6 +609,10 @@ class HttpResponse(object):
             self.cookies[key]['secure'] = True
         if httponly:
             self.cookies[key]['httponly'] = True
+
+    def set_signed_cookie(self, key, value, salt='', **kwargs):
+        value = signing.get_cookie_signer(salt=key + salt).sign(value)
+        return self.set_cookie(key, value, **kwargs)
 
     def delete_cookie(self, key, path='/', domain=None):
         self.set_cookie(key, max_age=0, path=path, domain=domain,

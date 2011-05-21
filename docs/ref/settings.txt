@@ -1647,6 +1647,19 @@ See :tfilter:`allowed date format strings <date>`.
 
 See also ``DATE_FORMAT`` and ``SHORT_DATETIME_FORMAT``.
 
+.. setting:: SIGNING_BACKEND
+
+SIGNING_BACKEND
+---------------
+
+.. versionadded:: 1.4
+
+Default: 'django.core.signing.TimestampSigner'
+
+The backend used for signing cookies and other data.
+
+See also the :doc:`/topics/signing` documentation.
+
 .. setting:: SITE_ID
 
 SITE_ID

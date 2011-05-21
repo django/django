@@ -171,6 +171,7 @@ Other batteries included
     * :doc:`Comments <ref/contrib/comments/index>` | :doc:`Moderation <ref/contrib/comments/moderation>` | :doc:`Custom comments <ref/contrib/comments/custom>`
     * :doc:`Content types <ref/contrib/contenttypes>`
     * :doc:`Cross Site Request Forgery protection <ref/contrib/csrf>`
+    * :doc:`Cryptographic signing <topics/signing>`
     * :doc:`Databrowse <ref/contrib/databrowse>`
     * :doc:`E-mail (sending) <topics/email>`
     * :doc:`Flatpages <ref/contrib/flatpages>`
