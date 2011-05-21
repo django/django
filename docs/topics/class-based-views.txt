@@ -550,8 +550,8 @@ requested::
                 return SingleObjectTemplateResponseMixin.render_to_response(self, context)
 
 Because of the way that Python resolves method overloading, the local
-:func:`render_to_response()` implementation will override the
-versions provided by :class:`JSONResponseMixin` and
+``render_to_response()`` implementation will override the versions provided by
+:class:`JSONResponseMixin` and
 :class:`~django.views.generic.detail.SingleObjectTemplateResponseMixin`.
 
 Decorating class-based views

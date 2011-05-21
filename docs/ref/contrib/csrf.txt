@@ -66,8 +66,9 @@ To enable CSRF protection for your views, follow these steps:
                   # ... view code here
                   return render_to_response("a_template.html", c)
 
-          You may want to write your own ``render_to_response`` wrapper that
-          takes care of this step for you.
+          You may want to write your own
+          :func:`~django.shortcuts.render_to_response()` wrapper that takes care
+          of this step for you.
 
 The utility script ``extras/csrf_migration_helper.py`` can help to automate the
 finding of code and templates that may need these steps. It contains full help

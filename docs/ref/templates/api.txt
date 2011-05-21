@@ -404,11 +404,12 @@ optional, third positional argument, ``processors``. In this example, the
         return HttpResponse(t.render(c))
 
 .. note::
-    If you're using Django's ``render_to_response()`` shortcut to populate a
-    template with the contents of a dictionary, your template will be passed a
-    ``Context`` instance by default (not a ``RequestContext``). To use a
-    ``RequestContext`` in your template rendering, pass an optional third
-    argument to ``render_to_response()``: a ``RequestContext``
+    If you're using Django's :func:`~django.shortcuts.render_to_response()`
+    shortcut to populate a template with the contents of a dictionary, your
+    template will be passed a ``Context`` instance by default (not a
+    ``RequestContext``). To use a ``RequestContext`` in your template rendering,
+    pass an optional third argument to
+    :func:`~django.shortcuts.render_to_response()`: a ``RequestContext``
     instance. Your code might look like this::
 
         def some_view(request):
@@ -789,7 +790,7 @@ implement this API we can use third party template systems like `Jinja2
 <http://jinja.pocoo.org/2/>`_ or `Cheetah <http://www.cheetahtemplate.org/>`_. This
 allows us to use third-party template libraries without giving up useful Django
 features like the Django ``Context`` object and handy shortcuts like
-``render_to_response()``.
+:func:`~django.shortcuts.render_to_response()`.
 
 The core component of the Django templating system is the ``Template`` class.
 This class has a very simple interface: it has a constructor that takes a single
