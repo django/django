@@ -1053,14 +1053,14 @@ class Query(object):
             value = SQLEvaluator(value, self)
             having_clause = value.contains_aggregate
 
-        if parts[0] in self.aggregates:
-            aggregate = self.aggregates[parts[0]]
-            entry = self.where_class()
-            entry.add((aggregate, lookup_type, value), AND)
-            if negate:
-                entry.negate()
-            self.having.add(entry, connector)
-            return
+        for alias, aggregate in self.aggregates.items():
+            if alias in (parts[0], LOOKUP_SEP.join(parts)):
+                entry = self.where_class()
+                entry.add((aggregate, lookup_type, value), AND)
+                if negate:
+                    entry.negate()
+                self.having.add(entry, connector)
+                return
 
         opts = self.get_meta()
         alias = self.get_initial_alias()
