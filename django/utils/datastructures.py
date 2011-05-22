@@ -228,6 +228,10 @@ class MultiValueDict(dict):
     'Simon'
     >>> d.getlist('name')
     ['Adrian', 'Simon']
+    >>> d.getlist('doesnotexist')
+    []
+    >>> d.getlist('doesnotexist', ['Adrian', 'Simon'])
+    ['Adrian', 'Simon']
     >>> d.get('lastname', 'nonexistent')
     'nonexistent'
     >>> d.setlist('lastname', ['Holovaty', 'Willison'])
@@ -300,14 +304,16 @@ class MultiValueDict(dict):
             return default
         return val
 
-    def getlist(self, key):
+    def getlist(self, key, default=None):
         """
         Returns the list of values for the passed key. If key doesn't exist,
-        then an empty list is returned.
+        then a default value is returned.
         """
         try:
             return super(MultiValueDict, self).__getitem__(key)
         except KeyError:
+            if default is not None:
+                return default
             return []
 
     def setlist(self, key, list_):

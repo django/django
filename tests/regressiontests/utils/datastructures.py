@@ -206,6 +206,8 @@ class MultiValueDictTests(DatastructuresTestCase):
         self.assertEqual(d.get('lastname'), None)
         self.assertEqual(d.get('lastname', 'nonexistent'), 'nonexistent')
         self.assertEqual(d.getlist('lastname'), [])
+        self.assertEqual(d.getlist('doesnotexist', ['Adrian', 'Simon']),
+                         ['Adrian', 'Simon'])
 
         d.setlist('lastname', ['Holovaty', 'Willison'])
         self.assertEqual(d.getlist('lastname'), ['Holovaty', 'Willison'])

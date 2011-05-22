@@ -448,11 +448,15 @@ In addition, ``QueryDict`` has the following methods:
     standard library. The copy will be mutable -- that is, you can change its
     values.
 
-.. method:: QueryDict.getlist(key)
+.. method:: QueryDict.getlist(key, default)
 
     Returns the data with the requested key, as a Python list. Returns an
-    empty list if the key doesn't exist. It's guaranteed to return a list of
-    some sort.
+    empty list if the key doesn't exist and no default value was provided.
+    It's guaranteed to return a list of some sort unless the default value
+    was no list.
+
+    .. versionchanged:: 1.4
+        The ``default`` parameter was added.
 
 .. method:: QueryDict.setlist(key, list_)
 
