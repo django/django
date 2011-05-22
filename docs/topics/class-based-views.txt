@@ -71,7 +71,7 @@ so we can just subclass it, and override the template name::
         template_name = "about.html"
 
 Then, we just need to add this new view into our URLconf. As the class-based
-views themselves are classes, we point the URL to the as_view class method
+views themselves are classes, we point the URL to the ``as_view`` class method
 instead, which is the entry point for class-based views::
 
     # urls.py
@@ -83,7 +83,7 @@ instead, which is the entry point for class-based views::
     )
 
 Alternatively, if you're only changing a few simple attributes on a
-class-based view, you can simply pass the new attributes into the as_view
+class-based view, you can simply pass the new attributes into the ``as_view``
 method call itself::
 
     from django.conf.urls.defaults import *
@@ -121,11 +121,11 @@ be using these models::
         country = models.CharField(max_length=50)
         website = models.URLField()
 
-        def __unicode__(self):
-            return self.name
-
         class Meta:
             ordering = ["-name"]
+
+        def __unicode__(self):
+            return self.name
 
     class Book(models.Model):
         title = models.CharField(max_length=100)
@@ -211,7 +211,7 @@ all the publishers in a variable named ``object_list``. While this
 works just fine, it isn't all that "friendly" to template authors:
 they have to "just know" that they're dealing with publishers here.
 
-Well, if you're dealing with a Django object, this is already done for
+Well, if you're dealing with a model object, this is already done for
 you. When you are dealing with an object or queryset, Django is able
 to populate the context using the verbose name (or the plural verbose
 name, in the case of a list of objects) of the object being displayed.
@@ -353,7 +353,7 @@ key in the URL. Earlier we hard-coded the publisher's name in the URLconf, but
 what if we wanted to write a view that displayed all the books by some arbitrary
 publisher?
 
-Handily, the ListView has a
+Handily, the ``ListView`` has a
 :meth:`~django.views.generic.detail.ListView.get_queryset` method we can
 override. Previously, it has just been returning the value of the ``queryset``
 attribute, but now we can add more logic.
@@ -444,8 +444,8 @@ custom view:
         **(r'^authors/(?P<pk>\\d+)/$', AuthorDetailView.as_view()),**
     )
 
-Then we'd write our new view - ``get_object`` is the method that retrieves the
-object, so we simply override it and wrap the call::
+Then we'd write our new view -- ``get_object`` is the method that retrieves the
+object -- so we simply override it and wrap the call::
 
     import datetime
     from books.models import Author
@@ -473,7 +473,7 @@ object, so we simply override it and wrap the call::
 .. note::
 
     The URLconf here uses the named group ``pk`` - this name is the default
-    name that DetailView uses to find the value of the primary key used to
+    name that ``DetailView`` uses to find the value of the primary key used to
     filter the queryset.
 
     If you want to change it, you'll need to do your own ``get()`` call
