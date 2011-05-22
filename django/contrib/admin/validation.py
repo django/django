@@ -247,9 +247,9 @@ def validate_fields_spec(cls, model, opts, flds, label):
             try:
                 f = opts.get_field(field)
             except models.FieldDoesNotExist:
-                # If we can't find a field on the model that matches,
-                # it could be an extra field on the form.
-                pass
+                # If we can't find a field on the model that matches, it could be an
+                # extra field on the form; nothing to check so move on to the next field.
+                continue
             if isinstance(f, models.ManyToManyField) and not f.rel.through._meta.auto_created:
                 raise ImproperlyConfigured("'%s.%s' "
                     "can't include the ManyToManyField field '%s' because "

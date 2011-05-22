@@ -256,3 +256,19 @@ class ValidationTestCase(TestCase):
             fields = ['title', 'extra_data']
 
         validate(FieldsOnFormOnlyAdmin, Song)
+
+    def test_non_model_first_field(self):
+        """
+        Regression for ensuring ModelAdmin.field can handle first elem being a
+        non-model field (test fix for UnboundLocalError introduced with r16225).
+        """
+        class SongForm(forms.ModelForm):
+            extra_data = forms.CharField()
+            class Meta:
+                model = Song
+
+        class FieldsOnFormOnlyAdmin(admin.ModelAdmin):
+            form = SongForm
+            fields = ['extra_data', 'title']
+
+        validate(FieldsOnFormOnlyAdmin, Song)
