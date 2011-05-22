@@ -116,7 +116,7 @@ One excellent feature of Memcached is its ability to share cache over multiple
 servers. This means you can run Memcached daemons on multiple machines, and the
 program will treat the group of machines as a *single* cache, without the need
 to duplicate cache values on each machine. To take advantage of this feature,
-include all server addresses in :setting:`BACKEND <CACHES-BACKEND>`, either
+include all server addresses in :setting:`LOCATION <CACHES-LOCATION>`, either
 separated by semicolons or as a list.
 
 In this example, the cache is shared over Memcached instances running on IP
