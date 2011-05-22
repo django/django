@@ -533,6 +533,8 @@ operators, from lowest to highest, is as follows:
 
 (This follows Python exactly). So, for example, the following complex if tag:
 
+.. code-block:: django
+
     {% if a == b or c == d and e %}
 
 ...will be interpreted as:
@@ -1471,7 +1473,7 @@ If ``value`` is the list ``['a', 'b', 'c']``, the output will be ``'a'``.
 fix_ampersands
 ~~~~~~~~~~~~~~
 
-..note::
+.. note::
 
     This is rarely useful as ampersands are automatically escaped. See escape_ for more information.
 
