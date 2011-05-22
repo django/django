@@ -100,7 +100,7 @@ class ContentType(models.Model):
         method. The ObjectNotExist exception, if thrown, will not be caught,
         so code that calls this method should catch it.
         """
-        return self.model_class()._default_manager.using(self._state.db).get(**kwargs)
+        return self.model_class()._base_manager.using(self._state.db).get(**kwargs)
 
     def natural_key(self):
         return (self.app_label, self.model)
