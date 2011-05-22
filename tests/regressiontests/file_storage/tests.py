@@ -90,13 +90,16 @@ class FileStorageTests(unittest.TestCase):
     storage_class = FileSystemStorage
 
     def setUp(self):
-        self.temp_dir = tempfile.mktemp()
-        os.makedirs(self.temp_dir)
+        self.temp_dir = tempfile.mkdtemp()
         self.storage = self.storage_class(location=self.temp_dir,
             base_url='/test_media_url/')
+        # Set up a second temporary directory which is ensured to have a mixed
+        # case name.
+        self.temp_dir2 = tempfile.mkdtemp(suffix='aBc')
 
     def tearDown(self):
         shutil.rmtree(self.temp_dir)
+        shutil.rmtree(self.temp_dir2)
 
     def test_file_access_options(self):
         """
@@ -264,6 +267,20 @@ class FileStorageTests(unittest.TestCase):
         """
         self.assertRaises(SuspiciousOperation, self.storage.exists, '..')
         self.assertRaises(SuspiciousOperation, self.storage.exists, '/etc/passwd')
+
+    def test_file_storage_preserves_filename_case(self):
+        """The storage backend should preserve case of filenames."""
+        # Create a storage backend associated with the mixed case name
+        # directory.
+        temp_storage = self.storage_class(location=self.temp_dir2)
+        # Ask that storage backend to store a file with a mixed case filename.
+        mixed_case = 'CaSe_SeNsItIvE'
+        file = temp_storage.open(mixed_case, 'w')
+        file.write('storage contents')
+        file.close()
+        self.assertEqual(os.path.join(self.temp_dir2, mixed_case),
+                         temp_storage.path(mixed_case))
+        temp_storage.delete(mixed_case)
 
 class CustomStorage(FileSystemStorage):
     def get_available_name(self, name):

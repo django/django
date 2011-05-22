@@ -120,3 +120,12 @@ def file_upload_getlist_count(request):
 def file_upload_errors(request):
     request.upload_handlers.insert(0, ErroringUploadHandler())
     return file_upload_echo(request)
+
+def file_upload_filename_case_view(request):
+    """
+    Check adding the file to the database will preserve the filename case.
+    """
+    file = request.FILES['file_field']
+    obj = FileModel()
+    obj.testfile.save(file.name, file)
+    return HttpResponse('%d' % obj.pk)

@@ -30,17 +30,16 @@ def safe_join(base, *paths):
     The final path must be located inside of the base path component (otherwise
     a ValueError is raised).
     """
-    # We need to use normcase to ensure we don't false-negative on case
-    # insensitive operating systems (like Windows).
     base = force_unicode(base)
     paths = [force_unicode(p) for p in paths]
-    final_path = normcase(abspathu(join(base, *paths)))
-    base_path = normcase(abspathu(base))
+    final_path = abspathu(join(base, *paths))
+    base_path = abspathu(base)
     base_path_len = len(base_path)
-    # Ensure final_path starts with base_path and that the next character after
-    # the final path is os.sep (or nothing, in which case final_path must be
-    # equal to base_path).
-    if not final_path.startswith(base_path) \
+    # Ensure final_path starts with base_path (using normcase to ensure we
+    # don't false-negative on case insensitive operating systems like Windows)
+    # and that the next character after the final path is os.sep (or nothing,
+    # in which case final_path must be equal to base_path).
+    if not normcase(final_path).startswith(normcase(base_path)) \
        or final_path[base_path_len:base_path_len+1] not in ('', sep):
         raise ValueError('The joined path (%s) is located outside of the base '
                          'path component (%s)' % (final_path, base_path))
