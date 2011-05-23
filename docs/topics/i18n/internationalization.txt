@@ -490,12 +490,14 @@ for use within the translation block. Examples::
     This will have {{ myvar }} inside.
     {% endblocktrans %}
 
-If you need to bind more than one expression inside a ``blocktrans`` tag,
-separate the pieces with ``and``::
+You can use multiple expressions inside a single ``blocktrans`` tag::
 
     {% blocktrans with book_t=book|title and author_t=author|title %}
     This is {{ book_t }} by {{ author_t }}
     {% endblocktrans %}
+
+.. note:: The previous more verbose format is still supported:
+   ``{% blocktrans with book|title as book_t and author|title as author_t %}``
 
 This tag also provides for pluralization. To use it:
 
@@ -527,9 +529,6 @@ in addition to the counter value, keep in mind that the ``blocktrans``
 construct is internally converted to an ``ungettext`` call. This means the
 same :ref:`notes regarding ungettext variables <pluralization-var-notes>`
 apply.
-
-.. note:: The previous more verbose format is still supported:
-   ``{% blocktrans with book|title as book_t and author|title as author_t %}``
 
 Reverse URL lookups cannot be carried out within the ``blocktrans`` and should
 be retrieved (and stored) beforehand::
