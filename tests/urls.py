@@ -29,5 +29,4 @@ urlpatterns = patterns('',
     # admin widget tests
     (r'widget_admin/', include('regressiontests.admin_widgets.urls')),
 
-    (r'^utils/', include('regressiontests.utils.urls')),
 )
