@@ -16,35 +16,50 @@ def fully_decorated(request):
     return HttpResponse('<html><body>dummy</body></html>')
 fully_decorated.anything = "Expected __dict__"
 
-# django.views.decorators.http
-fully_decorated = require_http_methods(["GET"])(fully_decorated)
-fully_decorated = require_GET(fully_decorated)
-fully_decorated = require_POST(fully_decorated)
-fully_decorated = require_safe(fully_decorated)
 
-# django.views.decorators.vary
-fully_decorated = vary_on_headers('Accept-language')(fully_decorated)
-fully_decorated = vary_on_cookie(fully_decorated)
+def compose(*functions):
+    # compose(f, g)(*args, **kwargs) == f(g(*args, **kwargs))
+    functions = list(reversed(functions))
+    def _inner(*args, **kwargs):
+        result = functions[0](*args, **kwargs)
+        for f in functions[1:]:
+            result = f(result)
+        return result
+    return _inner
 
-# django.views.decorators.cache
-fully_decorated = cache_page(60*15)(fully_decorated)
-fully_decorated = cache_control(private=True)(fully_decorated)
-fully_decorated = never_cache(fully_decorated)
 
-# django.contrib.auth.decorators
-# Apply user_passes_test twice to check #9474
-fully_decorated = user_passes_test(lambda u:True)(fully_decorated)
-fully_decorated = login_required(fully_decorated)
-fully_decorated = permission_required('change_world')(fully_decorated)
+full_decorator = compose(
+    # django.views.decorators.http
+    require_http_methods(["GET"]),
+    require_GET,
+    require_POST,
+    require_safe,
 
-# django.contrib.admin.views.decorators
-fully_decorated = staff_member_required(fully_decorated)
+    # django.views.decorators.vary
+    vary_on_headers('Accept-language'),
+    vary_on_cookie,
 
-# django.utils.functional
-fully_decorated = memoize(fully_decorated, {}, 1)
-fully_decorated = allow_lazy(fully_decorated)
-fully_decorated = lazy(fully_decorated)
+    # django.views.decorators.cache
+    cache_page(60*15),
+    cache_control(private=True),
+    never_cache,
 
+    # django.contrib.auth.decorators
+    # Apply user_passes_test twice to check #9474
+    user_passes_test(lambda u:True),
+    login_required,
+    permission_required('change_world'),
+
+    # django.contrib.admin.views.decorators
+    staff_member_required,
+
+    # django.utils.functional
+    lambda f: memoize(f, {}, 1),
+    allow_lazy,
+    lazy,
+)
+
+fully_decorated = full_decorator(fully_decorated)
 
 class DecoratorsTest(TestCase):
 
