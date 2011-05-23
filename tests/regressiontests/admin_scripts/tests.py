@@ -157,7 +157,18 @@ class AdminScriptTestCase(unittest.TestCase):
 
     def assertNoOutput(self, stream):
         "Utility assertion: assert that the given stream is empty"
+        # HACK: Under Windows, ignore warnings of the form:
+        # 'warning: Not loading directory '...\tests\regressiontests\locale': missing __init__.py'
+        # It has been impossible to filter them out using other means like:
+        # * Using warning.filterwarnings() (for the Python interpreter running the
+        #   tests) and/or
+        # * Using -Wignore:... (for the python interpreter spawned in self.run_test())
+        # Instead use a strategy copied from Mercurial's setup.py
+        if sys.platform == 'win32':
+            stream = [e for e in stream.splitlines()
+                if not e.startswith('warning: Not importing directory')]
         self.assertEqual(len(stream), 0, "Stream should be empty: actually contains '%s'" % stream)
+
     def assertOutput(self, stream, msg):
         "Utility assertion: assert that the given message exists in the output"
         self.assertTrue(msg in stream, "'%s' does not match actual output text '%s'" % (msg, stream))
@@ -545,10 +556,11 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
         "directory: startapp creates the correct directory"
         test_dir = os.path.dirname(os.path.dirname(__file__))
         args = ['startapp','settings_test']
+        app_path = os.path.join(test_dir, 'settings_test')
         out, err = self.run_django_admin(args,'settings')
+        self.addCleanup(shutil.rmtree, app_path)
         self.assertNoOutput(err)
-        self.assertTrue(os.path.exists(os.path.join(test_dir, 'settings_test')))
-        shutil.rmtree(os.path.join(test_dir, 'settings_test'))
+        self.assertTrue(os.path.exists(app_path))
 
     def test_builtin_command(self):
         "directory: django-admin builtin commands fail with an import error when no settings provided"
