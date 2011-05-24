@@ -911,7 +911,7 @@ class ValidationTests(unittest.TestCase):
         # Valid declarations below -----------
 
         class ValidationTestModelAdmin(ModelAdmin):
-            list_filter = ('is_active', AwesomeFilter, ('is_active', BooleanFieldListFilter))
+            list_filter = ('is_active', AwesomeFilter, ('is_active', BooleanFieldListFilter), 'no')
 
         validate(ValidationTestModelAdmin, ValidationTestModel)
 

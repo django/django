@@ -66,7 +66,7 @@ class CustomUserAdmin(UserAdmin):
     list_filter = ('books_authored', 'books_contributed')
 
 class BookAdmin(ModelAdmin):
-    list_filter = ('year', 'author', 'contributors', 'is_best_seller', 'date_registered')
+    list_filter = ('year', 'author', 'contributors', 'is_best_seller', 'date_registered', 'no')
     order_by = '-id'
 
 class DecadeFilterBookAdmin(ModelAdmin):
@@ -100,8 +100,8 @@ class ListFiltersTests(TestCase):
 
         # Books
         self.djangonaut_book = Book.objects.create(title='Djangonaut: an art of living', year=2009, author=self.alfred, is_best_seller=True, date_registered=self.today)
-        self.bio_book = Book.objects.create(title='Django: a biography', year=1999, author=self.alfred, is_best_seller=False)
-        self.django_book = Book.objects.create(title='The Django Book', year=None, author=self.bob, is_best_seller=None, date_registered=self.today)
+        self.bio_book = Book.objects.create(title='Django: a biography', year=1999, author=self.alfred, is_best_seller=False, no=207)
+        self.django_book = Book.objects.create(title='The Django Book', year=None, author=self.bob, is_best_seller=None, date_registered=self.today, no=103)
         self.gipsy_book = Book.objects.create(title='Gipsy guitar for dummies', year=2002, is_best_seller=True, date_registered=self.one_week_ago)
         self.gipsy_book.contributors = [self.bob, self.lisa]
         self.gipsy_book.save()
@@ -528,3 +528,22 @@ class ListFiltersTests(TestCase):
         self.assertEqual(choices[2]['display'], u'the 2000\'s')
         self.assertEqual(choices[2]['selected'], False)
         self.assertEqual(choices[2]['query_string'], '?publication-decade=the+00s')
+
+    def test_two_characters_long_field(self):
+        """
+        Ensure that list_filter works with two-characters long field names.
+        Refs #16080.
+        """
+        modeladmin = BookAdmin(Book, site)
+        request = self.request_factory.get('/', {'no': '207'})
+        changelist = self.get_changelist(request, Book, modeladmin)
+
+        # Make sure the correct queryset is returned
+        queryset = changelist.get_query_set(request)
+        self.assertEqual(list(queryset), [self.bio_book])
+
+        filterspec = changelist.get_filters(request)[0][-1]
+        self.assertEqual(force_unicode(filterspec.title), u'number')
+        choices = list(filterspec.choices(changelist))
+        self.assertEqual(choices[2]['selected'], True)
+        self.assertEqual(choices[2]['query_string'], '?no=207')

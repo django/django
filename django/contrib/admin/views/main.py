@@ -97,10 +97,10 @@ class ChangeList(object):
                         self.model, self.model_admin)
                 else:
                     field_path = None
-                    try:
-                        # This is custom FieldListFilter class for a given field.
+                    if isinstance(list_filer, (tuple, list)):
+                        # This is a custom FieldListFilter class for a given field.
                         field, field_list_filter_class = list_filer
-                    except (TypeError, ValueError):
+                    else:
                         # This is simply a field name, so use the default
                         # FieldListFilter class that has been registered for
                         # the type of the given field.
