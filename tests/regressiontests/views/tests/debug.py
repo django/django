@@ -1,4 +1,5 @@
 import inspect
+import os
 import sys
 
 from django.conf import settings
@@ -56,7 +57,8 @@ class DebugViewTests(TestCase):
 
     def test_template_loader_postmortem(self):
         response = self.client.get(reverse('raises_template_does_not_exist'))
-        self.assertContains(response, 'templates/i_dont_exist.html</code> (File does not exist)</li>', status_code=500)
+        template_path = os.path.join('templates', 'i_dont_exist.html')
+        self.assertContains(response, template_path, status_code=500)
 
 
 class ExceptionReporterTests(TestCase):
