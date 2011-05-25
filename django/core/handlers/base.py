@@ -133,7 +133,7 @@ class BaseHandler(object):
                 if hasattr(response, 'render') and callable(response.render):
                     for middleware_method in self._template_response_middleware:
                         response = middleware_method(request, response)
-                    response.render()
+                    response = response.render()
 
             except http.Http404, e:
                 logger.warning('Not Found: %s' % request.path,

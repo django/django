@@ -92,11 +92,14 @@ class SimpleTemplateResponse(HttpResponse):
 
         Returns the baked response instance.
         """
+        retval = self
         if not self._is_rendered:
             self._set_content(self.rendered_content)
             for post_callback in self._post_render_callbacks:
-                post_callback(self)
-        return self
+                newretval = post_callback(retval)
+                if newretval is not None:
+                    retval = newretval
+        return retval
 
     is_rendered = property(lambda self: self._is_rendered)
 
