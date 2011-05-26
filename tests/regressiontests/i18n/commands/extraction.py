@@ -82,7 +82,10 @@ class BasicExtractorTests(ExtractorTests):
         try:
             management.call_command('makemessages', locale=LOCALE, verbosity=0)
         except SyntaxError, e:
-            self.assertEqual(str(e), 'Translation blocks must not include other block tags: blocktrans (file templates/template_with_error.html, line 3)')
+            self.assertRegexpMatches(
+                str(e),
+                r'Translation blocks must not include other block tags: blocktrans \(file templates[/\\]template_with_error\.html, line 3\)'
+            )
         finally:
             os.remove('./templates/template_with_error.html')
             os.remove('./templates/template_with_error.html.py') # Waiting for #8536 to be fixed
@@ -105,7 +108,8 @@ class IgnoredExtractorTests(ExtractorTests):
 
     def test_ignore_option(self):
         os.chdir(self.test_dir)
-        management.call_command('makemessages', locale=LOCALE, verbosity=0, ignore_patterns=['ignore_dir/*'])
+        pattern1 = os.path.join('ignore_dir', '*')
+        management.call_command('makemessages', locale=LOCALE, verbosity=0, ignore_patterns=[pattern1])
         self.assertTrue(os.path.exists(self.PO_FILE))
         po_contents = open(self.PO_FILE, 'r').read()
         self.assertMsgId('This literal should be included.', po_contents)
