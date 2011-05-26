@@ -161,10 +161,18 @@ class FileSystemStorage(Storage):
     def _save(self, name, content):
         full_path = self.path(name)
 
+        # Create any intermediate directories that do not exist.
+        # Note that there is a race between os.path.exists and os.makedirs:
+        # if os.makedirs fails with EEXIST, the directory was created
+        # concurrently, and we can continue normally. Refs #16082.
         directory = os.path.dirname(full_path)
         if not os.path.exists(directory):
-            os.makedirs(directory)
-        elif not os.path.isdir(directory):
+            try:
+                os.makedirs(directory)
+            except OSError, e:
+                if e.errno != errno.EEXIST:
+                    raise
+        if not os.path.isdir(directory):
             raise IOError("%s exists and is not a directory." % directory)
 
         # There's a potential race condition between get_available_name and
