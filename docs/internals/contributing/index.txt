@@ -1,0 +1,48 @@
+======================
+Contributing to Django
+======================
+
+If you think working *with* Django is fun, wait until you start working *on*
+it. We're passionate about helping Django users make the jump to contributing
+members of the community, so there are several ways you can help Django's
+development:
+
+    * Blog about Django. We syndicate all the Django blogs we know about on
+      the `community page`_; if you'd like to see your blog on that page you
+      can `register it here`_.
+
+    * :doc:`Report bugs and request features<bugs-and-features>` in our
+      `ticket tracker`_.
+
+    * Join the `django-developers`_ mailing list and share your ideas for how
+      to improve Django. We're always open to suggestions.
+
+    * :doc:`Submit patches<writing-code/submitting-patches>` for new and/or
+      fixed behavior. If you're looking for an easy way to start contributing
+      to Django have a look at the `easy pickings`_ tickets.
+
+    * :doc:`Improve the documentation<writing-documentation>` or
+      :doc:`write unit tests<writing-code/unit-tests>`.
+
+    * :doc:`Triage tickets<triaging-tickets>` that have been created by other
+      users.
+
+... and many more ways! Really, **ANYONE** can do something to help make
+Django better and greater. Browse the following sections to find out how:
+
+.. toctree::
+   :maxdepth: 2
+
+   new-contributors
+   bugs-and-features
+   triaging-tickets
+   writing-code/index
+   writing-documentation
+   translations
+   committing-code
+
+.. _django-developers: http://groups.google.com/group/django-developers
+.. _ticket tracker: http://code.djangoproject.com/newticket
+.. _community page: http://www.djangoproject.com/community/
+.. _`easy pickings`: http://code.djangoproject.com/query?status=!closed&easy=1
+.. _`register it here`: http://www.djangoproject.com/community/add/blogs/

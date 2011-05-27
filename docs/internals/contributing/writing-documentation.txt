@@ -1,0 +1,319 @@
+=====================
+Writing documentation
+=====================
+
+We place a high importance on consistency and readability of documentation.
+After all, Django was created in a journalism environment! So we treat our
+documentation like we treat our code: we aim to improve it as often as
+possible.
+
+Documentation changes generally come in two forms:
+
+    * General improvements -- Typo corrections, error fixes and better
+      explanations through clearer writing and more examples.
+
+    * New features -- Documentation of features that have been added to the
+      framework since the last release.
+
+This section explains how writers can craft their documentation changes
+in the most useful and least error-prone ways.
+
+Getting started with Sphinx
+---------------------------
+
+Django's documentation uses the Sphinx__ documentation system, which in turn
+is based on docutils__. The basic idea is that lightly-formatted plain-text
+documentation is transformed into HTML, PDF, and any other output format.
+
+__ http://sphinx.pocoo.org/
+__ http://docutils.sourceforge.net/
+
+To actually build the documentation locally, you'll currently need to install
+Sphinx -- ``easy_install Sphinx`` should do the trick.
+
+.. note::
+
+    Building the Django documentation requires Sphinx 1.0.2 or newer. Sphinx
+    also requires the Pygments__ library for syntax highlighting; building the
+    Django documentation requires Pygments 1.1 or newer (a new-enough version
+    should automatically be installed along with Sphinx).
+
+__ http://pygments.org
+
+Then, building the HTML is easy; just ``make html`` from the ``docs``
+directory.
+
+To get started contributing, you'll want to read the `reStructuredText
+Primer`__. After that, you'll want to read about the `Sphinx-specific markup`__
+that's used to manage metadata, indexing, and cross-references.
+
+__ http://sphinx.pocoo.org/rest.html
+__ http://sphinx.pocoo.org/markup/
+
+Commonly used terms
+-------------------
+
+Here are some style guidelines on commonly used terms throughout the
+documentation:
+
+    * **Django** -- when referring to the framework, capitalize Django. It is
+      lowercase only in Python code and in the djangoproject.com logo.
+
+    * **email** -- no hyphen.
+
+    * **MySQL**
+
+    * **PostgreSQL**
+
+    * **Python** -- when referring to the language, capitalize Python.
+
+    * **realize**, **customize**, **initialize**, etc. -- use the American
+      "ize" suffix, not "ise."
+
+    * **SQLite**
+
+    * **subclass** -- it's a single word without a hyphen, both as a verb
+      ("subclass that model") and as a noun ("create a subclass").
+
+    * **Web**, **World Wide Web**, **the Web** -- note Web is always
+      capitalized when referring to the World Wide Web.
+
+    * **Web site** -- use two words, with Web capitalized.
+
+Django-specific terminology
+---------------------------
+
+    * **model** -- it's not capitalized.
+
+    * **template** -- it's not capitalized.
+
+    * **URLconf** -- use three capitalized letters, with no space before
+      "conf."
+
+    * **view** -- it's not capitalized.
+
+Guidelines for reStructuredText files
+-------------------------------------
+
+These guidelines regulate the format of our reST (reStructuredText)
+documentation:
+
+    * In section titles, capitalize only initial words and proper nouns.
+
+    * Wrap the documentation at 80 characters wide, unless a code example
+      is significantly less readable when split over two lines, or for another
+      good reason.
+
+    * The main thing to keep in mind as you write and edit docs is that the
+      more semantic markup you can add the better. So::
+
+          Add ``django.contrib.auth`` to your ``INSTALLED_APPS``...
+
+      Isn't nearly as helpful as::
+
+          Add :mod:`django.contrib.auth` to your :setting:`INSTALLED_APPS`...
+
+      This is because Sphinx will generate proper links for the latter, which
+      greatly helps readers. There's basically no limit to the amount of
+      useful markup you can add.
+
+Django-specific markup
+----------------------
+
+Besides the `Sphinx built-in markup`__, Django's docs defines some extra
+description units:
+
+__ http://sphinx.pocoo.org/markup/desc.html
+
+    * Settings::
+
+            .. setting:: INSTALLED_APPS
+
+      To link to a setting, use ``:setting:`INSTALLED_APPS```.
+
+    * Template tags::
+
+            .. templatetag:: regroup
+
+      To link, use ``:ttag:`regroup```.
+
+    * Template filters::
+
+            .. templatefilter:: linebreaksbr
+
+      To link, use ``:tfilter:`linebreaksbr```.
+
+    * Field lookups (i.e. ``Foo.objects.filter(bar__exact=whatever)``)::
+
+            .. fieldlookup:: exact
+
+      To link, use ``:lookup:`exact```.
+
+    * ``django-admin`` commands::
+
+            .. django-admin:: syncdb
+
+      To link, use ``:djadmin:`syncdb```.
+
+    * ``django-admin`` command-line options::
+
+            .. django-admin-option:: --traceback
+
+      To link, use ``:djadminopt:`--traceback```.
+
+.. _documenting-new-features:
+
+Documenting new features
+------------------------
+
+Our policy for new features is:
+
+    **All documentation of new features should be written in a way that
+    clearly designates the features are only available in the Django
+    development version. Assume documentation readers are using the latest
+    release, not the development version.**
+
+Our preferred way for marking new features is by prefacing the features'
+documentation with: "``.. versionadded:: X.Y``", followed by an optional one
+line comment and a mandatory blank line.
+
+General improvements, or other changes to the APIs that should be emphasized
+should use the "``.. versionchanged:: X.Y``" directive (with the same format
+as the ``versionadded`` mentioned above.
+
+An example
+----------
+
+For a quick example of how it all fits together, consider this hypothetical
+example:
+
+    * First, the ``ref/settings.txt`` document could have an overall layout
+      like this:
+
+      .. code-block:: rst
+
+        ========
+        Settings
+        ========
+
+        ...
+
+        .. _available-settings:
+
+        Available settings
+        ==================
+
+        ...
+
+        .. _deprecated-settings:
+
+        Deprecated settings
+        ===================
+
+        ...
+
+    * Next, the ``topics/settings.txt`` document could contain something like
+      this:
+
+      .. code-block:: rst
+
+        You can access a :ref:`listing of all available settings
+        <available-settings>`. For a list of deprecated settings see
+        :ref:`deprecated-settings`.
+
+        You can find both in the :doc:`settings reference document
+        </ref/settings>`.
+
+      We use the Sphinx doc_ cross reference element when we want to link to
+      another document as a whole and the ref_ element when we want to link to
+      an arbitrary location in a document.
+
+.. _doc: http://sphinx.pocoo.org/markup/inline.html#role-doc
+.. _ref: http://sphinx.pocoo.org/markup/inline.html#role-ref
+
+    * Next, notice how the settings are annotated:
+
+      .. code-block:: rst
+
+        .. setting:: ADMIN_FOR
+
+        ADMIN_FOR
+        ---------
+
+        Default: ``()`` (Empty tuple)
+
+        Used for admin-site settings modules, this should be a tuple of
+        settings modules (in the format ``'foo.bar.baz'``) for which this site
+        is an admin.
+
+        The admin site uses this in its automatically-introspected
+        documentation of models, views and template tags.
+
+      This marks up the following header as the "canonical" target for the
+      setting ``ADMIN_FOR`` This means any time I talk about ``ADMIN_FOR``,
+      I can reference it using ``:setting:`ADMIN_FOR```.
+
+That's basically how everything fits together.
+
+.. _improving-the-documentation:
+
+Improving the documentation
+---------------------------
+
+A few small improvements can be made to make the documentation read and
+look better:
+
+    * Most of the various ``index.txt`` documents have *very* short or even
+      non-existent intro text. Each of those documents needs a good short
+      intro the content below that point.
+
+    * The glossary is very perfunctory. It needs to be filled out.
+
+    * Add more metadata targets. Lots of places look like::
+
+            ``File.close()``
+            ~~~~~~~~~~~~~~~~
+
+      \... these should be::
+
+            .. method:: File.close()
+
+      That is, use metadata instead of titles.
+
+    * Add more links -- nearly everything that's an inline code literal
+      right now can probably be turned into a xref.
+
+      See the ``literals_to_xrefs.py`` file in ``_ext`` -- it's a shell script
+      to help do this work.
+
+      This will probably be a continuing, never-ending project.
+
+    * Add `info field lists`__ where appropriate.
+
+      __ http://sphinx.pocoo.org/markup/desc.html#info-field-lists
+
+    * Whenever possible, use links. So, use ``:setting:`ADMIN_FOR``` instead
+      of ````ADMIN_FOR````.
+
+    * Use directives where appropriate. Some directives
+      (e.g. ``.. setting::``) are prefix-style directives; they go *before*
+      the unit they're describing. These are known as "crossref" directives.
+      Others (e.g. ``.. class::``) generate their own markup; these should go
+      inside the section they're describing. These are called
+      "description units".
+
+      You can tell which are which by looking at in
+      :file:`_ext/djangodocs.py`; it registers roles as one of the other.
+
+    * Add ``.. code-block:: <lang>`` to literal blocks so that they get
+      highlighted.
+
+    * When referring to classes/functions/modules, etc., you'll want to use
+      the fully-qualified name of the target
+      (``:class:`django.contrib.contenttypes.models.ContentType```).
+
+      Since this doesn't look all that awesome in the output -- it shows the
+      entire path to the object -- you can prefix the target with a ``~``
+      (that's a tilde) to get just the "last bit" of that path. So
+      ``:class:`~django.contrib.contenttypes.models.ContentType``` will just
+      display a link with the title "ContentType".

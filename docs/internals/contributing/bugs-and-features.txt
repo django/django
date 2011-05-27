@@ -1,0 +1,181 @@
+======================================
+Reporting bugs and requesting features
+======================================
+
+Before reporting a bug or requesting a new feature please consider these
+general points:
+
+* Check that someone hasn't already filed the bug or feature request by
+  `searching`_ or running `custom queries`_ in the ticket tracker.
+
+* Don't use the ticket system to ask support questions. Use the
+  `django-users`_ list, or the `#django`_ IRC channel for that.
+
+* Don't reopen issues that have been marked "wontfix" by a core developer.
+  This mark means that the decision has been made that we can't or won't fix
+  this particular issue. If you're not sure why, please ask
+  on `django-developers`_.
+
+* Don't use the ticket tracker for lengthy discussions, because they're
+  likely to get lost. If a particular ticket is controversial, please move
+  discussion to `django-developers`_.
+
+.. _reporting-bugs:
+
+Reporting bugs
+--------------
+
+Well-written bug reports are *incredibly* helpful. However, there's a certain
+amount of overhead involved in working with any bug tracking system so your
+help in keeping our ticket tracker as useful as possible is appreciated. In
+particular:
+
+    * **Do** read the :doc:`FAQ </faq/index>` to see if your issue might
+      be a well-known question.
+
+    * **Do** ask on `django-users`_ *first* if you're not sure if what you're
+      seeing is a bug.
+
+    * **Do** write complete, reproducible, specific bug reports. Include as
+      much information as you possibly can, complete with code snippets, test
+      cases, etc. This means including a clear, concise description of the
+      problem, and a clear set of instructions for replicating the problem.
+      A minimal example that illustrates the bug in a nice small test case
+      is the best possible bug report.
+
+    * **Don't** post to django-developers just to announce that you have filed
+      a bug report. All the tickets are mailed to another list
+      (`django-updates`_), which is tracked by developers and interested
+      community members; we see them as they are filed.
+
+To understand the lifecycle of your ticket once you have created it, refer to
+:doc:`triaging-tickets`.
+
+.. _django-updates: http://groups.google.com/group/django-updates
+
+.. _reporting-security-issues:
+
+Reporting security issues
+-------------------------
+
+.. Important::
+
+    Please report security issues **only** to security@djangoproject.com.
+    This is a private list only open to long-time, highly trusted Django
+    developers, and its archives are not publicly readable.
+
+In the event of a confirmed vulnerability in Django itself, we will take the
+following actions:
+
+    * Acknowledge to the reporter that we've received the report and that a
+      fix is forthcoming. We'll give a rough timeline and ask the reporter
+      to keep the issue confidential until we announce it.
+
+    * Focus on developing a fix as quickly as possible and produce patches
+      against the current and two previous releases.
+
+    * Determine a go-public date for announcing the vulnerability and the fix.
+      To try to mitigate a possible "arms race" between those applying the
+      patch and those trying to exploit the hole, we will not announce
+      security problems immediately.
+
+    * Pre-notify third-party distributors of Django ("vendors"). We will send
+      these vendor notifications through private email which will include
+      documentation of the vulnerability, links to the relevant patch(es), and
+      a request to keep the vulnerability confidential until the official
+      go-public date.
+
+    * Publicly announce the vulnerability and the fix on the pre-determined
+      go-public date. This will probably mean a new release of Django, but
+      in some cases it may simply be patches against current releases.
+
+Requesting features
+-------------------
+
+We're always trying to make Django better, and your feature requests are a key
+part of that. Here are some tips on how to make a request most effectively:
+
+    * First request the feature on `django-developers`_, not in the ticket
+      tracker. It'll get read more closely if it's on the mailing list.
+
+    * Describe clearly and concisely what the missing feature is and how you'd
+      like to see it implemented. Include example code (non-functional is OK)
+      if possible.
+
+    * Explain *why* you'd like the feature. In some cases this is obvious, but
+      since Django is designed to help real developers get real work done,
+      you'll need to explain it, if it isn't obvious why the feature would be
+      useful.
+
+    * Don't use the ticket system to make large-scale feature requests.
+      We like to discuss any big changes to Django's core on the
+      `django-developers`_ list before actually working on them.
+
+As with most open-source projects, code talks. If you are willing to write the
+code for the feature yourself or if (even better) you've already written it,
+it's much more likely to be accepted. If it's a large feature that might need
+multiple developers, we're always happy to give you an experimental branch in
+our repository; see the :doc:`writing-code/branch-policy`.
+
+To understand the lifecycle of your ticket once you have created it, refer to
+:doc:`triaging-tickets`.
+
+See also: :ref:`documenting-new-features`.
+
+.. _how-we-make-decisions:
+
+How we make decisions
+---------------------
+
+Whenever possible, we strive for a rough consensus. To that end, we'll often
+have informal votes on `django-developers`_ about a feature. In these votes we
+follow the voting style invented by Apache and used on Python itself, where
+votes are given as +1, +0, -0, or -1. Roughly translated, these votes mean:
+
+    * +1: "I love the idea and I'm strongly committed to it."
+
+    * +0: "Sounds OK to me."
+
+    * -0: "I'm not thrilled, but I won't stand in the way."
+
+    * -1: "I strongly disagree and would be very unhappy to see the idea turn
+      into reality."
+
+Although these votes on django-developers are informal, they'll be taken very
+seriously. After a suitable voting period, if an obvious consensus arises
+we'll follow the votes.
+
+However, consensus is not always possible. If consensus cannot be reached, or
+if the discussion towards a consensus fizzles out without a concrete decision,
+we use a more formal process.
+
+Any :doc:`core committer</internals/committers>` may call for a formal vote
+using the same voting mechanism above. A proposition will be considered carried
+by the core team if:
+
+    * There are three "+1" votes from members of the core team.
+
+    * There is no "-1" vote from any member of the core team.
+
+    * The :ref:`BDFLs<django-bdfls>` haven't stepped in and executed their
+      positive or negative veto.
+
+When calling for a vote, the caller should specify a deadline by which
+votes must be received. One week is generally suggested as the minimum
+amount of time.
+
+Since this process allows any core committer to veto a proposal, any "-1"
+votes (or BDFL vetos) should be accompanied by an explanation that explains
+what it would take to convert that "-1" into at least a "+0".
+
+Whenever possible, these formal votes should be announced and held in
+public on the `django-developers`_ mailing list. However, overly sensitive
+or contentious issues -- including, most notably, votes on new core
+committers -- may be held in private.
+
+
+.. _searching: http://code.djangoproject.com/search
+.. _`custom queries`: https://code.djangoproject.com/query
+.. _django-developers: http://groups.google.com/group/django-developers
+.. _django-users: http://groups.google.com/group/django-users
+.. _`#django`: irc://irc.freenode.net/django

@@ -1,0 +1,160 @@
+==================
+Submitting patches
+==================
+
+We're always grateful for patches to Django's code. Indeed, bug reports
+with associated patches will get fixed *far* more quickly than those
+without patches.
+
+"Claiming" tickets
+------------------
+
+In an open-source project with hundreds of contributors around the world, it's
+important to manage communication efficiently so that work doesn't get
+duplicated and contributors can be as effective as possible. Hence, our policy
+is for contributors to "claim" tickets in order to let other developers know
+that a particular bug or feature is being worked on.
+
+If you have identified a contribution you want to make and you're capable of
+fixing it (as measured by your coding ability, knowledge of Django internals
+and time availability), claim it by following these steps:
+
+    * `Create an account`_ to use in our ticket system. If you have an account
+      but have forgotten your password, you can reset it using the
+      `password reset page`_.
+
+    * If a ticket for this issue doesn't exist yet, create one in our
+      `ticket tracker`_.
+
+    * If a ticket for this issue already exists, make sure nobody else has
+      claimed it. To do this, look at the "Assigned to" section of the ticket.
+      If it's assigned to "nobody," then it's available to be claimed.
+      Otherwise, somebody else is working on this ticket, and you either find
+      another bug/feature to work on, or contact the developer working on the
+      ticket to offer your help.
+
+    * Log into your account, if you haven't already, by clicking "Login" in
+      the upper right of the ticket page.
+
+    * Claim the ticket by clicking the radio button next to "Accept ticket"
+      near the bottom of the page, then clicking "Submit changes."
+
+.. _Create an account: https://www.djangoproject.com/accounts/register/
+.. _password reset page: https://www.djangoproject.com/accounts/password/reset/
+
+Ticket claimers' responsibility
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Once you've claimed a ticket, you have a responsibility to work on that ticket
+in a reasonably timely fashion. If you don't have time to work on it, either
+unclaim it or don't claim it in the first place!
+
+If there's no sign of progress on a particular claimed ticket for a week or
+two, another developer may ask you to relinquish the ticket claim so that it's
+no longer monopolized and somebody else can claim it.
+
+If you've claimed a ticket and it's taking a long time (days or weeks) to code,
+keep everybody updated by posting comments on the ticket. If you don't provide
+regular updates, and you don't respond to a request for a progress report,
+your claim on the ticket may be revoked. As always, more communication is
+better than less communication!
+
+Which tickets should be claimed?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Of course, going through the steps of claiming tickets is overkill in some
+cases. In the case of small changes, such as typos in the documentation or
+small bugs that will only take a few minutes to fix, you don't need to jump
+through the hoops of claiming tickets. Just submit your patch and be done with
+it.
+
+.. _patch-style:
+
+Patch style
+-----------
+
+    * Make sure your code matches our :doc:`coding-style`.
+
+    * Submit patches in the format returned by the ``svn diff`` command.
+      An exception is for code changes that are described more clearly in
+      plain English than in code. Indentation is the most common example; it's
+      hard to read patches when the only difference in code is that it's
+      indented.
+
+      Patches in ``git diff`` format are also acceptable.
+
+    * When creating patches, always run ``svn diff`` from the top-level
+      ``trunk`` directory -- i.e., the one that contains ``django``, ``docs``,
+      ``tests``, ``AUTHORS``, etc. This makes it easy for other people to
+      apply your patches.
+
+    * Attach patches to a ticket in the `ticket tracker`_, using the "attach
+      file" button. Please *don't* put the patch in the ticket description
+      or comment unless it's a single line patch.
+
+    * Name the patch file with a ``.diff`` extension; this will let the ticket
+      tracker apply correct syntax highlighting, which is quite helpful.
+
+    * Check the "Has patch" box on the ticket details. This will make it
+      obvious that the ticket includes a patch, and it will add the ticket to
+      the `list of tickets with patches`_.
+
+    * The code required to fix a problem or add a feature is an essential part
+      of a patch, but it is not the only part. A good patch should also
+      include a regression test to validate the behavior that has been fixed
+      (and prevent the problem from arising again).
+
+    * If the code associated with a patch adds a new feature, or modifies
+      behavior of an existing feature, the patch should also contain
+      documentation.
+
+Non-trivial patches
+-------------------
+
+A "non-trivial" patch is one that is more than a simple bug fix. It's a patch
+that introduces Django functionality and makes some sort of design decision.
+
+If you provide a non-trivial patch, include evidence that alternatives have
+been discussed on `django-developers`_. If you're not sure whether your patch
+should be considered non-trivial, just ask.
+
+Javascript patches
+------------------
+
+.. versionadded:: 1.2
+
+Django's admin system leverages the jQuery framework to increase the
+capabilities of the admin interface. In conjunction, there is an emphasis on
+admin javascript performance and minimizing overall admin media file size.
+Serving compressed or "minified" versions of javascript files is considered
+best practice in this regard.
+
+To that end, patches for javascript files should include both the original
+code for future development (e.g. "foo.js"), and a compressed version for
+production use (e.g. "foo.min.js"). Any links to the file in the codebase
+should point to the compressed version.
+
+To simplify the process of providing optimized javascript code, Django
+includes a handy script which should be used to create a "minified" version.
+This script is located at ``/contrib/admin/media/js/compress.py``.
+
+Behind the scenes, ``compress.py`` is a front-end for Google's
+`Closure Compiler`_ which is written in Java. However, the Closure Compiler
+library is not bundled with Django directly, so those wishing to contribute
+complete javascript patches will need to download and install the library
+independently.
+
+The Closure Compiler library requires Java version 6 or higher (Java 1.6 or
+higher on Mac OS X). Note that Mac OS X 10.5 and earlier did not ship with
+Java 1.6 by default, so it may be necessary to upgrade your Java installation
+before the tool will be functional. Also note that even after upgrading Java,
+the default `/usr/bin/java` command may remain linked to the previous Java
+binary, so relinking that command may be necessary as well.
+
+Please don't forget to run ``compress.py`` and include the ``diff`` of the
+minified scripts when submitting patches for Django's javascript.
+
+.. _Closure Compiler: http://code.google.com/closure/compiler/
+.. _django-developers: http://groups.google.com/group/django-developers
+.. _list of tickets with patches: http://code.djangoproject.com/query?status=new&status=assigned&status=reopened&has_patch=1&order=priority
+.. _ticket tracker: http://code.djangoproject.com/newticket

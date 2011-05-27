@@ -1,0 +1,133 @@
+===============
+Committing code
+===============
+
+This section is addressed to the :doc:`/internals/committers` and to anyone
+interested in knowing how code gets committed into Django core.
+
+Commit access
+-------------
+
+Django has two types of committers:
+
+Core committers
+    These are people who have a long history of contributions to Django's
+    codebase, a solid track record of being polite and helpful on the
+    mailing lists, and a proven desire to dedicate serious time to Django's
+    development. The bar is high for full commit access.
+
+Partial committers
+    These are people who are "domain experts." They have direct check-in
+    access to the subsystems that fall under their jurisdiction, and they're
+    given a formal vote in questions that involve their subsystems. This type
+    of access is likely to be given to someone who contributes a large
+    subframework to Django and wants to continue to maintain it.
+
+    Partial commit access is granted by the same process as full
+    committers. However, the bar is set lower; proven expertise in the area
+    in question is likely to be sufficient.
+
+Decisions on new committers will follow the process explained in
+:ref:`how-we-make-decisions`.
+
+To request commit access, please contact an existing committer privately.
+Public requests for commit access are potential flame-war starters, and
+will be ignored.
+
+Committing guidelines
+---------------------
+
+Please follow these guidelines when committing code to Django's Subversion
+repository:
+
+    * For any medium-to-big changes, where "medium-to-big" is according to
+      your judgment, please bring things up on the `django-developers`_
+      mailing list before making the change.
+
+      If you bring something up on `django-developers`_ and nobody responds,
+      please don't take that to mean your idea is great and should be
+      implemented immediately because nobody contested it. Django's lead
+      developers don't have a lot of time to read mailing-list discussions
+      immediately, so you may have to wait a couple of days before getting a
+      response.
+
+    * Write detailed commit messages in the past tense, not present tense.
+
+          * Good: "Fixed Unicode bug in RSS API."
+          * Bad: "Fixes Unicode bug in RSS API."
+          * Bad: "Fixing Unicode bug in RSS API."
+
+    * For commits to a branch, prefix the commit message with the branch name.
+      For example: "magic-removal: Added support for mind reading."
+
+    * Limit commits to the most granular change that makes sense. This means,
+      use frequent small commits rather than infrequent large commits. For
+      example, if implementing feature X requires a small change to library Y,
+      first commit the change to library Y, then commit feature X in a
+      separate commit. This goes a *long way* in helping all core Django
+      developers follow your changes.
+
+    * Separate bug fixes from feature changes.
+
+      Bug fixes need to be added to the current bugfix branch (e.g. the
+      ``1.0.X`` branch) as well as the current trunk.
+
+    * If your commit closes a ticket in the Django `ticket tracker`_, begin
+      your commit message with the text "Fixed #abc", where "abc" is the
+      number of the ticket your commit fixes. Example: "Fixed #123 -- Adde
+      support for foo". We've rigged Subversion and Trac so that any commit
+      message in that format will automatically close the referenced ticket
+      and post a comment to it with the full commit message.
+
+      If your commit closes a ticket and is in a branch, use the branch name
+      first, then the "Fixed #abc." For example:
+      "magic-removal: Fixed #123 -- Added whizbang feature."
+
+      For the curious: We're using a `Trac post-commit hook`_ for this.
+
+      .. _Trac post-commit hook: http://trac.edgewall.org/browser/trunk/contrib/trac-post-commit-hook
+
+    * If your commit references a ticket in the Django `ticket tracker`_ but
+      does *not* close the ticket, include the phrase "Refs #abc", where "abc"
+      is the number of the ticket your commit references. We've rigged
+      Subversion and Trac so that any commit message in that format will
+      automatically post a comment to the appropriate ticket.
+
+Reverting commits
+-----------------
+
+Nobody's perfect; mistakes will be committed. When a mistaken commit is
+discovered, please follow these guidelines:
+
+    * Try very hard to ensure that mistakes don't happen. Just because we
+      have a reversion policy doesn't relax your responsibility to aim for
+      the highest quality possible. Really: double-check your work before
+      you commit it in the first place!
+
+    * If possible, have the original author revert his/her own commit.
+
+    * Don't revert another author's changes without permission from the
+      original author.
+
+    * If the original author can't be reached (within a reasonable amount
+      of time -- a day or so) and the problem is severe -- crashing bug,
+      major test failures, etc -- then ask for objections on django-dev
+      then revert if there are none.
+
+    * If the problem is small (a feature commit after feature freeze,
+      say), wait it out.
+
+    * If there's a disagreement between the committer and the
+      reverter-to-be then try to work it out on the `django-developers`_
+      mailing list. If an agreement can't be reached then it should
+      be put to a vote.
+
+    * If the commit introduced a confirmed, disclosed security
+      vulnerability then the commit may be reverted immediately without
+      permission from anyone.
+
+    * The release branch maintainer may back out commits to the release
+      branch without permission if the commit breaks the release branch.
+
+.. _django-developers: http://groups.google.com/group/django-developers
+.. _ticket tracker: http://code.djangoproject.com/newticket

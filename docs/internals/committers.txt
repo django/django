@@ -58,6 +58,8 @@ Current developers
 
 Currently, Django is led by a team of volunteers from around the globe.
 
+.. _django-bdfls:
+
 BDFLs
 -----
 

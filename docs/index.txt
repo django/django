@@ -200,7 +200,7 @@ The Django open-source project
 ==============================
 
     * **Community:**
-      :doc:`How to get involved <internals/contributing>` |
+      :doc:`How to get involved <internals/contributing/index>` |
       :doc:`The release process <internals/release-process>` |
       :doc:`Team of committers <internals/committers>` |
       :doc:`The Django source code repository <internals/svn>`
@@ -209,7 +209,7 @@ The Django open-source project
       :doc:`Overview <misc/design-philosophies>`
 
     * **Documentation:**
-      :doc:`About this documentation <internals/documentation>`
+      :doc:`About this documentation <internals/contributing/writing-documentation>`
 
     * **Third-party distributions:**
       :doc:`Overview <misc/distributions>`

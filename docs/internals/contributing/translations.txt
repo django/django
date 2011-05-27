@@ -1,0 +1,60 @@
+=======================================
+Submitting and maintaining translations
+=======================================
+
+Various parts of Django, such as the admin site and validation error messages,
+are internationalized. This means they display different text depending on a
+user's language setting. For this, Django uses the same internationalization
+infrastructure available to Django applications described in the
+:doc:`i18n documentation</topics/i18n/index>`.
+
+These translations are contributed by Django users worldwide. If you find an
+incorrect translation or want to discuss specific translations, go to the
+`translation team`_ page for that language. If you would like to help out
+with translating or add a language that isn't yet translated, here's what
+to do:
+
+    * Join the `Django i18n mailing list`_ and introduce yourself.
+
+    * Make sure you read the notes about :ref:`specialties-of-django-i18n`.
+
+    * Signup at `Transifex`_ and visit the `Django project page`_.
+
+    * On the "`Translation Teams`_" page, choose the language team you want
+      to work with, **or** -- in case the language team doesn't exist yet --
+      request a new team by clicking on the "Request a new team" button
+      and select the appropriate language.
+
+    * Then, click the "Join this Team" button to become a member of this team.
+      Every team has at least one coordinator who is responsible to review
+      your membership request. You can of course also contact the team
+      coordinator to clarify procedural problems and handle the actual
+      translation process.
+
+    * Once you are a member of a team choose the translation resource you
+      want to update on the team page. For example the "core" resource refers
+      to the translation catalogue that contains all non-contrib translations.
+      Each of the contrib apps also have a resource (prefixed with "contrib").
+
+      .. note::
+         For more information about how to use Transifex, see the
+         `Transifex Help`_
+
+    * Optionally, review and update the ``conf/locale/<locale>/formats.py``
+      file to describe the date, time and numbers formatting particularities
+      of your locale. These files aren't covered by the use of Transifex and
+      require a patch against the Django source tree, just as a code change
+      would:
+
+      * Create a diff against the current Subversion trunk.
+
+      * Open a ticket in Django's ticket system, set its ``Component`` field
+        to ``Translations``, and attach the patch to it. See
+        :ref:`format-localization` for details.
+
+.. _Django i18n mailing list: http://groups.google.com/group/django-i18n/
+.. _Transifex: http://www.transifex.net/
+.. _Django project page: http://www.transifex.net/projects/p/django/
+.. _translation teams: http://www.transifex.net/projects/p/django/teams/
+.. _translation team: http://www.transifex.net/projects/p/django/teams/
+.. _Transifex Help: http://help.transifex.net/

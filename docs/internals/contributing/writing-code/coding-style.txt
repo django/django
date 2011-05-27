@@ -1,0 +1,190 @@
+============
+Coding Style
+============
+
+Please follow these coding standards when writing code for inclusion in Django.
+
+Python style
+------------
+
+    * Unless otherwise specified, follow :pep:`8`.
+
+      You could use a tool like `pep8.py`_ to check for some problems in this
+      area, but remember that PEP 8 is only a guide, so respect the style of
+      the surrounding code as a primary goal.
+
+    * Use four spaces for indentation.
+
+    * Use underscores, not camelCase, for variable, function and method names
+      (i.e. ``poll.get_unique_voters()``, not ``poll.getUniqueVoters``).
+
+    * Use ``InitialCaps`` for class names (or for factory functions that
+      return classes).
+
+    * In docstrings, use "action words" such as::
+
+          def foo():
+              """
+              Calculates something and returns the result.
+              """
+              pass
+
+      Here's an example of what not to do::
+
+          def foo():
+              """
+              Calculate something and return the result.
+              """
+              pass
+
+Template style
+--------------
+
+    * In Django template code, put one (and only one) space between the curly
+      brackets and the tag contents.
+
+      Do this:
+
+      .. code-block:: html+django
+
+          {{ foo }}
+
+      Don't do this:
+
+      .. code-block:: html+django
+
+          {{foo}}
+
+View style
+----------
+
+    * In Django views, the first parameter in a view function should be called
+      ``request``.
+
+      Do this::
+
+          def my_view(request, foo):
+              # ...
+
+      Don't do this::
+
+          def my_view(req, foo):
+              # ...
+
+Model style
+-----------
+
+    * Field names should be all lowercase, using underscores instead of
+      camelCase.
+
+      Do this::
+
+          class Person(models.Model):
+              first_name = models.CharField(max_length=20)
+              last_name = models.CharField(max_length=40)
+
+      Don't do this::
+
+          class Person(models.Model):
+              FirstName = models.CharField(max_length=20)
+              Last_Name = models.CharField(max_length=40)
+
+    * The ``class Meta`` should appear *after* the fields are defined, with
+      a single blank line separating the fields and the class definition.
+
+      Do this::
+
+          class Person(models.Model):
+              first_name = models.CharField(max_length=20)
+              last_name = models.CharField(max_length=40)
+
+              class Meta:
+                  verbose_name_plural = 'people'
+
+      Don't do this::
+
+          class Person(models.Model):
+              first_name = models.CharField(max_length=20)
+              last_name = models.CharField(max_length=40)
+              class Meta:
+                  verbose_name_plural = 'people'
+
+      Don't do this, either::
+
+          class Person(models.Model):
+              class Meta:
+                  verbose_name_plural = 'people'
+
+              first_name = models.CharField(max_length=20)
+              last_name = models.CharField(max_length=40)
+
+    * The order of model inner classes and standard methods should be as
+      follows (noting that these are not all required):
+
+        * All database fields
+        * Custom manager attributes
+        * ``class Meta``
+        * ``def __unicode__()``
+        * ``def __str__()``
+        * ``def save()``
+        * ``def get_absolute_url()``
+        * Any custom methods
+
+    * If ``choices`` is defined for a given model field, define the choices as
+      a tuple of tuples, with an all-uppercase name, either near the top of
+      the model module or just above the model class. Example::
+
+          GENDER_CHOICES = (
+              ('M', 'Male'),
+              ('F', 'Female'),
+          )
+
+Use of ``django.conf.settings``
+-------------------------------
+
+Modules should not in general use settings stored in ``django.conf.settings``
+at the top level (i.e. evaluated when the module is imported). The explanation
+for this is as follows:
+
+Manual configuration of settings (i.e. not relying on the
+``DJANGO_SETTINGS_MODULE`` environment variable) is allowed and possible as
+follows::
+
+    from django.conf import settings
+
+    settings.configure({}, SOME_SETTING='foo')
+
+However, if any setting is accessed before the ``settings.configure`` line,
+this will not work. (Internally, ``settings`` is a ``LazyObject`` which
+configures itself automatically when the settings are accessed if it has not
+already been configured).
+
+So, if there is a module containing some code as follows::
+
+    from django.conf import settings
+    from django.core.urlresolvers import get_callable
+
+    default_foo_view = get_callable(settings.FOO_VIEW)
+
+...then importing this module will cause the settings object to be configured.
+That means that the ability for third parties to import the module at the top
+level is incompatible with the ability to configure the settings object
+manually, or makes it very difficult in some circumstances.
+
+Instead of the above code, a level of laziness or indirection must be used,
+such as `django.utils.functional.LazyObject``, ``django.utils.functional.lazy``
+or ``lambda``.
+
+Miscellaneous
+-------------
+
+    * Mark all strings for internationalization; see the :doc:`i18n
+      documentation </topics/i18n/index>` for details.
+
+    * Please don't put your name in the code you contribute. Our policy is to
+      keep contributors' names in the ``AUTHORS`` file distributed with Django
+      -- not scattered throughout the codebase itself. Feel free to include a
+      change to the ``AUTHORS`` file in your patch if you make more than a
+      single trivial change.
+
+.. _pep8.py: http://pypi.python.org/pypi/pep8/

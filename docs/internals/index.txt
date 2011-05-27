@@ -14,10 +14,9 @@ the hood".
     these internals if we must.
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
-   contributing
-   documentation
+   contributing/index
    committers
    release-process
    deprecation
