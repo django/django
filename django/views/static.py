@@ -2,6 +2,7 @@
 Views and functions for serving static files. These are only to be used
 during development, and SHOULD NOT be used in a production setting.
 """
+from __future__ import with_statement
 
 import mimetypes
 import os
@@ -57,7 +58,8 @@ def serve(request, path, document_root=None, show_indexes=False):
     if not was_modified_since(request.META.get('HTTP_IF_MODIFIED_SINCE'),
                               statobj.st_mtime, statobj.st_size):
         return HttpResponseNotModified(mimetype=mimetype)
-    response = HttpResponse(open(fullpath, 'rb').read(), mimetype=mimetype)
+    with open(fullpath, 'rb') as f:
+        response = HttpResponse(f.read(), mimetype=mimetype)
     response["Last-Modified"] = http_date(statobj.st_mtime)
     if stat.S_ISREG(statobj.st_mode):
         response["Content-Length"] = statobj.st_size
