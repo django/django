@@ -10,10 +10,10 @@ from pprint import pformat
 from django.template.base import Variable, Library
 from django.conf import settings
 from django.utils import formats
-from django.utils.dateformat import format
+from django.utils.dateformat import format, time_format
 from django.utils.encoding import force_unicode, iri_to_uri
 from django.utils.html import (conditional_escape, escapejs, fix_ampersands,
-    escape, urlize, linebreaks, strip_tags)
+    escape, urlize as urlize_impl, linebreaks, strip_tags)
 from django.utils.http import urlquote
 from django.utils.text import truncate_words, truncate_html_words, wrap, phone2numeric
 from django.utils.safestring import mark_safe, SafeData, mark_for_escaping
@@ -298,13 +298,13 @@ def urlencode(value, safe=None):
 urlencode.is_safe = False
 urlencode = stringfilter(urlencode)
 
-@register.filter("urlize")
+@register.filter
 @stringfilter
-def urlize_filter(value, autoescape=None):
+def urlize(value, autoescape=None):
     """Converts URLs in plain text into clickable links."""
-    return mark_safe(urlize(value, nofollow=True, autoescape=autoescape))
-urlize_filter.is_safe = True
-urlize_filter.needs_autoescape = True
+    return mark_safe(urlize_impl(value, nofollow=True, autoescape=autoescape))
+urlize.is_safe = True
+urlize.needs_autoescape = True
 
 def urlizetrunc(value, limit, autoescape=None):
     """
@@ -313,7 +313,7 @@ def urlizetrunc(value, limit, autoescape=None):
 
     Argument: Length to truncate URLs to.
     """
-    return mark_safe(urlize(value, trim_url_limit=int(limit), nofollow=True,
+    return mark_safe(urlize_impl(value, trim_url_limit=int(limit), nofollow=True,
                             autoescape=autoescape))
 urlizetrunc.is_safe = True
 urlizetrunc.needs_autoescape = True
@@ -699,7 +699,7 @@ def time(value, arg=None):
         return formats.time_format(value, arg)
     except AttributeError:
         try:
-            return dateformat.time_format(value, arg)
+            return time_format(value, arg)
         except AttributeError:
             return ''
 time.is_safe = False
