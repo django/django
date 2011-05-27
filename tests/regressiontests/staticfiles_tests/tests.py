@@ -17,7 +17,7 @@ from django.utils.encoding import smart_unicode
 from django.utils._os import rmtree_errorhandler
 
 
-TEST_ROOT = os.path.normcase(os.path.dirname(__file__))
+TEST_ROOT = os.path.dirname(__file__)
 
 
 class StaticFilesTestCase(TestCase):
@@ -352,15 +352,23 @@ class TestServeAdminMedia(TestServeStatic):
 
 class FinderTestCase(object):
     """
-    Base finder test mixin
+    Base finder test mixin.
+
+    On Windows, sometimes the case of the path we ask the finders for and the
+    path(s) they find can differ. Compare them using os.path.normcase() to
+    avoid false negatives.
     """
     def test_find_first(self):
         src, dst = self.find_first
-        self.assertEqual(self.finder.find(src), dst)
+        found = self.finder.find(src)
+        self.assertEqual(os.path.normcase(found), os.path.normcase(dst))
 
     def test_find_all(self):
         src, dst = self.find_all
-        self.assertEqual(self.finder.find(src, all=True), dst)
+        found = self.finder.find(src, all=True)
+        found = [os.path.normcase(f) for f in found]
+        dst = [os.path.normcase(d) for d in dst]
+        self.assertEqual(found, dst)
 
 
 class TestFileSystemFinder(StaticFilesTestCase, FinderTestCase):
