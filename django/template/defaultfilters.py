@@ -2,15 +2,22 @@
 
 import re
 import random as random_module
+import unicodedata
 from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 from functools import wraps
+from pprint import pformat
 
 from django.template.base import Variable, Library
 from django.conf import settings
 from django.utils import formats
+from django.utils.dateformat import format
 from django.utils.encoding import force_unicode, iri_to_uri
-from django.utils.html import conditional_escape
-from django.utils.safestring import mark_safe, SafeData
+from django.utils.html import (conditional_escape, escapejs, fix_ampersands,
+    escape, urlize, linebreaks, strip_tags)
+from django.utils.http import urlquote
+from django.utils.text import truncate_words, truncate_html_words, wrap, phone2numeric
+from django.utils.safestring import mark_safe, SafeData, mark_for_escaping
+from django.utils.timesince import timesince, timeuntil
 from django.utils.translation import ugettext, ungettext
 
 register = Library()
@@ -61,18 +68,18 @@ def capfirst(value):
 capfirst.is_safe=True
 capfirst = stringfilter(capfirst)
 
-def escapejs(value):
+@register.filter("escapejs")
+@stringfilter
+def escapejs_filter(value):
     """Hex encodes characters for use in JavaScript strings."""
-    from django.utils.html import escapejs
     return escapejs(value)
-escapejs = stringfilter(escapejs)
 
-def fix_ampersands(value):
+@register.filter("fix_ampersands")
+@stringfilter
+def fix_ampersands_filter(value):
     """Replaces ampersands with ``&amp;`` entities."""
-    from django.utils.html import fix_ampersands
     return fix_ampersands(value)
-fix_ampersands.is_safe=True
-fix_ampersands = stringfilter(fix_ampersands)
+fix_ampersands_filter.is_safe=True
 
 # Values for testing floatformat input against infinity and NaN representations,
 # which differ across platforms and Python versions.  Some (i.e. old Windows
@@ -171,7 +178,6 @@ iriencode = stringfilter(iriencode)
 
 def linenumbers(value, autoescape=None):
     """Displays text with line numbers."""
-    from django.utils.html import escape
     lines = value.split(u'\n')
     # Find the maximum width of the line count, for use with zero padding
     # string format command
@@ -209,7 +215,6 @@ def slugify(value):
     Normalizes string, converts to lowercase, removes non-alpha characters,
     and converts spaces to hyphens.
     """
-    import unicodedata
     value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore')
     value = unicode(re.sub('[^\w\s-]', '', value).strip().lower())
     return mark_safe(re.sub('[-\s]+', '-', value))
@@ -247,7 +252,6 @@ def truncatewords(value, arg):
 
     Newlines within the string are removed.
     """
-    from django.utils.text import truncate_words
     try:
         length = int(arg)
     except ValueError: # Invalid literal for int().
@@ -264,7 +268,6 @@ def truncatewords_html(value, arg):
 
     Newlines in the HTML are preserved.
     """
-    from django.utils.text import truncate_html_words
     try:
         length = int(arg)
     except ValueError: # invalid literal for int()
@@ -288,7 +291,6 @@ def urlencode(value, safe=None):
     default safe characters will be used (but an empty string can be provided
     when *all* characters should be escaped).
     """
-    from django.utils.http import urlquote
     kwargs = {}
     if safe is not None:
         kwargs['safe'] = safe
@@ -296,13 +298,13 @@ def urlencode(value, safe=None):
 urlencode.is_safe = False
 urlencode = stringfilter(urlencode)
 
-def urlize(value, autoescape=None):
+@register.filter("urlize")
+@stringfilter
+def urlize_filter(value, autoescape=None):
     """Converts URLs in plain text into clickable links."""
-    from django.utils.html import urlize
     return mark_safe(urlize(value, nofollow=True, autoescape=autoescape))
-urlize.is_safe=True
-urlize.needs_autoescape = True
-urlize = stringfilter(urlize)
+urlize_filter.is_safe = True
+urlize_filter.needs_autoescape = True
 
 def urlizetrunc(value, limit, autoescape=None):
     """
@@ -311,7 +313,6 @@ def urlizetrunc(value, limit, autoescape=None):
 
     Argument: Length to truncate URLs to.
     """
-    from django.utils.html import urlize
     return mark_safe(urlize(value, trim_url_limit=int(limit), nofollow=True,
                             autoescape=autoescape))
 urlizetrunc.is_safe = True
@@ -330,7 +331,6 @@ def wordwrap(value, arg):
 
     Argument: number of characters to wrap the text at.
     """
-    from django.utils.text import wrap
     return wrap(value, int(arg))
 wordwrap.is_safe = True
 wordwrap = stringfilter(wordwrap)
@@ -376,14 +376,14 @@ cut = stringfilter(cut)
 # HTML STRINGS    #
 ###################
 
-def escape(value):
+@register.filter("escape")
+@stringfilter
+def escape_filter(value):
     """
     Marks the value as a string that should not be auto-escaped.
     """
-    from django.utils.safestring import mark_for_escaping
     return mark_for_escaping(value)
-escape.is_safe = True
-escape = stringfilter(escape)
+escape_filter.is_safe = True
 
 def force_escape(value):
     """
@@ -391,23 +391,22 @@ def force_escape(value):
     characters (as opposed to "escape", which marks the content for later
     possible escaping).
     """
-    from django.utils.html import escape
     return mark_safe(escape(value))
 force_escape = stringfilter(force_escape)
 force_escape.is_safe = True
 
-def linebreaks(value, autoescape=None):
+@register.filter("linebreaks")
+@stringfilter
+def linebreaks_filter(value, autoescape=None):
     """
     Replaces line breaks in plain text with appropriate HTML; a single
     newline becomes an HTML line break (``<br />``) and a new line
     followed by a blank line becomes a paragraph break (``</p>``).
     """
-    from django.utils.html import linebreaks
     autoescape = autoescape and not isinstance(value, SafeData)
     return mark_safe(linebreaks(value, autoescape))
-linebreaks.is_safe = True
-linebreaks.needs_autoescape = True
-linebreaks = stringfilter(linebreaks)
+linebreaks_filter.is_safe = True
+linebreaks_filter.needs_autoescape = True
 
 def linebreaksbr(value, autoescape=None):
     """
@@ -415,7 +414,6 @@ def linebreaksbr(value, autoescape=None):
     (``<br />``).
     """
     if autoescape and not isinstance(value, SafeData):
-        from django.utils.html import escape
         value = escape(value)
     return mark_safe(value.replace('\n', '<br />'))
 linebreaksbr.is_safe = True
@@ -453,7 +451,6 @@ removetags = stringfilter(removetags)
 
 def striptags(value):
     """Strips all [X]HTML tags."""
-    from django.utils.html import strip_tags
     return strip_tags(value)
 striptags.is_safe = True
 striptags = stringfilter(striptags)
@@ -573,7 +570,6 @@ def unordered_list(value, autoescape=None):
         </li>
     """
     if autoescape:
-        from django.utils.html import conditional_escape
         escaper = conditional_escape
     else:
         escaper = lambda x: x
@@ -680,7 +676,6 @@ get_digit.is_safe = False
 
 def date(value, arg=None):
     """Formats a date according to the given format."""
-    from django.utils.dateformat import format
     if not value:
         return u''
     if arg is None:
@@ -696,7 +691,6 @@ date.is_safe = False
 
 def time(value, arg=None):
     """Formats a time according to the given format."""
-    from django.utils import dateformat
     if value in (None, u''):
         return u''
     if arg is None:
@@ -710,9 +704,9 @@ def time(value, arg=None):
             return ''
 time.is_safe = False
 
-def timesince(value, arg=None):
+@register.filter("timesince")
+def timesince_filter(value, arg=None):
     """Formats a date as the time since that date (i.e. "4 days, 6 hours")."""
-    from django.utils.timesince import timesince
     if not value:
         return u''
     try:
@@ -721,18 +715,18 @@ def timesince(value, arg=None):
         return timesince(value)
     except (ValueError, TypeError):
         return u''
-timesince.is_safe = False
+timesince_filter.is_safe = False
 
-def timeuntil(value, arg=None):
+@register.filter("timeuntil")
+def timeuntil_filter(value, arg=None):
     """Formats a date as the time until that date (i.e. "4 days, 6 hours")."""
-    from django.utils.timesince import timeuntil
     if not value:
         return u''
     try:
         return timeuntil(value, arg)
     except (ValueError, TypeError):
         return u''
-timeuntil.is_safe = False
+timeuntil_filter.is_safe = False
 
 ###################
 # LOGIC           #
@@ -860,15 +854,14 @@ def pluralize(value, arg=u's'):
     return singular_suffix
 pluralize.is_safe = False
 
-def phone2numeric(value):
+@register.filter("phone2numeric")
+def phone2numeric_filter(value):
     """Takes a phone number and converts it in to its numerical equivalent."""
-    from django.utils.text import phone2numeric
     return phone2numeric(value)
-phone2numeric.is_safe = True
+phone2numeric_filter.is_safe = True
 
 def pprint(value):
     """A wrapper around pprint.pprint -- for debugging, really."""
-    from pprint import pformat
     try:
         return pformat(value)
     except Exception, e:
@@ -887,11 +880,8 @@ register.filter(default_if_none)
 register.filter(dictsort)
 register.filter(dictsortreversed)
 register.filter(divisibleby)
-register.filter(escape)
-register.filter(escapejs)
 register.filter(filesizeformat)
 register.filter(first)
-register.filter(fix_ampersands)
 register.filter(floatformat)
 register.filter(force_escape)
 register.filter(get_digit)
@@ -900,13 +890,11 @@ register.filter(join)
 register.filter(last)
 register.filter(length)
 register.filter(length_is)
-register.filter(linebreaks)
 register.filter(linebreaksbr)
 register.filter(linenumbers)
 register.filter(ljust)
 register.filter(lower)
 register.filter(make_list)
-register.filter(phone2numeric)
 register.filter(pluralize)
 register.filter(pprint)
 register.filter(removetags)
@@ -919,15 +907,12 @@ register.filter(slugify)
 register.filter(stringformat)
 register.filter(striptags)
 register.filter(time)
-register.filter(timesince)
-register.filter(timeuntil)
 register.filter(title)
 register.filter(truncatewords)
 register.filter(truncatewords_html)
 register.filter(unordered_list)
 register.filter(upper)
 register.filter(urlencode)
-register.filter(urlize)
 register.filter(urlizetrunc)
 register.filter(wordcount)
 register.filter(wordwrap)
