@@ -219,8 +219,15 @@ class FileSystemStorage(Storage):
     def delete(self, name):
         name = self.path(name)
         # If the file exists, delete it from the filesystem.
+        # Note that there is a race between os.path.exists and os.remove:
+        # if os.remove fails with ENOENT, the file was removed
+        # concurrently, and we can continue normally.
         if os.path.exists(name):
-            os.remove(name)
+            try:
+                os.remove(name)
+            except OSError, e:
+                if e.errno != errno.ENOENT:
+                    raise
 
     def exists(self, name):
         return os.path.exists(self.path(name))
