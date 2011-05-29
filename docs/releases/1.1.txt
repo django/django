@@ -454,7 +454,7 @@ join the discussions!
 Django's online documentation also includes pointers on how to contribute to
 Django:
 
-    * :doc:`How to contribute to Django </internals/contributing>`
+    * :doc:`How to contribute to Django </internals/contributing/index>`
 
 Contributions on any level -- developing code, writing documentation or simply
 triaging tickets and helping to test proposed bugfixes -- are always welcome and

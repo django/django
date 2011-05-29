@@ -129,7 +129,7 @@ to join the discussions there.
 Django's online documentation also includes pointers on how to
 contribute to Django:
 
-    :doc:`contributing to Django </internals/contributing>`
+    :doc:`contributing to Django </internals/contributing/index>`
 
 Contributions on any level -- developing code, writing
 documentation or simply triaging tickets and helping to test proposed

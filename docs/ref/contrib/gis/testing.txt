@@ -150,7 +150,7 @@ GeoDjango Tests
 .. versionchanged:: 1.3
 
 GeoDjango's test suite may be run in one of two ways, either by itself or
-with the rest of :ref:`Django's unit tests <unit-tests>`.
+with the rest of :ref:`Django's unit tests <running-unit-tests>`.
 
 Run only GeoDjango tests
 ------------------------

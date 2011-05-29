@@ -13,7 +13,7 @@ developers).
 
 At present, the package contains only a single template tag. If you have ideas
 for Web-designer-friendly functionality in Django, please
-:doc:`suggest them </internals/contributing>`.
+:doc:`suggest them </internals/contributing/index>`.
 
 Template tags
 =============
