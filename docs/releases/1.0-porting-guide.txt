@@ -443,10 +443,10 @@ The old :exc:`EnvironmentError` has split into an :exc:`ImportError` when
 Django fails to find the settings module and a :exc:`RuntimeError` when you try
 to reconfigure settings after having already used them
 
-``LOGIN_URL`` has moved
-~~~~~~~~~~~~~~~~~~~~~~~
+:setting:`LOGIN_URL` has moved
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The ``LOGIN_URL`` constant moved from ``django.contrib.auth`` into the
+The :setting:`LOGIN_URL` constant moved from ``django.contrib.auth`` into the
 ``settings`` module. Instead of using ``from django.contrib.auth import
 LOGIN_URL`` refer to :setting:`settings.LOGIN_URL <LOGIN_URL>`.
 
@@ -454,11 +454,11 @@ LOGIN_URL`` refer to :setting:`settings.LOGIN_URL <LOGIN_URL>`.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In 0.96, if a URL didn't end in a slash or have a period in the final
-component of its path, and ``APPEND_SLASH`` was True, Django would redirect
-to the same URL, but with a slash appended to the end. Now, Django checks to
-see whether the pattern without the trailing slash would be matched by
-something in your URL patterns. If so, no redirection takes place, because it
-is assumed you deliberately wanted to catch that pattern.
+component of its path, and :setting:`APPEND_SLASH` was True, Django would
+redirect to the same URL, but with a slash appended to the end. Now, Django
+checks to see whether the pattern without the trailing slash would be matched
+by something in your URL patterns. If so, no redirection takes place, because
+it is assumed you deliberately wanted to catch that pattern.
 
 For most people, this won't require any changes. Some people, though, have URL
 patterns that look like this::
@@ -548,8 +548,8 @@ need to reload your data. Do this after you have made the change to using
   **Back up your database first!**
 
   For SQLite, this means making a copy of the single file that stores the
-  database (the name of that file is the ``DATABASE_NAME`` in your settings.py
-  file).
+  database (the name of that file is the :setting:`DATABASE_NAME` in your
+  settings.py file).
 
 To upgrade each application to use a ``DecimalField``, you can do the
 following, replacing ``<app>`` in the code below with each app's name:

@@ -13,7 +13,7 @@ use internationalization, you should take the two seconds to set
 optimizations so as not to load the internationalization machinery.
 
 You'll probably also want to remove ``'django.core.context_processors.i18n'``
-from your ``TEMPLATE_CONTEXT_PROCESSORS`` setting.
+from your :setting:`TEMPLATE_CONTEXT_PROCESSORS` setting.
 
 .. note::
 
@@ -47,22 +47,22 @@ Django uses this language as the default translation -- the final attempt if no
 other translator finds a translation.
 
 If all you want to do is run Django with your native language, and a language
-file is available for it, all you need to do is set ``LANGUAGE_CODE``.
+file is available for it, all you need to do is set :setting:`LANGUAGE_CODE`.
 
 If you want to let each individual user specify which language he or she
 prefers, use ``LocaleMiddleware``. ``LocaleMiddleware`` enables language
 selection based on data from the request. It customizes content for each user.
 
 To use ``LocaleMiddleware``, add ``'django.middleware.locale.LocaleMiddleware'``
-to your ``MIDDLEWARE_CLASSES`` setting. Because middleware order matters, you
-should follow these guidelines:
+to your :setting:`MIDDLEWARE_CLASSES` setting. Because middleware order
+matters, you should follow these guidelines:
 
     * Make sure it's one of the first middlewares installed.
     * It should come after ``SessionMiddleware``, because ``LocaleMiddleware``
       makes use of session data.
     * If you use ``CacheMiddleware``, put ``LocaleMiddleware`` after it.
 
-For example, your ``MIDDLEWARE_CLASSES`` might look like this::
+For example, your :setting:`MIDDLEWARE_CLASSES` might look like this::
 
     MIDDLEWARE_CLASSES = (
        'django.contrib.sessions.middleware.SessionMiddleware',
@@ -81,7 +81,7 @@ following this algorithm:
 
     * Failing that, it looks for a cookie.
 
-      The name of the cookie used is set by the ``LANGUAGE_COOKIE_NAME``
+      The name of the cookie used is set by the :setting:`LANGUAGE_COOKIE_NAME`
       setting. (The default name is ``django_language``.)
 
     * Failing that, it looks at the ``Accept-Language`` HTTP header. This
@@ -89,7 +89,7 @@ following this algorithm:
       prefer, in order by priority. Django tries each language in the header
       until it finds one with available translations.
 
-    * Failing that, it uses the global ``LANGUAGE_CODE`` setting.
+    * Failing that, it uses the global :setting:`LANGUAGE_CODE` setting.
 
 .. _locale-middleware-notes:
 
@@ -107,7 +107,7 @@ Notes:
     * Only languages listed in the :setting:`LANGUAGES` setting can be selected.
       If you want to restrict the language selection to a subset of provided
       languages (because your application doesn't provide all those languages),
-      set ``LANGUAGES`` to a list of languages. For example::
+      set :setting:`LANGUAGES` to a list of languages. For example::
 
           LANGUAGES = (
             ('de', _('German')),
@@ -118,7 +118,7 @@ Notes:
       selection to German and English (and any sublanguage, like de-ch or
       en-us).
 
-    * If you define a custom ``LANGUAGES`` setting, as explained in the
+    * If you define a custom :setting:`LANGUAGES` setting, as explained in the
       previous bullet, it's OK to mark the languages as translation strings
       -- but use a "dummy" ``ugettext()`` function, not the one in
       ``django.utils.translation``. You should *never* import
@@ -139,7 +139,8 @@ Notes:
       With this arrangement, ``django-admin.py makemessages`` will still find
       and mark these strings for translation, but the translation won't happen
       at runtime -- so you'll have to remember to wrap the languages in the
-      *real* ``ugettext()`` in any code that uses ``LANGUAGES`` at runtime.
+      *real* ``ugettext()`` in any code that uses :setting:`LANGUAGES` at
+      runtime.
 
     * The ``LocaleMiddleware`` can only select languages for which there is a
       Django-provided base translation. If you want to provide translations

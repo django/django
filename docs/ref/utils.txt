@@ -61,8 +61,8 @@ to distinguish caches by the ``Accept-language`` header.
 
     Each header is only added if it isn't already set.
 
-    ``cache_timeout`` is in seconds. The ``CACHE_MIDDLEWARE_SECONDS`` setting
-    is used by default.
+    ``cache_timeout`` is in seconds. The :setting:`CACHE_MIDDLEWARE_SECONDS`
+    setting is used by default.
 
 .. function:: add_never_cache_headers(response)
 

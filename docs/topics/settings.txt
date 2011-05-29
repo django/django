@@ -209,7 +209,7 @@ provides the default settings as the ``default_settings`` argument (or as the
 first positional argument) in the call to ``configure()``.
 
 In this example, default settings are taken from ``myapp_defaults``, and the
-``DEBUG`` setting is set to ``True``, regardless of its value in
+:setting:`DEBUG` setting is set to ``True``, regardless of its value in
 ``myapp_defaults``::
 
     from django.conf import settings

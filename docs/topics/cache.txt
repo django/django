@@ -420,7 +420,7 @@ Once the cache is set up, the simplest way to use caching is to cache your
 entire site. You'll need to add
 ``'django.middleware.cache.UpdateCacheMiddleware'`` and
 ``'django.middleware.cache.FetchFromCacheMiddleware'`` to your
-``MIDDLEWARE_CLASSES`` setting, as in this example::
+:setting:`MIDDLEWARE_CLASSES` setting, as in this example::
 
     MIDDLEWARE_CLASSES = (
         'django.middleware.cache.UpdateCacheMiddleware',

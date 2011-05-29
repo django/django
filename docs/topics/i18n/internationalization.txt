@@ -673,9 +673,9 @@ You hook it up like this::
     )
 
 Each string in ``packages`` should be in Python dotted-package syntax (the
-same format as the strings in ``INSTALLED_APPS``) and should refer to a package
-that contains a ``locale`` directory. If you specify multiple packages, all
-those catalogs are merged into one catalog. This is useful if you have
+same format as the strings in :setting:`INSTALLED_APPS`) and should refer to a
+package that contains a ``locale`` directory. If you specify multiple packages,
+all those catalogs are merged into one catalog. This is useful if you have
 JavaScript that uses strings from different applications.
 
 The precedence of translations is such that the packages appearing later in the
@@ -706,8 +706,8 @@ the ones appearing first having higher precedence than the ones appearing
 later.
 
 .. versionchanged:: 1.3
-    Directories listed in ``LOCALE_PATHS`` weren't included in the lookup
-    algorithm until version 1.3.
+    Directories listed in :setting:`LOCALE_PATHS` weren't included in the
+    lookup algorithm until version 1.3.
 
 Using the JavaScript translation catalog
 ----------------------------------------

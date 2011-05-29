@@ -101,8 +101,8 @@ In the above example, ``{{ section.title }}`` will be replaced with the
 ``title`` attribute of the ``section`` object.
 
 If you use a variable that doesn't exist, the template system will insert
-the value of the ``TEMPLATE_STRING_IF_INVALID`` setting, which is set to ``''``
-(the empty string) by default.
+the value of the :setting:`TEMPLATE_STRING_IF_INVALID` setting, which is set
+to ``''`` (the empty string) by default.
 
 Filters
 =======

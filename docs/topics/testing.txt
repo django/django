@@ -383,7 +383,7 @@ entirely!). If you want to use a different database name, specify
 Aside from using a separate database, the test runner will otherwise
 use all of the same database settings you have in your settings file:
 :setting:`ENGINE`, :setting:`USER`, :setting:`HOST`, etc. The test
-database is created by the user specified by ``USER``, so you'll need
+database is created by the user specified by :setting:`USER`, so you'll need
 to make sure that the given user account has sufficient privileges to
 create a new database on the system.
 
@@ -1309,8 +1309,8 @@ In order to provide a reliable URL space for your test,
 ``django.test.TestCase`` provides the ability to customize the URLconf
 configuration for the duration of the execution of a test suite. If your
 ``TestCase`` instance defines an ``urls`` attribute, the ``TestCase`` will use
-the value of that attribute as the ``ROOT_URLCONF`` for the duration of that
-test.
+the value of that attribute as the :setting:`ROOT_URLCONF` for the duration
+of that test.
 
 For example::
 

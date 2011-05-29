@@ -48,7 +48,7 @@ Let's step through this code one line at a time:
 
 .. admonition:: Django's Time Zone
 
-    Django includes a ``TIME_ZONE`` setting that defaults to
+    Django includes a :setting:`TIME_ZONE` setting that defaults to
     ``America/Chicago``. This probably isn't where you live, so you might want
     to change it in your settings file.
 

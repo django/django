@@ -225,8 +225,8 @@ Upload Handlers
 
 When a user uploads a file, Django passes off the file data to an *upload
 handler* -- a small class that handles file data as it gets uploaded. Upload
-handlers are initially defined in the ``FILE_UPLOAD_HANDLERS`` setting, which
-defaults to::
+handlers are initially defined in the :setting:`FILE_UPLOAD_HANDLERS` setting,
+which defaults to::
 
     ("django.core.files.uploadhandler.MemoryFileUploadHandler",
      "django.core.files.uploadhandler.TemporaryFileUploadHandler",)
@@ -246,8 +246,8 @@ Modifying upload handlers on the fly
 Sometimes particular views require different upload behavior. In these cases,
 you can override upload handlers on a per-request basis by modifying
 ``request.upload_handlers``. By default, this list will contain the upload
-handlers given by ``FILE_UPLOAD_HANDLERS``, but you can modify the list as you
-would any other list.
+handlers given by :setting:`FILE_UPLOAD_HANDLERS`, but you can modify the list
+as you would any other list.
 
 For instance, suppose you've written a ``ProgressBarUploadHandler`` that
 provides feedback on upload progress to some sort of AJAX widget. You'd add this

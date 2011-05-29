@@ -759,7 +759,7 @@ Takes the following optional arguments:
 .. attribute:: URLField.validator_user_agent
 
     String used as the user-agent used when checking for a URL's existence.
-    Defaults to the value of the ``URL_VALIDATOR_USER_AGENT`` setting.
+    Defaults to the value of the :setting:`URL_VALIDATOR_USER_AGENT` setting.
 
 .. versionchanged:: 1.2
    The URLField previously did not recognize URLs as valid that contained an IDN
