@@ -57,7 +57,7 @@ App names
 ---------
 
 Many commands take a list of "app names." An "app name" is the basename of
-the package containing your models. For example, if your ``INSTALLED_APPS``
+the package containing your models. For example, if your :setting:`INSTALLED_APPS`
 contains the string ``'mysite.blog'``, the app name is ``blog``.
 
 Determining the version
@@ -126,7 +126,7 @@ dbshell
 
 Runs the command-line client for the database engine specified in your
 ``ENGINE`` setting, with the connection parameters specified in your
-``USER``, ``PASSWORD``, etc., settings.
+:setting:`USER`, :setting:`PASSWORD`, etc., settings.
 
     * For PostgreSQL, this runs the ``psql`` command-line client.
     * For MySQL, this runs the ``mysql`` command-line client.
@@ -151,8 +151,9 @@ Displays differences between the current settings file and Django's default
 settings.
 
 Settings that don't appear in the defaults are followed by ``"###"``. For
-example, the default settings don't define ``ROOT_URLCONF``, so
-``ROOT_URLCONF`` is followed by ``"###"`` in the output of ``diffsettings``.
+example, the default settings don't define :setting:`ROOT_URLCONF`, so
+:setting:`ROOT_URLCONF` is followed by ``"###"`` in the output of
+``diffsettings``.
 
 Note that Django's default settings live in ``django/conf/global_settings.py``,
 if you're ever curious to see the full list of defaults.
@@ -245,7 +246,7 @@ inspectdb
 .. django-admin:: inspectdb
 
 Introspects the database tables in the database pointed-to by the
-``NAME`` setting and outputs a Django model module (a ``models.py``
+:setting:`NAME` setting and outputs a Django model module (a ``models.py``
 file) to standard output.
 
 Use this if you have a legacy database with which you'd like to use Django.
@@ -309,7 +310,7 @@ fixture can be distributed over multiple directories, in multiple applications.
 Django will search in three locations for fixtures:
 
    1. In the ``fixtures`` directory of every installed application
-   2. In any directory named in the ``FIXTURE_DIRS`` setting
+   2. In any directory named in the :setting:`FIXTURE_DIRS` setting
    3. In the literal path named by the fixture
 
 Django will load any and all fixtures it finds in these locations that match
@@ -340,7 +341,7 @@ directories will be included in the search path. For example::
 
 would search ``<appname>/fixtures/foo/bar/mydata.json`` for each installed
 application,  ``<dirname>/foo/bar/mydata.json`` for each directory in
-``FIXTURE_DIRS``, and the literal path ``foo/bar/mydata.json``.
+:setting:`FIXTURE_DIRS`, and the literal path ``foo/bar/mydata.json``.
 
 When fixture files are processed, the data is saved to the database as is.
 Model defined ``save`` methods and ``pre_save`` signals are not called.
@@ -742,7 +743,7 @@ Serving static files with the development server
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 By default, the development server doesn't serve any static files for your site
-(such as CSS files, images, things under ``MEDIA_URL`` and so forth). If
+(such as CSS files, images, things under :setting:`MEDIA_URL` and so forth). If
 you want to configure Django to serve static media, read :doc:`/howto/static-files`.
 
 shell
@@ -912,13 +913,13 @@ syncdb
 
 .. django-admin:: syncdb
 
-Creates the database tables for all apps in ``INSTALLED_APPS`` whose tables
-have not already been created.
+Creates the database tables for all apps in :setting:`INSTALLED_APPS` whose
+tables have not already been created.
 
 Use this command when you've added new applications to your project and want to
 install them in the database. This includes any apps shipped with Django that
-might be in ``INSTALLED_APPS`` by default. When you start a new project, run
-this command to install the default apps.
+might be in :setting:`INSTALLED_APPS` by default. When you start a new project,
+run this command to install the default apps.
 
 .. admonition:: Syncdb will not alter existing tables
 
@@ -1032,8 +1033,8 @@ validate
 
 .. django-admin:: validate
 
-Validates all installed models (according to the ``INSTALLED_APPS`` setting)
-and prints validation errors to standard output.
+Validates all installed models (according to the :setting:`INSTALLED_APPS`
+setting) and prints validation errors to standard output.
 
 Commands provided by applications
 =================================

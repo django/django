@@ -170,9 +170,9 @@ their deprecation, as per the :ref:`Django deprecation policy
           and :class:`django.contrib.auth.context_processors.PermLookupDict`,
           respectively.
 
-        * The ``MEDIA_URL`` or ``STATIC_URL`` settings are required to end
-          with a trailing slash to ensure there is a consistent way to
-          combine paths in templates.
+        * The :setting:`MEDIA_URL` or :setting:`STATIC_URL` settings are
+          required to end with a trailing slash to ensure there is a consistent
+          way to combine paths in templates.
 
     * 1.6
         * The compatibility modules ``django.utils.copycompat`` and

@@ -386,7 +386,7 @@ SESSION_COOKIE_DOMAIN
 Default: ``None``
 
 The storage backends that use cookies -- ``CookieStorage`` and
-``FallbackStorage`` -- use the value of ``SESSION_COOKIE_DOMAIN`` in
+``FallbackStorage`` -- use the value of :setting:`SESSION_COOKIE_DOMAIN` in
 setting their cookies. See the :doc:`settings documentation </ref/settings>`
 for more information on how this works and why you might need to set it.
 

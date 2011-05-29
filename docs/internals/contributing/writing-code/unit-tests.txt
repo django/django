@@ -85,7 +85,7 @@ details for each database:
 
 You will also need to ensure that your database uses UTF-8 as the default
 character set. If your database server doesn't use UTF-8 as a default charset,
-you will need to include a value for ``TEST_CHARSET`` in the settings
+you will need to include a value for :setting:`TEST_CHARSET` in the settings
 dictionary for the applicable database.
 
 Running only some of the tests

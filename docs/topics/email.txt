@@ -509,8 +509,8 @@ Defining a custom email backend
 -------------------------------
 
 If you need to change how emails are sent you can write your own email
-backend. The ``EMAIL_BACKEND`` setting in your settings file is then the
-Python import path for your backend class.
+backend. The :setting:`EMAIL_BACKEND` setting in your settings file is then
+the Python import path for your backend class.
 
 Custom email backends should subclass ``BaseEmailBackend`` that is located in
 the ``django.core.mail.backends.base`` module. A custom email backend must

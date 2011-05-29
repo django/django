@@ -1765,7 +1765,7 @@ In this example, we register the default ``AdminSite`` instance
     )
 
 Above we used ``admin.autodiscover()`` to automatically load the
-``INSTALLED_APPS`` admin.py modules.
+:setting:`INSTALLED_APPS` admin.py modules.
 
 In this example, we register the ``AdminSite`` instance
 ``myproject.admin.admin_site`` at the URL ``/myadmin/`` ::

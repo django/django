@@ -264,8 +264,8 @@ The GeoDjango test suite is now included when
 :ref:`running the Django test suite <running-unit-tests>` with ``runtests.py``
 when using :ref:`spatial database backends <spatial-backends>`.
 
-``MEDIA_URL`` and ``STATIC_URL`` must end in a slash
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+:setting:`MEDIA_URL` and :setting:`STATIC_URL` must end in a slash
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Previously, the :setting:`MEDIA_URL` setting only required a trailing slash if
 it contained a suffix beyond the domain name.
@@ -581,7 +581,7 @@ gettext domain):
 
  * Now it is possible to override the translations shipped with applications by
    using the :setting:`LOCALE_PATHS` setting whose translations have now higher
-   precedence than the translations of ``INSTALLED_APPS`` applications.
+   precedence than the translations of :setting:`INSTALLED_APPS` applications.
    The relative priority among the values listed in this setting has also been
    modified so the paths listed first have higher precedence than the
    ones listed later.
@@ -589,7 +589,7 @@ gettext domain):
  * The ``locale`` subdirectory of the directory containing the settings, that
    usually coincides with and is know as the *project directory* is being
    deprecated in this release as a source of translations. (the precedence of
-   these translations is intermediate between applications and ``LOCALE_PATHS``
+   these translations is intermediate between applications and :setting:`LOCALE_PATHS`
    translations). See the `corresponding deprecated features section`_
    of this document.
 

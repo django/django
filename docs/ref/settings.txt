@@ -86,7 +86,7 @@ A tuple of strings representing allowed prefixes for the ``{% ssi %}`` template
 tag. This is a security measure, so that template authors can't access files
 that they shouldn't be accessing.
 
-For example, if ``ALLOWED_INCLUDE_ROOTS`` is ``('/home/html', '/var/www')``,
+For example, if :setting:`ALLOWED_INCLUDE_ROOTS` is ``('/home/html', '/var/www')``,
 then ``{% ssi /home/html/foo.txt %}`` would work, but ``{% ssi /etc/passwd %}``
 wouldn't.
 
@@ -102,7 +102,7 @@ in the URLconf and it doesn't end in a slash, an HTTP redirect is issued to the
 same URL with a slash appended. Note that the redirect may cause any data
 submitted in a POST request to be lost.
 
-The ``APPEND_SLASH`` setting is only used if
+The :setting:`APPEND_SLASH` setting is only used if
 :class:`~django.middleware.common.CommonMiddleware` is installed
 (see :doc:`/topics/http/middleware`). See also :setting:`PREPEND_WWW`.
 
@@ -634,9 +634,9 @@ locale-dictated format has higher precedence and will be applied instead. See
 :tfilter:`allowed date format strings <date>`.
 
 .. versionchanged:: 1.2
-    This setting can now be overriden by setting ``USE_L10N`` to ``True``.
+    This setting can now be overriden by setting :setting:`USE_L10N` to ``True``.
 
-See also ``DATETIME_FORMAT``, ``TIME_FORMAT`` and ``SHORT_DATE_FORMAT``.
+See also :setting:`DATETIME_FORMAT`, :setting:`TIME_FORMAT` and :setting:`SHORT_DATE_FORMAT`.
 
 .. setting:: DATE_INPUT_FORMATS
 
@@ -657,7 +657,7 @@ Note that these format strings are specified in Python's datetime_ module
 syntax, that is different from the one used by Django for formatting dates
 to be displayed.
 
-See also ``DATETIME_INPUT_FORMATS`` and ``TIME_INPUT_FORMATS``.
+See also :setting:`DATETIME_INPUT_FORMATS` and :setting:`TIME_INPUT_FORMATS`.
 
 .. _datetime: http://docs.python.org/library/datetime.html#strftime-strptime-behavior
 
@@ -674,9 +674,9 @@ locale-dictated format has higher precedence and will be applied instead. See
 :tfilter:`allowed date format strings <date>`.
 
 .. versionchanged:: 1.2
-    This setting can now be overriden by setting ``USE_L10N`` to ``True``.
+    This setting can now be overriden by setting :setting:`USE_L10N` to ``True``.
 
-See also ``DATE_FORMAT``, ``TIME_FORMAT`` and ``SHORT_DATETIME_FORMAT``.
+See also :setting:`DATE_FORMAT`, :setting:`TIME_FORMAT` and :setting:`SHORT_DATETIME_FORMAT`.
 
 .. setting:: DATETIME_INPUT_FORMATS
 
@@ -697,7 +697,7 @@ Note that these format strings are specified in Python's datetime_ module
 syntax, that is different from the one used by Django for formatting dates
 to be displayed.
 
-See also ``DATE_INPUT_FORMATS`` and ``TIME_INPUT_FORMATS``.
+See also :setting:`DATE_INPUT_FORMATS` and :setting:`TIME_INPUT_FORMATS`.
 
 .. _datetime: http://docs.python.org/library/datetime.html#strftime-strptime-behavior
 
@@ -720,11 +720,12 @@ Still, note that there are always going to be sections of your debug output that
 are inappropriate for public consumption. File paths, configuration options, and
 the like all give attackers extra information about your server.
 
-It is also important to remember that when running with ``DEBUG`` turned on, Django
-will remember every SQL query it executes. This is useful when you are debugging,
-but on a production server, it will rapidly consume memory.
+It is also important to remember that when running with :setting:`DEBUG`
+turned on, Django will remember every SQL query it executes. This is useful
+when you are debugging, but on a production server, it will rapidly consume
+memory.
 
-Never deploy a site into production with ``DEBUG`` turned on.
+Never deploy a site into production with :setting:`DEBUG` turned on.
 
 .. _django/views/debug.py: http://code.djangoproject.com/browser/django/trunk/django/views/debug.py
 
@@ -757,7 +758,7 @@ DEFAULT_CHARSET
 Default: ``'utf-8'``
 
 Default charset to use for all ``HttpResponse`` objects, if a MIME type isn't
-manually specified. Used with ``DEFAULT_CONTENT_TYPE`` to construct the
+manually specified. Used with :setting:`DEFAULT_CONTENT_TYPE` to construct the
 ``Content-Type`` header.
 
 .. setting:: DEFAULT_CONTENT_TYPE
@@ -768,8 +769,8 @@ DEFAULT_CONTENT_TYPE
 Default: ``'text/html'``
 
 Default content type to use for all ``HttpResponse`` objects, if a MIME type
-isn't manually specified. Used with ``DEFAULT_CHARSET`` to construct the
-``Content-Type`` header.
+isn't manually specified. Used with :setting:`DEFAULT_CHARSET` to construct
+the ``Content-Type`` header.
 
 .. setting:: DEFAULT_FILE_STORAGE
 
@@ -855,7 +856,7 @@ Default: ``'localhost'``
 
 The host to use for sending email.
 
-See also ``EMAIL_PORT``.
+See also :setting:`EMAIL_PORT`.
 
 .. setting:: EMAIL_HOST_PASSWORD
 
@@ -864,12 +865,12 @@ EMAIL_HOST_PASSWORD
 
 Default: ``''`` (Empty string)
 
-Password to use for the SMTP server defined in ``EMAIL_HOST``. This setting is
-used in conjunction with ``EMAIL_HOST_USER`` when authenticating to the SMTP
-server. If either of these settings is empty, Django won't attempt
-authentication.
+Password to use for the SMTP server defined in :setting:`EMAIL_HOST`. This
+setting is used in conjunction with :setting:`EMAIL_HOST_USER` when
+authenticating to the SMTP server. If either of these settings is empty,
+Django won't attempt authentication.
 
-See also ``EMAIL_HOST_USER``.
+See also :setting:`EMAIL_HOST_USER`.
 
 .. setting:: EMAIL_HOST_USER
 
@@ -878,10 +879,10 @@ EMAIL_HOST_USER
 
 Default: ``''`` (Empty string)
 
-Username to use for the SMTP server defined in ``EMAIL_HOST``. If empty,
-Django won't attempt authentication.
+Username to use for the SMTP server defined in :setting:`EMAIL_HOST`.
+If empty, Django won't attempt authentication.
 
-See also ``EMAIL_HOST_PASSWORD``.
+See also :setting:`EMAIL_HOST_PASSWORD`.
 
 .. setting:: EMAIL_PORT
 
@@ -890,7 +891,7 @@ EMAIL_PORT
 
 Default: ``25``
 
-Port to use for the SMTP server defined in ``EMAIL_HOST``.
+Port to use for the SMTP server defined in :setting:`EMAIL_HOST`.
 
 .. setting:: EMAIL_SUBJECT_PREFIX
 
@@ -1037,8 +1038,8 @@ project locales. If not ``None``, Django will check for a ``formats.py``
 file, under the directory named as the current locale, and will use the
 formats defined on this file.
 
-For example, if ``FORMAT_MODULE_PATH`` is set to ``mysite.formats``, and
-current language is ``en`` (English), Django will expect a directory tree
+For example, if :setting:`FORMAT_MODULE_PATH` is set to ``mysite.formats``,
+and current language is ``en`` (English), Django will expect a directory tree
 like::
 
     mysite/
@@ -1048,10 +1049,12 @@ like::
                 __init__.py
                 formats.py
 
-Available formats are ``DATE_FORMAT``, ``TIME_FORMAT``, ``DATETIME_FORMAT``,
-``YEAR_MONTH_FORMAT``, ``MONTH_DAY_FORMAT``, ``SHORT_DATE_FORMAT``,
-``SHORT_DATETIME_FORMAT``, ``FIRST_DAY_OF_WEEK``, ``DECIMAL_SEPARATOR``,
-``THOUSAND_SEPARATOR`` and ``NUMBER_GROUPING``.
+Available formats are :setting:`DATE_FORMAT`, :setting:`TIME_FORMAT`,
+:setting:`DATETIME_FORMAT`, :setting:`YEAR_MONTH_FORMAT`,
+:setting:`MONTH_DAY_FORMAT`, :setting:`SHORT_DATE_FORMAT`,
+:setting:`SHORT_DATETIME_FORMAT`, :setting:`FIRST_DAY_OF_WEEK`,
+:setting:`DECIMAL_SEPARATOR`, :setting:`THOUSAND_SEPARATOR` and
+:setting:`NUMBER_GROUPING`.
 
 .. setting:: IGNORABLE_404_URLS
 
@@ -1100,7 +1103,7 @@ Default: ``()`` (Empty tuple)
 
 A tuple of IP addresses, as strings, that:
 
-    * See debug comments, when ``DEBUG`` is ``True``
+    * See debug comments, when :setting:`DEBUG` is ``True``
     * Receive X headers if the ``XViewMiddleware`` is installed (see
       :doc:`/topics/http/middleware`)
 
@@ -1122,8 +1125,8 @@ LANGUAGE_COOKIE_NAME
 
 Default: ``'django_language'``
 
-The name of the cookie to use for the language cookie. This can be whatever you
-want (but should be different from ``SESSION_COOKIE_NAME``). See
+The name of the cookie to use for the language cookie. This can be whatever
+you want (but should be different from :setting:`SESSION_COOKIE_NAME`). See
 :doc:`/topics/i18n/index`.
 
 .. setting:: LANGUAGES
@@ -1147,12 +1150,13 @@ This specifies which languages are available for language selection. See
 Generally, the default value should suffice. Only set this setting if you want
 to restrict language selection to a subset of the Django-provided languages.
 
-If you define a custom ``LANGUAGES`` setting, it's OK to mark the languages as
-translation strings (as in the default value referred to above) -- but use a
-"dummy" ``gettext()`` function, not the one in ``django.utils.translation``.
-You should *never* import ``django.utils.translation`` from within your
-settings file, because that module in itself depends on the settings, and that
-would cause a circular import.
+If you define a custom :setting:`LANGUAGES` setting, it's OK to mark the
+languages as translation strings (as in the default value referred to above)
+-- but use a "dummy" ``gettext()`` function, not the one in
+``django.utils.translation``. You should *never* import
+``django.utils.translation`` from within your settings file, because that
+module in itself depends on the settings, and that would cause a circular
+import.
 
 The solution is to use a "dummy" ``gettext()`` function. Here's a sample
 settings file::
@@ -1167,7 +1171,7 @@ settings file::
 With this arrangement, ``django-admin.py makemessages`` will still find and
 mark these strings for translation, but the translation won't happen at
 runtime -- so you'll have to remember to wrap the languages in the *real*
-``gettext()`` in any code that uses ``LANGUAGES`` at runtime.
+``gettext()`` in any code that uses :setting:`LANGUAGES` at runtime.
 
 .. setting:: LOCALE_PATHS
 
@@ -1263,7 +1267,7 @@ MANAGERS
 
 Default: ``()`` (Empty tuple)
 
-A tuple in the same format as ``ADMINS`` that specifies who should get
+A tuple in the same format as :setting:`ADMINS` that specifies who should get
 broken-link notifications when ``SEND_BROKEN_LINK_EMAILS=True``.
 
 .. setting:: MEDIA_ROOT
@@ -1368,8 +1372,9 @@ drilldown, the header for a given day displays the day and month. Different
 locales have different formats. For example, U.S. English would say
 "January 1," whereas Spanish might say "1 Enero."
 
-See :tfilter:`allowed date format strings <date>`. See also ``DATE_FORMAT``,
-``DATETIME_FORMAT``, ``TIME_FORMAT`` and ``YEAR_MONTH_FORMAT``.
+See :tfilter:`allowed date format strings <date>`. See also
+:setting:`DATE_FORMAT`, :setting:`DATETIME_FORMAT`,
+:setting:`TIME_FORMAT` and :setting:`YEAR_MONTH_FORMAT`.
 
 .. setting:: NUMBER_GROUPING
 
@@ -1463,10 +1468,10 @@ SEND_BROKEN_LINK_EMAILS
 
 Default: ``False``
 
-Whether to send an email to the ``MANAGERS`` each time somebody visits a
-Django-powered page that is 404ed with a non-empty referer (i.e., a broken
+Whether to send an email to the :setting:`MANAGERS` each time somebody visits
+a Django-powered page that is 404ed with a non-empty referer (i.e., a broken
 link). This is only used if ``CommonMiddleware`` is installed (see
-:doc:`/topics/http/middleware`). See also ``IGNORABLE_404_URLS`` and
+:doc:`/topics/http/middleware`). See also :setting:`IGNORABLE_404_URLS` and
 :doc:`/howto/error-reporting`.
 
 .. setting:: SERIALIZATION_MODULES
@@ -1490,7 +1495,7 @@ SERVER_EMAIL
 Default: ``'root@localhost'``
 
 The email address that error messages come from, such as those sent to
-``ADMINS`` and ``MANAGERS``.
+:setting:`ADMINS` and :setting:`MANAGERS`.
 
 .. setting:: SESSION_COOKIE_AGE
 
@@ -1539,7 +1544,8 @@ SESSION_COOKIE_NAME
 Default: ``'sessionid'``
 
 The name of the cookie to use for sessions. This can be whatever you want (but
-should be different from ``LANGUAGE_COOKIE_NAME``). See the :doc:`/topics/http/sessions`.
+should be different from :setting:`LANGUAGE_COOKIE_NAME`).
+See the :doc:`/topics/http/sessions`.
 
 .. setting:: SESSION_COOKIE_PATH
 
@@ -1629,7 +1635,7 @@ templates. Note that if :setting:`USE_L10N` is set to ``True``, then the
 corresponding locale-dictated format has higher precedence and will be applied.
 See :tfilter:`allowed date format strings <date>`.
 
-See also ``DATE_FORMAT`` and ``SHORT_DATETIME_FORMAT``.
+See also :setting:`DATE_FORMAT` and :setting:`SHORT_DATETIME_FORMAT`.
 
 .. setting:: SHORT_DATETIME_FORMAT
 
@@ -1645,7 +1651,7 @@ templates. Note that if :setting:`USE_L10N` is set to ``True``, then the
 corresponding locale-dictated format has higher precedence and will be applied.
 See :tfilter:`allowed date format strings <date>`.
 
-See also ``DATE_FORMAT`` and ``SHORT_DATETIME_FORMAT``.
+See also :setting:`DATE_FORMAT` and :setting:`SHORT_DATETIME_FORMAT`.
 
 .. setting:: SIGNING_BACKEND
 
@@ -1767,10 +1773,10 @@ error page will display a detailed report for any ``TemplateSyntaxError``. This
 report contains the relevant snippet of the template, with the appropriate line
 highlighted.
 
-Note that Django only displays fancy error pages if ``DEBUG`` is ``True``, so
+Note that Django only displays fancy error pages if :setting:`DEBUG` is ``True``, so
 you'll want to set that to take advantage of this setting.
 
-See also ``DEBUG``.
+See also :setting:`DEBUG`.
 
 .. setting:: TEMPLATE_DIRS
 
@@ -1802,9 +1808,9 @@ module, subsequent items are passed to the ``Loader`` during initialization. See
 
 .. versionchanged:: 1.2
     The class-based API for template loaders was introduced in Django 1.2
-    although  the ``TEMPLATE_LOADERS`` setting will accept strings that specify
-    function-based loaders until compatibility with them is completely removed in
-    Django 1.4.
+    although  the :setting:`TEMPLATE_LOADERS` setting will accept strings
+    that specify function-based loaders until compatibility with them is
+    completely removed in Django 1.4.
 
 .. setting:: TEMPLATE_STRING_IF_INVALID
 
@@ -1838,10 +1844,11 @@ THOUSAND_SEPARATOR
 
 .. versionadded:: 1.2
 
-Default ``,`` (Comma)
+Default: ``,`` (Comma)
 
 Default thousand separator used when formatting numbers. This setting is
-used only when ``NUMBER_GROUPING`` and ``USE_THOUSAND_SEPARATOR`` are set.
+used only when :setting:`NUMBER_GROUPING` and :setting:`USE_THOUSAND_SEPARATOR`
+are set.
 
 See also :setting:`NUMBER_GROUPING`, :setting:`DECIMAL_SEPARATOR` and
 :setting:`USE_THOUSAND_SEPARATOR`.
@@ -1859,9 +1866,9 @@ locale-dictated format has higher precedence and will be applied instead. See
 :tfilter:`allowed date format strings <date>`.
 
 .. versionchanged:: 1.2
-    This setting can now be overriden by setting ``USE_L10N`` to ``True``.
+    This setting can now be overriden by setting :setting:`USE_L10N` to ``True``.
 
-See also ``DATE_FORMAT`` and ``DATETIME_FORMAT``.
+See also :setting:`DATE_FORMAT` and :setting:`DATETIME_FORMAT`.
 
 .. setting:: TIME_INPUT_FORMATS
 
@@ -1878,7 +1885,7 @@ Note that these format strings are specified in Python's datetime_ module
 syntax, that is different from the one used by Django for formatting dates
 to be displayed.
 
-See also ``DATE_INPUT_FORMATS`` and ``DATETIME_INPUT_FORMATS``.
+See also :setting:`DATE_INPUT_FORMATS` and :setting:`DATETIME_INPUT_FORMATS`.
 
 .. _datetime: http://docs.python.org/library/datetime.html#strftime-strptime-behavior
 
@@ -1897,7 +1904,7 @@ A string representing the time zone for this installation, or
 choices lists more than one on the same line; you'll want to use just
 one of the choices for a given time zone. For instance, one line says
 ``'Europe/London GB GB-Eire'``, but you should use the first bit of
-that -- ``'Europe/London'`` -- as your ``TIME_ZONE`` setting.)
+that -- ``'Europe/London'`` -- as your :setting:`TIME_ZONE` setting.)
 
 Note that this is the time zone to which Django will convert all
 dates/times -- not necessarily the timezone of the server. For
@@ -1905,7 +1912,7 @@ example, one server may serve multiple Django-powered sites, each with
 a separate time-zone setting.
 
 Normally, Django sets the ``os.environ['TZ']`` variable to the time
-zone you specify in the ``TIME_ZONE`` setting. Thus, all your views
+zone you specify in the :setting:`TIME_ZONE` setting. Thus, all your views
 and models will automatically operate in the correct time zone.
 However, Django won't set the ``TZ`` environment variable under the
 following conditions:
@@ -1962,7 +1969,7 @@ enabled. This provides an easy way to turn it off, for performance. If this is
 set to ``False``, Django will make some optimizations so as not to load the
 internationalization machinery.
 
-See also ``USE_L10N``
+See also :setting:`USE_L10N`
 
 .. setting:: USE_L10N
 
@@ -1971,13 +1978,13 @@ USE_L10N
 
 .. versionadded:: 1.2
 
-Default ``False``
+Default: ``False``
 
 A boolean that specifies if data will be localized by default or not. If this
 is set to ``True``, e.g. Django will display numbers and dates using the
 format of the current locale.
 
-See also ``USE_I18N`` and ``LANGUAGE_CODE``
+See also :setting:`USE_I18N` and :setting:`LANGUAGE_CODE`
 
 .. setting:: USE_THOUSAND_SEPARATOR
 
@@ -1986,14 +1993,15 @@ USE_THOUSAND_SEPARATOR
 
 .. versionadded:: 1.2
 
-Default ``False``
+Default: ``False``
 
 A boolean that specifies wheter to display numbers using a thousand separator.
-If this is set to ``True``, Django will use values from ``THOUSAND_SEPARATOR``
-and ``NUMBER_GROUPING`` from current locale, to format the number.
-``USE_L10N`` must be set to ``True``, in order to format numbers.
+If this is set to ``True``, Django will use values from
+:setting:`THOUSAND_SEPARATOR` and :setting:`NUMBER_GROUPING` from current
+locale, to format the number. :setting:`USE_L10N` must be set to ``True``,
+in order to format numbers.
 
-See also ``THOUSAND_SEPARATOR`` and ``NUMBER_GROUPING``.
+See also :setting:`THOUSAND_SEPARATOR` and :setting:`NUMBER_GROUPING`.
 
 .. setting:: YEAR_MONTH_FORMAT
 
@@ -2011,8 +2019,9 @@ drilldown, the header for a given month displays the month and the year.
 Different locales have different formats. For example, U.S. English would say
 "January 2006," whereas another locale might say "2006/January."
 
-See :tfilter:`allowed date format strings <date>`. See also ``DATE_FORMAT``,
-``DATETIME_FORMAT``, ``TIME_FORMAT`` and ``MONTH_DAY_FORMAT``.
+See :tfilter:`allowed date format strings <date>`. See also
+:setting:`DATE_FORMAT`, :setting:`DATETIME_FORMAT`, :setting:`TIME_FORMAT`
+and :setting:`MONTH_DAY_FORMAT`.
 
 Deprecated settings
 ===================

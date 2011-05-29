@@ -1307,10 +1307,11 @@ If ``value`` is a ``datetime`` object (e.g., the result of
 ``datetime.datetime.now()``), the output will be the string
 ``'Wed 09 Jan 2008'``.
 
-The format passed can be one of the predefined ones ``DATE_FORMAT``,
-``DATETIME_FORMAT``, ``SHORT_DATE_FORMAT`` or ``SHORT_DATETIME_FORMAT``, or a
-custom format that uses the format specifiers shown in the table above. Note
-that predefined formats may vary depending on the current locale.
+The format passed can be one of the predefined ones :setting:`DATE_FORMAT`,
+:setting:`DATETIME_FORMAT`, :setting:`SHORT_DATE_FORMAT` or
+:setting:`SHORT_DATETIME_FORMAT`, or a custom format that uses the format
+specifiers shown in the table above. Note that predefined formats may vary
+depending on the current locale.
 
 Assuming that :setting:`USE_L10N` is ``True`` and :setting:`LANGUAGE_CODE` is,
 for example, ``"es"``, then for::
@@ -1941,9 +1942,9 @@ time
 
 Formats a time according to the given format.
 
-Given format can be the predefined one ``TIME_FORMAT``, or a custom format,
-same as the :tfilter:`date` filter. Note that the predefined format is locale-
-dependant.
+Given format can be the predefined one :setting:`TIME_FORMAT`, or a custom
+format, same as the :tfilter:`date` filter. Note that the predefined format
+is locale-dependant.
 
 The time filter will only accept parameters in the format string that relate
 to the time of day, not the date (for obvious reasons). If you need to
@@ -2243,7 +2244,7 @@ Other tags and filter libraries
 -------------------------------
 
 Django comes with a couple of other template-tag libraries that you have to
-enable explicitly in your ``INSTALLED_APPS`` setting and enable in your
+enable explicitly in your :setting:`INSTALLED_APPS` setting and enable in your
 template with the ``{% load %}`` tag.
 
 django.contrib.humanize
@@ -2274,15 +2275,18 @@ i18n
 
 Provides a couple of templatetags that allow specifying translatable text in
 Django templates. It is slightly different from the libraries described
-above because you don't need to add any application to the ``INSTALLED_APPS``
-setting but rather set :setting:`USE_I18N` to True, then loading it with
-``{% load i18n %}``. See :ref:`specifying-translation-strings-in-template-code`.
+above because you don't need to add any application to the
+:setting:`INSTALLED_APPS` setting but rather set :setting:`USE_I18N` to True,
+then loading it with ``{% load i18n %}``.
+
+See :ref:`specifying-translation-strings-in-template-code`.
 
 l10n
 ~~~~
 
 Provides a couple of templatetags that allow control over the localization of
 values in Django templates. It is slightly different from the libraries described
-above because you don't need to add any application to the ``INSTALLED_APPS``;
-you only need to load the library using ``{% load l10n %}``. See
-:ref:`topic-l10n-templates`.
+above because you don't need to add any application to the :setting:`INSTALLED_APPS`;
+you only need to load the library using ``{% load l10n %}``.
+
+See :ref:`topic-l10n-templates`.

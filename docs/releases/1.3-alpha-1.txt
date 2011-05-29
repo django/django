@@ -249,7 +249,7 @@ framework, we have "fixed" the problem by making the list of
 prohibited words an empty list.
 
 If you want to restore the old behavior, simply put a
-``PROFANITIES_LIST`` setting in your settings file that includes the
+:setting:`PROFANITIES_LIST` setting in your settings file that includes the
 words that you want to prohibit (see the `commit that implemented this
 change`_ if you want to see the list of words that was historically
 prohibited). However, if avoiding profanities is important to you, you

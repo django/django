@@ -262,8 +262,8 @@ Connection settings are used in this order:
        :setting:`HOST`, :setting:`PORT`
     3. MySQL option files.
 
-In other words, if you set the name of the database in ``OPTIONS``,
-this will take precedence over ``NAME``, which would override
+In other words, if you set the name of the database in :setting:`OPTIONS`,
+this will take precedence over :setting:`NAME`, which would override
 anything in a `MySQL option file`_.
 
 Here's a sample configuration which uses a MySQL option file::
@@ -574,7 +574,7 @@ Your Django settings.py file should look something like this for Oracle::
 
 If you don't use a ``tnsnames.ora`` file or a similar naming method that
 recognizes the SID ("xe" in this example), then fill in both
-``HOST`` and ``PORT`` like so::
+:setting:`HOST` and :setting:`PORT` like so::
 
     DATABASES = {
         'default': {
@@ -587,7 +587,7 @@ recognizes the SID ("xe" in this example), then fill in both
         }
     }
 
-You should supply both ``HOST`` and ``PORT``, or leave both
+You should supply both :setting:`HOST` and :setting:`PORT`, or leave both
 as empty strings.
 
 Threaded option

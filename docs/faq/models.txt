@@ -6,16 +6,17 @@ FAQ: Databases and models
 How can I see the raw SQL queries Django is running?
 ----------------------------------------------------
 
-Make sure your Django ``DEBUG`` setting is set to ``True``. Then, just do
-this::
+Make sure your Django :setting:`DEBUG` setting is set to ``True``.
+Then, just do this::
 
     >>> from django.db import connection
     >>> connection.queries
     [{'sql': 'SELECT polls_polls.id,polls_polls.question,polls_polls.pub_date FROM polls_polls',
     'time': '0.002'}]
 
-``connection.queries`` is only available if ``DEBUG`` is ``True``. It's a list
-of dictionaries in order of query execution. Each dictionary has the following::
+``connection.queries`` is only available if :setting:`DEBUG` is ``True``.
+It's a list of dictionaries in order of query execution. Each dictionary has
+the following::
 
     ``sql`` -- The raw SQL statement
     ``time`` -- How long the statement took to execute, in seconds.
@@ -89,13 +90,13 @@ Why is Django leaking memory?
 
 Django isn't known to leak memory. If you find your Django processes are
 allocating more and more memory, with no sign of releasing it, check to make
-sure your ``DEBUG`` setting is set to ``False``. If ``DEBUG`` is ``True``, then
-Django saves a copy of every SQL statement it has executed.
+sure your :setting:`DEBUG` setting is set to ``False``. If :setting:`DEBUG`
+is ``True``, then Django saves a copy of every SQL statement it has executed.
 
 (The queries are saved in ``django.db.connection.queries``. See
 `How can I see the raw SQL queries Django is running?`_.)
 
-To fix the problem, set ``DEBUG`` to ``False``.
+To fix the problem, set :setting:`DEBUG` to ``False``.
 
 If you need to clear the query list manually at any point in your functions,
 just call ``reset_queries()``, like this::
