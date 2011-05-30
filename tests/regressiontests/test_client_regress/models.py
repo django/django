@@ -12,7 +12,7 @@ from django.template import (TemplateDoesNotExist, TemplateSyntaxError,
     Context, Template, loader)
 import django.template.context
 from django.test import Client, TestCase
-from django.test.client import encode_file
+from django.test.client import encode_file, RequestFactory
 from django.test.utils import ContextList
 
 
@@ -908,3 +908,32 @@ class RawPostDataTest(TestCase):
             response = self.client.get("/test_client_regress/raw_post_data/")
         except AssertionError:
             self.fail("Accessing request.raw_post_data from a view fetched with GET by the test client shouldn't fail.")
+
+
+class RequestFactoryStateTest(TestCase):
+    """Regression tests for #15929."""
+    # These tests are checking that certain middleware don't change certain
+    # global state. Alternatively, from the point of view of a test, they are
+    # ensuring test isolation behaviour. So, unusually, it doesn't make sense to
+    # run the tests individually, and if any are failing it is confusing to run
+    # them with any other set of tests.
+
+    def setUp(self):
+        self.factory = RequestFactory()
+
+    def common_test_that_should_always_pass(self):
+        request = self.factory.get('/')
+        request.session = {}
+        self.assertFalse(hasattr(request, 'user'))
+
+    def test_request(self):
+        self.common_test_that_should_always_pass()
+
+    def test_request_after_client(self):
+        # apart from the next line the three tests are identical
+        self.client.get('/')
+        self.common_test_that_should_always_pass()
+
+    def test_request_after_client_2(self):
+        # This test is executed after the previous one
+        self.common_test_that_should_always_pass()
