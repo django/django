@@ -167,8 +167,9 @@ Other batteries included
     * :doc:`Admin site <ref/contrib/admin/index>` | :doc:`Admin actions <ref/contrib/admin/actions>` | :doc:`Admin documentation generator<ref/contrib/admin/admindocs>`
     * :doc:`Authentication <topics/auth>`
     * :doc:`Cache system <topics/cache>`
-    * :doc:`Conditional content processing <topics/conditional-view-processing>`
+    * :doc:`Clickjacking protection <ref/clickjacking>`
     * :doc:`Comments <ref/contrib/comments/index>` | :doc:`Moderation <ref/contrib/comments/moderation>` | :doc:`Custom comments <ref/contrib/comments/custom>`
+    * :doc:`Conditional content processing <topics/conditional-view-processing>`
     * :doc:`Content types <ref/contrib/contenttypes>`
     * :doc:`Cross Site Request Forgery protection <ref/contrib/csrf>`
     * :doc:`Cryptographic signing <topics/signing>`

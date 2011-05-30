@@ -6,6 +6,7 @@ API Reference
    :maxdepth: 1
 
    authbackends
+   clickjacking
    contrib/index
    databases
    django-admin

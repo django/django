@@ -2023,6 +2023,17 @@ See :tfilter:`allowed date format strings <date>`. See also
 :setting:`DATE_FORMAT`, :setting:`DATETIME_FORMAT`, :setting:`TIME_FORMAT`
 and :setting:`MONTH_DAY_FORMAT`.
 
+.. setting:: X_FRAME_OPTIONS
+
+X_FRAME_OPTIONS
+---------------
+
+Default: ``'SAMEORIGIN'``
+
+The default value for the X-Frame-Options header used by
+:class:`~django.middleware.clickjacking.XFrameOptionsMiddleware`. See the
+:doc:`clickjacking protection </ref/clickjacking/>` documentation.
+
 Deprecated settings
 ===================
 

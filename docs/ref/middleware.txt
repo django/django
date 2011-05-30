@@ -204,3 +204,16 @@ Middleware modules running inside it (coming later in the stack) will be under
 the same transaction control as the view functions.
 
 See the :doc:`transaction management documentation </topics/db/transactions>`.
+
+X-Frame-Options middleware
+--------------------------
+
+.. module:: django.middleware.clickjacking
+   :synopsis: Clickjacking protection
+
+.. class:: XFrameOptionsMiddleware
+
+.. versionadded:: 1.4
+   ``XFrameOptionsMiddleware`` was added.
+
+Simple :doc:`clickjacking protection via the X-Frame-Options header </ref/clickjacking/>`.

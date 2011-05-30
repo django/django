@@ -55,6 +55,15 @@ signing in Web applications.
 
 See :doc:`cryptographic signing </topics/signing>` docs for more information.
 
+Simple clickjacking protection
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+We've added a middleware to provide easy protection against `clickjacking
+<http://en.wikipedia.org/wiki/Clickjacking>`_ using the X-Frame-Options
+header. It's not enabled by default for backwards compatibility reasons, but
+you'll almost certainly want to :doc:`enable it </ref/clickjacking/>` to help
+plug that security hole for browsers that support the header.
+
 ``reverse_lazy``
 ~~~~~~~~~~~~~~~~
 

@@ -9,6 +9,8 @@ from django.utils.unittest import TestCase
 from django.views.decorators.http import require_http_methods, require_GET, require_POST, require_safe
 from django.views.decorators.vary import vary_on_headers, vary_on_cookie
 from django.views.decorators.cache import cache_page, never_cache, cache_control
+from django.views.decorators.clickjacking import xframe_options_deny, xframe_options_sameorigin, xframe_options_exempt
+from django.middleware.clickjacking import XFrameOptionsMiddleware
 
 
 def fully_decorated(request):
@@ -216,3 +218,47 @@ class MethodDecoratorTests(TestCase):
 
         self.assertEqual(Test.method.__doc__, 'A method')
         self.assertEqual(Test.method.im_func.__name__, 'method')
+
+
+class XFrameOptionsDecoratorsTests(TestCase):
+    """
+    Tests for the X-Frame-Options decorators.
+    """
+    def test_deny_decorator(self):
+        """
+        Ensures @xframe_options_deny properly sets the X-Frame-Options header.
+        """
+        @xframe_options_deny
+        def a_view(request):
+            return HttpResponse()
+        r = a_view(HttpRequest())
+        self.assertEqual(r['X-Frame-Options'], 'DENY')
+
+    def test_sameorigin_decorator(self):
+        """
+        Ensures @xframe_options_sameorigin properly sets the X-Frame-Options
+        header.
+        """
+        @xframe_options_sameorigin
+        def a_view(request):
+            return HttpResponse()
+        r = a_view(HttpRequest())
+        self.assertEqual(r['X-Frame-Options'], 'SAMEORIGIN')
+
+    def test_exempt_decorator(self):
+        """
+        Ensures @xframe_options_exempt properly instructs the
+        XFrameOptionsMiddleware to NOT set the header.
+        """
+        @xframe_options_exempt
+        def a_view(request):
+            return HttpResponse()
+        req = HttpRequest()
+        resp = a_view(req)
+        self.assertEqual(resp.get('X-Frame-Options', None), None)
+        self.assertTrue(resp.xframe_options_exempt)
+
+        # Since the real purpose of the exempt decorator is to suppress
+        # the middleware's functionality, let's make sure it actually works...
+        r = XFrameOptionsMiddleware().process_response(req, resp)
+        self.assertEqual(r.get('X-Frame-Options', None), None)
