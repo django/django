@@ -24,7 +24,7 @@ for convenience. An attacker site might create an "I Like Ponies" button on one
 of their own pages, and load the store's page in a transparent iframe such that
 the "Buy Now" button is invisibly overlaid on the "I Like Ponies" button. If the
 user visits the attacker site and clicks "I Like Ponies" he will inadvertently
-click on the online store's "Buy Now" button and unknowningly purchase the item.
+click on the online store's "Buy Now" button and unknowingly purchase the item.
 
 Preventing clickjacking
 =======================
@@ -70,7 +70,7 @@ every outgoing ``HttpResponse``. If you want DENY instead, set the
 
 When using the middleware there may be some views where you do **not** want the
 X-Frame-Options header set. For those cases, you can use a view decorator that
-tells the middleware to not set the header::
+tells the middleware not to set the header::
 
     from django.http import HttpResponse
     from django.views.decorators.clickjacking import xframe_options_exempt
