@@ -5,7 +5,8 @@ from django.db import backend, connection, transaction, DEFAULT_DB_ALIAS
 from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 
 from models import (Book, Award, AwardNote, Person, Child, Toy, PlayedWith,
-    PlayedWithNote, Contact, Email, Researcher, Food, Eaten)
+    PlayedWithNote, Contact, Email, Researcher, Food, Eaten,
+    Policy, Version, Location, Item)
 
 
 # Can't run this test under SQLite, because you can't
@@ -101,6 +102,13 @@ class DeleteCascadeTests(TestCase):
         self.assertEqual(PlayedWith.objects.count(), 0)
         # first two asserts just sanity checks, this is the kicker:
         self.assertEqual(PlayedWithNote.objects.count(), 0)
+
+    def test_15776(self):
+        policy = Policy.objects.create(pk=1, policy_number="1234")
+        version = Version.objects.create(policy=policy)
+        location = Location.objects.create(version=version)
+        item = Item.objects.create(version=version, location=location)
+        policy.delete()
 
 
 class DeleteCascadeTransactionTests(TransactionTestCase):
