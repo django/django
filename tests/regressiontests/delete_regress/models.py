@@ -51,3 +51,19 @@ class Food(models.Model):
 class Eaten(models.Model):
     food = models.ForeignKey(Food, to_field="name")
     meal = models.CharField(max_length=20)
+
+
+# Models for #15776
+
+class Policy(models.Model):
+    policy_number = models.CharField(max_length=10)
+
+class Version(models.Model):
+    policy = models.ForeignKey(Policy)
+
+class Location(models.Model):
+    version = models.ForeignKey(Version, blank=True, null=True)
+
+class Item(models.Model):
+    version = models.ForeignKey(Version)
+    location = models.ForeignKey(Location, blank=True, null=True)

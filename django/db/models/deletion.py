@@ -83,8 +83,8 @@ class Collector(object):
     def add(self, objs, source=None, nullable=False, reverse_dependency=False):
         """
         Adds 'objs' to the collection of objects to be deleted.  If the call is
-        the result of a cascade, 'source' should be the model that caused it
-        and 'nullable' should be set to True, if the relation can be null.
+        the result of a cascade, 'source' should be the model that caused it,
+        and 'nullable' should be set to True if the relation can be null.
 
         Returns a list of all objects that were not already collected.
         """
@@ -100,7 +100,7 @@ class Collector(object):
         # Nullable relationships can be ignored -- they are nulled out before
         # deleting, and therefore do not affect the order in which objects have
         # to be deleted.
-        if new_objs and source is not None and not nullable:
+        if source is not None and not nullable:
             if reverse_dependency:
                 source, model = model, source
             self.dependencies.setdefault(source, set()).add(model)
