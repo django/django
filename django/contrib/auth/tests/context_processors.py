@@ -1,15 +1,26 @@
-# from django.conf import settings
+import os
+
+from django.conf import settings
 from django.contrib.auth import authenticate
 from django.db.models import Q
 from django.test import TestCase
-# from django.template import Template
+
 
 class AuthContextProcessorTests(TestCase):
     """
     Tests for the ``django.contrib.auth.context_processors.auth`` processor
     """
-    urls = 'regressiontests.context_processors.urls'
+    urls = 'django.contrib.auth.tests.urls'
     fixtures = ['context-processors-users.xml']
+
+    def setUp(self):
+        self.old_TEMPLATE_DIRS = settings.TEMPLATE_DIRS
+        settings.TEMPLATE_DIRS = (
+            os.path.join(os.path.dirname(__file__), 'templates'),
+        )
+
+    def tearDown(self):
+        settings.TEMPLATE_DIRS = self.old_TEMPLATE_DIRS
 
     def test_session_not_accessed(self):
         """

@@ -1,8 +1,11 @@
 from django.conf.urls.defaults import patterns, url
+from django.contrib.auth import context_processors
 from django.contrib.auth.urls import urlpatterns
 from django.contrib.auth.views import password_reset
 from django.contrib.auth.decorators import login_required
+from django.contrib.messages.api import info
 from django.http import HttpResponse
+from django.shortcuts import render_to_response
 from django.template import Template, RequestContext
 from django.views.decorators.cache import never_cache
 
@@ -35,7 +38,7 @@ def auth_processor_perms(request):
         RequestContext(request, {}, processors=[context_processors.auth]))
 
 def auth_processor_messages(request):
-    request.user.message_set.create(message="Message 1")
+    info(request, "Message 1")
     return render_to_response('context_processors/auth_attrs_messages.html',
          RequestContext(request, {}, processors=[context_processors.auth]))
 
