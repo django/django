@@ -38,7 +38,7 @@ There are three steps involved in validating a model:
     2. Validate the model as a whole
     3. Validate the field uniqueness
 
-All three steps are performed when you call by a model's
+All three steps are performed when you call a model's
 ``full_clean()`` method.
 
 When you use a ``ModelForm``, the call to ``is_valid()`` will perform
