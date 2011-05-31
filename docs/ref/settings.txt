@@ -1196,7 +1196,7 @@ configuration method by default.
 If you set :setting:`LOGGING_CONFIG` to ``None``, the logging
 configuration process will be skipped.
 
-.. _dictConfig: http://docs.python.org/library/logging.html#logging.dictConfig
+.. _dictConfig: http://docs.python.org/library/logging.config.html#configuration-dictionary-schema
 
 .. setting:: LOGIN_REDIRECT_URL
 
