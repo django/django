@@ -208,7 +208,7 @@ class LazyObject(object):
     def __dir__(self):
         if self._wrapped is None:
             self._setup()
-        return  dir(self._wrapped)
+        return dir(self._wrapped)
 
 class SimpleLazyObject(LazyObject):
     """
@@ -227,9 +227,7 @@ class SimpleLazyObject(LazyObject):
         value.
         """
         self.__dict__['_setupfunc'] = func
-        # For some reason, we have to inline LazyObject.__init__ here to avoid
-        # recursion
-        self._wrapped = None
+        super(SimpleLazyObject, self).__init__()
 
     def __str__(self):
         if self._wrapped is None: self._setup()
