@@ -17,7 +17,7 @@ class PTLocalFlavorTests(LocalFlavorTestCase):
         self.assertFieldOutput(PTZipCodeField, valid, invalid)
 
     def test_PTPhoneNumberField(self):
-        error_format = [u'Phone numbers must have 9 digits, or start by + or 00']
+        error_format = [u'Phone numbers must have 9 digits, or start by + or 00.']
         valid = {
             '917845189': '917845189',
             '91 784 5189': '917845189',

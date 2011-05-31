@@ -158,7 +158,7 @@ class HRLocalFlavorTests(LocalFlavorTestCase):
             '12345678901': '12345678901',
         }
         invalid = {
-            '1234567890': error_invalid,
+            '1234567890': [u'Ensure this value has at least 11 characters (it has 10).'] + error_invalid,
             'ABCDEFGHIJK': error_invalid,
         }
         self.assertFieldOutput(HROIBField, valid, invalid)

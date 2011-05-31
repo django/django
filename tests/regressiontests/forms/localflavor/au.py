@@ -20,14 +20,14 @@ class AULocalFlavorTests(LocalFlavorTestCase):
         self.assertEqual(f.render('state', 'NSW'), out)
 
     def test_AUPostCodeField(self):
-        error_format = [u'Enter a 4 digit post code.']
+        error_format = [u'Enter a 4 digit postcode.']
         valid = {
             '1234': '1234',
             '2000': '2000',
         }
         invalid = {
             'abcd': error_format,
-            '20001': error_format,
+            '20001': [u'Ensure this value has at most 4 characters (it has 5).'] + error_format,
         }
         self.assertFieldOutput(AUPostCodeField, valid, invalid)
 

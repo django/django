@@ -66,7 +66,7 @@ class ROLocalFlavorTests(LocalFlavorTestCase):
         invalid = {
             '21694680': error_invalid,
             '21694680000': error_atmost,
-            '0': error_atleast,
+            '0': error_atleast + error_invalid,
         }
         self.assertFieldOutput(ROCIFField, valid, invalid)
 
@@ -81,7 +81,7 @@ class ROLocalFlavorTests(LocalFlavorTestCase):
             '1981211204487': error_invalid,
             '1981232204489': error_invalid,
             '9981211204489': error_invalid,
-            '9981211209': error_atleast,
+            '9981211209': error_atleast + error_invalid,
             '19812112044891': error_atmost,
         }
         self.assertFieldOutput(ROCNPField, valid, invalid)
@@ -109,32 +109,34 @@ class ROLocalFlavorTests(LocalFlavorTestCase):
         invalid = {
             'RO56RZBR0000060003291176': error_invalid,
             'AT61 1904 3002 3457 3201': error_invalid,
-            'RO56RZBR000006000329117': error_atleast,
+            'RO56RZBR000006000329117': error_atleast + error_invalid,
         }
         self.assertFieldOutput(ROIBANField, valid, invalid)
 
     def test_ROPhoneNumberField(self):
         error_format = [u'Phone numbers must be in XXXX-XXXXXX format.']
         error_atleast = [u'Ensure this value has at least 10 characters (it has 9).']
+        error_invalid = [u'Phone numbers must be in XXXX-XXXXXX format.']
         valid = {
             '0264485936': '0264485936',
             '(0264)-485936': '0264485936',
         }
         invalid = {
             '02644859368': error_format,
-            '026448593': error_atleast,
+            '026448593': error_atleast + error_invalid,
         }
         self.assertFieldOutput(ROPhoneNumberField, valid, invalid)
 
     def test_ROPostalCodeField(self):
         error_atleast = [u'Ensure this value has at least 6 characters (it has 5).']
         error_atmost = [u'Ensure this value has at most 6 characters (it has 7).']
+        error_invalid = [u'Enter a valid postal code in the format XXXXXX']
 
         valid = {
             '400473': '400473',
         }
         invalid = {
-            '40047': error_atleast,
-            '4004731': error_atmost,
+            '40047': error_atleast + error_invalid,
+            '4004731': error_atmost + error_invalid,
         }
         self.assertFieldOutput(ROPostalCodeField, valid, invalid)

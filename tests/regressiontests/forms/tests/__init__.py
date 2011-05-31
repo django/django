@@ -46,5 +46,6 @@ from regressiontests.forms.localflavortests import (
     TRLocalFlavorTests,
     USLocalFlavorTests,
     UYLocalFlavorTests,
-    ZALocalFlavorTests
+    ZALocalFlavorTests,
+    AssertFieldOutputTests,
 )

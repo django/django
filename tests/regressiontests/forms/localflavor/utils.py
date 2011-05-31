@@ -1,3 +1,5 @@
+from __future__ import with_statement
+
 from django.core.exceptions import ValidationError
 from django.core.validators import EMPTY_VALUES
 from django.forms.fields import CharField
@@ -42,17 +44,19 @@ class LocalFlavorTestCase(TestCase):
             self.assertEqual(optional.clean(input), output)
         # test invalid inputs
         for input, errors in invalid.items():
-            self.assertRaisesRegexp(ValidationError, unicode(errors),
-                required.clean, input
-            )
-            self.assertRaisesRegexp(ValidationError, unicode(errors),
-                optional.clean, input
-            )
+            with self.assertRaises(ValidationError) as context_manager:
+                required.clean(input)
+            self.assertEqual(context_manager.exception.messages, errors)
+
+            with self.assertRaises(ValidationError) as context_manager:
+                optional.clean(input)
+            self.assertEqual(context_manager.exception.messages, errors)
         # test required inputs
-        error_required = u'This field is required'
+        error_required = [u'This field is required.']
         for e in EMPTY_VALUES:
-            self.assertRaisesRegexp(ValidationError, error_required,
-                required.clean, e)
+            with self.assertRaises(ValidationError) as context_manager:
+                required.clean(e)
+            self.assertEqual(context_manager.exception.messages, error_required)
             self.assertEqual(optional.clean(e), empty_value)
         # test that max_length and min_length are always accepted
         if issubclass(fieldclass, CharField):
