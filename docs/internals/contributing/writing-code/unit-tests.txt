@@ -26,7 +26,7 @@ Quickstart
 ~~~~~~~~~~
 
 Running the tests requires a Django settings module that defines the
-databases to use. To make it easy to get started. Django provides a
+databases to use. To make it easy to get started, Django provides a
 sample settings module that uses the SQLite database. To run the tests
 with this sample ``settings`` module, ``cd`` into the Django
 ``tests/`` directory and run:
