@@ -78,6 +78,16 @@ A new helper function,
 ``template.Library`` to ease the creation of template tags that store some
 data in a specified context variable.
 
+CSRF improvements
+~~~~~~~~~~~~~~~~~
+
+We've made various improvements to our CSRF features, including the
+:func:`~django.views.decorators.csrf.ensure_csrf_cookie` decorator which can
+help with AJAX heavy sites, protection for PUT and DELETE, and settings
+:setting:`CSRF_COOKIE_SECURE` and :setting:`CSRF_COOKIE_PATH` which can improve
+the security and usefulness of the CSRF protection. See the :doc:`CSRF docs
+</ref/contrib/csrf>` for more information.
+
 .. _backwards-incompatible-changes-1.4:
 
 Backwards incompatible changes in 1.4
