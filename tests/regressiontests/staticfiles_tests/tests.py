@@ -14,6 +14,7 @@ from django.core.files.storage import default_storage
 from django.core.management import call_command
 from django.test import TestCase
 from django.utils.encoding import smart_unicode
+from django.utils.functional import empty
 from django.utils._os import rmtree_errorhandler
 
 
@@ -61,7 +62,7 @@ class StaticFilesTestCase(TestCase):
         # Clear the cached default_storage out, this is because when it first
         # gets accessed (by some other test), it evaluates settings.MEDIA_ROOT,
         # since we're planning on changing that we need to clear out the cache.
-        default_storage._wrapped = None
+        default_storage._wrapped = empty
 
         # To make sure SVN doesn't hangs itself with the non-ASCII characters
         # during checkout, we actually create one file dynamically.
