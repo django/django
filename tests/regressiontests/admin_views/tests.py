@@ -32,7 +32,7 @@ from django.utils import unittest
 
 # local test models
 from models import (Article, BarAccount, CustomArticle, EmptyModel,
-    FooAccount, Gallery, ModelWithStringPrimaryKey,
+    FooAccount, Gallery, GalleryAdmin, ModelWithStringPrimaryKey,
     Person, Persona, Picture, Podcast, Section, Subscriber, Vodcast,
     Language, Collector, Widget, Grommet, DooHickey, FancyDoodad, Whatsit,
     Category, Post, Plot, FunkyTag, Chapter, Book, Promo, WorkHour, Employee,
@@ -237,6 +237,17 @@ class AdminViewBasicTest(TestCase):
             response.content.index('Middle content') < response.content.index('Newest content'),
             "Results of sorting on ModelAdmin method are out of order."
         )
+
+    def testChangeListSortColumnsDefault(self):
+        # Need a model that has a list_display with '__str__' as only item.
+        # Sanity check for assumption made in following test.
+        self.assertEqual(list(GalleryAdmin.list_display), ['__str__'])
+        # A header corresponding to '__str__' should not be in an anchor
+        # for sorting.
+        g = Gallery.objects.create(name='gallery1')
+        response = self.client.get('/test_admin/%s/admin_views/gallery/' % self.urlbit, {})
+        m = re.search('<th scope="col">\s*Gallery\s*</th>', response.content)
+        self.assertTrue(m is not None)
 
     def testLimitedFilter(self):
         """Ensure admin changelist filters do not contain objects excluded via limit_choices_to.

@@ -226,6 +226,12 @@ def lookup_field(name, obj, model_admin=None):
 
 
 def label_for_field(name, model, model_admin=None, return_attr=False):
+    """
+    Returns a sensible label for a field name. The name can be a callable or the
+    name of an object attributes, as well as a genuine fields. If return_attr is
+    True, the resolved attribute (which could be a callable) is also returned.
+    This will be None if (and only if) the name refers to a field.
+    """
     attr = None
     try:
         field = model._meta.get_field_by_name(name)[0]
@@ -236,8 +242,10 @@ def label_for_field(name, model, model_admin=None, return_attr=False):
     except models.FieldDoesNotExist:
         if name == "__unicode__":
             label = force_unicode(model._meta.verbose_name)
+            attr = unicode
         elif name == "__str__":
             label = smart_str(model._meta.verbose_name)
+            attr = str
         else:
             if callable(name):
                 attr = name
