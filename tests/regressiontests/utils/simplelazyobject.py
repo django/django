@@ -1,5 +1,5 @@
 import copy
-import unittest
+from django.utils.unittest import TestCase
 
 from django.utils.functional import SimpleLazyObject, empty
 
@@ -25,7 +25,7 @@ class _ComplexObject(object):
 
 complex_object = lambda: _ComplexObject("joe")
 
-class TestUtilsSimpleLazyObject(unittest.TestCase):
+class TestUtilsSimpleLazyObject(TestCase):
     """
     Tests for SimpleLazyObject
     """
