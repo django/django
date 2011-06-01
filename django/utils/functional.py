@@ -1,3 +1,4 @@
+import operator
 from functools import wraps, update_wrapper
 
 
@@ -164,6 +165,14 @@ def allow_lazy(func, *resultclasses):
         return lazy(func, *resultclasses)(*args, **kwargs)
     return wrapper
 
+empty = object()
+def new_method_proxy(func):
+    def inner(self, *args):
+        if self._wrapped is empty:
+            self._setup()
+        return func(self._wrapped, *args)
+    return inner
+
 class LazyObject(object):
     """
     A wrapper for another class that can be used to delay instantiation of the
@@ -173,26 +182,23 @@ class LazyObject(object):
     instantiation. If you don't need to do that, use SimpleLazyObject.
     """
     def __init__(self):
-        self._wrapped = None
+        self._wrapped = empty
 
-    def __getattr__(self, name):
-        if self._wrapped is None:
-            self._setup()
-        return getattr(self._wrapped, name)
+    __getattr__ = new_method_proxy(getattr)
 
     def __setattr__(self, name, value):
         if name == "_wrapped":
             # Assign to __dict__ to avoid infinite __setattr__ loops.
             self.__dict__["_wrapped"] = value
         else:
-            if self._wrapped is None:
+            if self._wrapped is empty:
                 self._setup()
             setattr(self._wrapped, name, value)
 
     def __delattr__(self, name):
         if name == "_wrapped":
             raise TypeError("can't delete _wrapped.")
-        if self._wrapped is None:
+        if self._wrapped is empty:
             self._setup()
         delattr(self._wrapped, name)
 
@@ -204,11 +210,8 @@ class LazyObject(object):
 
     # introspection support:
     __members__ = property(lambda self: self.__dir__())
+    __dir__ = new_method_proxy(dir)
 
-    def __dir__(self):
-        if self._wrapped is None:
-            self._setup()
-        return dir(self._wrapped)
 
 class SimpleLazyObject(LazyObject):
     """
@@ -229,16 +232,14 @@ class SimpleLazyObject(LazyObject):
         self.__dict__['_setupfunc'] = func
         super(SimpleLazyObject, self).__init__()
 
-    def __str__(self):
-        if self._wrapped is None: self._setup()
-        return str(self._wrapped)
+    def _setup(self):
+        self._wrapped = self._setupfunc()
 
-    def __unicode__(self):
-        if self._wrapped is None: self._setup()
-        return unicode(self._wrapped)
+    __str__ = new_method_proxy(str)
+    __unicode__ = new_method_proxy(unicode)
 
     def __deepcopy__(self, memo):
-        if self._wrapped is None:
+        if self._wrapped is empty:
             # We have to use SimpleLazyObject, not self.__class__, because the
             # latter is proxied.
             result = SimpleLazyObject(self._setupfunc)
@@ -250,21 +251,10 @@ class SimpleLazyObject(LazyObject):
 
     # Need to pretend to be the wrapped class, for the sake of objects that care
     # about this (especially in equality tests)
-    def __get_class(self):
-        if self._wrapped is None: self._setup()
-        return self._wrapped.__class__
-    __class__ = property(__get_class)
-
-    def __eq__(self, other):
-        if self._wrapped is None: self._setup()
-        return self._wrapped == other
-
-    def __hash__(self):
-        if self._wrapped is None: self._setup()
-        return hash(self._wrapped)
-
-    def _setup(self):
-        self._wrapped = self._setupfunc()
+    __class__ = property(new_method_proxy(operator.attrgetter("__class__")))
+    __eq__ = new_method_proxy(operator.eq)
+    __hash__ = new_method_proxy(hash)
+    __nonzero__ = new_method_proxy(bool)
 
 
 class lazy_property(property):

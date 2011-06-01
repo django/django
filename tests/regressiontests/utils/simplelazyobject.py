@@ -1,7 +1,8 @@
 import copy
 import unittest
 
-from django.utils.functional import SimpleLazyObject
+from django.utils.functional import SimpleLazyObject, empty
+
 
 class _ComplexObject(object):
     def __init__(self, name):
@@ -65,13 +66,33 @@ class TestUtilsSimpleLazyObject(unittest.TestCase):
 
         # First, for an unevaluated SimpleLazyObject
         s = SimpleLazyObject(complex_object)
-        assert s._wrapped is None
+        self.assertIs(s._wrapped, empty)
         s2 = copy.deepcopy(s)
-        assert s._wrapped is None # something has gone wrong is s is evaluated
+        # something has gone wrong is s is evaluated
+        self.assertIs(s._wrapped, empty)
         self.assertEqual(s2, complex_object())
 
         # Second, for an evaluated SimpleLazyObject
         name = s.name # evaluate
-        assert s._wrapped is not None
+        self.assertIsNot(s._wrapped, empty)
         s3 = copy.deepcopy(s)
         self.assertEqual(s3, complex_object())
+
+
+    def test_none(self):
+        i = [0]
+        def f():
+            i[0] += 1
+            return None
+
+        x = SimpleLazyObject(f)
+        self.assertEqual(str(x), "None")
+        self.assertEqual(i, [1])
+        self.assertEqual(str(x), "None")
+        self.assertEqual(i, [1])
+
+    def test_bool(self):
+        x = SimpleLazyObject(lambda: 3)
+        self.assertTrue(x)
+        x = SimpleLazyObject(lambda: 0)
+        self.assertFalse(x)
