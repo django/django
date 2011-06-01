@@ -1,0 +1,17 @@
+{% load i18n %}
+{% csrf_token %}
+{{ wizard.management_form }}
+{% if wizard.form.forms %}
+    {{ wizard.form.management_form }}
+    {% for form in wizard.form.forms %}
+        {{ form.as_p }}
+    {% endfor %}
+{% else %}
+    {{ wizard.form.as_p }}
+{% endif %}
+
+{% if wizard.steps.prev %}
+<button name="wizard_prev_step" value="{{ wizard.steps.first }}">{% trans "first step" %}</button>
+<button name="wizard_prev_step" value="{{ wizard.steps.prev }}">{% trans "prev step" %}</button>
+{% endif %}
+<input type="submit" name="submit" value="{% trans "submit" %}" />

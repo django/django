@@ -3,15 +3,7 @@ FormWizard class -- implements a multi-page form, validating between each
 step and storing the form's state as HTML hidden fields so that no state is
 stored on the server side.
 """
-
-try:
-    import cPickle as pickle
-except ImportError:
-    import pickle
-
-from django import forms
-from django.conf import settings
-from django.contrib.formtools.utils import form_hmac
+from django.forms import HiddenInput
 from django.http import Http404
 from django.shortcuts import render_to_response
 from django.template.context import RequestContext
@@ -20,6 +12,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect
 
+from django.contrib.formtools.utils import form_hmac
 
 class FormWizard(object):
     # The HTML (and POST data) field name for the "step" variable.
@@ -41,6 +34,12 @@ class FormWizard(object):
 
         # A zero-based counter keeping track of which step we're in.
         self.step = 0
+
+        import warnings
+        warnings.warn(
+            'Old-style form wizards have been deprecated; use the class-based '
+            'views in django.contrib.formtools.wizard.views instead.',
+            PendingDeprecationWarning)
 
     def __repr__(self):
         return "step: %d\nform_list: %s\ninitial_data: %s" % (self.step, self.form_list, self.initial)
@@ -71,7 +70,7 @@ class FormWizard(object):
         """
         if 'extra_context' in kwargs:
             self.extra_context.update(kwargs['extra_context'])
-        current_step = self.determine_step(request, *args, **kwargs)
+        current_step = self.get_current_or_first_step(request, *args, **kwargs)
         self.parse_params(request, *args, **kwargs)
 
         # Validate and process all the previous forms before instantiating the
@@ -132,7 +131,7 @@ class FormWizard(object):
         old_data = request.POST
         prev_fields = []
         if old_data:
-            hidden = forms.HiddenInput()
+            hidden = HiddenInput()
             # Collect all data from previous steps and render it as HTML hidden fields.
             for i in range(step):
                 old_form = self.get_form(i, old_data)
@@ -177,7 +176,7 @@ class FormWizard(object):
         """
         return form_hmac(form)
 
-    def determine_step(self, request, *args, **kwargs):
+    def get_current_or_first_step(self, request, *args, **kwargs):
         """
         Given the request object and whatever *args and **kwargs were passed to
         __call__(), returns the current step (which is zero-based).

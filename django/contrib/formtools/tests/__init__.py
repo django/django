@@ -1,13 +1,19 @@
 import os
+import re
 import warnings
 
-from django import forms, http
+from django import http
 from django.conf import settings
 from django.contrib.formtools import preview, wizard, utils
 from django.test import TestCase
 from django.test.utils import get_warnings_state, restore_warnings_state
 from django.utils import unittest
 
+from django.contrib.formtools.wizard.tests import *
+from django.contrib.formtools.tests.forms import *
+
+warnings.filterwarnings('ignore', category=PendingDeprecationWarning,
+                        module='django.contrib.formtools.wizard')
 
 success_string = "Done was called!"
 
@@ -22,12 +28,6 @@ class TestFormPreview(preview.FormPreview):
 
     def done(self, request, cleaned_data):
         return http.HttpResponse(success_string)
-
-
-class TestForm(forms.Form):
-    field1 = forms.CharField()
-    field1_ = forms.CharField()
-    bool1 = forms.BooleanField(required=False)
 
 
 class PreviewTests(TestCase):
@@ -63,7 +63,7 @@ class PreviewTests(TestCase):
         is created to manage the stage.
 
         """
-        response = self.client.get('/test1/')
+        response = self.client.get('/preview/')
         stage = self.input % 1
         self.assertContains(response, stage, 1)
         self.assertEqual(response.context['custom_context'], True)
@@ -81,7 +81,7 @@ class PreviewTests(TestCase):
         # Pass strings for form submittal and add stage variable to
         # show we previously saw first stage of the form.
         self.test_data.update({'stage': 1})
-        response = self.client.post('/test1/', self.test_data)
+        response = self.client.post('/preview/', self.test_data)
         # Check to confirm stage is set to 2 in output form.
         stage = self.input % 2
         self.assertContains(response, stage, 1)
@@ -99,11 +99,11 @@ class PreviewTests(TestCase):
         # Pass strings for form submittal and add stage variable to
         # show we previously saw first stage of the form.
         self.test_data.update({'stage':2})
-        response = self.client.post('/test1/', self.test_data)
+        response = self.client.post('/preview/', self.test_data)
         self.assertNotEqual(response.content, success_string)
         hash = self.preview.security_hash(None, TestForm(self.test_data))
         self.test_data.update({'hash': hash})
-        response = self.client.post('/test1/', self.test_data)
+        response = self.client.post('/preview/', self.test_data)
         self.assertEqual(response.content, success_string)
 
     def test_bool_submit(self):
@@ -122,7 +122,7 @@ class PreviewTests(TestCase):
         self.test_data.update({'stage':2})
         hash = self.preview.security_hash(None, TestForm(self.test_data))
         self.test_data.update({'hash':hash, 'bool1':u'False'})
-        response = self.client.post('/test1/', self.test_data)
+        response = self.client.post('/preview/', self.test_data)
         self.assertEqual(response.content, success_string)
 
     def test_form_submit_good_hash(self):
@@ -133,11 +133,11 @@ class PreviewTests(TestCase):
         # Pass strings for form submittal and add stage variable to
         # show we previously saw first stage of the form.
         self.test_data.update({'stage':2})
-        response = self.client.post('/test1/', self.test_data)
+        response = self.client.post('/preview/', self.test_data)
         self.assertNotEqual(response.content, success_string)
         hash = utils.form_hmac(TestForm(self.test_data))
         self.test_data.update({'hash': hash})
-        response = self.client.post('/test1/', self.test_data)
+        response = self.client.post('/preview/', self.test_data)
         self.assertEqual(response.content, success_string)
 
 
@@ -149,12 +149,12 @@ class PreviewTests(TestCase):
         # Pass strings for form submittal and add stage variable to
         # show we previously saw first stage of the form.
         self.test_data.update({'stage':2})
-        response = self.client.post('/test1/', self.test_data)
+        response = self.client.post('/preview/', self.test_data)
         self.assertEqual(response.status_code, 200)
         self.assertNotEqual(response.content, success_string)
         hash = utils.form_hmac(TestForm(self.test_data)) + "bad"
         self.test_data.update({'hash': hash})
-        response = self.client.post('/test1/', self.test_data)
+        response = self.client.post('/previewpreview/', self.test_data)
         self.assertNotEqual(response.content, success_string)
 
 
@@ -220,38 +220,14 @@ class FormHmacTests(unittest.TestCase):
         self.assertEqual(hash1, hash2)
 
 
-class HashTestForm(forms.Form):
-    name = forms.CharField()
-    bio = forms.CharField()
-
-
-class HashTestBlankForm(forms.Form):
-    name = forms.CharField(required=False)
-    bio = forms.CharField(required=False)
-
 #
 # FormWizard tests
 #
 
-
-class WizardPageOneForm(forms.Form):
-    field = forms.CharField()
-
-
-class WizardPageTwoForm(forms.Form):
-    field = forms.CharField()
-
-class WizardPageTwoAlternativeForm(forms.Form):
-    field = forms.CharField()
-
-class WizardPageThreeForm(forms.Form):
-    field = forms.CharField()
-
-
-class WizardClass(wizard.FormWizard):
+class TestWizardClass(wizard.FormWizard):
 
     def get_template(self, step):
-        return 'formwizard/wizard.html'
+        return 'forms/wizard.html'
 
     def done(self, request, cleaned_data):
         return http.HttpResponse(success_string)
@@ -269,6 +245,20 @@ class DummyRequest(http.HttpRequest):
 
 class WizardTests(TestCase):
     urls = 'django.contrib.formtools.tests.urls'
+    input_re = re.compile('name="([^"]+)" value="([^"]+)"')
+    wizard_step_data = (
+        {
+            '0-name': 'Pony',
+            '0-thirsty': '2',
+        },
+        {
+            '1-address1': '123 Main St',
+            '1-address2': 'Djangoland',
+        },
+        {
+            '2-random_crap': 'blah blah',
+        }
+    )
 
     def setUp(self):
         self.old_TEMPLATE_DIRS = settings.TEMPLATE_DIRS
@@ -290,21 +280,21 @@ class WizardTests(TestCase):
         """
         step should be zero for the first form
         """
-        response = self.client.get('/wizard/')
+        response = self.client.get('/wizard1/')
         self.assertEqual(0, response.context['step0'])
 
     def test_step_increments(self):
         """
         step should be incremented when we go to the next page
         """
-        response = self.client.post('/wizard/', {"0-field":"test", "wizard_step":"0"})
+        response = self.client.post('/wizard1/', {"0-field":"test", "wizard_step":"0"})
         self.assertEqual(1, response.context['step0'])
 
     def test_bad_hash(self):
         """
         Form should not advance if the hash is missing or bad
         """
-        response = self.client.post('/wizard/',
+        response = self.client.post('/wizard1/',
                                     {"0-field":"test",
                                      "1-field":"test2",
                                      "wizard_step": "1"})
@@ -319,7 +309,7 @@ class WizardTests(TestCase):
                 "1-field": "test2",
                 "hash_0": "7e9cea465f6a10a6fb47fcea65cb9a76350c9a5c",
                 "wizard_step": "1"}
-        response = self.client.post('/wizard/', data)
+        response = self.client.post('/wizard1/', data)
         self.assertEqual(2, response.context['step0'])
 
     def test_11726(self):
@@ -330,7 +320,7 @@ class WizardTests(TestCase):
         reached = [False]
         that = self
 
-        class WizardWithProcessStep(WizardClass):
+        class WizardWithProcessStep(TestWizardClass):
             def process_step(self, request, form, step):
                 if step == 0:
                     if self.num_steps() < 2:
@@ -362,7 +352,7 @@ class WizardTests(TestCase):
         reached = [False]
         that = self
 
-        class WizardWithProcessStep(WizardClass):
+        class WizardWithProcessStep(TestWizardClass):
             def process_step(self, request, form, step):
                 that.assertTrue(hasattr(form, 'cleaned_data'))
                 reached[0] = True
@@ -386,7 +376,7 @@ class WizardTests(TestCase):
         reached = [False]
         that = self
 
-        class Wizard(WizardClass):
+        class Wizard(TestWizardClass):
             def done(self, request, form_list):
                 reached[0] = True
                 that.assertTrue(len(form_list) == 2)
@@ -409,7 +399,7 @@ class WizardTests(TestCase):
         reached = [False]
         that = self
 
-        class WizardWithProcessStep(WizardClass):
+        class WizardWithProcessStep(TestWizardClass):
             def process_step(self, request, form, step):
                 if step == 0:
                     self.form_list[1] = WizardPageTwoAlternativeForm
@@ -426,3 +416,39 @@ class WizardTests(TestCase):
                 "wizard_step": "1"}
         wizard(DummyRequest(POST=data))
         self.assertTrue(reached[0])
+
+    def grab_field_data(self, response):
+        """
+        Pull the appropriate field data from the context to pass to the next wizard step
+        """
+        previous_fields = response.context['previous_fields']
+        fields = {'wizard_step': response.context['step0']}
+
+        def grab(m):
+            fields[m.group(1)] = m.group(2)
+            return ''
+
+        self.input_re.sub(grab, previous_fields)
+        return fields
+
+    def check_wizard_step(self, response, step_no):
+        """
+        Helper function to test each step of the wizard
+        - Make sure the call succeeded
+        - Make sure response is the proper step number
+        - return the result from the post for the next step
+        """
+        step_count = len(self.wizard_step_data)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Step %d of %d' % (step_no, step_count))
+
+        data = self.grab_field_data(response)
+        data.update(self.wizard_step_data[step_no - 1])
+
+        return self.client.post('/wizard2/', data)
+
+    def test_9473(self):
+        response = self.client.get('/wizard2/')
+        for step_no in range(1, len(self.wizard_step_data) + 1):
+            response = self.check_wizard_step(response, step_no)

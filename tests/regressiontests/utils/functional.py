@@ -1,5 +1,5 @@
 from django.utils import unittest
-from django.utils.functional import lazy
+from django.utils.functional import lazy, lazy_property
 
 
 class FunctionalTestCase(unittest.TestCase):
@@ -20,3 +20,20 @@ class FunctionalTestCase(unittest.TestCase):
 
         t = lazy(lambda: Klazz(), Klazz)()
         self.assertTrue('base_method' in dir(t))
+
+    def test_lazy_property(self):
+
+        class A(object):
+
+            def _get_do(self):
+                raise NotImplementedError
+            def _set_do(self, value):
+                raise NotImplementedError
+            do = lazy_property(_get_do, _set_do)
+
+        class B(A):
+            def _get_do(self):
+                return "DO IT"
+
+        self.assertRaises(NotImplementedError, lambda: A().do)
+        self.assertEqual(B().do, 'DO IT')
