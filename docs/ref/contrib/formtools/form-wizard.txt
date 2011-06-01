@@ -481,7 +481,7 @@ If the value of a specific step is callable it will be called with the
 the step's form will be used.
 
 This example provides a contact form including a condition. The condition is
-used to show a message from only if a checkbox in the first step was checked.
+used to show a message form only if a checkbox in the first step was checked.
 
 The steps are defined in a ``forms.py``::
 

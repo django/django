@@ -517,7 +517,7 @@ class WizardView(TemplateView):
         context['wizard'] = {
             'form': form,
             'steps': self.steps,
-            'managenent_form': ManagementForm(prefix=self.prefix, initial={
+            'management_form': ManagementForm(prefix=self.prefix, initial={
                 'current_step': self.steps.current,
             }),
         }
