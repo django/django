@@ -32,7 +32,7 @@ from django.utils import unittest
 
 # local test models
 from models import (Article, BarAccount, CustomArticle, EmptyModel,
-    FooAccount, Gallery, GalleryAdmin, ModelWithStringPrimaryKey,
+    FooAccount, Gallery, PersonAdmin, ModelWithStringPrimaryKey,
     Person, Persona, Picture, Podcast, Section, Subscriber, Vodcast,
     Language, Collector, Widget, Grommet, DooHickey, FancyDoodad, Whatsit,
     Category, Post, Plot, FunkyTag, Chapter, Book, Promo, WorkHour, Employee,
@@ -204,7 +204,7 @@ class AdminViewBasicTest(TestCase):
         Ensure we can sort on a list_display field that is a callable
         (column 2 is callable_year in ArticleAdmin)
         """
-        response = self.client.get('/test_admin/%s/admin_views/article/' % self.urlbit, {'ot': 'asc', 'o': 2})
+        response = self.client.get('/test_admin/%s/admin_views/article/' % self.urlbit, {'o': 2})
         self.assertEqual(response.status_code, 200)
         self.assertTrue(
             response.content.index('Oldest content') < response.content.index('Middle content') and
@@ -217,7 +217,7 @@ class AdminViewBasicTest(TestCase):
         Ensure we can sort on a list_display field that is a Model method
         (colunn 3 is 'model_year' in ArticleAdmin)
         """
-        response = self.client.get('/test_admin/%s/admin_views/article/' % self.urlbit, {'ot': 'dsc', 'o': 3})
+        response = self.client.get('/test_admin/%s/admin_views/article/' % self.urlbit, {'o': '-3'})
         self.assertEqual(response.status_code, 200)
         self.assertTrue(
             response.content.index('Newest content') < response.content.index('Middle content') and
@@ -230,12 +230,87 @@ class AdminViewBasicTest(TestCase):
         Ensure we can sort on a list_display field that is a ModelAdmin method
         (colunn 4 is 'modeladmin_year' in ArticleAdmin)
         """
-        response = self.client.get('/test_admin/%s/admin_views/article/' % self.urlbit, {'ot': 'asc', 'o': 4})
+        response = self.client.get('/test_admin/%s/admin_views/article/' % self.urlbit, {'o': '4'})
         self.assertEqual(response.status_code, 200)
         self.assertTrue(
             response.content.index('Oldest content') < response.content.index('Middle content') and
             response.content.index('Middle content') < response.content.index('Newest content'),
             "Results of sorting on ModelAdmin method are out of order."
+        )
+
+    def testChangeListSortingMultiple(self):
+        p1 = Person.objects.create(name="Chris", gender=1, alive=True)
+        p2 = Person.objects.create(name="Chris", gender=2, alive=True)
+        p3 = Person.objects.create(name="Bob", gender=1, alive=True)
+        link = '<a href="%s/'
+
+        # Sort by name, gender
+        # This hard-codes the URL because it'll fail if it runs against the
+        # 'admin2' custom admin (which doesn't have the Person model).
+        response = self.client.get('/test_admin/admin/admin_views/person/', {'o': '1.2'})
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(
+            response.content.index(link % p3.id) < response.content.index(link % p1.id) and
+            response.content.index(link % p1.id) < response.content.index(link % p2.id)
+        )
+
+        # Sort by gender descending, name
+        response = self.client.get('/test_admin/admin/admin_views/person/', {'o': '-2.1'})
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(
+            response.content.index(link % p2.id) < response.content.index(link % p3.id) and
+            response.content.index(link % p3.id) < response.content.index(link % p1.id)
+        )
+
+    def testChangeListSortingPreserveQuerySetOrdering(self):
+        # If no ordering on ModelAdmin, or query string, the underlying order of
+        # the queryset should not be changed.
+
+        p1 = Person.objects.create(name="Amy", gender=1, alive=True, age=80)
+        p2 = Person.objects.create(name="Bob", gender=1, alive=True, age=70)
+        p3 = Person.objects.create(name="Chris", gender=2, alive=False, age=60)
+        link = '<a href="%s/'
+
+        # This hard-codes the URL because it'll fail if it runs against the
+        # 'admin2' custom admin (which doesn't have the Person model).
+        response = self.client.get('/test_admin/admin/admin_views/person/', {})
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(
+            response.content.index(link % p3.id) < response.content.index(link % p2.id) and
+            response.content.index(link % p2.id) < response.content.index(link % p1.id)
+        )
+
+    def testChangeListSortingModelMeta(self):
+        # Test ordering on Model Meta is respected
+
+        l1 = Language.objects.create(iso='ur', name='Urdu')
+        l2 = Language.objects.create(iso='ar', name='Arabic')
+        link = '<a href="%s/'
+
+        response = self.client.get('/test_admin/admin/admin_views/language/', {})
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(
+            response.content.index(link % l2.pk) < response.content.index(link % l1.pk)
+        )
+
+        # Test we can override with query string
+        response = self.client.get('/test_admin/admin/admin_views/language/', {'o':'-1'})
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(
+            response.content.index(link % l1.pk) < response.content.index(link % l2.pk)
+        )
+
+    def testChangeListSortingModelAdmin(self):
+        # Test ordering on Model Admin is respected, and overrides Model Meta
+        dt = datetime.datetime.now()
+        p1 = Podcast.objects.create(name="A", release_date=dt)
+        p2 = Podcast.objects.create(name="B", release_date=dt - datetime.timedelta(10))
+
+        link = '<a href="%s/'
+        response = self.client.get('/test_admin/admin/admin_views/podcast/', {})
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(
+            response.content.index(link % p1.pk) < response.content.index(link % p2.pk)
         )
 
     def testLimitedFilter(self):
@@ -1956,7 +2031,7 @@ class AdminActionsTest(TestCase):
             'action' : 'external_mail',
             'index': 0,
         }
-        url = '/test_admin/admin/admin_views/externalsubscriber/?ot=asc&o=1'
+        url = '/test_admin/admin/admin_views/externalsubscriber/?o=1'
         response = self.client.post(url, action_data)
         self.assertRedirects(response, url)
 

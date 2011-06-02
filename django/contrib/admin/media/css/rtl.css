@@ -91,6 +91,14 @@ table thead th.descending a {
     background-position: left;
 }
 
+table thead th.sorted a span.text {
+   float: right;
+}
+
+table thead th.sorted a span.sortpos {
+   float: left;
+}
+
 /* dashboard styles */
 
 .dashboard .module table td a {

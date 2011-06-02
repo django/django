@@ -46,6 +46,14 @@ not custom filters. This has been rectified with a simple API previously
 known as "FilterSpec" which was used internally. For more details, see the
 documentation for :attr:`~django.contrib.admin.ModelAdmin.list_filter`.
 
+Multiple sort in admin interface
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The admin change list now supports sorting on multiple columns. It respects all
+elements of the :attr:`~django.contrib.admin.ModelAdmin.ordering` attribute, and
+sorting on multiple columns by clicking on headers is designed to work similarly
+to how desktop GUIs do it.
+
 Tools for cryptographic signing
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

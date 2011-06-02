@@ -67,11 +67,11 @@ class CustomUserAdmin(UserAdmin):
 
 class BookAdmin(ModelAdmin):
     list_filter = ('year', 'author', 'contributors', 'is_best_seller', 'date_registered', 'no')
-    order_by = '-id'
+    ordering = ('-id',)
 
 class DecadeFilterBookAdmin(ModelAdmin):
     list_filter = ('author', DecadeListFilterWithTitleAndParameter)
-    order_by = '-id'
+    ordering = ('-id',)
 
 class DecadeFilterBookAdminWithoutTitle(ModelAdmin):
     list_filter = (DecadeListFilterWithoutTitle,)

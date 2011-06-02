@@ -243,9 +243,6 @@ class Person(models.Model):
     def __unicode__(self):
         return self.name
 
-    class Meta:
-        ordering = ["id"]
-
 class BasePersonModelFormSet(BaseModelFormSet):
     def clean(self):
         for person_dict in self.cleaned_data:
@@ -259,12 +256,16 @@ class PersonAdmin(admin.ModelAdmin):
     list_editable = ('gender', 'alive')
     list_filter = ('gender',)
     search_fields = ('^name',)
-    ordering = ["id"]
     save_as = True
 
     def get_changelist_formset(self, request, **kwargs):
         return super(PersonAdmin, self).get_changelist_formset(request,
             formset=BasePersonModelFormSet, **kwargs)
+
+    def queryset(self, request):
+        # Order by a field that isn't in list display, to be able to test
+        # whether ordering is preserved.
+        return super(PersonAdmin, self).queryset(request).order_by('age')
 
 
 class Persona(models.Model):
@@ -356,6 +357,9 @@ class Media(models.Model):
 
 class Podcast(Media):
     release_date = models.DateField()
+
+    class Meta:
+        ordering = ('release_date',) # overridden in PodcastAdmin
 
 class PodcastAdmin(admin.ModelAdmin):
     list_display = ('name', 'release_date')
@@ -795,6 +799,7 @@ class StoryAdmin(admin.ModelAdmin):
     list_display_links = ('title',) # 'id' not in list_display_links
     list_editable = ('content', )
     form = StoryForm
+    ordering = ["-pk"]
 
 class OtherStory(models.Model):
     title = models.CharField(max_length=100)
@@ -804,6 +809,7 @@ class OtherStoryAdmin(admin.ModelAdmin):
     list_display = ('id', 'title', 'content')
     list_display_links = ('title', 'id') # 'id' in list_display_links
     list_editable = ('content', )
+    ordering = ["-pk"]
 
 admin.site.register(Article, ArticleAdmin)
 admin.site.register(CustomArticle, CustomArticleAdmin)

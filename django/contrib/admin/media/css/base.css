@@ -326,6 +326,34 @@ table thead th.descending a {
     background: url(../img/admin/arrow-down.gif) right .4em no-repeat;
 }
 
+table thead th.sorted a span.text {
+   display: block;
+   float: left;
+}
+
+table thead th.sorted a span.sortpos {
+   display: block;
+   float: right;
+   font-size: .6em;
+}
+
+table thead th.sorted a img {
+   vertical-align: bottom;
+}
+
+table thead th.sorted a span.clear {
+   display: block;
+   clear: both;
+}
+
+#sorting-popup-div {
+    position: absolute;
+    background-color: white;
+    border: 1px solid #ddd;
+    z-index: 2000; /* more than filters on right */
+    padding-right: 10px;
+}
+
 /* ORDERABLE TABLES */
 
 table.orderable tbody tr td:hover {

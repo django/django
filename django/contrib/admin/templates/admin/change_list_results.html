@@ -1,3 +1,5 @@
+{% load adminmedia %}
+{% load i18n %}
 {% if result_hidden_fields %}
 <div class="hiddenfields">{# DIV for HTML validation #}
 {% for item in result_hidden_fields %}{{ item }}{% endfor %}
@@ -8,10 +10,18 @@
 <table id="result_list">
 <thead>
 <tr>
-{% for header in result_headers %}<th scope="col"{{ header.class_attrib }}>
-{% if header.sortable %}<a href="{{ header.url }}">{% endif %}
-{{ header.text|capfirst }}
-{% if header.sortable %}</a>{% endif %}</th>{% endfor %}
+{% for header in result_headers %}
+<th scope="col" {{ header.class_attrib }}>
+  {% if header.sortable %}<a href="{{ header.url }}">{% endif %}
+  <span class="text">{{ header.text|capfirst }}</span>
+  {% if header.sortable %}
+    {% if header.sort_pos > 0 %}<span class="sortpos">
+      {% if header.sort_pos == 1 %}<img id="primary-sort-icon" src="{% admin_media_prefix %}img/admin/icon_cog.gif" alt="" />&nbsp;{% endif %}
+      {{ header.sort_pos }}</span>
+    {% endif %}
+    <span class="clear"></span></a>
+  {% endif %}
+</th>{% endfor %}
 </tr>
 </thead>
 <tbody>
@@ -24,4 +34,53 @@
 </tbody>
 </table>
 </div>
+
+{# Sorting popup: #}
+<div style="display: none;" id="sorting-popup-div">
+<p>{% trans "Sorting by:" %}</p>
+<ol>
+{% for header in result_headers|dictsort:"sort_pos" %}
+  {% if header.sort_pos > 0 %}
+    {% if header.ascending %}
+      <li>{% blocktrans with fieldname=header.text %}{{ fieldname }} (ascending){% endblocktrans %}</li>
+    {% else %}
+      <li>{% blocktrans with fieldname=header.text %}{{ fieldname }} (descending){% endblocktrans %}</li>
+    {% endif %}
+  {% endif %}
+{% endfor %}
+</ol>
+<p><a href="{{ reset_sorting_url }}">{% trans "Reset sorting" %}</a></p>
+</div>
+<script type="text/javascript">
+<!--
+(function($) {
+    $(document).ready(function() {
+        var popup = $('#sorting-popup-div');
+        /* These next lines seems necessary to prime the popup: */
+        popup.offset({left:-1000, top:0});
+        popup.show();
+        var popupWidth = popup.width();
+        popup.hide();
+
+        $('#primary-sort-icon').toggle(function(ev) {
+                                          ev.preventDefault();
+                                          var img = $(this);
+                                          var pos = img.offset();
+                                          pos.top += img.height();
+                                          if (pos.left + popupWidth >
+                                              $(window).width()) {
+                                              pos.left -= popupWidth;
+                                          }
+                                          popup.show();
+                                          popup.offset(pos);
+                                      },
+                                      function(ev) {
+                                          ev.preventDefault();
+                                          popup.hide();
+                                      });
+    });
+})(django.jQuery);
+//-->
+</script>
+
 {% endif %}
