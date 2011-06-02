@@ -338,7 +338,7 @@ table thead th.sorted a span.sortpos {
 }
 
 table thead th.sorted a img {
-   vertical-align: bottom;
+   vertical-align: top;
 }
 
 table thead th.sorted a span.clear {
