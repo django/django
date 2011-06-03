@@ -811,6 +811,20 @@ class OtherStoryAdmin(admin.ModelAdmin):
     list_editable = ('content', )
     ordering = ["-pk"]
 
+class ComplexSortedPerson(models.Model):
+    name = models.CharField(max_length=100)
+    age = models.PositiveIntegerField()
+    is_employee = models.NullBooleanField()
+
+class ComplexSortedPersonAdmin(admin.ModelAdmin):
+    list_display = ('name', 'age', 'is_employee', 'colored_name')
+    ordering = ('name',)
+
+    def colored_name(self, obj):
+        return '<span style="color: #%s;">%s</span>' % ('ff00ff', obj.name)
+    colored_name.allow_tags = True
+    colored_name.admin_order_field = 'name'
+
 admin.site.register(Article, ArticleAdmin)
 admin.site.register(CustomArticle, CustomArticleAdmin)
 admin.site.register(Section, save_as=True, inlines=[ArticleInline])
@@ -872,3 +886,4 @@ admin.site.register(Album, AlbumAdmin)
 admin.site.register(Question)
 admin.site.register(Answer)
 admin.site.register(PrePopulatedPost, PrePopulatedPostAdmin)
+admin.site.register(ComplexSortedPerson, ComplexSortedPersonAdmin)

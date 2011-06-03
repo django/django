@@ -85,7 +85,7 @@ def result_headers(cl):
     # We need to know the 'ordering field' that corresponds to each
     # item in list_display, and we need other info, so do a pre-pass
     # on list_display
-    list_display_info = SortedDict()
+    ordering_field_columns = cl.get_ordering_field_columns()
     for i, field_name in enumerate(cl.list_display):
         admin_order_field = None
         text, attr = label_for_field(field_name, cl.model,
@@ -93,36 +93,20 @@ def result_headers(cl):
             return_attr = True
         )
         if attr:
-            admin_order_field = getattr(attr, "admin_order_field", None)
-        if admin_order_field is None:
-            ordering_field_name = field_name
-        else:
-            ordering_field_name = admin_order_field
-        list_display_info[ordering_field_name] = dict(text=text,
-                                                      attr=attr,
-                                                      index=i,
-                                                      admin_order_field=admin_order_field,
-                                                      field_name=field_name)
-
-    del admin_order_field, text, attr
-
-    ordering_fields = cl.get_ordering_fields()
-
-    for ordering_field_name, info in list_display_info.items():
-        if info['attr']:
             # Potentially not sortable
 
             # if the field is the action checkbox: no sorting and special class
-            if info['field_name'] == 'action_checkbox':
+            if field_name == 'action_checkbox':
                 yield {
-                    "text": info['text'],
+                    "text": text,
                     "class_attrib": mark_safe(' class="action-checkbox-column"')
                 }
                 continue
 
-            if not info['admin_order_field']:
+            admin_order_field = getattr(attr, "admin_order_field", None)
+            if not admin_order_field:
                 # Not sortable
-                yield {"text": info['text']}
+                yield {"text": text}
                 continue
 
         # OK, it is sortable if we got this far
@@ -131,9 +115,9 @@ def result_headers(cl):
         new_order_type = 'asc'
         sort_pos = 0
         # Is it currently being sorted on?
-        if ordering_field_name in ordering_fields:
-            order_type = ordering_fields.get(ordering_field_name).lower()
-            sort_pos = ordering_fields.keys().index(ordering_field_name) + 1
+        if i in ordering_field_columns:
+            order_type = ordering_field_columns.get(i).lower()
+            sort_pos = ordering_field_columns.keys().index(i) + 1
             th_classes.append('sorted %sending' % order_type)
             new_order_type = {'asc': 'desc', 'desc': 'asc'}[order_type]
 
@@ -141,27 +125,21 @@ def result_headers(cl):
         o_list = []
         make_qs_param = lambda t, n: ('-' if t == 'desc' else '') + str(n)
 
-        for f, ot in ordering_fields.items():
-            try:
-                colnum = list_display_info[f]['index']
-            except KeyError:
-                continue
-
-            if f == ordering_field_name:
+        for j, ot in ordering_field_columns.items():
+            if j == i: # Same column
                 # We want clicking on this header to bring the ordering to the
                 # front
-                o_list.insert(0, make_qs_param(new_order_type, colnum))
+                o_list.insert(0, make_qs_param(new_order_type, j))
             else:
-                o_list.append(make_qs_param(ot, colnum))
+                o_list.append(make_qs_param(ot, j))
 
-        if ordering_field_name not in ordering_fields:
-            colnum = list_display_info[ordering_field_name]['index']
-            o_list.insert(0, make_qs_param(new_order_type, colnum))
+        if i not in ordering_field_columns:
+            o_list.insert(0, make_qs_param(new_order_type, i))
 
         o_list = '.'.join(o_list)
 
         yield {
-            "text": info['text'],
+            "text": text,
             "sortable": True,
             "ascending": order_type == "asc",
             "sort_pos": sort_pos,

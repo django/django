@@ -164,16 +164,20 @@ class ChangeList(object):
         self.multi_page = multi_page
         self.paginator = paginator
 
-    def get_ordering(self):
-        lookup_opts, params = self.lookup_opts, self.params
-        # For ordering, first check the "ordering" parameter in the admin
-        # options, then check the object's default ordering. Finally, a
-        # manually-specified ordering from the query string overrides anything.
+    def _get_default_ordering(self):
         ordering = []
         if self.model_admin.ordering:
             ordering = self.model_admin.ordering
-        elif lookup_opts.ordering:
-            ordering = lookup_opts.ordering
+        elif self.lookup_opts.ordering:
+            ordering = self.lookup_opts.ordering
+        return ordering
+
+    def get_ordering(self):
+        params = self.params
+        # For ordering, first check the "ordering" parameter in the admin
+        # options, then check the object's default ordering. Finally, a
+        # manually-specified ordering from the query string overrides anything.
+        ordering = self._get_default_ordering()
 
         if ORDER_VAR in params:
             # Clear ordering and used params
@@ -184,7 +188,7 @@ class ChangeList(object):
                     none, pfx, idx = p.rpartition('-')
                     field_name = self.list_display[int(idx)]
                     try:
-                        f = lookup_opts.get_field(field_name)
+                        f = self.lookup_opts.get_field(field_name)
                     except models.FieldDoesNotExist:
                         # See whether field_name is a name of a non-field
                         # that allows sorting.
@@ -208,12 +212,44 @@ class ChangeList(object):
 
         return ordering
 
-    def get_ordering_fields(self):
-        # Returns a SortedDict of ordering fields and asc/desc
+    def get_ordering_field_columns(self):
+        # Returns a SortedDict of ordering field column numbers and asc/desc
+
+        # We must cope with more than one column having the same underlying sort
+        # field, so we base things on column numbers.
+        ordering = self._get_default_ordering()
         ordering_fields = SortedDict()
-        for o in self.ordering:
-            none, t, f = o.rpartition('-')
-            ordering_fields[f] = 'desc' if t == '-' else 'asc'
+        if ORDER_VAR not in self.params:
+            # for ordering specified on ModelAdmin or model Meta, we don't know
+            # the right column numbers absolutely, because there might be more
+            # than one column associated with that ordering, so we guess.
+            for f in ordering:
+                if f.startswith('-'):
+                    f = f[1:]
+                    order_type = 'desc'
+                else:
+                    order_type = 'asc'
+                i = None
+                try:
+                    # Search for simply field name first
+                    i = self.list_display.index(f)
+                except ValueError:
+                    # No match, but their might be a match if we take into account
+                    # 'admin_order_field'
+                    for j, attr in enumerate(self.list_display):
+                        if getattr(attr, 'admin_order_field', '') == f:
+                            i = j
+                            break
+                if i is not None:
+                    ordering_fields[i] = order_type
+        else:
+            for p in self.params[ORDER_VAR].split('.'):
+                none, pfx, idx = p.rpartition('-')
+                try:
+                    idx = int(idx)
+                except ValueError:
+                    continue # skip it
+                ordering_fields[idx] = 'desc' if pfx == '-' else 'asc'
         return ordering_fields
 
     def get_lookup_params(self, use_distinct=False):

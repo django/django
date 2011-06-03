@@ -37,7 +37,8 @@ from models import (Article, BarAccount, CustomArticle, EmptyModel,
     Language, Collector, Widget, Grommet, DooHickey, FancyDoodad, Whatsit,
     Category, Post, Plot, FunkyTag, Chapter, Book, Promo, WorkHour, Employee,
     Question, Answer, Inquisition, Actor, FoodDelivery,
-    RowLevelChangePermissionModel, Paper, CoverLetter, Story, OtherStory)
+    RowLevelChangePermissionModel, Paper, CoverLetter, Story, OtherStory,
+    ComplexSortedPerson)
 
 
 class AdminViewBasicTest(TestCase):
@@ -311,6 +312,42 @@ class AdminViewBasicTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue(
             response.content.index(link % p1.pk) < response.content.index(link % p2.pk)
+        )
+
+    def testMultipleSortSameField(self):
+        # Check that we get the columns we expect if we have two columns
+        # that correspond to the same ordering field
+        dt = datetime.datetime.now()
+        p1 = Podcast.objects.create(name="A", release_date=dt)
+        p2 = Podcast.objects.create(name="B", release_date=dt - datetime.timedelta(10))
+
+        link = '<a href="%s/'
+        response = self.client.get('/test_admin/admin/admin_views/podcast/', {})
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(
+            response.content.index(link % p1.pk) < response.content.index(link % p2.pk)
+        )
+
+        p1 = ComplexSortedPerson.objects.create(name="Bob", age=10)
+        p2 = ComplexSortedPerson.objects.create(name="Amy", age=20)
+        link = '<a href="%s/'
+
+        response = self.client.get('/test_admin/admin/admin_views/complexsortedperson/', {})
+        self.assertEqual(response.status_code, 200)
+        # Should have 5 columns (including action checkbox col)
+        self.assertContains(response, '<th scope="col"', count=5)
+
+        self.assertContains(response, 'Name')
+        self.assertContains(response, 'Colored name')
+
+        # Check order
+        self.assertTrue(
+            response.content.index('Name') < response.content.index('Colored name')
+        )
+
+        # Check sorting - should be by name
+        self.assertTrue(
+            response.content.index(link % p2.id) < response.content.index(link % p1.id)
         )
 
     def testLimitedFilter(self):
