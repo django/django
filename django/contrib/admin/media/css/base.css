@@ -329,12 +329,15 @@ table thead th.descending a {
 table thead th.sorted a span.text {
    display: block;
    float: left;
+   cursor: pointer; /* IE needs this */
 }
 
 table thead th.sorted a span.sortpos {
    display: block;
    float: right;
    font-size: .6em;
+   text-align: right;
+   cursor: pointer; /* IE needs this */
 }
 
 table thead th.sorted a img {

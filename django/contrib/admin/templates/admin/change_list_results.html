@@ -65,8 +65,12 @@
         var popup = $('#sorting-popup-div');
         var img = $('#primary-sort-icon');
         /* These next lines seems necessary to prime the popup: */
-        popup.offset({left:-1000, top:0});
+        popup.offset({left:0, top:-1000});
         popup.show();
+        if ($.browser.msie) {
+            // Can't find a way to make IE autosize the div.
+            popup.width(300);
+        }
         var popupWidth = popup.width();
         popup.hide();
 
@@ -107,7 +111,10 @@
             }
         });
 
-        $('#sorting-popup-dismiss').click(hidePopup);
+        $('#sorting-popup-dismiss').click(function(ev) {
+            hidePopup();
+            ev.preventDefault()
+        });
     });
 })(django.jQuery);
 //-->
