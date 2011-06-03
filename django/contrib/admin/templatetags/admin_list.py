@@ -122,28 +122,37 @@ def result_headers(cl):
             new_order_type = {'asc': 'desc', 'desc': 'asc'}[order_type]
 
         # build new ordering param
-        o_list = []
+        o_list_primary = [] # URL for making this field the primary sort
+        o_list_remove  = [] # URL for removing this field from sort
+        o_list_toggle  = [] # URL for toggling order type for this field
         make_qs_param = lambda t, n: ('-' if t == 'desc' else '') + str(n)
 
         for j, ot in ordering_field_columns.items():
             if j == i: # Same column
+                param = make_qs_param(new_order_type, j)
                 # We want clicking on this header to bring the ordering to the
                 # front
-                o_list.insert(0, make_qs_param(new_order_type, j))
+                o_list_primary.insert(0, param)
+                o_list_toggle.append(param)
+                # o_list_remove - omit
             else:
-                o_list.append(make_qs_param(ot, j))
+                param = make_qs_param(ot, j)
+                o_list_primary.append(param)
+                o_list_toggle.append(param)
+                o_list_remove.append(param)
 
         if i not in ordering_field_columns:
-            o_list.insert(0, make_qs_param(new_order_type, i))
+            o_list_primary.insert(0, make_qs_param(new_order_type, i))
 
-        o_list = '.'.join(o_list)
 
         yield {
             "text": text,
             "sortable": True,
             "ascending": order_type == "asc",
             "sort_pos": sort_pos,
-            "url": cl.get_query_string({ORDER_VAR: o_list}),
+            "url_primary": cl.get_query_string({ORDER_VAR: '.'.join(o_list_primary)}),
+            "url_remove": cl.get_query_string({ORDER_VAR: '.'.join(o_list_remove)}),
+            "url_toggle": cl.get_query_string({ORDER_VAR: '.'.join(o_list_toggle)}),
             "class_attrib": mark_safe(th_classes and ' class="%s"' % ' '.join(th_classes) or '')
         }
 

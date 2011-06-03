@@ -351,7 +351,27 @@ table thead th.sorted a span.clear {
     background-color: white;
     border: 1px solid #ddd;
     z-index: 2000; /* more than filters on right */
-    padding-right: 10px;
+}
+
+#sorting-popup-div table {
+    border-right: 0px;
+    border-left: 0px;
+}
+
+#sorting-popup-div .reset {
+    text-align: center;
+}
+
+#sorting-popup-div .cancel {
+    font-size: 10px;
+    background: #e1e1e1 url(../img/admin/nav-bg.gif) 0 50% repeat-x;
+    border-top: 1px solid #ddd;
+    text-align: center;
+}
+
+#sorting-popup-div .cancel a {
+    width: 100%;
+    display: block;
 }
 
 /* ORDERABLE TABLES */

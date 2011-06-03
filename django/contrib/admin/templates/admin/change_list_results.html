@@ -12,7 +12,7 @@
 <tr>
 {% for header in result_headers %}
 <th scope="col" {{ header.class_attrib }}>
-  {% if header.sortable %}<a href="{{ header.url }}">{% endif %}
+  {% if header.sortable %}<a href="{{ header.url_primary }}">{% endif %}
   <span class="text">{{ header.text|capfirst }}</span>
   {% if header.sortable %}
     {% if header.sort_pos > 0 %}<span class="sortpos">
@@ -37,47 +37,77 @@
 
 {# Sorting popup: #}
 <div style="display: none;" id="sorting-popup-div">
-<p>{% trans "Sorting by:" %}</p>
-<ol>
-{% for header in result_headers|dictsort:"sort_pos" %}
-  {% if header.sort_pos > 0 %}
-    {% if header.ascending %}
-      <li>{% blocktrans with fieldname=header.text %}{{ fieldname }} (ascending){% endblocktrans %}</li>
-    {% else %}
-      <li>{% blocktrans with fieldname=header.text %}{{ fieldname }} (descending){% endblocktrans %}</li>
+<table>
+  <caption>
+   {% trans "Sorting by:" %}
+  </caption>
+  <tbody>
+  {% for header in result_headers|dictsort:"sort_pos" %}
+    {% if header.sort_pos > 0 %}
+    <tr>
+      <td>{{ header.sort_pos }}</td>
+      <td>{{ header.text|capfirst }}</td>
+      <td>{% if header.ascending %}{% trans "ascending" %}{% else %}{% trans "descending" %}{% endif %}</td>
+      <td><a href="{{ header.url_toggle }}">{% trans "toggle" %}</a></td>
+      <td><a href="{{ header.url_remove }}">{% trans "remove" %}</a></td>
+    </tr>
     {% endif %}
-  {% endif %}
-{% endfor %}
-</ol>
-<p><a href="{{ reset_sorting_url }}">{% trans "Reset sorting" %}</a></p>
+  {% endfor %}
+  </tbody>
+</table>
+<div class="reset"><a href="{{ reset_sorting_url }}">{% trans "Reset sorting" %}</a></div>
+<div class="cancel"><a href="javascript:void" id="sorting-popup-dismiss">{% trans "Cancel" %}</a></div>
 </div>
 <script type="text/javascript">
 <!--
 (function($) {
     $(document).ready(function() {
         var popup = $('#sorting-popup-div');
+        var img = $('#primary-sort-icon');
         /* These next lines seems necessary to prime the popup: */
         popup.offset({left:-1000, top:0});
         popup.show();
         var popupWidth = popup.width();
         popup.hide();
 
-        $('#primary-sort-icon').toggle(function(ev) {
-                                          ev.preventDefault();
-                                          var img = $(this);
-                                          var pos = img.offset();
-                                          pos.top += img.height();
-                                          if (pos.left + popupWidth >
-                                              $(window).width()) {
-                                              pos.left -= popupWidth;
-                                          }
-                                          popup.show();
-                                          popup.offset(pos);
-                                      },
-                                      function(ev) {
-                                          ev.preventDefault();
-                                          popup.hide();
-                                      });
+        var visible = false;
+
+        var escHandler = function(ev) {
+            if (ev.which == 27) {
+                hidePopup();
+                ev.preventDefault();
+            }
+        };
+
+        var showPopup = function() {
+            var pos = img.offset();
+            pos.top += img.height();
+            if (pos.left + popupWidth >
+                $(window).width()) {
+                pos.left -= popupWidth;
+            }
+            popup.show();
+            popup.offset(pos);
+            visible = true;
+            $(document).bind('keyup', escHandler);
+        };
+
+        var hidePopup = function() {
+            popup.hide();
+            visible = false;
+            $(document).unbind('keyup', escHandler);
+        };
+
+        $('#primary-sort-icon').click(function(ev) {
+            ev.preventDefault();
+            if (visible) {
+                hidePopup();
+            } else {
+                showPopup();
+            }
+        });
+
+        $('#sorting-popup-dismiss').click(hidePopup);
     });
 })(django.jQuery);
 //-->
