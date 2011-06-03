@@ -310,8 +310,8 @@ thead th a:link, thead th a:visited {
     display: block;
 }
 
-table thead th.sorted {
-    background-position: bottom left !important;
+thead th.sorted {
+    background: #c5c5c5 url(../img/admin/nav-bg-selected.gif) top left repeat-x;
 }
 
 table thead th.sorted a {
