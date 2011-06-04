@@ -371,9 +371,9 @@ in ``get_query_set()`` is not appropriate for use as an automatic manager.
 Set ``use_for_related_fields`` when you define the class
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The ``use_for_related_fields`` attribute must be set on the manager *class*,
-object not on an *instance* of the class. The earlier example shows the
-correct way to set it, whereas the following will not work::
+The ``use_for_related_fields`` attribute must be set on the manager *class*, not
+on an *instance* of the class. The earlier example shows the correct way to set
+it, whereas the following will not work::
 
     # BAD: Incorrect code
     class MyManager(models.Manager):
