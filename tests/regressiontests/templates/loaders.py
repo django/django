@@ -17,7 +17,6 @@ import os.path
 import warnings
 
 from django.template import TemplateDoesNotExist, Context
-from django.template.loaders.eggs import load_template_source as lts_egg
 from django.template.loaders.eggs import Loader as EggLoader
 from django.template import loader
 from django.test.utils import get_warnings_state, restore_warnings_state
