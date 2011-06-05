@@ -1073,7 +1073,19 @@ projects?
     For example::
 
         {% load url from future %}
+
+
+        {% url 'app_views.client' %}
+
         {% url 'myapp:view-name' %}
+
+        {% with view_path="app_views.client" %}
+        {% url view_path client.id %}
+        {% endwith %}
+
+        {% with url_name="client-detail-view" %}
+        {% url url_name client.id %}
+        {% endwith %}
 
     The new library also drops support for the comma syntax for
     separating arguments to the :ttag:`url` template tag.

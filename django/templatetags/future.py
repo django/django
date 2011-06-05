@@ -50,11 +50,15 @@ def url(parser, token):
 
         {% url "path.to.some_view" name1=value1 name2=value2 %}
 
-    The first argument is a path to a view. It can be an absolute python path
+    The first argument is a path to a view. It can be an absolute Python path
     or just ``app_name.view_name`` without the project name if the view is
-    located inside the project.  Other arguments are comma-separated values
-    that will be filled in place of positional and keyword arguments in the
-    URL. All arguments for the URL should be present.
+    located inside the project.
+
+    Other arguments are space-separated values that will be filled in place of
+    positional and keyword arguments in the URL. Don't mix positional and
+    keyword arguments.
+
+    All arguments for the URL should be present.
 
     For example if you have a view ``app_name.client`` taking client's id and
     the corresponding line in a URLconf looks like this::
@@ -71,6 +75,30 @@ def url(parser, token):
         {% url "app_name.client" client.id %}
 
     The URL will look like ``/clients/client/123/``.
+
+    The first argument can also be a named URL instead of the Python path to
+    the view callable. For example if the URLconf entry looks like this::
+
+        url('^client/(\d+)/$', name='client-detail-view')
+
+    then in the template you can use::
+
+        {% url "client-detail-view" client.id %}
+
+    There is even another possible value type for the first argument. It can be
+    the name of a template variable that will be evaluated to obtain the view
+    name or the URL name, e.g.::
+
+        {% with view_path="app_name.client" %}
+        {% url view_path client.id %}
+        {% endwith %}
+
+        or,
+
+        {% with url_name="client-detail-view" %}
+        {% url url_name client.id %}
+        {% endwith %}
+
     """
     bits = token.split_contents()
     if len(bits) < 2:
