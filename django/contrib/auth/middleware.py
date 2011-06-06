@@ -4,10 +4,8 @@ from django.utils.functional import SimpleLazyObject
 
 
 def get_user(request):
-    from django.contrib.auth import get_user
-
     if not hasattr(request, '_cached_user'):
-        request._cached_user = get_user(request)
+        request._cached_user = auth.get_user(request)
     return request._cached_user
 
 
