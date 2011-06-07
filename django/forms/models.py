@@ -396,7 +396,12 @@ def modelform_factory(model, form=ModelForm, fields=None, exclude=None,
         'formfield_callback': formfield_callback
     }
 
-    return ModelFormMetaclass(class_name, (form,), form_class_attrs)
+    form_metaclass = ModelFormMetaclass
+
+    if issubclass(form, BaseModelForm) and hasattr(form, '__metaclass__'):
+        form_metaclass = form.__metaclass__
+
+    return form_metaclass(class_name, (form,), form_class_attrs)
 
 
 # ModelFormSets ##############################################################
