@@ -9,8 +9,8 @@ from subprocess import PIPE, Popen
 
 from django.core.management.base import CommandError, NoArgsCommand
 from django.utils.text import get_text_list
+from django.utils.jslex import prepare_js_for_gettext
 
-pythonize_re = re.compile(r'(?:^|\n)\s*//')
 plural_forms_re = re.compile(r'^(?P<value>"Plural-Forms.+?\\n")\s*$', re.MULTILINE | re.DOTALL)
 
 def handle_extensions(extensions=('html',)):
@@ -184,15 +184,15 @@ def make_messages(locale=None, domain='django', verbosity='1', all=False,
                 if verbosity > 1:
                     sys.stdout.write('processing file %s in %s\n' % (file, dirpath))
                 src = open(os.path.join(dirpath, file), "rU").read()
-                src = pythonize_re.sub('\n#', src)
-                thefile = '%s.py' % file
+                src = prepare_js_for_gettext(src)
+                thefile = '%s.c' % file
                 f = open(os.path.join(dirpath, thefile), "w")
                 try:
                     f.write(src)
                 finally:
                     f.close()
                 cmd = (
-                    'xgettext -d %s -L Perl %s --keyword=gettext_noop '
+                    'xgettext -d %s -L C %s --keyword=gettext_noop '
                     '--keyword=gettext_lazy --keyword=ngettext_lazy:1,2 '
                     '--keyword=pgettext:1c,2 --keyword=npgettext:1c,2,3 '
                     '--from-code UTF-8 --add-comments=Translators -o - "%s"' % (

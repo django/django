@@ -18,3 +18,4 @@ from datastructures import *
 from tzinfo import *
 from datetime_safe import *
 from baseconv import *
+from jslex import *
