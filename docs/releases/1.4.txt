@@ -277,3 +277,10 @@ enforce protection on everything.
 
 If you using PUT or DELETE methods in AJAX applications, please see the
 :ref:`instructions about using AJAX and CSRF <csrf-ajax>`.
+
+``django.core.template_loaders``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This was an alias to ``django.template.loader`` since 2005, it has been removed
+without emitting a warning due to the length of the deprecation. If your code
+still referenced this please use ``django.template.loader`` instead.
