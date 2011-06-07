@@ -1,10 +1,13 @@
+from copy import deepcopy
 from datetime import datetime
+
 from django.test import TestCase
 from django.core.exceptions import FieldError
+
 from models import Article, Reporter
 
-class ManyToOneTests(TestCase):
 
+class ManyToOneTests(TestCase):
     def setUp(self):
         # Create a few Reporters.
         self.r = Reporter(first_name='John', last_name='Smith', email='john@example.com')
@@ -368,5 +371,4 @@ class ManyToOneTests(TestCase):
         # Regression for #12876 -- Model methods that include queries that
         # recursive don't cause recursion depth problems under deepcopy.
         self.r.cached_query = Article.objects.filter(reporter=self.r)
-        from copy import deepcopy
         self.assertEqual(repr(deepcopy(self.r)), "<Reporter: John Smith>")

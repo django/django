@@ -459,9 +459,7 @@ class ForeignRelatedObjectsDescriptor(object):
                 remove.alters_data = True
 
                 def clear(self):
-                    for obj in self.all():
-                        setattr(obj, rel_field.name, None)
-                        obj.save()
+                    self.update(**{rel_field.name: None})
                 clear.alters_data = True
 
         manager = RelatedManager()
