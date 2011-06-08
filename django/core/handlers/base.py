@@ -206,7 +206,7 @@ class BaseHandler(object):
             exc_info=exc_info,
             extra={
                 'status_code': 500,
-                'request':request
+                'request': request
             }
         )
 

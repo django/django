@@ -116,6 +116,26 @@ help with AJAX heavy sites, protection for PUT and DELETE, and settings
 the security and usefulness of the CSRF protection. See the :doc:`CSRF docs
 </ref/contrib/csrf>` for more information.
 
+Error report filtering
+~~~~~~~~~~~~~~~~~~~~~~
+
+Two new function decorators, :func:`sensitive_variables` and
+:func:`sensitive_post_parameters`, were added to allow designating the
+traceback frames' local variables and request's POST parameters susceptible
+to contain sensitive information and that should be filtered out of error
+reports.
+
+All POST parameters are now systematically filtered out of error reports for
+certain :mod:`contrib.views.auth` views (``login``, ``password_reset_confirm``,
+``password_change``, and ``add_view`` and ``user_change_password`` in the
+``auth`` admin) to prevent the leaking of sensitive information such as user
+passwords.
+
+You may override or customize the default filtering by writing a
+:ref:`custom filter<custom-error-reports>`. Learn more on
+:ref:`Filtering error reports<filtering-error-reports>`.
+
+
 .. _backwards-incompatible-changes-1.4:
 
 Backwards incompatible changes in 1.4

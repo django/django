@@ -1,3 +1,4 @@
+from __future__ import with_statement
 import inspect
 import os
 import sys
@@ -8,8 +9,12 @@ from django.test import TestCase, RequestFactory
 from django.core.urlresolvers import reverse
 from django.template import TemplateSyntaxError
 from django.views.debug import ExceptionReporter
+from django.core.exceptions import ImproperlyConfigured
+from django.core import mail
 
 from regressiontests.views import BrokenException, except_args
+from regressiontests.views.views import (sensitive_view, non_sensitive_view,
+    paranoid_view, custom_exception_reporter_filter_view)
 
 
 class DebugViewTests(TestCase):
@@ -143,3 +148,188 @@ class ExceptionReporterTests(TestCase):
         self.assertNotIn('<h2>Traceback ', html)
         self.assertIn('<h2>Request information</h2>', html)
         self.assertIn('<p>Request data not supplied</p>', html)
+
+
+class ExceptionReporterFilterTests(TestCase):
+    """
+    Ensure that sensitive information can be filtered out of error reports.
+    Refs #14614.
+    """
+    rf = RequestFactory()
+    breakfast_data = {'sausage-key': 'sausage-value',
+                      'baked-beans-key': 'baked-beans-value',
+                      'hash-brown-key': 'hash-brown-value',
+                      'bacon-key': 'bacon-value',}
+
+    def verify_unsafe_response(self, view):
+        """
+        Asserts that potentially sensitive info are displayed in the response.
+        """
+        request = self.rf.post('/some_url/', self.breakfast_data)
+        response = view(request)
+        # All variables are shown.
+        self.assertContains(response, 'cooked_eggs', status_code=500)
+        self.assertContains(response, 'scrambled', status_code=500)
+        self.assertContains(response, 'sauce', status_code=500)
+        self.assertContains(response, 'worcestershire', status_code=500)
+        for k, v in self.breakfast_data.items():
+            # All POST parameters are shown.
+            self.assertContains(response, k, status_code=500)
+            self.assertContains(response, v, status_code=500)
+
+    def verify_safe_response(self, view):
+        """
+        Asserts that certain sensitive info are not displayed in the response.
+        """
+        request = self.rf.post('/some_url/', self.breakfast_data)
+        response = view(request)
+        # Non-sensitive variable's name and value are shown.
+        self.assertContains(response, 'cooked_eggs', status_code=500)
+        self.assertContains(response, 'scrambled', status_code=500)
+        # Sensitive variable's name is shown but not its value.
+        self.assertContains(response, 'sauce', status_code=500)
+        self.assertNotContains(response, 'worcestershire', status_code=500)
+        for k, v in self.breakfast_data.items():
+            # All POST parameters' names are shown.
+            self.assertContains(response, k, status_code=500)
+        # Non-sensitive POST parameters' values are shown.
+        self.assertContains(response, 'baked-beans-value', status_code=500)
+        self.assertContains(response, 'hash-brown-value', status_code=500)
+        # Sensitive POST parameters' values are not shown.
+        self.assertNotContains(response, 'sausage-value', status_code=500)
+        self.assertNotContains(response, 'bacon-value', status_code=500)
+
+    def verify_paranoid_response(self, view):
+        """
+        Asserts that no variables or POST parameters are displayed in the response.
+        """
+        request = self.rf.post('/some_url/', self.breakfast_data)
+        response = view(request)
+        # Show variable names but not their values.
+        self.assertContains(response, 'cooked_eggs', status_code=500)
+        self.assertNotContains(response, 'scrambled', status_code=500)
+        self.assertContains(response, 'sauce', status_code=500)
+        self.assertNotContains(response, 'worcestershire', status_code=500)
+        for k, v in self.breakfast_data.items():
+            # All POST parameters' names are shown.
+            self.assertContains(response, k, status_code=500)
+            # No POST parameters' values are shown.
+            self.assertNotContains(response, v, status_code=500)
+
+    def verify_unsafe_email(self, view):
+        """
+        Asserts that potentially sensitive info are displayed in the email report.
+        """
+        with self.settings(ADMINS=(('Admin', 'admin@fattie-breakie.com'),)):
+            mail.outbox = [] # Empty outbox
+            request = self.rf.post('/some_url/', self.breakfast_data)
+            response = view(request)
+            self.assertEquals(len(mail.outbox), 1)
+            email = mail.outbox[0]
+            # Frames vars are never shown in plain text email reports.
+            self.assertNotIn('cooked_eggs', email.body)
+            self.assertNotIn('scrambled', email.body)
+            self.assertNotIn('sauce', email.body)
+            self.assertNotIn('worcestershire', email.body)
+            for k, v in self.breakfast_data.items():
+                # All POST parameters are shown.
+                self.assertIn(k, email.body)
+                self.assertIn(v, email.body)
+
+    def verify_safe_email(self, view):
+        """
+        Asserts that certain sensitive info are not displayed in the email report.
+        """
+        with self.settings(ADMINS=(('Admin', 'admin@fattie-breakie.com'),)):
+            mail.outbox = [] # Empty outbox
+            request = self.rf.post('/some_url/', self.breakfast_data)
+            response = view(request)
+            self.assertEquals(len(mail.outbox), 1)
+            email = mail.outbox[0]
+            # Frames vars are never shown in plain text email reports.
+            self.assertNotIn('cooked_eggs', email.body)
+            self.assertNotIn('scrambled', email.body)
+            self.assertNotIn('sauce', email.body)
+            self.assertNotIn('worcestershire', email.body)
+            for k, v in self.breakfast_data.items():
+                # All POST parameters' names are shown.
+                self.assertIn(k, email.body)
+            # Non-sensitive POST parameters' values are shown.
+            self.assertIn('baked-beans-value', email.body)
+            self.assertIn('hash-brown-value', email.body)
+            # Sensitive POST parameters' values are not shown.
+            self.assertNotIn('sausage-value', email.body)
+            self.assertNotIn('bacon-value', email.body)
+
+    def verify_paranoid_email(self, view):
+        """
+        Asserts that no variables or POST parameters are displayed in the email report.
+        """
+        with self.settings(ADMINS=(('Admin', 'admin@fattie-breakie.com'),)):
+            mail.outbox = [] # Empty outbox
+            request = self.rf.post('/some_url/', self.breakfast_data)
+            response = view(request)
+            self.assertEquals(len(mail.outbox), 1)
+            email = mail.outbox[0]
+            # Frames vars are never shown in plain text email reports.
+            self.assertNotIn('cooked_eggs', email.body)
+            self.assertNotIn('scrambled', email.body)
+            self.assertNotIn('sauce', email.body)
+            self.assertNotIn('worcestershire', email.body)
+            for k, v in self.breakfast_data.items():
+                # All POST parameters' names are shown.
+                self.assertIn(k, email.body)
+                # No POST parameters' values are shown.
+                self.assertNotIn(v, email.body)
+
+    def test_non_sensitive_request(self):
+        """
+        Ensure that everything (request info and frame variables) can bee seen
+        in the default error reports for non-sensitive requests.
+        """
+        with self.settings(DEBUG=True):
+            self.verify_unsafe_response(non_sensitive_view)
+            self.verify_unsafe_email(non_sensitive_view)
+
+        with self.settings(DEBUG=False):
+            self.verify_unsafe_response(non_sensitive_view)
+            self.verify_unsafe_email(non_sensitive_view)
+
+    def test_sensitive_request(self):
+        """
+        Ensure that sensitive POST parameters and frame variables cannot be
+        seen in the default error reports for sensitive requests.
+        """
+        with self.settings(DEBUG=True):
+            self.verify_unsafe_response(sensitive_view)
+            self.verify_unsafe_email(sensitive_view)
+
+        with self.settings(DEBUG=False):
+            self.verify_safe_response(sensitive_view)
+            self.verify_safe_email(sensitive_view)
+
+    def test_paranoid_request(self):
+        """
+        Ensure that no POST parameters and frame variables can be seen in the
+        default error reports for "paranoid" requests.
+        """
+        with self.settings(DEBUG=True):
+            self.verify_unsafe_response(paranoid_view)
+            self.verify_unsafe_email(paranoid_view)
+
+        with self.settings(DEBUG=False):
+            self.verify_paranoid_response(paranoid_view)
+            self.verify_paranoid_email(paranoid_view)
+
+    def test_custom_exception_reporter_filter(self):
+        """
+        Ensure that it's possible to assign an exception reporter filter to
+        the request to bypass the one set in DEFAULT_EXCEPTION_REPORTER_FILTER.
+        """
+        with self.settings(DEBUG=True):
+            self.verify_unsafe_response(custom_exception_reporter_filter_view)
+            self.verify_unsafe_email(custom_exception_reporter_filter_view)
+
+        with self.settings(DEBUG=False):
+            self.verify_unsafe_response(custom_exception_reporter_filter_view)
+            self.verify_unsafe_email(custom_exception_reporter_filter_view)

@@ -23,6 +23,8 @@ HttpRequest objects
 
 .. class:: HttpRequest
 
+.. _httprequest-attributes:
+
 Attributes
 ----------
 

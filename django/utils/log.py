@@ -1,6 +1,10 @@
 import logging
 import sys
+import traceback
+
+from django.conf import settings
 from django.core import mail
+from django.views.debug import ExceptionReporter, get_exception_reporter_filter
 
 # Make sure a NullHandler is available
 # This was added in Python 2.7/3.2
@@ -35,13 +39,9 @@ class AdminEmailHandler(logging.Handler):
     """An exception log handler that emails log entries to site admins.
 
     If the request is passed as the first argument to the log record,
-    request data will be provided in the
+    request data will be provided in the email report.
     """
     def emit(self, record):
-        import traceback
-        from django.conf import settings
-        from django.views.debug import ExceptionReporter
-
         try:
             request = record.request
             subject = '%s (%s IP): %s' % (
@@ -49,15 +49,15 @@ class AdminEmailHandler(logging.Handler):
                 (request.META.get('REMOTE_ADDR') in settings.INTERNAL_IPS and 'internal' or 'EXTERNAL'),
                 record.msg
             )
-            request_repr = repr(request)
+            filter = get_exception_reporter_filter(request)
+            request_repr = filter.get_request_repr(request)
         except:
             subject = '%s: %s' % (
                 record.levelname,
                 record.msg
             )
-
             request = None
-            request_repr = "Request repr() unavailable"
+            request_repr = "Request repr() unavailable."
 
         if record.exc_info:
             exc_info = record.exc_info

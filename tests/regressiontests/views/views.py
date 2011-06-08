@@ -5,7 +5,10 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import get_resolver
 from django.shortcuts import render_to_response, render
 from django.template import Context, RequestContext, TemplateDoesNotExist
-from django.views.debug import technical_500_response
+from django.views.debug import technical_500_response, SafeExceptionReporterFilter
+from django.views.decorators.debug import (sensitive_post_parameters,
+                                           sensitive_variables)
+from django.utils.log import getLogger
 
 from regressiontests.views import BrokenException, except_args
 
@@ -128,3 +131,84 @@ def raises_template_does_not_exist(request):
         return render_to_response('i_dont_exist.html')
     except TemplateDoesNotExist:
         return technical_500_response(request, *sys.exc_info())
+
+def send_log(request, exc_info):
+    logger = getLogger('django.request')
+    logger.error('Internal Server Error: %s' % request.path,
+        exc_info=exc_info,
+        extra={
+            'status_code': 500,
+            'request': request
+        }
+    )
+
+def non_sensitive_view(request):
+    # Do not just use plain strings for the variables' values in the code
+    # so that the tests don't return false positives when the function's source
+    # is displayed in the exception report.
+    cooked_eggs = ''.join(['s', 'c', 'r', 'a', 'm', 'b', 'l', 'e', 'd'])
+    sauce = ''.join(['w', 'o', 'r', 'c', 'e', 's', 't', 'e', 'r', 's', 'h', 'i', 'r', 'e'])
+    try:
+        raise Exception
+    except Exception:
+        exc_info = sys.exc_info()
+        send_log(request, exc_info)
+        return technical_500_response(request, *exc_info)
+
+@sensitive_variables('sauce')
+@sensitive_post_parameters('bacon-key', 'sausage-key')
+def sensitive_view(request):
+    # Do not just use plain strings for the variables' values in the code
+    # so that the tests don't return false positives when the function's source
+    # is displayed in the exception report.
+    cooked_eggs = ''.join(['s', 'c', 'r', 'a', 'm', 'b', 'l', 'e', 'd'])
+    sauce = ''.join(['w', 'o', 'r', 'c', 'e', 's', 't', 'e', 'r', 's', 'h', 'i', 'r', 'e'])
+    try:
+        raise Exception
+    except Exception:
+        exc_info = sys.exc_info()
+        send_log(request, exc_info)
+        return technical_500_response(request, *exc_info)
+
+@sensitive_variables()
+@sensitive_post_parameters()
+def paranoid_view(request):
+    # Do not just use plain strings for the variables' values in the code
+    # so that the tests don't return false positives when the function's source
+    # is displayed in the exception report.
+    cooked_eggs = ''.join(['s', 'c', 'r', 'a', 'm', 'b', 'l', 'e', 'd'])
+    sauce = ''.join(['w', 'o', 'r', 'c', 'e', 's', 't', 'e', 'r', 's', 'h', 'i', 'r', 'e'])
+    try:
+        raise Exception
+    except Exception:
+        exc_info = sys.exc_info()
+        send_log(request, exc_info)
+        return technical_500_response(request, *exc_info)
+
+class UnsafeExceptionReporterFilter(SafeExceptionReporterFilter):
+    """
+    Ignores all the filtering done by its parent class.
+    """
+
+    def get_post_parameters(self, request):
+        return request.POST
+
+    def get_traceback_frame_variables(self, request, tb_frame):
+        return tb_frame.f_locals.items()
+
+
+@sensitive_variables()
+@sensitive_post_parameters()
+def custom_exception_reporter_filter_view(request):
+    # Do not just use plain strings for the variables' values in the code
+    # so that the tests don't return false positives when the function's source
+    # is displayed in the exception report.
+    cooked_eggs = ''.join(['s', 'c', 'r', 'a', 'm', 'b', 'l', 'e', 'd'])
+    sauce = ''.join(['w', 'o', 'r', 'c', 'e', 's', 't', 'e', 'r', 's', 'h', 'i', 'r', 'e'])
+    request.exception_reporter_filter = UnsafeExceptionReporterFilter()
+    try:
+        raise Exception
+    except Exception:
+        exc_info = sys.exc_info()
+        send_log(request, exc_info)
+        return technical_500_response(request, *exc_info)

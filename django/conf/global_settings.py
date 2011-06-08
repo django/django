@@ -537,6 +537,10 @@ LOGGING = {
     }
 }
 
+# Default exception reporter filter class used in case none has been
+# specifically assigned to the HttpRequest instance.
+DEFAULT_EXCEPTION_REPORTER_FILTER = 'django.views.debug.SafeExceptionReporterFilter'
+
 ###########
 # TESTING #
 ###########

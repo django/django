@@ -504,6 +504,8 @@ Python logging module.
     sensitive, and you may not want to send it over email. Consider using
     something such as `django-sentry`_ to get the best of both worlds -- the
     rich information of full tracebacks plus the security of *not* sending the
-    information over email.
+    information over email. You may also explicitly designate certain
+    sensitive information to be filtered out of error reports -- learn more on
+    :ref:`Filtering error reports<filtering-error-reports>`.
 
 .. _django-sentry: http://pypi.python.org/pypi/django-sentry

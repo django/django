@@ -12,6 +12,7 @@ from django.utils.html import escape
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext, ugettext_lazy as _
 from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.debug import sensitive_post_parameters
 
 csrf_protect_m = method_decorator(csrf_protect)
 
@@ -78,6 +79,7 @@ class UserAdmin(admin.ModelAdmin):
             (r'^(\d+)/password/$', self.admin_site.admin_view(self.user_change_password))
         ) + super(UserAdmin, self).get_urls()
 
+    @sensitive_post_parameters()
     @csrf_protect_m
     @transaction.commit_on_success
     def add_view(self, request, form_url='', extra_context=None):
@@ -102,6 +104,7 @@ class UserAdmin(admin.ModelAdmin):
         extra_context.update(defaults)
         return super(UserAdmin, self).add_view(request, form_url, extra_context)
 
+    @sensitive_post_parameters()
     def user_change_password(self, request, id):
         if not self.has_change_permission(request):
             raise PermissionDenied

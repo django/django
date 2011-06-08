@@ -772,6 +772,17 @@ Default content type to use for all ``HttpResponse`` objects, if a MIME type
 isn't manually specified. Used with :setting:`DEFAULT_CHARSET` to construct
 the ``Content-Type`` header.
 
+.. setting:: DEFAULT_EXCEPTION_REPORTER_FILTER
+
+DEFAULT_EXCEPTION_REPORTER_FILTER
+---------------------------------
+
+Default: :class:`django.views.debug.SafeExceptionReporterFilter`
+
+Default exception reporter filter class to be used if none has been assigned to
+the :class:`HttpRequest` instance yet.
+See :ref:`Filtering error reports<filtering-error-reports>`.
+
 .. setting:: DEFAULT_FILE_STORAGE
 
 DEFAULT_FILE_STORAGE
