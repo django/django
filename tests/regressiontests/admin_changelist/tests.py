@@ -3,7 +3,7 @@ from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.admin.views.main import ChangeList, SEARCH_VAR
 from django.core.paginator import Paginator
 from django.template import Context, Template
-from django.test import TransactionTestCase
+from django.test import TestCase
 from django.test.client import RequestFactory
 from django.contrib.auth.models import User
 
@@ -11,7 +11,7 @@ from models import (Child, Parent, Genre, Band, Musician, Group, Quartet,
     Membership, ChordsMusician, ChordsBand, Invitation)
 
 
-class ChangeListTests(TransactionTestCase):
+class ChangeListTests(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
 
