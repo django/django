@@ -207,6 +207,9 @@ their deprecation, as per the :ref:`Django deprecation policy
           refactored to use class based views with pluggable backends in 1.4.
           The previous implementation will be deprecated.
 
+        * Legacy ways of calling
+          :func:`~django.views.decorators.cache.cache_page` will be removed.
+
     * 2.0
         * ``django.views.defaults.shortcut()``. This function has been moved
           to ``django.contrib.contenttypes.views.shortcut()`` as part of the

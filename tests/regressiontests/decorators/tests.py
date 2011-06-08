@@ -1,8 +1,10 @@
 from functools import wraps
+import warnings
 
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import HttpResponse, HttpRequest, HttpResponseNotAllowed
+from django.test.utils import get_warnings_state, restore_warnings_state
 from django.utils.decorators import method_decorator
 from django.utils.functional import allow_lazy, lazy, memoize
 from django.utils.unittest import TestCase
@@ -64,6 +66,14 @@ full_decorator = compose(
 fully_decorated = full_decorator(fully_decorated)
 
 class DecoratorsTest(TestCase):
+
+    def setUp(self):
+        self.warning_state = get_warnings_state()
+        warnings.filterwarnings('ignore', category=PendingDeprecationWarning,
+                                module='django.views.decorators.cache')
+
+    def tearDown(self):
+        restore_warnings_state(self.warning_state)
 
     def test_attributes(self):
         """

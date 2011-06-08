@@ -8,10 +8,14 @@ up-to-date information for those who are following trunk.
 
 Django 1.4 includes various `new features`_ and some minor `backwards
 incompatible changes`_. There are also some features that have been dropped,
-which are detailed in :doc:`our deprecation plan </internals/deprecation>`.
+which are detailed in :doc:`our deprecation plan </internals/deprecation>`, and
+we've `begun the deprecation process for some features`_.
+
+
 
 .. _new features: `What's new in Django 1.4`_
 .. _backwards incompatible changes: backwards-incompatible-changes-1.4_
+.. _begun the deprecation process for some features: deprecated-features-1.4_
 
 What's new in Django 1.4
 ========================
@@ -284,3 +288,15 @@ If you using PUT or DELETE methods in AJAX applications, please see the
 This was an alias to ``django.template.loader`` since 2005, it has been removed
 without emitting a warning due to the length of the deprecation. If your code
 still referenced this please use ``django.template.loader`` instead.
+
+.. _deprecated-features-1.4:
+
+Features deprecated in 1.4
+==========================
+
+Old styles of calling ``cache_page`` decorator
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Some legacy ways of calling :func:`~django.views.decorators.cache.cache_page`
+have been deprecated, please see the docs for the correct way to use this
+decorator.
