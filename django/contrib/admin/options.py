@@ -625,6 +625,13 @@ class ModelAdmin(BaseModelAdmin):
             description = capfirst(action.replace('_', ' '))
         return func, action, description
 
+    def get_list_display(self, request):
+        """
+        Return a sequence containing the fields to be displayed on the
+        changelist.
+        """
+        return self.list_display
+
     def construct_change_message(self, request, form, formsets):
         """
         Construct a change message from a changed object.
@@ -1053,7 +1060,7 @@ class ModelAdmin(BaseModelAdmin):
         actions = self.get_actions(request)
 
         # Remove action checkboxes if there aren't any actions available.
-        list_display = list(self.list_display)
+        list_display = list(self.get_list_display(request))
         if not actions:
             try:
                 list_display.remove('action_checkbox')

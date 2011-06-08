@@ -967,6 +967,15 @@ templates used by the :class:`ModelAdmin` views:
     a ``dictionary``, as described above in the :attr:`ModelAdmin.prepopulated_fields`
     section.
 
+.. method:: ModelAdmin.get_list_display(self, request)
+
+    .. versionadded:: 1.4
+
+    The ``get_list_display`` method is given the ``HttpRequest`` and is
+    expected to return a ``list`` or ``tuple`` of field names that will be
+    displayed on the changelist view as described above in the
+    :attr:`ModelAdmin.list_display` section.
+
 .. method:: ModelAdmin.get_urls(self)
 
     The ``get_urls`` method on a ``ModelAdmin`` returns the URLs to be used for
