@@ -7,7 +7,7 @@ from pprint import pformat
 
 from django.conf import settings
 from django.http import (HttpResponse, HttpResponseServerError,
-    HttpResponseNotFound, HttpRequest)
+    HttpResponseNotFound, HttpRequest, build_request_repr)
 from django.template import (Template, Context, TemplateDoesNotExist,
     TemplateSyntaxError)
 from django.template.defaultfilters import force_escape, pprint
@@ -96,34 +96,7 @@ class ExceptionReporterFilter(object):
         if request is None:
             return repr(None)
         else:
-            # Since this is called as part of error handling, we need to be very
-            # robust against potentially malformed input.
-            try:
-                get = pformat(request.GET)
-            except:
-                get = '<could not parse>'
-            if request._post_parse_error:
-                post = '<could not parse>'
-            else:
-                try:
-                    post = pformat(self.get_post_parameters(request))
-                except:
-                    post = '<could not parse>'
-            try:
-                cookies = pformat(request.COOKIES)
-            except:
-                cookies = '<could not parse>'
-            try:
-                meta = pformat(request.META)
-            except:
-                meta = '<could not parse>'
-            return smart_str(u'<%s\npath:%s,\nGET:%s,\nPOST:%s,\nCOOKIES:%s,\nMETA:%s>' %
-                             (request.__class__.__name__,
-                              request.path,
-                              unicode(get),
-                              unicode(post),
-                              unicode(cookies),
-                              unicode(meta)))
+            return build_request_repr(request, POST_override=self.get_post_parameters(request))
 
     def get_post_parameters(self, request):
         if request is None:

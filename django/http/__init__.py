@@ -134,6 +134,53 @@ class Http404(Exception):
 
 RAISE_ERROR = object()
 
+
+def build_request_repr(request, path_override=None, GET_override=None,
+                       POST_override=None, COOKIES_override=None,
+                       META_override=None):
+    """
+    Builds and returns the request's representation string. The request's
+    attributes may be overridden by pre-processed values.
+    """
+    # Since this is called as part of error handling, we need to be very
+    # robust against potentially malformed input.
+    try:
+        get = (pformat(GET_override)
+               if GET_override is not None
+               else pformat(request.GET))
+    except:
+        get = '<could not parse>'
+    if request._post_parse_error:
+        post = '<could not parse>'
+    else:
+        try:
+            post = (pformat(POST_override)
+                    if POST_override is not None
+                    else pformat(request.POST))
+        except:
+            post = '<could not parse>'
+    try:
+        cookies = (pformat(COOKIES_override)
+                   if COOKIES_override is not None
+                   else pformat(request.COOKIES))
+    except:
+        cookies = '<could not parse>'
+    try:
+        meta = (pformat(META_override)
+                if META_override is not None
+                else pformat(request.META))
+    except:
+        meta = '<could not parse>'
+    path = path_override if path_override is not None else request.path
+    return smart_str(u'<%s\npath:%s,\nGET:%s,\nPOST:%s,\nCOOKIES:%s,\nMETA:%s>' %
+                     (request.__class__.__name__,
+                      path,
+                      unicode(get),
+                      unicode(post),
+                      unicode(cookies),
+                      unicode(meta)))
+
+
 class HttpRequest(object):
     """A basic HTTP request."""
 
@@ -146,11 +193,10 @@ class HttpRequest(object):
         self.path = ''
         self.path_info = ''
         self.method = None
+        self._post_parse_error = False
 
     def __repr__(self):
-        return '<HttpRequest\nGET:%s,\nPOST:%s,\nCOOKIES:%s,\nMETA:%s>' % \
-            (pformat(self.GET), pformat(self.POST), pformat(self.COOKIES),
-            pformat(self.META))
+        return build_request_repr(self)
 
     def get_host(self):
         """Returns the HTTP host using the environment or request headers."""
