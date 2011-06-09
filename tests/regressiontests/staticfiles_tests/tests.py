@@ -34,7 +34,6 @@ class StaticFilesTestCase(TestCase):
         self.old_media_url = settings.MEDIA_URL
         self.old_admin_media_prefix = settings.ADMIN_MEDIA_PREFIX
         self.old_debug = settings.DEBUG
-        self.old_installed_apps = settings.INSTALLED_APPS
 
         site_media = os.path.join(TEST_ROOT, 'project', 'site_media')
         settings.DEBUG = True
@@ -51,13 +50,6 @@ class StaticFilesTestCase(TestCase):
             'django.contrib.staticfiles.finders.AppDirectoriesFinder',
             'django.contrib.staticfiles.finders.DefaultStorageFinder',
         )
-        settings.INSTALLED_APPS = [
-            'django.contrib.admin',
-            'django.contrib.staticfiles',
-            'regressiontests.staticfiles_tests',
-            'regressiontests.staticfiles_tests.apps.test',
-            'regressiontests.staticfiles_tests.apps.no_label',
-        ]
 
         # Clear the cached default_storage out, this is because when it first
         # gets accessed (by some other test), it evaluates settings.MEDIA_ROOT,
@@ -83,7 +75,6 @@ class StaticFilesTestCase(TestCase):
         settings.STATIC_URL = self.old_static_url
         settings.STATICFILES_DIRS = self.old_staticfiles_dirs
         settings.STATICFILES_FINDERS = self.old_staticfiles_finders
-        settings.INSTALLED_APPS = self.old_installed_apps
         if os.path.exists(self._nonascii_filepath):
             os.unlink(self._nonascii_filepath)
 
