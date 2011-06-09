@@ -338,7 +338,15 @@ class BaseTemporalField(Field):
                 try:
                     return self.strptime(value, format)
                 except ValueError:
-                    continue
+                    if format.endswith('.%f'):
+                        if not value.count('.')==1:
+                            continue
+                        try:
+                            datetime_str, usecs_str = value.rsplit('.', 1)
+                            usecs = int(usecs_str)
+                            return datetime.datetime(*time.strptime(datetime_str, format[:-3])[:6]+(usecs,))
+                        except ValueError:
+                            continue
         raise ValidationError(self.error_messages['invalid'])
 
     def strptime(self, value, format):
@@ -417,7 +425,7 @@ class DateTimeField(BaseTemporalField):
         return super(DateTimeField, self).to_python(value)
 
     def strptime(self, value, format):
-        return datetime.datetime(*time.strptime(value, format)[:6])
+        return datetime.datetime.strptime(value, format)
 
 class RegexField(CharField):
     def __init__(self, regex, max_length=None, min_length=None, error_message=None, *args, **kwargs):
