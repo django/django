@@ -29,8 +29,9 @@ class RegexValidator(object):
         if code is not None:
             self.code = code
 
+        # Compile the regex if it was not passed pre-compiled.
         if isinstance(self.regex, basestring):
-            self.regex = re.compile(regex)
+            self.regex = re.compile(self.regex)
 
     def __call__(self, value):
         """

@@ -60,26 +60,31 @@ to, or in lieu of custom ``field.clean()`` methods.
 
 ``RegexValidator``
 ------------------
-.. class:: RegexValidator(regex, [message=None, code=None])
+.. class:: RegexValidator([regex=None, message=None, code=None])
+
+    :param regex: If not ``None``, overrides :attr:`regex`. Can be a regular
+        expression string or a pre-compiled regular expression.
+    :param message: If not ``None``, overrides :attr:`.message`.
+    :param code: If not ``None``, overrides :attr:`code`.
 
     .. attribute:: regex
 
         The regular expression pattern to search for the provided ``value``,
         or a pre-compiled regular expression. Raises a
-        :exc:`~django.core.exceptions.ValidationError` with :attr:`.message`
-        and :attr:`.code` if no match is found.
+        :exc:`~django.core.exceptions.ValidationError` with :attr:`message`
+        and :attr:`code` if no match is found. By default, matches any string
+        (including an empty string).
 
     .. attribute:: message
 
-        The error message used by :exc:`~django.core.exceptions.ValidationError`
-        if validation fails. If no :attr:`.message` is specified, a generic
-        ``"Enter a valid value"`` message is used. Default value: ``None``.
+        The error message used by
+        :exc:`~django.core.exceptions.ValidationError` if validation fails.
+        Defaults to ``"Enter a valid value"``.
 
     .. attribute:: code
 
         The error code used by :exc:`~django.core.exceptions.ValidationError`
-        if validation fails. If :attr:`.code` is not specified, ``"invalid"``
-        is used. Default value: ``None``.
+        if validation fails. Defaults to ``"invalid"``.
 
 ``URLValidator``
 ----------------
@@ -90,16 +95,19 @@ to, or in lieu of custom ``field.clean()`` methods.
     404 status code). Raises an error code of ``'invalid'`` if it doesn't look
     like a URL, and a code of ``'invalid_link'`` if it doesn't exist.
 
+    :param verify_exists: Sets :attr:`verify_exists`. Defaults to ``False``.
+    :param validator_user_agent: Sets :attr:`validator_user_agent`. Defaults to
+        :setting:`URL_VALIDATOR_USER_AGENT` or, if that setting is set to a
+        null value, ``"Django (http://www.djangoproject.com/)"``.
+
     .. attribute:: verify_exists
 
-        Default value: ``False``. If set to ``True``, this validator checks
-        that the URL actually exists.
+        If set to ``True``, this validator checks that the URL actually exists.
 
     .. attribute:: validator_user_agent
 
-        If :attr:`.verify_exists` is ``True``, Django uses the value of
-        :attr:`.validator_user_agent` as the "User-agent" for the request. This
-        defaults to :setting:`settings.URL_VALIDATOR_USER_AGENT <URL_VALIDATOR_USER_AGENT>`.
+        If :attr:`verify_exists` is ``True``, Django uses this value as the
+        "User-agent" for the request.
 
 ``validate_email``
 ------------------

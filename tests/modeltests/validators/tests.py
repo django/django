@@ -112,6 +112,11 @@ TEST_DATA = (
     (BaseValidator(True), True, None),
     (BaseValidator(True), False, ValidationError),
 
+    (RegexValidator(), '', None),
+    (RegexValidator(), 'x1x2', None),
+    (RegexValidator('[0-9]+'), 'xxxxxx', ValidationError),
+    (RegexValidator('[0-9]+'), '1234', None),
+    (RegexValidator(re.compile('[0-9]+')), '1234', None),
     (RegexValidator('.*'), '', None),
     (RegexValidator(re.compile('.*')), '', None),
     (RegexValidator('.*'), 'xxxxx', None),
