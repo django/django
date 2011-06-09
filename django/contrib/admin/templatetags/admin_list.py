@@ -82,9 +82,6 @@ def result_headers(cl):
     """
     Generates the list column headers.
     """
-    # We need to know the 'ordering field' that corresponds to each
-    # item in list_display, and we need other info, so do a pre-pass
-    # on list_display
     ordering_field_columns = cl.get_ordering_field_columns()
     for i, field_name in enumerate(cl.list_display):
         admin_order_field = None
