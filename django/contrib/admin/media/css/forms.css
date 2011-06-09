@@ -167,6 +167,10 @@ fieldset.monospace textarea {
     overflow: hidden;
 }
 
+body.popup .submit-row {
+    overflow: auto;
+}
+
 .submit-row input {
     margin: 0 0 0 5px;
 }

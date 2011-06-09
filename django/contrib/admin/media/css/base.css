@@ -350,6 +350,7 @@ table thead th.sorted a span.clear {
 }
 
 #sorting-popup-div {
+    display: none;
     position: absolute;
     background-color: white;
     border: 1px solid #ddd;
