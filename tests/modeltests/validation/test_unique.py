@@ -83,12 +83,9 @@ class PerformUniqueChecksTest(TestCase):
             slug="Django 1.0", subtitle="Finally", posted=datetime.date(2008, 9, 3))
 
         p = Post(title="Django 1.0 is released", posted=datetime.date(2008, 9, 3))
-        try:
+        with self.assertRaises(ValidationError) as cm:
             p.full_clean()
-        except ValidationError, e:
-            self.assertEqual(e.message_dict, {'title': [u'Title must be unique for Posted date.']})
-        else:
-            self.fail('unique_for_date checks should catch this.')
+        self.assertEqual(cm.exception.message_dict, {'title': [u'Title must be unique for Posted date.']})
 
         # Should work without errors
         p = Post(title="Work on Django 1.1 begins", posted=datetime.date(2008, 9, 3))
@@ -99,28 +96,19 @@ class PerformUniqueChecksTest(TestCase):
         p.full_clean()
 
         p = Post(slug="Django 1.0", posted=datetime.datetime(2008, 1, 1))
-        try:
+        with self.assertRaises(ValidationError) as cm:
             p.full_clean()
-        except ValidationError, e:
-            self.assertEqual(e.message_dict, {'slug': [u'Slug must be unique for Posted year.']})
-        else:
-            self.fail('unique_for_year checks should catch this.')
+        self.assertEqual(cm.exception.message_dict, {'slug': [u'Slug must be unique for Posted year.']})
 
         p = Post(subtitle="Finally", posted=datetime.datetime(2008, 9, 30))
-        try:
+        with self.assertRaises(ValidationError) as cm:
             p.full_clean()
-        except ValidationError, e:
-            self.assertEqual(e.message_dict, {'subtitle': [u'Subtitle must be unique for Posted month.']})
-        else:
-            self.fail('unique_for_month checks should catch this.')
+        self.assertEqual(cm.exception.message_dict, {'subtitle': [u'Subtitle must be unique for Posted month.']})
 
         p = Post(title="Django 1.0 is released")
-        try:
+        with self.assertRaises(ValidationError) as cm:
             p.full_clean()
-        except ValidationError, e:
-            self.assertEqual(e.message_dict, {'posted': [u'This field cannot be null.']})
-        else:
-            self.fail("Model validation shouldn't allow an absent value for a DateField without null=True.")
+        self.assertEqual(cm.exception.message_dict, {'posted': [u'This field cannot be null.']})
 
     def test_unique_for_date_with_nullable_date(self):
         p1 = FlexibleDatePost.objects.create(title="Django 1.0 is released",
@@ -131,40 +119,28 @@ class PerformUniqueChecksTest(TestCase):
             p.full_clean()
         except ValidationError, e:
             self.fail("unique_for_date checks shouldn't trigger when the associated DateField is None.")
-        except:
-            self.fail("unique_for_date checks shouldn't explode when the associated DateField is None.")
 
         p = FlexibleDatePost(slug="Django 1.0")
         try:
             p.full_clean()
         except ValidationError, e:
             self.fail("unique_for_year checks shouldn't trigger when the associated DateField is None.")
-        except:
-            self.fail("unique_for_year checks shouldn't explode when the associated DateField is None.")
 
         p = FlexibleDatePost(subtitle="Finally")
         try:
             p.full_clean()
         except ValidationError, e:
             self.fail("unique_for_month checks shouldn't trigger when the associated DateField is None.")
-        except:
-            self.fail("unique_for_month checks shouldn't explode when the associated DateField is None.")
 
     def test_unique_errors(self):
         m1 = UniqueErrorsModel.objects.create(name='Some Name', number=10)
         m = UniqueErrorsModel(name='Some Name', number=11)
-        try:
+        with self.assertRaises(ValidationError) as cm:
             m.full_clean()
-        except ValidationError, e:
-            self.assertEqual(e.message_dict, {'name': [u'Custom unique name message.']})
-        except:
-            self.fail('unique checks should catch this.')
+        self.assertEqual(cm.exception.message_dict, {'name': [u'Custom unique name message.']})
 
         m = UniqueErrorsModel(name='Some Other Name', number=10)
-        try:
+        with self.assertRaises(ValidationError) as cm:
             m.full_clean()
-        except ValidationError, e:
-            self.assertEqual(e.message_dict, {'number': [u'Custom unique number message.']})
-        except:
-            self.fail('unique checks should catch this.')
+        self.assertEqual(cm.exception.message_dict, {'number': [u'Custom unique number message.']})
             
