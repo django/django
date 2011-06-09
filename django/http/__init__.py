@@ -17,13 +17,12 @@ except ImportError:
         # Python 2.6 and greater
         from urlparse import parse_qsl
     except ImportError:
-        # Python 2.5, 2.4.  Works on Python 2.6 but raises
-        # PendingDeprecationWarning
+        # Python 2.5.  Works on Python 2.6 but raises PendingDeprecationWarning
         from cgi import parse_qsl
 
 import Cookie
 # httponly support exists in Python 2.6's Cookie library,
-# but not in Python 2.4 or 2.5.
+# but not in Python 2.5.
 _morsel_supports_httponly = Cookie.Morsel._reserved.has_key('httponly')
 # Some versions of Python 2.7 and later won't need this encoding bug fix:
 _cookie_encodes_correctly = Cookie.SimpleCookie().value_encode(';') == (';', '"\\073"')

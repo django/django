@@ -9,7 +9,7 @@ Install Python
 
 Being a Python Web framework, Django requires Python.
 
-It works with any Python version from 2.4 to 2.7 (due to backwards
+It works with any Python version from 2.5 to 2.7 (due to backwards
 incompatibilities in Python 3.0, Django does not currently work with
 Python 3.0; see :doc:`the Django FAQ </faq/install>` for more
 information on supported Python versions and the 3.0 transition).
@@ -101,11 +101,6 @@ database bindings are installed.
 * If you're using MySQL, you'll need MySQLdb_, version 1.2.1p2 or higher. You
   will also want to read the database-specific :ref:`notes for the MySQL
   backend <mysql-notes>`.
-
-* If you're using SQLite and Python 2.4, you'll need pysqlite_. Use version
-  2.0.3 or higher. Python 2.5 ships with an SQLite wrapper in the standard
-  library, so you don't need to install anything extra in that case. Please
-  read the :ref:`SQLite backend notes <sqlite-notes>`.
 
 * If you're using Oracle, you'll need a copy of cx_Oracle_, but please
   read the database-specific :ref:`notes for the Oracle backend <oracle-notes>`

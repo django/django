@@ -198,8 +198,8 @@ if sys.version_info >= (2, 6):
         p1, p2 = urlparse.urlparse(url1), urlparse.urlparse(url2)
         return (p1.scheme, p1.hostname, p1.port) == (p2.scheme, p2.hostname, p2.port)
 else:
-    # Python 2.4, 2.5 compatibility. This actually works for Python 2.6 and
-    # above, but the above definition is much more obviously correct and so is
+    # Python 2.5 compatibility. This actually works for Python 2.6 and above,
+    # but the above definition is much more obviously correct and so is
     # preferred going forward.
     def same_origin(url1, url2):
         """

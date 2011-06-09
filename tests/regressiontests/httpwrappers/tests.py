@@ -248,9 +248,6 @@ class CookieTests(unittest.TestCase):
         """
         Test that we don't output tricky characters in encoded value
         """
-        # Python 2.4 compatibility note: Python 2.4's cookie implementation
-        # always returns Set-Cookie headers terminating in semi-colons.
-        # That's not the bug this test is looking for, so ignore it.
         c = SimpleCookie()
         c['test'] = "An,awkward;value"
         self.assertTrue(";" not in c.output().rstrip(';')) # IE compat

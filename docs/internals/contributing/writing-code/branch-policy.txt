@@ -135,8 +135,8 @@ Pointing Python at the new Django version
 Once you've retrieved the branch's code, you'll need to change your Python
 ``site-packages`` directory so that it points to the branch version of the
 ``django`` directory. (The ``site-packages`` directory is somewhere such as
-``/usr/lib/python2.4/site-packages`` or
-``/usr/local/lib/python2.4/site-packages`` or ``C:\Python\site-packages``.)
+``/usr/lib/python2.7/site-packages`` or
+``/usr/local/lib/python2.7/site-packages`` or ``C:\Python\site-packages``.)
 
 The simplest way to do this is by renaming the old ``django`` directory to
 ``django.OLD`` and moving the trunk version of the code into the directory
@@ -168,13 +168,6 @@ sure all other lines are commented::
 
     # On windows a path may look like this:
     # C:/path/to/<branch>
-
-If you're using Django 0.95 or earlier and installed it using
-``python setup.py install``, you'll have a directory called something like
-``Django-0.95-py2.4.egg`` instead of ``django``. In this case, edit the file
-``setuptools.pth`` and remove the line that references the Django ``.egg``
-file. Then copy the branch's version of the ``django`` directory into
-``site-packages``.
 
 .. _path file: http://docs.python.org/library/site.html
 .. _django-developers: http://groups.google.com/group/django-developers

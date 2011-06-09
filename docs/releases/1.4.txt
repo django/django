@@ -17,6 +17,26 @@ we've `begun the deprecation process for some features`_.
 .. _backwards incompatible changes: backwards-incompatible-changes-1.4_
 .. _begun the deprecation process for some features: deprecated-features-1.4_
 
+Python compatibility
+====================
+
+While not a new feature, it's important to note that Django 1.4 introduces the
+second shift in our Python compatibility policy since Django's initial public
+debut. Django 1.2 dropped support for Python 2.3; now Django 1.4 drops support
+for Python 2.4. As such, the minimum Python version required for Django is now
+2.5, and Django is tested and supported on Python 2.5, 2.6 and 2.7.
+
+This change should affect only a small number of Django users, as most
+operating-system vendors today are shipping Python 2.5 or newer as their default
+version. If you're still using Python 2.4, however, you'll need to stick to
+Django 1.3 until you can upgrade; per :doc:`our support policy
+</internals/release-process>`, Django 1.3 will continue to receive security
+support until the release of Django 1.5.
+
+Django does not support Python 3.x at this time. A document outlining our full
+timeline for deprecating Python 2.x and moving to Python 3.x will be published
+before the release of Django 1.4.
+
 What's new in Django 1.4
 ========================
 

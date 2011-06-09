@@ -915,10 +915,5 @@ def model_unpickle(model, attrs, factory):
     return cls.__new__(cls)
 model_unpickle.__safe_for_unpickle__ = True
 
-if sys.version_info < (2, 5):
-    # Prior to Python 2.5, Exception was an old-style class
-    def subclass_exception(name, parents, unused):
-        return types.ClassType(name, parents, {})
-else:
-    def subclass_exception(name, parents, module):
-        return type(name, parents, {'__module__': module})
+def subclass_exception(name, parents, module):
+    return type(name, parents, {'__module__': module})

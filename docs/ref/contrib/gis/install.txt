@@ -8,7 +8,7 @@ Overview
 ========
 In general, GeoDjango installation requires:
 
-1. :ref:`python24` and :ref:`django`
+1. Python and :ref:`django`
 2. :ref:`spatial_database`
 3. :ref:`geospatial_libs`
 
@@ -32,22 +32,10 @@ instructions are available for:
 Requirements
 ============
 
-.. _python24:
-
-Python 2.4+
------------
-
-Python 2.4 is the minimum version supported by Django, however Python 2.5+ is
-recommended because the `ctypes`__ module comes included; otherwise, 2.4 users
-will need to `download and install ctypes`__.
-
-__ http://docs.python.org/lib/module-ctypes.html
-__ http://sourceforge.net/projects/ctypes/files/
-
 .. _django:
 
-Django
-------
+Python and Django
+-----------------
 
 Because GeoDjango is included with Django, please refer to Django's
 :doc:`installation instructions </intro/install>` for details on how to install.
@@ -1034,7 +1022,6 @@ Required package information:
 * ``flex``: required to build PostGIS
 * ``postgresql-8.1``
 * ``postgresql-server-dev-8.1``: for ``pg_config``
-* ``python-ctypes``: Python 2.4 needs to have ctypes installed separately
 * ``python-psycopg2``
 * ``python-setuptools``: for ``easy_install``
 
@@ -1110,7 +1097,7 @@ Python
 ^^^^^^
 
 First, download the latest `Python 2.7 installer`__ from the Python Web site.
-Next, run the installer and keep the defaults -- for example, keep 
+Next, run the installer and keep the defaults -- for example, keep
 'Install for all users' checked and the installation path set as
 ``C:\Python27``.
 
@@ -1165,7 +1152,7 @@ tree and select :menuselection:`PostGIS 1.5 for PostgreSQL 9.0`.
 
 After clicking next, you will be prompted to select your mirror, PostGIS
 will be downloaded, and the PostGIS installer will begin.  Select only the
-default options during install (e.g., do not uncheck the option to create a 
+default options during install (e.g., do not uncheck the option to create a
 default PostGIS database).
 
 .. note::
@@ -1216,7 +1203,7 @@ executable with ``cmd.exe``, will set this up::
      reg ADD "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment" /v PROJ_LIB /t REG_EXPAND_SZ /f /d "%PROJ_LIB%"
 
 For your convenience, these commands are available in the execuatble batch
-script, :download:`geodjango_setup.bat`.  
+script, :download:`geodjango_setup.bat`.
 
 .. note::
 

@@ -79,9 +79,6 @@ These functions, described in detail below, can be used in two different ways:
                 # this code executes inside a transaction
                 # ...
 
-      This technique works with all supported version of Python (that is, with
-      Python 2.4 and greater).
-
     * As a `context manager`_ around a particular block of code::
 
             from django.db import transaction
@@ -96,8 +93,9 @@ These functions, described in detail below, can be used in two different ways:
                     # this code executes inside a transaction
                     # ...
 
-      The ``with`` statement is new in Python 2.5, and so this syntax can only
-      be used with Python 2.5 and above.
+Both techniques work with all supported version of Python. However, in Python
+2.5, you must add ``from __future__ import with_statement`` at the beginning
+of your module if you are using the ``with`` statement.
 
 .. _decorator: http://docs.python.org/glossary.html#term-decorator
 .. _context manager: http://docs.python.org/glossary.html#term-context-manager

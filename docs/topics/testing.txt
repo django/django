@@ -79,7 +79,7 @@ module defines tests in class-based approach.
     adding some extremely useful features. To ensure that every Django
     project can benefit from these new features, Django ships with a
     copy of unittest2_, a copy of the Python 2.7 unittest library,
-    backported for Python 2.4 compatibility.
+    backported for Python 2.5 compatibility.
 
     To access this library, Django provides the
     ``django.utils.unittest`` module alias. If you are using Python

@@ -29,8 +29,7 @@ except ImportError:
         # Python 2.6 and greater
         from urlparse import parse_qsl
     except ImportError:
-        # Python 2.5, 2.4.  Works on Python 2.6 but raises
-        # PendingDeprecationWarning
+        # Python 2.5.  Works on Python 2.6 but raises PendingDeprecationWarning
         from cgi import parse_qsl
 
 __all__ = [

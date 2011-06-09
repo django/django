@@ -63,8 +63,7 @@ def to_language(locale):
 class DjangoTranslation(gettext_module.GNUTranslations):
     """
     This class sets up the GNUTranslations context with regard to output
-    charset. Django uses a defined DEFAULT_CHARSET as the output charset on
-    Python 2.4.
+    charset.
     """
     def __init__(self, *args, **kw):
         gettext_module.GNUTranslations.__init__(self, *args, **kw)
