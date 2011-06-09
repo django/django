@@ -382,11 +382,12 @@ class ExceptionReporter(object):
             function = tb.tb_frame.f_code.co_name
             lineno = tb.tb_lineno - 1
             loader = tb.tb_frame.f_globals.get('__loader__')
-            module_name = tb.tb_frame.f_globals.get('__name__')
+            module_name = tb.tb_frame.f_globals.get('__name__') or ''
             pre_context_lineno, pre_context, context_line, post_context = self._get_lines_from_file(filename, lineno, 7, loader, module_name)
             if pre_context_lineno is not None:
                 frames.append({
                     'tb': tb,
+                    'type': module_name.startswith('django.') and 'django' or 'user',
                     'filename': filename,
                     'function': function,
                     'lineno': lineno + 1,
@@ -483,16 +484,20 @@ TECHNICAL_500_TEMPLATE = """
     table td.code pre { overflow:hidden; }
     table.source th { color:#666; }
     table.source td { font-family:monospace; white-space:pre; border-bottom:1px solid #eee; }
-    ul.traceback { list-style-type:none; }
-    ul.traceback li.frame { padding-bottom:1em; }
+    ul.traceback { list-style-type:none; color: #222; }
+    ul.traceback li.frame { padding-bottom:1em; color:#666; }
+    ul.traceback li.user { background-color:#e0e0e0; color:#000 }
     div.context { padding:10px 0; overflow:hidden; }
     div.context ol { padding-left:30px; margin:0 10px; list-style-position: inside; }
-    div.context ol li { font-family:monospace; white-space:pre; color:#666; cursor:pointer; }
+    div.context ol li { font-family:monospace; white-space:pre; color:#777; cursor:pointer; }
     div.context ol li pre { display:inline; }
-    div.context ol.context-line li { color:black; background-color:#ccc; }
+    div.context ol.context-line li { color:#505050; background-color:#dfdfdf; }
     div.context ol.context-line li span { position:absolute; right:32px; }
+    .user div.context ol.context-line li { background-color:#bbb; color:#000; }
+    .user div.context ol li { color:#666; }
     div.commands { margin-left: 40px; }
-    div.commands a { color:black; text-decoration:none; }
+    div.commands a { color:#555; text-decoration:none; }
+    .user div.commands a { color: black; }
     #summary { background: #ffc; }
     #summary h2 { font-weight: normal; color: #666; }
     #explanation { background:#eee; }
@@ -671,7 +676,7 @@ TECHNICAL_500_TEMPLATE = """
   <div id="browserTraceback">
     <ul class="traceback">
       {% for frame in frames %}
-        <li class="frame">
+        <li class="frame {{ frame.type }}">
           <code>{{ frame.filename|escape }}</code> in <code>{{ frame.function|escape }}</code>
 
           {% if frame.context_line %}

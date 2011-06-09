@@ -136,6 +136,17 @@ You may override or customize the default filtering by writing a
 :ref:`Filtering error reports<filtering-error-reports>`.
 
 
+Minor features
+~~~~~~~~~~~~~~
+
+Django 1.4 also includes several smaller improvements worth noting:
+
+* A more usable stacktrace in the technical 500 page: frames in the stack
+  trace which reference Django's code are dimmed out, while frames in user
+  code are slightly emphasized. This change makes it easier to scan a stacktrace
+  for issues in user code.
+
+
 .. _backwards-incompatible-changes-1.4:
 
 Backwards incompatible changes in 1.4
