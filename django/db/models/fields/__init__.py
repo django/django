@@ -60,6 +60,7 @@ class Field(object):
         'invalid_choice': _(u'Value %r is not a valid choice.'),
         'null': _(u'This field cannot be null.'),
         'blank': _(u'This field cannot be blank.'),
+        'unique': _(u'%(model_name)s with this %(field_label)s already exists.'),
     }
 
     # Generic field type description, usually overriden by subclasses

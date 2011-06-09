@@ -78,3 +78,7 @@ class FlexibleDatePost(models.Model):
     slug = models.CharField(max_length=50, unique_for_year='posted', blank=True)
     subtitle = models.CharField(max_length=50, unique_for_month='posted', blank=True)
     posted = models.DateField(blank=True, null=True)
+
+class UniqueErrorsModel(models.Model):
+    name = models.CharField(max_length=100, unique=True, error_messages={'unique': u'Custom unique name message.'})
+    number = models.IntegerField(unique=True, error_messages={'unique': u'Custom unique number message.'})

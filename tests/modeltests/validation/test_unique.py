@@ -7,7 +7,7 @@ from django.test import TestCase
 from django.utils import unittest
 
 from models import (CustomPKModel, UniqueTogetherModel, UniqueFieldsModel,
-    UniqueForDateModel, ModelToValidate, Post, FlexibleDatePost)
+    UniqueForDateModel, ModelToValidate, Post, FlexibleDatePost, UniqueErrorsModel)
 
 
 class GetUniqueCheckTests(unittest.TestCase):
@@ -149,3 +149,22 @@ class PerformUniqueChecksTest(TestCase):
             self.fail("unique_for_month checks shouldn't trigger when the associated DateField is None.")
         except:
             self.fail("unique_for_month checks shouldn't explode when the associated DateField is None.")
+
+    def test_unique_errors(self):
+        m1 = UniqueErrorsModel.objects.create(name='Some Name', number=10)
+        m = UniqueErrorsModel(name='Some Name', number=11)
+        try:
+            m.full_clean()
+        except ValidationError, e:
+            self.assertEqual(e.message_dict, {'name': [u'Custom unique name message.']})
+        except:
+            self.fail('unique checks should catch this.')
+
+        m = UniqueErrorsModel(name='Some Other Name', number=10)
+        try:
+            m.full_clean()
+        except ValidationError, e:
+            self.assertEqual(e.message_dict, {'number': [u'Custom unique number message.']})
+        except:
+            self.fail('unique checks should catch this.')
+            

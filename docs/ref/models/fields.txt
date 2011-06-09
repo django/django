@@ -210,6 +210,10 @@ The ``error_messages`` argument lets you override the default messages that the
 field will raise. Pass in a dictionary with keys matching the error messages you
 want to override.
 
+Error message keys include ``null``, ``blank``, ``invalid``, ``invalid_choice``,
+and ``unique``. Additional error message keys are specified for each field in
+the `Field types`_ section below.
+
 ``help_text``
 -------------
 
@@ -416,7 +420,8 @@ optional arguments:
     it's not just a default value that you can override.
 
 The admin represents this as an ``<input type="text">`` with a JavaScript
-calendar, and a shortcut for "Today".
+calendar, and a shortcut for "Today". Includes an additional ``invalid_date``
+error message key.
 
 .. note::
     As currently implemented, setting ``auto_now`` or ``auto_now_add`` to
