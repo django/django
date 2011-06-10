@@ -1612,7 +1612,6 @@ class AntiPetRouter(object):
             return model._meta.object_name == 'Pet'
         else:
             return model._meta.object_name != 'Pet'
-        return None
 
 class FixtureTestCase(TestCase):
     multi_db = True

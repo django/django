@@ -48,8 +48,7 @@ class ModelTests(TestCase):
             article_text = "ABCDE" * 1000
         )
         a = Article.objects.get(pk=a.pk)
-        self.assertEqual
-        (len(a.article_text), 5000)
+        self.assertEqual(len(a.article_text), 5000)
 
     def test_date_lookup(self):
         # Regression test for #659

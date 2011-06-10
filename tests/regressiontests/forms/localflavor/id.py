@@ -133,7 +133,6 @@ class IDLocalFlavorTests(LocalFlavorTestCase):
         invalid = {
             '0123456789': error_invalid,
             '+62-021-3456789': error_invalid,
-            '+62-021-3456789': error_invalid,
             '+62-0812-3456789': error_invalid,
             '0812345678901': error_invalid,
             'foo': error_invalid,

@@ -42,7 +42,7 @@ class DictList(generic.ListView):
     """A ListView that doesn't use a model."""
     queryset = [
         {'first': 'John', 'last': 'Lennon'},
-        {'last': 'Yoko',  'last': 'Ono'}
+        {'first': 'Yoko',  'last': 'Ono'}
     ]
     template_name = 'generic_views/list.html'
 
@@ -65,7 +65,7 @@ class CustomPaginator(Paginator):
             allow_empty_first_page=allow_empty_first_page)
 
 class AuthorListCustomPaginator(AuthorList):
-    paginate_by = 5;
+    paginate_by = 5
 
     def get_paginator(self, queryset, page_size, orphans=0, allow_empty_first_page=True):
         return super(AuthorListCustomPaginator, self).get_paginator(

@@ -92,7 +92,6 @@ class ARLocalFlavorTests(LocalFlavorTestCase):
             '20-10123456': error_format,
             '20-10123456-': error_format,
              '20-10123456-5': error_invalid,
-            '2-10123456-9': error_format,
              '27-10345678-1': error_invalid,
              u'27-10345678-1': error_invalid,
         }

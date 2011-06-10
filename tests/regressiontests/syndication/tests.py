@@ -25,7 +25,7 @@ class FeedTestCase(TestCase):
                 elem.getElementsByTagName(k)[0].firstChild.wholeText, v)
 
     def assertCategories(self, elem, expected):
-        self.assertEqual(set(i.firstChild.wholeText for i in elem.childNodes if i.nodeName == 'category'), set(expected));
+        self.assertEqual(set(i.firstChild.wholeText for i in elem.childNodes if i.nodeName == 'category'), set(expected))
 
 ######################################
 # Feed view
@@ -73,7 +73,7 @@ class SyndicationFeedTest(FeedTestCase):
             'ttl': '600',
             'copyright': 'Copyright (c) 2007, Sally Smith',
         })
-        self.assertCategories(chan, ['python', 'django']);
+        self.assertCategories(chan, ['python', 'django'])
 
         # Ensure the content of the channel is correct
         self.assertChildNodeContent(chan, {
@@ -102,7 +102,7 @@ class SyndicationFeedTest(FeedTestCase):
             'pubDate': pub_date,
             'author': 'test@example.com (Sally Smith)',
         })
-        self.assertCategories(items[0], ['python', 'testing']);
+        self.assertCategories(items[0], ['python', 'testing'])
 
         for item in items:
             self.assertChildNodes(item, ['title', 'link', 'description', 'guid', 'category', 'pubDate', 'author'])

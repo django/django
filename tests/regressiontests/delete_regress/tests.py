@@ -54,7 +54,7 @@ class DeleteLockingTest(TransactionTestCase):
         # Delete something using connection 2.
         cursor2 = self.conn2.cursor()
         cursor2.execute('DELETE from delete_regress_book WHERE id=1')
-        self.conn2._commit();
+        self.conn2._commit()
 
         # Now perform a queryset delete that covers the object
         # deleted in connection 2. This causes an infinite loop

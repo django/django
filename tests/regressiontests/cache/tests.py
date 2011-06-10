@@ -131,7 +131,7 @@ class DummyCacheTests(unittest.TestCase):
             u'ascii': u'ascii_value',
             u'unicode_ascii': u'Iñtërnâtiônàlizætiøn1',
             u'Iñtërnâtiônàlizætiøn': u'Iñtërnâtiônàlizætiøn2',
-            u'ascii': {u'x' : 1 }
+            u'ascii2': {u'x' : 1 }
             }
         for (key, value) in stuff.items():
             self.cache.set(key, value)
@@ -317,7 +317,7 @@ class BaseCacheTests(object):
             u'ascii': u'ascii_value',
             u'unicode_ascii': u'Iñtërnâtiônàlizætiøn1',
             u'Iñtërnâtiônàlizætiøn': u'Iñtërnâtiônàlizætiøn2',
-            u'ascii': {u'x' : 1 }
+            u'ascii2': {u'x' : 1 }
             }
         # Test `set`
         for (key, value) in stuff.items():
