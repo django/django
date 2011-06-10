@@ -1,3 +1,5 @@
+from __future__ import with_statement
+
 import datetime
 
 from django.conf import settings
@@ -143,4 +145,4 @@ class PerformUniqueChecksTest(TestCase):
         with self.assertRaises(ValidationError) as cm:
             m.full_clean()
         self.assertEqual(cm.exception.message_dict, {'number': [u'Custom unique number message.']})
-            
+
