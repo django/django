@@ -22,12 +22,14 @@ TEST_DATA = (
 
     (validate_email, 'email@here.com', None),
     (validate_email, 'weirder-email@here.and.there.com', None),
+    (validate_email, 'email@[127.0.0.1]', None),
 
     (validate_email, None, ValidationError),
     (validate_email, '', ValidationError),
     (validate_email, 'abc', ValidationError),
     (validate_email, 'a @x.cz', ValidationError),
     (validate_email, 'something@@somewhere.com', ValidationError),
+    (validate_email, 'email@127.0.0.1', ValidationError),
 
     (validate_slug, 'slug-ok', None),
     (validate_slug, 'longer-slug-still-ok', None),
