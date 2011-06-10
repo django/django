@@ -75,7 +75,7 @@ class MultiPartParser(object):
             # For now set it to 0; we'll try again later on down.
             content_length = 0
 
-        if content_length <= 0:
+        if content_length < 0:
             # This means we shouldn't continue...raise an error.
             raise MultiPartParserError("Invalid content length: %r" % content_length)
 
@@ -104,6 +104,11 @@ class MultiPartParser(object):
 
         encoding = self._encoding
         handlers = self._upload_handlers
+
+        # HTTP spec says that Content-Length >= 0 is valid
+        # handling content-length == 0 before continuing
+        if self._content_length == 0:
+            return QueryDict(MultiValueDict(), encoding=self._encoding), MultiValueDict()
 
         limited_input_data = LimitBytes(self._input_data, self._content_length)
 

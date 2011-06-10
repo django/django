@@ -239,6 +239,27 @@ class RequestsTests(unittest.TestCase):
         self.assertEqual(request.POST, {u'name': [u'value']})
         self.assertRaises(Exception, lambda: request.raw_post_data)
 
+    def test_POST_multipart_with_content_length_zero(self):
+        """
+        Multipart POST requests with Content-Length >= 0 are valid and need to be handled.
+        """
+        # According to:
+        # http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.13
+        # Every request.POST with Content-Length >= 0 is a valid request,
+        # this test ensures that we handle Content-Length == 0.
+        payload = "\r\n".join([
+                '--boundary',
+                'Content-Disposition: form-data; name="name"',
+                '',
+                'value',
+                '--boundary--'
+                ''])
+        request = WSGIRequest({'REQUEST_METHOD': 'POST',
+                               'CONTENT_TYPE': 'multipart/form-data; boundary=boundary',
+                               'CONTENT_LENGTH': 0,
+                               'wsgi.input': StringIO(payload)})
+        self.assertEqual(request.POST, {})
+
     def test_read_by_lines(self):
         request = WSGIRequest({'REQUEST_METHOD': 'POST', 'wsgi.input': StringIO('name=value')})
         self.assertEqual(list(request), ['name=value'])
