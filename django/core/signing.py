@@ -158,8 +158,12 @@ class Signer(object):
 
 
 class TimestampSigner(Signer):
+    def __init__(self, *args, **kwargs):
+        self.time_func = kwargs.pop('time', time.time)
+        super(TimestampSigner, self).__init__(*args, **kwargs)
+    
     def timestamp(self):
-        return baseconv.base62.encode(int(time.time()))
+        return baseconv.base62.encode(int(self.time_func() * 10000))
 
     def sign(self, value):
         value = smart_str('%s%s%s' % (value, self.sep, self.timestamp()))
@@ -168,10 +172,10 @@ class TimestampSigner(Signer):
     def unsign(self, value, max_age=None):
         result =  super(TimestampSigner, self).unsign(value)
         value, timestamp = result.rsplit(self.sep, 1)
-        timestamp = baseconv.base62.decode(timestamp)
+        timestamp = baseconv.base62.decode(timestamp) / 10000.0
         if max_age is not None:
             # Check timestamp is not older than max_age
-            age = time.time() - timestamp
+            age = self.time_func() - timestamp
             if age > max_age:
                 raise SignatureExpired(
                     'Signature age %s > %s seconds' % (age, max_age))
