@@ -118,8 +118,11 @@ def restore_warnings_state(state):
     warnings.filters = state[:]
 
 
-def get_runner(settings):
-    test_path = settings.TEST_RUNNER.split('.')
+def get_runner(settings, test_runner_class=None):
+    if not test_runner_class:
+        test_runner_class = settings.TEST_RUNNER
+
+    test_path = test_runner_class.split('.')
     # Allow for Python 2.5 relative paths
     if len(test_path) > 1:
         test_module_name = '.'.join(test_path[:-1])

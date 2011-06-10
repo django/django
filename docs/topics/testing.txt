@@ -1744,6 +1744,29 @@ set up, execute and tear down the test suite.
     write your own test runner, ensure accept and handle the ``**kwargs``
     parameter.
 
+    .. versionadded:: 1.4
+
+    Your test runner may also define additional command-line options.
+    If you add an ``option_list`` attribute to a subclassed test runner,
+    those options will be added to the list of command-line options that
+    the :djadmin:`test` command can use.
+
+
+Attributes
+~~~~~~~~~~
+
+
+.. attribute:: DjangoTestSuiteRunner.option_list
+
+    .. versionadded:: 1.4
+
+    This is the tuple of ``optparse`` options which will be fed into the
+    management command's ``OptionParser`` for parsing arguments. See the
+    documentation for Python's ``optparse`` module for more details.
+
+Methods
+~~~~~~~
+
 .. method:: DjangoTestSuiteRunner.run_tests(test_labels, extra_tests=None, **kwargs)
 
     Run the test suite.

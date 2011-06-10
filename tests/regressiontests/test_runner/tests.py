@@ -2,12 +2,15 @@
 Tests for django test runner
 """
 import StringIO
+from optparse import make_option
 import warnings
 
 from django.core.exceptions import ImproperlyConfigured
+from django.core.management import call_command
 from django.test import simple
 from django.test.utils import get_warnings_state, restore_warnings_state
 from django.utils import unittest
+from regressiontests.admin_scripts.tests import AdminScriptTestCase
 
 
 class DjangoTestRunnerTests(unittest.TestCase):
@@ -128,3 +131,75 @@ class DependencyOrderingTests(unittest.TestCase):
 
         self.assertRaises(ImproperlyConfigured, simple.dependency_ordered, raw, dependencies=dependencies)
 
+
+class MockTestRunner(object):
+    invoked = False
+
+    def __init__(self, *args, **kwargs):
+        pass
+
+    def run_tests(self, test_labels, extra_tests=None, **kwargs):
+        MockTestRunner.invoked = True
+
+
+class ManageCommandTests(unittest.TestCase):
+
+    def test_custom_test_runner(self):
+        call_command('test', 'sites',
+                     testrunner='regressiontests.test_runner.tests.MockTestRunner')
+        self.assertTrue(MockTestRunner.invoked,
+                        "The custom test runner has not been invoked")
+
+
+class CustomOptionsTestRunner(simple.DjangoTestSuiteRunner):
+    option_list = (
+        make_option('--option_a','-a', action='store', dest='option_a', default='1'),
+        make_option('--option_b','-b', action='store', dest='option_b', default='2'),
+        make_option('--option_c','-c', action='store', dest='option_c', default='3'),
+    )
+
+    def __init__(self, verbosity=1, interactive=True, failfast=True, option_a=None, option_b=None, option_c=None, **kwargs):
+        super(CustomOptionsTestRunner, self).__init__(verbosity=verbosity, interactive=interactive,
+                                                      failfast=failfast)
+        self.option_a = option_a
+        self.option_b = option_b
+        self.option_c = option_c
+
+    def run_tests(self, test_labels, extra_tests=None, **kwargs):
+        print "%s:%s:%s" % (self.option_a, self.option_b, self.option_c)
+
+
+class CustomTestRunnerOptionsTests(AdminScriptTestCase):
+
+    def setUp(self):
+        settings = {
+            'TEST_RUNNER': '\'regressiontests.test_runner.tests.CustomOptionsTestRunner\'',
+        }
+        self.write_settings('settings.py', sdict=settings)
+
+    def tearDown(self):
+        self.remove_settings('settings.py')
+
+    def test_default_options(self):
+        args = ['test', '--settings=settings']
+        out, err = self.run_django_admin(args)
+        self.assertNoOutput(err)
+        self.assertOutput(out, '1:2:3')
+
+    def test_default_and_given_options(self):
+        args = ['test', '--settings=settings', '--option_b=foo']
+        out, err = self.run_django_admin(args)
+        self.assertNoOutput(err)
+        self.assertOutput(out, '1:foo:3')
+
+    def test_option_name_and_value_separated(self):
+        args = ['test', '--settings=settings', '--option_b', 'foo']
+        out, err = self.run_django_admin(args)
+        self.assertNoOutput(err)
+        self.assertOutput(out, '1:foo:3')
+
+    def test_all_options_given(self):
+        args = ['test', '--settings=settings', '--option_a=bar', '--option_b=foo', '--option_c=31337']
+        out, err = self.run_django_admin(args)
+        self.assertNoOutput(err)
+        self.assertOutput(out, 'bar:foo:31337')
