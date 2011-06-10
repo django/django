@@ -13,6 +13,8 @@ return model instances`__, or you can avoid the model layer entirely and
 __ `performing raw queries`_
 __ `executing custom SQL directly`_
 
+.. _executing-raw-queries:
+
 Performing raw queries
 ======================
 
@@ -189,6 +191,8 @@ parameters from the ``params`` list.
     ``params`` list you'll be protected.
 
 __ http://en.wikipedia.org/wiki/SQL_injection
+
+.. _executing-custom-sql:
 
 Executing custom SQL directly
 =============================

@@ -21,6 +21,8 @@ can then be protected by following the steps below.
 .. _Cross Site Request Forgeries: http://www.squarefree.com/securitytips/web-developers.html#CSRF
 .. _9.1.1 Safe Methods, HTTP 1.1, RFC 2616: http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html
 
+.. _using-csrf:
+
 How to use it
 =============
 
@@ -181,6 +183,8 @@ POST form.
 The error page, however, is not very friendly, so you may want to provide your
 own view for handling this condition.  To do this, simply set the
 :setting:`CSRF_FAILURE_VIEW` setting.
+
+.. _how-csrf-works:
 
 How it works
 ============

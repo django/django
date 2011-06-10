@@ -185,6 +185,7 @@ Other batteries included
     * :doc:`Messages <ref/contrib/messages>`
     * :doc:`Pagination <topics/pagination>`
     * :doc:`Redirects <ref/contrib/redirects>`
+    * :doc:`Security <topics/security>`
     * :doc:`Serialization <topics/serialization>`
     * :doc:`Sessions <topics/http/sessions>`
     * :doc:`Signals <topics/signals>`
