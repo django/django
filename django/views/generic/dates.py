@@ -1,4 +1,3 @@
-import time
 import datetime
 from django.db import models
 from django.core.exceptions import ImproperlyConfigured
@@ -495,7 +494,7 @@ def _date_from_string(year, year_format, month, month_format, day='', day_format
     format = delim.join((year_format, month_format, day_format))
     datestr = delim.join((year, month, day))
     try:
-        return datetime.date(*time.strptime(datestr, format)[:3])
+        return datetime.datetime.strptime(datestr, format).date()
     except ValueError:
         raise Http404(_(u"Invalid date string '%(datestr)s' given format '%(format)s'") % {
             'datestr': datestr,

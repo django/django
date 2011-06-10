@@ -4,7 +4,6 @@ HTML Widget classes
 
 import copy
 import datetime
-import time
 from itertools import chain
 from urlparse import urljoin
 from util import flatatt
@@ -397,7 +396,7 @@ class DateInput(Input):
         # necessarily the format used for this widget. Attempt to convert it.
         try:
             input_format = formats.get_format('DATE_INPUT_FORMATS')[0]
-            initial = datetime.date(*time.strptime(initial, input_format)[:3])
+            initial = datetime.datetime.strptime(initial, input_format).date()
         except (TypeError, ValueError):
             pass
         return super(DateInput, self)._has_changed(self._format_value(initial), data)
@@ -429,7 +428,7 @@ class DateTimeInput(Input):
         # necessarily the format used for this widget. Attempt to convert it.
         try:
             input_format = formats.get_format('DATETIME_INPUT_FORMATS')[0]
-            initial = datetime.datetime(*time.strptime(initial, input_format)[:6])
+            initial = datetime.datetime.strptime(initial, input_format)
         except (TypeError, ValueError):
             pass
         return super(DateTimeInput, self)._has_changed(self._format_value(initial), data)
@@ -460,7 +459,7 @@ class TimeInput(Input):
         # necessarily the format used for this  widget. Attempt to convert it.
         try:
             input_format = formats.get_format('TIME_INPUT_FORMATS')[0]
-            initial = datetime.time(*time.strptime(initial, input_format)[3:6])
+            initial = datetime.datetime.strptime(initial, input_format).time()
         except (TypeError, ValueError):
             pass
         return super(TimeInput, self)._has_changed(self._format_value(initial), data)

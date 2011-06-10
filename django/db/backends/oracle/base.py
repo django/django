@@ -6,9 +6,8 @@ Requires cx_Oracle: http://cx-oracle.sourceforge.net/
 
 
 import datetime
-import sys
-import time
 from decimal import Decimal
+import sys
 
 
 def _setup_environment(environ):
@@ -341,7 +340,7 @@ WHEN (new.%(col_name)s IS NULL)
             return None
 
         if isinstance(value, basestring):
-            return datetime.datetime(*(time.strptime(value, '%H:%M:%S')[:6]))
+            return datetime.datetime.strptime(value, '%H:%M:%S')
 
         # Oracle doesn't support tz-aware datetimes
         if value.tzinfo is not None:

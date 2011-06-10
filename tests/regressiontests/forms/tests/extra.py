@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import datetime
-import time
+
 from django.conf import settings
 from django.forms import *
 from django.forms.extras import SelectDateWidget
@@ -379,7 +379,7 @@ class FormsExtraTestCase(unittest.TestCase, AssertFormErrorsMixin):
             def decompress(self, value):
                 if value:
                     data = value.split(',')
-                    return [data[0], data[1], datetime.datetime(*time.strptime(data[2], "%Y-%m-%d %H:%M:%S")[0:6])]
+                    return [data[0], data[1], datetime.datetime.strptime(data[2], "%Y-%m-%d %H:%M:%S")]
                 return [None, None, None]
 
             def format_output(self, rendered_widgets):

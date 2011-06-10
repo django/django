@@ -6,9 +6,7 @@ import copy
 import datetime
 import os
 import re
-import time
 import urlparse
-import warnings
 from decimal import Decimal, DecimalException
 try:
     from cStringIO import StringIO
@@ -20,7 +18,6 @@ from django.core import validators
 from django.utils import formats
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_unicode, smart_str, force_unicode
-from django.utils.functional import lazy
 
 # Provide this import for backwards compatibility.
 from django.core.validators import EMPTY_VALUES
@@ -344,7 +341,8 @@ class BaseTemporalField(Field):
                         try:
                             datetime_str, usecs_str = value.rsplit('.', 1)
                             usecs = int(usecs_str)
-                            return datetime.datetime(*time.strptime(datetime_str, format[:-3])[:6]+(usecs,))
+                            dt = datetime.datetime.strptime(datetime_str, format[:-3])
+                            return dt.replace(microsecond=usecs)
                         except ValueError:
                             continue
         raise ValidationError(self.error_messages['invalid'])
@@ -373,7 +371,7 @@ class DateField(BaseTemporalField):
         return super(DateField, self).to_python(value)
 
     def strptime(self, value, format):
-        return datetime.date(*time.strptime(value, format)[:3])
+        return datetime.datetime.strptime(value, format).date()
 
 class TimeField(BaseTemporalField):
     widget = TimeInput
@@ -394,7 +392,7 @@ class TimeField(BaseTemporalField):
         return super(TimeField, self).to_python(value)
 
     def strptime(self, value, format):
-        return datetime.time(*time.strptime(value, format)[3:6])
+        return datetime.datetime.strptime(value, format).time()
 
 class DateTimeField(BaseTemporalField):
     widget = DateTimeInput
