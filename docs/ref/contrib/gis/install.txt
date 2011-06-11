@@ -892,10 +892,10 @@ Summary::
 
         export PATH=/opt/local/bin:/opt/local/lib/postgresql83/bin
 
-    In addition, add the ``FALLBACK_DYLD_LIBRARY_PATH`` setting so that
+    In addition, add the ``DYLD_FALLBACK_LIBRARY_PATH`` setting so that
     the libraries can be found by Python::
 
-        export FALLBACK_DYLD_LIBRARY_PATH=/opt/local/lib:/opt/local/lib/postgresql83
+        export DYLD_FALLBACK_LIBRARY_PATH=/opt/local/lib:/opt/local/lib/postgresql83
 
 __ http://www.macports.org/
 
