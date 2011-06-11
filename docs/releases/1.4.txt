@@ -175,6 +175,7 @@ Django 1.4 also includes several smaller improvements worth noting:
   code are slightly emphasized. This change makes it easier to scan a stacktrace
   for issues in user code.
 
+* Customizable names for :meth:`~django.template.Library.simple_tag`.
 
 .. _backwards-incompatible-changes-1.4:
 

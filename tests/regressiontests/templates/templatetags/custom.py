@@ -114,3 +114,9 @@ def assignment_params_and_context(context, arg):
     """Expected assignment_params_and_context __doc__"""
     return "assignment_params_and_context - Expected result (context value: %s): %s" % (context['value'], arg)
 assignment_params_and_context.anything = "Expected assignment_params_and_context __dict__"
+
+register.simple_tag(lambda x: x - 1, name='minusone')
+
+@register.simple_tag(name='minustwo')
+def minustwo_overridden_name(value):
+    return value - 2

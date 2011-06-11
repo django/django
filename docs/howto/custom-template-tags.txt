@@ -687,6 +687,16 @@ Or, using decorator syntax::
 For more information on how the ``takes_context`` option works, see the section
 on :ref:`inclusion tags<howto-custom-template-tags-inclusion-tags>`.
 
+.. versionadded:: 1.4
+
+If you need to rename your tag, you can provide a custom name for it::
+
+    register.simple_tags(lambda x: x - 1, name='minusone')
+
+    @register.simple_tag(name='minustwo')
+    def some_function(value):
+        return value - 1
+
 .. _howto-custom-template-tags-assignment-tags:
 
 Assignment tags

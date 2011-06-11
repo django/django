@@ -866,7 +866,7 @@ class Library(object):
         self.filters[getattr(func, "_decorated_function", func).__name__] = func
         return func
 
-    def simple_tag(self, func=None, takes_context=None):
+    def simple_tag(self, func=None, takes_context=None, name=None):
         def dec(func):
             params, xx, xxx, defaults = getargspec(func)
             if takes_context:
@@ -887,9 +887,10 @@ class Library(object):
                         func_args = resolved_vars
                     return func(*func_args)
 
-            compile_func = partial(generic_tag_compiler, params, defaults, getattr(func, "_decorated_function", func).__name__, SimpleNode)
+            function_name = name or getattr(func, '_decorated_function', func).__name__
+            compile_func = partial(generic_tag_compiler, params, defaults, function_name, SimpleNode)
             compile_func.__doc__ = func.__doc__
-            self.tag(getattr(func, "_decorated_function", func).__name__, compile_func)
+            self.tag(function_name, compile_func)
             return func
 
         if func is None:
@@ -901,7 +902,7 @@ class Library(object):
         else:
             raise TemplateSyntaxError("Invalid arguments provided to simple_tag")
 
-    def assignment_tag(self, func=None, takes_context=None):
+    def assignment_tag(self, func=None, takes_context=None, name=None):
         def dec(func):
             params, xx, xxx, defaults = getargspec(func)
             if takes_context:
@@ -948,8 +949,9 @@ class Library(object):
                             % (tag_name, params_min, params_max))
                 return AssignmentNode(params_vars, target_var)
 
+            function_name = name or getattr(func, '_decorated_function', func).__name__
             compile_func.__doc__ = func.__doc__
-            self.tag(getattr(func, "_decorated_function", func).__name__, compile_func)
+            self.tag(function_name, compile_func)
             return func
 
         if func is None:
@@ -961,7 +963,7 @@ class Library(object):
         else:
             raise TemplateSyntaxError("Invalid arguments provided to assignment_tag")
 
-    def inclusion_tag(self, file_name, context_class=Context, takes_context=False):
+    def inclusion_tag(self, file_name, context_class=Context, takes_context=False, name=None):
         def dec(func):
             params, xx, xxx, defaults = getargspec(func)
             if takes_context:
@@ -1003,9 +1005,10 @@ class Library(object):
                         new_context['csrf_token'] = csrf_token
                     return self.nodelist.render(new_context)
 
-            compile_func = partial(generic_tag_compiler, params, defaults, getattr(func, "_decorated_function", func).__name__, InclusionNode)
+            function_name = name or getattr(func, '_decorated_function', func).__name__
+            compile_func = partial(generic_tag_compiler, params, defaults, function_name, InclusionNode)
             compile_func.__doc__ = func.__doc__
-            self.tag(getattr(func, "_decorated_function", func).__name__, compile_func)
+            self.tag(function_name, compile_func)
             return func
         return dec
 
