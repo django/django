@@ -355,6 +355,14 @@ subclass::
         because ``raw_id_fields`` and ``radio_fields`` imply custom widgets of
         their own.
 
+.. attribute:: ModelAdmin.get_changelist
+
+    .. versionchanged:: 1.2
+
+    Returns the Changelist class to be used for listing. By default,
+    ``django.contrib.admin.views.main.ChangeList`` is used. By inheriting this
+    class you can change the behavior of the listing.
+
 .. attribute:: ModelAdmin.inlines
 
     See :class:`InlineModelAdmin` objects below.
