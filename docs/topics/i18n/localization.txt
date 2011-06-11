@@ -355,6 +355,8 @@ This tag allows a more fine grained control of localization than
 
 To activate or deactivate localization for a template block, use::
 
+    {% load l10n %}
+
     {% localize on %}
         {{ value }}
     {% endlocalize %}
@@ -385,6 +387,8 @@ Forces localization of a single value.
 
 For example::
 
+    {% load l10n %}
+
     {{ value|localize }}
 
 To disable localization on a single value, use :tfilter:`unlocalize`. To control
@@ -402,6 +406,8 @@ unlocalize
 Forces a single value to be printed without localization.
 
 For example::
+
+    {% load l10n %}
 
     {{ value|unlocalize }}
 
