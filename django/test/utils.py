@@ -197,11 +197,21 @@ class override_settings(object):
     def __exit__(self, exc_type, exc_value, traceback):
         self.disable()
 
-    def __call__(self, func):
-        @wraps(func)
-        def inner(*args, **kwargs):
-            with self:
-                return func(*args, **kwargs)
+    def __call__(self, test_func):
+        from django.test import TestCase
+        if isinstance(test_func, type) and issubclass(test_func, TestCase):
+            class inner(test_func):
+                def _pre_setup(innerself):
+                    self.enable()
+                    super(inner, innerself)._pre_setup()
+                def _post_teardown(innerself):
+                    super(inner, innerself)._post_teardown()
+                    self.disable()
+        else:
+            @wraps(test_func)
+            def inner(*args, **kwargs):
+                with self:
+                    return test_func(*args, **kwargs)
         return inner
 
     def enable(self):

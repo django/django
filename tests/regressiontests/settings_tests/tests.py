@@ -1,10 +1,21 @@
 from __future__ import with_statement
-import os, sys
+import os
 from django.conf import settings, global_settings
 from django.test import TestCase, signals
 from django.test.utils import override_settings
-from django.utils.unittest import skipIf
 
+
+# @override_settings(TEST='override')
+class FullyDecoratedTestCase(TestCase):
+
+    def test_override(self):
+        self.assertEqual(settings.TEST, 'override')
+
+    @override_settings(TEST='override2')
+    def test_method_override(self):
+        self.assertEqual(settings.TEST, 'override2')
+
+FullyDecoratedTestCase = override_settings(TEST='override')(FullyDecoratedTestCase)
 
 class SettingGetter(object):
     def __init__(self):
