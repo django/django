@@ -983,7 +983,9 @@ includes a few other useful built-in views located in
 
 .. function:: password_reset_done(request[, template_name])
 
-    The page shown after a user has reset their password.
+    The page shown after a user has been emailed a link to reset their
+    password. This view is called by default if the :func:`password_reset` view
+    doesn't have an explicit ``post_reset_redirect`` URL set.
 
     **Optional arguments:**
 
