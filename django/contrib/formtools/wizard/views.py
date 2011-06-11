@@ -111,8 +111,8 @@ class WizardView(TemplateView):
         return super(WizardView, cls).as_view(**initkwargs)
 
     @classmethod
-    def get_initkwargs(cls, form_list,
-            initial_dict=None, instance_dict=None, condition_dict=None):
+    def get_initkwargs(cls, form_list, initial_dict=None,
+            instance_dict=None, condition_dict=None, *args, **kwargs):
         """
         Creates a dict with all needed parameters for the form wizard instances.
 
@@ -134,11 +134,11 @@ class WizardView(TemplateView):
           will be called with the formwizard instance as the only argument.
           If the return value is true, the step's form will be used.
         """
-        kwargs = {
+        kwargs.update({
             'initial_dict': initial_dict or {},
             'instance_dict': instance_dict or {},
             'condition_dict': condition_dict or {},
-        }
+        })
         init_form_list = SortedDict()
 
         assert len(form_list) > 0, 'at least one form is needed'
@@ -567,21 +567,16 @@ class NamedUrlWizardView(WizardView):
         We require a url_name to reverse URLs later. Additionally users can
         pass a done_step_name to change the URL name of the "done" view.
         """
-        extra_kwargs = {
-            'done_step_name': 'done'
-        }
         assert 'url_name' in kwargs, 'URL name is needed to resolve correct wizard URLs'
-        extra_kwargs['url_name'] = kwargs.pop('url_name')
-
-        if 'done_step_name' in kwargs:
-            extra_kwargs['done_step_name'] = kwargs.pop('done_step_name')
-
+        extra_kwargs = {
+            'done_step_name': kwargs.pop('done_step_name', 'done'),
+            'url_name': kwargs.pop('url_name'),
+        }
         initkwargs = super(NamedUrlWizardView, cls).get_initkwargs(*args, **kwargs)
         initkwargs.update(extra_kwargs)
 
         assert initkwargs['done_step_name'] not in initkwargs['form_list'], \
             'step name "%s" is reserved for "done" view' % initkwargs['done_step_name']
-
         return initkwargs
 
     def get(self, *args, **kwargs):

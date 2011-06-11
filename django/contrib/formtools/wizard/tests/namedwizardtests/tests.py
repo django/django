@@ -22,12 +22,6 @@ class NamedWizardTests(object):
         self.testuser, created = User.objects.get_or_create(username='testuser1')
         self.wizard_step_data[0]['form1-user'] = self.testuser.pk
 
-        wizard_template_dirs = [os.path.join(os.path.dirname(wizard.__file__), 'templates')]
-        settings.TEMPLATE_DIRS = list(settings.TEMPLATE_DIRS) + wizard_template_dirs
-
-    def tearDown(self):
-        del settings.TEMPLATE_DIRS[-1]
-
     def test_initial_call(self):
         response = self.client.get(reverse('%s_start' % self.wizard_urlname))
         self.assertEqual(response.status_code, 302)

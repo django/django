@@ -13,12 +13,6 @@ class WizardTests(object):
         self.testuser, created = User.objects.get_or_create(username='testuser1')
         self.wizard_step_data[0]['form1-user'] = self.testuser.pk
 
-        wizard_template_dirs = [os.path.join(os.path.dirname(wizard.__file__), 'templates')]
-        settings.TEMPLATE_DIRS = list(settings.TEMPLATE_DIRS) + wizard_template_dirs
-
-    def tearDown(self):
-        del settings.TEMPLATE_DIRS[-1]
-
     def test_initial_call(self):
         response = self.client.get(self.wizard_url)
         wizard = response.context['wizard']
@@ -245,4 +239,44 @@ class CookieWizardTests(WizardTests, TestCase):
         }
     )
 
+class WizardTestKwargs(TestCase):
+    wizard_url = '/wiz_other_template/'
+    wizard_step_1_data = {
+        'cookie_contact_wizard-current_step': 'form1',
+    }
+    wizard_step_data = (
+        {
+            'form1-name': 'Pony',
+            'form1-thirsty': '2',
+            'cookie_contact_wizard-current_step': 'form1',
+        },
+        {
+            'form2-address1': '123 Main St',
+            'form2-address2': 'Djangoland',
+            'cookie_contact_wizard-current_step': 'form2',
+        },
+        {
+            'form3-random_crap': 'blah blah',
+            'cookie_contact_wizard-current_step': 'form3',
+        },
+        {
+            'form4-INITIAL_FORMS': '0',
+            'form4-TOTAL_FORMS': '2',
+            'form4-MAX_NUM_FORMS': '0',
+            'form4-0-random_crap': 'blah blah',
+            'form4-1-random_crap': 'blah blah',
+            'cookie_contact_wizard-current_step': 'form4',
+        }
+    )
+    urls = 'django.contrib.formtools.wizard.tests.wizardtests.urls'
 
+    def setUp(self):
+        self.testuser, created = User.objects.get_or_create(username='testuser1')
+        self.wizard_step_data[0]['form1-user'] = self.testuser.pk
+
+    def test_template(self):
+        templates = os.path.join(os.path.dirname(__file__), 'templates')
+        with self.settings(
+                TEMPLATE_DIRS=list(settings.TEMPLATE_DIRS) + [templates]):
+            response = self.client.get(self.wizard_url)
+            self.assertTemplateUsed(response, 'other_wizard_form.html')
