@@ -987,7 +987,9 @@ class Library(object):
 
                     if not getattr(self, 'nodelist', False):
                         from django.template.loader import get_template, select_template
-                        if not isinstance(file_name, basestring) and is_iterable(file_name):
+                        if isinstance(file_name, Template):
+                            t = file_name
+                        elif not isinstance(file_name, basestring) and is_iterable(file_name):
                             t = select_template(file_name)
                         else:
                             t = get_template(file_name)

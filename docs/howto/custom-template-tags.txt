@@ -822,6 +822,15 @@ loader, we'd register the tag like this::
     # Here, register is a django.template.Library instance, as before
     register.inclusion_tag('results.html')(show_results)
 
+.. versionchanged:: 1.4
+
+    Alternatively it is possible to register the inclusion tag using a
+    :class:`django.template.Template` instance::
+
+        from django.template.loader import get_template
+        t = get_template('results.html')
+        register.inclusion_tag(t)(show_results)
+
 As always, decorator syntax works as well, so we could have written::
 
     @register.inclusion_tag('results.html')
