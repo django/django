@@ -2151,6 +2151,8 @@ urlize
 
 Converts URLs in text into clickable links.
 
+Only works for .com, .net, and .org top level domains.
+
 Works on links beginning with ``http://``, ``https://``, or ``www.`` and
 ending with ``.org``, ``.net`` or ``.com``. Links can have trailing punctuation
 (periods, commas, close-parens) and leading punctuation (opening parens) and
