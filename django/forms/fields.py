@@ -337,7 +337,7 @@ class BaseTemporalField(Field):
                     return self.strptime(value, format)
                 except ValueError:
                     if format.endswith('.%f'):
-                        if not value.count('.')==1:
+                        if value.count('.') != 1:
                             continue
                         try:
                             datetime_str, usecs_str = value.rsplit('.', 1)
