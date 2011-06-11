@@ -18,6 +18,7 @@ from django.core import validators
 from django.utils import formats
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_unicode, smart_str, force_unicode
+from django.utils.ipv6 import clean_ipv6_address
 
 # Provide this import for backwards compatibility.
 from django.core.validators import EMPTY_VALUES
@@ -34,8 +35,8 @@ __all__ = (
     'RegexField', 'EmailField', 'FileField', 'ImageField', 'URLField',
     'BooleanField', 'NullBooleanField', 'ChoiceField', 'MultipleChoiceField',
     'ComboField', 'MultiValueField', 'FloatField', 'DecimalField',
-    'SplitDateTimeField', 'IPAddressField', 'FilePathField', 'SlugField',
-    'TypedChoiceField', 'TypedMultipleChoiceField'
+    'SplitDateTimeField', 'IPAddressField', 'GenericIPAddressField', 'FilePathField',
+    'SlugField', 'TypedChoiceField', 'TypedMultipleChoiceField'
 )
 
 
@@ -951,6 +952,25 @@ class IPAddressField(CharField):
         'invalid': _(u'Enter a valid IPv4 address.'),
     }
     default_validators = [validators.validate_ipv4_address]
+
+
+class GenericIPAddressField(CharField):
+    default_error_messages = {}
+
+    def __init__(self, protocol='both', unpack_ipv4=False, *args, **kwargs):
+        self.unpack_ipv4 = unpack_ipv4
+        self.default_validators, invalid_error_message = \
+            validators.ip_address_validators(protocol, unpack_ipv4)
+        self.default_error_messages['invalid'] = invalid_error_message
+        super(GenericIPAddressField, self).__init__(*args, **kwargs)
+
+    def to_python(self, value):
+        if not value:
+            return ''
+        if value and ':' in value:
+                return clean_ipv6_address(value,
+                    self.unpack_ipv4, self.error_messages['invalid'])
+        return value
 
 
 class SlugField(CharField):

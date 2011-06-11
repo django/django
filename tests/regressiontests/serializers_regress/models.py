@@ -52,6 +52,9 @@ class BigIntegerData(models.Model):
 class IPAddressData(models.Model):
     data = models.IPAddressField(null=True)
 
+class GenericIPAddressData(models.Model):
+    data = models.GenericIPAddressField(null=True)
+
 class NullBooleanData(models.Model):
     data = models.NullBooleanField(null=True)
 
@@ -186,6 +189,9 @@ class IntegerPKData(models.Model):
 
 class IPAddressPKData(models.Model):
     data = models.IPAddressField(primary_key=True)
+
+class GenericIPAddressPKData(models.Model):
+    data = models.GenericIPAddressField(primary_key=True)
 
 # This is just a Boolean field with null=True, and we can't test a PK value of NULL.
 # class NullBooleanPKData(models.Model):

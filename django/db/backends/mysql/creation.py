@@ -19,6 +19,7 @@ class DatabaseCreation(BaseDatabaseCreation):
         'IntegerField':      'integer',
         'BigIntegerField':   'bigint',
         'IPAddressField':    'char(15)',
+        'GenericIPAddressField': 'char(39)',
         'NullBooleanField':  'bool',
         'OneToOneField':     'integer',
         'PositiveIntegerField': 'integer UNSIGNED',

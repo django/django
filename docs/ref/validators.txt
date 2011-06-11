@@ -130,6 +130,23 @@ to, or in lieu of custom ``field.clean()`` methods.
     A :class:`RegexValidator` instance that ensures a value looks like an IPv4
     address.
 
+``validate_ipv6_address``
+-------------------------
+.. versionadded:: 1.4
+
+.. data:: validate_ipv6_address
+
+    Uses :mod:`django.utils.ipv6` to check the validity of an IPv6 address.
+
+``validate_ipv46_address``
+--------------------------
+.. versionadded:: 1.4
+
+.. data:: validate_ipv46_address
+
+    Uses both ``validate_ipv4_address`` and ``validate_ipv6_address`` to
+    ensure a value is either a valid IPv4 or IPv6 address.
+
 ``validate_comma_separated_integer_list``
 -----------------------------------------
 .. data:: validate_comma_separated_integer_list

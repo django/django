@@ -82,3 +82,11 @@ class FlexibleDatePost(models.Model):
 class UniqueErrorsModel(models.Model):
     name = models.CharField(max_length=100, unique=True, error_messages={'unique': u'Custom unique name message.'})
     number = models.IntegerField(unique=True, error_messages={'unique': u'Custom unique number message.'})
+
+class GenericIPAddressTestModel(models.Model):
+    generic_ip = models.GenericIPAddressField(blank=True, unique=True)
+    v4_ip = models.GenericIPAddressField(blank=True, protocol="ipv4")
+    v6_ip = models.GenericIPAddressField(blank=True, protocol="ipv6")
+
+class GenericIPAddressWithUnpackUniqueTestModel(models.Model):
+    generic_v4unpack_ip = models.GenericIPAddressField(blank=True, unique=True, unpack_ipv4=True)

@@ -52,6 +52,31 @@ TEST_DATA = (
     (validate_ipv4_address, '25,1,1,1', ValidationError),
     (validate_ipv4_address, '25.1 .1.1', ValidationError),
 
+    # validate_ipv6_address uses django.utils.ipv6, which
+    # is tested in much greater detail in it's own testcase
+    (validate_ipv6_address, 'fe80::1', None),
+    (validate_ipv6_address, '::1', None),
+    (validate_ipv6_address, '1:2:3:4:5:6:7:8', None),
+
+    (validate_ipv6_address, '1:2', ValidationError),
+    (validate_ipv6_address, '::zzz', ValidationError),
+    (validate_ipv6_address, '12345::', ValidationError),
+
+    (validate_ipv46_address, '1.1.1.1', None),
+    (validate_ipv46_address, '255.0.0.0', None),
+    (validate_ipv46_address, '0.0.0.0', None),
+    (validate_ipv46_address, 'fe80::1', None),
+    (validate_ipv46_address, '::1', None),
+    (validate_ipv46_address, '1:2:3:4:5:6:7:8', None),
+
+    (validate_ipv46_address, '256.1.1.1', ValidationError),
+    (validate_ipv46_address, '25.1.1.', ValidationError),
+    (validate_ipv46_address, '25,1,1,1', ValidationError),
+    (validate_ipv46_address, '25.1 .1.1', ValidationError),
+    (validate_ipv46_address, '1:2', ValidationError),
+    (validate_ipv46_address, '::zzz', ValidationError),
+    (validate_ipv46_address, '12345::', ValidationError),
+
     (validate_comma_separated_integer_list, '1', None),
     (validate_comma_separated_integer_list, '1,2,3', None),
     (validate_comma_separated_integer_list, '1,2,3,', None),

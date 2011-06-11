@@ -21,6 +21,7 @@ class DatabaseCreation(BaseDatabaseCreation):
         'IntegerField':      'integer',
         'BigIntegerField':   'bigint',
         'IPAddressField':    'inet',
+        'GenericIPAddressField': 'inet',
         'NullBooleanField':  'boolean',
         'OneToOneField':     'integer',
         'PositiveIntegerField': 'integer CHECK ("%(column)s" >= 0)',

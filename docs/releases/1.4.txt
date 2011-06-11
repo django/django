@@ -155,6 +155,15 @@ You may override or customize the default filtering by writing a
 :ref:`custom filter<custom-error-reports>`. Learn more on
 :ref:`Filtering error reports<filtering-error-reports>`.
 
+Extended IPv6 support
+~~~~~~~~~~~~~~~~~~~~~
+
+The previously added support for IPv6 addresses when using the runserver
+management command in Django 1.3 has now been further extended by adding
+a :class:`~django.db.models.fields.GenericIPAddressField` model field,
+a :class:`~django.forms.fields.GenericIPAddressField` form field and
+the validators :data:`~django.core.validators.validate_ipv46_address` and
+:data:`~django.core.validators.validate_ipv6_address`
 
 Minor features
 ~~~~~~~~~~~~~~

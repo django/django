@@ -196,6 +196,15 @@ class FormsErrorMessagesTestCase(unittest.TestCase, AssertFormErrorsMixin):
         self.assertFormErrors([u'REQUIRED'], f.clean, '')
         self.assertFormErrors([u'INVALID IP ADDRESS'], f.clean, '127.0.0')
 
+    def test_generic_ipaddressfield(self):
+        e = {
+            'required': 'REQUIRED',
+            'invalid': 'INVALID IP ADDRESS',
+        }
+        f = GenericIPAddressField(error_messages=e)
+        self.assertFormErrors([u'REQUIRED'], f.clean, '')
+        self.assertFormErrors([u'INVALID IP ADDRESS'], f.clean, '127.0.0')
+
     def test_subclassing_errorlist(self):
         class TestForm(Form):
             first_name = CharField()
