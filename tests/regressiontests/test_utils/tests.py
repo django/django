@@ -3,6 +3,7 @@ from __future__ import with_statement
 import sys
 
 from django.test import TestCase, skipUnlessDBFeature, skipIfDBFeature
+from django.utils.unittest import skip
 
 from models import Person
 
@@ -114,6 +115,21 @@ class SaveRestoreWarningState(TestCase):
 
         # Remove the filter we just added.
         self.restore_warnings_state()
+
+
+class SkippingExtraTests(TestCase):
+    fixtures = ['should_not_be_loaded.json']
+
+    # HACK: This depends on internals of our TestCase subclasses
+    def __call__(self, result=None):
+        # Detect fixture loading by counting SQL queries, should be zero
+        with self.assertNumQueries(0):
+            super(SkippingExtraTests, self).__call__(result)
+
+    @skip("Fixture loading should not be performed for skipped tests.")
+    def test_fixtures_are_skipped(self):
+        pass
+
 
 __test__ = {"API_TEST": r"""
 # Some checks of the doctest output normalizer.
