@@ -76,7 +76,7 @@ class ChangeList(object):
             self.list_editable = ()
         else:
             self.list_editable = list_editable
-        self.ordering = self.get_ordering()
+        self.ordering = self.get_ordering(request)
         self.query = request.GET.get(SEARCH_VAR, '')
         self.query_set = self.get_query_set(request)
         self.get_results(request)
@@ -172,12 +172,13 @@ class ChangeList(object):
             ordering = self.lookup_opts.ordering
         return ordering
 
-    def get_ordering(self):
+    def get_ordering(self, request):
         params = self.params
-        # For ordering, first check the "ordering" parameter in the admin
+        # For ordering, first check the if exists the "get_ordering" method
+        # in model admin, then check "ordering" parameter in the admin
         # options, then check the object's default ordering. Finally, a
         # manually-specified ordering from the query string overrides anything.
-        ordering = self._get_default_ordering()
+        ordering = self.model_admin.get_ordering(request) or self._get_default_ordering()
 
         if ORDER_VAR in params:
             # Clear ordering and used params

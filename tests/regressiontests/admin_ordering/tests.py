@@ -1,7 +1,8 @@
-from django.test import TestCase
+from django.test import TestCase, RequestFactory
+from django.contrib.auth.models import User
 from django.contrib.admin.options import ModelAdmin
 
-from models import Band, Song, SongInlineDefaultOrdering, SongInlineNewOrdering
+from models import Band, Song, SongInlineDefaultOrdering, SongInlineNewOrdering, DynOrderingBandAdmin
 
 class TestAdminOrdering(TestCase):
     """
@@ -11,6 +12,7 @@ class TestAdminOrdering(TestCase):
     """
 
     def setUp(self):
+        self.request_factory = RequestFactory()
         b1 = Band(name='Aerosmith', bio='', rank=3)
         b1.save()
         b2 = Band(name='Radiohead', bio='', rank=1)
@@ -37,6 +39,22 @@ class TestAdminOrdering(TestCase):
         ma = BandAdmin(Band, None)
         names = [b.name for b in ma.queryset(None)]
         self.assertEqual([u'Radiohead', u'Van Halen', u'Aerosmith'], names)
+
+    def test_dynamic_ordering(self):
+        """
+        Let's use a custom ModelAdmin that changes the ordering dinamically.
+        """
+        super_user = User.objects.create(username='admin', is_superuser=True)
+        other_user = User.objects.create(username='other')
+        request = self.request_factory.get('/')
+        request.user = super_user
+        ma = DynOrderingBandAdmin(Band, None)
+        names = [b.name for b in ma.queryset(request)]
+        self.assertEqual([u'Radiohead', u'Van Halen', u'Aerosmith'], names)
+        request.user = other_user
+        names = [b.name for b in ma.queryset(request)]
+        self.assertEqual([u'Aerosmith', u'Radiohead', u'Van Halen'], names)
+
 
 class TestInlineModelAdminOrdering(TestCase):
     """

@@ -704,6 +704,11 @@ subclass::
     If this isn't provided, the Django admin will use the model's default
     ordering.
 
+    .. versionadded:: 1.4
+
+    If you need to specify a dynamic order (for example depending on user or
+    language) you can implement a :meth:`~ModelAdmin.get_ordering` method.
+
     .. versionchanged:: 1.4
 
     Django honors all elements in the list/tuple; before 1.4, only the first
@@ -957,6 +962,22 @@ templates used by the :class:`ModelAdmin` views:
                     instance.save()
                 formset.save_m2m()
 
+.. method:: ModelAdmin.get_ordering(self, request)
+
+    .. versionadded:: 1.4
+
+    The ``get_ordering`` method takes a``request`` as parameter and
+    is expected to return a ``list`` or ``tuple`` for ordering similiar
+    to the :attr:`ordering` attribute. For example::
+
+        class PersonAdmin(ModelAdmin):
+
+            def get_ordering(self, request):
+                if request.user.is_superuser:
+                    return ['name', 'rank']
+                else:
+                    return ['name']
+
 .. method:: ModelAdmin.get_readonly_fields(self, request, obj=None)
 
     .. versionadded:: 1.2
@@ -1053,7 +1074,7 @@ templates used by the :class:`ModelAdmin` views:
 .. method:: ModelAdmin.formfield_for_foreignkey(self, db_field, request, **kwargs)
 
     The ``formfield_for_foreignkey`` method on a ``ModelAdmin`` allows you to
-    override the default formfield for a foreign key field. For example, to
+    override the default formfield for a foreign keys field. For example, to
     return a subset of objects for this foreign key field based on the user::
 
         class MyModelAdmin(admin.ModelAdmin):

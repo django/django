@@ -189,6 +189,12 @@ class BaseModelAdmin(object):
         return None
     declared_fieldsets = property(_declared_fieldsets)
 
+    def get_ordering(self, request):
+        """
+        Hook for specifying field ordering.
+        """
+        return self.ordering or ()  # otherwise we might try to *None, which is bad ;)
+
     def get_readonly_fields(self, request, obj=None):
         """
         Hook for specifying custom readonly fields.
@@ -208,7 +214,7 @@ class BaseModelAdmin(object):
         """
         qs = self.model._default_manager.get_query_set()
         # TODO: this should be handled by some parameter to the ChangeList.
-        ordering = self.ordering or () # otherwise we might try to *None, which is bad ;)
+        ordering = self.get_ordering(request)
         if ordering:
             qs = qs.order_by(*ordering)
         return qs
@@ -259,6 +265,7 @@ class BaseModelAdmin(object):
                 return True
             clean_lookup = LOOKUP_SEP.join(parts)
             return clean_lookup in self.list_filter or clean_lookup == self.date_hierarchy
+
 
 class ModelAdmin(BaseModelAdmin):
     "Encapsulates all admin options and functionality for a given model."

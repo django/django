@@ -73,10 +73,12 @@ documentation for :attr:`~django.contrib.admin.ModelAdmin.list_filter`.
 Multiple sort in admin interface
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The admin change list now supports sorting on multiple columns. It respects all
-elements of the :attr:`~django.contrib.admin.ModelAdmin.ordering` attribute, and
-sorting on multiple columns by clicking on headers is designed to work similarly
-to how desktop GUIs do it.
+The admin change list now supports sorting on multiple columns. It respects
+all elements of the :attr:`~django.contrib.admin.ModelAdmin.ordering`
+attribute, and sorting on multiple columns by clicking on headers is designed
+to work similarly to how desktop GUIs do it. The new hook
+:meth:`~django.contrib.admin.ModelAdmin.get_ordering` for specifying the
+ordering dynamically (e.g. depending on the request) has also been added.
 
 Tools for cryptographic signing
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
