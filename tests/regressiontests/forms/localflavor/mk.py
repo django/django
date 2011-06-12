@@ -7,8 +7,8 @@ from utils import LocalFlavorTestCase
 class MKLocalFlavorTests(LocalFlavorTestCase):
 
     def test_MKIdentityCardNumberField(self):
-        error_invalid  = (u'Identity card numbers must contain'
-            ' either 4 to 7 digits or an uppercase letter and 7 digits.')
+        error_invalid  = [u'Identity card numbers must contain either 4 to 7 '
+                          'digits or an uppercase letter and 7 digits.']
         valid = {
             'L0018077':'L0018077',
             'A0078315' : 'A0078315',
