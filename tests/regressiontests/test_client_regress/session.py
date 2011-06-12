@@ -2,7 +2,7 @@ from django.contrib.sessions.backends.base import SessionBase
 
 class SessionStore(SessionBase):
     """
-    A simple cookie-based session storage implemenation.
+    A simple cookie-based session storage implementation.
 
     The session key is actually the session data, pickled and encoded.
     This means that saving the session will change the session key.
