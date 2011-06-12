@@ -8,9 +8,16 @@ import warnings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
 from django.test import simple
+from django.test.simple import get_tests
 from django.test.utils import get_warnings_state, restore_warnings_state
 from django.utils import unittest
+from django.utils.importlib import import_module
+
 from regressiontests.admin_scripts.tests import AdminScriptTestCase
+
+
+TEST_APP_OK = 'regressiontests.test_runner.valid_app.models'
+TEST_APP_ERROR = 'regressiontests.test_runner.invalid_app.models'
 
 
 class DjangoTestRunnerTests(unittest.TestCase):
@@ -203,3 +210,16 @@ class CustomTestRunnerOptionsTests(AdminScriptTestCase):
         out, err = self.run_django_admin(args)
         self.assertNoOutput(err)
         self.assertOutput(out, 'bar:foo:31337')
+
+
+class ModulesTestsPackages(unittest.TestCase):
+    def test_get_tests(self):
+        "Check that the get_tests helper function can find tests in a directory"
+        module = import_module(TEST_APP_OK)
+        tests = get_tests(module)
+        self.assertIsInstance(tests, type(module))
+
+    def test_import_error(self):
+        "Test for #12658 - Tests with ImportError's shouldn't fail silently"
+        module = import_module(TEST_APP_ERROR)
+        self.assertRaises(ImportError, get_tests, module)
