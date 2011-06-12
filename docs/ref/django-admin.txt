@@ -967,7 +967,7 @@ immediately after a test fails.
 .. versionadded:: 1.4
 .. django-admin-option:: --testrunner
 
-The :djandminopt:`--testrunner` option can be used to control the test runner
+The :djadminopt:`--testrunner` option can be used to control the test runner
 class that is used to execute tests. If this value is provided, it overrides
 the value provided by the :setting:`TEST_RUNNER` setting.
 
