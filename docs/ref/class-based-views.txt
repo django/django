@@ -1062,8 +1062,8 @@ DeleteView
 
     **Mixins**
 
-      * :class:`django.views.generic.edit.ModelFormMixin`
-      * :class:`django.views.generic.edit.ProcessFormView`
+      * :class:`django.views.generic.edit.DeletionMixin`
+      * :class:`django.views.generic.detail.BaseDetailView`
 
     **Notes**
 
