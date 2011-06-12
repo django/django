@@ -519,11 +519,11 @@ class SessionEngineTests(TestCase):
         self.assertEqual(response.context['user'].username, 'testclient')
 
 
-# Remove the 'session' contrib app from INSTALLED_APPS
-@override_settings(INSTALLED_APPS=tuple(filter(lambda a: a!='django.contrib.sessions', settings.INSTALLED_APPS)))
 class NoSessionsAppInstalled(SessionEngineTests):
     """#7836 - Test client can exercise sessions even when 'django.contrib.sessions' isn't installed."""
 
+    # Remove the 'session' contrib app from INSTALLED_APPS
+    @override_settings(INSTALLED_APPS=tuple(filter(lambda a: a!='django.contrib.sessions', settings.INSTALLED_APPS)))
     def test_session(self):
         # This request sets a session variable.
         response = self.client.get('/test_client_regress/set_session/')
