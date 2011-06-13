@@ -14,11 +14,19 @@ from django.utils.unittest import skipUnless
 from modeltests.model_forms.models import (Article, ArticleStatus,
     BetterWriter, BigInt, Book, Category, CommaSeparatedInteger,
     CustomFieldForExclusionModel, DerivedBook, DerivedPost, ExplicitPK,
-    FlexibleDatePost, ImageFile, ImprovedArticle,
-    ImprovedArticleWithParentLink, Inventory, OptionalImageFile, PhoneNumber,
-    Post, Price, Product, TextFile, Writer, WriterProfile,
-    test_images)
+    FlexibleDatePost, ImprovedArticle, ImprovedArticleWithParentLink,
+    Inventory, PhoneNumber, Post, Price, Product, TextFile, Writer,
+    WriterProfile, test_images)
 
+if test_images:
+    from modeltests.model_forms.models import ImageFile, OptionalImageFile
+    class ImageFileForm(forms.ModelForm):
+        class Meta:
+            model = ImageFile
+
+    class OptionalImageFileForm(forms.ModelForm):
+        class Meta:
+            model = OptionalImageFile
 
 class ProductForm(forms.ModelForm):
     class Meta:
@@ -148,14 +156,6 @@ class TextFileForm(forms.ModelForm):
 class BigIntForm(forms.ModelForm):
     class Meta:
         model = BigInt
-
-class ImageFileForm(forms.ModelForm):
-    class Meta:
-        model = ImageFile
-
-class OptionalImageFileForm(forms.ModelForm):
-    class Meta:
-        model = OptionalImageFile
 
 class ModelFormWithMedia(forms.ModelForm):
     class Media:
