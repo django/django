@@ -495,7 +495,7 @@ class FormsExtraTestCase(unittest.TestCase, AssertFormErrorsMixin):
         self.assertFormErrors([u'Enter a valid IPv4 address.'], f.clean, 'fe80::223:6cff:fe8a:2e8a')
         self.assertFormErrors([u'Enter a valid IPv4 address.'], f.clean, '2a02::223:6cff:fe8a:2e8a')
 
-    def test_generic_ipaddress_as_ipv4_only(self):
+    def test_generic_ipaddress_as_ipv6_only(self):
         f = GenericIPAddressField(protocol="IPv6")
         self.assertFormErrors([u'This field is required.'], f.clean, '')
         self.assertFormErrors([u'This field is required.'], f.clean, None)
