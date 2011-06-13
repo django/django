@@ -88,5 +88,5 @@ class GenericIPAddressTestModel(models.Model):
     v4_ip = models.GenericIPAddressField(blank=True, protocol="ipv4")
     v6_ip = models.GenericIPAddressField(blank=True, protocol="ipv6")
 
-class GenericIPAddressWithUnpackUniqueTestModel(models.Model):
+class GenericIPAddrUnpackUniqueTest(models.Model):
     generic_v4unpack_ip = models.GenericIPAddressField(blank=True, unique=True, unpack_ipv4=True)

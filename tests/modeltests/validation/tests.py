@@ -3,7 +3,7 @@ from django.test import TestCase
 from django.core.exceptions import NON_FIELD_ERRORS
 from modeltests.validation import ValidationTestCase
 from modeltests.validation.models import (Author, Article, ModelToValidate,
-    GenericIPAddressTestModel, GenericIPAddressWithUnpackUniqueTestModel)
+    GenericIPAddressTestModel, GenericIPAddrUnpackUniqueTest)
 
 # Import other tests for this package.
 from modeltests.validation.validators import TestModelsWithValidators
@@ -177,7 +177,7 @@ class GenericIPAddressFieldTests(ValidationTestCase):
         self.assertEqual(None, giptm.full_clean())
 
         # These two are the same, because we are doing IPv4 unpacking
-        giptm = GenericIPAddressWithUnpackUniqueTestModel(generic_v4unpack_ip="::ffff:18.52.18.52")
+        giptm = GenericIPAddrUnpackUniqueTest(generic_v4unpack_ip="::ffff:18.52.18.52")
         giptm.save()
-        giptm = GenericIPAddressWithUnpackUniqueTestModel(generic_v4unpack_ip="18.52.18.52")
+        giptm = GenericIPAddrUnpackUniqueTest(generic_v4unpack_ip="18.52.18.52")
         self.assertFailsValidation(giptm.full_clean, ['generic_v4unpack_ip',])
