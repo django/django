@@ -84,9 +84,9 @@ class UniqueErrorsModel(models.Model):
     number = models.IntegerField(unique=True, error_messages={'unique': u'Custom unique number message.'})
 
 class GenericIPAddressTestModel(models.Model):
-    generic_ip = models.GenericIPAddressField(blank=True, unique=True)
-    v4_ip = models.GenericIPAddressField(blank=True, protocol="ipv4")
-    v6_ip = models.GenericIPAddressField(blank=True, protocol="ipv6")
+    generic_ip = models.GenericIPAddressField(blank=True, null=True, unique=True)
+    v4_ip = models.GenericIPAddressField(blank=True, null=True, protocol="ipv4")
+    v6_ip = models.GenericIPAddressField(blank=True, null=True, protocol="ipv6")
 
 class GenericIPAddrUnpackUniqueTest(models.Model):
     generic_v4unpack_ip = models.GenericIPAddressField(blank=True, unique=True, unpack_ipv4=True)

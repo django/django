@@ -910,6 +910,7 @@ class BigIntegerField(IntegerField):
     empty_strings_allowed = False
     description = _("Big (8 byte) integer")
     MAX_BIGINT = 9223372036854775807
+
     def get_internal_type(self):
         return "BigIntegerField"
 
@@ -922,6 +923,7 @@ class BigIntegerField(IntegerField):
 class IPAddressField(Field):
     empty_strings_allowed = False
     description = _("IPv4 address")
+
     def __init__(self, *args, **kwargs):
         kwargs['max_length'] = 15
         Field.__init__(self, *args, **kwargs)
@@ -955,6 +957,11 @@ class GenericIPAddressField(Field):
             return clean_ipv6_address(value,
                 self.unpack_ipv4, self.error_messages['invalid'])
         return value
+
+    def get_db_prep_value(self, value, connection, prepared=False):
+        if not prepared:
+            value = self.get_prep_value(value)
+        return value or None
 
     def get_prep_value(self, value):
         if value and ':' in value:

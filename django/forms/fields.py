@@ -965,8 +965,8 @@ class GenericIPAddressField(CharField):
         super(GenericIPAddressField, self).__init__(*args, **kwargs)
 
     def to_python(self, value):
-        if not value:
-            return ''
+        if value in validators.EMPTY_VALUES:
+            return u''
         if value and ':' in value:
                 return clean_ipv6_address(value,
                     self.unpack_ipv4, self.error_messages['invalid'])
