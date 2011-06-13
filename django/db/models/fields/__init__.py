@@ -937,6 +937,7 @@ class IPAddressField(Field):
 class GenericIPAddressField(Field):
     empty_strings_allowed = True
     description = _("IP address")
+    default_error_messages = {}
 
     def __init__(self, protocol='both', unpack_ipv4=False, *args, **kwargs):
         self.unpack_ipv4 = unpack_ipv4
