@@ -224,7 +224,7 @@ class ExceptionReporterFilterTests(TestCase):
             mail.outbox = [] # Empty outbox
             request = self.rf.post('/some_url/', self.breakfast_data)
             response = view(request)
-            self.assertEquals(len(mail.outbox), 1)
+            self.assertEqual(len(mail.outbox), 1)
             email = mail.outbox[0]
             # Frames vars are never shown in plain text email reports.
             self.assertNotIn('cooked_eggs', email.body)
@@ -244,7 +244,7 @@ class ExceptionReporterFilterTests(TestCase):
             mail.outbox = [] # Empty outbox
             request = self.rf.post('/some_url/', self.breakfast_data)
             response = view(request)
-            self.assertEquals(len(mail.outbox), 1)
+            self.assertEqual(len(mail.outbox), 1)
             email = mail.outbox[0]
             # Frames vars are never shown in plain text email reports.
             self.assertNotIn('cooked_eggs', email.body)
@@ -269,7 +269,7 @@ class ExceptionReporterFilterTests(TestCase):
             mail.outbox = [] # Empty outbox
             request = self.rf.post('/some_url/', self.breakfast_data)
             response = view(request)
-            self.assertEquals(len(mail.outbox), 1)
+            self.assertEqual(len(mail.outbox), 1)
             email = mail.outbox[0]
             # Frames vars are never shown in plain text email reports.
             self.assertNotIn('cooked_eggs', email.body)

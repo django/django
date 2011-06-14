@@ -194,7 +194,7 @@ class EnvironmentVariableTest(TestCase):
 
         # expect default
         setup_environ(global_settings)
-        self.assertEquals(
+        self.assertEqual(
             os.environ.get('DJANGO_SETTINGS_MODULE'),
             original_module
         )
@@ -203,7 +203,7 @@ class EnvironmentVariableTest(TestCase):
         os.environ['DJANGO_SETTINGS_MODULE'] = user_override
         setup_environ(global_settings)
 
-        self.assertEquals(
+        self.assertEqual(
             os.environ.get('DJANGO_SETTINGS_MODULE'),
             user_override
         )
@@ -212,7 +212,7 @@ class EnvironmentVariableTest(TestCase):
         os.environ['DJANGO_SETTINGS_MODULE'] = user_override
         setup_environ(global_settings, original_settings_path = orig_path)
 
-        self.assertEquals(
+        self.assertEqual(
             os.environ.get('DJANGO_SETTINGS_MODULE'),
             orig_path
         )
