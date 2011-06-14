@@ -32,7 +32,7 @@ class TestAuthPermissions(TestCase):
         create_permissions(auth_models, [], verbosity=0)
         create_permissions(contenttypes_models, [], verbosity=0)
 
-        stderr = StringIO()
-        call_command('loaddata', 'test_permissions.json',
-                     verbosity=0, commit=False, stderr=stderr)
-        self.assertEqual(stderr.getvalue(), '')
+        stdout = StringIO()
+        call_command('loaddata', 'permissionstestdata.json',
+                     verbosity=1, commit=False, stdout=stdout)
+        self.assertNotEqual(stdout.getvalue(), 'No fixtures found.\n')

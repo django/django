@@ -1,6 +1,6 @@
 [
     {
-        "pk": 5, 
+        "pk": 4, 
         "model": "contenttypes.contenttype", 
         "fields": {
             "model": "contenttype", 
@@ -18,21 +18,12 @@
         }
     }, 
     {
-        "pk": 8, 
+        "pk": 7, 
         "model": "contenttypes.contenttype", 
         "fields": {
             "model": "logentry", 
             "name": "log entry", 
             "app_label": "admin"
-        }
-    }, 
-    {
-        "pk": 4, 
-        "model": "contenttypes.contenttype", 
-        "fields": {
-            "model": "message", 
-            "name": "message", 
-            "app_label": "auth"
         }
     }, 
     {
@@ -45,7 +36,7 @@
         }
     }, 
     {
-        "pk": 6, 
+        "pk": 5, 
         "model": "contenttypes.contenttype", 
         "fields": {
             "model": "session", 
@@ -54,7 +45,7 @@
         }
     }, 
     {
-        "pk": 7, 
+        "pk": 6, 
         "model": "contenttypes.contenttype", 
         "fields": {
             "model": "site", 
