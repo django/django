@@ -271,6 +271,16 @@ Advanced ``WizardView`` methods
         def get_form_initial(self, step):
             return self.initial_dict.get(step, {})
 
+.. method:: WizardView.get_form_kwargs(step)
+
+    Returns a dictionary which will be used as the keyword arguments when
+    instantiating the form instance on given ``step``.
+
+    The default implementation::
+
+        def get_form_kwargs(self, step):
+            return {}
+
 .. method:: WizardView.get_form_instance(step)
 
     Returns a object which will be passed to the form for ``step`` as

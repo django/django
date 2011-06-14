@@ -354,6 +354,13 @@ class WizardView(TemplateView):
         """
         return self.instance_dict.get(step, None)
 
+    def get_form_kwargs(self, step=None):
+        """
+        Returns the keyword arguments for instantiating the form
+        (or formset) on given step.
+        """
+        return {}
+
     def get_form(self, step=None, data=None, files=None):
         """
         Constructs the form for a given `step`. If no `step` is defined, the
@@ -366,12 +373,13 @@ class WizardView(TemplateView):
         if step is None:
             step = self.steps.current
         # prepare the kwargs for the form instance.
-        kwargs = {
+        kwargs = self.get_form_kwargs(step)
+        kwargs.update({
             'data': data,
             'files': files,
             'prefix': self.get_form_prefix(step, self.form_list[step]),
             'initial': self.get_form_initial(step),
-        }
+        })
         if issubclass(self.form_list[step], forms.ModelForm):
             # If the form is based on ModelForm, add instance if available.
             kwargs.update({'instance': self.get_form_instance(step)})

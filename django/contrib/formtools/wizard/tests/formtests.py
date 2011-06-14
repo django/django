@@ -35,6 +35,12 @@ class Step2(forms.Form):
 class Step3(forms.Form):
     data = forms.CharField()
 
+class CustomKwargsStep1(Step1):
+
+    def __init__(self, test=None, *args, **kwargs):
+        self.test = test
+        return super(CustomKwargsStep1, self).__init__(*args, **kwargs)
+
 class UserForm(forms.ModelForm):
     class Meta:
         model = User
@@ -47,6 +53,12 @@ class TestWizard(WizardView):
     def dispatch(self, request, *args, **kwargs):
         response = super(TestWizard, self).dispatch(request, *args, **kwargs)
         return response, self
+
+    def get_form_kwargs(self, step, *args, **kwargs):
+        kwargs = super(TestWizard, self).get_form_kwargs(step, *args, **kwargs)
+        if step == 'kwargs_test':
+            kwargs['test'] = True
+        return kwargs
 
 class FormTests(TestCase):
     def test_form_init(self):
@@ -101,6 +113,17 @@ class FormTests(TestCase):
             condition_dict={'step2': False})
         response, instance = testform(request)
         self.assertEquals(instance.get_next_step(), 'step3')
+
+    def test_form_kwargs(self):
+        request = get_request()
+
+        testform = TestWizard.as_view([('start', Step1),
+            ('kwargs_test', CustomKwargsStep1)])
+        response, instance = testform(request)
+
+        self.assertEqual(instance.get_form_kwargs('start'), {})
+        self.assertEqual(instance.get_form_kwargs('kwargs_test'), {'test': True})
+        self.assertEqual(instance.get_form('kwargs_test').test, True)
 
     def test_form_prefix(self):
         request = get_request()
