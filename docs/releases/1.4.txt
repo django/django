@@ -179,6 +179,9 @@ Django 1.4 also includes several smaller improvements worth noting:
 
 * Customizable names for :meth:`~django.template.Library.simple_tag`.
 
+* In the documentation, a helpful :doc:`security overview </topics/security>`
+  page.
+
 .. _backwards-incompatible-changes-1.4:
 
 Backwards incompatible changes in 1.4
