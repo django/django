@@ -10,7 +10,7 @@ from django.utils import unittest
 from django.utils.importlib import import_module
 from django.utils.module_loading import module_has_submodule
 
-__all__ = ('DjangoTestRunner', 'DjangoTestSuiteRunner', 'run_tests')
+__all__ = ('DjangoTestRunner', 'DjangoTestSuiteRunner')
 
 # The module name for tests outside models.py
 TEST_MODULE = 'tests'
