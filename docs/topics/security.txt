@@ -13,7 +13,7 @@ Cross site scripting (XSS) protection
 .. highlightlang:: html+django
 
 XSS attacks allow a user to inject client side scripts into the
-browsers of other users. This is usually acheived by storing the malicious
+browsers of other users. This is usually achieved by storing the malicious
 scripts to the database where it will be retrieved and displayed to other users
 or to get users to click a link containing variables containing scripts that
 will be rendered by the user's browser. However, XSS attacks can originate
@@ -25,7 +25,7 @@ and its limitations.
 
 Django templates :ref:`escape specific characters <automatic-html-escaping>`
 which are particularly dangerous to HTML. While this protects users from most
-malications input, it is not entirely foolproof. For example, it will not
+malicious input, it is not entirely foolproof. For example, it will not
 protect the following:
 
 .. code-block:: html+django
@@ -97,7 +97,7 @@ Django contains :ref:`clickjacking protection <clickjacking-prevention>` in
 the form of the
 :mod:`X-Frame-Options middleware <django.middleware.clickjacking.XFrameOptionsMiddleware>`
 which in a supporting browser can prevent a site from being rendered inside
-of a frame. It is possible to disable the protection on a per view basis
+a frame. It is possible to disable the protection on a per view basis
 or to configure the exact header value sent.
 
 The middleware is strongly recommended for any site that does not need to have
@@ -139,7 +139,7 @@ information is not leaked:
   :setting:`CSRF_COOKIE_SECURE` settings to ``True``. This instructs the browser
   to only send these cookies over HTTPS connections. Note that this will mean
   that sessions will not work over HTTP, and the CSRF protection will prevent
-  any data POST data being accepted over HTTP (which will be fine if you are
+  any POST data being accepted over HTTP (which will be fine if you are
   redirecting all HTTP traffic to HTTPS).
 
 .. _additional-security-topics:
@@ -157,7 +157,7 @@ security protection of the web server, operating system and other components.
   brute-force attacks against the authentication system, you may consider
   deploying a Django plugin or web server module to throttle these requests.
 * If your site accepts file uploads, it is strongly advised that you limit
-  the these uploads in your web server configuration to a reasonable
+  these uploads in your web server configuration to a reasonable
   size in order to prevent denial of service (DOS) attacks. In Apache, this
   can be easily set using the LimitRequestBody_ directive.
 * Keep your :setting:`SECRET_KEY` a secret.
