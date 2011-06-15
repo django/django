@@ -58,3 +58,7 @@ def to_locale(language):
 
 def get_language_from_request(request):
     return settings.LANGUAGE_CODE
+
+def get_language_from_path(request):
+    return None
+

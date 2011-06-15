@@ -144,6 +144,9 @@ def to_locale(language):
 def get_language_from_request(request):
     return _trans.get_language_from_request(request)
 
+def get_language_from_path(path):
+    return _trans.get_language_from_path(path)
+
 def templatize(src, origin=None):
     return _trans.templatize(src, origin)
 

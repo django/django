@@ -753,6 +753,138 @@ This isn't as fast as string interpolation in Python, so keep it to those
 cases where you really need it (for example, in conjunction with ``ngettext``
 to produce proper pluralizations).
 
+.. _url-internationalization:
+
+Specifying translation strings: In URL patterns
+===============================================
+
+..  versionadded:: 1.4
+
+.. module:: django.conf.urls.i18n
+
+Django provides two mechanisms to internationalize URL patterns:
+
+* Adding the language prefix to the root of the URL patterns to make it
+  possible for :class:`~django.middleware.locale.LocaleMiddleware` to detect
+  the language to activate from the requested URL.
+
+* Making URL patterns themselves translatable via the
+  :func:`django.utils.translation.ugettext_lazy()` function.
+
+.. warning::
+
+    Using either one of these features requires that an active language be set
+    for each request; in other words, you need to have
+    :class:`django.middleware.locale.LocaleMiddleware` in your
+    :setting:`MIDDLEWARE_CLASSES` setting.
+
+Language prefix in URL patterns
+-------------------------------
+
+.. function:: i18n_patterns(prefix, pattern_description, ...)
+
+This function can be used in your root URLconf as a replacement for the normal
+:func:`django.conf.urls.defaults.patterns` function. Django will automatically
+prepend the current active language code to all url patterns defined within
+:func:`~django.conf.urls.i18n.i18n_patterns`. Example URL patterns::
+
+    from django.conf.urls.defaults import patterns, include, url
+    from django.conf.urls.i18n import i18n_patterns
+
+    urlpatterns = patterns(''
+        url(r'^sitemap\.xml$', 'sitemap.view', name='sitemap_xml'),
+    )
+
+    news_patterns = patterns(''
+        url(r'^$', 'news.views.index', name='index'),
+        url(r'^category/(?P<slug>[\w-]+)/$', 'news.views.category', name='category'),
+        url(r'^(?P<slug>[\w-]+)/$', 'news.views.details', name='detail'),
+    )
+
+    urlpatterns += i18n_patterns('',
+        url(r'^about/$', 'about.view', name='about'),
+        url(r'^news/$', include(news_patterns, namespace='news')),
+    )
+
+
+After defining these URL patterns, Django will automatically add the
+language prefix to the URL patterns that were added by the ``i18n_patterns``
+function. Example::
+
+    from django.core.urlresolvers import reverse
+    from django.utils.translation import activate
+
+    >>> activate('en')
+    >>> reverse('sitemap_xml')
+    '/sitemap.xml'
+    >>> reverse('news:index')
+    '/en/news/'
+
+    >>> activate('nl')
+    >>> reverse('news:detail', kwargs={'slug': 'news-slug'})
+    '/nl/news/news-slug/'
+
+.. warning::
+
+    :func:`~django.conf.urls.i18n.i18n_patterns` is only allowed in your root
+    URLconf. Using it within an included URLconf will throw an
+    :exc:`ImproperlyConfigured` exception.
+
+.. warning::
+
+    Ensure that you don't have non-prefixed URL patterns that might collide
+    with an automatically-added language prefix.
+
+
+Translating URL patterns
+------------------------
+
+URL patterns can also be marked translatable using the
+:func:`~django.utils.translation.ugettext_lazy` function. Example::
+
+    from django.conf.urls.defaults import patterns, include, url
+    from django.conf.urls.i18n import i18n_patterns
+    from django.utils.translation import ugettext_lazy as _
+
+    urlpatterns = patterns(''
+        url(r'^sitemap\.xml$', 'sitemap.view', name='sitemap_xml'),
+    )
+
+    news_patterns = patterns(''
+        url(r'^$', 'news.views.index', name='index'),
+        url(_(r'^category/(?P<slug>[\w-]+)/$'), 'news.views.category', name='category'),
+        url(r'^(?P<slug>[\w-]+)/$', 'news.views.details', name='detail'),
+    )
+
+    urlpatterns += i18n_patterns('',
+        url(_(r'^about/$'), 'about.view', name='about'),
+        url(_(r'^news/$'), include(news_patterns, namespace='news')),
+    )
+
+
+After you've created the translations (see :doc:`localization` for more
+information), the :func:`~django.core.urlresolvers.reverse` function will
+return the URL in the active language. Example::
+
+    from django.core.urlresolvers import reverse
+    from django.utils.translation import activate
+
+    >>> activate('en')
+    >>> reverse('news:category', kwargs={'slug': 'recent'})
+    '/en/news/category/recent/'
+
+    >>> activate('nl')
+    >>> reverse('news:category', kwargs={'slug': 'recent'})
+    '/nl/nieuws/categorie/recent/'
+
+.. warning::
+
+    In most cases, it's best to use translated URLs only within a
+    language-code-prefixed block of patterns (using
+    :func:`~django.conf.urls.i18n.i18n_patterns`), to avoid the possibility
+    that a carelessly translated URL causes a collision with a non-translated
+    URL pattern.
+
 .. _set_language-redirect-view:
 
 The ``set_language`` redirect view

@@ -167,6 +167,16 @@ a :class:`~django.forms.fields.GenericIPAddressField` form field and
 the validators :data:`~django.core.validators.validate_ipv46_address` and
 :data:`~django.core.validators.validate_ipv6_address`
 
+Translating URL patterns
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django 1.4 gained the ability to look for a language prefix in the URL pattern
+when using the new :func:`django.conf.urls.i18n.i18n_patterns` helper function.
+Additionally, it's now possible to define translatable URL patterns using
+:func:`~django.utils.translation.ugettext_lazy`. See
+:ref:`url-internationalization` for more information about the language prefix
+and how to internationalize URL patterns.
+
 Minor features
 ~~~~~~~~~~~~~~
 

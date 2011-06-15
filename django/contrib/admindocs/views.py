@@ -346,12 +346,12 @@ def extract_views_from_urlpatterns(urlpatterns, base=''):
     """
     views = []
     for p in urlpatterns:
-        if hasattr(p, '_get_callback'):
+        if hasattr(p, 'callback'):
             try:
-                views.append((p._get_callback(), base + p.regex.pattern))
+                views.append((p.callback, base + p.regex.pattern))
             except ViewDoesNotExist:
                 continue
-        elif hasattr(p, '_get_url_patterns'):
+        elif hasattr(p, 'url_patterns'):
             try:
                 patterns = p.url_patterns
             except ImportError:

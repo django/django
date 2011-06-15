@@ -35,6 +35,8 @@ accept_language_re = re.compile(r'''
         (?:\s*,\s*|$)                            # Multiple accepts per header.
         ''', re.VERBOSE)
 
+language_code_prefix_re = re.compile(r'^/([\w-]+)/')
+
 def to_locale(language, to_lower=False):
     """
     Turns a language name (en-us) into a locale name (en_US). If 'to_lower' is
@@ -336,13 +338,27 @@ def check_for_language(lang_code):
     """
     Checks whether there is a global language file for the given language
     code. This is used to decide whether a user-provided language is
-    available. This is only used for language codes from either the cookies or
-    session and during format localization.
+    available. This is only used for language codes from either the cookies
+    or session and during format localization.
     """
     for path in all_locale_paths():
         if gettext_module.find('django', path, [to_locale(lang_code)]) is not None:
             return True
     return False
+
+def get_language_from_path(path, supported=None):
+    """
+    Returns the language-code if there is a valid language-code
+    found in the `path`.
+    """
+    if supported is None:
+        from django.conf import settings
+        supported = dict(settings.LANGUAGES)
+    regex_match = language_code_prefix_re.match(path)
+    if regex_match:
+        lang_code = regex_match.group(1)
+        if lang_code in supported and check_for_language(lang_code):
+            return lang_code
 
 def get_language_from_request(request):
     """
@@ -354,6 +370,10 @@ def get_language_from_request(request):
     global _accepted
     from django.conf import settings
     supported = dict(settings.LANGUAGES)
+
+    lang_code = get_language_from_path(request.path_info, supported)
+    if lang_code is not None:
+        return lang_code
 
     if hasattr(request, 'session'):
         lang_code = request.session.get('django_language', None)

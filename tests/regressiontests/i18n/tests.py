@@ -3,13 +3,12 @@ from __future__ import with_statement
 import datetime
 import decimal
 import os
-import sys
 import pickle
 from threading import local
 
 from django.conf import settings
 from django.template import Template, Context
-from django.test import TestCase
+from django.test import TestCase, RequestFactory
 from django.utils.formats import (get_format, date_format, time_format,
     localize, localize_input, iter_format_modules, get_format_modules)
 from django.utils.importlib import import_module
@@ -18,14 +17,14 @@ from django.utils.safestring import mark_safe, SafeString, SafeUnicode
 from django.utils import translation
 from django.utils.translation import (ugettext, ugettext_lazy, activate,
         deactivate, gettext_lazy, pgettext, npgettext, to_locale,
-        get_language_info, get_language)
+        get_language_info, get_language, get_language_from_request)
 
 
 from forms import I18nForm, SelectDateForm, SelectDateWidget, CompanyForm
 from models import Company, TestModel
 
 from commands.tests import *
-
+from patterns.tests import *
 from test_warnings import DeprecationWarningTests
 
 class TranslationTests(TestCase):
@@ -494,6 +493,9 @@ class FormattingTests(TestCase):
 
 class MiscTests(TestCase):
 
+    def setUp(self):
+        self.rf = RequestFactory()
+
     def test_parse_spec_http_header(self):
         """
         Testing HTTP header parsing. First, we test that we can parse the
@@ -534,10 +536,8 @@ class MiscTests(TestCase):
         """
         Now test that we parse a literal HTTP header correctly.
         """
-        from django.utils.translation.trans_real import get_language_from_request
         g = get_language_from_request
-        from django.http import HttpRequest
-        r = HttpRequest
+        r = self.rf.get('/')
         r.COOKIES = {}
         r.META = {'HTTP_ACCEPT_LANGUAGE': 'pt-br'}
         self.assertEqual('pt-br', g(r))
@@ -569,10 +569,8 @@ class MiscTests(TestCase):
         """
         Now test that we parse language preferences stored in a cookie correctly.
         """
-        from django.utils.translation.trans_real import get_language_from_request
         g = get_language_from_request
-        from django.http import HttpRequest
-        r = HttpRequest
+        r = self.rf.get('/')
         r.COOKIES = {settings.LANGUAGE_COOKIE_NAME: 'pt-br'}
         r.META = {}
         self.assertEqual('pt-br', g(r))
@@ -827,4 +825,3 @@ class MultipleLocaleActivationTests(TestCase):
             t = Template("{% load i18n %}{% blocktrans %}No{% endblocktrans %}")
         with translation.override('nl'):
             self.assertEqual(t.render(Context({})), 'Nee')
-
