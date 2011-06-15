@@ -315,6 +315,48 @@ Atom1Feed
 
     Spec: http://atompub.org/2005/07/11/draft-ietf-atompub-format-10.html
 
+``django.utils.functional``
+===========================
+
+.. module:: django.utils.functional
+    :synopsis: Functional programming tools.
+
+.. function:: allow_lazy(func, *resultclasses)
+
+    Django offers many utility functions (particularly in ``django.utils``) that
+    take a string as their first argument and do something to that string. These
+    functions are used by template filters as well as directly in other code.
+
+    If you write your own similar functions and deal with translations, you'll
+    face the problem of what to do when the first argument is a lazy translation
+    object. You don't want to convert it to a string immediately, because you might
+    be using this function outside of a view (and hence the current thread's locale
+    setting will not be correct).
+
+    For cases like this, use the ``django.utils.functional.allow_lazy()``
+    decorator. It modifies the function so that *if* it's called with a lazy
+    translation as the first argument, the function evaluation is delayed until it
+    needs to be converted to a string.
+
+    For example::
+
+        from django.utils.functional import allow_lazy
+
+        def fancy_utility_function(s, ...):
+            # Do some conversion on string 's'
+            ...
+        fancy_utility_function = allow_lazy(fancy_utility_function, unicode)
+
+    The ``allow_lazy()`` decorator takes, in addition to the function to decorate,
+    a number of extra arguments (``*args``) specifying the type(s) that the
+    original function can return. Usually, it's enough to include ``unicode`` here
+    and ensure that your function returns only Unicode strings.
+
+    Using this decorator means you can write your function and assume that the
+    input is a proper string, then add support for lazy translation objects at the
+    end.
+
+
 ``django.utils.http``
 =====================
 
@@ -428,14 +470,23 @@ For a complete discussion on the usage of the following see the
 
     Translates ``message`` and returns it in a unicode string
 
+.. function:: pgettext(context, message)
+
+    Translates ``message`` given the ``context`` and returns
+    it in a unicode string.
+
+    For more information, see :ref:`contextual-markers`.
+
 .. function:: gettext_lazy(message)
 .. function:: ugettext_lazy(message)
+.. function:: pgettext_lazy(context, message)
 
     Same as the non-lazy versions above, but using lazy execution.
 
     See :ref:`lazy translations documentation <lazy-translations>`.
 
 .. function:: gettext_noop(message)
+.. function:: ugettext_noop(message)
 
     Marks strings for translation but doesn't translate them now. This can be
     used to store strings in global variables that should stay in the base
@@ -452,8 +503,14 @@ For a complete discussion on the usage of the following see the
     Translates ``singular`` and ``plural`` and returns the appropriate string
     based on ``number`` in a unicode string.
 
+.. function:: npgettext(context, singular, plural, number)
+
+    Translates ``singular`` and ``plural`` and returns the appropriate string
+    based on ``number`` and the ``context`` in a unicode string.
+
 .. function:: ngettext_lazy(singular, plural, number)
 .. function:: ungettext_lazy(singular, plural, number)
+.. function:: npgettext_lazy(singular, plural, number)
 
     Same as the non-lazy versions above, but using lazy execution.
 
