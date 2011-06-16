@@ -376,3 +376,14 @@ Old styles of calling ``cache_page`` decorator
 Some legacy ways of calling :func:`~django.views.decorators.cache.cache_page`
 have been deprecated, please see the docs for the correct way to use this
 decorator.
+
+Support for PostgreSQL versions older than 8.2
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django 1.3 dropped support for PostgreSQL versions older than 8.0 and the
+relevant documents suggested to use a recent version because of performance
+reasons but more importantly because end of the upstream support periods for
+releases 8.0 and 8.1 was near (November 2010.)
+
+Django 1.4 takes that policy further and sets 8.2 as the minimum PostgreSQL
+version it officially supports.

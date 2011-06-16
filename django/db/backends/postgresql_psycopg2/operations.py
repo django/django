@@ -84,23 +84,13 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def sql_flush(self, style, tables, sequences):
         if tables:
-            if self.postgres_version[0:2] >= (8,1):
-                # Postgres 8.1+ can do 'TRUNCATE x, y, z...;'. In fact, it *has to*
-                # in order to be able to truncate tables referenced by a foreign
-                # key in any other table. The result is a single SQL TRUNCATE
-                # statement.
-                sql = ['%s %s;' % \
-                    (style.SQL_KEYWORD('TRUNCATE'),
-                     style.SQL_FIELD(', '.join([self.quote_name(table) for table in tables]))
-                )]
-            else:
-                # Older versions of Postgres can't do TRUNCATE in a single call, so
-                # they must use a simple delete.
-                sql = ['%s %s %s;' % \
-                        (style.SQL_KEYWORD('DELETE'),
-                         style.SQL_KEYWORD('FROM'),
-                         style.SQL_FIELD(self.quote_name(table))
-                         ) for table in tables]
+            # Perform a single SQL 'TRUNCATE x, y, z...;' statement.  It allows
+            # us to truncate tables referenced by a foreign key in any other
+            # table.
+            sql = ['%s %s;' % \
+                (style.SQL_KEYWORD('TRUNCATE'),
+                    style.SQL_FIELD(', '.join([self.quote_name(table) for table in tables]))
+            )]
 
             # 'ALTER SEQUENCE sequence_name RESTART WITH 1;'... style SQL statements
             # to reset sequence indices
@@ -171,17 +161,10 @@ class DatabaseOperations(BaseDatabaseOperations):
     def check_aggregate_support(self, aggregate):
         """Check that the backend fully supports the provided aggregate.
 
-        The population and sample statistics (STDDEV_POP, STDDEV_SAMP,
-        VAR_POP, VAR_SAMP) were first implemented in Postgres 8.2.
-
         The implementation of population statistics (STDDEV_POP and VAR_POP)
         under Postgres 8.2 - 8.2.4 is known to be faulty. Raise
         NotImplementedError if this is the database in use.
         """
-        if aggregate.sql_function in ('STDDEV_POP', 'STDDEV_SAMP', 'VAR_POP', 'VAR_SAMP'):
-            if self.postgres_version[0:2] < (8,2):
-                raise NotImplementedError('PostgreSQL does not support %s prior to version 8.2. Please upgrade your version of PostgreSQL.' % aggregate.sql_function)
-
         if aggregate.sql_function in ('STDDEV_POP', 'VAR_POP'):
             if self.postgres_version[0:2] == (8,2):
                 if self.postgres_version[2] is None or self.postgres_version[2] <= 4:
