@@ -278,6 +278,7 @@ as the rendered output.
 See the :ref:`format localization <format-localization>` documentation for
 more information.
 
+.. _built-in fields:
 
 Built-in ``Field`` classes
 --------------------------
