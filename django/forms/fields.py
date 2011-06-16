@@ -657,6 +657,11 @@ class ChoiceField(Field):
                                         initial=initial, help_text=help_text, *args, **kwargs)
         self.choices = choices
 
+    def __deepcopy__(self, memo):
+        result = super(ChoiceField, self).__deepcopy__(memo)
+        result._choices = copy.deepcopy(self._choices, memo)
+        return result
+
     def _get_choices(self):
         return self._choices
 

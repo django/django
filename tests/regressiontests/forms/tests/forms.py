@@ -771,6 +771,26 @@ class FormsTestCase(TestCase):
         f = Person(name_max_length=None)
         self.assertEqual(f['first_name'].field.max_length, f['last_name'].field.max_length, (30, 30))
 
+        # Similarly, choices do not persist from one Form instance to the next.
+        # Refs #15127.
+        class Person(Form):
+            first_name = CharField(required=False)
+            last_name = CharField(required=False)
+            gender = ChoiceField(choices=(('f', 'Female'), ('m', 'Male')))
+
+            def __init__(self, allow_unspec_gender=False, *args, **kwargs):
+                super(Person, self).__init__(*args, **kwargs)
+
+                if allow_unspec_gender:
+                    self.fields['gender'].choices += (('u', 'Unspecified'),)
+
+        f = Person()
+        self.assertEqual(f['gender'].field.choices, [('f', 'Female'), ('m', 'Male')])
+        f = Person(allow_unspec_gender=True)
+        self.assertEqual(f['gender'].field.choices, [('f', 'Female'), ('m', 'Male'), ('u', 'Unspecified')])
+        f = Person()
+        self.assertEqual(f['gender'].field.choices, [('f', 'Female'), ('m', 'Male')])
+
     def test_hidden_widget(self):
         # HiddenInput widgets are displayed differently in the as_table(), as_ul())
         # and as_p() output of a Form -- their verbose names are not displayed, and a
@@ -1154,7 +1174,7 @@ class FormsTestCase(TestCase):
     def test_boundfield_values(self):
         # It's possible to get to the value which would be used for rendering
         # the widget for a field by using the BoundField's value method.
- 
+
         class UserRegistration(Form):
             username = CharField(max_length=10, initial='djangonaut')
             password = CharField(widget=PasswordInput)
