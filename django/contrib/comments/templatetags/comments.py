@@ -323,7 +323,7 @@ def get_comment_permalink(comment, anchor_pattern=None):
     named anchor to be appended to the end of the URL.
 
     Example::
-        {{ get_comment_permalink comment "#c%(id)s-by-%(user_name)s" }}
+        {% get_comment_permalink comment "#c%(id)s-by-%(user_name)s" %}
     """
 
     if anchor_pattern:
