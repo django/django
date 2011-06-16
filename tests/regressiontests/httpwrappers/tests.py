@@ -243,6 +243,13 @@ class HttpResponseTests(unittest.TestCase):
         self.assertRaises(BadHeaderError, r.__setitem__, 'test\rstr', 'test')
         self.assertRaises(BadHeaderError, r.__setitem__, 'test\nstr', 'test')
 
+    def test_dict_behavior(self):
+        """
+        Test for bug #14020: Make HttpResponse.get work like dict.get
+        """
+        r = HttpResponse()
+        self.assertEqual(r.get('test'), None)
+
 class CookieTests(unittest.TestCase):
     def test_encode(self):
         """

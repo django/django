@@ -615,7 +615,7 @@ class HttpResponse(object):
     def items(self):
         return self._headers.values()
 
-    def get(self, header, alternate):
+    def get(self, header, alternate=None):
         return self._headers.get(header.lower(), (None, alternate))[1]
 
     def set_cookie(self, key, value='', max_age=None, expires=None, path='/',
