@@ -68,7 +68,7 @@ Basic usage
 
    .. code-block:: html+django
 
-       <img src="{{ STATIC_URL }}images/hi.jpg />
+       <img src="{{ STATIC_URL }}images/hi.jpg" />
 
    See :ref:`staticfiles-in-templates` for more details, including an
    alternate method using a template tag.
@@ -167,7 +167,7 @@ Once that's done, you can refer to :setting:`STATIC_URL` in your templates:
 
 .. code-block:: html+django
 
-     <img src="{{ STATIC_URL }}images/hi.jpg />
+     <img src="{{ STATIC_URL }}images/hi.jpg" />
 
 If ``{{ STATIC_URL }}`` isn't working in your template, you're probably not
 using :class:`~django.template.RequestContext` when rendering the template.
