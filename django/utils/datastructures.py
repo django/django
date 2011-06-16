@@ -391,6 +391,12 @@ class MultiValueDict(dict):
         for key, value in kwargs.iteritems():
             self.setlistdefault(key, []).append(value)
 
+    def dict(self):
+        """
+        Returns current object as a dict with singular values.
+        """
+        return dict((key, self[key]) for key in self)
+
 class DotExpandedDict(dict):
     """
     A special dictionary constructor that takes a dictionary in which the keys

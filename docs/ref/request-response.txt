@@ -482,6 +482,18 @@ In addition, ``QueryDict`` has the following methods:
         >>> q.lists()
         [(u'a', [u'1', u'2', u'3'])]
 
+.. method:: QueryDict.dict()
+
+    .. versionadded:: 1.4
+
+    Returns ``dict`` representation of ``QueryDict``. For every (key, list)
+    pair in ``QueryDict``, ``dict`` will have (key, item), where item is one
+    element of the list, using same logic as :meth:`QueryDict.__getitem__()`::
+
+        >>> q = QueryDict('a=1&a=3&a=5')
+        >>> q.dict()
+        {u'a': u'5'}
+
 .. method:: QueryDict.urlencode([safe])
 
     Returns a string of the data in query-string format. Example::

@@ -235,6 +235,18 @@ class MultiValueDictTests(DatastructuresTestCase):
             self.assertEqual(d1["key"], ["Penguin"])
             self.assertEqual(d2["key"], ["Penguin"])
 
+    def test_dict_translation(self):
+        mvd = MultiValueDict({
+            'devs': ['Bob', 'Joe'],
+            'pm': ['Rory'],
+        })
+        d = mvd.dict()
+        self.assertEqual(d.keys(), mvd.keys())
+        for key in mvd.keys():
+            self.assertEqual(d[key], mvd[key])
+
+        self.assertEqual({}, MultiValueDict().dict())
+
 
 class DotExpandedDictTests(DatastructuresTestCase):
 
