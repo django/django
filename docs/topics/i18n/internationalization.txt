@@ -451,6 +451,8 @@ It's not possible to mix a template variable inside a string within ``{% trans
 %}``. If your translations require strings with variables (placeholders), use
 ``{% blocktrans %}`` instead.
 
+.. templatetag:: blocktrans
+
 ``blocktrans`` template tag
 ---------------------------
 

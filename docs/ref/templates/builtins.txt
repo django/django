@@ -1794,6 +1794,8 @@ Example::
 
     You have {{ num_cherries }} cherr{{ num_cherries|pluralize:"y,ies" }}.
 
+.. note:: Use :ttag:`blocktrans` to pluralize translated strings.
+
 .. templatefilter:: pprint
 
 pprint
