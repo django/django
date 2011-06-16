@@ -433,7 +433,6 @@ class ModelAdmin(BaseModelAdmin):
             exclude = []
         else:
             exclude = list(self.exclude)
-        exclude.extend(kwargs.get("exclude", []))
         exclude.extend(self.get_readonly_fields(request, obj))
         # if exclude is an empty list we pass None to be consistant with the
         # default on modelform_factory
@@ -1342,7 +1341,6 @@ class InlineModelAdmin(BaseModelAdmin):
             exclude = []
         else:
             exclude = list(self.exclude)
-        exclude.extend(kwargs.get("exclude", []))
         exclude.extend(self.get_readonly_fields(request, obj))
         # if exclude is an empty list we use None, since that's the actual
         # default

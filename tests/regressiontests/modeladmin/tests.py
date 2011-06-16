@@ -141,6 +141,63 @@ class ModelAdminTests(TestCase):
             type(ma.get_form(request).base_fields['sign_date'].widget),
             AdminDateWidget)
 
+    def test_form_exclude_kwarg_override(self):
+        """
+        Ensure that the `exclude` kwarg passed to `ModelAdmin.get_form()`
+        overrides all other declarations. Refs #8999.
+        """
+
+        class AdminBandForm(forms.ModelForm):
+
+            class Meta:
+                model = Band
+                exclude = ['name']
+
+        class BandAdmin(ModelAdmin):
+            exclude = ['sign_date',]
+            form = AdminBandForm
+
+            def get_form(self, request, obj=None, **kwargs):
+                kwargs['exclude'] = ['bio']
+                return super(BandAdmin, self).get_form(request, obj, **kwargs)
+
+        ma = BandAdmin(Band, self.site)
+        self.assertEqual(ma.get_form(request).base_fields.keys(),
+            ['name', 'sign_date',])
+
+
+    def test_formset_exclude_kwarg_override(self):
+        """
+        Ensure that the `exclude` kwarg passed to `InlineModelAdmin.get_formset()`
+        overrides all other declarations. Refs #8999.
+        """
+
+        class AdminConcertForm(forms.ModelForm):
+
+            class Meta:
+                model = Concert
+                exclude = ['day']
+
+        class ConcertInline(TabularInline):
+            exclude = ['transport']
+            form = AdminConcertForm
+            fk_name = 'main_band'
+            model = Concert
+
+            def get_formset(self, request, obj=None, **kwargs):
+                kwargs['exclude'] = ['opening_band']
+                return super(ConcertInline, self).get_formset(request, obj, **kwargs)
+
+        class BandAdmin(ModelAdmin):
+            inlines = [
+                ConcertInline
+            ]
+
+        ma = BandAdmin(Band, self.site)
+        self.assertEqual(
+            list(ma.get_formsets(request))[0]().forms[0].fields.keys(),
+            ['main_band', 'day', 'transport', 'id', 'DELETE',])
+
     def test_queryset_override(self):
         # If we need to override the queryset of a ModelChoiceField in our custom form
         # make sure that RelatedFieldWidgetWrapper doesn't mess that up.
