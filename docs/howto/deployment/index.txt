@@ -10,16 +10,18 @@ ways to easily deploy Django:
    :maxdepth: 1
 
    modwsgi
+   uwsgi
    fastcgi
    mod_python (deprecated) <modpython>
 
 If you're new to deploying Django and/or Python, we'd recommend you try
-:doc:`mod_wsgi </howto/deployment/modwsgi>` first. In most cases it'll be the easiest,
-fastest, and most stable deployment choice.
+:doc:`mod_wsgi </howto/deployment/modwsgi>` first. In most cases it'll be
+the easiest, fastest, and most stable deployment choice.
 
 .. seealso::
 
-    * `Chapter 12 of The Django Book`_ discusses deployment and especially
-      scaling in more detail.
+    * `Chapter 12 of the Django Book`_ discusses deployment and especially
+      scaling in more detail. However, it hasn't been updated since mod_python
+      was deprecated.
 
 .. _chapter 12 of the django book: http://djangobook.com/en/2.0/chapter12/
