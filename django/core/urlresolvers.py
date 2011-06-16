@@ -16,6 +16,7 @@ from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import iri_to_uri, force_unicode, smart_str
 from django.utils.functional import memoize, lazy
 from django.utils.importlib import import_module
+from django.utils.module_loading import module_has_submodule
 from django.utils.regex_helper import normalize
 from django.utils.translation import get_language
 
@@ -84,19 +85,28 @@ def get_callable(lookup_view, can_fail=False):
     during the import fail and the string is returned.
     """
     if not callable(lookup_view):
+        mod_name, func_name = get_mod_func(lookup_view)
         try:
-            # Bail early for non-ASCII strings (they can't be functions).
-            lookup_view = lookup_view.encode('ascii')
-            mod_name, func_name = get_mod_func(lookup_view)
             if func_name != '':
                 lookup_view = getattr(import_module(mod_name), func_name)
                 if not callable(lookup_view):
-                    raise AttributeError("'%s.%s' is not a callable." % (mod_name, func_name))
-        except (ImportError, AttributeError):
+                    raise ViewDoesNotExist(
+                        "Could not import %s.%s. View is not callable."
+                    % (mod_name, func_name))
+        except AttributeError:
+            if not can_fail:
+                raise ViewDoesNotExist(
+                    "Could not import %s. View does not exist in module %s."
+                    % (lookup_view, mod_name))
+        except ImportError:
+            ownermod, submod = get_mod_func(mod_name)
+            if (not can_fail and submod != '' and
+                    not module_has_submodule(import_module(ownermod), submod)):
+                raise ViewDoesNotExist(
+                    "Could not import %s. Owning module %s does not exist."
+                    % (lookup_view, mod_name))
             if not can_fail:
                 raise
-        except UnicodeEncodeError:
-            pass
     return lookup_view
 get_callable = memoize(get_callable, _callable_cache, 1)
 
@@ -192,14 +202,8 @@ class RegexURLPattern(LocaleRegexProvider):
     def callback(self):
         if self._callback is not None:
             return self._callback
-        try:
-            self._callback = get_callable(self._callback_str)
-        except ImportError, e:
-            mod_name, _ = get_mod_func(self._callback_str)
-            raise ViewDoesNotExist("Could not import %s. Error was: %s" % (mod_name, str(e)))
-        except AttributeError, e:
-            mod_name, func_name = get_mod_func(self._callback_str)
-            raise ViewDoesNotExist("Tried %s in module %s. Error was: %s" % (func_name, mod_name, str(e)))
+
+        self._callback = get_callable(self._callback_str)
         return self._callback
 
 class RegexURLResolver(LocaleRegexProvider):
@@ -325,10 +329,7 @@ class RegexURLResolver(LocaleRegexProvider):
             # Lazy import, since urls.defaults imports this file
             from django.conf.urls import defaults
             callback = getattr(defaults, 'handler%s' % view_type)
-        try:
-            return get_callable(callback), {}
-        except (ImportError, AttributeError), e:
-            raise ViewDoesNotExist("Tried %s. Error was: %s" % (callback, str(e)))
+        return get_callable(callback), {}
 
     def resolve404(self):
         return self._resolve_special('404')

@@ -16,6 +16,11 @@ def absolute_kwargs_view(request, arg1=1, arg2=2):
 def defaults_view(request, arg1, arg2):
     pass
 
+def erroneous_view(request):
+    import non_existent
+
+uncallable = "Can I be a view? Pleeeease?"
+
 class ViewClass(object):
     def __call__(self, request, *args, **kwargs):
         return HttpResponse('')

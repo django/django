@@ -2,7 +2,7 @@
 Unit tests for reverse URL lookups.
 """
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
 from django.core.urlresolvers import reverse, resolve, NoReverseMatch,\
                                      Resolver404, ResolverMatch,\
                                      RegexURLResolver, RegexURLPattern
@@ -470,3 +470,14 @@ class ResolverMatchTests(TestCase):
             self.assertEqual(match[0], func)
             self.assertEqual(match[1], args)
             self.assertEqual(match[2], kwargs)
+
+class ErroneousViewTests(TestCase):
+    urls = 'regressiontests.urlpatterns_reverse.erroneous_urls'
+
+    def test_erroneous_resolve(self):
+        self.assertRaises(ImportError, self.client.get, '/erroneous_inner/')
+        self.assertRaises(ImportError, self.client.get, '/erroneous_outer/')
+        self.assertRaises(ViewDoesNotExist, self.client.get, '/missing_inner/')
+        self.assertRaises(ViewDoesNotExist, self.client.get, '/missing_outer/')
+        self.assertRaises(ViewDoesNotExist, self.client.get, '/uncallable/')
+
