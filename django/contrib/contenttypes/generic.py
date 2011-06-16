@@ -396,7 +396,7 @@ class GenericInlineModelAdmin(InlineModelAdmin):
     ct_fk_field = "object_id"
     formset = BaseGenericInlineFormSet
 
-    def get_formset(self, request, obj=None):
+    def get_formset(self, request, obj=None, **kwargs):
         if self.declared_fieldsets:
             fields = flatten_fieldsets(self.declared_fieldsets)
         else:
@@ -420,6 +420,7 @@ class GenericInlineModelAdmin(InlineModelAdmin):
             "max_num": self.max_num,
             "exclude": exclude
         }
+        defaults.update(kwargs)
         return generic_inlineformset_factory(self.model, **defaults)
 
 class GenericStackedInline(GenericInlineModelAdmin):

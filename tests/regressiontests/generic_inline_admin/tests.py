@@ -1,12 +1,13 @@
 # coding: utf-8
 
 from django.conf import settings
+from django.contrib.admin.sites import AdminSite
 from django.contrib.contenttypes.generic import generic_inlineformset_factory
 from django.test import TestCase
 
 # local test models
-from models import Episode, EpisodeExtra, EpisodeMaxNum, EpisodeExclude, \
-                   Media, EpisodePermanent, MediaPermanentInline, Category
+from models import (Episode, EpisodeExtra, EpisodeMaxNum, EpisodeExclude,
+    Media, MediaInline, EpisodePermanent, MediaPermanentInline, Category)
 
 
 class GenericAdminViewTest(TestCase):
@@ -214,3 +215,18 @@ class NoInlineDeletionTest(TestCase):
         fake_request = object()
         formset = inline.get_formset(fake_request)
         self.assertFalse(formset.can_delete)
+
+class GenericInlineModelAdminTest(TestCase):
+
+    def test_get_formset_kwargs(self):
+        media_inline = MediaInline(Media, AdminSite())
+
+        # Create a formset with default arguments
+        formset = media_inline.get_formset(None)
+        self.assertEqual(formset.max_num, None)
+        self.assertEqual(formset.can_order, False)
+
+        # Create a formset with custom keyword arguments
+        formset = media_inline.get_formset(None, max_num=100, can_order=True)
+        self.assertEqual(formset.max_num, 100)
+        self.assertEqual(formset.can_order, True)
