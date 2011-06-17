@@ -688,6 +688,13 @@ Example usage::
 
     django-admin.py runserver --noreload
 
+.. django-admin-option:: --nothreading
+
+.. versionadded:: 1.4
+
+Use the ``--nothreading`` option to disable the use of threading in the
+development server.
+
 .. django-admin-option:: --ipv6, -6
 
 .. versionadded:: 1.3

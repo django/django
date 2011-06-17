@@ -75,7 +75,7 @@ Runs this project as a FastCGI application. Requires flup. Use
 .B runfcgi help
 for help on the KEY=val pairs.
 .TP
-.BI "runserver [" "\-\-noreload" "] [" "\-\-nostatic" "] [" "\-\-insecure" "] [" "\-\-ipv6" "] [" "\-\-adminmedia=ADMIN_MEDIA_PATH" "] [" "port|ipaddr:port" "]"
+.BI "runserver [" "\-\-noreload" "] [" "\-\-nothreading" "] [" "\-\-nostatic" "] [" "\-\-insecure" "] [" "\-\-ipv6" "] [" "\-\-adminmedia=ADMIN_MEDIA_PATH" "] [" "port|ipaddr:port" "]"
 Starts a lightweight Web server for development.
 .TP
 .BI "shell [" "\-\-plain" "]"
@@ -166,6 +166,9 @@ Disable the development server's auto\-reloader.
 .TP
 .I \-\-nostatic
 Disable automatic serving of static files from STATIC_URL.
+.TP
+.I \-\-nothreading
+Disable the development server's threading.
 .TP
 .I \-\-insecure
 Enables serving of static files even if DEBUG is False.

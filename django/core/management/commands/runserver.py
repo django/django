@@ -17,10 +17,13 @@ naiveip_re = re.compile(r"""^(?:
 ):)?(?P<port>\d+)$""", re.X)
 DEFAULT_PORT = "8000"
 
+
 class BaseRunserverCommand(BaseCommand):
     option_list = BaseCommand.option_list + (
         make_option('--ipv6', '-6', action='store_true', dest='use_ipv6', default=False,
             help='Tells Django to use a IPv6 address.'),
+        make_option('--nothreading', action='store_false', dest='use_threading', default=True,
+            help='Use threading for web server.'),
         make_option('--noreload', action='store_false', dest='use_reloader', default=True,
             help='Tells Django to NOT use the auto-reloader.'),
     )
@@ -81,6 +84,7 @@ class BaseRunserverCommand(BaseCommand):
         from django.conf import settings
         from django.utils import translation
 
+        threading = options.get('use_threading', False)
         shutdown_message = options.get('shutdown_message', '')
         quit_command = (sys.platform == 'win32') and 'CTRL-BREAK' or 'CONTROL-C'
 
@@ -104,7 +108,8 @@ class BaseRunserverCommand(BaseCommand):
 
         try:
             handler = self.get_handler(*args, **options)
-            run(self.addr, int(self.port), handler, ipv6=self.use_ipv6)
+            run(self.addr, int(self.port), handler,
+                ipv6=self.use_ipv6, threading=threading)
         except WSGIServerException, e:
             # Use helpful error messages instead of ugly tracebacks.
             ERRORS = {

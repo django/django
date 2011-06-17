@@ -12,6 +12,7 @@ import socket
 import sys
 import traceback
 import urllib
+from SocketServer import ThreadingMixIn
 from wsgiref import simple_server
 from wsgiref.util import FileWrapper   # for backwards compatibility
 
@@ -205,8 +206,12 @@ class AdminMediaHandler(handlers.StaticFilesHandler):
         return path.startswith(self.base_url[2]) and not self.base_url[1]
 
 
-def run(addr, port, wsgi_handler, ipv6=False):
+def run(addr, port, wsgi_handler, ipv6=False, threading=False):
     server_address = (addr, port)
-    httpd = WSGIServer(server_address, WSGIRequestHandler, ipv6=ipv6)
+    if threading:
+        httpd_cls = type('WSGIServer', (ThreadingMixIn, WSGIServer), {})
+    else:
+        httpd_cls = WSGIServer
+    httpd = httpd_cls(server_address, WSGIRequestHandler, ipv6=ipv6)
     httpd.set_app(wsgi_handler)
     httpd.serve_forever()
