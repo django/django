@@ -424,6 +424,33 @@ with the management form:
 
 The above ends up calling the ``as_table`` method on the formset class.
 
+.. _manually-rendered-can-delete-and-can-order:
+
+Manually rendered ``can_delete`` and ``can_order``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you manually render fields in the template, you can render
+``can_delete`` parameter with ``{{ form.DELETE }}``:
+
+.. code-block:: html+django
+
+    <form method="post" action="">
+        {{ formset.management_form }}
+        {% for form in formset %}
+            {{ form.id }}
+            <ul>
+                <li>{{ form.title }}</li>
+                {% if formset.can_delete %}
+                    <li>{{ form.DELETE }}</li>
+                {% enif %}
+            </ul>
+        {% endfor %}
+    </form>
+
+
+Similarly, if the formset has the ability to order (``can_order=True``), it is possible to render it
+with ``{{ form.ORDER }}``.
+
 Using more than one formset in a view
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
