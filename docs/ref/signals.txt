@@ -114,6 +114,12 @@ Arguments sent with this signal:
 ``instance``
     The actual instance being saved.
 
+``raw``
+    A boolean; ``True`` if the model is saved exactly as presented
+    (i.e. when loading a fixture). One should not query/modify other
+    records in the database as the database might not be in a
+    consistent state yet.
+
 .. versionadded:: 1.3
 
 ``using``
@@ -138,6 +144,12 @@ Arguments sent with this signal:
 
 ``created``
     A boolean; ``True`` if a new record was created.
+
+``raw``
+    A boolean; ``True`` if the model is saved exactly as presented
+    (i.e. when loading a fixture). One should not query/modify other
+    records in the database as the database might not be in a
+    consistent state yet.
 
 .. versionadded:: 1.3
 
