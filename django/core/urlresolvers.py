@@ -99,11 +99,11 @@ def get_callable(lookup_view, can_fail=False):
                     "Could not import %s. View does not exist in module %s."
                     % (lookup_view, mod_name))
         except ImportError:
-            ownermod, submod = get_mod_func(mod_name)
+            parentmod, submod = get_mod_func(mod_name)
             if (not can_fail and submod != '' and
-                    not module_has_submodule(import_module(ownermod), submod)):
+                    not module_has_submodule(import_module(parentmod), submod)):
                 raise ViewDoesNotExist(
-                    "Could not import %s. Owning module %s does not exist."
+                    "Could not import %s. Parent module %s does not exist."
                     % (lookup_view, mod_name))
             if not can_fail:
                 raise
