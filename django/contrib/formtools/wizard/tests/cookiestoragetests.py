@@ -25,7 +25,6 @@ class TestCookieStorage(TestStorage, TestCase):
         self.assertRaises(SuspiciousOperation, storage.load_data)
 
     def test_reset_cookie(self):
-        from django.core.signing import SignatureExpired
         request = get_request()
         storage = self.get_storage()('wizard1', request, None)
 
@@ -36,15 +35,7 @@ class TestCookieStorage(TestStorage, TestCase):
 
         cookie_signer = signing.get_cookie_signer(storage.prefix)
         signed_cookie_data = cookie_signer.sign(storage.encoder.encode(storage.data))
-
-        # signing with different timestamps generates different signatures
-        self.assertNotEqual(response.cookies[storage.prefix].value, signed_cookie_data)
-        self.assertEqual(cookie_signer.unsign(response.cookies[storage.prefix].value),
-                         cookie_signer.unsign(signed_cookie_data))
-        self.assertRaises(SignatureExpired,
-                          lambda: cookie_signer.unsign(value=response.cookies[storage.prefix].value, max_age=0))
-        self.assertEqual(cookie_signer.unsign(value=response.cookies[storage.prefix].value, max_age=10),
-                         cookie_signer.unsign(signed_cookie_data))
+        self.assertEqual(response.cookies[storage.prefix].value, signed_cookie_data)
 
         storage.init_data()
         storage.update_response(response)
