@@ -23,7 +23,7 @@ class BaseRunserverCommand(BaseCommand):
         make_option('--ipv6', '-6', action='store_true', dest='use_ipv6', default=False,
             help='Tells Django to use a IPv6 address.'),
         make_option('--nothreading', action='store_false', dest='use_threading', default=True,
-            help='Use threading for web server.'),
+            help='Tells Django to NOT use threading.'),
         make_option('--noreload', action='store_false', dest='use_reloader', default=True,
             help='Tells Django to NOT use the auto-reloader.'),
     )
