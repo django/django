@@ -1,3 +1,5 @@
+import time
+
 from django.core import signing
 from django.test import TestCase
 from django.utils.encoding import force_unicode
@@ -96,21 +98,19 @@ class TestTimestampSigner(TestCase):
 
     def test_timestamp_signer(self):
         value = u'hello'
-        signer = signing.TimestampSigner('predictable-key',
-            time=lambda: 123456789)
-        ts = signer.sign(value)
-        self.assertNotEqual(ts,
-            signing.Signer('predictable-key').sign(value))
+        _time = time.time
+        time.time = lambda: 123456789
+        try:
+            signer = signing.TimestampSigner('predictable-key')
+            ts = signer.sign(value)
+            self.assertNotEqual(ts,
+                signing.Signer('predictable-key').sign(value))
 
-        self.assertEqual(signer.unsign(ts), value)
-        signer = signing.TimestampSigner('predictable-key',
-            time=lambda: 123456800)
-        self.assertEqual(signer.unsign(ts, max_age=12), value)
-        self.assertEqual(signer.unsign(ts, max_age=11), value)
-        self.assertRaises(
-            signing.SignatureExpired, signer.unsign, ts, max_age=10)
-    
-    def test_timestamp_precision(self):
-        one = signing.TimestampSigner('key', time=lambda: 123.4567).sign('v')
-        two = signing.TimestampSigner('key', time=lambda: 123.4568).sign('v')
-        self.assertNotEqual(one, two)
+            self.assertEqual(signer.unsign(ts), value)
+            time.time = lambda: 123456800
+            self.assertEqual(signer.unsign(ts, max_age=12), value)
+            self.assertEqual(signer.unsign(ts, max_age=11), value)
+            self.assertRaises(
+                signing.SignatureExpired, signer.unsign, ts, max_age=10)
+        finally:
+            time.time = _time
