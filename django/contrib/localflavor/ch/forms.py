@@ -59,7 +59,6 @@ class CHIdentityCardNumberField(Field):
         * Conforms to the X1234567<0 or 1234567890 format.
         * Included checksums match calculated checksums
 
-    Algorithm is documented at http://adi.kousz.ch/artikel/IDCHE.htm
     """
     default_error_messages = {
         'invalid': _('Enter a valid Swiss identity or passport card number in X1234567<0 or 1234567890 format.'),
