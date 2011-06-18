@@ -691,7 +691,7 @@ on :ref:`inclusion tags<howto-custom-template-tags-inclusion-tags>`.
 
 If you need to rename your tag, you can provide a custom name for it::
 
-    register.simple_tags(lambda x: x - 1, name='minusone')
+    register.simple_tag(lambda x: x - 1, name='minusone')
 
     @register.simple_tag(name='minustwo')
     def some_function(value):
