@@ -849,7 +849,7 @@ Switzerland (``ch``)
 
     A form field that validates input as a Swiss identity card number.
     A valid number must confirm to the X1234567<0 or 1234567890 format and
-    have the correct checksums -- see http://adi.kousz.ch/artikel/IDCHE.htm.
+    have the correct checksums.
 
 .. class:: ch.forms.CHPhoneNumberField
 
