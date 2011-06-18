@@ -442,7 +442,7 @@ If you manually render fields in the template, you can render
                 <li>{{ form.title }}</li>
                 {% if formset.can_delete %}
                     <li>{{ form.DELETE }}</li>
-                {% enif %}
+                {% endif %}
             </ul>
         {% endfor %}
     </form>
