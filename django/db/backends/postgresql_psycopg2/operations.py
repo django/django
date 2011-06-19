@@ -6,15 +6,6 @@ from django.db.backends import BaseDatabaseOperations
 class DatabaseOperations(BaseDatabaseOperations):
     def __init__(self, connection):
         super(DatabaseOperations, self).__init__(connection)
-        self._postgres_version = None
-
-    def _get_postgres_version(self):
-        if self._postgres_version is None:
-            from django.db.backends.postgresql_psycopg2.version import get_version
-            cursor = self.connection.cursor()
-            self._postgres_version = get_version(cursor)
-        return self._postgres_version
-    postgres_version = property(_get_postgres_version)
 
     def date_extract_sql(self, lookup_type, field_name):
         # http://www.postgresql.org/docs/8.0/static/functions-datetime.html#FUNCTIONS-DATETIME-EXTRACT
@@ -166,9 +157,9 @@ class DatabaseOperations(BaseDatabaseOperations):
         NotImplementedError if this is the database in use.
         """
         if aggregate.sql_function in ('STDDEV_POP', 'VAR_POP'):
-            if self.postgres_version[0:2] == (8,2):
-                if self.postgres_version[2] is None or self.postgres_version[2] <= 4:
-                    raise NotImplementedError('PostgreSQL 8.2 to 8.2.4 is known to have a faulty implementation of %s. Please upgrade your version of PostgreSQL.' % aggregate.sql_function)
+            pg_version = self.connection.pg_version
+            if pg_version >= 80200 and pg_version <= 80204:
+                raise NotImplementedError('PostgreSQL 8.2 to 8.2.4 is known to have a faulty implementation of %s. Please upgrade your version of PostgreSQL.' % aggregate.sql_function)
 
     def max_name_length(self):
         """

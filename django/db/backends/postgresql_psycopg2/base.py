@@ -105,6 +105,13 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         self.creation = DatabaseCreation(self)
         self.introspection = DatabaseIntrospection(self)
         self.validation = BaseDatabaseValidation(self)
+        self._pg_version = None
+
+    def _get_pg_version(self):
+        if self._pg_version is None:
+            self._pg_version = get_version(self.connection)
+        return self._pg_version
+    pg_version = property(_get_pg_version)
 
     def _cursor(self):
         new_connection = False
@@ -139,8 +146,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         if new_connection:
             if set_tz:
                 cursor.execute("SET TIME ZONE %s", [settings_dict['TIME_ZONE']])
-            if not hasattr(self, '_version'):
-                self.__class__._version = get_version(cursor)
+            self._get_pg_version()
             if self.features.uses_autocommit:
                 # FIXME: Eventually we'll enable this by default for
                 # versions that support it, but, right now, that's hard to

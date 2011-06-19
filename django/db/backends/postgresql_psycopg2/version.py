@@ -17,16 +17,27 @@ def _parse_version(text):
     "Internal parsing method. Factored out for testing purposes."
     major, major2, minor = VERSION_RE.search(text).groups()
     try:
-        return int(major), int(major2), int(minor)
+        return int(major) * 10000 + int(major2) * 100 + int(minor)
     except (ValueError, TypeError):
-        return int(major), int(major2), None
+        return int(major) * 10000 +  int(major2) * 100
 
-def get_version(cursor):
+def get_version(connection):
     """
-    Returns a tuple representing the major, minor and revision number of the
-    server. For example, (7, 4, 1) or (8, 3, 4). The revision number will be
-    None in the case of initial releases (e.g., 'PostgreSQL 8.3') or in the
-    case of beta and prereleases ('PostgreSQL 8.4beta1').
+    Returns an integer representing the major, minor and revision number of the
+    server. Format is the one used for the return value of libpq
+    PQServerVersion()/``server_version`` connection attribute (available in
+    newer psycopg2 versions.)
+
+    For example, 80304 for 8.3.4. The last two digits will be 00 in the case of
+    releases (e.g., 80400 for 'PostgreSQL 8.4') or in the case of beta and
+    prereleases (e.g. 90100 for 'PostgreSQL 9.1beta2').
+
+    PQServerVersion()/``server_version`` doesn't execute a query so try that
+    first, then fallback to a ``SELECT version()`` query.
     """
-    cursor.execute("SELECT version()")
-    return _parse_version(cursor.fetchone()[0])
+    if hasattr(connection, 'server_version'):
+        return connection.server_version
+    else:
+        cursor = connection.cursor()
+        cursor.execute("SELECT version()")
+        return _parse_version(cursor.fetchone()[0])
