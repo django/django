@@ -66,7 +66,7 @@ class CursorWrapper(object):
 
 class DatabaseFeatures(BaseDatabaseFeatures):
     needs_datetime_string_cast = False
-    can_return_id_from_insert = False
+    can_return_id_from_insert = True
     requires_rollback_on_dirty_transaction = True
     has_real_datatype = True
     can_defer_constraint_checks = True
@@ -147,11 +147,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             if set_tz:
                 cursor.execute("SET TIME ZONE %s", [settings_dict['TIME_ZONE']])
             self._get_pg_version()
-            if self.features.uses_autocommit:
-                # FIXME: Eventually we'll enable this by default for
-                # versions that support it, but, right now, that's hard to
-                # do without breaking other things (#10509).
-                self.features.can_return_id_from_insert = True
         return CursorWrapper(cursor)
 
     def _enter_transaction_management(self, managed):
