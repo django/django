@@ -79,7 +79,7 @@ class BasicExtractorTests(ExtractorTests):
 
     def test_extraction_error(self):
         os.chdir(self.test_dir)
-        shutil.copyfile('./templates/template_with_error.txt', './templates/template_with_error.html')
+        shutil.copyfile('./templates/template_with_error.tpl', './templates/template_with_error.html')
         self.assertRaises(SyntaxError, management.call_command, 'makemessages', locale=LOCALE, verbosity=0)
         try:
             management.call_command('makemessages', locale=LOCALE, verbosity=0)
