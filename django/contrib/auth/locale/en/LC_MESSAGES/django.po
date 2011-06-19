@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-15 13:14-0400\n"
+"POT-Creation-Date: 2011-06-19 13:08+0200\n"
 "PO-Revision-Date: 2010-05-13 15:35+0200\n"
 "Last-Translator: Django team\n"
 "Language-Team: English <en@li.org>\n"
@@ -12,27 +12,27 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: admin.py:28
+#: admin.py:29
 msgid "Personal info"
 msgstr ""
 
-#: admin.py:29
+#: admin.py:30
 msgid "Permissions"
 msgstr ""
 
-#: admin.py:30
+#: admin.py:31
 msgid "Important dates"
 msgstr ""
 
-#: admin.py:31
+#: admin.py:32
 msgid "Groups"
 msgstr ""
 
-#: admin.py:113
+#: admin.py:116
 msgid "Password changed successfully."
 msgstr ""
 
-#: admin.py:123
+#: admin.py:126
 #, python-format
 msgid "Change password: %s"
 msgstr ""
@@ -49,7 +49,7 @@ msgstr ""
 msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
 msgstr ""
 
-#: forms.py:17 forms.py:67 forms.py:193
+#: forms.py:17 forms.py:67 forms.py:201
 msgid "Password"
 msgstr ""
 
@@ -65,7 +65,7 @@ msgstr ""
 msgid "A user with that username already exists."
 msgstr ""
 
-#: forms.py:37 forms.py:163 forms.py:205
+#: forms.py:37 forms.py:171 forms.py:213
 msgid "The two password fields didn't match."
 msgstr ""
 
@@ -89,154 +89,150 @@ msgstr ""
 msgid "E-mail"
 msgstr ""
 
-#: forms.py:117
+#: forms.py:120
 msgid ""
 "That e-mail address doesn't have an associated user account. Are you sure "
 "you've registered?"
 msgstr ""
 
-#: forms.py:143
-#, python-format
-msgid "Password reset on %s"
-msgstr ""
-
-#: forms.py:151
+#: forms.py:159
 msgid "New password"
 msgstr ""
 
-#: forms.py:152
+#: forms.py:160
 msgid "New password confirmation"
 msgstr ""
 
-#: forms.py:177
+#: forms.py:185
 msgid "Old password"
 msgstr ""
 
-#: forms.py:185
+#: forms.py:193
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr ""
 
-#: forms.py:194
+#: forms.py:202
 msgid "Password (again)"
 msgstr ""
 
-#: models.py:76 models.py:104
+#: models.py:77 models.py:105
 msgid "name"
 msgstr ""
 
-#: models.py:78
+#: models.py:79
 msgid "codename"
 msgstr ""
 
-#: models.py:82
+#: models.py:83
 msgid "permission"
 msgstr ""
 
-#: models.py:83 models.py:105
+#: models.py:84 models.py:106
 msgid "permissions"
 msgstr ""
 
-#: models.py:108
+#: models.py:109
 msgid "group"
 msgstr ""
 
-#: models.py:109 models.py:216
+#: models.py:110 models.py:217
 msgid "groups"
 msgstr ""
 
-#: models.py:206
+#: models.py:207
 msgid "username"
 msgstr ""
 
-#: models.py:206
+#: models.py:207
 msgid ""
 "Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
 msgstr ""
 
-#: models.py:207
+#: models.py:208
 msgid "first name"
 msgstr ""
 
-#: models.py:208
+#: models.py:209
 msgid "last name"
 msgstr ""
 
-#: models.py:209
+#: models.py:210
 msgid "e-mail address"
 msgstr ""
 
-#: models.py:210
+#: models.py:211
 msgid "password"
 msgstr ""
 
-#: models.py:210
+#: models.py:211
 msgid ""
 "Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
 "password form</a>."
 msgstr ""
 
-#: models.py:211
+#: models.py:212
 msgid "staff status"
 msgstr ""
 
-#: models.py:211
+#: models.py:212
 msgid "Designates whether the user can log into this admin site."
 msgstr ""
 
-#: models.py:212
+#: models.py:213
 msgid "active"
 msgstr ""
 
-#: models.py:212
+#: models.py:213
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
 msgstr ""
 
-#: models.py:213
+#: models.py:214
 msgid "superuser status"
 msgstr ""
 
-#: models.py:213
+#: models.py:214
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
 msgstr ""
 
-#: models.py:214
+#: models.py:215
 msgid "last login"
 msgstr ""
 
-#: models.py:215
+#: models.py:216
 msgid "date joined"
 msgstr ""
 
-#: models.py:217
+#: models.py:218
 msgid ""
 "In addition to the permissions manually assigned, this user will also get "
 "all permissions granted to each group he/she is in."
 msgstr ""
 
-#: models.py:218
+#: models.py:219
 msgid "user permissions"
 msgstr ""
 
-#: models.py:222
+#: models.py:223
 msgid "user"
 msgstr ""
 
-#: models.py:223
+#: models.py:224
 msgid "users"
 msgstr ""
 
-#: models.py:406
-msgid "message"
-msgstr ""
-
-#: views.py:91
+#: views.py:93
 msgid "Logged out"
 msgstr ""
 
-#: management/commands/createsuperuser.py:23
+#: management/commands/createsuperuser.py:24
 msgid "Enter a valid e-mail address."
+msgstr ""
+
+#: templates/registration/password_reset_subject.txt:2
+#, python-format
+msgid "Password reset on %(site_name)s"
 msgstr ""

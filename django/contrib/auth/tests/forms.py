@@ -1,3 +1,7 @@
+from __future__ import with_statement
+import os
+from django.conf import settings
+from django.core import mail
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm,  PasswordChangeForm, SetPasswordForm, UserChangeForm, PasswordResetForm
 from django.test import TestCase
@@ -251,6 +255,15 @@ class PasswordResetFormTest(TestCase):
         self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data['email'], email)
 
+    def test_custom_email_subject(self):
+        template_path = os.path.join(os.path.dirname(__file__), 'templates')
+        with self.settings(TEMPLATE_DIRS=(template_path,)):
+            data = {'email': 'testclient@example.com'}
+            form = PasswordResetForm(data)
+            self.assertTrue(form.is_valid())
+            form.save()
+            self.assertEqual(len(mail.outbox), 1)
+            self.assertEqual(mail.outbox[0].subject, u'Custom password reset on example.com')
 
     def test_bug_5605(self):
         # bug #5605, preserve the case of the user name (before the @ in the

@@ -964,6 +964,12 @@ includes a few other useful built-in views located in
           generating the email with the new password. This will default to
           :file:`registration/password_reset_email.html` if not supplied.
 
+        * ``subject_template_name``: The full name of a template to use for
+          the subject of the email with the new password. This will default
+          to :file:`registration/password_reset_subject.txt` if not supplied.
+
+          .. versionadded:: 1.4
+
         * ``password_reset_form``: Form that will be used to set the password.
           Defaults to :class:`~django.contrib.auth.forms.PasswordResetForm`.
 
