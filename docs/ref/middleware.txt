@@ -6,7 +6,7 @@ Middleware
    :synopsis: Django's built-in middleware classes.
 
 This document explains all middleware components that come with Django. For
-information on how how to use them and how to write your own middleware, see
+information on how to use them and how to write your own middleware, see
 the :doc:`middleware usage guide </topics/http/middleware>`.
 
 Available middleware
