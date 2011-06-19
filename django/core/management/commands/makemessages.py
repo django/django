@@ -356,7 +356,7 @@ class Command(NoArgsCommand):
         if domain == 'djangojs':
             extensions = handle_extensions(extensions or ['js'])
         else:
-            extensions = handle_extensions(extensions or ['html'])
+            extensions = handle_extensions(extensions or ['html', 'txt'])
 
         if verbosity > 1:
             sys.stdout.write('examining files with the extensions: %s\n'

@@ -417,7 +417,7 @@ Example usage::
 .. django-admin-option:: --extension
 
 Use the ``--extension`` or ``-e`` option to specify a list of file extensions
-to examine (default: ".html").
+to examine (default: ".html", ".txt").
 
 Example usage::
 
@@ -438,7 +438,7 @@ Example usage::
 Use the ``--domain`` or ``-d`` option to change the domain of the messages files.
 Currently supported:
 
-    * ``django`` for all ``*.py`` and ``*.html`` files (default)
+    * ``django`` for all ``*.py``, ``*.html`` and ``*.txt`` files (default)
     * ``djangojs`` for ``*.js`` files
 
 .. django-admin-option:: --symlinks

@@ -84,8 +84,9 @@ message file in the directory ``locale/LANG/LC_MESSAGES``. In the ``de``
 example, the file will be ``locale/de/LC_MESSAGES/django.po``.
 
 By default ``django-admin.py makemessages`` examines every file that has the
-``.html`` file extension. In case you want to override that default, use the
-``--extension`` or ``-e`` option to specify the file extensions to examine::
+``.html`` or ``.txt`` file extension. In case you want to override that
+default, use the ``--extension`` or ``-e`` option to specify the file
+extensions to examine::
 
     django-admin.py makemessages -l de -e txt
 
