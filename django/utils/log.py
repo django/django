@@ -70,3 +70,20 @@ class AdminEmailHandler(logging.Handler):
         reporter = ExceptionReporter(request, is_email=True, *exc_info)
         html_message = self.include_html and reporter.get_traceback_html() or None
         mail.mail_admins(subject, message, fail_silently=True, html_message=html_message)
+
+
+class CallbackFilter(logging.Filter):
+    """
+    A logging filter that checks the return value of a given callable (which
+    takes the record-to-be-logged as its only parameter) to decide whether to
+    log a record.
+
+    """
+    def __init__(self, callback):
+        self.callback = callback
+
+
+    def filter(self, record):
+        if self.callback(record):
+            return 1
+        return 0

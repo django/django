@@ -387,3 +387,44 @@ releases 8.0 and 8.1 was near (November 2010.)
 
 Django 1.4 takes that policy further and sets 8.2 as the minimum PostgreSQL
 version it officially supports.
+
+Request exceptions are now always logged
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When :doc:`logging support </topics/logging/>` was added to Django in 1.3, the
+admin error email support was moved into the
+:class:`django.utils.log.AdminEmailHandler`, attached to the
+``'django.request'`` logger. In order to maintain the established behavior of
+error emails, the ``'django.request'`` logger was called only when
+:setting:`DEBUG` was `False`.
+
+To increase the flexibility of request-error logging, the ``'django.request'``
+logger is now called regardless of the value of :setting:`DEBUG`, and the
+default settings file for new projects now includes a separate filter attached
+to :class:`django.utils.log.AdminEmailHandler` to prevent admin error emails in
+`DEBUG` mode::
+
+   'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.CallbackFilter',
+            'callback': lambda r: not DEBUG
+        }
+    },
+    'handlers': {
+        'mail_admins': {
+            'level': 'ERROR',
+            'filters': ['require_debug_false'],
+            'class': 'django.utils.log.AdminEmailHandler'
+        }
+    },
+
+If your project was created prior to this change, your :setting:`LOGGING`
+setting will not include this new filter. In order to maintain
+backwards-compatibility, Django will detect that your ``'mail_admins'`` handler
+configuration includes no ``'filters'`` section, and will automatically add
+this filter for you and issue a pending-deprecation warning. This will become a
+deprecation warning in Django 1.5, and in Django 1.6 the
+backwards-compatibility shim will be removed entirely.
+
+The existence of any ``'filters'`` key under the ``'mail_admins'`` handler will
+disable this backward-compatibility shim and deprecation warning.

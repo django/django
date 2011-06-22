@@ -198,10 +198,6 @@ class BaseHandler(object):
         if settings.DEBUG_PROPAGATE_EXCEPTIONS:
             raise
 
-        if settings.DEBUG:
-            from django.views import debug
-            return debug.technical_500_response(request, *exc_info)
-
         logger.error('Internal Server Error: %s' % request.path,
             exc_info=exc_info,
             extra={
@@ -209,6 +205,10 @@ class BaseHandler(object):
                 'request': request
             }
         )
+
+        if settings.DEBUG:
+            from django.views import debug
+            return debug.technical_500_response(request, *exc_info)
 
         # If Http500 handler is not installed, re-raise last exception
         if resolver.urlconf_module is None:

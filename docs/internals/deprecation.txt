@@ -210,6 +210,11 @@ their deprecation, as per the :ref:`Django deprecation policy
         * Legacy ways of calling
           :func:`~django.views.decorators.cache.cache_page` will be removed.
 
+        * The backward-compatibility shim to automatically add a debug-false
+          filter to the ``'mail_admins'`` logging handler will be removed. The
+          :setting:`LOGGING` setting should include this filter explicitly if
+          it is desired.
+
     * 2.0
         * ``django.views.defaults.shortcut()``. This function has been moved
           to ``django.contrib.contenttypes.views.shortcut()`` as part of the
