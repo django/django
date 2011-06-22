@@ -91,21 +91,21 @@ class ChangeList(object):
         filter_specs = []
         cleaned_params, use_distinct = self.get_lookup_params(use_distinct)
         if self.list_filter:
-            for list_filer in self.list_filter:
-                if callable(list_filer):
+            for list_filter in self.list_filter:
+                if callable(list_filter):
                     # This is simply a custom list filter class.
-                    spec = list_filer(request, cleaned_params,
+                    spec = list_filter(request, cleaned_params,
                         self.model, self.model_admin)
                 else:
                     field_path = None
-                    if isinstance(list_filer, (tuple, list)):
+                    if isinstance(list_filter, (tuple, list)):
                         # This is a custom FieldListFilter class for a given field.
-                        field, field_list_filter_class = list_filer
+                        field, field_list_filter_class = list_filter
                     else:
                         # This is simply a field name, so use the default
                         # FieldListFilter class that has been registered for
                         # the type of the given field.
-                        field, field_list_filter_class = list_filer, FieldListFilter.create
+                        field, field_list_filter_class = list_filter, FieldListFilter.create
                     if not isinstance(field, models.Field):
                         field_path = field
                         field = get_fields_from_path(self.model, field_path)[-1]
