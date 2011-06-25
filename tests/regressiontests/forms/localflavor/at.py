@@ -28,6 +28,8 @@ class ATLocalFlavorTests(LocalFlavorTestCase):
             '8020': '8020',
         }
         invalid = {
+            '0000'  : error_format,
+            '0123'  : error_format,
             '111222': error_format,
             'eeffee': error_format,
         }

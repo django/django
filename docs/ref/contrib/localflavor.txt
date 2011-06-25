@@ -243,7 +243,8 @@ Austria (``at``)
 
 .. class:: at.forms.ATZipCodeField
 
-    A form field that validates its input as an Austrian zip code.
+    A form field that validates its input as an Austrian zip code, with the
+    format XXXX (first digit must be greater than 0).
 
 .. class:: at.forms.ATStateSelect
 
