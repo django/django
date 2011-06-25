@@ -750,7 +750,7 @@ The login_required decorator
     Note that if you provide a value to ``redirect_field_name``, you will most
     likely need to customize your login template as well, since the template
     context variable which stores the redirect path will use the value of
-    ``redirect_field_name`` as it's key rather than ``"next"`` (the default).
+    ``redirect_field_name`` as its key rather than ``"next"`` (the default).
 
     .. versionadded:: 1.3
 
