@@ -91,7 +91,7 @@ else:
         if not _cookie_allows_colon_in_names:
             def load(self, rawdata, ignore_parse_errors=False):
                 if ignore_parse_errors:
-                    self.bad_cookies = []
+                    self.bad_cookies = set()
                     self._BaseCookie__set = self._loose_set
                 super(SimpleCookie, self).load(rawdata)
                 if ignore_parse_errors:
@@ -105,8 +105,8 @@ else:
                 try:
                     self._strict_set(key, real_value, coded_value)
                 except Cookie.CookieError:
-                    self.bad_cookies.append(key)
-                    dict.__setitem__(self, key, None)
+                    self.bad_cookies.add(key)
+                    dict.__setitem__(self, key, Cookie.Morsel())
 
 
 class CompatCookie(SimpleCookie):
