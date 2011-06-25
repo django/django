@@ -134,44 +134,36 @@ to handling 404 errors. By default, it's the view
 ``404.html``.
 
 This means you need to define a ``404.html`` template in your root template
-directory. This template will be used for all 404 errors.
+directory. This template will be used for all 404 errors. The default 404 view
+will pass one variable to the template: ``request_path``, which is the URL
+that resulted in the error.
 
-This ``page_not_found`` view should suffice for 99% of Web applications, but if
-you want to override the 404 view, you can specify ``handler404`` in your
-URLconf, like so::
+The ``page_not_found`` view should suffice for 99% of Web applications, but if
+you want to override it, you can specify ``handler404`` in your URLconf, like
+so::
 
     handler404 = 'mysite.views.my_custom_404_view'
 
-Behind the scenes, Django determines the 404 view by looking for ``handler404``.
-By default, URLconfs contain the following line::
+Behind the scenes, Django determines the 404 view by looking for
+``handler404`` in your root URLconf, and falling back to
+``django.views.defaults.page_not_found`` if you did not define one.
 
-    from django.conf.urls.defaults import *
+Four things to note about 404 views:
 
-That takes care of setting ``handler404`` in the current module. As you can see
-in ``django/conf/urls/defaults.py``, ``handler404`` is set to
-``'django.views.defaults.page_not_found'`` by default.
+    * The 404 view is also called if Django doesn't find a match after
+      checking every regular expression in the URLconf.
 
-Three things to note about 404 views:
-
-    * The 404 view is also called if Django doesn't find a match after checking
-      every regular expression in the URLconf.
-
-    * If you don't define your own 404 view -- and simply use the
-      default, which is recommended -- you still have one obligation:
-      you must create a ``404.html`` template in the root of your
-      template directory. The default 404 view will use that template
-      for all 404 errors. The default 404 view will pass one variable
-      to the template: ``request_path``, which is the URL that resulted
-      in the 404.
+    * If you don't define your own 404 view — and simply use the default,
+      which is recommended — you still have one obligation: you must create a
+      ``404.html`` template in the root of your template directory.
 
     * The 404 view is passed a :class:`~django.template.RequestContext` and
       will have access to variables supplied by your
-      :setting:`TEMPLATE_CONTEXT_PROCESSORS` setting (e.g.,
-      :setting:`MEDIA_URL`).
+      :setting:`TEMPLATE_CONTEXT_PROCESSORS` setting (e.g., ``MEDIA_URL``).
 
     * If :setting:`DEBUG` is set to ``True`` (in your settings module), then
-      your 404 view will never be used, and the traceback will be displayed
-      instead.
+      your 404 view will never be used, and your URLconf will be displayed
+      instead, with some debug information.
 
 The 500 (server error) view
 ----------------------------
@@ -187,16 +179,21 @@ view passes no variables to this template and is rendered with an empty
 ``Context`` to lessen the chance of additional errors.
 
 This ``server_error`` view should suffice for 99% of Web applications, but if
-you want to override the view, you can specify ``handler500`` in your
-URLconf, like so::
+you want to override the view, you can specify ``handler500`` in your URLconf,
+like so::
 
     handler500 = 'mysite.views.my_custom_error_view'
 
-Behind the scenes, Django determines the error view by looking for ``handler500``.
-By default, URLconfs contain the following line::
+Behind the scenes, Django determines the 500 view by looking for
+``handler500`` in your root URLconf, and falling back to
+``django.views.defaults.server_error`` if you did not define one.
 
-    from django.conf.urls.defaults import *
+Two things to note about 500 views:
 
-That takes care of setting ``handler500`` in the current module. As you can see
-in ``django/conf/urls/defaults.py``, ``handler500`` is set to
-``'django.views.defaults.server_error'`` by default.
+    * If you don't define your own 500 view — and simply use the default,
+      which is recommended — you still have one obligation: you must create a
+      ``500.html`` template in the root of your template directory.
+
+    * If :setting:`DEBUG` is set to ``True`` (in your settings module), then
+      your 500 view will never be used, and the traceback will be displayed
+      instead, with some debug information.
