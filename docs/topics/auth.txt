@@ -262,9 +262,10 @@ Methods
 
         Returns a site-specific profile for this user. Raises
         :exc:`django.contrib.auth.models.SiteProfileNotAvailable` if the
-        current site doesn't allow profiles. For information on how to define a
-        site-specific user profile, see the section on `storing additional user
-        information`_ below.
+        current site doesn't allow profiles, or
+        :exc:`django.core.exceptions.ObjectDoesNotExist` if the user does not
+        have a profile. For information on how to define a site-specific user
+        profile, see the section on `storing additional user information`_ below.
 
 .. _storing additional user information: #storing-additional-information-about-users
 
@@ -470,7 +471,18 @@ you'd like to have available, and also add a
 :class:`~django.db.models.Field.OneToOneField` named ``user`` from your model
 to the :class:`~django.contrib.auth.models.User` model. This will ensure only
 one instance of your model can be created for each
-:class:`~django.contrib.auth.models.User`.
+:class:`~django.contrib.auth.models.User`. For example::
+
+    from django.contrib.auth.models import User
+
+    class UserProfile(models.Model):
+        # This field is required.
+        user = models.OneToOneField(User)
+
+        # Other fields here
+        accepted_eula = models.BooleanField()
+        favorite_animal = models.CharField(max_length=20, default="Dragons.")
+
 
 To indicate that this model is the user profile model for a given site, fill in
 the setting :setting:`AUTH_PROFILE_MODULE` with a string consisting of the
@@ -496,14 +508,26 @@ instance of the user profile model associated with that
 :class:`~django.contrib.auth.models.User`.
 
 The method :class:`~django.contrib.auth.models.User.get_profile()`
-does not create the profile, if it does not exist. You need to
-register a handler for the signal
-:attr:`django.db.models.signals.post_save` on the User model, and, in
-the handler, if created=True, create the associated user profile.
+does not create a profile if one does not exist. You need to register a handler
+for the User model's :attr:`django.db.models.signals.post_save` signal and, in
+the handler, if ``created`` is ``True``, create the associated user profile::
 
-For more information, see `Chapter 12 of the Django book`_.
+    # in models.py
 
-.. _Chapter 12 of the Django book: http://www.djangobook.com/en/1.0/chapter12/#cn222
+    from django.contrib.auth.models import User
+    from django.db.models.signals import post_save
+
+    # definition of UserProfile from above
+    # ...
+
+    def create_user_profile(sender, instance, created, **kwargs):
+        if created:
+            UserProfile.objects.create(user=instance)
+
+    post_save.connect(create_user_profile, sender=User)
+
+.. seealso:: :doc:`/topics/signals` for more information on Django's signal
+    dispatcher.
 
 Authentication in Web requests
 ==============================
