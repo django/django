@@ -25,11 +25,11 @@ Other than that, the Field subclasses have class-specific options for
 __init__(). For example, CharField has a max_length option.
 """
 import datetime
-import time
 import re
 import os
 import urllib2
 from decimal import Decimal
+from functools import wraps
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms import *
@@ -46,6 +46,28 @@ def fix_os_paths(x):
         return [fix_os_paths(y) for y in x]
     else:
         return x
+
+
+def verify_exists_urls(existing_urls=()):
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            from django.core import validators
+            # patch urllib2
+            original_urlopen = validators.urllib2.urlopen
+            def urlopen(req):
+                url = req.get_full_url()
+                if url in existing_urls:
+                    return True
+                raise Exception()
+            try:
+                urllib2.urlopen = urlopen
+                func(*args, **kwargs)
+            finally:
+                # unpatch urllib2
+                validators.urllib2.urlopen = original_urlopen
+        return wrapper
+    return decorator
 
 
 class FieldsTests(TestCase):
@@ -595,9 +617,10 @@ class FieldsTests(TestCase):
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid URL.']", f.clean, 'http://example.')
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid URL.']", f.clean, 'http://.com')
 
+    @verify_exists_urls(('http://www.google.com/',))
     def test_urlfield_3(self):
         f = URLField(verify_exists=True)
-        self.assertEqual(u'http://www.google.com/', f.clean('http://www.google.com')) # This will fail if there's no Internet connection
+        self.assertEqual(u'http://www.google.com/', f.clean('http://www.google.com'))
         self.assertRaisesErrorWithMessage(ValidationError, "[u'Enter a valid URL.']", f.clean, 'http://example')
         self.assertRaises(ValidationError, f.clean, 'http://www.broken.djangoproject.com') # bad domain
         self.assertRaises(ValidationError, f.clean, 'http://qa-dev.w3.org/link-testsuite/http.php?code=405') # Method not allowed
@@ -611,10 +634,11 @@ class FieldsTests(TestCase):
         except ValidationError, e:
             self.assertEqual("[u'This URL appears to be a broken link.']", str(e))
 
+    @verify_exists_urls(('http://www.google.com/',))
     def test_urlfield_4(self):
         f = URLField(verify_exists=True, required=False)
         self.assertEqual(u'', f.clean(''))
-        self.assertEqual(u'http://www.google.com/', f.clean('http://www.google.com')) # This will fail if there's no Internet connection
+        self.assertEqual(u'http://www.google.com/', f.clean('http://www.google.com'))
 
     def test_urlfield_5(self):
         f = URLField(min_length=15, max_length=20)
@@ -663,17 +687,12 @@ class FieldsTests(TestCase):
         except ValidationError, e:
             self.assertEqual("[u'This URL appears to be a broken link.']", str(e))
 
+    @verify_exists_urls(('http://xn--tr-xka.djangoproject.com/',))
     def test_urlfield_10(self):
-        # UTF-8 char in path, enclosed by a monkey-patch to make sure
-        # the encoding is passed to urllib2.urlopen
+        # UTF-8 char in path
         f = URLField(verify_exists=True)
-        try:
-            _orig_urlopen = urllib2.urlopen
-            urllib2.urlopen = lambda req: True
-            url = u'http://t\xfcr.djangoproject.com/'
-            self.assertEqual(url, f.clean(url))
-        finally:
-            urllib2.urlopen = _orig_urlopen
+        url = u'http://t\xfcr.djangoproject.com/'
+        self.assertEqual(url, f.clean(url))
 
     # BooleanField ################################################################
 
