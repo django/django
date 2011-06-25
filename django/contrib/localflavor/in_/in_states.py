@@ -79,6 +79,5 @@ STATES_NORMALIZED = {
     'orisa': 'OR',
     'odisa': 'OR',
     'or': 'OR',
-    'ar': 'AR',
 }
 
