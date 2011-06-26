@@ -78,7 +78,7 @@ point at that file::
 
 Time for an example. Edit ``mysite/urls.py`` so it looks like this::
 
-    from django.conf.urls.defaults import *
+    from django.conf.urls.defaults import patterns, include, url
 
     from django.contrib import admin
     admin.autodiscover()
@@ -88,7 +88,7 @@ Time for an example. Edit ``mysite/urls.py`` so it looks like this::
         (r'^polls/(?P<poll_id>\d+)/$', 'polls.views.detail'),
         (r'^polls/(?P<poll_id>\d+)/results/$', 'polls.views.results'),
         (r'^polls/(?P<poll_id>\d+)/vote/$', 'polls.views.vote'),
-        (r'^admin/', include(admin.site.urls)),
+        url(r'^admin/', include(admin.site.urls)),
     )
 
 This is worth a review. When somebody requests a page from your Web site -- say,
@@ -366,7 +366,7 @@ It's just a normal view.
 You normally won't have to bother with writing 404 views. By default, URLconfs
 have the following line up top::
 
-    from django.conf.urls.defaults import *
+    from django.conf.urls.defaults import patterns, include, url
 
 That takes care of setting ``handler404`` in the current module. As you can see
 in ``django/conf/urls/defaults.py``, ``handler404`` is set to
@@ -459,7 +459,7 @@ callback in your URLconf, you can concatenate multiple
 :func:`~django.conf.urls.defaults.patterns`. Your full ``mysite/urls.py`` might
 now look like this::
 
-    from django.conf.urls.defaults import *
+    from django.conf.urls.defaults import patterns, include, url
 
     from django.contrib import admin
     admin.autodiscover()
@@ -472,7 +472,7 @@ now look like this::
     )
     
     urlpatterns += patterns('',
-        (r'^admin/', include(admin.site.urls)),
+        url(r'^admin/', include(admin.site.urls)),
     )
 
 Decoupling the URLconfs
@@ -496,14 +496,14 @@ Copy the file ``mysite/urls.py`` to ``polls/urls.py``. Then, change
 :func:`~django.conf.urls.defaults.include`, leaving you with::
 
     # This also imports the include function
-    from django.conf.urls.defaults import *
+    from django.conf.urls.defaults import patterns, include, url
     
     from django.contrib import admin
     admin.autodiscover()
     
     urlpatterns = patterns('',
         (r'^polls/', include('polls.urls')),
-        (r'^admin/', include(admin.site.urls)),
+        url(r'^admin/', include(admin.site.urls)),
     )
 
 :func:`~django.conf.urls.defaults.include` simply references another URLconf.
@@ -526,7 +526,7 @@ URLconf by removing the leading "polls/" from each line, and removing the
 lines registering the admin site. Your ``polls/urls.py`` file should now look like
 this::
 
-    from django.conf.urls.defaults import *
+    from django.conf.urls.defaults import patterns, include, url
 
     urlpatterns = patterns('polls.views',
         (r'^$', 'index'),

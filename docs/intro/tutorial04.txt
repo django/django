@@ -218,7 +218,7 @@ Read on for details.
 First, open the ``polls/urls.py`` URLconf. It looks like this, according to the
 tutorial so far::
 
-    from django.conf.urls.defaults import *
+    from django.conf.urls.defaults import patterns, include, url
 
     urlpatterns = patterns('polls.views',
         (r'^$', 'index'),
@@ -229,7 +229,7 @@ tutorial so far::
 
 Change it like so::
 
-    from django.conf.urls.defaults import *
+    from django.conf.urls.defaults import patterns, include, url
     from django.views.generic import DetailView, ListView
     from polls.models import Poll
 
