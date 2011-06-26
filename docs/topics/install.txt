@@ -236,15 +236,33 @@ Installing the development version
 If you'd like to be able to update your Django code occasionally with the
 latest bug fixes and improvements, follow these instructions:
 
-1. Make sure that you have Subversion_ installed, and that you can run its
-   commands from a shell. (Enter ``svn help`` at a shell prompt to test
-   this.)
+1. Make sure that you have Subversion_, Git_, or Mercurial_ installed, and
+   that you can run its commands from a shell. (Enter ``svn help``,
+   ``git help``, or ``hg help`` at a shell prompt to test this.) Note that
+   the Subversion repository is the canonical source for the official
+   Git and Mercurial repositories and as such will always be the most up-to-date.
 
 2. Check out Django's main development branch (the 'trunk') like so:
 
    .. code-block:: bash
 
+       # Subversion
        svn co http://code.djangoproject.com/svn/django/trunk/ django-trunk
+
+   Mirrors of the Subversion repository can be obtained like so:
+
+   .. code-block:: bash
+
+       # Git
+       git clone https://github.com/django/django.git
+
+       # Mercurial
+       hg clone https://bitbucket.org/django/django
+
+   .. warning ::
+
+        These mirrors should be updated every 5 minutes but aren't guaranteed
+        to be up-to-date since they are hosted on external services.
 
 3. Next, make sure that the Python interpreter can load Django's code. The most
    convenient way to do this is to `modify Python's search path`_. Add a ``.pth``
@@ -288,4 +306,6 @@ this, Subversion will automatically download any changes.
 
 .. _`download page`: http://www.djangoproject.com/download/
 .. _Subversion: http://subversion.tigris.org/
+.. _Git: http://git-scm.com/
+.. _Mercurial: http://mercurial.selenic.com/
 .. _`modify Python's search path`: http://docs.python.org/install/index.html#modifying-python-s-search-path
