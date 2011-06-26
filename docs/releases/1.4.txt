@@ -192,6 +192,11 @@ Django 1.4 also includes several smaller improvements worth noting:
 * In the documentation, a helpful :doc:`security overview </topics/security>`
   page.
 
+* Function :func:`django.contrib.auth.models.check_password` has been moved
+  to the :mod:`django.contrib.auth.utils` module. Importing it from the old
+  location will still work, but you should update your imports.
+
+
 .. _backwards-incompatible-changes-1.4:
 
 Backwards incompatible changes in 1.4

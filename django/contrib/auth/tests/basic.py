@@ -1,7 +1,15 @@
 from django.test import TestCase
+from django.utils.unittest import skipUnless
 from django.contrib.auth.models import User, AnonymousUser
+from django.contrib.auth import utils
 from django.core.management import call_command
 from StringIO import StringIO
+
+try:
+    import crypt as crypt_module
+except ImportError:
+    crypt_module = None
+
 
 class BasicTestCase(TestCase):
     def test_user(self):
@@ -93,3 +101,29 @@ class BasicTestCase(TestCase):
         self.assertEqual(u.email, 'joe@somewhere.org')
         self.assertFalse(u.has_usable_password())
 
+
+class PasswordUtilsTestCase(TestCase):
+
+    def _test_make_password(self, algo):
+        password = utils.make_password(algo, "foobar")
+        self.assertTrue(utils.is_password_usable(password))
+        self.assertTrue(utils.check_password("foobar", password))
+
+    def test_make_unusable(self):
+        "Check that you can create an unusable password."
+        password = utils.make_password("any", None)
+        self.assertFalse(utils.is_password_usable(password))
+        self.assertFalse(utils.check_password("foobar", password))
+
+    def test_make_password_sha1(self):
+        "Check creating passwords with SHA1 algorithm."
+        self._test_make_password("sha1")
+
+    def test_make_password_md5(self):
+        "Check creating passwords with MD5 algorithm."
+        self._test_make_password("md5")
+
+    @skipUnless(crypt_module, "no crypt module to generate password.")
+    def test_make_password_crypt(self):
+        "Check creating passwords with CRYPT algorithm."
+        self._test_make_password("crypt")

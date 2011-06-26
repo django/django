@@ -627,19 +627,44 @@ Django provides two functions in :mod:`django.contrib.auth`:
 
 .. _backends documentation: #other-authentication-sources
 
-Manually checking a user's password
+Manually managing a user's password
 -----------------------------------
 
-.. currentmodule:: django.contrib.auth.models
+.. currentmodule:: django.contrib.auth.utils
+
+.. versionadded:: 1.4
+
+    The :mod:`django.contrib.auth.utils` module provides a set of functions
+    to create and validate hashed password. You can use them independently
+    from the ``User`` model.
 
 .. function:: check_password()
 
     If you'd like to manually authenticate a user by comparing a plain-text
     password to the hashed password in the database, use the convenience
-    function :func:`django.contrib.auth.models.check_password`. It takes two
-    arguments: the plain-text password to check, and the full value of a user's
-    ``password`` field in the database to check against, and returns ``True``
-    if they match, ``False`` otherwise.
+    function :func:`django.contrib.auth.utils.check_password`. It takes two
+    arguments: the plain-text password to check, and the full value of a
+    user's ``password`` field in the database to check against, and returns
+    ``True`` if they match, ``False`` otherwise.
+
+.. function:: make_password()
+
+    .. versionadded:: 1.4
+
+    Creates a hashed password in the format used by this application. It takes
+    two arguments: hashing algorithm to use and the password in plain-text.
+    Currently supported algorithms are: ``'sha1'``, ``'md5'`` and ``'crypt'``
+    if you have the ``crypt`` library installed. If the second argument is
+    ``None``, an unusable password is returned (a one that will be never
+    accepted by :func:`django.contrib.auth.utils.check_password`).
+
+.. function:: is_password_usable()
+
+    .. versionadded:: 1.4
+
+   Checks if the given string is a hashed password that has a chance
+   of being verified against :func:`django.contrib.auth.utils.check_password`.
+
 
 How to log a user out
 ---------------------
