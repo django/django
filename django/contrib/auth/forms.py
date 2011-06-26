@@ -1,11 +1,14 @@
-from django.contrib.auth.models import User
+from django import forms
+from django.template import Context, loader
+from django.utils.http import int_to_base36
+from django.utils.itercompat import any
+from django.utils.translation import ugettext_lazy as _
+
+from django.contrib.auth.models import User, UNUSABLE_PASSWORD
 from django.contrib.auth import authenticate
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.models import get_current_site
-from django.template import Context, loader
-from django import forms
-from django.utils.translation import ugettext_lazy as _
-from django.utils.http import int_to_base36
+
 
 class UserCreationForm(forms.ModelForm):
     """
@@ -114,10 +117,11 @@ class PasswordResetForm(forms.Form):
         email = self.cleaned_data["email"]
         self.users_cache = User.objects.filter(
                                 email__iexact=email,
-                                is_active=True
-                            )
-        if len(self.users_cache) == 0:
+                                is_active=True)
+        if not len(self.users_cache):
             raise forms.ValidationError(_("That e-mail address doesn't have an associated user account. Are you sure you've registered?"))
+        if any((user.password == UNUSABLE_PASSWORD) for user in self.users_cache):
+            raise forms.ValidationError(_("The user account associated with this e-mail address cannot reset the password."))
         return email
 
     def save(self, domain_override=None,
