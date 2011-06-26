@@ -76,7 +76,7 @@ MIME type ``application/xhtml+xml``::
 This example is equivalent to::
 
     from django.http import HttpResponse
-    from django.template import Context, loader
+    from django.template import RequestContext, loader
 
     def my_view(request):
         # View code here...
