@@ -104,8 +104,8 @@ def validate(cls, model):
                 field = opts.get_field_by_name(field_name)[0]
             except models.FieldDoesNotExist:
                 raise ImproperlyConfigured("'%s.list_editable[%d]' refers to a "
-                    "field, '%s', not defined on %s."
-                    % (cls.__name__, idx, field_name, model.__name__))
+                    "field, '%s', not defined on %s.%s."
+                    % (cls.__name__, idx, field_name, model._meta.app_label, model.__name__))
             if field_name not in cls.list_display:
                 raise ImproperlyConfigured("'%s.list_editable[%d]' refers to "
                     "'%s' which is not defined in 'list_display'."
@@ -215,7 +215,7 @@ def validate_inline(cls, parent, parent_model):
         if fk and fk.name in cls.exclude:
             raise ImproperlyConfigured("%s cannot exclude the field "
                     "'%s' - this is the foreign key to the parent model "
-                    "%s." % (cls.__name__, fk.name, parent_model.__name__))
+                    "%s.%s." % (cls.__name__, fk.name, parent_model._meta.app_label, parent_model.__name__))
 
     if hasattr(cls, "readonly_fields"):
         check_readonly_fields(cls, cls.model, cls.model._meta)
@@ -372,8 +372,8 @@ def get_field(cls, model, opts, label, field):
     try:
         return opts.get_field(field)
     except models.FieldDoesNotExist:
-        raise ImproperlyConfigured("'%s.%s' refers to field '%s' that is missing from model '%s'."
-                % (cls.__name__, label, field, model.__name__))
+        raise ImproperlyConfigured("'%s.%s' refers to field '%s' that is missing from model '%s.%s'."
+                % (cls.__name__, label, field, model._meta.app_label, model.__name__))
 
 def check_formfield(cls, model, opts, label, field):
     if getattr(cls.form, 'base_fields', None):
@@ -398,8 +398,8 @@ def fetch_attr(cls, model, opts, label, field):
     try:
         return getattr(model, field)
     except AttributeError:
-        raise ImproperlyConfigured("'%s.%s' refers to '%s' that is neither a field, method or property of model '%s'."
-            % (cls.__name__, label, field, model.__name__))
+        raise ImproperlyConfigured("'%s.%s' refers to '%s' that is neither a field, method or property of model '%s.%s'."
+            % (cls.__name__, label, field, model._meta.app_label, model.__name__))
 
 def check_readonly_fields(cls, model, opts):
     check_isseq(cls, "readonly_fields", cls.readonly_fields)

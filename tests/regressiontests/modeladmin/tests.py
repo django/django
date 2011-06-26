@@ -403,7 +403,7 @@ class ValidationTests(unittest.TestCase):
 
         self.assertRaisesRegexp(
             ImproperlyConfigured,
-            "'ValidationTestModelAdmin.raw_id_fields' refers to field 'non_existent_field' that is missing from model 'ValidationTestModel'.",
+            "'ValidationTestModelAdmin.raw_id_fields' refers to field 'non_existent_field' that is missing from model 'modeladmin.ValidationTestModel'.",
             validate,
             ValidationTestModelAdmin,
             ValidationTestModel,
@@ -631,7 +631,7 @@ class ValidationTests(unittest.TestCase):
 
         self.assertRaisesRegexp(
             ImproperlyConfigured,
-            "'ValidationTestModelAdmin.filter_vertical' refers to field 'non_existent_field' that is missing from model 'ValidationTestModel'.",
+            "'ValidationTestModelAdmin.filter_vertical' refers to field 'non_existent_field' that is missing from model 'modeladmin.ValidationTestModel'.",
             validate,
             ValidationTestModelAdmin,
             ValidationTestModel,
@@ -671,7 +671,7 @@ class ValidationTests(unittest.TestCase):
 
         self.assertRaisesRegexp(
             ImproperlyConfigured,
-            "'ValidationTestModelAdmin.filter_horizontal' refers to field 'non_existent_field' that is missing from model 'ValidationTestModel'.",
+            "'ValidationTestModelAdmin.filter_horizontal' refers to field 'non_existent_field' that is missing from model 'modeladmin.ValidationTestModel'.",
             validate,
             ValidationTestModelAdmin,
             ValidationTestModel,
@@ -711,7 +711,7 @@ class ValidationTests(unittest.TestCase):
 
         self.assertRaisesRegexp(
             ImproperlyConfigured,
-            "'ValidationTestModelAdmin.radio_fields' refers to field 'non_existent_field' that is missing from model 'ValidationTestModel'.",
+            "'ValidationTestModelAdmin.radio_fields' refers to field 'non_existent_field' that is missing from model 'modeladmin.ValidationTestModel'.",
             validate,
             ValidationTestModelAdmin,
             ValidationTestModel,
@@ -762,7 +762,7 @@ class ValidationTests(unittest.TestCase):
 
         self.assertRaisesRegexp(
             ImproperlyConfigured,
-            "'ValidationTestModelAdmin.prepopulated_fields' refers to field 'non_existent_field' that is missing from model 'ValidationTestModel'.",
+            "'ValidationTestModelAdmin.prepopulated_fields' refers to field 'non_existent_field' that is missing from model 'modeladmin.ValidationTestModel'.",
             validate,
             ValidationTestModelAdmin,
             ValidationTestModel,
@@ -773,7 +773,7 @@ class ValidationTests(unittest.TestCase):
 
         self.assertRaisesRegexp(
             ImproperlyConfigured,
-            "'ValidationTestModelAdmin.prepopulated_fields\['slug'\]\[0\]' refers to field 'non_existent_field' that is missing from model 'ValidationTestModel'.",
+            "'ValidationTestModelAdmin.prepopulated_fields\['slug'\]\[0\]' refers to field 'non_existent_field' that is missing from model 'modeladmin.ValidationTestModel'.",
             validate,
             ValidationTestModelAdmin,
             ValidationTestModel,
@@ -1010,7 +1010,7 @@ class ValidationTests(unittest.TestCase):
 
         self.assertRaisesRegexp(
             ImproperlyConfigured,
-            "'ValidationTestModelAdmin.date_hierarchy' refers to field 'non_existent_field' that is missing from model 'ValidationTestModel'.",
+            "'ValidationTestModelAdmin.date_hierarchy' refers to field 'non_existent_field' that is missing from model 'modeladmin.ValidationTestModel'.",
             validate,
             ValidationTestModelAdmin,
             ValidationTestModel,
@@ -1050,7 +1050,7 @@ class ValidationTests(unittest.TestCase):
 
         self.assertRaisesRegexp(
             ImproperlyConfigured,
-            "'ValidationTestModelAdmin.ordering\[0\]' refers to field 'non_existent_field' that is missing from model 'ValidationTestModel'.",
+            "'ValidationTestModelAdmin.ordering\[0\]' refers to field 'non_existent_field' that is missing from model 'modeladmin.ValidationTestModel'.",
             validate,
             ValidationTestModelAdmin,
             ValidationTestModel,
@@ -1245,7 +1245,7 @@ class ValidationTests(unittest.TestCase):
 
         self.assertRaisesRegexp(
             ImproperlyConfigured,
-            "'ValidationTestInline.fk_name' refers to field 'non_existent_field' that is missing from model 'ValidationTestInlineModel'.",
+            "'ValidationTestInline.fk_name' refers to field 'non_existent_field' that is missing from model 'modeladmin.ValidationTestInlineModel'.",
             validate,
             ValidationTestModelAdmin,
             ValidationTestModel,
