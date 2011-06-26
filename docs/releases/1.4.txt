@@ -89,6 +89,16 @@ signing in Web applications.
 
 See :doc:`cryptographic signing </topics/signing>` docs for more information.
 
+Cookie-based session backend
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django 1.4 introduces a new cookie based backend for the session framework
+which uses the tools for :doc:`cryptographic signing </topics/signing>` to
+store the session data in the client's browser.
+
+See the :ref:`cookie-based backend <cookie-session-backend>` docs for
+more information.
+
 New form wizard
 ~~~~~~~~~~~~~~~
 

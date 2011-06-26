@@ -7,11 +7,13 @@ from django.contrib.sessions.backends.db import SessionStore as DatabaseSession
 from django.contrib.sessions.backends.cache import SessionStore as CacheSession
 from django.contrib.sessions.backends.cached_db import SessionStore as CacheDBSession
 from django.contrib.sessions.backends.file import SessionStore as FileSession
+from django.contrib.sessions.backends.cookies import SessionStore as CookieSession
 from django.contrib.sessions.models import Session
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.core.exceptions import ImproperlyConfigured, SuspiciousOperation
 from django.http import HttpResponse
 from django.test import TestCase, RequestFactory
+from django.test.utils import override_settings
 from django.utils import unittest
 
 
@@ -213,35 +215,25 @@ class SessionTestsMixin(object):
     def test_get_expire_at_browser_close(self):
         # Tests get_expire_at_browser_close with different settings and different
         # set_expiry calls
-        try:
-            try:
-                original_expire_at_browser_close = settings.SESSION_EXPIRE_AT_BROWSER_CLOSE
-                settings.SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+        with override_settings(SESSION_EXPIRE_AT_BROWSER_CLOSE=False):
+            self.session.set_expiry(10)
+            self.assertFalse(self.session.get_expire_at_browser_close())
 
-                self.session.set_expiry(10)
-                self.assertFalse(self.session.get_expire_at_browser_close())
+            self.session.set_expiry(0)
+            self.assertTrue(self.session.get_expire_at_browser_close())
 
-                self.session.set_expiry(0)
-                self.assertTrue(self.session.get_expire_at_browser_close())
+            self.session.set_expiry(None)
+            self.assertFalse(self.session.get_expire_at_browser_close())
 
-                self.session.set_expiry(None)
-                self.assertFalse(self.session.get_expire_at_browser_close())
+        with override_settings(SESSION_EXPIRE_AT_BROWSER_CLOSE=True):
+            self.session.set_expiry(10)
+            self.assertFalse(self.session.get_expire_at_browser_close())
 
-                settings.SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+            self.session.set_expiry(0)
+            self.assertTrue(self.session.get_expire_at_browser_close())
 
-                self.session.set_expiry(10)
-                self.assertFalse(self.session.get_expire_at_browser_close())
-
-                self.session.set_expiry(0)
-                self.assertTrue(self.session.get_expire_at_browser_close())
-
-                self.session.set_expiry(None)
-                self.assertTrue(self.session.get_expire_at_browser_close())
-
-            except:
-                raise
-        finally:
-            settings.SESSION_EXPIRE_AT_BROWSER_CLOSE = original_expire_at_browser_close
+            self.session.set_expiry(None)
+            self.assertTrue(self.session.get_expire_at_browser_close())
 
     def test_decode(self):
         # Ensure we can decode what we encode
@@ -302,9 +294,10 @@ class FileSessionTests(SessionTestsMixin, unittest.TestCase):
         shutil.rmtree(self.temp_session_store)
         super(FileSessionTests, self).tearDown()
 
+    @override_settings(
+        SESSION_FILE_PATH="/if/this/directory/exists/you/have/a/weird/computer")
     def test_configuration_check(self):
         # Make sure the file backend checks for a good storage dir
-        settings.SESSION_FILE_PATH = "/if/this/directory/exists/you/have/a/weird/computer"
         self.assertRaises(ImproperlyConfigured, self.backend)
 
     def test_invalid_key_backslash(self):
@@ -324,17 +317,9 @@ class CacheSessionTests(SessionTestsMixin, unittest.TestCase):
 
 
 class SessionMiddlewareTests(unittest.TestCase):
-    def setUp(self):
-        self.old_SESSION_COOKIE_SECURE = settings.SESSION_COOKIE_SECURE
-        self.old_SESSION_COOKIE_HTTPONLY = settings.SESSION_COOKIE_HTTPONLY
 
-    def tearDown(self):
-        settings.SESSION_COOKIE_SECURE = self.old_SESSION_COOKIE_SECURE
-        settings.SESSION_COOKIE_HTTPONLY = self.old_SESSION_COOKIE_HTTPONLY
-
+    @override_settings(SESSION_COOKIE_SECURE=True)
     def test_secure_session_cookie(self):
-        settings.SESSION_COOKIE_SECURE = True
-
         request = RequestFactory().get('/')
         response = HttpResponse('Session test')
         middleware = SessionMiddleware()
@@ -347,9 +332,8 @@ class SessionMiddlewareTests(unittest.TestCase):
         response = middleware.process_response(request, response)
         self.assertTrue(response.cookies[settings.SESSION_COOKIE_NAME]['secure'])
 
+    @override_settings(SESSION_COOKIE_HTTPONLY=True)
     def test_httponly_session_cookie(self):
-        settings.SESSION_COOKIE_HTTPONLY = True
-
         request = RequestFactory().get('/')
         response = HttpResponse('Session test')
         middleware = SessionMiddleware()
@@ -361,3 +345,24 @@ class SessionMiddlewareTests(unittest.TestCase):
         # Handle the response through the middleware
         response = middleware.process_response(request, response)
         self.assertTrue(response.cookies[settings.SESSION_COOKIE_NAME]['httponly'])
+
+
+class CookieSessionTests(SessionTestsMixin, TestCase):
+
+    backend = CookieSession
+
+    def test_save(self):
+        """
+        This test tested exists() in the other session backends, but that
+        doesn't make sense for us.
+        """
+        pass
+
+    def test_cycle(self):
+        """
+        This test tested cycle_key() which would create a new session
+        key for the same session data. But we can't invalidate previously
+        signed cookies (other than letting them expire naturally) so
+        testing for this behaviour is meaningless.
+        """
+        pass

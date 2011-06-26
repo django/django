@@ -3,33 +3,33 @@ Functions for creating and restoring url-safe signed JSON objects.
 
 The format used looks like this:
 
->>> signed.dumps("hello")
-'ImhlbGxvIg.RjVSUCt6S64WBilMYxG89-l0OA8'
+>>> signing.dumps("hello")
+'ImhlbGxvIg:1QaUZC:YIye-ze3TTx7gtSv422nZA4sgmk'
 
-There are two components here, separatad by a '.'. The first component is a
+There are two components here, separatad by a ':'. The first component is a
 URLsafe base64 encoded JSON of the object passed to dumps(). The second
-component is a base64 encoded hmac/SHA1 hash of "$first_component.$secret"
+component is a base64 encoded hmac/SHA1 hash of "$first_component:$secret"
 
-signed.loads(s) checks the signature and returns the deserialised object.
+signing.loads(s) checks the signature and returns the deserialised object.
 If the signature fails, a BadSignature exception is raised.
 
->>> signed.loads("ImhlbGxvIg.RjVSUCt6S64WBilMYxG89-l0OA8")
+>>> signing.loads("ImhlbGxvIg:1QaUZC:YIye-ze3TTx7gtSv422nZA4sgmk")
 u'hello'
->>> signed.loads("ImhlbGxvIg.RjVSUCt6S64WBilMYxG89-l0OA8-modified")
+>>> signing.loads("ImhlbGxvIg:1QaUZC:YIye-ze3TTx7gtSv422nZA4sgmk-modified")
 ...
-BadSignature: Signature failed: RjVSUCt6S64WBilMYxG89-l0OA8-modified
+BadSignature: Signature failed: ImhlbGxvIg:1QaUZC:YIye-ze3TTx7gtSv422nZA4sgmk-modified
 
 You can optionally compress the JSON prior to base64 encoding it to save
 space, using the compress=True argument. This checks if compression actually
 helps and only applies compression if the result is a shorter string:
 
->>> signed.dumps(range(1, 20), compress=True)
-'.eJwFwcERACAIwLCF-rCiILN47r-GyZVJsNgkxaFxoDgxcOHGxMKD_T7vhAml.oFq6lAAEbkHXBHfGnVX7Qx6NlZ8'
+>>> signing.dumps(range(1, 20), compress=True)
+'.eJwFwcERACAIwLCF-rCiILN47r-GyZVJsNgkxaFxoDgxcOHGxMKD_T7vhAml:1QaUaL:BA0thEZrp4FQVXIXuOvYJtLJSrQ'
 
 The fact that the string is compressed is signalled by the prefixed '.' at the
 start of the base64 JSON.
 
-There are 65 url-safe characters: the 64 used by url-safe base64 and the '.'.
+There are 65 url-safe characters: the 64 used by url-safe base64 and the ':'.
 These functions make use of all of them.
 """
 import base64
@@ -87,7 +87,19 @@ def get_cookie_signer(salt='django.core.signing.get_cookie_signer'):
     return Signer('django.http.cookies' + settings.SECRET_KEY, salt=salt)
 
 
-def dumps(obj, key=None, salt='django.core.signing', compress=False):
+class JSONSerializer(object):
+    """
+    Simple wrapper around simplejson to be used in signing.dumps and
+    signing.loads.
+    """
+    def dumps(self, obj):
+        return simplejson.dumps(obj, separators=(',', ':'))
+
+    def loads(self, data):
+        return simplejson.loads(data)
+
+
+def dumps(obj, key=None, salt='django.core.signing', serializer=JSONSerializer, compress=False):
     """
     Returns URL-safe, sha1 signed base64 compressed JSON string. If key is
     None, settings.SECRET_KEY is used instead.
@@ -101,24 +113,24 @@ def dumps(obj, key=None, salt='django.core.signing', compress=False):
     value or re-using a salt value across different parts of your
     application without good cause is a security risk.
     """
-    json = simplejson.dumps(obj, separators=(',', ':'))
+    data = serializer().dumps(obj)
 
     # Flag for if it's been compressed or not
     is_compressed = False
 
     if compress:
         # Avoid zlib dependency unless compress is being used
-        compressed = zlib.compress(json)
-        if len(compressed) < (len(json) - 1):
-            json = compressed
+        compressed = zlib.compress(data)
+        if len(compressed) < (len(data) - 1):
+            data = compressed
             is_compressed = True
-    base64d = b64_encode(json)
+    base64d = b64_encode(data)
     if is_compressed:
         base64d = '.' + base64d
     return TimestampSigner(key, salt=salt).sign(base64d)
 
 
-def loads(s, key=None, salt='django.core.signing', max_age=None):
+def loads(s, key=None, salt='django.core.signing', serializer=JSONSerializer, max_age=None):
     """
     Reverse of dumps(), raises BadSignature if signature fails
     """
@@ -129,10 +141,10 @@ def loads(s, key=None, salt='django.core.signing', max_age=None):
         # It's compressed; uncompress it first
         base64d = base64d[1:]
         decompress = True
-    json = b64_decode(base64d)
+    data = b64_decode(base64d)
     if decompress:
-        json = zlib.decompress(json)
-    return simplejson.loads(json)
+        data = zlib.decompress(data)
+    return serializer().loads(data)
 
 
 class Signer(object):
@@ -160,6 +172,7 @@ class Signer(object):
 
 
 class TimestampSigner(Signer):
+
     def timestamp(self):
         return baseconv.base62.encode(int(time.time()))
 

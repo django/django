@@ -5,10 +5,11 @@ How to use sessions
 .. module:: django.contrib.sessions
    :synopsis: Provides session management for Django projects.
 
-Django provides full support for anonymous sessions. The session framework lets
-you store and retrieve arbitrary data on a per-site-visitor basis. It stores
-data on the server side and abstracts the sending and receiving of cookies.
-Cookies contain a session ID -- not the data itself.
+Django provides full support for anonymous sessions. The session framework
+lets you store and retrieve arbitrary data on a per-site-visitor basis. It
+stores data on the server side and abstracts the sending and receiving of
+cookies. Cookies contain a session ID -- not the data itself (unless you're
+using the :ref:`cookie based backend<cookie-session-backend>`).
 
 Enabling sessions
 =================
@@ -95,6 +96,38 @@ defaults to output from ``tempfile.gettempdir()``, most likely ``/tmp``) to
 control where Django stores session files. Be sure to check that your Web
 server has permissions to read and write to this location.
 
+.. _cookie-session-backend:
+
+Using cookie-based sessions
+---------------------------
+
+.. versionadded:: 1.4
+
+To use cookies-based sessions, set the :setting:`SESSION_ENGINE` setting to
+``"django.contrib.sessions.backends.cookies"``. The session data will be
+stored using Django's tools for :doc:`cryptographic signing </topics/signing>`
+and the :setting:`SECRET_KEY` setting.
+
+.. note::
+
+    It's recommended to set the :setting:`SESSION_COOKIE_HTTPONLY` setting
+    to ``True`` to prevent tampering of the stored data from JavaScript.
+
+.. warning::
+
+    **The session data is signed but not encrypted!**
+
+    When using the cookies backend the session data can be read out
+    and will be invalidated when being tampered with. The same invalidation
+    happens if the client storing the cookie (e.g. your user's browser)
+    can't store all of the session cookie and drops data. Even though
+    Django compresses the data, it's still entirely possible to exceed
+    the `common limit of 4096 bytes`_ per cookie.
+
+    Also, the size of a cookie can have an impact on the `speed of your site`_.
+
+.. _`common limit of 4096 bytes`: http://tools.ietf.org/html/rfc2965#section-5.3
+.. _`speed of your site`: http://yuiblog.com/blog/2007/03/01/performance-research-part-3/
 
 Using sessions in views
 =======================
@@ -420,6 +453,7 @@ Controls where Django stores session data. Valid values are:
     * ``'django.contrib.sessions.backends.file'``
     * ``'django.contrib.sessions.backends.cache'``
     * ``'django.contrib.sessions.backends.cached_db'``
+    * ``'django.contrib.sessions.backends.signed_cookies'``
 
 See `configuring the session engine`_ for more details.
 
