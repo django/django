@@ -1746,8 +1746,9 @@ If ``value`` is ``Still MAD At Yoko``, the output will be ``still mad at yoko``.
 make_list
 ~~~~~~~~~
 
-Returns the value turned into a list. For an integer, it's a list of
-digits. For a string, it's a list of characters.
+Returns the value turned into a list. For a string, it's a list of characters.
+For an integer, the argument is cast into an unicode string before creating a
+list.
 
 For example::
 
@@ -1755,7 +1756,7 @@ For example::
 
 If ``value`` is the string ``"Joel"``, the output would be the list
 ``[u'J', u'o', u'e', u'l']``. If ``value`` is ``123``, the output will be the
-list ``[1, 2, 3]``.
+list ``[u'1', u'2', u'3']``.
 
 .. templatefilter:: phone2numeric
 
