@@ -96,8 +96,10 @@ def dumps(obj, key=None, salt='django.core.signing', compress=False):
     save some space. Prepends a '.' to signify compression. This is included
     in the signature, to protect against zip bombs.
 
-    Salt can be used to further salt the hash, in case you're worried
-    that the NSA might try to brute-force your SHA-1 protected secret.
+    Salt can be used to namespace the hash, so that a signed string is
+    only valid for a given namespace. Leaving this at the default
+    value or re-using a salt value across different parts of your
+    application without good cause is a security risk.
     """
     json = simplejson.dumps(obj, separators=(',', ':'))
 
