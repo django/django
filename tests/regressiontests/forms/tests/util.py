@@ -55,3 +55,7 @@ class FormsUtilTestCase(TestCase):
                          '<ul class="errorlist"><li>Example of link: &lt;a href=&quot;http://www.example.com/&quot;&gt;example&lt;/a&gt;</li></ul>')
         self.assertEqual(str(ErrorList([mark_safe(example)])),
                          '<ul class="errorlist"><li>Example of link: <a href="http://www.example.com/">example</a></li></ul>')
+        self.assertEqual(str(ErrorDict({'name': example})),
+                         '<ul class="errorlist"><li>nameExample of link: &lt;a href=&quot;http://www.example.com/&quot;&gt;example&lt;/a&gt;</li></ul>')
+        self.assertEqual(str(ErrorDict({'name': mark_safe(example)})),
+                         '<ul class="errorlist"><li>nameExample of link: <a href="http://www.example.com/">example</a></li></ul>')

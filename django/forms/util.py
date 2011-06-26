@@ -27,7 +27,7 @@ class ErrorDict(dict, StrAndUnicode):
     def as_ul(self):
         if not self: return u''
         return mark_safe(u'<ul class="errorlist">%s</ul>'
-                % ''.join([u'<li>%s%s</li>' % (k, force_unicode(v))
+                % ''.join([u'<li>%s%s</li>' % (k, conditional_escape(force_unicode(v)))
                     for k, v in self.items()]))
 
     def as_text(self):
