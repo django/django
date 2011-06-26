@@ -257,6 +257,7 @@ def password_change(request,
     return TemplateResponse(request, template_name, context,
                             current_app=current_app)
 
+@login_required
 def password_change_done(request,
                          template_name='registration/password_change_done.html',
                          current_app=None, extra_context=None):

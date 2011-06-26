@@ -193,6 +193,23 @@ class ChangePasswordTest(AuthViewsTestCase):
         self.fail_login()
         self.login(password='password1')
 
+    def test_password_change_done_succeeds(self):
+        self.login()
+        response = self.client.post('/password_change/', {
+            'old_password': 'password',
+            'new_password1': 'password1',
+            'new_password2': 'password1',
+            }
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(response['Location'].endswith('/password_change/done/'))
+
+    def test_password_change_done_fails(self):
+        response = self.client.get('/password_change/done/')
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(response['Location'].endswith('/login/?next=/password_change/done/'))
+
+
 class LoginTest(AuthViewsTestCase):
 
     def test_current_site_in_context_after_login(self):
