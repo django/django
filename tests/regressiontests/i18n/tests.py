@@ -516,6 +516,7 @@ class MiscTests(TestCase):
         self.assertEqual([('de', 1.0), ('en-au', 0.75), ('en-us', 0.5), ('en', 0.25), ('es', 0.125), ('fa', 0.125)], p('de,en-au;q=0.75,en-us;q=0.5,en;q=0.25,es;q=0.125,fa;q=0.125'))
         self.assertEqual([('*', 1.0)], p('*'))
         self.assertEqual([('de', 1.0)], p('de;q=0.'))
+        self.assertEqual([('en', 1.0), ('*', 0.5)], p('en; q=1.0, * ; q=0.5'))
         self.assertEqual([], p(''))
 
         # Bad headers; should always return [].
