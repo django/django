@@ -1,10 +1,12 @@
 import datetime
 import hashlib
+import random
 import urllib
 
 from django.contrib import auth
 from django.contrib.auth.signals import user_logged_in
 from django.core.exceptions import ImproperlyConfigured
+from django.core.mail import send_mail
 from django.db import models
 from django.db.models.manager import EmptyManager
 from django.contrib.contenttypes.models import ContentType
@@ -33,6 +35,21 @@ def get_hexdigest(algorithm, salt, raw_password):
     elif algorithm == 'sha1':
         return hashlib.sha1(salt + raw_password).hexdigest()
     raise ValueError("Got unknown password algorithm type in password.")
+
+def get_random_string(length=12, allowed_chars='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'):
+    """
+    Returns a random string of length characters from the set of a-z, A-Z, 0-9
+    for use as a salt.
+
+    The default length of 12 with the a-z, A-Z, 0-9 character set returns
+    a 71-bit salt. log_2((26+26+10)^12) =~ 71 bits
+    """
+    import random
+    try:
+        random = random.SystemRandom()
+    except NotImplementedError:
+        pass
+    return ''.join([random.choice(allowed_chars) for i in range(length)])
 
 def check_password(raw_password, enc_password):
     """
@@ -145,11 +162,13 @@ class UserManager(models.Manager):
         return u
 
     def make_random_password(self, length=10, allowed_chars='abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789'):
-        "Generates a random password with the given length and given allowed_chars"
+        """
+        Generates a random password with the given length
+        and given allowed_chars
+        """
         # Note that default value of allowed_chars does not have "I" or letters
         # that look like it -- just to avoid confusion.
-        from random import choice
-        return ''.join([choice(allowed_chars) for i in range(length)])
+        return get_random_string(length, allowed_chars)
 
 
 # A few helper functions for common logic between User and AnonymousUser.
@@ -244,7 +263,9 @@ class User(models.Model):
         return True
 
     def get_full_name(self):
-        "Returns the first_name plus the last_name, with a space in between."
+        """
+        Returns the first_name plus the last_name, with a space in between.
+        """
         full_name = u'%s %s' % (self.first_name, self.last_name)
         return full_name.strip()
 
@@ -252,9 +273,8 @@ class User(models.Model):
         if raw_password is None:
             self.set_unusable_password()
         else:
-            import random
             algo = 'sha1'
-            salt = get_hexdigest(algo, str(random.random()), str(random.random()))[:5]
+            salt = get_random_string()
             hsh = get_hexdigest(algo, salt, raw_password)
             self.password = '%s$%s$%s' % (algo, salt, hsh)
 
@@ -346,8 +366,9 @@ class User(models.Model):
         return _user_has_module_perms(self, app_label)
 
     def email_user(self, subject, message, from_email=None):
-        "Sends an email to this User."
-        from django.core.mail import send_mail
+        """
+        Sends an email to this User.
+        """
         send_mail(subject, message, from_email, [self.email])
 
     def get_profile(self):
