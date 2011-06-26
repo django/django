@@ -371,7 +371,6 @@ class Textarea(Widget):
 
 class DateInput(Input):
     input_type = 'text'
-    format = '%Y-%m-%d'     # '2006-10-25'
 
     def __init__(self, attrs=None, format=None):
         super(DateInput, self).__init__(attrs)
@@ -403,7 +402,6 @@ class DateInput(Input):
 
 class DateTimeInput(Input):
     input_type = 'text'
-    format = '%Y-%m-%d %H:%M:%S'     # '2006-10-25 14:30:59'
 
     def __init__(self, attrs=None, format=None):
         super(DateTimeInput, self).__init__(attrs)
@@ -435,7 +433,6 @@ class DateTimeInput(Input):
 
 class TimeInput(Input):
     input_type = 'text'
-    format = '%H:%M:%S'     # '14:30:59'
 
     def __init__(self, attrs=None, format=None):
         super(TimeInput, self).__init__(attrs)
@@ -828,8 +825,6 @@ class SplitDateTimeWidget(MultiWidget):
     """
     A Widget that splits datetime input into two <input type="text"> boxes.
     """
-    date_format = DateInput.format
-    time_format = TimeInput.format
 
     def __init__(self, attrs=None, date_format=None, time_format=None):
         widgets = (DateInput(attrs=attrs, format=date_format),
