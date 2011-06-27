@@ -6,7 +6,7 @@ The format used looks like this:
 >>> signing.dumps("hello")
 'ImhlbGxvIg:1QaUZC:YIye-ze3TTx7gtSv422nZA4sgmk'
 
-There are two components here, separatad by a ':'. The first component is a
+There are two components here, separated by a ':'. The first component is a
 URLsafe base64 encoded JSON of the object passed to dumps(). The second
 component is a base64 encoded hmac/SHA1 hash of "$first_component:$secret"
 
