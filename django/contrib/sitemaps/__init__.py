@@ -76,10 +76,11 @@ class Sitemap(object):
             loc = "http://%s%s" % (site.domain, self.__get('location', item))
             priority = self.__get('priority', item, None)
             url_info = {
+                'item':       item,
                 'location':   loc,
                 'lastmod':    self.__get('lastmod', item, None),
                 'changefreq': self.__get('changefreq', item, None),
-                'priority':   str(priority is not None and priority or '')
+                'priority':   str(priority is not None and priority or ''),
             }
             urls.append(url_info)
         return urls

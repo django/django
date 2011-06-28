@@ -2,7 +2,7 @@ import os
 from datetime import date
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.contrib.sitemaps import Sitemap
+from django.contrib.sitemaps import Sitemap, GenericSitemap
 from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
@@ -171,3 +171,14 @@ class SitemapTests(TestCase):
         """
         Site._meta.installed = False
         self.assertRaises(ImproperlyConfigured, Sitemap().get_urls)
+
+    def test_sitemap_item(self):
+        """
+        Check to make sure that the raw item is included with each
+        Sitemap.get_url() url result.
+        """
+        user_sitemap = GenericSitemap({'queryset': User.objects.all()})
+        def is_user(url):
+            return isinstance(url['item'], User)
+        item_in_url_info = all(map(is_user, user_sitemap.get_urls()))
+        self.assertTrue(item_in_url_info)

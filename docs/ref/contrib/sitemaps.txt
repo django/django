@@ -284,10 +284,10 @@ Here's what the relevant URLconf lines would look like for the example above::
         (r'^sitemap-(?P<section>.+)\.xml$', 'sitemap', {'sitemaps': sitemaps}),
     )
 
-This will automatically generate a :file:`sitemap.xml` file that references both
-:file:`sitemap-flatpages.xml` and :file:`sitemap-blog.xml`. The
-:class:`~django.contrib.sitemaps.Sitemap` classes and the :data:`sitemaps` dict
-don't change at all.
+This will automatically generate a :file:`sitemap.xml` file that references
+both :file:`sitemap-flatpages.xml` and :file:`sitemap-blog.xml`. The
+:class:`~django.contrib.sitemaps.Sitemap` classes and the :data:`sitemaps`
+dict don't change at all.
 
 You should create an index file if one of your sitemaps has more than 50,000
 URLs. In this case, Django will automatically paginate the sitemap, and the
@@ -298,9 +298,9 @@ index will reflect that.
 Template customization
 ======================
 
-If you wish to use a different template for each sitemap or sitemap index available on your site,
-you may specify it by passing a `template_name` parameter to the `sitemap` and `index` views via
-the URLconf::
+If you wish to use a different template for each sitemap or sitemap index
+available on your site, you may specify it by passing a ``template_name``
+parameter to the ``sitemap`` and ``index`` views via the URLconf::
 
     urlpatterns = patterns('django.contrib.sitemaps.views',
         (r'^custom-sitemap\.xml$', 'index', {
@@ -312,6 +312,63 @@ the URLconf::
             'template_name': 'custom_sitemap.html'
         }),
     )
+
+Context variables
+------------------
+
+When customizing the templates for the :func:`~django.contrib.sitemaps.views.index`
+and ~:func:`django.contrib.sitemaps.views.sitemaps` views, you can rely on the
+following context variables.
+
+Index
+-----
+
+The variable :data:`sitemaps` is a list of absolute URLs to each of the sitemaps.
+
+Sitemap
+-------
+
+The variable :data:`urlset` is a list of URLs that should appear in the
+sitemap. Each URL exposes attributes as defined in the
+:class:`~django.contrib.sitemaps.Sitemap` class:
+
+    - ``changefreq``
+    - ``item``
+    - ``lastmod``
+    - ``location``
+    - ``priority``
+
+.. versionadded:: 1.4
+
+The ``item`` attribute has been added for each URL to allow more flexible
+customization of the templates, such as `Google news sitemaps`_. Assuming
+Sitemap's :attr:`~Sitemap.items()` would return a list of items with
+``publication_data`` and a ``tags`` field something like this would
+generate a Google News compatible sitemap:
+
+.. code-block:: xml+django
+
+    <?xml version="1.0" encoding="UTF-8"?>
+    <urlset
+      xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+      xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
+    {% spaceless %}
+    {% for url in urlset %}
+      <url>
+        <loc>{{ url.location }}</loc>
+        {% if url.lastmod %}<lastmod>{{ url.lastmod|date:"Y-m-d" }}</lastmod>{% endif %}
+        {% if url.changefreq %}<changefreq>{{ url.changefreq }}</changefreq>{% endif %}
+        {% if url.priority %}<priority>{{ url.priority }}</priority>{% endif %}
+        <news:news>
+          {% if url.item.publication_date %}<news:publication_date>{{ url.item.publication_date|date:"Y-m-d" }}</news:publication_date>{% endif %}
+          {% if url.item.tags %}<news:keywords>{{ url.item.tags }}</news:keywords>{% endif %}
+        </news:news>
+       </url>
+    {% endfor %}
+    {% endspaceless %}
+    </urlset>
+
+.. _`Google news sitemaps`: http://www.google.com/support/webmasters/bin/answer.py?hl=en&answer=74288
 
 Pinging Google
 ==============
