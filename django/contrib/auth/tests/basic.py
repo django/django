@@ -39,6 +39,17 @@ class BasicTestCase(TestCase):
         u2 = User.objects.create_user('testuser2', 'test2@example.com')
         self.assertFalse(u.has_usable_password())
 
+    def test_user_no_email(self):
+        "Check that users can be created without an email"
+        u = User.objects.create_user('testuser1')
+        u.email = ''
+
+        u2 = User.objects.create_user('testuser2', email='')
+        u2.email = ''
+
+        u3 = User.objects.create_user('testuser3', email=None)
+        u3.email = ''
+
     def test_anonymous_user(self):
         "Check the properties of the anonymous user"
         a = AnonymousUser()

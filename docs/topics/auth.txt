@@ -277,7 +277,10 @@ Manager functions
     The :class:`~django.contrib.auth.models.User` model has a custom manager
     that has the following helper functions:
 
-    .. method:: models.UserManager.create_user(username, email, password=None)
+    .. method:: models.UserManager.create_user(username, email=None, password=None)
+
+        .. versionchanged:: 1.4
+           The ``email`` parameter was made optional.
 
         Creates, saves and returns a :class:`~django.contrib.auth.models.User`.
 

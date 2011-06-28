@@ -86,7 +86,7 @@ class Group(models.Model):
         return self.name
 
 class UserManager(models.Manager):
-    def create_user(self, username, email, password=None):
+    def create_user(self, username, email=None, password=None):
         """
         Creates and saves a User with the given username, email and password.
         """
@@ -94,6 +94,7 @@ class UserManager(models.Manager):
 
         # Normalize the address by lowercasing the domain part of the email
         # address.
+        email = email or ''
         try:
             email_name, domain_part = email.strip().split('@', 1)
         except ValueError:
