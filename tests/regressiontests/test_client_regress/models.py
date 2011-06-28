@@ -913,14 +913,44 @@ class ResponseTemplateDeprecationTests(TestCase):
         response = self.client.get("/test_client_regress/request_methods/")
         self.assertEqual(response.template, None)
 
-class RawPostDataTest(TestCase):
-    "Access to request.raw_post_data from the test client."
-    def test_raw_post_data(self):
-        # Refs #14753
-        try:
-            response = self.client.get("/test_client_regress/raw_post_data/")
-        except AssertionError:
-            self.fail("Accessing request.raw_post_data from a view fetched with GET by the test client shouldn't fail.")
+
+class ReadLimitedStreamTest(TestCase):
+    """
+    Tests that ensure that HttpRequest.raw_post_data, HttpRequest.read() and
+    HttpRequest.read(BUFFER) have proper LimitedStream behaviour.
+
+    Refs #14753, #15785
+    """
+    def test_raw_post_data_from_empty_request(self):
+        """HttpRequest.raw_post_data on a test client GET request should return
+        the empty string."""
+        self.assertEquals(self.client.get("/test_client_regress/raw_post_data/").content, '')
+
+    def test_read_from_empty_request(self):
+        """HttpRequest.read() on a test client GET request should return the
+        empty string."""
+        self.assertEquals(self.client.get("/test_client_regress/read_all/").content, '')
+
+    def test_read_numbytes_from_empty_request(self):
+        """HttpRequest.read(LARGE_BUFFER) on a test client GET request should
+        return the empty string."""
+        self.assertEquals(self.client.get("/test_client_regress/read_buffer/").content, '')
+
+    def test_read_from_nonempty_request(self):
+        """HttpRequest.read() on a test client PUT request with some payload
+        should return that payload."""
+        payload = 'foobar'
+        self.assertEquals(self.client.put("/test_client_regress/read_all/",
+                                          data=payload,
+                                          content_type='text/plain').content, payload)
+
+    def test_read_numbytes_from_nonempty_request(self):
+        """HttpRequest.read(LARGE_BUFFER) on a test client PUT request with
+        some payload should return that payload."""
+        payload = 'foobar'
+        self.assertEquals(self.client.put("/test_client_regress/read_buffer/",
+                                          data=payload,
+                                          content_type='text/plain').content, payload)
 
 
 class RequestFactoryStateTest(TestCase):

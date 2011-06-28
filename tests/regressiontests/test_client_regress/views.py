@@ -96,6 +96,14 @@ def raw_post_data(request):
     "A view that is requested with GET and accesses request.raw_post_data. Refs #14753."
     return HttpResponse(request.raw_post_data)
 
+def read_all(request):
+    "A view that is requested with accesses request.read()."
+    return HttpResponse(request.read())
+
+def read_buffer(request):
+    "A view that is requested with accesses request.read(LARGE_BUFFER)."
+    return HttpResponse(request.read(99999))
+
 def request_context_view(request):
     # Special attribute that won't be present on a plain HttpRequest
     request.special_path = request.path

@@ -9,7 +9,7 @@ from StringIO import StringIO
 
 from django.core.files import temp as tempfile
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.http.multipartparser import MultiPartParser
+from django.http.multipartparser import MultiPartParser, MultiPartParserError
 from django.test import TestCase, client
 from django.utils import simplejson
 from django.utils import unittest
@@ -175,6 +175,47 @@ class FileUploadTests(TestCase):
         }
         got = simplejson.loads(self.client.request(**r).content)
         self.assertTrue(len(got['file']) < 256, "Got a long file name (%s characters)." % len(got['file']))
+
+    def test_truncated_multipart_handled_gracefully(self):
+        """
+        If passed an incomplete multipart message, MultiPartParser does not
+        attempt to read beyond the end of the stream, and simply will handle
+        the part that can be parsed gracefully.
+        """
+        payload = "\r\n".join([
+            '--' + client.BOUNDARY,
+            'Content-Disposition: form-data; name="file"; filename="foo.txt"',
+            'Content-Type: application/octet-stream',
+            '',
+            'file contents'
+            '--' + client.BOUNDARY + '--',
+            '',
+        ])
+        payload = payload[:-10]
+        r = {
+            'CONTENT_LENGTH': len(payload),
+            'CONTENT_TYPE': client.MULTIPART_CONTENT,
+            'PATH_INFO': '/file_uploads/echo/',
+            'REQUEST_METHOD': 'POST',
+            'wsgi.input': client.FakePayload(payload),
+        }
+        got = simplejson.loads(self.client.request(**r).content)
+        self.assertEquals(got, {})
+
+    def test_empty_multipart_handled_gracefully(self):
+        """
+        If passed an empty multipart message, MultiPartParser will return
+        an empty QueryDict.
+        """
+        r = {
+            'CONTENT_LENGTH': 0,
+            'CONTENT_TYPE': client.MULTIPART_CONTENT,
+            'PATH_INFO': '/file_uploads/echo/',
+            'REQUEST_METHOD': 'POST',
+            'wsgi.input': client.FakePayload(''),
+        }
+        got = simplejson.loads(self.client.request(**r).content)
+        self.assertEquals(got, {})
 
     def test_custom_upload_handler(self):
         # A small file (under the 5M quota)

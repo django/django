@@ -195,7 +195,10 @@ class RequestsTests(unittest.TestCase):
         self.assertEqual(stream.read(), '')
 
     def test_stream(self):
-        request = WSGIRequest({'REQUEST_METHOD': 'POST', 'wsgi.input': StringIO('name=value')})
+        payload = 'name=value'
+        request = WSGIRequest({'REQUEST_METHOD': 'POST',
+                               'CONTENT_LENGTH': len(payload),
+                               'wsgi.input': StringIO(payload)})
         self.assertEqual(request.read(), 'name=value')
 
     def test_read_after_value(self):
@@ -203,7 +206,10 @@ class RequestsTests(unittest.TestCase):
         Reading from request is allowed after accessing request contents as
         POST or raw_post_data.
         """
-        request = WSGIRequest({'REQUEST_METHOD': 'POST', 'wsgi.input': StringIO('name=value')})
+        payload = 'name=value'
+        request = WSGIRequest({'REQUEST_METHOD': 'POST',
+                               'CONTENT_LENGTH': len(payload),
+                               'wsgi.input': StringIO(payload)})
         self.assertEqual(request.POST, {u'name': [u'value']})
         self.assertEqual(request.raw_post_data, 'name=value')
         self.assertEqual(request.read(), 'name=value')
@@ -213,7 +219,10 @@ class RequestsTests(unittest.TestCase):
         Construction of POST or raw_post_data is not allowed after reading
         from request.
         """
-        request = WSGIRequest({'REQUEST_METHOD': 'POST', 'wsgi.input': StringIO('name=value')})
+        payload = 'name=value'
+        request = WSGIRequest({'REQUEST_METHOD': 'POST',
+                               'CONTENT_LENGTH': len(payload),
+                               'wsgi.input': StringIO(payload)})
         self.assertEqual(request.read(2), 'na')
         self.assertRaises(Exception, lambda: request.raw_post_data)
         self.assertEqual(request.POST, {})
@@ -261,14 +270,20 @@ class RequestsTests(unittest.TestCase):
         self.assertEqual(request.POST, {})
 
     def test_read_by_lines(self):
-        request = WSGIRequest({'REQUEST_METHOD': 'POST', 'wsgi.input': StringIO('name=value')})
+        payload = 'name=value'
+        request = WSGIRequest({'REQUEST_METHOD': 'POST',
+                               'CONTENT_LENGTH': len(payload),
+                               'wsgi.input': StringIO(payload)})
         self.assertEqual(list(request), ['name=value'])
 
     def test_POST_after_raw_post_data_read(self):
         """
         POST should be populated even if raw_post_data is read first
         """
-        request = WSGIRequest({'REQUEST_METHOD': 'POST', 'wsgi.input': StringIO('name=value')})
+        payload = 'name=value'
+        request = WSGIRequest({'REQUEST_METHOD': 'POST',
+                               'CONTENT_LENGTH': len(payload),
+                               'wsgi.input': StringIO(payload)})
         raw_data = request.raw_post_data
         self.assertEqual(request.POST, {u'name': [u'value']})
 
@@ -277,7 +292,10 @@ class RequestsTests(unittest.TestCase):
         POST should be populated even if raw_post_data is read first, and then
         the stream is read second.
         """
-        request = WSGIRequest({'REQUEST_METHOD': 'POST', 'wsgi.input': StringIO('name=value')})
+        payload = 'name=value'
+        request = WSGIRequest({'REQUEST_METHOD': 'POST',
+                               'CONTENT_LENGTH': len(payload),
+                               'wsgi.input': StringIO(payload)})
         raw_data = request.raw_post_data
         self.assertEqual(request.read(1), u'n')
         self.assertEqual(request.POST, {u'name': [u'value']})
