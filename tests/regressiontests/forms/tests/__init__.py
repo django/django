@@ -40,6 +40,7 @@ from regressiontests.forms.localflavortests import (
     NLLocalFlavorTests,
     PLLocalFlavorTests,
     PTLocalFlavorTests,
+    PYLocalFlavorTests,
     ROLocalFlavorTests,
     RULocalFlavorTests,
     SELocalFlavorTests,

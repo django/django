@@ -64,6 +64,7 @@ Countries currently supported by :mod:`~django.contrib.localflavor` are:
     * Peru_
     * Poland_
     * Portugal_
+    * Paraguay_
     * Romania_
     * Russia_
     * Slovakia_
@@ -114,6 +115,7 @@ Here's an example of how to use them::
 .. _Macedonia: `Macedonia (mk)`_
 .. _Mexico: `Mexico (mx)`_
 .. _Norway: `Norway (no)`_
+.. _Paraguay: `Paraguay (py)`_
 .. _Peru: `Peru (pe)`_
 .. _Poland: `Poland (pl)`_
 .. _Portugal: `Portugal (pt)`_
@@ -783,6 +785,19 @@ Norway (``no``)
 
     A ``Select`` widget that uses a list of Norwegian municipalities (fylker) as
     its choices.
+
+Paraguay (``py``)
+=================
+
+.. versionadded:: 1.4
+
+.. class:: py.forms.PyDepartmentSelect
+
+    A ``Select`` widget with a list of Paraguayan departments as choices.
+
+.. class:: py.forms.PyNumberedDepartmentSelect
+
+    A ``Select`` widget with a roman numbered list of Paraguayan departments as choices.
 
 Peru (``pe``)
 =============
