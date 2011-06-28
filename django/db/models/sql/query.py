@@ -1068,8 +1068,9 @@ class Query(object):
 
         try:
             field, target, opts, join_list, last, extra_filters = self.setup_joins(
-                    parts, opts, alias, True, allow_many, can_reuse=can_reuse,
-                    negate=negate, process_extras=process_extras)
+                    parts, opts, alias, True, allow_many, allow_explicit_fk=True,
+                    can_reuse=can_reuse, negate=negate,
+                    process_extras=process_extras)
         except MultiJoin, e:
             self.split_exclude(filter_expr, LOOKUP_SEP.join(parts[:e.level]),
                     can_reuse)

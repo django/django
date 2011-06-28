@@ -2,7 +2,7 @@ from copy import deepcopy
 from datetime import datetime
 
 from django.test import TestCase
-from django.core.exceptions import FieldError
+from django.core.exceptions import FieldError, MultipleObjectsReturned
 
 from models import Article, Reporter
 
@@ -229,10 +229,6 @@ class ManyToOneTests(TestCase):
                 "<Article: John's second story>",
                 "<Article: This is a test>",
             ])
-        # You need two underscores between "reporter" and "id" -- not one.
-        self.assertRaises(FieldError, Article.objects.filter, reporter_id__exact=self.r.id)
-        # You need to specify a comparison clause
-        self.assertRaises(FieldError, Article.objects.filter, reporter_id=self.r.id)
 
     def test_reverse_selects(self):
         a3 = Article.objects.create(id=None, headline="Third article",
@@ -372,3 +368,34 @@ class ManyToOneTests(TestCase):
         # recursive don't cause recursion depth problems under deepcopy.
         self.r.cached_query = Article.objects.filter(reporter=self.r)
         self.assertEqual(repr(deepcopy(self.r)), "<Reporter: John Smith>")
+
+    def test_explicit_fk(self):
+        # Create a new Article with get_or_create using an explicit value
+        # for a ForeignKey.
+        a2, created = Article.objects.get_or_create(id=None,
+                                                    headline="John's second test",
+                                                    pub_date=datetime(2011, 5, 7),
+                                                    reporter_id=self.r.id)
+        self.assertTrue(created)
+        self.assertEqual(a2.reporter.id, self.r.id)
+
+        # You can specify filters containing the explicit FK value.
+        self.assertQuerysetEqual(
+            Article.objects.filter(reporter_id__exact=self.r.id),
+            [
+                "<Article: John's second test>",
+                "<Article: This is a test>",
+            ])
+
+        # Create an Article by Paul for the same date.
+        a3 = Article.objects.create(id=None, headline="Paul's commentary",
+                                    pub_date=datetime(2011, 5, 7),
+                                    reporter_id=self.r2.id)
+        self.assertEqual(a3.reporter.id, self.r2.id)
+
+        # Get should respect explicit foreign keys as well.
+        self.assertRaises(MultipleObjectsReturned,
+                          Article.objects.get, reporter_id=self.r.id)
+        self.assertEqual(repr(a3),
+                         repr(Article.objects.get(reporter_id=self.r2.id,
+                                             pub_date=datetime(2011, 5, 7))))
