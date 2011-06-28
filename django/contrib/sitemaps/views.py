@@ -5,7 +5,8 @@ from django.core import urlresolvers
 from django.utils.encoding import smart_str
 from django.core.paginator import EmptyPage, PageNotAnInteger
 
-def index(request, sitemaps, template_name='sitemap_index.xml'):
+def index(request, sitemaps,
+        template_name='sitemap_index.xml', mimetype='application/xml'):
     current_site = get_current_site(request)
     sites = []
     protocol = request.is_secure() and 'https' or 'http'
@@ -21,9 +22,10 @@ def index(request, sitemaps, template_name='sitemap_index.xml'):
             for page in range(2, pages+1):
                 sites.append('%s://%s%s?p=%s' % (protocol, current_site.domain, sitemap_url, page))
     xml = loader.render_to_string(template_name, {'sitemaps': sites})
-    return HttpResponse(xml, mimetype='application/xml')
+    return HttpResponse(xml, mimetype=mimetype)
 
-def sitemap(request, sitemaps, section=None, template_name='sitemap.xml'):
+def sitemap(request, sitemaps, section=None,
+        template_name='sitemap.xml', mimetype='application/xml'):
     maps, urls = [], []
     if section is not None:
         if section not in sitemaps:
@@ -43,4 +45,4 @@ def sitemap(request, sitemaps, section=None, template_name='sitemap.xml'):
         except PageNotAnInteger:
             raise Http404("No page '%s'" % page)
     xml = smart_str(loader.render_to_string(template_name, {'urlset': urls}))
-    return HttpResponse(xml, mimetype='application/xml')
+    return HttpResponse(xml, mimetype=mimetype)
