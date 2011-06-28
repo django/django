@@ -15,6 +15,5 @@ from django.contrib.auth.tests.signals import SignalTestCase
 from django.contrib.auth.tests.tokens import TokenGeneratorTest
 from django.contrib.auth.tests.views import (PasswordResetTest,
     ChangePasswordTest, LoginTest, LogoutTest, LoginURLSettings)
-from django.contrib.auth.tests.permissions import TestAuthPermissions
 
 # The password for the fixture data users is 'password'
