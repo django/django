@@ -20,6 +20,7 @@ from localflavor.id import IDLocalFlavorTests
 from localflavor.ie import IELocalFlavorTests
 from localflavor.il import ILLocalFlavorTests
 from localflavor.is_ import ISLocalFlavorTests
+from localflavor.in_ import INLocalFlavorTests
 from localflavor.it import ITLocalFlavorTests
 from localflavor.jp import JPLocalFlavorTests
 from localflavor.kw import KWLocalFlavorTests
