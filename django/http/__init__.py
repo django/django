@@ -28,8 +28,11 @@ _morsel_supports_httponly = Cookie.Morsel._reserved.has_key('httponly')
 _cookie_encodes_correctly = Cookie.SimpleCookie().value_encode(';') == (';', '"\\073"')
 # See ticket #13007, http://bugs.python.org/issue2193 and http://trac.edgewall.org/ticket/2256
 _tc = Cookie.SimpleCookie()
-_tc.load('f:oo')
-_cookie_allows_colon_in_names = 'Set-Cookie: f:oo=' in _tc.output()
+try:
+    _tc.load('foo:bar=1')
+    _cookie_allows_colon_in_names = True
+except Cookie.CookieError:
+    _cookie_allows_colon_in_names = False
 
 if _morsel_supports_httponly and _cookie_encodes_correctly and _cookie_allows_colon_in_names:
     SimpleCookie = Cookie.SimpleCookie
@@ -89,19 +92,16 @@ else:
                 return val, encoded
 
         if not _cookie_allows_colon_in_names:
-            def load(self, rawdata, ignore_parse_errors=False):
-                if ignore_parse_errors:
-                    self.bad_cookies = set()
-                    self._BaseCookie__set = self._loose_set
+            def load(self, rawdata):
+                self.bad_cookies = set()
                 super(SimpleCookie, self).load(rawdata)
-                if ignore_parse_errors:
-                    self._BaseCookie__set = self._strict_set
-                    for key in self.bad_cookies:
-                        del self[key]
+                for key in self.bad_cookies:
+                    del self[key]
 
             _strict_set = Cookie.BaseCookie._BaseCookie__set
 
-            def _loose_set(self, key, real_value, coded_value):
+            # override private __set() method:
+            def _BaseCookie__set(self, key, real_value, coded_value):
                 try:
                     self._strict_set(key, real_value, coded_value)
                 except Cookie.CookieError:
@@ -519,7 +519,7 @@ def parse_cookie(cookie):
     if not isinstance(cookie, Cookie.BaseCookie):
         try:
             c = SimpleCookie()
-            c.load(cookie, ignore_parse_errors=True)
+            c.load(cookie)
         except Cookie.CookieError:
             # Invalid cookie
             return {}
