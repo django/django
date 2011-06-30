@@ -8,15 +8,16 @@ import tempfile
 from StringIO import StringIO
 
 from django.conf import settings
-from django.contrib.staticfiles import finders, storage
 from django.core.exceptions import ImproperlyConfigured
 from django.core.files.storage import default_storage
 from django.core.management import call_command
 from django.test import TestCase
+from django.test.utils import override_settings
 from django.utils.encoding import smart_unicode
 from django.utils.functional import empty
 from django.utils._os import rmtree_errorhandler
 
+from django.contrib.staticfiles import finders, storage
 
 TEST_ROOT = os.path.dirname(__file__)
 
@@ -26,31 +27,6 @@ class StaticFilesTestCase(TestCase):
     Test case with a couple utility assertions.
     """
     def setUp(self):
-        self.old_static_url = settings.STATIC_URL
-        self.old_static_root = settings.STATIC_ROOT
-        self.old_staticfiles_dirs = settings.STATICFILES_DIRS
-        self.old_staticfiles_finders = settings.STATICFILES_FINDERS
-        self.old_media_root = settings.MEDIA_ROOT
-        self.old_media_url = settings.MEDIA_URL
-        self.old_admin_media_prefix = settings.ADMIN_MEDIA_PREFIX
-        self.old_debug = settings.DEBUG
-
-        site_media = os.path.join(TEST_ROOT, 'project', 'site_media')
-        settings.DEBUG = True
-        settings.MEDIA_ROOT =  os.path.join(site_media, 'media')
-        settings.MEDIA_URL = '/media/'
-        settings.STATIC_ROOT = os.path.join(site_media, 'static')
-        settings.STATIC_URL = '/static/'
-        settings.ADMIN_MEDIA_PREFIX = '/static/admin/'
-        settings.STATICFILES_DIRS = (
-            os.path.join(TEST_ROOT, 'project', 'documents'),
-        )
-        settings.STATICFILES_FINDERS = (
-            'django.contrib.staticfiles.finders.FileSystemFinder',
-            'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-            'django.contrib.staticfiles.finders.DefaultStorageFinder',
-        )
-
         # Clear the cached default_storage out, this is because when it first
         # gets accessed (by some other test), it evaluates settings.MEDIA_ROOT,
         # since we're planning on changing that we need to clear out the cache.
@@ -58,25 +34,14 @@ class StaticFilesTestCase(TestCase):
 
         # To make sure SVN doesn't hangs itself with the non-ASCII characters
         # during checkout, we actually create one file dynamically.
-        self._nonascii_filepath = os.path.join(
+        _nonascii_filepath = os.path.join(
             TEST_ROOT, 'apps', 'test', 'static', 'test', u'fi\u015fier.txt')
-        f = codecs.open(self._nonascii_filepath, 'w', 'utf-8')
+        f = codecs.open(_nonascii_filepath, 'w', 'utf-8')
         try:
             f.write(u"fi\u015fier in the app dir")
         finally:
             f.close()
-
-    def tearDown(self):
-        settings.DEBUG = self.old_debug
-        settings.MEDIA_ROOT = self.old_media_root
-        settings.MEDIA_URL = self.old_media_url
-        settings.ADMIN_MEDIA_PREFIX = self.old_admin_media_prefix
-        settings.STATIC_ROOT = self.old_static_root
-        settings.STATIC_URL = self.old_static_url
-        settings.STATICFILES_DIRS = self.old_staticfiles_dirs
-        settings.STATICFILES_FINDERS = self.old_staticfiles_finders
-        if os.path.exists(self._nonascii_filepath):
-            os.unlink(self._nonascii_filepath)
+        self.addCleanup(os.unlink, _nonascii_filepath)
 
     def assertFileContains(self, filepath, text):
         self.assertTrue(text in self._get_file(smart_unicode(filepath)),
@@ -84,6 +49,20 @@ class StaticFilesTestCase(TestCase):
 
     def assertFileNotFound(self, filepath):
         self.assertRaises(IOError, self._get_file, filepath)
+
+StaticFilesTestCase = override_settings(
+    DEBUG = True,
+    MEDIA_URL = '/media/',
+    STATIC_URL = '/static/',
+    MEDIA_ROOT =  os.path.join(TEST_ROOT, 'project', 'site_media', 'media'),
+    STATIC_ROOT = os.path.join(TEST_ROOT, 'project', 'site_media', 'static'),
+    STATICFILES_DIRS = (os.path.join(TEST_ROOT, 'project', 'documents'),),
+    STATICFILES_FINDERS = (
+        'django.contrib.staticfiles.finders.FileSystemFinder',
+        'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+        'django.contrib.staticfiles.finders.DefaultStorageFinder',
+    ),
+)(StaticFilesTestCase)
 
 
 class BuildStaticTestCase(StaticFilesTestCase):
@@ -100,11 +79,11 @@ class BuildStaticTestCase(StaticFilesTestCase):
         self.old_root = settings.STATIC_ROOT
         settings.STATIC_ROOT = tempfile.mkdtemp()
         self.run_collectstatic()
+        # Use our own error handler that can handle .svn dirs on Windows
+        self.addCleanup(shutil.rmtree, settings.STATIC_ROOT,
+                        ignore_errors=True, onerror=rmtree_errorhandler)
 
     def tearDown(self):
-        # Use our own error handler that can handle .svn dirs on Windows
-        shutil.rmtree(settings.STATIC_ROOT, ignore_errors=True,
-                      onerror=rmtree_errorhandler)
         settings.STATIC_ROOT = self.old_root
         super(BuildStaticTestCase, self).tearDown()
 
@@ -120,6 +99,7 @@ class BuildStaticTestCase(StaticFilesTestCase):
             return f.read()
         finally:
             f.close()
+
 
 
 class TestDefaults(object):
@@ -258,14 +238,11 @@ class TestBuildStaticNonLocalStorage(BuildStaticTestCase, TestNoFilesCreated):
     """
     Tests for #15035
     """
-    def setUp(self):
-        self.old_staticfiles_storage = settings.STATICFILES_STORAGE
-        settings.STATICFILES_STORAGE = 'regressiontests.staticfiles_tests.storage.DummyStorage'
-        super(TestBuildStaticNonLocalStorage, self).setUp()
+    pass
 
-    def tearDown(self):
-        super(TestBuildStaticNonLocalStorage, self).tearDown()
-        settings.STATICFILES_STORAGE = self.old_staticfiles_storage
+TestBuildStaticNonLocalStorage = override_settings(
+    STATICFILES_STORAGE='regressiontests.staticfiles_tests.storage.DummyStorage',
+)(TestBuildStaticNonLocalStorage)
 
 
 if sys.platform != 'win32':
@@ -336,7 +313,7 @@ class TestServeAdminMedia(TestServeStatic):
     """
     def _response(self, filepath):
         return self.client.get(
-            posixpath.join(settings.ADMIN_MEDIA_PREFIX, filepath))
+            posixpath.join(settings.STATIC_URL, 'admin/', filepath))
 
     def test_serve_admin_media(self):
         self.assertFileContains('css/base.css', 'body')
@@ -423,12 +400,9 @@ class TestStaticfilesDirsType(TestCase):
     We can't determine if STATICFILES_DIRS is set correctly just by looking at
     the type, but we can determine if it's definitely wrong.
     """
-    def setUp(self):
-        self.old_settings_dir = settings.STATICFILES_DIRS
-        settings.STATICFILES_DIRS = 'a string'
-
-    def tearDown(self):
-        settings.STATICFILES_DIRS = self.old_settings_dir
-
     def test_non_tuple_raises_exception(self):
         self.assertRaises(ImproperlyConfigured, finders.FileSystemFinder)
+
+TestStaticfilesDirsType = override_settings(
+    STATICFILES_DIRS = 'a string',
+)(TestStaticfilesDirsType)

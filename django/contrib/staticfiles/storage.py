@@ -43,14 +43,7 @@ class AppStaticStorage(FileSystemStorage):
         Returns a static file storage if available in the given app.
         """
         # app is the actual app module
-        self.app_module = app
-        # We special case the admin app here since it has its static files
-        # in 'media' for historic reasons.
-        if self.app_module == 'django.contrib.admin':
-            self.prefix = 'admin'
-            self.source_dir = 'media'
-        mod = import_module(self.app_module)
+        mod = import_module(app)
         mod_path = os.path.dirname(mod.__file__)
         location = os.path.join(mod_path, self.source_dir)
         super(AppStaticStorage, self).__init__(location, *args, **kwargs)
-

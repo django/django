@@ -183,18 +183,34 @@ To see how that works, and to read more details, check out
 With a template tag
 -------------------
 
-The second option is the :ttag:`get_static_prefix` template tag. You can
-use this if you're not using :class:`~django.template.RequestContext`, or if you
-need more control over exactly where and how :setting:`STATIC_URL` is
-injected into the template. Here's an example:
+To easily link to static files Django ships with a :ttag:`static` template tag.
+
+.. code-block:: html+django
+
+    {% load static %}
+    <img src="{% static "images/hi.jpg" %}" />
+
+It is also able to consume standard context variables, e.g. assuming a
+``user_stylesheet`` variable is passed to the template:
+
+.. code-block:: html+django
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static user_stylesheet %}" type="text/css" media="screen" />
+
+Another option is the :ttag:`get_static_prefix` template tag. You can use
+this if you're not using :class:`~django.template.RequestContext` (and
+therefore not relying on the ``django.core.context_processors.static``
+context processor), or if you need more control over exactly where and how
+:setting:`STATIC_URL` is injected into the template. Here's an example:
 
 .. code-block:: html+django
 
     {% load static %}
     <img src="{% get_static_prefix %}images/hi.jpg" />
 
-There's also a second form you can use to avoid extra processing if you need the
-value multiple times:
+There's also a second form you can use to avoid extra processing if you need
+the value multiple times:
 
 .. code-block:: html+django
 

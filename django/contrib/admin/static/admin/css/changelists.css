@@ -20,7 +20,7 @@
 }
 
 .change-list .filtered {
-    background: white url(../img/admin/changelist-bg.gif) top right repeat-y !important;
+    background: white url(../img/changelist-bg.gif) top right repeat-y !important;
 }
 
 .change-list .filtered .results, .change-list .filtered .paginator, .filtered #toolbar, .filtered div.xfull {
@@ -40,7 +40,7 @@
     color: #666;
     border-top: 1px solid #eee;
     border-bottom: 1px solid #eee;
-    background: white url(../img/admin/nav-bg.gif) 0 180% repeat-x;
+    background: white url(../img/nav-bg.gif) 0 180% repeat-x;
     overflow: hidden;
 }
 
@@ -82,7 +82,7 @@
 #changelist #toolbar {
     padding: 3px;
     border-bottom: 1px solid #ddd;
-    background: #e1e1e1 url(../img/admin/nav-bg.gif) top left repeat-x;
+    background: #e1e1e1 url(../img/nav-bg.gif) top left repeat-x;
     color: #666;
 }
 
@@ -156,7 +156,7 @@
 
 .change-list ul.toplinks {
     display: block;
-    background: white url(../img/admin/nav-bg-reverse.gif) 0 -10px repeat-x;
+    background: white url(../img/nav-bg-reverse.gif) 0 -10px repeat-x;
     border-top: 1px solid white;
     float: left;
     padding: 0 !important;
@@ -246,7 +246,7 @@
     padding: 3px;
     border-top: 1px solid #fff;
     border-bottom: 1px solid #ddd;
-    background: white url(../img/admin/nav-bg-reverse.gif) 0 -10px repeat-x;
+    background: white url(../img/nav-bg-reverse.gif) 0 -10px repeat-x;
 }
 
 #changelist .actions.selected {

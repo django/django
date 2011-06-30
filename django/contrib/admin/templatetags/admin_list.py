@@ -6,6 +6,7 @@ from django.contrib.admin.views.main import (ALL_VAR, EMPTY_CHANGELIST_VALUE,
     ORDER_VAR, ORDER_TYPE_VAR, PAGE_VAR, SEARCH_VAR)
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
+from django.templatetags.static import static
 from django.utils import formats
 from django.utils.datastructures import SortedDict
 from django.utils.html import escape, conditional_escape
@@ -154,9 +155,9 @@ def result_headers(cl):
         }
 
 def _boolean_icon(field_val):
-    BOOLEAN_MAPPING = {True: 'yes', False: 'no', None: 'unknown'}
-    return mark_safe(u'<img src="%simg/admin/icon-%s.gif" alt="%s" />' %
-        (settings.ADMIN_MEDIA_PREFIX, BOOLEAN_MAPPING[field_val], field_val))
+    icon_url = static('admin/img/icon-%s.gif' %
+                      {True: 'yes', False: 'no', None: 'unknown'}[field_val])
+    return mark_safe(u'<img src="%s" alt="%s" />' % (icon_url, field_val))
 
 def items_for_result(cl, result, form):
     """

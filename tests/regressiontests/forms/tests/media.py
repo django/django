@@ -1,19 +1,13 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings
 from django.forms import TextInput, Media, TextInput, CharField, Form, MultiWidget
-from django.utils.unittest import TestCase
+from django.test import TestCase
+from django.test.utils import override_settings
+from django.template import Template, Context
 
 
 class FormsMediaTestCase(TestCase):
-    # Tests for the media handling on widgets and forms
-    def setUp(self):
-        super(FormsMediaTestCase, self).setUp()
-        self.original_media_url = settings.MEDIA_URL
-        settings.MEDIA_URL = 'http://media.example.com/media/'
-
-    def tearDown(self):
-        settings.MEDIA_URL = self.original_media_url
-        super(FormsMediaTestCase, self).tearDown()
+    """Tests for the media handling on widgets and forms"""
 
     def test_construction(self):
         # Check construction of media objects
@@ -449,7 +443,6 @@ class FormsMediaTestCase(TestCase):
 <script type="text/javascript" src="/some/form/javascript"></script>""")
 
         # Media works in templates
-        from django.template import Template, Context
         self.assertEqual(Template("{{ form.media.js }}{{ form.media.css }}").render(Context({'form': f3})), """<script type="text/javascript" src="/path/to/js1"></script>
 <script type="text/javascript" src="http://media.other.com/path/to/js2"></script>
 <script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>
@@ -459,20 +452,14 @@ class FormsMediaTestCase(TestCase):
 <link href="/path/to/css3" type="text/css" media="all" rel="stylesheet" />
 <link href="/some/form/css" type="text/css" media="all" rel="stylesheet" />""")
 
+FormsMediaTestCase = override_settings(
+    STATIC_URL=None,
+    MEDIA_URL='http://media.example.com/media/',
+)(FormsMediaTestCase)
+
 
 class StaticFormsMediaTestCase(TestCase):
-    # Tests for the media handling on widgets and forms
-    def setUp(self):
-        super(StaticFormsMediaTestCase, self).setUp()
-        self.original_media_url = settings.MEDIA_URL
-        self.original_static_url = settings.STATIC_URL
-        settings.MEDIA_URL = 'http://media.example.com/static/'
-        settings.STATIC_URL = 'http://media.example.com/static/'
-
-    def tearDown(self):
-        settings.MEDIA_URL = self.original_media_url
-        settings.STATIC_URL = self.original_static_url
-        super(StaticFormsMediaTestCase, self).tearDown()
+    """Tests for the media handling on widgets and forms"""
 
     def test_construction(self):
         # Check construction of media objects
@@ -908,7 +895,6 @@ class StaticFormsMediaTestCase(TestCase):
 <script type="text/javascript" src="/some/form/javascript"></script>""")
 
         # Media works in templates
-        from django.template import Template, Context
         self.assertEqual(Template("{{ form.media.js }}{{ form.media.css }}").render(Context({'form': f3})), """<script type="text/javascript" src="/path/to/js1"></script>
 <script type="text/javascript" src="http://media.other.com/path/to/js2"></script>
 <script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>
@@ -918,3 +904,8 @@ class StaticFormsMediaTestCase(TestCase):
 <link href="/path/to/css3" type="text/css" media="all" rel="stylesheet" />
 <link href="/some/form/css" type="text/css" media="all" rel="stylesheet" />""")
 
+
+StaticFormsMediaTestCase = override_settings(
+    STATIC_URL='http://media.example.com/static/',
+    MEDIA_URL='http://media.example.com/media/',
+)(StaticFormsMediaTestCase)

@@ -228,42 +228,23 @@ Example usage::
 Other Helpers
 =============
 
-The ``static`` context processor
---------------------------------
+There are a few other helpers outside of the
+:mod:`staticfiles <django.contrib.staticfiles>` app to work with static
+files:
 
-.. function:: django.core.context_processors.static
+    - The :func:`django.core.context_processors.static` context processor
+      which adds :setting:`STATIC_URL` to every template context rendered
+      with :class:`~django.template.RequestContext` contexts.
 
-This context processor adds the :setting:`STATIC_URL` into each template
-context as the variable ``{{ STATIC_URL }}``. To use it, make sure that
-``'django.core.context_processors.static'`` appears somewhere in your
-:setting:`TEMPLATE_CONTEXT_PROCESSORS` setting.
+    - The builtin template tag :ttag:`static` which takes a path and
+      joins it with the the static prefix :setting:`STATIC_URL`.
 
-Remember, only templates rendered with :class:`~django.template.RequestContext`
-will have acces to the data provided by this (and any) context processor.
+    - The builtin template tag :ttag:`get_static_prefix` which populates a
+      template variable with the static prefix :setting:`STATIC_URL` to be
+      used as a variable or directly.
 
-.. templatetag:: get_static_prefix
-
-The ``get_static_prefix`` templatetag
-=====================================
-
-.. highlight:: html+django
-
-If you're not using :class:`~django.template.RequestContext`, or if you need
-more control over exactly where and how :setting:`STATIC_URL` is injected
-into the template, you can use the :ttag:`get_static_prefix` template tag
-instead::
-
-    {% load static %}
-    <img src="{% get_static_prefix %}images/hi.jpg" />
-
-There's also a second form you can use to avoid extra processing if you need
-the value multiple times::
-
-    {% load static %}
-    {% get_static_prefix as STATIC_PREFIX %}
-
-    <img src="{{ STATIC_PREFIX }}images/hi.jpg" />
-    <img src="{{ STATIC_PREFIX }}images/hi2.jpg" />
+    - The similar template tag :ttag:`get_media_prefix` which works like
+      :ttag:`get_static_prefix` but uses :setting:`MEDIA_URL`.
 
 .. _staticfiles-development-view:
 

@@ -140,7 +140,7 @@ fieldset.collapsed h2, fieldset.collapsed {
 }
 
 fieldset.collapsed h2 {
-    background-image: url(../img/admin/nav-bg.gif);
+    background-image: url(../img/nav-bg.gif);
     background-position: bottom left;
     color: #999;
 }
@@ -161,7 +161,7 @@ fieldset.monospace textarea {
 .submit-row {
     padding: 5px 7px;
     text-align: right;
-    background: white url(../img/admin/nav-bg.gif) 0 100% repeat-x;
+    background: white url(../img/nav-bg.gif) 0 100% repeat-x;
     border: 1px solid #ccc;
     margin: 5px 0;
     overflow: hidden;
@@ -184,7 +184,7 @@ body.popup .submit-row {
 }
 
 .submit-row .deletelink {
-    background: url(../img/admin/icon_deletelink.gif) 0 50% no-repeat;
+    background: url(../img/icon_deletelink.gif) 0 50% no-repeat;
     padding-left: 14px;
 }
 
@@ -251,7 +251,7 @@ body.popup .submit-row {
     color: #666;
     padding: 3px 5px;
     font-size: 11px;
-    background: #e1e1e1 url(../img/admin/nav-bg.gif) top left repeat-x;
+    background: #e1e1e1 url(../img/nav-bg.gif) top left repeat-x;
     border-bottom: 1px solid #ddd;
 }
 
@@ -336,7 +336,7 @@ body.popup .submit-row {
     color: #666;
     padding: 3px 5px;
     border-bottom: 1px solid #ddd;
-    background: #e1e1e1 url(../img/admin/nav-bg.gif) top left repeat-x;
+    background: #e1e1e1 url(../img/nav-bg.gif) top left repeat-x;
 }
 
 .inline-group .tabular tr.add-row td {
@@ -347,7 +347,7 @@ body.popup .submit-row {
 .inline-group ul.tools a.add,
 .inline-group div.add-row a,
 .inline-group .tabular tr.add-row td a {
-    background: url(../img/admin/icon_addlink.gif) 0 50% no-repeat;
+    background: url(../img/icon_addlink.gif) 0 50% no-repeat;
     padding-left: 14px;
     font-size: 11px;
     outline: 0; /* Remove dotted border around link */

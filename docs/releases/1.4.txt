@@ -212,6 +212,42 @@ Django 1.4 also includes several smaller improvements worth noting:
 Backwards incompatible changes in 1.4
 =====================================
 
+django.contrib.admin
+~~~~~~~~~~~~~~~~~~~~
+
+The included administration app ``django.contrib.admin`` has for a long time
+shipped with a default set of static files such as JavaScript, images and
+stylesheets. Django 1.3 added a new contrib app ``django.contrib.staticfiles``
+to handle such files in a generic way and defined conventions for static
+files included in apps.
+
+Starting in Django 1.4 the admin's static files are now also following this
+convention to make it easier to deploy the included files. In previous
+versions of Django, it was also common to define a ``ADMIN_MEDIA_PREFIX``
+setting to point to the URL where the admin's static files are served by a
+web server. This setting has now been deprecated and replaced by the more
+general setting :setting:`STATIC_URL`. Django will now expect to find the
+admin static files under the URL ``<STATIC_URL>/admin/``.
+
+If you've previously used a URL path for ``ADMIN_MEDIA_PREFIX`` (e.g.
+``/media/``) simply make sure :setting:`STATIC_URL` and :setting:`STATIC_ROOT`
+are configured and your web server serves the files correctly. The development
+server continues to serve the admin files just like before. Don't hesitate to
+consult the :doc:`static files howto </howto/static-files>` for further
+details.
+
+In case your ``ADMIN_MEDIA_PREFIX`` is set to an own domain (e.g.
+``http://media.example.com/admin/``) make sure to also set your
+:setting:`STATIC_URL` setting to the correct URL, for example
+``http://media.example.com/``.
+
+.. warning::
+
+    If you're implicitely relying on the path of the admin static files on
+    your server's file system when you deploy your site, you have to update
+    that path. The files were moved from :file:`django/contrib/admin/media/`
+    to :file:`django/contrib/admin/static/admin/`.
+
 Compatibility with old signed data
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -1,15 +1,16 @@
 {% block extrastyle %}
+{% load static %}
 <style type="text/css">
   #{{ id }}_map { width: {{ map_width }}px; height: {{ map_height }}px; }
   #{{ id }}_map .aligned label { float:inherit; }
   #{{ id }}_admin_map { position: relative; vertical-align: top; float: {{ LANGUAGE_BIDI|yesno:"right,left" }}; }
   {% if not display_wkt %}#{{ id }} { display: none; }{% endif %}
   .olControlEditingToolbar .olControlModifyFeatureItemActive { 
-     background-image: url("{{ ADMIN_MEDIA_PREFIX }}img/gis/move_vertex_on.png");
+     background-image: url("{% static "admin/img/gis/move_vertex_on.png" %}");
      background-repeat: no-repeat;
   }
   .olControlEditingToolbar .olControlModifyFeatureItemInactive { 
-     background-image: url("{{ ADMIN_MEDIA_PREFIX }}img/gis/move_vertex_off.png");
+     background-image: url("{% static "admin/img/gis/move_vertex_off.png" %}");
      background-repeat: no-repeat;
   }
 </style>

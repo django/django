@@ -1,3 +1,4 @@
+from urlparse import urljoin
 from django import template
 from django.utils.encoding import iri_to_uri
 
@@ -68,7 +69,7 @@ def get_static_prefix(parser, token):
 @register.tag
 def get_media_prefix(parser, token):
     """
-    Populates a template variable with the static prefix,
+    Populates a template variable with the media prefix,
     ``settings.MEDIA_URL``.
 
     Usage::
@@ -82,3 +83,20 @@ def get_media_prefix(parser, token):
 
     """
     return PrefixNode.handle_token(parser, token, "MEDIA_URL")
+
+@register.simple_tag
+def static(path):
+    """
+    Joins the given path with the STATIC_URL setting.
+
+    Usage::
+
+        {% static path %}
+
+    Examples::
+
+        {% static "myapp/css/base.css" %}
+        {% static variable_with_path %}
+
+    """
+    return urljoin(PrefixNode.handle_simple("STATIC_URL"), path)

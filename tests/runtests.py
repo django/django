@@ -106,11 +106,13 @@ def setup(verbosity, test_labels):
         'LOGIN_URL': settings.LOGIN_URL,
         'LANGUAGE_CODE': settings.LANGUAGE_CODE,
         'MIDDLEWARE_CLASSES': settings.MIDDLEWARE_CLASSES,
+        'STATIC_URL': settings.STATIC_URL,
     }
 
     # Redirect some settings for the duration of these tests.
     settings.INSTALLED_APPS = ALWAYS_INSTALLED_APPS
     settings.ROOT_URLCONF = 'urls'
+    settings.STATIC_URL = '/static/'
     settings.TEMPLATE_DIRS = (os.path.join(os.path.dirname(__file__), TEST_TEMPLATE_DIR),)
     settings.USE_I18N = True
     settings.LANGUAGE_CODE = 'en'

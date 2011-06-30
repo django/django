@@ -1,5 +1,4 @@
-{% load adminmedia %}
-{% load i18n %}
+{% load i18n static %}
 {% if result_hidden_fields %}
 <div class="hiddenfields">{# DIV for HTML validation #}
 {% for item in result_hidden_fields %}{{ item }}{% endfor %}
@@ -16,7 +15,7 @@
   <span class="text">{{ header.text|capfirst }}</span>
   {% if header.sortable %}
     {% if header.sort_pos > 0 %}<span class="sortpos">
-      {% if header.sort_pos == 1 %}<img id="primary-sort-icon" src="{% admin_media_prefix %}img/admin/icon_cog.gif" alt="" />&nbsp;{% endif %}
+      {% if header.sort_pos == 1 %}<img id="primary-sort-icon" src="{% static "admin/img/icon_cog.gif" %}" alt="" />&nbsp;{% endif %}
       {{ header.sort_pos }}</span>
     {% endif %}
     <span class="clear"></span></a>

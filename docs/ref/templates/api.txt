@@ -479,6 +479,8 @@ value of the :setting:`MEDIA_URL` setting.
 django.core.context_processors.static
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. function:: django.core.context_processors.static
+
 .. versionadded:: 1.3
 
 If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
