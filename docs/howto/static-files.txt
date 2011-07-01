@@ -353,7 +353,7 @@ serving your site, the basic outline gets modified to look something like:
     * On the server, run :djadmin:`collectstatic` to copy all the static files
       into :setting:`STATIC_ROOT`.
     * Point your web server at :setting:`STATIC_ROOT`. For example, here's
-      :ref:`how to do this under Apache and mod_wsgi <serving-media-files>`.
+      :ref:`how to do this under Apache and mod_wsgi <serving-files>`.
 
 You'll probably want to automate this process, especially if you've got
 multiple web servers. There's any number of ways to do this automation, but
