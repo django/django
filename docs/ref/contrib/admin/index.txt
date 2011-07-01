@@ -46,8 +46,8 @@ Other topics
 
 .. seealso::
 
-    For information about serving the media files (images, JavaScript, and CSS)
-    associated with the admin in production, see :ref:`serving-media-files`.
+    For information about serving the static files (images, JavaScript, and
+    CSS) associated with the admin in production, see :ref:`serving-files`.
 
 ``ModelAdmin`` objects
 ======================
