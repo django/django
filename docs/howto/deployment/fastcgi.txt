@@ -225,6 +225,23 @@ This is probably the most common case, if you're using Django's admin site:
 Django will automatically use the pre-rewrite version of the URL when
 constructing URLs with the ``{% url %}`` template tag (and similar methods).
 
+Using mod_fcgid as alternative to mod_fastcgi
+----------------------------------------------
+
+Another way to serve applications through FastCGI is by using Apache's
+`mod_fcgid`_ module. Compared to mod_fastcgi mod_fcgid handles FastCGI
+applications differently in that it manages the spawning of worker processes
+by itself and doesn't offer something like ``FastCGIExternalServer``. This
+means that the configuration looks slightly different.
+
+In effect, you have to go the way of adding a script handler similar to what
+is described later on regarding running Django in a :ref:`shared-hosting
+environment <apache_shared_hosting>`. For further details please refer to the
+`mod_fcgid reference`_
+
+.. _mod_fcgid: http://httpd.apache.org/mod_fcgid/
+.. _mod_Fcgid reference: http://httpd.apache.org/mod_fcgid/mod/mod_fcgid.html
+
 lighttpd setup
 ==============
 
@@ -306,6 +323,8 @@ The Cherokee project provides a documentation to `setting up Django`_ with Chero
 
 .. _setting up Django: http://www.cherokee-project.com/doc/cookbook_django.html
 
+.. _apache_shared_hosting:
+
 Running Django on a shared-hosting provider with Apache
 =======================================================
 
@@ -348,6 +367,18 @@ be sure to make it executable:
 
     from django.core.servers.fastcgi import runfastcgi
     runfastcgi(method="threaded", daemonize="false")
+
+This works if your server uses mod_fastcgi. If, on the other hand, you are
+using mod_fcgid the setup is mostly the same except for a slight change in the
+``.htaccess`` file. Instead of adding a fastcgi-script handler, you have to
+add a fcgid-handler:
+
+.. code-block:: apache
+
+    AddHandler fcgid-script .fcgi
+    RewriteEngine On
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^(.*)$ mysite.fcgi/$1 [QSA,L]
 
 Restarting the spawned server
 -----------------------------
