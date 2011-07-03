@@ -4,7 +4,6 @@
 This example exists purely to point out errors in models.
 """
 
-from django.contrib.contenttypes import generic
 from django.db import models
 
 class FieldErrors(models.Model):
@@ -219,21 +218,6 @@ class InvalidSetNull(models.Model):
 class InvalidSetDefault(models.Model):
     fk = models.ForeignKey('self', on_delete=models.SET_DEFAULT)
 
-class Tag(models.Model):
-   name = models.CharField("name", max_length=20)
-
-class TaggedObject(models.Model):
-   object_id = models.PositiveIntegerField("Object ID")
-   tag = models.ForeignKey(Tag)
-   content_object = generic.GenericForeignKey()
-
-class UserTaggedObject(models.Model):
-   object_tag = models.ForeignKey(TaggedObject)
-
-class ArticleAttachment(models.Model):
-   tags = generic.GenericRelation(TaggedObject)
-   user_tags = generic.GenericRelation(UserTaggedObject)
-
 model_errors = """invalid_models.fielderrors: "charfield": CharFields require a "max_length" attribute that is a positive integer.
 invalid_models.fielderrors: "charfield2": CharFields require a "max_length" attribute that is a positive integer.
 invalid_models.fielderrors: "charfield3": CharFields require a "max_length" attribute that is a positive integer.
@@ -343,5 +327,4 @@ invalid_models.nonuniquefktarget2: Field 'bad' under model 'FKTarget' must have 
 invalid_models.nonexistingorderingwithsingleunderscore: "ordering" refers to "does_not_exist", a field that doesn't exist.
 invalid_models.invalidsetnull: 'fk' specifies on_delete=SET_NULL, but cannot be null.
 invalid_models.invalidsetdefault: 'fk' specifies on_delete=SET_DEFAULT, but has no default value.
-invalid_models.articleattachment: Model 'UserTaggedObject' must have a GenericForeignKey in order to create a GenericRelation that points to it.
 """
