@@ -635,3 +635,24 @@ class SMTPBackendTests(BaseEmailBackendTests, TestCase):
 
     def get_mailbox_content(self):
         return self.server.get_sink()
+
+    @override_settings(EMAIL_HOST_USER="not empty username",
+                        EMAIL_HOST_PASSWORD="not empty password")
+    def test_email_authentication_use_settings(self):
+        backend = smtp.EmailBackend()
+        self.assertEqual(backend.username, 'not empty username')
+        self.assertEqual(backend.password, 'not empty password')
+
+    @override_settings(EMAIL_HOST_USER="not empty username",
+                        EMAIL_HOST_PASSWORD="not empty password")
+    def test_email_authentication_override_settings(self):
+        backend = smtp.EmailBackend(username='username', password='password')
+        self.assertEqual(backend.username, 'username')
+        self.assertEqual(backend.password, 'password')
+
+    @override_settings(EMAIL_HOST_USER="not empty username",
+                        EMAIL_HOST_PASSWORD="not empty password")
+    def test_email_disabled_authentication(self):
+        backend = smtp.EmailBackend(username='', password='')
+        self.assertEqual(backend.username, '')
+        self.assertEqual(backend.password, '')

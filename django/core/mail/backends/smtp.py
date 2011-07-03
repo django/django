@@ -18,8 +18,14 @@ class EmailBackend(BaseEmailBackend):
         super(EmailBackend, self).__init__(fail_silently=fail_silently)
         self.host = host or settings.EMAIL_HOST
         self.port = port or settings.EMAIL_PORT
-        self.username = username or settings.EMAIL_HOST_USER
-        self.password = password or settings.EMAIL_HOST_PASSWORD
+        if username is None:
+            self.username = settings.EMAIL_HOST_USER
+        else:
+            self.username = username
+        if password is None:
+            self.password = settings.EMAIL_HOST_PASSWORD
+        else:
+            self.password = password
         if use_tls is None:
             self.use_tls = settings.EMAIL_USE_TLS
         else:
