@@ -81,7 +81,8 @@ class FlexibleDatePost(models.Model):
 
 class UniqueErrorsModel(models.Model):
     name = models.CharField(max_length=100, unique=True, error_messages={'unique': u'Custom unique name message.'})
-    number = models.IntegerField(unique=True, error_messages={'unique': u'Custom unique number message.'})
+    #number = models.IntegerField(unique=True, error_messages={'unique': u'Custom unique number message.'})
+    no = models.IntegerField(unique=True, error_messages={'unique': u'Custom unique number message.'})
 
 class GenericIPAddressTestModel(models.Model):
     generic_ip = models.GenericIPAddressField(blank=True, null=True, unique=True)

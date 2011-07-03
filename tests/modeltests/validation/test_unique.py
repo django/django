@@ -135,14 +135,14 @@ class PerformUniqueChecksTest(TestCase):
             self.fail("unique_for_month checks shouldn't trigger when the associated DateField is None.")
 
     def test_unique_errors(self):
-        m1 = UniqueErrorsModel.objects.create(name='Some Name', number=10)
-        m = UniqueErrorsModel(name='Some Name', number=11)
+        m1 = UniqueErrorsModel.objects.create(name='Some Name', no=10)
+        m = UniqueErrorsModel(name='Some Name', no=11)
         with self.assertRaises(ValidationError) as cm:
             m.full_clean()
         self.assertEqual(cm.exception.message_dict, {'name': [u'Custom unique name message.']})
 
-        m = UniqueErrorsModel(name='Some Other Name', number=10)
+        m = UniqueErrorsModel(name='Some Other Name', no=10)
         with self.assertRaises(ValidationError) as cm:
             m.full_clean()
-        self.assertEqual(cm.exception.message_dict, {'number': [u'Custom unique number message.']})
+        self.assertEqual(cm.exception.message_dict, {'no': [u'Custom unique number message.']})
 
