@@ -1,24 +1,26 @@
 from django.http import HttpResponse
-from django.middleware.doc import XViewMiddleware
 from django.template import Template, Context
 from django.template.response import TemplateResponse
 from django.test import TestCase, RequestFactory
 from django.utils.decorators import decorator_from_middleware
 
 
-xview_dec = decorator_from_middleware(XViewMiddleware)
+class ProcessViewMiddleware(object):
+    def process_view(self, request, view_func, view_args, view_kwargs):
+        pass
 
+process_view_dec = decorator_from_middleware(ProcessViewMiddleware)
 
-@xview_dec
-def xview(request):
+@process_view_dec
+def process_view(request):
     return HttpResponse()
 
 
-class ClassXView(object):
+class ClassProcessView(object):
     def __call__(self, request):
         return HttpResponse()
 
-class_xview = xview_dec(ClassXView())
+class_process_view = process_view_dec(ClassProcessView())
 
 
 class FullMiddleware(object):
@@ -52,13 +54,13 @@ class DecoratorFromMiddlewareTests(TestCase):
         """
         Test a middleware that implements process_view.
         """
-        xview(self.rf.get('/'))
+        process_view(self.rf.get('/'))
 
     def test_callable_process_view_middleware(self):
         """
         Test a middleware that implements process_view, operating on a callable class.
         """
-        class_xview(self.rf.get('/'))
+        class_process_view(self.rf.get('/'))
 
     def test_full_dec_normal(self):
         """
