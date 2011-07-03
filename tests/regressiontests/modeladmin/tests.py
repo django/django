@@ -237,6 +237,38 @@ class ModelAdminTests(TestCase):
             '<option value="%d">The Doors</option>\n'
             '</select>' % self.band.id)
 
+    def test_regression_for_ticket_15820(self):
+        """
+        Ensure that `obj` is passed from `InlineModelAdmin.get_fieldsets()` to
+        `InlineModelAdmin.get_formset()`.
+        """
+        class CustomConcertForm(forms.ModelForm):
+
+            class Meta:
+                model = Concert
+                fields = ['day']
+
+        class ConcertInline(TabularInline):
+            model = Concert
+            fk_name = 'main_band'
+
+            def get_formset(self, request, obj=None, **kwargs):
+                if obj:
+                    kwargs['form'] = CustomConcertForm
+                return super(ConcertInline, self).get_formset(request, obj, **kwargs)
+
+        class BandAdmin(ModelAdmin):
+            inlines = [
+                ConcertInline
+            ]
+
+        concert = Concert.objects.create(main_band=self.band, opening_band=self.band, day=1)
+        ma = BandAdmin(Band, self.site)
+        fieldsets = list(ma.inline_instances[0].get_fieldsets(request))
+        self.assertEqual(fieldsets[0][1]['fields'], ['main_band', 'opening_band', 'day', 'transport'])
+        fieldsets = list(ma.inline_instances[0].get_fieldsets(request, ma.inline_instances[0].model))
+        self.assertEqual(fieldsets[0][1]['fields'], ['day'])
+
     # radio_fields behavior ###########################################
 
     def test_default_foreign_key_widget(self):
