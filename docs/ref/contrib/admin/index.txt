@@ -978,6 +978,16 @@ templates used by the :class:`ModelAdmin` views:
                 else:
                     return ['name']
 
+.. method:: ModelAdmin.save_related(self, request, form, formsets, change)
+
+    .. versionadded:: 1.4
+
+    The ``save_related`` method is given the ``HttpRequest``, the parent
+    ``ModelForm`` instance, the list of inline formsets and a boolean value
+    based on whether the parent is being added or changed. Here you can do any
+    pre- or post-save operations for objects related to the parent. Note
+    that at this point the parent object and its form have already been saved.
+
 .. method:: ModelAdmin.get_readonly_fields(self, request, obj=None)
 
     .. versionadded:: 1.2

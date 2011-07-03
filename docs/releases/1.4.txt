@@ -80,6 +80,13 @@ to work similarly to how desktop GUIs do it. The new hook
 :meth:`~django.contrib.admin.ModelAdmin.get_ordering` for specifying the
 ordering dynamically (e.g. depending on the request) has also been added.
 
+``ModelAdmin.save_related()``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A new :meth:`~django.contrib.admin.ModelAdmin.save_related` hook was added to
+:mod:`~django.contrib.admin.ModelAdmin` to ease the customization of how
+related objects are saved in the admin.
+
 Tools for cryptographic signing
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
