@@ -576,21 +576,33 @@ Iceland (``is_``)
 India (``in_``)
 ===============
 
-.. class:: in.forms.INStateField
+.. class:: in_.forms.INStateField
 
     A form field that validates input as an Indian state/territory name or
     abbreviation. Input is normalized to the standard two-letter vehicle
     registration abbreviation for the given state or territory.
 
-.. class:: in.forms.INZipCodeField
+.. class:: in_.forms.INZipCodeField
 
     A form field that validates input as an Indian zip code, with the
     format XXXXXXX.
 
-.. class:: in.forms.INStateSelect
+.. class:: in_.forms.INStateSelect
 
     A ``Select`` widget that uses a list of Indian states/territories as its
     choices.
+
+.. versionadded:: 1.4
+
+.. class:: in_.forms.INPhoneNumberField
+
+    A form field that validates that the data is a valid Indian phone number,
+    including the STD code. It's normalised to 0XXX-XXXXXXX or 0XXX XXXXXXX
+    format. The first string is the STD code which is a '0' followed by 2-4
+    digits. The second string is 8 digits if the STD code is 3 digits, 7
+    digits if the STD code is 4 digits and 6 digits if the STD code is 5
+    digits. The second string will start with numbers between 1 and 6. The
+    separator is either a space or a hyphen.
 
 Ireland (``ie``)
 ================

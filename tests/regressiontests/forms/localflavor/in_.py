@@ -1,12 +1,32 @@
 import warnings
 
 from django.contrib.localflavor.in_.forms import (INZipCodeField,
-                                                  INStateField, INStateSelect)
+    INStateField, INStateSelect, INPhoneNumberField)
 
 from utils import LocalFlavorTestCase
 
 
+
 class INLocalFlavorTests(LocalFlavorTestCase):
+    def test_INPhoneNumberField(self):
+        error_format = [u'Phone numbers must be in 02X-8X or 03X-7X or 04X-6X format.']
+        valid = {
+            '0423-2443667': '0423-2443667',
+            '0423 2443667': '0423 2443667',
+            '04236-244366': '04236-244366',
+            '040-24436678': '040-24436678',
+        }
+        invalid = {
+            '04-2443667': error_format,
+            '423-2443667': error_format,
+            '0423-9442667': error_format,
+            '0423-0443667': error_format,
+            '0423-244366': error_format,
+            '04232442667': error_format,
+            '0423DJANGO': error_format,
+        }
+        self.assertFieldOutput(INPhoneNumberField, valid, invalid)
+
     def test_INPStateSelect(self):
         f = INStateSelect()
         out = u'''<select name="state">
