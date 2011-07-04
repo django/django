@@ -19,14 +19,14 @@ class BaseHandler(object):
     ]
 
     def __init__(self):
-        self._request_middleware = self._view_middleware = self._response_middleware = self._exception_middleware = None
+        self._request_middleware = self._view_middleware = self._template_response_middleware = self._response_middleware = self._exception_middleware = None
 
 
     def load_middleware(self):
         """
         Populate middleware lists from settings.MIDDLEWARE_CLASSES.
 
-        Must be called after the environment is fixed (see __call__).
+        Must be called after the environment is fixed (see __call__ in subclasses).
         """
         from django.conf import settings
         from django.core import exceptions
