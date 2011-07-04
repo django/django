@@ -1,4 +1,5 @@
 # -*- encoding: utf-8 -*-
+from __future__ import with_statement
 import codecs
 import os
 import posixpath
@@ -36,11 +37,8 @@ class StaticFilesTestCase(TestCase):
         # during checkout, we actually create one file dynamically.
         _nonascii_filepath = os.path.join(
             TEST_ROOT, 'apps', 'test', 'static', 'test', u'fi\u015fier.txt')
-        f = codecs.open(_nonascii_filepath, 'w', 'utf-8')
-        try:
+        with codecs.open(_nonascii_filepath, 'w', 'utf-8') as f:
             f.write(u"fi\u015fier in the app dir")
-        finally:
-            f.close()
         self.addCleanup(os.unlink, _nonascii_filepath)
 
     def assertFileContains(self, filepath, text):
@@ -94,12 +92,8 @@ class BuildStaticTestCase(StaticFilesTestCase):
     def _get_file(self, filepath):
         assert filepath, 'filepath is empty.'
         filepath = os.path.join(settings.STATIC_ROOT, filepath)
-        f = codecs.open(filepath, "r", "utf-8")
-        try:
+        with codecs.open(filepath, "r", "utf-8") as f:
             return f.read()
-        finally:
-            f.close()
-
 
 
 class TestDefaults(object):
@@ -197,9 +191,23 @@ class TestBuildStatic(BuildStaticTestCase, TestDefaults):
         self.assertFileNotFound('test/CVS')
 
 
+class TestBuildStaticClear(BuildStaticTestCase):
+    """
+    Test the ``--clear`` option of the ``collectstatic`` managemenet command.
+    """
+    def run_collectstatic(self, **kwargs):
+        clear_filepath = os.path.join(settings.STATIC_ROOT, 'cleared.txt')
+        with open(clear_filepath, 'w') as f:
+            f.write('should be cleared')
+        super(TestBuildStaticClear, self).run_collectstatic(clear=True)
+
+    def test_cleared_not_found(self):
+        self.assertFileNotFound('cleared.txt')
+
+
 class TestBuildStaticExcludeNoDefaultIgnore(BuildStaticTestCase, TestDefaults):
     """
-    Test ``--exclude-dirs`` and ``--no-default-ignore`` options for
+    Test ``--exclude-dirs`` and ``--no-default-ignore`` options of the
     ``collectstatic`` management command.
     """
     def run_collectstatic(self):

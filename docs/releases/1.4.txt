@@ -213,6 +213,9 @@ Django 1.4 also includes several smaller improvements worth noting:
   to the :mod:`django.contrib.auth.utils` module. Importing it from the old
   location will still work, but you should update your imports.
 
+* The :djadmin:`collectstatic` management command gained a ``--clear`` option
+  to delete all files at the destination before copying or linking the static
+  files.
 
 .. _backwards-incompatible-changes-1.4:
 

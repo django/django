@@ -143,20 +143,34 @@ specified by the :setting:`INSTALLED_APPS` setting.
 
 Some commonly used options are:
 
-``--noinput``
+.. django-admin-option:: --noinput
+
     Do NOT prompt the user for input of any kind.
 
-``-i PATTERN`` or ``--ignore=PATTERN``
+.. django-admin-option:: -i <pattern>
+.. django-admin-option:: --ignore <pattern>
+
     Ignore files or directories matching this glob-style pattern. Use multiple
     times to ignore more.
 
-``-n`` or ``--dry-run``
+.. django-admin-option:: -n
+.. django-admin-option:: --dry-run
+
     Do everything except modify the filesystem.
 
-``-l`` or ``--link``
+.. django-admin-option:: -c
+.. django-admin-option:: --clear
+.. versionadded:: 1.4
+
+    Clear the existing files before trying to copy or link the original file.
+
+.. django-admin-option:: -l
+.. django-admin-option:: --link
+
     Create a symbolic link to each file instead of copying.
 
-``--no-default-ignore``
+.. django-admin-option:: --no-default-ignore
+
     Don't ignore the common private glob-style patterns ``'CVS'``, ``'.*'``
     and ``'*~'``.
 
