@@ -791,7 +791,6 @@ class CoverLetterAdmin(admin.ModelAdmin):
     """
 
     def queryset(self, request):
-        #return super(CoverLetterAdmin, self).queryset(request).only('author')
         return super(CoverLetterAdmin, self).queryset(request).defer('date_written')
 
 class Story(models.Model):
