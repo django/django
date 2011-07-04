@@ -399,7 +399,7 @@ def language(parser, token):
 
     """
     bits = token.split_contents()
-    if len(bits) < 2:
+    if len(bits) != 2:
         raise TemplateSyntaxError("'%s' takes one argument (language)" % bits[0])
     language = parser.compile_filter(bits[1])
     nodelist = parser.parse(('endlanguage',))
