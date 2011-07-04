@@ -1,7 +1,8 @@
 from optparse import make_option
 
 from django.core.management.base import LabelCommand
-from django.db import connections, transaction, models, DEFAULT_DB_ALIAS
+from django.core.cache.backends.db import BaseDatabaseCache
+from django.db import connections, router, transaction, models, DEFAULT_DB_ALIAS
 
 class Command(LabelCommand):
     help = "Creates the table needed to use the SQL cache backend."
@@ -18,8 +19,11 @@ class Command(LabelCommand):
     requires_model_validation = False
 
     def handle_label(self, tablename, **options):
-        alias = options.get('database', DEFAULT_DB_ALIAS)
-        connection = connections[alias]
+        db = options.get('database', DEFAULT_DB_ALIAS)
+        cache = BaseDatabaseCache(tablename, {})
+        if not router.allow_syncdb(db, cache.cache_model_class):
+            return
+        connection = connections[db]
         fields = (
             # "key" is a reserved word in MySQL, so use "cache_key" instead.
             models.CharField(name='cache_key', max_length=255, unique=True, primary_key=True),
@@ -50,4 +54,4 @@ class Command(LabelCommand):
         curs.execute("\n".join(full_statement))
         for statement in index_output:
             curs.execute(statement)
-        transaction.commit_unless_managed(using=alias)
+        transaction.commit_unless_managed(using=db)

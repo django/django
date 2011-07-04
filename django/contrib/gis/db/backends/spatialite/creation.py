@@ -33,9 +33,7 @@ class SpatiaLiteCreation(DatabaseCreation):
         for cache_alias in settings.CACHES:
             cache = get_cache(cache_alias)
             if isinstance(cache, BaseDatabaseCache):
-                from django.db import router
-                if router.allow_syncdb(self.connection.alias, cache.cache_model_class):
-                    call_command('createcachetable', cache._table, database=self.connection.alias)
+                call_command('createcachetable', cache._table, database=self.connection.alias)
         # Get a cursor (even though we don't need one yet). This has
         # the side effect of initializing the test database.
         cursor = self.connection.cursor()
