@@ -1,14 +1,15 @@
+from __future__ import with_statement
 import re
 
-from django.template import Node, Variable, VariableNode
-from django.template import TemplateSyntaxError, TokenParser, Library
-from django.template import TOKEN_TEXT, TOKEN_VAR
+from django.template import (Node, Variable, TemplateSyntaxError,
+    TokenParser, Library, TOKEN_TEXT, TOKEN_VAR)
 from django.template.base import _render_value_in_context
-from django.utils import translation
-from django.utils.encoding import force_unicode
 from django.template.defaulttags import token_kwargs
+from django.utils import translation
+
 
 register = Library()
+
 
 class GetAvailableLanguagesNode(Node):
     def __init__(self, variable):
@@ -19,6 +20,7 @@ class GetAvailableLanguagesNode(Node):
         context[self.variable] = [(k, translation.ugettext(v)) for k, v in settings.LANGUAGES]
         return ''
 
+
 class GetLanguageInfoNode(Node):
     def __init__(self, lang_code, variable):
         self.lang_code = Variable(lang_code)
@@ -28,6 +30,7 @@ class GetLanguageInfoNode(Node):
         lang_code = self.lang_code.resolve(context)
         context[self.variable] = translation.get_language_info(lang_code)
         return ''
+
 
 class GetLanguageInfoListNode(Node):
     def __init__(self, languages, variable):
@@ -47,6 +50,7 @@ class GetLanguageInfoListNode(Node):
         context[self.variable] = [self.get_language_info(lang) for lang in langs]
         return ''
 
+
 class GetCurrentLanguageNode(Node):
     def __init__(self, variable):
         self.variable = variable
@@ -55,6 +59,7 @@ class GetCurrentLanguageNode(Node):
         context[self.variable] = translation.get_language()
         return ''
 
+
 class GetCurrentLanguageBidiNode(Node):
     def __init__(self, variable):
         self.variable = variable
@@ -62,6 +67,7 @@ class GetCurrentLanguageBidiNode(Node):
     def render(self, context):
         context[self.variable] = translation.get_language_bidi()
         return ''
+
 
 class TranslateNode(Node):
     def __init__(self, filter_expression, noop):
@@ -74,6 +80,7 @@ class TranslateNode(Node):
         self.filter_expression.var.translate = not self.noop
         output = self.filter_expression.resolve(context)
         return _render_value_in_context(output, context)
+
 
 class BlockTranslateNode(Node):
     def __init__(self, extra_context, singular, plural=None, countervar=None,
@@ -116,6 +123,18 @@ class BlockTranslateNode(Node):
         data = dict([(v, _render_value_in_context(context.get(v, ''), context)) for v in vars])
         context.pop()
         return result % data
+
+
+class LanguageNode(Node):
+    def __init__(self, nodelist, language):
+        self.nodelist = nodelist
+        self.language = language
+
+    def render(self, context):
+        with translation.override(self.language.resolve(context)):
+            output = self.nodelist.render(context)
+        return output
+
 
 @register.tag("get_available_languages")
 def do_get_available_languages(parser, token):
@@ -271,9 +290,9 @@ def do_translate(parser, token):
             # where single quote use is supported.
             if value[0] == "'":
                 pos = None
-                m = re.match("^'([^']+)'(\|.*$)",value)
+                m = re.match("^'([^']+)'(\|.*$)", value)
                 if m:
-                    value = '"%s"%s' % (m.group(1).replace('"','\\"'),m.group(2))
+                    value = '"%s"%s' % (m.group(1).replace('"','\\"'), m.group(2))
                 elif value[-1] == "'":
                     value = '"%s"' % value[1:-1].replace('"','\\"')
 
@@ -366,3 +385,23 @@ def do_block_translate(parser, token):
 
     return BlockTranslateNode(extra_context, singular, plural, countervar,
             counter)
+
+@register.tag
+def language(parser, token):
+    """
+    This will enable the given language just for this block.
+
+    Usage::
+
+        {% language "de" %}
+            This is {{ bar }} and {{ boo }}.
+        {% endlanguage %}
+
+    """
+    bits = token.split_contents()
+    if len(bits) < 2:
+        raise TemplateSyntaxError("'%s' takes one argument (language)" % bits[0])
+    language = parser.compile_filter(bits[1])
+    nodelist = parser.parse(('endlanguage',))
+    parser.delete_first_token()
+    return LanguageNode(nodelist, language)

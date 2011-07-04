@@ -887,6 +887,32 @@ return the URL in the active language. Example::
     that a carelessly translated URL causes a collision with a non-translated
     URL pattern.
 
+.. _reversing_in_templates:
+
+.. templatetag:: language
+
+Reversing in templates
+----------------------
+
+If localized URLs get reversed in templates they always use the current
+language. To link to a URL in another language use the ``language``
+template tag. It enables the given language in the enclosed template section:
+
+.. code-block:: html+django
+
+    {% load i18n %}
+
+    {% get_available_languages as languages %}
+
+    {% trans "View this category in:" %}
+    {% for lang_code, lang_name in languages %}
+        {% language lang_code %}
+        <a href="{% url category slug=category.slug %}">{{ lang_name }}</a>
+        {% endlanguage %}
+    {% endfor %}
+
+The :ttag:`language` tag expects the language code as the only argument.
+
 .. _set_language-redirect-view:
 
 The ``set_language`` redirect view

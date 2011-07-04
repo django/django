@@ -28,6 +28,12 @@ This mapping can be as short or as long as needed. It can reference other
 mappings. And, because it's pure Python code, it can be constructed
 dynamically.
 
+.. versionadded:: 1.4
+
+    Django also allows to translate URLs according to the active language.
+    This process is described in the
+    :ref:`internationalization docs <url-internationalization>`.
+
 .. _how-django-processes-a-request:
 
 How Django processes a request
