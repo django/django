@@ -126,12 +126,12 @@ def parse_backend_conf(backend, **kwargs):
         location = args.pop('LOCATION', '')
         return backend, location, args
     else:
-        # Trying to import the given backend, in case it's a dotted path
-        mod_path, cls_name = backend.rsplit('.', 1)
         try:
+            # Trying to import the given backend, in case it's a dotted path
+            mod_path, cls_name = backend.rsplit('.', 1)
             mod = importlib.import_module(mod_path)
             backend_cls = getattr(mod, cls_name)
-        except (AttributeError, ImportError):
+        except (AttributeError, ImportError, ValueError):
             raise InvalidCacheBackendError("Could not find backend '%s'" % backend)
         location = kwargs.pop('LOCATION', '')
         return backend, location, kwargs

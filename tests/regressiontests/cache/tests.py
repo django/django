@@ -12,7 +12,7 @@ import warnings
 from django.conf import settings
 from django.core import management
 from django.core.cache import get_cache, DEFAULT_CACHE_ALIAS
-from django.core.cache.backends.base import CacheKeyWarning
+from django.core.cache.backends.base import CacheKeyWarning, InvalidCacheBackendError
 from django.db import connections, router
 from django.http import HttpResponse, HttpRequest, QueryDict
 from django.middleware.cache import FetchFromCacheMiddleware, UpdateCacheMiddleware, CacheMiddleware
@@ -937,6 +937,23 @@ class CustomCacheKeyValidationTests(unittest.TestCase):
         val = 'a value'
         cache.set(key, val)
         self.assertEqual(cache.get(key), val)
+
+
+class GetCacheTests(unittest.TestCase):
+
+    def test_simple(self):
+        cache = get_cache('locmem://')
+        from django.core.cache.backends.locmem import LocMemCache
+        self.assertTrue(isinstance(cache, LocMemCache))
+
+        from django.core.cache import cache
+        self.assertTrue(isinstance(cache, get_cache('default').__class__))
+
+        cache = get_cache(
+            'django.core.cache.backends.dummy.DummyCache', **{'TIMEOUT': 120})
+        self.assertEqual(cache.default_timeout, 120)
+
+        self.assertRaises(InvalidCacheBackendError, get_cache, 'does_not_exist')
 
 class CacheUtils(unittest.TestCase):
     """TestCase for django.utils.cache functions."""
