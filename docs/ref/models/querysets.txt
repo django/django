@@ -1328,6 +1328,10 @@ memory. The former is more efficient. For example, instead of doing this::
 
     Entry.objects.get(id=10).update(comments_on=False)
 
+Using ``update()`` instead of loading the object into memory also prevents a
+race condition where something might change in your database in the short
+period of time between loading the object and calling ``save()``.
+
 Finally, note that the ``update()`` method does an update at the SQL level and,
 thus, does not call any ``save()`` methods on your models, nor does it emit the
 ``pre_save`` or ``post_save`` signals (which are a consequence of calling
