@@ -2,6 +2,7 @@
 
 # Unit tests for cache framework
 # Uses whatever cache backend is set in the test settings file.
+from __future__ import with_statement
 
 import hashlib
 import os
@@ -775,23 +776,23 @@ class DBCacheRouter(object):
 
 class CreateCacheTableForDBCacheTests(unittest.TestCase):
 
-    @override_settings(DEBUG=True)
     def test_createcachetable_observes_database_router(self):
-        old_routers = router.routers
-        try:
-            router.routers = [DBCacheRouter()]
-            # cache table should not be created on 'default'
-            management.call_command('createcachetable', 'cache_table',
-                                    database='default',
-                                    verbosity=0, interactive=False)
-            self.assertEqual(len(connections['default'].queries), 0)
-            # cache table should be created on 'other'
-            management.call_command('createcachetable', 'cache_table',
-                                    database='other',
-                                    verbosity=0, interactive=False)
-            self.assertNotEqual(len(connections['other'].queries), 0)
-        finally:
-            router.routers = old_routers
+        with override_settings(DEBUG=True):
+            old_routers = router.routers
+            try:
+                router.routers = [DBCacheRouter()]
+                # cache table should not be created on 'default'
+                management.call_command('createcachetable', 'cache_table',
+                                        database='default',
+                                        verbosity=0, interactive=False)
+                self.assertEqual(len(connections['default'].queries), 0)
+                # cache table should be created on 'other'
+                management.call_command('createcachetable', 'cache_table',
+                                        database='other',
+                                        verbosity=0, interactive=False)
+                self.assertNotEqual(len(connections['other'].queries), 0)
+            finally:
+                router.routers = old_routers
 
 class LocMemCacheTests(unittest.TestCase, BaseCacheTests):
     backend_name = 'django.core.cache.backends.locmem.LocMemCache'
