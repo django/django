@@ -577,6 +577,8 @@ The uploaded file's relative URL can be obtained using the
 this calls the :meth:`~django.core.files.storage.Storage.url` method of the
 underlying :class:`~django.core.files.storage.Storage` class.
 
+.. _file-upload-security:
+
 Note that whenever you deal with uploaded files, you should pay close attention
 to where you're uploading them and what type of files they are, to avoid
 security holes. *Validate all uploaded files* so that you're sure the files are
@@ -584,6 +586,10 @@ what you think they are. For example, if you blindly let somebody upload files,
 without validation, to a directory that's within your Web server's document
 root, then somebody could upload a CGI or PHP script and execute that script by
 visiting its URL on your site. Don't allow that.
+
+Also note that even an uploaded HTML file, since it can be executed by the
+browser (though not by the server), can pose security threats that are
+equivalent to XSS or CSRF attacks.
 
 By default, :class:`FileField` instances are
 created as ``varchar(100)`` columns in your database. As with other fields, you

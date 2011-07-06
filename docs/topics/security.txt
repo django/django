@@ -152,7 +152,9 @@ important to properly deploy your application and take advantage of the
 security protection of the web server, operating system and other components.
 
 * Make sure that your Python code is outside of the web server's root. This
-  will ensure that your Python code is not accidentally served as plain text.
+  will ensure that your Python code is not accidentally served as plain text
+  (or accidentally executed).
+* Take care with any :ref:`user uploaded files <file-upload-security>`.
 * Django does not throttle requests to authenticate users. To protect against
   brute-force attacks against the authentication system, you may consider
   deploying a Django plugin or web server module to throttle these requests.
