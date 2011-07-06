@@ -107,8 +107,10 @@ Type 'yes' to continue, or 'no' to cancel: """
             for path, storage in finder.list(self.ignore_patterns):
                 # Prefix the relative path if the source storage contains it
                 if getattr(storage, 'prefix', None):
-                    path = os.path.join(storage.prefix, path)
-                handler(path, path, storage)
+                    prefixed_path = os.path.join(storage.prefix, path)
+                else:
+                    prefixed_path = path
+                handler(path, prefixed_path, storage)
 
         actual_count = len(self.copied_files) + len(self.symlinked_files)
         unmodified_count = len(self.unmodified_files)

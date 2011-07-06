@@ -54,7 +54,10 @@ StaticFilesTestCase = override_settings(
     STATIC_URL = '/static/',
     MEDIA_ROOT =  os.path.join(TEST_ROOT, 'project', 'site_media', 'media'),
     STATIC_ROOT = os.path.join(TEST_ROOT, 'project', 'site_media', 'static'),
-    STATICFILES_DIRS = (os.path.join(TEST_ROOT, 'project', 'documents'),),
+    STATICFILES_DIRS = (
+        os.path.join(TEST_ROOT, 'project', 'documents'),
+        ('prefix', os.path.join(TEST_ROOT, 'project', 'prefixed')),
+    ),
     STATICFILES_FINDERS = (
         'django.contrib.staticfiles.finders.FileSystemFinder',
         'django.contrib.staticfiles.finders.AppDirectoriesFinder',
@@ -105,6 +108,7 @@ class TestDefaults(object):
         Can find a file in a STATICFILES_DIRS directory.
         """
         self.assertFileContains('test.txt', 'Can we find')
+        self.assertFileContains(os.path.join('prefix', 'test.txt'), 'Prefix')
 
     def test_staticfiles_dirs_subdir(self):
         """
