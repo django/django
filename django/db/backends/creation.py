@@ -247,7 +247,7 @@ class BaseDatabaseCreation(object):
             verbosity=max(verbosity - 1, 0),
             interactive=False,
             database=self.connection.alias)
-        
+
         # One effect of calling syncdb followed by flush is that the id of the
         # default site may or may not be 1, depending on how the sequence was
         # reset.  If the sites app is loaded, then we coerce it.
@@ -294,7 +294,7 @@ class BaseDatabaseCreation(object):
         # if the database supports it because PostgreSQL doesn't allow
         # CREATE/DROP DATABASE statements within transactions.
         cursor = self.connection.cursor()
-        self.set_autocommit()
+        self._prepare_for_test_db_ddl()
         try:
             cursor.execute("CREATE DATABASE %s %s" % (qn(test_database_name), suffix))
         except Exception, e:
@@ -339,20 +339,27 @@ class BaseDatabaseCreation(object):
         # to do so, because it's not allowed to delete a database while being
         # connected to it.
         cursor = self.connection.cursor()
-        self.set_autocommit()
+        self._prepare_for_test_db_ddl()
         time.sleep(1) # To avoid "database is being accessed by other users" errors.
         cursor.execute("DROP DATABASE %s" % self.connection.ops.quote_name(test_database_name))
         self.connection.close()
 
     def set_autocommit(self):
-        "Make sure a connection is in autocommit mode."
-        if hasattr(self.connection.connection, "autocommit"):
-            if callable(self.connection.connection.autocommit):
-                self.connection.connection.autocommit(True)
-            else:
-                self.connection.connection.autocommit = True
-        elif hasattr(self.connection.connection, "set_isolation_level"):
-            self.connection.connection.set_isolation_level(0)
+        """
+        Make sure a connection is in autocommit mode. - Deprecated, not used
+        anymore by Django code. Kept for compatibility with user code that
+        might use it.
+        """
+        pass
+
+    def _prepare_for_test_db_ddl(self):
+        """
+        Internal implementation - Hook for tasks that should be performed before
+        the ``CREATE DATABASE``/``DROP DATABASE`` clauses used by testing code
+        to create/ destroy test databases. Needed e.g. in PostgreSQL to rollback
+        and close any active transaction.
+        """
+        pass
 
     def sql_table_creation_suffix(self):
         "SQL to append to the end of the test table creation statements"

@@ -69,3 +69,6 @@ class DatabaseCreation(BaseDatabaseCreation):
         if test_database_name and test_database_name != ":memory:":
             # Remove the SQLite database file
             os.remove(test_database_name)
+
+    def set_autocommit(self):
+        self.connection.connection.isolation_level = None
