@@ -1326,7 +1326,7 @@ memory. The former is more efficient. For example, instead of doing this::
 
 ...do this::
 
-    Entry.objects.get(id=10).update(comments_on=False)
+    Entry.objects.filter(id=10).update(comments_on=False)
 
 Using ``update()`` instead of loading the object into memory also prevents a
 race condition where something might change in your database in the short
