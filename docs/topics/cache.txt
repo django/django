@@ -574,9 +574,6 @@ Here's the same thing, with ``my_view`` wrapped in ``cache_page``::
         (r'^foo/(\d{1,2})/$', cache_page(60 * 15)(my_view)),
     )
 
-If you take this approach, don't forget to import ``cache_page`` within your
-URLconf.
-
 Template fragment caching
 =========================
 
