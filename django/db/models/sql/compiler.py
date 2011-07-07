@@ -169,7 +169,7 @@ class SQLCompiler(object):
                 if isinstance(col, (list, tuple)):
                     alias, column = col
                     table = self.query.alias_map[alias][TABLE_NAME]
-                    if table in only_load and col not in only_load[table]:
+                    if table in only_load and column not in only_load[table]:
                         continue
                     r = '%s.%s' % (qn(alias), qn(column))
                     if with_aliases:

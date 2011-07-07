@@ -231,9 +231,6 @@ class QuerySet(object):
             fields = self.model._meta.fields
             pk_idx = self.model._meta.pk_index()
 
-        index_start = len(extra_select)
-        aggregate_start = index_start + len(self.model._meta.fields)
-
         load_fields = []
         # If only/defer clauses have been specified,
         # build the list of fields that are to be loaded.
@@ -252,6 +249,9 @@ class QuerySet(object):
                     # Model wasn't explicitly listed in the only_load table
                     # Therefore, we need to load all fields from this model
                     load_fields.append(field.name)
+
+        index_start = len(extra_select)
+        aggregate_start = index_start + len(load_fields or self.model._meta.fields)
 
         skip = None
         if load_fields and not fill_cache:
