@@ -291,3 +291,13 @@ class CookieTests(unittest.TestCase):
         Test that a repeated non-standard name doesn't affect all cookies. Ticket #15852
         """
         self.assertTrue('good_cookie' in parse_cookie('a,=b; a,=c; good_cookie=yes').keys())
+
+    def test_httponly_after_load(self):
+        """
+        Test that we can use httponly attribute on cookies that we load
+        """
+        c = SimpleCookie()
+        c.load("name=val")
+        c['name']['httponly'] = True
+        self.assertTrue(c['name']['httponly'])
+

@@ -54,18 +54,10 @@ else:
                 if "httponly" in self:
                     output += "; httponly"
                 return output
+    else:
+        Morsel = Cookie.Morsel
 
     class SimpleCookie(Cookie.SimpleCookie):
-        if not _morsel_supports_httponly:
-            def __set(self, key, real_value, coded_value):
-                M = self.get(key, Morsel())
-                M.set(key, real_value, coded_value)
-                dict.__setitem__(self, key, M)
-
-            def __setitem__(self, key, value):
-                rval, cval = self.value_encode(value)
-                self.__set(key, rval, cval)
-
         if not _cookie_encodes_correctly:
             def value_encode(self, val):
                 # Some browsers do not support quoted-string from RFC 2109,
@@ -91,19 +83,20 @@ else:
 
                 return val, encoded
 
-        if not _cookie_allows_colon_in_names:
+        if not _cookie_allows_colon_in_names or not _morsel_supports_httponly:
             def load(self, rawdata):
                 self.bad_cookies = set()
                 super(SimpleCookie, self).load(rawdata)
                 for key in self.bad_cookies:
                     del self[key]
 
-            _strict_set = Cookie.BaseCookie._BaseCookie__set
-
             # override private __set() method:
+            # (needed for using our Morsel, and for laxness with CookieError
             def _BaseCookie__set(self, key, real_value, coded_value):
                 try:
-                    self._strict_set(key, real_value, coded_value)
+                    M = self.get(key, Morsel())
+                    M.set(key, real_value, coded_value)
+                    dict.__setitem__(self, key, M)
                 except Cookie.CookieError:
                     self.bad_cookies.add(key)
                     dict.__setitem__(self, key, Cookie.Morsel())
