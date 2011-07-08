@@ -1,6 +1,7 @@
 from __future__ import with_statement
 
 import os
+import warnings
 
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse, clear_url_caches
@@ -248,6 +249,14 @@ class URLTagTests(URLTestCaseBase):
     """
     Test if the language tag works.
     """
+    def setUp(self):
+        self.save_warnings_state()
+        warnings.filterwarnings('ignore', category=DeprecationWarning,
+                                module='django.template.defaulttags')
+
+    def tearDown(self):
+        self.restore_warnings_state()
+
     def test_strings_only(self):
         t = Template("""{% load i18n %}
             {% language 'nl' %}{% url no-prefix-translated %}{% endlanguage %}
