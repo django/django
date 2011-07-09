@@ -42,13 +42,13 @@ Setting arguments for widgets
 Many widgets have optional extra arguments; they can be set when defining the
 widget on the field. In the following example, the
 :attr:`~SelectDateWidget.years` attribute is set for a
-:class:`~django.forms.widgets.extras.SelectDateWidget`:
+:class:`~django.forms.extras.widgets.SelectDateWidget`:
 
     .. code-block:: python
 
         from django.forms.fields import DateField, ChoiceField, MultipleChoiceField
         from django.forms.widgets import RadioSelect, CheckboxSelectMultiple
-        from django.forms.widgets.extras import SelectDateWidget
+        from django.forms.extras.widgets import SelectDateWidget
 
         BIRTH_YEAR_CHOICES = ('1980', '1981', '1982')
         GENDER_CHOICES = (('m', 'Male'), ('f', 'Female'))
@@ -402,7 +402,7 @@ commonly used groups of widgets:
     Similar to :class:`SplitDateTimeWidget`, but uses :class:`HiddenInput` for
     both date and time.
 
-.. currentmodule:: django.forms.widgets.extras
+.. currentmodule:: django.forms.extras.widgets
 
 .. class:: SelectDateWidget
 
