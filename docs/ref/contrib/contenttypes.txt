@@ -192,6 +192,15 @@ The ``ContentTypeManager``
         :class:`~django.contrib.contenttypes.models.ContentType` instance
         representing that model.
 
+    .. method:: get_by_natural_key(app_label, model)
+
+        Returns the :class:`~django.contrib.contenttypes.models.ContentType`
+        instance uniquely identified by the given application label and model
+        name. The primary purpose of this method is to allow
+        :class:`~django.contrib.contenttypes.models.ContentType` objects to be
+        referenced via a :ref:`natural key<topics-serialization-natural-keys>`
+        during deserialization.
+
 The :meth:`~ContentTypeManager.get_for_model()` method is especially
 useful when you know you need to work with a
 :class:`ContentType <django.contrib.contenttypes.models.ContentType>` but don't
@@ -284,6 +293,15 @@ model:
    There is no one-size-fits-all solution for which field type is best. You
    should evaluate the models you expect to be pointing to and determine
    which solution will be most effective for your use case.
+
+.. admonition:: Serializing references to ``ContentType`` objects
+
+   If you're serializing data (for example, when generating
+   :class:`~django.test.TestCase.fixtures`) from a model that implements
+   generic relations, you should probably be using a natural key to uniquely
+   identify related :class:`~django.contrib.contenttypes.models.ContentType`
+   objects. See :ref:`natural keys<topics-serialization-natural-keys>` and
+   :djadminopt:`dumpdata --natural <--natural>` for more information.
 
 This will enable an API similar to the one used for a normal
 :class:`~django.db.models.ForeignKey`;
