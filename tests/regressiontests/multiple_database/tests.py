@@ -1,6 +1,5 @@
 import datetime
 import pickle
-import sys
 from StringIO import StringIO
 
 from django.conf import settings
@@ -8,17 +7,10 @@ from django.contrib.auth.models import User
 from django.core import management
 from django.db import connections, router, DEFAULT_DB_ALIAS
 from django.db.models import signals
-from django.db.utils import ConnectionRouter
 from django.test import TestCase
 
 from models import Book, Person, Pet, Review, UserProfile
 
-try:
-    # we only have these models if the user is using multi-db, it's safe the
-    # run the tests without them though.
-    from models import Article, article_using
-except ImportError:
-    pass
 
 class QueryTestCase(TestCase):
     multi_db = True
@@ -1702,7 +1694,7 @@ class SignalTests(TestCase):
         self.old_routers = router.routers
 
     def tearDown(self):
-        router.routser = self.old_routers
+        router.routers = self.old_routers
 
     def _write_to_other(self):
         "Sends all writes to 'other'."
