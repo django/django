@@ -177,7 +177,7 @@ class OverrideSettingsHolder(UserSettingsHolder):
     """
     def __setattr__(self, name, value):
         UserSettingsHolder.__setattr__(self, name, value)
-        setting_changed.send(sender=name, setting=name, value=value)
+        setting_changed.send(sender=self.__class__, setting=name, value=value)
 
 
 class override_settings(object):

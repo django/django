@@ -487,7 +487,7 @@ Sent when some :ref:`settings are overridden <overriding-setting>` with the
 Arguments sent with this signal:
 
 ``sender``
-    The setting name (string).
+    The settings handler.
 
 ``setting``
     Same as sender

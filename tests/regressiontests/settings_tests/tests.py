@@ -24,10 +24,11 @@ class SettingGetter(object):
 testvalue = None
 
 def signal_callback(sender, setting, value, **kwargs):
-    global testvalue
-    testvalue = value
+    if setting == 'TEST':
+        global testvalue
+        testvalue = value
 
-signals.setting_changed.connect(signal_callback, sender='TEST')
+signals.setting_changed.connect(signal_callback)
 
 class SettingsTests(TestCase):
 
