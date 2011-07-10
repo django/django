@@ -570,11 +570,14 @@ result of the :meth:`~django.views.generic.base.View.as_view` method.
 The easiest place to do this is in the URLconf where you deploy your
 view::
 
-    from django.contrib.auth.decorators import login_required
+    from django.contrib.auth.decorators import login_required, permission_required
     from django.views.generic import TemplateView
 
+    from .views import VoteView
+
     urlpatterns = patterns('',
-        (r'^about/',login_required(TemplateView.as_view(template_name="secret.html"))),
+        (r'^about/', login_required(TemplateView.as_view(template_name="secret.html"))),
+        (r'^vote/', permission_required('polls.can_vote')(VoteView.as_view())),
     )
 
 This approach applies the decorator on a per-instance basis. If you
