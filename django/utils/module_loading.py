@@ -12,7 +12,7 @@ def module_has_submodule(package, module_name):
     except KeyError:
         pass
     for finder in sys.meta_path:
-        if finder.find_module(name, package):
+        if finder.find_module(name, package.__path__):
             return True
     for entry in package.__path__:  # No __path__, then not a package.
         try:
