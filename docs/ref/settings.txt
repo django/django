@@ -1983,6 +1983,11 @@ format of the current locale.
 
 See also :setting:`USE_I18N` and :setting:`LANGUAGE_CODE`
 
+.. note::
+    The default :file:`settings.py` file created by
+    :djadmin:`django-admin.py startproject <startproject>` includes
+    ``USE_L10N = True`` for convenience.
+
 .. setting:: USE_THOUSAND_SEPARATOR
 
 USE_THOUSAND_SEPARATOR
