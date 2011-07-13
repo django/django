@@ -1,14 +1,17 @@
 from django.conf import settings
-from django.contrib.gis import geos
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 
-class GoogleMapException(Exception): pass
-from django.contrib.gis.maps.google.overlays import GPolygon, GPolyline, GMarker, GIcon
+from django.contrib.gis.maps.google.overlays import GPolygon, GPolyline, GMarker
+
+class GoogleMapException(Exception):
+    pass
+
 
 # The default Google Maps URL (for the API javascript)
 # TODO: Internationalize for Japan, UK, etc.
 GOOGLE_MAPS_URL='http://maps.google.com/maps?file=api&amp;v=%s&amp;key='
+
 
 class GoogleMap(object):
     "A class for generating Google Maps JavaScript."

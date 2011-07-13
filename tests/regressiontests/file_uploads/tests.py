@@ -9,7 +9,7 @@ from StringIO import StringIO
 
 from django.core.files import temp as tempfile
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.http.multipartparser import MultiPartParser, MultiPartParserError
+from django.http.multipartparser import MultiPartParser
 from django.test import TestCase, client
 from django.utils import simplejson
 from django.utils import unittest

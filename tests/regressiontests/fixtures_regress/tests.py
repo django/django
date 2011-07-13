@@ -2,7 +2,6 @@
 # Unittests for fixtures.
 import os
 import re
-import sys
 try:
     from cStringIO import StringIO
 except ImportError:
@@ -13,8 +12,8 @@ from django.core.management.commands.dumpdata import sort_dependencies
 from django.core.management.base import CommandError
 from django.db.models import signals
 from django.db import transaction
-from django.test import TestCase, TransactionTestCase, skipIfDBFeature, \
-    skipUnlessDBFeature
+from django.test import (TestCase, TransactionTestCase, skipIfDBFeature,
+    skipUnlessDBFeature)
 
 from models import Animal, Stuff
 from models import Absolute, Parent, Child

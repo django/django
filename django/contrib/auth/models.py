@@ -10,9 +10,10 @@ from django.utils.translation import ugettext_lazy as _
 
 from django.contrib import auth
 from django.contrib.auth.signals import user_logged_in
+# UNUSABLE_PASSWORD is still imported here for backwards compatibility
 from django.contrib.auth.utils import (get_hexdigest, make_password,
-                                       check_password, is_password_usable,
-                                       get_random_string, UNUSABLE_PASSWORD)
+        check_password, is_password_usable, get_random_string,
+        UNUSABLE_PASSWORD)
 from django.contrib.contenttypes.models import ContentType
 
 def update_last_login(sender, user, **kwargs):

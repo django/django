@@ -2,7 +2,6 @@
 # encoding: utf-8
 # originally from https://bitbucket.org/ned/jslex
 
-import difflib
 from django.test import TestCase
 from django.utils.jslex import JsLexer, prepare_js_for_gettext
 

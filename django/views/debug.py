@@ -3,7 +3,6 @@ import os
 import re
 import sys
 import types
-from pprint import pformat
 
 from django.conf import settings
 from django.http import (HttpResponse, HttpResponseServerError,

@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
 import datetime
-from decimal import Decimal
-import re
-import time
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms import *
 from django.http import QueryDict

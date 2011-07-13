@@ -1,5 +1,3 @@
-from __future__ import with_statement
-
 import datetime
 
 from django.core.exceptions import ImproperlyConfigured

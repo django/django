@@ -1,9 +1,11 @@
-from regressiontests.comment_tests.tests import CommentTestCase, CT, Site
-from django.contrib.comments.forms import CommentForm
-from django.contrib.comments.models import Comment
-from django.contrib.comments.moderation import moderator, CommentModerator, AlreadyModerated
-from regressiontests.comment_tests.models import Entry
 from django.core import mail
+
+from django.contrib.comments.models import Comment
+from django.contrib.comments.moderation import (moderator, CommentModerator,
+                                                AlreadyModerated)
+
+from regressiontests.comment_tests.models import Entry
+from regressiontests.comment_tests.tests import CommentTestCase
 
 class EntryModerator1(CommentModerator):
     email_notification = True

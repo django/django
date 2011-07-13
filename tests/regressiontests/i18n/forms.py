@@ -1,5 +1,6 @@
-from django import template, forms
+from django import forms
 from django.forms.extras import SelectDateWidget
+
 from models import Company
 
 class I18nForm(forms.Form):

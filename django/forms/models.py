@@ -3,14 +3,14 @@ Helper functions for creating Form classes from Django models
 and database field objects.
 """
 
+from django.core.exceptions import ValidationError, NON_FIELD_ERRORS, FieldError
+from django.core.validators import EMPTY_VALUES
+
 from django.utils.encoding import smart_unicode, force_unicode
 from django.utils.datastructures import SortedDict
 from django.utils.text import get_text_list, capfirst
 from django.utils.translation import ugettext_lazy as _, ugettext
 
-from django.core.exceptions import ValidationError, NON_FIELD_ERRORS, \
-                                   FieldError
-from django.core.validators import EMPTY_VALUES
 from util import ErrorList
 from forms import BaseForm, get_declared_fields
 from fields import Field, ChoiceField

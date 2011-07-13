@@ -3,8 +3,7 @@ Spanning tests for all the operations that F() expressions can perform.
 """
 import datetime
 
-from django.conf import settings
-from django.db import models, connection
+from django.db import connection
 from django.db.models import F
 from django.test import TestCase, Approximate, skipUnlessDBFeature
 

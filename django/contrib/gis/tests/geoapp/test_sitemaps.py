@@ -1,4 +1,7 @@
-import cStringIO
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from StringIO import StringIO
 from xml.dom import minidom
 import zipfile
 from django.conf import settings
@@ -60,7 +63,7 @@ class GeoSitemapTest(TestCase):
                     kml_doc = minidom.parseString(self.client.get(kml_url).content)
                 elif kml_type == 'kmz':
                     # Have to decompress KMZ before parsing.
-                    buf = cStringIO.StringIO(self.client.get(kml_url).content)
+                    buf = StringIO(self.client.get(kml_url).content)
                     zf = zipfile.ZipFile(buf)
                     self.assertEqual(1, len(zf.filelist))
                     self.assertEqual('doc.kml', zf.filelist[0].filename)

@@ -1,5 +1,4 @@
 from django.db import models
-from django.conf import settings
 
 class Article(models.Model):
     headline = models.CharField(max_length=100, default='Default headline')

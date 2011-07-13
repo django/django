@@ -1,6 +1,5 @@
 from __future__ import with_statement
 import os
-from django.conf import settings
 from django.core import mail
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm,  PasswordChangeForm, SetPasswordForm, UserChangeForm, PasswordResetForm

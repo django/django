@@ -2,7 +2,6 @@
 Extra HTML Widget classes
 """
 
-import time
 import datetime
 import re
 

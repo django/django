@@ -1,8 +1,14 @@
-from django.contrib.gis.gdal import OGRGeometry, OGRGeomType, \
-    OGRException, OGRIndexError, SpatialReference, CoordTransform, \
-    GDAL_VERSION
-from django.utils import unittest
+from binascii import b2a_hex
+try:
+    import cPickle as pickle
+except ImportError:
+    import pickle
+
+from django.contrib.gis.gdal import (OGRGeometry, OGRGeomType, OGRException,
+    OGRIndexError, SpatialReference, CoordTransform, GDAL_VERSION)
+from django.contrib.gis.gdal.prototypes.geom import GEOJSON
 from django.contrib.gis.geometry.test_data import TestDataMixin
+from django.utils import unittest
 
 class OGRGeomTest(unittest.TestCase, TestDataMixin):
     "This tests the OGR Geometry."
@@ -92,7 +98,6 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
 
     def test01d_wkb(self):
         "Testing WKB input/output."
-        from binascii import b2a_hex
         for g in self.geometries.hex_wkt:
             geom1 = OGRGeometry(g.wkt)
             wkb = geom1.wkb
@@ -103,7 +108,6 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
 
     def test01e_json(self):
         "Testing GeoJSON input/output."
-        from django.contrib.gis.gdal.prototypes.geom import GEOJSON
         if not GEOJSON: return
         for g in self.geometries.json_geoms:
             geom = OGRGeometry(g.wkt)
@@ -446,9 +450,8 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
 
     def test17_pickle(self):
         "Testing pickle support."
-        import cPickle
         g1 = OGRGeometry('LINESTRING(1 1 1,2 2 2,3 3 3)', 'WGS84')
-        g2 = cPickle.loads(cPickle.dumps(g1))
+        g2 = pickle.loads(pickle.dumps(g1))
         self.assertEqual(g1, g2)
         self.assertEqual(4326, g2.srs.srid)
         self.assertEqual(g1.srs.wkt, g2.srs.wkt)

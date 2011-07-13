@@ -4,8 +4,7 @@
 This demonstrates features of the database API.
 """
 
-from django.db import models, DEFAULT_DB_ALIAS, connection
-from django.conf import settings
+from django.db import models
 
 class Author(models.Model):
     name = models.CharField(max_length=100)

@@ -2,7 +2,8 @@
 Norwegian-specific Form helpers
 """
 
-import re, datetime
+import re
+import datetime
 from django.core.validators import EMPTY_VALUES
 from django.forms import ValidationError
 from django.forms.fields import Field, RegexField, Select

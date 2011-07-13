@@ -5,8 +5,8 @@ from django.db.backends.util import truncate_name
 from django.db.models.sql.constants import *
 from django.db.models.sql.datastructures import EmptyResultSet
 from django.db.models.sql.expressions import SQLEvaluator
-from django.db.models.sql.query import get_proxied_model, get_order_dir, \
-     select_related_descend, Query
+from django.db.models.sql.query import (get_proxied_model, get_order_dir,
+     select_related_descend, Query)
 from django.db.utils import DatabaseError
 
 class SQLCompiler(object):

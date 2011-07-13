@@ -1,5 +1,3 @@
-from django.core.urlresolvers import set_urlconf
-
 import urlconf_inner
 
 class ChangeURLconfMiddleware(object):

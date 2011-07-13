@@ -1,13 +1,10 @@
 import StringIO
-import sys
 
-from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core import management
-from django.db import DEFAULT_DB_ALIAS
 from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 
-from models import Article, Blog, Book, Category, Person, Spy, Tag, Visa
+from models import Article, Book, Spy, Tag, Visa
 
 
 class TestCaseFixtureLoadingTests(TestCase):

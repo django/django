@@ -3,9 +3,8 @@
  inherit from this object.
 """
 # Python, ctypes and types dependencies.
-import re
 import warnings
-from ctypes import addressof, byref, c_double, c_size_t
+from ctypes import addressof, byref, c_double
 
 # super-class for mutable list behavior
 from django.contrib.gis.geos.mutable_list import ListMixin

@@ -1,12 +1,11 @@
 import re
 from django.db import connection
 from django.contrib.gis import gdal
-from django.contrib.gis.geos import fromstr, GEOSGeometry, \
-    Point, LineString, LinearRing, Polygon, GeometryCollection
-from django.contrib.gis.measure import Distance
-from django.contrib.gis.tests.utils import \
-    no_mysql, no_oracle, no_spatialite, \
-    mysql, oracle, postgis, spatialite
+from django.contrib.gis.geos import (fromstr, GEOSGeometry,
+    Point, LineString, LinearRing, Polygon, GeometryCollection)
+from django.contrib.gis.tests.utils import (
+    no_mysql, no_oracle, no_spatialite,
+    mysql, oracle, postgis, spatialite)
 from django.test import TestCase
 
 from models import Country, City, PennsylvaniaCity, State, Track

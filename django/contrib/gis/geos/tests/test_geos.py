@@ -1,4 +1,6 @@
-import ctypes, random, unittest, sys
+import ctypes
+import random
+import unittest
 from django.contrib.gis.geos import *
 from django.contrib.gis.geos.base import gdal, numpy, GEOSBase
 from django.contrib.gis.geos.libgeos import GEOS_PREPARE

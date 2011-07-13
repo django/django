@@ -9,7 +9,6 @@ from django.test import TestCase, RequestFactory
 from django.core.urlresolvers import reverse
 from django.template import TemplateSyntaxError
 from django.views.debug import ExceptionReporter
-from django.core.exceptions import ImproperlyConfigured
 from django.core import mail
 
 from regressiontests.views import BrokenException, except_args

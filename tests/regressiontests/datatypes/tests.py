@@ -1,7 +1,5 @@
 import datetime
 
-from django.conf import settings
-from django.db import DEFAULT_DB_ALIAS
 from django.test import TestCase, skipIfDBFeature
 from django.utils import tzinfo
 

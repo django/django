@@ -1,5 +1,4 @@
 import copy
-from django.conf import settings
 from django.db import router
 from django.db.models.query import QuerySet, EmptyQuerySet, insert_query, RawQuerySet
 from django.db.models import signals

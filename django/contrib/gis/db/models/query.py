@@ -1,9 +1,9 @@
 from django.db import connections
-from django.db.models.query import QuerySet, Q, ValuesQuerySet, ValuesListQuerySet
+from django.db.models.query import QuerySet, ValuesQuerySet, ValuesListQuerySet
 
 from django.contrib.gis.db.models import aggregates
-from django.contrib.gis.db.models.fields import get_srid_info, GeometryField, PointField, LineStringField
-from django.contrib.gis.db.models.sql import AreaField, DistanceField, GeomField, GeoQuery, GeoWhereNode
+from django.contrib.gis.db.models.fields import get_srid_info, PointField, LineStringField
+from django.contrib.gis.db.models.sql import AreaField, DistanceField, GeomField, GeoQuery
 from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.measure import Area, Distance
 

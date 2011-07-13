@@ -10,7 +10,7 @@ from django.forms.models import (_get_foreign_key, inlineformset_factory,
 from django.test import TestCase, skipUnlessDBFeature
 
 from modeltests.model_formsets.models import (
-    Author, BetterAuthor, Book, BookWithCustomPK, Editor,
+    Author, BetterAuthor, Book, BookWithCustomPK,
     BookWithOptionalAltEditor, AlternateBook, AuthorMeeting, CustomPrimaryKey,
     Place, Owner, Location, OwnerProfile, Restaurant, Product, Price,
     MexicanRestaurant, ClassyMexicanRestaurant, Repository, Revision,

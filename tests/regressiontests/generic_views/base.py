@@ -4,7 +4,6 @@ import unittest
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponse
 from django.test import TestCase, RequestFactory
-from django.utils import simplejson
 from django.views.generic import View, TemplateView, RedirectView
 
 

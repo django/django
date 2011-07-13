@@ -15,10 +15,9 @@ try:
 except ImportError:
     from StringIO import StringIO
 
-from django.conf import settings
-from django.core import serializers, management
+from django.core import serializers
 from django.core.serializers import SerializerDoesNotExist
-from django.db import transaction, DEFAULT_DB_ALIAS, connection
+from django.db import connection
 from django.test import TestCase
 from django.utils.functional import curry
 

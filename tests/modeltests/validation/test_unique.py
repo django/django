@@ -2,9 +2,7 @@ from __future__ import with_statement
 
 import datetime
 
-from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.db import connection
 from django.test import TestCase
 from django.utils import unittest
 

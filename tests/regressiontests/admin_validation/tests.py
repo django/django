@@ -1,8 +1,9 @@
-from django.contrib import admin
 from django import forms
-from django.contrib.admin.validation import validate, validate_inline, \
-                                            ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
+
+from django.contrib import admin
+from django.contrib.admin.validation import validate, validate_inline
 
 from models import Song, Book, Album, TwoAlbumFKAndAnE, State, City
 

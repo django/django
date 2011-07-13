@@ -4,7 +4,6 @@ Form Widget classes specific to the Django admin site.
 
 import copy
 from django import forms
-from django.conf import settings
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.forms.widgets import RadioFieldRenderer
 from django.forms.util import flatatt

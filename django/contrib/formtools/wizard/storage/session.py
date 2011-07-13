@@ -1,4 +1,3 @@
-from django.core.files.uploadedfile import UploadedFile
 from django.contrib.formtools.wizard import storage
 
 

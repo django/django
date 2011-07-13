@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from django.conf import settings
 from django.forms import TextInput, Media, TextInput, CharField, Form, MultiWidget
 from django.test import TestCase
 from django.test.utils import override_settings

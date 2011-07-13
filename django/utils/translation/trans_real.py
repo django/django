@@ -4,10 +4,13 @@ import locale
 import os
 import re
 import sys
-import warnings
 import gettext as gettext_module
-from cStringIO import StringIO
 from threading import local
+
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from StringIO import StringIO
 
 from django.utils.importlib import import_module
 from django.utils.safestring import mark_safe, SafeData

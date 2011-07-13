@@ -1,5 +1,4 @@
 from django.contrib.comments.forms import CommentForm
-from django.contrib.comments.models import Comment
 from django.contrib.contenttypes.models import ContentType
 from django.template import Template, Context
 from regressiontests.comment_tests.models import Article, Author

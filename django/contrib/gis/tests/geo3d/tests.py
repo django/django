@@ -5,9 +5,9 @@ from django.contrib.gis.db.models import Union, Extent3D
 from django.contrib.gis.geos import GEOSGeometry, Point, Polygon
 from django.contrib.gis.utils import LayerMapping, LayerMapError
 
-from models import City3D, Interstate2D, Interstate3D, \
-    InterstateProj2D, InterstateProj3D, \
-    Point2D, Point3D, MultiPoint3D, Polygon2D, Polygon3D
+from models import (City3D, Interstate2D, Interstate3D,
+    InterstateProj2D, InterstateProj3D,
+    Point2D, Point3D, MultiPoint3D, Polygon2D, Polygon3D)
 
 data_path = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', 'data'))
 city_file = os.path.join(data_path, 'cities', 'cities.shp')

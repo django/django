@@ -7,15 +7,14 @@
    http://geodjango.org/docs/layermapping.html
 """
 import sys
-from datetime import date, datetime
 from decimal import Decimal
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connections, DEFAULT_DB_ALIAS
 from django.contrib.gis.db.models import GeometryField
-from django.contrib.gis.gdal import CoordTransform, DataSource, \
-    OGRException, OGRGeometry, OGRGeomType, SpatialReference
-from django.contrib.gis.gdal.field import \
-    OFTDate, OFTDateTime, OFTInteger, OFTReal, OFTString, OFTTime
+from django.contrib.gis.gdal import (CoordTransform, DataSource,
+    OGRException, OGRGeometry, OGRGeomType, SpatialReference)
+from django.contrib.gis.gdal.field import (
+    OFTDate, OFTDateTime, OFTInteger, OFTReal, OFTString, OFTTime)
 from django.db import models, transaction
 from django.contrib.localflavor.us.models import USStateField
 

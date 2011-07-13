@@ -1,6 +1,3 @@
-import base64
-import cPickle as pickle
-
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 

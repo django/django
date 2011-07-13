@@ -26,7 +26,6 @@ from django.core.cache import get_cache
 from django.utils.encoding import smart_str, iri_to_uri
 from django.utils.http import http_date
 from django.utils.translation import get_language
-from django.http import HttpRequest
 
 cc_delim_re = re.compile(r'\s*,\s*')
 

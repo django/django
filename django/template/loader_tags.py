@@ -1,9 +1,7 @@
-from django.template.base import TemplateSyntaxError, TemplateDoesNotExist, Variable
-from django.template.base import Library, Node, TextNode
-from django.template.context import Context
+from django.conf import settings
+from django.template.base import TemplateSyntaxError, Library, Node, TextNode
 from django.template.defaulttags import token_kwargs
 from django.template.loader import get_template
-from django.conf import settings
 from django.utils.safestring import mark_safe
 
 register = Library()

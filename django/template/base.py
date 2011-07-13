@@ -1,4 +1,3 @@
-import imp
 import re
 from functools import partial
 from inspect import getargspec
@@ -7,7 +6,6 @@ from django.conf import settings
 from django.template.context import Context, RequestContext, ContextPopException
 from django.utils.importlib import import_module
 from django.utils.itercompat import is_iterable
-from django.utils.functional import Promise
 from django.utils.text import smart_split, unescape_string_literal, get_text_list
 from django.utils.encoding import smart_unicode, force_unicode, smart_str
 from django.utils.translation import ugettext_lazy

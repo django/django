@@ -1,7 +1,6 @@
 from __future__ import with_statement
 
 import shutil
-import sys
 import tempfile
 
 from django.core.cache import cache

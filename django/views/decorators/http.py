@@ -3,7 +3,6 @@ Decorators for views based on HTTP headers.
 """
 
 from calendar import timegm
-from datetime import timedelta
 from functools import wraps
 
 from django.utils.decorators import decorator_from_middleware, available_attrs

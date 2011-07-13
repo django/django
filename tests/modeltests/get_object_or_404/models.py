@@ -11,8 +11,6 @@ performing a ``filter()`` lookup and raising a ``Http404`` exception if a
 """
 
 from django.db import models
-from django.http import Http404
-from django.shortcuts import get_object_or_404, get_list_or_404
 
 class Author(models.Model):
     name = models.CharField(max_length=50)

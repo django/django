@@ -18,7 +18,6 @@ from wsgiref import simple_server
 from wsgiref.util import FileWrapper   # for backwards compatibility
 
 import django
-from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import color_style
 from django.utils._os import safe_join
 from django.views import static

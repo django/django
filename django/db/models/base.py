@@ -1,28 +1,29 @@
 import copy
 import sys
-import types
 from functools import update_wrapper
 from itertools import izip
 
 import django.db.models.manager     # Imported to register signal handler.
-from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned, FieldError, ValidationError, NON_FIELD_ERRORS
+from django.conf import settings
+from django.core.exceptions import (ObjectDoesNotExist,
+    MultipleObjectsReturned, FieldError, ValidationError, NON_FIELD_ERRORS)
 from django.core import validators
 from django.db.models.fields import AutoField, FieldDoesNotExist
-from django.db.models.fields.related import (OneToOneRel, ManyToOneRel,
+from django.db.models.fields.related import (ManyToOneRel,
     OneToOneField, add_lazy_relation)
+from django.db import (connections, router, transaction, DatabaseError,
+    DEFAULT_DB_ALIAS)
 from django.db.models.query import Q
 from django.db.models.query_utils import DeferredAttribute
 from django.db.models.deletion import Collector
 from django.db.models.options import Options
-from django.db import (connections, router, transaction, DatabaseError,
-    DEFAULT_DB_ALIAS)
 from django.db.models import signals
 from django.db.models.loading import register_models, get_model
 from django.utils.translation import ugettext_lazy as _
 from django.utils.functional import curry
 from django.utils.encoding import smart_str, force_unicode
 from django.utils.text import get_text_list, capfirst
-from django.conf import settings
+
 
 class ModelBase(type):
     """

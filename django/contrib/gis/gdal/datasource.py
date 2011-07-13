@@ -34,7 +34,7 @@
               val = field.value
 """
 # ctypes prerequisites.
-from ctypes import byref, c_void_p
+from ctypes import byref
 
 # The GDAL C library, OGR exceptions, and the Layer object.
 from django.contrib.gis.gdal.base import GDALBase

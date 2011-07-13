@@ -5,7 +5,7 @@ import re
 import mimetypes
 import warnings
 from copy import copy
-from urlparse import urlparse, urlunparse, urlsplit
+from urlparse import urlparse, urlsplit
 try:
     from cStringIO import StringIO
 except ImportError:
@@ -24,7 +24,7 @@ from django.utils.encoding import smart_str
 from django.utils.http import urlencode
 from django.utils.importlib import import_module
 from django.utils.itercompat import is_iterable
-from django.db import transaction, close_connection
+from django.db import close_connection
 from django.test.utils import ContextList
 
 __all__ = ('Client', 'RequestFactory', 'encode_file', 'encode_multipart')

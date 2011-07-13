@@ -5,7 +5,7 @@ Tests for field subclassing.
 from django.db import models
 from django.utils.encoding import force_unicode
 
-from fields import Small, SmallField, SmallerField, JSONField
+from fields import SmallField, SmallerField, JSONField
 
 
 class MyModel(models.Model):

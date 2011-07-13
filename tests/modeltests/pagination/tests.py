@@ -1,5 +1,4 @@
 from datetime import datetime
-from operator import attrgetter
 
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.test import TestCase

@@ -1,8 +1,5 @@
-from django.conf import settings
-from django.template import Library, Node, Template, TemplateSyntaxError
-from django.template.defaulttags import kwarg_re, include_is_allowed, SsiNode, URLNode
-from django.utils.encoding import smart_str
-
+from django.template import Library, TemplateSyntaxError
+from django.template.defaulttags import kwarg_re, SsiNode, URLNode
 
 register = Library()
 

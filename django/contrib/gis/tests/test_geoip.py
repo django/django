@@ -1,4 +1,5 @@
-import os, unittest
+import os
+import unittest
 from django.db import settings
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.utils import GeoIP, GeoIPException

@@ -1,4 +1,8 @@
-from django import template, templatetags
+import inspect
+import os
+import re
+
+from django import template
 from django.template import RequestContext
 from django.conf import settings
 from django.contrib.admin.views.decorators import staff_member_required
@@ -12,7 +16,6 @@ from django.contrib.sites.models import Site
 from django.utils.importlib import import_module
 from django.utils.translation import ugettext as _
 from django.utils.safestring import mark_safe
-import inspect, os, re
 
 # Exclude methods starting with these strings from documentation
 MODEL_METHODS_EXCLUDE = ('_', 'add_', 'delete', 'save', 'set_')

@@ -1,5 +1,4 @@
 import datetime
-import random
 
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase

@@ -1,4 +1,3 @@
-from django.core.exceptions import MiddlewareNotUsed
 from django.utils.http import http_date, parse_http_date_safe
 
 class ConditionalGetMiddleware(object):

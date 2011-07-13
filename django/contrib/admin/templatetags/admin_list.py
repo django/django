@@ -1,14 +1,12 @@
 import datetime
 
-from django.conf import settings
 from django.contrib.admin.util import lookup_field, display_for_field, label_for_field
 from django.contrib.admin.views.main import (ALL_VAR, EMPTY_CHANGELIST_VALUE,
-    ORDER_VAR, ORDER_TYPE_VAR, PAGE_VAR, SEARCH_VAR)
+    ORDER_VAR, PAGE_VAR, SEARCH_VAR)
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.templatetags.static import static
 from django.utils import formats
-from django.utils.datastructures import SortedDict
 from django.utils.html import escape, conditional_escape
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst

@@ -8,8 +8,8 @@ from django.forms.models import (modelform_factory, ModelChoiceField,
 from django.utils import unittest
 from django.test import TestCase
 
-from models import Person, RealPerson, Triple, FilePathModel, Article, \
-    Publication, CustomFF, Author, Author1, Homepage, Document, Edition
+from models import (Person, RealPerson, Triple, FilePathModel, Article,
+    Publication, CustomFF, Author, Author1, Homepage, Document, Edition)
 
 
 class ModelMultipleChoiceFieldTests(TestCase):

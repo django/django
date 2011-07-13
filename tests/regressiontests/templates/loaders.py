@@ -14,12 +14,10 @@ import pkg_resources
 import imp
 import StringIO
 import os.path
-import warnings
 
 from django.template import TemplateDoesNotExist, Context
 from django.template.loaders.eggs import Loader as EggLoader
 from django.template import loader
-from django.test.utils import get_warnings_state, restore_warnings_state
 from django.utils import unittest
 
 

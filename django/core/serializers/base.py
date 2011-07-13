@@ -5,8 +5,7 @@ Module for abstract serializer/unserializer base classes.
 from StringIO import StringIO
 
 from django.db import models
-from django.utils.encoding import smart_str, smart_unicode
-from django.utils import datetime_safe
+from django.utils.encoding import smart_unicode
 
 class SerializerDoesNotExist(KeyError):
     """The requested serializer was not found."""

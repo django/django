@@ -1,7 +1,6 @@
 """
 Parser and utilities for the smart 'if' tag
 """
-import operator
 
 # Using a simple top down parser, as described here:
 #    http://effbot.org/zone/simple-top-down-parsing.htm.

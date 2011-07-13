@@ -1,5 +1,3 @@
-import warnings
-
 from django.contrib.localflavor.in_.forms import (INZipCodeField,
     INStateField, INStateSelect, INPhoneNumberField)
 

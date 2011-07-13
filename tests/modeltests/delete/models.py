@@ -1,4 +1,4 @@
-from django.db import models, IntegrityError
+from django.db import models
 
 
 class R(models.Model):

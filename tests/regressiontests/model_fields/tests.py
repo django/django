@@ -12,14 +12,10 @@ from models import Foo, Bar, Whiz, BigD, BigS, Image, BigInt, Post, NullBooleanM
 
 # If PIL available, do these tests.
 if Image:
-    from imagefield import \
-            ImageFieldTests, \
-            ImageFieldTwoDimensionsTests, \
-            ImageFieldNoDimensionsTests, \
-            ImageFieldOneDimensionTests, \
-            ImageFieldDimensionsFirstTests, \
-            ImageFieldUsingFileTests, \
-            TwoImageFieldTests
+    from imagefield import (
+        ImageFieldTests, ImageFieldTwoDimensionsTests, TwoImageFieldTests,
+        ImageFieldNoDimensionsTests, ImageFieldOneDimensionTests,
+        ImageFieldDimensionsFirstTests, ImageFieldUsingFileTests)
 
 
 class BasicFieldTests(test.TestCase):

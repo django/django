@@ -1,11 +1,11 @@
 from django.contrib.messages import constants
-from django.contrib.messages.storage.fallback import FallbackStorage, \
-    CookieStorage
+from django.contrib.messages.storage.fallback import (FallbackStorage,
+    CookieStorage)
 from django.contrib.messages.tests.base import BaseTest
-from django.contrib.messages.tests.cookie import set_cookie_data, \
-    stored_cookie_messages_count
-from django.contrib.messages.tests.session import set_session_data, \
-    stored_session_messages_count
+from django.contrib.messages.tests.cookie import (set_cookie_data,
+    stored_cookie_messages_count)
+from django.contrib.messages.tests.session import (set_session_data,
+    stored_session_messages_count)
 
 
 class FallbackTest(BaseTest):

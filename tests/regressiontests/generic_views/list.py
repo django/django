@@ -2,7 +2,6 @@ from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
 
 from regressiontests.generic_views.models import Author, Artist
-from regressiontests.generic_views.views import CustomPaginator
 
 class ListViewTests(TestCase):
     fixtures = ['generic-views-test-data.json']

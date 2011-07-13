@@ -3,11 +3,8 @@ The main QuerySet implementation. This provides the public API for the ORM.
 """
 
 import copy
-from itertools import izip
 
 from django.db import connections, router, transaction, IntegrityError
-from django.db.models.aggregates import Aggregate
-from django.db.models.fields import DateField
 from django.db.models.query_utils import (Q, select_related_descend,
     deferred_class_factory, InvalidQuery)
 from django.db.models.deletion import Collector

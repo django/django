@@ -1,4 +1,5 @@
-import os, re, sys
+import os
+import re
 from ctypes import c_char_p, CDLL
 from ctypes.util import find_library
 from django.contrib.gis.gdal.error import OGRException

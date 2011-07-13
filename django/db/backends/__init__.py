@@ -1,4 +1,3 @@
-import decimal
 try:
     import thread
 except ImportError:

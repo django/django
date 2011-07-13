@@ -1,7 +1,6 @@
 from functools import update_wrapper
 from django import http
 from django.core.exceptions import ImproperlyConfigured
-from django.template import RequestContext, loader
 from django.template.response import TemplateResponse
 from django.utils.log import getLogger
 from django.utils.decorators import classonlymethod

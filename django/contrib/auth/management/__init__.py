@@ -102,8 +102,8 @@ def get_default_username(check_db=True):
     :returns: The username, or an empty string if no username can be
         determined.
     """
-    from django.contrib.auth.management.commands.createsuperuser import \
-        RE_VALID_USERNAME
+    from django.contrib.auth.management.commands.createsuperuser import (
+        RE_VALID_USERNAME)
     default_username = get_system_username()
     try:
         default_username = unicodedata.normalize('NFKD', default_username)\

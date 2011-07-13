@@ -1,5 +1,3 @@
-import datetime
-import warnings
 from xml.dom import minidom
 
 from django.contrib.syndication import views

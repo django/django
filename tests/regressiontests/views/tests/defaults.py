@@ -1,6 +1,3 @@
-from os import path
-
-from django.conf import settings
 from django.test import TestCase
 from django.contrib.contenttypes.models import ContentType
 

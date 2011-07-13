@@ -1,4 +1,3 @@
-import datetime
 from warnings import warn
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.importlib import import_module

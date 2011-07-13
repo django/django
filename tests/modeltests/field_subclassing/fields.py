@@ -1,4 +1,3 @@
-from django.core.exceptions import FieldError
 from django.db import models
 from django.utils import simplejson as json
 from django.utils.encoding import force_unicode

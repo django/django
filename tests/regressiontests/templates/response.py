@@ -6,7 +6,7 @@ from django.utils import unittest
 from django.test import RequestFactory, TestCase
 from django.conf import settings
 import django.template.context
-from django.template import Template, Context, RequestContext
+from django.template import Template, Context
 from django.template.response import (TemplateResponse, SimpleTemplateResponse,
                                       ContentNotRenderedError)
 

@@ -1,9 +1,7 @@
 from operator import attrgetter
 
-from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sessions.backends.db import SessionStore
-from django.db import connection
 from django.db.models import Count
 from django.db.models.loading import cache
 from django.test import TestCase

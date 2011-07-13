@@ -1,6 +1,5 @@
-from django.db import models, DEFAULT_DB_ALIAS, connection
+from django.db import models
 from django.contrib.auth.models import User
-from django.conf import settings
 
 
 class Animal(models.Model):

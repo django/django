@@ -1,4 +1,4 @@
-from django.template.smartif import IfParser, Literal
+from django.template.smartif import IfParser
 from django.utils import unittest
 
 class SmartIfTests(unittest.TestCase):

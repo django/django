@@ -38,7 +38,8 @@
  >>> g.geos('24.124.1.80').wkt
  'POINT (-95.2087020874023438 39.0392990112304688)'
 """
-import os, re
+import os
+import re
 from ctypes import c_char_p, c_float, c_int, Structure, CDLL, POINTER
 from ctypes.util import find_library
 from django.conf import settings

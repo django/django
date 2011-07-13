@@ -1,5 +1,3 @@
-import re
-
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 from django.http import Http404
 from django.utils.encoding import smart_str

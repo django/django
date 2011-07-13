@@ -1,6 +1,6 @@
 from django.db import connection
 from django.contrib.gis.gdal import GDAL_VERSION
-from django.contrib.gis.tests.utils import mysql, no_mysql, oracle, postgis, spatialite
+from django.contrib.gis.tests.utils import no_mysql, oracle, postgis, spatialite
 from django.utils import unittest
 
 

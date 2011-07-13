@@ -1,8 +1,16 @@
 import re
+from gzip import GzipFile
+from htmlentitydefs import name2codepoint
+
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from StringIO import StringIO
+
 from django.utils.encoding import force_unicode
 from django.utils.functional import allow_lazy
 from django.utils.translation import ugettext_lazy, ugettext as _
-from htmlentitydefs import name2codepoint
+
 
 # Capitalizes the first letter of a string.
 capfirst = lambda x: x and force_unicode(x)[0].upper() + force_unicode(x)[1:]
@@ -180,9 +188,8 @@ phone2numeric = allow_lazy(phone2numeric)
 # From http://www.xhaus.com/alan/python/httpcomp.html#gzip
 # Used with permission.
 def compress_string(s):
-    import cStringIO, gzip
-    zbuf = cStringIO.StringIO()
-    zfile = gzip.GzipFile(mode='wb', compresslevel=6, fileobj=zbuf)
+    zbuf = StringIO()
+    zfile = GzipFile(mode='wb', compresslevel=6, fileobj=zbuf)
     zfile.write(s)
     zfile.close()
     return zbuf.getvalue()

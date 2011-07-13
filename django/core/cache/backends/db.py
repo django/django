@@ -1,13 +1,16 @@
 "Database cache backend."
-
-from django.core.cache.backends.base import BaseCache
-from django.db import connections, router, transaction, DatabaseError
-import base64, time
+import base64
+import time
 from datetime import datetime
+
 try:
     import cPickle as pickle
 except ImportError:
     import pickle
+
+from django.core.cache.backends.base import BaseCache
+from django.db import connections, router, transaction, DatabaseError
+
 
 class Options(object):
     """A class that will quack like a Django model _meta class.

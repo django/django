@@ -6,7 +6,7 @@ from functools import wraps
 from urlparse import urlsplit, urlunsplit
 from xml.dom.minidom import parseString, Node
 
-from django.conf import settings, UserSettingsHolder
+from django.conf import settings
 from django.core import mail
 from django.core.management import call_command
 from django.core.signals import request_started

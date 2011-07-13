@@ -13,10 +13,8 @@ or implicit commits or rollbacks.
 """
 from __future__ import with_statement
 
-import sys
 from functools import wraps
 
-from django.conf import settings
 from django.db import connections, DEFAULT_DB_ALIAS
 
 

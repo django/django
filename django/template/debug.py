@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.template.base import Lexer, Parser, tag_re, NodeList, VariableNode, TemplateSyntaxError
 from django.utils.encoding import force_unicode
 from django.utils.html import escape

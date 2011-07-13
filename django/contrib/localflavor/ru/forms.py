@@ -3,9 +3,7 @@ Russian-specific forms helpers
 """
 import re
 
-from django.core.validators import EMPTY_VALUES
-from django.forms import ValidationError
-from django.forms.fields import CharField, Select, RegexField
+from django.forms.fields import RegexField, Select
 from django.utils.translation import ugettext_lazy as _
 
 phone_digits_re = re.compile(r'^(?:[78]-?)?(\d{3})[-\.]?(\d{3})[-\.]?(\d{4})$')

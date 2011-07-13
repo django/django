@@ -3,8 +3,8 @@ from operator import attrgetter
 
 from django.test import TestCase
 
-from models import Person, Group, Membership, CustomMembership, \
-    TestNoDefaultsOrNulls, PersonSelfRefM2M, Friendship
+from models import (Person, Group, Membership, CustomMembership,
+    PersonSelfRefM2M, Friendship)
 
 
 class M2mThroughTests(TestCase):

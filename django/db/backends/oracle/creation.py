@@ -1,4 +1,5 @@
-import sys, time
+import sys
+import time
 from django.db.backends.creation import BaseDatabaseCreation
 
 TEST_DATABASE_PREFIX = 'test_'

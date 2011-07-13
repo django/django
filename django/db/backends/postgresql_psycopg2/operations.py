@@ -1,5 +1,3 @@
-import re
-
 from django.db.backends import BaseDatabaseOperations
 
 

@@ -1,11 +1,11 @@
 import datetime
 
 from django.conf import settings
-from django.db import backend, connection, transaction, DEFAULT_DB_ALIAS
+from django.db import backend, transaction, DEFAULT_DB_ALIAS
 from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 
 from models import (Book, Award, AwardNote, Person, Child, Toy, PlayedWith,
-    PlayedWithNote, Contact, Email, Researcher, Food, Eaten,
+    PlayedWithNote, Email, Researcher, Food, Eaten,
     Policy, Version, Location, Item)
 
 

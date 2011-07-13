@@ -1,7 +1,6 @@
 from datetime import datetime
 
 from django.core.exceptions import ObjectDoesNotExist
-from django.db import models, DEFAULT_DB_ALIAS, connection
 from django.db.models.fields import FieldDoesNotExist
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 

@@ -10,7 +10,6 @@ import weakref
 
 from django.db.backends import util
 from django.utils import tree
-from django.utils.datastructures import SortedDict
 
 
 class InvalidQuery(Exception):

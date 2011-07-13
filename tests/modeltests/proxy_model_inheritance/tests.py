@@ -9,7 +9,7 @@ apps and calls syncdb, then verifies that the table has been created.
 import os
 import sys
 
-from django.conf import settings, Settings
+from django.conf import settings
 from django.core.management import call_command
 from django.db.models.loading import load_app
 from django.test import TransactionTestCase

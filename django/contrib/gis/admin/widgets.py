@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.forms.widgets import Textarea
 from django.template import loader, Context
 from django.templatetags.static import static

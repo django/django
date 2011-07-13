@@ -1,6 +1,5 @@
 from functools import update_wrapper
-from django.conf import settings
-from django.db import connection, DEFAULT_DB_ALIAS
+from django.db import connection
 from django.test import TestCase, skipUnlessDBFeature
 
 from models import Reporter, Article

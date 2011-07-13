@@ -1,6 +1,6 @@
 from ctypes import c_void_p
 from types import NoneType
-from django.contrib.gis.geos.error import GEOSException, GEOSIndexError
+from django.contrib.gis.geos.error import GEOSException
 
 # Trying to import GDAL libraries, if available.  Have to place in
 # try/except since this package may be used outside GeoDjango.

@@ -1,4 +1,4 @@
-from django.contrib.sites.models import Site, get_current_site
+from django.contrib.sites.models import Site
 from django.core import urlresolvers, paginator
 from django.core.exceptions import ImproperlyConfigured
 import urllib

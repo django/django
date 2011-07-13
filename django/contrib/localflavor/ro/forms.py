@@ -2,9 +2,6 @@
 """
 Romanian specific form helpers.
 """
-
-import re
-
 from django.core.validators import EMPTY_VALUES
 from django.forms import ValidationError, Field, RegexField, Select
 from django.utils.translation import ugettext_lazy as _

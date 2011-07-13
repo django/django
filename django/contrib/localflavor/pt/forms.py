@@ -1,13 +1,13 @@
 """
 PT-specific Form helpers
 """
+import re
 
 from django.core.validators import EMPTY_VALUES
 from django.forms import ValidationError
-from django.forms.fields import Field, RegexField, Select
+from django.forms.fields import Field, RegexField
 from django.utils.encoding import smart_unicode
 from django.utils.translation import ugettext_lazy as _
-import re
 
 phone_digits_re = re.compile(r'^(\d{9}|(00|\+)\d*)$')
 

@@ -33,7 +33,6 @@ from functools import wraps
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms import *
-from django.forms.widgets import RadioFieldRenderer
 from django.utils.unittest import TestCase
 
 

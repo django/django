@@ -1,12 +1,9 @@
-import re
-from datetime import date
-from ctypes import c_char, c_char_p, c_double, c_int, c_ubyte, c_void_p, POINTER
+from ctypes import c_char_p, c_double, c_int, c_void_p, POINTER
 from django.contrib.gis.gdal.envelope import OGREnvelope
 from django.contrib.gis.gdal.libgdal import lgdal, GEOJSON
 from django.contrib.gis.gdal.prototypes.errcheck import check_bool, check_envelope
-from django.contrib.gis.gdal.prototypes.generation import \
-    const_string_output, double_output, geom_output, int_output, \
-    srs_output, string_output, void_output
+from django.contrib.gis.gdal.prototypes.generation import (const_string_output,
+    double_output, geom_output, int_output, srs_output, string_output, void_output)
 
 ### Generation routines specific to this module ###
 def env_func(f, argtypes):

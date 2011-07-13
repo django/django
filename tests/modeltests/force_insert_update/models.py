@@ -2,7 +2,7 @@
 Tests for forcing insert and update queries (instead of Django's normal
 automatic behaviour).
 """
-from django.db import models, transaction, IntegrityError
+from django.db import models
 
 class Counter(models.Model):
     name = models.CharField(max_length = 10)

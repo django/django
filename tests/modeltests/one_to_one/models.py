@@ -6,7 +6,7 @@ To define a one-to-one relationship, use ``OneToOneField()``.
 In this example, a ``Place`` optionally can be a ``Restaurant``.
 """
 
-from django.db import models, transaction, IntegrityError
+from django.db import models
 
 class Place(models.Model):
     name = models.CharField(max_length=50)

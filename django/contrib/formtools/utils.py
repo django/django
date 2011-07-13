@@ -5,7 +5,6 @@ except ImportError:
 
 import hashlib
 from django.conf import settings
-from django.forms import BooleanField
 from django.utils.crypto import salted_hmac
 
 

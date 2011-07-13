@@ -1,5 +1,4 @@
-import sys, os
-from optparse import OptionParser, make_option
+from optparse import make_option
 
 from django.core.management.base import BaseCommand
 

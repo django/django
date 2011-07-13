@@ -6,7 +6,6 @@ from django.utils.datastructures import SortedDict
 from django.utils.importlib import import_module
 from django.utils.module_loading import module_has_submodule
 
-import imp
 import sys
 import os
 import threading

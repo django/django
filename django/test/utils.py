@@ -1,12 +1,8 @@
 from __future__ import with_statement
 
-import sys
-import time
-import os
 import warnings
 from django.conf import settings, UserSettingsHolder
 from django.core import mail
-from django.core.mail.backends import locmem
 from django.test.signals import template_rendered, setting_changed
 from django.template import Template, loader, TemplateDoesNotExist
 from django.template.loaders import cached

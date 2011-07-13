@@ -7,7 +7,7 @@ commit-on-success behavior. Alternatively, you can manage the transaction
 manually.
 """
 
-from django.db import models, DEFAULT_DB_ALIAS
+from django.db import models
 
 class Reporter(models.Model):
     first_name = models.CharField(max_length=30)

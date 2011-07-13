@@ -3,7 +3,6 @@ from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.error import OGRException, OGRIndexError
 from django.contrib.gis.gdal.field import Field
 from django.contrib.gis.gdal.geometries import OGRGeometry, OGRGeomType
-from django.contrib.gis.gdal.srs import SpatialReference
 
 # ctypes function prototypes
 from django.contrib.gis.gdal.prototypes import ds as capi, geom as geom_api

@@ -1,7 +1,6 @@
 from datetime import datetime
 from operator import attrgetter
 from django.core.exceptions import FieldError
-from django.db import connection
 from django.test import TestCase, skipUnlessDBFeature
 from models import Author, Article, Tag
 

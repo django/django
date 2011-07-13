@@ -1,4 +1,4 @@
-from django.db.models.fields import Field, FieldDoesNotExist
+from django.db.models.fields import FieldDoesNotExist
 from django.db.models.sql.constants import LOOKUP_SEP
 from django.db.models.sql.expressions import SQLEvaluator
 from django.db.models.sql.where import Constraint, WhereNode

@@ -2,8 +2,6 @@
 """
 UY-specific form helpers.
 """
-import re
-
 from django.core.validators import EMPTY_VALUES
 from django.forms.fields import Select, RegexField
 from django.forms import ValidationError

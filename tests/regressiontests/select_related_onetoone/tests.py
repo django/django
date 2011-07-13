@@ -1,5 +1,3 @@
-from django import db
-from django.conf import settings
 from django.test import TestCase
 
 from models import (User, UserProfile, UserStat, UserStatResult, StatDetails,

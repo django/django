@@ -1,5 +1,4 @@
 import logging
-import sys
 import traceback
 
 from django.conf import settings

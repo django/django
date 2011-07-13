@@ -1,8 +1,6 @@
 from __future__ import with_statement
 
-import sys
-
-from django.test import TestCase, skipUnlessDBFeature, skipIfDBFeature
+from django.test import TestCase, skipUnlessDBFeature
 from django.utils.unittest import skip
 
 from models import Person

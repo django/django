@@ -12,8 +12,9 @@ Run with the extra option "help" for a list of additional options you can
 pass to this server.
 """
 
+import os
+import sys
 from django.utils import importlib
-import sys, os
 
 __version__ = "0.1"
 __all__ = ["runfastcgi"]

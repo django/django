@@ -1,8 +1,7 @@
 from django.core import urlresolvers
 from django.core.paginator import EmptyPage, PageNotAnInteger
-from django.http import HttpResponse, Http404
+from django.http import Http404
 from django.template.response import TemplateResponse
-from django.utils.encoding import smart_str
 
 from django.contrib.sites.models import get_current_site
 

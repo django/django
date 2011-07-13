@@ -3,7 +3,8 @@ import datetime
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms import Form, ModelForm, FileField, ModelChoiceField
 from django.test import TestCase
-from regressiontests.forms.models import ChoiceModel, ChoiceOptionModel, ChoiceFieldModel, FileModel, Group, BoundaryModel, Defaults
+from regressiontests.forms.models import (ChoiceOptionModel, ChoiceFieldModel,
+    FileModel, Group, BoundaryModel, Defaults)
 
 
 class ChoiceFieldForm(ModelForm):

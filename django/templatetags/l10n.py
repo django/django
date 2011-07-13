@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.template import Node
 from django.template import TemplateSyntaxError, Library
 from django.utils import formats

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-from django.conf import settings
-from django.db import DEFAULT_DB_ALIAS, transaction, IntegrityError
+from django.db import transaction, IntegrityError
 from django.test import TestCase, skipIfDBFeature
 
 from models import Employee, Business, Bar, Foo

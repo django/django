@@ -8,7 +8,7 @@ Author: Travis Pinney, Dane Springmeyer, & Justin Bronn
 from itertools import izip
 # Requires GDAL to use.
 from django.contrib.gis.gdal import DataSource
-from django.contrib.gis.gdal.field import OFTDate, OFTDateTime, OFTInteger, OFTReal, OFTString, OFTTime
+from django.contrib.gis.gdal.field import OFTDate, OFTDateTime, OFTInteger, OFTReal, OFTString
 
 def mapping(data_source, geom_name='geom', layer_key=0, multi_geom=False):
     """

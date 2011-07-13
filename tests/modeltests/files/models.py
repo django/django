@@ -9,7 +9,6 @@ import random
 import tempfile
 
 from django.db import models
-from django.core.files.base import ContentFile
 from django.core.files.storage import FileSystemStorage
 
 

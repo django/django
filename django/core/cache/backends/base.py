@@ -2,7 +2,6 @@
 
 import warnings
 
-from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, DjangoRuntimeWarning
 from django.utils.encoding import smart_str
 from django.utils.importlib import import_module

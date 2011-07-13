@@ -1,3 +1,2 @@
-from django.contrib.gis.geos import \
-    GEOSGeometry as Geometry, \
-    GEOSException as GeometryException
+from django.contrib.gis.geos import (
+    GEOSGeometry as Geometry, GEOSException as GeometryException)

@@ -2,12 +2,6 @@
 Formtools Preview application.
 """
 
-try:
-    import cPickle as pickle
-except ImportError:
-    import pickle
-
-from django.conf import settings
 from django.http import Http404
 from django.shortcuts import render_to_response
 from django.template.context import RequestContext

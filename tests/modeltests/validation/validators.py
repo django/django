@@ -1,5 +1,3 @@
-from django.utils.unittest import TestCase
-
 from modeltests.validation import ValidationTestCase
 from models import *
 

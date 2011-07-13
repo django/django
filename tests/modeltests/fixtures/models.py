@@ -8,11 +8,10 @@ in the application directory, or in one of the directories named in the
 ``FIXTURE_DIRS`` setting.
 """
 
+from django.db import models
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
-from django.db import models, DEFAULT_DB_ALIAS
-from django.conf import settings
 
 
 class Category(models.Model):

@@ -3,9 +3,9 @@
  GeometryCollection, MultiPoint, MultiLineString, and MultiPolygon
 """
 from ctypes import c_int, c_uint, byref
-from django.contrib.gis.geos.error import GEOSException, GEOSIndexError
+from django.contrib.gis.geos.error import GEOSException
 from django.contrib.gis.geos.geometry import GEOSGeometry
-from django.contrib.gis.geos.libgeos import get_pointer_arr, GEOM_PTR, GEOS_PREPARE
+from django.contrib.gis.geos.libgeos import get_pointer_arr, GEOS_PREPARE
 from django.contrib.gis.geos.linestring import LineString, LinearRing
 from django.contrib.gis.geos.point import Point
 from django.contrib.gis.geos.polygon import Polygon

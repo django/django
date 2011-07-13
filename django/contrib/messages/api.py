@@ -1,6 +1,5 @@
 from django.contrib.messages import constants
 from django.contrib.messages.storage import default_storage
-from django.utils.functional import lazy, memoize
 
 __all__ = (
     'add_message', 'get_messages',

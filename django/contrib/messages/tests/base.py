@@ -1,5 +1,3 @@
-import warnings
-
 from django import http
 from django.test import TestCase
 from django.conf import settings

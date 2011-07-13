@@ -1,5 +1,4 @@
 from ctypes import c_uint, byref
-from django.contrib.gis.geos.error import GEOSIndexError
 from django.contrib.gis.geos.geometry import GEOSGeometry
 from django.contrib.gis.geos.libgeos import get_pointer_arr, GEOM_PTR
 from django.contrib.gis.geos.linestring import LinearRing

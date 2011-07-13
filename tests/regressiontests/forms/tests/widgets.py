@@ -2,9 +2,6 @@
 
 import copy
 import datetime
-import re
-import time
-from decimal import Decimal
 from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms import *

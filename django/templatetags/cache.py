@@ -2,7 +2,6 @@ import hashlib
 from django.template import Library, Node, TemplateSyntaxError, Variable, VariableDoesNotExist
 from django.template import resolve_variable
 from django.core.cache import cache
-from django.utils.encoding import force_unicode
 from django.utils.http import urlquote
 
 register = Library()

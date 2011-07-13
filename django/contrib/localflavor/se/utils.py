@@ -1,4 +1,3 @@
-import re
 import datetime
 
 def id_number_checksum(gd):

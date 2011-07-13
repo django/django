@@ -5,7 +5,8 @@ Provides a way to safely weakref any function, including bound methods (which
 aren't handled by the core weakref module).
 """
 
-import weakref, traceback
+import traceback
+import weakref
 
 def safeRef(target, onDelete = None):
     """Return a *safe* weak reference to a callable target

@@ -1,6 +1,5 @@
 from django.contrib.gis import feeds
-from django.contrib.gis.tests.utils import mysql
-from models import City, Country
+from models import City
 
 class TestGeoRSS1(feeds.Feed):
     link = '/city/'

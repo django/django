@@ -7,7 +7,7 @@ __all__ = ['geos_boundary', 'geos_buffer', 'geos_centroid', 'geos_convexhull',
            'geos_linemerge', 'geos_pointonsurface', 'geos_preservesimplify',
            'geos_simplify', 'geos_symdifference', 'geos_union', 'geos_relate']
 
-from ctypes import c_char_p, c_double, c_int
+from ctypes import c_double, c_int
 from django.contrib.gis.geos.libgeos import GEOM_PTR, GEOS_PREPARE
 from django.contrib.gis.geos.prototypes.errcheck import check_geom, check_string
 from django.contrib.gis.geos.prototypes.geom import geos_char_p

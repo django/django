@@ -2,7 +2,7 @@ from copy import deepcopy
 from datetime import datetime
 
 from django.test import TestCase
-from django.core.exceptions import FieldError, MultipleObjectsReturned
+from django.core.exceptions import MultipleObjectsReturned
 
 from models import Article, Reporter
 

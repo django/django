@@ -1,7 +1,3 @@
-import warnings
-
-from django.test.utils import get_warnings_state, restore_warnings_state
-
 from regressiontests.comment_tests.tests import CommentTestCase
 
 

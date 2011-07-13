@@ -1,6 +1,5 @@
 from django.db.models.sql.aggregates import *
 from django.contrib.gis.db.models.fields import GeometryField
-from django.contrib.gis.db.models.sql.conversion import GeomField
 
 class GeoAggregate(Aggregate):
     # Default SQL template for spatial aggregates.

@@ -1,5 +1,5 @@
-import os, unittest
-from django.contrib.gis.tests.utils import no_mysql, no_oracle, no_postgis, no_spatialite
+import unittest
+from django.contrib.gis.tests.utils import no_mysql, no_spatialite
 from django.contrib.gis.shortcuts import render_to_kmz
 from models import City
 

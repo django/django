@@ -2,9 +2,7 @@
 Regression tests for defer() / only() behavior.
 """
 
-from django.conf import settings
-from django.contrib.contenttypes.models import ContentType
-from django.db import connection, models
+from django.db import models
 
 class Item(models.Model):
     name = models.CharField(max_length=15)

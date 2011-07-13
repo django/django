@@ -1,11 +1,9 @@
-from pprint import pformat
 import sys
 from threading import Lock
 try:
     from cStringIO import StringIO
 except ImportError:
     from StringIO import StringIO
-import socket
 
 from django import http
 from django.core import signals

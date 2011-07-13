@@ -2,7 +2,6 @@ import base64
 import hashlib
 import os
 import random
-import sys
 import time
 from datetime import datetime, timedelta
 try:

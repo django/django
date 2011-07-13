@@ -3,8 +3,7 @@ from django.test import TestCase
 from django.utils.datastructures import SortedDict
 
 from django.contrib.auth.models import User
-from regressiontests.extra_regress.models import TestObject, Order, \
-        RevisionableModel
+from regressiontests.extra_regress.models import TestObject, Order, RevisionableModel
 
 import datetime
 

@@ -4,9 +4,9 @@
 """
 
 from ctypes import c_char_p, c_double, c_int, c_void_p
-from django.contrib.gis.gdal.prototypes.errcheck import \
-    check_arg_errcode, check_errcode, check_geom, check_geom_offset, \
-    check_pointer, check_srs, check_str_arg, check_string, check_const_string
+from django.contrib.gis.gdal.prototypes.errcheck import (
+    check_arg_errcode, check_errcode, check_geom, check_geom_offset,
+    check_pointer, check_srs, check_str_arg, check_string, check_const_string)
 
 class gdal_char_p(c_char_p):
     pass

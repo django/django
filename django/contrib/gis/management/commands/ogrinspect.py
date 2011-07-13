@@ -1,4 +1,4 @@
-import os, sys
+import os
 from optparse import make_option
 from django.contrib.gis import gdal
 from django.contrib.gis.management.base import ArgsCommand, CommandError

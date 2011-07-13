@@ -1,5 +1,3 @@
-from __future__ import with_statement
-
 from django import template
 from django.utils.unittest import TestCase
 from templatetags import custom

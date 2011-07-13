@@ -1,9 +1,6 @@
 from __future__ import with_statement
 
-import sys
-
-from django.db import connection, transaction, IntegrityError, DEFAULT_DB_ALIAS
-from django.conf import settings
+from django.db import connection, transaction, IntegrityError
 from django.test import TransactionTestCase, skipUnlessDBFeature
 
 from models import Reporter

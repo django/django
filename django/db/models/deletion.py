@@ -3,7 +3,6 @@ from operator import attrgetter
 
 from django.db import connections, transaction, IntegrityError
 from django.db.models import signals, sql
-from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE
 from django.utils.datastructures import SortedDict
 
 

@@ -1,4 +1,3 @@
-from django.db import connection
 from django.contrib.auth.models import User, Permission
 
 

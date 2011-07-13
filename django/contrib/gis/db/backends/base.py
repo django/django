@@ -3,7 +3,6 @@ Base/mixin classes for the spatial backend database operations and the
 `SpatialRefSys` model the backend.
 """
 import re
-from django.conf import settings
 from django.contrib.gis import gdal
 
 class BaseSpatialOperations(object):

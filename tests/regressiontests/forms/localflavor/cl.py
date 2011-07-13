@@ -1,5 +1,4 @@
 from django.contrib.localflavor.cl.forms import CLRutField, CLRegionSelect
-from django.core.exceptions import ValidationError
 
 from utils import LocalFlavorTestCase
 

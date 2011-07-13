@@ -1,4 +1,4 @@
-from django.conf.urls.defaults import include, url
+from django.conf.urls.defaults import url
 from django.conf.urls.i18n import i18n_patterns
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import TemplateView
