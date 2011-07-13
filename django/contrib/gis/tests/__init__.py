@@ -100,15 +100,16 @@ class GeoDjangoTestSuiteRunner(DjangoTestSuiteRunner):
 
         # Constructing the new INSTALLED_APPS, and including applications
         # within the GeoDjango test namespace.
-        new_installed =  ['django.contrib.sites',
-                          'django.contrib.sitemaps',
-                          'django.contrib.gis',
-                          ]
+        new_installed =  [
+            'django.contrib.sites',
+            'django.contrib.sitemaps',
+            'django.contrib.gis',
+        ]
 
         # Calling out to `geo_apps` to get GeoDjango applications supported
         # for testing.
         new_installed.extend(geo_apps())
-        settings.INSTALLED_APPS = new_installed
+        settings.INSTALLED_APPS = list(self.old_installed) + new_installed
 
         # SITE_ID needs to be set
         settings.SITE_ID = 1
