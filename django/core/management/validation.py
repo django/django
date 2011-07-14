@@ -1,6 +1,5 @@
 import sys
 
-from django.contrib.contenttypes.generic import GenericForeignKey, GenericRelation
 from django.core.management.color import color_style
 from django.utils.itercompat import is_iterable
 
@@ -240,12 +239,6 @@ def get_validation_errors(outfile, app=None):
                 e.add(opts, "'%s' specifies an m2m relation through model %s, "
                     "which has not been installed" % (f.name, f.rel.through)
                 )
-            elif isinstance(f, GenericRelation):
-                if not any([isinstance(vfield, GenericForeignKey) for vfield in f.rel.to._meta.virtual_fields]):
-                    e.add(opts, "Model '%s' must have a GenericForeignKey in "
-                        "order to create a GenericRelation that points to it."
-                        % f.rel.to.__name__
-                    )
 
             rel_opts = f.rel.to._meta
             rel_name = RelatedObject(f.rel.to, cls, f).get_accessor_name()
