@@ -9,7 +9,7 @@ from django.forms.widgets import RadioFieldRenderer
 from django.forms.util import flatatt
 from django.templatetags.static import static
 from django.utils.html import escape
-from django.utils.text import truncate_words
+from django.utils.text import Truncator
 from django.utils.translation import ugettext as _
 from django.utils.safestring import mark_safe
 from django.utils.encoding import force_unicode
@@ -152,7 +152,7 @@ class ForeignKeyRawIdWidget(forms.TextInput):
         key = self.rel.get_related_field().name
         try:
             obj = self.rel.to._default_manager.using(self.db).get(**{key: value})
-            return '&nbsp;<strong>%s</strong>' % escape(truncate_words(obj, 14))
+            return '&nbsp;<strong>%s</strong>' % escape(Truncator(obj).words(14, truncate='...'))
         except (ValueError, self.rel.to.DoesNotExist):
             return ''
 

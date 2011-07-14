@@ -15,7 +15,7 @@ from django.utils.encoding import force_unicode, iri_to_uri
 from django.utils.html import (conditional_escape, escapejs, fix_ampersands,
     escape, urlize as urlize_impl, linebreaks, strip_tags)
 from django.utils.http import urlquote
-from django.utils.text import truncate_words, truncate_html_words, wrap, phone2numeric
+from django.utils.text import Truncator, wrap, phone2numeric
 from django.utils.safestring import mark_safe, SafeData, mark_for_escaping
 from django.utils.timesince import timesince, timeuntil
 from django.utils.translation import ugettext, ungettext
@@ -244,6 +244,20 @@ def title(value):
 title.is_safe = True
 title = stringfilter(title)
 
+def truncatechars(value, arg):
+    """
+    Truncates a string after a certain number of characters.
+
+    Argument: Number of characters to truncate after.
+    """
+    try:
+        length = int(arg)
+    except ValueError: # Invalid literal for int().
+        return value # Fail silently.
+    return Truncator(value).chars(value, length)
+truncatechars.is_safe = True
+truncatechars = stringfilter(truncatechars)
+
 def truncatewords(value, arg):
     """
     Truncates a string after a certain number of words.
@@ -256,7 +270,7 @@ def truncatewords(value, arg):
         length = int(arg)
     except ValueError: # Invalid literal for int().
         return value # Fail silently.
-    return truncate_words(value, length)
+    return Truncator(value).words(length, truncate=' ...')
 truncatewords.is_safe = True
 truncatewords = stringfilter(truncatewords)
 
@@ -272,7 +286,7 @@ def truncatewords_html(value, arg):
         length = int(arg)
     except ValueError: # invalid literal for int()
         return value # Fail silently.
-    return truncate_html_words(value, length)
+    return Truncator(value).words(length, html=True, truncate=' ...')
 truncatewords_html.is_safe = True
 truncatewords_html = stringfilter(truncatewords_html)
 

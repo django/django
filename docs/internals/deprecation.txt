@@ -220,6 +220,12 @@ their deprecation, as per the :ref:`Django deprecation policy
           was deprecated since Django 1.4 and will be removed in favor of the
           generic static files handling.
 
+        * The builin truncation functions
+          :func:`django.utils.text.truncate_words` and
+          :func:`django.utils.text.truncate_html_words`
+          were deprecated since Django 1.4 and will be removed in favor
+          of the ``django.utils.text.Truncator`` class.
+
     * 2.0
         * ``django.views.defaults.shortcut()``. This function has been moved
           to ``django.contrib.contenttypes.views.shortcut()`` as part of the
