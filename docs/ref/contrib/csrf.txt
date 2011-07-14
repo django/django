@@ -128,6 +128,11 @@ that allow headers to be set on every request. In jQuery, you can use the
         }
     });
 
+.. note::
+
+    Due to a bug introduced in jQuery 1.5, the example above will not work
+    correctly on that version. Make sure you are running at least jQuery 1.5.1.
+
 Adding this to a javascript file that is included on your site will ensure that
 AJAX POST requests that are made via jQuery will not be caught by the CSRF
 protection.
