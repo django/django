@@ -6,7 +6,8 @@ from django.db.models import Count
 from django.db.models.loading import cache
 from django.test import TestCase
 
-from models import ResolveThis, Item, RelatedItem, Child, Leaf, Proxy
+from models import (ResolveThis, Item, RelatedItem, Child, Leaf, Proxy,
+        SimpleItem, Feature)
 
 
 class DeferRegressionTest(TestCase):
@@ -108,11 +109,13 @@ class DeferRegressionTest(TestCase):
         self.assertEqual(
             klasses, [
                 Child,
+                Feature,
                 Item,
                 Leaf,
                 Proxy,
                 RelatedItem,
                 ResolveThis,
+                SimpleItem,
             ]
         )
 
@@ -128,6 +131,7 @@ class DeferRegressionTest(TestCase):
             klasses, [
                 "Child",
                 "Child_Deferred_value",
+                "Feature",
                 "Item",
                 "Item_Deferred_name",
                 "Item_Deferred_name_other_value_text",
@@ -144,12 +148,13 @@ class DeferRegressionTest(TestCase):
                 "RelatedItem_Deferred_",
                 "RelatedItem_Deferred_item_id",
                 "ResolveThis",
+                "SimpleItem",
             ]
         )
 
         # Regression for #16409 - make sure defer() and only() work with annotate()
-        self.assertIsInstance(list(Item.objects.annotate(Count('relateditem')).defer('name')), list)
-        self.assertIsInstance(list(Item.objects.annotate(Count('relateditem')).only('name')), list)
+        self.assertIsInstance(list(SimpleItem.objects.annotate(Count('feature')).defer('name')), list)
+        self.assertIsInstance(list(SimpleItem.objects.annotate(Count('feature')).only('name')), list)
 
     def test_only_and_defer_usage_on_proxy_models(self):
         # Regression for #15790 - only() broken for proxy models
