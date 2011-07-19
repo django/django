@@ -183,6 +183,13 @@ You can get a local copy of the HTML documentation following a few easy steps:
 
       You'll need `GNU Make`__ installed for this.
 
+      If you're on Windows you can alternatively use the included batch file:
+
+      .. code-block:: bat
+
+            cd path\to\django\docs
+            make.bat html
+
     * The HTML documentation will be placed in ``docs/_build/html``.
 
 .. note::
