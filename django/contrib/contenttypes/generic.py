@@ -52,9 +52,9 @@ class GenericForeignKey(object):
         # using this model
         ContentType = get_model("contenttypes", "contenttype")
         if obj:
-             return ContentType.objects.db_manager(obj._state.db).get_for_model(obj)
+            return ContentType.objects.db_manager(obj._state.db).get_for_model(obj)
         elif id:
-             return ContentType.objects.db_manager(using).get_for_id(id)
+            return ContentType.objects.db_manager(using).get_for_id(id)
         else:
             # This should never happen. I love comments like this, don't you?
             raise Exception("Impossible arguments to GFK.get_content_type!")
