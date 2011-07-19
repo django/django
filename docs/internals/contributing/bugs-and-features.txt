@@ -2,14 +2,14 @@
 Reporting bugs and requesting features
 ======================================
 
-Before reporting a bug or requesting a new feature please consider these
+Before reporting a bug or requesting a new feature, please consider these
 general points:
 
 * Check that someone hasn't already filed the bug or feature request by
   `searching`_ or running `custom queries`_ in the ticket tracker.
 
 * Don't use the ticket system to ask support questions. Use the
-  `django-users`_ list, or the `#django`_ IRC channel for that.
+  `django-users`_ list or the `#django`_ IRC channel for that.
 
 * Don't reopen issues that have been marked "wontfix" by a core developer.
   This mark means that the decision has been made that we can't or won't fix
@@ -17,7 +17,7 @@ general points:
   on `django-developers`_.
 
 * Don't use the ticket tracker for lengthy discussions, because they're
-  likely to get lost. If a particular ticket is controversial, please move
+  likely to get lost. If a particular ticket is controversial, please move the
   discussion to `django-developers`_.
 
 .. _reporting-bugs:
@@ -33,19 +33,19 @@ particular:
     * **Do** read the :doc:`FAQ </faq/index>` to see if your issue might
       be a well-known question.
 
-    * **Do** ask on `django-users`_ *first* if you're not sure if what you're
-      seeing is a bug.
+    * **Do** ask on `django-users`_ or `#django`_ *first* if you're not sure if
+      what you're seeing is a bug.
 
-    * **Do** write complete, reproducible, specific bug reports. Include as
-      much information as you possibly can, complete with code snippets, test
-      cases, etc. This means including a clear, concise description of the
-      problem, and a clear set of instructions for replicating the problem.
-      A minimal example that illustrates the bug in a nice small test case
-      is the best possible bug report.
+    * **Do** write complete, reproducible, specific bug reports. You must
+      include a clear, concise description of the problem, and a set of
+      instructions for replicating it. Add as much debug information as you can:
+      code snippets, test cases, exception backtraces, screenshots, etc. A nice
+      small test case is the best way to report a bug, as it gives us an easy
+      way to confirm the bug quickly.
 
-    * **Don't** post to django-developers just to announce that you have filed
-      a bug report. All the tickets are mailed to another list
-      (`django-updates`_), which is tracked by developers and interested
+    * **Don't** post to `django-developers`_ just to announce that you have
+      filed a bug report. All the tickets are mailed to another list,
+      `django-updates`_, which is tracked by developers and interested
       community members; we see them as they are filed.
 
 To understand the lifecycle of your ticket once you have created it, refer to
@@ -95,8 +95,18 @@ Requesting features
 We're always trying to make Django better, and your feature requests are a key
 part of that. Here are some tips on how to make a request most effectively:
 
-    * First request the feature on `django-developers`_, not in the ticket
-      tracker. It'll get read more closely if it's on the mailing list.
+    * Make sure the feature actually requires changes in Django's core. If your
+      idea can be developed as an independent application or module — for
+      instance, you want to support another database engine — we'll probably
+      suggest that you to develop it independently. Then, if your project
+      gathers sufficient community support, we may consider it for inclusion in
+      Django.
+
+    * First request the feature on the `django-developers`_ list, not in the
+      ticket tracker. It'll get read more closely if it's on the mailing list.
+      This is even more important for large-scale feature requests. We like to
+      discuss any big changes to Django's core on the mailing list before
+      actually working on them.
 
     * Describe clearly and concisely what the missing feature is and how you'd
       like to see it implemented. Include example code (non-functional is OK)
@@ -107,18 +117,15 @@ part of that. Here are some tips on how to make a request most effectively:
       you'll need to explain it, if it isn't obvious why the feature would be
       useful.
 
-    * Don't use the ticket system to make large-scale feature requests.
-      We like to discuss any big changes to Django's core on the
-      `django-developers`_ list before actually working on them.
+If core developers agree on the feature, then it's appropriate to create a
+ticket. Include a link the discussion on `django-developers`_ in the ticket
+description.
 
 As with most open-source projects, code talks. If you are willing to write the
-code for the feature yourself or if (even better) you've already written it,
+code for the feature yourself or, even better, if you've already written it,
 it's much more likely to be accepted. If it's a large feature that might need
 multiple developers, we're always happy to give you an experimental branch in
 our repository; see the :doc:`writing-code/branch-policy`.
-
-To understand the lifecycle of your ticket once you have created it, refer to
-:doc:`triaging-tickets`.
 
 See also: :ref:`documenting-new-features`.
 
@@ -141,9 +148,9 @@ votes are given as +1, +0, -0, or -1. Roughly translated, these votes mean:
     * -1: "I strongly disagree and would be very unhappy to see the idea turn
       into reality."
 
-Although these votes on django-developers are informal, they'll be taken very
-seriously. After a suitable voting period, if an obvious consensus arises
-we'll follow the votes.
+Although these votes on `django-developers`_ are informal, they'll be taken very
+seriously. After a suitable voting period, if an obvious consensus arises we'll
+follow the votes.
 
 However, consensus is not always possible. If consensus cannot be reached, or
 if the discussion towards a consensus fizzles out without a concrete decision,
@@ -175,7 +182,7 @@ committers -- may be held in private.
 
 
 .. _searching: http://code.djangoproject.com/search
-.. _`custom queries`: https://code.djangoproject.com/query
+.. _custom queries: https://code.djangoproject.com/query
 .. _django-developers: http://groups.google.com/group/django-developers
 .. _django-users: http://groups.google.com/group/django-users
-.. _`#django`: irc://irc.freenode.net/django
+.. _#django: irc://irc.freenode.net/django

@@ -3,13 +3,13 @@ Unit tests
 ==========
 
 Django comes with a test suite of its own, in the ``tests`` directory of the
-Django tarball. It's our policy to make sure all tests pass at all times.
+code base. It's our policy to make sure all tests pass at all times.
 
 The tests cover:
 
-    * Models and the database API (``tests/modeltests/``).
-    * Everything else in core Django code (``tests/regressiontests``)
-    * Contrib apps (``django/contrib/<contribapp>/tests``, see below)
+    * Models and the database API (``tests/modeltests``),
+    * Everything else in core Django code (``tests/regressiontests``),
+    * :ref:`contrib-apps` (``django/contrib/<app>/tests``).
 
 We appreciate any and all contributions to the test suite!
 
@@ -105,8 +105,8 @@ internationalization, type:
     ./runtests.py --settings=path.to.settings generic_relations i18n
 
 How do you find out the names of individual tests? Look in
-``tests/modeltests`` and ``tests/regressiontests`` -- each directory name
-there is the name of a test.
+``tests/modeltests`` and ``tests/regressiontests`` — each directory name
+there is the name of a test. Contrib app names are also valid test names.
 
 If you just want to run a particular class of tests, you can specify a list of
 paths to individual test classes. For example, to run the ``TranslationTests``
@@ -150,16 +150,17 @@ associated tests will be skipped.
 .. _memcached: http://www.danga.com/memcached/
 .. _gettext: http://www.gnu.org/software/gettext/manual/gettext.html
 
+.. _contrib-apps:
+
 Contrib apps
 ------------
 
-Tests for apps in ``django/contrib/`` go in their respective directories under
-``django/contrib/``, in a ``tests.py`` file. (You can split the tests over
-multiple modules by using a ``tests`` directory in the normal Python way.)
+Tests for contrib apps go in their respective directories under
+``django/contrib``, in a ``tests.py`` file. You can split the tests over
+multiple modules by using a ``tests`` directory in the normal Python way.
 
-For the tests to be found, a ``models.py`` file must exist (it doesn't
-have to have anything in it). If you have URLs that need to be
-mapped, put them in ``tests/urls.py``.
+For the tests to be found, a ``models.py`` file must exist, even if it's empty.
+If you have URLs that need to be mapped, put them in ``tests/urls.py``.
 
 To run tests for just one contrib app (e.g. ``markup``), use the same
 method as above::

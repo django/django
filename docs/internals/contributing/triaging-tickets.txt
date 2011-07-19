@@ -2,16 +2,17 @@
 Triaging tickets
 ================
 
-Django uses Trac_ for managing our progress, and Trac is a community-tended
-garden of the bugs people have found and the features people would like to see
-added. As in any garden, sometimes there are weeds to be pulled and sometimes
-there are flowers and vegetables that need picking. We need your help to sort
-out one from the other, and in the end we all benefit together.
+Django uses Trac_ for managing the work on the code base. Trac is a
+community-tended garden of the bugs people have found and the features people
+would like to see added. As in any garden, sometimes there are weeds to be
+pulled and sometimes there are flowers and vegetables that need picking. We need
+your help to sort out one from the other, and in the end we all benefit
+together.
 
 Like all gardens, we can aspire to perfection but in reality there's no such
 thing. Even in the most pristine garden there are still snails and insects.
-In a community garden there are also helpful people who--with the best of
-intentions--fertilize the weeds and poison the roses. It's the job of the
+In a community garden there are also helpful people who -- with the best of
+intentions -- fertilize the weeds and poison the roses. It's the job of the
 community as a whole to self-manage, keep the problems to a minimum, and
 educate those coming into the community so that they can become valuable
 contributing members.
@@ -39,8 +40,8 @@ tickets have patches, but those patches don't meet all the requirements of a
 :ref:`good patch<patch-style>`.
 
 One way to help out is to *triage* tickets that have been created by other
-users. The core team--as well as many community members--work on this
-regularly, but more help is always appreciated.
+users. The core team and several community members work on this regularly, but
+more help is always appreciated.
 
 Most of the workflow is based around the concept of a ticket's
 :ref:`triage stages <triage-stages>`. Each stage describes where in its
@@ -146,11 +147,10 @@ made by the core committers, however that is not a requirement. See the
 :ref:`New contributors' FAQ<new-contributors-faq>` for "My ticket has been in
 DDN forever! What should I do?"
 
-This stage will generally only be used for feature
-requests. It can also be used for issues that *might* be bugs, depending on
-opinion or interpretation. Obvious bugs (such as crashes, incorrect query
-results, or non-compliance with a standard) skip this stage and move straight
-to "Accepted".
+This stage will often be used for feature requests. It can also be used for
+issues that *might* be bugs, depending on opinion or interpretation. Obvious
+bugs (such as crashes, incorrect query results, or non-compliance with a
+standard) skip this stage and move straight to "Accepted".
 
 Ready For Checkin
 ~~~~~~~~~~~~~~~~~
@@ -200,7 +200,7 @@ A number of flags, appearing as checkboxes in Trac, can be set on a ticket:
         This flag means that although the ticket *has* a patch, it's not quite
         ready for checkin. This could mean the patch no longer applies
         cleanly, there is a flaw in the implementation, or that the code
-        doesn't meet our standards."
+        doesn't meet our standards.
   * Easy pickings
         Tickets that would require small, easy, patches.
 
@@ -250,7 +250,7 @@ If you do close a ticket, you should always make sure of the following:
   * If there is a way they can improve the ticket to reopen it, let them know.
 
   * If the ticket is a duplicate, reference the original ticket. Also
-    cross-reference the closed ticket by living a comment in the original one
+    cross-reference the closed ticket by leaving a comment in the original one
     -- this allows to access more related information about the reported bug
     or requested feature.
 
@@ -279,7 +279,7 @@ A ticket can be resolved in a number of ways:
         discussion in the `django-developers`_ mailing list. Feel free to
         start or join in discussions of "wontfix" tickets on the
         django-developers_ mailing list, but please do not reopen tickets
-        closed as "wontfix" by core developers.
+        closed as "wontfix" by a :doc:`core developer</internals/committers>`.
 
   * duplicate
         Used when another ticket covers the same issue. By closing duplicate
@@ -371,9 +371,9 @@ the ticket database:
       checkin", but you should get at minimum one other community member to
       review a patch that you submit.
 
-    * Please **don't** reverse a decision that has been made by a core
-      developer. If you disagree with a decision that has been made,
-      please post a message to `django-developers`_.
+    * Please **don't** reverse a decision that has been made by a :doc:`core
+      developer</internals/committers>`. If you disagree with a decision that
+      has been made, please post a message to `django-developers`_.
 
     * If you're unsure if you should be making a change, don't make the
       change but instead leave a comment with your concerns on the ticket,

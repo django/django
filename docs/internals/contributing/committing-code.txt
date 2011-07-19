@@ -28,11 +28,9 @@ Partial committers
     in question is likely to be sufficient.
 
 Decisions on new committers will follow the process explained in
-:ref:`how-we-make-decisions`.
-
-To request commit access, please contact an existing committer privately.
-Public requests for commit access are potential flame-war starters, and
-will be ignored.
+:ref:`how-we-make-decisions`. To request commit access, please contact an
+existing committer privately. Public requests for commit access are potential
+flame-war starters, and will be ignored.
 
 Committing guidelines
 ---------------------
@@ -69,12 +67,12 @@ repository:
 
     * Separate bug fixes from feature changes.
 
-      Bug fixes need to be added to the current bugfix branch (e.g. the
-      ``1.0.X`` branch) as well as the current trunk.
+      Bug fixes need to be added to the current bugfix branch as well as the
+      current trunk.
 
     * If your commit closes a ticket in the Django `ticket tracker`_, begin
       your commit message with the text "Fixed #abc", where "abc" is the
-      number of the ticket your commit fixes. Example: "Fixed #123 -- Adde
+      number of the ticket your commit fixes. Example: "Fixed #123 -- Added
       support for foo". We've rigged Subversion and Trac so that any commit
       message in that format will automatically close the referenced ticket
       and post a comment to it with the full commit message.
@@ -83,7 +81,7 @@ repository:
       first, then the "Fixed #abc." For example:
       "magic-removal: Fixed #123 -- Added whizbang feature."
 
-      For the curious: We're using a `Trac post-commit hook`_ for this.
+      For the curious: we're using a `Trac post-commit hook`_ for this.
 
       .. _Trac post-commit hook: http://trac.edgewall.org/browser/trunk/contrib/trac-post-commit-hook
 
@@ -111,8 +109,8 @@ discovered, please follow these guidelines:
 
     * If the original author can't be reached (within a reasonable amount
       of time -- a day or so) and the problem is severe -- crashing bug,
-      major test failures, etc -- then ask for objections on django-dev
-      then revert if there are none.
+      major test failures, etc -- then ask for objections on the
+      `django-developers`_ mailing list then revert if there are none.
 
     * If the problem is small (a feature commit after feature freeze,
       say), wait it out.

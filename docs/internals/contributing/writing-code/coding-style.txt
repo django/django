@@ -9,7 +9,7 @@ Python style
 
     * Unless otherwise specified, follow :pep:`8`.
 
-      You could use a tool like `pep8.py`_ to check for some problems in this
+      You could use a tool like `pep8`_ to check for some problems in this
       area, but remember that PEP 8 is only a guide, so respect the style of
       the surrounding code as a primary goal.
 
@@ -171,9 +171,9 @@ That means that the ability for third parties to import the module at the top
 level is incompatible with the ability to configure the settings object
 manually, or makes it very difficult in some circumstances.
 
-Instead of the above code, a level of laziness or indirection must be used,
-such as `django.utils.functional.LazyObject``, ``django.utils.functional.lazy``
-or ``lambda``.
+Instead of the above code, a level of laziness or indirection must be used, such
+as :class:`django.utils.functional.LazyObject`,
+:func:`django.utils.functional.lazy` or ``lambda``.
 
 Miscellaneous
 -------------
@@ -181,10 +181,15 @@ Miscellaneous
     * Mark all strings for internationalization; see the :doc:`i18n
       documentation </topics/i18n/index>` for details.
 
+    * Remove ``import`` statements that are no longer used when you change code.
+      The most common tools for this task are `pyflakes`_ and `pylint`_.
+
     * Please don't put your name in the code you contribute. Our policy is to
       keep contributors' names in the ``AUTHORS`` file distributed with Django
       -- not scattered throughout the codebase itself. Feel free to include a
       change to the ``AUTHORS`` file in your patch if you make more than a
       single trivial change.
 
-.. _pep8.py: http://pypi.python.org/pypi/pep8/
+.. _pep8: http://pypi.python.org/pypi/pep8
+.. _pyflakes: http://pypi.python.org/pypi/pyflakes
+.. _pylint: http://pypi.python.org/pypi/pylint

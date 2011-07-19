@@ -9,10 +9,10 @@ possible.
 
 Documentation changes generally come in two forms:
 
-    * General improvements -- Typo corrections, error fixes and better
+    * General improvements: typo corrections, error fixes and better
       explanations through clearer writing and more examples.
 
-    * New features -- Documentation of features that have been added to the
+    * New features: documentation of features that have been added to the
       framework since the last release.
 
 This section explains how writers can craft their documentation changes
@@ -61,16 +61,12 @@ documentation:
 
     * **email** -- no hyphen.
 
-    * **MySQL**
-
-    * **PostgreSQL**
+    * **MySQL**, **PostgreSQL**, **SQLite**
 
     * **Python** -- when referring to the language, capitalize Python.
 
     * **realize**, **customize**, **initialize**, etc. -- use the American
       "ize" suffix, not "ise."
-
-    * **SQLite**
 
     * **subclass** -- it's a single word without a hyphen, both as a verb
       ("subclass that model") and as a noun ("create a subclass").
@@ -168,10 +164,10 @@ Documenting new features
 
 Our policy for new features is:
 
-    **All documentation of new features should be written in a way that
+    All documentation of new features should be written in a way that
     clearly designates the features are only available in the Django
     development version. Assume documentation readers are using the latest
-    release, not the development version.**
+    release, not the development version.
 
 Our preferred way for marking new features is by prefacing the features'
 documentation with: "``.. versionadded:: X.Y``", followed by an optional one
