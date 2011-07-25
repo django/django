@@ -254,7 +254,7 @@ def truncatechars(value, arg):
         length = int(arg)
     except ValueError: # Invalid literal for int().
         return value # Fail silently.
-    return Truncator(value).chars(value, length)
+    return Truncator(value).chars(length)
 truncatechars.is_safe = True
 truncatechars = stringfilter(truncatechars)
 
@@ -922,6 +922,7 @@ register.filter(stringformat)
 register.filter(striptags)
 register.filter(time)
 register.filter(title)
+register.filter(truncatechars)
 register.filter(truncatewords)
 register.filter(truncatewords_html)
 register.filter(unordered_list)
