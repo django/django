@@ -50,8 +50,9 @@ class Command(NoArgsCommand):
             self.local = False
         else:
             self.local = True
-        # Use ints for file times (ticket #14665)
-        os.stat_float_times(False)
+        # Use ints for file times (ticket #14665), if supported
+        if hasattr(os, 'stat_float_times'):
+            os.stat_float_times(False)
 
     def handle_noargs(self, **options):
         self.clear = options['clear']
