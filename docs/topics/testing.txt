@@ -710,6 +710,15 @@ arguments at time of construction:
         details view, which is a good way to test code paths that use the
         :meth:`django.http.HttpRequest.is_ajax()` method.
 
+        .. admonition:: CGI specification
+
+            The headers sent via ``**extra`` should follow CGI_ specification.
+            For example, emulating a different "Host" header as sent in the
+            HTTP request from the browser to the server should be passed
+            as ``HTTP_HOST``. 
+
+            .. _CGI: http://www.w3.org/CGI/
+
         If you already have the GET arguments in URL-encoded form, you can
         use that encoding instead of using the data argument. For example,
         the previous GET request could also be posed as::
