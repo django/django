@@ -343,7 +343,8 @@ Conditionally enabling or disabling actions
             def get_actions(self, request):
                 actions = super(MyModelAdmin, self).get_actions(request)
                 if request.user.username[0].upper() != 'J':
-                    del actions['delete_selected']
+                    if 'delete_selected' in actions:
+                        del actions['delete_selected']
                 return actions
     
 
