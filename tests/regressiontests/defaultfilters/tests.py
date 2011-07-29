@@ -266,6 +266,18 @@ class DefaultFiltersTests(TestCase):
         self.assertEqual(linebreaks(u'line 1'), u'<p>line 1</p>')
         self.assertEqual(linebreaks(u'line 1\nline 2'),
                           u'<p>line 1<br />line 2</p>')
+        self.assertEqual(linebreaks(u'line 1\rline 2'),
+                          u'<p>line 1<br />line 2</p>')
+        self.assertEqual(linebreaks(u'line 1\r\nline 2'),
+                          u'<p>line 1<br />line 2</p>')
+
+    def test_linebreaksbr(self):
+        self.assertEqual(linebreaksbr(u'line 1\nline 2'),
+                          u'line 1<br />line 2')
+        self.assertEqual(linebreaksbr(u'line 1\rline 2'),
+                          u'line 1<br />line 2')
+        self.assertEqual(linebreaksbr(u'line 1\r\nline 2'),
+                          u'line 1<br />line 2')
 
     def test_removetags(self):
         self.assertEqual(removetags(u'some <b>html</b> with <script>alert'\

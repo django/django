@@ -19,6 +19,7 @@ from django.utils.text import Truncator, wrap, phone2numeric
 from django.utils.safestring import mark_safe, SafeData, mark_for_escaping
 from django.utils.timesince import timesince, timeuntil
 from django.utils.translation import ugettext, ungettext
+from django.utils.text import normalize_newlines
 
 register = Library()
 
@@ -421,13 +422,16 @@ def linebreaks_filter(value, autoescape=None):
     return mark_safe(linebreaks(value, autoescape))
 linebreaks_filter.is_safe = True
 linebreaks_filter.needs_autoescape = True
+linebreaks = stringfilter(linebreaks)
 
 def linebreaksbr(value, autoescape=None):
     """
     Converts all newlines in a piece of plain text to HTML line breaks
     (``<br />``).
     """
-    if autoescape and not isinstance(value, SafeData):
+    autoescape = autoescape and not isinstance(value, SafeData)
+    value = normalize_newlines(value)
+    if autoescape:
         value = escape(value)
     return mark_safe(value.replace('\n', '<br />'))
 linebreaksbr.is_safe = True

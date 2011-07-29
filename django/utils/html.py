@@ -7,6 +7,7 @@ from django.utils.safestring import SafeData, mark_safe
 from django.utils.encoding import force_unicode
 from django.utils.functional import allow_lazy
 from django.utils.http import urlquote
+from django.utils.text import normalize_newlines
 
 # Configuration for urlize() function.
 LEADING_PUNCTUATION  = ['(', '<', '&lt;']
@@ -70,7 +71,7 @@ def conditional_escape(html):
 
 def linebreaks(value, autoescape=False):
     """Converts newlines into <p> and <br />s."""
-    value = re.sub(r'\r\n|\r|\n', '\n', force_unicode(value)) # normalize newlines
+    value = normalize_newlines(value)
     paras = re.split('\n{2,}', value)
     if autoescape:
         paras = [u'<p>%s</p>' % escape(p).replace('\n', '<br />') for p in paras]
