@@ -226,7 +226,6 @@ class QuerySet(object):
         only_load = self.query.get_loaded_field_names()
         if not fill_cache:
             fields = self.model._meta.fields
-            pk_idx = self.model._meta.pk_index()
 
         load_fields = []
         # If only/defer clauses have been specified,
@@ -235,9 +234,6 @@ class QuerySet(object):
             for field, model in self.model._meta.get_fields_with_model():
                 if model is None:
                     model = self.model
-                if field == self.model._meta.pk:
-                    # Record the index of the primary key when it is found
-                    pk_idx = len(load_fields)
                 try:
                     if field.name in only_load[model]:
                         # Add a field that has been explicitly included
@@ -276,7 +272,6 @@ class QuerySet(object):
             else:
                 if skip:
                     row_data = row[index_start:aggregate_start]
-                    pk_val = row_data[pk_idx]
                     obj = model_cls(**dict(zip(init_list, row_data)))
                 else:
                     # Omit aggregates in object creation.
