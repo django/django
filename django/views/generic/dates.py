@@ -211,9 +211,9 @@ class BaseDateListView(MultipleObjectMixin, DateMixin, View):
 
         date_list = queryset.dates(date_field, date_type)[::-1]
         if date_list is not None and not date_list and not allow_empty:
-            raise Http404(_(u"No %(verbose_name_plural)s available") % {
-                    'verbose_name_plural': force_unicode(qs.model._meta.verbose_name_plural)
-            })
+            name = force_unicode(queryset.model._meta.verbose_name_plural)
+            raise Http404(_(u"No %(verbose_name_plural)s available") %
+                          {'verbose_name_plural': name})
 
         return date_list
 

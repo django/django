@@ -122,7 +122,7 @@ class BaseSpatialOperations(object):
         raise NotImplementedError('Aggregate support not implemented for this spatial backend.')
 
     def spatial_lookup_sql(self, lvalue, lookup_type, value, field):
-        raise NotImplmentedError
+        raise NotImplementedError
 
     # Routines for getting the OGC-compliant models.
     def geometry_columns(self):
