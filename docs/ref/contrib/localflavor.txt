@@ -44,8 +44,10 @@ Countries currently supported by :mod:`~django.contrib.localflavor` are:
     * Canada_
     * Chile_
     * China_
+    * Colombia_
     * Croatia_
     * Czech_
+    * Ecuador_
     * Finland_
     * France_
     * Germany_
@@ -98,8 +100,10 @@ Here's an example of how to use them::
 .. _Canada: `Canada (ca)`_
 .. _Chile: `Chile (cl)`_
 .. _China: `China (cn)`_
+.. _Colombia: `Colombia (co)`_
 .. _Croatia: `Croatia (hr)`_
 .. _Czech: `Czech (cz)`_
+.. _Ecuador: `Ecuador (ec)`_
 .. _Finland: `Finland (fi)`_
 .. _France: `France (fr)`_
 .. _Germany: `Germany (de)`_
@@ -392,6 +396,16 @@ China (``cn``)
     Valid formats are like 1XXXXXXXXXX, where X is digit.
     The second digit could only be 3, 5 and 8.
 
+Colombia (``co``)
+=================
+
+.. versionadded:: 1.4
+
+.. class:: co.forms.CoDepartmentSelect
+
+    A ``Select`` widget that uses a list of Colombian departments
+    as its choices.
+
 Croatia (``hr``)
 ================
 
@@ -478,6 +492,16 @@ Czech (``cz``)
 .. class:: cz.forms.CZRegionSelect
 
     A ``Select`` widget that uses a list of Czech regions as its choices.
+
+Ecuador (``ec``)
+================
+
+.. versionadded:: 1.4
+
+.. class:: ec.forms.EcProvinceSelect
+
+    A ``Select`` widget that uses a list of Ecuatorian provinces as
+    its choices.
 
 Finland (``fi``)
 ================
