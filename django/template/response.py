@@ -1,22 +1,28 @@
 from django.http import HttpResponse
 from django.template import loader, Context, RequestContext
 
+
 class ContentNotRenderedError(Exception):
     pass
 
+
+class DiscardedAttributeError(AttributeError):
+    pass
+
+
 class SimpleTemplateResponse(HttpResponse):
+    rendering_attrs = ['template_name', 'context_data', '_post_render_callbacks']
 
     def __init__(self, template, context=None, mimetype=None, status=None,
             content_type=None):
         # It would seem obvious to call these next two members 'template' and
-        # 'context', but those names are reserved as part of the test Client API.
-        # To avoid the name collision, we use
-        # tricky-to-debug problems
+        # 'context', but those names are reserved as part of the test Client
+        # API. To avoid the name collision, we use tricky-to-debug problems
         self.template_name = template
         self.context_data = context
 
-        # _is_rendered tracks whether the template and context has been baked into
-        # a final response.
+        # _is_rendered tracks whether the template and context has been
+        # baked into a final response.
         self._is_rendered = False
 
         self._post_render_callbacks = []
@@ -36,12 +42,20 @@ class SimpleTemplateResponse(HttpResponse):
         """
         obj_dict = self.__dict__.copy()
         if not self._is_rendered:
-            raise ContentNotRenderedError('The response content must be rendered before it can be pickled.')
-        del obj_dict['template_name']
-        del obj_dict['context_data']
-        del obj_dict['_post_render_callbacks']
+            raise ContentNotRenderedError('The response content must be '
+                                          'rendered before it can be pickled.')
+        for attr in self.rendering_attrs:
+            if attr in obj_dict:
+                del obj_dict[attr]
 
         return obj_dict
+
+    def __getattr__(self, name):
+        if name in self.rendering_attrs:
+            raise DiscardedAttributeError('The %s attribute was discarded '
+                                          'when this %s class was pickled.' %
+                                          (name, self.__class__.__name__))
+        return super(SimpleTemplateResponse, self).__getattr__(name)
 
     def resolve_template(self, template):
         "Accepts a template object, path-to-template or list of paths"
@@ -53,7 +67,7 @@ class SimpleTemplateResponse(HttpResponse):
             return template
 
     def resolve_context(self, context):
-        """Convert context data into a full Context object
+        """Converts context data into a full Context object
         (assuming it isn't already a Context object).
         """
         if isinstance(context, Context):
@@ -76,9 +90,10 @@ class SimpleTemplateResponse(HttpResponse):
         return content
 
     def add_post_render_callback(self, callback):
-        """Add a new post-rendering callback.
+        """Adds a new post-rendering callback.
 
-        If the response has already been rendered, invoke the callback immediately.
+        If the response has already been rendered,
+        invoke the callback immediately.
         """
         if self._is_rendered:
             callback(self)
@@ -86,7 +101,7 @@ class SimpleTemplateResponse(HttpResponse):
             self._post_render_callbacks.append(callback)
 
     def render(self):
-        """Render (thereby finalizing) the content of the response.
+        """Renders (thereby finalizing) the content of the response.
 
         If the content has already been rendered, this is a no-op.
 
@@ -101,20 +116,25 @@ class SimpleTemplateResponse(HttpResponse):
                     retval = newretval
         return retval
 
-    is_rendered = property(lambda self: self._is_rendered)
+    @property
+    def is_rendered(self):
+        return self._is_rendered
 
     def __iter__(self):
         if not self._is_rendered:
-            raise ContentNotRenderedError('The response content must be rendered before it can be iterated over.')
+            raise ContentNotRenderedError('The response content must be '
+                                          'rendered before it can be iterated over.')
         return super(SimpleTemplateResponse, self).__iter__()
 
     def _get_content(self):
         if not self._is_rendered:
-            raise ContentNotRenderedError('The response content must be rendered before it can be accessed.')
+            raise ContentNotRenderedError('The response content must be '
+                                          'rendered before it can be accessed.')
         return super(SimpleTemplateResponse, self)._get_content()
 
     def _set_content(self, value):
-        "Sets the content for the response"
+        """Sets the content for the response
+        """
         super(SimpleTemplateResponse, self)._set_content(value)
         self._is_rendered = True
 
@@ -122,6 +142,9 @@ class SimpleTemplateResponse(HttpResponse):
 
 
 class TemplateResponse(SimpleTemplateResponse):
+    rendering_attrs = SimpleTemplateResponse.rendering_attrs + \
+        ['_request', '_current_app']
+
     def __init__(self, request, template, context=None, mimetype=None,
             status=None, content_type=None, current_app=None):
         # self.request gets over-written by django.test.client.Client - and
@@ -134,27 +157,10 @@ class TemplateResponse(SimpleTemplateResponse):
         super(TemplateResponse, self).__init__(
             template, context, mimetype, status, content_type)
 
-    def __getstate__(self):
-        """Pickling support function.
-
-        Ensures that the object can't be pickled before it has been
-        rendered, and that the pickled state only includes rendered
-        data, not the data used to construct the response.
-        """
-        obj_dict = super(TemplateResponse, self).__getstate__()
-
-        del obj_dict['_request']
-        del obj_dict['_current_app']
-
-        return obj_dict
-
     def resolve_context(self, context):
         """Convert context data into a full RequestContext object
         (assuming it isn't already a Context object).
         """
         if isinstance(context, Context):
             return context
-        else:
-            return RequestContext(self._request, context, current_app=self._current_app)
-
-
+        return RequestContext(self._request, context, current_app=self._current_app)
