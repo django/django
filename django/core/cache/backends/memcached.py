@@ -46,7 +46,7 @@ class BaseMemcachedCache(BaseCache):
             #
             # This means that we have to switch to absolute timestamps.
             timeout += int(time.time())
-        return timeout
+        return int(timeout)
 
     def add(self, key, value, timeout=0, version=None):
         key = self.make_key(key, version=version)

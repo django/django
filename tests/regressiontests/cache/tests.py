@@ -408,6 +408,11 @@ class BaseCacheTests(object):
         self.assertEqual(self.cache.get('key3'), 'sausage')
         self.assertEqual(self.cache.get('key4'), 'lobster bisque')
 
+    def test_float_timeout(self):
+        # Make sure a timeout given as a float doesn't crash anything.
+        self.cache.set("key1", "spam", 100.2)
+        self.assertEqual(self.cache.get("key1"), "spam")
+
     def perform_cull_test(self, initial_count, final_count):
         """This is implemented as a utility method, because only some of the backends
         implement culling. The culling algorithm also varies slightly, so the final
