@@ -769,7 +769,7 @@ as an ``<input type="text">`` (a single-line input).
 ``GenericIPAddressField``
 -------------------------
 
-.. class:: GenericIPAddressField([protocols=both, unpack_ipv4=False, **options])
+.. class:: GenericIPAddressField([protocol=both, unpack_ipv4=False, **options])
 
 .. versionadded:: 1.4
 
