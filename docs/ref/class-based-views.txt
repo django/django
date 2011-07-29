@@ -775,9 +775,9 @@ BaseDateListView
     .. attribute:: allow_empty
 
         A boolean specifying whether to display the page if no objects are
-        available. If this is ``False`` and no objects are available, the view
-        will raise a 404 instead of displaying an empty page. By default, this
-        is ``True``.
+        available. If this is ``True`` and no objects are available, the view
+        will display an empty page instead of raising a 404. By default, this
+        is ``False``.
 
     .. method:: get_dated_items():
 
