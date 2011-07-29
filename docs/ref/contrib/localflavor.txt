@@ -798,9 +798,78 @@ Macedonia (``mk``)
 Mexico (``mx``)
 ===============
 
+.. class:: mx.forms.MXZipCodeField
+
+    .. versionadded:: 1.4
+
+    A form field that accepts a Mexican Zip Code.
+
+    More info about this: List of postal codes in Mexico (zipcodes_)
+
+.. _zipcodes: http://en.wikipedia.org/wiki/List_of_postal_codes_in_Mexico
+
+.. class:: mx.forms.MXRFCField
+
+    .. versionadded:: 1.4
+
+    A form field that validates a Mexican *Registro Federal de Contribuyentes* for
+    either **Persona física** or **Persona moral**. This field accepts RFC strings
+    whether or not it contains a *homoclave*.
+
+    More info about this: Registro Federal de Contribuyentes (rfc_)
+
+.. _rfc: http://es.wikipedia.org/wiki/Registro_Federal_de_Contribuyentes_(M%C3%A9xico)
+
+.. class:: mx.forms.MXCURPField
+
+    .. versionadded:: 1.4
+
+   A field that validates a Mexican *Clave Única de Registro de Población*.
+
+   More info about this: Clave Unica de Registro de Poblacion (curp_)
+
+.. _curp: http://www.condusef.gob.mx/index.php/clave-unica-de-registro-de-poblacion-curp
+
 .. class:: mx.forms.MXStateSelect
 
     A ``Select`` widget that uses a list of Mexican states as its choices.
+
+.. class:: mx.models.MXStateField
+
+    .. versionadded:: 1.4
+
+    A model field that stores the three-letter Mexican state abbreviation in the
+    database.
+
+.. class:: mx.models.MXZipCodeField
+
+    .. versionadded:: 1.4
+
+    A model field that forms represent as a ``forms.MXZipCodeField`` field and
+    stores the five-digit Mexican zip code.
+
+.. class:: mx.models.MXRFCField
+
+    .. versionadded:: 1.4
+
+    A model field that forms represent as a ``forms.MXRFCField`` field and
+    stores the value of a valid Mexican RFC.
+
+.. class:: mx.models.MXCURPField
+
+    .. versionadded:: 1.4
+
+    A model field that forms represent as a ``forms.MXCURPField`` field and
+    stores the value of a valid Mexican CURP.
+
+Additionally, a choice tuple is provided in ``django.contrib.localflavor.mx.mx_states``,
+allowing customized model and form fields, and form presentations, for subsets of
+Mexican states abbreviations:
+
+.. data:: mx.mx_states.STATE_CHOICES
+
+    A tuple of choices of the states abbreviations for all 31 Mexican states,
+    plus the `Distrito Federal`.
 
 Norway (``no``)
 ===============

@@ -8,7 +8,7 @@ class MKPerson(models.Model):
     umcn = UMCNField()
     id_number = MKIdentityCardNumberField()
     municipality  = MKMunicipalityField(blank = True)
-    municipality_req = MKMunicipalityField(blank = False) 
+    municipality_req = MKMunicipalityField(blank = False)
 
     class Meta:
         app_label = 'localflavor'

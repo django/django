@@ -11,5 +11,6 @@ class USPlace(models.Model):
     state_default = USStateField(default="CA", blank=True)
     postal_code = USPostalCodeField(blank=True)
     name = models.CharField(max_length=20)
+
     class Meta:
         app_label = 'localflavor'

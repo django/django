@@ -27,6 +27,7 @@ from localflavor.it import ITLocalFlavorTests
 from localflavor.jp import JPLocalFlavorTests
 from localflavor.kw import KWLocalFlavorTests
 from localflavor.mk import MKLocalFlavorTests
+from localflavor.mx import MXLocalFlavorTests
 from localflavor.nl import NLLocalFlavorTests
 from localflavor.pl import PLLocalFlavorTests
 from localflavor.pt import PTLocalFlavorTests
