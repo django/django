@@ -544,7 +544,6 @@ class TransactionTestCase(ut2.TestCase):
         if func is None:
             return context
 
-        # Basically emulate the `with` statement here.
         with context:
             func(*args, **kwargs)
 
