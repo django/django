@@ -1288,8 +1288,8 @@ TodayArchiveView
 .. class:: TodayArchiveView()
 
     A day archive page showing all objects for *today*. This is exactly the
-    same as ``archive_day``, except the ``year``/``month``/``day`` arguments
-    are not used,
+    same as :class:`django.views.generic.dates.DayArchiveView`, except today's
+    date is used instead of the ``year``/``month``/``day`` arguments.
 
     :class:`~django.views.generic.dates.BaseTodayArchiveView` implements the
     same behavior as :class:`~django.views.generic.dates.TodayArchiveView`, but
@@ -1298,7 +1298,8 @@ TodayArchiveView
 
     **Mixins**
 
-        * :class:`django.views.generic.dates.DayArchiveView`
+        * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
+        * :class:`django.views.generic.dates.BaseDayArchiveView`
 
 DateDetailView
 ~~~~~~~~~~~~~~
@@ -1316,8 +1317,9 @@ DateDetailView
 
     **Mixins**
 
-        * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
+        * :class:`django.views.generic.detail.SingleObjectTemplateResponseMixin`
+        * :class:`django.views.generic.detail.BaseDetailView`
+        * :class:`django.views.generic.dates.DateMixin`
         * :class:`django.views.generic.dates.YearMixin`
         * :class:`django.views.generic.dates.MonthMixin`
         * :class:`django.views.generic.dates.DayMixin`
-        * :class:`django.views.generic.dates.BaseDateListView`
