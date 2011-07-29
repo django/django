@@ -153,6 +153,16 @@ number of characters. Truncated strings end with a translatable ellipsis
 sequence ("..."). See the :tfilter:`truncatechars docs <truncatechars>` for
 more details.
 
+Customizable ``SingleObjectMixin`` URLConf kwargs
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Two new attributes,
+:attr:`pk_url_kwarg<django.views.generic.detail.SingleObjectMixin.pk_url_kwarg>` and
+:attr:`slug_url_kwarg<django.views.generic.detail.SingleObjectMixin.slug_url_kwarg>`,
+have been added to :class:`django.views.generic.detail.SingleObjectMixin` to
+enable the customization of URLConf keyword arguments used for single
+object generic views.
+
 CSRF improvements
 ~~~~~~~~~~~~~~~~~
 
