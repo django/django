@@ -39,12 +39,9 @@ class AdminSite(object):
     password_change_template = None
     password_change_done_template = None
 
-    def __init__(self, name=None, app_name='admin'):
+    def __init__(self, name='admin', app_name='admin'):
         self._registry = {} # model_class class -> admin_class instance
-        if name is None:
-            self.name = 'admin'
-        else:
-            self.name = name
+        self.name = name
         self.app_name = app_name
         self._actions = {'delete_selected': actions.delete_selected}
         self._global_actions = self._actions.copy()
