@@ -1329,7 +1329,7 @@ class InlineModelAdmin(BaseModelAdmin):
     def _media(self):
         js = ['jquery.min.js', 'jquery.init.js', 'inlines.min.js']
         if self.prepopulated_fields:
-            js.extend(['urlify.js, prepopulate.min.js'])
+            js.extend(['urlify.js', 'prepopulate.min.js'])
         if self.filter_vertical or self.filter_horizontal:
             js.extend(['SelectBox.js', 'SelectFilter2.js'])
         return forms.Media(js=['admin/js/%s' % url for url in js])
