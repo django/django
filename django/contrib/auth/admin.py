@@ -136,7 +136,6 @@ class UserAdmin(admin.ModelAdmin):
             'original': user,
             'save_as': False,
             'show_save': True,
-            'root_path': self.admin_site.root_path,
         }
         return TemplateResponse(request, [
             self.change_user_password_template or

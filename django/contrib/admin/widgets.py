@@ -228,14 +228,10 @@ class RelatedFieldWidgetWrapper(forms.Widget):
     def render(self, name, value, *args, **kwargs):
         rel_to = self.rel.to
         info = (rel_to._meta.app_label, rel_to._meta.object_name.lower())
-        try:
-            related_url = reverse('admin:%s_%s_add' % info, current_app=self.admin_site.name)
-        except NoReverseMatch:
-            info = (self.admin_site.root_path, rel_to._meta.app_label, rel_to._meta.object_name.lower())
-            related_url = '%s%s/%s/add/' % info
         self.widget.choices = self.choices
         output = [self.widget.render(name, value, *args, **kwargs)]
         if self.can_add_related:
+            related_url = reverse('admin:%s_%s_add' % info, current_app=self.admin_site.name)
             # TODO: "id_" is hard-coded here. This should instead use the correct
             # API to determine the ID dynamically.
             output.append(u'<a href="%s" class="add-another" id="add_id_%s" onclick="return showAddAnotherPopup(this);"> '

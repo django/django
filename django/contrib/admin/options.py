@@ -726,7 +726,6 @@ class ModelAdmin(BaseModelAdmin):
             'content_type_id': ContentType.objects.get_for_model(self.model).id,
             'save_as': self.save_as,
             'save_on_top': self.save_on_top,
-            'root_path': self.admin_site.root_path,
         })
         if add and self.add_form_template is not None:
             form_template = self.add_form_template
@@ -962,7 +961,6 @@ class ModelAdmin(BaseModelAdmin):
             'media': mark_safe(media),
             'inline_admin_formsets': inline_admin_formsets,
             'errors': helpers.AdminErrorList(form, formsets),
-            'root_path': self.admin_site.root_path,
             'app_label': opts.app_label,
         }
         context.update(extra_context or {})
@@ -1053,7 +1051,6 @@ class ModelAdmin(BaseModelAdmin):
             'media': mark_safe(media),
             'inline_admin_formsets': inline_admin_formsets,
             'errors': helpers.AdminErrorList(form, formsets),
-            'root_path': self.admin_site.root_path,
             'app_label': opts.app_label,
         }
         context.update(extra_context or {})
@@ -1195,7 +1192,6 @@ class ModelAdmin(BaseModelAdmin):
             'cl': cl,
             'media': media,
             'has_add_permission': self.has_add_permission(request),
-            'root_path': self.admin_site.root_path,
             'app_label': app_label,
             'action_form': action_form,
             'actions_on_top': self.actions_on_top,
@@ -1260,7 +1256,6 @@ class ModelAdmin(BaseModelAdmin):
             "perms_lacking": perms_needed,
             "protected": protected,
             "opts": opts,
-            "root_path": self.admin_site.root_path,
             "app_label": app_label,
         }
         context.update(extra_context or {})
@@ -1288,7 +1283,6 @@ class ModelAdmin(BaseModelAdmin):
             'action_list': action_list,
             'module_name': capfirst(force_unicode(opts.verbose_name_plural)),
             'object': obj,
-            'root_path': self.admin_site.root_path,
             'app_label': app_label,
         }
         context.update(extra_context or {})
