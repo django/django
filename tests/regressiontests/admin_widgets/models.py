@@ -67,3 +67,35 @@ class CarTire(models.Model):
     A single car tire. This to test that a user can only select their own cars.
     """
     car = models.ForeignKey(Car)
+
+class Honeycomb(models.Model):
+    location = models.CharField(max_length=20)
+
+class Bee(models.Model):
+    """
+    A model with a FK to a model that won't be registered with the admin
+    (Honeycomb) so the corresponding raw ID widget won't have a magnifying
+    glass link to select related honeycomb instances.
+    """
+    honeycomb = models.ForeignKey(Honeycomb)
+
+class Individual(models.Model):
+    """
+    A model with a FK to itself. It won't be registered with the admin, so the
+    corresponding raw ID widget won't have a magnifying glass link to select
+    related instances (rendering will be called programmatically in this case).
+    """
+    name = models.CharField(max_length=20)
+    parent = models.ForeignKey('self', null=True)
+
+class Company(models.Model):
+    name = models.CharField(max_length=20)
+
+class Advisor(models.Model):
+    """
+    A model with a m2m to a model that won't be registered with the admin
+    (Company) so the corresponding raw ID widget won't have a magnifying
+    glass link to select related company instances.
+    """
+    name = models.CharField(max_length=20)
+    companies = models.ManyToManyField(Company)

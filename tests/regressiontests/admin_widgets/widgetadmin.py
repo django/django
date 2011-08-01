@@ -27,4 +27,14 @@ site = WidgetAdmin(name='widget-admin')
 site.register(models.User)
 site.register(models.Car, CarAdmin)
 site.register(models.CarTire, CarTireAdmin)
+
+site.register(models.Member)
+site.register(models.Band)
 site.register(models.Event, EventAdmin)
+site.register(models.Album)
+
+site.register(models.Inventory)
+
+site.register(models.Bee)
+
+site.register(models.Advisor)
