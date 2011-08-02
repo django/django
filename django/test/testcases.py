@@ -283,28 +283,27 @@ class TransactionTestCase(ut2.TestCase):
         include a call to super().setUp().
         """
         testMethod = getattr(self, self._testMethodName)
-        if (getattr(self.__class__, "__unittest_skip__", False) or
-            getattr(testMethod, "__unittest_skip__", False)):
-            return
+        skipped = (getattr(self.__class__, "__unittest_skip__", False) or
+            getattr(testMethod, "__unittest_skip__", False))
 
-        self.client = self.client_class()
-        try:
-            self._pre_setup()
-        except (KeyboardInterrupt, SystemExit):
-            raise
-        except Exception:
-            import sys
-            result.addError(self, sys.exc_info())
-            return
+        if not skipped:
+            self.client = self.client_class()
+            try:
+                self._pre_setup()
+            except (KeyboardInterrupt, SystemExit):
+                raise
+            except Exception:
+                result.addError(self, sys.exc_info())
+                return
         super(TransactionTestCase, self).__call__(result)
-        try:
-            self._post_teardown()
-        except (KeyboardInterrupt, SystemExit):
-            raise
-        except Exception:
-            import sys
-            result.addError(self, sys.exc_info())
-            return
+        if not skipped:
+            try:
+                self._post_teardown()
+            except (KeyboardInterrupt, SystemExit):
+                raise
+            except Exception:
+                result.addError(self, sys.exc_info())
+                return
 
     def _post_teardown(self):
         """ Performs any post-test things. This includes:
