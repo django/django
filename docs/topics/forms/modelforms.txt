@@ -182,6 +182,8 @@ With these models, the ``ModelForm`` subclasses above would be roughly
 equivalent to this (the only difference being the ``save()`` method, which
 we'll discuss in a moment.)::
 
+    from django import forms
+
     class AuthorForm(forms.Form):
         name = forms.CharField(max_length=100)
         title = forms.CharField(max_length=3,
