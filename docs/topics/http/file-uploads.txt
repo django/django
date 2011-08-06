@@ -278,13 +278,13 @@ list::
 
     Also, ``request.POST`` is accessed by
     :class:`~django.middleware.csrf.CsrfViewMiddleware` which is enabled by
-    default. This means you will probably need to use
+    default. This means you will need to use
     :func:`~django.views.decorators.csrf.csrf_exempt` on your view to allow you
-    to change the upload handlers. Assuming you do need CSRF protection, you
-    will then need to use :func:`~django.views.decorators.csrf.csrf_protect` on
-    the function that actually processes the request.  Note that this means that
-    the handlers may start receiving the file upload before the CSRF checks have
-    been done. Example code:
+    to change the upload handlers.  You will then need to use
+    :func:`~django.views.decorators.csrf.csrf_protect` on the function that
+    actually processes the request.  Note that this means that the handlers may
+    start receiving the file upload before the CSRF checks have been done.
+    Example code:
 
     .. code-block:: python
 
