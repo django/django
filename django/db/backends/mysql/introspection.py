@@ -51,10 +51,21 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         representing all relationships to the given table. Indexes are 0-based.
         """
         my_field_dict = self._name_to_index(cursor, table_name)
-        constraints = []
+        constraints = self.get_key_columns(cursor, table_name)
         relations = {}
+        for my_fieldname, other_table, other_field in constraints:
+            other_field_index = self._name_to_index(cursor, other_table)[other_field]
+            my_field_index = my_field_dict[my_fieldname]
+            relations[my_field_index] = (other_field_index, other_table)
+        return relations
+
+    def get_key_columns(self, cursor, table_name):
+        """
+        Returns a list of (column_name, referenced_table_name, referenced_column_name) for all
+        key columns in given table.
+        """
+        key_columns = []
         try:
-            # This should work for MySQL 5.0.
             cursor.execute("""
                 SELECT column_name, referenced_table_name, referenced_column_name
                 FROM information_schema.key_column_usage
@@ -62,7 +73,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     AND table_schema = DATABASE()
                     AND referenced_table_name IS NOT NULL
                     AND referenced_column_name IS NOT NULL""", [table_name])
-            constraints.extend(cursor.fetchall())
+            key_columns.extend(cursor.fetchall())
         except (ProgrammingError, OperationalError):
             # Fall back to "SHOW CREATE TABLE", for previous MySQL versions.
             # Go through all constraints and save the equal matches.
@@ -74,14 +85,17 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     if match == None:
                         break
                     pos = match.end()
-                    constraints.append(match.groups())
+                    key_columns.append(match.groups())
+        return key_columns
 
-        for my_fieldname, other_table, other_field in constraints:
-            other_field_index = self._name_to_index(cursor, other_table)[other_field]
-            my_field_index = my_field_dict[my_fieldname]
-            relations[my_field_index] = (other_field_index, other_table)
-
-        return relations
+    def get_primary_key_column(self, cursor, table_name):
+        """
+        Returns the name of the primary key column for the given table
+        """
+        for column in self.get_indexes(cursor, table_name).iteritems():
+            if column[1]['primary_key']:
+                return column[0]
+        return None
 
     def get_indexes(self, cursor, table_name):
         """

@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 # Unit and doctests for specific database backends.
+from __future__ import with_statement
 import datetime
 
 from django.conf import settings
 from django.core.management.color import no_style
-from django.db import backend, connection, connections, DEFAULT_DB_ALIAS, IntegrityError
+from django.db import backend, connection, connections, DEFAULT_DB_ALIAS, IntegrityError, transaction
 from django.db.backends.signals import connection_created
 from django.db.backends.postgresql_psycopg2 import version as pg_version
 from django.test import TestCase, skipUnlessDBFeature, TransactionTestCase
@@ -328,7 +329,8 @@ class FkConstraintsTests(TransactionTestCase):
         try:
             a.save()
         except IntegrityError:
-            pass
+            return
+        self.skipTest("This backend does not support integrity checks.")
 
     def test_integrity_checks_on_update(self):
         """
@@ -343,4 +345,60 @@ class FkConstraintsTests(TransactionTestCase):
         try:
             a.save()
         except IntegrityError:
-            pass
+            return
+        self.skipTest("This backend does not support integrity checks.")
+
+    def test_disable_constraint_checks_manually(self):
+        """
+        When constraint checks are disabled, should be able to write bad data without IntegrityErrors.
+        """
+        with transaction.commit_manually():
+            # Create an Article.
+            models.Article.objects.create(headline="Test article", pub_date=datetime.datetime(2010, 9, 4), reporter=self.r)
+            # Retrive it from the DB
+            a = models.Article.objects.get(headline="Test article")
+            a.reporter_id = 30
+            try:
+                connection.disable_constraint_checking()
+                a.save()
+                connection.enable_constraint_checking()
+            except IntegrityError:
+                self.fail("IntegrityError should not have occurred.")
+            finally:
+                transaction.rollback()
+
+    def test_disable_constraint_checks_context_manager(self):
+        """
+        When constraint checks are disabled (using context manager), should be able to write bad data without IntegrityErrors.
+        """
+        with transaction.commit_manually():
+            # Create an Article.
+            models.Article.objects.create(headline="Test article", pub_date=datetime.datetime(2010, 9, 4), reporter=self.r)
+            # Retrive it from the DB
+            a = models.Article.objects.get(headline="Test article")
+            a.reporter_id = 30
+            try:
+                with connection.constraint_checks_disabled():
+                    a.save()
+            except IntegrityError:
+                self.fail("IntegrityError should not have occurred.")
+            finally:
+                transaction.rollback()
+
+    def test_check_constraints(self):
+        """
+        Constraint checks should raise an IntegrityError when bad data is in the DB.
+        """
+        with transaction.commit_manually():
+            # Create an Article.
+            models.Article.objects.create(headline="Test article", pub_date=datetime.datetime(2010, 9, 4), reporter=self.r)
+            # Retrive it from the DB
+            a = models.Article.objects.get(headline="Test article")
+            a.reporter_id = 30
+            try:
+                with connection.constraint_checks_disabled():
+                    a.save()
+                    with self.assertRaises(IntegrityError):
+                        connection.check_constraints()
+            finally:
+                transaction.rollback()

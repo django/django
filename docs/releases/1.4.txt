@@ -235,6 +235,9 @@ Django 1.4 also includes several smaller improvements worth noting:
   to delete all files at the destination before copying or linking the static
   files.
 
+* It is now possible to load fixtures containing forward references when using
+  MySQL with the InnoDB database engine.
+
 .. _backwards-incompatible-changes-1.4:
 
 Backwards incompatible changes in 1.4

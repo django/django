@@ -1,3 +1,7 @@
+# This is necessary in Python 2.5 to enable the with statement, in 2.6
+# and up it is no longer necessary.
+from __future__ import with_statement
+
 # -*- coding: utf-8 -*-
 from datetime import datetime
 from StringIO import StringIO
@@ -5,7 +9,7 @@ from xml.dom import minidom
 
 from django.conf import settings
 from django.core import serializers
-from django.db import transaction
+from django.db import transaction, connection
 from django.test import TestCase, TransactionTestCase, Approximate
 from django.utils import simplejson, unittest
 
@@ -252,8 +256,9 @@ class SerializersTransactionTestBase(object):
         transaction.enter_transaction_management()
         transaction.managed(True)
         objs = serializers.deserialize(self.serializer_name, self.fwd_ref_str)
-        for obj in objs:
-            obj.save()
+        with connection.constraint_checks_disabled():
+            for obj in objs:
+                obj.save()
         transaction.commit()
         transaction.leave_transaction_management()
 

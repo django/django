@@ -142,6 +142,18 @@ currently the only engine that supports full-text indexing and searching.
 The InnoDB_ engine is fully transactional and supports foreign key references
 and is probably the best choice at this point in time.
 
+.. versionchanged:: 1.4
+
+In previous versions of Django, fixtures with forward references (i.e.
+relations to rows that have not yet been inserted into the database) would fail
+to load when using the InnoDB storage engine. This was due to the fact that InnoDB
+deviates from the SQL standard by checking foreign key constraints immediately
+instead of deferring the check until the transaction is committed. This
+problem has been resolved in Django 1.4. Fixture data is now loaded with foreign key
+checks turned off; foreign key checks are then re-enabled when the data has
+finished loading, at which point the entire table is checked for invalid foreign
+key references and an `IntegrityError` is raised if any are found.
+
 .. _storage engines: http://dev.mysql.com/doc/refman/5.5/en/storage-engines.html
 .. _MyISAM: http://dev.mysql.com/doc/refman/5.5/en/myisam-storage-engine.html
 .. _InnoDB: http://dev.mysql.com/doc/refman/5.5/en/innodb.html
