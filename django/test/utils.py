@@ -194,8 +194,8 @@ class override_settings(object):
         self.disable()
 
     def __call__(self, test_func):
-        from django.test import TestCase
-        if isinstance(test_func, type) and issubclass(test_func, TestCase):
+        from django.test import TransactionTestCase
+        if isinstance(test_func, type) and issubclass(test_func, TransactionTestCase):
             class inner(test_func):
                 def _pre_setup(innerself):
                     self.enable()
