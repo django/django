@@ -4,15 +4,16 @@ Form Widget classes specific to the Django admin site.
 
 import copy
 from django import forms
+from django.contrib.admin.templatetags.admin_static import static
 from django.core.urlresolvers import reverse
 from django.forms.widgets import RadioFieldRenderer
 from django.forms.util import flatatt
-from django.templatetags.static import static
 from django.utils.html import escape
 from django.utils.text import Truncator
 from django.utils.translation import ugettext as _
 from django.utils.safestring import mark_safe
 from django.utils.encoding import force_unicode
+
 
 class FilteredSelectMultiple(forms.SelectMultiple):
     """
@@ -21,9 +22,10 @@ class FilteredSelectMultiple(forms.SelectMultiple):
     Note that the resulting JavaScript assumes that the jsi18n
     catalog has been loaded in the page
     """
-    class Media:
-        js = ["admin/js/%s" % path
-              for path in ["core.js", "SelectBox.js", "SelectFilter2.js"]]
+    @property
+    def media(self):
+        js = ["core.js", "SelectBox.js", "SelectFilter2.js"]
+        return forms.Media(js=[static("admin/js/%s" % path) for path in js])
 
     def __init__(self, verbose_name, is_stacked, attrs=None, choices=()):
         self.verbose_name = verbose_name
@@ -31,9 +33,11 @@ class FilteredSelectMultiple(forms.SelectMultiple):
         super(FilteredSelectMultiple, self).__init__(attrs, choices)
 
     def render(self, name, value, attrs=None, choices=()):
-        if attrs is None: attrs = {}
+        if attrs is None:
+            attrs = {}
         attrs['class'] = 'selectfilter'
-        if self.is_stacked: attrs['class'] += 'stacked'
+        if self.is_stacked:
+            attrs['class'] += 'stacked'
         output = [super(FilteredSelectMultiple, self).render(name, value, attrs, choices)]
         output.append(u'<script type="text/javascript">addEvent(window, "load", function(e) {')
         # TODO: "id_" is hard-coded here. This should instead use the correct
@@ -43,15 +47,21 @@ class FilteredSelectMultiple(forms.SelectMultiple):
         return mark_safe(u''.join(output))
 
 class AdminDateWidget(forms.DateInput):
-    class Media:
-        js = ["admin/js/calendar.js", "admin/js/admin/DateTimeShortcuts.js"]
+
+    @property
+    def media(self):
+        js = ["calendar.js", "admin/DateTimeShortcuts.js"]
+        return forms.Media(js=[static("admin/js/%s" % path) for path in js])
 
     def __init__(self, attrs={}, format=None):
         super(AdminDateWidget, self).__init__(attrs={'class': 'vDateField', 'size': '10'}, format=format)
 
 class AdminTimeWidget(forms.TimeInput):
-    class Media:
-        js = ["admin/js/calendar.js", "admin/js/admin/DateTimeShortcuts.js"]
+
+    @property
+    def media(self):
+        js = ["calendar.js", "admin/DateTimeShortcuts.js"]
+        return forms.Media(js=[static("admin/js/%s" % path) for path in js])
 
     def __init__(self, attrs={}, format=None):
         super(AdminTimeWidget, self).__init__(attrs={'class': 'vTimeField', 'size': '8'}, format=format)
@@ -232,9 +242,9 @@ class RelatedFieldWidgetWrapper(forms.Widget):
         memo[id(self)] = obj
         return obj
 
-    def _media(self):
+    @property
+    def media(self):
         return self.widget.media
-    media = property(_media)
 
     def render(self, name, value, *args, **kwargs):
         rel_to = self.rel.to

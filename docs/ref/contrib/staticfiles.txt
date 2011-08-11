@@ -68,7 +68,9 @@ in a ``'downloads'`` subdirectory of :setting:`STATIC_ROOT`.
 
 This would allow you to refer to the local file
 ``'/opt/webfiles/stats/polls_20101022.tar.gz'`` with
-``'/static/downloads/polls_20101022.tar.gz'`` in your templates, e.g.::
+``'/static/downloads/polls_20101022.tar.gz'`` in your templates, e.g.:
+
+.. code-block:: html+django
 
     <a href="{{ STATIC_URL }}downloads/polls_20101022.tar.gz">
 
@@ -81,6 +83,11 @@ Default: ``'django.contrib.staticfiles.storage.StaticFilesStorage'``
 
 The file storage engine to use when collecting static files with the
 :djadmin:`collectstatic` management command.
+
+.. versionadded:: 1.4
+
+A ready-to-use instance of the storage backend defined in this setting
+can be found at ``django.contrib.staticfiles.storage.staticfiles_storage``.
 
 For an example, see :ref:`staticfiles-from-cdn`.
 
@@ -141,6 +148,16 @@ Files are searched by using the :setting:`enabled finders
 :setting:`STATICFILES_DIRS` and in the ``'static'`` directory of apps
 specified by the :setting:`INSTALLED_APPS` setting.
 
+.. versionadded:: 1.4
+
+The :djadmin:`collectstatic` management command calls the
+:meth:`~django.contrib.staticfiles.storage.StaticFilesStorage.post_process`
+method of the :setting:`STATICFILES_STORAGE` after each run and passes
+a list of paths that have been found by the management command. It also
+receives all command line options of :djadmin:`collectstatic`. This is used
+by the :class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage`
+by default.
+
 Some commonly used options are:
 
 .. django-admin-option:: --noinput
@@ -168,6 +185,13 @@ Some commonly used options are:
 .. django-admin-option:: --link
 
     Create a symbolic link to each file instead of copying.
+
+.. django-admin-option:: --no-post-process
+.. versionadded:: 1.4
+
+    Don't call the
+    :meth:`~django.contrib.staticfiles.storage.StaticFilesStorage.post_process`
+    method of the configured :setting:`STATICFILES_STORAGE` storage backend.
 
 .. django-admin-option:: --no-default-ignore
 
@@ -237,7 +261,120 @@ Example usage::
 
     django-admin.py runserver --insecure
 
-.. currentmodule:: None
+Storages
+========
+
+StaticFilesStorage
+------------------
+
+.. class:: storage.StaticFilesStorage
+
+    A subclass of the :class:`~django.core.files.storage.FileSystemStorage`
+    storage backend that uses the :setting:`STATIC_ROOT` setting as the base
+    file system location and the :setting:`STATIC_URL` setting respectively
+    as the base URL.
+
+    .. method:: post_process(paths, **options)
+
+    .. versionadded:: 1.4
+
+    This method is called by the :djadmin:`collectstatic` management command
+    after each run and gets passed the paths of found files, as well as the
+    command line options.
+
+    The :class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage`
+    uses this behind the scenes to replace the paths with their hashed
+    counterparts and update the cache appropriately.
+
+CachedStaticFilesStorage
+------------------------
+
+.. class:: storage.CachedStaticFilesStorage
+
+    .. versionadded:: 1.4
+
+    A subclass of the :class:`~django.contrib.staticfiles.storage.StaticFilesStorage`
+    storage backend which caches the files it saves by appending the MD5 hash
+    of the file's content to the filename. For example, the file
+    ``css/styles.css`` would also be saved as ``css/styles.55e7cbb9ba48.css``.
+
+    The purpose of this storage is to keep serving the old files in case some
+    pages still refer to those files, e.g. because they are cached by you or
+    a 3rd party proxy server. Additionally, it's very helpful if you want to
+    apply `far future Expires headers`_ to the deployed files to speed up the
+    load time for subsequent page visits.
+
+    The storage backend automatically replaces the paths found in the saved
+    files matching other saved files with the path of the cached copy (using
+    the :meth:`~django.contrib.staticfiles.storage.StaticFilesStorage.post_process`
+    method). The regular expressions used to find those paths
+    (``django.contrib.staticfiles.storage.CachedStaticFilesStorage.cached_patterns``)
+    by default cover the `@import`_ rule and `url()`_ statement of `Cascading
+    Style Sheets`_. For example, the ``'css/styles.css'`` file with the
+    content
+
+    .. code-block:: css+django
+
+        @import url("../admin/css/base.css");
+
+    would be replaced by calling the
+    :meth:`~django.core.files.storage.Storage.url`
+    method of the ``CachedStaticFilesStorage`` storage backend, ultimatively
+    saving a ``'css/styles.55e7cbb9ba48.css'`` file with the following
+    content:
+
+    .. code-block:: css+django
+
+        @import url("/static/admin/css/base.27e20196a850.css");
+
+    To enable the ``CachedStaticFilesStorage`` you have to make sure the
+    following requirements are met:
+
+    * the :setting:`STATICFILES_STORAGE` setting is set to
+      ``'django.contrib.staticfiles.storage.CachedStaticFilesStorage'``
+    * the :setting:`DEBUG` setting is set to ``False``
+    * you use the ``staticfiles`` :ttag:`static<staticfiles-static>` template
+      tag to refer to your static files in your templates
+    * you've collected all your static files by using the
+      :djadmin:`collectstatic` management command
+
+    Since creating the MD5 hash can be a performance burden to your website
+    during runtime, ``staticfiles`` will automatically try to cache the
+    hashed name for each file path using Django's :doc:`caching
+    framework</topics/cache>`. If you want to override certain options of the
+    cache backend the storage uses, simply specify a custom entry in the
+    :setting:`CACHES` setting named ``'staticfiles'``. It falls back to using
+    the ``'default'`` cache backend.
+
+.. _`far future Expires headers`: http://developer.yahoo.com/performance/rules.html#expires
+.. _`@import`: http://www.w3.org/TR/CSS2/cascade.html#at-import
+.. _`url()`: http://www.w3.org/TR/CSS2/syndata.html#uri
+.. _`Cascading Style Sheets`: http://www.w3.org/Style/CSS/
+
+.. currentmodule:: django.contrib.staticfiles.templatetags.staticfiles
+
+Template tags
+=============
+
+static
+------
+
+.. templatetag:: staticfiles-static
+
+.. versionadded:: 1.4
+
+Uses the configued :setting:`STATICFILES_STORAGE` storage to create the
+full URL for the given relative path, e.g.:
+
+.. code-block:: html+django
+
+    {% load static from staticfiles %}
+    <img src="{% static "css/base.css" %}" />
+
+The previous example is equal to calling the ``url`` method of an instance of
+:setting:`STATICFILES_STORAGE` with ``"css/base.css"``. This is especially
+useful when using a non-local storage backend to deploy files as documented
+in :ref:`staticfiles-from-cdn`.
 
 Other Helpers
 =============
@@ -251,7 +388,7 @@ files:
       with :class:`~django.template.RequestContext` contexts.
 
     - The builtin template tag :ttag:`static` which takes a path and
-      joins it with the the static prefix :setting:`STATIC_URL`.
+      urljoins it with the static prefix :setting:`STATIC_URL`.
 
     - The builtin template tag :ttag:`get_static_prefix` which populates a
       template variable with the static prefix :setting:`STATIC_URL` to be

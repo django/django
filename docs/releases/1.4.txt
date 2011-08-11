@@ -212,6 +212,29 @@ Additionally, it's now possible to define translatable URL patterns using
 :ref:`url-internationalization` for more information about the language prefix
 and how to internationalize URL patterns.
 
+``static`` template tag
+~~~~~~~~~~~~~~~~~~~~~~~
+
+The :mod:`staticfiles<django.contrib.staticfiles>` contrib app has now a new
+:ttag:`static template tag<staticfiles-static>` to refer to files saved with
+the :setting:`STATICFILES_STORAGE` storage backend. It'll use the storage
+``url`` method and therefore supports advanced features such as
+:ref:`serving files from a cloud service<staticfiles-from-cdn>`.
+
+``CachedStaticFilesStorage`` storage backend
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Additional to the `static template tag`_ the
+:mod:`staticfiles<django.contrib.staticfiles>` contrib app now has a
+:class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage` which
+caches the files it saves (when running the :djadmin:`collectstatic`
+management command) by appending the MD5 hash of the file's content to the
+filename. For example, the file ``css/styles.css`` would also be saved as
+``css/styles.55e7cbb9ba48.css``
+
+See the :class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage`
+docs for more information.
+
 Minor features
 ~~~~~~~~~~~~~~
 

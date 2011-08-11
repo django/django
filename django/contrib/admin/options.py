@@ -6,6 +6,7 @@ from django.forms.models import (modelform_factory, modelformset_factory,
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.admin import widgets, helpers
 from django.contrib.admin.util import unquote, flatten_fieldsets, get_deleted_objects, model_format_dict
+from django.contrib.admin.templatetags.admin_static import static
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_protect
 from django.core.exceptions import PermissionDenied, ValidationError
@@ -350,7 +351,8 @@ class ModelAdmin(BaseModelAdmin):
         return self.get_urls()
     urls = property(urls)
 
-    def _media(self):
+    @property
+    def media(self):
         js = [
             'core.js',
             'admin/RelatedObjectLookups.js',
@@ -363,8 +365,7 @@ class ModelAdmin(BaseModelAdmin):
             js.extend(['urlify.js', 'prepopulate.min.js'])
         if self.opts.get_ordered_objects():
             js.extend(['getElementsBySelector.js', 'dom-drag.js' , 'admin/ordering.js'])
-        return forms.Media(js=['admin/js/%s' % url for url in js])
-    media = property(_media)
+        return forms.Media(js=[static('admin/js/%s' % url) for url in js])
 
     def has_add_permission(self, request):
         """
@@ -1322,14 +1323,14 @@ class InlineModelAdmin(BaseModelAdmin):
         if self.verbose_name_plural is None:
             self.verbose_name_plural = self.model._meta.verbose_name_plural
 
-    def _media(self):
+    @property
+    def media(self):
         js = ['jquery.min.js', 'jquery.init.js', 'inlines.min.js']
         if self.prepopulated_fields:
             js.extend(['urlify.js', 'prepopulate.min.js'])
         if self.filter_vertical or self.filter_horizontal:
             js.extend(['SelectBox.js', 'SelectFilter2.js'])
-        return forms.Media(js=['admin/js/%s' % url for url in js])
-    media = property(_media)
+        return forms.Media(js=[static('admin/js/%s' % url) for url in js])
 
     def get_formset(self, request, obj=None, **kwargs):
         """Returns a BaseInlineFormSet class for use in admin add/change views."""

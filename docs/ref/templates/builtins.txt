@@ -2353,9 +2353,9 @@ static
 
 .. highlight:: html+django
 
-To link to static files Django ships with a :ttag:`static` template tag. You
-can use this regardless if you're using :class:`~django.template.RequestContext`
-or not.
+To link to static files that are saved in :setting:`STATIC_ROOT` Django ships
+with a :ttag:`static` template tag. You can use this regardless if you're
+using :class:`~django.template.RequestContext` or not.
 
 .. code-block:: html+django
 
@@ -2369,6 +2369,17 @@ It is also able to consume standard context variables, e.g. assuming a
 
     {% load static %}
     <link rel="stylesheet" href="{% static user_stylesheet %}" type="text/css" media="screen" />
+
+.. note::
+
+    The :mod:`staticfiles<django.contrib.staticfiles>` contrib app also ships
+    with a :ttag:`static template tag<staticfiles-static>` which uses
+    ``staticfiles'`` :setting:`STATICFILES_STORAGE` to build the URL of the
+    given path. Use that instead if you have an advanced use case such as
+    :ref:`using a cloud service to serve static files<staticfiles-from-cdn>`::
+
+        {% load static from staticfiles %}
+        <img src="{% static "images/hi.jpg" %}" />
 
 .. templatetag:: get_static_prefix
 

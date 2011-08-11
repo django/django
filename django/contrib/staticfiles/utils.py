@@ -3,30 +3,34 @@ import fnmatch
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
-def is_ignored(path, ignore_patterns=[]):
+def matches_patterns(path, patterns=None):
     """
     Return True or False depending on whether the ``path`` should be
     ignored (if it matches any pattern in ``ignore_patterns``).
     """
-    for pattern in ignore_patterns:
+    if patterns is None:
+        patterns = []
+    for pattern in patterns:
         if fnmatch.fnmatchcase(path, pattern):
             return True
     return False
 
-def get_files(storage, ignore_patterns=[], location=''):
+def get_files(storage, ignore_patterns=None, location=''):
     """
     Recursively walk the storage directories yielding the paths
     of all files that should be copied.
     """
+    if ignore_patterns is None:
+        ignore_patterns = []
     directories, files = storage.listdir(location)
     for fn in files:
-        if is_ignored(fn, ignore_patterns):
+        if matches_patterns(fn, ignore_patterns):
             continue
         if location:
             fn = os.path.join(location, fn)
         yield fn
     for dir in directories:
-        if is_ignored(dir, ignore_patterns):
+        if matches_patterns(dir, ignore_patterns):
             continue
         if location:
             dir = os.path.join(location, dir)
