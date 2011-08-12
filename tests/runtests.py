@@ -1,5 +1,9 @@
 #!/usr/bin/env python
-import os, subprocess, sys
+import os
+import shutil
+import subprocess
+import sys
+import tempfile
 
 import django.contrib as contrib
 from django.utils import unittest
@@ -10,9 +14,11 @@ REGRESSION_TESTS_DIR_NAME = 'regressiontests'
 
 TEST_TEMPLATE_DIR = 'templates'
 
+RUNTESTS_DIR = os.path.dirname(__file__)
 CONTRIB_DIR = os.path.dirname(contrib.__file__)
-MODEL_TEST_DIR = os.path.join(os.path.dirname(__file__), MODEL_TESTS_DIR_NAME)
-REGRESSION_TEST_DIR = os.path.join(os.path.dirname(__file__), REGRESSION_TESTS_DIR_NAME)
+MODEL_TEST_DIR = os.path.join(RUNTESTS_DIR, MODEL_TESTS_DIR_NAME)
+REGRESSION_TEST_DIR = os.path.join(RUNTESTS_DIR, REGRESSION_TESTS_DIR_NAME)
+TEMP_DIR = tempfile.mkdtemp(prefix='django_')
 
 REGRESSION_SUBDIRS_TO_SKIP = ['locale']
 
@@ -107,13 +113,15 @@ def setup(verbosity, test_labels):
         'LANGUAGE_CODE': settings.LANGUAGE_CODE,
         'MIDDLEWARE_CLASSES': settings.MIDDLEWARE_CLASSES,
         'STATIC_URL': settings.STATIC_URL,
+        'STATIC_ROOT': settings.STATIC_ROOT,
     }
 
     # Redirect some settings for the duration of these tests.
     settings.INSTALLED_APPS = ALWAYS_INSTALLED_APPS
     settings.ROOT_URLCONF = 'urls'
     settings.STATIC_URL = '/static/'
-    settings.TEMPLATE_DIRS = (os.path.join(os.path.dirname(__file__), TEST_TEMPLATE_DIR),)
+    settings.STATIC_ROOT = os.path.join(TEMP_DIR, 'static')
+    settings.TEMPLATE_DIRS = (os.path.join(RUNTESTS_DIR, TEST_TEMPLATE_DIR),)
     settings.USE_I18N = True
     settings.LANGUAGE_CODE = 'en'
     settings.LOGIN_URL = '/accounts/login/'
@@ -162,6 +170,8 @@ def setup(verbosity, test_labels):
 
 def teardown(state):
     from django.conf import settings
+    # Removing the temporary TEMP_DIR
+    shutil.rmtree(TEMP_DIR)
     # Restore the old settings.
     for key, value in state.items():
         setattr(settings, key, value)
