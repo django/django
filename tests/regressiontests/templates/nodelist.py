@@ -1,7 +1,7 @@
+from django.conf import settings
+from django.template import VariableNode, Context, TemplateSyntaxError
 from django.template.loader import get_template_from_string
-from django.template import VariableNode
 from django.utils.unittest import TestCase
-
 
 class NodelistTest(TestCase):
 
@@ -28,3 +28,37 @@ class NodelistTest(TestCase):
         template = get_template_from_string(source)
         vars = template.nodelist.get_nodes_by_type(VariableNode)
         self.assertEqual(len(vars), 1)
+
+
+class ErrorIndexTest(TestCase):
+    """
+    Checks whether index of error is calculated correctly in
+    template debugger in for loops. Refs ticket #5831
+    """
+    def setUp(self):
+        self.old_template_debug = settings.TEMPLATE_DEBUG
+        settings.TEMPLATE_DEBUG = True
+
+    def tearDown(self):
+        settings.TEMPLATE_DEBUG = self.old_template_debug
+
+    def test_correct_exception_index(self):
+        tests = [
+            ('{% load bad_tag %}{% for i in range %}{% badsimpletag %}{% endfor %}', (38, 56)),
+            ('{% load bad_tag %}{% for i in range %}{% for j in range %}{% badsimpletag %}{% endfor %}{% endfor %}', (58, 76)),
+            ('{% load bad_tag %}{% for i in range %}{% badsimpletag %}{% for j in range %}Hello{% endfor %}{% endfor %}', (38, 56)),
+            ('{% load bad_tag %}{% for i in range %}{% for j in five %}{% badsimpletag %}{% endfor %}{% endfor %}', (38, 57)),
+            ('{% load bad_tag %}{% for j in five %}{% badsimpletag %}{% endfor %}', (18, 37)),
+        ]
+        context = Context({
+            'range': range(5),
+            'five': 5,
+        })
+        for source, expected_error_source_index in tests:
+            template = get_template_from_string(source)
+            try:
+                template.render(context)
+            except TemplateSyntaxError, e:
+                error_source_index = e.source[1]
+                self.assertEqual(error_source_index,
+                                 expected_error_source_index)

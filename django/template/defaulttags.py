@@ -227,8 +227,21 @@ class ForNode(Node):
                     context.update(unpacked_vars)
             else:
                 context[self.loopvars[0]] = item
-            for node in self.nodelist_loop:
-                nodelist.append(node.render(context))
+            # In TEMPLATE_DEBUG mode providing source of the node which
+            # actually raised an exception to DefaultNodeList.render_node
+            if settings.TEMPLATE_DEBUG:
+                for node in self.nodelist_loop:
+                    try:
+                        nodelist.append(node.render(context))
+                    except Exception, e:
+                        if not hasattr(e, 'template_node_source'):
+                            from sys import exc_info
+                            e.template_node_source = node.source
+                            raise e, None, exc_info()[2]
+                        raise
+            else:
+                for node in self.nodelist_loop:
+                    nodelist.append(node.render(context))
             if pop_context:
                 # The loop variables were pushed on to the context so pop them
                 # off again. This is necessary because the tag lets the length
