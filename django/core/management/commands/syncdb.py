@@ -140,7 +140,7 @@ class Command(NoArgsCommand):
 
         if verbosity >= 1:
             print "Installing indexes ..."
-        # Install SQL indicies for all newly created models
+        # Install SQL indices for all newly created models
         for app_name, model_list in manifest.items():
             for model in model_list:
                 if model in created_models:

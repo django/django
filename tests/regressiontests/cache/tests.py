@@ -220,7 +220,7 @@ class BaseCacheTests(object):
         self.assertEqual(self.cache.has_key("goodbye1"), False)
 
     def test_in(self):
-        # The in operator can be used to inspet cache contents
+        # The in operator can be used to inspect cache contents
         self.cache.set("hello2", "goodbye2")
         self.assertEqual("hello2" in self.cache, True)
         self.assertEqual("goodbye2" in self.cache, False)
@@ -338,7 +338,7 @@ class BaseCacheTests(object):
             self.assertEqual(self.cache.get(key), value)
 
     def test_binary_string(self):
-        # Binary strings should be cachable
+        # Binary strings should be cacheable
         from zlib import compress, decompress
         value = 'value_to_be_compressed'
         compressed_value = compress(value)

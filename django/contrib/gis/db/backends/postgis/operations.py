@@ -536,7 +536,7 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
                     op = op(self.geom_func_prefix, value[1])
                 elif lookup_type in self.distance_functions and lookup_type != 'dwithin':
                     if not field.geography and field.geodetic(self.connection):
-                        # Geodetic distances are only availble from Points to
+                        # Geodetic distances are only available from Points to
                         # PointFields on PostGIS 1.4 and below.
                         if not self.connection.ops.geography:
                             if field.geom_type != 'POINT':

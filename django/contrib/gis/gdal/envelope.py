@@ -50,7 +50,7 @@ class Envelope(object):
             else:
                 raise TypeError('Incorrect type of argument: %s' % str(type(args[0])))
         elif len(args) == 4:
-            # Individiual parameters passed in.
+            # Individual parameters passed in.
             #  Thanks to ww for the help
             self._from_sequence(map(float, args))
         else:
@@ -125,7 +125,7 @@ class Envelope(object):
             # An x and an y parameter were passed in 
                 return self.expand_to_include((args[0], args[1], args[0], args[1])) 
         elif len(args) == 4: 
-            # Individiual parameters passed in. 
+            # Individual parameters passed in.
             return self.expand_to_include(args) 
         else: 
             raise OGRException('Incorrect number (%d) of arguments.' % len(args[0])) 

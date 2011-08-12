@@ -22,7 +22,7 @@ class GZipMiddleware(object):
         if response.has_header('Content-Encoding'):
             return response
 
-        # MSIE have issues with gzipped respones of various content types.
+        # MSIE have issues with gzipped response of various content types.
         if "msie" in request.META.get('HTTP_USER_AGENT', '').lower():
             ctype = response.get('Content-Type', '').lower()
             if not ctype.startswith("text/") or "javascript" in ctype:

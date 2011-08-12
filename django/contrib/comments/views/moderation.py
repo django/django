@@ -87,7 +87,7 @@ def approve(request, comment_id, next=None):
         )
 
 # The following functions actually perform the various flag/aprove/delete
-# actions. They've been broken out into seperate functions to that they
+# actions. They've been broken out into separate functions to that they
 # may be called from admin actions.
 
 def perform_flag(request, comment):

@@ -274,7 +274,7 @@ class ForeignKeyRawIdWidgetTest(DjangoTestCase):
         )
 
     def test_fk_related_model_not_in_admin(self):
-        # FK to a model not registered with admin site. Raw ID widget shoud
+        # FK to a model not registered with admin site. Raw ID widget should
         # have no magnifying glass link. See #16542
         big_honeycomb = models.Honeycomb.objects.create(location='Old tree')
         big_honeycomb.bee_set.create()
@@ -287,7 +287,7 @@ class ForeignKeyRawIdWidgetTest(DjangoTestCase):
         )
 
     def test_fk_to_self_model_not_in_admin(self):
-        # FK to self, not registered with admin site. Raw ID widget shoud have
+        # FK to self, not registered with admin site. Raw ID widget should have
         # no magnifying glass link. See #16542
         subject1 = models.Individual.objects.create(name='Subject #1')
         models.Individual.objects.create(name='Child', parent=subject1)
@@ -345,7 +345,7 @@ class ManyToManyRawIdWidgetTest(DjangoTestCase):
 
     def test_m2m_related_model_not_in_admin(self):
         # M2M relationship with model not registered with admin site. Raw ID
-        # widget shoud have no magnifying glass link. See #16542
+        # widget should have no magnifying glass link. See #16542
         consultor1 = models.Advisor.objects.create(name='Rockstar Techie')
 
         c1 = models.Company.objects.create(name='Doodle')

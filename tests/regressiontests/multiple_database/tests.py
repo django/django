@@ -1085,7 +1085,7 @@ class RouterTestCase(TestCase):
         self.assertEqual(list(pro.authors.values_list('name', flat=True)), [u'Marty Alchin'])
         self.assertEqual(pro.editor.name, u'Marty Alchin')
 
-        # get_or_create is a special case. The get needs to be targetted at
+        # get_or_create is a special case. The get needs to be targeted at
         # the write database in order to avoid potential transaction
         # consistency problems
         book, created = Book.objects.get_or_create(title="Pro Django")

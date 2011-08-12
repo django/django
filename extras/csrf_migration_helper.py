@@ -43,7 +43,7 @@
 #
 # - It's impossible to programmatically determine which forms should and should
 #   not have the token added.  The developer must decide when to do this,
-#   ensuring that the token is only added to internally targetted forms.
+#   ensuring that the token is only added to internally targeted forms.
 #
 # - It's impossible to programmatically work out when a template is used.  The
 #   attempts to trace back to view functions are guesses, and could easily fail

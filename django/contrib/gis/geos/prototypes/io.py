@@ -207,7 +207,7 @@ class ThreadLocalIO(threading.local):
 thread_context = ThreadLocalIO()
 
 # These module-level routines return the I/O object that is local to the
-# the thread.  If the I/O object does not exist yet it will be initialized.
+# thread. If the I/O object does not exist yet it will be initialized.
 def wkt_r():
     if not thread_context.wkt_r:
         thread_context.wkt_r = _WKTReader()

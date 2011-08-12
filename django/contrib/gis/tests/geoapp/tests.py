@@ -671,7 +671,7 @@ class GeoModelTest(TestCase):
                '12.40500 43.94833,12.40889 43.95499,12.41580 43.95795)))')
         sm = Country.objects.create(name='San Marino', mpoly=fromstr(wkt))
 
-        # Because floating-point arithmitic isn't exact, we set a tolerance
+        # Because floating-point arithmetic isn't exact, we set a tolerance
         # to pass into GEOS `equals_exact`.
         tol = 0.000000001
 

@@ -217,7 +217,7 @@ class Collector(object):
             self.data[model] = sorted(instances, key=attrgetter("pk"))
 
         # if possible, bring the models in an order suitable for databases that
-        # don't support transactions or cannot defer contraint checks until the
+        # don't support transactions or cannot defer constraint checks until the
         # end of a transaction.
         self.sort()
 

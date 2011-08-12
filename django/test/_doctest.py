@@ -552,7 +552,7 @@ class DocTestParser:
         ^ (?P<msg> \w+ .*)   #     a line *starts* with alphanum.
         """, re.VERBOSE | re.MULTILINE | re.DOTALL)
 
-    # A callable returning a true value iff its argument is a blank line
+    # A callable returning a true value if its argument is a blank line
     # or contains a single comment.
     _IS_BLANK_OR_COMMENT = re.compile(r'^[ ]*(#.*)?$').match
 

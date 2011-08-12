@@ -41,7 +41,7 @@ class GoogleZoom(object):
             # Getting the degrees and radians per pixel, and the 1/2 the number of
             # for every zoom level.
             self._degpp.append(z / 360.) # degrees per pixel
-            self._radpp.append(z / (2 * pi)) # radians per pixl
+            self._radpp.append(z / (2 * pi)) # radians per pixel
             self._npix.append(z / 2) # number of pixels to center of tile
 
             # Multiplying `z` by 2 for the next iteration.

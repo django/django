@@ -644,7 +644,7 @@ class AggregationTests(TestCase):
         )
 
         # Regression for #10766 - Shouldn't be able to reference an aggregate
-        # fields in an an aggregate() call.
+        # fields in an aggregate() call.
         self.assertRaises(
             FieldError,
             lambda: Book.objects.annotate(mean_age=Avg('authors__age')).annotate(Avg('mean_age'))

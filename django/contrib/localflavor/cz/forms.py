@@ -134,7 +134,7 @@ class CZICNumberField(Field):
         # remainder is equal:
         #  0 or 10: last digit is 1
         #  1: last digit is 0
-        # in other case, last digin is 11 - remainder
+        # in other case, last digit is 11 - remainder
 
         if (not remainder % 10 and check == 1) or \
         (remainder == 1 and check == 0) or \

@@ -152,7 +152,7 @@ class WizardView(TemplateView):
                 # if not, add the form with a zero based counter as unicode
                 init_form_list[unicode(i)] = form
 
-        # walk through the ne created list of forms
+        # walk through the new created list of forms
         for form in init_form_list.itervalues():
             if issubclass(form, formsets.BaseFormSet):
                 # if the element is based on BaseFormSet (FormSet/ModelFormSet)

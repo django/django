@@ -213,7 +213,7 @@ class BaseFormSet(StrAndUnicode):
                     return (1, 0) # +infinity, larger than any number
                 return (0, k[1])
             self._ordering.sort(key=compare_ordering_key)
-        # Return a list of form.cleaned_data dicts in the order spcified by
+        # Return a list of form.cleaned_data dicts in the order specified by
         # the form data.
         return [self.forms[i[0]] for i in self._ordering]
     ordered_forms = property(_get_ordered_forms)

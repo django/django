@@ -11,7 +11,7 @@ def sql_create(app, style, connection):
 
     if connection.settings_dict['ENGINE'] == 'django.db.backends.dummy':
         # This must be the "dummy" database backend, which means the user
-        # hasn't set ENGINE for the databse.
+        # hasn't set ENGINE for the database.
         raise CommandError("Django doesn't know which syntax to use for your SQL statements,\n" +
             "because you haven't specified the ENGINE setting for the database.\n" +
             "Edit your settings file and change DATBASES['default']['ENGINE'] to something like\n" +

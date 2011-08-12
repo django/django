@@ -130,7 +130,7 @@ class RelatedGeoModelTest(TestCase):
 
         # Now creating a second Parcel where the borders are the same, just
         # in different coordinate systems.  The center points are also the
-        # the same (but in different coordinate systems), and this time they
+        # same (but in different coordinate systems), and this time they
         # actually correspond to the centroid of the border.
         c1 = b1.centroid
         c2 = c1.transform(2276, clone=True)

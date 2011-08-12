@@ -339,7 +339,7 @@ class DayArchiveViewTests(TestCase):
         self.assertEqual(list(res.context['book_list']), [b])
         self.assertEqual(res.context['day'], future)
 
-        # allow_future but not allow_empty, next/prev amust be valid
+        # allow_future but not allow_empty, next/prev must be valid
         self.assertEqual(res.context['next_day'], None)
         self.assertEqual(res.context['previous_day'], datetime.date(2008, 10, 1))
 
