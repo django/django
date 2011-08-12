@@ -120,6 +120,99 @@ class ModelAdminTests(TestCase):
         self.assertEqual(ma.get_form(request).base_fields.keys(),
             ['name'])
 
+    def test_custom_form_meta_exclude_with_readonly(self):
+        """
+        Ensure that the custom ModelForm's `Meta.exclude` is respected when
+        used in conjunction with `ModelAdmin.readonly_fields` and when no
+        `ModelAdmin.exclude` is defined.
+        Refs #14496.
+        """
+        # First, with `ModelAdmin` -----------------------
+
+        class AdminBandForm(forms.ModelForm):
+
+            class Meta:
+                model = Band
+                exclude = ['bio']
+
+        class BandAdmin(ModelAdmin):
+            readonly_fields = ['name']
+            form = AdminBandForm
+
+        ma = BandAdmin(Band, self.site)
+        self.assertEqual(ma.get_form(request).base_fields.keys(),
+            ['sign_date',])
+
+        # Then, with `InlineModelAdmin`  -----------------
+
+        class AdminConcertForm(forms.ModelForm):
+
+            class Meta:
+                model = Concert
+                exclude = ['day']
+
+        class ConcertInline(TabularInline):
+            readonly_fields = ['transport']
+            form = AdminConcertForm
+            fk_name = 'main_band'
+            model = Concert
+
+        class BandAdmin(ModelAdmin):
+            inlines = [
+                ConcertInline
+            ]
+
+        ma = BandAdmin(Band, self.site)
+        self.assertEqual(
+            list(ma.get_formsets(request))[0]().forms[0].fields.keys(),
+            ['main_band', 'opening_band', 'id', 'DELETE',])
+
+    def test_custom_form_meta_exclude(self):
+        """
+        Ensure that the custom ModelForm's `Meta.exclude` is overridden if
+        `ModelAdmin.exclude` or `InlineModelAdmin.exclude` are defined.
+        Refs #14496.
+        """
+        # First, with `ModelAdmin` -----------------------
+
+        class AdminBandForm(forms.ModelForm):
+
+            class Meta:
+                model = Band
+                exclude = ['bio']
+
+        class BandAdmin(ModelAdmin):
+            exclude = ['name']
+            form = AdminBandForm
+
+        ma = BandAdmin(Band, self.site)
+        self.assertEqual(ma.get_form(request).base_fields.keys(),
+            ['bio', 'sign_date',])
+
+        # Then, with `InlineModelAdmin`  -----------------
+
+        class AdminConcertForm(forms.ModelForm):
+
+            class Meta:
+                model = Concert
+                exclude = ['day']
+
+        class ConcertInline(TabularInline):
+            exclude = ['transport']
+            form = AdminConcertForm
+            fk_name = 'main_band'
+            model = Concert
+
+        class BandAdmin(ModelAdmin):
+            inlines = [
+                ConcertInline
+            ]
+
+        ma = BandAdmin(Band, self.site)
+        self.assertEqual(
+            list(ma.get_formsets(request))[0]().forms[0].fields.keys(),
+            ['main_band', 'opening_band', 'day', 'id', 'DELETE',])
+
     def test_custom_form_validation(self):
         # If we specify a form, it should use it allowing custom validation to work
         # properly. This won't, however, break any of the admin widgets or media.

@@ -313,6 +313,24 @@ subclass::
 
     For an example see the section `Adding custom validation to the admin`_.
 
+    .. admonition:: Note
+
+        If your ``ModelForm`` and ``ModelAdmin`` both define an ``exclude``
+        option then ``ModelAdmin`` takes precedence::
+
+            class PersonForm(forms.ModelForm):
+
+                class Meta:
+                    model = Person
+                    exclude = ['name']
+
+            class PersonAdmin(admin.ModelAdmin):
+                exclude = ['age']
+                form = PersonForm
+
+        In the above example, the "age" field will be excluded but the "name"
+        field will be included in the generated form.
+
 .. attribute:: ModelAdmin.formfield_overrides
 
     This provides a quick-and-dirty way to override some of the
