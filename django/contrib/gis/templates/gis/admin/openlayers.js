@@ -1,4 +1,4 @@
-{# Author: Justin Bronn, Travis Pinney & Dane Springmeyer #}
+{% load l10n %}{# Author: Justin Bronn, Travis Pinney & Dane Springmeyer #}
 OpenLayers.Projection.addTransform("EPSG:4326", "EPSG:3857", OpenLayers.Layer.SphericalMercator.projectForward);
 {% block vars %}var {{ module }} = {};
 {{ module }}.map = null; {{ module }}.controls = null; {{ module }}.panel = null; {{ module }}.re = new RegExp("^SRID=\d+;(.+)", "i"); {{ module }}.layers = {};
@@ -68,7 +68,9 @@ OpenLayers.Projection.addTransform("EPSG:4326", "EPSG:3857", OpenLayers.Layer.Sp
 {{ module }}.clearFeatures = function (){
   {{ module }}.deleteFeatures();
   document.getElementById('{{ id }}').value = '';
+  {% localize off %}
   {{ module }}.map.setCenter(new OpenLayers.LonLat({{ default_lon }}, {{ default_lat }}), {{ default_zoom }});
+  {% endlocalize %}
 }
 // Add Select control
 {{ module }}.addSelectControl = function(){
@@ -137,7 +139,9 @@ OpenLayers.Projection.addTransform("EPSG:4326", "EPSG:3857", OpenLayers.Layer.Sp
           {{ module }}.map.zoomTo({{ point_zoom }});
       }
     } else {
+      {% localize off %}
       {{ module }}.map.setCenter(new OpenLayers.LonLat({{ default_lon }}, {{ default_lat }}), {{ default_zoom }});
+      {% endlocalize %}
     }
     // This allows editing of the geographic fields -- the modified WKT is
     // written back to the content field (as EWKT, so that the ORM will know
