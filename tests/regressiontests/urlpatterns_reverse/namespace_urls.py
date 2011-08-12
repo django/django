@@ -44,4 +44,6 @@ urlpatterns = patterns('regressiontests.urlpatterns_reverse.views',
 
     (r'^included/', include('regressiontests.urlpatterns_reverse.included_namespace_urls')),
 
+    (r'^ns-outer/(?P<outer>\d+)/', include('regressiontests.urlpatterns_reverse.included_namespace_urls', namespace='inc-outer')),
+
 )

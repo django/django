@@ -327,6 +327,13 @@ class NamespaceTests(TestCase):
         self.assertEqual('/ns-included1/normal/37/42/', reverse('inc-ns1:inc-normal-view', args=[37,42]))
         self.assertEqual('/ns-included1/normal/42/37/', reverse('inc-ns1:inc-normal-view', kwargs={'arg1':42, 'arg2':37}))
 
+    def test_namespace_pattern_with_variable_prefix(self):
+        "When using a include with namespaces when there is a regex variable in front of it"
+        self.assertEqual('/ns-outer/42/normal/', reverse('inc-outer:inc-normal-view', kwargs={'outer':42}))
+        self.assertEqual('/ns-outer/42/normal/', reverse('inc-outer:inc-normal-view', args=[42]))
+        self.assertEqual('/ns-outer/42/normal/37/4/', reverse('inc-outer:inc-normal-view', kwargs={'outer':42, 'arg1': 37, 'arg2': 4}))
+        self.assertEqual('/ns-outer/42/normal/37/4/', reverse('inc-outer:inc-normal-view', args=[42, 37, 4]))
+
     def test_multiple_namespace_pattern(self):
         "Namespaces can be embedded"
         self.assertEqual('/ns-included1/test3/inner/', reverse('inc-ns1:test-ns3:urlobject-view'))

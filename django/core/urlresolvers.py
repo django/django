@@ -22,6 +22,7 @@ from django.utils.translation import get_language
 
 
 _resolver_cache = {} # Maps URLconf modules to RegexURLResolver instances.
+_ns_resolver_cache = {} # Maps namespaces to RegexURLResolver instances.
 _callable_cache = {} # Maps view and url pattern names to their view functions.
 
 # SCRIPT_NAME prefixes for each thread are stored here. If there's no entry for
@@ -91,20 +92,20 @@ def get_callable(lookup_view, can_fail=False):
                 lookup_view = getattr(import_module(mod_name), func_name)
                 if not callable(lookup_view):
                     raise ViewDoesNotExist(
-                        "Could not import %s.%s. View is not callable."
-                    % (mod_name, func_name))
+                        "Could not import %s.%s. View is not callable." %
+                        (mod_name, func_name))
         except AttributeError:
             if not can_fail:
                 raise ViewDoesNotExist(
-                    "Could not import %s. View does not exist in module %s."
-                    % (lookup_view, mod_name))
+                    "Could not import %s. View does not exist in module %s." %
+                    (lookup_view, mod_name))
         except ImportError:
             parentmod, submod = get_mod_func(mod_name)
             if (not can_fail and submod != '' and
                     not module_has_submodule(import_module(parentmod), submod)):
                 raise ViewDoesNotExist(
-                    "Could not import %s. Parent module %s does not exist."
-                    % (lookup_view, mod_name))
+                    "Could not import %s. Parent module %s does not exist." %
+                    (lookup_view, mod_name))
             if not can_fail:
                 raise
     return lookup_view
@@ -116,6 +117,15 @@ def get_resolver(urlconf):
         urlconf = settings.ROOT_URLCONF
     return RegexURLResolver(r'^/', urlconf)
 get_resolver = memoize(get_resolver, _resolver_cache, 1)
+
+def get_ns_resolver(ns_pattern, resolver):
+    # Build a namespaced resolver for the given parent urlconf pattern.
+    # This makes it possible to have captured parameters in the parent
+    # urlconf pattern.
+    ns_resolver = RegexURLResolver(ns_pattern,
+                                          resolver.url_patterns)
+    return RegexURLResolver(r'^/', [ns_resolver])
+get_ns_resolver = memoize(get_ns_resolver, _ns_resolver_cache, 2)
 
 def get_mod_func(callback):
     # Converts 'django.views.news.stories.story_detail' to
@@ -424,6 +434,7 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, prefix=None, current
         path = parts[1:]
 
         resolved_path = []
+        ns_pattern = ''
         while path:
             ns = path.pop()
 
@@ -432,11 +443,13 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, prefix=None, current
                 app_list = resolver.app_dict[ns]
                 # Yes! Path part matches an app in the current Resolver
                 if current_app and current_app in app_list:
-                    # If we are reversing for a particular app, use that namespace
+                    # If we are reversing for a particular app,
+                    # use that namespace
                     ns = current_app
                 elif ns not in app_list:
-                    # The name isn't shared by one of the instances (i.e., the default)
-                    # so just pick the first instance as the default.
+                    # The name isn't shared by one of the instances
+                    # (i.e., the default) so just pick the first instance
+                    # as the default.
                     ns = app_list[0]
             except KeyError:
                 pass
@@ -444,22 +457,29 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, prefix=None, current
             try:
                 extra, resolver = resolver.namespace_dict[ns]
                 resolved_path.append(ns)
-                prefix = prefix + extra
+                ns_pattern = ns_pattern + extra
             except KeyError, key:
                 if resolved_path:
-                    raise NoReverseMatch("%s is not a registered namespace inside '%s'" % (key, ':'.join(resolved_path)))
+                    raise NoReverseMatch(
+                        "%s is not a registered namespace inside '%s'" %
+                        (key, ':'.join(resolved_path)))
                 else:
-                    raise NoReverseMatch("%s is not a registered namespace" % key)
+                    raise NoReverseMatch("%s is not a registered namespace" %
+                                         key)
+        if ns_pattern:
+            resolver = get_ns_resolver(ns_pattern, resolver)
 
-    return iri_to_uri(u'%s%s' % (prefix, resolver.reverse(view,
-            *args, **kwargs)))
+    return iri_to_uri(u'%s%s' %
+                      (prefix, resolver.reverse(view, *args, **kwargs)))
 
 reverse_lazy = lazy(reverse, str)
 
 def clear_url_caches():
     global _resolver_cache
+    global _ns_resolver_cache
     global _callable_cache
     _resolver_cache.clear()
+    _ns_resolver_cache.clear()
     _callable_cache.clear()
 
 def set_script_prefix(prefix):
