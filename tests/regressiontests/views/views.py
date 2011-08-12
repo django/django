@@ -1,8 +1,9 @@
 import sys
 
 from django import forms
-from django.http import HttpResponse, HttpResponseRedirect
+from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import get_resolver
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response, render
 from django.template import Context, RequestContext, TemplateDoesNotExist
 from django.views.debug import technical_500_response, SafeExceptionReporterFilter
@@ -52,6 +53,9 @@ def raises(request):
 def raises404(request):
     resolver = get_resolver(None)
     resolver.resolve('')
+
+def raises403(request):
+    raise PermissionDenied
 
 def redirect(request):
     """

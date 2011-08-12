@@ -6,6 +6,7 @@ from django.utils.importlib import import_module
 
 __all__ = ['handler404', 'handler500', 'include', 'patterns', 'url']
 
+handler403 = 'django.views.defaults.permission_denied'
 handler404 = 'django.views.defaults.page_not_found'
 handler500 = 'django.views.defaults.server_error'
 

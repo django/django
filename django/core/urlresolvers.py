@@ -331,6 +331,9 @@ class RegexURLResolver(LocaleRegexProvider):
             callback = getattr(defaults, 'handler%s' % view_type)
         return get_callable(callback), {}
 
+    def resolve403(self):
+        return self._resolve_special('403')
+
     def resolve404(self):
         return self._resolve_special('404')
 

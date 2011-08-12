@@ -261,6 +261,11 @@ Django 1.4 also includes several smaller improvements worth noting:
 * It is now possible to load fixtures containing forward references when using
   MySQL with the InnoDB database engine.
 
+* A new 403 response handler has been added as
+  ``'django.views.defaults.permission_denied'``. See the documentation
+  about :ref:`the 403 (HTTP Forbidden) view<http_forbidden_view>` for more
+  information.
+
 .. _backwards-incompatible-changes-1.4:
 
 Backwards incompatible changes in 1.4
