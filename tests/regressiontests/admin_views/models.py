@@ -391,6 +391,8 @@ class ParentAdmin(admin.ModelAdmin):
     model = Parent
     inlines = [ChildInline]
 
+    list_editable = ('name',)
+
     def save_related(self, request, form, formsets, change):
         super(ParentAdmin, self).save_related(request, form, formsets, change)
         first_name, last_name = form.instance.name.split()

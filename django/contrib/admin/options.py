@@ -1146,7 +1146,7 @@ class ModelAdmin(BaseModelAdmin):
                     if form.has_changed():
                         obj = self.save_form(request, form, change=True)
                         self.save_model(request, obj, form, change=True)
-                        form.save_m2m()
+                        self.save_related(request, form, formsets=[], change=True)
                         change_msg = self.construct_change_message(request, form, None)
                         self.log_change(request, obj, change_msg)
                         changecount += 1

@@ -3160,3 +3160,22 @@ class AdminCustomSaveRelatedTests(TestCase):
 
         self.assertEqual('Josh Stone', Parent.objects.latest('id').name)
         self.assertEqual([u'Catherine Stone', u'Paul Stone'], children_names)
+
+    def test_should_be_able_to_edit_related_objects_on_changelist_view(self):
+        parent = Parent.objects.create(name='Josh Rock')
+        paul = Child.objects.create(parent=parent, name='Paul')
+        catherine = Child.objects.create(parent=parent, name='Catherine')
+        post = {
+            'form-TOTAL_FORMS': '1',
+            'form-INITIAL_FORMS': '1',
+            'form-MAX_NUM_FORMS': '0',
+            'form-0-id': parent.id,
+            'form-0-name': 'Josh Stone',
+            '_save': 'Save'
+        }
+
+        response = self.client.post('/test_admin/admin/admin_views/parent/', post)
+        children_names = list(Child.objects.order_by('name').values_list('name', flat=True))
+
+        self.assertEqual('Josh Stone', Parent.objects.latest('id').name)
+        self.assertEqual([u'Catherine Stone', u'Paul Stone'], children_names)
