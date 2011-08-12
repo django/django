@@ -2,6 +2,7 @@ import urlparse
 from functools import wraps
 from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME
+from django.core.exceptions import PermissionDenied
 from django.utils.decorators import available_attrs
 
 
@@ -47,9 +48,20 @@ def login_required(function=None, redirect_field_name=REDIRECT_FIELD_NAME, login
     return actual_decorator
 
 
-def permission_required(perm, login_url=None):
+def permission_required(perm, login_url=None, raise_exception=False):
     """
     Decorator for views that checks whether a user has a particular permission
-    enabled, redirecting to the log-in page if necessary.
+    enabled, redirecting to the log-in page if neccesary.
+    If the raise_exception parameter is given the PermissionDenied exception
+    is raised.
     """
-    return user_passes_test(lambda u: u.has_perm(perm), login_url=login_url)
+    def check_perms(user):
+        # First check if the user has the permission (even anon users)
+        if user.has_perm(perm):
+            return True
+        # In case the 403 handler should be called raise the exception
+        if raise_exception:
+            raise PermissionDenied
+        # As the last resort, show the login form
+        return False
+    return user_passes_test(check_perms, login_url=login_url)

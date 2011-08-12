@@ -143,7 +143,7 @@ def login_protected_view_changed_redirect(request):
     return HttpResponse(t.render(c))
 login_protected_view_changed_redirect = login_required(redirect_field_name="redirect_to")(login_protected_view_changed_redirect)
 
-def permission_protected_view(request):
+def _permission_protected_view(request):
     "A simple view that is permission protected."
     t = Template('This is a permission protected test. '
                  'Username is {{ user.username }}. '
@@ -151,7 +151,8 @@ def permission_protected_view(request):
                  name='Permissions Template')
     c = Context({'user': request.user})
     return HttpResponse(t.render(c))
-permission_protected_view = permission_required('modeltests.test_perm')(permission_protected_view)
+permission_protected_view = permission_required('modeltests.test_perm')(_permission_protected_view)
+permission_protected_view_exception = permission_required('modeltests.test_perm', raise_exception=True)(_permission_protected_view)
 
 class _ViewManager(object):
     @method_decorator(login_required)

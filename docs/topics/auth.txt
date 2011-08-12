@@ -1167,7 +1167,7 @@ checks to make sure the user is logged in and has the permission
             return HttpResponse("You can't vote in this poll.")
         # ...
 
-.. function:: user_passes_test()
+.. function:: user_passes_test(func, [login_url=None])
 
     As a shortcut, you can use the convenient ``user_passes_test`` decorator::
 
@@ -1205,7 +1205,7 @@ checks to make sure the user is logged in and has the permission
 The permission_required decorator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. function:: permission_required()
+.. function:: permission_required([login_url=None, raise_exception=False])
 
     It's a relatively common task to check whether a user has a particular
     permission. For that reason, Django provides a shortcut for that case: the
@@ -1233,6 +1233,13 @@ The permission_required decorator
 
     As in the :func:`~decorators.login_required` decorator, ``login_url``
     defaults to :setting:`settings.LOGIN_URL <LOGIN_URL>`.
+
+    .. versionchanged:: 1.4
+
+    Added ``raise_exception`` parameter. If given, the decorator will raise
+    :exc:`~django.core.exceptions.PermissionDenied`, prompting
+    :ref:`the 403 (HTTP Forbidden) view<http_forbidden_view>` instead of
+    redirecting to the login page.
 
 .. currentmodule:: django.contrib.auth
 
@@ -1631,6 +1638,8 @@ A full authorization implementation can be found in
 the ``auth_permission`` table most of the time.
 
 .. _django/contrib/auth/backends.py: http://code.djangoproject.com/browser/django/trunk/django/contrib/auth/backends.py
+
+.. _anonymous_auth:
 
 Authorization for anonymous users
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
