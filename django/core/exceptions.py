@@ -3,7 +3,7 @@ Global Django exception and warning classes.
 """
 
 class DjangoRuntimeWarning(RuntimeWarning):
-   pass
+    pass
 
 class ObjectDoesNotExist(Exception):
     "The requested object does not exist"

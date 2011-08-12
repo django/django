@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 import datetime
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.db import models
 from django.forms import Form, ModelForm, FileField, ModelChoiceField
+from django.forms.models import ModelFormMetaclass
 from django.test import TestCase
 from regressiontests.forms.models import (ChoiceOptionModel, ChoiceFieldModel,
     FileModel, Group, BoundaryModel, Defaults)
@@ -160,3 +162,34 @@ class FormsModelTestCase(TestCase):
         self.assertEqual(obj.name, u'class default value')
         self.assertEqual(obj.value, 99)
         self.assertEqual(obj.def_date, datetime.date(1999, 3, 2))
+
+class RelatedModelFormTests(TestCase):
+    def test_invalid_loading_order(self):
+        """
+        Test for issue 10405
+        """
+        class A(models.Model):
+            ref = models.ForeignKey("B")
+
+        class Meta:
+            model=A
+
+        self.assertRaises(ValueError, ModelFormMetaclass, 'Form', (ModelForm,), {'Meta': Meta})
+
+        class B(models.Model):
+            pass
+
+    def test_valid_loading_order(self):
+        """
+        Test for issue 10405
+        """
+        class A(models.Model):
+            ref = models.ForeignKey("B")
+
+        class B(models.Model):
+            pass
+
+        class Meta:
+            model=A
+
+        self.assertTrue(issubclass(ModelFormMetaclass('Form', (ModelForm,), {'Meta': Meta}), ModelForm))
