@@ -10,7 +10,7 @@ from regressiontests.generic_views import views
 class ModelFormMixinTests(TestCase):
     def test_get_form(self):
         form_class = views.AuthorGetQuerySetFormView().get_form_class()
-        self.assertEqual(form_class.Meta.model, Author)
+        self.assertEqual(form_class._meta.model, Author)
 
 class CreateViewTests(TestCase):
     urls = 'regressiontests.generic_views.urls'
