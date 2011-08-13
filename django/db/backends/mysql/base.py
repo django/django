@@ -143,7 +143,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         # will tell you the default table type of the created
         # table. Since all Django's test tables will have the same
         # table type, that's enough to evaluate the feature.
-        cursor.execute('SHOW TABLE STATUS WHERE Name="INTROSPECT_TEST"')
+        cursor.execute("SHOW TABLE STATUS WHERE Name='INTROSPECT_TEST'")
         result = cursor.fetchone()
         cursor.execute('DROP TABLE INTROSPECT_TEST')
         return result[1] != 'MyISAM'
