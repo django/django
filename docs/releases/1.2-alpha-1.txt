@@ -23,7 +23,7 @@ CSRF Protection
 ---------------
 
 There have been large changes to the way that CSRF protection works, detailed in
-:doc:`the CSRF documentaton </ref/contrib/csrf>`.  The following are the major
+:doc:`the CSRF documentation </ref/contrib/csrf>`.  The following are the major
 changes that developers must be aware of:
 
  * ``CsrfResponseMiddleware`` and ``CsrfMiddleware`` have been deprecated, and

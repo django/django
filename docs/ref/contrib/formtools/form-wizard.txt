@@ -100,7 +100,7 @@ which preselects the wizard storage backend.
     in the :doc:`sessions documentation </topics/http/sessions>` on
     how to enable sessions.
 
-We will use the :class:`SessionWizardView` in all examples but is is completly
+We will use the :class:`SessionWizardView` in all examples but is is completely
 fine to use the :class:`CookieWizardView` instead. As with your
 :class:`~django.forms.Form` classes, this :class:`WizardView` class can live
 anywhere in your codebase, but convention is to put it in :file:`views.py`.
@@ -263,8 +263,8 @@ Advanced ``WizardView`` methods
 .. method:: WizardView.get_form_initial(step)
 
     Returns a dictionary which will be passed to the form for ``step`` as
-    ``initial``. If no initial data was provied while initializing the
-    form wizard, a empty dictionary should be returned.
+    ``initial``. If no initial data was provided while initializing the
+    form wizard, an empty dictionary should be returned.
 
     The default implementation::
 
@@ -283,8 +283,8 @@ Advanced ``WizardView`` methods
 
 .. method:: WizardView.get_form_instance(step)
 
-    Returns a object which will be passed to the form for ``step`` as
-    ``instance``. If no instance object was provied while initializing
+    Returns an object which will be passed to the form for ``step`` as
+    ``instance``. If no instance object was provided while initializing
     the form wizard, None be returned.
 
     The default implementation::
@@ -475,7 +475,7 @@ This storage will temporarilyy store the uploaded files for the wizard. The
 
     Please remember to take care of removing old files as the
     :class:`WizardView` won't remove any files, whether the wizard gets
-    finished corretly or not.
+    finished correctly or not.
 
 Conditionally view/skip specific steps
 ======================================

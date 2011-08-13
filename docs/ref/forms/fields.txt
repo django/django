@@ -938,8 +938,8 @@ representing a foreign key.  A single argument is required:
 
 .. attribute:: ModelChoiceField.empty_label
 
-    By default the ``<select>`` widget used by ``ModelChoiceField`` will have a
-    an empty choice at the top of the list. You can change the text of this
+    By default the ``<select>`` widget used by ``ModelChoiceField`` will have an
+    empty choice at the top of the list. You can change the text of this
     label (which is ``"---------"`` by default) with the ``empty_label``
     attribute, or you can disable the empty label entirely by setting
     ``empty_label`` to ``None``::

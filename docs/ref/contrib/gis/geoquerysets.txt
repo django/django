@@ -301,7 +301,7 @@ SpatiaLite SQL equivalent::
 Oracle
 ~~~~~~
 
-Here the relation pattern is compreised at least one of the nine relation
+Here the relation pattern is comprised at least one of the nine relation
 strings: ``TOUCH``, ``OVERLAPBDYDISJOINT``, ``OVERLAPBDYINTERSECT``,
 ``EQUAL``, ``INSIDE``, ``COVEREDBY``, ``CONTAINS``, ``COVERS``, ``ON``, and
 ``ANYINTERACT``.   Multiple strings may be combined with the logical Boolean

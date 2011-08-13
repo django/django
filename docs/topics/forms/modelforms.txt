@@ -713,7 +713,7 @@ Overiding ``clean()`` on a ``model_formset``
 Just like with ``ModelForms``, by default the ``clean()`` method of a
 ``model_formset`` will validate that none of the items in the formset violate
 the unique constraints on your model (either ``unique``, ``unique_together`` or
-``unique_for_date|month|year``).  If you want to overide the ``clean()`` method
+``unique_for_date|month|year``).  If you want to override the ``clean()`` method
 on a ``model_formset`` and maintain this validation, you must call the parent
 class's ``clean`` method::
 

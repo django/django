@@ -85,7 +85,7 @@ does all of the work.
        subsequently raise a 404.
 
     .. versionchanged:: 1.4
-       Redirects by the middlware are permanent (301 status code) instead of
+       Redirects by the middleware are permanent (301 status code) instead of
        temporary (302) to match behavior of the
        :class:`~django.middleware.common.CommonMiddleware`.
 

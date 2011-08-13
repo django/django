@@ -426,7 +426,7 @@ CSRF Protection
 ---------------
 
 We've made large changes to the way CSRF protection works, detailed in
-:doc:`the CSRF documentaton </ref/contrib/csrf>`. Here are the major changes you
+:doc:`the CSRF documentation </ref/contrib/csrf>`. Here are the major changes you
 should be aware of:
 
  * ``CsrfResponseMiddleware`` and ``CsrfMiddleware`` have been deprecated and

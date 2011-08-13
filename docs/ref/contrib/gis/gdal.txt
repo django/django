@@ -937,9 +937,9 @@ Coordinate System Objects
        4326
        >>> print srs['TOWGS84', 4] # the fourth value in this wkt
        0
-       >>> print srs['UNIT|AUTHORITY'] # For the units authority, have to use the pipe symbole.
+       >>> print srs['UNIT|AUTHORITY'] # For the units authority, have to use the pipe symbol.
        EPSG
-       >>> print srs['UNIT|AUTHORITY', 1] # The authority value for the untis
+       >>> print srs['UNIT|AUTHORITY', 1] # The authority value for the units
        9122
 
    .. method:: attr_value(target, index=0)

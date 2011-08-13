@@ -1363,5 +1363,5 @@ Uruguay (``uy``)
 
 .. class:: uy.forms.UYDepartamentSelect
 
-    A ``Select`` widget that uses a list of  Uruguayan departaments as its
+    A ``Select`` widget that uses a list of  Uruguayan departments as its
     choices.

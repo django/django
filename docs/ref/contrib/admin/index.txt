@@ -985,7 +985,7 @@ templates used by the :class:`ModelAdmin` views:
     .. versionadded:: 1.4
 
     The ``get_ordering`` method takes a``request`` as parameter and
-    is expected to return a ``list`` or ``tuple`` for ordering similiar
+    is expected to return a ``list`` or ``tuple`` for ordering similar
     to the :attr:`ordering` attribute. For example::
 
         class PersonAdmin(ModelAdmin):
