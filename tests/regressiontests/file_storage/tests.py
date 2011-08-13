@@ -22,6 +22,7 @@ from django.core.files.base import ContentFile
 from django.core.files.images import get_image_dimensions
 from django.core.files.storage import FileSystemStorage, get_storage_class
 from django.core.files.uploadedfile import UploadedFile
+from django.test import SimpleTestCase
 from django.utils import unittest
 
 # Try to import PIL in either of the two ways it can end up installed.
@@ -36,14 +37,7 @@ except ImportError:
         Image = None
 
 
-class GetStorageClassTests(unittest.TestCase):
-    def assertRaisesErrorWithMessage(self, error, message, callable,
-        *args, **kwargs):
-        self.assertRaises(error, callable, *args, **kwargs)
-        try:
-            callable(*args, **kwargs)
-        except error, e:
-            self.assertEqual(message, str(e))
+class GetStorageClassTests(SimpleTestCase):
 
     def test_get_filesystem_storage(self):
         """
@@ -57,7 +51,7 @@ class GetStorageClassTests(unittest.TestCase):
         """
         get_storage_class raises an error if the requested import don't exist.
         """
-        self.assertRaisesErrorWithMessage(
+        self.assertRaisesMessage(
             ImproperlyConfigured,
             "NonExistingStorage isn't a storage module.",
             get_storage_class,
@@ -67,7 +61,7 @@ class GetStorageClassTests(unittest.TestCase):
         """
         get_storage_class raises an error if the requested class don't exist.
         """
-        self.assertRaisesErrorWithMessage(
+        self.assertRaisesMessage(
             ImproperlyConfigured,
             'Storage module "django.core.files.storage" does not define a '\
                 '"NonExistingStorage" class.',

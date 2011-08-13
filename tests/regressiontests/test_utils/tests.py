@@ -1,6 +1,6 @@
 from __future__ import with_statement
 
-from django.test import TestCase, skipUnlessDBFeature
+from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.utils.unittest import skip
 
 from models import Person
@@ -47,6 +47,7 @@ class AssertNumQueriesTests(TestCase):
             self.client.get("/test_utils/get_person/%s/" % person.pk)
             self.client.get("/test_utils/get_person/%s/" % person.pk)
         self.assertNumQueries(2, test_func)
+
 
 class AssertNumQueriesContextManagerTests(TestCase):
     urls = 'regressiontests.test_utils.urls'
@@ -127,6 +128,15 @@ class SkippingExtraTests(TestCase):
     @skip("Fixture loading should not be performed for skipped tests.")
     def test_fixtures_are_skipped(self):
         pass
+
+
+class AssertRaisesMsgTest(SimpleTestCase):
+
+    def test_special_re_chars(self):
+        """assertRaisesMessage shouldn't interpret RE special chars."""
+        def func1():
+            raise ValueError("[.*x+]y?")
+        self.assertRaisesMessage(ValueError, "[.*x+]y?", func1)
 
 
 __test__ = {"API_TEST": r"""

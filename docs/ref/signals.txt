@@ -480,7 +480,7 @@ setting_changed
 .. data:: django.test.signals.setting_changed
    :module:
 
-Sent when some :ref:`settings are overridden <overriding-setting>` with the
+Sent when some :ref:`settings are overridden <overriding-settings>` with the
 :meth:`django.test.TestCase.setting` context manager or the
 :func:`django.test.utils.override_settings` decorator/context manager.
 

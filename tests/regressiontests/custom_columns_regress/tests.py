@@ -9,13 +9,6 @@ def pks(objects):
 
 class CustomColumnRegression(TestCase):
 
-    def assertRaisesMessage(self, exc, msg, func, *args, **kwargs):
-        try:
-            func(*args, **kwargs)
-        except Exception, e:
-            self.assertEqual(msg, str(e))
-            self.assertTrue(isinstance(e, exc), "Expected %s, got %s" % (exc, type(e)))
-
     def setUp(self):
         self.a1 = Author.objects.create(first_name='John', last_name='Smith')
         self.a2 = Author.objects.create(first_name='Peter', last_name='Jones')

@@ -393,12 +393,6 @@ class TestFixtures(TestCase):
 
 
 class NaturalKeyFixtureTests(TestCase):
-    def assertRaisesMessage(self, exc, msg, func, *args, **kwargs):
-        try:
-            func(*args, **kwargs)
-        except Exception, e:
-            self.assertEqual(msg, str(e))
-            self.assertTrue(isinstance(e, exc), "Expected %s, got %s" % (exc, type(e)))
 
     def test_nk_deserialize(self):
         """

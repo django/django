@@ -22,19 +22,6 @@ class BaseQuerysetTest(TestCase):
     def assertValueQuerysetEqual(self, qs, values):
         return self.assertQuerysetEqual(qs, values, transform=lambda x: x)
 
-    def assertRaisesMessage(self, exc, msg, func, *args, **kwargs):
-        try:
-            func(*args, **kwargs)
-        except Exception, e:
-            self.assertEqual(msg, str(e))
-            self.assertTrue(isinstance(e, exc), "Expected %s, got %s" % (exc, type(e)))
-        else:
-            if hasattr(exc, '__name__'):
-                excName = exc.__name__
-            else:
-                excName = str(exc)
-            raise AssertionError("%s not raised" % excName)
-
 
 class Queries1Tests(BaseQuerysetTest):
     def setUp(self):

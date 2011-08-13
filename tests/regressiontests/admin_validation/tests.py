@@ -19,12 +19,6 @@ class InvalidFields(admin.ModelAdmin):
     fields = ['spam']
 
 class ValidationTestCase(TestCase):
-    def assertRaisesMessage(self, exc, msg, func, *args, **kwargs):
-        try:
-            func(*args, **kwargs)
-        except Exception, e:
-            self.assertEqual(msg, str(e))
-            self.assertTrue(isinstance(e, exc), "Expected %s, got %s" % (exc, type(e)))
 
     def test_readonly_and_editable(self):
         class SongAdmin(admin.ModelAdmin):
