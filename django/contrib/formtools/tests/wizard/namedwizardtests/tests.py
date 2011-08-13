@@ -4,16 +4,12 @@ from django.test import TestCase
 
 from django.contrib.auth.models import User
 
-from django.contrib.formtools import wizard
-
 from django.contrib.formtools.wizard.views import (NamedUrlSessionWizardView,
                                                    NamedUrlCookieWizardView)
-from django.contrib.formtools.wizard.tests.formtests import (get_request,
-                                                             Step1,
-                                                             Step2)
+from django.contrib.formtools.tests.wizard.forms import get_request, Step1, Step2
 
 class NamedWizardTests(object):
-    urls = 'django.contrib.formtools.wizard.tests.namedwizardtests.urls'
+    urls = 'django.contrib.formtools.tests.wizard.namedwizardtests.urls'
 
     def setUp(self):
         self.testuser, created = User.objects.get_or_create(username='testuser1')
@@ -310,7 +306,7 @@ class NamedCookieWizardTests(NamedWizardTests, TestCase):
 
 
 class NamedFormTests(object):
-    urls = 'django.contrib.formtools.wizard.tests.namedwizardtests.urls'
+    urls = 'django.contrib.formtools.tests.wizard.namedwizardtests.urls'
 
     def test_revalidation(self):
         request = get_request()

@@ -4,12 +4,13 @@ import warnings
 
 from django import http
 from django.conf import settings
-from django.contrib.formtools import preview, wizard, utils
+from django.contrib.formtools import preview, utils
+from django.contrib.formtools.wizard import FormWizard
 from django.test import TestCase
 from django.test.utils import get_warnings_state, restore_warnings_state
 from django.utils import unittest
 
-from django.contrib.formtools.wizard.tests import *
+from django.contrib.formtools.tests.wizard import *
 from django.contrib.formtools.tests.forms import *
 
 warnings.filterwarnings('ignore', category=PendingDeprecationWarning,
@@ -30,10 +31,22 @@ class TestFormPreview(preview.FormPreview):
         return http.HttpResponse(success_string)
 
 
-class PreviewTests(TestCase):
+class FormToolsTestCase(TestCase):
+    def setUp(self):
+        # in the test runner use templates/tests/ to provide base.html
+        self.old_TEMPLATE_DIRS = settings.TEMPLATE_DIRS
+        settings.TEMPLATE_DIRS = list(settings.TEMPLATE_DIRS) + [
+            os.path.join(os.path.dirname(__file__), 'templates')]
+
+    def tearDown(self):
+        settings.TEMPLATE_DIRS = self.old_TEMPLATE_DIRS
+
+
+class PreviewTests(FormToolsTestCase):
     urls = 'django.contrib.formtools.tests.urls'
 
     def setUp(self):
+        super(PreviewTests, self).setUp()
         self.save_warnings_state()
         warnings.filterwarnings('ignore', category=DeprecationWarning,
                                 module='django.contrib.formtools.utils')
@@ -45,6 +58,7 @@ class PreviewTests(TestCase):
         self.test_data = {'field1':u'foo', 'field1_':u'asdf'}
 
     def tearDown(self):
+        super(PreviewTests, self).tearDown()
         self.restore_warnings_state()
 
     def test_unused_name(self):
@@ -224,7 +238,7 @@ class FormHmacTests(unittest.TestCase):
 # FormWizard tests
 #
 
-class TestWizardClass(wizard.FormWizard):
+class TestWizardClass(FormWizard):
 
     def get_template(self, step):
         return 'forms/wizard.html'
@@ -243,7 +257,7 @@ class DummyRequest(http.HttpRequest):
         self._dont_enforce_csrf_checks = True
 
 
-class WizardTests(TestCase):
+class WizardTests(FormToolsTestCase):
     urls = 'django.contrib.formtools.tests.urls'
     input_re = re.compile('name="([^"]+)" value="([^"]+)"')
     wizard_step_data = (
@@ -261,19 +275,13 @@ class WizardTests(TestCase):
     )
 
     def setUp(self):
-        self.old_TEMPLATE_DIRS = settings.TEMPLATE_DIRS
-        settings.TEMPLATE_DIRS = (
-            os.path.join(
-                os.path.dirname(__file__),
-                'templates'
-            ),
-        )
+        super(WizardTests, self).setUp()
         # Use a known SECRET_KEY to make security_hash tests deterministic
         self.old_SECRET_KEY = settings.SECRET_KEY
         settings.SECRET_KEY = "123"
 
     def tearDown(self):
-        settings.TEMPLATE_DIRS = self.old_TEMPLATE_DIRS
+        super(WizardTests, self).tearDown()
         settings.SECRET_KEY = self.old_SECRET_KEY
 
     def test_step_starts_at_zero(self):

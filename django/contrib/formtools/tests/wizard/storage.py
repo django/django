@@ -6,11 +6,13 @@ from django.utils.importlib import import_module
 
 from django.contrib.auth.models import User
 
+
 def get_request():
     request = HttpRequest()
     engine = import_module(settings.SESSION_ENGINE)
     request.session = engine.SessionStore(None)
     return request
+
 
 class TestStorage(object):
     def setUp(self):
@@ -73,4 +75,3 @@ class TestStorage(object):
         storage.extra_data = extra_context
         storage2 = self.get_storage()('wizard2', request, None)
         self.assertEqual(storage2.extra_data, {})
-

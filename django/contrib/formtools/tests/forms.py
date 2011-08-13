@@ -9,10 +9,10 @@ class Page1(forms.Form):
 class Page2(forms.Form):
     address1 = forms.CharField(max_length=100)
     address2 = forms.CharField(max_length=100)
-    
+
 class Page3(forms.Form):
     random_crap = forms.CharField(max_length=100)
-    
+
 class ContactWizard(FormWizard):
     def done(self, request, form_list):
         return HttpResponse("")

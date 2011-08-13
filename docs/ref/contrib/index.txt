@@ -102,7 +102,7 @@ An abstraction of the following workflow:
 See the :doc:`form preview documentation </ref/contrib/formtools/form-preview>`.
 
 django.contrib.formtools.wizard
---------------------------------
+-------------------------------
 
 Splits forms across multiple Web pages.
 

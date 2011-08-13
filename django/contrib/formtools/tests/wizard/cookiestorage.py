@@ -4,7 +4,8 @@ from django.core.exceptions import SuspiciousOperation
 from django.http import HttpResponse
 
 from django.contrib.formtools.wizard.storage.cookie import CookieStorage
-from django.contrib.formtools.wizard.tests.storagetests import get_request, TestStorage
+from django.contrib.formtools.tests.wizard.storage import get_request, TestStorage
+
 
 class TestCookieStorage(TestStorage, TestCase):
     def get_storage(self):

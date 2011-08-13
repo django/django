@@ -5,10 +5,9 @@ from django.test import TestCase
 from django.conf import settings
 from django.contrib.auth.models import User
 
-from django.contrib.formtools import wizard
 
 class WizardTests(object):
-    urls = 'django.contrib.formtools.wizard.tests.wizardtests.urls'
+    urls = 'django.contrib.formtools.tests.wizard.wizardtests.urls'
 
     def setUp(self):
         self.testuser, created = User.objects.get_or_create(username='testuser1')
@@ -269,7 +268,7 @@ class WizardTestKwargs(TestCase):
             'cookie_contact_wizard-current_step': 'form4',
         }
     )
-    urls = 'django.contrib.formtools.wizard.tests.wizardtests.urls'
+    urls = 'django.contrib.formtools.tests.wizard.wizardtests.urls'
 
     def setUp(self):
         self.testuser, created = User.objects.get_or_create(username='testuser1')

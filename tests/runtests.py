@@ -35,7 +35,6 @@ ALWAYS_INSTALLED_APPS = [
     'django.contrib.admindocs',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
-    'django.contrib.formtools.wizard',
     'regressiontests.staticfiles_tests',
     'regressiontests.staticfiles_tests.apps.test',
     'regressiontests.staticfiles_tests.apps.no_label',

@@ -20,6 +20,7 @@ class DummyRequest(http.HttpRequest):
         self.session = {}
         self._dont_enforce_csrf_checks = True
 
+
 def get_request(*args, **kwargs):
     request = DummyRequest(*args, **kwargs)
     engine = import_module(settings.SESSION_ENGINE)
@@ -202,4 +203,3 @@ class CookieFormTests(TestCase):
         request = get_request()
         testform = CookieWizardView.as_view([('start', Step1)])
         self.assertTrue(isinstance(testform(request), TemplateResponse))
-

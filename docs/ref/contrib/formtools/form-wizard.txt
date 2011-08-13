@@ -51,7 +51,7 @@ you just have to do these things:
        generic template to handle every one of the forms, or you can define a
        specific template for each form.
 
-    4. Add ``django.contrib.formtools.wizard`` to your
+    4. Add ``django.contrib.formtools`` to your
        :setting:`INSTALLED_APPS` list in your settings file.
 
     5. Point your URLconf at your :class:`WizardView` :meth:`~WizardView.as_view` method.

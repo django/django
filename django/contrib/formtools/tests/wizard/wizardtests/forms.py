@@ -34,7 +34,7 @@ class ContactWizard(WizardView):
     def done(self, form_list, **kwargs):
         c = Context({
             'form_list': [x.cleaned_data for x in form_list],
-            'all_cleaned_data': self.get_all_cleaned_data()
+            'all_cleaned_data': self.get_all_cleaned_data(),
         })
 
         for form in self.form_list.keys():

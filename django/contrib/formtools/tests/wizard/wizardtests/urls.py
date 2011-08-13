@@ -1,5 +1,5 @@
 from django.conf.urls.defaults import *
-from django.contrib.formtools.wizard.tests.wizardtests.forms import (
+from django.contrib.formtools.tests.wizard.wizardtests.forms import (
     SessionContactWizard, CookieContactWizard, Page1, Page2, Page3, Page4)
 
 urlpatterns = patterns('',
