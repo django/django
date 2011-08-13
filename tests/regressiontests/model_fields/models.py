@@ -66,6 +66,9 @@ class BooleanModel(models.Model):
     bfield = models.BooleanField()
     string = models.CharField(max_length=10, default='abc')
 
+class RenamedField(models.Model):
+    modelname = models.IntegerField(name="fieldname", choices=((1,'One'),))
+
 ###############################################################################
 # FileField
 

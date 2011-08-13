@@ -220,15 +220,16 @@ class Field(object):
         except KeyError:
             return None
 
+    @property
     def unique(self):
         return self._unique or self.primary_key
-    unique = property(unique)
 
     def set_attributes_from_name(self, name):
-        self.name = name
+        if not self.name:
+            self.name = name
         self.attname, self.column = self.get_attname_column()
-        if self.verbose_name is None and name:
-            self.verbose_name = name.replace('_', ' ')
+        if self.verbose_name is None and self.name:
+            self.verbose_name = self.name.replace('_', ' ')
 
     def contribute_to_class(self, cls, name):
         self.set_attributes_from_name(name)
