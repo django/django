@@ -201,7 +201,7 @@ Two things to note about 500 views:
 .. _http_forbidden_view:
 
 The 403 (HTTP Forbidden) view
-----------------------------
+-----------------------------
 
 .. versionadded:: 1.4
 
