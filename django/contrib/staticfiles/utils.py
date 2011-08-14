@@ -37,16 +37,18 @@ def get_files(storage, ignore_patterns=None, location=''):
         for fn in get_files(storage, ignore_patterns, dir):
             yield fn
 
-def check_settings():
+def check_settings(base_url=None):
     """
     Checks if the staticfiles settings have sane values.
 
     """
-    if not settings.STATIC_URL:
+    if base_url is not None:
+        base_url = settings.STATIC_URL
+    if not base_url:
         raise ImproperlyConfigured(
             "You're using the staticfiles app "
             "without having set the required STATIC_URL setting.")
-    if settings.MEDIA_URL == settings.STATIC_URL:
+    if settings.MEDIA_URL == base_url:
         raise ImproperlyConfigured("The MEDIA_URL and STATIC_URL "
                                    "settings must have different values")
     if ((settings.MEDIA_ROOT and settings.STATIC_ROOT) and
