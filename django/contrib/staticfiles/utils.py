@@ -42,7 +42,7 @@ def check_settings(base_url=None):
     Checks if the staticfiles settings have sane values.
 
     """
-    if base_url is not None:
+    if base_url is None:
         base_url = settings.STATIC_URL
     if not base_url:
         raise ImproperlyConfigured(
