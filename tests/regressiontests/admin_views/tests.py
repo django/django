@@ -12,7 +12,7 @@ from django.core.files import temp as tempfile
 from django.core.urlresolvers import reverse
 # Register auth models with the admin.
 from django.contrib.auth import REDIRECT_FIELD_NAME, admin
-from django.contrib.auth.models import User, Permission, UNUSABLE_PASSWORD
+from django.contrib.auth.models import Group, User, Permission, UNUSABLE_PASSWORD
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.admin.models import LogEntry, DELETION
 from django.contrib.admin.sites import LOGIN_FORM_KEY
@@ -2910,6 +2910,44 @@ class UserAdminTest(TestCase):
         self.assertRedirects(response, '/test_admin/admin/auth/user/add/')
         self.assertEqual(User.objects.count(), user_count + 1)
         self.assertNotEqual(new_user.password, UNUSABLE_PASSWORD)
+
+    def test_user_permission_performance(self):
+        u = User.objects.all()[0]
+
+        with self.assertNumQueries(7):
+            response = self.client.get('/test_admin/admin/auth/user/%s/' % u.pk)
+            self.assertEqual(response.status_code, 200)
+
+
+class GroupAdminTest(TestCase):
+    """
+    Tests group CRUD functionality.
+    """
+    fixtures = ['admin-views-users.xml']
+
+    def setUp(self):
+        self.client.login(username='super', password='secret')
+
+    def tearDown(self):
+        self.client.logout()
+
+    def test_save_button(self):
+        group_count = Group.objects.count()
+        response = self.client.post('/test_admin/admin/auth/group/add/', {
+            'name': 'newgroup',
+        })
+
+        new_group = Group.objects.order_by('-id')[0]
+        self.assertRedirects(response, '/test_admin/admin/auth/group/')
+        self.assertEqual(Group.objects.count(), group_count + 1)
+
+    def test_group_permission_performance(self):
+        g = Group.objects.create(name="test_group")
+
+        with self.assertNumQueries(6):  # instead of 259!
+            response = self.client.get('/test_admin/admin/auth/group/%s/' % g.pk)
+            self.assertEqual(response.status_code, 200)
+
 
 try:
     import docutils

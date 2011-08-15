@@ -21,6 +21,15 @@ class GroupAdmin(admin.ModelAdmin):
     ordering = ('name',)
     filter_horizontal = ('permissions',)
 
+    def formfield_for_manytomany(self, db_field, request=None, **kwargs):
+        if db_field.name == 'permissions':
+            qs = kwargs.get('queryset', db_field.rel.to.objects)
+            # Avoid a major performance hit resolving permission names which
+            # triggers a content_type load:
+            kwargs['queryset'] = qs.select_related('content_type')
+        return super(GroupAdmin, self).formfield_for_manytomany(db_field, request=request, **kwargs)
+
+
 class UserAdmin(admin.ModelAdmin):
     add_form_template = 'admin/auth/user/add_form.html'
     change_user_password_template = None
