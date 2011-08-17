@@ -55,15 +55,6 @@ class UserAdmin(admin.ModelAdmin):
     ordering = ('username',)
     filter_horizontal = ('user_permissions',)
 
-    def __call__(self, request, url):
-        # this should not be here, but must be due to the way __call__ routes
-        # in ModelAdmin.
-        if url is None:
-            return self.changelist_view(request)
-        if url.endswith('password'):
-            return self.user_change_password(request, url.split('/')[0])
-        return super(UserAdmin, self).__call__(request, url)
-
     def get_fieldsets(self, request, obj=None):
         if not obj:
             return self.add_fieldsets
