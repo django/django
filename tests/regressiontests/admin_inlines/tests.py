@@ -103,6 +103,16 @@ class TestInline(TestCase):
         # column cells
         self.assertContains(response, '<p>Callable in QuestionInline</p>')
 
+    def test_help_text(self):
+        """
+        Ensure that the inlines' model field help texts are displayed when
+        using both the stacked and tabular layouts.
+        Ref #8190.
+        """
+        response = self.client.get('/test_admin/admin/admin_inlines/holder4/add/')
+        self.assertContains(response, '<p class="help">Awesome stacked help text is awesome.</p>', 4)
+        self.assertContains(response, '<img src="/static/admin/img/icon-unknown.gif" alt="(Awesome tabular help text is awesome.)" title="Awesome tabular help text is awesome." />', 1)
+
 class TestInlineMedia(TestCase):
     fixtures = ['admin-views-users.xml']
 

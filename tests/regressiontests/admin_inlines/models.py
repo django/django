@@ -103,6 +103,32 @@ admin.site.register(Holder2, HolderAdmin, inlines=[InnerInline2])
 # only Inline media
 admin.site.register(Holder3, inlines=[InnerInline3])
 
+
+# Models for ticket #8190
+
+class Holder4(models.Model):
+    dummy = models.IntegerField()
+
+class Inner4Stacked(models.Model):
+    dummy = models.IntegerField(help_text="Awesome stacked help text is awesome.")
+    holder = models.ForeignKey(Holder4)
+
+class Inner4Tabular(models.Model):
+    dummy = models.IntegerField(help_text="Awesome tabular help text is awesome.")
+    holder = models.ForeignKey(Holder4)
+
+class Inner4StackedInline(admin.StackedInline):
+    model = Inner4Stacked
+
+class Inner4TabularInline(admin.TabularInline):
+    model = Inner4Tabular
+
+class Holder4Admin(admin.ModelAdmin):
+    inlines = [Inner4StackedInline, Inner4TabularInline]
+
+admin.site.register(Holder4, Holder4Admin)
+
+
 # Models for #12749
 
 class Person(models.Model):
