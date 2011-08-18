@@ -59,10 +59,10 @@ number of forms it generates from the initial data. Lets take a look at an
 example::
 
     >>> ArticleFormSet = formset_factory(ArticleForm, extra=2)
-    >>> formset = ArticleFormSet(initial={
-    ...      'title': u'Django is now open source',
-    ...      'pub_date': datetime.date.today(),
-    ... })
+    >>> formset = ArticleFormSet(initial=[
+    ...     {'title': u'Django is now open source',
+    ...      'pub_date': datetime.date.today(),}
+    ... ])
 
     >>> for form in formset:
     ...     print form.as_table()
