@@ -719,6 +719,7 @@ by 3rd parties that allow you to use other databases with Django:
 * `Microsoft SQL Server 2005`_
 * Firebird_
 * ODBC_
+* ADSDB_
 
 The Django versions and ORM features supported by these unofficial backends
 vary considerably. Queries regarding the specific capabilities of these
@@ -730,3 +731,4 @@ the support channels provided by each 3rd party project.
 .. _Microsoft SQL Server 2005: http://code.google.com/p/django-mssql/
 .. _Firebird: http://code.google.com/p/django-firebird/
 .. _ODBC: http://code.google.com/p/django-pyodbc/
+.. _ADSDB: http://code.google.com/p/adsdb-django/
