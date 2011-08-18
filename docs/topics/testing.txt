@@ -1278,6 +1278,7 @@ already have some data in your database. See the :djadmin:`dumpdata
 documentation<dumpdata>` for more details.
 
 .. note::
+
     If you've ever run :djadmin:`manage.py syncdb<syncdb>`, you've
     already used a fixture without even knowing it! When you call
     :djadmin:`syncdb` in the database for the first time, Django
@@ -1919,10 +1920,12 @@ utility methods in the ``django.test.utils`` module.
     magic hooks into the template system and restoring normal email
     services.
 
+.. currentmodule:: django.db.connection.creation
+
 The creation module of the database backend (``connection.creation``)
 also provides some utilities that can be useful during testing.
 
-.. function:: create_test_db(verbosity=1, autoclobber=False)
+.. function:: create_test_db([verbosity=1, autoclobber=False])
 
     Creates a new test database and runs ``syncdb`` against it.
 
@@ -1944,10 +1947,11 @@ also provides some utilities that can be useful during testing.
     :setting:`NAME` in :setting:`DATABASES` to match the name of the test
     database.
 
-.. function:: destroy_test_db(old_database_name, verbosity=1)
+.. function:: destroy_test_db(old_database_name, [verbosity=1])
 
-    Destroys the database whose name is in stored in :setting:`NAME` in the
-    :setting:`DATABASES`, and sets :setting:`NAME` to use the
-    provided name.
+    Destroys the database whose name is the value of :setting:`NAME` in
+    :setting:`DATABASES`, and sets :setting:`NAME` to the value of
+    ``old_database_name``.
 
-    ``verbosity`` has the same behavior as in ``run_tests()``.
+    The ``verbosity`` argument has the same behavior as for
+    :class:`~django.test.simple.DjangoTestSuiteRunner`.
