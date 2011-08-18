@@ -52,15 +52,15 @@ widget on the field. In the following example, the
 
         BIRTH_YEAR_CHOICES = ('1980', '1981', '1982')
         GENDER_CHOICES = (('m', 'Male'), ('f', 'Female'))
-        FAVOURITE_COLORS_CHOICES = (('blue', 'Blue'),
+        FAVORITE_COLORS_CHOICES = (('blue', 'Blue'),
                                     ('green', 'Green'),
                                     ('black', 'Black'))
 
         class SimpleForm(forms.Form):
-            birth_year = DateField(widget=SelectDateWidget(years=YEAR_CHOICES))
-            gender = ChoiceField(widget=RadioSelect, choices=RADIO_CHOICES)
-            favourite_colors = forms.MultipleChoiceField(required=False,
-                widget=CheckboxSelectMultiple, choices=CHECKBOX_CHOICES)
+            birth_year = DateField(widget=SelectDateWidget(years=BIRTH_YEAR_CHOICES))
+            gender = ChoiceField(widget=RadioSelect, choices=GENDER_CHOICES)
+            favorite_colors = forms.MultipleChoiceField(required=False,
+                widget=CheckboxSelectMultiple, choices=FAVORITE_COLORS_CHOICES)
 
 See the :ref:`built-in widgets` for more information about which widgets
 are available and which arguments they accept.
