@@ -6,7 +6,7 @@ Introduction
 ============
 
 GeoDjango is an add-on for Django that turns it into a world-class geographic
-Web framework.  GeoDjango strives to make at as simple as possible to create
+Web framework.  GeoDjango strives to make it as simple as possible to create
 geographic Web applications, like location-based services.  Some features include:
 
 * Django model fields for `OGC`_ geometries.
@@ -753,5 +753,5 @@ option class in your ``admin.py`` file::
 
 .. [#] Special thanks to Bjørn Sandvik of `thematicmapping.org <http://thematicmapping.org>`_ for providing and maintaining this data set.
 .. [#] GeoDjango basic apps was written by Dane Springmeyer, Josh Livni, and Christopher Schmidt.
-.. [#] Here the point is for the `University of Houston Law Center <http://www.law.uh.edu/>`_ .
+.. [#] Here the point is for the `University of Houston Law Center <http://www.law.uh.edu/>`_.
 .. [#] Open Geospatial Consortium, Inc., `OpenGIS Simple Feature Specification For SQL <http://www.opengis.org/docs/99-049.pdf>`_, Document 99-049.
