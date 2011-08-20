@@ -826,7 +826,7 @@ namespaces into URLs on specific application instances, according to the
     The string returned by :meth:`~django.core.urlresolvers.reverse` is already
     :ref:`urlquoted <uri-and-iri-handling>`. For example::
 
-        >>> reverse('cities', args=u'Orléans')
+        >>> reverse('cities', args=[u'Orléans'])
         '.../Orl%C3%A9ans/'
 
     Applying further encoding (such as :meth:`~django.utils.http.urlquote` or
