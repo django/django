@@ -943,7 +943,7 @@ includes a few other useful built-in views located in
         * ``next_page``: The URL to redirect to after logout.
 
         * ``template_name``: The full name of a template to display after
-          logging the user out. This will default to
+          logging the user out. Defaults to
           :file:`registration/logged_out.html` if no argument is supplied.
 
         * ``redirect_field_name``: The name of a ``GET`` field containing the
@@ -954,14 +954,26 @@ includes a few other useful built-in views located in
 
         * ``title``: The string "Logged out", localized.
 
+        * ``site``: The current :class:`~django.contrib.sites.models.Site`,
+          according to the :setting:`SITE_ID` setting. If you don't have the
+          site framework installed, this will be set to an instance of
+          :class:`~django.contrib.sites.models.RequestSite`, which derives the
+          site name and domain from the current
+          :class:`~django.http.HttpRequest`.
+
+        * ``site_name``: An alias for ``site.name``. If you don't have the site
+          framework installed, this will be set to the value of
+          :attr:`request.META['SERVER_NAME'] <django.http.HttpRequest.META>`.
+          For more on sites, see :doc:`/ref/contrib/sites`.
+
 .. function:: logout_then_login(request[, login_url])
 
     Logs a user out, then redirects to the login page.
 
     **Optional arguments:**
 
-        * ``login_url``: The URL of the login page to redirect to. This will
-          default to :setting:`settings.LOGIN_URL <LOGIN_URL>` if not supplied.
+        * ``login_url``: The URL of the login page to redirect to.
+          Defaults to :setting:`settings.LOGIN_URL <LOGIN_URL>` if not supplied.
 
 .. function:: password_change(request[, template_name, post_change_redirect, password_change_form])
 
@@ -970,22 +982,22 @@ includes a few other useful built-in views located in
     **Optional arguments:**
 
         * ``template_name``: The full name of a template to use for
-          displaying the password change form. This will default to
+          displaying the password change form. Defaults to
           :file:`registration/password_change_form.html` if not supplied.
 
         * ``post_change_redirect``: The URL to redirect to after a successful
           password change.
 
-        * .. versionadded:: 1.2
+          .. versionadded:: 1.2
 
-          ``password_change_form``: A custom "change password" form which must
+        * ``password_change_form``: A custom "change password" form which must
           accept a ``user`` keyword argument. The form is responsible for
-          actually changing the user's password.
-
+          actually changing the user's password. Defaults to
+          :class:`~django.contrib.auth.forms.PasswordChangeForm`.
 
     **Template context:**
 
-        * ``form``: The password change form.
+        * ``form``: The password change form (see ``password_change_form`` above).
 
 .. function:: password_change_done(request[, template_name])
 
@@ -993,8 +1005,8 @@ includes a few other useful built-in views located in
 
     **Optional arguments:**
 
-        * ``template_name``: The full name of a template to use. This will
-          default to :file:`registration/password_change_done.html` if not
+        * ``template_name``: The full name of a template to use.
+          Defaults to :file:`registration/password_change_done.html` if not
           supplied.
 
 .. function:: password_reset(request[, is_admin_site, template_name, email_template_name, password_reset_form, token_generator, post_reset_redirect, from_email])
@@ -1006,18 +1018,24 @@ includes a few other useful built-in views located in
     .. versionchanged:: 1.3
         The ``from_email`` argument was added.
 
+    .. versionchanged:: 1.4
+        Users flagged with an unusable password (see
+        :meth:`~django.contrib.auth.models.User.set_unusable_password()`
+        will not be able to request a password reset to prevent misuse
+        when using an external authentication source like LDAP.
+
     **Optional arguments:**
 
         * ``template_name``: The full name of a template to use for
-          displaying the password reset form. This will default to
+          displaying the password reset form. Defaults to
           :file:`registration/password_reset_form.html` if not supplied.
 
         * ``email_template_name``: The full name of a template to use for
-          generating the email with the new password. This will default to
+          generating the email with the new password. Defaults to
           :file:`registration/password_reset_email.html` if not supplied.
 
         * ``subject_template_name``: The full name of a template to use for
-          the subject of the email with the new password. This will default
+          the subject of the email with the new password. Defaults
           to :file:`registration/password_reset_subject.txt` if not supplied.
 
           .. versionadded:: 1.4
@@ -1037,13 +1055,43 @@ includes a few other useful built-in views located in
 
     **Template context:**
 
-        * ``form``: The form for resetting the user's password.
+        * ``form``: The form (see ``password_reset_form`` above) for resetting
+          the user's password.
 
-        .. versionchanged:: 1.4
-            Users flagged with an unusable password (see
-            :meth:`~django.contrib.auth.models.User.set_unusable_password()`
-            will not be able to request a password reset to prevent misuse
-            when using an external authentication source like LDAP.
+    **Email template context:**
+
+        * ``email``: An alias for ``user.email``
+
+        * ``user``: The current :class:`~django.contrib.auth.models.User`,
+          according to the ``email`` form field. Only active users are able to
+          reset their passwords (``User.is_active is True``).
+
+        * ``site_name``: An alias for ``site.name``. If you don't have the site
+          framework installed, this will be set to the value of
+          :attr:`request.META['SERVER_NAME'] <django.http.HttpRequest.META>`.
+          For more on sites, see :doc:`/ref/contrib/sites`.
+
+        * ``domain``: An alias for ``site.domain``. If you don't have the site
+          framework installed, this will be set to the value of
+          ``request.get_host()``.
+
+        * ``protocol``: http or https
+
+        * ``uid``: The user's id encoded in base 36.
+
+        * ``token``: Token to check that the password is valid.
+
+    Sample ``registration/password_reset_email.html`` (email body template):
+
+    .. code-block:: html+django
+
+        {% load url from future %}
+        Someone asked for password reset for email {{ email }}. Follow the link below:
+        {{ protocol}}://{{ site_name }}{% url 'auth_password_reset_confirm' uidb36=uid token=token %}
+
+    The same template context is used for subject template. Subject must be
+    single line plain text string.
+
 
 .. function:: password_reset_done(request[, template_name])
 
@@ -1053,8 +1101,8 @@ includes a few other useful built-in views located in
 
     **Optional arguments:**
 
-        * ``template_name``: The full name of a template to use. This will
-          default to :file:`registration/password_reset_done.html` if not
+        * ``template_name``: The full name of a template to use.
+          Defaults to :file:`registration/password_reset_done.html` if not
           supplied.
 
 .. function:: password_reset_confirm(request[, uidb36, token, template_name, token_generator, set_password_form, post_reset_redirect])
@@ -1063,18 +1111,31 @@ includes a few other useful built-in views located in
 
     **Optional arguments:**
 
-        * ``uidb36``: The user's id encoded in base 36. This will default to
+        * ``uidb36``: The user's id encoded in base 36. Defaults to ``None``.
+
+        * ``token``: Token to check that the password is valid. Defaults to
           ``None``.
-        * ``token``: Token to check that the password is valid. This will default to ``None``.
+
         * ``template_name``: The full name of a template to display the confirm
           password view. Default value is :file:`registration/password_reset_confirm.html`.
+
         * ``token_generator``: Instance of the class to check the password. This
           will default to ``default_token_generator``, it's an instance of
           ``django.contrib.auth.tokens.PasswordResetTokenGenerator``.
+
         * ``set_password_form``: Form that will be used to set the password.
-          This will default to ``SetPasswordForm``.
+          Defaults to :class:`~django.contrib.auth.forms.SetPasswordForm`
+
         * ``post_reset_redirect``: URL to redirect after the password reset
-          done. This will default to ``None``.
+          done. Defaults to ``None``.
+
+    **Template context:**
+
+        * ``form``: The form (see ``set_password_form`` above) for setting the
+          new user's password.
+
+        * ``validlink``: Boolean, True if the link (combination of uidb36 and
+          token) is valid or unused yet.
 
 .. function:: password_reset_complete(request[,template_name])
 
@@ -1084,7 +1145,7 @@ includes a few other useful built-in views located in
    **Optional arguments:**
 
        * ``template_name``: The full name of a template to display the view.
-         This will default to :file:`registration/password_reset_complete.html`.
+         Defaults to :file:`registration/password_reset_complete.html`.
 
 Helper functions
 ----------------
@@ -1102,8 +1163,8 @@ Helper functions
 
     **Optional arguments:**
 
-        * ``login_url``: The URL of the login page to redirect to. This will
-          default to :setting:`settings.LOGIN_URL <LOGIN_URL>` if not supplied.
+        * ``login_url``: The URL of the login page to redirect to.
+          Defaults to :setting:`settings.LOGIN_URL <LOGIN_URL>` if not supplied.
 
         * ``redirect_field_name``: The name of a ``GET`` field containing the
           URL to redirect to after log out. Overrides ``next`` if the given
