@@ -304,18 +304,19 @@ Specialists
 -----------
 
 `James Bennett`_
-    James is Django's release manager; he also contributes to the documentation.
+    James is Django's release manager, and also contributes to the
+    documentation and provide the occasional bugfix.
 
     James came to Web development from philosophy when he discovered
     that programmers get to argue just as much while collecting much
-    better pay. He lives in Lawrence, Kansas, where he works for the
-    Journal-World developing Ellington. He `keeps a blog`_, has
-    written a `book on Django`_, and enjoys fine port and talking to
-    his car.
+    better pay. He lives in Lawrence, Kansas and previously worked at
+    World Online; currently, he's part of the Web development team at
+    Mozilla.
+
+    He `keeps a blog`_, and enjoys fine port and talking to his car.
 
 .. _james bennett: http://b-list.org/
 .. _keeps a blog: `james bennett`_
-.. _book on Django: http://www.amazon.com/dp/1590599969/?tag=djangoproject-20
 
 Ian Kelly
     Ian is responsible for Django's support for Oracle.
