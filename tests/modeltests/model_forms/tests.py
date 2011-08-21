@@ -658,21 +658,21 @@ class OldFormForXTests(TestCase):
 <tr><th>Pub date:</th><td><input type="text" name="pub_date" /></td></tr>
 <tr><th>Writer:</th><td><select name="writer">
 <option value="" selected="selected">---------</option>
-<option value="2">Bob Woodward</option>
-<option value="1">Mike Royko</option>
+<option value="%s">Bob Woodward</option>
+<option value="%s">Mike Royko</option>
 </select></td></tr>
 <tr><th>Article:</th><td><textarea rows="10" cols="40" name="article"></textarea></td></tr>
 <tr><th>Categories:</th><td><select multiple="multiple" name="categories">
-<option value="1">Entertainment</option>
-<option value="2">It&#39;s a test</option>
-<option value="3">Third test</option>
+<option value="%s">Entertainment</option>
+<option value="%s">It&#39;s a test</option>
+<option value="%s">Third test</option>
 </select><br /><span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></td></tr>
 <tr><th>Status:</th><td><select name="status">
 <option value="" selected="selected">---------</option>
 <option value="1">Draft</option>
 <option value="2">Pending</option>
 <option value="3">Live</option>
-</select></td></tr>''')
+</select></td></tr>''' % (w_woodward.pk, w_royko.pk, c1.pk, c2.pk, c3.pk))
 
         # You can restrict a form to a subset of the complete list of fields
         # by providing a 'fields' argument. If you try to save a
@@ -706,21 +706,21 @@ class OldFormForXTests(TestCase):
 <li>Pub date: <input type="text" name="pub_date" value="1988-01-04" /></li>
 <li>Writer: <select name="writer">
 <option value="">---------</option>
-<option value="2">Bob Woodward</option>
-<option value="1" selected="selected">Mike Royko</option>
+<option value="%s">Bob Woodward</option>
+<option value="%s" selected="selected">Mike Royko</option>
 </select></li>
 <li>Article: <textarea rows="10" cols="40" name="article">Hello.</textarea></li>
 <li>Categories: <select multiple="multiple" name="categories">
-<option value="1">Entertainment</option>
-<option value="2">It&#39;s a test</option>
-<option value="3">Third test</option>
+<option value="%s">Entertainment</option>
+<option value="%s">It&#39;s a test</option>
+<option value="%s">Third test</option>
 </select> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></li>
 <li>Status: <select name="status">
 <option value="" selected="selected">---------</option>
 <option value="1">Draft</option>
 <option value="2">Pending</option>
 <option value="3">Live</option>
-</select></li>''')
+</select></li>''' % (w_woodward.pk, w_royko.pk, c1.pk, c2.pk, c3.pk))
         f = TestArticleForm({
                 'headline': u'Test headline',
                 'slug': 'test-headline',
@@ -760,21 +760,21 @@ class OldFormForXTests(TestCase):
 <li>Pub date: <input type="text" name="pub_date" value="1988-01-04" /></li>
 <li>Writer: <select name="writer">
 <option value="">---------</option>
-<option value="2">Bob Woodward</option>
-<option value="1" selected="selected">Mike Royko</option>
+<option value="%s">Bob Woodward</option>
+<option value="%s" selected="selected">Mike Royko</option>
 </select></li>
 <li>Article: <textarea rows="10" cols="40" name="article">Hello.</textarea></li>
 <li>Categories: <select multiple="multiple" name="categories">
-<option value="1" selected="selected">Entertainment</option>
-<option value="2">It&#39;s a test</option>
-<option value="3">Third test</option>
+<option value="%s" selected="selected">Entertainment</option>
+<option value="%s">It&#39;s a test</option>
+<option value="%s">Third test</option>
 </select> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></li>
 <li>Status: <select name="status">
 <option value="" selected="selected">---------</option>
 <option value="1">Draft</option>
 <option value="2">Pending</option>
 <option value="3">Live</option>
-</select></li>''')
+</select></li>''' % (w_woodward.pk, w_royko.pk, c1.pk, c2.pk, c3.pk))
 
         # Initial values can be provided for model forms
         f = TestArticleForm(
@@ -788,21 +788,21 @@ class OldFormForXTests(TestCase):
 <li>Pub date: <input type="text" name="pub_date" /></li>
 <li>Writer: <select name="writer">
 <option value="" selected="selected">---------</option>
-<option value="2">Bob Woodward</option>
-<option value="1">Mike Royko</option>
+<option value="%s">Bob Woodward</option>
+<option value="%s">Mike Royko</option>
 </select></li>
 <li>Article: <textarea rows="10" cols="40" name="article"></textarea></li>
 <li>Categories: <select multiple="multiple" name="categories">
-<option value="1" selected="selected">Entertainment</option>
-<option value="2" selected="selected">It&#39;s a test</option>
-<option value="3">Third test</option>
+<option value="%s" selected="selected">Entertainment</option>
+<option value="%s" selected="selected">It&#39;s a test</option>
+<option value="%s">Third test</option>
 </select> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></li>
 <li>Status: <select name="status">
 <option value="" selected="selected">---------</option>
 <option value="1">Draft</option>
 <option value="2">Pending</option>
 <option value="3">Live</option>
-</select></li>''')
+</select></li>''' % (w_woodward.pk, w_royko.pk, c1.pk, c2.pk, c3.pk))
 
         f = TestArticleForm({
                 'headline': u'New headline',
@@ -882,57 +882,58 @@ class OldFormForXTests(TestCase):
 <li>Pub date: <input type="text" name="pub_date" /></li>
 <li>Writer: <select name="writer">
 <option value="" selected="selected">---------</option>
-<option value="2">Bob Woodward</option>
-<option value="1">Mike Royko</option>
+<option value="%s">Bob Woodward</option>
+<option value="%s">Mike Royko</option>
 </select></li>
 <li>Article: <textarea rows="10" cols="40" name="article"></textarea></li>
 <li>Categories: <select multiple="multiple" name="categories">
-<option value="1">Entertainment</option>
-<option value="2">It&#39;s a test</option>
-<option value="3">Third</option>
+<option value="%s">Entertainment</option>
+<option value="%s">It&#39;s a test</option>
+<option value="%s">Third</option>
 </select> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></li>
 <li>Status: <select name="status">
 <option value="" selected="selected">---------</option>
 <option value="1">Draft</option>
 <option value="2">Pending</option>
 <option value="3">Live</option>
-</select></li>''')
+</select></li>''' % (w_woodward.pk, w_royko.pk, c1.pk, c2.pk, c3.pk))
 
         c4 = Category.objects.create(name='Fourth', url='4th')
         self.assertEqual(c4.name, 'Fourth')
-        self.assertEqual(Writer.objects.create(name='Carl Bernstein').name, 'Carl Bernstein')
+        w_bernstein = Writer.objects.create(name='Carl Bernstein')
+        self.assertEqual(w_bernstein.name, 'Carl Bernstein')
         self.assertEqual(f.as_ul(), '''<li>Headline: <input type="text" name="headline" maxlength="50" /></li>
 <li>Slug: <input type="text" name="slug" maxlength="50" /></li>
 <li>Pub date: <input type="text" name="pub_date" /></li>
 <li>Writer: <select name="writer">
 <option value="" selected="selected">---------</option>
-<option value="2">Bob Woodward</option>
-<option value="3">Carl Bernstein</option>
-<option value="1">Mike Royko</option>
+<option value="%s">Bob Woodward</option>
+<option value="%s">Carl Bernstein</option>
+<option value="%s">Mike Royko</option>
 </select></li>
 <li>Article: <textarea rows="10" cols="40" name="article"></textarea></li>
 <li>Categories: <select multiple="multiple" name="categories">
-<option value="1">Entertainment</option>
-<option value="2">It&#39;s a test</option>
-<option value="3">Third</option>
-<option value="4">Fourth</option>
+<option value="%s">Entertainment</option>
+<option value="%s">It&#39;s a test</option>
+<option value="%s">Third</option>
+<option value="%s">Fourth</option>
 </select> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></li>
 <li>Status: <select name="status">
 <option value="" selected="selected">---------</option>
 <option value="1">Draft</option>
 <option value="2">Pending</option>
 <option value="3">Live</option>
-</select></li>''')
+</select></li>''' % (w_woodward.pk, w_bernstein.pk, w_royko.pk, c1.pk, c2.pk, c3.pk, c4.pk))
 
         # ModelChoiceField ############################################################
 
         f = forms.ModelChoiceField(Category.objects.all())
         self.assertEqual(list(f.choices), [
             (u'', u'---------'),
-            (1, u'Entertainment'),
-            (2, u"It's a test"),
-            (3, u'Third'),
-            (4, u'Fourth')])
+            (c1.pk, u'Entertainment'),
+            (c2.pk, u"It's a test"),
+            (c3.pk, u'Third'),
+            (c4.pk, u'Fourth')])
         with self.assertRaises(ValidationError):
             f.clean('')
         with self.assertRaises(ValidationError):
@@ -967,9 +968,9 @@ class OldFormForXTests(TestCase):
         f.queryset = Category.objects.exclude(name='Fourth')
         self.assertEqual(list(f.choices), [
             (u'', u'---------'),
-            (1, u'Entertainment'),
-            (2, u"It's a test"),
-            (3, u'Third')])
+            (c1.pk, u'Entertainment'),
+            (c2.pk, u"It's a test"),
+            (c3.pk, u'Third')])
         self.assertEqual(f.clean(c3.id).name, 'Third')
         with self.assertRaises(ValidationError):
             f.clean(c4.id)
@@ -977,31 +978,31 @@ class OldFormForXTests(TestCase):
         # check that we can safely iterate choices repeatedly
         gen_one = list(f.choices)
         gen_two = f.choices
-        self.assertEqual(gen_one[2], (2, u"It's a test"))
+        self.assertEqual(gen_one[2], (c2.pk, u"It's a test"))
         self.assertEqual(list(gen_two), [
             (u'', u'---------'),
-            (1, u'Entertainment'),
-            (2, u"It's a test"),
-            (3, u'Third')])
+            (c1.pk, u'Entertainment'),
+            (c2.pk, u"It's a test"),
+            (c3.pk, u'Third')])
 
         # check that we can override the label_from_instance method to print custom labels (#4620)
         f.queryset = Category.objects.all()
         f.label_from_instance = lambda obj: "category " + str(obj)
         self.assertEqual(list(f.choices), [
             (u'', u'---------'),
-            (1, 'category Entertainment'),
-            (2, "category It's a test"),
-            (3, 'category Third'),
-            (4, 'category Fourth')])
+            (c1.pk, 'category Entertainment'),
+            (c2.pk, "category It's a test"),
+            (c3.pk, 'category Third'),
+            (c4.pk, 'category Fourth')])
 
         # ModelMultipleChoiceField ####################################################
 
         f = forms.ModelMultipleChoiceField(Category.objects.all())
         self.assertEqual(list(f.choices), [
-            (1, u'Entertainment'),
-            (2, u"It's a test"),
-            (3, u'Third'),
-            (4, u'Fourth')])
+            (c1.pk, u'Entertainment'),
+            (c2.pk, u"It's a test"),
+            (c3.pk, u'Third'),
+            (c4.pk, u'Fourth')])
         with self.assertRaises(ValidationError):
             f.clean(None)
         with self.assertRaises(ValidationError):
@@ -1046,9 +1047,9 @@ class OldFormForXTests(TestCase):
         # queryset can be changed after the field is created.
         f.queryset = Category.objects.exclude(name='Fourth')
         self.assertEqual(list(f.choices), [
-            (1, u'Entertainment'),
-            (2, u"It's a test"),
-            (3, u'Third')])
+            (c1.pk, u'Entertainment'),
+            (c2.pk, u"It's a test"),
+            (c3.pk, u'Third')])
         self.assertEqual(map(lambda o: o.name, f.clean([c3.id])), ["Third"])
         with self.assertRaises(ValidationError):
             f.clean([c4.id])
@@ -1058,10 +1059,10 @@ class OldFormForXTests(TestCase):
         f.queryset = Category.objects.all()
         f.label_from_instance = lambda obj: "multicategory " + str(obj)
         self.assertEqual(list(f.choices), [
-            (1, 'multicategory Entertainment'),
-            (2, "multicategory It's a test"),
-            (3, 'multicategory Third'),
-            (4, 'multicategory Fourth')])
+            (c1.pk, 'multicategory Entertainment'),
+            (c2.pk, "multicategory It's a test"),
+            (c3.pk, 'multicategory Third'),
+            (c4.pk, 'multicategory Fourth')])
 
         # OneToOneField ###############################################################
 
@@ -1082,12 +1083,12 @@ class OldFormForXTests(TestCase):
         form = WriterProfileForm()
         self.assertEqual(form.as_p(), '''<p><label for="id_writer">Writer:</label> <select name="writer" id="id_writer">
 <option value="" selected="selected">---------</option>
-<option value="2">Bob Woodward</option>
-<option value="3">Carl Bernstein</option>
-<option value="4">Joe Better</option>
-<option value="1">Mike Royko</option>
+<option value="%s">Bob Woodward</option>
+<option value="%s">Carl Bernstein</option>
+<option value="%s">Joe Better</option>
+<option value="%s">Mike Royko</option>
 </select></p>
-<p><label for="id_age">Age:</label> <input type="text" name="age" id="id_age" /></p>''')
+<p><label for="id_age">Age:</label> <input type="text" name="age" id="id_age" /></p>''' % (w_woodward.pk, w_bernstein.pk, bw.pk, w_royko.pk))
 
         data = {
             'writer': unicode(w_woodward.pk),
@@ -1100,12 +1101,12 @@ class OldFormForXTests(TestCase):
         form = WriterProfileForm(instance=instance)
         self.assertEqual(form.as_p(), '''<p><label for="id_writer">Writer:</label> <select name="writer" id="id_writer">
 <option value="">---------</option>
-<option value="2" selected="selected">Bob Woodward</option>
-<option value="3">Carl Bernstein</option>
-<option value="4">Joe Better</option>
-<option value="1">Mike Royko</option>
+<option value="%s" selected="selected">Bob Woodward</option>
+<option value="%s">Carl Bernstein</option>
+<option value="%s">Joe Better</option>
+<option value="%s">Mike Royko</option>
 </select></p>
-<p><label for="id_age">Age:</label> <input type="text" name="age" value="65" id="id_age" /></p>''')
+<p><label for="id_age">Age:</label> <input type="text" name="age" value="65" id="id_age" /></p>''' % (w_woodward.pk, w_bernstein.pk, bw.pk, w_royko.pk))
 
     def test_phone_number_field(self):
         f = PhoneNumberForm({'phone': '(312) 555-1212', 'description': 'Assistance'})
