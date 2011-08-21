@@ -171,6 +171,9 @@ Built-in widgets
 Django provides a representation of all the basic HTML widgets, plus some
 commonly used groups of widgets:
 
+``Widget``
+~~~~~~~~~~
+
 .. class:: Widget
 
     This abstract class cannot be rendered, but provides the basic attribute :attr:`~Widget.attrs`.
@@ -185,10 +188,15 @@ commonly used groups of widgets:
             >>> name.render('name', 'A name')
             u'<input title="Your name" type="text" name="name" value="A name" size="10" />'
 
+``TextInput``
+~~~~~~~~~~~~~
 
 .. class:: TextInput
 
     Text input: ``<input type='text' ...>``
+
+``PasswordInput``
+~~~~~~~~~~~~~~~~~
 
 .. class:: PasswordInput
 
@@ -206,9 +214,15 @@ commonly used groups of widgets:
             :attr:`~PasswordInput.render_value` was
             changed from ``True`` to ``False``
 
+``HiddenInput``
+~~~~~~~~~~~~~~~
+
 .. class:: HiddenInput
 
     Hidden input: ``<input type='hidden' ...>``
+
+``MultipleHiddenInput``
+~~~~~~~~~~~~~~~~~~~~~~~
 
 .. class:: MultipleHiddenInput
 
@@ -223,9 +237,15 @@ commonly used groups of widgets:
         :attr:`~Field.choices` attribute. If it does, it will override anything
         you set here when the attribute is updated on the :class:`Field`.
 
+``FileInput``
+~~~~~~~~~~~~~
+
 .. class:: FileInput
 
     File upload input: ``<input type='file' ...>``
+
+``ClearableFileInput``
+~~~~~~~~~~~~~~~~~~~~~~
 
 .. class:: ClearableFileInput
 
@@ -234,6 +254,9 @@ commonly used groups of widgets:
     File upload input: ``<input type='file' ...>``, with an additional checkbox
     input to clear the field's value, if the field is not required and has
     initial data.
+
+``DateInput``
+~~~~~~~~~~~~~
 
 .. class:: DateInput
 
@@ -249,6 +272,9 @@ commonly used groups of widgets:
     format found in :setting:`DATE_INPUT_FORMATS` and respects
     :ref:`format-localization`.
 
+``DateTimeInput``
+~~~~~~~~~~~~~~~~~
+
 .. class:: DateTimeInput
 
     Date/time input as a simple text box: ``<input type='text' ...>``
@@ -262,6 +288,9 @@ commonly used groups of widgets:
     If no ``format`` argument is provided, the default format is the first
     format found in :setting:`DATETIME_INPUT_FORMATS` and respects
     :ref:`format-localization`.
+
+``TimeInput``
+~~~~~~~~~~~~~
 
 .. class:: TimeInput
 
@@ -277,9 +306,15 @@ commonly used groups of widgets:
     format found in :setting:`TIME_INPUT_FORMATS` and respects
     :ref:`format-localization`.
 
+``Textarea``
+~~~~~~~~~~~~
+
 .. class:: Textarea
 
     Text area: ``<textarea>...</textarea>``
+
+``CheckboxInput``
+~~~~~~~~~~~~~~~~~
 
 .. class:: CheckboxInput
 
@@ -292,6 +327,9 @@ commonly used groups of widgets:
         A callable that takes the value of the CheckBoxInput and returns
         ``True`` if the checkbox should be checked for that value.
 
+``Select``
+~~~~~~~~~~
+
 .. class:: Select
 
     Select widget: ``<select><option ...>...</select>``
@@ -302,14 +340,23 @@ commonly used groups of widgets:
         :attr:`~Field.choices` attribute. If it does, it will override anything
         you set here when the attribute is updated on the :class:`Field`.
 
+``NullBooleanSelect``
+~~~~~~~~~~~~~~~~~~~~~
+
 .. class:: NullBooleanSelect
 
     Select widget with options 'Unknown', 'Yes' and 'No'
+
+``SelectMultiple``
+~~~~~~~~~~~~~~~~~~
 
 .. class:: SelectMultiple
 
     Similar to :class:`Select`, but allows multiple selection:
     ``<select multiple='multiple'>...</select>``
+
+``RadioSelect``
+~~~~~~~~~~~~~~~
 
 .. class:: RadioSelect
 
@@ -322,6 +369,9 @@ commonly used groups of widgets:
           ...
         </ul>
 
+``CheckboxSelectMultiple``
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 .. class:: CheckboxSelectMultiple
 
     Similar to :class:`SelectMultiple`, but rendered as a list of check
@@ -333,6 +383,9 @@ commonly used groups of widgets:
           <li><input type='checkbox' ...></li>
           ...
         </ul>
+
+``MultiWidget``
+~~~~~~~~~~~~~~~
 
 .. class:: MultiWidget
 
@@ -381,6 +434,9 @@ commonly used groups of widgets:
 
         An iterable containing the widgets needed.
 
+``SplitDateTimeWidget``
+~~~~~~~~~~~~~~~~~~~~~~~
+
 .. class:: SplitDateTimeWidget
 
     Wrapper (using :class:`MultiWidget`) around two widgets: :class:`DateInput`
@@ -396,6 +452,8 @@ commonly used groups of widgets:
 
         Similar to :attr:`TimeInput.format`
 
+``SplitHiddenDateTimeWidget``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. class:: SplitHiddenDateTimeWidget
 
@@ -403,6 +461,9 @@ commonly used groups of widgets:
     both date and time.
 
 .. currentmodule:: django.forms.extras.widgets
+
+``SelectDateWidget``
+~~~~~~~~~~~~~~~~~~~~
 
 .. class:: SelectDateWidget
 
