@@ -170,6 +170,12 @@ This file should also be located in your ``site-packages`` directory.
     (Note that this should be run from a shell prompt, not a Python interactive
     prompt.)
 
+    Some Debian-based Linux distributions have separate ``site-packages``
+    directories for user-installed packages, such as when installing Django
+    from a downloaded tarball. The command  listed above will give you the
+    system's ``site-packages``, the user's directory can be found in
+    ``/usr/local/lib/`` instead of ``/usr/lib/``.
+
 .. _install-django-code:
 
 Install the Django code
