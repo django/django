@@ -363,9 +363,9 @@ It's suggested, but not required, that the name of a
 :class:`~django.db.models.ManyToManyField` (``toppings`` in the example above)
 be a plural describing the set of related model objects.
 
-It doesn't matter which model gets the
-:class:`~django.db.models.ManyToManyField`, but you only need it in one of the
-models -- not in both.
+It doesn't matter which model has the
+:class:`~django.db.models.ManyToManyField`, but you should only put it in one
+of the models -- not both.
 
 Generally, :class:`~django.db.models.ManyToManyField` instances should go in the
 object that's going to be edited in the admin interface, if you're using
