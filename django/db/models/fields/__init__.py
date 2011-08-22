@@ -462,7 +462,7 @@ class AutoField(Field):
 
     empty_strings_allowed = False
     default_error_messages = {
-        'invalid': _(u'This value must be an integer.'),
+        'invalid': _(u"'%s' value must be an integer."),
     }
     def __init__(self, *args, **kwargs):
         assert kwargs.get('primary_key', False) is True, "%ss must have primary_key=True." % self.__class__.__name__
@@ -478,7 +478,8 @@ class AutoField(Field):
         try:
             return int(value)
         except (TypeError, ValueError):
-            raise exceptions.ValidationError(self.error_messages['invalid'])
+            msg = self.error_messages['invalid'] % str(value)
+            raise exceptions.ValidationError(msg)
 
     def validate(self, value, model_instance):
         pass
@@ -500,7 +501,7 @@ class AutoField(Field):
 class BooleanField(Field):
     empty_strings_allowed = False
     default_error_messages = {
-        'invalid': _(u'This value must be either True or False.'),
+        'invalid': _(u"'%s' value must be either True or False."),
     }
     description = _("Boolean (Either True or False)")
     def __init__(self, *args, **kwargs):
@@ -521,7 +522,8 @@ class BooleanField(Field):
             return True
         if value in ('f', 'False', '0'):
             return False
-        raise exceptions.ValidationError(self.error_messages['invalid'])
+        msg = self.error_messages['invalid'] % str(value)
+        raise exceptions.ValidationError(msg)
 
     def get_prep_lookup(self, lookup_type, value):
         # Special-case handling for filters coming from a Web request (e.g. the
@@ -753,7 +755,7 @@ class DateTimeField(DateField):
 class DecimalField(Field):
     empty_strings_allowed = False
     default_error_messages = {
-        'invalid': _(u'This value must be a decimal number.'),
+        'invalid': _(u"'%s' value must be a decimal number."),
     }
     description = _("Decimal number")
 
@@ -770,7 +772,8 @@ class DecimalField(Field):
         try:
             return decimal.Decimal(value)
         except decimal.InvalidOperation:
-            raise exceptions.ValidationError(self.error_messages['invalid'])
+            msg = self.error_messages['invalid'] % str(value)
+            raise exceptions.ValidationError(msg)
 
     def _format(self, value):
         if isinstance(value, basestring) or value is None:
@@ -848,7 +851,7 @@ class FilePathField(Field):
 class FloatField(Field):
     empty_strings_allowed = False
     default_error_messages = {
-        'invalid': _("This value must be a float."),
+        'invalid': _("'%s' value must be a float."),
     }
     description = _("Floating point number")
 
@@ -866,7 +869,8 @@ class FloatField(Field):
         try:
             return float(value)
         except (TypeError, ValueError):
-            raise exceptions.ValidationError(self.error_messages['invalid'])
+            msg = self.error_messages['invalid'] % str(value)
+            raise exceptions.ValidationError(msg)
 
     def formfield(self, **kwargs):
         defaults = {'form_class': forms.FloatField}
@@ -876,7 +880,7 @@ class FloatField(Field):
 class IntegerField(Field):
     empty_strings_allowed = False
     default_error_messages = {
-        'invalid': _("This value must be an integer."),
+        'invalid': _("'%s' value must be an integer."),
     }
     description = _("Integer")
 
@@ -900,7 +904,8 @@ class IntegerField(Field):
         try:
             return int(value)
         except (TypeError, ValueError):
-            raise exceptions.ValidationError(self.error_messages['invalid'])
+            msg = self.error_messages['invalid'] % str(value)
+            raise exceptions.ValidationError(msg)
 
     def formfield(self, **kwargs):
         defaults = {'form_class': forms.IntegerField}
@@ -981,7 +986,7 @@ class GenericIPAddressField(Field):
 class NullBooleanField(Field):
     empty_strings_allowed = False
     default_error_messages = {
-        'invalid': _("This value must be either None, True or False."),
+        'invalid': _("'%s' value must be either None, True or False."),
     }
     description = _("Boolean (Either True, False or None)")
 
@@ -1004,7 +1009,8 @@ class NullBooleanField(Field):
             return True
         if value in ('f', 'False', '0'):
             return False
-        raise exceptions.ValidationError(self.error_messages['invalid'])
+        msg = self.error_messages['invalid'] % str(value)
+        raise exceptions.ValidationError(msg)
 
     def get_prep_lookup(self, lookup_type, value):
         # Special-case handling for filters coming from a Web request (e.g. the
