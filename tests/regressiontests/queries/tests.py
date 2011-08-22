@@ -959,12 +959,36 @@ class Queries4Tests(BaseQuerysetTest):
         e1 = ExtraInfo.objects.create(info='e1', note=n1)
         e2 = ExtraInfo.objects.create(info='e2', note=n2)
 
-        a1 = Author.objects.create(name='a1', num=1001, extra=e1)
-        a3 = Author.objects.create(name='a3', num=3003, extra=e2)
+        self.a1 = Author.objects.create(name='a1', num=1001, extra=e1)
+        self.a3 = Author.objects.create(name='a3', num=3003, extra=e2)
 
-        Report.objects.create(name='r1', creator=a1)
-        Report.objects.create(name='r2', creator=a3)
-        Report.objects.create(name='r3')
+        self.r1 = Report.objects.create(name='r1', creator=self.a1)
+        self.r2 = Report.objects.create(name='r2', creator=self.a3)
+        self.r3 = Report.objects.create(name='r3')
+
+        Item.objects.create(name='i1', created=datetime.datetime.now(), note=n1, creator=self.a1)
+        Item.objects.create(name='i2', created=datetime.datetime.now(), note=n1, creator=self.a3)
+
+    def test_ticket14876(self):
+        q1 = Report.objects.filter(Q(creator__isnull=True) | Q(creator__extra__info='e1'))
+        q2 = Report.objects.filter(Q(creator__isnull=True)) | Report.objects.filter(Q(creator__extra__info='e1'))
+        self.assertQuerysetEqual(q1, ["<Report: r1>", "<Report: r3>"])
+        self.assertEqual(str(q1.query), str(q2.query))
+
+        q1 = Report.objects.filter(Q(creator__extra__info='e1') | Q(creator__isnull=True))
+        q2 = Report.objects.filter(Q(creator__extra__info='e1')) | Report.objects.filter(Q(creator__isnull=True))
+        self.assertQuerysetEqual(q1, ["<Report: r1>", "<Report: r3>"])
+        self.assertEqual(str(q1.query), str(q2.query))
+
+        q1 = Item.objects.filter(Q(creator=self.a1) | Q(creator__report__name='r1')).order_by()
+        q2 = Item.objects.filter(Q(creator=self.a1)).order_by() | Item.objects.filter(Q(creator__report__name='r1')).order_by()
+        self.assertQuerysetEqual(q1, ["<Item: i1>"])
+        self.assertEqual(str(q1.query), str(q2.query))
+
+        q1 = Item.objects.filter(Q(creator__report__name='e1') | Q(creator=self.a1)).order_by()
+        q2 = Item.objects.filter(Q(creator__report__name='e1')).order_by() | Item.objects.filter(Q(creator=self.a1)).order_by()
+        self.assertQuerysetEqual(q1, ["<Item: i1>"])
+        self.assertEqual(str(q1.query), str(q2.query))
 
     def test_ticket7095(self):
         # Updates that are filtered on the model being updated are somewhat
