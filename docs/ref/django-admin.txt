@@ -1213,8 +1213,8 @@ that ``django-admin.py`` should print to the console.
 Common options
 ==============
 
-The following options are not available on every commands, but they are
-common to a number of commands.
+The following options are not available on every command, but they are common
+to a number of commands.
 
 .. django-admin-option:: --database
 
