@@ -766,7 +766,7 @@ DateMixin
         Determine whether to include "future" objects on this page, where
         "future" means objects in which the field specified in ``date_field``
         is greater than the current date/time. Returns
-        :attr:`DateMixin.date_field` by default.
+        :attr:`DateMixin.allow_future` by default.
 
 BaseDateListView
 ~~~~~~~~~~~~~~~~
