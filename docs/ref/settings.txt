@@ -580,6 +580,18 @@ test database will use the name ``'test_' + DATABASE_NAME``.
 
 See :doc:`/topics/testing`.
 
+.. setting:: TEST_CREATE
+
+TEST_CREATE
+~~~~~~~~~~~
+
+Default: ``True``
+
+This is an Oracle-specific setting.
+
+If it is set to ``False``, the test tablespaces won't be automatically created
+at the beginning of the tests and dropped at the end.
+
 .. setting:: TEST_USER
 
 TEST_USER
@@ -590,7 +602,55 @@ Default: ``None``
 This is an Oracle-specific setting.
 
 The username to use when connecting to the Oracle database that will be used
-when running tests.
+when running tests. If not provided, Django will use ``'test_' + USER``.
+
+.. setting:: TEST_CREATE_USER
+
+TEST_CREATE_USER
+~~~~~~~~~~~~~~~~
+
+Default: ``True``
+
+This is an Oracle-specific setting.
+
+If it is set to ``False``, the test user won't be automatically created at the
+beginning of the tests and dropped at the end.
+
+.. setting:: TEST_PASSWD
+
+TEST_PASSWD
+~~~~~~~~~~~
+
+Default: ``None``
+
+This is an Oracle-specific setting.
+
+The password to use when connecting to the Oracle database that will be used
+when running tests. If not provided, Django will use a hardcoded default value.
+
+.. setting:: TEST_TBLSPACE
+
+TEST_TBLSPACE
+~~~~~~~~~~~~~
+
+Default: ``None``
+
+This is an Oracle-specific setting.
+
+The name of the tablespace that will be used when running tests. If not
+provided, Django will use ``'test_' + NAME``.
+
+.. setting:: TEST_TBLSPACE_TMP
+
+TEST_TBLSPACE_TMP
+~~~~~~~~~~~~~~~~~
+
+Default: ``None``
+
+This is an Oracle-specific setting.
+
+The name of the temporary tablespace that will be used when running tests. If
+not provided, Django will use ``'test_' + NAME + '_temp'``.
 
 .. setting:: DATABASE_ROUTERS
 
