@@ -91,7 +91,7 @@ fix_ampersands_filter.is_safe=True
 # (see Python Issue757815 and Issue1080440).
 pos_inf = 1e200 * 1e200
 neg_inf = -1e200 * 1e200
-nan = (1e200 * 1e200) / (1e200 * 1e200)
+nan = (1e200 * 1e200) // (1e200 * 1e200)
 special_floats = [str(pos_inf), str(neg_inf), str(nan)]
 
 def floatformat(text, arg=-1):
