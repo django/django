@@ -101,6 +101,12 @@ class Command(NoArgsCommand):
                     att_name += '_field'
                     comment_notes.append('Field renamed because it was a Python reserved word.')
 
+                if att_name.isdigit():
+                    att_name = 'number_%d' % int(att_name)
+                    extra_params['db_column'] = unicode(column_name)
+                    comment_notes.append("Field renamed because it wasn't a "
+                        "valid Python identifier.")
+
                 # Don't output 'id = meta.AutoField(primary_key=True)', because
                 # that's assumed if it doesn't exist.
                 if att_name == 'id' and field_type == 'AutoField(' and extra_params == {'primary_key': True}:
