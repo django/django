@@ -385,7 +385,7 @@ class Options(object):
                     cache[obj] = model
         for klass in get_models(include_auto_created=True, only_installed=False):
             for f in klass._meta.local_fields:
-                if f.rel and not isinstance(f.rel.to, str) and self == f.rel.to._meta:
+                if f.rel and not isinstance(f.rel.to, basestring) and self == f.rel.to._meta:
                     cache[RelatedObject(f.rel.to, klass, f)] = None
         self._related_objects_cache = cache
 
@@ -422,7 +422,7 @@ class Options(object):
                     cache[obj] = model
         for klass in get_models(only_installed=False):
             for f in klass._meta.local_many_to_many:
-                if f.rel and not isinstance(f.rel.to, str) and self == f.rel.to._meta:
+                if f.rel and not isinstance(f.rel.to, basestring) and self == f.rel.to._meta:
                     cache[RelatedObject(f.rel.to, klass, f)] = None
         if app_cache_ready():
             self._related_many_to_many_cache = cache

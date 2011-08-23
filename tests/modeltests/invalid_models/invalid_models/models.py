@@ -1,3 +1,4 @@
+#encoding=utf-8
 """
 26. Invalid models
 
@@ -217,6 +218,16 @@ class InvalidSetNull(models.Model):
 
 class InvalidSetDefault(models.Model):
     fk = models.ForeignKey('self', on_delete=models.SET_DEFAULT)
+
+class UnicodeForeignKeys(models.Model):
+    """Foreign keys which can translate to ascii should be OK, but fail if they're not."""
+    good = models.ForeignKey(u'FKTarget')
+    also_good = models.ManyToManyField(u'FKTarget', related_name='unicode2')
+
+    # In Python 3 this should become legal, but currently causes unicode errors
+    # when adding the errors in core/management/validation.py
+    #bad = models.ForeignKey(u'★')
+
 
 model_errors = """invalid_models.fielderrors: "charfield": CharFields require a "max_length" attribute that is a positive integer.
 invalid_models.fielderrors: "charfield2": CharFields require a "max_length" attribute that is a positive integer.
