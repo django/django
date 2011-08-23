@@ -320,9 +320,10 @@ class ImageField(FileField):
     descriptor_class = ImageFileDescriptor
     description = _("File path")
 
-    def __init__(self, verbose_name=None, name=None, width_field=None, height_field=None, **kwargs):
+    def __init__(self, verbose_name=None, name=None, width_field=None,
+            height_field=None, **kwargs):
         self.width_field, self.height_field = width_field, height_field
-        FileField.__init__(self, verbose_name, name, **kwargs)
+        super(ImageField, self).__init__(verbose_name, name, **kwargs)
 
     def contribute_to_class(self, cls, name):
         super(ImageField, self).contribute_to_class(cls, name)
