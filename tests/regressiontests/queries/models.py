@@ -319,13 +319,13 @@ class ObjectC(models.Model):
        return self.name
 
 class SimpleCategory(models.Model):
-    name = models.CharField(max_length=10)
+    name = models.CharField(max_length=15)
 
     def __unicode__(self):
         return self.name
 
 class SpecialCategory(SimpleCategory):
-    special_name = models.CharField(max_length=10)
+    special_name = models.CharField(max_length=15)
 
     def __unicode__(self):
         return self.name + " " + self.special_name
@@ -337,7 +337,7 @@ class CategoryItem(models.Model):
  	    return "category item: " + str(self.category)
 
 class OneToOneCategory(models.Model):
-    new_name = models.CharField(max_length=10)
+    new_name = models.CharField(max_length=15)
     category = models.OneToOneField(SimpleCategory)
 
     def __unicode__(self):
