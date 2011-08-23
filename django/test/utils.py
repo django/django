@@ -196,13 +196,22 @@ class override_settings(object):
     def __call__(self, test_func):
         from django.test import TransactionTestCase
         if isinstance(test_func, type) and issubclass(test_func, TransactionTestCase):
-            class inner(test_func):
-                def _pre_setup(innerself):
-                    self.enable()
-                    super(inner, innerself)._pre_setup()
-                def _post_teardown(innerself):
-                    super(inner, innerself)._post_teardown()
-                    self.disable()
+            # When decorating a class, we need to construct a new class
+            # with the same name so that the test discovery tools can
+            # get a useful name.
+            def _pre_setup(innerself):
+                self.enable()
+                test_func._pre_setup(innerself)
+            def _post_teardown(innerself):
+                test_func._post_teardown(innerself)
+                self.disable()
+            inner = type(
+                test_func.__name__,
+                (test_func,),
+                {
+                    '_pre_setup': _pre_setup,
+                    '_post_teardown': _post_teardown,
+                })
         else:
             @wraps(test_func)
             def inner(*args, **kwargs):

@@ -15,6 +15,9 @@ class FullyDecoratedTranTestCase(TransactionTestCase):
     def test_method_override(self):
         self.assertEqual(settings.TEST, 'override2')
 
+    def test_decorated_testcase_name(self):
+        self.assertEquals(FullyDecoratedTranTestCase.__name__, 'FullyDecoratedTranTestCase')
+
 FullyDecoratedTranTestCase = override_settings(TEST='override')(FullyDecoratedTranTestCase)
 
 # @override_settings(TEST='override')
