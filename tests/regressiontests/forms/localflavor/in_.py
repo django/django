@@ -1,11 +1,11 @@
 from django.contrib.localflavor.in_.forms import (INZipCodeField,
     INStateField, INStateSelect, INPhoneNumberField)
 
-from utils import LocalFlavorTestCase
+from django.test import SimpleTestCase
 
 
 
-class INLocalFlavorTests(LocalFlavorTestCase):
+class INLocalFlavorTests(SimpleTestCase):
     def test_INPhoneNumberField(self):
         error_format = [u'Phone numbers must be in 02X-8X or 03X-7X or 04X-6X format.']
         valid = {

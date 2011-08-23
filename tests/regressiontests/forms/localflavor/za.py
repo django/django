@@ -1,9 +1,9 @@
 from django.contrib.localflavor.za.forms import ZAIDField, ZAPostCodeField
 
-from utils import LocalFlavorTestCase
+from django.test import SimpleTestCase
 
 
-class ZALocalFlavorTests(LocalFlavorTestCase):
+class ZALocalFlavorTests(SimpleTestCase):
     def test_ZAIDField(self):
         error_invalid = [u'Enter a valid South African ID number']
         valid = {

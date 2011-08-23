@@ -1,4 +1,3 @@
-from localflavor import AssertFieldOutputTests
 from localflavor.ar import ARLocalFlavorTests
 from localflavor.at import ATLocalFlavorTests
 from localflavor.au import AULocalFlavorTests

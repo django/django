@@ -1,9 +1,9 @@
 from django.contrib.localflavor.pt.forms import PTZipCodeField, PTPhoneNumberField
 
-from utils import LocalFlavorTestCase
+from django.test import SimpleTestCase
 
 
-class PTLocalFlavorTests(LocalFlavorTestCase):
+class PTLocalFlavorTests(SimpleTestCase):
     def test_PTZipCodeField(self):
         error_format = [u'Enter a zip code in the format XXXX-XXX.']
         valid = {

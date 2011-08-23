@@ -1,10 +1,10 @@
 from django.contrib.localflavor.au.forms import (AUPostCodeField,
         AUPhoneNumberField, AUStateSelect)
 
-from utils import LocalFlavorTestCase
+from django.test import SimpleTestCase
 
 
-class AULocalFlavorTests(LocalFlavorTestCase):
+class AULocalFlavorTests(SimpleTestCase):
     def test_AUStateSelect(self):
         f = AUStateSelect()
         out = u'''<select name="state">

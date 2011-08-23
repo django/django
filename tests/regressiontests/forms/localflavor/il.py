@@ -1,10 +1,10 @@
 from django.contrib.localflavor.il.forms import (ILPostalCodeField,
     ILIDNumberField)
 
-from utils import LocalFlavorTestCase
+from django.test import SimpleTestCase
 
 
-class ILLocalFlavorTests(LocalFlavorTestCase):
+class ILLocalFlavorTests(SimpleTestCase):
     def test_ILPostalCodeField(self):
         error_format = [u'Enter a postal code in the format XXXXX']
         valid = {

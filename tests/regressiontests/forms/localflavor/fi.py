@@ -1,10 +1,10 @@
 from django.contrib.localflavor.fi.forms import (FIZipCodeField,
     FISocialSecurityNumber, FIMunicipalitySelect)
 
-from utils import LocalFlavorTestCase
+from django.test import SimpleTestCase
 
 
-class FILocalFlavorTests(LocalFlavorTestCase):
+class FILocalFlavorTests(SimpleTestCase):
     def test_FIMunicipalitySelect(self):
         f = FIMunicipalitySelect()
         out = u'''<select name="municipalities">

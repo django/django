@@ -1,10 +1,10 @@
 from django.contrib.localflavor.ar.forms import (ARProvinceSelect,
     ARPostalCodeField, ARDNIField, ARCUITField)
 
-from utils import LocalFlavorTestCase
+from django.test import SimpleTestCase
 
 
-class ARLocalFlavorTests(LocalFlavorTestCase):
+class ARLocalFlavorTests(SimpleTestCase):
     def test_ARProvinceSelect(self):
         f = ARProvinceSelect()
         out = u'''<select name="provincias">

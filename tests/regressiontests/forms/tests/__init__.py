@@ -53,5 +53,4 @@ from regressiontests.forms.localflavortests import (
     USLocalFlavorTests,
     UYLocalFlavorTests,
     ZALocalFlavorTests,
-    AssertFieldOutputTests,
 )

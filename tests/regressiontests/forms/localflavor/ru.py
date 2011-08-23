@@ -1,9 +1,9 @@
 from django.contrib.localflavor.ru.forms import *
  
-from utils import LocalFlavorTestCase
+from django.test import SimpleTestCase
 
 
-class RULocalFlavorTests(LocalFlavorTestCase):
+class RULocalFlavorTests(SimpleTestCase):
 
     def test_RUPassportNumberField(self):
         error = [u'Enter a passport number in the format XXXX XXXXXX.']

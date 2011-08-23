@@ -1,10 +1,10 @@
 from django.contrib.localflavor.uy.forms import UYDepartamentSelect, UYCIField
 from django.contrib.localflavor.uy.util import get_validation_digit
 
-from utils import LocalFlavorTestCase
+from django.test import SimpleTestCase
 
 
-class UYLocalFlavorTests(LocalFlavorTestCase):
+class UYLocalFlavorTests(SimpleTestCase):
     def test_UYDepartmentSelect(self):
         f = UYDepartamentSelect()
         out = u'''<select name="departamentos">

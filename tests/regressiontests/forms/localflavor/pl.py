@@ -1,10 +1,10 @@
 from django.contrib.localflavor.pl.forms import (PLProvinceSelect,
     PLCountySelect, PLPostalCodeField, PLNIPField, PLPESELField, PLNationalIDCardNumberField, PLREGONField)
 
-from utils import LocalFlavorTestCase
+from django.test import SimpleTestCase
 
 
-class PLLocalFlavorTests(LocalFlavorTestCase):
+class PLLocalFlavorTests(SimpleTestCase):
     def test_PLProvinceSelect(self):
         f = PLProvinceSelect()
         out = u'''<select name="voivodeships">

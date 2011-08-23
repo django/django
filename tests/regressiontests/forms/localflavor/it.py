@@ -1,10 +1,10 @@
 from django.contrib.localflavor.it.forms import (ITZipCodeField, ITRegionSelect,
     ITSocialSecurityNumberField, ITVatNumberField)
 
-from utils import LocalFlavorTestCase
+from django.test import SimpleTestCase
 
 
-class ITLocalFlavorTests(LocalFlavorTestCase):
+class ITLocalFlavorTests(SimpleTestCase):
     def test_ITRegionSelect(self):
         f = ITRegionSelect()
         out = u'''<select name="regions">

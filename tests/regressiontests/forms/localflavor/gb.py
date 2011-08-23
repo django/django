@@ -1,9 +1,9 @@
 from django.contrib.localflavor.gb.forms import GBPostcodeField
 
-from utils import LocalFlavorTestCase
+from django.test import SimpleTestCase
 
 
-class GBLocalFlavorTests(LocalFlavorTestCase):
+class GBLocalFlavorTests(SimpleTestCase):
     def test_GBPostcodeField(self):
         error_invalid = [u'Enter a valid postcode.']
         valid = {

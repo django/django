@@ -1,10 +1,10 @@
 from django.contrib.localflavor.de.forms import (DEZipCodeField, DEStateSelect,
     DEIdentityCardNumberField)
 
-from utils import LocalFlavorTestCase
+from django.test import SimpleTestCase
 
 
-class DELocalFlavorTests(LocalFlavorTestCase):
+class DELocalFlavorTests(SimpleTestCase):
     def test_DEStateSelect(self):
         f = DEStateSelect()
         out = u'''<select name="states">

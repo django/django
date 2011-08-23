@@ -1,10 +1,10 @@
 from django.contrib.localflavor.sk.forms import (SKRegionSelect,
     SKPostalCodeField, SKDistrictSelect)
 
-from utils import LocalFlavorTestCase
+from django.test import SimpleTestCase
 
 
-class SKLocalFlavorTests(LocalFlavorTestCase):
+class SKLocalFlavorTests(SimpleTestCase):
     def test_SKRegionSelect(self):
         f = SKRegionSelect()
         out = u'''<select name="regions">

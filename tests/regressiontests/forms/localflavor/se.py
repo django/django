@@ -4,10 +4,10 @@ from django.contrib.localflavor.se.forms import (SECountySelect,
     SEPostalCodeField)
 import datetime
 
-from utils import LocalFlavorTestCase
+from django.test import SimpleTestCase
 
 
-class SELocalFlavorTests(LocalFlavorTestCase):
+class SELocalFlavorTests(SimpleTestCase):
 
     def setUp(self):
         # Mocking datetime.date to make sure

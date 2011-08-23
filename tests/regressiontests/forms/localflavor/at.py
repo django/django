@@ -1,10 +1,10 @@
 from django.contrib.localflavor.at.forms import (ATZipCodeField, ATStateSelect,
     ATSocialSecurityNumberField)
 
-from utils import LocalFlavorTestCase
+from django.test import SimpleTestCase
 
 
-class ATLocalFlavorTests(LocalFlavorTestCase):
+class ATLocalFlavorTests(SimpleTestCase):
     def test_ATStateSelect(self):
         f = ATStateSelect()
         out = u'''<select name="bundesland">

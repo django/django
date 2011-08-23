@@ -4,9 +4,9 @@ from django.contrib.localflavor.hr.forms import (HRCountySelect,
     HRLicensePlateField, HRPostalCodeField, HROIBField, HRJMBGField,
     HRJMBAGField)
 
-from utils import LocalFlavorTestCase
+from django.test import SimpleTestCase
 
-class HRLocalFlavorTests(LocalFlavorTestCase):
+class HRLocalFlavorTests(SimpleTestCase):
     def test_HRCountySelect(self):
         f = HRCountySelect()
         out = u'''<select name="county">

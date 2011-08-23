@@ -4,10 +4,10 @@ from django.contrib.localflavor.ca.forms import (CAPostalCodeField,
         CAPhoneNumberField, CAProvinceField, CAProvinceSelect,
         CASocialInsuranceNumberField)
 
-from utils import LocalFlavorTestCase
+from django.test import SimpleTestCase
 
 
-class CALocalFlavorTests(LocalFlavorTestCase):
+class CALocalFlavorTests(SimpleTestCase):
     def setUp(self):
         self.save_warnings_state()
         warnings.filterwarnings(

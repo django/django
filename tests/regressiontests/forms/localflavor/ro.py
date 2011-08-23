@@ -3,10 +3,10 @@ from django.contrib.localflavor.ro.forms import (ROCIFField, ROCNPField,
     ROCountyField, ROCountySelect, ROIBANField, ROPhoneNumberField,
     ROPostalCodeField)
 
-from utils import LocalFlavorTestCase
+from django.test import SimpleTestCase
 
 
-class ROLocalFlavorTests(LocalFlavorTestCase):
+class ROLocalFlavorTests(SimpleTestCase):
     def test_ROCountySelect(self):
         f = ROCountySelect()
         out = u'''<select name="county">

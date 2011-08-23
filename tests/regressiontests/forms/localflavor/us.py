@@ -1,10 +1,10 @@
 from django.contrib.localflavor.us.forms import (USZipCodeField,
     USPhoneNumberField, USStateField, USStateSelect, USSocialSecurityNumberField)
 
-from utils import LocalFlavorTestCase
+from django.test import SimpleTestCase
 
 
-class USLocalFlavorTests(LocalFlavorTestCase):
+class USLocalFlavorTests(SimpleTestCase):
     def test_USStateSelect(self):
         f = USStateSelect()
         out = u'''<select name="state">

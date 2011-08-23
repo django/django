@@ -1,9 +1,9 @@
 from django.contrib.localflavor.cl.forms import CLRutField, CLRegionSelect
 
-from utils import LocalFlavorTestCase
+from django.test import SimpleTestCase
 
 
-class CLLocalFlavorTests(LocalFlavorTestCase):
+class CLLocalFlavorTests(SimpleTestCase):
     def test_CLRegionSelect(self):
         f = CLRegionSelect()
         out = u'''<select name="foo">

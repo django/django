@@ -1,8 +1,8 @@
 from django.contrib.localflavor.co.forms import CODepartmentSelect
 
-from utils import LocalFlavorTestCase
+from django.test import SimpleTestCase
 
-class COLocalFlavorTests(LocalFlavorTestCase):
+class COLocalFlavorTests(SimpleTestCase):
     def test_CODepartmentSelect(self):
         d = CODepartmentSelect()
         out = u"""<select name="department">

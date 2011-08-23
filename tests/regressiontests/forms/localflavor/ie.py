@@ -1,9 +1,9 @@
 from django.contrib.localflavor.ie.forms import IECountySelect
 
-from utils import LocalFlavorTestCase
+from django.test import SimpleTestCase
 
 
-class IELocalFlavorTests(LocalFlavorTestCase):
+class IELocalFlavorTests(SimpleTestCase):
     def test_IECountySelect(self):
         f = IECountySelect()
         out = u'''<select name="counties">

@@ -1,10 +1,10 @@
 from django.contrib.localflavor.fr.forms import (FRZipCodeField,
         FRPhoneNumberField, FRDepartmentSelect)
 
-from utils import LocalFlavorTestCase
+from django.test import SimpleTestCase
 
 
-class FRLocalFlavorTests(LocalFlavorTestCase):
+class FRLocalFlavorTests(SimpleTestCase):
     def test_FRZipCodeField(self):
         error_format = [u'Enter a zip code in the format XXXXX.']
         valid = {

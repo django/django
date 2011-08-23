@@ -1,10 +1,10 @@
 from django.contrib.localflavor.nl.forms import (NLPhoneNumberField,
     NLZipCodeField, NLSoFiNumberField, NLProvinceSelect)
 
-from utils import LocalFlavorTestCase
+from django.test import SimpleTestCase
 
 
-class NLLocalFlavorTests(LocalFlavorTestCase):
+class NLLocalFlavorTests(SimpleTestCase):
     def test_NLProvinceSelect(self):
         f = NLProvinceSelect()
         out = u'''<select name="provinces">

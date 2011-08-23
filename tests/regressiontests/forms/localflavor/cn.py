@@ -2,9 +2,9 @@
 
 from django.contrib.localflavor.cn.forms import (CNProvinceSelect,
         CNPostCodeField, CNIDCardField, CNPhoneNumberField, CNCellNumberField)
-from utils import LocalFlavorTestCase
+from django.test import SimpleTestCase
 
-class CNLocalFlavorTests(LocalFlavorTestCase):
+class CNLocalFlavorTests(SimpleTestCase):
     def test_CNProvinceSelect(self):
         f = CNProvinceSelect()
         correct_output = u'''<select name="provinces">

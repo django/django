@@ -1,10 +1,10 @@
 from django.contrib.localflavor.mk.forms import (
     MKIdentityCardNumberField, MKMunicipalitySelect, UMCNField)
 
-from utils import LocalFlavorTestCase
+from django.test import SimpleTestCase
 
 
-class MKLocalFlavorTests(LocalFlavorTestCase):
+class MKLocalFlavorTests(SimpleTestCase):
 
     def test_MKIdentityCardNumberField(self):
         error_invalid  = [u'Identity card numbers must contain either 4 to 7 '

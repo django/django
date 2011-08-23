@@ -1,10 +1,10 @@
 from django.contrib.localflavor.ch.forms import (CHZipCodeField,
     CHPhoneNumberField, CHIdentityCardNumberField, CHStateSelect)
 
-from utils import LocalFlavorTestCase
+from django.test import SimpleTestCase
 
 
-class CHLocalFlavorTests(LocalFlavorTestCase):
+class CHLocalFlavorTests(SimpleTestCase):
     def test_CHStateSelect(self):
         f = CHStateSelect()
         out = u'''<select name="state">

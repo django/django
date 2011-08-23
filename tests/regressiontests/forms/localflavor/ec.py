@@ -1,8 +1,8 @@
 from django.contrib.localflavor.ec.forms import ECProvinceSelect
 
-from utils import LocalFlavorTestCase
+from django.test import SimpleTestCase
 
-class ECLocalFlavorTests(LocalFlavorTestCase):
+class ECLocalFlavorTests(SimpleTestCase):
     def test_ECProvinceSelect(self):
         p = ECProvinceSelect()
         out = u"""<select name="province">

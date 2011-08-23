@@ -1,9 +1,9 @@
 from django.contrib.localflavor.py.forms import (PyDepartmentSelect,
     PyNumberedDepartmentSelect)
 
-from utils import LocalFlavorTestCase
+from django.test import SimpleTestCase
 
-class PYLocalFlavorTests(LocalFlavorTestCase):
+class PYLocalFlavorTests(SimpleTestCase):
     def test_PyDepartmentSelect(self):
         py = PyDepartmentSelect()
         out = u'''<select name="department">

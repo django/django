@@ -4,10 +4,10 @@ from django.contrib.localflavor.cz.forms import (CZPostalCodeField,
     CZRegionSelect, CZBirthNumberField, CZICNumberField)
 
 from django.core.exceptions import ValidationError
-from utils import LocalFlavorTestCase
+from django.test import SimpleTestCase
 
 
-class CZLocalFlavorTests(LocalFlavorTestCase):
+class CZLocalFlavorTests(SimpleTestCase):
     def setUp(self):
         self.save_warnings_state()
         warnings.filterwarnings(

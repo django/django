@@ -1,9 +1,9 @@
 from django.contrib.localflavor.kw.forms import KWCivilIDNumberField
 
-from utils import LocalFlavorTestCase
+from django.test import SimpleTestCase
 
 
-class KWLocalFlavorTests(LocalFlavorTestCase):
+class KWLocalFlavorTests(SimpleTestCase):
     def test_KWCivilIDNumberField(self):
         error_invalid = [u'Enter a valid Kuwaiti Civil ID number']
         valid = {

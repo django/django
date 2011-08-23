@@ -1,10 +1,10 @@
 from django.contrib.localflavor.is_.forms import (ISIdNumberField,
     ISPhoneNumberField, ISPostalCodeSelect)
 
-from utils import LocalFlavorTestCase
+from django.test import SimpleTestCase
 
 
-class ISLocalFlavorTests(LocalFlavorTestCase):
+class ISLocalFlavorTests(SimpleTestCase):
     def test_ISPostalCodeSelect(self):
         f = ISPostalCodeSelect()
         out = u'''<select name="foo">

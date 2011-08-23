@@ -2,10 +2,10 @@
 from django.contrib.localflavor.mx.forms import (MXZipCodeField, MXRFCField,
     MXStateSelect, MXCURPField)
 
-from utils import LocalFlavorTestCase
+from django.test import SimpleTestCase
 
 
-class MXLocalFlavorTests(LocalFlavorTestCase):
+class MXLocalFlavorTests(SimpleTestCase):
     def test_MXStateSelect(self):
         f = MXStateSelect()
         out = u'''<select name="state">

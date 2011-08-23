@@ -1,10 +1,10 @@
 from django.contrib.localflavor.jp.forms import (JPPostalCodeField,
     JPPrefectureSelect)
 
-from utils import LocalFlavorTestCase
+from django.test import SimpleTestCase
 
 
-class JPLocalFlavorTests(LocalFlavorTestCase):
+class JPLocalFlavorTests(SimpleTestCase):
     def test_JPPrefectureSelect(self):
         f = JPPrefectureSelect()
         out = u'''<select name="prefecture">

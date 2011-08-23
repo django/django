@@ -2,10 +2,10 @@ import datetime
 
 from django.contrib.localflavor.generic.forms import DateField, DateTimeField
 
-from utils import LocalFlavorTestCase
+from django.test import SimpleTestCase
 
 
-class GenericLocalFlavorTests(LocalFlavorTestCase):
+class GenericLocalFlavorTests(SimpleTestCase):
     def test_GenericDateField(self):
         error_invalid = [u'Enter a valid date.']
         valid = {

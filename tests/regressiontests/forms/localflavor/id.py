@@ -4,10 +4,10 @@ from django.contrib.localflavor.id.forms import (IDPhoneNumberField,
     IDPostCodeField, IDNationalIdentityNumberField, IDLicensePlateField,
     IDProvinceSelect, IDLicensePlatePrefixSelect)
 
-from utils import LocalFlavorTestCase
+from django.test import SimpleTestCase
 
 
-class IDLocalFlavorTests(LocalFlavorTestCase):
+class IDLocalFlavorTests(SimpleTestCase):
     def setUp(self):
         self.save_warnings_state()
         warnings.filterwarnings(
