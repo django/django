@@ -1059,6 +1059,28 @@ Django, use the ``cache_control`` view decorator. Example::
 This decorator takes care of sending out the appropriate HTTP header behind the
 scenes.
 
+Note that the cache control settings "private" and "public" are mutually
+exclusive. The decorator ensures that the "public" directive is removed if
+"private" should be set (and vice versa). An example use of the two directives
+would be a blog site that offers both private and public entries. Public
+entries may be cached on any shared cache. The following code uses
+``patch_cache_control``, the manual way to modify the cache control header
+(it is internally called by the ``cache_control`` decorator)::
+
+    from django.views.decorators.cache import patch_cache_control
+    from django.views.decorators.vary import vary_on_cookie
+
+    @vary_on_cookie
+    def list_blog_entries_view(request):
+        if request.user.is_anonymous():
+            response = render_only_public_entries()
+            patch_cache_control(response, public=True)
+        else:
+            response = render_private_and_public_entries(request.user)
+            patch_cache_control(response, private=True)
+
+        return response
+
 There are a few other ways to control cache parameters. For example, HTTP
 allows applications to do the following:
 

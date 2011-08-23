@@ -5,6 +5,7 @@
 
 import hashlib
 import os
+import re
 import tempfile
 import time
 import warnings
@@ -19,7 +20,7 @@ from django.test import RequestFactory
 from django.test.utils import get_warnings_state, restore_warnings_state
 from django.utils import translation
 from django.utils import unittest
-from django.utils.cache import patch_vary_headers, get_cache_key, learn_cache_key
+from django.utils.cache import patch_vary_headers, get_cache_key, learn_cache_key, patch_cache_control
 from django.views.decorators.cache import cache_page
 
 from regressiontests.cache.models import Poll, expensive_calculation
@@ -1002,6 +1003,31 @@ class CacheUtils(unittest.TestCase):
         # Make sure that the Vary header is added to the key hash
         learn_cache_key(request, response)
         self.assertEqual(get_cache_key(request), 'views.decorators.cache.cache_page.settingsprefix.HEAD.a8c87a3d8c44853d7f79474f7ffe4ad5.d41d8cd98f00b204e9800998ecf8427e')
+
+    def test_patch_cache_control(self):
+        tests = (
+            # Initial Cache-Control, kwargs to patch_cache_control, expected Cache-Control parts
+            (None, {'private' : True}, set(['private'])),
+
+            # Test whether private/public attributes are mutually exclusive
+            ('private', {'private' : True}, set(['private'])),
+            ('private', {'public' : True}, set(['public'])),
+            ('public', {'public' : True}, set(['public'])),
+            ('public', {'private' : True}, set(['private'])),
+            ('must-revalidate,max-age=60,private', {'public' : True}, set(['must-revalidate', 'max-age=60', 'public'])),
+            ('must-revalidate,max-age=60,public', {'private' : True}, set(['must-revalidate', 'max-age=60', 'private'])),
+            ('must-revalidate,max-age=60', {'public' : True}, set(['must-revalidate', 'max-age=60', 'public'])),
+        )
+
+        cc_delim_re = re.compile(r'\s*,\s*')
+
+        for initial_cc, newheaders, expected_cc in tests:
+            response = HttpResponse()
+            if initial_cc is not None:
+                response['Cache-Control'] = initial_cc
+            patch_cache_control(response, **newheaders)
+            parts = set(cc_delim_re.split(response['Cache-Control']))
+            self.assertEqual(parts, expected_cc)
 
 class PrefixedCacheUtils(CacheUtils):
     def setUp(self):
