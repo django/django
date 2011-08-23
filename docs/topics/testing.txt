@@ -1592,7 +1592,7 @@ your test suite.
     ``target_status_code`` will be the url and status code for the final
     point of the redirect chain.
 
-.. method:: TestCase.assertQuerysetEqual(qs, values, transform=repr)
+.. method:: TestCase.assertQuerysetEqual(qs, values, transform=repr, ordered=True)
 
     .. versionadded:: 1.3
 
@@ -1603,9 +1603,16 @@ your test suite.
     each value is compared. Any other callable can be used if ``repr()`` doesn't
     provide a unique or helpful comparison.
 
-    The comparison is also ordering dependent. If ``qs`` doesn't provide an
-    implicit ordering, you will need to apply a ``order_by()`` clause to your
-    queryset to ensure that the test will pass reliably.
+    By default, the comparison is also ordering dependent. If ``qs`` doesn't
+    provide an implicit ordering, you can set the ``ordered`` parameter to
+    ``False``, which turns the comparison into a Python set comparison.
+
+    .. versionchanged:: 1.4
+	The ``ordered`` parameter is new in version 1.4. In earlier versions,
+	you would need to ensure the queryset is ordered consistently, possibly
+	via an explicit ``order_by()`` call on the queryset prior to
+	comparison.
+
 
 .. method:: TestCase.assertNumQueries(num, func, *args, **kwargs)
 

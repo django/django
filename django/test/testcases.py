@@ -597,7 +597,9 @@ class TransactionTestCase(SimpleTestCase):
             msg_prefix + "Template '%s' was used unexpectedly in rendering"
             " the response" % template_name)
 
-    def assertQuerysetEqual(self, qs, values, transform=repr):
+    def assertQuerysetEqual(self, qs, values, transform=repr, ordered=True):
+        if not ordered:
+            return self.assertEqual(set(map(transform, qs)), set(values))
         return self.assertEqual(map(transform, qs), values)
 
     def assertNumQueries(self, num, func=None, *args, **kwargs):
