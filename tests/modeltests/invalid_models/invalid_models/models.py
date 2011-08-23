@@ -220,13 +220,17 @@ class InvalidSetDefault(models.Model):
     fk = models.ForeignKey('self', on_delete=models.SET_DEFAULT)
 
 class UnicodeForeignKeys(models.Model):
-    """Foreign keys which can translate to ascii should be OK, but fail if they're not."""
+    """Foreign keys which can translate to ascii should be OK, but fail if
+    they're not."""
     good = models.ForeignKey(u'FKTarget')
     also_good = models.ManyToManyField(u'FKTarget', related_name='unicode2')
 
     # In Python 3 this should become legal, but currently causes unicode errors
     # when adding the errors in core/management/validation.py
     #bad = models.ForeignKey(u'★')
+
+class PrimaryKeyNull(models.Model):
+    my_pk_field = models.IntegerField(primary_key=True, null=True)
 
 
 model_errors = """invalid_models.fielderrors: "charfield": CharFields require a "max_length" attribute that is a positive integer.
@@ -338,4 +342,5 @@ invalid_models.nonuniquefktarget2: Field 'bad' under model 'FKTarget' must have 
 invalid_models.nonexistingorderingwithsingleunderscore: "ordering" refers to "does_not_exist", a field that doesn't exist.
 invalid_models.invalidsetnull: 'fk' specifies on_delete=SET_NULL, but cannot be null.
 invalid_models.invalidsetdefault: 'fk' specifies on_delete=SET_DEFAULT, but has no default value.
+invalid_models.primarykeynull: "my_pk_field": Primary key fields cannot have null=True.
 """
