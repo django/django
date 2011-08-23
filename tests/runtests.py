@@ -6,7 +6,6 @@ import sys
 import tempfile
 
 import django.contrib as contrib
-from django.utils import unittest
 
 CONTRIB_DIR_NAME = 'django.contrib'
 MODEL_TESTS_DIR_NAME = 'modeltests'
@@ -50,56 +49,13 @@ def get_test_modules():
     modules = []
     for loc, dirpath in (MODEL_TESTS_DIR_NAME, MODEL_TEST_DIR), (REGRESSION_TESTS_DIR_NAME, REGRESSION_TEST_DIR), (CONTRIB_DIR_NAME, CONTRIB_DIR):
         for f in os.listdir(dirpath):
-            if f.startswith('__init__') or f.startswith('.') or \
-               f.startswith('sql') or f.startswith('invalid') or \
-               os.path.basename(f) in REGRESSION_SUBDIRS_TO_SKIP:
+            if (f.startswith('__init__') or
+                f.startswith('.') or
+                f.startswith('sql') or
+                os.path.basename(f) in REGRESSION_SUBDIRS_TO_SKIP):
                 continue
             modules.append((loc, f))
     return modules
-
-def get_invalid_modules():
-    modules = []
-    for loc, dirpath in (MODEL_TESTS_DIR_NAME, MODEL_TEST_DIR), (REGRESSION_TESTS_DIR_NAME, REGRESSION_TEST_DIR), (CONTRIB_DIR_NAME, CONTRIB_DIR):
-        for f in os.listdir(dirpath):
-            if f.startswith('__init__') or f.startswith('.') or f.startswith('sql'):
-                continue
-            if f.startswith('invalid'):
-                modules.append((loc, f))
-    return modules
-
-class InvalidModelTestCase(unittest.TestCase):
-    def __init__(self, module_label):
-        unittest.TestCase.__init__(self)
-        self.module_label = module_label
-
-    def runTest(self):
-        from django.core.management.validation import get_validation_errors
-        from django.db.models.loading import load_app
-        from cStringIO import StringIO
-
-        try:
-            module = load_app(self.module_label)
-        except Exception, e:
-            self.fail('Unable to load invalid model module')
-
-        # Make sure sys.stdout is not a tty so that we get errors without
-        # coloring attached (makes matching the results easier). We restore
-        # sys.stderr afterwards.
-        orig_stdout = sys.stdout
-        s = StringIO()
-        sys.stdout = s
-        count = get_validation_errors(s, module)
-        sys.stdout = orig_stdout
-        s.seek(0)
-        error_log = s.read()
-        actual = error_log.split('\n')
-        expected = module.model_errors.split('\n')
-
-        unexpected = [err for err in actual if err not in expected]
-        missing = [err for err in expected if err not in actual]
-
-        self.assertTrue(not unexpected, "Unexpected Errors: " + '\n'.join(unexpected))
-        self.assertTrue(not missing, "Missing Errors: " + '\n'.join(missing))
 
 def setup(verbosity, test_labels):
     from django.conf import settings
@@ -178,19 +134,7 @@ def teardown(state):
 def django_tests(verbosity, interactive, failfast, test_labels):
     from django.conf import settings
     state = setup(verbosity, test_labels)
-
-    # Add tests for invalid models apps.
     extra_tests = []
-    for module_dir, module_name in get_invalid_modules():
-        module_label = '.'.join([module_dir, module_name])
-        if not test_labels or module_name in test_labels:
-            extra_tests.append(InvalidModelTestCase(module_label))
-            try:
-                # Invalid models are not working apps, so we cannot pass them into
-                # the test runner with the other test_labels
-                test_labels.remove(module_name)
-            except ValueError:
-                pass
 
     # If GeoDjango is used, add it's tests that aren't a part of
     # an application (e.g., GEOS, GDAL, Distance objects).
