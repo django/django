@@ -34,7 +34,6 @@ from localflavor.py import PYLocalFlavorTests
 from localflavor.ro import ROLocalFlavorTests
 from localflavor.ru import RULocalFlavorTests
 from localflavor.se import SELocalFlavorTests
-from localflavor.si import SILocalFlavorTests
 from localflavor.sk import SKLocalFlavorTests
 from localflavor.tr import TRLocalFlavorTests
 from localflavor.us import USLocalFlavorTests
