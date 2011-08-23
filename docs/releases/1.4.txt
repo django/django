@@ -235,6 +235,11 @@ filename. For example, the file ``css/styles.css`` would also be saved as
 See the :class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage`
 docs for more information.
 
+Localflavor changes
+~~~~~~~~~~~~~~~~~~~
+
+ * A Slovenian (si) localflavor was added.
+
 Minor features
 ~~~~~~~~~~~~~~
 

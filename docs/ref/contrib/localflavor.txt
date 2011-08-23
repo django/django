@@ -70,6 +70,7 @@ Countries currently supported by :mod:`~django.contrib.localflavor` are:
     * Romania_
     * Russia_
     * Slovakia_
+    * Slovenia_
     * `South Africa`_
     * Spain_
     * Sweden_
@@ -126,6 +127,7 @@ Here's an example of how to use them::
 .. _Romania: `Romania (ro)`_
 .. _Russia: `Russia (ru)`_
 .. _Slovakia: `Slovakia (sk)`_
+.. _Slovenia: `Slovenia (si)`_
 .. _South Africa: `South Africa (za)`_
 .. _Spain: `Spain (es)`_
 .. _Sweden: `Sweden (se)`_
@@ -1067,6 +1069,35 @@ Slovakia (``sk``)
 .. class:: sk.forms.SKRegionSelect
 
     A ``Select`` widget that uses a list of Slovak regions as its choices.
+
+Slovenia (``si``)
+=================
+
+.. class:: si.forms.SIEMSOField
+
+    A form field that validates input as Slovenian personal identification
+    number and stores gender and birthday to self.info dictionary.
+
+.. class:: si.forms.SITaxNumberField
+
+    A form field that validates input as a Slovenian tax number. Valid input
+    is SIXXXXXXXX or XXXXXXXX.
+
+.. class:: si.forms.SIPhoneNumberField
+
+    A form field that validates input as a Slovenian phone number. Phone
+    number must contain at least local area code with optional country code.
+
+.. class:: si.forms.SIPostalCodeField
+
+    A form field that provides a choice field of major Slovenian postal
+    codes.
+
+.. class:: si.forms.SIPostalCodeSelect
+
+    A ``Select`` widget that uses a list of major Slovenian postal codes as
+    its choices.
+
 
 South Africa (``za``)
 =====================
