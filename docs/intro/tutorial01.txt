@@ -36,8 +36,13 @@ including database configuration, Django-specific options and
 application-specific settings.
 
 From the command line, ``cd`` into a directory where you'd like to store your
-code, then run the command ``django-admin.py startproject mysite``. This will
-create a ``mysite`` directory in your current directory.
+code, then run the following command:
+
+.. code-block:: bash
+
+   django-admin.py startproject mysite
+   
+This will create a ``mysite`` directory in your current directory.
 
 .. admonition:: Script name may differ in distribution packages
 
