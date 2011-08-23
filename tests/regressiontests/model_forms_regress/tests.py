@@ -275,6 +275,20 @@ class FormFieldCallbackTests(TestCase):
         Form = modelform_factory(Person, form=BaseForm)
         self.assertTrue(Form.base_fields['name'].widget is widget)
 
+    def test_factory_with_widget_argument(self):
+        """ Regression for #15315: modelform_factory should accept widgets
+            argument
+        """
+        widget = forms.Textarea()
+
+        # Without a widget should not set the widget to textarea
+        Form = modelform_factory(Person)
+        self.assertNotEqual(Form.base_fields['name'].widget.__class__, forms.Textarea)
+
+        # With a widget should not set the widget to textarea
+        Form = modelform_factory(Person, widgets={'name':widget})
+        self.assertEqual(Form.base_fields['name'].widget.__class__, forms.Textarea)
+
     def test_custom_callback(self):
         """Test that a custom formfield_callback is used if provided"""
 

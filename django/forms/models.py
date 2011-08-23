@@ -368,7 +368,7 @@ class ModelForm(BaseModelForm):
     __metaclass__ = ModelFormMetaclass
 
 def modelform_factory(model, form=ModelForm, fields=None, exclude=None,
-                       formfield_callback=None):
+                      formfield_callback=None,  widgets=None):
     # Create the inner Meta class. FIXME: ideally, we should be able to
     # construct a ModelForm without creating and passing in a temporary
     # inner class.
@@ -379,6 +379,8 @@ def modelform_factory(model, form=ModelForm, fields=None, exclude=None,
         attrs['fields'] = fields
     if exclude is not None:
         attrs['exclude'] = exclude
+    if widgets is not None:
+        attrs['widgets'] = widgets
 
     # If parent form class already has an inner Meta, the Meta we're
     # creating needs to inherit from the parent's inner meta.
