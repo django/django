@@ -405,14 +405,14 @@ By default, :setting:`TEMPLATE_DIRS` is empty. So, let's add a line to it, to
 tell Django where our templates live::
 
     TEMPLATE_DIRS = (
-        "/home/my_username/mytemplates", # Change this to your own directory.
+        '/home/my_username/mytemplates', # Change this to your own directory.
     )
 
 Now copy the template ``admin/base_site.html`` from within the default Django
 admin template directory in the source code of Django itself
 (``django/contrib/admin/templates``) into an ``admin`` subdirectory of
 whichever directory you're using in :setting:`TEMPLATE_DIRS`. For example, if
-your :setting:`TEMPLATE_DIRS` includes ``"/home/my_username/mytemplates"``, as
+your :setting:`TEMPLATE_DIRS` includes ``'/home/my_username/mytemplates'``, as
 above, then copy ``django/contrib/admin/templates/admin/base_site.html`` to
 ``/home/my_username/mytemplates/admin/base_site.html``. Don't forget that
 ``admin`` subdirectory.
