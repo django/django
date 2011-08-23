@@ -315,6 +315,20 @@ Honza Král
 .. _web developer: http://zerocoordinate.com
 .. _security consultant: http://subversivecode.com/about
 
+`Julien Phalip`_
+    Julien has a background in software engineering and human-computer
+    interaction. As a Web developer, he enjoys tinkering with the backend as
+    much as designing and coding user interfaces. Julien discovered Django in
+    2007 while doing his PhD in Computing Sciences. Since then he has
+    contributed patches to various components of the framework, in particular
+    the admin. Julien was a co-founder of the `Interaction Consortium`_. He
+    now works as a freelance Web developer and interaction designer.
+
+    Julien lives in Sydney, Australia.
+
+.. _Julien Phalip: http://julienphalip.com
+.. _Interaction Consortium: http://interaction.net.au
+
 Specialists
 -----------
 

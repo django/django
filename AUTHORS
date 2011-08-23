@@ -26,6 +26,7 @@ The PRIMARY AUTHORS are (and/or have been):
     * Honza Král
     * Idan Gazit
     * Paul McMillan
+    * Julien Phalip
 
 More information on the main contributors to Django can be found in
 docs/internals/committers.txt.
@@ -397,7 +398,6 @@ answer newbie questions, and generally made Django that much better:
     peter@mymart.com
     pgross@thoughtworks.com
     phaedo <http://phaedo.cx/>
-    Julien Phalip <http://www.julienphalip.com>
     phil@produxion.net
     phil.h.smith@gmail.com
     Gustavo Picon
