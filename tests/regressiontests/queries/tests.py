@@ -15,7 +15,7 @@ from models import (Annotation, Article, Author, Celebrity, Child, Cover, Detail
     DumbCategory, ExtraInfo, Fan, Item, LeafA, LoopX, LoopZ, ManagedModel,
     Member, NamedCategory, Note, Number, Plaything, PointerA, Ranking, Related,
     Report, ReservedName, Tag, TvChef, Valid, X, Food, Eaten, Node, ObjectA, ObjectB,
-    ObjectC)
+    ObjectC, CategoryItem, SimpleCategory, SpecialCategory, OneToOneCategory)
 
 
 class BaseQuerysetTest(TestCase):
@@ -1043,11 +1043,135 @@ class Queries4Tests(BaseQuerysetTest):
             []
         )
 
+    def test_ticket15316_filter_false(self):
+        c1 = SimpleCategory.objects.create(name="category1")
+        c2 = SpecialCategory.objects.create(name="named category1",
+                special_name="special1")
+        c3 = SpecialCategory.objects.create(name="named category2",
+                special_name="special2")
+
+        ci1 = CategoryItem.objects.create(category=c1)
+        ci2 = CategoryItem.objects.create(category=c2)
+        ci3 = CategoryItem.objects.create(category=c3)
+
+        qs = CategoryItem.objects.filter(category__specialcategory__isnull=False)
+        self.assertEqual(qs.count(), 2)
+        self.assertQuerysetEqual(qs, [ci2.pk, ci3.pk], lambda x: x.pk, False)
+
+    def test_ticket15316_exclude_false(self):
+        c1 = SimpleCategory.objects.create(name="category1")
+        c2 = SpecialCategory.objects.create(name="named category1",
+                special_name="special1")
+        c3 = SpecialCategory.objects.create(name="named category2",
+                special_name="special2")
+
+        ci1 = CategoryItem.objects.create(category=c1)
+        ci2 = CategoryItem.objects.create(category=c2)
+        ci3 = CategoryItem.objects.create(category=c3)
+
+        qs = CategoryItem.objects.exclude(category__specialcategory__isnull=False)
+        self.assertEqual(qs.count(), 1)
+        self.assertQuerysetEqual(qs, [ci1.pk], lambda x: x.pk)
+
+    def test_ticket15316_filter_true(self):
+        c1 = SimpleCategory.objects.create(name="category1")
+        c2 = SpecialCategory.objects.create(name="named category1",
+                special_name="special1")
+        c3 = SpecialCategory.objects.create(name="named category2",
+                special_name="special2")
+
+        ci1 = CategoryItem.objects.create(category=c1)
+        ci2 = CategoryItem.objects.create(category=c2)
+        ci3 = CategoryItem.objects.create(category=c3)
+
+        qs = CategoryItem.objects.filter(category__specialcategory__isnull=True)
+        self.assertEqual(qs.count(), 1)
+        self.assertQuerysetEqual(qs, [ci1.pk], lambda x: x.pk)
+
+    def test_ticket15316_exclude_true(self):
+        c1 = SimpleCategory.objects.create(name="category1")
+        c2 = SpecialCategory.objects.create(name="named category1",
+                special_name="special1")
+        c3 = SpecialCategory.objects.create(name="named category2",
+                special_name="special2")
+
+        ci1 = CategoryItem.objects.create(category=c1)
+        ci2 = CategoryItem.objects.create(category=c2)
+        ci3 = CategoryItem.objects.create(category=c3)
+
+        qs = CategoryItem.objects.exclude(category__specialcategory__isnull=True)
+        self.assertEqual(qs.count(), 2)
+        self.assertQuerysetEqual(qs, [ci2.pk, ci3.pk], lambda x: x.pk, False)
+
+    def test_ticket15316_one2one_filter_false(self):
+        c  = SimpleCategory.objects.create(name="cat")
+        c0 = SimpleCategory.objects.create(name="cat0")
+        c1 = SimpleCategory.objects.create(name="category1")
+        
+        c2 = OneToOneCategory.objects.create(category = c1, new_name="new1")
+        c3 = OneToOneCategory.objects.create(category = c0, new_name="new2")
+
+        ci1 = CategoryItem.objects.create(category=c)
+        ci2 = CategoryItem.objects.create(category=c0)
+        ci3 = CategoryItem.objects.create(category=c1)
+
+        qs = CategoryItem.objects.filter(category__onetoonecategory__isnull=False)
+        self.assertEqual(qs.count(), 2)
+        self.assertQuerysetEqual(qs, [ci2.pk, ci3.pk], lambda x: x.pk, False)
+
+    def test_ticket15316_one2one_exclude_false(self):
+        c  = SimpleCategory.objects.create(name="cat")
+        c0 = SimpleCategory.objects.create(name="cat0")
+        c1 = SimpleCategory.objects.create(name="category1")
+        
+        c2 = OneToOneCategory.objects.create(category = c1, new_name="new1")
+        c3 = OneToOneCategory.objects.create(category = c0, new_name="new2")
+
+        ci1 = CategoryItem.objects.create(category=c)
+        ci2 = CategoryItem.objects.create(category=c0)
+        ci3 = CategoryItem.objects.create(category=c1)
+
+        qs = CategoryItem.objects.exclude(category__onetoonecategory__isnull=False)
+        self.assertEqual(qs.count(), 1)
+        self.assertQuerysetEqual(qs, [ci1.pk], lambda x: x.pk)
+
+    def test_ticket15316_one2one_filter_true(self):
+        c  = SimpleCategory.objects.create(name="cat")
+        c0 = SimpleCategory.objects.create(name="cat0")
+        c1 = SimpleCategory.objects.create(name="category1")
+        
+        c2 = OneToOneCategory.objects.create(category = c1, new_name="new1")
+        c3 = OneToOneCategory.objects.create(category = c0, new_name="new2")
+
+        ci1 = CategoryItem.objects.create(category=c)
+        ci2 = CategoryItem.objects.create(category=c0)
+        ci3 = CategoryItem.objects.create(category=c1)
+
+        qs = CategoryItem.objects.filter(category__onetoonecategory__isnull=True)
+        self.assertEqual(qs.count(), 1)
+        self.assertQuerysetEqual(qs, [ci1.pk], lambda x: x.pk)
+
+    def test_ticket15316_one2one_exclude_true(self):
+        c  = SimpleCategory.objects.create(name="cat")
+        c0 = SimpleCategory.objects.create(name="cat0")
+        c1 = SimpleCategory.objects.create(name="category1")
+        
+        c2 = OneToOneCategory.objects.create(category = c1, new_name="new1")
+        c3 = OneToOneCategory.objects.create(category = c0, new_name="new2")
+
+        ci1 = CategoryItem.objects.create(category=c)
+        ci2 = CategoryItem.objects.create(category=c0)
+        ci3 = CategoryItem.objects.create(category=c1)
+
+        qs = CategoryItem.objects.exclude(category__onetoonecategory__isnull=True)
+        self.assertEqual(qs.count(), 2)
+        self.assertQuerysetEqual(qs, [ci2.pk, ci3.pk], lambda x: x.pk, False)
+
 
 class Queries5Tests(TestCase):
     def setUp(self):
-        # Ordering by 'rank' gives us rank2, rank1, rank3. Ordering by the Meta.ordering
-        # will be rank3, rank2, rank1.
+        # Ordering by 'rank' gives us rank2, rank1, rank3. Ordering by the
+        # Meta.ordering will be rank3, rank2, rank1.
         n1 = Note.objects.create(note='n1', misc='foo', id=1)
         n2 = Note.objects.create(note='n2', misc='bar', id=2)
         e1 = ExtraInfo.objects.create(info='e1', note=n1)

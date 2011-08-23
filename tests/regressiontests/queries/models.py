@@ -317,3 +317,29 @@ class ObjectC(models.Model):
 
     def __unicode__(self):
        return self.name
+
+class SimpleCategory(models.Model):
+    name = models.CharField(max_length=10)
+
+    def __unicode__(self):
+        return self.name
+
+class SpecialCategory(SimpleCategory):
+    special_name = models.CharField(max_length=10)
+
+    def __unicode__(self):
+        return self.name + " " + self.special_name
+
+class CategoryItem(models.Model):
+    category = models.ForeignKey(SimpleCategory)
+
+    def __unicode__(self):
+ 	    return "category item: " + str(self.category)
+
+class OneToOneCategory(models.Model):
+    new_name = models.CharField(max_length=10)
+    category = models.OneToOneField(SimpleCategory)
+
+    def __unicode__(self):
+        return "one2one " + self.new_name
+    
