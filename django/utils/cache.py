@@ -67,6 +67,12 @@ def patch_cache_control(response, **kwargs):
     if 'max-age' in cc and 'max_age' in kwargs:
         kwargs['max_age'] = min(cc['max-age'], kwargs['max_age'])
 
+    # Allow overriding private caching and vice versa
+    if 'private' in cc and 'public' in kwargs:
+        del cc['private']
+    elif 'public' in cc and 'private' in kwargs:
+        del cc['public']
+
     for (k, v) in kwargs.items():
         cc[k.replace('_', '-')] = v
     cc = ', '.join([dictvalue(el) for el in cc.items()])
