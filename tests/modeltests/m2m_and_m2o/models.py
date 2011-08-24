@@ -19,3 +19,7 @@ class Issue(models.Model):
 
     class Meta:
         ordering = ('num',)
+
+class UnicodeReferenceModel(models.Model): 
+    others = models.ManyToManyField(u"UnicodeReferenceModel") 
+
