@@ -5,7 +5,7 @@
 This example exists purely to point out errors in models.
 """
 
-from django.db import models
+from django.db import connection, models
 
 class FieldErrors(models.Model):
     charfield = models.CharField()
@@ -342,5 +342,8 @@ invalid_models.nonuniquefktarget2: Field 'bad' under model 'FKTarget' must have 
 invalid_models.nonexistingorderingwithsingleunderscore: "ordering" refers to "does_not_exist", a field that doesn't exist.
 invalid_models.invalidsetnull: 'fk' specifies on_delete=SET_NULL, but cannot be null.
 invalid_models.invalidsetdefault: 'fk' specifies on_delete=SET_DEFAULT, but has no default value.
-invalid_models.primarykeynull: "my_pk_field": Primary key fields cannot have null=True.
+"""
+
+if not connection.features.interprets_empty_strings_as_nulls:
+    model_errors += """invalid_models.primarykeynull: "my_pk_field": Primary key fields cannot have null=True.
 """
