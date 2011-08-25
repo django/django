@@ -1007,6 +1007,10 @@ class ManyToManyField(RelatedField, Field):
             assert not to._meta.abstract, "%s cannot define a relation with abstract class %s" % (self.__class__.__name__, to._meta.object_name)
         except AttributeError: # to._meta doesn't exist, so it must be RECURSIVE_RELATIONSHIP_CONSTANT
             assert isinstance(to, basestring), "%s(%r) is invalid. First parameter to ManyToManyField must be either a model, a model name, or the string %r" % (self.__class__.__name__, to, RECURSIVE_RELATIONSHIP_CONSTANT)
+            # Python 2.6 and earlier require dictionary keys to be of str type,
+            # not unicode and class names must be ASCII (in Python 2.x), so we
+            # forcibly coerce it here (breaks early if there's a problem).
+            to = str(to)
 
         kwargs['verbose_name'] = kwargs.get('verbose_name', None)
         kwargs['rel'] = ManyToManyRel(to,
