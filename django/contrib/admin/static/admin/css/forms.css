@@ -356,3 +356,9 @@ body.popup .submit-row {
 .empty-form {
     display: none;
 }
+
+/* IE7 specific bug fixes */
+
+.submit-row input {
+    float: right;
+}
