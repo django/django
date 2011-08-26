@@ -91,7 +91,8 @@ Django quotes column and table names behind the scenes.
 
     Defaults to ``True``, meaning Django will create the appropriate database
     tables in :djadmin:`syncdb` and remove them as part of a :djadmin:`reset`
-    management command. That is, Django *manages* the database tables' lifecycles.
+    management command. That is, Django *manages* the database tables'
+    lifecycles.
 
     If ``False``, no database table creation or deletion operations will be
     performed for this model. This is useful if the model represents an existing
@@ -99,21 +100,21 @@ Django quotes column and table names behind the scenes.
     the *only* difference when ``managed=False``. All other aspects of
     model handling are exactly the same as normal. This includes
 
-        1. Adding an automatic primary key field to the model if you don't declare
-           it.  To avoid confusion for later code readers, it's recommended to
-           specify all the columns from the database table you are modeling when
-           using unmanaged models.
+	1. Adding an automatic primary key field to the model if you don't
+	   declare it.  To avoid confusion for later code readers, it's
+	   recommended to specify all the columns from the database table you
+	   are modeling when using unmanaged models.
 
-        2. If a model with ``managed=False`` contains a
-           :class:`~django.db.models.ManyToManyField` that points to another
-           unmanaged model, then the intermediate table for the many-to-many join
-           will also not be created. However, the intermediary table between one
-           managed and one unmanaged model *will* be created.
+	2. If a model with ``managed=False`` contains a
+	   :class:`~django.db.models.ManyToManyField` that points to another
+	   unmanaged model, then the intermediate table for the many-to-many
+	   join will also not be created. However, the intermediary table
+	   between one managed and one unmanaged model *will* be created.
 
-           If you need to change this default behavior, create the intermediary
-           table as an explicit model (with ``managed`` set as needed) and use the
-           :attr:`ManyToManyField.through` attribute to make the relation use your
-           custom model.
+	   If you need to change this default behavior, create the intermediary
+	   table as an explicit model (with ``managed`` set as needed) and use
+	   the :attr:`ManyToManyField.through` attribute to make the relation
+	   use your custom model.
 
     For tests involving models with ``managed=False``, it's up to you to ensure
     the correct tables are created as part of the test setup.
