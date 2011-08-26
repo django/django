@@ -189,6 +189,10 @@ p.mini {
     color: #999;
 }
 
+img.help-tooltip {
+    cursor: help;
+}
+
 p img, h1 img, h2 img, h3 img, h4 img, td img {
     vertical-align: middle;
 }
