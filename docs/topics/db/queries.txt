@@ -113,6 +113,15 @@ method on the field to add a record to the relation. This example adds the
     >>> joe = Author.objects.create(name="Joe")
     >>> entry.authors.add(joe)
 
+To add multiple records to a ``ManyToManyField`` in one go, include multiple
+arguments in the call to ``add()``, like this::
+
+    >>> john = Author.objects.create(name="John")
+    >>> paul = Author.objects.create(name="Paul")
+    >>> george = Author.objects.create(name="George")
+    >>> ringo = Author.objects.create(name="Ringo")
+    >>> entry.authors.add(john, paul, george, ringo)
+
 Django will complain if you try to assign or add an object of the wrong type.
 
 Retrieving objects
