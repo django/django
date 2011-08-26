@@ -78,11 +78,10 @@ generate signatures. You can use a different secret by passing it to the
 Using the salt argument
 -----------------------
 
-If you do not wish to use the same key for every signing operation in your
-application, you can use the optional ``salt`` argument to the ``Signer``
-class to further strengthen your :setting:`SECRET_KEY` against brute force
-attacks. Using a salt will cause a new key to be derived from both the salt
-and your :setting:`SECRET_KEY`::
+If you do not wish for every occurrence of a particular string to have the same
+signature hash, you can use the optional ``salt`` argument to the ``Signer``
+class. Using a salt will seed the signing hash function with both the salt and
+your :setting:`SECRET_KEY`::
 
     >>> signer = Signer()
     >>> signer.sign('My string')
@@ -92,6 +91,14 @@ and your :setting:`SECRET_KEY`::
     'My string:Ee7vGi-ING6n02gkcJ-QLHg6vFw'
     >>> signer.unsign('My string:Ee7vGi-ING6n02gkcJ-QLHg6vFw')
     u'My string'
+
+Using salt in this way puts the different signatures into different
+namespaces.  A signature that comes from one namespace (a particular salt
+value) cannot be used to validate the same plaintext string in a different
+namespace that is using a different salt setting. The result is to prevent an
+attacker from using a signed string generated in one place in the code as input
+to another piece of code that is generating (and verifying) signatures using a
+different salt.
 
 Unlike your :setting:`SECRET_KEY`, your salt argument does not need to stay
 secret.
