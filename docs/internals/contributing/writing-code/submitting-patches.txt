@@ -36,8 +36,11 @@ and time availability), claim it by following these steps:
     * Log into your account, if you haven't already, by clicking "Login" in
       the upper right of the ticket page.
 
-    * Claim the ticket by clicking the radio button next to "Accept ticket"
-      near the bottom of the page, then clicking "Submit changes."
+    * Claim the ticket:
+
+	1. click the "accept" radio button under "Action" near the bottom of the
+	   page,
+        2. then click "Submit changes."
 
 .. _Create an account: https://www.djangoproject.com/accounts/register/
 .. _password reset page: https://www.djangoproject.com/accounts/password/reset/
