@@ -439,7 +439,7 @@ A few subtleties that are worth mentioning:
     * If you use a ``values()`` clause after an :py:meth:`extra()` call,
       any fields defined by a ``select`` argument in the :py:meth:`extra()`
       must be explicitly included in the ``values()`` call. Any
-      :py:meth:`extra()` call made after a ``values()`` call with have its
+      :py:meth:`extra()` call made after a ``values()`` call will have its
       extra selected fields ignored.
 
 A ``ValuesQuerySet`` is useful when you know you're only going to need values
