@@ -380,14 +380,27 @@ specific to SQLite that you should be aware of.
 
 .. _sqlite-string-matching:
 
-String matching for non-ASCII strings
---------------------------------------
+Substring matching and case sensitivity
+-----------------------------------------
 
-SQLite doesn't support case-insensitive matching for non-ASCII strings. Some
-possible workarounds for this are `documented at sqlite.org`_, but they are
-not utilised by the default SQLite backend in Django. Therefore, if you are
-using the ``iexact`` lookup type in your queryset filters, be aware that it
-will not work as expected for non-ASCII strings.
+For all SQLite versions, there is some slightly counter-intuitive behavior when
+attempting to match some types of strings.  These are triggered when using the
+:lookup:`iexact` or :lookup:`contains` filters in Querysets. The behavior
+splits into two cases:
+
+1. For substring matching, all matches are done case-insensitively. That is a
+filter such as ``filter(name__contains="aa")`` will match a name of ``"Aabb"``.
+
+2. For strings containing characters outside the ASCII range, all exact string
+matches are performed case-sensitively, even when the case-insensitive options
+are passed into the query. So the :lookup:`iexact` filter will behave exactly
+the same as the :lookup:`exact` filter in these cases.
+
+Some possible workarounds for this are `documented at sqlite.org`_, but they
+aren't utilised by the default SQLite backend in Django, as incorporating them
+would be fairly difficult to do robustly. Thus, Django exposes the default
+SQLite behavior and you should be aware of this when doing case-insensitive or
+substring filtering.
 
 .. _documented at sqlite.org: http://www.sqlite.org/faq.html#q18
 

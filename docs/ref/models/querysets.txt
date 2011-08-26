@@ -1476,8 +1476,12 @@ SQL equivalent::
 Note this will match the headline ``'Today Lennon honored'`` but not
 ``'today lennon honored'``.
 
-SQLite doesn't support case-sensitive ``LIKE`` statements; ``contains`` acts
-like ``icontains`` for SQLite.
+.. admonition:: SQLite users
+
+    SQLite doesn't support case-sensitive ``LIKE`` statements; ``contains``
+    acts like ``icontains`` for SQLite. See the :ref:`database note
+    <sqlite-string-matching>` for more information.
+
 
 .. fieldlookup:: icontains
 
