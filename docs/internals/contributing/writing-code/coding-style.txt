@@ -188,7 +188,10 @@ Miscellaneous
       add unnecessary bytes, add visual clutter to the patches and can also
       occasionally cause unnecessary merge conflicts. Some IDE's can be
       configured to automatically remove them and most VCS tools can be set to
-      highlight them in diff outputs.
+      highlight them in diff outputs. Note, however, that patches which only
+      remove whitespace (or only make changes for nominal PEP 8 conformance)
+      are likely to be rejected, since they only introduce noise rather than
+      code improvement. Tidy up when you're next changing code in the area.
 
     * Please don't put your name in the code you contribute. Our policy is to
       keep contributors' names in the ``AUTHORS`` file distributed with Django
