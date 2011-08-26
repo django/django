@@ -436,11 +436,11 @@ A few subtleties that are worth mentioning:
       ordering can affect the results. See the note in :meth:`distinct` for
       details.
 
-    * If you use a ``values()`` clause after an ``extra()`` clause,
-      any fields defined by a ``select`` argument in the ``extra()``
-      must be explicitly included in the ``values()`` clause. However,
-      if the ``extra()`` clause is used after the ``values()``, the
-      fields added by the select will be included automatically.
+    * If you use a ``values()`` clause after an :py:meth:`extra()` call,
+      any fields defined by a ``select`` argument in the :py:meth:`extra()`
+      must be explicitly included in the ``values()`` call. Any
+      :py:meth:`extra()` call made after a ``values()`` call with have its
+      extra selected fields ignored.
 
 A ``ValuesQuerySet`` is useful when you know you're only going to need values
 from a small number of the available fields and you won't need the
