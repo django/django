@@ -184,6 +184,12 @@ Miscellaneous
     * Remove ``import`` statements that are no longer used when you change code.
       The most common tools for this task are `pyflakes`_ and `pylint`_.
 
+    * Systematically remove all trailing whitespaces from your code as those
+      add unnecessary bytes, add visual clutter to the patches and can also
+      occasionally cause unnecessary merge conflicts. Some IDE's can be
+      configured to automatically remove them and most VCS tools can be set to
+      highlight them in diff outputs.
+
     * Please don't put your name in the code you contribute. Our policy is to
       keep contributors' names in the ``AUTHORS`` file distributed with Django
       -- not scattered throughout the codebase itself. Feel free to include a

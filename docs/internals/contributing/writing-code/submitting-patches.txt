@@ -101,8 +101,11 @@ Patch style
 
     * The code required to fix a problem or add a feature is an essential part
       of a patch, but it is not the only part. A good patch should also
-      include a regression test to validate the behavior that has been fixed,
-      to prevent the problem from arising again.
+      include a regression test to validate the behavior that has been fixed
+      and to prevent the problem from arising again. Also, if some tickets are
+      relevant to the code that you've written, mention the ticket numbers in
+      some comments in the test so that one can easily trace back the relevant
+      discussions after your patch gets committed and the tickets get closed.
 
     * If the code associated with a patch adds a new feature, or modifies
       behavior of an existing feature, the patch should also contain
