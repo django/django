@@ -74,7 +74,7 @@ You can evaluate a ``QuerySet`` in the following ways:
 
       Note: *Don't* use this if all you want to do is determine if at least one
       result exists, and don't need the actual objects. It's more efficient to
-      use ``exists()`` (see below).
+      use :meth:`exists() <QuerySet.exists>` (see below).
 
 .. _pickling QuerySets:
 
@@ -119,8 +119,8 @@ described here.
 QuerySet API
 ============
 
-Though you usually won't create one manually -- you'll go through a
-:class:`~django.db.models.Manager` -- here's the formal declaration of a
+Though you usually won't create one manually — you'll go through a
+:class:`~django.db.models.Manager` — here's the formal declaration of a
 ``QuerySet``:
 
 .. class:: QuerySet([model=None, query=None, using=None])
@@ -135,8 +135,9 @@ Though you usually won't create one manually -- you'll go through a
 
     .. attribute:: ordered
 
-        ``True`` if the ``QuerySet`` is ordered -- i.e. has an order_by()
-        clause or a default ordering on the model. ``False`` otherwise.
+	``True`` if the ``QuerySet`` is ordered — i.e. has an
+	:meth:`order_by()` clause or a default ordering on the model.
+	``False`` otherwise.
 
     .. attribute:: db
 
@@ -281,7 +282,8 @@ and so on for as many models as you want to join. For example::
 
 If you try to order by a field that is a relation to another model, Django will
 use the default ordering on the related model (or order by the related model's
-primary key if there is no ``Meta.ordering`` specified. For example::
+primary key if there is no :attr:`Meta.ordering
+<django.db.models.Options.ordering>` specified. For example::
 
     Entry.objects.order_by('blog')
 
@@ -292,23 +294,24 @@ primary key if there is no ``Meta.ordering`` specified. For example::
 ...since the ``Blog`` model has no default ordering specified.
 
 Be cautious when ordering by fields in related models if you are also using
-``distinct()``. See the note in :meth:`distinct` for an explanation of how
+:meth:`distinct()`. See the note in :meth:`distinct` for an explanation of how
 related model ordering can change the expected results.
 
 It is permissible to specify a multi-valued field to order the results by (for
-example, a ``ManyToMany`` field). Normally this won't be a sensible thing to
-do and it's really an advanced usage feature. However, if you know that your
-queryset's filtering or available data implies that there will only be one
-ordering piece of data for each of the main items you are selecting, the
-ordering may well be exactly what you want to do. Use ordering on multi-valued
-fields with care and make sure the results are what you expect.
+example, a :class:`~django.db.models.ManyToManyField` field). Normally
+this won't be a sensible thing to do and it's really an advanced usage
+feature. However, if you know that your queryset's filtering or available data
+implies that there will only be one ordering piece of data for each of the main
+items you are selecting, the ordering may well be exactly what you want to do.
+Use ordering on multi-valued fields with care and make sure the results are
+what you expect.
 
 There's no way to specify whether ordering should be case sensitive. With
 respect to case-sensitivity, Django will order results however your database
 backend normally orders them.
 
 If you don't want any ordering to be applied to a query, not even the default
-ordering, call ``order_by()`` with no parameters.
+ordering, call :meth:`order_by()` with no parameters.
 
 You can tell if a query is ordered or not by checking the
 :attr:`.QuerySet.ordered` attribute, which will be ``True`` if the
@@ -334,13 +337,12 @@ penultimate item and so on. If we had a Python sequence and looked at
 that mode of access (slicing from the end), because it's not possible to do it
 efficiently in SQL.
 
-Also, note that ``reverse()`` should generally only be called on a
-``QuerySet`` which has a defined ordering (e.g., when querying against
-a model which defines a default ordering, or when using
-``order_by()``). If no such ordering is defined for a given
-``QuerySet``, calling ``reverse()`` on it has no real effect (the
-ordering was undefined prior to calling ``reverse()``, and will remain
-undefined afterward).
+Also, note that ``reverse()`` should generally only be called on a ``QuerySet``
+which has a defined ordering (e.g., when querying against a model which defines
+a default ordering, or when using :meth:`order_by()`). If no such ordering is
+defined for a given ``QuerySet``, calling ``reverse()`` on it has no real
+effect (the ordering was undefined prior to calling ``reverse()``, and will
+remain undefined afterward).
 
 distinct
 ~~~~~~~~
@@ -358,30 +360,29 @@ query spans multiple tables, it's possible to get duplicate results when a
 
 .. note::
     Any fields used in an :meth:`order_by` call are included in the SQL
-    ``SELECT`` columns. This can sometimes lead to unexpected results when
-    used in conjunction with ``distinct()``. If you order by fields from a
-    related model, those fields will be added to the selected columns and they
-    may make otherwise duplicate rows appear to be distinct. Since the extra
-    columns don't appear in the returned results (they are only there to
-    support ordering), it sometimes looks like non-distinct results are being
-    returned.
+    ``SELECT`` columns. This can sometimes lead to unexpected results when used
+    in conjunction with ``distinct()``. If you order by fields from a related
+    model, those fields will be added to the selected columns and they may make
+    otherwise duplicate rows appear to be distinct. Since the extra columns
+    don't appear in the returned results (they are only there to support
+    ordering), it sometimes looks like non-distinct results are being returned.
 
-    Similarly, if you use a ``values()`` query to restrict the columns
-    selected, the columns used in any ``order_by()`` (or default model
+    Similarly, if you use a :meth:`values()` query to restrict the columns
+    selected, the columns used in any :meth:`order_by()` (or default model
     ordering) will still be involved and may affect uniqueness of the results.
 
     The moral here is that if you are using ``distinct()`` be careful about
     ordering by related models. Similarly, when using ``distinct()`` and
-    ``values()`` together, be careful when ordering by fields not in the
-    ``values()`` call.
+    :meth:`values()` together, be careful when ordering by fields not in the
+    :meth:`values()` call.
 
 values
 ~~~~~~
 
 .. method:: values(*fields)
 
-Returns a ``ValuesQuerySet`` -- a ``QuerySet`` that returns dictionaries when
-used as an iterable, rather than model-instance objects.
+Returns a ``ValuesQuerySet`` — a ``QuerySet`` subclass that returns
+dictionaries when used as an iterable, rather than model-instance objects.
 
 Each of those dictionaries represents an object, with the keys corresponding to
 the attribute names of model objects.
@@ -397,11 +398,11 @@ objects::
     >>> Blog.objects.filter(name__startswith='Beatles').values()
     [{'id': 1, 'name': 'Beatles Blog', 'tagline': 'All the latest Beatles news.'}]
 
-``values()`` takes optional positional arguments, ``*fields``, which specify
-field names to which the ``SELECT`` should be limited. If you specify the
-fields, each dictionary will contain only the field keys/values for the fields
-you specify. If you don't specify the fields, each dictionary will contain a
-key and value for every field in the database table.
+The ``values()`` method takes optional positional arguments, ``*fields``, which
+specify field names to which the ``SELECT`` should be limited. If you specify
+the fields, each dictionary will contain only the field keys/values for the
+fields you specify. If you don't specify the fields, each dictionary will
+contain a key and value for every field in the database table.
 
 Example::
 
@@ -432,15 +433,15 @@ A few subtleties that are worth mentioning:
         >>> Entry.objects.values('blog_id')
         [{'blog_id': 1}, ...]
 
-    * When using ``values()`` together with ``distinct()``, be aware that
+    * When using ``values()`` together with :meth:`distinct()`, be aware that
       ordering can affect the results. See the note in :meth:`distinct` for
       details.
 
-    * If you use a ``values()`` clause after an :py:meth:`extra()` call,
-      any fields defined by a ``select`` argument in the :py:meth:`extra()`
-      must be explicitly included in the ``values()`` call. Any
-      :py:meth:`extra()` call made after a ``values()`` call will have its
-      extra selected fields ignored.
+    * If you use a ``values()`` clause after an :meth:`extra()` call,
+      any fields defined by a ``select`` argument in the :meth:`extra()` must
+      be explicitly included in the ``values()`` call. Any :meth:`extra()` call
+      made after a ``values()`` call will have its extra selected fields
+      ignored.
 
 A ``ValuesQuerySet`` is useful when you know you're only going to need values
 from a small number of the available fields and you won't need the
@@ -488,7 +489,7 @@ values_list
 
 This is similar to ``values()`` except that instead of returning dictionaries,
 it returns tuples when iterated over. Each tuple contains the value from the
-respective field passed into the ``values_list()`` call -- so the first item is
+respective field passed into the ``values_list()`` call — so the first item is
 the first field, etc. For example::
 
     >>> Entry.objects.values_list('id', 'headline')
@@ -514,7 +515,7 @@ dates
 
 .. method:: dates(field, kind, order='ASC')
 
-Returns a ``DateQuerySet`` -- a ``QuerySet`` that evaluates to a list of
+Returns a ``DateQuerySet`` — a ``QuerySet`` that evaluates to a list of
 ``datetime.datetime`` objects representing all available dates of a particular
 kind within the contents of the ``QuerySet``.
 
@@ -526,8 +527,10 @@ model.
 ``type``.
 
     * ``"year"`` returns a list of all distinct year values for the field.
-    * ``"month"`` returns a list of all distinct year/month values for the field.
-    * ``"day"`` returns a list of all distinct year/month/day values for the field.
+    * ``"month"`` returns a list of all distinct year/month values for the
+      field.
+    * ``"day"`` returns a list of all distinct year/month/day values for the
+      field.
 
 ``order``, which defaults to ``'ASC'``, should be either ``'ASC'`` or
 ``'DESC'``. This specifies how to order the results.
@@ -550,10 +553,10 @@ none
 
 .. method:: none()
 
-Returns an ``EmptyQuerySet`` -- a ``QuerySet`` that always evaluates to
-an empty list. This can be used in cases where you know that you should
-return an empty result set and your caller is expecting a ``QuerySet``
-object (instead of returning an empty list, for example.)
+Returns an ``EmptyQuerySet`` — a ``QuerySet`` subclass that always evaluates to
+an empty list. This can be used in cases where you know that you should return
+an empty result set and your caller is expecting a ``QuerySet`` object (instead
+of returning an empty list, for example.)
 
 Examples::
 
@@ -565,11 +568,10 @@ all
 
 .. method:: all()
 
-Returns a *copy* of the current ``QuerySet`` (or ``QuerySet`` subclass you
-pass in). This can be useful in some situations where you might want to pass
-in either a model manager or a ``QuerySet`` and do further filtering on the
-result. You can safely call ``all()`` on either object and then you'll
-definitely have a ``QuerySet`` to work with.
+Returns a *copy* of the current ``QuerySet`` (or ``QuerySet`` subclass).  This
+can be useful in situations where you might want to pass in either a model
+manager or a ``QuerySet`` and do further filtering on the result. After calling
+``all()`` on either object, you'll definitely have a ``QuerySet`` to work with.
 
 .. _select-related:
 
@@ -671,23 +673,24 @@ This is also valid::
 
 ...and would also pull in the ``building`` relation.
 
-You can refer to any ``ForeignKey`` or ``OneToOneField`` relation in
-the list of fields passed to ``select_related``. This includes foreign
-keys that have ``null=True`` (unlike the default ``select_related()``
-call). It's an error to use both a list of fields and the ``depth``
-parameter in the same ``select_related()`` call, since they are
-conflicting options.
+You can refer to any :class:`~django.db.models.ForeignKey` or
+:class:`~django.db.models.OneToOneField` relation in the list of fields
+passed to ``select_related()``. This includes foreign keys that have
+``null=True`` (which are omitted in a no-parameter ``select_related()`` call).
+It's an error to use both a list of fields and the ``depth`` parameter in the
+same ``select_related()`` call; they are conflicting options.
 
 .. versionchanged:: 1.2
 
-You can also refer to the reverse direction of a ``OneToOneFields`` in
-the list of fields passed to ``select_related`` -- that is, you can traverse
-a ``OneToOneField`` back to the object on which the field is defined. Instead
-of specifying the field name, use the ``related_name`` for the field on the
-related object.
+You can also refer to the reverse direction of a
+:class:`~django.db.models.OneToOneField`` in the list of fields passed to
+``select_related`` — that is, you can traverse a
+:class:`~django.db.models.OneToOneField` back to the object on which the field
+is defined. Instead of specifying the field name, use the :attr:`related_name
+<django.db.models.ForeignKey.related_name>` for the field on the related object.
 
-``OneToOneFields`` will not be traversed in the reverse direction if you
-are performing a depth-based ``select_related``.
+A :class:`~django.db.models.OneToOneField` is not traversed in the reverse
+direction if you are performing a depth-based ``select_related()`` call.
 
 extra
 ~~~~~
@@ -696,7 +699,7 @@ extra
 
 Sometimes, the Django query syntax by itself can't easily express a complex
 ``WHERE`` clause. For these edge cases, Django provides the ``extra()``
-``QuerySet`` modifier -- a hook for injecting specific clauses into the SQL
+``QuerySet`` modifier — a hook for injecting specific clauses into the SQL
 generated by a ``QuerySet``.
 
 By definition, these extra lookups may not be portable to different database
@@ -707,17 +710,17 @@ Specify one or more of ``params``, ``select``, ``where`` or ``tables``. None
 of the arguments is required, but you should use at least one of them.
 
     * ``select``
-        The ``select`` argument lets you put extra fields in the ``SELECT`` clause.
-        It should be a dictionary mapping attribute names to SQL clauses to use to
-        calculate that attribute.
+        The ``select`` argument lets you put extra fields in the ``SELECT``
+        clause.  It should be a dictionary mapping attribute names to SQL
+        clauses to use to calculate that attribute.
 
         Example::
 
             Entry.objects.extra(select={'is_recent': "pub_date > '2006-01-01'"})
 
         As a result, each ``Entry`` object will have an extra attribute,
-        ``is_recent``, a boolean representing whether the entry's ``pub_date`` is
-        greater than Jan. 1, 2006.
+        ``is_recent``, a boolean representing whether the entry's ``pub_date``
+        is greater than Jan. 1, 2006.
 
         Django inserts the given SQL snippet directly into the ``SELECT``
         statement, so the resulting SQL of the above example would be something
@@ -737,26 +740,27 @@ of the arguments is required, but you should use at least one of them.
                 },
             )
 
-        (In this particular case, we're exploiting the fact that the query will
-        already contain the ``blog_blog`` table in its ``FROM`` clause.)
+        In this particular case, we're exploiting the fact that the query will
+        already contain the ``blog_blog`` table in its ``FROM`` clause.
 
         The resulting SQL of the above example would be::
 
             SELECT blog_blog.*, (SELECT COUNT(*) FROM blog_entry WHERE blog_entry.blog_id = blog_blog.id) AS entry_count
             FROM blog_blog;
 
-        Note that the parenthesis required by most database engines around
-        subqueries are not required in Django's ``select`` clauses. Also note that
-        some database backends, such as some MySQL versions, don't support
+        Note that the parentheses required by most database engines around
+        subqueries are not required in Django's ``select`` clauses. Also note
+        that some database backends, such as some MySQL versions, don't support
         subqueries.
 
-        In some rare cases, you might wish to pass parameters to the SQL fragments
-        in ``extra(select=...)``. For this purpose, use the ``select_params``
-        parameter. Since ``select_params`` is a sequence and the ``select``
-        attribute is a dictionary, some care is required so that the parameters
-        are matched up correctly with the extra select pieces.  In this situation,
-        you should use a ``django.utils.datastructures.SortedDict`` for the
-        ``select`` value, not just a normal Python dictionary.
+        In some rare cases, you might wish to pass parameters to the SQL
+        fragments in ``extra(select=...)``. For this purpose, use the
+        ``select_params`` parameter. Since ``select_params`` is a sequence and
+        the ``select`` attribute is a dictionary, some care is required so that
+        the parameters are matched up correctly with the extra select pieces.
+        In this situation, you should use a
+        :class:`django.utils.datastructures.SortedDict` for the ``select``
+        value, not just a normal Python dictionary.
 
         This will work, for example::
 
@@ -771,8 +775,8 @@ of the arguments is required, but you should use at least one of them.
         like this isn't detected. That will lead to incorrect results.
 
     * ``where`` / ``tables``
-        You can define explicit SQL ``WHERE`` clauses -- perhaps to perform
-        non-explicit joins -- by using ``where``. You can manually add tables to
+        You can define explicit SQL ``WHERE`` clauses — perhaps to perform
+        non-explicit joins — by using ``where``. You can manually add tables to
         the SQL ``FROM`` clause by using ``tables``.
 
         ``where`` and ``tables`` both take a list of strings. All ``where``
@@ -786,61 +790,62 @@ of the arguments is required, but you should use at least one of them.
 
             SELECT * FROM blog_entry WHERE id IN (3, 4, 5, 20);
 
-        Be careful when using the ``tables`` parameter if you're specifying
-        tables that are already used in the query. When you add extra tables
-        via the ``tables`` parameter, Django assumes you want that table included
-        an extra time, if it is already included. That creates a problem,
-        since the table name will then be given an alias. If a table appears
-        multiple times in an SQL statement, the second and subsequent occurrences
-        must use aliases so the database can tell them apart. If you're
-        referring to the extra table you added in the extra ``where`` parameter
-        this is going to cause errors.
+	Be careful when using the ``tables`` parameter if you're specifying
+	tables that are already used in the query. When you add extra tables
+	via the ``tables`` parameter, Django assumes you want that table
+	included an extra time, if it is already included. That creates a
+	problem, since the table name will then be given an alias. If a table
+	appears multiple times in an SQL statement, the second and subsequent
+	occurrences must use aliases so the database can tell them apart. If
+	you're referring to the extra table you added in the extra ``where``
+	parameter this is going to cause errors.
 
-        Normally you'll only be adding extra tables that don't already appear in
-        the query. However, if the case outlined above does occur, there are a few
-        solutions. First, see if you can get by without including the extra table
-        and use the one already in the query. If that isn't possible, put your
-        ``extra()`` call at the front of the queryset construction so that your
-        table is the first use of that table. Finally, if all else fails, look at
-        the query produced and rewrite your ``where`` addition to use the alias
-        given to your extra table. The alias will be the same each time you
-        construct the queryset in the same way, so you can rely upon the alias
-        name to not change.
+	Normally you'll only be adding extra tables that don't already appear
+	in the query. However, if the case outlined above does occur, there are
+	a few solutions. First, see if you can get by without including the
+	extra table and use the one already in the query. If that isn't
+	possible, put your ``extra()`` call at the front of the queryset
+	construction so that your table is the first use of that table.
+	Finally, if all else fails, look at the query produced and rewrite your
+	``where`` addition to use the alias given to your extra table. The
+	alias will be the same each time you construct the queryset in the same
+	way, so you can rely upon the alias name to not change.
 
     * ``order_by``
-        If you need to order the resulting queryset using some of the new fields
-        or tables you have included via ``extra()`` use the ``order_by`` parameter
-        to ``extra()`` and pass in a sequence of strings. These strings should
-        either be model fields (as in the normal ``order_by()`` method on
-        querysets), of the form ``table_name.column_name`` or an alias for a column
-        that you specified in the ``select`` parameter to ``extra()``.
+	If you need to order the resulting queryset using some of the new
+	fields or tables you have included via ``extra()`` use the ``order_by``
+	parameter to ``extra()`` and pass in a sequence of strings. These
+	strings should either be model fields (as in the normal
+	:meth:`order_by()` method on querysets), of the form
+	``table_name.column_name`` or an alias for a column that you specified
+	in the ``select`` parameter to ``extra()``.
 
         For example::
 
             q = Entry.objects.extra(select={'is_recent': "pub_date > '2006-01-01'"})
             q = q.extra(order_by = ['-is_recent'])
 
-        This would sort all the items for which ``is_recent`` is true to the front
-        of the result set (``True`` sorts before ``False`` in a descending
-        ordering).
+	This would sort all the items for which ``is_recent`` is true to the
+	front of the result set (``True`` sorts before ``False`` in a
+	descending ordering).
 
-        This shows, by the way, that you can make multiple calls to
-        ``extra()`` and it will behave as you expect (adding new constraints each
-        time).
+	This shows, by the way, that you can make multiple calls to ``extra()``
+	and it will behave as you expect (adding new constraints each time).
 
     * ``params``
-        The ``where`` parameter described above may use standard Python database
-        string placeholders -- ``'%s'`` to indicate parameters the database engine
-        should automatically quote. The ``params`` argument is a list of any extra
-        parameters to be substituted.
+	The ``where`` parameter described above may use standard Python
+	database string placeholders — ``'%s'`` to indicate parameters the
+	database engine should automatically quote. The ``params`` argument is
+	a list of any extra parameters to be substituted.
 
         Example::
 
             Entry.objects.extra(where=['headline=%s'], params=['Lennon'])
 
-        Always use ``params`` instead of embedding values directly into ``where``
-        because ``params`` will ensure values are quoted correctly according to
-        your particular backend. (For example, quotes will be escaped correctly.)
+	Always use ``params`` instead of embedding values directly into
+	``where`` because ``params`` will ensure values are quoted correctly
+	according to your particular backend. For example, quotes will be
+	escaped correctly.
 
         Bad::
 
@@ -858,9 +863,9 @@ defer
 In some complex data-modeling situations, your models might contain a lot of
 fields, some of which could contain a lot of data (for example, text fields),
 or require expensive processing to convert them to Python objects. If you are
-using the results of a queryset in some situation where you know you don't
-need those particular fields, you can tell Django not to retrieve them from
-the database.
+using the results of a queryset in some situation where you know you don't know
+if you need those particular fields when you initially fetch the data, you can
+tell Django not to retrieve them from the database.
 
 This is done by passing the names of the fields to not load to ``defer()``::
 
@@ -881,7 +886,7 @@ Calling ``defer()`` with a field name that has already been deferred is
 harmless (the field will still be deferred).
 
 You can defer loading of fields in related models (if the related models are
-loading via ``select_related()``) by using the standard double-underscore
+loading via :meth:`select_related()`) by using the standard double-underscore
 notation to separate related fields::
 
     Blog.objects.select_related().defer("entry__headline", "entry__body")
@@ -894,19 +899,17 @@ to ``defer()``::
 
 Some fields in a model won't be deferred, even if you ask for them. You can
 never defer the loading of the primary key. If you are using
-``select_related()`` to retrieve other models at the same time you shouldn't
-defer the loading of the field that connects from the primary model to the
-related one (at the moment, that doesn't raise an error, but it will
-eventually).
+:meth:`select_related()` to retrieve related models, you shouldn't defer the
+loading of the field that connects from the primary model to the related one
+(at the moment, that doesn't raise an error, but it will eventually).
 
 .. note::
 
-    The ``defer()`` method (and its cousin, ``only()``, below) are only for
-    advanced use-cases. They provide an optimization for when you have
-    analyzed your queries closely and understand *exactly* what information
-    you need and have measured that the difference between returning the
-    fields you need and the full set of fields for the model will be
-    significant.
+    The ``defer()`` method (and its cousin, :meth:`only()`, below) are only for
+    advanced use-cases. They provide an optimization for when you have analyzed
+    your queries closely and understand *exactly* what information you need and
+    have measured that the difference between returning the fields you need and
+    the full set of fields for the model will be significant.
 
     Even if you think you are in the advanced use-case situation, **only use
     defer() when you cannot, at queryset load time, determine if you will need
@@ -915,11 +918,11 @@ eventually).
     normalize your models and put the non-loaded data into a separate model
     (and database table). If the columns *must* stay in the one table for some
     reason, create a model with ``Meta.managed = False`` (see the
-    :py:attr:`managed attribute <django.db.models.Options.managed>`
-    documentation) containing just the fields you normally need to load and use
-    that where you might otherwise call ``defer()``. This makes your code more
-    explicit to the reader, is slightly faster and consumes a little less
-    memory in the Python process.
+    :attr:`managed attribute <django.db.models.Options.managed>` documentation)
+    containing just the fields you normally need to load and use that where you
+    might otherwise call ``defer()``. This makes your code more explicit to the
+    reader, is slightly faster and consumes a little less memory in the Python
+    process.
 
 
 only
@@ -927,13 +930,13 @@ only
 
 .. method:: only(*fields)
 
-The ``only()`` method is more or less the opposite of ``defer()``. You
-call it with the fields that should *not* be deferred when retrieving a model.
-If you have a model where almost all the fields need to be deferred, using
-``only()`` to specify the complementary set of fields could result in simpler
+The ``only()`` method is more or less the opposite of :meth:`defer()`. You call
+it with the fields that should *not* be deferred when retrieving a model.  If
+you have a model where almost all the fields need to be deferred, using
+``only()`` to specify the complementary set of fields can result in simpler
 code.
 
-If you have a model with fields ``name``, ``age`` and ``biography``, the
+Suppose you have a model with fields ``name``, ``age`` and ``biography``. The
 following two querysets are the same, in terms of deferred fields::
 
     Person.objects.defer("age", "biography")
@@ -958,7 +961,7 @@ logically::
     # existing set of fields).
     Entry.objects.defer("body").only("headline", "body")
 
-All of the cautions in the note for the :py:meth:`defer` documentation apply to
+All of the cautions in the note for the :meth:`defer` documentation apply to
 ``only()`` as well. Use it cautiously and only after exhausting your other
 options.
 
@@ -1004,21 +1007,23 @@ Usually, if another transaction has already acquired a lock on one of the
 selected rows, the query will block until the lock is released. If this is
 not the behavior you want, call ``select_for_update(nowait=True)``. This will
 make the call non-blocking. If a conflicting lock is already acquired by
-another transaction, ``django.db.utils.DatabaseError`` will be raised when
-the queryset is evaluated.
+another transaction, :exc:`~django.db.DatabaseError` will be raised when the
+queryset is evaluated.
 
-Note that using ``select_for_update`` will cause the current transaction to be
-set dirty, if under transaction management. This is to ensure that Django issues
-a ``COMMIT`` or ``ROLLBACK``, releasing any locks held by the ``SELECT FOR
-UPDATE``.
+Note that using ``select_for_update()`` will cause the current transaction to be
+considered dirty, if under transaction management. This is to ensure that
+Django issues a ``COMMIT`` or ``ROLLBACK``, releasing any locks held by the
+``SELECT FOR UPDATE``.
 
-Currently, the ``postgresql_psycopg2``, ``oracle``, and ``mysql``
-database backends support ``select_for_update()``. However, MySQL has no
-support for the ``nowait`` argument.
+Currently, the ``postgresql_psycopg2``, ``oracle``, and ``mysql`` database
+backends support ``select_for_update()``. However, MySQL has no support for the
+``nowait`` argument. Obviously, users of external third-party backends should
+check with their backend's documentation for specifics in those cases.
 
 Passing ``nowait=True`` to ``select_for_update`` using database backends that
-do not support ``nowait``, such as MySQL, will cause a ``DatabaseError`` to be
-raised. This is in order to prevent code unexpectedly blocking.
+do not support ``nowait``, such as MySQL, will cause a
+:exc:`~django.db.DatabaseError` to be raised. This is in order to prevent code
+unexpectedly blocking.
 
 Using ``select_for_update`` on backends which do not support
 ``SELECT ... FOR UPDATE`` (such as SQLite) will have no effect.
@@ -1040,19 +1045,20 @@ get
 Returns the object matching the given lookup parameters, which should be in
 the format described in `Field lookups`_.
 
-``get()`` raises ``MultipleObjectsReturned`` if more than one object was
-found. The ``MultipleObjectsReturned`` exception is an attribute of the model
-class.
+``get()`` raises :exc:`~django.core.exceptions.MultipleObjectsReturned` if more
+than one object was found. The
+:exc:`~django.core.excpetions.MultipleObjectsReturned` exception is an
+attribute of the model class.
 
-``get()`` raises a ``DoesNotExist`` exception if an object wasn't found for
-the given parameters. This exception is also an attribute of the model class.
-Example::
+``get()`` raises a :exc:`~django.core.exceptions.DoesNotExist` exception if an
+object wasn't found for the given parameters. This exception is also an
+attribute of the model class. Example::
 
     Entry.objects.get(id='foo') # raises Entry.DoesNotExist
 
-The ``DoesNotExist`` exception inherits from
-``django.core.exceptions.ObjectDoesNotExist``, so you can target multiple
-``DoesNotExist`` exceptions. Example::
+The :exc:`~django.core.exceptions.DoesNotExist` exception inherits from
+:exc:`django.core.exceptions.ObjectDoesNotExist`, so you can target multiple
+:exc:`~django.core.exceptions.DoesNotExist` exceptions. Example::
 
     from django.core.exceptions import ObjectDoesNotExist
     try:
@@ -1082,8 +1088,8 @@ elsewhere, but all it means is that a new object will always be created.
 Normally you won't need to worry about this. However, if your model contains a
 manual primary key value that you set and if that value already exists in the
 database, a call to ``create()`` will fail with an
-:exc:`~django.db.IntegrityError` since primary keys must be unique. So remember
-to be prepared to handle the exception if you are using manual primary keys.
+:exc:`~django.db.IntegrityError` since primary keys must be unique. Be
+prepared to handle the exception if you are using manual primary keys.
 
 get_or_create
 ~~~~~~~~~~~~~
@@ -1112,12 +1118,12 @@ The above example can be rewritten using ``get_or_create()`` like so::
     obj, created = Person.objects.get_or_create(first_name='John', last_name='Lennon',
                       defaults={'birthday': date(1940, 10, 9)})
 
-Any keyword arguments passed to ``get_or_create()`` -- *except* an optional one
-called ``defaults`` -- will be used in a ``get()`` call. If an object is found,
-``get_or_create()`` returns a tuple of that object and ``False``. If an object
-is *not* found, ``get_or_create()`` will instantiate and save a new object,
-returning a tuple of the new object and ``True``. The new object will be
-created roughly according to this algorithm::
+Any keyword arguments passed to ``get_or_create()`` — *except* an optional one
+called ``defaults`` — will be used in a :meth:`get()` call. If an object is
+found, ``get_or_create()`` returns a tuple of that object and ``False``. If an
+object is *not* found, ``get_or_create()`` will instantiate and save a new
+object, returning a tuple of the new object and ``True``. The new object will
+be created roughly according to this algorithm::
 
     defaults = kwargs.pop('defaults', {})
     params = dict([(k, v) for k, v in kwargs.items() if '__' not in k])
@@ -1139,11 +1145,10 @@ If you have a field named ``defaults`` and want to use it as an exact lookup in
 
     Foo.objects.get_or_create(defaults__exact='bar', defaults={'defaults': 'baz'})
 
-
-The ``get_or_create()`` method has similar error behavior to ``create()``
-when you are using manually specified primary keys. If an object needs to be
-created and the key already exists in the database, an ``IntegrityError`` will
-be raised.
+The ``get_or_create()`` method has similar error behavior to :meth:`create()`
+when you're using manually specified primary keys. If an object needs to be
+created and the key already exists in the database, an
+:exc:`~django.db.IntegrityError` will be raised.
 
 Finally, a word on using ``get_or_create()`` in Django views. As mentioned
 earlier, ``get_or_create()`` is mostly useful in scripts that need to parse
@@ -1161,7 +1166,7 @@ count
 .. method:: count()
 
 Returns an integer representing the number of objects in the database matching
-the ``QuerySet``. ``count()`` never raises exceptions.
+the ``QuerySet``. The ``count()`` method never raises exceptions.
 
 Example::
 
@@ -1171,8 +1176,8 @@ Example::
     # Returns the number of entries whose headline contains 'Lennon'
     Entry.objects.filter(headline__contains='Lennon').count()
 
-``count()`` performs a ``SELECT COUNT(*)`` behind the scenes, so you should
-always use ``count()`` rather than loading all of the record into Python
+A ``count()`` call performs a ``SELECT COUNT(*)`` behind the scenes, so you
+should always use ``count()`` rather than loading all of the record into Python
 objects and calling ``len()`` on the result (unless you need to load the
 objects into memory anyway, in which case ``len()`` will be faster).
 
@@ -1205,16 +1210,17 @@ iterator
 
 .. method:: iterator()
 
-Evaluates the ``QuerySet`` (by performing the query) and returns an
-`iterator`_ over the results. A ``QuerySet`` typically caches its
-results internally so that repeated evaluations do not result in
-additional queries; ``iterator()`` will instead read results directly,
-without doing any caching at the ``QuerySet`` level. For a
-``QuerySet`` which returns a large number of objects, this often
-results in better performance and a significant reduction in memory
+Evaluates the ``QuerySet`` (by performing the query) and returns an `iterator`_
+over the results. A ``QuerySet`` typically caches its results internally so
+that repeated evaluations do not result in additional queries. In contrast,
+``iterator()`` will read results directly, without doing any caching at the
+``QuerySet`` level (internally, the default iterator calls ``iterator()`` and
+caches the return value). For a ``QuerySet`` which returns a large number of
+objects that you only need to access once, this can results in better
+performance and a significant reduction in memory.
 
-Note that using ``iterator()`` on a ``QuerySet`` which has already
-been evaluated will force it to evaluate again, repeating the query.
+Note that using ``iterator()`` on a ``QuerySet`` which has already been
+evaluated will force it to evaluate again, repeating the query.
 
 .. _iterator: http://www.python.org/dev/peps/pep-0234/
 
@@ -1231,12 +1237,14 @@ This example returns the latest ``Entry`` in the table, according to the
 
     Entry.objects.latest('pub_date')
 
-If your model's ``Meta`` specifies ``get_latest_by``, you can leave off the
-``field_name`` argument to ``latest()``. Django will use the field specified in
-``get_latest_by`` by default.
+If your model's :ref:`Meta <meta-options>` specifies
+:attr:`~django.db.models.Options.get_latest_by`, you can leave off the
+``field_name`` argument to ``latest()``. Django will use the field specified
+in :attr:`~django.db.models.Options.get_latest_by` by default.
 
-Like ``get()``, ``latest()`` raises ``DoesNotExist`` if an object doesn't
-exist with the given parameters.
+Like :meth:`get()`, ``latest()`` raises
+:exc:`~django.core.exceptions.DoesNotExist` if there is no object with the given
+parameters.
 
 Note ``latest()`` exists purely for convenience and readability.
 
@@ -1245,20 +1253,20 @@ aggregate
 
 .. method:: aggregate(*args, **kwargs)
 
-Returns a dictionary of aggregate values (averages, sums, etc) calculated
-over the ``QuerySet``. Each argument to ``aggregate()`` specifies
-a value that will be included in the dictionary that is returned.
+Returns a dictionary of aggregate values (averages, sums, etc) calculated over
+the ``QuerySet``. Each argument to ``aggregate()`` specifies a value that will
+be included in the dictionary that is returned.
 
-The aggregation functions that are provided by Django are described
-in `Aggregation Functions`_ below.
+The aggregation functions that are provided by Django are described in
+`Aggregation Functions`_ below.
 
-Aggregates specified using keyword arguments will use the keyword as
-the name for the annotation. Anonymous arguments will have an name
-generated for them based upon the name of the aggregate function and
-the model field that is being aggregated.
+Aggregates specified using keyword arguments will use the keyword as the name
+for the annotation. Anonymous arguments will have a name generated for them
+based upon the name of the aggregate function and the model field that is being
+aggregated.
 
-For example, if you were manipulating blog entries, you may want to know
-the number of authors that have contributed blog entries::
+For example, when you are working with blog entries, you may want to know the
+number of authors that have contributed blog entries::
 
     >>> q = Blog.objects.aggregate(Count('entry'))
     {'entry__count': 16}
@@ -1283,10 +1291,11 @@ Returns ``True`` if the :class:`.QuerySet` contains any results, and ``False``
 if not. This tries to perform the query in the simplest and fastest way
 possible, but it *does* execute nearly the same query. This means that calling
 :meth:`.QuerySet.exists` is faster than ``bool(some_query_set)``, but not by
-a large degree.  If ``some_query_set`` has not yet been evaluated, but you know
+a large degree. If ``some_query_set`` has not yet been evaluated, but you know
 that it will be at some point, then using ``some_query_set.exists()`` will do
-more overall work (an additional query) than simply using
-``bool(some_query_set)``.
+more overall work (one query for the existence check plus an extra one to later
+retrieve the results) than simply using ``bool(some_query_set)``, which
+retrieves the results and then checks if any were returned.
 
 update
 ~~~~~~
@@ -1303,7 +1312,7 @@ you could do this::
 
 (This assumes your ``Entry`` model has fields ``pub_date`` and ``comments_on``.)
 
-You can update multiple fields -- there's no limit on how many. For example,
+You can update multiple fields — there's no limit on how many. For example,
 here we update the ``comments_on`` and ``headline`` fields::
 
     >>> Entry.objects.filter(pub_date__year=2010).update(comments_on=False, headline='This is old')
@@ -1333,8 +1342,8 @@ The ``update()`` method returns the number of affected rows::
     132
 
 If you're just updating a record and don't need to do anything with the model
-object, you should use ``update()`` rather than loading the model object into
-memory. The former is more efficient. For example, instead of doing this::
+object, the most efficient approach is to call ``update()``, rather than
+loading the model object into memory. For example, instead of doing this::
 
     e = Entry.objects.get(id=10)
     e.comments_on = False
@@ -1344,15 +1353,18 @@ memory. The former is more efficient. For example, instead of doing this::
 
     Entry.objects.filter(id=10).update(comments_on=False)
 
-Using ``update()`` instead of loading the object into memory also prevents a
-race condition where something might change in your database in the short
-period of time between loading the object and calling ``save()``.
+Using ``update()`` also prevents a race condition wherein something might
+change in your database in the short period of time between loading the object
+and calling ``save()``.
 
-Finally, note that the ``update()`` method does an update at the SQL level and,
-thus, does not call any ``save()`` methods on your models, nor does it emit the
-``pre_save`` or ``post_save`` signals (which are a consequence of calling
-``save()``). If you want to update a bunch of records for a model that has a
-custom ``save()`` method, loop over them and call ``save()``, like this::
+Finally, realize that ``update()`` does an update at the SQL level and, thus,
+does not call any ``save()`` methods on your models, nor does it emit the
+:attr:`~django.db.models.signals.pre_save` or
+:attr:`~django.db.models.signals.post_save` signals (which are a consequence of
+calling :meth:`Model.save() <~django.db.models.Model.save()>`). If you want to
+update a bunch of records for a model that has a custom
+:meth:`~django.db.models.Model.save()`` method, loop over them and call
+:meth:`~django.db.models.Model.save()`, like this::
 
     for e in Entry.objects.filter(pub_date__year=2010):
         e.comments_on = False
@@ -1376,7 +1388,7 @@ For example, to delete all the entries in a particular blog::
     >>> Entry.objects.filter(blog=b).delete()
 
 By default, Django's :class:`~django.db.models.ForeignKey` emulates the SQL
-constraint ``ON DELETE CASCADE`` -- in other words, any objects with foreign
+constraint ``ON DELETE CASCADE`` — in other words, any objects with foreign
 keys pointing at the objects to be deleted will be deleted along with them.
 For example::
 
@@ -1401,18 +1413,19 @@ Field lookups
 -------------
 
 Field lookups are how you specify the meat of an SQL ``WHERE`` clause. They're
-specified as keyword arguments to the ``QuerySet`` methods ``filter()``,
-``exclude()`` and ``get()``.
+specified as keyword arguments to the ``QuerySet`` methods :meth:`filter()`,
+:meth:`exclude()` and :meth:`get()`.
 
-For an introduction, see :ref:`field-lookups-intro`.
+For an introduction, see :ref:`models and database queries documentation
+<field-lookups-intro>`.
 
 .. fieldlookup:: exact
 
 exact
 ~~~~~
 
-Exact match. If the value provided for comparison is ``None``, it will
-be interpreted as an SQL ``NULL`` (See isnull_ for more details).
+Exact match. If the value provided for comparison is ``None``, it will be
+interpreted as an SQL ``NULL`` (see :lookup:`isnull` for more details).
 
 Examples::
 
@@ -1473,8 +1486,8 @@ SQL equivalent::
 
     SELECT ... WHERE headline LIKE '%Lennon%';
 
-Note this will match the headline ``'Today Lennon honored'`` but not
-``'today lennon honored'``.
+Note this will match the headline ``'Lennon honored today'`` but not ``'lennon
+honored today'``.
 
 .. admonition:: SQLite users
 
@@ -1667,8 +1680,11 @@ SQL equivalent::
 
     SELECT ... WHERE headline LIKE '%cats';
 
-SQLite doesn't support case-sensitive ``LIKE`` statements; ``endswith`` acts
-like ``iendswith`` for SQLite.
+.. admonition:: SQLite users
+
+    SQLite doesn't support case-sensitive ``LIKE`` statements; ``endswith``
+    acts like ``iendswith`` for SQLite. Refer to the :ref:`database note
+    <sqlite-string-matching>` documentation for more.
 
 .. fieldlookup:: iendswith
 
@@ -1708,7 +1724,7 @@ SQL equivalent::
 
     SELECT ... WHERE pub_date BETWEEN '2005-01-01' and '2005-03-31';
 
-You can use ``range`` anywhere you can use ``BETWEEN`` in SQL -- for dates,
+You can use ``range`` anywhere you can use ``BETWEEN`` in SQL — for dates,
 numbers and even characters.
 
 .. fieldlookup:: year
@@ -1733,8 +1749,8 @@ SQL equivalent::
 month
 ~~~~~
 
-For date/datetime fields, exact month match. Takes an integer 1 (January)
-through 12 (December).
+For date and datetime fields, an exact month match. Takes an integer 1
+(January) through 12 (December).
 
 Example::
 
@@ -1751,7 +1767,7 @@ SQL equivalent::
 day
 ~~~
 
-For date/datetime fields, exact day match.
+For date and datetime fields, an exact day match.
 
 Example::
 
@@ -1771,7 +1787,7 @@ such as January 3, July 3, etc.
 week_day
 ~~~~~~~~
 
-For date/datetime fields, a 'day of the week' match.
+For date and datetime fields, a 'day of the week' match.
 
 Takes an integer value representing the day of week from 1 (Sunday) to 7
 (Saturday).
@@ -1783,8 +1799,8 @@ Example::
 (No equivalent SQL code fragment is included for this lookup because
 implementation of the relevant query varies among different database engines.)
 
-Note this will match any record with a pub_date that falls on a Monday (day 2
-of the week), regardless of the month or year in which it occurs. Week days
+Note this will match any record with a ``pub_date`` that falls on a Monday (day
+2 of the week), regardless of the month or year in which it occurs. Week days
 are indexed with day 1 being Sunday and day 7 being Saturday.
 
 .. fieldlookup:: isnull
@@ -1809,7 +1825,7 @@ search
 ~~~~~~
 
 A boolean full-text search, taking advantage of full-text indexing. This is
-like ``contains`` but is significantly faster due to full-text indexing.
+like :lookup:`contains` but is significantly faster due to full-text indexing.
 
 Example::
 
@@ -1821,8 +1837,9 @@ SQL equivalent::
 
 Note this is only available in MySQL and requires direct manipulation of the
 database to add the full-text index. By default Django uses BOOLEAN MODE for
-full text searches. `See the MySQL documentation for additional details.
-<http://dev.mysql.com/doc/refman/5.1/en/fulltext-boolean.html>`_
+full text searches. See the `MySQL documentation`_ for additional details.
+
+.. _MySQL documentation: http://dev.mysql.com/doc/refman/5.1/en/fulltext-boolean.html>
 
 
 .. fieldlookup:: regex
@@ -1986,6 +2003,10 @@ Variance
 
     .. admonition:: SQLite
 
-        SQLite doesn't provide ``Variance`` out of the box. An implementation is
-        available as an extension module for SQLite. Consult the SQlite
-        documentation for instructions on obtaining and installing this extension.
+        SQLite doesn't provide ``Variance`` out of the box. An implementation
+        is available as an extension module for SQLite. Consult the `SQlite
+        documentation`_ for instructions on obtaining and installing this
+        extension.
+
+.. _SQLite documentation: http://www.sqlite.org/contrib
+
