@@ -88,8 +88,9 @@ class ExtendsNode(Node):
 
     def get_parent(self, context):
         if self.parent_name_expr:
-            self.parent_name = self.parent_name_expr.resolve(context)
-        parent = self.parent_name
+            parent = self.parent_name_expr.resolve(context)
+        else:
+            parent = self.parent_name
         if not parent:
             error_msg = "Invalid template name in 'extends' tag: %r." % parent
             if self.parent_name_expr:
