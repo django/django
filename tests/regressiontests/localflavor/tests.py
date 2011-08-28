@@ -34,6 +34,7 @@ from py.tests import *
 from ro.tests import *
 from ru.tests import *
 from se.tests import *
+from si.tests import *
 from sk.tests import *
 from tr.tests import *
 from us.tests import *
