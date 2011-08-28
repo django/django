@@ -414,60 +414,82 @@ using ``__str__()`` like this::
 .. method:: Model.get_absolute_url()
 
 Define a ``get_absolute_url()`` method to tell Django how to calculate the
-canonical URL for an object. For example::
+canonical URL for an object. To callers, this method should appear to return a
+string that can be used to refer to the object over HTTP.
+
+For example::
 
     def get_absolute_url(self):
         return "/people/%i/" % self.id
 
-Django uses this in its admin interface. If an object defines
-``get_absolute_url()``, the object-editing page will have a "View on site"
-link that will jump you directly to the object's public view, according to
+(Whilst this code is correct and simple, it may not be the most portable way to
+write this kind of method. The :func:`permalink() decorator <permalink>`,
+documented below, is usually the best approach and you should read that section
+before diving into code implementation.)
+
+One place Django uses ``get_absolute_url()`` is in the admin app. If an object
+defines this method, the object-editing page will have a "View on site" link
+that will jump you directly to the object's public view, as given by
 ``get_absolute_url()``.
 
-Also, a couple of other bits of Django, such as the :doc:`syndication feed
-framework </ref/contrib/syndication>`, use ``get_absolute_url()`` as a
-convenience to reward people who've defined the method.
+Similarly, a couple of other bits of Django, such as the :doc:`syndication feed
+framework </ref/contrib/syndication>`, use ``get_absolute_url()`` when it is
+defined. If it makes sense for your model's instances to each have a unique
+URL, you should define ``get_absolute_url()``.
 
 It's good practice to use ``get_absolute_url()`` in templates, instead of
 hard-coding your objects' URLs. For example, this template code is bad::
 
+    <!-- BAD template code. Avoid! -->
     <a href="/people/{{ object.id }}/">{{ object.name }}</a>
 
-But this template code is good::
+This template code is much better::
 
     <a href="{{ object.get_absolute_url }}">{{ object.name }}</a>
 
+The logic here is that if you change the URL structure of your objects, even
+for something simple such as correcting a spelling error, you don't want to
+have to track down every place that the URL might be created. Specify it once,
+in ``get_absolute_url()`` and have all your other code call that one place.
+
 .. note::
-    The string you return from ``get_absolute_url()`` must contain only ASCII
-    characters (required by the URI spec, `RFC 2396`_) that have been
-    URL-encoded, if necessary. Code and templates using ``get_absolute_url()``
-    should be able to use the result directly without needing to do any
-    further processing. You may wish to use the
+    The string you return from ``get_absolute_url()`` **must** contain only
+    ASCII characters (required by the URI specfication, `RFC 2396`_) and be
+    URL-encoded, if necessary.
+
+    Code and templates calling ``get_absolute_url()`` should be able to use the
+    result directly without any further processing. You may wish to use the
     ``django.utils.encoding.iri_to_uri()`` function to help with this if you
-    are using unicode strings a lot.
+    are using unicode strings containing characters outside the ASCII range at
+    all.
 
 .. _RFC 2396: http://www.ietf.org/rfc/rfc2396.txt
 
 The ``permalink`` decorator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The problem with the way we wrote ``get_absolute_url()`` above is that it
-slightly violates the DRY principle: the URL for this object is defined both
-in the URLconf file and in the model.
+The way we wrote ``get_absolute_url()`` above is a slightly violation of the
+DRY principle: the URL for this object is defined both in the URLconf file and
+in the model.
 
-You can further decouple your models from the URLconf using the ``permalink``
-decorator:
+You can decouple your models from the URLconf using the ``permalink`` decorator:
 
 .. function:: permalink()
 
-This decorator is passed the view function, a list of positional parameters and
-(optionally) a dictionary of named parameters. Django then works out the correct
-full URL path using the URLconf, substituting the parameters you have given into
-the URL. For example, if your URLconf contained a line such as::
+This decorator takes the name of a URL pattern (either a view name or a URL
+pattern name) and a list of position or keyword arguments and uses the URLconf
+patterns to construct the correct, full URL. It returns a string for the
+correct URL, with all parameters substituted in the correct positions.
+
+The ``permalink`` decorator is a Python-level equivalent to the :ttag:`url` template tag and a high-level wrapper for the :func:`django.core.urlresolvers.reverse()` function.
+
+An example should make it clear how to use ``permalink()``. Suppose your URLconf
+contains a line such as::
 
     (r'^people/(\d+)/$', 'people.views.details'),
 
-...your model could have a ``get_absolute_url`` method that looked like this::
+...your model could have a :meth:`~django.db.models.Model.get_absolute_url()`
+method that looked like this::
 
     from django.db import models
 
@@ -491,26 +513,22 @@ Similarly, if you had a URLconf entry that looked like::
 Notice that we specify an empty sequence for the second parameter in this case,
 because we only want to pass keyword parameters, not positional ones.
 
-In this way, you're tying the model's absolute path to the view that is used
-to display it, without repeating the URL information anywhere. You can still
-use the ``get_absolute_url`` method in templates, as before.
+In this way, you're associating the model's absolute path with the view that is
+used to display it, without repeating the view's URL information anywhere. You
+can still use the :meth:`~django.db.models.Model.get_absolute_url()` method in
+templates, as before.
 
-In some cases, such as the use of generic views or the re-use of
-custom views for multiple models, specifying the view function may
-confuse the reverse URL matcher (because multiple patterns point to
-the same view).
-
-For that problem, Django has **named URL patterns**. Using a named
-URL pattern, it's possible to give a name to a pattern, and then
-reference the name rather than the view function. A named URL
-pattern is defined by replacing the pattern tuple by a call to
-the ``url`` function)::
+In some cases, such as the use of generic views or the re-use of custom views
+for multiple models, specifying the view function may confuse the reverse URL
+matcher (because multiple patterns point to the same view). For that case,
+Django has :ref:`named URL patterns <naming-url-patterns>`. Using a named URL
+pattern, it's possible to give a name to a pattern, and then reference the name
+rather than the view function. A named URL pattern is defined by replacing the
+pattern tuple by a call to the ``url`` function)::
 
     from django.conf.urls.defaults import *
 
-    url(r'^people/(\d+)/$',
-        'django.views.generic.list_detail.object_detail',
-        name='people_view'),
+    url(r'^people/(\d+)/$', 'blog_views.generic_detail', name='people_view'),
 
 ...and then using that name to perform the reverse URL resolution instead
 of the view name::
