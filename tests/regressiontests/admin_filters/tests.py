@@ -7,7 +7,8 @@ from django.utils.encoding import force_unicode
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.contrib.admin.views.main import ChangeList
-from django.contrib.admin import site, ModelAdmin, SimpleListFilter
+from django.contrib.admin import (site, ModelAdmin, SimpleListFilter,
+    BooleanFieldListFilter)
 
 from models import Book
 
@@ -66,6 +67,9 @@ class CustomUserAdmin(UserAdmin):
 class BookAdmin(ModelAdmin):
     list_filter = ('year', 'author', 'contributors', 'is_best_seller', 'date_registered', 'no')
     ordering = ('-id',)
+
+class BookAdminWithTupleBooleanFilter(BookAdmin):
+    list_filter = ('year', 'author', 'contributors', ('is_best_seller', BooleanFieldListFilter), 'date_registered', 'no')
 
 class DecadeFilterBookAdmin(ModelAdmin):
     list_filter = ('author', DecadeListFilterWithTitleAndParameter)
@@ -331,7 +335,7 @@ class ListFiltersTests(TestCase):
         self.verify_booleanfieldlistfilter(modeladmin)
 
     def test_booleanfieldlistfilter_tuple(self):
-        modeladmin = BookAdmin(Book, site)
+        modeladmin = BookAdminWithTupleBooleanFilter(Book, site)
         self.verify_booleanfieldlistfilter(modeladmin)
 
     def verify_booleanfieldlistfilter(self, modeladmin):
