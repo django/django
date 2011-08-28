@@ -23,7 +23,7 @@ class:
 
 The keyword arguments are simply the names of the fields you've defined on your
 model. Note that instantiating a model in no way touches your database; for
-that, you need to ``save()``.
+that, you need to :meth:`~Model.save()`.
 
 .. _validating-objects:
 
@@ -39,31 +39,34 @@ There are three steps involved in validating a model:
     3. Validate the field uniqueness
 
 All three steps are performed when you call a model's
-``full_clean()`` method.
+:meth:`~Model.full_clean()` method.
 
-When you use a ``ModelForm``, the call to ``is_valid()`` will perform
-these validation steps for all the fields that are included on the
-form. (See the :doc:`ModelForm documentation
-</topics/forms/modelforms>` for more information.) You should only need
-to call a model's ``full_clean()`` method if you plan to handle
+When you use a :class:`~django.forms.ModelForm`, the call to
+:meth:`~django.forms.Form.is_valid()` will perform these validation steps for
+all the fields that are included on the form. See the :doc:`ModelForm
+documentation </topics/forms/modelforms>` for more information. You should only
+need to call a model's :meth:`~Model.full_clean()` method if you plan to handle
 validation errors yourself, or if you have excluded fields from the
-ModelForm that require validation.
+:class:`~django.forms.ModelForm` that require validation.
 
 .. method:: Model.full_clean(exclude=None)
 
-This method calls ``Model.clean_fields()``, ``Model.clean()``, and
-``Model.validate_unique()``, in that order and raises a ``ValidationError``
-that has a ``message_dict`` attribute containing errors from all three stages.
+This method calls :meth:`Model.clean_fields()`, :meth:`Model.clean()`, and
+:meth:`Model.validate_unique()`, in that order and raises a
+:exc:`~django.core.exceptions.ValidationError` that has a ``message_dict``
+attribute containing errors from all three stages.
 
 The optional ``exclude`` argument can be used to provide a list of field names
-that can be excluded from validation and cleaning. ``ModelForm`` uses this
-argument to exclude fields that aren't present on your form from being
-validated since any errors raised could not be corrected by the user.
+that can be excluded from validation and cleaning.
+:class:`~django.forms.ModelForm` uses this argument to exclude fields that
+aren't present on your form from being validated since any errors raised could
+not be corrected by the user.
 
-Note that ``full_clean()`` will *not* be called automatically when you
-call your model's ``save()`` method, nor as a result of ``ModelForm``
-validation. You'll need to call it manually when you want to run model
-validation outside of a ``ModelForm``.
+Note that ``full_clean()`` will *not* be called automatically when you call
+your model's :meth:`~Model.save()` method, nor as a result of
+:class:`~django.forms.ModelForm` validation. You'll need to call it manually
+when you want to run one-step model validation for your own manually created
+models.
 
 Example::
 
@@ -79,9 +82,10 @@ The first step ``full_clean()`` performs is to clean each individual field.
 
 This method will validate all fields on your model. The optional ``exclude``
 argument lets you provide a list of field names to exclude from validation. It
-will raise a ``ValidationError`` if any fields fail validation.
+will raise a :exc:`~django.core.exceptions.ValidationError` if any fields fail
+validation.
 
-The second step ``full_clean()`` performs is to call ``Model.clean()``.
+The second step ``full_clean()`` performs is to call :meth:`Model.clean()`.
 This method should be overridden to perform custom validation on your model.
 
 .. method:: Model.clean()
@@ -100,10 +104,10 @@ access to more than a single field::
         if self.status == 'published' and self.pub_date is None:
             self.pub_date = datetime.datetime.now()
 
-Any ``ValidationError`` raised by ``Model.clean()`` will be stored under a
-special key that is used for errors that are tied to the entire model instead
-of to a specific field. You can access these errors with ``NON_FIELD_ERRORS``::
-
+Any :exc:`~django.core.exceptions.ValidationError` exceptions raised by
+``Model.clean()`` will be stored in a special key error dictionary key,
+``NON_FIELD_ERRORS``, that is used for errors that are tied to the entire model
+instead of to a specific field::
 
     from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
     try:
@@ -115,15 +119,15 @@ Finally, ``full_clean()`` will check any unique constraints on your model.
 
 .. method:: Model.validate_unique(exclude=None)
 
-This method is similar to ``clean_fields``, but validates all uniqueness
-constraints on your model instead of individual field values. The optional
-``exclude`` argument allows you to provide a list of field names to exclude
-from validation. It will raise a ``ValidationError`` if any fields fail
-validation.
+This method is similar to :meth:`~Model.clean_fields`, but validates all
+uniqueness constraints on your model instead of individual field values. The
+optional ``exclude`` argument allows you to provide a list of field names to
+exclude from validation. It will raise a
+:exc:`~django.core.exceptions.ValidationError` if any fields fail validation.
 
-Note that if you provide an ``exclude`` argument to ``validate_unique``, any
-``unique_together`` constraint that contains one of the fields you provided
-will not be checked.
+Note that if you provide an ``exclude`` argument to ``validate_unique()``, any
+:attr:`~django.db.models.Options.unique_together` constraint involving one of
+the fields you provided will not be checked.
 
 
 Saving objects
@@ -136,19 +140,17 @@ To save an object back to the database, call ``save()``:
 .. versionadded:: 1.2
    The ``using`` argument was added.
 
-If you want customized saving behavior, you can override this
-``save()`` method. See :ref:`overriding-model-methods` for more
-details.
+If you want customized saving behavior, you can override this ``save()``
+method. See :ref:`overriding-model-methods` for more details.
 
-The model save process also has some subtleties; see the sections
-below.
+The model save process also has some subtleties; see the sections below.
 
 Auto-incrementing primary keys
 ------------------------------
 
-If a model has an ``AutoField`` -- an auto-incrementing primary key -- then
-that auto-incremented value will be calculated and saved as an attribute on
-your object the first time you call ``save()``::
+If a model has an :class:`~django.db.models.AutoField` — an auto-incrementing
+primary key — then that auto-incremented value will be calculated and saved as
+an attribute on your object the first time you call ``save()``::
 
     >>> b2 = Blog(name='Cheddar Talk', tagline='Thoughts on cheese.')
     >>> b2.id     # Returns None, because b doesn't have an ID yet.
@@ -158,9 +160,10 @@ your object the first time you call ``save()``::
 There's no way to tell what the value of an ID will be before you call
 ``save()``, because that value is calculated by your database, not by Django.
 
-(For convenience, each model has an ``AutoField`` named ``id`` by default
-unless you explicitly specify ``primary_key=True`` on a field. See the
-documentation for ``AutoField`` for more details.
+For convenience, each model has an :class:`~django.db.models.AutoField` named
+``id`` by default unless you explicitly specify ``primary_key=True`` on a field
+in your model. See the documentation for :class:`~django.db.models.AutoField`
+for more details.
 
 The ``pk`` property
 ~~~~~~~~~~~~~~~~~~~
@@ -177,9 +180,9 @@ correct field in the model.
 Explicitly specifying auto-primary-key values
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If a model has an ``AutoField`` but you want to define a new object's ID
-explicitly when saving, just define it explicitly before saving, rather than
-relying on the auto-assignment of the ID::
+If a model has an :class:`~django.db.models.AutoField` but you want to define a
+new object's ID explicitly when saving, just define it explicitly before
+saving, rather than relying on the auto-assignment of the ID::
 
     >>> b3 = Blog(id=3, name='Cheddar Talk', tagline='Thoughts on cheese.')
     >>> b3.id     # Returns 3.
@@ -217,13 +220,13 @@ When you save an object, Django performs the following steps:
        perform any automated data modification that the field may need
        to perform.
 
-       Most fields do *no* pre-processing -- the field data is kept as-is.
-       Pre-processing is only used on fields that have special behavior.
-       For example, if your model has a ``DateField`` with ``auto_now=True``,
-       the pre-save phase will alter the data in the object to ensure that
-       the date field contains the current date stamp. (Our documentation
-       doesn't yet include a list of all the fields with this "special
-       behavior.")
+       Most fields do *no* pre-processing — the field data is kept as-is.
+       Pre-processing is only used on fields that have special behavior.  For
+       example, if your model has a :class:`~django.db.models.DateField` with
+       ``auto_now=True``, the pre-save phase will alter the data in the object
+       to ensure that the date field contains the current date stamp. (Our
+       documentation doesn't yet include a list of all the fields with this
+       "special behavior.")
 
     3. **Prepare the data for the database.** Each field is asked to provide
        its current value in a data type that can be written to the database.
@@ -232,10 +235,10 @@ When you save an object, Django performs the following steps:
        integers and strings, are 'ready to write' as a Python object. However,
        more complex data types often require some modification.
 
-       For example, ``DateFields`` use a Python ``datetime`` object to store
-       data. Databases don't store ``datetime`` objects, so the field value
-       must be converted into an ISO-compliant date string for insertion
-       into the database.
+       For example, :class:`~django.db.models.DateField` fields use a Python
+       ``datetime`` object to store data. Databases don't store ``datetime``
+       objects, so the field value must be converted into an ISO-compliant date
+       string for insertion into the database.
 
     4. **Insert the data into the database.** The pre-processed, prepared
        data is then composed into an SQL statement for insertion into the
@@ -273,12 +276,13 @@ auto-primary-key values`_ above and `Forcing an INSERT or UPDATE`_ below.
 Forcing an INSERT or UPDATE
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In some rare circumstances, it's necessary to be able to force the ``save()``
-method to perform an SQL ``INSERT`` and not fall back to doing an ``UPDATE``.
-Or vice-versa: update, if possible, but not insert a new row. In these cases
-you can pass the ``force_insert=True`` or ``force_update=True`` parameters to
-the ``save()`` method. Passing both parameters is an error, since you cannot
-both insert *and* update at the same time.
+In some rare circumstances, it's necessary to be able to force the
+:meth:`~Model.save()` method to perform an SQL ``INSERT`` and not fall back to
+doing an ``UPDATE``. Or vice-versa: update, if possible, but not insert a new
+row. In these cases you can pass the ``force_insert=True`` or
+``force_update=True`` parameters to the :meth:`~Model.save()` method.
+Obviously, passing both parameters is an error: you cannot both insert *and*
+update at the same time!
 
 It should be very rare that you'll need to use these parameters. Django will
 almost always do the right thing and trying to override that will lead to
@@ -299,11 +303,16 @@ achieve this is to do something like::
 If the old ``number_sold`` value retrieved from the database was 10, then
 the value of 11 will be written back to the database.
 
-This can be optimized slightly by expressing the update relative to the
-original field value, rather than as an explicit assignment of a new value.
-Django provides :ref:`F() expressions <query-expressions>` as a way of
+This sequence has a standard update problem in that it contains a race
+condition. If another thread of execution has already saved an updated value
+after the current thread retrieved the old value, the current thread will only
+save the old value plus one, rather than the new (current) value plus one.
+
+The process can be made robust and slightly faster by expressing the update
+relative to the original field value, rather than as an explicit assignment of
+a new value. Django provides :ref:`F() expressions <query-expressions>` for
 performing this kind of relative update. Using ``F()`` expressions, the
-previous example would be expressed as::
+previous example is expressed as::
 
     >>> from django.db.models import F
     >>> product = Product.objects.get(name='Venezuelan Beaver Cheese')
@@ -311,8 +320,8 @@ previous example would be expressed as::
     >>> product.save()
 
 This approach doesn't use the initial value from the database. Instead, it
-makes the database do the update based on whatever value is current at the
-time that the save() is executed.
+makes the database do the update based on whatever value is current at the time
+that the :meth:`~Model.save()` is executed.
 
 Once the object has been saved, you must reload the object in order to access
 the actual value that was applied to the updated field::
@@ -333,16 +342,15 @@ Deleting objects
 .. versionadded:: 1.2
    The ``using`` argument was added.
 
-Issues a SQL ``DELETE`` for the object. This only deletes the object
-in the database; the Python instance will still be around, and will
-still have data in its fields.
+Issues a SQL ``DELETE`` for the object. This only deletes the object in the
+database; the Python instance will still exist and will still have data in
+its fields.
 
 For more details, including how to delete objects in bulk, see
 :ref:`topics-db-queries-delete`.
 
-If you want customized deletion behavior, you can override this
-``delete()`` method. See :ref:`overriding-model-methods` for more
-details.
+If you want customized deletion behavior, you can override the ``delete()``
+method. See :ref:`overriding-model-methods` for more details.
 
 .. _model-instance-methods:
 
@@ -351,21 +359,45 @@ Other model instance methods
 
 A few object methods have special purposes.
 
+``__unicode__``
+---------------
+
+.. method:: Model.__unicode__()
+
+The ``__unicode__()`` method is called whenever you call ``unicode()`` on an
+object. Django uses ``unicode(obj)`` (or the related function, :meth:`str(obj)
+<Model.__str__>`) in a number of places. Most notably, to display an object in
+the Django admin site and as the value inserted into a template when it
+displays an object. Thus, you should always return a nice, human-readable
+representation of the model from the ``__unicode__()`` method.
+
+For example::
+
+    class Person(models.Model):
+        first_name = models.CharField(max_length=50)
+        last_name = models.CharField(max_length=50)
+
+        def __unicode__(self):
+            return u'%s %s' % (self.first_name, self.last_name)
+
+If you define a ``__unicode__()`` method on your model and not a
+:meth:`~Model.__str__()` method, Django will automatically provide you with a
+:meth:`~Model.__str__()` that calls ``__unicode__()`` and then converts the
+result correctly to a UTF-8 encoded string object. This is recommended
+development practice: define only ``__unicode__()`` and let Django take care of
+the conversion to string objects when required.
+
 ``__str__``
 -----------
 
 .. method:: Model.__str__()
 
-``__str__()`` is a Python "magic method" that defines what should be returned
-if you call ``str()`` on the object. Django uses ``str(obj)`` (or the related
-function, ``unicode(obj)`` -- see below) in a number of places, most notably
-as the value displayed to render an object in the Django admin site and as the
-value inserted into a template when it displays an object. Thus, you should
-always return a nice, human-readable string for the object's ``__str__``.
-Although this isn't required, it's strongly encouraged (see the description of
-``__unicode__``, below, before putting ``__str__`` methods everywhere).
+The ``__str__()`` method is called whenever you call ``str()`` on an object. The main use for this method directly inside Django is when the ``repr()`` output of a model is displayed anywhere (for example, in debugging output).
+Thus, you should return a nice, human-readable string for the object's
+``__str__()``.  It isn't required to put ``__str__()`` methods everywhere if you have sensible :meth:`~Model.__unicode__()` methods.
 
-For example::
+The previous :meth:`~Model.__unicode__()` example could be similarly written
+using ``__str__()`` like this::
 
     class Person(models.Model):
         first_name = models.CharField(max_length=50)
@@ -376,38 +408,13 @@ For example::
             # first_name and last_name will be unicode strings.
             return smart_str('%s %s' % (self.first_name, self.last_name))
 
-``__unicode__``
----------------
-
-.. method:: Model.__unicode__()
-
-The ``__unicode__()`` method is called whenever you call ``unicode()`` on an
-object. Since Django's database backends will return Unicode strings in your
-model's attributes, you would normally want to write a ``__unicode__()``
-method for your model. The example in the previous section could be written
-more simply as::
-
-    class Person(models.Model):
-        first_name = models.CharField(max_length=50)
-        last_name = models.CharField(max_length=50)
-
-        def __unicode__(self):
-            return u'%s %s' % (self.first_name, self.last_name)
-
-If you define a ``__unicode__()`` method on your model and not a ``__str__()``
-method, Django will automatically provide you with a ``__str__()`` that calls
-``__unicode__()`` and then converts the result correctly to a UTF-8 encoded
-string object. This is recommended development practice: define only
-``__unicode__()`` and let Django take care of the conversion to string objects
-when required.
-
 ``get_absolute_url``
 --------------------
 
 .. method:: Model.get_absolute_url()
 
 Define a ``get_absolute_url()`` method to tell Django how to calculate the
-URL for an object. For example::
+canonical URL for an object. For example::
 
     def get_absolute_url(self):
         return "/people/%i/" % self.id
@@ -520,15 +527,15 @@ More details on named URL patterns are in the :doc:`URL dispatch documentation
 Extra instance methods
 ======================
 
-In addition to ``save()``, ``delete()``, a model object might get any or all
-of the following methods:
+In addition to :meth:`~Model.save()`, :meth:`~Model.delete()`, a model object
+might have some of the following methods:
 
 .. method:: Model.get_FOO_display()
 
-For every field that has ``choices`` set, the object will have a
-``get_FOO_display()`` method, where ``FOO`` is the name of the field. This
-method returns the "human-readable" value of the field. For example, in the
-following model::
+For every field that has :attr:`~django.db.models.Field.choices` set, the
+object will have a ``get_FOO_display()`` method, where ``FOO`` is the name of
+the field. This method returns the "human-readable" value of the field. For
+example, in the following model::
 
     GENDER_CHOICES = (
         ('M', 'Male'),
@@ -550,16 +557,17 @@ following model::
 .. method:: Model.get_next_by_FOO(\**kwargs)
 .. method:: Model.get_previous_by_FOO(\**kwargs)
 
-For every ``DateField`` and ``DateTimeField`` that does not have ``null=True``,
-the object will have ``get_next_by_FOO()`` and ``get_previous_by_FOO()``
-methods, where ``FOO`` is the name of the field. This returns the next and
-previous object with respect to the date field, raising the appropriate
-``DoesNotExist`` exception when appropriate.
+For every :class:`~django.db.models.DateField` and
+:class:`~django.db.models.DateTimeField` that does not have :attr:`null=True
+<django.db.models.Field.null>`, the object will have ``get_next_by_FOO()`` and
+``get_previous_by_FOO()`` methods, where ``FOO`` is the name of the field. This
+returns the next and previous object with respect to the date field, raising
+the appropriate :exc:`~django.db.DoesNotExist` exception when appropriate.
 
 Both methods accept optional keyword arguments, which should be in the format
 described in :ref:`Field lookups <field-lookups>`.
 
-Note that in the case of identical date values, these methods will use the ID
-as a fallback check. This guarantees that no records are skipped or duplicated.
+Note that in the case of identical date values, these methods will use the
+primary key as a tie-breaker. This guarantees that no records are skipped or
+duplicated. That also means you cannot use those methods on unsaved objects.
 
-That also means you cannot use those methods on unsaved objects.
