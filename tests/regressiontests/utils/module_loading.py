@@ -18,6 +18,8 @@ class DefaultLoader(unittest.TestCase):
     def test_loader(self):
         "Normal module existence can be tested"
         test_module = import_module('regressiontests.utils.test_module')
+        test_no_submodule = import_module(
+            'regressiontests.utils.test_no_submodule')
 
         # An importable child
         self.assertTrue(module_has_submodule(test_module, 'good_module'))
@@ -39,6 +41,11 @@ class DefaultLoader(unittest.TestCase):
         # Don't be confused by caching of import misses
         import types  # causes attempted import of regressiontests.utils.types
         self.assertFalse(module_has_submodule(sys.modules['regressiontests.utils'], 'types'))
+
+        # A module which doesn't have a __path__ (so no submodules)
+        self.assertFalse(module_has_submodule(test_no_submodule, 'anything'))
+        self.assertRaises(ImportError, import_module,
+            'regressiontests.utils.test_no_submodule.anything')
 
 class EggLoader(unittest.TestCase):
     def setUp(self):
