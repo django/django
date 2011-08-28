@@ -267,6 +267,7 @@ class ChangeList(object):
                 del lookup_params[key]
                 lookup_params[smart_str(key)] = value
 
+            field = None
             if not use_distinct:
                 # Check if it's a relationship that might return more than one
                 # instance
@@ -291,7 +292,7 @@ class ChangeList(object):
                     value = True
                 lookup_params[key] = value
 
-            if not self.model_admin.lookup_allowed(key, value):
+            if field and not self.model_admin.lookup_allowed(key, value):
                 raise SuspiciousOperation("Filtering by %s not allowed" % key)
 
         return lookup_params, use_distinct
@@ -300,28 +301,30 @@ class ChangeList(object):
         lookup_params, use_distinct = self.get_lookup_params(use_distinct=False)
         self.filter_specs, self.has_filters = self.get_filters(request, use_distinct)
 
-        # Let every list filter modify the qs and params to its liking
-        qs = self.root_query_set
-        for filter_spec in self.filter_specs:
-            new_qs = filter_spec.queryset(request, qs)
-            if new_qs is not None:
-                qs = new_qs
-                for param in filter_spec.used_params():
-                    try:
-                        del lookup_params[param]
-                    except KeyError:
-                        pass
-
-        # Apply the remaining lookup parameters from the query string (i.e.
-        # those that haven't already been processed by the filters).
         try:
+            # First, let every list filter modify the qs and params to its
+            # liking.
+            qs = self.root_query_set
+            for filter_spec in self.filter_specs:
+                new_qs = filter_spec.queryset(request, qs)
+                if new_qs is not None:
+                    qs = new_qs
+                    for param in filter_spec.used_params():
+                        try:
+                            del lookup_params[param]
+                        except KeyError:
+                            pass
+
+            # Then, apply the remaining lookup parameters from the query string
+            # (i.e. those that haven't already been processed by the filters).
             qs = qs.filter(**lookup_params)
-        # Naked except! Because we don't have any other way of validating "params".
-        # They might be invalid if the keyword arguments are incorrect, or if the
-        # values are not in the correct type, so we might get FieldError, ValueError,
-        # ValicationError, or ? from a custom field that raises yet something else
-        # when handed impossible data.
         except Exception, e:
+            # Naked except! Because we don't have any other way of validating
+            # "lookup_params". They might be invalid if the keyword arguments
+            # are incorrect, or if the values are not in the correct type, so
+            # we might get FieldError, ValueError, ValicationError, or ? from a
+            # custom field that raises yet something else when handed
+            # impossible data.
             raise IncorrectLookupParameters(e)
 
         # Use select_related() if one of the list_display options is a field
