@@ -19,6 +19,7 @@ from django.utils.log import getLogger
 try:
     import psycopg2 as Database
     import psycopg2.extensions
+    import psycopg2.Error
 except ImportError, e:
     from django.core.exceptions import ImproperlyConfigured
     raise ImproperlyConfigured("Error loading psycopg2 module: %s" % e)
