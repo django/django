@@ -19,7 +19,6 @@ from django.utils.log import getLogger
 try:
     import psycopg2 as Database
     import psycopg2.extensions
-    import psycopg2.Error
 except ImportError, e:
     from django.core.exceptions import ImproperlyConfigured
     raise ImproperlyConfigured("Error loading psycopg2 module: %s" % e)
@@ -125,7 +124,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         try:
             self.connection.close()
             self.connection = None
-        except psycopg2.Error:
+        except Database.Error:
             # In some cases (database restart, network connection lost etc...)
             # the connection to the database is lost without giving Django a
             # notification. If we don't set self.connection to None, the error
