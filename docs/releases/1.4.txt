@@ -283,6 +283,10 @@ Django 1.4 also includes several smaller improvements worth noting:
   about :ref:`the 403 (HTTP Forbidden) view<http_forbidden_view>` for more
   information.
 
+* The :ttag:`trans` template tag now takes an optional ``as`` argument to
+  be able to retrieve a translation string without displaying it but setting
+  a template context variable instead.
+
 .. _backwards-incompatible-changes-1.4:
 
 Backwards incompatible changes in 1.4

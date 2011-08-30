@@ -451,6 +451,32 @@ It's not possible to mix a template variable inside a string within ``{% trans
 %}``. If your translations require strings with variables (placeholders), use
 ``{% blocktrans %}`` instead.
 
+.. versionchanged:: 1.4
+
+If you'd like to retrieve a translated string without displaying it, you can
+use the following syntax::
+
+    {% trans "This is the title" as the_title %}
+
+    <title>{{ the_title }}</title>
+    <meta name="description" content="{{ the_title }}">
+
+In practice you'll use this to get strings that are used in multiple places
+or should be used as arguments for other template tags or filters::
+
+    {% trans "starting point" as start %}
+    {% trans "end point" as end %}
+    {% trans "La Grande Boucle" as race %}
+
+    <h1>
+      <a href="/" title="{% blocktrans %}Back to '{{ race }}' homepage{% endblocktrans %}">{{ race }}</a>
+    </h1>
+    <p>
+    {% for stage in tour_stages %}
+        {% cycle start end %}: {{ stage }}{% if forloop.counter|divisibleby:2 %}<br />{% else %}, {% endif %}
+    {% endfor %}
+    </p>
+
 .. templatetag:: blocktrans
 
 ``blocktrans`` template tag
