@@ -57,9 +57,26 @@ HTML5
 
 We've switched the admin and other bundled templates to use the HTML5
 doctype. While Django will be careful in its use of HTML5 features, to maintain
-compatibility with old browsers, this change means that you can use any HTML5
+compatibility with older browsers, this change means that you can use any HTML5
 features you need in admin pages without having to lose HTML validity or
 override the provided templates to change the doctype.
+
+Supported browsers for the admin
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django hasn't had a clear policy on which browsers are supported for using the
+admin app. Django's new policy formalizes existing practices: `YUI's A-grade`_
+browsers should provide a fully-functional admin experience, with the notable
+exception of IE6, which is no longer supported.
+
+Released over ten years ago, IE6 imposes many limitations on modern web
+development. The practical implications of this policy are that contributors
+are free to improve the admin without consideration for these limitations.
+
+This new policy **has no impact** on development outside of the admin. Users of
+Django are free to develop webapps compatible with any range of browsers.
+
+.. _YUI's A-grade: http://yuilibrary.com/yui/docs/tutorials/gbs/
 
 List filters in admin interface
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
