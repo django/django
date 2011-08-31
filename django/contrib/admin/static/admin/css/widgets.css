@@ -17,6 +17,10 @@
     margin-bottom: 5px;
 }
 
+.selector-chosen select {
+    border-top: none;
+}
+
 .selector-available h2, .selector-chosen h2 {
     border: 1px solid #ccc;
 }
@@ -37,8 +41,9 @@
     text-align: left;
 }
 
-.selector .selector-chosen .selector-filter {
-    padding: 4px 5px;
+.selector .selector-filter label {
+    width: 16px;
+    padding: 2px;
 }
 
 .selector .selector-available input {
@@ -50,7 +55,7 @@
     width: 22px;
     height: 50px;
     background: url(../img/chooser-bg.gif) top center no-repeat;
-    margin: 8em 3px 0 3px;
+    margin: 10em 5px 0 5px;
     padding: 0;
 }
 
@@ -61,7 +66,7 @@
 }
 
 .selector select {
-    margin-bottom: 5px;
+    margin-bottom: 10px;
     margin-top: 0;
 }
 
@@ -74,38 +79,66 @@
 }
 
 .selector-add {
-    background: url(../img/selector-add.gif) top center no-repeat;
+    background: url(../img/selector-icons.gif) 0 -161px no-repeat;
+    cursor: default;
     margin-bottom: 2px;
 }
 
+.active.selector-add {
+    background: url(../img/selector-icons.gif) 0 -187px no-repeat;
+    cursor: pointer;
+}
+
 .selector-remove {
-    background: url(../img/selector-remove.gif) top center no-repeat;
+    background: url(../img/selector-icons.gif) 0 -109px no-repeat;
+    cursor: default;
+}
+
+.active.selector-remove {
+    background: url(../img/selector-icons.gif) 0 -135px no-repeat;
+    cursor: pointer;
 }
 
 a.selector-chooseall, a.selector-clearall {
-    display: block;
-    width: 6em;
+    display: inline-block;
     text-align: left;
     margin-left: auto;
     margin-right: auto;
     font-weight: bold;
     color: #666;
+}
+
+a.selector-chooseall {
+    padding: 3px 18px 3px 0;
+}
+
+a.selector-clearall {
     padding: 3px 0 3px 18px;
 }
 
-a.selector-chooseall:hover, a.selector-clearall:hover {
+a.active.selector-chooseall:hover, a.active.selector-clearall:hover {
     color: #036;
 }
 
 a.selector-chooseall {
-    width: 7em;
-    background: url(../img/selector-addall.gif) left center no-repeat;
+    background: url(../img/selector-icons.gif) right -263px no-repeat;
+    cursor: default;
+}
+
+a.active.selector-chooseall {
+    background: url(../img/selector-icons.gif) right -289px no-repeat;
+    cursor: pointer;
 }
 
 a.selector-clearall {
-    background: url(../img/selector-removeall.gif) left center no-repeat;
+    background: url(../img/selector-icons.gif) left -211px no-repeat;
+    cursor: default;
 }
 
+a.active.selector-clearall {
+    background: url(../img/selector-icons.gif) left -237px no-repeat;
+    cursor: pointer;
+}
 
 /* STACKED SELECTORS */
 
@@ -148,13 +181,24 @@ a.selector-clearall {
 }
 
 .stacked .selector-add {
-    background-image: url(../img/selector_stacked-add.gif);
+    background: url(../img/selector-icons.gif) 0 -57px no-repeat;
+    cursor: default;
+}
+
+.stacked .active.selector-add {
+    background: url(../img/selector-icons.gif) 0 -83px no-repeat;
+    cursor: pointer;
 }
 
 .stacked .selector-remove {
-    background-image: url(../img/selector_stacked-remove.gif);
+    background: url(../img/selector-icons.gif) 0 -5px no-repeat;
+    cursor: default;
 }
 
+.stacked .active.selector-remove {
+    background: url(../img/selector-icons.gif) 0 -31px no-repeat;
+    cursor: pointer;
+}
 
 /* DATE AND TIME */
 

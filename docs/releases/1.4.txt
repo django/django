@@ -328,6 +328,18 @@ In case your ``ADMIN_MEDIA_PREFIX`` is set to an own domain (e.g.
     that path. The files were moved from :file:`django/contrib/admin/media/`
     to :file:`django/contrib/admin/static/admin/`.
 
+Removed admin icons
+~~~~~~~~~~~~~~~~~~~
+
+As part of an effort to improve the performance and usability of the admin's
+vertical and horizontal "filter" widgets, some icon files were removed and
+grouped into a single sprite file (``selector-icons.gif``):
+``selector-add.gif``, ``selector-addall.gif``, ``selector-remove.gif``,
+``selector-removeall.gif``, ``selector_stacked-add.gif`` and
+``selector_stacked-remove.gif``. If you used those icons to customize the
+admin then you will want to replace them with your own icons or retrieve them
+from a previous release.
+
 Compatibility with old signed data
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
