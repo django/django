@@ -604,9 +604,9 @@ This is an Oracle-specific setting.
 The username to use when connecting to the Oracle database that will be used
 when running tests. If not provided, Django will use ``'test_' + USER``.
 
-.. setting:: TEST_CREATE_USER
+.. setting:: TEST_USER_CREATE
 
-TEST_CREATE_USER
+TEST_USER_CREATE
 ~~~~~~~~~~~~~~~~
 
 Default: ``True``
