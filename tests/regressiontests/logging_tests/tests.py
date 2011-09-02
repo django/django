@@ -4,7 +4,10 @@ import copy
 
 from django.conf import compat_patch_logging_config
 from django.test import TestCase
-from django.utils.log import CallbackFilter
+from django.test.utils import override_settings
+from django.utils.log import CallbackFilter, getLogger
+from django.core import mail
+
 
 
 # logging config prior to using filter with mail_admins
@@ -115,3 +118,43 @@ class CallbackFilterTest(TestCase):
         f.filter("a record")
 
         self.assertEqual(collector, ["a record"])
+
+
+class AdminEmailHandlerTest(TestCase):
+
+    @override_settings(
+            ADMINS=(('whatever admin', 'admin@example.com'),),
+            EMAIL_SUBJECT_PREFIX='-SuperAwesomeSubject-'
+        )
+    def test_accepts_args(self):
+        """
+        Ensure that user-supplied arguments and the EMAIL_SUBJECT_PREFIX
+        setting are used to compose the email subject.
+        Refs #16736.
+        """
+
+        message = "Custom message that says '%s' and '%s'"
+        token1 = 'ping'
+        token2 = 'pong'
+
+        logger = getLogger('django.request')
+        # Inspired from regressiontests/views/views.py: send_log()
+        # ensuring the AdminEmailHandler does not get filtered out
+        # even with DEBUG=True.
+        admin_email_handler = [
+            h for h in logger.handlers
+            if h.__class__.__name__ == "AdminEmailHandler"
+            ][0]
+        # Backup then override original filters
+        orig_filters = admin_email_handler.filters
+        admin_email_handler.filters = []
+
+        logger.error(message, token1, token2)
+
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].to, ['admin@example.com'])
+        self.assertEqual(mail.outbox[0].subject,
+                         "-SuperAwesomeSubject-ERROR: Custom message that says 'ping' and 'pong'")
+
+        # Restore original filters
+        admin_email_handler.filters = orig_filters
