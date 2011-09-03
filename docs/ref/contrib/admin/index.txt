@@ -1748,7 +1748,7 @@ creating your own ``AdminSite`` instance (see below), and changing the
 ``AdminSite`` objects
 =====================
 
-.. class:: AdminSite(name=None)
+.. class:: AdminSite(name='admin')
 
     A Django administrative site is represented by an instance of
     ``django.contrib.admin.sites.AdminSite``; by default, an instance of

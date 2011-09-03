@@ -529,7 +529,7 @@ operators, from lowest to highest, is as follows:
  * ``and``
  * ``not``
  * ``in``
- * ``==``, ``!=``, ``<``, ``>``,``<=``, ``>=``
+ * ``==``, ``!=``, ``<``, ``>``, ``<=``, ``>=``
 
 (This follows Python exactly). So, for example, the following complex if tag:
 
