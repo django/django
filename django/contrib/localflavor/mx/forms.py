@@ -143,7 +143,7 @@ class MXRFCField(RegexField):
             www.sisi.org.mx/jspsi/documentos/2005/seguimiento/06101/0610100162005_065.doc
         """
         chars = u'0123456789ABCDEFGHIJKLMN&OPQRSTUVWXYZ-Ñ'
-        if len(rfc) is 11:
+        if len(rfc) == 11:
             rfc = '-' + rfc
 
         sum_ = sum(i * chars.index(c) for i, c in zip(reversed(xrange(14)), rfc))
