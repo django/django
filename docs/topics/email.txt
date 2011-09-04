@@ -5,15 +5,13 @@ Sending email
 .. module:: django.core.mail
    :synopsis: Helpers to easily send email.
 
-Although Python makes sending email relatively easy via the `smtplib
-library`_, Django provides a couple of light wrappers over it. These wrappers
-are provided to make sending email extra quick, to make it easy to test
-email sending during development, and to provide support for platforms that
-can't use SMTP.
+Although Python makes sending email relatively easy via the :mod:`smtplib`
+module, Django provides a couple of light wrappers over it. These wrappers are
+provided to make sending email extra quick, to make it easy to test email
+sending during development, and to provide support for platforms that can't use
+SMTP.
 
 The code lives in the ``django.core.mail`` module.
-
-.. _smtplib library: http://docs.python.org/library/smtplib.html
 
 Quick example
 =============
@@ -54,8 +52,9 @@ are required.
       member of ``recipient_list`` will see the other recipients in the "To:"
       field of the email message.
     * ``fail_silently``: A boolean. If it's ``False``, ``send_mail`` will raise
-      an ``smtplib.SMTPException``. See the `smtplib docs`_ for a list of
-      possible exceptions, all of which are subclasses of ``SMTPException``.
+      an :exc:`smtplib.SMTPException`. See the :mod:`smtplib` docs for a list of
+      possible exceptions, all of which are subclasses of
+      :exc:`~smtplib.SMTPException`.
     * ``auth_user``: The optional username to use to authenticate to the SMTP
       server. If this isn't provided, Django will use the value of the
       :setting:`EMAIL_HOST_USER` setting.
@@ -66,8 +65,6 @@ are required.
       If unspecified, an instance of the default backend will be used.
       See the documentation on :ref:`Email backends <topic-email-backends>`
       for more details.
-
-.. _smtplib docs: http://docs.python.org/library/smtplib.html
 
 send_mass_mail()
 ================
@@ -125,8 +122,9 @@ This method exists for convenience and readability.
 .. versionchanged:: 1.3
 
 If ``html_message`` is provided, the resulting email will be a
-multipart/alternative email with ``message`` as the "text/plain"
-content type and ``html_message`` as the "text/html" content type.
+:mimetype:`multipart/alternative` email with ``message`` as the
+:mimetype:`text/plain` content type and ``html_message`` as the
+:mimetype:`text/html` content type.
 
 mail_managers()
 ===============
@@ -608,9 +606,7 @@ the email body. You then only need to set the :setting:`EMAIL_HOST` and
 :setting:`EMAIL_PORT` accordingly, and you are set.
 
 For a more detailed discussion of testing and processing of emails locally,
-see the Python documentation on the `SMTP Server`_.
-
-.. _SMTP Server: http://docs.python.org/library/smtpd.html
+see the Python documentation for the :mod:`smtpd` module.
 
 SMTPConnection
 ==============

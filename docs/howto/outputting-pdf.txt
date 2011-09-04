@@ -63,10 +63,11 @@ Here's a "Hello World" example::
 The code and comments should be self-explanatory, but a few things deserve a
 mention:
 
-    * The response gets a special MIME type, ``application/pdf``. This tells
-      browsers that the document is a PDF file, rather than an HTML file. If
-      you leave this off, browsers will probably interpret the output as HTML,
-      which would result in ugly, scary gobbledygook in the browser window.
+    * The response gets a special MIME type, :mimetype:`application/pdf`. This
+      tells browsers that the document is a PDF file, rather than an HTML file.
+      If you leave this off, browsers will probably interpret the output as
+      HTML, which would result in ugly, scary gobbledygook in the browser
+      window.
 
     * The response gets an additional ``Content-Disposition`` header, which
       contains the name of the PDF file. This filename is arbitrary: Call it
@@ -97,9 +98,9 @@ Complex PDFs
 ============
 
 If you're creating a complex PDF document with ReportLab, consider using the
-cStringIO_ library as a temporary holding place for your PDF file. The cStringIO
+:mod:`cStringIO` library as a temporary holding place for your PDF file. This
 library provides a file-like object interface that is particularly efficient.
-Here's the above "Hello World" example rewritten to use ``cStringIO``::
+Here's the above "Hello World" example rewritten to use :mod:`cStringIO`::
 
     # Fall back to StringIO in environments where cStringIO is not available
     try:
@@ -132,8 +133,6 @@ Here's the above "Hello World" example rewritten to use ``cStringIO``::
         buffer.close()
         response.write(pdf)
         return response
-
-.. _cStringIO: http://docs.python.org/library/stringio.html#module-cStringIO
 
 Further resources
 =================

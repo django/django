@@ -10,7 +10,7 @@ Python style
     * Unless otherwise specified, follow :pep:`8`.
 
       You could use a tool like `pep8`_ to check for some problems in this
-      area, but remember that PEP 8 is only a guide, so respect the style of
+      area, but remember that :pep:`8` is only a guide, so respect the style of
       the surrounding code as a primary goal.
 
     * Use four spaces for indentation.

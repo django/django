@@ -36,7 +36,7 @@ two test frameworks that ship in the Python standard library. The two
 frameworks are:
 
     * **Unit tests** -- tests that are expressed as methods on a Python class
-      that subclasses ``unittest.TestCase`` or Django's customized
+      that subclasses :class:`unittest.TestCase` or Django's customized
       :class:`TestCase`. For example::
 
           import unittest
@@ -68,7 +68,7 @@ test framework, as we'll explain in a bit.
 Writing unit tests
 ------------------
 
-Django's unit tests use a Python standard library module: unittest_. This
+Django's unit tests use a Python standard library module: :mod:`unittest`. This
 module defines tests in class-based approach.
 
 .. admonition:: unittest2
@@ -82,7 +82,7 @@ module defines tests in class-based approach.
     backported for Python 2.5 compatibility.
 
     To access this library, Django provides the
-    ``django.utils.unittest`` module alias. If you are using Python
+    :mod:`django.utils.unittest` module alias. If you are using Python
     2.7, or you have installed unittest2 locally, Django will map the
     alias to the installed version of the unittest library. Otherwise,
     Django will use it's own bundled version of unittest2.
@@ -104,13 +104,13 @@ For a given Django application, the test runner looks for unit tests in two
 places:
 
     * The ``models.py`` file. The test runner looks for any subclass of
-      ``unittest.TestCase`` in this module.
+      :class:`unittest.TestCase` in this module.
 
     * A file called ``tests.py`` in the application directory -- i.e., the
       directory that holds ``models.py``. Again, the test runner looks for any
-      subclass of ``unittest.TestCase`` in this module.
+      subclass of :class:`unittest.TestCase` in this module.
 
-Here is an example ``unittest.TestCase`` subclass::
+Here is an example :class:`unittest.TestCase` subclass::
 
     from django.utils import unittest
     from myapp.models import Animal
@@ -124,10 +124,10 @@ Here is an example ``unittest.TestCase`` subclass::
             self.assertEqual(self.lion.speak(), 'The lion says "roar"')
             self.assertEqual(self.cat.speak(), 'The cat says "meow"')
 
-When you :ref:`run your tests <running-tests>`, the default behavior of the
-test utility is to find all the test cases (that is, subclasses of
-``unittest.TestCase``) in ``models.py`` and ``tests.py``, automatically build a
-test suite out of those test cases, and run that suite.
+When you :ref:`run your tests <running-tests>`, the default behavior of the test
+utility is to find all the test cases (that is, subclasses of
+:class:`unittest.TestCase`) in ``models.py`` and ``tests.py``, automatically
+build a test suite out of those test cases, and run that suite.
 
 There is a second way to define the test suite for a module: if you define a
 function called ``suite()`` in either ``models.py`` or ``tests.py``, the
@@ -136,20 +136,17 @@ module. This follows the `suggested organization`_ for unit tests. See the
 Python documentation for more details on how to construct a complex test
 suite.
 
-For more details about ``unittest``, see the `standard library unittest
-documentation`_.
+For more details about :mod:`unittest`, see the Python documentation.
 
-.. _unittest: http://docs.python.org/library/unittest.html
-.. _standard library unittest documentation: unittest_
 .. _suggested organization: http://docs.python.org/library/unittest.html#organizing-tests
 
 Writing doctests
 ----------------
 
-Doctests use Python's standard doctest_ module, which searches your docstrings
-for statements that resemble a session of the Python interactive interpreter.
-A full explanation of how doctest works is out of the scope of this document;
-read Python's official documentation for the details.
+Doctests use Python's standard :mod:`doctest` module, which searches your
+docstrings for statements that resemble a session of the Python interactive
+interpreter. A full explanation of how :mod:`doctest` works is out of the scope
+of this document; read Python's official documentation for the details.
 
 .. admonition:: What's a **docstring**?
 
@@ -221,12 +218,7 @@ database or loading a fixture. (See the section on fixtures, below, for more
 on this.) Note that to use this feature, the database user Django is connecting
 as must have ``CREATE DATABASE`` rights.
 
-For more details about how doctest works, see the `standard library
-documentation for doctest`_.
-
-.. _doctest: http://docs.python.org/library/doctest.html
-.. _standard library documentation for doctest: doctest_
-
+For more details about :mod:`doctest`, see the Python documentation.
 
 Which should I use?
 -------------------
@@ -239,7 +231,7 @@ For developers new to testing, however, this choice can seem confusing. Here,
 then, are a few key differences to help you decide which approach is right for
 you:
 
-    * If you've been using Python for a while, ``doctest`` will probably feel
+    * If you've been using Python for a while, :mod:`doctest` will probably feel
       more "pythonic". It's designed to make writing tests as easy as possible,
       so it requires no overhead of writing classes or methods. You simply put
       tests in docstrings. This has the added advantage of serving as
@@ -250,19 +242,19 @@ you:
       as it can be unclear exactly why the test failed. Thus, doctests should
       generally be avoided and used primarily for documentation examples only.
 
-    * The ``unittest`` framework will probably feel very familiar to developers
-      coming from Java. ``unittest`` is inspired by Java's JUnit, so you'll
-      feel at home with this method if you've used JUnit or any test framework
-      inspired by JUnit.
+    * The :mod:`unittest` framework will probably feel very familiar to
+      developers coming from Java. :mod:`unittest` is inspired by Java's JUnit,
+      so you'll feel at home with this method if you've used JUnit or any test
+      framework inspired by JUnit.
 
     * If you need to write a bunch of tests that share similar code, then
-      you'll appreciate the ``unittest`` framework's organization around
+      you'll appreciate the :mod:`unittest` framework's organization around
       classes and methods. This makes it easy to abstract common tasks into
       common methods. The framework also supports explicit setup and/or cleanup
       routines, which give you a high level of control over the environment
       in which your test cases are run.
 
-    * If you're writing tests for Django itself, you should use ``unittest``.
+    * If you're writing tests for Django itself, you should use :mod:`unittest`.
 
 .. _running-tests:
 
@@ -553,7 +545,7 @@ failed::
 
 A full explanation of this error output is beyond the scope of this document,
 but it's pretty intuitive. You can consult the documentation of Python's
-``unittest`` library for details.
+:mod:`unittest` library for details.
 
 Note that the return code for the test-runner script is 1 for any number of
 failed and erroneous tests. If all the tests pass, the return code is 0. This
@@ -639,7 +631,8 @@ Note a few important things about how the test client works:
 
       The test client is not capable of retrieving Web pages that are not
       powered by your Django project. If you need to retrieve other Web pages,
-      use a Python standard library module such as urllib_ or urllib2_.
+      use a Python standard library module such as :mod:`urllib` or
+      :mod:`urllib2`.
 
     * To resolve URLs, the test client uses whatever URLconf is pointed-to by
       your :setting:`ROOT_URLCONF` setting.
@@ -667,10 +660,6 @@ Note a few important things about how the test client works:
 
           >>> from django.test import Client
           >>> csrf_client = Client(enforce_csrf_checks=True)
-
-
-.. _urllib: http://docs.python.org/library/urllib.html
-.. _urllib2: http://docs.python.org/library/urllib2.html
 
 Making requests
 ~~~~~~~~~~~~~~~
@@ -759,15 +748,15 @@ arguments at time of construction:
 
             name=fred&passwd=secret
 
-        If you provide ``content_type`` (e.g., ``text/xml`` for an XML
+        If you provide ``content_type`` (e.g. :mimetype:`text/xml` for an XML
         payload), the contents of ``data`` will be sent as-is in the POST
         request, using ``content_type`` in the HTTP ``Content-Type`` header.
 
         If you don't provide a value for ``content_type``, the values in
         ``data`` will be transmitted with a content type of
-        ``multipart/form-data``. In this case, the key-value pairs in ``data``
-        will be encoded as a multipart message and used to create the POST data
-        payload.
+        :mimetype:`multipart/form-data`. In this case, the key-value pairs in
+        ``data`` will be encoded as a multipart message and used to create the
+        POST data payload.
 
         To submit multiple values for a given key -- for example, to specify
         the selections for a ``<select multiple>`` -- provide the values as a
@@ -955,8 +944,8 @@ Specifically, a ``Response`` object has the following attributes:
 
     .. attribute:: status_code
 
-        The HTTP status of the response, as an integer. See RFC2616_ for a full
-        list of HTTP status codes.
+        The HTTP status of the response, as an integer. See
+        :rfc:`2616#section-10` for a full list of HTTP status codes.
 
     .. versionadded:: 1.3
 
@@ -972,14 +961,12 @@ You can also use dictionary syntax on the response object to query the value
 of any settings in the HTTP headers. For example, you could determine the
 content type of a response using ``response['Content-Type']``.
 
-.. _RFC2616: http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
-
 Exceptions
 ~~~~~~~~~~
 
 If you point the test client at a view that raises an exception, that exception
-will be visible in the test case. You can then use a standard ``try...except``
-block or ``unittest.TestCase.assertRaises()`` to test for exceptions.
+will be visible in the test case. You can then use a standard ``try ... except``
+block or :meth:`~unittest.TestCase.assertRaises` to test for exceptions.
 
 The only exceptions that are not visible to the test client are ``Http404``,
 ``PermissionDenied`` and ``SystemExit``. Django catches these exceptions
@@ -1002,8 +989,9 @@ can access these properties as part of a test condition.
 
 .. attribute:: Client.cookies
 
-    A Python ``SimpleCookie`` object, containing the current values of all the
-    client cookies. See the `Cookie module documentation`_ for more.
+    A Python :class:`~Cookie.SimpleCookie` object, containing the current values
+    of all the client cookies. See the documentation of the :mod:`Cookie` module
+    for more.
 
 .. attribute:: Client.session
 
@@ -1018,8 +1006,6 @@ can access these properties as part of a test condition.
             session = self.client.session
             session['somekey'] = 'test'
             session.save()
-
-.. _Cookie module documentation: http://docs.python.org/library/cookie.html
 
 Example
 ~~~~~~~
@@ -1100,19 +1086,19 @@ TestCase
 
 .. currentmodule:: django.test
 
-Normal Python unit test classes extend a base class of ``unittest.TestCase``.
-Django provides a few extensions of this base class:
+Normal Python unit test classes extend a base class of
+:class:`unittest.TestCase`. Django provides a few extensions of this base class:
 
 .. class:: TestCase()
 
 This class provides some additional capabilities that can be useful for testing
 Web sites.
 
-Converting a normal ``unittest.TestCase`` to a Django ``TestCase`` is easy:
-just change the base class of your test from ``unittest.TestCase`` to
-``django.test.TestCase``. All of the standard Python unit test functionality
-will continue to be available, but it will be augmented with some useful
-additions, including:
+Converting a normal :class:`unittest.TestCase` to a Django :class:`TestCase` is
+easy: just change the base class of your test from :class:`unittest.TestCase` to
+:class:`django.test.TestCase`. All of the standard Python unit test
+functionality will continue to be available, but it will be augmented with some
+useful additions, including:
 
     * Automatic loading of fixtures.
 
@@ -1409,9 +1395,9 @@ Overriding settings
 
 .. versionadded:: 1.4
 
-For testing purposes it's often useful to change a setting temporarily
-and revert to the original value after running the testing code. For
-this use case Django provides a standard `Python context manager`_
+For testing purposes it's often useful to change a setting temporarily and
+revert to the original value after running the testing code. For this use case
+Django provides a standard Python context manager (see :pep:`343`)
 :meth:`~django.test.TestCase.settings`, which can be used like this::
 
     from django.test import TestCase
@@ -1437,8 +1423,9 @@ in the ``with`` block and reset its value to the previous state afterwards.
 .. function:: override_settings
 
 In case you want to override a setting for just one test method or even the
-whole TestCase class, Django provides the
-:func:`django.test.utils.override_settings` decorator_. It's used like this::
+whole :class:`TestCase` class, Django provides the
+:func:`~django.test.utils.override_settings` decorator (see :pep:`318`). It's
+used like this::
 
     from django.test import TestCase
     from django.test.utils import override_settings
@@ -1484,9 +1471,6 @@ decorate the class::
     :data:`django.test.signals.setting_changed` signal to connect cleanup
     and other state-resetting callbacks to.
 
-.. _`Python context manager`: http://www.python.org/dev/peps/pep-0343/
-.. _`decorator`: http://www.python.org/dev/peps/pep-0318/
-
 Emptying the test outbox
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1505,8 +1489,9 @@ Assertions
 .. versionchanged:: 1.2
     Addded ``msg_prefix`` argument.
 
-As Python's normal ``unittest.TestCase`` class implements assertion methods
-such as ``assertTrue`` and ``assertEqual``, Django's custom ``TestCase`` class
+As Python's normal :class:`unittest.TestCase` class implements assertion methods
+such as :meth:`~unittest.TestCase.assertTrue` and
+:meth:`~unittest.TestCase.assertEqual`, Django's custom :class:`TestCase` class
 provides a number of custom assertion methods that are useful for testing Web
 applications:
 
@@ -1521,8 +1506,8 @@ your test suite.
     Asserts that execution of callable ``callable_obj`` raised the
     ``expected_exception`` exception and that such exception has an
     ``expected_message`` representation. Any other outcome is reported as a
-    failure. Similar to unittest's ``assertRaisesRegexp`` with the difference
-    that ``expected_message`` isn't a regular expression.
+    failure. Similar to unittest's :meth:`~unittest.TestCase.assertRaisesRegexp`
+    with the difference that ``expected_message`` isn't a regular expression.
 
 .. method:: assertFieldOutput(self, fieldclass, valid, invalid, field_args=None, field_kwargs=None, empty_value=u'')
 
@@ -1706,14 +1691,15 @@ Skipping tests
 
 .. versionadded:: 1.3
 
-The unittest library provides the ``@skipIf`` and ``@skipUnless``
-decorators to allow you to skip tests if you know ahead of time that
-those tests are going to fail under certain conditions.
+The unittest library provides the :func:`@skipIf <unittest.skipIf>` and
+:func:`@skipUnless <unittest.skipUnless>` decorators to allow you to skip tests
+if you know ahead of time that those tests are going to fail under certain
+conditions.
 
-For example, if your test requires a particular optional library in
-order to succeed, you could decorate the test case with ``@skipIf``.
-Then, the test runner will report that the test wasn't executed and
-why, instead of failing the test or omitting the test altogether.
+For example, if your test requires a particular optional library in order to
+succeed, you could decorate the test case with :func:`@skipIf
+<unittest.skipIf>`. Then, the test runner will report that the test wasn't
+executed and why, instead of failing the test or omitting the test altogether.
 
 To supplement these test skipping behaviors, Django provides two
 additional skip decorators. Instead of testing a generic boolean,
@@ -1757,7 +1743,7 @@ under MySQL with MyISAM tables)::
 Using different testing frameworks
 ==================================
 
-Clearly, ``doctest`` and ``unittest`` are not the only Python testing
+Clearly, :mod:`doctest` and :mod:`unittest` are not the only Python testing
 frameworks. While Django doesn't provide explicit support for alternative
 frameworks, it does provide a way to invoke tests constructed for an
 alternative framework as if they were normal Django tests.

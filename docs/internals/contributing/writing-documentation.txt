@@ -43,12 +43,10 @@ __ http://pygments.org
 Then, building the HTML is easy; just ``make html`` (or ``make.bat html`` on
 Windows) from the ``docs`` directory.
 
-To get started contributing, you'll want to read the `reStructuredText
-Primer`__. After that, you'll want to read about the `Sphinx-specific markup`__
-that's used to manage metadata, indexing, and cross-references.
-
-__ http://sphinx.pocoo.org/rest.html
-__ http://sphinx.pocoo.org/markup/
+To get started contributing, you'll want to read the :ref:`reStructuredText
+Primer <sphinx:rst-primer>`. After that, you'll want to read about the
+:ref:`Sphinx-specific markup <sphinx:sphinxmarkup>` that's used to manage
+metadata, indexing, and cross-references.
 
 Commonly used terms
 -------------------
@@ -112,6 +110,9 @@ documentation:
       This is because Sphinx will generate proper links for the latter, which
       greatly helps readers. There's basically no limit to the amount of
       useful markup you can add.
+
+    * Use :mod:`~sphinx.ext.intersphinx` to reference Python's and Sphinx'
+      documentation.
 
 Django-specific markup
 ----------------------
@@ -220,12 +221,9 @@ example:
         You can find both in the :doc:`settings reference document
         </ref/settings>`.
 
-      We use the Sphinx doc_ cross reference element when we want to link to
-      another document as a whole and the ref_ element when we want to link to
-      an arbitrary location in a document.
-
-.. _doc: http://sphinx.pocoo.org/markup/inline.html#role-doc
-.. _ref: http://sphinx.pocoo.org/markup/inline.html#role-ref
+      We use the Sphinx :rst:role:`doc` cross reference element when we want to
+      link to another document as a whole and the :rst:role:`ref` element when
+      we want to link to an arbitrary location in a document.
 
     * Next, notice how the settings are annotated:
 

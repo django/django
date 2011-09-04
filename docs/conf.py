@@ -26,7 +26,7 @@ needs_sphinx = '1.0'
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ["djangodocs"]
+extensions = ["djangodocs", "sphinx.ext.intersphinx"]
 
 # Add any paths that contain templates here, relative to this directory.
 # templates_path = []
@@ -91,6 +91,16 @@ pygments_style = 'trac'
 # any document file within. These should be ignored.
 # Note: exclude_dirnames is new in Sphinx 0.5
 exclude_dirnames = ['.svn']
+
+# Links to Python's docs should reference the most recent version of the 2.x
+# branch, which is located at this URL.
+intersphinx_mapping = {
+    'python': ('http://docs.python.org/2.7', None),
+    'sphinx': ('http://sphinx.pocoo.org/', None),
+}
+
+# Python's docs don't change every week.
+intersphinx_cache_limit = 90 # days
 
 # -- Options for HTML output ---------------------------------------------------
 

@@ -196,9 +196,7 @@ Methods
     Returns the originating host of the request using information from the
     ``HTTP_X_FORWARDED_HOST`` and ``HTTP_HOST`` headers (in that order). If
     they don't provide a value, the method uses a combination of
-    ``SERVER_NAME`` and ``SERVER_PORT`` as detailed in `PEP 333`_.
-
-    .. _PEP 333: http://www.python.org/dev/peps/pep-0333/
+    ``SERVER_NAME`` and ``SERVER_PORT`` as detailed in :pep:`3333`.
 
     Example: ``"127.0.0.1:8000"``
 
@@ -645,7 +643,7 @@ Methods
     ``expires``, and the auto-calculation of ``max_age`` in such case
     was added. The ``httponly`` argument was also added.
 
-    Sets a cookie. The parameters are the same as in the `cookie Morsel`_
+    Sets a cookie. The parameters are the same as in the :class:`Cookie.Morsel`
     object in the Python standard library.
 
         * ``max_age`` should be a number of seconds, or ``None`` (default) if
@@ -664,13 +662,12 @@ Methods
           JavaScript from having access to the cookie.
 
           HTTPOnly_ is a flag included in a Set-Cookie HTTP response
-          header. It is not part of the RFC2109 standard for cookies,
+          header. It is not part of the :rfc:`2109` standard for cookies,
           and it isn't honored consistently by all browsers. However,
           when it is honored, it can be a useful way to mitigate the
           risk of client side script accessing the protected cookie
           data.
 
-    .. _`cookie Morsel`: http://docs.python.org/library/cookie.html#Cookie.Morsel
     .. _HTTPOnly: http://www.owasp.org/index.php/HTTPOnly
 
 .. method:: HttpResponse.set_signed_cookie(key, value='', salt='', max_age=None, expires=None, path='/', domain=None, secure=None, httponly=False)

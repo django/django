@@ -216,8 +216,8 @@ The test framework
 ------------------
 
 Django now includes a test framework so you can start transmuting fear into
-boredom (with apologies to Kent Beck). You can write tests based on doctest_
-or unittest_ and test your views with a simple test client.
+boredom (with apologies to Kent Beck). You can write tests based on
+:mod:`doctest` or :mod:`unittest` and test your views with a simple test client.
 
 There is also new support for "fixtures" -- initial data, stored in any of the
 supported `serialization formats`_, that will be loaded into your database at the
@@ -225,8 +225,6 @@ start of your tests. This makes testing with real data much easier.
 
 See `the testing documentation`_ for the full details.
 
-.. _doctest: http://docs.python.org/library/doctest.html
-.. _unittest: http://docs.python.org/library/unittest.html
 .. _the testing documentation: http://www.djangoproject.com/documentation/0.96/testing/
 .. _serialization formats: http://www.djangoproject.com/documentation/0.96/serialization/
 

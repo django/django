@@ -52,19 +52,17 @@ See :doc:`How to use Django with mod_wsgi </howto/deployment/modwsgi>`
 for information on how to configure mod_wsgi once you have it
 installed.
 
-If you can't use mod_wsgi for some reason, fear not: Django supports
-many other deployment options. One is :doc:`uWSGI </howto/deployment/fastcgi>`;
-it works very well with `nginx`_. Another is :doc:`FastCGI
-</howto/deployment/fastcgi>`, perfect for using Django with servers
-other than Apache. Additionally, Django follows the WSGI_ spec, which
-allows it to run on a variety of server platforms. See the
-`server-arrangements wiki page`_ for specific installation
-instructions for each platform.
+If you can't use mod_wsgi for some reason, fear not: Django supports many other
+deployment options. One is :doc:`uWSGI </howto/deployment/fastcgi>`; it works
+very well with `nginx`_. Another is :doc:`FastCGI </howto/deployment/fastcgi>`,
+perfect for using Django with servers other than Apache. Additionally, Django
+follows the WSGI spec (:pep:`3333`), which allows it to run on a variety of
+server platforms. See the `server-arrangements wiki page`_ for specific
+installation instructions for each platform.
 
 .. _Apache: http://httpd.apache.org/
 .. _nginx: http://nginx.net/
 .. _mod_wsgi: http://code.google.com/p/modwsgi/
-.. _WSGI: http://www.python.org/dev/peps/pep-0333/
 .. _server-arrangements wiki page: http://code.djangoproject.com/wiki/ServerArrangements
 
 .. _database-installation:

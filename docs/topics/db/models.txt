@@ -676,10 +676,7 @@ For example, this model has a few custom methods::
             return '%s %s' % (self.first_name, self.last_name)
         full_name = property(_get_full_name)
 
-The last method in this example is a :term:`property`. `Read more about
-properties`_.
-
-.. _Read more about properties: http://www.python.org/download/releases/2.2/descrintro/#property
+The last method in this example is a :term:`property`.
 
 The :doc:`model instance reference </ref/models/instances>` has a complete list
 of :ref:`methods automatically given to each model <model-instance-methods>`.

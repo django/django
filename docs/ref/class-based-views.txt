@@ -586,10 +586,8 @@ YearMixin
 
     .. attribute:: year_format
 
-        The strftime_ format to use when parsing the year. By default, this is
-        ``'%Y'``.
-
-    .. _strftime: http://docs.python.org/library/time.html#time.strftime
+        The :func:`~time.strftime` format to use when parsing the year.
+        By default, this is ``'%Y'``.
 
     .. attribute:: year
 
@@ -598,7 +596,7 @@ YearMixin
 
     .. method:: get_year_format()
 
-        Returns the strftime_ format to use when parsing the year. Returns
+        Returns the :func:`~time.strftime` format to use when parsing the year. Returns
         :attr:`YearMixin.year_format` by default.
 
     .. method:: get_year()
@@ -621,7 +619,7 @@ MonthMixin
 
     .. attribute:: month_format
 
-        The strftime_ format to use when parsing the month. By default, this is
+        The :func:`~time.strftime` format to use when parsing the month. By default, this is
         ``'%b'``.
 
     .. attribute:: month
@@ -631,7 +629,7 @@ MonthMixin
 
     .. method:: get_month_format()
 
-        Returns the strftime_ format to use when parsing the month. Returns
+        Returns the :func:`~time.strftime` format to use when parsing the month. Returns
         :attr:`MonthMixin.month_format` by default.
 
     .. method:: get_month()
@@ -667,7 +665,7 @@ DayMixin
 
     .. attribute:: day_format
 
-        The strftime_ format to use when parsing the day. By default, this is
+        The :func:`~time.strftime` format to use when parsing the day. By default, this is
         ``'%d'``.
 
     .. attribute:: day
@@ -677,7 +675,7 @@ DayMixin
 
     .. method:: get_day_format()
 
-        Returns the strftime_ format to use when parsing the day. Returns
+        Returns the :func:`~time.strftime` format to use when parsing the day. Returns
         :attr:`DayMixin.day_format` by default.
 
     .. method:: get_day()
@@ -712,7 +710,7 @@ WeekMixin
 
     .. attribute:: week_format
 
-        The strftime_ format to use when parsing the week. By default, this is
+        The :func:`~time.strftime` format to use when parsing the week. By default, this is
         ``'%U'``.
 
     .. attribute:: week
@@ -722,7 +720,7 @@ WeekMixin
 
     .. method:: get_week_format()
 
-        Returns the strftime_ format to use when parsing the week. Returns
+        Returns the :func:`~time.strftime` format to use when parsing the week. Returns
         :attr:`WeekMixin.week_format` by default.
 
     .. method:: get_week()

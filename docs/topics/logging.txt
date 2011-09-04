@@ -10,12 +10,10 @@ Logging
 A quick logging primer
 ======================
 
-Django uses Python's builtin logging module to perform system logging.
-The usage of the logging module is discussed in detail in `Python's
-own documentation`_. However, if you've never used Python's logging
-framework (or even if you have), here's a quick primer.
-
-.. _Python's own documentation: http://docs.python.org/library/logging.html
+Django uses Python's builtin :mod:`logging` module to perform system logging.
+The usage of this module is discussed in detail in Python's own documentation.
+However, if you've never used Python's logging framework (or even if you have),
+here's a quick primer.
 
 The cast of players
 -------------------

@@ -128,10 +128,8 @@ provided in :mod:`django.db`.
 .. exception:: IntegrityError
 
 The Django wrappers for database exceptions behave exactly the same as
-the underlying database exceptions. See `PEP 249 - Python Database API
-Specification v2.0`_ for further information.
-
-.. _`PEP 249 - Python Database API Specification v2.0`: http://www.python.org/dev/peps/pep-0249/
+the underlying database exceptions. See :pep:`249`, the Python Database API
+Specification v2.0, for further information.
 
 .. currentmodule:: django.db.transaction
 
@@ -147,8 +145,6 @@ Transaction Exceptions
 Python Exceptions
 =================
 
-Django raises built-in Python exceptions when appropriate as well. See
-the Python `documentation`_ for further information on the built-in
-exceptions.
-
-.. _`documentation`: http://docs.python.org/lib/module-exceptions.html
+Django raises built-in Python exceptions when appropriate as well. See the
+Python documentation for further information on the
+built-in :mod:`exceptions`.

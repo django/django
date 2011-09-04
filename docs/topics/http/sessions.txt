@@ -495,7 +495,7 @@ Whether to use HTTPOnly flag on the session cookie. If this is set to
 session cookie.
 
 HTTPOnly_ is a flag included in a Set-Cookie HTTP response header. It
-is not part of the RFC2109 standard for cookies, and it isn't honored
+is not part of the :rfc:`2109` standard for cookies, and it isn't honored
 consistently by all browsers. However, when it is honored, it can be a
 useful way to mitigate the risk of client side script accessing the
 protected cookie data.
@@ -553,14 +553,12 @@ Technical details
 =================
 
     * The session dictionary should accept any pickleable Python object. See
-      `the pickle module`_ for more information.
+      the :mod:`pickle` module for more information.
 
     * Session data is stored in a database table named ``django_session`` .
 
     * Django only sends a cookie if it needs to. If you don't set any session
       data, it won't send a session cookie.
-
-.. _`the pickle module`: http://docs.python.org/library/pickle.html
 
 Session IDs in URLs
 ===================

@@ -1010,8 +1010,8 @@ FILE_UPLOAD_PERMISSIONS
 Default: ``None``
 
 The numeric mode (i.e. ``0644``) to set newly uploaded files to. For
-more information about what these modes mean, see the `documentation for
-os.chmod`_
+more information about what these modes mean, see the documentation for
+:func:`os.chmod`.
 
 If this isn't given or is ``None``, you'll get operating-system
 dependent behavior. On most platforms, temporary files will have a mode
@@ -1027,8 +1027,6 @@ system's standard umask.
     way that modes must be specified. If you try to use ``644``, you'll
     get totally incorrect behavior.
 
-
-.. _documentation for os.chmod: http://docs.python.org/library/os.html#os.chmod
 
 .. setting:: FILE_UPLOAD_TEMP_DIR
 
@@ -1586,7 +1584,7 @@ Whether to use HTTPOnly flag on the session cookie. If this is set to
 session cookie.
 
 HTTPOnly_ is a flag included in a Set-Cookie HTTP response header. It
-is not part of the RFC2109 standard for cookies, and it isn't honored
+is not part of the :rfc:`2109` standard for cookies, and it isn't honored
 consistently by all browsers. However, when it is honored, it can be a
 useful way to mitigate the risk of client side script accessing the
 protected cookie data.

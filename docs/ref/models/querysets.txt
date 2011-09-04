@@ -81,7 +81,7 @@ You can evaluate a ``QuerySet`` in the following ways:
 Pickling QuerySets
 ------------------
 
-If you pickle_ a ``QuerySet``, this will force all the results to be loaded
+If you :mod:`pickle` a ``QuerySet``, this will force all the results to be loaded
 into memory prior to pickling. Pickling is usually used as a precursor to
 caching and when the cached queryset is reloaded, you want the results to
 already be present and ready for use (reading from the database can take some
@@ -111,8 +111,6 @@ described here.
 	version N, there is no guarantee that pickle will be readable with
 	Django version N+1. Pickles should not be used as part of a long-term
 	archival strategy.
-
-.. _pickle: http://docs.python.org/library/pickle.html
 
 .. _queryset-api:
 
@@ -1210,19 +1208,17 @@ iterator
 
 .. method:: iterator()
 
-Evaluates the ``QuerySet`` (by performing the query) and returns an `iterator`_
-over the results. A ``QuerySet`` typically caches its results internally so
-that repeated evaluations do not result in additional queries. In contrast,
-``iterator()`` will read results directly, without doing any caching at the
-``QuerySet`` level (internally, the default iterator calls ``iterator()`` and
-caches the return value). For a ``QuerySet`` which returns a large number of
+Evaluates the ``QuerySet`` (by performing the query) and returns an iterator
+(see :pep:`234`) over the results. A ``QuerySet`` typically caches its results
+internally so that repeated evaluations do not result in additional queries. In
+contrast, ``iterator()`` will read results directly, without doing any caching
+at the ``QuerySet`` level (internally, the default iterator calls ``iterator()``
+and caches the return value). For a ``QuerySet`` which returns a large number of
 objects that you only need to access once, this can results in better
 performance and a significant reduction in memory.
 
 Note that using ``iterator()`` on a ``QuerySet`` which has already been
 evaluated will force it to evaluate again, repeating the query.
-
-.. _iterator: http://www.python.org/dev/peps/pep-0234/
 
 latest
 ~~~~~~

@@ -21,9 +21,8 @@ managing the ``Vary`` header of responses. It includes functions to patch the
 header of response objects directly and decorators that change functions to do
 that header-patching themselves.
 
-For information on the ``Vary`` header, see `RFC 2616 section 14.44`_.
-
-.. _RFC 2616 section 14.44: http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.44
+For information on the ``Vary`` header, see :rfc:`2616#section-14.44` section
+14.44.
 
 Essentially, the ``Vary`` HTTP header defines which headers a cache should take
 into account when building its cache key. Requests with the same path but
@@ -179,11 +178,9 @@ results. Instead do::
     Convert an Internationalized Resource Identifier (IRI) portion to a URI
     portion that is suitable for inclusion in a URL.
 
-    This is the algorithm from section 3.1 of `RFC 3987`_.  However, since we
-    are assuming input is either UTF-8 or unicode already, we can simplify
-    things a little from the full method.
-
-    .. _RFC 3987: http://www.ietf.org/rfc/rfc3987.txt
+    This is the algorithm from section 3.1 of :rfc:`3987#section-3.1`. However,
+    since we are assuming input is either UTF-8 or unicode already, we can
+    simplify things a little from the full method.
 
     Returns an ASCII string containing the encoded result.
 
@@ -397,10 +394,8 @@ Atom1Feed
 
 .. function:: http_date(epoch_seconds=None)
 
-    Formats the time to match the RFC 1123 date format as specified by HTTP
-    `RFC 2616`_ section 3.3.1.
-
-    .. _RFC 2616: http://www.w3.org/Protocols/rfc2616/rfc2616.txt
+    Formats the time to match the :rfc:`1123` date format as specified by HTTP
+    :rfc:`2616#section-3.3.1` section 3.3.1.
 
     Accepts a floating point number expressed in seconds since the epoch in
     UTC--such as that outputted by ``time.time()``. If set to ``None``,

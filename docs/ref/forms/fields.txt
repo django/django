@@ -639,13 +639,11 @@ A field containing either an IPv4 or an IPv6 address.
     * Validates that the given value is a valid IP address.
     * Error message keys: ``required``, ``invalid``
 
-The IPv6 address normalization follows `RFC4291 section 2.2`_, including using
-the IPv4 format suggested in paragraph 3 of that section, like
+The IPv6 address normalization follows :rfc:`4291#section-2.2` section 2.2,
+including using the IPv4 format suggested in paragraph 3 of that section, like
 ``::ffff:192.0.2.0``. For example, ``2001:0::0:01`` would be normalized to
-``2001::1``, and ``::ffff:0a0a:0a0a`` to ``::ffff:10.10.10.10``. All
-characters are converted to lowercase.
-
-.. _RFC4291 section 2.2: http://tools.ietf.org/html/rfc4291#section-2.2
+``2001::1``, and ``::ffff:0a0a:0a0a`` to ``::ffff:10.10.10.10``. All characters
+are converted to lowercase.
 
 Takes two optional arguments:
 

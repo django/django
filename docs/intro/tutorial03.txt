@@ -122,14 +122,13 @@ the URLconf will look for ``myapp/``. In a request to
 ``http://www.example.com/myapp/?page=3``, the URLconf will look for ``myapp/``.
 
 If you need help with regular expressions, see `Wikipedia's entry`_ and the
-`Python documentation`_. Also, the O'Reilly book "Mastering Regular Expressions"
-by Jeffrey Friedl is fantastic.
+documentation of the :mod:`re` module. Also, the O'Reilly book "Mastering
+Regular Expressions" by Jeffrey Friedl is fantastic.
 
 Finally, a performance note: these regular expressions are compiled the first
 time the URLconf module is loaded. They're super fast.
 
 .. _Wikipedia's entry: http://en.wikipedia.org/wiki/Regular_expression
-.. _Python documentation: http://docs.python.org/library/re.html
 
 Write your first view
 =====================

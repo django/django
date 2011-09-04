@@ -1235,13 +1235,17 @@ may be executed from the SQL Shell as the ``postgres`` user::
     postgres# CREATE DATABASE geodjango OWNER geodjango TEMPLATE template_postgis ENCODING 'utf8';
 
 .. rubric:: Footnotes
-.. [#] The datum shifting files are needed for converting data to and from certain projections.
-       For example, the PROJ.4 string for the `Google projection (900913) <http://spatialreference.org/ref/epsg/900913/proj4>`_
-       requires the ``null`` grid file only included in the extra datum shifting files.
-       It is easier to install the shifting files now, then to have debug a problem caused by their absence later.
-.. [#] Specifically, GeoDjango provides support for the `OGR <http://gdal.org/ogr>`_ library, a component of GDAL.
+.. [#] The datum shifting files are needed for converting data to and from
+       certain projections.
+       For example, the PROJ.4 string for the `Google projection (900913)
+       <http://spatialreference.org/ref/epsg/900913/proj4>`_ requires the
+       ``null`` grid file only included in the extra datum shifting files.
+       It is easier to install the shifting files now, then to have debug a
+       problem caused by their absence later.
+.. [#] Specifically, GeoDjango provides support for the `OGR
+       <http://gdal.org/ogr>`_ library, a component of GDAL.
 .. [#] See `GDAL ticket #2382 <http://trac.osgeo.org/gdal/ticket/2382>`_.
-.. [#] GeoDjango uses the `find_library <http://docs.python.org/library/ctypes.html#finding-shared-libraries>`_
-       routine from ``ctypes.util`` to locate shared libraries.
+.. [#] GeoDjango uses the :func:`~ctypes.util.find_library` routine from
+       :mod:`ctypes.util` to locate shared libraries.
 .. [#] The ``psycopg2`` Windows installers are packaged and maintained by
        `Jason Erickson <http://www.stickpeople.com/projects/python/win-psycopg/>`_.

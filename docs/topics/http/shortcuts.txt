@@ -64,7 +64,7 @@ Example
 -------
 
 The following example renders the template ``myapp/index.html`` with the
-MIME type ``application/xhtml+xml``::
+MIME type :mimetype:`application/xhtml+xml`::
 
     from django.shortcuts import render
 
@@ -131,7 +131,7 @@ Example
 -------
 
 The following example renders the template ``myapp/index.html`` with the
-MIME type ``application/xhtml+xml``::
+MIME type :mimetype:`application/xhtml+xml`::
 
     from django.shortcuts import render_to_response
 

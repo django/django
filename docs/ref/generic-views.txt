@@ -346,11 +346,11 @@ date in the *future* are not displayed unless you set ``allow_future`` to
 
 **Optional arguments:**
 
-    * ``month_format``: A format string that regulates what format the
-      ``month`` parameter uses. This should be in the syntax accepted by
-      Python's ``time.strftime``. (See the `strftime docs`_.) It's set to
-      ``"%b"`` by default, which is a three-letter month abbreviation. To
-      change it to use numbers, use ``"%m"``.
+    * ``month_format``: A format string that regulates what format the ``month``
+      parameter uses. This should be in the syntax accepted by Python's
+      :func:`~time.strftime`. It's set to ``"%b"`` by default, which is a
+      three-letter month abbreviation. To change it to use numbers, use
+      ``"%m"``.
 
     * ``template_name``: The full name of a template to use in rendering the
       page. This lets you override the default template name (see below).
@@ -414,8 +414,6 @@ In addition to ``extra_context``, the template's context will be:
       variable's name depends on the ``template_object_name`` parameter, which
       is ``'object'`` by default. If ``template_object_name`` is ``'foo'``,
       this variable's name will be ``foo_list``.
-
-.. _strftime docs: http://docs.python.org/library/time.html#time.strftime
 
 ``django.views.generic.date_based.archive_week``
 ------------------------------------------------
@@ -516,11 +514,11 @@ you set ``allow_future`` to ``True``.
 
 **Optional arguments:**
 
-    * ``month_format``: A format string that regulates what format the
-      ``month`` parameter uses. This should be in the syntax accepted by
-      Python's ``time.strftime``. (See the `strftime docs`_.) It's set to
-      ``"%b"`` by default, which is a three-letter month abbreviation. To
-      change it to use numbers, use ``"%m"``.
+    * ``month_format``: A format string that regulates what format the ``month``
+      parameter uses. This should be in the syntax accepted by Python's
+      :func:`~time.strftime`. It's set to ``"%b"`` by default, which is a
+      three-letter month abbreviation. To change it to use numbers, use
+      ``"%m"``.
 
     * ``day_format``: Like ``month_format``, but for the ``day`` parameter.
       It defaults to ``"%d"`` (day of the month as a decimal number, 01-31).
@@ -624,11 +622,11 @@ future, the view will throw a 404 error by default, unless you set
 
 **Optional arguments:**
 
-    * ``month_format``: A format string that regulates what format the
-      ``month`` parameter uses. This should be in the syntax accepted by
-      Python's ``time.strftime``. (See the `strftime docs`_.) It's set to
-      ``"%b"`` by default, which is a three-letter month abbreviation. To
-      change it to use numbers, use ``"%m"``.
+    * ``month_format``: A format string that regulates what format the ``month``
+      parameter uses. This should be in the syntax accepted by Python's
+      :func:`~time.strftime`. It's set to ``"%b"`` by default, which is a
+      three-letter month abbreviation. To change it to use numbers, use
+      ``"%m"``.
 
     * ``day_format``: Like ``month_format``, but for the ``day`` parameter.
       It defaults to ``"%d"`` (day of the month as a decimal number, 01-31).

@@ -764,10 +764,8 @@ over the next few release cycles.
 
 Code taking advantage of any of the features below will raise a
 ``PendingDeprecationWarning`` in Django 1.2. This warning will be
-silent by default, but may be turned on using Python's `warnings
-module`_, or by running Python with a ``-Wd`` or `-Wall` flag.
-
-.. _warnings module: http://docs.python.org/library/warnings.html
+silent by default, but may be turned on using Python's :mod:`warnings`
+module, or by running Python with a ``-Wd`` or `-Wall` flag.
 
 In Django 1.3, these warnings will become a ``DeprecationWarning``,
 which is *not* silent. In Django 1.4 support for these features will

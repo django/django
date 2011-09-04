@@ -3,17 +3,15 @@ Outputting CSV with Django
 ==========================
 
 This document explains how to output CSV (Comma Separated Values) dynamically
-using Django views. To do this, you can either use the `Python CSV library`_ or
-the Django template system.
-
-.. _Python CSV library: http://docs.python.org/library/csv.html
+using Django views. To do this, you can either use the Python CSV library or the
+Django template system.
 
 Using the Python CSV library
 ============================
 
-Python comes with a CSV library, ``csv``. The key to using it with Django is
-that the ``csv`` module's CSV-creation capability acts on file-like objects, and
-Django's :class:`~django.http.HttpResponse` objects are file-like objects.
+Python comes with a CSV library, :mod:`csv`. The key to using it with Django is
+that the :mod:`csv` module's CSV-creation capability acts on file-like objects,
+and Django's :class:`~django.http.HttpResponse` objects are file-like objects.
 
 Here's an example::
 
@@ -34,7 +32,7 @@ Here's an example::
 The code and comments should be self-explanatory, but a few things deserve a
 mention:
 
-    * The response gets a special MIME type, ``text/csv``. This tells
+    * The response gets a special MIME type, :mimetype:`text/csv`. This tells
       browsers that the document is a CSV file, rather than an HTML file. If
       you leave this off, browsers will probably interpret the output as HTML,
       which will result in ugly, scary gobbledygook in the browser window.
@@ -59,7 +57,7 @@ mention:
 Handling Unicode
 ~~~~~~~~~~~~~~~~
 
-Python's ``csv`` module does not support Unicode input. Since Django uses
+Python's :mod:`csv` module does not support Unicode input. Since Django uses
 Unicode internally this means strings read from sources such as
 :class:`~django.http.HttpRequest` are potentially problematic. There are a few
 options for handling this:
@@ -70,20 +68,18 @@ options for handling this:
       section`_.
 
     * Use the `python-unicodecsv module`_, which aims to be a drop-in
-      replacement for ``csv`` that gracefully handles Unicode.
+      replacement for :mod:`csv` that gracefully handles Unicode.
 
-For more information, see the Python `CSV File Reading and Writing`_
-documentation.
+For more information, see the Python documentation of the :mod:`csv` module.
 
 .. _`csv module's examples section`: http://docs.python.org/library/csv.html#examples
 .. _`python-unicodecsv module`: https://github.com/jdunck/python-unicodecsv
-.. _`CSV File Reading and Writing`: http://docs.python.org/library/csv.html
 
 Using the template system
 =========================
 
 Alternatively, you can use the :doc:`Django template system </topics/templates>`
-to generate CSV. This is lower-level than using the convenient Python ``csv``
+to generate CSV. This is lower-level than using the convenient Python :mod:`csv`
 module, but the solution is presented here for completeness.
 
 The idea here is to pass a list of items to your template, and have the

@@ -73,13 +73,11 @@ as possible.
 Explicit is better than implicit
 --------------------------------
 
-This, a `core Python principle`_, means Django shouldn't do too much "magic."
-Magic shouldn't happen unless there's a really good reason for it. Magic is
-worth using only if it creates a huge convenience unattainable in other ways,
-and it isn't implemented in a way that confuses developers who are trying to
-learn how to use the feature.
-
-.. _`core Python principle`: http://www.python.org/dev/peps/pep-0020/
+This is a core Python principle listed in :pep:`20`, and it means Django
+shouldn't do too much "magic." Magic shouldn't happen unless there's a really
+good reason for it. Magic is worth using only if it creates a huge convenience
+unattainable in other ways, and it isn't implemented in a way that confuses
+developers who are trying to learn how to use the feature.
 
 .. _consistency:
 

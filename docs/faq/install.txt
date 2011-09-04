@@ -22,10 +22,10 @@ usage.
 
 For a development environment -- if you just want to experiment with Django --
 you don't need to have a separate Web server installed; Django comes with its
-own lightweight development server. For a production environment, Django
-follows the WSGI_ spec, which means it can run on a variety of server
-platforms.  See :doc:`Deploying Django </howto/deployment/index>` for some
-popular alternatives.  Also, the `server arrangements wiki page`_ contains
+own lightweight development server. For a production environment, Django follows
+the WSGI spec, :pep:`3333`, which means it can run on a variety of server
+platforms. See :doc:`Deploying Django </howto/deployment/index>` for some
+popular alternatives. Also, the `server arrangements wiki page`_ contains
 details for several deployment strategies.
 
 If you want to use Django with a database, which is probably the case, you'll
@@ -33,7 +33,6 @@ also need a database engine. PostgreSQL_ is recommended, because we're
 PostgreSQL fans, and MySQL_, `SQLite 3`_, and Oracle_ are also supported.
 
 .. _Python: http://www.python.org/
-.. _WSGI: http://www.python.org/dev/peps/pep-0333/
 .. _server arrangements wiki page: http://code.djangoproject.com/wiki/ServerArrangements
 .. _PostgreSQL: http://www.postgresql.org/
 .. _MySQL: http://www.mysql.com/
@@ -48,7 +47,7 @@ version of Python from 2.5 through 2.7, inclusive. However, newer versions of
 Python are often faster, have more features, and are better supported. If you
 use a newer version of Python you will also have access to some APIs that
 aren't available under older versions of Python. For example, since Python 2.6,
-you can use the advanced string formatting described in `PEP 3101`_.
+you can use the advanced string formatting described in :pep:`3101`.
 
 Third-party applications for use with Django are, of course, free to set their
 own version requirements.
@@ -62,8 +61,6 @@ All else being equal, we recommend that you use the latest 2.x release
 improvements and optimizations to the Python language since version 2.5, and
 will help ease the process of dropping support for older Python versions on
 the road to Python 3.
-
-.. _PEP 3101: http://www.python.org/dev/peps/pep-3101/
 
 Can I use Django with Python 2.4?
 ---------------------------------

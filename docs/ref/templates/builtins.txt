@@ -1254,7 +1254,8 @@ Available format strings:
     c                 ISO 8601 format. (Note: unlike others     ``2008-01-02T10:30:00.000123+02:00``,
                       formatters, such as "Z", "O" or "r",      or ``2008-01-02T10:30:00.000123`` if the datetime is naive
                       the "c" formatter will not add timezone
-                      offset if value is a `naive datetime`_.)
+                      offset if value is a naive datetime
+                      (see :class:`datetime.tzinfo`).
     d                 Day of the month, 2 digits with           ``'01'`` to ``'31'``
                       leading zeros.
     D                 Day of the week, textual, 3 letters.      ``'Fri'``
@@ -1288,7 +1289,7 @@ Available format strings:
                       if they're zero and the special-case
                       strings 'midnight' and 'noon' if
                       appropriate. Proprietary extension.
-    r                 RFC 2822 formatted date.                  ``'Thu, 21 Dec 2000 16:01:07 +0200'``
+    r                 :rfc:`2822` formatted date.               ``'Thu, 21 Dec 2000 16:01:07 +0200'``
     s                 Seconds, 2 digits with leading zeros.     ``'00'`` to ``'59'``
     S                 English ordinal suffix for day of the     ``'st'``, ``'nd'``, ``'rd'`` or ``'th'``
                       month, 2 characters.
@@ -1345,8 +1346,6 @@ used, without applying any localization.
 
 .. versionchanged:: 1.2
     Predefined formats can now be influenced by the current locale.
-
-.. _naive datetime: http://docs.python.org/library/datetime.html#datetime.tzinfo
 
 .. templatefilter:: default
 
@@ -1815,9 +1814,7 @@ Example::
 pprint
 ^^^^^^
 
-A wrapper around `pprint.pprint`__ -- for debugging, really.
-
-__ http://docs.python.org/library/pprint.html
+A wrapper around :func:`pprint.pprint` -- for debugging, really.
 
 .. templatefilter:: random
 

@@ -148,13 +148,12 @@ URI and IRI handling
 Web frameworks have to deal with URLs (which are a type of IRI_). One
 requirement of URLs is that they are encoded using only ASCII characters.
 However, in an international environment, you might need to construct a
-URL from an IRI_ -- very loosely speaking, a URI that can contain Unicode
+URL from an IRI_ -- very loosely speaking, a URI_ that can contain Unicode
 characters. Quoting and converting an IRI to URI can be a little tricky, so
 Django provides some assistance.
 
     * The function ``django.utils.encoding.iri_to_uri()`` implements the
-      conversion from IRI to URI as required by the specification (`RFC
-      3987`_).
+      conversion from IRI to URI as required by the specification (:rfc:`3987`).
 
     * The functions ``django.utils.http.urlquote()`` and
       ``django.utils.http.urlquote_plus()`` are versions of Python's standard
@@ -203,7 +202,6 @@ double-quoting problems.
 
 .. _URI: http://www.ietf.org/rfc/rfc2396.txt
 .. _IRI: http://www.ietf.org/rfc/rfc3987.txt
-.. _RFC 3987: IRI_
 
 Models
 ======

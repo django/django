@@ -9,10 +9,8 @@ Django into production.
 .. _mod_wsgi: http://code.google.com/p/modwsgi/
 
 mod_wsgi is an Apache module which can be used to host any Python application
-which supports the `Python WSGI interface`_, including Django. Django will work
-with any version of Apache which supports mod_wsgi.
-
-.. _python wsgi interface: http://www.python.org/dev/peps/pep-0333/
+which supports the Python WSGI interface described in :pep:`3333`, including
+Django. Django will work with any version of Apache which supports mod_wsgi.
 
 The `official mod_wsgi documentation`_ is fantastic; it's your source for all
 the details about how to use mod_wsgi. You'll probably want to start with the

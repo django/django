@@ -146,14 +146,14 @@ Alternatively, you can use a symlink called ``django`` that points to the
 location of the branch's ``django`` package. If you want to switch back, just
 change the symlink to point to the old code.
 
-A third option is to use a `path file`_ (``<something>.pth``). First, make sure
-there are no files, directories or symlinks named ``django`` in your
-``site-packages`` directory. Then create a text file named ``django.pth`` and
-save it to your ``site-packages`` directory. That file should contain a path to
-your copy of Django on a single line and optional comments. Here is an example
-that points to multiple branches. Just uncomment the line for the branch you
-want to use ('Trunk' in this example) and make sure all other lines are
-commented::
+A third option is to use a path file (``<something>.pth``). This is a feature of
+the :mod:`site` module. First, make sure there are no files, directories or
+symlinks named ``django`` in your ``site-packages`` directory. Then create a
+text file named ``django.pth`` and save it to your ``site-packages`` directory.
+That file should contain a path to your copy of Django on a single line and
+optional comments. Here is an example that points to multiple branches. Just
+uncomment the line for the branch you want to use ('trunk' in this example) and
+make sure all other lines are commented::
 
     # Trunk is a svn checkout of:
     #   http://code.djangoproject.com/svn/django/trunk/
@@ -168,5 +168,4 @@ commented::
     # On windows a path may look like this:
     # C:/path/to/<branch>
 
-.. _path file: http://docs.python.org/library/site.html
 .. _django-developers: http://groups.google.com/group/django-developers
