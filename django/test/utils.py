@@ -211,6 +211,7 @@ class override_settings(object):
                 {
                     '_pre_setup': _pre_setup,
                     '_post_teardown': _post_teardown,
+                    '__module__': test_func.__module__,
                 })
         else:
             @wraps(test_func)
