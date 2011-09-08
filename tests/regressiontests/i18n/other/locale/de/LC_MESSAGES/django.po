@@ -40,3 +40,15 @@ msgid "%d result"
 msgid_plural "%d results"
 msgstr[0] "%d Resultat"
 msgstr[1] "%d Resultate"
+
+#: models.py:13
+#, python-format
+msgid "The result was %(percent)s%%"
+msgstr "Das Ergebnis war %(percent)s%%"
+
+#: models.py:13
+#, python-format
+msgid "%(percent)s%% represents %(num)s object"
+msgid_plural "%(percent)s%% represents %(num)s objects"
+msgstr[0] "%(percent)s%% stellt %(num)s Objekt dar"
+msgstr[1] "%(percent)s%% stellt %(num)s Objekte dar"

@@ -116,16 +116,17 @@ class BlockTranslateNode(Node):
         # the end of function
         context.update(tmp_context)
         singular, vars = self.render_token_list(self.singular)
+        # Escape all isolated '%'
+        singular = re.sub(u'%(?!\()', u'%%', singular)
         if self.plural and self.countervar and self.counter:
             count = self.counter.resolve(context)
             context[self.countervar] = count
             plural, plural_vars = self.render_token_list(self.plural)
+            plural = re.sub(u'%(?!\()', u'%%', plural)
             result = translation.ungettext(singular, plural, count)
             vars.extend(plural_vars)
         else:
             result = translation.ugettext(singular)
-        # Escape all isolated '%' before substituting in the context.
-        result = re.sub(u'%(?!\()', u'%%', result)
         data = dict([(v, _render_value_in_context(context.get(v, ''), context)) for v in vars])
         context.pop()
         try:

@@ -618,6 +618,19 @@ class MiscTests(TestCase):
         r.META = {'HTTP_ACCEPT_LANGUAGE': 'de'}
         self.assertEqual(g(r), 'zh-cn')
 
+    def test_percent_in_translatable_block(self):
+        extended_locale_paths = settings.LOCALE_PATHS + (
+            os.path.join(here, 'other', 'locale'),
+        )
+        with self.settings(LOCALE_PATHS=extended_locale_paths):
+            t_sing = Template("{% load i18n %}{% blocktrans %}The result was {{ percent }}%{% endblocktrans %}")
+            t_plur = Template("{% load i18n %}{% blocktrans count num as number %}{{ percent }}% represents {{ num }} object{% plural %}{{ percent }}% represents {{ num }} objects{% endblocktrans %}")
+            with translation.override('de'):
+                self.assertEqual(t_sing.render(Context({'percent': 42})), u'Das Ergebnis war 42%')
+                self.assertEqual(t_plur.render(Context({'percent': 42, 'num': 1})), u'42% stellt 1 Objekt dar')
+                self.assertEqual(t_plur.render(Context({'percent': 42, 'num': 4})), u'42% stellt 4 Objekte dar')
+
+
 class ResolutionOrderI18NTests(TestCase):
 
     def setUp(self):
