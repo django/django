@@ -1408,7 +1408,7 @@ class CacheMiddlewareTest(unittest.TestCase):
 
         other_view = cache_page(cache='other')(hello_world_view)
         other_with_prefix_view = cache_page(cache='other', key_prefix='prefix2')(hello_world_view)
-        other_with_timeout_view = cache_page(4, cache='other', key_prefix='prefix3')(hello_world_view)
+        other_with_timeout_view = cache_page(3, cache='other', key_prefix='prefix3')(hello_world_view)
 
         request = self.factory.get('/view/')
 
