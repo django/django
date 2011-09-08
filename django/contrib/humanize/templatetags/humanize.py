@@ -41,7 +41,7 @@ def intcomma(value, use_l10n=True):
         except (TypeError, ValueError):
             return intcomma(value, False)
         else:
-            return number_format(value)
+            return number_format(value, force_grouping=True)
     orig = force_unicode(value)
     new = re.sub("^(-?\d+)(\d{3})", '\g<1>,\g<2>', orig)
     if orig == new:

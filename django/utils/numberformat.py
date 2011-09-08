@@ -2,7 +2,7 @@ from django.conf import settings
 from django.utils.safestring import mark_safe
 
 
-def format(number, decimal_sep, decimal_pos=None, grouping=0, thousand_sep=''):
+def format(number, decimal_sep, decimal_pos=None, grouping=0, thousand_sep='', force_grouping=False):
     """
     Gets a number (as a number or string), and returns it as a string,
     using formats definied as arguments:
@@ -13,7 +13,7 @@ def format(number, decimal_sep, decimal_pos=None, grouping=0, thousand_sep=''):
     * thousand_sep: Thousand separator symbol (for example ",")
 
     """
-    use_grouping = settings.USE_L10N and \
+    use_grouping = force_grouping or settings.USE_L10N and \
         settings.USE_THOUSAND_SEPARATOR and grouping
     # Make the common case fast:
     if isinstance(number, int) and not use_grouping and not decimal_pos:
