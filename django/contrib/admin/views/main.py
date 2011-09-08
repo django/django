@@ -12,10 +12,6 @@ from django.contrib.admin import FieldListFilter
 from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.admin.util import quote, get_fields_from_path
 
-# The system will display a "Show all" link on the change list only if the
-# total result count is less than or equal to this setting.
-MAX_SHOW_ALL_ALLOWED = 200
-
 # Changelist settings
 ALL_VAR = 'all'
 ORDER_VAR = 'o'
@@ -44,7 +40,7 @@ def field_needs_distinct(field):
 class ChangeList(object):
     def __init__(self, request, model, list_display, list_display_links,
             list_filter, date_hierarchy, search_fields, list_select_related,
-            list_per_page, list_editable, model_admin):
+            list_per_page, list_max_show_all, list_editable, model_admin):
         self.model = model
         self.opts = model._meta
         self.lookup_opts = self.opts
@@ -56,6 +52,7 @@ class ChangeList(object):
         self.search_fields = search_fields
         self.list_select_related = list_select_related
         self.list_per_page = list_per_page
+        self.list_max_show_all = list_max_show_all
         self.model_admin = model_admin
 
         # Get search parameters from the query string.
@@ -145,7 +142,7 @@ class ChangeList(object):
         else:
             full_result_count = self.root_query_set.count()
 
-        can_show_all = result_count <= MAX_SHOW_ALL_ALLOWED
+        can_show_all = result_count <= self.list_max_show_all
         multi_page = result_count > self.list_per_page
 
         # Get the list of objects to display on this page.

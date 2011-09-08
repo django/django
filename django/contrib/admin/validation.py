@@ -96,6 +96,11 @@ def validate(cls, model):
         raise ImproperlyConfigured("'%s.list_per_page' should be a integer."
                 % cls.__name__)
 
+    # list_max_show_all
+    if hasattr(cls, 'list_max_show_all') and not isinstance(cls.list_max_show_all, int):
+        raise ImproperlyConfigured("'%s.list_max_show_all' should be an integer."
+                % cls.__name__)
+
     # list_editable
     if hasattr(cls, 'list_editable') and cls.list_editable:
         check_isseq(cls, 'list_editable', cls.list_editable)

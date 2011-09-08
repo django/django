@@ -695,6 +695,15 @@ subclass::
               The ``FieldListFilter`` API is currently considered internal
               and prone to refactoring.
 
+.. attribute:: ModelAdmin.list_max_show_all
+
+    .. versionadded:: 1.4
+
+    Set ``list_max_show_all`` to control how many items can appear on a "Show
+    all" admin change list page. The admin will display a "Show all" link on the
+    change list only if the total result count is less than or equal to this
+    setting. By default, this is set to ``200``.
+
 .. attribute:: ModelAdmin.list_per_page
 
     Set ``list_per_page`` to control how many items appear on each paginated

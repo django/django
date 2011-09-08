@@ -278,6 +278,7 @@ class ModelAdmin(BaseModelAdmin):
     list_filter = ()
     list_select_related = False
     list_per_page = 100
+    list_max_show_all = 200
     list_editable = ()
     search_fields = ()
     date_hierarchy = None
@@ -1087,7 +1088,7 @@ class ModelAdmin(BaseModelAdmin):
         try:
             cl = ChangeList(request, self.model, list_display, self.list_display_links,
                 self.list_filter, self.date_hierarchy, self.search_fields,
-                self.list_select_related, self.list_per_page, self.list_editable, self)
+                self.list_select_related, self.list_per_page, self.list_max_show_all, self.list_editable, self)
         except IncorrectLookupParameters:
             # Wacky lookup parameters were given, so redirect to the main
             # changelist page, without parameters, and pass an 'invalid=1'
