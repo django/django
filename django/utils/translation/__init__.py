@@ -115,7 +115,10 @@ class override(object):
         self.old_language = get_language()
 
     def __enter__(self):
-        activate(self.language)
+        if self.language is not None:
+            activate(self.language)
+        else:
+            deactivate_all()
 
     def __exit__(self, exc_type, exc_value, traceback):
         if self.deactivate:

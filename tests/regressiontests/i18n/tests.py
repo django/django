@@ -9,6 +9,7 @@ from threading import local
 from django.conf import settings
 from django.template import Template, Context
 from django.test import TestCase, RequestFactory
+from django.test.utils import override_settings
 from django.utils.formats import (get_format, date_format, time_format,
     localize, localize_input, iter_format_modules, get_format_modules)
 from django.utils.importlib import import_module
@@ -27,12 +28,17 @@ from commands.tests import *
 from patterns.tests import *
 from test_warnings import DeprecationWarningTests
 
+here = os.path.dirname(os.path.abspath(__file__))
+
 class TranslationTests(TestCase):
 
     def test_override(self):
         activate('de')
         with translation.override('pl'):
             self.assertEqual(get_language(), 'pl')
+        self.assertEqual(get_language(), 'de')
+        with translation.override(None):
+            self.assertEqual(get_language(), settings.LANGUAGE_CODE)
         self.assertEqual(get_language(), 'de')
         deactivate()
 
@@ -67,7 +73,7 @@ class TranslationTests(TestCase):
     def test_pgettext(self):
         # Reset translation catalog to include other/locale/de
         extended_locale_paths = settings.LOCALE_PATHS + (
-            os.path.join(os.path.dirname(os.path.abspath(__file__)), 'other', 'locale'),
+            os.path.join(here, 'other', 'locale'),
         )
         with self.settings(LOCALE_PATHS=extended_locale_paths):
             from django.utils.translation import trans_real
@@ -128,6 +134,18 @@ class TranslationTests(TestCase):
         from django.utils.translation.trans_real import to_language
         self.assertEqual(to_language('en_US'), 'en-us')
         self.assertEqual(to_language('sr_Lat'), 'sr-lat')
+
+    @override_settings(LOCALE_PATHS=(os.path.join(here, 'other', 'locale'),))
+    def test_bad_placeholder(self):
+        """
+        Error in translation file should not crash template rendering
+        (%(person)s is translated as %(personne)s in fr.po)
+        """
+        from django.template import Template, Context
+        with translation.override('fr'):
+            t = Template('{% load i18n %}{% blocktrans %}My name is {{ person }}.{% endblocktrans %}')
+            rendered = t.render(Context({'person': 'James'}))
+            self.assertEqual(rendered, 'My name is James.')
 
 
 class FormattingTests(TestCase):
@@ -636,7 +654,7 @@ class LocalePathsResolutionOrderI18NTests(ResolutionOrderI18NTests):
 
     def setUp(self):
         self.old_locale_paths = settings.LOCALE_PATHS
-        settings.LOCALE_PATHS += (os.path.join(os.path.dirname(os.path.abspath(__file__)), 'other', 'locale'),)
+        settings.LOCALE_PATHS += (os.path.join(here, 'other', 'locale'),)
         super(LocalePathsResolutionOrderI18NTests, self).setUp()
 
     def tearDown(self):

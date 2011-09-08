@@ -512,6 +512,13 @@ You can use multiple expressions inside a single ``blocktrans`` tag::
 .. note:: The previous more verbose format is still supported:
    ``{% blocktrans with book|title as book_t and author|title as author_t %}``
 
+.. versionchanged:: 1.4
+
+If resolving one of the block arguments fails, blocktrans will fall back to
+the default language by deactivating the currently active language
+temporarily with the :func:`~django.utils.translation.deactivate_all`
+function.
+
 This tag also provides for pluralization. To use it:
 
     * Designate and bind a counter value with the name ``count``. This value will

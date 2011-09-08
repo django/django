@@ -128,7 +128,12 @@ class BlockTranslateNode(Node):
         result = re.sub(u'%(?!\()', u'%%', result)
         data = dict([(v, _render_value_in_context(context.get(v, ''), context)) for v in vars])
         context.pop()
-        return result % data
+        try:
+            result = result % data
+        except KeyError:
+            with translation.override(None):
+                result = self.render(context)
+        return result
 
 
 class LanguageNode(Node):
