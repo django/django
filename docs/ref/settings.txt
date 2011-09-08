@@ -796,6 +796,13 @@ Default: ``'.'`` (Dot)
 
 Default decimal separator used when formatting decimal numbers.
 
+Note that if :setting:`USE_I18N` is set to ``True``, then the locale-dictated
+format has higher precedence and will be applied instead.
+
+See also :setting:`NUMBER_GROUPING`, :setting:`THOUSAND_SEPARATOR` and
+:setting:`USE_THOUSAND_SEPARATOR`.
+
+
 .. setting:: DEFAULT_CHARSET
 
 DEFAULT_CHARSET
@@ -1440,13 +1447,18 @@ NUMBER_GROUPING
 
 Default: ``0``
 
-Number of digits grouped together on the integer part of a number. Common use
-is to display a thousand separator. If this setting is ``0``, then, no grouping
-will be applied to the number. If this setting is greater than ``0`` then the
-setting :setting:`THOUSAND_SEPARATOR` will be used as the separator between those
-groups.
+Number of digits grouped together on the integer part of a number.
 
-See also :setting:`THOUSAND_SEPARATOR` and :setting:`USE_THOUSAND_SEPARATOR`.
+Common use is to display a thousand separator. If this setting is ``0``, then
+no grouping will be applied to the number. If this setting is greater than
+``0``, then :setting:`THOUSAND_SEPARATOR` will be used as the separator between
+those groups.
+
+Note that if :setting:`USE_I18N` is set to ``True``, then the locale-dictated
+format has higher precedence and will be applied instead.
+
+See also :setting:`DECIMAL_SEPARATOR`, :setting:`THOUSAND_SEPARATOR` and
+:setting:`USE_THOUSAND_SEPARATOR`.
 
 .. setting:: PASSWORD_RESET_TIMEOUT_DAYS
 
@@ -1902,8 +1914,11 @@ THOUSAND_SEPARATOR
 Default: ``,`` (Comma)
 
 Default thousand separator used when formatting numbers. This setting is
-used only when :setting:`NUMBER_GROUPING` and :setting:`USE_THOUSAND_SEPARATOR`
-are set.
+used only when :setting:`USE_THOUSAND_SEPARATOR` is ``True`` and
+:setting:`NUMBER_GROUPING` is greater than ``0``.
+
+Note that if :setting:`USE_I18N` is set to ``True``, then the locale-dictated
+format has higher precedence and will be applied instead.
 
 See also :setting:`NUMBER_GROUPING`, :setting:`DECIMAL_SEPARATOR` and
 :setting:`USE_THOUSAND_SEPARATOR`.
@@ -2056,12 +2071,12 @@ USE_THOUSAND_SEPARATOR
 Default: ``False``
 
 A boolean that specifies whether to display numbers using a thousand separator.
-If this is set to ``True``, Django will use values from
-:setting:`THOUSAND_SEPARATOR` and :setting:`NUMBER_GROUPING` from current
-locale, to format the number. :setting:`USE_L10N` must be set to ``True``,
-in order to format numbers.
+When :setting:`USE_L10N` is set to ``True`` and if this is also set to
+``True``, Django will use the values of :setting:`THOUSAND_SEPARATOR` and
+:setting:`NUMBER_GROUPING` to format numbers.
 
-See also :setting:`THOUSAND_SEPARATOR` and :setting:`NUMBER_GROUPING`.
+See also :setting:`DECIMAL_SEPARATOR`, :setting:`NUMBER_GROUPING` and
+:setting:`THOUSAND_SEPARATOR`.
 
 .. setting:: YEAR_MONTH_FORMAT
 
