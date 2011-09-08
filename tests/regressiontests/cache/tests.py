@@ -2,6 +2,7 @@
 
 # Unit tests for cache framework
 # Uses whatever cache backend is set in the test settings file.
+from __future__ import with_statement
 
 import hashlib
 import os
@@ -13,14 +14,19 @@ import warnings
 from django.conf import settings
 from django.core import management
 from django.core.cache import get_cache, DEFAULT_CACHE_ALIAS
-from django.core.cache.backends.base import CacheKeyWarning, InvalidCacheBackendError
+from django.core.cache.backends.base import (CacheKeyWarning,
+    InvalidCacheBackendError)
 from django.http import HttpResponse, HttpRequest, QueryDict
-from django.middleware.cache import FetchFromCacheMiddleware, UpdateCacheMiddleware, CacheMiddleware
-from django.test import RequestFactory
-from django.test.utils import get_warnings_state, restore_warnings_state
-from django.utils import translation
-from django.utils import unittest
-from django.utils.cache import patch_vary_headers, get_cache_key, learn_cache_key, patch_cache_control
+from django.middleware.cache import (FetchFromCacheMiddleware,
+    UpdateCacheMiddleware, CacheMiddleware)
+from django.template import Template
+from django.template.response import TemplateResponse
+from django.test import TestCase, RequestFactory
+from django.test.utils import (get_warnings_state, restore_warnings_state,
+    override_settings)
+from django.utils import translation, unittest
+from django.utils.cache import (patch_vary_headers, get_cache_key,
+    learn_cache_key, patch_cache_control, patch_response_headers)
 from django.views.decorators.cache import cache_page
 
 from regressiontests.cache.models import Poll, expensive_calculation
@@ -1491,5 +1497,110 @@ class CacheMiddlewareTest(unittest.TestCase):
         response = other_with_timeout_view(request, '18')
         self.assertEqual(response.content, 'Hello World 18')
 
+
+class TestWithTemplateResponse(TestCase):
+    """
+    Tests various headers w/ TemplateResponse.
+
+    Most are probably redundant since they manipulate the same object
+    anyway but the Etag header is 'special' because it relies on the
+    content being complete (which is not necessarily always the case
+    with a TemplateResponse)
+    """
+    def setUp(self):
+        self.path = '/cache/test/'
+
+    def _get_request(self, path, method='GET'):
+        request = HttpRequest()
+        request.META = {
+            'SERVER_NAME': 'testserver',
+            'SERVER_PORT': 80,
+        }
+        request.method = method
+        request.path = request.path_info = "/cache/%s" % path
+        return request
+
+    def test_patch_vary_headers(self):
+        headers = (
+            # Initial vary, new headers, resulting vary.
+            (None, ('Accept-Encoding',), 'Accept-Encoding'),
+            ('Accept-Encoding', ('accept-encoding',), 'Accept-Encoding'),
+            ('Accept-Encoding', ('ACCEPT-ENCODING',), 'Accept-Encoding'),
+            ('Cookie', ('Accept-Encoding',), 'Cookie, Accept-Encoding'),
+            ('Cookie, Accept-Encoding', ('Accept-Encoding',), 'Cookie, Accept-Encoding'),
+            ('Cookie, Accept-Encoding', ('Accept-Encoding', 'cookie'), 'Cookie, Accept-Encoding'),
+            (None, ('Accept-Encoding', 'COOKIE'), 'Accept-Encoding, COOKIE'),
+            ('Cookie,     Accept-Encoding', ('Accept-Encoding', 'cookie'), 'Cookie, Accept-Encoding'),
+            ('Cookie    ,     Accept-Encoding', ('Accept-Encoding', 'cookie'), 'Cookie, Accept-Encoding'),
+        )
+        for initial_vary, newheaders, resulting_vary in headers:
+            response = TemplateResponse(HttpResponse(), Template("This is a test"))
+            if initial_vary is not None:
+                response['Vary'] = initial_vary
+            patch_vary_headers(response, newheaders)
+            self.assertEqual(response['Vary'], resulting_vary)
+
+    def test_get_cache_key(self):
+        request = self._get_request(self.path)
+        response = TemplateResponse(HttpResponse(), Template("This is a test"))
+        key_prefix = 'localprefix'
+        # Expect None if no headers have been set yet.
+        self.assertEqual(get_cache_key(request), None)
+        # Set headers to an empty list.
+        learn_cache_key(request, response)
+        self.assertEqual(get_cache_key(request), 'views.decorators.cache.cache_page.settingsprefix.GET.a8c87a3d8c44853d7f79474f7ffe4ad5.d41d8cd98f00b204e9800998ecf8427e')
+        # Verify that a specified key_prefix is taken into account.
+        learn_cache_key(request, response, key_prefix=key_prefix)
+        self.assertEqual(get_cache_key(request, key_prefix=key_prefix), 'views.decorators.cache.cache_page.localprefix.GET.a8c87a3d8c44853d7f79474f7ffe4ad5.d41d8cd98f00b204e9800998ecf8427e')
+
+    def test_get_cache_key_with_query(self):
+        request = self._get_request(self.path + '?test=1')
+        response = TemplateResponse(HttpResponse(), Template("This is a test"))
+        # Expect None if no headers have been set yet.
+        self.assertEqual(get_cache_key(request), None)
+        # Set headers to an empty list.
+        learn_cache_key(request, response)
+        # Verify that the querystring is taken into account.
+        self.assertEqual(get_cache_key(request), 'views.decorators.cache.cache_page.settingsprefix.GET.bd889c5a59603af44333ed21504db3cd.d41d8cd98f00b204e9800998ecf8427e')
+
+    @override_settings(USE_ETAGS=False)
+    def test_without_etag(self):
+        response = TemplateResponse(HttpResponse(), Template("This is a test"))
+        self.assertFalse(response.has_header('ETag'))
+        patch_response_headers(response)
+        self.assertFalse(response.has_header('ETag'))
+        response = response.render()
+        self.assertFalse(response.has_header('ETag'))
+
+    @override_settings(USE_ETAGS=True)
+    def test_with_etag(self):
+        response = TemplateResponse(HttpResponse(), Template("This is a test"))
+        self.assertFalse(response.has_header('ETag'))
+        patch_response_headers(response)
+        self.assertFalse(response.has_header('ETag'))
+        response = response.render()
+        self.assertTrue(response.has_header('ETag'))
+
+TestWithTemplateResponse = override_settings(
+    CACHE_MIDDLEWARE_KEY_PREFIX='settingsprefix',
+    CACHE_MIDDLEWARE_SECONDS=1,
+    USE_I18N=False,
+)(TestWithTemplateResponse)
+
+
+class TestEtagWithAdmin(TestCase):
+    # See https://code.djangoproject.com/ticket/16003
+    def test_admin(self):
+        with self.settings(USE_ETAGS=False):
+            response = self.client.get('/test_admin/admin/')
+            self.assertEqual(response.status_code, 200)
+            self.assertFalse(response.has_header('ETag'))
+
+        with self.settings(USE_ETAGS=True):
+            response = self.client.get('/test_admin/admin/')
+            self.assertEqual(response.status_code, 200)
+            self.assertTrue(response.has_header('ETag'))
+
 if __name__ == '__main__':
     unittest.main()
+

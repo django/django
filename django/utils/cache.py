@@ -92,6 +92,10 @@ def get_max_age(response):
         except (ValueError, TypeError):
             pass
 
+def _set_response_etag(response):
+    response['ETag'] = '"%s"' % hashlib.md5(response.content).hexdigest()
+    return response
+
 def patch_response_headers(response, cache_timeout=None):
     """
     Adds some useful headers to the given HttpResponse object:
@@ -107,7 +111,10 @@ def patch_response_headers(response, cache_timeout=None):
     if cache_timeout < 0:
         cache_timeout = 0 # Can't have max-age negative
     if settings.USE_ETAGS and not response.has_header('ETag'):
-        response['ETag'] = '"%s"' % hashlib.md5(response.content).hexdigest()
+        if hasattr(response, 'render') and callable(response.render):
+            response.add_post_render_callback(_set_response_etag)
+        else:
+            response = _set_response_etag(response)
     if not response.has_header('Last-Modified'):
         response['Last-Modified'] = http_date()
     if not response.has_header('Expires'):
