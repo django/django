@@ -1,9 +1,10 @@
-import os, unittest
+from datetime import datetime
 from django.contrib.gis.tests.utils import no_mysql, no_oracle, no_postgis, no_spatialite
 from django.contrib.gis.shortcuts import render_to_kmz
-from models import City
+from django.test import TestCase
+from models import City, PennsylvaniaCity
 
-class GeoRegressionTests(unittest.TestCase):
+class GeoRegressionTests(TestCase):
 
     def test01_update(self):
         "Testing GeoQuerySet.update(), see #10411."
@@ -35,3 +36,10 @@ class GeoRegressionTests(unittest.TestCase):
         extent = City.objects.filter(name='Pueblo').extent()
         for ref_val, val in zip(ref_ext, extent):
             self.assertAlmostEqual(ref_val, val, 4)
+
+    def test04_unicode_date(self):
+        "Testing dates are converted properly, even on SpatiaLite, see #16408."
+        founded = datetime(1857, 5, 23)
+        mansfield = PennsylvaniaCity.objects.create(name='Mansfield', county='Tioga', point='POINT(-77.071445 41.823881)',
+                                                    founded=founded)
+        self.assertEqual(founded, PennsylvaniaCity.objects.dates('founded', 'day')[0])

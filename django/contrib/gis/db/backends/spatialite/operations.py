@@ -48,7 +48,7 @@ def get_dist_ops(operator):
     return (SpatiaLiteDistance(operator),)
 
 class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
-    compiler_module = 'django.contrib.gis.db.models.sql.compiler'
+    compiler_module = 'django.contrib.gis.db.backends.spatialite.compiler'
     name = 'spatialite'
     spatialite = True
     version_regex = re.compile(r'^(?P<major>\d)\.(?P<minor1>\d)\.(?P<minor2>\d+)')

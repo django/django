@@ -2,15 +2,16 @@ from ctypes.util import find_library
 from django.conf import settings
 
 from django.core.exceptions import ImproperlyConfigured
-from django.db.backends.sqlite3.base import *
-from django.db.backends.sqlite3.base import DatabaseWrapper as SqliteDatabaseWrapper, \
-    _sqlite_extract, _sqlite_date_trunc, _sqlite_regexp
+from django.db.backends.sqlite3.base import (
+   _sqlite_extract, _sqlite_date_trunc, _sqlite_regexp, _sqlite_format_dtdelta,
+    connection_created, Database, DatabaseWrapper as SQLiteDatabaseWrapper,
+    SQLiteCursorWrapper)
 from django.contrib.gis.db.backends.spatialite.client import SpatiaLiteClient
 from django.contrib.gis.db.backends.spatialite.creation import SpatiaLiteCreation
 from django.contrib.gis.db.backends.spatialite.introspection import SpatiaLiteIntrospection
 from django.contrib.gis.db.backends.spatialite.operations import SpatiaLiteOperations
 
-class DatabaseWrapper(SqliteDatabaseWrapper):
+class DatabaseWrapper(SQLiteDatabaseWrapper):
     def __init__(self, *args, **kwargs):
         # Before we get too far, make sure pysqlite 2.5+ is installed.
         if Database.version_info < (2, 5, 0):
@@ -51,6 +52,7 @@ class DatabaseWrapper(SqliteDatabaseWrapper):
             self.connection.create_function("django_extract", 2, _sqlite_extract)
             self.connection.create_function("django_date_trunc", 2, _sqlite_date_trunc)
             self.connection.create_function("regexp", 2, _sqlite_regexp)
+            self.connection.create_function("django_format_dtdelta", 5, _sqlite_format_dtdelta)
             connection_created.send(sender=self.__class__, connection=self)
 
             ## From here on, customized for GeoDjango ##
