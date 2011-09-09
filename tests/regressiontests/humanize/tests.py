@@ -41,6 +41,17 @@ class HumanizeTests(TestCase):
 
         self.humanize_tester(test_list, result_list, 'intcomma')
 
+    def test_l10n_intcomma(self):
+        test_list = (100, 1000, 10123, 10311, 1000000, 1234567.25,
+                     '100', '1000', '10123', '10311', '1000000', '1234567.1234567',
+                     None)
+        result_list = ('100', '1,000', '10,123', '10,311', '1,000,000', '1,234,567.25',
+                       '100', '1,000', '10,123', '10,311', '1,000,000', '1,234,567.1234567',
+                     None)
+
+        with self.settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=False):
+            self.humanize_tester(test_list, result_list, 'intcomma')
+
     def test_intword(self):
         test_list = ('100', '1000000', '1200000', '1290000',
                      '1000000000', '2000000000', '6000000000000',
