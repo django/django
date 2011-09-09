@@ -202,7 +202,7 @@ class GeoSQLCompiler(compiler.SQLCompiler):
     #### Routines unique to GeoQuery ####
     def get_extra_select_format(self, alias):
         sel_fmt = '%s'
-        if alias in self.query.custom_select:
+        if hasattr(self.query, 'custom_select') and alias in self.query.custom_select:
             sel_fmt = sel_fmt % self.query.custom_select[alias]
         return sel_fmt
 

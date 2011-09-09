@@ -19,6 +19,7 @@ class City(models.Model):
 # This is an inherited model from City
 class PennsylvaniaCity(City):
     county = models.CharField(max_length=30)
+    founded = models.DateTimeField(null=True)
     objects = models.GeoManager() # TODO: This should be implicitly inherited.
 
 class State(models.Model):
