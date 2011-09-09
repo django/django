@@ -84,6 +84,9 @@ class SomeOtherException(Exception):
 class ContextStackException(Exception):
     pass
 
+class ShouldNotExecuteException(Exception):
+    pass
+
 class SomeClass:
     def __init__(self):
         self.otherclass = OtherClass()
@@ -127,8 +130,7 @@ class TestObj(object):
         return False
 
     def is_bad(self):
-        time.sleep(0.3)
-        return True
+        raise ShouldNotExecuteException()
 
 class SilentGetItemClass(object):
     def __getitem__(self, key):
@@ -456,24 +458,21 @@ class Templates(unittest.TestCase):
                 settings.TEMPLATE_DEBUG = template_debug
                 for is_cached in (False, True):
                     try:
-                        start = datetime.now()
-                        test_template = loader.get_template(name)
-                        end = datetime.now()
-                        if end-start > timedelta(seconds=0.2):
-                            failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s', TEMPLATE_DEBUG=%s): %s -- FAILED. Took too long to parse test" % (is_cached, invalid_str, template_debug, name))
+                        try:
+                            test_template = loader.get_template(name)
+                        except ShouldNotExecuteException:
+                            failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s', TEMPLATE_DEBUG=%s): %s -- FAILED. Template loading invoked method that shouldn't have been invoked." % (is_cached, invalid_str, template_debug, name))
 
-                        start = datetime.now()
-                        output = self.render(test_template, vals)
-                        end = datetime.now()
-                        if end-start > timedelta(seconds=0.2):
-                            failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s', TEMPLATE_DEBUG=%s): %s -- FAILED. Took too long to render test" % (is_cached, invalid_str, template_debug, name))
+                        try:
+                            output = self.render(test_template, vals)
+                        except ShouldNotExecuteException:
+                            failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s', TEMPLATE_DEBUG=%s): %s -- FAILED. Template rendering invoked method that shouldn't have been invoked." % (is_cached, invalid_str, template_debug, name))
                     except ContextStackException:
                         failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s', TEMPLATE_DEBUG=%s): %s -- FAILED. Context stack was left imbalanced" % (is_cached, invalid_str, template_debug, name))
                         continue
                     except Exception:
                         exc_type, exc_value, exc_tb = sys.exc_info()
                         if exc_type != result:
-                            print "CHECK", name, exc_type, result
                             tb = '\n'.join(traceback.format_exception(exc_type, exc_value, exc_tb))
                             failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s', TEMPLATE_DEBUG=%s): %s -- FAILED. Got %s, exception: %s\n%s" % (is_cached, invalid_str, template_debug, name, exc_type, exc_value, tb))
                         continue
@@ -921,9 +920,7 @@ class Templates(unittest.TestCase):
             'if-tag-error12': ("{% if a not b %}yes{% endif %}", {}, template.TemplateSyntaxError),
 
             # If evaluations are shortcircuited where possible
-            # These tests will fail by taking too long to run. When the if clause
-            # is shortcircuiting correctly, the is_bad() function shouldn't be
-            # evaluated, and the deliberate sleep won't happen.
+            # If is_bad is invoked, it will raise a ShouldNotExecuteException
             'if-tag-shortcircuit01': ('{% if x.is_true or x.is_bad %}yes{% else %}no{% endif %}', {'x': TestObj()}, "yes"),
             'if-tag-shortcircuit02': ('{% if x.is_false and x.is_bad %}yes{% else %}no{% endif %}', {'x': TestObj()}, "no"),
 
