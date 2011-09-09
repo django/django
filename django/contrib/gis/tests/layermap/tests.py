@@ -79,8 +79,8 @@ class LayerMapTest(TestCase):
 
             # Comparing the geometries.
             pnt1, pnt2 = feat.geom, city.point
-            self.assertAlmostEqual(pnt1.x, pnt2.x, 6)
-            self.assertAlmostEqual(pnt1.y, pnt2.y, 6)
+            self.assertAlmostEqual(pnt1.x, pnt2.x, 5)
+            self.assertAlmostEqual(pnt1.y, pnt2.y, 5)
 
     def test03_layermap_strict(self):
         "Testing the `strict` keyword, and import of a LineString shapefile."
