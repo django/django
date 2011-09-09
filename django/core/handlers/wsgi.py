@@ -16,10 +16,11 @@ from django.utils.log import getLogger
 logger = getLogger('django.request')
 
 
-# See http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
+# See http://www.iana.org/assignments/http-status-codes
 STATUS_CODE_TEXT = {
     100: 'CONTINUE',
     101: 'SWITCHING PROTOCOLS',
+    102: 'PROCESSING',
     200: 'OK',
     201: 'CREATED',
     202: 'ACCEPTED',
@@ -27,6 +28,9 @@ STATUS_CODE_TEXT = {
     204: 'NO CONTENT',
     205: 'RESET CONTENT',
     206: 'PARTIAL CONTENT',
+    207: 'MULTI-STATUS',
+    208: 'ALREADY REPORTED',
+    226: 'IM USED',
     300: 'MULTIPLE CHOICES',
     301: 'MOVED PERMANENTLY',
     302: 'FOUND',
@@ -53,12 +57,20 @@ STATUS_CODE_TEXT = {
     415: 'UNSUPPORTED MEDIA TYPE',
     416: 'REQUESTED RANGE NOT SATISFIABLE',
     417: 'EXPECTATION FAILED',
+    422: 'UNPROCESSABLE ENTITY',
+    423: 'LOCKED',
+    424: 'FAILED DEPENDENCY',
+    426: 'UPGRADE REQUIRED',
     500: 'INTERNAL SERVER ERROR',
     501: 'NOT IMPLEMENTED',
     502: 'BAD GATEWAY',
     503: 'SERVICE UNAVAILABLE',
     504: 'GATEWAY TIMEOUT',
     505: 'HTTP VERSION NOT SUPPORTED',
+    506: 'VARIANT ALSO NEGOTIATES',
+    507: 'INSUFFICIENT STORAGE',
+    508: 'LOOP DETECTED',
+    510: 'NOT EXTENDED',
 }
 
 class LimitedStream(object):
