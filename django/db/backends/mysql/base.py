@@ -124,6 +124,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     allows_group_by_pk = True
     related_fields_match_type = True
     allow_sliced_subqueries = False
+    has_bulk_insert = True
     has_select_for_update = True
     has_select_for_update_nowait = False
     supports_forward_references = False
@@ -262,6 +263,10 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def max_name_length(self):
         return 64
+
+    def bulk_insert_sql(self, fields, num_values):
+        items_sql = "(%s)" % ", ".join(["%s"] * len(fields))
+        return "VALUES " + ", ".join([items_sql] * num_values)
 
 class DatabaseWrapper(BaseDatabaseWrapper):
     vendor = 'mysql'

@@ -8,9 +8,10 @@ all about the internals of models in order to get the information it needs.
 """
 
 import copy
-from django.utils.tree import Node
+
 from django.utils.datastructures import SortedDict
 from django.utils.encoding import force_unicode
+from django.utils.tree import Node
 from django.db import connections, DEFAULT_DB_ALIAS
 from django.db.models import signals
 from django.db.models.fields import FieldDoesNotExist

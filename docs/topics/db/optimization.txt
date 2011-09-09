@@ -268,3 +268,33 @@ instead of::
 
    entry.blog.id
 
+Insert in bulk
+==============
+
+When creating objects, where possible, use the
+:meth:`~django.db.models.query.QuerySet.bulk_create()` method to reduce the
+number of SQL queries. For example::
+
+    Entry.objects.bulk_create([
+        Entry(headline="Python 3.0 Released"),
+        Entry(headline="Python 3.1 Planned")
+    ])
+
+Is preferable to::
+
+    Entry.objects.create(headline="Python 3.0 Released")
+    Entry.objects.create(headline="Python 3.1 Planned")
+
+Note that there are a number of :meth:`caveats to this method
+<django.db.models.query.QuerySet.bulk_create>`, make sure it is appropriate for
+your use case. This also applies to :class:`ManyToManyFields
+<django.db.models.ManyToManyField>`, doing::
+
+    my_band.members.add(me, my_friend)
+
+Is preferable to::
+
+    my_band.members.add(me)
+    my_band.members.add(my_friend)
+
+Where ``Bands`` and ``Artists`` have a many-to-many relationship.

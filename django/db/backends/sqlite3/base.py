@@ -58,6 +58,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_unspecified_pk = True
     supports_1000_query_parameters = False
     supports_mixed_date_datetime_comparisons = False
+    has_bulk_insert = True
+    can_combine_inserts_with_and_without_auto_increment_pk = True
 
     def _supports_stddev(self):
         """Confirm support for STDDEV and related stats functions
@@ -106,7 +108,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         return ""
 
     def pk_default_value(self):
-        return 'NULL'
+        return "NULL"
 
     def quote_name(self, name):
         if name.startswith('"') and name.endswith('"'):
@@ -153,6 +155,14 @@ class DatabaseOperations(BaseDatabaseOperations):
 
         # No field, or the field isn't known to be a decimal or integer
         return value
+
+    def bulk_insert_sql(self, fields, num_values):
+        res = []
+        res.append("SELECT %s" % ", ".join(
+            "%%s AS %s" % self.quote_name(f.column) for f in fields
+        ))
+        res.extend(["UNION SELECT %s" % ", ".join(["%s"] * len(fields))] * (num_values - 1))
+        return " ".join(res)
 
 class DatabaseWrapper(BaseDatabaseWrapper):
     vendor = 'sqlite'

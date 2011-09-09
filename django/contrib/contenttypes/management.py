@@ -8,25 +8,41 @@ def update_contenttypes(app, created_models, verbosity=2, **kwargs):
     entries that no longer have a matching model class.
     """
     ContentType.objects.clear_cache()
-    content_types = list(ContentType.objects.filter(app_label=app.__name__.split('.')[-2]))
     app_models = get_models(app)
     if not app_models:
         return
-    for klass in app_models:
-        opts = klass._meta
-        try:
-            ct = ContentType.objects.get(app_label=opts.app_label,
-                                         model=opts.object_name.lower())
-            content_types.remove(ct)
-        except ContentType.DoesNotExist:
-            ct = ContentType(name=smart_unicode(opts.verbose_name_raw),
-                app_label=opts.app_label, model=opts.object_name.lower())
-            ct.save()
-            if verbosity >= 2:
-                print "Adding content type '%s | %s'" % (ct.app_label, ct.model)
-    # The presence of any remaining content types means the supplied app has an
-    # undefined model. Confirm that the content type is stale before deletion.
-    if content_types:
+    # They all have the same app_label, get the first one.
+    app_label = app_models[0]._meta.app_label
+    app_models = dict(
+        (model._meta.object_name.lower(), model)
+        for model in app_models
+    )
+    # Get all the content types
+    content_types = dict(
+        (ct.model, ct)
+        for ct in ContentType.objects.filter(app_label=app_label)
+    )
+    to_remove = [
+        ct
+        for (model_name, ct) in content_types.iteritems()
+        if model_name not in app_models
+    ]
+
+    cts = ContentType.objects.bulk_create([
+        ContentType(
+            name=smart_unicode(model._meta.verbose_name_raw),
+            app_label=app_label,
+            model=model_name,
+        )
+        for (model_name, model) in app_models.iteritems()
+        if model_name not in content_types
+    ])
+    if verbosity >= 2:
+        for ct in cts:
+            print "Adding content type '%s | %s'" % (ct.app_label, ct.model)
+
+    # Confirm that the content type is stale before deletion.
+    if to_remove:
         if kwargs.get('interactive', False):
             content_type_display = '\n'.join(['    %s | %s' % (ct.app_label, ct.model) for ct in content_types])
             ok_to_delete = raw_input("""The following content types are stale and need to be deleted:
@@ -42,7 +58,7 @@ If you're unsure, answer 'no'.
             ok_to_delete = False
 
         if ok_to_delete == 'yes':
-            for ct in content_types:
+            for ct in to_remove:
                 if verbosity >= 2:
                     print "Deleting stale content type '%s | %s'" % (ct.app_label, ct.model)
                 ct.delete()

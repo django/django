@@ -276,3 +276,16 @@ class lazy_property(property):
             def fdel(instance, name=fdel.__name__):
                 return getattr(instance, name)()
         return property(fget, fset, fdel, doc)
+
+def partition(predicate, values):
+    """
+    Splits the values into two sets, based on the return value of the function
+    (True/False). e.g.:
+
+        >>> partition(lambda: x > 3, range(5))
+        [1, 2, 3], [4]
+    """
+    results = ([], [])
+    for item in values:
+        results[predicate(item)].append(item)
+    return results

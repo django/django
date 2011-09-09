@@ -5,10 +5,12 @@ The main QuerySet implementation. This provides the public API for the ORM.
 import copy
 
 from django.db import connections, router, transaction, IntegrityError
+from django.db.models.fields import AutoField
 from django.db.models.query_utils import (Q, select_related_descend,
     deferred_class_factory, InvalidQuery)
 from django.db.models.deletion import Collector
 from django.db.models import signals, sql
+from django.utils.functional import partition
 
 # Used to control how many objects are worked with at once in some cases (e.g.
 # when deleting objects).
@@ -351,6 +353,41 @@ class QuerySet(object):
         self._for_write = True
         obj.save(force_insert=True, using=self.db)
         return obj
+
+    def bulk_create(self, objs):
+        """
+        Inserts each of the instances into the database. This does *not* call
+        save() on each of the instances, does not send any pre/post save
+        signals, and does not set the primary key attribute if it is an
+        autoincrement field.
+        """
+        # So this case is fun. When you bulk insert you don't get the primary
+        # keys back (if it's an autoincrement), so you can't insert into the
+        # child tables which references this. There are two workarounds, 1)
+        # this could be implemented if you didn't have an autoincrement pk,
+        # and 2) you could do it by doing O(n) normal inserts into the parent
+        # tables to get the primary keys back, and then doing a single bulk
+        # insert into the childmost table. We're punting on these for now
+        # because they are relatively rare cases.
+        if self.model._meta.parents:
+            raise ValueError("Can't bulk create an inherited model")
+        if not objs:
+            return
+        self._for_write = True
+        connection = connections[self.db]
+        fields = self.model._meta.local_fields
+        if (connection.features.can_combine_inserts_with_and_without_auto_increment_pk
+            and self.model._meta.has_auto_field):
+            self.model._base_manager._insert(objs, fields=fields, using=self.db)
+        else:
+            objs_with_pk, objs_without_pk = partition(
+                lambda o: o.pk is None,
+                objs
+            )
+            if objs_with_pk:
+                self.model._base_manager._insert(objs_with_pk, fields=fields, using=self.db)
+            if objs_without_pk:
+                self.model._base_manager._insert(objs_without_pk, fields=[f for f in fields if not isinstance(f, AutoField)], using=self.db)
 
     def get_or_create(self, **kwargs):
         """
@@ -1437,12 +1474,12 @@ class RawQuerySet(object):
                 self._model_fields[converter(column)] = field
         return self._model_fields
 
-def insert_query(model, values, return_id=False, raw_values=False, using=None):
+def insert_query(model, objs, fields, return_id=False, raw=False, using=None):
     """
     Inserts a new record for the given model. This provides an interface to
     the InsertQuery class and is how Model.save() is implemented. It is not
     part of the public API.
     """
     query = sql.InsertQuery(model)
-    query.insert_values(values, raw_values)
+    query.insert_values(fields, objs, raw=raw)
     return query.get_compiler(using=using).execute_sql(return_id)

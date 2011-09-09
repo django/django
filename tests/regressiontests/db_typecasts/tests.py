@@ -53,10 +53,10 @@ TEST_CASES = {
 
 class DBTypeCasts(unittest.TestCase):
     def test_typeCasts(self):
-        for k, v in TEST_CASES.items():
+        for k, v in TEST_CASES.iteritems():
             for inpt, expected in v:
                 got = getattr(typecasts, k)(inpt)
-                assert got == expected, "In %s: %r doesn't match %r. Got %r instead." % (k, inpt, expected, got)
+                self.assertEqual(got, expected, "In %s: %r doesn't match %r. Got %r instead." % (k, inpt, expected, got))
 
 if __name__ == '__main__':
     unittest.main()

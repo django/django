@@ -301,8 +301,10 @@ class BaseDatabaseFeatures(object):
 
     can_use_chunked_reads = True
     can_return_id_from_insert = False
+    has_bulk_insert = False
     uses_autocommit = False
     uses_savepoints = False
+    can_combine_inserts_with_and_without_auto_increment_pk = False
 
     # If True, don't use integer foreign keys referring to, e.g., positive
     # integer primary keys.

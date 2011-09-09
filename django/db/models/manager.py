@@ -136,6 +136,9 @@ class Manager(object):
     def create(self, **kwargs):
         return self.get_query_set().create(**kwargs)
 
+    def bulk_create(self, *args, **kwargs):
+        return self.get_query_set().bulk_create(*args, **kwargs)
+
     def filter(self, *args, **kwargs):
         return self.get_query_set().filter(*args, **kwargs)
 
@@ -193,8 +196,8 @@ class Manager(object):
     def exists(self, *args, **kwargs):
         return self.get_query_set().exists(*args, **kwargs)
 
-    def _insert(self, values, **kwargs):
-        return insert_query(self.model, values, **kwargs)
+    def _insert(self, objs, fields, **kwargs):
+        return insert_query(self.model, objs, fields, **kwargs)
 
     def _update(self, values, **kwargs):
         return self.get_query_set()._update(values, **kwargs)

@@ -252,6 +252,17 @@ filename. For example, the file ``css/styles.css`` would also be saved as
 See the :class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage`
 docs for more information.
 
+``Model.objects.bulk_create`` in the ORM
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This method allows for more efficient creation of multiple objects in the ORM.
+It can provide significant performance increases if you have many objects,
+Django makes use of this internally, meaning some operations (such as database
+setup for test suites) has seen a performance benefit as a result.
+
+See the :meth:`~django.db.models.query.QuerySet.bulk_create` docs for more
+information.
+
 Minor features
 ~~~~~~~~~~~~~~
 
