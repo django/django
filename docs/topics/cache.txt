@@ -63,17 +63,18 @@ settings file. Here's an explanation of all available values for
 Memcached
 ---------
 
-By far the fastest, most efficient type of cache available to Django, Memcached
-is an entirely memory-based cache framework originally developed to handle high
-loads at LiveJournal.com and subsequently open-sourced by Danga Interactive.
-It's used by sites such as Facebook and Wikipedia to reduce database access and
-dramatically increase site performance.
+By far the fastest, most efficient type of cache available to Django,
+Memcached__ is an entirely memory-based cache framework originally developed to
+handle high loads at LiveJournal.com and subsequently open-sourced by Danga
+Interactive.  It is used by sites such as Facebook and Wikipedia to reduce
+database access and dramatically increase site performance.
 
-Memcached is available for free at http://memcached.org/. It runs as a
-daemon and is allotted a specified amount of RAM. All it does is provide a
-fast interface for adding, retrieving and deleting arbitrary data in the cache.
-All data is stored directly in memory, so there's no overhead of database or
-filesystem usage.
+__ http://memcached.org/
+
+Memcached runs as a daemon and is allotted a specified amount of RAM. All it does is
+provide a fast interface for adding, retrieving and deleting arbitrary data in
+the cache.  All data is stored directly in memory, so there's no overhead of
+database or filesystem usage.
 
 After installing Memcached itself, you'll need to install a memcached
 binding. There are several python memcached bindings available; the
@@ -1144,7 +1145,7 @@ site's performance:
       and ``Last-Modified`` headers.
 
     * :class:`django.middleware.gzip.GZipMiddleware` compresses responses for all
-      moderns browsers, saving bandwidth and transfer time.
+      modern browsers, saving bandwidth and transfer time.
 
 Order of MIDDLEWARE_CLASSES
 ===========================
