@@ -36,7 +36,6 @@ class SpatiaLiteCreation(DatabaseCreation):
 
         # Need to load the SpatiaLite initialization SQL before running `syncdb`.
         self.load_spatialite_sql()
-        call_command('syncdb', verbosity=verbosity, interactive=False, database=self.connection.alias)
 
         # Report syncdb messages at one level lower than that requested.
         # This ensures we don't get flooded with messages during testing
