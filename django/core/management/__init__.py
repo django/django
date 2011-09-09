@@ -283,7 +283,7 @@ class ManagementUtility(object):
         and formatted as potential completion suggestions.
         """
         # Don't complete if user hasn't sourced bash_completion file.
-        if not os.environ.has_key('DJANGO_AUTO_COMPLETE'):
+        if 'DJANGO_AUTO_COMPLETE' not in os.environ:
             return
 
         cwords = os.environ['COMP_WORDS'].split()[1:]

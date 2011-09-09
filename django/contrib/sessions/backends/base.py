@@ -113,7 +113,7 @@ class SessionBase(object):
         self.modified = True
 
     def has_key(self, key):
-        return self._session.has_key(key)
+        return key in self._session
 
     def values(self):
         return self._session.values()

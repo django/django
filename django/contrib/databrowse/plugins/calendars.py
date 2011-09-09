@@ -86,7 +86,7 @@ class CalendarPlugin(DatabrowsePlugin):
         if url is None:
             return self.homepage_view(request)
         url_bits = url.split('/')
-        if self.fields.has_key(url_bits[0]):
+        if url_bits[0] in self.fields:
             return self.calendar_view(request, self.fields[url_bits[0]], *url_bits[1:])
 
         raise http.Http404('The requested page does not exist.')

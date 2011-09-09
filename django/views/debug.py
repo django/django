@@ -141,7 +141,7 @@ class SafeExceptionReporterFilter(ExceptionReporterFilter):
                 else:
                     # Cleanse only the specified parameters.
                     for param in sensitive_post_parameters:
-                        if cleansed.has_key(param):
+                        if param in cleansed:
                             cleansed[param] = CLEANSED_SUBSTITUTE
                     return cleansed
             else:

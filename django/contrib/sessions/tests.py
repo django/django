@@ -80,7 +80,7 @@ class SessionTestsMixin(object):
         self.session['some key'] = 1
         self.session.modified = False
         self.session.accessed = False
-        self.assertTrue(self.session.has_key('some key'))
+        self.assertTrue('some key' in self.session)
         self.assertTrue(self.session.accessed)
         self.assertFalse(self.session.modified)
 

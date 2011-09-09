@@ -131,9 +131,7 @@ class SessionStore(SessionBase):
             pass
 
     def exists(self, session_key):
-        if os.path.exists(self._key_to_file(session_key)):
-            return True
-        return False
+        return os.path.exists(self._key_to_file(session_key))
 
     def delete(self, session_key=None):
         if session_key is None:

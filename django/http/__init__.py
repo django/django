@@ -23,7 +23,7 @@ except ImportError:
 import Cookie
 # httponly support exists in Python 2.6's Cookie library,
 # but not in Python 2.5.
-_morsel_supports_httponly = Cookie.Morsel._reserved.has_key('httponly')
+_morsel_supports_httponly = 'httponly' in Cookie.Morsel._reserved
 # Some versions of Python 2.7 and later won't need this encoding bug fix:
 _cookie_encodes_correctly = Cookie.SimpleCookie().value_encode(';') == (';', '"\\073"')
 # See ticket #13007, http://bugs.python.org/issue2193 and http://trac.edgewall.org/ticket/2256
@@ -591,7 +591,7 @@ class HttpResponse(object):
 
     def has_header(self, header):
         """Case-insensitive check for a header."""
-        return self._headers.has_key(header.lower())
+        return header.lower() in self._headers
 
     __contains__ = has_header
 
