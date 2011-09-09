@@ -4,7 +4,7 @@ import re
 import sys
 import urllib
 import urlparse
-from email.Utils import formatdate
+from email.utils import formatdate
 
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import smart_str, force_unicode

@@ -2,13 +2,13 @@ import mimetypes
 import os
 import random
 import time
-from email import Charset, Encoders
+from email import charset as Charset, encoders as Encoders
 from email.generator import Generator
-from email.MIMEText import MIMEText
-from email.MIMEMultipart import MIMEMultipart
-from email.MIMEBase import MIMEBase
-from email.Header import Header
-from email.Utils import formatdate, getaddresses, formataddr, parseaddr
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
+from email.header import Header
+from email.utils import formatdate, getaddresses, formataddr, parseaddr
 
 from django.conf import settings
 from django.core.mail.utils import DNS_NAME

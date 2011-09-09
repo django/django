@@ -78,7 +78,7 @@ class Command(BaseCommand):
                 return zipfile.ZipFile.read(self, self.namelist()[0])
 
         compression_types = {
-            None:   file,
+            None:   open,
             'gz':   gzip.GzipFile,
             'zip':  SingleZipReader
         }

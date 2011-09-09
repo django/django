@@ -1,8 +1,9 @@
 "Misc. utility functions/classes for admin documentation generator."
 
 import re
-from email.Parser import HeaderParser
-from email.Errors import HeaderParseError
+from email.parser import HeaderParser
+from email.errors import HeaderParseError
+
 from django.utils.safestring import mark_safe
 from django.core.urlresolvers import reverse
 from django.utils.encoding import smart_str
