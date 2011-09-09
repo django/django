@@ -583,6 +583,7 @@ class URLField(CharField):
         self.validators.append(validators.URLValidator(verify_exists=verify_exists, validator_user_agent=validator_user_agent))
 
     def to_python(self, value):
+        value = super(URLField, self).to_python(value)
         if value:
             url_fields = list(urlparse.urlsplit(value))
             if not url_fields[0]:
@@ -601,7 +602,7 @@ class URLField(CharField):
                 # the path portion may need to be added before query params
                 url_fields[2] = '/'
             value = urlparse.urlunsplit(url_fields)
-        return super(URLField, self).to_python(value)
+        return value
 
 class BooleanField(Field):
     widget = CheckboxInput

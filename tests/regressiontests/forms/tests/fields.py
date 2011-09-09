@@ -686,6 +686,10 @@ class FieldsTests(SimpleTestCase):
         url = u'http://t\xfcr.djangoproject.com/'
         self.assertEqual(url, f.clean(url))
 
+    def test_urlfield_not_string(self):
+        f = URLField(required=False)
+        self.assertRaisesMessage(ValidationError, "[u'Enter a valid URL.']", f.clean, 23)
+
     # BooleanField ################################################################
 
     def test_booleanfield_1(self):
