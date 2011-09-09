@@ -142,16 +142,6 @@ SERVER_EMAIL = 'root@localhost'
 SEND_BROKEN_LINK_EMAILS = False
 
 # Database connection info.
-# Legacy format
-DATABASE_ENGINE = ''           # 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-DATABASE_NAME = ''             # Or path to database file if using sqlite3.
-DATABASE_USER = ''             # Not used with sqlite3.
-DATABASE_PASSWORD = ''         # Not used with sqlite3.
-DATABASE_HOST = ''             # Set to empty string for localhost. Not used with sqlite3.
-DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
-DATABASE_OPTIONS = {}          # Set to empty dictionary for default.
-
-# New format
 DATABASES = {
 }
 
@@ -557,17 +547,6 @@ DEFAULT_EXCEPTION_REPORTER_FILTER = 'django.views.debug.SafeExceptionReporterFil
 
 # The name of the class to use to run the test suite
 TEST_RUNNER = 'django.test.simple.DjangoTestSuiteRunner'
-
-# The name of the database to use for testing purposes.
-# If None, a name of 'test_' + DATABASE_NAME will be assumed
-TEST_DATABASE_NAME = None
-
-# Strings used to set the character set and collation order for the test
-# database. These values are passed literally to the server, so they are
-# backend-dependent. If None, no special settings are sent (system defaults are
-# used).
-TEST_DATABASE_CHARSET = None
-TEST_DATABASE_COLLATION = None
 
 ############
 # FIXTURES #

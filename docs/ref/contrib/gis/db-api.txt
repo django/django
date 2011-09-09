@@ -23,30 +23,6 @@ its functionality into full-fledged spatial database backends:
 * :mod:`django.contrib.gis.db.backends.oracle`
 * :mod:`django.contrib.gis.db.backends.spatialite`
 
-Database Settings Backwards-Compatibility
------------------------------------------
-
-In :doc:`Django 1.2 </releases/1.2>`, the way
-to :ref:`specify databases <specifying-databases>` in your settings was changed.
-The old database settings format (e.g., the ``DATABASE_*`` settings)
-is backwards compatible with GeoDjango, and  will automatically use the
-appropriate spatial backend as long as :mod:`django.contrib.gis` is in
-your :setting:`INSTALLED_APPS`.  For example, if you have the following in
-your settings::
-
-    DATABASE_ENGINE='postgresql_psycopg2'
-
-    ...
-
-    INSTALLED_APPS = (
-      ...
-      'django.contrib.gis',
-      ...
-    )
-
-Then, :mod:`django.contrib.gis.db.backends.postgis` is automatically used as your
-spatial backend.
-
 .. _mysql-spatial-limitations:
 
 MySQL Spatial Limitations

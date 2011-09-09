@@ -573,7 +573,7 @@ Now, the ``spatialite`` command can be used to initialize a spatial database::
 .. note::
 
     The parameter ``geodjango.db`` is the *filename* of the SQLite database
-    you want to use.  Use the same in the :setting:`DATABASE_NAME`
+    you want to use.  Use the same in the :setting:`DATABASES` ``"name"`` key
     inside your ``settings.py``.
 
 
