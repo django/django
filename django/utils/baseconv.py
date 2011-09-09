@@ -88,7 +88,7 @@ class BaseConverter(object):
             while x > 0:
                 digit = x % len(to_digits)
                 res = to_digits[digit] + res
-                x = int(x / len(to_digits))
+                x = int(x // len(to_digits))
         return neg, res
 
 base2 = BaseConverter(BASE2_ALPHABET)

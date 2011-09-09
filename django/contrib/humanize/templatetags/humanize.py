@@ -165,13 +165,13 @@ def naturaltime(value):
             return ungettext(
                 u'a second ago', u'%(count)s seconds ago', delta.seconds
             ) % {'count': delta.seconds}
-        elif delta.seconds / 60 < 60:
-            count = delta.seconds / 60
+        elif delta.seconds // 60 < 60:
+            count = delta.seconds // 60
             return ungettext(
                 u'a minute ago', u'%(count)s minutes ago', count
             ) % {'count': count}
         else:
-            count = delta.seconds / 60 / 60
+            count = delta.seconds // 60 // 60
             return ungettext(
                 u'an hour ago', u'%(count)s hours ago', count
             ) % {'count': count}
@@ -187,13 +187,13 @@ def naturaltime(value):
             return ungettext(
                 u'a second from now', u'%(count)s seconds from now', delta.seconds
             ) % {'count': delta.seconds}
-        elif delta.seconds / 60 < 60:
-            count = delta.seconds / 60
+        elif delta.seconds // 60 < 60:
+            count = delta.seconds // 60
             return ungettext(
                 u'a minute from now', u'%(count)s minutes from now', count
             ) % {'count': count}
         else:
-            count = delta.seconds / 60 / 60
+            count = delta.seconds // 60 // 60
             return ungettext(
                 u'an hour from now', u'%(count)s hours from now', count
             ) % {'count': count}

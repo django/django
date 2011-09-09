@@ -166,7 +166,7 @@ def int_to_base36(i):
     # Construct base36 representation
     while factor >= 0:
         j = 36 ** factor
-        base36.append(digits[i / j])
+        base36.append(digits[i // j])
         i = i % j
         factor -= 1
     return ''.join(base36)

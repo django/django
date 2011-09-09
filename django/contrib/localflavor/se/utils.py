@@ -18,7 +18,7 @@ def id_number_checksum(gd):
     if (s % 10) == 0:
         return 0
 
-    return (((s / 10) + 1) * 10) - s
+    return (((s // 10) + 1) * 10) - s
 
 def validate_id_birthday(gd, fix_coordination_number_day=True):
     """
