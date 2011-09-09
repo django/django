@@ -583,9 +583,22 @@ class URLField(CharField):
         self.validators.append(validators.URLValidator(verify_exists=verify_exists, validator_user_agent=validator_user_agent))
 
     def to_python(self, value):
+
+        def split_url(url):
+            """
+            Returns a list of url parts via ``urlparse.urlsplit`` (or raises a
+            ``ValidationError`` exception for certain).
+            """
+            try:
+                return list(urlparse.urlsplit(url))
+            except ValueError:
+                # urlparse.urlsplit can raise a ValueError with some
+                # misformatted URLs.
+                raise ValidationError(self.error_messages['invalid'])
+
         value = super(URLField, self).to_python(value)
         if value:
-            url_fields = list(urlparse.urlsplit(value))
+            url_fields = split_url(value)
             if not url_fields[0]:
                 # If no URL scheme given, assume http://
                 url_fields[0] = 'http'
@@ -596,8 +609,7 @@ class URLField(CharField):
                 url_fields[2] = ''
                 # Rebuild the url_fields list, since the domain segment may now
                 # contain the path too.
-                value = urlparse.urlunsplit(url_fields)
-                url_fields = list(urlparse.urlsplit(value))
+                url_fields = split_url(urlparse.urlunsplit(url_fields))
             if not url_fields[2]:
                 # the path portion may need to be added before query params
                 url_fields[2] = '/'
