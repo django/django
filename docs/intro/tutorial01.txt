@@ -41,7 +41,7 @@ code, then run the following command:
 .. code-block:: bash
 
    django-admin.py startproject mysite
-   
+
 This will create a ``mysite`` directory in your current directory.
 
 .. admonition:: Script name may differ in distribution packages
@@ -173,11 +173,11 @@ module-level variables representing Django settings. Change the
 following keys in the :setting:`DATABASES` ``'default'`` item to match
 your databases connection settings.
 
-    * :setting:`ENGINE` -- Either
+    * :setting:`ENGINE <DATABASE-ENGINE>` -- Either
       ``'django.db.backends.postgresql_psycopg2'``,
       ``'django.db.backends.mysql'`` or
       ``'django.db.backends.sqlite3'``. Other backends are
-      :setting:`also available <ENGINE>`.
+      :setting:`also available <DATABASE-ENGINE>`.
 
     * :setting:`NAME` -- The name of your database. If you're using
       SQLite, the database will be a file on your computer; in that
@@ -692,7 +692,7 @@ Save these changes and start a new Python interactive shell by running
 
 For more information on model relations, see :doc:`Accessing related objects
 </ref/models/relations>`. For more on how to use double underscores to perform
-field lookups via the API, see `Field lookups`__. For full details on the 
+field lookups via the API, see `Field lookups`__. For full details on the
 database API, see our :doc:`Database API reference </topics/db/queries>`.
 
 __ http://docs.djangoproject.com/en/1.2/topics/db/queries/#field-lookups
