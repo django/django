@@ -47,7 +47,7 @@ class BaseCommentNode(template.Node):
     def lookup_content_type(token, tagname):
         try:
             app, model = token.split('.')
-            return ContentType.objects.get(app_label=app, model=model)
+            return ContentType.objects.get_by_natural_key(app, model)
         except ValueError:
             raise template.TemplateSyntaxError("Third argument in %r must be in the format 'app.model'" % tagname)
         except ContentType.DoesNotExist:
