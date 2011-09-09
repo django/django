@@ -238,6 +238,8 @@ could, for example, use custom handlers to enforce user-level quotas, compress
 data on the fly, render progress bars, and even send data to another storage
 location directly without storing it locally.
 
+.. _modifying_upload_handlers_on_the_fly:
+
 Modifying upload handlers on the fly
 ------------------------------------
 
