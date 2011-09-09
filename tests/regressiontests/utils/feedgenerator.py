@@ -66,6 +66,6 @@ class FeedgeneratorTest(unittest.TestCase):
         """
         atom_feed = feedgenerator.Atom1Feed("title", "link", "description")
         self.assertEqual(
-            atom_feed.mime_type, "application/atom+xml; charset=utf8"
+            atom_feed.mime_type, "application/atom+xml; charset=utf-8"
         )
 

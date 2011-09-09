@@ -13,7 +13,7 @@ class TestSigner(TestCase):
         for s in (
             'hello',
             '3098247:529:087:',
-            u'\u2019'.encode('utf8'),
+            u'\u2019'.encode('utf-8'),
         ):
             self.assertEqual(
                 signer.signature(s),
