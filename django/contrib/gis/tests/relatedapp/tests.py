@@ -1,3 +1,4 @@
+from datetime import date
 from django.test import TestCase
 
 from django.contrib.gis.geos import GEOSGeometry, Point, MultiPoint
@@ -280,5 +281,12 @@ class RelatedGeoModelTest(TestCase):
         # keyword.  The TypeError is swallowed if QuerySet is actually
         # evaluated as list generation swallows TypeError in CPython.
         sql = str(qs.query)
+
+    def test16_annotated_date_queryset(self):
+        "Ensure annotated date querysets work if spatial backend is used.  See #14648."
+        birth_years = [dt.year for dt in 
+                       list(Author.objects.annotate(num_books=Count('books')).dates('dob', 'year'))]
+        birth_years.sort()
+        self.assertEqual([1950, 1974], birth_years)
 
     # TODO: Related tests for KML, GML, and distance lookups.

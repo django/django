@@ -36,6 +36,7 @@ class Parcel(models.Model):
 # These use the GeoManager but do not have any geographic fields.
 class Author(models.Model):
     name = models.CharField(max_length=100)
+    dob = models.DateField()
     objects = models.GeoManager()
 
 class Article(models.Model):
