@@ -1070,10 +1070,6 @@ class Queries4Tests(BaseQuerysetTest):
         ci3 = CategoryItem.objects.create(category=c3)
 
         qs = CategoryItem.objects.exclude(category__specialcategory__isnull=False)
-        # Under MySQL, this query gives incorrect values on the first attempt.
-        # If you run exactly the same query twice, it yields the right answer
-        # the second attempt. Oh, how we do love MySQL.
-        qs.count()
         self.assertEqual(qs.count(), 1)
         self.assertQuerysetEqual(qs, [ci1.pk], lambda x: x.pk)
 
@@ -1136,10 +1132,6 @@ class Queries4Tests(BaseQuerysetTest):
         ci3 = CategoryItem.objects.create(category=c1)
 
         qs = CategoryItem.objects.exclude(category__onetoonecategory__isnull=False)
-        # Under MySQL, this query gives incorrect values on the first attempt.
-        # If you run exactly the same query twice, it yields the right answer
-        # the second attempt. Oh, how we do love MySQL.
-        qs.count()
         self.assertEqual(qs.count(), 1)
         self.assertQuerysetEqual(qs, [ci1.pk], lambda x: x.pk)
 
@@ -1421,11 +1413,6 @@ class Queries6Tests(TestCase):
             []
         )
 
-        # This next makes exactly *zero* sense, but it works. It's needed
-        # because MySQL fails to give the right results the first time this
-        # query is executed. If you run the same query a second time, it
-        # works fine. It's a hack, but it works...
-        list(Tag.objects.exclude(children=None))
         self.assertQuerysetEqual(
             Tag.objects.exclude(children=None),
             ['<Tag: t1>', '<Tag: t3>']
