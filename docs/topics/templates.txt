@@ -623,17 +623,17 @@ Custom tag and filter libraries
 ===============================
 
 Certain applications provide custom tag and filter libraries. To access them in
-a template, use the ``{% load %}`` tag::
+a template, use the :ttag:`load` tag::
 
     {% load comments %}
 
     {% comment_form for blogs.entries entry.id with is_public yes %}
 
-In the above, the ``load`` tag loads the ``comments`` tag library, which then
+In the above, the :ttag:`load` tag loads the ``comments`` tag library, which then
 makes the ``comment_form`` tag available for use. Consult the documentation
 area in your admin to find the list of custom libraries in your installation.
 
-The ``{% load %}`` tag can take multiple library names, separated by spaces.
+The :ttag:`load` tag can take multiple library names, separated by spaces.
 Example::
 
     {% load comments i18n %}
