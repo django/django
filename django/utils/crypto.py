@@ -64,13 +64,22 @@ class Token():
             self._hash = hashlib.md5(random.getrandbits(256))
 
     def base_16_digest(self, length=None):
+        """
+        Outputs our hash to a base 16 string.
+        """
         return self._hash.hexdigest()[:length]
 
     def base_62_digest(self, length=None):
+        """
+        Outputs our hash to a base 62 string.
+        """
         base16 = self._hash.hexdigest()
         base10 = int(base16, 16)
 
         return base62_encode(base10)[:length]
+
+    def update(self, value):
+        self._hash = self._hash.update(value)
 
 
 def salted_hmac(key_salt, value, secret=None):
