@@ -1,8 +1,7 @@
 from django.contrib.gis.gdal import SpatialReference
-from django.db import connections, DEFAULT_DB_ALIAS
 
 def add_srs_entry(srs, auth_name='EPSG', auth_srid=None, ref_sys_name=None,
-                  database=DEFAULT_DB_ALIAS):
+                  database=None):
     """
     This function takes a GDAL SpatialReference system and adds its information
     to the `spatial_ref_sys` table of the spatial backend.  Doing this enables
@@ -33,7 +32,11 @@ def add_srs_entry(srs, auth_name='EPSG', auth_srid=None, ref_sys_name=None,
       of `django.db.DEFAULT_DB_ALIAS` (at the time of this writing, it's value
       is 'default').
     """
+    from django.db import connections, DEFAULT_DB_ALIAS
+    if not database:
+        database = DEFAULT_DB_ALIAS
     connection = connections[database]
+
     if not hasattr(connection.ops, 'spatial_version'):
         raise Exception('The `add_srs_entry` utility only works '
                         'with spatial backends.')
@@ -69,9 +72,9 @@ def add_srs_entry(srs, auth_name='EPSG', auth_srid=None, ref_sys_name=None,
     try:
         # Try getting via SRID only, because using all kwargs may
         # differ from exact wkt/proj in database.
-        sr = SpatialRefSys.objects.get(srid=srs.srid)
+        sr = SpatialRefSys.objects.using(database).get(srid=srs.srid)
     except SpatialRefSys.DoesNotExist:
-        sr = SpatialRefSys.objects.create(**kwargs)
+        sr = SpatialRefSys.objects.using(database).create(**kwargs)
 
 # Alias is for backwards-compatibility purposes.
 add_postgis_srs = add_srs_entry

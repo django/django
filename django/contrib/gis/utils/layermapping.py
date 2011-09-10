@@ -132,9 +132,6 @@ class LayerMapping(object):
         else:
             raise LayerMapError('Unrecognized transaction mode: %s' % transaction_mode)
 
-        if using is None:
-            pass
-
     #### Checking routines used during initialization ####
     def check_fid_range(self, fid_range):
         "This checks the `fid_range` keyword."
@@ -393,7 +390,7 @@ class LayerMapping(object):
 
         # Attempting to retrieve and return the related model.
         try:
-            return rel_model.objects.get(**fk_kwargs)
+            return rel_model.objects.using(self.using).get(**fk_kwargs)
         except ObjectDoesNotExist:
             raise MissingForeignKey('No ForeignKey %s model found with keyword arguments: %s' % (rel_model.__name__, fk_kwargs))
 
@@ -429,7 +426,7 @@ class LayerMapping(object):
         SpatialRefSys = self.spatial_backend.spatial_ref_sys()
         try:
             # Getting the target spatial reference system
-            target_srs = SpatialRefSys.objects.get(srid=self.geo_field.srid).srs
+            target_srs = SpatialRefSys.objects.using(self.using).get(srid=self.geo_field.srid).srs
 
             # Creating the CoordTransform object
             return CoordTransform(self.source_srs, target_srs)
