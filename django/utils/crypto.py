@@ -64,13 +64,13 @@ class Token():
             self._hash = hashlib.md5(random.getrandbits(256))
 
     def base_16_digest(self, length):
-        return self._hash.hexdigest()
+        return self._hash.hexdigest()[:length]
 
     def base_62_digest(self, length):
         base16 = self._hash.hexdigest()
         base10 = int(base16, 16)
 
-        return base62_encode(base10)
+        return base62_encode(base10)[:length]
 
 
 def salted_hmac(key_salt, value, secret=None):
