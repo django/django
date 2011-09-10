@@ -805,6 +805,17 @@ class FormsFormsetTestCase(TestCase):
         self.assertEqual(str(reverse_formset[1]), str(forms[-2]))
         self.assertEqual(len(reverse_formset), len(forms))
 
+    def test_formset_nonzero(self):
+        """
+        Formsets with no forms should still evaluate as true.
+        Regression test for #15722
+        """
+        ChoiceFormset = formset_factory(Choice, extra=0)
+        formset = ChoiceFormset()
+        self.assertEqual(len(formset.forms), 0)
+        self.assertTrue(formset)
+
+
 data = {
     'choices-TOTAL_FORMS': '1', # the number of forms rendered
     'choices-INITIAL_FORMS': '0', # the number of forms with initial data

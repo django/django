@@ -60,6 +60,10 @@ class BaseFormSet(StrAndUnicode):
     def __len__(self):
         return len(self.forms)
 
+    def __nonzero__(self):
+        """All formsets have a management form which is not included in the length"""
+        return True
+
     def _management_form(self):
         """Returns the ManagementForm instance for this FormSet."""
         if self.is_bound:
