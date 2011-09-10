@@ -3,9 +3,9 @@ Django's standard crypto functions and utilities.
 """
 from __future__ import unicode_literals
 
+import hashlib
 import hmac
 import struct
-import hashlib
 import binascii
 import operator
 import time
@@ -28,6 +28,49 @@ from django.utils.encoding import smart_str
 
 _trans_5c = b"".join([chr(x ^ 0x5C) for x in xrange(256)])
 _trans_36 = b"".join([chr(x ^ 0x36) for x in xrange(256)])
+
+try:
+    random = random.SystemRandom()
+except NotImplementedError:
+    random = random.random()
+
+
+ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+
+def base62_encode(num, alphabet=ALPHABET):
+    """Encode a number in Base X
+
+    `num`: The number to encode
+    `alphabet`: The alphabet to use for encoding
+    """
+    if (num == 0):
+        return alphabet[0]
+    arr = []
+    base = len(alphabet)
+    while num:
+        rem = num % base
+        num = num // base
+        arr.append(alphabet[rem])
+    arr.reverse()
+    return ''.join(arr)
+
+
+class Token():
+    def __init__(self, value=None):
+        if value:
+            self._hash = hashlib.md5(value)
+        else:
+            self._hash = hashlib.md5(random.getrandbits(256))
+
+    def base_16_digest(self, length):
+        return self._hash.hexdigest()
+
+    def base_62_digest(self, length):
+        base16 = self._hash.hexdigest()
+        base10 = int(base16, 16)
+
+        return base62_encode(base10)
 
 
 def salted_hmac(key_salt, value, secret=None):
