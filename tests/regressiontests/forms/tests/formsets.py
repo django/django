@@ -793,8 +793,10 @@ class FormsFormsetTestCase(TestCase):
         # Formets can override the default iteration order
         class BaseReverseFormSet(BaseFormSet):
             def __iter__(self):
-                for form in reversed(self.forms):
-                    yield form
+                return reversed(self.forms)
+
+            def __getitem__(self, idx):
+                return super(BaseReverseFormSet, self).__getitem__(len(self) - idx - 1)
 
         ReverseChoiceFormset = formset_factory(Choice, BaseReverseFormSet, extra=3)
         reverse_formset = ReverseChoiceFormset()
@@ -911,12 +913,12 @@ class TestIsBoundBehavior(TestCase):
         # The empty forms should be equal.
         self.assertEqual(empty_forms[0].as_p(), empty_forms[1].as_p())
 
-class TestEmptyFormSet(TestCase): 
+class TestEmptyFormSet(TestCase):
     "Test that an empty formset still calls clean()"
-    def test_empty_formset_is_valid(self): 
-        EmptyFsetWontValidateFormset = formset_factory(FavoriteDrinkForm, extra=0, formset=EmptyFsetWontValidate) 
-        formset = EmptyFsetWontValidateFormset(data={'form-INITIAL_FORMS':'0', 'form-TOTAL_FORMS':'0'},prefix="form") 
-        formset2 = EmptyFsetWontValidateFormset(data={'form-INITIAL_FORMS':'0', 'form-TOTAL_FORMS':'1', 'form-0-name':'bah' },prefix="form") 
-        self.assertFalse(formset.is_valid()) 
-        self.assertFalse(formset2.is_valid()) 
+    def test_empty_formset_is_valid(self):
+        EmptyFsetWontValidateFormset = formset_factory(FavoriteDrinkForm, extra=0, formset=EmptyFsetWontValidate)
+        formset = EmptyFsetWontValidateFormset(data={'form-INITIAL_FORMS':'0', 'form-TOTAL_FORMS':'0'},prefix="form")
+        formset2 = EmptyFsetWontValidateFormset(data={'form-INITIAL_FORMS':'0', 'form-TOTAL_FORMS':'1', 'form-0-name':'bah' },prefix="form")
+        self.assertFalse(formset.is_valid())
+        self.assertFalse(formset2.is_valid())
 

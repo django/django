@@ -55,7 +55,7 @@ class BaseFormSet(StrAndUnicode):
 
     def __getitem__(self, index):
         """Returns the form at the given index, based on the rendering order"""
-        return list(self)[index]
+        return self.forms[index]
 
     def __len__(self):
         return len(self.forms)
