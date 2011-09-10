@@ -814,7 +814,8 @@ class SQLInsertCompiler(SQLCompiler):
             values = [[self.connection.ops.pk_default_value()] for obj in self.query.objs]
             params = [[]]
             fields = [None]
-        can_bulk = not any(hasattr(field, "get_placeholder") for field in fields) and not self.return_id
+        can_bulk = (not any(hasattr(field, "get_placeholder") for field in fields) and
+            not self.return_id and self.connection.features.has_bulk_insert)
 
         if can_bulk:
             placeholders = [["%s"] * len(fields)]
@@ -831,7 +832,7 @@ class SQLInsertCompiler(SQLCompiler):
             result.append(r_fmt % col)
             params += r_params
             return [(" ".join(result), tuple(params))]
-        if can_bulk and self.connection.features.has_bulk_insert:
+        if can_bulk:
             result.append(self.connection.ops.bulk_insert_sql(fields, len(values)))
             return [(" ".join(result), tuple([v for val in values for v in val]))]
         else:
