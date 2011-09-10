@@ -17,7 +17,8 @@ class BulkCreateTests(TestCase):
         ]
 
     def test_simple(self):
-        Country.objects.bulk_create(self.data)
+        created = Country.objects.bulk_create(self.data)
+        self.assertEqual(len(created), 4)
         self.assertQuerysetEqual(Country.objects.order_by("-name"), [
             "United States of America", "The Netherlands", "Germany", "Czech Republic"
         ], attrgetter("name"))

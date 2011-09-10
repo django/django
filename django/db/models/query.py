@@ -388,6 +388,7 @@ class QuerySet(object):
                 self.model._base_manager._insert(objs_with_pk, fields=fields, using=self.db)
             if objs_without_pk:
                 self.model._base_manager._insert(objs_without_pk, fields=[f for f in fields if not isinstance(f, AutoField)], using=self.db)
+        return objs
 
     def get_or_create(self, **kwargs):
         """
