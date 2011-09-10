@@ -1960,6 +1960,19 @@ in order to format numbers.
 
 See also :setting:`THOUSAND_SEPARATOR` and :setting:`NUMBER_GROUPING`.
 
+.. setting:: USE_X_FORWARDED_HOST
+
+USE_X_FORWARDED_HOST
+--------------------
+
+.. versionadded:: 1.3.1
+
+Default: ``False``
+
+A boolean that specifies whether to use the X-Forwarded-Host header in
+preference to the Host header. This should only be enabled if a proxy
+which sets this header is in use.
+
 .. setting:: YEAR_MONTH_FORMAT
 
 YEAR_MONTH_FORMAT

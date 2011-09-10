@@ -191,10 +191,11 @@ Methods
 
 .. method:: HttpRequest.get_host()
 
-    Returns the originating host of the request using information from the
-    ``HTTP_X_FORWARDED_HOST`` and ``HTTP_HOST`` headers (in that order). If
-    they don't provide a value, the method uses a combination of
-    ``SERVER_NAME`` and ``SERVER_PORT`` as detailed in `PEP 333`_.
+    Returns the originating host of the request using information from
+    the ``HTTP_X_FORWARDED_HOST`` (if enabled in the settings) and ``HTTP_HOST``
+    headers (in that order). If they don't provide a value, the method
+    uses a combination of ``SERVER_NAME`` and ``SERVER_PORT`` as
+    detailed in :pep:`3333`.
 
     .. _PEP 333: http://www.python.org/dev/peps/pep-0333/
 
