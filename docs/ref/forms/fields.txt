@@ -799,10 +799,10 @@ Takes the following optional arguments:
     If ``True``, the validator will attempt to load the given URL, raising
     ``ValidationError`` if the page gives a 404. Defaults to ``False``.
 
-.. deprecated:: 1.3.1
+.. deprecated:: 1.4
 
-   ``verify_exists`` was deprecated for security reasons and will be
-   removed in 1.4. This deprecation also removes ``validator_user_agent``.
+   ``verify_exists`` was deprecated for security reasons and will be removed in
+   Django 1.5. This deprecation also removes ``validator_user_agent``.
 
 .. attribute:: URLField.validator_user_agent
 

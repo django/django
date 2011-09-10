@@ -876,11 +876,10 @@ shortcuts.
 
 A :class:`CharField` for a URL. Has one extra optional argument:
 
-.. deprecated:: 1.3.1 
+.. deprecated:: 1.4
 
-   ``verify_exists`` is deprecated for security reasons as of 1.3.1
-   and will be removed in 1.4. Prior to 1.3.1, the default value was
-   ``True``.
+   ``verify_exists`` is deprecated for security reasons as of 1.4 and will be
+   removed in Django 1.5. Prior to 1.3.1, the default value was ``True``.
 
 .. attribute:: URLField.verify_exists
 
