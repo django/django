@@ -152,7 +152,7 @@ class BaseHandler(object):
                         try:
                             response = self.handle_uncaught_exception(request, resolver, sys.exc_info())
                         finally:
-                            receivers = signals.got_request_exception.send(sender=self.__class__, request=request)
+                            signals.got_request_exception.send(sender=self.__class__, request=request)
             except exceptions.PermissionDenied:
                 logger.warning(
                     'Forbidden (Permission denied): %s' % request.path,
@@ -168,14 +168,14 @@ class BaseHandler(object):
                         response = self.handle_uncaught_exception(request,
                             resolver, sys.exc_info())
                     finally:
-                        receivers = signals.got_request_exception.send(
+                        signals.got_request_exception.send(
                             sender=self.__class__, request=request)
             except SystemExit:
                 # Allow sys.exit() to actually exit. See tickets #1023 and #4701
                 raise
             except: # Handle everything else, including SuspiciousOperation, etc.
                 # Get the exception info now, in case another exception is thrown later.
-                receivers = signals.got_request_exception.send(sender=self.__class__, request=request)
+                signals.got_request_exception.send(sender=self.__class__, request=request)
                 response = self.handle_uncaught_exception(request, resolver, sys.exc_info())
         finally:
             # Reset URLconf for this thread on the way out for complete
@@ -188,7 +188,7 @@ class BaseHandler(object):
                 response = middleware_method(request, response)
             response = self.apply_response_fixes(request, response)
         except: # Any exception should be gathered and handled
-            receivers = signals.got_request_exception.send(sender=self.__class__, request=request)
+            signals.got_request_exception.send(sender=self.__class__, request=request)
             response = self.handle_uncaught_exception(request, resolver, sys.exc_info())
 
         return response

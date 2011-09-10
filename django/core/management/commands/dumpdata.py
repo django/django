@@ -1,7 +1,7 @@
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import BaseCommand, CommandError
 from django.core import serializers
-from django.db import connections, router, DEFAULT_DB_ALIAS
+from django.db import router, DEFAULT_DB_ALIAS
 from django.utils.datastructures import SortedDict
 
 from optparse import make_option
@@ -28,12 +28,11 @@ class Command(BaseCommand):
     args = '[appname appname.ModelName ...]'
 
     def handle(self, *app_labels, **options):
-        from django.db.models import get_app, get_apps, get_models, get_model
+        from django.db.models import get_app, get_apps, get_model
 
         format = options.get('format','json')
         indent = options.get('indent',None)
         using = options.get('database', DEFAULT_DB_ALIAS)
-        connection = connections[using]
         excludes = options.get('exclude',[])
         show_traceback = options.get('traceback', False)
         use_natural_keys = options.get('use_natural_keys', False)

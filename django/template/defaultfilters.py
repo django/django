@@ -607,7 +607,8 @@ def unordered_list(value, autoescape=None):
         if second_item == []:
             return [first_item], True
         try:
-            it = iter(second_item)  # see if second item is iterable
+            # see if second item is iterable
+            iter(second_item)
         except TypeError:
             return list_, False
         old_style_list = True

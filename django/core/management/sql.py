@@ -127,7 +127,6 @@ def sql_custom(app, style, connection):
     output = []
 
     app_models = get_models(app)
-    app_dir = os.path.normpath(os.path.join(os.path.dirname(app.__file__), 'sql'))
 
     for model in app_models:
         output.extend(custom_sql_for_model(model, style, connection))

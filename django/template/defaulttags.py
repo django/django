@@ -51,7 +51,7 @@ def token_kwargs(bits, parser, support_legacy=False):
 
     kwargs = {}
     while bits:
-        if kwarg_format: 
+        if kwarg_format:
             match = kwarg_re.match(bits[0])
             if not match or not match.group(1):
                 return kwargs
@@ -276,7 +276,6 @@ class IfChangedNode(Node):
             compare_to = None
 
         if compare_to != self._last_seen:
-            firstloop = (self._last_seen == None)
             self._last_seen = compare_to
             content = self.nodelist_true.render(context)
             return content
