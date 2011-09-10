@@ -35,7 +35,6 @@ def _get_failure_view():
 def _get_new_csrf_key():
     return get_random_string(CSRF_KEY_LENGTH)
 
-
 def get_token(request):
     """
     Returns the the CSRF token required for a POST form. The token is an

@@ -96,7 +96,7 @@ def get_max_age(response):
 
 def _set_response_etag(response):
     # response['ETag'] = '"%s"' % hashlib.md5(response.content).hexdigest()
-    response['ETag'] = '"%s"' % Token(response.content).base_16_digest()
+    response['ETag'] = '"%s"' % Token(response.content).base16_digest()
     return response
 
 def patch_response_headers(response, cache_timeout=None):
@@ -195,7 +195,7 @@ def _generate_cache_header_key(key_prefix, request):
     # path = hashlib.md5(iri_to_uri(request.get_full_path()))
     path = Token(iri_to_uri(request.get_full_path()))
     cache_key = 'views.decorators.cache.cache_header.%s.%s' % (
-        key_prefix, path.base_16_digest())
+        key_prefix, path.base16_digest())
     return _i18n_cache_key_suffix(request, cache_key)
 
 def get_cache_key(request, key_prefix=None, method='GET', cache=None):

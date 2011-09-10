@@ -139,7 +139,7 @@ class FileBasedCache(BaseCache):
         ``{cache-dir}ac/bd/18db4cc2f85cedef654fccc4a4d8``.
         """
         path = hashlib.md5(key).hexdigest()
-        path = Token(key).base_16_digest()
+        path = Token(key).base16_digest()
         path = os.path.join(path[:2], path[2:4], path[4:])
         return os.path.join(self._dir, path)
 

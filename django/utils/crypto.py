@@ -9,6 +9,7 @@ import struct
 import binascii
 import operator
 import time
+from string import digits, letters
 from functools import reduce
 
 # Use the system PRNG if possible
@@ -25,14 +26,14 @@ except NotImplementedError:
 from django.conf import settings
 from django.utils.encoding import smart_str
 
+    
+#ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 _trans_5c = b"".join([chr(x ^ 0x5C) for x in xrange(256)])
 _trans_36 = b"".join([chr(x ^ 0x36) for x in xrange(256)])
 
-ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
-
-def base62_encode(num, alphabet=ALPHABET):
+def base62_encode(num, alphabet=digits+letters):
     """Encode a number in Base X
 
     `num`: The number to encode
@@ -57,13 +58,13 @@ class Token():
         else:
             self._hash = hashlib.md5(value)
 
-    def base_16_digest(self, length=None):
+    def base16_digest(self, length=None):
         """
         Outputs our hash to a base 16 string.
         """
         return self._hash.hexdigest()[:length]
 
-    def base_62_digest(self, length=None):
+    def base62_digest(self, length=None):
         """
         Outputs our hash to a base 62 string.
         """
