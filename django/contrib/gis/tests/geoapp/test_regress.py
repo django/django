@@ -2,7 +2,7 @@ from datetime import datetime
 from django.contrib.gis.tests.utils import no_mysql, no_spatialite
 from django.contrib.gis.shortcuts import render_to_kmz
 from django.test import TestCase
-from models import City, PennsylvaniaCity
+from models import City, PennsylvaniaCity, State
 
 class GeoRegressionTests(TestCase):
 
@@ -43,3 +43,13 @@ class GeoRegressionTests(TestCase):
         mansfield = PennsylvaniaCity.objects.create(name='Mansfield', county='Tioga', point='POINT(-77.071445 41.823881)',
                                                     founded=founded)
         self.assertEqual(founded, PennsylvaniaCity.objects.dates('founded', 'day')[0])
+
+    def test05_empty_count(self):
+         "Testing that PostGISAdapter.__eq__ does check empty strings, see #13670"
+         # contrived example, but need a geo lookup paired with an id__in lookup
+         pueblo = City.objects.get(name='Pueblo')
+         state = State.objects.filter(poly__contains=pueblo.point)
+         cities_within_state = City.objects.filter(id__in=state)
+
+         # .count() should not throw TypeError in __eq__
+         self.assertEqual(cities_within_state.count(), 1)

@@ -8,6 +8,8 @@ class WKTAdapter(object):
         self.srid = geom.srid
 
     def __eq__(self, other):
+        if not isinstance(other, WKTAdapter):
+            return False
         return self.wkt == other.wkt and self.srid == other.srid
 
     def __str__(self):

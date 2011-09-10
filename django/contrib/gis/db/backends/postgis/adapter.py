@@ -21,6 +21,8 @@ class PostGISAdapter(object):
             raise Exception('Error implementing psycopg2 protocol. Is psycopg2 installed?')
 
     def __eq__(self, other):
+        if not isinstance(other, PostGISAdapter):
+            return False
         return (self.ewkb == other.ewkb) and (self.srid == other.srid)
 
     def __str__(self):
