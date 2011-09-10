@@ -53,25 +53,22 @@ class BaseModelValidationTests(ValidationTestCase):
         mtv = ModelToValidate(number=10, name='Some Name', url='not a url')
         self.assertFieldFailsValidationWithMessage(mtv.full_clean, 'url', [u'Enter a valid value.'])
 
+    #The tests below which use url_verify are deprecated
     def test_correct_url_but_nonexisting_gives_404(self):
-        mtv = ModelToValidate(number=10, name='Some Name', url='http://google.com/we-love-microsoft.html')
-        self.assertFieldFailsValidationWithMessage(mtv.full_clean, 'url', [u'This URL appears to be a broken link.'])
+        mtv = ModelToValidate(number=10, name='Some Name', url_verify='http://qa-dev.w3.org/link-testsuite/http.php?code=404')
+        self.assertFieldFailsValidationWithMessage(mtv.full_clean, 'url_verify', [u'This URL appears to be a broken link.'])
 
     def test_correct_url_value_passes(self):
-        mtv = ModelToValidate(number=10, name='Some Name', url='http://www.example.com/')
+        mtv = ModelToValidate(number=10, name='Some Name', url_verify='http://www.google.com/')
+        self.assertEqual(None, mtv.full_clean()) # This will fail if there's no Internet connection
+
+    def test_correct_url_with_redirect(self):
+        mtv = ModelToValidate(number=10, name='Some Name', url_verify='http://qa-dev.w3.org/link-testsuite/http.php?code=301') #example.com is a redirect to iana.org now
         self.assertEqual(None, mtv.full_clean()) # This will fail if there's no Internet connection
 
     def test_correct_https_url_but_nonexisting(self):
-        mtv = ModelToValidate(number=10, name='Some Name', url='https://www.example.com/')
-        self.assertFieldFailsValidationWithMessage(mtv.full_clean, 'url', [u'This URL appears to be a broken link.'])
-
-    def test_correct_ftp_url_but_nonexisting(self):
-        mtv = ModelToValidate(number=10, name='Some Name', url='ftp://ftp.google.com/we-love-microsoft.html')
-        self.assertFieldFailsValidationWithMessage(mtv.full_clean, 'url', [u'This URL appears to be a broken link.'])
-
-    def test_correct_ftps_url_but_nonexisting(self):
-        mtv = ModelToValidate(number=10, name='Some Name', url='ftps://ftp.google.com/we-love-microsoft.html')
-        self.assertFieldFailsValidationWithMessage(mtv.full_clean, 'url', [u'This URL appears to be a broken link.'])
+        mtv = ModelToValidate(number=10, name='Some Name', url_verify='https://www.example.com/')
+        self.assertFieldFailsValidationWithMessage(mtv.full_clean, 'url_verify', [u'This URL appears to be a broken link.'])
 
     def test_text_greater_that_charfields_max_length_raises_erros(self):
         mtv = ModelToValidate(number=10, name='Some Name'*100)

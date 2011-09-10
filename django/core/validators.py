@@ -1,3 +1,4 @@
+import platform
 import re
 import urllib2
 import urlparse
@@ -39,10 +40,6 @@ class RegexValidator(object):
         if not self.regex.search(smart_unicode(value)):
             raise ValidationError(self.message, code=self.code)
 
-class HeadRequest(urllib2.Request):
-    def get_method(self):
-        return "HEAD"
-
 class URLValidator(RegexValidator):
     regex = re.compile(
         r'^(?:http|ftp)s?://' # http:// or https://
@@ -52,7 +49,8 @@ class URLValidator(RegexValidator):
         r'(?::\d+)?' # optional port
         r'(?:/?|[/?]\S+)$', re.IGNORECASE)
 
-    def __init__(self, verify_exists=False, validator_user_agent=URL_VALIDATOR_USER_AGENT):
+    def __init__(self, verify_exists=False,
+                 validator_user_agent=URL_VALIDATOR_USER_AGENT):
         super(URLValidator, self).__init__()
         self.verify_exists = verify_exists
         self.user_agent = validator_user_agent
@@ -76,6 +74,7 @@ class URLValidator(RegexValidator):
         else:
             url = value
 
+        #This is deprecated and will be removed in a future release.
         if self.verify_exists:
             headers = {
                 "Accept": "text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5",
@@ -88,21 +87,36 @@ class URLValidator(RegexValidator):
             broken_error = ValidationError(
                 _(u'This URL appears to be a broken link.'), code='invalid_link')
             try:
-                req = HeadRequest(url, None, headers)
-                u = urllib2.urlopen(req)
+                req = urllib2.Request(url, None, headers)
+                req.get_method = lambda: 'HEAD'
+                #Create an opener that does not support local file access
+                opener = urllib2.OpenerDirector()
+
+                #Don't follow redirects, but don't treat them as errors either
+                error_nop = lambda *args, **kwargs: True
+                http_error_processor = urllib2.HTTPErrorProcessor()
+                http_error_processor.http_error_301 = error_nop
+                http_error_processor.http_error_302 = error_nop
+                http_error_processor.http_error_307 = error_nop
+
+                handlers = [urllib2.UnknownHandler(),
+                            urllib2.HTTPHandler(),
+                            urllib2.HTTPDefaultErrorHandler(),
+                            urllib2.FTPHandler(),
+                            http_error_processor]
+                try:
+                    import ssl
+                    handlers.append(urllib2.HTTPSHandler())
+                except:
+                    #Python isn't compiled with SSL support
+                    pass
+                map(opener.add_handler, handlers)
+                if platform.python_version_tuple() >= (2, 6):
+                    opener.open(req, timeout=10)
+                else:
+                    opener.open(req)
             except ValueError:
                 raise ValidationError(_(u'Enter a valid URL.'), code='invalid')
-            except urllib2.HTTPError, e:
-                if e.code in (405, 501):
-                    # Try a GET request (HEAD refused)
-                    # See also: http://www.w3.org/Protocols/rfc2616/rfc2616.html
-                    try:
-                        req = urllib2.Request(url, None, headers)
-                        u = urllib2.urlopen(req)
-                    except:
-                        raise broken_error
-                else:
-                    raise broken_error
             except: # urllib2.URLError, httplib.InvalidURL, etc.
                 raise broken_error
 

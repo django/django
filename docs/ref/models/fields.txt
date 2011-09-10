@@ -831,14 +831,21 @@ shortcuts.
 ``URLField``
 ------------
 
-.. class:: URLField([verify_exists=True, max_length=200, **options])
+.. class:: URLField([verify_exists=False, max_length=200, **options])
 
 A :class:`CharField` for a URL. Has one extra optional argument:
 
+.. deprecated:: 1.3.1
+
+   ``verify_exists`` is deprecated for security reasons as of 1.3.1
+   and will be removed in 1.4. Prior to 1.3.1, the default value was
+   ``True``.
+
 .. attribute:: URLField.verify_exists
 
-    If ``True`` (the default), the URL given will be checked for existence
-    (i.e., the URL actually loads and doesn't give a 404 response).
+    If ``True``, the URL given will be checked for existence (i.e.,
+    the URL actually loads and doesn't give a 404 response) using a
+    ``HEAD`` request. Redirects are allowed, but will not be followed.
 
     Note that when you're using the single-threaded development server,
     validating a URL being served by the same server will hang. This should not

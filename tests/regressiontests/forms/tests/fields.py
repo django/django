@@ -567,7 +567,7 @@ class FieldsTests(TestCase):
             f.clean('http://www.broken.djangoproject.com') # bad domain
         except ValidationError, e:
             self.assertEqual("[u'This URL appears to be a broken link.']", str(e))
-        self.assertRaises(ValidationError, f.clean, 'http://google.com/we-love-microsoft.html') # good domain, bad page
+        self.assertRaises(ValidationError, f.clean, 'http://qa-dev.w3.org/link-testsuite/http.php?code=400') # good domain, bad page
         try:
             f.clean('http://google.com/we-love-microsoft.html') # good domain, bad page
         except ValidationError, e:
@@ -626,16 +626,10 @@ class FieldsTests(TestCase):
             self.assertEqual("[u'This URL appears to be a broken link.']", str(e))
 
     def test_urlfield_10(self):
-        # UTF-8 char in path, enclosed by a monkey-patch to make sure
-        # the encoding is passed to urllib2.urlopen
+        # UTF-8 in the domain.
         f = URLField(verify_exists=True)
-        try:
-            _orig_urlopen = urllib2.urlopen
-            urllib2.urlopen = lambda req: True
-            url = u'http://t\xfcr.djangoproject.com/'
-            self.assertEqual(url, f.clean(url))
-        finally:
-            urllib2.urlopen = _orig_urlopen
+        url = u'http://\u03b5\u03bb\u03bb\u03b7\u03bd\u03b9\u03ba\u03ac.idn.icann.org/\u0391\u03c1\u03c7\u03b9\u03ba\u03ae_\u03c3\u03b5\u03bb\u03af\u03b4\u03b1'
+        self.assertEqual(url, f.clean(url)) #This will fail without internet.
 
     # BooleanField ################################################################
 

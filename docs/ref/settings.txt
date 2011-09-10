@@ -1892,16 +1892,6 @@ to ensure your processes are running in the correct environment.
 
 .. _See available choices: http://www.postgresql.org/docs/8.1/static/datetime-keywords.html#DATETIME-TIMEZONE-SET-TABLE
 
-.. setting:: URL_VALIDATOR_USER_AGENT
-
-URL_VALIDATOR_USER_AGENT
-------------------------
-
-Default: ``Django/<version> (http://www.djangoproject.com/)``
-
-The string to use as the ``User-Agent`` header when checking to see if URLs
-exist (see the ``verify_exists`` option on :class:`~django.db.models.URLField`).
-
 .. setting:: USE_ETAGS
 
 USE_ETAGS
@@ -2094,4 +2084,20 @@ TEST_DATABASE_NAME
 .. deprecated:: 1.2
    This setting has been replaced by :setting:`TEST_NAME` in
    :setting:`DATABASES`.
+
+
+
+URL_VALIDATOR_USER_AGENT
+------------------------
+
+.. deprecated:: 1.3.1
+   This setting has been removed due to intractable performance and
+   security problems.
+
+Default: ``Django/<version> (http://www.djangoproject.com/)``
+
+The string to use as the ``User-Agent`` header when checking to see if
+URLs exist (see the ``verify_exists`` option on
+:class:`~django.db.models.URLField`). This setting was deprecated in
+1.3.1 along with ``verify_exists`` and will be removed in 1.4.
 
