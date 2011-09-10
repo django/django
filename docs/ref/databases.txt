@@ -326,6 +326,19 @@ storage engine, you have a couple of options.
 
 .. _AlterModelOnSyncDB: http://code.djangoproject.com/wiki/AlterModelOnSyncDB
 
+Table names
+-----------
+
+There are `known issues`_ in even the latest versions of MySQL that can cause the
+case of a table name to be altered when certain SQL statements are executed
+under certain conditions. It is recommended that you use lowercase table
+names, if possible, to avoid any problems that might arise from this behavior.
+Django uses lowercase table names when it auto-generates table names from
+models, so this is mainly a consideration if you are overriding the table name
+via the :class:`~django.db.models.Options.db_table` parameter.
+
+.. _known issues: http://bugs.mysql.com/bug.php?id=48875
+
 Notes on specific fields
 ------------------------
 
