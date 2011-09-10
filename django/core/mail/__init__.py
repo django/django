@@ -16,7 +16,7 @@ from django.core.mail.message import (
     SafeMIMEText, SafeMIMEMultipart,
     DEFAULT_ATTACHMENT_MIME_TYPE, make_msgid,
     BadHeaderError, forbid_multi_line_headers)
-from django.core.mail.backends.smtp import EmailBackend as _SMTPConnection
+
 
 def get_connection(backend=None, fail_silently=False, **kwds):
     """Load an email backend and return an instance of it.
