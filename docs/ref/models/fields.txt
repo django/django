@@ -814,7 +814,7 @@ shortcuts.
 ``URLField``
 ------------
 
-.. class:: URLField([verify_exists=True, max_length=200, **options])
+.. class:: URLField([verify_exists=False, max_length=200, **options])
 
 A :class:`CharField` for a URL. Has one extra optional argument:
 
@@ -826,6 +826,12 @@ A :class:`CharField` for a URL. Has one extra optional argument:
     Note that when you're using the single-threaded development server,
     validating a URL being served by the same server will hang. This should not
     be a problem for multithreaded servers.
+
+.. versionchanged:: 1.2
+
+    The default value of ``verify_exists`` has been changed to
+    ``False``. This argument should not be set to ``True`` because it
+    has security and performance problems.
 
 The admin represents this as an ``<input type="text">`` (a single-line input).
 
