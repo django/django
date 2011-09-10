@@ -300,6 +300,12 @@ class BaseFormSet(StrAndUnicode):
         """
         pass
 
+    def has_changed(self):
+        """
+        Returns true if data in any form differs from initial.
+        """
+        return any(form.has_changed() for form in self)
+
     def add_fields(self, form, index):
         """A hook for adding extra fields on to each form instance."""
         if self.can_order:

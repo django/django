@@ -150,6 +150,20 @@ As we can see, ``formset.errors`` is a list whose entries correspond to the
 forms in the formset. Validation was performed for each of the two forms, and
 the expected error message appears for the second item.
 
+We can also check if form data differs from the initial data (i.e. the form was
+sent without any data)::
+
+    >>> data = {
+    ...     'form-TOTAL_FORMS': u'1',
+    ...     'form-INITIAL_FORMS': u'0',
+    ...     'form-MAX_NUM_FORMS': u'',
+    ...     'form-0-title': u'',
+    ...     'form-0-pub_date': u'',
+    ... }
+    >>> formset = ArticleFormSet(data)
+    >>> formset.has_changed()
+    False
+
 .. _understanding-the-managementform:
 
 Understanding the ManagementForm

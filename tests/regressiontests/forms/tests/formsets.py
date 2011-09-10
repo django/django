@@ -73,9 +73,11 @@ class FormsFormsetTestCase(TestCase):
         self.assertTrue(formset.is_valid())
         self.assertEqual([form.cleaned_data for form in formset.forms], [{'votes': 100, 'choice': u'Calexico'}])
 
-        # If a FormSet was not passed any data, its is_valid method should return False.
+        # If a FormSet was not passed any data, its is_valid and has_changed
+        # methods should return False.
         formset = ChoiceFormSet()
         self.assertFalse(formset.is_valid())
+        self.assertFalse(formset.has_changed())
 
     def test_formset_validation(self):
         # FormSet instances can also have an error attribute if validation failed for
@@ -92,6 +94,31 @@ class FormsFormsetTestCase(TestCase):
         formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
         self.assertFalse(formset.is_valid())
         self.assertEqual(formset.errors, [{'votes': [u'This field is required.']}])
+
+    def test_formset_has_changed(self):
+        # FormSet instances has_changed method will be True if any data is
+        # passed to his forms, even if the formset didn't validate
+        data = {
+            'choices-TOTAL_FORMS': '1', # the number of forms rendered
+            'choices-INITIAL_FORMS': '0', # the number of forms with initial data
+            'choices-MAX_NUM_FORMS': '0', # max number of forms
+            'choices-0-choice': '',
+            'choices-0-votes': '',
+        }
+        blank_formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
+        self.assertFalse(blank_formset.has_changed())
+
+        # invalid formset test
+        data['choices-0-choice'] = 'Calexico'
+        invalid_formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
+        self.assertFalse(invalid_formset.is_valid())
+        self.assertTrue(invalid_formset.has_changed())
+
+        # valid formset test
+        data['choices-0-votes'] = '100'
+        valid_formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
+        self.assertTrue(valid_formset.is_valid())
+        self.assertTrue(valid_formset.has_changed())
 
     def test_formset_initial_data(self):
         # We can also prefill a FormSet with existing data by providing an ``initial``
