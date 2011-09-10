@@ -49,6 +49,7 @@ HEX = string.digits + 'abcdef'
 # remove for human consumption - we don't want confusion between letter-O and zero
 # effectively: for i in 'ilIoO01': x.remove(i)
 READABLE_ALPHABET = '23456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijklmnpqrstuvwxyz'
+ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 
 def base62_encode(num, alphabet=digits+letters):
@@ -69,6 +70,15 @@ def base62_encode(num, alphabet=digits+letters):
     return ''.join(arr)
 
 
+class RandomToken():
+    def digits(self):
+        # Probably want to implement the NotImplementedError
+        pass
+    
+    def alphanumeric(self, length=32, case_sensitive=True):
+        # Probably want to implement the NotImplementedError
+        pass
+        
 class BaseToken():
     def __init__(self, value='', random=False):
         if random:
