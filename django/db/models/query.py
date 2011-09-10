@@ -372,7 +372,7 @@ class QuerySet(object):
         if self.model._meta.parents:
             raise ValueError("Can't bulk create an inherited model")
         if not objs:
-            return
+            return objs
         self._for_write = True
         connection = connections[self.db]
         fields = self.model._meta.local_fields

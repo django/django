@@ -23,6 +23,10 @@ class BulkCreateTests(TestCase):
             "United States of America", "The Netherlands", "Germany", "Czech Republic"
         ], attrgetter("name"))
 
+        created = Country.objects.bulk_create([])
+        self.assertEqual(created, [])
+        self.assertEqual(Country.objects.count(), 4)
+
     @skipUnlessDBFeature("has_bulk_insert")
     def test_efficiency(self):
         with self.assertNumQueries(1):
