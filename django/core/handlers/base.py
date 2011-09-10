@@ -242,7 +242,7 @@ def get_script_name(environ):
     Returns the equivalent of the HTTP request's SCRIPT_NAME environment
     variable. If Apache mod_rewrite has been used, returns what would have been
     the script name prior to any rewriting (so it's the script name as seen
-    from the client's perspective), unless DJANGO_USE_POST_REWRITE is set (to
+    from the client's perspective), unless FORCE_SCRIPT_NAME is set (to
     anything).
     """
     from django.conf import settings
