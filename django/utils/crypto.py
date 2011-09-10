@@ -63,10 +63,10 @@ class Token():
         else:
             self._hash = hashlib.md5(random.getrandbits(256))
 
-    def base_16_digest(self, length):
+    def base_16_digest(self, length=None):
         return self._hash.hexdigest()[:length]
 
-    def base_62_digest(self, length):
+    def base_62_digest(self, length=None):
         base16 = self._hash.hexdigest()
         base10 = int(base16, 16)
 
