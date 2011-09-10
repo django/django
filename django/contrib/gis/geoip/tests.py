@@ -1,8 +1,8 @@
 import os
-import unittest
-from django.db import settings
+from django.conf import settings
 from django.contrib.gis.geos import GEOSGeometry
-from django.contrib.gis.utils import GeoIP, GeoIPException
+from django.contrib.gis.geoip import GeoIP, GeoIPException
+from django.utils import unittest
 
 # Note: Requires use of both the GeoIP country and city datasets.
 # The GEOIP_DATA path should be the only setting set (the directory
@@ -69,8 +69,8 @@ class GeoIPTest(unittest.TestCase):
         "Testing GeoIP city querying methods."
         g = GeoIP(country='<foo>')
 
-        addr = '130.80.29.3'
-        fqdn = 'chron.com'
+        addr = '128.249.1.1'
+        fqdn = 'tmc.edu'
         for query in (fqdn, addr):
             # Country queries should still work.
             for func in (g.country_code, g.country_code_by_addr, g.country_code_by_name):
@@ -88,17 +88,24 @@ class GeoIPTest(unittest.TestCase):
             self.assertEqual(713, d['area_code'])
             geom = g.geos(query)
             self.failIf(not isinstance(geom, GEOSGeometry))
-            lon, lat = (-95.3670, 29.7523)
+            lon, lat = (-95.4010, 29.7079)
             lat_lon = g.lat_lon(query)
             lat_lon = (lat_lon[1], lat_lon[0])
             for tup in (geom.tuple, g.coords(query), g.lon_lat(query), lat_lon):
                 self.assertAlmostEqual(lon, tup[0], 4)
                 self.assertAlmostEqual(lat, tup[1], 4)
 
+    def test05_unicode(self):
+        "Testing that GeoIP strings are properly encoded, see #16553."
+        g = GeoIP()
+        d = g.city('62.224.93.23')
+        self.assertEqual(u'Sch\xf6mberg', d['city'])
+
+
 def suite():
     s = unittest.TestSuite()
     s.addTest(unittest.makeSuite(GeoIPTest))
     return s
 
-def run(verbosity=2):
+def run(verbosity=1):
     unittest.TextTestRunner(verbosity=verbosity).run(suite())

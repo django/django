@@ -4,10 +4,17 @@
 Geolocation with GeoIP
 ======================
 
-.. module:: django.contrib.gis.utils.geoip
+.. module:: django.contrib.gis.geoip
    :synopsis: High-level Python interface for MaxMind's GeoIP C library.
 
-.. currentmodule:: django.contrib.gis.utils
+.. versionchanged:: 1.4
+
+.. note::
+
+    In Django 1.4, the :class:`GeoIP` object was moved out of
+    :mod:`django.contrib.gis.utils` and into its own module, 
+    :mod:`django.contrib.gis.geoip`. A shortcut is still provided
+    in ``utils``, but will be removed in Django 1.6.
 
 The :class:`GeoIP` object is a ctypes wrapper for the
 `MaxMind GeoIP C API`__. [#]_  This interface is a BSD-licensed alternative
@@ -136,7 +143,7 @@ Querying
 
 All the following querying routines may take either a string IP address
 or a fully qualified domain name (FQDN).  For example, both 
-``'24.124.1.80'`` and ``'djangoproject.com'`` would be valid query 
+``'205.186.163.125'`` and ``'djangoproject.com'`` would be valid query 
 parameters. 
 
 .. method:: GeoIP.city(query)
@@ -144,7 +151,7 @@ parameters.
 Returns a dictionary of city information for the given query.  Some
 of the values in the dictionary may be undefined (``None``).
 
-.. method:: GeoIPcountry(query)
+.. method:: GeoIP.country(query)
 
 Returns a dictionary with the country code and country for the given 
 query.
@@ -190,7 +197,7 @@ This property returns information about the GeoIP city database.
 .. attribute:: GeoIP.info
 
 This property returns information about all GeoIP databases (both city
-and country).
+and country), and the version of the GeoIP C library (if supported).
 
 GeoIP-Python API compatibility methods
 ----------------------------------------

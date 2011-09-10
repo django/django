@@ -13,20 +13,5 @@ useful in creating geospatial Web applications.
 .. toctree::
    :maxdepth: 2
 
-   geoip
    layermapping
    ogrinspect
-
-GeoIP
-=====
-
-Interface to the MaxMind GeoIP library for performing IP-based geolocation
-from GeoDjango.  See :ref:`GeoIP reference <ref-geoip>` documentation for
-more information.
-
-LayerMapping
-============
-
-The :class:`~django.contrib.gis.utils.LayerMapping` simplifies the process
-of importing spatial data and attributes into your GeoDjango models.
-

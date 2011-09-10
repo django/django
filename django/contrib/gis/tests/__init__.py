@@ -78,10 +78,10 @@ def geodjango_suite(apps=True):
         sys.stderr.write('GDAL not available - no tests requiring GDAL will be run.\n')
 
     # Add GeoIP tests to the suite, if the library and data is available.
-    from django.contrib.gis.utils import HAS_GEOIP
+    from django.contrib.gis.geoip import HAS_GEOIP
     if HAS_GEOIP and hasattr(settings, 'GEOIP_PATH'):
-        from django.contrib.gis.tests import test_geoip
-        suite.addTest(test_geoip.suite())
+        from django.contrib.gis.geoip import tests as geoip_tests
+        suite.addTest(geoip_tests.suite())
 
     # Finally, adding the suites for each of the GeoDjango test apps.
     if apps:

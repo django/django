@@ -239,6 +239,10 @@ their deprecation, as per the :ref:`deprecation policy
       were deprecated since Django 1.4 and will be removed in favor
       of the ``django.utils.text.Truncator`` class.
 
+    * The :class:`~django.contrib.gis.geoip.GeoIP` class was moved to
+      :mod:`django.contrib.gis.geoip` in 1.4 -- the shortcut in
+      :mod:`django.contrib.gis.utils` will be removed.
+
 2.0
 ---
 
