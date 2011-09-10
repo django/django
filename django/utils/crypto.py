@@ -57,11 +57,13 @@ def base62_encode(num, alphabet=ALPHABET):
 
 
 class Token():
+    " By default, generate a random number;
+       We want you always doing this random salt (rather than the default, same one)
+    "
     def __init__(self, value=None):
-        if value:
-            self._hash = hashlib.md5(value)
-        else:
-            self._hash = hashlib.md5(random.getrandbits(256))
+        if value is None:  # don't want you starting w/ nothing
+            value = random.getrandbits(256)
+        self._hash = hashlib.md5(value)
 
     def base_16_digest(self, length=None):
         """
