@@ -2012,8 +2012,10 @@ URL_VALIDATOR_USER_AGENT
 
 Default: ``Django/<version> (http://www.djangoproject.com/)``
 
-The string to use as the ``User-Agent`` header when checking to see if URLs
-exist (see the ``verify_exists`` option on :class:`~django.db.models.URLField`).
+The string to use as the ``User-Agent`` header when checking to see if
+URLs exist (see the ``verify_exists`` option on
+:class:`~django.db.models.URLField`). This setting was deprecated in
+1.3.1 along with ``verify_exists`` and will be removed in 1.4.
 
 .. setting:: USE_ETAGS
 

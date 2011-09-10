@@ -1,8 +1,8 @@
-from django.utils import unittest
+from django.test import TestCase
 
 from django.core.exceptions import ValidationError
 
-class ValidationTestCase(unittest.TestCase):
+class ValidationTestCase(TestCase):
     def assertFailsValidation(self, clean, failed_fields):
         self.assertRaises(ValidationError, clean)
         try:

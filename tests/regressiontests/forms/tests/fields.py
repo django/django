@@ -28,6 +28,7 @@ import datetime
 import re
 import os
 import urllib2
+import warnings
 from decimal import Decimal
 from functools import wraps
 
@@ -70,6 +71,14 @@ def verify_exists_urls(existing_urls=()):
 
 
 class FieldsTests(SimpleTestCase):
+
+    def setUp(self):
+        self.save_warnings_state()
+        warnings.filterwarnings('ignore', category=DeprecationWarning,
+                                module='django.core.validators')
+
+    def tearDown(self):
+        self.restore_warnings_state()
 
     def test_field_sets_widget_is_required(self):
         self.assertTrue(Field(required=True).widget.is_required)
@@ -622,7 +631,7 @@ class FieldsTests(SimpleTestCase):
             f.clean('http://www.broken.djangoproject.com') # bad domain
         except ValidationError, e:
             self.assertEqual("[u'This URL appears to be a broken link.']", str(e))
-        self.assertRaises(ValidationError, f.clean, 'http://google.com/we-love-microsoft.html') # good domain, bad page
+        self.assertRaises(ValidationError, f.clean, 'http://qa-dev.w3.org/link-testsuite/http.php?code=400') # good domain, bad page
         try:
             f.clean('http://google.com/we-love-microsoft.html') # good domain, bad page
         except ValidationError, e:
@@ -681,11 +690,10 @@ class FieldsTests(SimpleTestCase):
         except ValidationError, e:
             self.assertEqual("[u'This URL appears to be a broken link.']", str(e))
 
-    @verify_exists_urls(('http://xn--tr-xka.djangoproject.com/',))
     def test_urlfield_10(self):
-        # UTF-8 char in path
+        # UTF-8 in the domain. 
         f = URLField(verify_exists=True)
-        url = u'http://t\xfcr.djangoproject.com/'
+        url = u'http://\u03b5\u03bb\u03bb\u03b7\u03bd\u03b9\u03ba\u03ac.idn.icann.org/\u0391\u03c1\u03c7\u03b9\u03ba\u03ae_\u03c3\u03b5\u03bb\u03af\u03b4\u03b1'
         self.assertEqual(url, f.clean(url))
 
     def test_urlfield_not_string(self):

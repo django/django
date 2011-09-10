@@ -115,6 +115,11 @@ their deprecation, as per the :ref:`deprecation policy
       beyond that of a simple ``TextField`` since the removal of oldforms.
       All uses of ``XMLField`` can be replaced with ``TextField``.
 
+    * ``django.db.models.fields.URLField.verify_exists`` has been
+      deprecated due to intractable security and performance
+      issues. Validation behavior has been removed in 1.4, and the
+      argument will be removed in 1.5.
+
 1.5
 ---
 

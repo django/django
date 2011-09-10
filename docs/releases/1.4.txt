@@ -519,6 +519,14 @@ This was an alias to ``django.template.loader`` since 2005, it has been removed
 without emitting a warning due to the length of the deprecation. If your code
 still referenced this please use ``django.template.loader`` instead.
 
+``django.db.models.fields.URLField.verify_exists``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This functionality has been removed due to intractable performance and
+security issues. Any existing usage of ``verify_exists`` should be
+removed.
+
+
 .. _deprecated-features-1.4:
 
 Features deprecated in 1.4
