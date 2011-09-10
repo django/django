@@ -103,13 +103,11 @@ class TestObj(object):
 
 
 class SimpleRowlevelBackend(object):
-    supports_object_permissions = True
     supports_inactive_user = False
 
     # This class also supports tests for anonymous user permissions, and
     # inactive user permissions via subclasses which just set the
     # 'supports_anonymous_user' or 'supports_inactive_user' attribute.
-
 
     def has_perm(self, user, perm, obj=None):
         if not obj:
@@ -119,7 +117,6 @@ class SimpleRowlevelBackend(object):
             if user.username == 'test2':
                 return True
             elif user.is_anonymous() and perm == 'anon':
-                # not reached due to supports_anonymous_user = False
                 return True
             elif not user.is_active and perm == 'inactive':
                 return True
@@ -199,20 +196,12 @@ class RowlevelBackendTest(TestCase):
 
 
 class AnonymousUserBackend(SimpleRowlevelBackend):
-
-    supports_anonymous_user = True
-    supports_inactive_user = False
-
-
-class NoAnonymousUserBackend(SimpleRowlevelBackend):
-
-    supports_anonymous_user = False
     supports_inactive_user = False
 
 
 class AnonymousUserBackendTest(TestCase):
     """
-    Tests for AnonymousUser delegating to backend if it has 'supports_anonymous_user' = True
+    Tests for AnonymousUser delegating to backend.
     """
 
     backend = 'django.contrib.auth.tests.auth_backends.AnonymousUserBackend'
@@ -241,33 +230,6 @@ class AnonymousUserBackendTest(TestCase):
         self.assertEqual(self.user1.get_all_permissions(TestObj()), set(['anon']))
 
 
-class NoAnonymousUserBackendTest(TestCase):
-    """
-    Tests that AnonymousUser does not delegate to backend if it has 'supports_anonymous_user' = False
-    """
-    backend = 'django.contrib.auth.tests.auth_backends.NoAnonymousUserBackend'
-
-    def setUp(self):
-        self.curr_auth = settings.AUTHENTICATION_BACKENDS
-        settings.AUTHENTICATION_BACKENDS = tuple(self.curr_auth) + (self.backend,)
-        self.user1 = AnonymousUser()
-
-    def tearDown(self):
-        settings.AUTHENTICATION_BACKENDS = self.curr_auth
-
-    def test_has_perm(self):
-        self.assertEqual(self.user1.has_perm('perm', TestObj()), False)
-        self.assertEqual(self.user1.has_perm('anon', TestObj()), False)
-
-    def test_has_perms(self):
-        self.assertEqual(self.user1.has_perms(['anon'], TestObj()), False)
-
-    def test_has_module_perms(self):
-        self.assertEqual(self.user1.has_module_perms("app1"), False)
-        self.assertEqual(self.user1.has_module_perms("app2"), False)
-
-    def test_get_all_permissions(self):
-        self.assertEqual(self.user1.get_all_permissions(TestObj()), set())
 
 
 class NoBackendsTest(TestCase):
@@ -287,14 +249,10 @@ class NoBackendsTest(TestCase):
 
 
 class InActiveUserBackend(SimpleRowlevelBackend):
-
-    supports_anonymous_user = False
     supports_inactive_user = True
 
 
 class NoInActiveUserBackend(SimpleRowlevelBackend):
-
-    supports_anonymous_user = False
     supports_inactive_user = False
 
 

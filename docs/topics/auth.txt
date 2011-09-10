@@ -1633,8 +1633,6 @@ object the first time a user authenticates::
         ADMIN_PASSWORD = 'sha1$4e987$afbcf42e21bd417fb71db8c66b321e9fc33051de'
         """
 
-        supports_object_permissions = False
-        supports_anonymous_user = False
         supports_inactive_user = False
 
         def authenticate(self, username=None, password=None):
@@ -1683,7 +1681,7 @@ fairly simply::
 
         # ...
 
-        def has_perm(self, user_obj, perm):
+        def has_perm(self, user_obj, perm, obj=None):
             if user_obj.username == settings.ADMIN_LOGIN:
                 return True
             else:
@@ -1720,19 +1718,6 @@ for the authors of re-usable apps, who can delegate all questions of authorizati
 to the auth backend, rather than needing settings, for example, to control
 anonymous access.
 
-To enable this in your own backend, you must set the class attribute
-``supports_anonymous_user`` to ``True``. (This precaution is to maintain
-compatibility with backends that assume that all user objects are actual
-instances of the :class:`django.contrib.auth.models.User` class). With this
-in place, :class:`django.contrib.auth.models.AnonymousUser` will delegate all
-the relevant permission methods to the authentication backends.
-
-A nonexistent ``supports_anonymous_user`` attribute will raise a hidden
-``PendingDeprecationWarning`` if used in Django 1.2. In Django 1.3, this
-warning will be upgraded to a ``DeprecationWarning``, which will be displayed
-loudly. Additionally ``supports_anonymous_user`` will be set to ``False``.
-Django 1.4 will assume that every backend supports anonymous users being
-passed to the authorization methods.
 
 Authorization for inactive users
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1766,16 +1751,3 @@ Django's permission framework has a foundation for object permissions, though
 there is no implementation for it in the core. That means that checking for
 object permissions will always return ``False`` or an empty list (depending on
 the check performed).
-
-To enable object permissions in your own
-:doc:`authentication backend </ref/authbackends>` you'll just have
-to allow passing an ``obj`` parameter to the permission methods and set the
-``supports_object_permissions`` class attribute to ``True``.
-
-A nonexistent ``supports_object_permissions`` will raise a hidden
-``PendingDeprecationWarning`` if used in Django 1.2. In Django 1.3, this
-warning will be upgraded to a ``DeprecationWarning``, which will be displayed
-loudly. Additionally ``supports_object_permissions`` will be set to ``False``.
-Django 1.4 will assume that every backend supports object permissions and
-won't check for the existence of ``supports_object_permissions``, which
-means not supporting ``obj`` as a parameter will raise a ``TypeError``.
