@@ -39,13 +39,13 @@ class GeoModelAdmin(ModelAdmin):
     debug = False
     widget = OpenLayersWidget
 
-    def _media(self):
+    @property
+    def media(self):
         "Injects OpenLayers JavaScript into the admin."
-        media = super(GeoModelAdmin, self)._media()
+        media = super(GeoModelAdmin, self).media
         media.add_js([self.openlayers_url])
         media.add_js(self.extra_js)
         return media
-    media = property(_media)
 
     def formfield_for_dbfield(self, db_field, **kwargs):
         """
