@@ -115,21 +115,33 @@ class HashToken():
     def __init__(self, value=None):
         self._hash = hashlib.md5(value)
 
-    def digits(self, length=None):
-        return _build_token(DIGITS, length)
+    def digits(self):
+        return _build_token(DIGITS)
         
-    def hex(self, length=None):
+    def hex(self):
         """ Outputs a base 16 string. """
-        return self._hash.hexdigest()[:length]
+        return self._hash.hexdigest()
     
-    def alphanumenric(self, length=None, casesensitive=True):
-        return _build_token(ALPHANUMERIC, length)
-
-    def _build_token(self, alphabet, length=None):
+    def alphanumenric(self, casesensitive=True):
+        return _build_token(ALPHANUMERIC)
+    
+    def lower_alphanumeric(self):
+        """
+        Creates a randomized token consisting of the LOWER_ALPHANUMERIC character sets.
+        """
+        return self._build_token(LOWER_ALPHANUMERIC)
+    
+    def readable_alphanumeric(self):
+        """
+        Creates a randomized token consisting of the READABLE_ALPHABET character set.
+        """
+        return self._build_token(READABLE_ALPHABET)
+    
+    def _build_token(self, alphabet):
         """ Outputs our hash to an alphabet specified string. """
         hextoken = self._hash.hexdigest()
         converter = BaseConverter(alphabet)
-        return converter.encode(int(hextoken, 16))[:length]
+        return converter.encode(int(hextoken, 16))
 
     def update(self, value):
         self._hash = self._hash.update(value)
