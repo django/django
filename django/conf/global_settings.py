@@ -390,6 +390,8 @@ URL_VALIDATOR_USER_AGENT = "Django/%s (http://www.djangoproject.com)" % get_vers
 DEFAULT_TABLESPACE = ''
 DEFAULT_INDEX_TABLESPACE = ''
 
+USE_X_FORWARDED_HOST = False
+
 ##############
 # MIDDLEWARE #
 ##############
