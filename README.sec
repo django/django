@@ -1,0 +1,12 @@
+This is the README for the team making security updates to django.
+
+
+Sat Sep 10 16:44:14 PDT 2011
+
+We are moving /splitting our work [HashToken, RandomToken, etc.]
+  out of django/utils/crypto.py into django/utils/tokens.py
+
+We also need to have the funtionality of contrib/auth/tokens.py in django/utils/tokens.py (eventually, we can move this out of contrib...)
+
+
+
