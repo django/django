@@ -147,6 +147,7 @@ class DummyCacheTests(unittest.TestCase):
     def test_set_many(self):
         "set_many does nothing for the dummy cache backend"
         self.cache.set_many({'a': 1, 'b': 2})
+        self.cache.set_many({'a': 1, 'b': 2}, timeout=2, version='1')
 
     def test_delete_many(self):
         "delete_many does nothing for the dummy cache backend"

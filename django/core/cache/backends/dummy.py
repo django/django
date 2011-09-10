@@ -32,7 +32,7 @@ class DummyCache(BaseCache):
         self.validate_key(key)
         return False
 
-    def set_many(self, data, version=None):
+    def set_many(self, data, timeout=0, version=None):
         pass
 
     def delete_many(self, keys, version=None):
