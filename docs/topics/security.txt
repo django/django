@@ -145,6 +145,23 @@ information is not leaked:
 
 .. _additional-security-topics:
 
+Host Headers and Virtual Hosting
+================================
+
+Django uses the Host header provided by the client to construct URLs
+in certain cases. While these values are sanitized to prevent Cross
+Site Scripting attacks, they can be used for Cross-Site Request
+Forgery and cache poisoning attacks in some circumstances. We
+recommend that users of Django ensure their web-server configuration
+always validates incoming HTTP Host headers against the expected host
+name, disallows requests with no Host header, and that the web server
+not be configured with a catch-all virtual host which forwards
+requests to a Django application.
+
+Additionally, as of 1.3.1, Django requires users to explicitly enable
+support for the X-Forwarded-Host header if their configuration
+requires it.
+
 Additional security topics
 ==========================
 

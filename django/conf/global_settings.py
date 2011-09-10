@@ -402,6 +402,8 @@ DEFAULT_INDEX_TABLESPACE = ''
 # Default X-Frame-Options header value
 X_FRAME_OPTIONS = 'SAMEORIGIN'
 
+USE_X_FORWARDED_HOST = False
+
 ##############
 # MIDDLEWARE #
 ##############
