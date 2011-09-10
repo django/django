@@ -474,7 +474,6 @@ class Model(object):
         ('raw', 'cls', and 'origin').
         """
         using = using or router.db_for_write(self.__class__, instance=self)
-        connection = connections[using]
         assert not (force_insert and force_update)
         if cls is None:
             cls = self.__class__

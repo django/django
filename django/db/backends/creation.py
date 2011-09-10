@@ -61,7 +61,7 @@ class BaseDatabaseCreation(object):
             if f.rel:
                 ref_output, pending = self.sql_for_inline_foreign_key_references(f, known_models, style)
                 if pending:
-                    pr = pending_references.setdefault(f.rel.to, []).append((model, f))
+                    pending_references.setdefault(f.rel.to, []).append((model, f))
                 else:
                     field_output.extend(ref_output)
             table_output.append(' '.join(field_output))
@@ -267,7 +267,7 @@ class BaseDatabaseCreation(object):
 
         # Get a cursor (even though we don't need one yet). This has
         # the side effect of initializing the test database.
-        cursor = self.connection.cursor()
+        self.connection.cursor()
 
         return test_database_name
 

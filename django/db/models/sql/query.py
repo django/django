@@ -15,7 +15,7 @@ from django.utils.tree import Node
 from django.db import connections, DEFAULT_DB_ALIAS
 from django.db.models import signals
 from django.db.models.fields import FieldDoesNotExist
-from django.db.models.query_utils import select_related_descend, InvalidQuery
+from django.db.models.query_utils import InvalidQuery
 from django.db.models.sql import aggregates as base_aggregates_module
 from django.db.models.sql.constants import *
 from django.db.models.sql.datastructures import EmptyResultSet, Empty, MultiJoin
@@ -567,7 +567,6 @@ class Query(object):
         field_names, defer = self.deferred_loading
         if not field_names:
             return
-        columns = set()
         orig_opts = self.model._meta
         seen = {}
         if orig_opts.proxy:

@@ -9,7 +9,7 @@ from django.db.models.fields import AutoField
 from django.db.models.query_utils import (Q, select_related_descend,
     deferred_class_factory, InvalidQuery)
 from django.db.models.deletion import Collector
-from django.db.models import signals, sql
+from django.db.models import sql
 from django.utils.functional import partition
 
 # Used to control how many objects are worked with at once in some cases (e.g.

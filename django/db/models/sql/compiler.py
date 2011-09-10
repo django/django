@@ -1,14 +1,13 @@
 from itertools import izip
 
 from django.core.exceptions import FieldError
-from django.db import connections
 from django.db import transaction
 from django.db.backends.util import truncate_name
+from django.db.models.query_utils import select_related_descend
 from django.db.models.sql.constants import *
 from django.db.models.sql.datastructures import EmptyResultSet
 from django.db.models.sql.expressions import SQLEvaluator
-from django.db.models.sql.query import (get_proxied_model, get_order_dir,
-     select_related_descend, Query)
+from django.db.models.sql.query import get_proxied_model, get_order_dir, Query
 from django.db.utils import DatabaseError
 
 
@@ -875,8 +874,6 @@ class SQLUpdateCompiler(SQLCompiler):
         Creates the SQL for this query. Returns the SQL string and list of
         parameters.
         """
-        from django.db.models.base import Model
-
         self.pre_sql_setup()
         if not self.query.values:
             return '', ()
