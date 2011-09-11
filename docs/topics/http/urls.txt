@@ -103,8 +103,8 @@ Example requests:
     * ``/articles/2003`` would not match any of these patterns, because each
       pattern requires that the URL end with a slash.
 
-    * ``/articles/2003/03/3/`` would match the final pattern. Django would call
-      the function ``news.views.article_detail(request, '2003', '03', '3')``.
+    * ``/articles/2003/03/03/`` would match the final pattern. Django would call
+      the function ``news.views.article_detail(request, '2003', '03', '03')``.
 
 .. _Dive Into Python's explanation: http://diveintopython.org/regular_expressions/street_addresses.html#re.matching.2.3
 
@@ -127,7 +127,7 @@ Here's the above example URLconf, rewritten to use named groups::
         (r'^articles/2003/$', 'news.views.special_case_2003'),
         (r'^articles/(?P<year>\d{4})/$', 'news.views.year_archive'),
         (r'^articles/(?P<year>\d{4})/(?P<month>\d{2})/$', 'news.views.month_archive'),
-        (r'^articles/(?P<year>\d{4})/(?P<month>\d{2})/(?P<day>\d+)/$', 'news.views.article_detail'),
+        (r'^articles/(?P<year>\d{4})/(?P<month>\d{2})/(?P<day>\d{2})/$', 'news.views.article_detail'),
     )
 
 This accomplishes exactly the same thing as the previous example, with one
@@ -138,8 +138,8 @@ arguments rather than positional arguments. For example:
       ``news.views.month_archive(request, year='2005', month='03')``, instead
       of ``news.views.month_archive(request, '2005', '03')``.
 
-    * A request to ``/articles/2003/03/3/`` would call the function
-      ``news.views.article_detail(request, year='2003', month='03', day='3')``.
+    * A request to ``/articles/2003/03/03/`` would call the function
+      ``news.views.article_detail(request, year='2003', month='03', day='03')``.
 
 In practice, this means your URLconfs are slightly more explicit and less prone
 to argument-order bugs -- and you can reorder the arguments in your views'
