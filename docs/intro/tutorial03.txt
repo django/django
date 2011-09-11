@@ -356,11 +356,13 @@ the list is empty.
 Write a 404 (page not found) view
 =================================
 
-When you raise :exc:`~django.http.Http404` from within a view, Django will load
-a special view devoted to handling 404 errors. It finds it by looking for the
-variable ``handler404``, which is a string in Python dotted syntax -- the same
-format the normal URLconf callbacks use. A 404 view itself has nothing special:
-It's just a normal view.
+When you raise :exc:`~django.http.Http404` from within a view, Django
+will load a special view devoted to handling 404 errors. It finds it
+by looking for the variable ``handler404`` in your root URLconf (and
+only in your root URLconf; setting ``handler404`` anywhere else will
+have no effect), which is a string in Python dotted syntax -- the same
+format the normal URLconf callbacks use. A 404 view itself has nothing
+special: It's just a normal view.
 
 You normally won't have to bother with writing 404 views. By default, URLconfs
 have the following line up top::
@@ -392,9 +394,9 @@ Four more things to note about 404 views:
 Write a 500 (server error) view
 ===============================
 
-Similarly, URLconfs may define a ``handler500``, which points to a view to call
-in case of server errors. Server errors happen when you have runtime errors in
-view code.
+Similarly, your root URLconf may define a ``handler500``, which points
+to a view to call in case of server errors. Server errors happen when
+you have runtime errors in view code.
 
 Use the template system
 =======================
