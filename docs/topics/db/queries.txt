@@ -1036,6 +1036,8 @@ Each "reverse" operation described in this section has an immediate effect on
 the database. Every addition, creation and deletion is immediately and
 automatically saved to the database.
 
+.. _m2m-reverse-relationships:
+
 Many-to-many relationships
 --------------------------
 

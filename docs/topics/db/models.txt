@@ -325,7 +325,7 @@ whatever you want. For example::
 
     For details on accessing backwards-related objects, see the
     `Following relationships backward example`_.
-    
+
     For sample code, see the `Many-to-one relationship model tests`_.
 
     .. _Following relationships backward example: http://docs.djangoproject.com/en/dev/topics/db/queries/#backwards-related-objects
@@ -518,6 +518,25 @@ As you are using an intermediate model, you can also query on its attributes::
     ...     group__name='The Beatles',
     ...     membership__date_joined__gt=date(1961,1,1))
     [<Person: Ringo Starr]
+
+If you need to access a membership's information you may do so by directly
+querying the ``Membership`` model::
+
+    >>> ringos_membership = Membership.objects.get(group=beatles, person=ringo)
+    >>> ringos_membership.date_joined
+    datetime.date(1962, 8, 16)
+    >>> ringos_membership.invite_reason
+    u'Needed a new drummer.'
+
+Another way to access the same information is by querying the
+:ref:`many-to-many reverse relationship<m2m-reverse-relationships>` from a
+``Person`` object::
+
+    >>> ringos_membership = ringo.membership_set.get(group=beatles)
+    >>> ringos_membership.date_joined
+    datetime.date(1962, 8, 16)
+    >>> ringos_membership.invite_reason
+    u'Needed a new drummer.'
 
 
 One-to-one relationships
