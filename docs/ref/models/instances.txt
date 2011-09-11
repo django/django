@@ -497,7 +497,7 @@ method that looked like this::
 
 Similarly, if you had a URLconf entry that looked like::
 
-    (r'/archive/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', archive_view)
+    (r'/archive/(?P<year>\d{4})/(?P<month>\d{2})/(?P<day>\d{2})/$', archive_view)
 
 ...you could reference this using ``permalink()`` as follows::
 
@@ -505,8 +505,8 @@ Similarly, if you had a URLconf entry that looked like::
     def get_absolute_url(self):
         return ('archive_view', (), {
             'year': self.created.year,
-            'month': self.created.month,
-            'day': self.created.day})
+            'month': self.created.strftime('%m'),
+            'day': self.created.strftime('%d')})
 
 Notice that we specify an empty sequence for the second parameter in this case,
 because we only want to pass keyword parameters, not positional ones.
