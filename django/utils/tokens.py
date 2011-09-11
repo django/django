@@ -20,8 +20,8 @@ LOWERCASE = string.lowercase
 HEX = string.digits + 'abcdef'
 ALPHANUMERIC = string.digits + string.uppercase + string.lowercase
 LOWER_ALPHANUMERIC = string.digits + string.lowercase
-# remove for human consumption - we don't want confusion between letter-O and zero
-# effectively: for i in 'ilIoO01': x.remove(i)
+# remove for human consumption - we don't want confusion between letter-O and zero, etc.
+# effectively: for i in 'iIloO01': x.remove(i)
 READABLE_ALPHABET = '23456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijklmnpqrstuvwxyz'
 
 DEFAULT_TOKEN_LENGTH = 32
@@ -54,7 +54,7 @@ class RandomToken():
         """
         return self._build_token(HEX, length)
     
-    def readable_alphanumeric(self, length=DEFAULT_TOKEN_LENGTH):
+    def readable_alphabet(self, length=DEFAULT_TOKEN_LENGTH):
         """
         Creates a randomized token consisting of the READABLE_ALPHABET character set.
         """
@@ -81,6 +81,10 @@ class HashToken():
         """ Outputs a base 16 string. """
         return self._hash.hexdigest()
     
+    def digest(self):
+        """ Returns the string digest. """
+        return self._hash.digest()
+    
     def alphanumenric(self, casesensitive=True):
         return _build_token(ALPHANUMERIC)
     
@@ -90,7 +94,7 @@ class HashToken():
         """
         return self._build_token(LOWER_ALPHANUMERIC)
     
-    def readable_alphanumeric(self):
+    def readable_alphabet(self):
         """
         Creates a randomized token consisting of the READABLE_ALPHABET character set.
         """

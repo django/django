@@ -1,4 +1,6 @@
 import base64
+import os
+import random
 import time
 from datetime import datetime, timedelta
 try:
@@ -8,10 +10,16 @@ except ImportError:
 
 from django.conf import settings
 from django.core.exceptions import SuspiciousOperation
-from django.utils.crypto import constant_time_compare
-from django.utils.crypto import get_random_string
-from django.utils.crypto import salted_hmac
 from django.utils import timezone
+from django.utils.crypto import constant_time_compare, salted_hmac
+from django.utils.token import HashToken
+
+# Use the system (hardware-based) random number generator if it exists.
+if hasattr(random, 'SystemRandom'):
+    randrange = random.SystemRandom().randrange
+else:
+    randrange = random.randrange
+MAX_SESSION_KEY = 18446744073709551616L     # 2 << 63
 
 class CreateError(Exception):
     """
@@ -130,12 +138,17 @@ class SessionBase(object):
 
     def _get_new_session_key(self):
         "Returns session key that isn't being used."
-        # Todo: move to 0-9a-z charset in 1.5
-        hex_chars = '1234567890abcdef'
-        # session_key should not be case sensitive because some backends
-        # can store it on case insensitive file systems.
-        while True:
-            session_key = get_random_string(32, hex_chars)
+        # The random module is seeded when this Apache child is created.
+        # Use settings.SECRET_KEY as added salt.
+        try:
+            pid = os.getpid()
+        except AttributeError:
+            # No getpid() in Jython, for example
+            pid = 1
+        while 1:
+            session_key = HashToken("%s%s%s%s"
+                    % (randrange(0, MAX_SESSION_KEY), pid, time.time(),
+                       settings.SECRET_KEY)).hex()
             if not self.exists(session_key):
                 break
         return session_key

@@ -1,9 +1,9 @@
 "File-based cache backend"
 
-import hashlib
 import os
 import shutil
 import time
+from django.utils.token import HashToken
 
 try:
     import cPickle as pickle
@@ -137,7 +137,7 @@ class FileBasedCache(BaseCache):
         Thus, a cache key of "foo" gets turnned into a file named
         ``{cache-dir}ac/bd/18db4cc2f85cedef654fccc4a4d8``.
         """
-        path = hashlib.md5(key).hexdigest()
+        path = HashToken(key).hex()
         path = os.path.join(path[:2], path[2:4], path[4:])
         return os.path.join(self._dir, path)
 

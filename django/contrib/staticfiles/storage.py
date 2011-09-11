@@ -1,4 +1,5 @@
 from __future__ import unicode_literals
+from __future__ import with_statement
 import hashlib
 import os
 import posixpath
@@ -16,6 +17,7 @@ from django.utils.datastructures import SortedDict
 from django.utils.encoding import force_unicode, smart_str
 from django.utils.functional import LazyObject
 from django.utils.importlib import import_module
+from django.utils.token import HashToken
 
 from django.contrib.staticfiles.utils import check_settings, matches_patterns
 
@@ -95,18 +97,12 @@ class CachedFilesMixin(object):
                 return name
         path, filename = os.path.split(clean_name)
         root, ext = os.path.splitext(filename)
-        file_hash = self.file_hash(clean_name, content)
-        if file_hash is not None:
-            file_hash = ".%s" % file_hash
-        hashed_name = os.path.join(path, "%s%s%s" %
-                                   (root, file_hash, ext))
-        unparsed_name = list(parsed_name)
-        unparsed_name[2] = hashed_name
-        # Special casing for a @font-face hack, like url(myfont.eot?#iefix")
-        # http://www.fontspring.com/blog/the-new-bulletproof-font-face-syntax
-        if '?#' in name and not unparsed_name[3]:
-            unparsed_name[2] += '?'
-        return urlunsplit(unparsed_name)
+        # Get the MD5 hash of the file
+        token = HashToken()
+        for chunk in content.chunks():
+            token.update(chunk)
+        token_sum = token.hex()[:12]
+        return os.path.join(path, u"%s.%s%s" % (root, token_sum, ext))
 
     def cache_key(self, name):
         return 'staticfiles:%s' % hashlib.md5(smart_str(name)).hexdigest()

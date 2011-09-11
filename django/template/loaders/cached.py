@@ -3,9 +3,9 @@ Wrapper class that takes a list of template loaders as an argument and attempts
 to load templates from them in order, caching the result.
 """
 
-import hashlib
 from django.template.base import TemplateDoesNotExist
 from django.template.loader import BaseLoader, get_template_from_string, find_template_loader, make_origin
+from django.utils.token import HashToken
 
 class Loader(BaseLoader):
     is_usable = True
@@ -40,7 +40,7 @@ class Loader(BaseLoader):
         key = template_name
         if template_dirs:
             # If template directories were specified, use a hash to differentiate
-            key = '-'.join([template_name, hashlib.sha1('|'.join(template_dirs)).hexdigest()])
+            key = '-'.join([template_name, HashToken('|'.join(template_dirs)).hex()])
 
         if key not in self.template_cache:
             template, origin = self.find_template(template_name, template_dirs)
