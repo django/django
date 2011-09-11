@@ -982,7 +982,7 @@ __ http://geojson.org/
 
 .. method:: GeoQuerySet.gml(**kwargs)
 
-*Availability*: PostGIS, Oracle
+*Availability*: PostGIS, Oracle, SpatiaLite
 
 Attaches a ``gml`` attribute to every model in the queryset that contains the
 `Geographic Markup Language (GML)`__ representation of the geometry.
@@ -1013,7 +1013,7 @@ __ http://en.wikipedia.org/wiki/Geography_Markup_Language
 
 .. method:: GeoQuerySet.kml(**kwargs)
 
-*Availability*: PostGIS
+*Availability*: PostGIS, SpatiaLite
 
 Attaches a ``kml`` attribute to every model in the queryset that contains the
 `Keyhole Markup Language (KML)`__ representation of the geometry fields. It

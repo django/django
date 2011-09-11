@@ -287,9 +287,9 @@ Method                                PostGIS  Oracle  SpatiaLite
 :meth:`GeoQuerySet.force_rhr`         X
 :meth:`GeoQuerySet.geohash`           X
 :meth:`GeoQuerySet.geojson`           X
-:meth:`GeoQuerySet.gml`               X        X
+:meth:`GeoQuerySet.gml`               X        X       X
 :meth:`GeoQuerySet.intersection`      X        X       X
-:meth:`GeoQuerySet.kml`               X
+:meth:`GeoQuerySet.kml`               X                X
 :meth:`GeoQuerySet.length`            X        X       X
 :meth:`GeoQuerySet.make_line`         X
 :meth:`GeoQuerySet.mem_size`          X
