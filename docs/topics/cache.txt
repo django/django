@@ -526,9 +526,10 @@ you may expect. But once a particular URL (e.g., ``/foo/23/``) has been
 requested, subsequent requests to that URL will use the cache.
 
 ``cache_page`` can also take an optional keyword argument, ``cache``,
-which directs the decorator to use a specific cache alias when caching view
-results. By default, the ``default`` alias will be used, but you can specify
-any cache alias you want::
+which directs the decorator to use a specific cache (from your
+:setting:`CACHES` setting) when caching view results. By default, the
+``default`` cache will be used, but you can specify any cache you
+want::
 
     @cache_page(60 * 15, cache="special_cache")
     def my_view(request):
