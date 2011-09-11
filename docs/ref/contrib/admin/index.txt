@@ -19,10 +19,11 @@ There are seven steps in activating the Django admin site:
     1. Add ``'django.contrib.admin'`` to your :setting:`INSTALLED_APPS`
        setting.
 
-    2. Admin has three dependencies - :mod:`django.contrib.auth`,
-       :mod:`django.contrib.contenttypes` and :mod:`django.contrib.messages`.
-       If these applications are not in your :setting:`INSTALLED_APPS` list,
-       add them.
+    2. The admin has four dependencies - :mod:`django.contrib.auth`,
+       :mod:`django.contrib.contenttypes`,
+       :mod:`django.contrib.messages` and
+       :mod:`django.contrib.sessions`.  If these applications are not
+       in your :setting:`INSTALLED_APPS` list, add them.
 
     3. Add ``django.contrib.messages.context_processors.messages`` to
        :setting:`TEMPLATE_CONTEXT_PROCESSORS` and
