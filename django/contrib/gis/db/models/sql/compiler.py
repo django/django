@@ -171,10 +171,6 @@ class GeoSQLCompiler(compiler.SQLCompiler):
         """
         values = []
         aliases = self.query.extra_select.keys()
-        if self.query.aggregates:
-            # If we have an aggregate annotation, must extend the aliases
-            # so their corresponding row values are included.
-            aliases.extend([None for i in xrange(len(self.query.aggregates))])
 
         # Have to set a starting row number offset that is used for
         # determining the correct starting row index -- needed for
