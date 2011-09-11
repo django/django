@@ -54,6 +54,10 @@ algorithm the system follows to determine which Python code to execute:
        :class:`~django.http.HttpRequest` as its first argument and any values
        captured in the regex as remaining arguments.
 
+    5. If no regex matches, or if an exception is raised during any
+       point in this process, Django invokes an appropriate
+       error-handling view. See `Error handling`_ below.
+
 Example
 =======
 
@@ -246,6 +250,31 @@ The ``prefix`` parameter has the same meaning as the first argument to
 ``patterns()`` and is only relevant when you're passing a string as the
 ``view`` parameter.
 
+include
+-------
+
+.. function:: include(<module or pattern_list>)
+
+A function that takes a full Python import path to another URLconf module that
+should be "included" in this place.
+
+:func:`include` also accepts as an argument an iterable that returns URL
+patterns.
+
+See `Including other URLconfs`_ below.
+
+Error handling
+==============
+
+When Django can't find a regex matching the requested URL, or when an
+exception is raised, Django will invoke an error-handling view. The
+views to use for these cases are specified by two variables which can
+be set in your root URLconf. Setting these variables in any other
+URLconf will have no effect.
+
+See the documentation on :ref:`customizing error views
+<customizing-error-views>` for more details.
+
 handler404
 ----------
 
@@ -274,19 +303,6 @@ value should suffice.
 
 .. versionchanged:: 1.2
     Previous versions of Django only accepted strings representing import paths.
-
-include
--------
-
-.. function:: include(<module or pattern_list>)
-
-A function that takes a full Python import path to another URLconf module that
-should be "included" in this place.
-
-:func:`include` also accepts as an argument an iterable that returns URL
-patterns.
-
-See `Including other URLconfs`_ below.
 
 Notes on capturing text in URLs
 ===============================
