@@ -1,4 +1,4 @@
-from django.conf.urls.defaults import *
+from django.conf.urls import patterns, url
 
 urlpatterns = patterns('django.contrib.comments.views',
     url(r'^post/$',          'comments.post_comment',       name='comments-post-comment'),

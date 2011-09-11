@@ -1,7 +1,7 @@
 # A URLs file that doesn't use the default
-# from django.conf.urls.defaults import *
+# from django.conf.urls import *
 # import pattern.
-from django.conf.urls.defaults import patterns, url
+from django.conf.urls import patterns, url
 from views import empty_view, bad_view
 
 urlpatterns = patterns('',

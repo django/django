@@ -2,7 +2,7 @@
 Some extra URL patterns that are included at the top level.
 """
 
-from django.conf.urls.defaults import *
+from django.conf.urls import patterns, url, include
 from views import empty_view
 
 urlpatterns = patterns('',

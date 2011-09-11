@@ -241,7 +241,7 @@ Example
 
 Here's an example of a :doc:`URLconf </topics/http/urls>` using both::
 
-    from django.conf.urls.defaults import *
+    from django.conf.urls import patterns, url, include
     from django.contrib.sitemaps import FlatPageSitemap, GenericSitemap
     from blog.models import Entry
 

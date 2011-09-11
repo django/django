@@ -1,5 +1,5 @@
 from datetime import datetime
-from django.conf.urls.defaults import *
+from django.conf.urls import patterns
 from django.contrib.sitemaps import Sitemap, GenericSitemap, FlatPageSitemap
 from django.contrib.auth.models import User
 

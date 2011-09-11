@@ -1,4 +1,4 @@
-from django.conf.urls.defaults import *
+from django.conf.urls import patterns, url
 
 from views import empty_view, LazyRedirectView, login_required_view
 

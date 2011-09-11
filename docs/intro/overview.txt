@@ -176,7 +176,7 @@ decouple URLs from Python code.
 Here's what a URLconf might look like for the ``Reporter``/``Article``
 example above::
 
-    from django.conf.urls.defaults import *
+    from django.conf.urls import patterns, url, include
 
     urlpatterns = patterns('',
         (r'^articles/(\d{4})/$', 'news.views.year_archive'),

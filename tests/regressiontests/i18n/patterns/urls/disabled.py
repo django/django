@@ -1,4 +1,4 @@
-from django.conf.urls.defaults import url
+from django.conf.urls import url
 from django.conf.urls.i18n import i18n_patterns
 from django.views.generic import TemplateView
 

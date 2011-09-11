@@ -243,6 +243,12 @@ their deprecation, as per the :ref:`deprecation policy
       :mod:`django.contrib.gis.geoip` in 1.4 -- the shortcut in
       :mod:`django.contrib.gis.utils` will be removed.
 
+    * In 1.4, functions :func:`~django.conf.urls.include`, :func:`~django.conf.urls.patterns`
+      and :func:`~django.conf.urls.url` plus :data:`~django.conf.urls.handler404`,
+      :data:`~django.conf.urls.handler500` were moved to :mod:`django.conf.urls`
+      from their previous location ``django.conf.urls.defaults``. This module
+      was deprecated at the same time and will be removed in this Django release.
+
 2.0
 ---
 

@@ -1,5 +1,5 @@
 # coding: utf-8
-from django.conf.urls.defaults import *
+from django.conf.urls import patterns
 from django.views.generic.list_detail import object_detail
 from models import Article
 import views

@@ -1,4 +1,4 @@
-from django.conf.urls.defaults import *
+from django.conf.urls import patterns
 from feeds import feed_dict
 
 urlpatterns = patterns('',

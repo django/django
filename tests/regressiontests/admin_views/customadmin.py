@@ -1,7 +1,7 @@
 """
 A second, custom AdminSite -- see tests.CustomAdminSiteTests.
 """
-from django.conf.urls.defaults import patterns
+from django.conf.urls import patterns
 from django.contrib import admin
 from django.http import HttpResponse
 

@@ -524,7 +524,7 @@ pattern, it's possible to give a name to a pattern, and then reference the name
 rather than the view function. A named URL pattern is defined by replacing the
 pattern tuple by a call to the ``url`` function)::
 
-    from django.conf.urls.defaults import *
+    from django.conf.urls import patterns, url, include
 
     url(r'^people/(\d+)/$', 'blog_views.generic_detail', name='people_view'),
 

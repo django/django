@@ -5,7 +5,7 @@ each name to resolve and Django must distinguish the possibilities based on the
 argument list.
 """
 
-from django.conf.urls.defaults import *
+from django.conf.urls import patterns, url
 from views import empty_view
 
 urlpatterns = patterns('',

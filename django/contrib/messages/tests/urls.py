@@ -1,4 +1,4 @@
-from django.conf.urls.defaults import *
+from django.conf.urls import patterns
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponse

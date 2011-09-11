@@ -1,4 +1,4 @@
-from django.conf.urls.defaults import *
+from django.conf.urls import patterns, url
 from django.contrib.formtools.tests.wizard.wizardtests.forms import (
     SessionContactWizard, CookieContactWizard, Page1, Page2, Page3, Page4)
 

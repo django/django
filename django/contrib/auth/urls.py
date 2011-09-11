@@ -2,7 +2,7 @@
 # provided as a convenience to those who want to deploy these URLs elsewhere.
 # This file is also used to provide a reliable view deployment for test purposes.
 
-from django.conf.urls.defaults import *
+from django.conf.urls import patterns
 
 urlpatterns = patterns('',
     (r'^login/$', 'django.contrib.auth.views.login'),

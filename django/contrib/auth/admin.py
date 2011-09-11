@@ -74,7 +74,7 @@ class UserAdmin(admin.ModelAdmin):
         return super(UserAdmin, self).get_form(request, obj, **defaults)
 
     def get_urls(self):
-        from django.conf.urls.defaults import patterns
+        from django.conf.urls import patterns
         return patterns('',
             (r'^(\d+)/password/$', self.admin_site.admin_view(self.user_change_password))
         ) + super(UserAdmin, self).get_urls()

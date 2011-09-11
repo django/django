@@ -819,11 +819,11 @@ Language prefix in URL patterns
 .. function:: i18n_patterns(prefix, pattern_description, ...)
 
 This function can be used in your root URLconf as a replacement for the normal
-:func:`django.conf.urls.defaults.patterns` function. Django will automatically
+:func:`django.conf.urls.patterns` function. Django will automatically
 prepend the current active language code to all url patterns defined within
 :func:`~django.conf.urls.i18n.i18n_patterns`. Example URL patterns::
 
-    from django.conf.urls.defaults import patterns, include, url
+    from django.conf.urls import patterns, include, url
     from django.conf.urls.i18n import i18n_patterns
 
     urlpatterns = patterns(''
@@ -877,7 +877,7 @@ Translating URL patterns
 URL patterns can also be marked translatable using the
 :func:`~django.utils.translation.ugettext_lazy` function. Example::
 
-    from django.conf.urls.defaults import patterns, include, url
+    from django.conf.urls import patterns, include, url
     from django.conf.urls.i18n import i18n_patterns
     from django.utils.translation import ugettext_lazy as _
 

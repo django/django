@@ -80,7 +80,7 @@ latest five news items::
 To connect a URL to this feed, put an instance of the Feed object in
 your :doc:`URLconf </topics/http/urls>`. For example::
 
-    from django.conf.urls.defaults import *
+    from django.conf.urls import patterns, url, include
     from myproject.feeds import LatestEntriesFeed
 
     urlpatterns = patterns('',
@@ -327,7 +327,7 @@ Here's a full example::
 
 And the accompanying URLconf::
 
-    from django.conf.urls.defaults import *
+    from django.conf.urls import patterns, url, include
     from myproject.feeds import RssSiteNewsFeed, AtomSiteNewsFeed
 
     urlpatterns = patterns('',

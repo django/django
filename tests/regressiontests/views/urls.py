@@ -1,7 +1,7 @@
 # coding: utf-8
 from os import path
 
-from django.conf.urls.defaults import *
+from django.conf.urls import patterns, url, include
 
 import views
 

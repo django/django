@@ -1,4 +1,4 @@
-from django.conf.urls.defaults import *
+from django.conf.urls import patterns, url
 from django.views.generic import RedirectView
 import views
 

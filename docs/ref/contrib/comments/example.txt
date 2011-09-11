@@ -143,7 +143,7 @@ enable it in your project's ``urls.py``:
 
 .. code-block:: python
 
-  from django.conf.urls.defaults import *
+  from django.conf.urls import patterns, url, include
   from django.contrib.comments.feeds import LatestCommentFeed
 
   urlpatterns = patterns('',
@@ -161,7 +161,7 @@ syndication feed view:
 
 .. code-block:: python
 
-    from django.conf.urls.defaults import *
+    from django.conf.urls import patterns
     from django.contrib.comments.feeds import LatestCommentFeed
 
     feeds = {

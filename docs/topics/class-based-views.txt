@@ -75,7 +75,7 @@ views themselves are classes, we point the URL to the ``as_view`` class method
 instead, which is the entry point for class-based views::
 
     # urls.py
-    from django.conf.urls.defaults import *
+    from django.conf.urls import patterns, url, include
     from some_app.views import AboutView
 
     urlpatterns = patterns('',
@@ -86,7 +86,7 @@ Alternatively, if you're only changing a few simple attributes on a
 class-based view, you can simply pass the new attributes into the ``as_view``
 method call itself::
 
-    from django.conf.urls.defaults import *
+    from django.conf.urls import patterns, url, include
     from django.views.generic import TemplateView
 
     urlpatterns = patterns('',
@@ -135,7 +135,7 @@ be using these models::
 
 To build a list page of all publishers, we'd use a URLconf along these lines::
 
-    from django.conf.urls.defaults import *
+    from django.conf.urls import patterns, url, include
     from django.views.generic import ListView
     from books.models import Publisher
 

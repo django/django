@@ -1,4 +1,4 @@
-from django.conf.urls.defaults import *
+from django.conf.urls import patterns, url
 from django.template import Template, Context
 from django.http import HttpResponse
 

@@ -1,4 +1,4 @@
-from django.conf.urls.defaults import *
+from django.conf.urls import patterns, url, include
 from views import view_class_instance
 
 class URLObject(object):

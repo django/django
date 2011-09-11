@@ -1,4 +1,4 @@
-from django.conf.urls.defaults import *
+from django.conf.urls import patterns
 from django.contrib.databrowse import views
 
 # Note: The views in this URLconf all require a 'models' argument,

@@ -218,7 +218,7 @@ Read on for details.
 First, open the ``polls/urls.py`` URLconf. It looks like this, according to the
 tutorial so far::
 
-    from django.conf.urls.defaults import patterns, include, url
+    from django.conf.urls import patterns, include, url
 
     urlpatterns = patterns('polls.views',
         (r'^$', 'index'),
@@ -229,7 +229,7 @@ tutorial so far::
 
 Change it like so::
 
-    from django.conf.urls.defaults import patterns, include, url
+    from django.conf.urls import patterns, include, url
     from django.views.generic import DetailView, ListView
     from polls.models import Poll
 
@@ -269,9 +269,9 @@ two views abstract the concepts of "display a list of objects" and
       that we have a way to refer to its URL later on (see the
       documentation about :ref:`naming URL patterns
       <naming-url-patterns>` for information). We're also using the
-      :func:`~django.conf.urls.default.url` function from
-      :mod:`django.conf.urls.defaults` here. It's a good habit to use
-      :func:`~django.conf.urls.defaults.url` when you are providing a
+      :func:`~django.conf.urls.url` function from
+      :mod:`django.conf.urls` here. It's a good habit to use
+      :func:`~django.conf.urls.url` when you are providing a
       pattern name like this.
 
 By default, the :class:`~django.views.generic.list.DetailView` generic

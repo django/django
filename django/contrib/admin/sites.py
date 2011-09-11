@@ -174,7 +174,7 @@ class AdminSite(object):
             class MyAdminSite(AdminSite):
 
                 def get_urls(self):
-                    from django.conf.urls.defaults import patterns, url
+                    from django.conf.urls import patterns, url
 
                     urls = super(MyAdminSite, self).get_urls()
                     urls += patterns('',
@@ -199,7 +199,7 @@ class AdminSite(object):
         return update_wrapper(inner, view)
 
     def get_urls(self):
-        from django.conf.urls.defaults import patterns, url, include
+        from django.conf.urls import patterns, url, include
 
         if settings.DEBUG:
             self.check_dependencies()

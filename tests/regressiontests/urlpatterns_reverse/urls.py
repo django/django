@@ -1,4 +1,4 @@
-from django.conf.urls.defaults import *
+from django.conf.urls import patterns, url, include
 from views import empty_view, absolute_kwargs_view
 
 other_patterns = patterns('',

@@ -58,7 +58,7 @@ URLconf tuple for a given pattern.
 For example, here's a simple URLconf you could use to present a static "about"
 page::
 
-    from django.conf.urls.defaults import *
+    from django.conf.urls import patterns, url, include
     from django.views.generic.simple import direct_to_template
 
     urlpatterns = patterns('',
@@ -80,7 +80,7 @@ the URLconf to point to a view function:
 
 .. parsed-literal::
 
-    from django.conf.urls.defaults import *
+    from django.conf.urls import patterns, url, include
     from django.views.generic.simple import direct_to_template
     **from books.views import about_pages**
 
@@ -160,7 +160,7 @@ be using these models::
 
 To build a list page of all publishers, we'd use a URLconf along these lines::
 
-    from django.conf.urls.defaults import *
+    from django.conf.urls import patterns, url, include
     from django.views.generic import list_detail
     from books.models import Publisher
 

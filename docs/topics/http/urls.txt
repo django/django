@@ -50,7 +50,7 @@ algorithm the system follows to determine which Python code to execute:
 
     2. Django loads that Python module and looks for the variable
        ``urlpatterns``. This should be a Python list, in the format returned by
-       the function :func:`django.conf.urls.defaults.patterns`.
+       the function :func:`django.conf.urls.patterns`.
 
     3. Django runs through each URL pattern, in order, and stops at the first
        one that matches the requested URL.
@@ -69,7 +69,7 @@ Example
 
 Here's a sample URLconf::
 
-    from django.conf.urls.defaults import *
+    from django.conf.urls import patterns, url, include
 
     urlpatterns = patterns('',
         (r'^articles/2003/$', 'news.views.special_case_2003'),
@@ -79,9 +79,6 @@ Here's a sample URLconf::
     )
 
 Notes:
-
-    * ``from django.conf.urls.defaults import *`` makes the ``patterns()``
-      function available.
 
     * To capture a value from the URL, just put parenthesis around it.
 
@@ -184,13 +181,21 @@ Syntax of the urlpatterns variable
 ==================================
 
 ``urlpatterns`` should be a Python list, in the format returned by the function
-:func:`django.conf.urls.defaults.patterns`. Always use ``patterns()`` to create
+:func:`django.conf.urls.patterns`. Always use ``patterns()`` to create
 the ``urlpatterns`` variable.
 
-Convention is to use ``from django.conf.urls.defaults import *`` at the top of
-your URLconf. This gives your module access to these objects:
+``django.conf.urls`` utility functions
+======================================
 
-.. module:: django.conf.urls.defaults
+.. module:: django.conf.urls
+
+.. deprecated:: 1.4
+    Starting with Django 1.4 functions ``patterns``, ``url``, ``include`` plus
+    the ``handler*`` symbols described below live in the ``django.conf.urls``
+    module.
+
+    Until Django 1.3 they were located in ``django.conf.urls.defaults``. You
+    still can import them from there but it will be removed in Django 1.6.
 
 patterns
 --------
@@ -281,6 +286,24 @@ URLconf will have no effect.
 See the documentation on :ref:`customizing error views
 <customizing-error-views>` for more details.
 
+handler403
+----------
+
+.. data:: handler403
+
+A callable, or a string representing the full Python import path to the view
+that should be called if the user has no the permissions required to access
+a resource.
+
+By default, this is ``'django.views.defaults.permission_denied'``. That default
+value should suffice.
+
+See the documentation about :ref:`the 403 (HTTP Forbidden) view
+<http_forbidden_view>` for more information.
+
+.. versionadded:: 1.4
+    ``handler403`` is new in Django 1.4.
+
 handler404
 ----------
 
@@ -355,7 +378,7 @@ code duplication.
 
 Here's the example URLconf from the :doc:`Django overview </intro/overview>`::
 
-    from django.conf.urls.defaults import *
+    from django.conf.urls import patterns, url, include
 
     urlpatterns = patterns('',
         (r'^articles/(\d{4})/$', 'news.views.year_archive'),
@@ -370,7 +393,7 @@ each view function.
 
 With this in mind, the above example can be written more concisely as::
 
-    from django.conf.urls.defaults import *
+    from django.conf.urls import patterns, url, include
 
     urlpatterns = patterns('news.views',
         (r'^articles/(\d{4})/$', 'year_archive'),
@@ -391,7 +414,7 @@ Just add multiple ``patterns()`` objects together, like this:
 
 Old::
 
-    from django.conf.urls.defaults import *
+    from django.conf.urls import patterns, url, include
 
     urlpatterns = patterns('',
         (r'^$', 'django.views.generic.date_based.archive_index'),
@@ -401,7 +424,7 @@ Old::
 
 New::
 
-    from django.conf.urls.defaults import *
+    from django.conf.urls import patterns, url, include
 
     urlpatterns = patterns('django.views.generic.date_based',
         (r'^$', 'archive_index'),
@@ -421,7 +444,7 @@ essentially "roots" a set of URLs below other ones.
 For example, here's the URLconf for the `Django Web site`_ itself. It includes a
 number of other URLconfs::
 
-    from django.conf.urls.defaults import *
+    from django.conf.urls import patterns, url, include
 
     urlpatterns = patterns('',
         (r'^weblog/',        include('django_website.apps.blog.urls.blog')),
@@ -439,7 +462,7 @@ Another possibility is to include additional URL patterns not by specifying the
 URLconf Python module defining them as the `include`_ argument but by using
 directly the pattern list as returned by `patterns`_ instead. For example::
 
-    from django.conf.urls.defaults import *
+    from django.conf.urls import patterns, url, include
 
     extra_patterns = patterns('',
         url(r'reports/(?P<id>\d+)/$', 'credit.views.report', name='credit-reports'),
@@ -784,8 +807,8 @@ following would happen:
     * ``foo:index`` will again resolve to the index page of the instance ``foo``.
 
 
-Utility methods
-===============
+``django.core.urlresolvers`` utility functions
+==============================================
 
 .. currentmodule:: django.core.urlresolvers
 
@@ -793,7 +816,7 @@ reverse()
 ---------
 
 If you need to use something similar to the :ttag:`url` template tag in
-your code, Django provides the following method (in the
+your code, Django provides the following function (in the
 :mod:`django.core.urlresolvers` module):
 
 .. function:: reverse(viewname, [urlconf=None, args=None, kwargs=None, current_app=None])
@@ -859,7 +882,7 @@ reverse_lazy()
 A lazily evaluated version of `reverse()`_.
 
 It is useful for when you need to use a URL reversal before your project's
-URLConf is loaded. Some common cases where this method is necessary are:
+URLConf is loaded. Some common cases where this function is necessary are:
 
 * providing a reversed URL as the ``url`` attribute of a generic class-based
   view.

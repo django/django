@@ -217,7 +217,7 @@ deploy the new :class:`WizardView` object a URL in the ``urls.py``. The
 wizard's :meth:`as_view` method takes a list of your
 :class:`~django.forms.Form` classes as an argument during instantiation::
 
-    from django.conf.urls.defaults import patterns
+    from django.conf.urls import patterns
 
     from myapp.forms import ContactForm1, ContactForm2
     from myapp.views import ContactWizard
@@ -525,7 +525,7 @@ We define our wizard in a ``views.py``::
 
 We need to add the ``ContactWizard`` to our ``urls.py`` file::
 
-    from django.conf.urls.defaults import pattern
+    from django.conf.urls import pattern
 
     from myapp.forms import ContactForm1, ContactForm2
     from myapp.views import ContactWizard, show_message_form_condition
@@ -572,7 +572,7 @@ Additionally you have to pass two more arguments to the
 
 Example code for the changed ``urls.py`` file::
 
-    from django.conf.urls.defaults import url, patterns
+    from django.conf.urls import url, patterns
 
     from myapp.forms import ContactForm1, ContactForm2
     from myapp.views import ContactWizard

@@ -697,7 +697,7 @@ Let's dive in again -- create a file called ``admin.py`` inside the
 Next, edit your ``urls.py`` in the ``geodjango`` project folder to look
 as follows::
 
-    from django.conf.urls.defaults import *
+    from django.conf.urls import patterns, url, include
     from django.contrib.gis import admin
 
     admin.autodiscover()
