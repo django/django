@@ -1203,7 +1203,7 @@ Aggregate Functions
 Example::
 
     >>> from django.contrib.gis.db.models import Extent, Union
-    >>> WorldBorders.objects.aggregate(Extent('mpoly'), Union('mpoly'))
+    >>> WorldBorder.objects.aggregate(Extent('mpoly'), Union('mpoly'))
 
 ``Collect``
 ~~~~~~~~~~~

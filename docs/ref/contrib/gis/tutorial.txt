@@ -212,7 +212,7 @@ create a GeoDjango model to represent this data::
 
     from django.contrib.gis.db import models
 
-    class WorldBorders(models.Model):
+    class WorldBorder(models.Model):
         # Regular Django fields corresponding to the attributes in the
 	# world borders shapefile.
         name = models.CharField(max_length=50)
@@ -231,10 +231,6 @@ create a GeoDjango model to represent this data::
         # overriding the default manager with a GeoManager instance.
 	mpoly = models.MultiPolygonField()
 	objects = models.GeoManager()
-
-        # So the model is pluralized correctly in the admin.
-        class Meta:
-            verbose_name_plural = "World Borders"
 
         # Returns the string representation of the model.
         def __unicode__(self):
@@ -259,7 +255,7 @@ Run ``syncdb``
 --------------
 
 After you've defined your model, it needs to be synced with the spatial database.
-First, let's look at the SQL that will generate the table for the ``WorldBorders``
+First, let's look at the SQL that will generate the table for the ``WorldBorder``
 model::
 
     $ python manage.py sqlall world
@@ -292,7 +288,7 @@ If satisfied, you may then create this table in the database by running the
 
     $ python manage.py syncdb
     Creating table world_worldborders
-    Installing custom SQL for world.WorldBorders model
+    Installing custom SQL for world.WorldBorder model
 
 The ``syncdb`` command may also prompt you to create an admin user; go ahead and
 do so (not required now, may be done at any point in the future using the
@@ -445,7 +441,7 @@ We're going to dive right in -- create a file called ``load.py`` inside the
 
     import os
     from django.contrib.gis.utils import LayerMapping
-    from models import WorldBorders
+    from models import WorldBorder
 
     world_mapping = {
         'fips' : 'FIPS',
@@ -465,7 +461,7 @@ We're going to dive right in -- create a file called ``load.py`` inside the
     world_shp = os.path.abspath(os.path.join(os.path.dirname(__file__), 'data/TM_WORLD_BORDERS-0.3.shp'))
 
     def run(verbose=True):
-        lm = LayerMapping(WorldBorders, world_shp, world_mapping,
+        lm = LayerMapping(WorldBorder, world_shp, world_mapping,
                           transform=False, encoding='iso-8859-1')
 
         lm.save(strict=True, verbose=verbose)
@@ -473,7 +469,7 @@ We're going to dive right in -- create a file called ``load.py`` inside the
 A few notes about what's going on:
 
 * Each key in the ``world_mapping`` dictionary corresponds to a field in the
-  ``WorldBorders`` model, and the value is the name of the shapefile field
+  ``WorldBorder`` model, and the value is the name of the shapefile field
   that data will be loaded from.
 * The key ``mpoly`` for the geometry field is ``MULTIPOLYGON``, the
   geometry type we wish to import as.  Even if simple polygons are encountered
@@ -517,10 +513,10 @@ Where ``data_source`` is the path to the GDAL-supported data source and
 ``model_name`` is the name to use for the model.  Command-line options may
 be used to further define how the model is generated.
 
-For example, the following command nearly reproduces the ``WorldBorders`` model
+For example, the following command nearly reproduces the ``WorldBorder`` model
 and mapping dictionary created above, automatically::
 
-    $ python manage.py ogrinspect world/data/TM_WORLD_BORDERS-0.3.shp WorldBorders --srid=4326 --mapping --multi
+    $ python manage.py ogrinspect world/data/TM_WORLD_BORDERS-0.3.shp WorldBorder --srid=4326 --mapping --multi
 
 A few notes about the command-line options given above:
 
@@ -537,7 +533,7 @@ directly into the ``models.py`` of a GeoDjango application::
     # This is an auto-generated Django model module created by ogrinspect.
     from django.contrib.gis.db import models
 
-    class WorldBorders(models.Model):
+    class WorldBorder(models.Model):
         fips = models.CharField(max_length=2)
         iso2 = models.CharField(max_length=2)
         iso3 = models.CharField(max_length=3)
@@ -552,7 +548,7 @@ directly into the ``models.py`` of a GeoDjango application::
         geom = models.MultiPolygonField(srid=4326)
         objects = models.GeoManager()
 
-    # Auto-generated `LayerMapping` dictionary for WorldBorders model
+    # Auto-generated `LayerMapping` dictionary for WorldBorder model
     worldborders_mapping = {
         'fips' : 'FIPS',
         'iso2' : 'ISO2',
@@ -586,25 +582,25 @@ Now, define a point of interest [#]_::
 The ``pnt_wkt`` string represents the point at -95.3385 degrees longitude,
 and 29.7245 degrees latitude.  The geometry is in a format known as
 Well Known Text (WKT), an open standard issued by the Open Geospatial
-Consortium (OGC). [#]_  Import the ``WorldBorders`` model, and perform
+Consortium (OGC). [#]_  Import the ``WorldBorder`` model, and perform
 a ``contains`` lookup using the ``pnt_wkt`` as the parameter::
 
-    >>> from world.models import WorldBorders
-    >>> qs = WorldBorders.objects.filter(mpoly__contains=pnt_wkt)
+    >>> from world.models import WorldBorder
+    >>> qs = WorldBorder.objects.filter(mpoly__contains=pnt_wkt)
     >>> qs
-    [<WorldBorders: United States>]
+    [<WorldBorder: United States>]
 
 Here we retrieved a ``GeoQuerySet`` that has only one model: the one
 for the United States (which is what we would expect).  Similarly,
 a :ref:`GEOS geometry object <ref-geos>` may also be used -- here the ``intersects``
 spatial lookup is combined with the ``get`` method to retrieve
-only the ``WorldBorders`` instance for San Marino instead of a queryset::
+only the ``WorldBorder`` instance for San Marino instead of a queryset::
 
     >>> from django.contrib.gis.geos import Point
     >>> pnt = Point(12.4604, 43.9420)
-    >>> sm = WorldBorders.objects.get(mpoly__intersects=pnt)
+    >>> sm = WorldBorder.objects.get(mpoly__intersects=pnt)
     >>> sm
-    <WorldBorders: San Marino>
+    <WorldBorder: San Marino>
 
 The ``contains`` and ``intersects`` lookups are just a subset of what's
 available -- the :ref:`ref-gis-db-api` documentation has more.
@@ -629,7 +625,7 @@ When using GeoDjango's ORM, it will automatically wrap geometry values
 in transformation SQL, allowing the developer to work at a higher level
 of abstraction::
 
-    >>> qs = WorldBorders.objects.filter(mpoly__intersects=pnt)
+    >>> qs = WorldBorder.objects.filter(mpoly__intersects=pnt)
     >>> print qs.query # Generating the SQL
     SELECT "world_worldborders"."id", "world_worldborders"."name", "world_worldborders"."area",
     "world_worldborders"."pop2005", "world_worldborders"."fips", "world_worldborders"."iso2",
@@ -638,7 +634,7 @@ of abstraction::
     "world_worldborders"."mpoly" FROM "world_worldborders"
     WHERE ST_Intersects("world_worldborders"."mpoly", ST_Transform(%s, 4326))
     >>> qs # printing evaluates the queryset
-    [<WorldBorders: United States>]
+    [<WorldBorder: United States>]
 
 __ http://spatialreference.org/ref/epsg/32140/
 
@@ -649,7 +645,7 @@ access of the geometry field, GeoDjango creates a `GEOS geometry object <ref-geo
 exposing powerful functionality, such as serialization properties for
 popular geospatial formats::
 
-    >>> sm = WorldBorders.objects.get(name='San Marino')
+    >>> sm = WorldBorder.objects.get(name='San Marino')
     >>> sm.mpoly
     <MultiPolygon object at 0x24c6798>
     >>> sm.mpoly.wkt # WKT
@@ -694,9 +690,9 @@ Let's dive in again -- create a file called ``admin.py`` inside the
 ``world`` application, and insert the following::
 
     from django.contrib.gis import admin
-    from models import WorldBorders
+    from models import WorldBorder
 
-    admin.site.register(WorldBorders, admin.GeoModelAdmin)
+    admin.site.register(WorldBorder, admin.GeoModelAdmin)
 
 Next, edit your ``urls.py`` in the ``geodjango`` project folder to look
 as follows::
@@ -715,7 +711,7 @@ Start up the Django development server::
     $ python manage.py runserver
 
 Finally, browse to ``http://localhost:8000/admin/``, and log in with the admin
-user created after running ``syncdb``.  Browse to any of the ``WorldBorders``
+user created after running ``syncdb``.  Browse to any of the ``WorldBorder``
 entries -- the borders may be edited by clicking on a polygon and dragging
 the vertexes to the desired position.
 
@@ -747,7 +743,7 @@ First, there are some important requirements and limitations:
 If you meet these requirements, then just substitute in the ``OSMGeoAdmin``
 option class in your ``admin.py`` file::
 
-    admin.site.register(WorldBorders, admin.OSMGeoAdmin)
+    admin.site.register(WorldBorder, admin.OSMGeoAdmin)
 
 .. rubric:: Footnotes
 
