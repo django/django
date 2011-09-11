@@ -330,7 +330,6 @@ def _sqlite_format_dtdelta(dt, conn, days, secs, usecs):
     return rv
 
 def _sqlite_regexp(re_pattern, re_string):
-    import re
     try:
         return bool(re.search(re_pattern, re_string))
     except:
