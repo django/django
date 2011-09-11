@@ -236,6 +236,30 @@ alias::
     # Your code here...
     transaction.commit_unless_managed(using='my_db_alias')
 
+By default, the Python DB API will return results without their field
+names, which means you end up with a ``list`` of values, rather than a
+``dict``. At a small performance cost, you can return results as a
+``dict`` by using something like this::
+    
+    def dictfetchall(cursor):
+        "Returns all rows from a cursor as a dict"
+        desc = cursor.description
+        return [
+            dict(zip([col[0] for col in desc], row))
+            for row in cursor.fetchall()
+        ]
+
+Here is an example of the difference between the two::
+
+    >>> cursor.execute("SELECT id, parent_id from test LIMIT 2");
+    >>> cursor.fetchall()
+    ((54360982L, None), (54360880L, None))
+    
+    >>> cursor.execute("SELECT id, parent_id from test LIMIT 2");
+    >>> dictfetchall(cursor)
+    [{'parent_id': None, 'id': 54360982L}, {'parent_id': None, 'id': 54360880L}]
+
+
 .. _transactions-and-raw-sql:
 
 Transactions and raw SQL
