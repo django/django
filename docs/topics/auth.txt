@@ -1251,16 +1251,19 @@ can or cannot do with Task instances, specific to your application::
         ...
         class Meta:
             permissions = (
-                ("can_view", "Can see available tasks"),
-                ("can_change_status", "Can change the status of tasks"),
-                ("can_close", "Can remove a task by setting its status as closed"),
+                ("view_task", "Can see available tasks"),
+                ("change_task_status", "Can change the status of tasks"),
+                ("close_task", "Can remove a task by setting its status as closed"),
             )
 
 The only thing this does is create those extra permissions when you run
 :djadmin:`manage.py syncdb <syncdb>`. Your code is in charge of checking the
 value of these permissions when an user is trying to access the functionality
 provided by the application (viewing tasks, changing the status of tasks,
-closing tasks.)
+closing tasks.) Continuing the above example, the following checks if a user may
+view tasks:
+
+    user.has_perm('app.view_task')
 
 API reference
 -------------
