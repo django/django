@@ -510,9 +510,9 @@ given length.
     * Error message keys: ``required``, ``invalid``, ``missing``, ``empty``,
       ``max_length``
 
-Has two optional arguments for validation, ''max_length'' and 
-''allow_empty_file''. If provided, these ensure that the file name is at 
-most the given length, and that validation will succeed even if the file 
+Has two optional arguments for validation, ``max_length`` and
+``allow_empty_file``. If provided, these ensure that the file name is at
+most the given length, and that validation will succeed even if the file
 content is empty.
 
 To learn more about the ``UploadedFile`` object, see the :doc:`file uploads
