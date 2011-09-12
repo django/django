@@ -379,7 +379,9 @@ Takes extra arguments:
 .. attribute:: TypedChoiceField.empty_value
 
     The value to use to represent "empty." Defaults to the empty string;
-    ``None`` is another common choice here.
+    ``None`` is another common choice here. Note that this value will not be
+    coerced by the function given in the ``coerce`` argument, so choose it
+    accordingly.
 
 ``DateField``
 ~~~~~~~~~~~~~
