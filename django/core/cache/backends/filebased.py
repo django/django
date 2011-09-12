@@ -130,7 +130,7 @@ class FileBasedCache(BaseCache):
 
     def _key_to_file(self, key):
         """
-        Convert the filename into an md5 string. We'll turn the first couple
+        Convert the filename into an hash-token string. We'll turn the first couple
         bits of the path into directory prefixes to be nice to filesystems
         that have problems with large numbers of files in a directory.
 

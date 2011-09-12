@@ -1,6 +1,5 @@
 from __future__ import absolute_import, unicode_literals
 
-import hashlib
 import json
 import os
 
@@ -11,6 +10,7 @@ from .models import FileModel, UPLOAD_TO
 from .tests import UNICODE_FILENAME
 from .uploadhandler import QuotaUploadHandler, ErroringUploadHandler
 
+from django.utils.tokens import HashToken
 
 def file_upload_view(request):
     """
@@ -42,9 +42,9 @@ def file_upload_view_verify(request):
             continue
         submitted_hash = form_data[key + '_hash']
         if isinstance(value, UploadedFile):
-            new_hash = hashlib.sha1(value.read()).hexdigest()
+            new_hash = HashToken(value.read()).hex()
         else:
-            new_hash = hashlib.sha1(value).hexdigest()
+            new_hash = HashToken(value).hex()
         if new_hash != submitted_hash:
             return HttpResponseServerError()
 

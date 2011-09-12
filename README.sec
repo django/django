@@ -13,3 +13,5 @@ Sat Sep 10 16:44:14 PDT 2011
 [   ] Do we need to do anything with django/utils/hashcompat.py ?  (e.g. change the warning message to ref. tokens.py?)
 
 [   ] I assume we want to leave django/utils/crypto alone, not using new django/utils/token - Paul: can you confirm?
+
+[   ]  django/contrib/auth/utils.py will need some lovin' eyes, will need to be looked over.  Do we want to leave it?  Modify it (how)?

@@ -36,7 +36,7 @@ class SessionStore(SessionBase):
             session_key = self._get_or_create_session_key()
 
         # Make sure we're not vulnerable to directory traversal. Session keys
-        # should always be md5s, so they should never contain directory
+        # should always be HashTokens, so they should never contain directory
         # components.
         if not set(session_key).issubset(self.VALID_KEY_CHARS):
             raise SuspiciousOperation(
