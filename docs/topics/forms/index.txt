@@ -333,16 +333,13 @@ and visible fields independently: ``hidden_fields()`` and
 these two methods::
 
     <form action="/contact/" method="post">
+        {# Include the hidden fields #}
+        {% for hidden in form.hidden_fields %}
+        {{ hidden }}
+        {% endfor %}
+        {# Include the visible fields #}
         {% for field in form.visible_fields %}
             <div class="fieldWrapper">
-
-                {# Include the hidden fields in the form #}
-                {% if forloop.first %}
-                    {% for hidden in form.hidden_fields %}
-                    {{ hidden }}
-                    {% endfor %}
-                {% endif %}
-
                 {{ field.errors }}
                 {{ field.label_tag }}: {{ field }}
             </div>
