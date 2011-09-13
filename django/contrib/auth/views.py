@@ -4,7 +4,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, QueryDict
 from django.template.response import TemplateResponse
-from django.utils.http import base36_to_int
+from django.utils.baseconv import BaseConverter, BASE36_ALPHABET, base36
 from django.utils.translation import ugettext as _
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
@@ -195,7 +195,7 @@ def password_reset_confirm(request, uidb36=None, token=None,
     if post_reset_redirect is None:
         post_reset_redirect = reverse('django.contrib.auth.views.password_reset_complete')
     try:
-        uid_int = base36_to_int(uidb36)
+        uid_int = base36.decode(uidb36)
         user = User.objects.get(id=uid_int)
     except (ValueError, User.DoesNotExist):
         user = None

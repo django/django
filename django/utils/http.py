@@ -148,6 +148,7 @@ def parse_http_date_safe(date):
         pass
 
 # Base 36 functions: useful for generating compact URLs
+## Use: django.utils.baseconv for these:
 
 def base36_to_int(s):
     """

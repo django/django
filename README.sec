@@ -8,11 +8,11 @@ Sat Sep 10 16:44:14 PDT 2011
 [Done] We are moving /splitting our work [HashToken, RandomToken, etc.]
   out of django/utils/crypto.py into django/utils/tokens.py
 
-[   ] We also need to have the funtionality of contrib/auth/tokens.py in django/utils/tokens.py (eventually, we can move this out of contrib...)
+[Done] We also need to have the funtionality of contrib/auth/tokens.py in django/utils/tokens.py (eventually, we can move this out of contrib...)
+
+[    ] We also need to have the funtionality of contrib/auth/utils.py in django/utils/crypto.py (?), but there are multiple password encodings (eventually, we can move this out of contrib...)
 
 [Done] Do we need to do anything with django/utils/hashcompat.py ?  (e.g. change the warning message to ref. tokens.py?)
      - Essentially, Justine (github.com/jart/django)  already solved this; just merge her work when we're all done.
 
 [   ] I assume we want to leave django/utils/crypto alone, not using new django/utils/token - maybe not; Paul: can you weigh in?
-
-[   ]  django/contrib/auth/utils.py will need some lovin' eyes, will need to be looked over.  Do we want to leave it?  Modify it (how)? absorbe it?

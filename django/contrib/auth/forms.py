@@ -7,6 +7,8 @@ from django.utils.html import format_html, format_html_join
 from django.utils.http import int_to_base36
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext, ugettext_lazy as _
+from django.utils.baseconv import base36
+from django.utils.itercompat import any
 
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
@@ -227,7 +229,7 @@ class PasswordResetForm(forms.Form):
                 'email': user.email,
                 'domain': domain,
                 'site_name': site_name,
-                'uid': int_to_base36(user.id),
+                'uid': base36.encode(user.id),
                 'user': user,
                 'token': token_generator.make_token(user),
                 'protocol': use_https and 'https' or 'http',
