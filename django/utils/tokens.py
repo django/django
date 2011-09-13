@@ -107,4 +107,4 @@ class HashToken():
         return converter.encode(int(hextoken, 16))
 
     def update(self, value):
-        self._hash = self._hash.update(value)
+        self._hash.update(value)
