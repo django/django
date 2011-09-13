@@ -25,16 +25,11 @@ class Storage(object):
     # The following methods represent a public interface to private methods.
     # These shouldn't be overridden by subclasses unless absolutely necessary.
 
-    def open(self, name, mode='rb', mixin=None):
+    def open(self, name, mode='rb'):
         """
-        Retrieves the specified file from storage, using the optional mixin
-        class to customize what features are available on the File returned.
+        Retrieves the specified file from storage.
         """
-        file = self._open(name, mode)
-        if mixin:
-            # Add the mixin as a parent class of the File returned from storage.
-            file.__class__ = type(mixin.__name__, (mixin, file.__class__), {})
-        return file
+        return self._open(name, mode)
 
     def save(self, name, content):
         """

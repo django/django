@@ -231,26 +231,6 @@ class FileStorageTests(unittest.TestCase):
         self.storage.base_url = None
         self.assertRaises(ValueError, self.storage.url, 'test.file')
 
-    def test_file_with_mixin(self):
-        """
-        File storage can get a mixin to extend the functionality of the
-        returned file.
-        """
-        self.assertFalse(self.storage.exists('test.file'))
-
-        class TestFileMixin(object):
-            mixed_in = True
-
-        f = ContentFile('custom contents')
-        f_name = self.storage.save('test.file', f)
-
-        self.assertTrue(isinstance(
-            self.storage.open('test.file', mixin=TestFileMixin),
-            TestFileMixin
-        ))
-
-        self.storage.delete('test.file')
-
     def test_listdir(self):
         """
         File storage returns a tuple containing directories and files.
