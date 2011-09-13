@@ -75,7 +75,7 @@ geospatial libraries:
 ========================  ====================================  ================================  ==========================
 Program                   Description                           Required                          Supported Versions
 ========================  ====================================  ================================  ==========================
-:ref:`GEOS <ref-geos>`    Geometry Engine Open Source           Yes                               3.2, 3.1, 3.0
+:ref:`GEOS <ref-geos>`    Geometry Engine Open Source           Yes                               3.3, 3.2, 3.1, 3.0
 `PROJ.4`_                 Cartographic Projections library      Yes (PostgreSQL and SQLite only)  4.7, 4.6, 4.5, 4.4
 :ref:`GDAL <ref-gdal>`    Geospatial Data Abstraction Library   No (but, required for SQLite)     1.8, 1.7, 1.6, 1.5, 1.4
 :ref:`GeoIP <ref-geoip>`  IP-based geolocation library          No                                1.4
@@ -139,13 +139,13 @@ directly from Python using ctypes.
 First, download GEOS 3.2 from the refractions Web site and untar the source
 archive::
 
-    $ wget http://download.osgeo.org/geos/geos-3.2.2.tar.bz2
-    $ tar xjf geos-3.2.2.tar.bz2
+    $ wget http://download.osgeo.org/geos/geos-3.3.0.tar.bz2
+    $ tar xjf geos-3.3.0.tar.bz2
 
 Next, change into the directory where GEOS was unpacked, run the configure
 script, compile, and install::
 
-    $ cd geos-3.2.2
+    $ cd geos-3.3.0
     $ ./configure
     $ make
     $ sudo make install
@@ -262,9 +262,9 @@ supports :ref:`GDAL's vector data <ref-gdal>` capabilities [#]_.
 
 First download the latest GDAL release version and untar the archive::
 
-    $ wget http://download.osgeo.org/gdal/gdal-1.8.0.tar.gz
-    $ tar xzf gdal-1.8.0.tar.gz
-    $ cd gdal-1.8.0
+    $ wget http://download.osgeo.org/gdal/gdal-1.8.1.tar.gz
+    $ tar xzf gdal-1.8.1.tar.gz
+    $ cd gdal-1.8.1
 
 Configure, make and install::
 
@@ -925,7 +925,7 @@ In Ubuntu 10 PostgreSQL was upgraded to 8.4 and GDAL was upgraded to 1.6.
 Ubuntu 10.04 uses PostGIS 1.4, while Ubuntu 10.10 uses PostGIS 1.5 (with
 geography support).  The installation commands are::
 
-    $ sudo apt-get install binutils gdal-bin postgresql-8.4-postgis \
+    $ sudo apt-get install binutils gdal-bin libproj-dev postgresql-8.4-postgis \
          postgresql-server-dev-8.4 python-psycopg2 python-setuptools
     $ sudo easy_install Django
 
