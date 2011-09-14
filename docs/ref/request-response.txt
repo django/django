@@ -587,7 +587,7 @@ Attributes
 
 .. attribute:: HttpResponse.content
 
-    A normal Python string representing the content, encoded from a Unicode
+    A string representing the content, encoded from a Unicode
     object if necessary.
 
 .. attribute:: HttpResponse.status_code
@@ -603,9 +603,11 @@ Methods
     string) and MIME type. The :setting:`DEFAULT_CONTENT_TYPE` is
     ``'text/html'``.
 
-    ``content`` can be an iterator or a string. If it's an iterator, it should
-    return strings, and those strings will be joined together to form the
-    content of the response.
+    ``content`` should be an iterator or a string. If it's an
+    iterator, it should return strings, and those strings will be
+    joined together to form the content of the response. If it is not
+    an iterator or a string, it will be converted to a string when
+    accessed.
 
     ``status`` is the `HTTP Status code`_ for the response.
 
