@@ -544,7 +544,7 @@ class HttpResponse(object):
         if not content_type:
             content_type = "%s; charset=%s" % (settings.DEFAULT_CONTENT_TYPE,
                     self._charset)
-        HttpResponse._set_content(self, content)
+        self.content = content
         self.cookies = SimpleCookie()
         if status:
             self.status_code = status
