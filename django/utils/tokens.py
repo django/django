@@ -100,7 +100,7 @@ class HashToken():
         # since we take 2.5 bytes (5 nibbles = 5 hex characters) off,
         # to keep it a valid hex string, we'll add a zero to the front:
         hextoken = '0'+self._hash.hexdigest()[:-5]
-        return BaseConverter(alphabet).encode(int(hextoken, 16))
+        return BaseConverter(ALPHANUMERIC).encode(int(hextoken, 16))
     
     def lower_alphanumeric(self):
         """
