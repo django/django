@@ -1,0 +1,18 @@
+# additional requirements for running tests:
+#  (modified, from output of 'pip freeze')
+# this, but as you make changes, run:
+#  $ python setup.py install
+#  # Django==1.4-pre-alpha
+#-----
+Markdown>=2.0.3
+PyYAML>=3.10
+docutils>=0.8.1
+psycopg2>=2.4.2
+# assumes you have memcached installed;
+#  - on my macbook, I used this to install:
+#  $ brew install memcached
+#  - then I run it from the command line (not as daemon) and leave it running while testing.
+python-memcached>=1.47
+textile>=2.1.5
+wsgiref>=0.1.2
+
