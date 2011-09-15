@@ -15,4 +15,7 @@ Sat Sep 10 16:44:14 PDT 2011
 [Done] Do we need to do anything with django/utils/hashcompat.py ?  (e.g. change the warning message to ref. tokens.py?)
      - Essentially, Justine (github.com/jart/django)  already solved this; just merge her work when we're all done.
 
-[   ] I assume we want to leave django/utils/crypto alone, not using new django/utils/token - maybe not; Paul: can you weigh in?
+[   ] I assume we want to leave django/utils/crypto alone, not using new django/utils/token - maybe not;
+      UPDATE:  Opinion:  I may try using sha256 from within here too, once other areas are sorted out - and using alphanumeric(),
+      rather than hexdigest() whereever it is called.  If length is (anywhere) an issue, we'll deal with that just as for session keys,
+      that is, 20-bits less than the hexdigest returns.

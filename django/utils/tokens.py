@@ -76,7 +76,7 @@ class HashToken():
         self._hash = hashlib.sha256(value)
 
     def digits(self):
-        return _build_token(DIGITS)
+        return self._build_token(DIGITS)
         
     def hex(self):
         """ Outputs a base 16 string. """
@@ -86,8 +86,21 @@ class HashToken():
         """ Returns the string digest. """
         return self._hash.digest()
     
-    def alphanumenric(self, casesensitive=True):
-        return _build_token(ALPHANUMERIC)
+    def alphanumeric(self, casesensitive=True):
+        return self._build_token(ALPHANUMERIC)
+    
+    def short_alphanumeric(self, casesensitive=True):
+        """
+        return a token which will fit within a 40-character field,
+        when represented by base-62 string (i.e. alphanumeric).
+        Since sha256 is a 32-byte digest (64-byte hexdigest),
+        for this to never get longer than 40 chars, we limit it
+        to 236 bits ( 2**236 < 64**40 ).
+        """
+        # since we take 2.5 bytes (5 nibbles = 5 hex characters) off,
+        # to keep it a valid hex string, we'll add a zero to the front:
+        hextoken = '0'+self._hash.hexdigest()[:-5]
+        return BaseConverter(alphabet).encode(int(hextoken, 16))
     
     def lower_alphanumeric(self):
         """

@@ -149,7 +149,7 @@ class SessionBase(object):
         while 1:
             session_key = HashToken("%s%s%s%s"
                     % (randrange(0, MAX_SESSION_KEY), pid, time.time(),
-                       settings.SECRET_KEY)).hex()
+                       settings.SECRET_KEY)).short_alphanumeric()
             if not self.exists(session_key):
                 break
         return session_key
