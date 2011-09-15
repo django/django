@@ -5,6 +5,7 @@ Django's standard token library and utilities.
 import hashlib
 import string
 import random
+from django.utils.baseconv import BaseConverter
 
 try:
     random = random.SystemRandom()
