@@ -44,7 +44,10 @@ def update_contenttypes(app, created_models, verbosity=2, **kwargs):
     # Confirm that the content type is stale before deletion.
     if to_remove:
         if kwargs.get('interactive', False):
-            content_type_display = '\n'.join(['    %s | %s' % (ct.app_label, ct.model) for ct in content_types])
+            content_type_display = '\n'.join([
+                '    %s | %s' % (ct.app_label, ct.model)
+                for ct in to_remove
+            ])
             ok_to_delete = raw_input("""The following content types are stale and need to be deleted:
 
 %s
