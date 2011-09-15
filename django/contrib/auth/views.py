@@ -197,7 +197,8 @@ def password_reset_confirm(request, uidb36=None, token=None,
     try:
         uid_int = base36.decode(uidb36)
         user = User.objects.get(id=uid_int)
-    except (ValueError, User.DoesNotExist):
+    except (OverflowError, ValueError, User.DoesNotExist):
+    # sqlite might produce an OverflowError - we let it;
         user = None
 
     if user is not None and token_generator.check_token(user, token):
