@@ -4,7 +4,7 @@ import re
 # to prevent potentially malicious input from reaching the underlying C
 # library.  Not a substitute for good Web security programming practices.
 hex_regex = re.compile(r'^[0-9A-F]+$', re.I)
-wkt_regex = re.compile(r'^(SRID=(?P<srid>\d+);)?'
+wkt_regex = re.compile(r'^(SRID=(?P<srid>\-?\d+);)?'
                        r'(?P<wkt>'
                        r'(?P<type>POINT|LINESTRING|LINEARRING|POLYGON|MULTIPOINT|MULTILINESTRING|MULTIPOLYGON|GEOMETRYCOLLECTION)'
                        r'[ACEGIMLONPSRUTYZ\d,\.\-\(\) ]+)$',
