@@ -177,6 +177,7 @@ below), but we ensure it has a fixed length, since it only needs to hold 52
 card values plus their suits; 104 characters in total.
 
 .. note::
+
     Many of Django's model fields accept options that they don't do anything
     with. For example, you can pass both
     :attr:`~django.db.models.Field.editable` and
@@ -189,8 +190,8 @@ card values plus their suits; 104 characters in total.
     This behavior simplifies the field classes, because they don't need to
     check for options that aren't necessary. They just pass all the options to
     the parent class and then don't use them later on. It's up to you whether
-    you want your fields to be more strict about the options they select, or
-    to use the simpler, more permissive behavior of the current fields.
+    you want your fields to be more strict about the options they select, or to
+    use the simpler, more permissive behavior of the current fields.
 
 .. method:: Field.__init__
 

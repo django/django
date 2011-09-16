@@ -1895,12 +1895,13 @@ a new view to your admin site, extend the base
 a pattern for your new view.
 
 .. note::
+
     Any view you render that uses the admin templates, or extends the base
     admin template, should provide the ``current_app`` argument to
-    :class:`~django.template.RequestContext` or :class:`~django.template.Context`
-    when rendering the template.  It should be set to either ``self.name`` if
-    your view is on an ``AdminSite`` or ``self.admin_site.name`` if your view
-    is on a ``ModelAdmin``.
+    :class:`~django.template.RequestContext` or
+    :class:`~django.template.Context` when rendering the template.  It should
+    be set to either ``self.name`` if your view is on an ``AdminSite`` or
+    ``self.admin_site.name`` if your view is on a ``ModelAdmin``.
 
 .. _admin-reverse-urls:
 

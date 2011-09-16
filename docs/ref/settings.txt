@@ -1765,11 +1765,13 @@ If the :doc:`staticfiles</ref/contrib/staticfiles>` contrib app is enabled
 files into this directory. See the howto on :doc:`managing static
 files</howto/static-files>` for more details about usage.
 
-.. warning:: This should be an (initially empty) destination directory for
-    collecting your static files from their permanent locations into one
-    directory for ease of deployment; it is **not** a place to store your
-    static files permanently. You should do that in directories that will be
-    found by :doc:`staticfiles</ref/contrib/staticfiles>`'s
+.. warning::
+
+    This should be an (initially empty) destination directory for collecting
+    your static files from their permanent locations into one directory for
+    ease of deployment; it is **not** a place to store your static files
+    permanently. You should do that in directories that will be found by
+    :doc:`staticfiles</ref/contrib/staticfiles>`'s
     :setting:`finders<STATICFILES_FINDERS>`, which by default, are
     ``'static/'`` app sub-directories and any directories you include in
     :setting:`STATICFILES_DIRS`).
@@ -2059,9 +2061,9 @@ format of the current locale.
 See also :setting:`USE_I18N` and :setting:`LANGUAGE_CODE`
 
 .. note::
-    The default :file:`settings.py` file created by
-    :djadmin:`django-admin.py startproject <startproject>` includes
-    ``USE_L10N = True`` for convenience.
+
+    The default :file:`settings.py` file created by :djadmin:`django-admin.py
+    startproject <startproject>` includes ``USE_L10N = True`` for convenience.
 
 .. setting:: USE_THOUSAND_SEPARATOR
 

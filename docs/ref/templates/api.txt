@@ -404,11 +404,12 @@ optional, third positional argument, ``processors``. In this example, the
         return HttpResponse(t.render(c))
 
 .. note::
+
     If you're using Django's :func:`~django.shortcuts.render_to_response()`
     shortcut to populate a template with the contents of a dictionary, your
     template will be passed a ``Context`` instance by default (not a
-    ``RequestContext``). To use a ``RequestContext`` in your template rendering,
-    pass an optional third argument to
+    ``RequestContext``). To use a ``RequestContext`` in your template
+    rendering, pass an optional third argument to
     :func:`~django.shortcuts.render_to_response()`: a ``RequestContext``
     instance. Your code might look like this::
 
@@ -704,12 +705,13 @@ class. Here are the template loaders that come with Django:
         )
 
     .. note::
-        All of the built-in Django template tags are safe to use with the cached
-        loader, but if you're using custom template tags that come from third
-        party packages, or that you wrote yourself, you should ensure that the
-        ``Node`` implementation for each tag is thread-safe. For more
-        information, see
-        :ref:`template tag thread safety considerations<template_tag_thread_safety>`.
+
+        All of the built-in Django template tags are safe to use with the
+        cached loader, but if you're using custom template tags that come from
+        third party packages, or that you wrote yourself, you should ensure
+        that the ``Node`` implementation for each tag is thread-safe. For more
+        information, see :ref:`template tag thread safety
+        considerations<template_tag_thread_safety>`.
 
     This loader is disabled by default.
 
