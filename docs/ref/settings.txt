@@ -1836,9 +1836,9 @@ TEMPLATE_DEBUG
 Default: ``False``
 
 A boolean that turns on/off template debug mode. If this is ``True``, the fancy
-error page will display a detailed report for any ``TemplateSyntaxError``. This
-report contains the relevant snippet of the template, with the appropriate line
-highlighted.
+error page will display a detailed report for any exception raised during
+template rendering. This report contains the relevant snippet of the template,
+with the appropriate line highlighted.
 
 Note that Django only displays fancy error pages if :setting:`DEBUG` is ``True``, so
 you'll want to set that to take advantage of this setting.
