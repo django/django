@@ -1,6 +1,7 @@
 import errno
 import os
 import tempfile
+import string
 
 from django.conf import settings
 from django.contrib.sessions.backends.base import SessionBase, CreateError
@@ -26,7 +27,7 @@ class SessionStore(SessionBase):
         self.file_prefix = settings.SESSION_COOKIE_NAME
         super(SessionStore, self).__init__(session_key)
 
-    VALID_KEY_CHARS = set("abcdef0123456789")
+    VALID_KEY_CHARS = set(string.digits + string.lowercase)
 
     def _key_to_file(self, session_key=None):
         """

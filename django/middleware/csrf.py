@@ -14,7 +14,8 @@ from django.core.urlresolvers import get_callable
 from django.utils.cache import patch_vary_headers
 from django.utils.http import same_origin
 from django.utils.log import getLogger
-from django.utils.crypto import constant_time_compare, get_random_string
+from django.utils.crypto import constant_time_compare
+from django.utils.tokens import RandomToken
 
 logger = getLogger('django.request')
 
@@ -33,7 +34,10 @@ def _get_failure_view():
 
 
 def _get_new_csrf_key():
-    return get_random_string(CSRF_KEY_LENGTH)
+    """
+    Returns a random base-62 value
+    """
+    return RandomToken().alphanumeric()
 
 def get_token(request):
     """

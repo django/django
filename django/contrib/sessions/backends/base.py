@@ -13,7 +13,7 @@ from django.conf import settings
 from django.core.exceptions import SuspiciousOperation
 from django.utils import timezone
 from django.utils.crypto import constant_time_compare, salted_hmac
-from django.utils.tokens import HashToken
+from django.utils.tokens import RandomToken
 
 # Use the system (hardware-based) random number generator if it exists.
 if hasattr(random, 'SystemRandom'):
@@ -147,9 +147,7 @@ class SessionBase(object):
             # No getpid() in Jython, for example
             pid = 1
         while 1:
-            session_key = HashToken("%s%s%s%s"
-                    % (randrange(0, MAX_SESSION_KEY), pid, time.time(),
-                       settings.SECRET_KEY)).short_alphanumeric()
+            session_key = RandomToken().lower_alphanumeric(length=39)
             if not self.exists(session_key):
                 break
         return session_key
