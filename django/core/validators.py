@@ -1,5 +1,6 @@
 import platform
 import re
+import urllib
 import urllib2
 import urlparse
 
@@ -92,6 +93,8 @@ class URLValidator(RegexValidator):
                 "User-Agent": self.user_agent,
             }
             url = url.encode('utf-8')
+            # Quote characters from the unreserved set, refs #16812
+            url = urllib.quote(url, "!*'();:@&=+$,/?#[]")
             broken_error = ValidationError(
                 _(u'This URL appears to be a broken link.'), code='invalid_link')
             try:
