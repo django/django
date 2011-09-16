@@ -227,17 +227,15 @@ class ForNode(Node):
                     context.update(unpacked_vars)
             else:
                 context[self.loopvars[0]] = item
-            # In TEMPLATE_DEBUG mode providing source of the node which
-            # actually raised an exception to DefaultNodeList.render_node
+            # In TEMPLATE_DEBUG mode provide source of the node which
+            # actually raised the exception
             if settings.TEMPLATE_DEBUG:
                 for node in self.nodelist_loop:
                     try:
                         nodelist.append(node.render(context))
                     except Exception, e:
-                        if not hasattr(e, 'template_node_source'):
-                            from sys import exc_info
-                            e.template_node_source = node.source
-                            raise e, None, exc_info()[2]
+                        if not hasattr(e, 'django_template_source'):
+                            e.django_template_source = node.source
                         raise
             else:
                 for node in self.nodelist_loop:

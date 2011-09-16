@@ -8,8 +8,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.http import (HttpResponse, HttpResponseServerError,
     HttpResponseNotFound, HttpRequest, build_request_repr)
-from django.template import (Template, Context, TemplateDoesNotExist,
-    TemplateSyntaxError)
+from django.template import Template, Context, TemplateDoesNotExist
 from django.template.defaultfilters import force_escape, pprint
 from django.utils.html import escape
 from django.utils.importlib import import_module
@@ -223,8 +222,8 @@ class ExceptionReporter(object):
                     'loader': loader_name,
                     'templates': template_list,
                 })
-        if (settings.TEMPLATE_DEBUG and hasattr(self.exc_value, 'source') and
-            isinstance(self.exc_value, TemplateSyntaxError)):
+        if (settings.TEMPLATE_DEBUG and
+            hasattr(self.exc_value, 'django_template_source')):
             self.get_template_exception_info()
 
         frames = self.get_traceback_frames()
@@ -268,7 +267,7 @@ class ExceptionReporter(object):
         return t.render(c)
 
     def get_template_exception_info(self):
-        origin, (start, end) = self.exc_value.source
+        origin, (start, end) = self.exc_value.django_template_source
         template_source = origin.reload()
         context_lines = 10
         line = 0
@@ -626,7 +625,7 @@ TECHNICAL_500_TEMPLATE = """
 {% endif %}
 {% if template_info %}
 <div id="template">
-   <h2>Template error</h2>
+   <h2>Error during template rendering</h2>
    <p>In template <code>{{ template_info.name }}</code>, error at line <strong>{{ template_info.line }}</strong></p>
    <h3>{{ template_info.message }}</h3>
    <table class="source{% if template_info.top %} cut-top{% endif %}{% ifnotequal template_info.bottom template_info.total %} cut-bottom{% endifnotequal %}">

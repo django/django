@@ -1,7 +1,7 @@
-from django.conf import settings
-from django.template import VariableNode, Context, TemplateSyntaxError
+from django.template import VariableNode, Context
 from django.template.loader import get_template_from_string
 from django.utils.unittest import TestCase
+from django.test.utils import override_settings
 
 class NodelistTest(TestCase):
 
@@ -35,13 +35,7 @@ class ErrorIndexTest(TestCase):
     Checks whether index of error is calculated correctly in
     template debugger in for loops. Refs ticket #5831
     """
-    def setUp(self):
-        self.old_template_debug = settings.TEMPLATE_DEBUG
-        settings.TEMPLATE_DEBUG = True
-
-    def tearDown(self):
-        settings.TEMPLATE_DEBUG = self.old_template_debug
-
+    @override_settings(DEBUG=True, TEMPLATE_DEBUG = True)
     def test_correct_exception_index(self):
         tests = [
             ('{% load bad_tag %}{% for i in range %}{% badsimpletag %}{% endfor %}', (38, 56)),
@@ -58,7 +52,7 @@ class ErrorIndexTest(TestCase):
             template = get_template_from_string(source)
             try:
                 template.render(context)
-            except TemplateSyntaxError, e:
-                error_source_index = e.source[1]
+            except (RuntimeError, TypeError), e:
+                error_source_index = e.django_template_source[1]
                 self.assertEqual(error_source_index,
                                  expected_error_source_index)

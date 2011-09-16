@@ -75,7 +75,7 @@ class DebugViewTests(TestCase):
         for n in range(len(except_args)):
             try:
                 self.client.get(reverse('template_exception', args=(n,)))
-            except TemplateSyntaxError, e:
+            except Exception:
                 raising_loc = inspect.trace()[-1][-2][0].strip()
                 self.assertFalse(raising_loc.find('raise BrokenException') == -1,
                     "Failed to find 'raise BrokenException' in last frame of traceback, instead found: %s" %
