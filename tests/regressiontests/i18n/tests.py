@@ -26,6 +26,7 @@ from models import Company, TestModel
 
 from commands.tests import *
 from patterns.tests import *
+from contenttypes.tests import *
 from test_warnings import DeprecationWarningTests
 
 here = os.path.dirname(os.path.abspath(__file__))

@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from django.utils.encoding import smart_unicode
+from django.utils.encoding import smart_unicode, force_unicode
 
 class ContentTypeManager(models.Manager):
 
@@ -85,7 +85,18 @@ class ContentType(models.Model):
         unique_together = (('app_label', 'model'),)
 
     def __unicode__(self):
-        return self.name
+        # self.name is deprecated in favor of using model's verbose_name, which
+        # can be translated. Formal deprecation is delayed until we have DB
+        # migration to be able to remove the field from the database along with
+        # the attribute.
+        #
+        # We return self.name only when users have changed its value from the
+        # initial verbose_name_raw and might rely on it.
+        meta = self.model_class()._meta
+        if self.name != meta.verbose_name_raw:
+            return self.name
+        else:
+            return force_unicode(meta.verbose_name)
 
     def model_class(self):
         "Returns the Python model class for this type of content."
