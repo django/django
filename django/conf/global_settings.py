@@ -514,13 +514,13 @@ LOGGING_CONFIG = 'django.utils.log.dictConfig'
 # The default logging configuration. This sends an email to
 # the site admins on every HTTP 500 error. All other log
 # records are sent to the bit bucket.
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'filters': {
         'require_debug_false': {
-            '()': 'django.utils.log.CallbackFilter',
-            'callback': lambda r: not DEBUG
+            '()': 'django.utils.log.RequireDebugFalse',
         }
     },
     'handlers': {

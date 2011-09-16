@@ -30,6 +30,7 @@ logger = getLogger('django')
 if not logger.handlers:
     logger.addHandler(NullHandler())
 
+
 class AdminEmailHandler(logging.Handler):
     """An exception log handler that emails log entries to site admins.
 
@@ -82,8 +83,12 @@ class CallbackFilter(logging.Filter):
     def __init__(self, callback):
         self.callback = callback
 
-
     def filter(self, record):
         if self.callback(record):
             return 1
         return 0
+
+
+class RequireDebugFalse(logging.Filter):
+    def filter(self, record):
+        return not settings.DEBUG

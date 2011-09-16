@@ -4,10 +4,10 @@ import copy
 
 from django.conf import compat_patch_logging_config
 from django.test import TestCase
-from django.test.utils import override_settings
-from django.utils.log import CallbackFilter, getLogger
-from django.core import mail
 
+from django.utils.log import CallbackFilter, RequireDebugFalse, getLogger
+from django.test.utils import override_settings
+from django.core import mail
 
 
 # logging config prior to using filter with mail_admins
@@ -30,7 +30,6 @@ OLD_LOGGING = {
 }
 
 
-
 class PatchLoggingConfigTest(TestCase):
     """
     Tests for backward-compat shim for #16288. These tests should be removed in
@@ -50,28 +49,30 @@ class PatchLoggingConfigTest(TestCase):
             config["handlers"]["mail_admins"]["filters"],
             ['require_debug_false'])
 
-
     def test_filter_configuration(self):
         """
-        Test that the debug-false filter is a CallbackFilter with a callback
-        that works as expected (returns ``not DEBUG``).
+        Test that the auto-added require_debug_false filter is an instance of
+        `RequireDebugFalse` filter class.
 
         """
         config = copy.deepcopy(OLD_LOGGING)
         compat_patch_logging_config(config)
 
         flt = config["filters"]["require_debug_false"]
+        self.assertEqual(flt["()"], "django.utils.log.RequireDebugFalse")
 
-        self.assertEqual(flt["()"], "django.utils.log.CallbackFilter")
+    def test_require_debug_false_filter(self):
+        """
+        Test the RequireDebugFalse filter class.
 
-        callback = flt["callback"]
+        """
+        filter_ = RequireDebugFalse()
 
         with self.settings(DEBUG=True):
-            self.assertEqual(callback("record is not used"), False)
+            self.assertEqual(filter_.filter("record is not used"), False)
 
         with self.settings(DEBUG=False):
-            self.assertEqual(callback("record is not used"), True)
-
+            self.assertEqual(filter_.filter("record is not used"), True)
 
     def test_no_patch_if_filters_key_exists(self):
         """
@@ -110,6 +111,7 @@ class CallbackFilterTest(TestCase):
 
     def test_passes_on_record(self):
         collector = []
+
         def _callback(record):
             collector.append(record)
             return True

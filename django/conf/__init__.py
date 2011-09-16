@@ -199,13 +199,8 @@ def compat_patch_logging_config(logging_config):
         while filter_name in filters:
             filter_name = filter_name + "_"
 
-        def _callback(record):
-            from django.conf import settings
-            return not settings.DEBUG
-
         filters[filter_name] = {
-            "()": "django.utils.log.CallbackFilter",
-            "callback": _callback
-            }
+            "()": "django.utils.log.RequireDebugFalse",
+        }
 
         logging_config["handlers"]["mail_admins"]["filters"] = [filter_name]

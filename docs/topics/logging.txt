@@ -504,8 +504,8 @@ Python logging module.
 Filters
 -------
 
-Django provides one log filter in addition to those provided by the
-Python logging module.
+Django provides two log filters in addition to those provided by the Python
+logging module.
 
 .. class:: CallbackFilter(callback)
 
@@ -516,14 +516,19 @@ Python logging module.
    through the filter. Handling of that record will not proceed if the callback
    returns False.
 
+.. class:: RequireDebugFalse()
+
+   .. versionadded:: 1.4
+
+   This filter will only pass on records when settings.DEBUG is False.
+
    This filter is used as follows in the default :setting:`LOGGING`
    configuration to ensure that the :class:`AdminEmailHandler` only sends error
    emails to admins when :setting:`DEBUG` is `False`::
 
        'filters': {
             'require_debug_false': {
-                '()': 'django.utils.log.CallbackFilter',
-                'callback': lambda r: not DEBUG
+                '()': 'django.utils.log.RequireDebugFalse',
             }
         },
         'handlers': {
