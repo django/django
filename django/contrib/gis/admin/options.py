@@ -31,7 +31,7 @@ class GeoModelAdmin(ModelAdmin):
     map_height = 400
     map_srid = 4326
     map_template = 'gis/admin/openlayers.html'
-    openlayers_url = 'http://openlayers.org/api/2.10/OpenLayers.js'
+    openlayers_url = 'http://openlayers.org/api/2.11/OpenLayers.js'
     point_zoom = num_zoom - 6
     wms_url = 'http://labs.metacarta.com/wms/vmap0'
     wms_layer = 'basic'
