@@ -121,7 +121,6 @@ if gdal.HAS_GDAL:
 
     class OSMGeoAdmin(GeoModelAdmin):
         map_template = 'gis/admin/osm.html'
-        extra_js = ['http://www.openstreetmap.org/openlayers/OpenStreetMap.js']
         num_zoom = 20
         map_srid = spherical_mercator_srid
         max_extent = '-20037508,-20037508,20037508,20037508'
