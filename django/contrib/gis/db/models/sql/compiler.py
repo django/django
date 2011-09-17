@@ -1,7 +1,7 @@
 from itertools import izip
-from django.db.backends.util import truncate_name
+from django.db.backends.util import truncate_name, typecast_timestamp
 from django.db.models.sql import compiler
-from django.db.models.sql.constants import TABLE_NAME
+from django.db.models.sql.constants import TABLE_NAME, MULTI
 from django.db.models.sql.query import get_proxied_model
 
 SQLCompiler = compiler.SQLCompiler
@@ -194,7 +194,7 @@ class GeoSQLCompiler(compiler.SQLCompiler):
             # We resolve the rest of the columns if we're on Oracle or if
             # the `geo_values` attribute is defined.
             for value, field in map(None, row[index_start:], fields):
-                values.append(self.query.convert_values(value, field, connection=self.connection))
+                values.append(self.query.convert_values(value, field, self.connection))
         else:
             values.extend(row[index_start:])
         return tuple(values)
@@ -275,4 +275,24 @@ class SQLAggregateCompiler(compiler.SQLAggregateCompiler, GeoSQLCompiler):
     pass
 
 class SQLDateCompiler(compiler.SQLDateCompiler, GeoSQLCompiler):
-    pass
+    """
+    This is overridden for GeoDjango to properly cast date columns, since
+    `GeoQuery.resolve_columns` is used for spatial values.
+    See #14648, #16757.
+    """
+    def results_iter(self):
+        if self.connection.ops.oracle:
+            from django.db.models.fields import DateTimeField
+            fields = [DateTimeField()]
+        else:
+            needs_string_cast = self.connection.features.needs_datetime_string_cast
+
+        offset = len(self.query.extra_select)
+        for rows in self.execute_sql(MULTI):
+            for row in rows:
+                date = row[offset]
+                if self.connection.ops.oracle:
+                    date = self.resolve_columns(row, fields)[offset]
+                elif needs_string_cast:
+                    date = typecast_timestamp(str(date))
+                yield date
