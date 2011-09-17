@@ -29,15 +29,13 @@ def geo_apps(namespace=True, runtests=False):
 
     # The following GeoDjango test apps depend on GDAL support.
     if HAS_GDAL:
-        # Geographic admin requires GDAL
-        apps.append('geoadmin')
+        # Geographic admin, LayerMapping, and ogrinspect test apps
+        # all require GDAL.
+        apps.extend(['geoadmin', 'layermap', 'inspectapp'])
 
-        # 3D apps use LayerMapping, which uses GDAL.
+        # 3D apps use LayerMapping, which uses GDAL and require GEOS 3.1+.
         if connection.ops.postgis and GEOS_PREPARE:
             apps.append('geo3d')
-
-        apps.append('layermap')
-
     if runtests:
         return [('django.contrib.gis.tests', app) for app in apps]
     elif namespace:

@@ -1,7 +1,7 @@
 import os
 from optparse import make_option
 from django.contrib.gis import gdal
-from django.contrib.gis.management.base import ArgsCommand, CommandError
+from django.core.management.base import LabelCommand, CommandError
 
 def layer_option(option, opt, value, parser):
     """
@@ -17,7 +17,7 @@ def layer_option(option, opt, value, parser):
 def list_option(option, opt, value, parser):
     """
     Callback for `make_option` for `ogrinspect` keywords that require
-    a string list.  If the string is 'True'/'true' then the option 
+    a string list.  If the string is 'True'/'true' then the option
     value will be a boolean instead.
     """
     if value.lower() == 'true':
@@ -25,20 +25,20 @@ def list_option(option, opt, value, parser):
     else:
         dest = [s for s in value.split(',')]
     setattr(parser.values, option.dest, dest)
-    
-class Command(ArgsCommand):
+
+class Command(LabelCommand):
     help = ('Inspects the given OGR-compatible data source (e.g., a shapefile) and outputs\n'
             'a GeoDjango model with the given model name. For example:\n'
             ' ./manage.py ogrinspect zipcode.shp Zipcode')
     args = '[data_source] [model_name]'
 
-    option_list = ArgsCommand.option_list + (
-        make_option('--blank', dest='blank', type='string', action='callback',  
+    option_list = LabelCommand.option_list + (
+        make_option('--blank', dest='blank', type='string', action='callback',
                     callback=list_option, default=False,
                     help='Use a comma separated list of OGR field names to add '
                     'the `blank=True` option to the field definition.  Set with'
                     '`true` to apply to all applicable fields.'),
-        make_option('--decimal', dest='decimal', type='string', action='callback', 
+        make_option('--decimal', dest='decimal', type='string', action='callback',
                     callback=list_option, default=False,
                     help='Use a comma separated list of OGR float fields to '
                     'generate `DecimalField` instead of the default '
@@ -46,7 +46,7 @@ class Command(ArgsCommand):
         make_option('--geom-name', dest='geom_name', type='string', default='geom',
                     help='Specifies the model name for the Geometry Field '
                     '(defaults to `geom`)'),
-        make_option('--layer', dest='layer_key', type='string', action='callback', 
+        make_option('--layer', dest='layer_key', type='string', action='callback',
                     callback=layer_option, default=0,
                     help='The key for specifying which layer in the OGR data '
                     'source to use. Defaults to 0 (the first layer). May be '
@@ -58,7 +58,7 @@ class Command(ArgsCommand):
         make_option('--no-imports', action='store_false', dest='imports', default=True,
                     help='Do not include `from django.contrib.gis.db import models` '
                     'statement.'),
-        make_option('--null', dest='null', type='string', action='callback',  
+        make_option('--null', dest='null', type='string', action='callback',
                     callback=list_option, default=False,
                     help='Use a comma separated list of OGR field names to add '
                     'the `null=True` option to the field definition.  Set with'
@@ -72,7 +72,7 @@ class Command(ArgsCommand):
 
     requires_model_validation = False
 
-    def handle_args(self, *args, **options):
+    def handle(self, *args, **options):
         try:
             data_source, model_name = args
         except ValueError:
@@ -81,10 +81,6 @@ class Command(ArgsCommand):
         if not gdal.HAS_GDAL:
             raise CommandError('GDAL is required to inspect geospatial data sources.')
 
-        # TODO: Support non file-based OGR datasources.
-        if not os.path.isfile(data_source):
-            raise CommandError('The given data source cannot be found: "%s"' % data_source)
-        
         # Removing options with `None` values.
         options = dict([(k, v) for k, v in options.items() if not v is None])
 
@@ -97,8 +93,9 @@ class Command(ArgsCommand):
         # Whether the user wants to generate the LayerMapping dictionary as well.
         show_mapping = options.pop('mapping', False)
 
-        # Popping the verbosity global option, as it's not accepted by `_ogrinspect`.
+        # Getting rid of settings that `_ogrinspect` doesn't like.
         verbosity = options.pop('verbosity', False)
+        settings = options.pop('settings', False)
 
         # Returning the output of ogrinspect with the given arguments
         # and options.
@@ -115,8 +112,8 @@ class Command(ArgsCommand):
             # This extra legwork is so that the dictionary definition comes
             # out in the same order as the fields in the model definition.
             rev_mapping = dict([(v, k) for k, v in mapping_dict.items()])
-            output.extend(['', '# Auto-generated `LayerMapping` dictionary for %s model' % model_name, 
+            output.extend(['', '# Auto-generated `LayerMapping` dictionary for %s model' % model_name,
                            '%s_mapping = {' % model_name.lower()])
             output.extend(["    '%s' : '%s'," % (rev_mapping[ogr_fld], ogr_fld) for ogr_fld in ds[options['layer_key']].fields])
             output.extend(["    '%s' : '%s'," % (options['geom_name'], mapping_dict[options['geom_name']]), '}'])
-        return '\n'.join(output)
+        return '\n'.join(output) + '\n'
