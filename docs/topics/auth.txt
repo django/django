@@ -131,7 +131,7 @@ Methods
 .. class:: models.User
 
     :class:`~django.contrib.auth.models.User` objects have two many-to-many
-    fields: models.User. ``groups`` and ``user_permissions``.
+    fields: ``groups`` and ``user_permissions``.
     :class:`~django.contrib.auth.models.User` objects can access their related
     objects in the same way as any other :doc:`Django model
     </topics/db/models>`:
@@ -1403,12 +1403,7 @@ API reference
 
 .. currentmodule:: django.contrib.auth.models
 
-.. class:: Permission
-
-    Just like users, permissions are implemented in a Django model that lives
-    in `django/contrib/auth/models.py`_.
-
-.. _django/contrib/auth/models.py: http://code.djangoproject.com/browser/django/trunk/django/contrib/auth/models.py
+.. class:: models.Permission
 
 Fields
 ~~~~~~
@@ -1436,6 +1431,26 @@ Methods
 data-access methods like any other :doc:`Django model </ref/models/instances>`.
 
 .. currentmodule:: django.contrib.auth
+
+Programmatically creating permissions
+-------------------------------------
+
+While custom permissions can be defined within a model's ``Meta`` class, you
+can also create permissions directly. For example, you can create the
+``can_publish`` permission for a ``BlogPost`` model in ``myapp``::
+
+    from django.contrib.auth.models import Group, Permission
+    from django.contrib.contenttypes.models import ContentType
+
+    content_type = ContentType.objects.get(app_label='myapp', model='BlogPost')
+    permission = Permission.objects.create(codename='can_publish',
+                                           name='Can Publish Posts',
+                                           content_type=content_type)
+
+The permission can then be assigned to a
+:class:`~django.contrib.auth.models.User` via its ``user_permissions``
+attribute or to a :class:`~django.contrib.auth.models.Group` via its
+``permissions`` attribute.
 
 Authentication data in templates
 ================================
@@ -1528,6 +1543,30 @@ them some label, or extended functionality. For example, you could create a
 group ``'Special users'``, and you could write code that could, say, give them
 access to a members-only portion of your site, or send them members-only email
 messages.
+
+API reference
+-------------
+
+.. class:: models.Group
+
+Fields
+~~~~~~
+
+:class:`~django.contrib.auth.models.Group` objects have the following fields:
+
+.. attribute:: Group.name
+
+    Required. 80 characters or fewer. Any characters are permitted. Example:
+    ``'Awesome Users'``.
+
+.. attribute:: Group.permissions
+
+    Many-to-many field to :class:`~django.contrib.auth.models.Permissions`::
+
+        group.permissions = [permission_list]
+        group.permissions.add(permission, permission, ...)
+        group.permissions.remove(permission, permission, ...)
+        group.permissions.clear()
 
 .. _authentication-backends:
 
