@@ -123,7 +123,6 @@ class URLValidator(RegexValidator):
                 else:
                     handlers.append(urllib2.HTTPSHandler())
                 map(opener.add_handler, handlers)
-                opener.http_error_301 = lambda: True
                 if platform.python_version_tuple() >= (2, 6):
                     opener.open(req, timeout=10)
                 else:
