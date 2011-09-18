@@ -665,8 +665,8 @@ def add(value, arg):
     except (ValueError, TypeError):
         try:
             return value + arg
-        except:
-            return value
+        except Exception:
+            return ''
 add.is_safe = False
 
 def get_digit(value, arg):
