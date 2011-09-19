@@ -55,3 +55,9 @@
 .inline-deletelink {
     background: transparent url(../img/inline-delete-8bit.png) no-repeat;
 }
+
+/* IE7 doesn't support inline-block */
+.change-list ul.toplinks li {
+    zoom: 1;
+    *display: inline;
+}

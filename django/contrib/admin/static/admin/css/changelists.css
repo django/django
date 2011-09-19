@@ -165,11 +165,10 @@
 }
 
 .change-list ul.toplinks li {
-    float: left;
-    width: 9em;
     padding: 3px 6px;
     font-weight: bold;
     list-style-type: none;
+    display: inline-block;
 }
 
 .change-list ul.toplinks .date-back a {
