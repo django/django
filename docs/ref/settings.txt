@@ -1718,7 +1718,7 @@ templates. Note that if :setting:`USE_L10N` is set to ``True``, then the
 corresponding locale-dictated format has higher precedence and will be applied.
 See :tfilter:`allowed date format strings <date>`.
 
-See also :setting:`DATE_FORMAT` and :setting:`SHORT_DATETIME_FORMAT`.
+See also :setting:`DATE_FORMAT` and :setting:`SHORT_DATE_FORMAT`.
 
 .. setting:: SIGNING_BACKEND
 
