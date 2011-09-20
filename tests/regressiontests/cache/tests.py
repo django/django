@@ -1591,6 +1591,8 @@ TestWithTemplateResponse = override_settings(
 
 class TestEtagWithAdmin(TestCase):
     # See https://code.djangoproject.com/ticket/16003
+    urls = "regressiontests.admin_views.urls"
+
     def test_admin(self):
         with self.settings(USE_ETAGS=False):
             response = self.client.get('/test_admin/admin/')

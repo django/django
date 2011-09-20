@@ -10,10 +10,12 @@ from django.test import TestCase
 
 # local test models
 from models import (Episode, EpisodeExtra, EpisodeMaxNum, Media,
-    MediaInline, EpisodePermanent, MediaPermanentInline, Category)
+    EpisodePermanent, Category)
+from admin import MediaInline, MediaPermanentInline
 
 
 class GenericAdminViewTest(TestCase):
+    urls = "regressiontests.generic_inline_admin.urls"
     fixtures = ['users.xml']
 
     def setUp(self):
@@ -125,6 +127,7 @@ class GenericAdminViewTest(TestCase):
         self.assertTrue(formset.get_queryset().ordered)
 
 class GenericInlineAdminParametersTest(TestCase):
+    urls = "regressiontests.generic_inline_admin.urls"
     fixtures = ['users.xml']
 
     def setUp(self):
@@ -177,6 +180,7 @@ class GenericInlineAdminParametersTest(TestCase):
 
 
 class GenericInlineAdminWithUniqueTogetherTest(TestCase):
+    urls = "regressiontests.generic_inline_admin.urls"
     fixtures = ['users.xml']
 
     def setUp(self):
@@ -203,6 +207,8 @@ class GenericInlineAdminWithUniqueTogetherTest(TestCase):
         self.assertEqual(response.status_code, 302) # redirect somewhere
 
 class NoInlineDeletionTest(TestCase):
+    urls = "regressiontests.generic_inline_admin.urls"
+
     def test_no_deletion(self):
         fake_site = object()
         inline = MediaPermanentInline(EpisodePermanent, fake_site)
@@ -211,6 +217,7 @@ class NoInlineDeletionTest(TestCase):
         self.assertFalse(formset.can_delete)
 
 class GenericInlineModelAdminTest(TestCase):
+    urls = "regressiontests.generic_inline_admin.urls"
 
     def setUp(self):
         self.site = AdminSite()

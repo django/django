@@ -32,7 +32,7 @@ from django.utils import unittest
 
 # local test models
 from models import (Article, BarAccount, CustomArticle, EmptyModel,
-    FooAccount, Gallery, PersonAdmin, ModelWithStringPrimaryKey,
+    FooAccount, Gallery, ModelWithStringPrimaryKey,
     Person, Persona, Picture, Podcast, Section, Subscriber, Vodcast,
     Language, Collector, Widget, Grommet, DooHickey, FancyDoodad, Whatsit,
     Category, Post, Plot, FunkyTag, Chapter, Book, Promo, WorkHour, Employee,
@@ -49,6 +49,8 @@ class AdminViewBasicTest(TestCase):
     # variable. That way we can test a second AdminSite just by subclassing
     # this test case and changing urlbit.
     urlbit = 'admin'
+
+    urls = "regressiontests.admin_views.urls"
 
     def setUp(self):
         self.old_USE_I18N = settings.USE_I18N
@@ -301,7 +303,7 @@ class AdminViewBasicTest(TestCase):
             response.content.index(link % l1.pk) < response.content.index(link % l2.pk)
         )
 
-    def testChangeListSortingModelAdmin(self):
+    def testChangeListSortingOverrideModelAdmin(self):
         # Test ordering on Model Admin is respected, and overrides Model Meta
         dt = datetime.datetime.now()
         p1 = Podcast.objects.create(name="A", release_date=dt)
@@ -542,6 +544,8 @@ class AdminViewBasicTest(TestCase):
             self.fail("Filters should be allowed if they are defined on a ForeignKey pointing to this model")
 
 class AdminJavaScriptTest(AdminViewBasicTest):
+    urls = "regressiontests.admin_views.urls"
+
     def testSingleWidgetFirsFieldFocus(self):
         """
         JavaScript-assisted auto-focus on first field.
@@ -565,6 +569,7 @@ class AdminJavaScriptTest(AdminViewBasicTest):
 
 
 class SaveAsTests(TestCase):
+    urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml','admin-views-person.xml']
 
     def setUp(self):
@@ -593,6 +598,7 @@ class SaveAsTests(TestCase):
         self.assertEqual(response.context['form_url'], '../add/')
 
 class CustomModelAdminTest(AdminViewBasicTest):
+    urls = "regressiontests.admin_views.urls"
     urlbit = "admin2"
 
     def testCustomAdminSiteLoginForm(self):
@@ -654,6 +660,7 @@ def get_perm(Model, perm):
 class AdminViewPermissionsTest(TestCase):
     """Tests for Admin Views Permissions."""
 
+    urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml']
 
     def setUp(self):
@@ -1055,6 +1062,7 @@ class AdminViewPermissionsTest(TestCase):
 
 
 class AdminViewDeletedObjectsTest(TestCase):
+    urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml', 'deleted-objects.xml']
 
     def setUp(self):
@@ -1170,6 +1178,7 @@ class AdminViewDeletedObjectsTest(TestCase):
         self.assertContains(response, should_contain)
 
 class AdminViewStringPrimaryKeyTest(TestCase):
+    urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml', 'string-primary-key.xml']
 
     def __init__(self, *args):
@@ -1261,6 +1270,7 @@ class AdminViewStringPrimaryKeyTest(TestCase):
 
 
 class SecureViewTests(TestCase):
+    urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml']
 
     def setUp(self):
@@ -1418,6 +1428,7 @@ class SecureViewTests(TestCase):
         self.assertEqual(response['Location'], 'http://example.com/users/super/')
 
 class AdminViewUnicodeTest(TestCase):
+    urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-unicode.xml']
 
     def setUp(self):
@@ -1471,6 +1482,7 @@ class AdminViewUnicodeTest(TestCase):
 
 
 class AdminViewListEditable(TestCase):
+    urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml', 'admin-views-person.xml']
 
     def setUp(self):
@@ -1827,6 +1839,7 @@ class AdminViewListEditable(TestCase):
 
 
 class AdminSearchTest(TestCase):
+    urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users', 'multiple-child-classes',
                 'admin-views-person']
 
@@ -1873,6 +1886,7 @@ class AdminSearchTest(TestCase):
 
 
 class AdminInheritedInlinesTest(TestCase):
+    urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml',]
 
     def setUp(self):
@@ -1958,6 +1972,7 @@ class AdminInheritedInlinesTest(TestCase):
         self.assertEqual(Persona.objects.all()[0].accounts.count(), 2)
 
 class AdminActionsTest(TestCase):
+    urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml', 'admin-views-actions.xml']
 
     def setUp(self):
@@ -2179,6 +2194,7 @@ class AdminActionsTest(TestCase):
 
 
 class TestCustomChangeList(TestCase):
+    urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml']
     urlbit = 'admin'
 
@@ -2206,6 +2222,7 @@ class TestCustomChangeList(TestCase):
 
 
 class TestInlineNotEditable(TestCase):
+    urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml']
 
     def setUp(self):
@@ -2223,6 +2240,7 @@ class TestInlineNotEditable(TestCase):
         self.assertEqual(response.status_code, 200)
 
 class AdminCustomQuerysetTest(TestCase):
+    urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml']
 
     def setUp(self):
@@ -2277,6 +2295,7 @@ class AdminCustomQuerysetTest(TestCase):
         self.assertContains(response, '<li class="info">The cover letter &quot;John Doe II&quot; was changed successfully.</li>')
 
 class AdminInlineFileUploadTest(TestCase):
+    urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml', 'admin-views-actions.xml']
     urlbit = 'admin'
 
@@ -2322,6 +2341,7 @@ class AdminInlineFileUploadTest(TestCase):
 
 
 class AdminInlineTests(TestCase):
+    urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml']
 
     def setUp(self):
@@ -2639,6 +2659,7 @@ class AdminInlineTests(TestCase):
 
 
 class NeverCacheTests(TestCase):
+    urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml', 'admin-views-colors.xml', 'admin-views-fabrics.xml']
 
     def setUp(self):
@@ -2711,6 +2732,7 @@ class NeverCacheTests(TestCase):
 
 
 class PrePopulatedTest(TestCase):
+    urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml']
 
     def setUp(self):
@@ -2735,6 +2757,7 @@ class PrePopulatedTest(TestCase):
         self.assertNotContains(response, "id: '#id_prepopulatedsubpost_set-0-subslug',")
 
 class ReadonlyTest(TestCase):
+    urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml']
 
     def setUp(self):
@@ -2802,6 +2825,7 @@ class ReadonlyTest(TestCase):
 
 
 class RawIdFieldsTest(TestCase):
+    urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml']
 
     def setUp(self):
@@ -2837,6 +2861,7 @@ class UserAdminTest(TestCase):
     """
     Tests user CRUD functionality.
     """
+    urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml']
 
     def setUp(self):
@@ -2928,6 +2953,7 @@ class GroupAdminTest(TestCase):
     """
     Tests group CRUD functionality.
     """
+    urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml']
 
     def setUp(self):
@@ -2961,6 +2987,7 @@ except ImportError:
 
 #@unittest.skipUnless(docutils, "no docutils installed.")
 class AdminDocsTest(TestCase):
+    urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml']
 
     def setUp(self):
@@ -3003,6 +3030,7 @@ class AdminDocsTest(TestCase):
 AdminDocsTest = unittest.skipUnless(docutils, "no docutils installed.")(AdminDocsTest)
 
 class ValidXHTMLTests(TestCase):
+    urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml']
     urlbit = 'admin'
 
@@ -3033,6 +3061,7 @@ class ValidXHTMLTests(TestCase):
 
 
 class DateHierarchyTests(TestCase):
+    urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml']
 
     def setUp(self):
@@ -3162,6 +3191,7 @@ class AdminCustomSaveRelatedTests(TestCase):
     Ensure that one can easily customize the way related objects are saved.
     Refs #16115.
     """
+    urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml']
 
     def setUp(self):

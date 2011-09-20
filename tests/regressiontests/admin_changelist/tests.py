@@ -3,7 +3,6 @@ from __future__ import with_statement
 from django.contrib import admin
 from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.admin.views.main import ChangeList, SEARCH_VAR, ALL_VAR
-from django.core.paginator import Paginator
 from django.template import Context, Template
 from django.test import TestCase
 from django.test.client import RequestFactory
@@ -12,8 +11,14 @@ from django.contrib.auth.models import User
 from models import (Child, Parent, Genre, Band, Musician, Group, Quartet,
     Membership, ChordsMusician, ChordsBand, Invitation)
 
+from admin import (ChildAdmin, QuartetAdmin, BandAdmin, ChordsBandAdmin,
+    GroupAdmin, ParentAdmin, DynamicListDisplayChildAdmin, CustomPaginationAdmin,
+    FilteredChildAdmin, CustomPaginator, site as custom_site)
+
 
 class ChangeListTests(TestCase):
+    urls = "regressiontests.admin_changelist.urls"
+
     def setUp(self):
         self.factory = RequestFactory()
 
@@ -129,11 +134,7 @@ class ChangeListTests(TestCase):
             new_child = Child.objects.create(name='name %s' % i, parent=new_parent)
 
         request = self.factory.get('/child/')
-        m = ChildAdmin(Child, admin.site)
-        m.list_display = ['id', 'name', 'parent']
-        m.list_display_links = ['id']
-        m.list_editable = ['name']
-        m.paginator = CustomPaginator
+        m = CustomPaginationAdmin(Child, admin.site)
 
         cl = ChangeList(request, Child, m.list_display, m.list_display_links,
                 m.list_filter, m.date_hierarchy, m.search_fields,
@@ -331,7 +332,7 @@ class ChangeListTests(TestCase):
             return request
 
         # Test with user 'noparents'
-        m = DynamicListDisplayChildAdmin(Child, admin.site)
+        m = custom_site._registry[Child]
         request = _mocked_authenticated_request(user_noparents)
         response = m.changelist_view(request)
         # XXX - Calling render here to avoid ContentNotRenderedError to be
@@ -347,8 +348,11 @@ class ChangeListTests(TestCase):
         response.render()
         self.assertContains(response, 'Parent object')
 
+        custom_site.unregister(Child)
+
         # Test default implementation
-        m = ChildAdmin(Child, admin.site)
+        custom_site.register(Child, ChildAdmin)
+        m = custom_site._registry[Child]
         request = _mocked_authenticated_request(user_noparents)
         response = m.changelist_view(request)
         # XXX - #15826
@@ -383,57 +387,3 @@ class ChangeListTests(TestCase):
         cl.get_results(request)
         self.assertEqual(len(cl.result_list), 10)
 
-
-class ParentAdmin(admin.ModelAdmin):
-    list_filter = ['child__name']
-    search_fields = ['child__name']
-
-
-class ChildAdmin(admin.ModelAdmin):
-    list_display = ['name', 'parent']
-    list_per_page = 10
-
-    def queryset(self, request):
-        return super(ChildAdmin, self).queryset(request).select_related("parent__name")
-
-
-class FilteredChildAdmin(admin.ModelAdmin):
-    list_display = ['name', 'parent']
-    list_per_page = 10
-
-    def queryset(self, request):
-        return super(FilteredChildAdmin, self).queryset(request).filter(
-            name__contains='filtered')
-
-
-class CustomPaginator(Paginator):
-    def __init__(self, queryset, page_size, orphans=0, allow_empty_first_page=True):
-        super(CustomPaginator, self).__init__(queryset, 5, orphans=2,
-            allow_empty_first_page=allow_empty_first_page)
-
-
-class BandAdmin(admin.ModelAdmin):
-    list_filter = ['genres']
-
-
-class GroupAdmin(admin.ModelAdmin):
-    list_filter = ['members']
-
-
-class QuartetAdmin(admin.ModelAdmin):
-    list_filter = ['members']
-
-
-class ChordsBandAdmin(admin.ModelAdmin):
-    list_filter = ['members']
-
-
-class DynamicListDisplayChildAdmin(admin.ModelAdmin):
-    list_display = ('name', 'parent')
-
-    def get_list_display(self, request):
-        my_list_display = list(self.list_display)
-        if request.user.username == 'noparents':
-            my_list_display.remove('parent')
-
-        return my_list_display
