@@ -1,7 +1,15 @@
 {% extends "admin/base_site.html" %}
 {% load i18n %}
+{% load url from future %}
+
 {% block coltype %}colSM{% endblock %}
-{% block breadcrumbs %}<div class="breadcrumbs"><a href="../../">Home</a> &rsaquo; <a href="../">Documentation</a> &rsaquo; Views</div>{% endblock %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'django-admindocs-docroot' %}">{% trans 'Documentation' %}</a>
+&rsaquo; {% trans 'Views' %}
+</div>
+{% endblock %}
 {% block title %}Views{% endblock %}
 
 {% block content %}
@@ -29,8 +37,8 @@
 
 {% for view in site_views.list|dictsort:"url" %}
 {% ifchanged %}
-<h3><a href="{{ view.module }}.{{ view.name }}/">{{ view.url }}</a></h3>
-<p class="small quiet">View function: {{ view.module }}.{{ view.name }}</p>
+<h3><a href="{% url 'django-admindocs-views-detail' view=view.full_name %}">{{ view.url }}</a></h3>
+<p class="small quiet">View function: {{ view.full_name }}</p>
 <p>{{ view.title }}</p>
 <hr />
 {% endifchanged %}

@@ -595,7 +595,7 @@ class SaveAsTests(TestCase):
         self.assertTrue(response.context['save_as'])
         post_data = {'_saveasnew':'', 'name':'John M', 'gender':3, 'alive':'checked'}
         response = self.client.post('/test_admin/admin/admin_views/person/1/', post_data)
-        self.assertEqual(response.context['form_url'], '../add/')
+        self.assertEqual(response.context['form_url'], '/test_admin/admin/admin_views/person/add/')
 
 class CustomModelAdminTest(AdminViewBasicTest):
     urls = "regressiontests.admin_views.urls"
@@ -842,7 +842,7 @@ class AdminViewPermissionsTest(TestCase):
         self.client.post('/test_admin/admin/', self.adduser_login)
         addpage = self.client.get('/test_admin/admin/admin_views/article/add/')
         self.assertEqual(addpage.status_code, 200)
-        change_list_link = '<a href="../">Articles</a> &rsaquo;'
+        change_list_link = '&rsaquo; <a href="/test_admin/admin/admin_views/article/">Articles</a>'
         self.assertFalse(change_list_link in addpage.content,
                     'User restricted to add permission is given link to change list view in breadcrumbs.')
         post = self.client.post('/test_admin/admin/admin_views/article/add/', add_dict)

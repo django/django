@@ -1,6 +1,13 @@
 {% extends "admin/base_site.html" %}
 {% load i18n %}
-{% block breadcrumbs %}<div class="breadcrumbs"><a href="{{ root_path }}">Home</a> &rsaquo; Documentation</div>{% endblock %}
+{% load url from future %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; {% trans 'Documentation' %}</a>
+</div>
+{% endblock %}
 {% block title %}Documentation{% endblock %}
 
 {% block content %}

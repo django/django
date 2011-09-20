@@ -1,5 +1,7 @@
 {% extends "admin/base_site.html" %}
 {% load i18n %}
+{% load url from future %}
+
 {% block extrahead %}
 {{ block.super }}
 <style type="text/css">
@@ -8,7 +10,14 @@
 </style>
 {% endblock %}
 
-{% block breadcrumbs %}<div class="breadcrumbs"><a href="../../../">Home</a> &rsaquo; <a href="../../">Documentation</a> &rsaquo; <a href="../">Models</a> &rsaquo; {{ name }}</div>{% endblock %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'django-admindocs-docroot' %}">{% trans 'Documentation' %}</a>
+&rsaquo; <a href="{% url 'django-admindocs-models-index' %}">{% trans 'Models' %}</a>
+&rsaquo; {{ name }}
+</div>
+{% endblock %}
 
 {% block title %}Model: {{ name }}{% endblock %}
 
@@ -41,6 +50,6 @@
 </table>
 </div>
 
-<p class="small"><a href="../">&lsaquo; Back to Models Documentation</a></p>
+<p class="small"><a href="{% url 'django-admindocs-models-index' %}">&lsaquo; Back to Models Documentation</a></p>
 </div>
 {% endblock %}

@@ -1,13 +1,15 @@
 {% extends "admin/base_site.html" %}
 {% load i18n %}
+{% load url from future %}
+{% load admin_urls %}
 
 {% block breadcrumbs %}
 <div class="breadcrumbs">
-    <a href="../../../../">{% trans 'Home' %}</a> &rsaquo; 
-    <a href="../../../">{{ app_label|capfirst }}</a> &rsaquo; 
-    <a href="../../">{{ module_name }}</a> &rsaquo; 
-    <a href="../">{{ object|truncatewords:"18" }}</a> &rsaquo; 
-    {% trans 'History' %}
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'admin:app_list' app_label=app_label %}">{{ app_label|capfirst|escape }}</a>
+&rsaquo; <a href="{% url opts|admin_urlname:'changelist' %}">{{ module_name }}</a>
+&rsaquo; <a href="{% url opts|admin_urlname:'changelist' %}{{ object.pk }}">{{ object|truncatewords:"18" }}</a>
+&rsaquo; {% trans 'History' %}
 </div>
 {% endblock %}
 

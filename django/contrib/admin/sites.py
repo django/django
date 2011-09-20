@@ -339,9 +339,11 @@ class AdminSite(object):
                 # Check whether user has any perm for this module.
                 # If so, add the module to the model_list.
                 if True in perms.values():
+                    info = (app_label, model._meta.module_name)
                     model_dict = {
                         'name': capfirst(model._meta.verbose_name_plural),
-                        'admin_url': mark_safe('%s/%s/' % (app_label, model.__name__.lower())),
+                        'admin_url': reverse('admin:%s_%s_changelist' % info, current_app=self.name),
+                        'add_url': reverse('admin:%s_%s_add' % info, current_app=self.name),
                         'perms': perms,
                     }
                     if app_label in app_dict:
@@ -349,7 +351,7 @@ class AdminSite(object):
                     else:
                         app_dict[app_label] = {
                             'name': app_label.title(),
-                            'app_url': app_label + '/',
+                            'app_url': reverse('admin:app_list', kwargs={'app_label': app_label}, current_app=self.name),
                             'has_module_perms': has_module_perms,
                             'models': [model_dict],
                         }
@@ -383,9 +385,11 @@ class AdminSite(object):
                     # Check whether user has any perm for this module.
                     # If so, add the module to the model_list.
                     if True in perms.values():
+                        info = (app_label, model._meta.module_name)
                         model_dict = {
                             'name': capfirst(model._meta.verbose_name_plural),
-                            'admin_url': '%s/' % model.__name__.lower(),
+                            'admin_url': reverse('admin:%s_%s_changelist' % info, current_app=self.name),
+                            'add_url': reverse('admin:%s_%s_add' % info, current_app=self.name),
                             'perms': perms,
                         }
                         if app_dict:

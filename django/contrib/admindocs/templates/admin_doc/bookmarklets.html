@@ -1,6 +1,14 @@
 {% extends "admin/base_site.html" %}
+{% load i18n %}
+{% load url from future %}
 
-{% block breadcrumbs %}{% load i18n %}<div class="breadcrumbs"><a href="../../">{% trans "Home" %}</a> &rsaquo; <a href="../">{% trans "Documentation" %}</a> &rsaquo; {% trans "Bookmarklets" %}</div>{% endblock %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'django-admindocs-docroot' %}">{% trans 'Documentation' %}</a>
+&rsaquo; {% trans 'Bookmarklets' %}
+</div>
+{% endblock %}
 {% block title %}{% trans "Documentation bookmarklets" %}{% endblock %}
 
 {% block content %}

@@ -1,7 +1,16 @@
 {% extends "admin/base_site.html" %}
 {% load i18n %}
+{% load url from future %}
+
 {% block coltype %}colSM{% endblock %}
-{% block breadcrumbs %}<div class="breadcrumbs"><a href="../../">Home</a> &rsaquo; <a href="../">Documentation</a> &rsaquo; Models</div>{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'django-admindocs-docroot' %}">{% trans 'Documentation' %}</a>
+&rsaquo; {% trans 'Models' %}
+</div>
+{% endblock %}
 
 {% block title %}Models{% endblock %}
 
@@ -19,7 +28,7 @@
 <table class="xfull">
 {% for model in group.list %}
 <tr>
-<th><a href="{{ model.app_label }}.{{ model.object_name.lower }}/">{{ model.object_name }}</a></th>
+<th><a href="{% url 'django-admindocs-models-detail' app_label=model.app_label model_name=model.object_name.lower %}">{{ model.object_name }}</a></th>
 </tr>
 {% endfor %}
 </table>

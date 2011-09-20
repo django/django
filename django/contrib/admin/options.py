@@ -11,6 +11,7 @@ from django.contrib import messages
 from django.views.decorators.csrf import csrf_protect
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.paginator import Paginator
+from django.core.urlresolvers import reverse
 from django.db import models, transaction, router
 from django.db.models.related import RelatedObject
 from django.db.models.fields import BLANK_CHOICE_DASH, FieldDoesNotExist
@@ -776,9 +777,12 @@ class ModelAdmin(BaseModelAdmin):
             # redirect to the change-list page for this object. Otherwise,
             # redirect to the admin index.
             if self.has_change_permission(request, None):
-                post_url = '../'
+                post_url = reverse('admin:%s_%s_changelist' %
+                                   (opts.app_label, opts.module_name),
+                                   current_app=self.admin_site.name)
             else:
-                post_url = '../../../'
+                post_url = reverse('admin:index',
+                                   current_app=self.admin_site.name)
             return HttpResponseRedirect(post_url)
 
     def response_change(self, request, obj):
@@ -787,11 +791,14 @@ class ModelAdmin(BaseModelAdmin):
         """
         opts = obj._meta
 
-        # Handle proxy models automatically created by .only() or .defer()
+        # Handle proxy models automatically created by .only() or .defer().
+        # Refs #14529
         verbose_name = opts.verbose_name
+        module_name = opts.module_name
         if obj._deferred:
             opts_ = opts.proxy_for_model._meta
             verbose_name = opts_.verbose_name
+            module_name = opts_.module_name
 
         pk_value = obj._get_pk_val()
 
@@ -805,19 +812,28 @@ class ModelAdmin(BaseModelAdmin):
         elif "_saveasnew" in request.POST:
             msg = _('The %(name)s "%(obj)s" was added successfully. You may edit it again below.') % {'name': force_unicode(verbose_name), 'obj': obj}
             self.message_user(request, msg)
-            return HttpResponseRedirect("../%s/" % pk_value)
+            return HttpResponseRedirect(reverse('admin:%s_%s_change' %
+                                        (opts.app_label, module_name),
+                                        args=(pk_value,),
+                                        current_app=self.admin_site.name))
         elif "_addanother" in request.POST:
             self.message_user(request, msg + ' ' + (_("You may add another %s below.") % force_unicode(verbose_name)))
-            return HttpResponseRedirect("../add/")
+            return HttpResponseRedirect(reverse('admin:%s_%s_add' %
+                                        (opts.app_label, module_name),
+                                        current_app=self.admin_site.name))
         else:
             self.message_user(request, msg)
             # Figure out where to redirect. If the user has change permission,
             # redirect to the change-list page for this object. Otherwise,
             # redirect to the admin index.
             if self.has_change_permission(request, None):
-                return HttpResponseRedirect('../')
+                post_url = reverse('admin:%s_%s_changelist' %
+                                   (opts.app_label, module_name),
+                                   current_app=self.admin_site.name)
             else:
-                return HttpResponseRedirect('../../../')
+                post_url = reverse('admin:index',
+                                   current_app=self.admin_site.name)
+            return HttpResponseRedirect(post_url)
 
     def response_action(self, request, queryset):
         """
@@ -990,7 +1006,9 @@ class ModelAdmin(BaseModelAdmin):
             raise Http404(_('%(name)s object with primary key %(key)r does not exist.') % {'name': force_unicode(opts.verbose_name), 'key': escape(object_id)})
 
         if request.method == 'POST' and "_saveasnew" in request.POST:
-            return self.add_view(request, form_url='../add/')
+            return self.add_view(request, form_url=reverse('admin:%s_%s_add' %
+                                    (opts.app_label, opts.module_name),
+                                    current_app=self.admin_site.name))
 
         ModelForm = self.get_form(request, obj)
         formsets = []
@@ -1246,8 +1264,11 @@ class ModelAdmin(BaseModelAdmin):
             self.message_user(request, _('The %(name)s "%(obj)s" was deleted successfully.') % {'name': force_unicode(opts.verbose_name), 'obj': force_unicode(obj_display)})
 
             if not self.has_change_permission(request, None):
-                return HttpResponseRedirect("../../../../")
-            return HttpResponseRedirect("../../")
+                return HttpResponseRedirect(reverse('admin:index',
+                                                    current_app=self.admin_site.name))
+            return HttpResponseRedirect(reverse('admin:%s_%s_changelist' %
+                                        (opts.app_label, opts.module_name),
+                                        current_app=self.admin_site.name))
 
         object_name = force_unicode(opts.verbose_name)
 
@@ -1292,6 +1313,7 @@ class ModelAdmin(BaseModelAdmin):
             'module_name': capfirst(force_unicode(opts.verbose_name_plural)),
             'object': obj,
             'app_label': app_label,
+            'opts': opts,
         }
         context.update(extra_context or {})
         return TemplateResponse(request, self.object_history_template or [
