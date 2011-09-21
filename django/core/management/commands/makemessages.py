@@ -15,16 +15,19 @@ plural_forms_re = re.compile(r'^(?P<value>"Plural-Forms.+?\\n")\s*$', re.MULTILI
 
 def handle_extensions(extensions=('html',)):
     """
-    organizes multiple extensions that are separated with commas or passed by
-    using --extension/-e multiple times.
+    Organizes multiple extensions that are separated with commas or passed by
+    using --extension/-e multiple times. Note that the .py extension is ignored
+    here because of the way non-*.py files are handled in make_messages() (they
+    are copied to file.ext.py files to trick xgettext to parse them as Python
+    files).
 
-    for example: running 'django-admin makemessages -e js,txt -e xhtml -a'
-    would result in a extension list: ['.js', '.txt', '.xhtml']
+    For example: running 'django-admin makemessages -e js,txt -e xhtml -a'
+    would result in an extension list: ['.js', '.txt', '.xhtml']
 
     >>> handle_extensions(['.html', 'html,js,py,py,py,.py', 'py,.py'])
-    ['.html', '.js']
+    set(['.html', '.js'])
     >>> handle_extensions(['.html, txt,.tpl'])
-    ['.html', '.tpl', '.txt']
+    set(['.html', '.tpl', '.txt'])
     """
     ext_list = []
     for ext in extensions:
@@ -32,10 +35,6 @@ def handle_extensions(extensions=('html',)):
     for i, ext in enumerate(ext_list):
         if not ext.startswith('.'):
             ext_list[i] = '.%s' % ext_list[i]
-
-    # we don't want *.py files here because of the way non-*.py files
-    # are handled in make_messages() (they are copied to file.ext.py files to
-    # trick xgettext to parse them as Python files)
     return set([x for x in ext_list if x != '.py'])
 
 def _popen(cmd):
@@ -318,7 +317,7 @@ class Command(NoArgsCommand):
         make_option('--all', '-a', action='store_true', dest='all',
             default=False, help='Updates the message files for all existing locales.'),
         make_option('--extension', '-e', dest='extensions',
-            help='The file extension(s) to examine (default: ".html", separate multiple extensions with commas, or use -e multiple times)',
+            help='The file extension(s) to examine (default: "html,txt", or "js" if the domain is "djangojs"). Separate multiple extensions with commas, or use -e multiple times.',
             action='append'),
         make_option('--symlinks', '-s', action='store_true', dest='symlinks',
             default=False, help='Follows symlinks to directories when examining source code and templates for translation strings.'),
