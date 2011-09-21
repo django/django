@@ -122,3 +122,17 @@ class Novel(models.Model):
 class Chapter(models.Model):
     novel = models.ForeignKey(Novel)
 
+
+# Models for #16838
+class CapoFamiglia(models.Model):
+    name = models.CharField(max_length=100)
+
+
+class Consigliere(models.Model):
+    name = models.CharField(max_length=100)
+    capo_famiglia = models.ForeignKey(CapoFamiglia, related_name='+')
+
+
+class SottoCapo(models.Model):
+    name = models.CharField(max_length=100)
+    capo_famiglia = models.ForeignKey(CapoFamiglia, related_name='+')

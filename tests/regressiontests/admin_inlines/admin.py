@@ -101,6 +101,14 @@ class NovelAdmin(admin.ModelAdmin):
     inlines = [ChapterInline]
 
 
+class ConsigliereInline(admin.TabularInline):
+    model = Consigliere
+
+
+class SottoCapoInline(admin.TabularInline):
+    model = SottoCapo
+
+
 site.register(TitleCollection, inlines=[TitleInline])
 # Test bug #12561 and #12778
 # only ModelAdmin media
@@ -115,3 +123,4 @@ site.register(Novel, NovelAdmin)
 site.register(Fashionista, inlines=[InlineWeakness])
 site.register(Holder4, Holder4Admin)
 site.register(Author, AuthorAdmin)
+site.register(CapoFamiglia, inlines=[ConsigliereInline, SottoCapoInline])

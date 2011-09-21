@@ -4,7 +4,8 @@ from django.test import TestCase
 
 # local test models
 from models import (Holder, Inner, Holder2, Inner2, Holder3,
-    Inner3, Person, OutfitItem, Fashionista, Teacher, Parent, Child)
+    Inner3, Person, OutfitItem, Fashionista, Teacher, Parent, Child,
+    CapoFamiglia, Consigliere, SottoCapo)
 from admin import InnerInline
 
 
@@ -114,6 +115,32 @@ class TestInline(TestCase):
         response = self.client.get('/admin/admin_inlines/holder4/add/')
         self.assertContains(response, '<p class="help">Awesome stacked help text is awesome.</p>', 4)
         self.assertContains(response, '<img src="/static/admin/img/icon-unknown.gif" class="help help-tooltip" width="10" height="10" alt="(Awesome tabular help text is awesome.)" title="Awesome tabular help text is awesome." />', 1)
+
+    def test_non_related_name_inline(self):
+        """
+        Ensure that multiple inlines with related_name='+' have correct form
+        prefixes. Bug #16838.
+        """
+        response = self.client.get('/admin/admin_inlines/capofamiglia/add/')
+
+        self.assertContains(response,
+                '<input type="hidden" name="-1-0-id" id="id_-1-0-id" />')
+        self.assertContains(response,
+                '<input type="hidden" name="-1-0-capo_famiglia" '
+                'id="id_-1-0-capo_famiglia" />')
+        self.assertContains(response,
+                '<input id="id_-1-0-name" type="text" class="vTextField" '
+                'name="-1-0-name" maxlength="100" />')
+
+        self.assertContains(response,
+                '<input type="hidden" name="-2-0-id" id="id_-2-0-id" />')
+        self.assertContains(response,
+                '<input type="hidden" name="-2-0-capo_famiglia" '
+                'id="id_-2-0-capo_famiglia" />')
+        self.assertContains(response,
+                '<input id="id_-2-0-name" type="text" class="vTextField" '
+                'name="-2-0-name" maxlength="100" />')
+
 
 class TestInlineMedia(TestCase):
     urls = "regressiontests.admin_inlines.urls"
