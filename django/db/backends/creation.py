@@ -374,15 +374,6 @@ class BaseDatabaseCreation(object):
             verbosity=max(verbosity - 1, 0),
             interactive=False,
             database=self.connection.alias)
-        
-        # One effect of calling syncdb followed by flush is that the id of the
-        # default site may or may not be 1, depending on how the sequence was
-        # reset.  If the sites app is loaded, then we coerce it.
-        from django.db.models import get_model
-        if 'django.contrib.sites' in settings.INSTALLED_APPS:
-            Site = get_model('sites', 'Site')
-            if Site is not None and Site.objects.using(self.connection.alias).count() == 1:
-                Site.objects.using(self.connection.alias).update(id=settings.SITE_ID)
 
         from django.core.cache import get_cache
         from django.core.cache.backends.db import BaseDatabaseCache
