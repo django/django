@@ -143,5 +143,16 @@ class RenderToStringTest(unittest.TestCase):
         self.assertEqual(output, 'obj:after')
         self.assertEqual(context['obj'], 'before')
 
+    def test_empty_list(self):
+        self.assertRaisesRegexp(TemplateDoesNotExist,
+                                'No template names provided$',
+                                loader.render_to_string, [])
+
+
+    def test_select_templates_from_empty_list(self):
+        self.assertRaisesRegexp(TemplateDoesNotExist,
+                                'No template names provided$',
+                                loader.select_template, [])
+
 if __name__ == "__main__":
     unittest.main()

@@ -179,6 +179,8 @@ def render_to_string(template_name, dictionary=None, context_instance=None):
 
 def select_template(template_name_list):
     "Given a list of template names, returns the first that can be loaded."
+    if not template_name_list:
+        raise TemplateDoesNotExist("No template names provided")
     not_found = []
     for template_name in template_name_list:
         try:
