@@ -113,13 +113,22 @@ class CachedFilesMixin(object):
                 return matched
             name_parts = name.split('/')
             # Using posix normpath here to remove duplicates
-            result = url_parts = posixpath.normpath(url).split('/')
-            level = url.count('..')
-            if level:
-                result = name_parts[:-level - 1] + url_parts[level:]
-            elif name_parts[:-1]:
-                result = name_parts[:-1] + url_parts[-1:]
-            joined_result = '/'.join(result)
+            url = posixpath.normpath(url)
+            url_parts = url.split('/')
+            parent_level, sub_level = url.count('..'), url.count('/')
+            if url.startswith('/'):
+                sub_level -= 1
+                url_parts = url_parts[1:]
+            if parent_level or not url.startswith('/'):
+                start, end = parent_level + 1, parent_level
+            else:
+                if sub_level:
+                    if sub_level == 1:
+                        parent_level -= 1
+                    start, end = parent_level, sub_level - 1
+                else:
+                    start, end = 1, sub_level - 1
+            joined_result = '/'.join(name_parts[:-start] + url_parts[end:])
             hashed_url = self.url(joined_result, force=True)
             # Return the hashed and normalized version to the file
             return 'url("%s")' % hashed_url
