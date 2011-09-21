@@ -96,6 +96,14 @@ class FileStorageTests(unittest.TestCase):
         shutil.rmtree(self.temp_dir)
         shutil.rmtree(self.temp_dir2)
 
+    def test_emtpy_location(self):
+        """
+        Makes sure an exception is raised if the location is empty
+        """
+        storage = self.storage_class(location='')
+        self.assertEqual(storage.base_location, '')
+        self.assertEqual(storage.location, os.getcwd())
+
     def test_file_access_options(self):
         """
         Standard file access options are available, and work as expected.

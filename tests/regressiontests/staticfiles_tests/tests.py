@@ -496,6 +496,9 @@ class TestMiscFinder(TestCase):
     """
     A few misc finder tests.
     """
+    def setUp(self):
+        default_storage._wrapped = empty
+
     def test_get_finder(self):
         self.assertTrue(isinstance(finders.get_finder(
             'django.contrib.staticfiles.finders.FileSystemFinder'),
@@ -509,13 +512,17 @@ class TestMiscFinder(TestCase):
         self.assertRaises(ImproperlyConfigured,
             finders.get_finder, 'foo.bar.FooBarFinder')
 
+    @override_settings(STATICFILES_DIRS='a string')
     def test_non_tuple_raises_exception(self):
         """
         We can't determine if STATICFILES_DIRS is set correctly just by
         looking at the type, but we can determine if it's definitely wrong.
         """
-        with self.settings(STATICFILES_DIRS='a string'):
-            self.assertRaises(ImproperlyConfigured, finders.FileSystemFinder)
+        self.assertRaises(ImproperlyConfigured, finders.FileSystemFinder)
+
+    @override_settings(MEDIA_ROOT='')
+    def test_location_empty(self):
+        self.assertRaises(ImproperlyConfigured, finders.DefaultStorageFinder)
 
 
 class TestTemplateTag(StaticFilesTestCase):
