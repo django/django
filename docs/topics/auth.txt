@@ -1637,13 +1637,13 @@ database ID or whatever -- and returns a ``User`` object.
 The ``authenticate`` method takes credentials as keyword arguments. Most of
 the time, it'll just look like this::
 
-    class MyBackend:
+    class MyBackend(object):
         def authenticate(self, username=None, password=None):
             # Check the username/password and return a User.
 
 But it could also authenticate a token, like so::
 
-    class MyBackend:
+    class MyBackend(object):
         def authenticate(self, token=None):
             # Check the token and return a User.
 
@@ -1665,7 +1665,7 @@ object the first time a user authenticates::
     from django.conf import settings
     from django.contrib.auth.models import User, check_password
 
-    class SettingsBackend:
+    class SettingsBackend(object):
         """
         Authenticate against the settings ADMIN_LOGIN and ADMIN_PASSWORD.
 
@@ -1719,7 +1719,7 @@ any one backend grants.
 The simple backend above could implement permissions for the magic admin
 fairly simply::
 
-    class SettingsBackend:
+    class SettingsBackend(object):
 
         # ...
 
