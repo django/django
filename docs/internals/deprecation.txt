@@ -249,6 +249,8 @@ their deprecation, as per the :ref:`deprecation policy
       from their previous location ``django.conf.urls.defaults``. This module
       was deprecated at the same time and will be removed in this Django release.
 
+    * The Databrowse contrib module was deprecated in 1.4 and will be removed.
+
 2.0
 ---
 
