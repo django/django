@@ -144,7 +144,7 @@ parameters.
 Returns a dictionary of city information for the given query.  Some
 of the values in the dictionary may be undefined (``None``).
 
-.. method:: GeoIPcountry(query)
+.. method:: GeoIP.country(query)
 
 Returns a dictionary with the country code and country for the given 
 query.
