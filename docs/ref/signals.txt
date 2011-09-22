@@ -365,7 +365,7 @@ post_syncdb
 .. data:: django.db.models.signals.post_syncdb
    :module:
 
-Sent by :djadmin:`syncdb` command after it installs an application, and
+Sent by the :djadmin:`syncdb` command after it installs an application, and the
 :djadmin:`flush` command.
 
 Any handlers that listen to this signal need to be written in a particular
