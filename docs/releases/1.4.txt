@@ -640,3 +640,19 @@ Until Django 1.3 the functions :func:`~django.conf.urls.include`,
 were located in a ``django.conf.urls.defaults`` module.
 
 Starting with Django 1.4 they are now available in :mod:`django.conf.urls`.
+
+``django.contrib.databrowse``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Databrowse has not seen active development for some time, and this does not
+show any sign of changing. There had been a suggestion for a GSOC project to
+integrate the functionality of databrowse into the admin, but no progress was
+made. While Databrowse has been deprecated, an enhancement of
+django.contrib.admin providing a similar feature set is still possible.
+
+.. _GSOC Proposal: https://code.djangoproject.com/wiki/SummerOfCode2011#Integratedatabrowseintotheadmin
+
+The code that powers Databrowse is licensed under the same terms as Django
+itself, and so is available to be adopted by an individual or group as
+a third-party project.
+

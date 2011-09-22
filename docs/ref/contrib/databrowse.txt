@@ -5,20 +5,14 @@ Databrowse
 .. module:: django.contrib.databrowse
    :synopsis: Databrowse is a Django application that lets you browse your data.
 
+.. deprecated:: 1.4
+    This module has been deprecated.
+
 Databrowse is a Django application that lets you browse your data.
 
 As the Django admin dynamically creates an admin interface by introspecting
 your models, Databrowse dynamically creates a rich, browsable Web site by
 introspecting your models.
-
-.. admonition:: Note
-
-    Databrowse is **very** new and is currently under active development. It
-    may change substantially before the next Django release.
-
-    With that said, it's easy to use, and it doesn't require writing any
-    code. So you can play around with it today, with very little investment in
-    time or coding.
 
 How to use Databrowse
 =====================
