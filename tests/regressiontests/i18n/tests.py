@@ -480,6 +480,11 @@ class FormattingTests(TestCase):
         en_gb_format_mod = import_module('django.conf.locale.en_GB.formats')
         self.assertEqual(list(iter_format_modules('en-gb')), [en_gb_format_mod, en_format_mod])
 
+    def test_get_format_modules_lang(self):
+        with self.settings(USE_L10N=True):
+            with translation.override('de', deactivate=True):
+                self.assertEqual('.', get_format('DECIMAL_SEPARATOR', lang='en'))
+
     def test_get_format_modules_stability(self):
         with self.settings(USE_L10N=True,
                 FORMAT_MODULE_PATH='regressiontests.i18n.other.locale'):
