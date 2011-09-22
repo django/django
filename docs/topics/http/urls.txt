@@ -436,8 +436,8 @@ directly the pattern list as returned by `patterns`_ instead. For example::
     from django.conf.urls.defaults import *
 
     extra_patterns = patterns('',
-        url(r'reports/(?P<id>\d+)/$', 'credit.views.report', name='credit-reports'),
-        url(r'charge/$', 'credit.views.charge', name='credit-charge'),
+        url(r'^reports/(?P<id>\d+)/$', 'credit.views.report', name='credit-reports'),
+        url(r'^charge/$', 'credit.views.charge', name='credit-charge'),
     )
 
     urlpatterns = patterns('',
