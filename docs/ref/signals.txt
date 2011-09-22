@@ -352,12 +352,16 @@ post_syncdb
 .. data:: django.db.models.signals.post_syncdb
    :module:
 
-Sent by :djadmin:`syncdb` after it installs an application.
+Sent by :djadmin:`syncdb` command after it installs an application, and
+:djadmin:`flush` command.
 
 Any handlers that listen to this signal need to be written in a particular
 place: a ``management`` module in one of your :setting:`INSTALLED_APPS`. If
 handlers are registered anywhere else they may not be loaded by
-:djadmin:`syncdb`.
+:djadmin:`syncdb`. It is important that handlers of this signal perform
+idempodent changes (e.g. no database alterations) as this may cause the
+:djadmin:`flush` management command to fail if it also ran during the
+:djadmin:`syncdb` command.
 
 Arguments sent with this signal:
 
