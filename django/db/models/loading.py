@@ -146,6 +146,7 @@ class AppCache(object):
                     if mod is None:
                         if emptyOK:
                             return None
+                        raise ImproperlyConfigured("App with label %s is missing a models.py module.")
                     else:
                         return mod
             raise ImproperlyConfigured("App with label %s could not be found" % app_label)
