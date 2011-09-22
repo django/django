@@ -1163,6 +1163,8 @@ bulk_create
 
 .. method:: bulk_create(objs)
 
+.. versionadded:: 1.4
+
 This method inserts the provided list of objects into the database in an
 efficient manner (generally only 1 query, no matter how many objects there
 are)::
