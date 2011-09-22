@@ -17,7 +17,10 @@ class Command(NoArgsCommand):
             default=DEFAULT_DB_ALIAS, help='Nominates a database to flush. '
                 'Defaults to the "default" database.'),
     )
-    help = "Executes ``sqlflush`` on the current database."
+    help = ('Returns the database to the state it was in immediately after '
+           'syncdb was executed. This means that all data will be removed '
+           'from the database, any post-synchronization handlers will be '
+           're-executed, and the initial_data fixture will be re-installed.')
 
     def handle_noargs(self, **options):
         db = options.get('database', DEFAULT_DB_ALIAS)
