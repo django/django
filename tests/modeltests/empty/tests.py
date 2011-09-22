@@ -25,7 +25,7 @@ class NoModelTests(TestCase):
     Test for #7198 to ensure that the proper error message is raised
     when attempting to load an app with no models.py file.
 
-    Becuase the test runner won't currently load a test module with no
+    Because the test runner won't currently load a test module with no
     models.py file, this TestCase instead lives in this module.
 
     It seemed like an appropriate home for it.
