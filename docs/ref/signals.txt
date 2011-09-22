@@ -359,7 +359,7 @@ Any handlers that listen to this signal need to be written in a particular
 place: a ``management`` module in one of your :setting:`INSTALLED_APPS`. If
 handlers are registered anywhere else they may not be loaded by
 :djadmin:`syncdb`. It is important that handlers of this signal perform
-idempodent changes (e.g. no database alterations) as this may cause the
+idempotent changes (e.g. no database alterations) as this may cause the
 :djadmin:`flush` management command to fail if it also ran during the
 :djadmin:`syncdb` command.
 
