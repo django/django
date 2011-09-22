@@ -177,7 +177,8 @@ Some commonly used options are:
 
 .. django-admin-option:: -c
 .. django-admin-option:: --clear
-.. versionadded:: 1.4
+
+    .. versionadded:: 1.4
 
     Clear the existing files before trying to copy or link the original file.
 
@@ -187,7 +188,8 @@ Some commonly used options are:
     Create a symbolic link to each file instead of copying.
 
 .. django-admin-option:: --no-post-process
-.. versionadded:: 1.4
+
+    .. versionadded:: 1.4
 
     Don't call the
     :meth:`~django.contrib.staticfiles.storage.StaticFilesStorage.post_process`
