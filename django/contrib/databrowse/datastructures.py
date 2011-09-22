@@ -184,6 +184,8 @@ class EasyInstanceField(object):
             if self.field.rel.to in self.model.model_list:
                 lst = []
                 for value in self.values():
+                    if value is None:
+                        continue
                     url = mark_safe('%s%s/%s/objects/%s/' % (self.model.site.root_url, m.model._meta.app_label, m.model._meta.module_name, iri_to_uri(value._get_pk_val())))
                     lst.append((smart_unicode(value), url))
             else:
