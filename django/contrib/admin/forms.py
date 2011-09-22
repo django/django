@@ -6,8 +6,8 @@ from django.contrib.auth.models import User
 
 from django.utils.translation import ugettext_lazy, ugettext as _
 
-ERROR_MESSAGE = ugettext_lazy("Please enter a correct username and password. "
-                              "Note that both fields are case-sensitive.")
+ERROR_MESSAGE = ugettext_lazy("Please enter the correct username and password "
+        "for a staff account. Note that both fields are case-sensitive.")
 
 class AdminAuthenticationForm(AuthenticationForm):
     """

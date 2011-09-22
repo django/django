@@ -40,6 +40,9 @@ from models import (Article, BarAccount, CustomArticle, EmptyModel,
     RowLevelChangePermissionModel, Paper, CoverLetter, Story, OtherStory,
     ComplexSortedPerson, Parent, Child)
 
+ERROR_MESSAGE = "Please enter the correct username and password \
+for a staff account. Note that both fields are case-sensitive."
+
 
 class AdminViewBasicTest(TestCase):
     fixtures = ['admin-views-users.xml', 'admin-views-colors.xml',
@@ -761,12 +764,12 @@ class AdminViewPermissionsTest(TestCase):
         self.assertContains(login, "Your e-mail address is not your username")
         # only correct passwords get a username hint
         login = self.client.post('/test_admin/admin/', self.super_email_bad_login)
-        self.assertContains(login, "Please enter a correct username and password.")
+        self.assertContains(login, ERROR_MESSAGE)
         new_user = User(username='jondoe', password='secret', email='super@example.com')
         new_user.save()
         # check to ensure if there are multiple e-mail addresses a user doesn't get a 500
         login = self.client.post('/test_admin/admin/', self.super_email_login)
-        self.assertContains(login, "Please enter a correct username and password.")
+        self.assertContains(login, ERROR_MESSAGE)
 
         # Add User
         request = self.client.get('/test_admin/admin/')
@@ -797,7 +800,7 @@ class AdminViewPermissionsTest(TestCase):
         self.assertEqual(request.status_code, 200)
         login = self.client.post('/test_admin/admin/', self.joepublic_login)
         self.assertEqual(login.status_code, 200)
-        self.assertContains(login, "Please enter a correct username and password.")
+        self.assertContains(login, ERROR_MESSAGE)
 
         # Requests without username should not return 500 errors.
         request = self.client.get('/test_admin/admin/')
@@ -1360,12 +1363,12 @@ class SecureViewTests(TestCase):
         self.assertContains(login, "Your e-mail address is not your username")
         # only correct passwords get a username hint
         login = self.client.post('/test_admin/admin/secure-view/', self.super_email_bad_login)
-        self.assertContains(login, "Please enter a correct username and password.")
+        self.assertContains(login, ERROR_MESSAGE)
         new_user = User(username='jondoe', password='secret', email='super@example.com')
         new_user.save()
         # check to ensure if there are multiple e-mail addresses a user doesn't get a 500
         login = self.client.post('/test_admin/admin/secure-view/', self.super_email_login)
-        self.assertContains(login, "Please enter a correct username and password.")
+        self.assertContains(login, ERROR_MESSAGE)
 
         # Add User
         request = self.client.get('/test_admin/admin/secure-view/')
@@ -1397,7 +1400,7 @@ class SecureViewTests(TestCase):
         login = self.client.post('/test_admin/admin/secure-view/', self.joepublic_login)
         self.assertEqual(login.status_code, 200)
         # Login.context is a list of context dicts we just need to check the first one.
-        self.assertContains(login, "Please enter a correct username and password.")
+        self.assertContains(login, ERROR_MESSAGE)
 
         # 8509 - if a normal user is already logged in, it is possible
         # to change user into the superuser without error
