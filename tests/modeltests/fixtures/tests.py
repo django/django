@@ -252,6 +252,17 @@ class FixtureLoadingTests(TestCase):
             '<Article: Python program becomes self aware>'
         ])
 
+    def test_loaddata_error_message(self):
+        """
+        Verifies that loading a fixture which contains an invalid object
+        outputs an error message which contains the pk of the object
+        that triggered the error.
+        """
+        new_io = StringIO.StringIO()
+        management.call_command('loaddata', 'invalid.json', verbosity=0, stderr=new_io, commit=False)
+        output = new_io.getvalue().strip().split('\n')
+        self.assertRegexpMatches(output[-1], "IntegrityError: Could not load fixtures.Article\(pk=1\): .*$")
+
     def test_loading_using(self):
         # Load db fixtures 1 and 2. These will load using the 'default' database identifier explicitly
         management.call_command('loaddata', 'db_fixture_1', verbosity=0, using='default', commit=False)

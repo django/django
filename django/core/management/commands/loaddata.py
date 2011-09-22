@@ -12,7 +12,8 @@ from django.conf import settings
 from django.core import serializers
 from django.core.management.base import BaseCommand
 from django.core.management.color import no_style
-from django.db import connections, router, transaction, DEFAULT_DB_ALIAS
+from django.db import (connections, router, transaction, DEFAULT_DB_ALIAS,
+      IntegrityError, DatabaseError)
 from django.db.models import get_apps
 from django.utils.itercompat import product
 
@@ -177,7 +178,16 @@ class Command(BaseCommand):
                                         if router.allow_syncdb(using, obj.object.__class__):
                                             loaded_objects_in_fixture += 1
                                             models.add(obj.object.__class__)
-                                            obj.save(using=using)
+                                            try:
+                                                obj.save(using=using)
+                                            except (DatabaseError, IntegrityError), e:
+                                                msg = "Could not load %(app_label)s.%(object_name)s(pk=%(pk)s): %(error_msg)s" % {
+                                                        'app_label': obj.object._meta.app_label,
+                                                        'object_name': obj.object._meta.object_name,
+                                                        'pk': obj.object.pk,
+                                                        'error_msg': e
+                                                    }
+                                                raise e.__class__, e.__class__(msg), sys.exc_info()[2]
 
                                 # Since we disabled constraint checks, we must manually check for
                                 # any invalid keys that might have been added
