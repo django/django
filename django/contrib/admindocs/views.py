@@ -24,23 +24,17 @@ class GenericSite(object):
     domain = 'example.com'
     name = 'my site'
 
-def get_root_path():
-    try:
-        return urlresolvers.reverse('admin:index')
-    except urlresolvers.NoReverseMatch:
-        return getattr(settings, "ADMIN_SITE_ROOT_URL", "/admin/")
-
 @staff_member_required
 def doc_index(request):
     if not utils.docutils_is_available:
         return missing_docutils_page(request)
     return render_to_response('admin_doc/index.html', {
-        'root_path': get_root_path(),
+        'root_path': urlresolvers.reverse('admin:index'),
     }, context_instance=RequestContext(request))
 
 @staff_member_required
 def bookmarklets(request):
-    admin_root = get_root_path()
+    admin_root = urlresolvers.reverse('admin:index')
     return render_to_response('admin_doc/bookmarklets.html', {
         'root_path': admin_root,
         'admin_url': mark_safe("%s://%s%s" % (request.is_secure() and 'https' or 'http', request.get_host(), admin_root)),
@@ -77,7 +71,7 @@ def template_tag_index(request):
                 'library': tag_library,
             })
     return render_to_response('admin_doc/template_tag_index.html', {
-        'root_path': get_root_path(),
+        'root_path': urlresolvers.reverse('admin:index'),
         'tags': tags
     }, context_instance=RequestContext(request))
 
@@ -112,7 +106,7 @@ def template_filter_index(request):
                 'library': tag_library,
             })
     return render_to_response('admin_doc/template_filter_index.html', {
-        'root_path': get_root_path(),
+        'root_path': urlresolvers.reverse('admin:index'),
         'filters': filters
     }, context_instance=RequestContext(request))
 
@@ -142,7 +136,7 @@ def view_index(request):
                 'url': simplify_regex(regex),
             })
     return render_to_response('admin_doc/view_index.html', {
-        'root_path': get_root_path(),
+        'root_path': urlresolvers.reverse('admin:index'),
         'views': views
     }, context_instance=RequestContext(request))
 
@@ -164,7 +158,7 @@ def view_detail(request, view):
     for key in metadata:
         metadata[key] = utils.parse_rst(metadata[key], 'model', _('view:') + view)
     return render_to_response('admin_doc/view_detail.html', {
-        'root_path': get_root_path(),
+        'root_path': urlresolvers.reverse('admin:index'),
         'name': view,
         'summary': title,
         'body': body,
@@ -177,7 +171,7 @@ def model_index(request):
         return missing_docutils_page(request)
     m_list = [m._meta for m in models.get_models()]
     return render_to_response('admin_doc/model_index.html', {
-        'root_path': get_root_path(),
+        'root_path': urlresolvers.reverse('admin:index'),
         'models': m_list
     }, context_instance=RequestContext(request))
 
@@ -207,7 +201,7 @@ def model_detail(request, app_label, model_name):
         # ForeignKey is a special case since the field will actually be a
         # descriptor that returns the other object
         if isinstance(field, models.ForeignKey):
-            data_type = related_object_name = field.rel.to.__name__
+            data_type = field.rel.to.__name__
             app_label = field.rel.to._meta.app_label
             verbose = utils.parse_rst((_("the related `%(app_label)s.%(data_type)s` object")  % {'app_label': app_label, 'data_type': data_type}), 'model', _('model:') + data_type)
         else:
@@ -222,7 +216,7 @@ def model_detail(request, app_label, model_name):
 
     # Gather many-to-many fields.
     for field in opts.many_to_many:
-        data_type = related_object_name = field.rel.to.__name__
+        data_type = field.rel.to.__name__
         app_label = field.rel.to._meta.app_label
         verbose = _("related `%(app_label)s.%(object_name)s` objects") % {'app_label': app_label, 'object_name': data_type}
         fields.append({
@@ -269,7 +263,7 @@ def model_detail(request, app_label, model_name):
             'verbose'   : utils.parse_rst(_("number of %s") % verbose , 'model', _('model:') + opts.module_name),
         })
     return render_to_response('admin_doc/model_detail.html', {
-        'root_path': get_root_path(),
+        'root_path': urlresolvers.reverse('admin:index'),
         'name': '%s.%s' % (opts.app_label, opts.object_name),
         'summary': _("Fields on %s objects") % opts.object_name,
         'description': model.__doc__,
@@ -296,7 +290,7 @@ def template_detail(request, template):
                 'order': list(settings_mod.TEMPLATE_DIRS).index(dir),
             })
     return render_to_response('admin_doc/template_detail.html', {
-        'root_path': get_root_path(),
+        'root_path': urlresolvers.reverse('admin:index'),
         'name': template,
         'templates': templates,
     }, context_instance=RequestContext(request))
