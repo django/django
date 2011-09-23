@@ -92,11 +92,11 @@ class ContentType(models.Model):
         #
         # We return self.name only when users have changed its value from the
         # initial verbose_name_raw and might rely on it.
-        meta = self.model_class()._meta
-        if self.name != meta.verbose_name_raw:
+        model = self.model_class()
+        if not model or self.name != model._meta.verbose_name_raw:
             return self.name
         else:
-            return force_unicode(meta.verbose_name)
+            return force_unicode(model._meta.verbose_name)
 
     def model_class(self):
         "Returns the Python model class for this type of content."

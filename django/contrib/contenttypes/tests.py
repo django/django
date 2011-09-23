@@ -109,3 +109,16 @@ class ContentTypesTests(TestCase):
         obj = FooWithoutUrl.objects.create(name="john")
 
         self.assertRaises(Http404, shortcut, request, user_ct.id, obj.id)
+
+    def test_missing_model(self):
+        """
+        Ensures that displaying content types in admin (or anywhere) doesn't
+        break on leftover content type records in the DB for which no model
+        is defined anymore.
+        """
+        ct = ContentType.objects.create(
+            name = 'Old model',
+            app_label = 'contenttypes',
+            model = 'OldModel',
+        )
+        self.assertEqual(unicode(ct), u'Old model')
