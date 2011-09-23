@@ -1,5 +1,5 @@
 from __future__ import with_statement
-from datetime import timedelta, date, datetime, tzinfo
+from datetime import timedelta, date, datetime
 
 from django.template import Template, Context, add_to_builtins, defaultfilters
 from django.test import TestCase
@@ -22,8 +22,8 @@ class HumanizeTests(TestCase):
                              msg="%s test failed, produced '%s', should've produced '%s'" % (method, rendered, result))
 
     def test_ordinal(self):
-        test_list = ('1','2','3','4','11','12',
-                     '13','101','102','103','111',
+        test_list = ('1', '2', '3', '4', '11', '12',
+                     '13', '101', '102', '103', '111',
                      'something else', None)
         result_list = ('1st', '2nd', '3rd', '4th', '11th',
                        '12th', '13th', '101st', '102nd', '103rd',
@@ -55,10 +55,12 @@ class HumanizeTests(TestCase):
     def test_intword(self):
         test_list = ('100', '1000000', '1200000', '1290000',
                      '1000000000', '2000000000', '6000000000000',
-                     None)
+                     '1300000000000000', '3500000000000000000000',
+                     '8100000000000000000000000000000000', None)
         result_list = ('100', '1.0 million', '1.2 million', '1.3 million',
                        '1.0 billion', '2.0 billion', '6.0 trillion',
-                       None)
+                       '1.3 quadrillion', '3.5 sextillion',
+                       '8.1 decillion', None)
         self.humanize_tester(test_list, result_list, 'intword')
 
     def test_i18n_intcomma(self):
@@ -72,7 +74,7 @@ class HumanizeTests(TestCase):
 
     def test_i18n_intword(self):
         test_list = ('100', '1000000', '1200000', '1290000',
-                     '1000000000','2000000000','6000000000000')
+                     '1000000000', '2000000000', '6000000000000')
         result_list = ('100', '1,0 Million', '1,2 Millionen', '1,3 Millionen',
                        '1,0 Milliarde', '2,0 Milliarden', '6,0 Billionen')
         with self.settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=True):

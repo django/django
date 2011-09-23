@@ -65,7 +65,7 @@ Examples:
     * ``1200000`` becomes ``1.2 million``.
     * ``1200000000`` becomes ``1.2 billion``.
 
-Values up to 1000000000000000 (one quadrillion) are supported.
+Values up to 10^100 (Googol) are supported.
 
 :ref:`Format localization <format-localization>` will be respected if enabled,
 e.g. with the ``'de'`` language:

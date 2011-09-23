@@ -4,7 +4,6 @@ from datetime import date, datetime, timedelta
 from django import template
 from django.conf import settings
 from django.template import defaultfilters
-from django.utils.datetime_safe import datetime, date
 from django.utils.encoding import force_unicode
 from django.utils.formats import number_format
 from django.utils.translation import pgettext, ungettext, ugettext as _
@@ -12,6 +11,7 @@ from django.utils.tzinfo import LocalTimezone
 
 
 register = template.Library()
+
 
 def ordinal(value):
     """
@@ -22,10 +22,10 @@ def ordinal(value):
         value = int(value)
     except (TypeError, ValueError):
         return value
-    t = (_('th'), _('st'), _('nd'), _('rd'), _('th'), _('th'), _('th'), _('th'), _('th'), _('th'))
+    suffixes = (_('th'), _('st'), _('nd'), _('rd'), _('th'), _('th'), _('th'), _('th'), _('th'), _('th'))
     if value % 100 in (11, 12, 13): # special case
-        return u"%d%s" % (value, t[0])
-    return u'%d%s' % (value, t[value % 10])
+        return u"%d%s" % (value, suffixes[0])
+    return u"%d%s" % (value, suffixes[value % 10])
 ordinal.is_safe = True
 register.filter(ordinal)
 
@@ -51,16 +51,65 @@ def intcomma(value, use_l10n=True):
 intcomma.is_safe = True
 register.filter(intcomma)
 
+# A dictionary of standard large number to their converters
+intword_converters = {
+    6: lambda number: (
+        ungettext('%(value).1f million', '%(value).1f million', number),
+        ungettext('%(value)s million', '%(value)s million', number),
+    ),
+    9: lambda number: (
+        ungettext('%(value).1f billion', '%(value).1f billion', number),
+        ungettext('%(value)s billion', '%(value)s billion', number),
+    ),
+    12: lambda number: (
+        ungettext('%(value).1f trillion', '%(value).1f trillion', number),
+        ungettext('%(value)s trillion', '%(value)s trillion', number),
+    ),
+    15: lambda number: (
+        ungettext('%(value).1f quadrillion', '%(value).1f quadrillion', number),
+        ungettext('%(value)s quadrillion', '%(value)s quadrillion', number),
+    ),
+    18: lambda number: (
+        ungettext('%(value).1f quintillion', '%(value).1f quintillion', number),
+        ungettext('%(value)s quintillion', '%(value)s quintillion', number),
+    ),
+    21: lambda number: (
+        ungettext('%(value).1f sextillion', '%(value).1f sextillion', number),
+        ungettext('%(value)s sextillion', '%(value)s sextillion', number),
+    ),
+    24: lambda number: (
+        ungettext('%(value).1f septillion', '%(value).1f septillion', number),
+        ungettext('%(value)s septillion', '%(value)s septillion', number),
+    ),
+    27: lambda number: (
+        ungettext('%(value).1f octillion', '%(value).1f octillion', number),
+        ungettext('%(value)s octillion', '%(value)s octillion', number),
+    ),
+    30: lambda number: (
+        ungettext('%(value).1f nonillion', '%(value).1f nonillion', number),
+        ungettext('%(value)s nonillion', '%(value)s nonillion', number),
+    ),
+    33: lambda number: (
+        ungettext('%(value).1f decillion', '%(value).1f decillion', number),
+        ungettext('%(value)s decillion', '%(value)s decillion', number),
+    ),
+    100: lambda number: (
+        ungettext('%(value).1f googol', '%(value).1f googol', number),
+        ungettext('%(value)s googol', '%(value)s googol', number),
+    ),
+}
+
 def intword(value):
     """
-    Converts a large integer to a friendly text representation. Works best for
-    numbers over 1 million. For example, 1000000 becomes '1.0 million', 1200000
-    becomes '1.2 million' and '1200000000' becomes '1.2 billion'.
+    Converts a large integer to a friendly text representation. Works best
+    for numbers over 1 million. For example, 1000000 becomes '1.0 million',
+    1200000 becomes '1.2 million' and '1200000000' becomes '1.2 billion'.
     """
     try:
         value = int(value)
     except (TypeError, ValueError):
         return value
+
     if value < 1000000:
         return value
 
@@ -69,27 +118,17 @@ def intword(value):
         Use the i18n enabled defaultfilters.floatformat if possible
         """
         if settings.USE_L10N:
-            return defaultfilters.floatformat(value, 1), string_formatted
-        return value, float_formatted
+            value = defaultfilters.floatformat(value, 1)
+            template = string_formatted
+        else:
+            template = float_formatted
+        return template % {'value': value}
 
-    if value < 1000000000:
-        new_value = value / 1000000.0
-        new_value, value_string = _check_for_i18n(new_value,
-            ungettext('%(value).1f million', '%(value).1f million', new_value),
-            ungettext('%(value)s million', '%(value)s million', new_value))
-        return value_string % {'value': new_value}
-    if value < 1000000000000:
-        new_value = value / 1000000000.0
-        new_value, value_string = _check_for_i18n(new_value,
-            ungettext('%(value).1f billion', '%(value).1f billion', new_value),
-            ungettext('%(value)s billion', '%(value)s billion', new_value))
-        return value_string % {'value': new_value}
-    if value < 1000000000000000:
-        new_value = value / 1000000000000.0
-        new_value, value_string = _check_for_i18n(new_value,
-            ungettext('%(value).1f trillion', '%(value).1f trillion', new_value),
-            ungettext('%(value)s trillion', '%(value)s trillion', new_value))
-        return value_string % {'value': new_value}
+    for exponent, converters in intword_converters.items():
+        large_number = 10 ** exponent
+        if value < large_number * 1000:
+            new_value = value / float(large_number)
+            return _check_for_i18n(new_value, *converters(new_value))
     return value
 intword.is_safe = False
 register.filter(intword)
