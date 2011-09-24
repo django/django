@@ -309,77 +309,84 @@ tr.alt {
 
 /* SORTABLE TABLES */
 
+thead th {
+    padding: 0;
+    line-height: normal;
+}
+
 thead th a:link, thead th a:visited {
     color: #666;
-    display: block;
 }
 
 thead th.sorted {
     background: #c5c5c5 url(../img/nav-bg-selected.gif) top left repeat-x;
 }
 
-table thead th.sorted a {
-    padding-right: 13px;
+table thead th .text span {
+    padding: 2px 5px;
+    display:block;
 }
 
-table thead th.ascending a {
-    background: url(../img/arrow-up.gif) right .4em no-repeat;
-}
-
-table thead th.descending a {
-    background: url(../img/arrow-down.gif) right .4em no-repeat;
-}
-
-table thead th.sorted a span.text {
-   display: block;
-   float: left;
-   cursor: pointer; /* IE needs this */
-}
-
-table thead th.sorted a span.sortpos {
-   display: block;
-   float: right;
-   font-size: .6em;
-   text-align: right;
-   cursor: pointer; /* IE needs this */
-}
-
-table thead th.sorted a img {
-   vertical-align: top;
-}
-
-table thead th.sorted a span.clear {
-   display: block;
-   clear: both;
-}
-
-#sorting-popup-div {
-    display: none;
-    position: absolute;
-    background-color: white;
-    border: 1px solid #ddd;
-    z-index: 2000; /* more than filters on right */
-}
-
-#sorting-popup-div table {
-    border-right: 0px;
-    border-left: 0px;
-}
-
-#sorting-popup-div .reset {
-    text-align: center;
-}
-
-#sorting-popup-div .cancel {
-    font-size: 10px;
-    background: #e1e1e1 url(../img/nav-bg.gif) 0 50% repeat-x;
-    border-top: 1px solid #ddd;
-    text-align: center;
-}
-
-#sorting-popup-div .cancel a {
-    width: 100%;
+table thead th .text a {
     display: block;
+    cursor: pointer;
+    padding: 2px 5px;
+}
+
+table thead th.sortable:hover {
+    background: white url(../img/nav-bg-reverse.gif) 0 -5px repeat-x;
+}
+
+thead th.sorted a.sortremove {
+    visibility: hidden;
+}
+
+table thead th.sorted:hover a.sortremove {
+    visibility: visible;
+}
+
+table thead th.sorted .sortoptions {
+    display: block;
+    padding: 4px 5px 0 5px;
+    float: right;
+    text-align: right;
+}
+
+table thead th.sorted .sortpriority {
+    font-size: .8em;
+    min-width: 12px;
+    text-align: center;
+    vertical-align: top;
+}
+
+table thead th.sorted .sortoptions a {
+    width: 14px;
+    height: 12px;
+    display: inline-block;
+}
+
+table thead th.sorted .sortoptions a.sortremove {
+    background: url(../img/sorting-icons.gif) -4px -5px no-repeat;
+}
+
+table thead th.sorted .sortoptions a.sortremove:hover {
+    background: url(../img/sorting-icons.gif) -4px -27px no-repeat;
+}
+
+table thead th.sorted .sortoptions a.ascending {
+    background: url(../img/sorting-icons.gif) -5px -50px no-repeat;
+}
+
+table thead th.sorted .sortoptions a.ascending:hover {
+    background: url(../img/sorting-icons.gif) -5px -72px no-repeat;
+}
+
+table thead th.sorted .sortoptions a.descending {
+    background: url(../img/sorting-icons.gif) -5px -94px no-repeat;
+}
+
+table thead th.sorted .sortoptions a.descending:hover {
+    background: url(../img/sorting-icons.gif) -5px -115px no-repeat;
 }
 
 /* ORDERABLE TABLES */

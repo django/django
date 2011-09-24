@@ -360,13 +360,16 @@ Removed admin icons
 ~~~~~~~~~~~~~~~~~~~
 
 As part of an effort to improve the performance and usability of the admin's
-vertical and horizontal "filter" widgets, some icon files were removed and
-grouped into a single sprite file (``selector-icons.gif``):
+changelist sorting interface and of the admin's :attr:`horizontal
+<django.contrib.admin.ModelAdmin.filter_horizontal>` and :attr:`vertical
+<django.contrib.admin.ModelAdmin.filter_vertical>` "filter" widgets, some icon
+files were removed and grouped into two sprite files, respectively:
 ``selector-add.gif``, ``selector-addall.gif``, ``selector-remove.gif``,
 ``selector-removeall.gif``, ``selector_stacked-add.gif`` and
-``selector_stacked-remove.gif``. If you used those icons to customize the
-admin then you will want to replace them with your own icons or retrieve them
-from a previous release.
+``selector_stacked-remove.gif`` into ``selector-icons.gif``; and
+``arrow-up.gif`` and ``arrow-down.gif`` into ``sorting-icons.gif``. If you used
+those icons to customize the admin then you will want to replace them with your
+own icons or retrieve them from a previous release.
 
 Compatibility with old signed data
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

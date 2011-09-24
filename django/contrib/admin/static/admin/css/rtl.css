@@ -80,22 +80,7 @@ div.breadcrumbs {
 
 /* SORTABLE TABLES */
 
-
-table thead th.sorted a {
-    padding-left: 13px;
-    padding-right: 0px;
-}
-
-table thead th.ascending a,
-table thead th.descending a {
-    background-position: left;
-}
-
-table thead th.sorted a span.text {
-   float: right;
-}
-
-table thead th.sorted a span.sortpos {
+table thead th.sorted .sortoptions {
    float: left;
 }
 
