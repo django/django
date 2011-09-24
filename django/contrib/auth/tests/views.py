@@ -8,10 +8,12 @@ from django.contrib.auth import SESSION_KEY, REDIRECT_FIELD_NAME
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.sites.models import Site, RequestSite
 from django.contrib.auth.models import User
+from django.core.urlresolvers import NoReverseMatch
 from django.test import TestCase
 from django.core import mail
 from django.core.urlresolvers import reverse
 from django.http import QueryDict
+
 
 class AuthViewsTestCase(TestCase):
     """
@@ -44,6 +46,32 @@ class AuthViewsTestCase(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertTrue(response['Location'].endswith(settings.LOGIN_REDIRECT_URL))
         self.assertTrue(SESSION_KEY in self.client.session)
+
+
+class AuthViewNamedURLTests(AuthViewsTestCase):
+    urls = 'django.contrib.auth.urls'
+
+    def test_named_urls(self):
+        "Named URLs should be reversible"
+        expected_named_urls = [
+            ('login', [], {}),
+            ('logout', [], {}),
+            ('password_change', [], {}),
+            ('password_change_done', [], {}),
+            ('password_reset', [], {}),
+            ('password_reset_done', [], {}),
+            ('password_reset_confirm', [], {
+                'uidb36': 'aaaaaaa',
+                'token': '1111-aaaaa',
+            }),
+            ('password_reset_complete', [], {}),
+        ]
+        for name, args, kwargs in expected_named_urls:
+            try:
+                reverse(name, args=args, kwargs=kwargs)
+            except NoReverseMatch:
+                self.fail("Reversal of url named '%s' failed with NoReverseMatch" % name)
+
 
 class PasswordResetTest(AuthViewsTestCase):
 

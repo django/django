@@ -823,6 +823,11 @@ The login_required decorator
 
 .. function:: views.login(request, [template_name, redirect_field_name, authentication_form])
 
+    **URL name:** ``login``
+
+    See :doc:`the URL documentation </topics/http/urls>` for details on using
+    named URL patterns.
+
     Here's what ``django.contrib.auth.views.login`` does:
 
         * If called via ``GET``, it displays a login form that POSTs to the
@@ -938,6 +943,11 @@ includes a few other useful built-in views located in
 
     Logs a user out.
 
+    **URL name:** ``logout``
+
+    See :doc:`the URL documentation </topics/http/urls>` for details on using
+    named URL patterns.
+
     **Optional arguments:**
 
         * ``next_page``: The URL to redirect to after logout.
@@ -970,6 +980,8 @@ includes a few other useful built-in views located in
 
     Logs a user out, then redirects to the login page.
 
+    **URL name:** No default URL provided
+
     **Optional arguments:**
 
         * ``login_url``: The URL of the login page to redirect to.
@@ -978,6 +990,8 @@ includes a few other useful built-in views located in
 .. function:: password_change(request[, template_name, post_change_redirect, password_change_form])
 
     Allows a user to change their password.
+
+    **URL name:** ``password_change``
 
     **Optional arguments:**
 
@@ -1003,6 +1017,8 @@ includes a few other useful built-in views located in
 
     The page shown after a user has changed their password.
 
+    **URL name:** ``password_change_done``
+
     **Optional arguments:**
 
         * ``template_name``: The full name of a template to use.
@@ -1023,6 +1039,8 @@ includes a few other useful built-in views located in
         :meth:`~django.contrib.auth.models.User.set_unusable_password()`
         will not be able to request a password reset to prevent misuse
         when using an external authentication source like LDAP.
+
+    **URL name:** ``password_reset``
 
     **Optional arguments:**
 
@@ -1099,6 +1117,8 @@ includes a few other useful built-in views located in
     password. This view is called by default if the :func:`password_reset` view
     doesn't have an explicit ``post_reset_redirect`` URL set.
 
+    **URL name:** ``password_reset_done``
+
     **Optional arguments:**
 
         * ``template_name``: The full name of a template to use.
@@ -1108,6 +1128,8 @@ includes a few other useful built-in views located in
 .. function:: password_reset_confirm(request[, uidb36, token, template_name, token_generator, set_password_form, post_reset_redirect])
 
     Presents a form for entering a new password.
+
+    **URL name:** ``password_reset_confirm``
 
     **Optional arguments:**
 
@@ -1141,6 +1163,8 @@ includes a few other useful built-in views located in
 
    Presents a view which informs the user that the password has been
    successfully changed.
+
+   **URL name:** ``password_reset_complete``
 
    **Optional arguments:**
 
