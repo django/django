@@ -13,7 +13,7 @@ class FixedOffset(tzinfo):
         else:
             self.__offset = timedelta(minutes=offset)
 
-        sign = offset < 0 and '-' or '+'
+        sign = '-' if offset < 0 else '+'
         self.__name = u"%s%02d%02d" % (sign, abs(offset) / 60., abs(offset) % 60)
 
     def __repr__(self):
