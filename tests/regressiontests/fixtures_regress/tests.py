@@ -277,19 +277,21 @@ class TestFixtures(TestCase):
         global pre_save_checks
         pre_save_checks = []
         signals.pre_save.connect(animal_pre_save_check)
-        management.call_command(
-            'loaddata',
-            'animal.xml',
-            verbosity=0,
-            commit=False,
-        )
-        self.assertEqual(
-            pre_save_checks,
-            [
-                ("Count = 42 (<type 'int'>)", "Weight = 1.2 (<type 'float'>)")
-            ]
-        )
-        signals.pre_save.disconnect(animal_pre_save_check)
+        try:
+            management.call_command(
+                'loaddata',
+                'animal.xml',
+                verbosity=0,
+                commit=False,
+            )
+            self.assertEqual(
+                pre_save_checks,
+                [
+                    ("Count = 42 (<type 'int'>)", "Weight = 1.2 (<type 'float'>)")
+                ]
+            )
+        finally:
+            signals.pre_save.disconnect(animal_pre_save_check)
 
     def test_dumpdata_uses_default_manager(self):
         """
