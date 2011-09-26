@@ -149,10 +149,13 @@ Creating templates for the forms
 Next, you'll need to create a template that renders the wizard's forms. By
 default, every form uses a template called
 :file:`formtools/wizard/wizard_form.html`. You can change this template name
-by overriding either the :attr:`~WizardView.template_name` attribute or the
-:meth:`~WizardView.get_template_names()` method, which is documented in the
-:class:`~django.views.generic.base.TemplateResponseMixin` documentation.
-This hook also allows you to use a different template for each form.
+by overriding either the
+:attr:`~django.views.generic.base.TemplateResponseMixin.template_name` attribute
+or the
+:meth:`~django.views.generic.base.TemplateResponseMixin.get_template_names()`
+method, which are documented in the
+:class:`~django.views.generic.base.TemplateResponseMixin` documentation.  The
+latter one allows you to use a different template for each form.
 
 This template expects a ``wizard`` object that has various items attached to
 it:
@@ -556,12 +559,12 @@ How to work with ModelForm and ModelFormSet
 
 .. attribute:: WizardView.instance_dict
 
-WizardView supports :class:`~django.forms.ModelForm` and
-:class:`~django.forms.ModelFormSet`. Additionally to the ``initial_dict``, the
-:meth:`~WizardView.as_view` method takes a ``instance_dict`` argument that
-should contain instances of ``ModelForm`` and ``ModelFormSet``.  Similarly to
-:attr:`~WizardView.initial_dict`, thos dictionary key values should be equal to
-the `step_name` in the `form_list`.
+WizardView supports :doc:`ModelForms </topics/forms/modelforms>` and
+:ref:`ModelFormSets <model-formsets>`. Additionally to
+:attr:`~WizardView.initial_dict`, the :meth:`~WizardView.as_view` method takes
+an ``instance_dict`` argument that should contain instances of ``ModelForm`` and
+``ModelFormSet``.  Similarly to :attr:`~WizardView.initial_dict`, these
+dictionary key values should be equal to the step number in the form list.
 
 Usage of NamedUrlWizardView
 ===========================
