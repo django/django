@@ -219,7 +219,6 @@ class ReverseGenericRelatedObjectsDescriptor(object):
             model = rel_model,
             instance = instance,
             symmetrical = (self.field.rel.symmetrical and instance.__class__ == rel_model),
-            join_table = qn(self.field.m2m_db_table()),
             source_col_name = qn(self.field.m2m_column_name()),
             target_col_name = qn(self.field.m2m_reverse_name()),
             content_type = ContentType.objects.db_manager(instance._state.db).get_for_model(instance),
@@ -246,7 +245,7 @@ def create_generic_related_manager(superclass):
 
     class GenericRelatedObjectManager(superclass):
         def __init__(self, model=None, core_filters=None, instance=None, symmetrical=None,
-                     join_table=None, source_col_name=None, target_col_name=None, content_type=None,
+                     source_col_name=None, target_col_name=None, content_type=None,
                      content_type_field_name=None, object_id_field_name=None):
 
             super(GenericRelatedObjectManager, self).__init__()
@@ -255,8 +254,6 @@ def create_generic_related_manager(superclass):
             self.content_type = content_type
             self.symmetrical = symmetrical
             self.instance = instance
-            self.join_table = join_table
-            self.join_table = model._meta.db_table
             self.source_col_name = source_col_name
             self.target_col_name = target_col_name
             self.content_type_field_name = content_type_field_name

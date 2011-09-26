@@ -474,8 +474,7 @@ def create_many_related_manager(superclass, rel=False):
     through = rel.through
     class ManyRelatedManager(superclass):
         def __init__(self, model=None, core_filters=None, instance=None, symmetrical=None,
-                join_table=None, source_field_name=None, target_field_name=None,
-                reverse=False):
+                     source_field_name=None, target_field_name=None, reverse=False):
             super(ManyRelatedManager, self).__init__()
             self.core_filters = core_filters
             self.model = model
@@ -544,9 +543,8 @@ def create_many_related_manager(superclass, rel=False):
         get_or_create.alters_data = True
 
         def _add_items(self, source_field_name, target_field_name, *objs):
-            # join_table: name of the m2m link table
-            # source_field_name: the PK fieldname in join_table for the source object
-            # target_field_name: the PK fieldname in join_table for the target object
+            # source_field_name: the PK fieldname in join table for the source object
+            # target_field_name: the PK fieldname in join table for the target object
             # *objs - objects to add. Either object instances, or primary keys of object instances.
 
             # If there aren't any objects, there is nothing to do.
@@ -593,8 +591,8 @@ def create_many_related_manager(superclass, rel=False):
                         model=self.model, pk_set=new_ids, using=db)
 
         def _remove_items(self, source_field_name, target_field_name, *objs):
-            # source_col_name: the PK colname in join_table for the source object
-            # target_col_name: the PK colname in join_table for the target object
+            # source_field_name: the PK colname in join table for the source object
+            # target_field_name: the PK colname in join table for the target object
             # *objs - objects to remove
 
             # If there aren't any objects, there is nothing to do.
@@ -629,7 +627,7 @@ def create_many_related_manager(superclass, rel=False):
 
         def _clear_items(self, source_field_name):
             db = router.db_for_write(self.through, instance=self.instance)
-            # source_col_name: the PK colname in join_table for the source object
+            # source_field_name: the PK colname in join table for the source object
             if self.reverse or source_field_name == self.source_field_name:
                 # Don't send the signal when we are clearing the
                 # duplicate data rows for symmetrical reverse entries.
