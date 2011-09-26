@@ -124,7 +124,7 @@ class WizardView(TemplateView):
           The key should be equal to the `step_name` in the `form_list` (or
           the str of the zero based counter - if no step_names added in the
           `form_list`)
-        * `instance_dict` - contains a dictionary of instance objects. This list
+        * `instance_dict` - contains a dictionary of instance objects. This
           is only used when `ModelForm`s are used. The key should be equal to
           the `step_name` in the `form_list`. Same rules as for `initial_dict`
           apply.
@@ -286,7 +286,7 @@ class WizardView(TemplateView):
 
     def render_next_step(self, form, **kwargs):
         """
-        THis method gets called when the next step/form should be rendered.
+        This method gets called when the next step/form should be rendered.
         `form` contains the last/current form.
         """
         # get the form instance based on the data from the storage backend
@@ -349,14 +349,14 @@ class WizardView(TemplateView):
         """
         Returns a object which will be passed to the form for `step`
         as `instance`. If no instance object was provied while initializing
-        the form wizard, None be returned.
+        the form wizard, None will be returned.
         """
         return self.instance_dict.get(step, None)
 
     def get_form_kwargs(self, step=None):
         """
         Returns the keyword arguments for instantiating the form
-        (or formset) on given step.
+        (or formset) on the given step.
         """
         return {}
 
@@ -404,7 +404,7 @@ class WizardView(TemplateView):
     def render_revalidation_failure(self, step, form, **kwargs):
         """
         Gets called when a form doesn't validate when rendering the done
-        view. By default, it changed the current step to failing forms step
+        view. By default, it changes the current step to failing forms step
         and renders the form.
         """
         self.storage.current_step = step
@@ -428,7 +428,7 @@ class WizardView(TemplateView):
         """
         Returns a merged dictionary of all step cleaned_data dictionaries.
         If a step contains a `FormSet`, the key will be prefixed with formset
-        and contain a list of the formset' cleaned_data dictionaries.
+        and contain a list of the formset cleaned_data dictionaries.
         """
         cleaned_data = {}
         for form_key in self.get_form_list():
@@ -532,7 +532,7 @@ class WizardView(TemplateView):
 
     def render(self, form=None, **kwargs):
         """
-        Returns a ``HttpResponse`` containing a all needed context data.
+        Returns a ``HttpResponse`` containing all needed context data.
         """
         form = form or self.get_form()
         context = self.get_context_data(form, **kwargs)
@@ -540,7 +540,7 @@ class WizardView(TemplateView):
 
     def done(self, form_list, **kwargs):
         """
-        This method muss be overrided by a subclass to process to form data
+        This method must be overridden by a subclass to process to form data
         after processing all steps.
         """
         raise NotImplementedError("Your %s class has not defined a done() "
