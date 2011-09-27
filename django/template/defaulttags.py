@@ -10,64 +10,13 @@ from django.template.base import (Node, NodeList, Template, Library,
     TemplateSyntaxError, VariableDoesNotExist, InvalidTemplateLibrary,
     BLOCK_TAG_START, BLOCK_TAG_END, VARIABLE_TAG_START, VARIABLE_TAG_END,
     SINGLE_BRACE_START, SINGLE_BRACE_END, COMMENT_TAG_START, COMMENT_TAG_END,
-    get_library)
+    get_library, token_kwargs, kwarg_re)
 from django.template.smartif import IfParser, Literal
 from django.template.defaultfilters import date
 from django.utils.encoding import smart_str, smart_unicode
 from django.utils.safestring import mark_safe
 
 register = Library()
-# Regex for token keyword arguments
-kwarg_re = re.compile(r"(?:(\w+)=)?(.+)")
-
-def token_kwargs(bits, parser, support_legacy=False):
-    """
-    A utility method for parsing token keyword arguments.
-
-    :param bits: A list containing remainder of the token (split by spaces)
-        that is to be checked for arguments. Valid arguments will be removed
-        from this list.
-
-    :param support_legacy: If set to true ``True``, the legacy format
-        ``1 as foo`` will be accepted. Otherwise, only the standard ``foo=1``
-        format is allowed.
-
-    :returns: A dictionary of the arguments retrieved from the ``bits`` token
-        list.
-
-    There is no requirement for all remaining token ``bits`` to be keyword
-    arguments, so the dictionary will be returned as soon as an invalid
-    argument format is reached.
-    """
-    if not bits:
-        return {}
-    match = kwarg_re.match(bits[0])
-    kwarg_format = match and match.group(1)
-    if not kwarg_format:
-        if not support_legacy:
-            return {}
-        if len(bits) < 3 or bits[1] != 'as':
-            return {}
-
-    kwargs = {}
-    while bits:
-        if kwarg_format:
-            match = kwarg_re.match(bits[0])
-            if not match or not match.group(1):
-                return kwargs
-            key, value = match.groups()
-            del bits[:1]
-        else:
-            if len(bits) < 3 or bits[1] != 'as':
-                return kwargs
-            key, value = bits[2], bits[0]
-            del bits[:3]
-        kwargs[key] = parser.compile_filter(value)
-        if bits and not kwarg_format:
-            if bits[0] != 'and':
-                return kwargs
-            del bits[:1]
-    return kwargs
 
 class AutoEscapeControlNode(Node):
     """Implements the actions of the autoescape tag."""

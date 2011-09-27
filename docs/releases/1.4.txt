@@ -162,6 +162,31 @@ A new helper function,
 ``template.Library`` to ease the creation of template tags that store some
 data in a specified context variable.
 
+``*args`` and ``**kwargs`` support for template tag helper functions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:ref:`simple_tag<howto-custom-template-tags-simple-tags>`, :ref:`inclusion_tag
+<howto-custom-template-tags-inclusion-tags>` and the newly introduced
+:ref:`assignment_tag<howto-custom-template-tags-assignment-tags>` template
+helper functions may now accept any number of positional or keyword arguments.
+For example:
+
+.. code-block:: python
+
+    @register.simple_tag
+    def my_tag(a, b, *args, **kwargs):
+        warning = kwargs['warning']
+        profile = kwargs['profile']
+        ...
+        return ...
+
+Then in the template any number of arguments may be passed to the template tag.
+For example:
+
+.. code-block:: html+django
+
+    {% my_tag 123 "abcd" book.title warning=message|lower profile=user.profile %}
+
 ``truncatechars`` template filter
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

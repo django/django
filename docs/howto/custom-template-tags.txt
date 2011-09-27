@@ -698,6 +698,29 @@ If you need to rename your tag, you can provide a custom name for it::
     def some_function(value):
         return value - 1
 
+.. versionadded:: 1.4
+
+``simple_tag`` functions may accept any number of positional or keyword
+arguments. For example:
+
+.. code-block:: python
+
+    @register.simple_tag
+    def my_tag(a, b, *args, **kwargs):
+        warning = kwargs['warning']
+        profile = kwargs['profile']
+        ...
+        return ...
+
+Then in the template any number of arguments, separated by spaces, may be
+passed to the template tag. Like in Python, the values for keyword arguments
+are set using the equal sign ("``=``") and must be provided after the positional
+arguments. For example:
+
+.. code-block:: html+django
+
+    {% my_tag 123 "abcd" book.title warning=message|lower profile=user.profile %}
+
 .. _howto-custom-template-tags-assignment-tags:
 
 Assignment tags
@@ -760,6 +783,27 @@ Or, using decorator syntax:
 
 For more information on how the ``takes_context`` option works, see the section
 on :ref:`inclusion tags<howto-custom-template-tags-inclusion-tags>`.
+
+``assignment_tag`` functions may accept any number of positional or keyword
+arguments. For example:
+
+.. code-block:: python
+
+    @register.assignment_tag
+    def my_tag(a, b, *args, **kwargs):
+        warning = kwargs['warning']
+        profile = kwargs['profile']
+        ...
+        return ...
+
+Then in the template any number of arguments, separated by spaces, may be
+passed to the template tag. Like in Python, the values for keyword arguments
+are set using the equal sign ("``=``") and must be provided after the positional
+arguments. For example:
+
+.. code-block:: html+django
+
+    {% my_tag 123 "abcd" book.title warning=message|lower profile=user.profile as the_result %}
 
 .. _howto-custom-template-tags-inclusion-tags:
 
@@ -883,6 +927,29 @@ arguments to the template tag. It automatically gets access to the context.
 The ``takes_context`` parameter defaults to ``False``. When it's set to *True*,
 the tag is passed the context object, as in this example. That's the only
 difference between this case and the previous ``inclusion_tag`` example.
+
+.. versionadded:: 1.4
+
+``inclusion_tag`` functions may accept any number of positional or keyword
+arguments. For example:
+
+.. code-block:: python
+
+    @register.inclusion_tag('my_template.html')
+    def my_tag(a, b, *args, **kwargs):
+        warning = kwargs['warning']
+        profile = kwargs['profile']
+        ...
+        return ...
+
+Then in the template any number of arguments, separated by spaces, may be
+passed to the template tag. Like in Python, the values for keyword arguments
+are set using the equal sign ("``=``") and must be provided after the positional
+arguments. For example:
+
+.. code-block:: html+django
+
+    {% my_tag 123 "abcd" book.title warning=message|lower profile=user.profile %}
 
 Setting a variable in the context
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
