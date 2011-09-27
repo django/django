@@ -2,16 +2,13 @@
 Custom template tags and filters
 ================================
 
-Introduction
-============
-
 Django's template system comes with a wide variety of :doc:`built-in
 tags and filters </ref/templates/builtins>` designed to address the
 presentation logic needs of your application. Nevertheless, you may
 find yourself needing functionality that is not covered by the core
 set of template primitives. You can extend the template engine by
 defining custom tags and filters using Python, and then make them
-available to your templates using the ``{% load %}`` tag.
+available to your templates using the :ttag:`{% load %}<load>` tag.
 
 Code layout
 -----------
@@ -47,18 +44,20 @@ And in your template you would use the following:
     {% load poll_extras %}
 
 The app that contains the custom tags must be in :setting:`INSTALLED_APPS` in
-order for the ``{% load %}`` tag to work. This is a security feature: It allows
-you to host Python code for many template libraries on a single host machine
-without enabling access to all of them for every Django installation.
+order for the :ttag:`{% load %}<load>` tag to work. This is a security feature:
+It allows you to host Python code for many template libraries on a single host
+machine without enabling access to all of them for every Django installation.
 
 There's no limit on how many modules you put in the ``templatetags`` package.
-Just keep in mind that a ``{% load %}`` statement will load tags/filters for
-the given Python module name, not the name of the app.
+Just keep in mind that a :ttag:`{% load %}<load>` statement will load
+tags/filters for the given Python module name, not the name of the app.
 
 To be a valid tag library, the module must contain a module-level variable
 named ``register`` that is a ``template.Library`` instance, in which all the
 tags and filters are registered. So, near the top of your module, put the
-following::
+following:
+
+.. code-block:: python
 
     from django import template
 
@@ -89,10 +88,12 @@ Filter functions should always return something. They shouldn't raise
 exceptions. They should fail silently. In case of error, they should return
 either the original input or an empty string -- whichever makes more sense.
 
-Here's an example filter definition::
+Here's an example filter definition:
+
+.. code-block:: python
 
     def cut(value, arg):
-        "Removes all values of arg from the given string"
+        """Removes all values of arg from the given string"""
         return value.replace(arg, '')
 
 And here's an example of how that filter would be used:
@@ -102,17 +103,21 @@ And here's an example of how that filter would be used:
     {{ somevariable|cut:"0" }}
 
 Most filters don't take arguments. In this case, just leave the argument out of
-your function. Example::
+your function. Example:
+
+.. code-block:: python
 
     def lower(value): # Only one argument.
-        "Converts a string into all lowercase"
+        """Converts a string into all lowercase"""
         return value.lower()
 
 Registering custom filters
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Once you've written your filter definition, you need to register it with
-your ``Library`` instance, to make it available to Django's template language::
+your ``Library`` instance, to make it available to Django's template language:
+
+.. code-block:: python
 
     register.filter('cut', cut)
     register.filter('lower', lower)
@@ -123,7 +128,9 @@ The ``Library.filter()`` method takes two arguments:
     2. The compilation function -- a Python function (not the name of the
        function as a string).
 
-You can use ``register.filter()`` as a decorator instead::
+You can use ``register.filter()`` as a decorator instead:
+
+.. code-block:: python
 
     @register.filter(name='cut')
     def cut(value, arg):
@@ -141,7 +148,9 @@ Template filters that expect strings
 
 If you're writing a template filter that only expects a string as the first
 argument, you should use the decorator ``stringfilter``. This will
-convert an object to its string value before being passed to your function::
+convert an object to its string value before being passed to your function:
+
+.. code-block:: python
 
     from django import template
     from django.template.defaultfilters import stringfilter
@@ -175,14 +184,17 @@ passed around inside the template code:
 
       Internally, these strings are of type ``SafeString`` or ``SafeUnicode``.
       They share a common base class of ``SafeData``, so you can test
-      for them using code like::
+      for them using code like:
+
+      .. code-block:: python
 
           if isinstance(value, SafeData):
               # Do something with the "safe" string.
+              ...
 
     * **Strings marked as "needing escaping"** are *always* escaped on
-      output, regardless of whether they are in an ``autoescape`` block or not.
-      These strings are only escaped once, however, even if auto-escaping
+      output, regardless of whether they are in an :ttag:`autoescape` block or
+      not. These strings are only escaped once, however, even if auto-escaping
       applies.
 
       Internally, these strings are of type ``EscapeString`` or
@@ -195,7 +207,9 @@ Template filter code falls into one of two situations:
        ``'``, ``"`` or ``&``) into the result that were not already present. In
        this case, you can let Django take care of all the auto-escaping
        handling for you. All you need to do is put the ``is_safe`` attribute on
-       your filter function and set it to ``True``, like so::
+       your filter function and set it to ``True``, like so:
+
+       .. code-block:: python
 
            @register.filter
            def myfilter(value):
@@ -215,10 +229,12 @@ Template filter code falls into one of two situations:
        them all, which would be very difficult, Django repairs the damage after
        the filter has completed.
 
-       For example, suppose you have a filter that adds the string ``xx`` to the
-       end of any input. Since this introduces no dangerous HTML characters to
-       the result (aside from any that were already present), you should mark
-       your filter with ``is_safe``::
+       For example, suppose you have a filter that adds the string ``xx`` to
+       the end of any input. Since this introduces no dangerous HTML characters
+       to the result (aside from any that were already present), you should
+       mark your filter with ``is_safe``:
+
+       .. code-block:: python
 
            @register.filter
            def add_xx(value):
@@ -226,8 +242,8 @@ Template filter code falls into one of two situations:
            add_xx.is_safe = True
 
        When this filter is used in a template where auto-escaping is enabled,
-       Django will escape the output whenever the input is not already marked as
-       "safe".
+       Django will escape the output whenever the input is not already marked
+       as "safe".
 
        By default, ``is_safe`` defaults to ``False``, and you can omit it from
        any filters where it isn't required.
@@ -271,7 +287,9 @@ Template filter code falls into one of two situations:
        auto-escaping is in effect and ``False`` otherwise.
 
        For example, let's write a filter that emphasizes the first character of
-       a string::
+       a string:
+
+       .. code-block:: python
 
            from django.utils.html import conditional_escape
            from django.utils.safestring import mark_safe
@@ -346,7 +364,9 @@ anything else. In our case, let's say the tag should be used like this:
     <p>The time is {% current_time "%Y-%m-%d %I:%M %p" %}.</p>
 
 The parser for this function should grab the parameter and create a ``Node``
-object::
+object:
+
+.. code-block:: python
 
     from django import template
     def do_current_time(parser, token):
@@ -399,7 +419,9 @@ Writing the renderer
 The second step in writing custom tags is to define a ``Node`` subclass that
 has a ``render()`` method.
 
-Continuing the above example, we need to define ``CurrentTimeNode``::
+Continuing the above example, we need to define ``CurrentTimeNode``:
+
+.. code-block:: python
 
     from django import template
     import datetime
@@ -441,7 +463,9 @@ as such.
 Also, if your template tag creates a new context for performing some
 sub-rendering, set the auto-escape attribute to the current context's value.
 The ``__init__`` method for the ``Context`` class takes a parameter called
-``autoescape`` that you can use for this purpose. For example::
+``autoescape`` that you can use for this purpose. For example:
+
+.. code-block:: python
 
     def render(self, context):
         # ...
@@ -449,7 +473,9 @@ The ``__init__`` method for the ``Context`` class takes a parameter called
         # ... Do something with new_context ...
 
 This is not a very common situation, but it's useful if you're rendering a
-template yourself. For example::
+template yourself. For example:
+
+.. code-block:: python
 
     def render(self, context):
         t = template.loader.get_template('small_fragment.html')
@@ -458,7 +484,7 @@ template yourself. For example::
 If we had neglected to pass in the current ``context.autoescape`` value to our
 new ``Context`` in this example, the results would have *always* been
 automatically escaped, which may not be the desired behavior if the template
-tag is used inside a ``{% autoescape off %}`` block.
+tag is used inside a :ttag:`{% autoescape off %}<autoescape>` block.
 
 .. _template_tag_thread_safety:
 
@@ -474,8 +500,11 @@ requests. Therefore, it's important to make sure your template tags are thread
 safe.
 
 To make sure your template tags are thread safe, you should never store state
-information on the node itself. For example, Django provides a builtin ``cycle``
-template tag that cycles among a list of given strings each time it's rendered::
+information on the node itself. For example, Django provides a builtin
+``cycle`` template tag that cycles among a list of given strings each time it's
+rendered:
+
+.. code-block:: html+django
 
     {% for o in some_list %}
         <tr class="{% cycle 'row1' 'row2' %}>
@@ -483,7 +512,9 @@ template tag that cycles among a list of given strings each time it's rendered::
         </tr>
     {% endfor %}
 
-A naive implementation of ``CycleNode`` might look something like this::
+A naive implementation of ``CycleNode`` might look something like this:
+
+.. code-block:: python
 
     class CycleNode(Node):
         def __init__(self, cyclevars):
@@ -509,10 +540,12 @@ obviously not what we want!
 
 To address this problem, Django provides a ``render_context`` that's associated
 with the ``context`` of the template that is currently being rendered. The
-``render_context`` behaves like a Python dictionary, and should be used to store
-``Node`` state between invocations of the ``render`` method.
+``render_context`` behaves like a Python dictionary, and should be used to
+store ``Node`` state between invocations of the ``render`` method.
 
-Let's refactor our ``CycleNode`` implementation to use the ``render_context``::
+Let's refactor our ``CycleNode`` implementation to use the ``render_context``:
+
+.. code-block:: python
 
     class CycleNode(Node):
         def __init__(self, cyclevars):
@@ -534,16 +567,18 @@ like the current iteration of the ``CycleNode``, should be stored in the
 .. note::
     Notice how we used ``self`` to scope the ``CycleNode`` specific information
     within the ``render_context``. There may be multiple ``CycleNodes`` in a
-    given template, so we need to be careful not to clobber another node's state
-    information. The easiest way to do this is to always use ``self`` as the key
-    into ``render_context``. If you're keeping track of several state variables,
-    make ``render_context[self]`` a dictionary.
+    given template, so we need to be careful not to clobber another node's
+    state information. The easiest way to do this is to always use ``self`` as
+    the key into ``render_context``. If you're keeping track of several state
+    variables, make ``render_context[self]`` a dictionary.
 
 Registering the tag
 ~~~~~~~~~~~~~~~~~~~
 
 Finally, register the tag with your module's ``Library`` instance, as explained
-in "Writing custom template filters" above. Example::
+in "Writing custom template filters" above. Example:
+
+.. code-block:: python
 
     register.tag('current_time', do_current_time)
 
@@ -554,15 +589,17 @@ The ``tag()`` method takes two arguments:
     2. The compilation function -- a Python function (not the name of the
        function as a string).
 
-As with filter registration, it is also possible to use this as a decorator::
+As with filter registration, it is also possible to use this as a decorator:
+
+.. code-block:: python
 
     @register.tag(name="current_time")
     def do_current_time(parser, token):
-        # ...
+        ...
 
     @register.tag
     def shout(parser, token):
-        # ...
+        ...
 
 If you leave off the ``name`` argument, as in the second example above, Django
 will use the function's name as the tag name.
@@ -576,8 +613,9 @@ string literals. A little more work is required in order to pass dynamic
 content (a template variable) to a template tag as an argument.
 
 While the previous examples have formatted the current time into a string and
-returned the string, suppose you wanted to pass in a ``DateTimeField`` from an
-object and have the template tag format that date-time:
+returned the string, suppose you wanted to pass in a
+:class:`~django.db.models.DateTimeField` from an object and have the template
+tag format that date-time:
 
 .. code-block:: html+django
 
@@ -586,12 +624,15 @@ object and have the template tag format that date-time:
 Initially, ``token.split_contents()`` will return three values:
 
     1. The tag name ``format_time``.
-    2. The string "blog_entry.date_updated" (without the surrounding quotes).
-    3. The formatting string "%Y-%m-%d %I:%M %p". The return value from
+    2. The string ``"blog_entry.date_updated"`` (without the surrounding
+       quotes).
+    3. The formatting string ``"%Y-%m-%d %I:%M %p"``. The return value from
        ``split_contents()`` will include the leading and trailing quotes for
        string literals like this.
 
-Now your tag should begin to look like this::
+Now your tag should begin to look like this:
+
+.. code-block:: python
 
     from django import template
     def do_format_time(parser, token):
@@ -610,7 +651,9 @@ accomplished by using the ``Variable()`` class in ``django.template``.
 
 To use the ``Variable`` class, simply instantiate it with the name of the
 variable to be resolved, and then call ``variable.resolve(context)``. So,
-for example::
+for example:
+
+.. code-block:: python
 
     class FormatTimeNode(template.Node):
         def __init__(self, date_to_be_formatted, format_string):
@@ -624,13 +667,13 @@ for example::
             except template.VariableDoesNotExist:
                 return ''
 
-Variable resolution will throw a ``VariableDoesNotExist`` exception if it cannot
-resolve the string passed to it in the current context of the page.
+Variable resolution will throw a ``VariableDoesNotExist`` exception if it
+cannot resolve the string passed to it in the current context of the page.
 
 .. _howto-custom-template-tags-simple-tags:
 
-Shortcut for simple tags
-~~~~~~~~~~~~~~~~~~~~~~~~
+Simple tags
+~~~~~~~~~~~
 
 Many template tags take a number of arguments -- strings or template variables
 -- and return a string after doing some processing based solely on
@@ -644,20 +687,24 @@ To ease the creation of these types of tags, Django provides a helper function,
 arguments, wraps it in a ``render`` function and the other necessary bits
 mentioned above and registers it with the template system.
 
-Our earlier ``current_time`` function could thus be written like this::
+Our earlier ``current_time`` function could thus be written like this:
+
+.. code-block:: python
 
     def current_time(format_string):
         return datetime.datetime.now().strftime(format_string)
 
     register.simple_tag(current_time)
 
-The decorator syntax also works::
+The decorator syntax also works:
+
+.. code-block:: python
 
     @register.simple_tag
     def current_time(format_string):
         ...
 
-A couple of things to note about the ``simple_tag`` helper function:
+A few things to note about the ``simple_tag`` helper function:
 
     * Checking for the required number of arguments, etc., has already been
       done by the time our function is called, so we don't need to do that.
@@ -669,7 +716,9 @@ A couple of things to note about the ``simple_tag`` helper function:
 .. versionadded:: 1.3
 
 If your template tag needs to access the current context, you can use the
-``takes_context`` argument when registering your tag::
+``takes_context`` argument when registering your tag:
+
+.. code-block:: python
 
     # The first argument *must* be called "context" here.
     def current_time(context, format_string):
@@ -678,7 +727,9 @@ If your template tag needs to access the current context, you can use the
 
     register.simple_tag(takes_context=True)(current_time)
 
-Or, using decorator syntax::
+Or, using decorator syntax:
+
+.. code-block:: python
 
     @register.simple_tag(takes_context=True)
     def current_time(context, format_string):
@@ -690,13 +741,15 @@ on :ref:`inclusion tags<howto-custom-template-tags-inclusion-tags>`.
 
 .. versionadded:: 1.4
 
-If you need to rename your tag, you can provide a custom name for it::
+If you need to rename your tag, you can provide a custom name for it:
+
+.. code-block:: python
 
     register.simple_tag(lambda x: x - 1, name='minusone')
 
     @register.simple_tag(name='minustwo')
     def some_function(value):
-        return value - 1
+        return value - 2
 
 .. versionadded:: 1.4
 
@@ -714,12 +767,254 @@ arguments. For example:
 
 Then in the template any number of arguments, separated by spaces, may be
 passed to the template tag. Like in Python, the values for keyword arguments
-are set using the equal sign ("``=``") and must be provided after the positional
-arguments. For example:
+are set using the equal sign ("``=``") and must be provided after the
+positional arguments. For example:
 
 .. code-block:: html+django
 
     {% my_tag 123 "abcd" book.title warning=message|lower profile=user.profile %}
+
+.. _howto-custom-template-tags-inclusion-tags:
+
+Inclusion tags
+~~~~~~~~~~~~~~
+
+Another common type of template tag is the type that displays some data by
+rendering *another* template. For example, Django's admin interface uses custom
+template tags to display the buttons along the bottom of the "add/change" form
+pages. Those buttons always look the same, but the link targets change
+depending on the object being edited -- so they're a perfect case for using a
+small template that is filled with details from the current object. (In the
+admin's case, this is the ``submit_row`` tag.)
+
+These sorts of tags are called "inclusion tags".
+
+Writing inclusion tags is probably best demonstrated by example. Let's write a
+tag that outputs a list of choices for a given ``Poll`` object, such as was
+created in the :ref:`tutorials <creating-models>`. We'll use the tag like this:
+
+.. code-block:: html+django
+
+    {% show_results poll %}
+
+...and the output will be something like this:
+
+.. code-block:: html
+
+    <ul>
+      <li>First choice</li>
+      <li>Second choice</li>
+      <li>Third choice</li>
+    </ul>
+
+First, define the function that takes the argument and produces a dictionary of
+data for the result. The important point here is we only need to return a
+dictionary, not anything more complex. This will be used as a template context
+for the template fragment. Example:
+
+.. code-block:: python
+
+    def show_results(poll):
+        choices = poll.choice_set.all()
+        return {'choices': choices}
+
+Next, create the template used to render the tag's output. This template is a
+fixed feature of the tag: the tag writer specifies it, not the template
+designer. Following our example, the template is very simple:
+
+.. code-block:: html+django
+
+    <ul>
+    {% for choice in choices %}
+        <li> {{ choice }} </li>
+    {% endfor %}
+    </ul>
+
+Now, create and register the inclusion tag by calling the ``inclusion_tag()``
+method on a ``Library`` object. Following our example, if the above template is
+in a file called ``results.html`` in a directory that's searched by the
+template loader, we'd register the tag like this:
+
+.. code-block:: python
+
+    # Here, register is a django.template.Library instance, as before
+    register.inclusion_tag('results.html')(show_results)
+
+.. versionchanged:: 1.4
+
+    Alternatively it is possible to register the inclusion tag using a
+    :class:`django.template.Template` instance:
+
+    .. code-block:: python
+
+        from django.template.loader import get_template
+        t = get_template('results.html')
+        register.inclusion_tag(t)(show_results)
+
+As always, decorator syntax works as well, so we could have written:
+
+.. code-block:: python
+
+    @register.inclusion_tag('results.html')
+    def show_results(poll):
+        ...
+
+...when first creating the function.
+
+Sometimes, your inclusion tags might require a large number of arguments,
+making it a pain for template authors to pass in all the arguments and remember
+their order. To solve this, Django provides a ``takes_context`` option for
+inclusion tags. If you specify ``takes_context`` in creating a template tag,
+the tag will have no required arguments, and the underlying Python function
+will have one argument -- the template context as of when the tag was called.
+
+For example, say you're writing an inclusion tag that will always be used in a
+context that contains ``home_link`` and ``home_title`` variables that point
+back to the main page. Here's what the Python function would look like:
+
+.. code-block:: python
+
+    # The first argument *must* be called "context" here.
+    def jump_link(context):
+        return {
+            'link': context['home_link'],
+            'title': context['home_title'],
+        }
+    # Register the custom tag as an inclusion tag with takes_context=True.
+    register.inclusion_tag('link.html', takes_context=True)(jump_link)
+
+(Note that the first parameter to the function *must* be called ``context``.)
+
+In that ``register.inclusion_tag()`` line, we specified ``takes_context=True``
+and the name of the template. Here's what the template ``link.html`` might look
+like:
+
+.. code-block:: html+django
+
+    Jump directly to <a href="{{ link }}">{{ title }}</a>.
+
+Then, any time you want to use that custom tag, load its library and call it
+without any arguments, like so:
+
+.. code-block:: html+django
+
+    {% jump_link %}
+
+Note that when you're using ``takes_context=True``, there's no need to pass
+arguments to the template tag. It automatically gets access to the context.
+
+The ``takes_context`` parameter defaults to ``False``. When it's set to
+``True``, the tag is passed the context object, as in this example. That's the
+only difference between this case and the previous ``inclusion_tag`` example.
+
+.. versionadded:: 1.4
+
+``inclusion_tag`` functions may accept any number of positional or keyword
+arguments. For example:
+
+.. code-block:: python
+
+    @register.inclusion_tag('my_template.html')
+    def my_tag(a, b, *args, **kwargs):
+        warning = kwargs['warning']
+        profile = kwargs['profile']
+        ...
+        return ...
+
+Then in the template any number of arguments, separated by spaces, may be
+passed to the template tag. Like in Python, the values for keyword arguments
+are set using the equal sign ("``=``") and must be provided after the
+positional arguments. For example:
+
+.. code-block:: html+django
+
+    {% my_tag 123 "abcd" book.title warning=message|lower profile=user.profile %}
+
+Setting a variable in the context
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The above examples simply output a value. Generally, it's more flexible if your
+template tags set template variables instead of outputting values. That way,
+template authors can reuse the values that your template tags create.
+
+To set a variable in the context, just use dictionary assignment on the context
+object in the ``render()`` method. Here's an updated version of
+``CurrentTimeNode`` that sets a template variable ``current_time`` instead of
+outputting it:
+
+.. code-block:: python
+
+    class CurrentTimeNode2(template.Node):
+        def __init__(self, format_string):
+            self.format_string = format_string
+        def render(self, context):
+            context['current_time'] = datetime.datetime.now().strftime(self.format_string)
+            return ''
+
+Note that ``render()`` returns the empty string. ``render()`` should always
+return string output. If all the template tag does is set a variable,
+``render()`` should return the empty string.
+
+Here's how you'd use this new version of the tag:
+
+.. code-block:: html+django
+
+    {% current_time "%Y-%M-%d %I:%M %p" %}<p>The time is {{ current_time }}.</p>
+
+.. admonition:: Variable scope in context
+
+    Any variable set in the context will only be available in the same
+    ``block`` of the template in which it was assigned. This behavior is
+    intentional; it provides a scope for variables so that they don't conflict
+    with context in other blocks.
+
+But, there's a problem with ``CurrentTimeNode2``: The variable name
+``current_time`` is hard-coded. This means you'll need to make sure your
+template doesn't use ``{{ current_time }}`` anywhere else, because the
+``{% current_time %}`` will blindly overwrite that variable's value. A cleaner
+solution is to make the template tag specify the name of the output variable,
+like so:
+
+.. code-block:: html+django
+
+    {% current_time "%Y-%M-%d %I:%M %p" as my_current_time %}
+    <p>The current time is {{ my_current_time }}.</p>
+
+To do that, you'll need to refactor both the compilation function and ``Node``
+class, like so:
+
+.. code-block:: python
+
+    class CurrentTimeNode3(template.Node):
+        def __init__(self, format_string, var_name):
+            self.format_string = format_string
+            self.var_name = var_name
+        def render(self, context):
+            context[self.var_name] = datetime.datetime.now().strftime(self.format_string)
+            return ''
+
+    import re
+    def do_current_time(parser, token):
+        # This version uses a regular expression to parse tag contents.
+        try:
+            # Splitting by None == splitting by spaces.
+            tag_name, arg = token.contents.split(None, 1)
+        except ValueError:
+            raise template.TemplateSyntaxError("%r tag requires arguments" % token.contents.split()[0])
+        m = re.search(r'(.*?) as (\w+)', arg)
+        if not m:
+            raise template.TemplateSyntaxError("%r tag had invalid arguments" % tag_name)
+        format_string, var_name = m.groups()
+        if not (format_string[0] == format_string[-1] and format_string[0] in ('"', "'")):
+            raise template.TemplateSyntaxError("%r tag's argument should be in quotes" % tag_name)
+        return CurrentTimeNode3(format_string[1:-1], var_name)
+
+The difference here is that ``do_current_time()`` grabs the format string and
+the variable name, passing both to ``CurrentTimeNode3``.
+
+Finally, if you only need to have a simple syntax for your custom
+context-updating template tag, you might want to consider using an
+:ref:`assignment tag <howto-custom-template-tags-assignment-tags>`.
 
 .. _howto-custom-template-tags-assignment-tags:
 
@@ -728,12 +1023,11 @@ Assignment tags
 
 .. versionadded:: 1.4
 
-Another common type of template tag is the type that fetches some data and
-stores it in a context variable. To ease the creation of this type of tags,
-Django provides a helper function, ``assignment_tag``. This function works
-the same way as :ref:`simple_tag<howto-custom-template-tags-simple-tags>`,
-except that it stores the tag's result in a specified context variable instead
-of directly outputting it.
+To ease the creation of tags setting a variable in the context, Django provides
+a helper function, ``assignment_tag``. This function works the same way as
+:ref:`simple_tag<howto-custom-template-tags-simple-tags>`, except that it
+stores the tag's result in a specified context variable instead of directly
+outputting it.
 
 Our earlier ``current_time`` function could thus be written like this:
 
@@ -798,245 +1092,24 @@ arguments. For example:
 
 Then in the template any number of arguments, separated by spaces, may be
 passed to the template tag. Like in Python, the values for keyword arguments
-are set using the equal sign ("``=``") and must be provided after the positional
-arguments. For example:
+are set using the equal sign ("``=``") and must be provided after the
+positional arguments. For example:
 
 .. code-block:: html+django
 
     {% my_tag 123 "abcd" book.title warning=message|lower profile=user.profile as the_result %}
 
-.. _howto-custom-template-tags-inclusion-tags:
-
-Inclusion tags
-~~~~~~~~~~~~~~
-
-Another common type of template tag is the type that displays some data by
-rendering *another* template. For example, Django's admin interface uses custom
-template tags to display the buttons along the bottom of the "add/change" form
-pages. Those buttons always look the same, but the link targets change depending
-on the object being edited -- so they're a perfect case for using a small
-template that is filled with details from the current object. (In the admin's
-case, this is the ``submit_row`` tag.)
-
-These sorts of tags are called "inclusion tags".
-
-Writing inclusion tags is probably best demonstrated by example. Let's write a
-tag that outputs a list of choices for a given ``Poll`` object, such as was
-created in the :ref:`tutorials <creating-models>`. We'll use the tag like this:
-
-.. code-block:: html+django
-
-    {% show_results poll %}
-
-...and the output will be something like this:
-
-.. code-block:: html
-
-    <ul>
-      <li>First choice</li>
-      <li>Second choice</li>
-      <li>Third choice</li>
-    </ul>
-
-First, define the function that takes the argument and produces a dictionary of
-data for the result. The important point here is we only need to return a
-dictionary, not anything more complex. This will be used as a template context
-for the template fragment. Example::
-
-    def show_results(poll):
-        choices = poll.choice_set.all()
-        return {'choices': choices}
-
-Next, create the template used to render the tag's output. This template is a
-fixed feature of the tag: the tag writer specifies it, not the template
-designer. Following our example, the template is very simple:
-
-.. code-block:: html+django
-
-    <ul>
-    {% for choice in choices %}
-        <li> {{ choice }} </li>
-    {% endfor %}
-    </ul>
-
-Now, create and register the inclusion tag by calling the ``inclusion_tag()``
-method on a ``Library`` object. Following our example, if the above template is
-in a file called ``results.html`` in a directory that's searched by the template
-loader, we'd register the tag like this::
-
-    # Here, register is a django.template.Library instance, as before
-    register.inclusion_tag('results.html')(show_results)
-
-.. versionchanged:: 1.4
-
-    Alternatively it is possible to register the inclusion tag using a
-    :class:`django.template.Template` instance::
-
-        from django.template.loader import get_template
-        t = get_template('results.html')
-        register.inclusion_tag(t)(show_results)
-
-As always, decorator syntax works as well, so we could have written::
-
-    @register.inclusion_tag('results.html')
-    def show_results(poll):
-        ...
-
-...when first creating the function.
-
-Sometimes, your inclusion tags might require a large number of arguments,
-making it a pain for template authors to pass in all the arguments and remember
-their order. To solve this, Django provides a ``takes_context`` option for
-inclusion tags. If you specify ``takes_context`` in creating a template tag,
-the tag will have no required arguments, and the underlying Python function
-will have one argument -- the template context as of when the tag was called.
-
-For example, say you're writing an inclusion tag that will always be used in a
-context that contains ``home_link`` and ``home_title`` variables that point
-back to the main page. Here's what the Python function would look like::
-
-    # The first argument *must* be called "context" here.
-    def jump_link(context):
-        return {
-            'link': context['home_link'],
-            'title': context['home_title'],
-        }
-    # Register the custom tag as an inclusion tag with takes_context=True.
-    register.inclusion_tag('link.html', takes_context=True)(jump_link)
-
-(Note that the first parameter to the function *must* be called ``context``.)
-
-In that ``register.inclusion_tag()`` line, we specified ``takes_context=True``
-and the name of the template. Here's what the template ``link.html`` might look
-like:
-
-.. code-block:: html+django
-
-    Jump directly to <a href="{{ link }}">{{ title }}</a>.
-
-Then, any time you want to use that custom tag, load its library and call it
-without any arguments, like so:
-
-.. code-block:: html+django
-
-    {% jump_link %}
-
-Note that when you're using ``takes_context=True``, there's no need to pass
-arguments to the template tag. It automatically gets access to the context.
-
-The ``takes_context`` parameter defaults to ``False``. When it's set to *True*,
-the tag is passed the context object, as in this example. That's the only
-difference between this case and the previous ``inclusion_tag`` example.
-
-.. versionadded:: 1.4
-
-``inclusion_tag`` functions may accept any number of positional or keyword
-arguments. For example:
-
-.. code-block:: python
-
-    @register.inclusion_tag('my_template.html')
-    def my_tag(a, b, *args, **kwargs):
-        warning = kwargs['warning']
-        profile = kwargs['profile']
-        ...
-        return ...
-
-Then in the template any number of arguments, separated by spaces, may be
-passed to the template tag. Like in Python, the values for keyword arguments
-are set using the equal sign ("``=``") and must be provided after the positional
-arguments. For example:
-
-.. code-block:: html+django
-
-    {% my_tag 123 "abcd" book.title warning=message|lower profile=user.profile %}
-
-Setting a variable in the context
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The above examples simply output a value. Generally, it's more flexible if your
-template tags set template variables instead of outputting values. That way,
-template authors can reuse the values that your template tags create.
-
-To set a variable in the context, just use dictionary assignment on the context
-object in the ``render()`` method. Here's an updated version of
-``CurrentTimeNode`` that sets a template variable ``current_time`` instead of
-outputting it::
-
-    class CurrentTimeNode2(template.Node):
-        def __init__(self, format_string):
-            self.format_string = format_string
-        def render(self, context):
-            context['current_time'] = datetime.datetime.now().strftime(self.format_string)
-            return ''
-
-Note that ``render()`` returns the empty string. ``render()`` should always
-return string output. If all the template tag does is set a variable,
-``render()`` should return the empty string.
-
-Here's how you'd use this new version of the tag:
-
-.. code-block:: html+django
-
-    {% current_time "%Y-%M-%d %I:%M %p" %}<p>The time is {{ current_time }}.</p>
-
-.. admonition:: Variable scope in context
-
-    Any variable set in the context will only be available in the same ``block``
-    of the template in which it was assigned. This behavior is intentional;
-    it provides a scope for variables so that they don't conflict with
-    context in other blocks.
-
-But, there's a problem with ``CurrentTimeNode2``: The variable name
-``current_time`` is hard-coded. This means you'll need to make sure your
-template doesn't use ``{{ current_time }}`` anywhere else, because the
-``{% current_time %}`` will blindly overwrite that variable's value. A cleaner
-solution is to make the template tag specify the name of the output variable,
-like so:
-
-.. code-block:: html+django
-
-    {% current_time "%Y-%M-%d %I:%M %p" as my_current_time %}
-    <p>The current time is {{ my_current_time }}.</p>
-
-To do that, you'll need to refactor both the compilation function and ``Node``
-class, like so::
-
-    class CurrentTimeNode3(template.Node):
-        def __init__(self, format_string, var_name):
-            self.format_string = format_string
-            self.var_name = var_name
-        def render(self, context):
-            context[self.var_name] = datetime.datetime.now().strftime(self.format_string)
-            return ''
-
-    import re
-    def do_current_time(parser, token):
-        # This version uses a regular expression to parse tag contents.
-        try:
-            # Splitting by None == splitting by spaces.
-            tag_name, arg = token.contents.split(None, 1)
-        except ValueError:
-            raise template.TemplateSyntaxError("%r tag requires arguments" % token.contents.split()[0])
-        m = re.search(r'(.*?) as (\w+)', arg)
-        if not m:
-            raise template.TemplateSyntaxError("%r tag had invalid arguments" % tag_name)
-        format_string, var_name = m.groups()
-        if not (format_string[0] == format_string[-1] and format_string[0] in ('"', "'")):
-            raise template.TemplateSyntaxError("%r tag's argument should be in quotes" % tag_name)
-        return CurrentTimeNode3(format_string[1:-1], var_name)
-
-The difference here is that ``do_current_time()`` grabs the format string and
-the variable name, passing both to ``CurrentTimeNode3``.
-
 Parsing until another block tag
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Template tags can work in tandem. For instance, the standard ``{% comment %}``
-tag hides everything until ``{% endcomment %}``. To create a template tag such
-as this, use ``parser.parse()`` in your compilation function.
+Template tags can work in tandem. For instance, the standard
+:ttag:`{% comment %}<comment>` tag hides everything until ``{% endcomment %}``.
+To create a template tag such as this, use ``parser.parse()`` in your
+compilation function.
 
-Here's how the standard ``{% comment %}`` tag is implemented::
+Here's how the standard :ttag:`{% comment %}<comment>` tag is implemented:
+
+.. code-block:: python
 
     def do_comment(parser, token):
         nodelist = parser.parse(('endcomment',))
@@ -1081,7 +1154,9 @@ Usage:
     {% upper %}This will appear in uppercase, {{ your_name }}.{% endupper %}
 
 As in the previous example, we'll use ``parser.parse()``. But this time, we
-pass the resulting ``nodelist`` to the ``Node``::
+pass the resulting ``nodelist`` to the ``Node``:
+
+.. code-block:: python
 
     def do_upper(parser, token):
         nodelist = parser.parse(('endupper',))
@@ -1098,6 +1173,7 @@ pass the resulting ``nodelist`` to the ``Node``::
 The only new concept here is the ``self.nodelist.render(context)`` in
 ``UpperNode.render()``.
 
-For more examples of complex rendering, see the source code for ``{% if %}``,
-``{% for %}``, ``{% ifequal %}`` and ``{% ifchanged %}``. They live in
+For more examples of complex rendering, see the source code for
+:ttag:`{% if %}<if>`, :ttag:`{% for %}<for>`, :ttag:`{% ifequal %}<ifequal>`
+or :ttag:`{% ifchanged %}<ifchanged>`. They live in
 ``django/template/defaulttags.py``.
