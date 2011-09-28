@@ -134,12 +134,12 @@ below) will also have a couple of extra methods:
     to point to it. If ``save`` is ``True``, the model's ``save()`` method will
     be called once the file is saved. That is, these two lines::
 
-        >>> car.photo.save('myphoto.jpg', contents, save=False)
+        >>> car.photo.save('myphoto.jpg', content, save=False)
         >>> car.save()
 
     are the same as this one line::
 
-        >>> car.photo.save('myphoto.jpg', contents, save=True)
+        >>> car.photo.save('myphoto.jpg', content, save=True)
 
     Note that the ``content`` argument must be an instance of either
     :class:`File` or of a subclass of :class:`File`, such as
