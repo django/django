@@ -417,58 +417,63 @@ class ForeignRelatedObjectsDescriptor(object):
         rel_model = self.related.model
 
         class RelatedManager(superclass):
+            def __init__(self, model=None, core_filters=None, instance=None):
+                super(RelatedManager, self).__init__()
+                self.model = model
+                self.core_filters = core_filters
+                self.instance = instance
+
             def get_query_set(self):
-                db = self._db or router.db_for_read(rel_model, instance=instance)
+                db = self._db or router.db_for_read(rel_model, instance=self.instance)
                 return superclass.get_query_set(self).using(db).filter(**(self.core_filters))
 
             def add(self, *objs):
                 for obj in objs:
                     if not isinstance(obj, self.model):
                         raise TypeError("'%s' instance expected" % self.model._meta.object_name)
-                    setattr(obj, rel_field.name, instance)
+                    setattr(obj, rel_field.name, self.instance)
                     obj.save()
             add.alters_data = True
 
             def create(self, **kwargs):
-                kwargs[rel_field.name] = instance
-                db = router.db_for_write(rel_model, instance=instance)
+                kwargs[rel_field.name] = self.instance
+                db = router.db_for_write(rel_model, instance=self.instance)
                 return super(RelatedManager, self.db_manager(db)).create(**kwargs)
             create.alters_data = True
 
             def get_or_create(self, **kwargs):
                 # Update kwargs with the related object that this
                 # ForeignRelatedObjectsDescriptor knows about.
-                kwargs[rel_field.name] = instance
-                db = router.db_for_write(rel_model, instance=instance)
+                kwargs[rel_field.name] = self.instance
+                db = router.db_for_write(rel_model, instance=self.instance)
                 return super(RelatedManager, self.db_manager(db)).get_or_create(**kwargs)
             get_or_create.alters_data = True
 
             # remove() and clear() are only provided if the ForeignKey can have a value of null.
             if rel_field.null:
                 def remove(self, *objs):
-                    val = getattr(instance, rel_field.rel.get_related_field().attname)
+                    val = getattr(self.instance, rel_field.rel.get_related_field().attname)
                     for obj in objs:
                         # Is obj actually part of this descriptor set?
                         if getattr(obj, rel_field.attname) == val:
                             setattr(obj, rel_field.name, None)
                             obj.save()
                         else:
-                            raise rel_field.rel.to.DoesNotExist("%r is not related to %r." % (obj, instance))
+                            raise rel_field.rel.to.DoesNotExist("%r is not related to %r." % (obj, self.instance))
                 remove.alters_data = True
 
                 def clear(self):
                     self.update(**{rel_field.name: None})
                 clear.alters_data = True
 
-        manager = RelatedManager()
         attname = rel_field.rel.get_related_field().name
-        manager.core_filters = {'%s__%s' % (rel_field.name, attname):
-                getattr(instance, attname)}
-        manager.model = self.related.model
+        return RelatedManager(model=self.related.model,
+                              core_filters = {'%s__%s' % (rel_field.name, attname):
+                                                  getattr(instance, attname)},
+                              instance=instance
+                              )
 
-        return manager
-
-def create_many_related_manager(superclass, rel=False):
+def create_many_related_manager(superclass, rel):
     """Creates a manager that subclasses 'superclass' (which is a Manager)
     and adds behavior for many-to-many related objects."""
     through = rel.through
