@@ -266,7 +266,7 @@ def create_generic_related_manager(superclass):
                 '%s__pk' % self.content_type_field_name : self.content_type.id,
                 '%s__exact' % self.object_id_field_name : self.pk_val,
             }
-            return superclass.get_query_set(self).using(db).filter(**query)
+            return super(GenericRelatedObjectManager, self).get_query_set().using(db).filter(**query)
 
         def add(self, *objs):
             for obj in objs:
