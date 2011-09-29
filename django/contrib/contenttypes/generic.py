@@ -214,6 +214,7 @@ class ReverseGenericRelatedObjectsDescriptor(object):
         RelatedManager = create_generic_related_manager(superclass)
 
         qn = connection.ops.quote_name
+        content_type = ContentType.objects.db_manager(instance._state.db).get_for_model(instance)
 
         manager = RelatedManager(
             model = rel_model,
@@ -221,9 +222,14 @@ class ReverseGenericRelatedObjectsDescriptor(object):
             symmetrical = (self.field.rel.symmetrical and instance.__class__ == rel_model),
             source_col_name = qn(self.field.m2m_column_name()),
             target_col_name = qn(self.field.m2m_reverse_name()),
-            content_type = ContentType.objects.db_manager(instance._state.db).get_for_model(instance),
+            content_type = content_type,
             content_type_field_name = self.field.content_type_field_name,
-            object_id_field_name = self.field.object_id_field_name
+            object_id_field_name = self.field.object_id_field_name,
+            core_filters = {
+                '%s__pk' % self.field.content_type_field_name: content_type.id,
+                '%s__exact' % self.field.object_id_field_name: instance._get_pk_val(),
+            }
+
         )
 
         return manager
@@ -249,7 +255,7 @@ def create_generic_related_manager(superclass):
                      content_type_field_name=None, object_id_field_name=None):
 
             super(GenericRelatedObjectManager, self).__init__()
-            self.core_filters = core_filters or {}
+            self.core_filters = core_filters
             self.model = model
             self.content_type = content_type
             self.symmetrical = symmetrical
@@ -262,11 +268,7 @@ def create_generic_related_manager(superclass):
 
         def get_query_set(self):
             db = self._db or router.db_for_read(self.model, instance=self.instance)
-            query = {
-                '%s__pk' % self.content_type_field_name : self.content_type.id,
-                '%s__exact' % self.object_id_field_name : self.pk_val,
-            }
-            return super(GenericRelatedObjectManager, self).get_query_set().using(db).filter(**query)
+            return super(GenericRelatedObjectManager, self).get_query_set().using(db).filter(**self.core_filters)
 
         def add(self, *objs):
             for obj in objs:
