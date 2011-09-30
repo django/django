@@ -8,6 +8,7 @@ from django import forms
 from django.test import TestCase
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.validators import ValidationError
+from django.db import connection
 from django.forms.models import model_to_dict
 from django.utils.unittest import skipUnless
 
@@ -1313,11 +1314,17 @@ class OldFormForXTests(TestCase):
         instance.delete()
 
         # Test the non-required ImageField
+        # Note: In Oracle, we expect a null ImageField to return u'' instead of
+        # None.
+        if connection.features.interprets_empty_strings_as_nulls:
+            expected_null_imagefield_repr = u''
+        else:
+            expected_null_imagefield_repr = None
 
         f = OptionalImageFileForm(data={'description': u'Test'})
         self.assertEqual(f.is_valid(), True)
         instance = f.save()
-        self.assertEqual(instance.image.name, None)
+        self.assertEqual(instance.image.name, expected_null_imagefield_repr)
         self.assertEqual(instance.width, None)
         self.assertEqual(instance.height, None)
 
