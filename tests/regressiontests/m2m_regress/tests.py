@@ -73,3 +73,17 @@ class M2MRegressionTests(TestCase):
 
         self.assertQuerysetEqual(c1.tags.all(), ["<Tag: t1>", "<Tag: t2>"])
         self.assertQuerysetEqual(t1.tag_collections.all(), ["<TagCollection: c1>"])
+
+    def test_manager_class_caching(self):
+        e1 = Entry.objects.create()
+        e2 = Entry.objects.create()
+        t1 = Tag.objects.create()
+        t2 = Tag.objects.create()
+
+        # Get same manager twice in a row:
+        self.assertTrue(t1.entry_set.__class__ is t1.entry_set.__class__)
+        self.assertTrue(e1.topics.__class__ is e1.topics.__class__)
+
+        # Get same manager for different instances
+        self.assertTrue(e1.topics.__class__ is e2.topics.__class__)
+        self.assertTrue(t1.entry_set.__class__ is t2.entry_set.__class__)
