@@ -9,8 +9,7 @@ from django.conf import settings
 import django.template.context
 from django.template import Template, Context
 from django.template.response import (TemplateResponse, SimpleTemplateResponse,
-                                      ContentNotRenderedError,
-                                      DiscardedAttributeError)
+                                      ContentNotRenderedError)
 
 def test_processor(request):
     return {'processors': 'yes'}
@@ -198,7 +197,7 @@ class SimpleTemplateResponseTest(BaseTemplateResponseTest):
 
         # ...and requesting any of those attributes raises an exception
         for attr in template_attrs:
-            with self.assertRaises(DiscardedAttributeError) as cm:
+            with self.assertRaises(AttributeError):
                 getattr(unpickled_response, attr)
 
     def test_repickling(self):
@@ -282,7 +281,7 @@ class TemplateResponseTest(BaseTemplateResponseTest):
 
         # ...and requesting any of those attributes raises an exception
         for attr in template_attrs:
-            with self.assertRaises(DiscardedAttributeError) as cm:
+            with self.assertRaises(AttributeError):
                 getattr(unpickled_response, attr)
 
     def test_repickling(self):
