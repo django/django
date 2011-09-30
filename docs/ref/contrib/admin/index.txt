@@ -713,13 +713,14 @@ subclass::
 .. attribute:: ModelAdmin.list_select_related
 
     Set ``list_select_related`` to tell Django to use
-    :meth:`~django.db.models.QuerySet.select_related` in retrieving the list of
-    objects on the admin change list page. This can save you a bunch of
-    database queries.
+    :meth:`~django.db.models.query.QuerySet.select_related` in retrieving
+    the list of objects on the admin change list page. This can save you a
+    bunch of database queries.
 
     The value should be either ``True`` or ``False``. Default is ``False``.
 
-    Note that Django will use :meth:`~django.db.models.QuerySet.select_related`,
+    Note that Django will use
+    :meth:`~django.db.models.query.QuerySet.select_related`,
     regardless of this setting if one of the ``list_display`` fields is a
     ``ForeignKey``.
 
@@ -1182,9 +1183,9 @@ templates used by the :class:`ModelAdmin` views:
 .. method:: ModelAdmin.queryset(self, request)
 
     The ``queryset`` method on a ``ModelAdmin`` returns a
-    :class:`~django.db.models.QuerySet` of all model instances that can be
-    edited by the admin site. One use case for overriding this method is
-    to show objects owned by the logged-in user::
+    :class:`~django.db.models.query.QuerySet` of all model instances that
+    can be edited by the admin site. One use case for overriding this method
+    is to show objects owned by the logged-in user::
 
         class MyModelAdmin(admin.ModelAdmin):
             def queryset(self, request):

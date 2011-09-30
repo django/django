@@ -23,13 +23,14 @@ models. For example, here's the user module from Django's built-in
 .. warning::
 
     The "delete selected objects" action uses :meth:`QuerySet.delete()
-    <django.db.models.QuerySet.delete>` for efficiency reasons, which has an
-    important caveat: your model's ``delete()`` method will not be called.
-    
+    <django.db.models.query.QuerySet.delete>` for efficiency reasons, which
+    has an important caveat: your model's ``delete()`` method will not be
+    called.
+
     If you wish to override this behavior, simply write a custom action which
     accomplishes deletion in your preferred manner -- for example, by calling
     ``Model.delete()`` for each of the selected items.
-    
+
     For more background on bulk deletion, see the documentation on :ref:`object
     deletion <topics-db-queries-delete>`.
 
@@ -55,10 +56,10 @@ simple news application with an ``Article`` model::
         title = models.CharField(max_length=100)
         body = models.TextField()
         status = models.CharField(max_length=1, choices=STATUS_CHOICES)
-    
+
         def __unicode__(self):
             return self.title
-        
+
 A common task we might perform with a model like this is to update an
 article's status from "draft" to "published". We could easily do this in the
 admin one article at a time, but if we wanted to bulk-publish a group of
@@ -70,29 +71,29 @@ Writing action functions
 
 First, we'll need to write a function that gets called when the action is
 trigged from the admin. Action functions are just regular functions that take
-three arguments: 
-    
+three arguments:
+
     * The current :class:`ModelAdmin`
     * An :class:`~django.http.HttpRequest` representing the current request,
-    * A :class:`~django.db.models.QuerySet` containing the set of objects
-      selected by the user.
+    * A :class:`~django.db.models.query.QuerySet` containing the set of
+      objects selected by the user.
 
 Our publish-these-articles function won't need the :class:`ModelAdmin` or the
 request object, but we will use the queryset::
 
     def make_published(modeladmin, request, queryset):
         queryset.update(status='p')
-        
+
 .. note::
 
     For the best performance, we're using the queryset's :ref:`update method
     <topics-db-queries-update>`. Other types of actions might need to deal
     with each object individually; in these cases we'd just iterate over the
     queryset::
-    
+
         for obj in queryset:
             do_something_with(obj)
-            
+
 That's actually all there is to writing an action! However, we'll take one
 more optional-but-useful step and give the action a "nice" title in the admin.
 By default, this action would appear in the action list as "Make published" --
@@ -103,13 +104,13 @@ can provide a better, more human-friendly name by giving the
     def make_published(modeladmin, request, queryset):
         queryset.update(status='p')
     make_published.short_description = "Mark selected stories as published"
-    
+
 .. note::
 
     This might look familiar; the admin's ``list_display`` option uses the
     same technique to provide human-readable descriptions for callback
     functions registered there, too.
-    
+
 Adding actions to the :class:`ModelAdmin`
 -----------------------------------------
 
@@ -130,11 +131,11 @@ the action and its registration would look like::
         actions = [make_published]
 
     admin.site.register(Article, ArticleAdmin)
-    
+
 That code will give us an admin change list that looks something like this:
 
 .. image:: _images/article_actions.png
-    
+
 That's really all there is to it! If you're itching to write your own actions,
 you now know enough to get started. The rest of this document just covers more
 advanced techniques.
@@ -157,13 +158,13 @@ That's easy enough to do::
 
     class ArticleAdmin(admin.ModelAdmin):
         ...
-        
+
         actions = ['make_published']
 
         def make_published(self, request, queryset):
             queryset.update(status='p')
         make_published.short_description = "Mark selected stories as published"
-        
+
 Notice first that we've moved ``make_published`` into a method and renamed the
 `modeladmin` parameter to `self`, and second that we've now put the string
 ``'make_published'`` in ``actions`` instead of a direct function reference. This
@@ -193,7 +194,7 @@ This make the action match what the admin itself does after successfully
 performing an action:
 
 .. image:: _images/article_actions_message.png
-    
+
 Actions that provide intermediate pages
 ---------------------------------------
 
@@ -230,7 +231,7 @@ that simply redirects to your custom export view::
     from django.contrib import admin
     from django.contrib.contenttypes.models import ContentType
     from django.http import HttpResponseRedirect
-    
+
     def export_selected_objects(modeladmin, request, queryset):
         selected = request.POST.getlist(admin.ACTION_CHECKBOX_NAME)
         ct = ContentType.objects.get_for_model(queryset.model)
@@ -255,7 +256,7 @@ Making actions available site-wide
     example::
 
         from django.contrib import admin
-        
+
         admin.site.add_action(export_selected_objects)
 
     This makes the `export_selected_objects` action globally available as an
@@ -263,7 +264,7 @@ Making actions available site-wide
     a name -- good if you later want to programatically :ref:`remove the action
     <disabling-admin-actions>` -- by passing a second argument to
     :meth:`AdminSite.add_action()`::
-    
+
         admin.site.add_action(export_selected_objects, 'export_selected')
 
 .. _disabling-admin-actions:
@@ -282,32 +283,32 @@ Disabling a site-wide action
 
     If you need to disable a :ref:`site-wide action <adminsite-actions>` you can
     call :meth:`AdminSite.disable_action()`.
-    
+
     For example, you can use this method to remove the built-in "delete selected
     objects" action::
-    
+
         admin.site.disable_action('delete_selected')
-        
+
     Once you've done the above, that action will no longer be available
     site-wide.
-    
+
     If, however, you need to re-enable a globally-disabled action for one
     particular model, simply list it explicitly in your ``ModelAdmin.actions``
     list::
-    
+
         # Globally disable delete selected
         admin.site.disable_action('delete_selected')
-        
+
         # This ModelAdmin will not have delete_selected available
         class SomeModelAdmin(admin.ModelAdmin):
             actions = ['some_other_action']
             ...
-            
+
         # This one will
         class AnotherModelAdmin(admin.ModelAdmin):
             actions = ['delete_selected', 'a_third_action']
             ...
-            
+
 
 Disabling all actions for a particular :class:`ModelAdmin`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -317,7 +318,7 @@ set :attr:`ModelAdmin.actions` to ``None``::
 
     class MyModelAdmin(admin.ModelAdmin):
         actions = None
-        
+
 This tells the :class:`ModelAdmin` to not display or allow any actions,
 including any :ref:`site-wide actions <adminsite-actions>`.
 
@@ -326,7 +327,7 @@ Conditionally enabling or disabling actions
 
 .. method:: ModelAdmin.get_actions(request)
 
-    Finally, you can conditionally enable or disable actions on a per-request 
+    Finally, you can conditionally enable or disable actions on a per-request
     (and hence per-user basis) by overriding :meth:`ModelAdmin.get_actions`.
 
     This returns a dictionary of actions allowed. The keys are action names, and
@@ -336,15 +337,15 @@ Conditionally enabling or disabling actions
     the list gathered by the superclass. For example, if I only wanted users
     whose names begin with 'J' to be able to delete objects in bulk, I could do
     the following::
-    
+
         class MyModelAdmin(admin.ModelAdmin):
             ...
-            
+
             def get_actions(self, request):
                 actions = super(MyModelAdmin, self).get_actions(request)
                 if request.user.username[0].upper() != 'J':
                     if 'delete_selected' in actions:
                         del actions['delete_selected']
                 return actions
-    
+
 

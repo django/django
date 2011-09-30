@@ -116,7 +116,8 @@ model it represents, or to retrieve objects from that model:
 
     Takes a set of valid :ref:`lookup arguments <field-lookups-intro>` for the
     model the :class:`~django.contrib.contenttypes.models.ContentType`
-    represents, and does :meth:`a get() lookup <django.db.models.QuerySet.get>`
+    represents, and does
+    :meth:`a get() lookup <django.db.models.query.QuerySet.get>`
     on that model, returning the corresponding object.
 
 .. method:: ContentType.model_class()
@@ -416,9 +417,9 @@ might be tempted to try something like::
 
 This will not work correctly, however. The generic relation adds extra filters
 to the queryset to ensure the correct content type, but the
-:meth:`~django.db.models.QuerySet.aggregate` method doesn't take them into
-account. For now, if you need aggregates on generic relations, you'll need
-to calculate them without using the aggregation API.
+:meth:`~django.db.models.query.QuerySet.aggregate` method doesn't take them
+into account. For now, if you need aggregates on generic relations, you'll
+need to calculate them without using the aggregation API.
 
 Generic relations in forms and admin
 ------------------------------------

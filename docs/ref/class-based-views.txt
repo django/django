@@ -388,7 +388,7 @@ MultipleObjectTemplateResponseMixin
     that operate upon a list of object instances. Requires that the view it is
     mixed with provides ``self.object_list``, the list of object instances that
     the view is operating on. ``self.object_list`` may be, but is not required
-    to be, a :class:`~django.db.models.Queryset`.
+    to be, a :class:`~django.db.models.query.QuerySet`.
 
     **Extends**
 
@@ -814,7 +814,7 @@ BaseDateListView
         Returns the list of dates of type ``date_type`` for which
         ``queryset`` contains entries. For example, ``get_date_list(qs,
         'year')`` will return the list of years for which ``qs`` has entries.
-        See :meth:`~django.db.models.QuerySet.dates()` for the
+        See :meth:`~django.db.models.query.QuerySet.dates()` for the
         ways that the ``date_type`` argument can be used.
 
 

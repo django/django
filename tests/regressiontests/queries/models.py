@@ -334,7 +334,7 @@ class CategoryItem(models.Model):
     category = models.ForeignKey(SimpleCategory)
 
     def __unicode__(self):
- 	    return "category item: " + str(self.category)
+        return "category item: " + str(self.category)
 
 class OneToOneCategory(models.Model):
     new_name = models.CharField(max_length=15)

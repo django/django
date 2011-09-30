@@ -106,11 +106,11 @@ described here.
 
 .. admonition:: You can't share pickles between versions
 
-	Pickles of QuerySets are only valid for the version of Django that
-	was used to generate them. If you generate a pickle using Django
-	version N, there is no guarantee that pickle will be readable with
-	Django version N+1. Pickles should not be used as part of a long-term
-	archival strategy.
+    Pickles of QuerySets are only valid for the version of Django that
+    was used to generate them. If you generate a pickle using Django
+    version N, there is no guarantee that pickle will be readable with
+    Django version N+1. Pickles should not be used as part of a long-term
+    archival strategy.
 
 .. _queryset-api:
 
@@ -133,9 +133,9 @@ Though you usually won't create one manually — you'll go through a
 
     .. attribute:: ordered
 
-	``True`` if the ``QuerySet`` is ordered — i.e. has an
-	:meth:`order_by()` clause or a default ordering on the model.
-	``False`` otherwise.
+        ``True`` if the ``QuerySet`` is ordered — i.e. has an
+        :meth:`order_by()` clause or a default ordering on the model.
+        ``False`` otherwise.
 
     .. attribute:: db
 
@@ -468,8 +468,8 @@ This restriction has been lifted, and you can now also refer to fields on
 related models with reverse relations through ``OneToOneField``, ``ForeignKey``
 and ``ManyToManyField`` attributes::
 
-	Blog.objects.values('name', 'entry__headline')
-	[{'name': 'My blog', 'entry__headline': 'An entry'},
+    Blog.objects.values('name', 'entry__headline')
+    [{'name': 'My blog', 'entry__headline': 'An entry'},
          {'name': 'My blog', 'entry__headline': 'Another entry'}, ...]
 
 .. warning::
@@ -788,62 +788,64 @@ of the arguments is required, but you should use at least one of them.
 
             SELECT * FROM blog_entry WHERE id IN (3, 4, 5, 20);
 
-	Be careful when using the ``tables`` parameter if you're specifying
-	tables that are already used in the query. When you add extra tables
-	via the ``tables`` parameter, Django assumes you want that table
-	included an extra time, if it is already included. That creates a
-	problem, since the table name will then be given an alias. If a table
-	appears multiple times in an SQL statement, the second and subsequent
-	occurrences must use aliases so the database can tell them apart. If
-	you're referring to the extra table you added in the extra ``where``
-	parameter this is going to cause errors.
+        Be careful when using the ``tables`` parameter if you're specifying
+        tables that are already used in the query. When you add extra tables
+        via the ``tables`` parameter, Django assumes you want that table
+        included an extra time, if it is already included. That creates a
+        problem, since the table name will then be given an alias. If a table
+        appears multiple times in an SQL statement, the second and subsequent
+        occurrences must use aliases so the database can tell them apart. If
+        you're referring to the extra table you added in the extra ``where``
+        parameter this is going to cause errors.
 
-	Normally you'll only be adding extra tables that don't already appear
-	in the query. However, if the case outlined above does occur, there are
-	a few solutions. First, see if you can get by without including the
-	extra table and use the one already in the query. If that isn't
-	possible, put your ``extra()`` call at the front of the queryset
-	construction so that your table is the first use of that table.
-	Finally, if all else fails, look at the query produced and rewrite your
-	``where`` addition to use the alias given to your extra table. The
-	alias will be the same each time you construct the queryset in the same
-	way, so you can rely upon the alias name to not change.
+        Normally you'll only be adding extra tables that don't already appear
+        in the query. However, if the case outlined above does occur, there are
+        a few solutions. First, see if you can get by without including the
+        extra table and use the one already in the query. If that isn't
+        possible, put your ``extra()`` call at the front of the queryset
+        construction so that your table is the first use of that table.
+        Finally, if all else fails, look at the query produced and rewrite your
+        ``where`` addition to use the alias given to your extra table. The
+        alias will be the same each time you construct the queryset in the same
+        way, so you can rely upon the alias name to not change.
 
     * ``order_by``
-	If you need to order the resulting queryset using some of the new
-	fields or tables you have included via ``extra()`` use the ``order_by``
-	parameter to ``extra()`` and pass in a sequence of strings. These
-	strings should either be model fields (as in the normal
-	:meth:`order_by()` method on querysets), of the form
-	``table_name.column_name`` or an alias for a column that you specified
-	in the ``select`` parameter to ``extra()``.
+
+        If you need to order the resulting queryset using some of the new
+        fields or tables you have included via ``extra()`` use the ``order_by``
+        parameter to ``extra()`` and pass in a sequence of strings. These
+        strings should either be model fields (as in the normal
+        :meth:`order_by()` method on querysets), of the form
+        ``table_name.column_name`` or an alias for a column that you specified
+        in the ``select`` parameter to ``extra()``.
 
         For example::
 
             q = Entry.objects.extra(select={'is_recent': "pub_date > '2006-01-01'"})
             q = q.extra(order_by = ['-is_recent'])
 
-	This would sort all the items for which ``is_recent`` is true to the
-	front of the result set (``True`` sorts before ``False`` in a
-	descending ordering).
+        This would sort all the items for which ``is_recent`` is true to the
+        front of the result set (``True`` sorts before ``False`` in a
+        descending ordering).
 
-	This shows, by the way, that you can make multiple calls to ``extra()``
-	and it will behave as you expect (adding new constraints each time).
+        This shows, by the way, that you can make multiple calls to ``extra()``
+        and it will behave as you expect (adding new constraints each time).
 
     * ``params``
-	The ``where`` parameter described above may use standard Python
-	database string placeholders — ``'%s'`` to indicate parameters the
-	database engine should automatically quote. The ``params`` argument is
-	a list of any extra parameters to be substituted.
+
+        The ``where`` parameter described above may use standard Python
+        database string placeholders — ``'%s'`` to indicate parameters the
+        database engine should automatically quote. The ``params`` argument is
+        a list of any extra parameters to be substituted.
 
         Example::
 
             Entry.objects.extra(where=['headline=%s'], params=['Lennon'])
 
-	Always use ``params`` instead of embedding values directly into
-	``where`` because ``params`` will ensure values are quoted correctly
-	according to your particular backend. For example, quotes will be
-	escaped correctly.
+        Always use ``params`` instead of embedding values directly into
+        ``where`` because ``params`` will ensure values are quoted correctly
+        according to your particular backend. For example, quotes will be
+        escaped correctly.
 
         Bad::
 

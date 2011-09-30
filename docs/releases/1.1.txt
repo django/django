@@ -257,8 +257,8 @@ particular fields, you can now tell Django not to retrieve them from the
 database.
 
 You'll do this with the new queryset methods
-:meth:`~django.db.models.QuerySet.defer` and
-:meth:`~django.db.models.QuerySet.only`.
+:meth:`~django.db.models.query.QuerySet.defer` and
+:meth:`~django.db.models.query.QuerySet.only`.
 
 Testing improvements
 --------------------

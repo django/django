@@ -119,7 +119,7 @@ A complete reference can be found in the :ref:`spatial lookup reference
 .. note::
 
     GeoDjango constructs spatial SQL with the :class:`GeoQuerySet`, a
-    subclass of :class:`~django.db.models.QuerySet`.  The
+    subclass of :class:`~django.db.models.query.QuerySet`.  The
     :class:`GeoManager` instance attached to your model is what
     enables use of :class:`GeoQuerySet`.
 

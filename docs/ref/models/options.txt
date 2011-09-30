@@ -89,7 +89,7 @@ Django quotes column and table names behind the scenes.
 
         get_latest_by = "order_date"
 
-    See the docs for :meth:`~django.db.models.QuerySet.latest` for more.
+    See the docs for :meth:`~django.db.models.query.QuerySet.latest` for more.
 
 ``managed``
 -----------

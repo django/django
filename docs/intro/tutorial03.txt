@@ -321,9 +321,9 @@ will get you started for now.
 A shortcut: get_object_or_404()
 -------------------------------
 
-It's a very common idiom to use :meth:`~django.db.models.QuerySet.get` and raise
-:exc:`~django.http.Http404` if the object doesn't exist. Django provides a
-shortcut. Here's the ``detail()`` view, rewritten::
+It's a very common idiom to use :meth:`~django.db.models.query.QuerySet.get`
+and raise :exc:`~django.http.Http404` if the object doesn't exist. Django
+provides a shortcut. Here's the ``detail()`` view, rewritten::
 
     from django.shortcuts import render_to_response, get_object_or_404
     # ...
@@ -333,8 +333,8 @@ shortcut. Here's the ``detail()`` view, rewritten::
 
 The :func:`~django.shortcuts.get_object_or_404` function takes a Django model
 as its first argument and an arbitrary number of keyword arguments, which it
-passes to the module's :meth:`~django.db.models.QuerySet.get` function. It
-raises :exc:`~django.http.Http404` if the object doesn't exist.
+passes to the module's :meth:`~django.db.models.query.QuerySet.get` function.
+It raises :exc:`~django.http.Http404` if the object doesn't exist.
 
 .. admonition:: Philosophy
 
@@ -349,9 +349,9 @@ raises :exc:`~django.http.Http404` if the object doesn't exist.
 
 There's also a :func:`~django.shortcuts.get_list_or_404` function, which works
 just as :func:`~django.shortcuts.get_object_or_404` -- except using
-:meth:`~django.db.models.QuerySet.filter` instead of
-:meth:`~django.db.models.QuerySet.get`. It raises :exc:`~django.http.Http404` if
-the list is empty.
+:meth:`~django.db.models.query.QuerySet.filter` instead of
+:meth:`~django.db.models.query.QuerySet.get`. It raises
+:exc:`~django.http.Http404` if the list is empty.
 
 Write a 404 (page not found) view
 =================================
