@@ -52,6 +52,17 @@ matched by a ``FOR UPDATE`` query.
 For more details, see the documentation for
 :meth:`~django.db.models.query.QuerySet.select_for_update`.
 
+``Model.objects.bulk_create`` in the ORM
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This method allows for more efficient creation of multiple objects in the ORM.
+It can provide significant performance increases if you have many objects,
+Django makes use of this internally, meaning some operations (such as database
+setup for test suites) has seen a performance benefit as a result.
+
+See the :meth:`~django.db.models.query.QuerySet.bulk_create` docs for more
+information.
+
 HTML5
 ~~~~~
 
@@ -139,20 +150,31 @@ Django 1.4 to store the wizard state in the user's cookies.
 See the :doc:`form wizard </ref/contrib/formtools/form-wizard>` docs for
 more information.
 
-Simple clickjacking protection
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-We've added a middleware to provide easy protection against `clickjacking
-<http://en.wikipedia.org/wiki/Clickjacking>`_ using the X-Frame-Options
-header. It's not enabled by default for backwards compatibility reasons, but
-you'll almost certainly want to :doc:`enable it </ref/clickjacking/>` to help
-plug that security hole for browsers that support the header.
-
 ``reverse_lazy``
 ~~~~~~~~~~~~~~~~
 
 A lazily evaluated version of :func:`django.core.urlresolvers.reverse` was
 added to allow using URL reversals before the project's URLConf gets loaded.
+
+Translating URL patterns
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django 1.4 gained the ability to look for a language prefix in the URL pattern
+when using the new :func:`django.conf.urls.i18n.i18n_patterns` helper function.
+Additionally, it's now possible to define translatable URL patterns using
+:func:`~django.utils.translation.ugettext_lazy`. See
+:ref:`url-internationalization` for more information about the language prefix
+and how to internationalize URL patterns.
+
+Customizable ``SingleObjectMixin`` URLConf kwargs
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Two new attributes,
+:attr:`pk_url_kwarg<django.views.generic.detail.SingleObjectMixin.pk_url_kwarg>` and
+:attr:`slug_url_kwarg<django.views.generic.detail.SingleObjectMixin.slug_url_kwarg>`,
+have been added to :class:`django.views.generic.detail.SingleObjectMixin` to
+enable the customization of URLConf keyword arguments used for single
+object generic views.
 
 Assignment template tags
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -187,6 +209,21 @@ For example:
 
     {% my_tag 123 "abcd" book.title warning=message|lower profile=user.profile %}
 
+No wrapping of exceptions in ``TEMPLATE_DEBUG`` mode
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In previous versions of Django, whenever the :setting:`TEMPLATE_DEBUG` setting
+was ``True``, any exception raised during template rendering (even exceptions
+unrelated to template syntax) were wrapped in ``TemplateSyntaxError`` and
+re-raised. This was done in order to provide detailed template source location
+information in the debug 500 page.
+
+In Django 1.4, exceptions are no longer wrapped. Instead, the original
+exception is annotated with the source information. This means that catching
+exceptions from template rendering is now consistent regardless of the value of
+:setting:`TEMPLATE_DEBUG`, and there's no need to catch and unwrap
+``TemplateSyntaxError`` in order to catch other errors.
+
 ``truncatechars`` template filter
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -195,15 +232,37 @@ number of characters. Truncated strings end with a translatable ellipsis
 sequence ("..."). See the :tfilter:`truncatechars docs <truncatechars>` for
 more details.
 
-Customizable ``SingleObjectMixin`` URLConf kwargs
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``static`` template tag
+~~~~~~~~~~~~~~~~~~~~~~~
 
-Two new attributes,
-:attr:`pk_url_kwarg<django.views.generic.detail.SingleObjectMixin.pk_url_kwarg>` and
-:attr:`slug_url_kwarg<django.views.generic.detail.SingleObjectMixin.slug_url_kwarg>`,
-have been added to :class:`django.views.generic.detail.SingleObjectMixin` to
-enable the customization of URLConf keyword arguments used for single
-object generic views.
+The :mod:`staticfiles<django.contrib.staticfiles>` contrib app has now a new
+:ttag:`static template tag<staticfiles-static>` to refer to files saved with
+the :setting:`STATICFILES_STORAGE` storage backend. It'll use the storage
+``url`` method and therefore supports advanced features such as
+:ref:`serving files from a cloud service<staticfiles-from-cdn>`.
+
+``CachedStaticFilesStorage`` storage backend
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Additional to the `static template tag`_ the
+:mod:`staticfiles<django.contrib.staticfiles>` contrib app now has a
+:class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage` which
+caches the files it saves (when running the :djadmin:`collectstatic`
+management command) by appending the MD5 hash of the file's content to the
+filename. For example, the file ``css/styles.css`` would also be saved as
+``css/styles.55e7cbb9ba48.css``
+
+See the :class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage`
+docs for more information.
+
+Simple clickjacking protection
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+We've added a middleware to provide easy protection against `clickjacking
+<http://en.wikipedia.org/wiki/Clickjacking>`_ using the X-Frame-Options
+header. It's not enabled by default for backwards compatibility reasons, but
+you'll almost certainly want to :doc:`enable it </ref/clickjacking/>` to help
+plug that security hole for browsers that support the header.
 
 CSRF improvements
 ~~~~~~~~~~~~~~~~~
@@ -243,66 +302,6 @@ a :class:`~django.db.models.fields.GenericIPAddressField` model field,
 a :class:`~django.forms.fields.GenericIPAddressField` form field and
 the validators :data:`~django.core.validators.validate_ipv46_address` and
 :data:`~django.core.validators.validate_ipv6_address`
-
-Translating URL patterns
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-Django 1.4 gained the ability to look for a language prefix in the URL pattern
-when using the new :func:`django.conf.urls.i18n.i18n_patterns` helper function.
-Additionally, it's now possible to define translatable URL patterns using
-:func:`~django.utils.translation.ugettext_lazy`. See
-:ref:`url-internationalization` for more information about the language prefix
-and how to internationalize URL patterns.
-
-``static`` template tag
-~~~~~~~~~~~~~~~~~~~~~~~
-
-The :mod:`staticfiles<django.contrib.staticfiles>` contrib app has now a new
-:ttag:`static template tag<staticfiles-static>` to refer to files saved with
-the :setting:`STATICFILES_STORAGE` storage backend. It'll use the storage
-``url`` method and therefore supports advanced features such as
-:ref:`serving files from a cloud service<staticfiles-from-cdn>`.
-
-``CachedStaticFilesStorage`` storage backend
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Additional to the `static template tag`_ the
-:mod:`staticfiles<django.contrib.staticfiles>` contrib app now has a
-:class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage` which
-caches the files it saves (when running the :djadmin:`collectstatic`
-management command) by appending the MD5 hash of the file's content to the
-filename. For example, the file ``css/styles.css`` would also be saved as
-``css/styles.55e7cbb9ba48.css``
-
-See the :class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage`
-docs for more information.
-
-``Model.objects.bulk_create`` in the ORM
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-This method allows for more efficient creation of multiple objects in the ORM.
-It can provide significant performance increases if you have many objects,
-Django makes use of this internally, meaning some operations (such as database
-setup for test suites) has seen a performance benefit as a result.
-
-See the :meth:`~django.db.models.query.QuerySet.bulk_create` docs for more
-information.
-
-No wrapping of exceptions in ``TEMPLATE_DEBUG`` mode
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-In previous versions of Django, whenever the :setting:`TEMPLATE_DEBUG` setting
-was ``True``, any exception raised during template rendering (even exceptions
-unrelated to template syntax) were wrapped in ``TemplateSyntaxError`` and
-re-raised. This was done in order to provide detailed template source location
-information in the debug 500 page.
-
-In Django 1.4, exceptions are no longer wrapped. Instead, the original
-exception is annotated with the source information. This means that catching
-exceptions from template rendering is now consistent regardless of the value of
-:setting:`TEMPLATE_DEBUG`, and there's no need to catch and unwrap
-``TemplateSyntaxError`` in order to catch other errors.
-
 
 Minor features
 ~~~~~~~~~~~~~~
