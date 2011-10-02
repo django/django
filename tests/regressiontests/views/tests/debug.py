@@ -171,45 +171,104 @@ class ExceptionReporterTests(TestCase):
         self.assertIn('<p>Request data not supplied</p>', html)
 
 
-class ExceptionReporterFilterTests(TestCase):
-    """
-    Ensure that sensitive information can be filtered out of error reports.
-    Refs #14614.
-    """
+class PlainTextReportTests(TestCase):
     rf = RequestFactory()
+
+    def test_request_and_exception(self):
+        "A simple exception report can be generated"
+        try:
+            request = self.rf.get('/test_view/')
+            raise ValueError("Can't find my keys")
+        except ValueError:
+            exc_type, exc_value, tb = sys.exc_info()
+        reporter = ExceptionReporter(request, exc_type, exc_value, tb)
+        text = reporter.get_traceback_text()
+        self.assertIn('ValueError at /test_view/', text)
+        self.assertIn("Can't find my keys", text)
+        self.assertIn('Request Method:', text)
+        self.assertIn('Request URL:', text)
+        self.assertIn('Exception Type:', text)
+        self.assertIn('Exception Value:', text)
+        self.assertIn('Traceback:', text)
+        self.assertIn('Request information:', text)
+        self.assertNotIn('Request data not supplied', text)
+
+    def test_no_request(self):
+        "An exception report can be generated without request"
+        try:
+            raise ValueError("Can't find my keys")
+        except ValueError:
+            exc_type, exc_value, tb = sys.exc_info()
+        reporter = ExceptionReporter(None, exc_type, exc_value, tb)
+        text = reporter.get_traceback_text()
+        self.assertIn('ValueError', text)
+        self.assertIn("Can't find my keys", text)
+        self.assertNotIn('Request Method:', text)
+        self.assertNotIn('Request URL:', text)
+        self.assertIn('Exception Type:', text)
+        self.assertIn('Exception Value:', text)
+        self.assertIn('Traceback:', text)
+        self.assertIn('Request data not supplied', text)
+
+    def test_no_exception(self):
+        "An exception report can be generated for just a request"
+        request = self.rf.get('/test_view/')
+        reporter = ExceptionReporter(request, None, None, None)
+        text = reporter.get_traceback_text()
+
+    def test_request_and_message(self):
+        "A message can be provided in addition to a request"
+        request = self.rf.get('/test_view/')
+        reporter = ExceptionReporter(request, None, "I'm a little teapot", None)
+        text = reporter.get_traceback_text()
+
+    def test_message_only(self):
+        reporter = ExceptionReporter(None, None, "I'm a little teapot", None)
+        text = reporter.get_traceback_text()
+
+
+class ExceptionReportTestMixin(object):
+
+    # Mixin used in the ExceptionReporterFilterTests and
+    # AjaxResponseExceptionReporterFilter tests below
+
     breakfast_data = {'sausage-key': 'sausage-value',
                       'baked-beans-key': 'baked-beans-value',
                       'hash-brown-key': 'hash-brown-value',
                       'bacon-key': 'bacon-value',}
 
-    def verify_unsafe_response(self, view):
+    def verify_unsafe_response(self, view, check_for_vars=True):
         """
         Asserts that potentially sensitive info are displayed in the response.
         """
         request = self.rf.post('/some_url/', self.breakfast_data)
         response = view(request)
-        # All variables are shown.
-        self.assertContains(response, 'cooked_eggs', status_code=500)
-        self.assertContains(response, 'scrambled', status_code=500)
-        self.assertContains(response, 'sauce', status_code=500)
-        self.assertContains(response, 'worcestershire', status_code=500)
+        if check_for_vars:
+            # All variables are shown.
+            self.assertContains(response, 'cooked_eggs', status_code=500)
+            self.assertContains(response, 'scrambled', status_code=500)
+            self.assertContains(response, 'sauce', status_code=500)
+            self.assertContains(response, 'worcestershire', status_code=500)
+
         for k, v in self.breakfast_data.items():
             # All POST parameters are shown.
             self.assertContains(response, k, status_code=500)
             self.assertContains(response, v, status_code=500)
 
-    def verify_safe_response(self, view):
+    def verify_safe_response(self, view, check_for_vars=True):
         """
         Asserts that certain sensitive info are not displayed in the response.
         """
         request = self.rf.post('/some_url/', self.breakfast_data)
         response = view(request)
-        # Non-sensitive variable's name and value are shown.
-        self.assertContains(response, 'cooked_eggs', status_code=500)
-        self.assertContains(response, 'scrambled', status_code=500)
-        # Sensitive variable's name is shown but not its value.
-        self.assertContains(response, 'sauce', status_code=500)
-        self.assertNotContains(response, 'worcestershire', status_code=500)
+        if check_for_vars:
+            # Non-sensitive variable's name and value are shown.
+            self.assertContains(response, 'cooked_eggs', status_code=500)
+            self.assertContains(response, 'scrambled', status_code=500)
+            # Sensitive variable's name is shown but not its value.
+            self.assertContains(response, 'sauce', status_code=500)
+            self.assertNotContains(response, 'worcestershire', status_code=500)
+
         for k, v in self.breakfast_data.items():
             # All POST parameters' names are shown.
             self.assertContains(response, k, status_code=500)
@@ -220,17 +279,19 @@ class ExceptionReporterFilterTests(TestCase):
         self.assertNotContains(response, 'sausage-value', status_code=500)
         self.assertNotContains(response, 'bacon-value', status_code=500)
 
-    def verify_paranoid_response(self, view):
+    def verify_paranoid_response(self, view, check_for_vars=True):
         """
         Asserts that no variables or POST parameters are displayed in the response.
         """
         request = self.rf.post('/some_url/', self.breakfast_data)
         response = view(request)
-        # Show variable names but not their values.
-        self.assertContains(response, 'cooked_eggs', status_code=500)
-        self.assertNotContains(response, 'scrambled', status_code=500)
-        self.assertContains(response, 'sauce', status_code=500)
-        self.assertNotContains(response, 'worcestershire', status_code=500)
+        if check_for_vars:
+            # Show variable names but not their values.
+            self.assertContains(response, 'cooked_eggs', status_code=500)
+            self.assertNotContains(response, 'scrambled', status_code=500)
+            self.assertContains(response, 'sauce', status_code=500)
+            self.assertNotContains(response, 'worcestershire', status_code=500)
+
         for k, v in self.breakfast_data.items():
             # All POST parameters' names are shown.
             self.assertContains(response, k, status_code=500)
@@ -303,6 +364,14 @@ class ExceptionReporterFilterTests(TestCase):
                 # No POST parameters' values are shown.
                 self.assertNotIn(v, email.body)
 
+
+class ExceptionReporterFilterTests(TestCase, ExceptionReportTestMixin):
+    """
+    Ensure that sensitive information can be filtered out of error reports.
+    Refs #14614.
+    """
+    rf = RequestFactory()
+
     def test_non_sensitive_request(self):
         """
         Ensure that everything (request info and frame variables) can bee seen
@@ -354,3 +423,62 @@ class ExceptionReporterFilterTests(TestCase):
         with self.settings(DEBUG=False):
             self.verify_unsafe_response(custom_exception_reporter_filter_view)
             self.verify_unsafe_email(custom_exception_reporter_filter_view)
+
+
+class AjaxResponseExceptionReporterFilter(TestCase, ExceptionReportTestMixin):
+    """
+    Ensure that sensitive information can be filtered out of error reports.
+
+    Here we specifically test the plain text 500 debug-only error page served
+    when it has been detected the request was sent by JS code. We don't check
+    for (non)existence of frames vars in the traceback information section of
+    the response content because we don't include them in these error pages.
+    Refs #14614.
+    """
+    rf = RequestFactory(HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+
+    def test_non_sensitive_request(self):
+        """
+        Ensure that request info can bee seen in the default error reports for
+        non-sensitive requests.
+        """
+        with self.settings(DEBUG=True):
+            self.verify_unsafe_response(non_sensitive_view, check_for_vars=False)
+
+        with self.settings(DEBUG=False):
+            self.verify_unsafe_response(non_sensitive_view, check_for_vars=False)
+
+    def test_sensitive_request(self):
+        """
+        Ensure that sensitive POST parameters cannot be seen in the default
+        error reports for sensitive requests.
+        """
+        with self.settings(DEBUG=True):
+            self.verify_unsafe_response(sensitive_view, check_for_vars=False)
+
+        with self.settings(DEBUG=False):
+            self.verify_safe_response(sensitive_view, check_for_vars=False)
+
+    def test_paranoid_request(self):
+        """
+        Ensure that no POST parameters can be seen in the default error reports
+        for "paranoid" requests.
+        """
+        with self.settings(DEBUG=True):
+            self.verify_unsafe_response(paranoid_view, check_for_vars=False)
+
+        with self.settings(DEBUG=False):
+            self.verify_paranoid_response(paranoid_view, check_for_vars=False)
+
+    def test_custom_exception_reporter_filter(self):
+        """
+        Ensure that it's possible to assign an exception reporter filter to
+        the request to bypass the one set in DEFAULT_EXCEPTION_REPORTER_FILTER.
+        """
+        with self.settings(DEBUG=True):
+            self.verify_unsafe_response(custom_exception_reporter_filter_view,
+                check_for_vars=False)
+
+        with self.settings(DEBUG=False):
+            self.verify_unsafe_response(custom_exception_reporter_filter_view,
+                check_for_vars=False)

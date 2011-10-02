@@ -59,8 +59,12 @@ def technical_500_response(request, exc_type, exc_value, tb):
     the values returned from sys.exc_info() and friends.
     """
     reporter = ExceptionReporter(request, exc_type, exc_value, tb)
-    html = reporter.get_traceback_html()
-    return HttpResponseServerError(html, mimetype='text/html')
+    if request.is_ajax():
+        text = reporter.get_traceback_text()
+        return HttpResponseServerError(text, mimetype='text/plain')
+    else:
+        html = reporter.get_traceback_html()
+        return HttpResponseServerError(html, mimetype='text/html')
 
 # Cache for the default exception reporter filter instance.
 default_exception_reporter_filter = None
@@ -201,8 +205,8 @@ class ExceptionReporter(object):
             self.exc_value = Exception('Deprecated String Exception: %r' % self.exc_type)
             self.exc_type = type(self.exc_value)
 
-    def get_traceback_html(self):
-        "Return HTML code for traceback."
+    def get_traceback_data(self):
+        "Return a Context instance containing traceback information."
 
         if self.exc_type and issubclass(self.exc_type, TemplateDoesNotExist):
             from django.template.loader import template_source_loaders
@@ -240,8 +244,7 @@ class ExceptionReporter(object):
                 unicode_str = self.exc_value.args[1]
                 unicode_hint = smart_unicode(unicode_str[max(start-5, 0):min(end+5, len(unicode_str))], 'ascii', errors='replace')
         from django import get_version
-        t = Template(TECHNICAL_500_TEMPLATE, name='Technical 500 template')
-        c = Context({
+        c = {
             'is_email': self.is_email,
             'unicode_hint': unicode_hint,
             'frames': frames,
@@ -256,7 +259,7 @@ class ExceptionReporter(object):
             'template_info': self.template_info,
             'template_does_not_exist': self.template_does_not_exist,
             'loader_debug_info': self.loader_debug_info,
-        })
+        }
         # Check whether exception info is available
         if self.exc_type:
             c['exception_type'] = self.exc_type.__name__
@@ -264,6 +267,18 @@ class ExceptionReporter(object):
             c['exception_value'] = smart_unicode(self.exc_value, errors='replace')
         if frames:
             c['lastframe'] = frames[-1]
+        return c
+
+    def get_traceback_html(self):
+        "Return HTML version of debug 500 HTTP error page."
+        t = Template(TECHNICAL_500_TEMPLATE, name='Technical 500 template')
+        c = Context(self.get_traceback_data())
+        return t.render(c)
+
+    def get_traceback_text(self):
+        "Return plain text version of debug 500 HTTP error page."
+        t = Template(TECHNICAL_500_TEXT_TEMPLATE, name='Technical 500 template')
+        c = Context(self.get_traceback_data(), autoescape=False)
         return t.render(c)
 
     def get_template_exception_info(self):
@@ -888,6 +903,67 @@ Exception Value: {{ exception_value|force_escape }}
 {% endif %}
 </body>
 </html>
+"""
+
+TECHNICAL_500_TEXT_TEMPLATE = """{% firstof exception_type 'Report' %}{% if request %} at {{ request.path_info }}{% endif %}
+{% firstof exception_value 'No exception supplied' %}
+{% if request %}
+Request Method: {{ request.META.REQUEST_METHOD }}
+Request URL: {{ request.build_absolute_uri }}{% endif %}
+Django Version: {{ django_version_info }}
+Python Executable: {{ sys_executable }}
+Python Version: {{ sys_version_info }}
+Python Path: {{ sys_path }}
+Server time: {{server_time|date:"r"}}
+Installed Applications:
+{{ settings.INSTALLED_APPS|pprint }}
+Installed Middleware:
+{{ settings.MIDDLEWARE_CLASSES|pprint }}
+{% if template_does_not_exist %}Template loader Error:
+{% if loader_debug_info %}Django tried loading these templates, in this order:
+{% for loader in loader_debug_info %}Using loader {{ loader.loader }}:
+{% for t in loader.templates %}{{ t.name }} (File {% if t.exists %}exists{% else %}does not exist{% endif %})
+{% endfor %}{% endfor %}
+{% else %}Django couldn't find any templates because your TEMPLATE_LOADERS setting is empty!
+{% endif %}
+{% endif %}{% if template_info %}
+Template error:
+In template {{ template_info.name }}, error at line {{ template_info.line }}
+   {{ template_info.message }}{% for source_line in template_info.source_lines %}{% ifequal source_line.0 template_info.line %}
+   {{ source_line.0 }} : {{ template_info.before }} {{ template_info.during }} {{ template_info.after }}
+{% else %}
+   {{ source_line.0 }} : {{ source_line.1 }}
+   {% endifequal %}{% endfor %}{% endif %}{% if frames %}
+Traceback:
+{% for frame in frames %}File "{{ frame.filename }}" in {{ frame.function }}
+{% if frame.context_line %}  {{ frame.lineno }}. {{ frame.context_line }}{% endif %}
+{% endfor %}
+{% if exception_type %}Exception Type: {{ exception_type }}{% if request %} at {{ request.path_info }}{% endif %}
+{% if exception_value %}Exception Value: {{ exception_value }}{% endif %}{% endif %}{% endif %}
+{% if request %}Request information:
+GET:{% for k, v in request.GET.items %}
+{{ k }} = {{ v|stringformat:"r" }}{% empty %} No GET data{% endfor %}
+
+POST:{% for k, v in filtered_POST.items %}
+{{ k }} = {{ v|stringformat:"r" }}{% empty %} No POST data{% endfor %}
+
+FILES:{% for k, v in request.FILES.items %}
+{{ k }} = {{ v|stringformat:"r" }}{% empty %} No FILES data{% endfor %}
+
+COOKIES:{% for k, v in request.COOKIES.items %}
+{{ k }} = {{ v|stringformat:"r" }}{% empty %} No cookie data{% endfor %}
+
+META:{% for k, v in request.META.items|dictsort:"0" %}
+{{ k }} = {{ v|stringformat:"r" }}{% endfor %}
+{% else %}Request data not supplied
+{% endif %}
+Settings:
+Using settings module {{ settings.SETTINGS_MODULE }}{% for k, v in settings.items|dictsort:"0" %}
+{{ k }} = {{ v|stringformat:"r" }}{% endfor %}
+
+You're seeing this error because you have DEBUG = True in your
+Django settings file. Change that to False, and Django will
+display a standard 500 page.
 """
 
 TECHNICAL_404_TEMPLATE = """
