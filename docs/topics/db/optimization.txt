@@ -225,8 +225,8 @@ It is optimal because:
  1. Since QuerySets are lazy, this does no database queries if 'display_inbox'
     is False.
 
- #. Use of ``with`` means that we store ``user.emails.all`` in a variable for
-    later use, allowing its cache to be re-used.
+ #. Use of :ttag:`with` means that we store ``user.emails.all`` in a variable
+    for later use, allowing its cache to be re-used.
 
  #. The line ``{% if emails %}`` causes ``QuerySet.__nonzero__()`` to be called,
     which causes the ``user.emails.all()`` query to be run on the database, and
@@ -236,10 +236,10 @@ It is optimal because:
  #. The use of ``{{ emails|length }}`` calls ``QuerySet.__len__()``, filling
     out the rest of the cache without doing another query.
 
- #. The ``for`` loop iterates over the already filled cache.
+ #. The :ttag:`for` loop iterates over the already filled cache.
 
 In total, this code does either one or zero database queries. The only
-deliberate optimization performed is the use of the ``with`` tag. Using
+deliberate optimization performed is the use of the :ttag:`with` tag. Using
 ``QuerySet.exists()`` or ``QuerySet.count()`` at any point would cause
 additional queries.
 

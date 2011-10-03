@@ -19,18 +19,18 @@ Built-in tag reference
 autoescape
 ^^^^^^^^^^
 
-Control the current auto-escaping behavior. This tag takes either ``on`` or
+Controls the current auto-escaping behavior. This tag takes either ``on`` or
 ``off`` as an argument and that determines whether auto-escaping is in effect
 inside the block. The block is closed with an ``endautoescape`` ending tag.
 
 When auto-escaping is in effect, all variable content has HTML escaping applied
 to it before placing the result into the output (but after any filters have
-been applied). This is equivalent to manually applying the ``escape`` filter
-to each variable.
+been applied). This is equivalent to manually applying the :tfilter:`escape`
+filter to each variable.
 
 The only exceptions are variables that are already marked as "safe" from
 escaping, either by the code that populated the variable, or because it has had
-the ``safe`` or ``escape`` filters applied.
+the :tfilter:`safe` or :tfilter:`escape` filters applied.
 
 Sample usage::
 
@@ -43,7 +43,7 @@ Sample usage::
 block
 ^^^^^
 
-Define a block that can be overridden by child templates. See
+Defines a block that can be overridden by child templates. See
 :ref:`Template inheritance <template-inheritance>` for more information.
 
 .. templatetag:: comment
@@ -51,16 +51,16 @@ Define a block that can be overridden by child templates. See
 comment
 ^^^^^^^
 
-Ignore everything between ``{% comment %}`` and ``{% endcomment %}``
+Ignores everything between ``{% comment %}`` and ``{% endcomment %}``
 
 .. templatetag:: csrf_token
 
 csrf_token
 ^^^^^^^^^^
 
-In the Django 1.1.X series, this is a no-op tag that returns an empty string for
-future compatibility purposes.  In Django 1.2 and later, it is used for CSRF
-protection, as described in the documentation for :doc:`Cross Site Request
+In the Django 1.1.X series, this is a no-op tag that returns an empty string
+for future compatibility purposes.  In Django 1.2 and later, it is used for
+CSRF protection, as described in the documentation for :doc:`Cross Site Request
 Forgeries </ref/contrib/csrf>`.
 
 .. templatetag:: cycle
@@ -68,7 +68,7 @@ Forgeries </ref/contrib/csrf>`.
 cycle
 ^^^^^
 
-Cycle among the given strings or variables each time this tag is encountered.
+Cycles among the given strings or variables each time this tag is encountered.
 
 Within a loop, cycles among the given strings each time through the
 loop::
@@ -189,15 +189,15 @@ call to ``{% cycle %}`` doesn't specify silent::
 debug
 ^^^^^
 
-Output a whole load of debugging information, including the current context and
-imported modules.
+Outputs a whole load of debugging information, including the current context
+and imported modules.
 
 .. templatetag:: extends
 
 extends
 ^^^^^^^
 
-Signal that this template extends a parent template.
+Signals that this template extends a parent template.
 
 This tag can be used in two ways:
 
@@ -216,7 +216,7 @@ See :ref:`template-inheritance` for more information.
 filter
 ^^^^^^
 
-Filter the contents of the variable through variable filters.
+Filters the contents of the variable through variable filters.
 
 Filters can also be piped through each other, and they can have arguments --
 just like in variable syntax.
@@ -281,7 +281,8 @@ provided in ``athlete_list``::
     {% endfor %}
     </ul>
 
-You can loop over a list in reverse by using ``{% for obj in list reversed %}``.
+You can loop over a list in reverse by using
+``{% for obj in list reversed %}``.
 
 If you need to loop over a list of lists, you can unpack the values
 in each sub-list into individual variables. For example, if your context
@@ -302,9 +303,9 @@ would display the keys and values of the dictionary::
 
 The for loop sets a number of variables available within the loop:
 
-    ==========================  ================================================
+    ==========================  ===============================================
     Variable                    Description
-    ==========================  ================================================
+    ==========================  ===============================================
     ``forloop.counter``         The current iteration of the loop (1-indexed)
     ``forloop.counter0``        The current iteration of the loop (0-indexed)
     ``forloop.revcounter``      The number of iterations from the end of the
@@ -315,7 +316,7 @@ The for loop sets a number of variables available within the loop:
     ``forloop.last``            True if this is the last time through the loop
     ``forloop.parentloop``      For nested loops, this is the loop "above" the
                                 current one
-    ==========================  ================================================
+    ==========================  ===============================================
 
 for ... empty
 ^^^^^^^^^^^^^
@@ -368,8 +369,8 @@ will be displayed if the test fails.
 Boolean operators
 ^^^^^^^^^^^^^^^^^
 
-``if`` tags may use ``and``, ``or`` or ``not`` to test a number of variables or
-to negate a given variable::
+:ttag:`if` tags may use ``and``, ``or`` or ``not`` to test a number of
+variables or to negate a given variable::
 
     {% if athlete_list and coach_list %}
         Both athletes and coaches are available.
@@ -406,13 +407,13 @@ will be interpreted like:
 
     if (athlete_list and coach_list) or cheerleader_list
 
-Use of actual brackets in the ``if`` tag is invalid syntax.  If you need them to
-indicate precedence, you should use nested ``if`` tags.
+Use of actual brackets in the :ttag:`if` tag is invalid syntax.  If you need
+them to indicate precedence, you should use nested :ttag:`if` tags.
 
 .. versionadded:: 1.2
 
 
-``if`` tags may also use the operators ``==``, ``!=``, ``<``, ``>``,
+:ttag:`if` tags may also use the operators ``==``, ``!=``, ``<``, ``>``,
 ``<=``, ``>=`` and ``in`` which work as follows:
 
 
@@ -475,8 +476,8 @@ Greater than or equal to. Example::
 ^^^^^^^^^^^^^^^
 
 Contained within. This operator is supported by many Python containers to test
-whether the given value is in the container.  The following are some examples of
-how ``x in y`` will be interpreted::
+whether the given value is in the container.  The following are some examples
+of how ``x in y`` will be interpreted::
 
     {% if "bc" in "abcdef" %}
       This appears since "bc" is a substring of "abcdef"
@@ -511,7 +512,7 @@ you should use::
 Filters
 ^^^^^^^
 
-You can also use filters in the ``if`` expression. For example::
+You can also use filters in the :ttag:`if` expression. For example::
 
     {% if messages|length >= 100 %}
        You have lots of messages today!
@@ -531,7 +532,8 @@ operators, from lowest to highest, is as follows:
  * ``in``
  * ``==``, ``!=``, ``<``, ``>``, ``<=``, ``>=``
 
-(This follows Python exactly). So, for example, the following complex if tag:
+(This follows Python exactly). So, for example, the following complex
+:ttag:`if` tag:
 
 .. code-block:: django
 
@@ -543,9 +545,9 @@ operators, from lowest to highest, is as follows:
 
     (a == b) or ((c == d) and e)
 
-If you need different precedence, you will need to use nested if tags. Sometimes
-that is better for clarity anyway, for the sake of those who do not know the
-precedence rules.
+If you need different precedence, you will need to use nested :ttag:`if` tags.
+Sometimes that is better for clarity anyway, for the sake of those who do not
+know the precedence rules.
 
 
 .. templatetag:: ifchanged
@@ -606,7 +608,7 @@ Example::
         ...
     {% endifequal %}
 
-As in the ``{% if %}`` tag, an ``{% else %}`` clause is optional.
+As in the :ttag:`if` tag, an ``{% else %}`` clause is optional.
 
 The arguments can be hard-coded strings, so the following is valid::
 
@@ -616,21 +618,24 @@ The arguments can be hard-coded strings, so the following is valid::
 
 It is only possible to compare an argument to template variables or strings.
 You cannot check for equality with Python objects such as ``True`` or
-``False``.  If you need to test if something is true or false, use the ``if``
-tag instead.
+``False``.  If you need to test if something is true or false, use the
+:ttag:`if` tag instead.
 
 .. versionadded:: 1.2
-   An alternative to the ``ifequal`` tag is to use the :ttag:`if` tag and the ``==`` operator.
+   An alternative to the ``ifequal`` tag is to use the :ttag:`if` tag and the
+   ``==`` operator.
 
 .. templatetag:: ifnotequal
 
 ifnotequal
 ^^^^^^^^^^
 
-Just like ``ifequal``, except it tests that the two arguments are not equal.
+Just like :ttag:`ifequal`, except it tests that the two arguments are not
+equal.
 
 .. versionadded:: 1.2
-   An alternative to the ``ifnotequal`` tag is to use the :ttag:`if` tag and the ``!=`` operator.
+   An alternative to the ``ifnotequal`` tag is to use the :ttag:`if` tag and
+   the ``!=`` operator.
 
 .. templatetag:: include
 
@@ -683,14 +688,14 @@ no variables at all), use the ``only`` option::
     This means that there is no shared state between included templates --
     each include is a completely independent rendering process.
 
-See also: ``{% ssi %}``.
+See also: :ttag:`{% ssi %}<ssi>`.
 
 .. templatetag:: load
 
 load
 ^^^^
 
-Load a custom template tag set.
+Loads a custom template tag set.
 
 For example, the following template would load all the tags and filters
 registered in ``somelibrary`` and ``otherlibrary``::
@@ -713,7 +718,7 @@ more information.
 now
 ^^^
 
-Display the current date and/or time, using a format according to the given
+Displays the current date and/or time, using a format according to the given
 string. Such string can contain format specifiers characters as described
 in the :tfilter:`date` filter section.
 
@@ -747,7 +752,7 @@ This would display as "It is the 4th of September".
 regroup
 ^^^^^^^
 
-Regroup a list of alike objects by a common attribute.
+Regroups a list of alike objects by a common attribute.
 
 This complex tag is best illustrated by use of an example: say that ``people``
 is a list of people represented by dictionaries with ``first_name``,
@@ -807,10 +812,10 @@ attribute and calling the result ``gender_list``.
 
 Note that ``{% regroup %}`` does not order its input! Our example relies on
 the fact that the ``people`` list was ordered by ``gender`` in the first place.
-If the ``people`` list did *not* order its members by ``gender``, the regrouping
-would naively display more than one group for a single gender. For example,
-say the ``people`` list was set to this (note that the males are not grouped
-together):
+If the ``people`` list did *not* order its members by ``gender``, the
+regrouping would naively display more than one group for a single gender. For
+example, say the ``people`` list was set to this (note that the males are not
+grouped together):
 
 .. code-block:: python
 
@@ -839,8 +844,8 @@ above would result in the following output:
 The easiest solution to this gotcha is to make sure in your view code that the
 data is ordered according to how you want to display it.
 
-Another solution is to sort the data in the template using the ``dictsort``
-filter, if your data is in a list of dictionaries::
+Another solution is to sort the data in the template using the
+:tfilter:`dictsort` filter, if your data is in a list of dictionaries::
 
     {% regroup people|dictsort:"gender" by gender as gender_list %}
 
@@ -899,11 +904,11 @@ this example, the space around ``Hello`` won't be stripped::
 ssi
 ^^^
 
-Output the contents of a given file into the page.
+Outputs the contents of a given file into the page.
 
-Like a simple "include" tag, ``{% ssi %}`` includes the contents of another
-file -- which must be specified using an absolute path -- in the current
-page::
+Like a simple :ttag:`include` tag, ``{% ssi %}`` includes the contents of
+another file -- which must be specified using an absolute path -- in the
+current page::
 
     {% ssi /home/html/ljworld.com/includes/right_generic.html %}
 
@@ -913,9 +918,10 @@ file are evaluated as template code, within the current context::
     {% ssi /home/html/ljworld.com/includes/right_generic.html parsed %}
 
 Note that if you use ``{% ssi %}``, you'll need to define
-:setting:`ALLOWED_INCLUDE_ROOTS` in your Django settings, as a security measure.
+:setting:`ALLOWED_INCLUDE_ROOTS` in your Django settings, as a security
+measure.
 
-See also: ``{% include %}``.
+See also: :ttag:`{% include %}<include>`.
 
 .. admonition:: Forwards compatibility
 
@@ -946,7 +952,7 @@ See also: ``{% include %}``.
 templatetag
 ^^^^^^^^^^^
 
-Output one of the syntax characters used to compose template tags.
+Outputs one of the syntax characters used to compose template tags.
 
 Since the template system has no concept of "escaping", to display one of the
 bits used in template tags, you must use the ``{% templatetag %}`` tag.
@@ -1100,8 +1106,8 @@ projects?
 widthratio
 ^^^^^^^^^^
 
-For creating bar charts and such, this tag calculates the ratio of a given value
-to a maximum value, and then applies that ratio to a constant.
+For creating bar charts and such, this tag calculates the ratio of a given
+value to a maximum value, and then applies that ratio to a constant.
 
 For example::
 
@@ -1189,7 +1195,8 @@ For example::
 
     {{ value|addslashes }}
 
-If ``value`` is ``"I'm using Django"``, the output will be ``"I\'m using Django"``.
+If ``value`` is ``"I'm using Django"``, the output will be
+``"I\'m using Django"``.
 
 .. templatefilter:: capfirst
 
@@ -1228,7 +1235,8 @@ For example::
 
     {{ value|cut:" "}}
 
-If ``value`` is ``"String with spaces"``, the output will be ``"Stringwithspaces"``.
+If ``value`` is ``"String with spaces"``, the output will be
+``"Stringwithspaces"``.
 
 .. templatefilter:: date
 
@@ -1353,7 +1361,8 @@ used, without applying any localization.
 default
 ^^^^^^^
 
-If value evaluates to ``False``, use given default. Otherwise, use the value.
+If value evaluates to ``False``, uses the given default. Otherwise, uses the
+value.
 
 For example::
 
@@ -1366,11 +1375,11 @@ If ``value`` is ``""`` (the empty string), the output will be ``nothing``.
 default_if_none
 ^^^^^^^^^^^^^^^
 
-If (and only if) value is ``None``, use given default. Otherwise, use the
+If (and only if) value is ``None``, uses the given default. Otherwise, uses the
 value.
 
 Note that if an empty string is given, the default value will *not* be used.
-Use the ``default`` filter if you want to fallback for empty strings.
+Use the :tfilter:`default` filter if you want to fallback for empty strings.
 
 For example::
 
@@ -1448,12 +1457,12 @@ Escapes a string's HTML. Specifically, it makes these replacements:
 The escaping is only applied when the string is output, so it does not matter
 where in a chained sequence of filters you put ``escape``: it will always be
 applied as though it were the last filter. If you want escaping to be applied
-immediately, use the ``force_escape`` filter.
+immediately, use the :tfilter:`force_escape` filter.
 
 Applying ``escape`` to a variable that would normally have auto-escaping
 applied to the result will only result in one round of escaping being done. So
 it is safe to use this function even in auto-escaping environments. If you want
-multiple escaping passes to be applied, use the ``force_escape`` filter.
+multiple escaping passes to be applied, use the :tfilter:`force_escape` filter.
 
 .. templatefilter:: escapejs
 
@@ -1476,7 +1485,7 @@ the output will be ``"testing\\u000D\\u000Ajavascript \\u0027string\\u0022 \\u00
 filesizeformat
 ^^^^^^^^^^^^^^
 
-Format the value like a 'human-readable' file size (i.e. ``'13 KB'``,
+Formats the value like a 'human-readable' file size (i.e. ``'13 KB'``,
 ``'4.1 MB'``, ``'102 bytes'``, etc).
 
 For example::
@@ -1505,7 +1514,8 @@ fix_ampersands
 
 .. note::
 
-    This is rarely useful as ampersands are automatically escaped. See escape_ for more information.
+    This is rarely useful as ampersands are automatically escaped. See
+    :tfilter:`escape` for more information.
 
 Replaces ampersands with ``&amp;`` entities.
 
@@ -1570,11 +1580,11 @@ with an argument of ``-1``.
 force_escape
 ^^^^^^^^^^^^
 
-Applies HTML escaping to a string (see the ``escape`` filter for details).
-This filter is applied *immediately* and returns a new, escaped string. This
-is useful in the rare cases where you need multiple escaping or want to apply
-other filters to the escaped results. Normally, you want to use the ``escape``
-filter.
+Applies HTML escaping to a string (see the :tfilter:`escape` filter for
+details). This filter is applied *immediately* and returns a new, escaped
+string. This is useful in the rare cases where you need multiple escaping or
+want to apply other filters to the escaped results. Normally, you want to use
+the :tfilter:`escape` filter.
 
 .. templatefilter:: get_digit
 
@@ -1602,7 +1612,7 @@ suitable for including in a URL. This is necessary if you're trying to use
 strings containing non-ASCII characters in a URL.
 
 It's safe to use this filter on a string that has already gone through the
-``urlencode`` filter.
+:tfilter:`urlencode` filter.
 
 For example::
 
@@ -1635,8 +1645,8 @@ For example::
 
     {{ value|last }}
 
-If ``value`` is the list ``['a', 'b', 'c', 'd']``, the output will be the string
-``"d"``.
+If ``value`` is the list ``['a', 'b', 'c', 'd']``, the output will be the
+string ``"d"``.
 
 .. templatefilter:: length
 
@@ -1744,7 +1754,8 @@ For example::
 
     {{ value|lower }}
 
-If ``value`` is ``Still MAD At Yoko``, the output will be ``still mad at yoko``.
+If ``value`` is ``Still MAD At Yoko``, the output will be
+``still mad at yoko``.
 
 .. templatefilter:: make_list
 
@@ -1785,7 +1796,8 @@ If ``value`` is ``800-COLLECT``, the output will be ``800-2655328``.
 pluralize
 ^^^^^^^^^
 
-Returns a plural suffix if the value is not 1. By default, this suffix is ``'s'``.
+Returns a plural suffix if the value is not 1. By default, this suffix is
+``'s'``.
 
 Example::
 
@@ -2093,12 +2105,12 @@ Newlines within the string will be removed.
 truncatewords_html
 ^^^^^^^^^^^^^^^^^^
 
-Similar to ``truncatewords``, except that it is aware of HTML tags. Any tags
-that are opened in the string and not closed before the truncation point, are
-closed immediately after the truncation.
+Similar to :tfilter:`truncatewords`, except that it is aware of HTML tags. Any
+tags that are opened in the string and not closed before the truncation point,
+are closed immediately after the truncation.
 
-This is less efficient than ``truncatewords``, so should only be used when it
-is being passed HTML text.
+This is less efficient than :tfilter:`truncatewords`, so should only be used
+when it is being passed HTML text.
 
 For example::
 
@@ -2117,8 +2129,8 @@ unordered_list
 Recursively takes a self-nested list and returns an HTML unordered list --
 WITHOUT opening and closing <ul> tags.
 
-The list is assumed to be in the proper format. For example, if ``var`` contains
-``['States', ['Kansas', ['Lawrence', 'Topeka'], 'Illinois']]``, then
+The list is assumed to be in the proper format. For example, if ``var``
+contains ``['States', ['Kansas', ['Lawrence', 'Topeka'], 'Illinois']]``, then
 ``{{ var|unordered_list }}`` would return::
 
     <li>States
@@ -2295,7 +2307,7 @@ Other tags and filter libraries
 
 Django comes with a couple of other template-tag libraries that you have to
 enable explicitly in your :setting:`INSTALLED_APPS` setting and enable in your
-template with the ``{% load %}`` tag.
+template with the :ttag:`{% load %}<load>` tag.
 
 django.contrib.humanize
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -2335,9 +2347,10 @@ l10n
 ^^^^
 
 Provides a couple of templatetags that allow control over the localization of
-values in Django templates. It is slightly different from the libraries described
-above because you don't need to add any application to the :setting:`INSTALLED_APPS`;
-you only need to load the library using ``{% load l10n %}``.
+values in Django templates. It is slightly different from the libraries
+described above because you don't need to add any application to the
+:setting:`INSTALLED_APPS`; you only need to load the library using
+``{% load l10n %}``.
 
 See :ref:`topic-l10n-templates`.
 

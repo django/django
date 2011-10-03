@@ -587,6 +587,8 @@ Here's the same thing, with ``my_view`` wrapped in ``cache_page``::
         (r'^foo/(\d{1,2})/$', cache_page(60 * 15)(my_view)),
     )
 
+.. templatetag:: cache
+
 Template fragment caching
 =========================
 

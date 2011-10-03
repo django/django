@@ -425,6 +425,8 @@ Translations in :doc:`Django templates </topics/templates>` uses two template
 tags and a slightly different syntax than in Python code. To give your template
 access to these tags, put ``{% load i18n %}`` toward the top of your template.
 
+.. templatetag:: trans
+
 ``trans`` template tag
 ----------------------
 
@@ -485,7 +487,7 @@ or should be used as arguments for other template tags or filters::
 .. versionchanged:: 1.3
    New keyword argument format.
 
-Contrarily to the ``trans`` tag, the ``blocktrans`` tag allows you to mark
+Contrarily to the :ttag:`trans` tag, the ``blocktrans`` tag allows you to mark
 complex sentences consisting of literals and variable content for translation
 by making use of placeholders::
 

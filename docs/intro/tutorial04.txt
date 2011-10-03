@@ -49,13 +49,13 @@ A quick rundown:
       data), we need to worry about Cross Site Request Forgeries.
       Thankfully, you don't have to worry too hard, because Django comes with
       a very easy-to-use system for protecting against it. In short, all POST
-      forms that are targeted at internal URLs should use the ``{% csrf_token %}``
-      template tag.
+      forms that are targeted at internal URLs should use the
+      :ttag:`{% csrf_token %}<csrf_token>` template tag.
 
-The ``{% csrf_token %}`` tag requires information from the request object, which
-is not normally accessible from within the template context. To fix this, a
-small adjustment needs to be made to the ``detail`` view, so that it looks like
-the following::
+The :ttag:`{% csrf_token %}<csrf_token>` tag requires information from the
+request object, which is not normally accessible from within the template
+context. To fix this, a small adjustment needs to be made to the ``detail``
+view, so that it looks like the following::
 
     from django.template import RequestContext
     # ...

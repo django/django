@@ -199,7 +199,7 @@ passed around inside the template code:
 
       Internally, these strings are of type ``EscapeString`` or
       ``EscapeUnicode``. Generally you don't have to worry about these; they
-      exist for the implementation of the ``escape`` filter.
+      exist for the implementation of the :tfilter:`escape` filter.
 
 Template filter code falls into one of two situations:
 
@@ -501,8 +501,8 @@ safe.
 
 To make sure your template tags are thread safe, you should never store state
 information on the node itself. For example, Django provides a builtin
-``cycle`` template tag that cycles among a list of given strings each time it's
-rendered:
+:ttag:`cycle` template tag that cycles among a list of given strings each time
+it's rendered:
 
 .. code-block:: html+django
 

@@ -110,8 +110,8 @@ Filters
 You can modify variables for display by using **filters**.
 
 Filters look like this: ``{{ name|lower }}``. This displays the value of the
-``{{ name }}`` variable after being filtered through the ``lower`` filter,
-which converts text to lowercase. Use a pipe (``|``) to apply a filter.
+``{{ name }}`` variable after being filtered through the :tfilter:`lower`
+filter, which converts text to lowercase. Use a pipe (``|``) to apply a filter.
 
 Filters can be "chained." The output of one filter is applied to the next.
 ``{{ text|escape|linebreaks }}`` is a common idiom for escaping text contents,
@@ -121,13 +121,13 @@ Some filters take arguments. A filter argument looks like this: ``{{
 bio|truncatewords:30 }}``. This will display the first 30 words of the ``bio``
 variable.
 
-Filter arguments that contain spaces must be quoted; for example, to join a list
-with commas and spaced you'd use ``{{ list|join:", " }}``.
+Filter arguments that contain spaces must be quoted; for example, to join a
+list with commas and spaced you'd use ``{{ list|join:", " }}``.
 
 Django provides about thirty built-in template filters. You can read all about
 them in the :ref:`built-in filter reference <ref-templates-builtins-filters>`.
-To give you a taste of what's available, here are some of the more commonly used
-template filters:
+To give you a taste of what's available, here are some of the more commonly
+used template filters:
 
     :tfilter:`default`
         If a variable is false or empty, use given default. Otherwise, use the
@@ -206,7 +206,7 @@ tags:
         In the above, if ``athlete_list`` is not empty, the number of athletes
         will be displayed by the ``{{ athlete_list|length }}`` variable.
 
-        You can also use filters and various operators in the ``if`` tag::
+        You can also use filters and various operators in the :ttag:`if` tag::
 
             {% if athlete_list|length > 1 %}
                Team: {% for athlete in athlete_list %} ... {% endfor %}
@@ -286,8 +286,8 @@ This template, which we'll call ``base.html``, defines a simple HTML skeleton
 document that you might use for a simple two-column page. It's the job of
 "child" templates to fill the empty blocks with content.
 
-In this example, the ``{% block %}`` tag defines three blocks that child
-templates can fill in. All the ``block`` tag does is to tell the template
+In this example, the :ttag:`block` tag defines three blocks that child
+templates can fill in. All the :ttag:`block` tag does is to tell the template
 engine that a child template may override those portions of the template.
 
 A child template might look like this::
@@ -303,11 +303,11 @@ A child template might look like this::
     {% endfor %}
     {% endblock %}
 
-The ``{% extends %}`` tag is the key here. It tells the template engine that
+The :ttag:`extends` tag is the key here. It tells the template engine that
 this template "extends" another template. When the template system evaluates
 this template, first it locates the parent -- in this case, "base.html".
 
-At that point, the template engine will notice the three ``{% block %}`` tags
+At that point, the template engine will notice the three :ttag:`block` tags
 in ``base.html`` and replace those blocks with the contents of the child
 template. Depending on the value of ``blog_entries``, the output might look
 like::
@@ -359,10 +359,10 @@ content areas, such as section-wide navigation.
 
 Here are some tips for working with inheritance:
 
-    * If you use ``{% extends %}`` in a template, it must be the first template
+    * If you use :ttag:`{% extends %}<extends>` in a template, it must be the first template
       tag in that template. Template inheritance won't work, otherwise.
 
-    * More ``{% block %}`` tags in your base templates are better. Remember,
+    * More :ttag:`{% block %}<block>` tags in your base templates are better. Remember,
       child templates don't have to define all parent blocks, so you can fill
       in reasonable defaults in a number of blocks, then only define the ones
       you need later. It's better to have more hooks than fewer hooks.
@@ -388,11 +388,11 @@ Here are some tips for working with inheritance:
       In larger templates, this technique helps you see which ``{% block %}``
       tags are being closed.
 
-Finally, note that you can't define multiple ``{% block %}`` tags with the same
+Finally, note that you can't define multiple :ttag:`block` tags with the same
 name in the same template. This limitation exists because a block tag works in
 "both" directions. That is, a block tag doesn't just provide a hole to fill --
 it also defines the content that fills the hole in the *parent*. If there were
-two similarly-named ``{% block %}`` tags in a template, that template's parent
+two similarly-named :ttag:`block` tags in a template, that template's parent
 wouldn't know which one of the blocks' content to use.
 
 .. _next section: #automatic-html-escaping
@@ -436,8 +436,8 @@ do potentially bad things. This type of security exploit is called a
 To avoid this problem, you have two options:
 
     * One, you can make sure to run each untrusted variable through the
-      ``escape`` filter (documented below), which converts potentially harmful
-      HTML characters to unharmful ones. This was the default solution
+      :tfilter:`escape` filter (documented below), which converts potentially
+      harmful HTML characters to unharmful ones. This was the default solution
       in Django for its first few years, but the problem is that it puts the
       onus on *you*, the developer / template author, to ensure you're escaping
       everything. It's easy to forget to escape data.
@@ -476,7 +476,8 @@ you might be using Django's template system to produce text that is *not* HTML
 For individual variables
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-To disable auto-escaping for an individual variable, use the ``safe`` filter::
+To disable auto-escaping for an individual variable, use the :tfilter:`safe`
+filter::
 
     This will be escaped: {{ data }}
     This will not be escaped: {{ data|safe }}
@@ -492,13 +493,13 @@ For template blocks
 ~~~~~~~~~~~~~~~~~~~
 
 To control auto-escaping for a template, wrap the template (or just a
-particular section of the template) in the ``autoescape`` tag, like so::
+particular section of the template) in the :ttag:`autoescape` tag, like so::
 
     {% autoescape off %}
         Hello {{ name }}
     {% endautoescape %}
 
-The ``autoescape`` tag takes either ``on`` or ``off`` as its argument. At
+The :ttag:`autoescape` tag takes either ``on`` or ``off`` as its argument. At
 times, you might want to force auto-escaping when it would otherwise be
 disabled. Here is an example template::
 
@@ -514,8 +515,8 @@ disabled. Here is an example template::
     {% endautoescape %}
 
 The auto-escaping tag passes its effect onto templates that extend the
-current one as well as templates included via the ``include`` tag, just like
-all block tags. For example::
+current one as well as templates included via the :ttag:`include` tag,
+just like all block tags. For example::
 
     # base.html
 
@@ -548,10 +549,10 @@ think about the cases in which data shouldn't be escaped, and mark data
 appropriately, so things Just Work in the template.
 
 If you're creating a template that might be used in situations where you're
-not sure whether auto-escaping is enabled, then add an ``escape`` filter to any
-variable that needs escaping. When auto-escaping is on, there's no danger of
-the ``escape`` filter *double-escaping* data -- the ``escape`` filter does not
-affect auto-escaped variables.
+not sure whether auto-escaping is enabled, then add an :tfilter:`escape` filter
+to any variable that needs escaping. When auto-escaping is on, there's no
+danger of the :tfilter:`escape` filter *double-escaping* data -- the
+:tfilter:`escape` filter does not affect auto-escaped variables.
 
 String literals and automatic escaping
 --------------------------------------
@@ -561,9 +562,9 @@ As we mentioned earlier, filter arguments can be strings::
     {{ data|default:"This is a string literal." }}
 
 All string literals are inserted **without** any automatic escaping into the
-template -- they act as if they were all passed through the ``safe`` filter.
-The reasoning behind this is that the template author is in control of what
-goes into the string literal, so they can make sure the text is correctly
+template -- they act as if they were all passed through the :tfilter:`safe`
+filter. The reasoning behind this is that the template author is in control of
+what goes into the string literal, so they can make sure the text is correctly
 escaped when the template is written.
 
 This means you would write ::

@@ -420,9 +420,10 @@ on the object ``poll``. Failing that, it tries an attribute lookup -- which
 works, in this case. If attribute lookup had failed, it would've tried a
 list-index lookup.
 
-Method-calling happens in the ``{% for %}`` loop: ``poll.choice_set.all`` is
-interpreted as the Python code ``poll.choice_set.all()``, which returns an
-iterable of Choice objects and is suitable for use in the ``{% for %}`` tag.
+Method-calling happens in the :ttag:`{% for %}<for>` loop:
+``poll.choice_set.all`` is interpreted as the Python code
+``poll.choice_set.all()``, which returns an iterable of Choice objects and is
+suitable for use in the :ttag:`{% for %}<for>` tag.
 
 See the :doc:`template guide </topics/templates>` for more about templates.
 

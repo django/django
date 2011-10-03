@@ -110,7 +110,7 @@ Running a threaded server on a TCP port::
 Running a preforked server on a Unix domain socket::
 
     ./manage.py runfcgi method=prefork socket=/home/user/mysite.sock pidfile=django.pid
-    
+
 .. admonition:: Socket security
 
     Django's default umask requires that the webserver and the Django fastcgi
@@ -223,7 +223,8 @@ This is probably the most common case, if you're using Django's admin site:
 .. _mod_rewrite: http://httpd.apache.org/docs/2.0/mod/mod_rewrite.html
 
 Django will automatically use the pre-rewrite version of the URL when
-constructing URLs with the ``{% url %}`` template tag (and similar methods).
+constructing URLs with the :ttag:`{% url %}<url>` template tag (and similar
+methods).
 
 Using mod_fcgid as alternative to mod_fastcgi
 ----------------------------------------------
@@ -409,8 +410,8 @@ Because many of these fastcgi-based solutions require rewriting the URL at
 some point inside the Web server, the path information that Django sees may not
 resemble the original URL that was passed in. This is a problem if the Django
 application is being served from under a particular prefix and you want your
-URLs from the ``{% url %}`` tag to look like the prefix, rather than the
-rewritten version, which might contain, for example, ``mysite.fcgi``.
+URLs from the :ttag:`{% url %}<url>` tag to look like the prefix, rather than
+the rewritten version, which might contain, for example, ``mysite.fcgi``.
 
 Django makes a good attempt to work out what the real script name prefix
 should be. In particular, if the Web server sets the ``SCRIPT_URL`` (specific

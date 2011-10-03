@@ -1962,8 +1962,8 @@ if you specifically wanted the admin view from the admin instance named
 For more details, see the documentation on :ref:`reversing namespaced URLs
 <topics-http-reversing-url-namespaces>`.
 
-To allow easier reversing of the admin urls in templates, Django provides an 
-``admin_url`` filter which takes an action as argument:
+To allow easier reversing of the admin urls in templates, Django provides an
+``admin_urlname`` filter which takes an action as argument:
 
 .. code-block:: html+django
 
@@ -1974,5 +1974,5 @@ To allow easier reversing of the admin urls in templates, Django provides an
 
 The action in the examples above match the last part of the URL names for
 :class:`ModelAdmin` instances described above. The ``opts`` variable can be any
-object which has an ``app_label`` and ``module_name`` and is usually supplied 
+object which has an ``app_label`` and ``module_name`` and is usually supplied
 by the admin views for the current model.
