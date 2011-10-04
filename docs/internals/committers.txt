@@ -329,6 +329,21 @@ Honza Král
 .. _Julien Phalip: http://julienphalip.com
 .. _Interaction Consortium: http://interaction.net.au
 
+`Aymeric Augustin`_
+    Aymeric is an engineer with a background in mathematics and computer
+    science. He chose Django because he believes that software should be simple,
+    explicit and tested. His perfectionist tendencies quickly led him to triage
+    tickets and contribute patches.
+
+    Aymeric has a pragmatic approach to software engineering, can't live without
+    a continuous integration server, and likes proving that Django is a good
+    choice for enterprise software.
+
+    He works in a `management consulting company`_ in Paris, France.
+
+.. _Aymeric Augustin: http://myks.org/
+.. _management consulting company: http://www.polyconseil.fr/
+
 Specialists
 -----------
 
