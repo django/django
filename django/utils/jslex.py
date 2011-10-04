@@ -51,19 +51,25 @@ class Lexer(object):
 
         Yields pairs (`name`, `tokentext`).
         """
-        while text:
-            eaten = 0
-            for match in self.regexes[self.state].finditer(text):
-                for name, toktext in match.groupdict().iteritems():
-                    if toktext is not None:
-                        tok = self.toks[name]
-                        new_state = tok.next
-                        eaten += len(toktext)
-                        yield (tok.name, toktext)
-                if new_state:
-                    self.state = new_state
+        end = len(text)
+        state = self.state
+        regexes = self.regexes
+        toks = self.toks
+        start = 0
+
+        while start < end:
+            for match in regexes[state].finditer(text, start):
+                name = match.lastgroup
+                tok = toks[name]
+                toktext = match.group(name)
+                start += len(toktext)
+                yield (tok.name, toktext)
+
+                if tok.next:
+                    state = tok.next
                     break
-            text = text[eaten:]
+
+        self.state = state
 
 
 class JsLexer(Lexer):
