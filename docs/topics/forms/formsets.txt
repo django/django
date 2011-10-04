@@ -273,7 +273,7 @@ getting to that data.
 
 Default: ``False``
 
-Lets create a formset with the ability to order::
+Lets you create a formset with the ability to order::
 
     >>> ArticleFormSet = formset_factory(ArticleForm, can_order=True)
     >>> formset = ArticleFormSet(initial=[
@@ -294,7 +294,7 @@ Lets create a formset with the ability to order::
 
 This adds an additional field to each form. This new field is named ``ORDER``
 and is an ``forms.IntegerField``. For the forms that came from the initial
-data it automatically assigned them a numeric value. Lets look at what will
+data it automatically assigned them a numeric value. Let's look at what will
 happen when the user changes these values::
 
     >>> data = {
@@ -329,7 +329,7 @@ happen when the user changes these values::
 
 Default: ``False``
 
-Lets create a formset with the ability to delete::
+Lets you create a formset with the ability to delete::
 
     >>> ArticleFormSet = formset_factory(ArticleForm, can_delete=True)
     >>> formset = ArticleFormSet(initial=[
