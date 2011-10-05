@@ -265,12 +265,13 @@ class QuerySet(object):
         db = self.db
         model = self.model
         compiler = self.query.get_compiler(using=db)
+        if fill_cache:
+            klass_info = get_klass_info(model, max_depth=max_depth,
+                                        requested=requested, only_load=only_load)
         for row in compiler.results_iter():
             if fill_cache:
-                obj, _ = get_cached_row(model, row,
-                            index_start, using=db, max_depth=max_depth,
-                            requested=requested, offset=len(aggregate_select),
-                            only_load=only_load)
+                obj, _ = get_cached_row(row, index_start, db, klass_info,
+                                        offset=len(aggregate_select))
             else:
                 if skip:
                     row_data = row[index_start:aggregate_start]
@@ -1174,22 +1175,16 @@ class EmptyQuerySet(QuerySet):
     # situations).
     value_annotation = False
 
-
-def get_cached_row(klass, row, index_start, using, max_depth=0, cur_depth=0,
-                   requested=None, offset=0, only_load=None, local_only=False):
+def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
+                   only_load=None, local_only=False):
     """
-    Helper function that recursively returns an object with the specified
-    related attributes already populated.
-
-    This method may be called recursively to populate deep select_related()
-    clauses.
+    Helper function that recursively returns an information for a klass, to be
+    used in get_cached_row.  It exists just to compute this information only
+    once for entire queryset. Otherwise it would be computed for each row, which
+    leads to poor perfomance on large querysets.
 
     Arguments:
      * klass - the class to retrieve (and instantiate)
-     * row - the row of data returned by the database cursor
-     * index_start - the index of the row at which data for this
-       object is known to start
-     * using - the database alias on which the query is being executed.
      * max_depth - the maximum depth to which a select_related()
        relationship should be explored.
      * cur_depth - the current depth in the select_related() tree.
@@ -1198,20 +1193,16 @@ def get_cached_row(klass, row, index_start, using, max_depth=0, cur_depth=0,
        that is to be retrieved. keys are field names; values are
        dictionaries describing the keys on that related object that
        are themselves to be select_related().
-     * offset - the number of additional fields that are known to
-       exist in `row` for `klass`. This usually means the number of
-       annotated results on `klass`.
      * only_load - if the query has had only() or defer() applied,
        this is the list of field names that will be returned. If None,
        the full field list for `klass` can be assumed.
-     * local_only - Only populate local fields. This is used when building
+     * local_only - Only populate local fields. This is used when
        following reverse select-related relations
     """
     if max_depth and requested is None and cur_depth > max_depth:
         # We've recursed deeply enough; stop now.
         return None
 
-    restricted = requested is not None
     if only_load:
         load_fields = only_load.get(klass)
         # When we create the object, we will also be creating populating
@@ -1223,6 +1214,7 @@ def get_cached_row(klass, row, index_start, using, max_depth=0, cur_depth=0,
                 load_fields.update(fields)
     else:
         load_fields = None
+
     if load_fields:
         # Handle deferred fields.
         skip = set()
@@ -1237,52 +1229,97 @@ def get_cached_row(klass, row, index_start, using, max_depth=0, cur_depth=0,
                 init_list.append(field.attname)
         # Retrieve all the requested fields
         field_count = len(init_list)
-        fields = row[index_start : index_start + field_count]
-        # If all the select_related columns are None, then the related
-        # object must be non-existent - set the relation to None.
-        # Otherwise, construct the related object.
-        if fields == (None,) * field_count:
-            obj = None
-        elif skip:
+        if skip:
             klass = deferred_class_factory(klass, skip)
-            obj = klass(**dict(zip(init_list, fields)))
+            field_names = init_list
         else:
-            obj = klass(*fields)
-
+            field_names = ()
     else:
         # Load all fields on klass
-        if local_only:
+
+        # We trying to not populate field_names variable for perfomance reason.
+        # If field_names variable is set, it is used to instantiate desired fields,
+        # by passing **dict(zip(field_names, fields)) as kwargs to Model.__init__ method.
+        # But kwargs version of Model.__init__ is slower, so we should avoid using
+        # it when it is not really neccesary.
+        if local_only and len(klass._meta.local_fields) != len(klass._meta.fields):
+            field_count = len(klass._meta.local_fields)
             field_names = [f.attname for f in klass._meta.local_fields]
         else:
-            field_names = [f.attname for f in klass._meta.fields]
-        field_count = len(field_names)
-        fields = row[index_start : index_start + field_count]
-        # If all the select_related columns are None, then the related
-        # object must be non-existent - set the relation to None.
-        # Otherwise, construct the related object.
-        if fields == (None,) * field_count:
-            obj = None
-        else:
+            field_count = len(klass._meta.fields)
+            field_names = ()
+
+    restricted = requested is not None
+
+    related_fields = []
+    for f in klass._meta.fields:
+        if select_related_descend(f, restricted, requested):
+            if restricted:
+                next = requested[f.name]
+            else:
+                next = None
+            klass_info = get_klass_info(f.rel.to, max_depth=max_depth, cur_depth=cur_depth+1,
+                                        requested=next, only_load=only_load)
+            related_fields.append((f, klass_info))
+
+    reverse_related_fields = []
+    if restricted:
+        for o in klass._meta.get_all_related_objects():
+            if o.field.unique and select_related_descend(o.field, restricted, requested, reverse=True):
+                next = requested[o.field.related_query_name()]
+                klass_info = get_klass_info(o.model, max_depth=max_depth, cur_depth=cur_depth+1,
+                                            requested=next, only_load=only_load, local_only=True)
+                reverse_related_fields.append((o.field, klass_info))
+
+    return klass, field_names, field_count, related_fields, reverse_related_fields
+
+
+def get_cached_row(row, index_start, using,  klass_info, offset=0):
+    """
+    Helper function that recursively returns an object with the specified
+    related attributes already populated.
+
+    This method may be called recursively to populate deep select_related()
+    clauses.
+
+    Arguments:
+         * row - the row of data returned by the database cursor
+         * index_start - the index of the row at which data for this
+           object is known to start
+         * offset - the number of additional fields that are known to
+           exist in row for `klass`. This usually means the number of
+           annotated results on `klass`.
+        * using - the database alias on which the query is being executed.
+         * klass_info - result of the get_klass_info function
+    """
+    if klass_info is None:
+        return None
+    klass, field_names, field_count, related_fields, reverse_related_fields = klass_info
+
+    fields = row[index_start : index_start + field_count]
+    # If all the select_related columns are None, then the related
+    # object must be non-existent - set the relation to None.
+    # Otherwise, construct the related object.
+    if fields == (None,) * field_count:
+        obj = None
+    else:
+        if field_names:
             obj = klass(**dict(zip(field_names, fields)))
+        else:
+            obj = klass(*fields)
 
     # If an object was retrieved, set the database state.
     if obj:
         obj._state.db = using
         obj._state.adding = False
 
+    # Instantiate related fields
     index_end = index_start + field_count + offset
     # Iterate over each related object, populating any
     # select_related() fields
-    for f in klass._meta.fields:
-        if not select_related_descend(f, restricted, requested):
-            continue
-        if restricted:
-            next = requested[f.name]
-        else:
-            next = None
+    for f, klass_info in related_fields:
         # Recursively retrieve the data for the related object
-        cached_row = get_cached_row(f.rel.to, row, index_end, using,
-                max_depth, cur_depth+1, next, only_load=only_load)
+        cached_row = get_cached_row(row, index_end, using, klass_info)
         # If the recursive descent found an object, populate the
         # descriptor caches relevant to the object
         if cached_row:
@@ -1299,45 +1336,35 @@ def get_cached_row(klass, row, index_start, using, max_depth=0, cur_depth=0,
     # Now do the same, but for reverse related objects.
     # Only handle the restricted case - i.e., don't do a depth
     # descent into reverse relations unless explicitly requested
-    if restricted:
-        related_fields = [
-            (o.field, o.model)
-            for o in klass._meta.get_all_related_objects()
-            if o.field.unique
-        ]
-        for f, model in related_fields:
-            if not select_related_descend(f, restricted, requested, reverse=True):
-                continue
-            next = requested[f.related_query_name()]
-            # Recursively retrieve the data for the related object
-            cached_row = get_cached_row(model, row, index_end, using,
-                max_depth, cur_depth+1, next, only_load=only_load, local_only=True)
-            # If the recursive descent found an object, populate the
-            # descriptor caches relevant to the object
-            if cached_row:
-                rel_obj, index_end = cached_row
-                if obj is not None:
-                    # If the field is unique, populate the
-                    # reverse descriptor cache
-                    setattr(obj, f.related.get_cache_name(), rel_obj)
-                if rel_obj is not None:
-                    # If the related object exists, populate
-                    # the descriptor cache.
-                    setattr(rel_obj, f.get_cache_name(), obj)
-                    # Now populate all the non-local field values
-                    # on the related object
-                    for rel_field,rel_model in rel_obj._meta.get_fields_with_model():
-                        if rel_model is not None:
-                            setattr(rel_obj, rel_field.attname, getattr(obj, rel_field.attname))
-                            # populate the field cache for any related object
-                            # that has already been retrieved
-                            if rel_field.rel:
-                                try:
-                                    cached_obj = getattr(obj, rel_field.get_cache_name())
-                                    setattr(rel_obj, rel_field.get_cache_name(), cached_obj)
-                                except AttributeError:
-                                    # Related object hasn't been cached yet
-                                    pass
+    for f, klass_info in reverse_related_fields:
+        # Recursively retrieve the data for the related object
+        cached_row = get_cached_row(row, index_end, using, klass_info)
+        # If the recursive descent found an object, populate the
+        # descriptor caches relevant to the object
+        if cached_row:
+            rel_obj, index_end = cached_row
+            if obj is not None:
+                # If the field is unique, populate the
+                # reverse descriptor cache
+                setattr(obj, f.related.get_cache_name(), rel_obj)
+            if rel_obj is not None:
+                # If the related object exists, populate
+                # the descriptor cache.
+                setattr(rel_obj, f.get_cache_name(), obj)
+                # Now populate all the non-local field values
+                # on the related object
+                for rel_field, rel_model in rel_obj._meta.get_fields_with_model():
+                    if rel_model is not None:
+                        setattr(rel_obj, rel_field.attname, getattr(obj, rel_field.attname))
+                        # populate the field cache for any related object
+                        # that has already been retrieved
+                        if rel_field.rel:
+                            try:
+                                cached_obj = getattr(obj, rel_field.get_cache_name())
+                                setattr(rel_obj, rel_field.get_cache_name(), cached_obj)
+                            except AttributeError:
+                                # Related object hasn't been cached yet
+                                pass
     return obj, index_end
 
 
