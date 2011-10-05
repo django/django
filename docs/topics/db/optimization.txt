@@ -141,10 +141,12 @@ retrieving it all in one query. This is particularly important if you have a
 query that is executed in a loop, and could therefore end up doing many database
 queries, when only one was needed. So:
 
-Use ``QuerySet.select_related()``
----------------------------------
+Use ``QuerySet.select_related()`` and ``prefetch_related()``
+------------------------------------------------------------
 
-Understand :ref:`QuerySet.select_related() <select-related>` thoroughly, and use it:
+Understand :meth:`~django.db.models.query.QuerySet.select_related` and
+:meth:`~django.db.models.query.QuerySet.prefetch_related` thoroughly, and use
+them:
 
 * in view code,
 

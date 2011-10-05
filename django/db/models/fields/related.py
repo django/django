@@ -432,8 +432,22 @@ class ForeignRelatedObjectsDescriptor(object):
                 self.model = rel_model
 
             def get_query_set(self):
-                db = self._db or router.db_for_read(self.model, instance=self.instance)
-                return super(RelatedManager, self).get_query_set().using(db).filter(**(self.core_filters))
+                try:
+                    return self.instance._prefetched_objects_cache[rel_field.related_query_name()]
+                except (AttributeError, KeyError):
+                    db = self._db or router.db_for_read(self.model, instance=self.instance)
+                    return super(RelatedManager, self).get_query_set().using(db).filter(**self.core_filters)
+
+            def get_prefetch_query_set(self, instances):
+                """
+                Return a queryset that does the bulk lookup needed
+                by prefetch_related functionality.
+                """
+                db = self._db or router.db_for_read(self.model)
+                query = {'%s__%s__in' % (rel_field.name, attname):
+                             [getattr(obj, attname) for obj in instances]}
+                qs = super(RelatedManager, self).get_query_set().using(db).filter(**query)
+                return (qs, rel_field.get_attname(), attname)
 
             def add(self, *objs):
                 for obj in objs:
@@ -482,25 +496,60 @@ def create_many_related_manager(superclass, rel):
     """Creates a manager that subclasses 'superclass' (which is a Manager)
     and adds behavior for many-to-many related objects."""
     class ManyRelatedManager(superclass):
-        def __init__(self, model=None, core_filters=None, instance=None, symmetrical=None,
+        def __init__(self, model=None, query_field_name=None, instance=None, symmetrical=None,
                      source_field_name=None, target_field_name=None, reverse=False,
-                     through=None):
+                     through=None, prefetch_cache_name=None):
             super(ManyRelatedManager, self).__init__()
             self.model = model
-            self.core_filters = core_filters
+            self.query_field_name = query_field_name
+            self.core_filters = {'%s__pk' % query_field_name: instance._get_pk_val()}
             self.instance = instance
             self.symmetrical = symmetrical
             self.source_field_name = source_field_name
             self.target_field_name = target_field_name
             self.reverse = reverse
             self.through = through
+            self.prefetch_cache_name = prefetch_cache_name
             self._pk_val = self.instance.pk
             if self._pk_val is None:
                 raise ValueError("%r instance needs to have a primary key value before a many-to-many relationship can be used." % instance.__class__.__name__)
 
         def get_query_set(self):
-            db = self._db or router.db_for_read(self.instance.__class__, instance=self.instance)
-            return super(ManyRelatedManager, self).get_query_set().using(db)._next_is_sticky().filter(**(self.core_filters))
+            try:
+                return self.instance._prefetched_objects_cache[self.prefetch_cache_name]
+            except (AttributeError, KeyError):
+                db = self._db or router.db_for_read(self.instance.__class__, instance=self.instance)
+                return super(ManyRelatedManager, self).get_query_set().using(db)._next_is_sticky().filter(**self.core_filters)
+
+        def get_prefetch_query_set(self, instances):
+            """
+            Returns a tuple:
+            (queryset of instances of self.model that are related to passed in instances
+             attr of returned instances needed for matching
+             attr of passed in instances needed for matching)
+            """
+            from django.db import connections
+            db = self._db or router.db_for_read(self.model)
+            query = {'%s__pk__in' % self.query_field_name:
+                         [obj._get_pk_val() for obj in instances]}
+            qs = super(ManyRelatedManager, self).get_query_set().using(db)._next_is_sticky().filter(**query)
+
+            # M2M: need to annotate the query in order to get the primary model
+            # that the secondary model was actually related to. We know that
+            # there will already be a join on the join table, so we can just add
+            # the select.
+
+            # For non-autocreated 'through' models, can't assume we are
+            # dealing with PK values.
+            fk = self.through._meta.get_field(self.source_field_name)
+            source_col = fk.column
+            join_table = self.through._meta.db_table
+            connection = connections[db]
+            qn = connection.ops.quote_name
+            qs = qs.extra(select={'_prefetch_related_val':
+                                      '%s.%s' % (qn(join_table), qn(source_col))})
+            select_attname = fk.rel.get_related_field().get_attname()
+            return (qs, '_prefetch_related_val', select_attname)
 
         # If the ManyToMany relation has an intermediary model,
         # the add and remove methods do not exist.
@@ -683,7 +732,8 @@ class ManyRelatedObjectsDescriptor(object):
 
         manager = self.related_manager_cls(
             model=rel_model,
-            core_filters={'%s__pk' % self.related.field.name: instance._get_pk_val()},
+            query_field_name=self.related.field.name,
+            prefetch_cache_name=self.related.field.related_query_name(),
             instance=instance,
             symmetrical=False,
             source_field_name=self.related.field.m2m_reverse_field_name(),
@@ -739,7 +789,8 @@ class ReverseManyRelatedObjectsDescriptor(object):
 
         manager = self.related_manager_cls(
             model=self.field.rel.to,
-            core_filters={'%s__pk' % self.field.related_query_name(): instance._get_pk_val()},
+            query_field_name=self.field.related_query_name(),
+            prefetch_cache_name=self.field.name,
             instance=instance,
             symmetrical=self.field.rel.symmetrical,
             source_field_name=self.field.m2m_field_name(),

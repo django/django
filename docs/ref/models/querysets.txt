@@ -571,8 +571,6 @@ can be useful in situations where you might want to pass in either a model
 manager or a ``QuerySet`` and do further filtering on the result. After calling
 ``all()`` on either object, you'll definitely have a ``QuerySet`` to work with.
 
-.. _select-related:
-
 select_related
 ~~~~~~~~~~~~~~
 
@@ -689,6 +687,107 @@ is defined. Instead of specifying the field name, use the :attr:`related_name
 
 A :class:`~django.db.models.OneToOneField` is not traversed in the reverse
 direction if you are performing a depth-based ``select_related()`` call.
+
+prefetch_related
+~~~~~~~~~~~~~~~~
+
+.. method:: prefetch_related(*lookups)
+
+.. versionadded:: 1.4
+
+Returns a ``QuerySet`` that will automatically retrieve, in a single batch,
+related many-to-many and many-to-one objects for each of the specified lookups.
+
+This is similar to ``select_related`` for the 'many related objects' case, but
+note that ``prefetch_related`` causes a separate query to be issued for each set
+of related objects that you request, unlike ``select_related`` which modifies
+the original query with joins in order to get the related objects. With
+``prefetch_related``, the additional queries are done as soon as the QuerySet
+begins to be evaluated.
+
+For example, suppose you have these models::
+
+    class Topping(models.Model):
+        name = models.CharField(max_length=30)
+
+    class Pizza(models.Model):
+        name = models.CharField(max_length=50)
+        toppings = models.ManyToManyField(Topping)
+
+        def __unicode__(self):
+            return u"%s (%s)" % (self.name, u", ".join([topping.name
+                                                        for topping in self.toppings.all()]))
+
+and run this code::
+
+    >>> Pizza.objects.all()
+    [u"Hawaiian (ham, pineapple)", u"Seafood (prawns, smoked salmon)"...
+
+The problem with this code is that it will run a query on the Toppings table for
+**every** item in the Pizza ``QuerySet``.  Using ``prefetch_related``, this can
+be reduced to two:
+
+    >>> Pizza.objects.all().prefetch_related('toppings')
+
+All the relevant toppings will be fetched in a single query, and used to make
+``QuerySets`` that have a pre-filled cache of the relevant results. These
+``QuerySets`` are then used in the ``self.toppings.all()`` calls.
+
+Please note that use of ``prefetch_related`` will mean that the additional
+queries run will **always** be executed - even if you never use the related
+objects - and it always fully populates the result cache on the primary
+``QuerySet`` (which can sometimes be avoided in other cases).
+
+Also remember that, as always with QuerySets, any subsequent chained methods
+will ignore previously cached results, and retrieve data using a fresh database
+query. So, if you write the following:
+
+    >>> pizzas = Pizza.objects.prefetch_related('toppings')
+    >>> [list(pizza.toppings.filter(spicy=True)) for pizza in pizzas]
+
+...then the fact that `pizza.toppings.all()` has been prefetched will not help
+you - in fact it hurts performance, since you have done a database query that
+you haven't used. So use this feature with caution!
+
+The lookups that must be supplied to this method can be any attributes on the
+model instances which represent related queries that return multiple
+objects. This includes attributes representing the 'many' side of ``ForeignKey``
+relationships, forward and reverse ``ManyToManyField`` attributes, and also any
+``GenericRelations``.
+
+You can also use the normal join syntax to do related fields of related
+fields. Suppose we have an additional model to the example above::
+
+    class Restaurant(models.Model):
+        pizzas = models.ManyToMany(Pizza, related_name='restaurants')
+        best_pizza = models.ForeignKey(Pizza, related_name='championed_by')
+
+The following are all legal:
+
+    >>> Restaurant.objects.prefetch_related('pizzas__toppings')
+
+This will prefetch all pizzas belonging to restaurants, and all toppings
+belonging to those pizzas. This will result in a total of 3 database queries -
+one for the restaurants, one for the pizzas, and one for the toppings.
+
+    >>> Restaurant.objects.select_related('best_pizza').prefetch_related('best_pizza__toppings')
+
+This will fetch the best pizza and all the toppings for the best pizza for each
+restaurant. This will be done in 2 database queries - one for the restaurants
+and 'best pizzas' combined (achieved through use of ``select_related``), and one
+for the toppings.
+
+Chaining ``prefetch_related`` calls will accumulate the fields that should have
+this behavior applied. To clear any ``prefetch_related`` behavior, pass `None`
+as a parameter::
+
+   >>> non_prefetched = qs.prefetch_related(None)
+
+One difference when using ``prefetch_related`` is that, in some circumstances,
+objects created by a query can be shared between the different objects that they
+are related to i.e. a single Python model instance can appear at more than one
+point in the tree of objects that are returned. Normally this behavior will not
+be a problem, and will in fact save both memory and CPU time.
 
 extra
 ~~~~~

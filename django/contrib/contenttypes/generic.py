@@ -225,11 +225,7 @@ class ReverseGenericRelatedObjectsDescriptor(object):
             content_type = content_type,
             content_type_field_name = self.field.content_type_field_name,
             object_id_field_name = self.field.object_id_field_name,
-            core_filters = {
-                '%s__pk' % self.field.content_type_field_name: content_type.id,
-                '%s__exact' % self.field.object_id_field_name: instance._get_pk_val(),
-            }
-
+            prefetch_cache_name = self.field.attname,
         )
 
         return manager
@@ -250,12 +246,12 @@ def create_generic_related_manager(superclass):
     """
 
     class GenericRelatedObjectManager(superclass):
-        def __init__(self, model=None, core_filters=None, instance=None, symmetrical=None,
+        def __init__(self, model=None, instance=None, symmetrical=None,
                      source_col_name=None, target_col_name=None, content_type=None,
-                     content_type_field_name=None, object_id_field_name=None):
+                     content_type_field_name=None, object_id_field_name=None,
+                     prefetch_cache_name=None):
 
             super(GenericRelatedObjectManager, self).__init__()
-            self.core_filters = core_filters
             self.model = model
             self.content_type = content_type
             self.symmetrical = symmetrical
@@ -264,11 +260,29 @@ def create_generic_related_manager(superclass):
             self.target_col_name = target_col_name
             self.content_type_field_name = content_type_field_name
             self.object_id_field_name = object_id_field_name
+            self.prefetch_cache_name = prefetch_cache_name
             self.pk_val = self.instance._get_pk_val()
+            self.core_filters = {
+                '%s__pk' % content_type_field_name: content_type.id,
+                '%s__exact' % object_id_field_name: instance._get_pk_val(),
+            }
 
         def get_query_set(self):
-            db = self._db or router.db_for_read(self.model, instance=self.instance)
-            return super(GenericRelatedObjectManager, self).get_query_set().using(db).filter(**self.core_filters)
+            try:
+                return self.instance._prefetched_objects_cache[self.prefetch_cache_name]
+            except (AttributeError, KeyError):
+                db = self._db or router.db_for_read(self.model, instance=self.instance)
+                return super(GenericRelatedObjectManager, self).get_query_set().using(db).filter(**self.core_filters)
+
+        def get_prefetch_query_set(self, instances):
+            db = self._db or router.db_for_read(self.model)
+            query = {
+                '%s__pk' % self.content_type_field_name: self.content_type.id,
+                '%s__in' % self.object_id_field_name:
+                    [obj._get_pk_val() for obj in instances]
+                }
+            qs = super(GenericRelatedObjectManager, self).get_query_set().using(db).filter(**query)
+            return (qs, self.object_id_field_name, 'pk')
 
         def add(self, *objs):
             for obj in objs:

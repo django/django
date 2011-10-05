@@ -172,6 +172,9 @@ class Manager(object):
     def select_related(self, *args, **kwargs):
         return self.get_query_set().select_related(*args, **kwargs)
 
+    def prefetch_related(self, *args, **kwargs):
+        return self.get_query_set().prefetch_related(*args, **kwargs)
+
     def values(self, *args, **kwargs):
         return self.get_query_set().values(*args, **kwargs)
 

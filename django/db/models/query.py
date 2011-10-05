@@ -36,6 +36,8 @@ class QuerySet(object):
         self._iter = None
         self._sticky_filter = False
         self._for_write = False
+        self._prefetch_related_lookups = []
+        self._prefetch_done = False
 
     ########################
     # PYTHON MAGIC METHODS #
@@ -81,9 +83,17 @@ class QuerySet(object):
                 self._result_cache = list(self.iterator())
         elif self._iter:
             self._result_cache.extend(self._iter)
+        if self._prefetch_related_lookups and not self._prefetch_done:
+            self._prefetch_related_objects()
         return len(self._result_cache)
 
     def __iter__(self):
+        if self._prefetch_related_lookups and not self._prefetch_done:
+            # We need all the results in order to be able to do the prefetch
+            # in one go. To minimize code duplication, we use the __len__
+            # code path which also forces this, and also does the prefetch
+            len(self)
+
         if self._result_cache is None:
             self._iter = self.iterator()
             self._result_cache = []
@@ -106,6 +116,12 @@ class QuerySet(object):
                 self._fill_cache()
 
     def __nonzero__(self):
+        if self._prefetch_related_lookups and not self._prefetch_done:
+            # We need all the results in order to be able to do the prefetch
+            # in one go. To minimize code duplication, we use the __len__
+            # code path which also forces this, and also does the prefetch
+            len(self)
+
         if self._result_cache is not None:
             return bool(self._result_cache)
         try:
@@ -527,6 +543,11 @@ class QuerySet(object):
             return self.query.has_results(using=self.db)
         return bool(self._result_cache)
 
+    def _prefetch_related_objects(self):
+        # This method can only be called once the result cache has been filled.
+        prefetch_related_objects(self._result_cache, self._prefetch_related_lookups)
+        self._prefetch_done = True
+
     ##################################################
     # PUBLIC METHODS THAT RETURN A QUERYSET SUBCLASS #
     ##################################################
@@ -649,6 +670,23 @@ class QuerySet(object):
         if depth:
             obj.query.max_depth = depth
         return obj
+
+    def prefetch_related(self, *lookups):
+        """
+        Returns a new QuerySet instance that will prefetch the specified
+        Many-To-One and Many-To-Many related objects when the QuerySet is
+        evaluated.
+
+        When prefetch_related() is called more than once, the list of lookups to
+        prefetch is appended to. If prefetch_related(None) is called, the
+        the list is cleared.
+        """
+        clone = self._clone()
+        if lookups == (None,):
+            clone._prefetch_related_lookups = []
+        else:
+            clone._prefetch_related_lookups.extend(lookups)
+        return clone
 
     def dup_select_related(self, other):
         """
@@ -799,6 +837,7 @@ class QuerySet(object):
             query.filter_is_sticky = True
         c = klass(model=self.model, query=query, using=self._db)
         c._for_write = self._for_write
+        c._prefetch_related_lookups = self._prefetch_related_lookups[:]
         c.__dict__.update(kwargs)
         if setup and hasattr(c, '_setup_query'):
             c._setup_query()
@@ -863,6 +902,7 @@ class QuerySet(object):
     # When used as part of a nested query, a queryset will never be an "always
     # empty" result.
     value_annotation = True
+
 
 class ValuesQuerySet(QuerySet):
     def __init__(self, *args, **kwargs):
@@ -992,6 +1032,7 @@ class ValuesQuerySet(QuerySet):
             raise TypeError('Cannot use a multi-field %s as a filter value.'
                     % self.__class__.__name__)
         return self
+
 
 class ValuesListQuerySet(ValuesQuerySet):
     def iterator(self):
@@ -1502,6 +1543,7 @@ class RawQuerySet(object):
                 self._model_fields[converter(column)] = field
         return self._model_fields
 
+
 def insert_query(model, objs, fields, return_id=False, raw=False, using=None):
     """
     Inserts a new record for the given model. This provides an interface to
@@ -1511,3 +1553,140 @@ def insert_query(model, objs, fields, return_id=False, raw=False, using=None):
     query = sql.InsertQuery(model)
     query.insert_values(fields, objs, raw=raw)
     return query.get_compiler(using=using).execute_sql(return_id)
+
+
+def prefetch_related_objects(result_cache, related_lookups):
+    """
+    Helper function for prefetch_related functionality
+
+    Populates prefetched objects caches for a list of results
+    from a QuerySet
+    """
+    from django.db.models.sql.constants import LOOKUP_SEP
+
+    if len(result_cache) == 0:
+        return # nothing to do
+
+    model = result_cache[0].__class__
+
+    # We need to be able to dynamically add to the list of prefetch_related
+    # lookups that we look up (see below).  So we need some book keeping to
+    # ensure we don't do duplicate work.
+    done_lookups = set() # list of lookups like foo__bar__baz
+    done_queries = {}    # dictionary of things like 'foo__bar': [results]
+    related_lookups = list(related_lookups)
+
+    # We may expand related_lookups, so need a loop that allows for that
+    for lookup in related_lookups:
+        if lookup in done_lookups:
+            # We've done exactly this already, skip the whole thing
+            continue
+        done_lookups.add(lookup)
+
+        # Top level, the list of objects to decorate is the the result cache
+        # from the primary QuerySet. It won't be for deeper levels.
+        obj_list = result_cache
+
+        attrs = lookup.split(LOOKUP_SEP)
+        for level, attr in enumerate(attrs):
+            # Prepare main instances
+            if len(obj_list) == 0:
+                break
+
+            good_objects = True
+            for obj in obj_list:
+                if not hasattr(obj, '_prefetched_objects_cache'):
+                    try:
+                        obj._prefetched_objects_cache = {}
+                    except AttributeError:
+                        # Must be in a QuerySet subclass that is not returning
+                        # Model instances, either in Django or 3rd
+                        # party. prefetch_related() doesn't make sense, so quit
+                        # now.
+                        good_objects = False
+                        break
+                else:
+                    # We already did this list
+                    break
+            if not good_objects:
+                break
+
+            # Descend down tree
+            try:
+                rel_obj = getattr(obj_list[0], attr)
+            except AttributeError:
+                raise AttributeError("Cannot find '%s' on %s object, '%s' is an invalid "
+                                     "parameter to prefetch_related()" %
+                                     (attr, obj_list[0].__class__.__name__, lookup))
+
+            can_prefetch = hasattr(rel_obj, 'get_prefetch_query_set')
+            if level == len(attrs) - 1 and not can_prefetch:
+                # Last one, this *must* resolve to a related manager.
+                raise ValueError("'%s' does not resolve to a supported 'many related"
+                                 " manager' for model %s - this is an invalid"
+                                 " parameter to prefetch_related()."
+                                 % (lookup, model.__name__))
+
+            if can_prefetch:
+                # Check we didn't do this already
+                current_lookup = LOOKUP_SEP.join(attrs[0:level+1])
+                if current_lookup in done_queries:
+                    obj_list = done_queries[current_lookup]
+                else:
+                    relmanager = rel_obj
+                    obj_list, additional_prl = prefetch_one_level(obj_list, relmanager, attr)
+                    for f in additional_prl:
+                        new_prl = LOOKUP_SEP.join([current_lookup, f])
+                        related_lookups.append(new_prl)
+                    done_queries[current_lookup] = obj_list
+            else:
+                # Assume we've got some singly related object. We replace
+                # the current list of parent objects with that list.
+                obj_list = [getattr(obj, attr) for obj in obj_list]
+
+                # Filter out 'None' so that we can continue with nullable
+                # relations.
+                obj_list = [obj for obj in obj_list if obj is not None]
+
+
+def prefetch_one_level(instances, relmanager, attname):
+    """
+    Helper function for prefetch_related_objects
+
+    Runs prefetches on all instances using the manager relmanager,
+    assigning results to queryset against instance.attname.
+
+    The prefetched objects are returned, along with any additional
+    prefetches that must be done due to prefetch_related lookups
+    found from default managers.
+    """
+    rel_qs, rel_obj_attr, instance_attr = relmanager.get_prefetch_query_set(instances)
+    # We have to handle the possibility that the default manager itself added
+    # prefetch_related lookups to the QuerySet we just got back. We don't want to
+    # trigger the prefetch_related functionality by evaluating the query.
+    # Rather, we need to merge in the prefetch_related lookups.
+    additional_prl = getattr(rel_qs, '_prefetch_related_lookups', [])
+    if additional_prl:
+        # Don't need to clone because the manager should have given us a fresh
+        # instance, so we access an internal instead of using public interface
+        # for performance reasons.
+        rel_qs._prefetch_related_lookups = []
+
+    all_related_objects = list(rel_qs)
+
+    rel_obj_cache = {}
+    for rel_obj in all_related_objects:
+        rel_attr_val = getattr(rel_obj, rel_obj_attr)
+        if rel_attr_val not in rel_obj_cache:
+            rel_obj_cache[rel_attr_val] = []
+        rel_obj_cache[rel_attr_val].append(rel_obj)
+
+    for obj in instances:
+        qs = getattr(obj, attname).all()
+        instance_attr_val = getattr(obj, instance_attr)
+        qs._result_cache = rel_obj_cache.get(instance_attr_val, [])
+        # We don't want the individual qs doing prefetch_related now, since we
+        # have merged this into the current work.
+        qs._prefetch_done = True
+        obj._prefetched_objects_cache[attname] = qs
+    return all_related_objects, additional_prl
