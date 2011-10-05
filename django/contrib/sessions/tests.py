@@ -162,7 +162,10 @@ class SessionTestsMixin(object):
         # removed the key) results in a new key being generated.
         try:
             session = self.backend('1')
-            session.save()
+            try:
+                session.save()
+            except AttributeError:
+                self.fail("The session object did not save properly.  Middleware may be saving cache items without namespaces.")
             self.assertNotEqual(session.session_key, '1')
             self.assertEqual(session.get('cat'), None)
             session.delete()
