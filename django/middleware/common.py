@@ -85,7 +85,7 @@ class CommonMiddleware(object):
                 new_url[0], urlquote(new_url[1]))
         else:
             newurl = urlquote(new_url[1])
-        if request.GET:
+        if request.META.get('QUERY_STRING', ''):
             newurl += '?' + request.META['QUERY_STRING']
         return http.HttpResponsePermanentRedirect(newurl)
 
