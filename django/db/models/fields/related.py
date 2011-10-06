@@ -9,7 +9,7 @@ from django.db.models.query_utils import QueryWrapper
 from django.db.models.deletion import CASCADE
 from django.utils.encoding import smart_unicode
 from django.utils.translation import ugettext_lazy as _, string_concat
-from django.utils.functional import curry, memoize, cached_property
+from django.utils.functional import curry, cached_property
 from django.core import exceptions
 from django import forms
 
@@ -386,8 +386,7 @@ class ForeignRelatedObjectsDescriptor(object):
         if instance is None:
             return self
 
-        manager = self.create_manager(self.related.model._default_manager.__class__)
-        return manager(instance)
+        return self.related_manager_cls(instance)
 
     def __set__(self, instance, value):
         if instance is None:
@@ -400,24 +399,11 @@ class ForeignRelatedObjectsDescriptor(object):
             manager.clear()
         manager.add(*value)
 
-    def delete_manager(self, instance):
-        """
-        Returns a queryset based on the related model's base manager (rather
-        than the default manager, as returned by __get__). Used by
-        Model.delete().
-        """
-        manager = self.create_manager(self.related.model._base_manager.__class__)
-        return manager(instance)
-
-    def create_manager(self, superclass):
-        """
-        Creates the managers used by other methods (__get__() and delete()).
-        """
-
-        # We use closures for these values so that we only need to memoize this
-        # function on the one argument of 'superclass', and the two places that
-        # call create_manager simply need to pass instance to the manager
-        # __init__
+    @cached_property
+    def related_manager_cls(self):
+        # Dynamically create a class that subclasses the related model's default
+        # manager.
+        superclass = self.related.model._default_manager.__class__
         rel_field = self.related.field
         rel_model = self.related.model
         attname = rel_field.rel.get_related_field().attname
@@ -489,7 +475,6 @@ class ForeignRelatedObjectsDescriptor(object):
                 clear.alters_data = True
 
         return RelatedManager
-    create_manager = memoize(create_manager, {}, 2)
 
 
 def create_many_related_manager(superclass, rel):
