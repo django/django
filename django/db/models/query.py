@@ -3,6 +3,7 @@ The main QuerySet implementation. This provides the public API for the ORM.
 """
 
 import copy
+import itertools
 
 from django.db import connections, router, transaction, IntegrityError
 from django.db.models.fields import AutoField
@@ -1574,9 +1575,12 @@ def prefetch_related_objects(result_cache, related_lookups):
     # ensure we don't do duplicate work.
     done_lookups = set() # list of lookups like foo__bar__baz
     done_queries = {}    # dictionary of things like 'foo__bar': [results]
-    related_lookups = list(related_lookups)
 
-    # We may expand related_lookups, so need a loop that allows for that
+    manual_lookups = list(related_lookups)
+    auto_lookups = [] # we add to this as we go through.
+    followed_descriptors = set() # recursion protection
+
+    related_lookups = itertools.chain(manual_lookups, auto_lookups)
     for lookup in related_lookups:
         if lookup in done_lookups:
             # We've done exactly this already, skip the whole thing
@@ -1616,7 +1620,7 @@ def prefetch_related_objects(result_cache, related_lookups):
             # We assume that objects retrieved are homogenous (which is the premise
             # of prefetch_related), so what applies to first object applies to all.
             first_obj = obj_list[0]
-            prefetcher, attr_found, is_fetched = get_prefetcher(first_obj, attr)
+            prefetcher, descriptor, attr_found, is_fetched = get_prefetcher(first_obj, attr)
 
             if not attr_found:
                 raise AttributeError("Cannot find '%s' on %s object, '%s' is an invalid "
@@ -1638,10 +1642,17 @@ def prefetch_related_objects(result_cache, related_lookups):
                     obj_list = done_queries[current_lookup]
                 else:
                     obj_list, additional_prl = prefetch_one_level(obj_list, prefetcher, attr)
-                    for f in additional_prl:
-                        new_prl = LOOKUP_SEP.join([current_lookup, f])
-                        related_lookups.append(new_prl)
-                    done_queries[current_lookup] = obj_list
+                    # We need to ensure we don't keep adding lookups from the
+                    # same relationships to stop infinite recursion. So, if we
+                    # are already on an automatically added lookup, don't add
+                    # the new lookups from relationships we've seen already.
+                    if not (lookup in auto_lookups and
+                            descriptor in followed_descriptors):
+                        for f in additional_prl:
+                            new_prl = LOOKUP_SEP.join([current_lookup, f])
+                            auto_lookups.append(new_prl)
+                        done_queries[current_lookup] = obj_list
+                    followed_descriptors.add(descriptor)
             else:
                 # Either a singly related object that has already been fetched
                 # (e.g. via select_related), or hopefully some other property
@@ -1659,8 +1670,9 @@ def get_prefetcher(instance, attr):
     """
     For the attribute 'attr' on the given instance, finds
     an object that has a get_prefetch_query_set().
-    Return a 3 tuple containing:
+    Returns a 4 tuple containing:
     (the object with get_prefetch_query_set (or None),
+     the descriptor object representing this relationship (or None),
      a boolean that is False if the attribute was not found at all,
      a boolean that is True if the attribute has already been fetched)
     """
@@ -1694,7 +1706,7 @@ def get_prefetcher(instance, attr):
                 rel_obj = getattr(instance, attr)
                 if hasattr(rel_obj, 'get_prefetch_query_set'):
                     prefetcher = rel_obj
-    return prefetcher, attr_found, is_fetched
+    return prefetcher, rel_obj_descriptor, attr_found, is_fetched
 
 
 def prefetch_one_level(instances, prefetcher, attname):
