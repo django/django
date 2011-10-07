@@ -1489,7 +1489,7 @@ PROFANITIES_LIST
 Default: ``()`` (Empty tuple)
 
 A tuple of profanities, as strings, that will be forbidden in comments when
-:setting:`COMMENTS_ALLOW_PROFANITIES` is ``True``.
+:setting:`COMMENTS_ALLOW_PROFANITIES` is ``False``.
 
 .. setting:: RESTRUCTUREDTEXT_FILTER_SETTINGS
 
