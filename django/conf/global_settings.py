@@ -455,8 +455,8 @@ CACHE_MIDDLEWARE_ALIAS = 'default'
 
 COMMENTS_ALLOW_PROFANITIES = False
 
-# The profanities that will trigger a validation error in the
-# 'hasNoProfanities' validator. All of these should be in lowercase.
+# The profanities that will trigger a validation error in
+# CommentDetailsForm.clean_comment. All of these should be in lowercase.
 PROFANITIES_LIST = ()
 
 ##################
