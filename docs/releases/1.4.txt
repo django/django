@@ -128,6 +128,15 @@ A new :meth:`~django.contrib.admin.ModelAdmin.save_related` hook was added to
 :mod:`~django.contrib.admin.ModelAdmin` to ease the customization of how
 related objects are saved in the admin.
 
+Admin inlines respect user permissions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Admin inlines will now only allow those actions for which the user has
+permission. For ``ManyToMany`` relationships with an auto-created intermediate
+model (which does not have its own permissions), the change permission for the
+related model determines if the user has the permission to add, change or
+delete relationships.
+
 Tools for cryptographic signing
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

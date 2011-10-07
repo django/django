@@ -1391,11 +1391,17 @@ adds some of its own (the shared features are actually defined in the
 - :attr:`~ModelAdmin.ordering`
 - :meth:`~ModelAdmin.queryset`
 
+.. versionadded:: 1.4
+
+- :meth:`~ModelAdmin.has_add_permission`
+- :meth:`~ModelAdmin.has_change_permission`
+- :meth:`~ModelAdmin.has_delete_permission`
+
 The ``InlineModelAdmin`` class adds:
 
 .. attribute:: InlineModelAdmin.model
 
-    The model in which the inline is using. This is required.
+    The model which the inline is using. This is required.
 
 .. attribute:: InlineModelAdmin.fk_name
 

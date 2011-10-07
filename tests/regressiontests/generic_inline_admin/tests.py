@@ -216,6 +216,18 @@ class NoInlineDeletionTest(TestCase):
         formset = inline.get_formset(fake_request)
         self.assertFalse(formset.can_delete)
 
+
+class MockRequest(object):
+    pass
+
+class MockSuperUser(object):
+    def has_perm(self, perm):
+        return True
+
+request = MockRequest()
+request.user = MockSuperUser()
+
+
 class GenericInlineModelAdminTest(TestCase):
     urls = "regressiontests.generic_inline_admin.urls"
 
@@ -226,12 +238,12 @@ class GenericInlineModelAdminTest(TestCase):
         media_inline = MediaInline(Media, AdminSite())
 
         # Create a formset with default arguments
-        formset = media_inline.get_formset(None)
+        formset = media_inline.get_formset(request)
         self.assertEqual(formset.max_num, None)
         self.assertEqual(formset.can_order, False)
 
         # Create a formset with custom keyword arguments
-        formset = media_inline.get_formset(None, max_num=100, can_order=True)
+        formset = media_inline.get_formset(request, max_num=100, can_order=True)
         self.assertEqual(formset.max_num, 100)
         self.assertEqual(formset.can_order, True)
 
@@ -241,9 +253,6 @@ class GenericInlineModelAdminTest(TestCase):
         used in conjunction with `GenericInlineModelAdmin.readonly_fields`
         and when no `ModelAdmin.exclude` is defined.
         """
-
-        request = None
-
         class MediaForm(ModelForm):
 
             class Meta:
@@ -272,9 +281,6 @@ class GenericInlineModelAdminTest(TestCase):
         `ModelAdmin.exclude` or `GenericInlineModelAdmin.exclude` are defined.
         Refs #15907.
         """
-
-        request = None
-
         # First with `GenericInlineModelAdmin`  -----------------
 
         class MediaForm(ModelForm):
