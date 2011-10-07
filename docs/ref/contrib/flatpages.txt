@@ -102,9 +102,12 @@ does all of the work.
    methods. Only requests which are successfully routed to a view via
    normal URL resolution apply view middleware.
 
-Note that the order of :setting:`MIDDLEWARE_CLASSES` matters. Generally, you can
-put :class:`~django.contrib.flatpages.middleware.FlatpageFallbackMiddleware` at
-the end of the list, because it's a last resort.
+Note that the order of :setting:`MIDDLEWARE_CLASSES` matters. Generally, you
+can put
+:class:`~django.contrib.flatpages.middleware.FlatpageFallbackMiddleware` at the
+end of the list. This means it will run first when processing the response, and
+ensures that any other response-processing middlewares see the real flatpage
+response rather than the 404.
 
 For more on middleware, read the :doc:`middleware docs
 </topics/http/middleware>`.
