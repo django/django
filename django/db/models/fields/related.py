@@ -1,3 +1,5 @@
+from operator import attrgetter
+
 from django.db import connection, router
 from django.db.backends import util
 from django.db.models import signals, get_model
@@ -227,6 +229,22 @@ class SingleRelatedObjectDescriptor(object):
         self.related = related
         self.cache_name = related.get_cache_name()
 
+    def is_cached(self, instance):
+        return hasattr(instance, self.cache_name)
+
+    def get_query_set(self, **db_hints):
+        db = router.db_for_read(self.related.model, **db_hints)
+        return self.related.model._base_manager.using(db)
+
+    def get_prefetch_query_set(self, instances):
+        vals = [instance._get_pk_val() for instance in instances]
+        params = {'%s__pk__in' % self.related.field.name: vals}
+        return (self.get_query_set(),
+                attrgetter(self.related.field.attname),
+                lambda obj: obj._get_pk_val(),
+                True,
+                self.cache_name)
+
     def __get__(self, instance, instance_type=None):
         if instance is None:
             return self
@@ -234,8 +252,7 @@ class SingleRelatedObjectDescriptor(object):
             return getattr(instance, self.cache_name)
         except AttributeError:
             params = {'%s__pk' % self.related.field.name: instance._get_pk_val()}
-            db = router.db_for_read(self.related.model, instance=instance)
-            rel_obj = self.related.model._base_manager.using(db).get(**params)
+            rel_obj = self.get_query_set(instance=instance).get(**params)
             setattr(instance, self.cache_name, rel_obj)
             return rel_obj
 
@@ -283,14 +300,40 @@ class ReverseSingleRelatedObjectDescriptor(object):
     # ReverseSingleRelatedObjectDescriptor instance.
     def __init__(self, field_with_rel):
         self.field = field_with_rel
+        self.cache_name = self.field.get_cache_name()
+
+    def is_cached(self, instance):
+        return hasattr(instance, self.cache_name)
+
+    def get_query_set(self, **db_hints):
+        db = router.db_for_read(self.field.rel.to, **db_hints)
+        rel_mgr = self.field.rel.to._default_manager
+        # If the related manager indicates that it should be used for
+        # related fields, respect that.
+        if getattr(rel_mgr, 'use_for_related_fields', False):
+            return rel_mgr.using(db)
+        else:
+            return QuerySet(self.field.rel.to).using(db)
+
+    def get_prefetch_query_set(self, instances):
+        vals = [getattr(instance, self.field.attname) for instance in instances]
+        other_field = self.field.rel.get_related_field()
+        if other_field.rel:
+            params = {'%s__pk__in' % self.field.rel.field_name: vals}
+        else:
+            params = {'%s__in' % self.field.rel.field_name: vals}
+        return (self.get_query_set().filter(**params),
+                attrgetter(self.field.rel.field_name),
+                attrgetter(self.field.attname),
+                True,
+                self.cache_name)
 
     def __get__(self, instance, instance_type=None):
         if instance is None:
             return self
 
-        cache_name = self.field.get_cache_name()
         try:
-            return getattr(instance, cache_name)
+            return getattr(instance, self.cache_name)
         except AttributeError:
             val = getattr(instance, self.field.attname)
             if val is None:
@@ -303,16 +346,9 @@ class ReverseSingleRelatedObjectDescriptor(object):
                 params = {'%s__pk' % self.field.rel.field_name: val}
             else:
                 params = {'%s__exact' % self.field.rel.field_name: val}
-
-            # If the related manager indicates that it should be used for
-            # related fields, respect that.
-            rel_mgr = self.field.rel.to._default_manager
-            db = router.db_for_read(self.field.rel.to, instance=instance)
-            if getattr(rel_mgr, 'use_for_related_fields', False):
-                rel_obj = rel_mgr.using(db).get(**params)
-            else:
-                rel_obj = QuerySet(self.field.rel.to).using(db).get(**params)
-            setattr(instance, cache_name, rel_obj)
+            qs = self.get_query_set(instance=instance)
+            rel_obj = qs.get(**params)
+            setattr(instance, self.cache_name, rel_obj)
             return rel_obj
 
     def __set__(self, instance, value):
@@ -425,15 +461,15 @@ class ForeignRelatedObjectsDescriptor(object):
                     return super(RelatedManager, self).get_query_set().using(db).filter(**self.core_filters)
 
             def get_prefetch_query_set(self, instances):
-                """
-                Return a queryset that does the bulk lookup needed
-                by prefetch_related functionality.
-                """
                 db = self._db or router.db_for_read(self.model)
                 query = {'%s__%s__in' % (rel_field.name, attname):
                              [getattr(obj, attname) for obj in instances]}
                 qs = super(RelatedManager, self).get_query_set().using(db).filter(**query)
-                return (qs, rel_field.get_attname(), attname)
+                return (qs,
+                        attrgetter(rel_field.get_attname()),
+                        attrgetter(attname),
+                        False,
+                        rel_field.related_query_name())
 
             def add(self, *objs):
                 for obj in objs:
@@ -507,12 +543,6 @@ def create_many_related_manager(superclass, rel):
                 return super(ManyRelatedManager, self).get_query_set().using(db)._next_is_sticky().filter(**self.core_filters)
 
         def get_prefetch_query_set(self, instances):
-            """
-            Returns a tuple:
-            (queryset of instances of self.model that are related to passed in instances
-             attr of returned instances needed for matching
-             attr of passed in instances needed for matching)
-            """
             from django.db import connections
             db = self._db or router.db_for_read(self.model)
             query = {'%s__pk__in' % self.query_field_name:
@@ -534,7 +564,11 @@ def create_many_related_manager(superclass, rel):
             qs = qs.extra(select={'_prefetch_related_val':
                                       '%s.%s' % (qn(join_table), qn(source_col))})
             select_attname = fk.rel.get_related_field().get_attname()
-            return (qs, '_prefetch_related_val', select_attname)
+            return (qs,
+                    attrgetter('_prefetch_related_val'),
+                    attrgetter(select_attname),
+                    False,
+                    self.prefetch_cache_name)
 
         # If the ManyToMany relation has an intermediary model,
         # the add and remove methods do not exist.

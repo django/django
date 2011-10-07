@@ -1612,36 +1612,42 @@ def prefetch_related_objects(result_cache, related_lookups):
                 break
 
             # Descend down tree
-            try:
-                rel_obj = getattr(obj_list[0], attr)
-            except AttributeError:
+
+            # We assume that objects retrieved are homogenous (which is the premise
+            # of prefetch_related), so what applies to first object applies to all.
+            first_obj = obj_list[0]
+            prefetcher, attr_found, is_fetched = get_prefetcher(first_obj, attr)
+
+            if not attr_found:
                 raise AttributeError("Cannot find '%s' on %s object, '%s' is an invalid "
                                      "parameter to prefetch_related()" %
-                                     (attr, obj_list[0].__class__.__name__, lookup))
+                                     (attr, first_obj.__class__.__name__, lookup))
 
-            can_prefetch = hasattr(rel_obj, 'get_prefetch_query_set')
-            if level == len(attrs) - 1 and not can_prefetch:
-                # Last one, this *must* resolve to a related manager.
-                raise ValueError("'%s' does not resolve to a supported 'many related"
-                                 " manager' for model %s - this is an invalid"
-                                 " parameter to prefetch_related()."
-                                 % (lookup, model.__name__))
+            if level == len(attrs) - 1 and prefetcher is None:
+                # Last one, this *must* resolve to something that supports
+                # prefetching, otherwise there is no point adding it and the
+                # developer asking for it has made a mistake.
+                raise ValueError("'%s' does not resolve to a item that supports "
+                                 "prefetching - this is an invalid parameter to "
+                                 "prefetch_related()." % lookup)
 
-            if can_prefetch:
+            if prefetcher is not None and not is_fetched:
                 # Check we didn't do this already
                 current_lookup = LOOKUP_SEP.join(attrs[0:level+1])
                 if current_lookup in done_queries:
                     obj_list = done_queries[current_lookup]
                 else:
-                    relmanager = rel_obj
-                    obj_list, additional_prl = prefetch_one_level(obj_list, relmanager, attr)
+                    obj_list, additional_prl = prefetch_one_level(obj_list, prefetcher, attr)
                     for f in additional_prl:
                         new_prl = LOOKUP_SEP.join([current_lookup, f])
                         related_lookups.append(new_prl)
                     done_queries[current_lookup] = obj_list
             else:
-                # Assume we've got some singly related object. We replace
-                # the current list of parent objects with that list.
+                # Either a singly related object that has already been fetched
+                # (e.g. via select_related), or hopefully some other property
+                # that doesn't support prefetching but needs to be traversed.
+
+                # We replace the current list of parent objects with that list.
                 obj_list = [getattr(obj, attr) for obj in obj_list]
 
                 # Filter out 'None' so that we can continue with nullable
@@ -1649,18 +1655,73 @@ def prefetch_related_objects(result_cache, related_lookups):
                 obj_list = [obj for obj in obj_list if obj is not None]
 
 
-def prefetch_one_level(instances, relmanager, attname):
+def get_prefetcher(instance, attr):
+    """
+    For the attribute 'attr' on the given instance, finds
+    an object that has a get_prefetch_query_set().
+    Return a 3 tuple containing:
+    (the object with get_prefetch_query_set (or None),
+     a boolean that is False if the attribute was not found at all,
+     a boolean that is True if the attribute has already been fetched)
+    """
+    prefetcher = None
+    attr_found = False
+    is_fetched = False
+
+    # For singly related objects, we have to avoid getting the attribute
+    # from the object, as this will trigger the query. So we first try
+    # on the class, in order to get the descriptor object.
+    rel_obj_descriptor = getattr(instance.__class__, attr, None)
+    if rel_obj_descriptor is None:
+        try:
+            rel_obj = getattr(instance, attr)
+            attr_found = True
+        except AttributeError:
+            pass
+    else:
+        attr_found = True
+        if rel_obj_descriptor:
+            # singly related object, descriptor object has the
+            # get_prefetch_query_set() method.
+            if hasattr(rel_obj_descriptor, 'get_prefetch_query_set'):
+                prefetcher = rel_obj_descriptor
+                if rel_obj_descriptor.is_cached(instance):
+                    is_fetched = True
+            else:
+                # descriptor doesn't support prefetching, so we go ahead and get
+                # the attribute on the instance rather than the class to
+                # support many related managers
+                rel_obj = getattr(instance, attr)
+                if hasattr(rel_obj, 'get_prefetch_query_set'):
+                    prefetcher = rel_obj
+    return prefetcher, attr_found, is_fetched
+
+
+def prefetch_one_level(instances, prefetcher, attname):
     """
     Helper function for prefetch_related_objects
 
-    Runs prefetches on all instances using the manager relmanager,
-    assigning results to queryset against instance.attname.
+    Runs prefetches on all instances using the prefetcher object,
+    assigning results to relevant caches in instance.
 
     The prefetched objects are returned, along with any additional
     prefetches that must be done due to prefetch_related lookups
     found from default managers.
     """
-    rel_qs, rel_obj_attr, instance_attr = relmanager.get_prefetch_query_set(instances)
+    # prefetcher must have a method get_prefetch_query_set() which takes a list
+    # of instances, and returns a tuple:
+
+    # (queryset of instances of self.model that are related to passed in instances,
+    #  callable that gets value to be matched for returned instances,
+    #  callable that gets value to be matched for passed in instances,
+    #  boolean that is True for singly related objects,
+    #  cache name to assign to).
+
+    # The 'values to be matched' must be hashable as they will be used
+    # in a dictionary.
+
+    rel_qs, rel_obj_attr, instance_attr, single, cache_name =\
+        prefetcher.get_prefetch_query_set(instances)
     # We have to handle the possibility that the default manager itself added
     # prefetch_related lookups to the QuerySet we just got back. We don't want to
     # trigger the prefetch_related functionality by evaluating the query.
@@ -1676,17 +1737,25 @@ def prefetch_one_level(instances, relmanager, attname):
 
     rel_obj_cache = {}
     for rel_obj in all_related_objects:
-        rel_attr_val = getattr(rel_obj, rel_obj_attr)
+        rel_attr_val = rel_obj_attr(rel_obj)
         if rel_attr_val not in rel_obj_cache:
             rel_obj_cache[rel_attr_val] = []
         rel_obj_cache[rel_attr_val].append(rel_obj)
 
     for obj in instances:
-        qs = getattr(obj, attname).all()
-        instance_attr_val = getattr(obj, instance_attr)
-        qs._result_cache = rel_obj_cache.get(instance_attr_val, [])
-        # We don't want the individual qs doing prefetch_related now, since we
-        # have merged this into the current work.
-        qs._prefetch_done = True
-        obj._prefetched_objects_cache[attname] = qs
+        instance_attr_val = instance_attr(obj)
+        vals = rel_obj_cache.get(instance_attr_val, [])
+        if single:
+            # Need to assign to single cache on instance
+            if vals:
+                setattr(obj, cache_name, vals[0])
+        else:
+            # Multi, attribute represents a manager with an .all() method that
+            # returns a QuerySet
+            qs = getattr(obj, attname).all()
+            qs._result_cache = vals
+            # We don't want the individual qs doing prefetch_related now, since we
+            # have merged this into the current work.
+            qs._prefetch_done = True
+            obj._prefetched_objects_cache[cache_name] = qs
     return all_related_objects, additional_prl

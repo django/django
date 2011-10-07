@@ -66,15 +66,18 @@ information.
 ``QuerySet.prefetch_related``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Analagous to :meth:`~django.db.models.query.QuerySet.select_related` but for
-many-to-many relationships,
+Similar to :meth:`~django.db.models.query.QuerySet.select_related` but with a
+different strategy and broader scope,
 :meth:`~django.db.models.query.QuerySet.prefetch_related` has been added to
-:class:`~django.db.models.query.QuerySet`. This method returns a new ``QuerySet``
-that will prefetch in a single batch each of the specified related lookups as
-soon as it begins to be evaluated (e.g. by iterating over it). This enables you
-to fix many instances of a very common performance problem, in which your code
-ends up doing O(n) database queries (or worse) if objects on your primary
-``QuerySet`` each have many related objects that you also need.
+:class:`~django.db.models.query.QuerySet`. This method returns a new
+``QuerySet`` that will prefetch in a single batch each of the specified related
+lookups as soon as it begins to be evaluated. Unlike ``select_related``, it does
+the joins in Python, not in the database, and supports many-to-many
+relationships, :class:`~django.contrib.contenttypes.generic.GenericForeignKey`
+and more. This enables you to fix many instances of a very common performance
+problem, in which your code ends up doing O(n) database queries (or worse) if
+objects on your primary ``QuerySet`` each have many related objects that you
+also need.
 
 HTML5
 ~~~~~

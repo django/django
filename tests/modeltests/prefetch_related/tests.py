@@ -54,6 +54,13 @@ class PrefetchRelatedTests(TestCase):
         normal_lists = [list(a.books.all()) for a in Author.objects.all()]
         self.assertEqual(lists, normal_lists)
 
+    def test_foreignkey_forward(self):
+        with self.assertNumQueries(2):
+            books = [a.first_book for a in Author.objects.prefetch_related('first_book')]
+
+        normal_books = [a.first_book for a in Author.objects.all()]
+        self.assertEqual(books, normal_books)
+
     def test_foreignkey_reverse(self):
         with self.assertNumQueries(2):
             lists = [list(b.first_time_authors.all())
@@ -175,12 +182,12 @@ class PrefetchRelatedTests(TestCase):
         self.assertTrue('prefetch_related' in str(cm.exception))
 
     def test_invalid_final_lookup(self):
-        qs = Book.objects.prefetch_related('authors__first_book')
+        qs = Book.objects.prefetch_related('authors__name')
         with self.assertRaises(ValueError) as cm:
             list(qs)
 
         self.assertTrue('prefetch_related' in str(cm.exception))
-        self.assertTrue("first_book" in str(cm.exception))
+        self.assertTrue("name" in str(cm.exception))
 
 
 class DefaultManagerTests(TestCase):
@@ -222,39 +229,68 @@ class DefaultManagerTests(TestCase):
 
 class GenericRelationTests(TestCase):
 
-    def test_traverse_GFK(self):
-        """
-        Test that we can traverse a 'content_object' with prefetch_related()
-        """
-        # In fact, there is no special support for this in prefetch_related code
-        # - we can traverse any object that will lead us to objects that have
-        # related managers.
-
+    def setUp(self):
         book1 = Book.objects.create(title="Winnie the Pooh")
         book2 = Book.objects.create(title="Do you like green eggs and spam?")
+        book3 = Book.objects.create(title="Three Men In A Boat")
 
         reader1 = Reader.objects.create(name="me")
         reader2 = Reader.objects.create(name="you")
+        reader3 = Reader.objects.create(name="someone")
 
-        book1.read_by.add(reader1)
+        book1.read_by.add(reader1, reader2)
         book2.read_by.add(reader2)
+        book3.read_by.add(reader3)
 
-        TaggedItem.objects.create(tag="awesome", content_object=book1)
-        TaggedItem.objects.create(tag="awesome", content_object=book2)
+        self.book1, self.book2, self.book3 = book1, book2, book3
+        self.reader1, self.reader2, self.reader3 = reader1, reader2, reader3
+
+    def test_prefetch_GFK(self):
+        TaggedItem.objects.create(tag="awesome", content_object=self.book1)
+        TaggedItem.objects.create(tag="great", content_object=self.reader1)
+        TaggedItem.objects.create(tag="stupid", content_object=self.book2)
+        TaggedItem.objects.create(tag="amazing", content_object=self.reader3)
+
+        # 1 for TaggedItem table, 1 for Book table, 1 for Reader table
+        with self.assertNumQueries(3):
+            qs = TaggedItem.objects.prefetch_related('content_object')
+            list(qs)
+
+    def test_traverse_GFK(self):
+        """
+        Test that we can traverse a 'content_object' with prefetch_related() and
+        get to related objects on the other side (assuming it is suitably
+        filtered)
+        """
+        TaggedItem.objects.create(tag="awesome", content_object=self.book1)
+        TaggedItem.objects.create(tag="awesome", content_object=self.book2)
+        TaggedItem.objects.create(tag="awesome", content_object=self.book3)
+        TaggedItem.objects.create(tag="awesome", content_object=self.reader1)
+        TaggedItem.objects.create(tag="awesome", content_object=self.reader2)
 
         ct = ContentType.objects.get_for_model(Book)
 
-        # We get 4 queries - 1 for main query, 2 for each access to
-        # 'content_object' because these can't be handled by select_related, and
-        # 1 for the 'read_by' relation.
-        with self.assertNumQueries(4):
+        # We get 3 queries - 1 for main query, 1 for content_objects since they
+        # all use the same table, and 1 for the 'read_by' relation.
+        with self.assertNumQueries(3):
             # If we limit to books, we know that they will have 'read_by'
             # attributes, so the following makes sense:
-            qs = TaggedItem.objects.select_related('content_type').prefetch_related('content_object__read_by').filter(tag='awesome').filter(content_type=ct, tag='awesome')
-            readers_of_awesome_books = [r.name for tag in qs
-                                        for r in tag.content_object.read_by.all()]
-            self.assertEqual(readers_of_awesome_books, ["me", "you"])
+            qs = TaggedItem.objects.filter(content_type=ct, tag='awesome').prefetch_related('content_object__read_by')
+            readers_of_awesome_books = set([r.name for tag in qs
+                                            for r in tag.content_object.read_by.all()])
+            self.assertEqual(readers_of_awesome_books, set(["me", "you", "someone"]))
 
+    def test_nullable_GFK(self):
+        TaggedItem.objects.create(tag="awesome", content_object=self.book1,
+                                  created_by=self.reader1)
+        TaggedItem.objects.create(tag="great", content_object=self.book2)
+        TaggedItem.objects.create(tag="rubbish", content_object=self.book3)
+
+        with self.assertNumQueries(2):
+            result = [t.created_by for t in TaggedItem.objects.prefetch_related('created_by')]
+
+        self.assertEqual(result,
+                         [t.created_by for t in TaggedItem.objects.all()])
 
     def test_generic_relation(self):
         b = Bookmark.objects.create(url='http://www.djangoproject.com/')
@@ -311,9 +347,14 @@ class MultiTableInheritanceTest(TestCase):
         self.assertEquals(lst, lst2)
 
     def test_parent_link_prefetch(self):
-        with self.assertRaises(ValueError) as cm:
-            qs = list(AuthorWithAge.objects.prefetch_related('author'))
-        self.assertTrue('prefetch_related' in str(cm.exception))
+        with self.assertNumQueries(2):
+            [a.author for a in AuthorWithAge.objects.prefetch_related('author')]
+
+    def test_child_link_prefetch(self):
+        with self.assertNumQueries(2):
+            l = [a.authorwithage for a in Author.objects.prefetch_related('authorwithage')]
+
+        self.assertEqual(l, [a.authorwithage for a in Author.objects.all()])
 
 
 class ForeignKeyToFieldTest(TestCase):
@@ -406,12 +447,27 @@ class NullableTest(TestCase):
         worker2 = Employee.objects.create(name="Angela", boss=boss)
 
     def test_traverse_nullable(self):
+        # Because we use select_related() for 'boss', it doesn't need to be
+        # prefetched, but we can still traverse it although it contains some nulls
         with self.assertNumQueries(2):
             qs = Employee.objects.select_related('boss').prefetch_related('boss__serfs')
             co_serfs = [list(e.boss.serfs.all()) if e.boss is not None else []
                         for e in qs]
 
         qs2 =  Employee.objects.select_related('boss')
+        co_serfs2 =  [list(e.boss.serfs.all()) if e.boss is not None else []
+                        for e in qs2]
+
+        self.assertEqual(co_serfs, co_serfs2)
+
+    def test_prefetch_nullable(self):
+        # One for main employee, one for boss, one for serfs
+        with self.assertNumQueries(3):
+            qs = Employee.objects.prefetch_related('boss__serfs')
+            co_serfs = [list(e.boss.serfs.all()) if e.boss is not None else []
+                        for e in qs]
+
+        qs2 =  Employee.objects.all()
         co_serfs2 =  [list(e.boss.serfs.all()) if e.boss is not None else []
                         for e in qs2]
 

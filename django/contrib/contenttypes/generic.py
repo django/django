@@ -2,7 +2,10 @@
 Classes allowing "generic" relations through ContentType and object-id fields.
 """
 
+from collections import defaultdict
 from functools import partial
+from operator import attrgetter
+
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection
 from django.db.models import signals
@@ -58,6 +61,49 @@ class GenericForeignKey(object):
         else:
             # This should never happen. I love comments like this, don't you?
             raise Exception("Impossible arguments to GFK.get_content_type!")
+
+    def get_prefetch_query_set(self, instances):
+        # For efficiency, group the instances by content type and then do one
+        # query per model
+        fk_dict = defaultdict(list)
+        # We need one instance for each group in order to get the right db:
+        instance_dict = {}
+        ct_attname = self.model._meta.get_field(self.ct_field).get_attname()
+        for instance in instances:
+            # We avoid looking for values if either ct_id or fkey value is None
+            ct_id = getattr(instance, ct_attname)
+            if ct_id is not None:
+                fk_val = getattr(instance, self.fk_field)
+                if fk_val is not None:
+                    fk_dict[ct_id].append(fk_val)
+                    instance_dict[ct_id] = instance
+
+        ret_val = []
+        for ct_id, fkeys in fk_dict.items():
+            instance = instance_dict[ct_id]
+            ct = self.get_content_type(id=ct_id, using=instance._state.db)
+            ret_val.extend(ct.get_all_objects_for_this_type(pk__in=fkeys))
+
+        # For doing the join in Python, we have to match both the FK val and the
+        # content type, so the 'attr' vals we return need to be callables that
+        # will return a (fk, class) pair.
+        def gfk_key(obj):
+            ct_id = getattr(obj, ct_attname)
+            if ct_id is None:
+                return None
+            else:
+                return (getattr(obj, self.fk_field),
+                        self.get_content_type(id=ct_id,
+                                              using=obj._state.db).model_class())
+
+        return (ret_val,
+                lambda obj: (obj._get_pk_val(), obj.__class__),
+                gfk_key,
+                True,
+                self.cache_attr)
+
+    def is_cached(self, instance):
+        return hasattr(instance, self.cache_attr)
 
     def __get__(self, instance, instance_type=None):
         if instance is None:
@@ -282,7 +328,11 @@ def create_generic_related_manager(superclass):
                     [obj._get_pk_val() for obj in instances]
                 }
             qs = super(GenericRelatedObjectManager, self).get_query_set().using(db).filter(**query)
-            return (qs, self.object_id_field_name, 'pk')
+            return (qs,
+                    attrgetter(self.object_id_field_name),
+                    lambda obj: obj._get_pk_val(),
+                    False,
+                    self.prefetch_cache_name)
 
         def add(self, *objs):
             for obj in objs:

@@ -113,5 +113,11 @@ class ContentType(models.Model):
         """
         return self.model_class()._base_manager.using(self._state.db).get(**kwargs)
 
+    def get_all_objects_for_this_type(self, **kwargs):
+        """
+        Returns all objects of this type for the keyword arguments given.
+        """
+        return self.model_class()._base_manager.using(self._state.db).filter(**kwargs)
+
     def natural_key(self):
         return (self.app_label, self.model)

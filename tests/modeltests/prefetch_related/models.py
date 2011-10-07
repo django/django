@@ -104,13 +104,17 @@ class Department(models.Model):
         ordering = ['id']
 
 
-## Generic relation tests
+## GenericRelation/GenericForeignKey tests
 
 class TaggedItem(models.Model):
     tag = models.SlugField()
     content_type = models.ForeignKey(ContentType, related_name="taggeditem_set2")
     object_id = models.PositiveIntegerField()
     content_object = generic.GenericForeignKey('content_type', 'object_id')
+    created_by_ct = models.ForeignKey(ContentType, null=True,
+                                      related_name='taggeditem_set3')
+    created_by_fkey = models.PositiveIntegerField(null=True)
+    created_by = generic.GenericForeignKey('created_by_ct', 'created_by_fkey',)
 
     def __unicode__(self):
         return self.tag
