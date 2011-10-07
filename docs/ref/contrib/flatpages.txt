@@ -148,6 +148,14 @@ Via the Python API
 
 .. currentmodule:: django.contrib.flatpages
 
+.. admonition:: Check for duplicate flatpage URLs.
+
+    If you add or modify flatpages via your own code, you will likely want to
+    check for duplicate flatpage URLs within the same site. The flatpage form
+    used in the admin performs this validation check, and can be imported from
+    :class:`django.contrib.flatpages.forms.FlatPageForm` and used in your own
+    views.
+
 Flatpage templates
 ==================
 
