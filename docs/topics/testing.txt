@@ -1450,6 +1450,15 @@ The decorator can also be applied to test case classes::
 
     LoginTestCase = override_settings(LOGIN_URL='/other/login/')(LoginTestCase)
 
+.. note::
+
+    When given a class, the decorator modifies the class directly and
+    returns it; it doesn't create and return a modified copy of it.  So if
+    you try to tweak the above example to assign the return value to a
+    different name than ``LoginTestCase``, you may be surprised to find that
+    the original ``LoginTestCase`` is still equally affected by the
+    decorator.
+
 On Python 2.6 and higher you can also use the well known decorator syntax to
 decorate the class::
 
