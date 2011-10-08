@@ -143,6 +143,9 @@ SEND_BROKEN_LINK_EMAILS = False
 
 # Database connection info.
 DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.dummy',
+    },
 }
 
 # Classes used to implement db routing behaviour
