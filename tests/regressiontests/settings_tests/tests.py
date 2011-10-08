@@ -46,7 +46,6 @@ class ClassDecoratedTestCaseSuper(TestCase):
         pass
 
 
-@override_settings(TEST='override')
 class ClassDecoratedTestCase(ClassDecoratedTestCaseSuper):
     def test_override(self):
         self.assertEqual(settings.TEST, 'override')
@@ -66,6 +65,7 @@ class ClassDecoratedTestCase(ClassDecoratedTestCaseSuper):
         except RuntimeError, e:
             self.fail()
 
+ClassDecoratedTestCase = override_settings(TEST='override')(ClassDecoratedTestCase)
 
 class SettingGetter(object):
     def __init__(self):
