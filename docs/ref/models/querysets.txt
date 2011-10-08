@@ -605,6 +605,7 @@ following models::
 
     class City(models.Model):
         # ...
+        pass
 
     class Person(models.Model):
         # ...
@@ -679,7 +680,7 @@ same ``select_related()`` call; they are conflicting options.
 .. versionchanged:: 1.2
 
 You can also refer to the reverse direction of a
-:class:`~django.db.models.OneToOneField`` in the list of fields passed to
+:class:`~django.db.models.OneToOneField` in the list of fields passed to
 ``select_related`` — that is, you can traverse a
 :class:`~django.db.models.OneToOneField` back to the object on which the field
 is defined. Instead of specifying the field name, use the :attr:`related_name
@@ -760,7 +761,7 @@ and retrieve data using a fresh database query. So, if you write the following:
     >>> pizzas = Pizza.objects.prefetch_related('toppings')
     >>> [list(pizza.toppings.filter(spicy=True)) for pizza in pizzas]
 
-...then the fact that `pizza.toppings.all()` has been prefetched will not help
+...then the fact that ``pizza.toppings.all()`` has been prefetched will not help
 you - in fact it hurts performance, since you have done a database query that
 you haven't used. So use this feature with caution!
 
