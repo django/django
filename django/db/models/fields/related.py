@@ -237,7 +237,7 @@ class SingleRelatedObjectDescriptor(object):
         return self.related.model._base_manager.using(db)
 
     def get_prefetch_query_set(self, instances):
-        vals = [instance._get_pk_val() for instance in instances]
+        vals = set(instance._get_pk_val() for instance in instances)
         params = {'%s__pk__in' % self.related.field.name: vals}
         return (self.get_query_set(),
                 attrgetter(self.related.field.attname),
@@ -316,7 +316,7 @@ class ReverseSingleRelatedObjectDescriptor(object):
             return QuerySet(self.field.rel.to).using(db)
 
     def get_prefetch_query_set(self, instances):
-        vals = [getattr(instance, self.field.attname) for instance in instances]
+        vals = set(getattr(instance, self.field.attname) for instance in instances)
         other_field = self.field.rel.get_related_field()
         if other_field.rel:
             params = {'%s__pk__in' % self.field.rel.field_name: vals}
@@ -463,7 +463,7 @@ class ForeignRelatedObjectsDescriptor(object):
             def get_prefetch_query_set(self, instances):
                 db = self._db or router.db_for_read(self.model)
                 query = {'%s__%s__in' % (rel_field.name, attname):
-                             [getattr(obj, attname) for obj in instances]}
+                             set(getattr(obj, attname) for obj in instances)}
                 qs = super(RelatedManager, self).get_query_set().using(db).filter(**query)
                 return (qs,
                         attrgetter(rel_field.get_attname()),
@@ -546,7 +546,7 @@ def create_many_related_manager(superclass, rel):
             from django.db import connections
             db = self._db or router.db_for_read(self.model)
             query = {'%s__pk__in' % self.query_field_name:
-                         [obj._get_pk_val() for obj in instances]}
+                         set(obj._get_pk_val() for obj in instances)}
             qs = super(ManyRelatedManager, self).get_query_set().using(db)._next_is_sticky().filter(**query)
 
             # M2M: need to annotate the query in order to get the primary model

@@ -65,7 +65,7 @@ class GenericForeignKey(object):
     def get_prefetch_query_set(self, instances):
         # For efficiency, group the instances by content type and then do one
         # query per model
-        fk_dict = defaultdict(list)
+        fk_dict = defaultdict(set)
         # We need one instance for each group in order to get the right db:
         instance_dict = {}
         ct_attname = self.model._meta.get_field(self.ct_field).get_attname()
@@ -75,7 +75,7 @@ class GenericForeignKey(object):
             if ct_id is not None:
                 fk_val = getattr(instance, self.fk_field)
                 if fk_val is not None:
-                    fk_dict[ct_id].append(fk_val)
+                    fk_dict[ct_id].add(fk_val)
                     instance_dict[ct_id] = instance
 
         ret_val = []
@@ -325,7 +325,7 @@ def create_generic_related_manager(superclass):
             query = {
                 '%s__pk' % self.content_type_field_name: self.content_type.id,
                 '%s__in' % self.object_id_field_name:
-                    [obj._get_pk_val() for obj in instances]
+                    set(obj._get_pk_val() for obj in instances)
                 }
             qs = super(GenericRelatedObjectManager, self).get_query_set().using(db).filter(**query)
             return (qs,
