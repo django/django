@@ -431,6 +431,16 @@ files were removed and grouped into two sprite files, respectively:
 those icons to customize the admin then you will want to replace them with your
 own icons or retrieve them from a previous release.
 
+CSS class names in admin forms
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To avoid conflicts with other common CSS class names (e.g. "button"), a prefix
+"field-" has been added to all CSS class names automatically generated from the
+form field names in the main admin forms, stacked inline forms and tabular
+inline cells. You will need to take that prefix into account in your custom
+style sheets or javascript files if you previously used plain field names as
+selectors for custom styles or javascript transformations.
+
 Compatibility with old signed data
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

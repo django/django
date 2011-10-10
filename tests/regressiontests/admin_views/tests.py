@@ -2786,11 +2786,11 @@ class ReadonlyTest(TestCase):
             formats.localize(datetime.date.today() - datetime.timedelta(days=7))
         )
 
-        self.assertContains(response, '<div class="form-row coolness">')
-        self.assertContains(response, '<div class="form-row awesomeness_level">')
-        self.assertContains(response, '<div class="form-row posted">')
-        self.assertContains(response, '<div class="form-row value">')
-        self.assertContains(response, '<div class="form-row ">')
+        self.assertContains(response, '<div class="form-row field-coolness">')
+        self.assertContains(response, '<div class="form-row field-awesomeness_level">')
+        self.assertContains(response, '<div class="form-row field-posted">')
+        self.assertContains(response, '<div class="form-row field-value">')
+        self.assertContains(response, '<div class="form-row">')
         self.assertContains(response, '<p class="help">', 3)
         self.assertContains(response, '<p class="help">Some help text for the title (with unicode ŠĐĆŽćžšđ)</p>')
         self.assertContains(response, '<p class="help">Some help text for the content (with unicode ŠĐĆŽćžšđ)</p>')
@@ -2981,6 +2981,33 @@ class GroupAdminTest(TestCase):
         with self.assertNumQueries(6):  # instead of 259!
             response = self.client.get('/test_admin/admin/auth/group/%s/' % g.pk)
             self.assertEqual(response.status_code, 200)
+
+
+class CSSTest(TestCase):
+    urls = "regressiontests.admin_views.urls"
+    fixtures = ['admin-views-users.xml']
+
+    def setUp(self):
+        self.client.login(username='super', password='secret')
+
+    def tearDown(self):
+        self.client.logout()
+
+    def test_css_classes(self):
+        response = self.client.get('/test_admin/admin/admin_views/post/add/')
+
+        # The main form
+        self.assertContains(response, 'class="form-row field-title"')
+        self.assertContains(response, 'class="form-row field-content"')
+        self.assertContains(response, 'class="form-row field-public"')
+        self.assertContains(response, 'class="form-row field-awesomeness_level"')
+        self.assertContains(response, 'class="form-row field-coolness"')
+        self.assertContains(response, 'class="form-row field-value"')
+        self.assertContains(response, 'class="form-row"') # The lambda function
+
+        # The tabular inline
+        self.assertContains(response, '<td class="field-url">')
+        self.assertContains(response, '<td class="field-posted">')
 
 
 try:
