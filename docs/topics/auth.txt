@@ -14,11 +14,11 @@ Overview
 
 The auth system consists of:
 
-    * Users
-    * Permissions: Binary (yes/no) flags designating whether a user may perform
-      a certain task.
-    * Groups: A generic way of applying labels and permissions to more than one
-      user.
+* Users
+* Permissions: Binary (yes/no) flags designating whether a user may perform
+  a certain task.
+* Groups: A generic way of applying labels and permissions to more than one
+  user.
 
 Installation
 ============
@@ -26,11 +26,11 @@ Installation
 Authentication support is bundled as a Django application in
 ``django.contrib.auth``. To install it, do the following:
 
-    1. Put ``'django.contrib.auth'`` and ``'django.contrib.contenttypes'`` in
-       your :setting:`INSTALLED_APPS` setting.
-       (The :class:`~django.contrib.auth.models.Permission` model in
-       :mod:`django.contrib.auth` depends on :mod:`django.contrib.contenttypes`.)
-    2. Run the command ``manage.py syncdb``.
+1. Put ``'django.contrib.auth'`` and ``'django.contrib.contenttypes'`` in
+   your :setting:`INSTALLED_APPS` setting.
+   (The :class:`~django.contrib.auth.models.Permission` model in
+   :mod:`django.contrib.auth` depends on :mod:`django.contrib.contenttypes`.)
+2. Run the command ``manage.py syncdb``.
 
 Note that the default :file:`settings.py` file created by
 :djadmin:`django-admin.py startproject <startproject>` includes
@@ -303,10 +303,10 @@ Manager functions
         allowed characters. (Note that the default value of ``allowed_chars``
         doesn't contain letters that can cause user confusion, including:
 
-            * ``i``, ``l``, ``I``, and ``1`` (lowercase letter i, lowercase
-              letter L, uppercase letter i, and the number one)
-            * ``o``, ``O``, and ``0`` (uppercase letter o, lowercase letter o,
-              and zero)
+        * ``i``, ``l``, ``I``, and ``1`` (lowercase letter i, lowercase
+          letter L, uppercase letter i, and the number one)
+        * ``o``, ``O``, and ``0`` (uppercase letter o, lowercase letter o,
+          and zero)
 
 Basic usage
 -----------
@@ -715,29 +715,29 @@ Sent when a user logs in successfully.
 
 Arguments sent with this signal:
 
-    ``sender``
-        As above: the class of the user that just logged in.
+``sender``
+    As above: the class of the user that just logged in.
 
-    ``request``
-        The current :class:`~django.http.HttpRequest` instance.
+``request``
+    The current :class:`~django.http.HttpRequest` instance.
 
-    ``user``
-        The user instance that just logged in.
+``user``
+    The user instance that just logged in.
 
 .. data:: django.contrib.auth.signals.user_logged_out
 
 Sent when the logout method is called.
 
-    ``sender``
-        As above: the class of the user that just logged out or ``None``
-        if the user was not authenticated.
+``sender``
+    As above: the class of the user that just logged out or ``None``
+    if the user was not authenticated.
 
-    ``request``
-        The current :class:`~django.http.HttpRequest` instance.
+``request``
+    The current :class:`~django.http.HttpRequest` instance.
 
-    ``user``
-        The user instance that just logged out or ``None`` if the
-        user was not authenticated.
+``user``
+    The user instance that just logged out or ``None`` if the
+    user was not authenticated.
 
 Limiting access to logged-in users
 ----------------------------------
@@ -830,38 +830,38 @@ The login_required decorator
 
     Here's what ``django.contrib.auth.views.login`` does:
 
-        * If called via ``GET``, it displays a login form that POSTs to the
-          same URL. More on this in a bit.
+    * If called via ``GET``, it displays a login form that POSTs to the
+      same URL. More on this in a bit.
 
-        * If called via ``POST``, it tries to log the user in. If login is
-          successful, the view redirects to the URL specified in ``next``. If
-          ``next`` isn't provided, it redirects to
-          :setting:`settings.LOGIN_REDIRECT_URL <LOGIN_REDIRECT_URL>` (which
-          defaults to ``/accounts/profile/``). If login isn't successful, it
-          redisplays the login form.
+    * If called via ``POST``, it tries to log the user in. If login is
+      successful, the view redirects to the URL specified in ``next``. If
+      ``next`` isn't provided, it redirects to
+      :setting:`settings.LOGIN_REDIRECT_URL <LOGIN_REDIRECT_URL>` (which
+      defaults to ``/accounts/profile/``). If login isn't successful, it
+      redisplays the login form.
 
     It's your responsibility to provide the login form in a template called
     ``registration/login.html`` by default. This template gets passed four
     template context variables:
 
-        * ``form``: A :class:`~django.forms.Form` object representing the login
-          form. See the :doc:`forms documentation </topics/forms/index>` for
-          more on ``Form`` objects.
+    * ``form``: A :class:`~django.forms.Form` object representing the login
+      form. See the :doc:`forms documentation </topics/forms/index>` for
+      more on ``Form`` objects.
 
-        * ``next``: The URL to redirect to after successful login. This may
-          contain a query string, too.
+    * ``next``: The URL to redirect to after successful login. This may
+      contain a query string, too.
 
-        * ``site``: The current :class:`~django.contrib.sites.models.Site`,
-          according to the :setting:`SITE_ID` setting. If you don't have the
-          site framework installed, this will be set to an instance of
-          :class:`~django.contrib.sites.models.RequestSite`, which derives the
-          site name and domain from the current
-          :class:`~django.http.HttpRequest`.
+    * ``site``: The current :class:`~django.contrib.sites.models.Site`,
+      according to the :setting:`SITE_ID` setting. If you don't have the
+      site framework installed, this will be set to an instance of
+      :class:`~django.contrib.sites.models.RequestSite`, which derives the
+      site name and domain from the current
+      :class:`~django.http.HttpRequest`.
 
-        * ``site_name``: An alias for ``site.name``. If you don't have the site
-          framework installed, this will be set to the value of
-          :attr:`request.META['SERVER_NAME'] <django.http.HttpRequest.META>`.
-          For more on sites, see :doc:`/ref/contrib/sites`.
+    * ``site_name``: An alias for ``site.name``. If you don't have the site
+      framework installed, this will be set to the value of
+      :attr:`request.META['SERVER_NAME'] <django.http.HttpRequest.META>`.
+      For more on sites, see :doc:`/ref/contrib/sites`.
 
     If you'd prefer not to call the template :file:`registration/login.html`,
     you can pass the ``template_name`` parameter via the extra arguments to
@@ -950,31 +950,31 @@ includes a few other useful built-in views located in
 
     **Optional arguments:**
 
-        * ``next_page``: The URL to redirect to after logout.
+    * ``next_page``: The URL to redirect to after logout.
 
-        * ``template_name``: The full name of a template to display after
-          logging the user out. Defaults to
-          :file:`registration/logged_out.html` if no argument is supplied.
+    * ``template_name``: The full name of a template to display after
+      logging the user out. Defaults to
+      :file:`registration/logged_out.html` if no argument is supplied.
 
-        * ``redirect_field_name``: The name of a ``GET`` field containing the
-          URL to redirect to after log out. Overrides ``next_page`` if the given
-          ``GET`` parameter is passed.
+    * ``redirect_field_name``: The name of a ``GET`` field containing the
+      URL to redirect to after log out. Overrides ``next_page`` if the given
+      ``GET`` parameter is passed.
 
     **Template context:**
 
-        * ``title``: The string "Logged out", localized.
+    * ``title``: The string "Logged out", localized.
 
-        * ``site``: The current :class:`~django.contrib.sites.models.Site`,
-          according to the :setting:`SITE_ID` setting. If you don't have the
-          site framework installed, this will be set to an instance of
-          :class:`~django.contrib.sites.models.RequestSite`, which derives the
-          site name and domain from the current
-          :class:`~django.http.HttpRequest`.
+    * ``site``: The current :class:`~django.contrib.sites.models.Site`,
+      according to the :setting:`SITE_ID` setting. If you don't have the
+      site framework installed, this will be set to an instance of
+      :class:`~django.contrib.sites.models.RequestSite`, which derives the
+      site name and domain from the current
+      :class:`~django.http.HttpRequest`.
 
-        * ``site_name``: An alias for ``site.name``. If you don't have the site
-          framework installed, this will be set to the value of
-          :attr:`request.META['SERVER_NAME'] <django.http.HttpRequest.META>`.
-          For more on sites, see :doc:`/ref/contrib/sites`.
+    * ``site_name``: An alias for ``site.name``. If you don't have the site
+      framework installed, this will be set to the value of
+      :attr:`request.META['SERVER_NAME'] <django.http.HttpRequest.META>`.
+      For more on sites, see :doc:`/ref/contrib/sites`.
 
 .. function:: logout_then_login(request[, login_url])
 
@@ -984,8 +984,8 @@ includes a few other useful built-in views located in
 
     **Optional arguments:**
 
-        * ``login_url``: The URL of the login page to redirect to.
-          Defaults to :setting:`settings.LOGIN_URL <LOGIN_URL>` if not supplied.
+    * ``login_url``: The URL of the login page to redirect to.
+      Defaults to :setting:`settings.LOGIN_URL <LOGIN_URL>` if not supplied.
 
 .. function:: password_change(request[, template_name, post_change_redirect, password_change_form])
 
@@ -995,23 +995,23 @@ includes a few other useful built-in views located in
 
     **Optional arguments:**
 
-        * ``template_name``: The full name of a template to use for
-          displaying the password change form. Defaults to
-          :file:`registration/password_change_form.html` if not supplied.
+    * ``template_name``: The full name of a template to use for
+      displaying the password change form. Defaults to
+      :file:`registration/password_change_form.html` if not supplied.
 
-        * ``post_change_redirect``: The URL to redirect to after a successful
-          password change.
+    * ``post_change_redirect``: The URL to redirect to after a successful
+      password change.
 
-          .. versionadded:: 1.2
+      .. versionadded:: 1.2
 
-        * ``password_change_form``: A custom "change password" form which must
-          accept a ``user`` keyword argument. The form is responsible for
-          actually changing the user's password. Defaults to
-          :class:`~django.contrib.auth.forms.PasswordChangeForm`.
+    * ``password_change_form``: A custom "change password" form which must
+      accept a ``user`` keyword argument. The form is responsible for
+      actually changing the user's password. Defaults to
+      :class:`~django.contrib.auth.forms.PasswordChangeForm`.
 
     **Template context:**
 
-        * ``form``: The password change form (see ``password_change_form`` above).
+    * ``form``: The password change form (see ``password_change_form`` above).
 
 .. function:: password_change_done(request[, template_name])
 
@@ -1021,9 +1021,9 @@ includes a few other useful built-in views located in
 
     **Optional arguments:**
 
-        * ``template_name``: The full name of a template to use.
-          Defaults to :file:`registration/password_change_done.html` if not
-          supplied.
+    * ``template_name``: The full name of a template to use.
+      Defaults to :file:`registration/password_change_done.html` if not
+      supplied.
 
 .. function:: password_reset(request[, is_admin_site, template_name, email_template_name, password_reset_form, token_generator, post_reset_redirect, from_email])
 
@@ -1044,60 +1044,60 @@ includes a few other useful built-in views located in
 
     **Optional arguments:**
 
-        * ``template_name``: The full name of a template to use for
-          displaying the password reset form. Defaults to
-          :file:`registration/password_reset_form.html` if not supplied.
+    * ``template_name``: The full name of a template to use for
+      displaying the password reset form. Defaults to
+      :file:`registration/password_reset_form.html` if not supplied.
 
-        * ``email_template_name``: The full name of a template to use for
-          generating the email with the new password. Defaults to
-          :file:`registration/password_reset_email.html` if not supplied.
+    * ``email_template_name``: The full name of a template to use for
+      generating the email with the new password. Defaults to
+      :file:`registration/password_reset_email.html` if not supplied.
 
-        * ``subject_template_name``: The full name of a template to use for
-          the subject of the email with the new password. Defaults
-          to :file:`registration/password_reset_subject.txt` if not supplied.
+    * ``subject_template_name``: The full name of a template to use for
+      the subject of the email with the new password. Defaults
+      to :file:`registration/password_reset_subject.txt` if not supplied.
 
-          .. versionadded:: 1.4
+      .. versionadded:: 1.4
 
-        * ``password_reset_form``: Form that will be used to set the password.
-          Defaults to :class:`~django.contrib.auth.forms.PasswordResetForm`.
+    * ``password_reset_form``: Form that will be used to set the password.
+      Defaults to :class:`~django.contrib.auth.forms.PasswordResetForm`.
 
-        * ``token_generator``: Instance of the class to check the password. This
-          will default to ``default_token_generator``, it's an instance of
-          ``django.contrib.auth.tokens.PasswordResetTokenGenerator``.
+    * ``token_generator``: Instance of the class to check the password. This
+      will default to ``default_token_generator``, it's an instance of
+      ``django.contrib.auth.tokens.PasswordResetTokenGenerator``.
 
-        * ``post_reset_redirect``: The URL to redirect to after a successful
-          password change.
+    * ``post_reset_redirect``: The URL to redirect to after a successful
+      password change.
 
-        * ``from_email``: A valid email address. By default Django uses
-          the :setting:`DEFAULT_FROM_EMAIL`.
+    * ``from_email``: A valid email address. By default Django uses
+      the :setting:`DEFAULT_FROM_EMAIL`.
 
     **Template context:**
 
-        * ``form``: The form (see ``password_reset_form`` above) for resetting
-          the user's password.
+    * ``form``: The form (see ``password_reset_form`` above) for resetting
+      the user's password.
 
     **Email template context:**
 
-        * ``email``: An alias for ``user.email``
+    * ``email``: An alias for ``user.email``
 
-        * ``user``: The current :class:`~django.contrib.auth.models.User`,
-          according to the ``email`` form field. Only active users are able to
-          reset their passwords (``User.is_active is True``).
+    * ``user``: The current :class:`~django.contrib.auth.models.User`,
+      according to the ``email`` form field. Only active users are able to
+      reset their passwords (``User.is_active is True``).
 
-        * ``site_name``: An alias for ``site.name``. If you don't have the site
-          framework installed, this will be set to the value of
-          :attr:`request.META['SERVER_NAME'] <django.http.HttpRequest.META>`.
-          For more on sites, see :doc:`/ref/contrib/sites`.
+    * ``site_name``: An alias for ``site.name``. If you don't have the site
+      framework installed, this will be set to the value of
+      :attr:`request.META['SERVER_NAME'] <django.http.HttpRequest.META>`.
+      For more on sites, see :doc:`/ref/contrib/sites`.
 
-        * ``domain``: An alias for ``site.domain``. If you don't have the site
-          framework installed, this will be set to the value of
-          ``request.get_host()``.
+    * ``domain``: An alias for ``site.domain``. If you don't have the site
+      framework installed, this will be set to the value of
+      ``request.get_host()``.
 
-        * ``protocol``: http or https
+    * ``protocol``: http or https
 
-        * ``uid``: The user's id encoded in base 36.
+    * ``uid``: The user's id encoded in base 36.
 
-        * ``token``: Token to check that the password is valid.
+    * ``token``: Token to check that the password is valid.
 
     Sample ``registration/password_reset_email.html`` (email body template):
 
@@ -1121,9 +1121,9 @@ includes a few other useful built-in views located in
 
     **Optional arguments:**
 
-        * ``template_name``: The full name of a template to use.
-          Defaults to :file:`registration/password_reset_done.html` if not
-          supplied.
+    * ``template_name``: The full name of a template to use.
+      Defaults to :file:`registration/password_reset_done.html` if not
+      supplied.
 
 .. function:: password_reset_confirm(request[, uidb36, token, template_name, token_generator, set_password_form, post_reset_redirect])
 
@@ -1133,31 +1133,31 @@ includes a few other useful built-in views located in
 
     **Optional arguments:**
 
-        * ``uidb36``: The user's id encoded in base 36. Defaults to ``None``.
+    * ``uidb36``: The user's id encoded in base 36. Defaults to ``None``.
 
-        * ``token``: Token to check that the password is valid. Defaults to
-          ``None``.
+    * ``token``: Token to check that the password is valid. Defaults to
+      ``None``.
 
-        * ``template_name``: The full name of a template to display the confirm
-          password view. Default value is :file:`registration/password_reset_confirm.html`.
+    * ``template_name``: The full name of a template to display the confirm
+      password view. Default value is :file:`registration/password_reset_confirm.html`.
 
-        * ``token_generator``: Instance of the class to check the password. This
-          will default to ``default_token_generator``, it's an instance of
-          ``django.contrib.auth.tokens.PasswordResetTokenGenerator``.
+    * ``token_generator``: Instance of the class to check the password. This
+      will default to ``default_token_generator``, it's an instance of
+      ``django.contrib.auth.tokens.PasswordResetTokenGenerator``.
 
-        * ``set_password_form``: Form that will be used to set the password.
-          Defaults to :class:`~django.contrib.auth.forms.SetPasswordForm`
+    * ``set_password_form``: Form that will be used to set the password.
+      Defaults to :class:`~django.contrib.auth.forms.SetPasswordForm`
 
-        * ``post_reset_redirect``: URL to redirect after the password reset
-          done. Defaults to ``None``.
+    * ``post_reset_redirect``: URL to redirect after the password reset
+      done. Defaults to ``None``.
 
     **Template context:**
 
-        * ``form``: The form (see ``set_password_form`` above) for setting the
-          new user's password.
+    * ``form``: The form (see ``set_password_form`` above) for setting the
+      new user's password.
 
-        * ``validlink``: Boolean, True if the link (combination of uidb36 and
-          token) is valid or unused yet.
+    * ``validlink``: Boolean, True if the link (combination of uidb36 and
+      token) is valid or unused yet.
 
 .. function:: password_reset_complete(request[,template_name])
 
@@ -1168,8 +1168,8 @@ includes a few other useful built-in views located in
 
    **Optional arguments:**
 
-       * ``template_name``: The full name of a template to display the view.
-         Defaults to :file:`registration/password_reset_complete.html`.
+   * ``template_name``: The full name of a template to display the view.
+     Defaults to :file:`registration/password_reset_complete.html`.
 
 Helper functions
 ----------------
@@ -1183,16 +1183,16 @@ Helper functions
 
     **Required arguments:**
 
-        * ``next``: The URL to redirect to after a successful login.
+    * ``next``: The URL to redirect to after a successful login.
 
     **Optional arguments:**
 
-        * ``login_url``: The URL of the login page to redirect to.
-          Defaults to :setting:`settings.LOGIN_URL <LOGIN_URL>` if not supplied.
+    * ``login_url``: The URL of the login page to redirect to.
+      Defaults to :setting:`settings.LOGIN_URL <LOGIN_URL>` if not supplied.
 
-        * ``redirect_field_name``: The name of a ``GET`` field containing the
-          URL to redirect to after log out. Overrides ``next`` if the given
-          ``GET`` parameter is passed.
+    * ``redirect_field_name``: The name of a ``GET`` field containing the
+      URL to redirect to after log out. Overrides ``next`` if the given
+      ``GET`` parameter is passed.
 
 Built-in forms
 --------------
@@ -1354,13 +1354,13 @@ code.
 
 The Django admin site uses permissions as follows:
 
-    * Access to view the "add" form and add an object is limited to users with
-      the "add" permission for that type of object.
-    * Access to view the change list, view the "change" form and change an
-      object is limited to users with the "change" permission for that type of
-      object.
-    * Access to delete an object is limited to users with the "delete"
-      permission for that type of object.
+* Access to view the "add" form and add an object is limited to users with
+  the "add" permission for that type of object.
+* Access to view the change list, view the "change" form and change an
+  object is limited to users with the "change" permission for that type of
+  object.
+* Access to delete an object is limited to users with the "delete"
+  permission for that type of object.
 
 Permissions are set globally per type of object, not per specific object
 instance. For example, it's possible to say "Mary may change news stories," but
@@ -1389,9 +1389,9 @@ Assuming you have an application with an
 :attr:`~django.db.models.Options.app_label` ``foo`` and a model named ``Bar``,
 to test for basic permissions you should use:
 
-    * add: ``user.has_perm('foo.add_bar')``
-    * change: ``user.has_perm('foo.change_bar')``
-    * delete: ``user.has_perm('foo.delete_bar')``
+* add: ``user.has_perm('foo.add_bar')``
+* change: ``user.has_perm('foo.change_bar')``
+* delete: ``user.has_perm('foo.delete_bar')``
 
 .. _custom-permissions:
 

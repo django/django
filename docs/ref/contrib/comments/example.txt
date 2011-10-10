@@ -125,12 +125,12 @@ moderate comments"``) can approve and delete comments. This can also be
 done through the ``admin`` as you'll see later. You might also want to
 customize the following templates:
 
-  * ``flag.html``
-  * ``flagged.html``
-  * ``approve.html``
-  * ``approved.html``
-  * ``delete.html``
-  * ``deleted.html``
+* ``flag.html``
+* ``flagged.html``
+* ``approve.html``
+* ``approved.html``
+* ``delete.html``
+* ``deleted.html``
 
 found under the directory structure we saw for ``form.html``.
 
@@ -185,9 +185,9 @@ in-built with :doc:`generic comment moderation
 </ref/contrib/comments/moderation>`. The comment moderation has the following
 features (all of which or only certain can be enabled):
 
-  * Enable comments for a particular model instance.
-  * Close comments after a particular (user-defined) number of days.
-  * Email new comments to the site-staff.
+* Enable comments for a particular model instance.
+* Close comments after a particular (user-defined) number of days.
+* Email new comments to the site-staff.
 
 To enable comment moderation, we subclass the :class:`CommentModerator` and
 register it with the moderation features we want. Let us suppose we want to

@@ -24,57 +24,57 @@ actually occurs until you do something to evaluate the queryset.
 
 You can evaluate a ``QuerySet`` in the following ways:
 
-    * **Iteration.** A ``QuerySet`` is iterable, and it executes its database
-      query the first time you iterate over it. For example, this will print
-      the headline of all entries in the database::
+* **Iteration.** A ``QuerySet`` is iterable, and it executes its database
+  query the first time you iterate over it. For example, this will print
+  the headline of all entries in the database::
 
-          for e in Entry.objects.all():
-              print e.headline
+      for e in Entry.objects.all():
+          print e.headline
 
-    * **Slicing.** As explained in :ref:`limiting-querysets`, a ``QuerySet`` can
-      be sliced, using Python's array-slicing syntax. Usually slicing a
-      ``QuerySet`` returns another (unevaluated) ``QuerySet``, but Django will
-      execute the database query if you use the "step" parameter of slice
-      syntax.
+* **Slicing.** As explained in :ref:`limiting-querysets`, a ``QuerySet`` can
+  be sliced, using Python's array-slicing syntax. Usually slicing a
+  ``QuerySet`` returns another (unevaluated) ``QuerySet``, but Django will
+  execute the database query if you use the "step" parameter of slice
+  syntax.
 
-    * **Pickling/Caching.** See the following section for details of what
-      is involved when `pickling QuerySets`_. The important thing for the
-      purposes of this section is that the results are read from the database.
+* **Pickling/Caching.** See the following section for details of what
+  is involved when `pickling QuerySets`_. The important thing for the
+  purposes of this section is that the results are read from the database.
 
-    * **repr().** A ``QuerySet`` is evaluated when you call ``repr()`` on it.
-      This is for convenience in the Python interactive interpreter, so you can
-      immediately see your results when using the API interactively.
+* **repr().** A ``QuerySet`` is evaluated when you call ``repr()`` on it.
+  This is for convenience in the Python interactive interpreter, so you can
+  immediately see your results when using the API interactively.
 
-    * **len().** A ``QuerySet`` is evaluated when you call ``len()`` on it.
-      This, as you might expect, returns the length of the result list.
+* **len().** A ``QuerySet`` is evaluated when you call ``len()`` on it.
+  This, as you might expect, returns the length of the result list.
 
-      Note: *Don't* use ``len()`` on ``QuerySet``\s if all you want to do is
-      determine the number of records in the set. It's much more efficient to
-      handle a count at the database level, using SQL's ``SELECT COUNT(*)``,
-      and Django provides a ``count()`` method for precisely this reason. See
-      ``count()`` below.
+  Note: *Don't* use ``len()`` on ``QuerySet``\s if all you want to do is
+  determine the number of records in the set. It's much more efficient to
+  handle a count at the database level, using SQL's ``SELECT COUNT(*)``,
+  and Django provides a ``count()`` method for precisely this reason. See
+  ``count()`` below.
 
-    * **list().** Force evaluation of a ``QuerySet`` by calling ``list()`` on
-      it. For example::
+* **list().** Force evaluation of a ``QuerySet`` by calling ``list()`` on
+  it. For example::
 
-          entry_list = list(Entry.objects.all())
+      entry_list = list(Entry.objects.all())
 
-      Be warned, though, that this could have a large memory overhead, because
-      Django will load each element of the list into memory. In contrast,
-      iterating over a ``QuerySet`` will take advantage of your database to
-      load data and instantiate objects only as you need them.
+  Be warned, though, that this could have a large memory overhead, because
+  Django will load each element of the list into memory. In contrast,
+  iterating over a ``QuerySet`` will take advantage of your database to
+  load data and instantiate objects only as you need them.
 
-    * **bool().** Testing a ``QuerySet`` in a boolean context, such as using
-      ``bool()``, ``or``, ``and`` or an ``if`` statement, will cause the query
-      to be executed. If there is at least one result, the ``QuerySet`` is
-      ``True``, otherwise ``False``. For example::
+* **bool().** Testing a ``QuerySet`` in a boolean context, such as using
+  ``bool()``, ``or``, ``and`` or an ``if`` statement, will cause the query
+  to be executed. If there is at least one result, the ``QuerySet`` is
+  ``True``, otherwise ``False``. For example::
 
-          if Entry.objects.filter(headline="Test"):
-             print "There is at least one Entry with the headline Test"
+      if Entry.objects.filter(headline="Test"):
+         print "There is at least one Entry with the headline Test"
 
-      Note: *Don't* use this if all you want to do is determine if at least one
-      result exists, and don't need the actual objects. It's more efficient to
-      use :meth:`exists() <QuerySet.exists>` (see below).
+  Note: *Don't* use this if all you want to do is determine if at least one
+  result exists, and don't need the actual objects. It's more efficient to
+  use :meth:`exists() <QuerySet.exists>` (see below).
 
 .. _pickling QuerySets:
 
@@ -411,35 +411,35 @@ Example::
 
 A few subtleties that are worth mentioning:
 
-    * If you have a field called ``foo`` that is a
-      :class:`~django.db.models.ForeignKey`, the default ``values()`` call
-      will return a dictionary key called ``foo_id``, since this is the name
-      of the hidden model attribute that stores the actual value (the ``foo``
-      attribute refers to the related model). When you are calling
-      ``values()`` and passing in field names, you can pass in either ``foo``
-      or ``foo_id`` and you will get back the same thing (the dictionary key
-      will match the field name you passed in).
+* If you have a field called ``foo`` that is a
+  :class:`~django.db.models.ForeignKey`, the default ``values()`` call
+  will return a dictionary key called ``foo_id``, since this is the name
+  of the hidden model attribute that stores the actual value (the ``foo``
+  attribute refers to the related model). When you are calling
+  ``values()`` and passing in field names, you can pass in either ``foo``
+  or ``foo_id`` and you will get back the same thing (the dictionary key
+  will match the field name you passed in).
 
-      For example::
+  For example::
 
-        >>> Entry.objects.values()
-        [{'blog_id': 1, 'headline': u'First Entry', ...}, ...]
+    >>> Entry.objects.values()
+    [{'blog_id': 1, 'headline': u'First Entry', ...}, ...]
 
-        >>> Entry.objects.values('blog')
-        [{'blog': 1}, ...]
+    >>> Entry.objects.values('blog')
+    [{'blog': 1}, ...]
 
-        >>> Entry.objects.values('blog_id')
-        [{'blog_id': 1}, ...]
+    >>> Entry.objects.values('blog_id')
+    [{'blog_id': 1}, ...]
 
-    * When using ``values()`` together with :meth:`distinct()`, be aware that
-      ordering can affect the results. See the note in :meth:`distinct` for
-      details.
+* When using ``values()`` together with :meth:`distinct()`, be aware that
+  ordering can affect the results. See the note in :meth:`distinct` for
+  details.
 
-    * If you use a ``values()`` clause after an :meth:`extra()` call,
-      any fields defined by a ``select`` argument in the :meth:`extra()` must
-      be explicitly included in the ``values()`` call. Any :meth:`extra()` call
-      made after a ``values()`` call will have its extra selected fields
-      ignored.
+* If you use a ``values()`` clause after an :meth:`extra()` call,
+  any fields defined by a ``select`` argument in the :meth:`extra()` must
+  be explicitly included in the ``values()`` call. Any :meth:`extra()` call
+  made after a ``values()`` call will have its extra selected fields
+  ignored.
 
 A ``ValuesQuerySet`` is useful when you know you're only going to need values
 from a small number of the available fields and you won't need the
@@ -524,11 +524,11 @@ model.
 ``datetime.datetime`` object in the result list is "truncated" to the given
 ``type``.
 
-    * ``"year"`` returns a list of all distinct year values for the field.
-    * ``"month"`` returns a list of all distinct year/month values for the
-      field.
-    * ``"day"`` returns a list of all distinct year/month/day values for the
-      field.
+* ``"year"`` returns a list of all distinct year values for the field.
+* ``"month"`` returns a list of all distinct year/month values for the
+  field.
+* ``"day"`` returns a list of all distinct year/month/day values for the
+  field.
 
 ``order``, which defaults to ``'ASC'``, should be either ``'ASC'`` or
 ``'DESC'``. This specifies how to order the results.
@@ -832,153 +832,155 @@ principle, so you should avoid them if possible.
 Specify one or more of ``params``, ``select``, ``where`` or ``tables``. None
 of the arguments is required, but you should use at least one of them.
 
-    * ``select``
-        The ``select`` argument lets you put extra fields in the ``SELECT``
-        clause.  It should be a dictionary mapping attribute names to SQL
-        clauses to use to calculate that attribute.
+* ``select``
 
-        Example::
+  The ``select`` argument lets you put extra fields in the ``SELECT``
+  clause.  It should be a dictionary mapping attribute names to SQL
+  clauses to use to calculate that attribute.
 
-            Entry.objects.extra(select={'is_recent': "pub_date > '2006-01-01'"})
+  Example::
 
-        As a result, each ``Entry`` object will have an extra attribute,
-        ``is_recent``, a boolean representing whether the entry's ``pub_date``
-        is greater than Jan. 1, 2006.
+      Entry.objects.extra(select={'is_recent': "pub_date > '2006-01-01'"})
 
-        Django inserts the given SQL snippet directly into the ``SELECT``
-        statement, so the resulting SQL of the above example would be something
-        like::
+  As a result, each ``Entry`` object will have an extra attribute,
+  ``is_recent``, a boolean representing whether the entry's ``pub_date``
+  is greater than Jan. 1, 2006.
 
-            SELECT blog_entry.*, (pub_date > '2006-01-01') AS is_recent
-            FROM blog_entry;
+  Django inserts the given SQL snippet directly into the ``SELECT``
+  statement, so the resulting SQL of the above example would be something
+  like::
+
+      SELECT blog_entry.*, (pub_date > '2006-01-01') AS is_recent
+      FROM blog_entry;
 
 
-        The next example is more advanced; it does a subquery to give each
-        resulting ``Blog`` object an ``entry_count`` attribute, an integer count
-        of associated ``Entry`` objects::
+  The next example is more advanced; it does a subquery to give each
+  resulting ``Blog`` object an ``entry_count`` attribute, an integer count
+  of associated ``Entry`` objects::
 
-            Blog.objects.extra(
-                select={
-                    'entry_count': 'SELECT COUNT(*) FROM blog_entry WHERE blog_entry.blog_id = blog_blog.id'
-                },
-            )
+      Blog.objects.extra(
+          select={
+              'entry_count': 'SELECT COUNT(*) FROM blog_entry WHERE blog_entry.blog_id = blog_blog.id'
+          },
+      )
 
-        In this particular case, we're exploiting the fact that the query will
-        already contain the ``blog_blog`` table in its ``FROM`` clause.
+  In this particular case, we're exploiting the fact that the query will
+  already contain the ``blog_blog`` table in its ``FROM`` clause.
 
-        The resulting SQL of the above example would be::
+  The resulting SQL of the above example would be::
 
-            SELECT blog_blog.*, (SELECT COUNT(*) FROM blog_entry WHERE blog_entry.blog_id = blog_blog.id) AS entry_count
-            FROM blog_blog;
+      SELECT blog_blog.*, (SELECT COUNT(*) FROM blog_entry WHERE blog_entry.blog_id = blog_blog.id) AS entry_count
+      FROM blog_blog;
 
-        Note that the parentheses required by most database engines around
-        subqueries are not required in Django's ``select`` clauses. Also note
-        that some database backends, such as some MySQL versions, don't support
-        subqueries.
+  Note that the parentheses required by most database engines around
+  subqueries are not required in Django's ``select`` clauses. Also note
+  that some database backends, such as some MySQL versions, don't support
+  subqueries.
 
-        In some rare cases, you might wish to pass parameters to the SQL
-        fragments in ``extra(select=...)``. For this purpose, use the
-        ``select_params`` parameter. Since ``select_params`` is a sequence and
-        the ``select`` attribute is a dictionary, some care is required so that
-        the parameters are matched up correctly with the extra select pieces.
-        In this situation, you should use a
-        :class:`django.utils.datastructures.SortedDict` for the ``select``
-        value, not just a normal Python dictionary.
+  In some rare cases, you might wish to pass parameters to the SQL
+  fragments in ``extra(select=...)``. For this purpose, use the
+  ``select_params`` parameter. Since ``select_params`` is a sequence and
+  the ``select`` attribute is a dictionary, some care is required so that
+  the parameters are matched up correctly with the extra select pieces.
+  In this situation, you should use a
+  :class:`django.utils.datastructures.SortedDict` for the ``select``
+  value, not just a normal Python dictionary.
 
-        This will work, for example::
+  This will work, for example::
 
-            Blog.objects.extra(
-                select=SortedDict([('a', '%s'), ('b', '%s')]),
-                select_params=('one', 'two'))
+      Blog.objects.extra(
+          select=SortedDict([('a', '%s'), ('b', '%s')]),
+          select_params=('one', 'two'))
 
-        The only thing to be careful about when using select parameters in
-        ``extra()`` is to avoid using the substring ``"%%s"`` (that's *two*
-        percent characters before the ``s``) in the select strings. Django's
-        tracking of parameters looks for ``%s`` and an escaped ``%`` character
-        like this isn't detected. That will lead to incorrect results.
+  The only thing to be careful about when using select parameters in
+  ``extra()`` is to avoid using the substring ``"%%s"`` (that's *two*
+  percent characters before the ``s``) in the select strings. Django's
+  tracking of parameters looks for ``%s`` and an escaped ``%`` character
+  like this isn't detected. That will lead to incorrect results.
 
-    * ``where`` / ``tables``
-        You can define explicit SQL ``WHERE`` clauses — perhaps to perform
-        non-explicit joins — by using ``where``. You can manually add tables to
-        the SQL ``FROM`` clause by using ``tables``.
+* ``where`` / ``tables``
 
-        ``where`` and ``tables`` both take a list of strings. All ``where``
-        parameters are "AND"ed to any other search criteria.
+  You can define explicit SQL ``WHERE`` clauses — perhaps to perform
+  non-explicit joins — by using ``where``. You can manually add tables to
+  the SQL ``FROM`` clause by using ``tables``.
 
-        Example::
+  ``where`` and ``tables`` both take a list of strings. All ``where``
+  parameters are "AND"ed to any other search criteria.
 
-            Entry.objects.extra(where=['id IN (3, 4, 5, 20)'])
+  Example::
 
-        ...translates (roughly) into the following SQL::
+      Entry.objects.extra(where=['id IN (3, 4, 5, 20)'])
 
-            SELECT * FROM blog_entry WHERE id IN (3, 4, 5, 20);
+  ...translates (roughly) into the following SQL::
 
-        Be careful when using the ``tables`` parameter if you're specifying
-        tables that are already used in the query. When you add extra tables
-        via the ``tables`` parameter, Django assumes you want that table
-        included an extra time, if it is already included. That creates a
-        problem, since the table name will then be given an alias. If a table
-        appears multiple times in an SQL statement, the second and subsequent
-        occurrences must use aliases so the database can tell them apart. If
-        you're referring to the extra table you added in the extra ``where``
-        parameter this is going to cause errors.
+      SELECT * FROM blog_entry WHERE id IN (3, 4, 5, 20);
 
-        Normally you'll only be adding extra tables that don't already appear
-        in the query. However, if the case outlined above does occur, there are
-        a few solutions. First, see if you can get by without including the
-        extra table and use the one already in the query. If that isn't
-        possible, put your ``extra()`` call at the front of the queryset
-        construction so that your table is the first use of that table.
-        Finally, if all else fails, look at the query produced and rewrite your
-        ``where`` addition to use the alias given to your extra table. The
-        alias will be the same each time you construct the queryset in the same
-        way, so you can rely upon the alias name to not change.
+  Be careful when using the ``tables`` parameter if you're specifying
+  tables that are already used in the query. When you add extra tables
+  via the ``tables`` parameter, Django assumes you want that table
+  included an extra time, if it is already included. That creates a
+  problem, since the table name will then be given an alias. If a table
+  appears multiple times in an SQL statement, the second and subsequent
+  occurrences must use aliases so the database can tell them apart. If
+  you're referring to the extra table you added in the extra ``where``
+  parameter this is going to cause errors.
 
-    * ``order_by``
+  Normally you'll only be adding extra tables that don't already appear
+  in the query. However, if the case outlined above does occur, there are
+  a few solutions. First, see if you can get by without including the
+  extra table and use the one already in the query. If that isn't
+  possible, put your ``extra()`` call at the front of the queryset
+  construction so that your table is the first use of that table.
+  Finally, if all else fails, look at the query produced and rewrite your
+  ``where`` addition to use the alias given to your extra table. The
+  alias will be the same each time you construct the queryset in the same
+  way, so you can rely upon the alias name to not change.
 
-      If you need to order the resulting queryset using some of the new
-      fields or tables you have included via ``extra()`` use the ``order_by``
-      parameter to ``extra()`` and pass in a sequence of strings. These
-      strings should either be model fields (as in the normal
-      :meth:`order_by()` method on querysets), of the form
-      ``table_name.column_name`` or an alias for a column that you specified
-      in the ``select`` parameter to ``extra()``.
+* ``order_by``
 
-      For example::
+  If you need to order the resulting queryset using some of the new
+  fields or tables you have included via ``extra()`` use the ``order_by``
+  parameter to ``extra()`` and pass in a sequence of strings. These
+  strings should either be model fields (as in the normal
+  :meth:`order_by()` method on querysets), of the form
+  ``table_name.column_name`` or an alias for a column that you specified
+  in the ``select`` parameter to ``extra()``.
 
-          q = Entry.objects.extra(select={'is_recent': "pub_date > '2006-01-01'"})
-          q = q.extra(order_by = ['-is_recent'])
+  For example::
 
-      This would sort all the items for which ``is_recent`` is true to the
-      front of the result set (``True`` sorts before ``False`` in a
-      descending ordering).
+      q = Entry.objects.extra(select={'is_recent': "pub_date > '2006-01-01'"})
+      q = q.extra(order_by = ['-is_recent'])
 
-      This shows, by the way, that you can make multiple calls to ``extra()``
-      and it will behave as you expect (adding new constraints each time).
+  This would sort all the items for which ``is_recent`` is true to the
+  front of the result set (``True`` sorts before ``False`` in a
+  descending ordering).
 
-    * ``params``
+  This shows, by the way, that you can make multiple calls to ``extra()``
+  and it will behave as you expect (adding new constraints each time).
 
-      The ``where`` parameter described above may use standard Python
-      database string placeholders — ``'%s'`` to indicate parameters the
-      database engine should automatically quote. The ``params`` argument is
-      a list of any extra parameters to be substituted.
+* ``params``
 
-      Example::
+  The ``where`` parameter described above may use standard Python
+  database string placeholders — ``'%s'`` to indicate parameters the
+  database engine should automatically quote. The ``params`` argument is
+  a list of any extra parameters to be substituted.
 
-          Entry.objects.extra(where=['headline=%s'], params=['Lennon'])
+  Example::
 
-      Always use ``params`` instead of embedding values directly into
-      ``where`` because ``params`` will ensure values are quoted correctly
-      according to your particular backend. For example, quotes will be
-      escaped correctly.
+      Entry.objects.extra(where=['headline=%s'], params=['Lennon'])
 
-      Bad::
+  Always use ``params`` instead of embedding values directly into
+  ``where`` because ``params`` will ensure values are quoted correctly
+  according to your particular backend. For example, quotes will be
+  escaped correctly.
 
-          Entry.objects.extra(where=["headline='Lennon'"])
+  Bad::
 
-      Good::
+      Entry.objects.extra(where=["headline='Lennon'"])
 
-          Entry.objects.extra(where=['headline=%s'], params=['Lennon'])
+  Good::
+
+      Entry.objects.extra(where=['headline=%s'], params=['Lennon'])
 
 defer
 ~~~~~
@@ -1304,11 +1306,11 @@ are)::
 
 This has a number of caveats though:
 
-  * The model's ``save()`` method will not be called, and the ``pre_save`` and
-    ``post_save`` signals will not be sent.
-  * It does not work with child models in a multi-table inheritance scenario.
-  * If the model's primary key is an :class:`~django.db.models.AutoField` it
-    does not retrieve and set the primary key attribute, as ``save()`` does.
+* The model's ``save()`` method will not be called, and the ``pre_save`` and
+``post_save`` signals will not be sent.
+* It does not work with child models in a multi-table inheritance scenario.
+* If the model's primary key is an :class:`~django.db.models.AutoField` it
+does not retrieve and set the primary key attribute, as ``save()`` does.
 
 count
 ~~~~~
@@ -2059,8 +2061,8 @@ Avg
 
     Returns the mean value of the given field.
 
-        * Default alias: ``<field>__avg``
-        * Return type: float
+    * Default alias: ``<field>__avg``
+    * Return type: float
 
 Count
 ~~~~~
@@ -2069,8 +2071,8 @@ Count
 
     Returns the number of objects that are related through the provided field.
 
-        * Default alias: ``<field>__count``
-        * Return type: integer
+    * Default alias: ``<field>__count``
+    * Return type: integer
 
     Has one optional argument:
 
@@ -2086,8 +2088,8 @@ Max
 
     Returns the maximum value of the given field.
 
-        * Default alias: ``<field>__max``
-        * Return type: same as input field
+    * Default alias: ``<field>__max``
+    * Return type: same as input field
 
 Min
 ~~~
@@ -2096,8 +2098,8 @@ Min
 
     Returns the minimum value of the given field.
 
-        * Default alias: ``<field>__min``
-        * Return type: same as input field
+    * Default alias: ``<field>__min``
+    * Return type: same as input field
 
 StdDev
 ~~~~~~
@@ -2106,8 +2108,8 @@ StdDev
 
     Returns the standard deviation of the data in the provided field.
 
-        * Default alias: ``<field>__stddev``
-        * Return type: float
+    * Default alias: ``<field>__stddev``
+    * Return type: float
 
     Has one optional argument:
 
@@ -2129,8 +2131,8 @@ Sum
 
     Computes the sum of all values of the given field.
 
-        * Default alias: ``<field>__sum``
-        * Return type: same as input field
+    * Default alias: ``<field>__sum``
+    * Return type: same as input field
 
 Variance
 ~~~~~~~~
@@ -2139,8 +2141,8 @@ Variance
 
     Returns the variance of the data in the provided field.
 
-        * Default alias: ``<field>__variance``
-        * Return type: float
+    * Default alias: ``<field>__variance``
+    * Return type: float
 
     Has one optional argument:
 

@@ -36,49 +36,49 @@ Supported countries
 
 Countries currently supported by :mod:`~django.contrib.localflavor` are:
 
-    * Argentina_
-    * Australia_
-    * Austria_
-    * Belgium_
-    * Brazil_
-    * Canada_
-    * Chile_
-    * China_
-    * Colombia_
-    * Croatia_
-    * Czech_
-    * Ecuador_
-    * Finland_
-    * France_
-    * Germany_
-    * Iceland_
-    * India_
-    * Indonesia_
-    * Ireland_
-    * Israel_
-    * Italy_
-    * Japan_
-    * Kuwait_
-    * Macedonia_
-    * Mexico_
-    * `The Netherlands`_
-    * Norway_
-    * Peru_
-    * Poland_
-    * Portugal_
-    * Paraguay_
-    * Romania_
-    * Russia_
-    * Slovakia_
-    * Slovenia_
-    * `South Africa`_
-    * Spain_
-    * Sweden_
-    * Switzerland_
-    * Turkey_
-    * `United Kingdom`_
-    * `United States of America`_
-    * Uruguay_
+* Argentina_
+* Australia_
+* Austria_
+* Belgium_
+* Brazil_
+* Canada_
+* Chile_
+* China_
+* Colombia_
+* Croatia_
+* Czech_
+* Ecuador_
+* Finland_
+* France_
+* Germany_
+* Iceland_
+* India_
+* Indonesia_
+* Ireland_
+* Israel_
+* Italy_
+* Japan_
+* Kuwait_
+* Macedonia_
+* Mexico_
+* `The Netherlands`_
+* Norway_
+* Peru_
+* Poland_
+* Portugal_
+* Paraguay_
+* Romania_
+* Russia_
+* Slovakia_
+* Slovenia_
+* `South Africa`_
+* Spain_
+* Sweden_
+* Switzerland_
+* Turkey_
+* `United Kingdom`_
+* `United States of America`_
+* Uruguay_
 
 The ``django.contrib.localflavor`` package also includes a ``generic`` subpackage,
 containing useful code that is not specific to one particular country or culture.
@@ -1286,13 +1286,13 @@ United States of America (``us``)
     A form field that validates input as a U.S. Social Security Number (SSN).
     A valid SSN must obey the following rules:
 
-        * Format of XXX-XX-XXXX
-        * No group of digits consisting entirely of zeroes
-        * Leading group of digits cannot be 666
-        * Number not in promotional block 987-65-4320 through 987-65-4329
-        * Number not one known to be invalid due to widespread promotional
-          use or distribution (e.g., the Woolworth's number or the 1962
-          promotional number)
+    * Format of XXX-XX-XXXX
+    * No group of digits consisting entirely of zeroes
+    * Leading group of digits cannot be 666
+    * Number not in promotional block 987-65-4320 through 987-65-4329
+    * Number not one known to be invalid due to widespread promotional
+      use or distribution (e.g., the Woolworth's number or the 1962
+      promotional number)
 
 .. class:: us.forms.USStateField
 

@@ -92,10 +92,10 @@ Use a dot (``.``) to access attributes of a variable.
     Technically, when the template system encounters a dot, it tries the
     following lookups, in this order:
 
-        * Dictionary lookup
-        * Attribute lookup
-        * Method call
-        * List-index lookup
+    * Dictionary lookup
+    * Attribute lookup
+    * Method call
+    * List-index lookup
 
 In the above example, ``{{ section.title }}`` will be replaced with the
 ``title`` attribute of the ``section`` object.
@@ -129,32 +129,32 @@ them in the :ref:`built-in filter reference <ref-templates-builtins-filters>`.
 To give you a taste of what's available, here are some of the more commonly
 used template filters:
 
-    :tfilter:`default`
-        If a variable is false or empty, use given default. Otherwise, use the
-        value of the variable
+:tfilter:`default`
+    If a variable is false or empty, use given default. Otherwise, use the
+    value of the variable
 
-        For example::
+    For example::
 
-            {{ value|default:"nothing" }}
+        {{ value|default:"nothing" }}
 
-        If ``value`` isn't provided or is empty, the above will display
-        "``nothing``".
+    If ``value`` isn't provided or is empty, the above will display
+    "``nothing``".
 
-    :tfilter:`length`
-        Returns the length of the value. This works for both strings and lists;
-        for example::
+:tfilter:`length`
+    Returns the length of the value. This works for both strings and lists;
+    for example::
 
-            {{ value|length }}
+        {{ value|length }}
 
-        If ``value`` is ``['a', 'b', 'c', 'd']``, the output will be ``4``.
+    If ``value`` is ``['a', 'b', 'c', 'd']``, the output will be ``4``.
 
-    :tfilter:`striptags`
-        Strips all [X]HTML tags. For example::
+:tfilter:`striptags`
+    Strips all [X]HTML tags. For example::
 
-            {{ value|striptags }}
+        {{ value|striptags }}
 
-        If ``value`` is ``"<b>Joel</b> <button>is</button> a
-        <span>slug</span>"``, the output will be ``"Joel is a slug"``.
+    If ``value`` is ``"<b>Joel</b> <button>is</button> a
+    <span>slug</span>"``, the output will be ``"Joel is a slug"``.
 
 Again, these are just a few examples; see the :ref:`built-in filter reference
 <ref-templates-builtins-filters>` for the complete list.
@@ -183,40 +183,40 @@ them in the :ref:`built-in tag reference <ref-templates-builtins-tags>`. To give
 you a taste of what's available, here are some of the more commonly used
 tags:
 
-    :ttag:`for`
-        Loop over each item in an array.  For example, to display a list of athletes
-        provided in ``athlete_list``::
+:ttag:`for`
+    Loop over each item in an array.  For example, to display a list of athletes
+    provided in ``athlete_list``::
 
-            <ul>
-            {% for athlete in athlete_list %}
-                <li>{{ athlete.name }}</li>
-            {% endfor %}
-            </ul>
+        <ul>
+        {% for athlete in athlete_list %}
+            <li>{{ athlete.name }}</li>
+        {% endfor %}
+        </ul>
 
-    :ttag:`if` and ``else``
-        Evaluates a variable, and if that variable is "true" the contents of the
-        block are displayed::
+:ttag:`if` and ``else``
+    Evaluates a variable, and if that variable is "true" the contents of the
+    block are displayed::
 
-            {% if athlete_list %}
-                Number of athletes: {{ athlete_list|length }}
-            {% else %}
-                No athletes.
-            {% endif %}
+        {% if athlete_list %}
+            Number of athletes: {{ athlete_list|length }}
+        {% else %}
+            No athletes.
+        {% endif %}
 
-        In the above, if ``athlete_list`` is not empty, the number of athletes
-        will be displayed by the ``{{ athlete_list|length }}`` variable.
+    In the above, if ``athlete_list`` is not empty, the number of athletes
+    will be displayed by the ``{{ athlete_list|length }}`` variable.
 
-        You can also use filters and various operators in the :ttag:`if` tag::
+    You can also use filters and various operators in the :ttag:`if` tag::
 
-            {% if athlete_list|length > 1 %}
-               Team: {% for athlete in athlete_list %} ... {% endfor %}
-            {% else %}
-               Athlete: {{ athlete_list.0.name }}
-            {% endif %}
+        {% if athlete_list|length > 1 %}
+           Team: {% for athlete in athlete_list %} ... {% endfor %}
+        {% else %}
+           Athlete: {{ athlete_list.0.name }}
+        {% endif %}
 
-    :ttag:`block` and :ttag:`extends`
-        Set up `template inheritance`_ (see below), a powerful way
-        of cutting down on "boilerplate" in templates.
+:ttag:`block` and :ttag:`extends`
+    Set up `template inheritance`_ (see below), a powerful way
+    of cutting down on "boilerplate" in templates.
 
 Again, the above is only a selection of the whole list; see the :ref:`built-in
 tag reference <ref-templates-builtins-tags>` for the complete list.
@@ -344,49 +344,49 @@ tag in a parent template is always used as a fallback.
 You can use as many levels of inheritance as needed. One common way of using
 inheritance is the following three-level approach:
 
-    * Create a ``base.html`` template that holds the main look-and-feel of your
-      site.
-    * Create a ``base_SECTIONNAME.html`` template for each "section" of your
-      site. For example, ``base_news.html``, ``base_sports.html``. These
-      templates all extend ``base.html`` and include section-specific
-      styles/design.
-    * Create individual templates for each type of page, such as a news
-      article or blog entry. These templates extend the appropriate section
-      template.
+* Create a ``base.html`` template that holds the main look-and-feel of your
+  site.
+* Create a ``base_SECTIONNAME.html`` template for each "section" of your
+  site. For example, ``base_news.html``, ``base_sports.html``. These
+  templates all extend ``base.html`` and include section-specific
+  styles/design.
+* Create individual templates for each type of page, such as a news
+  article or blog entry. These templates extend the appropriate section
+  template.
 
 This approach maximizes code reuse and makes it easy to add items to shared
 content areas, such as section-wide navigation.
 
 Here are some tips for working with inheritance:
 
-    * If you use :ttag:`{% extends %}<extends>` in a template, it must be the first template
-      tag in that template. Template inheritance won't work, otherwise.
+* If you use :ttag:`{% extends %}<extends>` in a template, it must be the first template
+  tag in that template. Template inheritance won't work, otherwise.
 
-    * More :ttag:`{% block %}<block>` tags in your base templates are better. Remember,
-      child templates don't have to define all parent blocks, so you can fill
-      in reasonable defaults in a number of blocks, then only define the ones
-      you need later. It's better to have more hooks than fewer hooks.
+* More :ttag:`{% block %}<block>` tags in your base templates are better. Remember,
+  child templates don't have to define all parent blocks, so you can fill
+  in reasonable defaults in a number of blocks, then only define the ones
+  you need later. It's better to have more hooks than fewer hooks.
 
-    * If you find yourself duplicating content in a number of templates, it
-      probably means you should move that content to a ``{% block %}`` in a
-      parent template.
+* If you find yourself duplicating content in a number of templates, it
+  probably means you should move that content to a ``{% block %}`` in a
+  parent template.
 
-    * If you need to get the content of the block from the parent template,
-      the ``{{ block.super }}`` variable will do the trick. This is useful
-      if you want to add to the contents of a parent block instead of
-      completely overriding it. Data inserted using ``{{ block.super }}`` will
-      not be automatically escaped (see the `next section`_), since it was
-      already escaped, if necessary, in the parent template.
+* If you need to get the content of the block from the parent template,
+  the ``{{ block.super }}`` variable will do the trick. This is useful
+  if you want to add to the contents of a parent block instead of
+  completely overriding it. Data inserted using ``{{ block.super }}`` will
+  not be automatically escaped (see the `next section`_), since it was
+  already escaped, if necessary, in the parent template.
 
-    * For extra readability, you can optionally give a *name* to your
-      ``{% endblock %}`` tag. For example::
+* For extra readability, you can optionally give a *name* to your
+  ``{% endblock %}`` tag. For example::
 
-          {% block content %}
-          ...
-          {% endblock content %}
+      {% block content %}
+      ...
+      {% endblock content %}
 
-      In larger templates, this technique helps you see which ``{% block %}``
-      tags are being closed.
+  In larger templates, this technique helps you see which ``{% block %}``
+  tags are being closed.
 
 Finally, note that you can't define multiple :ttag:`block` tags with the same
 name in the same template. This limitation exists because a block tag works in
@@ -437,25 +437,25 @@ do potentially bad things. This type of security exploit is called a
 
 To avoid this problem, you have two options:
 
-    * One, you can make sure to run each untrusted variable through the
-      :tfilter:`escape` filter (documented below), which converts potentially
-      harmful HTML characters to unharmful ones. This was the default solution
-      in Django for its first few years, but the problem is that it puts the
-      onus on *you*, the developer / template author, to ensure you're escaping
-      everything. It's easy to forget to escape data.
+* One, you can make sure to run each untrusted variable through the
+  :tfilter:`escape` filter (documented below), which converts potentially
+  harmful HTML characters to unharmful ones. This was the default solution
+  in Django for its first few years, but the problem is that it puts the
+  onus on *you*, the developer / template author, to ensure you're escaping
+  everything. It's easy to forget to escape data.
 
-    * Two, you can take advantage of Django's automatic HTML escaping. The
-      remainder of this section describes how auto-escaping works.
+* Two, you can take advantage of Django's automatic HTML escaping. The
+  remainder of this section describes how auto-escaping works.
 
 By default in Django, every template automatically escapes the output
 of every variable tag. Specifically, these five characters are
 escaped:
 
-    * ``<`` is converted to ``&lt;``
-    * ``>`` is converted to ``&gt;``
-    * ``'`` (single quote) is converted to ``&#39;``
-    * ``"`` (double quote) is converted to ``&quot;``
-    * ``&`` is converted to ``&amp;``
+* ``<`` is converted to ``&lt;``
+* ``>`` is converted to ``&gt;``
+* ``'`` (single quote) is converted to ``&#39;``
+* ``"`` (double quote) is converted to ``&quot;``
+* ``&`` is converted to ``&amp;``
 
 Again, we stress that this behavior is on by default. If you're using Django's
 template system, you're protected.

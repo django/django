@@ -62,7 +62,6 @@ def setup(app):
     app.add_config_value('django_next_version', '0.0', True)
     app.add_directive('versionadded', VersionDirective)
     app.add_directive('versionchanged', VersionDirective)
-    app.add_transform(SuppressBlockquotes)
     app.add_builder(DjangoStandaloneHTMLBuilder)
 
 
@@ -98,27 +97,6 @@ class VersionDirective(Directive):
         env.note_versionchange(node['type'], node['version'], node, self.lineno)
         return ret
 
-
-class SuppressBlockquotes(transforms.Transform):
-    """
-    Remove the default blockquotes that encase indented list, tables, etc.
-    """
-    default_priority = 300
-
-    suppress_blockquote_child_nodes = (
-        nodes.bullet_list,
-        nodes.enumerated_list,
-        nodes.definition_list,
-        nodes.literal_block,
-        nodes.doctest_block,
-        nodes.line_block,
-        nodes.table
-    )
-
-    def apply(self):
-        for node in self.document.traverse(nodes.block_quote):
-            if len(node.children) == 1 and isinstance(node.children[0], self.suppress_blockquote_child_nodes):
-                node.replace_self(node.children[0])
 
 class DjangoHTMLTranslator(SmartyPantsHTMLTranslator):
     """

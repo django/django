@@ -240,7 +240,7 @@ Caveats with support of certain databases
 Django attempts to support as many features as possible on all database
 backends. However, not all database backends are alike, and in particular many of the supported database differ greatly from version to version. It's a good idea to checkout our :doc:`notes on supported database </ref/databases>`:
 
-    - :ref:`mysql-notes`
-    - :ref:`sqlite-notes`
-    - :ref:`oracle-notes`
+- :ref:`mysql-notes`
+- :ref:`sqlite-notes`
+- :ref:`oracle-notes`
 
