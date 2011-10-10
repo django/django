@@ -115,7 +115,7 @@ Of course, like any estimated timeline, this is subject to change as
 requirements dictate. The latest information will always be available
 on the Django project wiki:
 
-    http://code.djangoproject.com/wiki/VersionOneRoadmap
+* http://code.djangoproject.com/wiki/VersionOneRoadmap
 
 
 What you can do to help
@@ -128,7 +128,7 @@ codebase in a safe test environment and reporting any bugs or issues
 you encounter. The Django ticket tracker is the central place to
 search for open issues:
 
-    http://code.djangoproject.com/timeline
+* http://code.djangoproject.com/timeline
 
 Please open new tickets if no existing ticket corresponds to a problem
 you're running into.
@@ -137,7 +137,7 @@ Additionally, discussion of Django development, including progress
 toward the 1.0 release, takes place daily on the django-developers
 mailing list:
 
-    http://groups.google.com/group/django-developers
+* http://groups.google.com/group/django-developers
 
 ...and in the ``#django-dev`` IRC channel on ``irc.freenode.net``. If
 you're interested in helping out with Django's development, feel free
@@ -146,7 +146,7 @@ to join the discussions there.
 Django's online documentation also includes pointers on how to
 contribute to Django:
 
-    :doc:`contributing to Django </internals/contributing/index>`
+* :doc:`contributing to Django </internals/contributing/index>`
 
 Contributions on any level -- developing code, writing
 documentation or simply triaging tickets and helping to test proposed

@@ -663,7 +663,7 @@ Manually managing a user's password
 
 .. function:: is_password_usable()
 
-    .. versionadded:: 1.4
+   .. versionadded:: 1.4
 
    Checks if the given string is a hashed password that has a chance
    of being verified against :func:`django.contrib.auth.utils.check_password`.

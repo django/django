@@ -40,7 +40,7 @@ available in the context, then you can refer to it directly::
 .. versionadded:: 1.2
 
 Next, we can use the :ttag:`render_comment_list` tag, to render all comments
-to the given instance (``entry``) by using the ``comments/list.html`` template.
+to the given instance (``entry``) by using the ``comments/list.html`` template::
 
    {% render_comment_list for entry %}
 

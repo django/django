@@ -420,6 +420,8 @@ With this name value, the template would be rendered as::
 
 Similarly, what if the name contained a ``'<'`` symbol, like this?
 
+.. code-block:: html
+
     <b>username
 
 That would result in a rendered template like this::

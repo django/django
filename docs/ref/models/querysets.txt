@@ -936,49 +936,49 @@ of the arguments is required, but you should use at least one of them.
 
     * ``order_by``
 
-        If you need to order the resulting queryset using some of the new
-        fields or tables you have included via ``extra()`` use the ``order_by``
-        parameter to ``extra()`` and pass in a sequence of strings. These
-        strings should either be model fields (as in the normal
-        :meth:`order_by()` method on querysets), of the form
-        ``table_name.column_name`` or an alias for a column that you specified
-        in the ``select`` parameter to ``extra()``.
+      If you need to order the resulting queryset using some of the new
+      fields or tables you have included via ``extra()`` use the ``order_by``
+      parameter to ``extra()`` and pass in a sequence of strings. These
+      strings should either be model fields (as in the normal
+      :meth:`order_by()` method on querysets), of the form
+      ``table_name.column_name`` or an alias for a column that you specified
+      in the ``select`` parameter to ``extra()``.
 
-        For example::
+      For example::
 
-            q = Entry.objects.extra(select={'is_recent': "pub_date > '2006-01-01'"})
-            q = q.extra(order_by = ['-is_recent'])
+          q = Entry.objects.extra(select={'is_recent': "pub_date > '2006-01-01'"})
+          q = q.extra(order_by = ['-is_recent'])
 
-        This would sort all the items for which ``is_recent`` is true to the
-        front of the result set (``True`` sorts before ``False`` in a
-        descending ordering).
+      This would sort all the items for which ``is_recent`` is true to the
+      front of the result set (``True`` sorts before ``False`` in a
+      descending ordering).
 
-        This shows, by the way, that you can make multiple calls to ``extra()``
-        and it will behave as you expect (adding new constraints each time).
+      This shows, by the way, that you can make multiple calls to ``extra()``
+      and it will behave as you expect (adding new constraints each time).
 
     * ``params``
 
-        The ``where`` parameter described above may use standard Python
-        database string placeholders — ``'%s'`` to indicate parameters the
-        database engine should automatically quote. The ``params`` argument is
-        a list of any extra parameters to be substituted.
+      The ``where`` parameter described above may use standard Python
+      database string placeholders — ``'%s'`` to indicate parameters the
+      database engine should automatically quote. The ``params`` argument is
+      a list of any extra parameters to be substituted.
 
-        Example::
+      Example::
 
-            Entry.objects.extra(where=['headline=%s'], params=['Lennon'])
+          Entry.objects.extra(where=['headline=%s'], params=['Lennon'])
 
-        Always use ``params`` instead of embedding values directly into
-        ``where`` because ``params`` will ensure values are quoted correctly
-        according to your particular backend. For example, quotes will be
-        escaped correctly.
+      Always use ``params`` instead of embedding values directly into
+      ``where`` because ``params`` will ensure values are quoted correctly
+      according to your particular backend. For example, quotes will be
+      escaped correctly.
 
-        Bad::
+      Bad::
 
-            Entry.objects.extra(where=["headline='Lennon'"])
+          Entry.objects.extra(where=["headline='Lennon'"])
 
-        Good::
+      Good::
 
-            Entry.objects.extra(where=['headline=%s'], params=['Lennon'])
+          Entry.objects.extra(where=['headline=%s'], params=['Lennon'])
 
 defer
 ~~~~~

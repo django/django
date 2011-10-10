@@ -824,7 +824,7 @@ Mexico (``mx``)
 
 .. class:: mx.forms.MXCURPField
 
-    .. versionadded:: 1.4
+   .. versionadded:: 1.4
 
    A field that validates a Mexican *Clave Única de Registro de Población*.
 

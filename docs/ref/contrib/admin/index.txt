@@ -230,7 +230,7 @@ subclass::
 
     This results in an admin page that looks like:
 
-        .. image:: _images/flatfiles_admin.png
+    .. image:: _images/flatfiles_admin.png
 
     If neither ``fieldsets`` nor :attr:`~ModelAdmin.fields` options are present,
     Django will default to displaying each field that isn't an ``AutoField`` and
@@ -577,7 +577,7 @@ subclass::
     Set ``list_filter`` to activate filters in the right sidebar of the change
     list page of the admin, as illustrated in the following screenshot:
 
-        .. image:: _images/users_changelist.png
+    .. image:: _images/users_changelist.png
 
     ``list_filter`` should be a list of elements, where each element should be
     of one of the following types:
