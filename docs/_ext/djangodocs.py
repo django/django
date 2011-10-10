@@ -16,7 +16,7 @@ except ImportError:
         except ImportError:
             json = None
 
-from sphinx import addnodes, roles
+from sphinx import addnodes, roles, __version__ as sphinx_ver
 from sphinx.builders.html import StandaloneHTMLBuilder
 from sphinx.writers.html import SmartyPantsHTMLTranslator
 from sphinx.util.console import bold
@@ -139,16 +139,17 @@ class DjangoHTMLTranslator(SmartyPantsHTMLTranslator):
     def depart_desc_parameterlist(self, node):
         self.body.append(')')
 
-    #
-    # Don't apply smartypants to literal blocks
-    #
-    def visit_literal_block(self, node):
-        self.no_smarty += 1
-        SmartyPantsHTMLTranslator.visit_literal_block(self, node)
+    if sphinx_ver < '1.0.8':
+        #
+        # Don't apply smartypants to literal blocks
+        #
+        def visit_literal_block(self, node):
+            self.no_smarty += 1
+            SmartyPantsHTMLTranslator.visit_literal_block(self, node)
 
-    def depart_literal_block(self, node):
-        SmartyPantsHTMLTranslator.depart_literal_block(self, node)
-        self.no_smarty -= 1
+        def depart_literal_block(self, node):
+            SmartyPantsHTMLTranslator.depart_literal_block(self, node)
+            self.no_smarty -= 1
 
     #
     # Turn the "new in version" stuff (versionadded/versionchanged) into a
