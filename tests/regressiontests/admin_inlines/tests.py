@@ -230,12 +230,14 @@ class TestInlinePermissions(TestCase):
         self.user.user_permissions.add(permission)
 
         author = Author.objects.create(pk=1, name=u'The Author')
-        author.books.create(name=u'The inline Book')
+        book = author.books.create(name=u'The inline Book')
         self.author_change_url = '/admin/admin_inlines/author/%i/' % author.id
+        self.book_id = book.id
 
         holder = Holder2.objects.create(dummy=13)
-        Inner2.objects.create(dummy=42, holder=holder)
+        inner2 = Inner2.objects.create(dummy=42, holder=holder)
         self.holder_change_url = '/admin/admin_inlines/holder2/%i/' % holder.id
+        self.inner2_id = inner2.id
 
         self.assertEqual(
             self.client.login(username='admin', password='secret'),
@@ -308,7 +310,7 @@ class TestInlinePermissions(TestCase):
         self.assertContains(response, '<h2>Author-book relationships</h2>')
         self.assertContains(response, 'Add another Author-Book Relationship')
         self.assertContains(response, 'value="4" id="id_Author_books-TOTAL_FORMS"')
-        self.assertContains(response, '<input type="hidden" name="Author_books-0-id" value="1"')
+        self.assertContains(response, '<input type="hidden" name="Author_books-0-id" value="%i"' % self.book_id)
         self.assertContains(response, 'id="id_Author_books-0-DELETE"')
 
     def test_inline_change_fk_add_perm(self):
@@ -320,7 +322,7 @@ class TestInlinePermissions(TestCase):
         self.assertContains(response, 'Add another Inner2')
         # 3 extra forms only, not the existing instance form
         self.assertContains(response, 'value="3" id="id_inner2_set-TOTAL_FORMS"')
-        self.assertNotContains(response, '<input type="hidden" name="inner2_set-0-id" value="1"')
+        self.assertNotContains(response, '<input type="hidden" name="inner2_set-0-id" value="%i"' % self.inner2_id)
 
     def test_inline_change_fk_change_perm(self):
         permission = Permission.objects.get(codename='change_inner2', content_type=self.inner_ct)
@@ -330,7 +332,7 @@ class TestInlinePermissions(TestCase):
         self.assertContains(response, '<h2>Inner2s</h2>')
         # Just the one form for existing instances
         self.assertContains(response, 'value="1" id="id_inner2_set-TOTAL_FORMS"')
-        self.assertContains(response, '<input type="hidden" name="inner2_set-0-id" value="1"')
+        self.assertContains(response, '<input type="hidden" name="inner2_set-0-id" value="%i"' % self.inner2_id)
         # max-num 0 means we can't add new ones
         self.assertContains(response, 'value="0" id="id_inner2_set-MAX_NUM_FORMS"')
 
@@ -344,7 +346,7 @@ class TestInlinePermissions(TestCase):
         self.assertContains(response, '<h2>Inner2s</h2>')
         # One form for existing instance and three extra for new
         self.assertContains(response, 'value="4" id="id_inner2_set-TOTAL_FORMS"')
-        self.assertContains(response, '<input type="hidden" name="inner2_set-0-id" value="1"')
+        self.assertContains(response, '<input type="hidden" name="inner2_set-0-id" value="%i"' % self.inner2_id)
 
 
     def test_inline_change_fk_change_del_perm(self):
@@ -357,7 +359,7 @@ class TestInlinePermissions(TestCase):
         self.assertContains(response, '<h2>Inner2s</h2>')
         # One form for existing instance only, no new
         self.assertContains(response, 'value="1" id="id_inner2_set-TOTAL_FORMS"')
-        self.assertContains(response, '<input type="hidden" name="inner2_set-0-id" value="1"')
+        self.assertContains(response, '<input type="hidden" name="inner2_set-0-id" value="%i"' % self.inner2_id)
         self.assertContains(response, 'id="id_inner2_set-0-DELETE"')
 
 
@@ -373,5 +375,5 @@ class TestInlinePermissions(TestCase):
         self.assertContains(response, '<h2>Inner2s</h2>')
         # One form for existing instance only, three for new
         self.assertContains(response, 'value="4" id="id_inner2_set-TOTAL_FORMS"')
-        self.assertContains(response, '<input type="hidden" name="inner2_set-0-id" value="1"')
+        self.assertContains(response, '<input type="hidden" name="inner2_set-0-id" value="%i"' % self.inner2_id)
         self.assertContains(response, 'id="id_inner2_set-0-DELETE"')
