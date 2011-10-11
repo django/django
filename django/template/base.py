@@ -814,10 +814,11 @@ class NodeList(list):
         bits = []
         for node in self:
             if isinstance(node, Node):
-                bits.append(self.render_node(node, context))
+                bit = self.render_node(node, context)
             else:
-                bits.append(node)
-        return mark_safe(u''.join([force_unicode(b) for b in bits]))
+                bit = node
+            bits.append(force_unicode(bit))
+        return mark_safe(u''.join(bits))
 
     def get_nodes_by_type(self, nodetype):
         "Return a list of all nodes of the given type"
