@@ -121,22 +121,20 @@ middleware is always called on every response.
 
 .. method:: process_template_response(self, request, response)
 
-``request`` is an :class:`~django.http.HttpRequest` object. ``response`` is the
-:class:`~django.template.response.SimpleTemplateResponse` subclass (e.g.
-:class:`~django.template.response.TemplateResponse`) object returned by a
-Django view.
+``request`` is an :class:`~django.http.HttpRequest` object. ``response`` is a
+subclass of :class:`~django.template.response.SimpleTemplateResponse` (e.g.
+:class:`~django.template.response.TemplateResponse`) or any response object
+that implements a ``render`` method.
 
-``process_template_response()`` must return an
-:class:`~django.template.response.SimpleTemplateResponse` (or its subclass)
-object. It could alter the given ``response`` by changing
-``response.template_name`` and ``response.context_data``, or it could
-create and return a brand-new
-:class:`~django.template.response.SimpleTemplateResponse` (or its subclass)
-instance.
+``process_template_response()`` must return a response object that implements a
+``render`` method. It could alter the given ``response`` by changing
+``response.template_name`` and ``response.context_data``, or it could create
+and return a brand-new
+:class:`~django.template.response.SimpleTemplateResponse` or equivalent.
 
 ``process_template_response()`` will only be called if the response
 instance has a ``render()`` method, indicating that it is a
-:class:`~django.template.response.TemplateResponse`.
+:class:`~django.template.response.TemplateResponse` or equivalent.
 
 You don't need to explicitly render responses -- responses will be
 automatically rendered once all template response middleware has been

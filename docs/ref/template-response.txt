@@ -126,7 +126,8 @@ Methods
 .. method:: SimpleTemplateResponse.render():
 
     Sets :attr:`response.content` to the result obtained by
-    :attr:`SimpleTemplateResponse.rendered_content`.
+    :attr:`SimpleTemplateResponse.rendered_content`, runs all post-rendering
+    callbacks, and returns the resulting response object.
 
     :meth:`~SimpleTemplateResponse.render()` will only have an effect
     the first time it is called. On subsequent calls, it will return

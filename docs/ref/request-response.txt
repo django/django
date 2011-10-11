@@ -758,3 +758,10 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
 .. class:: HttpResponseServerError
 
     Acts just like :class:`HttpResponse` but uses a 500 status code.
+
+.. note::
+
+    If a custom subclass of :class:`HttpResponse` implements a ``render``
+    method, Django will treat it as emulating a
+    :class:`~django.template.response.SimpleTemplateResponse`, and the
+    ``render`` method must itself return a valid response object.
