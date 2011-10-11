@@ -81,7 +81,7 @@ def force_unicode(s, encoding='utf-8', strings_only=False, errors='strict'):
                     # without raising a further exception. We do an
                     # approximation to what the Exception's standard str()
                     # output should be.
-                    s = ' '.join([force_unicode(arg, encoding, strings_only,
+                    s = u' '.join([force_unicode(arg, encoding, strings_only,
                             errors) for arg in s])
         elif not isinstance(s, unicode):
             # Note: We use .decode() here, instead of unicode(s, encoding,
@@ -97,7 +97,7 @@ def force_unicode(s, encoding='utf-8', strings_only=False, errors='strict'):
             # working unicode method. Try to handle this without raising a
             # further exception by individually forcing the exception args
             # to unicode.
-            s = ' '.join([force_unicode(arg, encoding, strings_only,
+            s = u' '.join([force_unicode(arg, encoding, strings_only,
                     errors) for arg in s])
     return s
 
