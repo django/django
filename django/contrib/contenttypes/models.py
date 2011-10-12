@@ -15,19 +15,26 @@ class ContentTypeManager(models.Manager):
             ct = self.get(app_label=app_label, model=model)
         return ct
 
+    def _get_opts(self, model):
+        opts = model._meta
+        while opts.proxy:
+            model = opts.proxy_for_model
+            opts = model._meta
+        return opts
+
+    def _get_from_cache(self, opts):
+        key = (opts.app_label, opts.object_name.lower())
+        return self.__class__._cache[self.db][key]
+
     def get_for_model(self, model):
         """
         Returns the ContentType object for a given model, creating the
         ContentType if necessary. Lookups are cached so that subsequent lookups
         for the same model don't hit the database.
         """
-        opts = model._meta
-        while opts.proxy:
-            model = opts.proxy_for_model
-            opts = model._meta
-        key = (opts.app_label, opts.object_name.lower())
+        opts = self._get_opts(model)
         try:
-            ct = self.__class__._cache[self.db][key]
+            ct = self._get_from_cache(opts)
         except KeyError:
             # Load or create the ContentType entry. The smart_unicode() is
             # needed around opts.verbose_name_raw because name_raw might be a
@@ -40,6 +47,48 @@ class ContentTypeManager(models.Manager):
             self._add_to_cache(self.db, ct)
 
         return ct
+
+    def get_for_models(self, *models):
+        """
+        Given *models, returns a dictionary mapping {model: content_type}.
+        """
+        # Final results
+        results = {}
+        # models that aren't already in the cache
+        needed_app_labels = set()
+        needed_models = set()
+        needed_opts = set()
+        for model in models:
+            opts = self._get_opts(model)
+            try:
+                ct = self._get_from_cache(opts)
+            except KeyError:
+                needed_app_labels.add(opts.app_label)
+                needed_models.add(opts.object_name.lower())
+                needed_opts.add(opts)
+            else:
+                results[model] = ct
+        if needed_opts:
+            cts = self.filter(
+                app_label__in=needed_app_labels,
+                model__in=needed_models
+            )
+            for ct in cts:
+                model = ct.model_class()
+                if model._meta in needed_opts:
+                    results[model] = ct
+                    needed_opts.remove(model._meta)
+                self._add_to_cache(self.db, ct)
+        for opts in needed_opts:
+            # These weren't in the cache, or the DB, create them.
+            ct = self.create(
+                app_label=opts.app_label,
+                model=opts.object_name.lower(),
+                name=smart_unicode(opts.verbose_name_raw),
+            )
+            self._add_to_cache(self.db, ct)
+            results[ct.model_class()] = ct
+        return results
 
     def get_for_id(self, id):
         """

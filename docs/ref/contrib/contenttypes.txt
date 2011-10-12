@@ -193,6 +193,13 @@ The ``ContentTypeManager``
         :class:`~django.contrib.contenttypes.models.ContentType` instance
         representing that model.
 
+    .. method:: get_for_models(*models)
+
+        Takes a variadic number of model classes, and returns a dictionary
+        mapping the model classes to the
+        :class:`~django.contrib.contenttypes.models.ContentType` instances
+        representing them.
+
     .. method:: get_by_natural_key(app_label, model)
 
         Returns the :class:`~django.contrib.contenttypes.models.ContentType`
@@ -319,8 +326,8 @@ creating a ``TaggedItem``::
 
 Due to the way :class:`~django.contrib.contenttypes.generic.GenericForeignKey`
 is implemented, you cannot use such fields directly with filters (``filter()``
-and ``exclude()``, for example) via the database API. Because a 
-:class:`~django.contrib.contenttypes.generic.GenericForeignKey` isn't a 
+and ``exclude()``, for example) via the database API. Because a
+:class:`~django.contrib.contenttypes.generic.GenericForeignKey` isn't a
 normal field objects, these examples will *not* work::
 
     # This will fail
