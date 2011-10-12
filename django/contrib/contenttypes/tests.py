@@ -1,12 +1,13 @@
+from __future__ import with_statement
+
 import urllib
-from django import db
-from django.conf import settings
+
+from django.db import models
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.sites.models import Site
 from django.contrib.contenttypes.views import shortcut
+from django.contrib.sites.models import Site
 from django.http import HttpRequest, Http404
 from django.test import TestCase
-from django.db import models
 from django.utils.encoding import smart_str
 
 
@@ -33,16 +34,10 @@ class FooWithUrl(FooWithoutUrl):
 class ContentTypesTests(TestCase):
 
     def setUp(self):
-        # First, let's make sure we're dealing with a blank slate (and that
-        # DEBUG is on so that queries get logged)
-        self.old_DEBUG = settings.DEBUG
         self.old_Site_meta_installed = Site._meta.installed
-        settings.DEBUG = True
         ContentType.objects.clear_cache()
-        db.reset_queries()
 
     def tearDown(self):
-        settings.DEBUG = self.old_DEBUG
         Site._meta.installed = self.old_Site_meta_installed
         ContentType.objects.clear_cache()
 
@@ -54,19 +49,19 @@ class ContentTypesTests(TestCase):
         """
 
         # At this point, a lookup for a ContentType should hit the DB
-        ContentType.objects.get_for_model(ContentType)
-        self.assertEqual(1, len(db.connection.queries))
+        with self.assertNumQueries(1):
+            ContentType.objects.get_for_model(ContentType)
 
         # A second hit, though, won't hit the DB, nor will a lookup by ID
-        ct = ContentType.objects.get_for_model(ContentType)
-        self.assertEqual(1, len(db.connection.queries))
-        ContentType.objects.get_for_id(ct.id)
-        self.assertEqual(1, len(db.connection.queries))
+        with self.assertNumQueries(0):
+            ct = ContentType.objects.get_for_model(ContentType)
+        with self.assertNumQueries(0):
+            ContentType.objects.get_for_id(ct.id)
 
         # Once we clear the cache, another lookup will again hit the DB
         ContentType.objects.clear_cache()
-        ContentType.objects.get_for_model(ContentType)
-        self.assertEqual(2, len(db.connection.queries))
+        with self.assertNumQueries(1):
+            ContentType.objects.get_for_model(ContentType)
 
     def test_shortcut_view(self):
         """
