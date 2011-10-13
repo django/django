@@ -412,3 +412,19 @@ class DateDetailViewTests(TestCase):
     def test_invalid_url(self):
         self.assertRaises(AttributeError, self.client.get, "/dates/books/2008/oct/01/nopk/")
 
+    def test_get_object_custom_queryset(self):
+        """
+        Ensure that custom querysets are used when provided to
+        BaseDateDetailView.get_object()
+        Refs #16918.
+        """
+        res = self.client.get(
+            '/dates/books/get_object_custom_queryset/2006/may/01/2/')
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.context['object'], Book.objects.get(pk=2))
+        self.assertEqual(res.context['book'], Book.objects.get(pk=2))
+        self.assertTemplateUsed(res, 'generic_views/book_detail.html')
+
+        res = self.client.get(
+            '/dates/books/get_object_custom_queryset/2008/oct/01/1/')
+        self.assertEqual(res.status_code, 404)

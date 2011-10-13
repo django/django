@@ -459,7 +459,8 @@ class BaseDateDetailView(YearMixin, MonthMixin, DayMixin, DateMixin, BaseDetailV
                                  month, self.get_month_format(),
                                  day, self.get_day_format())
 
-        qs = self.get_queryset()
+        # Use a custom queryset if provided
+        qs = queryset or self.get_queryset()
 
         if not self.get_allow_future() and date > datetime.date.today():
             raise Http404(_(u"Future %(verbose_name_plural)s not available because %(class_name)s.allow_future is False.") % {

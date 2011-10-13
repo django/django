@@ -177,3 +177,8 @@ class BookDetail(BookConfig, generic.DateDetailView):
 class AuthorGetQuerySetFormView(generic.edit.ModelFormMixin):
     def get_queryset(self):
         return Author.objects.all()
+
+class BookDetailGetObjectCustomQueryset(BookDetail):
+    def get_object(self, queryset=None):
+        return super(BookDetailGetObjectCustomQueryset,self).get_object(
+            queryset=Book.objects.filter(pk=2))
