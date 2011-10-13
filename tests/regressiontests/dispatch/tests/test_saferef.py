@@ -13,7 +13,7 @@ class Test2(object):
     def __call__(self, obj):
         pass
 
-class Tester(unittest.TestCase):
+class SaferefTests(unittest.TestCase):
     def setUp(self):
         ts = []
         ss = []
@@ -47,7 +47,7 @@ class Tester(unittest.TestCase):
         for s in self.ss:
             self.assertTrue(s())
 
-    def testShortCircuit (self):
+    def testShortCircuit(self):
         """Test that creation short-circuits to reuse existing references"""
         sd = {}
         for s in self.ss:
@@ -60,7 +60,7 @@ class Tester(unittest.TestCase):
                 self.assertTrue(sd.has_key(safeRef(t)))
                 self.assertTrue(safeRef(t) in sd)
 
-    def testRepresentation (self):
+    def testRepresentation(self):
         """Test that the reference object's representation works
 
         XXX Doesn't currently check the results, just that no error
@@ -71,9 +71,3 @@ class Tester(unittest.TestCase):
     def _closure(self, ref):
         """Dumb utility mechanism to increment deletion counter"""
         self.closureCount +=1
-
-def getSuite():
-    return unittest.makeSuite(Tester,'test')
-
-if __name__ == "__main__":
-    unittest.main()

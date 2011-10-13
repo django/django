@@ -116,9 +116,3 @@ class DispatcherTests(unittest.TestCase):
         garbage_collect()
         a_signal.disconnect(receiver_3)
         self._testIsClean(a_signal)
-
-def getSuite():
-    return unittest.makeSuite(DispatcherTests,'test')
-
-if __name__ == "__main__":
-    unittest.main()
