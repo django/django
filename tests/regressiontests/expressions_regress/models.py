@@ -3,6 +3,7 @@ Model for testing arithmetic expressions.
 """
 from django.db import models
 
+
 class Number(models.Model):
     integer = models.IntegerField(db_column='the_integer')
     float = models.FloatField(null=True, db_column='the_float')

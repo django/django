@@ -1,5 +1,5 @@
 # encoding: utf-8
-from __future__ import with_statement
+from __future__ import with_statement, absolute_import
 
 from datetime import datetime
 
@@ -15,8 +15,9 @@ from django.utils import translation
 from django.utils.html import conditional_escape
 from django.utils.unittest import TestCase
 
-import models
-from widgetadmin import site as widget_admin_site
+from . import models
+from .widgetadmin import site as widget_admin_site
+
 
 admin_media_prefix = lambda: {
     'ADMIN_MEDIA_PREFIX': "%sadmin/" % settings.STATIC_URL,

@@ -1,12 +1,16 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
+
 import datetime
+
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import models
 from django.forms import Form, ModelForm, FileField, ModelChoiceField
 from django.forms.models import ModelFormMetaclass
 from django.test import TestCase
-from regressiontests.forms.models import (ChoiceOptionModel, ChoiceFieldModel,
-    FileModel, Group, BoundaryModel, Defaults)
+
+from ..models import (ChoiceOptionModel, ChoiceFieldModel, FileModel, Group,
+    BoundaryModel, Defaults)
 
 
 class ChoiceFieldForm(ModelForm):

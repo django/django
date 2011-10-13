@@ -1,3 +1,8 @@
+from __future__ import absolute_import
+
 from django.contrib import admin
-from admin_scripts.complex_app.models.foo import Foo
+
+from ..models.foo import Foo
+
+
 admin.site.register(Foo)

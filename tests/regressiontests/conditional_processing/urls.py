@@ -1,5 +1,7 @@
 from django.conf.urls import patterns
-import views
+
+from . import views
+
 
 urlpatterns = patterns('',
     ('^condition/$', views.index),

@@ -1,7 +1,6 @@
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
-from django.db import models
-from django.db import connection
+from django.db import models, connection
 
 
 class Square(models.Model):

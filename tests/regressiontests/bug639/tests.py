@@ -4,13 +4,16 @@ gets called *again* for each FileField. This test will fail if calling a
 ModelForm's save() method causes Model.save() to be called more than once.
 """
 
+from __future__ import absolute_import
+
 import os
 import shutil
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.utils import unittest
 
-from regressiontests.bug639.models import Photo, PhotoForm, temp_storage_dir
+from .models import Photo, PhotoForm, temp_storage_dir
+
 
 class Bug639Test(unittest.TestCase):
 

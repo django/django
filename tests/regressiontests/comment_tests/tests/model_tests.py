@@ -1,7 +1,9 @@
+from __future__ import absolute_import
+
 from django.contrib.comments.models import Comment
 
-from regressiontests.comment_tests.models import Author, Article
-from regressiontests.comment_tests.tests import CommentTestCase
+from . import CommentTestCase
+from ..models import Author, Article
 
 
 class CommentModelTests(CommentTestCase):

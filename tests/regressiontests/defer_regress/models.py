@@ -4,6 +4,7 @@ Regression tests for defer() / only() behavior.
 
 from django.db import models
 
+
 class Item(models.Model):
     name = models.CharField(max_length=15)
     text = models.TextField(default="xyzzy")

@@ -2,7 +2,7 @@
 
 # Unit tests for cache framework
 # Uses whatever cache backend is set in the test settings file.
-from __future__ import with_statement
+from __future__ import with_statement, absolute_import
 
 import hashlib
 import os
@@ -29,7 +29,7 @@ from django.utils.cache import (patch_vary_headers, get_cache_key,
     learn_cache_key, patch_cache_control, patch_response_headers)
 from django.views.decorators.cache import cache_page
 
-from regressiontests.cache.models import Poll, expensive_calculation
+from .models import Poll, expensive_calculation
 
 # functions/classes for complex data type tests
 def f():

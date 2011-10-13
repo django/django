@@ -8,6 +8,7 @@ table creation or queries.
 
 from django.db import models
 
+
 class Article(models.Model):
     Article_ID = models.AutoField(primary_key=True, db_column='Article ID')
     headline = models.CharField(max_length=100)

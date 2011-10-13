@@ -1,13 +1,14 @@
+from __future__ import absolute_import
+
 from django.contrib.admin.helpers import InlineAdminForm
 from django.contrib.auth.models import User, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
 
 # local test models
-from models import (Holder, Inner, Holder2, Inner2, Holder3,
-    Inner3, Person, OutfitItem, Fashionista, Teacher, Parent, Child,
-    Author, Book)
-from admin import InnerInline
+from .admin import InnerInline
+from .models import (Holder, Inner, Holder2, Inner2, Holder3, Inner3, Person,
+    OutfitItem, Fashionista, Teacher, Parent, Child, Author, Book)
 
 
 class TestInline(TestCase):

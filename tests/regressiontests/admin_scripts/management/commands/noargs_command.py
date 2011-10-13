@@ -1,5 +1,6 @@
 from django.core.management.base import NoArgsCommand
 
+
 class Command(NoArgsCommand):
     help = "Test No-args commands"
     requires_model_validation = False

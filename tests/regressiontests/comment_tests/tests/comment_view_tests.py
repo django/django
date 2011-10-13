@@ -1,10 +1,15 @@
+from __future__ import absolute_import
+
 import re
+
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.comments import signals
 from django.contrib.comments.models import Comment
-from regressiontests.comment_tests.models import Article, Book
-from regressiontests.comment_tests.tests import CommentTestCase
+
+from . import CommentTestCase
+from ..models import Article, Book
+
 
 post_redirect_re = re.compile(r'^http://testserver/posted/\?c=(?P<pk>\d+$)')
 

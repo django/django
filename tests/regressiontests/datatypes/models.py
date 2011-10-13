@@ -5,6 +5,7 @@ types, which in the past were problematic for some database backends.
 
 from django.db import models
 
+
 class Donut(models.Model):
     name = models.CharField(max_length=100)
     is_frosted = models.BooleanField(default=False)

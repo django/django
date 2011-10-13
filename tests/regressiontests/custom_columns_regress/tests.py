@@ -1,7 +1,10 @@
-from django.test import TestCase
-from django.core.exceptions import FieldError
+from __future__ import absolute_import
 
-from models import Author, Article
+from django.core.exceptions import FieldError
+from django.test import TestCase
+
+from .models import Author, Article
+
 
 def pks(objects):
     """ Return pks to be able to compare lists"""

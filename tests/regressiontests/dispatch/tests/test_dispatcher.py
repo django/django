@@ -1,13 +1,14 @@
 import gc
 import sys
+import time
 
 from django.dispatch import Signal
 from django.utils import unittest
 
+
 if sys.platform.startswith('java'):
     def garbage_collect():
         """Run the garbage collector and wait a bit to let it do his work"""
-        import time
         gc.collect()
         time.sleep(0.1)
 else:

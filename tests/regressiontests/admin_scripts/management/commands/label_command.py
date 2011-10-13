@@ -1,5 +1,6 @@
 from django.core.management.base import LabelCommand
 
+
 class Command(LabelCommand):
     help = "Test Label-based commands"
     requires_model_validation = False

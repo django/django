@@ -1,11 +1,13 @@
+from __future__ import absolute_import
+
 import time
 
 from django.conf import settings
 from django.contrib.comments.forms import CommentForm
 from django.contrib.comments.models import Comment
 
-from regressiontests.comment_tests.models import Article
-from regressiontests.comment_tests.tests import CommentTestCase
+from . import CommentTestCase
+from ..models import Article
 
 
 class CommentFormTests(CommentTestCase):

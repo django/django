@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class Article(models.Model):
     """
     A simple Article model for testing

@@ -1,8 +1,10 @@
+from __future__ import absolute_import
+
 from django.core.urlresolvers import reverse
 from django.template.response import TemplateResponse
 from django.test import TestCase
 
-from models import Action
+from .models import Action
 
 
 class AdminCustomUrlsTest(TestCase):

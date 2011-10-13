@@ -1,5 +1,7 @@
-from django.db import models
+from __future__ import absolute_import
+
 from django.contrib.auth.models import User
+from django.db import models
 
 
 class Animal(models.Model):

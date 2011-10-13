@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-import os
 import errno
+import os
 import shutil
 import sys
 import tempfile

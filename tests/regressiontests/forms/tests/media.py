@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from django.forms import TextInput, Media, TextInput, CharField, Form, MultiWidget
+from django.template import Template, Context
 from django.test import TestCase
 from django.test.utils import override_settings
-from django.template import Template, Context
 
 
 class FormsMediaTestCase(TestCase):

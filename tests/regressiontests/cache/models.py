@@ -1,5 +1,7 @@
-from django.db import models
 from datetime import datetime
+
+from django.db import models
+
 
 def expensive_calculation():
     expensive_calculation.num_runs += 1

@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 
-from django.test import TestCase
+from django.conf import settings
+from django.core.context_processors import csrf
 from django.http import HttpRequest, HttpResponse
 from django.middleware.csrf import CsrfViewMiddleware
-from django.views.decorators.csrf import csrf_exempt, requires_csrf_token, ensure_csrf_cookie
-from django.core.context_processors import csrf
-from django.conf import settings
 from django.template import RequestContext, Template
+from django.test import TestCase
+from django.views.decorators.csrf import csrf_exempt, requires_csrf_token, ensure_csrf_cookie
+
 
 # Response/views used for CsrfResponseMiddleware and CsrfViewMiddleware tests
 def post_form_response():

@@ -4,6 +4,7 @@ Regression tests for custom manager classes.
 
 from django.db import models
 
+
 class RestrictedManager(models.Manager):
     """
     A manager that filters out non-public instances.

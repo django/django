@@ -1,9 +1,11 @@
+from __future__ import absolute_import
+
 from datetime import datetime
 
 from django.conf import settings
 from django.contrib import admin
-from django.contrib.admin.util import display_for_field, label_for_field, lookup_field
-from django.contrib.admin.util import NestedObjects
+from django.contrib.admin.util import (display_for_field, label_for_field,
+    lookup_field, NestedObjects)
 from django.contrib.admin.views.main import EMPTY_CHANGELIST_VALUE
 from django.contrib.sites.models import Site
 from django.db import models, DEFAULT_DB_ALIAS
@@ -11,7 +13,7 @@ from django.test import TestCase
 from django.utils import unittest
 from django.utils.formats import localize
 
-from models import Article, Count, Event, Location
+from .models import Article, Count, Event, Location
 
 
 class NestedObjectsTests(TestCase):

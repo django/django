@@ -1,11 +1,13 @@
+from __future__ import absolute_import
+
 from django import forms
+from django.contrib import admin
+from django.contrib.admin.validation import validate, validate_inline
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
 
-from django.contrib import admin
-from django.contrib.admin.validation import validate, validate_inline
+from .models import Song, Book, Album, TwoAlbumFKAndAnE, State, City
 
-from models import Song, Book, Album, TwoAlbumFKAndAnE, State, City
 
 class SongForm(forms.ModelForm):
     pass

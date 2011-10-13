@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.admin.forms import AdminAuthenticationForm
 
+
 class CustomAdminAuthenticationForm(AdminAuthenticationForm):
 
     def clean_username(self):

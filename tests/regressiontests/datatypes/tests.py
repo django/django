@@ -1,9 +1,12 @@
+from __future__ import absolute_import
+
 import datetime
 
 from django.test import TestCase, skipIfDBFeature
 from django.utils import tzinfo
 
-from models import Donut, RumBaba
+from .models import Donut, RumBaba
+
 
 class DataTypesTestCase(TestCase):
 

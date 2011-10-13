@@ -1,11 +1,16 @@
+from __future__ import absolute_import
+
 import hashlib
 import os
+
 from django.core.files.uploadedfile import UploadedFile
 from django.http import HttpResponse, HttpResponseServerError
 from django.utils import simplejson
-from models import FileModel, UPLOAD_TO
-from uploadhandler import QuotaUploadHandler, ErroringUploadHandler
-from tests import UNICODE_FILENAME
+
+from .models import FileModel, UPLOAD_TO
+from .tests import UNICODE_FILENAME
+from .uploadhandler import QuotaUploadHandler, ErroringUploadHandler
+
 
 def file_upload_view(request):
     """

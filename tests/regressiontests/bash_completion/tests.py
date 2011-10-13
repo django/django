@@ -9,6 +9,7 @@ from django.conf import settings
 from django.core.management import ManagementUtility
 from django.utils import unittest
 
+
 class BashCompletionTests(unittest.TestCase):
     """
     Testing the Python level bash completion code.

@@ -1,13 +1,15 @@
 """
 Spanning tests for all the operations that F() expressions can perform.
 """
+from __future__ import absolute_import
+
 import datetime
 
 from django.db import connection
 from django.db.models import F
 from django.test import TestCase, Approximate, skipUnlessDBFeature
 
-from regressiontests.expressions_regress.models import Number, Experiment
+from .models import Number, Experiment
 
 
 class ExpressionsRegressTests(TestCase):
@@ -240,7 +242,7 @@ class FTimeDeltaTests(TestCase):
         # e2: started three days after assigned, small duration
         end = stime+delta2
         e2 = Experiment.objects.create(name='e2',
-            assigned=sday-datetime.timedelta(3), start=stime, end=end, 
+            assigned=sday-datetime.timedelta(3), start=stime, end=end,
             completed=end.date())
         self.deltas.append(delta2)
         self.delays.append(e2.start-
@@ -293,22 +295,22 @@ class FTimeDeltaTests(TestCase):
     def test_exclude(self):
         for i in range(len(self.deltas)):
             delta = self.deltas[i]
-            test_set = [e.name for e in 
+            test_set = [e.name for e in
                 Experiment.objects.exclude(end__lt=F('start')+delta)]
             self.assertEqual(test_set, self.expnames[i:])
 
-            test_set = [e.name for e in 
+            test_set = [e.name for e in
                 Experiment.objects.exclude(end__lte=F('start')+delta)]
             self.assertEqual(test_set, self.expnames[i+1:])
 
     def test_date_comparison(self):
         for i in range(len(self.days_long)):
             days = self.days_long[i]
-            test_set = [e.name for e in 
+            test_set = [e.name for e in
                 Experiment.objects.filter(completed__lt=F('assigned')+days)]
             self.assertEqual(test_set, self.expnames[:i])
 
-            test_set = [e.name for e in 
+            test_set = [e.name for e in
                 Experiment.objects.filter(completed__lte=F('assigned')+days)]
             self.assertEqual(test_set, self.expnames[:i+1])
 

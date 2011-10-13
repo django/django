@@ -1,7 +1,9 @@
+from __future__ import absolute_import
+
 from django.conf.urls import patterns, include
-import views
-import customadmin
-import admin
+
+from . import views, customadmin, admin
+
 
 urlpatterns = patterns('',
     (r'^test_admin/admin/doc/', include('django.contrib.admindocs.urls')),

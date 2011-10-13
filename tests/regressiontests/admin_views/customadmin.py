@@ -1,11 +1,14 @@
 """
 A second, custom AdminSite -- see tests.CustomAdminSiteTests.
 """
+from __future__ import absolute_import
+
 from django.conf.urls import patterns
 from django.contrib import admin
 from django.http import HttpResponse
 
-import models, forms, admin as base_admin
+from . import models, forms, admin as base_admin
+
 
 class Admin2(admin.AdminSite):
     login_form = forms.CustomAdminAuthenticationForm

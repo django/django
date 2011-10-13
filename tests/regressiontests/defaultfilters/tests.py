@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+
 import datetime
+
+from django.template.defaultfilters import *
 from django.test import TestCase
 from django.utils import unittest, translation
 
-from django.template.defaultfilters import *
 
 class DefaultFiltersTests(TestCase):
 

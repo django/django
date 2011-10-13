@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class Parent(models.Model):
     name = models.CharField(max_length=128)
 

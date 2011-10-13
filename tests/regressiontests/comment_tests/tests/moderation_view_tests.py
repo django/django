@@ -1,9 +1,11 @@
+from __future__ import absolute_import
+
 from django.contrib.auth.models import User, Permission
 from django.contrib.comments import signals
 from django.contrib.comments.models import Comment, CommentFlag
 from django.contrib.contenttypes.models import ContentType
 
-from regressiontests.comment_tests.tests import CommentTestCase
+from . import CommentTestCase
 
 
 class FlagViewTests(CommentTestCase):

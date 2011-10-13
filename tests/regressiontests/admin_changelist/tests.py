@@ -1,19 +1,18 @@
-from __future__ import with_statement
+from __future__ import with_statement, absolute_import
 
 from django.contrib import admin
 from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.admin.views.main import ChangeList, SEARCH_VAR, ALL_VAR
+from django.contrib.auth.models import User
 from django.template import Context, Template
 from django.test import TestCase
 from django.test.client import RequestFactory
-from django.contrib.auth.models import User
 
-from models import (Child, Parent, Genre, Band, Musician, Group, Quartet,
-    Membership, ChordsMusician, ChordsBand, Invitation)
-
-from admin import (ChildAdmin, QuartetAdmin, BandAdmin, ChordsBandAdmin,
+from .admin import (ChildAdmin, QuartetAdmin, BandAdmin, ChordsBandAdmin,
     GroupAdmin, ParentAdmin, DynamicListDisplayChildAdmin, CustomPaginationAdmin,
     FilteredChildAdmin, CustomPaginator, site as custom_site)
+from .models import (Child, Parent, Genre, Band, Musician, Group, Quartet,
+    Membership, ChordsMusician, ChordsBand, Invitation)
 
 
 class ChangeListTests(TestCase):

@@ -1,11 +1,13 @@
-from django.test import TestCase
-
-from django.utils.datastructures import SortedDict
-
-from django.contrib.auth.models import User
-from regressiontests.extra_regress.models import TestObject, Order, RevisionableModel
+from __future__ import absolute_import
 
 import datetime
+
+from django.contrib.auth.models import User
+from django.test import TestCase
+from django.utils.datastructures import SortedDict
+
+from .models import TestObject, Order, RevisionableModel
+
 
 class ExtraRegressTests(TestCase):
 

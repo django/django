@@ -1,20 +1,22 @@
+from __future__ import absolute_import
+
 import datetime
 
+from django.contrib.admin import (site, ModelAdmin, SimpleListFilter,
+    BooleanFieldListFilter)
 from django.contrib.admin.options import IncorrectLookupParameters
+from django.contrib.admin.views.main import ChangeList
+from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase, RequestFactory
 from django.utils.encoding import force_unicode
-from django.contrib.auth.admin import UserAdmin
-from django.contrib.auth.models import User
-from django.contrib.admin.views.main import ChangeList
-from django.contrib.admin import (site, ModelAdmin, SimpleListFilter,
-    BooleanFieldListFilter)
 
-from models import Book
+from .models import Book
+
 
 def select_by(dictlist, key, value):
     return [x for x in dictlist if x[key] == value][0]
-
 
 class DecadeListFilter(SimpleListFilter):
 

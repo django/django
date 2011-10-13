@@ -1,8 +1,12 @@
+from __future__ import absolute_import
+
 from django.conf import settings
 from django.contrib import comments
 from django.contrib.comments.models import Comment
 from django.contrib.comments.forms import CommentForm
-from regressiontests.comment_tests.tests import CommentTestCase
+
+from . import CommentTestCase
+
 
 class CommentAppAPITests(CommentTestCase):
     """Tests for the "comment app" API"""

@@ -5,6 +5,7 @@ from django.test import TestCase
 from django.utils import unittest
 from django.utils.http import parse_etags, quote_etag, parse_http_date
 
+
 FULL_RESPONSE = 'Test conditional get response'
 LAST_MODIFIED = datetime(2007, 10, 21, 23, 21, 47)
 LAST_MODIFIED_STR = 'Sun, 21 Oct 2007 23:21:47 GMT'
@@ -13,7 +14,6 @@ LAST_MODIFIED_INVALID_STR = 'Mon, 32 Oct 2010 16:56:23 GMT'
 EXPIRED_LAST_MODIFIED_STR = 'Sat, 20 Oct 2007 23:21:47 GMT'
 ETAG = 'b4246ffc4f62314ca13147c9d4f76974'
 EXPIRED_ETAG = '7fae4cd4b0f81e7d2914700043aa8ed6'
-
 
 class ConditionalGet(TestCase):
     urls = 'regressiontests.conditional_processing.urls'

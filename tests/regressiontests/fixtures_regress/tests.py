@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 # Unittests for fixtures.
+from __future__ import absolute_import
+
 import os
 import re
 try:
@@ -8,21 +10,16 @@ except ImportError:
     from StringIO import StringIO
 
 from django.core import management
-from django.core.management.commands.dumpdata import sort_dependencies
 from django.core.management.base import CommandError
-from django.db.models import signals
+from django.core.management.commands.dumpdata import sort_dependencies
 from django.db import transaction
+from django.db.models import signals
 from django.test import (TestCase, TransactionTestCase, skipIfDBFeature,
     skipUnlessDBFeature)
 
-from models import Animal, Stuff
-from models import Absolute, Parent, Child
-from models import Article, Widget
-from models import Store, Person, Book
-from models import NKChild, RefToNKChild
-from models import Circle1, Circle2, Circle3
-from models import ExternalDependency
-from models import Thingy
+from .models import (Animal, Stuff, Absolute, Parent, Child, Article, Widget,
+    Store, Person, Book, NKChild, RefToNKChild, Circle1, Circle2, Circle3,
+    ExternalDependency, Thingy)
 
 
 pre_save_checks = []

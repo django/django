@@ -1,7 +1,9 @@
 import tempfile
 import os
-from django.db import models
+
 from django.core.files.storage import FileSystemStorage
+from django.db import models
+
 
 temp_storage = FileSystemStorage(tempfile.mkdtemp())
 UPLOAD_TO = os.path.join(temp_storage.location, 'test_upload')

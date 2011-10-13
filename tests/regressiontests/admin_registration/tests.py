@@ -1,8 +1,11 @@
-from django.test import TestCase
-from django.core.exceptions import ImproperlyConfigured
-from django.contrib import admin
+from __future__ import absolute_import
 
-from models import Person, Place, Location
+from django.contrib import admin
+from django.core.exceptions import ImproperlyConfigured
+from django.test import TestCase
+
+from .models import Person, Place, Location
+
 
 class NameAdmin(admin.ModelAdmin):
     list_display = ['name']

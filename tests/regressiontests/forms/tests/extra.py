@@ -1,15 +1,18 @@
 # -*- coding: utf-8 -*-
+
+from __future__ import absolute_import
+
 import datetime
 
 from django.conf import settings
 from django.forms import *
 from django.forms.extras import SelectDateWidget
 from django.forms.util import ErrorList
-from django.utils import translation
-from django.utils import unittest
-from django.utils.encoding import force_unicode
-from django.utils.encoding import smart_unicode
-from error_messages import AssertFormErrorsMixin
+from django.utils import translation, unittest
+from django.utils.encoding import force_unicode, smart_unicode
+
+from .error_messages import AssertFormErrorsMixin
+
 
 class GetDate(Form):
     mydate = DateField(widget=SelectDateWidget)

@@ -2,8 +2,8 @@
 import datetime
 import tempfile
 
-from django.db import models
 from django.core.files.storage import FileSystemStorage
+from django.db import models
 
 
 temp_storage_location = tempfile.mkdtemp()

@@ -1,10 +1,10 @@
-from __future__ import with_statement
+from __future__ import with_statement, absolute_import
 
 from operator import attrgetter
 
 from django.test import TestCase, skipUnlessDBFeature
 
-from models import Country, Restaurant, Pizzeria, State
+from .models import Country, Restaurant, Pizzeria, State
 
 
 class BulkCreateTests(TestCase):

@@ -1,18 +1,18 @@
-from functools import wraps
 import warnings
+from functools import wraps
 
-from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from django.http import HttpResponse, HttpRequest, HttpResponseNotAllowed
+from django.middleware.clickjacking import XFrameOptionsMiddleware
 from django.test.utils import get_warnings_state, restore_warnings_state
 from django.utils.decorators import method_decorator
 from django.utils.functional import allow_lazy, lazy, memoize
 from django.utils.unittest import TestCase
-from django.views.decorators.http import require_http_methods, require_GET, require_POST, require_safe
-from django.views.decorators.vary import vary_on_headers, vary_on_cookie
 from django.views.decorators.cache import cache_page, never_cache, cache_control
 from django.views.decorators.clickjacking import xframe_options_deny, xframe_options_sameorigin, xframe_options_exempt
-from django.middleware.clickjacking import XFrameOptionsMiddleware
+from django.views.decorators.http import require_http_methods, require_GET, require_POST, require_safe
+from django.views.decorators.vary import vary_on_headers, vary_on_cookie
 
 
 def fully_decorated(request):
