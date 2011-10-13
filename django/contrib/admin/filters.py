@@ -281,9 +281,9 @@ class DateFieldListFilter(FieldListFilter):
 
         today = datetime.date.today()
         one_week_ago = today - datetime.timedelta(days=7)
-        today_str = (isinstance(self.field, models.DateTimeField)
-                        and today.strftime('%Y-%m-%d 23:59:59')
-                        or today.strftime('%Y-%m-%d'))
+        today_str = str(today)
+        if isinstance(self.field, models.DateTimeField):
+            today_str += ' 23:59:59'
 
         self.lookup_kwarg_year = '%s__year' % self.field_path
         self.lookup_kwarg_month = '%s__month' % self.field_path
@@ -299,7 +299,7 @@ class DateFieldListFilter(FieldListFilter):
                 self.lookup_kwarg_day: str(today.day),
             }),
             (_('Past 7 days'), {
-                self.lookup_kwarg_past_7_days_gte: one_week_ago.strftime('%Y-%m-%d'),
+                self.lookup_kwarg_past_7_days_gte: str(one_week_ago),
                 self.lookup_kwarg_past_7_days_lte: today_str,
             }),
             (_('This month'), {

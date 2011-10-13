@@ -9,7 +9,6 @@ from django.conf import settings
 from django.db import DEFAULT_DB_ALIAS
 from django.db.backends import util
 from django.db.transaction import TransactionManagementError
-from django.utils import datetime_safe
 from django.utils.importlib import import_module
 
 
@@ -718,7 +717,7 @@ class BaseDatabaseOperations(object):
         """
         if value is None:
             return None
-        return datetime_safe.new_date(value).strftime('%Y-%m-%d')
+        return unicode(value)
 
     def value_to_db_datetime(self, value):
         """
@@ -731,7 +730,7 @@ class BaseDatabaseOperations(object):
 
     def value_to_db_time(self, value):
         """
-        Transform a datetime value to an object compatible with what is expected
+        Transform a time value to an object compatible with what is expected
         by the backend driver for time columns.
         """
         if value is None:

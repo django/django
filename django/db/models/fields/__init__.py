@@ -16,7 +16,6 @@ from django.utils.functional import curry
 from django.utils.text import capfirst
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_unicode, force_unicode, smart_str
-from django.utils import datetime_safe
 from django.utils.ipv6 import clean_ipv6_address
 
 class NOT_PROVIDED:
@@ -725,7 +724,7 @@ class DateField(Field):
         if val is None:
             data = ''
         else:
-            data = datetime_safe.new_date(val).strftime("%Y-%m-%d")
+            data = str(val)
         return data
 
     def formfield(self, **kwargs):
@@ -803,8 +802,7 @@ class DateTimeField(DateField):
         if val is None:
             data = ''
         else:
-            d = datetime_safe.new_datetime(val)
-            data = d.strftime('%Y-%m-%d %H:%M:%S')
+            data = str(val.replace(microsecond=0, tzinfo=None))
         return data
 
     def formfield(self, **kwargs):
@@ -1234,7 +1232,7 @@ class TimeField(Field):
         if val is None:
             data = ''
         else:
-            data = val.strftime("%H:%M:%S")
+            data = str(val.replace(microsecond=0))
         return data
 
     def formfield(self, **kwargs):

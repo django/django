@@ -67,7 +67,7 @@ class SitemapTests(TestCase):
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url><loc>%s/location/</loc><lastmod>%s</lastmod><changefreq>never</changefreq><priority>0.5</priority></url>
 </urlset>
-""" % (self.base_url, date.today().strftime('%Y-%m-%d')))
+""" % (self.base_url, date.today()))
 
     def test_simple_custom_sitemap(self):
         "A simple sitemap can be rendered with a custom template"
@@ -79,7 +79,7 @@ class SitemapTests(TestCase):
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url><loc>%s/location/</loc><lastmod>%s</lastmod><changefreq>never</changefreq><priority>0.5</priority></url>
 </urlset>
-""" % (self.base_url, date.today().strftime('%Y-%m-%d')))
+""" % (self.base_url, date.today()))
 
     @skipUnless(settings.USE_I18N, "Internationalization is not enabled")
     def test_localized_priority(self):
@@ -93,7 +93,7 @@ class SitemapTests(TestCase):
         # haven't been rendered in localized format
         response = self.client.get('/simple/sitemap.xml')
         self.assertContains(response, '<priority>0.5</priority>')
-        self.assertContains(response, '<lastmod>%s</lastmod>' % date.today().strftime('%Y-%m-%d'))
+        self.assertContains(response, '<lastmod>%s</lastmod>' % date.today())
         deactivate()
 
     def test_generic_sitemap(self):
@@ -152,7 +152,7 @@ class SitemapTests(TestCase):
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url><loc>http://testserver/location/</loc><lastmod>%s</lastmod><changefreq>never</changefreq><priority>0.5</priority></url>
 </urlset>
-""" % date.today().strftime('%Y-%m-%d'))
+""" % date.today())
 
     @skipUnless("django.contrib.sites" in settings.INSTALLED_APPS, "django.contrib.sites app not installed.")
     def test_sitemap_get_urls_no_site_1(self):

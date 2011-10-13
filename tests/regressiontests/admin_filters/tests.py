@@ -188,8 +188,8 @@ class ListFiltersTests(TestCase):
         self.assertEqual(choice['query_string'], '?date_registered__year=%s'
                                                 % (self.today.year))
 
-        request = self.request_factory.get('/', {'date_registered__gte': self.one_week_ago.strftime('%Y-%m-%d'),
-                                                 'date_registered__lte': self.today.strftime('%Y-%m-%d')})
+        request = self.request_factory.get('/', {'date_registered__gte': str(self.one_week_ago),
+                                                 'date_registered__lte': str(self.today)})
         changelist = self.get_changelist(request, Book, modeladmin)
 
         # Make sure the correct queryset is returned
@@ -203,7 +203,7 @@ class ListFiltersTests(TestCase):
         self.assertEqual(choice['selected'], True)
         self.assertEqual(choice['query_string'], '?date_registered__gte=%s'
                                                  '&date_registered__lte=%s'
-                                                % (self.one_week_ago.strftime('%Y-%m-%d'), self.today.strftime('%Y-%m-%d')))
+                                                % (str(self.one_week_ago), str(self.today)))
 
     def test_allvaluesfieldlistfilter(self):
         modeladmin = BookAdmin(Book, site)

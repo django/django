@@ -320,14 +320,9 @@ def _sqlite_format_dtdelta(dt, conn, days, secs, usecs):
             dt = dt - delta
     except (ValueError, TypeError):
         return None
-
-    if isinstance(dt, datetime.datetime):
-        rv = dt.strftime("%Y-%m-%d %H:%M:%S")
-        if dt.microsecond:
-            rv = "%s.%0.6d" % (rv, dt.microsecond)
-    else:
-        rv = dt.strftime("%Y-%m-%d")
-    return rv
+    # typecast_timestamp returns a date or a datetime without timezone.
+    # It will be formatted as "%Y-%m-%d" or "%Y-%m-%d %H:%M:%S[.%f]"
+    return str(dt)
 
 def _sqlite_regexp(re_pattern, re_string):
     try:
