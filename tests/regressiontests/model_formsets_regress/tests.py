@@ -1,10 +1,12 @@
+from __future__ import absolute_import
+
 from django import forms
 from django.forms.formsets import BaseFormSet, DELETION_FIELD_NAME
 from django.forms.util import ErrorDict, ErrorList
 from django.forms.models import modelform_factory, inlineformset_factory, modelformset_factory, BaseModelFormSet
 from django.test import TestCase
 
-from models import User, UserSite, Restaurant, Manager, Network, Host
+from .models import User, UserSite, Restaurant, Manager, Network, Host
 
 
 class InlineFormsetTests(TestCase):

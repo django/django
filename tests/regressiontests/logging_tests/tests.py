@@ -3,11 +3,11 @@ from __future__ import with_statement
 import copy
 
 from django.conf import compat_patch_logging_config
-from django.test import TestCase
-
-from django.utils.log import CallbackFilter, RequireDebugFalse, getLogger
-from django.test.utils import override_settings
 from django.core import mail
+from django.test import TestCase
+from django.test.utils import override_settings
+from django.utils.log import CallbackFilter, RequireDebugFalse, getLogger
+
 
 
 # logging config prior to using filter with mail_admins

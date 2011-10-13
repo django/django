@@ -1,6 +1,9 @@
+from __future__ import absolute_import
+
 from django import template
- 
-from regressiontests.views import BrokenException
+
+from ..views import BrokenException
+
 
 register = template.Library()
 

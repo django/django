@@ -1,6 +1,8 @@
+from __future__ import absolute_import
+
 from django.test import TestCase
 
-from models import Author, Publisher
+from .models import Author, Publisher
 
 
 class GetOrCreateTests(TestCase):

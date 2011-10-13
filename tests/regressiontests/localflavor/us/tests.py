@@ -1,11 +1,14 @@
+from __future__ import absolute_import
+
 from django.contrib.localflavor.us.forms import (USZipCodeField,
     USPhoneNumberField, USStateField, USStateSelect,
     USSocialSecurityNumberField)
 from django.test import SimpleTestCase
 
-from forms import USPlaceForm
+from .forms import USPlaceForm
 
-class USLocalflavorTests(SimpleTestCase):
+
+class USLocalFlavorTests(SimpleTestCase):
 
     def setUp(self):
         self.form = USPlaceForm({'state':'GA', 'state_req':'NC', 'postal_code': 'GA', 'name':'impossible'})

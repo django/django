@@ -1,9 +1,12 @@
+from __future__ import absolute_import
+
 import datetime
 
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
 
-from regressiontests.generic_views.models import Book
+from .models import Book
+
 
 class ArchiveIndexViewTests(TestCase):
     fixtures = ['generic-views-test-data.json']

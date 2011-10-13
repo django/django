@@ -1,5 +1,9 @@
+from __future__ import absolute_import
+
 from django.test import TestCase
-from regressiontests.model_permalink.models import Guitarist
+
+from .models import Guitarist
+
 
 class PermalinkTests(TestCase):
     urls = 'regressiontests.model_permalink.urls'

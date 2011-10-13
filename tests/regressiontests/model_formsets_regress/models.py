@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class User(models.Model):
     username = models.CharField(max_length=12, unique=True)
     serial = models.IntegerField()

@@ -1,8 +1,10 @@
+from __future__ import absolute_import
+
 from operator import attrgetter
 
 from django.test import TestCase
 
-from models import Restaurant, Person
+from .models import Restaurant, Person
 
 
 class ModelInheritanceSelectRelatedTests(TestCase):

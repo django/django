@@ -1,5 +1,9 @@
+from __future__ import absolute_import
+
 from django.conf.urls import patterns, url, include
-from views import view_class_instance
+
+from .views import view_class_instance
+
 
 class URLObject(object):
     def __init__(self, app_name, namespace):

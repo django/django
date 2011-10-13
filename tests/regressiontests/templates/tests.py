@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import with_statement
+from __future__ import with_statement, absolute_import
 
 from django.conf import settings
 
@@ -17,10 +17,11 @@ import warnings
 from urlparse import urljoin
 
 from django import template
-from django.template import base as template_base, RequestContext
+from django.template import base as template_base, RequestContext, Template, Context
 from django.core import urlresolvers
 from django.template import loader
 from django.template.loaders import app_directories, filesystem, cached
+from django.test import RequestFactory
 from django.test.utils import (get_warnings_state, restore_warnings_state,
     setup_test_template_loader, restore_template_loaders, override_settings)
 from django.utils import unittest
@@ -29,24 +30,25 @@ from django.utils.translation import activate, deactivate, ugettext as _
 from django.utils.safestring import mark_safe
 from django.utils.tzinfo import LocalTimezone
 
-from callables import *
-from context import ContextTests
-from custom import CustomTagTests, CustomFilterTests
-from parser import ParserTests
-from unicode import UnicodeTests
-from nodelist import NodelistTest, ErrorIndexTest
-from smartif import *
-from response import *
+from .callables import CallableVariablesTests
+from .context import ContextTests
+from .custom import CustomTagTests, CustomFilterTests
+from .parser import ParserTests
+from .unicode import UnicodeTests
+from .nodelist import NodelistTest, ErrorIndexTest
+from .smartif import SmartIfTests
+from .response import (TemplateResponseTest, BaseTemplateResponseTest,
+    CacheMiddlewareTest, SimpleTemplateResponseTest, CustomURLConfTest)
 
 try:
-    from loaders import *
+    from .loaders import RenderToStringTest, EggLoaderTest
 except ImportError, e:
     if "pkg_resources" in e.message:
         pass # If setuptools isn't installed, that's fine. Just move on.
     else:
         raise
 
-import filters
+from . import filters
 
 #################################
 # Custom template tag for tests #

@@ -1,7 +1,9 @@
+from __future__ import absolute_import
+
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
 
-from regressiontests.generic_views.models import Artist, Author, Page
+from .models import Artist, Author, Page
 
 
 class DetailViewTest(TestCase):

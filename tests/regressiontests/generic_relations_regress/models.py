@@ -1,9 +1,10 @@
-from django.db import models
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
+from django.db import models
 
-__all__ = ('Link', 'Place', 'Restaurant', 'Person', 'Address', 
-           'CharLink', 'TextLink', 'OddRelation1', 'OddRelation2', 
+
+__all__ = ('Link', 'Place', 'Restaurant', 'Person', 'Address',
+           'CharLink', 'TextLink', 'OddRelation1', 'OddRelation2',
            'Contact', 'Organization', 'Note')
 
 class Link(models.Model):

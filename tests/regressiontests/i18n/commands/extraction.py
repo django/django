@@ -2,8 +2,10 @@
 import os
 import re
 import shutil
-from django.test import TestCase
+
 from django.core import management
+from django.test import TestCase
+
 
 LOCALE='de'
 

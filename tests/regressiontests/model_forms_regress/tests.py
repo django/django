@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 from datetime import date
 
 from django import forms
@@ -8,7 +10,7 @@ from django.forms.models import (modelform_factory, ModelChoiceField,
 from django.utils import unittest
 from django.test import TestCase
 
-from models import (Person, RealPerson, Triple, FilePathModel, Article,
+from .models import (Person, RealPerson, Triple, FilePathModel, Article,
     Publication, CustomFF, Author, Author1, Homepage, Document, Edition)
 
 

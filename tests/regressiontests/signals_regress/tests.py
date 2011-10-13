@@ -1,7 +1,10 @@
-from django.test import TestCase
+from __future__ import absolute_import
 
 from django.db import models
-from regressiontests.signals_regress.models import Author, Book
+from django.test import TestCase
+
+from .models import Author, Book
+
 
 signal_output = []
 

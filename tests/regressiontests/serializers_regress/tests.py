@@ -8,7 +8,7 @@ forward, backwards and self references.
 """
 # This is necessary in Python 2.5 to enable the with statement, in 2.6
 # and up it is no longer necessary.
-from __future__ import with_statement
+from __future__ import with_statement, absolute_import
 
 import datetime
 import decimal
@@ -19,11 +19,23 @@ except ImportError:
 
 from django.core import serializers
 from django.core.serializers import SerializerDoesNotExist
-from django.db import connection
+from django.db import connection, models
 from django.test import TestCase
 from django.utils.functional import curry
 
-from models import *
+from .models import (BooleanData, CharData, DateData, DateTimeData, EmailData,
+    FileData, FilePathData, DecimalData, FloatData, IntegerData, IPAddressData,
+    GenericIPAddressData, NullBooleanData, PhoneData, PositiveIntegerData,
+    PositiveSmallIntegerData, SlugData, SmallData, TextData, TimeData,
+    USStateData, GenericData, Anchor, UniqueAnchor, FKData, M2MData, O2OData,
+    FKSelfData, M2MSelfData, FKDataToField, FKDataToO2O, M2MIntermediateData,
+    Intermediate, BooleanPKData, CharPKData, EmailPKData, FilePathPKData,
+    DecimalPKData, FloatPKData, IntegerPKData, IPAddressPKData,
+    GenericIPAddressPKData, PhonePKData, PositiveIntegerPKData,
+    PositiveSmallIntegerPKData, SlugPKData, SmallPKData, USStatePKData,
+    AutoNowDateTimeData, ModifyingSaveData, InheritAbstractModel,
+    ExplicitInheritBaseModel, InheritBaseModel, BigIntegerData, LengthModel,
+    Tag, ComplexModel)
 
 # A set of functions that can be used to recreate
 # test data objects of various kinds.

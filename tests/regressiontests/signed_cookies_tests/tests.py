@@ -4,6 +4,7 @@ from django.core import signing
 from django.http import HttpRequest, HttpResponse
 from django.test import TestCase
 
+
 class SignedCookieTest(TestCase):
 
     def test_can_set_and_read_signed_cookies(self):

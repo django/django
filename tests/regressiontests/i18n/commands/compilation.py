@@ -8,8 +8,8 @@ from django.core.management import CommandError
 from django.core.management.commands.compilemessages import compile_messages
 from django.test import TestCase
 
-LOCALE='es_AR'
 
+LOCALE='es_AR'
 
 class MessageCompilationTests(TestCase):
 

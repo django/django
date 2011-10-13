@@ -1,5 +1,7 @@
 from __future__ import with_statement
+
 import os
+
 from django.conf import settings, global_settings
 from django.test import TransactionTestCase, TestCase, signals
 from django.test.utils import override_settings

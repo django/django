@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from models import Simple
+from .models import Simple
 
 
 class InitialSQLTests(TestCase):

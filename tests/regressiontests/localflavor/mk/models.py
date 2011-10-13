@@ -1,6 +1,7 @@
-from django.db import models
 from django.contrib.localflavor.mk.models import (
     MKIdentityCardNumberField, MKMunicipalityField, UMCNField)
+from django.db import models
+
 
 class MKPerson(models.Model):
     first_name = models.CharField(max_length = 20)

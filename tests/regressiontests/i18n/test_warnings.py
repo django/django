@@ -1,5 +1,5 @@
-from os.path import join, normpath, abspath, dirname
 import warnings
+from os.path import join, normpath, abspath, dirname
 
 import django
 from django.conf import settings

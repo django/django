@@ -1,10 +1,10 @@
-from __future__ import with_statement
+from __future__ import with_statement, absolute_import
 
 from django.forms import EmailField
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.utils.unittest import skip
 
-from models import Person
+from .models import Person
 
 
 class SkippingTestCase(TestCase):

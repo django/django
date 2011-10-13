@@ -1,5 +1,5 @@
-from django.db import models
 from django.contrib.auth import models as auth
+from django.db import models
 
 # No related name is needed here, since symmetrical relations are not
 # explicitly reversible.

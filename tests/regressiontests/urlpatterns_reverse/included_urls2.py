@@ -5,8 +5,12 @@ each name to resolve and Django must distinguish the possibilities based on the
 argument list.
 """
 
+from __future__ import absolute_import
+
 from django.conf.urls import patterns, url
-from views import empty_view
+
+from .views import empty_view
+
 
 urlpatterns = patterns('',
     url(r'^part/(?P<value>\w+)/$', empty_view, name="part"),

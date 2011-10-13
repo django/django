@@ -1,6 +1,6 @@
 import copy
-from django.utils.unittest import TestCase
 
+from django.utils.unittest import TestCase
 from django.utils.functional import SimpleLazyObject, empty
 
 

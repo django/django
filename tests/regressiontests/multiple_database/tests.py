@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 import datetime
 import pickle
 from StringIO import StringIO
@@ -9,7 +11,7 @@ from django.db import connections, router, DEFAULT_DB_ALIAS
 from django.db.models import signals
 from django.test import TestCase
 
-from models import Book, Person, Pet, Review, UserProfile
+from .models import Book, Person, Pet, Review, UserProfile
 
 
 class QueryTestCase(TestCase):

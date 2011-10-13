@@ -1,5 +1,10 @@
-from regressiontests.generic_views.base import ViewTest, TemplateViewTest, RedirectViewTest
-from regressiontests.generic_views.dates import ArchiveIndexViewTests, YearArchiveViewTests, MonthArchiveViewTests, WeekArchiveViewTests, DayArchiveViewTests, DateDetailViewTests
-from regressiontests.generic_views.detail import DetailViewTest
-from regressiontests.generic_views.edit import ModelFormMixinTests, CreateViewTests, UpdateViewTests, DeleteViewTests
-from regressiontests.generic_views.list import ListViewTests
+from __future__ import absolute_import
+
+from .base import ViewTest, TemplateViewTest, RedirectViewTest
+from .dates import (ArchiveIndexViewTests, YearArchiveViewTests,
+    MonthArchiveViewTests, WeekArchiveViewTests, DayArchiveViewTests,
+    DateDetailViewTests)
+from .detail import DetailViewTest
+from .edit import (ModelFormMixinTests, CreateViewTests, UpdateViewTests,
+    DeleteViewTests)
+from .list import ListViewTests

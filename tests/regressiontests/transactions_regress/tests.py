@@ -1,9 +1,11 @@
+from __future__ import absolute_import
+
 from django.core.exceptions import ImproperlyConfigured
 from django.db import connection, transaction
 from django.db.transaction import commit_on_success, commit_manually, TransactionManagementError
 from django.test import TransactionTestCase, skipUnlessDBFeature
 
-from models import Mod
+from .models import Mod
 
 
 class TestTransactionClosing(TransactionTestCase):

@@ -1,8 +1,11 @@
+from __future__ import absolute_import
+
 from functools import update_wrapper
+
 from django.db import connection
 from django.test import TestCase, skipUnlessDBFeature
 
-from models import Reporter, Article
+from .models import Reporter, Article
 
 #
 # The introspection module is optional, so methods tested here might raise

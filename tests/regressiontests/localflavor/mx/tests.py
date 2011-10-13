@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
+
 from django.contrib.localflavor.mx.forms import (MXZipCodeField, MXRFCField,
     MXStateSelect, MXCURPField)
 from django.test import SimpleTestCase
 
-from forms import MXPersonProfileForm
+from .forms import MXPersonProfileForm
+
 
 class MXLocalFlavorTests(SimpleTestCase):
 

@@ -1,6 +1,9 @@
+from __future__ import absolute_import
+
 from django.test import TestCase
 
-from regressiontests.null_fk_ordering.models import *
+from .models import Author, Article, SystemInfo, Forum, Post, Comment
+
 
 class NullFkOrderingTests(TestCase):
 

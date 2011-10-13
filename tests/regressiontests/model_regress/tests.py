@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 import datetime
 from operator import attrgetter
 
@@ -5,7 +7,7 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase, skipUnlessDBFeature
 from django.utils import tzinfo
 
-from models import (Worker, Article, Party, Event, Department,
+from .models import (Worker, Article, Party, Event, Department,
     BrokenUnicodeMethod, NonAutoPK)
 
 

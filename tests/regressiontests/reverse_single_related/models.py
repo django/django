@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class SourceManager(models.Manager):
     def get_query_set(self):
         return super(SourceManager, self).get_query_set().filter(is_public=True)

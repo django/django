@@ -1,7 +1,9 @@
+from __future__ import absolute_import
+
 from django.test import TestCase
 from django.core.exceptions import FieldError
 
-from regressiontests.null_queries.models import *
+from .models import Poll, Choice, OuterA, Inner, OuterB
 
 
 class NullQueriesTests(TestCase):

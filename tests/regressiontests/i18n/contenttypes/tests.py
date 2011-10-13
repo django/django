@@ -3,10 +3,10 @@ from __future__ import with_statement
 
 import os
 
+from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils import translation
-from django.contrib.contenttypes.models import ContentType
 
 
 class ContentTypeTests(TestCase):

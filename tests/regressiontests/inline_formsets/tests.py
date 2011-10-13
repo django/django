@@ -1,7 +1,9 @@
+from __future__ import absolute_import
+
 from django.forms.models import inlineformset_factory
 from django.test import TestCase
 
-from regressiontests.inline_formsets.models import Poet, Poem, School, Parent, Child
+from .models import Poet, Poem, School, Parent, Child
 
 
 class DeletionTests(TestCase):

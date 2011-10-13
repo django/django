@@ -1,6 +1,8 @@
+from __future__ import absolute_import
+
 from django.test import TestCase
 
-from models import (User, UserProfile, UserStat, UserStatResult, StatDetails,
+from .models import (User, UserProfile, UserStat, UserStatResult, StatDetails,
     AdvancedUserStat, Image, Product)
 
 class ReverseSelectRelatedTestCase(TestCase):

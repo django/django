@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 from xml.dom import minidom
 
 from django.contrib.syndication import views
@@ -6,7 +8,7 @@ from django.test import TestCase
 from django.utils import tzinfo
 from django.utils.feedgenerator import rfc2822_date, rfc3339_date
 
-from models import Entry
+from .models import Entry
 
 
 class FeedTestCase(TestCase):

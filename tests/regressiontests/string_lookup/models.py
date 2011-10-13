@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 
+
 class Foo(models.Model):
     name = models.CharField(max_length=50)
     friend = models.CharField(max_length=50, blank=True)

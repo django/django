@@ -1,5 +1,9 @@
+from __future__ import absolute_import
+
 from django.test import TestCase
-from regressiontests.one_to_one_regress.models import *
+
+from .models import Place, Restaurant, Bar, Favorites, Target, UndergroundBar
+
 
 class OneToOneRegressionTests(TestCase):
 

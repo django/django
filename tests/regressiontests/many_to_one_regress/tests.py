@@ -1,7 +1,10 @@
+from __future__ import absolute_import
+
 from django.db import models
 from django.test import TestCase
 
-from models import First, Second, Third, Parent, Child, Category, Record, Relation
+from .models import First, Second, Third, Parent, Child, Category, Record, Relation
+
 
 class ManyToOneRegressionTests(TestCase):
     def test_object_creation(self):

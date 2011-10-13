@@ -1,8 +1,10 @@
-from django.conf.urls import patterns, url
-from django.views.generic import TemplateView
-from django.views.decorators.cache import cache_page
+from __future__ import absolute_import
 
-import views
+from django.conf.urls import patterns, url
+from django.views.decorators.cache import cache_page
+from django.views.generic import TemplateView
+
+from . import views
 
 
 urlpatterns = patterns('',

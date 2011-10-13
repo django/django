@@ -1,6 +1,7 @@
 import os
-from django.db import models
+
 from django.core.exceptions import ValidationError
+from django.db import models
 
 
 class Person(models.Model):

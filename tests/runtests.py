@@ -5,7 +5,8 @@ import subprocess
 import sys
 import tempfile
 
-import django.contrib as contrib
+from django import contrib
+
 
 CONTRIB_DIR_NAME = 'django.contrib'
 MODEL_TESTS_DIR_NAME = 'modeltests'

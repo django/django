@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class PersonWithDefaultMaxLengths(models.Model):
     email = models.EmailField()
     vcard = models.FileField(upload_to='/tmp')

@@ -1,7 +1,11 @@
-from django.test import TestCase
-from django.db.models import Q
+from __future__ import absolute_import
 
-from regressiontests.null_fk.models import *
+from django.db.models import Q
+from django.test import TestCase
+
+from .models import (SystemDetails, Item, PropertyValue, SystemInfo, Forum,
+    Post, Comment)
+
 
 class NullFkTests(TestCase):
 

@@ -1,5 +1,7 @@
 # coding: utf-8
 
+from __future__ import absolute_import
+
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.sites import AdminSite
@@ -9,9 +11,9 @@ from django.forms.models import ModelForm
 from django.test import TestCase
 
 # local test models
-from models import (Episode, EpisodeExtra, EpisodeMaxNum, Media,
+from .admin import MediaInline, MediaPermanentInline
+from .models import (Episode, EpisodeExtra, EpisodeMaxNum, Media,
     EpisodePermanent, Category)
-from admin import MediaInline, MediaPermanentInline
 
 
 class GenericAdminViewTest(TestCase):

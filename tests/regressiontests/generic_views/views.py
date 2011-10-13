@@ -1,11 +1,13 @@
+from __future__ import absolute_import
+
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse
 from django.utils.decorators import method_decorator
 from django.views import generic
 
-from regressiontests.generic_views.models import Artist, Author, Book, Page
-from regressiontests.generic_views.forms import AuthorForm
+from .forms import AuthorForm
+from .models import Artist, Author, Book, Page
 
 
 class CustomTemplateView(generic.TemplateView):

@@ -8,6 +8,7 @@ xpected results
 
 from django.db import models
 
+
 # The first two models represent a very simple null FK ordering case.
 class Author(models.Model):
     name = models.CharField(max_length=150)

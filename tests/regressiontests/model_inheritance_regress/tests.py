@@ -2,12 +2,14 @@
 Regression tests for Model inheritance behaviour.
 """
 
+from __future__ import absolute_import
+
 import datetime
 from operator import attrgetter
 
 from django.test import TestCase
 
-from models import (Place, Restaurant, ItalianRestaurant, ParkingLot,
+from .models import (Place, Restaurant, ItalianRestaurant, ParkingLot,
     ParkingLot2, ParkingLot3, Supplier, Wholesaler, Child, SelfRefParent,
     SelfRefChild, ArticleWithAuthor, M2MChild, QualityControl, DerivedM,
     Person, BirthdayParty, BachelorParty, MessyBachelorParty,

@@ -5,6 +5,7 @@ from django.http import (QueryDict, HttpResponse, SimpleCookie, BadHeaderError,
         parse_cookie)
 from django.utils import unittest
 
+
 class QueryDictTests(unittest.TestCase):
     def test_missing_key(self):
         q = QueryDict('')

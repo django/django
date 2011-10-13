@@ -1,6 +1,10 @@
+from __future__ import absolute_import
+
 from django import template
 from django.utils.unittest import TestCase
-from templatetags import custom
+
+from .templatetags import custom
+
 
 class CustomFilterTests(TestCase):
     def test_filter(self):

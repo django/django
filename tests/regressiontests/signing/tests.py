@@ -4,6 +4,7 @@ from django.core import signing
 from django.test import TestCase
 from django.utils.encoding import force_unicode
 
+
 class TestSigner(TestCase):
 
     def test_signature(self):

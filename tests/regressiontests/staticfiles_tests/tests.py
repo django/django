@@ -1,5 +1,6 @@
 # -*- encoding: utf-8 -*-
 from __future__ import with_statement
+
 import codecs
 import os
 import posixpath

@@ -1,8 +1,10 @@
 from __future__ import with_statement
-from datetime import datetime
+
 import os
 import pickle
 import time
+from datetime import datetime
+
 from django.utils import unittest
 from django.test import RequestFactory, TestCase
 from django.conf import settings

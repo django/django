@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 import mimetypes
 from os import path
 
@@ -6,8 +8,9 @@ from django.conf.urls.static import static
 from django.test import TestCase
 from django.http import HttpResponseNotModified
 
-from regressiontests.views import urls
-from regressiontests.views.urls import media_dir
+from .. import urls
+from ..urls import media_dir
+
 
 class StaticTests(TestCase):
     """Tests django views in django/views/static.py"""

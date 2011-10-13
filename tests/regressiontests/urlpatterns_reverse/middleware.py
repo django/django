@@ -1,4 +1,7 @@
-import urlconf_inner
+from __future__ import absolute_import
+
+from . import urlconf_inner
+
 
 class ChangeURLconfMiddleware(object):
     def process_request(self, request):

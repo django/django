@@ -1,5 +1,6 @@
 # -*- encoding: utf-8 -*-
-from __future__ import with_statement
+from __future__ import with_statement, absolute_import
+
 import datetime
 import decimal
 import os
@@ -10,24 +11,24 @@ from django.conf import settings
 from django.template import Template, Context
 from django.test import TestCase, RequestFactory
 from django.test.utils import override_settings
+from django.utils import translation
 from django.utils.formats import (get_format, date_format, time_format,
     localize, localize_input, iter_format_modules, get_format_modules)
 from django.utils.importlib import import_module
 from django.utils.numberformat import format as nformat
 from django.utils.safestring import mark_safe, SafeString, SafeUnicode
-from django.utils import translation
 from django.utils.translation import (ugettext, ugettext_lazy, activate,
-        deactivate, gettext_lazy, pgettext, npgettext, to_locale,
-        get_language_info, get_language, get_language_from_request)
+    deactivate, gettext_lazy, pgettext, npgettext, to_locale,
+    get_language_info, get_language, get_language_from_request)
 
 
-from forms import I18nForm, SelectDateForm, SelectDateWidget, CompanyForm
-from models import Company, TestModel
+from .commands.tests import NoWrapExtractorTests, IgnoredExtractorTests, MessageCompilationTests, PoFileTests, BasicExtractorTests, JavascriptExtractorTests, CopyPluralFormsExtractorTests, SymlinkExtractorTests, ExtractorTests
+from .contenttypes.tests import ContentTypeTests
+from .forms import I18nForm, SelectDateForm, SelectDateWidget, CompanyForm
+from .models import Company, TestModel
+from .patterns.tests import URLRedirectWithoutTrailingSlashTests, URLTranslationTests, URLDisabledTests, URLTagTests, URLTestCaseBase, URLRedirectWithoutTrailingSlashSettingTests, URLNamespaceTests, URLPrefixTests, URLResponseTests, URLRedirectTests
+from .test_warnings import DeprecationWarningTests
 
-from commands.tests import *
-from patterns.tests import *
-from contenttypes.tests import *
-from test_warnings import DeprecationWarningTests
 
 here = os.path.dirname(os.path.abspath(__file__))
 

@@ -1,10 +1,13 @@
+from __future__ import absolute_import
+
 from django.contrib.localflavor.mk.forms import (
     MKIdentityCardNumberField, MKMunicipalitySelect, UMCNField)
 from django.test import SimpleTestCase
 
-from forms import MKPersonForm
+from .forms import MKPersonForm
 
-class MKLocalflavorTests(SimpleTestCase):
+
+class MKLocalFlavorTests(SimpleTestCase):
 
     def setUp(self):
         self.form = MKPersonForm({

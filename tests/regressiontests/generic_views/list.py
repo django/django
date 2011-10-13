@@ -1,7 +1,10 @@
+from __future__ import absolute_import
+
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
 
-from regressiontests.generic_views.models import Author, Artist
+from .models import Author, Artist
+
 
 class ListViewTests(TestCase):
     fixtures = ['generic-views-test-data.json']

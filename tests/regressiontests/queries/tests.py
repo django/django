@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 import datetime
 import pickle
 import sys
@@ -11,11 +13,12 @@ from django.test import TestCase, skipUnlessDBFeature
 from django.utils import unittest
 from django.utils.datastructures import SortedDict
 
-from models import (Annotation, Article, Author, Celebrity, Child, Cover, Detail,
-    DumbCategory, ExtraInfo, Fan, Item, LeafA, LoopX, LoopZ, ManagedModel,
-    Member, NamedCategory, Note, Number, Plaything, PointerA, Ranking, Related,
-    Report, ReservedName, Tag, TvChef, Valid, X, Food, Eaten, Node, ObjectA, ObjectB,
-    ObjectC, CategoryItem, SimpleCategory, SpecialCategory, OneToOneCategory)
+from .models import (Annotation, Article, Author, Celebrity, Child, Cover,
+    Detail, DumbCategory, ExtraInfo, Fan, Item, LeafA, LoopX, LoopZ,
+    ManagedModel, Member, NamedCategory, Note, Number, Plaything, PointerA,
+    Ranking, Related, Report, ReservedName, Tag, TvChef, Valid, X, Food, Eaten,
+    Node, ObjectA, ObjectB, ObjectC, CategoryItem, SimpleCategory,
+    SpecialCategory, OneToOneCategory)
 
 
 class BaseQuerysetTest(TestCase):

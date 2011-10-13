@@ -1,6 +1,8 @@
 """
 Tests for django test runner
 """
+from __future__ import absolute_import
+
 import StringIO
 from optparse import make_option
 import warnings
@@ -13,7 +15,7 @@ from django.test.utils import get_warnings_state, restore_warnings_state
 from django.utils import unittest
 from django.utils.importlib import import_module
 
-from regressiontests.admin_scripts.tests import AdminScriptTestCase
+from ..admin_scripts.tests import AdminScriptTestCase
 
 
 TEST_APP_OK = 'regressiontests.test_runner.valid_app.models'

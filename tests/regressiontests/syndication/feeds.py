@@ -1,7 +1,10 @@
+from __future__ import absolute_import
+
 from django.contrib.syndication import views
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils import feedgenerator, tzinfo
-from models import Article, Entry
+
+from .models import Article, Entry
 
 
 class ComplexFeed(views.Feed):

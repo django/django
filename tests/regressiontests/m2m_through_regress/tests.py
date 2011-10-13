@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 try:
     from cStringIO import StringIO
 except ImportError:
@@ -7,8 +9,8 @@ from django.core import management
 from django.contrib.auth.models import User
 from django.test import TestCase
 
-from models import (Person, Group, Membership, UserMembership,
-                    Car, Driver, CarDriver)
+from .models import (Person, Group, Membership, UserMembership, Car, Driver,
+    CarDriver)
 
 
 class M2MThroughTestCase(TestCase):

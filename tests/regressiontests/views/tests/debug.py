@@ -1,4 +1,5 @@
-from __future__ import with_statement
+from __future__ import with_statement, absolute_import
+
 import inspect
 import os
 import sys
@@ -13,9 +14,9 @@ from django.template import TemplateSyntaxError
 from django.views.debug import ExceptionReporter
 from django.core import mail
 
-from regressiontests.views import BrokenException, except_args
-from regressiontests.views.views import (sensitive_view, non_sensitive_view,
-    paranoid_view, custom_exception_reporter_filter_view)
+from .. import BrokenException, except_args
+from ..views import (sensitive_view, non_sensitive_view, paranoid_view,
+    custom_exception_reporter_filter_view)
 
 
 class DebugViewTests(TestCase):

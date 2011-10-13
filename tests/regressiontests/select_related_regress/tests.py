@@ -1,5 +1,11 @@
+from __future__ import absolute_import
+
 from django.test import TestCase
-from regressiontests.select_related_regress.models import *
+
+from .models import (Building, Child, Device, Port, Item, Country, Connection,
+    ClientStatus, State, Client, SpecialClient, TUser, Person, Student,
+    Organizer, Class, Enrollment)
+
 
 class SelectRelatedRegressTests(TestCase):
 

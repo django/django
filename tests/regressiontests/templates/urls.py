@@ -1,6 +1,9 @@
 # coding: utf-8
+from __future__ import absolute_import
+
 from django.conf.urls import patterns, url
-from regressiontests.templates import views
+from . import views
+
 
 urlpatterns = patterns('',
 

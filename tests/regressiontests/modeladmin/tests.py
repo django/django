@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 from datetime import date
 
 from django import forms
@@ -15,8 +17,7 @@ from django.forms.widgets import Select
 from django.test import TestCase
 from django.utils import unittest
 
-from models import (Band, Concert, ValidationTestModel,
-    ValidationTestInlineModel)
+from .models import Band, Concert, ValidationTestModel, ValidationTestInlineModel
 
 
 class MockRequest(object):

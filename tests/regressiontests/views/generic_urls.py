@@ -1,9 +1,10 @@
 # -*- coding:utf-8 -*-
+from __future__ import absolute_import
+
 from django.conf.urls import patterns, url
 
-from models import *
-
-import views
+from . import views
+from .models import Article, DateArticle, UrlArticle
 
 
 date_based_info_dict = {

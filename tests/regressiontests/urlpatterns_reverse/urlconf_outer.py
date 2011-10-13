@@ -1,6 +1,8 @@
+from __future__ import absolute_import
+
 from django.conf.urls import patterns, url, include
 
-import urlconf_inner
+from . import urlconf_inner
 
 
 urlpatterns = patterns('',

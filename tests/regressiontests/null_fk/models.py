@@ -4,6 +4,7 @@ Regression tests for proper working of ForeignKey(null=True).
 
 from django.db import models
 
+
 class SystemDetails(models.Model):
     details = models.TextField()
 

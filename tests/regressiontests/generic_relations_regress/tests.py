@@ -1,6 +1,9 @@
-from django.test import TestCase
 from django.db.models import Q
-from models import *
+from django.test import TestCase
+
+from .models import (Address, Place, Restaurant, Link, CharLink, TextLink,
+    Person, Contact, Note, Organization, OddRelation1, OddRelation2)
+
 
 class GenericRelationTests(TestCase):
 

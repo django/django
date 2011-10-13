@@ -1,5 +1,6 @@
 # -*- coding:utf-8 -*-
-from __future__ import with_statement
+from __future__ import with_statement, absolute_import
+
 import gettext
 from os import path
 
@@ -8,7 +9,8 @@ from django.test import TestCase
 from django.utils.translation import override, activate
 from django.utils.text import javascript_quote
 
-from regressiontests.views.urls import locale_dir
+from ..urls import locale_dir
+
 
 class I18NTests(TestCase):
     """ Tests django views in django/views/i18n.py """

@@ -1,6 +1,9 @@
+from __future__ import absolute_import
+
 from django.test import TestCase
 
-from regressiontests.reverse_single_related.models import *
+from .models import Source, Item
+
 
 class ReverseSingleRelatedTests(TestCase):
     """

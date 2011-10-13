@@ -4,6 +4,7 @@ Various edge-cases for model managers.
 
 from django.db import models
 
+
 class OnlyFred(models.Manager):
     def get_query_set(self):
         return super(OnlyFred, self).get_query_set().filter(name='fred')

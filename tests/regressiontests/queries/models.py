@@ -6,6 +6,7 @@ import threading
 
 from django.db import models
 
+
 class DumbCategory(models.Model):
     pass
 
@@ -342,4 +343,4 @@ class OneToOneCategory(models.Model):
 
     def __unicode__(self):
         return "one2one " + self.new_name
-    
+

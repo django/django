@@ -1,10 +1,13 @@
+from __future__ import absolute_import
+
 import re
 
 from django.test import SimpleTestCase
 from django.contrib.localflavor.au.forms import (AUPostCodeField,
     AUPhoneNumberField, AUStateSelect)
 
-from forms import AustralianPlaceForm
+from .forms import AustralianPlaceForm
+
 
 SELECTED_OPTION_PATTERN = r'<option value="%s" selected="selected">'
 BLANK_OPTION_PATTERN = r'<option value="">'
