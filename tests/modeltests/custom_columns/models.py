@@ -17,6 +17,7 @@ from the default generated name, use the ``db_table`` parameter on the
 
 from django.db import models
 
+
 class Author(models.Model):
     first_name = models.CharField(max_length=30, db_column='firstname')
     last_name = models.CharField(max_length=30, db_column='last')

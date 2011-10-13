@@ -1,5 +1,7 @@
-from modeltests.validation import ValidationTestCase
-from models import CustomMessagesModel
+from __future__ import absolute_import
+
+from . import ValidationTestCase
+from .models import CustomMessagesModel
 
 
 class CustomMessagesTest(ValidationTestCase):

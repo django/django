@@ -1,6 +1,6 @@
 from django.core.exceptions import ValidationError
-from django.utils.unittest import TestCase
 from django.db import models
+from django.utils.unittest import TestCase
 
 
 class ValidationMessagesTest(TestCase):

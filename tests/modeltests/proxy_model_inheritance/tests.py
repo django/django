@@ -6,6 +6,8 @@ for the proxied model (as described in #12286).  This test creates two dummy
 apps and calls syncdb, then verifies that the table has been created.
 """
 
+from __future__ import absolute_import
+
 import os
 import sys
 
@@ -14,6 +16,7 @@ from django.core.management import call_command
 from django.db.models.loading import load_app
 from django.test import TransactionTestCase
 from django.test.utils import override_settings
+
 
 # @override_settings(INSTALLED_APPS=('app1', 'app2'))
 class ProxyModelInheritanceTests(TransactionTestCase):
@@ -28,9 +31,8 @@ class ProxyModelInheritanceTests(TransactionTestCase):
 
     def test_table_exists(self):
         call_command('syncdb', verbosity=0)
-        global ProxyModel, NiceModel
-        from app1.models import ProxyModel
-        from app2.models import NiceModel
+        from .app1.models import ProxyModel
+        from .app2.models import NiceModel
         self.assertEqual(NiceModel.objects.all().count(), 0)
         self.assertEqual(ProxyModel.objects.all().count(), 0)
 

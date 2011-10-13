@@ -1,5 +1,9 @@
+from __future__ import absolute_import
+
 from django.test import TestCase
-from modeltests.model_inheritance.models import Title
+
+from ..model_inheritance.models import Title
+
 
 class InheritanceSameModelNameTests(TestCase):
 

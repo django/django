@@ -1,8 +1,10 @@
+from __future__ import absolute_import
+
 from operator import attrgetter
 
 from django.test import TestCase
 
-from models import Person
+from .models import Person
 
 
 class RecursiveM2MTests(TestCase):
@@ -11,14 +13,14 @@ class RecursiveM2MTests(TestCase):
             Person.objects.create(name=name)
             for name in ["Anne", "Bill", "Chuck", "David"]
         ]
-        
+
         # Add some friends in the direction of field definition
         # Anne is friends with Bill and Chuck
         a.friends.add(b, c)
 
         # David is friends with Anne and Chuck - add in reverse direction
         d.friends.add(a,c)
-        
+
         # Who is friends with Anne?
         self.assertQuerysetEqual(
             a.friends.all(), [
@@ -54,7 +56,7 @@ class RecursiveM2MTests(TestCase):
         # Bill is already friends with Anne - add Anne again, but in the
         # reverse direction
         b.friends.add(a)
-        
+
         # Who is friends with Anne?
         self.assertQuerysetEqual(
             a.friends.all(), [
@@ -115,7 +117,7 @@ class RecursiveM2MTests(TestCase):
         b.idols.add(a)
         # David is idolized by Anne and Chuck - add in reverse direction
         d.stalkers.add(a, c)
-        
+
         # Who are Anne's idols?
         self.assertQuerysetEqual(
             a.idols.all(), [

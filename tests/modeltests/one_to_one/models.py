@@ -8,6 +8,7 @@ In this example, a ``Place`` optionally can be a ``Restaurant``.
 
 from django.db import models
 
+
 class Place(models.Model):
     name = models.CharField(max_length=50)
     address = models.CharField(max_length=80)

@@ -1,6 +1,8 @@
+from __future__ import absolute_import
+
 from django.test import TestCase
 
-from models import Domain, Kingdom, Phylum, Klass, Order, Family, Genus, Species
+from .models import Domain, Kingdom, Phylum, Klass, Order, Family, Genus, Species
 
 class SelectRelatedTests(TestCase):
 

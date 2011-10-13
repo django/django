@@ -6,6 +6,7 @@ To define a many-to-one relationship, use ``ForeignKey()``.
 
 from django.db import models
 
+
 class Reporter(models.Model):
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)

@@ -16,6 +16,7 @@ if you prefer. You must be careful to encode the results correctly, though.
 
 from django.db import models
 
+
 class Article(models.Model):
     headline = models.CharField(max_length=100)
     pub_date = models.DateTimeField()

@@ -1,5 +1,9 @@
+from __future__ import with_statement, absolute_import
+
 from django.test import TestCase
-from models import Person
+
+from .models import Person
+
 
 class PropertyTests(TestCase):
 

@@ -1,7 +1,8 @@
-from __future__ import with_statement
+from __future__ import with_statement, absolute_import
 
 from django.test import TestCase
-from models import Reporter, Article
+
+from .models import Reporter, Article
 
 
 class ManyToOneNullTests(TestCase):

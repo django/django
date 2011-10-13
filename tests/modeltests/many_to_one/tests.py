@@ -1,10 +1,12 @@
+from __future__ import absolute_import
+
 from copy import deepcopy
 from datetime import datetime
 
-from django.test import TestCase
 from django.core.exceptions import MultipleObjectsReturned
+from django.test import TestCase
 
-from models import Article, Reporter
+from .models import Article, Reporter
 
 
 class ManyToOneTests(TestCase):

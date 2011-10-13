@@ -1,5 +1,7 @@
-from modeltests.validation import ValidationTestCase
-from models import *
+from __future__ import absolute_import
+
+from . import ValidationTestCase
+from .models import ModelToValidate
 
 
 class TestModelsWithValidators(ValidationTestCase):

@@ -1,7 +1,7 @@
 from django.core import management
 from django.test import TestCase
 
-from models import Article
+from .models import Article
 
 
 class SampleTestCase(TestCase):

@@ -1,6 +1,10 @@
-from django.test import TestCase
+from __future__ import absolute_import
+
 from django.db import connection
-from models import A01, A02, B01, B02, C01, C02, Unmanaged2, Managed1
+from django.test import TestCase
+
+from .models import A01, A02, B01, B02, C01, C02, Unmanaged2, Managed1
+
 
 class SimpleTests(TestCase):
 

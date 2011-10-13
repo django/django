@@ -7,6 +7,7 @@ This example exists purely to point out errors in models.
 
 from django.db import connection, models
 
+
 class FieldErrors(models.Model):
     charfield = models.CharField()
     charfield2 = models.CharField(max_length=-1)

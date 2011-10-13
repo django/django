@@ -12,6 +12,7 @@ performing a ``filter()`` lookup and raising a ``Http404`` exception if a
 
 from django.db import models
 
+
 class Author(models.Model):
     name = models.CharField(max_length=50)
 

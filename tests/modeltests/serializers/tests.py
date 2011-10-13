@@ -1,11 +1,11 @@
 # This is necessary in Python 2.5 to enable the with statement, in 2.6
 # and up it is no longer necessary.
-from __future__ import with_statement
+from __future__ import with_statement, absolute_import
 
 # -*- coding: utf-8 -*-
 from datetime import datetime
-from StringIO import StringIO
 from xml.dom import minidom
+from StringIO import StringIO
 
 from django.conf import settings
 from django.core import serializers
@@ -13,8 +13,9 @@ from django.db import transaction, connection
 from django.test import TestCase, TransactionTestCase, Approximate
 from django.utils import simplejson, unittest
 
-from models import (Category, Author, Article, AuthorProfile,
-                    Actor, Movie, Score, Player, Team)
+from .models import (Category, Author, Article, AuthorProfile, Actor, Movie,
+    Score, Player, Team)
+
 
 class SerializerRegistrationTests(unittest.TestCase):
     def setUp(self):

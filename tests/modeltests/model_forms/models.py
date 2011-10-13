@@ -9,8 +9,9 @@ words, most of these tests should be rewritten.
 
 import tempfile
 
-from django.db import models
 from django.core.files.storage import FileSystemStorage
+from django.db import models
+
 
 temp_storage_dir = tempfile.mkdtemp()
 temp_storage = FileSystemStorage(temp_storage_dir)

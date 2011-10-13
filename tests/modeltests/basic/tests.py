@@ -1,10 +1,12 @@
+from __future__ import absolute_import
+
 from datetime import datetime
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.fields import FieldDoesNotExist
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
-from models import Article
+from .models import Article
 
 
 class ModelTest(TestCase):

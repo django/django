@@ -1,6 +1,8 @@
+from __future__ import absolute_import
+
 from django.test import TestCase
 
-from models import A, B, C, D, DataPoint, RelatedPoint
+from .models import A, B, C, D, DataPoint, RelatedPoint
 
 
 class SimpleTest(TestCase):

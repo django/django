@@ -1,10 +1,12 @@
+from __future__ import absolute_import
+
 import StringIO
 
 from django.contrib.sites.models import Site
 from django.core import management
 from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 
-from models import Article, Book, Spy, Tag, Visa
+from .models import Article, Book, Spy, Tag, Visa
 
 
 class TestCaseFixtureLoadingTests(TestCase):

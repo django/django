@@ -1,13 +1,11 @@
-from __future__ import with_statement
+from __future__ import with_statement, absolute_import
 
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
-from django.utils import unittest
 
-from models import (Author, Book, Reader, Qualification, Teacher, Department,
-                    TaggedItem, Bookmark, AuthorAddress, FavoriteAuthors,
-                    AuthorWithAge, BookWithYear, Person, House, Room,
-                    Employee)
+from .models import (Author, Book, Reader, Qualification, Teacher, Department,
+    TaggedItem, Bookmark, AuthorAddress, FavoriteAuthors, AuthorWithAge,
+    BookWithYear, Person, House, Room, Employee)
 
 
 class PrefetchRelatedTests(TestCase):

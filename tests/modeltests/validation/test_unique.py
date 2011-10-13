@@ -1,4 +1,4 @@
-from __future__ import with_statement
+from __future__ import with_statement, absolute_import
 
 import datetime
 
@@ -6,8 +6,9 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import unittest
 
-from models import (CustomPKModel, UniqueTogetherModel, UniqueFieldsModel,
-    UniqueForDateModel, ModelToValidate, Post, FlexibleDatePost, UniqueErrorsModel)
+from .models import (CustomPKModel, UniqueTogetherModel, UniqueFieldsModel,
+    UniqueForDateModel, ModelToValidate, Post, FlexibleDatePost,
+    UniqueErrorsModel)
 
 
 class GetUniqueCheckTests(unittest.TestCase):

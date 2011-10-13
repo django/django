@@ -2,10 +2,12 @@
 Testing signals emitted on changing m2m relations.
 """
 
+from .models import Person
+
 from django.db import models
 from django.test import TestCase
 
-from models import Part, Car, SportsCar, Person
+from .models import Part, Car, SportsCar, Person
 
 
 class ManyToManySignalsTest(TestCase):

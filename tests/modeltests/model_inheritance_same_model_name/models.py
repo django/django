@@ -6,8 +6,11 @@ in the need for an %(app_label)s format string. This app specifically tests
 this feature by redefining the Copy model from model_inheritance/models.py
 """
 
+from __future__ import absolute_import
+
 from django.db import models
-from modeltests.model_inheritance.models import NamedURL
+
+from ..model_inheritance.models import NamedURL
 
 #
 # Abstract base classes with related models

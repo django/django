@@ -2,6 +2,7 @@ from django.db import models
 from django.utils import simplejson as json
 from django.utils.encoding import force_unicode
 
+
 class Small(object):
     """
     A simple class to show that non-trivial Python objects can be used as

@@ -9,6 +9,7 @@ reserved-name usage.
 
 from django.db import models
 
+
 class Thing(models.Model):
     when = models.CharField(max_length=1, primary_key=True)
     join = models.CharField(max_length=1)

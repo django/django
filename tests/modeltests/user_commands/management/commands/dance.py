@@ -1,5 +1,7 @@
 from optparse import make_option
+
 from django.core.management.base import BaseCommand
+
 
 class Command(BaseCommand):
     help = "Dance around like a madman."

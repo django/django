@@ -1,6 +1,10 @@
+from __future__ import absolute_import
+
 from django.conf.urls import patterns
 from django.views.generic import RedirectView
-import views
+
+from . import views
+
 
 urlpatterns = patterns('',
     (r'^get_view/$', views.get_view),

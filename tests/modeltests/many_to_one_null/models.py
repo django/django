@@ -7,6 +7,7 @@ To define a many-to-one relationship that can have a null foreign key, use
 
 from django.db import models
 
+
 class Reporter(models.Model):
     name = models.CharField(max_length=30)
 

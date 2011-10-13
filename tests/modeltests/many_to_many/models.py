@@ -9,6 +9,7 @@ objects, and a ``Publication`` has multiple ``Article`` objects.
 
 from django.db import models
 
+
 class Publication(models.Model):
     title = models.CharField(max_length=30)
 

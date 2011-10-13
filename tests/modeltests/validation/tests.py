@@ -1,18 +1,20 @@
+from __future__ import absolute_import
+
 import warnings
 
 from django import forms
-from django.test import TestCase
 from django.core.exceptions import NON_FIELD_ERRORS
-from modeltests.validation import ValidationTestCase
-from modeltests.validation.models import (Author, Article, ModelToValidate,
-    GenericIPAddressTestModel, GenericIPAddrUnpackUniqueTest)
+from django.test import TestCase
 
+from . import ValidationTestCase
+from .models import (Author, Article, ModelToValidate,
+    GenericIPAddressTestModel, GenericIPAddrUnpackUniqueTest)
 # Import other tests for this package.
-from modeltests.validation.validators import TestModelsWithValidators
-from modeltests.validation.test_unique import (GetUniqueCheckTests,
-    PerformUniqueChecksTest)
-from modeltests.validation.test_custom_messages import CustomMessagesTest
-from modeltests.validation.test_error_messages import ValidationMessagesTest
+from .test_custom_messages import CustomMessagesTest
+from .test_error_messages import ValidationMessagesTest
+from .test_unique import GetUniqueCheckTests, PerformUniqueChecksTest
+from .validators import TestModelsWithValidators
+
 
 class BaseModelValidationTests(ValidationTestCase):
 

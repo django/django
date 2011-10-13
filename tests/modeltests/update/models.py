@@ -5,6 +5,7 @@ updates.
 
 from django.db import models
 
+
 class DataPoint(models.Model):
     name = models.CharField(max_length=20)
     value = models.CharField(max_length=20)

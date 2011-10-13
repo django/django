@@ -1,9 +1,11 @@
+from __future__ import absolute_import
+
 from django import forms
 from django.contrib.contenttypes.generic import generic_inlineformset_factory
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
 
-from models import (TaggedItem, ValuableTaggedItem, Comparison, Animal,
+from .models import (TaggedItem, ValuableTaggedItem, Comparison, Animal,
     Vegetable, Mineral, Gecko)
 
 

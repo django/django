@@ -1,9 +1,12 @@
  # -*- coding: utf-8 -*-
+from __future__ import absolute_import
+
 import datetime
 
 from django.test import TestCase
 
-from models import Article, InternationalArticle
+from .models import Article, InternationalArticle
+
 
 class SimpleTests(TestCase):
     def test_basic(self):

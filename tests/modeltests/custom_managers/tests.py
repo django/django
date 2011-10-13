@@ -1,6 +1,8 @@
+from __future__ import absolute_import
+
 from django.test import TestCase
 
-from models import Person, Book, Car, PersonManager, PublishedBookManager
+from .models import Person, Book, Car, PersonManager, PublishedBookManager
 
 
 class CustomManagerTests(TestCase):

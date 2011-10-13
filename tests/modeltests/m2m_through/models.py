@@ -1,5 +1,7 @@
-from django.db import models
 from datetime import datetime
+
+from django.db import models
+
 
 # M2M described on one of the models
 class Person(models.Model):

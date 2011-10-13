@@ -6,9 +6,12 @@ By default, Django adds an ``"id"`` field to each model. But you can override
 this behavior by explicitly adding ``primary_key=True`` to a field.
 """
 
+from __future__ import absolute_import
+
 from django.db import models
 
-from fields import MyAutoField
+from .fields import MyAutoField
+
 
 class Employee(models.Model):
     employee_code = models.IntegerField(primary_key=True, db_column = 'code')

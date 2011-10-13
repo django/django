@@ -11,6 +11,7 @@ clauses using the variable ``django.db.models.Q`` (or any object with an
 
 from django.db import models
 
+
 class Article(models.Model):
     headline = models.CharField(max_length=50)
     pub_date = models.DateTimeField()

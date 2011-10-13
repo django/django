@@ -1,4 +1,4 @@
-from __future__ import with_statement
+from __future__ import with_statement, absolute_import
 
 import shutil
 import tempfile
@@ -9,7 +9,7 @@ from django.core.files.base import ContentFile
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 
-from models import Storage, temp_storage, temp_storage_location
+from .models import Storage, temp_storage, temp_storage_location
 
 
 class FileTests(TestCase):

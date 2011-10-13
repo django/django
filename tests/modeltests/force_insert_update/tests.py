@@ -1,7 +1,9 @@
+from __future__ import absolute_import
+
 from django.db import transaction, IntegrityError, DatabaseError
 from django.test import TestCase
 
-from models import Counter, WithCustomPK
+from .models import Counter, WithCustomPK
 
 
 class ForceTests(TestCase):

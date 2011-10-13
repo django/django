@@ -9,6 +9,7 @@ Set ``related_name`` to designate what the reverse relationship is called.
 
 from django.db import models
 
+
 class Category(models.Model):
     name = models.CharField(max_length=20)
     class Meta:

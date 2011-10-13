@@ -10,8 +10,10 @@ This example uses ``datetime.datetime.now`` as the default for the ``pub_date``
 field.
 """
 
-from django.db import models
 from datetime import datetime
+
+from django.db import models
+
 
 class Article(models.Model):
     headline = models.CharField(max_length=100, default='Default headline')

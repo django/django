@@ -1,9 +1,9 @@
-from __future__ import with_statement
+from __future__ import with_statement, absolute_import
 
 from django.db import connection, transaction, IntegrityError
 from django.test import TransactionTestCase, skipUnlessDBFeature
 
-from models import Reporter
+from .models import Reporter
 
 
 class TransactionTests(TransactionTestCase):

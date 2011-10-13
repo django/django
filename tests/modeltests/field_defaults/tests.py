@@ -1,8 +1,10 @@
+from __future__ import absolute_import
+
 from datetime import datetime
 
 from django.test import TestCase
 
-from models import Article
+from .models import Article
 
 
 class DefaultTests(TestCase):

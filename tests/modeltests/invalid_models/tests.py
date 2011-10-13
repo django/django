@@ -1,9 +1,9 @@
 import copy
+import sys
+from cStringIO import StringIO
 
 from django.core.management.validation import get_validation_errors
 from django.db.models.loading import cache, load_app
-from cStringIO import StringIO
-import sys
 
 from django.utils import unittest
 

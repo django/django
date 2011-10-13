@@ -1,21 +1,18 @@
-from django.test import TestCase
+from __future__ import with_statement
 
 from django.core.exceptions import ValidationError
+from django.test import TestCase
+
 
 class ValidationTestCase(TestCase):
     def assertFailsValidation(self, clean, failed_fields):
-        self.assertRaises(ValidationError, clean)
-        try:
+        with self.assertRaises(ValidationError) as cm:
             clean()
-        except ValidationError, e:
-            self.assertEqual(sorted(failed_fields), sorted(e.message_dict.keys()))
-    
-    def assertFieldFailsValidationWithMessage(self, clean, field_name, message):
-        self.assertRaises(ValidationError, clean)
-        try:
-            clean()
-        except ValidationError, e:
-            self.assertTrue(field_name in e.message_dict)
-            self.assertEqual(message, e.message_dict[field_name])
+        self.assertEqual(sorted(failed_fields), sorted(cm.exception.message_dict))
 
+    def assertFieldFailsValidationWithMessage(self, clean, field_name, message):
+        with self.assertRaises(ValidationError) as cm:
+            clean()
+        self.assertIn(field_name, cm.exception.message_dict)
+        self.assertEqual(message, cm.exception.message_dict[field_name])
 

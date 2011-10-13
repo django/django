@@ -4,8 +4,10 @@
 Any method you add to a model will be available to instances.
 """
 
-from django.db import models
 import datetime
+
+from django.db import models
+
 
 class Article(models.Model):
     headline = models.CharField(max_length=100)

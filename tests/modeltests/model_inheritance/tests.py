@@ -1,9 +1,11 @@
+from __future__ import absolute_import
+
 from operator import attrgetter
 
 from django.core.exceptions import FieldError
 from django.test import TestCase
 
-from models import (Chef, CommonInfo, ItalianRestaurant, ParkingLot, Place,
+from .models import (Chef, CommonInfo, ItalianRestaurant, ParkingLot, Place,
     Post, Restaurant, Student, StudentWorker, Supplier, Worker, MixinModel)
 
 

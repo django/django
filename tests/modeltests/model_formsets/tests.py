@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 import datetime
 import re
 from datetime import date
@@ -9,12 +11,12 @@ from django.forms.models import (_get_foreign_key, inlineformset_factory,
     modelformset_factory)
 from django.test import TestCase, skipUnlessDBFeature
 
-from modeltests.model_formsets.models import (
-    Author, BetterAuthor, Book, BookWithCustomPK,
+from .models import (Author, BetterAuthor, Book, BookWithCustomPK,
     BookWithOptionalAltEditor, AlternateBook, AuthorMeeting, CustomPrimaryKey,
     Place, Owner, Location, OwnerProfile, Restaurant, Product, Price,
     MexicanRestaurant, ClassyMexicanRestaurant, Repository, Revision,
     Person, Membership, Team, Player, Poet, Poem, Post)
+
 
 class DeletionTests(TestCase):
     def test_deletion(self):

@@ -11,6 +11,7 @@ field. This method returns the "human-readable" value of the field.
 
 from django.db import models
 
+
 GENDER_CHOICES = (
     ('M', 'Male'),
     ('F', 'Female'),
