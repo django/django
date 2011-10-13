@@ -310,7 +310,7 @@ tr.alt {
 /* SORTABLE TABLES */
 
 thead th {
-    padding: 0;
+    padding: 2px 5px;
     line-height: normal;
 }
 
