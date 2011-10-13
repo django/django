@@ -57,12 +57,6 @@ class Serializer(object):
         self.end_serialization()
         return self.getvalue()
 
-    def get_string_value(self, obj, field):
-        """
-        Convert a field's value to a string.
-        """
-        return smart_unicode(field.value_to_string(obj))
-
     def start_serialization(self):
         """
         Called when serializing of the queryset starts.
