@@ -328,6 +328,73 @@ a :class:`~django.forms.fields.GenericIPAddressField` form field and
 the validators :data:`~django.core.validators.validate_ipv46_address` and
 :data:`~django.core.validators.validate_ipv6_address`
 
+Updated default project layout and ``manage.py``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django 1.4 ships with an updated default project layout and ``manage.py`` file
+for the :djadmin:`startproject` management command. These fix some issues with
+the previous ``manage.py`` handling of Python import paths that caused double
+imports, trouble moving from development to deployment, and other
+difficult-to-debug path issues.
+
+The previous ``manage.py`` calls functions that are now deprecated, and thus
+projects upgrading to Django 1.4 should update their ``manage.py``. (The
+old-style ``manage.py`` will continue to work as before until Django 1.6; in
+1.5 it will raise ``DeprecationWarning``).
+
+The new recommended ``manage.py`` file should look like this::
+
+    #!/usr/bin/env python
+    import os, sys
+
+    if __name__ == "__main__":
+        os.environ.setdefault("DJANGO_SETTINGS_MODULE", "{{ project_name }}.settings")
+
+        from django.core.management import execute_from_command_line
+
+        execute_from_command_line(sys.argv)
+
+``{{ project_name }}`` should be replaced with the Python package name of the
+actual project.
+
+If settings, URLconf, and apps within the project are imported or referenced
+using the project-name prefix (e.g. ``myproject.settings``, ``ROOT_URLCONF =
+``myproject.urls``, etc), the new ``manage.py`` will need to be moved one
+directory up, so it is outside the project package rather than adjacent to
+``settings.py`` and ``urls.py``.
+
+For instance, with the following layout::
+
+    manage.py
+    mysite/
+        __init__.py
+        settings.py
+        urls.py
+        myapp/
+            __init__.py
+            models.py
+
+You could import ``mysite.settings``, ``mysite.urls``, and ``mysite.myapp``,
+but not ``settings``, ``urls``, or ``myapp`` as top-level modules.
+
+Anything imported as a top-level module can be placed adjacent to the new
+``manage.py``. For instance, to decouple "myapp" from the project module and
+import it as just ``myapp``, place it outside the ``mysite/`` directory::
+
+    manage.py
+    myapp/
+        __init__.py
+        models.py
+    mysite/
+        __init__.py
+        settings.py
+        urls.py
+
+If the same code is imported inconsistently (some places with the project
+prefix, some places without it), the imports will need to be cleaned up when
+switching to the new ``manage.py``.
+
+
 Minor features
 ~~~~~~~~~~~~~~
 
@@ -729,3 +796,26 @@ The code that powers Databrowse is licensed under the same terms as Django
 itself, and so is available to be adopted by an individual or group as
 a third-party project.
 
+``django.core.management.setup_environ``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This function temporarily modified ``sys.path`` in order to make the parent
+"project" directory importable under the old flat :djadmin:`startproject`
+layout. This function is now deprecated, as its path workarounds are no longer
+needed with the new ``manage.py`` and default project layout.
+
+This function was never documented or public API, but was widely recommended
+for use in setting up a "Django environment" for a user script. These uses
+should be replaced by setting the ``DJANGO_SETTINGS_MODULE`` environment
+variable or using :func:`django.conf.settings.configure`.
+
+``django.core.management.execute_manager``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This function was previously used by ``manage.py`` to execute a management
+command. It is identical to
+``django.core.management.execute_from_command_line``, except that it first
+calls ``setup_environ``, which is now deprecated. ``execute_manager`` is also
+deprecated; ``execute_from_command_line`` can be used instead. (Neither of
+these functions is documented public API, but a deprecation path is needed due
+to use in existing ``manage.py`` files.)

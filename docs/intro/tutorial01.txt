@@ -90,41 +90,58 @@ within your Python installation. Consider symlinking to :doc:`django-admin.py
 Let's look at what :djadmin:`startproject` created::
 
     mysite/
-        __init__.py
         manage.py
-        settings.py
-        urls.py
+        mysite/
+            __init__.py
+            settings.py
+            urls.py
+
+.. admonition:: Doesn't match what you see?
+
+    The default project layout recently changed. If you're seeing a "flat"
+    layout (with no inner :file:`mysite/` directory), you're probably using
+    a version of Django that doesn't match this tutorial version.  You'll
+    want to either switch to the older tutorial or the newer Django version.
 
 These files are:
 
-    * :file:`__init__.py`: An empty file that tells Python that this directory
-      should be considered a Python package. (Read `more about packages`_ in the
-      official Python docs if you're a Python beginner.)
+* The outer :file:`mysite/` directory is just a container for your
+  project. Its name doesn't matter to Django; you can rename it to anything
+  you like.
 
-    * :file:`manage.py`: A command-line utility that lets you interact with this
-      Django project in various ways. You can read all the details about
-      :file:`manage.py` in :doc:`/ref/django-admin`.
+* :file:`manage.py`: A command-line utility that lets you interact with this
+  Django project in various ways. You can read all the details about
+  :file:`manage.py` in :doc:`/ref/django-admin`.
 
-    * :file:`settings.py`: Settings/configuration for this Django project.
-      :doc:`/topics/settings` will tell you all about how settings work.
+* The inner :file:`mysite/` directory is the actual Python package for your
+  project. Its name is the Python package name you'll need to use to import
+  anything inside it (e.g. ``import mysite.settings``).
 
-    * :file:`urls.py`: The URL declarations for this Django project; a "table of
-      contents" of your Django-powered site. You can read more about URLs in
-      :doc:`/topics/http/urls`.
+* :file:`mysite/__init__.py`: An empty file that tells Python that this
+  directory should be considered a Python package. (Read `more about
+  packages`_ in the official Python docs if you're a Python beginner.)
+
+* :file:`mysite/settings.py`: Settings/configuration for this Django
+  project.  :doc:`/topics/settings` will tell you all about how settings
+  work.
+
+* :file:`mysite/urls.py`: The URL declarations for this Django project; a
+  "table of contents" of your Django-powered site. You can read more about
+  URLs in :doc:`/topics/http/urls`.
 
 .. _more about packages: http://docs.python.org/tutorial/modules.html#packages
 
 The development server
 ----------------------
 
-Let's verify this worked. Change into the :file:`mysite` directory, if you
-haven't already, and run the command ``python manage.py runserver``. You'll see
-the following output on the command line::
+Let's verify this worked. Change into the outer :file:`mysite` directory, if
+you haven't already, and run the command ``python manage.py runserver``. You'll
+see the following output on the command line::
 
     Validating models...
     0 errors found.
 
-    Django version 1.0, using settings 'mysite.settings'
+    Django version 1.4, using settings 'mysite.settings'
     Development server is running at http://127.0.0.1:8000/
     Quit the server with CONTROL-C.
 
@@ -168,7 +185,7 @@ It worked!
 Database setup
 --------------
 
-Now, edit :file:`settings.py`. It's a normal Python module with
+Now, edit :file:`mysite/settings.py`. It's a normal Python module with
 module-level variables representing Django settings. Change the
 following keys in the :setting:`DATABASES` ``'default'`` item to match
 your databases connection settings.
@@ -286,10 +303,11 @@ so you can focus on writing code rather than creating directories.
     multiple apps. An app can be in multiple projects.
 
 Your apps can live anywhere on your `Python path`_. In this tutorial, we'll
-create our poll app in the :file:`mysite` directory for simplicity.
+create our poll app right next to your :file:`manage.py` file so that it can be
+imported as its own top-level module, rather than a submodule of ``mysite``.
 
-To create your app, make sure you're in the :file:`mysite` directory and type
-this command:
+To create your app, make sure you're in the same directory as :file:`manage.py`
+and type this command:
 
 .. code-block:: bash
 
@@ -499,27 +517,16 @@ API Django gives you. To invoke the Python shell, use this command:
 
     python manage.py shell
 
-We're using this instead of simply typing "python", because ``manage.py`` sets
-up the project's environment for you. "Setting up the environment" involves two
-things:
-
-    * Putting ``polls`` on ``sys.path``. For flexibility, several pieces of
-      Django refer to projects in Python dotted-path notation (e.g.
-      ``'polls.models'``). In order for this to work, the ``polls``
-      package has to be on ``sys.path``.
-
-      We've already seen one example of this: the :setting:`INSTALLED_APPS`
-      setting is a list of packages in dotted-path notation.
-
-    * Setting the ``DJANGO_SETTINGS_MODULE`` environment variable, which gives
-      Django the path to your ``settings.py`` file.
+We're using this instead of simply typing "python", because :file:`manage.py`
+sets the ``DJANGO_SETTINGS_MODULE`` environment variable, which gives Django
+the Python import path to your :file:`settings.py` file.
 
 .. admonition:: Bypassing manage.py
 
-    If you'd rather not use ``manage.py``, no problem. Just make sure ``mysite``
-    and ``polls`` are at the root level on the Python path (i.e., ``import mysite``
-    and ``import polls`` work) and set the ``DJANGO_SETTINGS_MODULE`` environment
-    variable to ``mysite.settings``.
+    If you'd rather not use :file:`manage.py`, no problem. Just set the
+    ``DJANGO_SETTINGS_MODULE`` environment variable to ``mysite.settings`` and
+    run ``python`` from the same directory :file:`manage.py` is in (or ensure
+    that directory is on the Python path, so that ``import mysite`` works).
 
     For more information on all of this, see the :doc:`django-admin.py
     documentation </ref/django-admin>`.

@@ -2,6 +2,7 @@ import os
 import sys
 from optparse import OptionParser, NO_DEFAULT
 import imp
+import warnings
 
 import django
 from django.core.management.base import BaseCommand, CommandError, handle_default_options
@@ -102,14 +103,6 @@ def get_commands():
         except (AttributeError, EnvironmentError, ImportError):
             apps = []
 
-        # Find the project directory
-        try:
-            from django.conf import settings
-            module = import_module(settings.SETTINGS_MODULE)
-            project_directory = setup_environ(module, settings.SETTINGS_MODULE)
-        except (AttributeError, EnvironmentError, ImportError, KeyError):
-            project_directory = None
-
         # Find and load the management module for each installed app.
         for app_name in apps:
             try:
@@ -118,17 +111,6 @@ def get_commands():
                                        for name in find_commands(path)]))
             except ImportError:
                 pass # No management module - ignore this app
-
-        if project_directory:
-            # Remove the "startproject" command from self.commands, because
-            # that's a django-admin.py command, not a manage.py command.
-            del _commands['startproject']
-
-            # Override the startapp command so that it always uses the
-            # project_directory, not the current working directory
-            # (which is default).
-            from django.core.management.commands.startapp import ProjectCommand
-            _commands['startapp'] = ProjectCommand(project_directory)
 
     return _commands
 
@@ -388,6 +370,13 @@ def setup_environ(settings_mod, original_settings_path=None):
     The "original_settings_path" parameter is optional, but recommended, since
     trying to work out the original path from the module can be problematic.
     """
+    warnings.warn(
+        "The 'setup_environ' function is deprecated, "
+        "you likely need to update your 'manage.py'; "
+        "please see the Django 1.4 release notes "
+        "(https://docs.djangoproject.com/en/dev/releases/1.4/).",
+        PendingDeprecationWarning)
+
     # Add this project to sys.path so that it's importable in the conventional
     # way. For example, if this file (manage.py) lives in a directory
     # "myproject", this code would add "/path/to/myproject" to sys.path.
@@ -437,6 +426,13 @@ def execute_manager(settings_mod, argv=None):
     Like execute_from_command_line(), but for use by manage.py, a
     project-specific django-admin.py utility.
     """
+    warnings.warn(
+        "The 'execute_manager' function is deprecated, "
+        "you likely need to update your 'manage.py'; "
+        "please see the Django 1.4 release notes "
+        "(https://docs.djangoproject.com/en/dev/releases/1.4/).",
+        PendingDeprecationWarning)
+
     setup_environ(settings_mod)
     utility = ManagementUtility(argv)
     utility.execute()

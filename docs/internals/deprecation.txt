@@ -246,6 +246,11 @@ these changes.
 
     * The Databrowse contrib module will be removed.
 
+    * The functions :func:`~django.core.management.setup_environ` and
+      :func:`~django.core.management.execute_manager` will be removed from
+      :mod:`django.core.management`. This also means that the old (pre-1.4)
+      style of :file:`manage.py` file will no longer work.
+
 2.0
 ---
 

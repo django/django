@@ -15,8 +15,6 @@ class Command(LabelCommand):
     can_import_settings = False
 
     def handle_label(self, project_name, **options):
-        # Determine the project_name a bit naively -- by looking at the name of
-        # the parent directory.
         directory = os.getcwd()
 
         # Check that the project_name cannot be imported.
@@ -30,7 +28,7 @@ class Command(LabelCommand):
         copy_helper(self.style, 'project', project_name, directory)
 
         # Create a random SECRET_KEY hash, and put it in the main settings.
-        main_settings_file = os.path.join(directory, project_name, 'settings.py')
+        main_settings_file = os.path.join(directory, project_name, project_name, 'settings.py')
         settings_contents = open(main_settings_file, 'r').read()
         fp = open(main_settings_file, 'w')
         secret_key = ''.join([choice('abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)') for i in range(50)])
