@@ -1289,10 +1289,14 @@ The :doc:`staticfiles app </ref/contrib/staticfiles>` prepends
 definitions on forms <form-media-paths>`.
 
 Django admin Javascript makes use of the `jQuery`_ library. To avoid
-conflict with user scripts, Django's jQuery is namespaced as
-``django.jQuery``. If you want to use jQuery in your own admin
-JavaScript without including a second copy, you can use the
-``django.jQuery`` object on changelist and add/edit views.
+conflicts with user-supplied scripts or libraries, Django's jQuery is
+namespaced as ``django.jQuery``. If you want to use jQuery in your own admin
+JavaScript without including a second copy, you can use the ``django.jQuery``
+object on changelist and add/edit views.
+
+If you require the jQuery library to be in the global namespace, for example
+when using third-party jQuery plugins, or need a newer version of jQuery, you
+will have to include your own copy of jQuery.
 
 .. _jQuery: http://jquery.com
 
