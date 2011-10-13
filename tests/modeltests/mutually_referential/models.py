@@ -4,16 +4,17 @@
 Strings can be used instead of model literals to set up "lazy" relations.
 """
 
-from django.db.models import *
+from django.db import models
 
-class Parent(Model):
-    name = CharField(max_length=100)
+
+class Parent(models.Model):
+    name = models.CharField(max_length=100)
 
     # Use a simple string for forward declarations.
-    bestchild = ForeignKey("Child", null=True, related_name="favoured_by")
+    bestchild = models.ForeignKey("Child", null=True, related_name="favoured_by")
 
-class Child(Model):
-    name = CharField(max_length=100)
+class Child(models.Model):
+    name = models.CharField(max_length=100)
 
     # You can also explicitally specify the related app.
-    parent = ForeignKey("mutually_referential.Parent")
+    parent = models.ForeignKey("mutually_referential.Parent")

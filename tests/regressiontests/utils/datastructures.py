@@ -6,7 +6,8 @@ import copy
 import pickle
 
 from django.test import SimpleTestCase
-from django.utils.datastructures import *
+from django.utils.datastructures import (DictWrapper, DotExpandedDict,
+    ImmutableList, MultiValueDict, MultiValueDictKeyError, MergeDict, SortedDict)
 
 
 class SortedDictTests(SimpleTestCase):

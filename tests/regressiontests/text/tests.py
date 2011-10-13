@@ -1,11 +1,12 @@
 # coding: utf-8
 from __future__ import with_statement
-from django.test import TestCase
 
-from django.utils.text import *
-from django.utils.http import urlquote, urlquote_plus, cookie_date, http_date
+from django.test import TestCase
 from django.utils.encoding import iri_to_uri
+from django.utils.http import urlquote, urlquote_plus, cookie_date, http_date
+from django.utils.text import get_text_list, smart_split
 from django.utils.translation import override
+
 
 class TextTests(TestCase):
     """
