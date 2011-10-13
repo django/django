@@ -805,7 +805,8 @@ this as a ``<select>`` box with "Unknown", "Yes" and "No" choices.
 
 .. class:: PositiveIntegerField([**options])
 
-Like an :class:`IntegerField`, but must be positive.
+Like an :class:`IntegerField`, but must be either positive or zero (`0`).
+The value `0` is accepted for backward compatibility reasons.
 
 ``PositiveSmallIntegerField``
 -----------------------------
