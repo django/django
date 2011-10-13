@@ -49,11 +49,6 @@ language. Message files have a ``.po`` file extension.
 Django comes with a tool, ``django-admin.py makemessages``, that automates the
 creation and upkeep of these files.
 
-.. admonition:: A note to Django veterans
-
-    The old tool ``bin/make-messages.py`` has been moved to the command
-    ``django-admin.py makemessages`` to provide consistency throughout Django.
-
 .. admonition:: Gettext utilities
 
     The ``makemessages`` command (and ``compilemessages`` discussed later) use
@@ -179,12 +174,6 @@ compilemessages`` like this::
 
 That's it. Your translations are ready for use.
 
-.. admonition:: A note to Django veterans
-
-    The old tool ``bin/compile-messages.py`` has been moved to the command
-    ``django-admin.py compilemessages`` to provide consistency throughout
-    Django.
-
 .. admonition:: Working on Windows?
 
    If you're using Windows and need to install the GNU gettext utilities so
@@ -202,9 +191,11 @@ That's it. Your translations are ready for use.
 Creating message files from JavaScript source code
 ==================================================
 
-You create and update the message files the same way as the other Django message
-files -- with the ``django-admin.py makemessages`` tool. The only difference is
-you need to provide a ``-d djangojs`` parameter, like this::
+You create and update the message files the same way as the other Django
+message files -- with the ``django-admin.py makemessages`` tool. The only
+difference is you need to explicitly specify what in gettext parlance is known
+as a domain in this case the ``djangojs`` domain, by providing a ``-d djangojs``
+parameter, like this::
 
     django-admin.py makemessages -d djangojs -l de
 
