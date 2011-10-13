@@ -12,7 +12,7 @@ from modeltests.validation.validators import TestModelsWithValidators
 from modeltests.validation.test_unique import (GetUniqueCheckTests,
     PerformUniqueChecksTest)
 from modeltests.validation.test_custom_messages import CustomMessagesTest
-
+from modeltests.validation.test_error_messages import ValidationMessagesTest
 
 class BaseModelValidationTests(ValidationTestCase):
 
