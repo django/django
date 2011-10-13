@@ -57,7 +57,9 @@ class LocalTimezone(tzinfo):
             return None
 
     def _isdst(self, dt):
-        tt = (dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second, dt.weekday(), 0, -1)
+        tt = (dt.year, dt.month, dt.day,
+              dt.hour, dt.minute, dt.second,
+              dt.weekday(), 0, 0)
         try:
             stamp = time.mktime(tt)
         except (OverflowError, ValueError):
