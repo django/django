@@ -77,6 +77,19 @@ http://127.0.0.1:8000/admin/. You should see the admin's login screen:
 .. image:: _images/admin01.png
    :alt: Django admin login screen
 
+.. admonition:: Doesn't match what you see?
+
+    If at this point, instead of the above login page, you get an error
+    page reporting something like::
+
+        ImportError at /admin/
+        cannot import name patterns
+        ...
+
+    then you're probably using a version of Django that doesn't match this
+    tutorial version. You'll want to either switch to the older tutorial or the
+    newer Django version.
+
 Enter the admin site
 ====================
 
