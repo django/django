@@ -864,7 +864,7 @@ DEFAULT_INDEX_TABLESPACE
 Default: ``''`` (Empty string)
 
 Default tablespace to use for indexes on fields that don't specify
-one, if the backend supports it.
+one, if the backend supports it (see :doc:`/topics/db/tablespaces`).
 
 .. setting:: DEFAULT_TABLESPACE
 
@@ -874,7 +874,7 @@ DEFAULT_TABLESPACE
 Default: ``''`` (Empty string)
 
 Default tablespace to use for models that don't specify one, if the
-backend supports it.
+backend supports it (see :doc:`/topics/db/tablespaces`).
 
 .. setting:: DISALLOWED_USER_AGENTS
 

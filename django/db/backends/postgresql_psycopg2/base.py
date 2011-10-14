@@ -75,7 +75,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     has_select_for_update = True
     has_select_for_update_nowait = True
     has_bulk_insert = True
-
+    supports_tablespaces = True
 
 class DatabaseWrapper(BaseDatabaseWrapper):
     vendor = 'postgresql'

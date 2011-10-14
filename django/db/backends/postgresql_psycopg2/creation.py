@@ -44,11 +44,9 @@ class DatabaseCreation(BaseDatabaseCreation):
             db_table = model._meta.db_table
             tablespace = f.db_tablespace or model._meta.db_tablespace
             if tablespace:
-                sql = self.connection.ops.tablespace_sql(tablespace)
-                if sql:
-                    tablespace_sql = ' ' + sql
-                else:
-                    tablespace_sql = ''
+                tablespace_sql = self.connection.ops.tablespace_sql(tablespace)
+                if tablespace_sql:
+                    tablespace_sql = ' ' + tablespace_sql
             else:
                 tablespace_sql = ''
 

@@ -79,6 +79,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     can_defer_constraint_checks = True
     ignores_nulls_in_unique_constraints = False
     has_bulk_insert = True
+    supports_tablespaces = True
 
 class DatabaseOperations(BaseDatabaseOperations):
     compiler_module = "django.db.backends.oracle.compiler"
@@ -326,8 +327,10 @@ WHEN (new.%(col_name)s IS NULL)
         return ''
 
     def tablespace_sql(self, tablespace, inline=False):
-        return "%sTABLESPACE %s" % ((inline and "USING INDEX " or ""),
-            self.quote_name(tablespace))
+        if inline:
+            return "USING INDEX TABLESPACE %s" % self.quote_name(tablespace)
+        else:
+            return "TABLESPACE %s" % self.quote_name(tablespace)
 
     def value_to_db_datetime(self, value):
         # Oracle doesn't support tz-aware datetimes

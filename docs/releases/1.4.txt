@@ -405,6 +405,8 @@ Django 1.4 also includes several smaller improvements worth noting:
   code are slightly emphasized. This change makes it easier to scan a stacktrace
   for issues in user code.
 
+* :doc:`Tablespace support </topics/db/tablespaces>` in PostgreSQL.
+
 * Customizable names for :meth:`~django.template.Library.simple_tag`.
 
 * In the documentation, a helpful :doc:`security overview </topics/security>`

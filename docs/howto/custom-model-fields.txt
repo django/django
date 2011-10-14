@@ -219,9 +219,9 @@ parameters:
 * :attr:`~django.db.models.Field.choices`
 * :attr:`~django.db.models.Field.help_text`
 * :attr:`~django.db.models.Field.db_column`
-* :attr:`~django.db.models.Field.db_tablespace`: Currently only used with
-  the Oracle backend and only for index creation. You can usually ignore
-  this option.
+* :attr:`~django.db.models.Field.db_tablespace`: Only for index creation, if the
+  backend supports :doc:`tablespaces </topics/db/tablespaces>`. You can usually
+  ignore this option.
 * :attr:`~django.db.models.Field.auto_created`: True if the field was
   automatically created, as for the `OneToOneField` used by model
   inheritance. For advanced use only.

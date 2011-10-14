@@ -17,4 +17,5 @@ model maps to a single database table.
    sql
    transactions
    multi-db
+   tablespaces
    optimization

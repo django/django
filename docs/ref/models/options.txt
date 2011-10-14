@@ -73,8 +73,10 @@ Django quotes column and table names behind the scenes.
 
 .. attribute:: Options.db_tablespace
 
-    The name of the database tablespace to use for the model. If the backend
-    doesn't support tablespaces, this option is ignored.
+    The name of the :doc:`database tablespace </topics/db/tablespaces>` to use
+    for this model. The default is the project's :setting:`DEFAULT_TABLESPACE`
+    setting, if set. If the backend doesn't support tablespaces, this option is
+    ignored.
 
 ``get_latest_by``
 -----------------

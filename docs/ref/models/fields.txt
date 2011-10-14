@@ -178,10 +178,11 @@ If ``True``, djadmin:`django-admin.py sqlindexes <sqlindexes>` will output a
 
 .. attribute:: Field.db_tablespace
 
-The name of the database tablespace to use for this field's index, if this field
-is indexed. The default is the project's :setting:`DEFAULT_INDEX_TABLESPACE`
-setting, if set, or the :attr:`~Field.db_tablespace` of the model, if any. If
-the backend doesn't support tablespaces, this option is ignored.
+The name of the :doc:`database tablespace </topics/db/tablespaces>` to use for
+this field's index, if this field is indexed. The default is the project's
+:setting:`DEFAULT_INDEX_TABLESPACE` setting, if set, or the
+:attr:`~Options.db_tablespace` of the model, if any. If the backend doesn't
+support tablespaces for indexes, this option is ignored.
 
 ``default``
 -----------

@@ -57,7 +57,9 @@ class BaseDatabaseCreation(object):
             if tablespace and f.unique:
                 # We must specify the index tablespace inline, because we
                 # won't be generating a CREATE INDEX statement for this field.
-                field_output.append(self.connection.ops.tablespace_sql(tablespace, inline=True))
+                tablespace_sql = self.connection.ops.tablespace_sql(tablespace, inline=True)
+                if tablespace_sql:
+                    field_output.append(tablespace_sql)
             if f.rel:
                 ref_output, pending = self.sql_for_inline_foreign_key_references(f, known_models, style)
                 if pending:
@@ -74,7 +76,9 @@ class BaseDatabaseCreation(object):
             full_statement.append('    %s%s' % (line, i < len(table_output)-1 and ',' or ''))
         full_statement.append(')')
         if opts.db_tablespace:
-            full_statement.append(self.connection.ops.tablespace_sql(opts.db_tablespace))
+            tablespace_sql = self.connection.ops.tablespace_sql(opts.db_tablespace)
+            if tablespace_sql:
+                full_statement.append(tablespace_sql)
         full_statement.append(';')
         final_output.append('\n'.join(full_statement))
 
@@ -149,11 +153,9 @@ class BaseDatabaseCreation(object):
             qn = self.connection.ops.quote_name
             tablespace = f.db_tablespace or model._meta.db_tablespace
             if tablespace:
-                sql = self.connection.ops.tablespace_sql(tablespace)
-                if sql:
-                    tablespace_sql = ' ' + sql
-                else:
-                    tablespace_sql = ''
+                tablespace_sql = self.connection.ops.tablespace_sql(tablespace)
+                if tablespace_sql:
+                    tablespace_sql = ' ' + tablespace_sql
             else:
                 tablespace_sql = ''
             i_name = '%s_%s' % (model._meta.db_table, self._digest(f.column))

@@ -1078,6 +1078,7 @@ def create_many_to_many_intermediary_model(field, klass):
         'managed': managed,
         'auto_created': klass,
         'app_label': klass._meta.app_label,
+        'db_tablespace': klass._meta.db_tablespace,
         'unique_together': (from_, to),
         'verbose_name': '%(from)s-%(to)s relationship' % {'from': from_, 'to': to},
         'verbose_name_plural': '%(from)s-%(to)s relationships' % {'from': from_, 'to': to},
@@ -1086,8 +1087,8 @@ def create_many_to_many_intermediary_model(field, klass):
     return type(name, (models.Model,), {
         'Meta': meta,
         '__module__': klass.__module__,
-        from_: models.ForeignKey(klass, related_name='%s+' % name),
-        to: models.ForeignKey(to_model, related_name='%s+' % name)
+        from_: models.ForeignKey(klass, related_name='%s+' % name, db_tablespace=field.db_tablespace),
+        to: models.ForeignKey(to_model, related_name='%s+' % name, db_tablespace=field.db_tablespace)
     })
 
 class ManyToManyField(RelatedField, Field):

@@ -365,6 +365,10 @@ class BaseDatabaseFeatures(object):
     # date_interval_sql can properly handle mixed Date/DateTime fields and timedeltas
     supports_mixed_date_datetime_comparisons = True
 
+    # Does the backend support tablespaces? Default to False because it isn't
+    # in the SQL standard.
+    supports_tablespaces = False
+
     # Features that need to be confirmed at runtime
     # Cache whether the confirmation has been performed.
     _confirmed = False
@@ -696,8 +700,12 @@ class BaseDatabaseOperations(object):
 
     def tablespace_sql(self, tablespace, inline=False):
         """
-        Returns the SQL that will be appended to tables or rows to define
-        a tablespace. Returns '' if the backend doesn't use tablespaces.
+        Returns the SQL that will be used in a query to define the tablespace.
+
+        Returns '' if the backend doesn't support tablespaces.
+
+        If inline is True, the SQL is appended to a row; otherwise it's appended
+        to the entire CREATE TABLE or CREATE INDEX statement.
         """
         return ''
 
