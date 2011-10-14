@@ -35,43 +35,43 @@ How the documentation is organized
 Django's main documentation is broken up into "chunks" designed to fill
 different needs:
 
-    * The :doc:`introductory material </intro/index>` is designed for people new
-      to Django -- or to Web development in general. It doesn't cover anything
-      in depth, but instead gives a high-level overview of how developing in
-      Django "feels".
+* The :doc:`introductory material </intro/index>` is designed for people new
+  to Django -- or to Web development in general. It doesn't cover anything
+  in depth, but instead gives a high-level overview of how developing in
+  Django "feels".
 
-    * The :doc:`topic guides </topics/index>`, on the other hand, dive deep into
-      individual parts of Django. There are complete guides to Django's
-      :doc:`model system </topics/db/index>`, :doc:`template engine
-      </topics/templates>`, :doc:`forms framework </topics/forms/index>`, and much
-      more.
+* The :doc:`topic guides </topics/index>`, on the other hand, dive deep into
+  individual parts of Django. There are complete guides to Django's
+  :doc:`model system </topics/db/index>`, :doc:`template engine
+  </topics/templates>`, :doc:`forms framework </topics/forms/index>`, and much
+  more.
 
-      This is probably where you'll want to spend most of your time; if you work
-      your way through these guides you should come out knowing pretty much
-      everything there is to know about Django.
+  This is probably where you'll want to spend most of your time; if you work
+  your way through these guides you should come out knowing pretty much
+  everything there is to know about Django.
 
-    * Web development is often broad, not deep -- problems span many domains.
-      We've written a set of :doc:`how-to guides </howto/index>` that answer
-      common "How do I ...?" questions. Here you'll find information about
-      :doc:`generating PDFs with Django </howto/outputting-pdf>`, :doc:`writing
-      custom template tags </howto/custom-template-tags>`, and more.
+* Web development is often broad, not deep -- problems span many domains.
+  We've written a set of :doc:`how-to guides </howto/index>` that answer
+  common "How do I ...?" questions. Here you'll find information about
+  :doc:`generating PDFs with Django </howto/outputting-pdf>`, :doc:`writing
+  custom template tags </howto/custom-template-tags>`, and more.
 
-      Answers to really common questions can also be found in the :doc:`FAQ
-      </faq/index>`.
+  Answers to really common questions can also be found in the :doc:`FAQ
+  </faq/index>`.
 
-    * The guides and how-to's don't cover every single class, function, and
-      method available in Django -- that would be overwhelming when you're
-      trying to learn. Instead, details about individual classes, functions,
-      methods, and modules are kept in the :doc:`reference </ref/index>`. This is
-      where you'll turn to find the details of a particular function or
-      whathaveyou.
+* The guides and how-to's don't cover every single class, function, and
+  method available in Django -- that would be overwhelming when you're
+  trying to learn. Instead, details about individual classes, functions,
+  methods, and modules are kept in the :doc:`reference </ref/index>`. This is
+  where you'll turn to find the details of a particular function or
+  whathaveyou.
 
-    * Finally, there's some "specialized" documentation not usually relevant to
-      most developers. This includes the :doc:`release notes </releases/index>`,
-      :doc:`documentation of obsolete features </obsolete/index>`,
-      :doc:`internals documentation </internals/index>` for those who want to add
-      code to Django itself, and a :doc:`few other things that simply don't fit
-      elsewhere </misc/index>`.
+* Finally, there's some "specialized" documentation not usually relevant to
+  most developers. This includes the :doc:`release notes </releases/index>`,
+  :doc:`documentation of obsolete features </obsolete/index>`,
+  :doc:`internals documentation </internals/index>` for those who want to add
+  code to Django itself, and a :doc:`few other things that simply don't fit
+  elsewhere </misc/index>`.
 
 
 How documentation is updated
@@ -81,16 +81,16 @@ Just as the Django code base is developed and improved on a daily basis, our
 documentation is consistently improving. We improve documentation for several
 reasons:
 
-    * To make content fixes, such as grammar/typo corrections.
+* To make content fixes, such as grammar/typo corrections.
 
-    * To add information and/or examples to existing sections that need to be
-      expanded.
+* To add information and/or examples to existing sections that need to be
+  expanded.
 
-    * To document Django features that aren't yet documented. (The list of
-      such features is shrinking but exists nonetheless.)
+* To document Django features that aren't yet documented. (The list of
+  such features is shrinking but exists nonetheless.)
 
-    * To add documentation for new features as new features get added, or as
-      Django APIs or behaviors change.
+* To add documentation for new features as new features get added, or as
+  Django APIs or behaviors change.
 
 Django's documentation is kept in the same source control system as its code. It
 lives in the `django/trunk/docs`_ directory of our Subversion repository. Each
@@ -164,33 +164,33 @@ As HTML, locally
 
 You can get a local copy of the HTML documentation following a few easy steps:
 
-    * Django's documentation uses a system called Sphinx__ to convert from
-      plain text to HTML. You'll need to install Sphinx by either downloading
-      and installing the package from the Sphinx Web site, or by Python's
-      ``easy_install``:
+* Django's documentation uses a system called Sphinx__ to convert from
+  plain text to HTML. You'll need to install Sphinx by either downloading
+  and installing the package from the Sphinx Web site, or by Python's
+  ``easy_install``:
 
-      .. code-block:: bash
+  .. code-block:: bash
 
-            $ easy_install Sphinx
+        $ easy_install Sphinx
 
-    * Then, just use the included ``Makefile`` to turn the documentation into
-      HTML:
+* Then, just use the included ``Makefile`` to turn the documentation into
+  HTML:
 
-      .. code-block:: bash
+  .. code-block:: bash
 
-            $ cd path/to/django/docs
-            $ make html
+        $ cd path/to/django/docs
+        $ make html
 
-      You'll need `GNU Make`__ installed for this.
+  You'll need `GNU Make`__ installed for this.
 
-      If you're on Windows you can alternatively use the included batch file:
+  If you're on Windows you can alternatively use the included batch file:
 
-      .. code-block:: bat
+  .. code-block:: bat
 
-            cd path\to\django\docs
-            make.bat html
+        cd path\to\django\docs
+        make.bat html
 
-    * The HTML documentation will be placed in ``docs/_build/html``.
+* The HTML documentation will be placed in ``docs/_build/html``.
 
 .. note::
 
@@ -212,27 +212,27 @@ versions of the framework.
 
 We follow this policy:
 
-    * The primary documentation on djangoproject.com is an HTML version of the
-      latest docs in Subversion. These docs always correspond to the latest
-      official Django release, plus whatever features we've added/changed in
-      the framework *since* the latest release.
+* The primary documentation on djangoproject.com is an HTML version of the
+  latest docs in Subversion. These docs always correspond to the latest
+  official Django release, plus whatever features we've added/changed in
+  the framework *since* the latest release.
 
-    * As we add features to Django's development version, we try to update the
-      documentation in the same Subversion commit transaction.
+* As we add features to Django's development version, we try to update the
+  documentation in the same Subversion commit transaction.
 
-    * To distinguish feature changes/additions in the docs, we use the phrase:
-      "New in version X.Y", being X.Y the next release version (hence, the one
-      being developed).
+* To distinguish feature changes/additions in the docs, we use the phrase:
+  "New in version X.Y", being X.Y the next release version (hence, the one
+  being developed).
 
-    * Documentation for a particular Django release is frozen once the version
-      has been released officially. It remains a snapshot of the docs as of the
-      moment of the release. We will make exceptions to this rule in
-      the case of retroactive security updates or other such retroactive
-      changes. Once documentation is frozen, we add a note to the top of each
-      frozen document that says "These docs are frozen for Django version XXX"
-      and links to the current version of that document.
+* Documentation for a particular Django release is frozen once the version
+  has been released officially. It remains a snapshot of the docs as of the
+  moment of the release. We will make exceptions to this rule in
+  the case of retroactive security updates or other such retroactive
+  changes. Once documentation is frozen, we add a note to the top of each
+  frozen document that says "These docs are frozen for Django version XXX"
+  and links to the current version of that document.
 
-    * The `main documentation Web page`_ includes links to documentation for
-      all previous versions.
+* The `main documentation Web page`_ includes links to documentation for
+  all previous versions.
 
 .. _main documentation Web page: http://docs.djangoproject.com/en/dev/

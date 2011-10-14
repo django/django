@@ -22,23 +22,23 @@ Quick start guide
 
 To get started using the ``comments`` app, follow these steps:
 
-    #. Install the comments framework by adding ``'django.contrib.comments'`` to
-       :setting:`INSTALLED_APPS`.
+#. Install the comments framework by adding ``'django.contrib.comments'`` to
+   :setting:`INSTALLED_APPS`.
 
-    #. Run ``manage.py syncdb`` so that Django will create the comment tables.
+#. Run ``manage.py syncdb`` so that Django will create the comment tables.
 
-    #. Add the comment app's URLs to your project's ``urls.py``:
+#. Add the comment app's URLs to your project's ``urls.py``:
 
-       .. code-block:: python
+   .. code-block:: python
 
-            urlpatterns = patterns('',
-                ...
-                (r'^comments/', include('django.contrib.comments.urls')),
-                ...
-            )
+        urlpatterns = patterns('',
+            ...
+            (r'^comments/', include('django.contrib.comments.urls')),
+            ...
+        )
 
-    #. Use the `comment template tags`_ below to embed comments in your
-       templates.
+#. Use the `comment template tags`_ below to embed comments in your
+   templates.
 
 You might also want to examine :doc:`/ref/contrib/comments/settings`.
 
@@ -62,25 +62,25 @@ Django's comments are all "attached" to some parent object. This can be any
 instance of a Django model. Each of the tags below gives you a couple of
 different ways you can specify which object to attach to:
 
-    #. Refer to the object directly -- the more common method. Most of the
-       time, you'll have some object in the template's context you want
-       to attach the comment to; you can simply use that object.
+#. Refer to the object directly -- the more common method. Most of the
+   time, you'll have some object in the template's context you want
+   to attach the comment to; you can simply use that object.
 
-       For example, in a blog entry page that has a variable named ``entry``,
-       you could use the following to load the number of comments::
+   For example, in a blog entry page that has a variable named ``entry``,
+   you could use the following to load the number of comments::
 
-            {% get_comment_count for entry as comment_count %}.
+        {% get_comment_count for entry as comment_count %}.
 
-    #. Refer to the object by content-type and object id. You'd use this method
-       if you, for some reason, don't actually have direct access to the object.
+#. Refer to the object by content-type and object id. You'd use this method
+   if you, for some reason, don't actually have direct access to the object.
 
-       Following the above example, if you knew the object ID was ``14`` but
-       didn't have access to the actual object, you could do something like::
+   Following the above example, if you knew the object ID was ``14`` but
+   didn't have access to the actual object, you could do something like::
 
-            {% get_comment_count for blog.entry 14 as comment_count %}
+        {% get_comment_count for blog.entry 14 as comment_count %}
 
-       In the above, ``blog.entry`` is the app label and (lower-cased) model
-       name of the model class.
+   In the above, ``blog.entry`` is the app label and (lower-cased) model
+   name of the model class.
 
 Displaying comments
 -------------------
@@ -262,25 +262,25 @@ Notes on the comment form
 The form used by the comment system has a few important anti-spam attributes you
 should know about:
 
-    * It contains a number of hidden fields that contain timestamps, information
-      about the object the comment should be attached to, and a "security hash"
-      used to validate this information. If someone tampers with this data --
-      something comment spammers will try -- the comment submission will fail.
+* It contains a number of hidden fields that contain timestamps, information
+  about the object the comment should be attached to, and a "security hash"
+  used to validate this information. If someone tampers with this data --
+  something comment spammers will try -- the comment submission will fail.
 
-      If you're rendering a custom comment form, you'll need to make sure to
-      pass these values through unchanged.
+  If you're rendering a custom comment form, you'll need to make sure to
+  pass these values through unchanged.
 
-    * The timestamp is used to ensure that "reply attacks" can't continue very
-      long. Users who wait too long between requesting the form and posting a
-      comment will have their submissions refused.
+* The timestamp is used to ensure that "reply attacks" can't continue very
+  long. Users who wait too long between requesting the form and posting a
+  comment will have their submissions refused.
 
-    * The comment form includes a "honeypot_" field. It's a trap: if any data is
-      entered in that field, the comment will be considered spam (spammers often
-      automatically fill in all fields in an attempt to make valid submissions).
+* The comment form includes a "honeypot_" field. It's a trap: if any data is
+  entered in that field, the comment will be considered spam (spammers often
+  automatically fill in all fields in an attempt to make valid submissions).
 
-      The default form hides this field with a piece of CSS and further labels
-      it with a warning field; if you use the comment form with a custom
-      template you should be sure to do the same.
+  The default form hides this field with a piece of CSS and further labels
+  it with a warning field; if you use the comment form with a custom
+  template you should be sure to do the same.
 
 The comments app also depends on the more general :doc:`Cross Site Request
 Forgery protection </ref/contrib/csrf>` that comes with Django.  As described in

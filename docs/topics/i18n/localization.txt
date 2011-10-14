@@ -70,8 +70,8 @@ German.
 
 The script should be run from one of two places:
 
-    * The root directory of your Django project.
-    * The root directory of your Django app.
+* The root directory of your Django project.
+* The root directory of your Django app.
 
 The script runs over your project source tree or your application source tree
 and pulls out all strings marked for translation. It creates (or updates) a
@@ -128,14 +128,14 @@ containing the following snippet -- a message::
 
 A quick explanation:
 
-    * ``msgid`` is the translation string, which appears in the source. Don't
-      change it.
-    * ``msgstr`` is where you put the language-specific translation. It starts
-      out empty, so it's your responsibility to change it. Make sure you keep
-      the quotes around your translation.
-    * As a convenience, each message includes, in the form of a comment line
-      prefixed with ``#`` and located above the ``msgid`` line, the filename and
-      line number from which the translation string was gleaned.
+* ``msgid`` is the translation string, which appears in the source. Don't
+  change it.
+* ``msgstr`` is where you put the language-specific translation. It starts
+  out empty, so it's your responsibility to change it. Make sure you keep
+  the quotes around your translation.
+* As a convenience, each message includes, in the form of a comment line
+  prefixed with ``#`` and located above the ``msgid`` line, the filename and
+  line number from which the translation string was gleaned.
 
 Long messages are a special case. There, the first string directly after the
 ``msgstr`` (or ``msgid``) is an empty string. Then the content itself will be
@@ -213,24 +213,24 @@ message files (``.po``). Translation work itself just involves editing existing
 files of this type, but if you want to create your own message files, or want to
 test or compile a changed message file, you will need the ``gettext`` utilities:
 
-    * Download the following zip files from the GNOME servers
-      http://ftp.gnome.org/pub/gnome/binaries/win32/dependencies/ or from one
-      of its mirrors_
+* Download the following zip files from the GNOME servers
+  http://ftp.gnome.org/pub/gnome/binaries/win32/dependencies/ or from one
+  of its mirrors_
 
-      * ``gettext-runtime-X.zip``
-      * ``gettext-tools-X.zip``
+  * ``gettext-runtime-X.zip``
+  * ``gettext-tools-X.zip``
 
-      ``X`` is the version number, we are requiring ``0.15`` or higher.
+  ``X`` is the version number, we are requiring ``0.15`` or higher.
 
-    * Extract the contents of the ``bin\`` directories in both files to the
-      same folder on your system (i.e. ``C:\Program Files\gettext-utils``)
+* Extract the contents of the ``bin\`` directories in both files to the
+  same folder on your system (i.e. ``C:\Program Files\gettext-utils``)
 
-    * Update the system PATH:
+* Update the system PATH:
 
-      * ``Control Panel > System > Advanced > Environment Variables``.
-      * In the ``System variables`` list, click ``Path``, click ``Edit``.
-      * Add ``;C:\Program Files\gettext-utils\bin`` at the end of the
-        ``Variable value`` field.
+  * ``Control Panel > System > Advanced > Environment Variables``.
+  * In the ``System variables`` list, click ``Path``, click ``Edit``.
+  * Add ``;C:\Program Files\gettext-utils\bin`` at the end of the
+    ``Variable value`` field.
 
 .. _mirrors: http://ftp.gnome.org/pub/GNOME/MIRRORS
 

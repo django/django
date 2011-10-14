@@ -77,9 +77,9 @@ Writing custom template filters
 
 Custom filters are just Python functions that take one or two arguments:
 
-    * The value of the variable (input) -- not necessarily a string.
-    * The value of the argument -- this can have a default value, or be left
-      out altogether.
+* The value of the variable (input) -- not necessarily a string.
+* The value of the argument -- this can have a default value, or be left
+  out altogether.
 
 For example, in the filter ``{{ var|foo:"bar" }}``, the filter ``foo`` would be
 passed the variable ``var`` and the argument ``"bar"``.
@@ -124,9 +124,9 @@ your ``Library`` instance, to make it available to Django's template language:
 
 The ``Library.filter()`` method takes two arguments:
 
-    1. The name of the filter -- a string.
-    2. The compilation function -- a Python function (not the name of the
-       function as a string).
+1. The name of the filter -- a string.
+2. The compilation function -- a Python function (not the name of the
+   function as a string).
 
 You can use ``register.filter()`` as a decorator instead:
 
@@ -173,156 +173,156 @@ When writing a custom filter, give some thought to how the filter will interact
 with Django's auto-escaping behavior. Note that three types of strings can be
 passed around inside the template code:
 
-    * **Raw strings** are the native Python ``str`` or ``unicode`` types. On
-      output, they're escaped if auto-escaping is in effect and presented
-      unchanged, otherwise.
+* **Raw strings** are the native Python ``str`` or ``unicode`` types. On
+  output, they're escaped if auto-escaping is in effect and presented
+  unchanged, otherwise.
 
-    * **Safe strings** are strings that have been marked safe from further
-      escaping at output time. Any necessary escaping has already been done.
-      They're commonly used for output that contains raw HTML that is intended
-      to be interpreted as-is on the client side.
+* **Safe strings** are strings that have been marked safe from further
+  escaping at output time. Any necessary escaping has already been done.
+  They're commonly used for output that contains raw HTML that is intended
+  to be interpreted as-is on the client side.
 
-      Internally, these strings are of type ``SafeString`` or ``SafeUnicode``.
-      They share a common base class of ``SafeData``, so you can test
-      for them using code like:
+  Internally, these strings are of type ``SafeString`` or ``SafeUnicode``.
+  They share a common base class of ``SafeData``, so you can test
+  for them using code like:
 
-      .. code-block:: python
+  .. code-block:: python
 
-          if isinstance(value, SafeData):
-              # Do something with the "safe" string.
-              ...
+      if isinstance(value, SafeData):
+          # Do something with the "safe" string.
+          ...
 
-    * **Strings marked as "needing escaping"** are *always* escaped on
-      output, regardless of whether they are in an :ttag:`autoescape` block or
-      not. These strings are only escaped once, however, even if auto-escaping
-      applies.
+* **Strings marked as "needing escaping"** are *always* escaped on
+  output, regardless of whether they are in an :ttag:`autoescape` block or
+  not. These strings are only escaped once, however, even if auto-escaping
+  applies.
 
-      Internally, these strings are of type ``EscapeString`` or
-      ``EscapeUnicode``. Generally you don't have to worry about these; they
-      exist for the implementation of the :tfilter:`escape` filter.
+  Internally, these strings are of type ``EscapeString`` or
+  ``EscapeUnicode``. Generally you don't have to worry about these; they
+  exist for the implementation of the :tfilter:`escape` filter.
 
 Template filter code falls into one of two situations:
 
-    1. Your filter does not introduce any HTML-unsafe characters (``<``, ``>``,
-       ``'``, ``"`` or ``&``) into the result that were not already present. In
-       this case, you can let Django take care of all the auto-escaping
-       handling for you. All you need to do is put the ``is_safe`` attribute on
-       your filter function and set it to ``True``, like so:
+1. Your filter does not introduce any HTML-unsafe characters (``<``, ``>``,
+   ``'``, ``"`` or ``&``) into the result that were not already present. In
+   this case, you can let Django take care of all the auto-escaping
+   handling for you. All you need to do is put the ``is_safe`` attribute on
+   your filter function and set it to ``True``, like so:
 
-       .. code-block:: python
+   .. code-block:: python
 
-           @register.filter
-           def myfilter(value):
-               return value
-           myfilter.is_safe = True
+       @register.filter
+       def myfilter(value):
+           return value
+       myfilter.is_safe = True
 
-       This attribute tells Django that if a "safe" string is passed into your
-       filter, the result will still be "safe" and if a non-safe string is
-       passed in, Django will automatically escape it, if necessary.
+   This attribute tells Django that if a "safe" string is passed into your
+   filter, the result will still be "safe" and if a non-safe string is
+   passed in, Django will automatically escape it, if necessary.
 
-       You can think of this as meaning "this filter is safe -- it doesn't
-       introduce any possibility of unsafe HTML."
+   You can think of this as meaning "this filter is safe -- it doesn't
+   introduce any possibility of unsafe HTML."
 
-       The reason ``is_safe`` is necessary is because there are plenty of
-       normal string operations that will turn a ``SafeData`` object back into
-       a normal ``str`` or ``unicode`` object and, rather than try to catch
-       them all, which would be very difficult, Django repairs the damage after
-       the filter has completed.
+   The reason ``is_safe`` is necessary is because there are plenty of
+   normal string operations that will turn a ``SafeData`` object back into
+   a normal ``str`` or ``unicode`` object and, rather than try to catch
+   them all, which would be very difficult, Django repairs the damage after
+   the filter has completed.
 
-       For example, suppose you have a filter that adds the string ``xx`` to
-       the end of any input. Since this introduces no dangerous HTML characters
-       to the result (aside from any that were already present), you should
-       mark your filter with ``is_safe``:
+   For example, suppose you have a filter that adds the string ``xx`` to
+   the end of any input. Since this introduces no dangerous HTML characters
+   to the result (aside from any that were already present), you should
+   mark your filter with ``is_safe``:
 
-       .. code-block:: python
+   .. code-block:: python
 
-           @register.filter
-           def add_xx(value):
-               return '%sxx' % value
-           add_xx.is_safe = True
+       @register.filter
+       def add_xx(value):
+           return '%sxx' % value
+       add_xx.is_safe = True
 
-       When this filter is used in a template where auto-escaping is enabled,
-       Django will escape the output whenever the input is not already marked
-       as "safe".
+   When this filter is used in a template where auto-escaping is enabled,
+   Django will escape the output whenever the input is not already marked
+   as "safe".
 
-       By default, ``is_safe`` defaults to ``False``, and you can omit it from
-       any filters where it isn't required.
+   By default, ``is_safe`` defaults to ``False``, and you can omit it from
+   any filters where it isn't required.
 
-       Be careful when deciding if your filter really does leave safe strings
-       as safe. If you're *removing* characters, you might inadvertently leave
-       unbalanced HTML tags or entities in the result. For example, removing a
-       ``>`` from the input might turn ``<a>`` into ``<a``, which would need to
-       be escaped on output to avoid causing problems. Similarly, removing a
-       semicolon (``;``) can turn ``&amp;`` into ``&amp``, which is no longer a
-       valid entity and thus needs further escaping. Most cases won't be nearly
-       this tricky, but keep an eye out for any problems like that when
-       reviewing your code.
+   Be careful when deciding if your filter really does leave safe strings
+   as safe. If you're *removing* characters, you might inadvertently leave
+   unbalanced HTML tags or entities in the result. For example, removing a
+   ``>`` from the input might turn ``<a>`` into ``<a``, which would need to
+   be escaped on output to avoid causing problems. Similarly, removing a
+   semicolon (``;``) can turn ``&amp;`` into ``&amp``, which is no longer a
+   valid entity and thus needs further escaping. Most cases won't be nearly
+   this tricky, but keep an eye out for any problems like that when
+   reviewing your code.
 
-       Marking a filter ``is_safe`` will coerce the filter's return value to
-       a string.  If your filter should return a boolean or other non-string
-       value, marking it ``is_safe`` will probably have unintended
-       consequences (such as converting a boolean False to the string
-       'False').
+   Marking a filter ``is_safe`` will coerce the filter's return value to
+   a string.  If your filter should return a boolean or other non-string
+   value, marking it ``is_safe`` will probably have unintended
+   consequences (such as converting a boolean False to the string
+   'False').
 
-    2. Alternatively, your filter code can manually take care of any necessary
-       escaping. This is necessary when you're introducing new HTML markup into
-       the result. You want to mark the output as safe from further
-       escaping so that your HTML markup isn't escaped further, so you'll need
-       to handle the input yourself.
+2. Alternatively, your filter code can manually take care of any necessary
+   escaping. This is necessary when you're introducing new HTML markup into
+   the result. You want to mark the output as safe from further
+   escaping so that your HTML markup isn't escaped further, so you'll need
+   to handle the input yourself.
 
-       To mark the output as a safe string, use
-       :func:`django.utils.safestring.mark_safe`.
+   To mark the output as a safe string, use
+   :func:`django.utils.safestring.mark_safe`.
 
-       Be careful, though. You need to do more than just mark the output as
-       safe. You need to ensure it really *is* safe, and what you do depends on
-       whether auto-escaping is in effect. The idea is to write filters than
-       can operate in templates where auto-escaping is either on or off in
-       order to make things easier for your template authors.
+   Be careful, though. You need to do more than just mark the output as
+   safe. You need to ensure it really *is* safe, and what you do depends on
+   whether auto-escaping is in effect. The idea is to write filters than
+   can operate in templates where auto-escaping is either on or off in
+   order to make things easier for your template authors.
 
-       In order for your filter to know the current auto-escaping state, set
-       the ``needs_autoescape`` attribute to ``True`` on your function. (If you
-       don't specify this attribute, it defaults to ``False``). This attribute
-       tells Django that your filter function wants to be passed an extra
-       keyword argument, called ``autoescape``, that is ``True`` if
-       auto-escaping is in effect and ``False`` otherwise.
+   In order for your filter to know the current auto-escaping state, set
+   the ``needs_autoescape`` attribute to ``True`` on your function. (If you
+   don't specify this attribute, it defaults to ``False``). This attribute
+   tells Django that your filter function wants to be passed an extra
+   keyword argument, called ``autoescape``, that is ``True`` if
+   auto-escaping is in effect and ``False`` otherwise.
 
-       For example, let's write a filter that emphasizes the first character of
-       a string:
+   For example, let's write a filter that emphasizes the first character of
+   a string:
 
-       .. code-block:: python
+   .. code-block:: python
 
-           from django.utils.html import conditional_escape
-           from django.utils.safestring import mark_safe
+       from django.utils.html import conditional_escape
+       from django.utils.safestring import mark_safe
 
-           def initial_letter_filter(text, autoescape=None):
-               first, other = text[0], text[1:]
-               if autoescape:
-                   esc = conditional_escape
-               else:
-                   esc = lambda x: x
-               result = '<strong>%s</strong>%s' % (esc(first), esc(other))
-               return mark_safe(result)
-           initial_letter_filter.needs_autoescape = True
+       def initial_letter_filter(text, autoescape=None):
+           first, other = text[0], text[1:]
+           if autoescape:
+               esc = conditional_escape
+           else:
+               esc = lambda x: x
+           result = '<strong>%s</strong>%s' % (esc(first), esc(other))
+           return mark_safe(result)
+       initial_letter_filter.needs_autoescape = True
 
-       The ``needs_autoescape`` attribute on the filter function and the
-       ``autoescape`` keyword argument mean that our function will know whether
-       automatic escaping is in effect when the filter is called. We use
-       ``autoescape`` to decide whether the input data needs to be passed
-       through ``django.utils.html.conditional_escape`` or not. (In the latter
-       case, we just use the identity function as the "escape" function.) The
-       ``conditional_escape()`` function is like ``escape()`` except it only
-       escapes input that is **not** a ``SafeData`` instance. If a ``SafeData``
-       instance is passed to ``conditional_escape()``, the data is returned
-       unchanged.
+   The ``needs_autoescape`` attribute on the filter function and the
+   ``autoescape`` keyword argument mean that our function will know whether
+   automatic escaping is in effect when the filter is called. We use
+   ``autoescape`` to decide whether the input data needs to be passed
+   through ``django.utils.html.conditional_escape`` or not. (In the latter
+   case, we just use the identity function as the "escape" function.) The
+   ``conditional_escape()`` function is like ``escape()`` except it only
+   escapes input that is **not** a ``SafeData`` instance. If a ``SafeData``
+   instance is passed to ``conditional_escape()``, the data is returned
+   unchanged.
 
-       Finally, in the above example, we remember to mark the result as safe
-       so that our HTML is inserted directly into the template without further
-       escaping.
+   Finally, in the above example, we remember to mark the result as safe
+   so that our HTML is inserted directly into the template without further
+   escaping.
 
-       There's no need to worry about the ``is_safe`` attribute in this case
-       (although including it wouldn't hurt anything). Whenever you manually
-       handle the auto-escaping issues and return a safe string, the
-       ``is_safe`` attribute won't change anything either way.
+   There's no need to worry about the ``is_safe`` attribute in this case
+   (although including it wouldn't hurt anything). Whenever you manually
+   handle the auto-escaping issues and return a safe string, the
+   ``is_safe`` attribute won't change anything either way.
 
 Writing custom template tags
 ----------------------------
@@ -381,37 +381,37 @@ object:
 
 Notes:
 
-    * ``parser`` is the template parser object. We don't need it in this
-      example.
+* ``parser`` is the template parser object. We don't need it in this
+  example.
 
-    * ``token.contents`` is a string of the raw contents of the tag. In our
-      example, it's ``'current_time "%Y-%m-%d %I:%M %p"'``.
+* ``token.contents`` is a string of the raw contents of the tag. In our
+  example, it's ``'current_time "%Y-%m-%d %I:%M %p"'``.
 
-    * The ``token.split_contents()`` method separates the arguments on spaces
-      while keeping quoted strings together. The more straightforward
-      ``token.contents.split()`` wouldn't be as robust, as it would naively
-      split on *all* spaces, including those within quoted strings. It's a good
-      idea to always use ``token.split_contents()``.
+* The ``token.split_contents()`` method separates the arguments on spaces
+  while keeping quoted strings together. The more straightforward
+  ``token.contents.split()`` wouldn't be as robust, as it would naively
+  split on *all* spaces, including those within quoted strings. It's a good
+  idea to always use ``token.split_contents()``.
 
-    * This function is responsible for raising
-      ``django.template.TemplateSyntaxError``, with helpful messages, for
-      any syntax error.
+* This function is responsible for raising
+  ``django.template.TemplateSyntaxError``, with helpful messages, for
+  any syntax error.
 
-    * The ``TemplateSyntaxError`` exceptions use the ``tag_name`` variable.
-      Don't hard-code the tag's name in your error messages, because that
-      couples the tag's name to your function. ``token.contents.split()[0]``
-      will ''always'' be the name of your tag -- even when the tag has no
-      arguments.
+* The ``TemplateSyntaxError`` exceptions use the ``tag_name`` variable.
+  Don't hard-code the tag's name in your error messages, because that
+  couples the tag's name to your function. ``token.contents.split()[0]``
+  will ''always'' be the name of your tag -- even when the tag has no
+  arguments.
 
-    * The function returns a ``CurrentTimeNode`` with everything the node needs
-      to know about this tag. In this case, it just passes the argument --
-      ``"%Y-%m-%d %I:%M %p"``. The leading and trailing quotes from the
-      template tag are removed in ``format_string[1:-1]``.
+* The function returns a ``CurrentTimeNode`` with everything the node needs
+  to know about this tag. In this case, it just passes the argument --
+  ``"%Y-%m-%d %I:%M %p"``. The leading and trailing quotes from the
+  template tag are removed in ``format_string[1:-1]``.
 
-    * The parsing is very low-level. The Django developers have experimented
-      with writing small frameworks on top of this parsing system, using
-      techniques such as EBNF grammars, but those experiments made the template
-      engine too slow. It's low-level because that's fastest.
+* The parsing is very low-level. The Django developers have experimented
+  with writing small frameworks on top of this parsing system, using
+  techniques such as EBNF grammars, but those experiments made the template
+  engine too slow. It's low-level because that's fastest.
 
 Writing the renderer
 ~~~~~~~~~~~~~~~~~~~~
@@ -433,14 +433,14 @@ Continuing the above example, we need to define ``CurrentTimeNode``:
 
 Notes:
 
-    * ``__init__()`` gets the ``format_string`` from ``do_current_time()``.
-      Always pass any options/parameters/arguments to a ``Node`` via its
-      ``__init__()``.
+* ``__init__()`` gets the ``format_string`` from ``do_current_time()``.
+  Always pass any options/parameters/arguments to a ``Node`` via its
+  ``__init__()``.
 
-    * The ``render()`` method is where the work actually happens.
+* The ``render()`` method is where the work actually happens.
 
-    * ``render()`` should never raise ``TemplateSyntaxError`` or any other
-      exception. It should fail silently, just as template filters should.
+* ``render()`` should never raise ``TemplateSyntaxError`` or any other
+  exception. It should fail silently, just as template filters should.
 
 Ultimately, this decoupling of compilation and rendering results in an
 efficient template system, because a template can render multiple contexts
@@ -525,14 +525,14 @@ A naive implementation of ``CycleNode`` might look something like this:
 But, suppose we have two templates rendering the template snippet from above at
 the same time:
 
-    1. Thread 1 performs its first loop iteration, ``CycleNode.render()``
-       returns 'row1'
-    2. Thread 2 performs its first loop iteration, ``CycleNode.render()``
-       returns 'row2'
-    3. Thread 1 performs its second loop iteration, ``CycleNode.render()``
-       returns 'row1'
-    4. Thread 2 performs its second loop iteration, ``CycleNode.render()``
-       returns 'row2'
+1. Thread 1 performs its first loop iteration, ``CycleNode.render()``
+   returns 'row1'
+2. Thread 2 performs its first loop iteration, ``CycleNode.render()``
+   returns 'row2'
+3. Thread 1 performs its second loop iteration, ``CycleNode.render()``
+   returns 'row1'
+4. Thread 2 performs its second loop iteration, ``CycleNode.render()``
+   returns 'row2'
 
 The CycleNode is iterating, but it's iterating globally. As far as Thread 1
 and Thread 2 are concerned, it's always returning the same value. This is
@@ -584,10 +584,10 @@ in "Writing custom template filters" above. Example:
 
 The ``tag()`` method takes two arguments:
 
-    1. The name of the template tag -- a string. If this is left out, the
-       name of the compilation function will be used.
-    2. The compilation function -- a Python function (not the name of the
-       function as a string).
+1. The name of the template tag -- a string. If this is left out, the
+   name of the compilation function will be used.
+2. The compilation function -- a Python function (not the name of the
+   function as a string).
 
 As with filter registration, it is also possible to use this as a decorator:
 
@@ -623,12 +623,12 @@ tag format that date-time:
 
 Initially, ``token.split_contents()`` will return three values:
 
-    1. The tag name ``format_time``.
-    2. The string ``"blog_entry.date_updated"`` (without the surrounding
-       quotes).
-    3. The formatting string ``"%Y-%m-%d %I:%M %p"``. The return value from
-       ``split_contents()`` will include the leading and trailing quotes for
-       string literals like this.
+1. The tag name ``format_time``.
+2. The string ``"blog_entry.date_updated"`` (without the surrounding
+   quotes).
+3. The formatting string ``"%Y-%m-%d %I:%M %p"``. The return value from
+   ``split_contents()`` will include the leading and trailing quotes for
+   string literals like this.
 
 Now your tag should begin to look like this:
 
@@ -706,12 +706,12 @@ The decorator syntax also works:
 
 A few things to note about the ``simple_tag`` helper function:
 
-    * Checking for the required number of arguments, etc., has already been
-      done by the time our function is called, so we don't need to do that.
-    * The quotes around the argument (if any) have already been stripped away,
-      so we just receive a plain string.
-    * If the argument was a template variable, our function is passed the
-      current value of the variable, not the variable itself.
+* Checking for the required number of arguments, etc., has already been
+  done by the time our function is called, so we don't need to do that.
+* The quotes around the argument (if any) have already been stripped away,
+  so we just receive a plain string.
+* If the argument was a template variable, our function is passed the
+  current value of the variable, not the variable itself.
 
 .. versionadded:: 1.3
 

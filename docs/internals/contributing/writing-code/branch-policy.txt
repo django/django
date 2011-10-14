@@ -14,31 +14,31 @@ take more than a single patch, or requires large-scale refactoring -- you need
 to do it on a feature branch. Our development process recognizes two options
 for feature branches:
 
-    1. Feature branches using a distributed revision control system like
-       Git_, Mercurial_, Bazaar_, etc.
+1. Feature branches using a distributed revision control system like
+   Git_, Mercurial_, Bazaar_, etc.
 
-       If you're familiar with one of these tools, this is probably your best
-       option since it doesn't require any support or buy-in from the Django
-       core developers.
+   If you're familiar with one of these tools, this is probably your best
+   option since it doesn't require any support or buy-in from the Django
+   core developers.
 
-       However, do keep in mind that Django will continue to use Subversion
-       for the foreseeable future, and this will naturally limit the
-       recognition of your branch. Further, if your branch becomes eligible
-       for merging to trunk you'll need to find a core developer familiar
-       with your DVCS of choice who'll actually perform the merge.
+   However, do keep in mind that Django will continue to use Subversion
+   for the foreseeable future, and this will naturally limit the
+   recognition of your branch. Further, if your branch becomes eligible
+   for merging to trunk you'll need to find a core developer familiar
+   with your DVCS of choice who'll actually perform the merge.
 
-       If you do decided to start a distributed branch of Django and choose to
-       make it public, please add the branch to the `Django branches`_ wiki
-       page.
+   If you do decided to start a distributed branch of Django and choose to
+   make it public, please add the branch to the `Django branches`_ wiki
+   page.
 
-    2. Feature branches using SVN have a higher bar. If you want a branch
-       in SVN itself, you'll need a "mentor" among the :doc:`core committers
-       </internals/committers>`. This person is responsible for actually
-       creating the branch, monitoring your process (see below), and
-       ultimately merging the branch into trunk.
+2. Feature branches using SVN have a higher bar. If you want a branch
+   in SVN itself, you'll need a "mentor" among the :doc:`core committers
+   </internals/committers>`. This person is responsible for actually
+   creating the branch, monitoring your process (see below), and
+   ultimately merging the branch into trunk.
 
-       If you want a feature branch in SVN, you'll need to ask in
-       `django-developers`_ for a mentor.
+   If you want a feature branch in SVN, you'll need to ask in
+   `django-developers`_ for a mentor.
 
 .. _git: http://git-scm.com/
 .. _mercurial: http://mercurial.selenic.com/
@@ -60,21 +60,21 @@ Developers with branches in SVN, however, **must** follow these rules. The
 branch mentor will keep on eye on the branch and **will delete it** if these
 rules are broken.
 
-    * Only branch entire copies of the Django tree, even if work is only
-      happening on part of that tree. This makes it painless to switch to a
-      branch.
+* Only branch entire copies of the Django tree, even if work is only
+  happening on part of that tree. This makes it painless to switch to a
+  branch.
 
-    * Merge changes from trunk no less than once a week, and preferably every
-      couple-three days.
+* Merge changes from trunk no less than once a week, and preferably every
+  couple-three days.
 
-      In our experience, doing regular trunk merges is often the difference
-      between a successful branch and one that fizzles and dies.
+  In our experience, doing regular trunk merges is often the difference
+  between a successful branch and one that fizzles and dies.
 
-      If you're working on an SVN branch, you should be using `svnmerge.py`_
-      to track merges from trunk.
+  If you're working on an SVN branch, you should be using `svnmerge.py`_
+  to track merges from trunk.
 
-    * Keep tests passing and documentation up-to-date. As with patches,
-      we'll only merge a branch that comes with tests and documentation.
+* Keep tests passing and documentation up-to-date. As with patches,
+  we'll only merge a branch that comes with tests and documentation.
 
 .. _svnmerge.py: http://www.orcaware.com/svn/wiki/Svnmerge.py
 
@@ -91,11 +91,11 @@ Using branches
 
 To use a branch, you'll need to do two things:
 
-    * Get the branch's code through Subversion.
+* Get the branch's code through Subversion.
 
-    * Point your Python ``site-packages`` directory at the branch's version of
-      the ``django`` package rather than the version you already have
-      installed.
+* Point your Python ``site-packages`` directory at the branch's version of
+  the ``django`` package rather than the version you already have
+  installed.
 
 Getting the code from Subversion
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

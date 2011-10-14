@@ -133,51 +133,51 @@ Changing upload handler behavior
 
 Three settings control Django's file upload behavior:
 
-    :setting:`FILE_UPLOAD_MAX_MEMORY_SIZE`
-        The maximum size, in bytes, for files that will be uploaded into memory.
-        Files larger than :setting:`FILE_UPLOAD_MAX_MEMORY_SIZE` will be
-        streamed to disk.
+:setting:`FILE_UPLOAD_MAX_MEMORY_SIZE`
+    The maximum size, in bytes, for files that will be uploaded into memory.
+    Files larger than :setting:`FILE_UPLOAD_MAX_MEMORY_SIZE` will be
+    streamed to disk.
 
-        Defaults to 2.5 megabytes.
+    Defaults to 2.5 megabytes.
 
-    :setting:`FILE_UPLOAD_TEMP_DIR`
-        The directory where uploaded files larger than
-        :setting:`FILE_UPLOAD_MAX_MEMORY_SIZE` will be stored.
+:setting:`FILE_UPLOAD_TEMP_DIR`
+    The directory where uploaded files larger than
+    :setting:`FILE_UPLOAD_MAX_MEMORY_SIZE` will be stored.
 
-        Defaults to your system's standard temporary directory (i.e. ``/tmp`` on
-        most Unix-like systems).
+    Defaults to your system's standard temporary directory (i.e. ``/tmp`` on
+    most Unix-like systems).
 
-    :setting:`FILE_UPLOAD_PERMISSIONS`
-        The numeric mode (i.e. ``0644``) to set newly uploaded files to. For
-        more information about what these modes mean, see the documentation for
-        :func:`os.chmod`.
+:setting:`FILE_UPLOAD_PERMISSIONS`
+    The numeric mode (i.e. ``0644``) to set newly uploaded files to. For
+    more information about what these modes mean, see the documentation for
+    :func:`os.chmod`.
 
-        If this isn't given or is ``None``, you'll get operating-system
-        dependent behavior. On most platforms, temporary files will have a mode
-        of ``0600``, and files saved from memory will be saved using the
-        system's standard umask.
+    If this isn't given or is ``None``, you'll get operating-system
+    dependent behavior. On most platforms, temporary files will have a mode
+    of ``0600``, and files saved from memory will be saved using the
+    system's standard umask.
 
-        .. warning::
+    .. warning::
 
-            If you're not familiar with file modes, please note that the leading
-            ``0`` is very important: it indicates an octal number, which is the
-            way that modes must be specified. If you try to use ``644``, you'll
-            get totally incorrect behavior.
+        If you're not familiar with file modes, please note that the leading
+        ``0`` is very important: it indicates an octal number, which is the
+        way that modes must be specified. If you try to use ``644``, you'll
+        get totally incorrect behavior.
 
-            **Always prefix the mode with a 0.**
+        **Always prefix the mode with a 0.**
 
-    :setting:`FILE_UPLOAD_HANDLERS`
-        The actual handlers for uploaded files. Changing this setting allows
-        complete customization -- even replacement -- of Django's upload
-        process. See `upload handlers`_, below, for details.
+:setting:`FILE_UPLOAD_HANDLERS`
+    The actual handlers for uploaded files. Changing this setting allows
+    complete customization -- even replacement -- of Django's upload
+    process. See `upload handlers`_, below, for details.
 
-        Defaults to::
+    Defaults to::
 
-            ("django.core.files.uploadhandler.MemoryFileUploadHandler",
-             "django.core.files.uploadhandler.TemporaryFileUploadHandler",)
+        ("django.core.files.uploadhandler.MemoryFileUploadHandler",
+         "django.core.files.uploadhandler.TemporaryFileUploadHandler",)
 
-        Which means "try to upload to memory first, then fall back to temporary
-        files."
+    Which means "try to upload to memory first, then fall back to temporary
+    files."
 
 ``UploadedFile`` objects
 ========================
@@ -312,32 +312,32 @@ Required methods
 
 Custom file upload handlers **must** define the following methods:
 
-    ``FileUploadHandler.receive_data_chunk(self, raw_data, start)``
-        Receives a "chunk" of data from the file upload.
+``FileUploadHandler.receive_data_chunk(self, raw_data, start)``
+    Receives a "chunk" of data from the file upload.
 
-        ``raw_data`` is a byte string containing the uploaded data.
+    ``raw_data`` is a byte string containing the uploaded data.
 
-        ``start`` is the position in the file where this ``raw_data`` chunk
-        begins.
+    ``start`` is the position in the file where this ``raw_data`` chunk
+    begins.
 
-        The data you return will get fed into the subsequent upload handlers'
-        ``receive_data_chunk`` methods. In this way, one handler can be a
-        "filter" for other handlers.
+    The data you return will get fed into the subsequent upload handlers'
+    ``receive_data_chunk`` methods. In this way, one handler can be a
+    "filter" for other handlers.
 
-        Return ``None`` from ``receive_data_chunk`` to sort-circuit remaining
-        upload handlers from getting this chunk.. This is useful if you're
-        storing the uploaded data yourself and don't want future handlers to
-        store a copy of the data.
+    Return ``None`` from ``receive_data_chunk`` to sort-circuit remaining
+    upload handlers from getting this chunk.. This is useful if you're
+    storing the uploaded data yourself and don't want future handlers to
+    store a copy of the data.
 
-        If you raise a ``StopUpload`` or a ``SkipFile`` exception, the upload
-        will abort or the file will be completely skipped.
+    If you raise a ``StopUpload`` or a ``SkipFile`` exception, the upload
+    will abort or the file will be completely skipped.
 
-    ``FileUploadHandler.file_complete(self, file_size)``
-        Called when a file has finished uploading.
+``FileUploadHandler.file_complete(self, file_size)``
+    Called when a file has finished uploading.
 
-        The handler should return an ``UploadedFile`` object that will be stored
-        in ``request.FILES``. Handlers may also return ``None`` to indicate that
-        the ``UploadedFile`` object should come from subsequent upload handlers.
+    The handler should return an ``UploadedFile`` object that will be stored
+    in ``request.FILES``. Handlers may also return ``None`` to indicate that
+    the ``UploadedFile`` object should come from subsequent upload handlers.
 
 Optional methods
 ~~~~~~~~~~~~~~~~
@@ -345,56 +345,56 @@ Optional methods
 Custom upload handlers may also define any of the following optional methods or
 attributes:
 
-    ``FileUploadHandler.chunk_size``
-        Size, in bytes, of the "chunks" Django should store into memory and feed
-        into the handler. That is, this attribute controls the size of chunks
-        fed into ``FileUploadHandler.receive_data_chunk``.
+``FileUploadHandler.chunk_size``
+    Size, in bytes, of the "chunks" Django should store into memory and feed
+    into the handler. That is, this attribute controls the size of chunks
+    fed into ``FileUploadHandler.receive_data_chunk``.
 
-        For maximum performance the chunk sizes should be divisible by ``4`` and
-        should not exceed 2 GB (2\ :sup:`31` bytes) in size. When there are
-        multiple chunk sizes provided by multiple handlers, Django will use the
-        smallest chunk size defined by any handler.
+    For maximum performance the chunk sizes should be divisible by ``4`` and
+    should not exceed 2 GB (2\ :sup:`31` bytes) in size. When there are
+    multiple chunk sizes provided by multiple handlers, Django will use the
+    smallest chunk size defined by any handler.
 
-        The default is 64*2\ :sup:`10` bytes, or 64 KB.
+    The default is 64*2\ :sup:`10` bytes, or 64 KB.
 
-    ``FileUploadHandler.new_file(self, field_name, file_name, content_type, content_length, charset)``
-        Callback signaling that a new file upload is starting. This is called
-        before any data has been fed to any upload handlers.
+``FileUploadHandler.new_file(self, field_name, file_name, content_type, content_length, charset)``
+    Callback signaling that a new file upload is starting. This is called
+    before any data has been fed to any upload handlers.
 
-        ``field_name`` is a string name of the file ``<input>`` field.
+    ``field_name`` is a string name of the file ``<input>`` field.
 
-        ``file_name`` is the unicode filename that was provided by the browser.
+    ``file_name`` is the unicode filename that was provided by the browser.
 
-        ``content_type`` is the MIME type provided by the browser -- E.g.
-        ``'image/jpeg'``.
+    ``content_type`` is the MIME type provided by the browser -- E.g.
+    ``'image/jpeg'``.
 
-        ``content_length`` is the length of the image given by the browser.
-        Sometimes this won't be provided and will be ``None``.
+    ``content_length`` is the length of the image given by the browser.
+    Sometimes this won't be provided and will be ``None``.
 
-        ``charset`` is the character set (i.e. ``utf8``) given by the browser.
-        Like ``content_length``, this sometimes won't be provided.
+    ``charset`` is the character set (i.e. ``utf8``) given by the browser.
+    Like ``content_length``, this sometimes won't be provided.
 
-        This method may raise a ``StopFutureHandlers`` exception to prevent
-        future handlers from handling this file.
+    This method may raise a ``StopFutureHandlers`` exception to prevent
+    future handlers from handling this file.
 
-    ``FileUploadHandler.upload_complete(self)``
-        Callback signaling that the entire upload (all files) has completed.
+``FileUploadHandler.upload_complete(self)``
+    Callback signaling that the entire upload (all files) has completed.
 
-    ``FileUploadHandler.handle_raw_input(self, input_data, META, content_length, boundary, encoding)``
-        Allows the handler to completely override the parsing of the raw
-        HTTP input.
+``FileUploadHandler.handle_raw_input(self, input_data, META, content_length, boundary, encoding)``
+    Allows the handler to completely override the parsing of the raw
+    HTTP input.
 
-        ``input_data`` is a file-like object that supports ``read()``-ing.
+    ``input_data`` is a file-like object that supports ``read()``-ing.
 
-        ``META`` is the same object as ``request.META``.
+    ``META`` is the same object as ``request.META``.
 
-        ``content_length`` is the length of the data in ``input_data``. Don't
-        read more than ``content_length`` bytes from ``input_data``.
+    ``content_length`` is the length of the data in ``input_data``. Don't
+    read more than ``content_length`` bytes from ``input_data``.
 
-        ``boundary`` is the MIME boundary for this request.
+    ``boundary`` is the MIME boundary for this request.
 
-        ``encoding`` is the encoding of the request.
+    ``encoding`` is the encoding of the request.
 
-        Return ``None`` if you want upload handling to continue, or a tuple of
-        ``(POST, FILES)`` if you want to return the new data structures suitable
-        for the request directly.
+    Return ``None`` if you want upload handling to continue, or a tuple of
+    ``(POST, FILES)`` if you want to return the new data structures suitable
+    for the request directly.

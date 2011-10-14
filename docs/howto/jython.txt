@@ -64,10 +64,10 @@ Differences with Django on Jython
 At this point, Django on Jython should behave nearly identically to Django
 running on standard Python. However, are a few differences to keep in mind:
 
-    * Remember to use the ``jython`` command instead of ``python``. The
-      documentation uses ``python`` for consistency, but if you're using Jython
-      you'll want to mentally replace ``python`` with ``jython`` every time it
-      occurs.
+* Remember to use the ``jython`` command instead of ``python``. The
+  documentation uses ``python`` for consistency, but if you're using Jython
+  you'll want to mentally replace ``python`` with ``jython`` every time it
+  occurs.
 
-    * Similarly, you'll need to use the ``JYTHONPATH`` environment variable
-      instead of ``PYTHONPATH``.
+* Similarly, you'll need to use the ``JYTHONPATH`` environment variable
+  instead of ``PYTHONPATH``.

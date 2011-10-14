@@ -69,29 +69,29 @@ per-function or per-code-block basis.
 
 These functions, described in detail below, can be used in two different ways:
 
-    * As a decorator_ on a particular function. For example::
+* As a decorator_ on a particular function. For example::
 
-            from django.db import transaction
+    from django.db import transaction
 
-            @transaction.commit_on_success
-            def viewfunc(request):
-                # ...
-                # this code executes inside a transaction
-                # ...
+    @transaction.commit_on_success
+    def viewfunc(request):
+        # ...
+        # this code executes inside a transaction
+        # ...
 
-    * As a `context manager`_ around a particular block of code::
+* As a `context manager`_ around a particular block of code::
 
-            from django.db import transaction
+    from django.db import transaction
 
-            def viewfunc(request):
-                # ...
-                # this code executes using default transaction management
-                # ...
+    def viewfunc(request):
+        # ...
+        # this code executes using default transaction management
+        # ...
 
-                with transaction.commit_on_success():
-                    # ...
-                    # this code executes inside a transaction
-                    # ...
+        with transaction.commit_on_success():
+            # ...
+            # this code executes inside a transaction
+            # ...
 
 Both techniques work with all supported version of Python. However, in Python
 2.5, you must add ``from __future__ import with_statement`` at the beginning

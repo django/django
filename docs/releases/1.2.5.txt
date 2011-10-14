@@ -28,14 +28,14 @@ token's presence on form submission, and validates it.
 Prior to Django 1.2.5, our CSRF protection made an exception for AJAX
 requests, on the following basis:
 
-    * Many AJAX toolkits add an X-Requested-With header when using
-      XMLHttpRequest.
+* Many AJAX toolkits add an X-Requested-With header when using
+  XMLHttpRequest.
 
-    * Browsers have strict same-origin policies regarding
-      XMLHttpRequest.
+* Browsers have strict same-origin policies regarding
+  XMLHttpRequest.
 
-    * In the context of a browser, the only way that a custom header
-      of this nature can be added is with XMLHttpRequest.
+* In the context of a browser, the only way that a custom header
+  of this nature can be added is with XMLHttpRequest.
 
 Therefore, for ease of use, we did not apply CSRF checks to requests
 that appeared to be AJAX on the basis of the X-Requested-With header.

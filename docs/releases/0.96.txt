@@ -72,13 +72,13 @@ to raise an error message about modifying non-existent constraints.
 
 If you need to work around this, there are two methods available:
 
-    1. Redirect the output of ``manage.py`` to a file, and edit the
-       generated SQL to use the correct constraint names before
-       executing it.
+1. Redirect the output of ``manage.py`` to a file, and edit the
+   generated SQL to use the correct constraint names before
+   executing it.
 
-    2. Examine the output of ``manage.py sqlall`` to see the new-style
-       constraint names, and use that as a guide to rename existing
-       constraints in your database.
+2. Examine the output of ``manage.py sqlall`` to see the new-style
+   constraint names, and use that as a guide to rename existing
+   constraints in your database.
 
 Name changes in ``manage.py``
 -----------------------------
@@ -86,16 +86,16 @@ Name changes in ``manage.py``
 A few of the options to ``manage.py`` have changed with the addition of fixture
 support:
 
-    * There are new ``dumpdata`` and ``loaddata`` commands which, as
-      you might expect, will dump and load data to/from the
-      database. These commands can operate against any of Django's
-      supported serialization formats.
+* There are new ``dumpdata`` and ``loaddata`` commands which, as
+  you might expect, will dump and load data to/from the
+  database. These commands can operate against any of Django's
+  supported serialization formats.
 
-    * The ``sqlinitialdata`` command has been renamed to ``sqlcustom`` to
-      emphasize that ``loaddata`` should be used for data (and ``sqlcustom`` for
-      other custom SQL -- views, stored procedures, etc.).
+* The ``sqlinitialdata`` command has been renamed to ``sqlcustom`` to
+  emphasize that ``loaddata`` should be used for data (and ``sqlcustom`` for
+  other custom SQL -- views, stored procedures, etc.).
 
-    * The vestigial ``install`` command has been removed. Use ``syncdb``.
+* The vestigial ``install`` command has been removed. Use ``syncdb``.
 
 Backslash escaping changed
 --------------------------
@@ -142,23 +142,23 @@ deprecate and remove the old system.
 
 There are three elements to this transition:
 
-    * We've copied the current ``django.forms`` to
-      ``django.oldforms``. This allows you to upgrade your code *now*
-      rather than waiting for the backwards-incompatible change and
-      rushing to fix your code after the fact.  Just change your
-      import statements like this::
+* We've copied the current ``django.forms`` to
+  ``django.oldforms``. This allows you to upgrade your code *now*
+  rather than waiting for the backwards-incompatible change and
+  rushing to fix your code after the fact.  Just change your
+  import statements like this::
 
-          from django import forms             # 0.95-style
-          from django import oldforms as forms # 0.96-style
+      from django import forms             # 0.95-style
+      from django import oldforms as forms # 0.96-style
 
-    * The next official release of Django will move the current
-      ``django.newforms`` to ``django.forms``. This will be a
-      backwards-incompatible change, and anyone still using the old
-      version of ``django.forms`` at that time will need to change
-      their import statements as described above.
+* The next official release of Django will move the current
+  ``django.newforms`` to ``django.forms``. This will be a
+  backwards-incompatible change, and anyone still using the old
+  version of ``django.forms`` at that time will need to change
+  their import statements as described above.
 
-    * The next release after that will completely remove
-      ``django.oldforms``.
+* The next release after that will completely remove
+  ``django.oldforms``.
 
 Although the ``newforms`` library will continue to evolve, it's ready for use
 for most common cases. We recommend that anyone new to form handling skip the
@@ -242,21 +242,21 @@ Since 0.95, a number of people have stepped forward and taken a major
 new role in Django's development. We'd like to thank these people for
 all their hard work:
 
-    * Russell Keith-Magee and Malcolm Tredinnick for their major code
-      contributions. This release wouldn't have been possible without them.
+* Russell Keith-Magee and Malcolm Tredinnick for their major code
+  contributions. This release wouldn't have been possible without them.
 
-    * Our new release manager, James Bennett, for his work in getting out
-      0.95.1, 0.96, and (hopefully) future release.
+* Our new release manager, James Bennett, for his work in getting out
+  0.95.1, 0.96, and (hopefully) future release.
 
-    * Our ticket managers Chris Beaven (aka SmileyChris), Simon Greenhill,
-      Michael Radziej, and Gary Wilson. They agreed to take on the monumental
-      task of wrangling our tickets into nicely cataloged submission. Figuring
-      out what to work on is now about a million times easier; thanks again,
-      guys.
+* Our ticket managers Chris Beaven (aka SmileyChris), Simon Greenhill,
+  Michael Radziej, and Gary Wilson. They agreed to take on the monumental
+  task of wrangling our tickets into nicely cataloged submission. Figuring
+  out what to work on is now about a million times easier; thanks again,
+  guys.
 
-    * Everyone who submitted a bug report, patch or ticket comment. We can't
-      possibly thank everyone by name -- over 200 developers submitted patches
-      that went into 0.96 -- but everyone who's contributed to Django is listed
-      in AUTHORS_.
+* Everyone who submitted a bug report, patch or ticket comment. We can't
+  possibly thank everyone by name -- over 200 developers submitted patches
+  that went into 0.96 -- but everyone who's contributed to Django is listed
+  in AUTHORS_.
 
 .. _AUTHORS: http://code.djangoproject.com/browser/django/trunk/AUTHORS

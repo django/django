@@ -84,15 +84,15 @@ FieldError
     The :exc:`FieldError` exception is raised when there is a problem with a
     model field. This can happen for several reasons:
 
-        - A field in a model clashes with a field of the same name from an
-          abstract base class
-        - An infinite loop is caused by ordering
-        - A keyword cannot be parsed from the filter parameters
-        - A field cannot be determined from a keyword in the query
-          parameters
-        - A join is not permitted on the specified field
-        - A field name is invalid
-        - A query contains invalid order_by arguments
+    - A field in a model clashes with a field of the same name from an
+      abstract base class
+    - An infinite loop is caused by ordering
+    - A keyword cannot be parsed from the filter parameters
+    - A field cannot be determined from a keyword in the query
+      parameters
+    - A join is not permitted on the specified field
+    - A field name is invalid
+    - A query contains invalid order_by arguments
 
 ValidationError
 ---------------

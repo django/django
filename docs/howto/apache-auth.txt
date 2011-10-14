@@ -14,12 +14,12 @@ dealing with Apache, you can configuring Apache to authenticate against Django's
 :doc:`authentication system </topics/auth>` directly. For example, you
 could:
 
-    * Serve static/media files directly from Apache only to authenticated users.
+* Serve static/media files directly from Apache only to authenticated users.
 
-    * Authenticate access to a Subversion_ repository against Django users with
-      a certain permission.
+* Authenticate access to a Subversion_ repository against Django users with
+  a certain permission.
 
-    * Allow certain users to connect to a WebDAV share created with mod_dav_.
+* Allow certain users to connect to a WebDAV share created with mod_dav_.
 
 .. _Subversion: http://subversion.tigris.org/
 .. _mod_dav: http://httpd.apache.org/docs/2.0/mod/mod_dav.html
@@ -93,29 +93,29 @@ By default, the authentication handler will limit access to the ``/example/``
 location to users marked as staff members.  You can use a set of
 ``PythonOption`` directives to modify this behavior:
 
-    ================================  =========================================
-    ``PythonOption``                  Explanation
-    ================================  =========================================
-    ``DjangoRequireStaffStatus``      If set to ``on`` only "staff" users (i.e.
-                                      those with the ``is_staff`` flag set)
-                                      will be allowed.
+================================  =========================================
+``PythonOption``                  Explanation
+================================  =========================================
+``DjangoRequireStaffStatus``      If set to ``on`` only "staff" users (i.e.
+                                  those with the ``is_staff`` flag set)
+                                  will be allowed.
 
-                                      Defaults to ``on``.
+                                  Defaults to ``on``.
 
-    ``DjangoRequireSuperuserStatus``  If set to ``on`` only superusers (i.e.
-                                      those with the ``is_superuser`` flag set)
-                                      will be allowed.
+``DjangoRequireSuperuserStatus``  If set to ``on`` only superusers (i.e.
+                                  those with the ``is_superuser`` flag set)
+                                  will be allowed.
 
-                                      Defaults to ``off``.
+                                  Defaults to ``off``.
 
-    ``DjangoPermissionName``          The name of a permission to require for
-                                      access. See :ref:`custom permissions
-                                      <custom-permissions>` for more
-                                      information.
+``DjangoPermissionName``          The name of a permission to require for
+                                  access. See :ref:`custom permissions
+                                  <custom-permissions>` for more
+                                  information.
 
-                                      By default no specific permission will be
-                                      required.
-    ================================  =========================================
+                                  By default no specific permission will be
+                                  required.
+================================  =========================================
 
 Note that sometimes ``SetEnv`` doesn't play well in this mod_python
 configuration, for reasons unknown. If you're having problems getting

@@ -21,16 +21,14 @@ which widget is used on which field, see the documentation about
 
 However, if you want to use a different widget for a field, you can
 just use the :attr:`~Field.widget` argument on the field definition. For
-example:
+example::
 
-    .. code-block:: python
+    from django import forms
 
-        from django import forms
-
-        class CommentForm(forms.Form):
-            name = forms.CharField()
-            url = forms.URLField()
-            comment = forms.CharField(widget=forms.Textarea)
+    class CommentForm(forms.Form):
+        name = forms.CharField()
+        url = forms.URLField()
+        comment = forms.CharField(widget=forms.Textarea)
 
 This would specify a form with a comment that uses a larger :class:`Textarea`
 widget, rather than the default :class:`TextInput` widget.
@@ -42,25 +40,23 @@ Setting arguments for widgets
 Many widgets have optional extra arguments; they can be set when defining the
 widget on the field. In the following example, the
 :attr:`~SelectDateWidget.years` attribute is set for a
-:class:`~django.forms.extras.widgets.SelectDateWidget`:
+:class:`~django.forms.extras.widgets.SelectDateWidget`::
 
-    .. code-block:: python
+    from django.forms.fields import DateField, ChoiceField, MultipleChoiceField
+    from django.forms.widgets import RadioSelect, CheckboxSelectMultiple
+    from django.forms.extras.widgets import SelectDateWidget
 
-        from django.forms.fields import DateField, ChoiceField, MultipleChoiceField
-        from django.forms.widgets import RadioSelect, CheckboxSelectMultiple
-        from django.forms.extras.widgets import SelectDateWidget
+    BIRTH_YEAR_CHOICES = ('1980', '1981', '1982')
+    GENDER_CHOICES = (('m', 'Male'), ('f', 'Female'))
+    FAVORITE_COLORS_CHOICES = (('blue', 'Blue'),
+                                ('green', 'Green'),
+                                ('black', 'Black'))
 
-        BIRTH_YEAR_CHOICES = ('1980', '1981', '1982')
-        GENDER_CHOICES = (('m', 'Male'), ('f', 'Female'))
-        FAVORITE_COLORS_CHOICES = (('blue', 'Blue'),
-                                    ('green', 'Green'),
-                                    ('black', 'Black'))
-
-        class SimpleForm(forms.Form):
-            birth_year = DateField(widget=SelectDateWidget(years=BIRTH_YEAR_CHOICES))
-            gender = ChoiceField(widget=RadioSelect, choices=GENDER_CHOICES)
-            favorite_colors = forms.MultipleChoiceField(required=False,
-                widget=CheckboxSelectMultiple, choices=FAVORITE_COLORS_CHOICES)
+    class SimpleForm(forms.Form):
+        birth_year = DateField(widget=SelectDateWidget(years=BIRTH_YEAR_CHOICES))
+        gender = ChoiceField(widget=RadioSelect, choices=GENDER_CHOICES)
+        favorite_colors = forms.MultipleChoiceField(required=False,
+            widget=CheckboxSelectMultiple, choices=FAVORITE_COLORS_CHOICES)
 
 See the :ref:`built-in widgets` for more information about which widgets
 are available and which arguments they accept.
@@ -78,21 +74,19 @@ buttons.
 :class:`Select` widgets are used by default on :class:`ChoiceField` fields. The
 choices displayed on the widget are inherited from the :class:`ChoiceField` and
 changing :attr:`ChoiceField.choices` will update :attr:`Select.choices`. For
-example:
+example::
 
-    .. code-block:: python
-
-        >>> from django import forms
-        >>> CHOICES = (('1', 'First',), ('2', 'Second',)))
-        >>> choice_field = forms.ChoiceField(widget=forms.RadioSelect, choices=CHOICES)
-        >>> choice_field.choices
-        [('1', 'First'), ('2', 'Second')]
-        >>> choice_field.widget.choices
-        [('1', 'First'), ('2', 'Second')]
-        >>> choice_field.widget.choices = ()
-        >>> choice_field.choices = (('1', 'First and only',),)
-        >>> choice_field.widget.choices
-        [('1', 'First and only')]
+    >>> from django import forms
+    >>> CHOICES = (('1', 'First',), ('2', 'Second',)))
+    >>> choice_field = forms.ChoiceField(widget=forms.RadioSelect, choices=CHOICES)
+    >>> choice_field.choices
+    [('1', 'First'), ('2', 'Second')]
+    >>> choice_field.widget.choices
+    [('1', 'First'), ('2', 'Second')]
+    >>> choice_field.widget.choices = ()
+    >>> choice_field.choices = (('1', 'First and only',),)
+    >>> choice_field.widget.choices
+    [('1', 'First and only')]
 
 
 Widgets which offer a :attr:`~Select.choices` attribute can however be used
@@ -113,55 +107,46 @@ specify additional attributes for each widget. When you specify a
 widget, you can provide a list of attributes that will be added to the
 rendered HTML for the widget.
 
-For example, take the following simple form:
+For example, take the following simple form::
 
-    .. code-block:: python
+    from django import forms
 
-        from django import forms
-
-        class CommentForm(forms.Form):
-            name = forms.CharField()
-            url = forms.URLField()
-            comment = forms.CharField()
+    class CommentForm(forms.Form):
+        name = forms.CharField()
+        url = forms.URLField()
+        comment = forms.CharField()
 
 This form will include three default :class:`TextInput` widgets, with default
 rendering -- no CSS class, no extra attributes. This means that the input boxes
-provided for each widget will be rendered exactly the same:
+provided for each widget will be rendered exactly the same::
 
-    .. code-block:: python
-
-        >>> f = CommentForm(auto_id=False)
-        >>> f.as_table()
-        <tr><th>Name:</th><td><input type="text" name="name" /></td></tr>
-        <tr><th>Url:</th><td><input type="text" name="url"/></td></tr>
-        <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
-
+    >>> f = CommentForm(auto_id=False)
+    >>> f.as_table()
+    <tr><th>Name:</th><td><input type="text" name="name" /></td></tr>
+    <tr><th>Url:</th><td><input type="text" name="url"/></td></tr>
+    <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
 
 On a real Web page, you probably don't want every widget to look the same. You
 might want a larger input element for the comment, and you might want the
 'name' widget to have some special CSS class. To do this, you use the
 :attr:`Widget.attrs` argument when creating the widget:
 
-For example:
+For example::
 
-    .. code-block:: python
-
-        class CommentForm(forms.Form):
-            name = forms.CharField(
-                        widget=forms.TextInput(attrs={'class':'special'}))
-            url = forms.URLField()
-            comment = forms.CharField(
-                       widget=forms.TextInput(attrs={'size':'40'}))
+    class CommentForm(forms.Form):
+        name = forms.CharField(
+                    widget=forms.TextInput(attrs={'class':'special'}))
+        url = forms.URLField()
+        comment = forms.CharField(
+                   widget=forms.TextInput(attrs={'size':'40'}))
 
 Django will then include the extra attributes in the rendered output:
 
-    .. code-block:: python
-
-        >>> f = CommentForm(auto_id=False)
-        >>> f.as_table()
-        <tr><th>Name:</th><td><input type="text" name="name" class="special"/></td></tr>
-        <tr><th>Url:</th><td><input type="text" name="url"/></td></tr>
-        <tr><th>Comment:</th><td><input type="text" name="comment" size="40"/></td></tr>
+    >>> f = CommentForm(auto_id=False)
+    >>> f.as_table()
+    <tr><th>Name:</th><td><input type="text" name="name" class="special"/></td></tr>
+    <tr><th>Url:</th><td><input type="text" name="url"/></td></tr>
+    <tr><th>Comment:</th><td><input type="text" name="comment" size="40"/></td></tr>
 
 .. _built-in widgets:
 
@@ -411,9 +396,7 @@ commonly used groups of widgets:
     :class:`MultiWidget`'s subclasses must implement. This method takes a
     single "compressed" value and returns a ``list``. An example of this is how
     :class:`SplitDateTimeWidget` turns a :class:`datetime` value into a list
-    with date and time split into two seperate values:
-
-    .. code-block:: python
+    with date and time split into two seperate values::
 
         class SplitDateTimeWidget(MultiWidget):
 

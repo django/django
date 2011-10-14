@@ -41,13 +41,13 @@ usable generic views.
 For example, the :class:`~django.views.generic.base.detail.DetailView`
 is composed from:
 
-    * :class:`~django.db.views.generic.base.View`, which provides the
-      basic class-based behavior
-    * :class:`~django.db.views.generic.detail.SingleObjectMixin`, which
-      provides the utilities for retrieving and displaying a single object
-    * :class:`~django.db.views.generic.detail.SingleObjectTemplateResponseMixin`,
-      which provides the tools for rendering a single object into a
-      template-based response.
+* :class:`~django.db.views.generic.base.View`, which provides the
+  basic class-based behavior
+* :class:`~django.db.views.generic.detail.SingleObjectMixin`, which
+  provides the utilities for retrieving and displaying a single object
+* :class:`~django.db.views.generic.detail.SingleObjectTemplateResponseMixin`,
+  which provides the tools for rendering a single object into a
+  template-based response.
 
 When combined, these mixins provide all the pieces necessary to
 provide a view over a single object that renders a template to produce
@@ -192,9 +192,9 @@ SingleObjectMixin
 
     **Context**
 
-        * ``object``: The object that this view is displaying. If
-          ``context_object_name`` is specified, that variable will also be
-          set in the context, with the same value as ``object``.
+    * ``object``: The object that this view is displaying. If
+      ``context_object_name`` is specified, that variable will also be
+      set in the context, with the same value as ``object``.
 
 SingleObjectTemplateResponseMixin
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -210,7 +210,7 @@ SingleObjectTemplateResponseMixin
 
     **Extends**
 
-        * :class:`~django.views.generic.base.TemplateResponseMixin`
+    * :class:`~django.views.generic.base.TemplateResponseMixin`
 
     .. attribute:: template_name_field
 
@@ -229,10 +229,10 @@ SingleObjectTemplateResponseMixin
 
         Returns a list of candidate template names. Returns the following list:
 
-          * the value of ``template_name`` on the view (if provided)
-          * the contents of the ``template_name_field`` field on the
-            object instance that the view is operating upon (if available)
-          * ``<app_label>/<object_name><template_name_suffix>.html``
+        * the value of ``template_name`` on the view (if provided)
+        * the contents of the ``template_name_field`` field on the
+          object instance that the view is operating upon (if available)
+        * ``<app_label>/<object_name><template_name_suffix>.html``
 
 Multiple object mixins
 ----------------------
@@ -248,15 +248,15 @@ MultipleObjectMixin
     If ``paginate_by`` is specified, Django will paginate the results returned
     by this. You can specify the page number in the URL in one of two ways:
 
-        * Use the ``page`` parameter in the URLconf. For example, this is what
-          your URLconf might look like::
+    * Use the ``page`` parameter in the URLconf. For example, this is what
+      your URLconf might look like::
 
-            (r'^objects/page(?P<page>[0-9]+)/$', PaginatedView.as_view())
+        (r'^objects/page(?P<page>[0-9]+)/$', PaginatedView.as_view())
 
-        * Pass the page number via the ``page`` query-string parameter. For
-          example, a URL would look like this::
+    * Pass the page number via the ``page`` query-string parameter. For
+      example, a URL would look like this::
 
-            /objects/?page=3
+        /objects/?page=3
 
     These values and lists are 1-based, not 0-based, so the first page would be
     represented as page ``1``.
@@ -363,22 +363,22 @@ MultipleObjectMixin
 
     **Context**
 
-        * ``object_list``: The list of objects that this view is displaying. If
-          ``context_object_name`` is specified, that variable will also be set
-          in the context, with the same value as ``object_list``.
+    * ``object_list``: The list of objects that this view is displaying. If
+      ``context_object_name`` is specified, that variable will also be set
+      in the context, with the same value as ``object_list``.
 
-        * ``is_paginated``: A boolean representing whether the results are
-          paginated. Specifically, this is set to ``False`` if no page size has
-          been specified, or if the available objects do not span multiple
-          pages.
+    * ``is_paginated``: A boolean representing whether the results are
+      paginated. Specifically, this is set to ``False`` if no page size has
+      been specified, or if the available objects do not span multiple
+      pages.
 
-        * ``paginator``: An instance of
-          :class:`django.core.paginator.Paginator`. If the page is not
-          paginated, this context variable will be ``None``.
+    * ``paginator``: An instance of
+      :class:`django.core.paginator.Paginator`. If the page is not
+      paginated, this context variable will be ``None``.
 
-        * ``page_obj``: An instance of
-          :class:`django.core.paginator.Page`. If the page is not paginated,
-          this context variable will be ``None``.
+    * ``page_obj``: An instance of
+      :class:`django.core.paginator.Page`. If the page is not paginated,
+      this context variable will be ``None``.
 
 MultipleObjectTemplateResponseMixin
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -392,7 +392,7 @@ MultipleObjectTemplateResponseMixin
 
     **Extends**
 
-        * :class:`~django.views.generic.base.TemplateResponseMixin`
+    * :class:`~django.views.generic.base.TemplateResponseMixin`
 
     .. attribute:: template_name_suffix
 
@@ -403,8 +403,8 @@ MultipleObjectTemplateResponseMixin
 
         Returns a list of candidate template names. Returns the following list:
 
-          * the value of ``template_name`` on the view (if provided)
-          * ``<app_label>/<object_name><template_name_suffix>.html``
+        * the value of ``template_name`` on the view (if provided)
+        * ``<app_label>/<object_name><template_name_suffix>.html``
 
 Editing mixins
 --------------
@@ -471,7 +471,7 @@ FormMixin
 
     **Context**
 
-        * ``form``: The form instance that was generated for the view.
+    * ``form``: The form instance that was generated for the view.
 
     .. note::
 
@@ -495,8 +495,8 @@ ModelFormMixin
 
     **Mixins**
 
-        * :class:`django.views.generic.edit.FormMixin`
-        * :class:`django.views.generic.detail.SingleObjectMixin`
+    * :class:`django.views.generic.edit.FormMixin`
+    * :class:`django.views.generic.detail.SingleObjectMixin`
 
     .. attribute:: success_url
 
@@ -604,9 +604,9 @@ YearMixin
         Returns the year for which this view will display data. Tries the
         following sources, in order:
 
-            * The value of the :attr:`YearMixin.year` attribute.
-            * The value of the `year` argument captured in the URL pattern
-            * The value of the `year` GET query argument.
+        * The value of the :attr:`YearMixin.year` attribute.
+        * The value of the `year` argument captured in the URL pattern
+        * The value of the `year` GET query argument.
 
         Raises a 404 if no valid year specification can be found.
 
@@ -637,9 +637,9 @@ MonthMixin
         Returns the month for which this view will display data. Tries the
         following sources, in order:
 
-            * The value of the :attr:`MonthMixin.month` attribute.
-            * The value of the `month` argument captured in the URL pattern
-            * The value of the `month` GET query argument.
+        * The value of the :attr:`MonthMixin.month` attribute.
+        * The value of the `month` argument captured in the URL pattern
+        * The value of the `month` GET query argument.
 
         Raises a 404 if no valid month specification can be found.
 
@@ -683,9 +683,9 @@ DayMixin
         Returns the day for which this view will display data. Tries the
         following sources, in order:
 
-            * The value of the :attr:`DayMixin.day` attribute.
-            * The value of the `day` argument captured in the URL pattern
-            * The value of the `day` GET query argument.
+        * The value of the :attr:`DayMixin.day` attribute.
+        * The value of the `day` argument captured in the URL pattern
+        * The value of the `day` GET query argument.
 
         Raises a 404 if no valid day specification can be found.
 
@@ -728,9 +728,9 @@ WeekMixin
         Returns the week for which this view will display data. Tries the
         following sources, in order:
 
-            * The value of the :attr:`WeekMixin.week` attribute.
-            * The value of the `week` argument captured in the URL pattern
-            * The value of the `week` GET query argument.
+        * The value of the :attr:`WeekMixin.week` attribute.
+        * The value of the `week` argument captured in the URL pattern
+        * The value of the `week` GET query argument.
 
         Raises a 404 if no valid week specification can be found.
 
@@ -782,8 +782,8 @@ BaseDateListView
 
     **Mixins**
 
-        * :class:`~django.views.generic.dates.DateMixin`
-        * :class:`~django.views.generic.list.MultipleObjectMixin`
+    * :class:`~django.views.generic.dates.DateMixin`
+    * :class:`~django.views.generic.list.MultipleObjectMixin`
 
     .. attribute:: allow_empty
 
@@ -888,7 +888,7 @@ TemplateView
 
     **Mixins**
 
-        * :class:`django.views.generic.base.TemplateResponseMixin`
+    * :class:`django.views.generic.base.TemplateResponseMixin`
 
     .. attribute:: template_name
 
@@ -901,8 +901,8 @@ TemplateView
 
     **Context**
 
-        * ``params``: The dictionary of keyword arguments captured from the URL
-          pattern that served the view.
+    * ``params``: The dictionary of keyword arguments captured from the URL
+      pattern that served the view.
 
 RedirectView
 ~~~~~~~~~~~~
@@ -971,8 +971,8 @@ DetailView
 
     **Mixins**
 
-      * :class:`django.views.generic.detail.SingleObjectMixin`
-      * :class:`django.views.generic.detail.SingleObjectTemplateResponseMixin`
+    * :class:`django.views.generic.detail.SingleObjectMixin`
+    * :class:`django.views.generic.detail.SingleObjectTemplateResponseMixin`
 
 List views
 ----------
@@ -997,8 +997,8 @@ ListView
 
     **Mixins**
 
-      * :class:`django.views.generic.list.MultipleObjectMixin`
-      * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
+    * :class:`django.views.generic.list.MultipleObjectMixin`
+    * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
 
 
 Editing views
@@ -1020,8 +1020,8 @@ FormView
 
     **Mixins**
 
-      * :class:`django.views.generic.edit.FormMixin`
-      * :class:`django.views.generic.edit.ProcessFormView`
+    * :class:`django.views.generic.edit.FormMixin`
+    * :class:`django.views.generic.edit.ProcessFormView`
 
 CreateView
 ~~~~~~~~~~
@@ -1037,8 +1037,8 @@ CreateView
 
     **Mixins**
 
-      * :class:`django.views.generic.edit.ModelFormMixin`
-      * :class:`django.views.generic.edit.ProcessFormView`
+    * :class:`django.views.generic.edit.ModelFormMixin`
+    * :class:`django.views.generic.edit.ProcessFormView`
 
 UpdateView
 ~~~~~~~~~~
@@ -1056,8 +1056,8 @@ UpdateView
 
     **Mixins**
 
-      * :class:`django.views.generic.edit.ModelFormMixin`
-      * :class:`django.views.generic.edit.ProcessFormView`
+    * :class:`django.views.generic.edit.ModelFormMixin`
+    * :class:`django.views.generic.edit.ProcessFormView`
 
 DeleteView
 ~~~~~~~~~~
@@ -1075,13 +1075,13 @@ DeleteView
 
     **Mixins**
 
-      * :class:`django.views.generic.edit.DeletionMixin`
-      * :class:`django.views.generic.detail.BaseDetailView`
+    * :class:`django.views.generic.edit.DeletionMixin`
+    * :class:`django.views.generic.detail.BaseDetailView`
 
     **Notes**
 
-       * The delete confirmation page displayed to a GET request uses a
-         ``template_name_suffix`` of ``'_confirm_delete'``.
+    * The delete confirmation page displayed to a GET request uses a
+      ``template_name_suffix`` of ``'_confirm_delete'``.
 
 Date-based views
 ----------------
@@ -1107,13 +1107,13 @@ ArchiveIndexView
 
     **Mixins**
 
-        * :class:`django.views.generic.dates.BaseDateListView`
-        * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
+    * :class:`django.views.generic.dates.BaseDateListView`
+    * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
 
     **Notes**
 
-        * Uses a default ``context_object_name`` of ``latest``.
-        * Uses a default ``template_name_suffix`` of ``_archive``.
+    * Uses a default ``context_object_name`` of ``latest``.
+    * Uses a default ``template_name_suffix`` of ``_archive``.
 
 YearArchiveView
 ~~~~~~~~~~~~~~~
@@ -1131,9 +1131,9 @@ YearArchiveView
 
     **Mixins**
 
-        * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
-        * :class:`django.views.generic.dates.YearMixin`
-        * :class:`django.views.generic.dates.BaseDateListView`
+    * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
+    * :class:`django.views.generic.dates.YearMixin`
+    * :class:`django.views.generic.dates.BaseDateListView`
 
     .. attribute:: make_object_list
 
@@ -1154,15 +1154,15 @@ YearArchiveView
     :class:`django.views.generic.dates.BaseDateListView`), the template's
     context will be:
 
-        * ``date_list``: A ``DateQuerySet`` object containing all months that
-          have objects available according to ``queryset``, represented as
-          ``datetime.datetime`` objects, in ascending order.
+    * ``date_list``: A ``DateQuerySet`` object containing all months that
+      have objects available according to ``queryset``, represented as
+      ``datetime.datetime`` objects, in ascending order.
 
-        * ``year``: The given year, as a four-character string.
+    * ``year``: The given year, as a four-character string.
 
     **Notes**
 
-        * Uses a default ``template_name_suffix`` of ``_archive_year``.
+    * Uses a default ``template_name_suffix`` of ``_archive_year``.
 
 MonthArchiveView
 ~~~~~~~~~~~~~~~~
@@ -1181,10 +1181,10 @@ MonthArchiveView
 
     **Mixins**
 
-        * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
-        * :class:`django.views.generic.dates.YearMixin`
-        * :class:`django.views.generic.dates.MonthMixin`
-        * :class:`django.views.generic.dates.BaseDateListView`
+    * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
+    * :class:`django.views.generic.dates.YearMixin`
+    * :class:`django.views.generic.dates.MonthMixin`
+    * :class:`django.views.generic.dates.BaseDateListView`
 
     **Context**
 
@@ -1193,23 +1193,23 @@ MonthArchiveView
     :class:`~django.views.generic.dates.BaseDateListView`), the template's
     context will be:
 
-        * ``date_list``: A ``DateQuerySet`` object containing all days that
-          have objects available in the given month, according to ``queryset``,
-          represented as ``datetime.datetime`` objects, in ascending order.
+    * ``date_list``: A ``DateQuerySet`` object containing all days that
+      have objects available in the given month, according to ``queryset``,
+      represented as ``datetime.datetime`` objects, in ascending order.
 
-        * ``month``: A ``datetime.date`` object representing the given month.
+    * ``month``: A ``datetime.date`` object representing the given month.
 
-        * ``next_month``: A ``datetime.date`` object representing the first day
-          of the next month. If the next month is in the future, this will be
-          ``None``.
+    * ``next_month``: A ``datetime.date`` object representing the first day
+      of the next month. If the next month is in the future, this will be
+      ``None``.
 
-        * ``previous_month``: A ``datetime.date`` object representing the first
-          day of the previous month. Unlike ``next_month``, this will never be
-          ``None``.
+    * ``previous_month``: A ``datetime.date`` object representing the first
+      day of the previous month. Unlike ``next_month``, this will never be
+      ``None``.
 
     **Notes**
 
-        * Uses a default ``template_name_suffix`` of ``_archive_month``.
+    * Uses a default ``template_name_suffix`` of ``_archive_month``.
 
 WeekArchiveView
 ~~~~~~~~~~~~~~~
@@ -1227,10 +1227,10 @@ WeekArchiveView
 
     **Mixins**
 
-        * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
-        * :class:`django.views.generic.dates.YearMixin`
-        * :class:`django.views.generic.dates.MonthMixin`
-        * :class:`django.views.generic.dates.BaseDateListView`
+    * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
+    * :class:`django.views.generic.dates.YearMixin`
+    * :class:`django.views.generic.dates.MonthMixin`
+    * :class:`django.views.generic.dates.BaseDateListView`
 
     **Context**
 
@@ -1239,12 +1239,12 @@ WeekArchiveView
     :class:`~django.views.generic.dates.BaseDateListView`), the template's
     context will be:
 
-        * ``week``: A ``datetime.date`` object representing the first day of
-          the given week.
+    * ``week``: A ``datetime.date`` object representing the first day of
+      the given week.
 
     **Notes**
 
-        * Uses a default ``template_name_suffix`` of ``_archive_week``.
+    * Uses a default ``template_name_suffix`` of ``_archive_week``.
 
 DayArchiveView
 ~~~~~~~~~~~~~~
@@ -1262,11 +1262,11 @@ DayArchiveView
 
     **Mixins**
 
-        * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
-        * :class:`django.views.generic.dates.YearMixin`
-        * :class:`django.views.generic.dates.MonthMixin`
-        * :class:`django.views.generic.dates.DayMixin`
-        * :class:`django.views.generic.dates.BaseDateListView`
+    * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
+    * :class:`django.views.generic.dates.YearMixin`
+    * :class:`django.views.generic.dates.MonthMixin`
+    * :class:`django.views.generic.dates.DayMixin`
+    * :class:`django.views.generic.dates.BaseDateListView`
 
     **Context**
 
@@ -1275,25 +1275,25 @@ DayArchiveView
     :class:`~django.views.generic.dates.BaseDateListView`), the template's
     context will be:
 
-        * ``day``: A ``datetime.date`` object representing the given day.
+    * ``day``: A ``datetime.date`` object representing the given day.
 
-        * ``next_day``: A ``datetime.date`` object representing the next day.
-          If the next day is in the future, this will be ``None``.
+    * ``next_day``: A ``datetime.date`` object representing the next day.
+      If the next day is in the future, this will be ``None``.
 
-        * ``previous_day``: A ``datetime.date`` object representing the
-          previous day. Unlike ``next_day``, this will never be ``None``.
+    * ``previous_day``: A ``datetime.date`` object representing the
+      previous day. Unlike ``next_day``, this will never be ``None``.
 
-        * ``next_month``: A ``datetime.date`` object representing the first day
-          of the next month. If the next month is in the future, this will be
-          ``None``.
+    * ``next_month``: A ``datetime.date`` object representing the first day
+      of the next month. If the next month is in the future, this will be
+      ``None``.
 
-        * ``previous_month``: A ``datetime.date`` object representing the first
-          day of the previous month. Unlike ``next_month``, this will never be
-          ``None``.
+    * ``previous_month``: A ``datetime.date`` object representing the first
+      day of the previous month. Unlike ``next_month``, this will never be
+      ``None``.
 
     **Notes**
 
-        * Uses a default ``template_name_suffix`` of ``_archive_day``.
+    * Uses a default ``template_name_suffix`` of ``_archive_day``.
 
 TodayArchiveView
 ~~~~~~~~~~~~~~~~
@@ -1311,8 +1311,8 @@ TodayArchiveView
 
     **Mixins**
 
-        * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
-        * :class:`django.views.generic.dates.BaseDayArchiveView`
+    * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
+    * :class:`django.views.generic.dates.BaseDayArchiveView`
 
 DateDetailView
 ~~~~~~~~~~~~~~
@@ -1330,9 +1330,9 @@ DateDetailView
 
     **Mixins**
 
-        * :class:`django.views.generic.detail.SingleObjectTemplateResponseMixin`
-        * :class:`django.views.generic.detail.BaseDetailView`
-        * :class:`django.views.generic.dates.DateMixin`
-        * :class:`django.views.generic.dates.YearMixin`
-        * :class:`django.views.generic.dates.MonthMixin`
-        * :class:`django.views.generic.dates.DayMixin`
+    * :class:`django.views.generic.detail.SingleObjectTemplateResponseMixin`
+    * :class:`django.views.generic.detail.BaseDetailView`
+    * :class:`django.views.generic.dates.DateMixin`
+    * :class:`django.views.generic.dates.YearMixin`
+    * :class:`django.views.generic.dates.MonthMixin`
+    * :class:`django.views.generic.dates.DayMixin`

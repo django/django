@@ -9,12 +9,12 @@ Automated testing is an extremely useful bug-killing tool for the modern
 Web developer. You can use a collection of tests -- a **test suite** -- to
 solve, or avoid, a number of problems:
 
-    * When you're writing new code, you can use tests to validate your code
-      works as expected.
+* When you're writing new code, you can use tests to validate your code
+  works as expected.
 
-    * When you're refactoring or modifying old code, you can use tests to
-      ensure your changes haven't affected your application's behavior
-      unexpectedly.
+* When you're refactoring or modifying old code, you can use tests to
+  ensure your changes haven't affected your application's behavior
+  unexpectedly.
 
 Testing a Web application is a complex task, because a Web application is made
 of several layers of logic -- from HTTP-level request handling, to form
@@ -35,31 +35,31 @@ There are two primary ways to write tests with Django, corresponding to the
 two test frameworks that ship in the Python standard library. The two
 frameworks are:
 
-    * **Unit tests** -- tests that are expressed as methods on a Python class
-      that subclasses :class:`unittest.TestCase` or Django's customized
-      :class:`TestCase`. For example::
+* **Unit tests** -- tests that are expressed as methods on a Python class
+  that subclasses :class:`unittest.TestCase` or Django's customized
+  :class:`TestCase`. For example::
 
-          import unittest
+      import unittest
 
-          class MyFuncTestCase(unittest.TestCase):
-              def testBasic(self):
-                  a = ['larry', 'curly', 'moe']
-                  self.assertEqual(my_func(a, 0), 'larry')
-                  self.assertEqual(my_func(a, 1), 'curly')
+      class MyFuncTestCase(unittest.TestCase):
+          def testBasic(self):
+              a = ['larry', 'curly', 'moe']
+              self.assertEqual(my_func(a, 0), 'larry')
+              self.assertEqual(my_func(a, 1), 'curly')
 
-    * **Doctests** -- tests that are embedded in your functions' docstrings and
-      are written in a way that emulates a session of the Python interactive
-      interpreter. For example::
+* **Doctests** -- tests that are embedded in your functions' docstrings and
+  are written in a way that emulates a session of the Python interactive
+  interpreter. For example::
 
-          def my_func(a_list, idx):
-              """
-              >>> a = ['larry', 'curly', 'moe']
-              >>> my_func(a, 0)
-              'larry'
-              >>> my_func(a, 1)
-              'curly'
-              """
-              return a_list[idx]
+      def my_func(a_list, idx):
+          """
+          >>> a = ['larry', 'curly', 'moe']
+          >>> my_func(a, 0)
+          'larry'
+          >>> my_func(a, 1)
+          'curly'
+          """
+          return a_list[idx]
 
 We'll discuss choosing the appropriate test framework later, however, most
 experienced developers prefer unit tests. You can also use any *other* Python
@@ -103,12 +103,12 @@ module defines tests in class-based approach.
 For a given Django application, the test runner looks for unit tests in two
 places:
 
-    * The ``models.py`` file. The test runner looks for any subclass of
-      :class:`unittest.TestCase` in this module.
+* The ``models.py`` file. The test runner looks for any subclass of
+  :class:`unittest.TestCase` in this module.
 
-    * A file called ``tests.py`` in the application directory -- i.e., the
-      directory that holds ``models.py``. Again, the test runner looks for any
-      subclass of :class:`unittest.TestCase` in this module.
+* A file called ``tests.py`` in the application directory -- i.e., the
+  directory that holds ``models.py``. Again, the test runner looks for any
+  subclass of :class:`unittest.TestCase` in this module.
 
 Here is an example :class:`unittest.TestCase` subclass::
 
@@ -169,14 +169,14 @@ of this document; read Python's official documentation for the details.
 As with unit tests, for a given Django application, the test runner looks for
 doctests in two places:
 
-    * The ``models.py`` file. You can define module-level doctests and/or a
-      doctest for individual models. It's common practice to put
-      application-level doctests in the module docstring and model-level
-      doctests in the model docstrings.
+* The ``models.py`` file. You can define module-level doctests and/or a
+  doctest for individual models. It's common practice to put
+  application-level doctests in the module docstring and model-level
+  doctests in the model docstrings.
 
-    * A file called ``tests.py`` in the application directory -- i.e., the
-      directory that holds ``models.py``. This file is a hook for any and all
-      doctests you want to write that aren't necessarily related to models.
+* A file called ``tests.py`` in the application directory -- i.e., the
+  directory that holds ``models.py``. This file is a hook for any and all
+  doctests you want to write that aren't necessarily related to models.
 
 This example doctest is equivalent to the example given in the unittest section
 above::
@@ -231,30 +231,30 @@ For developers new to testing, however, this choice can seem confusing. Here,
 then, are a few key differences to help you decide which approach is right for
 you:
 
-    * If you've been using Python for a while, :mod:`doctest` will probably feel
-      more "pythonic". It's designed to make writing tests as easy as possible,
-      so it requires no overhead of writing classes or methods. You simply put
-      tests in docstrings. This has the added advantage of serving as
-      documentation (and correct documentation, at that!). However, while
-      doctests are good for some simple example code, they are not very good if
-      you want to produce either high quality, comprehensive tests or high
-      quality documentation. Test failures are often difficult to debug
-      as it can be unclear exactly why the test failed. Thus, doctests should
-      generally be avoided and used primarily for documentation examples only.
+* If you've been using Python for a while, :mod:`doctest` will probably feel
+  more "pythonic". It's designed to make writing tests as easy as possible,
+  so it requires no overhead of writing classes or methods. You simply put
+  tests in docstrings. This has the added advantage of serving as
+  documentation (and correct documentation, at that!). However, while
+  doctests are good for some simple example code, they are not very good if
+  you want to produce either high quality, comprehensive tests or high
+  quality documentation. Test failures are often difficult to debug
+  as it can be unclear exactly why the test failed. Thus, doctests should
+  generally be avoided and used primarily for documentation examples only.
 
-    * The :mod:`unittest` framework will probably feel very familiar to
-      developers coming from Java. :mod:`unittest` is inspired by Java's JUnit,
-      so you'll feel at home with this method if you've used JUnit or any test
-      framework inspired by JUnit.
+* The :mod:`unittest` framework will probably feel very familiar to
+  developers coming from Java. :mod:`unittest` is inspired by Java's JUnit,
+  so you'll feel at home with this method if you've used JUnit or any test
+  framework inspired by JUnit.
 
-    * If you need to write a bunch of tests that share similar code, then
-      you'll appreciate the :mod:`unittest` framework's organization around
-      classes and methods. This makes it easy to abstract common tasks into
-      common methods. The framework also supports explicit setup and/or cleanup
-      routines, which give you a high level of control over the environment
-      in which your test cases are run.
+* If you need to write a bunch of tests that share similar code, then
+  you'll appreciate the :mod:`unittest` framework's organization around
+  classes and methods. This makes it easy to abstract common tasks into
+  common methods. The framework also supports explicit setup and/or cleanup
+  routines, which give you a high level of control over the environment
+  in which your test cases are run.
 
-    * If you're writing tests for Django itself, you should use :mod:`unittest`.
+* If you're writing tests for Django itself, you should use :mod:`unittest`.
 
 .. _running-tests:
 
@@ -571,24 +571,24 @@ programmatically.
 
 Some of the things you can do with the test client are:
 
-    * Simulate GET and POST requests on a URL and observe the response --
-      everything from low-level HTTP (result headers and status codes) to
-      page content.
+* Simulate GET and POST requests on a URL and observe the response --
+  everything from low-level HTTP (result headers and status codes) to
+  page content.
 
-    * Test that the correct view is executed for a given URL.
+* Test that the correct view is executed for a given URL.
 
-    * Test that a given request is rendered by a given Django template, with
-      a template context that contains certain values.
+* Test that a given request is rendered by a given Django template, with
+  a template context that contains certain values.
 
 Note that the test client is not intended to be a replacement for Twill_,
 Selenium_, or other "in-browser" frameworks. Django's test client has
 a different focus. In short:
 
-    * Use Django's test client to establish that the correct view is being
-      called and that the view is collecting the correct context data.
+* Use Django's test client to establish that the correct view is being
+  called and that the view is collecting the correct context data.
 
-    * Use in-browser frameworks such as Twill and Selenium to test *rendered*
-      HTML and the *behavior* of Web pages, namely JavaScript functionality.
+* Use in-browser frameworks such as Twill and Selenium to test *rendered*
+  HTML and the *behavior* of Web pages, namely JavaScript functionality.
 
 A comprehensive test suite should use a combination of both test types.
 
@@ -615,51 +615,51 @@ of the Python interactive interpreter.
 
 Note a few important things about how the test client works:
 
-    * The test client does *not* require the Web server to be running. In fact,
-      it will run just fine with no Web server running at all! That's because
-      it avoids the overhead of HTTP and deals directly with the Django
-      framework. This helps make the unit tests run quickly.
+* The test client does *not* require the Web server to be running. In fact,
+  it will run just fine with no Web server running at all! That's because
+  it avoids the overhead of HTTP and deals directly with the Django
+  framework. This helps make the unit tests run quickly.
 
-    * When retrieving pages, remember to specify the *path* of the URL, not the
-      whole domain. For example, this is correct::
+* When retrieving pages, remember to specify the *path* of the URL, not the
+  whole domain. For example, this is correct::
 
-          >>> c.get('/login/')
+      >>> c.get('/login/')
 
-      This is incorrect::
+  This is incorrect::
 
-          >>> c.get('http://www.example.com/login/')
+      >>> c.get('http://www.example.com/login/')
 
-      The test client is not capable of retrieving Web pages that are not
-      powered by your Django project. If you need to retrieve other Web pages,
-      use a Python standard library module such as :mod:`urllib` or
-      :mod:`urllib2`.
+  The test client is not capable of retrieving Web pages that are not
+  powered by your Django project. If you need to retrieve other Web pages,
+  use a Python standard library module such as :mod:`urllib` or
+  :mod:`urllib2`.
 
-    * To resolve URLs, the test client uses whatever URLconf is pointed-to by
-      your :setting:`ROOT_URLCONF` setting.
+* To resolve URLs, the test client uses whatever URLconf is pointed-to by
+  your :setting:`ROOT_URLCONF` setting.
 
-    * Although the above example would work in the Python interactive
-      interpreter, some of the test client's functionality, notably the
-      template-related functionality, is only available *while tests are
-      running*.
+* Although the above example would work in the Python interactive
+  interpreter, some of the test client's functionality, notably the
+  template-related functionality, is only available *while tests are
+  running*.
 
-      The reason for this is that Django's test runner performs a bit of black
-      magic in order to determine which template was loaded by a given view.
-      This black magic (essentially a patching of Django's template system in
-      memory) only happens during test running.
+  The reason for this is that Django's test runner performs a bit of black
+  magic in order to determine which template was loaded by a given view.
+  This black magic (essentially a patching of Django's template system in
+  memory) only happens during test running.
 
-    * By default, the test client will disable any CSRF checks
-      performed by your site.
+* By default, the test client will disable any CSRF checks
+  performed by your site.
 
-      .. versionadded:: 1.2.2
+  .. versionadded:: 1.2.2
 
-      If, for some reason, you *want* the test client to perform CSRF
-      checks, you can create an instance of the test client that
-      enforces CSRF checks. To do this, pass in the
-      ``enforce_csrf_checks`` argument when you construct your
-      client::
+  If, for some reason, you *want* the test client to perform CSRF
+  checks, you can create an instance of the test client that
+  enforces CSRF checks. To do this, pass in the
+  ``enforce_csrf_checks`` argument when you construct your
+  client::
 
-          >>> from django.test import Client
-          >>> csrf_client = Client(enforce_csrf_checks=True)
+      >>> from django.test import Client
+      >>> csrf_client = Client(enforce_csrf_checks=True)
 
 Making requests
 ~~~~~~~~~~~~~~~
@@ -1047,18 +1047,18 @@ a black box, with exactly known inputs, testing for specific outputs.
 The API for the :class:`~django.test.client.RequestFactory` is a slightly
 restricted subset of the test client API:
 
-    * It only has access to the HTTP methods :meth:`~Client.get()`,
-      :meth:`~Client.post()`, :meth:`~Client.put()`,
-      :meth:`~Client.delete()`, :meth:`~Client.head()` and
-      :meth:`~Client.options()`.
+* It only has access to the HTTP methods :meth:`~Client.get()`,
+  :meth:`~Client.post()`, :meth:`~Client.put()`,
+  :meth:`~Client.delete()`, :meth:`~Client.head()` and
+  :meth:`~Client.options()`.
 
-    * These methods accept all the same arguments *except* for
-      ``follows``. Since this is just a factory for producing
-      requests, it's up to you to handle the response.
+* These methods accept all the same arguments *except* for
+  ``follows``. Since this is just a factory for producing
+  requests, it's up to you to handle the response.
 
-    * It does not support middleware. Session and authentication
-      attributes must be supplied by the test itself if required
-      for the view to function properly.
+* It does not support middleware. Session and authentication
+  attributes must be supplied by the test itself if required
+  for the view to function properly.
 
 Example
 ~~~~~~~
@@ -1100,14 +1100,14 @@ easy: just change the base class of your test from :class:`unittest.TestCase` to
 functionality will continue to be available, but it will be augmented with some
 useful additions, including:
 
-    * Automatic loading of fixtures.
+* Automatic loading of fixtures.
 
-    * Wraps each test in a transaction.
+* Wraps each test in a transaction.
 
-    * Creates a TestClient instance.
+* Creates a TestClient instance.
 
-    * Django-specific assertions for testing for things
-      like redirection and form errors.
+* Django-specific assertions for testing for things
+  like redirection and form errors.
 
 ``TestCase`` inherits from :class:`~django.test.TransactionTestCase`.
 
@@ -1162,20 +1162,20 @@ by truncating tables and reloading initial data.
 A very thin subclass of :class:`unittest.TestCase`, it extends it with some
 basic functionality like:
 
- * Saving and restoring the Python warning machinery state.
- * Checking that a callable :meth:`raises a certain exeception <TestCase.assertRaisesMessage>`.
- * :meth:`Testing form field rendering <assertFieldOutput>`.
+* Saving and restoring the Python warning machinery state.
+* Checking that a callable :meth:`raises a certain exeception <TestCase.assertRaisesMessage>`.
+* :meth:`Testing form field rendering <assertFieldOutput>`.
 
 If you need any of the other more complex and heavyweight Django-specific
 features like:
 
- * The ability to run tests with :ref:`modified settings <overriding-settings>`
- * Using the :attr:`~TestCase.client` :class:`~django.test.client.Client`.
- * Testing or using the ORM.
- * Database :attr:`~TestCase.fixtures`.
- * Custom test-time :attr:`URL maps <TestCase.urls>`.
- * Test :ref:`skipping based on database backend features <skipping-tests>`.
- * Our specialized :ref:`assert* <assertions>` metods.
+* The ability to run tests with :ref:`modified settings <overriding-settings>`
+* Using the :attr:`~TestCase.client` :class:`~django.test.client.Client`.
+* Testing or using the ORM.
+* Database :attr:`~TestCase.fixtures`.
+* Custom test-time :attr:`URL maps <TestCase.urls>`.
+* Test :ref:`skipping based on database backend features <skipping-tests>`.
+* Our specialized :ref:`assert* <assertions>` metods.
 
 then you should use :class:`~django.test.TransactionTestCase` or
 :class:`~django.test.TestCase` instead.
@@ -1306,14 +1306,14 @@ subclass::
 
 Here's specifically what will happen:
 
-    * At the start of each test case, before ``setUp()`` is run, Django will
-      flush the database, returning the database to the state it was in
-      directly after :djadmin:`syncdb` was called.
+* At the start of each test case, before ``setUp()`` is run, Django will
+  flush the database, returning the database to the state it was in
+  directly after :djadmin:`syncdb` was called.
 
-    * Then, all the named fixtures are installed. In this example, Django will
-      install any JSON fixture named ``mammals``, followed by any fixture named
-      ``birds``. See the :djadmin:`loaddata` documentation for more
-      details on defining and installing fixtures.
+* Then, all the named fixtures are installed. In this example, Django will
+  install any JSON fixture named ``mammals``, followed by any fixture named
+  ``birds``. See the :djadmin:`loaddata` documentation for more
+  details on defining and installing fixtures.
 
 This flush/load procedure is repeated for each test in the test case, so you
 can be certain that the outcome of a test will not be affected by another test,
@@ -1762,21 +1762,21 @@ setting to determine what to do. By default, :setting:`TEST_RUNNER` points to
 ``'django.test.simple.DjangoTestSuiteRunner'``. This class defines the default Django
 testing behavior. This behavior involves:
 
-    #. Performing global pre-test setup.
+#. Performing global pre-test setup.
 
-    #. Looking for unit tests and doctests in the ``models.py`` and
-       ``tests.py`` files in each installed application.
+#. Looking for unit tests and doctests in the ``models.py`` and
+   ``tests.py`` files in each installed application.
 
-    #. Creating the test databases.
+#. Creating the test databases.
 
-    #. Running ``syncdb`` to install models and initial data into the test
-       databases.
+#. Running ``syncdb`` to install models and initial data into the test
+   databases.
 
-    #. Running the unit tests and doctests that are found.
+#. Running the unit tests and doctests that are found.
 
-    #. Destroying the test databases.
+#. Destroying the test databases.
 
-    #. Performing global post-test teardown.
+#. Performing global post-test teardown.
 
 If you define your own test runner class and point :setting:`TEST_RUNNER` at
 that class, Django will execute your test runner whenever you run
@@ -1851,10 +1851,10 @@ Methods
     ``test_labels`` is a list of strings describing the tests to be run. A test
     label can take one of three forms:
 
-        * ``app.TestCase.test_method`` -- Run a single test method in a test
-          case.
-        * ``app.TestCase`` -- Run all the test methods in a test case.
-        * ``app`` -- Search for and run all tests in the named application.
+    * ``app.TestCase.test_method`` -- Run a single test method in a test
+      case.
+    * ``app.TestCase`` -- Run all the test methods in a test case.
+    * ``app`` -- Search for and run all tests in the named application.
 
     If ``test_labels`` has a value of ``None``, the test runner should run
     search for tests in all the applications in :setting:`INSTALLED_APPS`.
@@ -1876,10 +1876,10 @@ Methods
     ``test_labels`` is a list of strings describing the tests to be run. A test
     label can take one of three forms:
 
-        * ``app.TestCase.test_method`` -- Run a single test method in a test
-          case.
-        * ``app.TestCase`` -- Run all the test methods in a test case.
-        * ``app`` -- Search for and run all tests in the named application.
+    * ``app.TestCase.test_method`` -- Run a single test method in a test
+      case.
+    * ``app.TestCase`` -- Run all the test methods in a test case.
+    * ``app`` -- Search for and run all tests in the named application.
 
     If ``test_labels`` has a value of ``None``, the test runner should run
     search for tests in all the applications in :setting:`INSTALLED_APPS`.
@@ -1957,12 +1957,12 @@ also provides some utilities that can be useful during testing.
     ``autoclobber`` describes the behavior that will occur if a
     database with the same name as the test database is discovered:
 
-        * If ``autoclobber`` is ``False``, the user will be asked to
-          approve destroying the existing database. ``sys.exit`` is
-          called if the user does not approve.
+    * If ``autoclobber`` is ``False``, the user will be asked to
+      approve destroying the existing database. ``sys.exit`` is
+      called if the user does not approve.
 
-        * If autoclobber is ``True``, the database will be destroyed
-          without consulting the user.
+    * If autoclobber is ``True``, the database will be destroyed
+      without consulting the user.
 
     Returns the name of the test database that it created.
 

@@ -510,23 +510,23 @@ Has one **required** argument:
     to be passed along to the storage system. The two arguments that will be
     passed are:
 
-        ======================  ===============================================
-        Argument                Description
-        ======================  ===============================================
-        ``instance``            An instance of the model where the
-                                ``FileField`` is defined. More specifically,
-                                this is the particular instance where the
-                                current file is being attached.
+    ======================  ===============================================
+    Argument                Description
+    ======================  ===============================================
+    ``instance``            An instance of the model where the
+                            ``FileField`` is defined. More specifically,
+                            this is the particular instance where the
+                            current file is being attached.
 
-                                In most cases, this object will not have been
-                                saved to the database yet, so if it uses the
-                                default ``AutoField``, *it might not yet have a
-                                value for its primary key field*.
+                            In most cases, this object will not have been
+                            saved to the database yet, so if it uses the
+                            default ``AutoField``, *it might not yet have a
+                            value for its primary key field*.
 
-        ``filename``            The filename that was originally given to the
-                                file. This may or may not be taken into account
-                                when determining the final destination path.
-        ======================  ===============================================
+    ``filename``            The filename that was originally given to the
+                            file. This may or may not be taken into account
+                            when determining the final destination path.
+    ======================  ===============================================
 
 Also has one optional argument:
 
@@ -541,22 +541,22 @@ widget).
 Using a :class:`FileField` or an :class:`ImageField` (see below) in a model
 takes a few steps:
 
-    1. In your settings file, you'll need to define :setting:`MEDIA_ROOT` as the
-       full path to a directory where you'd like Django to store uploaded files.
-       (For performance, these files are not stored in the database.) Define
-       :setting:`MEDIA_URL` as the base public URL of that directory. Make sure
-       that this directory is writable by the Web server's user account.
+1. In your settings file, you'll need to define :setting:`MEDIA_ROOT` as the
+   full path to a directory where you'd like Django to store uploaded files.
+   (For performance, these files are not stored in the database.) Define
+   :setting:`MEDIA_URL` as the base public URL of that directory. Make sure
+   that this directory is writable by the Web server's user account.
 
-    2. Add the :class:`FileField` or :class:`ImageField` to your model, making
-       sure to define the :attr:`~FileField.upload_to` option to tell Django
-       to which subdirectory of :setting:`MEDIA_ROOT` it should upload files.
+2. Add the :class:`FileField` or :class:`ImageField` to your model, making
+   sure to define the :attr:`~FileField.upload_to` option to tell Django
+   to which subdirectory of :setting:`MEDIA_ROOT` it should upload files.
 
-    3. All that will be stored in your database is a path to the file
-       (relative to :setting:`MEDIA_ROOT`). You'll most likely want to use the
-       convenience :attr:`~django.core.files.File.url` function provided by
-       Django. For example, if your :class:`ImageField` is called ``mug_shot``,
-       you can get the absolute path to your image in a template with
-       ``{{ object.mug_shot.url }}``.
+3. All that will be stored in your database is a path to the file
+   (relative to :setting:`MEDIA_ROOT`). You'll most likely want to use the
+   convenience :attr:`~django.core.files.File.url` function provided by
+   Django. For example, if your :class:`ImageField` is called ``mug_shot``,
+   you can get the absolute path to your image in a template with
+   ``{{ object.mug_shot.url }}``.
 
 For example, say your :setting:`MEDIA_ROOT` is set to ``'/home/media'``, and
 :attr:`~FileField.upload_to` is set to ``'photos/%Y/%m/%d'``. The ``'%Y/%m/%d'``

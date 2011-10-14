@@ -27,38 +27,38 @@ This signal is sent at more or less the same time (just before, actually) as the
 ``Comment`` object's :data:`~django.db.models.signals.pre_save` signal.
 
 Arguments sent with this signal:
-    
-    ``sender``
-        The comment model.
-        
-    ``comment``
-        The comment instance about to be posted. Note that it won't have been
-        saved into the database yet, so it won't have a primary key, and any
-        relations might not work correctly yet.
-        
-    ``request``
-        The :class:`~django.http.HttpRequest` that posted the comment.
-        
+
+``sender``
+    The comment model.
+
+``comment``
+    The comment instance about to be posted. Note that it won't have been
+    saved into the database yet, so it won't have a primary key, and any
+    relations might not work correctly yet.
+
+``request``
+    The :class:`~django.http.HttpRequest` that posted the comment.
+
 comment_was_posted
 ==================
 
 .. data:: django.contrib.comments.signals.comment_was_posted
    :module:
-   
+
 Sent just after the comment is saved.
 
 Arguments sent with this signal:
-    
-    ``sender``
-        The comment model.
-        
-    ``comment``
-        The comment instance that was posted. Note that it will have already
-        been saved, so if you modify it you'll need to call
-        :meth:`~django.db.models.Model.save` again.
-        
-    ``request``
-        The :class:`~django.http.HttpRequest` that posted the comment.
+
+``sender``
+    The comment model.
+
+``comment``
+    The comment instance that was posted. Note that it will have already
+    been saved, so if you modify it you'll need to call
+    :meth:`~django.db.models.Model.save` again.
+
+``request``
+    The :class:`~django.http.HttpRequest` that posted the comment.
 
 comment_was_flagged
 ===================
@@ -71,21 +71,21 @@ was a user requesting removal of a comment, a moderator approving/removing a
 comment, or some other custom user flag.
 
 Arguments sent with this signal:
-    
-    ``sender``
-        The comment model.
-        
-    ``comment``
-        The comment instance that was posted. Note that it will have already
-        been saved, so if you modify it you'll need to call
-        :meth:`~django.db.models.Model.save` again.
-        
-    ``flag``
-        The :class:`~django.contrib.comments.models.CommentFlag` that's been
-        attached to the comment.
-        
-    ``created``
-        ``True`` if this is a new flag; ``False`` if it's a duplicate flag.
-        
-    ``request``
-        The :class:`~django.http.HttpRequest` that posted the comment.
+
+``sender``
+    The comment model.
+
+``comment``
+    The comment instance that was posted. Note that it will have already
+    been saved, so if you modify it you'll need to call
+    :meth:`~django.db.models.Model.save` again.
+
+``flag``
+    The :class:`~django.contrib.comments.models.CommentFlag` that's been
+    attached to the comment.
+
+``created``
+    ``True`` if this is a new flag; ``False`` if it's a duplicate flag.
+
+``request``
+    The :class:`~django.http.HttpRequest` that posted the comment.

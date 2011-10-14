@@ -138,17 +138,17 @@ Serialization formats
 Django supports a number of serialization formats, some of which require you
 to install third-party Python modules:
 
-    ==========  ==============================================================
-    Identifier  Information
-    ==========  ==============================================================
-    ``xml``     Serializes to and from a simple XML dialect.
+==========  ==============================================================
+Identifier  Information
+==========  ==============================================================
+``xml``     Serializes to and from a simple XML dialect.
 
-    ``json``    Serializes to and from JSON_ (using a version of simplejson_
-                bundled with Django).
+``json``    Serializes to and from JSON_ (using a version of simplejson_
+            bundled with Django).
 
-    ``yaml``    Serializes to YAML (YAML Ain't a Markup Language). This
-                serializer is only available if PyYAML_ is installed.
-    ==========  ==============================================================
+``yaml``    Serializes to YAML (YAML Ain't a Markup Language). This
+            serializer is only available if PyYAML_ is installed.
+==========  ==============================================================
 
 .. _json: http://json.org/
 .. _simplejson: http://undefined.org/python/#simplejson

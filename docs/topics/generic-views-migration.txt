@@ -17,24 +17,24 @@ Replace generic views with generic classes
 Existing usage of function-based generic views should be replaced with
 their class-based analogs:
 
-    ====================================================  ====================================================
-    Old function-based generic view                       New class-based generic view
-    ====================================================  ====================================================
-    ``django.views.generic.simple.direct_to_template``    :class:`django.views.generic.base.TemplateView`
-    ``django.views.generic.simple.redirect_to``           :class:`django.views.generic.base.RedirectView`
-    ``django.views.generic.list_detail.object_list``      :class:`django.views.generic.list.ListView`
-    ``django.views.generic.list_detail.object_detail``    :class:`django.views.generic.detail.DetailView`
-    ``django.views.generic.create_update.create_object``  :class:`django.views.generic.edit.CreateView`
-    ``django.views.generic.create_update.update_object``  :class:`django.views.generic.edit.UpdateView`
-    ``django.views.generic.create_update.delete_object``  :class:`django.views.generic.edit.DeleteView`
-    ``django.views.generic.date_based.archive_index``     :class:`django.views.generic.dates.ArchiveIndexView`
-    ``django.views.generic.date_based.archive_year``      :class:`django.views.generic.dates.YearArchiveView`
-    ``django.views.generic.date_based.archive_month``     :class:`django.views.generic.dates.MonthArchiveView`
-    ``django.views.generic.date_based.archive_week``      :class:`django.views.generic.dates.WeekArchiveView`
-    ``django.views.generic.date_based.archive_day``       :class:`django.views.generic.dates.DayArchiveView`
-    ``django.views.generic.date_based.archive_today``     :class:`django.views.generic.dates.TodayArchiveView`
-    ``django.views.generic.date_based.object_detail``     :class:`django.views.generic.dates.DateDetailView`
-    ====================================================  ====================================================
+====================================================  ====================================================
+Old function-based generic view                       New class-based generic view
+====================================================  ====================================================
+``django.views.generic.simple.direct_to_template``    :class:`django.views.generic.base.TemplateView`
+``django.views.generic.simple.redirect_to``           :class:`django.views.generic.base.RedirectView`
+``django.views.generic.list_detail.object_list``      :class:`django.views.generic.list.ListView`
+``django.views.generic.list_detail.object_detail``    :class:`django.views.generic.detail.DetailView`
+``django.views.generic.create_update.create_object``  :class:`django.views.generic.edit.CreateView`
+``django.views.generic.create_update.update_object``  :class:`django.views.generic.edit.UpdateView`
+``django.views.generic.create_update.delete_object``  :class:`django.views.generic.edit.DeleteView`
+``django.views.generic.date_based.archive_index``     :class:`django.views.generic.dates.ArchiveIndexView`
+``django.views.generic.date_based.archive_year``      :class:`django.views.generic.dates.YearArchiveView`
+``django.views.generic.date_based.archive_month``     :class:`django.views.generic.dates.MonthArchiveView`
+``django.views.generic.date_based.archive_week``      :class:`django.views.generic.dates.WeekArchiveView`
+``django.views.generic.date_based.archive_day``       :class:`django.views.generic.dates.DayArchiveView`
+``django.views.generic.date_based.archive_today``     :class:`django.views.generic.dates.TodayArchiveView`
+``django.views.generic.date_based.object_detail``     :class:`django.views.generic.dates.DateDetailView`
+====================================================  ====================================================
 
 To do this, replace the reference to the generic view function with
 a ``as_view()`` instantiation of the class-based view. For example,

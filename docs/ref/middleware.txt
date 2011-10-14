@@ -36,38 +36,38 @@ defines. See the :doc:`cache documentation </topics/cache>`.
 
 Adds a few conveniences for perfectionists:
 
-    * Forbids access to user agents in the :setting:`DISALLOWED_USER_AGENTS`
-      setting, which should be a list of strings.
+* Forbids access to user agents in the :setting:`DISALLOWED_USER_AGENTS`
+  setting, which should be a list of strings.
 
-    * Performs URL rewriting based on the :setting:`APPEND_SLASH` and
-      :setting:`PREPEND_WWW` settings.
+* Performs URL rewriting based on the :setting:`APPEND_SLASH` and
+  :setting:`PREPEND_WWW` settings.
 
-      If :setting:`APPEND_SLASH` is ``True`` and the initial URL doesn't end
-      with a slash, and it is not found in the URLconf, then a new URL is
-      formed by appending a slash at the end. If this new URL is found in the
-      URLconf, then Django redirects the request to this new URL. Otherwise,
-      the initial URL is processed as usual.
+  If :setting:`APPEND_SLASH` is ``True`` and the initial URL doesn't end
+  with a slash, and it is not found in the URLconf, then a new URL is
+  formed by appending a slash at the end. If this new URL is found in the
+  URLconf, then Django redirects the request to this new URL. Otherwise,
+  the initial URL is processed as usual.
 
-      For example, ``foo.com/bar`` will be redirected to ``foo.com/bar/`` if
-      you don't have a valid URL pattern for ``foo.com/bar`` but *do* have a
-      valid pattern for ``foo.com/bar/``.
+  For example, ``foo.com/bar`` will be redirected to ``foo.com/bar/`` if
+  you don't have a valid URL pattern for ``foo.com/bar`` but *do* have a
+  valid pattern for ``foo.com/bar/``.
 
-      If :setting:`PREPEND_WWW` is ``True``, URLs that lack a leading "www."
-      will be redirected to the same URL with a leading "www."
+  If :setting:`PREPEND_WWW` is ``True``, URLs that lack a leading "www."
+  will be redirected to the same URL with a leading "www."
 
-      Both of these options are meant to normalize URLs. The philosophy is that
-      each URL should exist in one, and only one, place. Technically a URL
-      ``foo.com/bar`` is distinct from ``foo.com/bar/`` -- a search-engine
-      indexer would treat them as separate URLs -- so it's best practice to
-      normalize URLs.
+  Both of these options are meant to normalize URLs. The philosophy is that
+  each URL should exist in one, and only one, place. Technically a URL
+  ``foo.com/bar`` is distinct from ``foo.com/bar/`` -- a search-engine
+  indexer would treat them as separate URLs -- so it's best practice to
+  normalize URLs.
 
-    * Sends broken link notification emails to :setting:`MANAGERS` if
-      :setting:`SEND_BROKEN_LINK_EMAILS` is set to ``True``.
+* Sends broken link notification emails to :setting:`MANAGERS` if
+  :setting:`SEND_BROKEN_LINK_EMAILS` is set to ``True``.
 
-    * Handles ETags based on the :setting:`USE_ETAGS` setting. If
-      :setting:`USE_ETAGS` is set to ``True``, Django will calculate an ETag
-      for each request by MD5-hashing the page content, and it'll take care of
-      sending ``Not Modified`` responses, if appropriate.
+* Handles ETags based on the :setting:`USE_ETAGS` setting. If
+  :setting:`USE_ETAGS` is set to ``True``, Django will calculate an ETag
+  for each request by MD5-hashing the page content, and it'll take care of
+  sending ``Not Modified`` responses, if appropriate.
 
 View metadata middleware
 ------------------------

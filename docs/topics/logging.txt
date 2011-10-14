@@ -20,10 +20,10 @@ The cast of players
 
 A Python logging configuration consists of four parts:
 
-    * :ref:`topic-logging-parts-loggers`
-    * :ref:`topic-logging-parts-handlers`
-    * :ref:`topic-logging-parts-filters`
-    * :ref:`topic-logging-parts-formatters`
+* :ref:`topic-logging-parts-loggers`
+* :ref:`topic-logging-parts-handlers`
+* :ref:`topic-logging-parts-filters`
+* :ref:`topic-logging-parts-formatters`
 
 .. _topic-logging-parts-loggers:
 
@@ -37,18 +37,18 @@ A logger is configured to have a *log level*. This log level describes
 the severity of the messages that the logger will handle. Python
 defines the following log levels:
 
-    * ``DEBUG``: Low level system information for debugging purposes
+* ``DEBUG``: Low level system information for debugging purposes
 
-    * ``INFO``: General system information
+* ``INFO``: General system information
 
-    * ``WARNING``: Information describing a minor problem that has
-      occurred.
+* ``WARNING``: Information describing a minor problem that has
+  occurred.
 
-    * ``ERROR``: Information describing a major problem that has
-      occurred.
+* ``ERROR``: Information describing a major problem that has
+  occurred.
 
-    * ``CRITICAL``: Information describing a critical problem that has
-      occurred.
+* ``CRITICAL``: Information describing a critical problem that has
+  occurred.
 
 Each message that is written to the logger is a *Log Record*. Each log
 record also has a *log level* indicating the severity of that specific
@@ -180,19 +180,19 @@ Making logging calls
 The logger instance contains an entry method for each of the default
 log levels:
 
-    * ``logger.critical()``
-    * ``logger.error()``
-    * ``logger.warning()``
-    * ``logger.info()``
-    * ``logger.debug()``
+* ``logger.critical()``
+* ``logger.error()``
+* ``logger.warning()``
+* ``logger.info()``
+* ``logger.debug()``
 
 There are two other logging calls available:
 
-    * ``logger.log()``: Manually emits a logging message with a
-      specific log level.
+* ``logger.log()``: Manually emits a logging message with a
+  specific log level.
 
-    * ``logger.exception()``: Creates an ``ERROR`` level logging
-      message wrapping the current exception stack frame.
+* ``logger.exception()``: Creates an ``ERROR`` level logging
+  message wrapping the current exception stack frame.
 
 Configuring logging
 ===================
@@ -289,63 +289,62 @@ complex logging setup, configured using :meth:`logging.dictConfig`::
 
 This logging configuration does the following things:
 
-    * Identifies the configuration as being in 'dictConfig version 1'
-      format. At present, this is the only dictConfig format version.
+* Identifies the configuration as being in 'dictConfig version 1'
+  format. At present, this is the only dictConfig format version.
 
-    * Disables all existing logging configurations.
+* Disables all existing logging configurations.
 
-    * Defines two formatters:
+* Defines two formatters:
 
-        * ``simple``, that just outputs the log level name (e.g.,
-          ``DEBUG``) and the log message.
+  * ``simple``, that just outputs the log level name (e.g.,
+    ``DEBUG``) and the log message.
 
-          The `format` string is a normal Python formatting string
-          describing the details that are to be output on each logging
-          line. The full list of detail that can be output can be
-          found in the `formatter documentation`_.
+    The `format` string is a normal Python formatting string
+    describing the details that are to be output on each logging
+    line. The full list of detail that can be output can be
+    found in the `formatter documentation`_.
 
-        * ``verbose``, that outputs the log level name, the log
-          message, plus the time, process, thread and module that
-          generate the log message.
+  * ``verbose``, that outputs the log level name, the log
+    message, plus the time, process, thread and module that
+    generate the log message.
 
+* Defines one filter -- :class:`project.logging.SpecialFilter`,
+  using the alias ``special``. If this filter required additional
+  arguments at time of construction, they can be provided as
+  additional keys in the filter configuration dictionary. In this
+  case, the argument ``foo`` will be given a value of ``bar`` when
+  instantiating the :class:`SpecialFilter`.
 
-    * Defines one filter -- :class:`project.logging.SpecialFilter`,
-      using the alias ``special``. If this filter required additional
-      arguments at time of construction, they can be provided as
-      additional keys in the filter configuration dictionary. In this
-      case, the argument ``foo`` will be given a value of ``bar`` when
-      instantiating the :class:`SpecialFilter`.
+* Defines three handlers:
 
-    * Defines three handlers:
+  * ``null``, a NullHandler, which will pass any ``DEBUG`` or
+    higher message to ``/dev/null``.
 
-        * ``null``, a NullHandler, which will pass any ``DEBUG`` or
-          higher message to ``/dev/null``.
+  * ``console``, a StreamHandler, which will print any ``DEBUG``
+    message to stdout. This handler uses the `simple` output
+    format.
 
-        * ``console``, a StreamHandler, which will print any ``DEBUG``
-          message to stdout. This handler uses the `simple` output
-          format.
+  * ``mail_admins``, an AdminEmailHandler, which will email any
+    ``ERROR`` level message to the site admins. This handler uses
+    the ``special`` filter.
 
-        * ``mail_admins``, an AdminEmailHandler, which will email any
-          ``ERROR`` level message to the site admins. This handler uses
-          the ``special`` filter.
+* Configures three loggers:
 
-    * Configures three loggers:
+  * ``django``, which passes all messages at ``INFO`` or higher
+    to the ``null`` handler.
 
-        * ``django``, which passes all messages at ``INFO`` or higher
-          to the ``null`` handler.
+  * ``django.request``, which passes all ``ERROR`` messages to
+    the ``mail_admins`` handler. In addition, this logger is
+    marked to *not* propagate messages. This means that log
+    messages written to ``django.request`` will not be handled
+    by the ``django`` logger.
 
-        * ``django.request``, which passes all ``ERROR`` messages to
-          the ``mail_admins`` handler. In addition, this logger is
-          marked to *not* propagate messages. This means that log
-          messages written to ``django.request`` will not be handled
-          by the ``django`` logger.
-
-        * ``myproject.custom``, which passes all messages at ``INFO``
-          or higher that also pass the ``special`` filter to two
-          handlers -- the ``console``, and ``mail_admins``. This
-          means that all ``INFO`` level messages (or higher) will be
-          printed to the console; ``ERROR`` and ``CRITICAL``
-          messages will also be output via email.
+  * ``myproject.custom``, which passes all messages at ``INFO``
+    or higher that also pass the ``special`` filter to two
+    handlers -- the ``console``, and ``mail_admins``. This
+    means that all ``INFO`` level messages (or higher) will be
+    printed to the console; ``ERROR`` and ``CRITICAL``
+    messages will also be output via email.
 
 .. admonition:: Custom handlers and circular imports
 
@@ -433,11 +432,11 @@ messages.
 
 Messages to this logger have the following extra context:
 
-    * ``status_code``: The HTTP response code associated with the
-      request.
+* ``status_code``: The HTTP response code associated with the
+  request.
 
-    * ``request``: The request object that generated the logging
-      message.
+* ``request``: The request object that generated the logging
+  message.
 
 ``django.db.backends``
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -448,9 +447,9 @@ at the ``DEBUG`` level to this logger.
 
 Messages to this logger have the following extra context:
 
-    * ``duration``: The time taken to execute the SQL statement.
-    * ``sql``: The SQL statement that was executed.
-    * ``params``: The parameters that were used in the SQL call.
+* ``duration``: The time taken to execute the SQL statement.
+* ``sql``: The SQL statement that was executed.
+* ``params``: The parameters that were used in the SQL call.
 
 For performance reasons, SQL logging is only enabled when
 ``settings.DEBUG`` is set to ``True``, regardless of the logging

@@ -13,11 +13,11 @@ Installation
 
 To install the redirects app, follow these steps:
 
-    1. Add ``'django.contrib.redirects'`` to your :setting:`INSTALLED_APPS`
-       setting.
-    2. Add ``'django.contrib.redirects.middleware.RedirectFallbackMiddleware'``
-       to your :setting:`MIDDLEWARE_CLASSES` setting.
-    3. Run the command :djadmin:`manage.py syncdb <syncdb>`.
+1. Add ``'django.contrib.redirects'`` to your :setting:`INSTALLED_APPS`
+   setting.
+2. Add ``'django.contrib.redirects.middleware.RedirectFallbackMiddleware'``
+   to your :setting:`MIDDLEWARE_CLASSES` setting.
+3. Run the command :djadmin:`manage.py syncdb <syncdb>`.
 
 How it works
 ============
@@ -31,12 +31,12 @@ for the requested URL as a last resort. Specifically, it checks for a redirect
 with the given ``old_path`` with a site ID that corresponds to the
 :setting:`SITE_ID` setting.
 
-    * If it finds a match, and ``new_path`` is not empty, it redirects to
-      ``new_path``.
-    * If it finds a match, and ``new_path`` is empty, it sends a 410 ("Gone")
-      HTTP header and empty (content-less) response.
-    * If it doesn't find a match, the request continues to be processed as
-      usual.
+* If it finds a match, and ``new_path`` is not empty, it redirects to
+  ``new_path``.
+* If it finds a match, and ``new_path`` is empty, it sends a 410 ("Gone")
+  HTTP header and empty (content-less) response.
+* If it doesn't find a match, the request continues to be processed as
+  usual.
 
 The middleware only gets activated for 404s -- not for 500s or responses of any
 other status code.

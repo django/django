@@ -9,10 +9,10 @@ In addition, ``manage.py`` is automatically created in each Django project.
 ``manage.py`` is a thin wrapper around ``django-admin.py`` that takes care of
 two things for you before delegating to ``django-admin.py``:
 
-    * It puts your project's package on ``sys.path``.
+* It puts your project's package on ``sys.path``.
 
-    * It sets the :envvar:`DJANGO_SETTINGS_MODULE` environment variable so that
-      it points to your project's ``settings.py`` file.
+* It sets the :envvar:`DJANGO_SETTINGS_MODULE` environment variable so that
+  it points to your project's ``settings.py`` file.
 
 The ``django-admin.py`` script should be on your system path if you installed
 Django via its ``setup.py`` utility. If it's not on your path, you can find it
@@ -128,9 +128,9 @@ Runs the command-line client for the database engine specified in your
 ``ENGINE`` setting, with the connection parameters specified in your
 :setting:`USER`, :setting:`PASSWORD`, etc., settings.
 
-    * For PostgreSQL, this runs the ``psql`` command-line client.
-    * For MySQL, this runs the ``mysql`` command-line client.
-    * For SQLite, this runs the ``sqlite3`` command-line client.
+* For PostgreSQL, this runs the ``psql`` command-line client.
+* For MySQL, this runs the ``mysql`` command-line client.
+* For SQLite, this runs the ``sqlite3`` command-line client.
 
 This command assumes the programs are on your ``PATH`` so that a simple call to
 the program name (``psql``, ``mysql``, ``sqlite3``) will find the program in
@@ -257,19 +257,19 @@ As you might expect, the created models will have an attribute for every field
 in the table. Note that ``inspectdb`` has a few special cases in its field-name
 output:
 
-    * If ``inspectdb`` cannot map a column's type to a model field type, it'll
-      use ``TextField`` and will insert the Python comment
-      ``'This field type is a guess.'`` next to the field in the generated
-      model.
+* If ``inspectdb`` cannot map a column's type to a model field type, it'll
+  use ``TextField`` and will insert the Python comment
+  ``'This field type is a guess.'`` next to the field in the generated
+  model.
 
-    * If the database column name is a Python reserved word (such as
-      ``'pass'``, ``'class'`` or ``'for'``), ``inspectdb`` will append
-      ``'_field'`` to the attribute name. For example, if a table has a column
-      ``'for'``, the generated model will have a field ``'for_field'``, with
-      the ``db_column`` attribute set to ``'for'``. ``inspectdb`` will insert
-      the Python comment
-      ``'Field renamed because it was a Python reserved word.'`` next to the
-      field.
+* If the database column name is a Python reserved word (such as
+  ``'pass'``, ``'class'`` or ``'for'``), ``inspectdb`` will append
+  ``'_field'`` to the attribute name. For example, if a table has a column
+  ``'for'``, the generated model will have a field ``'for_field'``, with
+  the ``db_column`` attribute set to ``'for'``. ``inspectdb`` will insert
+  the Python comment
+  ``'Field renamed because it was a Python reserved word.'`` next to the
+  field.
 
 This feature is meant as a shortcut, not as definitive model generation. After
 you run it, you'll want to look over the generated models yourself to make
@@ -309,9 +309,9 @@ fixture can be distributed over multiple directories, in multiple applications.
 
 Django will search in three locations for fixtures:
 
-   1. In the ``fixtures`` directory of every installed application
-   2. In any directory named in the :setting:`FIXTURE_DIRS` setting
-   3. In the literal path named by the fixture
+1. In the ``fixtures`` directory of every installed application
+2. In any directory named in the :setting:`FIXTURE_DIRS` setting
+3. In the literal path named by the fixture
 
 Django will load any and all fixtures it finds in these locations that match
 the provided fixture names.
@@ -438,8 +438,8 @@ Example usage::
 Use the ``--domain`` or ``-d`` option to change the domain of the messages files.
 Currently supported:
 
-    * ``django`` for all ``*.py``, ``*.html`` and ``*.txt`` files (default)
-    * ``djangojs`` for ``*.js`` files
+* ``django`` for all ``*.py``, ``*.html`` and ``*.txt`` files (default)
+* ``djangojs`` for ``*.js`` files
 
 .. django-admin-option:: --symlinks
 
@@ -984,25 +984,25 @@ For example, this command::
 
 ...would perform the following steps:
 
-    1. Create a test database, as described in :doc:`/topics/testing`.
-    2. Populate the test database with fixture data from the given fixtures.
-       (For more on fixtures, see the documentation for ``loaddata`` above.)
-    3. Runs the Django development server (as in ``runserver``), pointed at
-       this newly created test database instead of your production database.
+1. Create a test database, as described in :doc:`/topics/testing`.
+2. Populate the test database with fixture data from the given fixtures.
+   (For more on fixtures, see the documentation for ``loaddata`` above.)
+3. Runs the Django development server (as in ``runserver``), pointed at
+   this newly created test database instead of your production database.
 
 This is useful in a number of ways:
 
-    * When you're writing :doc:`unit tests </topics/testing>` of how your views
-      act with certain fixture data, you can use ``testserver`` to interact with
-      the views in a Web browser, manually.
+* When you're writing :doc:`unit tests </topics/testing>` of how your views
+  act with certain fixture data, you can use ``testserver`` to interact with
+  the views in a Web browser, manually.
 
-    * Let's say you're developing your Django application and have a "pristine"
-      copy of a database that you'd like to interact with. You can dump your
-      database to a fixture (using the ``dumpdata`` command, explained above),
-      then use ``testserver`` to run your Web application with that data. With
-      this arrangement, you have the flexibility of messing up your data
-      in any way, knowing that whatever data changes you're making are only
-      being made to a test database.
+* Let's say you're developing your Django application and have a "pristine"
+  copy of a database that you'd like to interact with. You can dump your
+  database to a fixture (using the ``dumpdata`` command, explained above),
+  then use ``testserver`` to run your Web application with that data. With
+  this arrangement, you have the flexibility of messing up your data
+  in any way, knowing that whatever data changes you're making are only
+  being made to a test database.
 
 Note that this server does *not* automatically detect changes to your Python
 source code (as ``runserver`` does). It does, however, detect changes to
@@ -1197,10 +1197,10 @@ Example usage::
 Use ``--verbosity`` to specify the amount of notification and debug information
 that ``django-admin.py`` should print to the console.
 
-    * ``0`` means no output.
-    * ``1`` means normal output (default).
-    * ``2`` means verbose output.
-    * ``3`` means *very* verbose output.
+* ``0`` means no output.
+* ``1`` means normal output (default).
+* ``2`` means verbose output.
+* ``3`` means *very* verbose output.
 
 Common options
 ==============
@@ -1259,13 +1259,13 @@ another program.
 The colors used for syntax highlighting can be customized. Django
 ships with three color palettes:
 
-    * ``dark``, suited to terminals that show white text on a black
-      background. This is the default palette.
+* ``dark``, suited to terminals that show white text on a black
+  background. This is the default palette.
 
-    * ``light``, suited to terminals that show black text on a white
-      background.
+* ``light``, suited to terminals that show black text on a white
+  background.
 
-    * ``nocolor``, which disables syntax highlighting.
+* ``nocolor``, which disables syntax highlighting.
 
 You select a palette by setting a ``DJANGO_COLORS`` environment
 variable to specify the palette you want to use. For example, to
@@ -1277,47 +1277,47 @@ would run the following at a command prompt::
 You can also customize the colors that are used. Django specifies a
 number of roles in which color is used:
 
-    * ``error`` - A major error.
-    * ``notice`` - A minor error.
-    * ``sql_field`` - The name of a model field in SQL.
-    * ``sql_coltype`` - The type of a model field in SQL.
-    * ``sql_keyword`` - A SQL keyword.
-    * ``sql_table`` - The name of a model in SQL.
-    * ``http_info`` - A 1XX HTTP Informational server response.
-    * ``http_success`` - A 2XX HTTP Success server response.
-    * ``http_not_modified`` - A 304 HTTP Not Modified server response.
-    * ``http_redirect`` - A 3XX HTTP Redirect server response other than 304.
-    * ``http_not_found`` - A 404 HTTP Not Found server response.
-    * ``http_bad_request`` - A 4XX HTTP Bad Request server response other than 404.
-    * ``http_server_error`` - A 5XX HTTP Server Error response.
+* ``error`` - A major error.
+* ``notice`` - A minor error.
+* ``sql_field`` - The name of a model field in SQL.
+* ``sql_coltype`` - The type of a model field in SQL.
+* ``sql_keyword`` - A SQL keyword.
+* ``sql_table`` - The name of a model in SQL.
+* ``http_info`` - A 1XX HTTP Informational server response.
+* ``http_success`` - A 2XX HTTP Success server response.
+* ``http_not_modified`` - A 304 HTTP Not Modified server response.
+* ``http_redirect`` - A 3XX HTTP Redirect server response other than 304.
+* ``http_not_found`` - A 404 HTTP Not Found server response.
+* ``http_bad_request`` - A 4XX HTTP Bad Request server response other than 404.
+* ``http_server_error`` - A 5XX HTTP Server Error response.
 
 Each of these roles can be assigned a specific foreground and
 background color, from the following list:
 
-    * ``black``
-    * ``red``
-    * ``green``
-    * ``yellow``
-    * ``blue``
-    * ``magenta``
-    * ``cyan``
-    * ``white``
+* ``black``
+* ``red``
+* ``green``
+* ``yellow``
+* ``blue``
+* ``magenta``
+* ``cyan``
+* ``white``
 
 Each of these colors can then be modified by using the following
 display options:
 
-    * ``bold``
-    * ``underscore``
-    * ``blink``
-    * ``reverse``
-    * ``conceal``
+* ``bold``
+* ``underscore``
+* ``blink``
+* ``reverse``
+* ``conceal``
 
 A color specification follows one of the following patterns:
 
-    * ``role=fg``
-    * ``role=fg/bg``
-    * ``role=fg,option,option``
-    * ``role=fg/bg,option,option``
+* ``role=fg``
+* ``role=fg/bg``
+* ``role=fg,option,option``
+* ``role=fg/bg,option,option``
 
 where ``role`` is the name of a valid color role, ``fg`` is the
 foreground color, ``bg`` is the background color and each ``option``
@@ -1348,10 +1348,10 @@ script, which lives in ``extras/django_bash_completion`` in the Django
 distribution. It enables tab-completion of ``django-admin.py`` and
 ``manage.py`` commands, so you can, for instance...
 
-    * Type ``django-admin.py``.
-    * Press [TAB] to see all available options.
-    * Type ``sql``, then [TAB], to see all available options whose names start
-      with ``sql``.
+* Type ``django-admin.py``.
+* Press [TAB] to see all available options.
+* Type ``sql``, then [TAB], to see all available options whose names start
+  with ``sql``.
 
 
 See :doc:`/howto/custom-management-commands` for how to add customized actions.

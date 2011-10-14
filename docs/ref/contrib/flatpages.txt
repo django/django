@@ -22,30 +22,30 @@ content in a custom template.
 
 Here are some examples of flatpages on Django-powered sites:
 
-    * http://www.lawrence.com/about/contact/
-    * http://www2.ljworld.com/site/rules/
+* http://www.lawrence.com/about/contact/
+* http://www2.ljworld.com/site/rules/
 
 Installation
 ============
 
 To install the flatpages app, follow these steps:
 
-    1. Install the :mod:`sites framework <django.contrib.sites>` by adding
-       ``'django.contrib.sites'`` to your :setting:`INSTALLED_APPS` setting,
-       if it's not already in there.
+1. Install the :mod:`sites framework <django.contrib.sites>` by adding
+   ``'django.contrib.sites'`` to your :setting:`INSTALLED_APPS` setting,
+   if it's not already in there.
 
-       Also make sure you've correctly set :setting:`SITE_ID` to the ID of the
-       site the settings file represents. This will usually be ``1`` (i.e.
-       ``SITE_ID = 1``, but if you're using the sites framework to manage
-       multiple sites, it could be the ID of a different site.
+   Also make sure you've correctly set :setting:`SITE_ID` to the ID of the
+   site the settings file represents. This will usually be ``1`` (i.e.
+   ``SITE_ID = 1``, but if you're using the sites framework to manage
+   multiple sites, it could be the ID of a different site.
 
-    2. Add ``'django.contrib.flatpages'`` to your :setting:`INSTALLED_APPS`
-       setting.
+2. Add ``'django.contrib.flatpages'`` to your :setting:`INSTALLED_APPS`
+   setting.
 
-    3. Add ``'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware'``
-       to your :setting:`MIDDLEWARE_CLASSES` setting.
+3. Add ``'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware'``
+   to your :setting:`MIDDLEWARE_CLASSES` setting.
 
-    4. Run the command :djadmin:`manage.py syncdb <syncdb>`.
+4. Run the command :djadmin:`manage.py syncdb <syncdb>`.
 
 .. currentmodule:: django.contrib.flatpages.middleware
 
@@ -69,13 +69,13 @@ does all of the work.
 
     If it finds a match, it follows this algorithm:
 
-        * If the flatpage has a custom template, it loads that template.
-          Otherwise, it loads the template :file:`flatpages/default.html`.
+    * If the flatpage has a custom template, it loads that template.
+      Otherwise, it loads the template :file:`flatpages/default.html`.
 
-        * It passes that template a single context variable, ``flatpage``,
-          which is the flatpage object. It uses
-          :class:`~django.template.RequestContext` in rendering the
-          template.
+    * It passes that template a single context variable, ``flatpage``,
+      which is the flatpage object. It uses
+      :class:`~django.template.RequestContext` in rendering the
+      template.
 
     .. versionchanged:: 1.4
        The middleware will only add a trailing slash and redirect (by looking

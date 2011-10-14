@@ -41,14 +41,14 @@ comment model has no field for that title.
 
 To make this kind of customization, we'll need to do three things:
 
-    #. Create a custom comment :class:`~django.db.models.Model` that adds on the
-       "title" field.
+#. Create a custom comment :class:`~django.db.models.Model` that adds on the
+   "title" field.
 
-    #. Create a custom comment :class:`~django.forms.Form` that also adds this
-       "title" field.
+#. Create a custom comment :class:`~django.forms.Form` that also adds this
+   "title" field.
 
-    #. Inform Django of these objects by defining a few functions in a
-       custom :setting:`COMMENTS_APP`.
+#. Inform Django of these objects by defining a few functions in a
+   custom :setting:`COMMENTS_APP`.
 
 So, carrying on the example above, we're dealing with a typical app structure in
 the ``my_custom_app`` directory::

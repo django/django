@@ -32,27 +32,27 @@ Here's an example::
 The code and comments should be self-explanatory, but a few things deserve a
 mention:
 
-    * The response gets a special MIME type, :mimetype:`text/csv`. This tells
-      browsers that the document is a CSV file, rather than an HTML file. If
-      you leave this off, browsers will probably interpret the output as HTML,
-      which will result in ugly, scary gobbledygook in the browser window.
+* The response gets a special MIME type, :mimetype:`text/csv`. This tells
+  browsers that the document is a CSV file, rather than an HTML file. If
+  you leave this off, browsers will probably interpret the output as HTML,
+  which will result in ugly, scary gobbledygook in the browser window.
 
-    * The response gets an additional ``Content-Disposition`` header, which
-      contains the name of the CSV file. This filename is arbitrary; call it
-      whatever you want. It'll be used by browsers in the "Save as..."
-      dialogue, etc.
+* The response gets an additional ``Content-Disposition`` header, which
+  contains the name of the CSV file. This filename is arbitrary; call it
+  whatever you want. It'll be used by browsers in the "Save as..."
+  dialogue, etc.
 
-    * Hooking into the CSV-generation API is easy: Just pass ``response`` as the
-      first argument to ``csv.writer``. The ``csv.writer`` function expects a
-      file-like object, and :class:`~django.http.HttpResponse` objects fit the
-      bill.
+* Hooking into the CSV-generation API is easy: Just pass ``response`` as the
+  first argument to ``csv.writer``. The ``csv.writer`` function expects a
+  file-like object, and :class:`~django.http.HttpResponse` objects fit the
+  bill.
 
-    * For each row in your CSV file, call ``writer.writerow``, passing it an
-      iterable object such as a list or tuple.
+* For each row in your CSV file, call ``writer.writerow``, passing it an
+  iterable object such as a list or tuple.
 
-    * The CSV module takes care of quoting for you, so you don't have to worry
-      about escaping strings with quotes or commas in them. Just pass
-      ``writerow()`` your raw strings, and it'll do the right thing.
+* The CSV module takes care of quoting for you, so you don't have to worry
+  about escaping strings with quotes or commas in them. Just pass
+  ``writerow()`` your raw strings, and it'll do the right thing.
 
 Handling Unicode
 ~~~~~~~~~~~~~~~~
@@ -62,13 +62,13 @@ Unicode internally this means strings read from sources such as
 :class:`~django.http.HttpRequest` are potentially problematic. There are a few
 options for handling this:
 
-    * Manually encode all Unicode objects to a compatible encoding.
+* Manually encode all Unicode objects to a compatible encoding.
 
-    * Use the ``UnicodeWriter`` class provided in the `csv module's examples
-      section`_.
+* Use the ``UnicodeWriter`` class provided in the `csv module's examples
+  section`_.
 
-    * Use the `python-unicodecsv module`_, which aims to be a drop-in
-      replacement for :mod:`csv` that gracefully handles Unicode.
+* Use the `python-unicodecsv module`_, which aims to be a drop-in
+  replacement for :mod:`csv` that gracefully handles Unicode.
 
 For more information, see the Python documentation of the :mod:`csv` module.
 

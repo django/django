@@ -29,11 +29,11 @@ setting is ``True``) when using the :djadmin:`runserver` management command.
 Based on feedback from the community this release adds two new options to the
 :djadmin:`runserver` command to modify this behavior:
 
-    * ``--nostatic``: prevents the :djadmin:`runserver` command from serving
-      files completely.
+* ``--nostatic``: prevents the :djadmin:`runserver` command from serving
+  files completely.
 
-    * ``--insecure``: enables serving of static files even if running with
-      :setting:`DEBUG` set to False. (This is **not** recommended!)
+* ``--insecure``: enables serving of static files even if running with
+  :setting:`DEBUG` set to False. (This is **not** recommended!)
 
 See the :doc:`staticfiles reference documentation </ref/contrib/staticfiles>`
 for more details, or learn :doc:`how to manage static files
@@ -100,25 +100,25 @@ desired outside the use of the optional :mod:`~django.contrib.staticfiles` app.
 
 As a result, we took the following steps to rectify the issue:
 
-  * Two new global settings were added that will be used by, **but are not
-    limited to**, the :doc:`staticfiles</ref/contrib/staticfiles>` app:
+* Two new global settings were added that will be used by, **but are not
+limited to**, the :doc:`staticfiles</ref/contrib/staticfiles>` app:
 
-    * :setting:`STATIC_ROOT` (formally ``STATICFILES_ROOT``)
+* :setting:`STATIC_ROOT` (formally ``STATICFILES_ROOT``)
 
-    * :setting:`STATIC_URL` (formally ``STATICFILES_URL``)
+* :setting:`STATIC_URL` (formally ``STATICFILES_URL``)
 
-  * The ``django.contrib.staticfiles.templatetags.staticfiles.get_staticfiles_prefix``
-    template tag was moved to Django's core (``django.templatetags.static``) and
-    renamed to :ttag:`get_static_prefix`.
+* The ``django.contrib.staticfiles.templatetags.staticfiles.get_staticfiles_prefix``
+template tag was moved to Django's core (``django.templatetags.static``) and
+renamed to :ttag:`get_static_prefix`.
 
-  * The ``django.contrib.staticfiles.context_processors.staticfiles``
-    context processor was moved to Django's core
-    (``django.core.context_processors.static``) and renamed to
-    :func:`~django.core.context_processors.static`.
+* The ``django.contrib.staticfiles.context_processors.staticfiles``
+context processor was moved to Django's core
+(``django.core.context_processors.static``) and renamed to
+:func:`~django.core.context_processors.static`.
 
-  * :ref:`form-media-paths` now uses :setting:`STATIC_URL` as the prefix
-    **if the value is not None**, and falls back to the previously used
-    :setting:`MEDIA_URL` setting otherwise.
+* :ref:`form-media-paths` now uses :setting:`STATIC_URL` as the prefix
+**if the value is not None**, and falls back to the previously used
+:setting:`MEDIA_URL` setting otherwise.
 
 Changes to the login methods of the admin
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -209,7 +209,7 @@ Django team by trying out the beta codebase in a safe test environment and
 reporting any bugs or issues you encounter. The Django ticket tracker is the
 central place to search for open issues:
 
-    * http://code.djangoproject.com/timeline
+* http://code.djangoproject.com/timeline
 
 Please open new tickets if no existing ticket corresponds to a problem you're
 running into.
@@ -217,7 +217,7 @@ running into.
 Additionally, discussion of Django development, including progress toward the
 1.3 release, takes place daily on the django-developers mailing list:
 
-    * http://groups.google.com/group/django-developers
+* http://groups.google.com/group/django-developers
 
 ... and in the ``#django-dev`` IRC channel on ``irc.freenode.net``. If you're
 interested in helping out with Django's development, feel free to join the
@@ -226,7 +226,7 @@ discussions there.
 Django's online documentation also includes pointers on how to contribute to
 Django:
 
-    * :doc:`How to contribute to Django </internals/contributing/index>`
+* :doc:`How to contribute to Django </internals/contributing/index>`
 
 Contributions on any level -- developing code, writing documentation or simply
 triaging tickets and helping to test proposed bugfixes -- are always welcome and

@@ -17,45 +17,45 @@ introspecting your models.
 How to use Databrowse
 =====================
 
-    1. Point Django at the default Databrowse templates. There are two ways to
-       do this:
+1. Point Django at the default Databrowse templates. There are two ways to
+   do this:
 
-       * Add ``'django.contrib.databrowse'`` to your :setting:`INSTALLED_APPS`
-         setting. This will work if your :setting:`TEMPLATE_LOADERS` setting
-         includes the ``app_directories`` template loader (which is the case by
-         default). See the :ref:`template loader docs <template-loaders>` for
-         more.
+   * Add ``'django.contrib.databrowse'`` to your :setting:`INSTALLED_APPS`
+     setting. This will work if your :setting:`TEMPLATE_LOADERS` setting
+     includes the ``app_directories`` template loader (which is the case by
+     default). See the :ref:`template loader docs <template-loaders>` for
+     more.
 
-       * Otherwise, determine the full filesystem path to the
-         :file:`django/contrib/databrowse/templates` directory, and add that
-         directory to your :setting:`TEMPLATE_DIRS` setting.
+   * Otherwise, determine the full filesystem path to the
+     :file:`django/contrib/databrowse/templates` directory, and add that
+     directory to your :setting:`TEMPLATE_DIRS` setting.
 
-    2. Register a number of models with the Databrowse site::
+2. Register a number of models with the Databrowse site::
 
-           from django.contrib import databrowse
-           from myapp.models import SomeModel, SomeOtherModel
+       from django.contrib import databrowse
+       from myapp.models import SomeModel, SomeOtherModel
 
-           databrowse.site.register(SomeModel)
-           databrowse.site.register(SomeOtherModel)
+       databrowse.site.register(SomeModel)
+       databrowse.site.register(SomeOtherModel)
 
-       Note that you should register the model *classes*, not instances.
+   Note that you should register the model *classes*, not instances.
 
-       It doesn't matter where you put this, as long as it gets executed at some
-       point. A good place for it is in your :doc:`URLconf file
-       </topics/http/urls>` (``urls.py``).
+   It doesn't matter where you put this, as long as it gets executed at some
+   point. A good place for it is in your :doc:`URLconf file
+   </topics/http/urls>` (``urls.py``).
 
-    3. Change your URLconf to import the :mod:`~django.contrib.databrowse` module::
+3. Change your URLconf to import the :mod:`~django.contrib.databrowse` module::
 
-           from django.contrib import databrowse
+       from django.contrib import databrowse
 
-       ...and add the following line to your URLconf::
+   ...and add the following line to your URLconf::
 
-           (r'^databrowse/(.*)', databrowse.site.root),
+       (r'^databrowse/(.*)', databrowse.site.root),
 
-       The prefix doesn't matter -- you can use ``databrowse/`` or ``db/`` or
-       whatever you'd like.
+   The prefix doesn't matter -- you can use ``databrowse/`` or ``db/`` or
+   whatever you'd like.
 
-    4. Run the Django server and visit ``/databrowse/`` in your browser.
+4. Run the Django server and visit ``/databrowse/`` in your browser.
 
 Requiring user login
 ====================

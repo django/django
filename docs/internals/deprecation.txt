@@ -13,13 +13,13 @@ about each item can often be found in the release notes of two versions prior.
 See the :doc:`Django 1.1 release notes</releases/1.1>` for more details on
 these changes.
 
-    * ``AdminSite.root()``.  This method of hooking up the admin URLs will be
-      removed in favor of including ``admin.site.urls``.
+* ``AdminSite.root()``.  This method of hooking up the admin URLs will be
+  removed in favor of including ``admin.site.urls``.
 
-    * Authentication backends need to define the boolean attributes
-      ``supports_object_permissions`` and ``supports_anonymous_user`` until
-      version 1.4, at which point it will be assumed that all backends will
-      support these options.
+* Authentication backends need to define the boolean attributes
+  ``supports_object_permissions`` and ``supports_anonymous_user`` until
+  version 1.4, at which point it will be assumed that all backends will
+  support these options.
 
 1.4
 ---
@@ -27,92 +27,92 @@ these changes.
 See the :doc:`Django 1.2 release notes</releases/1.2>` for more details on
 these changes.
 
-    * ``CsrfResponseMiddleware`` and ``CsrfMiddleware`` will be removed.  Use
-      the {% csrf_token %} template tag inside forms to enable CSRF
-      protection. ``CsrfViewMiddleware`` remains and is enabled by default.
+* ``CsrfResponseMiddleware`` and ``CsrfMiddleware`` will be removed.  Use
+  the {% csrf_token %} template tag inside forms to enable CSRF
+  protection. ``CsrfViewMiddleware`` remains and is enabled by default.
 
-    * The old imports for CSRF functionality (``django.contrib.csrf.*``),
-      which moved to core in 1.2, will be removed.
+* The old imports for CSRF functionality (``django.contrib.csrf.*``),
+  which moved to core in 1.2, will be removed.
 
-    * The :mod:`django.contrib.gis.db.backend` module will be removed in favor
-      of the specific backends.
+* The :mod:`django.contrib.gis.db.backend` module will be removed in favor
+  of the specific backends.
 
-    * ``SMTPConnection`` will be removed in favor of a generic E-mail backend API.
+* ``SMTPConnection`` will be removed in favor of a generic E-mail backend API.
 
-    * The many to many SQL generation functions on the database backends
-      will be removed.
+* The many to many SQL generation functions on the database backends
+  will be removed.
 
-    * The ability to use the ``DATABASE_*`` family of top-level settings to
-      define database connections will be removed.
+* The ability to use the ``DATABASE_*`` family of top-level settings to
+  define database connections will be removed.
 
-    * The ability to use shorthand notation to specify a database backend
-      (i.e., ``sqlite3`` instead of ``django.db.backends.sqlite3``) will be
-      removed.
+* The ability to use shorthand notation to specify a database backend
+  (i.e., ``sqlite3`` instead of ``django.db.backends.sqlite3``) will be
+  removed.
 
-    * The ``get_db_prep_save``, ``get_db_prep_value`` and
-      ``get_db_prep_lookup`` methods will have to support multiple databases.
+* The ``get_db_prep_save``, ``get_db_prep_value`` and
+  ``get_db_prep_lookup`` methods will have to support multiple databases.
 
-    * The ``Message`` model (in ``django.contrib.auth``), its related
-      manager in the ``User`` model (``user.message_set``), and the
-      associated methods (``user.message_set.create()`` and
-      ``user.get_and_delete_messages()``), will be removed.  The
-      :doc:`messages framework </ref/contrib/messages>` should be used
-      instead. The related ``messages`` variable returned by the
-      auth context processor will also be removed. Note that this
-      means that the admin application will depend on the messages
-      context processor.
+* The ``Message`` model (in ``django.contrib.auth``), its related
+  manager in the ``User`` model (``user.message_set``), and the
+  associated methods (``user.message_set.create()`` and
+  ``user.get_and_delete_messages()``), will be removed.  The
+  :doc:`messages framework </ref/contrib/messages>` should be used
+  instead. The related ``messages`` variable returned by the
+  auth context processor will also be removed. Note that this
+  means that the admin application will depend on the messages
+  context processor.
 
-    * Authentication backends will need to support the ``obj`` parameter for
-      permission checking. The ``supports_object_permissions`` attribute
-      will no longer be checked and can be removed from custom backends.
+* Authentication backends will need to support the ``obj`` parameter for
+  permission checking. The ``supports_object_permissions`` attribute
+  will no longer be checked and can be removed from custom backends.
 
-    * Authentication backends will need to support the ``AnonymousUser`` class
-      being passed to all methods dealing with permissions.  The
-      ``supports_anonymous_user`` variable will no longer be checked and can be
-      removed from custom backends.
+* Authentication backends will need to support the ``AnonymousUser`` class
+  being passed to all methods dealing with permissions.  The
+  ``supports_anonymous_user`` variable will no longer be checked and can be
+  removed from custom backends.
 
-    * The ability to specify a callable template loader rather than a
-      ``Loader`` class will be removed, as will the ``load_template_source``
-      functions that are included with the built in template loaders for
-      backwards compatibility.
+* The ability to specify a callable template loader rather than a
+  ``Loader`` class will be removed, as will the ``load_template_source``
+  functions that are included with the built in template loaders for
+  backwards compatibility.
 
-    * ``django.utils.translation.get_date_formats()`` and
-      ``django.utils.translation.get_partial_date_formats()``. These functions
-      will be removed; use the locale-aware
-      ``django.utils.formats.get_format()`` to get the appropriate formats.
+* ``django.utils.translation.get_date_formats()`` and
+  ``django.utils.translation.get_partial_date_formats()``. These functions
+  will be removed; use the locale-aware
+  ``django.utils.formats.get_format()`` to get the appropriate formats.
 
-    * In ``django.forms.fields``, the constants: ``DEFAULT_DATE_INPUT_FORMATS``,
-      ``DEFAULT_TIME_INPUT_FORMATS`` and
-      ``DEFAULT_DATETIME_INPUT_FORMATS`` will be removed. Use
-      ``django.utils.formats.get_format()`` to get the appropriate
-      formats.
+* In ``django.forms.fields``, the constants: ``DEFAULT_DATE_INPUT_FORMATS``,
+  ``DEFAULT_TIME_INPUT_FORMATS`` and
+  ``DEFAULT_DATETIME_INPUT_FORMATS`` will be removed. Use
+  ``django.utils.formats.get_format()`` to get the appropriate
+  formats.
 
-    * The ability to use a function-based test runners will be removed,
-      along with the ``django.test.simple.run_tests()`` test runner.
+* The ability to use a function-based test runners will be removed,
+  along with the ``django.test.simple.run_tests()`` test runner.
 
-    * The ``views.feed()`` view and ``feeds.Feed`` class in
-      ``django.contrib.syndication`` will be removed. The class-based view
-      ``views.Feed`` should be used instead.
+* The ``views.feed()`` view and ``feeds.Feed`` class in
+  ``django.contrib.syndication`` will be removed. The class-based view
+  ``views.Feed`` should be used instead.
 
-    * ``django.core.context_processors.auth``.  This release will
-      remove the old method in favor of the new method in
-      ``django.contrib.auth.context_processors.auth``.
+* ``django.core.context_processors.auth``.  This release will
+  remove the old method in favor of the new method in
+  ``django.contrib.auth.context_processors.auth``.
 
-    * The ``postgresql`` database backend will be removed, use the
-      ``postgresql_psycopg2`` backend instead.
+* The ``postgresql`` database backend will be removed, use the
+  ``postgresql_psycopg2`` backend instead.
 
-    * The ``no`` language code will be removed and has been replaced by the
-      ``nb`` language code.
+* The ``no`` language code will be removed and has been replaced by the
+  ``nb`` language code.
 
-    * Authentication backends will need to define the boolean attribute
-      ``supports_inactive_user`` until version 1.5 when it will be assumed that
-      all backends will handle inactive users.
+* Authentication backends will need to define the boolean attribute
+  ``supports_inactive_user`` until version 1.5 when it will be assumed that
+  all backends will handle inactive users.
 
-    * ``django.db.models.fields.XMLField`` will be removed. This was
-      deprecated as part of the 1.3 release. An accelerated deprecation
-      schedule has been used because the field hasn't performed any role
-      beyond that of a simple ``TextField`` since the removal of oldforms.
-      All uses of ``XMLField`` can be replaced with ``TextField``.
+* ``django.db.models.fields.XMLField`` will be removed. This was
+  deprecated as part of the 1.3 release. An accelerated deprecation
+  schedule has been used because the field hasn't performed any role
+  beyond that of a simple ``TextField`` since the removal of oldforms.
+  All uses of ``XMLField`` can be replaced with ``TextField``.
 
 
 1.5
@@ -121,67 +121,67 @@ these changes.
 See the :doc:`Django 1.3 release notes</releases/1.3>` for more details on
 these changes.
 
-    * The ``mod_python`` request handler will be removed. The ``mod_wsgi``
-      handler should be used instead.
+* The ``mod_python`` request handler will be removed. The ``mod_wsgi``
+  handler should be used instead.
 
-    * The ``template`` attribute on :class:`~django.test.client.Response`
-      objects returned by the :ref:`test client <test-client>` will be removed.
-      The :attr:`~django.test.client.Response.templates` attribute should be
-      used instead.
+* The ``template`` attribute on :class:`~django.test.client.Response`
+  objects returned by the :ref:`test client <test-client>` will be removed.
+  The :attr:`~django.test.client.Response.templates` attribute should be
+  used instead.
 
-    * The :class:`~django.test.simple.DjangoTestRunner` will be removed.
-      Instead use a unittest-native class.  The features of the
-      :class:`django.test.simple.DjangoTestRunner` (including fail-fast and
-      Ctrl-C test termination) can currently be provided by the unittest-native
-      :class:`TextTestRunner`.
+* The :class:`~django.test.simple.DjangoTestRunner` will be removed.
+  Instead use a unittest-native class.  The features of the
+  :class:`django.test.simple.DjangoTestRunner` (including fail-fast and
+  Ctrl-C test termination) can currently be provided by the unittest-native
+  :class:`TextTestRunner`.
 
-    * The undocumented function
-      :func:`django.contrib.formtools.utils.security_hash` will be removed,
-      instead use :func:`django.contrib.formtools.utils.form_hmac`
+* The undocumented function
+  :func:`django.contrib.formtools.utils.security_hash` will be removed,
+  instead use :func:`django.contrib.formtools.utils.form_hmac`
 
-    * The function-based generic view modules will be removed in favor of their
-      class-based equivalents, outlined :doc:`here
-      </topics/generic-views-migration>`:
+* The function-based generic view modules will be removed in favor of their
+  class-based equivalents, outlined :doc:`here
+  </topics/generic-views-migration>`:
 
-    * The :class:`~django.core.servers.basehttp.AdminMediaHandler` will be
-      removed.  In its place use
-      :class:`~django.contrib.staticfiles.handlers.StaticFilesHandler`.
+* The :class:`~django.core.servers.basehttp.AdminMediaHandler` will be
+  removed.  In its place use
+  :class:`~django.contrib.staticfiles.handlers.StaticFilesHandler`.
 
-    * The :ttag:`url` and :ttag:`ssi` template tags will be
-      modified so that the first argument to each tag is a
-      template variable, not an implied string. Until then, the new-style
-      behavior is provided in the ``future`` template tag library.
+* The :ttag:`url` and :ttag:`ssi` template tags will be
+  modified so that the first argument to each tag is a
+  template variable, not an implied string. Until then, the new-style
+  behavior is provided in the ``future`` template tag library.
 
-    * The :djadmin:`reset` and :djadmin:`sqlreset` management commands
-      will be removed.
+* The :djadmin:`reset` and :djadmin:`sqlreset` management commands
+  will be removed.
 
-    * Authentication backends will need to support an inactive user
-      being passed to all methods dealing with permissions.
-      The ``supports_inactive_user`` attribute will no longer be checked
-      and can be removed from custom backends.
+* Authentication backends will need to support an inactive user
+  being passed to all methods dealing with permissions.
+  The ``supports_inactive_user`` attribute will no longer be checked
+  and can be removed from custom backends.
 
-    * :meth:`~django.contrib.gis.geos.GEOSGeometry.transform` will raise
-      a :class:`~django.contrib.gis.geos.GEOSException` when called
-      on a geometry with no SRID value.
+* :meth:`~django.contrib.gis.geos.GEOSGeometry.transform` will raise
+  a :class:`~django.contrib.gis.geos.GEOSException` when called
+  on a geometry with no SRID value.
 
-    * :class:`~django.http.CompatCookie` will be removed in favor of
-      :class:`~django.http.SimpleCookie`.
+* :class:`~django.http.CompatCookie` will be removed in favor of
+  :class:`~django.http.SimpleCookie`.
 
-    * :class:`django.core.context_processors.PermWrapper` and
-      :class:`django.core.context_processors.PermLookupDict` will be removed in
-      favor of the corresponding
-      :class:`django.contrib.auth.context_processors.PermWrapper` and
-      :class:`django.contrib.auth.context_processors.PermLookupDict`,
-      respectively.
+* :class:`django.core.context_processors.PermWrapper` and
+  :class:`django.core.context_processors.PermLookupDict` will be removed in
+  favor of the corresponding
+  :class:`django.contrib.auth.context_processors.PermWrapper` and
+  :class:`django.contrib.auth.context_processors.PermLookupDict`,
+  respectively.
 
-    * The :setting:`MEDIA_URL` or :setting:`STATIC_URL` settings will be
-      required to end with a trailing slash to ensure there is a consistent
-      way to combine paths in templates.
+* The :setting:`MEDIA_URL` or :setting:`STATIC_URL` settings will be
+  required to end with a trailing slash to ensure there is a consistent
+  way to combine paths in templates.
 
-    * ``django.db.models.fields.URLField.verify_exists`` will be removed. The
-      feature was deprecated in 1.3.1 due to intractable security and
-      performance issues and will follow a slightly accelerated deprecation
-      timeframe.
+* ``django.db.models.fields.URLField.verify_exists`` will be removed. The
+  feature was deprecated in 1.3.1 due to intractable security and
+  performance issues and will follow a slightly accelerated deprecation
+  timeframe.
 
 1.6
 ---
@@ -189,73 +189,73 @@ these changes.
 See the :doc:`Django 1.4 release notes</releases/1.4>` for more details on
 these changes.
 
-    * The compatibility modules ``django.utils.copycompat`` and
-      ``django.utils.hashcompat`` as well as the functions
-      ``django.utils.itercompat.all`` and ``django.utils.itercompat.any`` will
-      be removed. The Python builtin versions should be used instead.
+* The compatibility modules ``django.utils.copycompat`` and
+  ``django.utils.hashcompat`` as well as the functions
+  ``django.utils.itercompat.all`` and ``django.utils.itercompat.any`` will
+  be removed. The Python builtin versions should be used instead.
 
-    * The :func:`~django.views.decorators.csrf.csrf_response_exempt` and
-      :func:`~django.views.decorators.csrf.csrf_view_exempt` decorators will
-      be removed. Since 1.4 ``csrf_response_exempt`` has been a no-op (it
-      returns the same function), and ``csrf_view_exempt`` has been a
-      synonym for ``django.views.decorators.csrf.csrf_exempt``, which should
-      be used to replace it.
+* The :func:`~django.views.decorators.csrf.csrf_response_exempt` and
+  :func:`~django.views.decorators.csrf.csrf_view_exempt` decorators will
+  be removed. Since 1.4 ``csrf_response_exempt`` has been a no-op (it
+  returns the same function), and ``csrf_view_exempt`` has been a
+  synonym for ``django.views.decorators.csrf.csrf_exempt``, which should
+  be used to replace it.
 
-    * The :class:`~django.core.cache.backends.memcached.CacheClass` backend
-      was split into two in Django 1.3 in order to introduce support for
-      PyLibMC. The historical :class:`~django.core.cache.backends.memcached.CacheClass`
-      will be removed in favor of :class:`~django.core.cache.backends.memcached.MemcachedCache`.
+* The :class:`~django.core.cache.backends.memcached.CacheClass` backend
+  was split into two in Django 1.3 in order to introduce support for
+  PyLibMC. The historical :class:`~django.core.cache.backends.memcached.CacheClass`
+  will be removed in favor of :class:`~django.core.cache.backends.memcached.MemcachedCache`.
 
-    * The UK-prefixed objects of ``django.contrib.localflavor.uk`` will only
-      be accessible through their GB-prefixed names (GB is the correct
-      ISO 3166 code for United Kingdom).
+* The UK-prefixed objects of ``django.contrib.localflavor.uk`` will only
+  be accessible through their GB-prefixed names (GB is the correct
+  ISO 3166 code for United Kingdom).
 
-    * The :setting:`IGNORABLE_404_STARTS` and :setting:`IGNORABLE_404_ENDS`
-      settings have been superseded by :setting:`IGNORABLE_404_URLS` in
-      the 1.4 release. They will be removed.
+* The :setting:`IGNORABLE_404_STARTS` and :setting:`IGNORABLE_404_ENDS`
+  settings have been superseded by :setting:`IGNORABLE_404_URLS` in
+  the 1.4 release. They will be removed.
 
-    * The :doc:`form wizard </ref/contrib/formtools/form-wizard>` has been
-      refactored to use class based views with pluggable backends in 1.4.
-      The previous implementation will be removed.
+* The :doc:`form wizard </ref/contrib/formtools/form-wizard>` has been
+  refactored to use class based views with pluggable backends in 1.4.
+  The previous implementation will be removed.
 
-    * Legacy ways of calling
-      :func:`~django.views.decorators.cache.cache_page` will be removed.
+* Legacy ways of calling
+  :func:`~django.views.decorators.cache.cache_page` will be removed.
 
-    * The backward-compatibility shim to automatically add a debug-false
-      filter to the ``'mail_admins'`` logging handler will be removed. The
-      :setting:`LOGGING` setting should include this filter explicitly if
-      it is desired.
+* The backward-compatibility shim to automatically add a debug-false
+  filter to the ``'mail_admins'`` logging handler will be removed. The
+  :setting:`LOGGING` setting should include this filter explicitly if
+  it is desired.
 
-    * The template tag
-      :func:`django.contrib.admin.templatetags.adminmedia.admin_media_prefix`
-      will be removed in favor of the generic static files handling.
+* The template tag
+  :func:`django.contrib.admin.templatetags.adminmedia.admin_media_prefix`
+  will be removed in favor of the generic static files handling.
 
-    * The builtin truncation functions :func:`django.utils.text.truncate_words`
-      and :func:`django.utils.text.truncate_html_words` will be removed in
-      favor of the ``django.utils.text.Truncator`` class.
+* The builtin truncation functions :func:`django.utils.text.truncate_words`
+  and :func:`django.utils.text.truncate_html_words` will be removed in
+  favor of the ``django.utils.text.Truncator`` class.
 
-    * The :class:`~django.contrib.gis.geoip.GeoIP` class was moved to
-      :mod:`django.contrib.gis.geoip` in 1.4 -- the shortcut in
-      :mod:`django.contrib.gis.utils` will be removed.
+* The :class:`~django.contrib.gis.geoip.GeoIP` class was moved to
+  :mod:`django.contrib.gis.geoip` in 1.4 -- the shortcut in
+  :mod:`django.contrib.gis.utils` will be removed.
 
-    * ``django.conf.urls.defaults`` will be removed. The functions
-      :func:`~django.conf.urls.include`, :func:`~django.conf.urls.patterns` and
-      :func:`~django.conf.urls.url` plus :data:`~django.conf.urls.handler404`,
-      :data:`~django.conf.urls.handler500`, are now available through
-      :mod:`django.conf.urls` .
+* ``django.conf.urls.defaults`` will be removed. The functions
+  :func:`~django.conf.urls.include`, :func:`~django.conf.urls.patterns` and
+  :func:`~django.conf.urls.url` plus :data:`~django.conf.urls.handler404`,
+  :data:`~django.conf.urls.handler500`, are now available through
+  :mod:`django.conf.urls` .
 
-    * The Databrowse contrib module will be removed.
+* The Databrowse contrib module will be removed.
 
-    * The functions :func:`~django.core.management.setup_environ` and
-      :func:`~django.core.management.execute_manager` will be removed from
-      :mod:`django.core.management`. This also means that the old (pre-1.4)
-      style of :file:`manage.py` file will no longer work.
+* The functions :func:`~django.core.management.setup_environ` and
+  :func:`~django.core.management.execute_manager` will be removed from
+  :mod:`django.core.management`. This also means that the old (pre-1.4)
+  style of :file:`manage.py` file will no longer work.
 
 2.0
 ---
 
-    * ``django.views.defaults.shortcut()``. This function has been moved
-      to ``django.contrib.contenttypes.views.shortcut()`` as part of the
-      goal of removing all ``django.contrib`` references from the core
-      Django codebase. The old shortcut will be removed in the 2.0
-      release.
+* ``django.views.defaults.shortcut()``. This function has been moved
+  to ``django.contrib.contenttypes.views.shortcut()`` as part of the
+  goal of removing all ``django.contrib`` references from the core
+  Django codebase. The old shortcut will be removed in the 2.0
+  release.

@@ -35,18 +35,18 @@ as a shorter alias, ``_``, to save typing.
     global namespace, as an alias for ``gettext()``. In Django, we have chosen
     not to follow this practice, for a couple of reasons:
 
-      1. For international character set (Unicode) support,
-         :func:`~django.utils.translation.ugettext` is more useful than
-         ``gettext()``. Sometimes, you should be using
-         :func:`~django.utils.translation.ugettext_lazy` as the default
-         translation method for a particular file. Without ``_()`` in the
-         global namespace, the developer has to think about which is the
-         most appropriate translation function.
+    1. For international character set (Unicode) support,
+       :func:`~django.utils.translation.ugettext` is more useful than
+       ``gettext()``. Sometimes, you should be using
+       :func:`~django.utils.translation.ugettext_lazy` as the default
+       translation method for a particular file. Without ``_()`` in the
+       global namespace, the developer has to think about which is the
+       most appropriate translation function.
 
-      2. The underscore character (``_``) is used to represent "the previous
-         result" in Python's interactive shell and doctest tests. Installing a
-         global ``_()`` function causes interference. Explicitly importing
-         ``ugettext()`` as ``_()`` avoids this problem.
+    2. The underscore character (``_``) is used to represent "the previous
+       result" in Python's interactive shell and doctest tests. Installing a
+       global ``_()`` function causes interference. Explicitly importing
+       ``ugettext()`` as ``_()`` avoids this problem.
 
 .. highlightlang:: python
 
@@ -523,12 +523,12 @@ function.
 
 This tag also provides for pluralization. To use it:
 
-    * Designate and bind a counter value with the name ``count``. This value will
-      be the one used to select the right plural form.
+* Designate and bind a counter value with the name ``count``. This value will
+  be the one used to select the right plural form.
 
-    * Specify both the singular and plural forms separating them with the
-      ``{% plural %}`` tag within the ``{% blocktrans %}`` and
-      ``{% endblocktrans %}`` tags.
+* Specify both the singular and plural forms separating them with the
+  ``{% plural %}`` tag within the ``{% blocktrans %}`` and
+  ``{% endblocktrans %}`` tags.
 
 An example::
 
@@ -567,16 +567,16 @@ Other tags
 
 Each ``RequestContext`` has access to three translation-specific variables:
 
-    * ``LANGUAGES`` is a list of tuples in which the first element is the
-      :term:`language code` and the second is the language name (translated into
-      the currently active locale).
+* ``LANGUAGES`` is a list of tuples in which the first element is the
+  :term:`language code` and the second is the language name (translated into
+  the currently active locale).
 
-    * ``LANGUAGE_CODE`` is the current user's preferred language, as a string.
-      Example: ``en-us``. (See :ref:`how-django-discovers-language-preference`.)
+* ``LANGUAGE_CODE`` is the current user's preferred language, as a string.
+  Example: ``en-us``. (See :ref:`how-django-discovers-language-preference`.)
 
-    * ``LANGUAGE_BIDI`` is the current locale's direction. If True, it's a
-      right-to-left language, e.g.: Hebrew, Arabic. If False it's a
-      left-to-right language, e.g.: English, French, German etc.
+* ``LANGUAGE_BIDI`` is the current locale's direction. If True, it's a
+  right-to-left language, e.g.: Hebrew, Arabic. If False it's a
+  left-to-right language, e.g.: English, French, German etc.
 
 If you don't use the ``RequestContext`` extension, you can get those values with
 three tags::
@@ -643,9 +643,9 @@ you can iterate over those languages in the template::
 
 There are also simple filters available for convenience:
 
-    * ``{{ LANGUAGE_CODE|language_name }}`` ("German")
-    * ``{{ LANGUAGE_CODE|language_name_local }}`` ("Deutsch")
-    * ``{{ LANGUAGE_CODE|bidi }}`` (False)
+* ``{{ LANGUAGE_CODE|language_name }}`` ("German")
+* ``{{ LANGUAGE_CODE|language_name_local }}`` ("Deutsch")
+* ``{{ LANGUAGE_CODE|bidi }}`` (False)
 
 .. _Django templates: ../templates_python/
 
@@ -656,13 +656,13 @@ Specifying translation strings: In JavaScript code
 
 Adding translations to JavaScript poses some problems:
 
-    * JavaScript code doesn't have access to a ``gettext`` implementation.
+* JavaScript code doesn't have access to a ``gettext`` implementation.
 
-    * JavaScript code doesn't have access to .po or .mo files; they need to be
-      delivered by the server.
+* JavaScript code doesn't have access to .po or .mo files; they need to be
+  delivered by the server.
 
-    * The translation catalogs for JavaScript should be kept as small as
-      possible.
+* The translation catalogs for JavaScript should be kept as small as
+  possible.
 
 Django provides an integrated solution for these problems: It passes the
 translations into JavaScript, so you can call ``gettext``, etc., from within
@@ -761,28 +761,28 @@ and even a string interpolation function::
 The interpolation syntax is borrowed from Python, so the ``interpolate``
 function supports both positional and named interpolation:
 
-    * Positional interpolation: ``obj`` contains a JavaScript Array object
-      whose elements values are then sequentially interpolated in their
-      corresponding ``fmt`` placeholders in the same order they appear.
-      For example::
+* Positional interpolation: ``obj`` contains a JavaScript Array object
+  whose elements values are then sequentially interpolated in their
+  corresponding ``fmt`` placeholders in the same order they appear.
+  For example::
 
-        fmts = ngettext('There is %s object. Remaining: %s',
-                'There are %s objects. Remaining: %s', 11);
-        s = interpolate(fmts, [11, 20]);
-        // s is 'There are 11 objects. Remaining: 20'
+    fmts = ngettext('There is %s object. Remaining: %s',
+            'There are %s objects. Remaining: %s', 11);
+    s = interpolate(fmts, [11, 20]);
+    // s is 'There are 11 objects. Remaining: 20'
 
-    * Named interpolation: This mode is selected by passing the optional
-      boolean ``named`` parameter as true. ``obj`` contains a JavaScript
-      object or associative array. For example::
+* Named interpolation: This mode is selected by passing the optional
+  boolean ``named`` parameter as true. ``obj`` contains a JavaScript
+  object or associative array. For example::
 
-        d = {
-            count: 10,
-            total: 50
-        };
+    d = {
+        count: 10,
+        total: 50
+    };
 
-        fmts = ngettext('Total: %(total)s, there is %(count)s object',
-        'there are %(count)s of a total of %(total)s objects', d.count);
-        s = interpolate(fmts, d, true);
+    fmts = ngettext('Total: %(total)s, there is %(count)s object',
+    'there are %(count)s of a total of %(total)s objects', d.count);
+    s = interpolate(fmts, d, true);
 
 You shouldn't go over the top with string interpolation, though: this is still
 JavaScript, so the code has to make repeated regular-expression substitutions.
@@ -975,11 +975,11 @@ language choice in a cookie that is by default named ``django_language``.
 After setting the language choice, Django redirects the user, following this
 algorithm:
 
-    * Django looks for a ``next`` parameter in the ``POST`` data.
-    * If that doesn't exist, or is empty, Django tries the URL in the
-      ``Referrer`` header.
-    * If that's empty -- say, if a user's browser suppresses that header --
-      then the user will be redirected to ``/`` (the site root) as a fallback.
+* Django looks for a ``next`` parameter in the ``POST`` data.
+* If that doesn't exist, or is empty, Django tries the URL in the
+  ``Referrer`` header.
+* If that's empty -- say, if a user's browser suppresses that header --
+  then the user will be redirected to ``/`` (the site root) as a fallback.
 
 Here's example HTML template code:
 

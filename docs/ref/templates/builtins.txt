@@ -201,13 +201,13 @@ Signals that this template extends a parent template.
 
 This tag can be used in two ways:
 
-   * ``{% extends "base.html" %}`` (with quotes) uses the literal value
-     ``"base.html"`` as the name of the parent template to extend.
+* ``{% extends "base.html" %}`` (with quotes) uses the literal value
+  ``"base.html"`` as the name of the parent template to extend.
 
-   * ``{% extends variable %}`` uses the value of ``variable``. If the variable
-     evaluates to a string, Django will use that string as the name of the
-     parent template. If the variable evaluates to a ``Template`` object,
-     Django will use that object as the parent template.
+* ``{% extends variable %}`` uses the value of ``variable``. If the variable
+  evaluates to a string, Django will use that string as the name of the
+  parent template. If the variable evaluates to a ``Template`` object,
+  Django will use that object as the parent template.
 
 See :ref:`template-inheritance` for more information.
 
@@ -303,20 +303,20 @@ would display the keys and values of the dictionary::
 
 The for loop sets a number of variables available within the loop:
 
-    ==========================  ===============================================
-    Variable                    Description
-    ==========================  ===============================================
-    ``forloop.counter``         The current iteration of the loop (1-indexed)
-    ``forloop.counter0``        The current iteration of the loop (0-indexed)
-    ``forloop.revcounter``      The number of iterations from the end of the
-                                loop (1-indexed)
-    ``forloop.revcounter0``     The number of iterations from the end of the
-                                loop (0-indexed)
-    ``forloop.first``           True if this is the first time through the loop
-    ``forloop.last``            True if this is the last time through the loop
-    ``forloop.parentloop``      For nested loops, this is the loop "above" the
-                                current one
-    ==========================  ===============================================
+==========================  ===============================================
+Variable                    Description
+==========================  ===============================================
+``forloop.counter``         The current iteration of the loop (1-indexed)
+``forloop.counter0``        The current iteration of the loop (0-indexed)
+``forloop.revcounter``      The number of iterations from the end of the
+                            loop (1-indexed)
+``forloop.revcounter0``     The number of iterations from the end of the
+                            loop (0-indexed)
+``forloop.first``           True if this is the first time through the loop
+``forloop.last``            True if this is the last time through the loop
+``forloop.parentloop``      For nested loops, this is the loop "above" the
+                            current one
+==========================  ===============================================
 
 for ... empty
 ^^^^^^^^^^^^^
@@ -526,11 +526,11 @@ expressions, it can be important to know how the operators are grouped when the
 expression is evaluated - that is, the precedence rules.  The precedence of the
 operators, from lowest to highest, is as follows:
 
- * ``or``
- * ``and``
- * ``not``
- * ``in``
- * ``==``, ``!=``, ``<``, ``>``, ``<=``, ``>=``
+* ``or``
+* ``and``
+* ``not``
+* ``in``
+* ``==``, ``!=``, ``<``, ``>``, ``<=``, ``>=``
 
 (This follows Python exactly). So, for example, the following complex
 :ttag:`if` tag:
@@ -660,14 +660,14 @@ the variable ``template_name``::
 An included template is rendered with the context of the template that's
 including it. This example produces the output ``"Hello, John"``:
 
-    * Context: variable ``person`` is set to ``"john"``.
-    * Template::
+* Context: variable ``person`` is set to ``"john"``.
+* Template::
 
-        {% include "name_snippet.html" %}
+    {% include "name_snippet.html" %}
 
-    * The ``name_snippet.html`` template::
+* The ``name_snippet.html`` template::
 
-        {{ greeting }}, {{ person|default:"friend" }}!
+    {{ greeting }}, {{ person|default:"friend" }}!
 
 .. versionchanged:: 1.3
    Additional context and exclusive context.
@@ -771,14 +771,14 @@ is a list of people represented by dictionaries with ``first_name``,
 ...and you'd like to display a hierarchical list that is ordered by gender,
 like this:
 
-    * Male:
-        * George Bush
-        * Bill Clinton
-    * Female:
-        * Margaret Thatcher
-        * Condoleezza Rice
-    * Unknown:
-        * Pat Smith
+* Male:
+  * George Bush
+  * Bill Clinton
+* Female:
+  * Margaret Thatcher
+  * Condoleezza Rice
+* Unknown:
+  * Pat Smith
 
 You can use the ``{% regroup %}`` tag to group the list of people by gender.
 The following snippet of template code would accomplish this::
@@ -805,10 +805,10 @@ attribute and calling the result ``gender_list``.
 ``{% regroup %}`` produces a list (in this case, ``gender_list``) of
 **group objects**. Each group object has two attributes:
 
-    * ``grouper`` -- the item that was grouped by (e.g., the string "Male" or
-      "Female").
-    * ``list`` -- a list of all items in this group (e.g., a list of all people
-      with gender='Male').
+* ``grouper`` -- the item that was grouped by (e.g., the string "Male" or
+  "Female").
+* ``list`` -- a list of all items in this group (e.g., a list of all people
+  with gender='Male').
 
 Note that ``{% regroup %}`` does not order its input! Our example relies on
 the fact that the ``people`` list was ordered by ``gender`` in the first place.
@@ -830,16 +830,16 @@ grouped together):
 With this input for ``people``, the example ``{% regroup %}`` template code
 above would result in the following output:
 
-    * Male:
-        * Bill Clinton
-    * Unknown:
-        * Pat Smith
-    * Female:
-        * Margaret Thatcher
-    * Male:
-        * George Bush
-    * Female:
-        * Condoleezza Rice
+* Male:
+  * Bill Clinton
+* Unknown:
+  * Pat Smith
+* Female:
+  * Margaret Thatcher
+* Male:
+  * George Bush
+* Female:
+  * Condoleezza Rice
 
 The easiest solution to this gotcha is to make sure in your view code that the
 data is ordered according to how you want to display it.
@@ -959,18 +959,18 @@ bits used in template tags, you must use the ``{% templatetag %}`` tag.
 
 The argument tells which template bit to output:
 
-    ==================  =======
-    Argument            Outputs
-    ==================  =======
-    ``openblock``       ``{%``
-    ``closeblock``      ``%}``
-    ``openvariable``    ``{{``
-    ``closevariable``   ``}}``
-    ``openbrace``       ``{``
-    ``closebrace``      ``}``
-    ``opencomment``     ``{#``
-    ``closecomment``    ``#}``
-    ==================  =======
+==================  =======
+Argument            Outputs
+==================  =======
+``openblock``       ``{%``
+``closeblock``      ``%}``
+``openvariable``    ``{{``
+``closevariable``   ``}}``
+``openbrace``       ``{``
+``closebrace``      ``}``
+``opencomment``     ``{#``
+``closecomment``    ``#}``
+==================  =======
 
 .. templatetag:: url
 
@@ -1250,75 +1250,75 @@ with some custom extensions.
 
 Available format strings:
 
-    ================  ========================================  =====================
-    Format character  Description                               Example output
-    ================  ========================================  =====================
-    a                 ``'a.m.'`` or ``'p.m.'`` (Note that       ``'a.m.'``
-                      this is slightly different than PHP's
-                      output, because this includes periods
-                      to match Associated Press style.)
-    A                 ``'AM'`` or ``'PM'``.                     ``'AM'``
-    b                 Month, textual, 3 letters, lowercase.     ``'jan'``
-    B                 Not implemented.
-    c                 ISO 8601 format. (Note: unlike others     ``2008-01-02T10:30:00.000123+02:00``,
-                      formatters, such as "Z", "O" or "r",      or ``2008-01-02T10:30:00.000123`` if the datetime is naive
-                      the "c" formatter will not add timezone
-                      offset if value is a naive datetime
-                      (see :class:`datetime.tzinfo`).
-    d                 Day of the month, 2 digits with           ``'01'`` to ``'31'``
-                      leading zeros.
-    D                 Day of the week, textual, 3 letters.      ``'Fri'``
-    E                 Month, locale specific alternative
-                      representation usually used for long
-                      date representation.                      ``'listopada'`` (for Polish locale, as opposed to ``'Listopad'``)
-    f                 Time, in 12-hour hours and minutes,       ``'1'``, ``'1:30'``
-                      with minutes left off if they're zero.
-                      Proprietary extension.
-    F                 Month, textual, long.                     ``'January'``
-    g                 Hour, 12-hour format without leading      ``'1'`` to ``'12'``
-                      zeros.
-    G                 Hour, 24-hour format without leading      ``'0'`` to ``'23'``
-                      zeros.
-    h                 Hour, 12-hour format.                     ``'01'`` to ``'12'``
-    H                 Hour, 24-hour format.                     ``'00'`` to ``'23'``
-    i                 Minutes.                                  ``'00'`` to ``'59'``
-    I                 Not implemented.
-    j                 Day of the month without leading          ``'1'`` to ``'31'``
-                      zeros.
-    l                 Day of the week, textual, long.           ``'Friday'``
-    L                 Boolean for whether it's a leap year.     ``True`` or ``False``
-    m                 Month, 2 digits with leading zeros.       ``'01'`` to ``'12'``
-    M                 Month, textual, 3 letters.                ``'Jan'``
-    n                 Month without leading zeros.              ``'1'`` to ``'12'``
-    N                 Month abbreviation in Associated Press    ``'Jan.'``, ``'Feb.'``, ``'March'``, ``'May'``
-                      style. Proprietary extension.
-    O                 Difference to Greenwich time in hours.    ``'+0200'``
-    P                 Time, in 12-hour hours, minutes and       ``'1 a.m.'``, ``'1:30 p.m.'``, ``'midnight'``, ``'noon'``, ``'12:30 p.m.'``
-                      'a.m.'/'p.m.', with minutes left off
-                      if they're zero and the special-case
-                      strings 'midnight' and 'noon' if
-                      appropriate. Proprietary extension.
-    r                 :rfc:`2822` formatted date.               ``'Thu, 21 Dec 2000 16:01:07 +0200'``
-    s                 Seconds, 2 digits with leading zeros.     ``'00'`` to ``'59'``
-    S                 English ordinal suffix for day of the     ``'st'``, ``'nd'``, ``'rd'`` or ``'th'``
-                      month, 2 characters.
-    t                 Number of days in the given month.        ``28`` to ``31``
-    T                 Time zone of this machine.                ``'EST'``, ``'MDT'``
-    u                 Microseconds.                             ``0`` to ``999999``
-    U                 Seconds since the Unix Epoch
-                      (January 1 1970 00:00:00 UTC).
-    w                 Day of the week, digits without           ``'0'`` (Sunday) to ``'6'`` (Saturday)
-                      leading zeros.
-    W                 ISO-8601 week number of year, with        ``1``, ``53``
-                      weeks starting on Monday.
-    y                 Year, 2 digits.                           ``'99'``
-    Y                 Year, 4 digits.                           ``'1999'``
-    z                 Day of the year.                          ``0`` to ``365``
-    Z                 Time zone offset in seconds. The          ``-43200`` to ``43200``
-                      offset for timezones west of UTC is
-                      always negative, and for those east of
-                      UTC is always positive.
-    ================  ========================================  =====================
+================  ========================================  =====================
+Format character  Description                               Example output
+================  ========================================  =====================
+a                 ``'a.m.'`` or ``'p.m.'`` (Note that       ``'a.m.'``
+                  this is slightly different than PHP's
+                  output, because this includes periods
+                  to match Associated Press style.)
+A                 ``'AM'`` or ``'PM'``.                     ``'AM'``
+b                 Month, textual, 3 letters, lowercase.     ``'jan'``
+B                 Not implemented.
+c                 ISO 8601 format. (Note: unlike others     ``2008-01-02T10:30:00.000123+02:00``,
+                  formatters, such as "Z", "O" or "r",      or ``2008-01-02T10:30:00.000123`` if the datetime is naive
+                  the "c" formatter will not add timezone
+                  offset if value is a naive datetime
+                  (see :class:`datetime.tzinfo`).
+d                 Day of the month, 2 digits with           ``'01'`` to ``'31'``
+                  leading zeros.
+D                 Day of the week, textual, 3 letters.      ``'Fri'``
+E                 Month, locale specific alternative
+                  representation usually used for long
+                  date representation.                      ``'listopada'`` (for Polish locale, as opposed to ``'Listopad'``)
+f                 Time, in 12-hour hours and minutes,       ``'1'``, ``'1:30'``
+                  with minutes left off if they're zero.
+                  Proprietary extension.
+F                 Month, textual, long.                     ``'January'``
+g                 Hour, 12-hour format without leading      ``'1'`` to ``'12'``
+                  zeros.
+G                 Hour, 24-hour format without leading      ``'0'`` to ``'23'``
+                  zeros.
+h                 Hour, 12-hour format.                     ``'01'`` to ``'12'``
+H                 Hour, 24-hour format.                     ``'00'`` to ``'23'``
+i                 Minutes.                                  ``'00'`` to ``'59'``
+I                 Not implemented.
+j                 Day of the month without leading          ``'1'`` to ``'31'``
+                  zeros.
+l                 Day of the week, textual, long.           ``'Friday'``
+L                 Boolean for whether it's a leap year.     ``True`` or ``False``
+m                 Month, 2 digits with leading zeros.       ``'01'`` to ``'12'``
+M                 Month, textual, 3 letters.                ``'Jan'``
+n                 Month without leading zeros.              ``'1'`` to ``'12'``
+N                 Month abbreviation in Associated Press    ``'Jan.'``, ``'Feb.'``, ``'March'``, ``'May'``
+                  style. Proprietary extension.
+O                 Difference to Greenwich time in hours.    ``'+0200'``
+P                 Time, in 12-hour hours, minutes and       ``'1 a.m.'``, ``'1:30 p.m.'``, ``'midnight'``, ``'noon'``, ``'12:30 p.m.'``
+                  'a.m.'/'p.m.', with minutes left off
+                  if they're zero and the special-case
+                  strings 'midnight' and 'noon' if
+                  appropriate. Proprietary extension.
+r                 :rfc:`2822` formatted date.               ``'Thu, 21 Dec 2000 16:01:07 +0200'``
+s                 Seconds, 2 digits with leading zeros.     ``'00'`` to ``'59'``
+S                 English ordinal suffix for day of the     ``'st'``, ``'nd'``, ``'rd'`` or ``'th'``
+                  month, 2 characters.
+t                 Number of days in the given month.        ``28`` to ``31``
+T                 Time zone of this machine.                ``'EST'``, ``'MDT'``
+u                 Microseconds.                             ``0`` to ``999999``
+U                 Seconds since the Unix Epoch
+                  (January 1 1970 00:00:00 UTC).
+w                 Day of the week, digits without           ``'0'`` (Sunday) to ``'6'`` (Saturday)
+                  leading zeros.
+W                 ISO-8601 week number of year, with        ``1``, ``53``
+                  weeks starting on Monday.
+y                 Year, 2 digits.                           ``'99'``
+Y                 Year, 4 digits.                           ``'1999'``
+z                 Day of the year.                          ``0`` to ``365``
+Z                 Time zone offset in seconds. The          ``-43200`` to ``43200``
+                  offset for timezones west of UTC is
+                  always negative, and for those east of
+                  UTC is always positive.
+================  ========================================  =====================
 
 .. versionadded:: 1.2
 
@@ -1448,11 +1448,11 @@ escape
 
 Escapes a string's HTML. Specifically, it makes these replacements:
 
-    * ``<`` is converted to ``&lt;``
-    * ``>`` is converted to ``&gt;``
-    * ``'`` (single quote) is converted to ``&#39;``
-    * ``"`` (double quote) is converted to ``&quot;``
-    * ``&`` is converted to ``&amp;``
+* ``<`` is converted to ``&lt;``
+* ``>`` is converted to ``&gt;``
+* ``'`` (single quote) is converted to ``&#39;``
+* ``"`` (double quote) is converted to ``&quot;``
+* ``&`` is converted to ``&amp;``
 
 The escaping is only applied when the string is output, so it does not matter
 where in a chained sequence of filters you put ``escape``: it will always be
@@ -2320,9 +2320,9 @@ django.contrib.markup
 
 A collection of template filters that implement these common markup languages:
 
-    * Textile
-    * Markdown
-    * reST (reStructuredText)
+* Textile
+* Markdown
+* reST (reStructuredText)
 
 See the :doc:`markup documentation </ref/contrib/markup>`.
 

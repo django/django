@@ -28,72 +28,72 @@ after the field's ``to_python`` and ``validate`` methods have been called.
 Validation of a Form is split into several steps, which can be customized or
 overridden:
 
-    * The ``to_python()`` method on a Field is the first step in every
-      validation. It coerces the value to correct datatype and raises
-      ``ValidationError`` if that is not possible. This method accepts the raw
-      value from the widget and returns the converted value. For example, a
-      FloatField will turn the data into a Python ``float`` or raise a
-      ``ValidationError``.
+* The ``to_python()`` method on a Field is the first step in every
+  validation. It coerces the value to correct datatype and raises
+  ``ValidationError`` if that is not possible. This method accepts the raw
+  value from the widget and returns the converted value. For example, a
+  FloatField will turn the data into a Python ``float`` or raise a
+  ``ValidationError``.
 
-    * The ``validate()`` method on a Field handles field-specific validation
-      that is not suitable for a validator, It takes a value that has been
-      coerced to correct datatype and raises ``ValidationError`` on any error.
-      This method does not return anything and shouldn't alter the value. You
-      should override it to handle validation logic that you can't or don't
-      want to put in a validator.
+* The ``validate()`` method on a Field handles field-specific validation
+  that is not suitable for a validator, It takes a value that has been
+  coerced to correct datatype and raises ``ValidationError`` on any error.
+  This method does not return anything and shouldn't alter the value. You
+  should override it to handle validation logic that you can't or don't
+  want to put in a validator.
 
-    * The ``run_validators()`` method on a Field runs all of the field's
-      validators and aggregates all the errors into a single
-      ``ValidationError``. You shouldn't need to override this method.
+* The ``run_validators()`` method on a Field runs all of the field's
+  validators and aggregates all the errors into a single
+  ``ValidationError``. You shouldn't need to override this method.
 
-    * The ``clean()`` method on a Field subclass. This is responsible for
-      running ``to_python``, ``validate`` and ``run_validators`` in the correct
-      order and propagating their errors. If, at any time, any of the methods
-      raise ``ValidationError``, the validation stops and that error is raised.
-      This method returns the clean data, which is then inserted into the
-      ``cleaned_data`` dictionary of the form.
+* The ``clean()`` method on a Field subclass. This is responsible for
+  running ``to_python``, ``validate`` and ``run_validators`` in the correct
+  order and propagating their errors. If, at any time, any of the methods
+  raise ``ValidationError``, the validation stops and that error is raised.
+  This method returns the clean data, which is then inserted into the
+  ``cleaned_data`` dictionary of the form.
 
-    * The ``clean_<fieldname>()`` method in a form subclass -- where
-      ``<fieldname>`` is replaced with the name of the form field attribute.
-      This method does any cleaning that is specific to that particular
-      attribute, unrelated to the type of field that it is. This method is not
-      passed any parameters. You will need to look up the value of the field
-      in ``self.cleaned_data`` and remember that it will be a Python object
-      at this point, not the original string submitted in the form (it will be
-      in ``cleaned_data`` because the general field ``clean()`` method, above,
-      has already cleaned the data once).
+* The ``clean_<fieldname>()`` method in a form subclass -- where
+  ``<fieldname>`` is replaced with the name of the form field attribute.
+  This method does any cleaning that is specific to that particular
+  attribute, unrelated to the type of field that it is. This method is not
+  passed any parameters. You will need to look up the value of the field
+  in ``self.cleaned_data`` and remember that it will be a Python object
+  at this point, not the original string submitted in the form (it will be
+  in ``cleaned_data`` because the general field ``clean()`` method, above,
+  has already cleaned the data once).
 
-      For example, if you wanted to validate that the contents of a
-      ``CharField`` called ``serialnumber`` was unique,
-      ``clean_serialnumber()`` would be the right place to do this. You don't
-      need a specific field (it's just a ``CharField``), but you want a
-      formfield-specific piece of validation and, possibly,
-      cleaning/normalizing the data.
+  For example, if you wanted to validate that the contents of a
+  ``CharField`` called ``serialnumber`` was unique,
+  ``clean_serialnumber()`` would be the right place to do this. You don't
+  need a specific field (it's just a ``CharField``), but you want a
+  formfield-specific piece of validation and, possibly,
+  cleaning/normalizing the data.
 
-      Just like the general field ``clean()`` method, above, this method
-      should return the cleaned data, regardless of whether it changed
-      anything or not.
+  Just like the general field ``clean()`` method, above, this method
+  should return the cleaned data, regardless of whether it changed
+  anything or not.
 
-    * The Form subclass's ``clean()`` method. This method can perform
-      any validation that requires access to multiple fields from the form at
-      once. This is where you might put in things to check that if field ``A``
-      is supplied, field ``B`` must contain a valid email address and the
-      like. The data that this method returns is the final ``cleaned_data``
-      attribute for the form, so don't forget to return the full list of
-      cleaned data if you override this method (by default, ``Form.clean()``
-      just returns ``self.cleaned_data``).
+* The Form subclass's ``clean()`` method. This method can perform
+  any validation that requires access to multiple fields from the form at
+  once. This is where you might put in things to check that if field ``A``
+  is supplied, field ``B`` must contain a valid email address and the
+  like. The data that this method returns is the final ``cleaned_data``
+  attribute for the form, so don't forget to return the full list of
+  cleaned data if you override this method (by default, ``Form.clean()``
+  just returns ``self.cleaned_data``).
 
-      Note that any errors raised by your ``Form.clean()`` override will not
-      be associated with any field in particular. They go into a special
-      "field" (called ``__all__``), which you can access via the
-      ``non_field_errors()`` method if you need to. If you want to attach
-      errors to a specific field in the form, you will need to access the
-      ``_errors`` attribute on the form, which is `described later`_.
+  Note that any errors raised by your ``Form.clean()`` override will not
+  be associated with any field in particular. They go into a special
+  "field" (called ``__all__``), which you can access via the
+  ``non_field_errors()`` method if you need to. If you want to attach
+  errors to a specific field in the form, you will need to access the
+  ``_errors`` attribute on the form, which is `described later`_.
 
-      Also note that there are special considerations when overriding
-      the ``clean()`` method of a ``ModelForm`` subclass. (see the
-      :ref:`ModelForm documentation
-      <overriding-modelform-clean-method>` for more information)
+  Also note that there are special considerations when overriding
+  the ``clean()`` method of a ``ModelForm`` subclass. (see the
+  :ref:`ModelForm documentation
+  <overriding-modelform-clean-method>` for more information)
 
 These methods are run in the order given above, one field at a time.  That is,
 for each field in the form (in the order they are declared in the form

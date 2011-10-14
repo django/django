@@ -195,11 +195,11 @@ essentially placeholders for the ``process_*`` methods. If you do need some
 global state you may use ``__init__`` to set up. However, keep in mind a couple
 of caveats:
 
-    * Django initializes your middleware without any arguments, so you can't
-      define ``__init__`` as requiring any arguments.
+* Django initializes your middleware without any arguments, so you can't
+  define ``__init__`` as requiring any arguments.
 
-    * Unlike the ``process_*`` methods which get called once per request,
-      ``__init__`` gets called only *once*, when the Web server starts up.
+* Unlike the ``process_*`` methods which get called once per request,
+  ``__init__`` gets called only *once*, when the Web server starts up.
 
 Marking middleware as unused
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -212,15 +212,15 @@ piece of middleware from the middleware process.
 Guidelines
 ----------
 
-    * Middleware classes don't have to subclass anything.
+* Middleware classes don't have to subclass anything.
 
-    * The middleware class can live anywhere on your Python path. All Django
-      cares about is that the :setting:`MIDDLEWARE_CLASSES` setting includes
-      the path to it.
+* The middleware class can live anywhere on your Python path. All Django
+  cares about is that the :setting:`MIDDLEWARE_CLASSES` setting includes
+  the path to it.
 
-    * Feel free to look at :doc:`Django's available middleware
-      </ref/middleware>` for examples.
+* Feel free to look at :doc:`Django's available middleware
+  </ref/middleware>` for examples.
 
-    * If you write a middleware component that you think would be useful to
-      other people, contribute to the community! :doc:`Let us know
-      </internals/contributing/index>`, and we'll consider adding it to Django.
+* If you write a middleware component that you think would be useful to
+  other people, contribute to the community! :doc:`Let us know
+  </internals/contributing/index>`, and we'll consider adding it to Django.

@@ -9,27 +9,27 @@ Official releases
 
 Since version 1.0, Django's release numbering works as follows:
 
-    * Versions are numbered in the form ``A.B`` or ``A.B.C``.
+* Versions are numbered in the form ``A.B`` or ``A.B.C``.
 
-    * ``A`` is the *major version* number, which is only incremented for major
-      changes to Django, and these changes are not necessarily
-      backwards-compatible. That is, code you wrote for Django 1.2 may break
-      when we release Django 2.0.
+* ``A`` is the *major version* number, which is only incremented for major
+  changes to Django, and these changes are not necessarily
+  backwards-compatible. That is, code you wrote for Django 1.2 may break
+  when we release Django 2.0.
 
-    * ``B`` is the *minor version* number, which is incremented for large yet
-      backwards compatible changes.  Code written for Django 1.2 will continue
-      to work under Django 1.3. Exceptions to this rule will be listed in the
-      release notes.
+* ``B`` is the *minor version* number, which is incremented for large yet
+  backwards compatible changes.  Code written for Django 1.2 will continue
+  to work under Django 1.3. Exceptions to this rule will be listed in the
+  release notes.
 
-    * ``C`` is the *micro version* number, which is incremented for bug and
-      security fixes. A new micro-release will be 100% backwards-compatible with
-      the previous micro-release. The only exception is when a security issue
-      can't be fixed without breaking backwards-compatibility. If this happens,
-      the release notes will provide detailed upgrade instructions.
+* ``C`` is the *micro version* number, which is incremented for bug and
+  security fixes. A new micro-release will be 100% backwards-compatible with
+  the previous micro-release. The only exception is when a security issue
+  can't be fixed without breaking backwards-compatibility. If this happens,
+  the release notes will provide detailed upgrade instructions.
 
-    * In some cases, we'll make alpha, beta, or release candidate releases.
-      These are of the form ``A.B alpha/beta/rc N``, which means the ``Nth``
-      alpha/beta/release candidate of version ``A.B``.
+* In some cases, we'll make alpha, beta, or release candidate releases.
+  These are of the form ``A.B alpha/beta/rc N``, which means the ``Nth``
+  alpha/beta/release candidate of version ``A.B``.
 
 In Subversion, each Django release will be tagged under ``tags/releases``.  If
 it's necessary to release a bug fix release or a security release that doesn't
@@ -59,15 +59,15 @@ remove the feature entirely.
 
 So, for example, if we decided to remove a function that existed in Django 1.0:
 
-    * Django 1.1 will contain a backwards-compatible replica of the function
-      which will raise a ``PendingDeprecationWarning``. This warning is silent
-      by default; you need to explicitly turn on display of these warnings.
+* Django 1.1 will contain a backwards-compatible replica of the function
+  which will raise a ``PendingDeprecationWarning``. This warning is silent
+  by default; you need to explicitly turn on display of these warnings.
 
-    * Django 1.2 will contain the backwards-compatible replica, but the warning
-      will be promoted to a full-fledged ``DeprecationWarning``. This warning is
-      *loud* by default, and will likely be quite annoying.
+* Django 1.2 will contain the backwards-compatible replica, but the warning
+  will be promoted to a full-fledged ``DeprecationWarning``. This warning is
+  *loud* by default, and will likely be quite annoying.
 
-    * Django 1.3 will remove the feature outright.
+* Django 1.3 will remove the feature outright.
 
 Micro releases
 --------------
@@ -90,38 +90,38 @@ Supported versions
 At any moment in time, Django's developer team will support a set of releases to
 varying levels:
 
-    * The current development trunk will get new features and bug fixes
-      requiring major refactoring.
+* The current development trunk will get new features and bug fixes
+  requiring major refactoring.
 
-    * Patches applied to the trunk will also be applied to the last minor
-      release, to be released as the next micro release, when they fix critical
-      problems:
+* Patches applied to the trunk will also be applied to the last minor
+  release, to be released as the next micro release, when they fix critical
+  problems:
 
-      * Security issues.
+  * Security issues.
 
-      * Data-loss bugs.
+  * Data-loss bugs.
 
-      * Crashing bugs.
+  * Crashing bugs.
 
-      * Major functionality bugs in newly-introduced features.
+  * Major functionality bugs in newly-introduced features.
 
-      The rule of thumb is that fixes will be backported to the last minor
-      release for bugs that would have prevented a release in the first place.
+  The rule of thumb is that fixes will be backported to the last minor
+  release for bugs that would have prevented a release in the first place.
 
-    * Security fixes will be applied to the current trunk and the previous two
-      minor releases.
+* Security fixes will be applied to the current trunk and the previous two
+  minor releases.
 
 As a concrete example, consider a moment in time halfway between the release of
 Django 1.3 and 1.4. At this point in time:
 
-    * Features will be added to development trunk, to be released as Django 1.4.
+* Features will be added to development trunk, to be released as Django 1.4.
 
-    * Critical bug fixes will be applied to a ``1.3.X`` branch, and released as
-      1.3.1, 1.3.2, etc.
+* Critical bug fixes will be applied to a ``1.3.X`` branch, and released as
+  1.3.1, 1.3.2, etc.
 
-    * Security fixes will be applied to trunk, a ``1.3.X`` branch and a
-      ``1.2.X`` branch. They will trigger the release of ``1.3.1``, ``1.2.1``,
-      etc.
+* Security fixes will be applied to trunk, a ``1.3.X`` branch and a
+  ``1.2.X`` branch. They will trigger the release of ``1.3.1``, ``1.2.1``,
+  etc.
 
 .. _release-process:
 
@@ -204,15 +204,15 @@ Let's look at a hypothetical example for how this all first together. Imagine,
 if you will, a point about halfway between 1.1 and 1.2. At this point,
 development will be happening in a bunch of places:
 
-    * On trunk, development towards 1.2 proceeds with small additions, bugs
-      fixes, etc. being checked in daily.
+* On trunk, development towards 1.2 proceeds with small additions, bugs
+  fixes, etc. being checked in daily.
 
-    * On the branch "branches/releases/1.1.X", fixes for critical bugs found in
-      the 1.1 release are checked in as needed. At some point, this branch will
-      be released as "1.1.1", "1.1.2", etc.
+* On the branch "branches/releases/1.1.X", fixes for critical bugs found in
+  the 1.1 release are checked in as needed. At some point, this branch will
+  be released as "1.1.1", "1.1.2", etc.
 
-    * On the branch "branches/releases/1.0.X", security fixes are made if
-      needed and released as "1.0.2", "1.0.3", etc.
+* On the branch "branches/releases/1.0.X", security fixes are made if
+  needed and released as "1.0.2", "1.0.3", etc.
 
-    * On feature branches, development of major features is done. These
-      branches will be merged into trunk before the end of phase two.
+* On feature branches, development of major features is done. These
+  branches will be merged into trunk before the end of phase two.

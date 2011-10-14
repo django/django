@@ -240,11 +240,11 @@ server you choose.
 We recommend using a separate Web server -- i.e., one that's not also running
 Django -- for serving media. Here are some good choices:
 
-    * lighttpd_
-    * Nginx_
-    * TUX_
-    * A stripped-down version of Apache_
-    * Cherokee_
+* lighttpd_
+* Nginx_
+* TUX_
+* A stripped-down version of Apache_
+* Cherokee_
 
 If, however, you have no option but to serve media or static files on the
 same Apache ``VirtualHost`` as Django, here's how you can turn off mod_python
@@ -299,11 +299,11 @@ Django distribution.
 We **strongly** recommend using :mod:`django.contrib.staticfiles` to handle
 the admin files, but here are two other approaches:
 
-    1. Create a symbolic link to the admin static files from within your
-       document root.
+1. Create a symbolic link to the admin static files from within your
+   document root.
 
-    2. Or, copy the admin static files so that they live within your Apache
-       document root.
+2. Or, copy the admin static files so that they live within your Apache
+   document root.
 
 Using "eggs" with mod_python
 ============================
@@ -362,15 +362,15 @@ If you get a segmentation fault
 If Apache causes a segmentation fault, there are two probable causes, neither
 of which has to do with Django itself.
 
-    1. It may be because your Python code is importing the "pyexpat" module,
-       which may conflict with the version embedded in Apache. For full
-       information, see `Expat Causing Apache Crash`_.
+1. It may be because your Python code is importing the "pyexpat" module,
+   which may conflict with the version embedded in Apache. For full
+   information, see `Expat Causing Apache Crash`_.
 
-    2. It may be because you're running mod_python and mod_php in the same
-       Apache instance, with MySQL as your database backend. In some cases,
-       this causes a known mod_python issue due to version conflicts in PHP and
-       the Python MySQL backend. There's full information in the
-       `mod_python FAQ entry`_.
+2. It may be because you're running mod_python and mod_php in the same
+   Apache instance, with MySQL as your database backend. In some cases,
+   this causes a known mod_python issue due to version conflicts in PHP and
+   the Python MySQL backend. There's full information in the
+   `mod_python FAQ entry`_.
 
 If you continue to have problems setting up mod_python, a good thing to do is
 get a barebones mod_python site working, without the Django framework. This is

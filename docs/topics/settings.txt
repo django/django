@@ -19,13 +19,13 @@ Here are a couple of example settings::
 
 Because a settings file is a Python module, the following apply:
 
-    * It doesn't allow for Python syntax errors.
-    * It can assign settings dynamically using normal Python syntax.
-      For example::
+* It doesn't allow for Python syntax errors.
+* It can assign settings dynamically using normal Python syntax.
+  For example::
 
-          MY_SETTING = [str(i) for i in range(30)]
+      MY_SETTING = [str(i) for i in range(30)]
 
-    * It can import values from other settings files.
+* It can import values from other settings files.
 
 .. _django-settings-module:
 
@@ -87,9 +87,9 @@ module :file:`django/conf/global_settings.py`.
 
 Here's the algorithm Django uses in compiling settings:
 
-    * Load settings from ``global_settings.py``.
-    * Load settings from the specified settings file, overriding the global
-      settings as necessary.
+* Load settings from ``global_settings.py``.
+* Load settings from the specified settings file, overriding the global
+  settings as necessary.
 
 Note that a settings file should *not* import from ``global_settings``, because
 that's redundant.
@@ -156,8 +156,8 @@ Creating your own settings
 There's nothing stopping you from creating your own settings, for your own
 Django apps. Just follow these conventions:
 
-    * Setting names are in all uppercase.
-    * Don't reinvent an already-existing setting.
+* Setting names are in all uppercase.
+* Don't reinvent an already-existing setting.
 
 For settings that are sequences, Django itself uses tuples, rather than lists,
 but this is only a convention.

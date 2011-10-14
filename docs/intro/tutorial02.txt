@@ -27,38 +27,38 @@ Activate the admin site
 The Django admin site is not activated by default -- it's an opt-in thing. To
 activate the admin site for your installation, do these three things:
 
-    * Add ``"django.contrib.admin"`` to your :setting:`INSTALLED_APPS` setting.
+* Add ``"django.contrib.admin"`` to your :setting:`INSTALLED_APPS` setting.
 
-    * Run ``python manage.py syncdb``. Since you have added a new application
-      to :setting:`INSTALLED_APPS`, the database tables need to be updated.
+* Run ``python manage.py syncdb``. Since you have added a new application
+  to :setting:`INSTALLED_APPS`, the database tables need to be updated.
 
-    * Edit your ``mysite/urls.py`` file and uncomment the lines that reference
-      the admin -- there are three lines in total to uncomment. This file is a
-      URLconf; we'll dig into URLconfs in the next tutorial. For now, all you
-      need to know is that it maps URL roots to applications. In the end, you
-      should have a ``urls.py`` file that looks like this:
+* Edit your ``mysite/urls.py`` file and uncomment the lines that reference
+  the admin -- there are three lines in total to uncomment. This file is a
+  URLconf; we'll dig into URLconfs in the next tutorial. For now, all you
+  need to know is that it maps URL roots to applications. In the end, you
+  should have a ``urls.py`` file that looks like this:
 
-      .. parsed-literal::
+  .. parsed-literal::
 
-          from django.conf.urls import patterns, include, url
+      from django.conf.urls import patterns, include, url
 
-          # Uncomment the next two lines to enable the admin:
-          **from django.contrib import admin**
-          **admin.autodiscover()**
+      # Uncomment the next two lines to enable the admin:
+      **from django.contrib import admin**
+      **admin.autodiscover()**
 
-          urlpatterns = patterns('',
-              # Examples:
-              # url(r'^$', '{{ project_name }}.views.home', name='home'),
-              # url(r'^{{ project_name }}/', include('{{ project_name }}.foo.urls')),
+      urlpatterns = patterns('',
+          # Examples:
+          # url(r'^$', '{{ project_name }}.views.home', name='home'),
+          # url(r'^{{ project_name }}/', include('{{ project_name }}.foo.urls')),
 
-              # Uncomment the admin/doc line below to enable admin documentation:
-              # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
+          # Uncomment the admin/doc line below to enable admin documentation:
+          # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
-              # Uncomment the next line to enable the admin:
-              **url(r'^admin/', include(admin.site.urls)),**
-          )
+          # Uncomment the next line to enable the admin:
+          **url(r'^admin/', include(admin.site.urls)),**
+      )
 
-      (The bold lines are the ones that needed to be uncommented.)
+  (The bold lines are the ones that needed to be uncommented.)
 
 Start the development server
 ============================
@@ -145,29 +145,29 @@ Click the "What's up?" poll to edit it:
 
 Things to note here:
 
-    * The form is automatically generated from the Poll model.
+* The form is automatically generated from the Poll model.
 
-    * The different model field types (:class:`~django.db.models.DateTimeField`,
-      :class:`~django.db.models.CharField`) correspond to the appropriate HTML
-      input widget. Each type of field knows how to display itself in the Django
-      admin.
+* The different model field types (:class:`~django.db.models.DateTimeField`,
+  :class:`~django.db.models.CharField`) correspond to the appropriate HTML
+  input widget. Each type of field knows how to display itself in the Django
+  admin.
 
-    * Each :class:`~django.db.models.DateTimeField` gets free JavaScript
-      shortcuts. Dates get a "Today" shortcut and calendar popup, and times get
-      a "Now" shortcut and a convenient popup that lists commonly entered times.
+* Each :class:`~django.db.models.DateTimeField` gets free JavaScript
+  shortcuts. Dates get a "Today" shortcut and calendar popup, and times get
+  a "Now" shortcut and a convenient popup that lists commonly entered times.
 
 The bottom part of the page gives you a couple of options:
 
-    * Save -- Saves changes and returns to the change-list page for this type of
-      object.
+* Save -- Saves changes and returns to the change-list page for this type of
+  object.
 
-    * Save and continue editing -- Saves changes and reloads the admin page for
-      this object.
+* Save and continue editing -- Saves changes and reloads the admin page for
+  this object.
 
-    * Save and add another -- Saves changes and loads a new, blank form for this
-      type of object.
+* Save and add another -- Saves changes and loads a new, blank form for this
+  type of object.
 
-    * Delete -- Displays a delete confirmation page.
+* Delete -- Displays a delete confirmation page.
 
 Change the "Date published" by clicking the "Today" and "Now" shortcuts. Then
 click "Save and continue editing." Then click "History" in the upper right.

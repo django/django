@@ -28,49 +28,49 @@ How to use it
 
 To enable CSRF protection for your views, follow these steps:
 
-    1. Add the middleware
-       ``'django.middleware.csrf.CsrfViewMiddleware'`` to your list of
-       middleware classes, :setting:`MIDDLEWARE_CLASSES`.  (It should come
-       before any view middleware that assume that CSRF attacks have
-       been dealt with.)
+1. Add the middleware
+   ``'django.middleware.csrf.CsrfViewMiddleware'`` to your list of
+   middleware classes, :setting:`MIDDLEWARE_CLASSES`.  (It should come
+   before any view middleware that assume that CSRF attacks have
+   been dealt with.)
 
-       Alternatively, you can use the decorator
-       :func:`~django.views.decorators.csrf.csrf_protect` on particular views
-       you want to protect (see below).
+   Alternatively, you can use the decorator
+   :func:`~django.views.decorators.csrf.csrf_protect` on particular views
+   you want to protect (see below).
 
-    2. In any template that uses a POST form, use the :ttag:`csrf_token` tag inside
-       the ``<form>`` element if the form is for an internal URL, e.g.::
+2. In any template that uses a POST form, use the :ttag:`csrf_token` tag inside
+   the ``<form>`` element if the form is for an internal URL, e.g.::
 
-           <form action="." method="post">{% csrf_token %}
+       <form action="." method="post">{% csrf_token %}
 
-       This should not be done for POST forms that target external URLs, since
-       that would cause the CSRF token to be leaked, leading to a vulnerability.
+   This should not be done for POST forms that target external URLs, since
+   that would cause the CSRF token to be leaked, leading to a vulnerability.
 
-    3. In the corresponding view functions, ensure that the
-       ``'django.core.context_processors.csrf'`` context processor is
-       being used. Usually, this can be done in one of two ways:
+3. In the corresponding view functions, ensure that the
+   ``'django.core.context_processors.csrf'`` context processor is
+   being used. Usually, this can be done in one of two ways:
 
-       1. Use RequestContext, which always uses
-          ``'django.core.context_processors.csrf'`` (no matter what your
-          TEMPLATE_CONTEXT_PROCESSORS setting).  If you are using
-          generic views or contrib apps, you are covered already, since these
-          apps use RequestContext throughout.
+   1. Use RequestContext, which always uses
+      ``'django.core.context_processors.csrf'`` (no matter what your
+      TEMPLATE_CONTEXT_PROCESSORS setting).  If you are using
+      generic views or contrib apps, you are covered already, since these
+      apps use RequestContext throughout.
 
-       2. Manually import and use the processor to generate the CSRF token and
-          add it to the template context. e.g.::
+   2. Manually import and use the processor to generate the CSRF token and
+      add it to the template context. e.g.::
 
-              from django.core.context_processors import csrf
-              from django.shortcuts import render_to_response
+          from django.core.context_processors import csrf
+          from django.shortcuts import render_to_response
 
-              def my_view(request):
-                  c = {}
-                  c.update(csrf(request))
-                  # ... view code here
-                  return render_to_response("a_template.html", c)
+          def my_view(request):
+              c = {}
+              c.update(csrf(request))
+              # ... view code here
+              return render_to_response("a_template.html", c)
 
-          You may want to write your own
-          :func:`~django.shortcuts.render_to_response()` wrapper that takes care
-          of this step for you.
+      You may want to write your own
+      :func:`~django.shortcuts.render_to_response()` wrapper that takes care
+      of this step for you.
 
 The utility script ``extras/csrf_migration_helper.py`` can help to automate the
 finding of code and templates that may need these steps. It contains full help

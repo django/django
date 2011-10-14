@@ -193,14 +193,14 @@ final byte stream that can be served to the client.
 There are three circumstances under which a TemplateResponse will be
 rendered:
 
-    * When the TemplateResponse instance is explicitly rendered, using
-      the :meth:`SimpleTemplateResponse.render()` method.
+* When the TemplateResponse instance is explicitly rendered, using
+  the :meth:`SimpleTemplateResponse.render()` method.
 
-    * When the content of the response is explicitly set by assigning
-      :attr:`response.content`.
+* When the content of the response is explicitly set by assigning
+  :attr:`response.content`.
 
-    * After passing through template response middleware, but before
-      passing through response middleware.
+* After passing through template response middleware, but before
+  passing through response middleware.
 
 A TemplateResponse can only be rendered once. The first call to
 :meth:`SimpleTemplateResponse.render` sets the content of the

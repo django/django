@@ -64,11 +64,11 @@ server you choose.
 We recommend using a separate Web server -- i.e., one that's not also running
 Django -- for serving media. Here are some good choices:
 
-    * lighttpd_
-    * Nginx_
-    * TUX_
-    * A stripped-down version of Apache_
-    * Cherokee_
+* lighttpd_
+* Nginx_
+* TUX_
+* A stripped-down version of Apache_
+* Cherokee_
 
 If, however, you have no option but to serve media files on the same Apache
 ``VirtualHost`` as Django, you can set up Apache to serve some URLs as
@@ -131,11 +131,11 @@ Django distribution.
 We **strongly** recommend using :mod:`django.contrib.staticfiles` to handle
 the admin files, but here are two other approaches:
 
-    1. Create a symbolic link to the admin static files from within your
-       document root.
+1. Create a symbolic link to the admin static files from within your
+   document root.
 
-    2. Or, copy the admin static files so that they live within your Apache
-       document root.
+2. Or, copy the admin static files so that they live within your Apache
+   document root.
 
 Details
 =======

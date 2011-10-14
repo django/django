@@ -18,22 +18,22 @@ Overview
 
 Django 1.2 introduces several large, important new features, including:
 
-    * Support for `multiple database connections`_ in a single Django instance.
+* Support for `multiple database connections`_ in a single Django instance.
 
-    * `Model validation`_ inspired by Django's form validation.
+* `Model validation`_ inspired by Django's form validation.
 
-    * Vastly `improved protection against Cross-Site Request Forgery`_ (CSRF).
+* Vastly `improved protection against Cross-Site Request Forgery`_ (CSRF).
 
-    * A new `user "messages" framework`_ with support for cookie- and session-based
-      message for both anonymous and authenticated users.
+* A new `user "messages" framework`_ with support for cookie- and session-based
+  message for both anonymous and authenticated users.
 
-    * Hooks for `object-level permissions`_, `permissions for anonymous users`_,
-      and `more flexible username requirements`_.
+* Hooks for `object-level permissions`_, `permissions for anonymous users`_,
+  and `more flexible username requirements`_.
 
-    * Customization of email sending via `email backends`_.
+* Customization of email sending via `email backends`_.
 
-    * New :ref:`"smart" if template tag <new-in-1.2-smart-if>` which supports
-      comparison operators.
+* New :ref:`"smart" if template tag <new-in-1.2-smart-if>` which supports
+  comparison operators.
 
 .. _multiple database connections: `support for multiple databases`_
 .. _improved protection against Cross-Site Request Forgery: `improved CSRF protection`_
@@ -58,31 +58,31 @@ manner per :doc:`our API stability policy </misc/api-stability>` policy.
 However, a handful of features *have* changed in ways that, for some users, will be
 backwards-incompatible. The big changes are:
 
-    * Support for Python 2.3 has been dropped. See the full notes
-      below.
+* Support for Python 2.3 has been dropped. See the full notes
+  below.
 
-    * The new CSRF protection framework is not backwards-compatible with
-      the old system. Users of the old system will not be affected until
-      the old system is removed in Django 1.4.
+* The new CSRF protection framework is not backwards-compatible with
+  the old system. Users of the old system will not be affected until
+  the old system is removed in Django 1.4.
 
-      However, upgrading to the new CSRF protection framework requires a few
-      important backwards-incompatible changes, detailed in `CSRF Protection`_,
-      below.
+  However, upgrading to the new CSRF protection framework requires a few
+  important backwards-incompatible changes, detailed in `CSRF Protection`_,
+  below.
 
-    * Authors of custom :class:`~django.db.models.Field` subclasses should be
-      aware that a number of methods have had a change in prototype, detailed
-      under `get_db_prep_*() methods on Field`_, below.
+* Authors of custom :class:`~django.db.models.Field` subclasses should be
+  aware that a number of methods have had a change in prototype, detailed
+  under `get_db_prep_*() methods on Field`_, below.
 
-    * The internals of template tags have changed somewhat; authors of custom
-      template tags that need to store state (e.g. custom control flow tags)
-      should ensure that their code follows the new rules for `stateful template
-      tags`_
+* The internals of template tags have changed somewhat; authors of custom
+  template tags that need to store state (e.g. custom control flow tags)
+  should ensure that their code follows the new rules for `stateful template
+  tags`_
 
-    * The :func:`~django.contrib.auth.decorators.user_passes_test`,
-      :func:`~django.contrib.auth.decorators.login_required`, and
-      :func:`~django.contrib.auth.decorators.permission_required`, decorators
-      from :mod:`django.contrib.auth` only apply to functions and no longer
-      work on methods. There's a simple one-line fix `detailed below`_.
+* The :func:`~django.contrib.auth.decorators.user_passes_test`,
+  :func:`~django.contrib.auth.decorators.login_required`, and
+  :func:`~django.contrib.auth.decorators.permission_required`, decorators
+  from :mod:`django.contrib.auth` only apply to functions and no longer
+  work on methods. There's a simple one-line fix `detailed below`_.
 
 .. _detailed below: `user_passes_test, login_required and permission_required`_
 
@@ -429,28 +429,28 @@ We've made large changes to the way CSRF protection works, detailed in
 :doc:`the CSRF documentation </ref/contrib/csrf>`. Here are the major changes you
 should be aware of:
 
- * ``CsrfResponseMiddleware`` and ``CsrfMiddleware`` have been deprecated and
-   will be removed completely in Django 1.4, in favor of a template tag that
-   should be inserted into forms.
+* ``CsrfResponseMiddleware`` and ``CsrfMiddleware`` have been deprecated and
+  will be removed completely in Django 1.4, in favor of a template tag that
+  should be inserted into forms.
 
- * All contrib apps use a ``csrf_protect`` decorator to protect the view. This
-   requires the use of the ``csrf_token`` template tag in the template. If you
-   have used custom templates for contrib views, you MUST READ THE UPGRADE
-   INSTRUCTIONS to fix those templates.
+* All contrib apps use a ``csrf_protect`` decorator to protect the view. This
+  requires the use of the ``csrf_token`` template tag in the template. If you
+  have used custom templates for contrib views, you MUST READ THE UPGRADE
+  INSTRUCTIONS to fix those templates.
 
-   .. admonition:: Documentation removed
+  .. admonition:: Documentation removed
 
-      The upgrade notes have been removed in current Django docs. Please refer
-      to the docs for Django 1.3 or older to find these instructions.
+     The upgrade notes have been removed in current Django docs. Please refer
+     to the docs for Django 1.3 or older to find these instructions.
 
- * ``CsrfViewMiddleware`` is included in :setting:`MIDDLEWARE_CLASSES` by
-   default. This turns on CSRF protection by default, so views that accept
-   POST requests need to be written to work with the middleware. Instructions
-   on how to do this are found in the CSRF docs.
+* ``CsrfViewMiddleware`` is included in :setting:`MIDDLEWARE_CLASSES` by
+  default. This turns on CSRF protection by default, so views that accept
+  POST requests need to be written to work with the middleware. Instructions
+  on how to do this are found in the CSRF docs.
 
- * All of the CSRF has moved from contrib to core (with backwards
-   compatible imports in the old locations, which are deprecated and
-   will cease to be supported in Django 1.4).
+* All of the CSRF has moved from contrib to core (with backwards
+  compatible imports in the old locations, which are deprecated and
+  will cease to be supported in Django 1.4).
 
 ``get_db_prep_*()`` methods on ``Field``
 ----------------------------------------
@@ -816,20 +816,20 @@ shortened. The previous sample settings would now look like this::
 
 This affects the following settings:
 
-    =========================================  ==========================
-     Old setting                                New Setting
-    =========================================  ==========================
-    :setting:`DATABASE_ENGINE`                 :setting:`ENGINE`
-    :setting:`DATABASE_HOST`                   :setting:`HOST`
-    :setting:`DATABASE_NAME`                   :setting:`NAME`
-    :setting:`DATABASE_OPTIONS`                :setting:`OPTIONS`
-    :setting:`DATABASE_PASSWORD`               :setting:`PASSWORD`
-    :setting:`DATABASE_PORT`                   :setting:`PORT`
-    :setting:`DATABASE_USER`                   :setting:`USER`
-    :setting:`TEST_DATABASE_CHARSET`           :setting:`TEST_CHARSET`
-    :setting:`TEST_DATABASE_COLLATION`         :setting:`TEST_COLLATION`
-    :setting:`TEST_DATABASE_NAME`              :setting:`TEST_NAME`
-    =========================================  ==========================
+=========================================  ==========================
+ Old setting                                New Setting
+=========================================  ==========================
+:setting:`DATABASE_ENGINE`                 :setting:`ENGINE`
+:setting:`DATABASE_HOST`                   :setting:`HOST`
+:setting:`DATABASE_NAME`                   :setting:`NAME`
+:setting:`DATABASE_OPTIONS`                :setting:`OPTIONS`
+:setting:`DATABASE_PASSWORD`               :setting:`PASSWORD`
+:setting:`DATABASE_PORT`                   :setting:`PORT`
+:setting:`DATABASE_USER`                   :setting:`USER`
+:setting:`TEST_DATABASE_CHARSET`           :setting:`TEST_CHARSET`
+:setting:`TEST_DATABASE_COLLATION`         :setting:`TEST_COLLATION`
+:setting:`TEST_DATABASE_NAME`              :setting:`TEST_NAME`
+=========================================  ==========================
 
 These changes are also required if you have manually created a database
 connection using ``DatabaseWrapper()`` from your database backend of choice.
@@ -967,9 +967,9 @@ Or, when directly formatting a date value::
 
 The same applies to the globals found in ``django.forms.fields``:
 
-  * ``DEFAULT_DATE_INPUT_FORMATS``
-  * ``DEFAULT_TIME_INPUT_FORMATS``
-  * ``DEFAULT_DATETIME_INPUT_FORMATS``
+* ``DEFAULT_DATE_INPUT_FORMATS``
+* ``DEFAULT_TIME_INPUT_FORMATS``
+* ``DEFAULT_DATETIME_INPUT_FORMATS``
 
 Use ``django.utils.formats.get_format()`` to get the appropriate formats.
 

@@ -7,9 +7,9 @@ code base. It's our policy to make sure all tests pass at all times.
 
 The tests cover:
 
-    * Models and the database API (``tests/modeltests``),
-    * Everything else in core Django code (``tests/regressiontests``),
-    * :ref:`contrib-apps` (``django/contrib/<app>/tests``).
+* Models and the database API (``tests/modeltests``),
+* Everything else in core Django code (``tests/regressiontests``),
+* :ref:`contrib-apps` (``django/contrib/<app>/tests``).
 
 We appreciate any and all contributions to the test suite!
 
@@ -58,30 +58,30 @@ and type:
 The :setting:`DATABASES` setting in this test settings module needs to define
 two databases:
 
-    * A ``default`` database. This database should use the backend that
-      you want to use for primary testing
+* A ``default`` database. This database should use the backend that
+  you want to use for primary testing
 
-    * A database with the alias ``other``. The ``other`` database is
-      used to establish that queries can be directed to different
-      databases. As a result, this database can use any backend you
-      want. It doesn't need to use the same backend as the ``default``
-      database (although it can use the same backend if you want to).
+* A database with the alias ``other``. The ``other`` database is
+  used to establish that queries can be directed to different
+  databases. As a result, this database can use any backend you
+  want. It doesn't need to use the same backend as the ``default``
+  database (although it can use the same backend if you want to).
 
 If you're using a backend that isn't SQLite, you will need to provide other
 details for each database:
 
-    * The :setting:`USER` option for each of your databases needs to
-      specify an existing user account for the database.
+* The :setting:`USER` option for each of your databases needs to
+  specify an existing user account for the database.
 
-    * The :setting:`PASSWORD` option needs to provide the password for
-      the :setting:`USER` that has been specified.
+* The :setting:`PASSWORD` option needs to provide the password for
+  the :setting:`USER` that has been specified.
 
-    * The :setting:`NAME` option must be the name of an existing database to
-      which the given user has permission to connect. The unit tests will not
-      touch this database; the test runner creates a new database whose name
-      is :setting:`NAME` prefixed with ``test_``, and this test database is
-      deleted when the tests are finished. This means your user account needs
-      permission to execute ``CREATE DATABASE``.
+* The :setting:`NAME` option must be the name of an existing database to
+  which the given user has permission to connect. The unit tests will not
+  touch this database; the test runner creates a new database whose name
+  is :setting:`NAME` prefixed with ``test_``, and this test database is
+  deleted when the tests are finished. This means your user account needs
+  permission to execute ``CREATE DATABASE``.
 
 You will also need to ensure that your database uses UTF-8 as the default
 character set. If your database server doesn't use UTF-8 as a default charset,
@@ -128,13 +128,13 @@ Running all the tests
 If you want to run the full suite of tests, you'll need to install a number of
 dependencies:
 
-    *  PyYAML_
-    *  Markdown_
-    *  Textile_
-    *  Docutils_
-    *  setuptools_
-    *  memcached_, plus a :ref:`supported Python binding <memcached>`
-    *  gettext_ (:ref:`gettext_on_windows`)
+*  PyYAML_
+*  Markdown_
+*  Textile_
+*  Docutils_
+*  setuptools_
+*  memcached_, plus a :ref:`supported Python binding <memcached>`
+*  gettext_ (:ref:`gettext_on_windows`)
 
 If you want to test the memcached cache backend, you'll also need to define
 a :setting:`CACHES` setting that points at your memcached instance.

@@ -28,22 +28,22 @@ be passed as an extra argument to the URLconf.
 
 Django ships with generic views to do the following:
 
-    * Perform common "simple" tasks: redirect to a different page and
-      render a given template.
+* Perform common "simple" tasks: redirect to a different page and
+  render a given template.
 
-    * Display list and detail pages for a single object. If we were creating an
-      application to manage conferences then a ``talk_list`` view and a
-      ``registered_user_list`` view would be examples of list views. A single
-      talk page is an example of what we call a "detail" view.
+* Display list and detail pages for a single object. If we were creating an
+  application to manage conferences then a ``talk_list`` view and a
+  ``registered_user_list`` view would be examples of list views. A single
+  talk page is an example of what we call a "detail" view.
 
-    * Present date-based objects in year/month/day archive pages,
-      associated detail, and "latest" pages. The Django Weblog's
-      (http://www.djangoproject.com/weblog/) year, month, and
-      day archives are built with these, as would be a typical
-      newspaper's archives.
+* Present date-based objects in year/month/day archive pages,
+  associated detail, and "latest" pages. The Django Weblog's
+  (http://www.djangoproject.com/weblog/) year, month, and
+  day archives are built with these, as would be a typical
+  newspaper's archives.
 
-    * Allow users to create, update, and delete objects -- with or
-      without authorization.
+* Allow users to create, update, and delete objects -- with or
+  without authorization.
 
 Taken together, these views provide easy interfaces to perform the most common
 tasks developers encounter.

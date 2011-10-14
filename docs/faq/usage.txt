@@ -6,21 +6,21 @@ Why do I get an error about importing DJANGO_SETTINGS_MODULE?
 
 Make sure that:
 
-    * The environment variable DJANGO_SETTINGS_MODULE is set to a
-      fully-qualified Python module (i.e. "mysite.settings").
+* The environment variable DJANGO_SETTINGS_MODULE is set to a
+  fully-qualified Python module (i.e. "mysite.settings").
 
-    * Said module is on ``sys.path`` (``import mysite.settings`` should work).
+* Said module is on ``sys.path`` (``import mysite.settings`` should work).
 
-    * The module doesn't contain syntax errors (of course).
+* The module doesn't contain syntax errors (of course).
 
-    * If you're using mod_python but *not* using Django's request handler,
-      you'll need to work around a mod_python bug related to the use of
-      ``SetEnv``; before you import anything from Django you'll need to do
-      the following::
+* If you're using mod_python but *not* using Django's request handler,
+  you'll need to work around a mod_python bug related to the use of
+  ``SetEnv``; before you import anything from Django you'll need to do
+  the following::
 
-            os.environ.update(req.subprocess_env)
+        os.environ.update(req.subprocess_env)
 
-      (where ``req`` is the mod_python request object).
+  (where ``req`` is the mod_python request object).
 
 I can't stand your template language. Do I have to use it?
 ----------------------------------------------------------
@@ -46,25 +46,25 @@ How do I use image and file fields?
 Using a :class:`~django.db.models.FileField` or an
 :class:`~django.db.models.ImageField` in a model takes a few steps:
 
-    #. In your settings file, you'll need to define :setting:`MEDIA_ROOT` as
-       the full path to a directory where you'd like Django to store uploaded
-       files. (For performance, these files are not stored in the database.)
-       Define :setting:`MEDIA_URL` as the base public URL of that directory.
-       Make sure that this directory is writable by the Web server's user
-       account.
+#. In your settings file, you'll need to define :setting:`MEDIA_ROOT` as
+   the full path to a directory where you'd like Django to store uploaded
+   files. (For performance, these files are not stored in the database.)
+   Define :setting:`MEDIA_URL` as the base public URL of that directory.
+   Make sure that this directory is writable by the Web server's user
+   account.
 
-    #. Add the :class:`~django.db.models.FileField` or
-       :class:`~django.db.models.ImageField` to your model, making sure to
-       define the :attr:`~django.db.models.FileField.upload_to` option to tell
-       Django to which subdirectory of :setting:`MEDIA_ROOT` it should upload
-       files.
+#. Add the :class:`~django.db.models.FileField` or
+   :class:`~django.db.models.ImageField` to your model, making sure to
+   define the :attr:`~django.db.models.FileField.upload_to` option to tell
+   Django to which subdirectory of :setting:`MEDIA_ROOT` it should upload
+   files.
 
-    #. All that will be stored in your database is a path to the file
-       (relative to :setting:`MEDIA_ROOT`). You'll most likely want to use the
-       convenience :attr:`~django.core.files.File.url` attribute provided by
-       Django. For example, if your :class:`~django.db.models.ImageField` is
-       called ``mug_shot``, you can get the absolute path to your image in a
-       template with ``{{ object.mug_shot.url }}``.
+#. All that will be stored in your database is a path to the file
+   (relative to :setting:`MEDIA_ROOT`). You'll most likely want to use the
+   convenience :attr:`~django.core.files.File.url` attribute provided by
+   Django. For example, if your :class:`~django.db.models.ImageField` is
+   called ``mug_shot``, you can get the absolute path to your image in a
+   template with ``{{ object.mug_shot.url }}``.
 
 How do I make a variable available to all my templates?
 -------------------------------------------------------

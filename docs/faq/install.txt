@@ -4,11 +4,11 @@ FAQ: Installation
 How do I get started?
 ---------------------
 
-    #. `Download the code`_.
-    #. Install Django (read the :doc:`installation guide </intro/install>`).
-    #. Walk through the :doc:`tutorial </intro/tutorial01>`.
-    #. Check out the rest of the :doc:`documentation </index>`, and `ask questions`_ if you
-       run into trouble.
+#. `Download the code`_.
+#. Install Django (read the :doc:`installation guide </intro/install>`).
+#. Walk through the :doc:`tutorial </intro/tutorial01>`.
+#. Check out the rest of the :doc:`documentation </index>`, and `ask questions`_ if you
+   run into trouble.
 
 .. _`Download the code`: http://www.djangoproject.com/download/
 .. _ask questions: http://www.djangoproject.com/community/

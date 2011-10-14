@@ -8,10 +8,10 @@ django.contrib.markup
 Django provides template filters that implement the following markup
 languages:
 
-    * ``textile`` -- implements `Textile`_ -- requires `PyTextile`_
-    * ``markdown`` -- implements `Markdown`_ -- requires `Python-markdown`_
-    * ``restructuredtext`` -- implements `reST (reStructured Text)`_
-      -- requires `doc-utils`_
+* ``textile`` -- implements `Textile`_ -- requires `PyTextile`_
+* ``markdown`` -- implements `Markdown`_ -- requires `Python-markdown`_
+* ``restructuredtext`` -- implements `reST (reStructured Text)`_
+  -- requires `doc-utils`_
 
 In each case, the filter expects formatted markup as a string and
 returns a string representing the marked-up text. For example, the

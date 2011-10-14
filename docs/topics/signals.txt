@@ -15,27 +15,27 @@ Django provides a :doc:`set of built-in signals </ref/signals>` that let user
 code get notified by Django itself of certain actions. These include some useful
 notifications:
 
-    * :data:`django.db.models.signals.pre_save` &
-      :data:`django.db.models.signals.post_save`
+* :data:`django.db.models.signals.pre_save` &
+  :data:`django.db.models.signals.post_save`
 
-      Sent before or after a model's :meth:`~django.db.models.Model.save` method
-      is called.
+  Sent before or after a model's :meth:`~django.db.models.Model.save` method
+  is called.
 
-    * :data:`django.db.models.signals.pre_delete` &
-      :data:`django.db.models.signals.post_delete`
+* :data:`django.db.models.signals.pre_delete` &
+  :data:`django.db.models.signals.post_delete`
 
-      Sent before or after a model's :meth:`~django.db.models.Model.delete`
-      method or queryset's :meth:`~django.db.models.query.QuerySet.delete`
-      method is called.
+  Sent before or after a model's :meth:`~django.db.models.Model.delete`
+  method or queryset's :meth:`~django.db.models.query.QuerySet.delete`
+  method is called.
 
-    * :data:`django.db.models.signals.m2m_changed`
+* :data:`django.db.models.signals.m2m_changed`
 
-      Sent when a :class:`ManyToManyField` on a model is changed.
+  Sent when a :class:`ManyToManyField` on a model is changed.
 
-    * :data:`django.core.signals.request_started` &
-      :data:`django.core.signals.request_finished`
+* :data:`django.core.signals.request_started` &
+  :data:`django.core.signals.request_finished`
 
-      Sent when Django starts or finishes an HTTP request.
+  Sent when Django starts or finishes an HTTP request.
 
 See the :doc:`built-in signal documentation </ref/signals>` for a complete list,
 and a complete explanation of each signal.

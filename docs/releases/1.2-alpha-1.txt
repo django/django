@@ -26,28 +26,28 @@ There have been large changes to the way that CSRF protection works, detailed in
 :doc:`the CSRF documentation </ref/contrib/csrf>`.  The following are the major
 changes that developers must be aware of:
 
- * ``CsrfResponseMiddleware`` and ``CsrfMiddleware`` have been deprecated, and
-   **will be removed completely in Django 1.4**, in favor of a template tag that
-   should be inserted into forms.
+* ``CsrfResponseMiddleware`` and ``CsrfMiddleware`` have been deprecated, and
+  **will be removed completely in Django 1.4**, in favor of a template tag that
+  should be inserted into forms.
 
- * All contrib apps use a ``csrf_protect`` decorator to protect the view. This
-   requires the use of the ``csrf_token`` template tag in the template, so if you
-   have used custom templates for contrib views, you MUST READ THE UPGRADE
-   INSTRUCTIONS to fix those templates.
+* All contrib apps use a ``csrf_protect`` decorator to protect the view. This
+  requires the use of the ``csrf_token`` template tag in the template, so if you
+  have used custom templates for contrib views, you MUST READ THE UPGRADE
+  INSTRUCTIONS to fix those templates.
 
-   .. admonition:: Documentation removed
+  .. admonition:: Documentation removed
 
-      The upgrade notes have been removed in current Django docs. Please refer
-      to the docs for Django 1.3 or older to find these instructions.
+     The upgrade notes have been removed in current Django docs. Please refer
+     to the docs for Django 1.3 or older to find these instructions.
 
- * ``CsrfViewMiddleware`` is included in :setting:`MIDDLEWARE_CLASSES` by
-   default. This turns on CSRF protection by default, so that views that accept
-   POST requests need to be written to work with the middleware. Instructions
-   on how to do this are found in the CSRF docs.
+* ``CsrfViewMiddleware`` is included in :setting:`MIDDLEWARE_CLASSES` by
+  default. This turns on CSRF protection by default, so that views that accept
+  POST requests need to be written to work with the middleware. Instructions
+  on how to do this are found in the CSRF docs.
 
- * CSRF-related code has moved from ``contrib`` to ``core`` (with
-   backwards compatible imports in the old locations, which are
-   deprecated).
+* CSRF-related code has moved from ``contrib`` to ``core`` (with
+  backwards compatible imports in the old locations, which are
+  deprecated).
 
 :ttag:`if` tag changes
 ----------------------
@@ -70,18 +70,18 @@ If you used ``LazyObject`` in your own code, and implemented the
 ``get_all_members()`` method for wrapped objects, you need to make the following
 changes:
 
- * If your class does not have special requirements for introspection (i.e. you
-   have not implemented ``__getattr__()`` or other methods that allow for
-   attributes not discoverable by normal mechanisms), you can simply remove the
-   ``get_all_members()`` method.  The default implementation on ``LazyObject``
-   will do the right thing.
+* If your class does not have special requirements for introspection (i.e. you
+  have not implemented ``__getattr__()`` or other methods that allow for
+  attributes not discoverable by normal mechanisms), you can simply remove the
+  ``get_all_members()`` method.  The default implementation on ``LazyObject``
+  will do the right thing.
 
- * If you have more complex requirements for introspection, first rename the
-   ``get_all_members()`` method to ``__dir__()``.  This is the standard method,
-   from Python 2.6 onwards, for supporting introspection.  If you are require
-   support for Python < 2.6, add the following code to the class::
+* If you have more complex requirements for introspection, first rename the
+  ``get_all_members()`` method to ``__dir__()``.  This is the standard method,
+  from Python 2.6 onwards, for supporting introspection.  If you are require
+  support for Python < 2.6, add the following code to the class::
 
-       __members__ = property(lambda self: self.__dir__())
+      __members__ = property(lambda self: self.__dir__())
 
 ``__dict__`` on Model instances
 -------------------------------
@@ -282,20 +282,20 @@ The sample settings given previously would now be stored using::
 
 This affects the following settings:
 
-    =========================================  ==========================
-     Old setting                                New Setting
-    =========================================  ==========================
-    :setting:`DATABASE_ENGINE`                 :setting:`ENGINE`
-    :setting:`DATABASE_HOST`                   :setting:`HOST`
-    :setting:`DATABASE_NAME`                   :setting:`NAME`
-    :setting:`DATABASE_OPTIONS`                :setting:`OPTIONS`
-    :setting:`DATABASE_PASSWORD`               :setting:`PASSWORD`
-    :setting:`DATABASE_PORT`                   :setting:`PORT`
-    :setting:`DATABASE_USER`                   :setting:`USER`
-    :setting:`TEST_DATABASE_CHARSET`           :setting:`TEST_CHARSET`
-    :setting:`TEST_DATABASE_COLLATION`         :setting:`TEST_COLLATION`
-    :setting:`TEST_DATABASE_NAME`              :setting:`TEST_NAME`
-    =========================================  ==========================
+=========================================  ==========================
+ Old setting                                New Setting
+=========================================  ==========================
+:setting:`DATABASE_ENGINE`                 :setting:`ENGINE`
+:setting:`DATABASE_HOST`                   :setting:`HOST`
+:setting:`DATABASE_NAME`                   :setting:`NAME`
+:setting:`DATABASE_OPTIONS`                :setting:`OPTIONS`
+:setting:`DATABASE_PASSWORD`               :setting:`PASSWORD`
+:setting:`DATABASE_PORT`                   :setting:`PORT`
+:setting:`DATABASE_USER`                   :setting:`USER`
+:setting:`TEST_DATABASE_CHARSET`           :setting:`TEST_CHARSET`
+:setting:`TEST_DATABASE_COLLATION`         :setting:`TEST_COLLATION`
+:setting:`TEST_DATABASE_NAME`              :setting:`TEST_NAME`
+=========================================  ==========================
 
 These changes are also required if you have manually created a database
 connection using ``DatabaseWrapper()`` from your database backend of choice.
@@ -367,9 +367,9 @@ or, when directly formatting a date value::
 
 The same applies to the globals found in ``django.forms.fields``:
 
-  * ``DEFAULT_DATE_INPUT_FORMATS``
-  * ``DEFAULT_TIME_INPUT_FORMATS``
-  * ``DEFAULT_DATETIME_INPUT_FORMATS``
+* ``DEFAULT_DATE_INPUT_FORMATS``
+* ``DEFAULT_TIME_INPUT_FORMATS``
+* ``DEFAULT_DATETIME_INPUT_FORMATS``
 
 Use ``django.utils.formats.get_format()`` to get the appropriate formats.
 
@@ -559,7 +559,7 @@ Django team by trying out the alpha codebase in a safe test environment and
 reporting any bugs or issues you encounter. The Django ticket tracker is the
 central place to search for open issues:
 
-    * http://code.djangoproject.com/timeline
+* http://code.djangoproject.com/timeline
 
 Please open new tickets if no existing ticket corresponds to a problem you're
 running into.
@@ -567,7 +567,7 @@ running into.
 Additionally, discussion of Django development, including progress toward the
 1.2 release, takes place daily on the django-developers mailing list:
 
-    * http://groups.google.com/group/django-developers
+* http://groups.google.com/group/django-developers
 
 ... and in the ``#django-dev`` IRC channel on ``irc.freenode.net``. If you're
 interested in helping out with Django's development, feel free to join the
@@ -576,7 +576,7 @@ discussions there.
 Django's online documentation also includes pointers on how to contribute to
 Django:
 
-    * :doc:`How to contribute to Django </internals/contributing/index>`
+* :doc:`How to contribute to Django </internals/contributing/index>`
 
 Contributions on any level -- developing code, writing documentation or simply
 triaging tickets and helping to test proposed bugfixes -- are always welcome and

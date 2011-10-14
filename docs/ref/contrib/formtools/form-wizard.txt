@@ -24,15 +24,15 @@ How it works
 
 Here's the basic workflow for how a user would use a wizard:
 
-    1. The user visits the first page of the wizard, fills in the form and
-       submits it.
-    2. The server validates the data. If it's invalid, the form is displayed
-       again, with error messages. If it's valid, the server saves the current
-       state of the wizard in the backend and redirects to the next step.
-    3. Step 1 and 2 repeat, for every subsequent form in the wizard.
-    4. Once the user has submitted all the forms and all the data has been
-       validated, the wizard processes the data -- saving it to the database,
-       sending an email, or whatever the application needs to do.
+1. The user visits the first page of the wizard, fills in the form and
+   submits it.
+2. The server validates the data. If it's invalid, the form is displayed
+   again, with error messages. If it's valid, the server saves the current
+   state of the wizard in the backend and redirects to the next step.
+3. Step 1 and 2 repeat, for every subsequent form in the wizard.
+4. Once the user has submitted all the forms and all the data has been
+   validated, the wizard processes the data -- saving it to the database,
+   sending an email, or whatever the application needs to do.
 
 Usage
 =====
@@ -40,21 +40,21 @@ Usage
 This application handles as much machinery for you as possible. Generally,
 you just have to do these things:
 
-    1. Define a number of :class:`~django.forms.Form` classes -- one per
-       wizard page.
+1. Define a number of :class:`~django.forms.Form` classes -- one per
+   wizard page.
 
-    2. Create a :class:`WizardView` subclass that specifies what to do once
-       all of your forms have been submitted and validated. This also lets
-       you override some of the wizard's behavior.
+2. Create a :class:`WizardView` subclass that specifies what to do once
+   all of your forms have been submitted and validated. This also lets
+   you override some of the wizard's behavior.
 
-    3. Create some templates that render the forms. You can define a single,
-       generic template to handle every one of the forms, or you can define a
-       specific template for each form.
+3. Create some templates that render the forms. You can define a single,
+   generic template to handle every one of the forms, or you can define a
+   specific template for each form.
 
-    4. Add ``django.contrib.formtools`` to your
-       :setting:`INSTALLED_APPS` list in your settings file.
+4. Add ``django.contrib.formtools`` to your
+   :setting:`INSTALLED_APPS` list in your settings file.
 
-    5. Point your URLconf at your :class:`WizardView` :meth:`~WizardView.as_view` method.
+5. Point your URLconf at your :class:`WizardView` :meth:`~WizardView.as_view` method.
 
 Defining ``Form`` classes
 -------------------------
@@ -160,21 +160,21 @@ latter one allows you to use a different template for each form.
 This template expects a ``wizard`` object that has various items attached to
 it:
 
-    * ``form`` -- The :class:`~django.forms.Form` instance for the current
-      step (either empty or with errors).
+* ``form`` -- The :class:`~django.forms.Form` instance for the current
+  step (either empty or with errors).
 
-    * ``steps`` -- A helper object to access the various steps related data:
+* ``steps`` -- A helper object to access the various steps related data:
 
-        * ``step0`` -- The current step (zero-based).
-        * ``step1`` -- The current step (one-based).
-        * ``count`` -- The total number of steps.
-        * ``first`` -- The first step.
-        * ``last`` -- The last step.
-        * ``current`` -- The current (or first) step.
-        * ``next`` -- The next step.
-        * ``prev`` -- The previous step.
-        * ``index`` -- The index of the current step.
-        * ``all`` -- A list of all steps of the wizard.
+  * ``step0`` -- The current step (zero-based).
+  * ``step1`` -- The current step (one-based).
+  * ``count`` -- The total number of steps.
+  * ``first`` -- The first step.
+  * ``last`` -- The last step.
+  * ``current`` -- The current (or first) step.
+  * ``next`` -- The next step.
+  * ``prev`` -- The previous step.
+  * ``index`` -- The index of the current step.
+  * ``all`` -- A list of all steps of the wizard.
 
 You can supply additional context variables by using the
 :meth:`~WizardView.get_context_data` method of your :class:`WizardView`
@@ -582,8 +582,8 @@ Below you will see an example of a contact wizard with two steps, step 1 with
 Additionally you have to pass two more arguments to the
 :meth:`~WizardView.as_view` method:
 
-   * ``url_name`` -- the name of the url (as provided in the urls.py)
-   * ``done_step_name`` -- the name in the url for the done step
+* ``url_name`` -- the name of the url (as provided in the urls.py)
+* ``done_step_name`` -- the name in the url for the done step
 
 Example code for the changed ``urls.py`` file::
 

@@ -104,15 +104,15 @@ Testing improvements
 A couple of small but very useful improvements have been made to the
 :doc:`testing framework </topics/testing>`:
 
-    * The test :class:`Client` now can automatically follow redirects with the
-      ``follow`` argument to :meth:`Client.get` and :meth:`Client.post`. This
-      makes testing views that issue redirects simpler.
+* The test :class:`Client` now can automatically follow redirects with the
+  ``follow`` argument to :meth:`Client.get` and :meth:`Client.post`. This
+  makes testing views that issue redirects simpler.
 
-    * It's now easier to get at the template context in the response returned
-      the test client: you'll simply access the context as
-      ``request.context[key]``. The old way, which treats ``request.context``
-      as a list of contexts, one for each rendered template, is still
-      available if you need it.
+* It's now easier to get at the template context in the response returned
+  the test client: you'll simply access the context as
+  ``request.context[key]``. The old way, which treats ``request.context``
+  as a list of contexts, one for each rendered template, is still
+  available if you need it.
 
 Conditional view processing
 ---------------------------
@@ -129,30 +129,30 @@ Other improvements
 Finally, a grab-bag of other neat features made their way into this beta
 release, including:
 
-    * The :djadmin:`dumpdata` management command now accepts individual
-      model names as arguments, allowing you to export the data just from
-      particular models.
+* The :djadmin:`dumpdata` management command now accepts individual
+  model names as arguments, allowing you to export the data just from
+  particular models.
 
-    * There's a new :tfilter:`safeseq` template filter which works just like
-      :tfilter:`safe` for lists, marking each item in the list as safe.
+* There's a new :tfilter:`safeseq` template filter which works just like
+  :tfilter:`safe` for lists, marking each item in the list as safe.
 
-    * :doc:`Cache backends </topics/cache>` now support ``incr()`` and
-      ``decr()`` commands to increment and decrement the value of a cache key.
-      On cache backends that support atomic increment/decrement -- most
-      notably, the memcached backend -- these operations will be atomic, and
-      quite fast.
+* :doc:`Cache backends </topics/cache>` now support ``incr()`` and
+  ``decr()`` commands to increment and decrement the value of a cache key.
+  On cache backends that support atomic increment/decrement -- most
+  notably, the memcached backend -- these operations will be atomic, and
+  quite fast.
 
-    * Django now can :doc:`easily delegate authentication to the Web server
-      </howto/auth-remote-user>` via a new authentication backend that supports
-      the standard ``REMOTE_USER`` environment variable used for this purpose.
+* Django now can :doc:`easily delegate authentication to the Web server
+  </howto/auth-remote-user>` via a new authentication backend that supports
+  the standard ``REMOTE_USER`` environment variable used for this purpose.
 
-    * There's a new :func:`django.shortcuts.redirect` function that makes it
-      easier to issue redirects given an object, a view name, or a URL.
+* There's a new :func:`django.shortcuts.redirect` function that makes it
+  easier to issue redirects given an object, a view name, or a URL.
 
-    * The ``postgresql_psycopg2`` backend now supports :ref:`native PostgreSQL
-      autocommit <postgresql-notes>`. This is an advanced, PostgreSQL-specific
-      feature, that can make certain read-heavy applications a good deal
-      faster.
+* The ``postgresql_psycopg2`` backend now supports :ref:`native PostgreSQL
+  autocommit <postgresql-notes>`. This is an advanced, PostgreSQL-specific
+  feature, that can make certain read-heavy applications a good deal
+  faster.
 
 The Django 1.1 roadmap
 ======================
@@ -179,7 +179,7 @@ Django team by trying out the beta codebase in a safe test environment and
 reporting any bugs or issues you encounter. The Django ticket tracker is the
 central place to search for open issues:
 
-    * http://code.djangoproject.com/timeline
+* http://code.djangoproject.com/timeline
 
 Please open new tickets if no existing ticket corresponds to a problem you're
 running into.
@@ -187,7 +187,7 @@ running into.
 Additionally, discussion of Django development, including progress toward the
 1.1 release, takes place daily on the django-developers mailing list:
 
-    * http://groups.google.com/group/django-developers
+* http://groups.google.com/group/django-developers
 
 ... and in the ``#django-dev`` IRC channel on ``irc.freenode.net``. If you're
 interested in helping out with Django's development, feel free to join the
@@ -196,7 +196,7 @@ discussions there.
 Django's online documentation also includes pointers on how to contribute to
 Django:
 
-    * :doc:`How to contribute to Django </internals/contributing/index>`
+* :doc:`How to contribute to Django </internals/contributing/index>`
 
 Contributions on any level -- developing code, writing documentation or simply
 triaging tickets and helping to test proposed bugfixes -- are always welcome and

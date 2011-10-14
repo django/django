@@ -93,13 +93,13 @@ other than raise a ``DeprecationWarning``.
 
 If you've been relying on this middleware, the easiest upgrade path is:
 
-    * Examine `the code as it existed before it was removed`__.
+* Examine `the code as it existed before it was removed`__.
 
-    * Verify that it works correctly with your upstream proxy, modifying
-      it to support your particular proxy (if necessary).
+* Verify that it works correctly with your upstream proxy, modifying
+  it to support your particular proxy (if necessary).
 
-    * Introduce your modified version of ``SetRemoteAddrFromForwardedFor`` as a
-      piece of middleware in your own project.
+* Introduce your modified version of ``SetRemoteAddrFromForwardedFor`` as a
+  piece of middleware in your own project.
 
 __ http://code.djangoproject.com/browser/django/trunk/django/middleware/http.py?rev=11000#L33
 
@@ -157,14 +157,14 @@ Features deprecated in 1.1
 
 One feature has been marked as deprecated in Django 1.1:
 
-    * You should no longer use ``AdminSite.root()`` to register that admin
-      views. That is, if your URLconf contains the line::
+* You should no longer use ``AdminSite.root()`` to register that admin
+  views. That is, if your URLconf contains the line::
 
-            (r'^admin/(.*)', admin.site.root),
+        (r'^admin/(.*)', admin.site.root),
 
-      You should change it to read::
+  You should change it to read::
 
-            (r'^admin/', include(admin.site.urls)),
+        (r'^admin/', include(admin.site.urls)),
 
 You should begin to remove use of this feature from your code immediately.
 
@@ -289,15 +289,15 @@ Test client improvements
 A couple of small -- but highly useful -- improvements have been made to the
 test client:
 
-    * The test :class:`Client` now can automatically follow redirects with the
-      ``follow`` argument to :meth:`Client.get` and :meth:`Client.post`. This
-      makes testing views that issue redirects simpler.
+* The test :class:`Client` now can automatically follow redirects with the
+  ``follow`` argument to :meth:`Client.get` and :meth:`Client.post`. This
+  makes testing views that issue redirects simpler.
 
-    * It's now easier to get at the template context in the response returned
-      the test client: you'll simply access the context as
-      ``request.context[key]``. The old way, which treats ``request.context`` as
-      a list of contexts, one for each rendered template in the inheritance
-      chain, is still available if you need it.
+* It's now easier to get at the template context in the response returned
+  the test client: you'll simply access the context as
+  ``request.context[key]``. The old way, which treats ``request.context`` as
+  a list of contexts, one for each rendered template in the inheritance
+  chain, is still available if you need it.
 
 New admin features
 ------------------
@@ -352,16 +352,16 @@ GeoDjango
 In Django 1.1, GeoDjango_ (i.e. ``django.contrib.gis``) has several new
 features:
 
-    * Support for SpatiaLite_ -- a spatial database for SQLite -- as a spatial
-      backend.
+* Support for SpatiaLite_ -- a spatial database for SQLite -- as a spatial
+  backend.
 
-    * Geographic aggregates (``Collect``, ``Extent``, ``MakeLine``, ``Union``)
-      and ``F`` expressions.
+* Geographic aggregates (``Collect``, ``Extent``, ``MakeLine``, ``Union``)
+  and ``F`` expressions.
 
-    * New ``GeoQuerySet`` methods: ``collect``, ``geojson``, and
-      ``snap_to_grid``.
+* New ``GeoQuerySet`` methods: ``collect``, ``geojson``, and
+  ``snap_to_grid``.
 
-    * A new list interface methods for ``GEOSGeometry`` objects.
+* A new list interface methods for ``GEOSGeometry`` objects.
 
 For more details, see the `GeoDjango documentation`_.
 
@@ -446,7 +446,7 @@ the weary! If you'd like to help, discussion of Django development, including
 progress toward the 1.2 release, takes place daily on the django-developers
 mailing list:
 
-    * http://groups.google.com/group/django-developers
+* http://groups.google.com/group/django-developers
 
 ... and in the ``#django-dev`` IRC channel on ``irc.freenode.net``. Feel free to
 join the discussions!
@@ -454,7 +454,7 @@ join the discussions!
 Django's online documentation also includes pointers on how to contribute to
 Django:
 
-    * :doc:`How to contribute to Django </internals/contributing/index>`
+* :doc:`How to contribute to Django </internals/contributing/index>`
 
 Contributions on any level -- developing code, writing documentation or simply
 triaging tickets and helping to test proposed bugfixes -- are always welcome and

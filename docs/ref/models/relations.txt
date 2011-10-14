@@ -9,28 +9,28 @@ Related objects reference
     A "related manager" is a manager used in a one-to-many or many-to-many
     related context. This happens in two cases:
 
-        * The "other side" of a :class:`~django.db.models.ForeignKey` relation.
-          That is::
+    * The "other side" of a :class:`~django.db.models.ForeignKey` relation.
+      That is::
 
-                class Reporter(models.Model):
-                    ...
+            class Reporter(models.Model):
+                ...
 
-                class Article(models.Model):
-                    reporter = models.ForeignKey(Reporter)
+            class Article(models.Model):
+                reporter = models.ForeignKey(Reporter)
 
-          In the above example, the methods below will be available on
-          the manager ``reporter.article_set``.
+      In the above example, the methods below will be available on
+      the manager ``reporter.article_set``.
 
-        * Both sides of a :class:`~django.db.models.ManyToManyField` relation::
+    * Both sides of a :class:`~django.db.models.ManyToManyField` relation::
 
-                class Topping(models.Model):
-                    ...
+            class Topping(models.Model):
+                ...
 
-                class Pizza(models.Model):
-                    toppings = models.ManyToManyField(Topping)
+            class Pizza(models.Model):
+                toppings = models.ManyToManyField(Topping)
 
-          In this example, the methods below will be available both on
-          ``topping.pizza_set`` and on ``pizza.toppings``.
+      In this example, the methods below will be available both on
+      ``topping.pizza_set`` and on ``pizza.toppings``.
 
     These related managers have some extra methods:
 

@@ -7,31 +7,31 @@ new comment system; this guide explains how.
 
 The main changes from the old system are:
 
-    * This new system is documented.
-    
-    * It uses modern Django features like :doc:`forms </topics/forms/index>` and
-      :doc:`modelforms </topics/forms/modelforms>`.
+* This new system is documented.
 
-    * It has a single ``Comment`` model instead of separate ``FreeComment`` and
-      ``Comment`` models.
+* It uses modern Django features like :doc:`forms </topics/forms/index>` and
+  :doc:`modelforms </topics/forms/modelforms>`.
 
-    * Comments have "email" and "URL" fields.
+* It has a single ``Comment`` model instead of separate ``FreeComment`` and
+  ``Comment`` models.
 
-    * No ratings, photos and karma. This should only effect World Online.
+* Comments have "email" and "URL" fields.
 
-    * The ``{% comment_form %}`` tag no longer exists. Instead, there's now two
-      functions: ``{% get_comment_form %}``, which returns a form for posting a
-      new comment, and ``{% render_comment_form %}``, which renders said form
-      using the ``comments/form.html`` template.
-      
-    * The way comments are include in your URLconf have changed; you'll need to
-      replace::
-    
-            (r'^comments/', include('django.contrib.comments.urls.comments')),
-      
-      with::
+* No ratings, photos and karma. This should only effect World Online.
 
-            (r'^comments/', include('django.contrib.comments.urls')),
+* The ``{% comment_form %}`` tag no longer exists. Instead, there's now two
+  functions: ``{% get_comment_form %}``, which returns a form for posting a
+  new comment, and ``{% render_comment_form %}``, which renders said form
+  using the ``comments/form.html`` template.
+
+* The way comments are include in your URLconf have changed; you'll need to
+  replace::
+
+        (r'^comments/', include('django.contrib.comments.urls.comments')),
+
+  with::
+
+        (r'^comments/', include('django.contrib.comments.urls')),
 
 Upgrading data
 --------------

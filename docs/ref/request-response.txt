@@ -125,20 +125,20 @@ All attributes except ``session`` should be considered read-only.
     Available headers depend on the client and server, but here are some
     examples:
 
-        * ``CONTENT_LENGTH`` -- the length of the request body (as a string).
-        * ``CONTENT_TYPE`` -- the MIME type of the request body.
-        * ``HTTP_ACCEPT_ENCODING`` -- Acceptable encodings for the response.
-        * ``HTTP_ACCEPT_LANGUAGE`` -- Acceptable languages for the response.
-        * ``HTTP_HOST`` -- The HTTP Host header sent by the client.
-        * ``HTTP_REFERER`` -- The referring page, if any.
-        * ``HTTP_USER_AGENT`` -- The client's user-agent string.
-        * ``QUERY_STRING`` -- The query string, as a single (unparsed) string.
-        * ``REMOTE_ADDR`` -- The IP address of the client.
-        * ``REMOTE_HOST`` -- The hostname of the client.
-        * ``REMOTE_USER`` -- The user authenticated by the Web server, if any.
-        * ``REQUEST_METHOD`` -- A string such as ``"GET"`` or ``"POST"``.
-        * ``SERVER_NAME`` -- The hostname of the server.
-        * ``SERVER_PORT`` -- The port of the server (as a string).
+    * ``CONTENT_LENGTH`` -- the length of the request body (as a string).
+    * ``CONTENT_TYPE`` -- the MIME type of the request body.
+    * ``HTTP_ACCEPT_ENCODING`` -- Acceptable encodings for the response.
+    * ``HTTP_ACCEPT_LANGUAGE`` -- Acceptable languages for the response.
+    * ``HTTP_HOST`` -- The HTTP Host header sent by the client.
+    * ``HTTP_REFERER`` -- The referring page, if any.
+    * ``HTTP_USER_AGENT`` -- The client's user-agent string.
+    * ``QUERY_STRING`` -- The query string, as a single (unparsed) string.
+    * ``REMOTE_ADDR`` -- The IP address of the client.
+    * ``REMOTE_HOST`` -- The hostname of the client.
+    * ``REMOTE_USER`` -- The user authenticated by the Web server, if any.
+    * ``REQUEST_METHOD`` -- A string such as ``"GET"`` or ``"POST"``.
+    * ``SERVER_NAME`` -- The hostname of the server.
+    * ``SERVER_PORT`` -- The port of the server (as a string).
 
     With the exception of ``CONTENT_LENGTH`` and ``CONTENT_TYPE``, as given
     above, any HTTP headers in the request are converted to ``META`` keys by
@@ -549,10 +549,10 @@ Passing iterators
 Finally, you can pass ``HttpResponse`` an iterator rather than passing it
 hard-coded strings. If you use this technique, follow these guidelines:
 
-    * The iterator should return strings.
-    * If an :class:`HttpResponse` has been initialized with an iterator as its
-      content, you can't use the :class:`HttpResponse` instance as a file-like
-      object. Doing so will raise ``Exception``.
+* The iterator should return strings.
+* If an :class:`HttpResponse` has been initialized with an iterator as its
+  content, you can't use the :class:`HttpResponse` instance as a file-like
+  object. Doing so will raise ``Exception``.
 
 Setting headers
 ~~~~~~~~~~~~~~~
@@ -649,27 +649,27 @@ Methods
     Sets a cookie. The parameters are the same as in the :class:`Cookie.Morsel`
     object in the Python standard library.
 
-        * ``max_age`` should be a number of seconds, or ``None`` (default) if
-          the cookie should last only as long as the client's browser session.
-          If ``expires`` is not specified, it will be calculated.
-        * ``expires`` should either be a string in the format
-          ``"Wdy, DD-Mon-YY HH:MM:SS GMT"`` or a ``datetime.datetime`` object
-          in UTC. If ``expires`` is a ``datetime`` object, the ``max_age``
-          will be calculated.
-        * Use ``domain`` if you want to set a cross-domain cookie. For example,
-          ``domain=".lawrence.com"`` will set a cookie that is readable by
-          the domains www.lawrence.com, blogs.lawrence.com and
-          calendars.lawrence.com. Otherwise, a cookie will only be readable by
-          the domain that set it.
-        * Use ``httponly=True`` if you want to prevent client-side
-          JavaScript from having access to the cookie.
+    * ``max_age`` should be a number of seconds, or ``None`` (default) if
+      the cookie should last only as long as the client's browser session.
+      If ``expires`` is not specified, it will be calculated.
+    * ``expires`` should either be a string in the format
+      ``"Wdy, DD-Mon-YY HH:MM:SS GMT"`` or a ``datetime.datetime`` object
+      in UTC. If ``expires`` is a ``datetime`` object, the ``max_age``
+      will be calculated.
+    * Use ``domain`` if you want to set a cross-domain cookie. For example,
+      ``domain=".lawrence.com"`` will set a cookie that is readable by
+      the domains www.lawrence.com, blogs.lawrence.com and
+      calendars.lawrence.com. Otherwise, a cookie will only be readable by
+      the domain that set it.
+    * Use ``httponly=True`` if you want to prevent client-side
+      JavaScript from having access to the cookie.
 
-          HTTPOnly_ is a flag included in a Set-Cookie HTTP response
-          header. It is not part of the :rfc:`2109` standard for cookies,
-          and it isn't honored consistently by all browsers. However,
-          when it is honored, it can be a useful way to mitigate the
-          risk of client side script accessing the protected cookie
-          data.
+      HTTPOnly_ is a flag included in a Set-Cookie HTTP response
+      header. It is not part of the :rfc:`2109` standard for cookies,
+      and it isn't honored consistently by all browsers. However,
+      when it is honored, it can be a useful way to mitigate the
+      risk of client side script accessing the protected cookie
+      data.
 
     .. _HTTPOnly: http://www.owasp.org/index.php/HTTPOnly
 

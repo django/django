@@ -45,14 +45,14 @@ but if you've removed it or if you manually set up your
 It's generally a good idea to have the contenttypes framework
 installed; several of Django's other bundled applications require it:
 
-    * The admin application uses it to log the history of each object
-      added or changed through the admin interface.
+* The admin application uses it to log the history of each object
+  added or changed through the admin interface.
 
-    * Django's :mod:`authentication framework <django.contrib.auth>` uses it
-      to tie user permissions to specific models.
+* Django's :mod:`authentication framework <django.contrib.auth>` uses it
+  to tie user permissions to specific models.
 
-    * Django's comments system (:mod:`django.contrib.comments`) uses it to
-      "attach" comments to any installed model.
+* Django's comments system (:mod:`django.contrib.comments`) uses it to
+  "attach" comments to any installed model.
 
 .. currentmodule:: django.contrib.contenttypes.models
 
@@ -92,15 +92,15 @@ your database. Along with it a new instance of
 :class:`~django.contrib.contenttypes.models.ContentType` will be
 created with the following values:
 
-    * :attr:`~django.contrib.contenttypes.models.ContentType.app_label`
-      will be set to ``'sites'`` (the last part of the Python
-      path "django.contrib.sites").
+* :attr:`~django.contrib.contenttypes.models.ContentType.app_label`
+  will be set to ``'sites'`` (the last part of the Python
+  path "django.contrib.sites").
 
-    * :attr:`~django.contrib.contenttypes.models.ContentType.model`
-      will be set to ``'site'``.
+* :attr:`~django.contrib.contenttypes.models.ContentType.model`
+  will be set to ``'site'``.
 
-    * :attr:`~django.contrib.contenttypes.models.ContentType.name`
-      will be set to ``'site'``.
+* :attr:`~django.contrib.contenttypes.models.ContentType.name`
+  will be set to ``'site'``.
 
 .. _the verbose_name attribute: ../model-api/#verbose_name
 
@@ -148,17 +148,17 @@ Together,
 and :meth:`~django.contrib.contenttypes.models.ContentType.model_class` enable
 two extremely important use cases:
 
-    1. Using these methods, you can write high-level generic code that
-       performs queries on any installed model -- instead of importing and
-       using a single specific model class, you can pass an ``app_label`` and
-       ``model`` into a
-       :class:`~django.contrib.contenttypes.models.ContentType` lookup at
-       runtime, and then work with the model class or retrieve objects from it.
+1. Using these methods, you can write high-level generic code that
+   performs queries on any installed model -- instead of importing and
+   using a single specific model class, you can pass an ``app_label`` and
+   ``model`` into a
+   :class:`~django.contrib.contenttypes.models.ContentType` lookup at
+   runtime, and then work with the model class or retrieve objects from it.
 
-    2. You can relate another model to
-       :class:`~django.contrib.contenttypes.models.ContentType` as a way of
-       tying instances of it to particular model classes, and use these methods
-       to get access to those model classes.
+2. You can relate another model to
+   :class:`~django.contrib.contenttypes.models.ContentType` as a way of
+   tying instances of it to particular model classes, and use these methods
+   to get access to those model classes.
 
 Several of Django's bundled applications make use of the latter technique.
 For example,
@@ -263,21 +263,21 @@ model:
     There are three parts to setting up a
     :class:`~django.contrib.contenttypes.generic.GenericForeignKey`:
 
-        1. Give your model a :class:`~django.db.models.ForeignKey`
-           to :class:`~django.contrib.contenttypes.models.ContentType`.
+    1. Give your model a :class:`~django.db.models.ForeignKey`
+       to :class:`~django.contrib.contenttypes.models.ContentType`.
 
-        2. Give your model a field that can store primary key values from the
-           models you'll be relating to. For most models, this means a
-           :class:`~django.db.models.PositiveIntegerField`. The usual name
-           for this field is "object_id".
+    2. Give your model a field that can store primary key values from the
+       models you'll be relating to. For most models, this means a
+       :class:`~django.db.models.PositiveIntegerField`. The usual name
+       for this field is "object_id".
 
-        3. Give your model a
-           :class:`~django.contrib.contenttypes.generic.GenericForeignKey`, and
-           pass it the names of the two fields described above. If these fields
-           are named "content_type" and "object_id", you can omit this -- those
-           are the default field names
-           :class:`~django.contrib.contenttypes.generic.GenericForeignKey` will
-           look for.
+    3. Give your model a
+       :class:`~django.contrib.contenttypes.generic.GenericForeignKey`, and
+       pass it the names of the two fields described above. If these fields
+       are named "content_type" and "object_id", you can omit this -- those
+       are the default field names
+       :class:`~django.contrib.contenttypes.generic.GenericForeignKey` will
+       look for.
 
 .. admonition:: Primary key type compatibility
 

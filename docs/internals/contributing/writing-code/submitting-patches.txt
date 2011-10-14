@@ -19,28 +19,28 @@ If you have identified a contribution you want to make and you're capable of
 fixing it (as measured by your coding ability, knowledge of Django internals
 and time availability), claim it by following these steps:
 
-    * `Create an account`_ to use in our ticket system. If you have an account
-      but have forgotten your password, you can reset it using the
-      `password reset page`_.
+* `Create an account`_ to use in our ticket system. If you have an account
+  but have forgotten your password, you can reset it using the
+  `password reset page`_.
 
-    * If a ticket for this issue doesn't exist yet, create one in our
-      `ticket tracker`_.
+* If a ticket for this issue doesn't exist yet, create one in our
+  `ticket tracker`_.
 
-    * If a ticket for this issue already exists, make sure nobody else has
-      claimed it. To do this, look at the "Assigned to" section of the ticket.
-      If it's assigned to "nobody," then it's available to be claimed.
-      Otherwise, somebody else is working on this ticket, and you either find
-      another bug/feature to work on, or contact the developer working on the
-      ticket to offer your help.
+* If a ticket for this issue already exists, make sure nobody else has
+  claimed it. To do this, look at the "Assigned to" section of the ticket.
+  If it's assigned to "nobody," then it's available to be claimed.
+  Otherwise, somebody else is working on this ticket, and you either find
+  another bug/feature to work on, or contact the developer working on the
+  ticket to offer your help.
 
-    * Log into your account, if you haven't already, by clicking "Login" in
-      the upper right of the ticket page.
+* Log into your account, if you haven't already, by clicking "Login" in
+  the upper right of the ticket page.
 
-    * Claim the ticket:
+* Claim the ticket:
 
-	1. click the "accept" radio button under "Action" near the bottom of the
-	   page,
-        2. then click "Submit changes."
+  1. click the "accept" radio button under "Action" near the bottom of the
+     page,
+  2. then click "Submit changes."
 
 .. _Create an account: https://www.djangoproject.com/accounts/register/
 .. _password reset page: https://www.djangoproject.com/accounts/password/reset/
@@ -76,43 +76,43 @@ it.
 Patch style
 -----------
 
-    * Make sure your code matches our :doc:`coding-style`.
+* Make sure your code matches our :doc:`coding-style`.
 
-    * Submit patches in the format returned by the ``svn diff`` command.
-      An exception is for code changes that are described more clearly in
-      plain English than in code. Indentation is the most common example; it's
-      hard to read patches when the only difference in code is that it's
-      indented.
+* Submit patches in the format returned by the ``svn diff`` command.
+  An exception is for code changes that are described more clearly in
+  plain English than in code. Indentation is the most common example; it's
+  hard to read patches when the only difference in code is that it's
+  indented.
 
-      Patches in ``git diff`` format are also acceptable.
+  Patches in ``git diff`` format are also acceptable.
 
-    * When creating patches, always run ``svn diff`` from the top-level
-      ``trunk`` directory -- i.e. the one that contains ``django``, ``docs``,
-      ``tests``, ``AUTHORS``, etc. This makes it easy for other people to
-      apply your patches.
+* When creating patches, always run ``svn diff`` from the top-level
+  ``trunk`` directory -- i.e. the one that contains ``django``, ``docs``,
+  ``tests``, ``AUTHORS``, etc. This makes it easy for other people to
+  apply your patches.
 
-    * Attach patches to a ticket in the `ticket tracker`_, using the "attach
-      file" button. Please *don't* put the patch in the ticket description
-      or comment unless it's a single line patch.
+* Attach patches to a ticket in the `ticket tracker`_, using the "attach
+  file" button. Please *don't* put the patch in the ticket description
+  or comment unless it's a single line patch.
 
-    * Name the patch file with a ``.diff`` extension; this will let the ticket
-      tracker apply correct syntax highlighting, which is quite helpful.
+* Name the patch file with a ``.diff`` extension; this will let the ticket
+  tracker apply correct syntax highlighting, which is quite helpful.
 
-    * Check the "Has patch" box on the ticket details. This will make it
-      obvious that the ticket includes a patch, and it will add the ticket to
-      the `list of tickets with patches`_.
+* Check the "Has patch" box on the ticket details. This will make it
+  obvious that the ticket includes a patch, and it will add the ticket to
+  the `list of tickets with patches`_.
 
-    * The code required to fix a problem or add a feature is an essential part
-      of a patch, but it is not the only part. A good patch should also
-      include a regression test to validate the behavior that has been fixed
-      and to prevent the problem from arising again. Also, if some tickets are
-      relevant to the code that you've written, mention the ticket numbers in
-      some comments in the test so that one can easily trace back the relevant
-      discussions after your patch gets committed and the tickets get closed.
+* The code required to fix a problem or add a feature is an essential part
+  of a patch, but it is not the only part. A good patch should also
+  include a regression test to validate the behavior that has been fixed
+  and to prevent the problem from arising again. Also, if some tickets are
+  relevant to the code that you've written, mention the ticket numbers in
+  some comments in the test so that one can easily trace back the relevant
+  discussions after your patch gets committed and the tickets get closed.
 
-    * If the code associated with a patch adds a new feature, or modifies
-      behavior of an existing feature, the patch should also contain
-      documentation.
+* If the code associated with a patch adds a new feature, or modifies
+  behavior of an existing feature, the patch should also contain
+  documentation.
 
 Non-trivial patches
 -------------------

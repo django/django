@@ -57,12 +57,12 @@ To use ``LocaleMiddleware``, add ``'django.middleware.locale.LocaleMiddleware'``
 to your :setting:`MIDDLEWARE_CLASSES` setting. Because middleware order
 matters, you should follow these guidelines:
 
-    * Make sure it's one of the first middlewares installed.
-    * It should come after ``SessionMiddleware``, because ``LocaleMiddleware``
-      makes use of session data. And it should come before ``CommonMiddleware``
-      because ``CommonMiddleware`` needs an activated language in order
-      to resolve the requested URL.
-    * If you use ``CacheMiddleware``, put ``LocaleMiddleware`` after it.
+* Make sure it's one of the first middlewares installed.
+* It should come after ``SessionMiddleware``, because ``LocaleMiddleware``
+  makes use of session data. And it should come before ``CommonMiddleware``
+  because ``CommonMiddleware`` needs an activated language in order
+  to resolve the requested URL.
+* If you use ``CacheMiddleware``, put ``LocaleMiddleware`` after it.
 
 For example, your :setting:`MIDDLEWARE_CLASSES` might look like this::
 
@@ -80,83 +80,83 @@ following this algorithm:
 
 .. versionchanged:: 1.4
 
-    * First, it looks for the language prefix in the requested URL.  This is
-      only performed when you are using the ``i18n_patterns`` function in your
-      root URLconf. See :ref:`url-internationalization` for more information
-      about the language prefix and how to internationalize URL patterns.
+* First, it looks for the language prefix in the requested URL.  This is
+  only performed when you are using the ``i18n_patterns`` function in your
+  root URLconf. See :ref:`url-internationalization` for more information
+  about the language prefix and how to internationalize URL patterns.
 
-    * Failing that, it looks for a ``django_language`` key in the current
-      user's session.
+* Failing that, it looks for a ``django_language`` key in the current
+  user's session.
 
-    * Failing that, it looks for a cookie.
+* Failing that, it looks for a cookie.
 
-      The name of the cookie used is set by the :setting:`LANGUAGE_COOKIE_NAME`
-      setting. (The default name is ``django_language``.)
+  The name of the cookie used is set by the :setting:`LANGUAGE_COOKIE_NAME`
+  setting. (The default name is ``django_language``.)
 
-    * Failing that, it looks at the ``Accept-Language`` HTTP header. This
-      header is sent by your browser and tells the server which language(s) you
-      prefer, in order by priority. Django tries each language in the header
-      until it finds one with available translations.
+* Failing that, it looks at the ``Accept-Language`` HTTP header. This
+  header is sent by your browser and tells the server which language(s) you
+  prefer, in order by priority. Django tries each language in the header
+  until it finds one with available translations.
 
-    * Failing that, it uses the global :setting:`LANGUAGE_CODE` setting.
+* Failing that, it uses the global :setting:`LANGUAGE_CODE` setting.
 
 .. _locale-middleware-notes:
 
 Notes:
 
-    * In each of these places, the language preference is expected to be in the
-      standard :term:`language format<language code>`, as a string. For example,
-      Brazilian Portuguese is ``pt-br``.
+* In each of these places, the language preference is expected to be in the
+  standard :term:`language format<language code>`, as a string. For example,
+  Brazilian Portuguese is ``pt-br``.
 
-    * If a base language is available but the sublanguage specified is not,
-      Django uses the base language. For example, if a user specifies ``de-at``
-      (Austrian German) but Django only has ``de`` available, Django uses
-      ``de``.
+* If a base language is available but the sublanguage specified is not,
+  Django uses the base language. For example, if a user specifies ``de-at``
+  (Austrian German) but Django only has ``de`` available, Django uses
+  ``de``.
 
-    * Only languages listed in the :setting:`LANGUAGES` setting can be selected.
-      If you want to restrict the language selection to a subset of provided
-      languages (because your application doesn't provide all those languages),
-      set :setting:`LANGUAGES` to a list of languages. For example::
+* Only languages listed in the :setting:`LANGUAGES` setting can be selected.
+  If you want to restrict the language selection to a subset of provided
+  languages (because your application doesn't provide all those languages),
+  set :setting:`LANGUAGES` to a list of languages. For example::
 
-          LANGUAGES = (
-            ('de', _('German')),
-            ('en', _('English')),
-          )
+      LANGUAGES = (
+        ('de', _('German')),
+        ('en', _('English')),
+      )
 
-      This example restricts languages that are available for automatic
-      selection to German and English (and any sublanguage, like de-ch or
-      en-us).
+  This example restricts languages that are available for automatic
+  selection to German and English (and any sublanguage, like de-ch or
+  en-us).
 
-    * If you define a custom :setting:`LANGUAGES` setting, as explained in the
-      previous bullet, it's OK to mark the languages as translation strings
-      -- but use a "dummy" ``ugettext()`` function, not the one in
-      ``django.utils.translation``. You should *never* import
-      ``django.utils.translation`` from within your settings file, because that
-      module in itself depends on the settings, and that would cause a circular
-      import.
+* If you define a custom :setting:`LANGUAGES` setting, as explained in the
+  previous bullet, it's OK to mark the languages as translation strings
+  -- but use a "dummy" ``ugettext()`` function, not the one in
+  ``django.utils.translation``. You should *never* import
+  ``django.utils.translation`` from within your settings file, because that
+  module in itself depends on the settings, and that would cause a circular
+  import.
 
-      The solution is to use a "dummy" ``ugettext()`` function. Here's a sample
-      settings file::
+  The solution is to use a "dummy" ``ugettext()`` function. Here's a sample
+  settings file::
 
-          ugettext = lambda s: s
+      ugettext = lambda s: s
 
-          LANGUAGES = (
-              ('de', ugettext('German')),
-              ('en', ugettext('English')),
-          )
+      LANGUAGES = (
+          ('de', ugettext('German')),
+          ('en', ugettext('English')),
+      )
 
-      With this arrangement, ``django-admin.py makemessages`` will still find
-      and mark these strings for translation, but the translation won't happen
-      at runtime -- so you'll have to remember to wrap the languages in the
-      *real* ``ugettext()`` in any code that uses :setting:`LANGUAGES` at
-      runtime.
+  With this arrangement, ``django-admin.py makemessages`` will still find
+  and mark these strings for translation, but the translation won't happen
+  at runtime -- so you'll have to remember to wrap the languages in the
+  *real* ``ugettext()`` in any code that uses :setting:`LANGUAGES` at
+  runtime.
 
-    * The ``LocaleMiddleware`` can only select languages for which there is a
-      Django-provided base translation. If you want to provide translations
-      for your application that aren't already in the set of translations
-      in Django's source tree, you'll want to provide at least a basic
-      one as described in the :ref:`Locale restrictions<locale-restrictions>`
-      note.
+* The ``LocaleMiddleware`` can only select languages for which there is a
+  Django-provided base translation. If you want to provide translations
+  for your application that aren't already in the set of translations
+  in Django's source tree, you'll want to provide at least a basic
+  one as described in the :ref:`Locale restrictions<locale-restrictions>`
+  note.
 
 Once ``LocaleMiddleware`` determines the user's preference, it makes this
 preference available as ``request.LANGUAGE_CODE`` for each
@@ -187,16 +187,16 @@ examines the different file paths to load the compiled :term:`message files
 <message file>` (``.mo``) and the precedence of multiple translations for the
 same literal:
 
-    1. The directories listed in :setting:`LOCALE_PATHS` have the highest
-       precedence, with the ones appearing first having higher precedence than
-       the ones appearing later.
-    2. Then, it looks for and uses if it exists a ``locale`` directory in each
-       of the installed apps listed in :setting:`INSTALLED_APPS`.  The ones
-       appearing first have higher precedence than the ones appearing later.
-    3. Then, it looks for a ``locale`` directory in the project directory, or
-       more accurately, in the directory containing your settings file.
-    4. Finally, the Django-provided base translation in ``django/conf/locale``
-       is used as a fallback.
+1. The directories listed in :setting:`LOCALE_PATHS` have the highest
+   precedence, with the ones appearing first having higher precedence than
+   the ones appearing later.
+2. Then, it looks for and uses if it exists a ``locale`` directory in each
+   of the installed apps listed in :setting:`INSTALLED_APPS`.  The ones
+   appearing first have higher precedence than the ones appearing later.
+3. Then, it looks for a ``locale`` directory in the project directory, or
+   more accurately, in the directory containing your settings file.
+4. Finally, the Django-provided base translation in ``django/conf/locale``
+   is used as a fallback.
 
 .. deprecated:: 1.3
     Lookup in the ``locale`` subdirectory of the directory containing your

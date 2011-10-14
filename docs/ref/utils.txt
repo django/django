@@ -37,12 +37,12 @@ to distinguish caches by the ``Accept-language`` header.
     This function patches the ``Cache-Control`` header by adding all keyword
     arguments to it. The transformation is as follows:
 
-     * All keyword parameter names are turned to lowercase, and underscores
-       are converted to hyphens.
-     * If the value of a parameter is ``True`` (exactly ``True``, not just a
-       true value), only the parameter name is added to the header.
-     * All other parameters are added with their value, after applying
-       ``str()`` to it.
+    * All keyword parameter names are turned to lowercase, and underscores
+      are converted to hyphens.
+    * If the value of a parameter is ``True`` (exactly ``True``, not just a
+      true value), only the parameter name is added to the header.
+    * All other parameters are added with their value, after applying
+      ``str()`` to it.
 
 .. function:: get_max_age(response)
 
@@ -53,10 +53,10 @@ to distinguish caches by the ``Accept-language`` header.
 
     Adds some useful headers to the given ``HttpResponse`` object:
 
-     * ``ETag``
-     * ``Last-Modified``
-     * ``Expires``
-     * ``Cache-Control``
+    * ``ETag``
+    * ``Last-Modified``
+    * ``Expires``
+    * ``Cache-Control``
 
     Each header is only added if it isn't already set.
 
@@ -553,8 +553,8 @@ For a complete discussion on the usage of the following see the
 
     Returns selected language's BiDi layout:
 
-     * ``False`` = left-to-right layout
-     * ``True`` = right-to-left layout
+    * ``False`` = left-to-right layout
+    * ``True`` = right-to-left layout
 
 .. function:: get_language_from_request(request)
 

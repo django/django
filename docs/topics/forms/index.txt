@@ -17,10 +17,10 @@ While it is possible to process form submissions just using Django's
 :class:`~django.http.HttpRequest` class, using the form library takes care of a
 number of common form-related tasks. Using it, you can:
 
-    1. Display an HTML form with automatically generated form widgets.
-    2. Check submitted data against a set of validation rules.
-    3. Redisplay a form in the case of validation errors.
-    4. Convert submitted form data to the relevant Python data types.
+1. Display an HTML form with automatically generated form widgets.
+2. Check submitted data against a set of validation rules.
+3. Redisplay a form in the case of validation errors.
+4. Convert submitted form data to the relevant Python data types.
 
 Overview
 ========
@@ -106,13 +106,13 @@ The standard pattern for processing a form in a view looks like this:
 
 There are three code paths here:
 
-    1. If the form has not been submitted, an unbound instance of ContactForm is
-       created and passed to the template.
-    2. If the form has been submitted, a bound instance of the form is created
-       using ``request.POST``. If the submitted data is valid, it is processed
-       and the user is re-directed to a "thanks" page.
-    3. If the form has been submitted but is invalid, the bound form instance is
-       passed on to the template.
+1. If the form has not been submitted, an unbound instance of ContactForm is
+   created and passed to the template.
+2. If the form has been submitted, a bound instance of the form is created
+   using ``request.POST``. If the submitted data is valid, it is processed
+   and the user is re-directed to a "thanks" page.
+3. If the form has been submitted but is invalid, the bound form instance is
+   passed on to the template.
 
 The distinction between **bound** and **unbound** forms is important. An unbound
 form does not have any data associated with it; when rendered to the user, it
@@ -287,35 +287,35 @@ Within this loop, ``{{ field }}`` is an instance of :class:`BoundField`.
 ``BoundField`` also has the following attributes, which can be useful in your
 templates:
 
-    ``{{ field.label }}``
-        The label of the field, e.g. ``Email address``.
+``{{ field.label }}``
+    The label of the field, e.g. ``Email address``.
 
-    ``{{ field.label_tag }}``
-        The field's label wrapped in the appropriate HTML ``<label>`` tag,
-        e.g. ``<label for="id_email">Email address</label>``
+``{{ field.label_tag }}``
+    The field's label wrapped in the appropriate HTML ``<label>`` tag,
+    e.g. ``<label for="id_email">Email address</label>``
 
-    ``{{ field.html_name }}``
-        The name of the field that will be used in the input element's name
-        field. This takes the form prefix into account, if it has been set.
+``{{ field.html_name }}``
+    The name of the field that will be used in the input element's name
+    field. This takes the form prefix into account, if it has been set.
 
-    ``{{ field.help_text }}``
-        Any help text that has been associated with the field.
+``{{ field.help_text }}``
+    Any help text that has been associated with the field.
 
-    ``{{ field.errors }}``
-        Outputs a ``<ul class="errorlist">`` containing any validation errors
-        corresponding to this field. You can customize the presentation of
-        the errors with a ``{% for error in field.errors %}`` loop. In this
-        case, each object in the loop is a simple string containing the error
-        message.
+``{{ field.errors }}``
+    Outputs a ``<ul class="errorlist">`` containing any validation errors
+    corresponding to this field. You can customize the presentation of
+    the errors with a ``{% for error in field.errors %}`` loop. In this
+    case, each object in the loop is a simple string containing the error
+    message.
 
-    ``field.is_hidden``
-        This attribute is ``True`` if the form field is a hidden field and
-        ``False`` otherwise. It's not particularly useful as a template
-        variable, but could be useful in conditional tests such as::
+``field.is_hidden``
+    This attribute is ``True`` if the form field is a hidden field and
+    ``False`` otherwise. It's not particularly useful as a template
+    variable, but could be useful in conditional tests such as::
 
-            {% if field.is_hidden %}
-               {# Do something special #}
-            {% endif %}
+        {% if field.is_hidden %}
+           {# Do something special #}
+        {% endif %}
 
 Looping over hidden and visible fields
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

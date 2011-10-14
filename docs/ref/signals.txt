@@ -62,24 +62,22 @@ Arguments sent with this signal:
     A dictionary of keyword arguments passed to
     :meth:`~django.db.models.Model.__init__`:.
 
-For example, the :doc:`tutorial </intro/tutorial01>` has this line:
-
-.. code-block:: python
+For example, the :doc:`tutorial </intro/tutorial01>` has this line::
 
     p = Poll(question="What's up?", pub_date=datetime.now())
 
 The arguments sent to a :data:`pre_init` handler would be:
 
-    ==========  ===============================================================
-    Argument    Value
-    ==========  ===============================================================
-    ``sender``  ``Poll`` (the class itself)
+==========  ===============================================================
+Argument    Value
+==========  ===============================================================
+``sender``  ``Poll`` (the class itself)
 
-    ``args``    ``[]`` (an empty list because there were no positional
-                arguments passed to ``__init__``.)
+``args``    ``[]`` (an empty list because there were no positional
+            arguments passed to ``__init__``.)
 
-    ``kwargs``  ``{'question': "What's up?", 'pub_date': datetime.now()}``
-    ==========  ===============================================================
+``kwargs``  ``{'question': "What's up?", 'pub_date': datetime.now()}``
+==========  ===============================================================
 
 post_init
 ---------
@@ -269,12 +267,11 @@ Arguments sent with this signal:
     The database alias being used.
 
 For example, if a ``Pizza`` can have multiple ``Topping`` objects, modeled
-like this:
-
-.. code-block:: python
+like this::
 
     class Topping(models.Model):
         # ...
+        pass
 
     class Pizza(models.Model):
         # ...
@@ -282,62 +279,58 @@ like this:
 
 If we would do something like this:
 
-.. code-block:: python
-
     >>> p = Pizza.object.create(...)
     >>> t = Topping.objects.create(...)
     >>> p.toppings.add(t)
 
 the arguments sent to a :data:`m2m_changed` handler would be:
 
-    ==============  ============================================================
-    Argument        Value
-    ==============  ============================================================
-    ``sender``      ``Pizza.toppings.through`` (the intermediate m2m class)
+==============  ============================================================
+Argument        Value
+==============  ============================================================
+``sender``      ``Pizza.toppings.through`` (the intermediate m2m class)
 
-    ``instance``    ``p`` (the ``Pizza`` instance being modified)
+``instance``    ``p`` (the ``Pizza`` instance being modified)
 
-    ``action``      ``"pre_add"`` (followed by a separate signal with ``"post_add"``)
+``action``      ``"pre_add"`` (followed by a separate signal with ``"post_add"``)
 
-    ``reverse``     ``False`` (``Pizza`` contains the :class:`ManyToManyField`,
-                    so this call modifies the forward relation)
+``reverse``     ``False`` (``Pizza`` contains the :class:`ManyToManyField`,
+                so this call modifies the forward relation)
 
-    ``model``       ``Topping`` (the class of the objects added to the
-                    ``Pizza``)
+``model``       ``Topping`` (the class of the objects added to the
+                ``Pizza``)
 
-    ``pk_set``      ``[t.id]`` (since only ``Topping t`` was added to the relation)
+``pk_set``      ``[t.id]`` (since only ``Topping t`` was added to the relation)
 
-    ``using``       ``"default"`` (since the default router sends writes here)
-    ==============  ============================================================
+``using``       ``"default"`` (since the default router sends writes here)
+==============  ============================================================
 
-And if we would then do something like this:
-
-.. code-block:: python
+And if we would then do something like this::
 
     >>> t.pizza_set.remove(p)
 
 the arguments sent to a :data:`m2m_changed` handler would be:
 
-    ==============  ============================================================
-    Argument        Value
-    ==============  ============================================================
-    ``sender``      ``Pizza.toppings.through`` (the intermediate m2m class)
+==============  ============================================================
+Argument        Value
+==============  ============================================================
+``sender``      ``Pizza.toppings.through`` (the intermediate m2m class)
 
-    ``instance``    ``t`` (the ``Topping`` instance being modified)
+``instance``    ``t`` (the ``Topping`` instance being modified)
 
-    ``action``      ``"pre_remove"`` (followed by a separate signal with ``"post_remove"``)
+``action``      ``"pre_remove"`` (followed by a separate signal with ``"post_remove"``)
 
-    ``reverse``     ``True`` (``Pizza`` contains the :class:`ManyToManyField`,
-                    so this call modifies the reverse relation)
+``reverse``     ``True`` (``Pizza`` contains the :class:`ManyToManyField`,
+                so this call modifies the reverse relation)
 
-    ``model``       ``Pizza`` (the class of the objects removed from the
-                    ``Topping``)
+``model``       ``Pizza`` (the class of the objects removed from the
+                ``Topping``)
 
-    ``pk_set``      ``[p.id]`` (since only ``Pizza p`` was removed from the
-                    relation)
+``pk_set``      ``[p.id]`` (since only ``Pizza p`` was removed from the
+                relation)
 
-    ``using``       ``"default"`` (since the default router sends writes here)
-    ==============  ============================================================
+``using``       ``"default"`` (since the default router sends writes here)
+==============  ============================================================
 
 class_prepared
 --------------

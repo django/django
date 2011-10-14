@@ -385,19 +385,19 @@ There are a few other helpers outside of the
 :mod:`staticfiles <django.contrib.staticfiles>` app to work with static
 files:
 
-    - The :func:`django.core.context_processors.static` context processor
-      which adds :setting:`STATIC_URL` to every template context rendered
-      with :class:`~django.template.RequestContext` contexts.
+- The :func:`django.core.context_processors.static` context processor
+  which adds :setting:`STATIC_URL` to every template context rendered
+  with :class:`~django.template.RequestContext` contexts.
 
-    - The builtin template tag :ttag:`static` which takes a path and
-      urljoins it with the static prefix :setting:`STATIC_URL`.
+- The builtin template tag :ttag:`static` which takes a path and
+  urljoins it with the static prefix :setting:`STATIC_URL`.
 
-    - The builtin template tag :ttag:`get_static_prefix` which populates a
-      template variable with the static prefix :setting:`STATIC_URL` to be
-      used as a variable or directly.
+- The builtin template tag :ttag:`get_static_prefix` which populates a
+  template variable with the static prefix :setting:`STATIC_URL` to be
+  used as a variable or directly.
 
-    - The similar template tag :ttag:`get_media_prefix` which works like
-      :ttag:`get_static_prefix` but uses :setting:`MEDIA_URL`.
+- The similar template tag :ttag:`get_media_prefix` which works like
+  :ttag:`get_static_prefix` but uses :setting:`MEDIA_URL`.
 
 .. _staticfiles-development-view:
 

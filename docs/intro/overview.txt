@@ -307,14 +307,14 @@ This is just the surface
 This has been only a quick overview of Django's functionality. Some more useful
 features:
 
-    * A :doc:`caching framework </topics/cache>` that integrates with memcached
-      or other backends.
+* A :doc:`caching framework </topics/cache>` that integrates with memcached
+  or other backends.
 
-    * A :doc:`syndication framework </ref/contrib/syndication>` that makes
-      creating RSS and Atom feeds as easy as writing a small Python class.
+* A :doc:`syndication framework </ref/contrib/syndication>` that makes
+  creating RSS and Atom feeds as easy as writing a small Python class.
 
-    * More sexy automatically-generated admin features -- this overview barely
-      scratched the surface.
+* More sexy automatically-generated admin features -- this overview barely
+  scratched the surface.
 
 The next obvious steps are for you to `download Django`_, read :doc:`the
 tutorial </intro/tutorial01>` and join `the community`_. Thanks for your

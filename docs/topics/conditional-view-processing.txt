@@ -154,18 +154,18 @@ trying to change has been altered in the meantime.
 
 For example, consider the following exchange between the client and server:
 
-    1. Client requests ``/foo/``.
-    2. Server responds with some content with an ETag of ``"abcd1234"``.
-    3. Client sends an HTTP ``PUT`` request to ``/foo/`` to update the
-       resource. It also sends an ``If-Match: "abcd1234"`` header to specify
-       the version it is trying to update.
-    4. Server checks to see if the resource has changed, by computing the ETag
-       the same way it does for a ``GET`` request (using the same function).
-       If the resource *has* changed, it will return a 412 status code code,
-       meaning "precondition failed".
-    5. Client sends a ``GET`` request to ``/foo/``, after receiving a 412
-       response, to retrieve an updated version of the content before updating
-       it.
+1. Client requests ``/foo/``.
+2. Server responds with some content with an ETag of ``"abcd1234"``.
+3. Client sends an HTTP ``PUT`` request to ``/foo/`` to update the
+   resource. It also sends an ``If-Match: "abcd1234"`` header to specify
+   the version it is trying to update.
+4. Server checks to see if the resource has changed, by computing the ETag
+   the same way it does for a ``GET`` request (using the same function).
+   If the resource *has* changed, it will return a 412 status code code,
+   meaning "precondition failed".
+5. Client sends a ``GET`` request to ``/foo/``, after receiving a 412
+   response, to retrieve an updated version of the content before updating
+   it.
 
 The important thing this example shows is that the same functions can be used
 to compute the ETag and last modification values in all situations. In fact,
@@ -182,10 +182,10 @@ conditional ``GET`` handling via the
 easy to use and suitable for many situations, those pieces of middleware
 functionality have limitations for advanced usage:
 
-    * They are applied globally to all views in your project
-    * They don't save you from generating the response itself, which may be
-      expensive
-    * They are only appropriate for HTTP ``GET`` requests.
+* They are applied globally to all views in your project
+* They don't save you from generating the response itself, which may be
+  expensive
+* They are only appropriate for HTTP ``GET`` requests.
 
 You should choose the most appropriate tool for your particular problem here.
 If you have a way to compute ETags and modification times quickly and if some

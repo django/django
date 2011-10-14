@@ -29,28 +29,28 @@ tutorial, so that the template contains an HTML ``<form>`` element:
 
 A quick rundown:
 
-    * The above template displays a radio button for each poll choice. The
-      ``value`` of each radio button is the associated poll choice's ID. The
-      ``name`` of each radio button is ``"choice"``. That means, when somebody
-      selects one of the radio buttons and submits the form, it'll send the
-      POST data ``choice=3``. This is HTML Forms 101.
+* The above template displays a radio button for each poll choice. The
+  ``value`` of each radio button is the associated poll choice's ID. The
+  ``name`` of each radio button is ``"choice"``. That means, when somebody
+  selects one of the radio buttons and submits the form, it'll send the
+  POST data ``choice=3``. This is HTML Forms 101.
 
-    * We set the form's ``action`` to ``/polls/{{ poll.id }}/vote/``, and we
-      set ``method="post"``. Using ``method="post"`` (as opposed to
-      ``method="get"``) is very important, because the act of submitting this
-      form will alter data server-side. Whenever you create a form that alters
-      data server-side, use ``method="post"``. This tip isn't specific to
-      Django; it's just good Web development practice.
+* We set the form's ``action`` to ``/polls/{{ poll.id }}/vote/``, and we
+  set ``method="post"``. Using ``method="post"`` (as opposed to
+  ``method="get"``) is very important, because the act of submitting this
+  form will alter data server-side. Whenever you create a form that alters
+  data server-side, use ``method="post"``. This tip isn't specific to
+  Django; it's just good Web development practice.
 
-    * ``forloop.counter`` indicates how many times the :ttag:`for` tag has gone
-      through its loop
+* ``forloop.counter`` indicates how many times the :ttag:`for` tag has gone
+  through its loop
 
-    * Since we're creating a POST form (which can have the effect of modifying
-      data), we need to worry about Cross Site Request Forgeries.
-      Thankfully, you don't have to worry too hard, because Django comes with
-      a very easy-to-use system for protecting against it. In short, all POST
-      forms that are targeted at internal URLs should use the
-      :ttag:`{% csrf_token %}<csrf_token>` template tag.
+* Since we're creating a POST form (which can have the effect of modifying
+  data), we need to worry about Cross Site Request Forgeries.
+  Thankfully, you don't have to worry too hard, because Django comes with
+  a very easy-to-use system for protecting against it. In short, all POST
+  forms that are targeted at internal URLs should use the
+  :ttag:`{% csrf_token %}<csrf_token>` template tag.
 
 The :ttag:`{% csrf_token %}<csrf_token>` tag requires information from the
 request object, which is not normally accessible from within the template
@@ -102,48 +102,48 @@ create a real version. Add the following to ``polls/views.py``::
 
 This code includes a few things we haven't covered yet in this tutorial:
 
-    * :attr:`request.POST <django.http.HttpRequest.POST>` is a dictionary-like
-      object that lets you access submitted data by key name. In this case,
-      ``request.POST['choice']`` returns the ID of the selected choice, as a
-      string. :attr:`request.POST <django.http.HttpRequest.POST>` values are
-      always strings.
+* :attr:`request.POST <django.http.HttpRequest.POST>` is a dictionary-like
+  object that lets you access submitted data by key name. In this case,
+  ``request.POST['choice']`` returns the ID of the selected choice, as a
+  string. :attr:`request.POST <django.http.HttpRequest.POST>` values are
+  always strings.
 
-      Note that Django also provides :attr:`request.GET
-      <django.http.HttpRequest.GET>` for accessing GET data in the same way --
-      but we're explicitly using :attr:`request.POST
-      <django.http.HttpRequest.POST>` in our code, to ensure that data is only
-      altered via a POST call.
+  Note that Django also provides :attr:`request.GET
+  <django.http.HttpRequest.GET>` for accessing GET data in the same way --
+  but we're explicitly using :attr:`request.POST
+  <django.http.HttpRequest.POST>` in our code, to ensure that data is only
+  altered via a POST call.
 
-    * ``request.POST['choice']`` will raise :exc:`KeyError` if ``choice`` wasn't
-      provided in POST data. The above code checks for :exc:`KeyError` and
-      redisplays the poll form with an error message if ``choice`` isn't given.
+* ``request.POST['choice']`` will raise :exc:`KeyError` if ``choice`` wasn't
+  provided in POST data. The above code checks for :exc:`KeyError` and
+  redisplays the poll form with an error message if ``choice`` isn't given.
 
-    * After incrementing the choice count, the code returns an
-      :class:`~django.http.HttpResponseRedirect` rather than a normal
-      :class:`~django.http.HttpResponse`.
-      :class:`~django.http.HttpResponseRedirect` takes a single argument: the
-      URL to which the user will be redirected (see the following point for how
-      we construct the URL in this case).
+* After incrementing the choice count, the code returns an
+  :class:`~django.http.HttpResponseRedirect` rather than a normal
+  :class:`~django.http.HttpResponse`.
+  :class:`~django.http.HttpResponseRedirect` takes a single argument: the
+  URL to which the user will be redirected (see the following point for how
+  we construct the URL in this case).
 
-      As the Python comment above points out, you should always return an
-      :class:`~django.http.HttpResponseRedirect` after successfully dealing with
-      POST data. This tip isn't specific to Django; it's just good Web
-      development practice.
+  As the Python comment above points out, you should always return an
+  :class:`~django.http.HttpResponseRedirect` after successfully dealing with
+  POST data. This tip isn't specific to Django; it's just good Web
+  development practice.
 
-    * We are using the :func:`~django.core.urlresolvers.reverse` function in the
-      :class:`~django.http.HttpResponseRedirect` constructor in this example.
-      This function helps avoid having to hardcode a URL in the view function.
-      It is given the name of the view that we want to pass control to and the
-      variable portion of the URL pattern that points to that view. In this
-      case, using the URLconf we set up in Tutorial 3, this
-      :func:`~django.core.urlresolvers.reverse` call will return a string like
-      ::
+* We are using the :func:`~django.core.urlresolvers.reverse` function in the
+  :class:`~django.http.HttpResponseRedirect` constructor in this example.
+  This function helps avoid having to hardcode a URL in the view function.
+  It is given the name of the view that we want to pass control to and the
+  variable portion of the URL pattern that points to that view. In this
+  case, using the URLconf we set up in Tutorial 3, this
+  :func:`~django.core.urlresolvers.reverse` call will return a string like
+  ::
 
-        '/polls/3/results/'
+    '/polls/3/results/'
 
-      ... where the ``3`` is the value of ``p.id``. This redirected URL will
-      then call the ``'results'`` view to display the final page. Note that you
-      need to use the full name of the view here (including the prefix).
+  ... where the ``3`` is the value of ``p.id``. This redirected URL will
+  then call the ``'results'`` view to display the final page. Note that you
+  need to use the full name of the view here (including the prefix).
 
 As mentioned in Tutorial 3, ``request`` is a :class:`~django.http.HttpRequest`
 object. For more on :class:`~django.http.HttpRequest` objects, see the
@@ -197,11 +197,11 @@ Let's convert our poll app to use the generic views system, so we can delete a
 bunch of our own code. We'll just have to take a few steps to make the
 conversion. We will:
 
-    1. Convert the URLconf.
+1. Convert the URLconf.
 
-    2. Delete some of the old, unneeded views.
+2. Delete some of the old, unneeded views.
 
-    3. Fix up URL handling for the new views.
+3. Fix up URL handling for the new views.
 
 Read on for details.
 
@@ -257,22 +257,22 @@ We're using two generic views here:
 two views abstract the concepts of "display a list of objects" and
 "display a detail page for a particular type of object."
 
-    * Each generic view needs to know what model it will be acting
-      upon. This is provided using the ``model`` parameter.
+* Each generic view needs to know what model it will be acting
+  upon. This is provided using the ``model`` parameter.
 
-    * The :class:`~django.views.generic.list.DetailView` generic view
-      expects the primary key value captured from the URL to be called
-      ``"pk"``, so we've changed ``poll_id`` to ``pk`` for the generic
-      views.
+* The :class:`~django.views.generic.list.DetailView` generic view
+  expects the primary key value captured from the URL to be called
+  ``"pk"``, so we've changed ``poll_id`` to ``pk`` for the generic
+  views.
 
-    * We've added a name, ``poll_results``, to the results view so
-      that we have a way to refer to its URL later on (see the
-      documentation about :ref:`naming URL patterns
-      <naming-url-patterns>` for information). We're also using the
-      :func:`~django.conf.urls.url` function from
-      :mod:`django.conf.urls` here. It's a good habit to use
-      :func:`~django.conf.urls.url` when you are providing a
-      pattern name like this.
+* We've added a name, ``poll_results``, to the results view so
+  that we have a way to refer to its URL later on (see the
+  documentation about :ref:`naming URL patterns
+  <naming-url-patterns>` for information). We're also using the
+  :func:`~django.conf.urls.url` function from
+  :mod:`django.conf.urls` here. It's a good habit to use
+  :func:`~django.conf.urls.url` when you are providing a
+  pattern name like this.
 
 By default, the :class:`~django.views.generic.list.DetailView` generic
 view uses a template called ``<app name>/<model name>_detail.html``.
@@ -328,12 +328,12 @@ Coming soon
 The tutorial ends here for the time being. Future installments of the tutorial
 will cover:
 
-    * Advanced form processing
-    * Using the RSS framework
-    * Using the cache framework
-    * Using the comments framework
-    * Advanced admin features: Permissions
-    * Advanced admin features: Custom JavaScript
+* Advanced form processing
+* Using the RSS framework
+* Using the cache framework
+* Using the comments framework
+* Advanced admin features: Permissions
+* Advanced admin features: Custom JavaScript
 
 In the meantime, you might want to check out some pointers on :doc:`where to go
 from here </intro/whatsnext>`

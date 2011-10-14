@@ -56,9 +56,9 @@ Using the template system
 
 Using the template system in Python is a two-step process:
 
-    * First, you compile the raw template code into a ``Template`` object.
-    * Then, you call the ``render()`` method of the ``Template`` object with a
-      given context.
+* First, you compile the raw template code into a ``Template`` object.
+* Then, you call the ``render()`` method of the ``Template`` object with a
+  given context.
 
 Compiling a string
 ------------------
@@ -91,11 +91,11 @@ multiple contexts -- with it. The ``Context`` class lives at
 :class:`django.template.Context`, and the constructor takes two (optional)
 arguments:
 
-    * A dictionary mapping variable names to variable values.
+* A dictionary mapping variable names to variable values.
 
-    * The name of the current application. This application name is used
-      to help :ref:`resolve namespaced URLs<topics-http-reversing-url-namespaces>`.
-      If you're not using namespaced URLs, you can ignore this argument.
+* The name of the current application. This application name is used
+  to help :ref:`resolve namespaced URLs<topics-http-reversing-url-namespaces>`.
+  If you're not using namespaced URLs, you can ignore this argument.
 
 Call the ``Template`` object's ``render()`` method with the context to "fill" the
 template::
@@ -118,9 +118,9 @@ Dots have a special meaning in template rendering. A dot in a variable name
 signifies a **lookup**. Specifically, when the template system encounters a
 dot in a variable name, it tries the following lookups, in this order:
 
-    * Dictionary lookup. Example: ``foo["bar"]``
-    * Attribute lookup. Example: ``foo.bar``
-    * List-index lookup. Example: ``foo[bar]``
+* Dictionary lookup. Example: ``foo["bar"]``
+* Attribute lookup. Example: ``foo.bar``
+* List-index lookup. Example: ``foo[bar]``
 
 The template system uses the first lookup type that works. It's short-circuit
 logic. Here are a few examples::
@@ -161,69 +161,69 @@ it. Example::
 Callable variables are slightly more complex than variables which only require
 straight lookups. Here are some things to keep in mind:
 
-    * If the variable raises an exception when called, the exception will be
-      propagated, unless the exception has an attribute
-      ``silent_variable_failure`` whose value is ``True``. If the exception
-      *does* have a ``silent_variable_failure`` attribute whose value is
-      ``True``, the variable will render as an empty string. Example::
+* If the variable raises an exception when called, the exception will be
+  propagated, unless the exception has an attribute
+  ``silent_variable_failure`` whose value is ``True``. If the exception
+  *does* have a ``silent_variable_failure`` attribute whose value is
+  ``True``, the variable will render as an empty string. Example::
 
-        >>> t = Template("My name is {{ person.first_name }}.")
-        >>> class PersonClass3:
-        ...     def first_name(self):
-        ...         raise AssertionError("foo")
-        >>> p = PersonClass3()
-        >>> t.render(Context({"person": p}))
-        Traceback (most recent call last):
-        ...
-        AssertionError: foo
+    >>> t = Template("My name is {{ person.first_name }}.")
+    >>> class PersonClass3:
+    ...     def first_name(self):
+    ...         raise AssertionError("foo")
+    >>> p = PersonClass3()
+    >>> t.render(Context({"person": p}))
+    Traceback (most recent call last):
+    ...
+    AssertionError: foo
 
-        >>> class SilentAssertionError(Exception):
-        ...     silent_variable_failure = True
-        >>> class PersonClass4:
-        ...     def first_name(self):
-        ...         raise SilentAssertionError
-        >>> p = PersonClass4()
-        >>> t.render(Context({"person": p}))
-        "My name is ."
+    >>> class SilentAssertionError(Exception):
+    ...     silent_variable_failure = True
+    >>> class PersonClass4:
+    ...     def first_name(self):
+    ...         raise SilentAssertionError
+    >>> p = PersonClass4()
+    >>> t.render(Context({"person": p}))
+    "My name is ."
 
-      Note that :exc:`django.core.exceptions.ObjectDoesNotExist`, which is the
-      base class for all Django database API ``DoesNotExist`` exceptions, has
-      ``silent_variable_failure = True``. So if you're using Django templates
-      with Django model objects, any ``DoesNotExist`` exception will fail
-      silently.
+  Note that :exc:`django.core.exceptions.ObjectDoesNotExist`, which is the
+  base class for all Django database API ``DoesNotExist`` exceptions, has
+  ``silent_variable_failure = True``. So if you're using Django templates
+  with Django model objects, any ``DoesNotExist`` exception will fail
+  silently.
 
-    * A variable can only be called if it has no required arguments. Otherwise,
-      the system will return an empty string.
+* A variable can only be called if it has no required arguments. Otherwise,
+  the system will return an empty string.
 
-    * Obviously, there can be side effects when calling some variables, and
-      it'd be either foolish or a security hole to allow the template system
-      to access them.
+* Obviously, there can be side effects when calling some variables, and
+  it'd be either foolish or a security hole to allow the template system
+  to access them.
 
-      A good example is the :meth:`~django.db.models.Model.delete` method on
-      each Django model object. The template system shouldn't be allowed to do
-      something like this::
+  A good example is the :meth:`~django.db.models.Model.delete` method on
+  each Django model object. The template system shouldn't be allowed to do
+  something like this::
 
-        I will now delete this valuable data. {{ data.delete }}
+    I will now delete this valuable data. {{ data.delete }}
 
-      To prevent this, set an ``alters_data`` attribute on the callable
-      variable. The template system won't call a variable if it has
-      ``alters_data=True`` set, and will instead replace the variable with
-      :setting:`TEMPLATE_STRING_IF_INVALID`, unconditionally.  The
-      dynamically-generated :meth:`~django.db.models.Model.delete` and
-      :meth:`~django.db.models.Model.save` methods on Django model objects get
-      ``alters_data=True`` automatically. Example::
+  To prevent this, set an ``alters_data`` attribute on the callable
+  variable. The template system won't call a variable if it has
+  ``alters_data=True`` set, and will instead replace the variable with
+  :setting:`TEMPLATE_STRING_IF_INVALID`, unconditionally.  The
+  dynamically-generated :meth:`~django.db.models.Model.delete` and
+  :meth:`~django.db.models.Model.save` methods on Django model objects get
+  ``alters_data=True`` automatically. Example::
 
-        def sensitive_function(self):
-            self.database_record.delete()
-        sensitive_function.alters_data = True
+    def sensitive_function(self):
+        self.database_record.delete()
+    sensitive_function.alters_data = True
 
-    * .. versionadded:: 1.4
-         Occasionally you may want to turn off this feature for other reasons,
-         and tell the template system to leave a variable un-called no matter
-         what.  To do so, set a ``do_not_call_in_templates`` attribute on the
-         callable with the value ``True``.  The template system then will act as
-         if your variable is not callable (allowing you to access attributes of
-         the callable, for example).
+* .. versionadded:: 1.4
+     Occasionally you may want to turn off this feature for other reasons,
+     and tell the template system to leave a variable un-called no matter
+     what.  To do so, set a ``do_not_call_in_templates`` attribute on the
+     callable with the value ``True``.  The template system then will act as
+     if your variable is not callable (allowing you to access attributes of
+     the callable, for example).
 
 
 .. _invalid-template-variables:
@@ -427,13 +427,13 @@ django.contrib.auth.context_processors.auth
 If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
 ``RequestContext`` will contain these three variables:
 
-    * ``user`` -- An ``auth.User`` instance representing the currently
-      logged-in user (or an ``AnonymousUser`` instance, if the client isn't
-      logged in).
+* ``user`` -- An ``auth.User`` instance representing the currently
+  logged-in user (or an ``AnonymousUser`` instance, if the client isn't
+  logged in).
 
-    * ``perms`` -- An instance of
-      ``django.contrib.auth.context_processors.PermWrapper``, representing the
-      permissions that the currently logged-in user has.
+* ``perms`` -- An instance of
+  ``django.contrib.auth.context_processors.PermWrapper``, representing the
+  permissions that the currently logged-in user has.
 
 .. versionchanged:: 1.2
     This context processor was moved in this release from
@@ -452,11 +452,11 @@ If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
 :setting:`DEBUG` setting is set to ``True`` and the request's IP address
 (``request.META['REMOTE_ADDR']``) is in the :setting:`INTERNAL_IPS` setting:
 
-    * ``debug`` -- ``True``. You can use this in templates to test whether
-      you're in :setting:`DEBUG` mode.
-    * ``sql_queries`` -- A list of ``{'sql': ..., 'time': ...}`` dictionaries,
-      representing every SQL query that has happened so far during the request
-      and how long it took. The list is in order by query.
+* ``debug`` -- ``True``. You can use this in templates to test whether
+  you're in :setting:`DEBUG` mode.
+* ``sql_queries`` -- A list of ``{'sql': ..., 'time': ...}`` dictionaries,
+  representing every SQL query that has happened so far during the request
+  and how long it took. The list is in order by query.
 
 django.core.context_processors.i18n
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -464,9 +464,9 @@ django.core.context_processors.i18n
 If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
 ``RequestContext`` will contain these two variables:
 
-    * ``LANGUAGES`` -- The value of the :setting:`LANGUAGES` setting.
-    * ``LANGUAGE_CODE`` -- ``request.LANGUAGE_CODE``, if it exists. Otherwise,
-      the value of the :setting:`LANGUAGE_CODE` setting.
+* ``LANGUAGES`` -- The value of the :setting:`LANGUAGES` setting.
+* ``LANGUAGE_CODE`` -- ``request.LANGUAGE_CODE``, if it exists. Otherwise,
+  the value of the :setting:`LANGUAGE_CODE` setting.
 
 See :doc:`/topics/i18n/index` for more.
 
@@ -511,9 +511,9 @@ django.contrib.messages.context_processors.messages
 If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
 ``RequestContext`` will contain a single additional variable:
 
-    * ``messages`` -- A list of messages (as strings) that have been set
-      via the user model (using ``user.message_set.create``) or through
-      the :doc:`messages framework </ref/contrib/messages>`.
+* ``messages`` -- A list of messages (as strings) that have been set
+  via the user model (using ``user.message_set.create``) or through
+  the :doc:`messages framework </ref/contrib/messages>`.
 
 .. versionadded:: 1.2
    This template context variable was previously supplied by the ``'auth'``
@@ -589,16 +589,16 @@ For example, if you call ``get_template('story_detail.html')`` and have the
 above :setting:`TEMPLATE_DIRS` setting, here are the files Django will look for,
 in order:
 
-    * ``/home/html/templates/lawrence.com/story_detail.html``
-    * ``/home/html/templates/default/story_detail.html``
+* ``/home/html/templates/lawrence.com/story_detail.html``
+* ``/home/html/templates/default/story_detail.html``
 
 If you call ``select_template(['story_253_detail.html', 'story_detail.html'])``,
 here's what Django will look for:
 
-    * ``/home/html/templates/lawrence.com/story_253_detail.html``
-    * ``/home/html/templates/default/story_253_detail.html``
-    * ``/home/html/templates/lawrence.com/story_detail.html``
-    * ``/home/html/templates/default/story_detail.html``
+* ``/home/html/templates/lawrence.com/story_253_detail.html``
+* ``/home/html/templates/default/story_253_detail.html``
+* ``/home/html/templates/lawrence.com/story_detail.html``
+* ``/home/html/templates/default/story_detail.html``
 
 When Django finds a template that exists, it stops looking.
 
@@ -628,8 +628,8 @@ To load a template that's within a subdirectory, just use a slash, like so::
 Using the same :setting:`TEMPLATE_DIRS` setting from above, this example
 ``get_template()`` call will attempt to load the following templates:
 
-    * ``/home/html/templates/lawrence.com/news/story_detail.html``
-    * ``/home/html/templates/default/news/story_detail.html``
+* ``/home/html/templates/lawrence.com/news/story_detail.html``
+* ``/home/html/templates/default/news/story_detail.html``
 
 .. _template-loaders:
 
@@ -669,8 +669,8 @@ class. Here are the template loaders that come with Django:
     ...then ``get_template('foo.html')`` will look for templates in these
     directories, in this order:
 
-        * ``/path/to/myproject/polls/templates/foo.html``
-        * ``/path/to/myproject/music/templates/foo.html``
+    * ``/path/to/myproject/polls/templates/foo.html``
+    * ``/path/to/myproject/music/templates/foo.html``
 
     Note that the loader performs an optimization when it is first imported: It
     caches a list of which :setting:`INSTALLED_APPS` packages have a
@@ -739,15 +739,15 @@ The ``render_to_string`` shortcut takes one required argument --
 and render (or a list of template names, in which case Django will use
 the first template in the list that exists) -- and two optional arguments:
 
-    dictionary
-        A dictionary to be used as variables and values for the
-        template's context. This can also be passed as the second
-        positional argument.
+dictionary
+    A dictionary to be used as variables and values for the
+    template's context. This can also be passed as the second
+    positional argument.
 
-    context_instance
-        An instance of ``Context`` or a subclass (e.g., an instance of
-        ``RequestContext``) to use as the template's context. This can
-        also be passed as the third positional argument.
+context_instance
+    An instance of ``Context`` or a subclass (e.g., an instance of
+    ``RequestContext``) to use as the template's context. This can
+    also be passed as the third positional argument.
 
 See also the :func:`~django.shortcuts.render_to_response()` shortcut, which
 calls ``render_to_string`` and feeds the result into an :class:`~django.http.HttpResponse`

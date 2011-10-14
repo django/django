@@ -31,15 +31,15 @@ Installation
 
 To install the sitemap app, follow these steps:
 
-    1. Add ``'django.contrib.sitemaps'`` to your :setting:`INSTALLED_APPS`
-       setting.
+1. Add ``'django.contrib.sitemaps'`` to your :setting:`INSTALLED_APPS`
+   setting.
 
-    2. Make sure ``'django.template.loaders.app_directories.Loader'``
-       is in your :setting:`TEMPLATE_LOADERS` setting. It's in there by default,
-       so you'll only need to change this if you've changed that setting.
+2. Make sure ``'django.template.loaders.app_directories.Loader'``
+   is in your :setting:`TEMPLATE_LOADERS` setting. It's in there by default,
+   so you'll only need to change this if you've changed that setting.
 
-    3. Make sure you've installed the
-       :mod:`sites framework <django.contrib.sites>`.
+3. Make sure you've installed the
+   :mod:`sites framework <django.contrib.sites>`.
 
 (Note: The sitemap application doesn't install any database tables. The only
 reason it needs to go into :setting:`INSTALLED_APPS` is so that the
@@ -109,20 +109,20 @@ your sitemap class might look::
 
 Note:
 
-    * :attr:`~Sitemap.changefreq` and :attr:`~Sitemap.priority` are class
-      attributes corresponding to ``<changefreq>`` and ``<priority>`` elements,
-      respectively. They can be made callable as functions, as
-      :attr:`~Sitemap.lastmod` was in the example.
-    * :attr:`~Sitemap.items()` is simply a method that returns a list of
-      objects. The objects returned will get passed to any callable methods
-      corresponding to a sitemap property (:attr:`~Sitemap.location`,
-      :attr:`~Sitemap.lastmod`, :attr:`~Sitemap.changefreq`, and
-      :attr:`~Sitemap.priority`).
-    * :attr:`~Sitemap.lastmod` should return a Python ``datetime`` object.
-    * There is no :attr:`~Sitemap.location` method in this example, but you
-      can provide it in order to specify the URL for your object. By default,
-      :attr:`~Sitemap.location()` calls ``get_absolute_url()`` on each object
-      and returns the result.
+* :attr:`~Sitemap.changefreq` and :attr:`~Sitemap.priority` are class
+  attributes corresponding to ``<changefreq>`` and ``<priority>`` elements,
+  respectively. They can be made callable as functions, as
+  :attr:`~Sitemap.lastmod` was in the example.
+* :attr:`~Sitemap.items()` is simply a method that returns a list of
+  objects. The objects returned will get passed to any callable methods
+  corresponding to a sitemap property (:attr:`~Sitemap.location`,
+  :attr:`~Sitemap.lastmod`, :attr:`~Sitemap.changefreq`, and
+  :attr:`~Sitemap.priority`).
+* :attr:`~Sitemap.lastmod` should return a Python ``datetime`` object.
+* There is no :attr:`~Sitemap.location` method in this example, but you
+  can provide it in order to specify the URL for your object. By default,
+  :attr:`~Sitemap.location()` calls ``get_absolute_url()`` on each object
+  and returns the result.
 
 Sitemap class reference
 =======================
@@ -153,9 +153,9 @@ Sitemap class reference
         In both cases, "absolute path" means a URL that doesn't include the
         protocol or domain. Examples:
 
-            * Good: :file:`'/foo/bar/'`
-            * Bad: :file:`'example.com/foo/bar/'`
-            * Bad: :file:`'http://example.com/foo/bar/'`
+        * Good: :file:`'/foo/bar/'`
+        * Bad: :file:`'example.com/foo/bar/'`
+        * Bad: :file:`'http://example.com/foo/bar/'`
 
         If :attr:`~Sitemap.location` isn't provided, the framework will call
         the ``get_absolute_url()`` method on each object as returned by
@@ -185,13 +185,13 @@ Sitemap class reference
 
         Possible values for :attr:`~Sitemap.changefreq`, whether you use a method or attribute, are:
 
-            * ``'always'``
-            * ``'hourly'``
-            * ``'daily'``
-            * ``'weekly'``
-            * ``'monthly'``
-            * ``'yearly'``
-            * ``'never'``
+        * ``'always'``
+        * ``'hourly'``
+        * ``'daily'``
+        * ``'weekly'``
+        * ``'monthly'``
+        * ``'yearly'``
+        * ``'never'``
 
     .. method:: Sitemap.priority
 
@@ -272,10 +272,10 @@ The sitemap framework also has the ability to create a sitemap index that
 references individual sitemap files, one per each section defined in your
 :data:`sitemaps` dictionary. The only differences in usage are:
 
-    * You use two views in your URLconf: :func:`django.contrib.sitemaps.views.index`
-      and :func:`django.contrib.sitemaps.views.sitemap`.
-    * The :func:`django.contrib.sitemaps.views.sitemap` view should take a
-      :data:`section` keyword argument.
+* You use two views in your URLconf: :func:`django.contrib.sitemaps.views.index`
+  and :func:`django.contrib.sitemaps.views.sitemap`.
+* The :func:`django.contrib.sitemaps.views.sitemap` view should take a
+  :data:`section` keyword argument.
 
 Here's what the relevant URLconf lines would look like for the example above::
 
@@ -341,11 +341,11 @@ The variable :data:`urlset` is a list of URLs that should appear in the
 sitemap. Each URL exposes attributes as defined in the
 :class:`~django.contrib.sitemaps.Sitemap` class:
 
-    - ``changefreq``
-    - ``item``
-    - ``lastmod``
-    - ``location``
-    - ``priority``
+- ``changefreq``
+- ``item``
+- ``lastmod``
+- ``location``
+- ``priority``
 
 .. versionadded:: 1.4
 

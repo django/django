@@ -20,12 +20,12 @@ what the name of the database is. Do that by editing the :setting:`DATABASES`
 setting and assigning values to the following keys for the ``'default'``
 connection:
 
-    * :setting:`NAME`
-    * :setting:`ENGINE`
-    * :setting:`USER`
-    * :setting:`PASSWORD`
-    * :setting:`HOST`
-    * :setting:`PORT`
+* :setting:`NAME`
+* :setting:`ENGINE`
+* :setting:`USER`
+* :setting:`PASSWORD`
+* :setting:`HOST`
+* :setting:`PORT`
 
 Auto-generate the models
 ========================

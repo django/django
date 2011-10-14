@@ -23,20 +23,20 @@ class and corresponding :doc:`context processor </ref/templates/api>`.
 
 To enable message functionality, do the following:
 
-    * Edit the :setting:`MIDDLEWARE_CLASSES` setting and make sure
-      it contains ``'django.contrib.messages.middleware.MessageMiddleware'``.
+* Edit the :setting:`MIDDLEWARE_CLASSES` setting and make sure
+  it contains ``'django.contrib.messages.middleware.MessageMiddleware'``.
 
-      If you are using a :ref:`storage backend <message-storage-backends>` that
-      relies on :doc:`sessions </topics/http/sessions>` (the default),
-      ``'django.contrib.sessions.middleware.SessionMiddleware'`` must be
-      enabled and appear before ``MessageMiddleware`` in your
-      :setting:`MIDDLEWARE_CLASSES`.
+  If you are using a :ref:`storage backend <message-storage-backends>` that
+  relies on :doc:`sessions </topics/http/sessions>` (the default),
+  ``'django.contrib.sessions.middleware.SessionMiddleware'`` must be
+  enabled and appear before ``MessageMiddleware`` in your
+  :setting:`MIDDLEWARE_CLASSES`.
 
-    * Edit the :setting:`TEMPLATE_CONTEXT_PROCESSORS` setting and make sure
-      it contains ``'django.contrib.messages.context_processors.messages'``.
+* Edit the :setting:`TEMPLATE_CONTEXT_PROCESSORS` setting and make sure
+  it contains ``'django.contrib.messages.context_processors.messages'``.
 
-    * Add ``'django.contrib.messages'`` to your :setting:`INSTALLED_APPS`
-      setting
+* Add ``'django.contrib.messages'`` to your :setting:`INSTALLED_APPS`
+  setting
 
 The default ``settings.py`` created by ``django-admin.py startproject`` has
 ``MessageMiddleware`` activated and the ``django.contrib.messages`` app
@@ -349,9 +349,9 @@ Default: ``'django.contrib.messages.storage.user_messages.FallbackStorage'``
 
 Controls where Django stores message data. Valid values are:
 
-    * ``'django.contrib.messages.storage.fallback.FallbackStorage'``
-    * ``'django.contrib.messages.storage.session.SessionStorage'``
-    * ``'django.contrib.messages.storage.cookie.CookieStorage'``
+* ``'django.contrib.messages.storage.fallback.FallbackStorage'``
+* ``'django.contrib.messages.storage.session.SessionStorage'``
+* ``'django.contrib.messages.storage.cookie.CookieStorage'``
 
 See `Storage backends`_ for more details.
 

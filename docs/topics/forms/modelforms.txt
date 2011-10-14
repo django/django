@@ -45,70 +45,70 @@ model field has a corresponding default form field. For example, a
 model ``ManyToManyField`` is represented as a ``MultipleChoiceField``. Here is
 the full list of conversions:
 
-    ===============================  ========================================
-    Model field                      Form field
-    ===============================  ========================================
-    ``AutoField``                    Not represented in the form
+===============================  ========================================
+Model field                      Form field
+===============================  ========================================
+``AutoField``                    Not represented in the form
 
-    ``BigIntegerField``              ``IntegerField`` with ``min_value`` set
-                                     to -9223372036854775808 and ``max_value``
-                                     set to 9223372036854775807.
+``BigIntegerField``              ``IntegerField`` with ``min_value`` set
+                                 to -9223372036854775808 and ``max_value``
+                                 set to 9223372036854775807.
 
-    ``BooleanField``                 ``BooleanField``
+``BooleanField``                 ``BooleanField``
 
-    ``CharField``                    ``CharField`` with ``max_length`` set to
-                                     the model field's ``max_length``
+``CharField``                    ``CharField`` with ``max_length`` set to
+                                 the model field's ``max_length``
 
-    ``CommaSeparatedIntegerField``   ``CharField``
+``CommaSeparatedIntegerField``   ``CharField``
 
-    ``DateField``                    ``DateField``
+``DateField``                    ``DateField``
 
-    ``DateTimeField``                ``DateTimeField``
+``DateTimeField``                ``DateTimeField``
 
-    ``DecimalField``                 ``DecimalField``
+``DecimalField``                 ``DecimalField``
 
-    ``EmailField``                   ``EmailField``
+``EmailField``                   ``EmailField``
 
-    ``FileField``                    ``FileField``
+``FileField``                    ``FileField``
 
-    ``FilePathField``                ``CharField``
+``FilePathField``                ``CharField``
 
-    ``FloatField``                   ``FloatField``
+``FloatField``                   ``FloatField``
 
-    ``ForeignKey``                   ``ModelChoiceField`` (see below)
+``ForeignKey``                   ``ModelChoiceField`` (see below)
 
-    ``ImageField``                   ``ImageField``
+``ImageField``                   ``ImageField``
 
-    ``IntegerField``                 ``IntegerField``
+``IntegerField``                 ``IntegerField``
 
-    ``IPAddressField``               ``IPAddressField``
+``IPAddressField``               ``IPAddressField``
 
-    ``GenericIPAddressField``        ``GenericIPAddressField``
+``GenericIPAddressField``        ``GenericIPAddressField``
 
-    ``ManyToManyField``              ``ModelMultipleChoiceField`` (see
-                                     below)
+``ManyToManyField``              ``ModelMultipleChoiceField`` (see
+                                 below)
 
-    ``NullBooleanField``             ``CharField``
+``NullBooleanField``             ``CharField``
 
-    ``PhoneNumberField``             ``USPhoneNumberField``
-                                     (from ``django.contrib.localflavor.us``)
+``PhoneNumberField``             ``USPhoneNumberField``
+                                 (from ``django.contrib.localflavor.us``)
 
-    ``PositiveIntegerField``         ``IntegerField``
+``PositiveIntegerField``         ``IntegerField``
 
-    ``PositiveSmallIntegerField``    ``IntegerField``
+``PositiveSmallIntegerField``    ``IntegerField``
 
-    ``SlugField``                    ``SlugField``
+``SlugField``                    ``SlugField``
 
-    ``SmallIntegerField``            ``IntegerField``
+``SmallIntegerField``            ``IntegerField``
 
-    ``TextField``                    ``CharField`` with
-                                     ``widget=forms.Textarea``
+``TextField``                    ``CharField`` with
+                                 ``widget=forms.Textarea``
 
-    ``TimeField``                    ``TimeField``
+``TimeField``                    ``TimeField``
 
-    ``URLField``                     ``URLField`` with ``verify_exists`` set
-                                     to the model field's ``verify_exists``
-    ===============================  ========================================
+``URLField``                     ``URLField`` with ``verify_exists`` set
+                                 to the model field's ``verify_exists``
+===============================  ========================================
 
 .. versionadded:: 1.2
     The ``BigIntegerField`` is new in Django 1.2.
@@ -117,31 +117,31 @@ the full list of conversions:
 As you might expect, the ``ForeignKey`` and ``ManyToManyField`` model field
 types are special cases:
 
-    * ``ForeignKey`` is represented by ``django.forms.ModelChoiceField``,
-      which is a ``ChoiceField`` whose choices are a model ``QuerySet``.
+* ``ForeignKey`` is represented by ``django.forms.ModelChoiceField``,
+  which is a ``ChoiceField`` whose choices are a model ``QuerySet``.
 
-    * ``ManyToManyField`` is represented by
-      ``django.forms.ModelMultipleChoiceField``, which is a
-      ``MultipleChoiceField`` whose choices are a model ``QuerySet``.
+* ``ManyToManyField`` is represented by
+  ``django.forms.ModelMultipleChoiceField``, which is a
+  ``MultipleChoiceField`` whose choices are a model ``QuerySet``.
 
 In addition, each generated form field has attributes set as follows:
 
-    * If the model field has ``blank=True``, then ``required`` is set to
-      ``False`` on the form field. Otherwise, ``required=True``.
+* If the model field has ``blank=True``, then ``required`` is set to
+  ``False`` on the form field. Otherwise, ``required=True``.
 
-    * The form field's ``label`` is set to the ``verbose_name`` of the model
-      field, with the first character capitalized.
+* The form field's ``label`` is set to the ``verbose_name`` of the model
+  field, with the first character capitalized.
 
-    * The form field's ``help_text`` is set to the ``help_text`` of the model
-      field.
+* The form field's ``help_text`` is set to the ``help_text`` of the model
+  field.
 
-    * If the model field has ``choices`` set, then the form field's ``widget``
-      will be set to ``Select``, with choices coming from the model field's
-      ``choices``. The choices will normally include the blank choice which is
-      selected by default. If the field is required, this forces the user to
-      make a selection. The blank choice will not be included if the model
-      field has ``blank=False`` and an explicit ``default`` value (the
-      ``default`` value will be initially selected instead).
+* If the model field has ``choices`` set, then the form field's ``widget``
+  will be set to ``Select``, with choices coming from the model field's
+  ``choices``. The choices will normally include the blank choice which is
+  selected by default. If the field is required, this forces the user to
+  make a selection. The blank choice will not be included if the model
+  field has ``blank=False`` and an explicit ``default`` value (the
+  ``default`` value will be initially selected instead).
 
 Finally, note that you can override the form field used for a given model
 field. See `Overriding the default field types or widgets`_ below.
@@ -518,13 +518,13 @@ the original ``ArticleForm.Meta`` to remove one field.
 
 There are a couple of things to note, however.
 
- * Normal Python name resolution rules apply. If you have multiple base
-   classes that declare a ``Meta`` inner class, only the first one will be
-   used. This means the child's ``Meta``, if it exists, otherwise the
-   ``Meta`` of the first parent, etc.
+* Normal Python name resolution rules apply. If you have multiple base
+  classes that declare a ``Meta`` inner class, only the first one will be
+  used. This means the child's ``Meta``, if it exists, otherwise the
+  ``Meta`` of the first parent, etc.
 
- * For technical reasons, a subclass cannot inherit from both a ``ModelForm``
-   and a ``Form`` simultaneously.
+* For technical reasons, a subclass cannot inherit from both a ``ModelForm``
+  and a ``Form`` simultaneously.
 
 Chances are these notes won't affect you unless you're trying to do something
 tricky with subclassing.

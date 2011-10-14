@@ -345,11 +345,11 @@ Serving the app and your static files from the same server
 If you want to serve your static files from the same server that's already
 serving your site, the basic outline gets modified to look something like:
 
-    * Push your code up to the deployment server.
-    * On the server, run :djadmin:`collectstatic` to copy all the static files
-      into :setting:`STATIC_ROOT`.
-    * Point your web server at :setting:`STATIC_ROOT`. For example, here's
-      :ref:`how to do this under Apache and mod_wsgi <serving-files>`.
+* Push your code up to the deployment server.
+* On the server, run :djadmin:`collectstatic` to copy all the static files
+  into :setting:`STATIC_ROOT`.
+* Point your web server at :setting:`STATIC_ROOT`. For example, here's
+  :ref:`how to do this under Apache and mod_wsgi <serving-files>`.
 
 You'll probably want to automate this process, especially if you've got
 multiple web servers. There's any number of ways to do this automation, but
@@ -386,11 +386,11 @@ Most larger Django apps use a separate Web server -- i.e., one that's not also
 running Django -- for serving static files. This server often runs a different
 type of web server -- faster but less full-featured. Some good choices are:
 
-    * lighttpd_
-    * Nginx_
-    * TUX_
-    * Cherokee_
-    * A stripped-down version of Apache_
+* lighttpd_
+* Nginx_
+* TUX_
+* Cherokee_
+* A stripped-down version of Apache_
 
 .. _lighttpd: http://www.lighttpd.net/
 .. _Nginx: http://wiki.nginx.org/Main
@@ -404,11 +404,11 @@ server's respective documentation for instructions.
 Since your static file server won't be running Django, you'll need to modify
 the deployment strategy to look something like:
 
-    * When your static files change, run :djadmin:`collectstatic` locally.
-    * Push your local :setting:`STATIC_ROOT` up to the static file server
-      into the directory that's being served. ``rsync`` is a good
-      choice for this step since it only needs to transfer the
-      bits of static files that have changed.
+* When your static files change, run :djadmin:`collectstatic` locally.
+* Push your local :setting:`STATIC_ROOT` up to the static file server
+  into the directory that's being served. ``rsync`` is a good
+  choice for this step since it only needs to transfer the
+  bits of static files that have changed.
 
 Here's how this might look in a fabfile::
 
@@ -479,27 +479,27 @@ Upgrading from ``django-staticfiles``
 you're upgrading from `django-staticfiles`_ older than 1.0 (e.g. 0.3.4) to
 ``django.contrib.staticfiles``, you'll need to make a few changes:
 
-    * Application files should now live in a ``static`` directory in each app
-      (`django-staticfiles`_ used the name ``media``, which was slightly
-      confusing).
+* Application files should now live in a ``static`` directory in each app
+  (`django-staticfiles`_ used the name ``media``, which was slightly
+  confusing).
 
-    * The management commands ``build_static`` and ``resolve_static`` are now
-      called :djadmin:`collectstatic` and :djadmin:`findstatic`.
+* The management commands ``build_static`` and ``resolve_static`` are now
+  called :djadmin:`collectstatic` and :djadmin:`findstatic`.
 
-    * The settings ``STATICFILES_PREPEND_LABEL_APPS``,
-      ``STATICFILES_MEDIA_DIRNAMES`` and ``STATICFILES_EXCLUDED_APPS`` were
-      removed.
+* The settings ``STATICFILES_PREPEND_LABEL_APPS``,
+  ``STATICFILES_MEDIA_DIRNAMES`` and ``STATICFILES_EXCLUDED_APPS`` were
+  removed.
 
-    * The setting ``STATICFILES_RESOLVERS`` was removed, and replaced by the
-      new :setting:`STATICFILES_FINDERS`.
+* The setting ``STATICFILES_RESOLVERS`` was removed, and replaced by the
+  new :setting:`STATICFILES_FINDERS`.
 
-    * The default for :setting:`STATICFILES_STORAGE` was renamed from
-      ``staticfiles.storage.StaticFileStorage`` to
-      ``staticfiles.storage.StaticFilesStorage``
+* The default for :setting:`STATICFILES_STORAGE` was renamed from
+  ``staticfiles.storage.StaticFileStorage`` to
+  ``staticfiles.storage.StaticFilesStorage``
 
-    * If using :ref:`runserver<staticfiles-runserver>` for local development
-      (and the :setting:`DEBUG` setting is ``True``), you no longer need to add
-      anything to your URLconf for serving static files in development.
+* If using :ref:`runserver<staticfiles-runserver>` for local development
+  (and the :setting:`DEBUG` setting is ``True``), you no longer need to add
+  anything to your URLconf for serving static files in development.
 
 Learn more
 ==========

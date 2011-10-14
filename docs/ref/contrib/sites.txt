@@ -70,24 +70,24 @@ that's represented by a :class:`~django.db.models.ManyToManyField` in the
 
 This accomplishes several things quite nicely:
 
-    * It lets the site producers edit all content -- on both sites -- in a
-      single interface (the Django admin).
+* It lets the site producers edit all content -- on both sites -- in a
+  single interface (the Django admin).
 
-    * It means the same story doesn't have to be published twice in the
-      database; it only has a single record in the database.
+* It means the same story doesn't have to be published twice in the
+  database; it only has a single record in the database.
 
-    * It lets the site developers use the same Django view code for both sites.
-      The view code that displays a given story just checks to make sure the
-      requested story is on the current site. It looks something like this::
+* It lets the site developers use the same Django view code for both sites.
+  The view code that displays a given story just checks to make sure the
+  requested story is on the current site. It looks something like this::
 
-          from django.conf import settings
+      from django.conf import settings
 
-          def article_detail(request, article_id):
-              try:
-                  a = Article.objects.get(id=article_id, sites__id__exact=settings.SITE_ID)
-              except Article.DoesNotExist:
-                  raise Http404
-              # ...
+      def article_detail(request, article_id):
+          try:
+              a = Article.objects.get(id=article_id, sites__id__exact=settings.SITE_ID)
+          except Article.DoesNotExist:
+              raise Http404
+          # ...
 
 .. _ljworld.com: http://www.ljworld.com/
 .. _lawrence.com: http://www.lawrence.com/

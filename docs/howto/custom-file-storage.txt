@@ -37,11 +37,11 @@ You'll need to follow these steps:
 Your custom storage system may override any of the storage methods explained in
 :doc:`/ref/files/storage`, but you **must** implement the following methods:
 
-    * :meth:`Storage.delete`
-    * :meth:`Storage.exists`
-    * :meth:`Storage.listdir`
-    * :meth:`Storage.size`
-    * :meth:`Storage.url`
+* :meth:`Storage.delete`
+* :meth:`Storage.exists`
+* :meth:`Storage.listdir`
+* :meth:`Storage.size`
+* :meth:`Storage.url`
 
 You'll also usually want to use hooks specifically designed for custom storage
 objects. These are:

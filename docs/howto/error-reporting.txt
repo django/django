@@ -56,12 +56,12 @@ setting.
 Django can also be configured to email errors about broken links (404 "page
 not found" errors). Django sends emails about 404 errors when:
 
-    * :setting:`DEBUG` is ``False``
+* :setting:`DEBUG` is ``False``
 
-    * :setting:`SEND_BROKEN_LINK_EMAILS` is ``True``
+* :setting:`SEND_BROKEN_LINK_EMAILS` is ``True``
 
-    * Your :setting:`MIDDLEWARE_CLASSES` setting includes ``CommonMiddleware``
-      (which it does by default).
+* Your :setting:`MIDDLEWARE_CLASSES` setting includes ``CommonMiddleware``
+  (which it does by default).
 
 If those conditions are met, Django will email the users listed in the
 :setting:`MANAGERS` setting whenever your code raises a 404 and the request has
@@ -144,18 +144,16 @@ production environment (that is, where :setting:`DEBUG` is set to ``False``):
     If a function (either a view or any regular callback) in your code uses
     local variables susceptible to contain sensitive information, you may
     prevent the values of those variables from being included in error reports
-    using the ``sensitive_variables`` decorator:
+    using the ``sensitive_variables`` decorator::
 
-        .. code-block:: python
+        from django.views.decorators.debug import sensitive_variables
 
-            from django.views.decorators.debug import sensitive_variables
-
-            @sensitive_variables('user', 'pw', 'cc')
-            def process_info(user):
-                pw = user.pass_word
-                cc = user.credit_card_number
-                name = user.name
-                ...
+        @sensitive_variables('user', 'pw', 'cc')
+        def process_info(user):
+            pw = user.pass_word
+            cc = user.credit_card_number
+            name = user.name
+            ...
 
     In the above example, the values for the ``user``, ``pw`` and ``cc``
     variables will be hidden and replaced with stars (`**********`) in the
@@ -163,13 +161,11 @@ production environment (that is, where :setting:`DEBUG` is set to ``False``):
     disclosed.
 
     To systematically hide all local variables of a function from error logs,
-    do not provide any argument to the ``sensitive_variables`` decorator:
+    do not provide any argument to the ``sensitive_variables`` decorator::
 
-        .. code-block:: python
-
-            @sensitive_variables()
-            def my_function():
-                ...
+        @sensitive_variables()
+        def my_function():
+            ...
 
 .. function:: sensitive_post_parameters(*parameters)
 
@@ -177,19 +173,17 @@ production environment (that is, where :setting:`DEBUG` is set to ``False``):
     :attr:`POST parameters<HttpRequest.POST>` susceptible to contain sensitive
     information, you may prevent the values of those parameters from being
     included in the error reports using the ``sensitive_post_parameters``
-    decorator:
+    decorator::
 
-        .. code-block:: python
+        from django.views.decorators.debug import sensitive_post_parameters
 
-            from django.views.decorators.debug import sensitive_post_parameters
-
-            @sensitive_post_parameters('pass_word', 'credit_card_number')
-            def record_user_profile(request):
-                UserProfile.create(user=request.user,
-                                   password=request.POST['pass_word'],
-                                   credit_card=request.POST['credit_card_number'],
-                                   name=request.POST['name'])
-                ...
+        @sensitive_post_parameters('pass_word', 'credit_card_number')
+        def record_user_profile(request):
+            UserProfile.create(user=request.user,
+                               password=request.POST['pass_word'],
+                               credit_card=request.POST['credit_card_number'],
+                               name=request.POST['name'])
+            ...
 
     In the above example, the values for the ``pass_word`` and
     ``credit_card_number`` POST parameters will be hidden and replaced with
@@ -197,13 +191,11 @@ production environment (that is, where :setting:`DEBUG` is set to ``False``):
     reports, whereas the value of the ``name`` parameter will be disclosed.
 
     To systematically hide all POST parameters of a request in error reports,
-    do not provide any argument to the ``sensitive_post_parameters`` decorator:
+    do not provide any argument to the ``sensitive_post_parameters`` decorator::
 
-        .. code-block:: python
-
-            @sensitive_post_parameters()
-            def my_view(request):
-                ...
+        @sensitive_post_parameters()
+        def my_view(request):
+            ...
 
 .. note::
 
@@ -231,22 +223,18 @@ decorators' annotations to replace the corresponding values with stars
 (`**********`) when the error reports are produced. If you wish to override or
 customize this default behavior for your entire site, you need to define your
 own filter class and tell Django to use it via the
-:setting:`DEFAULT_EXCEPTION_REPORTER_FILTER` setting:
+:setting:`DEFAULT_EXCEPTION_REPORTER_FILTER` setting::
 
-    .. code-block:: python
-
-        DEFAULT_EXCEPTION_REPORTER_FILTER = 'path.to.your.CustomExceptionReporterFilter'
+    DEFAULT_EXCEPTION_REPORTER_FILTER = 'path.to.your.CustomExceptionReporterFilter'
 
 You may also control in a more granular way which filter to use within any
 given view by setting the ``HttpRequest``'s ``exception_reporter_filter``
-attribute:
+attribute::
 
-    .. code-block:: python
-
-        def my_view(request):
-            if request.user.is_authenticated():
-                request.exception_reporter_filter = CustomExceptionReporterFilter()
-            ...
+    def my_view(request):
+        if request.user.is_authenticated():
+            request.exception_reporter_filter = CustomExceptionReporterFilter()
+        ...
 
 Your custom filter class needs to inherit from
 :class:`django.views.debug.SafeExceptionReporterFilter` and may override the

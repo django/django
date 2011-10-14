@@ -168,9 +168,9 @@ Once you've got that set up, point Apache at your Django FastCGI instance by
 editing the ``httpd.conf`` (Apache configuration) file. You'll need to do two
 things:
 
-    * Use the ``FastCGIExternalServer`` directive to specify the location of
-      your FastCGI server.
-    * Use ``mod_rewrite`` to point URLs at FastCGI as appropriate.
+* Use the ``FastCGIExternalServer`` directive to specify the location of
+  your FastCGI server.
+* Use ``mod_rewrite`` to point URLs at FastCGI as appropriate.
 
 .. _mod_fastcgi: http://www.fastcgi.com/mod_fastcgi/docs/mod_fastcgi.html
 

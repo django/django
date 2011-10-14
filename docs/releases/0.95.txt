@@ -44,46 +44,46 @@ etc., to improve developers' quality of life.
 
 The new features and changes introduced in 0.95 include:
 
-    * Django now uses a more consistent and natural filtering interface for
-      retrieving objects from the database.
+* Django now uses a more consistent and natural filtering interface for
+  retrieving objects from the database.
 
-    * User-defined models, functions and constants now appear in the module
-      namespace they were defined in. (Previously everything was magically
-      transferred to the django.models.* namespace.)
+* User-defined models, functions and constants now appear in the module
+  namespace they were defined in. (Previously everything was magically
+  transferred to the django.models.* namespace.)
 
-    * Some optional applications, such as the FlatPage, Sites and Redirects
-      apps, have been decoupled and moved into django.contrib. If you don't
-      want to use these applications, you no longer have to install their
-      database tables.
+* Some optional applications, such as the FlatPage, Sites and Redirects
+  apps, have been decoupled and moved into django.contrib. If you don't
+  want to use these applications, you no longer have to install their
+  database tables.
 
-    * Django now has support for managing database transactions.
+* Django now has support for managing database transactions.
 
-    * We've added the ability to write custom authentication and authorization
-      backends for authenticating users against alternate systems, such as
-      LDAP.
+* We've added the ability to write custom authentication and authorization
+  backends for authenticating users against alternate systems, such as
+  LDAP.
 
-    * We've made it easier to add custom table-level functions to models,
-      through a new "Manager" API.
+* We've made it easier to add custom table-level functions to models,
+  through a new "Manager" API.
 
-    * It's now possible to use Django without a database. This simply means
-      that the framework no longer requires you to have a working database set
-      up just to serve dynamic pages. In other words, you can just use
-      URLconfs/views on their own. Previously, the framework required that a
-      database be configured, regardless of whether you actually used it.
+* It's now possible to use Django without a database. This simply means
+  that the framework no longer requires you to have a working database set
+  up just to serve dynamic pages. In other words, you can just use
+  URLconfs/views on their own. Previously, the framework required that a
+  database be configured, regardless of whether you actually used it.
 
-    * It's now more explicit and natural to override save() and delete()
-      methods on models, rather than needing to hook into the pre_save() and
-      post_save() method hooks.
+* It's now more explicit and natural to override save() and delete()
+  methods on models, rather than needing to hook into the pre_save() and
+  post_save() method hooks.
 
-    * Individual pieces of the framework now can be configured without
-      requiring the setting of an environment variable. This permits use of,
-      for example, the Django templating system inside other applications.
+* Individual pieces of the framework now can be configured without
+  requiring the setting of an environment variable. This permits use of,
+  for example, the Django templating system inside other applications.
 
-    * More and more parts of the framework have been internationalized, as
-      we've expanded internationalization (i18n) support. The Django
-      codebase, including code and templates, has now been translated, at least
-      in part, into 31 languages. From Arabic to Chinese to Hungarian to Welsh,
-      it is now possible to use Django's admin site in your native language.
+* More and more parts of the framework have been internationalized, as
+  we've expanded internationalization (i18n) support. The Django
+  codebase, including code and templates, has now been translated, at least
+  in part, into 31 languages. From Arabic to Chinese to Hungarian to Welsh,
+  it is now possible to use Django's admin site in your native language.
 
 The number of changes required to port from 0.91-compatible code to the 0.95
 code base are significant in some cases. However, they are, for the most part,

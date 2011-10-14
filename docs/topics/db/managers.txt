@@ -205,26 +205,26 @@ first manager declared is the *default manager*, it is important to allow that
 to be controlled. So here's how Django handles custom managers and
 :ref:`model inheritance <model-inheritance>`:
 
-    1. Managers defined on non-abstract base classes are *not* inherited by
-       child classes. If you want to reuse a manager from a non-abstract base,
-       redeclare it explicitly on the child class. These sorts of managers are
-       likely to be fairly specific to the class they are defined on, so
-       inheriting them can often lead to unexpected results (particularly as
-       far as the default manager goes). Therefore, they aren't passed onto
-       child classes.
+1. Managers defined on non-abstract base classes are *not* inherited by
+   child classes. If you want to reuse a manager from a non-abstract base,
+   redeclare it explicitly on the child class. These sorts of managers are
+   likely to be fairly specific to the class they are defined on, so
+   inheriting them can often lead to unexpected results (particularly as
+   far as the default manager goes). Therefore, they aren't passed onto
+   child classes.
 
-    2. Managers from abstract base classes are always inherited by the child
-       class, using Python's normal name resolution order (names on the child
-       class override all others; then come names on the first parent class,
-       and so on). Abstract base classes are designed to capture information
-       and behavior that is common to their child classes. Defining common
-       managers is an appropriate part of this common information.
+2. Managers from abstract base classes are always inherited by the child
+   class, using Python's normal name resolution order (names on the child
+   class override all others; then come names on the first parent class,
+   and so on). Abstract base classes are designed to capture information
+   and behavior that is common to their child classes. Defining common
+   managers is an appropriate part of this common information.
 
-    3. The default manager on a class is either the first manager declared on
-       the class, if that exists, or the default manager of the first abstract
-       base class in the parent hierarchy, if that exists. If no default
-       manager is explicitly declared, Django's normal default manager is
-       used.
+3. The default manager on a class is either the first manager declared on
+   the class, if that exists, or the default manager of the first abstract
+   base class in the parent hierarchy, if that exists. If no default
+   manager is explicitly declared, Django's normal default manager is
+   used.
 
 These rules provide the necessary flexibility if you want to install a
 collection of custom managers on a group of models, via an abstract base

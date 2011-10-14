@@ -73,10 +73,10 @@ First, we'll need to write a function that gets called when the action is
 trigged from the admin. Action functions are just regular functions that take
 three arguments:
 
-    * The current :class:`ModelAdmin`
-    * An :class:`~django.http.HttpRequest` representing the current request,
-    * A :class:`~django.db.models.query.QuerySet` containing the set of
-      objects selected by the user.
+* The current :class:`ModelAdmin`
+* An :class:`~django.http.HttpRequest` representing the current request,
+* A :class:`~django.db.models.query.QuerySet` containing the set of
+  objects selected by the user.
 
 Our publish-these-articles function won't need the :class:`ModelAdmin` or the
 request object, but we will use the queryset::

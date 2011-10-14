@@ -184,13 +184,13 @@ complete set of objects.
 To create such a subset, you refine the initial ``QuerySet``, adding filter
 conditions. The two most common ways to refine a ``QuerySet`` are:
 
-    ``filter(**kwargs)``
-        Returns a new ``QuerySet`` containing objects that match the given
-        lookup parameters.
+``filter(**kwargs)``
+    Returns a new ``QuerySet`` containing objects that match the given
+    lookup parameters.
 
-    ``exclude(**kwargs)``
-        Returns a new ``QuerySet`` containing objects that do *not* match the
-        given lookup parameters.
+``exclude(**kwargs)``
+    Returns a new ``QuerySet`` containing objects that do *not* match the
+    given lookup parameters.
 
 The lookup parameters (``**kwargs`` in the above function definitions) should
 be in the format described in `Field lookups`_ below.
@@ -391,56 +391,56 @@ The database API supports about two dozen lookup types; a complete reference
 can be found in the :ref:`field lookup reference <field-lookups>`. To give you a taste of what's available, here's some of the more common lookups
 you'll probably use:
 
-    :lookup:`exact`
-        An "exact" match. For example::
+:lookup:`exact`
+    An "exact" match. For example::
 
-            >>> Entry.objects.get(headline__exact="Man bites dog")
+        >>> Entry.objects.get(headline__exact="Man bites dog")
 
-        Would generate SQL along these lines:
+    Would generate SQL along these lines:
 
-        .. code-block:: sql
+    .. code-block:: sql
 
-            SELECT ... WHERE headline = 'Man bites dog';
+        SELECT ... WHERE headline = 'Man bites dog';
 
-        If you don't provide a lookup type -- that is, if your keyword argument
-        doesn't contain a double underscore -- the lookup type is assumed to be
-        ``exact``.
+    If you don't provide a lookup type -- that is, if your keyword argument
+    doesn't contain a double underscore -- the lookup type is assumed to be
+    ``exact``.
 
-        For example, the following two statements are equivalent::
+    For example, the following two statements are equivalent::
 
-            >>> Blog.objects.get(id__exact=14)  # Explicit form
-            >>> Blog.objects.get(id=14)         # __exact is implied
+        >>> Blog.objects.get(id__exact=14)  # Explicit form
+        >>> Blog.objects.get(id=14)         # __exact is implied
 
-        This is for convenience, because ``exact`` lookups are the common case.
+    This is for convenience, because ``exact`` lookups are the common case.
 
-    :lookup:`iexact`
-        A case-insensitive match. So, the query::
+:lookup:`iexact`
+    A case-insensitive match. So, the query::
 
-            >>> Blog.objects.get(name__iexact="beatles blog")
+        >>> Blog.objects.get(name__iexact="beatles blog")
 
-        Would match a ``Blog`` titled "Beatles Blog", "beatles blog", or even
-        "BeAtlES blOG".
+    Would match a ``Blog`` titled "Beatles Blog", "beatles blog", or even
+    "BeAtlES blOG".
 
-    :lookup:`contains`
-        Case-sensitive containment test. For example::
+:lookup:`contains`
+    Case-sensitive containment test. For example::
 
-            Entry.objects.get(headline__contains='Lennon')
+        Entry.objects.get(headline__contains='Lennon')
 
-        Roughly translates to this SQL:
+    Roughly translates to this SQL:
 
-        .. code-block:: sql
+    .. code-block:: sql
 
-            SELECT ... WHERE headline LIKE '%Lennon%';
+        SELECT ... WHERE headline LIKE '%Lennon%';
 
-        Note this will match the headline ``'Today Lennon honored'`` but not
-        ``'today lennon honored'``.
+    Note this will match the headline ``'Today Lennon honored'`` but not
+    ``'today lennon honored'``.
 
-        There's also a case-insensitive version, :lookup:`icontains`.
+    There's also a case-insensitive version, :lookup:`icontains`.
 
-    :lookup:`startswith`, :lookup:`endswith`
-        Starts-with and ends-with search, respectively. There are also
-        case-insensitive versions called :lookup:`istartswith` and
-        :lookup:`iendswith`.
+:lookup:`startswith`, :lookup:`endswith`
+    Starts-with and ends-with search, respectively. There are also
+    case-insensitive versions called :lookup:`istartswith` and
+    :lookup:`iendswith`.
 
 Again, this only scratches the surface. A complete reference can be found in the
 :ref:`field lookup reference <field-lookups>`.
