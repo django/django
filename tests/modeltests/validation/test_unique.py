@@ -58,26 +58,23 @@ class GetUniqueCheckTests(unittest.TestCase):
 class PerformUniqueChecksTest(TestCase):
     def test_primary_key_unique_check_not_performed_when_adding_and_pk_not_specified(self):
         # Regression test for #12560
-        def test():
+        with self.assertNumQueries(0):
             mtv = ModelToValidate(number=10, name='Some Name')
             setattr(mtv, '_adding', True)
             mtv.full_clean()
-        self.assertNumQueries(0, test)
 
     def test_primary_key_unique_check_performed_when_adding_and_pk_specified(self):
         # Regression test for #12560
-        def test():
+        with self.assertNumQueries(1):
             mtv = ModelToValidate(number=10, name='Some Name', id=123)
             setattr(mtv, '_adding', True)
             mtv.full_clean()
-        self.assertNumQueries(1, test)
 
     def test_primary_key_unique_check_not_performed_when_not_adding(self):
         # Regression test for #12132
-        def test():
+        with self.assertNumQueries(0):
             mtv = ModelToValidate(number=10, name='Some Name')
             mtv.full_clean()
-        self.assertNumQueries(0, test)
 
     def test_unique_for_date(self):
         p1 = Post.objects.create(title="Django 1.0 is released",

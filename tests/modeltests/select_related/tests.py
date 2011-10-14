@@ -1,8 +1,9 @@
-from __future__ import absolute_import
+from __future__ import with_statement, absolute_import
 
 from django.test import TestCase
 
 from .models import Domain, Kingdom, Phylum, Klass, Order, Family, Genus, Species
+
 
 class SelectRelatedTests(TestCase):
 
@@ -41,29 +42,27 @@ class SelectRelatedTests(TestCase):
         """
         Normally, accessing FKs doesn't fill in related objects
         """
-        def test():
+        with self.assertNumQueries(8):
             fly = Species.objects.get(name="melanogaster")
             domain = fly.genus.family.order.klass.phylum.kingdom.domain
             self.assertEqual(domain.name, 'Eukaryota')
-        self.assertNumQueries(8, test)
 
     def test_access_fks_with_select_related(self):
         """
         A select_related() call will fill in those related objects without any
         extra queries
         """
-        def test():
+        with self.assertNumQueries(1):
             person = Species.objects.select_related(depth=10).get(name="sapiens")
             domain = person.genus.family.order.klass.phylum.kingdom.domain
             self.assertEqual(domain.name, 'Eukaryota')
-        self.assertNumQueries(1, test)
 
     def test_list_without_select_related(self):
         """
         select_related() also of course applies to entire lists, not just
         items. This test verifies the expected behavior without select_related.
         """
-        def test():
+        with self.assertNumQueries(9):
             world = Species.objects.all()
             families = [o.genus.family.name for o in world]
             self.assertEqual(sorted(families), [
@@ -72,14 +71,13 @@ class SelectRelatedTests(TestCase):
                 'Fabaceae',
                 'Hominidae',
             ])
-        self.assertNumQueries(9, test)
 
     def test_list_with_select_related(self):
         """
         select_related() also of course applies to entire lists, not just
         items. This test verifies the expected behavior with select_related.
         """
-        def test():
+        with self.assertNumQueries(1):
             world = Species.objects.all().select_related()
             families = [o.genus.family.name for o in world]
             self.assertEqual(sorted(families), [
@@ -88,21 +86,19 @@ class SelectRelatedTests(TestCase):
                 'Fabaceae',
                 'Hominidae',
             ])
-        self.assertNumQueries(1, test)
 
     def test_depth(self, depth=1, expected=7):
         """
         The "depth" argument to select_related() will stop the descent at a
         particular level.
         """
-        def test():
+        # Notice: one fewer queries than above because of depth=1
+        with self.assertNumQueries(expected):
             pea = Species.objects.select_related(depth=depth).get(name="sativum")
             self.assertEqual(
                 pea.genus.family.order.klass.phylum.kingdom.domain.name,
                 'Eukaryota'
             )
-        # Notice: one fewer queries than above because of depth=1
-        self.assertNumQueries(expected, test)
 
     def test_larger_depth(self):
         """
@@ -116,12 +112,11 @@ class SelectRelatedTests(TestCase):
         The "depth" argument to select_related() will stop the descent at a
         particular level. This can be used on lists as well.
         """
-        def test():
+        with self.assertNumQueries(5):
             world = Species.objects.all().select_related(depth=2)
             orders = [o.genus.family.order.name for o in world]
             self.assertEqual(sorted(orders),
                 ['Agaricales', 'Diptera', 'Fabales', 'Primates'])
-        self.assertNumQueries(5, test)
 
     def test_select_related_with_extra(self):
         s = Species.objects.all().select_related(depth=1)\
@@ -137,31 +132,28 @@ class SelectRelatedTests(TestCase):
         In this case, we explicitly say to select the 'genus' and
         'genus.family' models, leading to the same number of queries as before.
         """
-        def test():
+        with self.assertNumQueries(1):
             world = Species.objects.select_related('genus__family')
             families = [o.genus.family.name for o in world]
             self.assertEqual(sorted(families),
                 ['Amanitacae', 'Drosophilidae', 'Fabaceae', 'Hominidae'])
-        self.assertNumQueries(1, test)
 
     def test_more_certain_fields(self):
         """
         In this case, we explicitly say to select the 'genus' and
         'genus.family' models, leading to the same number of queries as before.
         """
-        def test():
+        with self.assertNumQueries(2):
             world = Species.objects.filter(genus__name='Amanita')\
                 .select_related('genus__family')
             orders = [o.genus.family.order.name for o in world]
             self.assertEqual(orders, [u'Agaricales'])
-        self.assertNumQueries(2, test)
 
     def test_field_traversal(self):
-        def test():
+        with self.assertNumQueries(1):
             s = Species.objects.all().select_related('genus__family__order'
                 ).order_by('id')[0:1].get().genus.family.order.name
             self.assertEqual(s, u'Diptera')
-        self.assertNumQueries(1, test)
 
     def test_depth_fields_fails(self):
         self.assertRaises(TypeError,

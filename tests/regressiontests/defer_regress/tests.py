@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import with_statement, absolute_import
 
 from operator import attrgetter
 
@@ -21,22 +21,18 @@ class DeferRegressionTest(TestCase):
         obj = Item.objects.only("name", "other_value").get(name="first")
         # Accessing "name" doesn't trigger a new database query. Accessing
         # "value" or "text" should.
-        def test():
+        with self.assertNumQueries(0):
             self.assertEqual(obj.name, "first")
             self.assertEqual(obj.other_value, 0)
-        self.assertNumQueries(0, test)
 
-        def test():
+        with self.assertNumQueries(1):
             self.assertEqual(obj.value, 42)
-        self.assertNumQueries(1, test)
 
-        def test():
+        with self.assertNumQueries(1):
             self.assertEqual(obj.text, "xyzzy")
-        self.assertNumQueries(1, test)
 
-        def test():
+        with self.assertNumQueries(0):
             self.assertEqual(obj.text, "xyzzy")
-        self.assertNumQueries(0, test)
 
         # Regression test for #10695. Make sure different instances don't
         # inadvertently share data in the deferred descriptor objects.
