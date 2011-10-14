@@ -101,24 +101,24 @@ desired outside the use of the optional :mod:`~django.contrib.staticfiles` app.
 As a result, we took the following steps to rectify the issue:
 
 * Two new global settings were added that will be used by, **but are not
-limited to**, the :doc:`staticfiles</ref/contrib/staticfiles>` app:
+  limited to**, the :doc:`staticfiles</ref/contrib/staticfiles>` app:
 
 * :setting:`STATIC_ROOT` (formally ``STATICFILES_ROOT``)
 
 * :setting:`STATIC_URL` (formally ``STATICFILES_URL``)
 
 * The ``django.contrib.staticfiles.templatetags.staticfiles.get_staticfiles_prefix``
-template tag was moved to Django's core (``django.templatetags.static``) and
-renamed to :ttag:`get_static_prefix`.
+  template tag was moved to Django's core (``django.templatetags.static``) and
+  renamed to :ttag:`get_static_prefix`.
 
 * The ``django.contrib.staticfiles.context_processors.staticfiles``
-context processor was moved to Django's core
-(``django.core.context_processors.static``) and renamed to
-:func:`~django.core.context_processors.static`.
+  context processor was moved to Django's core
+  (``django.core.context_processors.static``) and renamed to
+  :func:`~django.core.context_processors.static`.
 
 * :ref:`form-media-paths` now uses :setting:`STATIC_URL` as the prefix
-**if the value is not None**, and falls back to the previously used
-:setting:`MEDIA_URL` setting otherwise.
+  **if the value is not None**, and falls back to the previously used
+  :setting:`MEDIA_URL` setting otherwise.
 
 Changes to the login methods of the admin
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -726,11 +726,11 @@ some limitations on the usage of such LOB columns in general:
 * LOB columns may not be used in indexes.
 
 * LOB columns may not be used in a ``SELECT DISTINCT`` list. This means that
-attempting to use the ``QuerySet.distinct`` method on a model that
-includes ``TextField`` columns will result in an error when run against
-Oracle. As a workaround, use the ``QuerySet.defer`` method in conjunction
-with ``distinct()`` to prevent ``TextField`` columns from being included in
-the ``SELECT DISTINCT`` list.
+  attempting to use the ``QuerySet.distinct`` method on a model that
+  includes ``TextField`` columns will result in an error when run against
+  Oracle. As a workaround, use the ``QuerySet.defer`` method in conjunction
+  with ``distinct()`` to prevent ``TextField`` columns from being included in
+  the ``SELECT DISTINCT`` list.
 
 .. _third-party-notes:
 
