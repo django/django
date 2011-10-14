@@ -135,7 +135,7 @@ class AdminViewBasicTest(TestCase):
             'date_1': u'14:55:39',
         }
         response = self.client.post('/test_admin/%s/admin_views/article/add/' % self.urlbit, post_data)
-        self.failUnlessEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'dismissAddAnotherPopup')
         self.assertContains(response, 'title with a new\u000Aline')
 

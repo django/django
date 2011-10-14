@@ -1,7 +1,6 @@
 from django import forms
 from django.template import loader
 from django.utils.http import int_to_base36
-from django.utils.itercompat import any
 from django.utils.translation import ugettext_lazy as _
 
 from django.contrib.auth.models import User

@@ -4,6 +4,7 @@ Where possible, we try to use the system-native version and only fall back to
 these implementations if necessary.
 """
 
+import __builtin__
 import itertools
 import warnings
 
@@ -36,15 +37,9 @@ def is_iterable(x):
 def all(iterable):
     warnings.warn("django.utils.itercompat.all is deprecated; use the native version instead",
                   PendingDeprecationWarning)
-    for item in iterable:
-        if not item:
-            return False
-    return True
+    return __builtin__.all(iterable)
 
 def any(iterable):
     warnings.warn("django.utils.itercompat.any is deprecated; use the native version instead",
                   PendingDeprecationWarning)
-    for item in iterable:
-        if item:
-            return True
-    return False
+    return __builtin__.any(iterable)
