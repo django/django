@@ -42,6 +42,15 @@ class FeedgeneratorTest(unittest.TestCase):
             "Fri, 14 Nov 2008 13:37:00 +0100"
         )
 
+    def test_rfc2822_date_without_time(self):
+        """
+        Test rfc2822_date() correctly formats date objects.
+        """
+        self.assertEqual(
+            feedgenerator.rfc2822_date(datetime.date(2008, 11, 14)),
+            "Fri, 14 Nov 2008 00:00:00 -0000"
+        )
+
     def test_rfc3339_date(self):
         """
         Test rfc3339_date() correctly formats datetime objects.
@@ -58,6 +67,15 @@ class FeedgeneratorTest(unittest.TestCase):
         self.assertEqual(
             feedgenerator.rfc3339_date(datetime.datetime(2008, 11, 14, 13, 37, 0, tzinfo=tzinfo.FixedOffset(datetime.timedelta(minutes=120)))),
             "2008-11-14T13:37:00+02:00"
+        )
+
+    def test_rfc3339_date_without_time(self):
+        """
+        Test rfc3339_date() correctly formats date objects.
+        """
+        self.assertEqual(
+            feedgenerator.rfc3339_date(datetime.date(2008, 11, 14)),
+            "2008-11-14T00:00:00Z"
         )
 
     def test_atom1_mime_type(self):
