@@ -3,9 +3,9 @@ from django.db import models
 # Since the test database doesn't have tablespaces, it's impossible for Django
 # to create the tables for models where db_tablespace is set. To avoid this
 # problem, we mark the models as unmanaged, and temporarily revert them to
-# managed during each tes. See setUp and tearDown -- it isn't possible to use
-# setUpClass and tearDownClass because they're called before Django flushes the
-# tables, so Django attempts to flush a non-existing table.
+# managed during each test. We also set them to use the same tables as the
+# "reference" models to avoid errors when other tests run 'syncdb'
+# (proxy_models_inheritance does).
 
 class ScientistRef(models.Model):
     name = models.CharField(max_length=50)
@@ -19,6 +19,7 @@ class ArticleRef(models.Model):
 class Scientist(models.Model):
     name = models.CharField(max_length=50)
     class Meta:
+        db_table = 'tablespaces_scientistref'
         db_tablespace = 'tbl_tbsp'
         managed = False
 
@@ -28,5 +29,14 @@ class Article(models.Model):
     authors = models.ManyToManyField(Scientist, related_name='articles_written_set')
     reviewers = models.ManyToManyField(Scientist, related_name='articles_reviewed_set', db_tablespace='idx_tbsp')
     class Meta:
+        db_table = 'tablespaces_articleref'
         db_tablespace = 'tbl_tbsp'
         managed = False
+
+# Also set the tables for automatically created models
+
+Authors = Article._meta.get_field('authors').rel.through
+Authors._meta.db_table = 'tablespaces_articleref_authors'
+
+Reviewers = Article._meta.get_field('reviewers').rel.through
+Reviewers._meta.db_table = 'tablespaces_articleref_reviewers'

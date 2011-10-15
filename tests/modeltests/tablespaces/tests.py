@@ -6,11 +6,7 @@ from django.db.models.loading import cache
 from django.core.management.color import no_style 
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
-from models import Article, ArticleRef, Scientist, ScientistRef
-
-# Automatically created models
-Authors = Article._meta.get_field('authors').rel.through
-Reviewers = Article._meta.get_field('reviewers').rel.through
+from models import Article, ArticleRef, Authors, Reviewers, Scientist, ScientistRef
 
 # We can't test the DEFAULT_TABLESPACE and DEFAULT_INDEX_TABLESPACE settings
 # because they're evaluated when the model class is defined. As a consequence,
@@ -27,7 +23,7 @@ class TablespacesTests(TestCase):
 
     def setUp(self):
         # The unmanaged models need to be removed after the test in order to
-        # prevent bad interactions with other tests (proxy_models_inheritance).
+        # prevent bad interactions with the flush operation in other tests.
         self.old_app_models = copy.deepcopy(cache.app_models)
         self.old_app_store = copy.deepcopy(cache.app_store)
 
@@ -56,7 +52,7 @@ class TablespacesTests(TestCase):
     def test_tablespace_ignored_for_model(self):
         # No tablespace-related SQL
         self.assertEqual(sql_for_table(Scientist),
-                         sql_for_table(ScientistRef).replace('ref', ''))
+                         sql_for_table(ScientistRef))
 
     @skipUnlessDBFeature('supports_tablespaces')
     def test_tablespace_for_indexed_field(self):
@@ -69,7 +65,7 @@ class TablespacesTests(TestCase):
     def test_tablespace_ignored_for_indexed_field(self):
         # No tablespace-related SQL
         self.assertEqual(sql_for_table(Article),
-                         sql_for_table(ArticleRef).replace('ref', ''))
+                         sql_for_table(ArticleRef))
 
     @skipUnlessDBFeature('supports_tablespaces')
     def test_tablespace_for_many_to_many_field(self):
