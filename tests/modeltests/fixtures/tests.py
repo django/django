@@ -4,6 +4,7 @@ import StringIO
 
 from django.contrib.sites.models import Site
 from django.core import management
+from django.db import connection
 from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 
 from .models import Article, Book, Spy, Tag, Visa
@@ -260,6 +261,11 @@ class FixtureLoadingTests(TestCase):
         outputs an error message which contains the pk of the object
         that triggered the error.
         """
+        # MySQL needs a little prodding to reject invalid data.
+        # This won't affect other tests because the database connection
+        # is closed at the end of each test.
+        if connection.vendor == 'mysql':
+            connection.cursor().execute("SET sql_mode = 'TRADITIONAL'")
         new_io = StringIO.StringIO()
         management.call_command('loaddata', 'invalid.json', verbosity=0, stderr=new_io, commit=False)
         output = new_io.getvalue().strip().split('\n')
