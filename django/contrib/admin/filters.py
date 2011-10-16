@@ -146,14 +146,11 @@ class RelatedFieldListFilter(FieldListFilter):
     def __init__(self, field, request, params, model, model_admin, field_path):
         super(RelatedFieldListFilter, self).__init__(
             field, request, params, model, model_admin, field_path)
-
         other_model = get_model_from_relation(field)
-        if isinstance(field, (models.ManyToManyField,
-                          models.related.RelatedObject)):
-            # no direct field on this model, get name from other model
-            self.lookup_title = other_model._meta.verbose_name
+        if hasattr(field, 'verbose_name'):
+            self.lookup_title = field.verbose_name
         else:
-            self.lookup_title = field.verbose_name # use field name
+            self.lookup_title = other_model._meta.verbose_name
         rel_name = other_model._meta.pk.name
         self.lookup_kwarg = '%s__%s__exact' % (self.field_path, rel_name)
         self.lookup_kwarg_isnull = '%s__isnull' % (self.field_path)
