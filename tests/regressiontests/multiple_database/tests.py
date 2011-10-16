@@ -6,12 +6,23 @@ from StringIO import StringIO
 
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
 from django.core import management
 from django.db import connections, router, DEFAULT_DB_ALIAS
 from django.db.models import signals
 from django.test import TestCase
 
 from .models import Book, Person, Pet, Review, UserProfile
+
+
+def copy_content_types_from_default_to_other():
+    # On post_syncdb, content types are created in the 'default' database.
+    # However, tests of generic foreign keys require them in 'other' too.
+    # The problem is masked on backends that defer constraints checks: at the
+    # end of each test, there's a rollback, and constraints are never checked.
+    # It only appears on MySQL + InnoDB.
+    for ct in ContentType.objects.using('default').all():
+        ct.save(using='other')
 
 
 class QueryTestCase(TestCase):
@@ -692,6 +703,8 @@ class QueryTestCase(TestCase):
 
     def test_generic_key_separation(self):
         "Generic fields are constrained to a single database"
+        copy_content_types_from_default_to_other()
+
         # Create a book and author on the default database
         pro = Book.objects.create(title="Pro Django",
                                   published=datetime.date(2008, 12, 16))
@@ -719,6 +732,8 @@ class QueryTestCase(TestCase):
 
     def test_generic_key_reverse_operations(self):
         "Generic reverse manipulations are all constrained to a single DB"
+        copy_content_types_from_default_to_other()
+
         dive = Book.objects.using('other').create(title="Dive into Python",
                                                   published=datetime.date(2009, 5, 4))
 
@@ -763,6 +778,8 @@ class QueryTestCase(TestCase):
 
     def test_generic_key_cross_database_protection(self):
         "Operations that involve sharing generic key objects across databases raise an error"
+        copy_content_types_from_default_to_other()
+
         # Create a book and author on the default database
         pro = Book.objects.create(title="Pro Django",
                                   published=datetime.date(2008, 12, 16))
@@ -814,6 +831,8 @@ class QueryTestCase(TestCase):
 
     def test_generic_key_deletion(self):
         "Cascaded deletions of Generic Key relations issue queries on the right database"
+        copy_content_types_from_default_to_other()
+
         dive = Book.objects.using('other').create(title="Dive into Python",
                                                   published=datetime.date(2009, 5, 4))
         review = Review.objects.using('other').create(source="Python Weekly", content_object=dive)
@@ -1217,6 +1236,15 @@ class RouterTestCase(TestCase):
         water = Book(title="Dive into Water", published=datetime.date(2001, 1, 1), editor=mark)
         self.assertEqual(water._state.db, 'default')
 
+        # For the remainder of this test, create a copy of 'mark' in the
+        # 'default' database to prevent integrity errors on backends that
+        # don't defer constraints checks until the end of the transaction
+        mark.save(using='default')
+
+        # This moved 'mark' in the 'default' database, move it back in 'other'
+        mark.save(using='other')
+        self.assertEqual(mark._state.db, 'other')
+
         # If you create an object through a FK relation, it will be
         # written to the write database, even if the original object
         # was on the read database
@@ -1372,6 +1400,8 @@ class RouterTestCase(TestCase):
 
     def test_generic_key_cross_database_protection(self):
         "Generic Key operations can span databases if they share a source"
+        copy_content_types_from_default_to_other()
+
         # Create a book and author on the default database
         pro = Book.objects.using('default'
                 ).create(title="Pro Django", published=datetime.date(2008, 12, 16))
@@ -1459,7 +1489,8 @@ class RouterTestCase(TestCase):
                                                  published=datetime.date(2008, 12, 16))
 
         marty = Person.objects.using('other').create(pk=1, name="Marty Alchin")
-        pro.authors = [marty]
+        pro_authors = pro.authors.using('other')
+        authors = [marty]
 
         self.assertEqual(pro.authors.db, 'other')
         self.assertEqual(pro.authors.db_manager('default').db, 'default')
@@ -1482,6 +1513,8 @@ class RouterTestCase(TestCase):
 
     def test_generic_key_managers(self):
         "Generic key relations are represented by managers, and can be controlled like managers"
+        copy_content_types_from_default_to_other()
+
         pro = Book.objects.using('other').create(title="Pro Django",
                                                  published=datetime.date(2008, 12, 16))
 
@@ -1745,13 +1778,19 @@ class SignalTests(TestCase):
         """
         # Make a receiver
         receiver = DatabaseReceiver()
-        # Connect it, and make the models
+        # Connect it
         signals.m2m_changed.connect(receiver=receiver)
 
+        # Create the models that will be used for the tests
         b = Book.objects.create(title="Pro Django",
                                 published=datetime.date(2008, 12, 16))
-
         p = Person.objects.create(name="Marty Alchin")
+
+        # Create a copy of the models on the 'other' database to prevent
+        # integrity errors on backends that don't defer constraints checks
+        Book.objects.using('other').create(pk=b.pk, title=b.title,
+                                           published=b.published)
+        Person.objects.using('other').create(pk=p.pk, name=p.name)
 
         # Test addition
         b.authors.add(p)
