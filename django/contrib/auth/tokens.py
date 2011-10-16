@@ -52,8 +52,12 @@ class PasswordResetTokenGenerator(object):
         # invalid as soon as it is used.
         # We limit the hash to 20 chars to keep URL short
         key_salt = "django.contrib.auth.tokens.PasswordResetTokenGenerator"
+
+        # Ensure results are consistent across DB backends
+        login_timestamp = user.last_login.replace(microsecond=0, tzinfo=None)
+
         value = (unicode(user.id) + user.password +
-                unicode(user.last_login) + unicode(timestamp))
+                unicode(login_timestamp) + unicode(timestamp))
         hash = salted_hmac(key_salt, value).hexdigest()[::2]
         return "%s-%s" % (ts_b36, hash)
 
