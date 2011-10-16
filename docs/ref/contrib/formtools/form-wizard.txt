@@ -252,20 +252,6 @@ Advanced ``WizardView`` methods
     the step itself. For more, see the :ref:`form prefix documentation
     <form-prefix>`.
 
-.. method:: WizardView.process_step(form)
-
-    Hook for modifying the wizard's internal state, given a fully validated
-    :class:`~django.forms.Form` object. The Form is guaranteed to have clean,
-    valid data.
-
-    Note that this method is called every time a page is rendered for *all*
-    submitted steps.
-
-    The default implementation::
-
-        def process_step(self, form):
-            return self.get_form_step_data(form)
-
 .. method:: WizardView.get_form_initial(step)
 
     Returns a dictionary which will be passed as the
@@ -368,12 +354,19 @@ Advanced ``WizardView`` methods
 
 .. method:: WizardView.process_step(form)
 
+    Hook for modifying the wizard's internal state, given a fully validated
+    :class:`~django.forms.Form` object. The Form is guaranteed to have clean,
+    valid data.
+
     This method gives you a way to post-process the form data before the data
     gets stored within the storage backend. By default it just returns the
     ``form.data`` dictionary. You should not manipulate the data here but you
     can use it to do some extra work if needed (e.g. set storage extra data).
 
-    Default implementation::
+    Note that this method is called every time a page is rendered for *all*
+    submitted steps.
+
+    The default implementation::
 
         def process_step(self, form):
             return self.get_form_step_data(form)
