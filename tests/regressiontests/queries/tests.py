@@ -1868,3 +1868,12 @@ class UnionTests(unittest.TestCase):
         Q1 = Q(objecta__name='one', objectc__objecta__name='two')
         Q2 = Q(objecta__objectc__name='ein', objectc__objecta__name='three', objecta__objectb__name='trois')
         self.check_union(ObjectB, Q1, Q2)
+
+
+class DefaultValuesInsertTest(TestCase):
+    def test_no_extra_params(self):
+        # Ticket #17056 -- affects Oracle
+        try:
+            DumbCategory.objects.create()
+        except TypeError:
+            self.fail("Creation of an instance of a model with only the PK field shouldn't error out after bulk insert refactoring (#17056)")

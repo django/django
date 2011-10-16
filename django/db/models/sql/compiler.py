@@ -824,7 +824,7 @@ class SQLInsertCompiler(SQLCompiler):
                 for val in values
             ]
         if self.return_id and self.connection.features.can_return_id_from_insert:
-            params = values[0]
+            params = params[0]
             col = "%s.%s" % (qn(opts.db_table), qn(opts.pk.column))
             result.append("VALUES (%s)" % ", ".join(placeholders[0]))
             r_fmt, r_params = self.connection.ops.return_insert_id()
