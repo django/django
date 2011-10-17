@@ -864,14 +864,16 @@ class ManageAlternateSettings(AdminScriptTestCase):
         "alternate: manage.py builtin commands work with settings provided as argument"
         args = ['sqlall','--settings=alternate_settings', 'admin_scripts']
         out, err = self.run_manage(args)
-        self.assertRegexpMatches(out,  'CREATE TABLE [`"]admin_scripts_article[`"]')
+        expected_query_re = re.compile('CREATE TABLE [`"]admin_scripts_article[`"]', re.IGNORECASE)
+        self.assertRegexpMatches(out, expected_query_re)
         self.assertNoOutput(err)
 
     def test_builtin_with_environment(self):
         "alternate: manage.py builtin commands work if settings are provided in the environment"
         args = ['sqlall','admin_scripts']
         out, err = self.run_manage(args,'alternate_settings')
-        self.assertRegexpMatches(out,  'CREATE TABLE [`"]admin_scripts_article[`"]')
+        expected_query_re = re.compile('CREATE TABLE [`"]admin_scripts_article[`"]', re.IGNORECASE)
+        self.assertRegexpMatches(out, expected_query_re)
         self.assertNoOutput(err)
 
     def test_builtin_with_bad_settings(self):
