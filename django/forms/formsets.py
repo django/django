@@ -1,11 +1,14 @@
-from forms import Form
+from __future__ import absolute_import
+
 from django.core.exceptions import ValidationError
+from django.forms import Form
+from django.forms.fields import IntegerField, BooleanField
+from django.forms.util import ErrorList
+from django.forms.widgets import Media, HiddenInput
 from django.utils.encoding import StrAndUnicode
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
-from fields import IntegerField, BooleanField
-from widgets import Media, HiddenInput
-from util import ErrorList
+
 
 __all__ = ('BaseFormSet', 'all_valid')
 
