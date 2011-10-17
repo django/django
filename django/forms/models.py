@@ -3,20 +3,21 @@ Helper functions for creating Form classes from Django models
 and database field objects.
 """
 
+from __future__ import absolute_import
+
 from django.core.exceptions import ValidationError, NON_FIELD_ERRORS, FieldError
 from django.core.validators import EMPTY_VALUES
-
+from django.forms.fields import Field, ChoiceField
+from django.forms.forms import BaseForm, get_declared_fields
+from django.forms.formsets import BaseFormSet, formset_factory
+from django.forms.util import ErrorList
+from django.forms.widgets import (SelectMultiple, HiddenInput,
+    MultipleHiddenInput, media_property)
 from django.utils.encoding import smart_unicode, force_unicode
 from django.utils.datastructures import SortedDict
 from django.utils.text import get_text_list, capfirst
 from django.utils.translation import ugettext_lazy as _, ugettext
 
-from util import ErrorList
-from forms import BaseForm, get_declared_fields
-from fields import Field, ChoiceField
-from widgets import SelectMultiple, HiddenInput, MultipleHiddenInput
-from widgets import media_property
-from formsets import BaseFormSet, formset_factory
 
 __all__ = (
     'ModelForm', 'BaseModelForm', 'model_to_dict', 'fields_for_model',

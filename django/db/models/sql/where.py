@@ -1,12 +1,15 @@
 """
 Code to manage the creation and SQL rendering of 'where' constraints.
 """
+
+from __future__ import absolute_import
+
 import datetime
 from itertools import repeat
 
 from django.utils import tree
 from django.db.models.fields import Field
-from datastructures import EmptyResultSet, FullResultSet
+from django.db.models.sql.datastructures import EmptyResultSet, FullResultSet
 
 # Connection types
 AND = 'AND'

@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 import re
 from functools import partial
 from inspect import getargspec
@@ -141,7 +143,7 @@ class Template(object):
 def compile_string(template_string, origin):
     "Compiles template_string into NodeList ready for rendering"
     if settings.TEMPLATE_DEBUG:
-        from debug import DebugLexer, DebugParser
+        from django.template.debug import DebugLexer, DebugParser
         lexer_class, parser_class = DebugLexer, DebugParser
     else:
         lexer_class, parser_class = Lexer, Parser

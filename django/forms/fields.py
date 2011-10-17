@@ -2,6 +2,8 @@
 Field classes.
 """
 
+from __future__ import absolute_import
+
 import copy
 import datetime
 import os
@@ -13,21 +15,21 @@ try:
 except ImportError:
     from StringIO import StringIO
 
-from django.core.exceptions import ValidationError
 from django.core import validators
+from django.core.exceptions import ValidationError
+from django.forms.util import ErrorList
+from django.forms.widgets import (TextInput, PasswordInput, HiddenInput,
+    MultipleHiddenInput, ClearableFileInput, CheckboxInput, Select,
+    NullBooleanSelect, SelectMultiple, DateInput, DateTimeInput, TimeInput,
+    SplitDateTimeWidget, SplitHiddenDateTimeWidget, FILE_INPUT_CONTRADICTION)
 from django.utils import formats
-from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_unicode, smart_str, force_unicode
 from django.utils.ipv6 import clean_ipv6_address
+from django.utils.translation import ugettext_lazy as _
 
 # Provide this import for backwards compatibility.
 from django.core.validators import EMPTY_VALUES
 
-from util import ErrorList
-from widgets import (TextInput, PasswordInput, HiddenInput,
-    MultipleHiddenInput, ClearableFileInput, CheckboxInput, Select,
-    NullBooleanSelect, SelectMultiple, DateInput, DateTimeInput, TimeInput,
-    SplitDateTimeWidget, SplitHiddenDateTimeWidget, FILE_INPUT_CONTRADICTION)
 
 __all__ = (
     'Field', 'CharField', 'IntegerField',
