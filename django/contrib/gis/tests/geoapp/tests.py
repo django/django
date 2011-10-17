@@ -1,4 +1,7 @@
+from __future__ import absolute_import
+
 import re
+
 from django.db import connection
 from django.db.utils import DatabaseError
 from django.contrib.gis import gdal
@@ -9,10 +12,10 @@ from django.contrib.gis.tests.utils import (
     mysql, oracle, postgis, spatialite)
 from django.test import TestCase
 
-from models import Country, City, PennsylvaniaCity, State, Track
+from .models import Country, City, PennsylvaniaCity, State, Track
 
 if not spatialite:
-    from models import Feature, MinusOneSRID
+    from .models import Feature, MinusOneSRID
 
 class GeoModelTest(TestCase):
 
@@ -733,6 +736,6 @@ class GeoModelTest(TestCase):
         self.assertEqual(ref_hash, h1.geohash)
         self.assertEqual(ref_hash[:5], h2.geohash)
 
-from test_feeds import GeoFeedTest
-from test_regress import GeoRegressionTests
-from test_sitemaps import GeoSitemapTest
+from .test_feeds import GeoFeedTest
+from .test_regress import GeoRegressionTests
+from .test_sitemaps import GeoSitemapTest

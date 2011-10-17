@@ -1,5 +1,9 @@
+from __future__ import absolute_import
+
 from django.contrib.gis import feeds
-from models import City
+
+from .models import City
+
 
 class TestGeoRSS1(feeds.Feed):
     link = '/city/'

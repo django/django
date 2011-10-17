@@ -1,14 +1,17 @@
+from __future__ import absolute_import
+
 try:
     from cStringIO import StringIO
 except ImportError:
     from StringIO import StringIO
 from xml.dom import minidom
 import zipfile
+
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.test import TestCase
 
-from models import City, Country
+from .models import City, Country
 
 
 class GeoSitemapTest(TestCase):
@@ -78,7 +81,7 @@ class GeoSitemapTest(TestCase):
 
     def test_geositemap_georss(self):
         "Tests GeoRSS geographic sitemaps."
-        from feeds import feed_dict
+        from .feeds import feed_dict
 
         doc = minidom.parseString(self.client.get('/sitemaps/georss.xml').content)
 

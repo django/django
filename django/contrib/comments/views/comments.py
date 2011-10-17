@@ -1,16 +1,20 @@
+from __future__ import absolute_import
+
 from django import http
 from django.conf import settings
-from utils import next_redirect, confirmation_view
+from django.contrib import comments
+from django.contrib.comments import signals
+from django.contrib.comments.views.utils import next_redirect, confirmation_view
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import models
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.utils.html import escape
-from django.views.decorators.http import require_POST
-from django.contrib import comments
-from django.contrib.comments import signals
 from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.http import require_POST
+
+
 
 class CommentPostBadRequest(http.HttpResponseBadRequest):
     """

@@ -1,10 +1,14 @@
+from __future__ import absolute_import
+
 import os
+
 from django.db import connections
 from django.test import TestCase
 from django.contrib.gis.gdal import Driver
 from django.contrib.gis.geometry.test_data import TEST_DATA
 from django.contrib.gis.utils.ogrinspect import ogrinspect
-from models import AllOGRFields
+
+from .models import AllOGRFields
 
 
 class OGRInspectTest(TestCase):

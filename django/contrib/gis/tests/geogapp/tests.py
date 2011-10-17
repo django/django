@@ -1,11 +1,16 @@
 """
 Tests for geography support in PostGIS 1.5+
 """
+from __future__ import absolute_import
+
 import os
+
 from django.contrib.gis import gdal
 from django.contrib.gis.measure import D
 from django.test import TestCase
-from models import City, County, Zipcode
+
+from .models import City, County, Zipcode
+
 
 class GeographyTest(TestCase):
 

@@ -1,8 +1,13 @@
+from __future__ import absolute_import
+
 from datetime import datetime
+
 from django.contrib.gis.tests.utils import no_mysql, no_spatialite
 from django.contrib.gis.shortcuts import render_to_kmz
 from django.test import TestCase
-from models import City, PennsylvaniaCity, State
+
+from .models import City, PennsylvaniaCity, State
+
 
 class GeoRegressionTests(TestCase):
 

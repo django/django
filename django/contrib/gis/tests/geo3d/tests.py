@@ -1,13 +1,15 @@
+from __future__ import absolute_import
+
 import os
 import re
+
 from django.utils.unittest import TestCase
 from django.contrib.gis.db.models import Union, Extent3D
 from django.contrib.gis.geos import GEOSGeometry, Point, Polygon
 from django.contrib.gis.utils import LayerMapping, LayerMapError
 
-from models import (City3D, Interstate2D, Interstate3D,
-    InterstateProj2D, InterstateProj3D,
-    Point2D, Point3D, MultiPoint3D, Polygon2D, Polygon3D)
+from .models import (City3D, Interstate2D, Interstate3D, InterstateProj2D,
+    InterstateProj3D, Point2D, Point3D, MultiPoint3D, Polygon2D, Polygon3D)
 
 data_path = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', 'data'))
 city_file = os.path.join(data_path, 'cities', 'cities.shp')
@@ -29,10 +31,10 @@ city_data = (
 # Reference mapping of city name to its altitude (Z value).
 city_dict = dict((name, coords) for name, coords in city_data)
 
-# 3D freeway data derived from the National Elevation Dataset: 
+# 3D freeway data derived from the National Elevation Dataset:
 #  http://seamless.usgs.gov/products/9arc.php
 interstate_data = (
-    ('I-45', 
+    ('I-45',
      'LINESTRING(-95.3708481 29.7765870 11.339,-95.3694580 29.7787980 4.536,-95.3690305 29.7797359 9.762,-95.3691886 29.7812450 12.448,-95.3696447 29.7850144 10.457,-95.3702511 29.7868518 9.418,-95.3706724 29.7881286 14.858,-95.3711632 29.7896157 15.386,-95.3714525 29.7936267 13.168,-95.3717848 29.7955007 15.104,-95.3717719 29.7969804 16.516,-95.3717305 29.7982117 13.923,-95.3717254 29.8000778 14.385,-95.3719875 29.8013539 15.160,-95.3720575 29.8026785 15.544,-95.3721321 29.8040912 14.975,-95.3722074 29.8050998 15.688,-95.3722779 29.8060430 16.099,-95.3733818 29.8076750 15.197,-95.3741563 29.8103686 17.268,-95.3749458 29.8129927 19.857,-95.3763564 29.8144557 15.435)',
      ( 11.339,   4.536,   9.762,  12.448,  10.457,   9.418,  14.858,
        15.386,  13.168,  15.104,  16.516,  13.923,  14.385,  15.16 ,
@@ -48,13 +50,13 @@ bbox_wkt = 'POLYGON((941527.97 4225693.20,962596.48 4226349.75,963152.57 4209023
 bbox_z = (21.71, 13.21, 9.12, 16.40, 21.71)
 def gen_bbox():
     bbox_2d = GEOSGeometry(bbox_wkt, srid=32140)
-    bbox_3d = Polygon(tuple((x, y, z) for (x, y), z in zip(bbox_2d[0].coords, bbox_z)), srid=32140)    
+    bbox_3d = Polygon(tuple((x, y, z) for (x, y), z in zip(bbox_2d[0].coords, bbox_z)), srid=32140)
     return bbox_2d, bbox_3d
 
 class Geo3DTest(TestCase):
     """
     Only a subset of the PostGIS routines are 3D-enabled, and this TestCase
-    tries to test the features that can handle 3D and that are also 
+    tries to test the features that can handle 3D and that are also
     available within GeoDjango.  For more information, see the PostGIS docs
     on the routines that support 3D:
 
@@ -64,7 +66,7 @@ class Geo3DTest(TestCase):
     def test01_3d(self):
         "Test the creation of 3D models."
         # 3D models for the rest of the tests will be populated in here.
-        # For each 3D data set create model (and 2D version if necessary), 
+        # For each 3D data set create model (and 2D version if necessary),
         # retrieve, and assert geometry is in 3D and contains the expected
         # 3D values.
         for name, pnt_data in city_data:
@@ -106,7 +108,7 @@ class Geo3DTest(TestCase):
 
     def test01a_3d_layermapping(self):
         "Testing LayerMapping on 3D models."
-        from models import Point2D, Point3D
+        from .models import Point2D, Point3D
 
         point_mapping = {'point' : 'POINT'}
         mpoint_mapping = {'mpoint' : 'MULTIPOINT'}
@@ -120,7 +122,7 @@ class Geo3DTest(TestCase):
         # in the 3D model -- thus, a LayerMapError is raised.
         self.assertRaises(LayerMapError, LayerMapping,
                           Point3D, city_file, point_mapping, transform=False)
-        
+
         # 3D model should take 3D data just fine.
         lm = LayerMapping(Point3D, vrt_file, point_mapping, transform=False)
         lm.save()
@@ -190,7 +192,7 @@ class Geo3DTest(TestCase):
         "Testing GeoQuerySet.length() on 3D fields."
         # ST_Length_Spheroid Z-aware, and thus does not need to use
         # a separate function internally.
-        # `SELECT ST_Length_Spheroid(line, 'SPHEROID["GRS 1980",6378137,298.257222101]') 
+        # `SELECT ST_Length_Spheroid(line, 'SPHEROID["GRS 1980",6378137,298.257222101]')
         #    FROM geo3d_interstate[2d|3d];`
         tol = 3
         ref_length_2d = 4368.1721949481
@@ -214,7 +216,7 @@ class Geo3DTest(TestCase):
         self.assertAlmostEqual(ref_length_3d,
                                InterstateProj3D.objects.length().get(name='I-45').length.m,
                                tol)
-        
+
     def test06_scale(self):
         "Testing GeoQuerySet.scale() on Z values."
         # Mapping of City name to reference Z values.

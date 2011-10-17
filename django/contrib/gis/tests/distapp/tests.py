@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 from django.db import connection
 from django.db.models import Q
 from django.contrib.gis.geos import GEOSGeometry, LineString
@@ -5,8 +7,9 @@ from django.contrib.gis.measure import D # alias for Distance
 from django.contrib.gis.tests.utils import oracle, postgis, spatialite, no_oracle, no_spatialite
 from django.test import TestCase
 
-from models import (AustraliaCity, Interstate, SouthTexasInterstate,
+from .models import (AustraliaCity, Interstate, SouthTexasInterstate,
     SouthTexasCity, SouthTexasCityFt, CensusZipcode, SouthTexasZipcode)
+
 
 class DistanceTest(TestCase):
 

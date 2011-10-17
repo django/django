@@ -1,12 +1,15 @@
+from __future__ import absolute_import
+
 from datetime import date
-from django.test import TestCase
 
 from django.contrib.gis.geos import GEOSGeometry, Point, MultiPoint
 from django.contrib.gis.db.models import Collect, Count, Extent, F, Union
 from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.tests.utils import mysql, oracle, no_mysql, no_oracle, no_spatialite
+from django.test import TestCase
 
-from models import City, Location, DirectoryEntry, Parcel, Book, Author, Article
+from .models import City, Location, DirectoryEntry, Parcel, Book, Author, Article
+
 
 class RelatedGeoModelTest(TestCase):
 
