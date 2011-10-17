@@ -2,16 +2,19 @@
 Form classes
 """
 
+from __future__ import absolute_import
+
 import copy
+
 from django.core.exceptions import ValidationError
+from django.forms.fields import Field, FileField
+from django.forms.util import flatatt, ErrorDict, ErrorList
+from django.forms.widgets import Media, media_property, TextInput, Textarea
 from django.utils.datastructures import SortedDict
 from django.utils.html import conditional_escape
 from django.utils.encoding import StrAndUnicode, smart_unicode, force_unicode
 from django.utils.safestring import mark_safe
 
-from fields import Field, FileField
-from widgets import Media, media_property, TextInput, Textarea
-from util import flatatt, ErrorDict, ErrorList
 
 __all__ = ('BaseForm', 'Form')
 
