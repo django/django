@@ -133,7 +133,7 @@ and the :setting:`SECRET_KEY` setting.
     integrity of the data (that it is all there and correct), it cannot
     guarantee freshness i.e. that you are being sent back the last thing you
     sent to the client. This means that for some uses of session data, the
-    cookie backend might open you up to `replay attacks`_. Cookies will only
+    cookie backend might open you up to `replay attacks`_. Cookies will only be
     detected as 'stale' if they are older than your
     :setting:`SESSION_COOKIE_AGE`.
 
