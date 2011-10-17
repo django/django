@@ -269,7 +269,7 @@ class FixtureLoadingTests(TestCase):
         new_io = StringIO.StringIO()
         management.call_command('loaddata', 'invalid.json', verbosity=0, stderr=new_io, commit=False)
         output = new_io.getvalue().strip().split('\n')
-        self.assertRegexpMatches(output[-1], "IntegrityError: Could not load fixtures.Article\(pk=1\): .*$")
+        self.assertRegexpMatches(output[-1], "Error: Could not load fixtures.Article\(pk=1\): .*$")
 
     def test_loading_using(self):
         # Load db fixtures 1 and 2. These will load using the 'default' database identifier explicitly
