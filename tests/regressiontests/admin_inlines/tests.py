@@ -233,7 +233,9 @@ class TestInlinePermissions(TestCase):
         author = Author.objects.create(pk=1, name=u'The Author')
         book = author.books.create(name=u'The inline Book')
         self.author_change_url = '/admin/admin_inlines/author/%i/' % author.id
-        self.book_id = book.id
+        # Get the ID of the automatically created intermediate model for thw Author-Book m2m
+        author_book_auto_m2m_intermediate = Author.books.through.objects.get(author=author, book=book)
+        self.author_book_auto_m2m_intermediate_id = author_book_auto_m2m_intermediate.pk
 
         holder = Holder2.objects.create(dummy=13)
         inner2 = Inner2.objects.create(dummy=42, holder=holder)
@@ -311,7 +313,7 @@ class TestInlinePermissions(TestCase):
         self.assertContains(response, '<h2>Author-book relationships</h2>')
         self.assertContains(response, 'Add another Author-Book Relationship')
         self.assertContains(response, 'value="4" id="id_Author_books-TOTAL_FORMS"')
-        self.assertContains(response, '<input type="hidden" name="Author_books-0-id" value="%i"' % self.book_id)
+        self.assertContains(response, '<input type="hidden" name="Author_books-0-id" value="%i"' % self.author_book_auto_m2m_intermediate_id)
         self.assertContains(response, 'id="id_Author_books-0-DELETE"')
 
     def test_inline_change_fk_add_perm(self):
