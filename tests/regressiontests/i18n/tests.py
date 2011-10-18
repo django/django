@@ -22,11 +22,20 @@ from django.utils.translation import (ugettext, ugettext_lazy, activate,
     get_language_info, get_language, get_language_from_request)
 
 
-from .commands.tests import NoWrapExtractorTests, IgnoredExtractorTests, MessageCompilationTests, PoFileTests, BasicExtractorTests, JavascriptExtractorTests, CopyPluralFormsExtractorTests, SymlinkExtractorTests, ExtractorTests
+from .commands.tests import can_run_extraction_tests, can_run_compilation_tests
+if can_run_extraction_tests:
+    from .commands.extraction import (ExtractorTests, BasicExtractorTests,
+        JavascriptExtractorTests, IgnoredExtractorTests, SymlinkExtractorTests,
+        CopyPluralFormsExtractorTests, NoWrapExtractorTests)
+if can_run_compilation_tests:
+    from .commands.compilation import MessageCompilationTests, PoFileTests
 from .contenttypes.tests import ContentTypeTests
 from .forms import I18nForm, SelectDateForm, SelectDateWidget, CompanyForm
 from .models import Company, TestModel
-from .patterns.tests import URLRedirectWithoutTrailingSlashTests, URLTranslationTests, URLDisabledTests, URLTagTests, URLTestCaseBase, URLRedirectWithoutTrailingSlashSettingTests, URLNamespaceTests, URLPrefixTests, URLResponseTests, URLRedirectTests
+from .patterns.tests import (URLRedirectWithoutTrailingSlashTests,
+    URLTranslationTests, URLDisabledTests, URLTagTests, URLTestCaseBase,
+    URLRedirectWithoutTrailingSlashSettingTests, URLNamespaceTests,
+    URLPrefixTests, URLResponseTests, URLRedirectTests)
 from .test_warnings import DeprecationWarningTests
 
 
