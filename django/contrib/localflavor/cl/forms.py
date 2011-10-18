@@ -2,6 +2,9 @@
 Chile specific form helpers.
 """
 
+from __future__ import absolute_import
+
+from django.contrib.localflavor.cl.cl_regions import REGION_CHOICES
 from django.core.validators import EMPTY_VALUES
 from django.forms import ValidationError
 from django.forms.fields import RegexField, Select
@@ -15,7 +18,6 @@ class CLRegionSelect(Select):
     as its choices.
     """
     def __init__(self, attrs=None):
-        from cl_regions import REGION_CHOICES
         super(CLRegionSelect, self).__init__(attrs, choices=REGION_CHOICES)
 
 class CLRutField(RegexField):

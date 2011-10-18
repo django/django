@@ -2,11 +2,16 @@
 FI-specific Form helpers
 """
 
+from __future__ import absolute_import
+
 import re
+
+from django.contrib.localflavor.fi.fi_municipalities import MUNICIPALITY_CHOICES
 from django.core.validators import EMPTY_VALUES
 from django.forms import ValidationError
 from django.forms.fields import Field, RegexField, Select
 from django.utils.translation import ugettext_lazy as _
+
 
 class FIZipCodeField(RegexField):
     default_error_messages = {
@@ -21,7 +26,6 @@ class FIMunicipalitySelect(Select):
     A Select widget that uses a list of Finnish municipalities as its choices.
     """
     def __init__(self, attrs=None):
-        from fi_municipalities import MUNICIPALITY_CHOICES
         super(FIMunicipalitySelect, self).__init__(attrs, choices=MUNICIPALITY_CHOICES)
 
 class FISocialSecurityNumber(Field):

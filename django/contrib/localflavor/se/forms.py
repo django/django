@@ -2,13 +2,18 @@
 """
 Swedish specific Form helpers
 """
+from __future__ import absolute_import
+
 import re
+
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 from django.core.validators import EMPTY_VALUES
+from django.contrib.localflavor.se.se_counties import COUNTY_CHOICES
 from django.contrib.localflavor.se.utils import (id_number_checksum,
     validate_id_birthday, format_personal_id_number, valid_organisation,
     format_organisation_number)
+
 
 __all__ = ('SECountySelect', 'SEOrganisationNumberField',
     'SEPersonalIdentityNumberField', 'SEPostalCodeField')
@@ -26,7 +31,6 @@ class SECountySelect(forms.Select):
     """
 
     def __init__(self, attrs=None):
-        from se_counties import COUNTY_CHOICES
         super(SECountySelect, self).__init__(attrs=attrs,
                                              choices=COUNTY_CHOICES)
 
@@ -52,20 +56,20 @@ class SEOrganisationNumberField(forms.CharField):
 
     def clean(self, value):
         value = super(SEOrganisationNumberField, self).clean(value)
-        
+
         if value in EMPTY_VALUES:
             return u''
-        
+
         match = SWEDISH_ID_NUMBER.match(value)
         if not match:
             raise forms.ValidationError(self.error_messages['invalid'])
 
         gd = match.groupdict()
-        
-        # Compare the calculated value with the checksum 
+
+        # Compare the calculated value with the checksum
         if id_number_checksum(gd) != int(gd['checksum']):
             raise forms.ValidationError(self.error_messages['invalid'])
-        
+
         # First: check if this is a real organisation_number
         if valid_organisation(gd):
             return format_organisation_number(gd)
@@ -88,7 +92,7 @@ class SEPersonalIdentityNumberField(forms.CharField):
 
     A + indicates that the person is older than 100 years, which will be taken
     into consideration when the date is validated.
-    
+
     The checksum will be calculated and checked. The birth date is checked to
     be a valid date.
 
@@ -113,14 +117,14 @@ class SEPersonalIdentityNumberField(forms.CharField):
 
         if value in EMPTY_VALUES:
             return u''
- 
+
         match = SWEDISH_ID_NUMBER.match(value)
         if match is None:
             raise forms.ValidationError(self.error_messages['invalid'])
 
         gd = match.groupdict()
- 
-        # compare the calculated value with the checksum 
+
+        # compare the calculated value with the checksum
         if id_number_checksum(gd) != int(gd['checksum']):
             raise forms.ValidationError(self.error_messages['invalid'])
 
@@ -130,10 +134,10 @@ class SEPersonalIdentityNumberField(forms.CharField):
         except ValueError:
             raise forms.ValidationError(self.error_messages['invalid'])
 
-        # make sure that co-ordination numbers do not pass if not allowed 
+        # make sure that co-ordination numbers do not pass if not allowed
         if not self.coordination_number and int(gd['day']) > 60:
             raise forms.ValidationError(self.error_messages['coordination_number'])
-  
+
         return format_personal_id_number(birth_day, gd)
 
 
@@ -143,7 +147,7 @@ class SEPostalCodeField(forms.RegexField):
     Valid codes consist of five digits (XXXXX). The number can optionally be
     formatted with a space after the third digit (XXX XX).
 
-    The cleaned value will never contain the space. 
+    The cleaned value will never contain the space.
     """
 
     default_error_messages = {

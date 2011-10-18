@@ -2,12 +2,17 @@
 Swiss-specific Form helpers
 """
 
+from __future__ import absolute_import
+
+import re
+
+from django.contrib.localflavor.ch.ch_states import STATE_CHOICES
 from django.core.validators import EMPTY_VALUES
 from django.forms import ValidationError
 from django.forms.fields import Field, RegexField, Select
 from django.utils.encoding import smart_unicode
 from django.utils.translation import ugettext_lazy as _
-import re
+
 
 id_re = re.compile(r"^(?P<idnumber>\w{8})(?P<pos9>(\d{1}|<))(?P<checksum>\d{1})$")
 phone_digits_re = re.compile(r'^0([1-9]{1})\d{8}$')
@@ -47,7 +52,6 @@ class CHStateSelect(Select):
     A Select widget that uses a list of CH states as its choices.
     """
     def __init__(self, attrs=None):
-        from ch_states import STATE_CHOICES # relative import
         super(CHStateSelect, self).__init__(attrs, choices=STATE_CHOICES)
 
 class CHIdentityCardNumberField(Field):

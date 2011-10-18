@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 import datetime
 
 from django.core.validators import EMPTY_VALUES
@@ -5,7 +7,7 @@ from django.forms import ValidationError
 from django.forms.fields import RegexField, Select
 from django.utils.translation import ugettext_lazy as _
 
-from mk_choices import MK_MUNICIPALITIES
+from django.contrib.localflavor.mk.mk_choices import MK_MUNICIPALITIES
 
 
 class MKIdentityCardNumberField(RegexField):

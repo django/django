@@ -2,11 +2,16 @@
 Czech-specific form helpers
 """
 
+from __future__ import absolute_import
+
+import re
+
+from django.contrib.localflavor.cz.cz_regions import REGION_CHOICES
 from django.core.validators import EMPTY_VALUES
 from django.forms import ValidationError
 from django.forms.fields import Select, RegexField, Field
 from django.utils.translation import ugettext_lazy as _
-import re
+
 
 birth_number = re.compile(r'^(?P<birth>\d{6})/?(?P<id>\d{3,4})$')
 ic_number = re.compile(r'^(?P<number>\d{7})(?P<check>\d)$')
@@ -16,7 +21,6 @@ class CZRegionSelect(Select):
     A select widget widget with list of Czech regions as choices.
     """
     def __init__(self, attrs=None):
-        from cz_regions import REGION_CHOICES
         super(CZRegionSelect, self).__init__(attrs, choices=REGION_CHOICES)
 
 class CZPostalCodeField(RegexField):

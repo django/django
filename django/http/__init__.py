@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 import datetime
 import os
 import re
@@ -109,14 +111,14 @@ class CompatCookie(SimpleCookie):
         warnings.warn("CompatCookie is deprecated, use django.http.SimpleCookie instead.",
                       DeprecationWarning)
 
-from django.utils.datastructures import MultiValueDict, ImmutableList
-from django.utils.encoding import smart_str, iri_to_uri, force_unicode
-from django.utils.http import cookie_date
-from django.http.multipartparser import MultiPartParser
 from django.conf import settings
 from django.core import signing
 from django.core.files import uploadhandler
-from utils import *
+from django.http.multipartparser import MultiPartParser
+from django.http.utils import *
+from django.utils.datastructures import MultiValueDict, ImmutableList
+from django.utils.encoding import smart_str, iri_to_uri, force_unicode
+from django.utils.http import cookie_date
 
 RESERVED_CHARS="!*'();:@&=+$,/?%#[]"
 

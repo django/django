@@ -2,9 +2,13 @@
 """
 Romanian specific form helpers.
 """
+from __future__ import absolute_import
+
+from django.contrib.localflavor.ro.ro_counties import COUNTIES_CHOICES
 from django.core.validators import EMPTY_VALUES
 from django.forms import ValidationError, Field, RegexField, Select
 from django.utils.translation import ugettext_lazy as _
+
 
 class ROCIFField(RegexField):
     """
@@ -100,7 +104,6 @@ class ROCountyField(Field):
     }
 
     def clean(self, value):
-        from ro_counties import COUNTIES_CHOICES
         super(ROCountyField, self).clean(value)
         if value in EMPTY_VALUES:
             return u''
@@ -127,7 +130,6 @@ class ROCountySelect(Select):
     choices.
     """
     def __init__(self, attrs=None):
-        from ro_counties import COUNTIES_CHOICES
         super(ROCountySelect, self).__init__(attrs, choices=COUNTIES_CHOICES)
 
 class ROIBANField(RegexField):

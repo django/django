@@ -2,15 +2,19 @@
 Slovak-specific form helpers
 """
 
+from __future__ import absolute_import
+
+from django.contrib.localflavor.sk.sk_districts import DISTRICT_CHOICES
+from django.contrib.localflavor.sk.sk_regions import REGION_CHOICES
 from django.forms.fields import Select, RegexField
 from django.utils.translation import ugettext_lazy as _
+
 
 class SKRegionSelect(Select):
     """
     A select widget widget with list of Slovak regions as choices.
     """
     def __init__(self, attrs=None):
-        from sk_regions import REGION_CHOICES
         super(SKRegionSelect, self).__init__(attrs, choices=REGION_CHOICES)
 
 class SKDistrictSelect(Select):
@@ -18,7 +22,6 @@ class SKDistrictSelect(Select):
     A select widget with list of Slovak districts as choices.
     """
     def __init__(self, attrs=None):
-        from sk_districts import DISTRICT_CHOICES
         super(SKDistrictSelect, self).__init__(attrs, choices=DISTRICT_CHOICES)
 
 class SKPostalCodeField(RegexField):

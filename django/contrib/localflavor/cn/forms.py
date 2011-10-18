@@ -3,8 +3,11 @@
 """
 Chinese-specific form helpers
 """
+from __future__ import absolute_import
+
 import re
 
+from django.contrib.localflavor.cn.cn_provinces import CN_PROVINCE_CHOICES
 from django.forms import ValidationError
 from django.forms.fields import CharField, RegexField, Select
 from django.utils.translation import ugettext_lazy as _
@@ -67,7 +70,6 @@ class CNProvinceSelect(Select):
     A select widget with list of Chinese provinces as choices.
     """
     def __init__(self, attrs=None):
-        from cn_provinces import CN_PROVINCE_CHOICES
         super(CNProvinceSelect, self).__init__(
             attrs, choices=CN_PROVINCE_CHOICES,
         )

@@ -2,12 +2,17 @@
 TR-specific Form helpers
 """
 
+from __future__ import absolute_import
+
+import re
+
+from django.contrib.localflavor.tr.tr_provinces import PROVINCE_CHOICES
 from django.core.validators import EMPTY_VALUES
 from django.forms import ValidationError
 from django.forms.fields import Field, RegexField, Select, CharField
 from django.utils.encoding import smart_unicode
 from django.utils.translation import ugettext_lazy as _
-import re
+
 
 phone_digits_re = re.compile(r'^(\+90|0)? ?(([1-9]\d{2})|\([1-9]\d{2}\)) ?([2-9]\d{2} ?\d{2} ?\d{2})$')
 
@@ -87,5 +92,4 @@ class TRProvinceSelect(Select):
     A Select widget that uses a list of provinces in Turkey as its choices.
     """
     def __init__(self, attrs=None):
-        from tr_provinces import PROVINCE_CHOICES
         super(TRProvinceSelect, self).__init__(attrs, choices=PROVINCE_CHOICES)

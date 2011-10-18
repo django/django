@@ -2,19 +2,23 @@
 Polish-specific form helpers
 """
 
+from __future__ import absolute_import
+
 import re
 
+from django.contrib.localflavor.pl.pl_administrativeunits import ADMINISTRATIVE_UNIT_CHOICES
+from django.contrib.localflavor.pl.pl_voivodeships import VOIVODESHIP_CHOICES
+from django.core.validators import EMPTY_VALUES
 from django.forms import ValidationError
 from django.forms.fields import Select, RegexField
 from django.utils.translation import ugettext_lazy as _
-from django.core.validators import EMPTY_VALUES
+
 
 class PLProvinceSelect(Select):
     """
     A select widget with list of Polish administrative provinces as choices.
     """
     def __init__(self, attrs=None):
-        from pl_voivodeships import VOIVODESHIP_CHOICES
         super(PLProvinceSelect, self).__init__(attrs, choices=VOIVODESHIP_CHOICES)
 
 class PLCountySelect(Select):
@@ -22,7 +26,6 @@ class PLCountySelect(Select):
     A select widget with list of Polish administrative units as choices.
     """
     def __init__(self, attrs=None):
-        from pl_administrativeunits import ADMINISTRATIVE_UNIT_CHOICES
         super(PLCountySelect, self).__init__(attrs, choices=ADMINISTRATIVE_UNIT_CHOICES)
 
 class PLPESELField(RegexField):

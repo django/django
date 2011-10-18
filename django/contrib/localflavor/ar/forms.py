@@ -3,10 +3,14 @@
 AR-specific Form helpers.
 """
 
-from django.forms import ValidationError
+from __future__ import absolute_import
+
+from django.contrib.localflavor.ar.ar_provinces import PROVINCE_CHOICES
 from django.core.validators import EMPTY_VALUES
+from django.forms import ValidationError
 from django.forms.fields import RegexField, CharField, Select
 from django.utils.translation import ugettext_lazy as _
+
 
 class ARProvinceSelect(Select):
     """
@@ -14,7 +18,6 @@ class ARProvinceSelect(Select):
     as its choices.
     """
     def __init__(self, attrs=None):
-        from ar_provinces import PROVINCE_CHOICES
         super(ARProvinceSelect, self).__init__(attrs, choices=PROVINCE_CHOICES)
 
 class ARPostalCodeField(RegexField):

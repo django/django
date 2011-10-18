@@ -1,13 +1,19 @@
 """
 Belgium-specific Form helpers
 """
+
+from __future__ import absolute_import
+
+from django.contrib.localflavor.be.be_provinces import PROVINCE_CHOICES
+from django.contrib.localflavor.be.be_regions import REGION_CHOICES
 from django.forms.fields import RegexField, Select
 from django.utils.translation import ugettext_lazy as _
+
 
 class BEPostalCodeField(RegexField):
     """
     A form field that validates its input as a belgium postal code.
-    
+
     Belgium postal code is a 4 digits string. The first digit indicates
     the province (except for the 3ddd numbers that are shared by the
     eastern part of Flemish Brabant and Limburg and the and 1ddd that
@@ -28,14 +34,14 @@ class BEPhoneNumberField(RegexField):
     A form field that validates its input as a belgium phone number.
 
     Landlines have a seven-digit subscriber number and a one-digit area code,
-    while smaller cities have a six-digit subscriber number and a two-digit 
-    area code. Cell phones have a six-digit subscriber number and a two-digit 
+    while smaller cities have a six-digit subscriber number and a two-digit
+    area code. Cell phones have a six-digit subscriber number and a two-digit
     area code preceeded by the number 4.
-    0d ddd dd dd, 0d/ddd.dd.dd, 0d.ddd.dd.dd, 
+    0d ddd dd dd, 0d/ddd.dd.dd, 0d.ddd.dd.dd,
     0dddddddd - dialling a bigger city
-    0dd dd dd dd, 0dd/dd.dd.dd, 0dd.dd.dd.dd, 
+    0dd dd dd dd, 0dd/dd.dd.dd, 0dd.dd.dd.dd,
     0dddddddd - dialling a smaller city
-    04dd ddd dd dd, 04dd/ddd.dd.dd, 
+    04dd ddd dd dd, 04dd/ddd.dd.dd,
     04dd.ddd.dd.dd, 04ddddddddd - dialling a mobile number
     """
     default_error_messages = {
@@ -55,7 +61,6 @@ class BERegionSelect(Select):
     A Select widget that uses a list of belgium regions as its choices.
     """
     def __init__(self, attrs=None):
-        from be_regions import REGION_CHOICES
         super(BERegionSelect, self).__init__(attrs, choices=REGION_CHOICES)
 
 class BEProvinceSelect(Select):
@@ -63,5 +68,4 @@ class BEProvinceSelect(Select):
     A Select widget that uses a list of belgium provinces as its choices.
     """
     def __init__(self, attrs=None):
-        from be_provinces import PROVINCE_CHOICES
         super(BEProvinceSelect, self).__init__(attrs, choices=PROVINCE_CHOICES)

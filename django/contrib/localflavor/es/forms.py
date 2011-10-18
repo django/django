@@ -3,11 +3,17 @@
 Spanish-specific Form helpers
 """
 
+from __future__ import absolute_import
+
+import re
+
+from django.contrib.localflavor.es.es_provinces import PROVINCE_CHOICES
+from django.contrib.localflavor.es.es_regions import REGION_CHOICES
 from django.core.validators import EMPTY_VALUES
 from django.forms import ValidationError
 from django.forms.fields import RegexField, Select
 from django.utils.translation import ugettext_lazy as _
-import re
+
 
 class ESPostalCodeField(RegexField):
     """
@@ -166,7 +172,6 @@ class ESRegionSelect(Select):
     A Select widget that uses a list of spanish regions as its choices.
     """
     def __init__(self, attrs=None):
-        from es_regions import REGION_CHOICES
         super(ESRegionSelect, self).__init__(attrs, choices=REGION_CHOICES)
 
 class ESProvinceSelect(Select):
@@ -174,7 +179,6 @@ class ESProvinceSelect(Select):
     A Select widget that uses a list of spanish provinces as its choices.
     """
     def __init__(self, attrs=None):
-        from es_provinces import PROVINCE_CHOICES
         super(ESProvinceSelect, self).__init__(attrs, choices=PROVINCE_CHOICES)
 
 

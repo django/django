@@ -2,13 +2,19 @@
 """
 HR-specific Form helpers
 """
+from __future__ import absolute_import
+
 import re
 
-from django.forms.fields import Field, Select, RegexField
+from django.contrib.localflavor.hr.hr_choices import (
+    HR_LICENSE_PLATE_PREFIX_CHOICES, HR_COUNTY_CHOICES,
+    HR_PHONE_NUMBER_PREFIX_CHOICES)
 from django.core.validators import EMPTY_VALUES
 from django.forms import ValidationError
-from django.utils.translation import ugettext_lazy as _
+from django.forms.fields import Field, Select, RegexField
 from django.utils.encoding import smart_unicode
+from django.utils.translation import ugettext_lazy as _
+
 
 jmbg_re = re.compile(r'^(?P<dd>\d{2})(?P<mm>\d{2})(?P<yyy>\d{3})' + \
             r'(?P<rr>\d{2})(?P<bbb>\d{3})(?P<k>\d{1})$')
@@ -26,7 +32,6 @@ class HRCountySelect(Select):
     """
 
     def __init__(self, attrs=None):
-        from hr_choices import HR_COUNTY_CHOICES
         super(HRCountySelect, self).__init__(attrs, choices=HR_COUNTY_CHOICES)
 
 
@@ -37,7 +42,6 @@ class HRLicensePlatePrefixSelect(Select):
     """
 
     def __init__(self, attrs=None):
-        from hr_choices import HR_LICENSE_PLATE_PREFIX_CHOICES
         super(HRLicensePlatePrefixSelect, self).__init__(attrs,
             choices=HR_LICENSE_PLATE_PREFIX_CHOICES)
 
@@ -49,7 +53,6 @@ class HRPhoneNumberPrefixSelect(Select):
     """
 
     def __init__(self, attrs=None):
-        from hr_choices import HR_PHONE_NUMBER_PREFIX_CHOICES
         super(HRPhoneNumberPrefixSelect, self).__init__(attrs,
             choices=HR_PHONE_NUMBER_PREFIX_CHOICES)
 
@@ -163,7 +166,6 @@ class HRLicensePlateField(Field):
             raise ValidationError(self.error_messages['invalid'])
 
         # Make sure the prefix is in the list of known codes.
-        from hr_choices import HR_LICENSE_PLATE_PREFIX_CHOICES
         prefix = matches.group('prefix')
         if prefix not in [choice[0] for choice in HR_LICENSE_PLATE_PREFIX_CHOICES]:
             raise ValidationError(self.error_messages['area'])
@@ -230,7 +232,6 @@ class HRPhoneNumberField(Field):
             raise ValidationError(self.error_messages['invalid'])
 
         # Make sure the prefix is in the list of known codes.
-        from hr_choices import HR_PHONE_NUMBER_PREFIX_CHOICES
         prefix = matches.group('prefix')
         number = matches.group('number')
         if prefix[0] == '1':

@@ -2,13 +2,17 @@
 NL-specific Form helpers
 """
 
+from __future__ import absolute_import
+
 import re
 
+from django.contrib.localflavor.nl.nl_provinces import PROVINCE_CHOICES
 from django.core.validators import EMPTY_VALUES
 from django.forms import ValidationError
 from django.forms.fields import Field, Select
-from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_unicode
+from django.utils.translation import ugettext_lazy as _
+
 
 pc_re = re.compile('^\d{4}[A-Z]{2}$')
 sofi_re = re.compile('^\d{9}$')
@@ -42,7 +46,6 @@ class NLProvinceSelect(Select):
     choices.
     """
     def __init__(self, attrs=None):
-        from nl_provinces import PROVINCE_CHOICES
         super(NLProvinceSelect, self).__init__(attrs, choices=PROVINCE_CHOICES)
 
 class NLPhoneNumberField(Field):

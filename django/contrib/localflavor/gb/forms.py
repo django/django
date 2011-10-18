@@ -2,11 +2,15 @@
 GB-specific Form helpers
 """
 
+from __future__ import absolute_import
+
 import re
 
+from django.contrib.localflavor.gb.gb_regions import GB_NATIONS_CHOICES, GB_REGION_CHOICES
 from django.forms.fields import CharField, Select
 from django.forms import ValidationError
 from django.utils.translation import ugettext_lazy as _
+
 
 class GBPostcodeField(CharField):
     """
@@ -41,7 +45,6 @@ class GBCountySelect(Select):
     A Select widget that uses a list of UK Counties/Regions as its choices.
     """
     def __init__(self, attrs=None):
-        from gb_regions import GB_REGION_CHOICES
         super(GBCountySelect, self).__init__(attrs, choices=GB_REGION_CHOICES)
 
 class GBNationSelect(Select):
@@ -49,5 +52,4 @@ class GBNationSelect(Select):
     A Select widget that uses a list of UK Nations as its choices.
     """
     def __init__(self, attrs=None):
-        from gb_regions import GB_NATIONS_CHOICES
         super(GBNationSelect, self).__init__(attrs, choices=GB_NATIONS_CHOICES)

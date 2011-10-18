@@ -2,12 +2,16 @@
 Iceland specific form helpers.
 """
 
+from __future__ import absolute_import
+
+from django.contrib.localflavor.is_.is_postalcodes import IS_POSTALCODES
 from django.core.validators import EMPTY_VALUES
 from django.forms import ValidationError
 from django.forms.fields import RegexField
 from django.forms.widgets import Select
-from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_unicode
+from django.utils.translation import ugettext_lazy as _
+
 
 class ISIdNumberField(RegexField):
     """
@@ -78,6 +82,5 @@ class ISPostalCodeSelect(Select):
     A Select widget that uses a list of Icelandic postal codes as its choices.
     """
     def __init__(self, attrs=None):
-        from is_postalcodes import IS_POSTALCODES
         super(ISPostalCodeSelect, self).__init__(attrs, choices=IS_POSTALCODES)
 

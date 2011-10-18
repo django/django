@@ -2,12 +2,15 @@
 Slovenian specific form helpers.
 """
 
+from __future__ import absolute_import
+
 import datetime
 import re
 
-from django.forms.fields import CharField, Select, ChoiceField
+from django.contrib.localflavor.si.si_postalcodes import SI_POSTALCODES_CHOICES
 from django.core.validators import EMPTY_VALUES
 from django.forms import ValidationError
+from django.forms.fields import CharField, Select, ChoiceField
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -116,7 +119,6 @@ class SIPostalCodeField(ChoiceField):
     """
 
     def __init__(self, *args, **kwargs):
-        from si_postalcodes import SI_POSTALCODES_CHOICES
         kwargs.setdefault('choices', SI_POSTALCODES_CHOICES)
         super(SIPostalCodeField, self).__init__(*args, **kwargs)
 
@@ -125,7 +127,6 @@ class SIPostalCodeSelect(Select):
     """A Select widget that uses Slovenian postal codes as its choices.
     """
     def __init__(self, attrs=None):
-        from si_postalcodes import SI_POSTALCODES_CHOICES
         super(SIPostalCodeSelect, self).__init__(attrs,
             choices=SI_POSTALCODES_CHOICES)
 

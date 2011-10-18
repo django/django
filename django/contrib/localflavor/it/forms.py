@@ -2,13 +2,19 @@
 IT-specific Form helpers
 """
 
+from __future__ import absolute_import
+
+import re
+
+from django.contrib.localflavor.it.it_province import PROVINCE_CHOICES
+from django.contrib.localflavor.it.it_region import REGION_CHOICES
+from django.contrib.localflavor.it.util import ssn_check_digit, vat_number_check_digit
 from django.core.validators import EMPTY_VALUES
 from django.forms import ValidationError
 from django.forms.fields import Field, RegexField, Select
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_unicode
-from django.contrib.localflavor.it.util import ssn_check_digit, vat_number_check_digit
-import re
+
 
 class ITZipCodeField(RegexField):
     default_error_messages = {
@@ -23,7 +29,6 @@ class ITRegionSelect(Select):
     A Select widget that uses a list of IT regions as its choices.
     """
     def __init__(self, attrs=None):
-        from it_region import REGION_CHOICES
         super(ITRegionSelect, self).__init__(attrs, choices=REGION_CHOICES)
 
 class ITProvinceSelect(Select):
@@ -31,7 +36,6 @@ class ITProvinceSelect(Select):
     A Select widget that uses a list of IT provinces as its choices.
     """
     def __init__(self, attrs=None):
-        from it_province import PROVINCE_CHOICES
         super(ITProvinceSelect, self).__init__(attrs, choices=PROVINCE_CHOICES)
 
 class ITSocialSecurityNumberField(RegexField):

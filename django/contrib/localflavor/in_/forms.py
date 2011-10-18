@@ -1,13 +1,18 @@
 """
 India-specific Form helpers.
 """
+
+from __future__ import absolute_import
+
 import re
 
+from django.contrib.localflavor.in_.in_states import STATES_NORMALIZED, STATE_CHOICES
 from django.core.validators import EMPTY_VALUES
 from django.forms import ValidationError
 from django.forms.fields import Field, RegexField, CharField, Select
 from django.utils.encoding import smart_unicode
 from django.utils.translation import ugettext_lazy as _
+
 
 phone_digits_re = re.compile(r"""
 (
@@ -60,7 +65,6 @@ class INStateField(Field):
     }
 
     def clean(self, value):
-        from in_states import STATES_NORMALIZED
         super(INStateField, self).clean(value)
         if value in EMPTY_VALUES:
             return u''
@@ -82,7 +86,6 @@ class INStateSelect(Select):
     choices.
     """
     def __init__(self, attrs=None):
-        from in_states import STATE_CHOICES
         super(INStateSelect, self).__init__(attrs, choices=STATE_CHOICES)
 
 

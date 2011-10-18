@@ -1,13 +1,18 @@
 """
 Australian-specific Form helpers
 """
+
+from __future__ import absolute_import
+
 import re
 
+from django.contrib.localflavor.au.au_states import STATE_CHOICES
 from django.core.validators import EMPTY_VALUES
 from django.forms import ValidationError
 from django.forms.fields import Field, RegexField, Select
 from django.utils.encoding import smart_unicode
 from django.utils.translation import ugettext_lazy as _
+
 
 PHONE_DIGITS_RE = re.compile(r'^(\d{10})$')
 
@@ -52,5 +57,4 @@ class AUStateSelect(Select):
     choices.
     """
     def __init__(self, attrs=None):
-        from au_states import STATE_CHOICES
         super(AUStateSelect, self).__init__(attrs, choices=STATE_CHOICES)
