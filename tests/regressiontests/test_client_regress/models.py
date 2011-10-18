@@ -994,3 +994,23 @@ class RequestFactoryStateTest(TestCase):
     def test_request_after_client_2(self):
         # This test is executed after the previous one
         self.common_test_that_should_always_pass()
+
+
+class RequestFactoryEnvironmentTests(TestCase):
+    """
+    Regression tests for #8551 and #17067: ensure that environment variables
+    are set correctly in RequestFactory.
+    """
+
+    def setUp(self):
+        self.factory = RequestFactory()
+
+    def test_should_set_correct_env_variables(self):
+        request = self.factory.get('/path/')
+
+        self.assertEqual(request.META.get('REMOTE_ADDR'), '127.0.0.1')
+        self.assertEqual(request.META.get('SERVER_NAME'), 'testserver')
+        self.assertEqual(request.META.get('SERVER_PORT'), '80')
+        self.assertEqual(request.META.get('SERVER_PROTOCOL'), 'HTTP/1.1')
+        self.assertEqual(request.META.get('SCRIPT_NAME') +
+                         request.META.get('PATH_INFO'), '/path/')
