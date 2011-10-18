@@ -140,7 +140,7 @@ class MediaDefiningClass(type):
 class Widget(object):
     __metaclass__ = MediaDefiningClass
     is_hidden = False          # Determines whether this corresponds to an <input type="hidden">.
-    needs_multipart_form = False # Determines does this widget need multipart-encrypted form
+    needs_multipart_form = False # Determines does this widget need multipart form
     is_localized = False
     is_required = False
 

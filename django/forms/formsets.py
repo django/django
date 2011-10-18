@@ -325,7 +325,7 @@ class BaseFormSet(StrAndUnicode):
 
     def is_multipart(self):
         """
-        Returns True if the formset needs to be multipart-encrypted, i.e. it
+        Returns True if the formset needs to be multipart, i.e. it
         has FileInput. Otherwise, False.
         """
         return self.forms and self.forms[0].is_multipart()

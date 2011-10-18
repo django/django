@@ -358,7 +358,7 @@ class BaseForm(StrAndUnicode):
 
     def is_multipart(self):
         """
-        Returns True if the form needs to be multipart-encrypted, i.e. it has
+        Returns True if the form needs to be multipart-encoded, i.e. it has
         FileInput. Otherwise, False.
         """
         for field in self.fields.values():

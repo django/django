@@ -220,7 +220,7 @@ class User(models.Model):
     def check_password(self, raw_password):
         """
         Returns a boolean of whether the raw_password was correct. Handles
-        encryption formats behind the scenes.
+        hashing formats behind the scenes.
         """
         # Backwards-compatibility check. Older passwords won't include the
         # algorithm or salt.

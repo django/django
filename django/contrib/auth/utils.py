@@ -41,7 +41,7 @@ def get_random_string(length=12, allowed_chars='abcdefghijklmnopqrstuvwxyzABCDEF
 def check_password(raw_password, enc_password):
     """
     Returns a boolean of whether the raw_password was correct. Handles
-    encryption formats behind the scenes.
+    hashing formats behind the scenes.
     """
     parts = enc_password.split('$')
     if len(parts) != 3:
