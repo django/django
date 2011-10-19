@@ -1,8 +1,10 @@
 from django.core.files.uploadedfile import UploadedFile
-from django.utils.functional import lazy_property
+from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import smart_str
+from django.utils.functional import lazy_property
 
 from django.contrib.formtools.wizard.storage.exceptions import NoFileStorageConfigured
+
 
 class BaseStorage(object):
     step_key = 'step'
@@ -43,9 +45,20 @@ class BaseStorage(object):
     extra_data = lazy_property(_get_extra_data, _set_extra_data)
 
     def get_step_data(self, step):
-        return self.data[self.step_data_key].get(step, None)
+        # When reading the serialized data, upconvert it to a MultiValueDict,
+        # some serializers (json) don't preserve the type of the object.
+        values = self.data[self.step_data_key].get(step, None)
+        if values is not None:
+            values = MultiValueDict(values)
+        return values
 
     def set_step_data(self, step, cleaned_data):
+        # If the value is a MultiValueDict, convert it to a regular dict of the
+        # underlying contents.  Some serializers call the public API on it (as
+        # opposed to the underlying dict methods), in which case the content
+        # can be truncated (__getitem__ returns only the first item).
+        if isinstance(cleaned_data, MultiValueDict):
+            cleaned_data = dict(cleaned_data.lists())
         self.data[self.step_data_key][step] = cleaned_data
 
     @property
