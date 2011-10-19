@@ -9,6 +9,7 @@ from threading import local
 
 from django.conf import settings
 from django.template import Template, Context
+from django.template.base import TemplateSyntaxError
 from django.test import TestCase, RequestFactory
 from django.test.utils import override_settings
 from django.utils import translation
@@ -95,6 +96,126 @@ class TranslationTests(TestCase):
                 self.assertEqual(pgettext("month name", "May"), u"Mai")
                 self.assertEqual(pgettext("verb", "May"), u"Kann")
                 self.assertEqual(npgettext("search", "%d result", "%d results", 4) % 4, u"4 Resultate")
+
+    def test_template_tags_pgettext(self):
+        """
+        Ensure that message contexts are taken into account the {% trans %} and
+        {% blocktrans %} template tags.
+        Refs #14806.
+        """
+        # Reset translation catalog to include other/locale/de
+        extended_locale_paths = settings.LOCALE_PATHS + (
+            os.path.join(here, 'other', 'locale'),
+        )
+        with self.settings(LOCALE_PATHS=extended_locale_paths):
+            from django.utils.translation import trans_real
+            trans_real._active = local()
+            trans_real._translations = {}
+            with translation.override('de'):
+
+                # {% trans %} -----------------------------------
+
+                # Inexisting context...
+                t = Template('{% load i18n %}{% trans "May" context "unexisting" %}')
+                rendered = t.render(Context())
+                self.assertEqual(rendered, 'May')
+
+                # Existing context...
+                # Using a literal
+                t = Template('{% load i18n %}{% trans "May" context "month name" %}')
+                rendered = t.render(Context())
+                self.assertEqual(rendered, 'Mai')
+                t = Template('{% load i18n %}{% trans "May" context "verb" %}')
+                rendered = t.render(Context())
+                self.assertEqual(rendered, 'Kann')
+
+                # Using a variable
+                t = Template('{% load i18n %}{% trans "May" context message_context %}')
+                rendered = t.render(Context({'message_context': 'month name'}))
+                self.assertEqual(rendered, 'Mai')
+                t = Template('{% load i18n %}{% trans "May" context message_context %}')
+                rendered = t.render(Context({'message_context': 'verb'}))
+                self.assertEqual(rendered, 'Kann')
+
+                # Using a filter
+                t = Template('{% load i18n %}{% trans "May" context message_context|lower %}')
+                rendered = t.render(Context({'message_context': 'MONTH NAME'}))
+                self.assertEqual(rendered, 'Mai')
+                t = Template('{% load i18n %}{% trans "May" context message_context|lower %}')
+                rendered = t.render(Context({'message_context': 'VERB'}))
+                self.assertEqual(rendered, 'Kann')
+
+                # Using 'as'
+                t = Template('{% load i18n %}{% trans "May" context "month name" as var %}Value: {{ var }}')
+                rendered = t.render(Context())
+                self.assertEqual(rendered, 'Value: Mai')
+                t = Template('{% load i18n %}{% trans "May" as var context "verb" %}Value: {{ var }}')
+                rendered = t.render(Context())
+                self.assertEqual(rendered, 'Value: Kann')
+
+                # Mis-uses
+                self.assertRaises(TemplateSyntaxError, Template, '{% load i18n %}{% trans "May" context as var %}{{ var }}')
+                self.assertRaises(TemplateSyntaxError, Template, '{% load i18n %}{% trans "May" as var context %}{{ var }}')
+
+                # {% blocktrans %} ------------------------------
+
+                # Inexisting context...
+                t = Template('{% load i18n %}{% blocktrans context "unexisting" %}May{% endblocktrans %}')
+                rendered = t.render(Context())
+                self.assertEqual(rendered, 'May')
+
+                # Existing context...
+                # Using a literal
+                t = Template('{% load i18n %}{% blocktrans context "month name" %}May{% endblocktrans %}')
+                rendered = t.render(Context())
+                self.assertEqual(rendered, 'Mai')
+                t = Template('{% load i18n %}{% blocktrans context "verb" %}May{% endblocktrans %}')
+                rendered = t.render(Context())
+                self.assertEqual(rendered, 'Kann')
+
+                # Using a variable
+                t = Template('{% load i18n %}{% blocktrans context message_context %}May{% endblocktrans %}')
+                rendered = t.render(Context({'message_context': 'month name'}))
+                self.assertEqual(rendered, 'Mai')
+                t = Template('{% load i18n %}{% blocktrans context message_context %}May{% endblocktrans %}')
+                rendered = t.render(Context({'message_context': 'verb'}))
+                self.assertEqual(rendered, 'Kann')
+
+                # Using a filter
+                t = Template('{% load i18n %}{% blocktrans context message_context|lower %}May{% endblocktrans %}')
+                rendered = t.render(Context({'message_context': 'MONTH NAME'}))
+                self.assertEqual(rendered, 'Mai')
+                t = Template('{% load i18n %}{% blocktrans context message_context|lower %}May{% endblocktrans %}')
+                rendered = t.render(Context({'message_context': 'VERB'}))
+                self.assertEqual(rendered, 'Kann')
+
+                # Using 'count'
+                t = Template('{% load i18n %}{% blocktrans count number=1 context "super search" %}{{ number }} super result{% plural %}{{ number }} super results{% endblocktrans %}')
+                rendered = t.render(Context())
+                self.assertEqual(rendered, '1 Super-Ergebnis')
+                t = Template('{% load i18n %}{% blocktrans count number=2 context "super search" %}{{ number }} super result{% plural %}{{ number }} super results{% endblocktrans %}')
+                rendered = t.render(Context())
+                self.assertEqual(rendered, '2 Super-Ergebnisse')
+                t = Template('{% load i18n %}{% blocktrans context "other super search" count number=1 %}{{ number }} super result{% plural %}{{ number }} super results{% endblocktrans %}')
+                rendered = t.render(Context())
+                self.assertEqual(rendered, '1 anderen Super-Ergebnis')
+                t = Template('{% load i18n %}{% blocktrans context "other super search" count number=2 %}{{ number }} super result{% plural %}{{ number }} super results{% endblocktrans %}')
+                rendered = t.render(Context())
+                self.assertEqual(rendered, '2 andere Super-Ergebnisse')
+
+                # Using 'with'
+                t = Template('{% load i18n %}{% blocktrans with num_comments=5 context "comment count" %}There are {{ num_comments }} comments{% endblocktrans %}')
+                rendered = t.render(Context())
+                self.assertEqual(rendered, 'Es gibt 5 Kommentare')
+                t = Template('{% load i18n %}{% blocktrans with num_comments=5 context "other comment count" %}There are {{ num_comments }} comments{% endblocktrans %}')
+                rendered = t.render(Context())
+                self.assertEqual(rendered, 'Andere: Es gibt 5 Kommentare')
+
+                # Mis-uses
+                self.assertRaises(TemplateSyntaxError, Template, '{% load i18n %}{% blocktrans context with month="May" %}{{ month }}{% endblocktrans %}')
+                self.assertRaises(TemplateSyntaxError, Template, '{% load i18n %}{% blocktrans context %}{% endblocktrans %}')
+                self.assertRaises(TemplateSyntaxError, Template, '{% load i18n %}{% blocktrans count number=2 context %}{{ number }} super result{% plural %}{{ number }} super results{% endblocktrans %}')
+
 
     def test_string_concat(self):
         """

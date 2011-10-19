@@ -191,6 +191,14 @@ Additionally, it's now possible to define translatable URL patterns using
 :ref:`url-internationalization` for more information about the language prefix
 and how to internationalize URL patterns.
 
+Contextual translation support for ``{% trans %}`` and ``{% blocktrans %}``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django 1.3 introduced :ref:`contextual translation<contextual-markers>` support
+in Python files via the ``pgettext`` function. This is now also supported by
+the :ttag:`trans` and :ttag:`blocktrans` template tags using the new
+``context`` keyword.
+
 Customizable ``SingleObjectMixin`` URLConf kwargs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

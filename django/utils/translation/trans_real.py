@@ -433,11 +433,13 @@ def blankout(src, char):
     """
     return dot_re.sub(char, src)
 
-inline_re = re.compile(r"""^\s*trans\s+((?:".*?")|(?:'.*?'))\s*""")
-block_re = re.compile(r"""^\s*blocktrans(?:\s+|$)""")
+context_re = re.compile(r"""^\s+.*context\s+((?:"[^"]*?")|(?:'[^']*?'))\s*""")
+inline_re = re.compile(r"""^\s*trans\s+((?:"[^"]*?")|(?:'[^']*?'))(\s+.*context\s+(?:"[^"]*?")|(?:'[^']*?'))?\s*""")
+block_re = re.compile(r"""^\s*blocktrans(\s+.*context\s+(?:"[^"]*?")|(?:'[^']*?'))?(?:\s+|$)""")
 endblock_re = re.compile(r"""^\s*endblocktrans$""")
 plural_re = re.compile(r"""^\s*plural$""")
 constant_re = re.compile(r"""_\(((?:".*?")|(?:'.*?'))\)""")
+
 
 def templatize(src, origin=None):
     """
@@ -448,6 +450,7 @@ def templatize(src, origin=None):
     from django.template import (Lexer, TOKEN_TEXT, TOKEN_VAR, TOKEN_BLOCK,
             TOKEN_COMMENT, TRANSLATOR_COMMENT_MARK)
     out = StringIO()
+    message_context = None
     intrans = False
     inplural = False
     singular = []
@@ -477,15 +480,22 @@ def templatize(src, origin=None):
                 pluralmatch = plural_re.match(t.contents)
                 if endbmatch:
                     if inplural:
-                        out.write(' ngettext(%r,%r,count) ' % (''.join(singular), ''.join(plural)))
+                        if message_context:
+                            out.write(' npgettext(%r, %r, %r,count) ' % (message_context, ''.join(singular), ''.join(plural)))
+                        else:
+                            out.write(' ngettext(%r, %r, count) ' % (''.join(singular), ''.join(plural)))
                         for part in singular:
                             out.write(blankout(part, 'S'))
                         for part in plural:
                             out.write(blankout(part, 'P'))
                     else:
-                        out.write(' gettext(%r) ' % ''.join(singular))
+                        if message_context:
+                            out.write(' pgettext(%r, %r) ' % (message_context, ''.join(singular)))
+                        else:
+                            out.write(' gettext(%r) ' % ''.join(singular))
                         for part in singular:
                             out.write(blankout(part, 'S'))
+                    message_context = None
                     intrans = False
                     inplural = False
                     singular = []
@@ -515,12 +525,33 @@ def templatize(src, origin=None):
                 cmatches = constant_re.findall(t.contents)
                 if imatch:
                     g = imatch.group(1)
-                    if g[0] == '"': g = g.strip('"')
-                    elif g[0] == "'": g = g.strip("'")
-                    out.write(' gettext(%r) ' % g)
+                    if g[0] == '"':
+                        g = g.strip('"')
+                    elif g[0] == "'":
+                        g = g.strip("'")
+                    if imatch.group(2):
+                        # A context is provided
+                        context_match = context_re.match(imatch.group(2))
+                        message_context = context_match.group(1)
+                        if message_context[0] == '"':
+                            message_context = message_context.strip('"')
+                        elif message_context[0] == "'":
+                            message_context = message_context.strip("'")
+                        out.write(' pgettext(%r, %r) ' % (message_context, g))
+                        message_context = None
+                    else:
+                        out.write(' gettext(%r) ' % g)
                 elif bmatch:
                     for fmatch in constant_re.findall(t.contents):
                         out.write(' _(%s) ' % fmatch)
+                    if bmatch.group(1):
+                        # A context is provided
+                        context_match = context_re.match(bmatch.group(1))
+                        message_context = context_match.group(1)
+                        if message_context[0] == '"':
+                            message_context = message_context.strip('"')
+                        elif message_context[0] == "'":
+                            message_context = message_context.strip("'")
                     intrans = True
                     inplural = False
                     singular = []

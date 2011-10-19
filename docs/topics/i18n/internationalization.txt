@@ -266,6 +266,11 @@ will appear in the .po file as:
     msgid "May"
     msgstr ""
 
+.. versionadded:: 1.4
+
+Contextual markers are also supported by the :ttag:`trans` and
+:ttag:`blocktrans` template tags.
+
 .. _lazy-translations:
 
 Lazy translation
@@ -453,7 +458,7 @@ It's not possible to mix a template variable inside a string within ``{% trans
 %}``. If your translations require strings with variables (placeholders), use
 ``{% blocktrans %}`` instead.
 
-.. versionchanged:: 1.4
+.. versionadded:: 1.4
 
 If you'd like to retrieve a translated string without displaying it, you can
 use the following syntax::
@@ -478,6 +483,15 @@ or should be used as arguments for other template tags or filters::
         {% cycle start end %}: {{ stage }}{% if forloop.counter|divisibleby:2 %}<br />{% else %}, {% endif %}
     {% endfor %}
     </p>
+
+.. versionadded:: 1.4
+
+``{% trans %}`` also supports :ref:`contextual markers<contextual-markers>`
+using the ``context`` keyword:
+
+.. code-block:: html+django
+
+    {% trans "May" context "month name" %}
 
 .. templatetag:: blocktrans
 
@@ -559,6 +573,15 @@ be retrieved (and stored) beforehand::
     {% blocktrans %}
     This is a URL: {{ the_url }}
     {% endblocktrans %}
+
+.. versionadded:: 1.4
+
+``{% blocktrans %}`` also supports :ref:`contextual
+markers<contextual-markers>` using the ``context`` keyword:
+
+.. code-block:: html+django
+
+    {% blocktrans with name=user.username context "greeting" %}Hi {{ name }}{% endblocktrans %}
 
 .. _template-translation-vars:
 

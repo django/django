@@ -94,6 +94,35 @@ class BasicExtractorTests(ExtractorTests):
             os.remove('./templates/template_with_error.html')
             os.remove('./templates/template_with_error.html.py') # Waiting for #8536 to be fixed
 
+    def test_template_message_context_extractor(self):
+        """
+        Ensure that message contexts are correctly extracted for the
+        {% trans %} and {% blocktrans %} template tags.
+        Refs #14806.
+        """
+        os.chdir(self.test_dir)
+        management.call_command('makemessages', locale=LOCALE, verbosity=0)
+        self.assertTrue(os.path.exists(self.PO_FILE))
+        po_contents = open(self.PO_FILE, 'r').read()
+        # {% trans %}
+        self.assertTrue('msgctxt "Special trans context #1"' in po_contents)
+        self.assertTrue("Translatable literal #7a" in po_contents)
+        self.assertTrue('msgctxt "Special trans context #2"' in po_contents)
+        self.assertTrue("Translatable literal #7b" in po_contents)
+        self.assertTrue('msgctxt "Special trans context #3"' in po_contents)
+        self.assertTrue("Translatable literal #7c" in po_contents)
+
+        # {% blocktrans %}
+        self.assertTrue('msgctxt "Special blocktrans context #1"' in po_contents)
+        self.assertTrue("Translatable literal #8a" in po_contents)
+        self.assertTrue('msgctxt "Special blocktrans context #2"' in po_contents)
+        self.assertTrue("Translatable literal #8b-singular" in po_contents)
+        self.assertTrue("Translatable literal #8b-plural" in po_contents)
+        self.assertTrue('msgctxt "Special blocktrans context #3"' in po_contents)
+        self.assertTrue("Translatable literal #8c-singular" in po_contents)
+        self.assertTrue("Translatable literal #8c-plural" in po_contents)
+        self.assertTrue('msgctxt "Special blocktrans context #4"' in po_contents)
+        self.assertTrue("Translatable literal #8d" in po_contents)
 
 class JavascriptExtractorTests(ExtractorTests):
 

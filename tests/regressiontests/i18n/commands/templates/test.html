@@ -57,3 +57,12 @@ continued here.{% endcomment %}
 {% comment %}  Translators: Two-line translator comment #5 -- with non ASCII characters: áéíóúö
 continued here.{% endcomment %}
 {% trans "Translatable literal #6b" %}
+
+{% trans "Translatable literal #7a" context "Special trans context #1" %}
+{% trans "Translatable literal #7b" as var context "Special trans context #2" %}
+{% trans "Translatable literal #7c" context "Special trans context #3" as var %}
+
+{% blocktrans context "Special blocktrans context #1" %}Translatable literal #8a{% endblocktrans %}
+{% blocktrans count 2 context "Special blocktrans context #2" %}Translatable literal #8b-singular{% plural %}Translatable literal #8b-plural{% endblocktrans %}
+{% blocktrans context "Special blocktrans context #3" count 2 %}Translatable literal #8c-singular{% plural %}Translatable literal #8c-plural{% endblocktrans %}
+{% blocktrans with a=1 context "Special blocktrans context #4" %}Translatable literal #8d {{ a }}{% endblocktrans %}

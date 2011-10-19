@@ -52,3 +52,27 @@ msgid "%(percent)s%% represents %(num)s object"
 msgid_plural "%(percent)s%% represents %(num)s objects"
 msgstr[0] "%(percent)s%% stellt %(num)s Objekt dar"
 msgstr[1] "%(percent)s%% stellt %(num)s Objekte dar"
+
+#: models.py:17
+msgctxt "super search"
+msgid "%(number)s super result"
+msgid_plural "%(number)s super results"
+msgstr[0] "%(number)s Super-Ergebnis"
+msgstr[1] "%(number)s Super-Ergebnisse"
+
+#: models.py:19
+msgctxt "other super search"
+msgid "%(number)s super result"
+msgid_plural "%(number)s super results"
+msgstr[0] "%(number)s anderen Super-Ergebnis"
+msgstr[1] "%(number)s andere Super-Ergebnisse"
+
+#: models.py:21
+msgctxt "comment count"
+msgid "There are %(num_comments)s comments"
+msgstr "Es gibt %(num_comments)s Kommentare"
+
+#: models.py:23
+msgctxt "other comment count"
+msgid "There are %(num_comments)s comments"
+msgstr "Andere: Es gibt %(num_comments)s Kommentare"
