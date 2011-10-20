@@ -113,6 +113,8 @@ try:
             hasattr(simplejson, '_speedups')):
         from simplejson import *
         use_system_version = True
+        # Make sure we copy over the version. See #17071
+        __version__ = simplejson.__version__
 except ImportError:
     pass
 
@@ -126,6 +128,8 @@ if not use_system_version:
         JSONDecoder
 
         use_system_version = True
+        # Make sure we copy over the version. See #17071
+        __version__ = json.__version__
     except (ImportError, NameError):
         pass
 
