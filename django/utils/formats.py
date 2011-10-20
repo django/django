@@ -71,7 +71,12 @@ def get_format(format_type, lang=None, use_l10n=None):
             lang = get_language()
         cache_key = (format_type, lang)
         try:
-            return _format_cache[cache_key] or getattr(settings, format_type)
+            cached = _format_cache[cache_key]
+            if cached is not None:
+                return cached
+            else:
+                # Return the general setting by default
+                return getattr(settings, format_type)
         except KeyError:
             for module in get_format_modules(lang):
                 try:

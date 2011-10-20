@@ -14,7 +14,8 @@ from django.test import TestCase, RequestFactory
 from django.test.utils import override_settings
 from django.utils import translation
 from django.utils.formats import (get_format, date_format, time_format,
-    localize, localize_input, iter_format_modules, get_format_modules)
+    localize, localize_input, iter_format_modules, get_format_modules,
+    number_format)
 from django.utils.importlib import import_module
 from django.utils.numberformat import format as nformat
 from django.utils.safestring import mark_safe, SafeString, SafeUnicode
@@ -396,6 +397,39 @@ class FormattingTests(TestCase):
                     NUMBER_GROUPING=1, THOUSAND_SEPARATOR='!'):
                 self.assertEqual(u'66666.67', Template('{{ n|floatformat:2 }}').render(self.ctxt))
                 self.assertEqual(u'100000.0', Template('{{ f|floatformat }}').render(self.ctxt))
+
+    def test_false_like_locale_formats(self):
+        """
+        Ensure that the active locale's formats take precedence over the
+        default settings even if they would be interpreted as False in a
+        conditional test (e.g. 0 or empty string).
+        Refs #16938.
+        """
+        from django.conf.locale.fr import formats as fr_formats
+
+        # Back up original formats
+        backup_THOUSAND_SEPARATOR = fr_formats.THOUSAND_SEPARATOR
+        backup_FIRST_DAY_OF_WEEK = fr_formats.FIRST_DAY_OF_WEEK
+
+        # Set formats that would get interpreted as False in a conditional test
+        fr_formats.THOUSAND_SEPARATOR = ''
+        fr_formats.FIRST_DAY_OF_WEEK = 0
+
+        with translation.override('fr'):
+            with self.settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=True,
+                               THOUSAND_SEPARATOR='!'):
+                self.assertEqual('', get_format('THOUSAND_SEPARATOR'))
+                # Even a second time (after the format has been cached)...
+                self.assertEqual('', get_format('THOUSAND_SEPARATOR'))
+
+            with self.settings(USE_L10N=True, FIRST_DAY_OF_WEEK=1):
+                self.assertEqual(0, get_format('FIRST_DAY_OF_WEEK'))
+                # Even a second time (after the format has been cached)...
+                self.assertEqual(0, get_format('FIRST_DAY_OF_WEEK'))
+
+        # Restore original formats
+        fr_formats.THOUSAND_SEPARATOR = backup_THOUSAND_SEPARATOR
+        fr_formats.FIRST_DAY_OF_WEEK = backup_FIRST_DAY_OF_WEEK
 
     def test_l10n_enabled(self):
         settings.USE_L10N = True
