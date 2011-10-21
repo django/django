@@ -1,3 +1,4 @@
+import copy
 import operator
 from functools import wraps, update_wrapper
 
@@ -258,7 +259,6 @@ class SimpleLazyObject(LazyObject):
             memo[id(self)] = result
             return result
         else:
-            import copy
             return copy.deepcopy(self._wrapped, memo)
 
     # Need to pretend to be the wrapped class, for the sake of objects that care
