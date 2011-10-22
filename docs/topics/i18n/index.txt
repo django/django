@@ -2,64 +2,77 @@
 Internationalization and localization
 =====================================
 
-Overview
-========
-
-Django has full support for internationalization of text in code and
-templates, and format localization of dates and numbers. Here's how it works.
-
-Essentially, Django does two things:
-
-* It allows developers and template authors to specify which parts of
-  their apps should be translatable.
-* It uses these hooks to translate Web apps for particular users according
-  to their language preferences.
-
-The complete process can be seen as divided in three stages. It is also possible
-to identify an identical number of roles with very well defined responsibilities
-associated with each of these tasks (although it's perfectly normal if you
-find yourself performing more than one of these roles):
-
-* For application authors wishing to make sure their Django apps can be
-  used in different locales: :doc:`/topics/i18n/internationalization`.
-* For translators wanting to translate Django apps: :doc:`/topics/i18n/localization`.
-* For system administrators/final users setting up internationalized apps or
-  developers integrating third party apps: :doc:`/topics/i18n/deployment`.
-
 .. toctree::
    :hidden:
    :maxdepth: 1
 
-   internationalization
-   localization
-   deployment
+   translation
+   formatting
 
-.. _ seealso::
+Overview
+========
 
-For more general information about the topic, see the `GNU gettext documentation`_
-and the `Wikipedia article`_.
+The goal of internationalization and localization is to allow a single Web
+application to offer its content in languages and formats tailored to the
+audience.
 
+Django has full support for :doc:`translation of text
+</topics/i18n/translation>` and :doc:`formatting of dates, times and numbers
+</topics/i18n/formatting>`.
+
+Essentially, Django does two things:
+
+* It allows developers and template authors to specify which parts of their apps
+  should be translated or formatted for local languages and cultures.
+* It uses these hooks to localize Web apps for particular users according to
+  their preferences.
+
+Obviously, translation depends on the target language. Formatting usually
+depends on the target country.
+
+Definitions
+===========
+
+The words "internationalization" and "localization" often cause confusion;
+here's a simplified definition:
+
+.. glossary::
+
+    internationalization
+      Preparing the software for localization. Usually done by developers.
+
+    localization
+      Writing the translations and local formats. Usually done by translators.
+
+More details can be found in the `W3C Web Internationalization FAQ`_, the `Wikipedia article`_ or the `GNU gettext documentation`_.
+
+.. _W3C Web Internationalization FAQ: http://www.w3.org/International/questions/qa-i18n
 .. _GNU gettext documentation: http://www.gnu.org/software/gettext/manual/gettext.html#Concepts
 .. _Wikipedia article: http://en.wikipedia.org/wiki/Internationalization_and_localization
 
-Glossary
-========
+.. warning::
 
-First lets define some terms that will help us to handle a common language:
+    Translation and formatting are controlled by :setting:`USE_I18N` and
+    :setting:`USE_L10N` settings respectively. However, both features involve
+    internationalization and localization. The names of the settings are an
+    unfortunate result of Django's history.
+
+Here are some other terms that will help us to handle a common language:
 
 .. glossary::
 
     locale name
       A locale name, either a language specification of the form ``ll`` or a
       combined language and country specification of the form ``ll_CC``.
-      Examples: ``it``, ``de_AT``, ``es``, ``pt_BR``. Note the underscore in
-      some of them and the case of the part located to its right.
+      Examples: ``it``, ``de_AT``, ``es``, ``pt_BR``. The language part is
+      always is lower case and the country part in upper case. The separator
+      is an underscore.
 
     language code
       Represents the name of a language. Browsers send the names of the
       languages they accept in the ``Accept-Language`` HTTP header using this
-      format. Examples: ``it``, ``de-at``, ``es``, ``pt-br``. Note the ``-``
-      separator.
+      format. Examples: ``it``, ``de-at``, ``es``, ``pt-br``. Both the language
+      and the country parts are in lower case. The separator is a dash.
 
     message file
       A message file is a plain-text file, representing a single language,
@@ -70,21 +83,6 @@ First lets define some terms that will help us to handle a common language:
     translation string
       A literal that can be translated.
 
-.. _specialties-of-django-i18n:
-
-Specialties of Django translation
-=================================
-
-Django's translation machinery uses the standard ``gettext`` module that comes
-with Python. If you know ``gettext``, you might note these specialties in the
-way Django does translation:
-
-* The string domain is ``django`` or ``djangojs``. This string domain is
-  used to differentiate between different programs that store their data
-  in a common message-file library (usually ``/usr/share/locale/``). The
-  ``django`` domain is used for python and template translation strings
-  and is loaded into the global translation catalogs. The ``djangojs``
-  domain is only used for JavaScript translation catalogs to make sure
-  that those are as small as possible.
-* Django doesn't use ``xgettext`` alone. It uses Python wrappers around
-  ``xgettext`` and ``msgfmt``. This is mostly for convenience.
+    format file
+      A format file is a Python module that defines the data formats for a given
+      locale.

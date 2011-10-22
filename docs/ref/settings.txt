@@ -1243,7 +1243,7 @@ LOCALE_PATHS
 Default: ``()`` (Empty tuple)
 
 A tuple of directories where Django looks for translation files.
-See :ref:`using-translations-in-your-own-projects`.
+See :ref:`how-django-discovers-translations`.
 
 Example::
 
@@ -2038,10 +2038,10 @@ USE_I18N
 
 Default: ``True``
 
-A boolean that specifies whether Django's internationalization system should be
-enabled. This provides an easy way to turn it off, for performance. If this is
-set to ``False``, Django will make some optimizations so as not to load the
-internationalization machinery.
+A boolean that specifies whether Django's translation system should be enabled.
+This provides an easy way to turn it off, for performance. If this is set to
+``False``, Django will make some optimizations so as not to load the
+translation machinery.
 
 See also :setting:`USE_L10N`
 
@@ -2054,9 +2054,9 @@ USE_L10N
 
 Default: ``False``
 
-A boolean that specifies if data will be localized by default or not. If this
-is set to ``True``, e.g. Django will display numbers and dates using the
-format of the current locale.
+A boolean that specifies if localized formatting of data will be enabled by
+default or not. If this is set to ``True``, e.g. Django will display numbers and
+dates using the format of the current locale.
 
 See also :setting:`USE_I18N` and :setting:`LANGUAGE_CODE`
 

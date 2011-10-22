@@ -455,7 +455,7 @@ appropriate entities.
    :synopsis: Internationalization support.
 
 For a complete discussion on the usage of the following see the
-:doc:`Internationalization documentation </topics/i18n/internationalization>`.
+:doc:`translation documentation </topics/i18n/translation>`.
 
 .. function:: gettext(message)
 

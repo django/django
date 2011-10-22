@@ -1,15 +1,15 @@
-=======================================
-Submitting and maintaining translations
-=======================================
+=================
+Localizing Django
+=================
 
 Various parts of Django, such as the admin site and validation error messages,
-are internationalized. This means they display different text depending on each
-user's language setting. For this, Django uses the same internationalization and
-localization infrastructure available to Django applications, described in the
-:doc:`i18n documentation</topics/i18n/index>`.
+are internationalized. This means they display differently depending on each
+user's language or country. For this, Django uses the same internationalization
+and localization infrastructure available to Django applications, described in
+the :doc:`i18n documentation </topics/i18n/index>`.
 
-Internationalization
---------------------
+Translations
+------------
 
 Translations are contributed by Django users worldwide. The translation work is
 coordinated at `Transifex`_.
@@ -45,8 +45,8 @@ do:
      For more information about how to use Transifex, read the
      `Transifex User Guide`_.
 
-Localization
-------------
+Formats
+-------
 
 You can also review ``conf/locale/<locale>/formats.py``. This file describes
 the date, time and numbers formatting particularities of your locale. See

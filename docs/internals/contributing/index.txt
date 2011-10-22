@@ -56,7 +56,7 @@ Browse the following sections to find out how:
    triaging-tickets
    writing-code/index
    writing-documentation
-   translations
+   localizing
    committing-code
 
 .. _django-users: http://groups.google.com/group/django-users
