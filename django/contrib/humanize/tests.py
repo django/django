@@ -159,4 +159,21 @@ class HumanizeTests(TestCase):
             '1 day from now',
             '1 year, 4 months from now',
         ]
-        self.humanize_tester(test_list, result_list, 'naturaltime')
+
+        # mock out datetime so these tests don't fail occasionally when the
+        # test runs too slow
+        class MockDateTime(object):
+            def now(self):
+                return now
+
+            def __call__(self, *args, **kwargs):
+                return datetime(*args, **kwargs)
+
+        from django.contrib.humanize.templatetags import humanize
+        orig_datetime = humanize.datetime
+        humanize.datetime = MockDateTime()
+
+        try:
+            self.humanize_tester(test_list, result_list, 'naturaltime')
+        finally:
+            humanize.datetime = orig_datetime
