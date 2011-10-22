@@ -379,15 +379,19 @@ span.clearable-file-input label {
 
 .calendar-cancel {
     margin: 0 !important;
-    padding: 0;
+    padding: 0 !important;
     font-size: 10px;
     background: #e1e1e1 url(../img/nav-bg.gif) 0 50% repeat-x;
     border-top: 1px solid #ddd;
 }
 
+.calendar-cancel:hover {
+    background: #e1e1e1 url(../img/nav-bg-reverse.gif) 0 50% repeat-x;
+}
+
 .calendar-cancel a {
-    padding: 2px;
-    color: #999;
+    color: black;
+    display: block;
 }
 
 ul.timelist, .timelist li {

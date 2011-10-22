@@ -79,17 +79,24 @@ var DateTimeShortcuts = {
         addEvent(clock_box, 'click', DateTimeShortcuts.cancelEventPropagation);
 
         quickElement('h2', clock_box, gettext('Choose a time'));
-        time_list = quickElement('ul', clock_box, '');
+        var time_list = quickElement('ul', clock_box, '');
         time_list.className = 'timelist';
-        time_format = get_format('TIME_INPUT_FORMATS')[0];
+        var time_format = get_format('TIME_INPUT_FORMATS')[0];
         quickElement("a", quickElement("li", time_list, ""), gettext("Now"), "href", "javascript:DateTimeShortcuts.handleClockQuicklink(" + num + ", new Date().strftime('" + time_format + "'));");
         quickElement("a", quickElement("li", time_list, ""), gettext("Midnight"), "href", "javascript:DateTimeShortcuts.handleClockQuicklink(" + num + ", new Date(1970,1,1,0,0,0,0).strftime('" + time_format + "'));");
         quickElement("a", quickElement("li", time_list, ""), gettext("6 a.m."), "href", "javascript:DateTimeShortcuts.handleClockQuicklink(" + num + ", new Date(1970,1,1,6,0,0,0).strftime('" + time_format + "'));");
         quickElement("a", quickElement("li", time_list, ""), gettext("Noon"), "href", "javascript:DateTimeShortcuts.handleClockQuicklink(" + num + ", new Date(1970,1,1,12,0,0,0).strftime('" + time_format + "'));");
 
-        cancel_p = quickElement('p', clock_box, '');
+        var cancel_p = quickElement('p', clock_box, '');
         cancel_p.className = 'calendar-cancel';
         quickElement('a', cancel_p, gettext('Cancel'), 'href', 'javascript:DateTimeShortcuts.dismissClock(' + num + ');');
+        django.jQuery(document).bind('keyup', function(event) {
+            if (event.which == 27) {
+                // ESC key closes popup
+                DateTimeShortcuts.dismissClock(num);
+                event.preventDefault();
+            }
+        });
     },
     openClock: function(num) {
         var clock_box = document.getElementById(DateTimeShortcuts.clockDivName+num)
@@ -195,6 +202,13 @@ var DateTimeShortcuts = {
         var cancel_p = quickElement('p', cal_box, '');
         cancel_p.className = 'calendar-cancel';
         quickElement('a', cancel_p, gettext('Cancel'), 'href', 'javascript:DateTimeShortcuts.dismissCalendar(' + num + ');');
+        django.jQuery(document).bind('keyup', function(event) {
+            if (event.which == 27) {
+                // ESC key closes popup
+                DateTimeShortcuts.dismissCalendar(num);
+                event.preventDefault();
+            }
+        });
     },
     openCalendar: function(num) {
         var cal_box = document.getElementById(DateTimeShortcuts.calendarDivName1+num)
