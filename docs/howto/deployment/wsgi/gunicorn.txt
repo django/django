@@ -1,0 +1,66 @@
+===============================
+How to use Django with Gunicorn
+===============================
+
+.. highlight:: bash
+
+Gunicorn_ ('Green Unicorn') is a pure-Python WSGI server for UNIX. It has no
+dependencies and is easy to install and use.
+
+.. _Gunicorn: http://gunicorn.org/
+
+There are two ways to use Gunicorn with Django. One is to have Gunicorn treat
+Django as just another WSGI application. The second is to use Gunicorn's
+special `integration with Django`_.
+
+.. _integration with Django: http://gunicorn.org/run.html#django-manage-py_
+
+Installing Gunicorn
+===================
+
+Installing gunicorn is as easy as ``pip install gunicorn``. For more details,
+see the `gunicorn documentation`_.
+
+.. _gunicorn documentation: http://gunicorn.org/install.html
+
+Running Django in Gunicorn as a generic WSGI application
+========================================================
+
+When Gunicorn is installed, a ``gunicorn`` command is available which starts
+the Gunicorn server process. At its simplest, gunicorn just needs to be called
+with a the location of a WSGI application object.::
+
+    gunicorn [OPTIONS] APP_MODULE
+
+Where ``APP_MODULE`` is of the pattern ``MODULE_NAME:VARIABLE_NAME``. The
+module name should be a full dotted path. The variable name refers to a WSGI
+callable that should be found in the specified module.
+
+So for a typical Django project, invoking gunicorn would look like::
+
+    gunicorn myproject.wsgi:application
+
+(This requires that your project be on the Python path; the simplest way to
+ensure that is to run this command from the same directory as your
+``manage.py`` file.)
+
+
+Using Gunicorn's Django integration
+===================================
+
+To use Gunicorn's built-in Django integration, first add ``"gunicorn"`` to
+:setting:`INSTALLED_APPS`. Then run ``python manage.py run_gunicorn``.
+
+This provides a few Django-specific niceties:
+
+* sets the gunicorn process name to be that of the project
+
+* validates installed models
+
+* allows an ``--adminmedia`` option for passing in the location of the
+  admin media files, mimicing the behavior of runserver.
+
+See Gunicorn's `deployment documentation`_ for additional tips on starting and
+maintaining the Gunicorn server.
+
+.. _deployment documentation: http://gunicorn.org/deploy.html

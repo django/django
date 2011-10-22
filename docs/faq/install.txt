@@ -23,7 +23,7 @@ usage.
 For a development environment -- if you just want to experiment with Django --
 you don't need to have a separate Web server installed; Django comes with its
 own lightweight development server. For a production environment, Django follows
-the WSGI spec, :pep:`333`, which means it can run on a variety of server
+the WSGI spec, :pep:`3333`, which means it can run on a variety of server
 platforms. See :doc:`Deploying Django </howto/deployment/index>` for some
 popular alternatives. Also, the `server arrangements wiki page`_ contains
 details for several deployment strategies.

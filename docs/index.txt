@@ -154,10 +154,9 @@ The development process
 
 * **Deployment:**
   :doc:`Overview <howto/deployment/index>` |
-  :doc:`Apache/mod_wsgi <howto/deployment/modwsgi>` |
-  :doc:`uWSGI <howto/deployment/uwsgi>` |
-  :doc:`Apache/mod_python (deprecated) <howto/deployment/modpython>` |
+  :doc:`WSGI servers <howto/deployment/wsgi/index>` |
   :doc:`FastCGI/SCGI/AJP <howto/deployment/fastcgi>` |
+  :doc:`Apache/mod_python (deprecated) <howto/deployment/modpython>` |
   :doc:`Apache authentication <howto/apache-auth>` |
   :doc:`Handling static files <howto/static-files>` |
   :doc:`Tracking code errors by email <howto/error-reporting>`

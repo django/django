@@ -18,13 +18,53 @@ from wsgiref import simple_server
 from wsgiref.util import FileWrapper   # for backwards compatibility
 
 import django
+from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import color_style
+from django.core.wsgi import get_wsgi_application
+from django.utils.importlib import import_module
 from django.utils._os import safe_join
 from django.views import static
 
 from django.contrib.staticfiles import handlers
 
 __all__ = ['WSGIServer', 'WSGIRequestHandler']
+
+
+def get_internal_wsgi_application():
+    """
+    Loads and returns the WSGI application as configured by the user in
+    ``settings.WSGI_APPLICATION``. With the default ``startproject`` layout,
+    this will be the ``application`` object in ``projectname/wsgi.py``.
+
+    This function, and the ``WSGI_APPLICATION`` setting itself, are only useful
+    for Django's internal servers (runserver, runfcgi); external WSGI servers
+    should just be configured to point to the correct application object
+    directly.
+
+    If settings.WSGI_APPLICATION is not set (is ``None``), we just return
+    whatever ``django.core.wsgi.get_wsgi_application`` returns.
+
+    """
+    from django.conf import settings
+    app_path = getattr(settings, 'WSGI_APPLICATION')
+    if app_path is None:
+        return get_wsgi_application()
+    module_name, attr = app_path.rsplit('.', 1)
+    try:
+        mod = import_module(module_name)
+    except ImportError, e:
+        raise ImproperlyConfigured(
+            "WSGI application '%s' could not be loaded; "
+            "could not import module '%s': %s" % (app_path, module_name, e))
+    try:
+        app = getattr(mod, attr)
+    except AttributeError, e:
+        raise ImproperlyConfigured(
+            "WSGI application '%s' could not be loaded; "
+            "can't find '%s' in module '%s': %s"
+            % (app_path, attr, module_name, e))
+
+    return app
 
 
 class WSGIServerException(Exception):

@@ -7,14 +7,14 @@ How to use Django with Apache and mod_python
     Support for mod_python has been deprecated, and will be removed in
     Django 1.5. If you are configuring a new deployment, you are
     strongly encouraged to consider using :doc:`mod_wsgi
-    </howto/deployment/modwsgi>` or any of the other :doc:`supported
-    backends </howto/deployment/index>`.
+    </howto/deployment/wsgi/modwsgi>` or any of the other :doc:`supported
+    servers </howto/deployment/index>`.
 
 .. highlight:: apache
 
 The `mod_python`_ module for Apache_ can be used to deploy Django to a
 production server, although it has been mostly superseded by the simpler
-:doc:`mod_wsgi deployment option </howto/deployment/modwsgi>`.
+:doc:`mod_wsgi deployment option </howto/deployment/wsgi/modwsgi>`.
 
 mod_python is similar to (and inspired by) `mod_perl`_ : It embeds Python within
 Apache and loads Python code into memory when the server starts. Code stays in

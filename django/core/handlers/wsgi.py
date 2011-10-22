@@ -124,6 +124,7 @@ class LimitedStream(object):
         self.buffer = sio.read()
         return line
 
+
 class WSGIRequest(http.HttpRequest):
     def __init__(self, environ):
         script_name = base.get_script_name(environ)
@@ -202,13 +203,12 @@ class WSGIRequest(http.HttpRequest):
     FILES = property(_get_files)
     REQUEST = property(_get_request)
 
+
 class WSGIHandler(base.BaseHandler):
     initLock = Lock()
     request_class = WSGIRequest
 
     def __call__(self, environ, start_response):
-        from django.conf import settings
-
         # Set up middleware if needed. We couldn't do this earlier, because
         # settings weren't available.
         if self._request_middleware is None:
@@ -253,4 +253,3 @@ class WSGIHandler(base.BaseHandler):
             response_headers.append(('Set-Cookie', str(c.output(header=''))))
         start_response(status, response_headers)
         return response
-

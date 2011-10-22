@@ -36,7 +36,7 @@ uWSGI model
 -----------
 
 uWSGI operates on a client-server model. Your Web server (ie. nginx, Apache)
-communicates with a django-uwsgi "worker" process to serve dynamic contents.
+communicates with a django-uwsgi "worker" process to serve dynamic content.
 The Web server can communicate with the uWSGI process either:
 
 * directly by the uWSGI protocol through a socket created by uWSGI,
@@ -48,9 +48,9 @@ systems), or it can use a TCP socket. What you choose is a matterr of
 preference. Usually, a TCP socket is easier because connecting to a port
 doesn't require special permissions.
 
-In the second case, the Web server doesn't need to do uWSGI protocol. It just
-needs to be able to proxy HTTP requests to the HTTP server built-in uWSGI.
-The procedure is the same than proxying any HTTP server. Note that the Web
+In the second case, the Web server doesn't need to speak the uWSGI protocol. It
+just needs to be able to proxy HTTP requests to the HTTP server built-in uWSGI.
+The procedure is the same as proxying to any HTTP server. Note that the Web
 server is a "reverse proxy" in this case.
 
 Configuring the uWSGI server
@@ -68,9 +68,9 @@ the uWSGI server.
     on that file.
 
 uWSGI is highly configurable and thus there are many ways to start the
-process. For example, uwsgi version 0.9.6.8 provides a hundred switches.
-This guide demonstrates the most important of them, but does not intent to
-substitute the official manual and online documentation.
+process. For example, uwsgi version 0.9.6.8 provides a hundred switches.  This
+guide demonstrates the most important of them, but is not a substitute the
+official manual and online documentation.
 
 uWSGI supports configuration through:
 
@@ -98,8 +98,8 @@ uWSGI server. This means:
 
 * the uWSGI server can be restarted or reloaded independently from the Web
   server,
-* (except with Cheerokee), it is the role of the system administrator to make
-  uWSGI to start on boot or reboot: either through tools like supervisor or
+* (except with Cherokee), it is the role of the system administrator to make
+  uWSGI start on boot or reboot: either through tools like supervisor or
   daemontools, either directly at init level in a file like /etc/rc.local or
   /etc/conf.d/local
 
@@ -109,11 +109,11 @@ Managing uWSGI
 Starting the server
 -------------------
 
-Example command line for a Web server that understand the uWSGI protocol::
+Example command line for a Web server that understands the uWSGI protocol::
 
     uwsgi --chdir=/path/to/your/project
-        --module='django.core.handlers.wsgi:WSGIHandler()' \
-        --env DJANGO_SETTINGS_MODULE=settings \
+        --module='mysite.wsgi:application' \
+        --env DJANGO_SETTINGS_MODULE=mysite.settings \
         --master --pidfile=/tmp/project-master.pid \
         --socket=127.0.0.1:49152 \      # can also be a file
         --processes=5 \                 # number of worker processes
@@ -125,17 +125,27 @@ Example command line for a Web server that understand the uWSGI protocol::
         --home=/path/to/virtual/env \   # optionnal path to a virtualenv
         --daemonize=/var/log/uwsgi/yourproject.log      # background the process
 
-Django specific options are:
+This assumes that you have a top-level project package named ``mysite``, and
+within it a module :file:`mysite/wsgi.py` that contains a WSGI ``application``
+object. This is the layout you will have if you ran ``django-admin.py
+startproject mysite`` (using your own project name in place of ``mysite``) with
+a recent version of Django. If this file does not exist, you'll need to create
+it. See the :doc:`/howto/deployment/wsgi/index` documentation for the default
+contents you should put in this file, and what else you can add to it.
 
-* ``chdir``: should be the path to your project
-* ``module``: uwsgi module to use
-* ``pythonpath``: optional path to your project virtualenv
-* ``env``: should contain at least ``DJANGO_SETTINGS_MODULE``
+The Django-specific options here are:
+
+* ``chdir``: the path to the directory that needs to be on Python's import path; i.e. the directory containing the ``mysite`` package.
+* ``module``: The WSGI module to use, probably the ``mysite.wsgi`` module which
+  :djadmin:`startproject` creates.
+* ``env``: should probably contain at least ``DJANGO_SETTINGS_MODULE``
+* ``home``: optional path to your project virtualenv
 
 Example ini configuration file::
 
     [uwsgi]
     chdir=/path/to/your/project
+    module='mysite.wsgi:application'
     master=True
     pidfile=/tmp/project-master.pid
     vacuum=True
@@ -157,7 +167,7 @@ Read more `uWSGI configuration examples
 Reloading the daemon
 --------------------
 
-As mentioned above, the uWSGI master process is one of the core component of
+As mentioned above, the uWSGI master process is one of the core components of
 the uWSGI stack. The signal to brutally reload all the workers and the master
 process is SIGTERM. Example command to brutally reload the uWSGI processes::
 
@@ -167,7 +177,7 @@ Patching the daemon
 -------------------
 
 One of the great advantages of uWSGI is its ability to gradually restart each
-worker without loosing any request.
+worker without losing any requests.
 
 For example, uWSGI can be signaled that worker should reload the code after
 handling their current request (if any) from bash::
@@ -236,7 +246,7 @@ still experimental.
 Troubleshooting
 ===============
 
-As usual, the first things to do is to check the logs. This implies:
+As usual, the first thing to do is to check the logs. This implies:
 
 * the web server log, which will indicate if it couldn't connect to the uWSGI
   process,
@@ -251,5 +261,5 @@ Typical gotchas:
   killed with ``SIGKILL``, it won't remove the socket and pidfile when it is
   interrupted. It is safe to remove them manually and to start uWSGI again in
   that case.
-* uWSGI can start the process on the foreground, this will make errors easily
+* uWSGI can start the process in the foreground, this will make errors easily
   visible to the system administrator.

@@ -48,7 +48,7 @@ documentation to determine which mode is right for your setup. Make
 sure you have Apache installed, with the mod_wsgi module activated.
 Django will work with any version of Apache that supports mod_wsgi.
 
-See :doc:`How to use Django with mod_wsgi </howto/deployment/modwsgi>`
+See :doc:`How to use Django with mod_wsgi </howto/deployment/wsgi/modwsgi>`
 for information on how to configure mod_wsgi once you have it
 installed.
 

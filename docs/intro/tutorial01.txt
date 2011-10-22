@@ -95,6 +95,7 @@ Let's look at what :djadmin:`startproject` created::
             __init__.py
             settings.py
             urls.py
+            wsgi.py
 
 .. admonition:: Doesn't match what you see?
 
@@ -128,6 +129,9 @@ These files are:
 * :file:`mysite/urls.py`: The URL declarations for this Django project; a
   "table of contents" of your Django-powered site. You can read more about
   URLs in :doc:`/topics/http/urls`.
+
+* :file:`mysite/wsgi.py`: An entry-point for WSGI-compatible webservers to
+  serve your project. See :doc:`/howto/deployment/wsgi/index` for more details.
 
 .. _more about packages: http://docs.python.org/tutorial/modules.html#packages
 

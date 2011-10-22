@@ -303,7 +303,7 @@ more flexible ``mod_wsgi`` backend.
 
 If you are currently using the ``mod_python`` request handler, you are strongly
 encouraged to redeploy your Django instances using :doc:`mod_wsgi
-</howto/deployment/modwsgi>`.
+</howto/deployment/wsgi/modwsgi>`.
 
 Function-based generic views
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -4,10 +4,9 @@ How to use Django with FastCGI, SCGI, or AJP
 
 .. highlight:: bash
 
-Although the current preferred setup for running Django is :doc:`Apache with
-mod_wsgi </howto/deployment/modwsgi>`, many people use shared hosting, on
-which protocols such as FastCGI, SCGI or AJP are the only viable options. In
-some setups, these protocols may provide better performance than mod_wsgi_.
+Although :doc:`WSGI</howto/deployment/wsgi/index>` is the preferred deployment
+platform for Django, many people use shared hosting, on which protocols such as
+FastCGI, SCGI or AJP are the only viable options.
 
 .. admonition:: Note
 
@@ -20,13 +19,13 @@ serve pages to a Web server. The Web server delegates the incoming Web requests
 (via a socket) to FastCGI, which executes the code and passes the response back
 to the Web server, which, in turn, passes it back to the client's Web browser.
 
-Like mod_wsgi, FastCGI allows code to stay in memory, allowing requests to be
-served with no startup time. While mod_wsgi can either be configured embedded
-in the Apache Web server process or as a separate daemon process, a FastCGI
-process never runs inside the Web server process, always in a separate,
+Like WSGI, FastCGI allows code to stay in memory, allowing requests to be
+served with no startup time. While
+e.g. :doc:`mod_wsgi</howto/deployment/wsgi/modwsgi>` can either be configured
+embedded in the Apache Web server process or as a separate daemon process, a
+FastCGI process never runs inside the Web server process, always in a separate,
 persistent process.
 
-.. _mod_wsgi: http://code.google.com/p/modwsgi/
 .. _mod_perl: http://perl.apache.org/
 
 .. admonition:: Why run code in a separate process?

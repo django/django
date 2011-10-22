@@ -139,7 +139,7 @@ def runfastcgi(argset=[], **kwargs):
         return False
 
     # Prep up and go
-    from django.core.handlers.wsgi import WSGIHandler
+    from django.core.servers.basehttp import get_internal_wsgi_application
 
     if options["host"] and options["port"] and not options["socket"]:
         wsgi_opts['bindAddress'] = (options["host"], int(options["port"]))
@@ -178,7 +178,7 @@ def runfastcgi(argset=[], **kwargs):
         fp.write("%d\n" % os.getpid())
         fp.close()
 
-    WSGIServer(WSGIHandler(), **wsgi_opts).run()
+    WSGIServer(get_internal_wsgi_application(), **wsgi_opts).run()
 
 if __name__ == '__main__':
     runfastcgi(sys.argv[1:])

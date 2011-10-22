@@ -9,13 +9,12 @@ ways to easily deploy Django:
 .. toctree::
    :maxdepth: 1
 
-   modwsgi
-   uwsgi
+   wsgi/index
    fastcgi
    mod_python (deprecated) <modpython>
 
 If you're new to deploying Django and/or Python, we'd recommend you try
-:doc:`mod_wsgi </howto/deployment/modwsgi>` first. In most cases it'll be
+:doc:`mod_wsgi </howto/deployment/wsgi/modwsgi>` first. In most cases it'll be
 the easiest, fastest, and most stable deployment choice.
 
 .. seealso::

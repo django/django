@@ -54,7 +54,7 @@ Example::
     number of ``processes`` instead.
 
 For more information, please consult Django's
-:doc:`mod_wsgi documentation </howto/deployment/modwsgi>`.
+:doc:`mod_wsgi documentation </howto/deployment/wsgi/modwsgi>`.
 
 ``mod_python``
 --------------
@@ -62,8 +62,8 @@ For more information, please consult Django's
 .. warning::
     Support for mod_python will be deprecated in a future release of Django. If
     you are configuring a new deployment, you are strongly encouraged to
-    consider using :doc:`mod_wsgi </howto/deployment/modwsgi>` or any of the
-    other :doc:`supported backends </howto/deployment/index>`.
+    consider using :doc:`mod_wsgi </howto/deployment/wsgi/modwsgi>` or any of
+    the other :doc:`supported servers </howto/deployment/index>`.
 
 Example::
 
