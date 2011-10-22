@@ -500,6 +500,13 @@ class TransactionTestCase(SimpleTestCase):
         If ``count`` is None, the count doesn't matter - the assertion is true
         if the text occurs at least once in the response.
         """
+
+        # If the response supports deferred rendering and hasn't been rendered
+        # yet, then ensure that it does get rendered before proceeding further.
+        if (hasattr(response, 'render') and callable(response.render)
+            and not response.is_rendered):
+            response.render()
+
         if msg_prefix:
             msg_prefix += ": "
 
@@ -523,6 +530,13 @@ class TransactionTestCase(SimpleTestCase):
         successfully, (i.e., the HTTP status code was as expected), and that
         ``text`` doesn't occurs in the content of the response.
         """
+
+        # If the response supports deferred rendering and hasn't been rendered
+        # yet, then ensure that it does get rendered before proceeding further.
+        if (hasattr(response, 'render') and callable(response.render)
+            and not response.is_rendered):
+            response.render()
+
         if msg_prefix:
             msg_prefix += ": "
 
