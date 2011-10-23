@@ -224,7 +224,9 @@ class RssFeed(SyndicationFeed):
         handler.addQuickElement(u"title", self.feed['title'])
         handler.addQuickElement(u"link", self.feed['link'])
         handler.addQuickElement(u"description", self.feed['description'])
-        handler.addQuickElement(u"atom:link", None, {u"rel": u"self", u"href": self.feed['feed_url']})
+        if self.feed['feed_url'] is not None:
+            handler.addQuickElement(u"atom:link", None,
+                    {u"rel": u"self", u"href": self.feed['feed_url']})
         if self.feed['language'] is not None:
             handler.addQuickElement(u"language", self.feed['language'])
         for cat in self.feed['categories']:
