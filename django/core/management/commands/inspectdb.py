@@ -25,7 +25,7 @@ class Command(NoArgsCommand):
             raise CommandError("Database inspection isn't supported for the currently selected database backend.")
 
     def handle_inspection(self, options):
-        connection = connections[options.get('database', DEFAULT_DB_ALIAS)]
+        connection = connections[options.get('database')]
 
         table2model = lambda table_name: table_name.title().replace('_', '').replace(' ', '').replace('-', '')
 

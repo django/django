@@ -16,4 +16,4 @@ class Command(AppCommand):
     output_transaction = True
 
     def handle_app(self, app, **options):
-        return u'\n'.join(sql_custom(app, self.style, connections[options.get('database', DEFAULT_DB_ALIAS)])).encode('utf-8')
+        return u'\n'.join(sql_custom(app, self.style, connections[options.get('database')])).encode('utf-8')

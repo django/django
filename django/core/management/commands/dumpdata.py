@@ -30,13 +30,13 @@ class Command(BaseCommand):
     def handle(self, *app_labels, **options):
         from django.db.models import get_app, get_apps, get_model
 
-        format = options.get('format','json')
-        indent = options.get('indent',None)
-        using = options.get('database', DEFAULT_DB_ALIAS)
-        excludes = options.get('exclude',[])
-        show_traceback = options.get('traceback', False)
-        use_natural_keys = options.get('use_natural_keys', False)
-        use_base_manager = options.get('use_base_manager', False)
+        format = options.get('format')
+        indent = options.get('indent')
+        using = options.get('database')
+        excludes = options.get('exclude')
+        show_traceback = options.get('traceback')
+        use_natural_keys = options.get('use_natural_keys')
+        use_base_manager = options.get('use_base_manager')
 
         excluded_apps = set()
         excluded_models = set()

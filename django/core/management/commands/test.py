@@ -46,9 +46,7 @@ class Command(BaseCommand):
         from django.test.utils import get_runner
 
         TestRunner = get_runner(settings, options.get('testrunner'))
-        options['verbosity'] = int(options.get('verbosity', 1))
-        options.setdefault('interactive', True)
-        options.setdefault('failfast', False)
+        options['verbosity'] = int(options.get('verbosity'))
 
         test_runner = TestRunner(**options)
         failures = test_runner.run_tests(test_labels)

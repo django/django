@@ -16,4 +16,4 @@ class Command(NoArgsCommand):
     output_transaction = True
 
     def handle_noargs(self, **options):
-        return u'\n'.join(sql_flush(self.style, connections[options.get('database', DEFAULT_DB_ALIAS)], only_django=True)).encode('utf-8')
+        return u'\n'.join(sql_flush(self.style, connections[options.get('database')], only_django=True)).encode('utf-8')

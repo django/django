@@ -34,13 +34,13 @@ class Command(BaseCommand):
     )
 
     def handle(self, *fixture_labels, **options):
-        using = options.get('database', DEFAULT_DB_ALIAS)
+        using = options.get('database')
 
         connection = connections[using]
         self.style = no_style()
 
-        verbosity = int(options.get('verbosity', 1))
-        show_traceback = options.get('traceback', False)
+        verbosity = int(options.get('verbosity'))
+        show_traceback = options.get('traceback')
 
         # commit is a stealth option - it isn't really useful as
         # a command line option, but it can be useful when invoking

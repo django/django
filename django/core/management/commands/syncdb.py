@@ -22,9 +22,9 @@ class Command(NoArgsCommand):
 
     def handle_noargs(self, **options):
 
-        verbosity = int(options.get('verbosity', 1))
+        verbosity = int(options.get('verbosity'))
         interactive = options.get('interactive')
-        show_traceback = options.get('traceback', False)
+        show_traceback = options.get('traceback')
 
         # Stealth option -- 'load_initial_data' is used by the testing setup
         # process to disable initial fixture loading.
@@ -51,7 +51,7 @@ class Command(NoArgsCommand):
                 if not msg.startswith('No module named') or 'management' not in msg:
                     raise
 
-        db = options.get('database', DEFAULT_DB_ALIAS)
+        db = options.get('database')
         connection = connections[db]
         cursor = connection.cursor()
 

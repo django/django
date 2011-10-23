@@ -23,9 +23,9 @@ class Command(NoArgsCommand):
            're-executed, and the initial_data fixture will be re-installed.')
 
     def handle_noargs(self, **options):
-        db = options.get('database', DEFAULT_DB_ALIAS)
+        db = options.get('database')
         connection = connections[db]
-        verbosity = int(options.get('verbosity', 1))
+        verbosity = int(options.get('verbosity'))
         interactive = options.get('interactive')
 
         self.style = no_style()

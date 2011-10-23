@@ -21,8 +21,8 @@ class Command(BaseCommand):
         from django.core.management import call_command
         from django.db import connection
 
-        verbosity = int(options.get('verbosity', 1))
-        interactive = options.get('interactive', True)
+        verbosity = int(options.get('verbosity'))
+        interactive = options.get('interactive')
         addrport = options.get('addrport')
 
         # Create a test database.

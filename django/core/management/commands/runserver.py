@@ -139,4 +139,4 @@ class Command(BaseRunserverCommand):
         Serves admin media like old-school (deprecation pending).
         """
         handler = super(Command, self).get_handler(*args, **options)
-        return AdminMediaHandler(handler, options.get('admin_media_path', ''))
+        return AdminMediaHandler(handler, options.get('admin_media_path'))
