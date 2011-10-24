@@ -1,13 +1,11 @@
 from __future__ import with_statement
 from datetime import timedelta, date, datetime
 
-from django.template import Template, Context, add_to_builtins, defaultfilters
+from django.template import Template, Context, defaultfilters
 from django.test import TestCase
 from django.utils import translation, tzinfo
 from django.utils.translation import ugettext as _
 from django.utils.html import escape
-
-add_to_builtins('django.contrib.humanize.templatetags.humanize')
 
 
 class HumanizeTests(TestCase):
@@ -16,7 +14,7 @@ class HumanizeTests(TestCase):
         # Using max below ensures we go through both lists
         # However, if the lists are not equal length, this raises an exception
         for test_content, result in zip(test_list, result_list):
-            t = Template('{{ test_content|%s }}' % method)
+            t = Template('{%% load humanize %%}{{ test_content|%s }}' % method)
             rendered = t.render(Context(locals())).strip()
             self.assertEqual(rendered, escape(result),
                              msg="%s test failed, produced '%s', should've produced '%s'" % (method, rendered, result))
