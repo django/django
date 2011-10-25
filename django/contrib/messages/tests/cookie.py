@@ -3,8 +3,8 @@ from django.contrib.messages.tests.base import BaseTest
 from django.contrib.messages.storage.cookie import (CookieStorage,
     MessageEncoder, MessageDecoder)
 from django.contrib.messages.storage.base import Message
+from django.test.utils import override_settings
 from django.utils import simplejson as json
-from django.conf import settings
 
 
 def set_cookie_data(storage, messages, invalid=False, encode_empty=False):
@@ -40,15 +40,6 @@ def stored_cookie_messages_count(storage, response):
 
 class CookieTest(BaseTest):
     storage_class = CookieStorage
-
-    def setUp(self):
-        super(CookieTest, self).setUp()
-        self.old_SESSION_COOKIE_DOMAIN = settings.SESSION_COOKIE_DOMAIN
-        settings.SESSION_COOKIE_DOMAIN = '.lawrence.com'
-
-    def tearDown(self):
-        super(CookieTest, self).tearDown()
-        settings.SESSION_COOKIE_DOMAIN = self.old_SESSION_COOKIE_DOMAIN
 
     def stored_messages_count(self, storage, response):
         return stored_cookie_messages_count(storage, response)
@@ -139,3 +130,6 @@ class CookieTest(BaseTest):
         value = encoder.encode(messages)
         decoded_messages = json.loads(value, cls=MessageDecoder)
         self.assertEqual(messages, decoded_messages)
+
+CookieTest = override_settings(
+        SESSION_COOKIE_DOMAIN='.lawrence.com')(CookieTest)
