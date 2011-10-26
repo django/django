@@ -1,8 +1,8 @@
+.. _format-localization:
+
 ===================
 Format localization
 ===================
-
-.. _format-localization:
 
 .. versionadded:: 1.2
 
