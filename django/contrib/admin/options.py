@@ -342,13 +342,6 @@ class ModelAdmin(BaseModelAdmin):
         self.model = model
         self.opts = model._meta
         self.admin_site = admin_site
-        if 'action_checkbox' not in self.list_display and self.actions is not None:
-            self.list_display = ['action_checkbox'] +  list(self.list_display)
-        if not self.list_display_links:
-            for name in self.list_display:
-                if name != 'action_checkbox':
-                    self.list_display_links = [name]
-                    break
         super(ModelAdmin, self).__init__()
 
     def get_inline_instances(self, request):
@@ -1104,19 +1097,23 @@ class ModelAdmin(BaseModelAdmin):
         # Check actions to see if any are available on this changelist
         actions = self.get_actions(request)
 
-        # Remove action checkboxes if there aren't any actions available.
-        list_display = list(self.get_list_display(request))
-        if not actions:
-            try:
-                list_display.remove('action_checkbox')
-            except ValueError:
-                pass
+        list_display = self.get_list_display(request)
+
+        list_display_links = self.list_display_links
+        if not self.list_display_links and list_display:
+            list_display_links = list(list_display)[:1]
+
+        if actions:
+            # Add the action checkboxes if there are any actions available.
+            list_display = ['action_checkbox'] +  list(list_display)
 
         ChangeList = self.get_changelist(request)
         try:
-            cl = ChangeList(request, self.model, list_display, self.list_display_links,
-                self.list_filter, self.date_hierarchy, self.search_fields,
-                self.list_select_related, self.list_per_page, self.list_max_show_all, self.list_editable, self)
+            cl = ChangeList(request, self.model, list_display,
+                list_display_links, self.list_filter, self.date_hierarchy,
+                self.search_fields, self.list_select_related,
+                self.list_per_page, self.list_max_show_all, self.list_editable,
+                self)
         except IncorrectLookupParameters:
             # Wacky lookup parameters were given, so redirect to the main
             # changelist page, without parameters, and pass an 'invalid=1'

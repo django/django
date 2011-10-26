@@ -42,7 +42,7 @@ class TestRegistration(TestCase):
                            search_fields=["name"], list_display=['__str__'])
         self.assertEqual(self.site._registry[Person].search_fields, ['name'])
         self.assertEqual(self.site._registry[Person].list_display,
-                         ['action_checkbox', '__str__'])
+                         ['__str__'])
         self.assertTrue(self.site._registry[Person].save_on_top)
 
     def test_iterable_registration(self):
