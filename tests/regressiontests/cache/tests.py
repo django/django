@@ -941,11 +941,15 @@ class GetCacheTests(unittest.TestCase):
         self.assertRaises(InvalidCacheBackendError, get_cache, 'does_not_exist')
 
 
-class CacheUtils(unittest.TestCase):
+class CacheUtils(TestCase):
     """TestCase for django.utils.cache functions."""
 
     def setUp(self):
         self.path = '/cache/test/'
+        self.cache = get_cache('default')
+
+    def tearDown(self):
+        self.cache.clear()
 
     def _get_request(self, path, method='GET'):
         request = HttpRequest()
@@ -1006,7 +1010,7 @@ class CacheUtils(unittest.TestCase):
         response['Vary'] = 'Pony'
         # Make sure that the Vary header is added to the key hash
         learn_cache_key(request, response)
-        self.assertEqual(get_cache_key(request), 'views.decorators.cache.cache_page.settingsprefix.HEAD.a8c87a3d8c44853d7f79474f7ffe4ad5.d41d8cd98f00b204e9800998ecf8427e')
+        self.assertEqual(get_cache_key(request), 'views.decorators.cache.cache_page.settingsprefix.GET.a8c87a3d8c44853d7f79474f7ffe4ad5.d41d8cd98f00b204e9800998ecf8427e')
 
     def test_patch_cache_control(self):
         tests = (
@@ -1054,10 +1058,14 @@ PrefixedCacheUtils = override_settings(
 )(CacheUtils)
 
 
-class CacheHEADTest(unittest.TestCase):
+class CacheHEADTest(TestCase):
 
     def setUp(self):
         self.path = '/cache/test/'
+        self.cache = get_cache('default')
+
+    def tearDown(self):
+        self.cache.clear()
 
     def _get_request(self, method):
         request = HttpRequest()
@@ -1112,17 +1120,22 @@ CacheHEADTest = override_settings(
 )(CacheHEADTest)
 
 
-class CacheI18nTest(unittest.TestCase):
+class CacheI18nTest(TestCase):
 
     def setUp(self):
         self.path = '/cache/test/'
+        self.cache = get_cache('default')
 
-    def _get_request(self):
+    def tearDown(self):
+        self.cache.clear()
+
+    def _get_request(self, method='GET'):
         request = HttpRequest()
         request.META = {
             'SERVER_NAME': 'testserver',
             'SERVER_PORT': 80,
         }
+        request.method = method
         request.path = request.path_info = self.path
         return request
 
@@ -1167,10 +1180,10 @@ class CacheI18nTest(unittest.TestCase):
     )
     def test_middleware(self):
         def set_cache(request, lang, msg):
-            with translation.override(lang):
-                response = HttpResponse()
-                response.content= msg
-                return UpdateCacheMiddleware().process_response(request, response)
+            translation.activate(lang)
+            response = HttpResponse()
+            response.content = msg
+            return UpdateCacheMiddleware().process_response(request, response)
 
         # cache with non empty request.GET
         request = self._get_request_cache(query_string='foo=bar&other=true')
@@ -1198,8 +1211,8 @@ class CacheI18nTest(unittest.TestCase):
         set_cache(request, 'en', en_message)
         get_cache_data = FetchFromCacheMiddleware().process_request(request)
         # Check that we can recover the cache
-        self.assertNotEqual(get_cache_data.content, None)
-        self.assertEqual(en_message, get_cache_data.content)
+        self.assertNotEqual(get_cache_data, None)
+        self.assertEqual(get_cache_data.content, en_message)
         # Check that we use etags
         self.assertTrue(get_cache_data.has_header('ETag'))
         # Check that we can disable etags
@@ -1212,14 +1225,14 @@ class CacheI18nTest(unittest.TestCase):
         request = self._get_request_cache()
         set_cache(request, 'es', es_message)
         # change again the language
-        with translation.override('en'):
-            # retrieve the content from cache
-            get_cache_data = FetchFromCacheMiddleware().process_request(request)
-            self.assertEqual(get_cache_data.content, en_message)
+        translation.activate('en')
+        # retrieve the content from cache
+        get_cache_data = FetchFromCacheMiddleware().process_request(request)
+        self.assertEqual(get_cache_data.content, en_message)
         # change again the language
-        with translation.override('es'):
-            get_cache_data = FetchFromCacheMiddleware().process_request(request)
-            self.assertEqual(get_cache_data.content, es_message)
+        translation.activate('es')
+        get_cache_data = FetchFromCacheMiddleware().process_request(request)
+        self.assertEqual(get_cache_data.content, es_message)
 
 CacheI18nTest = override_settings(
         CACHE_MIDDLEWARE_KEY_PREFIX='settingsprefix',
@@ -1248,10 +1261,16 @@ def hello_world_view(request, value):
     return HttpResponse('Hello World %s' % value)
 
 
-class CacheMiddlewareTest(unittest.TestCase):
+class CacheMiddlewareTest(TestCase):
 
     def setUp(self):
         self.factory = RequestFactory()
+        self.default_cache = get_cache('default')
+        self.other_cache = get_cache('other')
+
+    def tearDown(self):
+        self.default_cache.clear()
+        self.other_cache.clear()
 
     def test_constructor(self):
         """
@@ -1488,6 +1507,10 @@ class TestWithTemplateResponse(TestCase):
     """
     def setUp(self):
         self.path = '/cache/test/'
+        self.cache = get_cache('default')
+
+    def tearDown(self):
+        self.cache.clear()
 
     def _get_request(self, path, method='GET'):
         request = HttpRequest()
@@ -1561,9 +1584,14 @@ class TestWithTemplateResponse(TestCase):
         self.assertTrue(response.has_header('ETag'))
 
 TestWithTemplateResponse = override_settings(
-    CACHE_MIDDLEWARE_KEY_PREFIX='settingsprefix',
-    CACHE_MIDDLEWARE_SECONDS=1,
-    USE_I18N=False,
+        CACHE_MIDDLEWARE_KEY_PREFIX='settingsprefix',
+        CACHE_MIDDLEWARE_SECONDS=1,
+        CACHES={
+            'default': {
+                'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            },
+        },
+        USE_I18N=False,
 )(TestWithTemplateResponse)
 
 
