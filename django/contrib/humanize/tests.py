@@ -118,7 +118,8 @@ class HumanizeTests(TestCase):
         self.assertNotEqual(naturalday_one, naturalday_two)
 
     def test_naturaltime(self):
-        now = datetime.now()
+        # we're going to mock datetime.datetime, so use a fixed datetime
+        now = datetime(2011, 8, 15)
         test_list = [
             now,
             now - timedelta(seconds=1),
@@ -160,18 +161,21 @@ class HumanizeTests(TestCase):
 
         # mock out datetime so these tests don't fail occasionally when the
         # test runs too slow
-        class MockDateTime(object):
+        class MockDateTime(datetime):
+            @classmethod
             def now(self):
                 return now
 
-            def __call__(self, *args, **kwargs):
-                return datetime(*args, **kwargs)
-
+        # naturaltime also calls timesince/timeuntil
         from django.contrib.humanize.templatetags import humanize
-        orig_datetime = humanize.datetime
-        humanize.datetime = MockDateTime()
+        from django.utils import timesince
+        orig_humanize_datetime = humanize.datetime
+        orig_timesince_datetime = timesince.datetime.datetime
+        humanize.datetime = MockDateTime
+        timesince.datetime.datetime = MockDateTime
 
         try:
             self.humanize_tester(test_list, result_list, 'naturaltime')
         finally:
-            humanize.datetime = orig_datetime
+            humanize.datetime = orig_humanize_datetime
+            timesince.datetime.datetime = orig_timesince_datetime
