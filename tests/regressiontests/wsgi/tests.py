@@ -83,20 +83,17 @@ class GetInternalWSGIApplicationTest(unittest.TestCase):
 
     @override_settings(WSGI_APPLICATION="regressiontests.wsgi.noexist.app")
     def test_bad_module(self):
-        with self.assertRaises(ImproperlyConfigured) as cm:
-            get_internal_wsgi_application()
+        with self.assertRaisesRegexp(
+            ImproperlyConfigured,
+            r"^WSGI application 'regressiontests.wsgi.noexist.app' could not be loaded; could not import module 'regressiontests.wsgi.noexist':"):
 
-        self.assertEqual(
-            str(cm.exception),
-            "WSGI application 'regressiontests.wsgi.noexist.app' could not be loaded; could not import module 'regressiontests.wsgi.noexist': No module named noexist")
+            get_internal_wsgi_application()
 
 
     @override_settings(WSGI_APPLICATION="regressiontests.wsgi.wsgi.noexist")
     def test_bad_name(self):
-        with self.assertRaises(ImproperlyConfigured) as cm:
+        with self.assertRaisesRegexp(
+            ImproperlyConfigured,
+            r"^WSGI application 'regressiontests.wsgi.wsgi.noexist' could not be loaded; can't find 'noexist' in module 'regressiontests.wsgi.wsgi':"):
+
             get_internal_wsgi_application()
-
-        self.assertEqual(
-            str(cm.exception),
-            "WSGI application 'regressiontests.wsgi.wsgi.noexist' could not be loaded; can't find 'noexist' in module 'regressiontests.wsgi.wsgi': 'module' object has no attribute 'noexist'")
-
