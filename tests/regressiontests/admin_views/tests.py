@@ -28,6 +28,7 @@ from django.utils.cache import get_max_age
 from django.utils.encoding import iri_to_uri
 from django.utils.html import escape
 from django.utils.http import urlencode
+from django.test.utils import override_settings
 
 # local test models
 from .models import (Article, BarAccount, CustomArticle, EmptyModel, FooAccount,
@@ -2756,6 +2757,15 @@ class PrePopulatedTest(TestCase):
         self.assertNotContains(response, "id: '#id_slug'")
         self.assertNotContains(response, "field['dependency_ids'].push('#id_title');")
         self.assertNotContains(response, "id: '#id_prepopulatedsubpost_set-0-subslug',")
+    
+    @override_settings(USE_THOUSAND_SEPARATOR = True, USE_L10N = True)
+    def test_prepopulated_maxlength_localized(self):
+        """
+        Regression test for #15938: if USE_THOUSAND_SEPARATOR is set, make sure
+        that maxLength (in the javascript) is rendered without separators.
+        """
+        response = self.client.get('/test_admin/admin/admin_views/prepopulatedpostlargeslug/add/')
+        self.assertContains(response, "maxLength: 1000") # instead of 1,000
 
 class ReadonlyTest(TestCase):
     urls = "regressiontests.admin_views.urls"

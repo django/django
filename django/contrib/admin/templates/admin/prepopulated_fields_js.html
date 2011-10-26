@@ -1,3 +1,4 @@
+{% load l10n %}
 <script type="text/javascript">
 (function($) {
     var field = null;
@@ -7,7 +8,7 @@
         id: '#{{ field.field.auto_id }}',
         dependency_ids: [],
         dependency_list: [],
-        maxLength: {{ field.field.field.max_length|default_if_none:"50" }}
+        maxLength: {{ field.field.field.max_length|default_if_none:"50"|unlocalize }}
     };
 
     {% for dependency in field.dependencies %}

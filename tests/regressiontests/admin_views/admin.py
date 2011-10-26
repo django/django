@@ -22,7 +22,7 @@ from .models import (Article, Chapter, Account, Media, Child, Parent, Picture,
     Gadget, Villain, SuperVillain, Plot, PlotDetails, CyclicOne, CyclicTwo,
     WorkHour, Reservation, FoodDelivery, RowLevelChangePermissionModel, Paper,
     CoverLetter, Story, OtherStory, Book, Promo, ChapterXtra1, Pizza, Topping,
-    Album, Question, Answer, ComplexSortedPerson)
+    Album, Question, Answer, ComplexSortedPerson, PrePopulatedPostLargeSlug)
 
 
 def callable_year(dt_value):
@@ -469,6 +469,11 @@ class WorkHourAdmin(admin.ModelAdmin):
     list_filter = ('employee',)
 
 
+class PrePopulatedPostLargeSlugAdmin(admin.ModelAdmin): 
+    prepopulated_fields = { 
+        'slug' : ('title',) 
+    } 
+ 
 site = admin.AdminSite(name="admin")
 site.register(Article, ArticleAdmin)
 site.register(CustomArticle, CustomArticleAdmin)
@@ -538,3 +543,4 @@ from django.contrib.auth.models import User, Group
 from django.contrib.auth.admin import UserAdmin, GroupAdmin
 site.register(User, UserAdmin)
 site.register(Group, GroupAdmin)
+site.register(PrePopulatedPostLargeSlug, PrePopulatedPostLargeSlugAdmin) 
