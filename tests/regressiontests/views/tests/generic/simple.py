@@ -48,9 +48,17 @@ class RedirectToTest(TestCase):
         self.assertEqual(response.status_code, 301)
         self.assertEqual('http://testserver/simple/target/?param1=foo&param2=bar', response['Location'])
 
+        # Confirm that the contents of the query string are not subject to
+        # string interpolation (Refs #17111):
+        response = self.client.get('/simple/redirect_to_query/?param1=foo&param2=hist%C3%B3ria')
+        self.assertEqual(response.status_code, 301)
+        self.assertEqual('http://testserver/simple/target/?param1=foo&param2=hist%C3%B3ria', response['Location'])
+        response = self.client.get('/simple/redirect_to_arg_and_query/99/?param1=foo&param2=hist%C3%B3ria')
+        self.assertEqual(response.status_code, 301)
+        self.assertEqual('http://testserver/simple/target_arg/99/?param1=foo&param2=hist%C3%B3ria', response['Location'])
+
     def test_redirect_to_when_meta_contains_no_query_string(self):
         "regression for #16705"
         # we can't use self.client.get because it always sets QUERY_STRING
         response = self.client.request(PATH_INFO='/simple/redirect_to/')
         self.assertEqual(response.status_code, 301)
-        

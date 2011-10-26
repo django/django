@@ -49,12 +49,16 @@ def redirect_to(request, url, permanent=True, query_string=False, **kwargs):
 
     """
     args = request.META.get('QUERY_STRING', '')
-    if args and query_string and url is not None:
-        url = "%s?%s" % (url, args)
 
     if url is not None:
+        if kwargs:
+            url = url % kwargs
+
+        if args and query_string:
+            url = "%s?%s" % (url, args)
+
         klass = permanent and HttpResponsePermanentRedirect or HttpResponseRedirect
-        return klass(url % kwargs)
+        return klass(url)
     else:
         logger.warning('Gone: %s' % request.path,
                     extra={
