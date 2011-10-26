@@ -53,6 +53,3 @@ class DBTypeCasts(unittest.TestCase):
             for inpt, expected in v:
                 got = getattr(typecasts, k)(inpt)
                 self.assertEqual(got, expected, "In %s: %r doesn't match %r. Got %r instead." % (k, inpt, expected, got))
-
-if __name__ == '__main__':
-    unittest.main()

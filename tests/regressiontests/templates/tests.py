@@ -1711,7 +1711,3 @@ class RequestContextTests(BaseTemplateResponseTest):
             template.Template('{% include "child" only %}').render(ctx),
             'none'
         )
-
-
-if __name__ == "__main__":
-    unittest.main()

@@ -1581,8 +1581,3 @@ class TestEtagWithAdmin(TestCase):
             response = self.client.get('/test_admin/admin/')
             self.assertEqual(response.status_code, 200)
             self.assertTrue(response.has_header('ETag'))
-
-
-if __name__ == '__main__':
-    unittest.main()
-

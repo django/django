@@ -83,7 +83,3 @@ Paragraph 2 with a link_
         t = Template("{% load markup %}{{ rest_content|restructuredtext }}")
         rendered = t.render(Context({'rest_content':self.rest_content})).strip()
         self.assertEqual(rendered, self.rest_content)
-
-
-if __name__ == '__main__':
-    unittest.main()

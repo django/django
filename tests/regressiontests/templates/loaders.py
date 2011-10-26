@@ -153,6 +153,3 @@ class RenderToStringTest(unittest.TestCase):
         self.assertRaisesRegexp(TemplateDoesNotExist,
                                 'No template names provided$',
                                 loader.select_template, [])
-
-if __name__ == "__main__":
-    unittest.main()
