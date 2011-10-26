@@ -650,6 +650,18 @@ class ModelAdmin(BaseModelAdmin):
         """
         return self.list_display
 
+    def get_list_display_links(self, request, list_display):
+        """
+        Return a sequence containing the fields to be displayed as links
+        on the changelist. The list_display parameter is the list of fields
+        returned by get_list_display().
+        """
+        if self.list_display_links or not list_display:
+            return self.list_display_links
+        else:
+            # Use only the first item in list_display as link
+            return list(list_display)[:1]
+
     def construct_change_message(self, request, form, formsets):
         """
         Construct a change message from a changed object.
@@ -1087,22 +1099,20 @@ class ModelAdmin(BaseModelAdmin):
 
     @csrf_protect_m
     def changelist_view(self, request, extra_context=None):
-        "The 'change list' admin view for this model."
+        """
+        The 'change list' admin view for this model.
+        """
         from django.contrib.admin.views.main import ERROR_FLAG
         opts = self.model._meta
         app_label = opts.app_label
         if not self.has_change_permission(request, None):
             raise PermissionDenied
 
+        list_display = self.get_list_display(request)
+        list_display_links = self.get_list_display_links(request, list_display)
+
         # Check actions to see if any are available on this changelist
         actions = self.get_actions(request)
-
-        list_display = self.get_list_display(request)
-
-        list_display_links = self.list_display_links
-        if not self.list_display_links and list_display:
-            list_display_links = list(list_display)[:1]
-
         if actions:
             # Add the action checkboxes if there are any actions available.
             list_display = ['action_checkbox'] +  list(list_display)

@@ -9,7 +9,8 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 
 from .admin import (ChildAdmin, QuartetAdmin, BandAdmin, ChordsBandAdmin,
-    GroupAdmin, ParentAdmin, DynamicListDisplayChildAdmin, CustomPaginationAdmin,
+    GroupAdmin, ParentAdmin, DynamicListDisplayChildAdmin,
+    DynamicListDisplayLinksChildAdmin, CustomPaginationAdmin,
     FilteredChildAdmin, CustomPaginator, site as custom_site)
 from .models import (Child, Parent, Genre, Band, Musician, Group, Quartet,
     Membership, ChordsMusician, ChordsBand, Invitation)
@@ -41,7 +42,9 @@ class ChangeListTests(TestCase):
         new_child = Child.objects.create(name='name', parent=None)
         request = self.factory.get('/child/')
         m = ChildAdmin(Child, admin.site)
-        cl = ChangeList(request, Child, m.list_display, m.list_display_links,
+        list_display = m.get_list_display(request)
+        list_display_links = m.get_list_display_links(request, list_display)
+        cl = ChangeList(request, Child, list_display, list_display_links,
                 m.list_filter, m.date_hierarchy, m.search_fields,
                 m.list_select_related, m.list_per_page, m.list_max_show_all, m.list_editable, m)
         cl.formset = None
@@ -61,7 +64,9 @@ class ChangeListTests(TestCase):
         new_child = Child.objects.create(name='name', parent=new_parent)
         request = self.factory.get('/child/')
         m = ChildAdmin(Child, admin.site)
-        cl = ChangeList(request, Child, m.list_display, m.list_display_links,
+        list_display = m.get_list_display(request)
+        list_display_links = m.get_list_display_links(request, list_display)
+        cl = ChangeList(request, Child, list_display, list_display_links,
                 m.list_filter, m.date_hierarchy, m.search_fields,
                 m.list_select_related, m.list_per_page, m.list_max_show_all, m.list_editable, m)
         cl.formset = None
@@ -334,28 +339,31 @@ class ChangeListTests(TestCase):
         m = custom_site._registry[Child]
         request = _mocked_authenticated_request(user_noparents)
         response = m.changelist_view(request)
-        # XXX - Calling render here to avoid ContentNotRenderedError to be
-        # raised. Ticket #15826 should fix this but it's not yet integrated.
-        response.render()
         self.assertNotContains(response, 'Parent object')
+
+        list_display = m.get_list_display(request)
+        list_display_links = m.get_list_display_links(request, list_display)
+        self.assertEqual(list_display, ['name', 'age'])
+        self.assertEqual(list_display_links, ['name'])
 
         # Test with user 'parents'
         m = DynamicListDisplayChildAdmin(Child, admin.site)
         request = _mocked_authenticated_request(user_parents)
         response = m.changelist_view(request)
-        # XXX - #15826
-        response.render()
         self.assertContains(response, 'Parent object')
 
         custom_site.unregister(Child)
+
+        list_display = m.get_list_display(request)
+        list_display_links = m.get_list_display_links(request, list_display)
+        self.assertEqual(list_display, ('parent', 'name', 'age'))
+        self.assertEqual(list_display_links, ['parent'])
 
         # Test default implementation
         custom_site.register(Child, ChildAdmin)
         m = custom_site._registry[Child]
         request = _mocked_authenticated_request(user_noparents)
         response = m.changelist_view(request)
-        # XXX - #15826
-        response.render()
         self.assertContains(response, 'Parent object')
 
     def test_show_all(self):
@@ -386,3 +394,30 @@ class ChangeListTests(TestCase):
         cl.get_results(request)
         self.assertEqual(len(cl.result_list), 10)
 
+    def test_dynamic_list_display_links(self):
+        """
+        Regression tests for #16257: dynamic list_display_links support.
+        """
+        parent = Parent.objects.create(name='parent')
+        for i in range(1, 10):
+            Child.objects.create(id=i, name='child %s' % i, parent=parent, age=i)
+
+        superuser = User.objects.create(
+            username='superuser',
+            is_superuser=True)
+
+        def _mocked_authenticated_request(user):
+            request = self.factory.get('/child/')
+            request.user = user
+            return request
+
+        m = DynamicListDisplayLinksChildAdmin(Child, admin.site)
+        request = _mocked_authenticated_request(superuser)
+        response = m.changelist_view(request)
+        for i in range(1, 10):
+            self.assertContains(response, '<a href="%s/">%s</a>' % (i, i))
+
+        list_display = m.get_list_display(request)
+        list_display_links = m.get_list_display_links(request, list_display)
+        self.assertEqual(list_display, ('parent', 'name', 'age'))
+        self.assertEqual(list_display_links, ['age'])

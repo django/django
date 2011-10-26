@@ -58,13 +58,20 @@ class ChordsBandAdmin(admin.ModelAdmin):
 
 
 class DynamicListDisplayChildAdmin(admin.ModelAdmin):
-    list_display = ('name', 'parent')
+    list_display = ('parent', 'name', 'age')
 
     def get_list_display(self, request):
-        my_list_display = list(self.list_display)
+        my_list_display = super(DynamicListDisplayChildAdmin, self).get_list_display(request)
         if request.user.username == 'noparents':
+            my_list_display = list(my_list_display)
             my_list_display.remove('parent')
-
         return my_list_display
+
+class DynamicListDisplayLinksChildAdmin(admin.ModelAdmin):
+    list_display = ('parent', 'name', 'age')
+    list_display_links = ['parent', 'name']
+
+    def get_list_display_links(self, request, list_display):
+        return ['age']
 
 site.register(Child, DynamicListDisplayChildAdmin)

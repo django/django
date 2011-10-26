@@ -7,6 +7,7 @@ class Parent(models.Model):
 class Child(models.Model):
     parent = models.ForeignKey(Parent, editable=False, null=True)
     name = models.CharField(max_length=30, blank=True)
+    age = models.IntegerField(null=True, blank=True)
 
 class Genre(models.Model):
     name = models.CharField(max_length=20)

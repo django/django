@@ -124,12 +124,19 @@ to work similarly to how desktop GUIs do it. The new hook
 :meth:`~django.contrib.admin.ModelAdmin.get_ordering` for specifying the
 ordering dynamically (e.g. depending on the request) has also been added.
 
-``ModelAdmin.save_related()``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+New ``ModelAdmin`` methods
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-A new :meth:`~django.contrib.admin.ModelAdmin.save_related` hook was added to
+A new :meth:`~django.contrib.admin.ModelAdmin.save_related` method was added to
 :mod:`~django.contrib.admin.ModelAdmin` to ease the customization of how
 related objects are saved in the admin.
+
+Two other new methods,
+:meth:`~django.contrib.admin.ModelAdmin.get_list_display` and
+:meth:`~django.contrib.admin.ModelAdmin.get_list_display_links`
+were added to :class:`~django.contrib.admin.ModelAdmin` to enable the dynamic
+customization of fields and links to display on the admin
+change list.
 
 Admin inlines respect user permissions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
