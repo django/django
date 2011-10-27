@@ -1233,6 +1233,8 @@ class CacheI18nTest(TestCase):
         translation.activate('es')
         get_cache_data = FetchFromCacheMiddleware().process_request(request)
         self.assertEqual(get_cache_data.content, es_message)
+        # reset the language
+        translation.deactivate()
 
 CacheI18nTest = override_settings(
         CACHE_MIDDLEWARE_KEY_PREFIX='settingsprefix',
