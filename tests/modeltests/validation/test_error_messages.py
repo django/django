@@ -17,7 +17,7 @@ class ValidationMessagesTest(TestCase):
         try:
             models.AutoField(primary_key=False)
         except AssertionError, e:
-            self.assertEqual(e.message, u"AutoFields must have primary_key=True.")
+            self.assertEqual(str(e), "AutoFields must have primary_key=True.")
 
     def test_integer_field_raises_error_message(self):
         f = models.IntegerField()

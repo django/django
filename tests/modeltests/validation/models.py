@@ -102,4 +102,4 @@ try:
         auto2 = models.AutoField(primary_key=True)
 except AssertionError, assertion_error:
     pass # Fail silently
-assert assertion_error.message == u"A model can't have more than one AutoField."
+assert str(assertion_error) == u"A model can't have more than one AutoField."
