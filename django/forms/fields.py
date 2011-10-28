@@ -178,6 +178,7 @@ class Field(object):
         result = copy.copy(self)
         memo[id(self)] = result
         result.widget = copy.deepcopy(self.widget, memo)
+        result.validators = self.validators[:]
         return result
 
 class CharField(Field):
