@@ -337,8 +337,8 @@ class RegexURLResolver(LocaleRegexProvider):
         if not callback:
             # No handler specified in file; use default
             # Lazy import, since urls.defaults imports this file
-            from django.conf.urls import defaults
-            callback = getattr(defaults, 'handler%s' % view_type)
+            from django.conf import urls
+            callback = getattr(urls, 'handler%s' % view_type)
         return get_callable(callback), {}
 
     def resolve403(self):
