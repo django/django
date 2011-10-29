@@ -581,7 +581,7 @@ def random(value):
 random.is_safe = True
 
 @register.filter("slice")
-def slice_(value, arg):
+def slice_filter(value, arg):
     """
     Returns a slice of the list.
 
@@ -600,7 +600,7 @@ def slice_(value, arg):
 
     except (ValueError, TypeError):
         return value # Fail silently.
-slice_.is_safe = True
+slice_filter.is_safe = True
 
 @register.filter
 def unordered_list(value, autoescape=None):
