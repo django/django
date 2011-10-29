@@ -18,6 +18,7 @@ from django.utils.safestring import mark_safe
 
 register = template.Library()
 
+@register.filter
 def textile(value):
     try:
         import textile
@@ -29,6 +30,7 @@ def textile(value):
         return mark_safe(force_unicode(textile.textile(smart_str(value), encoding='utf-8', output='utf-8')))
 textile.is_safe = True
 
+@register.filter
 def markdown(value, arg=''):
     """
     Runs Markdown over a given value, optionally using various
@@ -73,6 +75,7 @@ def markdown(value, arg=''):
             return mark_safe(force_unicode(markdown.markdown(smart_str(value))))
 markdown.is_safe = True
 
+@register.filter
 def restructuredtext(value):
     try:
         from docutils.core import publish_parts
@@ -86,6 +89,3 @@ def restructuredtext(value):
         return mark_safe(force_unicode(parts["fragment"]))
 restructuredtext.is_safe = True
 
-register.filter(textile)
-register.filter(markdown)
-register.filter(restructuredtext)

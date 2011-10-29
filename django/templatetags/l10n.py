@@ -3,9 +3,9 @@ from django.template import TemplateSyntaxError, Library
 from django.utils import formats
 from django.utils.encoding import force_unicode
 
-
 register = Library()
 
+@register.filter
 def localize(value):
     """
     Forces a value to be rendered as a localized value,
@@ -14,6 +14,7 @@ def localize(value):
     return force_unicode(formats.localize(value, use_l10n=True))
 localize.is_safe = False
 
+@register.filter
 def unlocalize(value):
     """
     Forces a value to be rendered as a non-localized value,
@@ -61,6 +62,3 @@ def localize_tag(parser, token):
     nodelist = parser.parse(('endlocalize',))
     parser.delete_first_token()
     return LocalizeNode(nodelist, use_l10n)
-
-register.filter(localize)
-register.filter(unlocalize)
