@@ -53,6 +53,7 @@ def stringfilter(func):
 # STRINGS         #
 ###################
 
+@stringfilter
 def addslashes(value):
     """
     Adds slashes before quotes. Useful for escaping strings in CSV, for
@@ -61,13 +62,12 @@ def addslashes(value):
     """
     return value.replace('\\', '\\\\').replace('"', '\\"').replace("'", "\\'")
 addslashes.is_safe = True
-addslashes = stringfilter(addslashes)
 
+@stringfilter
 def capfirst(value):
     """Capitalizes the first character of the value."""
     return value and value[0].upper() + value[1:]
-capfirst.is_safe=True
-capfirst = stringfilter(capfirst)
+capfirst.is_safe = True
 
 @register.filter("escapejs")
 @stringfilter
@@ -80,7 +80,7 @@ def escapejs_filter(value):
 def fix_ampersands_filter(value):
     """Replaces ampersands with ``&amp;`` entities."""
     return fix_ampersands(value)
-fix_ampersands_filter.is_safe=True
+fix_ampersands_filter.is_safe = True
 
 # Values for testing floatformat input against infinity and NaN representations,
 # which differ across platforms and Python versions.  Some (i.e. old Windows
@@ -171,12 +171,13 @@ def floatformat(text, arg=-1):
         return input_val
 floatformat.is_safe = True
 
+@stringfilter
 def iriencode(value):
     """Escapes an IRI value for use in a URL."""
     return force_unicode(iri_to_uri(value))
 iriencode.is_safe = True
-iriencode = stringfilter(iriencode)
 
+@stringfilter
 def linenumbers(value, autoescape=None):
     """Displays text with line numbers."""
     lines = value.split(u'\n')
@@ -192,14 +193,14 @@ def linenumbers(value, autoescape=None):
     return mark_safe(u'\n'.join(lines))
 linenumbers.is_safe = True
 linenumbers.needs_autoescape = True
-linenumbers = stringfilter(linenumbers)
 
+@stringfilter
 def lower(value):
     """Converts a string into all lowercase."""
     return value.lower()
 lower.is_safe = True
-lower = stringfilter(lower)
 
+@stringfilter
 def make_list(value):
     """
     Returns the value turned into a list.
@@ -209,8 +210,8 @@ def make_list(value):
     """
     return list(value)
 make_list.is_safe = False
-make_list = stringfilter(make_list)
 
+@stringfilter
 def slugify(value):
     """
     Normalizes string, converts to lowercase, removes non-alpha characters,
@@ -220,7 +221,6 @@ def slugify(value):
     value = unicode(re.sub('[^\w\s-]', '', value).strip().lower())
     return mark_safe(re.sub('[-\s]+', '-', value))
 slugify.is_safe = True
-slugify = stringfilter(slugify)
 
 def stringformat(value, arg):
     """
@@ -238,13 +238,14 @@ def stringformat(value, arg):
         return u""
 stringformat.is_safe = True
 
+@stringfilter
 def title(value):
     """Converts a string into titlecase."""
     t = re.sub("([a-z])'([A-Z])", lambda m: m.group(0).lower(), value.title())
     return re.sub("\d([A-Z])", lambda m: m.group(0).lower(), t)
 title.is_safe = True
-title = stringfilter(title)
 
+@stringfilter
 def truncatechars(value, arg):
     """
     Truncates a string after a certain number of characters.
@@ -257,8 +258,8 @@ def truncatechars(value, arg):
         return value # Fail silently.
     return Truncator(value).chars(length)
 truncatechars.is_safe = True
-truncatechars = stringfilter(truncatechars)
 
+@stringfilter
 def truncatewords(value, arg):
     """
     Truncates a string after a certain number of words.
@@ -273,8 +274,8 @@ def truncatewords(value, arg):
         return value # Fail silently.
     return Truncator(value).words(length, truncate=' ...')
 truncatewords.is_safe = True
-truncatewords = stringfilter(truncatewords)
 
+@stringfilter
 def truncatewords_html(value, arg):
     """
     Truncates HTML after a certain number of words.
@@ -289,14 +290,14 @@ def truncatewords_html(value, arg):
         return value # Fail silently.
     return Truncator(value).words(length, html=True, truncate=' ...')
 truncatewords_html.is_safe = True
-truncatewords_html = stringfilter(truncatewords_html)
 
+@stringfilter
 def upper(value):
     """Converts a string into all uppercase."""
     return value.upper()
 upper.is_safe = False
-upper = stringfilter(upper)
 
+@stringfilter
 def urlencode(value, safe=None):
     """
     Escapes a value for use in a URL.
@@ -311,7 +312,6 @@ def urlencode(value, safe=None):
         kwargs['safe'] = safe
     return urlquote(value, **kwargs)
 urlencode.is_safe = False
-urlencode = stringfilter(urlencode)
 
 @register.filter
 @stringfilter
@@ -321,6 +321,7 @@ def urlize(value, autoescape=None):
 urlize.is_safe = True
 urlize.needs_autoescape = True
 
+@stringfilter
 def urlizetrunc(value, limit, autoescape=None):
     """
     Converts URLs into clickable links, truncating URLs to the given character
@@ -332,14 +333,14 @@ def urlizetrunc(value, limit, autoescape=None):
                             autoescape=autoescape))
 urlizetrunc.is_safe = True
 urlizetrunc.needs_autoescape = True
-urlizetrunc = stringfilter(urlizetrunc)
 
+@stringfilter
 def wordcount(value):
     """Returns the number of words."""
     return len(value.split())
 wordcount.is_safe = False
-wordcount = stringfilter(wordcount)
 
+@stringfilter
 def wordwrap(value, arg):
     """
     Wraps words at specified line length.
@@ -348,8 +349,8 @@ def wordwrap(value, arg):
     """
     return wrap(value, int(arg))
 wordwrap.is_safe = True
-wordwrap = stringfilter(wordwrap)
 
+@stringfilter
 def ljust(value, arg):
     """
     Left-aligns the value in a field of a given width.
@@ -358,8 +359,8 @@ def ljust(value, arg):
     """
     return value.ljust(int(arg))
 ljust.is_safe = True
-ljust = stringfilter(ljust)
 
+@stringfilter
 def rjust(value, arg):
     """
     Right-aligns the value in a field of a given width.
@@ -368,14 +369,14 @@ def rjust(value, arg):
     """
     return value.rjust(int(arg))
 rjust.is_safe = True
-rjust = stringfilter(rjust)
 
+@stringfilter
 def center(value, arg):
     """Centers the value in a field of a given width."""
     return value.center(int(arg))
 center.is_safe = True
-center = stringfilter(center)
 
+@stringfilter
 def cut(value, arg):
     """
     Removes all values of arg from the given string.
@@ -385,7 +386,6 @@ def cut(value, arg):
     if safe and arg != ';':
         return mark_safe(value)
     return value
-cut = stringfilter(cut)
 
 ###################
 # HTML STRINGS    #
@@ -400,6 +400,7 @@ def escape_filter(value):
     return mark_for_escaping(value)
 escape_filter.is_safe = True
 
+@stringfilter
 def force_escape(value):
     """
     Escapes a string's HTML. This returns a new string containing the escaped
@@ -407,7 +408,6 @@ def force_escape(value):
     possible escaping).
     """
     return mark_safe(escape(value))
-force_escape = stringfilter(force_escape)
 force_escape.is_safe = True
 
 @register.filter("linebreaks")
@@ -422,8 +422,8 @@ def linebreaks_filter(value, autoescape=None):
     return mark_safe(linebreaks(value, autoescape))
 linebreaks_filter.is_safe = True
 linebreaks_filter.needs_autoescape = True
-linebreaks = stringfilter(linebreaks)
 
+@stringfilter
 def linebreaksbr(value, autoescape=None):
     """
     Converts all newlines in a piece of plain text to HTML line breaks
@@ -436,15 +436,14 @@ def linebreaksbr(value, autoescape=None):
     return mark_safe(value.replace('\n', '<br />'))
 linebreaksbr.is_safe = True
 linebreaksbr.needs_autoescape = True
-linebreaksbr = stringfilter(linebreaksbr)
 
+@stringfilter
 def safe(value):
     """
     Marks the value as a string that should not be auto-escaped.
     """
     return mark_safe(value)
 safe.is_safe = True
-safe = stringfilter(safe)
 
 def safeseq(value):
     """
@@ -455,6 +454,7 @@ def safeseq(value):
     return [mark_safe(force_unicode(obj)) for obj in value]
 safeseq.is_safe = True
 
+@stringfilter
 def removetags(value, tags):
     """Removes a space separated list of [X]HTML tags from the output."""
     tags = [re.escape(tag) for tag in tags.split()]
@@ -465,13 +465,12 @@ def removetags(value, tags):
     value = endtag_re.sub(u'', value)
     return value
 removetags.is_safe = True
-removetags = stringfilter(removetags)
 
+@stringfilter
 def striptags(value):
     """Strips all [X]HTML tags."""
     return strip_tags(value)
 striptags.is_safe = True
-striptags = stringfilter(striptags)
 
 ###################
 # LISTS           #
