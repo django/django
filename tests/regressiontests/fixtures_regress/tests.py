@@ -405,6 +405,18 @@ class TestFixtures(TestCase):
             stderr.getvalue(), 'No database fixture specified. Please provide the path of at least one fixture in the command line.\n'
         )
 
+    def test_loaddata_not_existant_fixture_file(self):
+        stdout_output = StringIO()
+        management.call_command(
+            'loaddata',
+            'this_fixture_doesnt_exist',
+            verbosity=2,
+            commit=False,
+            stdout=stdout_output,
+        )
+        self.assertTrue("No xml fixture 'this_fixture_doesnt_exist' in" in
+            stdout_output.getvalue())
+
 
 class NaturalKeyFixtureTests(TestCase):
 
