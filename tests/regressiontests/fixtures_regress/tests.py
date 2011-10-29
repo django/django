@@ -390,6 +390,21 @@ class TestFixtures(TestCase):
             stderr.getvalue().startswith('Problem installing fixture')
         )
 
+    def test_loaddata_no_fixture_specified(self):
+        """
+        Regression for #7043 - Error is quickly reported when no fixtures is provided in the command line.
+        """
+        stderr = StringIO()
+        management.call_command(
+            'loaddata',
+            verbosity=0,
+            commit=False,
+            stderr=stderr,
+        )
+        self.assertEqual(
+            stderr.getvalue(), 'No database fixture specified. Please provide the path of at least one fixture in the command line.\n'
+        )
+
 
 class NaturalKeyFixtureTests(TestCase):
 
