@@ -251,6 +251,9 @@ these changes.
   :mod:`django.core.management`. This also means that the old (pre-1.4)
   style of :file:`manage.py` file will no longer work.
 
+* Setting the ``is_safe`` and ``needs_autoescape`` flags as attributes of
+  template filter functions will no longer be supported.
+
 2.0
 ---
 

@@ -37,23 +37,33 @@ def stringfilter(func):
         if args:
             args = list(args)
             args[0] = force_unicode(args[0])
-            if isinstance(args[0], SafeData) and getattr(func, 'is_safe', False):
+            if (isinstance(args[0], SafeData) and
+                getattr(_dec._decorated_function, 'is_safe', False)):
                 return mark_safe(func(*args, **kwargs))
         return func(*args, **kwargs)
 
     # Include a reference to the real function (used to check original
-    # arguments by the template parser).
+    # arguments by the template parser, and to bear the 'is_safe' attribute
+    # when multiple decorators are applied).
     _dec._decorated_function = getattr(func, '_decorated_function', func)
+
     for attr in ('is_safe', 'needs_autoescape'):
         if hasattr(func, attr):
+            import warnings
+            warnings.warn("Setting the %s attribute of a template filter "
+                          "function is deprecated; use @register.filter(%s=%s) "
+                          "instead" % (attr, attr, getattr(func, attr)),
+                          PendingDeprecationWarning)
             setattr(_dec, attr, getattr(func, attr))
+
     return wraps(func)(_dec)
+
 
 ###################
 # STRINGS         #
 ###################
 
-@register.filter
+@register.filter(is_safe=True)
 @stringfilter
 def addslashes(value):
     """
@@ -62,14 +72,12 @@ def addslashes(value):
     filter instead.
     """
     return value.replace('\\', '\\\\').replace('"', '\\"').replace("'", "\\'")
-addslashes.is_safe = True
 
-@register.filter
+@register.filter(is_safe=True)
 @stringfilter
 def capfirst(value):
     """Capitalizes the first character of the value."""
     return value and value[0].upper() + value[1:]
-capfirst.is_safe = True
 
 @register.filter("escapejs")
 @stringfilter
@@ -77,12 +85,11 @@ def escapejs_filter(value):
     """Hex encodes characters for use in JavaScript strings."""
     return escapejs(value)
 
-@register.filter("fix_ampersands")
+@register.filter("fix_ampersands", is_safe=True)
 @stringfilter
 def fix_ampersands_filter(value):
     """Replaces ampersands with ``&amp;`` entities."""
     return fix_ampersands(value)
-fix_ampersands_filter.is_safe = True
 
 # Values for testing floatformat input against infinity and NaN representations,
 # which differ across platforms and Python versions.  Some (i.e. old Windows
@@ -96,7 +103,7 @@ neg_inf = -1e200 * 1e200
 nan = (1e200 * 1e200) // (1e200 * 1e200)
 special_floats = [str(pos_inf), str(neg_inf), str(nan)]
 
-@register.filter
+@register.filter(is_safe=True)
 def floatformat(text, arg=-1):
     """
     Displays a float to a specified number of decimal places.
@@ -172,16 +179,14 @@ def floatformat(text, arg=-1):
         return mark_safe(formats.number_format(number, abs(p)))
     except InvalidOperation:
         return input_val
-floatformat.is_safe = True
 
-@register.filter
+@register.filter(is_safe=True)
 @stringfilter
 def iriencode(value):
     """Escapes an IRI value for use in a URL."""
     return force_unicode(iri_to_uri(value))
-iriencode.is_safe = True
 
-@register.filter
+@register.filter(is_safe=True, needs_autoescape=True)
 @stringfilter
 def linenumbers(value, autoescape=None):
     """Displays text with line numbers."""
@@ -196,17 +201,14 @@ def linenumbers(value, autoescape=None):
         for i, line in enumerate(lines):
             lines[i] = (u"%0" + width  + u"d. %s") % (i + 1, escape(line))
     return mark_safe(u'\n'.join(lines))
-linenumbers.is_safe = True
-linenumbers.needs_autoescape = True
 
-@register.filter
+@register.filter(is_safe=True)
 @stringfilter
 def lower(value):
     """Converts a string into all lowercase."""
     return value.lower()
-lower.is_safe = True
 
-@register.filter
+@register.filter(is_safe=False)
 @stringfilter
 def make_list(value):
     """
@@ -216,9 +218,8 @@ def make_list(value):
     For a string, it's a list of characters.
     """
     return list(value)
-make_list.is_safe = False
 
-@register.filter
+@register.filter(is_safe=True)
 @stringfilter
 def slugify(value):
     """
@@ -228,9 +229,8 @@ def slugify(value):
     value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore')
     value = unicode(re.sub('[^\w\s-]', '', value).strip().lower())
     return mark_safe(re.sub('[-\s]+', '-', value))
-slugify.is_safe = True
 
-@register.filter
+@register.filter(is_safe=True)
 def stringformat(value, arg):
     """
     Formats the variable according to the arg, a string formatting specifier.
@@ -245,17 +245,15 @@ def stringformat(value, arg):
         return (u"%" + unicode(arg)) % value
     except (ValueError, TypeError):
         return u""
-stringformat.is_safe = True
 
-@register.filter
+@register.filter(is_safe=True)
 @stringfilter
 def title(value):
     """Converts a string into titlecase."""
     t = re.sub("([a-z])'([A-Z])", lambda m: m.group(0).lower(), value.title())
     return re.sub("\d([A-Z])", lambda m: m.group(0).lower(), t)
-title.is_safe = True
 
-@register.filter
+@register.filter(is_safe=True)
 @stringfilter
 def truncatechars(value, arg):
     """
@@ -268,9 +266,8 @@ def truncatechars(value, arg):
     except ValueError: # Invalid literal for int().
         return value # Fail silently.
     return Truncator(value).chars(length)
-truncatechars.is_safe = True
 
-@register.filter
+@register.filter(is_safe=True)
 @stringfilter
 def truncatewords(value, arg):
     """
@@ -285,9 +282,8 @@ def truncatewords(value, arg):
     except ValueError: # Invalid literal for int().
         return value # Fail silently.
     return Truncator(value).words(length, truncate=' ...')
-truncatewords.is_safe = True
 
-@register.filter
+@register.filter(is_safe=True)
 @stringfilter
 def truncatewords_html(value, arg):
     """
@@ -302,16 +298,14 @@ def truncatewords_html(value, arg):
     except ValueError: # invalid literal for int()
         return value # Fail silently.
     return Truncator(value).words(length, html=True, truncate=' ...')
-truncatewords_html.is_safe = True
 
-@register.filter
+@register.filter(is_safe=False)
 @stringfilter
 def upper(value):
     """Converts a string into all uppercase."""
     return value.upper()
-upper.is_safe = False
 
-@register.filter
+@register.filter(is_safe=False)
 @stringfilter
 def urlencode(value, safe=None):
     """
@@ -326,17 +320,14 @@ def urlencode(value, safe=None):
     if safe is not None:
         kwargs['safe'] = safe
     return urlquote(value, **kwargs)
-urlencode.is_safe = False
 
-@register.filter
+@register.filter(is_safe=True, needs_autoescape=True)
 @stringfilter
 def urlize(value, autoescape=None):
     """Converts URLs in plain text into clickable links."""
     return mark_safe(urlize_impl(value, nofollow=True, autoescape=autoescape))
-urlize.is_safe = True
-urlize.needs_autoescape = True
 
-@register.filter
+@register.filter(is_safe=True, needs_autoescape=True)
 @stringfilter
 def urlizetrunc(value, limit, autoescape=None):
     """
@@ -347,17 +338,14 @@ def urlizetrunc(value, limit, autoescape=None):
     """
     return mark_safe(urlize_impl(value, trim_url_limit=int(limit), nofollow=True,
                             autoescape=autoescape))
-urlizetrunc.is_safe = True
-urlizetrunc.needs_autoescape = True
 
-@register.filter
+@register.filter(is_safe=False)
 @stringfilter
 def wordcount(value):
     """Returns the number of words."""
     return len(value.split())
-wordcount.is_safe = False
 
-@register.filter
+@register.filter(is_safe=True)
 @stringfilter
 def wordwrap(value, arg):
     """
@@ -366,9 +354,8 @@ def wordwrap(value, arg):
     Argument: number of characters to wrap the text at.
     """
     return wrap(value, int(arg))
-wordwrap.is_safe = True
 
-@register.filter
+@register.filter(is_safe=True)
 @stringfilter
 def ljust(value, arg):
     """
@@ -377,9 +364,8 @@ def ljust(value, arg):
     Argument: field size.
     """
     return value.ljust(int(arg))
-ljust.is_safe = True
 
-@register.filter
+@register.filter(is_safe=True)
 @stringfilter
 def rjust(value, arg):
     """
@@ -388,14 +374,12 @@ def rjust(value, arg):
     Argument: field size.
     """
     return value.rjust(int(arg))
-rjust.is_safe = True
 
-@register.filter
+@register.filter(is_safe=True)
 @stringfilter
 def center(value, arg):
     """Centers the value in a field of a given width."""
     return value.center(int(arg))
-center.is_safe = True
 
 @register.filter
 @stringfilter
@@ -413,16 +397,15 @@ def cut(value, arg):
 # HTML STRINGS    #
 ###################
 
-@register.filter("escape")
+@register.filter("escape", is_safe=True)
 @stringfilter
 def escape_filter(value):
     """
     Marks the value as a string that should not be auto-escaped.
     """
     return mark_for_escaping(value)
-escape_filter.is_safe = True
 
-@register.filter
+@register.filter(is_safe=True)
 @stringfilter
 def force_escape(value):
     """
@@ -431,9 +414,8 @@ def force_escape(value):
     possible escaping).
     """
     return mark_safe(escape(value))
-force_escape.is_safe = True
 
-@register.filter("linebreaks")
+@register.filter("linebreaks", is_safe=True, needs_autoescape=True)
 @stringfilter
 def linebreaks_filter(value, autoescape=None):
     """
@@ -443,10 +425,8 @@ def linebreaks_filter(value, autoescape=None):
     """
     autoescape = autoescape and not isinstance(value, SafeData)
     return mark_safe(linebreaks(value, autoescape))
-linebreaks_filter.is_safe = True
-linebreaks_filter.needs_autoescape = True
 
-@register.filter
+@register.filter(is_safe=True, needs_autoescape=True)
 @stringfilter
 def linebreaksbr(value, autoescape=None):
     """
@@ -458,19 +438,16 @@ def linebreaksbr(value, autoescape=None):
     if autoescape:
         value = escape(value)
     return mark_safe(value.replace('\n', '<br />'))
-linebreaksbr.is_safe = True
-linebreaksbr.needs_autoescape = True
 
-@register.filter
+@register.filter(is_safe=True)
 @stringfilter
 def safe(value):
     """
     Marks the value as a string that should not be auto-escaped.
     """
     return mark_safe(value)
-safe.is_safe = True
 
-@register.filter
+@register.filter(is_safe=True)
 def safeseq(value):
     """
     A "safe" filter for sequences. Marks each element in the sequence,
@@ -478,9 +455,8 @@ def safeseq(value):
     with the results.
     """
     return [mark_safe(force_unicode(obj)) for obj in value]
-safeseq.is_safe = True
 
-@register.filter
+@register.filter(is_safe=True)
 @stringfilter
 def removetags(value, tags):
     """Removes a space separated list of [X]HTML tags from the output."""
@@ -491,47 +467,42 @@ def removetags(value, tags):
     value = starttag_re.sub(u'', value)
     value = endtag_re.sub(u'', value)
     return value
-removetags.is_safe = True
 
-@register.filter
+@register.filter(is_safe=True)
 @stringfilter
 def striptags(value):
     """Strips all [X]HTML tags."""
     return strip_tags(value)
-striptags.is_safe = True
 
 ###################
 # LISTS           #
 ###################
 
-@register.filter
+@register.filter(is_safe=False)
 def dictsort(value, arg):
     """
     Takes a list of dicts, returns that list sorted by the property given in
     the argument.
     """
     return sorted(value, key=Variable(arg).resolve)
-dictsort.is_safe = False
 
-@register.filter
+@register.filter(is_safe=False)
 def dictsortreversed(value, arg):
     """
     Takes a list of dicts, returns that list sorted in reverse order by the
     property given in the argument.
     """
     return sorted(value, key=Variable(arg).resolve, reverse=True)
-dictsortreversed.is_safe = False
 
-@register.filter
+@register.filter(is_safe=False)
 def first(value):
     """Returns the first item in a list."""
     try:
         return value[0]
     except IndexError:
         return u''
-first.is_safe = False
 
-@register.filter
+@register.filter(is_safe=True, needs_autoescape=True)
 def join(value, arg, autoescape=None):
     """
     Joins a list with a string, like Python's ``str.join(list)``.
@@ -544,43 +515,37 @@ def join(value, arg, autoescape=None):
     except AttributeError: # fail silently but nicely
         return value
     return mark_safe(data)
-join.is_safe = True
-join.needs_autoescape = True
 
-@register.filter
+@register.filter(is_safe=True)
 def last(value):
     "Returns the last item in a list"
     try:
         return value[-1]
     except IndexError:
         return u''
-last.is_safe = True
 
-@register.filter
+@register.filter(is_safe=True)
 def length(value):
     """Returns the length of the value - useful for lists."""
     try:
         return len(value)
     except (ValueError, TypeError):
         return ''
-length.is_safe = True
 
-@register.filter
+@register.filter(is_safe=False)
 def length_is(value, arg):
     """Returns a boolean of whether the value's length is the argument."""
     try:
         return len(value) == int(arg)
     except (ValueError, TypeError):
         return ''
-length_is.is_safe = False
 
-@register.filter
+@register.filter(is_safe=True)
 def random(value):
     """Returns a random item from the list."""
     return random_module.choice(value)
-random.is_safe = True
 
-@register.filter("slice")
+@register.filter("slice", is_safe=True)
 def slice_filter(value, arg):
     """
     Returns a slice of the list.
@@ -600,9 +565,8 @@ def slice_filter(value, arg):
 
     except (ValueError, TypeError):
         return value # Fail silently.
-slice_filter.is_safe = True
 
-@register.filter
+@register.filter(is_safe=True, needs_autoescape=True)
 def unordered_list(value, autoescape=None):
     """
     Recursively takes a self-nested list and returns an HTML unordered list --
@@ -688,14 +652,12 @@ def unordered_list(value, autoescape=None):
         return '\n'.join(output)
     value, converted = convert_old_style_list(value)
     return mark_safe(_helper(value))
-unordered_list.is_safe = True
-unordered_list.needs_autoescape = True
 
 ###################
 # INTEGERS        #
 ###################
 
-@register.filter
+@register.filter(is_safe=False)
 def add(value, arg):
     """Adds the arg to the value."""
     try:
@@ -705,9 +667,8 @@ def add(value, arg):
             return value + arg
         except Exception:
             return ''
-add.is_safe = False
 
-@register.filter
+@register.filter(is_safe=False)
 def get_digit(value, arg):
     """
     Given a whole number, returns the requested digit of it, where 1 is the
@@ -726,13 +687,12 @@ def get_digit(value, arg):
         return int(str(value)[-arg])
     except IndexError:
         return 0
-get_digit.is_safe = False
 
 ###################
 # DATES           #
 ###################
 
-@register.filter
+@register.filter(is_safe=False)
 def date(value, arg=None):
     """Formats a date according to the given format."""
     if not value:
@@ -746,9 +706,8 @@ def date(value, arg=None):
             return format(value, arg)
         except AttributeError:
             return ''
-date.is_safe = False
 
-@register.filter
+@register.filter(is_safe=False)
 def time(value, arg=None):
     """Formats a time according to the given format."""
     if value in (None, u''):
@@ -762,9 +721,8 @@ def time(value, arg=None):
             return time_format(value, arg)
         except AttributeError:
             return ''
-time.is_safe = False
 
-@register.filter("timesince")
+@register.filter("timesince", is_safe=False)
 def timesince_filter(value, arg=None):
     """Formats a date as the time since that date (i.e. "4 days, 6 hours")."""
     if not value:
@@ -775,9 +733,8 @@ def timesince_filter(value, arg=None):
         return timesince(value)
     except (ValueError, TypeError):
         return u''
-timesince_filter.is_safe = False
 
-@register.filter("timeuntil")
+@register.filter("timeuntil", is_safe=False)
 def timeuntil_filter(value, arg=None):
     """Formats a date as the time until that date (i.e. "4 days, 6 hours")."""
     if not value:
@@ -786,33 +743,29 @@ def timeuntil_filter(value, arg=None):
         return timeuntil(value, arg)
     except (ValueError, TypeError):
         return u''
-timeuntil_filter.is_safe = False
 
 ###################
 # LOGIC           #
 ###################
 
-@register.filter
+@register.filter(is_safe=False)
 def default(value, arg):
     """If value is unavailable, use given default."""
     return value or arg
-default.is_safe = False
 
-@register.filter
+@register.filter(is_safe=False)
 def default_if_none(value, arg):
     """If value is None, use given default."""
     if value is None:
         return arg
     return value
-default_if_none.is_safe = False
 
-@register.filter
+@register.filter(is_safe=False)
 def divisibleby(value, arg):
     """Returns True if the value is devisible by the argument."""
     return int(value) % int(arg) == 0
-divisibleby.is_safe = False
 
-@register.filter
+@register.filter(is_safe=False)
 def yesno(value, arg=None):
     """
     Given a string mapping values for true, false and (optionally) None,
@@ -843,13 +796,12 @@ def yesno(value, arg=None):
     if value:
         return yes
     return no
-yesno.is_safe = False
 
 ###################
 # MISC            #
 ###################
 
-@register.filter
+@register.filter(is_safe=True)
 def filesizeformat(bytes):
     """
     Formats the value like a 'human-readable' file size (i.e. 13 KB, 4.1 MB,
@@ -873,9 +825,8 @@ def filesizeformat(bytes):
     if bytes < 1024 * 1024 * 1024 * 1024 * 1024:
         return ugettext("%s TB") % filesize_number_format(bytes / (1024 * 1024 * 1024 * 1024))
     return ugettext("%s PB") % filesize_number_format(bytes / (1024 * 1024 * 1024 * 1024 * 1024))
-filesizeformat.is_safe = True
 
-@register.filter
+@register.filter(is_safe=False)
 def pluralize(value, arg=u's'):
     """
     Returns a plural suffix if the value is not 1. By default, 's' is used as
@@ -918,19 +869,16 @@ def pluralize(value, arg=u's'):
         except TypeError: # len() of unsized object.
             pass
     return singular_suffix
-pluralize.is_safe = False
 
-@register.filter("phone2numeric")
+@register.filter("phone2numeric", is_safe=True)
 def phone2numeric_filter(value):
     """Takes a phone number and converts it in to its numerical equivalent."""
     return phone2numeric(value)
-phone2numeric_filter.is_safe = True
 
-@register.filter
+@register.filter(is_safe=True)
 def pprint(value):
     """A wrapper around pprint.pprint -- for debugging, really."""
     try:
         return pformat(value)
     except Exception, e:
         return u"Error in formatting: %s" % force_unicode(e, errors="replace")
-pprint.is_safe = True

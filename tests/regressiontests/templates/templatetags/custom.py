@@ -6,11 +6,10 @@ from django.template.loader import get_template
 
 register = template.Library()
 
+@register.filter
+@stringfilter
 def trim(value, num):
     return value[:num]
-trim = stringfilter(trim)
-
-register.filter(trim)
 
 @register.simple_tag
 def no_params():

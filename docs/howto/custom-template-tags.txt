@@ -143,6 +143,10 @@ You can use ``register.filter()`` as a decorator instead:
 If you leave off the ``name`` argument, as in the second example above, Django
 will use the function's name as the filter name.
 
+Finally, ``register.filter()`` also accepts two keyword arguments, ``is_safe``
+and ``needs_autoescape``, described in :ref:`filters and auto-escaping
+<filters-auto-escaping>` below.
+
 Template filters that expect strings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -165,6 +169,8 @@ convert an object to its string value before being passed to your function:
 This way, you'll be able to pass, say, an integer to this filter, and it
 won't cause an ``AttributeError`` (because integers don't have ``lower()``
 methods).
+
+.. _filters-auto-escaping:
 
 Filters and auto-escaping
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -206,17 +212,16 @@ Template filter code falls into one of two situations:
 1. Your filter does not introduce any HTML-unsafe characters (``<``, ``>``,
    ``'``, ``"`` or ``&``) into the result that were not already present. In
    this case, you can let Django take care of all the auto-escaping
-   handling for you. All you need to do is put the ``is_safe`` attribute on
-   your filter function and set it to ``True``, like so:
+   handling for you. All you need to do is set the ``is_safe`` flag to ``True``
+   when you register your filter function, like so:
 
    .. code-block:: python
 
-       @register.filter
+       @register.filter(is_safe=True)
        def myfilter(value):
            return value
-       myfilter.is_safe = True
 
-   This attribute tells Django that if a "safe" string is passed into your
+   This flag tells Django that if a "safe" string is passed into your
    filter, the result will still be "safe" and if a non-safe string is
    passed in, Django will automatically escape it, if necessary.
 
@@ -236,17 +241,16 @@ Template filter code falls into one of two situations:
 
    .. code-block:: python
 
-       @register.filter
+       @register.filter(is_safe=True)
        def add_xx(value):
            return '%sxx' % value
-       add_xx.is_safe = True
 
    When this filter is used in a template where auto-escaping is enabled,
    Django will escape the output whenever the input is not already marked
    as "safe".
 
-   By default, ``is_safe`` defaults to ``False``, and you can omit it from
-   any filters where it isn't required.
+   By default, ``is_safe`` is ``False``, and you can omit it from any filters
+   where it isn't required.
 
    Be careful when deciding if your filter really does leave safe strings
    as safe. If you're *removing* characters, you might inadvertently leave
@@ -279,12 +283,12 @@ Template filter code falls into one of two situations:
    can operate in templates where auto-escaping is either on or off in
    order to make things easier for your template authors.
 
-   In order for your filter to know the current auto-escaping state, set
-   the ``needs_autoescape`` attribute to ``True`` on your function. (If you
-   don't specify this attribute, it defaults to ``False``). This attribute
-   tells Django that your filter function wants to be passed an extra
-   keyword argument, called ``autoescape``, that is ``True`` if
-   auto-escaping is in effect and ``False`` otherwise.
+   In order for your filter to know the current auto-escaping state, set the
+   ``needs_autoescape`` flag to ``True`` when you register your filter function.
+   (If you don't specify this flag, it defaults to ``False``). This flag tells
+   Django that your filter function wants to be passed an extra keyword
+   argument, called ``autoescape``, that is ``True`` if auto-escaping is in
+   effect and ``False`` otherwise.
 
    For example, let's write a filter that emphasizes the first character of
    a string:
@@ -294,6 +298,7 @@ Template filter code falls into one of two situations:
        from django.utils.html import conditional_escape
        from django.utils.safestring import mark_safe
 
+       @register.filter(needs_autoescape=True)
        def initial_letter_filter(text, autoescape=None):
            first, other = text[0], text[1:]
            if autoescape:
@@ -302,27 +307,45 @@ Template filter code falls into one of two situations:
                esc = lambda x: x
            result = '<strong>%s</strong>%s' % (esc(first), esc(other))
            return mark_safe(result)
-       initial_letter_filter.needs_autoescape = True
 
-   The ``needs_autoescape`` attribute on the filter function and the
-   ``autoescape`` keyword argument mean that our function will know whether
-   automatic escaping is in effect when the filter is called. We use
-   ``autoescape`` to decide whether the input data needs to be passed
-   through ``django.utils.html.conditional_escape`` or not. (In the latter
-   case, we just use the identity function as the "escape" function.) The
-   ``conditional_escape()`` function is like ``escape()`` except it only
-   escapes input that is **not** a ``SafeData`` instance. If a ``SafeData``
-   instance is passed to ``conditional_escape()``, the data is returned
-   unchanged.
+   The ``needs_autoescape`` flag and the ``autoescape`` keyword argument mean
+   that our function will know whether automatic escaping is in effect when the
+   filter is called. We use ``autoescape`` to decide whether the input data
+   needs to be passed through ``django.utils.html.conditional_escape`` or not.
+   (In the latter case, we just use the identity function as the "escape"
+   function.) The ``conditional_escape()`` function is like ``escape()`` except
+   it only escapes input that is **not** a ``SafeData`` instance. If a
+   ``SafeData`` instance is passed to ``conditional_escape()``, the data is
+   returned unchanged.
 
    Finally, in the above example, we remember to mark the result as safe
    so that our HTML is inserted directly into the template without further
    escaping.
 
-   There's no need to worry about the ``is_safe`` attribute in this case
+   There's no need to worry about the ``is_safe`` flag in this case
    (although including it wouldn't hurt anything). Whenever you manually
    handle the auto-escaping issues and return a safe string, the
-   ``is_safe`` attribute won't change anything either way.
+   ``is_safe`` flag won't change anything either way.
+
+.. versionchanged:: 1.4
+
+``is_safe`` and ``needs_autoescape`` used to be attributes of the filter
+function; this syntax is deprecated.
+
+.. code-block:: python
+
+    @register.filter
+    def myfilter(value):
+        return value
+    myfilter.is_safe = True
+
+.. code-block:: python
+
+    @register.filter
+    def initial_letter_filter(text, autoescape=None):
+        # ...
+        return mark_safe(result)
+    initial_letter_filter.needs_autoescape = True
 
 Writing custom template tags
 ----------------------------

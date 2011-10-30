@@ -5,23 +5,21 @@ from django.utils.encoding import force_unicode
 
 register = Library()
 
-@register.filter
+@register.filter(is_safe=False)
 def localize(value):
     """
     Forces a value to be rendered as a localized value,
     regardless of the value of ``settings.USE_L10N``.
     """
     return force_unicode(formats.localize(value, use_l10n=True))
-localize.is_safe = False
 
-@register.filter
+@register.filter(is_safe=False)
 def unlocalize(value):
     """
     Forces a value to be rendered as a non-localized value,
     regardless of the value of ``settings.USE_L10N``.
     """
     return force_unicode(value)
-unlocalize.is_safe = False
 
 class LocalizeNode(Node):
     def __init__(self, nodelist, use_l10n):

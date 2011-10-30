@@ -1057,30 +1057,43 @@ class Library(object):
         self.tags[getattr(func, "_decorated_function", func).__name__] = func
         return func
 
-    def filter(self, name=None, filter_func=None):
+    def filter(self, name=None, filter_func=None, **flags):
         if name is None and filter_func is None:
             # @register.filter()
-            return self.filter_function
-        elif filter_func is None:
+            def dec(func):
+                return self.filter_function(func, **flags)
+            return dec
+
+        elif name is not None and filter_func is None:
             if callable(name):
                 # @register.filter
-                return self.filter_function(name)
+                return self.filter_function(name, **flags)
             else:
                 # @register.filter('somename') or @register.filter(name='somename')
                 def dec(func):
-                    return self.filter(name, func)
+                    return self.filter(name, func, **flags)
                 return dec
+
         elif name is not None and filter_func is not None:
             # register.filter('somename', somefunc)
             self.filters[name] = filter_func
+            for attr in ('is_safe', 'needs_autoescape'):
+                if attr in flags:
+                    value = flags[attr]
+                    # set the flag on the filter for FilterExpression.resolve
+                    setattr(filter_func, attr, value)
+                    # set the flag on the innermost decorated function
+                    # for decorators that need it e.g. stringfilter
+                    if hasattr(filter_func, "_decorated_function"):
+                        setattr(filter_func._decorated_function, attr, value)
             return filter_func
         else:
             raise InvalidTemplateLibrary("Unsupported arguments to "
                 "Library.filter: (%r, %r)", (name, filter_func))
 
-    def filter_function(self, func):
-        self.filters[getattr(func, "_decorated_function", func).__name__] = func
-        return func
+    def filter_function(self, func, **flags):
+        name = getattr(func, "_decorated_function", func).__name__
+        return self.filter(name, func, **flags)
 
     def simple_tag(self, func=None, takes_context=None, name=None):
         def dec(func):
