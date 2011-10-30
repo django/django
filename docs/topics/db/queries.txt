@@ -375,7 +375,6 @@ translates (roughly) into the following SQL::
    .. _`Keyword Arguments`: http://docs.python.org/tutorial/controlflow.html#keyword-arguments
 
 .. versionchanged:: 1.4
-
     The field specified in a lookup has to be the name of a model field.
     There's one exception though, in case of a
     :class:`~django.db.models.fields.ForeignKey` you can specify the field

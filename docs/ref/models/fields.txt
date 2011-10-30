@@ -353,7 +353,6 @@ If you need to accept :attr:`~Field.null` values then use
 :class:`NullBooleanField` instead.
 
 .. versionchanged:: 1.2
-
     In previous versions of Django when running under MySQL ``BooleanFields``
     would return their data as ``ints``, instead of true ``bools``.  See the
     release notes for a complete description of the change.
@@ -879,7 +878,6 @@ shortcuts.
 A :class:`CharField` for a URL. Has one extra optional argument:
 
 .. deprecated:: 1.4
-
    ``verify_exists`` is deprecated for security reasons as of 1.4 and will be
    removed in Django 1.5. Prior to 1.3.1, the default value was ``True``.
 

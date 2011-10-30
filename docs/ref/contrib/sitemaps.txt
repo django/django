@@ -315,7 +315,6 @@ parameter to the ``sitemap`` and ``index`` views via the URLconf::
 
 
 .. versionchanged:: 1.4
-
     In addition, these views also return
     :class:`~django.template.response.TemplateResponse`
     instances which allow you to easily customize the response data before

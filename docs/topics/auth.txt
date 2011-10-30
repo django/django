@@ -636,7 +636,6 @@ Manually managing a user's password
 .. currentmodule:: django.contrib.auth.utils
 
 .. versionadded:: 1.4
-
     The :mod:`django.contrib.auth.utils` module provides a set of functions
     to create and validate hashed password. You can use them independently
     from the ``User`` model.

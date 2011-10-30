@@ -1496,7 +1496,6 @@ translations for the same literal:
    is used as a fallback.
 
 .. deprecated:: 1.3
-
     Lookup in the ``locale`` subdirectory of the directory containing your
     settings file (item 3 above) is deprecated since the 1.3 release and will be
     removed in Django 1.5. You can use the :setting:`LOCALE_PATHS` setting

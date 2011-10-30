@@ -198,7 +198,6 @@ Natural keys
 ------------
 
 .. versionadded:: 1.2
-
    The ability to use natural keys when serializing/deserializing data was
    added in the 1.2 release.
 
