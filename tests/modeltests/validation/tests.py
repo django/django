@@ -6,9 +6,13 @@ from django import forms
 from django.core.exceptions import NON_FIELD_ERRORS
 from django.test import TestCase
 
+# Import the verify_exists_urls from the 'forms' test app
+from regressiontests.forms.tests.fields import verify_exists_urls
+
 from . import ValidationTestCase
 from .models import (Author, Article, ModelToValidate,
     GenericIPAddressTestModel, GenericIPAddrUnpackUniqueTest)
+
 # Import other tests for this package.
 from .test_custom_messages import CustomMessagesTest
 from .test_error_messages import ValidationMessagesTest
@@ -71,10 +75,12 @@ class BaseModelValidationTests(ValidationTestCase):
         mtv = ModelToValidate(number=10, name='Some Name', url_verify='http://qa-dev.w3.org/link-testsuite/http.php?code=404')
         self.assertFieldFailsValidationWithMessage(mtv.full_clean, 'url_verify', [u'This URL appears to be a broken link.'])
 
+    @verify_exists_urls(existing_urls=('http://www.google.com/',))
     def test_correct_url_value_passes(self):
         mtv = ModelToValidate(number=10, name='Some Name', url_verify='http://www.google.com/')
         self.assertEqual(None, mtv.full_clean()) # This will fail if there's no Internet connection
 
+    @verify_exists_urls(existing_urls=('http://qa-dev.w3.org/link-testsuite/http.php?code=301',))
     def test_correct_url_with_redirect(self):
         mtv = ModelToValidate(number=10, name='Some Name', url_verify='http://qa-dev.w3.org/link-testsuite/http.php?code=301') #example.com is a redirect to iana.org now
         self.assertEqual(None, mtv.full_clean()) # This will fail if there's no Internet connection
