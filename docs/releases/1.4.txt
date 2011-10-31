@@ -854,3 +854,26 @@ calls ``setup_environ``, which is now deprecated. ``execute_manager`` is also
 deprecated; ``execute_from_command_line`` can be used instead. (Neither of
 these functions is documented public API, but a deprecation path is needed due
 to use in existing ``manage.py`` files.)
+
+``is_safe`` and ``needs_autoescape`` attributes of template filters
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Two flags, ``is_safe`` and ``needs_autoescape``, define how each template filter
+interacts with Django's auto-escaping behavior. They used to be attributes of
+the filter function::
+
+    @register.filter
+    def noop(value):
+        return value
+    noop.is_safe = True
+
+However, this technique caused some problems in combination with decorators,
+especially :func:`@stringfilter <django.template.defaultfilters.stringfilter>`.
+Now, the flags are keyword arguments of :meth:`@register.filter
+<django.template.Library.filter>`::
+
+    @register.filter(is_safe=True)
+    def noop(value):
+        return value
+
+See :ref:`filters and auto-escaping <filters-auto-escaping>` for more information.
