@@ -158,7 +158,7 @@ def has_vary_header(response, header_query):
 
 def _i18n_cache_key_suffix(request, cache_key):
     """If enabled, returns the cache key ending with a locale."""
-    if settings.USE_I18N:
+    if settings.USE_I18N or settings.USE_L10N:
         # first check if LocaleMiddleware or another middleware added
         # LANGUAGE_CODE to request, then fall back to the active language
         # which in turn can also fall back to settings.LANGUAGE_CODE

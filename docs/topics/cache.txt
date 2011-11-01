@@ -498,6 +498,10 @@ include the name of the active :term:`language<language code>` -- see also
 :ref:`how-django-discovers-language-preference`). This allows you to easily
 cache multilingual sites without having to create the cache key yourself.
 
+.. versionchanged:: 1.4
+
+This also happens when :setting:`USE_L10N` is set to ``True``.
+
 __ `Controlling cache: Using other headers`_
 
 The per-view cache

@@ -1154,23 +1154,33 @@ class CacheI18nTest(TestCase):
         request.session = {}
         return request
 
-    @override_settings(USE_I18N=True)
-    def test_cache_key_i18n(self):
+    @override_settings(USE_I18N=True, USE_L10N=False)
+    def test_cache_key_i18n_translation(self):
         request = self._get_request()
         lang = translation.get_language()
         response = HttpResponse()
         key = learn_cache_key(request, response)
-        self.assertTrue(key.endswith(lang), "Cache keys should include the language name when i18n is active")
+        self.assertIn(lang, key, "Cache keys should include the language name when translation is active")
         key2 = get_cache_key(request)
         self.assertEqual(key, key2)
 
-    @override_settings(USE_I18N=False)
+    @override_settings(USE_I18N=False, USE_L10N=True)
+    def test_cache_key_i18n_formatting(self):
+        request = self._get_request()
+        lang = translation.get_language()
+        response = HttpResponse()
+        key = learn_cache_key(request, response)
+        self.assertIn(lang, key, "Cache keys should include the language name when formatting is active")
+        key2 = get_cache_key(request)
+        self.assertEqual(key, key2)
+
+    @override_settings(USE_I18N=False, USE_L10N=False)
     def test_cache_key_no_i18n (self):
         request = self._get_request()
         lang = translation.get_language()
         response = HttpResponse()
         key = learn_cache_key(request, response)
-        self.assertFalse(key.endswith(lang), "Cache keys shouldn't include the language name when i18n is inactive")
+        self.assertNotIn(lang, key, "Cache keys shouldn't include the language name when i18n isn't active")
 
     @override_settings(
             CACHE_MIDDLEWARE_KEY_PREFIX="test",
