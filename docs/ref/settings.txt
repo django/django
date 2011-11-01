@@ -2148,6 +2148,16 @@ The default value for the X-Frame-Options header used by
 Deprecated settings
 ===================
 
+.. setting:: ADMIN_MEDIA_PREFIX
+
+ADMIN_MEDIA_PREFIX
+------------------
+
+.. deprecated:: 1.4
+   This setting has been obsoleted by the ``django.contrib.staticfiles`` app
+   integration. See the :doc:`Django 1.4 release notes</releases/1.4>` for
+   more information.
+
 .. setting:: CACHE_BACKEND
 
 CACHE_BACKEND
