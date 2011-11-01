@@ -828,6 +828,46 @@ complete query set::
 
     Entry.objects.all().delete()
 
+.. _topics-db-queries-copy:
+
+Copying model instances
+=======================
+
+Although there is no built-in method for copying model instances, it is
+possible to easily create new instance with all fields' values copied. In the
+simplest case, you can just set ``pk`` to ``None``. Using our blog example::
+
+    blog = Blog(name='My blog', tagline='Blogging is easy')
+    blog.save() # post.pk == 1
+
+    blog.pk = None
+    blog.save() # post.pk == 2
+
+Things get more complicated if you use inheritance. Consider a subclass of
+``Blog``::
+
+    class ThemeBlog(Blog):
+        theme = models.CharField(max_length=200)
+
+    django_blog = ThemeBlog(name='Django', tagline='Django is easy', theme = 'python')
+    django_blog.save() # django_blog.pk == 3
+
+Due to how inheritance works, you have to set both ``pk`` and ``id`` to None::
+
+    django_blog.pk = None
+    django_blog.id = None
+    django_blog.save() # django_blog.pk == 4
+
+This process does not copy related objects. If you want to copy relations,
+you have to write a little bit more code. In our example, ``Entry`` has a many to many
+field to ``Author``::
+
+    entry = Entry.objects.all()[0] # some previous entry
+    old_authors = entry.authors.all()
+    entry.pk = None
+    entry.save()
+    entry.authors = old_authors # saves new many2many relations
+
 .. _topics-db-queries-update:
 
 Updating multiple objects at once
