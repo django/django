@@ -743,6 +743,16 @@ you can easily achieve the same by overriding the `open` method, e.g.::
         def open(self, name, mode='rb'):
             return Spam(open(self.path(name), mode))
 
+YAML deserializer now uses ``yaml.safe_load``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``yaml.load`` is able to construct any Python object, which may trigger
+arbitrary code execution if you process a YAML document that comes from an
+untrusted source. This feature isn't necessary for Django's YAML deserializer,
+whose primary use is to load fixtures consisting of simple objects. Even though
+fixtures are trusted data, for additional security, the YAML deserializer now
+uses ``yaml.safe_load``.
+
 .. _deprecated-features-1.4:
 
 Features deprecated in 1.4

@@ -425,7 +425,7 @@ else:
         @staticmethod
         def _validate_output(serial_str):
             try:
-                yaml.load(StringIO(serial_str))
+                yaml.safe_load(StringIO(serial_str))
             except Exception:
                 return False
             else:
@@ -435,7 +435,7 @@ else:
         def _get_pk_values(serial_str):
             ret_list = []
             stream = StringIO(serial_str)
-            for obj_dict in yaml.load(stream):
+            for obj_dict in yaml.safe_load(stream):
                 ret_list.append(obj_dict["pk"])
             return ret_list
 
@@ -443,10 +443,10 @@ else:
         def _get_field_values(serial_str, field_name):
             ret_list = []
             stream = StringIO(serial_str)
-            for obj_dict in yaml.load(stream):
+            for obj_dict in yaml.safe_load(stream):
                 if "fields" in obj_dict and field_name in obj_dict["fields"]:
                     field_value = obj_dict["fields"][field_name]
-                    # yaml.load will return non-string objects for some
+                    # yaml.safe_load will return non-string objects for some
                     # of the fields we are interested in, this ensures that
                     # everything comes back as a string
                     if isinstance(field_value, basestring):
