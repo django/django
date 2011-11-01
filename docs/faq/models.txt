@@ -50,10 +50,11 @@ option to reset the SQL for a particular application::
 This drops any tables associated with ``appname`` and recreates them.
 
 If you do care about deleting data, you'll have to execute the ``ALTER TABLE``
-statements manually in your database. That's the way we've always done it,
-because dealing with data is a very sensitive operation that we've wanted to
-avoid automating. That said, there's some work being done to add partially
-automated database-upgrade functionality.
+statements manually in your database.
+
+There are `external projects which handle schema updates
+<http://djangopackages.com/grids/g/database-migration/>`_, of which the current
+defacto standard is `south <http://south.aeracode.org/>`_.
 
 Do Django models support multiple-column primary keys?
 ------------------------------------------------------
