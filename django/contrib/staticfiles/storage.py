@@ -90,11 +90,14 @@ class CachedFilesMixin(object):
         Returns the real URL in DEBUG mode.
         """
         if settings.DEBUG and not force:
-            return super(CachedFilesMixin, self).url(name)
-        cache_key = self.cache_key(name)
-        hashed_name = self.cache.get(cache_key)
-        if hashed_name is None:
-            hashed_name = self.hashed_name(name)
+            hashed_name = name
+        else:
+            cache_key = self.cache_key(name)
+            hashed_name = self.cache.get(cache_key)
+            if hashed_name is None:
+                hashed_name = self.hashed_name(name)
+                # set the cache if there was a miss (e.g. if cache server goes down)
+                self.cache.set(cache_key, hashed_name)
         return super(CachedFilesMixin, self).url(hashed_name)
 
     def url_converter(self, name):
