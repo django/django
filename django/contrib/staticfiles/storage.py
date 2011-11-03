@@ -3,6 +3,8 @@ import hashlib
 import os
 import posixpath
 import re
+from urllib import unquote
+from urlparse import urlsplit, urlunsplit
 
 from django.conf import settings
 from django.core.cache import (get_cache, InvalidCacheBackendError,
@@ -64,23 +66,28 @@ class CachedFilesMixin(object):
                 self._patterns.setdefault(extension, []).append(compiled)
 
     def hashed_name(self, name, content=None):
+        parsed_name = urlsplit(unquote(name))
+        clean_name = parsed_name.path
         if content is None:
-            if not self.exists(name):
+            if not self.exists(clean_name):
                 raise ValueError("The file '%s' could not be found with %r." %
-                                 (name, self))
+                                 (clean_name, self))
             try:
-                content = self.open(name)
+                content = self.open(clean_name)
             except IOError:
                 # Handle directory paths
                 return name
-        path, filename = os.path.split(name)
+        path, filename = os.path.split(clean_name)
         root, ext = os.path.splitext(filename)
         # Get the MD5 hash of the file
         md5 = hashlib.md5()
         for chunk in content.chunks():
             md5.update(chunk)
         md5sum = md5.hexdigest()[:12]
-        return os.path.join(path, u"%s.%s%s" % (root, md5sum, ext))
+        hashed_name = os.path.join(path, u"%s.%s%s" % (root, md5sum, ext))
+        unparsed_name = list(parsed_name)
+        unparsed_name[2] = hashed_name
+        return urlunsplit(unparsed_name)
 
     def cache_key(self, name):
         return u'staticfiles:cache:%s' % name
@@ -98,7 +105,7 @@ class CachedFilesMixin(object):
                 hashed_name = self.hashed_name(name)
                 # set the cache if there was a miss (e.g. if cache server goes down)
                 self.cache.set(cache_key, hashed_name)
-        return super(CachedFilesMixin, self).url(hashed_name)
+        return unquote(super(CachedFilesMixin, self).url(hashed_name))
 
     def url_converter(self, name):
         """
@@ -132,9 +139,9 @@ class CachedFilesMixin(object):
                 else:
                     start, end = 1, sub_level - 1
             joined_result = '/'.join(name_parts[:-start] + url_parts[end:])
-            hashed_url = self.url(joined_result, force=True)
+            hashed_url = self.url(unquote(joined_result), force=True)
             # Return the hashed and normalized version to the file
-            return 'url("%s")' % hashed_url
+            return 'url("%s")' % unquote(hashed_url)
         return converter
 
     def post_process(self, paths, dry_run=False, **options):
