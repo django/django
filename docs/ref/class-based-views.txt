@@ -491,7 +491,7 @@ ModelFormMixin
     :attr:`~SingleObjectMixin.queryset` attributes, describing the type of
     object that the ModelForm is manipulating. The view also provides
     ``self.object``, the instance being manipulated. If the instance is being
-    created, ``self.object`` will be ``None``
+    created, ``self.object`` will be ``None``.
 
     **Mixins**
 
@@ -527,7 +527,7 @@ ModelFormMixin
         validated. Returns :attr:`FormMixin.success_url` if it is provided;
         otherwise, attempts to use the ``get_absolute_url()`` of the object.
 
-    .. method:: form_valid()
+    .. method:: form_valid(form)
 
         Saves the form instance, sets the current object for the view, and
         redirects to :meth:`.get_success_url`.
