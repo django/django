@@ -310,7 +310,7 @@ Atom1Feed
 
 .. class:: Atom1Feed(SyndicationFeed)
 
-    Spec: http://atompub.org/2005/07/11/draft-ietf-atompub-format-10.html
+    Spec: http://www.atomenabled.org/developers/syndication/atom-format-spec.php
 
 ``django.utils.functional``
 ===========================
