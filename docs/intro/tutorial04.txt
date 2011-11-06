@@ -221,10 +221,10 @@ tutorial so far::
     from django.conf.urls import patterns, include, url
 
     urlpatterns = patterns('polls.views',
-        (r'^$', 'index'),
-        (r'^(?P<poll_id>\d+)/$', 'detail'),
-        (r'^(?P<poll_id>\d+)/results/$', 'results'),
-        (r'^(?P<poll_id>\d+)/vote/$', 'vote'),
+        url(r'^$', 'index'),
+        url(r'^(?P<poll_id>\d+)/$', 'detail'),
+        url(r'^(?P<poll_id>\d+)/results/$', 'results'),
+        url(r'^(?P<poll_id>\d+)/vote/$', 'vote'),
     )
 
 Change it like so::
@@ -234,12 +234,12 @@ Change it like so::
     from polls.models import Poll
 
     urlpatterns = patterns('',
-        (r'^$',
+        url(r'^$',
             ListView.as_view(
                 queryset=Poll.objects.order_by('-pub_date')[:5],
                 context_object_name='latest_poll_list',
                 template_name='polls/index.html')),
-        (r'^(?P<pk>\d+)/$',
+        url(r'^(?P<pk>\d+)/$',
             DetailView.as_view(
                 model=Poll,
                 template_name='polls/detail.html')),
@@ -248,7 +248,7 @@ Change it like so::
                 model=Poll,
                 template_name='polls/results.html'),
             name='poll_results'),
-        (r'^(?P<poll_id>\d+)/vote/$', 'polls.views.vote'),
+        url(r'^(?P<poll_id>\d+)/vote/$', 'polls.views.vote'),
     )
 
 We're using two generic views here:

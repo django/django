@@ -84,10 +84,10 @@ Time for an example. Edit ``mysite/urls.py`` so it looks like this::
     admin.autodiscover()
 
     urlpatterns = patterns('',
-        (r'^polls/$', 'polls.views.index'),
-        (r'^polls/(?P<poll_id>\d+)/$', 'polls.views.detail'),
-        (r'^polls/(?P<poll_id>\d+)/results/$', 'polls.views.results'),
-        (r'^polls/(?P<poll_id>\d+)/vote/$', 'polls.views.vote'),
+        url(r'^polls/$', 'polls.views.index'),
+        url(r'^polls/(?P<poll_id>\d+)/$', 'polls.views.detail'),
+        url(r'^polls/(?P<poll_id>\d+)/results/$', 'polls.views.results'),
+        url(r'^polls/(?P<poll_id>\d+)/vote/$', 'polls.views.vote'),
         url(r'^admin/', include(admin.site.urls)),
     )
 
@@ -434,10 +434,10 @@ Take some time to play around with the views and template system. As you edit
 the URLconf, you may notice there's a fair bit of redundancy in it::
 
     urlpatterns = patterns('',
-        (r'^polls/$', 'polls.views.index'),
-        (r'^polls/(?P<poll_id>\d+)/$', 'polls.views.detail'),
-        (r'^polls/(?P<poll_id>\d+)/results/$', 'polls.views.results'),
-        (r'^polls/(?P<poll_id>\d+)/vote/$', 'polls.views.vote'),
+        url(r'^polls/$', 'polls.views.index'),
+        url(r'^polls/(?P<poll_id>\d+)/$', 'polls.views.detail'),
+        url(r'^polls/(?P<poll_id>\d+)/results/$', 'polls.views.results'),
+        url(r'^polls/(?P<poll_id>\d+)/vote/$', 'polls.views.vote'),
     )
 
 Namely, ``polls.views`` is in every callback.
@@ -447,10 +447,10 @@ common prefixes. You can factor out the common prefixes and add them as the
 first argument to :func:`~django.conf.urls.patterns`, like so::
 
     urlpatterns = patterns('polls.views',
-        (r'^polls/$', 'index'),
-        (r'^polls/(?P<poll_id>\d+)/$', 'detail'),
-        (r'^polls/(?P<poll_id>\d+)/results/$', 'results'),
-        (r'^polls/(?P<poll_id>\d+)/vote/$', 'vote'),
+        url(r'^polls/$', 'index'),
+        url(r'^polls/(?P<poll_id>\d+)/$', 'detail'),
+        url(r'^polls/(?P<poll_id>\d+)/results/$', 'results'),
+        url(r'^polls/(?P<poll_id>\d+)/vote/$', 'vote'),
     )
 
 This is functionally identical to the previous formatting. It's just a bit
@@ -467,10 +467,10 @@ now look like this::
     admin.autodiscover()
 
     urlpatterns = patterns('polls.views',
-        (r'^polls/$', 'index'),
-        (r'^polls/(?P<poll_id>\d+)/$', 'detail'),
-        (r'^polls/(?P<poll_id>\d+)/results/$', 'results'),
-        (r'^polls/(?P<poll_id>\d+)/vote/$', 'vote'),
+        url(r'^polls/$', 'index'),
+        url(r'^polls/(?P<poll_id>\d+)/$', 'detail'),
+        url(r'^polls/(?P<poll_id>\d+)/results/$', 'results'),
+        url(r'^polls/(?P<poll_id>\d+)/vote/$', 'vote'),
     )
 
     urlpatterns += patterns('',
@@ -497,14 +497,13 @@ Copy the file ``mysite/urls.py`` to ``polls/urls.py``. Then, change
 ``mysite/urls.py`` to remove the poll-specific URLs and insert an
 :func:`~django.conf.urls.include`, leaving you with::
 
-    # This also imports the include function
     from django.conf.urls import patterns, include, url
 
     from django.contrib import admin
     admin.autodiscover()
 
     urlpatterns = patterns('',
-        (r'^polls/', include('polls.urls')),
+        url(r'^polls/', include('polls.urls')),
         url(r'^admin/', include(admin.site.urls)),
     )
 
@@ -531,10 +530,10 @@ this::
     from django.conf.urls import patterns, include, url
 
     urlpatterns = patterns('polls.views',
-        (r'^$', 'index'),
-        (r'^(?P<poll_id>\d+)/$', 'detail'),
-        (r'^(?P<poll_id>\d+)/results/$', 'results'),
-        (r'^(?P<poll_id>\d+)/vote/$', 'vote'),
+        url(r'^$', 'index'),
+        url(r'^(?P<poll_id>\d+)/$', 'detail'),
+        url(r'^(?P<poll_id>\d+)/results/$', 'results'),
+        url(r'^(?P<poll_id>\d+)/vote/$', 'vote'),
     )
 
 The idea behind :func:`~django.conf.urls.include` and URLconf
