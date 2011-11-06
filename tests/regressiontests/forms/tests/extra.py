@@ -17,6 +17,9 @@ from .error_messages import AssertFormErrorsMixin
 class GetDate(Form):
     mydate = DateField(widget=SelectDateWidget)
 
+class GetDateShowHiddenInitial(Form):
+    mydate = DateField(widget=SelectDateWidget, show_hidden_initial=True)
+
 class FormsExtraTestCase(unittest.TestCase, AssertFormErrorsMixin):
     ###############
     # Extra stuff #
@@ -696,6 +699,60 @@ class FormsExtraL10NTestCase(unittest.TestCase):
         # Years before 1900 work
         w = SelectDateWidget(years=('1899',))
         self.assertEqual(w.value_from_datadict({'date_year': '1899', 'date_month': '8', 'date_day': '13'}, {}, 'date'), '13-08-1899')
+
+    def test_l10n_date_changed(self):
+        """
+        Ensure that SelectDateWidget._has_changed() works correctly with a
+        localized date format.
+        Refs #17165.
+        """
+        # With Field.show_hidden_initial=False -----------------------
+        b = GetDate({
+            'mydate_year': '2008',
+            'mydate_month': '4',
+            'mydate_day': '1',
+        }, initial={'mydate': datetime.date(2008, 4, 1)})
+        self.assertFalse(b.has_changed())
+
+        b = GetDate({
+            'mydate_year': '2008',
+            'mydate_month': '4',
+            'mydate_day': '2',
+        }, initial={'mydate': datetime.date(2008, 4, 1)})
+        self.assertTrue(b.has_changed())
+
+        # With Field.show_hidden_initial=True ------------------------
+        b = GetDateShowHiddenInitial({
+            'mydate_year': '2008',
+            'mydate_month': '4',
+            'mydate_day': '1',
+            'initial-mydate': HiddenInput()._format_value(datetime.date(2008, 4, 1))
+        }, initial={'mydate': datetime.date(2008, 4, 1)})
+        self.assertFalse(b.has_changed())
+
+        b = GetDateShowHiddenInitial({
+            'mydate_year': '2008',
+            'mydate_month': '4',
+            'mydate_day': '22',
+            'initial-mydate': HiddenInput()._format_value(datetime.date(2008, 4, 1))
+        }, initial={'mydate': datetime.date(2008, 4, 1)})
+        self.assertTrue(b.has_changed())
+
+        b = GetDateShowHiddenInitial({
+            'mydate_year': '2008',
+            'mydate_month': '4',
+            'mydate_day': '22',
+            'initial-mydate': HiddenInput()._format_value(datetime.date(2008, 4, 1))
+        }, initial={'mydate': datetime.date(2008, 4, 22)})
+        self.assertTrue(b.has_changed())
+
+        b = GetDateShowHiddenInitial({
+            'mydate_year': '2008',
+            'mydate_month': '4',
+            'mydate_day': '22',
+            'initial-mydate': HiddenInput()._format_value(datetime.date(2008, 4, 22))
+        }, initial={'mydate': datetime.date(2008, 4, 1)})
+        self.assertFalse(b.has_changed())
 
     def test_l10n_invalid_date_in(self):
         # Invalid dates shouldn't be allowed

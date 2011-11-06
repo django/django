@@ -134,3 +134,8 @@ class SelectDateWidget(Widget):
         s = Select(choices=choices)
         select_html = s.render(field % name, val, local_attrs)
         return select_html
+
+    def _has_changed(self, initial, data):
+        input_format = get_format('DATE_INPUT_FORMATS')[0]
+        data = datetime_safe.datetime.strptime(data, input_format).date()
+        return super(SelectDateWidget, self)._has_changed(initial, data)
