@@ -160,8 +160,9 @@ latter one allows you to use a different template for each form.
 This template expects a ``wizard`` object that has various items attached to
 it:
 
-* ``form`` -- The :class:`~django.forms.Form` instance for the current
-  step (either empty or with errors).
+* ``form`` -- The :class:`~django.forms.Form` or
+  :class:`~django.forms.formset.BaseFormSet` instance for the current step
+  (either empty or with errors).
 
 * ``steps`` -- A helper object to access the various steps related data:
 
@@ -186,9 +187,13 @@ Here's a full example template:
 
     {% extends "base.html" %}
 
+    {% block head %}
+    {{ wizard.form.media }}
+    {% endblock %}
+
     {% block content %}
     <p>Step {{ wizard.steps.step1 }} of {{ wizard.steps.count }}</p>
-    <form action="." method="post">{% csrf_token %}
+    <form action="" method="post">{% csrf_token %}
     <table>
     {{ wizard.management_form }}
     {% if wizard.form.forms %}
@@ -199,12 +204,12 @@ Here's a full example template:
     {% else %}
         {{ wizard.form }}
     {% endif %}
-    {% if wizard.steps.prev %}
-    <button name="wizard_prev_step" value="{{ wizard.steps.first }}">{% trans "first step" %}</button>
-    <button name="wizard_prev_step" value="{{ wizard.steps.prev }}">{% trans "prev step" %}</button>
-    {% endif %}
     </table>
-    <input type="submit">
+    {% if wizard.steps.prev %}
+    <button name="wizard_prev_step" type="submit" value="{{ wizard.steps.first }}">{% trans "first step" %}</button>
+    <button name="wizard_prev_step" type="submit" value="{{ wizard.steps.prev }}">{% trans "prev step" %}</button>
+    {% endif %}
+    <input type="submit" value="{% trans "submit" %}"/>
     </form>
     {% endblock %}
 
