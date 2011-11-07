@@ -14,6 +14,7 @@ class URLObject(object):
         return patterns('',
             url(r'^inner/$', 'empty_view', name='urlobject-view'),
             url(r'^inner/(?P<arg1>\d+)/(?P<arg2>\d+)/$', 'empty_view', name='urlobject-view'),
+            url(r'^inner/\+\\\$\*/$', 'empty_view', name='urlobject-special-view'),
         ), self.app_name, self.namespace
     urls = property(urls)
 
@@ -27,6 +28,8 @@ otherobj2 = URLObject('nodefault', 'other-ns2')
 urlpatterns = patterns('regressiontests.urlpatterns_reverse.views',
     url(r'^normal/$', 'empty_view', name='normal-view'),
     url(r'^normal/(?P<arg1>\d+)/(?P<arg2>\d+)/$', 'empty_view', name='normal-view'),
+
+    url(r'^\+\\\$\*/$', 'empty_view', name='special-view'),
 
     url(r'^mixed_args/(\d+)/(?P<arg2>\d+)/$', 'empty_view', name='mixed-args'),
     url(r'^no_kwargs/(\d+)/(\d+)/$', 'empty_view', name='no-kwargs'),
@@ -50,4 +53,5 @@ urlpatterns = patterns('regressiontests.urlpatterns_reverse.views',
 
     (r'^ns-outer/(?P<outer>\d+)/', include('regressiontests.urlpatterns_reverse.included_namespace_urls', namespace='inc-outer')),
 
+    (r'^\+\\\$\*/', include('regressiontests.urlpatterns_reverse.namespace_urls', namespace='special')),
 )
