@@ -923,7 +923,7 @@ Along with another app ``rare/models.py``::
     class ChildB(Base):
         pass
 
-The reverse name of the ``commmon.ChildA.m2m`` field will be
+The reverse name of the ``common.ChildA.m2m`` field will be
 ``common_childa_related``, whilst the reverse name of the
 ``common.ChildB.m2m`` field will be ``common_childb_related``, and finally the
 reverse name of the ``rare.ChildB.m2m`` field will be ``rare_childb_related``.
