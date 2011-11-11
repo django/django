@@ -475,6 +475,14 @@ Use the ``--no-default-ignore`` option to disable the default values of
 Use the ``--no-wrap`` option to disable breaking long message lines into
 several lines in language files.
 
+.. django-admin-option:: --no-location
+
+.. versionadded:: 1.4
+
+Use the ``--no-location`` option to not write '``#: filename:line``'
+comment lines in language files. Note that using this option makes it harder
+for technically skilled translators to understand each message's context.
+
 reset <appname appname ...>
 ---------------------------
 

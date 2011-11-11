@@ -28,7 +28,8 @@ from .commands.tests import can_run_extraction_tests, can_run_compilation_tests
 if can_run_extraction_tests:
     from .commands.extraction import (ExtractorTests, BasicExtractorTests,
         JavascriptExtractorTests, IgnoredExtractorTests, SymlinkExtractorTests,
-        CopyPluralFormsExtractorTests, NoWrapExtractorTests)
+        CopyPluralFormsExtractorTests, NoWrapExtractorTests,
+        NoLocationExtractorTests)
 if can_run_compilation_tests:
     from .commands.compilation import MessageCompilationTests, PoFileTests
 from .contenttypes.tests import ContentTypeTests

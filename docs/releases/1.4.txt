@@ -477,6 +477,9 @@ Django 1.4 also includes several smaller improvements worth noting:
   This should make it easier to read when debugging interaction with
   client-side Javascript code.
 
+* Added the :djadminopt:`--no-location` option to the :djadmin:`makemessages`
+  command.
+
 .. _backwards-incompatible-changes-1.4:
 
 Backwards incompatible changes in 1.4

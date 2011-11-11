@@ -214,3 +214,20 @@ class NoWrapExtractorTests(ExtractorTests):
         self.assertTrue(os.path.exists(self.PO_FILE))
         po_contents = open(self.PO_FILE, 'r').read()
         self.assertMsgId('""\n"This literal should also be included wrapped or not wrapped depending on the "\n"use of the --no-wrap option."', po_contents, use_quotes=False)
+
+
+class NoLocationExtractorTests(ExtractorTests):
+
+    def test_no_location_enabled(self):
+        os.chdir(self.test_dir)
+        management.call_command('makemessages', locale=LOCALE, verbosity=0, no_location=True)
+        self.assertTrue(os.path.exists(self.PO_FILE))
+        po_contents = open(self.PO_FILE, 'r').read()
+        self.assertFalse('#: templates/test.html:55' in po_contents)
+
+    def test_no_location_disabled(self):
+        os.chdir(self.test_dir)
+        management.call_command('makemessages', locale=LOCALE, verbosity=0, no_location=False)
+        self.assertTrue(os.path.exists(self.PO_FILE))
+        po_contents = open(self.PO_FILE, 'r').read()
+        self.assertTrue('#: templates/test.html:55' in po_contents)
