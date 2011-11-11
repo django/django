@@ -6,7 +6,7 @@ from os import path
 
 from django.conf import settings
 from django.test import TestCase
-from django.utils.translation import override, activate
+from django.utils.translation import override, activate, get_language
 from django.utils.text import javascript_quote
 
 from ..urls import locale_dir
@@ -25,6 +25,7 @@ class I18NTests(TestCase):
 
     def test_jsi18n(self):
         """The javascript_catalog can be deployed with language settings"""
+        saved_lang = get_language()
         for lang_code in ['es', 'fr', 'ru']:
             activate(lang_code)
             catalog = gettext.translation('djangojs', locale_dir, [lang_code])
@@ -37,6 +38,7 @@ class I18NTests(TestCase):
             if lang_code == 'fr':
                 # Message with context (msgctxt)
                 self.assertContains(response, "['month name\x04May'] = 'mai';", 1)
+        activate(saved_lang)
 
 
 class JsI18NTests(TestCase):
