@@ -147,8 +147,7 @@ You should get a pleasantly-colored error page with the following message::
 
     ViewDoesNotExist at /polls/
 
-    Tried index in module polls.views. Error was: 'module'
-    object has no attribute 'index'
+    Could not import polls.views.index. View does not exist in module polls.views.
 
 This error happened because you haven't written a function ``index()`` in the
 module ``polls/views.py``.
