@@ -2285,7 +2285,8 @@ If ``value`` is ``Joel is a slug``, the output would be::
 yesno
 ^^^^^
 
-Given a string mapping values for true, false and (optionally) None,
+Maps values for true, false and (optionally) None, to the strings "yes", "no",
+"maybe", or a custom mapping passed as a comma-separated list, and
 returns one of those strings according to the value:
 
 For example::
@@ -2295,6 +2296,7 @@ For example::
 ==========  ======================  ==================================
 Value       Argument                Outputs
 ==========  ======================  ==================================
+``True``                            ``yes``
 ``True``    ``"yeah,no,maybe"``     ``yeah``
 ``False``   ``"yeah,no,maybe"``     ``no``
 ``None``    ``"yeah,no,maybe"``     ``maybe``
