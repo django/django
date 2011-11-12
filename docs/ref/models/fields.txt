@@ -450,7 +450,7 @@ A fixed-precision decimal number, represented in Python by a
 .. attribute:: DecimalField.max_digits
 
     The maximum number of digits allowed in the number. Note that this number
-    must be greater than ``decimal_places``, if it exists.
+    must be greater than or equal to ``decimal_places``, if it exists.
 
 .. attribute:: DecimalField.decimal_places
 

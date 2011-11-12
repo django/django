@@ -72,9 +72,9 @@ def get_validation_errors(outfile, app=None):
                         mdigits_ok = True
                 except (ValueError, TypeError):
                     e.add(opts, mdigits_msg % f.name)
-                invalid_values_msg = '"%s": DecimalFields require a "max_digits" attribute value that is greater than the value of the "decimal_places" attribute.'
+                invalid_values_msg = '"%s": DecimalFields require a "max_digits" attribute value that is greater than or equal to the value of the "decimal_places" attribute.'
                 if decimalp_ok and mdigits_ok:
-                    if decimal_places >= max_digits:
+                    if decimal_places > max_digits:
                         e.add(opts, invalid_values_msg % f.name)
             if isinstance(f, models.FileField) and not f.upload_to:
                 e.add(opts, '"%s": FileFields require an "upload_to" attribute.' % f.name)

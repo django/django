@@ -69,6 +69,11 @@ class BooleanModel(models.Model):
 class RenamedField(models.Model):
     modelname = models.IntegerField(name="fieldname", choices=((1,'One'),))
 
+# This model isn't used in any test, just here to ensure it validates successfully.
+# See ticket #16570.
+class DecimalLessThanOne(models.Model):
+    d = models.DecimalField(max_digits=3, decimal_places=3)
+
 ###############################################################################
 # FileField
 
