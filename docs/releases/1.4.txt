@@ -704,7 +704,7 @@ AJAX applications is becoming more common, we now protect all methods not
 defined as safe by :rfc:`2616` i.e. we exempt GET, HEAD, OPTIONS and TRACE, and
 enforce protection on everything else.
 
-If you using PUT or DELETE methods in AJAX applications, please see the
+If you are using PUT or DELETE methods in AJAX applications, please see the
 :ref:`instructions about using AJAX and CSRF <csrf-ajax>`.
 
 ``django.core.template_loaders``
