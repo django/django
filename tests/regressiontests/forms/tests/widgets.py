@@ -984,6 +984,10 @@ beatle J R Ringo False""")
         self.assertEqual(w.render('date', datetime.datetime(2007, 9, 17, 12, 51)), u'<input type="hidden" name="date_0" value="2007-09-17" /><input type="hidden" name="date_1" value="12:51:00" />')
 
 
+class NullBooleanSelectLazyForm(Form):
+    """Form to test for lazy evaluation. Refs #17190"""
+    bool = BooleanField(widget=NullBooleanSelect())
+
 class FormsI18NWidgetsTestCase(TestCase):
     def setUp(self):
         super(FormsI18NWidgetsTestCase, self).setUp()
@@ -1024,6 +1028,15 @@ class FormsI18NWidgetsTestCase(TestCase):
         w = SplitHiddenDateTimeWidget()
         w.is_localized = True
         self.assertEqual(w.render('date', datetime.datetime(2007, 9, 17, 12, 51)), u'<input type="hidden" name="date_0" value="17.09.2007" /><input type="hidden" name="date_1" value="12:51:00" />')
+
+    def test_nullbooleanselect(self):
+        """
+        Ensure that the NullBooleanSelect widget's options are lazily
+        localized.
+        Refs #17190
+        """
+        f = NullBooleanSelectLazyForm()
+        self.assertEqual(f.fields['bool'].widget.render('id_bool', True), u'<select name="id_bool">\n<option value="1">Unbekannt</option>\n<option value="2" selected="selected">Ja</option>\n<option value="3">Nein</option>\n</select>')
 
 
 class SelectAndTextWidget(MultiWidget):

@@ -552,7 +552,9 @@ class NullBooleanSelect(Select):
     A Select Widget intended to be used with NullBooleanField.
     """
     def __init__(self, attrs=None):
-        choices = ((u'1', ugettext('Unknown')), (u'2', ugettext('Yes')), (u'3', ugettext('No')))
+        choices = ((u'1', ugettext_lazy('Unknown')),
+                   (u'2', ugettext_lazy('Yes')),
+                   (u'3', ugettext_lazy('No')))
         super(NullBooleanSelect, self).__init__(attrs, choices)
 
     def render(self, name, value, attrs=None, choices=()):
