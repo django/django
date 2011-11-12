@@ -688,7 +688,7 @@ This is completely valid, but it leads to problems when you try to do reverse
 URL matching (through the ``permalink()`` decorator or the :ttag:`url` template
 tag). Continuing this example, if you wanted to retrieve the URL for the
 ``archive`` view, Django's reverse URL matcher would get confused, because *two*
-URLpatterns point at that view.
+URL patterns point at that view.
 
 To solve this problem, Django supports **named URL patterns**. That is, you can
 give a name to a URL pattern in order to distinguish it from other patterns
