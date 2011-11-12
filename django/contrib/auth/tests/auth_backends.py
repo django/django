@@ -300,7 +300,7 @@ class NoInActiveUserBackendTest(TestCase):
 
     def test_has_perm(self):
         self.assertEqual(self.user1.has_perm('perm', TestObj()), False)
-        self.assertEqual(self.user1.has_perm('inactive', TestObj()), True)
+        self.assertEqual(self.user1.has_perm('inactive', TestObj()), False)
 
     def test_has_module_perms(self):
         self.assertEqual(self.user1.has_module_perms("app1"), False)

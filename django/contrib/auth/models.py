@@ -142,22 +142,28 @@ def _user_get_all_permissions(user, obj):
 
 
 def _user_has_perm(user, perm, obj):
+    anon = user.is_anonymous()
+    active = user.is_active
     for backend in auth.get_backends():
-        if hasattr(backend, "has_perm"):
-            if obj is not None:
-                if backend.has_perm(user, perm, obj):
+        if anon or active or backend.supports_inactive_user:
+            if hasattr(backend, "has_perm"):
+                if obj is not None:
+                    if backend.has_perm(user, perm, obj):
+                            return True
+                else:
+                    if backend.has_perm(user, perm):
                         return True
-            else:
-                if backend.has_perm(user, perm):
-                    return True
     return False
 
 
 def _user_has_module_perms(user, app_label):
+    anon = user.is_anonymous()
+    active = user.is_active
     for backend in auth.get_backends():
-        if hasattr(backend, "has_module_perms"):
-            if backend.has_module_perms(user, app_label):
-                return True
+        if anon or active or backend.supports_inactive_user:
+            if hasattr(backend, "has_module_perms"):
+                if backend.has_module_perms(user, app_label):
+                    return True
     return False
 
 
