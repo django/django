@@ -372,6 +372,9 @@ store a timezone-aware ``time`` or ``datetime`` to a
 :class:`~django.db.models.TimeField` or :class:`~django.db.models.DateTimeField`
 respectively, a ``ValueError`` is raised rather than truncating data.
 
+MySQL does not store fractions of seconds. Fractions of seconds are truncated
+to zero when the time is stored.
+
 Row locking with ``QuerySet.select_for_update()``
 -------------------------------------------------
 
