@@ -100,7 +100,7 @@ class BaseCollectionTestCase(BaseStaticFilesTestCase):
     def setUp(self):
         super(BaseCollectionTestCase, self).setUp()
         self.old_root = settings.STATIC_ROOT
-        settings.STATIC_ROOT = tempfile.mkdtemp()
+        settings.STATIC_ROOT = tempfile.mkdtemp(dir=os.environ['DJANGO_TEST_TEMP_DIR'])
         self.run_collectstatic()
         # Use our own error handler that can handle .svn dirs on Windows
         #self.addCleanup(shutil.rmtree, settings.STATIC_ROOT,

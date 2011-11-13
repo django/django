@@ -246,7 +246,7 @@ class EmptyModel(models.Model):
         return "Primary key = %s" % self.id
 
 
-temp_storage = FileSystemStorage(tempfile.mkdtemp())
+temp_storage = FileSystemStorage(tempfile.mkdtemp(dir=os.environ['DJANGO_TEST_TEMP_DIR']))
 UPLOAD_TO = os.path.join(temp_storage.location, 'test_upload')
 
 

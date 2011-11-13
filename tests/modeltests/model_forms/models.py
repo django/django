@@ -7,13 +7,14 @@ and the examples are probably a poor fit for the ``ModelForm`` syntax. In other
 words, most of these tests should be rewritten.
 """
 
+import os
 import tempfile
 
 from django.core.files.storage import FileSystemStorage
 from django.db import models
 
 
-temp_storage_dir = tempfile.mkdtemp()
+temp_storage_dir = tempfile.mkdtemp(dir=os.environ['DJANGO_TEST_TEMP_DIR'])
 temp_storage = FileSystemStorage(temp_storage_dir)
 
 ARTICLE_STATUS = (

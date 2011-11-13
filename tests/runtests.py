@@ -19,6 +19,7 @@ CONTRIB_DIR = os.path.dirname(contrib.__file__)
 MODEL_TEST_DIR = os.path.join(RUNTESTS_DIR, MODEL_TESTS_DIR_NAME)
 REGRESSION_TEST_DIR = os.path.join(RUNTESTS_DIR, REGRESSION_TESTS_DIR_NAME)
 TEMP_DIR = tempfile.mkdtemp(prefix='django_')
+os.environ['DJANGO_TEST_TEMP_DIR'] = TEMP_DIR
 
 REGRESSION_SUBDIRS_TO_SKIP = ['locale']
 

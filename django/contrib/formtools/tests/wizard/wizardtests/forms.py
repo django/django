@@ -1,3 +1,4 @@
+import os
 import tempfile
 
 from django import forms
@@ -10,7 +11,7 @@ from django.contrib.auth.models import User
 
 from django.contrib.formtools.wizard.views import WizardView
 
-temp_storage_location = tempfile.mkdtemp()
+temp_storage_location = tempfile.mkdtemp(dir=os.environ.get('DJANGO_TEST_TEMP_DIR'))
 temp_storage = FileSystemStorage(location=temp_storage_location)
 
 class Page1(forms.Form):

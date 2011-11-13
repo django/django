@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import os
 import datetime
 import tempfile
 
@@ -6,7 +7,7 @@ from django.core.files.storage import FileSystemStorage
 from django.db import models
 
 
-temp_storage_location = tempfile.mkdtemp()
+temp_storage_location = tempfile.mkdtemp(dir=os.environ['DJANGO_TEST_TEMP_DIR'])
 temp_storage = FileSystemStorage(location=temp_storage_location)
 
 
