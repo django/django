@@ -164,8 +164,23 @@ class ModelTests(TestCase):
             1
         )
 
+
 class ModelValidationTest(TestCase):
     def test_pk_validation(self):
         one = NonAutoPK.objects.create(name="one")
         again = NonAutoPK(name="one")
         self.assertRaises(ValidationError, again.validate_unique)
+
+
+class EvaluateMethodTest(TestCase):
+    """
+    Regression test for #13640: cannot filter by objects with 'evaluate' attr
+    """
+
+    def test_model_with_evaluate_method(self):
+        """
+        Ensures that you can filter by objects that have an 'evaluate' attr
+        """
+        dept = Department.objects.create(pk=1, name='abc')
+        dept.evaluate = 'abc'
+        Worker.objects.filter(department=dept)
