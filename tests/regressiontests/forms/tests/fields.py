@@ -136,6 +136,23 @@ class FieldsTests(SimpleTestCase):
         self.assertEqual(f.max_length, None)
         self.assertEqual(f.min_length, 10)
 
+    def test_charfield_widget_attrs(self):
+        """
+        Ensure that CharField.widget_attrs() always returns a dictionary.
+        Refs #15912
+        """
+        # Return an empty dictionary if max_length is None
+        f = CharField()
+        self.assertEqual(f.widget_attrs(TextInput()), {})
+
+        # Or if the widget is not TextInput or PasswordInput
+        f = CharField(max_length=10)
+        self.assertEqual(f.widget_attrs(HiddenInput()), {})
+
+        # Otherwise, return a maxlength attribute equal to max_length
+        self.assertEqual(f.widget_attrs(TextInput()), {'maxlength': '10'})
+        self.assertEqual(f.widget_attrs(PasswordInput()), {'maxlength': '10'})
+
     # IntegerField ################################################################
 
     def test_integerfield_1(self):
