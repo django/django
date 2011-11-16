@@ -703,10 +703,9 @@ Save these changes and start a new Python interactive shell by running
 
 For more information on model relations, see :doc:`Accessing related objects
 </ref/models/relations>`. For more on how to use double underscores to perform
-field lookups via the API, see `Field lookups`__. For full details on the
-database API, see our :doc:`Database API reference </topics/db/queries>`.
-
-__ http://docs.djangoproject.com/en/1.2/topics/db/queries/#field-lookups
+field lookups via the API, see :ref:`Field lookups <field-lookups-intro>`. For
+full details on the database API, see our :doc:`Database API reference
+</topics/db/queries>`.
 
 When you're comfortable with the API, read :doc:`part 2 of this tutorial
 </intro/tutorial02>` to get Django's automatic admin working.

@@ -556,6 +556,8 @@ to any variable that needs escaping. When auto-escaping is on, there's no
 danger of the :tfilter:`escape` filter *double-escaping* data -- the
 :tfilter:`escape` filter does not affect auto-escaped variables.
 
+.. _string-literals-and-automatic-escaping:
+
 String literals and automatic escaping
 --------------------------------------
 
