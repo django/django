@@ -772,12 +772,17 @@ is a list of people represented by dictionaries with ``first_name``,
 like this:
 
 * Male:
+
   * George Bush
   * Bill Clinton
+
 * Female:
+
   * Margaret Thatcher
   * Condoleezza Rice
+
 * Unknown:
+
   * Pat Smith
 
 You can use the ``{% regroup %}`` tag to group the list of people by gender.
@@ -831,14 +836,23 @@ With this input for ``people``, the example ``{% regroup %}`` template code
 above would result in the following output:
 
 * Male:
+
   * Bill Clinton
+
 * Unknown:
+
   * Pat Smith
+
 * Female:
+
   * Margaret Thatcher
+
 * Male:
+
   * George Bush
+
 * Female:
+
   * Condoleezza Rice
 
 The easiest solution to this gotcha is to make sure in your view code that the
