@@ -11,9 +11,10 @@ from django.test.client import RequestFactory
 from .admin import (ChildAdmin, QuartetAdmin, BandAdmin, ChordsBandAdmin,
     GroupAdmin, ParentAdmin, DynamicListDisplayChildAdmin,
     DynamicListDisplayLinksChildAdmin, CustomPaginationAdmin,
-    FilteredChildAdmin, CustomPaginator, site as custom_site)
+    FilteredChildAdmin, CustomPaginator, site as custom_site,
+    SwallowAdmin)
 from .models import (Child, Parent, Genre, Band, Musician, Group, Quartet,
-    Membership, ChordsMusician, ChordsBand, Invitation)
+    Membership, ChordsMusician, ChordsBand, Invitation, Swallow)
 
 
 class ChangeListTests(TestCase):
@@ -21,6 +22,14 @@ class ChangeListTests(TestCase):
 
     def setUp(self):
         self.factory = RequestFactory()
+
+    def _create_superuser(self, username):
+        return User.objects.create(username=username, is_superuser=True)
+
+    def _mocked_authenticated_request(self, url, user):
+        request = self.factory.get(url)
+        request.user = user
+        return request
 
     def test_select_related_preserved(self):
         """
@@ -323,21 +332,12 @@ class ChangeListTests(TestCase):
         for i in range(10):
             Child.objects.create(name='child %s' % i, parent=parent)
 
-        user_noparents = User.objects.create(
-            username='noparents',
-            is_superuser=True)
-        user_parents = User.objects.create(
-            username='parents',
-            is_superuser=True)
-
-        def _mocked_authenticated_request(user):
-            request = self.factory.get('/child/')
-            request.user = user
-            return request
+        user_noparents = self._create_superuser('noparents')
+        user_parents = self._create_superuser('parents')
 
         # Test with user 'noparents'
         m = custom_site._registry[Child]
-        request = _mocked_authenticated_request(user_noparents)
+        request = self._mocked_authenticated_request('/child/', user_noparents)
         response = m.changelist_view(request)
         self.assertNotContains(response, 'Parent object')
 
@@ -348,7 +348,7 @@ class ChangeListTests(TestCase):
 
         # Test with user 'parents'
         m = DynamicListDisplayChildAdmin(Child, admin.site)
-        request = _mocked_authenticated_request(user_parents)
+        request = self._mocked_authenticated_request('/child/', user_parents)
         response = m.changelist_view(request)
         self.assertContains(response, 'Parent object')
 
@@ -362,7 +362,7 @@ class ChangeListTests(TestCase):
         # Test default implementation
         custom_site.register(Child, ChildAdmin)
         m = custom_site._registry[Child]
-        request = _mocked_authenticated_request(user_noparents)
+        request = self._mocked_authenticated_request('/child/', user_noparents)
         response = m.changelist_view(request)
         self.assertContains(response, 'Parent object')
 
@@ -402,17 +402,9 @@ class ChangeListTests(TestCase):
         for i in range(1, 10):
             Child.objects.create(id=i, name='child %s' % i, parent=parent, age=i)
 
-        superuser = User.objects.create(
-            username='superuser',
-            is_superuser=True)
-
-        def _mocked_authenticated_request(user):
-            request = self.factory.get('/child/')
-            request.user = user
-            return request
-
         m = DynamicListDisplayLinksChildAdmin(Child, admin.site)
-        request = _mocked_authenticated_request(superuser)
+        superuser = self._create_superuser('superuser')
+        request = self._mocked_authenticated_request('/child/', superuser)
         response = m.changelist_view(request)
         for i in range(1, 10):
             self.assertContains(response, '<a href="%s/">%s</a>' % (i, i))
@@ -421,3 +413,20 @@ class ChangeListTests(TestCase):
         list_display_links = m.get_list_display_links(request, list_display)
         self.assertEqual(list_display, ('parent', 'name', 'age'))
         self.assertEqual(list_display_links, ['age'])
+
+    def test_tuple_list_display(self):
+        """
+        Regression test for #17128
+        (ChangeList failing under Python 2.5 after r16319)
+        """
+        swallow = Swallow.objects.create(
+            origin='Africa', load='12.34', speed='22.2')
+        model_admin = SwallowAdmin(Swallow, admin.site)
+        superuser = self._create_superuser('superuser')
+        request = self._mocked_authenticated_request('/swallow/', superuser)
+        response = model_admin.changelist_view(request)
+        # just want to ensure it doesn't blow up during rendering
+        self.assertContains(response, unicode(swallow.origin))
+        self.assertContains(response, unicode(swallow.load))
+        self.assertContains(response, unicode(swallow.speed))
+

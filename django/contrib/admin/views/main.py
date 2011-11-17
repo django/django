@@ -221,25 +221,25 @@ class ChangeList(object):
             # for ordering specified on ModelAdmin or model Meta, we don't know
             # the right column numbers absolutely, because there might be more
             # than one column associated with that ordering, so we guess.
-            for f in ordering:
-                if f.startswith('-'):
-                    f = f[1:]
+            for field in ordering:
+                if field.startswith('-'):
+                    field = field[1:]
                     order_type = 'desc'
                 else:
                     order_type = 'asc'
-                i = None
+                index = None
                 try:
                     # Search for simply field name first
-                    i = self.list_display.index(f)
+                    index = list(self.list_display).index(field)
                 except ValueError:
-                    # No match, but their might be a match if we take into account
-                    # 'admin_order_field'
-                    for j, attr in enumerate(self.list_display):
-                        if getattr(attr, 'admin_order_field', '') == f:
-                            i = j
+                    # No match, but there might be a match if we take into
+                    # account 'admin_order_field'
+                    for _index, attr in enumerate(self.list_display):
+                        if getattr(attr, 'admin_order_field', '') == field:
+                            index = _index
                             break
-                if i is not None:
-                    ordering_fields[i] = order_type
+                if index is not None:
+                    ordering_fields[index] = order_type
         else:
             for p in self.params[ORDER_VAR].split('.'):
                 none, pfx, idx = p.rpartition('-')

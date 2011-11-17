@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.core.paginator import Paginator
 
 from .models import (Child, Parent, Genre, Band, Musician, Group, Quartet,
-    Membership, ChordsMusician, ChordsBand, Invitation)
+    Membership, ChordsMusician, ChordsBand, Invitation, Swallow)
 
 
 site = admin.AdminSite(name="admin")
@@ -75,3 +75,9 @@ class DynamicListDisplayLinksChildAdmin(admin.ModelAdmin):
         return ['age']
 
 site.register(Child, DynamicListDisplayChildAdmin)
+
+class SwallowAdmin(admin.ModelAdmin):
+    actions = None # prevent ['action_checkbox'] + list(list_display)
+    list_display = ('origin', 'load', 'speed')
+
+site.register(Swallow, SwallowAdmin)

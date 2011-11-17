@@ -49,3 +49,11 @@ class Invitation(models.Model):
     player = models.ForeignKey(ChordsMusician)
     band = models.ForeignKey(ChordsBand)
     instrument = models.CharField(max_length=15)
+
+class Swallow(models.Model):
+    origin = models.CharField(max_length=255)
+    load = models.FloatField()
+    speed = models.FloatField()
+
+    class Meta:
+        ordering = ('speed', 'load')
