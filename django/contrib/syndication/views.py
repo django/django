@@ -9,15 +9,15 @@ from django.utils.html import escape
 from django.utils.timezone import is_naive
 
 def add_domain(domain, url, secure=False):
-    if not (url.startswith('http://')
+    protocol = 'https' if secure else 'http'
+    if url.startswith('//'):
+        # Support network-path reference (see #16753) - RSS requires a protocol
+        url = '%s:%s' % (protocol, url)
+    elif not (url.startswith('http://')
             or url.startswith('https://')
             or url.startswith('mailto:')):
         # 'url' must already be ASCII and URL-quoted, so no need for encoding
         # conversions here.
-        if secure:
-            protocol = 'https'
-        else:
-            protocol = 'http'
         url = iri_to_uri(u'%s://%s%s' % (protocol, domain, url))
     return url
 

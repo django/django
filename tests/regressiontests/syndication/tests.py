@@ -305,3 +305,7 @@ class SyndicationFeedTest(FeedTestCase):
             views.add_domain('example.com', 'mailto:uhoh@djangoproject.com'),
             'mailto:uhoh@djangoproject.com'
         )
+        self.assertEqual(
+            views.add_domain('example.com', '//example.com/foo/?arg=value'),
+            'http://example.com/foo/?arg=value'
+        )
