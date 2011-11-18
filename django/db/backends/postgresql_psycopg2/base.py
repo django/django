@@ -13,8 +13,9 @@ from django.db.backends.postgresql_psycopg2.client import DatabaseClient
 from django.db.backends.postgresql_psycopg2.creation import DatabaseCreation
 from django.db.backends.postgresql_psycopg2.version import get_version
 from django.db.backends.postgresql_psycopg2.introspection import DatabaseIntrospection
-from django.utils.safestring import SafeUnicode, SafeString
 from django.utils.log import getLogger
+from django.utils.safestring import SafeUnicode, SafeString
+from django.utils.timezone import utc
 
 try:
     import psycopg2 as Database
@@ -31,6 +32,11 @@ psycopg2.extensions.register_adapter(SafeString, psycopg2.extensions.QuotedStrin
 psycopg2.extensions.register_adapter(SafeUnicode, psycopg2.extensions.QuotedString)
 
 logger = getLogger('django.db.backends')
+
+def utc_tzinfo_factory(offset):
+    if offset != 0:
+        raise AssertionError("database connection isn't set to UTC")
+    return utc
 
 class CursorWrapper(object):
     """
@@ -144,11 +150,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     def _cursor(self):
         new_connection = False
-        set_tz = False
         settings_dict = self.settings_dict
         if self.connection is None:
             new_connection = True
-            set_tz = settings_dict.get('TIME_ZONE')
             if settings_dict['NAME'] == '':
                 from django.core.exceptions import ImproperlyConfigured
                 raise ImproperlyConfigured("You need to specify NAME in your Django settings file.")
@@ -171,10 +175,11 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             self.connection.set_isolation_level(self.isolation_level)
             connection_created.send(sender=self.__class__, connection=self)
         cursor = self.connection.cursor()
-        cursor.tzinfo_factory = None
+        cursor.tzinfo_factory = utc_tzinfo_factory if settings.USE_TZ else None
         if new_connection:
-            if set_tz:
-                cursor.execute("SET TIME ZONE %s", [settings_dict['TIME_ZONE']])
+            tz = 'UTC' if settings.USE_TZ else settings_dict.get('TIME_ZONE')
+            if tz:
+                cursor.execute("SET TIME ZONE %s", [tz])
             self._get_pg_version()
         return CursorWrapper(cursor)
 

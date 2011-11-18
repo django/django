@@ -1,8 +1,6 @@
 import copy
 import datetime
 import decimal
-import re
-import time
 import math
 from itertools import tee
 
@@ -12,8 +10,10 @@ from django.conf import settings
 from django import forms
 from django.core import exceptions, validators
 from django.utils.datastructures import DictWrapper
+from django.utils.dateparse import parse_date, parse_datetime, parse_time
 from django.utils.functional import curry
 from django.utils.text import capfirst
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_unicode, force_unicode, smart_str
 from django.utils.ipv6 import clean_ipv6_address
@@ -180,8 +180,8 @@ class Field(object):
                             return
                 elif value == option_key:
                     return
-            raise exceptions.ValidationError(
-                self.error_messages['invalid_choice'] % value)
+            msg = self.error_messages['invalid_choice'] % value
+            raise exceptions.ValidationError(msg)
 
         if value is None and not self.null:
             raise exceptions.ValidationError(self.error_messages['null'])
@@ -638,11 +638,7 @@ class CommaSeparatedIntegerField(CharField):
         defaults.update(kwargs)
         return super(CommaSeparatedIntegerField, self).formfield(**defaults)
 
-ansi_date_re = re.compile(r'^\d{4}-\d{1,2}-\d{1,2}$')
-
 class DateField(Field):
-    description = _("Date (without time)")
-
     empty_strings_allowed = False
     default_error_messages = {
         'invalid': _(u"'%s' value has an invalid date format. It must be "
@@ -650,11 +646,11 @@ class DateField(Field):
         'invalid_date': _(u"'%s' value has the correct format (YYYY-MM-DD) "
                           u"but it is an invalid date."),
     }
+    description = _("Date (without time)")
+
     def __init__(self, verbose_name=None, name=None, auto_now=False,
                  auto_now_add=False, **kwargs):
         self.auto_now, self.auto_now_add = auto_now, auto_now_add
-        # HACKs : auto_now_add/auto_now should be done as a default or a
-        # pre_save.
         if auto_now or auto_now_add:
             kwargs['editable'] = False
             kwargs['blank'] = True
@@ -671,19 +667,18 @@ class DateField(Field):
         if isinstance(value, datetime.date):
             return value
 
-        if not ansi_date_re.search(value):
-            msg = self.error_messages['invalid'] % str(value)
-            raise exceptions.ValidationError(msg)
-        # Now that we have the date string in YYYY-MM-DD format, check to make
-        # sure it's a valid date.
-        # We could use time.strptime here and catch errors, but datetime.date
-        # produces much friendlier error messages.
-        year, month, day = map(int, value.split('-'))
+        value = smart_str(value)
+
         try:
-            return datetime.date(year, month, day)
-        except ValueError, e:
-            msg = self.error_messages['invalid_date'] % str(value)
+            parsed = parse_date(value)
+            if parsed is not None:
+                return parsed
+        except ValueError:
+            msg = self.error_messages['invalid_date'] % value
             raise exceptions.ValidationError(msg)
+
+        msg = self.error_messages['invalid'] % value
+        raise exceptions.ValidationError(msg)
 
     def pre_save(self, model_instance, add):
         if self.auto_now or (self.auto_now_add and add):
@@ -721,11 +716,7 @@ class DateField(Field):
 
     def value_to_string(self, obj):
         val = self._get_val_from_obj(obj)
-        if val is None:
-            data = ''
-        else:
-            data = str(val)
-        return data
+        return '' if val is None else val.isoformat()
 
     def formfield(self, **kwargs):
         defaults = {'form_class': forms.DateField}
@@ -733,12 +724,19 @@ class DateField(Field):
         return super(DateField, self).formfield(**defaults)
 
 class DateTimeField(DateField):
+    empty_strings_allowed = False
     default_error_messages = {
-        'invalid': _(u"'%s' value either has an invalid valid format (The "
-                     u"format must be YYYY-MM-DD HH:MM[:ss[.uuuuuu]]) or is "
-                     u"an invalid date/time."),
+        'invalid': _(u"'%s' value has an invalid format. It must be in "
+                     u"YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ] format."),
+        'invalid_date': _(u"'%s' value has the correct format "
+                          u"(YYYY-MM-DD) but it is an invalid date."),
+        'invalid_datetime': _(u"'%s' value has the correct format "
+                              u"(YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]) "
+                              u"but it is an invalid date/time."),
     }
     description = _("Date (with time)")
+
+    # __init__ is inherited from DateField
 
     def get_internal_type(self):
         return "DateTimeField"
@@ -751,59 +749,59 @@ class DateTimeField(DateField):
         if isinstance(value, datetime.date):
             return datetime.datetime(value.year, value.month, value.day)
 
-        # Attempt to parse a datetime:
         value = smart_str(value)
-        # split usecs, because they are not recognized by strptime.
-        if '.' in value:
-            try:
-                value, usecs = value.split('.')
-                usecs = int(usecs)
-            except ValueError:
-                raise exceptions.ValidationError(
-                    self.error_messages['invalid'] % str(value))
-        else:
-            usecs = 0
-        kwargs = {'microsecond': usecs}
-        try: # Seconds are optional, so try converting seconds first.
-            return datetime.datetime(
-                *time.strptime(value, '%Y-%m-%d %H:%M:%S')[:6], **kwargs)
 
+        try:
+            parsed = parse_datetime(value)
+            if parsed is not None:
+                return parsed
         except ValueError:
-            try: # Try without seconds.
-                return datetime.datetime(
-                    *time.strptime(value, '%Y-%m-%d %H:%M')[:5], **kwargs)
-            except ValueError: # Try without hour/minutes/seconds.
-                try:
-                    return datetime.datetime(
-                        *time.strptime(value, '%Y-%m-%d')[:3], **kwargs)
-                except ValueError:
-                    raise exceptions.ValidationError(
-                        self.error_messages['invalid'] % str(value))
+            msg = self.error_messages['invalid_datetime'] % value
+            raise exceptions.ValidationError(msg)
+
+        try:
+            parsed = parse_date(value)
+            if parsed is not None:
+                return datetime.datetime(parsed.year, parsed.month, parsed.day)
+        except ValueError:
+            msg = self.error_messages['invalid_date'] % value
+            raise exceptions.ValidationError(msg)
+
+        msg = self.error_messages['invalid'] % value
+        raise exceptions.ValidationError(msg)
 
     def pre_save(self, model_instance, add):
         if self.auto_now or (self.auto_now_add and add):
-            value = datetime.datetime.now()
+            value = timezone.now()
             setattr(model_instance, self.attname, value)
             return value
         else:
             return super(DateTimeField, self).pre_save(model_instance, add)
 
+    # contribute_to_class is inherited from DateField, it registers
+    # get_next_by_FOO and get_prev_by_FOO
+
+    # get_prep_lookup is inherited from DateField
+
     def get_prep_value(self, value):
-        return self.to_python(value)
+        value = self.to_python(value)
+        if settings.USE_TZ and timezone.is_naive(value):
+            # For backwards compatibility, interpret naive datetimes in local
+            # time. This won't work during DST change, but we can't do much
+            # about it, so we let the exceptions percolate up the call stack.
+            default_timezone = timezone.get_default_timezone()
+            value = timezone.make_aware(value, default_timezone)
+        return value
 
     def get_db_prep_value(self, value, connection, prepared=False):
-        # Casts dates into the format expected by the backend
+        # Casts datetimes into the format expected by the backend
         if not prepared:
             value = self.get_prep_value(value)
         return connection.ops.value_to_db_datetime(value)
 
     def value_to_string(self, obj):
         val = self._get_val_from_obj(obj)
-        if val is None:
-            data = ''
-        else:
-            data = str(val.replace(microsecond=0, tzinfo=None))
-        return data
+        return '' if val is None else val.isoformat()
 
     def formfield(self, **kwargs):
         defaults = {'form_class': forms.DateTimeField}
@@ -1158,17 +1156,21 @@ class TextField(Field):
         return super(TextField, self).formfield(**defaults)
 
 class TimeField(Field):
-    description = _("Time")
-
     empty_strings_allowed = False
     default_error_messages = {
-        'invalid': _('Enter a valid time in HH:MM[:ss[.uuuuuu]] format.'),
+        'invalid': _(u"'%s' value has an invalid format. It must be in "
+                     u"HH:MM[:ss[.uuuuuu]] format."),
+        'invalid_time': _(u"'%s' value has the correct format "
+                          u"(HH:MM[:ss[.uuuuuu]]) but it is an invalid time."),
     }
+    description = _("Time")
+
     def __init__(self, verbose_name=None, name=None, auto_now=False,
                  auto_now_add=False, **kwargs):
         self.auto_now, self.auto_now_add = auto_now, auto_now_add
         if auto_now or auto_now_add:
             kwargs['editable'] = False
+            kwargs['blank'] = True
         Field.__init__(self, verbose_name, name, **kwargs)
 
     def get_internal_type(self):
@@ -1185,30 +1187,18 @@ class TimeField(Field):
             # database backend (e.g. Oracle), so we'll be accommodating.
             return value.time()
 
-        # Attempt to parse a datetime:
         value = smart_str(value)
-        # split usecs, because they are not recognized by strptime.
-        if '.' in value:
-            try:
-                value, usecs = value.split('.')
-                usecs = int(usecs)
-            except ValueError:
-                raise exceptions.ValidationError(
-                    self.error_messages['invalid'])
-        else:
-            usecs = 0
-        kwargs = {'microsecond': usecs}
 
-        try: # Seconds are optional, so try converting seconds first.
-            return datetime.time(*time.strptime(value, '%H:%M:%S')[3:6],
-                                 **kwargs)
+        try:
+            parsed = parse_time(value)
+            if parsed is not None:
+                return parsed
         except ValueError:
-            try: # Try without seconds.
-                return datetime.time(*time.strptime(value, '%H:%M')[3:5],
-                                         **kwargs)
-            except ValueError:
-                raise exceptions.ValidationError(
-                    self.error_messages['invalid'])
+            msg = self.error_messages['invalid_time'] % value
+            raise exceptions.ValidationError(msg)
+
+        msg = self.error_messages['invalid'] % value
+        raise exceptions.ValidationError(msg)
 
     def pre_save(self, model_instance, add):
         if self.auto_now or (self.auto_now_add and add):
@@ -1229,11 +1219,7 @@ class TimeField(Field):
 
     def value_to_string(self, obj):
         val = self._get_val_from_obj(obj)
-        if val is None:
-            data = ''
-        else:
-            data = str(val.replace(microsecond=0))
-        return data
+        return '' if val is None else val.isoformat()
 
     def formfield(self, **kwargs):
         defaults = {'form_class': forms.TimeField}

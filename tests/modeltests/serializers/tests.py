@@ -230,7 +230,7 @@ class SerializersTestBase(object):
 
         serial_str = serializers.serialize(self.serializer_name, [a])
         date_values = self._get_field_values(serial_str, "pub_date")
-        self.assertEqual(date_values[0], "0001-02-03 04:05:06")
+        self.assertEqual(date_values[0].replace('T', ' '), "0001-02-03 04:05:06")
 
     def test_pkless_serialized_strings(self):
         """
@@ -323,7 +323,7 @@ class XmlSerializerTransactionTestCase(SerializersTransactionTestBase, Transacti
     <object pk="1" model="serializers.article">
         <field to="serializers.author" name="author" rel="ManyToOneRel">1</field>
         <field type="CharField" name="headline">Forward references pose no problem</field>
-        <field type="DateTimeField" name="pub_date">2006-06-16 15:00:00</field>
+        <field type="DateTimeField" name="pub_date">2006-06-16T15:00:00</field>
         <field to="serializers.category" name="categories" rel="ManyToManyRel">
             <object pk="1"></object>
         </field>
@@ -374,7 +374,7 @@ class JsonSerializerTransactionTestCase(SerializersTransactionTestBase, Transact
         "model": "serializers.article",
         "fields": {
             "headline": "Forward references pose no problem",
-            "pub_date": "2006-06-16 15:00:00",
+            "pub_date": "2006-06-16T15:00:00",
             "categories": [1],
             "author": 1
         }

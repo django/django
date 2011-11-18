@@ -66,7 +66,7 @@ class ConnectionHandler(object):
         if conn['ENGINE'] == 'django.db.backends.' or not conn['ENGINE']:
             conn['ENGINE'] = 'django.db.backends.dummy'
         conn.setdefault('OPTIONS', {})
-        conn.setdefault('TIME_ZONE', settings.TIME_ZONE)
+        conn.setdefault('TIME_ZONE', 'UTC' if settings.USE_TZ else settings.TIME_ZONE)
         for setting in ['NAME', 'USER', 'PASSWORD', 'HOST', 'PORT']:
             conn.setdefault(setting, '')
         for setting in ['TEST_CHARSET', 'TEST_COLLATION', 'TEST_NAME', 'TEST_MIRROR']:

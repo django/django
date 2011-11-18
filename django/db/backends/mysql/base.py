@@ -33,6 +33,7 @@ from django.db.backends.mysql.creation import DatabaseCreation
 from django.db.backends.mysql.introspection import DatabaseIntrospection
 from django.db.backends.mysql.validation import DatabaseValidation
 from django.utils.safestring import SafeString, SafeUnicode
+from django.utils.timezone import is_aware, is_naive, utc
 
 # Raise exceptions for database warnings if DEBUG is on
 from django.conf import settings
@@ -43,16 +44,29 @@ if settings.DEBUG:
 DatabaseError = Database.DatabaseError
 IntegrityError = Database.IntegrityError
 
+# It's impossible to import datetime_or_None directly from MySQLdb.times
+datetime_or_None = conversions[FIELD_TYPE.DATETIME]
+
+def datetime_or_None_with_timezone_support(value):
+    dt = datetime_or_None(value)
+    # Confirm that dt is naive before overwriting its tzinfo.
+    if dt is not None and settings.USE_TZ and is_naive(dt):
+        dt = dt.replace(tzinfo=utc)
+    return dt
+
 # MySQLdb-1.2.1 returns TIME columns as timedelta -- they are more like
 # timedelta in terms of actual behavior as they are signed and include days --
 # and Django expects time, so we still need to override that. We also need to
 # add special handling for SafeUnicode and SafeString as MySQLdb's type
 # checking is too tight to catch those (see Django ticket #6052).
+# Finally, MySQLdb always returns naive datetime objects. However, when
+# timezone support is active, Django expects timezone-aware datetime objects.
 django_conversions = conversions.copy()
 django_conversions.update({
     FIELD_TYPE.TIME: util.typecast_time,
     FIELD_TYPE.DECIMAL: util.typecast_decimal,
     FIELD_TYPE.NEWDECIMAL: util.typecast_decimal,
+    FIELD_TYPE.DATETIME: datetime_or_None_with_timezone_support,
 })
 
 # This should match the numerical portion of the version numbers (we can treat
@@ -238,8 +252,11 @@ class DatabaseOperations(BaseDatabaseOperations):
             return None
 
         # MySQL doesn't support tz-aware datetimes
-        if value.tzinfo is not None:
-            raise ValueError("MySQL backend does not support timezone-aware datetimes.")
+        if is_aware(value):
+            if settings.USE_TZ:
+                value = value.astimezone(utc).replace(tzinfo=None)
+            else:
+                raise ValueError("MySQL backend does not support timezone-aware datetimes when USE_TZ is False.")
 
         # MySQL doesn't support microseconds
         return unicode(value.replace(microsecond=0))
@@ -248,9 +265,9 @@ class DatabaseOperations(BaseDatabaseOperations):
         if value is None:
             return None
 
-        # MySQL doesn't support tz-aware datetimes
-        if value.tzinfo is not None:
-            raise ValueError("MySQL backend does not support timezone-aware datetimes.")
+        # MySQL doesn't support tz-aware times
+        if is_aware(value):
+            raise ValueError("MySQL backend does not support timezone-aware times.")
 
         # MySQL doesn't support microseconds
         return unicode(value.replace(microsecond=0))

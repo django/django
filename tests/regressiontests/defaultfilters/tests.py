@@ -421,7 +421,7 @@ class DefaultFiltersTests(TestCase):
 
     def test_timeuntil(self):
         self.assertEqual(
-            timeuntil_filter(datetime.datetime.now() + datetime.timedelta(1)),
+            timeuntil_filter(datetime.datetime.now() + datetime.timedelta(1, 1)),
             u'1 day')
 
         self.assertEqual(

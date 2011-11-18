@@ -6,6 +6,7 @@ from django.template import loader, TemplateDoesNotExist, RequestContext
 from django.utils import feedgenerator, tzinfo
 from django.utils.encoding import force_unicode, iri_to_uri, smart_unicode
 from django.utils.html import escape
+from django.utils.timezone import is_naive
 
 def add_domain(domain, url, secure=False):
     if not (url.startswith('http://')
@@ -164,7 +165,7 @@ class Feed(object):
                 author_email = author_link = None
 
             pubdate = self.__get_dynamic_attr('item_pubdate', item)
-            if pubdate and not pubdate.tzinfo:
+            if pubdate and is_naive(pubdate):
                 ltz = tzinfo.LocalTimezone(pubdate)
                 pubdate = pubdate.replace(tzinfo=ltz)
 

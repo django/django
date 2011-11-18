@@ -14,10 +14,13 @@ Usage:
 import re
 import time
 import calendar
+import datetime
+
 from django.utils.dates import MONTHS, MONTHS_3, MONTHS_ALT, MONTHS_AP, WEEKDAYS, WEEKDAYS_ABBR
 from django.utils.tzinfo import LocalTimezone
 from django.utils.translation import ugettext as _
 from django.utils.encoding import force_unicode
+from django.utils.timezone import is_aware, is_naive
 
 re_formatchars = re.compile(r'(?<!\\)([aAbBcdDEfFgGhHiIjlLmMnNOPrsStTUuwWyYzZ])')
 re_escaped = re.compile(r'\\(.)')
@@ -115,9 +118,12 @@ class DateFormat(TimeFormat):
     def __init__(self, dt):
         # Accepts either a datetime or date object.
         self.data = dt
-        self.timezone = getattr(dt, 'tzinfo', None)
-        if hasattr(self.data, 'hour') and not self.timezone:
-            self.timezone = LocalTimezone(dt)
+        self.timezone = None
+        if isinstance(dt, datetime.datetime):
+            if is_naive(dt):
+                self.timezone = LocalTimezone(dt)
+            else:
+                self.timezone = dt.tzinfo
 
     def b(self):
         "Month, textual, 3 letters, lowercase; e.g. 'jan'"
@@ -218,7 +224,7 @@ class DateFormat(TimeFormat):
 
     def U(self):
         "Seconds since the Unix epoch (January 1 1970 00:00:00 GMT)"
-        if getattr(self.data, 'tzinfo', None):
+        if isinstance(self.data, datetime.datetime) and is_aware(self.data):
             return int(calendar.timegm(self.data.utctimetuple()))
         else:
             return int(time.mktime(self.data.timetuple()))

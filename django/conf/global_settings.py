@@ -31,8 +31,12 @@ INTERNAL_IPS = ()
 
 # Local time zone for this installation. All choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name (although not all
-# systems may support all possibilities).
+# systems may support all possibilities). When USE_TZ is True, this is
+# interpreted as the default user time zone.
 TIME_ZONE = 'America/Chicago'
+
+# If you set this to True, Django will use timezone-aware datetimes.
+USE_TZ = False
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
@@ -119,7 +123,7 @@ LOCALE_PATHS = ()
 LANGUAGE_COOKIE_NAME = 'django_language'
 
 # If you set this to True, Django will format dates, numbers and calendars
-# according to user current locale
+# according to user current locale.
 USE_L10N = False
 
 # Not-necessarily-technical managers of the site. They get broken link
@@ -192,6 +196,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.i18n',
     'django.core.context_processors.media',
     'django.core.context_processors.static',
+    'django.core.context_processors.tz',
 #    'django.core.context_processors.request',
     'django.contrib.messages.context_processors.messages',
 )

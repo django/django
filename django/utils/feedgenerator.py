@@ -28,6 +28,7 @@ import urlparse
 from django.utils.xmlutils import SimplerXMLGenerator
 from django.utils.encoding import force_unicode, iri_to_uri
 from django.utils import datetime_safe
+from django.utils.timezone import is_aware
 
 def rfc2822_date(date):
     # We can't use strftime() because it produces locale-dependant results, so
@@ -40,7 +41,7 @@ def rfc2822_date(date):
     dow = days[date.weekday()]
     month = months[date.month - 1]
     time_str = date.strftime('%s, %%d %s %%Y %%H:%%M:%%S ' % (dow, month))
-    if date.tzinfo:
+    if is_aware(date):
         offset = date.tzinfo.utcoffset(date)
         timezone = (offset.days * 24 * 60) + (offset.seconds // 60)
         hour, minute = divmod(timezone, 60)
@@ -51,7 +52,7 @@ def rfc2822_date(date):
 def rfc3339_date(date):
     # Support datetime objects older than 1900
     date = datetime_safe.new_datetime(date)
-    if date.tzinfo:
+    if is_aware(date):
         time_str = date.strftime('%Y-%m-%dT%H:%M:%S')
         offset = date.tzinfo.utcoffset(date)
         timezone = (offset.days * 24 * 60) + (offset.seconds // 60)

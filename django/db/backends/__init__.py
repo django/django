@@ -10,6 +10,7 @@ from django.db import DEFAULT_DB_ALIAS
 from django.db.backends import util
 from django.db.transaction import TransactionManagementError
 from django.utils.importlib import import_module
+from django.utils.timezone import is_aware
 
 
 class BaseDatabaseWrapper(local):
@@ -743,6 +744,8 @@ class BaseDatabaseOperations(object):
         """
         if value is None:
             return None
+        if is_aware(value):
+            raise ValueError("Django does not support timezone-aware times.")
         return unicode(value)
 
     def value_to_db_decimal(self, value, max_digits, decimal_places):

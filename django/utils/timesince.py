@@ -1,6 +1,6 @@
 import datetime
 
-from django.utils.tzinfo import LocalTimezone
+from django.utils.timezone import is_aware, utc
 from django.utils.translation import ungettext, ugettext
 
 def timesince(d, now=None):
@@ -31,13 +31,10 @@ def timesince(d, now=None):
         now = datetime.datetime(now.year, now.month, now.day)
 
     if not now:
-        if d.tzinfo:
-            now = datetime.datetime.now(LocalTimezone(d))
-        else:
-            now = datetime.datetime.now()
+        now = datetime.datetime.now(utc if is_aware(d) else None)
 
-    # ignore microsecond part of 'd' since we removed it from 'now'
-    delta = now - (d - datetime.timedelta(0, 0, d.microsecond))
+    delta = now - d
+    # ignore microseconds
     since = delta.days * 24 * 60 * 60 + delta.seconds
     if since <= 0:
         # d is in the future compared to now, stop processing.
@@ -61,8 +58,5 @@ def timeuntil(d, now=None):
     the given time.
     """
     if not now:
-        if getattr(d, 'tzinfo', None):
-            now = datetime.datetime.now(LocalTimezone(d))
-        else:
-            now = datetime.datetime.now()
+        now = datetime.datetime.now(utc if is_aware(d) else None)
     return timesince(now, d)

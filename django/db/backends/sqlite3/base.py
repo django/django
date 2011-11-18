@@ -10,13 +10,16 @@ import decimal
 import re
 import sys
 
+from django.conf import settings
 from django.db import utils
 from django.db.backends import *
 from django.db.backends.signals import connection_created
 from django.db.backends.sqlite3.client import DatabaseClient
 from django.db.backends.sqlite3.creation import DatabaseCreation
 from django.db.backends.sqlite3.introspection import DatabaseIntrospection
+from django.utils.dateparse import parse_date, parse_datetime, parse_time
 from django.utils.safestring import SafeString
+from django.utils.timezone import is_aware, is_naive, utc
 
 try:
     try:
@@ -31,22 +34,29 @@ except ImportError, exc:
 DatabaseError = Database.DatabaseError
 IntegrityError = Database.IntegrityError
 
+def parse_datetime_with_timezone_support(value):
+    dt = parse_datetime(value)
+    # Confirm that dt is naive before overwriting its tzinfo.
+    if dt is not None and settings.USE_TZ and is_naive(dt):
+        dt = dt.replace(tzinfo=utc)
+    return dt
+
 Database.register_converter("bool", lambda s: str(s) == '1')
-Database.register_converter("time", util.typecast_time)
-Database.register_converter("date", util.typecast_date)
-Database.register_converter("datetime", util.typecast_timestamp)
-Database.register_converter("timestamp", util.typecast_timestamp)
-Database.register_converter("TIMESTAMP", util.typecast_timestamp)
+Database.register_converter("time", parse_time)
+Database.register_converter("date", parse_date)
+Database.register_converter("datetime", parse_datetime_with_timezone_support)
+Database.register_converter("timestamp", parse_datetime_with_timezone_support)
+Database.register_converter("TIMESTAMP", parse_datetime_with_timezone_support)
 Database.register_converter("decimal", util.typecast_decimal)
 Database.register_adapter(decimal.Decimal, util.rev_typecast_decimal)
-if Database.version_info >= (2,4,1):
+if Database.version_info >= (2, 4, 1):
     # Starting in 2.4.1, the str type is not accepted anymore, therefore,
     # we convert all str objects to Unicode
     # As registering a adapter for a primitive type causes a small
     # slow-down, this adapter is only registered for sqlite3 versions
     # needing it.
-    Database.register_adapter(str, lambda s:s.decode('utf-8'))
-    Database.register_adapter(SafeString, lambda s:s.decode('utf-8'))
+    Database.register_adapter(str, lambda s: s.decode('utf-8'))
+    Database.register_adapter(SafeString, lambda s: s.decode('utf-8'))
 
 class DatabaseFeatures(BaseDatabaseFeatures):
     # SQLite cannot handle us only partially reading from a cursor's result set
@@ -56,6 +66,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     can_use_chunked_reads = False
     test_db_allows_multiple_connections = False
     supports_unspecified_pk = True
+    supports_timezones = False
     supports_1000_query_parameters = False
     supports_mixed_date_datetime_comparisons = False
     has_bulk_insert = True
@@ -131,6 +142,29 @@ class DatabaseOperations(BaseDatabaseOperations):
         # sql_flush() implementations). Just return SQL at this point
         return sql
 
+    def value_to_db_datetime(self, value):
+        if value is None:
+            return None
+
+        # SQLite doesn't support tz-aware datetimes
+        if is_aware(value):
+            if settings.USE_TZ:
+                value = value.astimezone(utc).replace(tzinfo=None)
+            else:
+                raise ValueError("SQLite backend does not support timezone-aware datetimes when USE_TZ is False.")
+
+        return unicode(value)
+
+    def value_to_db_time(self, value):
+        if value is None:
+            return None
+
+        # SQLite doesn't support tz-aware datetimes
+        if is_aware(value):
+            raise ValueError("SQLite backend does not support timezone-aware times.")
+
+        return unicode(value)
+
     def year_lookup_bounds(self, value):
         first = '%s-01-01'
         second = '%s-12-31 23:59:59.999999'
@@ -147,11 +181,11 @@ class DatabaseOperations(BaseDatabaseOperations):
         elif internal_type and internal_type.endswith('IntegerField') or internal_type == 'AutoField':
             return int(value)
         elif internal_type == 'DateField':
-            return util.typecast_date(value)
+            return parse_date(value)
         elif internal_type == 'DateTimeField':
-            return util.typecast_timestamp(value)
+            return parse_datetime_with_timezone_support(value)
         elif internal_type == 'TimeField':
-            return util.typecast_time(value)
+            return parse_time(value)
 
         # No field, or the field isn't known to be a decimal or integer
         return value

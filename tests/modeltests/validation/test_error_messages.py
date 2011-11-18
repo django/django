@@ -104,16 +104,43 @@ class ValidationMessagesTest(TestCase):
             f.clean('foo', None)
         except ValidationError, e:
             self.assertEqual(e.messages, [
-                u"'foo' value either has an invalid valid format "
-                u"(The format must be YYYY-MM-DD HH:MM[:ss[.uuuuuu]]) "
-                u"or is an invalid date/time."])
-        self.assertRaises(ValidationError, f.clean,
-                          '2011-10-32 10:10', None)
+                u"'foo' value has an invalid format. It must be "
+                u"in YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ] format."])
+
+        # Correct format but invalid date
+        self.assertRaises(ValidationError, f.clean, '2011-10-32', None)
+        try:
+            f.clean('2011-10-32', None)
+        except ValidationError, e:
+            self.assertEqual(e.messages, [
+                u"'2011-10-32' value has the correct format "
+                u"(YYYY-MM-DD) but it is an invalid date."])
+
         # Correct format but invalid date/time
+        self.assertRaises(ValidationError, f.clean, '2011-10-32 10:10', None)
         try:
             f.clean('2011-10-32 10:10', None)
         except ValidationError, e:
             self.assertEqual(e.messages, [
-                u"'2011-10-32 10:10' value either has an invalid valid format "
-                u"(The format must be YYYY-MM-DD HH:MM[:ss[.uuuuuu]]) "
-                u"or is an invalid date/time."])
+                u"'2011-10-32 10:10' value has the correct format "
+                u"(YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]) "
+                u"but it is an invalid date/time."])
+
+    def test_time_field_raises_error_message(self):
+        f = models.TimeField()
+        # Wrong format
+        self.assertRaises(ValidationError, f.clean, 'foo', None)
+        try:
+            f.clean('foo', None)
+        except ValidationError, e:
+            self.assertEqual(e.messages, [
+                u"'foo' value has an invalid format. It must be in "
+                u"HH:MM[:ss[.uuuuuu]] format."])
+        # Correct format but invalid time
+        self.assertRaises(ValidationError, f.clean, '25:50', None)
+        try:
+            f.clean('25:50', None)
+        except ValidationError, e:
+            self.assertEqual(e.messages, [
+                u"'25:50' value has the correct format "
+                u"(HH:MM[:ss[.uuuuuu]]) but it is an invalid time."])

@@ -2,7 +2,13 @@
 
 import time
 from datetime import timedelta, tzinfo
+
 from django.utils.encoding import smart_unicode, smart_str, DEFAULT_LOCALE_ENCODING
+
+# Python's doc say: "A tzinfo subclass must have an __init__() method that can
+# be called with no arguments". FixedOffset and LocalTimezone don't honor this
+# requirement. Defining __getinitargs__ is sufficient to fix copy/deepcopy as
+# well as pickling/unpickling.
 
 class FixedOffset(tzinfo):
     "Fixed offset in minutes east from UTC."
@@ -19,6 +25,9 @@ class FixedOffset(tzinfo):
     def __repr__(self):
         return self.__name
 
+    def __getinitargs__(self):
+        return self.__offset,
+
     def utcoffset(self, dt):
         return self.__offset
 
@@ -28,14 +37,24 @@ class FixedOffset(tzinfo):
     def dst(self, dt):
         return timedelta(0)
 
+# This implementation is used for display purposes. It uses an approximation
+# for DST computations on dates >= 2038.
+
+# A similar implementation exists in django.utils.timezone. It's used for
+# timezone support (when USE_TZ = True) and focuses on correctness.
+
 class LocalTimezone(tzinfo):
     "Proxy timezone information from time module."
     def __init__(self, dt):
         tzinfo.__init__(self)
+        self.__dt = dt
         self._tzname = self.tzname(dt)
 
     def __repr__(self):
         return smart_str(self._tzname)
+
+    def __getinitargs__(self):
+        return self.__dt,
 
     def utcoffset(self, dt):
         if self._isdst(dt):

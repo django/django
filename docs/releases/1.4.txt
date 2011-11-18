@@ -409,7 +409,6 @@ If the same code is imported inconsistently (some places with the project
 prefix, some places without it), the imports will need to be cleaned up when
 switching to the new ``manage.py``.
 
-
 Improved WSGI support
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -427,6 +426,25 @@ callable :djadmin:`runserver` uses.
 (The :djadmin:`runfcgi` management command also internally wraps the WSGI
 callable configured via :setting:`WSGI_APPLICATION`.)
 
+Support for time zones
+~~~~~~~~~~~~~~~~~~~~~~
+
+Django 1.4 adds :ref:`support for time zones <time-zones>`. When it's enabled,
+Django stores date and time information in UTC in the database, uses time
+zone-aware datetime objects internally, and translates them to the end user's
+time zone in templates and forms.
+
+Reasons for using this feature include:
+
+- Customizing date and time display for users around the world.
+- Storing datetimes in UTC for database portability and interoperability.
+  (This argument doesn't apply to PostgreSQL, because it already stores
+  timestamps with time zone information in Django 1.3.)
+- Avoiding data corruption problems around DST transitions.
+
+Time zone support in enabled by default in new projects created with
+:djadmin:`startproject`. If you want to use this feature in an existing
+project, there is a :ref:`migration guide <time-zones-migration-guide>`.
 
 Minor features
 ~~~~~~~~~~~~~~
@@ -615,6 +633,39 @@ subsequently raise a 404. Requesting ``/notaflatpageoravalidurl`` now will
 immediately raise a 404. Additionally redirects returned by flatpages are now
 permanent (301 status code) to match the behavior of the
 :class:`~django.middleware.common.CommonMiddleware`.
+
+Serialization of :class:`~datetime.datetime` and :class:`~datetime.time`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+As a consequence of time zone support, and according to the ECMA-262
+specification, some changes were made to the JSON serializer:
+
+- It includes the time zone for aware datetime objects. It raises an exception
+  for aware time objects.
+- It includes milliseconds for datetime and time objects. There is still
+  some precision loss, because Python stores microseconds (6 digits) and JSON
+  only supports milliseconds (3 digits). However, it's better than discarding
+  microseconds entirely.
+
+The XML serializer was also changed to use ISO8601 for datetimes. The letter
+``T`` is used to separate the date part from the time part, instead of a
+space. Time zone information is included in the ``[+-]HH:MM`` format.
+
+The serializers will dump datetimes in fixtures with these new formats. They
+can still load fixtures that use the old format.
+
+``supports_timezone`` changed to ``False`` for SQLite
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The database feature ``supports_timezone`` used to be ``True`` for SQLite.
+Indeed, if you saved an aware datetime object, SQLite stored a string that
+included an UTC offset. However, this offset was ignored when loading the value
+back from the database, which could corrupt the data.
+
+In the context of time zone support, this flag was changed to ``False``, and
+datetimes are now stored without time zone information in SQLite. When
+:setting:`USE_TZ` is ``False``, if you attempt to save an aware datetime
+object, Django raises an exception.
 
 `COMMENTS_BANNED_USERS_GROUP` setting
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

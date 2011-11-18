@@ -692,7 +692,7 @@ def get_digit(value, arg):
 # DATES           #
 ###################
 
-@register.filter(is_safe=False)
+@register.filter(expects_localtime=True, is_safe=False)
 def date(value, arg=None):
     """Formats a date according to the given format."""
     if not value:
@@ -707,7 +707,7 @@ def date(value, arg=None):
         except AttributeError:
             return ''
 
-@register.filter(is_safe=False)
+@register.filter(expects_localtime=True, is_safe=False)
 def time(value, arg=None):
     """Formats a time according to the given format."""
     if value in (None, u''):

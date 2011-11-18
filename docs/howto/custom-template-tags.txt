@@ -347,6 +347,31 @@ function; this syntax is deprecated.
         return mark_safe(result)
     initial_letter_filter.needs_autoescape = True
 
+.. _filters-timezones:
+
+Filters and time zones
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.4
+
+If you write a custom filter that operates on :class:`~datetime.datetime`
+objects, you'll usually register it with the ``expects_localtime`` flag set to
+``True``:
+
+.. code-block:: python
+
+    @register.filter(expects_localtime=True)
+    def businesshours(value):
+        try:
+            return 9 <= value.hour < 17
+        except AttributeError:
+            return ''
+
+When this flag is set, if the first argument to your filter is a time zone
+aware datetime, Django will convert it to the current time zone before passing
+to your filter when appropriate, according to :ref:`rules for time zones
+conversions in templates <time-zones-in-templates>`.
+
 Writing custom template tags
 ----------------------------
 

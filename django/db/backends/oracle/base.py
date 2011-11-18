@@ -44,6 +44,7 @@ except ImportError, e:
     from django.core.exceptions import ImproperlyConfigured
     raise ImproperlyConfigured("Error loading cx_Oracle module: %s" % e)
 
+from django.conf import settings
 from django.db import utils
 from django.db.backends import *
 from django.db.backends.signals import connection_created
@@ -51,6 +52,7 @@ from django.db.backends.oracle.client import DatabaseClient
 from django.db.backends.oracle.creation import DatabaseCreation
 from django.db.backends.oracle.introspection import DatabaseIntrospection
 from django.utils.encoding import smart_str, force_unicode
+from django.utils.timezone import is_aware, is_naive, utc
 
 DatabaseError = Database.DatabaseError
 IntegrityError = Database.IntegrityError
@@ -333,11 +335,17 @@ WHEN (new.%(col_name)s IS NULL)
             return "TABLESPACE %s" % self.quote_name(tablespace)
 
     def value_to_db_datetime(self, value):
-        # Oracle doesn't support tz-aware datetimes
-        if getattr(value, 'tzinfo', None) is not None:
-            raise ValueError("Oracle backend does not support timezone-aware datetimes.")
+        if value is None:
+            return None
 
-        return super(DatabaseOperations, self).value_to_db_datetime(value)
+        # Oracle doesn't support tz-aware datetimes
+        if is_aware(value):
+            if settings.USE_TZ:
+                value = value.astimezone(utc).replace(tzinfo=None)
+            else:
+                raise ValueError("Oracle backend does not support timezone-aware datetimes when USE_TZ is False.")
+
+        return unicode(value)
 
     def value_to_db_time(self, value):
         if value is None:
@@ -346,9 +354,9 @@ WHEN (new.%(col_name)s IS NULL)
         if isinstance(value, basestring):
             return datetime.datetime.strptime(value, '%H:%M:%S')
 
-        # Oracle doesn't support tz-aware datetimes
-        if value.tzinfo is not None:
-            raise ValueError("Oracle backend does not support timezone-aware datetimes.")
+        # Oracle doesn't support tz-aware times
+        if is_aware(value):
+            raise ValueError("Oracle backend does not support timezone-aware times.")
 
         return datetime.datetime(1900, 1, 1, value.hour, value.minute,
                                  value.second, value.microsecond)
@@ -472,9 +480,28 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             # Set oracle date to ansi date format.  This only needs to execute
             # once when we create a new connection. We also set the Territory
             # to 'AMERICA' which forces Sunday to evaluate to a '1' in TO_CHAR().
-            cursor.execute("ALTER SESSION SET NLS_DATE_FORMAT = 'YYYY-MM-DD HH24:MI:SS' "
-                           "NLS_TIMESTAMP_FORMAT = 'YYYY-MM-DD HH24:MI:SS.FF' "
-                           "NLS_TERRITORY = 'AMERICA'")
+            cursor.execute("ALTER SESSION SET NLS_DATE_FORMAT = 'YYYY-MM-DD HH24:MI:SS'"
+                           " NLS_TIMESTAMP_FORMAT = 'YYYY-MM-DD HH24:MI:SS.FF'"
+                           " NLS_TERRITORY = 'AMERICA'"
+                           + (" TIME_ZONE = 'UTC'" if settings.USE_TZ else ''))
+
+            def datetime_converter(dt):
+                # Confirm that dt is naive before overwriting its tzinfo.
+                if dt is not None and is_naive(dt):
+                    dt = dt.replace(tzinfo=utc)
+                return dt
+
+            def output_type_handler(cursor, name, default_type,
+                                    size, precision, scale):
+                # datetimes are returned as TIMESTAMP, except the results
+                # of "dates" queries, which are returned as DATETIME.
+                if settings.USE_TZ and default_type in (Database.TIMESTAMP,
+                                                        Database.DATETIME):
+                    return cursor.var(default_type,
+                                      arraysize=cursor.arraysize,
+                                      outconverter=datetime_converter)
+
+            self.connection.outputtypehandler = output_type_handler
 
             if 'operators' not in self.__dict__:
                 # Ticket #14149: Check whether our LIKE implementation will

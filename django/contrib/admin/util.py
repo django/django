@@ -7,6 +7,7 @@ from django.utils import formats
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
+from django.utils import timezone
 from django.utils.encoding import force_unicode, smart_unicode, smart_str
 from django.utils.translation import ungettext
 from django.core.urlresolvers import reverse
@@ -293,6 +294,8 @@ def display_for_field(value, field):
         return _boolean_icon(value)
     elif value is None:
         return EMPTY_CHANGELIST_VALUE
+    elif isinstance(field, models.DateTimeField):
+        return formats.localize(timezone.aslocaltime(value))
     elif isinstance(field, models.DateField) or isinstance(field, models.TimeField):
         return formats.localize(value)
     elif isinstance(field, models.DecimalField):

@@ -7,7 +7,7 @@ from django.template import defaultfilters
 from django.utils.encoding import force_unicode
 from django.utils.formats import number_format
 from django.utils.translation import pgettext, ungettext, ugettext as _
-from django.utils.tzinfo import LocalTimezone
+from django.utils.timezone import is_aware, utc
 
 register = template.Library()
 
@@ -158,8 +158,8 @@ def naturalday(value, arg=None):
     except ValueError:
         # Date arguments out of range
         return value
-    today = datetime.now(tzinfo).replace(microsecond=0, second=0, minute=0, hour=0)
-    delta = value - today.date()
+    today = datetime.now(tzinfo).date()
+    delta = value - today
     if delta.days == 0:
         return _(u'today')
     elif delta.days == 1:
@@ -174,18 +174,10 @@ def naturaltime(value):
     For date and time values shows how many seconds, minutes or hours ago
     compared to current timestamp returns representing string.
     """
-    try:
-        value = datetime(value.year, value.month, value.day, value.hour, value.minute, value.second)
-    except AttributeError:
-        return value
-    except ValueError:
+    if not isinstance(value, date): # datetime is a subclass of date
         return value
 
-    if getattr(value, 'tzinfo', None):
-        now = datetime.now(LocalTimezone(value))
-    else:
-        now = datetime.now()
-    now = now - timedelta(0, 0, now.microsecond)
+    now = datetime.now(utc if is_aware(value) else None)
     if value < now:
         delta = now - value
         if delta.days != 0:

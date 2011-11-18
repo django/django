@@ -10,7 +10,7 @@ from itertools import chain
 from urlparse import urljoin
 
 from django.conf import settings
-from django.forms.util import flatatt
+from django.forms.util import flatatt, to_current_timezone
 from django.utils.datastructures import MultiValueDict, MergeDict
 from django.utils.html import escape, conditional_escape
 from django.utils.translation import ugettext, ugettext_lazy
@@ -847,6 +847,7 @@ class SplitDateTimeWidget(MultiWidget):
 
     def decompress(self, value):
         if value:
+            value = to_current_timezone(value)
             return [value.date(), value.time().replace(microsecond=0)]
         return [None, None]
 

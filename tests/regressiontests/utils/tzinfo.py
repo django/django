@@ -1,5 +1,7 @@
+import copy
 import datetime
 import os
+import pickle
 import time
 from django.utils.tzinfo import FixedOffset, LocalTimezone
 from django.utils import unittest
@@ -60,3 +62,18 @@ class TzinfoTests(unittest.TestCase):
         self.assertEqual(
                 repr(datetime.datetime.fromtimestamp(ts + 3600, tz)),
                 'datetime.datetime(2010, 11, 7, 1, 0, tzinfo=EST)')
+
+    def test_copy(self):
+        now = datetime.datetime.now()
+        self.assertIsInstance(copy.copy(FixedOffset(90)), FixedOffset)
+        self.assertIsInstance(copy.copy(LocalTimezone(now)), LocalTimezone)
+
+    def test_deepcopy(self):
+        now = datetime.datetime.now()
+        self.assertIsInstance(copy.deepcopy(FixedOffset(90)), FixedOffset)
+        self.assertIsInstance(copy.deepcopy(LocalTimezone(now)), LocalTimezone)
+
+    def test_pickling_unpickling(self):
+        now = datetime.datetime.now()
+        self.assertIsInstance(pickle.loads(pickle.dumps(FixedOffset(90))), FixedOffset)
+        self.assertIsInstance(pickle.loads(pickle.dumps(LocalTimezone(now))), LocalTimezone)

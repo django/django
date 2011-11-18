@@ -546,6 +546,12 @@ Examples::
     >>> Entry.objects.filter(headline__contains='Lennon').dates('pub_date', 'day')
     [datetime.datetime(2005, 3, 20)]
 
+.. warning::
+
+    When :doc:`time zone support </topics/i18n/timezones>` is enabled, Django
+    uses UTC in the database connection, which means the aggregation is
+    performed in UTC. This is a known limitation of the current implementation.
+
 none
 ~~~~
 
@@ -1952,6 +1958,13 @@ implementation of the relevant query varies among different database engines.)
 Note this will match any record with a ``pub_date`` that falls on a Monday (day
 2 of the week), regardless of the month or year in which it occurs. Week days
 are indexed with day 1 being Sunday and day 7 being Saturday.
+
+.. warning::
+
+    When :doc:`time zone support </topics/i18n/timezones>` is enabled, Django
+    uses UTC in the database connection, which means the ``year``, ``month``,
+    ``day`` and ``week_day`` lookups are performed in UTC. This is a known
+    limitation of the current implementation.
 
 .. fieldlookup:: isnull
 

@@ -48,6 +48,11 @@ def i18n(request):
 
     return context_extras
 
+def tz(request):
+    from django.utils import timezone
+
+    return {'TIME_ZONE': timezone.get_current_timezone_name()}
+
 def static(request):
     """
     Adds static-related context variables to the context.

@@ -8,8 +8,8 @@ from StringIO import StringIO
 
 from django.core.serializers.python import Serializer as PythonSerializer
 from django.core.serializers.python import Deserializer as PythonDeserializer
-from django.utils import datetime_safe
 from django.utils import simplejson
+from django.utils.timezone import is_aware
 
 class Serializer(PythonSerializer):
     """
@@ -39,19 +39,24 @@ class DjangoJSONEncoder(simplejson.JSONEncoder):
     """
     JSONEncoder subclass that knows how to encode date/time and decimal types.
     """
-
-    DATE_FORMAT = "%Y-%m-%d"
-    TIME_FORMAT = "%H:%M:%S"
-
     def default(self, o):
+        # See "Date Time String Format" in the ECMA-262 specification.
         if isinstance(o, datetime.datetime):
-            d = datetime_safe.new_datetime(o)
-            return d.strftime("%s %s" % (self.DATE_FORMAT, self.TIME_FORMAT))
+            r = o.isoformat()
+            if o.microsecond:
+                r = r[:23] + r[26:]
+            if r.endswith('+00:00'):
+                r = r[:-6] + 'Z'
+            return r
         elif isinstance(o, datetime.date):
-            d = datetime_safe.new_date(o)
-            return d.strftime(self.DATE_FORMAT)
+            return o.isoformat()
         elif isinstance(o, datetime.time):
-            return o.strftime(self.TIME_FORMAT)
+            if is_aware(o):
+                raise ValueError("JSON can't represent timezone-aware times.")
+            r = o.isoformat()
+            if o.microsecond:
+                r = r[:12]
+            return r
         elif isinstance(o, decimal.Decimal):
             return str(o)
         else:

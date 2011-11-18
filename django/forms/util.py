@@ -1,6 +1,9 @@
+from django.conf import settings
 from django.utils.html import conditional_escape
 from django.utils.encoding import StrAndUnicode, force_unicode
 from django.utils.safestring import mark_safe
+from django.utils import timezone
+from django.utils.translation import ugettext_lazy as _
 
 # Import ValidationError so that it can be imported from this
 # module to maintain backwards compatibility.
@@ -52,3 +55,31 @@ class ErrorList(list, StrAndUnicode):
     def __repr__(self):
         return repr([force_unicode(e) for e in self])
 
+# Utilities for time zone support in DateTimeField et al.
+
+def from_current_timezone(value):
+    """
+    When time zone support is enabled, convert naive datetimes
+    entered in the current time zone to aware datetimes.
+    """
+    if settings.USE_TZ and value is not None and timezone.is_naive(value):
+        current_timezone = timezone.get_current_timezone()
+        try:
+            return timezone.make_aware(value, current_timezone)
+        except Exception, e:
+            raise ValidationError(_('%(datetime)s couldn\'t be interpreted '
+                                    'in time zone %(current_timezone)s; it '
+                                    'may be ambiguous or it may not exist.')
+                                  % {'datetime': value,
+                                     'current_timezone': current_timezone})
+    return value
+
+def to_current_timezone(value):
+    """
+    When time zone support is enabled, convert aware datetimes
+    to naive dateimes in the current time zone for display.
+    """
+    if settings.USE_TZ and value is not None and timezone.is_aware(value):
+        current_timezone = timezone.get_current_timezone()
+        return timezone.make_naive(value, current_timezone)
+    return value

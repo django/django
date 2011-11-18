@@ -24,7 +24,7 @@ from django.template.response import TemplateResponse
 from django.test import TestCase, RequestFactory
 from django.test.utils import (get_warnings_state, restore_warnings_state,
     override_settings)
-from django.utils import translation, unittest
+from django.utils import timezone, translation, unittest
 from django.utils.cache import (patch_vary_headers, get_cache_key,
     learn_cache_key, patch_cache_control, patch_response_headers)
 from django.views.decorators.cache import cache_page
@@ -1154,7 +1154,7 @@ class CacheI18nTest(TestCase):
         request.session = {}
         return request
 
-    @override_settings(USE_I18N=True, USE_L10N=False)
+    @override_settings(USE_I18N=True, USE_L10N=False, USE_TZ=False)
     def test_cache_key_i18n_translation(self):
         request = self._get_request()
         lang = translation.get_language()
@@ -1164,7 +1164,7 @@ class CacheI18nTest(TestCase):
         key2 = get_cache_key(request)
         self.assertEqual(key, key2)
 
-    @override_settings(USE_I18N=False, USE_L10N=True)
+    @override_settings(USE_I18N=False, USE_L10N=True, USE_TZ=False)
     def test_cache_key_i18n_formatting(self):
         request = self._get_request()
         lang = translation.get_language()
@@ -1174,13 +1174,25 @@ class CacheI18nTest(TestCase):
         key2 = get_cache_key(request)
         self.assertEqual(key, key2)
 
+    @override_settings(USE_I18N=False, USE_L10N=False, USE_TZ=True)
+    def test_cache_key_i18n_timezone(self):
+        request = self._get_request()
+        tz = timezone.get_current_timezone_name()
+        response = HttpResponse()
+        key = learn_cache_key(request, response)
+        self.assertIn(tz, key, "Cache keys should include the time zone name when time zones are active")
+        key2 = get_cache_key(request)
+        self.assertEqual(key, key2)
+
     @override_settings(USE_I18N=False, USE_L10N=False)
     def test_cache_key_no_i18n (self):
         request = self._get_request()
         lang = translation.get_language()
+        tz = timezone.get_current_timezone_name()
         response = HttpResponse()
         key = learn_cache_key(request, response)
         self.assertNotIn(lang, key, "Cache keys shouldn't include the language name when i18n isn't active")
+        self.assertNotIn(tz, key, "Cache keys shouldn't include the time zone name when i18n isn't active")
 
     @override_settings(
             CACHE_MIDDLEWARE_KEY_PREFIX="test",
