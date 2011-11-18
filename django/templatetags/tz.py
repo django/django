@@ -13,6 +13,7 @@ from django.utils import timezone
 
 register = Library()
 
+
 # HACK: datetime is an old-style class, create a new-style equivalent
 # so we can define additional attributes.
 class datetimeobject(datetime, object):
@@ -22,23 +23,25 @@ class datetimeobject(datetime, object):
 # Template filters
 
 @register.filter
-def aslocaltime(value):
+def localtime(value):
     """
     Converts a datetime to local time in the active time zone.
 
     This only makes sense within a {% localtime off %} block.
     """
-    return astimezone(value, timezone.get_current_timezone())
+    return do_timezone(value, timezone.get_current_timezone())
+
 
 @register.filter
-def asutc(value):
+def utc(value):
     """
     Converts a datetime to UTC.
     """
-    return astimezone(value, timezone.utc)
+    return do_timezone(value, timezone.utc)
 
-@register.filter
-def astimezone(value, arg):
+
+@register.filter('timezone')
+def do_timezone(value, arg):
     """
     Converts a datetime to local time in a given time zone.
 
@@ -103,6 +106,7 @@ class LocalTimeNode(Node):
         context.use_tz = old_setting
         return output
 
+
 class TimezoneNode(Node):
     """
     Template node class used by ``timezone_tag``.
@@ -116,6 +120,7 @@ class TimezoneNode(Node):
             output = self.nodelist.render(context)
         return output
 
+
 class GetCurrentTimezoneNode(Node):
     """
     Template node class used by ``get_current_timezone_tag``.
@@ -126,6 +131,7 @@ class GetCurrentTimezoneNode(Node):
     def render(self, context):
         context[self.variable] = timezone.get_current_timezone_name()
         return ''
+
 
 @register.tag('localtime')
 def localtime_tag(parser, token):
@@ -142,12 +148,14 @@ def localtime_tag(parser, token):
     if len(bits) == 1:
         use_tz = True
     elif len(bits) > 2 or bits[1] not in ('on', 'off'):
-        raise TemplateSyntaxError("%r argument should be 'on' or 'off'" % bits[0])
+        raise TemplateSyntaxError("%r argument should be 'on' or 'off'" %
+                                  bits[0])
     else:
         use_tz = bits[1] == 'on'
     nodelist = parser.parse(('endlocaltime',))
     parser.delete_first_token()
     return LocalTimeNode(nodelist, use_tz)
+
 
 @register.tag('timezone')
 def timezone_tag(parser, token):
@@ -167,11 +175,13 @@ def timezone_tag(parser, token):
     """
     bits = token.split_contents()
     if len(bits) != 2:
-        raise TemplateSyntaxError("'%s' takes one argument (timezone)" % bits[0])
+        raise TemplateSyntaxError("'%s' takes one argument (timezone)" %
+                                  bits[0])
     tz = parser.compile_filter(bits[1])
     nodelist = parser.parse(('endtimezone',))
     parser.delete_first_token()
     return TimezoneNode(nodelist, tz)
+
 
 @register.tag("get_current_timezone")
 def get_current_timezone_tag(parser, token):
@@ -187,5 +197,6 @@ def get_current_timezone_tag(parser, token):
     """
     args = token.contents.split()
     if len(args) != 3 or args[1] != 'as':
-        raise TemplateSyntaxError("'get_current_timezone' requires 'as variable' (got %r)" % args)
+        raise TemplateSyntaxError("'get_current_timezone' requires "
+                                  "'as variable' (got %r)" % args)
     return GetCurrentTimezoneNode(args[2])

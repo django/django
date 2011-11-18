@@ -17,7 +17,7 @@ from django.conf import settings
 __all__ = [
     'utc', 'get_default_timezone', 'get_current_timezone',
     'activate', 'deactivate', 'override',
-    'aslocaltime', 'isnaive',
+    'localtime', 'isnaive',
 ]
 
 
@@ -198,7 +198,7 @@ class override(object):
 
 # Utilities
 
-def aslocaltime(value, use_tz=None):
+def localtime(value, use_tz=None):
     """
     Checks if value is a datetime and converts it to local time if necessary.
 

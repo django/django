@@ -330,10 +330,10 @@ These filters accept both aware and naive datetimes. For conversion purposes,
 they assume that naive datetimes are in the default time zone. They always
 return aware datetimes.
 
-.. templatefilter:: aslocaltime
+.. templatefilter:: localtime
 
-aslocaltime
-~~~~~~~~~~~
+localtime
+~~~~~~~~~
 
 Forces conversion of a single value to the current time zone.
 
@@ -341,12 +341,12 @@ For example::
 
     {% load tz %}
 
-    {{ value|aslocaltime }}
+    {{ value|localtime }}
 
-.. templatefilter:: asutc
+.. templatefilter:: utc
 
-asutc
-~~~~~
+utc
+~~~
 
 Forces conversion of a single value to UTC.
 
@@ -354,10 +354,12 @@ For example::
 
     {% load tz %}
 
-    {{ value|asutc }}
+    {{ value|utc }}
 
-astimezone
-~~~~~~~~~~
+.. templatefilter:: timezone
+
+timezone
+~~~~~~~~
 
 Forces conversion of a single value to an arbitrary timezone.
 
@@ -368,7 +370,7 @@ For example::
 
     {% load tz %}
 
-    {{ value|astimezone:"Europe/Paris" }}
+    {{ value|timezone:"Europe/Paris" }}
 
 .. _time-zones-migration-guide:
 

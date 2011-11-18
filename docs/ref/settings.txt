@@ -2108,6 +2108,7 @@ Otherwise, Django will use naive datetimes in local time.
 See also :setting:`TIME_ZONE`, :setting:`USE_I18N` and :setting:`USE_L10N`.
 
 .. note::
+
     The default :file:`settings.py` file created by
     :djadmin:`django-admin.py startproject <startproject>` includes
     ``USE_TZ = True`` for convenience.

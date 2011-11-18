@@ -3,7 +3,7 @@ from django.utils.encoding import force_unicode
 from django.utils.html import escape
 from django.utils.safestring import SafeData, EscapeData
 from django.utils.formats import localize
-from django.utils.timezone import aslocaltime
+from django.utils.timezone import localtime
 
 
 class DebugLexer(Lexer):
@@ -82,7 +82,7 @@ class DebugVariableNode(VariableNode):
     def render(self, context):
         try:
             output = self.filter_expression.resolve(context)
-            output = aslocaltime(output, use_tz=context.use_tz)
+            output = localtime(output, use_tz=context.use_tz)
             output = localize(output, use_l10n=context.use_l10n)
             output = force_unicode(output)
         except UnicodeDecodeError:

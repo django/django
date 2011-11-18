@@ -295,7 +295,7 @@ def display_for_field(value, field):
     elif value is None:
         return EMPTY_CHANGELIST_VALUE
     elif isinstance(field, models.DateTimeField):
-        return formats.localize(timezone.aslocaltime(value))
+        return formats.localize(timezone.localtime(value))
     elif isinstance(field, models.DateField) or isinstance(field, models.TimeField):
         return formats.localize(value)
     elif isinstance(field, models.DecimalField):

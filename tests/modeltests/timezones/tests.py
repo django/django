@@ -537,10 +537,10 @@ class TemplateTests(BaseDateTimeTests):
             'naive': datetime.datetime(2011, 9, 1, 13, 20, 30),
         }
         templates = {
-            'notag': Template("{% load tz %}{{ dt }}|{{ dt|aslocaltime }}|{{ dt|asutc }}|{{ dt|astimezone:ICT }}"),
-            'noarg': Template("{% load tz %}{% localtime %}{{ dt }}|{{ dt|aslocaltime }}|{{ dt|asutc }}|{{ dt|astimezone:ICT }}{% endlocaltime %}"),
-            'on':    Template("{% load tz %}{% localtime on %}{{ dt }}|{{ dt|aslocaltime }}|{{ dt|asutc }}|{{ dt|astimezone:ICT }}{% endlocaltime %}"),
-            'off':   Template("{% load tz %}{% localtime off %}{{ dt }}|{{ dt|aslocaltime }}|{{ dt|asutc }}|{{ dt|astimezone:ICT }}{% endlocaltime %}"),
+            'notag': Template("{% load tz %}{{ dt }}|{{ dt|localtime }}|{{ dt|utc }}|{{ dt|timezone:ICT }}"),
+            'noarg': Template("{% load tz %}{% localtime %}{{ dt }}|{{ dt|localtime }}|{{ dt|utc }}|{{ dt|timezone:ICT }}{% endlocaltime %}"),
+            'on':    Template("{% load tz %}{% localtime on %}{{ dt }}|{{ dt|localtime }}|{{ dt|utc }}|{{ dt|timezone:ICT }}{% endlocaltime %}"),
+            'off':   Template("{% load tz %}{% localtime off %}{{ dt }}|{{ dt|localtime }}|{{ dt|utc }}|{{ dt|timezone:ICT }}{% endlocaltime %}"),
         }
 
         # Transform a list of keys in 'datetimes' to the expected template
@@ -600,10 +600,10 @@ class TemplateTests(BaseDateTimeTests):
     @skipIf(pytz is None, "this test requires pytz")
     def test_localtime_filters_with_pytz(self):
         """
-        Test the |aslocaltime, |asutc, and |astimezone filters with pytz.
+        Test the |localtime, |utc, and |timezone filters with pytz.
         """
         # Use a pytz timezone as local time
-        tpl = Template("{% load tz %}{{ dt|aslocaltime }}|{{ dt|asutc }}")
+        tpl = Template("{% load tz %}{{ dt|localtime }}|{{ dt|utc }}")
         ctx = Context({'dt': datetime.datetime(2011, 9, 1, 12, 20, 30)})
 
         timezone._localtime = None
@@ -612,13 +612,13 @@ class TemplateTests(BaseDateTimeTests):
         timezone._localtime = None
 
         # Use a pytz timezone as argument
-        tpl = Template("{% load tz %}{{ dt|astimezone:tz }}")
+        tpl = Template("{% load tz %}{{ dt|timezone:tz }}")
         ctx = Context({'dt': datetime.datetime(2011, 9, 1, 13, 20, 30),
                        'tz': pytz.timezone('Europe/Paris')})
         self.assertEqual(tpl.render(ctx), "2011-09-01T12:20:30+02:00")
 
         # Use a pytz timezone name as argument
-        tpl = Template("{% load tz %}{{ dt|astimezone:'Europe/Paris' }}")
+        tpl = Template("{% load tz %}{{ dt|timezone:'Europe/Paris' }}")
         ctx = Context({'dt': datetime.datetime(2011, 9, 1, 13, 20, 30),
                        'tz': pytz.timezone('Europe/Paris')})
         self.assertEqual(tpl.render(ctx), "2011-09-01T12:20:30+02:00")
@@ -629,9 +629,9 @@ class TemplateTests(BaseDateTimeTests):
 
     def test_localtime_filters_do_not_raise_exceptions(self):
         """
-        Test the |aslocaltime, |asutc, and |astimezone filters on bad inputs.
+        Test the |localtime, |utc, and |timezone filters on bad inputs.
         """
-        tpl = Template("{% load tz %}{{ dt }}|{{ dt|aslocaltime }}|{{ dt|asutc }}|{{ dt|astimezone:tz }}")
+        tpl = Template("{% load tz %}{{ dt }}|{{ dt|localtime }}|{{ dt|utc }}|{{ dt|timezone:tz }}")
         with self.settings(USE_TZ=True):
             # bad datetime value
             ctx = Context({'dt': None, 'tz': ICT})
@@ -639,7 +639,7 @@ class TemplateTests(BaseDateTimeTests):
             ctx = Context({'dt': 'not a date', 'tz': ICT})
             self.assertEqual(tpl.render(ctx), "not a date|||")
             # bad timezone value
-            tpl = Template("{% load tz %}{{ dt|astimezone:tz }}")
+            tpl = Template("{% load tz %}{{ dt|timezone:tz }}")
             ctx = Context({'dt': datetime.datetime(2011, 9, 1, 13, 20, 30), 'tz': None})
             self.assertEqual(tpl.render(ctx), "")
             ctx = Context({'dt': datetime.datetime(2011, 9, 1, 13, 20, 30), 'tz': 'not a tz'})

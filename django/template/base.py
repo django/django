@@ -18,7 +18,7 @@ from django.utils.safestring import (SafeData, EscapeData, mark_safe,
 from django.utils.formats import localize
 from django.utils.html import escape
 from django.utils.module_loading import module_has_submodule
-from django.utils.timezone import aslocaltime
+from django.utils.timezone import localtime
 
 
 TOKEN_TEXT = 0
@@ -595,7 +595,7 @@ class FilterExpression(object):
                 else:
                     arg_vals.append(arg.resolve(context))
             if getattr(func, 'expects_localtime', False):
-                obj = aslocaltime(obj, context.use_tz)
+                obj = localtime(obj, context.use_tz)
             if getattr(func, 'needs_autoescape', False):
                 new_obj = func(obj, autoescape=context.autoescape, *arg_vals)
             else:
@@ -856,7 +856,7 @@ def _render_value_in_context(value, context):
     means escaping, if required, and conversion to a unicode object. If value
     is a string, it is expected to have already been translated.
     """
-    value = aslocaltime(value, use_tz=context.use_tz)
+    value = localtime(value, use_tz=context.use_tz)
     value = localize(value, use_l10n=context.use_l10n)
     value = force_unicode(value)
     if ((context.autoescape and not isinstance(value, SafeData)) or
