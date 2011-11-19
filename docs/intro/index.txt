@@ -31,6 +31,6 @@ place: read this material to quickly get up and running.
     
     .. _python: http://python.org/
     .. _list of Python resources for non-programmers: http://wiki.python.org/moin/BeginnersGuide/NonProgrammers
-    .. _dive into python: http://diveintopython.org/
+    .. _dive into python: http://diveintopython.net/
     .. _dead-tree version: http://www.amazon.com/exec/obidos/ASIN/1590593561/ref=nosim/jacobian20
     .. _books about Python: http://wiki.python.org/moin/PythonBooks
