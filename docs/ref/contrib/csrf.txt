@@ -347,8 +347,9 @@ all the views that need it, enable the middleware and use
 CsrfViewMiddleware.process_view not used
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-There are cases when may not have run before your view is run - 404 and 500
-handlers, for example - but you still need the CSRF token in a form.
+There are cases when ``CsrfViewMiddleware.process_view``` may not have run
+before your view is run - 404 and 500 handlers, for example - but you still
+need the CSRF token in a form.
 
 Solution: use :func:`~django.views.decorators.csrf.requires_csrf_token`
 
@@ -420,7 +421,7 @@ The domain to be used when setting the CSRF cookie.  This can be useful for
 easily allowing cross-subdomain requests to be excluded from the normal cross
 site request forgery protection.  It should be set to a string such as
 ``".lawrence.com"`` to allow a POST request from a form on one subdomain to be
-accepted by accepted by a view served from another subdomain.
+accepted by a view served from another subdomain.
 
 Please note that, with or without use of this setting, this CSRF protection
 mechanism is not safe against cross-subdomain attacks -- see `Limitations`_.
