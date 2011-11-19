@@ -1,3 +1,5 @@
+import psycopg2.extensions
+
 from django.db.backends.creation import BaseDatabaseCreation
 from django.db.backends.util import truncate_name
 
@@ -81,4 +83,5 @@ class DatabaseCreation(BaseDatabaseCreation):
     def _prepare_for_test_db_ddl(self):
         """Rollback and close the active transaction."""
         self.connection.connection.rollback()
-        self.connection.connection.set_isolation_level(0)
+        self.connection.connection.set_isolation_level(
+                psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT)

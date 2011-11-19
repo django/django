@@ -108,7 +108,11 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         self.features = DatabaseFeatures(self)
         autocommit = self.settings_dict["OPTIONS"].get('autocommit', False)
         self.features.uses_autocommit = autocommit
-        self._set_isolation_level(int(not autocommit))
+        if autocommit:
+            level = psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT
+        else:
+            level = psycopg2.extensions.ISOLATION_LEVEL_READ_COMMITTED
+        self._set_isolation_level(level)
         self.ops = DatabaseOperations(self)
         self.client = DatabaseClient(self)
         self.creation = DatabaseCreation(self)
@@ -189,7 +193,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         the same transaction is visible across all the queries.
         """
         if self.features.uses_autocommit and managed and not self.isolation_level:
-            self._set_isolation_level(1)
+            self._set_isolation_level(psycopg2.extensions.ISOLATION_LEVEL_READ_COMMITTED)
 
     def _leave_transaction_management(self, managed):
         """
@@ -197,7 +201,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         leaving transaction management.
         """
         if self.features.uses_autocommit and not managed and self.isolation_level:
-            self._set_isolation_level(0)
+            self._set_isolation_level(psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT)
 
     def _set_isolation_level(self, level):
         """
@@ -205,7 +209,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         levels. This doesn't touch the uses_autocommit feature, since that
         controls the movement *between* isolation levels.
         """
-        assert level in (0, 1)
+        assert level in range(5)
         try:
             if self.connection is not None:
                 self.connection.set_isolation_level(level)
