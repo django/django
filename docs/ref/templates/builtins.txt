@@ -1931,7 +1931,7 @@ slice
 Returns a slice of the list.
 
 Uses the same syntax as Python's list slicing. See
-http://diveintopython.org/native_data_types/lists.html#odbchelper.list.slice
+http://diveintopython.net/native_data_types/lists.html#odbchelper.list.slice
 for an introduction.
 
 Example::
