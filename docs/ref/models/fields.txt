@@ -572,6 +572,11 @@ information on the available attributes and methods, see the
 :class:`~django.core.files.File` class reference and the :doc:`/topics/files`
 topic guide.
 
+.. note::
+    The file is saved as part of saving the model in the database, so the actual
+    file name used on disk cannot be relied on until after the model has been
+    saved.
+
 The uploaded file's relative URL can be obtained using the
 :attr:`~django.db.models.fields.FileField.url` attribute. Internally,
 this calls the :meth:`~django.core.files.storage.Storage.url` method of the

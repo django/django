@@ -45,6 +45,12 @@ the details of the attached photo::
 This object -- ``car.photo`` in the example -- is a ``File`` object, which means
 it has all the methods and attributes described below.
 
+.. note::
+    The file is saved as part of saving the model in the database, so the actual
+    file name used on disk cannot be relied on until after the model has been
+    saved.
+
+
 The ``File`` object
 ===================
 
