@@ -365,7 +365,7 @@ static
 
 .. versionadded:: 1.4
 
-Uses the configued :setting:`STATICFILES_STORAGE` storage to create the
+Uses the configured :setting:`STATICFILES_STORAGE` storage to create the
 full URL for the given relative path, e.g.:
 
 .. code-block:: html+django
