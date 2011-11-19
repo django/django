@@ -170,7 +170,7 @@ Other batteries included
 * :doc:`Clickjacking protection <ref/clickjacking>`
 * :doc:`Comments <ref/contrib/comments/index>` | :doc:`Moderation <ref/contrib/comments/moderation>` | :doc:`Custom comments <ref/contrib/comments/custom>`
 * :doc:`Conditional content processing <topics/conditional-view-processing>`
-* :doc:`Content types <ref/contrib/contenttypes>`
+* :doc:`Content types and generic relations <ref/contrib/contenttypes>`
 * :doc:`Cross Site Request Forgery protection <ref/contrib/csrf>`
 * :doc:`Cryptographic signing <topics/signing>`
 * :doc:`Databrowse <ref/contrib/databrowse>`
