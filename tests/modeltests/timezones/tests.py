@@ -3,6 +3,7 @@ from __future__ import with_statement
 import datetime
 import os
 import time
+import warnings
 
 try:
     import pytz
@@ -238,7 +239,11 @@ class NewDatabaseTests(BaseDateTimeTests):
 
     def test_naive_datetime(self):
         dt = datetime.datetime(2011, 9, 1, 13, 20, 30)
-        Event.objects.create(dt=dt)
+        with warnings.catch_warnings(record=True) as recorded:
+            Event.objects.create(dt=dt)
+            self.assertEqual(len(recorded), 1)
+            msg = str(recorded[0].message)
+            self.assertTrue(msg.startswith("DateTimeField received a naive datetime"))
         event = Event.objects.get()
         # naive datetimes are interpreted in local time
         self.assertEqual(event.dt, dt.replace(tzinfo=EAT))
@@ -246,7 +251,11 @@ class NewDatabaseTests(BaseDateTimeTests):
     @skipUnlessDBFeature('supports_microsecond_precision')
     def test_naive_datetime_with_microsecond(self):
         dt = datetime.datetime(2011, 9, 1, 13, 20, 30, 405060)
-        Event.objects.create(dt=dt)
+        with warnings.catch_warnings(record=True) as recorded:
+            Event.objects.create(dt=dt)
+            self.assertEqual(len(recorded), 1)
+            msg = str(recorded[0].message)
+            self.assertTrue(msg.startswith("DateTimeField received a naive datetime"))
         event = Event.objects.get()
         # naive datetimes are interpreted in local time
         self.assertEqual(event.dt, dt.replace(tzinfo=EAT))
@@ -254,7 +263,11 @@ class NewDatabaseTests(BaseDateTimeTests):
     @skipIfDBFeature('supports_microsecond_precision')
     def test_naive_datetime_with_microsecond_unsupported(self):
         dt = datetime.datetime(2011, 9, 1, 13, 20, 30, 405060)
-        Event.objects.create(dt=dt)
+        with warnings.catch_warnings(record=True) as recorded:
+            Event.objects.create(dt=dt)
+            self.assertEqual(len(recorded), 1)
+            msg = str(recorded[0].message)
+            self.assertTrue(msg.startswith("DateTimeField received a naive datetime"))
         event = Event.objects.get()
         # microseconds are lost during a round-trip in the database
         # naive datetimes are interpreted in local time
@@ -294,7 +307,7 @@ class NewDatabaseTests(BaseDateTimeTests):
         self.assertEqual(event.dt, dt)
 
     def test_auto_now_and_auto_now_add(self):
-        now = datetime.datetime.utcnow().replace(tzinfo=UTC)
+        now = timezone.now()
         past = now - datetime.timedelta(seconds=2)
         future = now + datetime.timedelta(seconds=2)
         Timestamp.objects.create()
@@ -824,7 +837,7 @@ NewFormsTests = override_settings(DATETIME_FORMAT='c', USE_L10N=False, USE_TZ=Tr
 class AdminTests(BaseDateTimeTests):
 
     urls = 'modeltests.timezones.urls'
-    fixtures = ['users.xml']
+    fixtures = ['tz_users.xml']
 
     def setUp(self):
         self.client.login(username='super', password='secret')

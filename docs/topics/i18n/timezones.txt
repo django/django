@@ -106,9 +106,9 @@ Interpretation of naive datetime objects
 ----------------------------------------
 
 When :setting:`USE_TZ` is ``True``, Django still accepts naive datetime
-objects, in order to preserve backwards-compatibility. It attempts to make them
-aware by interpreting them in the :ref:`default time zone
-<default-current-time-zone>`.
+objects, in order to preserve backwards-compatibility. When the database layer
+receives one, it attempts to make it aware by interpreting it in the
+:ref:`default time zone <default-current-time-zone>` and raises a warning.
 
 Unfortunately, during DST transitions, some datetimes don't exist or are
 ambiguous. In such situations, pytz_ raises an exception. Other
@@ -421,10 +421,21 @@ with a naive datetime that you've created in your code.
 So the second step is to refactor your code wherever you instanciate datetime
 objects to make them aware. This can be done incrementally.
 :mod:`django.utils.timezone` defines some handy helpers for compatibility
-code: :func:`~django.utils.timezone.is_aware`,
+code: :func:`~django.utils.timezone.now`,
+:func:`~django.utils.timezone.is_aware`,
 :func:`~django.utils.timezone.is_naive`,
 :func:`~django.utils.timezone.make_aware`, and
 :func:`~django.utils.timezone.make_naive`.
+
+Finally, in order to help you locate code that needs upgrading, Django raises
+a warning when you attempt to save a naive datetime to the database. During
+development, you can turn such warnings into exceptions and get a traceback
+by adding to your settings file::
+
+    import warnings
+    warnings.filterwarnings(
+            'error', r"DateTimeField received a naive datetime",
+            RuntimeWarning, r'django\.db\.models\.fields')
 
 .. _pytz: http://pytz.sourceforge.net/
 .. _these issues: http://pytz.sourceforge.net/#problems-with-localtime
