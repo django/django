@@ -205,6 +205,41 @@ class FilteredSelectMultipleWidgetTest(DjangoTestCase):
             '<select multiple="multiple" name="test" class="selectfilterstacked">\n</select><script type="text/javascript">addEvent(window, "load", function(e) {SelectFilter.init("id_test", "test", 1, "%(ADMIN_MEDIA_PREFIX)s"); });</script>\n' % admin_media_prefix()
         )
 
+class AdminDateWidgetTest(DjangoTestCase):
+    def test_attrs(self):
+        """
+        Ensure that user-supplied attrs are used.
+        Refs #12073.
+        """
+        w = widgets.AdminDateWidget()
+        self.assertEqual(
+            conditional_escape(w.render('test', datetime(2007, 12, 1, 9, 30))),
+            '<input value="2007-12-01" type="text" class="vDateField" name="test" size="10" />',
+        )
+        # pass attrs to widget
+        w = widgets.AdminDateWidget(attrs={'size': 20, 'class': 'myDateField'})
+        self.assertEqual(
+            conditional_escape(w.render('test', datetime(2007, 12, 1, 9, 30))),
+            '<input value="2007-12-01" type="text" class="myDateField" name="test" size="20" />',
+        )
+
+class AdminTimeWidgetTest(DjangoTestCase):
+    def test_attrs(self):
+        """
+        Ensure that user-supplied attrs are used.
+        Refs #12073.
+        """
+        w = widgets.AdminTimeWidget()
+        self.assertEqual(
+            conditional_escape(w.render('test', datetime(2007, 12, 1, 9, 30))),
+            '<input value="09:30:00" type="text" class="vTimeField" name="test" size="8" />',
+        )
+        # pass attrs to widget
+        w = widgets.AdminTimeWidget(attrs={'size': 20, 'class': 'myTimeField'})
+        self.assertEqual(
+            conditional_escape(w.render('test', datetime(2007, 12, 1, 9, 30))),
+            '<input value="09:30:00" type="text" class="myTimeField" name="test" size="20" />',
+        )
 
 class AdminSplitDateTimeWidgetTest(DjangoTestCase):
     def test_render(self):

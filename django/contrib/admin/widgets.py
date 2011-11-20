@@ -53,8 +53,11 @@ class AdminDateWidget(forms.DateInput):
         js = ["calendar.js", "admin/DateTimeShortcuts.js"]
         return forms.Media(js=[static("admin/js/%s" % path) for path in js])
 
-    def __init__(self, attrs={}, format=None):
-        super(AdminDateWidget, self).__init__(attrs={'class': 'vDateField', 'size': '10'}, format=format)
+    def __init__(self, attrs=None, format=None):
+        final_attrs = {'class': 'vDateField', 'size': '10'}
+        if attrs is not None:
+            final_attrs.update(attrs)
+        super(AdminDateWidget, self).__init__(attrs=final_attrs, format=format)
 
 class AdminTimeWidget(forms.TimeInput):
 
@@ -63,8 +66,11 @@ class AdminTimeWidget(forms.TimeInput):
         js = ["calendar.js", "admin/DateTimeShortcuts.js"]
         return forms.Media(js=[static("admin/js/%s" % path) for path in js])
 
-    def __init__(self, attrs={}, format=None):
-        super(AdminTimeWidget, self).__init__(attrs={'class': 'vTimeField', 'size': '8'}, format=format)
+    def __init__(self, attrs=None, format=None):
+        final_attrs = {'class': 'vTimeField', 'size': '8'}
+        if attrs is not None:
+            final_attrs.update(attrs)
+        super(AdminTimeWidget, self).__init__(attrs=final_attrs, format=format)
 
 class AdminSplitDateTime(forms.SplitDateTimeWidget):
     """
