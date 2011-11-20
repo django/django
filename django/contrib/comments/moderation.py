@@ -63,6 +63,7 @@ from django.db.models.base import ModelBase
 from django.template import Context, loader
 from django.contrib import comments
 from django.contrib.sites.models import Site
+from django.utils import timezone
 
 class AlreadyModerated(Exception):
     """
@@ -207,7 +208,7 @@ class CommentModerator(object):
                 return False
         if self.auto_close_field and self.close_after is not None:
             close_after_date = getattr(content_object, self.auto_close_field)
-            if close_after_date is not None and self._get_delta(datetime.datetime.now(), close_after_date).days >= self.close_after:
+            if close_after_date is not None and self._get_delta(timezone.now(), close_after_date).days >= self.close_after:
                 return False
         return True
 
@@ -223,7 +224,7 @@ class CommentModerator(object):
         """
         if self.auto_moderate_field and self.moderate_after is not None:
             moderate_after_date = getattr(content_object, self.auto_moderate_field)
-            if moderate_after_date is not None and self._get_delta(datetime.datetime.now(), moderate_after_date).days >= self.moderate_after:
+            if moderate_after_date is not None and self._get_delta(timezone.now(), moderate_after_date).days >= self.moderate_after:
                 return True
         return False
 

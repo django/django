@@ -1,4 +1,3 @@
-import datetime
 from django.contrib.auth.models import User
 from django.contrib.comments.managers import CommentManager
 from django.contrib.contenttypes import generic
@@ -7,6 +6,7 @@ from django.contrib.sites.models import Site
 from django.db import models
 from django.core import urlresolvers
 from django.utils.translation import ugettext_lazy as _
+from django.utils import timezone
 from django.conf import settings
 
 COMMENT_MAX_LENGTH = getattr(settings,'COMMENT_MAX_LENGTH',3000)
@@ -81,7 +81,7 @@ class Comment(BaseCommentAbstractModel):
 
     def save(self, *args, **kwargs):
         if self.submit_date is None:
-            self.submit_date = datetime.datetime.now()
+            self.submit_date = timezone.now()
         super(Comment, self).save(*args, **kwargs)
 
     def _get_userinfo(self):
@@ -187,5 +187,5 @@ class CommentFlag(models.Model):
 
     def save(self, *args, **kwargs):
         if self.flag_date is None:
-            self.flag_date = datetime.datetime.now()
+            self.flag_date = timezone.now()
         super(CommentFlag, self).save(*args, **kwargs)

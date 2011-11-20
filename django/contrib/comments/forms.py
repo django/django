@@ -1,4 +1,3 @@
-import datetime
 import time
 from django import forms
 from django.forms.util import ErrorDict
@@ -8,6 +7,7 @@ from django.contrib.comments.models import Comment
 from django.utils.crypto import salted_hmac, constant_time_compare
 from django.utils.encoding import force_unicode
 from django.utils.text import get_text_list
+from django.utils import timezone
 from django.utils.translation import ungettext, ugettext_lazy as _
 
 COMMENT_MAX_LENGTH = getattr(settings,'COMMENT_MAX_LENGTH', 3000)
@@ -138,7 +138,7 @@ class CommentDetailsForm(CommentSecurityForm):
             user_email   = self.cleaned_data["email"],
             user_url     = self.cleaned_data["url"],
             comment      = self.cleaned_data["comment"],
-            submit_date  = datetime.datetime.now(),
+            submit_date  = timezone.now(),
             site_id      = settings.SITE_ID,
             is_public    = True,
             is_removed   = False,
