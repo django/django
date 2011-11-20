@@ -746,7 +746,7 @@ def custom_key_func(key, key_prefix, version):
     return 'CUSTOM-' + '-'.join([key_prefix, str(version), key])
 
 
-class DBCacheTests(unittest.TestCase, BaseCacheTests):
+class DBCacheTests(BaseCacheTests, TestCase):
     backend_name = 'django.core.cache.backends.db.DatabaseCache'
 
     def setUp(self):
@@ -763,6 +763,7 @@ class DBCacheTests(unittest.TestCase, BaseCacheTests):
         from django.db import connection
         cursor = connection.cursor()
         cursor.execute('DROP TABLE %s' % connection.ops.quote_name(self._table_name))
+        connection.commit()
 
     def test_cull(self):
         self.perform_cull_test(50, 29)
@@ -774,6 +775,9 @@ class DBCacheTests(unittest.TestCase, BaseCacheTests):
     def test_old_initialization(self):
         self.cache = get_cache('db://%s?max_entries=30&cull_frequency=0' % self._table_name)
         self.perform_cull_test(50, 18)
+
+
+DBCacheWithTimeZoneTests = override_settings(USE_TZ=True)(DBCacheTests)
 
 
 class DBCacheRouter(object):
