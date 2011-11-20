@@ -16,6 +16,7 @@ from django.core.exceptions import ImproperlyConfigured, SuspiciousOperation
 from django.http import HttpResponse
 from django.test import TestCase, RequestFactory
 from django.test.utils import override_settings
+from django.utils import timezone
 from django.utils import unittest
 
 
@@ -187,7 +188,7 @@ class SessionTestsMixin(object):
     def test_custom_expiry_seconds(self):
         # Using seconds
         self.session.set_expiry(10)
-        delta = self.session.get_expiry_date() - datetime.now()
+        delta = self.session.get_expiry_date() - timezone.now()
         self.assertTrue(delta.seconds in (9, 10))
 
         age = self.session.get_expiry_age()
@@ -196,7 +197,7 @@ class SessionTestsMixin(object):
     def test_custom_expiry_timedelta(self):
         # Using timedelta
         self.session.set_expiry(timedelta(seconds=10))
-        delta = self.session.get_expiry_date() - datetime.now()
+        delta = self.session.get_expiry_date() - timezone.now()
         self.assertTrue(delta.seconds in (9, 10))
 
         age = self.session.get_expiry_age()
@@ -204,8 +205,8 @@ class SessionTestsMixin(object):
 
     def test_custom_expiry_datetime(self):
         # Using fixed datetime
-        self.session.set_expiry(datetime.now() + timedelta(seconds=10))
-        delta = self.session.get_expiry_date() - datetime.now()
+        self.session.set_expiry(timezone.now() + timedelta(seconds=10))
+        delta = self.session.get_expiry_date() - timezone.now()
         self.assertTrue(delta.seconds in (9, 10))
 
         age = self.session.get_expiry_age()
@@ -279,9 +280,16 @@ class DatabaseSessionTests(SessionTestsMixin, TestCase):
         self.assertEqual(self.session['y'], 2)
 
 
+DatabaseSessionWithTimeZoneTests = override_settings(USE_TZ=True)(DatabaseSessionTests)
+
+
 class CacheDBSessionTests(SessionTestsMixin, TestCase):
 
     backend = CacheDBSession
+
+
+CacheDBSessionWithTimeZoneTests = override_settings(USE_TZ=True)(CacheDBSessionTests)
+
 
 # Don't need DB flushing for these tests, so can use unittest.TestCase as base class
 class FileSessionTests(SessionTestsMixin, unittest.TestCase):

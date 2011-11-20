@@ -12,6 +12,7 @@ except ImportError:
 from django.conf import settings
 from django.core.exceptions import SuspiciousOperation
 from django.utils.crypto import constant_time_compare, salted_hmac
+from django.utils import timezone
 
 # Use the system (hardware-based) random number generator if it exists.
 if hasattr(random, 'SystemRandom'):
@@ -188,7 +189,7 @@ class SessionBase(object):
             return settings.SESSION_COOKIE_AGE
         if not isinstance(expiry, datetime):
             return expiry
-        delta = expiry - datetime.now()
+        delta = expiry - timezone.now()
         return delta.days * 86400 + delta.seconds
 
     def get_expiry_date(self):
@@ -198,7 +199,7 @@ class SessionBase(object):
             return expiry
         if not expiry:   # Checks both None and 0 cases
             expiry = settings.SESSION_COOKIE_AGE
-        return datetime.now() + timedelta(seconds=expiry)
+        return timezone.now() + timedelta(seconds=expiry)
 
     def set_expiry(self, value):
         """
@@ -223,7 +224,7 @@ class SessionBase(object):
                 pass
             return
         if isinstance(value, timedelta):
-            value = datetime.now() + value
+            value = timezone.now() + value
         self['_session_expiry'] = value
 
     def get_expire_at_browser_close(self):
