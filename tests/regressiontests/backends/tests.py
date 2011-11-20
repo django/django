@@ -10,6 +10,7 @@ from django.db import (backend, connection, connections, DEFAULT_DB_ALIAS,
     IntegrityError, transaction)
 from django.db.backends.signals import connection_created
 from django.db.backends.postgresql_psycopg2 import version as pg_version
+from django.db.utils import ConnectionHandler, DatabaseError
 from django.test import TestCase, skipUnlessDBFeature, TransactionTestCase
 from django.utils import unittest
 
@@ -228,6 +229,47 @@ class PostgresVersionTest(TestCase):
         # psycopg2 < 2.0.12 code path
         conn = OlderConnectionMock()
         self.assertEqual(pg_version.get_version(conn), 80300)
+
+class PostgresNewConnectionTest(TestCase):
+    """
+    #17062: PostgreSQL shouldn't roll back SET TIME ZONE, even if the first
+    transaction is rolled back.
+    """
+    @unittest.skipUnless(connection.vendor == 'postgresql',
+                         "Test valid only for PostgreSQL")
+    @unittest.skipUnless(connection.isolation_level > 0,
+                         "Test valid only if not using autocommit")
+    def test_connect_and_rollback(self):
+        new_connections = ConnectionHandler(settings.DATABASES)
+        new_connection = new_connections[DEFAULT_DB_ALIAS]
+        try:
+            # Ensure the database default time zone is different than
+            # the time zone in new_connection.settings_dict. We can
+            # get the default time zone by reset & show.
+            cursor = new_connection.cursor()
+            cursor.execute("RESET TIMEZONE")
+            cursor.execute("SHOW TIMEZONE")
+            db_default_tz = cursor.fetchone()[0]
+            new_tz = 'Europe/Paris' if db_default_tz == 'UTC' else 'UTC'
+            new_connection.close()
+
+            # Fetch a new connection with the new_tz as default
+            # time zone, run a query and rollback.
+            new_connection.settings_dict['TIME_ZONE'] = new_tz
+            new_connection.enter_transaction_management()
+            cursor = new_connection.cursor()
+            new_connection.rollback()
+
+            # Now let's see if the rollback rolled back the SET TIME ZONE.
+            cursor.execute("SHOW TIMEZONE")
+            tz = cursor.fetchone()[0]
+            self.assertEqual(new_tz, tz)
+        finally:
+            try:
+                new_connection.close()
+            except DatabaseError:
+                pass
+
 
 # Unfortunately with sqlite3 the in-memory test database cannot be
 # closed, and so it cannot be re-opened during testing, and so we

@@ -153,10 +153,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     pg_version = property(_get_pg_version)
 
     def _cursor(self):
-        new_connection = False
         settings_dict = self.settings_dict
         if self.connection is None:
-            new_connection = True
             if settings_dict['NAME'] == '':
                 from django.core.exceptions import ImproperlyConfigured
                 raise ImproperlyConfigured("You need to specify NAME in your Django settings file.")
@@ -176,15 +174,17 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 conn_params['port'] = settings_dict['PORT']
             self.connection = Database.connect(**conn_params)
             self.connection.set_client_encoding('UTF8')
+            # Set the time zone in autocommit mode (see #17062)
+            tz = 'UTC' if settings.USE_TZ else settings_dict.get('TIME_ZONE')
+            if tz:
+                self.connection.set_isolation_level(
+                        psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT)
+                self.connection.cursor().execute("SET TIME ZONE %s", [tz])
             self.connection.set_isolation_level(self.isolation_level)
+            self._get_pg_version()
             connection_created.send(sender=self.__class__, connection=self)
         cursor = self.connection.cursor()
         cursor.tzinfo_factory = utc_tzinfo_factory if settings.USE_TZ else None
-        if new_connection:
-            tz = 'UTC' if settings.USE_TZ else settings_dict.get('TIME_ZONE')
-            if tz:
-                cursor.execute("SET TIME ZONE %s", [tz])
-            self._get_pg_version()
         return CursorWrapper(cursor)
 
     def _enter_transaction_management(self, managed):
