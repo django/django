@@ -242,6 +242,7 @@ class NewDatabaseTests(BaseDateTimeTests):
     def test_naive_datetime(self):
         dt = datetime.datetime(2011, 9, 1, 13, 20, 30)
         with warnings.catch_warnings(record=True) as recorded:
+            warnings.simplefilter('always')
             Event.objects.create(dt=dt)
             self.assertEqual(len(recorded), 1)
             msg = str(recorded[0].message)
@@ -255,6 +256,7 @@ class NewDatabaseTests(BaseDateTimeTests):
     def test_naive_datetime_with_microsecond(self):
         dt = datetime.datetime(2011, 9, 1, 13, 20, 30, 405060)
         with warnings.catch_warnings(record=True) as recorded:
+            warnings.simplefilter('always')
             Event.objects.create(dt=dt)
             self.assertEqual(len(recorded), 1)
             msg = str(recorded[0].message)
@@ -268,6 +270,7 @@ class NewDatabaseTests(BaseDateTimeTests):
     def test_naive_datetime_with_microsecond_unsupported(self):
         dt = datetime.datetime(2011, 9, 1, 13, 20, 30, 405060)
         with warnings.catch_warnings(record=True) as recorded:
+            warnings.simplefilter('always')
             Event.objects.create(dt=dt)
             self.assertEqual(len(recorded), 1)
             msg = str(recorded[0].message)
@@ -343,6 +346,22 @@ class NewDatabaseTests(BaseDateTimeTests):
         self.assertEqual(Event.objects.filter(dt__in=(prev, next)).count(), 0)
         self.assertEqual(Event.objects.filter(dt__in=(prev, dt, next)).count(), 1)
         self.assertEqual(Event.objects.filter(dt__range=(prev, next)).count(), 1)
+
+    @skipIf(sys.version_info < (2, 6), "this test requires Python >= 2.6")
+    def test_query_filter_with_naive_datetime(self):
+        dt = datetime.datetime(2011, 9, 1, 12, 20, 30, tzinfo=EAT)
+        Event.objects.create(dt=dt)
+        dt = dt.replace(tzinfo=None)
+        with warnings.catch_warnings(record=True) as recorded:
+            warnings.simplefilter('always')
+            # naive datetimes are interpreted in local time
+            self.assertEqual(Event.objects.filter(dt__exact=dt).count(), 1)
+            self.assertEqual(Event.objects.filter(dt__lte=dt).count(), 1)
+            self.assertEqual(Event.objects.filter(dt__gt=dt).count(), 0)
+            self.assertEqual(len(recorded), 3)
+            for warning in recorded:
+                msg = str(warning.message)
+                self.assertTrue(msg.startswith("DateTimeField received a naive datetime"))
 
     def test_query_date_related_filters(self):
         # These two dates fall in the same day in EAT, but in different days,
