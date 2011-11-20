@@ -4,6 +4,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.http import Http404
 from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext as _
+from django.utils import timezone
 from django.views.generic.base import View
 from django.views.generic.detail import BaseDetailView, SingleObjectTemplateResponseMixin
 from django.views.generic.list import MultipleObjectMixin, MultipleObjectTemplateResponseMixin
@@ -191,7 +192,7 @@ class BaseDateListView(MultipleObjectMixin, DateMixin, View):
         allow_empty = self.get_allow_empty()
 
         if not allow_future:
-            qs = qs.filter(**{'%s__lte' % date_field: datetime.datetime.now()})
+            qs = qs.filter(**{'%s__lte' % date_field: timezone.now()})
 
         if not allow_empty and not qs:
             raise Http404(_(u"No %(verbose_name_plural)s available") % {
