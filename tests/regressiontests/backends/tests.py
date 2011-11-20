@@ -235,10 +235,9 @@ class PostgresNewConnectionTest(TestCase):
     #17062: PostgreSQL shouldn't roll back SET TIME ZONE, even if the first
     transaction is rolled back.
     """
-    @unittest.skipUnless(connection.vendor == 'postgresql',
-                         "Test valid only for PostgreSQL")
-    @unittest.skipUnless(connection.isolation_level > 0,
-                         "Test valid only if not using autocommit")
+    @unittest.skipUnless(
+        connection.vendor == 'postgresql' and connection.isolation_level > 0,
+        "This test applies only to PostgreSQL without autocommit")
     def test_connect_and_rollback(self):
         new_connections = ConnectionHandler(settings.DATABASES)
         new_connection = new_connections[DEFAULT_DB_ALIAS]
