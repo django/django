@@ -2,6 +2,7 @@ from __future__ import with_statement
 
 import datetime
 import os
+import sys
 import time
 import warnings
 
@@ -237,6 +238,7 @@ LegacyDatabaseTests = override_settings(USE_TZ=False)(LegacyDatabaseTests)
 #@override_settings(USE_TZ=True)
 class NewDatabaseTests(BaseDateTimeTests):
 
+    @skipIf(sys.version_info < (2, 6), "this test requires Python >= 2.6")
     def test_naive_datetime(self):
         dt = datetime.datetime(2011, 9, 1, 13, 20, 30)
         with warnings.catch_warnings(record=True) as recorded:
@@ -248,6 +250,7 @@ class NewDatabaseTests(BaseDateTimeTests):
         # naive datetimes are interpreted in local time
         self.assertEqual(event.dt, dt.replace(tzinfo=EAT))
 
+    @skipIf(sys.version_info < (2, 6), "this test requires Python >= 2.6")
     @skipUnlessDBFeature('supports_microsecond_precision')
     def test_naive_datetime_with_microsecond(self):
         dt = datetime.datetime(2011, 9, 1, 13, 20, 30, 405060)
@@ -260,6 +263,7 @@ class NewDatabaseTests(BaseDateTimeTests):
         # naive datetimes are interpreted in local time
         self.assertEqual(event.dt, dt.replace(tzinfo=EAT))
 
+    @skipIf(sys.version_info < (2, 6), "this test requires Python >= 2.6")
     @skipIfDBFeature('supports_microsecond_precision')
     def test_naive_datetime_with_microsecond_unsupported(self):
         dt = datetime.datetime(2011, 9, 1, 13, 20, 30, 405060)
