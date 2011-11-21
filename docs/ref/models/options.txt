@@ -189,11 +189,6 @@ Django quotes column and table names behind the scenes.
     "-" prefix, which indicates descending order. Fields without a leading "-" will
     be ordered ascending. Use the string "?" to order randomly.
 
-    .. note::
-
-        Regardless of how many fields are in :attr:`~Options.ordering`, the admin
-        site uses only the first field.
-
     For example, to order by a ``pub_date`` field ascending, use this::
 
         ordering = ['pub_date']
@@ -205,6 +200,10 @@ Django quotes column and table names behind the scenes.
     To order by ``pub_date`` descending, then by ``author`` ascending, use this::
 
         ordering = ['-pub_date', 'author']
+
+    .. versionchanged:: 1.4
+       The Django admin honors all elements in the list/tuple; before 1.4, only
+       the first one was respected.
 
 ``permissions``
 ---------------
