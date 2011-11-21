@@ -1215,6 +1215,22 @@ class Library(object):
             return func
         return dec
 
+def is_library_missing(name):
+    """Check if library that failed to load cannot be found under any
+    templatetags directory or does exist but fails to import.
+
+    Non-existing condition is checked recursively for each subpackage in cases
+    like <appdir>/templatetags/subpackage/package/module.py.
+    """
+    # Don't bother to check if '.' is in name since any name will be prefixed
+    # with some template root.
+    path, module = name.rsplit('.', 1)
+    try:
+        package = import_module(path)
+        return not module_has_submodule(package, module)
+    except ImportError:
+        return is_library_missing(path)
+
 def import_library(taglib_module):
     """
     Load a template tag library module.
@@ -1222,8 +1238,6 @@ def import_library(taglib_module):
     Verifies that the library contains a 'register' attribute, and
     returns that attribute as the representation of the library
     """
-    app_path, taglib = taglib_module.rsplit('.', 1)
-    app_module = import_module(app_path)
     try:
         mod = import_module(taglib_module)
     except ImportError, e:
@@ -1231,7 +1245,7 @@ def import_library(taglib_module):
         # that's not an error that should be raised. If the submodule exists
         # and raised an ImportError on the attempt to load it, that we want
         # to raise.
-        if not module_has_submodule(app_module, taglib):
+        if is_library_missing(taglib_module):
             return None
         else:
             raise InvalidTemplateLibrary("ImportError raised loading %s: %s" %

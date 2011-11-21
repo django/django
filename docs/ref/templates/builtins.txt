@@ -698,9 +698,10 @@ load
 Loads a custom template tag set.
 
 For example, the following template would load all the tags and filters
-registered in ``somelibrary`` and ``otherlibrary``::
+registered in ``somelibrary`` and ``otherlibrary`` located in package
+``package``::
 
-    {% load somelibrary otherlibrary %}
+    {% load somelibrary package.otherlibrary %}
 
 .. versionchanged:: 1.3
 

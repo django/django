@@ -1193,17 +1193,22 @@ class Templates(unittest.TestCase):
             'inheritance41': ("{% extends 'inheritance36' %}{% block opt %}new{{ block.super }}{% endblock %}", {'numbers': '123'}, '_new1_new2_new3_'),
 
             ### LOADING TAG LIBRARIES #################################################
+            'load01': ("{% load testtags subpackage.echo %}{% echo test %} {% echo2 \"test\" %}", {}, "test test"),
+            'load02': ("{% load subpackage.echo %}{% echo2 \"test\" %}", {}, "test"),
 
             # {% load %} tag, importing individual tags
-            'load1': ("{% load echo from testtags %}{% echo this that theother %}", {}, 'this that theother'),
-            'load2': ("{% load echo other_echo from testtags %}{% echo this that theother %} {% other_echo and another thing %}", {}, 'this that theother and another thing'),
-            'load3': ("{% load echo upper from testtags %}{% echo this that theother %} {{ statement|upper }}", {'statement': 'not shouting'}, 'this that theother NOT SHOUTING'),
+            'load03': ("{% load echo from testtags %}{% echo this that theother %}", {}, 'this that theother'),
+            'load04': ("{% load echo other_echo from testtags %}{% echo this that theother %} {% other_echo and another thing %}", {}, 'this that theother and another thing'),
+            'load05': ("{% load echo upper from testtags %}{% echo this that theother %} {{ statement|upper }}", {'statement': 'not shouting'}, 'this that theother NOT SHOUTING'),
+            'load06': ("{% load echo2 from subpackage.echo %}{% echo2 \"test\" %}", {}, "test"),
 
             # {% load %} tag errors
-            'load4': ("{% load echo other_echo bad_tag from testtags %}", {}, template.TemplateSyntaxError),
-            'load5': ("{% load echo other_echo bad_tag from %}", {}, template.TemplateSyntaxError),
-            'load6': ("{% load from testtags %}", {}, template.TemplateSyntaxError),
-            'load7': ("{% load echo from bad_library %}", {}, template.TemplateSyntaxError),
+            'load07': ("{% load echo other_echo bad_tag from testtags %}", {}, template.TemplateSyntaxError),
+            'load08': ("{% load echo other_echo bad_tag from %}", {}, template.TemplateSyntaxError),
+            'load09': ("{% load from testtags %}", {}, template.TemplateSyntaxError),
+            'load10': ("{% load echo from bad_library %}", {}, template.TemplateSyntaxError),
+            'load11': ("{% load subpackage.echo_invalid %}", {}, template.TemplateSyntaxError),
+            'load12': ("{% load subpackage.missing %}", {}, template.TemplateSyntaxError),
 
             ### I18N ##################################################################
 
