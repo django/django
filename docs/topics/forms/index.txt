@@ -294,6 +294,9 @@ templates:
     The field's label wrapped in the appropriate HTML ``<label>`` tag,
     e.g. ``<label for="id_email">Email address</label>``
 
+``{{ field.value }}`` 
+    The value of the field. e.g ``someone@example.com``
+
 ``{{ field.html_name }}``
     The name of the field that will be used in the input element's name
     field. This takes the form prefix into account, if it has been set.
