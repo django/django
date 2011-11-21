@@ -22,7 +22,7 @@ from django.middleware.cache import (FetchFromCacheMiddleware,
     UpdateCacheMiddleware, CacheMiddleware)
 from django.template import Template
 from django.template.response import TemplateResponse
-from django.test import TestCase, RequestFactory
+from django.test import TestCase, TransactionTestCase, RequestFactory
 from django.test.utils import (get_warnings_state, restore_warnings_state,
     override_settings)
 from django.utils import timezone, translation, unittest
@@ -746,7 +746,7 @@ def custom_key_func(key, key_prefix, version):
     return 'CUSTOM-' + '-'.join([key_prefix, str(version), key])
 
 
-class DBCacheTests(BaseCacheTests, TestCase):
+class DBCacheTests(BaseCacheTests, TransactionTestCase):
     backend_name = 'django.core.cache.backends.db.DatabaseCache'
 
     def setUp(self):
