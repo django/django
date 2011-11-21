@@ -257,8 +257,10 @@ latest bug fixes and improvements, follow these instructions:
 
    .. code-block:: bash
 
-       # Git
+       # Git (requires version 1.6.6 or later)
        git clone https://github.com/django/django.git
+       # or (works with all versions)
+       git clone git://github.com/django/django.git       
 
        # Mercurial
        hg clone https://bitbucket.org/django/django
