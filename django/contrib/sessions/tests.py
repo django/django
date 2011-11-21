@@ -343,7 +343,8 @@ class SessionMiddlewareTests(unittest.TestCase):
 
         # Handle the response through the middleware
         response = middleware.process_response(request, response)
-        self.assertTrue(response.cookies[settings.SESSION_COOKIE_NAME]['secure'])
+        self.assertTrue(
+            response.cookies[settings.SESSION_COOKIE_NAME]['secure'])
 
     @override_settings(SESSION_COOKIE_HTTPONLY=True)
     def test_httponly_session_cookie(self):
@@ -357,7 +358,27 @@ class SessionMiddlewareTests(unittest.TestCase):
 
         # Handle the response through the middleware
         response = middleware.process_response(request, response)
-        self.assertTrue(response.cookies[settings.SESSION_COOKIE_NAME]['httponly'])
+        self.assertTrue(
+            response.cookies[settings.SESSION_COOKIE_NAME]['httponly'])
+        self.assertIn('httponly', 
+            str(response.cookies[settings.SESSION_COOKIE_NAME]))
+
+    @override_settings(SESSION_COOKIE_HTTPONLY=False)
+    def test_no_httponly_session_cookie(self):
+        request = RequestFactory().get('/')
+        response = HttpResponse('Session test')
+        middleware = SessionMiddleware()
+
+        # Simulate a request the modifies the session
+        middleware.process_request(request)
+        request.session['hello'] = 'world'
+
+        # Handle the response through the middleware
+        response = middleware.process_response(request, response)
+        self.assertFalse(
+            response.cookies[settings.SESSION_COOKIE_NAME]['httponly'])
+        self.assertNotIn('httponly', 
+            str(response.cookies[settings.SESSION_COOKIE_NAME]['httponly']))
 
 
 class CookieSessionTests(SessionTestsMixin, TestCase):

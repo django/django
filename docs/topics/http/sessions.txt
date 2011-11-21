@@ -110,8 +110,8 @@ and the :setting:`SECRET_KEY` setting.
 
 .. note::
 
-    It's recommended to set the :setting:`SESSION_COOKIE_HTTPONLY` setting
-    to ``True`` to prevent tampering of the stored data from JavaScript.
+    It's recommended to leave the :setting:`SESSION_COOKIE_HTTPONLY` setting
+    ``True`` to prevent tampering of the stored data from JavaScript.
 
 .. warning::
 
@@ -504,7 +504,7 @@ The domain to use for session cookies. Set this to a string such as
 SESSION_COOKIE_HTTPONLY
 -----------------------
 
-Default: ``False``
+Default: ``True``
 
 Whether to use HTTPOnly flag on the session cookie. If this is set to
 ``True``, client-side JavaScript will not to be able to access the

@@ -638,13 +638,17 @@ Methods
     Returns ``True`` or ``False`` based on a case-insensitive check for a
     header with the given name.
 
-.. method:: HttpResponse.set_cookie(key, value='', max_age=None, expires=None, path='/', domain=None, secure=None, httponly=False)
+.. method:: HttpResponse.set_cookie(key, value='', max_age=None, expires=None, path='/', domain=None, secure=None, httponly=True)
 
     .. versionchanged:: 1.3
 
     The possibility of specifying a ``datetime.datetime`` object in
     ``expires``, and the auto-calculation of ``max_age`` in such case
     was added. The ``httponly`` argument was also added.
+
+    .. versionchanged:: 1.4
+
+    The default value for httponly was changed from ``False`` to ``True``.
 
     Sets a cookie. The parameters are the same as in the :class:`Cookie.Morsel`
     object in the Python standard library.
@@ -673,7 +677,7 @@ Methods
 
     .. _HTTPOnly: http://www.owasp.org/index.php/HTTPOnly
 
-.. method:: HttpResponse.set_signed_cookie(key, value='', salt='', max_age=None, expires=None, path='/', domain=None, secure=None, httponly=False)
+.. method:: HttpResponse.set_signed_cookie(key, value='', salt='', max_age=None, expires=None, path='/', domain=None, secure=None, httponly=True)
 
     .. versionadded:: 1.4
 
