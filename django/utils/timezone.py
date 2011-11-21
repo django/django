@@ -102,8 +102,10 @@ def get_default_timezone():
     """
     global _localtime
     if _localtime is None:
-        tz = settings.TIME_ZONE
-        _localtime = pytz.timezone(tz) if pytz else LocalTimezone()
+        if isinstance(settings.TIME_ZONE, basestring) and pytz is not None:
+            _localtime = pytz.timezone(settings.TIME_ZONE)
+        else:
+            _localtime = LocalTimezone()
     return _localtime
 
 # This function exists for consistency with get_current_timezone_name

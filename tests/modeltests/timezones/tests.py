@@ -774,6 +774,17 @@ class TemplateTests(BaseDateTimeTests):
         with timezone.override(ICT):
             self.assertEqual(tpl.render(ctx), "2011-09-01 at 20:20:20")
 
+    def test_localtime_with_time_zone_setting_set_to_none(self):
+        # Regression for #17274
+        tpl = Template("{% load tz %}{{ dt }}")
+        ctx = Context({'dt': datetime.datetime(2011, 9, 1, 12, 20, 30, tzinfo=EAT)})
+
+        timezone._localtime = None
+        with self.settings(TIME_ZONE=None):
+            # the actual value depends on the system time zone of the host
+            self.assertTrue(tpl.render(ctx).startswith("2011"))
+        timezone._localtime = None
+
 TemplateTests = override_settings(DATETIME_FORMAT='c', USE_L10N=False, USE_TZ=True)(TemplateTests)
 
 #@override_settings(DATETIME_FORMAT='c', USE_L10N=False, USE_TZ=False)
