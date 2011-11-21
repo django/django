@@ -195,6 +195,10 @@ class FormsWidgetTestCase(TestCase):
 
         self.assertEqual(w.render('is_cool', False, attrs={'class': 'pretty'}), u'<input type="checkbox" name="is_cool" class="pretty" />')
 
+        # regression for #17114
+        self.assertEqual(w.render('is_cool', 0), u'<input checked="checked" type="checkbox" name="is_cool" value="0" />')
+        self.assertEqual(w.render('is_cool', 1), u'<input checked="checked" type="checkbox" name="is_cool" value="1" />')
+
         # You can also pass 'attrs' to the constructor:
         w = CheckboxInput(attrs={'class': 'pretty'})
         self.assertEqual(w.render('is_cool', ''), u'<input type="checkbox" class="pretty" name="is_cool" />')

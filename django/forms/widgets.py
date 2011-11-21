@@ -464,11 +464,14 @@ class TimeInput(Input):
         return super(TimeInput, self)._has_changed(self._format_value(initial), data)
 
 class CheckboxInput(Widget):
-    def __init__(self, attrs=None, check_test=bool):
+    def __init__(self, attrs=None, check_test=None):
         super(CheckboxInput, self).__init__(attrs)
         # check_test is a callable that takes a value and returns True
         # if the checkbox should be checked for that value.
-        self.check_test = check_test
+        if check_test is None:
+            self.check_test = lambda v: not (v is False or v is None or v == '')
+        else:
+            self.check_test = check_test
 
     def render(self, name, value, attrs=None):
         final_attrs = self.build_attrs(attrs, type='checkbox', name=name)
@@ -478,7 +481,7 @@ class CheckboxInput(Widget):
             result = False
         if result:
             final_attrs['checked'] = 'checked'
-        if value not in ('', True, False, None):
+        if not (value is True or value is False or value is None or value == ''):
             # Only add the 'value' attribute if a value is non-empty.
             final_attrs['value'] = force_unicode(value)
         return mark_safe(u'<input%s />' % flatatt(final_attrs))
