@@ -501,6 +501,10 @@ Django 1.4 also includes several smaller improvements worth noting:
 * Changed the default value for ``httponly`` on session cookies to
   ``True`` to help reduce the impact of potential XSS attacks.
 
+* Changed the ``locmem`` cache backend to use
+  ``pickle.HIGHEST_PROTOCOL`` for better compatibility with the other
+  cache backends.
+
 .. _backwards-incompatible-changes-1.4:
 
 Backwards incompatible changes in 1.4

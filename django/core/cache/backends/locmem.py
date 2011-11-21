@@ -31,7 +31,8 @@ class LocMemCache(BaseCache):
             exp = self._expire_info.get(key)
             if exp is None or exp <= time.time():
                 try:
-                    self._set(key, pickle.dumps(value), timeout)
+                    pickled = pickle.dumps(value, pickle.HIGHEST_PROTOCOL)
+                    self._set(key, pickled, timeout)
                     return True
                 except pickle.PickleError:
                     pass
@@ -49,7 +50,8 @@ class LocMemCache(BaseCache):
                 return default
             elif exp > time.time():
                 try:
-                    return pickle.loads(self._cache[key])
+                    pickled = self._cache[key]
+                    return pickle.loads(pickled)
                 except pickle.PickleError:
                     return default
         finally:
@@ -78,7 +80,8 @@ class LocMemCache(BaseCache):
         self.validate_key(key)
         self._lock.writer_enters()
         try:
-            self._set(key, pickle.dumps(value), timeout)
+            pickled = pickle.dumps(value, pickle.HIGHEST_PROTOCOL)
+            self._set(key, pickled, timeout)
         except pickle.PickleError:
             pass
         finally:
