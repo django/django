@@ -68,6 +68,14 @@ class DecadeListFilterWithQuerysetBasedLookups(DecadeListFilterWithTitleAndParam
         if qs.filter(year__gte=2000, year__lte=2009).exists():
             yield ('the 00s', "the 2000's")
 
+class DecadeListFilterParameterEndsWith__In(DecadeListFilter):
+    title = 'publication decade'
+    parameter_name = 'decade__in' # Ends with '__in"
+
+class DecadeListFilterParameterEndsWith__Isnull(DecadeListFilter):
+    title = 'publication decade'
+    parameter_name = 'decade__isnull' # Ends with '__isnull"
+
 class CustomUserAdmin(UserAdmin):
     list_filter = ('books_authored', 'books_contributed')
 
@@ -96,6 +104,12 @@ class DecadeFilterBookAdminWithFailingQueryset(ModelAdmin):
 
 class DecadeFilterBookAdminWithQuerysetBasedLookups(ModelAdmin):
     list_filter = (DecadeListFilterWithQuerysetBasedLookups,)
+
+class DecadeFilterBookAdminParameterEndsWith__In(ModelAdmin):
+    list_filter = (DecadeListFilterParameterEndsWith__In,)
+
+class DecadeFilterBookAdminParameterEndsWith__Isnull(ModelAdmin):
+    list_filter = (DecadeListFilterParameterEndsWith__Isnull,)
 
 class ListFiltersTests(TestCase):
 
@@ -570,3 +584,44 @@ class ListFiltersTests(TestCase):
         choices = list(filterspec.choices(changelist))
         self.assertEqual(choices[2]['selected'], True)
         self.assertEqual(choices[2]['query_string'], '?no=207')
+
+    def test_parameter_ends_with__in__or__isnull(self):
+        """
+        Ensure that a SimpleListFilter's parameter name is not mistaken for a
+        model field if it ends with '__isnull' or '__in'.
+        Refs #17091.
+        """
+
+        # When it ends with '__in' -----------------------------------------
+        modeladmin = DecadeFilterBookAdminParameterEndsWith__In(Book, site)
+        request = self.request_factory.get('/', {'decade__in': 'the 90s'})
+        changelist = self.get_changelist(request, Book, modeladmin)
+
+        # Make sure the correct queryset is returned
+        queryset = changelist.get_query_set(request)
+        self.assertEqual(list(queryset), [self.bio_book])
+
+        # Make sure the correct choice is selected
+        filterspec = changelist.get_filters(request)[0][0]
+        self.assertEqual(force_unicode(filterspec.title), u'publication decade')
+        choices = list(filterspec.choices(changelist))
+        self.assertEqual(choices[2]['display'], u'the 1990\'s')
+        self.assertEqual(choices[2]['selected'], True)
+        self.assertEqual(choices[2]['query_string'], '?decade__in=the+90s')
+
+        # When it ends with '__isnull' ---------------------------------------
+        modeladmin = DecadeFilterBookAdminParameterEndsWith__Isnull(Book, site)
+        request = self.request_factory.get('/', {'decade__isnull': 'the 90s'})
+        changelist = self.get_changelist(request, Book, modeladmin)
+
+        # Make sure the correct queryset is returned
+        queryset = changelist.get_query_set(request)
+        self.assertEqual(list(queryset), [self.bio_book])
+
+        # Make sure the correct choice is selected
+        filterspec = changelist.get_filters(request)[0][0]
+        self.assertEqual(force_unicode(filterspec.title), u'publication decade')
+        choices = list(filterspec.choices(changelist))
+        self.assertEqual(choices[2]['display'], u'the 1990\'s')
+        self.assertEqual(choices[2]['selected'], True)
+        self.assertEqual(choices[2]['query_string'], '?decade__isnull=the+90s')
