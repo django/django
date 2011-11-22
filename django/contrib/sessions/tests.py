@@ -379,8 +379,9 @@ class SessionMiddlewareTests(unittest.TestCase):
         if 'httponly' in settings.SESSION_COOKIE_NAME:
             self.assertFalse(
                response.cookies[settings.SESSION_COOKIE_NAME]['httponly'])
-            self.assertNotIn('httponly', 
-               str(response.cookies[settings.SESSION_COOKIE_NAME]['httponly']))
+
+        self.assertNotIn('httponly', 
+                         str(response.cookies[settings.SESSION_COOKIE_NAME]))
 
 class CookieSessionTests(SessionTestsMixin, TestCase):
 
