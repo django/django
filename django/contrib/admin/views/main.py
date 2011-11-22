@@ -169,6 +169,28 @@ class ChangeList(object):
             ordering = self.lookup_opts.ordering
         return ordering
 
+    def get_ordering_field(self, field_name):
+        """
+        Returns the proper model field name corresponding to the given
+        field_name to use for ordering. field_name may either be the name of a
+        proper model field or the name of a method (on the admin or model) or a
+        callable with the 'admin_order_field' attribute. Returns None if no
+        proper model field name can be matched.
+        """
+        try:
+            field = self.lookup_opts.get_field(field_name)
+            return field.name
+        except models.FieldDoesNotExist:
+            # See whether field_name is a name of a non-field
+            # that allows sorting.
+            if callable(field_name):
+                attr = field_name
+            elif hasattr(self.model_admin, field_name):
+                attr = getattr(self.model_admin, field_name)
+            else:
+                attr = getattr(self.model, field_name)
+            return getattr(attr, 'admin_order_field', None)
+
     def get_ordering(self, request):
         params = self.params
         # For ordering, first check the if exists the "get_ordering" method
@@ -176,7 +198,6 @@ class ChangeList(object):
         # options, then check the object's default ordering. Finally, a
         # manually-specified ordering from the query string overrides anything.
         ordering = self.model_admin.get_ordering(request) or self._get_default_ordering()
-
         if ORDER_VAR in params:
             # Clear ordering and used params
             ordering = []
@@ -185,33 +206,18 @@ class ChangeList(object):
                 try:
                     none, pfx, idx = p.rpartition('-')
                     field_name = self.list_display[int(idx)]
-                    try:
-                        f = self.lookup_opts.get_field(field_name)
-                    except models.FieldDoesNotExist:
-                        # See whether field_name is a name of a non-field
-                        # that allows sorting.
-                        try:
-                            if callable(field_name):
-                                attr = field_name
-                            elif hasattr(self.model_admin, field_name):
-                                attr = getattr(self.model_admin, field_name)
-                            else:
-                                attr = getattr(self.model, field_name)
-                            field_name = attr.admin_order_field
-                        except AttributeError:
-                            continue # No 'admin_order_field', skip it
-                    else:
-                        field_name = f.name
-
-                    ordering.append(pfx + field_name)
-
+                    order_field = self.get_ordering_field(field_name)
+                    if not order_field:
+                        continue # No 'admin_order_field', skip it
+                    ordering.append(pfx + order_field)
                 except (IndexError, ValueError):
                     continue # Invalid ordering specified, skip it.
-
         return ordering
 
     def get_ordering_field_columns(self):
-        # Returns a SortedDict of ordering field column numbers and asc/desc
+        """
+        Returns a SortedDict of ordering field column numbers and asc/desc
+        """
 
         # We must cope with more than one column having the same underlying sort
         # field, so we base things on column numbers.
@@ -227,19 +233,10 @@ class ChangeList(object):
                     order_type = 'desc'
                 else:
                     order_type = 'asc'
-                index = None
-                try:
-                    # Search for simply field name first
-                    index = list(self.list_display).index(field)
-                except ValueError:
-                    # No match, but there might be a match if we take into
-                    # account 'admin_order_field'
-                    for _index, attr in enumerate(self.list_display):
-                        if getattr(attr, 'admin_order_field', '') == field:
-                            index = _index
-                            break
-                if index is not None:
-                    ordering_fields[index] = order_type
+                for index, attr in enumerate(self.list_display):
+                    if self.get_ordering_field(attr) == field:
+                        ordering_fields[index] = order_type
+                        break
         else:
             for p in self.params[ORDER_VAR].split('.'):
                 none, pfx, idx = p.rpartition('-')

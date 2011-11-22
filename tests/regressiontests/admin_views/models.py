@@ -538,13 +538,31 @@ class ComplexSortedPerson(models.Model):
     age = models.PositiveIntegerField()
     is_employee = models.NullBooleanField()
 
-class PrePopulatedPostLargeSlug(models.Model): 
-    """ 
-    Regression test for #15938: a large max_length for the slugfield must not 
-    be localized in prepopulated_fields_js.html or it might end up breaking 
-    the javascript (ie, using THOUSAND_SEPARATOR ends up with maxLength=1,000) 
-    """ 
-    title = models.CharField(max_length=100) 
-    published = models.BooleanField() 
+class PrePopulatedPostLargeSlug(models.Model):
+    """
+    Regression test for #15938: a large max_length for the slugfield must not
+    be localized in prepopulated_fields_js.html or it might end up breaking
+    the javascript (ie, using THOUSAND_SEPARATOR ends up with maxLength=1,000)
+    """
+    title = models.CharField(max_length=100)
+    published = models.BooleanField()
     slug = models.SlugField(max_length=1000)
-    
+
+class AdminOrderedField(models.Model):
+    order = models.IntegerField()
+    stuff = models.CharField(max_length=200)
+
+class AdminOrderedModelMethod(models.Model):
+    order = models.IntegerField()
+    stuff = models.CharField(max_length=200)
+    def some_order(self):
+        return self.order
+    some_order.admin_order_field = 'order'
+
+class AdminOrderedAdminMethod(models.Model):
+    order = models.IntegerField()
+    stuff = models.CharField(max_length=200)
+
+class AdminOrderedCallable(models.Model):
+    order = models.IntegerField()
+    stuff = models.CharField(max_length=200)

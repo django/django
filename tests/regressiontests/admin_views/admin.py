@@ -22,7 +22,9 @@ from .models import (Article, Chapter, Account, Media, Child, Parent, Picture,
     Gadget, Villain, SuperVillain, Plot, PlotDetails, CyclicOne, CyclicTwo,
     WorkHour, Reservation, FoodDelivery, RowLevelChangePermissionModel, Paper,
     CoverLetter, Story, OtherStory, Book, Promo, ChapterXtra1, Pizza, Topping,
-    Album, Question, Answer, ComplexSortedPerson, PrePopulatedPostLargeSlug)
+    Album, Question, Answer, ComplexSortedPerson, PrePopulatedPostLargeSlug,
+    AdminOrderedField, AdminOrderedModelMethod, AdminOrderedAdminMethod,
+    AdminOrderedCallable)
 
 
 def callable_year(dt_value):
@@ -469,11 +471,35 @@ class WorkHourAdmin(admin.ModelAdmin):
     list_filter = ('employee',)
 
 
-class PrePopulatedPostLargeSlugAdmin(admin.ModelAdmin): 
-    prepopulated_fields = { 
-        'slug' : ('title',) 
-    } 
- 
+class PrePopulatedPostLargeSlugAdmin(admin.ModelAdmin):
+    prepopulated_fields = {
+        'slug' : ('title',)
+    }
+
+
+class AdminOrderedFieldAdmin(admin.ModelAdmin):
+    ordering = ('order',)
+    list_display = ('stuff', 'order')
+
+class AdminOrderedModelMethodAdmin(admin.ModelAdmin):
+    ordering = ('order',)
+    list_display = ('stuff', 'some_order')
+
+class AdminOrderedAdminMethodAdmin(admin.ModelAdmin):
+    def some_admin_order(self, obj):
+        return obj.order
+    some_admin_order.admin_order_field = 'order'
+    ordering = ('order',)
+    list_display = ('stuff', 'some_admin_order')
+
+def admin_ordered_callable(obj):
+    return obj.order
+admin_ordered_callable.admin_order_field = 'order'
+class AdminOrderedCallableAdmin(admin.ModelAdmin):
+    ordering = ('order',)
+    list_display = ('stuff', admin_ordered_callable)
+
+
 site = admin.AdminSite(name="admin")
 site.register(Article, ArticleAdmin)
 site.register(CustomArticle, CustomArticleAdmin)
@@ -537,10 +563,14 @@ site.register(Question)
 site.register(Answer)
 site.register(PrePopulatedPost, PrePopulatedPostAdmin)
 site.register(ComplexSortedPerson, ComplexSortedPersonAdmin)
+site.register(PrePopulatedPostLargeSlug, PrePopulatedPostLargeSlugAdmin)
+site.register(AdminOrderedField, AdminOrderedFieldAdmin)
+site.register(AdminOrderedModelMethod, AdminOrderedModelMethodAdmin)
+site.register(AdminOrderedAdminMethod, AdminOrderedAdminMethodAdmin)
+site.register(AdminOrderedCallable, AdminOrderedCallableAdmin)
 
 # Register core models we need in our tests
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.admin import UserAdmin, GroupAdmin
 site.register(User, UserAdmin)
 site.register(Group, GroupAdmin)
-site.register(PrePopulatedPostLargeSlug, PrePopulatedPostLargeSlugAdmin) 
