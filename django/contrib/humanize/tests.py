@@ -1,5 +1,7 @@
 from __future__ import with_statement
+
 import datetime
+import new
 
 from django.template import Template, Context, defaultfilters
 from django.test import TestCase
@@ -182,12 +184,13 @@ class HumanizeTests(TestCase):
         from django.contrib.humanize.templatetags import humanize
         from django.utils import timesince
         orig_humanize_datetime = humanize.datetime
-        orig_timesince_datetime = timesince.datetime.datetime
+        orig_timesince_datetime = timesince.datetime
         humanize.datetime = MockDateTime
+        timesince.datetime = new.module("mock_datetime")
         timesince.datetime.datetime = MockDateTime
 
         try:
             self.humanize_tester(test_list, result_list, 'naturaltime')
         finally:
             humanize.datetime = orig_humanize_datetime
-            timesince.datetime.datetime = orig_timesince_datetime
+            timesince.datetime = orig_timesince_datetime
