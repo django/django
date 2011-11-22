@@ -302,7 +302,6 @@ class LoginTest(AuthViewsTestCase):
 
 
 class LoginURLSettings(AuthViewsTestCase):
-    urls = 'django.contrib.auth.tests.urls'
 
     def setUp(self):
         super(LoginURLSettings, self).setUp()
@@ -361,7 +360,6 @@ class LoginURLSettings(AuthViewsTestCase):
 
 
 class LogoutTest(AuthViewsTestCase):
-    urls = 'django.contrib.auth.tests.urls'
 
     def confirm_logged_out(self):
         self.assertTrue(SESSION_KEY not in self.client.session)
