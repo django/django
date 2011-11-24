@@ -821,6 +821,12 @@ referenced is needed, rather than one query for all the items. There could be
 additional queries on the ``ContentType`` table if the relevant rows have not
 already been fetched.
 
+``prefetch_related`` in most cases will be implemented using a SQL query that
+uses the 'IN' operator. This means that for a large QuerySet a large 'IN' clause
+could be generated, which, depending on the database, might have performance
+problems of its own when it comes to parsing or executing the SQL query. Always
+profile for your use case!
+
 extra
 ~~~~~
 
