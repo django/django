@@ -786,7 +786,7 @@ class DateTimeField(DateField):
 
     def get_prep_value(self, value):
         value = self.to_python(value)
-        if settings.USE_TZ and timezone.is_naive(value):
+        if value is not None and settings.USE_TZ and timezone.is_naive(value):
             # For backwards compatibility, interpret naive datetimes in local
             # time. This won't work during DST change, but we can't do much
             # about it, so we let the exceptions percolate up the call stack.

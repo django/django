@@ -25,7 +25,7 @@ from django.utils.tzinfo import FixedOffset
 from django.utils.unittest import skipIf
 
 from .forms import EventForm, EventSplitForm, EventModelForm
-from .models import Event, Timestamp
+from .models import Event, MaybeEvent, Timestamp
 
 
 # These tests use the EAT (Eastern Africa Time) and ICT (Indochina Time)
@@ -402,6 +402,11 @@ class NewDatabaseTests(BaseDateTimeTests):
                 [datetime.datetime(2010, 12, 31, tzinfo=UTC),
                  datetime.datetime(2011, 1, 1, tzinfo=UTC)],
                 transform=lambda d: d)
+
+    def test_null_datetime(self):
+        # Regression for #17294
+        e = MaybeEvent.objects.create()
+        self.assertEqual(e.dt, None)
 
 NewDatabaseTests = override_settings(USE_TZ=True)(NewDatabaseTests)
 

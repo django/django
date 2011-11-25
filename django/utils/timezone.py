@@ -228,6 +228,9 @@ def now():
     else:
         return datetime.now()
 
+# By design, these four functions don't perform any checks on their arguments.
+# The caller should ensure that they don't receive an invalid value like None.
+
 def is_aware(value):
     """
     Determines if a given datetime.datetime is aware.
