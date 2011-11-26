@@ -87,6 +87,22 @@ class LocMemCache(BaseCache):
         finally:
             self._lock.writer_leaves()
 
+    def incr(self, key, delta=1, version=None):
+        value = self.get(key, version=version)
+        if value is None:
+            raise ValueError("Key '%s' not found" % key)
+        new_value = value + delta
+        key = self.make_key(key, version=version)
+        self._lock.writer_enters()
+        try:
+            pickled = pickle.dumps(new_value, pickle.HIGHEST_PROTOCOL)
+            self._cache[key] = pickled
+        except pickle.PickleError:
+            pass
+        finally:
+            self._lock.writer_leaves()
+        return new_value
+
     def has_key(self, key, version=None):
         key = self.make_key(key, version=version)
         self.validate_key(key)

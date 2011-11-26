@@ -865,6 +865,16 @@ class LocMemCacheTests(unittest.TestCase, BaseCacheTests):
         self.assertEqual(mirror_cache.get('value1'), 42)
         self.assertEqual(other_cache.get('value1'), None)
 
+    def test_incr_decr_timeout(self):
+        """incr/decr does not modify expiry time (matches memcached behavior)"""
+        key = 'value'
+        _key = self.cache.make_key(key)
+        self.cache.set(key, 1, timeout=self.cache.default_timeout*10)
+        expire = self.cache._expire_info[_key]
+        self.cache.incr(key)
+        self.assertEqual(expire, self.cache._expire_info[_key])
+        self.cache.decr(key)
+        self.assertEqual(expire, self.cache._expire_info[_key])
 
 # memcached backend isn't guaranteed to be available.
 # To check the memcached backend, the test settings file will
