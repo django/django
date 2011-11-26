@@ -10,7 +10,7 @@
 .. currentmodule:: django.contrib.gis.utils
 
 The :class:`LayerMapping` class provides a way to map the contents of
-vector spatial data files (e.g. shapefiles) intoto GeoDjango models.
+vector spatial data files (e.g. shapefiles) into GeoDjango models.
 
 This utility grew out of the author's personal needs to eliminate
 the code repetition that went into pulling geometries and fields out of
