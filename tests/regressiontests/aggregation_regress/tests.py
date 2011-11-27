@@ -13,6 +13,8 @@ from .models import Author, Book, Publisher, Clues, Entries, HardbackBook
 
 
 class AggregationTests(TestCase):
+    fixtures = ["aggregation_regress.json"]
+
     def assertObjectAttrs(self, obj, **kwargs):
         for attr, value in kwargs.iteritems():
             self.assertEqual(getattr(obj, attr), value)
