@@ -92,8 +92,8 @@ class Book(models.Model):
     authors = models.ManyToManyField(Person)
 
     def __unicode__(self):
-        return '%s by %s' % (self.name,
-                          ' and '.join(a.name for a in self.authors.all()))
+        authors = ' and '.join(a.name for a in self.authors.all())
+        return '%s by %s' % (self.name, authors) if authors else self.name
 
     class Meta:
         ordering = ('name',)
