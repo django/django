@@ -1,3 +1,0 @@
-INSTALLED_APPS = (
-    'parent.*',
-)
