@@ -28,6 +28,8 @@ class SessionStore(DBStore):
         return data
 
     def exists(self, session_key):
+        if (KEY_PREFIX + session_key) in cache:
+            return True
         return super(SessionStore, self).exists(session_key)
 
     def save(self, must_create=False):

@@ -293,6 +293,11 @@ class CacheDBSessionTests(SessionTestsMixin, TestCase):
 
     backend = CacheDBSession
 
+    def test_exists_searches_cache_first(self):
+        self.session.save()
+        with self.assertNumQueries(0):
+            self.assertTrue(self.session.exists(self.session.session_key))
+
 
 CacheDBSessionWithTimeZoneTests = override_settings(USE_TZ=True)(CacheDBSessionTests)
 
