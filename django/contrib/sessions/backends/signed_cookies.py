@@ -30,7 +30,7 @@ class SessionStore(SessionBase):
         raises BadSignature if signature fails.
         """
         try:
-            return signing.loads(self._session_key,
+            return signing.loads(self.session_key,
                 serializer=PickleSerializer,
                 max_age=settings.SESSION_COOKIE_AGE,
                 salt='django.contrib.sessions.backends.signed_cookies')

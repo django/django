@@ -136,6 +136,7 @@ class SessionTestsMixin(object):
         self.assertTrue(self.session.exists(self.session.session_key))
 
     def test_delete(self):
+        self.session.save()
         self.session.delete(self.session.session_key)
         self.assertFalse(self.session.exists(self.session.session_key))
 
@@ -174,6 +175,11 @@ class SessionTestsMixin(object):
             # Some backends leave a stale cache entry for the invalid
             # session key; make sure that entry is manually deleted
             session.delete('1')
+
+    def test_session_key_is_read_only(self):
+        def set_session_key(session):
+            session.session_key = session._get_new_session_key()
+        self.assertRaises(AttributeError, set_session_key, self.session)
 
     # Custom session expiry
     def test_default_expiry(self):
@@ -360,7 +366,7 @@ class SessionMiddlewareTests(unittest.TestCase):
         response = middleware.process_response(request, response)
         self.assertTrue(
             response.cookies[settings.SESSION_COOKIE_NAME]['httponly'])
-        self.assertIn('httponly', 
+        self.assertIn('httponly',
             str(response.cookies[settings.SESSION_COOKIE_NAME]))
 
     @override_settings(SESSION_COOKIE_HTTPONLY=False)
@@ -375,12 +381,12 @@ class SessionMiddlewareTests(unittest.TestCase):
 
         # Handle the response through the middleware
         response = middleware.process_response(request, response)
-        #if it isn't in the cookie, that's fine (Python 2.5). 
+        # If it isn't in the cookie, that's fine (Python 2.5)
         if 'httponly' in settings.SESSION_COOKIE_NAME:
             self.assertFalse(
                response.cookies[settings.SESSION_COOKIE_NAME]['httponly'])
 
-        self.assertNotIn('httponly', 
+        self.assertNotIn('httponly',
                          str(response.cookies[settings.SESSION_COOKIE_NAME]))
 
 class CookieSessionTests(SessionTestsMixin, TestCase):

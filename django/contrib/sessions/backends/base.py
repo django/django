@@ -54,12 +54,6 @@ class SessionBase(object):
         del self._session[key]
         self.modified = True
 
-    def keys(self):
-        return self._session.keys()
-
-    def items(self):
-        return self._session.items()
-
     def get(self, key, default=None):
         return self._session.get(key, default)
 
@@ -116,8 +110,14 @@ class SessionBase(object):
     def has_key(self, key):
         return key in self._session
 
+    def keys(self):
+        return self._session.keys()
+
     def values(self):
         return self._session.values()
+
+    def items(self):
+        return self._session.items()
 
     def iterkeys(self):
         return self._session.iterkeys()
@@ -145,7 +145,7 @@ class SessionBase(object):
         except AttributeError:
             # No getpid() in Jython, for example
             pid = 1
-        while 1:
+        while True:
             session_key = hashlib.md5("%s%s%s%s"
                     % (randrange(0, MAX_SESSION_KEY), pid, time.time(),
                        settings.SECRET_KEY)).hexdigest()
@@ -153,17 +153,15 @@ class SessionBase(object):
                 break
         return session_key
 
-    def _get_session_key(self):
-        if self._session_key:
-            return self._session_key
-        else:
+    def _get_or_create_session_key(self):
+        if self._session_key is None:
             self._session_key = self._get_new_session_key()
-            return self._session_key
+        return self._session_key
 
-    def _set_session_key(self, session_key):
-        self._session_key = session_key
+    def _get_session_key(self):
+        return self._session_key
 
-    session_key = property(_get_session_key, _set_session_key)
+    session_key = property(_get_session_key)
 
     def _get_session(self, no_load=False):
         """
@@ -174,7 +172,7 @@ class SessionBase(object):
         try:
             return self._session_cache
         except AttributeError:
-            if self._session_key is None or no_load:
+            if self.session_key is None or no_load:
                 self._session_cache = {}
             else:
                 self._session_cache = self.load()
