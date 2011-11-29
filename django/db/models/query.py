@@ -1576,12 +1576,11 @@ def prefetch_related_objects(result_cache, related_lookups):
     done_lookups = set() # list of lookups like foo__bar__baz
     done_queries = {}    # dictionary of things like 'foo__bar': [results]
 
-    manual_lookups = list(related_lookups)
     auto_lookups = [] # we add to this as we go through.
     followed_descriptors = set() # recursion protection
 
-    related_lookups = itertools.chain(manual_lookups, auto_lookups)
-    for lookup in related_lookups:
+    all_lookups = itertools.chain(related_lookups, auto_lookups)
+    for lookup in all_lookups:
         if lookup in done_lookups:
             # We've done exactly this already, skip the whole thing
             continue
