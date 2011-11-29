@@ -114,6 +114,9 @@ these changes.
   beyond that of a simple ``TextField`` since the removal of oldforms.
   All uses of ``XMLField`` can be replaced with ``TextField``.
 
+* The undocumented ``mixin`` parameter to the ``open()`` method of
+  ``django.core.files.storage.Storage`` (and subclasses) will be removed.
+
 
 1.5
 ---

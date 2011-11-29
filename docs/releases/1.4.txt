@@ -780,9 +780,10 @@ removed.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The ``open`` method of the base Storage class took an obscure parameter
-``mixin`` which allowed to dynamically change the base classes of the
-returned file object. In the rare case you relied on the `mixin` parameter,
-you can easily achieve the same by overriding the `open` method, e.g.::
+``mixin`` which allowed you to dynamically change the base classes of the
+returned file object. This has been removed. In the rare case you relied on the
+`mixin` parameter, you can easily achieve the same by overriding the `open`
+method, e.g.::
 
     from django.core.files import File
     from django.core.files.storage import FileSystemStorage
