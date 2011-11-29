@@ -56,7 +56,7 @@ For more details, see the documentation for
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This method allows for more efficient creation of multiple objects in the ORM.
-It can provide significant performance increases if you have many objects,
+It can provide significant performance increases if you have many objects.
 Django makes use of this internally, meaning some operations (such as database
 setup for test suites) have seen a performance benefit as a result.
 
