@@ -8,7 +8,6 @@ import re
 import time
 
 from django.core.validators import EMPTY_VALUES
-from django.contrib.localflavor.id.id_choices import PROVINCE_CHOICES, LICENSE_PLATE_PREFIX_CHOICES
 from django.forms import ValidationError
 from django.forms.fields import Field, Select
 from django.utils.translation import ugettext_lazy as _
@@ -58,6 +57,8 @@ class IDProvinceSelect(Select):
     """
 
     def __init__(self, attrs=None):
+        # Load data in memory only when it is required, see also #17275
+        from django.contrib.localflavor.id.id_choices import PROVINCE_CHOICES
         super(IDProvinceSelect, self).__init__(attrs, choices=PROVINCE_CHOICES)
 
 
@@ -93,6 +94,8 @@ class IDLicensePlatePrefixSelect(Select):
     """
 
     def __init__(self, attrs=None):
+        # Load data in memory only when it is required, see also #17275
+        from django.contrib.localflavor.id.id_choices import LICENSE_PLATE_PREFIX_CHOICES
         super(IDLicensePlatePrefixSelect, self).__init__(attrs,
             choices=LICENSE_PLATE_PREFIX_CHOICES)
 
@@ -110,6 +113,8 @@ class IDLicensePlateField(Field):
     }
 
     def clean(self, value):
+        # Load data in memory only when it is required, see also #17275
+        from django.contrib.localflavor.id.id_choices import LICENSE_PLATE_PREFIX_CHOICES
         super(IDLicensePlateField, self).clean(value)
         if value in EMPTY_VALUES:
             return u''

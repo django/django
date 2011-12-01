@@ -6,7 +6,6 @@ from __future__ import absolute_import
 
 import re
 
-from django.contrib.localflavor.ca.ca_provinces import PROVINCE_CHOICES, PROVINCES_NORMALIZED
 from django.core.validators import EMPTY_VALUES
 from django.forms import ValidationError
 from django.forms.fields import Field, CharField, Select
@@ -79,6 +78,8 @@ class CAProvinceField(Field):
         except AttributeError:
             pass
         else:
+            # Load data in memory only when it is required, see also #17275
+            from django.contrib.localflavor.ca.ca_provinces import PROVINCES_NORMALIZED
             try:
                 return PROVINCES_NORMALIZED[value.strip().lower()].decode('ascii')
             except KeyError:
@@ -91,6 +92,8 @@ class CAProvinceSelect(Select):
     territories as its choices.
     """
     def __init__(self, attrs=None):
+        # Load data in memory only when it is required, see also #17275
+        from django.contrib.localflavor.ca.ca_provinces import PROVINCE_CHOICES
         super(CAProvinceSelect, self).__init__(attrs, choices=PROVINCE_CHOICES)
 
 class CASocialInsuranceNumberField(Field):
