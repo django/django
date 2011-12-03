@@ -119,7 +119,7 @@ class BaseCommand(object):
     option_list = (
         make_option('-v', '--verbosity', action='store', dest='verbosity', default='1',
             type='choice', choices=['0', '1', '2', '3'],
-            help='Verbosity level; 0=minimal output, 1=normal output, 2=verbose output 3=very verbose output'),
+            help='Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very verbose output'),
         make_option('--settings',
             help='The Python path to a settings module, e.g. "myproject.settings.main". If this isn\'t provided, the DJANGO_SETTINGS_MODULE environment variable will be used.'),
         make_option('--pythonpath',
