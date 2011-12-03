@@ -1982,6 +1982,8 @@ if you specifically wanted the admin view from the admin instance named
 For more details, see the documentation on :ref:`reversing namespaced URLs
 <topics-http-reversing-url-namespaces>`.
 
+.. versionadded:: 1.4
+
 To allow easier reversing of the admin urls in templates, Django provides an
 ``admin_urlname`` filter which takes an action as argument:
 
