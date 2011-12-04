@@ -15,6 +15,7 @@ from django.template.smartif import IfParser, Literal
 from django.template.defaultfilters import date
 from django.utils.encoding import smart_str, smart_unicode
 from django.utils.safestring import mark_safe
+from django.utils import timezone
 
 register = Library()
 
@@ -343,7 +344,8 @@ class NowNode(Node):
         self.format_string = format_string
 
     def render(self, context):
-        return date(datetime.now(), self.format_string)
+        tzinfo = timezone.get_current_timezone() if settings.USE_TZ else None
+        return date(datetime.now(tz=tzinfo), self.format_string)
 
 class SpacelessNode(Node):
     def __init__(self, nodelist):

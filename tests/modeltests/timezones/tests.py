@@ -790,6 +790,13 @@ class TemplateTests(BaseDateTimeTests):
             self.assertTrue(tpl.render(ctx).startswith("2011"))
         timezone._localtime = None
 
+    def test_now_template_tag_uses_current_time_zone(self):
+        # Regression for #17343
+        tpl = Template("{% now \"O\" %}")
+        self.assertEqual(tpl.render(Context({})), "+0300")
+        with timezone.override(ICT):
+            self.assertEqual(tpl.render(Context({})), "+0700")
+
 TemplateTests = override_settings(DATETIME_FORMAT='c', USE_L10N=False, USE_TZ=True)(TemplateTests)
 
 #@override_settings(DATETIME_FORMAT='c', USE_L10N=False, USE_TZ=False)
