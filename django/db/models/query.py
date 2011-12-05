@@ -232,7 +232,9 @@ class QuerySet(object):
         An iterator over the results from applying this QuerySet to the
         database.
         """
-        fill_cache = self.query.select_related
+        fill_cache = False
+        if connections[self.db].features.supports_select_related:
+            fill_cache = self.query.select_related
         if isinstance(fill_cache, dict):
             requested = fill_cache
         else:
