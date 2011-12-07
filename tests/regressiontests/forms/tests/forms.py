@@ -434,6 +434,28 @@ class FormsTestCase(TestCase):
 <li><label for="id_language_1"><input type="radio" id="id_language_1" value="J" name="language" /> Java</label></li>
 </ul></p>""")
 
+    def test_form_with_iterable_boundfield(self):
+        class BeatleForm(Form):
+            name = ChoiceField(choices=[('john', 'John'), ('paul', 'Paul'), ('george', 'George'), ('ringo', 'Ringo')], widget=RadioSelect)
+
+        f = BeatleForm(auto_id=False)
+        self.assertEqual('\n'.join(list(f['name'])), """<label><input type="radio" name="name" value="john" /> John</label>
+<label><input type="radio" name="name" value="paul" /> Paul</label>
+<label><input type="radio" name="name" value="george" /> George</label>
+<label><input type="radio" name="name" value="ringo" /> Ringo</label>""")
+        self.assertEqual('\n'.join(['<div>%s</div>' % bf for bf in f['name']]), """<div><label><input type="radio" name="name" value="john" /> John</label></div>
+<div><label><input type="radio" name="name" value="paul" /> Paul</label></div>
+<div><label><input type="radio" name="name" value="george" /> George</label></div>
+<div><label><input type="radio" name="name" value="ringo" /> Ringo</label></div>""")
+
+    def test_form_with_noniterable_boundfield(self):
+        # You can iterate over any BoundField, not just those with widget=RadioSelect.
+        class BeatleForm(Form):
+            name = CharField()
+
+        f = BeatleForm(auto_id=False)
+        self.assertEqual('\n'.join(list(f['name'])), u'<input type="text" name="name" />')
+
     def test_forms_wit_hmultiple_choice(self):
         # MultipleChoiceField is a special case, as its data is required to be a list:
         class SongForm(Form):

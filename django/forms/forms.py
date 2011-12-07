@@ -410,6 +410,16 @@ class BoundField(StrAndUnicode):
             return self.as_widget() + self.as_hidden(only_initial=True)
         return self.as_widget()
 
+    def __iter__(self):
+        """
+        Yields rendered strings that comprise all widgets in this BoundField.
+
+        This really is only useful for RadioSelect widgets, so that you can
+        iterate over individual radio buttons in a template.
+        """
+        for subwidget in self.field.widget.subwidgets(self.html_name, self.value()):
+            yield self.as_widget(subwidget)
+
     def _errors(self):
         """
         Returns an ErrorList for this field. Returns an empty ErrorList

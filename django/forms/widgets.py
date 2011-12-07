@@ -156,6 +156,15 @@ class Widget(object):
         memo[id(self)] = obj
         return obj
 
+    def subwidgets(self, name, value, attrs=None, choices=()):
+        """
+        Yields all "subwidgets" of this widget. Used only by RadioSelect to
+        allow template access to individual <input type="radio"> buttons.
+
+        Arguments are the same as for render().
+        """
+        yield self
+
     def render(self, name, value, attrs=None):
         """
         Returns this Widget rendered as HTML, as a Unicode string.
@@ -628,6 +637,12 @@ class RadioInput(StrAndUnicode):
         self.index = index
 
     def __unicode__(self):
+        return self.render()
+
+    def render(self, name=None, value=None, attrs=None, choices=()):
+        name = name or self.name
+        value = value or self.value
+        attrs = attrs or self.attrs
         if 'id' in self.attrs:
             label_for = ' for="%s_%s"' % (self.attrs['id'], self.index)
         else:
@@ -680,6 +695,10 @@ class RadioSelect(Select):
         if renderer:
             self.renderer = renderer
         super(RadioSelect, self).__init__(*args, **kwargs)
+
+    def subwidgets(self, name, value, attrs=None, choices=()):
+        for widget in self.get_renderer(name, value, attrs, choices):
+            yield widget
 
     def get_renderer(self, name, value, attrs=None, choices=()):
         """Returns an instance of the renderer."""

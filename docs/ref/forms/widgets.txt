@@ -345,7 +345,8 @@ commonly used groups of widgets:
 
 .. class:: RadioSelect
 
-    Similar to :class:`Select`, but rendered as a list of radio buttons:
+    Similar to :class:`Select`, but rendered as a list of radio buttons within
+    ``<li>`` tags:
 
     .. code-block:: html
 
@@ -353,6 +354,40 @@ commonly used groups of widgets:
           <li><input type='radio' ...></li>
           ...
         </ul>
+
+    .. versionadded:: 1.4
+
+    For more granular control over the generated markup, you can loop over the
+    radio buttons in the template. Assuming a form ``myform`` with a field
+    ``beatles`` that uses a ``RadioSelect`` as its widget:
+
+    .. code-block:: html+django
+
+        {% for radio in myform.beatles %}
+        <div class="myradio">
+            {{ radio }}
+        </div>
+        {% endfor %}
+
+    This would generate the following HTML:
+
+    .. code-block:: html
+
+        <div class="myradio">
+            <label><input type="radio" name="beatles" value="john" /> John</label>
+        </div>
+        <div class="myradio">
+            <label><input type="radio" name="beatles" value="paul" /> Paul</label>
+        </div>
+        <div class="myradio">
+            <label><input type="radio" name="beatles" value="george" /> George</label>
+        </div>
+        <div class="myradio">
+            <label><input type="radio" name="beatles" value="ringo" /> Ringo</label>
+        </div>
+
+    If you decide not to loop over the radio buttons, they'll be output in a
+    ``<ul>`` with ``<li>`` tags, as above.
 
 ``CheckboxSelectMultiple``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
