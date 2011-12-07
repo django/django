@@ -456,7 +456,7 @@ class FormsTestCase(TestCase):
         f = BeatleForm(auto_id=False)
         self.assertEqual('\n'.join(list(f['name'])), u'<input type="text" name="name" />')
 
-    def test_forms_wit_hmultiple_choice(self):
+    def test_forms_with_multiple_choice(self):
         # MultipleChoiceField is a special case, as its data is required to be a list:
         class SongForm(Form):
             name = CharField()
