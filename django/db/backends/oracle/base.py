@@ -485,24 +485,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                            " NLS_TERRITORY = 'AMERICA'"
                            + (" TIME_ZONE = 'UTC'" if settings.USE_TZ else ''))
 
-            def datetime_converter(dt):
-                # Confirm that dt is naive before overwriting its tzinfo.
-                if dt is not None and is_naive(dt):
-                    dt = dt.replace(tzinfo=utc)
-                return dt
-
-            def output_type_handler(cursor, name, default_type,
-                                    size, precision, scale):
-                # datetimes are returned as TIMESTAMP, except the results
-                # of "dates" queries, which are returned as DATETIME.
-                if settings.USE_TZ and default_type in (Database.TIMESTAMP,
-                                                        Database.DATETIME):
-                    return cursor.var(default_type,
-                                      arraysize=cursor.arraysize,
-                                      outconverter=datetime_converter)
-
-            self.connection.outputtypehandler = output_type_handler
-
             if 'operators' not in self.__dict__:
                 # Ticket #14149: Check whether our LIKE implementation will
                 # work for this connection or we need to fall back on LIKEC.
@@ -794,6 +776,12 @@ def _rowfactory(row, cursor):
                 value = decimal.Decimal(value)
             else:
                 value = int(value)
+        # datetimes are returned as TIMESTAMP, except the results
+        # of "dates" queries, which are returned as DATETIME.
+        elif desc[1] in (Database.TIMESTAMP, Database.DATETIME):
+            # Confirm that dt is naive before overwriting its tzinfo.
+            if settings.USE_TZ and value is not None and is_naive(value):
+                value = value.replace(tzinfo=utc)
         elif desc[1] in (Database.STRING, Database.FIXED_CHAR,
                          Database.LONG_STRING):
             value = to_unicode(value)
