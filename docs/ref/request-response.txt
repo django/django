@@ -193,10 +193,10 @@ Methods
 
 .. method:: HttpRequest.get_host()
 
-    Returns the originating host of the request using information from
-    the ``HTTP_X_FORWARDED_HOST`` (if enabled in the settings) and ``HTTP_HOST``
-    headers (in that order). If they don't provide a value, the method
-    uses a combination of ``SERVER_NAME`` and ``SERVER_PORT`` as
+    Returns the originating host of the request using information from the
+    ``HTTP_X_FORWARDED_HOST`` (if :setting:`USE_X_FORWARDED_HOST` is enabled)
+    and ``HTTP_HOST`` headers, in that order. If they don't provide a value,
+    the method uses a combination of ``SERVER_NAME`` and ``SERVER_PORT`` as
     detailed in :pep:`3333`.
 
     Example: ``"127.0.0.1:8000"``
