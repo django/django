@@ -137,6 +137,22 @@ class MediaDefiningClass(type):
             new_class.media = media_property(new_class)
         return new_class
 
+class SubWidget(StrAndUnicode):
+    """
+    Some widgets are made of multiple HTML elements -- namely, RadioSelect.
+    This is a class that represents the "inner" HTML element of a widget.
+    """
+    def __init__(self, parent_widget, name, value, attrs, choices):
+        self.parent_widget = parent_widget
+        self.name, self.value = name, value
+        self.attrs, self.choices = attrs, choices
+
+    def __unicode__(self):
+        args = [self.name, self.value, self.attrs]
+        if self.choices:
+            args.append(self.choices)
+        return self.parent_widget.render(*args)
+
 class Widget(object):
     __metaclass__ = MediaDefiningClass
     is_hidden = False          # Determines whether this corresponds to an <input type="hidden">.
@@ -163,7 +179,7 @@ class Widget(object):
 
         Arguments are the same as for render().
         """
-        yield self
+        yield SubWidget(self, name, value, attrs, choices)
 
     def render(self, name, value, attrs=None):
         """
@@ -623,7 +639,7 @@ class SelectMultiple(Select):
         data_set = set([force_unicode(value) for value in data])
         return data_set != initial_set
 
-class RadioInput(StrAndUnicode):
+class RadioInput(SubWidget):
     """
     An object used by RadioFieldRenderer that represents a single
     <input type='radio'>.

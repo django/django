@@ -386,8 +386,41 @@ commonly used groups of widgets:
             <label><input type="radio" name="beatles" value="ringo" /> Ringo</label>
         </div>
 
-    If you decide not to loop over the radio buttons, they'll be output in a
-    ``<ul>`` with ``<li>`` tags, as above.
+    That included the ``<label>`` tags. To get more granular, you can use each
+    radio button's ``tag`` and ``choice_label`` attributes. For example, this template...
+
+    .. code-block:: html+django
+
+        {% for radio in myform.beatles %}
+            <label>
+                {{ radio.choice_label }}
+                <span class="radio">{{ radio.tag }}</span>
+            </label>
+        {% endfor %}
+
+    ...will result in the following HTML:
+
+    .. code-block:: html
+
+            <label>
+                John
+                <span class="radio"><input type="radio" name="beatles" value="john" /></span>
+            </label>
+            <label>
+                Paul
+                <span class="radio"><input type="radio" name="beatles" value="paul" /></span>
+            </label>
+            <label>
+                George
+                <span class="radio"><input type="radio" name="beatles" value="george" /></span>
+            </label>
+            <label>
+                Ringo
+                <span class="radio"><input type="radio" name="beatles" value="ringo" /></span>
+            </label>
+
+    If you decide not to loop over the radio buttons -- e.g., if your template simply includes
+    ``{{ myform.beatles }}`` -- they'll be output in a ``<ul>`` with ``<li>`` tags, as above.
 
 ``CheckboxSelectMultiple``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~

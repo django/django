@@ -439,7 +439,7 @@ class FormsTestCase(TestCase):
             name = ChoiceField(choices=[('john', 'John'), ('paul', 'Paul'), ('george', 'George'), ('ringo', 'Ringo')], widget=RadioSelect)
 
         f = BeatleForm(auto_id=False)
-        self.assertEqual('\n'.join(list(f['name'])), """<label><input type="radio" name="name" value="john" /> John</label>
+        self.assertEqual('\n'.join([str(bf) for bf in f['name']]), """<label><input type="radio" name="name" value="john" /> John</label>
 <label><input type="radio" name="name" value="paul" /> Paul</label>
 <label><input type="radio" name="name" value="george" /> George</label>
 <label><input type="radio" name="name" value="ringo" /> Ringo</label>""")
@@ -454,7 +454,7 @@ class FormsTestCase(TestCase):
             name = CharField()
 
         f = BeatleForm(auto_id=False)
-        self.assertEqual('\n'.join(list(f['name'])), u'<input type="text" name="name" />')
+        self.assertEqual('\n'.join([str(bf) for bf in f['name']]), u'<input type="text" name="name" />')
 
     def test_forms_with_multiple_choice(self):
         # MultipleChoiceField is a special case, as its data is required to be a list:

@@ -418,7 +418,13 @@ class BoundField(StrAndUnicode):
         iterate over individual radio buttons in a template.
         """
         for subwidget in self.field.widget.subwidgets(self.html_name, self.value()):
-            yield self.as_widget(subwidget)
+            yield subwidget
+
+    def __len__(self):
+        return len(list(self.__iter__()))
+
+    def __getitem__(self, idx):
+        return list(self.__iter__())[idx]
 
     def _errors(self):
         """
