@@ -1084,7 +1084,7 @@ class ManageRunserver(AdminScriptTestCase):
         self.cmd.handle(addrport="7000")
         self.assertServerSettings('127.0.0.1', '7000')
 
-    @unittest.skipUnless(socket.has_ipv6, 'markdown is installed')
+    @unittest.skipUnless(socket.has_ipv6, "platform doesn't support IPv6")
     def test_runner_addrport_ipv6(self):
         self.cmd.handle(addrport="", use_ipv6=True)
         self.assertServerSettings('::1', '8000', ipv6=True, raw_ipv6=True)
@@ -1102,7 +1102,7 @@ class ManageRunserver(AdminScriptTestCase):
         self.cmd.handle(addrport="test.domain.local:7000")
         self.assertServerSettings('test.domain.local', '7000')
 
-    @unittest.skipUnless(socket.has_ipv6, 'markdown is installed')
+    @unittest.skipUnless(socket.has_ipv6, "platform doesn't support IPv6")
     def test_runner_hostname_ipv6(self):
         self.cmd.handle(addrport="test.domain.local:7000", use_ipv6=True)
         self.assertServerSettings('test.domain.local', '7000', ipv6=True)
