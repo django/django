@@ -88,7 +88,17 @@ You can use variables, too. For example, if you have two template variables,
         </tr>
     {% endfor %}
 
-Yes, you can mix variables and strings::
+Note that variable arguments (``rowvalue1`` and ``rowvalue2`` above) are NOT
+auto-escaped! So either make sure that you trust their values, or use explicit
+escaping, like this::
+
+    {% for o in some_list %}
+        <tr class="{% filter force_escape %}{% cycle rowvalue1 rowvalue2 %}{% endfilter %}">
+            ...
+        </tr>
+    {% endfor %}
+
+You can mix variables and strings::
 
     {% for o in some_list %}
         <tr class="{% cycle 'row1' rowvalue2 'row3' %}">
@@ -232,7 +242,8 @@ Sample usage::
 firstof
 ^^^^^^^
 
-Outputs the first variable passed that is not False, without escaping.
+Outputs the first variable passed that is not False. Does NOT auto-escape
+variable values.
 
 Outputs nothing if all the passed variables are False.
 
@@ -258,9 +269,8 @@ passed variables are False::
 Note that the variables included in the firstof tag will not be
 escaped. This is because template tags do not escape their content.
 Any HTML or Javascript code contained in the printed variable will be
-rendered as-is, which could potentially lead to security issues.
-
-If you need to escape the variables in the firstof tag, you must do so
+rendered as-is, which could potentially lead to security issues. If you
+need to escape the variables in the firstof tag, you must do so
 explicitly::
 
     {% filter force_escape %}
