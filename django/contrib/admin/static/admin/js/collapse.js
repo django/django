@@ -12,11 +12,11 @@
 		// Add toggle to anchor tag
 		$("fieldset.collapse a.collapse-toggle").toggle(
 			function() { // Show
-				$(this).text(gettext("Hide")).closest("fieldset").removeClass("collapsed");
+				$(this).text(gettext("Hide")).closest("fieldset").removeClass("collapsed").trigger("show.fieldset", [$(this).attr("id")]);
 				return false;
 			},
 			function() { // Hide
-				$(this).text(gettext("Show")).closest("fieldset").addClass("collapsed");
+				$(this).text(gettext("Show")).closest("fieldset").addClass("collapsed").trigger("hide.fieldset", [$(this).attr("id")]);
 				return false;
 			}
 		);
