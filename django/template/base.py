@@ -250,15 +250,15 @@ class Parser(object):
                 var_node = self.create_variable_node(filter_expression)
                 self.extend_nodelist(nodelist, var_node, token)
             elif token.token_type == TOKEN_BLOCK:
-                if token.contents in parse_until:
-                    # put token back on token list so calling
-                    # code knows why it terminated
-                    self.prepend_token(token)
-                    return nodelist
                 try:
                     command = token.contents.split()[0]
                 except IndexError:
                     self.empty_block_tag(token)
+                if command in parse_until:
+                    # put token back on token list so calling
+                    # code knows why it terminated
+                    self.prepend_token(token)
+                    return nodelist
                 # execute callback function for this tag and append
                 # resulting node
                 self.enter_command(command, token)

@@ -189,8 +189,14 @@ def do_block(parser, token):
         parser.__loaded_blocks.append(block_name)
     except AttributeError: # parser.__loaded_blocks isn't a list yet
         parser.__loaded_blocks = [block_name]
-    nodelist = parser.parse(('endblock', 'endblock %s' % block_name))
-    parser.delete_first_token()
+    nodelist = parser.parse(('endblock',))
+
+    # This check is kept for backwards-compatibility. See #3100.
+    endblock = parser.next_token()
+    acceptable_endblocks = ('endblock', 'endblock %s' % block_name)
+    if endblock.contents not in acceptable_endblocks:
+        parser.invalid_block_tag(endblock, 'endblock', acceptable_endblocks)
+
     return BlockNode(block_name, nodelist)
 
 @register.tag('extends')
