@@ -7,6 +7,7 @@ from __future__ import with_statement
 
 import os
 import shutil
+import socket
 import sys
 import re
 
@@ -1056,10 +1057,13 @@ class ManageValidate(AdminScriptTestCase):
         self.assertNoOutput(err)
         self.assertOutput(out, '0 errors found')
 
+
 class ManageRunserver(AdminScriptTestCase):
     def setUp(self):
         from django.core.management.commands.runserver import BaseRunserverCommand
-        def monkey_run(*args, **options): return
+
+        def monkey_run(*args, **options):
+            return
 
         self.cmd = BaseRunserverCommand()
         self.cmd.run = monkey_run
@@ -1080,7 +1084,8 @@ class ManageRunserver(AdminScriptTestCase):
         self.cmd.handle(addrport="7000")
         self.assertServerSettings('127.0.0.1', '7000')
 
-        # IPv6
+    @unittest.skipUnless(socket.has_ipv6, 'markdown is installed')
+    def test_runner_addrport_ipv6(self):
         self.cmd.handle(addrport="", use_ipv6=True)
         self.assertServerSettings('::1', '8000', ipv6=True, raw_ipv6=True)
 
@@ -1090,18 +1095,19 @@ class ManageRunserver(AdminScriptTestCase):
         self.cmd.handle(addrport="[2001:0db8:1234:5678::9]:7000")
         self.assertServerSettings('2001:0db8:1234:5678::9', '7000', ipv6=True, raw_ipv6=True)
 
-        # Hostname
+    def test_runner_hostname(self):
         self.cmd.handle(addrport="localhost:8000")
         self.assertServerSettings('localhost', '8000')
 
         self.cmd.handle(addrport="test.domain.local:7000")
         self.assertServerSettings('test.domain.local', '7000')
 
+    @unittest.skipUnless(socket.has_ipv6, 'markdown is installed')
+    def test_runner_hostname_ipv6(self):
         self.cmd.handle(addrport="test.domain.local:7000", use_ipv6=True)
         self.assertServerSettings('test.domain.local', '7000', ipv6=True)
 
-        # Potentially ambiguous
-
+    def test_runner_ambiguous(self):
         # Only 4 characters, all of which could be in an ipv6 address
         self.cmd.handle(addrport="beef:7654")
         self.assertServerSettings('beef', '7654')
