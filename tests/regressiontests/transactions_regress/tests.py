@@ -5,7 +5,7 @@ from django.db import connection, transaction
 from django.db.transaction import commit_on_success, commit_manually, TransactionManagementError
 from django.test import TransactionTestCase, skipUnlessDBFeature
 
-from .models import Mod
+from .models import Mod, M2mA, M2mB
 
 
 class TestTransactionClosing(TransactionTestCase):
@@ -164,3 +164,17 @@ class TestTransactionClosing(TransactionTestCase):
             _ = User.objects.all()[0]
         except:
             self.fail("A transaction consisting of a failed operation was not closed.")
+
+class TestManyToManyAddTransaction(TransactionTestCase):
+    def test_manyrelated_add_commit(self):
+        "Test for https://code.djangoproject.com/ticket/16818"
+        a = M2mA.objects.create()
+        b = M2mB.objects.create(fld=10)
+        a.others.add(b)
+
+        # We're in a TransactionTestCase and have not changed transaction
+        # behavior from default of "autocommit", so this rollback should not
+        # actually do anything. If it does in fact undo our add, that's a bug
+        # that the bulk insert was not auto-committed.
+        transaction.rollback()
+        self.assertEqual(a.others.count(), 1)
