@@ -1,6 +1,8 @@
 from django import forms
+from django.forms.util import flatatt
 from django.template import loader
 from django.utils.http import int_to_base36
+from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 
 from django.contrib.auth.models import User
@@ -9,6 +11,40 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.models import get_current_site
 
+UNMASKED_DIGITS_TO_SHOW = 6
+
+mask_password = lambda p: "%s%s" % (p[:UNMASKED_DIGITS_TO_SHOW], "*" * max(len(p) - UNMASKED_DIGITS_TO_SHOW, 0))
+
+class ReadOnlyPasswordHashWidget(forms.Widget):
+    def render(self, name, value, attrs):
+        if not value:
+            return "None"
+        final_attrs = self.build_attrs(attrs)
+        parts = value.split("$")
+        if len(parts) != 3:
+            # Legacy passwords didn't specify a hash type and were md5.
+            hash_type = "md5"
+            masked = mask_password(value)
+        else:
+            hash_type = parts[0]
+            masked = mask_password(parts[2])
+        return mark_safe("""<div%(attrs)s>
+                    <strong>%(hash_type_label)s</strong>: %(hash_type)s
+                    <strong>%(masked_label)s</strong>: %(masked)s
+                </div>""" % {
+                    "attrs": flatatt(final_attrs),
+                    "hash_type_label": _("Hash type"),
+                    "hash_type": hash_type,
+                    "masked_label": _("Masked hash"),
+                    "masked": masked,
+                })
+
+class ReadOnlyPasswordHashField(forms.Field):
+    widget = ReadOnlyPasswordHashWidget
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("required", False)
+        super(ReadOnlyPasswordHashField, self).__init__(*args, **kwargs)
 
 class UserCreationForm(forms.ModelForm):
     """
@@ -51,6 +87,10 @@ class UserChangeForm(forms.ModelForm):
     username = forms.RegexField(label=_("Username"), max_length=30, regex=r'^[\w.@+-]+$',
         help_text = _("Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."),
         error_messages = {'invalid': _("This value may contain only letters, numbers and @/./+/-/_ characters.")})
+    password = ReadOnlyPasswordHashField(label=_("Password"), help_text=_("We don't store raw passwords, so there's no way to see this user's password, but you can change the password using <a href=\"password/\">this form</a>."))
+
+    def clean_password(self):
+        return self.initial["password"]
 
     class Meta:
         model = User
