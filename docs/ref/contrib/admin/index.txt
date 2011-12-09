@@ -28,7 +28,8 @@ There are seven steps in activating the Django admin site:
 3. Add ``django.contrib.messages.context_processors.messages`` to
    :setting:`TEMPLATE_CONTEXT_PROCESSORS` and
    :class:`~django.contrib.messages.middleware.MessageMiddleware` to
-   :setting:`MIDDLEWARE_CLASSES`.
+   :setting:`MIDDLEWARE_CLASSES`. (These are both active by default, so
+   you only need to do this if you've manually tweaked the settings.)
 
 4. Determine which of your application's models should be editable in the
    admin interface.
@@ -41,6 +42,9 @@ There are seven steps in activating the Django admin site:
    ``ModelAdmin`` classes.
 
 7. Hook the ``AdminSite`` instance into your URLconf.
+
+After you've taken these steps, you'll be able to use your Django admin site
+by visiting the URL you hooked it into (``/admin/``, by default).
 
 Other topics
 ------------
