@@ -788,6 +788,7 @@ class Templates(unittest.TestCase):
             'firstof07': ('{% firstof a b "c" %}', {'a':0}, 'c'),
             'firstof08': ('{% firstof a b "c and d" %}', {'a':0,'b':0}, 'c and d'),
             'firstof09': ('{% firstof %}', {}, template.TemplateSyntaxError),
+            'firstof10': ('{% firstof a %}', {'a': '<'}, '<'), # Variables are NOT auto-escaped.
 
             ### FOR TAG ###############################################################
             'for-tag01': ("{% for val in values %}{{ val }}{% endfor %}", {"values": [1, 2, 3]}, "123"),
