@@ -366,6 +366,8 @@ block are output::
 
     {% if athlete_list %}
         Number of athletes: {{ athlete_list|length }}
+    {% elif athlete_in_locker_room_list %}
+        Athletes should be out of the locker room soon!
     {% else %}
         No athletes.
     {% endif %}
@@ -373,8 +375,13 @@ block are output::
 In the above, if ``athlete_list`` is not empty, the number of athletes will be
 displayed by the ``{{ athlete_list|length }}`` variable.
 
-As you can see, the ``if`` tag can take an optional ``{% else %}`` clause that
-will be displayed if the test fails.
+As you can see, the ``if`` tag may take one or several `` {% elif %}``
+clauses, as well as an ``{% else %}`` clause that will be displayed if all
+previous conditions fail. These clauses are optional.
+
+.. versionadded:: 1.4
+
+The ``if`` tag now supports ``{% elif %}`` clauses.
 
 Boolean operators
 ^^^^^^^^^^^^^^^^^
