@@ -1,8 +1,6 @@
 /*
 SelectFilter2 - Turns a multiple-select box into a filter interface.
 
-Different than SelectFilter because this is coupled to the admin framework.
-
 Requires core.js, SelectBox.js and addevent.js.
 */
 (function($) {
