@@ -1,4 +1,6 @@
 # -*- encoding: utf-8 -*-
+from __future__ import with_statement
+
 import os
 import re
 import shutil
@@ -52,7 +54,6 @@ class BasicExtractorTests(ExtractorTests):
         os.chdir(self.test_dir)
         management.call_command('makemessages', locale=LOCALE, verbosity=0)
         self.assertTrue(os.path.exists(self.PO_FILE))
-        #po_contents = open(self.PO_FILE, 'r').read()
         with open(self.PO_FILE, 'r') as fp:
             po_contents = fp.read()
             self.assertTrue('#. Translators: This comment should be extracted' in po_contents)
@@ -81,7 +82,6 @@ class BasicExtractorTests(ExtractorTests):
         os.chdir(self.test_dir)
         management.call_command('makemessages', locale=LOCALE, verbosity=0)
         self.assertTrue(os.path.exists(self.PO_FILE))
-        #po_contents = open(self.PO_FILE, 'r').read()
         with open(self.PO_FILE, 'r') as fp:
             po_contents = fp.read()
             self.assertMsgId('Literal with a percent symbol at the end %%', po_contents)
@@ -98,11 +98,11 @@ class BasicExtractorTests(ExtractorTests):
         os.chdir(self.test_dir)
         management.call_command('makemessages', locale=LOCALE, verbosity=0)
         self.assertTrue(os.path.exists(self.PO_FILE))
-        #po_contents = open(self.PO_FILE, 'r').read()
         with open(self.PO_FILE, 'r') as fp:
             po_contents = fp.read()
             self.assertMsgId('I think that 100%% is more that 50%% of anything.', po_contents)
             self.assertMsgId('I think that 100%% is more that 50%% of %(obj)s.', po_contents)
+            self.assertMsgId("Blocktrans extraction shouldn't double escape this: %%, a=%(a)s", po_contents)
 
     def test_extraction_error(self):
         os.chdir(self.test_dir)
@@ -128,7 +128,6 @@ class BasicExtractorTests(ExtractorTests):
         os.chdir(self.test_dir)
         management.call_command('makemessages', locale=LOCALE, verbosity=0)
         self.assertTrue(os.path.exists(self.PO_FILE))
-        #po_contents = open(self.PO_FILE, 'r').read()
         with open(self.PO_FILE, 'r') as fp:
             po_contents = fp.read()
             # {% trans %}
@@ -159,7 +158,6 @@ class JavascriptExtractorTests(ExtractorTests):
         os.chdir(self.test_dir)
         management.call_command('makemessages', domain='djangojs', locale=LOCALE, verbosity=0)
         self.assertTrue(os.path.exists(self.PO_FILE))
-        #po_contents = open(self.PO_FILE, 'r').read()
         with open(self.PO_FILE, 'r') as fp:
             po_contents = fp.read()
             self.assertMsgId('This literal should be included.', po_contents)
@@ -183,7 +181,6 @@ class IgnoredExtractorTests(ExtractorTests):
         pattern1 = os.path.join('ignore_dir', '*')
         management.call_command('makemessages', locale=LOCALE, verbosity=0, ignore_patterns=[pattern1])
         self.assertTrue(os.path.exists(self.PO_FILE))
-        #po_contents = open(self.PO_FILE, 'r').read()
         with open(self.PO_FILE, 'r') as fp:
             po_contents = fp.read()
             self.assertMsgId('This literal should be included.', po_contents)
@@ -215,7 +212,6 @@ class SymlinkExtractorTests(ExtractorTests):
             os.chdir(self.test_dir)
             management.call_command('makemessages', locale=LOCALE, verbosity=0, symlinks=True)
             self.assertTrue(os.path.exists(self.PO_FILE))
-            #po_contents = open(self.PO_FILE, 'r').read()
             with open(self.PO_FILE, 'r') as fp:
                 po_contents = fp.read()
                 self.assertMsgId('This literal should be included.', po_contents)
@@ -228,7 +224,6 @@ class CopyPluralFormsExtractorTests(ExtractorTests):
         os.chdir(self.test_dir)
         management.call_command('makemessages', locale=LOCALE, verbosity=0)
         self.assertTrue(os.path.exists(self.PO_FILE))
-        #po_contents = open(self.PO_FILE, 'r').read()
         with open(self.PO_FILE, 'r') as fp:
             po_contents = fp.read()
             self.assertTrue('Plural-Forms: nplurals=2; plural=(n != 1)' in po_contents)
@@ -240,7 +235,6 @@ class NoWrapExtractorTests(ExtractorTests):
         os.chdir(self.test_dir)
         management.call_command('makemessages', locale=LOCALE, verbosity=0, no_wrap=True)
         self.assertTrue(os.path.exists(self.PO_FILE))
-        #po_contents = open(self.PO_FILE, 'r').read()
         with open(self.PO_FILE, 'r') as fp:
             po_contents = fp.read()
             self.assertMsgId('This literal should also be included wrapped or not wrapped depending on the use of the --no-wrap option.', po_contents)
@@ -249,7 +243,6 @@ class NoWrapExtractorTests(ExtractorTests):
         os.chdir(self.test_dir)
         management.call_command('makemessages', locale=LOCALE, verbosity=0, no_wrap=False)
         self.assertTrue(os.path.exists(self.PO_FILE))
-        #po_contents = open(self.PO_FILE, 'r').read()
         with open(self.PO_FILE, 'r') as fp:
             po_contents = fp.read()
             self.assertMsgId('""\n"This literal should also be included wrapped or not wrapped depending on the "\n"use of the --no-wrap option."', po_contents, use_quotes=False)
@@ -261,7 +254,6 @@ class NoLocationExtractorTests(ExtractorTests):
         os.chdir(self.test_dir)
         management.call_command('makemessages', locale=LOCALE, verbosity=0, no_location=True)
         self.assertTrue(os.path.exists(self.PO_FILE))
-        #po_contents = open(self.PO_FILE, 'r').read()
         with open(self.PO_FILE, 'r') as fp:
             po_contents = fp.read()
             self.assertFalse('#: templates/test.html:55' in po_contents)
@@ -270,7 +262,6 @@ class NoLocationExtractorTests(ExtractorTests):
         os.chdir(self.test_dir)
         management.call_command('makemessages', locale=LOCALE, verbosity=0, no_location=False)
         self.assertTrue(os.path.exists(self.PO_FILE))
-        #po_contents = open(self.PO_FILE, 'r').read()
         with open(self.PO_FILE, 'r') as fp:
             po_contents = fp.read()
             self.assertTrue('#: templates/test.html:55' in po_contents)

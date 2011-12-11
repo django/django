@@ -67,6 +67,8 @@ continued here.{% endcomment %}
 {% blocktrans context "Special blocktrans context #3" count 2 %}Translatable literal #8c-singular{% plural %}Translatable literal #8c-plural{% endblocktrans %}
 {% blocktrans with a=1 context "Special blocktrans context #4" %}Translatable literal #8d {{ a }}{% endblocktrans %}
 
+{% blocktrans with a=1 %}Blocktrans extraction shouldn't double escape this: %%, a={{ a }}{% endblocktrans %}
+
 {% trans "Literal with a percent symbol at the end %" %}
 {% trans "Literal with a percent % symbol in the middle" %}
 {% trans "Completed 50% of all the tasks" %}
