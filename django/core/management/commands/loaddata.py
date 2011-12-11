@@ -7,6 +7,7 @@ import os
 import gzip
 import zipfile
 from optparse import make_option
+import traceback
 
 from django.conf import settings
 from django.core import serializers
@@ -211,7 +212,6 @@ class Command(BaseCommand):
                             except (SystemExit, KeyboardInterrupt):
                                 raise
                             except Exception:
-                                import traceback
                                 fixture.close()
                                 if commit:
                                     transaction.rollback(using=using)

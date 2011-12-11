@@ -7,6 +7,7 @@ be executed through ``django-admin.py`` or ``manage.py``).
 import os
 import sys
 from optparse import make_option, OptionParser
+import traceback
 
 import django
 from django.core.exceptions import ImproperlyConfigured
@@ -197,8 +198,9 @@ class BaseCommand(object):
         ``self.requires_model_validation``). If the command raises a
         ``CommandError``, intercept it and print it sensibly to
         stderr.
-
         """
+        show_traceback = options.get('traceback', False)
+
         # Switch to English, because django-admin.py creates database content
         # like permissions, and those shouldn't contain any translations.
         # But only do this if we can assume we have a working settings file,
@@ -212,8 +214,12 @@ class BaseCommand(object):
             except ImportError, e:
                 # If settings should be available, but aren't,
                 # raise the error and quit.
-                sys.stderr.write(smart_str(self.style.ERROR('Error: %s\n' % e)))
+                if show_traceback:
+                    traceback.print_exc()
+                else:
+                    sys.stderr.write(smart_str(self.style.ERROR('Error: %s\n' % e)))
                 sys.exit(1)
+
         try:
             self.stdout = options.get('stdout', sys.stdout)
             self.stderr = options.get('stderr', sys.stderr)
@@ -232,7 +238,10 @@ class BaseCommand(object):
                 if self.output_transaction:
                     self.stdout.write('\n' + self.style.SQL_KEYWORD("COMMIT;") + '\n')
         except CommandError, e:
-            self.stderr.write(smart_str(self.style.ERROR('Error: %s\n' % e)))
+            if show_traceback:
+                traceback.print_exc()
+            else:
+                self.stderr.write(smart_str(self.style.ERROR('Error: %s\n' % e)))
             sys.exit(1)
         if saved_lang is not None:
             translation.activate(saved_lang)

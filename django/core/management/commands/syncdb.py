@@ -1,5 +1,6 @@
 from optparse import make_option
 import sys
+import traceback
 
 from django.conf import settings
 from django.core.management.base import NoArgsCommand
@@ -129,7 +130,6 @@ class Command(NoArgsCommand):
                             sys.stderr.write("Failed to install custom SQL for %s.%s model: %s\n" % \
                                                 (app_name, model._meta.object_name, e))
                             if show_traceback:
-                                import traceback
                                 traceback.print_exc()
                             transaction.rollback_unless_managed(using=db)
                         else:
