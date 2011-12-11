@@ -439,6 +439,7 @@ block_re = re.compile(r"""^\s*blocktrans(\s+.*context\s+(?:"[^"]*?")|(?:'[^']*?'
 endblock_re = re.compile(r"""^\s*endblocktrans$""")
 plural_re = re.compile(r"""^\s*plural$""")
 constant_re = re.compile(r"""_\(((?:".*?")|(?:'.*?'))\)""")
+one_percent_re = re.compile(r"""(?<!%)%(?!%)""")
 
 
 def templatize(src, origin=None):
@@ -529,6 +530,7 @@ def templatize(src, origin=None):
                         g = g.strip('"')
                     elif g[0] == "'":
                         g = g.strip("'")
+                    g = one_percent_re.sub('%%', g)
                     if imatch.group(2):
                         # A context is provided
                         context_match = context_re.match(imatch.group(2))

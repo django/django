@@ -31,7 +31,8 @@ if can_run_extraction_tests:
         CopyPluralFormsExtractorTests, NoWrapExtractorTests,
         NoLocationExtractorTests)
 if can_run_compilation_tests:
-    from .commands.compilation import MessageCompilationTests, PoFileTests
+    from .commands.compilation import (PoFileTests, PoFileContentsTests,
+        PercentRenderingTests)
 from .contenttypes.tests import ContentTypeTests
 from .forms import I18nForm, SelectDateForm, SelectDateWidget, CompanyForm
 from .models import Company, TestModel

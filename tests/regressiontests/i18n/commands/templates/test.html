@@ -66,3 +66,12 @@ continued here.{% endcomment %}
 {% blocktrans count 2 context "Special blocktrans context #2" %}Translatable literal #8b-singular{% plural %}Translatable literal #8b-plural{% endblocktrans %}
 {% blocktrans context "Special blocktrans context #3" count 2 %}Translatable literal #8c-singular{% plural %}Translatable literal #8c-plural{% endblocktrans %}
 {% blocktrans with a=1 context "Special blocktrans context #4" %}Translatable literal #8d {{ a }}{% endblocktrans %}
+
+{% trans "Literal with a percent symbol at the end %" %}
+{% trans "Literal with a percent % symbol in the middle" %}
+{% trans "Completed 50% of all the tasks" %}
+{% trans "Completed 99% of all the tasks" context "ctx0" %}
+{% trans "Shouldn't double escape this sequence: %% (two percent signs)" %}
+{% trans "Shouldn't double escape this sequence %% either" context "ctx1" %}
+{% trans "Looks like a str fmt spec %s but shouldn't be interpreted as such" %}
+{% trans "Looks like a str fmt spec % o but shouldn't be interpreted as such" %}
