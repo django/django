@@ -174,12 +174,21 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 conn_params['port'] = settings_dict['PORT']
             self.connection = Database.connect(**conn_params)
             self.connection.set_client_encoding('UTF8')
-            # Set the time zone in autocommit mode (see #17062)
             tz = 'UTC' if settings.USE_TZ else settings_dict.get('TIME_ZONE')
             if tz:
-                self.connection.set_isolation_level(
-                        psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT)
-                self.connection.cursor().execute("SET TIME ZONE %s", [tz])
+                try:
+                    get_parameter_status = self.connection.get_parameter_status
+                except AttributeError:
+                    # psycopg2 < 2.0.12 doesn't have get_parameter_status
+                    conn_tz = None
+                else:
+                    conn_tz = get_parameter_status('TimeZone')
+
+                if conn_tz != tz:
+                    # Set the time zone in autocommit mode (see #17062)
+                    self.connection.set_isolation_level(
+                            psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT)
+                    self.connection.cursor().execute("SET TIME ZONE %s", [tz])
             self.connection.set_isolation_level(self.isolation_level)
             self._get_pg_version()
             connection_created.send(sender=self.__class__, connection=self)

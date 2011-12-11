@@ -33,6 +33,26 @@ aggregate with a database backend that falls within the affected release range.
 .. _known to be faulty: http://archives.postgresql.org/pgsql-bugs/2007-07/msg00046.php
 .. _Release 8.2.5: http://developer.postgresql.org/pgdocs/postgres/release-8-2-5.html
 
+Optimizing PostgreSQL's configuration
+-------------------------------------
+
+Django needs the following parameters for its database connections:
+
+- ``client_encoding``: ``'UTF8'``,
+- ``default_transaction_isolation``: ``'read committed'``,
+- ``timezone``: ``'UTC'`` when :setting:`USE_TZ` is ``True``, value of
+  :setting:`TIME_ZONE` otherwise.
+
+If these parameters already have the correct values, Django won't set them for
+every new connection, which improves performance slightly. You can configure
+them directly in :file:`postgresql.conf` or more conveniently per database
+user with `ALTER ROLE`_.
+
+Django will work just fine without this optimization, but each new connection
+will do some additional queries to set these parameters.
+
+.. _ALTER ROLE: http://www.postgresql.org/docs/current/interactive/sql-alterrole.html
+
 Transaction handling
 ---------------------
 
@@ -48,9 +68,8 @@ Autocommit mode
 
 If your application is particularly read-heavy and doesn't make many
 database writes, the overhead of a constantly open transaction can
-sometimes be noticeable. For those situations, if you're using the
-``postgresql_psycopg2`` backend, you can configure Django to use
-*"autocommit"* behavior for the connection, meaning that each database
+sometimes be noticeable. For those situations, you can configure Django
+to use *"autocommit"* behavior for the connection, meaning that each database
 operation will normally be in its own transaction, rather than having
 the transaction extend over multiple operations. In this case, you can
 still manually start a transaction if you're doing something that
