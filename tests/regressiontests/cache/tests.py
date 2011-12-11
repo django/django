@@ -176,6 +176,17 @@ class DummyCacheTests(unittest.TestCase):
 class BaseCacheTests(object):
     # A common set of tests to apply to all cache backends
 
+    def _get_request_cache(self, path):
+        request = HttpRequest()
+        request.META = {
+            'SERVER_NAME': 'testserver',
+            'SERVER_PORT': 80,
+        }
+        request.path = request.path_info = path
+        request._cache_update_cache = True
+        request.method = 'GET'
+        return request
+
     def test_simple(self):
         # Simple cache set/get works
         self.cache.set("key", "value")
@@ -740,6 +751,35 @@ class BaseCacheTests(object):
         self.assertEqual(self.custom_key_cache.get('answer2'), 42)
         self.assertEqual(self.custom_key_cache2.get('answer2'), 42)
 
+
+    def test_cache_write_unpickable_object(self):
+        update_middleware = UpdateCacheMiddleware()
+        update_middleware.cache = self.cache
+
+        fetch_middleware = FetchFromCacheMiddleware()
+        fetch_middleware.cache = self.cache
+
+        request = self._get_request_cache('/cache/test')
+        get_cache_data = FetchFromCacheMiddleware().process_request(request)
+        self.assertEqual(get_cache_data, None)
+
+        response = HttpResponse()
+        content = 'Testing cookie serialization.'
+        response.content = content
+        response.set_cookie('foo', 'bar')
+
+        update_middleware.process_response(request, response)
+
+        get_cache_data = fetch_middleware.process_request(request)
+        self.assertNotEqual(get_cache_data, None)
+        self.assertEqual(get_cache_data.content, content)
+        self.assertEqual(get_cache_data.cookies, response.cookies)
+
+        update_middleware.process_response(request, get_cache_data)
+        get_cache_data = fetch_middleware.process_request(request)
+        self.assertNotEqual(get_cache_data, None)
+        self.assertEqual(get_cache_data.content, content)
+        self.assertEqual(get_cache_data.cookies, response.cookies)
 
 def custom_key_func(key, key_prefix, version):
     "A customized cache key function"
