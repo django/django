@@ -155,7 +155,7 @@ class SelectForUpdateTests(TransactionTestCase):
         Person instances. After the select_for_update, it attempts
         to update the name of the only record, save, and commit.
 
-        In general, this will be run in a separate thread.
+        This function expects to run in a separate thread.
         """
         status.append('started')
         try:
@@ -173,6 +173,10 @@ class SelectForUpdateTests(TransactionTestCase):
             status.append(e)
         except Exception, e:
             raise
+        finally:
+            # This method is run in a separate thread. It uses its own
+            # database connection. Close it without waiting for the GC.
+            connection.close()
 
     @requires_threading
     @skipUnlessDBFeature('has_select_for_update')
@@ -244,6 +248,11 @@ class SelectForUpdateTests(TransactionTestCase):
                 )
             except DatabaseError, e:
                 status.append(e)
+            finally:
+                # This method is run in a separate thread. It uses its own
+                # database connection. Close it without waiting for the GC.
+                connection.close()
+
         status = []
         thread = threading.Thread(target=raw, kwargs={'status': status})
         thread.start()
