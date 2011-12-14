@@ -5,7 +5,7 @@
 # NAME and potentially authentication information. See the
 # following section in the docs for more information:
 #
-# http://docs.djangoproject.com/en/dev/internals/contributing/#unit-tests
+# https://docs.djangoproject.com/en/dev/internals/contributing/writing-code/unit-tests/
 #
 # The different databases that Django supports behave differently in certain
 # situations, so it is recommended to run the test suite against as many
