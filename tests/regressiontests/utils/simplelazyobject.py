@@ -1,4 +1,5 @@
 import copy
+import pickle
 
 from django.utils.unittest import TestCase
 from django.utils.functional import SimpleLazyObject, empty
@@ -96,3 +97,12 @@ class TestUtilsSimpleLazyObject(TestCase):
         self.assertTrue(x)
         x = SimpleLazyObject(lambda: 0)
         self.assertFalse(x)
+
+    def test_pickle_complex(self):
+        # See ticket #16563
+        x = SimpleLazyObject(complex_object)
+        pickled = pickle.dumps(x)
+        unpickled = pickle.loads(pickled)
+        self.assertEqual(unpickled, x)
+        self.assertEqual(unicode(unpickled), unicode(x))
+        self.assertEqual(unpickled.name, x.name)

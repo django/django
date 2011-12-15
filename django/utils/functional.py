@@ -261,6 +261,16 @@ class SimpleLazyObject(LazyObject):
         else:
             return copy.deepcopy(self._wrapped, memo)
 
+    # Because we have messed with __class__ below, we confuse pickle as to what
+    # class we are pickling. It also appears to stop __reduce__ from being
+    # called. So, we define __getstate__ in a way that cooperates with the way
+    # that pickle interprets this class.  This fails when the wrapped class is a
+    # builtin, but it is better than nothing.
+    def __getstate__(self):
+        if self._wrapped is empty:
+            self._setup()
+        return self._wrapped.__dict__
+
     # Need to pretend to be the wrapped class, for the sake of objects that care
     # about this (especially in equality tests)
     __class__ = property(new_method_proxy(operator.attrgetter("__class__")))
