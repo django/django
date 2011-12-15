@@ -294,21 +294,83 @@ Contextual markers are also supported by the :ttag:`trans` and
 Lazy translation
 ----------------
 
-Use the function :func:`django.utils.translation.ugettext_lazy()` to translate
-strings lazily -- when the value is accessed rather than when the
-``ugettext_lazy()`` function is called.
+Use the lazy versions of translation functions in
+:mod:`django.utils.translation` (easily recognizable by the ``lazy`` suffix in
+their names) to translate strings lazily -- when the value is accessed rather
+than when they are called.
 
-For example, to translate a model's ``help_text``, do the following::
+These functions store a lazy reference to the string -- not the actual
+translation. The translation itself will be done when the string is used in a
+string context, such as in template rendering.
+
+This is essential when calls to these functions are located in code paths that
+are executed at module load time.
+
+As this is something that can easily happen when defining models (the
+declarative notation of Django models is implemented in a way such that model
+fields are actually class level attributes) this means you need to make sure to
+use lazy translations in the following cases:
+
+Model fields and relationship ``verbose_name`` and ``help_text`` option values
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For example, to translate the help text of the *name* field in the following
+model, do the following::
 
     from django.utils.translation import ugettext_lazy
 
     class MyThing(models.Model):
         name = models.CharField(help_text=ugettext_lazy('This is the help text'))
 
-In this example, ``ugettext_lazy()`` stores a lazy reference to the string --
-not the actual translation. The translation itself will be done when the string
-is used in a string context, such as template rendering on the Django admin
-site.
+You can mark names of ``ForeignKey``, ``ManyTomanyField`` or ``OneToOneField``
+relationship as translatable by using their ``verbose_name`` options::
+
+    from django.utils.translation import ugettext_lazy as _
+
+    class MyThing(models.Model):
+        kind = models.ForeignKey(ThingKind, related_name='kinds',
+                                 verbose_name=_('kind'))
+
+Just like you would do in :attr:`~django.db.models.Options.verbose_name` you
+should provide a lowercase verbose name text for the relation as Django will
+automatically titlecase it when required.
+
+Model verbose names values
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+It is recommended to always provide explicit
+:attr:`~django.db.models.Options.verbose_name` and
+:attr:`~django.db.models.Options.verbose_name_plural` options rather than
+relying on the fallback English-centric and somewhat naïve determination of
+verbose names Django performs bu looking at the model's class name::
+
+    from django.utils.translation import ugettext_lazy
+
+    class MyThing(models.Model):
+        name = models.CharField(_('name'), help_text=ugettext_lazy('This is the help text'))
+
+        class Meta:
+            verbose_name = ugettext_lazy('my thing')
+            verbose_name_plural = ugettext_lazy('my things')
+
+Model methods ``short_description`` attribute values
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For model methods, you can provide translations to Django and the admin site
+with the ``short_description`` attribute::
+
+    from django.utils.translation import ugettext_lazy as _
+
+    class MyThing(models.Model):
+        kind = models.ForeignKey(ThingKind, related_name='kinds',
+                                 verbose_name=_('kind'))
+
+        def is_mouse(self):
+            return self.kind.type == MOUSE_TYPE
+        is_mouse.short_description = _('Is it a mouse?')
+
+Notes on translation in models
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The result of a ``ugettext_lazy()`` call can be used wherever you would use a
 unicode string (an object with type ``unicode``) in Python. If you try to use
@@ -328,63 +390,13 @@ If you ever see output that looks like ``"hello
 <django.utils.functional...>"``, you have tried to insert the result of
 ``ugettext_lazy()`` into a bytestring. That's a bug in your code.
 
-If you don't like the verbose name ``ugettext_lazy``, you can just alias it as
+If you don't like the long ``ugettext_lazy`` name, you can just alias it as
 ``_`` (underscore), like so::
 
     from django.utils.translation import ugettext_lazy as _
 
     class MyThing(models.Model):
         name = models.CharField(help_text=_('This is the help text'))
-
-Always use lazy translations in :doc:`Django models </topics/db/models>`.
-Field names and table names should be marked for translation (otherwise, they
-won't be translated in the admin interface). This means writing explicit
-``verbose_name`` and ``verbose_name_plural`` options in the ``Meta`` class,
-though, rather than relying on Django's default determination of
-``verbose_name`` and ``verbose_name_plural`` by looking at the model's class
-name::
-
-    from django.utils.translation import ugettext_lazy as _
-
-    class MyThing(models.Model):
-        name = models.CharField(_('name'), help_text=_('This is the help text'))
-
-        class Meta:
-            verbose_name = _('my thing')
-            verbose_name_plural = _('my things')
-
-Notes on model classes translation
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Your model classes may not only contain normal fields: you may have relations
-(with a ``ForeignKey`` field) or additional model methods you may use for
-columns in the Django admin site.
-
-If you have models with foreign keys and you use the Django admin site, you can
-provide translations for the relation itself by using the ``verbose_name``
-parameter on the ``ForeignKey`` object::
-
-    class MyThing(models.Model):
-        kind = models.ForeignKey(ThingKind, related_name='kinds',
-                                 verbose_name=_('kind'))
-
-As you would do for the ``verbose_name`` and ``verbose_name_plural`` settings of
-a model Meta class, you should provide a lowercase verbose name text for the
-relation as Django will automatically titlecase it when required.
-
-For model methods, you can provide translations to Django and the admin site
-with the ``short_description`` parameter set on the corresponding method::
-
-    class MyThing(models.Model):
-        kind = models.ForeignKey(ThingKind, related_name='kinds',
-                                 verbose_name=_('kind'))
-
-        def is_mouse(self):
-            return self.kind.type == MOUSE_TYPE
-        is_mouse.short_description = _('Is it a mouse?')
-
-As always with model classes translations, don't forget to use the lazy
-translation method!
 
 Working with lazy translation objects
 -------------------------------------
