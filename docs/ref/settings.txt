@@ -1530,6 +1530,64 @@ better. ``django-admin.py startproject`` creates one automatically.
 
 .. setting:: SEND_BROKEN_LINK_EMAILS
 
+SECURE_PROXY_SSL_HEADER
+-----------------------
+
+.. versionadded:: 1.4
+
+Default: ``None``
+
+A tuple representing a HTTP header/value combination that signifies a request
+is secure. This controls the behavior of the request object's ``is_secure()``
+method.
+
+This takes some explanation. By default, ``is_secure()`` is able to determine
+whether a request is secure by looking at whether the requested URL uses
+"https://".
+
+If your Django app is behind a proxy, though, the proxy may be "swallowing" the
+fact that a request is HTTPS, using a non-HTTPS connection between the proxy
+and Django. In this case, ``is_secure()`` would always return ``False`` -- even
+for requests that were made via HTTPS by the end user.
+
+In this situation, you'll want to configure your proxy to set a custom HTTP
+header that tells Django whether the request came in via HTTPS, and you'll want
+to set ``SECURE_PROXY_SSL_HEADER`` so that Django knows what header to look
+for.
+
+You'll need to set a tuple with two elements -- the name of the header to look
+for and the required value. For example::
+
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTOCOL', 'https')
+
+Here, we're telling Django that we trust the ``X-Forwarded-Protocol`` header
+that comes from our proxy, and any time its value is ``'https'``, then the
+request is guaranteed to be secure (i.e., it originally came in via HTTPS).
+Obviously, you should *only* set this setting if you control your proxy or
+have some other guarantee that it sets/strips this header appropriately.
+
+Note that the header needs to be in the format as used by ``request.META`` --
+all caps and likely starting with ``HTTP_``. (Remember, Django automatically
+adds ``'HTTP_'`` to the start of x-header names before making the header
+available in ``request.META``.)
+
+.. warning::
+
+    **You will probably open security holes in your site if you set this without knowing what you're doing. Seriously.**
+
+    Make sure ALL of the following are true before setting this (assuming the
+    values from the example above):
+
+    * Your Django app is behind a proxy.
+    * Your proxy strips the 'X-Forwarded-Protocol' header from all incoming
+      requests. In other words, if end users include that header in their
+      requests, the proxy will discard it.
+    * Your proxy sets the 'X-Forwarded-Protocol' header and sends it to Django,
+      but only for requests that originally come in via HTTPS.
+
+    If any of those are not true, you should keep this setting set to ``None``
+    and find another way of determining HTTPS, perhaps via custom middleware.
+
 SEND_BROKEN_LINK_EMAILS
 -----------------------
 

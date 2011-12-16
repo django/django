@@ -158,9 +158,8 @@ class WSGIRequest(http.HttpRequest):
         # Rather than crash if this doesn't happen, we encode defensively.
         return '%s%s' % (self.path, self.environ.get('QUERY_STRING', '') and ('?' + iri_to_uri(self.environ.get('QUERY_STRING', ''))) or '')
 
-    def is_secure(self):
-        return 'wsgi.url_scheme' in self.environ \
-            and self.environ['wsgi.url_scheme'] == 'https'
+    def _is_secure(self):
+        return 'wsgi.url_scheme' in self.environ and self.environ['wsgi.url_scheme'] == 'https'
 
     def _get_request(self):
         if not hasattr(self, '_request'):

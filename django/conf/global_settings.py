@@ -419,6 +419,15 @@ USE_X_FORWARDED_HOST = False
 # actual WSGI application object.
 WSGI_APPLICATION = None
 
+# If your Django app is behind a proxy that sets a header to specify secure
+# connections, AND that proxy ensures that user-submitted headers with the
+# same name are ignored (so that people can't spoof it), set this value to
+# a tuple of (header_name, header_value). For any requests that come in with
+# that header/value, request.is_secure() will return True.
+# WARNING! Only set this if you fully understand what you're doing. Otherwise,
+# you may be opening yourself up to a security risk.
+SECURE_PROXY_SSL_HEADER = None
+
 ##############
 # MIDDLEWARE #
 ##############

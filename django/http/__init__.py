@@ -113,6 +113,7 @@ class CompatCookie(SimpleCookie):
 
 from django.conf import settings
 from django.core import signing
+from django.core.exceptions import ImproperlyConfigured
 from django.core.files import uploadhandler
 from django.http.multipartparser import MultiPartParser
 from django.http.utils import *
@@ -251,8 +252,22 @@ class HttpRequest(object):
             location = urljoin(current_uri, location)
         return iri_to_uri(location)
 
-    def is_secure(self):
+    def _is_secure(self):
         return os.environ.get("HTTPS") == "on"
+
+    def is_secure(self):
+        # First, check the SECURE_PROXY_SSL_HEADER setting.
+        if settings.SECURE_PROXY_SSL_HEADER:
+            try:
+                header, value = settings.SECURE_PROXY_SSL_HEADER
+            except ValueError:
+                raise ImproperlyConfigured('The SECURE_PROXY_SSL_HEADER setting must be a tuple containing two values.')
+            if self.META.get(header, None) == value:
+                return True
+
+        # Failing that, fall back to _is_secure(), which is a hook for
+        # subclasses to implement.
+        return self._is_secure()
 
     def is_ajax(self):
         return self.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'

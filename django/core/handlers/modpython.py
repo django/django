@@ -44,7 +44,7 @@ class ModPythonRequest(http.HttpRequest):
         # doesn't always happen, so rather than crash, we defensively encode it.
         return '%s%s' % (self.path, self._req.args and ('?' + iri_to_uri(self._req.args)) or '')
 
-    def is_secure(self):
+    def _is_secure(self):
         try:
             return self._req.is_https()
         except AttributeError:
