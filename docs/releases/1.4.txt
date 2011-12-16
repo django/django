@@ -673,6 +673,32 @@ datetimes are now stored without time zone information in SQLite. When
 :setting:`USE_TZ` is ``False``, if you attempt to save an aware datetime
 object, Django raises an exception.
 
+Database connection's thread-locality
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``DatabaseWrapper`` objects (i.e. the connection objects referenced by
+``django.db.connection`` and ``django.db.connections["some_alias"]``) used to
+be thread-local. They are now global objects in order to be potentially shared
+between multiple threads. While the individual connection objects are now
+global, the ``django.db.connections`` dictionary referencing those objects is
+still thread-local. Therefore if you just use the ORM or
+``DatabaseWrapper.cursor()`` then the behavior is still the same as before.
+Note, however, that ``django.db.connection`` does not directly reference the
+default ``DatabaseWrapper`` object any more and is now a proxy to access that
+object's attributes. If you need to access the actual ``DatabaseWrapper``
+object, use ``django.db.connections[DEFAULT_DB_ALIAS]`` instead.
+
+As part of this change, all underlying SQLite connections are now enabled for
+potential thread-sharing (by passing the ``check_same_thread=False`` attribute
+to pysqlite). ``DatabaseWrapper`` however preserves the previous behavior by
+disabling thread-sharing by default, so this does not affect any existing
+code that purely relies on the ORM or on ``DatabaseWrapper.cursor()``.
+
+Finally, while it is now possible to pass connections between threads, Django
+does not make any effort to synchronize access to the underlying backend.
+Concurrency behavior is defined by the underlying backend implementation.
+Check their documentation for details.
+
 `COMMENTS_BANNED_USERS_GROUP` setting
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

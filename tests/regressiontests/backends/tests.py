@@ -3,6 +3,7 @@
 from __future__ import with_statement, absolute_import
 
 import datetime
+import threading
 
 from django.conf import settings
 from django.core.management.color import no_style
@@ -283,7 +284,7 @@ class ConnectionCreatedSignalTest(TestCase):
         connection_created.connect(receiver)
         connection.close()
         cursor = connection.cursor()
-        self.assertTrue(data["connection"] is connection)
+        self.assertTrue(data["connection"].connection is connection.connection)
 
         connection_created.disconnect(receiver)
         data.clear()
@@ -446,3 +447,94 @@ class FkConstraintsTests(TransactionTestCase):
                         connection.check_constraints()
             finally:
                 transaction.rollback()
+
+
+class ThreadTests(TestCase):
+
+    def test_default_connection_thread_local(self):
+        """
+        Ensure that the default connection (i.e. django.db.connection) is
+        different for each thread.
+        Refs #17258.
+        """
+        connections_set = set()
+        connection.cursor()
+        connections_set.add(connection.connection)
+        def runner():
+            from django.db import connection
+            connection.cursor()
+            connections_set.add(connection.connection)
+        for x in xrange(2):
+            t = threading.Thread(target=runner)
+            t.start()
+            t.join()
+        self.assertEquals(len(connections_set), 3)
+        # Finish by closing the connections opened by the other threads (the
+        # connection opened in the main thread will automatically be closed on
+        # teardown).
+        for conn in connections_set:
+            if conn != connection.connection:
+                conn.close()
+
+    def test_connections_thread_local(self):
+        """
+        Ensure that the connections are different for each thread.
+        Refs #17258.
+        """
+        connections_set = set()
+        for conn in connections.all():
+            connections_set.add(conn)
+        def runner():
+            from django.db import connections
+            for conn in connections.all():
+                connections_set.add(conn)
+        for x in xrange(2):
+            t = threading.Thread(target=runner)
+            t.start()
+            t.join()
+        self.assertEquals(len(connections_set), 6)
+        # Finish by closing the connections opened by the other threads (the
+        # connection opened in the main thread will automatically be closed on
+        # teardown).
+        for conn in connections_set:
+            if conn != connection:
+                conn.close()
+
+    def test_pass_connection_between_threads(self):
+        """
+        Ensure that a connection can be passed from one thread to the other.
+        Refs #17258.
+        """
+        models.Person.objects.create(first_name="John", last_name="Doe")
+
+        def do_thread():
+            def runner(main_thread_connection):
+                from django.db import connections
+                connections['default'] = main_thread_connection
+                try:
+                    models.Person.objects.get(first_name="John", last_name="Doe")
+                except DatabaseError, e:
+                    exceptions.append(e)
+            t = threading.Thread(target=runner, args=[connections['default']])
+            t.start()
+            t.join()
+
+        # Without touching allow_thread_sharing, which should be False by default.
+        exceptions = []
+        do_thread()
+        # Forbidden!
+        self.assertTrue(isinstance(exceptions[0], DatabaseError))
+
+        # If explicitly setting allow_thread_sharing to False
+        connections['default'].allow_thread_sharing = False
+        exceptions = []
+        do_thread()
+        # Forbidden!
+        self.assertTrue(isinstance(exceptions[0], DatabaseError))
+
+        # If explicitly setting allow_thread_sharing to True
+        connections['default'].allow_thread_sharing = True
+        exceptions = []
+        do_thread()
+        # All good
+        self.assertEqual(len(exceptions), 0)

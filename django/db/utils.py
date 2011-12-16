@@ -1,4 +1,5 @@
 import os
+from threading import local
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -50,7 +51,7 @@ class ConnectionDoesNotExist(Exception):
 class ConnectionHandler(object):
     def __init__(self, databases):
         self.databases = databases
-        self._connections = {}
+        self._connections = local()
 
     def ensure_defaults(self, alias):
         """
@@ -73,15 +74,18 @@ class ConnectionHandler(object):
             conn.setdefault(setting, None)
 
     def __getitem__(self, alias):
-        if alias in self._connections:
-            return self._connections[alias]
+        if hasattr(self._connections, alias):
+            return getattr(self._connections, alias)
 
         self.ensure_defaults(alias)
         db = self.databases[alias]
         backend = load_backend(db['ENGINE'])
         conn = backend.DatabaseWrapper(db, alias)
-        self._connections[alias] = conn
+        setattr(self._connections, alias, conn)
         return conn
+
+    def __setitem__(self, key, value):
+        setattr(self._connections, key, value)
 
     def __iter__(self):
         return iter(self.databases)

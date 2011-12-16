@@ -22,9 +22,21 @@ router = ConnectionRouter(settings.DATABASE_ROUTERS)
 # we manually create the dictionary from the settings, passing only the
 # settings that the database backends care about. Note that TIME_ZONE is used
 # by the PostgreSQL backends.
-# we load all these up for backwards compatibility, you should use
+# We load all these up for backwards compatibility, you should use
 # connections['default'] instead.
-connection = connections[DEFAULT_DB_ALIAS]
+class DefaultConnectionProxy(object):
+    """
+    Proxy for accessing the default DatabaseWrapper object's attributes. If you
+    need to access the DatabaseWrapper object itself, use
+    connections[DEFAULT_DB_ALIAS] instead.
+    """
+    def __getattr__(self, item):
+        return getattr(connections[DEFAULT_DB_ALIAS], item)
+
+    def __setattr__(self, name, value):
+        return setattr(connections[DEFAULT_DB_ALIAS], name, value)
+
+connection = DefaultConnectionProxy()
 backend = load_backend(connection.settings_dict['ENGINE'])
 
 # Register an event that closes the database connection

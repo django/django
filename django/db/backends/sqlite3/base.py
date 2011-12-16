@@ -7,10 +7,10 @@ standard library.
 
 import datetime
 import decimal
+import warnings
 import re
 import sys
 
-from django.conf import settings
 from django.db import utils
 from django.db.backends import *
 from django.db.backends.signals import connection_created
@@ -241,6 +241,21 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 'detect_types': Database.PARSE_DECLTYPES | Database.PARSE_COLNAMES,
             }
             kwargs.update(settings_dict['OPTIONS'])
+            # Always allow the underlying SQLite connection to be shareable
+            # between multiple threads. The safe-guarding will be handled at a
+            # higher level by the `BaseDatabaseWrapper.allow_thread_sharing`
+            # property. This is necessary as the shareability is disabled by
+            # default in pysqlite and it cannot be changed once a connection is
+            # opened.
+            if 'check_same_thread' in kwargs and kwargs['check_same_thread']:
+                warnings.warn(
+                    'The `check_same_thread` option was provided and set to '
+                    'True. It will be overriden with False. Use the '
+                    '`DatabaseWrapper.allow_thread_sharing` property instead '
+                    'for controlling thread shareability.',
+                    RuntimeWarning
+                )
+            kwargs.update({'check_same_thread': False})
             self.connection = Database.connect(**kwargs)
             # Register extract, date_trunc, and regexp functions.
             self.connection.create_function("django_extract", 2, _sqlite_extract)
