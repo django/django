@@ -136,7 +136,7 @@ class WSGIRequest(http.HttpRequest):
             # the path like this, but should be harmless.
             #
             # (The comparison of path_info to script_name is to work around an
-            # apparent bug in flup 1.0.1. Se Django ticket #8490).
+            # apparent bug in flup 1.0.1. See Django ticket #8490).
             path_info = u'/'
         self.environ = environ
         self.path_info = path_info
