@@ -426,5 +426,7 @@ class RequestsTests(unittest.TestCase):
 
         warnings_state = get_warnings_state()
         warnings.filterwarnings('ignore', category=DeprecationWarning, module='django.http')
-        self.assertEqual(request.body, request.raw_post_data)
-        restore_warnings_state(warnings_state)
+        try:
+            self.assertEqual(request.body, request.raw_post_data)
+        finally:
+            restore_warnings_state(warnings_state)
