@@ -130,7 +130,7 @@ class BaseDatabaseWrapper(object):
         if (not self.allow_thread_sharing
             and self._thread_ident != thread.get_ident()):
                 raise DatabaseError("DatabaseWrapper objects created in a "
-                    "thread can only be used in that same thread. The object"
+                    "thread can only be used in that same thread. The object "
                     "with alias '%s' was created in thread id %s and this is "
                     "thread id %s."
                     % (self.alias, self._thread_ident, thread.get_ident()))

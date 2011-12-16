@@ -129,6 +129,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         self.cursor().execute('SET CONSTRAINTS ALL DEFERRED')
 
     def close(self):
+        self.validate_thread_sharing()
         if self.connection is None:
             return
 
