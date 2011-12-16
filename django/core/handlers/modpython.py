@@ -12,11 +12,6 @@ from django.utils.log import getLogger
 
 logger = getLogger('django.request')
 
-
-# NOTE: do *not* import settings (or any module which eventually imports
-# settings) until after ModPythonHandler has been called; otherwise os.environ
-# won't be set up correctly (with respect to settings).
-
 class ModPythonRequest(http.HttpRequest):
     def __init__(self, req):
         self._req = req
