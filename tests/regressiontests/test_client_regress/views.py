@@ -1,3 +1,5 @@
+import warnings
+
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
@@ -79,7 +81,7 @@ def return_json_file(request):
         charset = settings.DEFAULT_CHARSET
 
     # This just checks that the uploaded data is JSON
-    obj_dict = simplejson.loads(request.raw_post_data.decode(charset))
+    obj_dict = simplejson.loads(request.body.decode(charset))
     obj_json = simplejson.dumps(obj_dict, encoding=charset,
                                 cls=DjangoJSONEncoder,
                                 ensure_ascii=False)
@@ -92,9 +94,9 @@ def check_headers(request):
     "A view that responds with value of the X-ARG-CHECK header"
     return HttpResponse('HTTP_X_ARG_CHECK: %s' % request.META.get('HTTP_X_ARG_CHECK', 'Undefined'))
 
-def raw_post_data(request):
-    "A view that is requested with GET and accesses request.raw_post_data. Refs #14753."
-    return HttpResponse(request.raw_post_data)
+def body(request):
+    "A view that is requested with GET and accesses request.body. Refs #14753."
+    return HttpResponse(request.body)
 
 def read_all(request):
     "A view that is requested with accesses request.read()."

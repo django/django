@@ -995,3 +995,10 @@ useful, it was removed in Django 1.4. If you relied on it, you must edit your
 settings file to list all your applications explicitly.
 
 .. _this can't be done reliably: http://docs.python.org/tutorial/modules.html#importing-from-a-package
+
+``HttpRequest.raw_post_data`` renamed to ``HttpRequest.body``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This attribute was confusingly named ``HttpRequest.raw_post_data``, but it
+actually provided the body of the HTTP request. It's been renamed to
+``HttpRequest.body``, and ``HttpRequest.raw_post_data`` has been deprecated.

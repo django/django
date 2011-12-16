@@ -1,4 +1,5 @@
 import time
+import warnings
 from datetime import datetime, timedelta
 from StringIO import StringIO
 
@@ -6,6 +7,7 @@ from django.conf import settings
 from django.core.handlers.modpython import ModPythonRequest
 from django.core.handlers.wsgi import WSGIRequest, LimitedStream
 from django.http import HttpRequest, HttpResponse, parse_cookie, build_request_repr
+from django.test.utils import get_warnings_state, restore_warnings_state
 from django.utils import unittest
 from django.utils.http import cookie_date
 
@@ -294,19 +296,19 @@ class RequestsTests(unittest.TestCase):
     def test_read_after_value(self):
         """
         Reading from request is allowed after accessing request contents as
-        POST or raw_post_data.
+        POST or body.
         """
         payload = 'name=value'
         request = WSGIRequest({'REQUEST_METHOD': 'POST',
                                'CONTENT_LENGTH': len(payload),
                                'wsgi.input': StringIO(payload)})
         self.assertEqual(request.POST, {u'name': [u'value']})
-        self.assertEqual(request.raw_post_data, 'name=value')
+        self.assertEqual(request.body, 'name=value')
         self.assertEqual(request.read(), 'name=value')
 
     def test_value_after_read(self):
         """
-        Construction of POST or raw_post_data is not allowed after reading
+        Construction of POST or body is not allowed after reading
         from request.
         """
         payload = 'name=value'
@@ -314,16 +316,16 @@ class RequestsTests(unittest.TestCase):
                                'CONTENT_LENGTH': len(payload),
                                'wsgi.input': StringIO(payload)})
         self.assertEqual(request.read(2), 'na')
-        self.assertRaises(Exception, lambda: request.raw_post_data)
+        self.assertRaises(Exception, lambda: request.body)
         self.assertEqual(request.POST, {})
 
-    def test_raw_post_data_after_POST_multipart(self):
+    def test_body_after_POST_multipart(self):
         """
-        Reading raw_post_data after parsing multipart is not allowed
+        Reading body after parsing multipart is not allowed
         """
         # Because multipart is used for large amounts fo data i.e. file uploads,
         # we don't want the data held in memory twice, and we don't want to
-        # silence the error by setting raw_post_data = '' either.
+        # silence the error by setting body = '' either.
         payload = "\r\n".join([
                 '--boundary',
                 'Content-Disposition: form-data; name="name"',
@@ -336,7 +338,7 @@ class RequestsTests(unittest.TestCase):
                                'CONTENT_LENGTH': len(payload),
                                'wsgi.input': StringIO(payload)})
         self.assertEqual(request.POST, {u'name': [u'value']})
-        self.assertRaises(Exception, lambda: request.raw_post_data)
+        self.assertRaises(Exception, lambda: request.body)
 
     def test_POST_multipart_with_content_length_zero(self):
         """
@@ -366,33 +368,33 @@ class RequestsTests(unittest.TestCase):
                                'wsgi.input': StringIO(payload)})
         self.assertEqual(list(request), ['name=value'])
 
-    def test_POST_after_raw_post_data_read(self):
+    def test_POST_after_body_read(self):
         """
-        POST should be populated even if raw_post_data is read first
+        POST should be populated even if body is read first
         """
         payload = 'name=value'
         request = WSGIRequest({'REQUEST_METHOD': 'POST',
                                'CONTENT_LENGTH': len(payload),
                                'wsgi.input': StringIO(payload)})
-        raw_data = request.raw_post_data
+        raw_data = request.body
         self.assertEqual(request.POST, {u'name': [u'value']})
 
-    def test_POST_after_raw_post_data_read_and_stream_read(self):
+    def test_POST_after_body_read_and_stream_read(self):
         """
-        POST should be populated even if raw_post_data is read first, and then
+        POST should be populated even if body is read first, and then
         the stream is read second.
         """
         payload = 'name=value'
         request = WSGIRequest({'REQUEST_METHOD': 'POST',
                                'CONTENT_LENGTH': len(payload),
                                'wsgi.input': StringIO(payload)})
-        raw_data = request.raw_post_data
+        raw_data = request.body
         self.assertEqual(request.read(1), u'n')
         self.assertEqual(request.POST, {u'name': [u'value']})
 
-    def test_POST_after_raw_post_data_read_and_stream_read_multipart(self):
+    def test_POST_after_body_read_and_stream_read_multipart(self):
         """
-        POST should be populated even if raw_post_data is read first, and then
+        POST should be populated even if body is read first, and then
         the stream is read second. Using multipart/form-data instead of urlencoded.
         """
         payload = "\r\n".join([
@@ -406,7 +408,23 @@ class RequestsTests(unittest.TestCase):
                                'CONTENT_TYPE': 'multipart/form-data; boundary=boundary',
                                'CONTENT_LENGTH': len(payload),
                                'wsgi.input': StringIO(payload)})
-        raw_data = request.raw_post_data
+        raw_data = request.body
         # Consume enough data to mess up the parsing:
         self.assertEqual(request.read(13), u'--boundary\r\nC')
         self.assertEqual(request.POST, {u'name': [u'value']})
+
+    def test_raw_post_data_returns_body(self):
+        """
+        HttpRequest.raw_post_body should be the same as HttpRequest.body
+        """
+        payload = 'Hello There!'
+        request = WSGIRequest({
+            'REQUEST_METHOD': 'POST',
+            'CONTENT_LENGTH': len(payload),
+            'wsgi.input': StringIO(payload)
+        })
+
+        warnings_state = get_warnings_state()
+        warnings.filterwarnings('ignore', category=DeprecationWarning, module='django.http')
+        self.assertEqual(request.body, request.raw_post_data)
+        restore_warnings_state(warnings_state)

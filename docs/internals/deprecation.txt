@@ -257,6 +257,10 @@ these changes.
 * Setting the ``is_safe`` and ``needs_autoescape`` flags as attributes of
   template filter functions will no longer be supported.
 
+* The attribute ``HttpRequest.raw_post_data`` was renamed to ``HttpRequest.body``
+  in 1.4. The backward compatibility will be removed --
+  ``HttpRequest.raw_post_data`` will no longer work.
+
 2.0
 ---
 

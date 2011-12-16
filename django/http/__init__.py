@@ -4,6 +4,8 @@ import datetime
 import os
 import re
 import time
+import warnings
+
 from pprint import pformat
 from urllib import urlencode, quote
 from urlparse import urljoin
@@ -315,14 +317,19 @@ class HttpRequest(object):
         parser = MultiPartParser(META, post_data, self.upload_handlers, self.encoding)
         return parser.parse()
 
-    def _get_raw_post_data(self):
-        if not hasattr(self, '_raw_post_data'):
+    @property
+    def body(self):
+        if not hasattr(self, '_body'):
             if self._read_started:
-                raise Exception("You cannot access raw_post_data after reading from request's data stream")
-            self._raw_post_data = self.read()
-            self._stream = StringIO(self._raw_post_data)
-        return self._raw_post_data
-    raw_post_data = property(_get_raw_post_data)
+                raise Exception("You cannot access body after reading from request's data stream")
+            self._body = self.read()
+            self._stream = StringIO(self._body)
+        return self._body
+
+    @property
+    def raw_post_data(self):
+        warnings.warn('HttpRequest.raw_post_data has been deprecated. Use HttpRequest.body instead.', PendingDeprecationWarning)
+        return self.body
 
     def _mark_post_parse_error(self):
         self._post = QueryDict('')
@@ -334,14 +341,14 @@ class HttpRequest(object):
         if self.method != 'POST':
             self._post, self._files = QueryDict('', encoding=self._encoding), MultiValueDict()
             return
-        if self._read_started and not hasattr(self, '_raw_post_data'):
+        if self._read_started and not hasattr(self, '_body'):
             self._mark_post_parse_error()
             return
 
         if self.META.get('CONTENT_TYPE', '').startswith('multipart'):
-            if hasattr(self, '_raw_post_data'):
+            if hasattr(self, '_body'):
                 # Use already read data
-                data = StringIO(self._raw_post_data)
+                data = StringIO(self._body)
             else:
                 data = self
             try:
@@ -357,14 +364,14 @@ class HttpRequest(object):
                 self._mark_post_parse_error()
                 raise
         else:
-            self._post, self._files = QueryDict(self.raw_post_data, encoding=self._encoding), MultiValueDict()
+            self._post, self._files = QueryDict(self.body, encoding=self._encoding), MultiValueDict()
 
     ## File-like and iterator interface.
     ##
     ## Expects self._stream to be set to an appropriate source of bytes by
     ## a corresponding request subclass (WSGIRequest or ModPythonRequest).
     ## Also when request data has already been read by request.POST or
-    ## request.raw_post_data, self._stream points to a StringIO instance
+    ## request.body, self._stream points to a StringIO instance
     ## containing that data.
 
     def read(self, *args, **kwargs):

@@ -30,6 +30,20 @@ Attributes
 
 All attributes except ``session`` should be considered read-only.
 
+.. attribute:: HttpRequest.body
+
+    .. versionchanged:: 1.4
+    Before Django 1.4, ``HttpRequest.body`` was named ``HttpRequest.raw_post_data``.
+
+    The raw HTTP request body as a byte string. This is useful for processing
+    data in different ways than conventional HTML forms: binary images,
+    XML payload etc. For processing conventional form data, use ``HttpRequest.POST``.
+
+    .. versionadded:: 1.3
+
+    You can also read from an HttpRequest using a file-like interface. See
+    :meth:`HttpRequest.read()`.
+
 .. attribute:: HttpRequest.path
 
     A string representing the full path to the requested page, not including
@@ -169,17 +183,6 @@ All attributes except ``session`` should be considered read-only.
     session. This is only available if your Django installation has session
     support activated. See the :doc:`session documentation
     </topics/http/sessions>` for full details.
-
-.. attribute:: HttpRequest.raw_post_data
-
-    The raw HTTP POST data as a byte string. This is useful for processing
-    data in different formats than of conventional HTML forms: binary images,
-    XML payload etc. For processing form data use ``HttpRequest.POST``.
-
-    .. versionadded:: 1.3
-
-    You can also read from an HttpRequest using file-like interface. See
-    :meth:`HttpRequest.read()`.
 
 .. attribute:: HttpRequest.urlconf
 
