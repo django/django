@@ -1,9 +1,9 @@
-====================
- Security in Django
-====================
+==================
+Security in Django
+==================
 
-This document will show you the security features of Django as well
-as give some advice about securing a Django site.
+This document is an overview of Django's security features. It includes advice
+on securing a Django-powered site.
 
 .. _cross-site-scripting:
 
@@ -15,9 +15,9 @@ Cross site scripting (XSS) protection
 XSS attacks allow a user to inject client side scripts into the browsers of
 other users. This is usually achieved by storing the malicious scripts in the
 database where it will be retrieved and displayed to other users, or by getting
-users to click a link which will cause the attacker's javascript to be executed
+users to click a link which will cause the attacker's JavaScript to be executed
 by the user's browser. However, XSS attacks can originate from any untrusted
-source of data, such as cookies or web services, whenever the data is not
+source of data, such as cookies or Web services, whenever the data is not
 sufficiently sanitized before including in a page.
 
 Using Django templates protects you against the majority of XSS attacks.
@@ -34,7 +34,7 @@ protect the following:
     <style class={{ var }}>...</style>
 
 If ``var`` is set to ``'class1 onmouseover=javascript:func()'``, this can result
-in unauthorized javascript execution depending on how the browser renders
+in unauthorized JavaScript execution, depending on how the browser renders
 imperfect HTML.
 
 It is also important to be particularly careful when using ``is_safe`` with
@@ -64,7 +64,7 @@ control.
 
 :ref:`CSRF protection works <how-csrf-works>` by checking for a nonce in each
 POST request. This ensures that a malicious user cannot simply "replay" a form
-POST to your website and have another logged in user unwittingly submit that
+POST to your Web site and have another logged in user unwittingly submit that
 form. The malicious user would have to know the nonce, which is user specific
 (using a cookie).
 
@@ -85,7 +85,6 @@ write :ref:`raw queries <executing-raw-queries>` or execute
 sparingly and you should always be careful to properly escape any parameters
 that the user can control. In addition, you should exercise caution when using
 :meth:`extra() <django.db.models.query.QuerySet.extra>`.
-
 
 Clickjacking protection
 =======================
@@ -111,8 +110,8 @@ SSL/HTTPS
 It is always better for security, though not always practical in all cases, to
 deploy your site behind HTTPS. Without this, it is possible for malicious
 network users to sniff authentication credentials or any other information
-transferred between client and server, and in some cases - **active** network
-attackers - to alter data that is sent in either direction.
+transferred between client and server, and in some cases -- **active** network
+attackers -- to alter data that is sent in either direction.
 
 If you want the protection that HTTPS provides, and have enabled it on your
 server, there are some additional steps to consider to ensure that sensitive
@@ -128,7 +127,7 @@ information is not leaked:
   this method usually cannot be relied on, as a client, or a malicious active
   network attacker, could also set this header.
 
-  So, for the case of a reverse proxy, it is recommended that the main web
+  So, for the case of a reverse proxy, it is recommended that the main Web
   server should be configured to do the redirect to HTTPS, or configured to send
   HTTP requests to an app that unconditionally redirects to HTTPS.
 
@@ -145,39 +144,40 @@ information is not leaked:
 
 .. _additional-security-topics:
 
-Host Headers and Virtual Hosting
+Host headers and virtual hosting
 ================================
 
-Django uses the Host header provided by the client to construct URLs
+Django uses the ``Host`` header provided by the client to construct URLs
 in certain cases. While these values are sanitized to prevent Cross
 Site Scripting attacks, they can be used for Cross-Site Request
 Forgery and cache poisoning attacks in some circumstances. We
-recommend that users of Django ensure their web-server configuration
-always validates incoming HTTP Host headers against the expected host
-name, disallows requests with no Host header, and that the web server
-not be configured with a catch-all virtual host which forwards
-requests to a Django application.
+recommend you ensure your Web server is configured such that:
 
-Additionally, as of 1.3.1, Django requires users to explicitly enable
-support for the X-Forwarded-Host header if their configuration
-requires it.
+    * It always validates incoming HTTP ``Host`` headers against the expected
+      host name.
+    * Disallows requests with no ``Host`` header.
+    * Is *not* configured with a catch-all virtual host that forwards requests
+      to a Django application.
+
+Additionally, as of 1.3.1, Django requires you to explicitly enable support for
+the ``X-Forwarded-Host`` header if your configuration requires it.
 
 Additional security topics
 ==========================
 
 While Django provides good security protection out of the box, it is still
 important to properly deploy your application and take advantage of the
-security protection of the web server, operating system and other components.
+security protection of the Web server, operating system and other components.
 
-* Make sure that your Python code is outside of the web server's root. This
+* Make sure that your Python code is outside of the Web server's root. This
   will ensure that your Python code is not accidentally served as plain text
   (or accidentally executed).
 * Take care with any :ref:`user uploaded files <file-upload-security>`.
 * Django does not throttle requests to authenticate users. To protect against
   brute-force attacks against the authentication system, you may consider
-  deploying a Django plugin or web server module to throttle these requests.
+  deploying a Django plugin or Web server module to throttle these requests.
 * If your site accepts file uploads, it is strongly advised that you limit
-  these uploads in your web server configuration to a reasonable
+  these uploads in your Web server configuration to a reasonable
   size in order to prevent denial of service (DOS) attacks. In Apache, this
   can be easily set using the LimitRequestBody_ directive.
 * Keep your :setting:`SECRET_KEY` a secret.
@@ -185,4 +185,3 @@ security protection of the web server, operating system and other components.
   database using a firewall.
 
 .. _LimitRequestBody: http://httpd.apache.org/docs/2.2/mod/core.html#limitrequestbody
-
