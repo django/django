@@ -18,6 +18,7 @@ class Serializer(PythonSerializer):
     internal_use_only = False
 
     def end_serialization(self):
+        self.options.update({'use_decimal': False}) # Use JS strings to represent Python Decimal instances (ticket #16850)
         simplejson.dump(self.objects, self.stream, cls=DjangoJSONEncoder, **self.options)
 
     def getvalue(self):
