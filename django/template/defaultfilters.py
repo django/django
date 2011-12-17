@@ -769,7 +769,7 @@ def divisibleby(value, arg):
 def yesno(value, arg=None):
     """
     Given a string mapping values for true, false and (optionally) None,
-    returns one of those strings accoding to the value:
+    returns one of those strings according to the value:
 
     ==========  ======================  ==================================
     Value       Argument                Outputs
