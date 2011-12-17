@@ -536,6 +536,7 @@ Passing strings
 Typical usage is to pass the contents of the page, as a string, to the
 :class:`HttpResponse` constructor::
 
+    >>> from django.http import HttpResponse
     >>> response = HttpResponse("Here's the text of the Web page.")
     >>> response = HttpResponse("Text only, please.", mimetype="text/plain")
 
