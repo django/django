@@ -110,8 +110,7 @@ class CompatCookie(SimpleCookie):
     def __init__(self, *args, **kwargs):
         super(CompatCookie, self).__init__(*args, **kwargs)
         import warnings
-        warnings.warn("CompatCookie is deprecated, use django.http.SimpleCookie instead.",
-                      DeprecationWarning)
+        warnings.warn("CompatCookie is deprecated. Use django.http.SimpleCookie instead.", DeprecationWarning)
 
 from django.conf import settings
 from django.core import signing
