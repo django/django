@@ -317,15 +317,15 @@ This logging configuration does the following things:
 
 * Defines three handlers:
 
-  * ``null``, a NullHandler, which will pass any ``DEBUG`` or
-    higher message to ``/dev/null``.
+  * ``null``, a NullHandler, which will pass any ``DEBUG`` (or
+    higher) message to ``/dev/null``.
 
   * ``console``, a StreamHandler, which will print any ``DEBUG``
-    message to stdout. This handler uses the `simple` output
+    (or higher) message to stdout. This handler uses the `simple` output
     format.
 
   * ``mail_admins``, an AdminEmailHandler, which will email any
-    ``ERROR`` level message to the site admins. This handler uses
+    ``ERROR`` (or higher) message to the site admins. This handler uses
     the ``special`` filter.
 
 * Configures three loggers:
