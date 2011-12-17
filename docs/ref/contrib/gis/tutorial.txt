@@ -650,7 +650,7 @@ a coordinate system specific to south Texas **only** and in units of
     >>> from django.contrib.gis.geos import *
     >>> pnt = Point(954158.1, 4215137.1, srid=32140)
 
-Note that ``pnt`` may also constructed with EWKT, an "extended" form of
+Note that ``pnt`` may also be constructed with EWKT, an "extended" form of
 WKT that includes the SRID::
 
     >>> pnt = GEOSGeometry('SRID=32140;POINT(954158.1 4215137.1)')
@@ -771,8 +771,7 @@ First, there are some important requirements and limitations:
 
 * :class:`~django.contrib.gis.admin.OSMGeoAdmin` requires that the
   :ref:`spherical mercator projection be added <addgoogleprojection>`
-  to the to be added to the ``spatial_ref_sys`` table (PostGIS 1.3 and
-  below, only).
+  to the ``spatial_ref_sys`` table (PostGIS 1.3 and below, only).
 * The PROJ.4 datum shifting files must be installed (see the
   :ref:`PROJ.4 installation instructions <proj4>` for more details).
 

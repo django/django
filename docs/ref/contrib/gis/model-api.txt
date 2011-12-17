@@ -199,8 +199,8 @@ details.
 Geography Type
 ^^^^^^^^^^^^^^
 
-In PostGIS 1.5, the geography type was introduced -- it provides
-provides native support for spatial features represented with geographic
+In PostGIS 1.5, the geography type was introduced -- it provides 
+native support for spatial features represented with geographic
 coordinates (e.g., WGS84 longitude/latitude). [#fngeography]_
 Unlike the plane used by a geometry type, the geography type uses a spherical
 representation of its data.  Distance and measurement operations
