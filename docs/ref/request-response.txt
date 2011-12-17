@@ -538,7 +538,7 @@ Typical usage is to pass the contents of the page, as a string, to the
 
     >>> from django.http import HttpResponse
     >>> response = HttpResponse("Here's the text of the Web page.")
-    >>> response = HttpResponse("Text only, please.", mimetype="text/plain")
+    >>> response = HttpResponse("Text only, please.", content_type="text/plain")
 
 But if you want to add content incrementally, you can use ``response`` as a
 file-like object::
@@ -577,10 +577,10 @@ Telling the browser to treat the response as a file attachment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To tell the browser to treat the response as a file attachment, use the
-``mimetype`` argument and set the ``Content-Disposition`` header. For example,
+``content_type`` argument and set the ``Content-Disposition`` header. For example,
 this is how you might return a Microsoft Excel spreadsheet::
 
-    >>> response = HttpResponse(my_data, mimetype='application/vnd.ms-excel')
+    >>> response = HttpResponse(my_data, content_type='application/vnd.ms-excel')
     >>> response['Content-Disposition'] = 'attachment; filename=foo.xls'
 
 There's nothing Django-specific about the ``Content-Disposition`` header, but

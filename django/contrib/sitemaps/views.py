@@ -1,12 +1,10 @@
+from django.contrib.sites.models import get_current_site
 from django.core import urlresolvers
 from django.core.paginator import EmptyPage, PageNotAnInteger
 from django.http import Http404
 from django.template.response import TemplateResponse
 
-from django.contrib.sites.models import get_current_site
-
-def index(request, sitemaps,
-        template_name='sitemap_index.xml', mimetype='application/xml'):
+def index(request, sitemaps, template_name='sitemap_index.xml', mimetype='application/xml'):
     current_site = get_current_site(request)
     sites = []
     protocol = request.is_secure() and 'https' or 'http'
@@ -21,10 +19,9 @@ def index(request, sitemaps,
         if pages > 1:
             for page in range(2, pages+1):
                 sites.append('%s://%s%s?p=%s' % (protocol, current_site.domain, sitemap_url, page))
-    return TemplateResponse(request, template_name, {'sitemaps': sites}, mimetype=mimetype)
+    return TemplateResponse(request, template_name, {'sitemaps': sites}, content_type=mimetype)
 
-def sitemap(request, sitemaps, section=None,
-        template_name='sitemap.xml', mimetype='application/xml'):
+def sitemap(request, sitemaps, section=None, template_name='sitemap.xml', mimetype='application/xml'):
     maps, urls = [], []
     if section is not None:
         if section not in sitemaps:
@@ -43,4 +40,4 @@ def sitemap(request, sitemaps, section=None,
             raise Http404("Page %s empty" % page)
         except PageNotAnInteger:
             raise Http404("No page '%s'" % page)
-    return TemplateResponse(request, template_name, {'urlset': urls}, mimetype=mimetype)
+    return TemplateResponse(request, template_name, {'urlset': urls}, content_type=mimetype)
