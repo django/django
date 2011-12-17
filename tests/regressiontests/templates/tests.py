@@ -1429,7 +1429,7 @@ class Templates(unittest.TestCase):
 
             ### WIDTHRATIO TAG ########################################################
             'widthratio01': ('{% widthratio a b 0 %}', {'a':50,'b':100}, '0'),
-            'widthratio02': ('{% widthratio a b 100 %}', {'a':0,'b':0}, ''),
+            'widthratio02': ('{% widthratio a b 100 %}', {'a':0,'b':0}, '0'),
             'widthratio03': ('{% widthratio a b 100 %}', {'a':0,'b':100}, '0'),
             'widthratio04': ('{% widthratio a b 100 %}', {'a':50,'b':100}, '50'),
             'widthratio05': ('{% widthratio a b 100 %}', {'a':100,'b':100}, '100'),
