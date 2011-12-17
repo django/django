@@ -11,7 +11,7 @@ function reorder_init() {
     setOrder(input.value.split(','));
     input.disabled = true;
     draw();
-    // Now initialise the dragging behaviour
+    // Now initialize the dragging behavior
     var limit = (lis.length - 1) * height;
     for (var i = 0; i < lis.length; i++) {
         var li = lis[i];

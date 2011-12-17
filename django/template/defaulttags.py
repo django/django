@@ -474,7 +474,7 @@ class WithNode(Node):
 @register.tag
 def autoescape(parser, token):
     """
-    Force autoescape behaviour for this block.
+    Force autoescape behavior for this block.
     """
     args = token.contents.split()
     if len(args) != 2:

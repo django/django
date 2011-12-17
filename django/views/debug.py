@@ -92,7 +92,7 @@ def get_exception_reporter_filter(request):
 class ExceptionReporterFilter(object):
     """
     Base for all exception reporter filter classes. All overridable hooks
-    contain lenient default behaviours.
+    contain lenient default behaviors.
     """
 
     def get_request_repr(self, request):

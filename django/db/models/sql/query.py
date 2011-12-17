@@ -1249,7 +1249,7 @@ class Query(object):
         case). Finally, 'negate' is used in the same sense as for add_filter()
         -- it indicates an exclude() filter, or something similar. It is only
         passed in here so that it can be passed to a field's extra_filter() for
-        customised behaviour.
+        customized behavior.
 
         Returns the final field involved in the join, the target database
         column (used for any 'where' constraint), the final 'opts' value and the

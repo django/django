@@ -47,7 +47,7 @@ class DeferRegressionTest(TestCase):
         self.assertEqual(r.item, i)
 
         # Some further checks for select_related() and inherited model
-        # behaviour (regression for #10710).
+        # behavior (regression for #10710).
         c1 = Child.objects.create(name="c1", value=42)
         c2 = Child.objects.create(name="c2", value=37)
         Leaf.objects.create(name="l1", child=c1, second_child=c2)

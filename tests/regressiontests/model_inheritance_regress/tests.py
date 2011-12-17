@@ -1,5 +1,5 @@
 """
-Regression tests for Model inheritance behaviour.
+Regression tests for Model inheritance behavior.
 """
 
 from __future__ import absolute_import
@@ -21,7 +21,7 @@ class ModelInheritanceTest(TestCase):
         # Regression for #7350, #7202
         # Check that when you create a Parent object with a specific reference
         # to an existent child instance, saving the Parent doesn't duplicate
-        # the child. This behaviour is only activated during a raw save - it
+        # the child. This behavior is only activated during a raw save - it
         # is mostly relevant to deserialization, but any sort of CORBA style
         # 'narrow()' API would require a similar approach.
 

@@ -1,6 +1,6 @@
 """
 Tests for forcing insert and update queries (instead of Django's normal
-automatic behaviour).
+automatic behavior).
 """
 from django.db import models
 

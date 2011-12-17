@@ -152,7 +152,7 @@ DATABASES = {
     },
 }
 
-# Classes used to implement db routing behaviour
+# Classes used to implement DB routing behavior.
 DATABASE_ROUTERS = []
 
 # The email backend to use. For possible shortcuts see django.core.mail.

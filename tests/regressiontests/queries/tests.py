@@ -1354,7 +1354,7 @@ class Queries6Tests(TestCase):
         ann1.notes.add(n1)
         ann2 = Annotation.objects.create(name='a2', tag=t4)
 
-    # This next test used to cause really weird PostgreSQL behaviour, but it was
+    # This next test used to cause really weird PostgreSQL behavior, but it was
     # only apparent much later when the full test suite ran.
     #@unittest.expectedFailure
     def test_slicing_and_cache_interaction(self):

@@ -113,7 +113,7 @@ class Person(models.Model):
         return self.name
 
     # Person doesn't actually have a dependency on store, but we need to define
-    # one to test the behaviour of the dependency resolution algorithm.
+    # one to test the behavior of the dependency resolution algorithm.
     def natural_key(self):
         return (self.name,)
     natural_key.dependencies = ['fixtures_regress.store']

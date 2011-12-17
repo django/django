@@ -892,11 +892,11 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
     def test23_transform_nosrid(self):
         """ Testing `transform` method (no SRID) """
-        # raise a warning if SRID <0/None
+        # Raise a warning if SRID <0/None.
         import warnings
         print "\nBEGIN - expecting Warnings; safe to ignore.\n"
 
-        # test for do-nothing behaviour.
+        # Test for do-nothing behavior.
         try:
             # Keeping line-noise down by only printing the relevant
             # warnings once.

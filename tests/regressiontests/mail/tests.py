@@ -75,9 +75,9 @@ class MailTests(TestCase):
         """
         Test for space continuation character in long (ascii) subject headers (#7747)
         """
-        email = EmailMessage('Long subject lines that get wrapped should use a space continuation character to get expected behaviour in Outlook and Thunderbird', 'Content', 'from@example.com', ['to@example.com'])
+        email = EmailMessage('Long subject lines that get wrapped should use a space continuation character to get expected behavior in Outlook and Thunderbird', 'Content', 'from@example.com', ['to@example.com'])
         message = email.message()
-        self.assertEqual(message['Subject'], 'Long subject lines that get wrapped should use a space continuation\n character to get expected behaviour in Outlook and Thunderbird')
+        self.assertEqual(message['Subject'], 'Long subject lines that get wrapped should use a space continuation\n character to get expected behavior in Outlook and Thunderbird')
 
     def test_message_header_overrides(self):
         """

@@ -168,7 +168,7 @@ class LaxOptionParser(OptionParser):
     def print_lax_help(self):
         """Output the basic options available to every command.
 
-        This just redirects to the default print_help() behaviour.
+        This just redirects to the default print_help() behavior.
         """
         OptionParser.print_help(self)
 

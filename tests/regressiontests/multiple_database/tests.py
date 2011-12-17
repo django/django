@@ -934,7 +934,7 @@ class QueryTestCase(TestCase):
                                   extra_arg=True)
 
 class TestRouter(object):
-    # A test router. The behaviour is vaguely master/slave, but the
+    # A test router. The behavior is vaguely master/slave, but the
     # databases aren't assumed to propagate changes.
     def db_for_read(self, model, instance=None, **hints):
         if instance:
@@ -1010,7 +1010,7 @@ class RouterTestCase(TestCase):
         self.assertEqual(Book.objects.db_manager('default').all().db, 'default')
 
     def test_syncdb_selection(self):
-        "Synchronization behaviour is predicatable"
+        "Synchronization behavior is predictable"
 
         self.assertTrue(router.allow_syncdb('default', User))
         self.assertTrue(router.allow_syncdb('default', Book))
@@ -1042,7 +1042,7 @@ class RouterTestCase(TestCase):
         dive = Book.objects.using('other').create(title="Dive into Python",
                                                   published=datetime.date(2009, 5, 4))
 
-        # First check the baseline behaviour
+        # First check the baseline behavior.
 
         self.assertEqual(router.db_for_read(User), 'other')
         self.assertEqual(router.db_for_read(Book), 'other')

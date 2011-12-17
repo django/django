@@ -149,7 +149,7 @@ class PrefetchRelatedTests(TestCase):
 
     def test_get(self):
         """
-        Test that objects retrieved with .get() get the prefetch behaviour
+        Test that objects retrieved with .get() get the prefetch behavior.
         """
         # Need a double
         with self.assertNumQueries(3):

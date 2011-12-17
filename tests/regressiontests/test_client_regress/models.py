@@ -976,7 +976,7 @@ class ResponseTemplateDeprecationTests(TestCase):
 class ReadLimitedStreamTest(TestCase):
     """
     Tests that ensure that HttpRequest.body, HttpRequest.read() and
-    HttpRequest.read(BUFFER) have proper LimitedStream behaviour.
+    HttpRequest.read(BUFFER) have proper LimitedStream behavior.
 
     Refs #14753, #15785
     """
@@ -1017,7 +1017,7 @@ class RequestFactoryStateTest(TestCase):
     """Regression tests for #15929."""
     # These tests are checking that certain middleware don't change certain
     # global state. Alternatively, from the point of view of a test, they are
-    # ensuring test isolation behaviour. So, unusually, it doesn't make sense to
+    # ensuring test isolation behavior. So, unusually, it doesn't make sense to
     # run the tests individually, and if any are failing it is confusing to run
     # them with any other set of tests.
 

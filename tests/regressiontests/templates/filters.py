@@ -113,7 +113,7 @@ def get_filter_tests():
         'filter-make_list03': ('{% autoescape off %}{{ a|make_list|stringformat:"s"|safe }}{% endautoescape %}', {"a": mark_safe("&")}, u"[u'&']"),
         'filter-make_list04': ('{{ a|make_list|stringformat:"s"|safe }}', {"a": mark_safe("&")}, u"[u'&']"),
 
-        # Running slugify on a pre-escaped string leads to odd behaviour,
+        # Running slugify on a pre-escaped string leads to odd behavior,
         # but the result is still safe.
         'filter-slugify01': ("{% autoescape off %}{{ a|slugify }} {{ b|slugify }}{% endautoescape %}", {"a": "a & b", "b": mark_safe("a &amp; b")}, u"a-b a-amp-b"),
         'filter-slugify02': ("{{ a|slugify }} {{ b|slugify }}", {"a": "a & b", "b": mark_safe("a &amp; b")}, u"a-b a-amp-b"),

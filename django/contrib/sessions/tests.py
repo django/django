@@ -410,6 +410,6 @@ class CookieSessionTests(SessionTestsMixin, TestCase):
         This test tested cycle_key() which would create a new session
         key for the same session data. But we can't invalidate previously
         signed cookies (other than letting them expire naturally) so
-        testing for this behaviour is meaningless.
+        testing for this behavior is meaningless.
         """
         pass

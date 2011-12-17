@@ -97,7 +97,7 @@ def pk_create(pk, klass, data):
 def inherited_create(pk, klass, data):
     instance = klass(id=pk,**data)
     # This isn't a raw save because:
-    #  1) we're testing inheritance, not field behaviour, so none
+    #  1) we're testing inheritance, not field behavior, so none
     #     of the field values need to be protected.
     #  2) saving the child class and having the parent created
     #     automatically is easier than manually creating both.
