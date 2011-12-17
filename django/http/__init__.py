@@ -21,7 +21,7 @@ except ImportError:
         # Python 2.6 and greater
         from urlparse import parse_qsl
     except ImportError:
-        # Python 2.5.  Works on Python 2.6 but raises PendingDeprecationWarning
+        # Python 2.5. Works on Python 2.6 but raises PendingDeprecationWarning
         from cgi import parse_qsl
 
 import Cookie
@@ -71,7 +71,7 @@ else:
 
                 # SimpleCookie already does the hard work of encoding and decoding.
                 # It uses octal sequences like '\\012' for newline etc.
-                # and non-ASCII chars.  We just make use of this mechanism, to
+                # and non-ASCII chars. We just make use of this mechanism, to
                 # avoid introducing two encoding schemes which would be confusing
                 # and especially awkward for javascript.
 
@@ -353,11 +353,11 @@ class HttpRequest(object):
             try:
                 self._post, self._files = self.parse_file_upload(self.META, data)
             except:
-                # An error occured while parsing POST data.  Since when
+                # An error occured while parsing POST data. Since when
                 # formatting the error the request handler might access
                 # self.POST, set self._post and self._file to prevent
                 # attempts to parse POST data again.
-                # Mark that an error occured.  This allows self.__repr__ to
+                # Mark that an error occured. This allows self.__repr__ to
                 # be explicit about it instead of simply representing an
                 # empty POST
                 self._mark_post_parse_error()
@@ -559,11 +559,11 @@ class HttpResponse(object):
             content_type=None):
         # _headers is a mapping of the lower-case name to the original case of
         # the header (required for working with legacy systems) and the header
-        # value.  Both the name of the header and its value are ASCII strings.
+        # value. Both the name of the header and its value are ASCII strings.
         self._headers = {}
         self._charset = settings.DEFAULT_CHARSET
-        if mimetype:
-            content_type = mimetype     # For backwards compatibility
+        if mimetype: # For backwards compatibility.
+            content_type = mimetype
         if not content_type:
             content_type = "%s; charset=%s" % (settings.DEFAULT_CONTENT_TYPE,
                     self._charset)
