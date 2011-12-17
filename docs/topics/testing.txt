@@ -85,7 +85,7 @@ module defines tests in class-based approach.
     :mod:`django.utils.unittest` module alias. If you are using Python
     2.7, or you have installed unittest2 locally, Django will map the
     alias to the installed version of the unittest library. Otherwise,
-    Django will use it's own bundled version of unittest2.
+    Django will use its own bundled version of unittest2.
 
     To use this alias, simply use::
 
@@ -120,7 +120,8 @@ Here is an example :class:`unittest.TestCase` subclass::
             self.lion = Animal.objects.create(name="lion", sound="roar")
             self.cat = Animal.objects.create(name="cat", sound="meow")
 
-        def testSpeaking(self):
+        def test_animals_can_speak(self):
+            """Animals that can speak are correctly identified"""
             self.assertEqual(self.lion.speak(), 'The lion says "roar"')
             self.assertEqual(self.cat.speak(), 'The cat says "meow"')
 
@@ -288,7 +289,7 @@ And it gets even more granular than that! To run a *single* test
 method inside a test case, add the name of the test method to the
 label::
 
-    $ ./manage.py test animals.AnimalTestCase.testFluffyAnimals
+    $ ./manage.py test animals.AnimalTestCase.test_animals_can_speak
 
 .. versionadded:: 1.2
    The ability to select individual doctests was added.
