@@ -7,7 +7,7 @@ from django.contrib.contenttypes import views as contenttype_views
 from django.views.decorators.csrf import csrf_protect
 from django.db.models.base import ModelBase
 from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, NoReverseMatch
 from django.template.response import TemplateResponse
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
@@ -342,10 +342,18 @@ class AdminSite(object):
                     info = (app_label, model._meta.module_name)
                     model_dict = {
                         'name': capfirst(model._meta.verbose_name_plural),
-                        'admin_url': reverse('admin:%s_%s_changelist' % info, current_app=self.name),
-                        'add_url': reverse('admin:%s_%s_add' % info, current_app=self.name),
                         'perms': perms,
                     }
+                    if perms.get('change', False):
+                        try:
+                            model_dict['admin_url'] = reverse('admin:%s_%s_changelist' % info, current_app=self.name)
+                        except NoReverseMatch:
+                            pass
+                    if perms.get('add', False):
+                        try:
+                            model_dict['add_url'] = reverse('admin:%s_%s_add' % info, current_app=self.name)
+                        except NoReverseMatch:
+                            pass
                     if app_label in app_dict:
                         app_dict[app_label]['models'].append(model_dict)
                     else:
@@ -388,10 +396,18 @@ class AdminSite(object):
                         info = (app_label, model._meta.module_name)
                         model_dict = {
                             'name': capfirst(model._meta.verbose_name_plural),
-                            'admin_url': reverse('admin:%s_%s_changelist' % info, current_app=self.name),
-                            'add_url': reverse('admin:%s_%s_add' % info, current_app=self.name),
                             'perms': perms,
                         }
+                        if perms.get('change', False):
+                            try:
+                                model_dict['admin_url'] = reverse('admin:%s_%s_changelist' % info, current_app=self.name)
+                            except NoReverseMatch:
+                                pass
+                        if perms.get('add', False):
+                            try:
+                                model_dict['add_url'] = reverse('admin:%s_%s_add' % info, current_app=self.name)
+                            except NoReverseMatch:
+                                pass
                         if app_dict:
                             app_dict['models'].append(model_dict),
                         else:

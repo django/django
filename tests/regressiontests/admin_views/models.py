@@ -566,3 +566,9 @@ class AdminOrderedAdminMethod(models.Model):
 class AdminOrderedCallable(models.Model):
     order = models.IntegerField()
     stuff = models.CharField(max_length=200)
+
+class Report(models.Model):
+    title = models.CharField(max_length=100)
+
+    def __unicode__(self):
+        return self.title

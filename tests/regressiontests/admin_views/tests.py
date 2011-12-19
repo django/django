@@ -38,7 +38,8 @@ from .models import (Article, BarAccount, CustomArticle, EmptyModel, FooAccount,
     Book, Promo, WorkHour, Employee, Question, Answer, Inquisition, Actor,
     FoodDelivery, RowLevelChangePermissionModel, Paper, CoverLetter, Story,
     OtherStory, ComplexSortedPerson, Parent, Child, AdminOrderedField,
-    AdminOrderedModelMethod, AdminOrderedAdminMethod, AdminOrderedCallable)
+    AdminOrderedModelMethod, AdminOrderedAdminMethod, AdminOrderedCallable,
+    Report)
 
 
 ERROR_MESSAGE = "Please enter the correct username and password \
@@ -1088,6 +1089,37 @@ class AdminViewPermissionsTest(TestCase):
 
         response = self.client.get('/test_admin/admin/secure-view/')
         self.assertContains(response, 'id="login-form"')
+
+
+class AdminViewsNoUrlTest(TestCase):
+    """Regression test for #17333"""
+
+    urls = "regressiontests.admin_views.urls"
+    fixtures = ['admin-views-users.xml']
+
+    def setUp(self):
+        opts = Report._meta
+        # User who can change Reports
+        change_user = User.objects.get(username='changeuser')
+        change_user.user_permissions.add(get_perm(Report,
+            opts.get_change_permission()))
+
+        # login POST dict
+        self.changeuser_login = {
+            REDIRECT_FIELD_NAME: '/test_admin/admin/',
+            LOGIN_FORM_KEY: 1,
+            'username': 'changeuser',
+            'password': 'secret',
+        }
+
+    def test_no_standard_modeladmin_urls(self):
+        """Admin index views don't break when user's ModelAdmin removes standard urls"""
+        self.client.get('/test_admin/admin/')
+        self.client.post('/test_admin/admin/', self.changeuser_login)
+        r = self.client.get('/test_admin/admin/')
+        # we shouldn' get an 500 error caused by a NoReverseMatch
+        self.assertEqual(r.status_code, 200)
+        self.client.get('/test_admin/admin/logout/')
 
 
 class AdminViewDeletedObjectsTest(TestCase):

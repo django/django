@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
 
-import datetime
 import tempfile
 import os
 
@@ -10,8 +9,10 @@ from django.contrib import admin
 from django.contrib.admin.views.main import ChangeList
 from django.core.files.storage import FileSystemStorage
 from django.core.mail import EmailMessage
+from django.conf.urls import patterns, url
 from django.db import models
 from django.forms.models import BaseModelFormSet
+from django.http import HttpResponse
 
 from .models import (Article, Chapter, Account, Media, Child, Parent, Picture,
     Widget, DooHickey, Grommet, Whatsit, FancyDoodad, Category, Link,
@@ -24,7 +25,7 @@ from .models import (Article, Chapter, Account, Media, Child, Parent, Picture,
     CoverLetter, Story, OtherStory, Book, Promo, ChapterXtra1, Pizza, Topping,
     Album, Question, Answer, ComplexSortedPerson, PrePopulatedPostLargeSlug,
     AdminOrderedField, AdminOrderedModelMethod, AdminOrderedAdminMethod,
-    AdminOrderedCallable)
+    AdminOrderedCallable, Report)
 
 
 def callable_year(dt_value):
@@ -499,6 +500,17 @@ class AdminOrderedCallableAdmin(admin.ModelAdmin):
     ordering = ('order',)
     list_display = ('stuff', admin_ordered_callable)
 
+class ReportAdmin(admin.ModelAdmin):
+    def extra(self, request):
+        return HttpResponse()
+
+    def get_urls(self):
+        # Corner case: Don't call parent implementation
+        return patterns('',
+            url(r'^extra/$',
+                self.extra,
+                name='cable_extra'),
+        )
 
 site = admin.AdminSite(name="admin")
 site.register(Article, ArticleAdmin)
@@ -543,6 +555,7 @@ site.register(Paper, PaperAdmin)
 site.register(CoverLetter, CoverLetterAdmin)
 site.register(Story, StoryAdmin)
 site.register(OtherStory, OtherStoryAdmin)
+site.register(Report, ReportAdmin)
 
 # We intentionally register Promo and ChapterXtra1 but not Chapter nor ChapterXtra2.
 # That way we cover all four cases:
