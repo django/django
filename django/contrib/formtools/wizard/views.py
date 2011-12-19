@@ -243,12 +243,12 @@ class WizardView(TemplateView):
         wasn't successful), the next step (if the current step was stored
         successful) or the done view (if no more steps are available)
         """
-        # Look for a wizard_prev_step element in the posted data which
+        # Look for a wizard_goto_step element in the posted data which
         # contains a valid step name. If one was found, render the requested
         # form. (This makes stepping back a lot easier).
-        wizard_prev_step = self.request.POST.get('wizard_prev_step', None)
-        if wizard_prev_step and wizard_prev_step in self.get_form_list():
-            self.storage.current_step = wizard_prev_step
+        wizard_goto_step = self.request.POST.get('wizard_goto_step', None)
+        if wizard_goto_step and wizard_goto_step in self.get_form_list():
+            self.storage.current_step = wizard_goto_step
             form = self.get_form(
                 data=self.storage.get_step_data(self.steps.current),
                 files=self.storage.get_step_files(self.steps.current))
@@ -638,10 +638,10 @@ class NamedUrlWizardView(WizardView):
         Do a redirect if user presses the prev. step button. The rest of this
         is super'd from FormWizard.
         """
-        prev_step = self.request.POST.get('wizard_prev_step', None)
-        if prev_step and prev_step in self.get_form_list():
-            self.storage.current_step = prev_step
-            return redirect(self.url_name, step=prev_step)
+        wizard_goto_step = self.request.POST.get('wizard_goto_step', None)
+        if wizard_goto_step and wizard_goto_step in self.get_form_list():
+            self.storage.current_step = wizard_goto_step
+            return redirect(self.url_name, step=wizard_goto_step)
         return super(NamedUrlWizardView, self).post(*args, **kwargs)
 
     def get_context_data(self, form, **kwargs):

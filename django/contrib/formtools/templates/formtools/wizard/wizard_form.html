@@ -12,7 +12,7 @@
 {% endif %}
 
 {% if wizard.steps.prev %}
-<button name="wizard_prev_step" type="submit" value="{{ wizard.steps.first }}">{% trans "first step" %}</button>
-<button name="wizard_prev_step" type="submit" value="{{ wizard.steps.prev }}">{% trans "prev step" %}</button>
+<button name="wizard_goto_step" type="submit" value="{{ wizard.steps.first }}">{% trans "first step" %}</button>
+<button name="wizard_goto_step" type="submit" value="{{ wizard.steps.prev }}">{% trans "prev step" %}</button>
 {% endif %}
 <input type="submit" name="submit" value="{% trans "submit" %}" />

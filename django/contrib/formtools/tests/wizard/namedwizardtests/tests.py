@@ -85,7 +85,7 @@ class NamedWizardTests(object):
         response = self.client.post(
             reverse(self.wizard_urlname, kwargs={
                 'step': response.context['wizard']['steps'].current
-            }), {'wizard_prev_step': response.context['wizard']['steps'].prev})
+            }), {'wizard_goto_step': response.context['wizard']['steps'].prev})
         response = self.client.get(response['Location'])
 
         self.assertEqual(response.status_code, 200)
