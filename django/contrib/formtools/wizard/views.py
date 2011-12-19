@@ -591,6 +591,9 @@ class NamedUrlWizardView(WizardView):
             'step name "%s" is reserved for "done" view' % initkwargs['done_step_name']
         return initkwargs
 
+    def get_step_url(self, step):
+        return reverse(self.url_name, kwargs={'step': step})
+
     def get(self, *args, **kwargs):
         """
         This renders the form or, if needed, does the http redirects.
@@ -604,10 +607,8 @@ class NamedUrlWizardView(WizardView):
                 query_string = "?%s" % self.request.GET.urlencode()
             else:
                 query_string = ""
-            next_step_url = reverse(self.url_name, kwargs={
-                'step': self.steps.current,
-            }) + query_string
-            return redirect(next_step_url)
+            return redirect(self.get_step_url(self.steps.current)
+                            + query_string)
 
         # is the current step the "done" name/view?
         elif step_url == self.done_step_name:
@@ -636,7 +637,7 @@ class NamedUrlWizardView(WizardView):
         # invalid step name, reset to first and redirect.
         else:
             self.storage.current_step = self.steps.first
-            return redirect(self.url_name, step=self.steps.first)
+            return redirect(self.get_step_url(self.steps.first))
 
     def post(self, *args, **kwargs):
         """
@@ -646,7 +647,7 @@ class NamedUrlWizardView(WizardView):
         wizard_goto_step = self.request.POST.get('wizard_goto_step', None)
         if wizard_goto_step and wizard_goto_step in self.get_form_list():
             self.storage.current_step = wizard_goto_step
-            return redirect(self.url_name, step=wizard_goto_step)
+            return redirect(self.get_step_url(wizard_goto_step))
         return super(NamedUrlWizardView, self).post(*args, **kwargs)
 
     def get_context_data(self, form, **kwargs):
@@ -665,7 +666,7 @@ class NamedUrlWizardView(WizardView):
         """
         next_step = self.get_next_step()
         self.storage.current_step = next_step
-        return redirect(self.url_name, step=next_step)
+        return redirect(self.get_step_url(next_step))
 
     def render_revalidation_failure(self, failed_step, form, **kwargs):
         """
@@ -673,7 +674,7 @@ class NamedUrlWizardView(WizardView):
         step.
         """
         self.storage.current_step = failed_step
-        return redirect(self.url_name, step=failed_step)
+        return redirect(self.get_step_url(failed_step))
 
     def render_done(self, form, **kwargs):
         """
@@ -681,7 +682,7 @@ class NamedUrlWizardView(WizardView):
         name doesn't fit).
         """
         if kwargs.get('step', None) != self.done_step_name:
-            return redirect(self.url_name, step=self.done_step_name)
+            return redirect(self.get_step_url(self.done_step_name))
         return super(NamedUrlWizardView, self).render_done(form, **kwargs)
 
 

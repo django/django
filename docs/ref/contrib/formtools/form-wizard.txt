@@ -557,8 +557,8 @@ an ``instance_dict`` argument that should contain instances of ``ModelForm`` and
 ``ModelFormSet``.  Similarly to :attr:`~WizardView.initial_dict`, these
 dictionary key values should be equal to the step number in the form list.
 
-Usage of NamedUrlWizardView
-===========================
+Usage of ``NamedUrlWizardView``
+===============================
 
 .. class:: NamedUrlWizardView
 
@@ -595,3 +595,15 @@ Example code for the changed ``urls.py`` file::
         url(r'^contact/(?P<step>.+)/$', contact_wizard, name='contact_step'),
         url(r'^contact/$', contact_wizard, name='contact'),
     )
+
+Advanced ``NamedUrlWizardView`` methods
+=======================================
+
+.. method:: NamedUrlWizardView.get_step_url(step)
+
+    This method returns the URL for a specific step.
+
+    Default implementation::
+
+        def get_step_url(self, step):
+            return reverse(self.url_name, kwargs={'step': step})
