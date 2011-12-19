@@ -4,8 +4,8 @@ from django.contrib.formtools.tests.wizard.loadstorage import TestLoadStorage
 from django.contrib.formtools.tests.wizard.namedwizardtests.tests import (
     NamedSessionWizardTests,
     NamedCookieWizardTests,
-    TestNamedUrlSessionFormWizard,
-    TestNamedUrlCookieFormWizard,
+    TestNamedUrlSessionWizardView,
+    TestNamedUrlCookieWizardView,
     NamedSessionFormTests,
     NamedCookieFormTests,
 )

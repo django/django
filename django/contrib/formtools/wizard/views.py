@@ -111,9 +111,9 @@ class WizardView(TemplateView):
     @classonlymethod
     def as_view(cls, *args, **kwargs):
         """
-        This method is used within urls.py to create unique formwizard
+        This method is used within urls.py to create unique wizardview
         instances for every request. We need to override this method because
-        we add some kwargs which are needed to make the formwizard usable.
+        we add some kwargs which are needed to make the wizardview usable.
         """
         initkwargs = cls.get_initkwargs(*args, **kwargs)
         return super(WizardView, cls).as_view(**initkwargs)
@@ -126,7 +126,7 @@ class WizardView(TemplateView):
 
         * `form_list` - is a list of forms. The list entries can be single form
           classes or tuples of (`step_name`, `form_class`). If you pass a list
-          of forms, the formwizard will convert the class list to
+          of forms, the wizardview will convert the class list to
           (`zero_based_counter`, `form_class`). This is needed to access the
           form for a specific step.
         * `initial_dict` - contains a dictionary of initial data dictionaries.
@@ -139,7 +139,7 @@ class WizardView(TemplateView):
           apply.
         * `condition_dict` - contains a dictionary of boolean values or
           callables. If the value of for a specific `step_name` is callable it
-          will be called with the formwizard instance as the only argument.
+          will be called with the wizardview instance as the only argument.
           If the return value is true, the step's form will be used.
         """
         kwargs.update({
@@ -168,13 +168,13 @@ class WizardView(TemplateView):
                 # we need to override the form variable.
                 form = form.form
             # check if any form contains a FileField, if yes, we need a
-            # file_storage added to the formwizard (by subclassing).
+            # file_storage added to the wizardview (by subclassing).
             for field in form.base_fields.itervalues():
                 if (isinstance(field, forms.FileField) and
                         not hasattr(cls, 'file_storage')):
                     raise NoFileStorageConfigured
 
-        # build the kwargs for the formwizard instances
+        # build the kwargs for the wizardview instances
         kwargs['form_list'] = init_form_list
         return kwargs
 
@@ -215,7 +215,7 @@ class WizardView(TemplateView):
         After processing the request using the `dispatch` method, the
         response gets updated by the storage engine (for example add cookies).
         """
-        # add the storage engine to the current formwizard instance
+        # add the storage engine to the current wizardview instance
         self.prefix = self.get_prefix(*args, **kwargs)
         self.storage = get_storage(self.storage_name, self.prefix, request,
             getattr(self, 'file_storage', None))
@@ -517,7 +517,7 @@ class WizardView(TemplateView):
 
         .. code-block:: python
 
-            class MyWizard(FormWizard):
+            class MyWizard(WizardView):
                 def get_context_data(self, form, **kwargs):
                     context = super(MyWizard, self).get_context_data(form=form, **kwargs)
                     if self.steps.current == 'my_step_name':
@@ -642,7 +642,7 @@ class NamedUrlWizardView(WizardView):
     def post(self, *args, **kwargs):
         """
         Do a redirect if user presses the prev. step button. The rest of this
-        is super'd from FormWizard.
+        is super'd from WizardView.
         """
         wizard_goto_step = self.request.POST.get('wizard_goto_step', None)
         if wizard_goto_step and wizard_goto_step in self.get_form_list():
@@ -661,7 +661,7 @@ class NamedUrlWizardView(WizardView):
 
     def render_next_step(self, form, **kwargs):
         """
-        When using the NamedUrlFormWizard, we have to redirect to update the
+        When using the NamedUrlWizardView, we have to redirect to update the
         browser's URL to match the shown step.
         """
         next_step = self.get_next_step()

@@ -321,24 +321,24 @@ class NamedFormTests(object):
         instance.render_done(None)
         self.assertEqual(instance.storage.current_step, 'start')
 
-class TestNamedUrlSessionFormWizard(NamedUrlSessionWizardView):
+class TestNamedUrlSessionWizardView(NamedUrlSessionWizardView):
 
     def dispatch(self, request, *args, **kwargs):
-        response = super(TestNamedUrlSessionFormWizard, self).dispatch(request, *args, **kwargs)
+        response = super(TestNamedUrlSessionWizardView, self).dispatch(request, *args, **kwargs)
         return response, self
 
-class TestNamedUrlCookieFormWizard(NamedUrlCookieWizardView):
+class TestNamedUrlCookieWizardView(NamedUrlCookieWizardView):
 
     def dispatch(self, request, *args, **kwargs):
-        response = super(TestNamedUrlCookieFormWizard, self).dispatch(request, *args, **kwargs)
+        response = super(TestNamedUrlCookieWizardView, self).dispatch(request, *args, **kwargs)
         return response, self
 
 
 class NamedSessionFormTests(NamedFormTests, TestCase):
-    formwizard_class = TestNamedUrlSessionFormWizard
+    formwizard_class = TestNamedUrlSessionWizardView
     wizard_urlname = 'nwiz_session'
 
 
 class NamedCookieFormTests(NamedFormTests, TestCase):
-    formwizard_class = TestNamedUrlCookieFormWizard
+    formwizard_class = TestNamedUrlCookieWizardView
     wizard_urlname = 'nwiz_cookie'

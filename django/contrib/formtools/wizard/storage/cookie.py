@@ -20,7 +20,7 @@ class CookieStorage(storage.BaseStorage):
         except KeyError:
             data = None
         except BadSignature:
-            raise SuspiciousOperation('FormWizard cookie manipulated')
+            raise SuspiciousOperation('WizardView cookie manipulated')
         if data is None:
             return None
         return json.loads(data, cls=json.JSONDecoder)
