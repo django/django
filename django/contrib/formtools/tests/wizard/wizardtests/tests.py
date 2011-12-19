@@ -1,9 +1,12 @@
 from __future__ import with_statement
 import os
 
+from django import forms
 from django.test import TestCase
+from django.test.client import RequestFactory
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.contrib.formtools.wizard.views import CookieWizardView
 
 
 class WizardTests(object):
@@ -280,3 +283,51 @@ class WizardTestKwargs(TestCase):
                 TEMPLATE_DIRS=list(settings.TEMPLATE_DIRS) + [templates]):
             response = self.client.get(self.wizard_url)
             self.assertTemplateUsed(response, 'other_wizard_form.html')
+
+
+class WizardTestGenericViewInterface(TestCase):
+    def test_get_context_data_inheritance(self):
+        class TestWizard(CookieWizardView):
+            """
+            A subclass that implements ``get_context_data`` using the standard
+            protocol for generic views (accept only **kwargs).
+
+            See ticket #17148.
+            """
+            def get_context_data(self, **kwargs):
+                context = super(TestWizard, self).get_context_data(**kwargs)
+                context['test_key'] = 'test_value'
+                return context
+
+        factory = RequestFactory()
+        view = TestWizard.as_view([forms.Form])
+
+        response = view(factory.get('/'))
+        self.assertEquals(response.context_data['test_key'], 'test_value')
+
+    def test_get_context_data_with_mixin(self):
+        class AnotherMixin(object):
+            def get_context_data(self, **kwargs):
+                context = super(AnotherMixin, self).get_context_data(**kwargs)
+                context['another_key'] = 'another_value'
+                return context
+
+        class TestWizard(AnotherMixin, CookieWizardView):
+            """
+            A subclass that implements ``get_context_data`` using the standard
+            protocol for generic views (accept only **kwargs).
+
+            See ticket #17148.
+            """
+            def get_context_data(self, **kwargs):
+                context = super(TestWizard, self).get_context_data(**kwargs)
+                context['test_key'] = 'test_value'
+                return context
+
+        factory = RequestFactory()
+
+        view = TestWizard.as_view([forms.Form])
+
+        response = view(factory.get('/'))
+        self.assertEquals(response.context_data['test_key'], 'test_value')
+        self.assertEquals(response.context_data['another_key'], 'another_value')

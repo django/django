@@ -497,7 +497,7 @@ class WizardView(TemplateView):
             step = self.steps.current
         return self.get_form_list().keyOrder.index(step)
 
-    def get_context_data(self, form, *args, **kwargs):
+    def get_context_data(self, form, **kwargs):
         """
         Returns the template context for a step. You can overwrite this method
         to add more data for all or some steps. This method returns a
@@ -514,12 +514,12 @@ class WizardView(TemplateView):
 
             class MyWizard(FormWizard):
                 def get_context_data(self, form, **kwargs):
-                    context = super(MyWizard, self).get_context_data(form, **kwargs)
+                    context = super(MyWizard, self).get_context_data(form=form, **kwargs)
                     if self.steps.current == 'my_step_name':
                         context.update({'another_var': True})
                     return context
         """
-        context = super(WizardView, self).get_context_data(*args, **kwargs)
+        context = super(WizardView, self).get_context_data(**kwargs)
         context.update(self.storage.extra_data)
         context['wizard'] = {
             'form': form,
@@ -535,7 +535,7 @@ class WizardView(TemplateView):
         Returns a ``HttpResponse`` containing all needed context data.
         """
         form = form or self.get_form()
-        context = self.get_context_data(form, **kwargs)
+        context = self.get_context_data(form=form, **kwargs)
         return self.render_to_response(context)
 
     def done(self, form_list, **kwargs):
@@ -683,4 +683,3 @@ class NamedUrlCookieWizardView(NamedUrlWizardView):
     A NamedUrlFormWizard with pre-configured CookieStorageBackend.
     """
     storage_name = 'django.contrib.formtools.wizard.storage.cookie.CookieStorage'
-
