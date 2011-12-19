@@ -28,6 +28,8 @@ class NamedWizardTests(object):
         self.assertEqual(wizard['steps'].prev, None)
         self.assertEqual(wizard['steps'].next, 'form2')
         self.assertEqual(wizard['steps'].count, 4)
+        self.assertEqual(wizard['url_name'], self.wizard_urlname)
+
 
     def test_initial_call_with_params(self):
         get_params = {'getvar1': 'getval1', 'getvar2': 'getval2'}

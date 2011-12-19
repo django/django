@@ -644,6 +644,15 @@ class NamedUrlWizardView(WizardView):
             return redirect(self.url_name, step=prev_step)
         return super(NamedUrlWizardView, self).post(*args, **kwargs)
 
+    def get_context_data(self, form, **kwargs):
+        """
+        NamedUrlWizardView provides the url_name of this wizard in the context
+        dict `wizard`.
+        """
+        context = super(NamedUrlWizardView, self).get_context_data(form=form, **kwargs)
+        context['wizard']['url_name'] = self.url_name
+        return context
+
     def render_next_step(self, form, **kwargs):
         """
         When using the NamedUrlFormWizard, we have to redirect to update the
