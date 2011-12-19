@@ -1523,6 +1523,8 @@ your test suite.
 
 .. method:: assertFieldOutput(self, fieldclass, valid, invalid, field_args=None, field_kwargs=None, empty_value=u'')
 
+    .. versionadded:: 1.4
+
     Asserts that a form field behaves correctly with various inputs.
 
     :param fieldclass: the class of the field to be tested.
