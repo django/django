@@ -14,6 +14,15 @@ from django.contrib.formtools.wizard.forms import ManagementForm
 
 
 def normalize_name(name):
+    """
+    Converts camel-case style names into underscore seperated words. Example::
+
+        >>> normalize_name('oneTwoThree')
+        'one_two_three'
+        >>> normalize_name('FourFiveSix')
+        'four_five_six'
+
+    """
     new = re.sub('(((?<=[a-z])[A-Z])|([A-Z](?![A-Z]|$)))', '_\\1', name)
     return new.lower().strip('_')
 
@@ -169,12 +178,9 @@ class WizardView(TemplateView):
         kwargs['form_list'] = init_form_list
         return kwargs
 
-    def get_wizard_name(self):
-        return normalize_name(self.__class__.__name__)
-
-    def get_prefix(self):
+    def get_prefix(self, *args, **kwargs):
         # TODO: Add some kind of unique id to prefix
-        return self.wizard_name
+        return normalize_name(self.__class__.__name__)
 
     def get_form_list(self):
         """
@@ -210,8 +216,7 @@ class WizardView(TemplateView):
         response gets updated by the storage engine (for example add cookies).
         """
         # add the storage engine to the current formwizard instance
-        self.wizard_name = self.get_wizard_name()
-        self.prefix = self.get_prefix()
+        self.prefix = self.get_prefix(*args, **kwargs)
         self.storage = get_storage(self.storage_name, self.prefix, request,
             getattr(self, 'file_storage', None))
         self.steps = StepsHelper(self)

@@ -314,28 +314,21 @@ Advanced ``WizardView`` methods
                 context.update({'another_var': True})
             return context
 
-.. method:: WizardView.get_wizard_name()
+.. method:: WizardView.get_prefix(*args, **kwargs)
 
-    This method can be used to change the wizard's internal name.
-
-    Default implementation::
-
-        def get_wizard_name(self):
-            return normalize_name(self.__class__.__name__)
-
-.. method:: WizardView.get_prefix()
-
-    This method returns a prefix for the storage backends. These backends use
-    the prefix to fetch the correct data for the wizard. (Multiple wizards
-    could save their data in one session)
+    This method returns a prefix for use by the storage backends. Backends use
+    the prefix as a mechanism to allow data to be stored separately for each
+    wizard. This allows wizards to store their data in a single backend
+    without overwriting each other.
 
     You can change this method to make the wizard data prefix more unique to,
     e.g. have multiple instances of one wizard in one session.
 
     Default implementation::
 
-        def get_prefix(self):
-            return self.wizard_name
+        def get_prefix(self, *args, **kwargs):
+            # use the lowercase underscore version of the class name
+            return normalize_name(self.__class__.__name__)
 
 .. method:: WizardView.get_form(step=None, data=None, files=None)
 
