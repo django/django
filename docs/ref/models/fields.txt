@@ -308,7 +308,7 @@ underscores to spaces. See :ref:`Verbose field names <verbose-field-names>`.
 
 .. attribute:: Field.validators
 
-A list of validators to run for this field.See the :doc:`validators
+A list of validators to run for this field. See the :doc:`validators
 documentation </ref/validators>` for more information.
 
 .. _model-field-types:
