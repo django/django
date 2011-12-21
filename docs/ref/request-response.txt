@@ -33,7 +33,9 @@ All attributes except ``session`` should be considered read-only.
 .. attribute:: HttpRequest.body
 
     .. versionchanged:: 1.4
-    Before Django 1.4, ``HttpRequest.body`` was named ``HttpRequest.raw_post_data``.
+
+    Before Django 1.4, ``HttpRequest.body`` was named
+    ``HttpRequest.raw_post_data``.
 
     The raw HTTP request body as a byte string. This is useful for processing
     data in different ways than conventional HTML forms: binary images,
