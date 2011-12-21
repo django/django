@@ -229,9 +229,10 @@ def make_messages(locale=None, domain='django', verbosity='1', all=False,
                 if file_ext in extensions:
                     src = open(orig_file, "rU").read()
                     thefile = '%s.py' % file
+                    content = templatize(src, orig_file[2:])
                     f = open(os.path.join(dirpath, thefile), "w")
                     try:
-                        f.write(templatize(src, orig_file[2:]))
+                        f.write(content)
                     finally:
                         f.close()
                 if verbosity > 1:
