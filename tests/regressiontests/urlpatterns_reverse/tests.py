@@ -48,6 +48,10 @@ resolve_test_data = (
     # Nested namespaces
     ('/ns-included1/test3/inner/42/37/', 'urlobject-view', 'testapp', 'inc-ns1:test-ns3', 'empty_view', tuple(), {'arg1': '42', 'arg2': '37'}),
     ('/ns-included1/ns-included4/ns-included2/test3/inner/42/37/', 'urlobject-view', 'testapp', 'inc-ns1:inc-ns4:inc-ns2:test-ns3', 'empty_view', tuple(), {'arg1': '42', 'arg2': '37'}),
+
+    # Namespaces capturing variables
+    ('/inc70/', 'inner-nothing', None, 'inc-ns5', views.empty_view, tuple(), {'outer': '70'}),
+    ('/inc78/extra/foobar/', 'inner-extra', None, 'inc-ns5', views.empty_view, tuple(), {'outer':'78', 'extra':'foobar'}),
 )
 
 test_data = (
@@ -378,6 +382,13 @@ class NamespaceTests(TestCase):
         self.assertEqual('/+%5C$*/included/normal/37/42/', reverse('special:inc-normal-view', args=[37,42]))
         self.assertEqual('/+%5C$*/included/normal/42/37/', reverse('special:inc-normal-view', kwargs={'arg1':42, 'arg2':37}))
         self.assertEqual('/+%5C$*/included/+%5C$*/', reverse('special:inc-special-view'))
+
+    def test_namespaces_with_variables(self):
+        "Namespace prefixes can capture variables: see #15900"
+        self.assertEqual('/inc70/', reverse('inc-ns5:inner-nothing', kwargs={'outer': '70'}))
+        self.assertEqual('/inc78/extra/foobar/', reverse('inc-ns5:inner-extra', kwargs={'outer':'78', 'extra':'foobar'}))
+        self.assertEqual('/inc70/', reverse('inc-ns5:inner-nothing', args=['70']))
+        self.assertEqual('/inc78/extra/foobar/', reverse('inc-ns5:inner-extra', args=['78','foobar']))
 
 class RequestURLconfTests(TestCase):
     def setUp(self):

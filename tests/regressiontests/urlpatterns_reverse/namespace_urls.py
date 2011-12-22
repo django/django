@@ -44,12 +44,13 @@ urlpatterns = patterns('regressiontests.urlpatterns_reverse.views',
     (r'^default/', include(default_testobj.urls)),
 
     (r'^other1/', include(otherobj1.urls)),
-    (r'^other2/', include(otherobj2.urls)),
+    (r'^other[246]/', include(otherobj2.urls)),
 
-    (r'^ns-included1/', include('regressiontests.urlpatterns_reverse.included_namespace_urls', namespace='inc-ns1')),
+    (r'^ns-included[135]/', include('regressiontests.urlpatterns_reverse.included_namespace_urls', namespace='inc-ns1')),
     (r'^ns-included2/', include('regressiontests.urlpatterns_reverse.included_namespace_urls', namespace='inc-ns2')),
 
     (r'^included/', include('regressiontests.urlpatterns_reverse.included_namespace_urls')),
+    (r'^inc(?P<outer>\d+)/', include('regressiontests.urlpatterns_reverse.included_urls', namespace='inc-ns5')),
 
     (r'^ns-outer/(?P<outer>\d+)/', include('regressiontests.urlpatterns_reverse.included_namespace_urls', namespace='inc-outer')),
 

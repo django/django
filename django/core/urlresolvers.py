@@ -351,6 +351,9 @@ class RegexURLResolver(LocaleRegexProvider):
         return self._resolve_special('500')
 
     def reverse(self, lookup_view, *args, **kwargs):
+        return self._reverse_with_prefix(lookup_view, '', *args, **kwargs)
+
+    def _reverse_with_prefix(self, lookup_view, _prefix, *args, **kwargs):
         if args and kwargs:
             raise ValueError("Don't mix *args and **kwargs in call to reverse()!")
         try:
@@ -358,15 +361,16 @@ class RegexURLResolver(LocaleRegexProvider):
         except (ImportError, AttributeError), e:
             raise NoReverseMatch("Error importing '%s': %s." % (lookup_view, e))
         possibilities = self.reverse_dict.getlist(lookup_view)
+        prefix_norm, prefix_args = normalize(_prefix)[0]
         for possibility, pattern, defaults in possibilities:
             for result, params in possibility:
                 if args:
-                    if len(args) != len(params):
+                    if len(args) != len(params) + len(prefix_args):
                         continue
                     unicode_args = [force_unicode(val) for val in args]
-                    candidate =  result % dict(zip(params, unicode_args))
+                    candidate =  (prefix_norm + result) % dict(zip(prefix_args + params, unicode_args))
                 else:
-                    if set(kwargs.keys() + defaults.keys()) != set(params + defaults.keys()):
+                    if set(kwargs.keys() + defaults.keys()) != set(params + defaults.keys() + prefix_args):
                         continue
                     matches = True
                     for k, v in defaults.items():
@@ -376,8 +380,8 @@ class RegexURLResolver(LocaleRegexProvider):
                     if not matches:
                         continue
                     unicode_kwargs = dict([(k, force_unicode(v)) for (k, v) in kwargs.items()])
-                    candidate = result % unicode_kwargs
-                if re.search(u'^%s' % pattern, candidate, re.UNICODE):
+                    candidate = (prefix_norm + result) % unicode_kwargs
+                if re.search(u'^%s%s' % (_prefix, pattern), candidate, re.UNICODE):
                     return candidate
         # lookup_view can be URL label, or dotted path, or callable, Any of
         # these can be passed in at the top, but callables are not friendly in
@@ -469,8 +473,7 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, prefix=None, current
         if ns_pattern:
             resolver = get_ns_resolver(ns_pattern, resolver)
 
-    return iri_to_uri(u'%s%s' %
-                      (prefix, resolver.reverse(view, *args, **kwargs)))
+    return iri_to_uri(resolver._reverse_with_prefix(view, prefix, *args, **kwargs))
 
 reverse_lazy = lazy(reverse, str)
 
