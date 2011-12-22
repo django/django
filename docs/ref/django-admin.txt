@@ -907,21 +907,121 @@ of sync with its automatically incremented field data.
 The :djadminopt:`--database` option can be used to specify the database for
 which to print the SQL.
 
-startapp <appname>
-------------------
+startapp <appname> [destination]
+--------------------------------
 
 .. django-admin:: startapp
 
 Creates a Django app directory structure for the given app name in the current
+directory or the given destination.
+
+.. versionchanged:: 1.4
+
+By default the directory created contains a ``models.py`` file and other app
+template files, see the `source`_ for more details. If only the app
+name is given, the app directory will be created in the current working
 directory.
 
-startproject <projectname>
---------------------------
+If the optional destination is provided, it will be used to create the
+the new app directory in. The use of '.' to denote the current working
+directory is valid for the destination. For example::
+
+    django-admin.py startapp myapp /Users/jezdez/Code
+
+
+.. versionadded:: 1.4
+.. django-admin-option:: --template
+
+With the ``--template`` option you can use a custom app template by providing
+either the path to a directory with the app template file, a path to a
+compressed file (``.tar.gz``, ``.tar.bz2``, ``.tgz``, ``.tbz``, ``.zip``)
+containing the app template files.
+
+Additionally Django will also accept URLs (``http``, ``https``, ``ftp``) to
+compressed archives with the app template files, downloading and extracting
+them on the fly.
+
+For example, this would look for an app template in the given directory when creating the ``myapp`` app::
+
+    django-admin.py startapp --template=/Users/jezdez/Code/my_app_template myapp
+
+.. versionadded:: 1.4
+
+When Django copies the app template files it will also render the files
+whose extension matches those passed with the ``--extension`` option (``py``
+by default) using the template engine. The :class:`template context
+<django.template.Context>` used is:
+
+- Any option passed to the startapp command
+- ``app_name`` -- the appp name as passed to the command
+- ``app_directory`` -- the full path of the newly created app
+
+.. _render_warning:
+
+.. warning::
+
+    When the app template files are rendered with the Django template
+    engine (by default all ``*.py`` files) it will also replace all
+    stray template variables contained. If one of the Python files for
+    example contains a docstring explaining a particular feature related
+    to template rendering, it might result in an incorrect example.
+
+    To work around this problem you can use the :ttag:`templatetag`
+    templatetag to "escape" the various parts of the template syntax.
+
+.. _source: https://code.djangoproject.com/browser/django/trunk/django/conf/app_template/
+
+startproject <projectname> [destination]
+----------------------------------------
 
 .. django-admin:: startproject
 
-Creates a Django project directory structure for the given project name in the
-current directory.
+Creates a Django project directory structure for the given project name in
+the current directory or the given destination.
+
+.. versionchanged:: 1.4
+
+By default the directory created contains a ``manage.py`` file and a project
+package (containing ``settings.py`` file and other project template files),
+see the `template source`_ for more details.
+
+If only the project name is given, both the project directory and project
+package will be named ``<projectname>`` and the project directory
+will be created in the current working directory.
+
+If the optional destination is provided, it will be used to create the
+the new project directory in. The use of '.' to denote the current working
+directory is valid for the destination. For example::
+
+    django-admin.py startproject myproject /Users/jezdez/Code
+
+.. versionadded:: 1.4
+
+Similar to the :djadmin:`startapp` command the ``--template`` option is also
+available for specifying a directory or file path of a custom project
+template. See the :djadmin:`startapp` documentation for details of supported
+project template formats.
+
+For example, this would look for a project template in the given directory
+when creating the ``myproject`` project::
+
+    django-admin.py startproject --template=/Users/jezdez/Code/my_project_template myproject
+
+When Django copies the project template files it will also render the files
+whose extension matches those passed with the ``--extension`` option (``py``
+by default) using the template engine. The :class:`template context
+<django.template.Context>` used is:
+
+- Any option passed to the startproject command
+- ``project_name`` -- the project name as passed to the command
+- ``project_directory`` -- the full path of the newly created project
+- ``secret_key`` -- a random key for the :setting:`SECRET_KEY` setting
+
+Please also see the :ref:`rendering warning <render_warning>` as mentioned
+for :djadmin:`startapp`.
+
+.. _`template source`: https://code.djangoproject.com/browser/django/trunk/django/conf/project_template/
+
 
 syncdb
 ------

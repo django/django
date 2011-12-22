@@ -13,7 +13,7 @@ from django.utils.jslex import prepare_js_for_gettext
 
 plural_forms_re = re.compile(r'^(?P<value>"Plural-Forms.+?\\n")\s*$', re.MULTILINE | re.DOTALL)
 
-def handle_extensions(extensions=('html',)):
+def handle_extensions(extensions=('html',), ignored=('py',)):
     """
     Organizes multiple extensions that are separated with commas or passed by
     using --extension/-e multiple times. Note that the .py extension is ignored
@@ -31,11 +31,11 @@ def handle_extensions(extensions=('html',)):
     """
     ext_list = []
     for ext in extensions:
-        ext_list.extend(ext.replace(' ','').split(','))
+        ext_list.extend(ext.replace(' ', '').split(','))
     for i, ext in enumerate(ext_list):
         if not ext.startswith('.'):
             ext_list[i] = '.%s' % ext_list[i]
-    return set([x for x in ext_list if x != '.py'])
+    return set([x for x in ext_list if x.strip('.') not in ignored])
 
 def _popen(cmd):
     """

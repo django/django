@@ -24,3 +24,4 @@ from .baseconv import TestBaseConv
 from .jslex import JsTokensTest, JsToCForGettextTest
 from .ipv6 import TestUtilsIPv6
 from .timezone import TimezoneTests
+from .archive import TestZip, TestTar, TestGzipTar, TestBzip2Tar

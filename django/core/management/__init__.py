@@ -77,9 +77,7 @@ def get_commands():
     in that package are registered.
 
     Core commands are always included. If a settings module has been
-    specified, user-defined commands will also be included, the
-    startproject command will be disabled, and the startapp command
-    will be modified to use the directory in which the settings module appears.
+    specified, user-defined commands will also be included.
 
     The dictionary is in the format {command_name: app_name}. Key-value
     pairs from this dictionary can then be used in calls to
