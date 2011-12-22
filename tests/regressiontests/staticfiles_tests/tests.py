@@ -103,8 +103,8 @@ class BaseCollectionTestCase(BaseStaticFilesTestCase):
         settings.STATIC_ROOT = tempfile.mkdtemp(dir=os.environ['DJANGO_TEST_TEMP_DIR'])
         self.run_collectstatic()
         # Use our own error handler that can handle .svn dirs on Windows
-        #self.addCleanup(shutil.rmtree, settings.STATIC_ROOT,
-        #                ignore_errors=True, onerror=rmtree_errorhandler)
+        self.addCleanup(shutil.rmtree, settings.STATIC_ROOT,
+                        ignore_errors=True, onerror=rmtree_errorhandler)
 
     def tearDown(self):
         settings.STATIC_ROOT = self.old_root
