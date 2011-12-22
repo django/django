@@ -345,7 +345,7 @@ remain undefined afterward).
 distinct
 ~~~~~~~~
 
-.. method:: distinct()
+.. method:: distinct([*fields])
 
 Returns a new ``QuerySet`` that uses ``SELECT DISTINCT`` in its SQL query. This
 eliminates duplicate rows from the query results.
@@ -373,6 +373,43 @@ query spans multiple tables, it's possible to get duplicate results when a
     ordering by related models. Similarly, when using ``distinct()`` and
     :meth:`values()` together, be careful when ordering by fields not in the
     :meth:`values()` call.
+
+.. versionadded:: 1.4
+
+The possibility to pass positional arguments (``*fields``) is new in Django 1.4.
+They are names of fields to which the ``DISTINCT`` should be limited. This
+translates to a ``SELECT DISTINCT ON`` SQL query. A ``DISTINCT ON`` query eliminates
+duplicate rows not by comparing all fields in a row, but by comparing only the given
+fields.
+
+.. note::
+    Note that the ability to specify field names is only available in PostgreSQL.
+
+.. note::
+    When using the ``DISTINCT ON`` functionality it is required that the columns given
+    to :meth:`distinct` match the first :meth:`order_by` columns. For example ``SELECT
+    DISTINCT ON (a)`` gives you the first row for each value in column ``a``. If you
+    don't specify an order, then you'll get some arbitrary row.
+
+Examples::
+
+    >>> Author.objects.distinct()
+    [...]
+
+    >>> Entry.objects.order_by('pub_date').distinct('pub_date')
+    [...]
+
+    >>> Entry.objects.order_by('blog').distinct('blog')
+    [...]
+
+    >>> Entry.objects.order_by('author', 'pub_date').distinct('author', 'pub_date')
+    [...]
+
+    >>> Entry.objects.order_by('blog__name', 'mod_date').distinct('blog__name', 'mod_date')
+    [...]
+
+    >>> Entry.objects.order_by('author', 'pub_date').distinct('author')
+    [...]
 
 values
 ~~~~~~

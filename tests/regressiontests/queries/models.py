@@ -209,6 +209,9 @@ class Celebrity(models.Model):
     name = models.CharField("Name", max_length=20)
     greatest_fan = models.ForeignKey("Fan", null=True, unique=True)
 
+    def __unicode__(self):
+        return self.name
+
 class TvChef(Celebrity):
     pass
 
@@ -343,4 +346,3 @@ class OneToOneCategory(models.Model):
 
     def __unicode__(self):
         return "one2one " + self.new_name
-

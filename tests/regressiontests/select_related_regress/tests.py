@@ -40,9 +40,9 @@ class SelectRelatedRegressTests(TestCase):
         self.assertEqual([(c.id, unicode(c.start), unicode(c.end)) for c in connections],
             [(c1.id, u'router/4', u'switch/7'), (c2.id, u'switch/7', u'server/1')])
 
-        # This final query should only join seven tables (port, device and building
-        # twice each, plus connection once).
-        self.assertEqual(connections.query.count_active_tables(), 7)
+        # This final query should only have seven tables (port, device and building
+        # twice each, plus connection once). Thus, 6 joins plus the FROM table.
+        self.assertEqual(str(connections.query).count(" JOIN "), 6)
 
 
     def test_regression_8106(self):

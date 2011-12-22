@@ -179,6 +179,12 @@ class DatabaseOperations(BaseDatabaseOperations):
 
         return 63
 
+    def distinct_sql(self, fields):
+        if fields:
+            return 'DISTINCT ON (%s)' % ', '.join(fields)
+        else:
+            return 'DISTINCT'
+
     def last_executed_query(self, cursor, sql, params):
         # http://initd.org/psycopg/docs/cursor.html#cursor.query
         # The query attribute is a Psycopg extension to the DB API 2.0.

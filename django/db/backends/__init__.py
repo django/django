@@ -406,6 +406,9 @@ class BaseDatabaseFeatures(object):
     supports_stddev = None
     can_introspect_foreign_keys = None
 
+    # Support for the DISTINCT ON clause
+    can_distinct_on_fields = False
+
     def __init__(self, connection):
         self.connection = connection
 
@@ -558,6 +561,17 @@ class BaseDatabaseOperations(object):
         contain a '%s' placeholder for the value being searched against.
         """
         raise NotImplementedError('Full-text search is not implemented for this database backend')
+
+    def distinct_sql(self, fields):
+        """
+        Returns an SQL DISTINCT clause which removes duplicate rows from the
+        result set. If any fields are given, only the given fields are being
+        checked for duplicates.
+        """
+        if fields:
+            raise NotImplementedError('DISTINCT ON fields is not supported by this database backend')
+        else:
+            return 'DISTINCT'
 
     def last_executed_query(self, cursor, sql, params):
         """

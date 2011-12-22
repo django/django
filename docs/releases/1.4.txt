@@ -498,6 +498,16 @@ Django 1.4 also includes several smaller improvements worth noting:
   ``pickle.HIGHEST_PROTOCOL`` for better compatibility with the other
   cache backends.
 
+* Support in the ORM for generating ``SELECT`` queries containing ``DISTINCT ON``
+
+  The ``distinct()`` ``Queryset`` method now accepts an optional list of model
+  field names. If specified, then the ``DISTINCT`` statement is limited to these
+  fields.  The PostgreSQL is the only of the database backends shipped with
+  Django that supports this new functionality.
+
+  For more details, see the documentation for
+  :meth:`~django.db.models.query.QuerySet.distinct`.
+
 .. _backwards-incompatible-changes-1.4:
 
 Backwards incompatible changes in 1.4

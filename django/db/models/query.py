@@ -323,6 +323,8 @@ class QuerySet(object):
         If args is present the expression is passed as a kwarg using
         the Aggregate object's default alias.
         """
+        if self.query.distinct_fields:
+            raise NotImplementedError("aggregate() + distinct(fields) not implemented.")
         for arg in args:
             kwargs[arg.default_alias] = arg
 
@@ -751,12 +753,14 @@ class QuerySet(object):
         obj.query.add_ordering(*field_names)
         return obj
 
-    def distinct(self, true_or_false=True):
+    def distinct(self, *field_names):
         """
         Returns a new QuerySet instance that will select only distinct results.
         """
+        assert self.query.can_filter(), \
+                "Cannot create distinct fields once a slice has been taken."
         obj = self._clone()
-        obj.query.distinct = true_or_false
+        obj.query.add_distinct_fields(*field_names)
         return obj
 
     def extra(self, select=None, where=None, params=None, tables=None,
@@ -1179,7 +1183,7 @@ class EmptyQuerySet(QuerySet):
         """
         return self
 
-    def distinct(self, true_or_false=True):
+    def distinct(self, fields=None):
         """
         Always returns EmptyQuerySet.
         """
