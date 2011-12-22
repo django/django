@@ -302,8 +302,14 @@ class ExceptionReporter(object):
         top = max(1, line - context_lines)
         bottom = min(total, line + 1 + context_lines)
 
+        # In some rare cases, exc_value.args might be empty.
+        try:
+            message = self.exc_value.args[0]
+        except IndexError:
+            message = '(Could not get exception message)'
+
         self.template_info = {
-            'message': self.exc_value.args[0],
+            'message': message,
             'source_lines': source_lines[top:bottom],
             'before': before,
             'during': during,
