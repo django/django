@@ -13,6 +13,7 @@ import re
 
 from django import conf, bin, get_version
 from django.conf import settings
+from django.test.simple import DjangoTestSuiteRunner
 from django.utils import unittest
 
 
@@ -1056,6 +1057,50 @@ class ManageValidate(AdminScriptTestCase):
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
         self.assertOutput(out, '0 errors found')
+
+
+class CustomTestRunner(DjangoTestSuiteRunner):
+
+    def __init__(self, *args, **kwargs):
+        assert 'liveserver' not in kwargs
+        super(CustomTestRunner, self).__init__(*args, **kwargs)
+
+    def run_tests(self, test_labels, extra_tests=None, **kwargs):
+        pass
+
+class ManageTestCommand(AdminScriptTestCase):
+    def setUp(self):
+        from django.core.management.commands.test import Command as TestCommand
+        self.cmd = TestCommand()
+
+    def test_liveserver(self):
+        """
+        Ensure that the --liveserver option sets the environment variable
+        correctly.
+        Refs #2879.
+        """
+
+        # Backup original state
+        address_predefined = 'DJANGO_LIVE_TEST_SERVER_ADDRESS' in os.environ
+        old_address = os.environ.get('DJANGO_LIVE_TEST_SERVER_ADDRESS')
+
+        self.cmd.handle(verbosity=0, testrunner='regressiontests.admin_scripts.tests.CustomTestRunner')
+
+        # Original state hasn't changed
+        self.assertEqual('DJANGO_LIVE_TEST_SERVER_ADDRESS' in os.environ, address_predefined)
+        self.assertEqual(os.environ.get('DJANGO_LIVE_TEST_SERVER_ADDRESS'), old_address)
+
+        self.cmd.handle(verbosity=0, testrunner='regressiontests.admin_scripts.tests.CustomTestRunner',
+                        liveserver='blah')
+
+        # Variable was correctly set
+        self.assertEqual(os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'], 'blah')
+
+        # Restore original state
+        if address_predefined:
+            os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = old_address
+        else:
+            del os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS']
 
 
 class ManageRunserver(AdminScriptTestCase):

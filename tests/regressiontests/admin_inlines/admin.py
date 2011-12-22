@@ -109,6 +109,10 @@ class SottoCapoInline(admin.TabularInline):
     model = SottoCapo
 
 
+class ProfileInline(admin.TabularInline):
+    model = Profile
+    extra = 1
+
 site.register(TitleCollection, inlines=[TitleInline])
 # Test bug #12561 and #12778
 # only ModelAdmin media
@@ -124,3 +128,4 @@ site.register(Fashionista, inlines=[InlineWeakness])
 site.register(Holder4, Holder4Admin)
 site.register(Author, AuthorAdmin)
 site.register(CapoFamiglia, inlines=[ConsigliereInline, SottoCapoInline])
+site.register(ProfileCollection, inlines=[ProfileInline])

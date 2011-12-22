@@ -3,13 +3,17 @@ Tests for django.core.servers.
 """
 import os
 from urlparse import urljoin
+import urllib2
 
 import django
 from django.conf import settings
-from django.test import TestCase
+from django.core.exceptions import ImproperlyConfigured
+from django.test import TestCase, LiveServerTestCase
 from django.core.handlers.wsgi import WSGIHandler
-from django.core.servers.basehttp import AdminMediaHandler
+from django.core.servers.basehttp import AdminMediaHandler, WSGIServerException
+from django.test.utils import override_settings
 
+from .models import Person
 
 class AdminMediaHandlerTests(TestCase):
 
@@ -68,3 +72,146 @@ class AdminMediaHandlerTests(TestCase):
                 continue
             self.fail('URL: %s should have caused a ValueError exception.'
                       % url)
+
+
+TEST_ROOT = os.path.dirname(__file__)
+TEST_SETTINGS = {
+    'MEDIA_URL': '/media/',
+    'MEDIA_ROOT': os.path.join(TEST_ROOT, 'media'),
+    'STATIC_URL': '/static/',
+    'STATIC_ROOT': os.path.join(TEST_ROOT, 'static'),
+}
+
+
+class LiveServerBase(LiveServerTestCase):
+    urls = 'regressiontests.servers.urls'
+    fixtures = ['testdata.json']
+
+    @classmethod
+    def setUpClass(cls):
+        # Override settings
+        cls.settings_override = override_settings(**TEST_SETTINGS)
+        cls.settings_override.enable()
+        super(LiveServerBase, cls).setUpClass()
+
+    @classmethod
+    def tearDownClass(cls):
+        # Restore original settings
+        cls.settings_override.disable()
+        super(LiveServerBase, cls).tearDownClass()
+
+    def urlopen(self, url):
+        server_address = os.environ.get(
+            'DJANGO_LIVE_TEST_SERVER_ADDRESS', 'localhost:8081')
+        base = 'http://%s' % server_address
+        return urllib2.urlopen(base + url)
+
+
+class LiveServerAddress(LiveServerBase):
+    """
+    Ensure that the address set in the environment variable is valid.
+    Refs #2879.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        # Backup original environment variable
+        address_predefined = 'DJANGO_LIVE_TEST_SERVER_ADDRESS' in os.environ
+        old_address = os.environ.get('DJANGO_LIVE_TEST_SERVER_ADDRESS')
+
+        # Just the host is not accepted
+        os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = 'localhost'
+        try:
+            super(LiveServerAddress, cls).setUpClass()
+            raise Exception("The line above should have raised an exception")
+        except ImproperlyConfigured:
+            pass
+
+        # The host must be valid
+        os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = 'blahblahblah:8081'
+        try:
+            super(LiveServerAddress, cls).setUpClass()
+            raise Exception("The line above should have raised an exception")
+        except WSGIServerException:
+            pass
+
+        # If contrib.staticfiles isn't configured properly, the exception
+        # should bubble up to the main thread.
+        old_STATIC_URL = TEST_SETTINGS['STATIC_URL']
+        TEST_SETTINGS['STATIC_URL'] = None
+        os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = 'localhost:8081'
+        try:
+            super(LiveServerAddress, cls).setUpClass()
+            raise Exception("The line above should have raised an exception")
+        except ImproperlyConfigured:
+            pass
+        TEST_SETTINGS['STATIC_URL'] = old_STATIC_URL
+
+        # Restore original environment variable
+        if address_predefined:
+            os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = old_address
+        else:
+            del os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS']
+
+    def test_test_test(self):
+        # Intentionally empty method so that the test is picked up by the
+        # test runner and the overriden setUpClass() method is executed.
+        pass
+
+class LiveServerViews(LiveServerBase):
+    def test_404(self):
+        """
+        Ensure that the LiveServerTestCase serves 404s.
+        Refs #2879.
+        """
+        try:
+            self.urlopen('/')
+        except urllib2.HTTPError, err:
+            self.assertEquals(err.code, 404, 'Expected 404 response')
+        else:
+            self.fail('Expected 404 response')
+
+    def test_view(self):
+        """
+        Ensure that the LiveServerTestCase serves views.
+        Refs #2879.
+        """
+        f = self.urlopen('/example_view/')
+        self.assertEquals(f.read(), 'example view')
+
+    def test_static_files(self):
+        """
+        Ensure that the LiveServerTestCase serves static files.
+        Refs #2879.
+        """
+        f = self.urlopen('/static/example_static_file.txt')
+        self.assertEquals(f.read(), 'example static file\n')
+
+    def test_media_files(self):
+        """
+        Ensure that the LiveServerTestCase serves media files.
+        Refs #2879.
+        """
+        f = self.urlopen('/media/example_media_file.txt')
+        self.assertEquals(f.read(), 'example media file\n')
+
+
+class LiveServerDatabase(LiveServerBase):
+
+    def test_fixtures_loaded(self):
+        """
+        Ensure that fixtures are properly loaded and visible to the
+        live server thread.
+        Refs #2879.
+        """
+        f = self.urlopen('/model_view/')
+        self.assertEquals(f.read().splitlines(), ['jane', 'robert'])
+
+    def test_database_writes(self):
+        """
+        Ensure that data written to the database by a view can be read.
+        Refs #2879.
+        """
+        self.urlopen('/create_model_instance/')
+        names = [person.name for person in Person.objects.all()]
+        self.assertEquals(names, ['jane', 'robert', 'emily'])

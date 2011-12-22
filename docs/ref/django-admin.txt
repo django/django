@@ -976,15 +976,22 @@ information.
 .. versionadded:: 1.2
 .. django-admin-option:: --failfast
 
-Use the :djadminopt:`--failfast` option to stop running tests and report the failure
-immediately after a test fails.
+The ``--failfast`` option can be used to stop running tests and report the
+failure immediately after a test fails.
 
 .. versionadded:: 1.4
 .. django-admin-option:: --testrunner
 
-The :djadminopt:`--testrunner` option can be used to control the test runner
-class that is used to execute tests. If this value is provided, it overrides
-the value provided by the :setting:`TEST_RUNNER` setting.
+The ``--testrunner`` option can be used to control the test runner class that
+is used to execute tests. If this value is provided, it overrides the value
+provided by the :setting:`TEST_RUNNER` setting.
+
+.. versionadded:: 1.4
+.. django-admin-option:: --liveserver
+
+The ``--liveserver`` option can be used to override the default address where
+the live server (used with :class:`~django.test.LiveServerTestCase`) is
+expected to run from. The default value is ``localhost:8081``.
 
 testserver <fixture fixture ...>
 --------------------------------

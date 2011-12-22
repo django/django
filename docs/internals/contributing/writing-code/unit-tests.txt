@@ -122,6 +122,19 @@ Going beyond that, you can specify an individual test method like this:
 
     ./runtests.py --settings=path.to.settings i18n.TranslationTests.test_lazy_objects
 
+Running the Selenium tests
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Some admin tests require Selenium 2, Firefox and Python >= 2.6 to work via a
+real Web browser. To allow those tests to run and not be skipped, you must
+install the selenium_ package (version > 2.13) into your Python path.
+
+Then, run the tests normally, for example:
+
+.. code-block:: bash
+
+    ./runtests.py --settings=test_sqlite admin_inlines
+
 Running all the tests
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -135,6 +148,7 @@ dependencies:
 *  setuptools_
 *  memcached_, plus a :ref:`supported Python binding <memcached>`
 *  gettext_ (:ref:`gettext_on_windows`)
+*  selenium_ (if also using Python >= 2.6)
 
 If you want to test the memcached cache backend, you'll also need to define
 a :setting:`CACHES` setting that points at your memcached instance.
@@ -149,6 +163,7 @@ associated tests will be skipped.
 .. _setuptools: http://pypi.python.org/pypi/setuptools/
 .. _memcached: http://www.danga.com/memcached/
 .. _gettext: http://www.gnu.org/software/gettext/manual/gettext.html
+.. _selenium: http://pypi.python.org/pypi/selenium
 
 .. _contrib-apps:
 

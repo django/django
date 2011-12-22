@@ -581,20 +581,19 @@ Some of the things you can do with the test client are:
 * Test that a given request is rendered by a given Django template, with
   a template context that contains certain values.
 
-Note that the test client is not intended to be a replacement for Twill_,
+Note that the test client is not intended to be a replacement for Windmill_,
 Selenium_, or other "in-browser" frameworks. Django's test client has
 a different focus. In short:
 
 * Use Django's test client to establish that the correct view is being
   called and that the view is collecting the correct context data.
 
-* Use in-browser frameworks such as Twill and Selenium to test *rendered*
-  HTML and the *behavior* of Web pages, namely JavaScript functionality.
+* Use in-browser frameworks such as Windmill_ and Selenium_ to test *rendered*
+  HTML and the *behavior* of Web pages, namely JavaScript functionality. Django
+  also provides special support for those frameworks; see the section on
+  :class:`~django.test.LiveServerTestCase` for more details.
 
 A comprehensive test suite should use a combination of both test types.
-
-.. _Twill: http://twill.idyll.org/
-.. _Selenium: http://seleniumhq.org/
 
 Overview and a quick example
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1753,6 +1752,97 @@ under MySQL with MyISAM tables)::
         def test_transaction_behavior(self):
             # ... conditional test code
 
+Live test server
+----------------
+
+.. versionadded:: 1.4
+
+.. currentmodule:: django.test
+
+.. class:: LiveServerTestCase()
+
+``LiveServerTestCase`` does basically the same as
+:class:`~django.test.TransactionTestCase` with one extra feature: it launches a
+live Django server in the background on setup, and shuts it down on teardown.
+This allows the use of automated test clients other than the
+:ref:`Django dummy client <test-client>` such as, for example, the Selenium_ or
+Windmill_ clients, to execute a series of functional tests inside a browser and
+simulate a real user's actions.
+
+By default the live server's address is `'localhost:8081'` and the full URL
+can be accessed during the tests with ``self.live_server_url``. If you'd like
+to change the default address (in the case, for example, where the 8081 port is
+already taken) you may pass a different one to the :djadmin:`test` command via
+the :djadminopt:`--liveserver` option, for example:
+
+.. code-block:: bash
+
+    ./manage.py test --liveserver=localhost:8082
+
+Another way of changing the default server address is by setting the
+`DJANGO_LIVE_TEST_SERVER_ADDRESS` environment variable.
+
+To demonstrate how to use ``LiveServerTestCase``, let's write a simple Selenium
+test. First of all, you need to install the `selenium package`_ into your
+Python path:
+
+.. code-block:: bash
+
+   pip install selenium
+
+Then, add a ``LiveServerTestCase``-based test to your app's tests module
+(for example: ``myapp/tests.py``). The code for this test may look as follows:
+
+.. code-block:: python
+
+    from django.test import LiveServerTestCase
+    from selenium.webdriver.firefox.webdriver import WebDriver
+
+    class MySeleniumTests(LiveServerTestCase):
+        fixtures = ['user-data.json']
+
+        @classmethod
+        def setUpClass(cls):
+            cls.selenium = WebDriver()
+            super(MySeleniumTests, cls).setUpClass()
+
+        @classmethod
+        def tearDownClass(cls):
+            super(MySeleniumTests, cls).tearDownClass()
+            cls.selenium.quit()
+
+        def test_login(self):
+            self.selenium.get('%s%s' % (self.live_server_url, '/login/'))
+            username_input = self.selenium.find_element_by_name("username")
+            username_input.send_keys('myuser')
+            password_input = self.selenium.find_element_by_name("password")
+            password_input.send_keys('secret')
+            self.selenium.find_element_by_xpath('//input[@value="Log in"]').click()
+
+Finally, you may run the test as follows:
+
+.. code-block:: bash
+
+    ./manage.py test myapp.MySeleniumTests.test_login
+
+This example will automatically open Firefox then go to the login page, enter
+the credentials and press the "Log in" button. Selenium offers other drivers in
+case you do not have Firefox installed or wish to use another browser. The
+example above is just a tiny fraction of what the Selenium client can do; check
+out the `full reference`_ for more details.
+
+.. _Windmill: http://www.getwindmill.com/
+.. _Selenium: http://seleniumhq.org/
+.. _selenium package: http://pypi.python.org/pypi/selenium
+.. _full reference: http://readthedocs.org/docs/selenium-python/en/latest/api.html
+.. _Firefox: http://www.mozilla.com/firefox/
+
+.. note::
+
+    ``LiveServerTestCase`` makes use of the :doc:`staticfiles contrib app
+    </howto/static-files>` so you'll need to have your project configured
+    accordingly (in particular by setting :setting:`STATIC_URL`).
+
 
 Using different testing frameworks
 ==================================
@@ -1833,10 +1923,8 @@ set up, execute and tear down the test suite.
     those options will be added to the list of command-line options that
     the :djadmin:`test` command can use.
 
-
 Attributes
 ~~~~~~~~~~
-
 
 .. attribute:: DjangoTestSuiteRunner.option_list
 

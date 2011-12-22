@@ -136,3 +136,13 @@ class Consigliere(models.Model):
 class SottoCapo(models.Model):
     name = models.CharField(max_length=100)
     capo_famiglia = models.ForeignKey(CapoFamiglia, related_name='+')
+
+# Other models
+
+class ProfileCollection(models.Model):
+    pass
+
+class Profile(models.Model):
+    collection = models.ForeignKey(ProfileCollection, blank=True, null=True)
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
