@@ -1,19 +1,28 @@
-============================================
-Django 1.4 release notes - UNDER DEVELOPMENT
-============================================
+==============================
+Django 1.4 alpha release notes
+==============================
 
-This page documents release notes for the as-yet-unreleased Django
-1.4. As such, it's tentative and subject to change. It provides
-up-to-date information for those who are following trunk.
+December 22, 2011.
 
-Django 1.4 includes various `new features`_ and some minor `backwards
+Welcome to Django 1.4 alpha!
+
+This is the first in a series of preview/development releases leading up to the
+eventual release of Django 1.4, scheduled for March 2012. This release is
+primarily targeted at developers who are interested in trying out new features
+and testing the Django codebase to help identify and resolve bugs prior to the
+final 1.4 release.
+
+As such, this release is *not* intended for production use, and any such use is
+discouraged.
+
+Django 1.4 alpha includes various `new features`_ and some minor `backwards
 incompatible changes`_. There are also some features that have been dropped,
 which are detailed in :doc:`our deprecation plan </internals/deprecation>`, and
 we've `begun the deprecation process for some features`_.
 
 .. _new features: `What's new in Django 1.4`_
-.. _backwards incompatible changes: backwards-incompatible-changes-1.4_
-.. _begun the deprecation process for some features: deprecated-features-1.4_
+.. _backwards incompatible changes: `Backwards incompatible changes in 1.4`_
+.. _begun the deprecation process for some features: `Features deprecated in 1.4`_
 
 Python compatibility
 ====================
@@ -498,8 +507,6 @@ Django 1.4 also includes several smaller improvements worth noting:
   ``pickle.HIGHEST_PROTOCOL`` for better compatibility with the other
   cache backends.
 
-.. _backwards-incompatible-changes-1.4:
-
 Backwards incompatible changes in 1.4
 =====================================
 
@@ -851,8 +858,6 @@ whose primary use is to load fixtures consisting of simple objects. Even though
 fixtures are trusted data, for additional security, the YAML deserializer now
 uses ``yaml.safe_load``.
 
-.. _deprecated-features-1.4:
-
 Features deprecated in 1.4
 ==========================
 
@@ -1013,3 +1018,58 @@ settings file to list all your applications explicitly.
 This attribute was confusingly named ``HttpRequest.raw_post_data``, but it
 actually provided the body of the HTTP request. It's been renamed to
 ``HttpRequest.body``, and ``HttpRequest.raw_post_data`` has been deprecated.
+
+The Django 1.4 roadmap
+======================
+
+Before the final Django 1.4 release, several other preview/development releases
+will be made available. The current schedule consists of at least the following:
+
+* Week of **January 30, 2012**: First Django 1.4 beta release; final
+  feature freeze for Django 1.4.
+
+* Week of **February 27, 2012**: First Django 1.4 release
+  candidate; string freeze for translations.
+
+* Week of **March 5, 2011**: Django 1.4 final release.
+
+If necessary, additional alpha, beta or release-candidate packages
+will be issued prior to the final 1.4 release. Django 1.4 will be
+released approximately one week after the final release candidate.
+
+What you can do to help
+=======================
+
+In order to provide a high-quality 1.4 release, we need your help. Although this
+alpha release is, again, *not* intended for production use, you can help the
+Django team by trying out the alpha codebase in a safe test environment and
+reporting any bugs or issues you encounter. The Django ticket tracker is the
+central place to search for open issues:
+
+* http://code.djangoproject.com/timeline
+
+Please open new tickets if no existing ticket corresponds to a problem you're
+running into.
+
+Additionally, discussion of Django development, including progress toward the
+1.3 release, takes place daily on the django-developers mailing list:
+
+* http://groups.google.com/group/django-developers
+
+... and in the ``#django-dev`` IRC channel on ``irc.freenode.net``. If you're
+interested in helping out with Django's development, feel free to join the
+discussions there.
+
+Django's online documentation also includes pointers on how to contribute to
+Django:
+
+* :doc:`How to contribute to Django </internals/contributing/index>`
+
+Contributions on any level -- developing code, writing documentation or simply
+triaging tickets and helping to test proposed bugfixes -- are always welcome and
+appreciated.
+
+Several development sprints will also be taking place before the 1.4
+release; these will typically be announced in advance on the
+django-developers mailing list, and anyone who wants to help is
+welcome to join in.
