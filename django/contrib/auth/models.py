@@ -4,6 +4,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.mail import send_mail
 from django.db import models
 from django.db.models.manager import EmptyManager
+from django.utils.crypto import get_random_string
 from django.utils.encoding import smart_str
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
@@ -31,7 +32,7 @@ class PermissionManager(models.Manager):
     def get_by_natural_key(self, codename, app_label, model):
         return self.get(
             codename=codename,
-            content_type=ContentType.objects.get_by_natural_key(app_label, model)
+            content_type=ContentType.objects.get_by_natural_key(app_label, model),
         )
 
 class Permission(models.Model):
