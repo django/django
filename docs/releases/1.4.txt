@@ -41,7 +41,7 @@ What's new in Django 1.4
 Support for in-browser testing frameworks
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Django 1.4 now supports the integration with in-browser testing frameworks such
+Django 1.4 now supports integration with in-browser testing frameworks such
 as Selenium_ or Windmill_ thanks to the :class:`django.test.LiveServerTestCase`
 base class, allowing you to test the interactions between your site's front and
 back ends more comprehensively. See the
@@ -81,56 +81,55 @@ Similar to :meth:`~django.db.models.query.QuerySet.select_related` but with a
 different strategy and broader scope,
 :meth:`~django.db.models.query.QuerySet.prefetch_related` has been added to
 :class:`~django.db.models.query.QuerySet`. This method returns a new
-``QuerySet`` that will prefetch in a single batch each of the specified related
-lookups as soon as it begins to be evaluated. Unlike ``select_related``, it does
-the joins in Python, not in the database, and supports many-to-many
-relationships, :class:`~django.contrib.contenttypes.generic.GenericForeignKey`
-and more. This enables you to fix many instances of a very common performance
-problem, in which your code ends up doing O(n) database queries (or worse) if
-objects on your primary ``QuerySet`` each have many related objects that you
-also need.
+``QuerySet`` that will prefetch each of the specified related lookups in a
+single batch as soon as the query begins to be evaluated. Unlike
+``select_related``, it does the joins in Python, not in the database, and
+supports many-to-many relationships,
+:class:`~django.contrib.contenttypes.generic.GenericForeignKey` and more. This
+allows you to fix a very common performance problem in which your code ends up
+doing O(n) database queries (or worse) if objects on your primary ``QuerySet``
+each have many related objects that you also need.
 
-HTML5
-~~~~~
+HTML5 Doctype
+~~~~~~~~~~~~~
 
 We've switched the admin and other bundled templates to use the HTML5
-doctype. While Django will be careful in its use of HTML5 features, to maintain
-compatibility with older browsers, this change means that you can use any HTML5
-features you need in admin pages without having to lose HTML validity or
-override the provided templates to change the doctype.
+doctype. While Django will be careful to maintain compatibility with older
+browsers, this change means that you can use any HTML5 features you need in
+admin pages without having to lose HTML validity or override the provided
+templates to change the doctype.
 
 List filters in admin interface
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Prior to Django 1.4, the Django admin app allowed specifying change list
-filters by specifying a field lookup (including spanning relations), and
-not custom filters. This has been rectified with a simple API previously
-known as "FilterSpec" which was used internally. For more details, see the
-documentation for :attr:`~django.contrib.admin.ModelAdmin.list_filter`.
+Prior to Django 1.4, the :mod:`~django.contrib.admin` app allowed you to specify
+change list filters by specifying a field lookup, but didn't allow you to create
+custom filters. This has been rectified with a simple API (previously used
+internally and known as "FilterSpec"). For more details, see the documentation
+for :attr:`~django.contrib.admin.ModelAdmin.list_filter`.
 
 Multiple sort in admin interface
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The admin change list now supports sorting on multiple columns. It respects
-all elements of the :attr:`~django.contrib.admin.ModelAdmin.ordering`
-attribute, and sorting on multiple columns by clicking on headers is designed
-to work similarly to how desktop GUIs do it. The new hook
-:meth:`~django.contrib.admin.ModelAdmin.get_ordering` for specifying the
+The admin change list now supports sorting on multiple columns. It respects all
+elements of the :attr:`~django.contrib.admin.ModelAdmin.ordering` attribute, and
+sorting on multiple columns by clicking on headers is designed to mimic the
+behavior of desktop GUIs. The
+:meth:`~django.contrib.admin.ModelAdmin.get_ordering` method for specifying the
 ordering dynamically (e.g. depending on the request) has also been added.
 
 New ``ModelAdmin`` methods
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A new :meth:`~django.contrib.admin.ModelAdmin.save_related` method was added to
-:mod:`~django.contrib.admin.ModelAdmin` to ease the customization of how
+:mod:`~django.contrib.admin.ModelAdmin` to ease customization of how
 related objects are saved in the admin.
 
 Two other new methods,
 :meth:`~django.contrib.admin.ModelAdmin.get_list_display` and
 :meth:`~django.contrib.admin.ModelAdmin.get_list_display_links`
 were added to :class:`~django.contrib.admin.ModelAdmin` to enable the dynamic
-customization of fields and links to display on the admin
-change list.
+customization of fields and links displayed on the admin change list.
 
 Admin inlines respect user permissions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -148,30 +147,31 @@ Django 1.4 adds both a low-level API for signing values and a high-level API
 for setting and reading signed cookies, one of the most common uses of
 signing in Web applications.
 
-See :doc:`cryptographic signing </topics/signing>` docs for more information.
+See the :doc:`cryptographic signing </topics/signing>` docs for more
+information.
 
 Cookie-based session backend
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Django 1.4 introduces a new cookie based backend for the session framework
+Django 1.4 introduces a new cookie-based backend for the session framework
 which uses the tools for :doc:`cryptographic signing </topics/signing>` to
 store the session data in the client's browser.
 
-See the :ref:`cookie-based backend <cookie-session-backend>` docs for
+See the :ref:`cookie-based session backend <cookie-session-backend>` docs for
 more information.
 
 New form wizard
 ~~~~~~~~~~~~~~~
 
-The previously shipped ``FormWizard`` of the formtools contrib app has been
-replaced with a new implementation that is based on the class based views
+The previous ``FormWizard`` from the formtools contrib app has been
+replaced with a new implementation based on the class-based views
 introduced in Django 1.3. It features a pluggable storage API and doesn't
 require the wizard to pass around hidden fields for every previous step.
 
-Django 1.4 ships with a session based storage backend and a cookie based
+Django 1.4 ships with a session-based storage backend and a cookie-based
 storage backend. The latter uses the tools for
 :doc:`cryptographic signing </topics/signing>` also introduced in
-Django 1.4 to store the wizard state in the user's cookies.
+Django 1.4 to store the wizard's state in the user's cookies.
 
 See the :doc:`form wizard </ref/contrib/formtools/form-wizard>` docs for
 more information.
@@ -186,7 +186,7 @@ Translating URL patterns
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 Django 1.4 gained the ability to look for a language prefix in the URL pattern
-when using the new :func:`django.conf.urls.i18n.i18n_patterns` helper function.
+when using the new :func:`~django.conf.urls.i18n.i18n_patterns` helper function.
 Additionally, it's now possible to define translatable URL patterns using
 :func:`~django.utils.translation.ugettext_lazy`. See
 :ref:`url-internationalization` for more information about the language prefix
@@ -195,34 +195,35 @@ and how to internationalize URL patterns.
 Contextual translation support for ``{% trans %}`` and ``{% blocktrans %}``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Django 1.3 introduced :ref:`contextual translation<contextual-markers>` support
-in Python files via the ``pgettext`` function. This is now also supported by
-the :ttag:`trans` and :ttag:`blocktrans` template tags using the new
-``context`` keyword.
+The :ref:`contextual translation<contextual-markers>` support introduced in
+Django 1.3 via the ``pgettext`` function has been extended to the
+:ttag:`trans` and :ttag:`blocktrans` template tags using the new ``context``
+keyword.
 
 Customizable ``SingleObjectMixin`` URLConf kwargs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Two new attributes,
-:attr:`pk_url_kwarg<django.views.generic.detail.SingleObjectMixin.pk_url_kwarg>` and
+:attr:`pk_url_kwarg<django.views.generic.detail.SingleObjectMixin.pk_url_kwarg>`
+and
 :attr:`slug_url_kwarg<django.views.generic.detail.SingleObjectMixin.slug_url_kwarg>`,
-have been added to :class:`django.views.generic.detail.SingleObjectMixin` to
+have been added to :class:`~django.views.generic.detail.SingleObjectMixin` to
 enable the customization of URLConf keyword arguments used for single
 object generic views.
 
 Assignment template tags
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-A new helper function,
-:ref:`assignment_tag<howto-custom-template-tags-assignment-tags>`, was added to
-``template.Library`` to ease the creation of template tags that store some
-data in a specified context variable.
+A new :ref:`assignment_tag<howto-custom-template-tags-assignment-tags>` helper
+function was added to ``template.Library`` to ease the creation of template
+tags that store data in a specified context variable.
 
 ``*args`` and ``**kwargs`` support for template tag helper functions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-:ref:`simple_tag<howto-custom-template-tags-simple-tags>`, :ref:`inclusion_tag
-<howto-custom-template-tags-inclusion-tags>` and the newly introduced
+The :ref:`simple_tag<howto-custom-template-tags-simple-tags>`,
+:ref:`inclusion_tag <howto-custom-template-tags-inclusion-tags>` and
+newly introduced
 :ref:`assignment_tag<howto-custom-template-tags-assignment-tags>` template
 helper functions may now accept any number of positional or keyword arguments.
 For example:
@@ -263,25 +264,25 @@ exceptions from template rendering is now consistent regardless of the value of
 
 Added a filter which truncates a string to be no longer than the specified
 number of characters. Truncated strings end with a translatable ellipsis
-sequence ("..."). See the :tfilter:`truncatechars docs <truncatechars>` for
+sequence ("..."). See the documentation for :tfilter:`truncatechars` for
 more details.
 
 ``static`` template tag
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-The :mod:`staticfiles<django.contrib.staticfiles>` contrib app has now a new
-:ttag:`static template tag<staticfiles-static>` to refer to files saved with
-the :setting:`STATICFILES_STORAGE` storage backend. It'll use the storage
-``url`` method and therefore supports advanced features such as
+The :mod:`staticfiles<django.contrib.staticfiles>` contrib app has a new
+:ttag:`static<staticfiles-static>` template tag to refer to files saved with
+the :setting:`STATICFILES_STORAGE` storage backend. It uses the storage
+backend's ``url`` method and therefore supports advanced features such as
 :ref:`serving files from a cloud service<staticfiles-from-cdn>`.
 
 ``CachedStaticFilesStorage`` storage backend
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Additional to the `static template tag`_ the
+In addition to the `static template tag`_, the
 :mod:`staticfiles<django.contrib.staticfiles>` contrib app now has a
-:class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage` which
-caches the files it saves (when running the :djadmin:`collectstatic`
+:class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage` backend
+which caches the files it saves (when running the :djadmin:`collectstatic`
 management command) by appending the MD5 hash of the file's content to the
 filename. For example, the file ``css/styles.css`` would also be saved as
 ``css/styles.55e7cbb9ba48.css``
@@ -293,7 +294,7 @@ Simple clickjacking protection
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 We've added a middleware to provide easy protection against `clickjacking
-<http://en.wikipedia.org/wiki/Clickjacking>`_ using the X-Frame-Options
+<http://en.wikipedia.org/wiki/Clickjacking>`_ using the ``X-Frame-Options``
 header. It's not enabled by default for backwards compatibility reasons, but
 you'll almost certainly want to :doc:`enable it </ref/clickjacking/>` to help
 plug that security hole for browsers that support the header.
@@ -303,28 +304,27 @@ CSRF improvements
 
 We've made various improvements to our CSRF features, including the
 :func:`~django.views.decorators.csrf.ensure_csrf_cookie` decorator which can
-help with AJAX heavy sites, protection for PUT and DELETE, and settings
-:setting:`CSRF_COOKIE_SECURE` and :setting:`CSRF_COOKIE_PATH` which can improve
-the security and usefulness of the CSRF protection. See the :doc:`CSRF docs
-</ref/contrib/csrf>` for more information.
+help with AJAX heavy sites, protection for PUT and DELETE requests, and the
+:setting:`CSRF_COOKIE_SECURE` and :setting:`CSRF_COOKIE_PATH` settings which can
+improve the security and usefulness of the CSRF protection. See the :doc:`CSRF
+docs </ref/contrib/csrf>` for more information.
 
 Error report filtering
 ~~~~~~~~~~~~~~~~~~~~~~
 
 Two new function decorators, :func:`sensitive_variables` and
 :func:`sensitive_post_parameters`, were added to allow designating the
-traceback frames' local variables and request's POST parameters susceptible
-to contain sensitive information and that should be filtered out of error
-reports.
+local variables and POST parameters which may contain sensitive
+information and should be filtered out of error reports.
 
 All POST parameters are now systematically filtered out of error reports for
-certain :mod:`contrib.views.auth` views (``login``, ``password_reset_confirm``,
-``password_change``, and ``add_view`` and ``user_change_password`` in the
-``auth`` admin) to prevent the leaking of sensitive information such as user
-passwords.
+certain views (``login``, ``password_reset_confirm``, ``password_change``, and
+``add_view`` in :mod:`django.contrib.auth.views`, as well as
+``user_change_password`` in the admin app) to prevent the leaking of sensitive
+information such as user passwords.
 
-You may override or customize the default filtering by writing a
-:ref:`custom filter<custom-error-reports>`. Learn more on
+You may override or customize the default filtering by writing a :ref:`custom
+filter<custom-error-reports>`. For more information see the docs on
 :ref:`Filtering error reports<filtering-error-reports>`.
 
 Extended IPv6 support
@@ -346,7 +346,7 @@ the previous ``manage.py`` handling of Python import paths that caused double
 imports, trouble moving from development to deployment, and other
 difficult-to-debug path issues.
 
-The previous ``manage.py`` calls functions that are now deprecated, and thus
+The previous ``manage.py`` called functions that are now deprecated, and thus
 projects upgrading to Django 1.4 should update their ``manage.py``. (The
 old-style ``manage.py`` will continue to work as before until Django 1.6; in
 1.5 it will raise ``DeprecationWarning``).
@@ -366,8 +366,8 @@ The new recommended ``manage.py`` file should look like this::
 ``{{ project_name }}`` should be replaced with the Python package name of the
 actual project.
 
-If settings, URLconf, and apps within the project are imported or referenced
-using the project-name prefix (e.g. ``myproject.settings``, ``ROOT_URLCONF =
+If settings, URLconfs, and apps within the project are imported or referenced
+using the project name prefix (e.g. ``myproject.settings``, ``ROOT_URLCONF =
 "myproject.urls"``, etc), the new ``manage.py`` will need to be moved one
 directory up, so it is outside the project package rather than adjacent to
 ``settings.py`` and ``urls.py``.
@@ -424,8 +424,8 @@ Custom project and app templates
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The :djadmin:`startapp` and :djadmin:`startproject` management commands
-got a ``--template`` option for specifying paths or URL to custom app or
-project templates.
+got a ``--template`` option for specifying a path or URL to a custom app or
+project template.
 
 For example, Django will use the ``/path/to/my_project_template``
 directorywhen running the following command::
@@ -457,7 +457,7 @@ Reasons for using this feature include:
   timestamps with time zone information in Django 1.3.)
 - Avoiding data corruption problems around DST transitions.
 
-Time zone support in enabled by default in new projects created with
+Time zone support is enabled by default in new projects created with
 :djadmin:`startproject`. If you want to use this feature in an existing
 project, there is a :ref:`migration guide <time-zones-migration-guide>`.
 
@@ -478,7 +478,7 @@ Django 1.4 also includes several smaller improvements worth noting:
 * In the documentation, a helpful :doc:`security overview </topics/security>`
   page.
 
-* Function :func:`django.contrib.auth.models.check_password` has been moved
+* The :func:`django.contrib.auth.models.check_password` function has been moved
   to the :mod:`django.contrib.auth.utils` module. Importing it from the old
   location will still work, but you should update your imports.
 
@@ -519,17 +519,16 @@ Django 1.4 also includes several smaller improvements worth noting:
   ``pickle.HIGHEST_PROTOCOL`` for better compatibility with the other
   cache backends.
 
-* Support in the ORM for generating ``SELECT`` queries containing ``DISTINCT ON``
+* Added support in the ORM for generating ``SELECT`` queries containing
+  ``DISTINCT ON``.
 
   The ``distinct()`` ``Queryset`` method now accepts an optional list of model
   field names. If specified, then the ``DISTINCT`` statement is limited to these
-  fields.  The PostgreSQL is the only of the database backends shipped with
-  Django that supports this new functionality.
+  fields. PostgreSQL is the only database backend shipped with Django that
+  supports this new functionality.
 
   For more details, see the documentation for
   :meth:`~django.db.models.query.QuerySet.distinct`.
-
-.. _backwards-incompatible-changes-1.4:
 
 Backwards incompatible changes in 1.4
 =====================================
@@ -543,9 +542,9 @@ stylesheets. Django 1.3 added a new contrib app ``django.contrib.staticfiles``
 to handle such files in a generic way and defined conventions for static
 files included in apps.
 
-Starting in Django 1.4 the admin's static files are now also following this
+Starting in Django 1.4 the admin's static files also follow this
 convention to make it easier to deploy the included files. In previous
-versions of Django, it was also common to define a ``ADMIN_MEDIA_PREFIX``
+versions of Django, it was also common to define an ``ADMIN_MEDIA_PREFIX``
 setting to point to the URL where the admin's static files are served by a
 web server. This setting has now been deprecated and replaced by the more
 general setting :setting:`STATIC_URL`. Django will now expect to find the
@@ -558,7 +557,7 @@ server continues to serve the admin files just like before. Don't hesitate to
 consult the :doc:`static files howto </howto/static-files>` for further
 details.
 
-In case your ``ADMIN_MEDIA_PREFIX`` is set to an own domain (e.g.
+In case your ``ADMIN_MEDIA_PREFIX`` is set to an specific domain (e.g.
 ``http://media.example.com/admin/``) make sure to also set your
 :setting:`STATIC_URL` setting to the correct URL, for example
 ``http://media.example.com/``.
@@ -594,13 +593,16 @@ As part of an effort to improve the performance and usability of the admin's
 changelist sorting interface and of the admin's :attr:`horizontal
 <django.contrib.admin.ModelAdmin.filter_horizontal>` and :attr:`vertical
 <django.contrib.admin.ModelAdmin.filter_vertical>` "filter" widgets, some icon
-files were removed and grouped into two sprite files, respectively:
-``selector-add.gif``, ``selector-addall.gif``, ``selector-remove.gif``,
-``selector-removeall.gif``, ``selector_stacked-add.gif`` and
-``selector_stacked-remove.gif`` into ``selector-icons.gif``; and
-``arrow-up.gif`` and ``arrow-down.gif`` into ``sorting-icons.gif``. If you used
-those icons to customize the admin then you will want to replace them with your
-own icons or retrieve them from a previous release.
+files were removed and grouped into two sprite files.
+
+Specifically: ``selector-add.gif``, ``selector-addall.gif``,
+``selector-remove.gif``, ``selector-removeall.gif``,
+``selector_stacked-add.gif`` and ``selector_stacked-remove.gif`` were
+combined into ``selector-icons.gif``; and ``arrow-up.gif`` and
+``arrow-down.gif`` were combined into ``sorting-icons.gif``.
+
+If you used those icons to customize the admin then you will want to replace
+them with your own icons or retrieve them from a previous release.
 
 CSS class names in admin forms
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -621,39 +623,39 @@ produced by the previous methods, these fallbacks are removed in Django 1.4.
 
 So, if you upgrade to Django 1.4 directly from 1.2 or earlier, you may
 lose/invalidate certain pieces of data that have been cryptographically signed
-using an old method. To avoid this, use Django 1.3 first, for a period of time,
+using an old method. To avoid this, use Django 1.3 first for a period of time
 to allow the signed data to expire naturally. The affected parts are detailed
 below, with 1) the consequences of ignoring this advice and 2) the amount of
 time you need to run Django 1.3 for the data to expire or become irrelevant.
 
-* contrib.sessions data integrity check
+* ``contrib.sessions`` data integrity check
 
   * consequences: the user will be logged out, and session data will be lost.
 
-  * time period: defined by SESSION_COOKIE_AGE.
+  * time period: defined by :setting:`SESSION_COOKIE_AGE`.
 
-* contrib.auth password reset hash
+* ``contrib.auth`` password reset hash
 
   * consequences: password reset links from before the upgrade will not work.
 
-  * time period: defined by PASSWORD_RESET_TIMEOUT_DAYS.
+  * time period: defined by :setting:`PASSWORD_RESET_TIMEOUT_DAYS`.
 
-Form related hashes — these are much shorter lifetime, and are relevant only for
+Form-related hashes — these are much shorter lifetime, and are relevant only for
 the short window where a user might fill in a form generated by the pre-upgrade
 Django instance, and try to submit it to the upgraded Django instance:
 
-* contrib.comments form security hash
+* ``contrib.comments`` form security hash
 
   * consequences: the user will see a validation error "Security hash failed".
 
   * time period: the amount of time you expect users to take filling out comment
     forms.
 
-* FormWizard security hash
+* ``FormWizard`` security hash
 
   * consequences: the user will see an error about the form having expired,
     and will be sent back to the first page of the wizard, losing the data
-    they have inputted so far.
+    they have entered so far.
 
   * time period: the amount of time you expect users to take filling out the
     affected forms.
@@ -695,9 +697,9 @@ specification, some changes were made to the JSON serializer:
   only supports milliseconds (3 digits). However, it's better than discarding
   microseconds entirely.
 
-The XML serializer was also changed to use ISO8601 for datetimes. The letter
-``T`` is used to separate the date part from the time part, instead of a
-space. Time zone information is included in the ``[+-]HH:MM`` format.
+The XML serializer was also changed to use the ISO8601 format for datetimes.
+The letter ``T`` is used to separate the date part from the time part, instead
+of a space. Time zone information is included in the ``[+-]HH:MM`` format.
 
 The serializers will dump datetimes in fixtures with these new formats. They
 can still load fixtures that use the old format.
@@ -726,7 +728,7 @@ global, the ``django.db.connections`` dictionary referencing those objects is
 still thread-local. Therefore if you just use the ORM or
 ``DatabaseWrapper.cursor()`` then the behavior is still the same as before.
 Note, however, that ``django.db.connection`` does not directly reference the
-default ``DatabaseWrapper`` object any more and is now a proxy to access that
+default ``DatabaseWrapper`` object anymore and is now a proxy to access that
 object's attributes. If you need to access the actual ``DatabaseWrapper``
 object, use ``django.db.connections[DEFAULT_DB_ALIAS]`` instead.
 
@@ -747,7 +749,7 @@ Check their documentation for details.
 Django's :doc:`comments app </ref/contrib/comments/index>` has historically
 supported excluding the comments of a special user group, but we've never
 documented the feature properly and didn't enforce the exclusion in other parts
-of the app, e.g., the template tags. To fix this problem, we removed the code
+of the app such as the template tags. To fix this problem, we removed the code
 from the feed class.
 
 If you rely on the feature and want to restore the old behavior, simply use
@@ -785,10 +787,9 @@ For more details, see the documentation about
 `IGNORABLE_404_STARTS` and `IGNORABLE_404_ENDS` settings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Django can report 404 errors: see :doc:`/howto/error-reporting`.
-Until Django 1.3, it was possible to exclude some URLs from the reporting
-by adding prefixes to :setting:`IGNORABLE_404_STARTS` and suffixes to
-:setting:`IGNORABLE_404_ENDS`.
+Until Django 1.3, it was possible to exclude some URLs from Django's
+:doc:`404 error reporting</howto/error-reporting>` by adding prefixes to
+:setting:`IGNORABLE_404_STARTS` and suffixes to :setting:`IGNORABLE_404_ENDS`.
 
 In Django 1.4, these two settings are superseded by
 :setting:`IGNORABLE_404_URLS`, which is a list of compiled regular expressions.
@@ -882,8 +883,6 @@ whose primary use is to load fixtures consisting of simple objects. Even though
 fixtures are trusted data, for additional security, the YAML deserializer now
 uses ``yaml.safe_load``.
 
-.. _deprecated-features-1.4:
-
 Features deprecated in 1.4
 ==========================
 
@@ -900,7 +899,7 @@ Support for PostgreSQL versions older than 8.2
 Django 1.3 dropped support for PostgreSQL versions older than 8.0 and the
 relevant documents suggested to use a recent version because of performance
 reasons but more importantly because end of the upstream support periods for
-releases 8.0 and 8.1 was near (November 2010.)
+releases 8.0 and 8.1 was near (November 2010).
 
 Django 1.4 takes that policy further and sets 8.2 as the minimum PostgreSQL
 version it officially supports.
@@ -913,13 +912,13 @@ admin error email support was moved into the
 :class:`django.utils.log.AdminEmailHandler`, attached to the
 ``'django.request'`` logger. In order to maintain the established behavior of
 error emails, the ``'django.request'`` logger was called only when
-:setting:`DEBUG` was `False`.
+:setting:`DEBUG` was ``False``.
 
-To increase the flexibility of request-error logging, the ``'django.request'``
-logger is now called regardless of the value of :setting:`DEBUG`, and the
-default settings file for new projects now includes a separate filter attached
-to :class:`django.utils.log.AdminEmailHandler` to prevent admin error emails in
-`DEBUG` mode::
+To increase the flexibility of error logging for requests, the
+``'django.request'`` logger is now called regardless of the value of
+:setting:`DEBUG`, and the default settings file for new projects now includes a
+separate filter attached to :class:`django.utils.log.AdminEmailHandler` to
+prevent admin error emails in ``DEBUG`` mode::
 
    'filters': {
         'require_debug_false': {
@@ -958,13 +957,13 @@ Starting with Django 1.4 they are now available in :mod:`django.conf.urls`.
 ``django.contrib.databrowse``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Databrowse has not seen active development for some time, and this does not
-show any sign of changing. There had been a suggestion for a GSOC project to
+Databrowse has not seen active development for some time, and this does not show
+any sign of changing. There had been a suggestion for a `GSOC project`_ to
 integrate the functionality of databrowse into the admin, but no progress was
 made. While Databrowse has been deprecated, an enhancement of
-django.contrib.admin providing a similar feature set is still possible.
+``django.contrib.admin`` providing a similar feature set is still possible.
 
-.. _GSOC Proposal: https://code.djangoproject.com/wiki/SummerOfCode2011#Integratedatabrowseintotheadmin
+.. _GSOC project: https://code.djangoproject.com/wiki/SummerOfCode2011#Integratedatabrowseintotheadmin
 
 The code that powers Databrowse is licensed under the same terms as Django
 itself, and so is available to be adopted by an individual or group as
@@ -978,10 +977,10 @@ This function temporarily modified ``sys.path`` in order to make the parent
 layout. This function is now deprecated, as its path workarounds are no longer
 needed with the new ``manage.py`` and default project layout.
 
-This function was never documented or public API, but was widely recommended
-for use in setting up a "Django environment" for a user script. These uses
-should be replaced by setting the ``DJANGO_SETTINGS_MODULE`` environment
-variable or using :func:`django.conf.settings.configure`.
+This function was never documented or part of the public API, but was widely
+recommended for use in setting up a "Django environment" for a user script.
+These uses should be replaced by setting the ``DJANGO_SETTINGS_MODULE``
+environment variable or using :func:`django.conf.settings.configure`.
 
 ``django.core.management.execute_manager``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -989,10 +988,10 @@ variable or using :func:`django.conf.settings.configure`.
 This function was previously used by ``manage.py`` to execute a management
 command. It is identical to
 ``django.core.management.execute_from_command_line``, except that it first
-calls ``setup_environ``, which is now deprecated. ``execute_manager`` is also
-deprecated; ``execute_from_command_line`` can be used instead. (Neither of
-these functions is documented public API, but a deprecation path is needed due
-to use in existing ``manage.py`` files.)
+calls ``setup_environ``, which is now deprecated. As such, ``execute_manager``
+is also deprecated; ``execute_from_command_line`` can be used instead. Neither
+of these functions is documented as part of the public API, but a deprecation
+path is needed due to use in existing ``manage.py`` files.
 
 ``is_safe`` and ``needs_autoescape`` attributes of template filters
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1022,7 +1021,7 @@ Session cookies now have the ``httponly`` flag by default
 
 Session cookies now include the ``httponly`` attribute by default to
 help reduce the impact of potential XSS attacks. For strict backwards
-compatibility, use ``SESSION_COOKIE_HTTPONLY = False`` in settings.
+compatibility, use ``SESSION_COOKIE_HTTPONLY = False`` in your settings file.
 
 Wildcard expansion of application names in `INSTALLED_APPS`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
