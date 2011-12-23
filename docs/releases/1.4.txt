@@ -443,8 +443,8 @@ The :djadmin:`startapp` and :djadmin:`startproject` management commands
 got a ``--template`` option for specifying a path or URL to a custom app or
 project template.
 
-For example, Django will use the ``/path/to/my_project_template``
-directorywhen running the following command::
+For example, Django will use the ``/path/to/my_project_template`` directory
+when running the following command::
 
     django-admin.py startproject --template=/path/to/my_project_template myproject
 
