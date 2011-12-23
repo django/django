@@ -8,12 +8,12 @@ up-to-date information for those who are following trunk.
 
 Django 1.4 includes various `new features`_ and some minor `backwards
 incompatible changes`_. There are also some features that have been dropped,
-which are detailed in :doc:`our deprecation plan </internals/deprecation>`, and
-we've `begun the deprecation process for some features`_.
+which are detailed in :doc:`our deprecation plan </internals/deprecation>`,
+and we've `begun the deprecation process for some features`_.
 
-.. _new features: `What's new in Django 1.4`_
-.. _backwards incompatible changes: backwards-incompatible-changes-1.4_
-.. _begun the deprecation process for some features: deprecated-features-1.4_
+.. _`new features`: `What's new in Django 1.4`_
+.. _`backwards incompatible changes`: `Backwards incompatible changes in 1.4`_
+.. _`begun the deprecation process for some features`: `Features deprecated in 1.4`_
 
 Python compatibility
 ====================
