@@ -17,7 +17,7 @@ from django.conf import settings
 __all__ = [
     'utc', 'get_default_timezone', 'get_current_timezone',
     'activate', 'deactivate', 'override',
-    'localtime', 'isnaive',
+    'localtime', 'is_naive', 'is_aware', 'make_aware', 'make_naive',
 ]
 
 
