@@ -1082,7 +1082,7 @@ will be made available. The current schedule consists of at least the following:
 * Week of **February 27, 2012**: First Django 1.4 release
   candidate; string freeze for translations.
 
-* Week of **March 5, 2011**: Django 1.4 final release.
+* Week of **March 5, 2012**: Django 1.4 final release.
 
 If necessary, additional alpha, beta or release-candidate packages
 will be issued prior to the final 1.4 release. Django 1.4 will be
