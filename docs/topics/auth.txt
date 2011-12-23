@@ -371,35 +371,162 @@ Don't set the :attr:`~django.contrib.auth.models.User.password` attribute
 directly unless you know what you're doing. This is explained in the next
 section.
 
-Passwords
----------
+.. _auth_password_storage:
+
+How Django stores passwords
+---------------------------
+
+.. versionadded:: 1.4
+   Django 1.4 introduces a new flexible password storage system and uses
+   PBKDF2 by default. Previous versions of Django used SHA1, and other
+   algorithms couldn't be chosen.
 
 The :attr:`~django.contrib.auth.models.User.password` attribute of a
 :class:`~django.contrib.auth.models.User` object is a string in this format::
 
-    hashtype$salt$hash
+    algorithm$hash
 
-That's hashtype, salt and hash, separated by the dollar-sign character.
+That's a storage algorithm, and hash, separated by the dollar-sign
+character. The algorithm is one of a number of one way hashing or password
+storage algorithms Django can use; see below. The hash is the result of the one-
+way function.
 
-Hashtype is either ``sha1`` (default), ``md5`` or ``crypt`` -- the algorithm
-used to perform a one-way hash of the password. Salt is a random string used
-to salt the raw password to create the hash. Note that the ``crypt`` method is
-only supported on platforms that have the standard Python ``crypt`` module
-available.
+By default, Django uses the PBKDF2_ algorithm with a SHA256 hash, a
+password stretching mechanism recommended by NIST_. This should be
+sufficient for most users: it's quite secure, requiring massive
+amounts of computing time to break.
 
-For example::
+However, depending on your requirements, you may choose a different
+algorithm, or even use a custom algorithm to match your specific
+security situation. Again, most users shouldn't need to do this -- if
+you're not sure, you probably don't.  If you do, please read on:
 
-    sha1$a1976$a36cc8cbf81742a8fb52e221aaeab48ed7f58ab4
+Django chooses the an algorithm by consulting the :setting:`PASSWORD_HASHERS`
+setting. This is a list of hashing algorithm classes that this Django
+installation supports. The first entry in this list (that is,
+``settings.PASSWORD_HASHERS[0]``) will be used to store passwords, and all the
+other entries are valid hashers that can be used to check existing passwords.
+This means that if you want to use a different algorithm, you'll need to modify
+:setting:`PASSWORD_HASHERS` to list your prefered algorithm first in the list.
 
-The :meth:`~django.contrib.auth.models.User.set_password` and
-:meth:`~django.contrib.auth.models.User.check_password` functions handle the
-setting and checking of these values behind the scenes.
+The default for :setting:`PASSWORD_HASHERS` is::
 
-Previous Django versions, such as 0.90, used simple MD5 hashes without password
-salts. For backwards compatibility, those are still supported; they'll be
-converted automatically to the new style the first time
-:meth:`~django.contrib.auth.models.User.check_password()` works correctly for
-a given user.
+    PASSWORD_HASHERS = (
+        'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+        'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+        'django.contrib.auth.hashers.BCryptPasswordHasher',
+        'django.contrib.auth.hashers.SHA1PasswordHasher',
+        'django.contrib.auth.hashers.MD5PasswordHasher',
+        'django.contrib.auth.hashers.CryptPasswordHasher',
+    )
+
+This means that Django will use PBKDF2_ to store all passwords, but will support
+checking passwords stored with PBKDF2SHA1, bcrypt_, SHA1_, etc. The next few
+sections describe a couple of common ways advanced users may want to modify this
+setting.
+
+Using bcrypt with Django
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Bcrypt_ is a popular password storage algorithm that's specifically designed
+for long-term password storage. It's not the default used by Django since it
+requires the use of third-party libraries, but since many people may want to
+use it Django supports bcrypt with minimal effort.
+
+To use Bcrypt as your default storage algorithm, do the following:
+
+    1. Install the `py-bcrypt`_ library (probably by running ``pip install py-bcrypt``,
+       ``easy_install py-bcrypt``, or downloading the library and installing
+       it with ``python setup.py install``).
+
+    2. Modify :setting:`PASSWORD_HASHERS` to list ``BCryptPasswordHasher``
+       first. That is, in your settings file, you'd put::
+
+            PASSWORD_HASHERS = (
+                'django.contrib.auth.hashers.BCryptPasswordHasher',
+                'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+                'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+                'django.contrib.auth.hashers.SHA1PasswordHasher',
+                'django.contrib.auth.hashers.MD5PasswordHasher',
+                'django.contrib.auth.hashers.CryptPasswordHasher',
+            )
+
+       (You need to keep the other entries in this list, or else Django won't
+       be able to upgrade passwords; see below).
+
+That's it -- now your Django install will use Bcrypt as the default storage
+algorithm.
+
+.. admonition:: Other bcrypt implementations
+
+   There are several other implementations that allow bcrypt to be
+   used with Django. Django's bcrypt support is NOT directly
+   compatible with these. To upgrade, you will need to modify the
+   hashes in your database to be in the form `bcrypt$(raw bcrypt
+   output)`. For example:
+   `bcrypt$$2a$12$NT0I31Sa7ihGEWpka9ASYrEFkhuTNeBQ2xfZskIiiJeyFXhRgS.Sy`.
+
+Increasing the work factor
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The PDKDF2 and bcrypt algorithms use a number of iterations or rounds of
+hashing. This deliberately slows down attackers, making attacks against hashed
+passwords harder. However, as computing power increases, the number of
+iterations needs to be increased. We've chosen a reasonable default (and will
+increase it with each release of Django), but you may wish to tune it up or
+down, depending on your security needs and available processing power. To do so,
+you'll subclass the appropriate algorithm and override the ``iterations``
+parameters. For example, to increase the number of iterations used by the
+default PDKDF2 algorithm:
+
+    1. Create a subclass of ``django.contrib.auth.hashers.PBKDF2PasswordHasher``::
+
+            from django.contrib.auth.hashers import PBKDF2PasswordHasher
+
+            class MyPBKDF2PasswordHasher(PBKDF2PasswordHasher):
+                """
+                A subclass of PBKDF2PasswordHasher that uses 100 times more iterations.
+                """
+                iterations = PBKDF2PasswordHasher.iterations * 100
+
+       Save this somewhere in your project. For example, you might put this in
+       a file like ``myproject/hashers.py``.
+
+    2. Add your new hasher as the first entry in :setting:`PASSWORD_HASHERS`::
+
+            PASSWORD_HASHERS = (
+                'myproject.hashers.MyPBKDF2PasswordHasher',
+                'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+                'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+                'django.contrib.auth.hashers.BCryptPasswordHasher',
+                'django.contrib.auth.hashers.SHA1PasswordHasher',
+                'django.contrib.auth.hashers.MD5PasswordHasher',
+                'django.contrib.auth.hashers.CryptPasswordHasher',
+            )
+
+
+That's it -- now your Django install will use more iterations when it
+stores passwords using PBKDF2.
+
+Password upgrading
+~~~~~~~~~~~~~~~~~~
+
+When users log in, if their passwords are stored with anything other than
+the preferred algorithm, Django will automatically upgrade the algorithm
+to the preferred one. This means that old installs of Django will get
+automatically more secure as users log in, and it also means that you
+can switch to new (and better) storage algorithms as they get invented.
+
+However, Django can only upgrade passwords that use algorithms mentioned in
+:setting:`PASSWORD_HASHERS`, so as you upgrade to new systems you should make
+sure never to *remove* entries from this list. If you do, users using un-
+mentioned algorithms won't be able to upgrade.
+
+.. _sha1: http://en.wikipedia.org/wiki/SHA1
+.. _pbkdf2: http://en.wikipedia.org/wiki/PBKDF2
+.. _nist: http://csrc.nist.gov/publications/nistpubs/800-132/nist-sp800-132.pdf
+.. _bcrypt: http://en.wikipedia.org/wiki/Bcrypt
+.. _py-bcrypt: http://pypi.python.org/pypi/py-bcrypt/
 
 Anonymous users
 ---------------

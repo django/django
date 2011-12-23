@@ -90,6 +90,22 @@ allows you to fix a very common performance problem in which your code ends up
 doing O(n) database queries (or worse) if objects on your primary ``QuerySet``
 each have many related objects that you also need.
 
+Improved password hashing
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django's auth system (``django.contrib.auth``) stores passwords using a one-way
+algorithm. Django 1.3 uses the SHA1_ algorithm, but increasing processor speeds
+and theoretical attacks have revealed that SHA1 isn't as secure as we'd like.
+Thus, Django 1.4 introduces a new password storage system: by default Django now
+uses the PBKDF2_ algorithm (as recommended by NIST_). You can also easily choose
+a different algorithm (including the popular bcrypt_ algorithm). For more
+details, see :ref:`auth_password_storage`.
+
+.. _sha1: http://en.wikipedia.org/wiki/SHA1
+.. _pbkdf2: http://en.wikipedia.org/wiki/PBKDF2
+.. _nist: http://csrc.nist.gov/publications/nistpubs/800-132/nist-sp800-132.pdf
+.. _bcrypt: http://en.wikipedia.org/wiki/Bcrypt
+
 HTML5 Doctype
 ~~~~~~~~~~~~~
 

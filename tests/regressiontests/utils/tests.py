@@ -1,7 +1,6 @@
 """
 Tests for django.utils.
 """
-
 from __future__ import absolute_import
 
 from .dateformat import DateFormatTests
@@ -24,4 +23,5 @@ from .baseconv import TestBaseConv
 from .jslex import JsTokensTest, JsToCForGettextTest
 from .ipv6 import TestUtilsIPv6
 from .timezone import TimezoneTests
+from .crypto import TestUtilsCryptoPBKDF2
 from .archive import TestZip, TestTar, TestGzipTar, TestBzip2Tar

@@ -9,11 +9,10 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 
 from django.contrib import auth
-from django.contrib.auth.signals import user_logged_in
 # UNUSABLE_PASSWORD is still imported here for backwards compatibility
-from django.contrib.auth.utils import (get_hexdigest, make_password,
-        check_password, is_password_usable, get_random_string,
-        UNUSABLE_PASSWORD)
+from django.contrib.auth.hashers import (
+    check_password, make_password, is_password_usable, UNUSABLE_PASSWORD)
+from django.contrib.auth.signals import user_logged_in
 from django.contrib.contenttypes.models import ContentType
 
 def update_last_login(sender, user, **kwargs):
@@ -220,27 +219,21 @@ class User(models.Model):
         return full_name.strip()
 
     def set_password(self, raw_password):
-        self.password = make_password('sha1', raw_password)
+        self.password = make_password(raw_password)
 
     def check_password(self, raw_password):
         """
         Returns a boolean of whether the raw_password was correct. Handles
         hashing formats behind the scenes.
         """
-        # Backwards-compatibility check. Older passwords won't include the
-        # algorithm or salt.
-        if '$' not in self.password:
-            is_correct = (self.password == get_hexdigest('md5', '', raw_password))
-            if is_correct:
-                # Convert the password to the new, more secure format.
-                self.set_password(raw_password)
-                self.save()
-            return is_correct
-        return check_password(raw_password, self.password)
+        def setter(raw_password):
+            self.set_password(raw_password)
+            self.save()
+        return check_password(raw_password, self.password, setter)
 
     def set_unusable_password(self):
         # Sets a value that will never be a valid hash
-        self.password = make_password('sha1', None)
+        self.password = make_password(None)
 
     def has_usable_password(self):
         return is_password_usable(self.password)

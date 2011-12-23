@@ -1,13 +1,14 @@
 from django import forms
 from django.forms.util import flatatt
 from django.template import loader
+from django.utils.encoding import smart_str
 from django.utils.http import int_to_base36
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 
-from django.contrib.auth.models import User
-from django.contrib.auth.utils import UNUSABLE_PASSWORD
 from django.contrib.auth import authenticate
+from django.contrib.auth.models import User
+from django.contrib.auth.hashers import UNUSABLE_PASSWORD, is_password_usable, get_hasher
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.models import get_current_site
 
@@ -18,27 +19,26 @@ mask_password = lambda p: "%s%s" % (p[:UNMASKED_DIGITS_TO_SHOW], "*" * max(len(p
 
 class ReadOnlyPasswordHashWidget(forms.Widget):
     def render(self, name, value, attrs):
-        if not value:
+        encoded = value
+
+        if not is_password_usable(encoded):
             return "None"
+
         final_attrs = self.build_attrs(attrs)
-        parts = value.split("$")
-        if len(parts) != 3:
-            # Legacy passwords didn't specify a hash type and were md5.
-            hash_type = "md5"
-            masked = mask_password(value)
+
+        encoded = smart_str(encoded)
+
+        if len(encoded) == 32 and '$' not in encoded:
+            hasher = get_hasher('md5')
         else:
-            hash_type = parts[0]
-            masked = mask_password(parts[2])
-        return mark_safe("""<div%(attrs)s>
-                    <strong>%(hash_type_label)s</strong>: %(hash_type)s
-                    <strong>%(masked_label)s</strong>: %(masked)s
-                </div>""" % {
-                    "attrs": flatatt(final_attrs),
-                    "hash_type_label": _("Hash type"),
-                    "hash_type": hash_type,
-                    "masked_label": _("Masked hash"),
-                    "masked": masked,
-                })
+            algorithm = encoded.split('$', 1)[0]
+            hasher = get_hasher(algorithm)
+
+        summary = ""
+        for key, value in hasher.safe_summary(encoded).iteritems():
+            summary += "<strong>%(key)s</strong>: %(value)s " % {"key": key, "value": value}
+
+        return mark_safe("<div%(attrs)s>%(summary)s</div>" % {"attrs": flatatt(final_attrs), "summary": summary})
 
 
 class ReadOnlyPasswordHashField(forms.Field):
