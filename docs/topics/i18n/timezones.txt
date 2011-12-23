@@ -22,10 +22,10 @@ store data in UTC in your database. Here is why.
 Many countries have a system of daylight saving time (DST), where clocks are
 moved forwards in spring and backwards in autumn. If you're working in local
 time, you're likely to encounter errors twice a year, when the transitions
-happen. pytz' docs discuss `these issues`_ in greater detail. It probably
-doesn't matter for your blog, but it's more annoying if you over-bill or
-under-bill your customers by one hour, twice a year, every year. The solution
-to this problem is to use UTC in the code and local time only when
+happen. The pytz_ documentation discusses `these issues`_ in greater detail.
+It probably doesn't matter for your blog, but it's more annoying if you
+over-bill or under-bill your customers by one hour, twice a year, every year.
+The solution to this problem is to use UTC in the code and local time only when
 interacting with end users.
 
 Time zone support is disabled by default. To enable it, set :setting:`USE_TZ =
@@ -201,7 +201,7 @@ Create a view that can set the current timezone::
         else:
             return render(request, 'template.html', {'timezones': pytz.common_timezones})
 
-Include in :file:`template.html` a form that will ``POST`` to this view:
+Include a form in ``template.html`` that will ``POST`` to this view:
 
 .. code-block:: html+django
 
@@ -247,7 +247,7 @@ in templates. This behaves very much like :doc:`format localization
 
 Conversion to local time isn't always appropriate -- you may be generating
 output for computers rather than for humans. The following filters and tags,
-provided the ``tz`` template library, allow you to control the time zone
+provided by the ``tz`` template tag library, allow you to control the time zone
 conversions.
 
 Template tags
@@ -305,8 +305,8 @@ time zone is unset, the default time zone applies.
 .. note::
 
     In the second block, ``None`` resolves to the Python object ``None``
-    because isn't defined in the template context, not because it's the string
-    ``None``.
+    because it isn't defined in the template context, not because it's the
+    string ``None``.
 
 .. templatetag:: get_current_timezone
 
@@ -418,7 +418,7 @@ with an aware datetime. Since Django now gives you aware datetimes, you'll get
 exceptions wherever you compare a datetime that comes from a model or a form
 with a naive datetime that you've created in your code.
 
-So the second step is to refactor your code wherever you instanciate datetime
+So the second step is to refactor your code wherever you instantiate datetime
 objects to make them aware. This can be done incrementally.
 :mod:`django.utils.timezone` defines some handy helpers for compatibility
 code: :func:`~django.utils.timezone.now`,
@@ -430,7 +430,7 @@ code: :func:`~django.utils.timezone.now`,
 Finally, in order to help you locate code that needs upgrading, Django raises
 a warning when you attempt to save a naive datetime to the database. During
 development, you can turn such warnings into exceptions and get a traceback
-by adding to your settings file::
+by adding the following to your settings file::
 
     import warnings
     warnings.filterwarnings(
