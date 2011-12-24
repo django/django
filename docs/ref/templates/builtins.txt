@@ -237,6 +237,12 @@ Sample usage::
         This text will be HTML-escaped, and will appear in all lowercase.
     {% endfilter %}
 
+.. note::
+
+    The :tfilter:`escape` and :tfilter:`safe` filters are not acceptable
+    arguments. Instead, use the :ttag:`autoescape` tag to manage autoescaping
+    for blocks of template code.
+
 .. templatetag:: firstof
 
 firstof

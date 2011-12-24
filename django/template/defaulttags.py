@@ -617,6 +617,10 @@ def do_filter(parser, token):
         {% filter force_escape|lower %}
             This text will be HTML-escaped, and will appear in lowercase.
         {% endfilter %}
+
+    Note that the ``escape`` and ``safe`` filters are not acceptable arguments.
+    Instead, use the ``autoescape`` tag to manage autoescaping for blocks of
+    template code.
     """
     _, rest = token.contents.split(None, 1)
     filter_expr = parser.compile_filter("var|%s" % (rest))
