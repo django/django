@@ -53,6 +53,12 @@ class HumanizeTests(TestCase):
         with self.settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=False):
             self.humanize_tester(test_list, result_list, 'intcomma')
 
+    def test_intcomma_without_number_grouping(self):
+        # Regression for #17414
+        with translation.override('ja'):
+            with self.settings(USE_L10N=True):
+                self.humanize_tester([100], ['100'], 'intcomma')
+
     def test_intword(self):
         test_list = ('100', '1000000', '1200000', '1290000',
                      '1000000000', '2000000000', '6000000000000',
