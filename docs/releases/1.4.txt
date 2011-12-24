@@ -546,6 +546,11 @@ Django 1.4 also includes several smaller improvements worth noting:
   For more details, see the documentation for
   :meth:`~django.db.models.query.QuerySet.distinct`.
 
+* The admin login page will add a password reset link if you include a URL with
+  the name `'admin_password_reset'` in your urls.py, so plugging in the builtin
+  password reset mechanism and making it available is now much easier. For
+  details, see :ref:`auth_password_reset`.
+
 Backwards incompatible changes in 1.4
 =====================================
 

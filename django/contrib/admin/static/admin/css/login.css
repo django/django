@@ -52,3 +52,6 @@ body.login {
     padding: 1em 0 0 9.4em;
 }
 
+.login .password-reset-link {
+    text-align: center;
+}
