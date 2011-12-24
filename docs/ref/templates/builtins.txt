@@ -2340,7 +2340,7 @@ Internationalization tags and filters
 -------------------------------------
 
 Django provides template tags and filters to control each aspect of
-`internationalization </topics/i18n/index>`_ in templates. They allow for
+:doc:`internationalization </topics/i18n/index>` in templates. They allow for
 granular control of translations, formatting, and time zone conversions.
 
 i18n
