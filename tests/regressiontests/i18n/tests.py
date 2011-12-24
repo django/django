@@ -329,6 +329,8 @@ class FormattingTests(TestCase):
             self.assertEqual(u'-66666.6', nformat(-66666.666, decimal_sep='.', decimal_pos=1))
             self.assertEqual(u'-66666.0', nformat(int('-66666'), decimal_sep='.', decimal_pos=1))
             self.assertEqual(u'10000.0', nformat(self.l, decimal_sep='.', decimal_pos=1))
+            # This unusual grouping/force_grouping combination may be triggered by the intcomma filter (#17414)
+            self.assertEqual(u'10000', nformat(self.l, decimal_sep='.', decimal_pos=0, grouping=0, force_grouping=True))
 
             # date filter
             self.assertEqual(u'31.12.2009 в 20:50', Template('{{ dt|date:"d.m.Y в H:i" }}').render(self.ctxt))
