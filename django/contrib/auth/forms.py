@@ -4,7 +4,7 @@ from django.template import loader
 from django.utils.encoding import smart_str
 from django.utils.http import int_to_base36
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext, ugettext_lazy as _
 
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
@@ -36,7 +36,7 @@ class ReadOnlyPasswordHashWidget(forms.Widget):
 
         summary = ""
         for key, value in hasher.safe_summary(encoded).iteritems():
-            summary += "<strong>%(key)s</strong>: %(value)s " % {"key": key, "value": value}
+            summary += "<strong>%(key)s</strong>: %(value)s " % {"key": ugettext(key), "value": value}
 
         return mark_safe("<div%(attrs)s>%(summary)s</div>" % {"attrs": flatatt(final_attrs), "summary": summary})
 

@@ -7,6 +7,7 @@ from django.utils.encoding import smart_str
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.crypto import (
     pbkdf2, constant_time_compare, get_random_string)
+from django.utils.translation import ugettext_noop as _
 
 
 UNUSABLE_PASSWORD = '!'  # This will never be a valid encoded hash
@@ -212,10 +213,10 @@ class PBKDF2PasswordHasher(BasePasswordHasher):
         algorithm, iterations, salt, hash = encoded.split('$', 3)
         assert algorithm == self.algorithm
         return SortedDict([
-            ('algorithm', algorithm),
-            ('iterations', iterations),
-            ('salt', mask_hash(salt)),
-            ('hash', mask_hash(hash)),
+            (_('algorithm'), algorithm),
+            (_('iterations'), iterations),
+            (_('salt'), mask_hash(salt)),
+            (_('hash'), mask_hash(hash)),
         ])
 
 
@@ -263,10 +264,10 @@ class BCryptPasswordHasher(BasePasswordHasher):
         assert algorithm == self.algorithm
         salt, checksum = data[:22], data[22:]
         return SortedDict([
-            ('algorithm', algorithm),
-            ('work factor', work_factor),
-            ('salt', mask_hash(salt)),
-            ('checksum', mask_hash(checksum)),
+            (_('algorithm'), algorithm),
+            (_('work factor'), work_factor),
+            (_('salt'), mask_hash(salt)),
+            (_('checksum'), mask_hash(checksum)),
         ])
 
 
@@ -292,9 +293,9 @@ class SHA1PasswordHasher(BasePasswordHasher):
         algorithm, salt, hash = encoded.split('$', 2)
         assert algorithm == self.algorithm
         return SortedDict([
-            ('algorithm', algorithm),
-            ('salt', mask_hash(salt, show=2)),
-            ('hash', mask_hash(hash)),
+            (_('algorithm'), algorithm),
+            (_('salt'), mask_hash(salt, show=2)),
+            (_('hash'), mask_hash(hash)),
         ])
 
 
@@ -321,8 +322,8 @@ class MD5PasswordHasher(BasePasswordHasher):
 
     def safe_summary(self, encoded):
         return SortedDict([
-            ('algorithm', self.algorithm),
-            ('hash', mask_hash(encoded, show=3)),
+            (_('algorithm'), self.algorithm),
+            (_('hash'), mask_hash(encoded, show=3)),
         ])
 
 
@@ -355,8 +356,8 @@ class CryptPasswordHasher(BasePasswordHasher):
         algorithm, salt, data = encoded.split('$', 2)
         assert algorithm == self.algorithm
         return SortedDict([
-            ('algorithm', algorithm),
-            ('salt', salt),
-            ('hash', mask_hash(data, show=3)),
+            (_('algorithm'), algorithm),
+            (_('salt'), salt),
+            (_('hash'), mask_hash(data, show=3)),
         ])
 
