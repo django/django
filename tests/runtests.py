@@ -130,8 +130,11 @@ def setup(verbosity, test_labels):
 
 def teardown(state):
     from django.conf import settings
-    # Removing the temporary TEMP_DIR
-    shutil.rmtree(TEMP_DIR)
+    # Removing the temporary TEMP_DIR. Ensure we pass in unicode
+    # so that it will successfully remove temp trees containing
+    # non-ASCII filenames on Windows. (We're assuming the temp dir
+    # name itself does not contain non-ASCII characters.)
+    shutil.rmtree(unicode(TEMP_DIR))
     # Restore the old settings.
     for key, value in state.items():
         setattr(settings, key, value)
