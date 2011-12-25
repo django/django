@@ -102,7 +102,7 @@ class CachedFilesMixin(object):
             cache_key = self.cache_key(name)
             hashed_name = self.cache.get(cache_key)
             if hashed_name is None:
-                hashed_name = self.hashed_name(name)
+                hashed_name = self.hashed_name(name).replace('\\', '/')
                 # set the cache if there was a miss (e.g. if cache server goes down)
                 self.cache.set(cache_key, hashed_name)
         return unquote(super(CachedFilesMixin, self).url(hashed_name))
@@ -121,7 +121,7 @@ class CachedFilesMixin(object):
             # Completely ignore http(s) prefixed URLs
             if url.startswith(('http', 'https')):
                 return matched
-            name_parts = name.split('/')
+            name_parts = name.split(os.sep)
             # Using posix normpath here to remove duplicates
             url = posixpath.normpath(url)
             url_parts = url.split('/')
