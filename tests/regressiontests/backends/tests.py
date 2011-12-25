@@ -7,11 +7,12 @@ import threading
 
 from django.conf import settings
 from django.core.management.color import no_style
+from django.core.exceptions import ImproperlyConfigured
 from django.db import (backend, connection, connections, DEFAULT_DB_ALIAS,
     IntegrityError, transaction)
 from django.db.backends.signals import connection_created
 from django.db.backends.postgresql_psycopg2 import version as pg_version
-from django.db.utils import ConnectionHandler, DatabaseError
+from django.db.utils import ConnectionHandler, DatabaseError, load_backend
 from django.test import TestCase, skipUnlessDBFeature, TransactionTestCase
 from django.utils import unittest
 
@@ -583,3 +584,10 @@ class ThreadTests(TestCase):
         t1.join()
         # No exception was raised
         self.assertEqual(len(exceptions), 0)
+
+
+class BackendLoadingTests(TestCase):
+    def test_old_style_backends_raise_useful_exception(self):
+        self.assertRaisesRegexp(ImproperlyConfigured,
+            "Try using django.db.backends.sqlite3 instead",
+            load_backend, 'sqlite3')

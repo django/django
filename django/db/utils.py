@@ -32,16 +32,26 @@ def load_backend(backend_name):
                     and not f.startswith('.')]
         except EnvironmentError:
             available_backends = []
-        if backend_name.startswith('django.db.backends.'):
+        full_notation = backend_name.startswith('django.db.backends.')
+        if full_notation:
             backend_name = backend_name[19:] # See #15621.
         if backend_name not in available_backends:
-            error_msg = ("%r isn't an available database backend. \n" +
-                "Try using django.db.backends.XXX, where XXX is one of:\n    %s\n" +
-                "Error was: %s") % \
-                (backend_name, ", ".join(map(repr, sorted(available_backends))), e_user)
+            backend_reprs = map(repr, sorted(available_backends))
+            error_msg = ("%r isn't an available database backend.\n"
+                         "Try using django.db.backends.XXX, where XXX "
+                         "is one of:\n    %s\nError was: %s" %
+                         (backend_name, ", ".join(backend_reprs), e_user))
+            raise ImproperlyConfigured(error_msg)
+        elif not full_notation:
+            # user tried to use the old notation for the database backend
+            error_msg = ("%r isn't an available database backend.\n"
+                         "Try using django.db.backends.%s instead.\n"
+                         "Error was: %s" %
+                         (backend_name, backend_name, e_user))
             raise ImproperlyConfigured(error_msg)
         else:
-            raise # If there's some other error, this must be an error in Django itself.
+            # If there's some other error, this must be an error in Django
+            raise
 
 
 class ConnectionDoesNotExist(Exception):
