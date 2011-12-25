@@ -126,8 +126,8 @@ class TestUtilsCryptoPBKDF2(unittest.TestCase):
         times as long as running with 1 iteration.
         """
         n1, n2 = 100, 10000
-        elapsed = lambda f: timeit.timeit(f, number=1)
-        t1 = elapsed(lambda: pbkdf2("password", "salt", iterations=n1))
-        t2 = elapsed(lambda: pbkdf2("password", "salt", iterations=n2))
+        elapsed = lambda f: timeit.Timer(f, 'from django.utils.crypto import pbkdf2').timeit(number=1)
+        t1 = elapsed('pbkdf2("password", "salt", iterations=%d)' % n1)
+        t2 = elapsed('pbkdf2("password", "salt", iterations=%d)' % n2)
         measured_scale_exponent = math.log(t2 / t1, n2 / n1)
         self.assertLess(measured_scale_exponent, 1.1)

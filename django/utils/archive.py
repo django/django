@@ -141,7 +141,7 @@ class TarArchive(BaseArchive):
                 name = self.split_leading_dir(name)[1]
             filename = os.path.join(to_path, name)
             if member.isdir():
-                if not os.path.exists(filename):
+                if filename and not os.path.exists(filename):
                     os.makedirs(filename)
             else:
                 try:
@@ -153,7 +153,7 @@ class TarArchive(BaseArchive):
                            (name, member.name, sys.exc_info()[1]))
                 else:
                     dirname = os.path.dirname(filename)
-                    if not os.path.exists(dirname):
+                    if dirname and not os.path.exists(dirname):
                         os.makedirs(dirname)
                     with open(filename, 'wb') as outfile:
                         shutil.copyfileobj(extracted, outfile)
