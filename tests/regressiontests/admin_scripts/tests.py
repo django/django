@@ -9,6 +9,7 @@ import os
 import re
 import shutil
 import socket
+import subprocess
 import sys
 import urllib
 
@@ -111,27 +112,14 @@ class AdminScriptTestCase(unittest.TestCase):
         python_path.extend(ext_backend_base_dirs)
         os.environ[python_path_var_name] = os.pathsep.join(python_path)
 
-        # Build the command line
-        executable = sys.executable
-        arg_string = ' '.join(['%s' % arg for arg in args])
         # Silence the DeprecationWarning caused by having a locale directory
         # in the project directory.
-        if ' ' in executable:
-            cmd = '""%s" -Wignore:::django.utils.translation "%s" %s"' % (executable, script, arg_string)
-        else:
-            cmd = '%s -Wignore:::django.utils.translation "%s" %s' % (executable, script, arg_string)
+        cmd = [sys.executable, '-Wignore:::django.utils.translation', script]
 
         # Move to the test directory and run
         os.chdir(test_dir)
-        try:
-            from subprocess import Popen, PIPE
-        except ImportError:
-            stdin, stdout, stderr = os.popen3(cmd)
-        else:
-            p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE)
-            stdin, stdout, stderr = (p.stdin, p.stdout, p.stderr)
-            p.wait()
-        out, err = stdout.read(), stderr.read()
+        out, err = subprocess.Popen(cmd + args,
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
 
         # Restore the old environment
         if old_django_settings_module:
