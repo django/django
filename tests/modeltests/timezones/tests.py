@@ -22,7 +22,7 @@ from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.utils import override_settings
 from django.utils import timezone
 from django.utils.tzinfo import FixedOffset
-from django.utils.unittest import skipIf
+from django.utils.unittest import skipIf, skipUnless
 
 from .forms import EventForm, EventSplitForm, EventModelForm
 from .models import Event, MaybeEvent, Timestamp
@@ -41,6 +41,15 @@ EAT = FixedOffset(180)      # Africa/Nairobi
 ICT = FixedOffset(420)      # Asia/Bangkok
 
 TZ_SUPPORT = hasattr(time, 'tzset')
+
+# On OSes that don't provide tzset (Windows), we can't set the timezone
+# in which the program runs. As a consequence, we must skip tests that
+# don't enforce a specific timezone (with timezone.override or equivalent),
+# or attempt to interpret naive datetimes in the default timezone.
+
+requires_tz_support = skipUnless(TZ_SUPPORT,
+        "This test relies on the ability to run a program in an arbitrary "
+        "time zone, but your operating system isn't able to do that.")
 
 
 class BaseDateTimeTests(TestCase):
@@ -238,6 +247,7 @@ LegacyDatabaseTests = override_settings(USE_TZ=False)(LegacyDatabaseTests)
 #@override_settings(USE_TZ=True)
 class NewDatabaseTests(BaseDateTimeTests):
 
+    @requires_tz_support
     @skipIf(sys.version_info < (2, 6), "this test requires Python >= 2.6")
     def test_naive_datetime(self):
         dt = datetime.datetime(2011, 9, 1, 13, 20, 30)
@@ -251,6 +261,7 @@ class NewDatabaseTests(BaseDateTimeTests):
         # naive datetimes are interpreted in local time
         self.assertEqual(event.dt, dt.replace(tzinfo=EAT))
 
+    @requires_tz_support
     @skipIf(sys.version_info < (2, 6), "this test requires Python >= 2.6")
     @skipUnlessDBFeature('supports_microsecond_precision')
     def test_naive_datetime_with_microsecond(self):
@@ -265,6 +276,7 @@ class NewDatabaseTests(BaseDateTimeTests):
         # naive datetimes are interpreted in local time
         self.assertEqual(event.dt, dt.replace(tzinfo=EAT))
 
+    @requires_tz_support
     @skipIf(sys.version_info < (2, 6), "this test requires Python >= 2.6")
     @skipIfDBFeature('supports_microsecond_precision')
     def test_naive_datetime_with_microsecond_unsupported(self):
@@ -347,6 +359,7 @@ class NewDatabaseTests(BaseDateTimeTests):
         self.assertEqual(Event.objects.filter(dt__in=(prev, dt, next)).count(), 1)
         self.assertEqual(Event.objects.filter(dt__range=(prev, next)).count(), 1)
 
+    @requires_tz_support
     @skipIf(sys.version_info < (2, 6), "this test requires Python >= 2.6")
     def test_query_filter_with_naive_datetime(self):
         dt = datetime.datetime(2011, 9, 1, 12, 20, 30, tzinfo=EAT)
@@ -567,6 +580,7 @@ class SerializationTests(BaseDateTimeTests):
 #@override_settings(DATETIME_FORMAT='c', USE_L10N=False, USE_TZ=True)
 class TemplateTests(BaseDateTimeTests):
 
+    @requires_tz_support
     def test_localtime_templatetag_and_filters(self):
         """
         Test the {% localtime %} templatetag and related filters.
@@ -686,6 +700,7 @@ class TemplateTests(BaseDateTimeTests):
             ctx = Context({'dt': datetime.datetime(2011, 9, 1, 13, 20, 30), 'tz': 'not a tz'})
             self.assertEqual(tpl.render(ctx), "")
 
+    @requires_tz_support
     def test_timezone_templatetag(self):
         """
         Test the {% timezone %} templatetag.
@@ -725,6 +740,7 @@ class TemplateTests(BaseDateTimeTests):
         with self.assertRaises(ValueError if pytz is None else pytz.UnknownTimeZoneError):
             Template("{% load tz %}{% timezone tz %}{% endtimezone %}").render(Context({'tz': 'foobar'}))
 
+    @skipIf(sys.platform.startswith('win'), "Windows uses non-standard time zone names")
     def test_get_current_timezone_templatetag(self):
         """
         Test the {% get_current_timezone %} templatetag.
@@ -757,6 +773,7 @@ class TemplateTests(BaseDateTimeTests):
         with self.assertRaises(TemplateSyntaxError):
             Template("{% load tz %}{% get_current_timezone %}").render()
 
+    @skipIf(sys.platform.startswith('win'), "Windows uses non-standard time zone names")
     def test_tz_template_context_processor(self):
         """
         Test the django.core.context_processors.tz template context processor.
@@ -765,6 +782,7 @@ class TemplateTests(BaseDateTimeTests):
         self.assertEqual(tpl.render(Context()), "")
         self.assertEqual(tpl.render(RequestContext(HttpRequest())), "Africa/Nairobi" if pytz else "EAT")
 
+    @requires_tz_support
     def test_date_and_time_template_filters(self):
         tpl = Template("{{ dt|date:'Y-m-d' }} at {{ dt|time:'H:i:s' }}")
         ctx = Context({'dt': datetime.datetime(2011, 9, 1, 20, 20, 20, tzinfo=UTC)})
@@ -790,6 +808,7 @@ class TemplateTests(BaseDateTimeTests):
             self.assertTrue(tpl.render(ctx).startswith("2011"))
         timezone._localtime = None
 
+    @requires_tz_support
     def test_now_template_tag_uses_current_time_zone(self):
         # Regression for #17343
         tpl = Template("{% now \"O\" %}")
@@ -838,6 +857,7 @@ LegacyFormsTests = override_settings(DATETIME_FORMAT='c', USE_L10N=False, USE_TZ
 #@override_settings(DATETIME_FORMAT='c', USE_L10N=False, USE_TZ=True)
 class NewFormsTests(BaseDateTimeTests):
 
+    @requires_tz_support
     def test_form(self):
         form = EventForm({'dt': u'2011-09-01 13:20:30'})
         self.assertTrue(form.is_valid())
@@ -867,11 +887,13 @@ class NewFormsTests(BaseDateTimeTests):
                 [u"2011-10-30 02:30:00 couldn't be interpreted in time zone "
                  u"Europe/Paris; it may be ambiguous or it may not exist."])
 
+    @requires_tz_support
     def test_split_form(self):
         form = EventSplitForm({'dt_0': u'2011-09-01', 'dt_1': u'13:20:30'})
         self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data['dt'], datetime.datetime(2011, 9, 1, 10, 20, 30, tzinfo=UTC))
 
+    @requires_tz_support
     def test_model_form(self):
         EventModelForm({'dt': u'2011-09-01 13:20:30'}).save()
         e = Event.objects.get()
@@ -888,6 +910,7 @@ class AdminTests(BaseDateTimeTests):
     def setUp(self):
         self.client.login(username='super', password='secret')
 
+    @requires_tz_support
     def test_changelist(self):
         e = Event.objects.create(dt=datetime.datetime(2011, 9, 1, 10, 20, 30, tzinfo=UTC))
         response = self.client.get(reverse('admin:timezones_event_changelist'))
@@ -899,6 +922,7 @@ class AdminTests(BaseDateTimeTests):
             response = self.client.get(reverse('admin:timezones_event_changelist'))
         self.assertContains(response, e.dt.astimezone(ICT).isoformat())
 
+    @requires_tz_support
     def test_change_editable(self):
         e = Event.objects.create(dt=datetime.datetime(2011, 9, 1, 10, 20, 30, tzinfo=UTC))
         response = self.client.get(reverse('admin:timezones_event_change', args=(e.pk,)))
@@ -912,6 +936,7 @@ class AdminTests(BaseDateTimeTests):
         self.assertContains(response, e.dt.astimezone(ICT).date().isoformat())
         self.assertContains(response, e.dt.astimezone(ICT).time().isoformat())
 
+    @requires_tz_support
     def test_change_readonly(self):
         Timestamp.objects.create()
         # re-fetch the object for backends that lose microseconds (MySQL)
