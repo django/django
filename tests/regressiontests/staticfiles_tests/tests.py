@@ -331,6 +331,16 @@ class TestCollectionCachedStorage(BaseCollectionTestCase,
             self.assertNotIn("cached/other.css", content)
             self.assertIn("/static/cached/other.d41d8cd98f00.css", content)
 
+    def test_path_with_querystring_and_fragment(self):
+        relpath = self.cached_file_path("cached/css/fragments.css")
+        self.assertEqual(relpath, "cached/css/fragments.75433540b096.css")
+        with storage.staticfiles_storage.open(relpath) as relfile:
+            content = relfile.read()
+            self.assertIn('/static/cached/css/fonts/font.a4b0478549d0.eot?#iefix', content)
+            self.assertIn('/static/cached/css/fonts/font.b8d603e42714.svg#webfontIyfZbseF', content)
+            self.assertIn('data:font/woff;charset=utf-8;base64,d09GRgABAAAAADJoAA0AAAAAR2QAAQAAAAAAAAAAAAA', content)
+            self.assertIn('#default#VML', content)
+
     def test_template_tag_absolute(self):
         relpath = self.cached_file_path("cached/absolute.css")
         self.assertEqual(relpath, "cached/absolute.cc80cb5e2eb1.css")

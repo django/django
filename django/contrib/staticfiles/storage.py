@@ -12,7 +12,7 @@ from django.core.cache import (get_cache, InvalidCacheBackendError,
 from django.core.exceptions import ImproperlyConfigured
 from django.core.files.base import ContentFile
 from django.core.files.storage import FileSystemStorage, get_storage_class
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_unicode, smart_str
 from django.utils.functional import LazyObject
 from django.utils.importlib import import_module
 from django.utils.datastructures import SortedDict
@@ -84,9 +84,14 @@ class CachedFilesMixin(object):
         for chunk in content.chunks():
             md5.update(chunk)
         md5sum = md5.hexdigest()[:12]
-        hashed_name = os.path.join(path, u"%s.%s%s" % (root, md5sum, ext))
+        hashed_name = os.path.join(path, u"%s.%s%s" %
+                                   (root, md5sum, ext))
         unparsed_name = list(parsed_name)
         unparsed_name[2] = hashed_name
+        # Special casing for a @font-face hack, like url(myfont.eot?#iefix")
+        # http://www.fontspring.com/blog/the-new-bulletproof-font-face-syntax
+        if '?#' in name and not unparsed_name[3]:
+            unparsed_name[2] += '?'
         return urlunsplit(unparsed_name)
 
     def cache_key(self, name):
@@ -103,7 +108,8 @@ class CachedFilesMixin(object):
             hashed_name = self.cache.get(cache_key)
             if hashed_name is None:
                 hashed_name = self.hashed_name(name).replace('\\', '/')
-                # set the cache if there was a miss (e.g. if cache server goes down)
+                # set the cache if there was a miss
+                # (e.g. if cache server goes down)
                 self.cache.set(cache_key, hashed_name)
         return unquote(super(CachedFilesMixin, self).url(hashed_name))
 
@@ -119,7 +125,7 @@ class CachedFilesMixin(object):
             """
             matched, url = matchobj.groups()
             # Completely ignore http(s) prefixed URLs
-            if url.startswith(('http', 'https')):
+            if url.startswith(('#', 'http', 'https', 'data:')):
                 return matched
             name_parts = name.split(os.sep)
             # Using posix normpath here to remove duplicates
@@ -182,7 +188,8 @@ class CachedFilesMixin(object):
                 if self.exists(hashed_name):
                     self.delete(hashed_name)
 
-                saved_name = self._save(hashed_name, ContentFile(content))
+                content_file = ContentFile(smart_str(content))
+                saved_name = self._save(hashed_name, content_file)
                 hashed_name = force_unicode(saved_name.replace('\\', '/'))
                 processed_files.append(hashed_name)
 

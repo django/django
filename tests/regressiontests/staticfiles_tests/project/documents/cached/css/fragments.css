@@ -1,0 +1,8 @@
+@font-face {
+    src: url('fonts/font.eot?#iefix') format('embedded-opentype'),
+         url('fonts/font.svg#webfontIyfZbseF') format('svg');
+         url('data:font/woff;charset=utf-8;base64,d09GRgABAAAAADJoAA0AAAAAR2QAAQAAAAAAAAAAAAA');
+}
+div {
+    behavior: url("#default#VML");
+}
