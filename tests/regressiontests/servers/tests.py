@@ -61,9 +61,9 @@ class AdminMediaHandlerTests(TestCase):
                 self.fail("Got a ValueError exception, but wasn't expecting"
                           " one. URL was: %s" % url)
             rel_path = os.path.join(*path_tuple)
-            desired = os.path.normcase(
-                os.path.join(self.admin_media_file_path, rel_path))
-            self.assertEqual(output, desired,
+            desired = os.path.join(self.admin_media_file_path, rel_path)
+            self.assertEqual(
+                os.path.normcase(output), os.path.normcase(desired),
                 "Got: %s, Expected: %s, URL was: %s" % (output, desired, url))
         for url in bad_data:
             try:
