@@ -1377,9 +1377,9 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         testproject_dir = os.path.join(test_dir, 'testproject')
 
         out, err = self.run_django_admin(args)
+        self.addCleanup(shutil.rmtree, testproject_dir)
         self.assertNoOutput(err)
         self.assertTrue(os.path.isdir(testproject_dir))
-        self.addCleanup(shutil.rmtree, testproject_dir)
 
         # running again..
         out, err = self.run_django_admin(args)
@@ -1392,10 +1392,10 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         testproject_dir = os.path.join(test_dir, 'othertestproject')
 
         out, err = self.run_django_admin(args)
+        self.addCleanup(shutil.rmtree, testproject_dir)
         self.assertNoOutput(err)
         self.assertTrue(os.path.isdir(os.path.join(testproject_dir, 'testproject')))
         self.assertTrue(os.path.exists(os.path.join(testproject_dir, 'testproject', 'manage.py')))
-        self.addCleanup(shutil.rmtree, testproject_dir)
 
         # running again..
         out, err = self.run_django_admin(args)
@@ -1409,9 +1409,9 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         testproject_dir = os.path.join(test_dir, 'customtestproject')
 
         out, err = self.run_django_admin(args)
+        self.addCleanup(shutil.rmtree, testproject_dir)
         self.assertNoOutput(err)
         self.assertTrue(os.path.isdir(testproject_dir))
-        self.addCleanup(shutil.rmtree, testproject_dir)
         self.assertTrue(os.path.exists(os.path.join(testproject_dir, 'additional_dir')))
 
     def test_custom_project_template_from_tarball_by_path(self):
@@ -1421,9 +1421,9 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         testproject_dir = os.path.join(test_dir, 'tarballtestproject')
 
         out, err = self.run_django_admin(args)
+        self.addCleanup(shutil.rmtree, testproject_dir)
         self.assertNoOutput(err)
         self.assertTrue(os.path.isdir(testproject_dir))
-        self.addCleanup(shutil.rmtree, testproject_dir)
         self.assertTrue(os.path.exists(os.path.join(testproject_dir, 'run.py')))
 
     def test_custom_project_template_from_tarball_by_url(self):
@@ -1435,7 +1435,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         testproject_dir = os.path.join(test_dir, 'urltestproject')
 
         out, err = self.run_django_admin(args)
+        self.addCleanup(shutil.rmtree, testproject_dir)
         self.assertNoOutput(err)
         self.assertTrue(os.path.isdir(testproject_dir))
-        self.addCleanup(shutil.rmtree, testproject_dir)
         self.assertTrue(os.path.exists(os.path.join(testproject_dir, 'run.py')))
