@@ -1270,7 +1270,7 @@ class CacheI18nTest(TestCase):
     @override_settings(USE_I18N=False, USE_L10N=False, USE_TZ=True)
     def test_cache_key_i18n_timezone(self):
         request = self._get_request()
-        tz = timezone.get_current_timezone_name()
+        tz = timezone.get_current_timezone_name().replace(' ', '_')
         response = HttpResponse()
         key = learn_cache_key(request, response)
         self.assertIn(tz, key, "Cache keys should include the time zone name when time zones are active")
@@ -1281,7 +1281,7 @@ class CacheI18nTest(TestCase):
     def test_cache_key_no_i18n (self):
         request = self._get_request()
         lang = translation.get_language()
-        tz = timezone.get_current_timezone_name()
+        tz = timezone.get_current_timezone_name().replace(' ', '_')
         response = HttpResponse()
         key = learn_cache_key(request, response)
         self.assertNotIn(lang, key, "Cache keys shouldn't include the language name when i18n isn't active")
