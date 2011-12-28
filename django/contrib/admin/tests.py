@@ -29,6 +29,26 @@ class AdminSeleniumWebDriverTestCase(LiveServerTestCase):
         if hasattr(cls, 'selenium'):
             cls.selenium.quit()
 
+    def wait_until(self, callback, timeout=10):
+        """
+        Helper function that blocks the execution of the tests until the
+        specified callback returns a value that is not falsy. This function can
+        be called, for example, after clicking a link or submitting a form.
+        See the other public methods that call this function for more details.
+        """
+        from selenium.webdriver.support.wait import WebDriverWait
+        WebDriverWait(self.selenium, timeout).until(callback)
+
+    def wait_loaded_tag(self, tag_name, timeout=10):
+        """
+        Helper function that blocks until the element with the given tag name
+        is found on the page.
+        """
+        self.wait_until(
+            lambda driver: driver.find_element_by_tag_name(tag_name),
+            timeout
+        )
+
     def admin_login(self, username, password, login_url='/admin/'):
         """
         Helper function to log into the admin.
@@ -41,6 +61,8 @@ class AdminSeleniumWebDriverTestCase(LiveServerTestCase):
         login_text = _('Log in')
         self.selenium.find_element_by_xpath(
             '//input[@value="%s"]' % login_text).click()
+        # Wait for the next page to be loaded.
+        self.wait_loaded_tag('body')
 
     def get_css_value(self, selector, attribute):
         """

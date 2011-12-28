@@ -1843,6 +1843,41 @@ out the `full reference`_ for more details.
     </howto/static-files>` so you'll need to have your project configured
     accordingly (in particular by setting :setting:`STATIC_URL`).
 
+.. note::
+
+    When using an in-memory SQLite database to run the tests, the same database
+    connection will be shared by two threads in parallel: the thread in which
+    the live server is run, and the thread in which the test case is run. It is
+    important to prevent simultaneous database queries via this shared
+    connection by the two threads as that may sometimes cause the tests to
+    randomly fail. So you need to ensure that the two threads do not access the
+    database at the same time. In particular, this means that in some cases
+    (for example just after clicking a link or submitting a form) you might
+    need to check that a response is received by Selenium and that the next
+    page is loaded before proceeding further with the execution of the tests.
+    This can be achieved, for example, by making Selenium wait until the
+    `<body>` HTML tag is found in the response:
+
+    .. code-block:: python
+
+        def test_login(self):
+            from selenium.webdriver.support.wait import WebDriverWait
+            ...
+            self.selenium.find_element_by_xpath('//input[@value="Log in"]').click()
+            # Wait until the response is received
+            WebDriverWait(self.selenium, timeout).until(
+                lambda driver: driver.find_element_by_tag_name('body'), timeout=10)
+
+    The difficult point is that there really is no such thing as a "page load",
+    especially in modern Web apps that have dynamically-generated page
+    components that do not exist in the HTML initially received from the
+    server. So simply checking for the presence of the `<body>` tag in the
+    response might not necessarily be appropriate for all use cases. Please
+    refer to the `Selenium FAQ`_ and the `Selenium documentation`_ for more
+    information on this topic.
+
+    .. _Selenium FAQ: http://code.google.com/p/selenium/wiki/FrequentlyAskedQuestions#Q:_WebDriver_fails_to_find_elements_/_Does_not_block_on_page_loa
+    .. _Selenium documentation: http://seleniumhq.org/docs/04_webdriver_advanced.html#explicit-waits
 
 Using different testing frameworks
 ==================================

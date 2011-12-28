@@ -443,6 +443,9 @@ class SeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
         self.selenium.find_element_by_name('profile_set-2-last_name').send_keys('2 last name 2')
         self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
 
+        # Wait for the next page to be loaded.
+        self.wait_loaded_tag('body')
+
         # Check that the objects have been created in the database
         self.assertEqual(ProfileCollection.objects.all().count(), 1)
         self.assertEqual(Profile.objects.all().count(), 3)
