@@ -214,6 +214,20 @@ class CustomTestRunnerOptionsTests(AdminScriptTestCase):
         self.assertOutput(out, 'bar:foo:31337')
 
 
+class Ticket17477RegressionTests(AdminScriptTestCase):
+    def setUp(self):
+        self.write_settings('settings.py')
+
+    def tearDown(self):
+        self.remove_settings('settings.py')
+
+    def test_ticket_17477(self):
+        """'manage.py help test' works after r16352."""
+        args = ['help', 'test']
+        out, err = self.run_manage(args)
+        self.assertNoOutput(err)
+
+
 class ModulesTestsPackages(unittest.TestCase):
     def test_get_tests(self):
         "Check that the get_tests helper function can find tests in a directory"

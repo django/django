@@ -31,13 +31,16 @@ class Command(BaseCommand):
 
     requires_model_validation = False
 
+    def __init__(self):
+        self.test_runner = None
+        super(Command, self).__init__()
+
     def run_from_argv(self, argv):
         """
         Pre-parse the command line to extract the value of the --testrunner
         option. This allows a test runner to define additional command line
         arguments.
         """
-        self.test_runner = None
         option = '--testrunner='
         for arg in argv[2:]:
             if arg.startswith(option):
