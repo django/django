@@ -60,6 +60,17 @@ class TemplateCommand(BaseCommand):
         self.paths_to_remove = []
         self.verbosity = int(options.get('verbosity'))
 
+        # If it's not a valid directory name.
+        if not re.search(r'^[_a-zA-Z]\w*$', name):
+            # Provide a smart error message, depending on the error.
+            if not re.search(r'^[_a-zA-Z]', name):
+                message = ('make sure the name begins '
+                           'with a letter or underscore')
+            else:
+                message = 'use only numbers, letters and underscores'
+            raise CommandError("%r is not a valid %s name. Please %s." %
+                               (name, app_or_project, message))
+
         # if some directory is given, make sure it's nicely expanded
         if target is None:
             target = os.getcwd()
@@ -87,17 +98,6 @@ class TemplateCommand(BaseCommand):
             base_name: name,
             base_directory: top_dir,
         }))
-
-        # If it's not a valid directory name.
-        if not re.search(r'^[_a-zA-Z]\w*$', name):
-            # Provide a smart error message, depending on the error.
-            if not re.search(r'^[_a-zA-Z]', name):
-                message = ('make sure the name begins '
-                           'with a letter or underscore')
-            else:
-                message = 'use only numbers, letters and underscores'
-            raise CommandError("%r is not a valid %s name. Please %s." %
-                               (name, app_or_project, message))
 
         # Setup a stub settings environment for template rendering
         from django.conf import settings
