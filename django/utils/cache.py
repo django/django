@@ -23,7 +23,7 @@ import time
 
 from django.conf import settings
 from django.core.cache import get_cache
-from django.utils.encoding import smart_str, iri_to_uri
+from django.utils.encoding import smart_str, iri_to_uri, force_unicode
 from django.utils.http import http_date
 from django.utils.timezone import get_current_timezone_name
 from django.utils.translation import get_language
@@ -165,9 +165,12 @@ def _i18n_cache_key_suffix(request, cache_key):
         # which in turn can also fall back to settings.LANGUAGE_CODE
         cache_key += '.%s' % getattr(request, 'LANGUAGE_CODE', get_language())
     if settings.USE_TZ:
-        # Windows uses non-standard timezone names that may include spaces,
-        # which triggers CacheKeyWarning.
-        cache_key += '.%s' % get_current_timezone_name().replace(' ', '_')
+        # The datetime module doesn't restrict the output of tzname().
+        # Windows is known to use non-standard, locale-dependant names.
+        # User-defined tzinfo classes may return absolutely anything.
+        # Hence this paranoid conversion to create a valid cache key.
+        tz_name = force_unicode(get_current_timezone_name(), errors='ignore')
+        cache_key += '.%s' % tz_name.encode('ascii', 'ignore').replace(' ', '_')
     return cache_key
 
 def _generate_cache_key(request, method, headerlist, key_prefix):
