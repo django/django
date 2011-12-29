@@ -1856,7 +1856,7 @@ out the `full reference`_ for more details.
     need to check that a response is received by Selenium and that the next
     page is loaded before proceeding further with the execution of the tests.
     This can be achieved, for example, by making Selenium wait until the
-    `<body>` HTML tag is found in the response:
+    `<body>` HTML tag is found in the response (requires Selenium > 2.13):
 
     .. code-block:: python
 
