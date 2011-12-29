@@ -27,7 +27,7 @@ urlpatterns = patterns('',
     # admin custom URL tests
     (r'^custom_urls/', include('regressiontests.admin_custom_urls.urls')),
 
-    # admin custom URL tests
+    # admin scripts tests
     (r'^admin_scripts/', include('regressiontests.admin_scripts.urls')),
 
 )
