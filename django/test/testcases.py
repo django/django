@@ -9,6 +9,7 @@ from xml.dom.minidom import parseString, Node
 import select
 import socket
 import threading
+import errno
 
 from django.conf import settings
 from django.contrib.staticfiles.handlers import StaticFilesHandler
@@ -17,7 +18,8 @@ from django.core.exceptions import ValidationError, ImproperlyConfigured
 from django.core.handlers.wsgi import WSGIHandler
 from django.core.management import call_command
 from django.core.signals import request_started
-from django.core.servers.basehttp import (WSGIRequestHandler, WSGIServer)
+from django.core.servers.basehttp import (WSGIRequestHandler, WSGIServer,
+    WSGIServerException)
 from django.core.urlresolvers import clear_url_caches
 from django.core.validators import EMPTY_VALUES
 from django.db import (transaction, connection, connections, DEFAULT_DB_ALIAS,
@@ -877,9 +879,10 @@ class LiveServerThread(threading.Thread):
     Thread for running a live http server while the tests are running.
     """
 
-    def __init__(self, address, port, connections_override=None):
-        self.address = address
-        self.port = port
+    def __init__(self, host, possible_ports, connections_override=None):
+        self.host = host
+        self.port = None
+        self.possible_ports = possible_ports
         self.is_ready = threading.Event()
         self.error = None
         self.connections_override = connections_override
@@ -899,9 +902,33 @@ class LiveServerThread(threading.Thread):
         try:
             # Create the handler for serving static and media files
             handler = StaticFilesHandler(_MediaFilesHandler(WSGIHandler()))
-            # Instantiate and start the WSGI server
-            self.httpd = StoppableWSGIServer(
-                (self.address, self.port), QuietWSGIRequestHandler)
+
+            # Go through the list of possible ports, hoping that we can find
+            # one that is free to use for the WSGI server.
+            for index, port in enumerate(self.possible_ports):
+                try:
+                    self.httpd = StoppableWSGIServer(
+                        (self.host, port), QuietWSGIRequestHandler)
+                except WSGIServerException, e:
+                    if sys.version_info < (2, 6):
+                        error_code = e.args[0].args[0]
+                    else:
+                        error_code = e.args[0].errno
+                    if (index + 1 < len(self.possible_ports) and
+                        error_code == errno.EADDRINUSE):
+                        # This port is already in use, so we go on and try with
+                        # the next one in the list.
+                        continue
+                    else:
+                        # Either none of the given ports are free or the error
+                        # is something else than "Address already in use". So
+                        # we let that error bubble up to the main thread.
+                        raise
+                else:
+                    # A free port was found.
+                    self.port = port
+                    break
+
             self.httpd.set_app(handler)
             self.is_ready.set()
             self.httpd.serve_forever()
@@ -931,7 +958,8 @@ class LiveServerTestCase(TransactionTestCase):
 
     @property
     def live_server_url(self):
-        return 'http://%s' % self.__test_server_address
+        return 'http://%s:%s' % (
+            self.server_thread.host, self.server_thread.port)
 
     @classmethod
     def setUpClass(cls):
@@ -946,15 +974,31 @@ class LiveServerTestCase(TransactionTestCase):
                 connections_override[conn.alias] = conn
 
         # Launch the live server's thread
-        cls.__test_server_address = os.environ.get(
+        specified_address = os.environ.get(
             'DJANGO_LIVE_TEST_SERVER_ADDRESS', 'localhost:8081')
+
+        # The specified ports may be of the form '8000-8010,8080,9200-9300'
+        # i.e. a comma-separated list of ports or ranges of ports, so we break
+        # it down into a detailed list of all possible ports.
+        possible_ports = []
         try:
-            host, port = cls.__test_server_address.split(':')
+            host, port_ranges = specified_address.split(':')
+            for port_range in port_ranges.split(','):
+                # A port range can be of either form: '8000' or '8000-8010'.
+                extremes = map(int, port_range.split('-'))
+                assert len(extremes) in [1, 2]
+                if len(extremes) == 1:
+                    # Port range of the form '8000'
+                    possible_ports.append(extremes[0])
+                else:
+                    # Port range of the form '8000-8010'
+                    for port in range(extremes[0], extremes[1] + 1):
+                        possible_ports.append(port)
         except Exception:
             raise ImproperlyConfigured('Invalid address ("%s") for live '
-                'server.' % cls.__test_server_address)
+                'server.' % specified_address)
         cls.server_thread = LiveServerThread(
-            host, int(port), connections_override)
+            host, possible_ports, connections_override)
         cls.server_thread.daemon = True
         cls.server_thread.start()
 

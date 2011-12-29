@@ -1772,15 +1772,38 @@ simulate a real user's actions.
 By default the live server's address is `'localhost:8081'` and the full URL
 can be accessed during the tests with ``self.live_server_url``. If you'd like
 to change the default address (in the case, for example, where the 8081 port is
-already taken) you may pass a different one to the :djadmin:`test` command via
-the :djadminopt:`--liveserver` option, for example:
+already taken) then you may pass a different one to the :djadmin:`test` command
+via the :djadminopt:`--liveserver` option, for example:
 
 .. code-block:: bash
 
     ./manage.py test --liveserver=localhost:8082
 
 Another way of changing the default server address is by setting the
-`DJANGO_LIVE_TEST_SERVER_ADDRESS` environment variable.
+`DJANGO_LIVE_TEST_SERVER_ADDRESS` environment variable somewhere in your
+code (for example in a :ref:`custom test runner<topics-testing-test_runner>`
+if you're using one):
+
+.. code-block:: python
+
+    import os
+    os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = 'localhost:8082'
+
+In the case where the tests are run by multiple processes in parallel (for
+example in the context of several simultaneous `continuous integration`_
+builds), the processes will compete for the same address and therefore your
+tests might randomly fail with an "Address already in use" error. To avoid this
+problem, you can pass a comma-separated list of ports or ranges of ports (at
+least as many as the number of potential parallel processes), for example:
+
+.. code-block:: bash
+
+    ./manage.py test --liveserver=localhost:8082,8090-8100,9000-9200,7041
+
+Then, during the execution of the tests, each new live test server will try
+every specified port until it finds one that is free and takes it.
+
+.. _continuous integration: http://en.wikipedia.org/wiki/Continuous_integration
 
 To demonstrate how to use ``LiveServerTestCase``, let's write a simple Selenium
 test. First of all, you need to install the `selenium package`_ into your

@@ -101,10 +101,7 @@ class LiveServerBase(LiveServerTestCase):
         super(LiveServerBase, cls).tearDownClass()
 
     def urlopen(self, url):
-        server_address = os.environ.get(
-            'DJANGO_LIVE_TEST_SERVER_ADDRESS', 'localhost:8081')
-        base = 'http://%s' % server_address
-        return urllib2.urlopen(base + url)
+        return urllib2.urlopen(self.live_server_url + url)
 
 
 class LiveServerAddress(LiveServerBase):
@@ -120,31 +117,23 @@ class LiveServerAddress(LiveServerBase):
         old_address = os.environ.get('DJANGO_LIVE_TEST_SERVER_ADDRESS')
 
         # Just the host is not accepted
-        os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = 'localhost'
-        try:
-            super(LiveServerAddress, cls).setUpClass()
-            raise Exception("The line above should have raised an exception")
-        except ImproperlyConfigured:
-            pass
+        cls.raises_exception('localhost', ImproperlyConfigured)
 
         # The host must be valid
-        os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = 'blahblahblah:8081'
-        try:
-            super(LiveServerAddress, cls).setUpClass()
-            raise Exception("The line above should have raised an exception")
-        except WSGIServerException:
-            pass
+        cls.raises_exception('blahblahblah:8081', WSGIServerException)
+
+        # The list of ports must be in a valid format
+        cls.raises_exception('localhost:8081,', ImproperlyConfigured)
+        cls.raises_exception('localhost:8081,blah', ImproperlyConfigured)
+        cls.raises_exception('localhost:8081-', ImproperlyConfigured)
+        cls.raises_exception('localhost:8081-blah', ImproperlyConfigured)
+        cls.raises_exception('localhost:8081-8082-8083', ImproperlyConfigured)
 
         # If contrib.staticfiles isn't configured properly, the exception
         # should bubble up to the main thread.
         old_STATIC_URL = TEST_SETTINGS['STATIC_URL']
         TEST_SETTINGS['STATIC_URL'] = None
-        os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = 'localhost:8081'
-        try:
-            super(LiveServerAddress, cls).setUpClass()
-            raise Exception("The line above should have raised an exception")
-        except ImproperlyConfigured:
-            pass
+        cls.raises_exception('localhost:8081', ImproperlyConfigured)
         TEST_SETTINGS['STATIC_URL'] = old_STATIC_URL
 
         # Restore original environment variable
@@ -152,6 +141,15 @@ class LiveServerAddress(LiveServerBase):
             os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = old_address
         else:
             del os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS']
+
+    @classmethod
+    def raises_exception(cls, address, exception):
+        os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = address
+        try:
+            super(LiveServerAddress, cls).setUpClass()
+            raise Exception("The line above should have raised an exception")
+        except exception:
+            pass
 
     def test_test_test(self):
         # Intentionally empty method so that the test is picked up by the
