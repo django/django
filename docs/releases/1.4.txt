@@ -515,6 +515,11 @@ Django 1.4 also includes several smaller improvements worth noting:
 
 * The :ttag:`if` template tag now supports ``{% elif %}`` clauses.
 
+* If your Django app is behind a proxy, you might find the new
+  :setting:`SECURE_PROXY_SSL_HEADER` setting useful. It solves the problem of your
+  proxy "eating" the fact that a request came in via HTTPS. But only use this
+  setting if you know what you're doing.
+
 * A new, plain-text, version of the HTTP 500 status code internal error page
   served when :setting:`DEBUG` is ``True`` is now sent to the client when
   Django detects that the request has originated in JavaScript code.
