@@ -122,9 +122,9 @@ class ContentFile(File):
     """
     A File-like object that takes just raw content, rather than an actual file.
     """
-    def __init__(self, content):
+    def __init__(self, content, name=None):
         content = content or ''
-        super(ContentFile, self).__init__(StringIO(content))
+        super(ContentFile, self).__init__(StringIO(content), name=name)
         self.size = len(content)
 
     def __str__(self):

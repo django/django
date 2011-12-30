@@ -542,3 +542,14 @@ class InconsistentGetImageDimensionsBug(unittest.TestCase):
         size_1, size_2 = get_image_dimensions(image), get_image_dimensions(image)
         self.assertEqual(image_pil.size, size_1)
         self.assertEqual(size_1, size_2)
+
+class ContentFileTestCase(unittest.TestCase):
+    """
+    Test that the constructor of ContentFile accepts 'name' (#16590).
+    """
+    def test_content_file_default_name(self):
+        self.assertEqual(ContentFile("content").name, None)
+
+    def test_content_file_custome_name(self):
+        name = "I can have a name too!"
+        self.assertEqual(ContentFile("content", name=name).name, name)
