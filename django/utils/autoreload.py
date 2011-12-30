@@ -115,7 +115,11 @@ def python_reloader(main_func, args, kwargs):
             pass
     else:
         try:
-            sys.exit(restart_with_reloader())
+            exit_code = restart_with_reloader()
+            if exit_code < 0:
+                os.kill(os.getpid(), -exit_code)
+            else:
+                sys.exit(exit_code)
         except KeyboardInterrupt:
             pass
 
