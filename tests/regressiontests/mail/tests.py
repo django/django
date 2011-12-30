@@ -96,6 +96,24 @@ class MailTests(TestCase):
         message = email.message()
         self.assertEqual(message['From'], 'from@example.com')
 
+    def test_to_header(self):
+        """
+        Make sure we can manually set the To header (#17444)
+        """
+        email = EmailMessage('Subject', 'Content', 'bounce@example.com',
+                             ['list-subscriber@example.com', 'list-subscriber2@example.com'],
+                             headers={'To': 'mailing-list@example.com'})
+        message = email.message()
+        self.assertEqual(message['To'], 'mailing-list@example.com')
+        self.assertEqual(email.to, ['list-subscriber@example.com', 'list-subscriber2@example.com'])
+
+        # If we don't set the To header manually, it should default to the `to` argument to the constructor
+        email = EmailMessage('Subject', 'Content', 'bounce@example.com',
+                             ['list-subscriber@example.com', 'list-subscriber2@example.com'])
+        message = email.message()
+        self.assertEqual(message['To'], 'list-subscriber@example.com, list-subscriber2@example.com')
+        self.assertEqual(email.to, ['list-subscriber@example.com', 'list-subscriber2@example.com'])
+
     def test_multiple_message_call(self):
         """
         Regression for #13259 - Make sure that headers are not changed when
