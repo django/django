@@ -3,7 +3,7 @@
 import re
 import random as random_module
 import unicodedata
-from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
+from decimal import Decimal, InvalidOperation, Context, ROUND_HALF_UP
 from functools import wraps
 from pprint import pformat
 
@@ -166,9 +166,15 @@ def floatformat(text, arg=-1):
     else:
         exp = Decimal(u'1.0') / (Decimal(10) ** abs(p))
     try:
+        # Set the precision high enough to avoid an exception, see #15789.
+        tupl = d.as_tuple()
+        units = len(tupl[1]) - tupl[2]
+        prec = abs(arg) + units + 1
+
         # Avoid conversion to scientific notation by accessing `sign`, `digits`
         # and `exponent` from `Decimal.as_tuple()` directly.
-        sign, digits, exponent = d.quantize(exp, ROUND_HALF_UP).as_tuple()
+        sign, digits, exponent = d.quantize(exp, ROUND_HALF_UP,
+            Context(prec=prec)).as_tuple()
         digits = [unicode(digit) for digit in reversed(digits)]
         while len(digits) <= abs(exponent):
             digits.append(u'0')

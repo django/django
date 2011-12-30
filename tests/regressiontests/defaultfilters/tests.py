@@ -2,6 +2,7 @@
 from __future__ import with_statement
 
 import datetime
+import decimal
 
 from django.template.defaultfilters import *
 from django.test import TestCase
@@ -26,6 +27,11 @@ class DefaultFiltersTests(TestCase):
         self.assertEqual(floatformat(11.0000, -2), u'11')
         self.assertEqual(floatformat(11.000001, -2), u'11.00')
         self.assertEqual(floatformat(8.2798, 3), u'8.280')
+        self.assertEqual(floatformat(5555.555, 2), u'5555.56')
+        self.assertEqual(floatformat(001.3000, 2), u'1.30')
+        self.assertEqual(floatformat(0.12345, 2), u'0.12')
+        self.assertEqual(floatformat(decimal.Decimal('555.555'), 2), u'555.56')
+        self.assertEqual(floatformat(decimal.Decimal('09.000')), u'9')
         self.assertEqual(floatformat(u'foo'), u'')
         self.assertEqual(floatformat(13.1031, u'bar'), u'13.1031')
         self.assertEqual(floatformat(18.125, 2), u'18.13')
@@ -56,6 +62,18 @@ class DefaultFiltersTests(TestCase):
                 return self.value
 
         self.assertEqual(floatformat(FloatWrapper(11.000001), -2), u'11.00')
+
+        # Regression for #15789
+        decimal_ctx = decimal.getcontext()
+        old_prec, decimal_ctx.prec = decimal_ctx.prec, 2
+        try:
+            self.assertEqual(floatformat(1.2345, 2), u'1.23')
+            self.assertEqual(floatformat(15.2042, -3), u'15.204')
+            self.assertEqual(floatformat(decimal.Decimal('1.2345'), 2), u'1.23')
+            self.assertEqual(floatformat(decimal.Decimal('15.2042'), -3), u'15.204')
+        finally:
+            decimal_ctx.prec = old_prec
+
 
     # This fails because of Python's float handling. Floats with many zeroes
     # after the decimal point should be passed in as another type such as
