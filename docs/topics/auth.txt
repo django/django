@@ -371,34 +371,6 @@ Don't set the :attr:`~django.contrib.auth.models.User.password` attribute
 directly unless you know what you're doing. This is explained in the next
 section.
 
-.. _auth_password_reset:
-
-User-requested password resets
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-There is a bundled reset mechanism that integrates into the admin, allowing
-users to reset their passwords by email. It can be customized and is described
-in detail below under :func:`~django.contrib.auth.views.password_reset`. To
-enable it without customization, add lines something like the following to your
-urls.py:
-
-.. code-block:: python
-
-    url(r'^admin/password_reset/$', 'django.contrib.auth.views.password_reset', name='admin_password_reset'),
-    (r'^admin/password_reset/done/$', 'django.contrib.auth.views.password_reset_done'),
-    (r'^reset/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$', 'django.contrib.auth.views.password_reset_confirm'),
-    (r'^reset/done/$', 'django.contrib.auth.views.password_reset_complete'),
-
-(This assumes you've added the admin at ``admin/``, and requires that you put
-the URLs starting with ``^admin/`` before the line that includes the admin app
-itself).
-
-.. versionchanged:: 1.4
-
-The presence of the 'admin_password_reset' named URL will cause a "forgotten
-your password?" link to appear on the default admin login page under the
-password box.
-
 .. _auth_password_storage:
 
 How Django stores passwords

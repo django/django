@@ -1928,6 +1928,31 @@ a pattern for your new view.
     be set to either ``self.name`` if your view is on an ``AdminSite`` or
     ``self.admin_site.name`` if your view is on a ``ModelAdmin``.
 
+.. _auth_password_reset:
+
+Adding a password-reset feature
+-------------------------------
+
+You can add a password-reset feature to the admin site by adding a few lines to
+your URLconf. Specifically, add these four patterns:
+
+.. code-block:: python
+
+    url(r'^admin/password_reset/$', 'django.contrib.auth.views.password_reset', name='admin_password_reset'),
+    (r'^admin/password_reset/done/$', 'django.contrib.auth.views.password_reset_done'),
+    (r'^reset/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$', 'django.contrib.auth.views.password_reset_confirm'),
+    (r'^reset/done/$', 'django.contrib.auth.views.password_reset_complete'),
+
+(This assumes you've added the admin at ``admin/`` and requires that you put
+the URLs starting with ``^admin/`` before the line that includes the admin app
+itself).
+
+.. versionchanged:: 1.4
+
+The presence of the ``admin_password_reset`` named URL will cause a "forgotten
+your password?" link to appear on the default admin log-in page under the
+password box.
+
 .. _admin-reverse-urls:
 
 Reversing admin URLs
