@@ -50,11 +50,9 @@ aside from any necessary security fixes, it will not be actively
 maintained, and it will be removed in a future release of Django.
 
 Also, note that some features, like the new :setting:`DATABASE_OPTIONS`
-setting (see the `databases documentation`_ for details), are only
-available on the "mysql" backend, and will not be made available for
+setting (see the :doc:`databases documentation </ref/databases>` for details),
+are only available on the "mysql" backend, and will not be made available for
 "mysql_old".
-
-.. _databases documentation: http://www.djangoproject.com/documentation/0.96/databases/
 
 Database constraint names changed
 ---------------------------------
@@ -164,10 +162,8 @@ Although the ``newforms`` library will continue to evolve, it's ready for use
 for most common cases. We recommend that anyone new to form handling skip the
 old forms system and start with the new.
 
-For more information about ``django.newforms``, read the `newforms
-documentation`_.
-
-.. _newforms documentation: http://www.djangoproject.com/documentation/0.96/newforms/
+For more information about ``django.newforms``, read the :doc:`newforms
+documentation </topics/forms/index>`.
 
 URLconf improvements
 --------------------
@@ -216,19 +212,15 @@ The test framework
 ------------------
 
 Django now includes a test framework so you can start transmuting fear into
-boredom (with apologies to Kent Beck). You can write tests based on doctest_
-or unittest_ and test your views with a simple test client.
+boredom (with apologies to Kent Beck). You can write tests based on
+:mod:`doctest` or :mod:`unittest` and test your views with a simple test client.
 
 There is also new support for "fixtures" -- initial data, stored in any of the
-supported `serialization formats`_, that will be loaded into your database at the
-start of your tests. This makes testing with real data much easier.
+supported :doc:`serialization formats </topics/serialization>`, that will be
+loaded into your database at the start of your tests. This makes testing with
+real data much easier.
 
-See `the testing documentation`_ for the full details.
-
-.. _doctest: http://docs.python.org/library/doctest.html
-.. _unittest: http://docs.python.org/library/unittest.html
-.. _the testing documentation: http://www.djangoproject.com/documentation/0.96/testing/
-.. _serialization formats: http://www.djangoproject.com/documentation/0.96/serialization/
+See :doc:`the testing documentation </topics/testing>` for the full details.
 
 Improvements to the admin interface
 -----------------------------------
