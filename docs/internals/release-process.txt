@@ -111,6 +111,13 @@ varying levels:
 * Security fixes will be applied to the current trunk and the previous two
   minor releases.
 
+* Documentation fixes will generally be more freely backported to the last
+  release branch (at the discretion of the committer), and don't need to meet
+  the "critical fixes only" bar as it's highly advantageous to have the docs
+  for the last release be up-to-date and correct, and the downside of
+  backporting (risk of introducing regressions) is much less of a concern
+  with doc fixes.
+
 As a concrete example, consider a moment in time halfway between the release of
 Django 1.3 and 1.4. At this point in time:
 
@@ -122,6 +129,9 @@ Django 1.3 and 1.4. At this point in time:
 * Security fixes will be applied to trunk, a ``1.3.X`` branch and a
   ``1.2.X`` branch. They will trigger the release of ``1.3.1``, ``1.2.1``,
   etc.
+
+* Documentation fixes will be applied to trunk, and if easily backported, to
+  the ``1.3.X`` branch.
 
 .. _release-process:
 
