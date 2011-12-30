@@ -19,8 +19,12 @@ class Loader(BaseLoader):
     def loaders(self):
         # Resolve loaders on demand to avoid circular imports
         if not self._cached_loaders:
+            # Set self._cached_loaders atomically. Otherwise, another thread
+            # could see an incomplete list. See #17303.
+            cached_loaders = []
             for loader in self._loaders:
-                self._cached_loaders.append(find_template_loader(loader))
+                cached_loaders.append(find_template_loader(loader))
+            self._cached_loaders = cached_loaders
         return self._cached_loaders
 
     def find_template(self, name, dirs=None):
