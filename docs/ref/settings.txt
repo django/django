@@ -1528,7 +1528,7 @@ A secret key for this particular Django installation. Used to provide a seed in
 secret-key hashing algorithms. Set this to a random string -- the longer, the
 better. ``django-admin.py startproject`` creates one automatically.
 
-.. setting:: SEND_BROKEN_LINK_EMAILS
+.. setting:: SECURE_PROXY_SSL_HEADER
 
 SECURE_PROXY_SSL_HEADER
 -----------------------
@@ -1587,6 +1587,8 @@ available in ``request.META``.)
 
     If any of those are not true, you should keep this setting set to ``None``
     and find another way of determining HTTPS, perhaps via custom middleware.
+
+.. setting:: SEND_BROKEN_LINK_EMAILS
 
 SEND_BROKEN_LINK_EMAILS
 -----------------------
