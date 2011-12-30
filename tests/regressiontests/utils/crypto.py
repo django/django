@@ -130,6 +130,6 @@ class TestUtilsCryptoPBKDF2(unittest.TestCase):
         t1 = elapsed('pbkdf2("password", "salt", iterations=%d)' % n1)
         t2 = elapsed('pbkdf2("password", "salt", iterations=%d)' % n2)
         measured_scale_exponent = math.log(t2 / t1, n2 / n1)
-        #This should be less than 1. We allow up to 1.1 so that tests don't 
-        #fail nondeterministically too often.
+        # This should be less than 1. We allow up to 1.1 so that tests don't 
+        # fail nondeterministically too often.
         self.assertLess(measured_scale_exponent, 1.1)
