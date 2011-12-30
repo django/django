@@ -146,6 +146,24 @@ In addition, if the CSRF cookie has not been sent to the client by use of
 :ttag:`csrf_token`, you may need to ensure the client receives the cookie by
 using :func:`~django.views.decorators.csrf.ensure_csrf_cookie`.
 
+Other template engines
+----------------------
+
+When using a different template engine than Django's built-in engine, you can
+set the token in your forms manually after making sure it is available in the
+context of the template.
+
+So in Cheetah for example, your form could contain the following:
+
+.. code-block:: html
+
+    <div style="display:none">
+        <input type="hidden" name="csrfmiddlewaretoken" value="$csrf_token"/>
+    </div>
+
+You may use javascript similar to the :ref:`AJAX code <csrf-ajax>` above to get
+the value of the CSRF token.
+
 The decorator method
 --------------------
 
