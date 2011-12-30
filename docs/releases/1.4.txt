@@ -448,13 +448,13 @@ when running the following command::
 
     django-admin.py startproject --template=/path/to/my_project_template myproject
 
-Additionally you can now provide a destination directory as the second
+You can also now provide a destination directory as the second
 argument to both :djadmin:`startapp` and :djadmin:`startproject`::
 
     django-admin.py startapp myapp /path/to/new/app
     django-admin.py startproject myproject /path/to/new/project
 
-For more information see the :djadmin:`startapp` and :djadmin:`startproject`
+For more information, see the :djadmin:`startapp` and :djadmin:`startproject`
 documentation.
 
 Support for time zones
