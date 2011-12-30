@@ -91,6 +91,18 @@ repository:
   Subversion and Trac so that any commit message in that format will
   automatically post a comment to the appropriate ticket.
 
+* Write commit messages for backports using this pattern::
+
+    [<Django version>] Fixed <ticket> -- <description>
+
+    Backport of <revision> from <branch>.
+
+  For example::
+
+    [1.3.X] Fixed #17028 - Changed diveintopython.org -> diveintopython.net.
+
+    Backport of r17115 from trunk.
+
 Reverting commits
 -----------------
 
