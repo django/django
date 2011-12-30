@@ -125,9 +125,11 @@ class TestUtilsCryptoPBKDF2(unittest.TestCase):
         Theory: If you run with 100 iterations, it should take 100
         times as long as running with 1 iteration.
         """
-        n1, n2 = 100, 10000
+        n1, n2 = 1000, 100000
         elapsed = lambda f: timeit.Timer(f, 'from django.utils.crypto import pbkdf2').timeit(number=1)
         t1 = elapsed('pbkdf2("password", "salt", iterations=%d)' % n1)
         t2 = elapsed('pbkdf2("password", "salt", iterations=%d)' % n2)
         measured_scale_exponent = math.log(t2 / t1, n2 / n1)
+        #This should be less than 1. We allow up to 1.1 so that tests don't 
+        #fail nondeterministically too often.
         self.assertLess(measured_scale_exponent, 1.1)
