@@ -548,10 +548,9 @@ Django 1.4 also includes several smaller improvements worth noting:
 * Added support in the ORM for generating ``SELECT`` queries containing
   ``DISTINCT ON``.
 
-  The ``distinct()`` ``Queryset`` method now accepts an optional list of model
+  The ``distinct()`` ``QuerySet`` method now accepts an optional list of model
   field names. If specified, then the ``DISTINCT`` statement is limited to these
-  fields. PostgreSQL is the only database backend shipped with Django that
-  supports this new functionality.
+  fields. This is only supported in PostgreSQL.
 
   For more details, see the documentation for
   :meth:`~django.db.models.query.QuerySet.distinct`.
