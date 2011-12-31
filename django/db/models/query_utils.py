@@ -125,18 +125,19 @@ class DeferredAttribute(object):
         return None
 
 
-def select_related_descend(field, restricted, requested, reverse=False):
+def select_related_descend(field, restricted, requested, load_fields, reverse=False):
     """
     Returns True if this field should be used to descend deeper for
     select_related() purposes. Used by both the query construction code
     (sql.query.fill_related_selections()) and the model instance creation code
-    (query.get_cached_row()).
+    (query.get_klass_info()).
 
     Arguments:
      * field - the field to be checked
      * restricted - a boolean field, indicating if the field list has been
        manually restricted using a requested clause)
      * requested - The select_related() dictionary.
+     * load_fields - the set of fields to be loaded on this model
      * reverse - boolean, True if we are checking a reverse select related
     """
     if not field.rel:
@@ -150,6 +151,14 @@ def select_related_descend(field, restricted, requested, reverse=False):
             return False
     if not restricted and field.null:
         return False
+    if load_fields:
+        if field.name not in load_fields:
+            if restricted and field.name in requested:
+                raise InvalidQuery("Field %s.%s cannot be both deferred"
+                                   " and traversed using select_related"
+                                   " at the same time." %
+                                   (field.model._meta.object_name, field.name))
+            return False
     return True
 
 # This function is needed because data descriptors must be defined on a class
