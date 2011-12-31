@@ -59,7 +59,7 @@ This will create a ``mysite`` directory in your current directory.
    can be run as a program. To do this, open Terminal.app and navigate (using
    the ``cd`` command) to the directory where :doc:`django-admin.py
    </ref/django-admin>` is installed, then run the command
-   ``chmod +x django-admin.py``.
+   ``sudo chmod +x django-admin.py``.
 
 .. note::
 
