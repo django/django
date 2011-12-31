@@ -176,6 +176,13 @@ Django quotes column and table names behind the scenes.
         >>> answer.get_previous_in_order()
         <Answer: 1>
 
+.. admonition:: Changing order_with_respect_to
+
+        ``order_with_respect_to`` adds an additional field/database column
+        named ``_order``, so be sure to handle that as you would any other
+        change to your models if you add or change ``order_with_respect_to``
+        after your initial :djadmin:`syncdb`.
+
 ``ordering``
 ------------
 
