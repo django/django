@@ -8,9 +8,16 @@ from django.utils import unittest
 
 if sys.platform.startswith('java'):
     def garbage_collect():
-        """Run the garbage collector and wait a bit to let it do his work"""
+        # Some JVM GCs will execute finalizers in a different thread, meaning
+        # we need to wait for that to complete before we go on looking for the
+        # effects of that.
         gc.collect()
         time.sleep(0.1)
+elif hasattr(sys, "pypy_version_info"):
+    def garbage_collect():
+        # Collecting weakreferences can take two collections on PyPy.
+        gc.collect()
+        gc.collect()
 else:
     def garbage_collect():
         gc.collect()
