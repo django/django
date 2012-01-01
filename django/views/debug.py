@@ -1083,7 +1083,7 @@ EMPTY_URLCONF_TEMPLATE = """
   <p>Of course, you haven't actually done any work yet. Here's what to do next:</p>
   <ul>
     <li>If you plan to use a database, edit the <code>DATABASES</code> setting in <code>{{ project_name }}/settings.py</code>.</li>
-    <li>Start your first app by running <code>python {{ project_name }}/manage.py startapp [appname]</code>.</li>
+    <li>Start your first app by running <code>python manage.py startapp [appname]</code>.</li>
   </ul>
 </div>
 
