@@ -257,7 +257,8 @@ class WeekArchiveViewTests(TestCase):
         self.assertEqual(list(res.context['book_list']), [])
 
     def test_week_view_allow_future(self):
-        future = datetime.date(datetime.date.today().year + 1, 1, 1)
+        # January 7th always falls in week 1, given Python's definition of week numbers
+        future = datetime.date(datetime.date.today().year + 1, 1, 7)
         b = Book.objects.create(name="The New New Testement", pages=600, pubdate=future)
 
         res = self.client.get('/dates/books/%s/week/1/' % future.year)
