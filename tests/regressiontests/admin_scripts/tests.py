@@ -11,7 +11,6 @@ import shutil
 import socket
 import subprocess
 import sys
-import urllib
 
 from django import conf, bin, get_version
 from django.conf import settings
@@ -1387,11 +1386,12 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         self.assertOutput(err, "File exists")
 
     def test_invalid_project_name(self):
+        "Make sure the startproject management command validates a project name"
+
         def cleanup(p):
             if os.path.exists(p):
                 shutil.rmtree(p)
 
-        "Make sure the startproject management command validates a project name"
         args = ['startproject', '7testproject']
         testproject_dir = os.path.join(test_dir, '7testproject')
 
@@ -1454,8 +1454,20 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
 
     def test_custom_project_template_from_tarball_by_url(self):
         "Make sure the startproject management command is able to use a different project template from a tarball via a url"
-        template_path = os.path.join(test_dir, 'admin_scripts', 'custom_templates', 'project_template.tgz')
         template_url = '%s/admin_scripts/custom_templates/project_template.tgz' % self.live_server_url
+
+        args = ['startproject', '--template', template_url, 'urltestproject']
+        testproject_dir = os.path.join(test_dir, 'urltestproject')
+
+        out, err = self.run_django_admin(args)
+        self.addCleanup(shutil.rmtree, testproject_dir)
+        self.assertNoOutput(err)
+        self.assertTrue(os.path.isdir(testproject_dir))
+        self.assertTrue(os.path.exists(os.path.join(testproject_dir, 'run.py')))
+
+    def test_project_template_tarball_url(self):
+        "Startproject management command handles project template tar/zip balls from non-canonical urls"
+        template_url = '%s/admin_scripts/custom_templates/project_template.tgz/' % self.live_server_url
 
         args = ['startproject', '--template', template_url, 'urltestproject']
         testproject_dir = os.path.join(test_dir, 'urltestproject')

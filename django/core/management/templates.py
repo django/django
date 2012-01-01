@@ -196,13 +196,22 @@ class TemplateCommand(BaseCommand):
         """
         Downloads the given URL and returns the file name.
         """
+        def cleanup_url(url):
+            tmp = url.rstrip('/')
+            filename = tmp.split('/')[-1]
+            if url.endswith('/'):
+                display_url  = tmp + '/'
+            else:
+                display_url = url
+            return filename, display_url
+
         prefix = 'django_%s_template_' % self.app_or_project
         tempdir = tempfile.mkdtemp(prefix=prefix, suffix='_download')
         self.paths_to_remove.append(tempdir)
-        filename = url.split('/')[-1]
+        filename, display_url = cleanup_url(url)
 
         if self.verbosity >= 2:
-            self.stdout.write("Downloading %s\n" % url)
+            self.stdout.write("Downloading %s\n" % display_url)
         try:
             the_path, info = urllib.urlretrieve(url,
                                                 path.join(tempdir, filename))
