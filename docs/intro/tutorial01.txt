@@ -414,7 +414,7 @@ it'll look like this::
         'django.contrib.contenttypes',
         'django.contrib.sessions',
         'django.contrib.sites',
-        'polls'
+        'polls',
     )
 
 Now Django knows to include the ``polls`` app. Let's run another
