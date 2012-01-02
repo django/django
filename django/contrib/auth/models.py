@@ -16,6 +16,7 @@ from django.contrib.auth.hashers import (
 from django.contrib.auth.signals import user_logged_in
 from django.contrib.contenttypes.models import ContentType
 
+
 def update_last_login(sender, user, **kwargs):
     """
     A signal receiver which updates the last_login date for
@@ -25,28 +26,42 @@ def update_last_login(sender, user, **kwargs):
     user.save()
 user_logged_in.connect(update_last_login)
 
+
 class SiteProfileNotAvailable(Exception):
     pass
+
 
 class PermissionManager(models.Manager):
     def get_by_natural_key(self, codename, app_label, model):
         return self.get(
             codename=codename,
-            content_type=ContentType.objects.get_by_natural_key(app_label, model),
+            content_type=ContentType.objects.get_by_natural_key(app_label,
+                                                                model),
         )
 
+
 class Permission(models.Model):
-    """The permissions system provides a way to assign permissions to specific users and groups of users.
+    """
+    The permissions system provides a way to assign permissions to specific
+    users and groups of users.
 
-    The permission system is used by the Django admin site, but may also be useful in your own code. The Django admin site uses permissions as follows:
+    The permission system is used by the Django admin site, but may also be
+    useful in your own code. The Django admin site uses permissions as follows:
 
-        - The "add" permission limits the user's ability to view the "add" form and add an object.
-        - The "change" permission limits a user's ability to view the change list, view the "change" form and change an object.
+        - The "add" permission limits the user's ability to view the "add" form
+          and add an object.
+        - The "change" permission limits a user's ability to view the change
+          list, view the "change" form and change an object.
         - The "delete" permission limits the ability to delete an object.
 
-    Permissions are set globally per type of object, not per specific object instance. It is possible to say "Mary may change news stories," but it's not currently possible to say "Mary may change news stories, but only the ones she created herself" or "Mary may only change news stories that have a certain status or publication date."
+    Permissions are set globally per type of object, not per specific object
+    instance. It is possible to say "Mary may change news stories," but it's
+    not currently possible to say "Mary may change news stories, but only the
+    ones she created herself" or "Mary may only change news stories that have a
+    certain status or publication date."
 
-    Three basic permissions -- add, change and delete -- are automatically created for each Django model.
+    Three basic permissions -- add, change and delete -- are automatically
+    created for each Django model.
     """
     name = models.CharField(_('name'), max_length=50)
     content_type = models.ForeignKey(ContentType)
@@ -57,7 +72,8 @@ class Permission(models.Model):
         verbose_name = _('permission')
         verbose_name_plural = _('permissions')
         unique_together = (('content_type', 'codename'),)
-        ordering = ('content_type__app_label', 'content_type__model', 'codename')
+        ordering = ('content_type__app_label', 'content_type__model',
+                    'codename')
 
     def __unicode__(self):
         return u"%s | %s | %s" % (
@@ -69,15 +85,27 @@ class Permission(models.Model):
         return (self.codename,) + self.content_type.natural_key()
     natural_key.dependencies = ['contenttypes.contenttype']
 
+
 class Group(models.Model):
-    """Groups are a generic way of categorizing users to apply permissions, or some other label, to those users. A user can belong to any number of groups.
+    """
+    Groups are a generic way of categorizing users to apply permissions, or
+    some other label, to those users. A user can belong to any number of
+    groups.
 
-    A user in a group automatically has all the permissions granted to that group. For example, if the group Site editors has the permission can_edit_home_page, any user in that group will have that permission.
+    A user in a group automatically has all the permissions granted to that
+    group. For example, if the group Site editors has the permission
+    can_edit_home_page, any user in that group will have that permission.
 
-    Beyond permissions, groups are a convenient way to categorize users to apply some label, or extended functionality, to them. For example, you could create a group 'Special users', and you could write code that would do special things to those users -- such as giving them access to a members-only portion of your site, or sending them members-only email messages.
+    Beyond permissions, groups are a convenient way to categorize users to
+    apply some label, or extended functionality, to them. For example, you
+    could create a group 'Special users', and you could write code that would
+    do special things to those users -- such as giving them access to a
+    members-only portion of your site, or sending them members-only email
+    messages.
     """
     name = models.CharField(_('name'), max_length=80, unique=True)
-    permissions = models.ManyToManyField(Permission, verbose_name=_('permissions'), blank=True)
+    permissions = models.ManyToManyField(Permission,
+        verbose_name=_('permissions'), blank=True)
 
     class Meta:
         verbose_name = _('group')
@@ -85,6 +113,7 @@ class Group(models.Model):
 
     def __unicode__(self):
         return self.name
+
 
 class UserManager(models.Manager):
     def create_user(self, username, email=None, password=None):
@@ -119,13 +148,16 @@ class UserManager(models.Manager):
         u.save(using=self._db)
         return u
 
-    def make_random_password(self, length=10, allowed_chars='abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789'):
+    def make_random_password(self, length=10,
+                             allowed_chars='abcdefghjkmnpqrstuvwxyz'
+                                           'ABCDEFGHJKLMNPQRSTUVWXYZ'
+                                           '23456789'):
         """
-        Generates a random password with the given length
-        and given allowed_chars
+        Generates a random password with the given length and given
+        allowed_chars. Note that the default value of allowed_chars does not
+        have "I" or "O" or letters and digits that look similar -- just to
+        avoid confusion.
         """
-        # Note that default value of allowed_chars does not have "I" or letters
-        # that look like it -- just to avoid confusion.
         return get_random_string(length, allowed_chars)
 
 
@@ -169,23 +201,36 @@ def _user_has_module_perms(user, app_label):
 
 class User(models.Model):
     """
-    Users within the Django authentication system are represented by this model.
+    Users within the Django authentication system are represented by this
+    model.
 
     Username and password are required. Other fields are optional.
     """
-    username = models.CharField(_('username'), max_length=30, unique=True, help_text=_("Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"))
+    username = models.CharField(_('username'), max_length=30, unique=True,
+        help_text=_('Required. 30 characters or fewer. Letters, numbers and '
+                    '@/./+/-/_ characters'))
     first_name = models.CharField(_('first name'), max_length=30, blank=True)
     last_name = models.CharField(_('last name'), max_length=30, blank=True)
     email = models.EmailField(_('e-mail address'), blank=True)
     password = models.CharField(_('password'), max_length=128)
-    is_staff = models.BooleanField(_('staff status'), default=False, help_text=_("Designates whether the user can log into this admin site."))
-    is_active = models.BooleanField(_('active'), default=True, help_text=_("Designates whether this user should be treated as active. Unselect this instead of deleting accounts."))
-    is_superuser = models.BooleanField(_('superuser status'), default=False, help_text=_("Designates that this user has all permissions without explicitly assigning them."))
+    is_staff = models.BooleanField(_('staff status'), default=False,
+        help_text=_('Designates whether the user can log into this admin '
+                    'site.'))
+    is_active = models.BooleanField(_('active'), default=True,
+        help_text=_('Designates whether this user should be treated as '
+                    'active. Unselect this instead of deleting accounts.'))
+    is_superuser = models.BooleanField(_('superuser status'), default=False,
+        help_text=_('Designates that this user has all permissions without '
+                    'explicitly assigning them.'))
     last_login = models.DateTimeField(_('last login'), default=timezone.now)
     date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
-    groups = models.ManyToManyField(Group, verbose_name=_('groups'), blank=True,
-        help_text=_("In addition to the permissions manually assigned, this user will also get all permissions granted to each group he/she is in."))
-    user_permissions = models.ManyToManyField(Permission, verbose_name=_('user permissions'), blank=True)
+    groups = models.ManyToManyField(Group, verbose_name=_('groups'),
+        blank=True, help_text=_('The groups this user belongs to. A user will '
+                                'get all permissions granted to each of '
+                                'his/her group.'))
+    user_permissions = models.ManyToManyField(Permission,
+        verbose_name=_('user permissions'), blank=True,
+        help_text='Specific permissions for this user.')
     objects = UserManager()
 
     class Meta:
@@ -241,16 +286,16 @@ class User(models.Model):
 
     def get_group_permissions(self, obj=None):
         """
-        Returns a list of permission strings that this user has through
-        his/her groups. This method queries all available auth backends.
-        If an object is passed in, only permissions matching this object
-        are returned.
+        Returns a list of permission strings that this user has through his/her
+        groups. This method queries all available auth backends. If an object
+        is passed in, only permissions matching this object are returned.
         """
         permissions = set()
         for backend in auth.get_backends():
             if hasattr(backend, "get_group_permissions"):
                 if obj is not None:
-                    permissions.update(backend.get_group_permissions(self, obj))
+                    permissions.update(backend.get_group_permissions(self,
+                                                                     obj))
                 else:
                     permissions.update(backend.get_group_permissions(self))
         return permissions
@@ -263,8 +308,8 @@ class User(models.Model):
         Returns True if the user has the specified permission. This method
         queries all available auth backends, but returns immediately if any
         backend returns True. Thus, a user who has permission from a single
-        auth backend is assumed to have permission in general. If an object
-        is provided, permissions for this specific object are checked.
+        auth backend is assumed to have permission in general. If an object is
+        provided, permissions for this specific object are checked.
         """
 
         # Active superusers have all permissions.
@@ -276,9 +321,9 @@ class User(models.Model):
 
     def has_perms(self, perm_list, obj=None):
         """
-        Returns True if the user has each of the specified permissions.
-        If object is passed, it checks if the user has all required perms
-        for this object.
+        Returns True if the user has each of the specified permissions. If
+        object is passed, it checks if the user has all required perms for this
+        object.
         """
         for perm in perm_list:
             if not self.has_perm(perm, obj):
@@ -287,8 +332,8 @@ class User(models.Model):
 
     def has_module_perms(self, app_label):
         """
-        Returns True if the user has any permissions in the given app
-        label. Uses pretty much the same logic as has_perm, above.
+        Returns True if the user has any permissions in the given app label.
+        Uses pretty much the same logic as has_perm, above.
         """
         # Active superusers have all permissions.
         if self.is_active and self.is_superuser:
@@ -310,22 +355,23 @@ class User(models.Model):
         if not hasattr(self, '_profile_cache'):
             from django.conf import settings
             if not getattr(settings, 'AUTH_PROFILE_MODULE', False):
-                raise SiteProfileNotAvailable('You need to set AUTH_PROFILE_MO'
-                                              'DULE in your project settings')
+                raise SiteProfileNotAvailable(
+                    'You need to set AUTH_PROFILE_MODULE in your project '
+                    'settings')
             try:
                 app_label, model_name = settings.AUTH_PROFILE_MODULE.split('.')
             except ValueError:
-                raise SiteProfileNotAvailable('app_label and model_name should'
-                        ' be separated by a dot in the AUTH_PROFILE_MODULE set'
-                        'ting')
-
+                raise SiteProfileNotAvailable(
+                    'app_label and model_name should be separated by a dot in '
+                    'the AUTH_PROFILE_MODULE setting')
             try:
                 model = models.get_model(app_label, model_name)
                 if model is None:
-                    raise SiteProfileNotAvailable('Unable to load the profile '
-                        'model, check AUTH_PROFILE_MODULE in your project sett'
-                        'ings')
-                self._profile_cache = model._default_manager.using(self._state.db).get(user__id__exact=self.id)
+                    raise SiteProfileNotAvailable(
+                        'Unable to load the profile model, check '
+                        'AUTH_PROFILE_MODULE in your project settings')
+                self._profile_cache = model._default_manager.using(
+                                   self._state.db).get(user__id__exact=self.id)
                 self._profile_cache.user = self
             except (ImportError, ImproperlyConfigured):
                 raise SiteProfileNotAvailable
