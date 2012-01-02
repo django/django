@@ -4,6 +4,7 @@ The main QuerySet implementation. This provides the public API for the ORM.
 
 import copy
 import itertools
+import sys
 
 from django.db import connections, router, transaction, IntegrityError
 from django.db.models.fields import AutoField
@@ -450,10 +451,12 @@ class QuerySet(object):
                 return obj, True
             except IntegrityError, e:
                 transaction.savepoint_rollback(sid, using=self.db)
+                exc_info = sys.exc_info()
                 try:
                     return self.get(**lookup), False
                 except self.model.DoesNotExist:
-                    raise e
+                    # Re-raise the IntegrityError with its original traceback.
+                    raise exc_info[1], None, exc_info[2]
 
     def latest(self, field_name=None):
         """
