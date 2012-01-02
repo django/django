@@ -30,6 +30,13 @@ class FooWithUrl(FooWithoutUrl):
     def get_absolute_url(self):
         return "/users/%s/" % urllib.quote(smart_str(self.name))
 
+class FooWithBrokenAbsoluteUrl(FooWithoutUrl):
+    """
+    Fake model defining a ``get_absolute_url`` method containing an error
+    """
+
+    def get_absolute_url(self):
+        return "/users/%s/" % self.unknown_field
 
 class ContentTypesTests(TestCase):
 
@@ -134,6 +141,22 @@ class ContentTypesTests(TestCase):
         obj = FooWithoutUrl.objects.create(name="john")
 
         self.assertRaises(Http404, shortcut, request, user_ct.id, obj.id)
+
+    def test_shortcut_view_with_broken_get_absolute_url(self):
+        """
+        Check that the shortcut view does not catch an AttributeError raised
+        by the model's get_absolute_url method.
+        Refs #8997.
+        """
+        request = HttpRequest()
+        request.META = {
+            "SERVER_NAME": "Example.com",
+            "SERVER_PORT": "80",
+        }
+        user_ct = ContentType.objects.get_for_model(FooWithBrokenAbsoluteUrl)
+        obj = FooWithBrokenAbsoluteUrl.objects.create(name="john")
+
+        self.assertRaises(AttributeError, shortcut, request, user_ct.id, obj.id)
 
     def test_missing_model(self):
         """
