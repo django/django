@@ -267,5 +267,5 @@ def make_naive(value, timezone):
     value = value.astimezone(timezone)
     if hasattr(timezone, 'normalize'):
         # available for pytz time zones
-        return timezone.normalize(value)
+        value = timezone.normalize(value)
     return value.replace(tzinfo=None)

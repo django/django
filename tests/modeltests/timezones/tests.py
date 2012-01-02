@@ -953,3 +953,30 @@ class AdminTests(BaseDateTimeTests):
         self.assertContains(response, t.created.astimezone(ICT).isoformat())
 
 AdminTests = override_settings(DATETIME_FORMAT='c', USE_L10N=False, USE_TZ=True)(AdminTests)
+
+
+class UtilitiesTests(BaseDateTimeTests):
+
+    def test_make_aware(self):
+        self.assertEqual(
+            timezone.make_aware(datetime.datetime(2011, 9, 1, 13, 20, 30), EAT),
+            datetime.datetime(2011, 9, 1, 13, 20, 30, tzinfo=EAT)
+        )
+        self.assertEqual(
+            timezone.make_aware(datetime.datetime(2011, 9, 1, 10, 20, 30), UTC),
+            datetime.datetime(2011, 9, 1, 10, 20, 30, tzinfo=UTC)
+        )
+
+    def test_make_naive(self):
+        self.assertEqual(
+            timezone.make_naive(datetime.datetime(2011, 9, 1, 13, 20, 30, tzinfo=EAT), EAT),
+            datetime.datetime(2011, 9, 1, 13, 20, 30)
+        )
+        self.assertEqual(
+            timezone.make_naive(datetime.datetime(2011, 9, 1, 13, 20, 30, tzinfo=EAT), UTC),
+            datetime.datetime(2011, 9, 1, 10, 20, 30)
+        )
+        self.assertEqual(
+            timezone.make_naive(datetime.datetime(2011, 9, 1, 10, 20, 30, tzinfo=UTC), UTC),
+            datetime.datetime(2011, 9, 1, 10, 20, 30)
+        )
