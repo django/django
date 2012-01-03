@@ -347,7 +347,9 @@ class SQLCompiler(object):
         elif not self.query.default_ordering:
             ordering = self.query.order_by
         else:
-            ordering = self.query.order_by or self.query.model._meta.ordering
+            ordering = (self.query.order_by
+                        or self.query.model._meta.ordering
+                        or [])
         qn = self.quote_name_unless_alias
         qn2 = self.connection.ops.quote_name
         distinct = self.query.distinct

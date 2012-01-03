@@ -830,6 +830,17 @@ class Queries1Tests(BaseQuerysetTest):
             1
         )
 
+    def test_ticket17429(self):
+        """
+        Ensure that Meta.ordering=None works the same as Meta.ordering=[]
+        """
+        original_ordering = Tag._meta.ordering
+        Tag._meta.ordering = None
+        self.assertQuerysetEqual(
+            Tag.objects.all(),
+            ['<Tag: t1>', '<Tag: t2>', '<Tag: t3>', '<Tag: t4>', '<Tag: t5>'],
+        )
+        Tag._meta.ordering = original_ordering
 
 class Queries2Tests(TestCase):
     def setUp(self):
