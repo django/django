@@ -134,18 +134,28 @@ def normalize(pattern):
                         raise ValueError("Non-reversible reg-exp portion: '(?%s'" % ch)
                     else:
                         ch, escaped = pattern_iter.next()
-                        if ch != '<':
+                        if ch not in ('<', '='):
                             raise ValueError("Non-reversible reg-exp portion: '(?P%s'" % ch)
                         # We are in a named capturing group. Extra the name and
                         # then skip to the end.
+                        if ch == '<':
+                            terminal_char = '>'
+                        # We are in a named backreference.
+                        else:
+                            terminal_char = ')'
                         name = []
                         ch, escaped = pattern_iter.next()
-                        while ch != '>':
+                        while ch != terminal_char:
                             name.append(ch)
                             ch, escaped = pattern_iter.next()
                         param = ''.join(name)
-                        result.append(Group(((u"%%(%s)s" % param), param)))
-                        walk_to_end(ch, pattern_iter)
+                        # Named backreferences have already consumed the
+                        # parenthesis.
+                        if terminal_char != ')':
+                            result.append(Group(((u"%%(%s)s" % param), param)))
+                            walk_to_end(ch, pattern_iter)
+                        else:
+                            result.append(Group(((u"%%(%s)s" % param), None)))
             elif ch in "*?+{":
                 # Quanitifers affect the previous item in the result list.
                 count, ch = get_quantifier(ch, pattern_iter)

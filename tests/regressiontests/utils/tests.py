@@ -25,3 +25,4 @@ from .ipv6 import TestUtilsIPv6
 from .timezone import TimezoneTests
 from .crypto import TestUtilsCryptoPBKDF2
 from .archive import TestZip, TestTar, TestGzipTar, TestBzip2Tar
+from .regex_helper import NormalizeTests

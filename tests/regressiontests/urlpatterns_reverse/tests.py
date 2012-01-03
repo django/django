@@ -76,6 +76,8 @@ test_data = (
     ('people', NoReverseMatch, [], {'name': 'name with spaces'}),
     ('people2', '/people/name/', [], {}),
     ('people2a', '/people/name/fred/', ['fred'], {}),
+    ('people_backref', '/people/nate-nate/', ['nate'], {}),
+    ('people_backref', '/people/nate-nate/', [], {'name': 'nate'}),
     ('optional', '/optional/fred/', [], {'name': 'fred'}),
     ('optional', '/optional/fred/', ['fred'], {}),
     ('hardcoded', '/hardcoded/', [], {}),
