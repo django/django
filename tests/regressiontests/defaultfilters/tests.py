@@ -69,6 +69,8 @@ class DefaultFiltersTests(TestCase):
         try:
             self.assertEqual(floatformat(1.2345, 2), u'1.23')
             self.assertEqual(floatformat(15.2042, -3), u'15.204')
+            self.assertEqual(floatformat(1.2345, '2'), u'1.23')
+            self.assertEqual(floatformat(15.2042, '-3'), u'15.204')
             self.assertEqual(floatformat(decimal.Decimal('1.2345'), 2), u'1.23')
             self.assertEqual(floatformat(decimal.Decimal('15.2042'), -3), u'15.204')
         finally:
