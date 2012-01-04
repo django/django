@@ -922,13 +922,13 @@ template files. (See the `source`_ for more details.) If only the app
 name is given, the app directory will be created in the current working
 directory.
 
-If the optional destination is provided, Django will create the new project
-directory in that directory. You can use '.' to denote the current working
-directory.
+If the optional destination is provided, Django will use that existing
+directory rather than creating a new one. You can use '.' to denote the current
+working directory.
 
 For example::
 
-    django-admin.py startapp myapp /Users/jezdez/Code
+    django-admin.py startapp myapp /Users/jezdez/Code/myapp
 
 .. versionadded:: 1.4
 .. django-admin-option:: --template
@@ -984,20 +984,20 @@ the current directory or the given destination.
 .. versionchanged:: 1.4
 
 By default, the new directory contains ``manage.py`` and a project package
-(containing ``settings.py`` file and other project template files).
-See the `template source`_ for details.
+(containing a ``settings.py`` and other files).  See the `template source`_ for
+details.
 
 If only the project name is given, both the project directory and project
 package will be named ``<projectname>`` and the project directory
 will be created in the current working directory.
 
-If the optional destination is provided, Django will create the new project
-directory in that directory. You can use '.' to denote the current working
-directory.
+If the optional destination is provided, Django will use that existing
+directory as the project directory, and create ``manage.py`` and the project
+package within it. You can use '.' to denote the current working directory.
 
 For example::
 
-    django-admin.py startproject myproject /Users/jezdez/Code
+    django-admin.py startproject myproject /Users/jezdez/Code/myproject_repo
 
 .. versionadded:: 1.4
 

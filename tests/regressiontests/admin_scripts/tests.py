@@ -1404,17 +1404,17 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         "Make sure the startproject management command creates a project in a specific directory"
         args = ['startproject', 'testproject', 'othertestproject']
         testproject_dir = os.path.join(test_dir, 'othertestproject')
+        os.mkdir(testproject_dir)
 
         out, err = self.run_django_admin(args)
         self.addCleanup(shutil.rmtree, testproject_dir)
         self.assertNoOutput(err)
-        self.assertTrue(os.path.isdir(os.path.join(testproject_dir, 'testproject')))
-        self.assertTrue(os.path.exists(os.path.join(testproject_dir, 'testproject', 'manage.py')))
+        self.assertTrue(os.path.exists(os.path.join(testproject_dir, 'manage.py')))
 
         # running again..
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, "File exists")
+        self.assertOutput(err, "already exists")
 
     def test_custom_project_template(self):
         "Make sure the startproject management command is able to use a different project template"
@@ -1445,6 +1445,19 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         template_path = os.path.join(test_dir, 'admin_scripts', 'custom_templates', 'project_template.tgz')
         args = ['startproject', '--template', template_path, 'tarballtestproject']
         testproject_dir = os.path.join(test_dir, 'tarballtestproject')
+
+        out, err = self.run_django_admin(args)
+        self.addCleanup(shutil.rmtree, testproject_dir)
+        self.assertNoOutput(err)
+        self.assertTrue(os.path.isdir(testproject_dir))
+        self.assertTrue(os.path.exists(os.path.join(testproject_dir, 'run.py')))
+
+    def test_custom_project_template_from_tarball_to_alternative_location(self):
+        "Startproject can use a project template from a tarball and create it in a specified location"
+        template_path = os.path.join(test_dir, 'admin_scripts', 'custom_templates', 'project_template.tgz')
+        args = ['startproject', '--template', template_path, 'tarballtestproject', 'altlocation']
+        testproject_dir = os.path.join(test_dir, 'altlocation')
+        os.mkdir(testproject_dir)
 
         out, err = self.run_django_admin(args)
         self.addCleanup(shutil.rmtree, testproject_dir)

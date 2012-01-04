@@ -73,15 +73,14 @@ class TemplateCommand(BaseCommand):
 
         # if some directory is given, make sure it's nicely expanded
         if target is None:
-            target = os.getcwd()
+            top_dir = path.join(os.getcwd(), name)
+            try:
+                os.makedirs(top_dir)
+            except OSError, e:
+                raise CommandError(e)
         else:
-            target = path.expanduser(target)
+            top_dir = path.expanduser(target)
 
-        top_dir = path.join(target, name)
-        try:
-            os.makedirs(top_dir)
-        except OSError, e:
-            raise CommandError(e)
 
         extensions = tuple(
             handle_extensions(options.get('extensions'), ignored=()))
