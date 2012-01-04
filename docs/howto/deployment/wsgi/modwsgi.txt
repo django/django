@@ -159,9 +159,12 @@ or whichever media server you're using, to serve the admin files.
 The admin files live in (:file:`django/contrib/admin/static/admin`) of the
 Django distribution.
 
-We **strongly** recommend using :mod:`django.contrib.staticfiles` (along with
-a Web server as outlined in the previous section) to handle the admin files, but
-here are three other approaches:
+We **strongly** recommend using :mod:`django.contrib.staticfiles` to handle the
+admin files (along with a Web server as outlined in the previous section; this
+means using the :djadmin:`collectstatic` management command to collect the
+static files in :setting:`STATIC_ROOT`, and then configuring your webserver to
+serve :setting:`STATIC_ROOT` at :setting:`STATIC_URL`), but here are three
+other approaches:
 
 1. Create a symbolic link to the admin static files from within your
    document root (this may require ``+FollowSymLinks`` in your Apache
