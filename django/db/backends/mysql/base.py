@@ -150,18 +150,28 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     requires_explicit_null_ordering_when_grouping = True
     allows_primary_key_0 = False
 
+    def __init__(self, connection):
+        super(DatabaseFeatures, self).__init__(connection)
+        self._storage_engine = None
+
+    def _mysql_storage_engine(self):
+        "Internal method used in Django tests. Don't rely on this from your code"
+        if self._storage_engine is None:
+            cursor = self.connection.cursor()
+            cursor.execute('CREATE TABLE INTROSPECT_TEST (X INT)')
+            # This command is MySQL specific; the second column
+            # will tell you the default table type of the created
+            # table. Since all Django's test tables will have the same
+            # table type, that's enough to evaluate the feature.
+            cursor.execute("SHOW TABLE STATUS WHERE Name='INTROSPECT_TEST'")
+            result = cursor.fetchone()
+            cursor.execute('DROP TABLE INTROSPECT_TEST')
+            self._storage_engine = result[1]
+        return self._storage_engine
+
     def _can_introspect_foreign_keys(self):
         "Confirm support for introspected foreign keys"
-        cursor = self.connection.cursor()
-        cursor.execute('CREATE TABLE INTROSPECT_TEST (X INT)')
-        # This command is MySQL specific; the second column
-        # will tell you the default table type of the created
-        # table. Since all Django's test tables will have the same
-        # table type, that's enough to evaluate the feature.
-        cursor.execute("SHOW TABLE STATUS WHERE Name='INTROSPECT_TEST'")
-        result = cursor.fetchone()
-        cursor.execute('DROP TABLE INTROSPECT_TEST')
-        return result[1] != 'MyISAM'
+        return self._mysql_storage_engine() != 'MyISAM'
 
 class DatabaseOperations(BaseDatabaseOperations):
     compiler_module = "django.db.backends.mysql.compiler"
@@ -285,6 +295,15 @@ class DatabaseOperations(BaseDatabaseOperations):
         items_sql = "(%s)" % ", ".join(["%s"] * len(fields))
         return "VALUES " + ", ".join([items_sql] * num_values)
 
+    def savepoint_create_sql(self, sid):
+        return "SAVEPOINT %s" % sid
+
+    def savepoint_commit_sql(self, sid):
+        return "RELEASE SAVEPOINT %s" % sid
+
+    def savepoint_rollback_sql(self, sid):
+        return "ROLLBACK TO SAVEPOINT %s" % sid
+
 class DatabaseWrapper(BaseDatabaseWrapper):
     vendor = 'mysql'
     operators = {
@@ -354,6 +373,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             self.connection = Database.connect(**kwargs)
             self.connection.encoders[SafeUnicode] = self.connection.encoders[unicode]
             self.connection.encoders[SafeString] = self.connection.encoders[str]
+            self.features.uses_savepoints = \
+                self.get_server_version() >= (5, 0, 3)
             connection_created.send(sender=self.__class__, connection=self)
         cursor = self.connection.cursor()
         if new_connection:

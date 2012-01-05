@@ -553,6 +553,9 @@ Django 1.4 also includes several smaller improvements worth noting:
   password reset mechanism and making it available is now much easier. For
   details, see :ref:`auth_password_reset`.
 
+* The MySQL database backend can now make use of the savepoint feature
+  implemented by MySQL version 5.0.3 or newer with the InnoDB storage engine.
+
 Backwards incompatible changes in 1.4
 =====================================
 

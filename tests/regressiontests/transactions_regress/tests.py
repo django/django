@@ -4,6 +4,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db import connection, transaction
 from django.db.transaction import commit_on_success, commit_manually, TransactionManagementError
 from django.test import TransactionTestCase, skipUnlessDBFeature
+from django.utils.unittest import skipIf
 
 from .models import Mod, M2mA, M2mB
 
@@ -165,6 +166,7 @@ class TestTransactionClosing(TransactionTestCase):
         except:
             self.fail("A transaction consisting of a failed operation was not closed.")
 
+
 class TestManyToManyAddTransaction(TransactionTestCase):
     def test_manyrelated_add_commit(self):
         "Test for https://code.djangoproject.com/ticket/16818"
@@ -178,3 +180,39 @@ class TestManyToManyAddTransaction(TransactionTestCase):
         # that the bulk insert was not auto-committed.
         transaction.rollback()
         self.assertEqual(a.others.count(), 1)
+
+
+class SavepointTest(TransactionTestCase):
+
+    @skipUnlessDBFeature('uses_savepoints')
+    def test_savepoint_commit(self):
+        @commit_manually
+        def work():
+            mod = Mod.objects.create(fld=1)
+            pk = mod.pk
+            sid = transaction.savepoint()
+            mod1 = Mod.objects.filter(pk=pk).update(fld=10)
+            transaction.savepoint_commit(sid)
+            mod2 = Mod.objects.get(pk=pk)
+            transaction.commit()
+            self.assertEqual(mod2.fld, 10)
+
+        work()
+
+    @skipIf(connection.vendor == 'mysql' and \
+            connection.features._mysql_storage_engine() == 'MyISAM',
+            "MyISAM MySQL storage engine doesn't support savepoints")
+    @skipUnlessDBFeature('uses_savepoints')
+    def test_savepoint_rollback(self):
+        @commit_manually
+        def work():
+            mod = Mod.objects.create(fld=1)
+            pk = mod.pk
+            sid = transaction.savepoint()
+            mod1 = Mod.objects.filter(pk=pk).update(fld=20)
+            transaction.savepoint_rollback(sid)
+            mod2 = Mod.objects.get(pk=pk)
+            transaction.commit()
+            self.assertEqual(mod2.fld, 1)
+
+        work()

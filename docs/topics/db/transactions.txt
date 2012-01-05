@@ -225,11 +225,14 @@ transaction middleware, and only modify selected functions as needed.
 Savepoints
 ==========
 
-A savepoint is a marker within a transaction that enables you to roll back
-part of a transaction, rather than the full transaction. Savepoints are
-available to the PostgreSQL 8 and Oracle backends. Other backends will
-provide the savepoint functions, but they are empty operations - they won't
-actually do anything.
+A savepoint is a marker within a transaction that enables you to roll back part
+of a transaction, rather than the full transaction. Savepoints are available to
+the PostgreSQL 8, Oracle and MySQL (version 5.0.3 and newer, when using the
+InnoDB storage engine) backends. Other backends will provide the savepoint
+functions, but they are empty operations - they won't actually do anything.
+
+.. versionchanged:: 1.4
+   Savepoint support when using the MySQL backend was added in Django 1.4
 
 Savepoints aren't especially useful if you are using the default
 ``autocommit`` behavior of Django. However, if you are using
