@@ -17,10 +17,10 @@ class osx_install_data(install_data):
         self.set_undefined_options('install', ('install_lib', 'install_dir'))
         install_data.finalize_options(self)
 
-if sys.platform == "darwin": 
-    cmdclasses = {'install_data': osx_install_data} 
-else: 
-    cmdclasses = {'install_data': install_data} 
+if sys.platform == "darwin":
+    cmdclasses = {'install_data': osx_install_data}
+else:
+    cmdclasses = {'install_data': install_data}
 
 def fullsplit(path, result=None):
     """
@@ -66,13 +66,11 @@ if len(sys.argv) > 1 and sys.argv[1] == 'bdist_wininst':
         file_info[0] = '\\PURELIB\\%s' % file_info[0]
 
 # Dynamically calculate the version based on django.VERSION.
-version = __import__('django').get_version()
-if u'SVN' in version:
-    version = ' '.join(version.split(' ')[:-1])
+version = __import__('django').get_distutils_version()
 
 setup(
     name = "Django",
-    version = version.replace(' ', '-'),
+    version = version,
     url = 'http://www.djangoproject.com/',
     author = 'Django Software Foundation',
     author_email = 'foundation@djangoproject.com',
