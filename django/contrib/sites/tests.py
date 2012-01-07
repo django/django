@@ -15,6 +15,12 @@ class SitesFrameworkTests(TestCase):
     def tearDown(self):
         Site._meta.installed = self.old_Site_meta_installed
 
+    def test_save_another(self):
+        # Regression for #17415
+        # On some backends the sequence needs reset after save with explicit ID.
+        # Test that there is no sequence collisions by saving another site.
+        Site(domain="example2.com", name="example2.com").save()
+
     def test_site_manager(self):
         # Make sure that get_current() does not return a deleted Site object.
         s = Site.objects.get_current()
