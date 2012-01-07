@@ -745,6 +745,15 @@ datetimes are now stored without time-zone information in SQLite. When
 :setting:`USE_TZ` is ``False``, if you attempt to save an aware datetime
 object, Django raises an exception.
 
+``MySQLdb``-specific exceptions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The MySQL backend could raise :class:`MySQLdb.OperationalError`
+when a query triggered an exception. This bug was fixed and
+:class:`django.db.utils.DatabaseError` is now raised instead.
+If you were testing for :class:`MySQLdb.OperationalError`,
+you must update your ``except`` clauses.
+
 Database connection's thread-locality
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
