@@ -17,6 +17,7 @@ TRAILING_PUNCTUATION = ['.', ',', ')', '>', '\n', '&gt;']
 DOTS = [u'&middot;', u'*', u'\u2022', u'&#149;', u'&bull;', u'&#8226;']
 
 unencoded_ampersands_re = re.compile(r'&(?!(\w+|#\d+);)')
+unquoted_percents_re = re.compile(r'%(?![0-9A-Fa-f]{2})')
 word_split_re = re.compile(r'(\s+)')
 punctuation_re = re.compile('^(?P<lead>(?:%s)*)(?P<middle>.*?)(?P<trail>(?:%s)*)$' % \
     ('|'.join([re.escape(x) for x in LEADING_PUNCTUATION]),
@@ -100,6 +101,15 @@ def fix_ampersands(value):
     return unencoded_ampersands_re.sub('&amp;', force_unicode(value))
 fix_ampersands = allow_lazy(fix_ampersands, unicode)
 
+def smart_urlquote(url):
+    """Quotes an URL if it isn't already quoted."""
+    # An URL is considered unquoted if it contains no % character, or if it
+    # contains a % not followed by two hexadecimal digits. See #9655.
+    if '%' not in url or unquoted_percents_re.search(url):
+        # See http://bugs.python.org/issue2637
+        return urlquote(url, safe='!*\'();:@&=+$,/?#[]~')
+    return url
+
 def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
     """
     Converts any URLs in text into clickable links.
@@ -130,11 +140,11 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
             # Make URL we want to point to.
             url = None
             if middle.startswith('http://') or middle.startswith('https://'):
-                url = urlquote(middle, safe='/&=:;#?+*')
+                url = smart_urlquote(middle)
             elif middle.startswith('www.') or ('@' not in middle and \
                     middle and middle[0] in string.ascii_letters + string.digits and \
                     (middle.endswith('.org') or middle.endswith('.net') or middle.endswith('.com'))):
-                url = urlquote('http://%s' % middle, safe='/&=:;#?+*')
+                url = smart_urlquote('http://%s' % middle)
             elif '@' in middle and not ':' in middle and simple_email_re.match(middle):
                 url = 'mailto:%s' % middle
                 nofollow_attr = ''

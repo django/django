@@ -238,6 +238,19 @@ class DefaultFiltersTests(TestCase):
         # Check urlize with https addresses
         self.assertEqual(urlize('https://google.com'),
             u'<a href="https://google.com" rel="nofollow">https://google.com</a>')
+        # Check urlize doesn't overquote already quoted urls - see #9655
+        self.assertEqual(urlize('http://hi.baidu.com/%D6%D8%D0%C2%BF'),
+            u'<a href="http://hi.baidu.com/%D6%D8%D0%C2%BF" rel="nofollow">'
+            u'http://hi.baidu.com/%D6%D8%D0%C2%BF</a>')
+        self.assertEqual(urlize('www.mystore.com/30%OffCoupons!'),
+            u'<a href="http://www.mystore.com/30%25OffCoupons!" rel="nofollow">'
+            u'www.mystore.com/30%OffCoupons!</a>')
+        self.assertEqual(urlize('http://en.wikipedia.org/wiki/Caf%C3%A9'),
+            u'<a href="http://en.wikipedia.org/wiki/Caf%C3%A9" rel="nofollow">'
+            u'http://en.wikipedia.org/wiki/Caf%C3%A9</a>')
+        self.assertEqual(urlize('http://en.wikipedia.org/wiki/Café'),
+            u'<a href="http://en.wikipedia.org/wiki/Caf%C3%A9" rel="nofollow">'
+            u'http://en.wikipedia.org/wiki/Café</a>')
 
     def test_wordcount(self):
         self.assertEqual(wordcount(''), 0)

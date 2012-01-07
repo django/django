@@ -1044,6 +1044,15 @@ Now, the flags are keyword arguments of :meth:`@register.filter
 
 See :ref:`filters and auto-escaping <filters-auto-escaping>` for more information.
 
+The :tfilter:`urlize` filter no longer escapes every URL
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When an URL contains a ``%xx`` sequence, where ``xx`` are two hexadecimal
+digits, :tfilter:`urlize` assumes that the URL is already escaped, and doesn't
+apply URL escaping again. This is wrong for URLs whose unquoted form contains
+a ``%xx`` sequence, but such URLs are very unlikely to happen in the wild,
+since they would confuse browsers too.
+
 Session cookies now have the ``httponly`` flag by default
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
