@@ -351,6 +351,12 @@ class BackendTestCase(TestCase):
         self.assertTrue(hasattr(connection.ops, 'connection'))
         self.assertEqual(connection, connection.ops.connection)
 
+    def test_duplicate_table_error(self):
+        """ Test that creating an existing table returns a DatabaseError """
+        cursor = connection.cursor()
+        query = 'CREATE TABLE %s (id INTEGER);' % models.Article._meta.db_table
+        with self.assertRaises(DatabaseError):
+            cursor.execute(query)
 
 # We don't make these tests conditional because that means we would need to
 # check and differentiate between:
