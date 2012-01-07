@@ -122,18 +122,18 @@ class PLNationalIDCardNumberField(RegexField):
 class PLNIPField(RegexField):
     """
     A form field that validates as Polish Tax Number (NIP).
-    Valid forms are: XXX-XXX-YY-YY or XX-XX-YYY-YYY.
+    Valid forms are: XXX-YYY-YY-YY, XXX-YY-YY-YYY or XXXYYYYYYY.
 
     Checksum algorithm based on documentation at
     http://wipos.p.lodz.pl/zylla/ut/nip-rego.html
     """
     default_error_messages = {
-        'invalid': _(u'Enter a tax number field (NIP) in the format XXX-XXX-XX-XX or XX-XX-XXX-XXX.'),
+        'invalid': _(u'Enter a tax number field (NIP) in the format XXX-XXX-XX-XX, XXX-XX-XX-XXX or XXXXXXXXXX.'),
         'checksum': _(u'Wrong checksum for the Tax Number (NIP).'),
     }
 
     def __init__(self, max_length=None, min_length=None, *args, **kwargs):
-        super(PLNIPField, self).__init__(r'^\d{3}-\d{3}-\d{2}-\d{2}$|^\d{2}-\d{2}-\d{3}-\d{3}$',
+        super(PLNIPField, self).__init__(r'^\d{3}-\d{3}-\d{2}-\d{2}$|^\d{3}-\d{2}-\d{2}-\d{3}$|^\d{10}$',
             max_length, min_length, *args, **kwargs)
 
     def clean(self,value):

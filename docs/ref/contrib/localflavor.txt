@@ -960,8 +960,8 @@ Poland (``pl``)
 
 .. class:: pl.forms.PLNIPField
 
-    A form field that validates input as a Polish Tax Number (NIP). Valid
-    formats are XXX-XXX-XX-XX or XX-XX-XXX-XXX. The checksum algorithm used
+    A form field that validates input as a Polish Tax Number (NIP). Valid formats
+    are XXX-XXX-XX-XX, XXX-XX-XX-XXX or XXXXXXXXXX. The checksum algorithm used
     for NIPs is documented at http://wipos.p.lodz.pl/zylla/ut/nip-rego.html.
 
 .. class:: pl.forms.PLCountySelect

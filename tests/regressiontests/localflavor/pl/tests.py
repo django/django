@@ -420,14 +420,16 @@ class PLLocalFlavorTests(SimpleTestCase):
         self.assertFieldOutput(PLPostalCodeField, valid, invalid)
 
     def test_PLNIPField(self):
-        error_format = [u'Enter a tax number field (NIP) in the format XXX-XXX-XX-XX or XX-XX-XXX-XXX.']
+        error_format = [u'Enter a tax number field (NIP) in the format XXX-XXX-XX-XX, XXX-XX-XX-XXX or XXXXXXXXXX.']
         error_checksum = [u'Wrong checksum for the Tax Number (NIP).']
         valid = {
-            '64-62-414-124': '6462414124',
             '646-241-41-24': '6462414124',
+            '646-24-14-124': '6462414124',
+            '6462414124': '6462414124',
         }
         invalid = {
             '43-343-234-323': error_format,
+	    '64-62-414-124': error_format,
             '646-241-41-23': error_checksum,
         }
         self.assertFieldOutput(PLNIPField, valid, invalid)
