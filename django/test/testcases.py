@@ -31,7 +31,7 @@ from django.test.client import Client
 from django.test.utils import (get_warnings_state, restore_warnings_state,
     override_settings)
 from django.utils import simplejson, unittest as ut2
-from django.utils.encoding import smart_str
+from django.utils.encoding import smart_str, force_unicode
 from django.views.static import serve
 
 __all__ = ('DocTestRunner', 'OutputChecker', 'TestCase', 'TransactionTestCase',
@@ -335,7 +335,7 @@ class SimpleTestCase(ut2.TestCase):
                 optional.clean(input)
             self.assertEqual(context_manager.exception.messages, errors)
         # test required inputs
-        error_required = [u'This field is required.']
+        error_required = [force_unicode(required.error_messages['required'])]
         for e in EMPTY_VALUES:
             with self.assertRaises(ValidationError) as context_manager:
                 required.clean(e)
