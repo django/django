@@ -920,6 +920,22 @@ whose primary use is to load fixtures consisting of simple objects. Even though
 fixtures are trusted data, the YAML deserializer now uses ``yaml.safe_load``
 for additional security.
 
+Session cookies now have the ``httponly`` flag by default
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Session cookies now include the ``httponly`` attribute by default to
+help reduce the impact of potential XSS attacks. For strict backwards
+compatibility, use ``SESSION_COOKIE_HTTPONLY = False`` in your settings file.
+
+The :tfilter:`urlize` filter no longer escapes every URL
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When an URL contains a ``%xx`` sequence, where ``xx`` are two hexadecimal
+digits, :tfilter:`urlize` assumes that the URL is already escaped, and doesn't
+apply URL escaping again. This is wrong for URLs whose unquoted form contains
+a ``%xx`` sequence, but such URLs are very unlikely to happen in the wild,
+since they would confuse browsers too.
+
 Features deprecated in 1.4
 ==========================
 
@@ -1052,22 +1068,6 @@ Now, the flags are keyword arguments of :meth:`@register.filter
         return value
 
 See :ref:`filters and auto-escaping <filters-auto-escaping>` for more information.
-
-The :tfilter:`urlize` filter no longer escapes every URL
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-When an URL contains a ``%xx`` sequence, where ``xx`` are two hexadecimal
-digits, :tfilter:`urlize` assumes that the URL is already escaped, and doesn't
-apply URL escaping again. This is wrong for URLs whose unquoted form contains
-a ``%xx`` sequence, but such URLs are very unlikely to happen in the wild,
-since they would confuse browsers too.
-
-Session cookies now have the ``httponly`` flag by default
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Session cookies now include the ``httponly`` attribute by default to
-help reduce the impact of potential XSS attacks. For strict backwards
-compatibility, use ``SESSION_COOKIE_HTTPONLY = False`` in your settings file.
 
 Wildcard expansion of application names in `INSTALLED_APPS`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
