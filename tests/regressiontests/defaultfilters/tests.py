@@ -238,6 +238,7 @@ class DefaultFiltersTests(TestCase):
         # Check urlize with https addresses
         self.assertEqual(urlize('https://google.com'),
             u'<a href="https://google.com" rel="nofollow">https://google.com</a>')
+
         # Check urlize doesn't overquote already quoted urls - see #9655
         self.assertEqual(urlize('http://hi.baidu.com/%D6%D8%D0%C2%BF'),
             u'<a href="http://hi.baidu.com/%D6%D8%D0%C2%BF" rel="nofollow">'
@@ -251,6 +252,16 @@ class DefaultFiltersTests(TestCase):
         self.assertEqual(urlize('http://en.wikipedia.org/wiki/Café'),
             u'<a href="http://en.wikipedia.org/wiki/Caf%C3%A9" rel="nofollow">'
             u'http://en.wikipedia.org/wiki/Café</a>')
+
+        # Check urlize handles IDN correctly - see #13704
+        self.assertEqual(urlize('http://c✶.ws'),
+            u'<a href="http://xn--c-lgq.ws" rel="nofollow">http://c✶.ws</a>')
+        self.assertEqual(urlize('www.c✶.ws'),
+            u'<a href="http://www.xn--c-lgq.ws" rel="nofollow">www.c✶.ws</a>')
+        self.assertEqual(urlize('c✶.org'),
+            u'<a href="http://xn--c-lgq.org" rel="nofollow">c✶.org</a>')
+        self.assertEqual(urlize('info@c✶.org'),
+            u'<a href="mailto:info@xn--c-lgq.org">info@c✶.org</a>')
 
     def test_wordcount(self):
         self.assertEqual(wordcount(''), 0)

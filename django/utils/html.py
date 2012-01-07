@@ -2,11 +2,12 @@
 
 import re
 import string
+import urllib
+import urlparse
 
 from django.utils.safestring import SafeData, mark_safe
-from django.utils.encoding import force_unicode
+from django.utils.encoding import smart_str, force_unicode
 from django.utils.functional import allow_lazy
-from django.utils.http import urlquote
 from django.utils.text import normalize_newlines
 
 # Configuration for urlize() function.
@@ -22,7 +23,7 @@ word_split_re = re.compile(r'(\s+)')
 punctuation_re = re.compile('^(?P<lead>(?:%s)*)(?P<middle>.*?)(?P<trail>(?:%s)*)$' % \
     ('|'.join([re.escape(x) for x in LEADING_PUNCTUATION]),
     '|'.join([re.escape(x) for x in TRAILING_PUNCTUATION])))
-simple_email_re = re.compile(r'^\S+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+$')
+simple_email_re = re.compile(r'^\S+@\S+\.\S+$')
 link_target_attribute_re = re.compile(r'(<a [^>]*?)target=[^\s>]+')
 html_gunk_re = re.compile(r'(?:<br clear="all">|<i><\/i>|<b><\/b>|<em><\/em>|<strong><\/strong>|<\/?smallcaps>|<\/?uppercase>)', re.IGNORECASE)
 hard_coded_bullets_re = re.compile(r'((?:<p>(?:%s).*?[a-zA-Z].*?</p>\s*)+)' % '|'.join([re.escape(x) for x in DOTS]), re.DOTALL)
@@ -103,12 +104,22 @@ fix_ampersands = allow_lazy(fix_ampersands, unicode)
 
 def smart_urlquote(url):
     """Quotes an URL if it isn't already quoted."""
+    # Handle IDN before quoting.
+    scheme, netloc, path, query, fragment = urlparse.urlsplit(url)
+    try:
+        netloc = netloc.encode('idna') # IDN -> ACE
+    except UnicodeError: # invalid domain part
+        pass
+    else:
+        url = urlparse.urlunsplit((scheme, netloc, path, query, fragment))
+
     # An URL is considered unquoted if it contains no % character, or if it
     # contains a % not followed by two hexadecimal digits. See #9655.
     if '%' not in url or unquoted_percents_re.search(url):
         # See http://bugs.python.org/issue2637
-        return urlquote(url, safe='!*\'();:@&=+$,/?#[]~')
-    return url
+        url = urllib.quote(smart_str(url), safe='!*\'();:@&=+$,/?#[]~')
+
+    return force_unicode(url)
 
 def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
     """
@@ -145,8 +156,10 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
                     middle and middle[0] in string.ascii_letters + string.digits and \
                     (middle.endswith('.org') or middle.endswith('.net') or middle.endswith('.com'))):
                 url = smart_urlquote('http://%s' % middle)
-            elif '@' in middle and not ':' in middle and simple_email_re.match(middle):
-                url = 'mailto:%s' % middle
+            elif not ':' in middle and simple_email_re.match(middle):
+                local, domain = middle.rsplit('@', 1)
+                domain = domain.encode('idna')
+                url = 'mailto:%s@%s' % (local, domain)
                 nofollow_attr = ''
             # Make link.
             if url:
