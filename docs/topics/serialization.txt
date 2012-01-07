@@ -198,23 +198,32 @@ Natural keys
 ------------
 
 .. versionadded:: 1.2
+
    The ability to use natural keys when serializing/deserializing data was
    added in the 1.2 release.
 
-The default serialization strategy for foreign keys and many-to-many
-relations is to serialize the value of the primary key(s) of the
-objects in the relation. This strategy works well for most types of
-object, but it can cause difficulty in some circumstances.
+The default serialization strategy for foreign keys and many-to-many relations
+is to serialize the value of the primary key(s) of the objects in the relation.
+This strategy works well for most objects, but it can cause difficulty in some
+circumstances.
 
-Consider the case of a list of objects that have foreign key on
-:class:`ContentType`. If you're going to serialize an object that
-refers to a content type, you need to have a way to refer to that
-content type. Content Types are automatically created by Django as
-part of the database synchronization process, so you don't need to
-include content types in a fixture or other serialized data. As a
-result, the primary key of any given content type isn't easy to
-predict - it will depend on how and when :djadmin:`syncdb` was
-executed to create the content types.
+Consider the case of a list of objects that have a foreign key referencing
+:class:`~django.contrib.conttenttypes.models.ContentType`. If you're going to
+serialize an object that refers to a content type, then you need to have a way
+to refer to that content type to begin with. Since ``ContentType`` objects are
+automatically created by Django during the database synchronization process,
+the primary key of a given content type isn't easy to predict; it will
+depend on how and when :djadmin:`syncdb` was executed. This is true for all
+models which automatically generate objects, notably including
+:class:`~django.contrib.auth.models.Permission`.
+
+.. warning::
+
+    You should never include automatically generated objects in a fixture or
+    other serialized data. By chance, the primary keys in the fixture
+    may match those in the database and loading the fixture will
+    have no effect. In the more likely case that they don't match, the fixture
+    loading will fail with an :class:`~django.db.IntegrityError`.
 
 There is also the matter of convenience. An integer id isn't always
 the most convenient way to refer to an object; sometimes, a
@@ -363,13 +372,13 @@ Dependencies during serialization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Since natural keys rely on database lookups to resolve references, it
-is important that data exists before it is referenced. You can't make
-a `forward reference` with natural keys - the data you are referencing
+is important that the data exists before it is referenced. You can't make
+a `forward reference` with natural keys--the data you are referencing
 must exist before you include a natural key reference to that data.
 
 To accommodate this limitation, calls to :djadmin:`dumpdata` that use
 the :djadminopt:`--natural` option will serialize any model with a
-``natural_key()`` method before it serializes normal key objects.
+``natural_key()`` method before serializing standard primary key objects.
 
 However, this may not always be enough. If your natural key refers to
 another object (by using a foreign key or natural key to another object
@@ -381,28 +390,24 @@ To control this ordering, you can define dependencies on your
 ``natural_key()`` methods. You do this by setting a ``dependencies``
 attribute on the ``natural_key()`` method itself.
 
-For example, consider the ``Permission`` model in ``contrib.auth``.
-The following is a simplified version of the ``Permission`` model::
+For example, let's add a natural key to the ``Book`` model from the
+example above::
 
-    class Permission(models.Model):
-        name = models.CharField(max_length=50)
-        content_type = models.ForeignKey(ContentType)
-        codename = models.CharField(max_length=100)
-        # ...
+    class Book(models.Model):
+        name = models.CharField(max_length=100)
+        author = models.ForeignKey(Person)
+
         def natural_key(self):
-            return (self.codename,) + self.content_type.natural_key()
+            return (self.name,) + self.author.natural_key()
 
-The natural key for a ``Permission`` is a combination of the codename for the
-``Permission``, and the ``ContentType`` to which the ``Permission`` applies. This means
-that ``ContentType`` must be serialized before ``Permission``. To define this
-dependency, we add one extra line::
+The natural key for a ``Book`` is a combination of its name and its
+author.  This means that ``Person`` must be serialized before ``Book``.
+To define this dependency, we add one extra line::
 
-    class Permission(models.Model):
-        # ...
         def natural_key(self):
-            return (self.codename,) + self.content_type.natural_key()
-        natural_key.dependencies = ['contenttypes.contenttype']
+            return (self.name,) + self.author.natural_key()
+        natural_key.dependencies = ['example_app.person']
 
-This definition ensures that ``ContentType`` models are serialized before
-``Permission`` models. In turn, any object referencing ``Permission`` will
-be serialized after both ``ContentType`` and ``Permission``.
+This definition ensures that all ``Person`` objects are serialized before
+any ``Book`` objects. In turn, any object referencing ``Book`` will be
+serialized after both ``Person`` and ``Book`` have been serialized.
