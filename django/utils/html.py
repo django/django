@@ -11,8 +11,8 @@ from django.utils.functional import allow_lazy
 from django.utils.text import normalize_newlines
 
 # Configuration for urlize() function.
-LEADING_PUNCTUATION  = ['(', '<', '&lt;']
-TRAILING_PUNCTUATION = ['.', ',', ')', '>', '\n', '&gt;']
+TRAILING_PUNCTUATION = ['.', ',', ':', ';']
+WRAPPING_PUNCTUATION = [('(', ')'), ('<', '>'), ('&lt;', '&gt;')]
 
 # List of possible strings used for bullets in bulleted lists.
 DOTS = [u'&middot;', u'*', u'\u2022', u'&#149;', u'&bull;', u'&#8226;']
@@ -20,9 +20,6 @@ DOTS = [u'&middot;', u'*', u'\u2022', u'&#149;', u'&bull;', u'&#8226;']
 unencoded_ampersands_re = re.compile(r'&(?!(\w+|#\d+);)')
 unquoted_percents_re = re.compile(r'%(?![0-9A-Fa-f]{2})')
 word_split_re = re.compile(r'(\s+)')
-punctuation_re = re.compile('^(?P<lead>(?:%s)*)(?P<middle>.*?)(?P<trail>(?:%s)*)$' % \
-    ('|'.join([re.escape(x) for x in LEADING_PUNCTUATION]),
-    '|'.join([re.escape(x) for x in TRAILING_PUNCTUATION])))
 simple_url_re = re.compile(r'^https?://\w')
 simple_url_2_re = re.compile(r'^www\.|^(?!http)\w[^@]+\.(com|edu|gov|int|mil|net|org|[a-z]{2})$')
 simple_email_re = re.compile(r'^\S+@\S+\.\S+$')
@@ -147,9 +144,22 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
     for i, word in enumerate(words):
         match = None
         if '.' in word or '@' in word or ':' in word:
-            match = punctuation_re.match(word)
-        if match:
-            lead, middle, trail = match.groups()
+            # Deal with punctuation.
+            lead, middle, trail = '', word, ''
+            for punctuation in TRAILING_PUNCTUATION:
+                if middle.endswith(punctuation):
+                    middle = middle[:-len(punctuation)]
+                    trail = punctuation + trail
+            for opening, closing in WRAPPING_PUNCTUATION:
+                if middle.startswith(opening):
+                    middle = middle[len(opening):]
+                    lead = lead + opening
+                # Keep parentheses at the end only if they're balanced.
+                if (middle.endswith(closing)
+                    and middle.count(closing) == middle.count(opening) + 1):
+                    middle = middle[:-len(closing)]
+                    trail = closing + trail
+
             # Make URL we want to point to.
             url = None
             nofollow_attr = ' rel="nofollow"' if nofollow else ''
@@ -162,6 +172,7 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
                 domain = domain.encode('idna')
                 url = 'mailto:%s@%s' % (local, domain)
                 nofollow_attr = ''
+
             # Make link.
             if url:
                 trimmed = trim_url(middle)

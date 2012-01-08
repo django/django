@@ -253,6 +253,14 @@ class DefaultFiltersTests(TestCase):
             u'<a href="http://en.wikipedia.org/wiki/Caf%C3%A9" rel="nofollow">'
             u'http://en.wikipedia.org/wiki/Café</a>')
 
+        # Check urlize keeps balanced parentheses - see #11911
+        self.assertEqual(urlize('http://en.wikipedia.org/wiki/Django_(web_framework)'),
+            u'<a href="http://en.wikipedia.org/wiki/Django_(web_framework)" rel="nofollow">'
+            u'http://en.wikipedia.org/wiki/Django_(web_framework)</a>')
+        self.assertEqual(urlize('(see http://en.wikipedia.org/wiki/Django_(web_framework))'),
+            u'(see <a href="http://en.wikipedia.org/wiki/Django_(web_framework)" rel="nofollow">'
+            u'http://en.wikipedia.org/wiki/Django_(web_framework)</a>)')
+
         # Check urlize adds nofollow properly - see #12183
         self.assertEqual(urlize('foo@bar.com or www.bar.com'),
             u'<a href="mailto:foo@bar.com">foo@bar.com</a> or '
