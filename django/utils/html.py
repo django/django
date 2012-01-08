@@ -24,7 +24,7 @@ punctuation_re = re.compile('^(?P<lead>(?:%s)*)(?P<middle>.*?)(?P<trail>(?:%s)*)
     ('|'.join([re.escape(x) for x in LEADING_PUNCTUATION]),
     '|'.join([re.escape(x) for x in TRAILING_PUNCTUATION])))
 simple_url_re = re.compile(r'^https?://\w')
-simple_url_2_re = re.compile(r'^www\.|^(?!http)\w[^@]+\.(com|net|org)$')
+simple_url_2_re = re.compile(r'^www\.|^(?!http)\w[^@]+\.(com|edu|gov|int|mil|net|org|[a-z]{2})$')
 simple_email_re = re.compile(r'^\S+@\S+\.\S+$')
 link_target_attribute_re = re.compile(r'(<a [^>]*?)target=[^\s>]+')
 html_gunk_re = re.compile(r'(?:<br clear="all">|<i><\/i>|<b><\/b>|<em><\/em>|<strong><\/strong>|<\/?smallcaps>|<\/?uppercase>)', re.IGNORECASE)
@@ -127,10 +127,11 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
     """
     Converts any URLs in text into clickable links.
 
-    Works on http://, https://, www. links and links ending in .org, .net or
-    .com. Links can have trailing punctuation (periods, commas, close-parens)
-    and leading punctuation (opening parens) and it'll still do the right
-    thing.
+    Works on http://, https://, www. links, and also on links ending in one of
+    the original seven gTLDs (.com, .edu, .gov, .int, .mil, .net, and .org) or
+    a two-letter ccTLD. Links can have trailing punctuation (periods, commas,
+    close-parens) and leading punctuation (opening parens) and it'll still do
+    the right thing.
 
     If trim_url_limit is not None, the URLs in link text longer than this limit
     will truncated to trim_url_limit-3 characters and appended with an elipsis.

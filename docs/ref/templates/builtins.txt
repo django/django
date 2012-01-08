@@ -2226,13 +2226,20 @@ urlize
 
 Converts URLs in text into clickable links.
 
-Works on links prefixed with ``http://``, ``https://``, or ``www.``. For
-example, ``http://goo.gl/aia1t`` will get converted but ``goo.gl/aia1t``
-won't.
+This template tag works on several kinds of links:
 
-Also works on domain-only links ending in one of the common ``.com``, ``.net``,
-or ``.org`` top level domains. For example, ``djangoproject.com`` will still
-get converted.
+- links prefixed with ``http://``, ``https://``, or ``www.``. For example,
+  ``http://goo.gl/aia1t`` will get converted but ``goo.gl/aia1t`` won't.
+- domain-only links ending in one of the original top level domains
+  (``.com``, ``.edu``, ``.gov``, ``.int``, ``.mil``, ``.net``, and
+  ``.org``). For example, ``djangoproject.com`` also gets converted.
+- domain-only links ending in a dot followed by two letters. This covers
+  most country codes. For example, ``djangocon.eu`` still gets converted.
+
+.. versionchanged:: 1.4
+
+Until Django 1.4, only the ``.com``, ``.net`` and ``.org`` suffixes were
+supported for domain-only links.
 
 Links can have trailing punctuation (periods, commas, close-parens) and leading
 punctuation (opening parens) and ``urlize`` will still do the right thing.
