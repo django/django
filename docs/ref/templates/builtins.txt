@@ -2226,15 +2226,13 @@ urlize
 
 Converts URLs in text into clickable links.
 
-This template tag works on several kinds of links:
+This template tag works on links prefixed with ``http://``, ``https://``, or
+``www.``. For example, ``http://goo.gl/aia1t`` will get converted but
+``goo.gl/aia1t`` won't.
 
-- links prefixed with ``http://``, ``https://``, or ``www.``. For example,
-  ``http://goo.gl/aia1t`` will get converted but ``goo.gl/aia1t`` won't.
-- domain-only links ending in one of the original top level domains
-  (``.com``, ``.edu``, ``.gov``, ``.int``, ``.mil``, ``.net``, and
-  ``.org``). For example, ``djangoproject.com`` also gets converted.
-- domain-only links ending in a dot followed by two letters. This covers
-  most country codes. For example, ``djangocon.eu`` still gets converted.
+It also supports domain-only links ending in one of the original top level
+domains (``.com``, ``.edu``, ``.gov``, ``.int``, ``.mil``, ``.net``, and
+``.org``). For example, ``djangoproject.com`` gets converted too.
 
 .. versionchanged:: 1.4
 

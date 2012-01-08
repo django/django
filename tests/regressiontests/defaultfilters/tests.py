@@ -287,8 +287,6 @@ class DefaultFiltersTests(TestCase):
         # Check urlize accepts more TLDs - see #16656
         self.assertEqual(urlize('usa.gov'),
             u'<a href="http://usa.gov" rel="nofollow">usa.gov</a>')
-        self.assertEqual(urlize('europa.eu'),
-            u'<a href="http://europa.eu" rel="nofollow">europa.eu</a>')
 
     def test_wordcount(self):
         self.assertEqual(wordcount(''), 0)
