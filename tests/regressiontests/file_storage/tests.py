@@ -229,8 +229,8 @@ class FileStorageTests(unittest.TestCase):
 
         # should encode special chars except ~!*()'
         # like encodeURIComponent() JavaScript function do
-        self.assertEqual(self.storage.url(r"""~!*()'@#$%^&*abc`+=.file"""),
-            """/test_media_url/~!*()'%40%23%24%25%5E%26*abc%60%2B%3D.file""")
+        self.assertEqual(self.storage.url(r"""~!*()'@#$%^&*abc`+ =.file"""),
+            """/test_media_url/~!*()'%40%23%24%25%5E%26*abc%60%2B%20%3D.file""")
 
         # should stanslate os path separator(s) to the url path separator
         self.assertEqual(self.storage.url("""a/b\\c.file"""),
