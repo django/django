@@ -1177,8 +1177,7 @@ class CommandTypes(AdminScriptTestCase):
         args = ['--version']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        # Only check the first part of the version number
-        self.assertOutput(out, get_version().split('-')[0])
+        self.assertOutput(out, get_version())
 
     def test_help(self):
         "--help is handled as a special case"

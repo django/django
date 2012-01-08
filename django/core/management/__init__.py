@@ -4,12 +4,11 @@ from optparse import OptionParser, NO_DEFAULT
 import imp
 import warnings
 
-import django
 from django.core.management.base import BaseCommand, CommandError, handle_default_options
 from django.utils.importlib import import_module
 
 # For backwards compatibility: get_version() used to be in this module.
-get_version = django.get_version
+from django import get_version
 
 # A cache of loaded commands, so that call_command
 # doesn't have to reload every time it's called.
