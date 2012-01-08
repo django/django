@@ -66,7 +66,6 @@ def lazy(func, *resultclasses):
         __dispatch = None
 
         def __init__(self, args, kw):
-            self.__func = func
             self.__args = args
             self.__kw = kw
             if self.__dispatch is None:
@@ -75,7 +74,7 @@ def lazy(func, *resultclasses):
         def __reduce__(self):
             return (
                 _lazy_proxy_unpickle,
-                (self.__func, self.__args, self.__kw) + resultclasses
+                (func, self.__args, self.__kw) + resultclasses
             )
 
         def __prepare_class__(cls):
@@ -100,13 +99,13 @@ def lazy(func, *resultclasses):
                 cls.__str__ = cls.__str_cast
         __prepare_class__ = classmethod(__prepare_class__)
 
-        def __promise__(cls, klass, funcname, func):
+        def __promise__(cls, klass, funcname, method):
             # Builds a wrapper around some magic method and registers that magic
             # method for the given type and method name.
             def __wrapper__(self, *args, **kw):
                 # Automatically triggers the evaluation of a lazy value and
                 # applies the given magic method of the result type.
-                res = self.__func(*self.__args, **self.__kw)
+                res = func(*self.__args, **self.__kw)
                 for t in type(res).mro():
                     if t in self.__dispatch:
                         return self.__dispatch[t][funcname](res, *args, **kw)
@@ -114,23 +113,23 @@ def lazy(func, *resultclasses):
 
             if klass not in cls.__dispatch:
                 cls.__dispatch[klass] = {}
-            cls.__dispatch[klass][funcname] = func
+            cls.__dispatch[klass][funcname] = method
             return __wrapper__
         __promise__ = classmethod(__promise__)
 
         def __unicode_cast(self):
-            return self.__func(*self.__args, **self.__kw)
+            return func(*self.__args, **self.__kw)
 
         def __str_cast(self):
-            return str(self.__func(*self.__args, **self.__kw))
+            return str(func(*self.__args, **self.__kw))
 
         def __cmp__(self, rhs):
             if self._delegate_str:
-                s = str(self.__func(*self.__args, **self.__kw))
+                s = str(func(*self.__args, **self.__kw))
             elif self._delegate_unicode:
-                s = unicode(self.__func(*self.__args, **self.__kw))
+                s = unicode(func(*self.__args, **self.__kw))
             else:
-                s = self.__func(*self.__args, **self.__kw)
+                s = func(*self.__args, **self.__kw)
             if isinstance(rhs, Promise):
                 return -cmp(rhs, s)
             else:
