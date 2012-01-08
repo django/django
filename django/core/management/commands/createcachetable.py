@@ -3,6 +3,7 @@ from optparse import make_option
 from django.core.cache.backends.db import BaseDatabaseCache
 from django.core.management.base import LabelCommand
 from django.db import connections, router, transaction, models, DEFAULT_DB_ALIAS
+from django.db.utils import DatabaseError
 
 class Command(LabelCommand):
     help = "Creates the table needed to use the SQL cache backend."
@@ -51,7 +52,14 @@ class Command(LabelCommand):
             full_statement.append('    %s%s' % (line, i < len(table_output)-1 and ',' or ''))
         full_statement.append(');')
         curs = connection.cursor()
-        curs.execute("\n".join(full_statement))
-        for statement in index_output:
-            curs.execute(statement)
-        transaction.commit_unless_managed(using=db)
+        try:
+            curs.execute("\n".join(full_statement))
+        except DatabaseError, e:
+            self.stderr.write(
+                self.style.ERROR("Cache table '%s' could not be created.\nThe error was: %s.\n" %
+                    (tablename, e)))
+            transaction.rollback_unless_managed(using=db)
+        else:
+            for statement in index_output:
+                curs.execute(statement)
+            transaction.commit_unless_managed(using=db)
