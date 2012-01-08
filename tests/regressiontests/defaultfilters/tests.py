@@ -268,6 +268,14 @@ class DefaultFiltersTests(TestCase):
         self.assertEqual(urlize('info@c✶.org'),
             u'<a href="mailto:info@xn--c-lgq.org">info@c✶.org</a>')
 
+        # Check urlize doesn't highlight malformed URIs - see #16395
+        self.assertEqual(urlize('http:///www.google.com'),
+           u'http:///www.google.com')
+        self.assertEqual(urlize('http://.google.com'),
+            u'http://.google.com')
+        self.assertEqual(urlize('http://@foo.com'),
+            u'http://@foo.com')
+
     def test_wordcount(self):
         self.assertEqual(wordcount(''), 0)
         self.assertEqual(wordcount(u'oneword'), 1)

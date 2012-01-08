@@ -23,6 +23,8 @@ word_split_re = re.compile(r'(\s+)')
 punctuation_re = re.compile('^(?P<lead>(?:%s)*)(?P<middle>.*?)(?P<trail>(?:%s)*)$' % \
     ('|'.join([re.escape(x) for x in LEADING_PUNCTUATION]),
     '|'.join([re.escape(x) for x in TRAILING_PUNCTUATION])))
+simple_url_re = re.compile(r'^https?://\w')
+simple_url_2_re = re.compile(r'^www\.|^(?!http)\w[^@]+\.(com|net|org)$')
 simple_email_re = re.compile(r'^\S+@\S+\.\S+$')
 link_target_attribute_re = re.compile(r'(<a [^>]*?)target=[^\s>]+')
 html_gunk_re = re.compile(r'(?:<br clear="all">|<i><\/i>|<b><\/b>|<em><\/em>|<strong><\/strong>|<\/?smallcaps>|<\/?uppercase>)', re.IGNORECASE)
@@ -150,11 +152,9 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
             # Make URL we want to point to.
             url = None
             nofollow_attr = ' rel="nofollow"' if nofollow else ''
-            if middle.startswith('http://') or middle.startswith('https://'):
+            if simple_url_re.match(middle):
                 url = smart_urlquote(middle)
-            elif middle.startswith('www.') or ('@' not in middle and \
-                    middle and middle[0] in string.ascii_letters + string.digits and \
-                    (middle.endswith('.org') or middle.endswith('.net') or middle.endswith('.com'))):
+            elif simple_url_2_re.match(middle):
                 url = smart_urlquote('http://%s' % middle)
             elif not ':' in middle and simple_email_re.match(middle):
                 local, domain = middle.rsplit('@', 1)
