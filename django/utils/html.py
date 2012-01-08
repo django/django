@@ -141,7 +141,6 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
     trim_url = lambda x, limit=trim_url_limit: limit is not None and (len(x) > limit and ('%s...' % x[:max(0, limit - 3)])) or x
     safe_input = isinstance(text, SafeData)
     words = word_split_re.split(force_unicode(text))
-    nofollow_attr = nofollow and ' rel="nofollow"' or ''
     for i, word in enumerate(words):
         match = None
         if '.' in word or '@' in word or ':' in word:
@@ -150,6 +149,7 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
             lead, middle, trail = match.groups()
             # Make URL we want to point to.
             url = None
+            nofollow_attr = ' rel="nofollow"' if nofollow else ''
             if middle.startswith('http://') or middle.startswith('https://'):
                 url = smart_urlquote(middle)
             elif middle.startswith('www.') or ('@' not in middle and \

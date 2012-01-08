@@ -253,6 +253,11 @@ class DefaultFiltersTests(TestCase):
             u'<a href="http://en.wikipedia.org/wiki/Caf%C3%A9" rel="nofollow">'
             u'http://en.wikipedia.org/wiki/Café</a>')
 
+        # Check urlize adds nofollow properly - see #12183
+        self.assertEqual(urlize('foo@bar.com or www.bar.com'),
+            u'<a href="mailto:foo@bar.com">foo@bar.com</a> or '
+            u'<a href="http://www.bar.com" rel="nofollow">www.bar.com</a>')
+
         # Check urlize handles IDN correctly - see #13704
         self.assertEqual(urlize('http://c✶.ws'),
             u'<a href="http://xn--c-lgq.ws" rel="nofollow">http://c✶.ws</a>')
