@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 
+import gzip
 import re
+import random
+import StringIO
 
 from django.conf import settings
 from django.core import mail
@@ -9,6 +12,7 @@ from django.http import HttpResponse
 from django.middleware.clickjacking import XFrameOptionsMiddleware
 from django.middleware.common import CommonMiddleware
 from django.middleware.http import ConditionalGetMiddleware
+from django.middleware.gzip import GZipMiddleware
 from django.test import TestCase
 
 
@@ -495,3 +499,86 @@ class XFrameOptionsMiddlewareTest(TestCase):
         r = OtherXFrameOptionsMiddleware().process_response(HttpRequest(),
                                                        HttpResponse())
         self.assertEqual(r['X-Frame-Options'], 'DENY')
+
+
+class GZipMiddlewareTest(TestCase):
+    """
+    Tests the GZip middleware.
+    """
+    short_string = "This string is too short to be worth compressing."
+    compressible_string = 'a' * 500
+    uncompressible_string = ''.join(chr(random.randint(0, 255)) for _ in xrange(500))
+
+    def setUp(self):
+        self.req = HttpRequest()
+        self.req.META = {
+            'SERVER_NAME': 'testserver',
+            'SERVER_PORT': 80,
+        }
+        self.req.path = self.req.path_info = "/"
+        self.req.META['HTTP_ACCEPT_ENCODING'] = 'gzip, deflate'
+        self.req.META['HTTP_USER_AGENT'] = 'Mozilla/5.0 (Windows NT 5.1; rv:9.0.1) Gecko/20100101 Firefox/9.0.1'
+        self.resp = HttpResponse()
+        self.resp.status_code = 200
+        self.resp.content = self.compressible_string
+        self.resp['Content-Type'] = 'text/html; charset=UTF-8'
+
+    @staticmethod
+    def decompress(gzipped_string):
+        return gzip.GzipFile(mode='rb', fileobj=StringIO.StringIO(gzipped_string)).read()
+
+    def test_compress_response(self):
+        """
+        Tests that compression is performed on responses with compressible content.
+        """
+        r = GZipMiddleware().process_response(self.req, self.resp)
+        self.assertEqual(self.decompress(r.content), self.compressible_string)
+        self.assertEqual(r.get('Content-Encoding'), 'gzip')
+        self.assertEqual(r.get('Content-Length'), str(len(r.content)))
+
+    def test_compress_non_200_response(self):
+        """
+        Tests that compression is performed on responses with a status other than 200.
+        See #10762.
+        """
+        self.resp.status_code = 404
+        r = GZipMiddleware().process_response(self.req, self.resp)
+        self.assertEqual(self.decompress(r.content), self.compressible_string)
+        self.assertEqual(r.get('Content-Encoding'), 'gzip')
+
+    def test_no_compress_short_response(self):
+        """
+        Tests that compression isn't performed on responses with short content.
+        """
+        self.resp.content = self.short_string
+        r = GZipMiddleware().process_response(self.req, self.resp)
+        self.assertEqual(r.content, self.short_string)
+        self.assertEqual(r.get('Content-Encoding'), None)
+
+    def test_no_compress_compressed_response(self):
+        """
+        Tests that compression isn't performed on responses that are already compressed.
+        """
+        self.resp['Content-Encoding'] = 'deflate'
+        r = GZipMiddleware().process_response(self.req, self.resp)
+        self.assertEqual(r.content, self.compressible_string)
+        self.assertEqual(r.get('Content-Encoding'), 'deflate')
+
+    def test_no_compress_ie_js_requests(self):
+        """
+        Tests that compression isn't performed on JavaScript requests from Internet Explorer.
+        """
+        self.req.META['HTTP_USER_AGENT'] = 'Mozilla/4.0 (compatible; MSIE 5.00; Windows 98)'
+        self.resp['Content-Type'] = 'application/javascript; charset=UTF-8'
+        r = GZipMiddleware().process_response(self.req, self.resp)
+        self.assertEqual(r.content, self.compressible_string)
+        self.assertEqual(r.get('Content-Encoding'), None)
+
+    def test_no_compress_uncompressible_response(self):
+        """
+        Tests that compression isn't performed on responses with uncompressible content.
+        """
+        self.resp.content = self.uncompressible_string
+        r = GZipMiddleware().process_response(self.req, self.resp)
+        self.assertEqual(r.content, self.uncompressible_string)
+        self.assertEqual(r.get('Content-Encoding'), None)

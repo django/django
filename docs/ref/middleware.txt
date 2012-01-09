@@ -82,22 +82,29 @@ addresses defined in the :setting:`INTERNAL_IPS` setting. This is used by
 Django's :doc:`automatic documentation system </ref/contrib/admin/admindocs>`.
 Depends on :class:`~django.contrib.auth.middleware.AuthenticationMiddleware`.
 
-GZIP middleware
+GZip middleware
 ---------------
 
 .. module:: django.middleware.gzip
-   :synopsis: Middleware to serve gziped content for performance.
+   :synopsis: Middleware to serve GZipped content for performance.
 
 .. class:: GZipMiddleware
 
-Compresses content for browsers that understand gzip compression (all modern
+Compresses content for browsers that understand GZip compression (all modern
 browsers).
 
 It is suggested to place this first in the middleware list, so that the
-compression of the response content is the last thing that happens. Will not
-compress content bodies less than 200 bytes long, when the response code is
-something other than 200, JavaScript files (for IE compatibility), or
-responses that have the ``Content-Encoding`` header already specified.
+compression of the response content is the last thing that happens.
+
+It will not compress content bodies less than 200 bytes long, when the
+``Content-Encoding`` header is already set, or when the browser does not send
+an ``Accept-Encoding`` header containing ``gzip``.
+
+Content will also not be compressed when the browser is Internet Explorer and
+the ``Content-Type`` header contains ``javascript`` or starts with anything
+other than ``text/``. This is done to overcome a bug present in early versions
+of Internet Explorer which caused decompression not to be performed on certain
+content types.
 
 GZip compression can be applied to individual views using the
 :func:`~django.views.decorators.http.gzip_page()` decorator.
