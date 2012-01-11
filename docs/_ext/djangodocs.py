@@ -81,7 +81,7 @@ class VersionDirective(Directive):
         ret.append(node)
         if not is_nextversion:
             if len(self.arguments) == 1:
-                linktext = 'Please, see the release notes </releases/%s>' % (arg0)
+                linktext = 'Please see the release notes </releases/%s>' % (arg0)
                 xrefs = roles.XRefRole()('doc', linktext, linktext, self.lineno, self.state)
                 node.extend(xrefs[0])
             node['version'] = arg0
