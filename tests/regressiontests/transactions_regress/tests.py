@@ -4,6 +4,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db import connection, transaction
 from django.db.transaction import commit_on_success, commit_manually, TransactionManagementError
 from django.test import TransactionTestCase, skipUnlessDBFeature
+from django.test.utils import override_settings
 from django.utils.unittest import skipIf
 
 from .models import Mod, M2mA, M2mB
@@ -165,6 +166,13 @@ class TestTransactionClosing(TransactionTestCase):
             _ = User.objects.all()[0]
         except:
             self.fail("A transaction consisting of a failed operation was not closed.")
+
+    @override_settings(DEBUG=True)
+    def test_failing_query_transaction_closed_debug(self):
+        """
+        Regression for #6669. Same test as above, with DEBUG=True.
+        """
+        self.test_failing_query_transaction_closed()
 
 
 class TestManyToManyAddTransaction(TransactionTestCase):
