@@ -363,16 +363,15 @@ have no effect), which is a string in Python dotted syntax -- the same
 format the normal URLconf callbacks use. A 404 view itself has nothing
 special: It's just a normal view.
 
-You normally won't have to bother with writing 404 views. By default, URLconfs
-have the following line up top::
+You normally won't have to bother with writing 404 views. If you don't set
+``handler404``, the built-in view :func:`django.views.defaults.page_not_found`
+is used by default. In this case, you still have one obligation: To create a
+``404.html`` template in the root of your template directory. The default 404
+view will use that template for all 404 errors. If :setting:`DEBUG` is set to
+``False`` (in your settings module) and if you didn't create a ``404.html``
+file, an ``Http500`` is raised instead.  So remember to create a ``404.html``.
 
-    from django.conf.urls import patterns, include, url
-
-That takes care of setting ``handler404`` in the current module. As you can see
-in ``django/conf/urls/defaults.py``, ``handler404`` is set to
-:func:`django.views.defaults.page_not_found` by default.
-
-Four more things to note about 404 views:
+A couple more things to note about 404 views:
 
 * If :setting:`DEBUG` is set to ``True`` (in your settings module) then your
   404 view will never be used (and thus the ``404.html`` template will never
@@ -380,15 +379,6 @@ Four more things to note about 404 views:
 
 * The 404 view is also called if Django doesn't find a match after checking
   every regular expression in the URLconf.
-
-* If you don't define your own 404 view -- and simply use the default, which
-  is recommended -- you still have one obligation: To create a ``404.html``
-  template in the root of your template directory. The default 404 view will
-  use that template for all 404 errors.
-
-* If :setting:`DEBUG` is set to ``False`` (in your settings module) and if
-  you didn't create a ``404.html`` file, an ``Http500`` is raised instead.
-  So remember to create a ``404.html``.
 
 Write a 500 (server error) view
 ===============================
