@@ -41,6 +41,42 @@ used to track the inventory for a series of online bookstores:
        name = models.CharField(max_length=300)
        books = models.ManyToManyField(Book)
 
+Cheat sheet
+===========
+
+In a hurry? Here's how to do common aggregate queries, assuming the models above::
+
+    # Total number of books.
+    >>> Book.objects.count()
+    2452
+
+    # Total number of books with publisher=BaloneyPress
+    >>> Book.objects.filter(publisher__name='BaloneyPress').count()
+    73
+
+    # Average price across all books.
+    >>> from django.db.models import Avg
+    >>> Book.objects.all().aggregate(Avg('price'))
+    {'price__avg': 34.35}
+
+    # Max price across all books.
+    >>> from django.db.models import Max
+    >>> Book.objects.all().aggregate(Max('price'))
+    {'price__max': Decimal('81.20')}
+
+    # Each publisher, each with a count of books as a "num_books" attribute.
+    >>> from django.db.models import Count
+    >>> pubs = Publisher.objects.annotate(num_books=Count('book'))
+    >>> pubs
+    [<Publisher BaloneyPress>, <Publisher SalamiPress>, ...]
+    >>> pubs[0].num_books
+    73
+
+    # The top 5 publishers, in order by number of books.
+    >>> from django.db.models import Count
+    >>> pubs = Publisher.objects.annotate(num_books=Count('book')).order_by('-num_books')[:5]
+    >>> pubs[0].num_books
+    1323
 
 Generating aggregates over a QuerySet
 =====================================
