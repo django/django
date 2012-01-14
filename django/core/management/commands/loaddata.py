@@ -104,87 +104,89 @@ class Command(BaseCommand):
                 app_module_paths.append(app.__file__)
 
         app_fixtures = [os.path.join(os.path.dirname(path), 'fixtures') for path in app_module_paths]
-        for fixture_label in fixture_labels:
-            parts = fixture_label.split('.')
 
-            if len(parts) > 1 and parts[-1] in compression_types:
-                compression_formats = [parts[-1]]
-                parts = parts[:-1]
-            else:
-                compression_formats = compression_types.keys()
+        try:
+            with connection.constraint_checks_disabled():
+                for fixture_label in fixture_labels:
+                    parts = fixture_label.split('.')
 
-            if len(parts) == 1:
-                fixture_name = parts[0]
-                formats = serializers.get_public_serializer_formats()
-            else:
-                fixture_name, format = '.'.join(parts[:-1]), parts[-1]
-                if format in serializers.get_public_serializer_formats():
-                    formats = [format]
-                else:
-                    formats = []
-
-            if formats:
-                if verbosity >= 2:
-                    self.stdout.write("Loading '%s' fixtures...\n" % fixture_name)
-            else:
-                self.stderr.write(
-                    self.style.ERROR("Problem installing fixture '%s': %s is not a known serialization format.\n" %
-                        (fixture_name, format)))
-                if commit:
-                    transaction.rollback(using=using)
-                    transaction.leave_transaction_management(using=using)
-                return
-
-            if os.path.isabs(fixture_name):
-                fixture_dirs = [fixture_name]
-            else:
-                fixture_dirs = app_fixtures + list(settings.FIXTURE_DIRS) + ['']
-
-            for fixture_dir in fixture_dirs:
-                if verbosity >= 2:
-                    self.stdout.write("Checking %s for fixtures...\n" % humanize(fixture_dir))
-
-                label_found = False
-                for combo in product([using, None], formats, compression_formats):
-                    database, format, compression_format = combo
-                    file_name = '.'.join(
-                        p for p in [
-                            fixture_name, database, format, compression_format
-                        ]
-                        if p
-                    )
-
-                    if verbosity >= 3:
-                        self.stdout.write("Trying %s for %s fixture '%s'...\n" % \
-                            (humanize(fixture_dir), file_name, fixture_name))
-                    full_path = os.path.join(fixture_dir, file_name)
-                    open_method = compression_types[compression_format]
-                    try:
-                        fixture = open_method(full_path, 'r')
-                    except IOError:
-                        if verbosity >= 2:
-                            self.stdout.write("No %s fixture '%s' in %s.\n" % \
-                                (format, fixture_name, humanize(fixture_dir)))
+                    if len(parts) > 1 and parts[-1] in compression_types:
+                        compression_formats = [parts[-1]]
+                        parts = parts[:-1]
                     else:
-                        if label_found:
-                            fixture.close()
-                            self.stderr.write(self.style.ERROR("Multiple fixtures named '%s' in %s. Aborting.\n" %
-                                (fixture_name, humanize(fixture_dir))))
-                            if commit:
-                                transaction.rollback(using=using)
-                                transaction.leave_transaction_management(using=using)
-                            return
-                        else:
-                            fixture_count += 1
-                            objects_in_fixture = 0
-                            loaded_objects_in_fixture = 0
-                            if verbosity >= 2:
-                                self.stdout.write("Installing %s fixture '%s' from %s.\n" % \
-                                    (format, fixture_name, humanize(fixture_dir)))
-                            try:
-                                objects = serializers.deserialize(format, fixture, using=using)
+                        compression_formats = compression_types.keys()
 
-                                with connection.constraint_checks_disabled():
+                    if len(parts) == 1:
+                        fixture_name = parts[0]
+                        formats = serializers.get_public_serializer_formats()
+                    else:
+                        fixture_name, format = '.'.join(parts[:-1]), parts[-1]
+                        if format in serializers.get_public_serializer_formats():
+                            formats = [format]
+                        else:
+                            formats = []
+
+                    if formats:
+                        if verbosity >= 2:
+                            self.stdout.write("Loading '%s' fixtures...\n" % fixture_name)
+                    else:
+                        self.stderr.write(
+                            self.style.ERROR("Problem installing fixture '%s': %s is not a known serialization format.\n" %
+                                (fixture_name, format)))
+                        if commit:
+                            transaction.rollback(using=using)
+                            transaction.leave_transaction_management(using=using)
+                        return
+
+                    if os.path.isabs(fixture_name):
+                        fixture_dirs = [fixture_name]
+                    else:
+                        fixture_dirs = app_fixtures + list(settings.FIXTURE_DIRS) + ['']
+
+                    for fixture_dir in fixture_dirs:
+                        if verbosity >= 2:
+                            self.stdout.write("Checking %s for fixtures...\n" % humanize(fixture_dir))
+
+                        label_found = False
+                        for combo in product([using, None], formats, compression_formats):
+                            database, format, compression_format = combo
+                            file_name = '.'.join(
+                                p for p in [
+                                    fixture_name, database, format, compression_format
+                                ]
+                                if p
+                            )
+
+                            if verbosity >= 3:
+                                self.stdout.write("Trying %s for %s fixture '%s'...\n" % \
+                                    (humanize(fixture_dir), file_name, fixture_name))
+                            full_path = os.path.join(fixture_dir, file_name)
+                            open_method = compression_types[compression_format]
+                            try:
+                                fixture = open_method(full_path, 'r')
+                            except IOError:
+                                if verbosity >= 2:
+                                    self.stdout.write("No %s fixture '%s' in %s.\n" % \
+                                        (format, fixture_name, humanize(fixture_dir)))
+                            else:
+                                try:
+                                    if label_found:
+                                        self.stderr.write(self.style.ERROR("Multiple fixtures named '%s' in %s. Aborting.\n" %
+                                            (fixture_name, humanize(fixture_dir))))
+                                        if commit:
+                                            transaction.rollback(using=using)
+                                            transaction.leave_transaction_management(using=using)
+                                        return
+
+                                    fixture_count += 1
+                                    objects_in_fixture = 0
+                                    loaded_objects_in_fixture = 0
+                                    if verbosity >= 2:
+                                        self.stdout.write("Installing %s fixture '%s' from %s.\n" % \
+                                            (format, fixture_name, humanize(fixture_dir)))
+
+                                    objects = serializers.deserialize(format, fixture, using=using)
+
                                     for obj in objects:
                                         objects_in_fixture += 1
                                         if router.allow_syncdb(using, obj.object.__class__):
@@ -201,41 +203,43 @@ class Command(BaseCommand):
                                                     }
                                                 raise e.__class__, e.__class__(msg), sys.exc_info()[2]
 
-                                # Since we disabled constraint checks, we must manually check for
-                                # any invalid keys that might have been added
-                                table_names = [model._meta.db_table for model in models]
-                                connection.check_constraints(table_names=table_names)
+                                    loaded_object_count += loaded_objects_in_fixture
+                                    fixture_object_count += objects_in_fixture
+                                    label_found = True
+                                finally:
+                                    fixture.close()
 
-                                loaded_object_count += loaded_objects_in_fixture
-                                fixture_object_count += objects_in_fixture
-                                label_found = True
-                            except (SystemExit, KeyboardInterrupt):
-                                raise
-                            except Exception:
-                                fixture.close()
-                                if commit:
-                                    transaction.rollback(using=using)
-                                    transaction.leave_transaction_management(using=using)
-                                if show_traceback:
-                                    traceback.print_exc()
-                                else:
+                                # If the fixture we loaded contains 0 objects, assume that an
+                                # error was encountered during fixture loading.
+                                if objects_in_fixture == 0:
                                     self.stderr.write(
-                                        self.style.ERROR("Problem installing fixture '%s': %s\n" %
-                                             (full_path, ''.join(traceback.format_exception(sys.exc_type,
-                                                 sys.exc_value, sys.exc_traceback)))))
-                                return
-                            fixture.close()
+                                        self.style.ERROR("No fixture data found for '%s'. (File format may be invalid.)\n" %
+                                            (fixture_name)))
+                                    if commit:
+                                        transaction.rollback(using=using)
+                                        transaction.leave_transaction_management(using=using)
+                                    return
 
-                            # If the fixture we loaded contains 0 objects, assume that an
-                            # error was encountered during fixture loading.
-                            if objects_in_fixture == 0:
-                                self.stderr.write(
-                                    self.style.ERROR("No fixture data found for '%s'. (File format may be invalid.)\n" %
-                                        (fixture_name)))
-                                if commit:
-                                    transaction.rollback(using=using)
-                                    transaction.leave_transaction_management(using=using)
-                                return
+            # Since we disabled constraint checks, we must manually check for
+            # any invalid keys that might have been added
+            table_names = [model._meta.db_table for model in models]
+            connection.check_constraints(table_names=table_names)
+
+        except (SystemExit, KeyboardInterrupt):
+            raise
+        except Exception:
+            if commit:
+                transaction.rollback(using=using)
+                transaction.leave_transaction_management(using=using)
+            if show_traceback:
+                traceback.print_exc()
+            else:
+                self.stderr.write(
+                    self.style.ERROR("Problem installing fixture '%s': %s\n" %
+                         (full_path, ''.join(traceback.format_exception(sys.exc_type,
+                             sys.exc_value, sys.exc_traceback)))))
+            return
+
 
         # If we found even one object in a fixture, we need to reset the
         # database sequences.

@@ -16,6 +16,7 @@ from django.db import transaction
 from django.db.models import signals
 from django.test import (TestCase, TransactionTestCase, skipIfDBFeature,
     skipUnlessDBFeature)
+from django.test.utils import override_settings
 
 from .models import (Animal, Stuff, Absolute, Parent, Child, Article, Widget,
     Store, Person, Book, NKChild, RefToNKChild, Circle1, Circle2, Circle3,
@@ -389,6 +390,25 @@ class TestFixtures(TestCase):
         self.assertTrue(
             stderr.getvalue().startswith('Problem installing fixture')
         )
+
+    _cur_dir = os.path.dirname(os.path.abspath(__file__))
+
+    @override_settings(FIXTURE_DIRS=[os.path.join(_cur_dir, 'fixtures_1'),
+                                     os.path.join(_cur_dir, 'fixtures_2')])
+    def test_loaddata_forward_refs_split_fixtures(self):
+        """
+        Regression for #17530 - should be able to cope with forward references
+        when the fixtures are not in the same files or directories.
+        """
+        management.call_command(
+            'loaddata',
+            'forward_ref_1.json',
+            'forward_ref_2.json',
+            verbosity=0,
+            commit=False
+        )
+        self.assertEqual(Book.objects.all()[0].id, 1)
+        self.assertEqual(Person.objects.all()[0].id, 4)
 
     def test_loaddata_no_fixture_specified(self):
         """
