@@ -368,6 +368,13 @@ class DefaultFiltersTests(TestCase):
              [('age', 23), ('name', 'Barbara-Ann')],
              [('age', 63), ('name', 'Ra Ra Rasputin')]])
 
+        # If it gets passed a list of something else different from
+        # dictionaries it should fail silently
+        self.assertEqual(dictsort([1, 2, 3], 'age'), '')
+        self.assertEqual(dictsort('Hello!', 'age'), '')
+        self.assertEqual(dictsort({'a': 1}, 'age'), '')
+        self.assertEqual(dictsort(1, 'age'), '')
+
     def test_dictsortreversed(self):
         sorted_dicts = dictsortreversed([{'age': 23, 'name': 'Barbara-Ann'},
                                          {'age': 63, 'name': 'Ra Ra Rasputin'},
@@ -378,6 +385,13 @@ class DefaultFiltersTests(TestCase):
             [[('age', 63), ('name', 'Ra Ra Rasputin')],
              [('age', 23), ('name', 'Barbara-Ann')],
              [('age', 18), ('name', 'Jonny B Goode')]])
+
+        # If it gets passed a list of something else different from
+        # dictionaries it should fail silently
+        self.assertEqual(dictsortreversed([1, 2, 3], 'age'), '')
+        self.assertEqual(dictsortreversed('Hello!', 'age'), '')
+        self.assertEqual(dictsortreversed({'a': 1}, 'age'), '')
+        self.assertEqual(dictsortreversed(1, 'age'), '')
 
     def test_first(self):
         self.assertEqual(first([0,1,2]), 0)

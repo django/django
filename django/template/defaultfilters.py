@@ -7,7 +7,7 @@ from decimal import Decimal, InvalidOperation, Context, ROUND_HALF_UP
 from functools import wraps
 from pprint import pformat
 
-from django.template.base import Variable, Library
+from django.template.base import Variable, Library, VariableDoesNotExist
 from django.conf import settings
 from django.utils import formats
 from django.utils.dateformat import format, time_format
@@ -490,7 +490,10 @@ def dictsort(value, arg):
     Takes a list of dicts, returns that list sorted by the property given in
     the argument.
     """
-    return sorted(value, key=Variable(arg).resolve)
+    try:
+        return sorted(value, key=Variable(arg).resolve)
+    except (TypeError, VariableDoesNotExist):
+        return u''
 
 @register.filter(is_safe=False)
 def dictsortreversed(value, arg):
@@ -498,7 +501,10 @@ def dictsortreversed(value, arg):
     Takes a list of dicts, returns that list sorted in reverse order by the
     property given in the argument.
     """
-    return sorted(value, key=Variable(arg).resolve, reverse=True)
+    try:
+        return sorted(value, key=Variable(arg).resolve, reverse=True)
+    except (TypeError, VariableDoesNotExist):
+        return u''
 
 @register.filter(is_safe=False)
 def first(value):
