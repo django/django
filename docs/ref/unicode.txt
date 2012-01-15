@@ -322,7 +322,9 @@ can be non-ASCII::
     sender = u'Arnbjörg Ráðormsdóttir <arnbjorg@example.com>'
     recipients = ['Fred <fred@example.com']
     body = u'...'
-    EmailMessage(subject, body, sender, recipients).send()
+    msg = EmailMessage(subject, body, sender, recipients)
+    msg.attach(u"Une pièce jointe.pdf", "%PDF-1.4.%...", mimetype="application/pdf")
+    msg.send()
 
 Form submission
 ===============

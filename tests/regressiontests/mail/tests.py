@@ -198,6 +198,19 @@ class MailTests(TestCase):
         self.assertEqual(payload[0].get_content_type(), 'multipart/alternative')
         self.assertEqual(payload[1].get_content_type(), 'application/pdf')
 
+    def test_non_ascii_attachment_filename(self):
+        """Regression test for #14964"""
+        headers = {"Date": "Fri, 09 Nov 2001 01:08:47 -0000", "Message-ID": "foo"}
+        subject, from_email, to = 'hello', 'from@example.com', 'to@example.com'
+        content = 'This is the message.'
+        msg = EmailMessage(subject, content, from_email, [to], headers=headers)
+        # Unicode in file name
+        msg.attach(u"une pièce jointe.pdf", "%PDF-1.4.%...", mimetype="application/pdf")
+        msg_str = msg.message().as_string()
+        message = email.message_from_string(msg_str)
+        payload = message.get_payload()
+        self.assertEqual(payload[1].get_filename(), u'une pièce jointe.pdf')
+
     def test_dummy_backend(self):
         """
         Make sure that dummy backends returns correct number of sent messages

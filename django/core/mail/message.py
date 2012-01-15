@@ -311,6 +311,10 @@ class EmailMessage(object):
                 mimetype = DEFAULT_ATTACHMENT_MIME_TYPE
         attachment = self._create_mime_attachment(content, mimetype)
         if filename:
+            try:
+                filename = filename.encode('ascii')
+            except UnicodeEncodeError:
+                filename = ('utf-8', '', filename.encode('utf-8'))
             attachment.add_header('Content-Disposition', 'attachment',
                                   filename=filename)
         return attachment
