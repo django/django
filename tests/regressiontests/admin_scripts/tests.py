@@ -1382,7 +1382,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         # running again..
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, "File exists")
+        self.assertOutput(err, "already exists")
 
     def test_invalid_project_name(self):
         "Make sure the startproject management command validates a project name"
