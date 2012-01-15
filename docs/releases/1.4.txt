@@ -556,6 +556,12 @@ Django 1.4 also includes several smaller improvements worth noting:
 * The MySQL database backend can now make use of the savepoint feature
   implemented by MySQL version 5.0.3 or newer with the InnoDB storage engine.
 
+* It is now possible to pass initial values to the model forms that are part of
+  both model formsets and inline model formset as returned from factory
+  functions ``modelformset_factory`` and ``inlineformset_factory`` respectively
+  just like with regular formsets. However, initial values only apply to extra
+  forms i.e. those which are not bound to an existing model instance.
+
 Backwards incompatible changes in 1.4
 =====================================
 

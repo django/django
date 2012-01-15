@@ -418,6 +418,7 @@ class BaseModelFormSet(BaseFormSet):
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
                  queryset=None, **kwargs):
         self.queryset = queryset
+        self.initial_extra = kwargs.pop('initial', None)
         defaults = {'data': data, 'files': files, 'auto_id': auto_id, 'prefix': prefix}
         defaults.update(kwargs)
         super(BaseModelFormSet, self).__init__(**defaults)
@@ -448,6 +449,12 @@ class BaseModelFormSet(BaseFormSet):
             kwargs['instance'] = self._existing_object(pk)
         if i < self.initial_form_count() and not kwargs.get('instance'):
             kwargs['instance'] = self.get_queryset()[i]
+        if i >= self.initial_form_count() and self.initial_extra:
+            # Set initial values for extra forms
+            try:
+                kwargs['initial'] = self.initial_extra[i-self.initial_form_count()]
+            except IndexError:
+                pass
         return super(BaseModelFormSet, self)._construct_form(i, **kwargs)
 
     def get_queryset(self):
@@ -674,7 +681,7 @@ def modelformset_factory(model, form=ModelForm, formfield_callback=None,
 class BaseInlineFormSet(BaseModelFormSet):
     """A formset for child objects related to a parent."""
     def __init__(self, data=None, files=None, instance=None,
-                 save_as_new=False, prefix=None, queryset=None):
+                 save_as_new=False, prefix=None, queryset=None, **kwargs):
         from django.db.models.fields.related import RelatedObject
         if instance is None:
             self.instance = self.fk.rel.to()
@@ -687,7 +694,7 @@ class BaseInlineFormSet(BaseModelFormSet):
             queryset = self.model._default_manager
         qs = queryset.filter(**{self.fk.name: self.instance})
         super(BaseInlineFormSet, self).__init__(data, files, prefix=prefix,
-                                                queryset=qs)
+                                                queryset=qs, **kwargs)
 
     def initial_form_count(self):
         if self.save_as_new:

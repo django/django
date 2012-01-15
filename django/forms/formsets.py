@@ -122,7 +122,7 @@ class BaseFormSet(StrAndUnicode):
         if self.is_bound:
             defaults['data'] = self.data
             defaults['files'] = self.files
-        if self.initial:
+        if self.initial and not 'initial' in kwargs:
             try:
                 defaults['initial'] = self.initial[i]
             except IndexError:

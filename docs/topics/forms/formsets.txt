@@ -53,6 +53,8 @@ Formsets can also be indexed into, which returns the corresponding form. If you
 override ``__iter__``, you will need to also override ``__getitem__`` to have
 matching behavior.
 
+.. _formsets-initial-data:
+
 Using initial data with a formset
 ---------------------------------
 

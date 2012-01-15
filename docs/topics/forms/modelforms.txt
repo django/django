@@ -617,6 +617,17 @@ exclude::
 
     >>> AuthorFormSet = modelformset_factory(Author, exclude=('birth_date',))
 
+Providing initial values
+------------------------
+
+.. versionadded:: 1.4
+
+As with regular formsets, it is possible to :ref:`specify initial data
+<formsets-initial-data>` for forms in the formset by specifying an ``initial``
+parameter when instantiating the model formset class returned by
+``modelformset_factory``. However, with model formsets the initial values only
+apply to extra forms, those which are not bound to an existing object instance.
+
 .. _saving-objects-in-the-formset:
 
 Saving objects in the formset
