@@ -41,8 +41,8 @@
 {% block breadcrumbs %}
 <div class="breadcrumbs">
 <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
-&rsaquo; <a href="{% url 'admin:app_list' app_label=cl.opts.app_label %}">{{ app_label|capfirst|escape }}</a>
-&rsaquo; {{ cl.opts.verbose_name_plural|capfirst }}
+&rsaquo; <a href="{% url 'admin:app_list' app_label=cl.opts.app_label %}">{% trans app_label|capfirst|escape %}</a>
+&rsaquo; {{ cl.opts.verbose_name_plural|capfirst|escape }}
 </div>
 {% endblock %}
 {% endif %}

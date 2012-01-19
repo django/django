@@ -358,7 +358,7 @@ class AdminSite(object):
                         app_dict[app_label]['models'].append(model_dict)
                     else:
                         app_dict[app_label] = {
-                            'name': app_label.title(),
+                            'name': app_label,
                             'app_url': reverse('admin:app_list', kwargs={'app_label': app_label}, current_app=self.name),
                             'has_module_perms': has_module_perms,
                             'models': [model_dict],
@@ -415,7 +415,7 @@ class AdminSite(object):
                             # something to display, add in the necessary meta
                             # information.
                             app_dict = {
-                                'name': app_label.title(),
+                                'name': app_label,
                                 'app_url': '',
                                 'has_module_perms': has_module_perms,
                                 'models': [model_dict],
@@ -425,7 +425,7 @@ class AdminSite(object):
         # Sort the models alphabetically within each app.
         app_dict['models'].sort(key=lambda x: x['name'])
         context = {
-            'title': _('%s administration') % capfirst(app_label),
+            'title': _('%(app_label)s administration') % {'app_label': capfirst(_(app_label))},
             'app_list': [app_dict],
         }
         context.update(extra_context or {})
