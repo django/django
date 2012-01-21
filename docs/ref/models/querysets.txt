@@ -32,10 +32,11 @@ You can evaluate a ``QuerySet`` in the following ways:
           print e.headline
 
 * **Slicing.** As explained in :ref:`limiting-querysets`, a ``QuerySet`` can
-  be sliced, using Python's array-slicing syntax. Usually slicing a
-  ``QuerySet`` returns another (unevaluated) ``QuerySet``, but Django will
-  execute the database query if you use the "step" parameter of slice
-  syntax.
+  be sliced, using Python's array-slicing syntax. Slicing an unevaluated
+  ``QuerySet`` usually returns another unevaluated ``QuerySet``, but Django
+  will execute the database query if you use the "step" parameter of slice
+  syntax, and will return a list. Slicing a ``QuerySet`` that has been
+  evaluated (partially or fully) also returns a list.
 
 * **Pickling/Caching.** See the following section for details of what
   is involved when `pickling QuerySets`_. The important thing for the
