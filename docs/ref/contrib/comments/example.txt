@@ -1,14 +1,14 @@
 .. highlightlang:: html+django
 
 ===========================================
-Example of using the in-built comments app
+Example of using the built-in comments app
 ===========================================
 
 Follow the first three steps of the quick start guide in the
 :doc:`documentation </ref/contrib/comments/index>`.
 
 Now suppose, you have an app (``blog``) with a model (``Post``)
-to which you want to attach comments. Let us also suppose that
+to which you want to attach comments. Let's also suppose that
 you have a template called ``blog_detail.html`` where you want
 to display the comments list and comment form.
 
@@ -16,12 +16,12 @@ Template
 ========
 
 First, we should load the ``comment`` template tags in the
-``blog_detail.html`` so that we can use it's functionality. So
+``blog_detail.html`` so that we can use its functionality. So
 just like all other custom template tag libraries::
 
     {% load comments %}
 
-Next, let us add the number of comments attached to the particular
+Next, let's add the number of comments attached to the particular
 model instance of ``Post``. For this we assume that a context
 variable ``object_pk`` is present which gives the ``id`` of the
 instance of ``Post``.
@@ -52,9 +52,9 @@ Django will will look for the ``list.html`` under the following directories
   comments/list.html
 
 To get a list of comments, we make use of the :ttag:`get_comment_list` tag.
-This tag's usage is very similar to the :ttag:`get_comment_count` tag. We
-need to remember that the :ttag:`get_comment_list` returns a list of comments
-and hence we will have to iterate through them to display them::
+Using this tag is very similar to the :ttag:`get_comment_count` tag. We
+need to remember that :ttag:`get_comment_list` returns a list of comments
+and hence we have to iterate through them to display them::
 
    {% get_comment_list for blog.post object_pk as comment_list %}
    {% for comment in comment_list %}
@@ -69,7 +69,7 @@ comments. There are two ways of doing so. The first is when you want to
 display the comments template available under your ``comments/form.html``.
 The other method gives you a chance to customize the form.
 
-The first method makes use of the :ttag:`render_comment_form` tag. It's usage
+The first method makes use of the :ttag:`render_comment_form` tag. Its usage
 too is similar to the other three tags we have discussed above::
 
    {% render_comment_form for entry %}
@@ -138,7 +138,7 @@ Feeds
 =====
 
 Suppose you want to export a :doc:`feed </ref/contrib/syndication>` of the
-latest comments, you can use the in-built :class:`LatestCommentFeed`. Just
+latest comments, you can use the built-in :class:`LatestCommentFeed`. Just
 enable it in your project's ``urls.py``:
 
 .. code-block:: python
@@ -181,7 +181,7 @@ Moderation
 
 Now that we have the comments framework working, we might want to have some
 moderation setup to administer the comments. The comments framework comes
-in-built with :doc:`generic comment moderation
+built-in with :doc:`generic comment moderation
 </ref/contrib/comments/moderation>`. The comment moderation has the following
 features (all of which or only certain can be enabled):
 
@@ -190,7 +190,7 @@ features (all of which or only certain can be enabled):
 * Email new comments to the site-staff.
 
 To enable comment moderation, we subclass the :class:`CommentModerator` and
-register it with the moderation features we want. Let us suppose we want to
+register it with the moderation features we want. Let's suppose we want to
 close comments after 7 days of posting and also send out an email to the
 site staff. In ``blog/models.py``, we register a comment moderator in the
 following way:
