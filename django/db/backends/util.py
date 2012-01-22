@@ -47,7 +47,7 @@ class CursorDebugWrapper(CursorWrapper):
                 'time': "%.3f" % duration,
             })
             logger.debug('(%.3f) %s; args=%s' % (duration, sql, params),
-                extra={'duration':duration, 'sql':sql, 'params':params}
+                extra={'duration': duration, 'sql': sql, 'params': params}
             )
 
     def executemany(self, sql, param_list):
@@ -58,12 +58,16 @@ class CursorDebugWrapper(CursorWrapper):
         finally:
             stop = time()
             duration = stop - start
+            try:
+                times = len(param_list)
+            except TypeError:           # param_list could be an iterator
+                times = '?'
             self.db.queries.append({
-                'sql': '%s times: %s' % (len(param_list), sql),
+                'sql': '%s times: %s' % (times, sql),
                 'time': "%.3f" % duration,
             })
             logger.debug('(%.3f) %s; args=%s' % (duration, sql, param_list),
-                extra={'duration':duration, 'sql':sql, 'params':param_list}
+                extra={'duration': duration, 'sql': sql, 'params': param_list}
             )
 
 

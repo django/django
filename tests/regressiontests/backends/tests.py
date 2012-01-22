@@ -14,6 +14,7 @@ from django.db.backends.signals import connection_created
 from django.db.backends.postgresql_psycopg2 import version as pg_version
 from django.db.utils import ConnectionHandler, DatabaseError, load_backend
 from django.test import TestCase, skipUnlessDBFeature, TransactionTestCase
+from django.test.utils import override_settings
 from django.utils import unittest
 
 from . import models
@@ -308,23 +309,43 @@ class EscapingChecks(TestCase):
 
 
 class BackendTestCase(TestCase):
+
+    def create_squares_with_executemany(self, args):
+        cursor = connection.cursor()
+        opts = models.Square._meta
+        tbl = connection.introspection.table_name_converter(opts.db_table)
+        f1 = connection.ops.quote_name(opts.get_field('root').column)
+        f2 = connection.ops.quote_name(opts.get_field('square').column)
+        query = 'INSERT INTO %s (%s, %s) VALUES (%%s, %%s)' % (tbl, f1, f2)
+        cursor.executemany(query, args)
+
     def test_cursor_executemany(self):
         #4896: Test cursor.executemany
-        cursor = connection.cursor()
-        qn = connection.ops.quote_name
-        opts = models.Square._meta
-        f1, f2 = opts.get_field('root'), opts.get_field('square')
-        query = ('INSERT INTO %s (%s, %s) VALUES (%%s, %%s)'
-                 % (connection.introspection.table_name_converter(opts.db_table), qn(f1.column), qn(f2.column)))
-        cursor.executemany(query, [(i, i**2) for i in range(-5, 6)])
+        args = [(i, i**2) for i in range(-5, 6)]
+        self.create_squares_with_executemany(args)
         self.assertEqual(models.Square.objects.count(), 11)
         for i in range(-5, 6):
             square = models.Square.objects.get(root=i)
             self.assertEqual(square.square, i**2)
 
+    def test_cursor_executemany_with_empty_params_list(self):
         #4765: executemany with params=[] does nothing
-        cursor.executemany(query, [])
-        self.assertEqual(models.Square.objects.count(), 11)
+        args = []
+        self.create_squares_with_executemany(args)
+        self.assertEqual(models.Square.objects.count(), 0)
+
+    def test_cursor_executemany_with_iterator(self):
+        #10320: executemany accepts iterators
+        args = iter((i, i**2) for i in range(-3, 2))
+        self.create_squares_with_executemany(args)
+        self.assertEqual(models.Square.objects.count(), 5)
+
+        args = iter((i, i**2) for i in range(3, 7))
+        with override_settings(DEBUG=True):
+            # same test for DebugCursorWrapper
+            self.create_squares_with_executemany(args)
+        self.assertEqual(models.Square.objects.count(), 9)
+
 
     def test_unicode_fetches(self):
         #6254: fetchone, fetchmany, fetchall return strings as unicode objects

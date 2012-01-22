@@ -670,6 +670,9 @@ class FormatStylePlaceholderCursor(object):
             raise utils.DatabaseError, utils.DatabaseError(*tuple(e)), sys.exc_info()[2]
 
     def executemany(self, query, params=None):
+        # cx_Oracle doesn't support iterators, convert them to lists
+        if params is not None and not isinstance(params, (list, tuple)):
+            params = list(params)
         try:
             args = [(':arg%d' % i) for i in range(len(params[0]))]
         except (IndexError, TypeError):
