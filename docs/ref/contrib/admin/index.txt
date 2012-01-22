@@ -544,7 +544,7 @@ subclass::
     Fields in ``list_filter`` can also span relations using the ``__`` lookup::
 
         class UserAdminWithLookup(UserAdmin):
-            list_filter = ('groups__name')
+            list_filter = ('groups__name',)
 
 .. attribute:: ModelAdmin.list_per_page
 
