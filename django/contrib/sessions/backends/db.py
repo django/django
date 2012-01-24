@@ -24,11 +24,7 @@ class SessionStore(SessionBase):
             return {}
 
     def exists(self, session_key):
-        try:
-            Session.objects.get(session_key=session_key)
-        except Session.DoesNotExist:
-            return False
-        return True
+        return Session.objects.filter(session_key=session_key).exists()
 
     def create(self):
         while True:
