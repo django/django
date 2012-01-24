@@ -1049,10 +1049,10 @@ def now(parser, token):
 
         It is {% now "jS F Y H:i" %}
     """
-    bits = token.contents.split('"')
-    if len(bits) != 3:
+    bits = token.split_contents()
+    if len(bits) != 2:
         raise TemplateSyntaxError("'now' statement takes one argument")
-    format_string = bits[1]
+    format_string = bits[1][1:-1]
     return NowNode(format_string)
 
 @register.tag
