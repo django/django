@@ -186,6 +186,12 @@ these changes.
   performance issues and will follow a slightly accelerated deprecation
   timeframe.
 
+* Translations located under the so-called *project path* will be ignored during
+  the translation building process performed at runtime. The
+  :setting:`LOCALE_PATHS` setting can be used for the same task by including the
+  filesystem path to a ``locale`` directory containing non-app-specific
+  translations in its value.
+
 1.6
 ---
 
