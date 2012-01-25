@@ -321,12 +321,11 @@ Honza Král
     2007 while doing his PhD in Computing Sciences. Since then he has
     contributed patches to various components of the framework, in particular
     the admin. Julien was a co-founder of the `Interaction Consortium`_. He
-    now works as a freelance Web developer and interaction designer.
-
-    Julien lives in Sydney, Australia.
+    now works at Odopod_, a digital agency based in San Francisco, CA, USA.
 
 .. _Julien Phalip: http://julienphalip.com
 .. _Interaction Consortium: http://interaction.net.au
+.. _Odopod: http://odopod.com
 
 `Aymeric Augustin`_
     Aymeric is an engineer with a background in mathematics and computer
