@@ -6,10 +6,10 @@ Welcome to Django 1.0.1!
 
 This is the first "bugfix" release in the Django 1.0 series, improving
 the stability and performance of the Django 1.0 codebase. As such,
-Django 1.0.1 contains no new features (and, pursuant to `our
-compatibility policy`_, maintains backwards compatibility with Django
-1.0), but does contain a number of fixes and other
-improvements. Django 1.0.1 is a recommended upgrade for any
+Django 1.0.1 contains no new features (and, pursuant to :doc:`our
+compatibility policy </misc/api-stability/>`, maintains backwards
+compatibility with Django 1.0), but does contain a number of fixes
+and other improvements. Django 1.0.1 is a recommended upgrade for any
 development or deployment currently using or targeting Django 1.0.
 
 
@@ -46,8 +46,9 @@ highlights:
 
 * A fix to the application of autoescaping for literal strings passed
   to the ``join`` template filter. Previously, literal strings passed
-  to ``join`` were automatically escaped, contrary to `the documented
-  behavior for autoescaping and literal strings`_. Literal strings
+  to ``join`` were automatically escaped, contrary to :ref:`the
+  documented behavior for autoescaping and literal strings
+  <string-literals-and-automatic-escaping>`. Literal strings
   passed to ``join`` are no longer automatically escaped, meaning you
   must now manually escape them; this is an incompatibility if you
   were relying on this bug, but not if you were relying on escaping
@@ -60,6 +61,4 @@ highlights:
   documentation, including both corrections to existing documents and
   expanded and new documentation.
 
-.. _our compatibility policy: http://docs.djangoproject.com/en/dev/misc/api-stability/
 .. _the Subversion log of the 1.0.X branch: http://code.djangoproject.com/log/django/branches/releases/1.0.X
-.. _the documented behavior for autoescaping and literal strings: http://docs.djangoproject.com/en/dev/topics/templates/#string-literals-and-automatic-escaping

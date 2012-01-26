@@ -324,11 +324,10 @@ whatever you want. For example::
     should work; all are optional.
 
     For details on accessing backwards-related objects, see the
-    `Following relationships backward example`_.
-    
+    :ref:`Following relationships backward example <backwards-related-objects>`.
+
     For sample code, see the `Many-to-one relationship model tests`_.
 
-    .. _Following relationships backward example: http://docs.djangoproject.com/en/dev/topics/db/queries/#backwards-related-objects
     .. _Many-to-one relationship model tests: http://code.djangoproject.com/browser/django/trunk/tests/modeltests/many_to_one
 
 Many-to-many relationships
