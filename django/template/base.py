@@ -204,22 +204,18 @@ class Lexer(object):
         otherwise it should be treated as a literal string.
         """
         if in_tag:
+            # The [2:-2] ranges below strip off *_TAG_START and *_TAG_END.
+            # We could do len(BLOCK_TAG_START) to be more "correct", but we've
+            # hard-coded the 2s here for performance. And it's not like
+            # the TAG_START values are going to change anytime, anyway.
             if token_string.startswith(VARIABLE_TAG_START):
-                token = Token(TOKEN_VAR,
-                              token_string[
-                                len(VARIABLE_TAG_START):-len(VARIABLE_TAG_END)
-                              ].strip())
+                token = Token(TOKEN_VAR, token_string[2:-2].strip())
             elif token_string.startswith(BLOCK_TAG_START):
-                token = Token(TOKEN_BLOCK,
-                              token_string[
-                                len(BLOCK_TAG_START):-len(BLOCK_TAG_END)
-                              ].strip())
+                token = Token(TOKEN_BLOCK, token_string[2:-2].strip())
             elif token_string.startswith(COMMENT_TAG_START):
                 content = ''
                 if token_string.find(TRANSLATOR_COMMENT_MARK):
-                    content = token_string[
-                                len(COMMENT_TAG_START):-len(COMMENT_TAG_END)
-                              ].strip()
+                    content = token_string[2:-2].strip()
                 token = Token(TOKEN_COMMENT, content)
         else:
             token = Token(TOKEN_TEXT, token_string)
