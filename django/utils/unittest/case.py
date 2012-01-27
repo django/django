@@ -241,9 +241,6 @@ class TestCase(unittest.TestCase):
         Cleanup items are called even if setUp fails (unlike tearDown)."""
         self._cleanups.append((function, args, kwargs))
 
-    def setUp(self):
-        "Hook method for setting up the test fixture before exercising it."
-
     @classmethod
     def setUpClass(cls):
         "Hook method for setting up class fixture before running tests in the class."
@@ -251,9 +248,6 @@ class TestCase(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         "Hook method for deconstructing the class fixture after running all tests in the class."
-
-    def tearDown(self):
-        "Hook method for deconstructing the test fixture after testing it."
 
     def countTestCases(self):
         return 1
