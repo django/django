@@ -1,6 +1,7 @@
 from django import forms
-from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
 from django.contrib.flatpages.models import FlatPage
+from django.utils.translation import ugettext, ugettext_lazy as _
 
 class FlatpageForm(forms.ModelForm):
     url = forms.RegexField(label=_("URL"), max_length=100, regex=r'^[-\w/\.~]+$',
@@ -11,6 +12,16 @@ class FlatpageForm(forms.ModelForm):
 
     class Meta:
         model = FlatPage
+
+    def clean_url(self):
+        url = self.cleaned_data['url']
+        if not url.startswith('/'):
+            raise forms.ValidationError(ugettext("URL is missing a leading slash."))
+        if (settings.APPEND_SLASH and
+            'django.middleware.common.CommonMiddleware' in settings.MIDDLEWARE_CLASSES and
+            not url.endswith('/')):
+            raise forms.ValidationError(ugettext("URL is missing a trailing slash."))
+        return url
 
     def clean(self):
         url = self.cleaned_data.get('url', None)
