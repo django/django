@@ -237,15 +237,16 @@ class Parser(object):
         nodelist = self.create_nodelist()
         while self.tokens:
             token = self.next_token()
-            if token.token_type == TOKEN_TEXT:
+            # Use the raw values here for TOKEN_* for a tiny performance boost.
+            if token.token_type == 0: # TOKEN_TEXT
                 self.extend_nodelist(nodelist, TextNode(token.contents), token)
-            elif token.token_type == TOKEN_VAR:
+            elif token.token_type == 1: # TOKEN_VAR
                 if not token.contents:
                     self.empty_variable(token)
                 filter_expression = self.compile_filter(token.contents)
                 var_node = self.create_variable_node(filter_expression)
                 self.extend_nodelist(nodelist, var_node, token)
-            elif token.token_type == TOKEN_BLOCK:
+            elif token.token_type == 2: # TOKEN_BLOCK
                 try:
                     command = token.contents.split()[0]
                 except IndexError:
