@@ -264,7 +264,12 @@ class NewDatabaseTests(BaseDateTimeTests):
     @requires_tz_support
     def test_datetime_from_date(self):
         dt = datetime.date(2011, 9, 1)
-        Event.objects.create(dt=dt)
+        with warnings.catch_warnings(record=True) as recorded:
+            warnings.simplefilter('always')
+            Event.objects.create(dt=dt)
+            self.assertEqual(len(recorded), 1)
+            msg = str(recorded[0].message)
+            self.assertTrue(msg.startswith("DateTimeField received a naive datetime"))
         event = Event.objects.get()
         self.assertEqual(event.dt, datetime.datetime(2011, 9, 1, tzinfo=EAT))
 
