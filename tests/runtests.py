@@ -4,9 +4,13 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import warnings
 
 from django import contrib
 
+# databrowse is deprecated, but we still want to run its tests
+warnings.filterwarnings('ignore', "The Databrowse contrib app is deprecated",
+                        PendingDeprecationWarning, 'django.contrib.databrowse')
 
 CONTRIB_DIR_NAME = 'django.contrib'
 MODEL_TESTS_DIR_NAME = 'modeltests'
@@ -34,6 +38,7 @@ ALWAYS_INSTALLED_APPS = [
     'django.contrib.comments',
     'django.contrib.admin',
     'django.contrib.admindocs',
+    'django.contrib.databrowse',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
     'regressiontests.staticfiles_tests',

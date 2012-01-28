@@ -33,12 +33,17 @@ How to use Databrowse
 2. Register a number of models with the Databrowse site::
 
        from django.contrib import databrowse
-       from myapp.models import SomeModel, SomeOtherModel
+       from myapp.models import SomeModel, SomeOtherModel, YetAnotherModel
 
        databrowse.site.register(SomeModel)
-       databrowse.site.register(SomeOtherModel)
+       databrowse.site.register(SomeOtherModel, YetAnotherModel)
 
    Note that you should register the model *classes*, not instances.
+
+   .. versionchanged:: 1.4
+
+   Since Django 1.4, it is possible to register several models in the same
+   call to :func:`~databrowse.site.register`.
 
    It doesn't matter where you put this, as long as it gets executed at some
    point. A good place for it is in your :doc:`URLconf file
