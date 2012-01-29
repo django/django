@@ -31,7 +31,6 @@ def urlquote(url, safe='/'):
     without double-quoting occurring.
     """
     return force_unicode(urllib.quote(smart_str(url), smart_str(safe)))
-
 urlquote = allow_lazy(urlquote, unicode)
 
 def urlquote_plus(url, safe=''):
@@ -43,6 +42,22 @@ def urlquote_plus(url, safe=''):
     """
     return force_unicode(urllib.quote_plus(smart_str(url), smart_str(safe)))
 urlquote_plus = allow_lazy(urlquote_plus, unicode)
+
+def urlunquote(quoted_url):
+    """
+    A wrapper for Python's urllib.unquote() function that can operate on
+    the result of django.utils.http.urlquote().
+    """
+    return force_unicode(urllib.unquote(smart_str(quoted_url)))
+urlunquote = allow_lazy(urlunquote, unicode)
+
+def urlunquote_plus(quoted_url):
+    """
+    A wrapper for Python's urllib.unquote_plus() function that can operate on
+    the result of django.utils.http.urlquote_plus().
+    """
+    return force_unicode(urllib.unquote_plus(smart_str(quoted_url)))
+urlunquote_plus = allow_lazy(urlunquote_plus, unicode)
 
 def urlencode(query, doseq=0):
     """
