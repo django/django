@@ -1,1 +1,4 @@
-from django.contrib.sitemaps.tests.basic import *
+from .flatpages import FlatpagesSitemapTests
+from .generic import GenericViewsSitemapTests
+from .http import HTTPSitemapTests
+from .https import HTTPSSitemapTests, HTTPSDetectionSitemapTests

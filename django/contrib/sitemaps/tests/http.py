@@ -1,39 +1,16 @@
-import os
 from datetime import date
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sitemaps import Sitemap, GenericSitemap
 from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured
-from django.test import TestCase
 from django.utils.unittest import skipUnless
 from django.utils.formats import localize
 from django.utils.translation import activate, deactivate
 
+from .base import SitemapTestsBase
 
-class SitemapTests(TestCase):
-    urls = 'django.contrib.sitemaps.tests.urls'
-
-    def setUp(self):
-        if Site._meta.installed:
-            self.base_url = 'http://example.com'
-        else:
-            self.base_url = 'http://testserver'
-        self.old_USE_L10N = settings.USE_L10N
-        self.old_Site_meta_installed = Site._meta.installed
-        self.old_TEMPLATE_DIRS = settings.TEMPLATE_DIRS
-        self.old_Site_meta_installed = Site._meta.installed
-        settings.TEMPLATE_DIRS = (
-            os.path.join(os.path.dirname(__file__), 'templates'),
-        )
-        # Create a user that will double as sitemap content
-        User.objects.create_user('testuser', 'test@example.com', 's3krit')
-
-    def tearDown(self):
-        settings.USE_L10N = self.old_USE_L10N
-        Site._meta.installed = self.old_Site_meta_installed
-        settings.TEMPLATE_DIRS = self.old_TEMPLATE_DIRS
-        Site._meta.installed = self.old_Site_meta_installed
+class HTTPSitemapTests(SitemapTestsBase):
 
     def test_simple_sitemap_index(self):
         "A simple sitemap index can be rendered"
@@ -53,6 +30,15 @@ class SitemapTests(TestCase):
 <sitemap><loc>%s/simple/sitemap-simple.xml</loc></sitemap>
 </sitemapindex>
 """ % self.base_url)
+
+    def test_simple_sitemap_section(self):
+        "A simple sitemap section can be rendered"
+        response = self.client.get('/simple/sitemap-simple.xml')
+        self.assertEqual(response.content, """<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<url><loc>%s/location/</loc><lastmod>%s</lastmod><changefreq>never</changefreq><priority>0.5</priority></url>
+</urlset>
+""" % (self.base_url, date.today()))
 
     def test_simple_sitemap(self):
         "A simple sitemap can be rendered"
@@ -88,48 +74,6 @@ class SitemapTests(TestCase):
         self.assertContains(response, '<lastmod>%s</lastmod>' % date.today())
         deactivate()
 
-    def test_generic_sitemap(self):
-        "A minimal generic sitemap can be rendered"
-        response = self.client.get('/generic/sitemap.xml')
-        expected = ''
-        for username in User.objects.values_list("username", flat=True):
-            expected += "<url><loc>%s/users/%s/</loc></url>" % (self.base_url, username)
-        self.assertEqual(response.content, """<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-%s
-</urlset>
-""" % expected)
-
-    @skipUnless("django.contrib.flatpages" in settings.INSTALLED_APPS, "django.contrib.flatpages app not installed.")
-    def test_flatpage_sitemap(self):
-        "Basic FlatPage sitemap test"
-
-        # Import FlatPage inside the test so that when django.contrib.flatpages
-        # is not installed we don't get problems trying to delete Site
-        # objects (FlatPage has an M2M to Site, Site.delete() tries to
-        # delete related objects, but the M2M table doesn't exist.
-        from django.contrib.flatpages.models import FlatPage
-
-        public = FlatPage.objects.create(
-            url=u'/public/',
-            title=u'Public Page',
-            enable_comments=True,
-            registration_required=False,
-        )
-        public.sites.add(settings.SITE_ID)
-        private = FlatPage.objects.create(
-            url=u'/private/',
-            title=u'Private Page',
-            enable_comments=True,
-            registration_required=True
-        )
-        private.sites.add(settings.SITE_ID)
-        response = self.client.get('/flatpages/sitemap.xml')
-        # Public flatpage should be in the sitemap
-        self.assertContains(response, '<loc>%s%s</loc>' % (self.base_url, public.url))
-        # Private flatpage should not be in the sitemap
-        self.assertNotContains(response, '<loc>%s%s</loc>' % (self.base_url, private.url))
-
     def test_requestsite_sitemap(self):
         # Make sure hitting the flatpages sitemap without the sites framework
         # installed doesn't raise an exception
@@ -141,7 +85,8 @@ class SitemapTests(TestCase):
 </urlset>
 """ % date.today())
 
-    @skipUnless("django.contrib.sites" in settings.INSTALLED_APPS, "django.contrib.sites app not installed.")
+    @skipUnless("django.contrib.sites" in settings.INSTALLED_APPS,
+                "django.contrib.sites app not installed.")
     def test_sitemap_get_urls_no_site_1(self):
         """
         Check we get ImproperlyConfigured if we don't pass a site object to

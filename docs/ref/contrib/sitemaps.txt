@@ -161,6 +161,9 @@ Sitemap class reference
         the ``get_absolute_url()`` method on each object as returned by
         :attr:`~Sitemap.items()`.
 
+        To specify a protocol other than ``'http'``, use
+        :attr:`~Sitemap.protocol`.
+
     .. attribute:: Sitemap.lastmod
 
         **Optional.** Either a method or attribute.
@@ -193,7 +196,7 @@ Sitemap class reference
         * ``'yearly'``
         * ``'never'``
 
-    .. method:: Sitemap.priority
+    .. attribute:: Sitemap.priority
 
         **Optional.** Either a method or attribute.
 
@@ -207,6 +210,18 @@ Sitemap class reference
         page is ``0.5``. See the `sitemaps.org documentation`_ for more.
 
         .. _sitemaps.org documentation: http://www.sitemaps.org/protocol.html#prioritydef
+
+    .. attribute:: Sitemap.protocol
+
+        .. versionadded:: 1.4
+
+        **Optional.**
+
+        This attribute defines the protocol (``'http'`` or ``'https'``) of the
+        URLs in the sitemap. If it isn't set, the protocol with which the
+        sitemap was requested is used. If the sitemap is built outside the
+        context of a request, the default is ``'http'``.
+
 
 Shortcuts
 =========

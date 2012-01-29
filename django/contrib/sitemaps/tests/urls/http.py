@@ -18,9 +18,7 @@ simple_sitemaps = {
 }
 
 generic_sitemaps = {
-    'generic': GenericSitemap({
-        'queryset': User.objects.all()
-    }),
+    'generic': GenericSitemap({'queryset': User.objects.all()}),
 }
 
 flatpage_sitemaps = {

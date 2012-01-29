@@ -562,6 +562,10 @@ Django 1.4 also includes several smaller improvements worth noting:
   just like with regular formsets. However, initial values only apply to extra
   forms i.e. those which are not bound to an existing model instance.
 
+* The sitemaps framework can now handle HTTPS links using the new
+  :attr:`Sitemap.protocol <django.contrib.sitemaps.Sitemap.protocol>` class
+  attribute.
+
 Backwards incompatible changes in 1.4
 =====================================
 
