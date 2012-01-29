@@ -37,9 +37,7 @@ class SitemapTests(TestCase):
 
     def test_simple_sitemap_index(self):
         "A simple sitemap index can be rendered"
-        # Retrieve the sitemap.
         response = self.client.get('/simple/index.xml')
-        # Check for all the important bits:
         self.assertEqual(response.content, """<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <sitemap><loc>%s/simple/sitemap-simple.xml</loc></sitemap>
@@ -48,9 +46,7 @@ class SitemapTests(TestCase):
 
     def test_simple_sitemap_custom_index(self):
         "A simple sitemap index can be rendered with a custom template"
-        # Retrieve the sitemap.
         response = self.client.get('/simple/custom-index.xml')
-        # Check for all the important bits:
         self.assertEqual(response.content, """<?xml version="1.0" encoding="UTF-8"?>
 <!-- This is a customised template -->
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -60,9 +56,7 @@ class SitemapTests(TestCase):
 
     def test_simple_sitemap(self):
         "A simple sitemap can be rendered"
-        # Retrieve the sitemap.
         response = self.client.get('/simple/sitemap.xml')
-        # Check for all the important bits:
         self.assertEqual(response.content, """<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url><loc>%s/location/</loc><lastmod>%s</lastmod><changefreq>never</changefreq><priority>0.5</priority></url>
@@ -71,9 +65,7 @@ class SitemapTests(TestCase):
 
     def test_simple_custom_sitemap(self):
         "A simple sitemap can be rendered with a custom template"
-        # Retrieve the sitemap.
         response = self.client.get('/simple/custom-sitemap.xml')
-        # Check for all the important bits:
         self.assertEqual(response.content, """<?xml version="1.0" encoding="UTF-8"?>
 <!-- This is a customised template -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -98,13 +90,10 @@ class SitemapTests(TestCase):
 
     def test_generic_sitemap(self):
         "A minimal generic sitemap can be rendered"
-        # Retrieve the sitemap.
         response = self.client.get('/generic/sitemap.xml')
-
         expected = ''
         for username in User.objects.values_list("username", flat=True):
             expected += "<url><loc>%s/users/%s/</loc></url>" % (self.base_url, username)
-        # Check for all the important bits:
         self.assertEqual(response.content, """<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 %s
@@ -145,9 +134,7 @@ class SitemapTests(TestCase):
         # Make sure hitting the flatpages sitemap without the sites framework
         # installed doesn't raise an exception
         Site._meta.installed = False
-        # Retrieve the sitemap.
         response = self.client.get('/simple/sitemap.xml')
-        # Check for all the important bits:
         self.assertEqual(response.content, """<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url><loc>http://testserver/location/</loc><lastmod>%s</lastmod><changefreq>never</changefreq><priority>0.5</priority></url>
@@ -182,3 +169,14 @@ class SitemapTests(TestCase):
             return isinstance(url['item'], User)
         item_in_url_info = all(map(is_user, user_sitemap.get_urls()))
         self.assertTrue(item_in_url_info)
+
+    def test_cached_sitemap_index(self):
+        """
+        Check that a cached sitemap index can be rendered (#2713).
+        """
+        response = self.client.get('/cached/index.xml')
+        self.assertEqual(response.content, """<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<sitemap><loc>%s/cached/sitemap-simple.xml</loc></sitemap>
+</sitemapindex>
+""" % self.base_url)
