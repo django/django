@@ -1002,7 +1002,7 @@ For example::
 .. versionadded:: 1.4
 
 As with the :djadmin:`startapp` command, the ``--template`` option lets you
-specify a directory or file path of a custom project template. See the
+specify a directory, file path, or URL of a custom project template. See the
 :djadmin:`startapp` documentation for details of supported project template
 formats.
 
