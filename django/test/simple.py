@@ -17,14 +17,17 @@ TEST_MODULE = 'tests'
 
 doctestOutputChecker = OutputChecker()
 
+
 class DjangoTestRunner(unittest.TextTestRunner):
     def __init__(self, *args, **kwargs):
         import warnings
         warnings.warn(
-            "DjangoTestRunner is deprecated; it's functionality is indistinguishable from TextTestRunner",
+            "DjangoTestRunner is deprecated; it's functionality is "
+            "indistinguishable from TextTestRunner",
             DeprecationWarning
         )
         super(DjangoTestRunner, self).__init__(*args, **kwargs)
+
 
 def get_tests(app_module):
     parts = app_module.__name__.split('.')
@@ -49,8 +52,11 @@ def get_tests(app_module):
             raise
     return test_module
 
+
 def build_suite(app_module):
-    "Create a complete Django test suite for the provided application module"
+    """
+    Create a complete Django test suite for the provided application module.
+    """
     suite = unittest.TestSuite()
 
     # Load unit and doctests in the models.py module. If module has
@@ -58,7 +64,8 @@ def build_suite(app_module):
     if hasattr(app_module, 'suite'):
         suite.addTest(app_module.suite())
     else:
-        suite.addTest(unittest.defaultTestLoader.loadTestsFromModule(app_module))
+        suite.addTest(unittest.defaultTestLoader.loadTestsFromModule(
+            app_module))
         try:
             suite.addTest(doctest.DocTestSuite(app_module,
                                                checker=doctestOutputChecker,
@@ -76,25 +83,29 @@ def build_suite(app_module):
         if hasattr(test_module, 'suite'):
             suite.addTest(test_module.suite())
         else:
-            suite.addTest(unittest.defaultTestLoader.loadTestsFromModule(test_module))
+            suite.addTest(unittest.defaultTestLoader.loadTestsFromModule(
+                test_module))
             try:
-                suite.addTest(doctest.DocTestSuite(test_module,
-                                                   checker=doctestOutputChecker,
-                                                   runner=DocTestRunner))
+                suite.addTest(doctest.DocTestSuite(
+                    test_module, checker=doctestOutputChecker,
+                    runner=DocTestRunner))
             except ValueError:
                 # No doc tests in tests.py
                 pass
     return suite
 
+
 def build_test(label):
-    """Construct a test case with the specified label. Label should be of the
+    """
+    Construct a test case with the specified label. Label should be of the
     form model.TestClass or model.TestClass.test_method. Returns an
     instantiated test or test suite corresponding to the label provided.
 
     """
     parts = label.split('.')
     if len(parts) < 2 or len(parts) > 3:
-        raise ValueError("Test label '%s' should be of the form app.TestCase or app.TestCase.test_method" % label)
+        raise ValueError("Test label '%s' should be of the form app.TestCase "
+                         "or app.TestCase.test_method" % label)
 
     #
     # First, look for TestCase instances with a name that matches
@@ -112,9 +123,12 @@ def build_test(label):
         if issubclass(TestClass, (unittest.TestCase, real_unittest.TestCase)):
             if len(parts) == 2: # label is app.TestClass
                 try:
-                    return unittest.TestLoader().loadTestsFromTestCase(TestClass)
+                    return unittest.TestLoader().loadTestsFromTestCase(
+                        TestClass)
                 except TypeError:
-                    raise ValueError("Test label '%s' does not refer to a test class" % label)
+                    raise ValueError(
+                        "Test label '%s' does not refer to a test class"
+                        % label)
             else: # label is app.TestClass.test_method
                 return TestClass(parts[2])
     except TypeError:
@@ -135,7 +149,8 @@ def build_test(label):
             for test in doctests:
                 if test._dt_test.name in (
                         '%s.%s' % (module.__name__, '.'.join(parts[1:])),
-                        '%s.__test__.%s' % (module.__name__, '.'.join(parts[1:]))):
+                        '%s.__test__.%s' % (
+                            module.__name__, '.'.join(parts[1:]))):
                     tests.append(test)
         except ValueError:
             # No doctests found.
@@ -147,6 +162,7 @@ def build_test(label):
 
     # Construct a suite out of the tests that matched.
     return unittest.TestSuite(tests)
+
 
 def partition_suite(suite, classes, bins):
     """
@@ -169,14 +185,15 @@ def partition_suite(suite, classes, bins):
             else:
                 bins[-1].addTest(test)
 
+
 def reorder_suite(suite, classes):
     """
     Reorders a test suite by test type.
 
-    classes is a sequence of types
+    `classes` is a sequence of types
 
-    All tests of type clases[0] are placed first, then tests of type classes[1], etc.
-    Tests with no match in classes are placed last.
+    All tests of type classes[0] are placed first, then tests of type
+    classes[1], etc. Tests with no match in classes are placed last.
     """
     class_count = len(classes)
     bins = [unittest.TestSuite() for i in range(class_count+1)]
@@ -184,6 +201,7 @@ def reorder_suite(suite, classes):
     for i in range(class_count):
         bins[0].addTests(bins[i+1])
     return bins[0]
+
 
 def dependency_ordered(test_databases, dependencies):
     """Reorder test_databases into an order that honors the dependencies
@@ -200,7 +218,8 @@ def dependency_ordered(test_databases, dependencies):
             dependencies_satisfied = True
             for alias in aliases:
                 if alias in dependencies:
-                    if all(a in resolved_databases for a in dependencies[alias]):
+                    if all(a in resolved_databases
+                           for a in dependencies[alias]):
                         # all dependencies for this alias are satisfied
                         dependencies.pop(alias)
                         resolved_databases.add(alias)
@@ -216,9 +235,11 @@ def dependency_ordered(test_databases, dependencies):
                 deferred.append((signature, (db_name, aliases)))
 
         if not changed:
-            raise ImproperlyConfigured("Circular dependency in TEST_DEPENDENCIES")
+            raise ImproperlyConfigured(
+                "Circular dependency in TEST_DEPENDENCIES")
         test_databases = deferred
     return ordered_test_databases
+
 
 class DjangoTestSuiteRunner(object):
     def __init__(self, verbosity=1, interactive=True, failfast=True, **kwargs):
@@ -264,7 +285,8 @@ class DjangoTestSuiteRunner(object):
             if connection.settings_dict['TEST_MIRROR']:
                 # If the database is marked as a test mirror, save
                 # the alias.
-                mirrored_aliases[alias] = connection.settings_dict['TEST_MIRROR']
+                mirrored_aliases[alias] = (
+                    connection.settings_dict['TEST_MIRROR'])
             else:
                 # Store a tuple with DB parameters that uniquely identify it.
                 # If we have two aliases with the same values for that tuple,
@@ -276,53 +298,57 @@ class DjangoTestSuiteRunner(object):
                 item[1].append(alias)
 
                 if 'TEST_DEPENDENCIES' in connection.settings_dict:
-                    dependencies[alias] = connection.settings_dict['TEST_DEPENDENCIES']
+                    dependencies[alias] = (
+                        connection.settings_dict['TEST_DEPENDENCIES'])
                 else:
                     if alias != DEFAULT_DB_ALIAS:
-                        dependencies[alias] = connection.settings_dict.get('TEST_DEPENDENCIES', [DEFAULT_DB_ALIAS])
+                        dependencies[alias] = connection.settings_dict.get(
+                            'TEST_DEPENDENCIES', [DEFAULT_DB_ALIAS])
 
         # Second pass -- actually create the databases.
         old_names = []
         mirrors = []
-        for signature, (db_name, aliases) in dependency_ordered(test_databases.items(), dependencies):
+        for signature, (db_name, aliases) in dependency_ordered(
+            test_databases.items(), dependencies):
             # Actually create the database for the first connection
             connection = connections[aliases[0]]
             old_names.append((connection, db_name, True))
-            test_db_name = connection.creation.create_test_db(self.verbosity, autoclobber=not self.interactive)
+            test_db_name = connection.creation.create_test_db(
+                self.verbosity, autoclobber=not self.interactive)
             for alias in aliases[1:]:
                 connection = connections[alias]
                 if db_name:
                     old_names.append((connection, db_name, False))
                     connection.settings_dict['NAME'] = test_db_name
                 else:
-                    # If settings_dict['NAME'] isn't defined, we have a backend where
-                    # the name isn't important -- e.g., SQLite, which uses :memory:.
-                    # Force create the database instead of assuming it's a duplicate.
+                    # If settings_dict['NAME'] isn't defined, we have a backend
+                    # where the name isn't important -- e.g., SQLite, which
+                    # uses :memory:. Force create the database instead of
+                    # assuming it's a duplicate.
                     old_names.append((connection, db_name, True))
-                    connection.creation.create_test_db(self.verbosity, autoclobber=not self.interactive)
+                    connection.creation.create_test_db(
+                        self.verbosity, autoclobber=not self.interactive)
 
         for alias, mirror_alias in mirrored_aliases.items():
             mirrors.append((alias, connections[alias].settings_dict['NAME']))
-            connections[alias].settings_dict['NAME'] = connections[mirror_alias].settings_dict['NAME']
+            connections[alias].settings_dict['NAME'] = (
+                connections[mirror_alias].settings_dict['NAME'])
             connections[alias].features = connections[mirror_alias].features
 
         return old_names, mirrors
 
     def run_suite(self, suite, **kwargs):
-        return unittest.TextTestRunner(verbosity=self.verbosity, failfast=self.failfast).run(suite)
+        return unittest.TextTestRunner(
+            verbosity=self.verbosity, failfast=self.failfast).run(suite)
 
     def teardown_databases(self, old_config, **kwargs):
-        from django.db import connections
+        """
+        Destroys all the non-mirror databases.
+        """
         old_names, mirrors = old_config
-        # Point all the mirrors back to the originals
-        for alias, old_name in mirrors:
-            connections[alias].settings_dict['NAME'] = old_name
-        # Destroy all the non-mirror databases
         for connection, old_name, destroy in old_names:
             if destroy:
                 connection.creation.destroy_test_db(old_name, self.verbosity)
-            else:
-                connection.settings_dict['NAME'] = old_name
 
     def teardown_test_environment(self, **kwargs):
         unittest.removeHandler()

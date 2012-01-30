@@ -946,6 +946,19 @@ apply URL escaping again. This is wrong for URLs whose unquoted form contains
 a ``%xx`` sequence, but such URLs are very unlikely to happen in the wild,
 since they would confuse browsers too.
 
+Database connections after running the test suite
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The default test runner now does not restore the database connections after the
+tests' execution any more. This prevents the production database from being
+exposed to potential threads that would still be running and attempting to
+create new connections.
+
+If your code relied on connections to the production database being created
+after the tests' execution, then you may restore the previous behavior by
+subclassing ``DjangoTestRunner`` and overriding its ``teardown_databases()``
+method.
+
 Features deprecated in 1.4
 ==========================
 
