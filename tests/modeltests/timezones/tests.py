@@ -262,6 +262,7 @@ class NewDatabaseTests(BaseDateTimeTests):
         self.assertEqual(event.dt, dt.replace(tzinfo=EAT))
 
     @requires_tz_support
+    @skipIf(sys.version_info < (2, 6), "this test requires Python >= 2.6")
     def test_datetime_from_date(self):
         dt = datetime.date(2011, 9, 1)
         with warnings.catch_warnings(record=True) as recorded:
