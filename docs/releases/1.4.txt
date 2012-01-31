@@ -946,6 +946,21 @@ apply URL escaping again. This is wrong for URLs whose unquoted form contains
 a ``%xx`` sequence, but such URLs are very unlikely to happen in the wild,
 since they would confuse browsers too.
 
+``assertTemplateUsed`` and ``assertTemplateNotUsed`` as context manager
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+It is now possible to check whether a template was used or not in a block of
+code with the :meth:`~django.test.testcase.TestCase.assertTemplateUsed` and
+:meth:`~django.test.testcase.TestCase.assertTemplateNotUsed` assertions. They
+can be used as a context manager::
+
+    with self.assertTemplateUsed('index.html'):
+        render_to_string('index.html')
+    with self.assertTemplateNotUsed('base.html'):
+        render_to_string('index.html')
+
+See the :ref:`assertion documentation<assertions>` for more information.
+
 Database connections after running the test suite
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

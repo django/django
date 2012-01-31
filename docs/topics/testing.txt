@@ -1575,10 +1575,29 @@ your test suite.
 
     The name is a string such as ``'admin/index.html'``.
 
+    .. versionadded:: 1.4
+
+    You can also use this as a context manager. The code that is executed
+    under the with statement is then observed instead of a response::
+
+        # This is necessary in Python 2.5 to enable the with statement, in 2.6
+        # and up it is no longer necessary.
+        from __future__ import with_statement
+
+        with self.assertTemplateUsed('index.html'):
+            render_to_string('index.html')
+        with self.assertTemplateUsed(template_name='index.html'):
+            render_to_string('index.html')
+
 .. method:: TestCase.assertTemplateNotUsed(response, template_name, msg_prefix='')
 
     Asserts that the template with the given name was *not* used in rendering
     the response.
+
+    .. versionadded:: 1.4
+
+    You can use this as a context manager in the same way as
+    :func:`~TestCase.assertTemplateUsed`.
 
 .. method:: TestCase.assertRedirects(response, expected_url, status_code=302, target_status_code=200, msg_prefix='')
 
