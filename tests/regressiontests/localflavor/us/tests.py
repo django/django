@@ -90,7 +90,7 @@ class USLocalFlavorTests(SimpleTestCase):
 <option value="WI">Wisconsin</option>
 <option value="WY">Wyoming</option>
 </select>"""
-        self.assertEqual(str(self.form['state']), state_select_html)
+        self.assertHTMLEqual(str(self.form['state']), state_select_html)
 
     def test_full_postal_code_list(self):
         """Test that the full USPS code field is really the full list."""
@@ -160,7 +160,7 @@ class USLocalFlavorTests(SimpleTestCase):
 <option value="WI">Wisconsin</option>
 <option value="WY">Wyoming</option>
 </select>"""
-        self.assertEqual(str(self.form['postal_code']), usps_select_html)
+        self.assertHTMLEqual(str(self.form['postal_code']), usps_select_html)
 
     def test_USStateSelect(self):
         f = USStateSelect()
@@ -225,7 +225,7 @@ class USLocalFlavorTests(SimpleTestCase):
 <option value="WI">Wisconsin</option>
 <option value="WY">Wyoming</option>
 </select>'''
-        self.assertEqual(f.render('state', 'IL'), out)
+        self.assertHTMLEqual(f.render('state', 'IL'), out)
 
     def test_USZipCodeField(self):
         error_format = [u'Enter a zip code in the format XXXXX or XXXXX-XXXX.']

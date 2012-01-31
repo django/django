@@ -8,7 +8,8 @@ from django.conf import settings
 from django.forms import *
 from django.forms.extras import SelectDateWidget
 from django.forms.util import ErrorList
-from django.utils import translation, unittest
+from django.test import TestCase
+from django.utils import translation
 from django.utils.encoding import force_unicode, smart_unicode
 
 from .error_messages import AssertFormErrorsMixin
@@ -20,7 +21,7 @@ class GetDate(Form):
 class GetDateShowHiddenInitial(Form):
     mydate = DateField(widget=SelectDateWidget, show_hidden_initial=True)
 
-class FormsExtraTestCase(unittest.TestCase, AssertFormErrorsMixin):
+class FormsExtraTestCase(TestCase, AssertFormErrorsMixin):
     ###############
     # Extra stuff #
     ###############
@@ -28,7 +29,7 @@ class FormsExtraTestCase(unittest.TestCase, AssertFormErrorsMixin):
     # The forms library comes with some extra, higher-level Field and Widget
     def test_selectdate(self):
         w = SelectDateWidget(years=('2007','2008','2009','2010','2011','2012','2013','2014','2015','2016'))
-        self.assertEqual(w.render('mydate', ''), """<select name="mydate_month" id="id_mydate_month">
+        self.assertHTMLEqual(w.render('mydate', ''), """<select name="mydate_month" id="id_mydate_month">
 <option value="0">---</option>
 <option value="1">January</option>
 <option value="2">February</option>
@@ -43,6 +44,7 @@ class FormsExtraTestCase(unittest.TestCase, AssertFormErrorsMixin):
 <option value="11">November</option>
 <option value="12">December</option>
 </select>
+
 <select name="mydate_day" id="id_mydate_day">
 <option value="0">---</option>
 <option value="1">1</option>
@@ -77,6 +79,7 @@ class FormsExtraTestCase(unittest.TestCase, AssertFormErrorsMixin):
 <option value="30">30</option>
 <option value="31">31</option>
 </select>
+
 <select name="mydate_year" id="id_mydate_year">
 <option value="0">---</option>
 <option value="2007">2007</option>
@@ -90,9 +93,9 @@ class FormsExtraTestCase(unittest.TestCase, AssertFormErrorsMixin):
 <option value="2015">2015</option>
 <option value="2016">2016</option>
 </select>""")
-        self.assertEqual(w.render('mydate', None), w.render('mydate', ''))
+        self.assertHTMLEqual(w.render('mydate', None), w.render('mydate', ''))
 
-        self.assertEqual(w.render('mydate', '2010-04-15'), """<select name="mydate_month" id="id_mydate_month">
+        self.assertHTMLEqual(w.render('mydate', '2010-04-15'), """<select name="mydate_month" id="id_mydate_month">
 <option value="1">January</option>
 <option value="2">February</option>
 <option value="3">March</option>
@@ -153,10 +156,10 @@ class FormsExtraTestCase(unittest.TestCase, AssertFormErrorsMixin):
 </select>""")
 
         # Accepts a datetime or a string:
-        self.assertEqual(w.render('mydate', datetime.date(2010, 4, 15)), w.render('mydate', '2010-04-15'))
+        self.assertHTMLEqual(w.render('mydate', datetime.date(2010, 4, 15)), w.render('mydate', '2010-04-15'))
 
         # Invalid dates still render the failed date:
-        self.assertEqual(w.render('mydate', '2010-02-31'), """<select name="mydate_month" id="id_mydate_month">
+        self.assertHTMLEqual(w.render('mydate', '2010-02-31'), """<select name="mydate_month" id="id_mydate_month">
 <option value="1">January</option>
 <option value="2" selected="selected">February</option>
 <option value="3">March</option>
@@ -218,7 +221,7 @@ class FormsExtraTestCase(unittest.TestCase, AssertFormErrorsMixin):
 
         # Using a SelectDateWidget in a form:
         w = SelectDateWidget(years=('2007','2008','2009','2010','2011','2012','2013','2014','2015','2016'), required=False)
-        self.assertEqual(w.render('mydate', ''), """<select name="mydate_month" id="id_mydate_month">
+        self.assertHTMLEqual(w.render('mydate', ''), """<select name="mydate_month" id="id_mydate_month">
 <option value="0">---</option>
 <option value="1">January</option>
 <option value="2">February</option>
@@ -280,7 +283,7 @@ class FormsExtraTestCase(unittest.TestCase, AssertFormErrorsMixin):
 <option value="2015">2015</option>
 <option value="2016">2016</option>
 </select>""")
-        self.assertEqual(w.render('mydate', '2010-04-15'), """<select name="mydate_month" id="id_mydate_month">
+        self.assertHTMLEqual(w.render('mydate', '2010-04-15'), """<select name="mydate_month" id="id_mydate_month">
 <option value="0">---</option>
 <option value="1">January</option>
 <option value="2">February</option>
@@ -351,7 +354,7 @@ class FormsExtraTestCase(unittest.TestCase, AssertFormErrorsMixin):
         # we must be prepared to accept the input from the "as_hidden"
         # rendering as well.
 
-        self.assertEqual(a['mydate'].as_hidden(), '<input type="hidden" name="mydate" value="2008-4-1" id="id_mydate" />')
+        self.assertHTMLEqual(a['mydate'].as_hidden(), '<input type="hidden" name="mydate" value="2008-4-1" id="id_mydate" />')
 
         b = GetDate({'mydate':'2008-4-1'})
         self.assertTrue(b.is_valid())
@@ -392,7 +395,7 @@ class FormsExtraTestCase(unittest.TestCase, AssertFormErrorsMixin):
                 return u'\n'.join(rendered_widgets)
 
         w = ComplexMultiWidget()
-        self.assertEqual(w.render('name', 'some text,JP,2007-04-25 06:24:00'), """<input type="text" name="name_0" value="some text" />
+        self.assertHTMLEqual(w.render('name', 'some text,JP,2007-04-25 06:24:00'), """<input type="text" name="name_0" value="some text" />
 <select multiple="multiple" name="name_1">
 <option value="J" selected="selected">John</option>
 <option value="P" selected="selected">Paul</option>
@@ -426,7 +429,7 @@ class FormsExtraTestCase(unittest.TestCase, AssertFormErrorsMixin):
             field1 = ComplexField(widget=w)
 
         f = ComplexFieldForm()
-        self.assertEqual(f.as_table(), """<tr><th><label for="id_field1_0">Field1:</label></th><td><input type="text" name="field1_0" id="id_field1_0" />
+        self.assertHTMLEqual(f.as_table(), """<tr><th><label for="id_field1_0">Field1:</label></th><td><input type="text" name="field1_0" id="id_field1_0" />
 <select multiple="multiple" name="field1_1" id="id_field1_1">
 <option value="J">John</option>
 <option value="P">Paul</option>
@@ -436,7 +439,7 @@ class FormsExtraTestCase(unittest.TestCase, AssertFormErrorsMixin):
 <input type="text" name="field1_2_0" id="id_field1_2_0" /><input type="text" name="field1_2_1" id="id_field1_2_1" /></td></tr>""")
 
         f = ComplexFieldForm({'field1_0':'some text','field1_1':['J','P'], 'field1_2_0':'2007-04-25', 'field1_2_1':'06:24:00'})
-        self.assertEqual(f.as_table(), """<tr><th><label for="id_field1_0">Field1:</label></th><td><input type="text" name="field1_0" value="some text" id="id_field1_0" />
+        self.assertHTMLEqual(f.as_table(), """<tr><th><label for="id_field1_0">Field1:</label></th><td><input type="text" name="field1_0" value="some text" id="id_field1_0" />
 <select multiple="multiple" name="field1_1" id="id_field1_1">
 <option value="J" selected="selected">John</option>
 <option value="P" selected="selected">Paul</option>
@@ -595,7 +598,7 @@ class FormsExtraTestCase(unittest.TestCase, AssertFormErrorsMixin):
 
         data = dict(email='invalid')
         f = CommentForm(data, auto_id=False, error_class=DivErrorList)
-        self.assertEqual(f.as_p(), """<p>Name: <input type="text" name="name" maxlength="50" /></p>
+        self.assertHTMLEqual(f.as_p(), """<p>Name: <input type="text" name="name" maxlength="50" /></p>
 <div class="errorlist"><div class="error">Enter a valid e-mail address.</div></div>
 <p>Email: <input type="text" name="email" value="invalid" /></p>
 <div class="errorlist"><div class="error">This field is required.</div></div>
@@ -617,7 +620,7 @@ class FormsExtraTestCase(unittest.TestCase, AssertFormErrorsMixin):
         self.assertTrue(FormWithImage().is_multipart())
 
 
-class FormsExtraL10NTestCase(unittest.TestCase):
+class FormsExtraL10NTestCase(TestCase):
     def setUp(self):
         super(FormsExtraL10NTestCase, self).setUp()
         self.old_use_l10n = getattr(settings, 'USE_L10N', False)
@@ -633,7 +636,7 @@ class FormsExtraL10NTestCase(unittest.TestCase):
         w = SelectDateWidget(years=('2007','2008','2009','2010','2011','2012','2013','2014','2015','2016'), required=False)
         self.assertEqual(w.value_from_datadict({'date_year': '2010', 'date_month': '8', 'date_day': '13'}, {}, 'date'), '13-08-2010')
 
-        self.assertEqual(w.render('date', '13-08-2010'), """<select name="date_day" id="id_date_day">
+        self.assertHTMLEqual(w.render('date', '13-08-2010'), """<select name="date_day" id="id_date_day">
 <option value="0">---</option>
 <option value="1">1</option>
 <option value="2">2</option>

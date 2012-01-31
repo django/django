@@ -25,7 +25,7 @@ class DELocalFlavorTests(SimpleTestCase):
 <option value="SH">Schleswig-Holstein</option>
 <option value="TH" selected="selected">Thuringia</option>
 </select>'''
-        self.assertEqual(f.render('states', 'TH'), out)
+        self.assertHTMLEqual(f.render('states', 'TH'), out)
 
     def test_DEZipCodeField(self):
         error_format = [u'Enter a zip code in the format XXXXX.']

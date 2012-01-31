@@ -1,6 +1,8 @@
+# -*- coding: utf-8 -*-
 from __future__ import with_statement, absolute_import
 
 from django.forms import EmailField, IntegerField
+from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.utils.unittest import skip
@@ -202,6 +204,258 @@ class SaveRestoreWarningState(TestCase):
 
         # Remove the filter we just added.
         self.restore_warnings_state()
+
+
+class HTMLEqualTests(TestCase):
+    def test_html_parser(self):
+        from django.test.html import parse_html
+        element = parse_html('<div><p>Hello</p></div>')
+        self.assertEqual(len(element.children), 1)
+        self.assertEqual(element.children[0].name, 'p')
+        self.assertEqual(element.children[0].children[0], 'Hello')
+
+        parse_html('<p>')
+        parse_html('<p attr>')
+        dom = parse_html('<p>foo')
+        self.assertEqual(len(dom.children), 1)
+        self.assertEqual(dom.name, 'p')
+        self.assertEqual(dom[0], 'foo')
+
+    def test_parse_html_in_script(self):
+        from django.test.html import parse_html
+        parse_html('<script>var a = "<p" + ">";</script>');
+        parse_html('''
+            <script>
+            var js_sha_link='<p>***</p>';
+            </script>
+        ''')
+
+        # script content will be parsed to text
+        dom = parse_html('''
+            <script><p>foo</p> '</scr'+'ipt>' <span>bar</span></script>
+        ''')
+        self.assertEqual(len(dom.children), 1)
+        self.assertEqual(dom.children[0], "<p>foo</p> '</scr'+'ipt>' <span>bar</span>")
+
+    def test_self_closing_tags(self):
+        from django.test.html import parse_html
+
+        self_closing_tags = ('br' , 'hr', 'input', 'img', 'meta', 'spacer',
+            'link', 'frame', 'base', 'col')
+        for tag in self_closing_tags:
+            dom = parse_html('<p>Hello <%s> world</p>' % tag)
+            self.assertEqual(len(dom.children), 3)
+            self.assertEqual(dom[0], 'Hello')
+            self.assertEqual(dom[1].name, tag)
+            self.assertEqual(dom[2], 'world')
+
+            dom = parse_html('<p>Hello <%s /> world</p>' % tag)
+            self.assertEqual(len(dom.children), 3)
+            self.assertEqual(dom[0], 'Hello')
+            self.assertEqual(dom[1].name, tag)
+            self.assertEqual(dom[2], 'world')
+
+    def test_simple_equal_html(self):
+        self.assertHTMLEqual('', '')
+        self.assertHTMLEqual('<p></p>', '<p></p>')
+        self.assertHTMLEqual('<p></p>', ' <p> </p> ')
+        self.assertHTMLEqual(
+            '<div><p>Hello</p></div>',
+            '<div><p>Hello</p></div>')
+        self.assertHTMLEqual(
+            '<div><p>Hello</p></div>',
+            '<div> <p>Hello</p> </div>')
+        self.assertHTMLEqual(
+            '<div>\n<p>Hello</p></div>',
+            '<div><p>Hello</p></div>\n')
+        self.assertHTMLEqual(
+            '<div><p>Hello\nWorld !</p></div>',
+            '<div><p>Hello World\n!</p></div>')
+        self.assertHTMLEqual(
+            '<div><p>Hello\nWorld !</p></div>',
+            '<div><p>Hello World\n!</p></div>')
+        self.assertHTMLEqual(
+            '<p>Hello  World   !</p>',
+            '<p>Hello World\n\n!</p>')
+        self.assertHTMLEqual('<p> </p>', '<p></p>')
+        self.assertHTMLEqual('<p/>', '<p></p>')
+        self.assertHTMLEqual('<p />', '<p></p>')
+        self.assertHTMLEqual('<input checked>', '<input checked="checked">')
+        self.assertHTMLEqual('<p>Hello', '<p> Hello')
+        self.assertHTMLEqual('<p>Hello</p>World', '<p>Hello</p> World')
+
+    def test_ignore_comments(self):
+        self.assertHTMLEqual(
+            '<div>Hello<!-- this is a comment --> World!</div>',
+            '<div>Hello World!</div>')
+
+    def test_unequal_html(self):
+        self.assertHTMLNotEqual('<p>Hello</p>', '<p>Hello!</p>')
+        self.assertHTMLNotEqual('<p>foo&#20;bar</p>', '<p>foo&nbsp;bar</p>')
+        self.assertHTMLNotEqual('<p>foo bar</p>', '<p>foo &nbsp;bar</p>')
+        self.assertHTMLNotEqual('<p>foo nbsp</p>', '<p>foo &nbsp;</p>')
+        self.assertHTMLNotEqual('<p>foo #20</p>', '<p>foo &#20;</p>')
+        self.assertHTMLNotEqual(
+            '<p><span>Hello</span><span>World</span></p>',
+            '<p><span>Hello</span>World</p>')
+        self.assertHTMLNotEqual(
+            '<p><span>Hello</span>World</p>',
+            '<p><span>Hello</span><span>World</span></p>')
+
+    def test_attributes(self):
+        self.assertHTMLEqual(
+            '<input type="text" id="id_name" />',
+            '<input id="id_name" type="text" />')
+        self.assertHTMLEqual(
+            '''<input type='text' id="id_name" />''',
+            '<input id="id_name" type="text" />')
+        self.assertHTMLNotEqual(
+            '<input type="text" id="id_name" />',
+            '<input type="password" id="id_name" />')
+
+    def test_complex_examples(self):
+        self.assertHTMLEqual(
+        """<tr><th><label for="id_first_name">First name:</label></th>
+<td><input type="text" name="first_name" value="John" id="id_first_name" /></td></tr>
+<tr><th><label for="id_last_name">Last name:</label></th>
+<td><input type="text" id="id_last_name" name="last_name" value="Lennon" /></td></tr>
+<tr><th><label for="id_birthday">Birthday:</label></th>
+<td><input type="text" value="1940-10-9" name="birthday" id="id_birthday" /></td></tr>""",
+        """
+        <tr><th>
+            <label for="id_first_name">First name:</label></th><td><input type="text" name="first_name" value="John" id="id_first_name" />
+        </td></tr>
+        <tr><th>
+            <label for="id_last_name">Last name:</label></th><td><input type="text" name="last_name" value="Lennon" id="id_last_name" />
+        </td></tr>
+        <tr><th>
+            <label for="id_birthday">Birthday:</label></th><td><input type="text" name="birthday" value="1940-10-9" id="id_birthday" />
+        </td></tr>
+        """)
+
+        self.assertHTMLEqual(
+        """<!DOCTYPE html>
+        <html>
+        <head>
+            <link rel="stylesheet">
+            <title>Document</title>
+            <meta attribute="value">
+        </head>
+        <body>
+            <p>
+            This is a valid paragraph
+            <div> this is a div AFTER the p</div>
+        </body>
+        </html>""", """
+        <html>
+        <head>
+            <link rel="stylesheet">
+            <title>Document</title>
+            <meta attribute="value">
+        </head>
+        <body>
+            <p> This is a valid paragraph
+            <!-- browsers would close the p tag here -->
+            <div> this is a div AFTER the p</div>
+            </p> <!-- this is invalid html parsing however it should make no
+            difference in most cases -->
+        </body>
+        </html>""")
+
+    def test_html_contain(self):
+        from django.test.html import parse_html
+        # equal html contains each other
+        dom1 = parse_html('<p>foo')
+        dom2 = parse_html('<p>foo</p>')
+        self.assertTrue(dom1 in dom2)
+        self.assertTrue(dom2 in dom1)
+
+        dom2 = parse_html('<div><p>foo</p></div>')
+        self.assertTrue(dom1 in dom2)
+        self.assertTrue(dom2 not in dom1)
+
+        self.assertFalse('<p>foo</p>' in dom2)
+        self.assertTrue('foo' in dom2)
+
+        # when a root element is used ...
+        dom1 = parse_html('<p>foo</p><p>bar</p>')
+        dom2 = parse_html('<p>foo</p><p>bar</p>')
+        self.assertTrue(dom1 in dom2)
+        dom1 = parse_html('<p>foo</p>')
+        self.assertTrue(dom1 in dom2)
+        dom1 = parse_html('<p>bar</p>')
+        self.assertTrue(dom1 in dom2)
+
+    def test_count(self):
+        from django.test.html import parse_html
+        # equal html contains each other one time
+        dom1 = parse_html('<p>foo')
+        dom2 = parse_html('<p>foo</p>')
+        self.assertEqual(dom1.count(dom2), 1)
+        self.assertEqual(dom2.count(dom1), 1)
+
+        dom2 = parse_html('<p>foo</p><p>bar</p>')
+        self.assertEqual(dom2.count(dom1), 1)
+
+        dom2 = parse_html('<p>foo foo</p><p>foo</p>')
+        self.assertEqual(dom2.count('foo'), 3)
+
+        dom2 = parse_html('<p class="bar">foo</p>')
+        self.assertEqual(dom2.count('bar'), 0)
+        self.assertEqual(dom2.count('class'), 0)
+        self.assertEqual(dom2.count('p'), 0)
+        self.assertEqual(dom2.count('o'), 2)
+
+        dom2 = parse_html('<p>foo</p><p>foo</p>')
+        self.assertEqual(dom2.count(dom1), 2)
+
+        dom2 = parse_html('<div><p>foo<input type=""></p><p>foo</p></div>')
+        self.assertEqual(dom2.count(dom1), 1)
+
+        dom2 = parse_html('<div><div><p>foo</p></div></div>')
+        self.assertEqual(dom2.count(dom1), 1)
+
+        dom2 = parse_html('<p>foo<p>foo</p></p>')
+        self.assertEqual(dom2.count(dom1), 1)
+
+        dom2 = parse_html('<p>foo<p>bar</p></p>')
+        self.assertEqual(dom2.count(dom1), 0)
+
+    def test_parsing_errors(self):
+        from django.test.html import HTMLParseError, parse_html
+        with self.assertRaises(AssertionError):
+            self.assertHTMLEqual('<p>', '')
+        with self.assertRaises(AssertionError):
+            self.assertHTMLEqual('', '<p>')
+        with self.assertRaises(HTMLParseError):
+            parse_html('</p>')
+        with self.assertRaises(HTMLParseError):
+            parse_html('<!--')
+
+    def test_contains_html(self):
+        response = HttpResponse('''<body>
+        This is a form: <form action="" method="get">
+            <input type="text" name="Hello" />
+        </form></body>''')
+
+        self.assertNotContains(response, "<input name='Hello' type='text'>")
+        self.assertContains(response, '<form action="" method="get">')
+
+        self.assertContains(response, "<input name='Hello' type='text'>", html=True)
+        self.assertNotContains(response, '<form action="" method="get">', html=True)
+
+        invalid_response = HttpResponse('''<body <bad>>''')
+
+        with self.assertRaises(AssertionError):
+            self.assertContains(invalid_response, '<p></p>')
+
+        with self.assertRaises(AssertionError):
+            self.assertContains(response, '<p "whats" that>')
+
+    def test_unicode_handling(self):
+        from django.http import HttpResponse
+        response = HttpResponse('<p class="help">Some help text for the title (with unicode ŠĐĆŽćžšđ)</p>')
+        self.assertContains(response, '<p class="help">Some help text for the title (with unicode ŠĐĆŽćžšđ)</p>', html=True)
 
 
 class SkippingExtraTests(TestCase):

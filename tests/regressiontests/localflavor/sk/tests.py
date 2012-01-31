@@ -17,7 +17,7 @@ class SKLocalFlavorTests(SimpleTestCase):
 <option value="TT" selected="selected">Trnava region</option>
 <option value="ZA">Zilina region</option>
 </select>'''
-        self.assertEqual(f.render('regions', 'TT'), out)
+        self.assertHTMLEqual(f.render('regions', 'TT'), out)
 
     def test_SKDistrictSelect(self):
         f = SKDistrictSelect()
@@ -102,7 +102,7 @@ class SKLocalFlavorTests(SimpleTestCase):
 <option value="ZH">Ziar nad Hronom</option>
 <option value="ZA">Zilina</option>
 </select>'''
-        self.assertEqual(f.render('Districts', 'RK'), out)
+        self.assertHTMLEqual(f.render('Districts', 'RK'), out)
 
     def test_SKPostalCodeField(self):
         error_format = [u'Enter a postal code in the format XXXXX or XXX XX.']

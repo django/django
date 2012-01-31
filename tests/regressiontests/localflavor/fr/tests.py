@@ -142,4 +142,4 @@ class FRLocalFlavorTests(SimpleTestCase):
 <option value="987">987 - Polynesie Francaise</option>
 <option value="988">988 - Nouvelle-Caledonie</option>
 </select>'''
-        self.assertEqual(f.render('dep', 'Paris'), out)
+        self.assertHTMLEqual(f.render('dep', 'Paris'), out)

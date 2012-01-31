@@ -40,4 +40,4 @@ class IELocalFlavorTests(SimpleTestCase):
 <option value="wexford">Wexford</option>
 <option value="wicklow">Wicklow</option>
 </select>'''
-        self.assertEqual(f.render('counties', 'dublin'), out)
+        self.assertHTMLEqual(f.render('counties', 'dublin'), out)

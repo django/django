@@ -33,7 +33,7 @@ class ARLocalFlavorTests(SimpleTestCase):
 <option value="V">Tierra del Fuego, Ant\xe1rtida e Islas del Atl\xe1ntico Sur</option>
 <option value="T">Tucum\xe1n</option>
 </select>'''
-        self.assertEqual(f.render('provincias', 'A'), out)
+        self.assertHTMLEqual(f.render('provincias', 'A'), out)
 
     def test_ARPostalCodeField(self):
         error_format = [u'Enter a postal code in the format NNNN or ANNNNAAA.']

@@ -105,7 +105,7 @@ class BRLocalFlavorTests(SimpleTestCase):
 <option value="SE">Sergipe</option>
 <option value="TO">Tocantins</option>
 </select>'''
-        self.assertEqual(f.render('states', 'PR'), out)
+        self.assertHTMLEqual(f.render('states', 'PR'), out)
 
     def test_BRStateChoiceField(self):
         error_invalid = [u'Select a valid brazilian state. That state is not one of the available states.']

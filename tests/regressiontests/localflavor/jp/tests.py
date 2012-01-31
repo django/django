@@ -56,7 +56,7 @@ class JPLocalFlavorTests(SimpleTestCase):
 <option value="kagoshima">Kagoshima</option>
 <option value="okinawa">Okinawa</option>
 </select>'''
-        self.assertEqual(f.render('prefecture', 'kanagawa'), out)
+        self.assertHTMLEqual(f.render('prefecture', 'kanagawa'), out)
 
     def test_JPPostalCodeField(self):
         error_format = [u'Enter a postal code in the format XXXXXXX or XXX-XXXX.']

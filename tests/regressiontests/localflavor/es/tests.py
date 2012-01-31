@@ -26,7 +26,7 @@ class ESLocalFlavorTests(SimpleTestCase):
 <option value="NA">Foral Community of Navarre</option>
 <option value="VC">Valencian Community</option>
 </select>'''
-        self.assertEqual(f.render('regions', 'CT'), out)
+        self.assertHTMLEqual(f.render('regions', 'CT'), out)
 
     def test_ESProvinceSelect(self):
         f = ESProvinceSelect()
@@ -84,7 +84,7 @@ class ESLocalFlavorTests(SimpleTestCase):
 <option value="51">Ceuta</option>
 <option value="52">Melilla</option>
 </select>'''
-        self.assertEqual(f.render('provinces', '08'), out)
+        self.assertHTMLEqual(f.render('provinces', '08'), out)
 
     def test_ESPostalCodeField(self):
         error_invalid = [u'Enter a valid postal code in the range and format 01XXX - 52XXX.']

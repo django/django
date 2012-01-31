@@ -180,7 +180,7 @@ class MKLocalFlavorTests(SimpleTestCase):
 <option value="ST">\xc5\xa0tip</option>
 <option value="SO">\xc5\xa0uto Orizari</option>
 </select>"""
-        self.assertEqual(str(self.form['municipality']), municipality_select_html)
+        self.assertHTMLEqual(str(self.form['municipality']), municipality_select_html)
 
     def test_MKIdentityCardNumberField(self):
         error_invalid  = [u'Identity card numbers must contain either 4 to 7 '
@@ -284,7 +284,7 @@ class MKLocalFlavorTests(SimpleTestCase):
 <option value="ST">\u0160tip</option>
 <option value="SO">\u0160uto Orizari</option>
 </select>'''
-        self.assertEqual(f.render('municipality', 'DL' ), out)
+        self.assertHTMLEqual(f.render('municipality', 'DL' ), out)
 
     def test_UMCNField(self):
         error_invalid = [u'This field should contain exactly 13 digits.']

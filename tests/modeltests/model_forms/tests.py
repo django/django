@@ -298,7 +298,7 @@ class ModelFormBaseTest(TestCase):
             class Meta(SomeCategoryForm.Meta):
                 exclude = ['url']
 
-        self.assertEqual(
+        self.assertHTMLEqual(
             str(SubclassMeta()),
             """<tr><th><label for="id_name">Name:</label></th><td><input id="id_name" type="text" name="name" maxlength="20" /></td></tr>
 <tr><th><label for="id_slug">Slug:</label></th><td><input id="id_slug" type="text" name="slug" maxlength="20" /></td></tr>
@@ -313,7 +313,7 @@ class ModelFormBaseTest(TestCase):
 
         self.assertEqual(OrderFields.base_fields.keys(),
                          ['url', 'name'])
-        self.assertEqual(
+        self.assertHTMLEqual(
             str(OrderFields()),
             """<tr><th><label for="id_url">The URL:</label></th><td><input id="id_url" type="text" name="url" maxlength="40" /></td></tr>
 <tr><th><label for="id_name">Name:</label></th><td><input id="id_name" type="text" name="name" maxlength="20" /></td></tr>"""
@@ -344,15 +344,15 @@ class TestWidgetForm(forms.ModelForm):
 class TestWidgets(TestCase):
     def test_base_widgets(self):
         frm = TestWidgetForm()
-        self.assertEqual(
+        self.assertHTMLEqual(
             str(frm['name']),
             '<textarea id="id_name" rows="10" cols="40" name="name"></textarea>'
         )
-        self.assertEqual(
+        self.assertHTMLEqual(
             str(frm['url']),
             '<input id="id_url" type="text" class="url" name="url" maxlength="40" />'
         )
-        self.assertEqual(
+        self.assertHTMLEqual(
             str(frm['slug']),
             '<input id="id_slug" type="text" name="slug" maxlength="20" />'
         )
@@ -563,25 +563,25 @@ class OldFormForXTests(TestCase):
     def test_base_form(self):
         self.assertEqual(Category.objects.count(), 0)
         f = BaseCategoryForm()
-        self.assertEqual(
+        self.assertHTMLEqual(
             str(f),
             """<tr><th><label for="id_name">Name:</label></th><td><input id="id_name" type="text" name="name" maxlength="20" /></td></tr>
 <tr><th><label for="id_slug">Slug:</label></th><td><input id="id_slug" type="text" name="slug" maxlength="20" /></td></tr>
 <tr><th><label for="id_url">The URL:</label></th><td><input id="id_url" type="text" name="url" maxlength="40" /></td></tr>"""
             )
-        self.assertEqual(
+        self.assertHTMLEqual(
             str(f.as_ul()),
             """<li><label for="id_name">Name:</label> <input id="id_name" type="text" name="name" maxlength="20" /></li>
 <li><label for="id_slug">Slug:</label> <input id="id_slug" type="text" name="slug" maxlength="20" /></li>
 <li><label for="id_url">The URL:</label> <input id="id_url" type="text" name="url" maxlength="40" /></li>"""
             )
-        self.assertEqual(
+        self.assertHTMLEqual(
             str(f["name"]),
             """<input id="id_name" type="text" name="name" maxlength="20" />""")
 
     def test_auto_id(self):
         f = BaseCategoryForm(auto_id=False)
-        self.assertEqual(
+        self.assertHTMLEqual(
             str(f.as_ul()),
             """<li>Name: <input type="text" name="name" maxlength="20" /></li>
 <li>Slug: <input type="text" name="slug" maxlength="20" /></li>
@@ -653,7 +653,7 @@ class OldFormForXTests(TestCase):
         # ManyToManyFields are represented by a MultipleChoiceField, ForeignKeys and any
         # fields with the 'choices' attribute are represented by a ChoiceField.
         f = ArticleForm(auto_id=False)
-        self.assertEqual(unicode(f), '''<tr><th>Headline:</th><td><input type="text" name="headline" maxlength="50" /></td></tr>
+        self.assertHTMLEqual(unicode(f), '''<tr><th>Headline:</th><td><input type="text" name="headline" maxlength="50" /></td></tr>
 <tr><th>Slug:</th><td><input type="text" name="slug" maxlength="50" /></td></tr>
 <tr><th>Pub date:</th><td><input type="text" name="pub_date" /></td></tr>
 <tr><th>Writer:</th><td><select name="writer">
@@ -681,14 +681,14 @@ class OldFormForXTests(TestCase):
         # a value of None. If a field isn't specified on a form, the object created
         # from the form can't provide a value for that field!
         f = PartialArticleForm(auto_id=False)
-        self.assertEqual(unicode(f), '''<tr><th>Headline:</th><td><input type="text" name="headline" maxlength="50" /></td></tr>
+        self.assertHTMLEqual(unicode(f), '''<tr><th>Headline:</th><td><input type="text" name="headline" maxlength="50" /></td></tr>
 <tr><th>Pub date:</th><td><input type="text" name="pub_date" /></td></tr>''')
 
         # When the ModelForm is passed an instance, that instance's current values are
         # inserted as 'initial' data in each Field.
         w = Writer.objects.get(name='Mike Royko')
         f = RoykoForm(auto_id=False, instance=w)
-        self.assertEqual(unicode(f), '''<tr><th>Name:</th><td><input type="text" name="name" value="Mike Royko" maxlength="50" /><br /><span class="helptext">Use both first and last names.</span></td></tr>''')
+        self.assertHTMLEqual(unicode(f), '''<tr><th>Name:</th><td><input type="text" name="name" value="Mike Royko" maxlength="50" /><br /><span class="helptext">Use both first and last names.</span></td></tr>''')
 
         art = Article(
                     headline='Test article',
@@ -701,7 +701,7 @@ class OldFormForXTests(TestCase):
         art_id_1 = art.id
         self.assertEqual(art_id_1 is not None, True)
         f = TestArticleForm(auto_id=False, instance=art)
-        self.assertEqual(f.as_ul(), '''<li>Headline: <input type="text" name="headline" value="Test article" maxlength="50" /></li>
+        self.assertHTMLEqual(f.as_ul(), '''<li>Headline: <input type="text" name="headline" value="Test article" maxlength="50" /></li>
 <li>Slug: <input type="text" name="slug" value="test-article" maxlength="50" /></li>
 <li>Pub date: <input type="text" name="pub_date" value="1988-01-04" /></li>
 <li>Writer: <select name="writer">
@@ -741,7 +741,7 @@ class OldFormForXTests(TestCase):
                 'slug': 'new-headline',
                 'pub_date': u'1988-01-04'
             }, auto_id=False, instance=art)
-        self.assertEqual(f.as_ul(), '''<li>Headline: <input type="text" name="headline" value="New headline" maxlength="50" /></li>
+        self.assertHTMLEqual(f.as_ul(), '''<li>Headline: <input type="text" name="headline" value="New headline" maxlength="50" /></li>
 <li>Slug: <input type="text" name="slug" value="new-headline" maxlength="50" /></li>
 <li>Pub date: <input type="text" name="pub_date" value="1988-01-04" /></li>''')
         self.assertEqual(f.is_valid(), True)
@@ -755,7 +755,7 @@ class OldFormForXTests(TestCase):
         new_art.categories.add(Category.objects.get(name='Entertainment'))
         self.assertEqual(map(lambda o: o.name, new_art.categories.all()), ["Entertainment"])
         f = TestArticleForm(auto_id=False, instance=new_art)
-        self.assertEqual(f.as_ul(), '''<li>Headline: <input type="text" name="headline" value="New headline" maxlength="50" /></li>
+        self.assertHTMLEqual(f.as_ul(), '''<li>Headline: <input type="text" name="headline" value="New headline" maxlength="50" /></li>
 <li>Slug: <input type="text" name="slug" value="new-headline" maxlength="50" /></li>
 <li>Pub date: <input type="text" name="pub_date" value="1988-01-04" /></li>
 <li>Writer: <select name="writer">
@@ -783,7 +783,7 @@ class OldFormForXTests(TestCase):
                     'headline': 'Your headline here',
                     'categories': [str(c1.id), str(c2.id)]
                 })
-        self.assertEqual(f.as_ul(), '''<li>Headline: <input type="text" name="headline" value="Your headline here" maxlength="50" /></li>
+        self.assertHTMLEqual(f.as_ul(), '''<li>Headline: <input type="text" name="headline" value="Your headline here" maxlength="50" /></li>
 <li>Slug: <input type="text" name="slug" maxlength="50" /></li>
 <li>Pub date: <input type="text" name="pub_date" /></li>
 <li>Writer: <select name="writer">
@@ -877,7 +877,7 @@ class OldFormForXTests(TestCase):
         # at runtime, based on the data in the database when the form is displayed, not
         # the data in the database when the form is instantiated.
         f = ArticleForm(auto_id=False)
-        self.assertEqual(f.as_ul(), '''<li>Headline: <input type="text" name="headline" maxlength="50" /></li>
+        self.assertHTMLEqual(f.as_ul(), '''<li>Headline: <input type="text" name="headline" maxlength="50" /></li>
 <li>Slug: <input type="text" name="slug" maxlength="50" /></li>
 <li>Pub date: <input type="text" name="pub_date" /></li>
 <li>Writer: <select name="writer">
@@ -902,7 +902,7 @@ class OldFormForXTests(TestCase):
         self.assertEqual(c4.name, 'Fourth')
         w_bernstein = Writer.objects.create(name='Carl Bernstein')
         self.assertEqual(w_bernstein.name, 'Carl Bernstein')
-        self.assertEqual(f.as_ul(), '''<li>Headline: <input type="text" name="headline" maxlength="50" /></li>
+        self.assertHTMLEqual(f.as_ul(), '''<li>Headline: <input type="text" name="headline" maxlength="50" /></li>
 <li>Slug: <input type="text" name="slug" maxlength="50" /></li>
 <li>Pub date: <input type="text" name="pub_date" /></li>
 <li>Writer: <select name="writer">
@@ -1081,7 +1081,7 @@ class OldFormForXTests(TestCase):
         bw2.delete()
 
         form = WriterProfileForm()
-        self.assertEqual(form.as_p(), '''<p><label for="id_writer">Writer:</label> <select name="writer" id="id_writer">
+        self.assertHTMLEqual(form.as_p(), '''<p><label for="id_writer">Writer:</label> <select name="writer" id="id_writer">
 <option value="" selected="selected">---------</option>
 <option value="%s">Bob Woodward</option>
 <option value="%s">Carl Bernstein</option>
@@ -1099,7 +1099,7 @@ class OldFormForXTests(TestCase):
         self.assertEqual(unicode(instance), 'Bob Woodward is 65')
 
         form = WriterProfileForm(instance=instance)
-        self.assertEqual(form.as_p(), '''<p><label for="id_writer">Writer:</label> <select name="writer" id="id_writer">
+        self.assertHTMLEqual(form.as_p(), '''<p><label for="id_writer">Writer:</label> <select name="writer" id="id_writer">
 <option value="">---------</option>
 <option value="%s" selected="selected">Bob Woodward</option>
 <option value="%s">Carl Bernstein</option>
@@ -1374,7 +1374,7 @@ class OldFormForXTests(TestCase):
         # Similar to a regular Form class you can define custom media to be used on
         # the ModelForm.
         f = ModelFormWithMedia()
-        self.assertEqual(unicode(f.media), '''<link href="/some/form/css" type="text/css" media="all" rel="stylesheet" />
+        self.assertHTMLEqual(unicode(f.media), '''<link href="/some/form/css" type="text/css" media="all" rel="stylesheet" />
 <script type="text/javascript" src="/some/form/javascript"></script>''')
 
         f = CommaSeparatedIntegerForm({'field': '1,2,3'})
@@ -1443,7 +1443,7 @@ class OldFormForXTests(TestCase):
             (22, u'Pear')))
 
         form = InventoryForm(instance=core)
-        self.assertEqual(unicode(form['parent']), '''<select name="parent" id="id_parent">
+        self.assertHTMLEqual(unicode(form['parent']), '''<select name="parent" id="id_parent">
 <option value="">---------</option>
 <option value="86" selected="selected">Apple</option>
 <option value="87">Core</option>
@@ -1464,7 +1464,7 @@ class OldFormForXTests(TestCase):
         self.assertEqual(CategoryForm.base_fields.keys(),
                          ['description', 'url'])
 
-        self.assertEqual(unicode(CategoryForm()), '''<tr><th><label for="id_description">Description:</label></th><td><input type="text" name="description" id="id_description" /></td></tr>
+        self.assertHTMLEqual(unicode(CategoryForm()), '''<tr><th><label for="id_description">Description:</label></th><td><input type="text" name="description" id="id_description" /></td></tr>
 <tr><th><label for="id_url">The URL:</label></th><td><input id="id_url" type="text" name="url" maxlength="40" /></td></tr>''')
         # to_field_name should also work on ModelMultipleChoiceField ##################
 
@@ -1479,5 +1479,5 @@ class OldFormForXTests(TestCase):
 
     def test_model_field_that_returns_none_to_exclude_itself_with_explicit_fields(self):
         self.assertEqual(CustomFieldForExclusionForm.base_fields.keys(), ['name'])
-        self.assertEqual(unicode(CustomFieldForExclusionForm()),
+        self.assertHTMLEqual(unicode(CustomFieldForExclusionForm()),
                          '''<tr><th><label for="id_name">Name:</label></th><td><input id="id_name" type="text" name="name" maxlength="10" /></td></tr>''')

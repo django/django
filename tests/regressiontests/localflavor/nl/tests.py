@@ -21,7 +21,7 @@ class NLLocalFlavorTests(SimpleTestCase):
 <option value="ZE">Zeeland</option>
 <option value="ZH">Zuid-Holland</option>
 </select>'''
-        self.assertEqual(f.render('provinces', 'OV'), out)
+        self.assertHTMLEqual(f.render('provinces', 'OV'), out)
 
     def test_NLPhoneNumberField(self):
         error_invalid = [u'Enter a valid phone number']

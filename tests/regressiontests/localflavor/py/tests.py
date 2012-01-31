@@ -26,7 +26,7 @@ class PYLocalFlavorTests(SimpleTestCase):
 <option value="PH">Pdte. Hayes</option>
 <option value="SP">San Pedro</option>
 </select>'''
-        self.assertEqual(py.render('department', 'M'), out)
+        self.assertHTMLEqual(py.render('department', 'M'), out)
 
     def test_PyNumberedDepartmentSelect(self):
         py = PyNumberedDepartmentSelect()
@@ -50,4 +50,4 @@ class PYLocalFlavorTests(SimpleTestCase):
 <option value="BQ">XVII Boquer\xf3n</option>
 <option value="AS">XVIII Asunci\xf3n</option>
 </select>'''
-        self.assertEqual(py.render('department', 'AM'), out)
+        self.assertHTMLEqual(py.render('department', 'AM'), out)

@@ -5,9 +5,9 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms import *
 from django.http import QueryDict
 from django.template import Template, Context
+from django.test import TestCase
 from django.utils.datastructures import MultiValueDict, MergeDict
 from django.utils.safestring import mark_safe
-from django.utils.unittest import TestCase
 
 
 class Person(Form):
@@ -34,14 +34,14 @@ class FormsTestCase(TestCase):
         self.assertTrue(p.is_bound)
         self.assertEqual(p.errors, {})
         self.assertTrue(p.is_valid())
-        self.assertEqual(p.errors.as_ul(), u'')
+        self.assertHTMLEqual(p.errors.as_ul(), u'')
         self.assertEqual(p.errors.as_text(), u'')
         self.assertEqual(p.cleaned_data["first_name"], u'John')
         self.assertEqual(p.cleaned_data["last_name"], u'Lennon')
         self.assertEqual(p.cleaned_data["birthday"], datetime.date(1940, 10, 9))
-        self.assertEqual(str(p['first_name']), '<input type="text" name="first_name" value="John" id="id_first_name" />')
-        self.assertEqual(str(p['last_name']), '<input type="text" name="last_name" value="Lennon" id="id_last_name" />')
-        self.assertEqual(str(p['birthday']), '<input type="text" name="birthday" value="1940-10-9" id="id_birthday" />')
+        self.assertHTMLEqual(str(p['first_name']), '<input type="text" name="first_name" value="John" id="id_first_name" />')
+        self.assertHTMLEqual(str(p['last_name']), '<input type="text" name="last_name" value="Lennon" id="id_last_name" />')
+        self.assertHTMLEqual(str(p['birthday']), '<input type="text" name="birthday" value="1940-10-9" id="id_birthday" />')
         try:
             p['nonexistentfield']
             self.fail('Attempts to access non-existent fields should fail.')
@@ -53,7 +53,7 @@ class FormsTestCase(TestCase):
         for boundfield in p:
             form_output.append(str(boundfield))
 
-        self.assertEqual('\n'.join(form_output), """<input type="text" name="first_name" value="John" id="id_first_name" />
+        self.assertHTMLEqual('\n'.join(form_output), """<input type="text" name="first_name" value="John" id="id_first_name" />
 <input type="text" name="last_name" value="Lennon" id="id_last_name" />
 <input type="text" name="birthday" value="1940-10-9" id="id_birthday" />""")
 
@@ -67,7 +67,7 @@ class FormsTestCase(TestCase):
             ['Last name', u'Lennon'],
             ['Birthday', u'1940-10-9']
         ])
-        self.assertEqual(str(p), """<tr><th><label for="id_first_name">First name:</label></th><td><input type="text" name="first_name" value="John" id="id_first_name" /></td></tr>
+        self.assertHTMLEqual(str(p), """<tr><th><label for="id_first_name">First name:</label></th><td><input type="text" name="first_name" value="John" id="id_first_name" /></td></tr>
 <tr><th><label for="id_last_name">Last name:</label></th><td><input type="text" name="last_name" value="Lennon" id="id_last_name" /></td></tr>
 <tr><th><label for="id_birthday">Birthday:</label></th><td><input type="text" name="birthday" value="1940-10-9" id="id_birthday" /></td></tr>""")
 
@@ -84,16 +84,16 @@ class FormsTestCase(TestCase):
             self.fail('Attempts to access cleaned_data when validation fails should fail.')
         except AttributeError:
             pass
-        self.assertEqual(str(p), """<tr><th><label for="id_first_name">First name:</label></th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="first_name" id="id_first_name" /></td></tr>
+        self.assertHTMLEqual(str(p), """<tr><th><label for="id_first_name">First name:</label></th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="first_name" id="id_first_name" /></td></tr>
 <tr><th><label for="id_last_name">Last name:</label></th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="last_name" id="id_last_name" /></td></tr>
 <tr><th><label for="id_birthday">Birthday:</label></th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="birthday" id="id_birthday" /></td></tr>""")
-        self.assertEqual(p.as_table(), """<tr><th><label for="id_first_name">First name:</label></th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="first_name" id="id_first_name" /></td></tr>
+        self.assertHTMLEqual(p.as_table(), """<tr><th><label for="id_first_name">First name:</label></th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="first_name" id="id_first_name" /></td></tr>
 <tr><th><label for="id_last_name">Last name:</label></th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="last_name" id="id_last_name" /></td></tr>
 <tr><th><label for="id_birthday">Birthday:</label></th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="birthday" id="id_birthday" /></td></tr>""")
-        self.assertEqual(p.as_ul(), """<li><ul class="errorlist"><li>This field is required.</li></ul><label for="id_first_name">First name:</label> <input type="text" name="first_name" id="id_first_name" /></li>
+        self.assertHTMLEqual(p.as_ul(), """<li><ul class="errorlist"><li>This field is required.</li></ul><label for="id_first_name">First name:</label> <input type="text" name="first_name" id="id_first_name" /></li>
 <li><ul class="errorlist"><li>This field is required.</li></ul><label for="id_last_name">Last name:</label> <input type="text" name="last_name" id="id_last_name" /></li>
 <li><ul class="errorlist"><li>This field is required.</li></ul><label for="id_birthday">Birthday:</label> <input type="text" name="birthday" id="id_birthday" /></li>""")
-        self.assertEqual(p.as_p(), """<ul class="errorlist"><li>This field is required.</li></ul>
+        self.assertHTMLEqual(p.as_p(), """<ul class="errorlist"><li>This field is required.</li></ul>
 <p><label for="id_first_name">First name:</label> <input type="text" name="first_name" id="id_first_name" /></p>
 <ul class="errorlist"><li>This field is required.</li></ul>
 <p><label for="id_last_name">Last name:</label> <input type="text" name="last_name" id="id_last_name" /></p>
@@ -113,31 +113,31 @@ class FormsTestCase(TestCase):
             self.fail('Attempts to access cleaned_data when validation fails should fail.')
         except AttributeError:
             pass
-        self.assertEqual(str(p), """<tr><th><label for="id_first_name">First name:</label></th><td><input type="text" name="first_name" id="id_first_name" /></td></tr>
+        self.assertHTMLEqual(str(p), """<tr><th><label for="id_first_name">First name:</label></th><td><input type="text" name="first_name" id="id_first_name" /></td></tr>
 <tr><th><label for="id_last_name">Last name:</label></th><td><input type="text" name="last_name" id="id_last_name" /></td></tr>
 <tr><th><label for="id_birthday">Birthday:</label></th><td><input type="text" name="birthday" id="id_birthday" /></td></tr>""")
-        self.assertEqual(p.as_table(), """<tr><th><label for="id_first_name">First name:</label></th><td><input type="text" name="first_name" id="id_first_name" /></td></tr>
+        self.assertHTMLEqual(p.as_table(), """<tr><th><label for="id_first_name">First name:</label></th><td><input type="text" name="first_name" id="id_first_name" /></td></tr>
 <tr><th><label for="id_last_name">Last name:</label></th><td><input type="text" name="last_name" id="id_last_name" /></td></tr>
 <tr><th><label for="id_birthday">Birthday:</label></th><td><input type="text" name="birthday" id="id_birthday" /></td></tr>""")
-        self.assertEqual(p.as_ul(), """<li><label for="id_first_name">First name:</label> <input type="text" name="first_name" id="id_first_name" /></li>
+        self.assertHTMLEqual(p.as_ul(), """<li><label for="id_first_name">First name:</label> <input type="text" name="first_name" id="id_first_name" /></li>
 <li><label for="id_last_name">Last name:</label> <input type="text" name="last_name" id="id_last_name" /></li>
 <li><label for="id_birthday">Birthday:</label> <input type="text" name="birthday" id="id_birthday" /></li>""")
-        self.assertEqual(p.as_p(), """<p><label for="id_first_name">First name:</label> <input type="text" name="first_name" id="id_first_name" /></p>
+        self.assertHTMLEqual(p.as_p(), """<p><label for="id_first_name">First name:</label> <input type="text" name="first_name" id="id_first_name" /></p>
 <p><label for="id_last_name">Last name:</label> <input type="text" name="last_name" id="id_last_name" /></p>
 <p><label for="id_birthday">Birthday:</label> <input type="text" name="birthday" id="id_birthday" /></p>""")
 
     def test_unicode_values(self):
         # Unicode values are handled properly.
         p = Person({'first_name': u'John', 'last_name': u'\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111', 'birthday': '1940-10-9'})
-        self.assertEqual(p.as_table(), u'<tr><th><label for="id_first_name">First name:</label></th><td><input type="text" name="first_name" value="John" id="id_first_name" /></td></tr>\n<tr><th><label for="id_last_name">Last name:</label></th><td><input type="text" name="last_name" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" id="id_last_name" /></td></tr>\n<tr><th><label for="id_birthday">Birthday:</label></th><td><input type="text" name="birthday" value="1940-10-9" id="id_birthday" /></td></tr>')
-        self.assertEqual(p.as_ul(), u'<li><label for="id_first_name">First name:</label> <input type="text" name="first_name" value="John" id="id_first_name" /></li>\n<li><label for="id_last_name">Last name:</label> <input type="text" name="last_name" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" id="id_last_name" /></li>\n<li><label for="id_birthday">Birthday:</label> <input type="text" name="birthday" value="1940-10-9" id="id_birthday" /></li>')
-        self.assertEqual(p.as_p(), u'<p><label for="id_first_name">First name:</label> <input type="text" name="first_name" value="John" id="id_first_name" /></p>\n<p><label for="id_last_name">Last name:</label> <input type="text" name="last_name" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" id="id_last_name" /></p>\n<p><label for="id_birthday">Birthday:</label> <input type="text" name="birthday" value="1940-10-9" id="id_birthday" /></p>')
+        self.assertHTMLEqual(p.as_table(), u'<tr><th><label for="id_first_name">First name:</label></th><td><input type="text" name="first_name" value="John" id="id_first_name" /></td></tr>\n<tr><th><label for="id_last_name">Last name:</label></th><td><input type="text" name="last_name" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" id="id_last_name" /></td></tr>\n<tr><th><label for="id_birthday">Birthday:</label></th><td><input type="text" name="birthday" value="1940-10-9" id="id_birthday" /></td></tr>')
+        self.assertHTMLEqual(p.as_ul(), u'<li><label for="id_first_name">First name:</label> <input type="text" name="first_name" value="John" id="id_first_name" /></li>\n<li><label for="id_last_name">Last name:</label> <input type="text" name="last_name" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" id="id_last_name" /></li>\n<li><label for="id_birthday">Birthday:</label> <input type="text" name="birthday" value="1940-10-9" id="id_birthday" /></li>')
+        self.assertHTMLEqual(p.as_p(), u'<p><label for="id_first_name">First name:</label> <input type="text" name="first_name" value="John" id="id_first_name" /></p>\n<p><label for="id_last_name">Last name:</label> <input type="text" name="last_name" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" id="id_last_name" /></p>\n<p><label for="id_birthday">Birthday:</label> <input type="text" name="birthday" value="1940-10-9" id="id_birthday" /></p>')
 
         p = Person({'last_name': u'Lennon'})
         self.assertEqual(p.errors['first_name'], [u'This field is required.'])
         self.assertEqual(p.errors['birthday'], [u'This field is required.'])
         self.assertFalse(p.is_valid())
-        self.assertEqual(p.errors.as_ul(), u'<ul class="errorlist"><li>first_name<ul class="errorlist"><li>This field is required.</li></ul></li><li>birthday<ul class="errorlist"><li>This field is required.</li></ul></li></ul>')
+        self.assertHTMLEqual(p.errors.as_ul(), u'<ul class="errorlist"><li>first_name<ul class="errorlist"><li>This field is required.</li></ul></li><li>birthday<ul class="errorlist"><li>This field is required.</li></ul></li></ul>')
         self.assertEqual(p.errors.as_text(), """* first_name
   * This field is required.
 * birthday
@@ -148,13 +148,13 @@ class FormsTestCase(TestCase):
         except AttributeError:
             pass
         self.assertEqual(p['first_name'].errors, [u'This field is required.'])
-        self.assertEqual(p['first_name'].errors.as_ul(), u'<ul class="errorlist"><li>This field is required.</li></ul>')
+        self.assertHTMLEqual(p['first_name'].errors.as_ul(), u'<ul class="errorlist"><li>This field is required.</li></ul>')
         self.assertEqual(p['first_name'].errors.as_text(), u'* This field is required.')
 
         p = Person()
-        self.assertEqual(str(p['first_name']), '<input type="text" name="first_name" id="id_first_name" />')
-        self.assertEqual(str(p['last_name']), '<input type="text" name="last_name" id="id_last_name" />')
-        self.assertEqual(str(p['birthday']), '<input type="text" name="birthday" id="id_birthday" />')
+        self.assertHTMLEqual(str(p['first_name']), '<input type="text" name="first_name" id="id_first_name" />')
+        self.assertHTMLEqual(str(p['last_name']), '<input type="text" name="last_name" id="id_last_name" />')
+        self.assertHTMLEqual(str(p['birthday']), '<input type="text" name="birthday" id="id_birthday" />')
 
     def test_cleaned_data_only_fields(self):
         # cleaned_data will always *only* contain a key for fields defined in the
@@ -205,13 +205,13 @@ class FormsTestCase(TestCase):
         # into which the field's name will be inserted. It will also put a <label> around
         # the human-readable labels for a field.
         p = Person(auto_id='%s_id')
-        self.assertEqual(p.as_table(), """<tr><th><label for="first_name_id">First name:</label></th><td><input type="text" name="first_name" id="first_name_id" /></td></tr>
+        self.assertHTMLEqual(p.as_table(), """<tr><th><label for="first_name_id">First name:</label></th><td><input type="text" name="first_name" id="first_name_id" /></td></tr>
 <tr><th><label for="last_name_id">Last name:</label></th><td><input type="text" name="last_name" id="last_name_id" /></td></tr>
 <tr><th><label for="birthday_id">Birthday:</label></th><td><input type="text" name="birthday" id="birthday_id" /></td></tr>""")
-        self.assertEqual(p.as_ul(), """<li><label for="first_name_id">First name:</label> <input type="text" name="first_name" id="first_name_id" /></li>
+        self.assertHTMLEqual(p.as_ul(), """<li><label for="first_name_id">First name:</label> <input type="text" name="first_name" id="first_name_id" /></li>
 <li><label for="last_name_id">Last name:</label> <input type="text" name="last_name" id="last_name_id" /></li>
 <li><label for="birthday_id">Birthday:</label> <input type="text" name="birthday" id="birthday_id" /></li>""")
-        self.assertEqual(p.as_p(), """<p><label for="first_name_id">First name:</label> <input type="text" name="first_name" id="first_name_id" /></p>
+        self.assertHTMLEqual(p.as_p(), """<p><label for="first_name_id">First name:</label> <input type="text" name="first_name" id="first_name_id" /></p>
 <p><label for="last_name_id">Last name:</label> <input type="text" name="last_name" id="last_name_id" /></p>
 <p><label for="birthday_id">Birthday:</label> <input type="text" name="birthday" id="birthday_id" /></p>""")
 
@@ -219,7 +219,7 @@ class FormsTestCase(TestCase):
         # If auto_id is any True value whose str() does not contain '%s', the "id"
         # attribute will be the name of the field.
         p = Person(auto_id=True)
-        self.assertEqual(p.as_ul(), """<li><label for="first_name">First name:</label> <input type="text" name="first_name" id="first_name" /></li>
+        self.assertHTMLEqual(p.as_ul(), """<li><label for="first_name">First name:</label> <input type="text" name="first_name" id="first_name" /></li>
 <li><label for="last_name">Last name:</label> <input type="text" name="last_name" id="last_name" /></li>
 <li><label for="birthday">Birthday:</label> <input type="text" name="birthday" id="birthday" /></li>""")
 
@@ -227,7 +227,7 @@ class FormsTestCase(TestCase):
         # If auto_id is any False value, an "id" attribute won't be output unless it
         # was manually entered.
         p = Person(auto_id=False)
-        self.assertEqual(p.as_ul(), """<li>First name: <input type="text" name="first_name" /></li>
+        self.assertHTMLEqual(p.as_ul(), """<li>First name: <input type="text" name="first_name" /></li>
 <li>Last name: <input type="text" name="last_name" /></li>
 <li>Birthday: <input type="text" name="birthday" /></li>""")
 
@@ -235,7 +235,7 @@ class FormsTestCase(TestCase):
         # In this example, auto_id is False, but the "id" attribute for the "first_name"
         # field is given. Also note that field gets a <label>, while the others don't.
         p = PersonNew(auto_id=False)
-        self.assertEqual(p.as_ul(), """<li><label for="first_name_id">First name:</label> <input type="text" id="first_name_id" name="first_name" /></li>
+        self.assertHTMLEqual(p.as_ul(), """<li><label for="first_name_id">First name:</label> <input type="text" id="first_name_id" name="first_name" /></li>
 <li>Last name: <input type="text" name="last_name" /></li>
 <li>Birthday: <input type="text" name="birthday" /></li>""")
 
@@ -243,7 +243,7 @@ class FormsTestCase(TestCase):
         # If the "id" attribute is specified in the Form and auto_id is True, the "id"
         # attribute in the Form gets precedence.
         p = PersonNew(auto_id=True)
-        self.assertEqual(p.as_ul(), """<li><label for="first_name_id">First name:</label> <input type="text" id="first_name_id" name="first_name" /></li>
+        self.assertHTMLEqual(p.as_ul(), """<li><label for="first_name_id">First name:</label> <input type="text" id="first_name_id" name="first_name" /></li>
 <li><label for="last_name">Last name:</label> <input type="text" name="last_name" id="last_name" /></li>
 <li><label for="birthday">Birthday:</label> <input type="text" name="birthday" id="birthday" /></li>""")
 
@@ -253,26 +253,26 @@ class FormsTestCase(TestCase):
             get_spam = BooleanField()
 
         f = SignupForm(auto_id=False)
-        self.assertEqual(str(f['email']), '<input type="text" name="email" />')
-        self.assertEqual(str(f['get_spam']), '<input type="checkbox" name="get_spam" />')
+        self.assertHTMLEqual(str(f['email']), '<input type="text" name="email" />')
+        self.assertHTMLEqual(str(f['get_spam']), '<input type="checkbox" name="get_spam" />')
 
         f = SignupForm({'email': 'test@example.com', 'get_spam': True}, auto_id=False)
-        self.assertEqual(str(f['email']), '<input type="text" name="email" value="test@example.com" />')
-        self.assertEqual(str(f['get_spam']), '<input checked="checked" type="checkbox" name="get_spam" />')
+        self.assertHTMLEqual(str(f['email']), '<input type="text" name="email" value="test@example.com" />')
+        self.assertHTMLEqual(str(f['get_spam']), '<input checked="checked" type="checkbox" name="get_spam" />')
 
         # 'True' or 'true' should be rendered without a value attribute
         f = SignupForm({'email': 'test@example.com', 'get_spam': 'True'}, auto_id=False)
-        self.assertEqual(str(f['get_spam']), '<input checked="checked" type="checkbox" name="get_spam" />')
+        self.assertHTMLEqual(str(f['get_spam']), '<input checked="checked" type="checkbox" name="get_spam" />')
 
         f = SignupForm({'email': 'test@example.com', 'get_spam': 'true'}, auto_id=False)
-        self.assertEqual(str(f['get_spam']), '<input checked="checked" type="checkbox" name="get_spam" />')
+        self.assertHTMLEqual(str(f['get_spam']), '<input checked="checked" type="checkbox" name="get_spam" />')
 
         # A value of 'False' or 'false' should be rendered unchecked
         f = SignupForm({'email': 'test@example.com', 'get_spam': 'False'}, auto_id=False)
-        self.assertEqual(str(f['get_spam']), '<input type="checkbox" name="get_spam" />')
+        self.assertHTMLEqual(str(f['get_spam']), '<input type="checkbox" name="get_spam" />')
 
         f = SignupForm({'email': 'test@example.com', 'get_spam': 'false'}, auto_id=False)
-        self.assertEqual(str(f['get_spam']), '<input type="checkbox" name="get_spam" />')
+        self.assertHTMLEqual(str(f['get_spam']), '<input type="checkbox" name="get_spam" />')
 
     def test_widget_output(self):
         # Any Field can have a Widget class passed to its constructor:
@@ -281,14 +281,14 @@ class FormsTestCase(TestCase):
             message = CharField(widget=Textarea)
 
         f = ContactForm(auto_id=False)
-        self.assertEqual(str(f['subject']), '<input type="text" name="subject" />')
-        self.assertEqual(str(f['message']), '<textarea rows="10" cols="40" name="message"></textarea>')
+        self.assertHTMLEqual(str(f['subject']), '<input type="text" name="subject" />')
+        self.assertHTMLEqual(str(f['message']), '<textarea name="message" rows="10" cols="40"></textarea>')
 
         # as_textarea(), as_text() and as_hidden() are shortcuts for changing the output
         # widget type:
-        self.assertEqual(f['subject'].as_textarea(), u'<textarea rows="10" cols="40" name="subject"></textarea>')
-        self.assertEqual(f['message'].as_text(), u'<input type="text" name="message" />')
-        self.assertEqual(f['message'].as_hidden(), u'<input type="hidden" name="message" />')
+        self.assertHTMLEqual(f['subject'].as_textarea(), u'<textarea name="subject" rows="10" cols="40"></textarea>')
+        self.assertHTMLEqual(f['message'].as_text(), u'<input type="text" name="message" />')
+        self.assertHTMLEqual(f['message'].as_hidden(), u'<input type="hidden" name="message" />')
 
         # The 'widget' parameter to a Field can also be an instance:
         class ContactForm(Form):
@@ -296,15 +296,15 @@ class FormsTestCase(TestCase):
             message = CharField(widget=Textarea(attrs={'rows': 80, 'cols': 20}))
 
         f = ContactForm(auto_id=False)
-        self.assertEqual(str(f['message']), '<textarea rows="80" cols="20" name="message"></textarea>')
+        self.assertHTMLEqual(str(f['message']), '<textarea name="message" rows="80" cols="20"></textarea>')
 
         # Instance-level attrs are *not* carried over to as_textarea(), as_text() and
         # as_hidden():
-        self.assertEqual(f['message'].as_text(), u'<input type="text" name="message" />')
+        self.assertHTMLEqual(f['message'].as_text(), u'<input type="text" name="message" />')
         f = ContactForm({'subject': 'Hello', 'message': 'I love you.'}, auto_id=False)
-        self.assertEqual(f['subject'].as_textarea(), u'<textarea rows="10" cols="40" name="subject">Hello</textarea>')
-        self.assertEqual(f['message'].as_text(), u'<input type="text" name="message" value="I love you." />')
-        self.assertEqual(f['message'].as_hidden(), u'<input type="hidden" name="message" value="I love you." />')
+        self.assertHTMLEqual(f['subject'].as_textarea(), u'<textarea rows="10" cols="40" name="subject">Hello</textarea>')
+        self.assertHTMLEqual(f['message'].as_text(), u'<input type="text" name="message" value="I love you." />')
+        self.assertHTMLEqual(f['message'].as_hidden(), u'<input type="hidden" name="message" value="I love you." />')
 
     def test_forms_with_choices(self):
         # For a form with a <select>, use ChoiceField:
@@ -313,12 +313,12 @@ class FormsTestCase(TestCase):
             language = ChoiceField(choices=[('P', 'Python'), ('J', 'Java')])
 
         f = FrameworkForm(auto_id=False)
-        self.assertEqual(str(f['language']), """<select name="language">
+        self.assertHTMLEqual(str(f['language']), """<select name="language">
 <option value="P">Python</option>
 <option value="J">Java</option>
 </select>""")
         f = FrameworkForm({'name': 'Django', 'language': 'P'}, auto_id=False)
-        self.assertEqual(str(f['language']), """<select name="language">
+        self.assertHTMLEqual(str(f['language']), """<select name="language">
 <option value="P" selected="selected">Python</option>
 <option value="J">Java</option>
 </select>""")
@@ -330,7 +330,7 @@ class FormsTestCase(TestCase):
             language = ChoiceField(choices=[('', '------'), ('P', 'Python'), ('J', 'Java')])
 
         f = FrameworkForm(auto_id=False)
-        self.assertEqual(str(f['language']), """<select name="language">
+        self.assertHTMLEqual(str(f['language']), """<select name="language">
 <option value="" selected="selected">------</option>
 <option value="P">Python</option>
 <option value="J">Java</option>
@@ -342,12 +342,12 @@ class FormsTestCase(TestCase):
             language = ChoiceField(choices=[('P', 'Python'), ('J', 'Java')], widget=Select(attrs={'class': 'foo'}))
 
         f = FrameworkForm(auto_id=False)
-        self.assertEqual(str(f['language']), """<select class="foo" name="language">
+        self.assertHTMLEqual(str(f['language']), """<select class="foo" name="language">
 <option value="P">Python</option>
 <option value="J">Java</option>
 </select>""")
         f = FrameworkForm({'name': 'Django', 'language': 'P'}, auto_id=False)
-        self.assertEqual(str(f['language']), """<select class="foo" name="language">
+        self.assertHTMLEqual(str(f['language']), """<select class="foo" name="language">
 <option value="P" selected="selected">Python</option>
 <option value="J">Java</option>
 </select>""")
@@ -360,12 +360,12 @@ class FormsTestCase(TestCase):
             language = ChoiceField(choices=[('P', 'Python'), ('J', 'Java')], widget=Select(choices=[('R', 'Ruby'), ('P', 'Perl')], attrs={'class': 'foo'}))
 
         f = FrameworkForm(auto_id=False)
-        self.assertEqual(str(f['language']), """<select class="foo" name="language">
+        self.assertHTMLEqual(str(f['language']), """<select class="foo" name="language">
 <option value="P">Python</option>
 <option value="J">Java</option>
 </select>""")
         f = FrameworkForm({'name': 'Django', 'language': 'P'}, auto_id=False)
-        self.assertEqual(str(f['language']), """<select class="foo" name="language">
+        self.assertHTMLEqual(str(f['language']), """<select class="foo" name="language">
 <option value="P" selected="selected">Python</option>
 <option value="J">Java</option>
 </select>""")
@@ -376,10 +376,10 @@ class FormsTestCase(TestCase):
             language = ChoiceField()
 
         f = FrameworkForm(auto_id=False)
-        self.assertEqual(str(f['language']), """<select name="language">
+        self.assertHTMLEqual(str(f['language']), """<select name="language">
 </select>""")
         f.fields['language'].choices = [('P', 'Python'), ('J', 'Java')]
-        self.assertEqual(str(f['language']), """<select name="language">
+        self.assertHTMLEqual(str(f['language']), """<select name="language">
 <option value="P">Python</option>
 <option value="J">Java</option>
 </select>""")
@@ -391,16 +391,16 @@ class FormsTestCase(TestCase):
             language = ChoiceField(choices=[('P', 'Python'), ('J', 'Java')], widget=RadioSelect)
 
         f = FrameworkForm(auto_id=False)
-        self.assertEqual(str(f['language']), """<ul>
+        self.assertHTMLEqual(str(f['language']), """<ul>
 <li><label><input type="radio" name="language" value="P" /> Python</label></li>
 <li><label><input type="radio" name="language" value="J" /> Java</label></li>
 </ul>""")
-        self.assertEqual(f.as_table(), """<tr><th>Name:</th><td><input type="text" name="name" /></td></tr>
+        self.assertHTMLEqual(f.as_table(), """<tr><th>Name:</th><td><input type="text" name="name" /></td></tr>
 <tr><th>Language:</th><td><ul>
 <li><label><input type="radio" name="language" value="P" /> Python</label></li>
 <li><label><input type="radio" name="language" value="J" /> Java</label></li>
 </ul></td></tr>""")
-        self.assertEqual(f.as_ul(), """<li>Name: <input type="text" name="name" /></li>
+        self.assertHTMLEqual(f.as_ul(), """<li>Name: <input type="text" name="name" /></li>
 <li>Language: <ul>
 <li><label><input type="radio" name="language" value="P" /> Python</label></li>
 <li><label><input type="radio" name="language" value="J" /> Java</label></li>
@@ -410,7 +410,7 @@ class FormsTestCase(TestCase):
         # gets a distinct ID, formed by appending an underscore plus the button's
         # zero-based index.
         f = FrameworkForm(auto_id='id_%s')
-        self.assertEqual(str(f['language']), """<ul>
+        self.assertHTMLEqual(str(f['language']), """<ul>
 <li><label for="id_language_0"><input type="radio" id="id_language_0" value="P" name="language" /> Python</label></li>
 <li><label for="id_language_1"><input type="radio" id="id_language_1" value="J" name="language" /> Java</label></li>
 </ul>""")
@@ -418,17 +418,17 @@ class FormsTestCase(TestCase):
         # When RadioSelect is used with auto_id, and the whole form is printed using
         # either as_table() or as_ul(), the label for the RadioSelect will point to the
         # ID of the *first* radio button.
-        self.assertEqual(f.as_table(), """<tr><th><label for="id_name">Name:</label></th><td><input type="text" name="name" id="id_name" /></td></tr>
+        self.assertHTMLEqual(f.as_table(), """<tr><th><label for="id_name">Name:</label></th><td><input type="text" name="name" id="id_name" /></td></tr>
 <tr><th><label for="id_language_0">Language:</label></th><td><ul>
 <li><label for="id_language_0"><input type="radio" id="id_language_0" value="P" name="language" /> Python</label></li>
 <li><label for="id_language_1"><input type="radio" id="id_language_1" value="J" name="language" /> Java</label></li>
 </ul></td></tr>""")
-        self.assertEqual(f.as_ul(), """<li><label for="id_name">Name:</label> <input type="text" name="name" id="id_name" /></li>
+        self.assertHTMLEqual(f.as_ul(), """<li><label for="id_name">Name:</label> <input type="text" name="name" id="id_name" /></li>
 <li><label for="id_language_0">Language:</label> <ul>
 <li><label for="id_language_0"><input type="radio" id="id_language_0" value="P" name="language" /> Python</label></li>
 <li><label for="id_language_1"><input type="radio" id="id_language_1" value="J" name="language" /> Java</label></li>
 </ul></li>""")
-        self.assertEqual(f.as_p(), """<p><label for="id_name">Name:</label> <input type="text" name="name" id="id_name" /></p>
+        self.assertHTMLEqual(f.as_p(), """<p><label for="id_name">Name:</label> <input type="text" name="name" id="id_name" /></p>
 <p><label for="id_language_0">Language:</label> <ul>
 <li><label for="id_language_0"><input type="radio" id="id_language_0" value="P" name="language" /> Python</label></li>
 <li><label for="id_language_1"><input type="radio" id="id_language_1" value="J" name="language" /> Java</label></li>
@@ -439,11 +439,11 @@ class FormsTestCase(TestCase):
             name = ChoiceField(choices=[('john', 'John'), ('paul', 'Paul'), ('george', 'George'), ('ringo', 'Ringo')], widget=RadioSelect)
 
         f = BeatleForm(auto_id=False)
-        self.assertEqual('\n'.join([str(bf) for bf in f['name']]), """<label><input type="radio" name="name" value="john" /> John</label>
+        self.assertHTMLEqual('\n'.join([str(bf) for bf in f['name']]), """<label><input type="radio" name="name" value="john" /> John</label>
 <label><input type="radio" name="name" value="paul" /> Paul</label>
 <label><input type="radio" name="name" value="george" /> George</label>
 <label><input type="radio" name="name" value="ringo" /> Ringo</label>""")
-        self.assertEqual('\n'.join(['<div>%s</div>' % bf for bf in f['name']]), """<div><label><input type="radio" name="name" value="john" /> John</label></div>
+        self.assertHTMLEqual('\n'.join(['<div>%s</div>' % bf for bf in f['name']]), """<div><label><input type="radio" name="name" value="john" /> John</label></div>
 <div><label><input type="radio" name="name" value="paul" /> Paul</label></div>
 <div><label><input type="radio" name="name" value="george" /> George</label></div>
 <div><label><input type="radio" name="name" value="ringo" /> Ringo</label></div>""")
@@ -454,7 +454,7 @@ class FormsTestCase(TestCase):
             name = CharField()
 
         f = BeatleForm(auto_id=False)
-        self.assertEqual('\n'.join([str(bf) for bf in f['name']]), u'<input type="text" name="name" />')
+        self.assertHTMLEqual('\n'.join([str(bf) for bf in f['name']]), u'<input type="text" name="name" />')
 
     def test_forms_with_multiple_choice(self):
         # MultipleChoiceField is a special case, as its data is required to be a list:
@@ -463,7 +463,7 @@ class FormsTestCase(TestCase):
             composers = MultipleChoiceField()
 
         f = SongForm(auto_id=False)
-        self.assertEqual(str(f['composers']), """<select multiple="multiple" name="composers">
+        self.assertHTMLEqual(str(f['composers']), """<select multiple="multiple" name="composers">
 </select>""")
 
         class SongForm(Form):
@@ -471,13 +471,13 @@ class FormsTestCase(TestCase):
             composers = MultipleChoiceField(choices=[('J', 'John Lennon'), ('P', 'Paul McCartney')])
 
         f = SongForm(auto_id=False)
-        self.assertEqual(str(f['composers']), """<select multiple="multiple" name="composers">
+        self.assertHTMLEqual(str(f['composers']), """<select multiple="multiple" name="composers">
 <option value="J">John Lennon</option>
 <option value="P">Paul McCartney</option>
 </select>""")
         f = SongForm({'name': 'Yesterday', 'composers': ['P']}, auto_id=False)
-        self.assertEqual(str(f['name']), '<input type="text" name="name" value="Yesterday" />')
-        self.assertEqual(str(f['composers']), """<select multiple="multiple" name="composers">
+        self.assertHTMLEqual(str(f['name']), '<input type="text" name="name" value="Yesterday" />')
+        self.assertHTMLEqual(str(f['composers']), """<select multiple="multiple" name="composers">
 <option value="J">John Lennon</option>
 <option value="P" selected="selected">Paul McCartney</option>
 </select>""")
@@ -491,9 +491,9 @@ class FormsTestCase(TestCase):
         # have multiple values, its as_hidden() renders multiple <input type="hidden">
         # tags.
         f = SongForm({'name': 'Yesterday', 'composers': ['P']}, auto_id=False)
-        self.assertEqual(f['composers'].as_hidden(), '<input type="hidden" name="composers" value="P" />')
+        self.assertHTMLEqual(f['composers'].as_hidden(), '<input type="hidden" name="composers" value="P" />')
         f = SongForm({'name': 'From Me To You', 'composers': ['P', 'J']}, auto_id=False)
-        self.assertEqual(f['composers'].as_hidden(), """<input type="hidden" name="composers" value="P" />
+        self.assertHTMLEqual(f['composers'].as_hidden(), """<input type="hidden" name="composers" value="P" />
 <input type="hidden" name="composers" value="J" />""")
 
         # DateTimeField rendered as_hidden() is special too
@@ -502,8 +502,8 @@ class FormsTestCase(TestCase):
 
         f = MessageForm({'when_0': '1992-01-01', 'when_1': '01:01'})
         self.assertTrue(f.is_valid())
-        self.assertEqual(str(f['when']), '<input type="text" name="when_0" value="1992-01-01" id="id_when_0" /><input type="text" name="when_1" value="01:01" id="id_when_1" />')
-        self.assertEqual(f['when'].as_hidden(), '<input type="hidden" name="when_0" value="1992-01-01" id="id_when_0" /><input type="hidden" name="when_1" value="01:01" id="id_when_1" />')
+        self.assertHTMLEqual(str(f['when']), '<input type="text" name="when_0" value="1992-01-01" id="id_when_0" /><input type="text" name="when_1" value="01:01" id="id_when_1" />')
+        self.assertHTMLEqual(f['when'].as_hidden(), '<input type="hidden" name="when_0" value="1992-01-01" id="id_when_0" /><input type="hidden" name="when_1" value="01:01" id="id_when_1" />')
 
     def test_mulitple_choice_checkbox(self):
         # MultipleChoiceField can also be used with the CheckboxSelectMultiple widget.
@@ -512,17 +512,17 @@ class FormsTestCase(TestCase):
             composers = MultipleChoiceField(choices=[('J', 'John Lennon'), ('P', 'Paul McCartney')], widget=CheckboxSelectMultiple)
 
         f = SongForm(auto_id=False)
-        self.assertEqual(str(f['composers']), """<ul>
+        self.assertHTMLEqual(str(f['composers']), """<ul>
 <li><label><input type="checkbox" name="composers" value="J" /> John Lennon</label></li>
 <li><label><input type="checkbox" name="composers" value="P" /> Paul McCartney</label></li>
 </ul>""")
         f = SongForm({'composers': ['J']}, auto_id=False)
-        self.assertEqual(str(f['composers']), """<ul>
+        self.assertHTMLEqual(str(f['composers']), """<ul>
 <li><label><input checked="checked" type="checkbox" name="composers" value="J" /> John Lennon</label></li>
 <li><label><input type="checkbox" name="composers" value="P" /> Paul McCartney</label></li>
 </ul>""")
         f = SongForm({'composers': ['J', 'P']}, auto_id=False)
-        self.assertEqual(str(f['composers']), """<ul>
+        self.assertHTMLEqual(str(f['composers']), """<ul>
 <li><label><input checked="checked" type="checkbox" name="composers" value="J" /> John Lennon</label></li>
 <li><label><input checked="checked" type="checkbox" name="composers" value="P" /> Paul McCartney</label></li>
 </ul>""")
@@ -536,7 +536,7 @@ class FormsTestCase(TestCase):
             composers = MultipleChoiceField(choices=[('J', 'John Lennon'), ('P', 'Paul McCartney')], widget=CheckboxSelectMultiple)
 
         f = SongForm(auto_id='%s_id')
-        self.assertEqual(str(f['composers']), """<ul>
+        self.assertHTMLEqual(str(f['composers']), """<ul>
 <li><label for="composers_id_0"><input type="checkbox" name="composers" value="J" id="composers_id_0" /> John Lennon</label></li>
 <li><label for="composers_id_1"><input type="checkbox" name="composers" value="P" id="composers_id_1" /> Paul McCartney</label></li>
 </ul>""")
@@ -576,7 +576,7 @@ class FormsTestCase(TestCase):
             composers = MultipleChoiceField(choices=[('J', 'John Lennon'), ('P', 'Paul McCartney')], widget=MultipleHiddenInput)
 
         f = SongFormHidden(MultiValueDict(dict(name=['Yesterday'], composers=['J', 'P'])), auto_id=False)
-        self.assertEqual(f.as_ul(), """<li>Name: <input type="text" name="name" value="Yesterday" /><input type="hidden" name="composers" value="J" />
+        self.assertHTMLEqual(f.as_ul(), """<li>Name: <input type="text" name="name" value="Yesterday" /><input type="hidden" name="composers" value="J" />
 <input type="hidden" name="composers" value="P" /></li>""")
 
         # When using CheckboxSelectMultiple, the framework expects a list of input and
@@ -605,13 +605,13 @@ class FormsTestCase(TestCase):
                 raise ValidationError(mark_safe("'<b>%s</b>' is a safe string" % self.cleaned_data['special_safe_name']))
 
         f = EscapingForm({'special_name': "Nothing to escape", 'special_safe_name': "Nothing to escape"}, auto_id=False)
-        self.assertEqual(f.as_table(), """<tr><th>&lt;em&gt;Special&lt;/em&gt; Field:</th><td><ul class="errorlist"><li>Something&#39;s wrong with &#39;Nothing to escape&#39;</li></ul><input type="text" name="special_name" value="Nothing to escape" /></td></tr>
+        self.assertHTMLEqual(f.as_table(), """<tr><th>&lt;em&gt;Special&lt;/em&gt; Field:</th><td><ul class="errorlist"><li>Something&#39;s wrong with &#39;Nothing to escape&#39;</li></ul><input type="text" name="special_name" value="Nothing to escape" /></td></tr>
 <tr><th><em>Special</em> Field:</th><td><ul class="errorlist"><li>'<b>Nothing to escape</b>' is a safe string</li></ul><input type="text" name="special_safe_name" value="Nothing to escape" /></td></tr>""")
         f = EscapingForm({
             'special_name': "Should escape < & > and <script>alert('xss')</script>",
             'special_safe_name': "<i>Do not escape</i>"
         }, auto_id=False)
-        self.assertEqual(f.as_table(), """<tr><th>&lt;em&gt;Special&lt;/em&gt; Field:</th><td><ul class="errorlist"><li>Something&#39;s wrong with &#39;Should escape &lt; &amp; &gt; and &lt;script&gt;alert(&#39;xss&#39;)&lt;/script&gt;&#39;</li></ul><input type="text" name="special_name" value="Should escape &lt; &amp; &gt; and &lt;script&gt;alert(&#39;xss&#39;)&lt;/script&gt;" /></td></tr>
+        self.assertHTMLEqual(f.as_table(), """<tr><th>&lt;em&gt;Special&lt;/em&gt; Field:</th><td><ul class="errorlist"><li>Something&#39;s wrong with &#39;Should escape &lt; &amp; &gt; and &lt;script&gt;alert(&#39;xss&#39;)&lt;/script&gt;&#39;</li></ul><input type="text" name="special_name" value="Should escape &lt; &amp; &gt; and &lt;script&gt;alert(&#39;xss&#39;)&lt;/script&gt;" /></td></tr>
 <tr><th><em>Special</em> Field:</th><td><ul class="errorlist"><li>'<b><i>Do not escape</i></b>' is a safe string</li></ul><input type="text" name="special_safe_name" value="&lt;i&gt;Do not escape&lt;/i&gt;" /></td></tr>""")
 
     def test_validating_multiple_fields(self):
@@ -668,7 +668,7 @@ class FormsTestCase(TestCase):
         f = UserRegistration(auto_id=False)
         self.assertEqual(f.errors, {})
         f = UserRegistration({}, auto_id=False)
-        self.assertEqual(f.as_table(), """<tr><th>Username:</th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="username" maxlength="10" /></td></tr>
+        self.assertHTMLEqual(f.as_table(), """<tr><th>Username:</th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="username" maxlength="10" /></td></tr>
 <tr><th>Password1:</th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="password" name="password1" /></td></tr>
 <tr><th>Password2:</th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="password" name="password2" /></td></tr>""")
         self.assertEqual(f.errors['username'], [u'This field is required.'])
@@ -676,11 +676,11 @@ class FormsTestCase(TestCase):
         self.assertEqual(f.errors['password2'], [u'This field is required.'])
         f = UserRegistration({'username': 'adrian', 'password1': 'foo', 'password2': 'bar'}, auto_id=False)
         self.assertEqual(f.errors['__all__'], [u'Please make sure your passwords match.'])
-        self.assertEqual(f.as_table(), """<tr><td colspan="2"><ul class="errorlist"><li>Please make sure your passwords match.</li></ul></td></tr>
+        self.assertHTMLEqual(f.as_table(), """<tr><td colspan="2"><ul class="errorlist"><li>Please make sure your passwords match.</li></ul></td></tr>
 <tr><th>Username:</th><td><input type="text" name="username" value="adrian" maxlength="10" /></td></tr>
 <tr><th>Password1:</th><td><input type="password" name="password1" /></td></tr>
 <tr><th>Password2:</th><td><input type="password" name="password2" /></td></tr>""")
-        self.assertEqual(f.as_ul(), """<li><ul class="errorlist"><li>Please make sure your passwords match.</li></ul></li>
+        self.assertHTMLEqual(f.as_ul(), """<li><ul class="errorlist"><li>Please make sure your passwords match.</li></ul></li>
 <li>Username: <input type="text" name="username" value="adrian" maxlength="10" /></li>
 <li>Password1: <input type="password" name="password1" /></li>
 <li>Password2: <input type="password" name="password2" /></li>""")
@@ -703,7 +703,7 @@ class FormsTestCase(TestCase):
                 self.fields['birthday'] = DateField()
 
         p = Person(auto_id=False)
-        self.assertEqual(p.as_table(), """<tr><th>First name:</th><td><input type="text" name="first_name" /></td></tr>
+        self.assertHTMLEqual(p.as_table(), """<tr><th>First name:</th><td><input type="text" name="first_name" /></td></tr>
 <tr><th>Last name:</th><td><input type="text" name="last_name" /></td></tr>
 <tr><th>Birthday:</th><td><input type="text" name="birthday" /></td></tr>""")
 
@@ -718,11 +718,11 @@ class FormsTestCase(TestCase):
 
         field_list = [('field1', CharField()), ('field2', CharField())]
         my_form = MyForm(field_list=field_list)
-        self.assertEqual(my_form.as_table(), """<tr><th>Field1:</th><td><input type="text" name="field1" /></td></tr>
+        self.assertHTMLEqual(my_form.as_table(), """<tr><th>Field1:</th><td><input type="text" name="field1" /></td></tr>
 <tr><th>Field2:</th><td><input type="text" name="field2" /></td></tr>""")
         field_list = [('field3', CharField()), ('field4', CharField())]
         my_form = MyForm(field_list=field_list)
-        self.assertEqual(my_form.as_table(), """<tr><th>Field3:</th><td><input type="text" name="field3" /></td></tr>
+        self.assertHTMLEqual(my_form.as_table(), """<tr><th>Field3:</th><td><input type="text" name="field3" /></td></tr>
 <tr><th>Field4:</th><td><input type="text" name="field4" /></td></tr>""")
 
         class MyForm(Form):
@@ -737,13 +737,13 @@ class FormsTestCase(TestCase):
 
         field_list = [('field1', CharField()), ('field2', CharField())]
         my_form = MyForm(field_list=field_list)
-        self.assertEqual(my_form.as_table(), """<tr><th>Default field 1:</th><td><input type="text" name="default_field_1" /></td></tr>
+        self.assertHTMLEqual(my_form.as_table(), """<tr><th>Default field 1:</th><td><input type="text" name="default_field_1" /></td></tr>
 <tr><th>Default field 2:</th><td><input type="text" name="default_field_2" /></td></tr>
 <tr><th>Field1:</th><td><input type="text" name="field1" /></td></tr>
 <tr><th>Field2:</th><td><input type="text" name="field2" /></td></tr>""")
         field_list = [('field3', CharField()), ('field4', CharField())]
         my_form = MyForm(field_list=field_list)
-        self.assertEqual(my_form.as_table(), """<tr><th>Default field 1:</th><td><input type="text" name="default_field_1" /></td></tr>
+        self.assertHTMLEqual(my_form.as_table(), """<tr><th>Default field 1:</th><td><input type="text" name="default_field_1" /></td></tr>
 <tr><th>Default field 2:</th><td><input type="text" name="default_field_2" /></td></tr>
 <tr><th>Field3:</th><td><input type="text" name="field3" /></td></tr>
 <tr><th>Field4:</th><td><input type="text" name="field4" /></td></tr>""")
@@ -836,25 +836,25 @@ class FormsTestCase(TestCase):
             birthday = DateField()
 
         p = Person(auto_id=False)
-        self.assertEqual(p.as_table(), """<tr><th>First name:</th><td><input type="text" name="first_name" /></td></tr>
+        self.assertHTMLEqual(p.as_table(), """<tr><th>First name:</th><td><input type="text" name="first_name" /></td></tr>
 <tr><th>Last name:</th><td><input type="text" name="last_name" /></td></tr>
 <tr><th>Birthday:</th><td><input type="text" name="birthday" /><input type="hidden" name="hidden_text" /></td></tr>""")
-        self.assertEqual(p.as_ul(), """<li>First name: <input type="text" name="first_name" /></li>
+        self.assertHTMLEqual(p.as_ul(), """<li>First name: <input type="text" name="first_name" /></li>
 <li>Last name: <input type="text" name="last_name" /></li>
 <li>Birthday: <input type="text" name="birthday" /><input type="hidden" name="hidden_text" /></li>""")
-        self.assertEqual(p.as_p(), """<p>First name: <input type="text" name="first_name" /></p>
+        self.assertHTMLEqual(p.as_p(), """<p>First name: <input type="text" name="first_name" /></p>
 <p>Last name: <input type="text" name="last_name" /></p>
 <p>Birthday: <input type="text" name="birthday" /><input type="hidden" name="hidden_text" /></p>""")
 
         # With auto_id set, a HiddenInput still gets an ID, but it doesn't get a label.
         p = Person(auto_id='id_%s')
-        self.assertEqual(p.as_table(), """<tr><th><label for="id_first_name">First name:</label></th><td><input type="text" name="first_name" id="id_first_name" /></td></tr>
+        self.assertHTMLEqual(p.as_table(), """<tr><th><label for="id_first_name">First name:</label></th><td><input type="text" name="first_name" id="id_first_name" /></td></tr>
 <tr><th><label for="id_last_name">Last name:</label></th><td><input type="text" name="last_name" id="id_last_name" /></td></tr>
 <tr><th><label for="id_birthday">Birthday:</label></th><td><input type="text" name="birthday" id="id_birthday" /><input type="hidden" name="hidden_text" id="id_hidden_text" /></td></tr>""")
-        self.assertEqual(p.as_ul(), """<li><label for="id_first_name">First name:</label> <input type="text" name="first_name" id="id_first_name" /></li>
+        self.assertHTMLEqual(p.as_ul(), """<li><label for="id_first_name">First name:</label> <input type="text" name="first_name" id="id_first_name" /></li>
 <li><label for="id_last_name">Last name:</label> <input type="text" name="last_name" id="id_last_name" /></li>
 <li><label for="id_birthday">Birthday:</label> <input type="text" name="birthday" id="id_birthday" /><input type="hidden" name="hidden_text" id="id_hidden_text" /></li>""")
-        self.assertEqual(p.as_p(), """<p><label for="id_first_name">First name:</label> <input type="text" name="first_name" id="id_first_name" /></p>
+        self.assertHTMLEqual(p.as_p(), """<p><label for="id_first_name">First name:</label> <input type="text" name="first_name" id="id_first_name" /></p>
 <p><label for="id_last_name">Last name:</label> <input type="text" name="last_name" id="id_last_name" /></p>
 <p><label for="id_birthday">Birthday:</label> <input type="text" name="birthday" id="id_birthday" /><input type="hidden" name="hidden_text" id="id_hidden_text" /></p>""")
 
@@ -863,15 +863,15 @@ class FormsTestCase(TestCase):
         # prepended. This message is displayed at the top of the output, regardless of
         # its field's order in the form.
         p = Person({'first_name': 'John', 'last_name': 'Lennon', 'birthday': '1940-10-9'}, auto_id=False)
-        self.assertEqual(p.as_table(), """<tr><td colspan="2"><ul class="errorlist"><li>(Hidden field hidden_text) This field is required.</li></ul></td></tr>
+        self.assertHTMLEqual(p.as_table(), """<tr><td colspan="2"><ul class="errorlist"><li>(Hidden field hidden_text) This field is required.</li></ul></td></tr>
 <tr><th>First name:</th><td><input type="text" name="first_name" value="John" /></td></tr>
 <tr><th>Last name:</th><td><input type="text" name="last_name" value="Lennon" /></td></tr>
 <tr><th>Birthday:</th><td><input type="text" name="birthday" value="1940-10-9" /><input type="hidden" name="hidden_text" /></td></tr>""")
-        self.assertEqual(p.as_ul(), """<li><ul class="errorlist"><li>(Hidden field hidden_text) This field is required.</li></ul></li>
+        self.assertHTMLEqual(p.as_ul(), """<li><ul class="errorlist"><li>(Hidden field hidden_text) This field is required.</li></ul></li>
 <li>First name: <input type="text" name="first_name" value="John" /></li>
 <li>Last name: <input type="text" name="last_name" value="Lennon" /></li>
 <li>Birthday: <input type="text" name="birthday" value="1940-10-9" /><input type="hidden" name="hidden_text" /></li>""")
-        self.assertEqual(p.as_p(), """<ul class="errorlist"><li>(Hidden field hidden_text) This field is required.</li></ul>
+        self.assertHTMLEqual(p.as_p(), """<ul class="errorlist"><li>(Hidden field hidden_text) This field is required.</li></ul>
 <p>First name: <input type="text" name="first_name" value="John" /></p>
 <p>Last name: <input type="text" name="last_name" value="Lennon" /></p>
 <p>Birthday: <input type="text" name="birthday" value="1940-10-9" /><input type="hidden" name="hidden_text" /></p>""")
@@ -882,9 +882,9 @@ class FormsTestCase(TestCase):
             bar = CharField(widget=HiddenInput)
 
         p = TestForm(auto_id=False)
-        self.assertEqual(p.as_table(), '<input type="hidden" name="foo" /><input type="hidden" name="bar" />')
-        self.assertEqual(p.as_ul(), '<input type="hidden" name="foo" /><input type="hidden" name="bar" />')
-        self.assertEqual(p.as_p(), '<input type="hidden" name="foo" /><input type="hidden" name="bar" />')
+        self.assertHTMLEqual(p.as_table(), '<input type="hidden" name="foo" /><input type="hidden" name="bar" />')
+        self.assertHTMLEqual(p.as_ul(), '<input type="hidden" name="foo" /><input type="hidden" name="bar" />')
+        self.assertHTMLEqual(p.as_p(), '<input type="hidden" name="foo" /><input type="hidden" name="bar" />')
 
     def test_field_order(self):
         # A Form's fields are displayed in the same order in which they were defined.
@@ -905,7 +905,7 @@ class FormsTestCase(TestCase):
             field14 = CharField()
 
         p = TestForm(auto_id=False)
-        self.assertEqual(p.as_table(), """<tr><th>Field1:</th><td><input type="text" name="field1" /></td></tr>
+        self.assertHTMLEqual(p.as_table(), """<tr><th>Field1:</th><td><input type="text" name="field1" /></td></tr>
 <tr><th>Field2:</th><td><input type="text" name="field2" /></td></tr>
 <tr><th>Field3:</th><td><input type="text" name="field3" /></td></tr>
 <tr><th>Field4:</th><td><input type="text" name="field4" /></td></tr>
@@ -932,7 +932,7 @@ class FormsTestCase(TestCase):
             address = CharField()                                 # no max_length defined here
 
         p = UserRegistration(auto_id=False)
-        self.assertEqual(p.as_ul(), """<li>Username: <input type="text" name="username" maxlength="10" /></li>
+        self.assertHTMLEqual(p.as_ul(), """<li>Username: <input type="text" name="username" maxlength="10" /></li>
 <li>Password: <input type="password" name="password" maxlength="10" /></li>
 <li>Realname: <input type="text" name="realname" maxlength="10" /></li>
 <li>Address: <input type="text" name="address" /></li>""")
@@ -945,7 +945,7 @@ class FormsTestCase(TestCase):
             password = CharField(max_length=10, widget=PasswordInput)
 
         p = UserRegistration(auto_id=False)
-        self.assertEqual(p.as_ul(), """<li>Username: <input type="text" name="username" maxlength="10" /></li>
+        self.assertHTMLEqual(p.as_ul(), """<li>Username: <input type="text" name="username" maxlength="10" /></li>
 <li>Password: <input type="password" name="password" maxlength="10" /></li>""")
 
     def test_specifying_labels(self):
@@ -958,7 +958,7 @@ class FormsTestCase(TestCase):
             password2 = CharField(widget=PasswordInput, label='Password (again)')
 
         p = UserRegistration(auto_id=False)
-        self.assertEqual(p.as_ul(), """<li>Your username: <input type="text" name="username" maxlength="10" /></li>
+        self.assertHTMLEqual(p.as_ul(), """<li>Your username: <input type="text" name="username" maxlength="10" /></li>
 <li>Password1: <input type="password" name="password1" /></li>
 <li>Password (again): <input type="password" name="password2" /></li>""")
 
@@ -971,12 +971,12 @@ class FormsTestCase(TestCase):
             q4 = CharField(label='Answer this question!')
             q5 = CharField(label='The last question. Period.')
 
-        self.assertEqual(Questions(auto_id=False).as_p(), """<p>The first question: <input type="text" name="q1" /></p>
+        self.assertHTMLEqual(Questions(auto_id=False).as_p(), """<p>The first question: <input type="text" name="q1" /></p>
 <p>What is your name? <input type="text" name="q2" /></p>
 <p>The answer to life is: <input type="text" name="q3" /></p>
 <p>Answer this question! <input type="text" name="q4" /></p>
 <p>The last question. Period. <input type="text" name="q5" /></p>""")
-        self.assertEqual(Questions().as_p(), """<p><label for="id_q1">The first question:</label> <input type="text" name="q1" id="id_q1" /></p>
+        self.assertHTMLEqual(Questions().as_p(), """<p><label for="id_q1">The first question:</label> <input type="text" name="q1" id="id_q1" /></p>
 <p><label for="id_q2">What is your name?</label> <input type="text" name="q2" id="id_q2" /></p>
 <p><label for="id_q3">The answer to life is:</label> <input type="text" name="q3" id="id_q3" /></p>
 <p><label for="id_q4">Answer this question!</label> <input type="text" name="q4" id="id_q4" /></p>
@@ -988,7 +988,7 @@ class FormsTestCase(TestCase):
             password = CharField(widget=PasswordInput, label=u'\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111')
 
         p = UserRegistration(auto_id=False)
-        self.assertEqual(p.as_ul(), u'<li>\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111: <input type="text" name="username" maxlength="10" /></li>\n<li>\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111: <input type="password" name="password" /></li>')
+        self.assertHTMLEqual(p.as_ul(), u'<li>\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111: <input type="text" name="username" maxlength="10" /></li>\n<li>\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111: <input type="password" name="password" /></li>')
 
         # If a label is set to the empty string for a field, that field won't get a label.
         class UserRegistration(Form):
@@ -996,10 +996,10 @@ class FormsTestCase(TestCase):
             password = CharField(widget=PasswordInput)
 
         p = UserRegistration(auto_id=False)
-        self.assertEqual(p.as_ul(), """<li> <input type="text" name="username" maxlength="10" /></li>
+        self.assertHTMLEqual(p.as_ul(), """<li> <input type="text" name="username" maxlength="10" /></li>
 <li>Password: <input type="password" name="password" /></li>""")
         p = UserRegistration(auto_id='id_%s')
-        self.assertEqual(p.as_ul(), """<li> <input id="id_username" type="text" name="username" maxlength="10" /></li>
+        self.assertHTMLEqual(p.as_ul(), """<li> <input id="id_username" type="text" name="username" maxlength="10" /></li>
 <li><label for="id_password">Password:</label> <input type="password" name="password" id="id_password" /></li>""")
 
         # If label is None, Django will auto-create the label from the field name. This
@@ -1009,10 +1009,10 @@ class FormsTestCase(TestCase):
             password = CharField(widget=PasswordInput)
 
         p = UserRegistration(auto_id=False)
-        self.assertEqual(p.as_ul(), """<li>Username: <input type="text" name="username" maxlength="10" /></li>
+        self.assertHTMLEqual(p.as_ul(), """<li>Username: <input type="text" name="username" maxlength="10" /></li>
 <li>Password: <input type="password" name="password" /></li>""")
         p = UserRegistration(auto_id='id_%s')
-        self.assertEqual(p.as_ul(), """<li><label for="id_username">Username:</label> <input id="id_username" type="text" name="username" maxlength="10" /></li>
+        self.assertHTMLEqual(p.as_ul(), """<li><label for="id_username">Username:</label> <input id="id_username" type="text" name="username" maxlength="10" /></li>
 <li><label for="id_password">Password:</label> <input type="password" name="password" id="id_password" /></li>""")
 
     def test_label_suffix(self):
@@ -1026,16 +1026,16 @@ class FormsTestCase(TestCase):
             animal = CharField(label='Favorite animal')
 
         f = FavoriteForm(auto_id=False)
-        self.assertEqual(f.as_ul(), """<li>Favorite color? <input type="text" name="color" /></li>
+        self.assertHTMLEqual(f.as_ul(), """<li>Favorite color? <input type="text" name="color" /></li>
 <li>Favorite animal: <input type="text" name="animal" /></li>""")
         f = FavoriteForm(auto_id=False, label_suffix='?')
-        self.assertEqual(f.as_ul(), """<li>Favorite color? <input type="text" name="color" /></li>
+        self.assertHTMLEqual(f.as_ul(), """<li>Favorite color? <input type="text" name="color" /></li>
 <li>Favorite animal? <input type="text" name="animal" /></li>""")
         f = FavoriteForm(auto_id=False, label_suffix='')
-        self.assertEqual(f.as_ul(), """<li>Favorite color? <input type="text" name="color" /></li>
+        self.assertHTMLEqual(f.as_ul(), """<li>Favorite color? <input type="text" name="color" /></li>
 <li>Favorite animal <input type="text" name="animal" /></li>""")
         f = FavoriteForm(auto_id=False, label_suffix=u'\u2192')
-        self.assertEqual(f.as_ul(), u'<li>Favorite color? <input type="text" name="color" /></li>\n<li>Favorite animal\u2192 <input type="text" name="animal" /></li>')
+        self.assertHTMLEqual(f.as_ul(), u'<li>Favorite color? <input type="text" name="color" /></li>\n<li>Favorite animal\u2192 <input type="text" name="animal" /></li>')
 
     def test_initial_data(self):
         # You can specify initial data for a field by using the 'initial' argument to a
@@ -1049,18 +1049,18 @@ class FormsTestCase(TestCase):
 
         # Here, we're not submitting any data, so the initial value will be displayed.)
         p = UserRegistration(auto_id=False)
-        self.assertEqual(p.as_ul(), """<li>Username: <input type="text" name="username" value="django" maxlength="10" /></li>
+        self.assertHTMLEqual(p.as_ul(), """<li>Username: <input type="text" name="username" value="django" maxlength="10" /></li>
 <li>Password: <input type="password" name="password" /></li>""")
 
         # Here, we're submitting data, so the initial value will *not* be displayed.
         p = UserRegistration({}, auto_id=False)
-        self.assertEqual(p.as_ul(), """<li><ul class="errorlist"><li>This field is required.</li></ul>Username: <input type="text" name="username" maxlength="10" /></li>
+        self.assertHTMLEqual(p.as_ul(), """<li><ul class="errorlist"><li>This field is required.</li></ul>Username: <input type="text" name="username" maxlength="10" /></li>
 <li><ul class="errorlist"><li>This field is required.</li></ul>Password: <input type="password" name="password" /></li>""")
         p = UserRegistration({'username': u''}, auto_id=False)
-        self.assertEqual(p.as_ul(), """<li><ul class="errorlist"><li>This field is required.</li></ul>Username: <input type="text" name="username" maxlength="10" /></li>
+        self.assertHTMLEqual(p.as_ul(), """<li><ul class="errorlist"><li>This field is required.</li></ul>Username: <input type="text" name="username" maxlength="10" /></li>
 <li><ul class="errorlist"><li>This field is required.</li></ul>Password: <input type="password" name="password" /></li>""")
         p = UserRegistration({'username': u'foo'}, auto_id=False)
-        self.assertEqual(p.as_ul(), """<li>Username: <input type="text" name="username" value="foo" maxlength="10" /></li>
+        self.assertHTMLEqual(p.as_ul(), """<li>Username: <input type="text" name="username" value="foo" maxlength="10" /></li>
 <li><ul class="errorlist"><li>This field is required.</li></ul>Password: <input type="password" name="password" /></li>""")
 
         # An 'initial' value is *not* used as a fallback if data is not provided. In this
@@ -1082,21 +1082,21 @@ class FormsTestCase(TestCase):
 
         # Here, we're not submitting any data, so the initial value will be displayed.)
         p = UserRegistration(initial={'username': 'django'}, auto_id=False)
-        self.assertEqual(p.as_ul(), """<li>Username: <input type="text" name="username" value="django" maxlength="10" /></li>
+        self.assertHTMLEqual(p.as_ul(), """<li>Username: <input type="text" name="username" value="django" maxlength="10" /></li>
 <li>Password: <input type="password" name="password" /></li>""")
         p = UserRegistration(initial={'username': 'stephane'}, auto_id=False)
-        self.assertEqual(p.as_ul(), """<li>Username: <input type="text" name="username" value="stephane" maxlength="10" /></li>
+        self.assertHTMLEqual(p.as_ul(), """<li>Username: <input type="text" name="username" value="stephane" maxlength="10" /></li>
 <li>Password: <input type="password" name="password" /></li>""")
 
         # The 'initial' parameter is meaningless if you pass data.
         p = UserRegistration({}, initial={'username': 'django'}, auto_id=False)
-        self.assertEqual(p.as_ul(), """<li><ul class="errorlist"><li>This field is required.</li></ul>Username: <input type="text" name="username" maxlength="10" /></li>
+        self.assertHTMLEqual(p.as_ul(), """<li><ul class="errorlist"><li>This field is required.</li></ul>Username: <input type="text" name="username" maxlength="10" /></li>
 <li><ul class="errorlist"><li>This field is required.</li></ul>Password: <input type="password" name="password" /></li>""")
         p = UserRegistration({'username': u''}, initial={'username': 'django'}, auto_id=False)
-        self.assertEqual(p.as_ul(), """<li><ul class="errorlist"><li>This field is required.</li></ul>Username: <input type="text" name="username" maxlength="10" /></li>
+        self.assertHTMLEqual(p.as_ul(), """<li><ul class="errorlist"><li>This field is required.</li></ul>Username: <input type="text" name="username" maxlength="10" /></li>
 <li><ul class="errorlist"><li>This field is required.</li></ul>Password: <input type="password" name="password" /></li>""")
         p = UserRegistration({'username': u'foo'}, initial={'username': 'django'}, auto_id=False)
-        self.assertEqual(p.as_ul(), """<li>Username: <input type="text" name="username" value="foo" maxlength="10" /></li>
+        self.assertHTMLEqual(p.as_ul(), """<li>Username: <input type="text" name="username" value="foo" maxlength="10" /></li>
 <li><ul class="errorlist"><li>This field is required.</li></ul>Password: <input type="password" name="password" /></li>""")
 
         # A dynamic 'initial' value is *not* used as a fallback if data is not provided.
@@ -1113,7 +1113,7 @@ class FormsTestCase(TestCase):
             password = CharField(widget=PasswordInput)
 
         p = UserRegistration(initial={'username': 'babik'}, auto_id=False)
-        self.assertEqual(p.as_ul(), """<li>Username: <input type="text" name="username" value="babik" maxlength="10" /></li>
+        self.assertHTMLEqual(p.as_ul(), """<li>Username: <input type="text" name="username" value="babik" maxlength="10" /></li>
 <li>Password: <input type="password" name="password" /></li>""")
 
     def test_callable_initial_data(self):
@@ -1139,7 +1139,7 @@ class FormsTestCase(TestCase):
 
         # Here, we're not submitting any data, so the initial value will be displayed.)
         p = UserRegistration(initial={'username': initial_django, 'options': initial_options}, auto_id=False)
-        self.assertEqual(p.as_ul(), """<li>Username: <input type="text" name="username" value="django" maxlength="10" /></li>
+        self.assertHTMLEqual(p.as_ul(), """<li>Username: <input type="text" name="username" value="django" maxlength="10" /></li>
 <li>Password: <input type="password" name="password" /></li>
 <li>Options: <select multiple="multiple" name="options">
 <option value="f" selected="selected">foo</option>
@@ -1149,7 +1149,7 @@ class FormsTestCase(TestCase):
 
         # The 'initial' parameter is meaningless if you pass data.
         p = UserRegistration({}, initial={'username': initial_django, 'options': initial_options}, auto_id=False)
-        self.assertEqual(p.as_ul(), """<li><ul class="errorlist"><li>This field is required.</li></ul>Username: <input type="text" name="username" maxlength="10" /></li>
+        self.assertHTMLEqual(p.as_ul(), """<li><ul class="errorlist"><li>This field is required.</li></ul>Username: <input type="text" name="username" maxlength="10" /></li>
 <li><ul class="errorlist"><li>This field is required.</li></ul>Password: <input type="password" name="password" /></li>
 <li><ul class="errorlist"><li>This field is required.</li></ul>Options: <select multiple="multiple" name="options">
 <option value="f">foo</option>
@@ -1157,7 +1157,7 @@ class FormsTestCase(TestCase):
 <option value="w">whiz</option>
 </select></li>""")
         p = UserRegistration({'username': u''}, initial={'username': initial_django}, auto_id=False)
-        self.assertEqual(p.as_ul(), """<li><ul class="errorlist"><li>This field is required.</li></ul>Username: <input type="text" name="username" maxlength="10" /></li>
+        self.assertHTMLEqual(p.as_ul(), """<li><ul class="errorlist"><li>This field is required.</li></ul>Username: <input type="text" name="username" maxlength="10" /></li>
 <li><ul class="errorlist"><li>This field is required.</li></ul>Password: <input type="password" name="password" /></li>
 <li><ul class="errorlist"><li>This field is required.</li></ul>Options: <select multiple="multiple" name="options">
 <option value="f">foo</option>
@@ -1165,7 +1165,7 @@ class FormsTestCase(TestCase):
 <option value="w">whiz</option>
 </select></li>""")
         p = UserRegistration({'username': u'foo', 'options':['f','b']}, initial={'username': initial_django}, auto_id=False)
-        self.assertEqual(p.as_ul(), """<li>Username: <input type="text" name="username" value="foo" maxlength="10" /></li>
+        self.assertHTMLEqual(p.as_ul(), """<li>Username: <input type="text" name="username" value="foo" maxlength="10" /></li>
 <li><ul class="errorlist"><li>This field is required.</li></ul>Password: <input type="password" name="password" /></li>
 <li>Options: <select multiple="multiple" name="options">
 <option value="f" selected="selected">foo</option>
@@ -1188,7 +1188,7 @@ class FormsTestCase(TestCase):
            options = MultipleChoiceField(choices=[('f','foo'),('b','bar'),('w','whiz')], initial=initial_other_options)
 
         p = UserRegistration(auto_id=False)
-        self.assertEqual(p.as_ul(), """<li>Username: <input type="text" name="username" value="django" maxlength="10" /></li>
+        self.assertHTMLEqual(p.as_ul(), """<li>Username: <input type="text" name="username" value="django" maxlength="10" /></li>
 <li>Password: <input type="password" name="password" /></li>
 <li>Options: <select multiple="multiple" name="options">
 <option value="f">foo</option>
@@ -1196,7 +1196,7 @@ class FormsTestCase(TestCase):
 <option value="w" selected="selected">whiz</option>
 </select></li>""")
         p = UserRegistration(initial={'username': initial_stephane, 'options': initial_options}, auto_id=False)
-        self.assertEqual(p.as_ul(), """<li>Username: <input type="text" name="username" value="stephane" maxlength="10" /></li>
+        self.assertHTMLEqual(p.as_ul(), """<li>Username: <input type="text" name="username" value="stephane" maxlength="10" /></li>
 <li>Password: <input type="password" name="password" /></li>
 <li>Options: <select multiple="multiple" name="options">
 <option value="f" selected="selected">foo</option>
@@ -1226,16 +1226,16 @@ class FormsTestCase(TestCase):
             password = CharField(widget=PasswordInput, help_text='Choose wisely.')
 
         p = UserRegistration(auto_id=False)
-        self.assertEqual(p.as_ul(), """<li>Username: <input type="text" name="username" maxlength="10" /> <span class="helptext">e.g., user@example.com</span></li>
+        self.assertHTMLEqual(p.as_ul(), """<li>Username: <input type="text" name="username" maxlength="10" /> <span class="helptext">e.g., user@example.com</span></li>
 <li>Password: <input type="password" name="password" /> <span class="helptext">Choose wisely.</span></li>""")
-        self.assertEqual(p.as_p(), """<p>Username: <input type="text" name="username" maxlength="10" /> <span class="helptext">e.g., user@example.com</span></p>
+        self.assertHTMLEqual(p.as_p(), """<p>Username: <input type="text" name="username" maxlength="10" /> <span class="helptext">e.g., user@example.com</span></p>
 <p>Password: <input type="password" name="password" /> <span class="helptext">Choose wisely.</span></p>""")
-        self.assertEqual(p.as_table(), """<tr><th>Username:</th><td><input type="text" name="username" maxlength="10" /><br /><span class="helptext">e.g., user@example.com</span></td></tr>
+        self.assertHTMLEqual(p.as_table(), """<tr><th>Username:</th><td><input type="text" name="username" maxlength="10" /><br /><span class="helptext">e.g., user@example.com</span></td></tr>
 <tr><th>Password:</th><td><input type="password" name="password" /><br /><span class="helptext">Choose wisely.</span></td></tr>""")
 
         # The help text is displayed whether or not data is provided for the form.
         p = UserRegistration({'username': u'foo'}, auto_id=False)
-        self.assertEqual(p.as_ul(), """<li>Username: <input type="text" name="username" value="foo" maxlength="10" /> <span class="helptext">e.g., user@example.com</span></li>
+        self.assertHTMLEqual(p.as_ul(), """<li>Username: <input type="text" name="username" value="foo" maxlength="10" /> <span class="helptext">e.g., user@example.com</span></li>
 <li><ul class="errorlist"><li>This field is required.</li></ul>Password: <input type="password" name="password" /> <span class="helptext">Choose wisely.</span></li>""")
 
         # help_text is not displayed for hidden fields. It can be used for documentation
@@ -1246,7 +1246,7 @@ class FormsTestCase(TestCase):
             next = CharField(widget=HiddenInput, initial='/', help_text='Redirect destination')
 
         p = UserRegistration(auto_id=False)
-        self.assertEqual(p.as_ul(), """<li>Username: <input type="text" name="username" maxlength="10" /> <span class="helptext">e.g., user@example.com</span></li>
+        self.assertHTMLEqual(p.as_ul(), """<li>Username: <input type="text" name="username" maxlength="10" /> <span class="helptext">e.g., user@example.com</span></li>
 <li>Password: <input type="password" name="password" /><input type="hidden" name="next" value="/" /></li>""")
 
         # Help text can include arbitrary Unicode characters.
@@ -1254,7 +1254,7 @@ class FormsTestCase(TestCase):
             username = CharField(max_length=10, help_text='ŠĐĆŽćžšđ')
 
         p = UserRegistration(auto_id=False)
-        self.assertEqual(p.as_ul(), u'<li>Username: <input type="text" name="username" maxlength="10" /> <span class="helptext">\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111</span></li>')
+        self.assertHTMLEqual(p.as_ul(), u'<li>Username: <input type="text" name="username" maxlength="10" /> <span class="helptext">\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111</span></li>')
 
     def test_subclassing_forms(self):
         # You can subclass a Form to add fields. The resulting form subclass will have
@@ -1269,11 +1269,11 @@ class FormsTestCase(TestCase):
             instrument = CharField()
 
         p = Person(auto_id=False)
-        self.assertEqual(p.as_ul(), """<li>First name: <input type="text" name="first_name" /></li>
+        self.assertHTMLEqual(p.as_ul(), """<li>First name: <input type="text" name="first_name" /></li>
 <li>Last name: <input type="text" name="last_name" /></li>
 <li>Birthday: <input type="text" name="birthday" /></li>""")
         m = Musician(auto_id=False)
-        self.assertEqual(m.as_ul(), """<li>First name: <input type="text" name="first_name" /></li>
+        self.assertHTMLEqual(m.as_ul(), """<li>First name: <input type="text" name="first_name" /></li>
 <li>Last name: <input type="text" name="last_name" /></li>
 <li>Birthday: <input type="text" name="birthday" /></li>
 <li>Instrument: <input type="text" name="instrument" /></li>""")
@@ -1292,7 +1292,7 @@ class FormsTestCase(TestCase):
             haircut_type = CharField()
 
         b = Beatle(auto_id=False)
-        self.assertEqual(b.as_ul(), """<li>First name: <input type="text" name="first_name" /></li>
+        self.assertHTMLEqual(b.as_ul(), """<li>First name: <input type="text" name="first_name" /></li>
 <li>Last name: <input type="text" name="last_name" /></li>
 <li>Birthday: <input type="text" name="birthday" /></li>
 <li>Instrument: <input type="text" name="instrument" /></li>
@@ -1317,12 +1317,12 @@ class FormsTestCase(TestCase):
             'person1-birthday': u'1940-10-9'
         }
         p = Person(data, prefix='person1')
-        self.assertEqual(p.as_ul(), """<li><label for="id_person1-first_name">First name:</label> <input type="text" name="person1-first_name" value="John" id="id_person1-first_name" /></li>
+        self.assertHTMLEqual(p.as_ul(), """<li><label for="id_person1-first_name">First name:</label> <input type="text" name="person1-first_name" value="John" id="id_person1-first_name" /></li>
 <li><label for="id_person1-last_name">Last name:</label> <input type="text" name="person1-last_name" value="Lennon" id="id_person1-last_name" /></li>
 <li><label for="id_person1-birthday">Birthday:</label> <input type="text" name="person1-birthday" value="1940-10-9" id="id_person1-birthday" /></li>""")
-        self.assertEqual(str(p['first_name']), '<input type="text" name="person1-first_name" value="John" id="id_person1-first_name" />')
-        self.assertEqual(str(p['last_name']), '<input type="text" name="person1-last_name" value="Lennon" id="id_person1-last_name" />')
-        self.assertEqual(str(p['birthday']), '<input type="text" name="person1-birthday" value="1940-10-9" id="id_person1-birthday" />')
+        self.assertHTMLEqual(str(p['first_name']), '<input type="text" name="person1-first_name" value="John" id="id_person1-first_name" />')
+        self.assertHTMLEqual(str(p['last_name']), '<input type="text" name="person1-last_name" value="Lennon" id="id_person1-last_name" />')
+        self.assertHTMLEqual(str(p['birthday']), '<input type="text" name="person1-birthday" value="1940-10-9" id="id_person1-birthday" />')
         self.assertEqual(p.errors, {})
         self.assertTrue(p.is_valid())
         self.assertEqual(p.cleaned_data['first_name'], u'John')
@@ -1393,7 +1393,7 @@ class FormsTestCase(TestCase):
                 return self.prefix and '%s-prefix-%s' % (self.prefix, field_name) or field_name
 
         p = Person(prefix='foo')
-        self.assertEqual(p.as_ul(), """<li><label for="id_foo-prefix-first_name">First name:</label> <input type="text" name="foo-prefix-first_name" id="id_foo-prefix-first_name" /></li>
+        self.assertHTMLEqual(p.as_ul(), """<li><label for="id_foo-prefix-first_name">First name:</label> <input type="text" name="foo-prefix-first_name" id="id_foo-prefix-first_name" /></li>
 <li><label for="id_foo-prefix-last_name">Last name:</label> <input type="text" name="foo-prefix-last_name" id="id_foo-prefix-last_name" /></li>
 <li><label for="id_foo-prefix-birthday">Birthday:</label> <input type="text" name="foo-prefix-birthday" id="id_foo-prefix-birthday" /></li>""")
         data = {
@@ -1415,37 +1415,37 @@ class FormsTestCase(TestCase):
             is_cool = NullBooleanField()
 
         p = Person({'name': u'Joe'}, auto_id=False)
-        self.assertEqual(str(p['is_cool']), """<select name="is_cool">
+        self.assertHTMLEqual(str(p['is_cool']), """<select name="is_cool">
 <option value="1" selected="selected">Unknown</option>
 <option value="2">Yes</option>
 <option value="3">No</option>
 </select>""")
         p = Person({'name': u'Joe', 'is_cool': u'1'}, auto_id=False)
-        self.assertEqual(str(p['is_cool']), """<select name="is_cool">
+        self.assertHTMLEqual(str(p['is_cool']), """<select name="is_cool">
 <option value="1" selected="selected">Unknown</option>
 <option value="2">Yes</option>
 <option value="3">No</option>
 </select>""")
         p = Person({'name': u'Joe', 'is_cool': u'2'}, auto_id=False)
-        self.assertEqual(str(p['is_cool']), """<select name="is_cool">
+        self.assertHTMLEqual(str(p['is_cool']), """<select name="is_cool">
 <option value="1">Unknown</option>
 <option value="2" selected="selected">Yes</option>
 <option value="3">No</option>
 </select>""")
         p = Person({'name': u'Joe', 'is_cool': u'3'}, auto_id=False)
-        self.assertEqual(str(p['is_cool']), """<select name="is_cool">
+        self.assertHTMLEqual(str(p['is_cool']), """<select name="is_cool">
 <option value="1">Unknown</option>
 <option value="2">Yes</option>
 <option value="3" selected="selected">No</option>
 </select>""")
         p = Person({'name': u'Joe', 'is_cool': True}, auto_id=False)
-        self.assertEqual(str(p['is_cool']), """<select name="is_cool">
+        self.assertHTMLEqual(str(p['is_cool']), """<select name="is_cool">
 <option value="1">Unknown</option>
 <option value="2" selected="selected">Yes</option>
 <option value="3">No</option>
 </select>""")
         p = Person({'name': u'Joe', 'is_cool': False}, auto_id=False)
-        self.assertEqual(str(p['is_cool']), """<select name="is_cool">
+        self.assertHTMLEqual(str(p['is_cool']), """<select name="is_cool">
 <option value="1">Unknown</option>
 <option value="2">Yes</option>
 <option value="3" selected="selected">No</option>
@@ -1458,23 +1458,23 @@ class FormsTestCase(TestCase):
             file1 = FileField()
 
         f = FileForm(auto_id=False)
-        self.assertEqual(f.as_table(), '<tr><th>File1:</th><td><input type="file" name="file1" /></td></tr>')
+        self.assertHTMLEqual(f.as_table(), '<tr><th>File1:</th><td><input type="file" name="file1" /></td></tr>')
 
         f = FileForm(data={}, files={}, auto_id=False)
-        self.assertEqual(f.as_table(), '<tr><th>File1:</th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="file" name="file1" /></td></tr>')
+        self.assertHTMLEqual(f.as_table(), '<tr><th>File1:</th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="file" name="file1" /></td></tr>')
 
         f = FileForm(data={}, files={'file1': SimpleUploadedFile('name', '')}, auto_id=False)
-        self.assertEqual(f.as_table(), '<tr><th>File1:</th><td><ul class="errorlist"><li>The submitted file is empty.</li></ul><input type="file" name="file1" /></td></tr>')
+        self.assertHTMLEqual(f.as_table(), '<tr><th>File1:</th><td><ul class="errorlist"><li>The submitted file is empty.</li></ul><input type="file" name="file1" /></td></tr>')
 
         f = FileForm(data={}, files={'file1': 'something that is not a file'}, auto_id=False)
-        self.assertEqual(f.as_table(), '<tr><th>File1:</th><td><ul class="errorlist"><li>No file was submitted. Check the encoding type on the form.</li></ul><input type="file" name="file1" /></td></tr>')
+        self.assertHTMLEqual(f.as_table(), '<tr><th>File1:</th><td><ul class="errorlist"><li>No file was submitted. Check the encoding type on the form.</li></ul><input type="file" name="file1" /></td></tr>')
 
         f = FileForm(data={}, files={'file1': SimpleUploadedFile('name', 'some content')}, auto_id=False)
-        self.assertEqual(f.as_table(), '<tr><th>File1:</th><td><input type="file" name="file1" /></td></tr>')
+        self.assertHTMLEqual(f.as_table(), '<tr><th>File1:</th><td><input type="file" name="file1" /></td></tr>')
         self.assertTrue(f.is_valid())
 
         f = FileForm(data={}, files={'file1': SimpleUploadedFile('我隻氣墊船裝滿晒鱔.txt', 'मेरी मँडराने वाली नाव सर्पमीनों से भरी ह')}, auto_id=False)
-        self.assertEqual(f.as_table(), '<tr><th>File1:</th><td><input type="file" name="file1" /></td></tr>')
+        self.assertHTMLEqual(f.as_table(), '<tr><th>File1:</th><td><input type="file" name="file1" /></td></tr>')
 
     def test_basic_processing_in_view(self):
         class UserRegistration(Form):
@@ -1501,7 +1501,7 @@ class FormsTestCase(TestCase):
             return t.render(Context({'form': form}))
 
         # Case 1: GET (an empty form, with no errors).)
-        self.assertEqual(my_function('GET', {}), """<form action="" method="post">
+        self.assertHTMLEqual(my_function('GET', {}), """<form action="" method="post">
 <table>
 <tr><th>Username:</th><td><input type="text" name="username" maxlength="10" /></td></tr>
 <tr><th>Password1:</th><td><input type="password" name="password1" /></td></tr>
@@ -1510,7 +1510,7 @@ class FormsTestCase(TestCase):
 <input type="submit" />
 </form>""")
         # Case 2: POST with erroneous data (a redisplayed form, with errors).)
-        self.assertEqual(my_function('POST', {'username': 'this-is-a-long-username', 'password1': 'foo', 'password2': 'bar'}), """<form action="" method="post">
+        self.assertHTMLEqual(my_function('POST', {'username': 'this-is-a-long-username', 'password1': 'foo', 'password2': 'bar'}), """<form action="" method="post">
 <table>
 <tr><td colspan="2"><ul class="errorlist"><li>Please make sure your passwords match.</li></ul></td></tr>
 <tr><th>Username:</th><td><ul class="errorlist"><li>Ensure this value has at most 10 characters (it has 23).</li></ul><input type="text" name="username" value="this-is-a-long-username" maxlength="10" /></td></tr>
@@ -1520,7 +1520,7 @@ class FormsTestCase(TestCase):
 <input type="submit" />
 </form>""")
         # Case 3: POST with valid data (the success message).)
-        self.assertEqual(my_function('POST', {'username': 'adrian', 'password1': 'secret', 'password2': 'secret'}), "VALID: {'username': u'adrian', 'password1': u'secret', 'password2': u'secret'}")
+        self.assertHTMLEqual(my_function('POST', {'username': 'adrian', 'password1': 'secret', 'password2': 'secret'}), "VALID: {'username': u'adrian', 'password1': u'secret', 'password2': u'secret'}")
 
     def test_templates_with_forms(self):
         class UserRegistration(Form):
@@ -1545,13 +1545,13 @@ class FormsTestCase(TestCase):
 {{ form.password2.errors.as_ul }}<p><label>Password (again): {{ form.password2 }}</label></p>
 <input type="submit" />
 </form>''')
-        self.assertEqual(t.render(Context({'form': UserRegistration(auto_id=False)})), """<form action="">
+        self.assertHTMLEqual(t.render(Context({'form': UserRegistration(auto_id=False)})), """<form action="">
 <p><label>Your username: <input type="text" name="username" maxlength="10" /></label></p>
 <p><label>Password: <input type="password" name="password1" /></label></p>
 <p><label>Password (again): <input type="password" name="password2" /></label></p>
 <input type="submit" />
 </form>""")
-        self.assertEqual(t.render(Context({'form': UserRegistration({'username': 'django'}, auto_id=False)})), """<form action="">
+        self.assertHTMLEqual(t.render(Context({'form': UserRegistration({'username': 'django'}, auto_id=False)})), """<form action="">
 <p><label>Your username: <input type="text" name="username" value="django" maxlength="10" /></label></p>
 <ul class="errorlist"><li>This field is required.</li></ul><p><label>Password: <input type="password" name="password1" /></label></p>
 <ul class="errorlist"><li>This field is required.</li></ul><p><label>Password (again): <input type="password" name="password2" /></label></p>
@@ -1568,7 +1568,7 @@ class FormsTestCase(TestCase):
 <p><label>{{ form.password2.label }}: {{ form.password2 }}</label></p>
 <input type="submit" />
 </form>''')
-        self.assertEqual(t.render(Context({'form': UserRegistration(auto_id=False)})), """<form action="">
+        self.assertHTMLEqual(t.render(Context({'form': UserRegistration(auto_id=False)})), """<form action="">
 <p><label>Username: <input type="text" name="username" maxlength="10" /></label></p>
 <p><label>Password1: <input type="password" name="password1" /></label></p>
 <p><label>Password2: <input type="password" name="password2" /></label></p>
@@ -1585,13 +1585,13 @@ class FormsTestCase(TestCase):
 <p>{{ form.password2.label_tag }}: {{ form.password2 }}</p>
 <input type="submit" />
 </form>''')
-        self.assertEqual(t.render(Context({'form': UserRegistration(auto_id=False)})), """<form action="">
+        self.assertHTMLEqual(t.render(Context({'form': UserRegistration(auto_id=False)})), """<form action="">
 <p>Username: <input type="text" name="username" maxlength="10" /></p>
 <p>Password1: <input type="password" name="password1" /></p>
 <p>Password2: <input type="password" name="password2" /></p>
 <input type="submit" />
 </form>""")
-        self.assertEqual(t.render(Context({'form': UserRegistration(auto_id='id_%s')})), """<form action="">
+        self.assertHTMLEqual(t.render(Context({'form': UserRegistration(auto_id='id_%s')})), """<form action="">
 <p><label for="id_username">Username</label>: <input id="id_username" type="text" name="username" maxlength="10" /></p>
 <p><label for="id_password1">Password1</label>: <input type="password" name="password1" id="id_password1" /></p>
 <p><label for="id_password2">Password2</label>: <input type="password" name="password2" id="id_password2" /></p>
@@ -1606,7 +1606,7 @@ class FormsTestCase(TestCase):
 <p>{{ form.password2.label_tag }}: {{ form.password2 }}</p>
 <input type="submit" />
 </form>''')
-        self.assertEqual(t.render(Context({'form': UserRegistration(auto_id=False)})), """<form action="">
+        self.assertHTMLEqual(t.render(Context({'form': UserRegistration(auto_id=False)})), """<form action="">
 <p>Username: <input type="text" name="username" maxlength="10" /><br />Good luck picking a username that doesn&#39;t already exist.</p>
 <p>Password1: <input type="password" name="password1" /></p>
 <p>Password2: <input type="password" name="password2" /></p>
@@ -1622,11 +1622,14 @@ class FormsTestCase(TestCase):
         for bf in f:
             form_output.append(bf.label_tag(attrs={'class': 'pretty'}))
 
-        self.assertEqual(form_output, [
+        expected_form_output = [
             '<label for="id_username" class="pretty">Username</label>',
             '<label for="id_password1" class="pretty">Password1</label>',
             '<label for="id_password2" class="pretty">Password2</label>',
-        ])
+        ]
+        self.assertEqual(len(form_output), len(expected_form_output))
+        for i in range(len(form_output)):
+            self.assertHTMLEqual(form_output[i], expected_form_output[i])
 
         # To display the errors that aren't associated with a particular field -- e.g.,
         # the errors caused by Form.clean() -- use {{ form.non_field_errors }} in the
@@ -1638,7 +1641,7 @@ class FormsTestCase(TestCase):
 {{ form.password2.errors.as_ul }}<p><label>Password (again): {{ form.password2 }}</label></p>
 <input type="submit" />
 </form>''')
-        self.assertEqual(t.render(Context({'form': UserRegistration({'username': 'django', 'password1': 'foo', 'password2': 'bar'}, auto_id=False)})), """<form action="">
+        self.assertHTMLEqual(t.render(Context({'form': UserRegistration({'username': 'django', 'password1': 'foo', 'password2': 'bar'}, auto_id=False)})), """<form action="">
 <p><label>Your username: <input type="text" name="username" value="django" maxlength="10" /></label></p>
 <p><label>Password: <input type="password" name="password1" /></label></p>
 <p><label>Password (again): <input type="password" name="password2" /></label></p>
@@ -1651,7 +1654,7 @@ class FormsTestCase(TestCase):
 {{ form.password2.errors.as_ul }}<p><label>Password (again): {{ form.password2 }}</label></p>
 <input type="submit" />
 </form>''')
-        self.assertEqual(t.render(Context({'form': UserRegistration({'username': 'django', 'password1': 'foo', 'password2': 'bar'}, auto_id=False)})), """<form action="">
+        self.assertHTMLEqual(t.render(Context({'form': UserRegistration({'username': 'django', 'password1': 'foo', 'password2': 'bar'}, auto_id=False)})), """<form action="">
 <ul class="errorlist"><li>Please make sure your passwords match.</li></ul>
 <p><label>Your username: <input type="text" name="username" value="django" maxlength="10" /></label></p>
 <p><label>Password: <input type="password" name="password1" /></label></p>
@@ -1727,7 +1730,7 @@ class FormsTestCase(TestCase):
         class MyForm(Form):
             field1 = CharField(max_length=50, show_hidden_initial=True)
 
-        self.assertEqual(MyForm().as_table(), '<tr><th><label for="id_field1">Field1:</label></th><td><input id="id_field1" type="text" name="field1" maxlength="50" /><input type="hidden" name="initial-field1" id="initial-id_field1" /></td></tr>')
+        self.assertHTMLEqual(MyForm().as_table(), '<tr><th><label for="id_field1">Field1:</label></th><td><input id="id_field1" type="text" name="field1" maxlength="50" /><input type="hidden" name="initial-field1" id="initial-id_field1" /></td></tr>')
 
     def test_error_html_required_html_classes(self):
         class Person(Form):
@@ -1740,7 +1743,7 @@ class FormsTestCase(TestCase):
         p.error_css_class = 'error'
         p.required_css_class = 'required'
 
-        self.assertEqual(p.as_ul(), """<li class="required error"><ul class="errorlist"><li>This field is required.</li></ul><label for="id_name">Name:</label> <input type="text" name="name" id="id_name" /></li>
+        self.assertHTMLEqual(p.as_ul(), """<li class="required error"><ul class="errorlist"><li>This field is required.</li></ul><label for="id_name">Name:</label> <input type="text" name="name" id="id_name" /></li>
 <li class="required"><label for="id_is_cool">Is cool:</label> <select name="is_cool" id="id_is_cool">
 <option value="1" selected="selected">Unknown</option>
 <option value="2">Yes</option>
@@ -1749,7 +1752,7 @@ class FormsTestCase(TestCase):
 <li><label for="id_email">Email:</label> <input type="text" name="email" id="id_email" /></li>
 <li class="required error"><ul class="errorlist"><li>This field is required.</li></ul><label for="id_age">Age:</label> <input type="text" name="age" id="id_age" /></li>""")
 
-        self.assertEqual(p.as_p(), """<ul class="errorlist"><li>This field is required.</li></ul>
+        self.assertHTMLEqual(p.as_p(), """<ul class="errorlist"><li>This field is required.</li></ul>
 <p class="required error"><label for="id_name">Name:</label> <input type="text" name="name" id="id_name" /></p>
 <p class="required"><label for="id_is_cool">Is cool:</label> <select name="is_cool" id="id_is_cool">
 <option value="1" selected="selected">Unknown</option>
@@ -1760,7 +1763,7 @@ class FormsTestCase(TestCase):
 <ul class="errorlist"><li>This field is required.</li></ul>
 <p class="required error"><label for="id_age">Age:</label> <input type="text" name="age" id="id_age" /></p>""")
 
-        self.assertEqual(p.as_table(), """<tr class="required error"><th><label for="id_name">Name:</label></th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="name" id="id_name" /></td></tr>
+        self.assertHTMLEqual(p.as_table(), """<tr class="required error"><th><label for="id_name">Name:</label></th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="name" id="id_name" /></td></tr>
 <tr class="required"><th><label for="id_is_cool">Is cool:</label></th><td><select name="is_cool" id="id_is_cool">
 <option value="1" selected="selected">Unknown</option>
 <option value="2">Yes</option>
@@ -1774,4 +1777,4 @@ class FormsTestCase(TestCase):
             happened_at = SplitDateTimeField(widget=widgets.SplitHiddenDateTimeWidget)
 
         form = EventForm()
-        self.assertEqual(form.as_ul(), u'<input type="hidden" name="happened_at_0" id="id_happened_at_0" /><input type="hidden" name="happened_at_1" id="id_happened_at_1" />')
+        self.assertHTMLEqual(form.as_ul(), u'<input type="hidden" name="happened_at_0" id="id_happened_at_0" /><input type="hidden" name="happened_at_1" id="id_happened_at_1" />')

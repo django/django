@@ -35,7 +35,7 @@ class CHLocalFlavorTests(SimpleTestCase):
 <option value="ZG">Zug</option>
 <option value="ZH">Zurich</option>
 </select>'''
-        self.assertEqual(f.render('state', 'AG'), out)
+        self.assertHTMLEqual(f.render('state', 'AG'), out)
 
     def test_CHZipCodeField(self):
         error_format = [u'Enter a zip code in the format XXXX.']

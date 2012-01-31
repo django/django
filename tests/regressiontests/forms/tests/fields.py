@@ -674,6 +674,7 @@ class FieldsTests(SimpleTestCase):
         self.assertEqual(u'', f.clean(''))
         self.assertEqual(u'http://www.google.com/', f.clean('http://www.google.com'))
 
+    @verify_exists_urls(('http://example.com/',))
     def test_urlfield_5(self):
         f = URLField(min_length=15, max_length=20)
         self.assertRaisesMessage(ValidationError, "[u'Ensure this value has at least 15 characters (it has 13).']", f.clean, 'http://f.com')
@@ -852,7 +853,7 @@ class FieldsTests(SimpleTestCase):
             hidden_nullbool1 = NullBooleanField(widget=HiddenInput, initial=True)
             hidden_nullbool2 = NullBooleanField(widget=HiddenInput, initial=False)
         f = HiddenNullBooleanForm()
-        self.assertEqual('<input type="hidden" name="hidden_nullbool1" value="True" id="id_hidden_nullbool1" /><input type="hidden" name="hidden_nullbool2" value="False" id="id_hidden_nullbool2" />', str(f))
+        self.assertHTMLEqual('<input type="hidden" name="hidden_nullbool1" value="True" id="id_hidden_nullbool1" /><input type="hidden" name="hidden_nullbool2" value="False" id="id_hidden_nullbool2" />', str(f))
 
     def test_nullbooleanfield_3(self):
         class HiddenNullBooleanForm(Form):

@@ -47,7 +47,7 @@ class SELocalFlavorTests(SimpleTestCase):
 <option value="Y">V\xe4sternorrland</option>
 <option value="Z">J\xe4mtland</option>
 </select>'''
-        self.assertEqual(f.render('swedish_county', 'E'), out)
+        self.assertHTMLEqual(f.render('swedish_county', 'E'), out)
 
     def test_SEOrganizationNumberField(self):
         error_invalid = [u'Enter a valid Swedish organisation number.']

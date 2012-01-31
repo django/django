@@ -59,7 +59,7 @@ class BELocalFlavorTests(SimpleTestCase):
 <option value="VLG" selected="selected">Flemish Region</option>
 <option value="WAL">Wallonia</option>
 </select>'''
-        self.assertEqual(f.render('regions', 'VLG'), out)
+        self.assertHTMLEqual(f.render('regions', 'VLG'), out)
 
     def test_BEProvinceSelect(self):
         f = BEProvinceSelect()
@@ -76,4 +76,4 @@ class BELocalFlavorTests(SimpleTestCase):
 <option value="WBR">Walloon Brabant</option>
 <option value="VWV">West Flanders</option>
 </select>'''
-        self.assertEqual(f.render('provinces', 'WLG'), out)
+        self.assertHTMLEqual(f.render('provinces', 'WLG'), out)

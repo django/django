@@ -1696,7 +1696,7 @@ class AdminViewListEditable(TestCase):
             "_save": "Save",
         }
         response = self.client.post('/test_admin/admin/admin_views/fooddelivery/', data)
-        self.assertContains(response, '<tr><td colspan="4"><ul class="errorlist"><li>Food delivery with this Driver and Restaurant already exists.</li></ul></td></tr>', 1)
+        self.assertContains(response, '<tr><td colspan="4"><ul class="errorlist"><li>Food delivery with this Driver and Restaurant already exists.</li></ul></td></tr>', 1, html=True)
 
         data = {
             "form-TOTAL_FORMS": "3",
@@ -1723,7 +1723,7 @@ class AdminViewListEditable(TestCase):
             "_save": "Save",
         }
         response = self.client.post('/test_admin/admin/admin_views/fooddelivery/', data)
-        self.assertContains(response, '<tr><td colspan="4"><ul class="errorlist"><li>Food delivery with this Driver and Restaurant already exists.</li></ul></td></tr>', 2)
+        self.assertContains(response, '<tr><td colspan="4"><ul class="errorlist"><li>Food delivery with this Driver and Restaurant already exists.</li></ul></td></tr>', 2, html=True)
 
     def test_non_form_errors(self):
         # test if non-form errors are handled; ticket #12716
@@ -1880,7 +1880,7 @@ class AdminViewListEditable(TestCase):
         response = self.client.get('/test_admin/admin/admin_views/story/')
         self.assertContains(response, 'id="id_form-0-id"', 1) # Only one hidden field, in a separate place than the table.
         self.assertContains(response, 'id="id_form-1-id"', 1)
-        self.assertContains(response, '<div class="hiddenfields">\n<input type="hidden" name="form-0-id" value="%d" id="id_form-0-id" /><input type="hidden" name="form-1-id" value="%d" id="id_form-1-id" />\n</div>' % (story2.id, story1.id))
+        self.assertContains(response, '<div class="hiddenfields">\n<input type="hidden" name="form-0-id" value="%d" id="id_form-0-id" /><input type="hidden" name="form-1-id" value="%d" id="id_form-1-id" />\n</div>' % (story2.id, story1.id), html=True)
         self.assertContains(response, '<td>%d</td>' % story1.id, 1)
         self.assertContains(response, '<td>%d</td>' % story2.id, 1)
 
@@ -1894,7 +1894,7 @@ class AdminViewListEditable(TestCase):
         response = self.client.get('/test_admin/admin/admin_views/otherstory/')
         self.assertContains(response, 'id="id_form-0-id"', 1) # Only one hidden field, in a separate place than the table.
         self.assertContains(response, 'id="id_form-1-id"', 1)
-        self.assertContains(response, '<div class="hiddenfields">\n<input type="hidden" name="form-0-id" value="%d" id="id_form-0-id" /><input type="hidden" name="form-1-id" value="%d" id="id_form-1-id" />\n</div>' % (story2.id, story1.id))
+        self.assertContains(response, '<div class="hiddenfields">\n<input type="hidden" name="form-0-id" value="%d" id="id_form-0-id" /><input type="hidden" name="form-1-id" value="%d" id="id_form-1-id" />\n</div>' % (story2.id, story1.id), html=True)
         self.assertContains(response, '<th><a href="%d/">%d</a></th>' % (story1.id, story1.id), 1)
         self.assertContains(response, '<th><a href="%d/">%d</a></th>' % (story2.id, story2.id), 1)
 
@@ -1923,7 +1923,7 @@ class AdminSearchTest(TestCase):
         from django.contrib.admin.views.main import TO_FIELD_VAR
         response = self.client.get('/test_admin/admin/auth/user/?q=joe&%s=username' % TO_FIELD_VAR)
         self.assertContains(response, "\n1 user\n")
-        self.assertContains(response, '<input type="hidden" name="t" value="username"/>')
+        self.assertContains(response, '<input type="hidden" name="t" value="username"/>', html=True)
 
     def test_exact_matches(self):
         response = self.client.get('/test_admin/admin/admin_views/recommendation/?q=bar')
@@ -2114,8 +2114,8 @@ class AdminActionsTest(TestCase):
         response = self.client.post("/test_admin/admin/admin_views/question/", action_data)
 
         self.assertContains(response, "would require deleting the following protected related objects")
-        self.assertContains(response, '<li>Answer: <a href="/test_admin/admin/admin_views/answer/%s/">Because.</a></li>' % a1.pk)
-        self.assertContains(response, '<li>Answer: <a href="/test_admin/admin/admin_views/answer/%s/">Yes.</a></li>' % a2.pk)
+        self.assertContains(response, '<li>Answer: <a href="/test_admin/admin/admin_views/answer/%s/">Because.</a></li>' % a1.pk, html=True)
+        self.assertContains(response, '<li>Answer: <a href="/test_admin/admin/admin_views/answer/%s/">Yes.</a></li>' % a2.pk, html=True)
 
     def test_custom_function_mail_action(self):
         "Tests a custom action defined in a function"
@@ -2159,13 +2159,12 @@ class AdminActionsTest(TestCase):
         Refs #15964.
         """
         response = self.client.get('/test_admin/admin/admin_views/externalsubscriber/')
-        self.assertTrue('''<label>Action: <select name="action">
+        self.assertContains(response, '''<label>Action: <select name="action">
 <option value="" selected="selected">---------</option>
 <option value="delete_selected">Delete selected external subscribers</option>
 <option value="redirect_to">Redirect to (Awesome action)</option>
 <option value="external_mail">External mail (Another awesome action)</option>
-</select>'''in response.content,
-        )
+</select>''', html=True)
 
     def test_model_without_action(self):
         "Tests a ModelAdmin without any action"
@@ -2338,7 +2337,7 @@ class AdminCustomQuerysetTest(TestCase):
                 post_data, follow=True)
         self.assertEqual(response.status_code, 200)
         # Message should contain non-ugly model name. Instance representation is set by unicode() (ugly)
-        self.assertContains(response, '<li class="info">The paper &quot;Paper_Deferred_author object&quot; was changed successfully.</li>')
+        self.assertContains(response, '<li class="info">The paper &quot;Paper_Deferred_author object&quot; was changed successfully.</li>', html=True)
 
         # defer() is used in ModelAdmin.queryset()
         cl = CoverLetter.objects.create(author=u"John Doe")
@@ -2353,7 +2352,7 @@ class AdminCustomQuerysetTest(TestCase):
                 post_data, follow=True)
         self.assertEqual(response.status_code, 200)
         # Message should contain non-ugly model name. Instance representation is set by model's __unicode__()
-        self.assertContains(response, '<li class="info">The cover letter &quot;John Doe II&quot; was changed successfully.</li>')
+        self.assertContains(response, '<li class="info">The cover letter &quot;John Doe II&quot; was changed successfully.</li>', html=True)
 
 class AdminInlineFileUploadTest(TestCase):
     urls = "regressiontests.admin_views.urls"
@@ -2859,9 +2858,9 @@ class ReadonlyTest(TestCase):
         self.assertContains(response, '<div class="form-row field-value">')
         self.assertContains(response, '<div class="form-row">')
         self.assertContains(response, '<p class="help">', 3)
-        self.assertContains(response, '<p class="help">Some help text for the title (with unicode ŠĐĆŽćžšđ)</p>')
-        self.assertContains(response, '<p class="help">Some help text for the content (with unicode ŠĐĆŽćžšđ)</p>')
-        self.assertContains(response, '<p class="help">Some help text for the date (with unicode ŠĐĆŽćžšđ)</p>')
+        self.assertContains(response, '<p class="help">Some help text for the title (with unicode ŠĐĆŽćžšđ)</p>', html=True)
+        self.assertContains(response, '<p class="help">Some help text for the content (with unicode ŠĐĆŽćžšđ)</p>', html=True)
+        self.assertContains(response, '<p class="help">Some help text for the date (with unicode ŠĐĆŽćžšđ)</p>', html=True)
 
         p = Post.objects.create(title="I worked on readonly_fields", content="Its good stuff")
         response = self.client.get('/test_admin/admin/admin_views/post/%d/' % p.pk)
@@ -3099,32 +3098,32 @@ class AdminDocsTest(TestCase):
         response = self.client.get('/test_admin/admin/doc/tags/')
 
         # The builtin tag group exists
-        self.assertContains(response, "<h2>Built-in tags</h2>", count=2)
+        self.assertContains(response, "<h2>Built-in tags</h2>", count=2, html=True)
 
         # A builtin tag exists in both the index and detail
-        self.assertContains(response, '<h3 id="built_in-autoescape">autoescape</h3>')
-        self.assertContains(response, '<li><a href="#built_in-autoescape">autoescape</a></li>')
+        self.assertContains(response, '<h3 id="built_in-autoescape">autoescape</h3>', html=True)
+        self.assertContains(response, '<li><a href="#built_in-autoescape">autoescape</a></li>', html=True)
 
         # An app tag exists in both the index and detail
-        self.assertContains(response, '<h3 id="flatpages-get_flatpages">get_flatpages</h3>')
-        self.assertContains(response, '<li><a href="#flatpages-get_flatpages">get_flatpages</a></li>')
+        self.assertContains(response, '<h3 id="flatpages-get_flatpages">get_flatpages</h3>', html=True)
+        self.assertContains(response, '<li><a href="#flatpages-get_flatpages">get_flatpages</a></li>', html=True)
 
         # The admin list tag group exists
-        self.assertContains(response, "<h2>admin_list</h2>", count=2)
+        self.assertContains(response, "<h2>admin_list</h2>", count=2, html=True)
 
         # An admin list tag exists in both the index and detail
-        self.assertContains(response, '<h3 id="admin_list-admin_actions">admin_actions</h3>')
-        self.assertContains(response, '<li><a href="#admin_list-admin_actions">admin_actions</a></li>')
+        self.assertContains(response, '<h3 id="admin_list-admin_actions">admin_actions</h3>', html=True)
+        self.assertContains(response, '<li><a href="#admin_list-admin_actions">admin_actions</a></li>', html=True)
 
     def test_filters(self):
         response = self.client.get('/test_admin/admin/doc/filters/')
 
         # The builtin filter group exists
-        self.assertContains(response, "<h2>Built-in filters</h2>", count=2)
+        self.assertContains(response, "<h2>Built-in filters</h2>", count=2, html=True)
 
         # A builtin filter exists in both the index and detail
-        self.assertContains(response, '<h3 id="built_in-add">add</h3>')
-        self.assertContains(response, '<li><a href="#built_in-add">add</a></li>')
+        self.assertContains(response, '<h3 id="built_in-add">add</h3>', html=True)
+        self.assertContains(response, '<li><a href="#built_in-add">add</a></li>', html=True)
 
 AdminDocsTest = unittest.skipUnless(docutils, "no docutils installed.")(AdminDocsTest)
 

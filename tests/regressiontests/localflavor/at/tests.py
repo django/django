@@ -18,7 +18,7 @@ class ATLocalFlavorTests(SimpleTestCase):
 <option value="VO">Vorarlberg</option>
 <option value="WI" selected="selected">Vienna</option>
 </select>'''
-        self.assertEqual(f.render('bundesland', 'WI'), out)
+        self.assertHTMLEqual(f.render('bundesland', 'WI'), out)
 
     def test_ATZipCodeField(self):
         error_format = [u'Enter a zip code in the format XXXX.']

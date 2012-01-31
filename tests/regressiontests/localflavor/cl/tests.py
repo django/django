@@ -23,7 +23,7 @@ class CLLocalFlavorTests(SimpleTestCase):
 <option value="XIV">Regi\xf3n de Los R\xedos</option>
 <option value="XV">Regi\xf3n de Arica-Parinacota</option>
 </select>'''
-        self.assertEqual(f.render('foo', 'bar'), out)
+        self.assertHTMLEqual(f.render('foo', 'bar'), out)
 
     def test_CLRutField(self):
         error_invalid =  [u'The Chilean RUT is not valid.']

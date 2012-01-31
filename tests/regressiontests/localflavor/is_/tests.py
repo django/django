@@ -156,7 +156,7 @@ class ISLocalFlavorTests(SimpleTestCase):
 <option value="900">900 Vestmannaeyjar</option>
 <option value="902">902 Vestmannaeyjar</option>
 </select>'''
-        self.assertEqual(f.render('foo', 'bar'), out)
+        self.assertHTMLEqual(f.render('foo', 'bar'), out)
 
     def test_ISIdNumberField(self):
         error_atleast = [u'Ensure this value has at least 10 characters (it has 9).']

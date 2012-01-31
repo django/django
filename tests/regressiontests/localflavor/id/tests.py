@@ -56,7 +56,7 @@ class IDLocalFlavorTests(SimpleTestCase):
 <option value="SMS">Sumatera Selatan</option>
 <option value="SMU">Sumatera Utara</option>
 </select>'''
-        self.assertEqual(f.render('provinces', 'LPG'), out)
+        self.assertHTMLEqual(f.render('provinces', 'LPG'), out)
 
     def test_IDLicensePlatePrefixSelect(self):
         f = IDLicensePlatePrefixSelect()
@@ -118,7 +118,7 @@ class IDLocalFlavorTests(SimpleTestCase):
 <option value="W">Sidoarjo</option>
 <option value="Z">Garut</option>
 </select>'''
-        self.assertEqual(f.render('codes', 'BE'), out)
+        self.assertHTMLEqual(f.render('codes', 'BE'), out)
 
     def test_IDPhoneNumberField(self):
         error_invalid = [u'Enter a valid phone number']

@@ -475,6 +475,21 @@ Time zone support is enabled by default in new projects created with
 :djadmin:`startproject`. If you want to use this feature in an existing
 project, read the :ref:`migration guide <time-zones-migration-guide>`.
 
+HTML comparisons in tests
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The :class:`~django.test.testcase.TestCase` base class now has some helpers to
+compare HTML without tripping over irrelevant differences in whitespace,
+argument quoting and ordering, and closing of self-closing tags. HTML can
+either be compared directly with the new
+:meth:`~django.test.testcase.TestCase.assertHTMLEqual` and
+:meth:`~django.test.testcase.TestCase.assertHTMLNotEqual` assertions, or use
+the ``html=True`` flag with
+:meth:`~django.test.testcase.TestCase.assertContains` and
+:meth:`~django.test.testcase.TestCase.assertNotContains` to test if the test
+client's response contains a given HTML fragment. See the :ref:`assertion
+documentation<assertions>` for more information.
+
 Minor features
 ~~~~~~~~~~~~~~
 

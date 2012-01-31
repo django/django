@@ -43,7 +43,7 @@ class CNLocalFlavorTests(SimpleTestCase):
 <option value="yunnan">\u4e91\u5357</option>
 <option value="zhejiang">\u6d59\u6c5f</option>
 </select>'''
-        self.assertEqual(f.render('provinces', 'hubei'), correct_output)
+        self.assertHTMLEqual(f.render('provinces', 'hubei'), correct_output)
 
     def test_CNPostCodeField(self):
         error_format = [u'Enter a post code in the format XXXXXX.']

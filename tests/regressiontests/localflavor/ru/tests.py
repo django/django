@@ -56,7 +56,7 @@ class RULocalFlavorTests(SimpleTestCase):
 <option value="Privolzhsky Federal County">Privolzhsky Federal County</option>
 <option value="North-Caucasian Federal County">North-Caucasian Federal County</option>
 </select>'''
-        self.assertEqual(f.render('county', None), out)
+        self.assertHTMLEqual(f.render('county', None), out)
 
     def test_RURegionSelect(self):
         f = RURegionSelect()
@@ -145,4 +145,4 @@ class RULocalFlavorTests(SimpleTestCase):
 <option value="87">Chukotskiy avtonomnyy okrug</option>
 <option value="89">Yamalo-Neneckiy avtonomnyy okrug</option>
 </select>'''
-        self.assertEqual(f.render('region', '67'), out)
+        self.assertHTMLEqual(f.render('region', '67'), out)

@@ -34,7 +34,7 @@ class TestInline(TestCase):
         can_delete should be passed to inlineformset factory.
         """
         response = self.client.get(self.change_url)
-        inner_formset = response.context[-1]['inline_admin_formsets'][0].formset
+        inner_formset = response.context['inline_admin_formsets'][0].formset
         expected = InnerInline.can_delete
         actual = inner_formset.can_delete
         self.assertEqual(expected, actual, 'can_delete must be equal')
@@ -134,7 +134,7 @@ class TestInline(TestCase):
                 'id="id_-1-0-capo_famiglia" />')
         self.assertContains(response,
                 '<input id="id_-1-0-name" type="text" class="vTextField" '
-                'name="-1-0-name" maxlength="100" />')
+                'name="-1-0-name" maxlength="100" />', html=True)
 
         self.assertContains(response,
                 '<input type="hidden" name="-2-0-id" id="id_-2-0-id" />')
@@ -143,7 +143,7 @@ class TestInline(TestCase):
                 'id="id_-2-0-capo_famiglia" />')
         self.assertContains(response,
                 '<input id="id_-2-0-name" type="text" class="vTextField" '
-                'name="-2-0-name" maxlength="100" />')
+                'name="-2-0-name" maxlength="100" />', html=True)
 
 class TestInlineMedia(TestCase):
     urls = "regressiontests.admin_inlines.urls"

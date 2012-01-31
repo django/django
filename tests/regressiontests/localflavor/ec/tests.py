@@ -31,4 +31,4 @@ class ECLocalFlavorTests(SimpleTestCase):
 <option value="T">Tungurahua</option>
 <option value="Z">Zamora Chinchipe</option>
 </select>"""
-        self.assertEqual(p.render('province', 'U'), out)
+        self.assertHTMLEqual(p.render('province', 'U'), out)

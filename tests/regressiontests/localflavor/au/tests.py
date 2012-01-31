@@ -76,7 +76,7 @@ class AULocalflavorTests(SimpleTestCase):
 <option value="VIC">Victoria</option>
 <option value="WA">Western Australia</option>
 </select>'''
-        self.assertEqual(f.render('state', 'NSW'), out)
+        self.assertHTMLEqual(f.render('state', 'NSW'), out)
 
     def test_AUPostCodeField(self):
         error_format = [u'Enter a 4 digit postcode.']

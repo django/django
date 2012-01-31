@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 from django.forms import *
-from django.utils.unittest import TestCase
+from django.test import TestCase
 from django.utils.translation import ugettext_lazy, override
 
 from regressiontests.forms.models import Cheese
@@ -16,7 +16,7 @@ class FormsRegressionsTestCase(TestCase):
             f1 = CharField(max_length=10, widget=TextInput(attrs=extra_attrs))
             f2 = CharField(widget=TextInput(attrs=extra_attrs))
 
-        self.assertEqual(TestForm(auto_id=False).as_p(), u'<p>F1: <input type="text" class="special" name="f1" maxlength="10" /></p>\n<p>F2: <input type="text" class="special" name="f2" /></p>')
+        self.assertHTMLEqual(TestForm(auto_id=False).as_p(), u'<p>F1: <input type="text" class="special" name="f1" maxlength="10" /></p>\n<p>F2: <input type="text" class="special" name="f2" /></p>')
 
     def test_regression_3600(self):
         # Tests for form i18n #
@@ -26,13 +26,13 @@ class FormsRegressionsTestCase(TestCase):
             username = CharField(max_length=10, label=ugettext_lazy('Username'))
 
         f = SomeForm()
-        self.assertEqual(f.as_p(), '<p><label for="id_username">Username:</label> <input id="id_username" type="text" name="username" maxlength="10" /></p>')
+        self.assertHTMLEqual(f.as_p(), '<p><label for="id_username">Username:</label> <input id="id_username" type="text" name="username" maxlength="10" /></p>')
 
         # Translations are done at rendering time, so multi-lingual apps can define forms)
         with override('de'):
-            self.assertEqual(f.as_p(), '<p><label for="id_username">Benutzername:</label> <input id="id_username" type="text" name="username" maxlength="10" /></p>')
+            self.assertHTMLEqual(f.as_p(), '<p><label for="id_username">Benutzername:</label> <input id="id_username" type="text" name="username" maxlength="10" /></p>')
         with override('pl', deactivate=True):
-            self.assertEqual(f.as_p(), u'<p><label for="id_username">Nazwa u\u017cytkownika:</label> <input id="id_username" type="text" name="username" maxlength="10" /></p>')
+            self.assertHTMLEqual(f.as_p(), u'<p><label for="id_username">Nazwa u\u017cytkownika:</label> <input id="id_username" type="text" name="username" maxlength="10" /></p>')
 
     def test_regression_5216(self):
         # There was some problems with form translations in #5216
@@ -41,8 +41,8 @@ class FormsRegressionsTestCase(TestCase):
             field_2 = CharField(max_length=10, label=ugettext_lazy('field_2'), widget=TextInput(attrs={'id': 'field_2_id'}))
 
         f = SomeForm()
-        self.assertEqual(f['field_1'].label_tag(), '<label for="id_field_1">field_1</label>')
-        self.assertEqual(f['field_2'].label_tag(), '<label for="field_2_id">field_2</label>')
+        self.assertHTMLEqual(f['field_1'].label_tag(), '<label for="id_field_1">field_1</label>')
+        self.assertHTMLEqual(f['field_2'].label_tag(), '<label for="field_2_id">field_2</label>')
 
         # Unicode decoding problems...
         GENDERS = ((u'\xc5', u'En tied\xe4'), (u'\xf8', u'Mies'), (u'\xdf', u'Nainen'))
@@ -51,7 +51,7 @@ class FormsRegressionsTestCase(TestCase):
             somechoice = ChoiceField(choices=GENDERS, widget=RadioSelect(), label=u'\xc5\xf8\xdf')
 
         f = SomeForm()
-        self.assertEqual(f.as_p(), u'<p><label for="id_somechoice_0">\xc5\xf8\xdf:</label> <ul>\n<li><label for="id_somechoice_0"><input type="radio" id="id_somechoice_0" value="\xc5" name="somechoice" /> En tied\xe4</label></li>\n<li><label for="id_somechoice_1"><input type="radio" id="id_somechoice_1" value="\xf8" name="somechoice" /> Mies</label></li>\n<li><label for="id_somechoice_2"><input type="radio" id="id_somechoice_2" value="\xdf" name="somechoice" /> Nainen</label></li>\n</ul></p>')
+        self.assertHTMLEqual(f.as_p(), u'<p><label for="id_somechoice_0">\xc5\xf8\xdf:</label> <ul>\n<li><label for="id_somechoice_0"><input type="radio" id="id_somechoice_0" value="\xc5" name="somechoice" /> En tied\xe4</label></li>\n<li><label for="id_somechoice_1"><input type="radio" id="id_somechoice_1" value="\xf8" name="somechoice" /> Mies</label></li>\n<li><label for="id_somechoice_2"><input type="radio" id="id_somechoice_2" value="\xdf" name="somechoice" /> Nainen</label></li>\n</ul></p>')
 
         # Testing choice validation with UTF-8 bytestrings as input (these are the
         # Russian abbreviations "мес." and "шт.".
@@ -63,7 +63,7 @@ class FormsRegressionsTestCase(TestCase):
         # Translated error messages used to be buggy.
         with override('ru'):
             f = SomeForm({})
-            self.assertEqual(f.as_p(), u'<ul class="errorlist"><li>\u041e\u0431\u044f\u0437\u0430\u0442\u0435\u043b\u044c\u043d\u043e\u0435 \u043f\u043e\u043b\u0435.</li></ul>\n<p><label for="id_somechoice_0">\xc5\xf8\xdf:</label> <ul>\n<li><label for="id_somechoice_0"><input type="radio" id="id_somechoice_0" value="\xc5" name="somechoice" /> En tied\xe4</label></li>\n<li><label for="id_somechoice_1"><input type="radio" id="id_somechoice_1" value="\xf8" name="somechoice" /> Mies</label></li>\n<li><label for="id_somechoice_2"><input type="radio" id="id_somechoice_2" value="\xdf" name="somechoice" /> Nainen</label></li>\n</ul></p>')
+            self.assertHTMLEqual(f.as_p(), u'<ul class="errorlist"><li>\u041e\u0431\u044f\u0437\u0430\u0442\u0435\u043b\u044c\u043d\u043e\u0435 \u043f\u043e\u043b\u0435.</li></ul>\n<p><label for="id_somechoice_0">\xc5\xf8\xdf:</label> <ul>\n<li><label for="id_somechoice_0"><input type="radio" id="id_somechoice_0" value="\xc5" name="somechoice" /> En tied\xe4</label></li>\n<li><label for="id_somechoice_1"><input type="radio" id="id_somechoice_1" value="\xf8" name="somechoice" /> Mies</label></li>\n<li><label for="id_somechoice_2"><input type="radio" id="id_somechoice_2" value="\xdf" name="somechoice" /> Nainen</label></li>\n</ul></p>')
 
         # Deep copying translated text shouldn't raise an error)
         from django.utils.translation import gettext_lazy
@@ -88,8 +88,8 @@ class FormsRegressionsTestCase(TestCase):
             data = IntegerField(widget=HiddenInput)
 
         f = HiddenForm({})
-        self.assertEqual(f.as_p(), u'<ul class="errorlist"><li>(Hidden field data) This field is required.</li></ul>\n<p> <input type="hidden" name="data" id="id_data" /></p>')
-        self.assertEqual(f.as_table(), u'<tr><td colspan="2"><ul class="errorlist"><li>(Hidden field data) This field is required.</li></ul><input type="hidden" name="data" id="id_data" /></td></tr>')
+        self.assertHTMLEqual(f.as_p(), u'<ul class="errorlist"><li>(Hidden field data) This field is required.</li></ul>\n<p> <input type="hidden" name="data" id="id_data" /></p>')
+        self.assertHTMLEqual(f.as_table(), u'<tr><td colspan="2"><ul class="errorlist"><li>(Hidden field data) This field is required.</li></ul><input type="hidden" name="data" id="id_data" /></td></tr>')
 
     def test_xss_error_messages(self):
         ###################################################
@@ -107,13 +107,13 @@ class FormsRegressionsTestCase(TestCase):
             field = ChoiceField(choices=[('one', 'One')])
 
         f = SomeForm({'field': '<script>'})
-        self.assertEqual(t.render(Context({'form': f})), u'<ul class="errorlist"><li>field<ul class="errorlist"><li>Select a valid choice. &lt;script&gt; is not one of the available choices.</li></ul></li></ul>')
+        self.assertHTMLEqual(t.render(Context({'form': f})), u'<ul class="errorlist"><li>field<ul class="errorlist"><li>Select a valid choice. &lt;script&gt; is not one of the available choices.</li></ul></li></ul>')
 
         class SomeForm(Form):
             field = MultipleChoiceField(choices=[('one', 'One')])
 
         f = SomeForm({'field': ['<script>']})
-        self.assertEqual(t.render(Context({'form': f})), u'<ul class="errorlist"><li>field<ul class="errorlist"><li>Select a valid choice. &lt;script&gt; is not one of the available choices.</li></ul></li></ul>')
+        self.assertHTMLEqual(t.render(Context({'form': f})), u'<ul class="errorlist"><li>field<ul class="errorlist"><li>Select a valid choice. &lt;script&gt; is not one of the available choices.</li></ul></li></ul>')
 
         from regressiontests.forms.models import ChoiceModel
 
@@ -121,7 +121,7 @@ class FormsRegressionsTestCase(TestCase):
             field = ModelMultipleChoiceField(ChoiceModel.objects.all())
 
         f = SomeForm({'field': ['<script>']})
-        self.assertEqual(t.render(Context({'form': f})), u'<ul class="errorlist"><li>field<ul class="errorlist"><li>&quot;&lt;script&gt;&quot; is not a valid value for a primary key.</li></ul></li></ul>')
+        self.assertHTMLEqual(t.render(Context({'form': f})), u'<ul class="errorlist"><li>field<ul class="errorlist"><li>&quot;&lt;script&gt;&quot; is not a valid value for a primary key.</li></ul></li></ul>')
 
     def test_regression_14234(self):
         """

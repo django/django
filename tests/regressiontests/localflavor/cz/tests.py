@@ -37,7 +37,7 @@ class CZLocalFlavorTests(SimpleTestCase):
 <option value="ZL">Zlin Region</option>
 <option value="MS">Moravian-Silesian Region</option>
 </select>'''
-        self.assertEqual(f.render('regions', 'TT'), out)
+        self.assertHTMLEqual(f.render('regions', 'TT'), out)
 
     def test_CZPostalCodeField(self):
         error_format = [u'Enter a postal code in the format XXXXX or XXX XX.']

@@ -53,7 +53,7 @@ class ROLocalFlavorTests(SimpleTestCase):
 <option value="VL">V\xe2lcea</option>
 <option value="VN">Vrancea</option>
 </select>'''
-        self.assertEqual(f.render('county', 'CJ'), out)
+        self.assertHTMLEqual(f.render('county', 'CJ'), out)
 
     def test_ROCIFField(self):
         error_invalid = [u'Enter a valid CIF.']

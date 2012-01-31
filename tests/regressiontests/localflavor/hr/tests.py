@@ -32,7 +32,7 @@ class HRLocalFlavorTests(SimpleTestCase):
 <option value="ZDŽ">Zadarska županija</option>
 <option value="ZGŽ">Zagrebačka županija</option>
 </select>'''
-        self.assertEqual(f.render('county', 'GZG'), out)
+        self.assertHTMLEqual(f.render('county', 'GZG'), out)
 
     def test_HRPhoneNumberPrefixSelect(self):
         f = HRPhoneNumberPrefixSelect()
@@ -64,7 +64,7 @@ class HRLocalFlavorTests(SimpleTestCase):
 <option value="98">098</option>
 <option value="99">099</option>
 </select>'''
-        self.assertEqual(f.render('phone', '1'), out)
+        self.assertHTMLEqual(f.render('phone', '1'), out)
 
     def test_HRLicensePlatePrefixSelect(self):
         f = HRLicensePlatePrefixSelect()
@@ -104,7 +104,7 @@ class HRLocalFlavorTests(SimpleTestCase):
 <option value="ZG">ZG</option>
 <option value="ŽU">ŽU</option>
 </select>'''
-        self.assertEqual(f.render('license', 'BJ'), out)
+        self.assertHTMLEqual(f.render('license', 'BJ'), out)
 
     def test_HRPhoneNumberField(self):
         error_invalid = [u'Enter a valid phone number']

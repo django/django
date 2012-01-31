@@ -75,7 +75,7 @@ class MXLocalFlavorTests(SimpleTestCase):
 <option value="YUC">Yucatán</option>
 <option value="ZAC">Zacatecas</option>
 </select>"""
-        self.assertEqual(str(self.form['state']), state_select_html)
+        self.assertHTMLEqual(str(self.form['state']), state_select_html)
 
     def test_MXStateSelect(self):
         f = MXStateSelect()
@@ -113,7 +113,7 @@ class MXLocalFlavorTests(SimpleTestCase):
 <option value="YUC">Yucatán</option>
 <option value="ZAC">Zacatecas</option>
 </select>'''
-        self.assertEqual(f.render('state', 'MIC'), out)
+        self.assertHTMLEqual(f.render('state', 'MIC'), out)
 
     def test_MXZipCodeField(self):
         error_format = [u'Enter a valid zip code in the format XXXXX.']

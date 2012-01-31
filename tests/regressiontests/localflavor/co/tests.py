@@ -40,4 +40,4 @@ class COLocalFlavorTests(SimpleTestCase):
 <option value="VAU">Vaup\xe9s</option>
 <option value="VID">Vichada</option>
 </select>"""
-        self.assertEqual(d.render('department', 'COR'), out)
+        self.assertHTMLEqual(d.render('department', 'COR'), out)

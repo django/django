@@ -553,4 +553,4 @@ class SILocalFlavorTests(SimpleTestCase):
 <option value="4274">\u017dirovnica</option>
 <option value="8360">\u017du\u017eemberk</option>
 </select>'''
-        self.assertEqual(f.render('Kranj', '4000'), out)
+        self.assertHTMLEqual(f.render('Kranj', '4000'), out)

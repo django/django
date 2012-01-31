@@ -36,7 +36,7 @@ class CALocalFlavorTests(SimpleTestCase):
 <option value="SK">Saskatchewan</option>
 <option value="YT">Yukon</option>
 </select>'''
-        self.assertEqual(f.render('province', 'AB'), out)
+        self.assertHTMLEqual(f.render('province', 'AB'), out)
 
     def test_CAPostalCodeField(self):
         error_format = [u'Enter a postal code in the format XXX XXX.']

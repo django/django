@@ -25,7 +25,7 @@ class PLLocalFlavorTests(SimpleTestCase):
 <option value="greater_poland">Greater Poland</option>
 <option value="west_pomerania">West Pomerania</option>
 </select>'''
-        self.assertEqual(f.render('voivodeships', 'pomerania'), out)
+        self.assertHTMLEqual(f.render('voivodeships', 'pomerania'), out)
 
     def test_PLCountrySelect(self):
         f = PLCountySelect()
@@ -407,7 +407,7 @@ class PLLocalFlavorTests(SimpleTestCase):
 <option value="swidwinski">\u015bwidwi\u0144ski</option>
 <option value="walecki">wa\u0142ecki</option>
 </select>'''
-        self.assertEqual(f.render('administrativeunit', 'katowice'), out)
+        self.assertHTMLEqual(f.render('administrativeunit', 'katowice'), out)
 
     def test_PLPostalCodeField(self):
         error_format = [u'Enter a postal code in the format XX-XXX.']

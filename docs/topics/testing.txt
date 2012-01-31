@@ -1542,16 +1542,32 @@ your test suite.
         self.assertFieldOutput(EmailField, {'a@a.com': 'a@a.com'}, {'aaa': [u'Enter a valid e-mail address.']})
 
 
-.. method:: TestCase.assertContains(response, text, count=None, status_code=200, msg_prefix='')
+.. method:: TestCase.assertContains(response, text, count=None, status_code=200, msg_prefix='', html=False)
 
     Asserts that a ``Response`` instance produced the given ``status_code`` and
     that ``text`` appears in the content of the response. If ``count`` is
     provided, ``text`` must occur exactly ``count`` times in the response.
 
-.. method:: TestCase.assertNotContains(response, text, status_code=200, msg_prefix='')
+    .. versionadded:: 1.4
+
+    Set ``html`` to ``True`` to handle ``text`` as HTML. The comparison with
+    the response content will be based on HTML semantics instead of
+    character-by-character equality. Whitespace is ignored in most cases,
+    attribute ordering is not significant. See
+    :func:`~TestCase.assertHTMLEqual` for more details.
+
+.. method:: TestCase.assertNotContains(response, text, status_code=200, msg_prefix='', html=False)
 
     Asserts that a ``Response`` instance produced the given ``status_code`` and
     that ``text`` does not appears in the content of the response.
+
+    .. versionadded:: 1.4
+
+    Set ``html`` to ``True`` to handle ``text`` as HTML. The comparison with
+    the response content will be based on HTML semantics instead of
+    character-by-character equality. Whitespace is ignored in most cases,
+    attribute ordering is not significant. See
+    :func:`~TestCase.assertHTMLEqual` for more details.
 
 .. method:: TestCase.assertFormError(response, form, field, errors, msg_prefix='')
 
@@ -1655,6 +1671,48 @@ your test suite.
         with self.assertNumQueries(2):
             Person.objects.create(name="Aaron")
             Person.objects.create(name="Daniel")
+
+.. method:: TestCase.assertHTMLEqual(html1, html2, msg=None)
+
+    .. versionadded:: 1.4
+
+    Asserts that the strings ``html1`` and ``html2`` are equal. The comparison
+    is based on HTML semantics. The comparison takes following things into
+    account:
+
+    * Whitespace before and after HTML tags is ignored
+    * All types of whitespace are considered equivalent
+    * All open tags are closed implicitly, i.e. when a surrounding tag is
+      closed or the HTML document ends
+    * Empty tags are equivalent to their self-closing version
+    * The ordering of attributes of an HTML element is not significant
+    * Attributes without an argument are equal to attributes that equal in
+      name and value (see the examples)
+
+    The following examples are valid tests and don't raise any
+    ``AssertionError``::
+
+        self.assertHTMLEqual('<p>Hello <b>world!</p>',
+            '''<p>
+                Hello   <b>world! <b/>
+            </p>''')
+        self.assertHTMLEqual(
+            '<input type="checkbox" checked="checked" id="id_accept_terms" />',
+            '<input id="id_accept_terms" type='checkbox' checked>')
+
+    ``html1`` and ``html2`` must be valid HTML. An ``AssertionError`` will be
+    raised if one of them cannot be parsed.
+
+.. method:: TestCase.assertHTMLNotEqual(html1, html2, msg=None)
+
+    .. versionadded:: 1.4
+
+    Asserts that the strings ``html1`` and ``html2`` are *not* equal. The
+    comparison is based on HTML semantics. See
+    :func:`~TestCase.assertHTMLEqual` for details.
+
+    ``html1`` and ``html2`` must be valid HTML. An ``AssertionError`` will be
+    raised if one of them cannot be parsed.
 
 
 .. _topics-testing-email:

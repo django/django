@@ -351,7 +351,7 @@ class FILocalFlavorTests(SimpleTestCase):
 <option value="ahtari">\xc4ht\xe4ri</option>
 <option value="aanekoski">\xc4\xe4nekoski</option>
 </select>'''
-        self.assertEqual(f.render('municipalities', 'turku'), out)
+        self.assertHTMLEqual(f.render('municipalities', 'turku'), out)
 
     def test_FIZipCodeField(self):
         error_format = [u'Enter a zip code in the format XXXXX.']

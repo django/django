@@ -47,7 +47,7 @@ class ModelFormCallableModelDefault(TestCase):
         obj1 = ChoiceOptionModel.objects.create(id=1, name='default')
         obj2 = ChoiceOptionModel.objects.create(id=2, name='option 2')
         obj3 = ChoiceOptionModel.objects.create(id=3, name='option 3')
-        self.assertEqual(ChoiceFieldForm().as_p(), """<p><label for="id_choice">Choice:</label> <select name="choice" id="id_choice">
+        self.assertHTMLEqual(ChoiceFieldForm().as_p(), """<p><label for="id_choice">Choice:</label> <select name="choice" id="id_choice">
 <option value="1" selected="selected">ChoiceOption 1</option>
 <option value="2">ChoiceOption 2</option>
 <option value="3">ChoiceOption 3</option>
@@ -73,7 +73,7 @@ class ModelFormCallableModelDefault(TestCase):
         obj1 = ChoiceOptionModel.objects.create(id=1, name='default')
         obj2 = ChoiceOptionModel.objects.create(id=2, name='option 2')
         obj3 = ChoiceOptionModel.objects.create(id=3, name='option 3')
-        self.assertEqual(ChoiceFieldForm(initial={
+        self.assertHTMLEqual(ChoiceFieldForm(initial={
                 'choice': obj2,
                 'choice_int': obj2,
                 'multi_choice': [obj2,obj3],

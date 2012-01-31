@@ -92,7 +92,7 @@ class UpdateDeleteObjectTest(TestCase):
         """
         response = self.client.get('/create_update/update/article/old_article/')
         self.assertTemplateUsed(response, 'views/article_form.html')
-        self.assertEqual(unicode(response.context['form']['title']),
+        self.assertHTMLEqual(unicode(response.context['form']['title']),
             u'<input id="id_title" type="text" name="title" value="Old Article" maxlength="100" />')
 
     def test_update_object(self):

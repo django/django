@@ -29,7 +29,7 @@ class ITLocalFlavorTests(SimpleTestCase):
 <option value="VAO">Valle d\u2019Aosta</option>
 <option value="VEN">Veneto</option>
 </select>'''
-        self.assertEqual(f.render('regions', 'PMN'), out)
+        self.assertHTMLEqual(f.render('regions', 'PMN'), out)
 
     def test_ITZipCodeField(self):
         error_invalid = [u'Enter a valid zip code.']
