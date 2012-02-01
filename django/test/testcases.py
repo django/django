@@ -998,7 +998,7 @@ class _MediaFilesHandler(StaticFilesHandler):
         return settings.MEDIA_URL
 
     def serve(self, request):
-        return serve(request, self.file_path(request.path),
+        return serve(request, request.path,
             document_root=self.get_base_dir())
 
 
