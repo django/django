@@ -998,8 +998,8 @@ class _MediaFilesHandler(StaticFilesHandler):
         return settings.MEDIA_URL
 
     def serve(self, request):
-        return serve(request, request.path,
-            document_root=self.get_base_dir())
+        relative_url = request.path[len(self.base_url[2]):]
+        return serve(request, relative_url, document_root=self.get_base_dir())
 
 
 class LiveServerThread(threading.Thread):
