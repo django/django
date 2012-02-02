@@ -1,6 +1,5 @@
 from django.conf import settings
-from django.template.base import TemplateSyntaxError, Library, Node, TextNode
-from django.template.defaulttags import token_kwargs
+from django.template.base import TemplateSyntaxError, Library, Node, TextNode, token_kwargs
 from django.template.loader import get_template
 from django.utils.safestring import mark_safe
 
