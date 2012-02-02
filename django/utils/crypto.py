@@ -10,8 +10,8 @@ import operator
 from django.conf import settings
 
 
-trans_5c = "".join([chr(x ^ 0x5C) for x in xrange(256)])
-trans_36 = "".join([chr(x ^ 0x36) for x in xrange(256)])
+_trans_5c = "".join([chr(x ^ 0x5C) for x in xrange(256)])
+_trans_36 = "".join([chr(x ^ 0x36) for x in xrange(256)])
 
 
 def salted_hmac(key_salt, value, secret=None):
@@ -66,7 +66,7 @@ def constant_time_compare(val1, val2):
     return result == 0
 
 
-def bin_to_long(x):
+def _bin_to_long(x):
     """
     Convert a binary string into a long integer
 
@@ -75,17 +75,15 @@ def bin_to_long(x):
     return long(x.encode('hex'), 16)
 
 
-def long_to_bin(x):
+def _long_to_bin(x, hex_format_string):
     """
-    Convert a long integer into a binary string
+    Convert a long integer into a binary string.
+    hex_format_string is like "%020x" for padding 10 characters.
     """
-    hex = "%x" % (x)
-    if len(hex) % 2 == 1:
-        hex = '0' + hex
-    return binascii.unhexlify(hex)
+    return binascii.unhexlify(hex_format_string % x)
 
 
-def fast_hmac(key, msg, digest):
+def _fast_hmac(key, msg, digest):
     """
     A trimmed down version of Python's HMAC implementation
     """
@@ -93,9 +91,9 @@ def fast_hmac(key, msg, digest):
     if len(key) > dig1.block_size:
         key = digest(key).digest()
     key += chr(0) * (dig1.block_size - len(key))
-    dig1.update(key.translate(trans_36))
+    dig1.update(key.translate(_trans_36))
     dig1.update(msg)
-    dig2.update(key.translate(trans_5c))
+    dig2.update(key.translate(_trans_5c))
     dig2.update(dig1.digest())
     return dig2
 
@@ -123,13 +121,15 @@ def pbkdf2(password, salt, iterations, dklen=0, digest=None):
     l = -(-dklen // hlen)
     r = dklen - (l - 1) * hlen
 
+    hex_format_string = "%%0%ix" % (hlen * 2)
+
     def F(i):
         def U():
             u = salt + struct.pack('>I', i)
             for j in xrange(int(iterations)):
-                u = fast_hmac(password, u, digest).digest()
-                yield bin_to_long(u)
-        return long_to_bin(reduce(operator.xor, U()))
+                u = _fast_hmac(password, u, digest).digest()
+                yield _bin_to_long(u)
+        return _long_to_bin(reduce(operator.xor, U()), hex_format_string)
 
     T = [F(x) for x in range(1, l + 1)]
     return ''.join(T[:-1]) + T[-1][:r]

@@ -108,6 +108,17 @@ class TestUtilsCryptoPBKDF2(unittest.TestCase):
                        "c4007d5298f9033c0241d5ab69305e7b64eceeb8d"
                        "834cfec"),
         },
+        # Check leading zeros are not stripped (#17481) 
+        {
+            "args": { 
+                "password": chr(186), 
+                "salt": "salt", 
+                "iterations": 1, 
+                "dklen": 20, 
+                "digest": hashlib.sha1, 
+            }, 
+            "result": '0053d3b91a7f1e54effebd6d68771e8a6e0b2c5b',
+        },
     ]
 
     def test_public_vectors(self):
@@ -125,11 +136,15 @@ class TestUtilsCryptoPBKDF2(unittest.TestCase):
         Theory: If you run with 100 iterations, it should take 100
         times as long as running with 1 iteration.
         """
-        n1, n2 = 1000, 100000
-        elapsed = lambda f: timeit.Timer(f, 'from django.utils.crypto import pbkdf2').timeit(number=1)
+        # These values are chosen as a reasonable tradeoff between time
+        # to run the test suite and false positives caused by imprecise
+        # measurement.
+        n1, n2 = 200000, 800000
+        elapsed = lambda f: timeit.Timer(f, 
+                    'from django.utils.crypto import pbkdf2').timeit(number=1)
         t1 = elapsed('pbkdf2("password", "salt", iterations=%d)' % n1)
         t2 = elapsed('pbkdf2("password", "salt", iterations=%d)' % n2)
         measured_scale_exponent = math.log(t2 / t1, n2 / n1)
-        # This should be less than 1. We allow up to 1.1 so that tests don't 
+        # This should be less than 1. We allow up to 1.2 so that tests don't 
         # fail nondeterministically too often.
-        self.assertLess(measured_scale_exponent, 1.1)
+        self.assertLess(measured_scale_exponent, 1.2)
