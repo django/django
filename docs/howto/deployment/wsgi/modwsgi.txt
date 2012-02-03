@@ -162,7 +162,7 @@ Django distribution.
 We **strongly** recommend using :mod:`django.contrib.staticfiles` to handle the
 admin files (along with a Web server as outlined in the previous section; this
 means using the :djadmin:`collectstatic` management command to collect the
-static files in :setting:`STATIC_ROOT`, and then configuring your webserver to
+static files in :setting:`STATIC_ROOT`, and then configuring your Web server to
 serve :setting:`STATIC_ROOT` at :setting:`STATIC_URL`), but here are three
 other approaches:
 
