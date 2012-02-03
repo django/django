@@ -480,15 +480,15 @@ HTML comparisons in tests
 
 The :class:`~django.test.testcase.TestCase` base class now has some helpers to
 compare HTML without tripping over irrelevant differences in whitespace,
-argument quoting and ordering, and closing of self-closing tags. HTML can
-either be compared directly with the new
+argument quoting/ordering and closing of self-closing tags. You can either
+compare HTML directly with the new
 :meth:`~django.test.testcase.TestCase.assertHTMLEqual` and
 :meth:`~django.test.testcase.TestCase.assertHTMLNotEqual` assertions, or use
 the ``html=True`` flag with
 :meth:`~django.test.testcase.TestCase.assertContains` and
-:meth:`~django.test.testcase.TestCase.assertNotContains` to test if the test
+:meth:`~django.test.testcase.TestCase.assertNotContains` to test whether the
 client's response contains a given HTML fragment. See the :ref:`assertion
-documentation<assertions>` for more information.
+documentation<assertions>` for more.
 
 Minor features
 ~~~~~~~~~~~~~~
@@ -571,11 +571,11 @@ Django 1.4 also includes several smaller improvements worth noting:
 * The MySQL database backend can now make use of the savepoint feature
   implemented by MySQL version 5.0.3 or newer with the InnoDB storage engine.
 
-* It is now possible to pass initial values to the model forms that are part of
-  both model formsets and inline model formset as returned from factory
+* It's now possible to pass initial values to the model forms that are part of
+  both model formsets and inline model formsets as returned from factory
   functions ``modelformset_factory`` and ``inlineformset_factory`` respectively
   just like with regular formsets. However, initial values only apply to extra
-  forms i.e. those which are not bound to an existing model instance.
+  forms, i.e. those which are not bound to an existing model instance.
 
 * The sitemaps framework can now handle HTTPS links using the new
   :attr:`Sitemap.protocol <django.contrib.sitemaps.Sitemap.protocol>` class
@@ -800,8 +800,8 @@ to pysqlite). ``DatabaseWrapper`` however preserves the previous behavior by
 disabling thread-sharing by default, so this does not affect any existing
 code that purely relies on the ORM or on ``DatabaseWrapper.cursor()``.
 
-Finally, while it is now possible to pass connections between threads, Django
-does not make any effort to synchronize access to the underlying backend.
+Finally, while it's now possible to pass connections between threads, Django
+doesn't make any effort to synchronize access to the underlying backend.
 Concurrency behavior is defined by the underlying backend implementation.
 Check their documentation for details.
 
@@ -964,9 +964,9 @@ wild, because they would confuse browsers too.
 ``assertTemplateUsed`` and ``assertTemplateNotUsed`` as context manager
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-It is now possible to check whether a template was used or not in a block of
-code with the :meth:`~django.test.testcase.TestCase.assertTemplateUsed` and
-:meth:`~django.test.testcase.TestCase.assertTemplateNotUsed` assertions. They
+It's now possible to check whether a template was used within a block of
+code with :meth:`~django.test.testcase.TestCase.assertTemplateUsed` and
+:meth:`~django.test.testcase.TestCase.assertTemplateNotUsed`. And they
 can be used as a context manager::
 
     with self.assertTemplateUsed('index.html'):
@@ -974,18 +974,18 @@ can be used as a context manager::
     with self.assertTemplateNotUsed('base.html'):
         render_to_string('index.html')
 
-See the :ref:`assertion documentation<assertions>` for more information.
+See the :ref:`assertion documentation<assertions>` for more.
 
 Database connections after running the test suite
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The default test runner now does not restore the database connections after the
-tests' execution any more. This prevents the production database from being
-exposed to potential threads that would still be running and attempting to
-create new connections.
+The default test runner no longer restores the database connections after
+tests' execution. This prevents the production database from being exposed to
+potential threads that would still be running and attempting to create new
+connections.
 
 If your code relied on connections to the production database being created
-after the tests' execution, then you may restore the previous behavior by
+after tests' execution, then you can restore the previous behavior by
 subclassing ``DjangoTestRunner`` and overriding its ``teardown_databases()``
 method.
 

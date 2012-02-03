@@ -365,11 +365,11 @@ special: It's just a normal view.
 
 You normally won't have to bother with writing 404 views. If you don't set
 ``handler404``, the built-in view :func:`django.views.defaults.page_not_found`
-is used by default. In this case, you still have one obligation: To create a
+is used by default. In this case, you still have one obligation: create a
 ``404.html`` template in the root of your template directory. The default 404
 view will use that template for all 404 errors. If :setting:`DEBUG` is set to
 ``False`` (in your settings module) and if you didn't create a ``404.html``
-file, an ``Http500`` is raised instead.  So remember to create a ``404.html``.
+file, an ``Http500`` is raised instead. So remember to create a ``404.html``.
 
 A couple more things to note about 404 views:
 

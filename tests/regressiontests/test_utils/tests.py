@@ -357,7 +357,7 @@ class HTMLEqualTests(TestCase):
             <p> This is a valid paragraph
             <!-- browsers would close the p tag here -->
             <div> this is a div AFTER the p</div>
-            </p> <!-- this is invalid html parsing however it should make no
+            </p> <!-- this is invalid HTML parsing, but it should make no
             difference in most cases -->
         </body>
         </html>""")

@@ -96,17 +96,21 @@ browsers).
 It is suggested to place this first in the middleware list, so that the
 compression of the response content is the last thing that happens.
 
-It will not compress content bodies less than 200 bytes long, when the
-``Content-Encoding`` header is already set, or when the browser does not send
-an ``Accept-Encoding`` header containing ``gzip``.
+It will NOT compress content if any of the following are true:
 
-Content will also not be compressed when the browser is Internet Explorer and
-the ``Content-Type`` header contains ``javascript`` or starts with anything
-other than ``text/``. This is done to overcome a bug present in early versions
-of Internet Explorer which caused decompression not to be performed on certain
-content types.
+* The content body is less than 200 bytes long.
 
-GZip compression can be applied to individual views using the
+* The response has already set the ``Content-Encoding`` header.
+
+* The request (the browser) hasn't sent an ``Accept-Encoding`` header
+  containing ``gzip``.
+
+* The request is from Internet Explorer and the ``Content-Type`` header
+  contains ``javascript`` or starts with anything other than ``text/``.
+  We do this to avoid a bug in early versions of IE that caused decompression
+  not to be performed on certain content types.
+
+You can apply GZip compression to individual views using the
 :func:`~django.views.decorators.http.gzip_page()` decorator.
 
 Conditional GET middleware

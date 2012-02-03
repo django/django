@@ -411,15 +411,14 @@ class SimpleTestCase(ut2.TestCase):
 
     def assertHTMLEqual(self, html1, html2, msg=None):
         """
-        Asserts that two html snippets are semantically the same,
-        e.g. whitespace in most cases is ignored, attribute ordering is not
-        significant. The passed in arguments must be valid HTML.
-
+        Asserts that two HTML snippets are semantically the same.
+        Whitespace in most cases is ignored, and attribute ordering is not
+        significant. The passed-in arguments must be valid HTML.
         """
         dom1 = assert_and_parse_html(self, html1, msg,
-            u'First argument is not valid html:')
+            u'First argument is not valid HTML:')
         dom2 = assert_and_parse_html(self, html2, msg,
-            u'Second argument is not valid html:')
+            u'Second argument is not valid HTML:')
 
         if dom1 != dom2:
             standardMsg = '%s != %s' % (
@@ -433,9 +432,9 @@ class SimpleTestCase(ut2.TestCase):
     def assertHTMLNotEqual(self, html1, html2, msg=None):
         """Asserts that two HTML snippets are not semantically equivalent."""
         dom1 = assert_and_parse_html(self, html1, msg,
-            u'First argument is not valid html:')
+            u'First argument is not valid HTML:')
         dom2 = assert_and_parse_html(self, html2, msg,
-            u'Second argument is not valid html:')
+            u'Second argument is not valid HTML:')
 
         if dom1 == dom2:
             standardMsg = '%s == %s' % (
@@ -625,9 +624,9 @@ class TransactionTestCase(SimpleTestCase):
         content = response.content
         if html:
             content = assert_and_parse_html(self, content, None,
-                u"Response's content is not valid html:")
+                u"Response's content is not valid HTML:")
             text = assert_and_parse_html(self, text, None,
-                u"Second argument is not valid html:")
+                u"Second argument is not valid HTML:")
         real_count = content.count(text)
         if count is not None:
             self.assertEqual(real_count, count,
@@ -661,9 +660,9 @@ class TransactionTestCase(SimpleTestCase):
         content = response.content
         if html:
             content = assert_and_parse_html(self, content, None,
-                u'Response\'s content is no valid html:')
+                u'Response\'s content is not valid HTML:')
             text = assert_and_parse_html(self, text, None,
-                u'Second argument is no valid html:')
+                u'Second argument is not valid HTML:')
         self.assertEqual(content.count(text), 0,
             msg_prefix + "Response should not contain '%s'" % text)
 
@@ -721,7 +720,7 @@ class TransactionTestCase(SimpleTestCase):
     def assertTemplateUsed(self, response=None, template_name=None, msg_prefix=''):
         """
         Asserts that the template with the provided name was used in rendering
-        the response. Also useable as context manager.
+        the response. Also usable as context manager.
         """
         if response is None and template_name is None:
             raise TypeError(u'response and/or template_name argument must be provided')
@@ -729,7 +728,7 @@ class TransactionTestCase(SimpleTestCase):
         if msg_prefix:
             msg_prefix += ": "
 
-        # use assertTemplateUsed as context manager
+        # Use assertTemplateUsed as context manager.
         if not hasattr(response, 'templates') or (response is None and template_name):
             if response:
                 template_name = response
@@ -748,7 +747,7 @@ class TransactionTestCase(SimpleTestCase):
     def assertTemplateNotUsed(self, response=None, template_name=None, msg_prefix=''):
         """
         Asserts that the template with the provided name was NOT used in
-        rendering the response. Also useable as context manager.
+        rendering the response. Also usable as context manager.
         """
         if response is None and template_name is None:
             raise TypeError(u'response and/or template_name argument must be provided')
@@ -756,7 +755,7 @@ class TransactionTestCase(SimpleTestCase):
         if msg_prefix:
             msg_prefix += ": "
 
-        # use assertTemplateUsed as context manager
+        # Use assertTemplateUsed as context manager.
         if not hasattr(response, 'templates') or (response is None and template_name):
             if response:
                 template_name = response

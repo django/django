@@ -1593,11 +1593,10 @@ your test suite.
 
     .. versionadded:: 1.4
 
-    You can also use this as a context manager. The code that is executed
-    under the with statement is then observed instead of a response::
+    You can use this as a context manager, like this::
 
-        # This is necessary in Python 2.5 to enable the with statement, in 2.6
-        # and up it is no longer necessary.
+        # This is necessary in Python 2.5 to enable the with statement.
+        # In 2.6 and up, it's not necessary.
         from __future__ import with_statement
 
         with self.assertTemplateUsed('index.html'):
@@ -1680,14 +1679,14 @@ your test suite.
     is based on HTML semantics. The comparison takes following things into
     account:
 
-    * Whitespace before and after HTML tags is ignored
-    * All types of whitespace are considered equivalent
-    * All open tags are closed implicitly, i.e. when a surrounding tag is
-      closed or the HTML document ends
-    * Empty tags are equivalent to their self-closing version
-    * The ordering of attributes of an HTML element is not significant
+    * Whitespace before and after HTML tags is ignored.
+    * All types of whitespace are considered equivalent.
+    * All open tags are closed implicitly, e.g. when a surrounding tag is
+      closed or the HTML document ends.
+    * Empty tags are equivalent to their self-closing version.
+    * The ordering of attributes of an HTML element is not significant.
     * Attributes without an argument are equal to attributes that equal in
-      name and value (see the examples)
+      name and value (see the examples).
 
     The following examples are valid tests and don't raise any
     ``AssertionError``::
@@ -1713,7 +1712,6 @@ your test suite.
 
     ``html1`` and ``html2`` must be valid HTML. An ``AssertionError`` will be
     raised if one of them cannot be parsed.
-
 
 .. _topics-testing-email:
 

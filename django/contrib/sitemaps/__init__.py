@@ -80,10 +80,7 @@ class Sitemap(object):
                 except Site.DoesNotExist:
                     pass
             if site is None:
-                raise ImproperlyConfigured("In order to use Sitemaps "
-                        "you must either use the sites framework "
-                        "or pass in a Site or RequestSite object "
-                        "in your view code.")
+                raise ImproperlyConfigured("To use sitemaps, either enable the sites framework or pass a Site/RequestSite object in your view.")
         domain = site.domain
 
         urls = []

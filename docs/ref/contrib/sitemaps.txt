@@ -310,7 +310,7 @@ index will reflect that.
 
 .. versionadded:: 1.4
 
-If you are not using the vanilla sitemap view -- for example, if it is wrapped
+If you're not using the vanilla sitemap view -- for example, if it's wrapped
 with a caching decorator -- you must name your sitemap view and pass
 ``sitemap_url_name`` to the index view::
 
