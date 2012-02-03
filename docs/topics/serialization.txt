@@ -373,7 +373,7 @@ Dependencies during serialization
 
 Since natural keys rely on database lookups to resolve references, it
 is important that the data exists before it is referenced. You can't make
-a `forward reference` with natural keys--the data you are referencing
+a `forward reference` with natural keys -- the data you're referencing
 must exist before you include a natural key reference to that data.
 
 To accommodate this limitation, calls to :djadmin:`dumpdata` that use
@@ -401,7 +401,7 @@ example above::
             return (self.name,) + self.author.natural_key()
 
 The natural key for a ``Book`` is a combination of its name and its
-author.  This means that ``Person`` must be serialized before ``Book``.
+author. This means that ``Person`` must be serialized before ``Book``.
 To define this dependency, we add one extra line::
 
         def natural_key(self):
