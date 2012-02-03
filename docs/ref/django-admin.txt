@@ -362,7 +362,7 @@ Fixtures may be compressed in ``zip``, ``gz``, or ``bz2`` format. For example::
     django-admin.py loaddata mydata.json
 
 would look for any of ``mydata.json``, ``mydata.json.zip``,
-``mydata.json.gz``, or ``mydata.json.bz2``.  The first file contained within a
+``mydata.json.gz``, or ``mydata.json.bz2``. The first file contained within a
 zip-compressed archive is used.
 
 Note that if two fixtures with the same name but different
@@ -984,7 +984,7 @@ the current directory or the given destination.
 .. versionchanged:: 1.4
 
 By default, the new directory contains ``manage.py`` and a project package
-(containing a ``settings.py`` and other files).  See the `template source`_ for
+(containing a ``settings.py`` and other files). See the `template source`_ for
 details.
 
 If only the project name is given, both the project directory and project
@@ -993,7 +993,7 @@ will be created in the current working directory.
 
 If the optional destination is provided, Django will use that existing
 directory as the project directory, and create ``manage.py`` and the project
-package within it. You can use '.' to denote the current working directory.
+package within it. Use '.' to denote the current working directory.
 
 For example::
 
