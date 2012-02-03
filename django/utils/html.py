@@ -102,7 +102,7 @@ def fix_ampersands(value):
 fix_ampersands = allow_lazy(fix_ampersands, unicode)
 
 def smart_urlquote(url):
-    """Quotes an URL if it isn't already quoted."""
+    "Quotes a URL if it isn't already quoted."
     # Handle IDN before quoting.
     scheme, netloc, path, query, fragment = urlparse.urlsplit(url)
     try:
@@ -112,7 +112,7 @@ def smart_urlquote(url):
     else:
         url = urlparse.urlunsplit((scheme, netloc, path, query, fragment))
 
-    # An URL is considered unquoted if it contains no % character, or if it
+    # An URL is considered unquoted if it contains no % characters or
     # contains a % not followed by two hexadecimal digits. See #9655.
     if '%' not in url or unquoted_percents_re.search(url):
         # See http://bugs.python.org/issue2637
