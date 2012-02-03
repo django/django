@@ -955,11 +955,11 @@ compatibility, use ``SESSION_COOKIE_HTTPONLY = False`` in your settings file.
 The :tfilter:`urlize` filter no longer escapes every URL
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-When an URL contains a ``%xx`` sequence, where ``xx`` are two hexadecimal
-digits, :tfilter:`urlize` assumes that the URL is already escaped, and doesn't
-apply URL escaping again. This is wrong for URLs whose unquoted form contains
-a ``%xx`` sequence, but such URLs are very unlikely to happen in the wild,
-since they would confuse browsers too.
+When a URL contains a ``%xx`` sequence, where ``xx`` are two hexadecimal
+digits, :tfilter:`urlize` now assumes that the URL is already escaped and
+doesn't apply URL escaping again. This is wrong for URLs whose unquoted form
+contains a ``%xx`` sequence, but such URLs are very unlikely to happen in the
+wild, because they would confuse browsers too.
 
 ``assertTemplateUsed`` and ``assertTemplateNotUsed`` as context manager
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
