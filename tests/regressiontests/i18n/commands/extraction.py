@@ -4,6 +4,7 @@ from __future__ import with_statement
 import os
 import re
 import shutil
+from StringIO import StringIO
 
 from django.core import management
 from django.test import TestCase
@@ -177,7 +178,11 @@ class IgnoredExtractorTests(ExtractorTests):
     def test_ignore_option(self):
         os.chdir(self.test_dir)
         pattern1 = os.path.join('ignore_dir', '*')
-        management.call_command('makemessages', locale=LOCALE, verbosity=0, ignore_patterns=[pattern1])
+        stdout = StringIO()
+        management.call_command('makemessages', locale=LOCALE, verbosity=2,
+            ignore_patterns=[pattern1], stdout=stdout)
+        data = stdout.getvalue()
+        self.assertTrue("ignoring directory ignore_dir" in data)
         self.assertTrue(os.path.exists(self.PO_FILE))
         with open(self.PO_FILE, 'r') as fp:
             po_contents = fp.read()

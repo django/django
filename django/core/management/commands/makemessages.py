@@ -7,6 +7,7 @@ from itertools import dropwhile
 from optparse import make_option
 from subprocess import PIPE, Popen
 
+import django
 from django.core.management.base import CommandError, NoArgsCommand
 from django.utils.text import get_text_list
 from django.utils.jslex import prepare_js_for_gettext
@@ -44,11 +45,23 @@ def _popen(cmd):
     p = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE, close_fds=os.name != 'nt', universal_newlines=True)
     return p.communicate()
 
-def walk(root, topdown=True, onerror=None, followlinks=False):
+def walk(root, topdown=True, onerror=None, followlinks=False,
+         ignore_patterns=[], verbosity=0, stdout=sys.stdout):
     """
     A version of os.walk that can follow symlinks for Python < 2.6
     """
+    dir_suffix = '%s*' % os.sep
+    norm_patterns = map(lambda p: p.endswith(dir_suffix)
+                        and p[:-len(dir_suffix)] or p, ignore_patterns)
     for dirpath, dirnames, filenames in os.walk(root, topdown, onerror):
+        remove_dirs = []
+        for dirname in dirnames:
+            if is_ignored(os.path.normpath(os.path.join(dirpath, dirname)), norm_patterns):
+                remove_dirs.append(dirname)
+        for dirname in remove_dirs:
+            dirnames.remove(dirname)
+            if verbosity > 1:
+                stdout.write('ignoring directory %s\n' % dirname)
         yield (dirpath, dirnames, filenames)
         if followlinks:
             for d in dirnames:
@@ -66,29 +79,29 @@ def is_ignored(path, ignore_patterns):
             return True
     return False
 
-def find_files(root, ignore_patterns, verbosity, symlinks=False):
+def find_files(root, ignore_patterns, verbosity, stdout=sys.stdout, symlinks=False):
     """
     Helper function to get all files in the given root.
     """
     all_files = []
-    for (dirpath, dirnames, filenames) in walk(".", followlinks=symlinks):
-        for f in filenames:
-            norm_filepath = os.path.normpath(os.path.join(dirpath, f))
+    for (dirpath, dirnames, filenames) in walk(".", followlinks=symlinks,
+            ignore_patterns=ignore_patterns, verbosity=verbosity, stdout=stdout):
+        for filename in filenames:
+            norm_filepath = os.path.normpath(os.path.join(dirpath, filename))
             if is_ignored(norm_filepath, ignore_patterns):
                 if verbosity > 1:
-                    sys.stdout.write('ignoring file %s in %s\n' % (f, dirpath))
+                    stdout.write('ignoring file %s in %s\n' % (f, dirpath))
             else:
-                all_files.extend([(dirpath, f)])
+                all_files.extend([(dirpath, filename)])
     all_files.sort()
     return all_files
 
-def copy_plural_forms(msgs, locale, domain, verbosity):
+def copy_plural_forms(msgs, locale, domain, verbosity, stdout=sys.stdout):
     """
     Copies plural forms header contents from a Django catalog of locale to
     the msgs string, inserting it at the right place. msgs should be the
     contents of a newly created .po file.
     """
-    import django
     django_dir = os.path.normpath(os.path.join(os.path.dirname(django.__file__)))
     if domain == 'djangojs':
         domains = ('djangojs', 'django')
@@ -100,7 +113,7 @@ def copy_plural_forms(msgs, locale, domain, verbosity):
             m = plural_forms_re.search(open(django_po, 'rU').read())
             if m:
                 if verbosity > 1:
-                    sys.stderr.write("copying plural forms: %s\n" % m.group('value'))
+                    stdout.write("copying plural forms: %s\n" % m.group('value'))
                 lines = []
                 seen = False
                 for line in msgs.split('\n'):
@@ -132,8 +145,8 @@ def write_pot_file(potfile, msgs, file, work_file, is_templatized):
     finally:
         f.close()
 
-def process_file(file, dirpath, potfile, domain, verbosity, extensions, wrap,
-        location):
+def process_file(file, dirpath, potfile, domain, verbosity,
+                 extensions, wrap, location, stdout=sys.stdout):
     """
     Extract translatable literals from :param file: for :param domain:
     creating or updating the :param potfile: POT file.
@@ -144,7 +157,7 @@ def process_file(file, dirpath, potfile, domain, verbosity, extensions, wrap,
     from django.utils.translation import templatize
 
     if verbosity > 1:
-        sys.stdout.write('processing file %s in %s\n' % (file, dirpath))
+        stdout.write('processing file %s in %s\n' % (file, dirpath))
     _, file_ext = os.path.splitext(file)
     if domain == 'djangojs' and file_ext in extensions:
         is_templatized = True
@@ -162,10 +175,8 @@ def process_file(file, dirpath, potfile, domain, verbosity, extensions, wrap,
             'xgettext -d %s -L C %s %s --keyword=gettext_noop '
             '--keyword=gettext_lazy --keyword=ngettext_lazy:1,2 '
             '--keyword=pgettext:1c,2 --keyword=npgettext:1c,2,3 '
-            '--from-code UTF-8 --add-comments=Translators -o - "%s"' % (
-                domain, wrap, location, work_file
-            )
-        )
+            '--from-code UTF-8 --add-comments=Translators -o - "%s"' %
+            (domain, wrap, location, work_file))
     elif domain == 'django' and (file_ext == '.py' or file_ext in extensions):
         thefile = file
         orig_file = os.path.join(dirpath, file)
@@ -187,9 +198,8 @@ def process_file(file, dirpath, potfile, domain, verbosity, extensions, wrap,
             '--keyword=ungettext_lazy:1,2 --keyword=pgettext:1c,2 '
             '--keyword=npgettext:1c,2,3 --keyword=pgettext_lazy:1c,2 '
             '--keyword=npgettext_lazy:1c,2,3 --from-code UTF-8 '
-            '--add-comments=Translators -o - "%s"' % (
-                domain, wrap, location, work_file)
-        )
+            '--add-comments=Translators -o - "%s"' %
+            (domain, wrap, location, work_file))
     else:
         return
     msgs, errors = _popen(cmd)
@@ -206,8 +216,8 @@ def process_file(file, dirpath, potfile, domain, verbosity, extensions, wrap,
     if is_templatized:
         os.unlink(work_file)
 
-def write_po_file(pofile, potfile, domain, locale, verbosity,
-        copy_pforms, wrap, location, no_obsolete):
+def write_po_file(pofile, potfile, domain, locale, verbosity, stdout,
+                  copy_pforms, wrap, location, no_obsolete):
     """
     Creates of updates the :param pofile: PO file for :param domain: and :param
     locale:.  Uses contents of the existing :param potfile:.
@@ -232,7 +242,7 @@ def write_po_file(pofile, potfile, domain, locale, verbosity,
             raise CommandError(
                 "errors happened while running msgmerge\n%s" % errors)
     elif copy_pforms:
-        msgs = copy_plural_forms(msgs, locale, domain, verbosity)
+        msgs = copy_plural_forms(msgs, locale, domain, verbosity, stdout)
     msgs = msgs.replace(
         "#. #-#-#-#-#  %s.pot (PACKAGE VERSION)  #-#-#-#-#\n" % domain, "")
     f = open(pofile, 'wb')
@@ -250,7 +260,7 @@ def write_po_file(pofile, potfile, domain, locale, verbosity,
 
 def make_messages(locale=None, domain='django', verbosity=1, all=False,
         extensions=None, symlinks=False, ignore_patterns=None, no_wrap=False,
-        no_location=False, no_obsolete=False):
+        no_location=False, no_obsolete=False, stdout=sys.stdout):
     """
     Uses the ``locale/`` directory from the Django SVN tree or an
     application/project to process all files with translatable literals for
@@ -312,7 +322,7 @@ def make_messages(locale=None, domain='django', verbosity=1, all=False,
 
     for locale in locales:
         if verbosity > 0:
-            print "processing language", locale
+            stdout.write("processing language %s" % locale)
         basedir = os.path.join(localedir, locale, 'LC_MESSAGES')
         if not os.path.isdir(basedir):
             os.makedirs(basedir)
@@ -324,12 +334,12 @@ def make_messages(locale=None, domain='django', verbosity=1, all=False,
             os.unlink(potfile)
 
         for dirpath, file in find_files(".", ignore_patterns, verbosity,
-                symlinks=symlinks):
+                stdout, symlinks=symlinks):
             process_file(file, dirpath, potfile, domain, verbosity, extensions,
-                    wrap, location)
+                    wrap, location, stdout)
 
         if os.path.exists(potfile):
-            write_po_file(pofile, potfile, domain, locale, verbosity,
+            write_po_file(pofile, potfile, domain, locale, verbosity, stdout,
                     not invoked_for_django, wrap, location, no_obsolete)
 
 
@@ -357,7 +367,7 @@ class Command(NoArgsCommand):
         make_option('--no-obsolete', action='store_true', dest='no_obsolete',
             default=False, help="Remove obsolete message strings"),
     )
-    help = ( "Runs over the entire source tree of the current directory and "
+    help = ("Runs over the entire source tree of the current directory and "
 "pulls out all strings marked for translation. It creates (or updates) a message "
 "file in the conf/locale (in the django tree) or locale (for projects and "
 "applications) directory.\n\nYou must run this command with one of either the "
@@ -386,7 +396,8 @@ class Command(NoArgsCommand):
             extensions = handle_extensions(extensions or ['html', 'txt'])
 
         if verbosity > 1:
-            sys.stdout.write('examining files with the extensions: %s\n'
+            self.stdout.write('examining files with the extensions: %s\n'
                              % get_text_list(list(extensions), 'and'))
 
-        make_messages(locale, domain, verbosity, process_all, extensions, symlinks, ignore_patterns, no_wrap, no_location, no_obsolete)
+        make_messages(locale, domain, verbosity, process_all, extensions,
+            symlinks, ignore_patterns, no_wrap, no_location, no_obsolete, self.stdout)
