@@ -908,6 +908,7 @@ class MultiValueField(Field):
 
         out = self.compress(clean_data)
         self.validate(out)
+        self.run_validators(out)
         return out
 
     def compress(self, data_list):
