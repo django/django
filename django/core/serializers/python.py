@@ -45,18 +45,12 @@ class Serializer(base.Serializer):
             self._current[field.name] = field.value_to_string(obj)
 
     def handle_fk_field(self, obj, field):
-        related = getattr(obj, field.name)
-        if related is not None:
-            if self.use_natural_keys and hasattr(related, 'natural_key'):
-                related = related.natural_key()
-            else:
-                if field.rel.field_name == related._meta.pk.name:
-                    # Related to remote object via primary key
-                    related = related._get_pk_val()
-                else:
-                    # Related to remote object via other field
-                    related = smart_unicode(getattr(related, field.rel.field_name), strings_only=True)
-        self._current[field.name] = related
+        if self.use_natural_keys and hasattr(field.rel.to, 'natural_key'):
+            related = getattr(obj, field.name)
+            value = related.natural_key()
+        else:
+            value = getattr(obj, field.get_attname())
+        self._current[field.name] = value
 
     def handle_m2m_field(self, obj, field):
         if field.rel.through._meta.auto_created:

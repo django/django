@@ -178,6 +178,19 @@ class SerializersTestBase(object):
         mv_obj = obj_list[0].object
         self.assertEqual(mv_obj.title, movie_title)
 
+    def test_serialize_superfluous_queries(self):
+        """Ensure no superfluous queries are made when serializing ForeignKeys
+
+        #17602
+        """
+        ac = Actor(name='Actor name')
+        ac.save()
+        mv = Movie(title='Movie title', actor_id=ac.pk)
+        mv.save()
+
+        with self.assertNumQueries(0):
+            serial_str = serializers.serialize(self.serializer_name, [mv])
+
     def test_serialize_with_null_pk(self):
         """
         Tests that serialized data with no primary key results
