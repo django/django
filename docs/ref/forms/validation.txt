@@ -300,7 +300,7 @@ example::
         ...
 
         def clean(self):
-            cleaned_data = self.cleaned_data
+            cleaned_data = super(ContactForm, self).clean()
             cc_myself = cleaned_data.get("cc_myself")
             subject = cleaned_data.get("subject")
 
@@ -316,6 +316,9 @@ example::
 In this code, if the validation error is raised, the form will display an
 error message at the top of the form (normally) describing the problem.
 
+Note that the call to ``super(ContactForm, self).clean()`` in the example code
+ensures that any validation logic in parent classes is maintained.
+
 The second approach might involve assigning the error message to one of the
 fields. In this case, let's assign an error message to both the "subject" and
 "cc_myself" rows in the form display. Be careful when doing this in practice,
@@ -329,7 +332,7 @@ sample) looks like this::
         ...
 
         def clean(self):
-            cleaned_data = self.cleaned_data
+            cleaned_data = super(ContactForm, self).clean()
             cc_myself = cleaned_data.get("cc_myself")
             subject = cleaned_data.get("subject")
 
