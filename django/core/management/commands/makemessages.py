@@ -84,7 +84,7 @@ def find_files(root, ignore_patterns, verbosity, stdout=sys.stdout, symlinks=Fal
     Helper function to get all files in the given root.
     """
     all_files = []
-    for (dirpath, dirnames, filenames) in walk(".", followlinks=symlinks,
+    for (dirpath, dirnames, filenames) in walk(root, followlinks=symlinks,
             ignore_patterns=ignore_patterns, verbosity=verbosity, stdout=stdout):
         for filename in filenames:
             norm_filepath = os.path.normpath(os.path.join(dirpath, filename))
