@@ -474,7 +474,7 @@ class ForeignRelatedObjectsDescriptor(object):
             def add(self, *objs):
                 for obj in objs:
                     if not isinstance(obj, self.model):
-                        raise TypeError("'%s' instance expected" % self.model._meta.object_name)
+                        raise TypeError("'%s' instance expected, got %r" % (self.model._meta.object_name, obj))
                     setattr(obj, rel_field.name, self.instance)
                     obj.save()
             add.alters_data = True
@@ -636,7 +636,7 @@ def create_many_related_manager(superclass, rel):
                                                (obj, self.instance._state.db, obj._state.db))
                         new_ids.add(obj.pk)
                     elif isinstance(obj, Model):
-                        raise TypeError("'%s' instance expected" % self.model._meta.object_name)
+                        raise TypeError("'%s' instance expected, got %r" % (self.model._meta.object_name, obj))
                     else:
                         new_ids.add(obj)
                 db = router.db_for_write(self.through, instance=self.instance)

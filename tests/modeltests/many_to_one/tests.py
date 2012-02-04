@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, with_statement
 
 from copy import deepcopy
 from datetime import datetime
@@ -68,7 +68,8 @@ class ManyToOneTests(TestCase):
         self.assertQuerysetEqual(self.r2.article_set.all(), ["<Article: Paul's story>"])
 
         # Adding an object of the wrong type raises TypeError.
-        self.assertRaises(TypeError, self.r.article_set.add, self.r2)
+        with self.assertRaisesRegexp(TypeError, "'Article' instance expected, got <Reporter.*"):
+            self.r.article_set.add(self.r2)
         self.assertQuerysetEqual(self.r.article_set.all(),
             [
                 "<Article: John's second story>",
