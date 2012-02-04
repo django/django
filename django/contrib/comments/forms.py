@@ -8,7 +8,7 @@ from django.utils.crypto import salted_hmac, constant_time_compare
 from django.utils.encoding import force_unicode
 from django.utils.text import get_text_list
 from django.utils import timezone
-from django.utils.translation import ungettext, ugettext_lazy as _
+from django.utils.translation import ungettext, ugettext, ugettext_lazy as _
 
 COMMENT_MAX_LENGTH = getattr(settings,'COMMENT_MAX_LENGTH', 3000)
 
@@ -175,8 +175,10 @@ class CommentDetailsForm(CommentSecurityForm):
             if bad_words:
                 raise forms.ValidationError(ungettext(
                     "Watch your mouth! The word %s is not allowed here.",
-                    "Watch your mouth! The words %s are not allowed here.", len(bad_words))
-                    % get_text_list(['"%s%s%s"' % (i[0], '-'*(len(i)-2), i[-1]) for i in bad_words], 'and'))
+                    "Watch your mouth! The words %s are not allowed here.",
+                    len(bad_words)) % get_text_list(
+                        ['"%s%s%s"' % (i[0], '-'*(len(i)-2), i[-1])
+                         for i in bad_words], ugettext('and')))
         return comment
 
 class CommentForm(CommentDetailsForm):
