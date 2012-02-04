@@ -38,7 +38,7 @@ accept_language_re = re.compile(r'''
         (?:\s*,\s*|$)                                 # Multiple accepts per header.
         ''', re.VERBOSE)
 
-language_code_prefix_re = re.compile(r'^/([\w-]+)/')
+language_code_prefix_re = re.compile(r'^/([\w-]+)(/|$)')
 
 def to_locale(language, to_lower=False):
     """
