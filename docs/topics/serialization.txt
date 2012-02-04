@@ -215,7 +215,9 @@ automatically created by Django during the database synchronization process,
 the primary key of a given content type isn't easy to predict; it will
 depend on how and when :djadmin:`syncdb` was executed. This is true for all
 models which automatically generate objects, notably including
-:class:`~django.contrib.auth.models.Permission`.
+:class:`~django.contrib.auth.models.Permission`,
+:class:`~django.contrib.auth.models.Group`, and
+:class:`~django.contrib.auth.models.User`.
 
 .. warning::
 

@@ -1,0 +1,32 @@
+[
+    {
+        "pk": 1, 
+        "model": "auth.group", 
+        "fields": {
+            "name": "my_group", 
+            "permissions": []
+        }
+    }, 
+    {
+        "pk": 1, 
+        "model": "auth.user", 
+        "fields": {
+            "username": "my_username", 
+            "first_name": "", 
+            "last_name": "", 
+            "is_active": true, 
+            "is_superuser": true, 
+            "is_staff": true, 
+            "last_login": "2012-01-13 00:14:00", 
+            "groups": [
+                [
+                    "my_group"
+                ]
+            ], 
+            "user_permissions": [], 
+            "password": "pbkdf2_sha256$10000$LUyhxJjuLwXF$f6Zbpnx1L5dPze8m0itBaHMDyZ/n6JyhuavQy2RrBIM=", 
+            "email": "email@example.com", 
+            "date_joined": "2012-01-13 00:14:00"
+        }
+    }
+]

@@ -86,6 +86,13 @@ class Permission(models.Model):
     natural_key.dependencies = ['contenttypes.contenttype']
 
 
+class GroupManager(models.Manager):
+    """
+    The manager for the auth's Group model.
+    """
+    def get_by_natural_key(self, name):
+        return self.get(name=name)
+
 class Group(models.Model):
     """
     Groups are a generic way of categorizing users to apply permissions, or
@@ -107,12 +114,17 @@ class Group(models.Model):
     permissions = models.ManyToManyField(Permission,
         verbose_name=_('permissions'), blank=True)
 
+    objects = GroupManager()
+
     class Meta:
         verbose_name = _('group')
         verbose_name_plural = _('groups')
 
     def __unicode__(self):
         return self.name
+
+    def natural_key(self):
+        return (self.name,)
 
 
 class UserManager(models.Manager):
@@ -159,6 +171,9 @@ class UserManager(models.Manager):
         avoid confusion.
         """
         return get_random_string(length, allowed_chars)
+
+    def get_by_natural_key(self, username):
+        return self.get(username=username)
 
 
 # A few helper functions for common logic between User and AnonymousUser.
@@ -239,6 +254,9 @@ class User(models.Model):
 
     def __unicode__(self):
         return self.username
+
+    def natural_key(self):
+        return (self.username,)
 
     def get_absolute_url(self):
         return "/users/%s/" % urllib.quote(smart_str(self.username))
