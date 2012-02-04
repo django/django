@@ -249,6 +249,17 @@ class FormsetTests(TestCase):
         self.assertEqual(formset.extra_forms[0].initial['username'], "apollo11")
         self.assertTrue(u'value="apollo12"' in formset.extra_forms[1].as_p())
 
+    def test_extraneous_query_is_not_run(self):
+        Formset = modelformset_factory(Network)
+        data = {u'test-TOTAL_FORMS': u'1',
+                u'test-INITIAL_FORMS': u'0',
+                u'test-MAX_NUM_FORMS': u'',
+                u'test-0-name': u'Random Place', }
+        with self.assertNumQueries(1):
+            formset = Formset(data, prefix="test")
+            formset.save()
+
+
 class CustomWidget(forms.CharField):
     pass
 

@@ -591,7 +591,7 @@ class BaseModelFormSet(BaseFormSet):
     def save_existing_objects(self, commit=True):
         self.changed_objects = []
         self.deleted_objects = []
-        if not self.get_queryset():
+        if not self.initial_forms:
             return []
 
         saved_instances = []
