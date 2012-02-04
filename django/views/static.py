@@ -14,6 +14,7 @@ import urllib
 from django.http import Http404, HttpResponse, HttpResponseRedirect, HttpResponseNotModified
 from django.template import loader, Template, Context, TemplateDoesNotExist
 from django.utils.http import http_date, parse_http_date
+from django.utils.translation import ugettext as _, ugettext_noop
 
 def serve(request, path, document_root=None, show_indexes=False):
     """
@@ -48,9 +49,9 @@ def serve(request, path, document_root=None, show_indexes=False):
     if os.path.isdir(fullpath):
         if show_indexes:
             return directory_index(newpath, fullpath)
-        raise Http404("Directory indexes are not allowed here.")
+        raise Http404(_(u"Directory indexes are not allowed here."))
     if not os.path.exists(fullpath):
-        raise Http404('"%s" does not exist' % fullpath)
+        raise Http404(_(u'"%s" does not exist') % fullpath)
     # Respect the If-Modified-Since header.
     statobj = os.stat(fullpath)
     mimetype, encoding = mimetypes.guess_type(fullpath)
@@ -69,16 +70,17 @@ def serve(request, path, document_root=None, show_indexes=False):
 
 
 DEFAULT_DIRECTORY_INDEX_TEMPLATE = """
+{% load i18n %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
     <meta http-equiv="Content-Language" content="en-us" />
     <meta name="robots" content="NONE,NOARCHIVE" />
-    <title>Index of {{ directory }}</title>
+    <title>{% blocktrans %}Index of {{ directory }}{% endblocktrans %}</title>
   </head>
   <body>
-    <h1>Index of {{ directory }}</h1>
+    <h1>{% blocktrans %}Index of {{ directory }}{% endblocktrans %}</h1>
     <ul>
       {% ifnotequal directory "/" %}
       <li><a href="../">../</a></li>
@@ -90,6 +92,7 @@ DEFAULT_DIRECTORY_INDEX_TEMPLATE = """
   </body>
 </html>
 """
+template_translatable = ugettext_noop(u"Index of %(directory)s")
 
 def directory_index(path, fullpath):
     try:
