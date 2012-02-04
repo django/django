@@ -24,3 +24,12 @@ class Article(models.Model):
 
     def __unicode__(self):
         return self.headline
+
+class ArticlePKOrdering(models.Model):
+    headline = models.CharField(max_length=100)
+    pub_date = models.DateTimeField()
+    class Meta:
+        ordering = ('-pk',)
+
+    def __unicode__(self):
+        return self.headline

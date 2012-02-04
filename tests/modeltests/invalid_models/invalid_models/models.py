@@ -233,6 +233,15 @@ class UnicodeForeignKeys(models.Model):
 class PrimaryKeyNull(models.Model):
     my_pk_field = models.IntegerField(primary_key=True, null=True)
 
+class OrderByPKModel(models.Model):
+    """
+    Model to test that ordering by pk passes validation.
+    Refs #8291
+    """
+    name = models.CharField(max_length=100, blank=True)
+
+    class Meta:
+        ordering = ('pk',)
 
 model_errors = """invalid_models.fielderrors: "charfield": CharFields require a "max_length" attribute that is a positive integer.
 invalid_models.fielderrors: "charfield2": CharFields require a "max_length" attribute that is a positive integer.

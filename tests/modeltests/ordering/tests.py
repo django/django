@@ -5,7 +5,7 @@ from operator import attrgetter
 
 from django.test import TestCase
 
-from .models import Article
+from .models import Article, ArticlePKOrdering
 
 
 class OrderingTests(TestCase):
@@ -134,6 +134,34 @@ class OrderingTests(TestCase):
                 "Article 2",
                 "Article 3",
                 "Article 4",
+            ],
+            attrgetter("headline")
+        )
+
+    def test_order_by_pk(self):
+        """
+        Ensure that 'pk' works as an ordering option in Meta.
+        Refs #8291.
+        """
+        a1 = ArticlePKOrdering.objects.create(
+            pk=1, headline="Article 1", pub_date=datetime(2005, 7, 26)
+        )
+        a2 = ArticlePKOrdering.objects.create(
+            pk=2, headline="Article 2", pub_date=datetime(2005, 7, 27)
+        )
+        a3 = ArticlePKOrdering.objects.create(
+            pk=3, headline="Article 3", pub_date=datetime(2005, 7, 27)
+        )
+        a4 = ArticlePKOrdering.objects.create(
+            pk=4, headline="Article 4", pub_date=datetime(2005, 7, 28)
+        )
+
+        self.assertQuerysetEqual(
+            ArticlePKOrdering.objects.all(), [
+                "Article 4",
+                "Article 3",
+                "Article 2",
+                "Article 1",
             ],
             attrgetter("headline")
         )
