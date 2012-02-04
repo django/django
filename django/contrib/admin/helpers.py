@@ -115,17 +115,17 @@ class AdminField(object):
 
     def label_tag(self):
         classes = []
+        contents = conditional_escape(force_unicode(self.field.label))
         if self.is_checkbox:
             classes.append(u'vCheckboxLabel')
-            contents = force_unicode(escape(self.field.label))
         else:
-            contents = force_unicode(escape(self.field.label)) + u':'
+            contents += u':'
         if self.field.field.required:
             classes.append(u'required')
         if not self.is_first:
             classes.append(u'inline')
         attrs = classes and {'class': u' '.join(classes)} or {}
-        return self.field.label_tag(contents=contents, attrs=attrs)
+        return self.field.label_tag(contents=mark_safe(contents), attrs=attrs)
 
     def errors(self):
         return mark_safe(self.field.errors.as_ul())

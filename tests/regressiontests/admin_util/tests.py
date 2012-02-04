@@ -4,14 +4,17 @@ from datetime import datetime
 
 from django.conf import settings
 from django.contrib import admin
+from django.contrib.admin import helpers
 from django.contrib.admin.util import (display_for_field, label_for_field,
     lookup_field, NestedObjects)
 from django.contrib.admin.views.main import EMPTY_CHANGELIST_VALUE
 from django.contrib.sites.models import Site
 from django.db import models, DEFAULT_DB_ALIAS
+from django import forms
 from django.test import TestCase
 from django.utils import unittest
 from django.utils.formats import localize
+from django.utils.safestring import mark_safe
 
 from .models import Article, Count, Event, Location
 
@@ -258,3 +261,26 @@ class UtilTests(unittest.TestCase):
         self.assertTrue(
             unicode(log_entry).startswith('Deleted ')
         )
+
+    def test_safestring_in_field_label(self):
+        # safestring should not be escaped
+        class MyForm(forms.Form):
+            text = forms.CharField(label=mark_safe('<i>text</i>'))
+            cb   = forms.BooleanField(label=mark_safe('<i>cb</i>'))
+
+        form = MyForm()
+        self.assertEqual(helpers.AdminField(form, 'text', is_first=False).label_tag(),
+                         '<label for="id_text" class="required inline"><i>text</i>:</label>')
+        self.assertEqual(helpers.AdminField(form, 'cb', is_first=False).label_tag(),
+                         '<label for="id_cb" class="vCheckboxLabel required inline"><i>cb</i></label>')
+
+        # normal strings needs to be escaped
+        class MyForm(forms.Form):
+            text = forms.CharField(label='&text')
+            cb   = forms.BooleanField(label='&cb')
+
+        form = MyForm()
+        self.assertEqual(helpers.AdminField(form, 'text', is_first=False).label_tag(),
+                         '<label for="id_text" class="required inline">&amp;text:</label>')
+        self.assertEqual(helpers.AdminField(form, 'cb', is_first=False).label_tag(),
+                         '<label for="id_cb" class="vCheckboxLabel required inline">&amp;cb</label>')
