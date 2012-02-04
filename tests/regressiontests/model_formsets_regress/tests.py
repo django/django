@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, with_statement
 
 from django import forms
 from django.forms.formsets import BaseFormSet, DELETION_FIELD_NAME
