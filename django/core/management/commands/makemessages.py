@@ -90,7 +90,7 @@ def find_files(root, ignore_patterns, verbosity, stdout=sys.stdout, symlinks=Fal
             norm_filepath = os.path.normpath(os.path.join(dirpath, filename))
             if is_ignored(norm_filepath, ignore_patterns):
                 if verbosity > 1:
-                    stdout.write('ignoring file %s in %s\n' % (f, dirpath))
+                    stdout.write('ignoring file %s in %s\n' % (filename, dirpath))
             else:
                 all_files.extend([(dirpath, filename)])
     all_files.sort()
