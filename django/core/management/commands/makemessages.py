@@ -46,10 +46,12 @@ def _popen(cmd):
     return p.communicate()
 
 def walk(root, topdown=True, onerror=None, followlinks=False,
-         ignore_patterns=[], verbosity=0, stdout=sys.stdout):
+         ignore_patterns=None, verbosity=0, stdout=sys.stdout):
     """
     A version of os.walk that can follow symlinks for Python < 2.6
     """
+    if ignore_patterns is None:
+        ignore_patterns = []
     dir_suffix = '%s*' % os.sep
     norm_patterns = map(lambda p: p.endswith(dir_suffix)
                         and p[:-len(dir_suffix)] or p, ignore_patterns)
@@ -391,9 +393,10 @@ class Command(NoArgsCommand):
         no_location = options.get('no_location')
         no_obsolete = options.get('no_obsolete')
         if domain == 'djangojs':
-            extensions = handle_extensions(extensions or ['js'])
+            exts = extensions if extensions else ['js']
         else:
-            extensions = handle_extensions(extensions or ['html', 'txt'])
+            exts = extensions if extensions else ['html', 'txt']
+        extensions = handle_extensions(exts)
 
         if verbosity > 1:
             self.stdout.write('examining files with the extensions: %s\n'
