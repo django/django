@@ -48,6 +48,11 @@ class TemplateCommand(BaseCommand):
                     help='The file extension(s) to render (default: "py") '
                          'Separate multiple extensions with commas, or use '
                          '-e multiple times.'),
+        make_option('--name', '-n', dest='files',
+                    action='append', default=[],
+                    help='The file name(s) to render '
+                         'Separate multiple extensions with commas, or use '
+                         '-n multiple times.')
         )
     requires_model_validation = False
     # Can't import settings during this command, because they haven't
@@ -89,10 +94,16 @@ class TemplateCommand(BaseCommand):
 
         extensions = tuple(
             handle_extensions(options.get('extensions'), ignored=()))
+        extra_files = []
+        for file in options.get('files'):
+            extra_files.extend(map(lambda x: x.strip(), file.split(',')))
         if self.verbosity >= 2:
             self.stdout.write("Rendering %s template files with "
                               "extensions: %s\n" %
                               (app_or_project, ', '.join(extensions)))
+            self.stdout.write("Rendering %s template files with "
+                              "filenames: %s\n" %
+                              (app_or_project, ', '.join(extra_files)))
 
         base_name = '%s_name' % app_or_project
         base_subdir = '%s_template' % app_or_project
@@ -142,7 +153,7 @@ class TemplateCommand(BaseCommand):
                 # accidentally render Django templates files
                 with open(old_path, 'r') as template_file:
                     content = template_file.read()
-                if filename.endswith(extensions):
+                if filename.endswith(extensions) or filename in extra_files:
                     template = Template(content)
                     content = template.render(context)
                 with open(new_path, 'w') as new_file:

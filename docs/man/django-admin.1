@@ -115,11 +115,11 @@ name(s).
 Prints the SQL statements for resetting PostgreSQL sequences for the
 given app name(s).
 .TP
-.BI "startapp [" "\-\-template=PATH_OR_URL" "] [" "\-\-extension=EXTENSION" "] [" "appname" "] [" "destination" "]"
+.BI "startapp [" "\-\-template=PATH_OR_URL" "] [" "\-\-extension=EXTENSION" "] [" "\-\-name=FILENAME" "] [" "appname" "] [" "destination" "]"
 Creates a Django app directory structure for the given app name in
 the current directory or the optional destination.
 .TP
-.BI "startproject [" "\-\-template=PATH_OR_URL" "] [" "\-\-extension=EXTENSION" "] [" "projectname" "] [" "destination" "]"
+.BI "startproject [" "\-\-template=PATH_OR_URL" "] [" "\-\-extension=EXTENSION" "] [" "\-\-name=FILENAME" "] [" "projectname" "] [" "destination" "]"
 Creates a Django project directory structure for the given project name
 in the current directory or the optional destination.
 .TP
@@ -213,8 +213,11 @@ Don't break long message lines into several lines.
 .I \-a, \-\-all
 Process all available locales when using makemessages..SH "ENVIRONMENT"
 .TP
-.I \-a, \-\-template=PATH_OR_URL
+.I \-\-template=PATH_OR_URL
 The file or directory path or URL to load the project and app templates from.
+.TP
+.I \-n, \-\-name=FILENAME
+The name of an additional file to render when using app and project templates.
 .TP
 .I DJANGO_SETTINGS_MODULE
 In the absence of the
