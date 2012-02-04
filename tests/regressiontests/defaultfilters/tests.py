@@ -288,6 +288,10 @@ class DefaultFiltersTests(TestCase):
         self.assertEqual(urlize('usa.gov'),
             u'<a href="http://usa.gov" rel="nofollow">usa.gov</a>')
 
+        # Check urlize don't crash on invalid email with dot-starting domain - see #17592
+        self.assertEqual(urlize('email@.stream.ru'),
+            u'email@.stream.ru')
+
     def test_wordcount(self):
         self.assertEqual(wordcount(''), 0)
         self.assertEqual(wordcount(u'oneword'), 1)

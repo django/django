@@ -168,7 +168,10 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
                 url = smart_urlquote('http://%s' % middle)
             elif not ':' in middle and simple_email_re.match(middle):
                 local, domain = middle.rsplit('@', 1)
-                domain = domain.encode('idna')
+                try:
+                    domain = domain.encode('idna')
+                except UnicodeError:
+                    continue
                 url = 'mailto:%s@%s' % (local, domain)
                 nofollow_attr = ''
 
