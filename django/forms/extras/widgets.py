@@ -136,6 +136,9 @@ class SelectDateWidget(Widget):
         return select_html
 
     def _has_changed(self, initial, data):
-        input_format = get_format('DATE_INPUT_FORMATS')[0]
-        data = datetime_safe.datetime.strptime(data, input_format).date()
+        try:
+            input_format = get_format('DATE_INPUT_FORMATS')[0]
+            data = datetime_safe.datetime.strptime(data, input_format).date()
+        except (TypeError, ValueError):
+            pass
         return super(SelectDateWidget, self)._has_changed(initial, data)

@@ -18,6 +18,9 @@ from .error_messages import AssertFormErrorsMixin
 class GetDate(Form):
     mydate = DateField(widget=SelectDateWidget)
 
+class GetNotRequiredDate(Form):
+    mydate = DateField(widget=SelectDateWidget, required=False)
+
 class GetDateShowHiddenInitial(Form):
     mydate = DateField(widget=SelectDateWidget, show_hidden_initial=True)
 
@@ -618,6 +621,15 @@ class FormsExtraTestCase(TestCase, AssertFormErrorsMixin):
         self.assertFalse(FormWithoutFile().is_multipart())
         self.assertTrue(FormWithFile().is_multipart())
         self.assertTrue(FormWithImage().is_multipart())
+
+    def test_field_not_required(self):
+        b = GetNotRequiredDate({
+            'mydate_year': '',
+            'mydate_month': '',
+            'mydate_day': ''
+        })
+        self.assertFalse(b.has_changed())
+
 
 
 class FormsExtraL10NTestCase(TestCase):
