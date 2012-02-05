@@ -1,4 +1,5 @@
 import HTMLParser as _HTMLParser
+import re
 
 
 class HTMLParser(_HTMLParser.HTMLParser):
@@ -11,7 +12,10 @@ class HTMLParser(_HTMLParser.HTMLParser):
         self.cdata_tag = None
 
     def set_cdata_mode(self, tag):
-        self.interesting = _HTMLParser.interesting_cdata
+        try:
+            self.interesting = _HTMLParser.interesting_cdata
+        except AttributeError:
+            self.interesting = re.compile(r'</\s*%s\s*>' % tag.lower(), re.I)
         self.cdata_tag = tag.lower()
 
     def clear_cdata_mode(self):
