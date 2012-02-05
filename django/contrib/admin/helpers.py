@@ -11,6 +11,7 @@ from django.utils.encoding import force_unicode, smart_unicode
 from django.utils.html import escape, conditional_escape
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
 
 
 ACTION_CHECKBOX_NAME = '_selected_action'
@@ -75,7 +76,10 @@ class Fieldset(object):
 
     def _media(self):
         if 'collapse' in self.classes:
-            js = ['jquery.min.js', 'jquery.init.js', 'collapse.min.js']
+            extra = '' if settings.DEBUG else '.min'
+            js = ['jquery%s.js' % extra,
+                  'jquery.init.js',
+                  'collapse%s.js' % extra]
             return forms.Media(js=[static('admin/js/%s' % url) for url in js])
         return forms.Media()
     media = property(_media)

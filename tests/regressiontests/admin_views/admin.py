@@ -35,7 +35,19 @@ callable_year.admin_order_field = 'date'
 
 class ArticleInline(admin.TabularInline):
     model = Article
-
+    prepopulated_fields = {
+        'title' : ('content',)
+    }
+    fieldsets=(
+        ('Some fields', {
+            'classes': ('collapse',),
+            'fields': ('title', 'content')
+        }),
+        ('Some other fields', {
+            'classes': ('wide',),
+            'fields': ('date', 'section')
+        })
+    )
 
 class ChapterInline(admin.TabularInline):
     model = Chapter
@@ -511,6 +523,7 @@ class ReportAdmin(admin.ModelAdmin):
                 self.extra,
                 name='cable_extra'),
         )
+
 
 site = admin.AdminSite(name="admin")
 site.register(Article, ArticleAdmin)

@@ -573,6 +573,7 @@ class AdminViewBasicTest(TestCase):
         except SuspiciousOperation:
             self.fail("Filters should be allowed if they are defined on a ForeignKey pointing to this model")
 
+
 class AdminJavaScriptTest(AdminViewBasicTest):
     urls = "regressiontests.admin_views.urls"
 
@@ -596,6 +597,40 @@ class AdminJavaScriptTest(AdminViewBasicTest):
             response,
             '<script type="text/javascript">document.getElementById("id_start_date_0").focus();</script>'
         )
+
+
+    def test_js_minified_only_if_debug_is_false(self):
+        """
+        Ensure that the minified versions of the JS files are only used when
+        DEBUG is False.
+        Refs #17521.
+        """
+        with override_settings(DEBUG=False):
+            response = self.client.get(
+                '/test_admin/%s/admin_views/section/add/' % self.urlbit)
+            self.assertNotContains(response, 'jquery.js')
+            self.assertContains(response, 'jquery.min.js')
+            self.assertNotContains(response, 'prepopulate.js')
+            self.assertContains(response, 'prepopulate.min.js')
+            self.assertNotContains(response, 'actions.js')
+            self.assertContains(response, 'actions.min.js')
+            self.assertNotContains(response, 'collapse.js')
+            self.assertContains(response, 'collapse.min.js')
+            self.assertNotContains(response, 'inlines.js')
+            self.assertContains(response, 'inlines.min.js')
+        with override_settings(DEBUG=True):
+            response = self.client.get(
+                '/test_admin/%s/admin_views/section/add/' % self.urlbit)
+            self.assertContains(response, 'jquery.js')
+            self.assertNotContains(response, 'jquery.min.js')
+            self.assertContains(response, 'prepopulate.js')
+            self.assertNotContains(response, 'prepopulate.min.js')
+            self.assertContains(response, 'actions.js')
+            self.assertNotContains(response, 'actions.min.js')
+            self.assertContains(response, 'collapse.js')
+            self.assertNotContains(response, 'collapse.min.js')
+            self.assertContains(response, 'inlines.js')
+            self.assertNotContains(response, 'inlines.min.js')
 
 
 class SaveAsTests(TestCase):
