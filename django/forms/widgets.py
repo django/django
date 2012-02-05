@@ -234,7 +234,6 @@ class Widget(object):
         tags.
         """
         return id_
-    id_for_label = classmethod(id_for_label)
 
 class Input(Widget):
     """
@@ -735,7 +734,6 @@ class RadioSelect(Select):
         if id_:
             id_ += '_0'
         return id_
-    id_for_label = classmethod(id_for_label)
 
 class CheckboxSelectMultiple(SelectMultiple):
     def render(self, name, value, attrs=None, choices=()):
@@ -767,7 +765,6 @@ class CheckboxSelectMultiple(SelectMultiple):
         if id_:
             id_ += '_0'
         return id_
-    id_for_label = classmethod(id_for_label)
 
 class MultiWidget(Widget):
     """
@@ -826,7 +823,6 @@ class MultiWidget(Widget):
         if id_:
             id_ += '_0'
         return id_
-    id_for_label = classmethod(id_for_label)
 
     def value_from_datadict(self, data, files, name):
         return [widget.value_from_datadict(data, files, name + '_%s' % i) for i, widget in enumerate(self.widgets)]

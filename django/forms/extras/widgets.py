@@ -101,7 +101,6 @@ class SelectDateWidget(Widget):
             return '%s_%s' % (id_, first_select)
         else:
             return '%s_month' % id_
-    id_for_label = classmethod(id_for_label)
 
     def value_from_datadict(self, data, files, name):
         y = data.get(self.year_field % name)
