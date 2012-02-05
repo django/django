@@ -380,7 +380,7 @@ Next, we'll write the ``PublisherBookListView`` view itself::
     class PublisherBookListView(ListView):
 
         context_object_name = "book_list"
-        template_name = "books/books_by_publisher.html",
+        template_name = "books/books_by_publisher.html"
 
         def get_queryset(self):
             publisher = get_object_or_404(Publisher, name__iexact=self.args[0])
@@ -396,7 +396,7 @@ use it in the template::
     class PublisherBookListView(ListView):
 
         context_object_name = "book_list"
-        template_name = "books/books_by_publisher.html",
+        template_name = "books/books_by_publisher.html"
 
         def get_queryset(self):
             self.publisher = get_object_or_404(Publisher, name__iexact=self.args[0])
