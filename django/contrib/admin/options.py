@@ -1,5 +1,6 @@
 from functools import update_wrapper, partial
 from django import forms
+from django.conf import settings
 from django.forms.formsets import all_valid
 from django.forms.models import (modelform_factory, modelformset_factory,
     inlineformset_factory, BaseInlineFormSet)
@@ -394,16 +395,17 @@ class ModelAdmin(BaseModelAdmin):
 
     @property
     def media(self):
+        extra = "" if settings.DEBUG else ".min"
         js = [
             'core.js',
             'admin/RelatedObjectLookups.js',
-            'jquery.min.js',
+            'jquery%s.js' % extra,
             'jquery.init.js'
         ]
         if self.actions is not None:
-            js.append('actions.min.js')
+            js.append('actions%s.js' % extra)
         if self.prepopulated_fields:
-            js.extend(['urlify.js', 'prepopulate.min.js'])
+            js.extend(['urlify.js', 'prepopulate%s.js' % extra])
         if self.opts.get_ordered_objects():
             js.extend(['getElementsBySelector.js', 'dom-drag.js' , 'admin/ordering.js'])
         return forms.Media(js=[static('admin/js/%s' % url) for url in js])
@@ -1371,9 +1373,10 @@ class InlineModelAdmin(BaseModelAdmin):
 
     @property
     def media(self):
-        js = ['jquery.min.js', 'jquery.init.js', 'inlines.min.js']
+        extra = "" if settings.DEBUG else ".min"
+        js = ['jquery%s.js' % extra, 'jquery.init.js', "inlines%s.js" % extra]
         if self.prepopulated_fields:
-            js.extend(['urlify.js', 'prepopulate.min.js'])
+            js.extend(['urlify.js', 'prepopulate%s.js' % extra])
         if self.filter_vertical or self.filter_horizontal:
             js.extend(['SelectBox.js', 'SelectFilter2.js'])
         return forms.Media(js=[static('admin/js/%s' % url) for url in js])

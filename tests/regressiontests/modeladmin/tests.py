@@ -1,11 +1,11 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, with_statement
 
 from datetime import date
 
 from django import forms
 from django.conf import settings
 from django.contrib.admin.options import (ModelAdmin, TabularInline,
-    HORIZONTAL, VERTICAL)
+     InlineModelAdmin, HORIZONTAL, VERTICAL)
 from django.contrib.admin.sites import AdminSite
 from django.contrib.admin.validation import validate
 from django.contrib.admin.widgets import AdminDateWidget, AdminRadioSelect
@@ -15,6 +15,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.forms.models import BaseModelFormSet
 from django.forms.widgets import Select
 from django.test import TestCase
+from django.test.utils import override_settings
 from django.utils import unittest
 
 from .models import Band, Concert, ValidationTestModel, ValidationTestInlineModel
@@ -492,6 +493,63 @@ class ModelAdminTests(TestCase):
         self.assertEqual(
             list(ma.get_formsets(request))[0]().forms[0].fields.keys(),
             ['extra', 'transport', 'id', 'DELETE', 'main_band'])
+
+    def test_media_minified_only_if_debug_is_false(self):
+        """
+        Ensure that, with ModelAdmin, the minified versions of the JS files are
+        only used when DEBUG is False.
+        Refs #17521.
+        """
+        ma = ModelAdmin(Band, self.site)
+        ma.prepopulated_fields = ['something']
+        ma.actions = ['some action']
+
+        with override_settings(DEBUG=False):
+            media_js = str(ma.media['js'])
+            self.assertFalse('jquery.js' in media_js)
+            self.assertTrue('jquery.min.js' in media_js)
+            self.assertFalse('prepopulate.js' in media_js)
+            self.assertTrue('prepopulate.min.js' in media_js)
+            self.assertFalse('actions.js' in media_js)
+            self.assertTrue('actions.min.js' in media_js)
+        with override_settings(DEBUG=True):
+            media_js = str(ma.media['js'])
+            self.assertTrue('jquery.js' in media_js)
+            self.assertFalse('jquery.min.js' in media_js)
+            self.assertTrue('prepopulate.js' in media_js)
+            self.assertFalse('prepopulate.min.js' in media_js)
+            self.assertTrue('actions.js' in media_js)
+            self.assertFalse('actions.min.js' in media_js)
+
+    def test_inlines_media_minified_only_if_debug_is_false(self):
+        """
+        Ensure that, with InlineModelAdmin, the minified versions of the JS
+        files are only used when DEBUG is False.
+        Refs #17521.
+        """
+        class InlineBandAdmin(InlineModelAdmin):
+            model = Band
+
+        ma = InlineBandAdmin(Band, self.site)
+        ma.prepopulated_fields = ['something']
+        ma.actions = ['some action']
+
+        with override_settings(DEBUG=False):
+            media_js = str(ma.media['js'])
+            self.assertFalse('jquery.js' in media_js)
+            self.assertTrue('jquery.min.js' in media_js)
+            self.assertFalse('prepopulate.js' in media_js)
+            self.assertTrue('prepopulate.min.js' in media_js)
+            self.assertFalse('inlines.js' in media_js)
+            self.assertTrue('inlines.min.js' in media_js)
+        with override_settings(DEBUG=True):
+            media_js = str(ma.media['js'])
+            self.assertTrue('jquery.js' in media_js)
+            self.assertFalse('jquery.min.js' in media_js)
+            self.assertTrue('prepopulate.js' in media_js)
+            self.assertFalse('prepopulate.min.js' in media_js)
+            self.assertTrue('inlines.js' in media_js)
+            self.assertFalse('inlines.min.js' in media_js)
 
 
 class ValidationTests(unittest.TestCase):
