@@ -1586,7 +1586,7 @@ skipUnlessDBFeature
 Skip the decorated test if the named database feature is *not*
 supported.
 
-For example, the following test will not be executed if the database
+For example, the following test will only be executed if the database
 supports transactions (e.g., it would run under PostgreSQL, but *not*
 under MySQL with MyISAM tables)::
 
