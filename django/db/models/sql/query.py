@@ -1061,11 +1061,31 @@ class Query(object):
         if not parts:
             raise FieldError("Cannot parse keyword query %r" % arg)
 
-        # Work out the lookup type and remove it from 'parts', if necessary.
-        if len(parts) == 1 or parts[-1] not in self.query_terms:
-            lookup_type = 'exact'
-        else:
-            lookup_type = parts.pop()
+        # Work out the lookup type and remove it from the end of 'parts',
+        # if necessary.
+        lookup_type = 'exact' # Default lookup type
+        num_parts = len(parts)
+        if (len(parts) > 1 and parts[-1] in self.query_terms
+            and arg not in self.aggregates):
+            # Traverse the lookup query to distinguish related fields from
+            # lookup types.
+            lookup_model = self.model
+            for counter, field_name in enumerate(parts):
+                try:
+                    lookup_field = lookup_model._meta.get_field(field_name)
+                except FieldDoesNotExist:
+                    # Not a field. Bail out.
+                    lookup_type = parts.pop()
+                    break
+                # Unless we're at the end of the list of lookups, let's attempt
+                # to continue traversing relations.
+                if (counter + 1) < num_parts:
+                    try:
+                        lookup_model = lookup_field.rel.to
+                    except AttributeError:
+                        # Not a related field. Bail out.
+                        lookup_type = parts.pop()
+                        break
 
         # By default, this is a WHERE clause. If an aggregate is referenced
         # in the value, the filter will be promoted to a HAVING
