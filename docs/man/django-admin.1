@@ -60,7 +60,7 @@ Executes
 .B sqlall
 for the given app(s) in the current database.
 .TP
-.BI "makemessages [" "\-\-locale=LOCALE" "] [" "\-\-domain=DOMAIN" "] [" "\-\-extension=EXTENSION" "] [" "\-\-all" "] [" "\-\-symlinks" "] [" "\-\-ignore=PATTERN" "] [" "\-\-no\-default\-ignore" "] [" "\-\-no\-wrap" "]"
+.BI "makemessages [" "\-\-locale=LOCALE" "] [" "\-\-domain=DOMAIN" "] [" "\-\-extension=EXTENSION" "] [" "\-\-all" "] [" "\-\-symlinks" "] [" "\-\-ignore=PATTERN" "] [" "\-\-no\-default\-ignore" "] [" "\-\-no\-wrap" "] [" "\-\-no\-location" "]"
 Runs over the entire source tree of the current directory and pulls out all
 strings marked for translation. It creates (or updates) a message file in the
 conf/locale (in the django tree) or locale (for project and application) directory.
@@ -194,24 +194,27 @@ The domain of the message files (default: "django") when using makemessages.
 .TP
 .I \-e, \-\-extension=EXTENSION
 The file extension(s) to examine (separate multiple
-extensions with commas, or use -e multiple times).
+extensions with commas, or use -e multiple times) (makemessages command).
 .TP
 .I \-s, \-\-symlinks
 Follows symlinks to directories when examining source code and templates for
-translation strings.
+translation strings (makemessages command).
 .TP
 .I \-i, \-\-ignore=PATTERN
 Ignore files or directories matching this glob-style pattern. Use multiple
-times to ignore more.
+times to ignore more (makemessages command).
 .TP
 .I \-\-no\-default\-ignore
-Don't ignore the common private glob-style patterns 'CVS', '.*' and '*~'.
+Don't ignore the common private glob-style patterns 'CVS', '.*' and '*~' (makemessages command).
 .TP
 .I \-\-no\-wrap
-Don't break long message lines into several lines.
+Don't break long message lines into several lines (makemessages command).
+.TP
+.I \-\-no\-location
+Don't write '#: filename:line' comment lines in language files (makemessages command).
 .TP
 .I \-a, \-\-all
-Process all available locales when using makemessages..SH "ENVIRONMENT"
+Process all available locales when using makemessages.
 .TP
 .I \-\-template=PATH_OR_URL
 The file or directory path or URL to load the project and app templates from.
@@ -219,15 +222,16 @@ The file or directory path or URL to load the project and app templates from.
 .I \-n, \-\-name=FILENAME
 The name of an additional file to render when using app and project templates.
 .TP
+.I \-\-database=DB
+Used to specify the database on which a command will operate. If not
+specified, this option will default to an alias of "default".
+.SH "ENVIRONMENT"
+.TP
 .I DJANGO_SETTINGS_MODULE
 In the absence of the
 .BI \-\-settings
 option, this environment variable defines the settings module to be read.
 It should be in Python-import form, e.g. "myproject.settings".
-.I \-\-database=DB
-Used to specify the database on which a command will operate. If not
-specified, this option will default to an alias of "default".
-.TP
 
 .SH "SEE ALSO"
 Full descriptions of all these options, with examples, as well as documentation
