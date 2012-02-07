@@ -47,11 +47,16 @@ for the given command.
 Getting runtime help
 --------------------
 
-.. django-admin-option:: --help
+.. django-admin:: help
 
-Run ``django-admin.py help`` to display a list of all available commands.
-Run ``django-admin.py help <command>`` to display a description of the
-given command and a list of its available options.
+Run ``django-admin.py help`` to display usage information and a list of the
+commands provided by each application.
+
+Run ``django-admin.py help --commands`` to display a list of all available
+commands.
+
+Run ``django-admin.py help <command>`` to display a description of the given
+command and a list of its available options.
 
 App names
 ---------
@@ -63,9 +68,9 @@ contains the string ``'mysite.blog'``, the app name is ``blog``.
 Determining the version
 -----------------------
 
-.. django-admin-option:: --version
+.. django-admin:: version
 
-Run ``django-admin.py --version`` to display the current Django version.
+Run ``django-admin.py version`` to display the current Django version.
 
 Examples of output::
 

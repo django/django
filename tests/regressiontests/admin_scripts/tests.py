@@ -173,6 +173,10 @@ class AdminScriptTestCase(unittest.TestCase):
         "Utility assertion: assert that the given message exists in the output"
         self.assertTrue(msg in stream, "'%s' does not match actual output text '%s'" % (msg, stream))
 
+    def assertNotInOutput(self, stream, msg):
+        "Utility assertion: assert that the given message doesn't exist in the output"
+        self.assertFalse(msg in stream, "'%s' matches actual output text '%s'" % (msg, stream))
+
 ##########################################################################
 # DJANGO ADMIN TESTS
 # This first series of test classes checks the environment processing
@@ -1173,25 +1177,47 @@ class CommandTypes(AdminScriptTestCase):
         self.remove_settings('settings.py')
 
     def test_version(self):
-        "--version is handled as a special case"
-        args = ['--version']
+        "version is handled as a special case"
+        args = ['version']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
         self.assertOutput(out, get_version())
 
-    def test_help(self):
-        "--help is handled as a special case"
-        args = ['--help']
-        out, err = self.run_manage(args)
-        self.assertOutput(out, "Usage: manage.py subcommand [options] [args]")
-        self.assertOutput(out, "Type 'manage.py help <subcommand>' for help on a specific subcommand.")
+    def test_version_alternative(self):
+        "--version is equivalent to version"
+        args1, args2 = ['version'], ['--version']
+        self.assertEqual(self.run_manage(args1), self.run_manage(args2))
 
-    def test_short_help(self):
-        "-h is handled as a short form of --help"
-        args = ['-h']
+    def test_help(self):
+        "help is handled as a special case"
+        args = ['help']
         out, err = self.run_manage(args)
         self.assertOutput(out, "Usage: manage.py subcommand [options] [args]")
         self.assertOutput(out, "Type 'manage.py help <subcommand>' for help on a specific subcommand.")
+        self.assertOutput(out, '[django]')
+        self.assertOutput(out, 'startapp')
+        self.assertOutput(out, 'startproject')
+
+    def test_help_commands(self):
+        "help --commands shows the list of all available commands"
+        args = ['help', '--commands']
+        out, err = self.run_manage(args)
+        self.assertNotInOutput(out, 'Usage:')
+        self.assertNotInOutput(out, 'Options:')
+        self.assertNotInOutput(out, '[django]')
+        self.assertOutput(out, 'startapp')
+        self.assertOutput(out, 'startproject')
+        self.assertNotInOutput(out, '\n\n')
+
+    def test_help_alternative(self):
+        "--help is equivalent to help"
+        args1, args2 = ['help'], ['--help']
+        self.assertEqual(self.run_manage(args1), self.run_manage(args2))
+
+    def test_help_short_altert(self):
+        "-h is handled as a short form of --help"
+        args1, args2 = ['--help'], ['-h']
+        self.assertEqual(self.run_manage(args1), self.run_manage(args2))
 
     def test_specific_help(self):
         "--help can be used on a specific command"

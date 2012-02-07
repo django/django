@@ -1,3 +1,4 @@
+import collections
 import os
 import sys
 from optparse import OptionParser, NO_DEFAULT
@@ -5,6 +6,7 @@ import imp
 import warnings
 
 from django.core.management.base import BaseCommand, CommandError, handle_default_options
+from django.core.management.color import color_style
 from django.utils.importlib import import_module
 
 # For backwards compatibility: get_version() used to be in this module.
@@ -209,16 +211,32 @@ class ManagementUtility(object):
         self.argv = argv or sys.argv[:]
         self.prog_name = os.path.basename(self.argv[0])
 
-    def main_help_text(self):
+    def main_help_text(self, commands_only=False):
         """
         Returns the script's main help text, as a string.
         """
-        usage = ['',"Type '%s help <subcommand>' for help on a specific subcommand." % self.prog_name,'']
-        usage.append('Available subcommands:')
-        commands = get_commands().keys()
-        commands.sort()
-        for cmd in commands:
-            usage.append('  %s' % cmd)
+        if commands_only:
+            usage = sorted(get_commands().keys())
+        else:
+            usage = [
+                "",
+                "Type '%s help <subcommand>' for help on a specific subcommand." % self.prog_name,
+                "",
+                "Available subcommands:",
+            ]
+            commands_dict = collections.defaultdict(lambda: [])
+            for name, app in get_commands().iteritems():
+                if app == 'django.core':
+                    app = 'django'
+                else:
+                    app = app.rpartition('.')[-1]
+                commands_dict[app].append(name)
+            style = color_style()
+            for app in sorted(commands_dict.keys()):
+                usage.append("")
+                usage.append(style.NOTICE("[%s]" % app))
+                for name in sorted(commands_dict[app]):
+                    usage.append("    %s" % name)
         return '\n'.join(usage)
 
     def fetch_command(self, subcommand):
@@ -340,12 +358,15 @@ class ManagementUtility(object):
             subcommand = 'help' # Display help if no arguments were given.
 
         if subcommand == 'help':
-            if len(args) > 2:
-                self.fetch_command(args[2]).print_help(self.prog_name, args[2])
-            else:
+            if len(args) <= 2:
                 parser.print_lax_help()
                 sys.stdout.write(self.main_help_text() + '\n')
-                sys.exit(1)
+            elif args[2] == '--commands':
+                sys.stdout.write(self.main_help_text(commands_only=True) + '\n')
+            else:
+                self.fetch_command(args[2]).print_help(self.prog_name, args[2])
+        elif subcommand == 'version':
+            sys.stdout.write(parser.get_version() + '\n')
         # Special-cases: We want 'django-admin.py --version' and
         # 'django-admin.py --help' to work, for backwards compatibility.
         elif self.argv[1:] == ['--version']:

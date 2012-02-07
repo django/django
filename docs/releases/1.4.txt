@@ -989,6 +989,14 @@ after tests' execution, then you can restore the previous behavior by
 subclassing ``DjangoTestRunner`` and overriding its ``teardown_databases()``
 method.
 
+Output of :djadmin:`manage.py help <help>`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:djadmin:`manage.py help <help>` now groups available commands by application.
+If you depended on its output, for instance if you parsed it, you must update
+your scripts. To obtain the list of all available management commands in a
+script, you can use :djadmin:`manage.py help --commands <help>` instead.
+
 Features deprecated in 1.4
 ==========================
 
