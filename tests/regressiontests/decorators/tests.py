@@ -11,7 +11,7 @@ from django.utils.functional import allow_lazy, lazy, memoize
 from django.utils.unittest import TestCase
 from django.views.decorators.cache import cache_page, never_cache, cache_control
 from django.views.decorators.clickjacking import xframe_options_deny, xframe_options_sameorigin, xframe_options_exempt
-from django.views.decorators.http import require_http_methods, require_GET, require_POST, require_safe
+from django.views.decorators.http import require_http_methods, require_GET, require_POST, require_safe, condition
 from django.views.decorators.vary import vary_on_headers, vary_on_cookie
 
 
@@ -38,6 +38,7 @@ full_decorator = compose(
     require_GET,
     require_POST,
     require_safe,
+    condition(lambda r: None, lambda r: None),
 
     # django.views.decorators.vary
     vary_on_headers('Accept-language'),

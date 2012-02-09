@@ -74,6 +74,7 @@ def condition(etag_func=None, last_modified_func=None):
     called.
     """
     def decorator(func):
+        @wraps(func, assigned=available_attrs(func))
         def inner(request, *args, **kwargs):
             # Get HTTP request headers
             if_modified_since = request.META.get("HTTP_IF_MODIFIED_SINCE")
