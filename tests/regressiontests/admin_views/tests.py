@@ -2946,6 +2946,11 @@ class ReadonlyTest(TestCase):
         response = self.client.get('/test_admin/admin/admin_views/pizza/add/')
         self.assertEqual(response.status_code, 200)
 
+    def test_user_password_change_limited_queryset(self):
+        su = User.objects.filter(is_superuser=True)[0]
+        response = self.client.get('/test_admin/admin2/auth/user/%s/password/' % su.pk)
+        self.assertEquals(response.status_code, 404)
+
 
 class RawIdFieldsTest(TestCase):
     urls = "regressiontests.admin_views.urls"

@@ -117,7 +117,7 @@ class UserAdmin(admin.ModelAdmin):
     def user_change_password(self, request, id, form_url=''):
         if not self.has_change_permission(request):
             raise PermissionDenied
-        user = get_object_or_404(self.model, pk=id)
+        user = get_object_or_404(self.queryset(request), pk=id)
         if request.method == 'POST':
             form = self.change_password_form(user, request.POST)
             if form.is_valid():
