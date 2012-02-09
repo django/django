@@ -1,5 +1,5 @@
 from functools import update_wrapper
-from django import http
+from django.http import Http404, HttpResponseRedirect
 from django.contrib.admin import ModelAdmin, actions
 from django.contrib.admin.forms import AdminAuthenticationForm
 from django.contrib.auth import REDIRECT_FIELD_NAME
@@ -188,6 +188,10 @@ class AdminSite(object):
         """
         def inner(request, *args, **kwargs):
             if not self.has_permission(request):
+                if request.path == reverse('admin:logout',
+                                           current_app=self.name):
+                    index_path = reverse('admin:index', current_app=self.name)
+                    return HttpResponseRedirect(index_path)
                 return self.login(request)
             return view(request, *args, **kwargs)
         if not cacheable:
@@ -421,7 +425,7 @@ class AdminSite(object):
                                 'models': [model_dict],
                             }
         if not app_dict:
-            raise http.Http404('The requested admin page does not exist.')
+            raise Http404('The requested admin page does not exist.')
         # Sort the models alphabetically within each app.
         app_dict['models'].sort(key=lambda x: x['name'])
         context = {

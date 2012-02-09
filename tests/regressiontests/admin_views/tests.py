@@ -3385,3 +3385,31 @@ class AdminCustomSaveRelatedTests(TestCase):
 
         self.assertEqual('Josh Stone', Parent.objects.latest('id').name)
         self.assertEqual([u'Catherine Stone', u'Paul Stone'], children_names)
+
+
+class AdminViewLogoutTest(TestCase):
+    urls = "regressiontests.admin_views.urls"
+    fixtures = ['admin-views-users.xml']
+
+    def setUp(self):
+        self.client.login(username='super', password='secret')
+
+    def tearDown(self):
+        self.client.logout()
+
+    def test_client_logout_url_can_be_used_to_login(self):
+        response = self.client.get('/test_admin/admin/logout/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.template_name, 'registration/logged_out.html')
+        self.assertEqual(response.request['PATH_INFO'], '/test_admin/admin/logout/')
+
+        # we are now logged out
+        response = self.client.get('/test_admin/admin/logout/')
+        self.assertEqual(response.status_code, 302)  # we should be redirected to the login page.
+
+        # follow the redirect and test results.
+        response = self.client.get('/test_admin/admin/logout/', follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.template_name, 'admin/login.html')
+        self.assertEqual(response.request['PATH_INFO'], '/test_admin/admin/')
+        self.assertContains(response, '<input type="hidden" name="next" value="/test_admin/admin/" />')
