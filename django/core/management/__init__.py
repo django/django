@@ -139,9 +139,12 @@ def call_command(name, *args, **options):
     # when the script runs from the command line, but since call_command can
     # be called programatically, we need to simulate the loading and handling
     # of defaults (see #10080 for details).
-    defaults = dict([(o.dest, o.default)
-                     for o in klass.option_list
-                     if o.default is not NO_DEFAULT])
+    defaults = {}
+    for opt in klass.option_list:
+        if opt.default is NO_DEFAULT:
+            defaults[opt.dest] = None
+        else:
+            defaults[opt.dest] = opt.default
     defaults.update(options)
 
     return klass.execute(*args, **defaults)
