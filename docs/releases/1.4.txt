@@ -1150,3 +1150,18 @@ settings file to list all your applications explicitly.
 This attribute was confusingly named ``HttpRequest.raw_post_data``, but it
 actually provided the body of the HTTP request. It's been renamed to
 ``HttpRequest.body``, and ``HttpRequest.raw_post_data`` has been deprecated.
+
+``django.contrib.sitemaps`` bugfix with potential performance implications
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In previous versions the Paginator objects used in sitemap classes were
+cached and could result in stale sitemap indexes. Removing this cache causes
+new Paginator objects to be created and the
+:attr:`~django.contrib.sitemaps.Sitemap.items()` method of the
+:class:`~django.contrib.sitemaps.Sitemap` subclass to be called during every
+sitemap-related request.
+
+If the :attr:`django.contrib.sitemaps.Sitemap.items()` method returns a
+``QuerySet`` its length will be evaluated which may lead to extra database
+queries. To mitigate the performance impact consider using the :doc:`caching
+framework </topics/cache>`.

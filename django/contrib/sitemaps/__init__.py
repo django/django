@@ -60,9 +60,7 @@ class Sitemap(object):
         return obj.get_absolute_url()
 
     def _get_paginator(self):
-        if not hasattr(self, "_paginator"):
-            self._paginator = paginator.Paginator(self.items(), self.limit)
-        return self._paginator
+        return paginator.Paginator(self.items(), self.limit)
     paginator = property(_get_paginator)
 
     def get_urls(self, page=1, site=None, protocol=None):
