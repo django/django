@@ -72,11 +72,11 @@ Determining the version
 
 Run ``django-admin.py version`` to display the current Django version.
 
-Examples of output::
+The output follows the schema described in :pep:`386`::
 
-    0.95
-    0.96
-    0.97-pre-SVN-6069
+    1.4.dev17026
+    1.4a1
+    1.4
 
 Displaying debug output
 -----------------------
