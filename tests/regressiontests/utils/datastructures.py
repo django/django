@@ -206,6 +206,12 @@ class MultiValueDictTests(SimpleTestCase):
         self.assertEqual(list(d.itervalues()),
                           ['Developer', 'Simon', 'Willison'])
 
+    def test_appendlist(self):
+        d = MultiValueDict()
+        d.appendlist('name', 'Adrian')
+        d.appendlist('name', 'Simon')
+        self.assertEqual(d.getlist('name'), ['Adrian', 'Simon'])
+
     def test_copy(self):
         for copy_func in [copy.copy, lambda d: d.copy()]:
             d1 = MultiValueDict({

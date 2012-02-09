@@ -312,9 +312,9 @@ class MultiValueDict(dict):
         try:
             return super(MultiValueDict, self).__getitem__(key)
         except KeyError:
-            if default is not None:
-                return default
-            return []
+            if default is None:
+                return []
+            return default
 
     def setlist(self, key, list_):
         super(MultiValueDict, self).__setitem__(key, list_)
@@ -322,17 +322,20 @@ class MultiValueDict(dict):
     def setdefault(self, key, default=None):
         if key not in self:
             self[key] = default
+            return default
         return self[key]
 
-    def setlistdefault(self, key, default_list=()):
+    def setlistdefault(self, key, default_list=None):
         if key not in self:
+            if default_list is None:
+                default_list = []
             self.setlist(key, default_list)
+            return default_list
         return self.getlist(key)
 
     def appendlist(self, key, value):
         """Appends an item to the internal list associated with key."""
-        self.setlistdefault(key, [])
-        super(MultiValueDict, self).__setitem__(key, self.getlist(key) + [value])
+        self.setlistdefault(key).append(value)
 
     def items(self):
         """
@@ -381,15 +384,15 @@ class MultiValueDict(dict):
             other_dict = args[0]
             if isinstance(other_dict, MultiValueDict):
                 for key, value_list in other_dict.lists():
-                    self.setlistdefault(key, []).extend(value_list)
+                    self.setlistdefault(key).extend(value_list)
             else:
                 try:
                     for key, value in other_dict.items():
-                        self.setlistdefault(key, []).append(value)
+                        self.setlistdefault(key).append(value)
                 except TypeError:
                     raise ValueError("MultiValueDict.update() takes either a MultiValueDict or dictionary")
         for key, value in kwargs.iteritems():
-            self.setlistdefault(key, []).append(value)
+            self.setlistdefault(key).append(value)
 
     def dict(self):
         """
