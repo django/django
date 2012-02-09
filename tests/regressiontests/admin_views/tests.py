@@ -574,6 +574,25 @@ class AdminViewBasicTest(TestCase):
             self.fail("Filters should be allowed if they are defined on a ForeignKey pointing to this model")
 
 
+class AdminViewFormUrlTest(TestCase):
+    urls = "regressiontests.admin_views.urls"
+    fixtures = ["admin-views-users.xml"]
+    urlbit = "admin3"
+
+    def setUp(self):
+        self.client.login(username='super', password='secret')
+
+    def tearDown(self):
+        self.client.logout()
+
+    def testChangeFormUrlHasCorrectValue(self):
+        """
+        Tests whether change_view has form_url in request.context
+        """
+        response = self.client.get('/test_admin/%s/admin_views/section/1/' % self.urlbit)
+        self.assertTrue('form_url' in response.context, msg='form_url not present in response.context')
+        self.assertEqual(response.context['form_url'], 'pony')
+
 class AdminJavaScriptTest(AdminViewBasicTest):
     urls = "regressiontests.admin_views.urls"
 
@@ -3053,6 +3072,12 @@ class UserAdminTest(TestCase):
         with self.assertNumQueries(8):
             response = self.client.get('/test_admin/admin/auth/user/%s/' % u.pk)
             self.assertEqual(response.status_code, 200)
+
+    def test_form_url_present_in_context(self):
+        u = User.objects.all()[0]
+        response = self.client.get('/test_admin/admin3/auth/user/%s/password/' % u.pk)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['form_url'], 'pony')
 
 
 class GroupAdminTest(TestCase):

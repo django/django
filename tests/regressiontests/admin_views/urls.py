@@ -10,4 +10,5 @@ urlpatterns = patterns('',
     (r'^test_admin/admin/secure-view/$', views.secure_view),
     (r'^test_admin/admin/', include(admin.site.urls)),
     (r'^test_admin/admin2/', include(customadmin.site.urls)),
+    (r'^test_admin/admin3/', include(admin.site.urls), dict(form_url='pony')),
 )

@@ -1011,7 +1011,7 @@ class ModelAdmin(BaseModelAdmin):
 
     @csrf_protect_m
     @transaction.commit_on_success
-    def change_view(self, request, object_id, extra_context=None):
+    def change_view(self, request, object_id, form_url='', extra_context=None):
         "The 'change' admin view for this model."
         model = self.model
         opts = model._meta
@@ -1099,7 +1099,7 @@ class ModelAdmin(BaseModelAdmin):
             'app_label': opts.app_label,
         }
         context.update(extra_context or {})
-        return self.render_change_form(request, context, change=True, obj=obj)
+        return self.render_change_form(request, context, change=True, obj=obj, form_url=form_url)
 
     @csrf_protect_m
     def changelist_view(self, request, extra_context=None):

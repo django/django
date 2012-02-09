@@ -11,6 +11,7 @@ from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
 from django.utils.html import escape
 from django.utils.decorators import method_decorator
+from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext, ugettext_lazy as _
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
@@ -113,7 +114,7 @@ class UserAdmin(admin.ModelAdmin):
                                                extra_context)
 
     @sensitive_post_parameters()
-    def user_change_password(self, request, id):
+    def user_change_password(self, request, id, form_url=''):
         if not self.has_change_permission(request):
             raise PermissionDenied
         user = get_object_or_404(self.model, pk=id)
@@ -133,6 +134,7 @@ class UserAdmin(admin.ModelAdmin):
         context = {
             'title': _('Change password: %s') % escape(user.username),
             'adminForm': adminForm,
+            'form_url': mark_safe(form_url),
             'form': form,
             'is_popup': '_popup' in request.REQUEST,
             'add': True,
