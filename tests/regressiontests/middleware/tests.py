@@ -13,8 +13,8 @@ from django.middleware.clickjacking import XFrameOptionsMiddleware
 from django.middleware.common import CommonMiddleware
 from django.middleware.http import ConditionalGetMiddleware
 from django.middleware.gzip import GZipMiddleware
-from django.test import TestCase
-
+from django.test import TestCase, RequestFactory
+from django.test.utils import override_settings
 
 class CommonMiddlewareTest(TestCase):
     def setUp(self):
@@ -582,3 +582,32 @@ class GZipMiddlewareTest(TestCase):
         r = GZipMiddleware().process_response(self.req, self.resp)
         self.assertEqual(r.content, self.uncompressible_string)
         self.assertEqual(r.get('Content-Encoding'), None)
+
+
+@override_settings(USE_ETAGS=True)
+class ETagGZipMiddlewareTest(TestCase):
+    """
+    Tests if the ETag middleware behaves correctly with GZip middleware.
+    """
+    compressible_string = 'a' * 500
+
+    def setUp(self):
+        self.rf = RequestFactory()
+
+    def test_compress_response(self):
+        """
+        Tests that ETag is changed after gzip compression is performed.
+        """
+        request = self.rf.get('/', HTTP_ACCEPT_ENCODING='gzip, deflate')
+        response = GZipMiddleware().process_response(request,
+            CommonMiddleware().process_response(request,
+                HttpResponse(self.compressible_string)))
+        gzip_etag = response.get('ETag')
+
+        request = self.rf.get('/', HTTP_ACCEPT_ENCODING='')
+        response = GZipMiddleware().process_response(request,
+            CommonMiddleware().process_response(request,
+                HttpResponse(self.compressible_string)))
+        nogzip_etag = response.get('ETag')
+
+        self.assertNotEqual(gzip_etag, nogzip_etag)

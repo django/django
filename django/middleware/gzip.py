@@ -37,6 +37,9 @@ class GZipMiddleware(object):
         if len(compressed_content) >= len(response.content):
             return response
 
+        if response.has_header('ETag'):
+            response['ETag'] = re.sub('"$', ';gzip"', response['ETag'])
+
         response.content = compressed_content
         response['Content-Encoding'] = 'gzip'
         response['Content-Length'] = str(len(response.content))
