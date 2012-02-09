@@ -60,7 +60,7 @@ def redirect_to(request, url, permanent=True, query_string=False, **kwargs):
         klass = permanent and HttpResponsePermanentRedirect or HttpResponseRedirect
         return klass(url)
     else:
-        logger.warning('Gone: %s' % request.path,
+        logger.warning('Gone: %s', request.path,
                     extra={
                         'status_code': 410,
                         'request': request

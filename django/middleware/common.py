@@ -42,7 +42,7 @@ class CommonMiddleware(object):
         if 'HTTP_USER_AGENT' in request.META:
             for user_agent_regex in settings.DISALLOWED_USER_AGENTS:
                 if user_agent_regex.search(request.META['HTTP_USER_AGENT']):
-                    logger.warning('Forbidden (User agent): %s' % request.path,
+                    logger.warning('Forbidden (User agent): %s', request.path,
                         extra={
                             'status_code': 403,
                             'request': request

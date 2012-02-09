@@ -134,7 +134,7 @@ class CsrfViewMiddleware(object):
                 # we can use strict Referer checking.
                 referer = request.META.get('HTTP_REFERER')
                 if referer is None:
-                    logger.warning('Forbidden (%s): %s' % (REASON_NO_REFERER, request.path),
+                    logger.warning('Forbidden (%s): %s', REASON_NO_REFERER, request.path,
                         extra={
                             'status_code': 403,
                             'request': request,
@@ -146,7 +146,7 @@ class CsrfViewMiddleware(object):
                 good_referer = 'https://%s/' % request.get_host()
                 if not same_origin(referer, good_referer):
                     reason = REASON_BAD_REFERER % (referer, good_referer)
-                    logger.warning('Forbidden (%s): %s' % (reason, request.path),
+                    logger.warning('Forbidden (%s): %s', reason, request.path,
                         extra={
                             'status_code': 403,
                             'request': request,
@@ -158,7 +158,7 @@ class CsrfViewMiddleware(object):
                 # No CSRF cookie. For POST requests, we insist on a CSRF cookie,
                 # and in this way we can avoid all CSRF attacks, including login
                 # CSRF.
-                logger.warning('Forbidden (%s): %s' % (REASON_NO_CSRF_COOKIE, request.path),
+                logger.warning('Forbidden (%s): %s', REASON_NO_CSRF_COOKIE, request.path,
                     extra={
                         'status_code': 403,
                         'request': request,
@@ -177,7 +177,7 @@ class CsrfViewMiddleware(object):
                 request_csrf_token = request.META.get('HTTP_X_CSRFTOKEN', '')
 
             if not constant_time_compare(request_csrf_token, csrf_token):
-                logger.warning('Forbidden (%s): %s' % (REASON_BAD_TOKEN, request.path),
+                logger.warning('Forbidden (%s): %s', REASON_BAD_TOKEN, request.path,
                     extra={
                         'status_code': 403,
                         'request': request,

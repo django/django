@@ -136,7 +136,7 @@ class BaseHandler(object):
                     response = response.render()
 
             except http.Http404, e:
-                logger.warning('Not Found: %s' % request.path,
+                logger.warning('Not Found: %s', request.path,
                             extra={
                                 'status_code': 404,
                                 'request': request
@@ -155,7 +155,7 @@ class BaseHandler(object):
                             signals.got_request_exception.send(sender=self.__class__, request=request)
             except exceptions.PermissionDenied:
                 logger.warning(
-                    'Forbidden (Permission denied): %s' % request.path,
+                    'Forbidden (Permission denied): %s', request.path,
                     extra={
                         'status_code': 403,
                         'request': request
@@ -208,7 +208,7 @@ class BaseHandler(object):
         if settings.DEBUG_PROPAGATE_EXCEPTIONS:
             raise
 
-        logger.error('Internal Server Error: %s' % request.path,
+        logger.error('Internal Server Error: %s', request.path,
             exc_info=exc_info,
             extra={
                 'status_code': 500,

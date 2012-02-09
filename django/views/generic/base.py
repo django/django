@@ -68,7 +68,7 @@ class View(object):
 
     def http_method_not_allowed(self, request, *args, **kwargs):
         allowed_methods = [m for m in self.http_method_names if hasattr(self, m)]
-        logger.warning('Method Not Allowed (%s): %s' % (request.method, request.path),
+        logger.warning('Method Not Allowed (%s): %s', request.method, request.path,
             extra={
                 'status_code': 405,
                 'request': self.request
@@ -157,7 +157,7 @@ class RedirectView(View):
             else:
                 return http.HttpResponseRedirect(url)
         else:
-            logger.warning('Gone: %s' % self.request.path,
+            logger.warning('Gone: %s', self.request.path,
                         extra={
                             'status_code': 410,
                             'request': self.request
