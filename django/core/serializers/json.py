@@ -6,6 +6,7 @@ import datetime
 import decimal
 from StringIO import StringIO
 
+from django.core.serializers.base import DeserializationError
 from django.core.serializers.python import Serializer as PythonSerializer
 from django.core.serializers.python import Deserializer as PythonDeserializer
 from django.utils import simplejson
@@ -27,6 +28,7 @@ class Serializer(PythonSerializer):
         if callable(getattr(self.stream, 'getvalue', None)):
             return self.stream.getvalue()
 
+
 def Deserializer(stream_or_string, **options):
     """
     Deserialize a stream or string of JSON data.
@@ -35,8 +37,13 @@ def Deserializer(stream_or_string, **options):
         stream = StringIO(stream_or_string)
     else:
         stream = stream_or_string
-    for obj in PythonDeserializer(simplejson.load(stream), **options):
-        yield obj
+    try:
+        for obj in PythonDeserializer(simplejson.load(stream), **options):
+            yield obj
+    except Exception, e:
+        # Map to deserializer error
+        raise DeserializationError(e)
+
 
 class DjangoJSONEncoder(simplejson.JSONEncoder):
     """
