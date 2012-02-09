@@ -180,3 +180,21 @@ where :file:`formats.py` contains custom format definitions. For example::
 
 to use a space as a thousand separator, instead of the default for English,
 a comma.
+
+
+Limitations of the provided locale formats
+==========================================
+
+Some locales use context-sensitive formats for numbers, which Djangos
+localization system cannot handle automatically.
+
+
+Switzerland (German)
+--------------------
+
+The Swiss number formatting depends on the type of number that is being
+formatted. For monetary values, a comma is used as the thousand separator and
+a decimal point for the decimal separator, for all other numbers, a comma is
+used as decimal separator and a space as thousand separator. The locale format
+provided by Django uses the generic separators, a comma for decimal and a space
+for thousand separators.
