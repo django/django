@@ -14,7 +14,7 @@ from django.utils.html import escape
 from django.utils.importlib import import_module
 from django.utils.encoding import smart_unicode, smart_str
 
-HIDDEN_SETTINGS = re.compile('SECRET|PASSWORD|PROFANITIES_LIST|SIGNATURE')
+HIDDEN_SETTINGS = re.compile('API|TOKEN|KEY|SECRET|PASS|PROFANITIES_LIST|SIGNATURE')
 
 CLEANSED_SUBSTITUTE = u'********************'
 

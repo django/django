@@ -756,15 +756,24 @@ Default: ``False``
 
 A boolean that turns on/off debug mode.
 
-If you define custom settings, `django/views/debug.py`_ has a ``HIDDEN_SETTINGS``
-regular expression which will hide from the DEBUG view anything that contains
-``'SECRET'``, ``'PASSWORD'``, ``'PROFANITIES'``, or ``'SIGNATURE'``. This allows
-untrusted users to be able to give backtraces without seeing sensitive (or
-offensive) settings.
+If you define custom settings, `django/views/debug.py`_ has a
+``HIDDEN_SETTINGS`` regular expression which will hide from the DEBUG view
+anything that contains ``'API'``, ``'TOKEN'``, ``'KEY'``, ``'SECRET'``,
+``'PASS'``, ``'PROFANITIES_LIST'``, or ``'SIGNATURE'``. This allows untrusted
+users to be able to give backtraces without seeing sensitive (or offensive)
+settings.
 
-Still, note that there are always going to be sections of your debug output that
-are inappropriate for public consumption. File paths, configuration options, and
-the like all give attackers extra information about your server.
+.. versionchanged:: 1.4
+
+    ``'PASSWORD'`` changed to ``'PASS'``. ``'API'``, ``'TOKEN'``, ``'KEY'`` 
+    were added.
+
+Note that due to how regular expression matching works ``'PASS'`` will also
+match PASSWORD, just as ``'TOKEN'`` will also match TOKENIZED and so on.
+
+Still, note that there are always going to be sections of your debug output
+that are inappropriate for public consumption. File paths, configuration
+options, and the like all give attackers extra information about your server.
 
 It is also important to remember that when running with :setting:`DEBUG`
 turned on, Django will remember every SQL query it executes. This is useful
