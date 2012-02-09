@@ -697,8 +697,18 @@ subclass::
 
       .. note::
 
-          The ``FieldListFilter`` API is currently considered internal
-          and prone to refactoring.
+        The ``FieldListFilter`` API is currently considered internal and prone
+        to refactoring.
+
+    .. versionadded:: 1.4
+
+    It is possible to specify a custom template for rendering a list filter::
+
+        class FilterWithCustomTemplate(SimpleListFilter):
+            template = "custom_template.html"
+
+    See the default template provided by django (``admin/filter.html``) for
+    a concrete example.
 
 .. attribute:: ModelAdmin.list_max_show_all
 

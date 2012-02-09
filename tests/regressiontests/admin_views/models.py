@@ -105,6 +105,10 @@ class Color(models.Model):
     def __unicode__(self):
         return self.value
 
+# we replicate Color to register with another ModelAdmin
+class Color2(Color):
+    class Meta:
+        proxy = True
 
 class Thing(models.Model):
     title = models.CharField(max_length=20)

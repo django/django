@@ -13,7 +13,8 @@ from django.utils.text import capfirst
 from django.utils.translation import ugettext as _
 from django.utils.encoding import smart_unicode, force_unicode
 from django.template import Library
-
+from django.template.loader import get_template
+from django.template.context import Context
 
 register = Library()
 
@@ -360,9 +361,14 @@ def search_form(cl):
         'search_var': SEARCH_VAR
     }
 
-@register.inclusion_tag('admin/filter.html')
+@register.simple_tag
 def admin_list_filter(cl, spec):
-    return {'title': spec.title, 'choices' : list(spec.choices(cl))}
+    tpl = get_template(spec.template)
+    return tpl.render(Context({
+        'title': spec.title,
+        'choices' : list(spec.choices(cl)),
+        'spec': spec,
+    }))
 
 @register.inclusion_tag('admin/actions.html', takes_context=True)
 def admin_actions(context):

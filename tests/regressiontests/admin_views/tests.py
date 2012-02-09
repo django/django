@@ -1,6 +1,7 @@
 # coding: utf-8
 from __future__ import with_statement, absolute_import
 
+import os
 import re
 import datetime
 import urlparse
@@ -592,6 +593,18 @@ class AdminViewFormUrlTest(TestCase):
         response = self.client.get('/test_admin/%s/admin_views/section/1/' % self.urlbit)
         self.assertTrue('form_url' in response.context, msg='form_url not present in response.context')
         self.assertEqual(response.context['form_url'], 'pony')
+
+    def test_filter_with_custom_template(self):
+        """
+        Ensure that one can use a custom template to render an admin filter.
+        Refs #17515.
+        """
+        template_dirs = settings.TEMPLATE_DIRS + (
+            os.path.join(os.path.dirname(__file__), 'templates'),)
+        with self.settings(TEMPLATE_DIRS=template_dirs):
+            response = self.client.get("/test_admin/admin/admin_views/color2/")
+            self.assertTrue('custom_filter_template.html' in [t.name for t in response.templates])
+
 
 class AdminJavaScriptTest(AdminViewBasicTest):
     urls = "regressiontests.admin_views.urls"

@@ -17,6 +17,7 @@ from django.contrib.admin.util import (get_model_from_relation,
 
 class ListFilter(object):
     title = None  # Human-readable title to appear in the right sidebar.
+    template = 'admin/filter.html'
 
     def __init__(self, request, params, model, model_admin):
         # This dictionary will eventually contain the request's query string

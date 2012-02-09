@@ -13,6 +13,7 @@ from django.conf.urls import patterns, url
 from django.db import models
 from django.forms.models import BaseModelFormSet
 from django.http import HttpResponse
+from django.contrib.admin import BooleanFieldListFilter
 
 from .models import (Article, Chapter, Account, Media, Child, Parent, Picture,
     Widget, DooHickey, Grommet, Whatsit, FancyDoodad, Category, Link,
@@ -25,7 +26,7 @@ from .models import (Article, Chapter, Account, Media, Child, Parent, Picture,
     CoverLetter, Story, OtherStory, Book, Promo, ChapterXtra1, Pizza, Topping,
     Album, Question, Answer, ComplexSortedPerson, PrePopulatedPostLargeSlug,
     AdminOrderedField, AdminOrderedModelMethod, AdminOrderedAdminMethod,
-    AdminOrderedCallable, Report)
+    AdminOrderedCallable, Report, Color2)
 
 
 def callable_year(dt_value):
@@ -525,6 +526,12 @@ class ReportAdmin(admin.ModelAdmin):
         )
 
 
+class CustomTemplateBooleanFieldListFilter(BooleanFieldListFilter):
+    template = 'custom_filter_template.html'
+
+class CustomTemplateFilterColorAdmin(admin.ModelAdmin):
+    list_filter = (('warm', CustomTemplateBooleanFieldListFilter),)
+
 site = admin.AdminSite(name="admin")
 site.register(Article, ArticleAdmin)
 site.register(CustomArticle, CustomArticleAdmin)
@@ -594,6 +601,7 @@ site.register(AdminOrderedField, AdminOrderedFieldAdmin)
 site.register(AdminOrderedModelMethod, AdminOrderedModelMethodAdmin)
 site.register(AdminOrderedAdminMethod, AdminOrderedAdminMethodAdmin)
 site.register(AdminOrderedCallable, AdminOrderedCallableAdmin)
+site.register(Color2, CustomTemplateFilterColorAdmin)
 
 # Register core models we need in our tests
 from django.contrib.auth.models import User, Group
