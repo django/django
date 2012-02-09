@@ -1276,8 +1276,8 @@ date
 
 Formats a date according to the given format.
 
-Uses the same format as PHP's ``date()`` function (http://php.net/date)
-with some custom extensions.
+Uses a similar format as PHP's ``date()`` function (http://php.net/date)
+with some differences.
 
 Available format strings:
 
@@ -1299,6 +1299,9 @@ c                 ISO 8601 format. (Note: unlike others     ``2008-01-02T10:30:0
 d                 Day of the month, 2 digits with           ``'01'`` to ``'31'``
                   leading zeros.
 D                 Day of the week, textual, 3 letters.      ``'Fri'``
+e                 Timezone name. Could be in any format,
+                  or might return an empty string,          ``''``, ``'GMT'``, ``'-500'``, ``'US/Eastern'``, etc.
+                  depending on the datetime.
 E                 Month, locale specific alternative
                   representation usually used for long
                   date representation.                      ``'listopada'`` (for Polish locale, as opposed to ``'Listopad'``)
@@ -1323,6 +1326,9 @@ M                 Month, textual, 3 letters.                ``'Jan'``
 n                 Month without leading zeros.              ``'1'`` to ``'12'``
 N                 Month abbreviation in Associated Press    ``'Jan.'``, ``'Feb.'``, ``'March'``, ``'May'``
                   style. Proprietary extension.
+o                 ISO-8601 week-numbering year,             ``'1999'``
+                  corresponding to
+                  the ISO-8601 week number (W)
 O                 Difference to Greenwich time in hours.    ``'+0200'``
 P                 Time, in 12-hour hours, minutes and       ``'1 a.m.'``, ``'1:30 p.m.'``, ``'midnight'``, ``'noon'``, ``'12:30 p.m.'``
                   'a.m.'/'p.m.', with minutes left off

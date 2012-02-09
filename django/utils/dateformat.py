@@ -22,7 +22,7 @@ from django.utils.translation import ugettext as _
 from django.utils.encoding import force_unicode
 from django.utils.timezone import is_aware, is_naive
 
-re_formatchars = re.compile(r'(?<!\\)([aAbBcdDEfFgGhHiIjlLmMnNOPrsStTUuwWyYzZ])')
+re_formatchars = re.compile(r'(?<!\\)([aAbBcdDeEfFgGhHiIjlLmMnNoOPrsStTUuwWyYzZ])')
 re_escaped = re.compile(r'\\(.)')
 
 class Formatter(object):
@@ -144,6 +144,17 @@ class DateFormat(TimeFormat):
         "Day of the week, textual, 3 letters; e.g. 'Fri'"
         return WEEKDAYS_ABBR[self.data.weekday()]
 
+    def e(self):
+        "Timezone name if available"
+        try:
+            if self.data.tzinfo:
+                # Have to use tzinfo.tzname and not datetime.tzname
+                # because datatime.tzname does not expect Unicode
+                return self.data.tzinfo.tzname(self.data) or ""
+        except NotImplementedError:
+            pass
+        return ""
+
     def E(self):
         "Alternative month names as required by some locales. Proprietary extension."
         return MONTHS_ALT[self.data.month]
@@ -186,6 +197,10 @@ class DateFormat(TimeFormat):
     def N(self):
         "Month abbreviation in Associated Press style. Proprietary extension."
         return MONTHS_AP[self.data.month]
+
+    def o(self):
+        "ISO 8601 year number matching the ISO week number (W)"
+        return self.data.isocalendar()[0]
 
     def O(self):
         "Difference to Greenwich time in hours; e.g. '+0200', '-0430'"

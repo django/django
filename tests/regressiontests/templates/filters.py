@@ -345,6 +345,12 @@ def get_filter_tests():
         'date02': (r'{{ d|date }}', {'d': datetime(2008, 1, 1)}, 'Jan. 1, 2008'),
         #Ticket 9520: Make sure |date doesn't blow up on non-dates
         'date03': (r'{{ d|date:"m" }}', {'d': 'fail_string'}, ''),
+        # ISO date formats
+        'date04': (r'{{ d|date:"o" }}', {'d': datetime(2008, 12, 29)}, '2009'),
+        'date05': (r'{{ d|date:"o" }}', {'d': datetime(2010, 1, 3)}, '2009'),
+        # Timezone name
+        'date06': (r'{{ d|date:"e" }}', {'d': datetime(2009, 3, 12, tzinfo=FixedOffset(30))}, '+0030'),
+        'date07': (r'{{ d|date:"e" }}', {'d': datetime(2009, 3, 12)}, ''),
 
          # Tests for #11687 and #16676
          'add01': (r'{{ i|add:"5" }}', {'i': 2000}, '2005'),
