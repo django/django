@@ -5,7 +5,7 @@ from __future__ import absolute_import
 
 import re
 
-from django.contrib.localflavor.fr.fr_department import DEPARTMENT_ASCII_CHOICES
+from django.contrib.localflavor.fr.fr_department import DEPARTMENT_CHOICES
 from django.core.validators import EMPTY_VALUES
 from django.forms import ValidationError
 from django.forms.fields import Field, RegexField, Select
@@ -50,5 +50,5 @@ class FRDepartmentSelect(Select):
     A Select widget that uses a list of FR departments as its choices.
     """
     def __init__(self, attrs=None):
-        super(FRDepartmentSelect, self).__init__(attrs, choices=DEPARTMENT_ASCII_CHOICES)
+        super(FRDepartmentSelect, self).__init__(attrs, choices=DEPARTMENT_CHOICES)
 
