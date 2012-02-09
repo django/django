@@ -24,7 +24,7 @@ DATETIME_INPUT_FORMATS = (
     '%d/%m/%y %H:%M:%S',
     '%d/%m/%y %H:%M',
 )
-DECIMAL_SEPARATOR = '.' 		# ',' is also official (less common): NOM-008-SCFI-2002
-THOUSAND_SEPARATOR = ' '		# white space
+DECIMAL_SEPARATOR = '.'   # ',' is also official (less common): NOM-008-SCFI-2002
+THOUSAND_SEPARATOR = u' ' # non-breaking space
 NUMBER_GROUPING = 3
 
