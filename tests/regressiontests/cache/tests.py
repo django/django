@@ -1040,6 +1040,13 @@ class GetCacheTests(unittest.TestCase):
 
         self.assertRaises(InvalidCacheBackendError, get_cache, 'does_not_exist')
 
+    def test_close(self):
+        from django.core import signals
+        cache = get_cache('regressiontests.cache.closeable_cache.CacheClass')
+        self.assertFalse(cache.closed)
+        signals.request_finished.send(self.__class__)
+        self.assertTrue(cache.closed)
+
 
 class CacheUtils(TestCase):
     """TestCase for django.utils.cache functions."""

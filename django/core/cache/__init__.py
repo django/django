@@ -176,12 +176,13 @@ def get_cache(backend, **kwargs):
     except (AttributeError, ImportError), e:
         raise InvalidCacheBackendError(
             "Could not find backend '%s': %s" % (backend, e))
-    return backend_cls(location, params)
+    cache = backend_cls(location, params)
+    # Some caches -- python-memcached in particular -- need to do a cleanup at the
+    # end of a request cycle. If the cache provides a close() method, wire it up
+    # here.
+    if hasattr(cache, 'close'):
+        signals.request_finished.connect(cache.close)
+    return cache
 
 cache = get_cache(DEFAULT_CACHE_ALIAS)
 
-# Some caches -- python-memcached in particular -- need to do a cleanup at the
-# end of a request cycle. If the cache provides a close() method, wire it up
-# here.
-if hasattr(cache, 'close'):
-    signals.request_finished.connect(cache.close)
