@@ -128,25 +128,31 @@ class Group(models.Model):
 
 
 class UserManager(models.Manager):
+
+    @classmethod
+    def normalize_email(cls, email):
+        """
+        Normalize the address by lowercasing the domain part of the email
+        address.
+        """
+        email = email or ''
+        try:
+            email_name, domain_part = email.strip().rsplit('@', 1)
+        except ValueError:
+            pass
+        else:
+            email = '@'.join([email_name, domain_part.lower()])
+        return email
+
     def create_user(self, username, email=None, password=None):
         """
         Creates and saves a User with the given username, email and password.
         """
         now = timezone.now()
-
-        # Normalize the address by lowercasing the domain part of the email
-        # address.
-        email = email or ''
-        try:
-            email_name, domain_part = email.strip().split('@', 1)
-        except ValueError:
-            pass
-        else:
-            email = '@'.join([email_name, domain_part.lower()])
-
-        user = self.model(username=username, email=email, is_staff=False,
-                         is_active=True, is_superuser=False, last_login=now,
-                         date_joined=now)
+        email = UserManager.normalize_email(email)
+        user = self.model(username=username, email=email,
+                          is_staff=False, is_active=True, is_superuser=False,
+                          last_login=now, date_joined=now)
 
         user.set_password(password)
         user.save(using=self._db)

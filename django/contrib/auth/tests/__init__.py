@@ -11,7 +11,8 @@ from django.contrib.auth.tests.remote_user import (RemoteUserTest,
     RemoteUserNoCreateTest, RemoteUserCustomTest)
 from django.contrib.auth.tests.management import GetDefaultUsernameTestCase
 from django.contrib.auth.tests.models import (ProfileTestCase, NaturalKeysTestCase,
-    LoadDataWithoutNaturalKeysTestCase, LoadDataWithNaturalKeysTestCase)
+    LoadDataWithoutNaturalKeysTestCase, LoadDataWithNaturalKeysTestCase,
+    UserManagerTestCase)
 from django.contrib.auth.tests.hashers import TestUtilsHashPass
 from django.contrib.auth.tests.signals import SignalTestCase
 from django.contrib.auth.tests.tokens import TokenGeneratorTest
