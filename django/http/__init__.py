@@ -3,6 +3,7 @@ from __future__ import absolute_import
 import datetime
 import os
 import re
+import sys
 import time
 import warnings
 
@@ -177,6 +178,8 @@ def build_request_repr(request, path_override=None, GET_override=None,
                       unicode(cookies),
                       unicode(meta)))
 
+class UnreadablePostError(IOError):
+    pass
 
 class HttpRequest(object):
     """A basic HTTP request."""
@@ -321,7 +324,10 @@ class HttpRequest(object):
         if not hasattr(self, '_body'):
             if self._read_started:
                 raise Exception("You cannot access body after reading from request's data stream")
-            self._body = self.read()
+            try:
+                self._body = self.read()
+            except IOError, e:
+                raise UnreadablePostError, e, sys.exc_traceback
             self._stream = StringIO(self._body)
         return self._body
 

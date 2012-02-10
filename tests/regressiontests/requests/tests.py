@@ -1,3 +1,5 @@
+from __future__ import with_statement
+
 import time
 import warnings
 from datetime import datetime, timedelta
@@ -6,7 +8,7 @@ from StringIO import StringIO
 from django.conf import settings
 from django.core.handlers.modpython import ModPythonRequest
 from django.core.handlers.wsgi import WSGIRequest, LimitedStream
-from django.http import HttpRequest, HttpResponse, parse_cookie, build_request_repr
+from django.http import HttpRequest, HttpResponse, parse_cookie, build_request_repr, UnreadablePostError
 from django.test.utils import get_warnings_state, restore_warnings_state
 from django.utils import unittest
 from django.utils.http import cookie_date
@@ -430,3 +432,21 @@ class RequestsTests(unittest.TestCase):
             self.assertEqual(request.body, request.raw_post_data)
         finally:
             restore_warnings_state(warnings_state)
+
+
+    def test_POST_connection_error(self):
+        """
+        If wsgi.input.read() raises an exception while trying to read() the
+        POST, the exception should be identifiable (not a generic IOError).
+        """
+        class ExplodingStringIO(StringIO):
+            def read(self, len=0):
+                raise IOError("kaboom!")
+
+        payload = 'name=value'
+        request = WSGIRequest({'REQUEST_METHOD': 'POST',
+                               'CONTENT_LENGTH': len(payload),
+                               'wsgi.input': ExplodingStringIO(payload)})
+
+        with self.assertRaises(UnreadablePostError):
+            request.raw_post_data
