@@ -306,13 +306,13 @@ string context, such as in template rendering.
 This is essential when calls to these functions are located in code paths that
 are executed at module load time.
 
-As this is something that can easily happen when defining models (the
-declarative notation of Django models is implemented in a way such that model
-fields are actually class level attributes) this means you need to make sure to
-use lazy translations in the following cases:
+As this is something that can easily happen when defining models, forms and
+model forms (the declarative notation Django offers for them is implemented in a
+way such that their fields are actually class level attributes) this means you
+need to make sure to use lazy translations in the following cases:
 
-Model fields and relationship ``verbose_name`` and ``help_text`` option values
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Model fields and relationships ``verbose_name`` and ``help_text`` option values
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 For example, to translate the help text of the *name* field in the following
 model, do the following::
@@ -369,8 +369,8 @@ with the ``short_description`` attribute::
             return self.kind.type == MOUSE_TYPE
         is_mouse.short_description = _('Is it a mouse?')
 
-Notes on translation in models
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Working with lazy translation objects
+-------------------------------------
 
 The result of a ``ugettext_lazy()`` call can be used wherever you would use a
 unicode string (an object with type ``unicode``) in Python. If you try to use
@@ -398,15 +398,12 @@ If you don't like the long ``ugettext_lazy`` name, you can just alias it as
     class MyThing(models.Model):
         name = models.CharField(help_text=_('This is the help text'))
 
-Working with lazy translation objects
--------------------------------------
-
 Using ``ugettext_lazy()`` and ``ungettext_lazy()`` to mark strings in models
 and utility functions is a common operation. When you're working with these
 objects elsewhere in your code, you should ensure that you don't accidentally
 convert them to strings, because they should be converted as late as possible
-(so that the correct locale is in effect). This necessitates the use of a
-couple of helper functions.
+(so that the correct locale is in effect). This necessitates the use of the
+helper function described next.
 
 Joining strings: string_concat()
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
