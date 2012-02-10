@@ -563,7 +563,7 @@ After the SpatiaLite library and tools have been installed, it is now possible
 to create spatial database for use with GeoDjango.  In order to do this, download
 the spatial database initialization SQL from the `SpatiaLite Resources`__ page::
 
-   $ wget http://www.gaia-gis.it/spatialite/init_spatialite-2.3.sql.gz
+   $ wget http://www.gaia-gis.it/spatialite-2.3.1/init_spatialite-2.3.sql.gz
    $ gunzip init_spatialite-2.3.sql.gz
 
 Now, the ``spatialite`` command can be used to initialize a spatial database::
@@ -577,7 +577,7 @@ Now, the ``spatialite`` command can be used to initialize a spatial database::
     inside your ``settings.py``.
 
 
-__ http://www.gaia-gis.it/spatialite/resources.html
+__ http://www.gaia-gis.it/spatialite-2.3.1/resources.html
 
 
 Add ``django.contrib.gis`` to :setting:`INSTALLED_APPS`
@@ -632,7 +632,6 @@ community!  You can:
   sure to provide a complete description of the problem, versions used,
   and specify the component as "GIS".
 
-__ http://www.mibbit.com/?server=irc.freenode.net&channel=%23geodjango
 __ http://groups.google.com/group/geodjango
 __ http://code.djangoproject.com/simpleticket
 
