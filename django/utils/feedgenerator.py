@@ -200,7 +200,7 @@ class Enclosure(object):
         self.url = iri_to_uri(url)
 
 class RssFeed(SyndicationFeed):
-    mime_type = 'application/rss+xml'
+    mime_type = 'application/rss+xml; charset=utf-8'
     def write(self, outfile, encoding):
         handler = SimplerXMLGenerator(outfile, encoding)
         handler.startDocument()

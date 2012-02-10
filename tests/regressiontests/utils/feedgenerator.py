@@ -87,6 +87,15 @@ class FeedgeneratorTest(unittest.TestCase):
             atom_feed.mime_type, "application/atom+xml; charset=utf-8"
         )
 
+    def test_rss_mime_type(self):
+        """
+        Test to make sure RSS MIME type has UTF8 Charset parameter set
+        """
+        rss_feed = feedgenerator.Rss201rev2Feed("title", "link", "description")
+        self.assertEqual(
+            rss_feed.mime_type, "application/rss+xml; charset=utf-8"
+        )
+
     # Two regression tests for #14202
 
     def test_feed_without_feed_url_gets_rendered_without_atom_link(self):
