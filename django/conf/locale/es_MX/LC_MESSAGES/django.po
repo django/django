@@ -1082,7 +1082,7 @@ msgstr "F Y"
 
 #: utils/translation/trans_real.py:592
 msgid "MONTH_DAY_FORMAT"
-msgstr "j \\de F"
+msgstr "j \\d\\e F"
 
 #: views/generic/create_update.py:121
 #, python-format

@@ -439,7 +439,7 @@ class FormattingTests(TestCase):
         settings.USE_L10N = True
         # Catalan locale
         with translation.override('ca', deactivate=True):
-            self.assertEqual('j \de F \de Y', get_format('DATE_FORMAT'))
+            self.assertEqual('j \d\e F \d\e Y', get_format('DATE_FORMAT'))
             self.assertEqual(1, get_format('FIRST_DAY_OF_WEEK'))
             self.assertEqual(',', get_format('DECIMAL_SEPARATOR'))
             self.assertEqual(u'10:15:48', time_format(self.t))

@@ -104,7 +104,7 @@ class DateFormatTests(unittest.TestCase):
 
         self.assertEqual(dateformat.format(my_birthday, r'Y z \C\E\T'), u'1979 189 CET')
 
-        self.assertEqual(dateformat.format(my_birthday, r'jS o\f F'), u'8th of July')
+        self.assertEqual(dateformat.format(my_birthday, r'jS \o\f F'), u'8th of July')
 
     def test_futuredates(self):
         the_future = datetime(2100, 10, 25, 0, 00)

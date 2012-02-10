@@ -487,7 +487,7 @@ class DefaultFiltersTests(TestCase):
         # real testing of date() is in dateformat.py
         self.assertEqual(date(datetime.datetime(2005, 12, 29), u"d F Y"),
                           u'29 December 2005')
-        self.assertEqual(date(datetime.datetime(2005, 12, 29), ur'jS o\f F'),
+        self.assertEqual(date(datetime.datetime(2005, 12, 29), ur'jS \o\f F'),
                           u'29th of December')
 
     def test_time(self):

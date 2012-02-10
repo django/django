@@ -1064,11 +1064,11 @@ msgstr ", %(number)d %(type)s"
 
 #: utils/translation/trans_real.py:568
 msgid "DATE_FORMAT"
-msgstr "j \\de F \\de Y"
+msgstr "j \\d\\e F \\d\\e Y"
 
 #: utils/translation/trans_real.py:569
 msgid "DATETIME_FORMAT"
-msgstr "j \\de F \\de Y, H:i"
+msgstr "j \\d\\e F \\d\\e Y, H:i"
 
 #: utils/translation/trans_real.py:570
 msgid "TIME_FORMAT"
@@ -1076,11 +1076,11 @@ msgstr "H:i"
 
 #: utils/translation/trans_real.py:591
 msgid "YEAR_MONTH_FORMAT"
-msgstr "F \\de Y"
+msgstr "F \\d\\e Y"
 
 #: utils/translation/trans_real.py:592
 msgid "MONTH_DAY_FORMAT"
-msgstr "j \\de F"
+msgstr "j \\d\\e F"
 
 #: views/generic/create_update.py:121
 #, python-format

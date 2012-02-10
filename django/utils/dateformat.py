@@ -147,7 +147,7 @@ class DateFormat(TimeFormat):
     def e(self):
         "Timezone name if available"
         try:
-            if self.data.tzinfo:
+            if hasattr(self.data, 'tzinfo') and self.data.tzinfo:
                 # Have to use tzinfo.tzname and not datetime.tzname
                 # because datatime.tzname does not expect Unicode
                 return self.data.tzinfo.tzname(self.data) or ""

@@ -4,11 +4,11 @@
 
 # The *_FORMAT strings use the Django date format syntax,
 # see http://docs.djangoproject.com/en/dev/ref/templates/builtins/#date
-DATE_FORMAT = r'j \de F \de Y'
+DATE_FORMAT = r'j \d\e F \d\e Y'
 TIME_FORMAT = 'H:i:s'
-DATETIME_FORMAT = r'j \de F \de Y à\s H:i'
-YEAR_MONTH_FORMAT = r'F \de Y'
-MONTH_DAY_FORMAT = r'j \de F'
+DATETIME_FORMAT = r'j \d\e F \d\e Y à\s H:i'
+YEAR_MONTH_FORMAT = r'F \d\e Y'
+MONTH_DAY_FORMAT = r'j \d\e F'
 SHORT_DATE_FORMAT = 'd/m/Y'
 SHORT_DATETIME_FORMAT = 'd/m/Y H:i'
 FIRST_DAY_OF_WEEK = 0  # Sunday
