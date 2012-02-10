@@ -55,6 +55,8 @@ def Deserializer(stream_or_string, **options):
     try:
         for obj in PythonDeserializer(yaml.safe_load(stream), **options):
             yield obj
+    except GeneratorExit:
+        raise
     except Exception, e:
         # Map to deserializer error
         raise DeserializationError(e)

@@ -17,12 +17,18 @@ try:
 except ImportError:
     from StringIO import StringIO
 
+try:
+    import yaml
+except ImportError:
+    yaml = None
+
 from django.core import serializers
 from django.core.serializers import SerializerDoesNotExist
 from django.core.serializers.base import DeserializationError
 from django.db import connection, models
 from django.test import TestCase
 from django.utils.functional import curry
+from django.utils.unittest import skipUnless
 
 from .models import (BooleanData, CharData, DateData, DateTimeData, EmailData,
     FileData, FilePathData, DecimalData, FloatData, IntegerData, IPAddressData,
@@ -396,6 +402,7 @@ class SerializerTests(TestCase):
             for obj in serializers.deserialize("json", """[{"pk":1}"""):
                 pass
 
+    @skipUnless(yaml, "PyYAML not installed")
     def test_yaml_deserializer_exception(self):
         with self.assertRaises(DeserializationError):
             for obj in serializers.deserialize("yaml", "{"):
