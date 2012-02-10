@@ -8,7 +8,7 @@ Overview
 ========
 In general, GeoDjango installation requires:
 
-1. Python and :ref:`django`
+1. :ref:`Python and Django <django>`
 2. :ref:`spatial_database`
 3. :ref:`geospatial_libs`
 
@@ -624,10 +624,9 @@ Troubleshooting
 If you can't find the solution to your problem here then participate in the
 community!  You can:
 
-* Join the ``#geodjango`` IRC channel on FreeNode (may be accessed on the
-  Web via `Mibbit`__).  Please be patient and polite -- while you may not
-  get an immediate response, someone will attempt to answer your question
-  as soon as they see it.
+* Join the ``#geodjango`` IRC channel on FreeNode. Please be patient and polite
+  -- while you may not get an immediate response, someone will attempt to answer
+  your question as soon as they see it.
 * Ask your question on the `GeoDjango`__ mailing list.
 * File a ticket on the `Django trac`__ if you think there's a bug.  Make
   sure to provide a complete description of the problem, versions used,
@@ -906,10 +905,10 @@ Ubuntu & Debian GNU/Linux
 
 .. note::
 
-    The PostGIS SQL files are not placed the PostgreSQL share directory in the
-    Debian and Ubuntu packages, and are located instead special directory
-    depending on the release.  Thus, when :ref:`spatialdb_template` use the
-    :download:`create_template_postgis-debian.sh` script instead
+    The PostGIS SQL files are not placed in the PostgreSQL share directory in
+    the Debian and Ubuntu packages, and are located instead in a special
+    directory depending on the release.  Thus, when :ref:`spatialdb_template`
+    use the :download:`create_template_postgis-debian.sh` script instead.
 
 .. _ubuntu:
 
@@ -1012,7 +1011,8 @@ Binary Packages
 The following command will install acceptable binary packages, as well as
 the development tools necessary to build the rest of the requirements::
 
-    $ sudo apt-get install binutils bzip2 gcc g++ flex make postgresql-8.1 postgresql-server-dev-8.1 python-ctypes python-psycopg2 python-setuptools
+    $ sudo apt-get install binutils bzip2 gcc g++ flex make postgresql-8.1 \
+        postgresql-server-dev-8.1 python-ctypes python-psycopg2 python-setuptools
 
 Required package information:
 
@@ -1043,7 +1043,9 @@ directions carefully.
 This version is comparable to Ubuntu :ref:`ibex`, so the command
 is very similar::
 
-    $ sudo apt-get install binutils libgdal1-1.5.0 postgresql-8.3 postgresql-8.3-postgis postgresql-server-dev-8.3 python-psycopg2 python-setuptools
+    $ sudo apt-get install binutils libgdal1-1.5.0 postgresql-8.3 \
+        postgresql-8.3-postgis postgresql-server-dev-8.3 \
+        python-psycopg2 python-setuptools
 
 This assumes that you are using PostgreSQL version 8.3. Else, replace ``8.3``
 in the above command with the appropriate PostgreSQL version.
@@ -1072,7 +1074,8 @@ Debian 5.0 . Thus when :ref:`spatialdb_template` either:
 
 * Create a symbolic link to these files::
 
-    $ sudo ln -s /usr/share/postgresql-8.3-postgis/{lwpostgis,spatial_ref_sys}.sql /usr/share/postgresql/8.3
+    $ sudo ln -s /usr/share/postgresql-8.3-postgis/{lwpostgis,spatial_ref_sys}.sql \
+        /usr/share/postgresql/8.3
 
   If not running PostgreSQL 8.3, then  replace ``8.3`` in the command above with the correct version.
 

@@ -72,7 +72,7 @@ create the database from a :ref:`spatial database template
         $ createuser --createdb geo
         $ exit
 
-    Replace ``geo`` to correspond to the system login user name will be
+    Replace ``geo`` with the system login user name that will be
     connecting to the database.  For example, ``johndoe`` if that is the
     system user that will be running GeoDjango.
 
@@ -177,7 +177,7 @@ shapefiles (or other vector data sources):
           using driver `ESRI Shapefile' successful.
     1: TM_WORLD_BORDERS-0.3 (Polygon)
 
-Here ``ogrinfo`` is telling us that the shapefile has one layer, and that
+Here ``ogrinfo`` is telling us that the shapefile has one layer, and that such
 layer contains polygon data.  To find out more we'll specify the layer name
 and use the ``-so`` option to get only important summary information:
 
@@ -355,7 +355,7 @@ tutorial, then we can determine the path using Python's built-in
 ``os`` module::
 
     >>> import os
-    >>> from geodjango import world
+    >>> import world
     >>> world_shp = os.path.abspath(os.path.join(os.path.dirname(world.__file__),
     ...                             'data/TM_WORLD_BORDERS-0.3.shp'))
 
