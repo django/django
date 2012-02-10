@@ -136,24 +136,17 @@ class AssertTemplateUsedContextManagerTests(TestCase):
             pass
 
     def test_error_message(self):
-        try:
+        with self.assertRaisesRegexp(AssertionError, r'^template_used/base\.html'):
             with self.assertTemplateUsed('template_used/base.html'):
                 pass
-        except AssertionError, e:
-            self.assertTrue('template_used/base.html' in e.message)
 
-        try:
+        with self.assertRaisesRegexp(AssertionError, r'^template_used/base\.html'):
             with self.assertTemplateUsed(template_name='template_used/base.html'):
                 pass
-        except AssertionError, e:
-            self.assertTrue('template_used/base.html' in e.message)
 
-        try:
+        with self.assertRaisesRegexp(AssertionError, r'^template_used/base\.html.*template_used/alternative\.html$'):
             with self.assertTemplateUsed('template_used/base.html'):
                 render_to_string('template_used/alternative.html')
-        except AssertionError, e:
-            self.assertTrue('template_used/base.html' in e.message, e.message)
-            self.assertTrue('template_used/alternative.html' in e.message, e.message)
 
     def test_failure(self):
         with self.assertRaises(TypeError):
