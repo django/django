@@ -53,6 +53,17 @@ class IntrospectionTests(TestCase):
         self.assertTrue('django_ixn_testcase_table' not in tl,
                      "django_table_names() returned a non-Django table")
 
+    def test_django_table_names_retval_type(self):
+        # Ticket #15216
+        cursor = connection.cursor()
+        cursor.execute('CREATE TABLE django_ixn_test_table (id INTEGER);')
+
+        tl = connection.introspection.django_table_names(only_existing=True)
+        self.assertIs(type(tl), list)
+
+        tl = connection.introspection.django_table_names(only_existing=False)
+        self.assertIs(type(tl), list)
+
     def test_installed_models(self):
         tables = [Article._meta.db_table, Reporter._meta.db_table]
         models = connection.introspection.installed_models(tables)

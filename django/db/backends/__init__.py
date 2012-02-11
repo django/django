@@ -905,6 +905,7 @@ class BaseDatabaseIntrospection(object):
                     continue
                 tables.add(model._meta.db_table)
                 tables.update([f.m2m_db_table() for f in model._meta.local_many_to_many])
+        tables = list(tables)
         if only_existing:
             existing_tables = self.table_names()
             tables = [
