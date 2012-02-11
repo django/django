@@ -572,25 +572,36 @@ Creating a Spatial Database for SpatiaLite
 -------------------------------------------
 
 After the SpatiaLite library and tools have been installed, it is now possible
-to create spatial database for use with GeoDjango.  In order to do this, download
-the spatial database initialization SQL from the `SpatiaLite Resources`__ page::
+to create a spatial database for use with GeoDjango.
 
-   $ wget http://www.gaia-gis.it/spatialite/init_spatialite-2.3.sql.gz
+For this, a number of spatial metadata tables must be created in the database
+before any spatial query is performed against it.  You need to download a
+database initialization file and execute the SQL queries it contains against
+your database.
+
+First, get it from the appropiate SpatiaLite Resources page (i.e.
+http://www.gaia-gis.it/spatialite-2.3.1/resources.html for 2.3 or
+http://www.gaia-gis.it/spatialite-2.4.0/ for 2.4)::
+
+   $ wget http://www.gaia-gis.it/spatialite-2.3.1/init_spatialite-2.3.sql.gz
    $ gunzip init_spatialite-2.3.sql.gz
+
+(Or, if you are using SpatiaLite 2.4 then do::
+
+   $ wget http://www.gaia-gis.it/spatialite-2.4.0/init_spatialite-2.4.sql.gz
+   $ gunzip init_spatialite-2.4.sql.gz
+
+)
 
 Now, the ``spatialite`` command can be used to initialize a spatial database::
 
-   $ spatialite geodjango.db < init_spatialite-2.3.sql
+   $ spatialite geodjango.db < init_spatialite-2.X.sql
 
 .. note::
 
     The parameter ``geodjango.db`` is the *filename* of the SQLite database
     you want to use.  Use the same in the :setting:`DATABASE_NAME`
     inside your ``settings.py``.
-
-
-__ http://www.gaia-gis.it/spatialite/resources.html
-
 
 Add ``django.contrib.gis`` to :setting:`INSTALLED_APPS`
 -------------------------------------------------------
@@ -1110,7 +1121,7 @@ Python
 ^^^^^^
 
 First, download the latest `Python 2.7 installer`__ from the Python Web site.
-Next, run the installer and keep the defaults -- for example, keep 
+Next, run the installer and keep the defaults -- for example, keep
 'Install for all users' checked and the installation path set as
 ``C:\Python27``.
 
@@ -1165,7 +1176,7 @@ tree and select :menuselection:`PostGIS 1.5 for PostgreSQL 9.0`.
 
 After clicking next, you will be prompted to select your mirror, PostGIS
 will be downloaded, and the PostGIS installer will begin.  Select only the
-default options during install (e.g., do not uncheck the option to create a 
+default options during install (e.g., do not uncheck the option to create a
 default PostGIS database).
 
 .. note::
@@ -1216,7 +1227,7 @@ executable with ``cmd.exe``, will set this up::
      reg ADD "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment" /v PROJ_LIB /t REG_EXPAND_SZ /f /d "%PROJ_LIB%"
 
 For your convenience, these commands are available in the execuatble batch
-script, :download:`geodjango_setup.bat`.  
+script, :download:`geodjango_setup.bat`.
 
 .. note::
 
