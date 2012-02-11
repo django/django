@@ -160,3 +160,50 @@ class AdminEmailHandlerTest(TestCase):
 
         # Restore original filters
         admin_email_handler.filters = orig_filters
+
+    @override_settings(
+            ADMINS=(('admin', 'admin@example.com'),),
+            EMAIL_SUBJECT_PREFIX='',
+            DEBUG=False,
+        )
+    def test_subject_accepts_newlines(self):
+        """
+        Ensure that newlines in email reports' subjects are escaped to avoid
+        AdminErrorHandler to fail.
+        Refs #17281.
+        """
+        message = u'Message \r\n with newlines'
+        expected_subject = u'ERROR: Message \\r\\n with newlines'
+
+        self.assertEqual(len(mail.outbox), 0)
+
+        logger = getLogger('django.request')
+        logger.error(message)
+
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertFalse('\n' in mail.outbox[0].subject)
+        self.assertFalse('\r' in mail.outbox[0].subject)
+        self.assertEqual(mail.outbox[0].subject, expected_subject)
+
+    @override_settings(
+            ADMINS=(('admin', 'admin@example.com'),),
+            EMAIL_SUBJECT_PREFIX='',
+            DEBUG=False,
+        )
+    def test_truncate_subject(self):
+        """
+        RFC 2822's hard limit is 998 characters per line.
+        So, minus "Subject: ", the actual subject must be no longer than 989
+        characters.
+        Refs #17281.
+        """
+        message = 'a' * 1000
+        expected_subject = 'ERROR: aa' + 'a' * 980
+
+        self.assertEqual(len(mail.outbox), 0)
+
+        logger = getLogger('django.request')
+        logger.error(message)
+
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].subject, expected_subject)

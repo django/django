@@ -47,18 +47,20 @@ class AdminEmailHandler(logging.Handler):
             request = record.request
             subject = '%s (%s IP): %s' % (
                 record.levelname,
-                (request.META.get('REMOTE_ADDR') in settings.INTERNAL_IPS and 'internal' or 'EXTERNAL'),
+                (request.META.get('REMOTE_ADDR') in settings.INTERNAL_IPS
+                 and 'internal' or 'EXTERNAL'),
                 record.msg
             )
             filter = get_exception_reporter_filter(request)
             request_repr = filter.get_request_repr(request)
-        except:
+        except Exception:
             subject = '%s: %s' % (
                 record.levelname,
                 record.getMessage()
             )
             request = None
             request_repr = "Request repr() unavailable."
+        subject = self.format_subject(subject)
 
         if record.exc_info:
             exc_info = record.exc_info
@@ -71,6 +73,15 @@ class AdminEmailHandler(logging.Handler):
         reporter = ExceptionReporter(request, is_email=True, *exc_info)
         html_message = self.include_html and reporter.get_traceback_html() or None
         mail.mail_admins(subject, message, fail_silently=True, html_message=html_message)
+
+    def format_subject(self, subject):
+        """
+        Escape CR and LF characters, and limit length.
+        RFC 2822's hard limit is 998 characters per line. So, minus "Subject: "
+        the actual subject must be no longer than 989 characters.
+        """
+        formatted_subject = subject.replace('\n', '\\n').replace('\r', '\\r')
+        return formatted_subject[:989]
 
 
 class CallbackFilter(logging.Filter):
