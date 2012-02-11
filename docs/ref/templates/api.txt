@@ -112,7 +112,7 @@ template::
     "My name is Dolores."
 
 Variable names must consist of any letter (A-Z), any digit (0-9), an underscore
-or a dot.
+(but they must not start with an underscore) or a dot.
 
 Dots have a special meaning in template rendering. A dot in a variable name
 signifies a **lookup**. Specifically, when the template system encounters a
