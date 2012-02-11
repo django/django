@@ -101,8 +101,8 @@ class Command(NoArgsCommand):
                     att_name += '_field'
                     comment_notes.append('Field renamed because it was a Python reserved word.')
 
-                if att_name.isdigit():
-                    att_name = 'number_%d' % int(att_name)
+                if att_name[0].isdigit():
+                    att_name = 'number_%s' % att_name
                     extra_params['db_column'] = unicode(column_name)
                     comment_notes.append("Field renamed because it wasn't a "
                         "valid Python identifier.")

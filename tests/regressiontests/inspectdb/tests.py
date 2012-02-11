@@ -18,3 +18,18 @@ class InspectDBTestCase(TestCase):
         self.assertIn("people_unique = models.ForeignKey(InspectdbPeople, unique=True)",
             out.getvalue())
         out.close()
+
+    def test_digits_column_name_introspection(self):
+        """Introspection of column names consist/start with digits (#16536/#17676)"""
+        out = StringIO()
+        call_command('inspectdb', stdout=out)
+        error_message = "inspectdb generated a model field name which is a number"
+        self.assertNotIn("    123 = models.CharField", out.getvalue(), msg=error_message)
+        self.assertIn("number_123 = models.CharField", out.getvalue())
+
+        error_message = "inspectdb generated a model field name which starts with a digit"
+        self.assertNotIn("    4extra = models.CharField", out.getvalue(), msg=error_message)
+        self.assertIn("number_4extra = models.CharField", out.getvalue())
+
+        self.assertNotIn("    45extra = models.CharField", out.getvalue(), msg=error_message)
+        self.assertIn("number_45extra = models.CharField", out.getvalue())

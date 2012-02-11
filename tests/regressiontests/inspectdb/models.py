@@ -15,3 +15,7 @@ class PeopleMoreData(models.Model):
     people_unique = models.ForeignKey(People, unique=True)
     license = models.CharField(max_length=255)
 
+class DigitsInColumnName(models.Model):
+    all_digits = models.CharField(max_length=11, db_column='123')
+    leading_digit = models.CharField(max_length=11, db_column='4extra')
+    leading_digits = models.CharField(max_length=11, db_column='45extra')
