@@ -130,8 +130,7 @@ class CommentTemplateTagTests(CommentTestCase):
         with self.assertNumQueries(4):
             self.testRenderCommentListFromObject()
 
-        # Force the CT to be cached
-        ct = ContentType.objects.get_for_model(Article)
+        # CT's should be cached
         with self.assertNumQueries(3):
             self.testRenderCommentListFromObject()
 
@@ -141,7 +140,6 @@ class CommentTemplateTagTests(CommentTestCase):
         with self.assertNumQueries(4):
             self.verifyGetCommentList()
 
-        ct = ContentType.objects.get_for_model(Author)
         with self.assertNumQueries(3):
             self.verifyGetCommentList()
 
@@ -151,7 +149,6 @@ class CommentTemplateTagTests(CommentTestCase):
         with self.assertNumQueries(3):
             self.testRenderCommentForm()
 
-        ct = ContentType.objects.get_for_model(Article)
         with self.assertNumQueries(2):
             self.testRenderCommentForm()
 
@@ -161,7 +158,6 @@ class CommentTemplateTagTests(CommentTestCase):
         with self.assertNumQueries(3):
             self.testGetCommentForm()
 
-        ct = ContentType.objects.get_for_model(Article)
         with self.assertNumQueries(2):
             self.testGetCommentForm()
 
@@ -171,6 +167,5 @@ class CommentTemplateTagTests(CommentTestCase):
         with self.assertNumQueries(3):
             self.verifyGetCommentCount()
 
-        ct = ContentType.objects.get_for_model(Article)
         with self.assertNumQueries(2):
             self.verifyGetCommentCount()

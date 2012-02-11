@@ -13,6 +13,7 @@ class ContentTypeManager(models.Manager):
             ct = self.__class__._cache[self.db][(app_label, model)]
         except KeyError:
             ct = self.get(app_label=app_label, model=model)
+            self._add_to_cache(self.db, ct)
         return ct
 
     def _get_opts(self, model):
