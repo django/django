@@ -4,6 +4,7 @@ from datetime import datetime
 
 from django.contrib.gis.tests.utils import no_mysql, no_spatialite
 from django.contrib.gis.shortcuts import render_to_kmz
+from django.db.models import Count
 from django.test import TestCase
 
 from .models import City, PennsylvaniaCity, State
@@ -58,3 +59,8 @@ class GeoRegressionTests(TestCase):
 
          # .count() should not throw TypeError in __eq__
          self.assertEqual(cities_within_state.count(), 1)
+
+    def test06_defer_or_only_with_annotate(self):
+        "Regression for #16409 - make sure defer() and only() work with annotate()"
+        self.assertIsInstance(list(City.objects.annotate(Count('point')).defer('name')), list)
+        self.assertIsInstance(list(City.objects.annotate(Count('point')).only('name')), list)
