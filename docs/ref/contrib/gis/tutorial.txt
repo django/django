@@ -284,7 +284,7 @@ This management command should produce the following output:
 .. code-block:: sql
 
     BEGIN;
-    CREATE TABLE "world_worldborders" (
+    CREATE TABLE "world_worldborder" (
         "id" serial NOT NULL PRIMARY KEY,
         "name" varchar(50) NOT NULL,
         "area" integer NOT NULL,
@@ -299,16 +299,16 @@ This management command should produce the following output:
         "lat" double precision NOT NULL
     )
     ;
-    SELECT AddGeometryColumn('world_worldborders', 'mpoly', 4326, 'MULTIPOLYGON', 2);
-    ALTER TABLE "world_worldborders" ALTER "mpoly" SET NOT NULL;
-    CREATE INDEX "world_worldborders_mpoly_id" ON "world_worldborders" USING GIST ( "mpoly" GIST_GEOMETRY_OPS );
+    SELECT AddGeometryColumn('world_worldborder', 'mpoly', 4326, 'MULTIPOLYGON', 2);
+    ALTER TABLE "world_worldborder" ALTER "mpoly" SET NOT NULL;
+    CREATE INDEX "world_worldborder_mpoly_id" ON "world_worldborder" USING GIST ( "mpoly" GIST_GEOMETRY_OPS );
     COMMIT;
 
 If satisfied, you may then create this table in the database by running the
 ``syncdb`` management command::
 
     $ python manage.py syncdb
-    Creating table world_worldborders
+    Creating table world_worldborder
     Installing custom SQL for world.WorldBorder model
 
 The ``syncdb`` command may also prompt you to create an admin user; go ahead
@@ -547,7 +547,8 @@ and mapping dictionary created above, automatically:
 
 .. code-block:: bash
 
-    $ python manage.py ogrinspect world/data/TM_WORLD_BORDERS-0.3.shp WorldBorder --srid=4326 --mapping --multi
+    $ python manage.py ogrinspect world/data/TM_WORLD_BORDERS-0.3.shp WorldBorder \
+        --srid=4326 --mapping --multi
 
 A few notes about the command-line options given above:
 
@@ -661,12 +662,12 @@ of abstraction::
 
     >>> qs = WorldBorder.objects.filter(mpoly__intersects=pnt)
     >>> print qs.query # Generating the SQL
-    SELECT "world_worldborders"."id", "world_worldborders"."name", "world_worldborders"."area",
-    "world_worldborders"."pop2005", "world_worldborders"."fips", "world_worldborders"."iso2",
-    "world_worldborders"."iso3", "world_worldborders"."un", "world_worldborders"."region",
-    "world_worldborders"."subregion", "world_worldborders"."lon", "world_worldborders"."lat",
-    "world_worldborders"."mpoly" FROM "world_worldborders"
-    WHERE ST_Intersects("world_worldborders"."mpoly", ST_Transform(%s, 4326))
+    SELECT "world_worldborder"."id", "world_worldborder"."name", "world_worldborder"."area",
+    "world_worldborder"."pop2005", "world_worldborder"."fips", "world_worldborder"."iso2",
+    "world_worldborder"."iso3", "world_worldborder"."un", "world_worldborder"."region",
+    "world_worldborder"."subregion", "world_worldborder"."lon", "world_worldborder"."lat",
+    "world_worldborder"."mpoly" FROM "world_worldborder"
+    WHERE ST_Intersects("world_worldborder"."mpoly", ST_Transform(%s, 4326))
     >>> qs # printing evaluates the queryset
     [<WorldBorder: United States>]
 

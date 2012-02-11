@@ -4,6 +4,8 @@
 GeoDjango Installation
 ======================
 
+.. highlight:: console
+
 Overview
 ========
 In general, GeoDjango installation requires:
@@ -157,7 +159,9 @@ Troubleshooting
 Can't find GEOS Library
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-When GeoDjango can't find GEOS, this error is raised::
+When GeoDjango can't find GEOS, this error is raised:
+
+.. code-block:: text
 
     ImportError: Could not find the GEOS library (tried "geos_c"). Try setting GEOS_LIBRARY_PATH in your settings.
 
@@ -174,7 +178,9 @@ If using a binary package of GEOS (e.g., on Ubuntu), you may need to :ref:`binut
 If your GEOS library is in a non-standard location, or you don't want to
 modify the system's library path then the :setting:`GEOS_LIBRARY_PATH`
 setting may be added to your Django settings file with the full path to the
-GEOS C library.  For example::
+GEOS C library.  For example:
+
+.. code-block:: python
 
     GEOS_LIBRARY_PATH = '/home/bob/local/lib/libgeos_c.so'
 
@@ -295,7 +301,9 @@ Can't find GDAL Library
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 When GeoDjango can't find the GDAL library, the ``HAS_GDAL`` flag
-will be false::
+will be false:
+
+.. code-block:: pycon
 
     >>> from django.contrib.gis import gdal
     >>> gdal.HAS_GDAL
@@ -312,7 +320,9 @@ The solution is to properly configure your :ref:`libsettings` *or* set
 If your GDAL library is in a non-standard location, or you don't want to
 modify the system's library path then the :setting:`GDAL_LIBRARY_PATH`
 setting may be added to your Django settings file with the full path to
-the GDAL library.  For example::
+the GDAL library.  For example:
+
+.. code-block:: python
 
     GDAL_LIBRARY_PATH = '/home/sue/local/lib/libgdal.so'
 
@@ -323,7 +333,9 @@ Can't find GDAL data files (``GDAL_DATA``)
 
 When installed from source, GDAL versions 1.5.1 and below have an autoconf bug
 that places data in the wrong location. [#]_   This can lead to error messages
-like this::
+like this:
+
+.. code-block:: text
 
     ERROR 4: Unable to open EPSG support file gcs.csv.
     ...
@@ -337,7 +349,9 @@ GDAL data files before invoking Python  (typically ``/usr/local/share``; use
     $ python manage.py shell
 
 If using Apache, you may need to add this environment variable to your configuration
-file::
+file:
+
+.. code-block:: apache
 
     SetEnv GDAL_DATA /usr/local/share
 
@@ -457,7 +471,9 @@ Thus, download pysqlite2 2.6, and untar::
     $ cd pysqlite-2.6.0
 
 Next, use a text editor (e.g., ``emacs`` or ``vi``) to edit the ``setup.cfg`` file
-to look like the following::
+to look like the following:
+
+.. code-block:: ini
 
     [build_ext]
     #define=
@@ -627,7 +643,9 @@ In order to conduct database transformations to the so-called "Google"
 projection (a spherical mercator projection used by Google Maps),
 an entry must be added to your spatial database's ``spatial_ref_sys`` table.
 Invoke the Django shell from your project and execute the
-``add_srs_entry`` function::
+``add_srs_entry`` function:
+
+.. code-block:: pycon
 
     $ python manage shell
     >>> from django.contrib.gis.utils import add_srs_entry
@@ -814,7 +832,9 @@ __ http://www.kyngchaos.com/software/postgres
 
     Use of these binaries requires Django 1.0.3 and above.  If you are
     using a previous version of Django (like 1.0.2), then you will have
-    to add the following in your settings::
+    to add the following in your settings:
+
+    .. code-block:: python
 
         GEOS_LIBRARY_PATH='/Library/Frameworks/GEOS.framework/GEOS'
         GDAL_LIBRARY_PATH='/Library/Frameworks/GDAL.framework/GDAL'
@@ -841,7 +861,9 @@ pysqlite2
 ~~~~~~~~~
 
 Follow the :ref:`pysqlite2` source install instructions, however,
-when editing the ``setup.cfg`` use the following instead::
+when editing the ``setup.cfg`` use the following instead:
+
+.. code-block:: ini
 
     [build_ext]
     #define=
@@ -866,7 +888,9 @@ location available in your ``PATH``.  For example::
     $ sudo cp spatialite /Library/Frameworks/SQLite3.framework/Programs
 
 Finally, for GeoDjango to be able to find the KyngChaos SpatiaLite library,
-add the following to your ``settings.py``::
+add the following to your ``settings.py``:
+
+.. code-block:: python
 
     SPATIALITE_LIBRARY_PATH='/Library/Frameworks/SQLite3.framework/SQLite3'
 
@@ -1216,7 +1240,9 @@ Modify Windows Environment
 In order to use GeoDjango, you will need to add your Python and OSGeo4W
 directories to your Windows system ``Path``, as well as create ``GDAL_DATA``
 and ``PROJ_LIB`` environment variables.  The following set of commands,
-executable with ``cmd.exe``, will set this up::
+executable with ``cmd.exe``, will set this up:
+
+.. code-block:: bat
 
      set OSGEO4W_ROOT=C:\OSGeo4W
      set PYTHON_ROOT=C:\Python27
