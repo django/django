@@ -10,7 +10,7 @@ class CommentFeedTests(CommentTestCase):
     def test_feed(self):
         response = self.client.get(self.feed_url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response['Content-Type'], 'application/rss+xml')
+        self.assertEqual(response['Content-Type'], 'application/rss+xml; charset=utf-8')
         self.assertContains(response, '<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">')
         self.assertContains(response, '<title>example.com comments</title>')
         self.assertContains(response, '<link>http://example.com/</link>')
