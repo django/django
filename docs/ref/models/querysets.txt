@@ -246,6 +246,15 @@ control the name of the annotation::
     >>> q[0].number_of_entries
     42
 
+In addition to aggregation functions, `:ref:`F() objects <query-expressions>`
+can be used to perform a specific mathematical operation::
+
+    # The 1.0 is to force float conversion
+    >>> q = Entry.objects.annotate(cpb_ratio=F('n_comments')*1.0/F('n_pingbacks'))
+    # The ratio of comments to pingbacks for the first blog entry
+    >>> q[0].cpb_ratio
+    0.0625
+
 For an in-depth discussion of aggregation, see :doc:`the topic guide on
 Aggregation </topics/db/aggregation>`.
 
@@ -1504,6 +1513,13 @@ control the name of the aggregation value that is returned::
     >>> q = Blog.objects.aggregate(number_of_entries=Count('entry'))
     {'number_of_entries': 16}
 
+Inside aggregation functions, `:ref:`F() objects <query-expressions>`
+can be used to perform a specific mathematical operation::
+
+    # The 1.0 is to force float conversion
+    >>> q = Entry.objects.aggregate(avg_cpb_ratio=Avg(F('n_comments')*1.0/F('n_pingbacks')))
+    {'avg_cpb_ratio': 0.125}
+
 For an in-depth discussion of aggregation, see :doc:`the topic guide on
 Aggregation </topics/db/aggregation>`.
 
@@ -2137,6 +2153,13 @@ Django provides the following aggregation functions in the
 ``django.db.models`` module. For details on how to use these
 aggregate functions, see
 :doc:`the topic guide on aggregation </topics/db/aggregation>`.
+
+Note that in addition to taking a named field, aggregation
+functions can take `:ref:`F() objects <query-expressions>`.
+
+.. admonition:: Default aliases
+
+    When using ``F()`` objects, note that there is no default alias.
 
 Avg
 ~~~

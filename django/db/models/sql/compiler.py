@@ -68,7 +68,7 @@ class SQLCompiler(object):
         # as the pre_sql_setup will modify query state in a way that forbids
         # another run of it.
         self.refcounts_before = self.query.alias_refcount.copy()
-        out_cols = self.get_columns(with_col_aliases)
+        out_cols, c_params = self.get_columns(with_col_aliases)
         ordering, ordering_group_by = self.get_ordering()
 
         distinct_fields = self.get_distinct()
@@ -84,6 +84,8 @@ class SQLCompiler(object):
         params = []
         for val in self.query.extra_select.itervalues():
             params.extend(val[1])
+        # Extra-select comes before aggregation in the select list 
+        params.extend(c_params)
 
         result = ['SELECT']
 
@@ -178,6 +180,7 @@ class SQLCompiler(object):
         qn = self.quote_name_unless_alias
         qn2 = self.connection.ops.quote_name
         result = ['(%s) AS %s' % (col[0], qn2(alias)) for alias, col in self.query.extra_select.iteritems()]
+        query_params = []
         aliases = set(self.query.extra_select.keys())
         if with_aliases:
             col_aliases = aliases.copy()
@@ -220,15 +223,17 @@ class SQLCompiler(object):
             aliases.update(new_aliases)
 
         max_name_length = self.connection.ops.max_name_length()
-        result.extend([
-            '%s%s' % (
-                aggregate.as_sql(qn, self.connection),
-                alias is not None
-                    and ' AS %s' % qn(truncate_name(alias, max_name_length))
-                    or ''
-            )
-            for alias, aggregate in self.query.aggregate_select.items()
-        ])
+        for alias, aggregate in self.query.aggregate_select.items(): 
+            sql, params = aggregate.as_sql(qn, self.connection) 
+            result.append( 
+                '%s%s' % ( 
+                    sql, 
+                    alias is not None 
+                        and ' AS %s' % qn(truncate_name(alias, max_name_length)) 
+                        or '' 
+                ) 
+            ) 
+            query_params.extend(params)
 
         for table, col in self.query.related_select_cols:
             r = '%s.%s' % (qn(table), qn(col))
@@ -243,7 +248,7 @@ class SQLCompiler(object):
                 col_aliases.add(col)
 
         self._select_aliases = aliases
-        return result
+        return result, query_params
 
     def get_default_columns(self, with_aliases=False, col_aliases=None,
             start_alias=None, opts=None, as_pairs=False, local_only=False):
@@ -1046,15 +1051,19 @@ class SQLAggregateCompiler(SQLCompiler):
         """
         if qn is None:
             qn = self.quote_name_unless_alias
+        buf = [] 
+        a_params = [] 
+        for aggregate in self.query.aggregate_select.values(): 
+            sql, query_params = aggregate.as_sql(qn, self.connection) 
+            buf.append(sql) 
+            a_params.extend(query_params) 
+        aggregate_sql = ', '.join(buf)
 
         sql = ('SELECT %s FROM (%s) subquery' % (
-            ', '.join([
-                aggregate.as_sql(qn, self.connection)
-                for aggregate in self.query.aggregate_select.values()
-            ]),
+            aggregate_sql,
             self.query.subquery)
         )
-        params = self.query.sub_params
+        params = tuple(a_params) + (self.query.sub_params)
         return (sql, params)
 
 class SQLDateCompiler(SQLCompiler):

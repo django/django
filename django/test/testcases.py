@@ -773,6 +773,18 @@ class TransactionTestCase(SimpleTestCase):
             return self.assertEqual(set(map(transform, qs)), set(values))
         return self.assertEqual(map(transform, qs), values)
 
+    def assertQuerysetAlmostEqual(self, qs, values, transform=repr, ordered=True, places=7):
+        # This could have been done with iterating zip(map(transform, qs), values),
+        # checking each with assertAlmostEqual, which rounds the difference of each
+        # pair, but this way you get much nicer error messages, and you can have an 
+        # unordered comparison, at the cost of a half a digit of accuracy.
+        round_to = lambda v: round(v,places) if isinstance(v, float) else v
+        tqs = map(round_to, map(transform, qs) )
+        tvs = map(round_to, values)
+        if not ordered:
+            return self.assertEqual(set(tqs), set(tvs))
+        return self.assertEqual(tqs, tvs)
+
     def assertNumQueries(self, num, func=None, *args, **kwargs):
         using = kwargs.pop("using", DEFAULT_DB_ALIAS)
         conn = connections[using]

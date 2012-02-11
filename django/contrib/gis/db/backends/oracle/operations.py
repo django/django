@@ -265,17 +265,26 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
 
         raise TypeError("Got invalid lookup_type: %s" % repr(lookup_type))
 
-    def spatial_aggregate_sql(self, agg):
+    def expression_sql(self, function_type):
+        """
+        Returns the SQL template and function for the given function_type.
+        """
+        try:
+            return super(OracleOperations, self).expression_sql(function_type)
+        except NotImplementedError:
+            return self.spatial_aggregate_sql(function_type)
+
+    def spatial_aggregate_sql(self, agg_name):
         """
         Returns the spatial aggregate SQL template and function for the
         given Aggregate instance.
         """
-        agg_name = agg.__class__.__name__.lower()
-        if agg_name == 'union' : agg_name += 'agg'
-        if agg.is_extent:
-            sql_template = '%(function)s(%(field)s)'
+        agg_name = agg_name.lower()
+        if agg_name == 'union': agg_name += 'agg'
+        if agg_name.startswith('extent'):
+            sql_template = '%(function)s(%%s)'
         else:
-            sql_template = '%(function)s(SDOAGGRTYPE(%(field)s,%(tolerance)s))'
+            sql_template = '%(function)s(SDOAGGRTYPE(%%s,%(tolerance)s))'
         sql_function = getattr(self, agg_name)
         return self.select % sql_template, sql_function
 

@@ -96,7 +96,7 @@ class GeoQuery(sql.Query):
                 else:
                     return connection.ops.convert_extent(value)
             else:
-                return connection.ops.convert_geom(value, aggregate.source)
+                return connection.ops.convert_geom(value, aggregate.field)
         else:
             return super(GeoQuery, self).resolve_aggregate(value, aggregate, connection)
 

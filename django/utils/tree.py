@@ -93,7 +93,7 @@ class Node(object):
             self.connector = conn_type
         if self.connector == conn_type:
             if isinstance(node, Node) and (node.connector == conn_type or
-                    len(node) == 1):
+                    (not getattr(node,'preserve_tree',False) and len(node) == 1)):
                 self.children.extend(node.children)
             else:
                 self.children.append(node)
@@ -151,3 +151,11 @@ class Node(object):
         self.children = obj.children
         self.children.append(node)
 
+    def traverse(self):
+        yield self
+        for child in self.children:
+            if not getattr(child, 'children', None):
+                yield child
+            else:
+                for descendent in child.traverse():
+                    yield descendent
