@@ -36,10 +36,11 @@ def salted_hmac(key_salt, value, secret=None):
     return hmac.new(key, msg=value, digestmod=hashlib.sha1)
 
 
-def get_random_string(length=12, allowed_chars='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'):
+def get_random_string(length=12,
+                      allowed_chars='abcdefghijklmnopqrstuvwxyz'
+                                    'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'):
     """
-    Returns a random string of length characters from the set of a-z, A-Z, 0-9
-    for use as a salt.
+    Returns a random string of length characters from the set of a-z, A-Z, 0-9.
 
     The default length of 12 with the a-z, A-Z, 0-9 character set returns
     a 71-bit salt. log_2((26+26+10)^12) =~ 71 bits

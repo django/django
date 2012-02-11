@@ -4,7 +4,7 @@ from __future__ import with_statement
 from django.conf import settings
 from django.core.context_processors import csrf
 from django.http import HttpRequest, HttpResponse
-from django.middleware.csrf import CsrfViewMiddleware
+from django.middleware.csrf import CsrfViewMiddleware, CSRF_KEY_LENGTH
 from django.template import RequestContext, Template
 from django.test import TestCase
 from django.views.decorators.csrf import csrf_exempt, requires_csrf_token, ensure_csrf_cookie
@@ -76,6 +76,19 @@ class CsrfViewMiddlewareTest(TestCase):
 
     def _check_token_present(self, response, csrf_id=None):
         self.assertContains(response, "name='csrfmiddlewaretoken' value='%s'" % (csrf_id or self._csrf_id))
+
+    def test_process_view_token_too_long(self): 
+        """ 
+        Check that if the token is longer than expected, it is ignored and 
+        a new token is created. 
+        """ 
+        req = self._get_GET_no_csrf_cookie_request() 
+        req.COOKIES[settings.CSRF_COOKIE_NAME] = 'x' * 10000000 
+        CsrfViewMiddleware().process_view(req, token_view, (), {}) 
+        resp = token_view(req) 
+        resp2 = CsrfViewMiddleware().process_response(req, resp) 
+        csrf_cookie = resp2.cookies.get(settings.CSRF_COOKIE_NAME, False) 
+        self.assertEqual(len(csrf_cookie.value), CSRF_KEY_LENGTH) 
 
     def test_process_response_get_token_used(self):
         """
