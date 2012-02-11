@@ -78,6 +78,14 @@ class IntrospectionTests(TestCase):
             ['IntegerField', 'CharField', 'CharField', 'CharField', 'BigIntegerField']
         )
 
+    def test_get_table_description_nullable(self):
+        cursor = connection.cursor()
+        desc = connection.introspection.get_table_description(cursor, Reporter._meta.db_table)
+        self.assertEqual(
+            [r[6] for r in desc],
+            [False, False, False, False, True]
+        )
+
     # Regression test for #9991 - 'real' types in postgres
     @skipUnlessDBFeature('has_real_datatype')
     def test_postgresql_real_type(self):

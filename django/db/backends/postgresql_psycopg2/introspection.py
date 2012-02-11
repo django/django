@@ -34,8 +34,16 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     def get_table_description(self, cursor, table_name):
         "Returns a description of the table, with the DB-API cursor.description interface."
+        # As cursor.description does not return reliably the nullable property,
+        # we have to query the information_schema (#7783)
+        cursor.execute("""
+            SELECT column_name, is_nullable
+            FROM information_schema.columns
+            WHERE table_name = %s""", [table_name])
+        null_map = dict(cursor.fetchall())
         cursor.execute("SELECT * FROM %s LIMIT 1" % self.connection.ops.quote_name(table_name))
-        return cursor.description
+        return [tuple([item for item in line[:6]] + [null_map[line[0]]==u'YES'])
+            for line in cursor.description]
 
     def get_relations(self, cursor, table_name):
         """
