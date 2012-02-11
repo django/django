@@ -102,21 +102,30 @@ class SpatiaLiteCreation(DatabaseCreation):
         """
         This routine loads up the SpatiaLite SQL file.
         """
-        # Getting the location of the SpatiaLite SQL file, and confirming
-        # it exists.
-        spatialite_sql = self.spatialite_init_file()
-        if not os.path.isfile(spatialite_sql):
-            raise ImproperlyConfigured('Could not find the required SpatiaLite initialization '
-                                       'SQL file (necessary for testing): %s' % spatialite_sql)
-
-        # Opening up the SpatiaLite SQL initialization file and executing
-        # as a script.
-        sql_fh = open(spatialite_sql, 'r')
-        try:
+        if self.connection.ops.spatial_version[:2] >= (3, 0):
+            # Spatialite >= 3.0.x -- No ned to load any SQL file, calling
+            # InitSpatialMetaData() transparently creates the spatial metadata
+            # tables
             cur = self.connection._cursor()
-            cur.executescript(sql_fh.read())
-        finally:
-            sql_fh.close()
+            cur.execute("SELECT InitSpatialMetaData()")
+        else:
+            # Spatialite < 3.0.x -- Load the initial SQL
+
+            # Getting the location of the SpatiaLite SQL file, and confirming
+            # it exists.
+            spatialite_sql = self.spatialite_init_file()
+            if not os.path.isfile(spatialite_sql):
+                raise ImproperlyConfigured('Could not find the required SpatiaLite initialization '
+                                        'SQL file (necessary for testing): %s' % spatialite_sql)
+
+            # Opening up the SpatiaLite SQL initialization file and executing
+            # as a script.
+            sql_fh = open(spatialite_sql, 'r')
+            try:
+                cur = self.connection._cursor()
+                cur.executescript(sql_fh.read())
+            finally:
+                sql_fh.close()
 
     def spatialite_init_file(self):
         # SPATIALITE_SQL may be placed in settings to tell GeoDjango

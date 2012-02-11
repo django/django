@@ -80,7 +80,7 @@ Program                   Description                           Required        
 :ref:`GDAL <ref-gdal>`    Geospatial Data Abstraction Library   No (but, required for SQLite)     1.8, 1.7, 1.6, 1.5, 1.4
 :ref:`GeoIP <ref-geoip>`  IP-based geolocation library          No                                1.4
 `PostGIS`__               Spatial extensions for PostgreSQL     Yes (PostgreSQL only)             1.5, 1.4, 1.3
-`SpatiaLite`__            Spatial extensions for SQLite         Yes (SQLite only)                 2.4, 2.3
+`SpatiaLite`__            Spatial extensions for SQLite         Yes (SQLite only)                 3.0, 2.4, 2.3
 ========================  ====================================  ================================  ==========================
 
 .. admonition::  Install GDAL
@@ -560,25 +560,48 @@ Creating a Spatial Database for SpatiaLite
 -------------------------------------------
 
 After the SpatiaLite library and tools have been installed, it is now possible
-to create spatial database for use with GeoDjango.  In order to do this, download
-the spatial database initialization SQL from the `SpatiaLite Resources`__ page::
+to create a spatial database for use with GeoDjango.
+
+For this, a number of spatial metadata tables must be created in the database
+before any spatial query is performed against it.
+
+If you are using SpatiaLite 3.0 or newer then use the ``spatialite`` utility to
+call the ``InitSpatiaMetaData()`` function whch will take care of that (you can
+safely ignore the error messages shown) then you can skip the rest of this
+section::
+
+   $ spatialite geodjango.db "SELECT InitSpatialMetaData();"
+   the SPATIAL_REF_SYS table already contains some row(s)
+    InitSpatiaMetaData ()error:"table spatial_ref_sys already exists"
+   0
+
+If you re using a version of Spatialite older than 3.0 then to achieve the same
+result you need to download a database initialization file and execute the SQL
+queries it contains against your database.
+
+First, get it from the appropiate SpatiaLite Resources page (i.e.
+http://www.gaia-gis.it/spatialite-2.3.1/resources.html for 2.3 or
+http://www.gaia-gis.it/spatialite-2.4.0/ for 2.4)::
 
    $ wget http://www.gaia-gis.it/spatialite-2.3.1/init_spatialite-2.3.sql.gz
    $ gunzip init_spatialite-2.3.sql.gz
 
+(Or, if you are using SpatiaLite 2.4 then do::
+
+   $ wget http://www.gaia-gis.it/spatialite-2.4.0/init_spatialite-2.4.sql.gz
+   $ gunzip init_spatialite-2.4.sql.gz
+
+)
+
 Now, the ``spatialite`` command can be used to initialize a spatial database::
 
-   $ spatialite geodjango.db < init_spatialite-2.3.sql
+   $ spatialite geodjango.db < init_spatialite-2.X.sql
 
 .. note::
 
     The parameter ``geodjango.db`` is the *filename* of the SQLite database
     you want to use.  Use the same in the :setting:`DATABASES` ``"name"`` key
     inside your ``settings.py``.
-
-
-__ http://www.gaia-gis.it/spatialite-2.3.1/resources.html
-
 
 Add ``django.contrib.gis`` to :setting:`INSTALLED_APPS`
 -------------------------------------------------------
