@@ -103,7 +103,7 @@ class SpatiaLiteCreation(DatabaseCreation):
         This routine loads up the SpatiaLite SQL file.
         """
         if self.connection.ops.spatial_version[:2] >= (3, 0):
-            # Spatialite >= 3.0.x -- No ned to load any SQL file, calling
+            # Spatialite >= 3.0.x -- No need to load any SQL file, calling
             # InitSpatialMetaData() transparently creates the spatial metadata
             # tables
             cur = self.connection._cursor()

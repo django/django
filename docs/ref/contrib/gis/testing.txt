@@ -114,13 +114,8 @@ spatial database entitled ``template_postgis``.
 SpatiaLite
 ==========
 
-You will need to download the `initialization SQL`__ script for SpatiaLite::
-
-    $ wget http://www.gaia-gis.it/spatialite/init_spatialite-2.3.zip
-    $ unzip init_spatialite-2.3.zip
-
-If ``init_spatialite-2.3.sql`` is in the same path as your project's ``manage.py``,
-then all you have to do is::
+You need to make sure needed spatial tables are created in your test spatial
+database as described in :ref:`create_spatialite_db`. Then all you have to do is::
 
     $ python manage.py test
 
@@ -132,15 +127,14 @@ Settings
 ``SPATIALITE_SQL``
 ^^^^^^^^^^^^^^^^^^
 
+(only relevant when using a SpatiaLite version older than 3.0).
+
 By default, the GeoDjango test runner looks for the SpatiaLite SQL in the
 same directory where it was invoked (by default the same directory where
 ``manage.py`` is located).  If you want to use a different location, then
 you may add the following to your settings::
 
     SPATIALITE_SQL='/path/to/init_spatialite-2.3.sql'
-
-__ http://www.gaia-gis.it/spatialite/init_spatialite-2.3.zip
-
 
 .. _geodjango-tests:
 

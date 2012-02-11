@@ -582,7 +582,7 @@ For this, a number of spatial metadata tables must be created in the database
 before any spatial query is performed against it.
 
 If you are using SpatiaLite 3.0 or newer then use the ``spatialite`` utility to
-call the ``InitSpatiaMetaData()`` function whch will take care of that (you can
+call the ``InitSpatiaMetaData()`` function which will take care of that (you can
 safely ignore the error messages shown) then you can skip the rest of this
 section::
 
