@@ -388,16 +388,33 @@ This example illustrates all possible attributes and methods for a
 
         def link(self, obj):
             """
-            # Takes the object returned by get_object() and returns the feed's
-            # link as a normal Python string.
+            # Takes the object returned by get_object() and returns the URL
+            # of the HTML version of the feed as a normal Python string.
             """
 
         def link(self):
             """
-            Returns the feed's link as a normal Python string.
+            Returns the URL of the HTML version of the feed as a normal Python
+            string.
             """
 
-        link = '/foo/bar/' # Hard-coded link.
+        link = '/blog/' # Hard-coded URL.
+
+        # FEED_URL -- One of the following three is optional. The framework
+        # looks for them in this order.
+
+        def feed_url(self, obj):
+            """
+            # Takes the object returned by get_object() and returns the feed's
+            # own URL as a normal Python string.
+            """
+
+        def feed_url(self):
+            """
+            Returns the feed's own URL as a normal Python string.
+            """
+
+        feed_url = '/blog/rss/' # Hard-coded URL.
 
         # GUID -- One of the following three is optional. The framework looks
         # for them in this order. This property is only used for Atom feeds
