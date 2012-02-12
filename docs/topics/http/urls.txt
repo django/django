@@ -818,6 +818,13 @@ This ``current_app`` argument is used as a hint to resolve application
 namespaces into URLs on specific application instances, according to the
 :ref:`namespaced URL resolution strategy <topics-http-reversing-url-namespaces>`.
 
+You can use ``kwargs`` instead of ``args``, for example::
+
+    >>> reverse('admin:app_list', kwargs={'app_label': 'auth'})
+    '/admin/auth/'
+
+``args`` and ``kwargs`` cannot be passed to ``reverse()`` at the same time.
+
 .. admonition:: Make sure your views are all correct.
 
     As part of working out which URL names map to which patterns, the
