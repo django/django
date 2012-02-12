@@ -115,6 +115,21 @@ details, see :ref:`auth_password_storage`.
 .. _nist: http://csrc.nist.gov/publications/nistpubs/800-132/nist-sp800-132.pdf
 .. _bcrypt: http://en.wikipedia.org/wiki/Bcrypt
 
+.. warning::
+
+    Django 1.4 alpha contained a bug that corrupted PBKDF2 hashes. To
+    determine which accounts are affected, run :djadmin:`manage.py shell
+    <shell>` and paste this snippet::
+
+        from base64 import b64decode
+        from django.contrib.auth.models import User
+        hash_len = {'pbkdf2_sha1': 20, 'pbkdf2_sha256': 32}
+        for user in User.objects.filter(password__startswith='pbkdf2_'):
+            algo, _, _, hash = user.password.split('$')
+            if len(b64decode(hash)) != hash_len[algo]:
+                print user
+
+    These users should reset their passwords.
 
 HTML5 Doctype
 ~~~~~~~~~~~~~
@@ -557,7 +572,7 @@ Django 1.4 also includes several smaller improvements worth noting:
 
 * New phrases added to ``HIDDEN_SETTINGS`` regex in `django/views/debug.py`_.
 
-  ``'API'``, ``'TOKEN'``, ``'KEY'`` were added, ``'PASSWORD'`` was changed to 
+  ``'API'``, ``'TOKEN'``, ``'KEY'`` were added, ``'PASSWORD'`` was changed to
   ``'PASS'``.
 
 .. _django/views/debug.py: http://code.djangoproject.com/browser/django/trunk/django/views/debug.py
