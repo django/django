@@ -43,6 +43,7 @@ class Command(NoArgsCommand):
                 "'.*' and '*~'."),
     )
     help = "Collect static files in a single location."
+    requires_model_validation = False
 
     def __init__(self, *args, **kwargs):
         super(NoArgsCommand, self).__init__(*args, **kwargs)
