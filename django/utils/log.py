@@ -49,7 +49,7 @@ class AdminEmailHandler(logging.Handler):
                 record.levelname,
                 (request.META.get('REMOTE_ADDR') in settings.INTERNAL_IPS
                  and 'internal' or 'EXTERNAL'),
-                record.msg
+                record.getMessage()
             )
             filter = get_exception_reporter_filter(request)
             request_repr = filter.get_request_repr(request)
