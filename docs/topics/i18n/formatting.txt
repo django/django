@@ -149,6 +149,8 @@ To force localization of a single value, use :tfilter:`localize`. To
 control localization over a large section of a template, use the
 :ttag:`localize` template tag.
 
+.. _custom-format-files:
+
 Creating custom format files
 ============================
 

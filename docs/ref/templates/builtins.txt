@@ -1361,6 +1361,10 @@ Z                 Time zone offset in seconds. The          ``-43200`` to ``4320
 
 The ``c`` and ``u`` format specification characters were added in Django 1.2.
 
+.. versionadded:: 1.4
+
+The ``e`` and ``o`` format specification characters were added in Django 1.4.
+
 For example::
 
     {{ value|date:"D d M Y" }}

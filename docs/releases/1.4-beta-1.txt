@@ -502,6 +502,28 @@ Time zone support is enabled by default in new projects created with
 :djadmin:`startproject`. If you want to use this feature in an existing
 project, there is a :ref:`migration guide <time-zones-migration-guide>`.
 
+Two new date format strings
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Two new :tfilter:`date` formats for use in template filters, template tags
+and :ref:`format-localization`:
+
+- ``e`` -- the name of the timezone of the given datetime object
+- ``o`` -- the ISO 8601 year number
+
+Please make sure to update your :ref:`custom format files
+<custom-format-files>` if they contain either ``e`` or ``o`` in a format
+string. For example a Spanish localization format previously only escaped the
+``d`` format character::
+
+  DATE_FORMAT = r'j \de F \de Y'
+
+But now it needs to also escape ``e`` and ``o``::
+
+  DATE_FORMAT = r'j \d\e F \d\e Y'
+
+For more information, see the :tfilter:`date` documentation.
+
 Minor features
 ~~~~~~~~~~~~~~
 
