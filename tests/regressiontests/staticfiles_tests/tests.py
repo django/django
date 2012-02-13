@@ -39,6 +39,7 @@ TEST_SETTINGS = {
         'django.contrib.staticfiles.finders.DefaultStorageFinder',
     ),
 }
+from django.contrib.staticfiles.management.commands.collectstatic import Command as CollectstaticCommand
 
 
 class BaseStaticFilesTestCase(object):
@@ -52,13 +53,26 @@ class BaseStaticFilesTestCase(object):
         default_storage._wrapped = empty
         storage.staticfiles_storage._wrapped = empty
 
+        testfiles_path = os.path.join(TEST_ROOT, 'apps', 'test', 'static', 'test')
         # To make sure SVN doesn't hangs itself with the non-ASCII characters
         # during checkout, we actually create one file dynamically.
-        _nonascii_filepath = os.path.join(
-            TEST_ROOT, 'apps', 'test', 'static', 'test', u'fi\u015fier.txt')
-        with codecs.open(_nonascii_filepath, 'w', 'utf-8') as f:
+        self._nonascii_filepath = os.path.join(testfiles_path, u'fi\u015fier.txt')
+        with codecs.open(self._nonascii_filepath, 'w', 'utf-8') as f:
             f.write(u"fi\u015fier in the app dir")
-        self.addCleanup(os.unlink, _nonascii_filepath)
+        # And also create the stupid hidden file to dwarf the setup.py's
+        # package data handling.
+        self._hidden_filepath = os.path.join(testfiles_path, '.hidden')
+        with codecs.open(self._hidden_filepath, 'w', 'utf-8') as f:
+            f.write("should be ignored")
+        self._backup_filepath = os.path.join(
+            TEST_ROOT, 'project', 'documents', 'test', 'backup~')
+        with codecs.open(self._backup_filepath, 'w', 'utf-8') as f:
+            f.write("should be ignored")
+
+    def tearDown(self):
+        os.unlink(self._nonascii_filepath)
+        os.unlink(self._hidden_filepath)
+        os.unlink(self._backup_filepath)
 
     def assertFileContains(self, filepath, text):
         self.assertIn(text, self._get_file(smart_unicode(filepath)),
@@ -93,7 +107,7 @@ class BaseCollectionTestCase(BaseStaticFilesTestCase):
     Tests shared by all file finding features (collectstatic,
     findstatic, and static serve view).
 
-    This relies on the asserts defined in UtilityAssertsTestCase, but
+    This relies on the asserts defined in BaseStaticFilesTestCase, but
     is separated because some test cases need those asserts without
     all these tests.
     """
@@ -300,7 +314,7 @@ class TestCollectionCachedStorage(BaseCollectionTestCase,
                                 "does/not/exist.png",
                                 "/static/does/not/exist.png")
         self.assertStaticRenders("test/file.txt",
-                                 "/static/test/file.dad0999e4f8f.txt")
+                                 "/static/test/file.ea5bccaf16d5.txt")
         self.assertStaticRenders("cached/styles.css",
                                  "/static/cached/styles.93b1147e8552.css")
 
@@ -362,12 +376,12 @@ class TestCollectionCachedStorage(BaseCollectionTestCase,
         self.assertEqual(relpath, "cached/relative.2217ea7273c2.css")
         with storage.staticfiles_storage.open(relpath) as relfile:
             content = relfile.read()
+            self.assertIn("/static/cached/styles.93b1147e8552.css", content)
             self.assertNotIn("../cached/styles.css", content)
             self.assertNotIn('@import "styles.css"', content)
+            self.assertNotIn('url(img/relative.png)', content)
+            self.assertIn('url("/static/cached/img/relative.acae32e4532b.png")', content)
             self.assertIn("/static/cached/styles.93b1147e8552.css", content)
-            self.assertNotIn("url(img/relative.png)", content)
-            self.assertIn("/static/cached/img/relative.acae32e4532b.png", content)
-            self.assertIn("/static/cached/absolute.cc80cb5e2eb1.css#eggs", content)
 
     def test_template_tag_deep_relative(self):
         relpath = self.cached_file_path("cached/css/window.css")
@@ -398,12 +412,37 @@ class TestCollectionCachedStorage(BaseCollectionTestCase,
         cached_name = storage.staticfiles_storage.cache.get(cache_key)
         self.assertEqual(cached_name, hashed_name)
 
+    def test_post_processing(self):
+        """Test that post_processing behaves correctly.
+
+        Files that are alterable should always be post-processed; files that
+        aren't should be skipped.
+
+        collectstatic has already been called once in setUp() for this testcase,
+        therefore we check by verifying behavior on a second run.
+        """
+        collectstatic_args = {
+            'interactive': False,
+            'verbosity': '0',
+            'link': False,
+            'clear': False,
+            'dry_run': False,
+            'post_process': True,
+            'use_default_ignore_patterns': True,
+            'ignore_patterns': ['*.ignoreme'],
+        }
+
+        collectstatic_cmd = CollectstaticCommand()
+        collectstatic_cmd.set_options(**collectstatic_args)
+        stats = collectstatic_cmd.collect()
+        self.assertTrue(u'cached/css/window.css' in stats['post_processed'])
+        self.assertTrue(u'cached/css/img/window.png' in stats['unmodified'])
+
 # we set DEBUG to False here since the template tag wouldn't work otherwise
 TestCollectionCachedStorage = override_settings(**dict(TEST_SETTINGS,
     STATICFILES_STORAGE='django.contrib.staticfiles.storage.CachedStaticFilesStorage',
     DEBUG=False,
 ))(TestCollectionCachedStorage)
-
 
 if sys.platform != 'win32':
 

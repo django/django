@@ -7,13 +7,14 @@ from optparse import make_option
 from django.core.files.storage import FileSystemStorage
 from django.core.management.base import CommandError, NoArgsCommand
 from django.utils.encoding import smart_str, smart_unicode
+from django.utils.datastructures import SortedDict
 
 from django.contrib.staticfiles import finders, storage
 
 
 class Command(NoArgsCommand):
     """
-    Command that allows to copy or symlink media files from different
+    Command that allows to copy or symlink static files from different
     locations to the settings.STATIC_ROOT.
     """
     option_list = NoArgsCommand.option_list + (
@@ -50,6 +51,7 @@ class Command(NoArgsCommand):
         self.copied_files = []
         self.symlinked_files = []
         self.unmodified_files = []
+        self.post_processed_files = []
         self.storage = storage.staticfiles_storage
         try:
             self.storage.path('')
@@ -61,18 +63,27 @@ class Command(NoArgsCommand):
         if hasattr(os, 'stat_float_times'):
             os.stat_float_times(False)
 
-    def handle_noargs(self, **options):
+    def set_options(self, **options):
+        """
+        Set instance variables based on an options dict
+        """
+        self.interactive = options['interactive']
+        self.verbosity = int(options.get('verbosity', 1))
+        self.symlink = options['link']
         self.clear = options['clear']
         self.dry_run = options['dry_run']
         ignore_patterns = options['ignore_patterns']
         if options['use_default_ignore_patterns']:
             ignore_patterns += ['CVS', '.*', '*~']
         self.ignore_patterns = list(set(ignore_patterns))
-        self.interactive = options['interactive']
-        self.symlink = options['link']
-        self.verbosity = int(options.get('verbosity', 1))
         self.post_process = options['post_process']
 
+    def collect(self):
+        """
+        Perform the bulk of the work of collectstatic.
+
+        Split off from handle_noargs() to facilitate testing.
+        """
         if self.symlink:
             if sys.platform == 'win32':
                 raise CommandError("Symlinking is not supported by this "
@@ -80,6 +91,46 @@ class Command(NoArgsCommand):
             if not self.local:
                 raise CommandError("Can't symlink to a remote destination.")
 
+        if self.clear:
+            self.clear_dir('')
+
+        if self.symlink:
+            handler = self.link_file
+        else:
+            handler = self.copy_file
+
+        found_files = SortedDict()
+        for finder in finders.get_finders():
+            for path, storage in finder.list(self.ignore_patterns):
+                # Prefix the relative path if the source storage contains it
+                if getattr(storage, 'prefix', None):
+                    prefixed_path = os.path.join(storage.prefix, path)
+                else:
+                    prefixed_path = path
+                found_files[prefixed_path] = storage.open(path)
+                handler(path, prefixed_path, storage)
+
+        # Here we check if the storage backend has a post_process
+        # method and pass it the list of modified files.
+        if self.post_process and hasattr(self.storage, 'post_process'):
+            processor = self.storage.post_process(found_files,
+                                                  dry_run=self.dry_run)
+            for original_path, processed_path, processed in processor:
+                if processed:
+                    self.log(u"Post-processed '%s' as '%s" %
+                             (original_path, processed_path), level=1)
+                    self.post_processed_files.append(original_path)
+                else:
+                    self.log(u"Skipped post-processing '%s'" % original_path)
+
+        return {
+            'modified': self.copied_files + self.symlinked_files,
+            'unmodified': self.unmodified_files,
+            'post_processed': self.post_processed_files,
+        }
+
+    def handle_noargs(self, **options):
+        self.set_options(**options)
         # Warn before doing anything more.
         if (isinstance(self.storage, FileSystemStorage) and
                 self.storage.location):
@@ -107,49 +158,25 @@ Type 'yes' to continue, or 'no' to cancel: """
             if confirm != 'yes':
                 raise CommandError("Collecting static files cancelled.")
 
-        if self.clear:
-            self.clear_dir('')
-
-        handler = {
-            True: self.link_file,
-            False: self.copy_file,
-        }[self.symlink]
-
-        found_files = []
-        for finder in finders.get_finders():
-            for path, storage in finder.list(self.ignore_patterns):
-                # Prefix the relative path if the source storage contains it
-                if getattr(storage, 'prefix', None):
-                    prefixed_path = os.path.join(storage.prefix, path)
-                else:
-                    prefixed_path = path
-                found_files.append(prefixed_path)
-                handler(path, prefixed_path, storage)
-
-        # Here we check if the storage backend has a post_process
-        # method and pass it the list of modified files.
-        if self.post_process and hasattr(self.storage, 'post_process'):
-            post_processed = self.storage.post_process(found_files, **options)
-            for path in post_processed:
-                self.log(u"Post-processed '%s'" % path, level=1)
-        else:
-            post_processed = []
-
-        modified_files = self.copied_files + self.symlinked_files
-        actual_count = len(modified_files)
-        unmodified_count = len(self.unmodified_files)
+        collected = self.collect()
+        modified_count = len(collected['modified'])
+        unmodified_count = len(collected['unmodified'])
+        post_processed_count = len(collected['post_processed'])
 
         if self.verbosity >= 1:
-            template = ("\n%(actual_count)s %(identifier)s %(action)s"
-                        "%(destination)s%(unmodified)s.\n")
+            template = ("\n%(modified_count)s %(identifier)s %(action)s"
+                        "%(destination)s%(unmodified)s%(post_processed)s.\n")
             summary = template % {
-                'actual_count': actual_count,
-                'identifier': 'static file' + (actual_count > 1 and 's' or ''),
+                'modified_count': modified_count,
+                'identifier': 'static file' + (modified_count != 1 and 's' or ''),
                 'action': self.symlink and 'symlinked' or 'copied',
                 'destination': (destination_path and " to '%s'"
                                 % destination_path or ''),
-                'unmodified': (self.unmodified_files and ', %s unmodified'
+                'unmodified': (collected['unmodified'] and ', %s unmodified'
                                % unmodified_count or ''),
+                'post_processed': (collected['post_processed'] and
+                                   ', %s post-processed'
+                                   % post_processed_count or ''),
             }
             self.stdout.write(smart_str(summary))
 
@@ -180,21 +207,20 @@ Type 'yes' to continue, or 'no' to cancel: """
             self.clear_dir(os.path.join(path, d))
 
     def delete_file(self, path, prefixed_path, source_storage):
-        # Whether we are in symlink mode
         # Checks if the target file should be deleted if it already exists
         if self.storage.exists(prefixed_path):
             try:
                 # When was the target file modified last time?
                 target_last_modified = \
                     self.storage.modified_time(prefixed_path)
-            except (OSError, NotImplementedError):
+            except (OSError, NotImplementedError, AttributeError):
                 # The storage doesn't support ``modified_time`` or failed
                 pass
             else:
                 try:
                     # When was the source file modified last time?
                     source_last_modified = source_storage.modified_time(path)
-                except (OSError, NotImplementedError):
+                except (OSError, NotImplementedError, AttributeError):
                     pass
                 else:
                     # The full path of the target file
