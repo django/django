@@ -6,7 +6,7 @@ from django.core.urlresolvers import reverse
 from django.utils.decorators import method_decorator
 from django.views import generic
 
-from .forms import AuthorForm
+from .forms import AuthorForm, ArtistForm
 from .models import Artist, Author, Book, Page, BookSigning
 
 
@@ -77,6 +77,9 @@ class AuthorListCustomPaginator(AuthorList):
 
 class ArtistCreate(generic.CreateView):
     model = Artist
+
+class ArtistOnlyFormClassCreate(generic.CreateView):
+    form_class = ArtistForm
 
 
 class NaiveAuthorCreate(generic.CreateView):

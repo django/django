@@ -87,6 +87,21 @@ class CreateViewTests(TestCase):
         self.assertRedirects(res, reverse('author_detail', kwargs={'pk': obj.pk}))
         self.assertQuerysetEqual(Author.objects.all(), ['<Author: Randall Munroe>'])
 
+    def test_create_with_only_form_class(self):
+        res = self.client.get('/edit/artists/create/formclass/')
+        self.assertEqual(res.status_code, 200)
+        self.assertTrue(isinstance(res.context['form'], views.ArtistForm))
+        self.assertFalse('object' in res.context)
+        self.assertFalse('artist' in res.context)
+        self.assertTemplateUsed(res, 'generic_views/artist_form.html')
+        
+        res = self.client.post('/edit/artists/create/formclass/',
+                               {'name': 'Rene Magritte'})
+        self.assertEqual(res.status_code, 302)
+        artist = Artist.objects.get(name='Rene Magritte')
+        self.assertRedirects(res, 'http://testserver/detail/artist/%d/' % artist.pk)
+        self.assertQuerysetEqual(Artist.objects.all(), ['<Artist: Rene Magritte>'])
+
     def test_create_without_redirect(self):
         try:
             res = self.client.post('/edit/authors/create/naive/',
