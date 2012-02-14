@@ -10,7 +10,7 @@ from django.template.base import (Node, NodeList, Template, Library,
     TemplateSyntaxError, VariableDoesNotExist, InvalidTemplateLibrary,
     BLOCK_TAG_START, BLOCK_TAG_END, VARIABLE_TAG_START, VARIABLE_TAG_END,
     SINGLE_BRACE_START, SINGLE_BRACE_END, COMMENT_TAG_START, COMMENT_TAG_END,
-    get_library, token_kwargs, kwarg_re)
+    VARIABLE_ATTRIBUTE_SEPARATOR, get_library, token_kwargs, kwarg_re)
 from django.template.smartif import IfParser, Literal
 from django.template.defaultfilters import date
 from django.utils.encoding import smart_str, smart_unicode
@@ -287,6 +287,12 @@ class RegroupNode(Node):
         self.target, self.expression = target, expression
         self.var_name = var_name
 
+    def resolve_expression(self, obj, context):
+        # This method is called for each object in self.target. See regroup()
+        # for the reason why we temporarily put the object in the context.
+        context[self.var_name] = obj
+        return self.expression.resolve(context, True)
+
     def render(self, context):
         obj_list = self.target.resolve(context, True)
         if obj_list == None:
@@ -298,7 +304,7 @@ class RegroupNode(Node):
         context[self.var_name] = [
             {'grouper': key, 'list': list(val)}
             for key, val in
-            groupby(obj_list, lambda v, f=self.expression.resolve: f(v, True))
+            groupby(obj_list, lambda obj: self.resolve_expression(obj, context))
         ]
         return ''
 
@@ -1112,10 +1118,16 @@ def regroup(parser, token):
     if lastbits_reversed[1][::-1] != 'as':
         raise TemplateSyntaxError("next-to-last argument to 'regroup' tag must"
                                   " be 'as'")
-
-    expression = parser.compile_filter(lastbits_reversed[2][::-1])
-
     var_name = lastbits_reversed[0][::-1]
+    # RegroupNode will take each item in 'target', put it in the context under
+    # 'var_name', evaluate 'var_name'.'expression' in the current context, and
+    # group by the resulting value. After all items are processed, it will
+    # save the final result in the context under 'var_name', thus clearing the
+    # temporary values. This hack is necessary because the template engine
+    # doesn't provide a context-aware equivalent of Python's getattr.
+    expression = parser.compile_filter(var_name +
+                                       VARIABLE_ATTRIBUTE_SEPARATOR +
+                                       lastbits_reversed[2][::-1])
     return RegroupNode(target, expression, var_name)
 
 @register.tag

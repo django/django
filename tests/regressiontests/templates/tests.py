@@ -8,7 +8,7 @@ if __name__ == '__main__':
     # before importing 'template'.
     settings.configure()
 
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 import time
 import os
 import sys
@@ -1376,6 +1376,33 @@ class Templates(unittest.TestCase):
                           '{% endfor %},'
                           '{% endfor %}',
                           {}, ''),
+
+            # Regression tests for #17675
+            # The date template filter has expects_localtime = True
+            'regroup03': ('{% regroup data by at|date:"m" as grouped %}'
+                          '{% for group in grouped %}'
+                          '{{ group.grouper }}:'
+                          '{% for item in group.list %}'
+                          '{{ item.at|date:"d" }}'
+                          '{% endfor %},'
+                          '{% endfor %}',
+                          {'data': [{'at': date(2012, 2, 14)},
+                                    {'at': date(2012, 2, 28)},
+                                    {'at': date(2012, 7, 4)}]},
+                          '02:1428,07:04,'),
+            # The join template filter has needs_autoescape = True
+            'regroup04': ('{% regroup data by bar|join:"" as grouped %}'
+                          '{% for group in grouped %}'
+                          '{{ group.grouper }}:'
+                          '{% for item in group.list %}'
+                          '{{ item.foo|first }}'
+                          '{% endfor %},'
+                          '{% endfor %}',
+                          {'data': [{'foo': 'x', 'bar': ['ab', 'c']},
+                                    {'foo': 'y', 'bar': ['a', 'bc']},
+                                    {'foo': 'z', 'bar': ['a', 'd']}]},
+                          'abc:xy,ad:z,'),
+
             ### SSI TAG ########################################################
 
             # Test normal behavior
