@@ -41,31 +41,56 @@ def find_management_module(app_name):
     """
     parts = app_name.split('.')
     parts.append('management')
-    parts.reverse()
-    part = parts.pop()
-    path = None
 
-    # When using manage.py, the project module is added to the path,
-    # loaded, then removed from the path. This means that
-    # testproject.testapp.models can be loaded in future, even if
-    # testproject isn't in the path. When looking for the management
-    # module, we need look for the case where the project name is part
-    # of the app_name but the project directory itself isn't on the path.
-    try:
-        f, path, descr = imp.find_module(part, path)
-    except ImportError as e:
-        if os.path.basename(os.getcwd()) != part:
-            raise e
+    for i in range(len(parts), 0, -1):
+        try:
+            path = sys.modules['.'.join(parts[:i])].__path__
+        except AttributeError:
+            raise ImportError("No package named %s" % parts[i-1])
+        except KeyError:
+            continue
+
+        parts = parts[i:]
+        parts.reverse()
+        break
     else:
-        if f:
-            f.close()
+        parts.reverse()
+        part = parts.pop()
+        path = sys.path
+
+        # When using manage.py, the project module is added to the path,
+        # loaded, then removed from the path. This means that
+        # testproject.testapp.models can be loaded in future, even if
+        # testproject isn't in the path. When looking for the management
+        # module, we need look for the case where the project name is part
+        # of the app_name but the project directory itself isn't on the path.
+        try:
+            next_path = []
+            for p in path:
+                try:
+                    next_path.append(imp.find_module(part, [p])[1])
+                except ImportError:
+                    pass
+            if not next_path:
+                raise ImportError("No module named %s" % part)
+            path = next_path
+        except ImportError as e:
+            if os.path.basename(os.getcwd()) != part:
+                raise e
 
     while parts:
         part = parts.pop()
-        f, path, descr = imp.find_module(part, path and [path] or None)
-        if f:
-            f.close()
-    return path
+        next_path = []
+        for p in path:
+            try:
+                next_path.append(imp.find_module(part, [p])[1])
+            except ImportError:
+                pass
+        if not next_path:
+            raise ImportError("No module named %s" % part)
+        path = next_path
+
+    return path[0]
 
 def load_command_class(app_name, name):
     """

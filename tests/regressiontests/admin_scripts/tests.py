@@ -96,6 +96,9 @@ class AdminScriptTestCase(unittest.TestCase):
     def run_test(self, script, args, settings_file=None, apps=None):
         project_dir = os.path.dirname(test_dir)
         base_dir = os.path.dirname(project_dir)
+        lib1_dir = os.path.join(os.path.dirname(__file__), 'lib1')
+        lib2_dir = os.path.join(os.path.dirname(__file__), 'lib2')
+        lib3_dir = os.path.join(os.path.dirname(__file__), 'lib3')
         ext_backend_base_dirs = self._ext_backend_paths()
 
         # Remember the old environment
@@ -113,7 +116,7 @@ class AdminScriptTestCase(unittest.TestCase):
             os.environ['DJANGO_SETTINGS_MODULE'] = settings_file
         elif 'DJANGO_SETTINGS_MODULE' in os.environ:
             del os.environ['DJANGO_SETTINGS_MODULE']
-        python_path = [project_dir, base_dir]
+        python_path = [project_dir, base_dir, lib1_dir, lib2_dir, lib3_dir]
         python_path.extend(ext_backend_base_dirs)
         os.environ[python_path_var_name] = os.pathsep.join(python_path)
 
@@ -1613,3 +1616,91 @@ class DiffSettings(AdminScriptTestCase):
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
         self.assertOutput(out, "FOO = 'bar'  ###")
+
+
+class NamespacePackagedApps(AdminScriptTestCase):
+    def setUp(self):
+        self.write_settings('settings.py', apps=['nons_app', 'nsapps.contrib.app1','nsapps.contrib.app2','exapps.app3'])
+        test_dir = os.path.dirname(os.path.dirname(__file__))
+        settings_file = open(os.path.join(test_dir, 'settings.py'), 'a')
+        settings_file.write('import _addsitedir')
+        settings_file.close()
+
+    def tearDown(self):
+        self.remove_settings('settings.py')
+
+    def test_help(self):
+        out, err = self.run_manage(['help'])
+        self.assertNoOutput(err)
+        self.assertOutput(out, "nons_app_command1")
+        self.assertOutput(out, "app1_command1")
+        self.assertOutput(out, "app2_command1")
+        self.assertOutput(out, "app3_command1")
+
+    def test_nons_app(self):
+        args = ['nons_app_command1']
+        out, err = self.run_manage(args)
+        self.assertNoOutput(err)
+        self.assertOutput(out, "EXECUTE:nons_app_command1")
+
+    def test_nsapps(self):
+        args = ['app1_command1']
+        out, err = self.run_manage(args)
+        self.assertNoOutput(err)
+        self.assertOutput(out, "EXECUTE:app1_command1")
+
+        args = ['app2_command1']
+        out, err = self.run_manage(args)
+        self.assertNoOutput(err)
+        self.assertOutput(out, "EXECUTE:app2_command1")
+
+    def test_exapps(self):
+        args = ['app3_command1']
+        out, err = self.run_manage(args)
+        self.assertNoOutput(err)
+        self.assertOutput(out, "EXECUTE:app3_command1")
+
+class PreloadedNamespacePackagedApps(AdminScriptTestCase):
+    def setUp(self):
+        self.write_settings('settings.py', apps=['nsapps.contrib.app1','nsapps.contrib.app2'])
+        test_dir = os.path.dirname(os.path.dirname(__file__))
+        settings_file = open(os.path.join(test_dir, 'settings.py'), 'a')
+        settings_file.write('import nsapps')
+        settings_file.close()
+
+    def tearDown(self):
+        self.remove_settings('settings.py')
+
+    def test_help(self):
+        out, err = self.run_manage(['help'])
+        self.assertNoOutput(err)
+        self.assertOutput(out, "app1_command1")
+        self.assertOutput(out, "app2_command1")
+
+    def test_nsapps(self):
+        args = ['app1_command1']
+        out, err = self.run_manage(args)
+        self.assertNoOutput(err)
+        self.assertOutput(out, "EXECUTE:app1_command1")
+
+        args = ['app2_command1']
+        out, err = self.run_manage(args)
+        self.assertNoOutput(err)
+        self.assertOutput(out, "EXECUTE:app2_command1")
+
+
+class NonPackageManagementApps(AdminScriptTestCase):
+    def setUp(self):
+        self.write_settings('settings.py', apps=['npapp'])
+        settings_file = open(os.path.join(test_dir, 'settings.py'), 'a')
+        settings_file.write('import npapp.management')
+        settings_file.close()
+
+    def tearDown(self):
+        self.remove_settings('settings.py')
+
+    def test_help(self):
+        out, err = self.run_manage(['help'])
+        self.assertNoOutput(err)
+
+
