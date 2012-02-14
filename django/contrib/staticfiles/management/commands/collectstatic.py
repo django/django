@@ -107,7 +107,7 @@ class Command(NoArgsCommand):
                     prefixed_path = os.path.join(storage.prefix, path)
                 else:
                     prefixed_path = path
-                found_files[prefixed_path] = storage.open(path)
+                found_files[prefixed_path] = (storage, path)
                 handler(path, prefixed_path, storage)
 
         # Here we check if the storage backend has a post_process

@@ -281,8 +281,8 @@ StaticFilesStorage
     .. versionadded:: 1.4
 
     This method is called by the :djadmin:`collectstatic` management command
-    after each run and gets passed the paths of found files, as well as the
-    command line options.
+    after each run and gets passed the local storages and paths of found
+    files as a dictionary, as well as the command line options.
 
     The :class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage`
     uses this behind the scenes to replace the paths with their hashed

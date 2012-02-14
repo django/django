@@ -198,7 +198,8 @@ class CachedFilesMixin(object):
 
             # use the original, local file, not the copied-but-unprocessed
             # file, which might be somewhere far away, like S3
-            with paths[name] as original_file:
+            storage, path = paths[name]
+            with storage.open(path) as original_file:
 
                 # generate the hash with the original content, even for
                 # adjustable files.
