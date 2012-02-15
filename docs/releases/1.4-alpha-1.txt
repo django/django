@@ -50,14 +50,13 @@ What's new in Django 1.4
 Support for in-browser testing frameworks
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Django 1.4 now supports integration with in-browser testing frameworks such
-as Selenium_ or Windmill_ thanks to the :class:`django.test.LiveServerTestCase`
-base class, allowing you to test the interactions between your site's front and
-back ends more comprehensively. See the
+Django 1.4 supports integration with in-browser testing frameworks like
+Selenium_. The new :class:`django.test.LiveServerTestCase` base class lets you
+test the interactions between your site's front and back ends more
+comprehensively. See the
 :class:`documentation<django.test.LiveServerTestCase>` for more details and
 concrete examples.
 
-.. _Windmill: http://www.getwindmill.com/
 .. _Selenium: http://seleniumhq.org/
 
 ``SELECT FOR UPDATE`` support

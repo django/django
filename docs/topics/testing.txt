@@ -581,16 +581,16 @@ Some of the things you can do with the test client are:
 * Test that a given request is rendered by a given Django template, with
   a template context that contains certain values.
 
-Note that the test client is not intended to be a replacement for Windmill_,
-Selenium_, or other "in-browser" frameworks. Django's test client has
-a different focus. In short:
+Note that the test client is not intended to be a replacement for Selenium_ or
+other "in-browser" frameworks. Django's test client has a different focus. In
+short:
 
 * Use Django's test client to establish that the correct view is being
   called and that the view is collecting the correct context data.
 
-* Use in-browser frameworks such as Windmill_ and Selenium_ to test *rendered*
-  HTML and the *behavior* of Web pages, namely JavaScript functionality. Django
-  also provides special support for those frameworks; see the section on
+* Use in-browser frameworks like Selenium_ to test *rendered* HTML and the
+  *behavior* of Web pages, namely JavaScript functionality. Django also
+  provides special support for those frameworks; see the section on
   :class:`~django.test.LiveServerTestCase` for more details.
 
 A comprehensive test suite should use a combination of both test types.
@@ -1840,9 +1840,9 @@ Live test server
 :class:`~django.test.TransactionTestCase` with one extra feature: it launches a
 live Django server in the background on setup, and shuts it down on teardown.
 This allows the use of automated test clients other than the
-:ref:`Django dummy client <test-client>` such as, for example, the Selenium_ or
-Windmill_ clients, to execute a series of functional tests inside a browser and
-simulate a real user's actions.
+:ref:`Django dummy client <test-client>` such as, for example, the Selenium_
+client, to execute a series of functional tests inside a browser and simulate a
+real user's actions.
 
 By default the live server's address is `'localhost:8081'` and the full URL
 can be accessed during the tests with ``self.live_server_url``. If you'd like
@@ -1928,7 +1928,6 @@ case you do not have Firefox installed or wish to use another browser. The
 example above is just a tiny fraction of what the Selenium client can do; check
 out the `full reference`_ for more details.
 
-.. _Windmill: http://www.getwindmill.com/
 .. _Selenium: http://seleniumhq.org/
 .. _selenium package: http://pypi.python.org/pypi/selenium
 .. _full reference: http://readthedocs.org/docs/selenium-python/en/latest/api.html
