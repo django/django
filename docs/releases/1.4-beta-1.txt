@@ -32,7 +32,7 @@ Internally, Django's version number is represented by the tuple
 ``django.VERSION``. This is used to generate human-readable version
 number strings; as of Django 1.4 beta 1, the algorithm for generating
 these strings has been changed to match the recommendations of `PEP
-386 <http://www.python.org/dev/peps/pep-0386/>`. This only affects the
+386 <http://www.python.org/dev/peps/pep-0386/>`_. This only affects the
 human-readable strings identifying Django alphas, betas and release
 candidates, and should not affect end users in any way.
 
