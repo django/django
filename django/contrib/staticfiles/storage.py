@@ -105,13 +105,16 @@ class CachedFilesMixin(object):
             hashed_name, fragment = name, ''
         else:
             clean_name, fragment = urldefrag(name)
-            cache_key = self.cache_key(name)
-            hashed_name = self.cache.get(cache_key)
-            if hashed_name is None:
-                hashed_name = self.hashed_name(clean_name).replace('\\', '/')
-                # set the cache if there was a miss
-                # (e.g. if cache server goes down)
-                self.cache.set(cache_key, hashed_name)
+            if urlsplit(clean_name).path.endswith('/'):  # don't hash paths
+                hashed_name = name
+            else:
+                cache_key = self.cache_key(name)
+                hashed_name = self.cache.get(cache_key)
+                if hashed_name is None:
+                    hashed_name = self.hashed_name(clean_name).replace('\\', '/')
+                    # set the cache if there was a miss
+                    # (e.g. if cache server goes down)
+                    self.cache.set(cache_key, hashed_name)
 
         final_url = super(CachedFilesMixin, self).url(hashed_name)
 

@@ -317,6 +317,10 @@ class TestCollectionCachedStorage(BaseCollectionTestCase,
                                  "/static/test/file.ea5bccaf16d5.txt")
         self.assertStaticRenders("cached/styles.css",
                                  "/static/cached/styles.93b1147e8552.css")
+        self.assertStaticRenders("path/",
+                                 "/static/path/")
+        self.assertStaticRenders("path/?query",
+                                 "/static/path/?query")
 
     def test_template_tag_simple_content(self):
         relpath = self.cached_file_path("cached/styles.css")
