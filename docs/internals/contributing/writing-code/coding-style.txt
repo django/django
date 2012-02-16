@@ -189,7 +189,7 @@ Miscellaneous
   occasionally cause unnecessary merge conflicts. Some IDE's can be
   configured to automatically remove them and most VCS tools can be set to
   highlight them in diff outputs. Note, however, that patches which only
-  remove whitespace (or only make changes for nominal PEP 8 conformance)
+  remove whitespace (or only make changes for nominal :pep:`8` conformance)
   are likely to be rejected, since they only introduce noise rather than
   code improvement. Tidy up when you're next changing code in the area.
 

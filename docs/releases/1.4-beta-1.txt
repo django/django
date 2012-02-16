@@ -31,10 +31,9 @@ Version numbering
 Internally, Django's version number is represented by the tuple
 ``django.VERSION``. This is used to generate human-readable version
 number strings; as of Django 1.4 beta 1, the algorithm for generating
-these strings has been changed to match the recommendations of `PEP
-386 <http://www.python.org/dev/peps/pep-0386/>`_. This only affects the
-human-readable strings identifying Django alphas, betas and release
-candidates, and should not affect end users in any way.
+these strings has been changed to match the recommendations of :pep:`386`.
+This only affects the human-readable strings identifying Django alphas,
+betas and release candidates, and should not affect end users in any way.
 
 For example purposes, the old algorithm would give Django 1.4 beta 1 a
 version string of the form "1.4 beta 1". The new algorithm generates
@@ -1171,7 +1170,7 @@ Please open new tickets if no existing ticket corresponds to a problem you're
 running into.
 
 Additionally, discussion of Django development, including progress toward the
-1.3 release, takes place daily on the django-developers mailing list:
+1.4 release, takes place daily on the django-developers mailing list:
 
 * http://groups.google.com/group/django-developers
 
