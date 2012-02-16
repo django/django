@@ -171,6 +171,14 @@ Django 1.4 introduces a cookie-based session backend that uses the tools for
 :doc:`cryptographic signing </topics/signing>` to store the session data in
 the client's browser.
 
++.. warning::
++
++    Session data is signed and validated by the server, but is not
++    encrypted.  This means that a user can view any data stored in the
++    session, but cannot change it. Please read the documentation for
++    further clarification before using this backend.
++
+
 See the :ref:`cookie-based session backend <cookie-session-backend>` docs for
 more information.
 
