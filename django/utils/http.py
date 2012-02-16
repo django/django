@@ -171,7 +171,7 @@ def int_to_base36(i):
     """
     digits = "0123456789abcdefghijklmnopqrstuvwxyz"
     factor = 0
-    if (i < 0) or (i > sys.maxint):
+    if not 0 <= i <= sys.maxint:
         raise ValueError("Base36 conversion input too large or incorrect type.")
     # Find starting factor
     while True:
