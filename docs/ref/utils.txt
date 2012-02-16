@@ -444,7 +444,7 @@ Atom1Feed
 
 .. function:: int_to_base36(i)
 
-    Converts an integer to a base 36 string.
+    Converts a positive integer less than sys.maxint to a base 36 string.
 
 ``django.utils.safestring``
 ===========================
