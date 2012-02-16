@@ -492,8 +492,8 @@ documentation<assertions>` for more.
 Two new date format strings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Two new :tfilter:`date` formats for use in template filters, template tags
-and :ref:`format-localization`:
+Two new :tfilter:`date` formats were added for use in template filters,
+template tags and :ref:`format-localization`:
 
 - ``e`` -- the name of the timezone of the given datetime object
 - ``o`` -- the ISO 8601 year number
