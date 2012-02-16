@@ -278,7 +278,7 @@ Error handling
 
 When Django can't find a regex matching the requested URL, or when an
 exception is raised, Django will invoke an error-handling view. The
-views to use for these cases are specified by two variables which can
+views to use for these cases are specified by three variables which can
 be set in your root URLconf. Setting these variables in any other
 URLconf will have no effect.
 
@@ -291,8 +291,8 @@ handler403
 .. data:: handler403
 
 A callable, or a string representing the full Python import path to the view
-that should be called if the user has no the permissions required to access
-a resource.
+that should be called if the user doesn't have the permissions required to
+access a resource.
 
 By default, this is ``'django.views.defaults.permission_denied'``. That default
 value should suffice.
@@ -440,15 +440,18 @@ Including other URLconfs
 At any point, your ``urlpatterns`` can "include" other URLconf modules. This
 essentially "roots" a set of URLs below other ones.
 
-For example, here's the URLconf for the `Django Web site`_ itself. It includes a
-number of other URLconfs::
+For example, here's an except of the URLconf for the `Django Web site`_
+itself. It includes a number of other URLconfs::
 
     from django.conf.urls import patterns, url, include
 
     urlpatterns = patterns('',
-        (r'^weblog/',        include('django_website.apps.blog.urls.blog')),
-        (r'^documentation/', include('django_website.apps.docs.urls.docs')),
-        (r'^comments/',      include('django.contrib.comments.urls')),
+        # ... snip ...
+        (r'^comments/', include('django.contrib.comments.urls')),
+        (r'^community/', include('django_website.aggregator.urls')),
+        (r'^contact/', include('django_website.contact.urls')),
+        (r'^r/', include('django.conf.urls.shortcut')),
+        # ... snip ...
     )
 
 Note that the regular expressions in this example don't have a ``$``
@@ -469,8 +472,8 @@ directly the pattern list as returned by `patterns`_ instead. For example::
     )
 
     urlpatterns = patterns('',
-        url(r'^$',    'apps.main.views.homepage', name='site-homepage'),
-        (r'^help/',   include('apps.help.urls')),
+        url(r'^$', 'apps.main.views.homepage', name='site-homepage'),
+        (r'^help/', include('apps.help.urls')),
         (r'^credit/', include(extra_patterns)),
     )
 
@@ -972,9 +975,8 @@ A :class:`ResolverMatch` object can also be assigned to a triple::
     the :class:`ResolverMatch` object (as well as the namespace and pattern
     information it provides) is not available in earlier Django releases.
 
-One possible use of :func:`~django.core.urlresolvers.resolve` would be
-to testing if a view would raise a ``Http404`` error before
-redirecting to it::
+One possible use of :func:`~django.core.urlresolvers.resolve` would be to test
+if a view would raise a ``Http404`` error before redirecting to it::
 
     from urlparse import urlparse
     from django.core.urlresolvers import resolve
