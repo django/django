@@ -2,15 +2,15 @@
 Django 1.4 beta release notes
 ==============================
 
-December 22, 2011.
+February 15, 2012.
 
 Welcome to Django 1.4 beta!
 
-This is the first in a series of preview/development releases leading up to
-the eventual release of Django 1.4, scheduled for March 2012. This release is
-primarily targeted at developers who are interested in trying out new features
-and testing the Django codebase to help identify and resolve bugs prior to the
-final 1.4 release.
+This is the second in a series of preview/development releases leading
+up to the eventual release of Django 1.4, scheduled for March
+2012. This release is primarily targeted at developers who are
+interested in trying out new features and testing the Django codebase
+to help identify and resolve bugs prior to the final 1.4 release.
 
 As such, this release is *not* intended for production use, and any such use
 is discouraged.
@@ -1127,7 +1127,7 @@ The Django 1.4 roadmap
 Before the final Django 1.4 release, several other preview/development releases
 will be made available. The current schedule consists of at least the following:
 
-* Week of **January 30, 2012**: First Django 1.4 beta release; final
+* Week of **January 13, 2012**: First Django 1.4 beta release; final
   feature freeze for Django 1.4.
 
 * Week of **February 27, 2012**: First Django 1.4 release
