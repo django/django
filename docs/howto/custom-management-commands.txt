@@ -9,9 +9,8 @@ command for the ``polls`` application from the
 :doc:`tutorial</intro/tutorial01>`.
 
 To do this, just add a ``management/commands`` directory to the application.
-Each Python module in that directory will be auto-discovered. Modules having
-names not starting with an underscore will be registered as commands that can be
-executed as an action when you run ``manage.py``::
+Django will register a ``manage.py`` command for each Python module in that
+directory whose name doesn't begin with an underscore. For example::
 
     polls/
         __init__.py

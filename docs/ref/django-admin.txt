@@ -954,10 +954,10 @@ creating the ``myapp`` app::
 
 .. versionadded:: 1.4
 
-When Django copies the app template files, it also renders the files
-whose extension matches those passed with the ``--extension`` option (``py``
-by default) and those files which names are passed with the ``--name`` option
-using the template engine. The :class:`template context
+When Django copies the app template files, it also renders certain files
+through the template engine: the files whose extensions match the
+``--extension`` option (``py`` by default) and the files whose names are passed
+with the ``--name`` option. The :class:`template context
 <django.template.Context>` used is:
 
 - Any option passed to the startapp command
@@ -1017,10 +1017,10 @@ when creating the ``myproject`` project::
 
     django-admin.py startproject --template=/Users/jezdez/Code/my_project_template myproject
 
-When Django copies the project template files, it will also render the files
-whose extension matches those passed with the ``--extension`` option (``py``
-by default) and those files which names are passed with the ``--name`` option
-using the template engine. The :class:`template context
+When Django copies the project template files, it also renders certain files
+through the template engine: the files whose extensions match the
+``--extension`` option (``py`` by default) and the files whose names are passed
+with the ``--name`` option. The :class:`template context
 <django.template.Context>` used is:
 
 - Any option passed to the startproject command

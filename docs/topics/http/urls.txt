@@ -440,7 +440,7 @@ Including other URLconfs
 At any point, your ``urlpatterns`` can "include" other URLconf modules. This
 essentially "roots" a set of URLs below other ones.
 
-For example, here's an except of the URLconf for the `Django Web site`_
+For example, here's an excerpt of the URLconf for the `Django Web site`_
 itself. It includes a number of other URLconfs::
 
     from django.conf.urls import patterns, url, include
@@ -849,7 +849,7 @@ This ``current_app`` argument is used as a hint to resolve application
 namespaces into URLs on specific application instances, according to the
 :ref:`namespaced URL resolution strategy <topics-http-reversing-url-namespaces>`.
 
-You can use ``kwargs`` instead of ``args``, for example::
+You can use ``kwargs`` instead of ``args``. For example::
 
     >>> reverse('admin:app_list', kwargs={'app_label': 'auth'})
     '/admin/auth/'
@@ -976,7 +976,7 @@ A :class:`ResolverMatch` object can also be assigned to a triple::
     information it provides) is not available in earlier Django releases.
 
 One possible use of :func:`~django.core.urlresolvers.resolve` would be to test
-if a view would raise a ``Http404`` error before redirecting to it::
+whether a view would raise a ``Http404`` error before redirecting to it::
 
     from urlparse import urlparse
     from django.core.urlresolvers import resolve

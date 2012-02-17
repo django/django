@@ -171,13 +171,12 @@ Django 1.4 introduces a cookie-based session backend that uses the tools for
 :doc:`cryptographic signing </topics/signing>` to store the session data in
 the client's browser.
 
-+.. warning::
-+
-+    Session data is signed and validated by the server, but is not
-+    encrypted.  This means that a user can view any data stored in the
-+    session, but cannot change it. Please read the documentation for
-+    further clarification before using this backend.
-+
+.. warning::
+
+    Session data is signed and validated by the server, but it's not
+    encrypted. This means a user can view any data stored in the
+    session but cannot change it. Please read the documentation for
+    further clarification before using this backend.
 
 See the :ref:`cookie-based session backend <cookie-session-backend>` docs for
 more information.
@@ -1027,9 +1026,10 @@ Output of :djadmin:`manage.py help <help>`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 :djadmin:`manage.py help <help>` now groups available commands by application.
-If you depended on its output, for instance if you parsed it, you must update
-your scripts. To obtain the list of all available management commands in a
-script, you can use :djadmin:`manage.py help --commands <help>` instead.
+If you depended on the output of this command -- if you parsed it, for example
+-- then you'll need to update your code. To get a list of all available
+management commands in a script, use
+:djadmin:`manage.py help --commands <help>` instead.
 
 Features deprecated in 1.4
 ==========================
@@ -1185,17 +1185,14 @@ This attribute was confusingly named ``HttpRequest.raw_post_data``, but it
 actually provided the body of the HTTP request. It's been renamed to
 ``HttpRequest.body``, and ``HttpRequest.raw_post_data`` has been deprecated.
 
-``django.contrib.sitemaps`` bugfix with potential performance implications
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``django.contrib.sitemaps`` bug fix with potential performance implications
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In previous versions the Paginator objects used in sitemap classes were
-cached and could result in stale sitemap indexes. Removing this cache causes
-new Paginator objects to be created and the
+In previous versions, ``Paginator`` objects used in sitemap classes were
+cached, which could result in stale site maps. We've removed the caching, so
+each request to a site map now creates a new Paginator object and calls the
 :attr:`~django.contrib.sitemaps.Sitemap.items()` method of the
-:class:`~django.contrib.sitemaps.Sitemap` subclass to be called during every
-sitemap-related request.
-
-If the :attr:`django.contrib.sitemaps.Sitemap.items()` method returns a
-``QuerySet`` its length will be evaluated which may lead to extra database
-queries. To mitigate the performance impact consider using the :doc:`caching
-framework </topics/cache>`.
+:class:`~django.contrib.sitemaps.Sitemap` subclass. Depending on what your
+``items()`` method is doing, this may have a negative performance impact.
+To mitigate the performance impact, consider using the :doc:`caching
+framework </topics/cache>` within your ``Sitemap`` subclass.

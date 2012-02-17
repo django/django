@@ -283,9 +283,8 @@ def get_validation_errors(outfile, app=None):
                 # this format would be nice, but it's a little fiddly).
                 if '__' in field_name:
                     continue
-                # Skip ordering on pk, this is always a valid order_by field
-                # but is an alias and therefore won't be found by
-                # opts.get_field.
+                # Skip ordering on pk. This is always a valid order_by field
+                # but is an alias and therefore won't be found by opts.get_field.
                 if field_name == 'pk':
                     continue
                 try:

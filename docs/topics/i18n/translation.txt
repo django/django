@@ -297,7 +297,7 @@ Lazy translation
 Use the lazy versions of translation functions in
 :mod:`django.utils.translation` (easily recognizable by the ``lazy`` suffix in
 their names) to translate strings lazily -- when the value is accessed rather
-than when they are called.
+than when they're called.
 
 These functions store a lazy reference to the string -- not the actual
 translation. The translation itself will be done when the string is used in a
@@ -306,10 +306,10 @@ string context, such as in template rendering.
 This is essential when calls to these functions are located in code paths that
 are executed at module load time.
 
-As this is something that can easily happen when defining models, forms and
-model forms (the declarative notation Django offers for them is implemented in a
-way such that their fields are actually class level attributes) this means you
-need to make sure to use lazy translations in the following cases:
+This is something that can easily happen when defining models, forms and
+model forms, because Django implements these such that their fields are
+actually class-level attributes. For that reason, make sure to use lazy
+translations in the following cases:
 
 Model fields and relationships ``verbose_name`` and ``help_text`` option values
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

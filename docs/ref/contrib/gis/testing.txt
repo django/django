@@ -1,11 +1,11 @@
 ======================
-Testing GeoDjango Apps
+Testing GeoDjango apps
 ======================
 
 .. versionchanged:: 1.2
 
 In Django 1.2, the addition of :ref:`spatial-backends` simplified the
-process of testing GeoDjango applications -- the process is now the
+process of testing GeoDjango applications. The process is now the
 same as :doc:`/topics/testing`.
 
 Included in this documentation are some additional notes and settings
@@ -31,7 +31,7 @@ Settings
 .. versionchanged:: 1.2
 
 This setting may be used to customize the name of the PostGIS template
-database to use.  In Django versions 1.2 and above, it automatically
+database to use. In Django versions 1.2 and above, it automatically
 defaults to ``'template_postgis'`` (the same name used in the
 :ref:`installation documentation <spatialdb_template>`).
 
@@ -42,25 +42,25 @@ defaults to ``'template_postgis'`` (the same name used in the
 
 When GeoDjango's spatial backend initializes on PostGIS, it has to perform
 a SQL query to determine the version in order to figure out what
-features are available.  Advanced users wishing to prevent this additional
+features are available. Advanced users wishing to prevent this additional
 query may set the version manually using a 3-tuple of integers specifying
-the major, minor, and subminor version numbers for PostGIS.  For example,
+the major, minor, and subminor version numbers for PostGIS. For example,
 to configure for PostGIS 1.5.2 you would use::
 
     POSTGIS_VERSION = (1, 5, 2)
 
-Obtaining Sufficient Privileges
+Obtaining sufficient privileges
 -------------------------------
 
 Depending on your configuration, this section describes several methods to
 configure a database user with sufficient privileges to run tests for
-GeoDjango applications on PostgreSQL.  If your
+GeoDjango applications on PostgreSQL. If your
 :ref:`spatial database template <spatialdb_template>`
 was created like in the instructions, then your testing database user
-only needs to have the ability to create databases.  In other configurations,
+only needs to have the ability to create databases. In other configurations,
 you may be required to use a database superuser.
 
-Create Database User
+Create database user
 ^^^^^^^^^^^^^^^^^^^^
 
 To make database user with the ability to create databases, use the
@@ -76,7 +76,7 @@ Alternatively, you may alter an existing user's role from the SQL shell
 
     postgres# ALTER ROLE <user_name> CREATEDB NOSUPERUSER NOCREATEROLE;
 
-Create Database Superuser
+Create database superuser
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This may be done at the time the user is created, for example::
@@ -89,7 +89,7 @@ is done from an existing superuser account)::
     postgres# ALTER ROLE <user_name> SUPERUSER;
 
 
-Create Local PostgreSQL Database
+Create local PostgreSQL database
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. Initialize database: ``initdb -D /path/to/user/db``
@@ -114,8 +114,8 @@ spatial database entitled ``template_postgis``.
 SpatiaLite
 ==========
 
-You need to make sure needed spatial tables are created in your test spatial
-database as described in :ref:`create_spatialite_db`. Then all you have to do is::
+Make sure the necessary spatial tables are created in your test spatial
+database, as described in :ref:`create_spatialite_db`. Then just do this::
 
     $ python manage.py test
 
@@ -127,18 +127,18 @@ Settings
 ``SPATIALITE_SQL``
 ^^^^^^^^^^^^^^^^^^
 
-(only relevant when using a SpatiaLite version older than 3.0).
+Only relevant when using a SpatiaLite version older than 3.0.
 
 By default, the GeoDjango test runner looks for the SpatiaLite SQL in the
 same directory where it was invoked (by default the same directory where
-``manage.py`` is located).  If you want to use a different location, then
-you may add the following to your settings::
+``manage.py`` is located). To use a different location, add the following to
+your settings::
 
     SPATIALITE_SQL='/path/to/init_spatialite-2.3.sql'
 
 .. _geodjango-tests:
 
-GeoDjango Tests
+GeoDjango tests
 ===============
 
 .. versionchanged:: 1.3

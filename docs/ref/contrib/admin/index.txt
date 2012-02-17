@@ -697,8 +697,8 @@ subclass::
 
       .. note::
 
-        The ``FieldListFilter`` API is currently considered internal and prone
-        to refactoring.
+        The ``FieldListFilter`` API is considered internal and might be
+        changed.
 
     .. versionadded:: 1.4
 
