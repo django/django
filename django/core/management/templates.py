@@ -45,12 +45,12 @@ class TemplateCommand(BaseCommand):
                     help='The dotted import path to load the template from.'),
         make_option('--extension', '-e', dest='extensions',
                     action='append', default=['py'],
-                    help='The file extension(s) to render (default: "py") '
+                    help='The file extension(s) to render (default: "py"). '
                          'Separate multiple extensions with commas, or use '
                          '-e multiple times.'),
         make_option('--name', '-n', dest='files',
                     action='append', default=[],
-                    help='The file name(s) to render '
+                    help='The file name(s) to render. '
                          'Separate multiple extensions with commas, or use '
                          '-n multiple times.')
         )
