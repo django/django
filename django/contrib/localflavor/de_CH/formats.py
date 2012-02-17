@@ -39,5 +39,5 @@ DATETIME_INPUT_FORMATS = (
 # For details, please refer to http://www.bk.admin.ch/dokumentation/sprachen/04915/05016/index.html?lang=de
 # (in German) and the documentation
 DECIMAL_SEPARATOR = ','
-THOUSAND_SEPARATOR = u' '
+THOUSAND_SEPARATOR = u'\xa0' # non-breaking space
 NUMBER_GROUPING = 3
