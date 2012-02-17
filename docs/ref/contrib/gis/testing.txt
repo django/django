@@ -63,7 +63,7 @@ you may be required to use a database superuser.
 Create database user
 ^^^^^^^^^^^^^^^^^^^^
 
-To make database user with the ability to create databases, use the
+To make a database user with the ability to create databases, use the
 following command::
 
     $ createuser --createdb -R -S <user_name>
