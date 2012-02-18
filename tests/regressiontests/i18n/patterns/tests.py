@@ -78,6 +78,20 @@ class URLDisabledTests(URLTestCaseBase):
             self.assertEqual(reverse('prefixed'), '/prefixed/')
 
 
+class PathUnusedTests(URLTestCaseBase):
+    """
+    Check that if no i18n_patterns is used in root urlconfs, then no
+    language activation happens based on url prefix.
+    """
+    urls = 'regressiontests.i18n.patterns.urls.path_unused'
+
+    def test_no_lang_activate(self):
+        response = self.client.get('/nl/foo/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['content-language'], 'en')
+        self.assertEqual(response.context['LANGUAGE_CODE'], 'en')
+
+
 class URLTranslationTests(URLTestCaseBase):
     """
     Tests if the pattern-strings are translated correctly (within the

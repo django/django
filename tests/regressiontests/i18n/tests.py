@@ -39,7 +39,7 @@ from .models import Company, TestModel
 from .patterns.tests import (URLRedirectWithoutTrailingSlashTests,
     URLTranslationTests, URLDisabledTests, URLTagTests, URLTestCaseBase,
     URLRedirectWithoutTrailingSlashSettingTests, URLNamespaceTests,
-    URLPrefixTests, URLResponseTests, URLRedirectTests)
+    URLPrefixTests, URLResponseTests, URLRedirectTests, PathUnusedTests)
 from .test_warnings import DeprecationWarningTests
 
 

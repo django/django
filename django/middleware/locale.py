@@ -15,7 +15,9 @@ class LocaleMiddleware(object):
     """
 
     def process_request(self, request):
-        language = translation.get_language_from_request(request)
+        check_path = self.is_language_prefix_patterns_used()
+        language = translation.get_language_from_request(
+            request, check_path=check_path)
         translation.activate(language)
         request.LANGUAGE_CODE = translation.get_language()
 

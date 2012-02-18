@@ -363,20 +363,24 @@ def get_language_from_path(path, supported=None):
         if lang_code in supported and check_for_language(lang_code):
             return lang_code
 
-def get_language_from_request(request):
+def get_language_from_request(request, check_path=False):
     """
     Analyzes the request to find what language the user wants the system to
     show. Only languages listed in settings.LANGUAGES are taken into account.
     If the user requests a sublanguage where we have a main language, we send
     out the main language.
+
+    If check_path is True, the URL path prefix will be checked for a language
+    code, otherwise this is skipped for backwards compatibility.
     """
     global _accepted
     from django.conf import settings
     supported = dict(settings.LANGUAGES)
 
-    lang_code = get_language_from_path(request.path_info, supported)
-    if lang_code is not None:
-        return lang_code
+    if check_path:
+        lang_code = get_language_from_path(request.path_info, supported)
+        if lang_code is not None:
+            return lang_code
 
     if hasattr(request, 'session'):
         lang_code = request.session.get('django_language', None)

@@ -55,7 +55,7 @@ def to_locale(language):
     else:
         return language.lower()
 
-def get_language_from_request(request):
+def get_language_from_request(request, check_path=False):
     return settings.LANGUAGE_CODE
 
 def get_language_from_path(request):
