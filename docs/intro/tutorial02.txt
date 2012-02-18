@@ -343,9 +343,11 @@ an arbitrary method is not supported. Also note that the column header for
 underscores replaced with spaces). But you can change that by giving that
 method (in ``models.py``) a ``short_description`` attribute::
 
-    def was_published_today(self):
-        return self.pub_date.date() == datetime.date.today()
-    was_published_today.short_description = 'Published today?'
+    class Poll(models.Model):
+        # ...
+        def was_published_today(self):
+            return self.pub_date.date() == datetime.date.today()
+        was_published_today.short_description = 'Published today?'
 
 Edit your admin.py file again and add an improvement to the Poll change list page: Filters. Add the
 following line to ``PollAdmin``::
