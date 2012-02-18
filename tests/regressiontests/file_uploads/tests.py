@@ -1,5 +1,6 @@
 #! -*- coding: utf-8 -*-
 import errno
+import base64
 import os
 import shutil
 from StringIO import StringIO
@@ -54,6 +55,30 @@ class FileUploadTests(TestCase):
         response = self.client.post('/file_uploads/verify/', post_data)
 
         self.assertEqual(response.status_code, 200)
+
+    def test_base64_upload(self):
+        test_string = "This data will be transmitted base64-encoded."
+        payload = "\r\n".join([
+            '--' + client.BOUNDARY,
+            'Content-Disposition: form-data; name="file"; filename="test.txt"',
+            'Content-Type: application/octet-stream',
+            'Content-Transfer-Encoding: base64',
+            '',
+            base64.b64encode(test_string),
+            '--' + client.BOUNDARY + '--',
+            '',
+        ])
+        r = {
+            'CONTENT_LENGTH': len(payload),
+            'CONTENT_TYPE':   client.MULTIPART_CONTENT,
+            'PATH_INFO':      "/file_uploads/echo_content/",
+            'REQUEST_METHOD': 'POST',
+            'wsgi.input':     client.FakePayload(payload),
+        }
+        response = self.client.request(**r)
+        received = simplejson.loads(response.content)
+
+        self.assertEqual(received['file'], test_string)
 
     def test_unicode_file_name(self):
         tdir = tempfile.gettempdir()

@@ -150,6 +150,8 @@ class MultiPartParser(object):
                     continue
 
                 transfer_encoding = meta_data.get('content-transfer-encoding')
+                if transfer_encoding is not None:
+                    transfer_encoding = transfer_encoding[0].strip()
                 field_name = force_unicode(field_name, encoding, errors='replace')
 
                 if item_type == FIELD:
