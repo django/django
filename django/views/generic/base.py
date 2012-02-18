@@ -43,6 +43,8 @@ class View(object):
 
         def view(request, *args, **kwargs):
             self = cls(**initkwargs)
+            if hasattr(self, 'get') and not hasattr(self, 'head'):
+                self.head = self.get
             return self.dispatch(request, *args, **kwargs)
 
         # take name and docstring from class
@@ -75,9 +77,6 @@ class View(object):
             }
         )
         return http.HttpResponseNotAllowed(allowed_methods)
-
-    def head(self, *args, **kwargs):
-        return self.get(*args, **kwargs)
 
 
 class TemplateResponseMixin(object):

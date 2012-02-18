@@ -19,8 +19,14 @@ class SimplePostView(SimpleView):
     post = SimpleView.get
 
 
+class PostOnlyView(View):
+    def post(self, request):
+        return HttpResponse('This view only accepts POST')
+
+
 class CustomizableView(SimpleView):
     parameter = {}
+
 
 def decorator(view):
     view.is_decorated = True
@@ -102,11 +108,18 @@ class ViewTest(unittest.TestCase):
 
     def test_get_and_head(self):
         """
-        Test a view which supplies a GET method also responds correctly to HEAD
+        Test a view which supplies a GET method also responds correctly to HEAD.
         """
         self._assert_simple(SimpleView.as_view()(self.rf.get('/')))
         response = SimpleView.as_view()(self.rf.head('/'))
         self.assertEqual(response.status_code, 200)
+
+    def test_head_no_get(self):
+        """
+        Test a view which supplies no GET method responds to HEAD with HTTP 405.
+        """
+        response = PostOnlyView.as_view()(self.rf.head('/'))
+        self.assertEqual(response.status_code, 405)
 
     def test_get_and_post(self):
         """
