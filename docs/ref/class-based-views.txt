@@ -781,11 +781,11 @@ BaseDateListView
 
     .. method:: get_dated_items():
 
-        Returns a 3-tuple containing (``date_list``, ``latest``,
+        Returns a 3-tuple containing (``date_list``, ``object_list``,
         ``extra_context``).
 
         ``date_list`` is the list of dates for which data is available.
-        ``object_list`` is the list of objects ``extra_context`` is a
+        ``object_list`` is the list of objects. ``extra_context`` is a
         dictionary of context data that will be added to any context data
         provided by the
         :class:`~django.views.generic.list.MultipleObjectMixin`.
