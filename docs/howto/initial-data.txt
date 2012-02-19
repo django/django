@@ -13,6 +13,8 @@ but initial SQL is also quite a bit more flexible.
 .. _initial data as sql: `providing initial sql data`_
 .. _initial data via fixtures: `providing initial data with fixtures`_
 
+.. _initial-data-via-fixtures:
+
 Providing initial data with fixtures
 ====================================
 
@@ -65,12 +67,12 @@ And here's that same fixture as YAML:
 
 You'll store this data in a ``fixtures`` directory inside your app.
 
-Loading data is easy: just call :djadmin:`manage.py loaddata fixturename
-<loaddata>`, where *fixturename* is the name of the fixture file you've created.
-Every time you run :djadmin:`loaddata` the data will be read from the fixture
-and re-loaded into the database. Note that this means that if you change one of
-the rows created by a fixture and then run :djadmin:`loaddata` again you'll
-wipe out any changes you've made.
+Loading data is easy: just call :djadmin:`manage.py loaddata <fixturename>
+<loaddata>`, where ``<fixturename>`` is the name of the fixture file you've
+created. Every time you run :djadmin:`loaddata` the data will be read from the
+fixture and re-loaded into the database. Note that this means that if you
+change one of the rows created by a fixture and then run :djadmin:`loaddata`
+again you'll wipe out any changes you've made.
 
 Automatically loading initial data fixtures
 -------------------------------------------
@@ -79,6 +81,17 @@ If you create a fixture named ``initial_data.[xml/yaml/json]``, that fixture wil
 be loaded every time you run :djadmin:`syncdb`. This is extremely convenient,
 but be careful: remember that the data will be refreshed *every time* you run
 :djadmin:`syncdb`. So don't use ``initial_data`` for data you'll want to edit.
+
+Where Django finds fixture files
+--------------------------------
+
+By default, Django looks in the ``fixtures`` directory inside each app for
+fixtures. You can set the :setting:`FIXTURE_DIRS` setting to a list of
+additional directories where Django should look.
+
+When running :djadmin:`manage.py loaddata <loaddata>`, you can also
+specify an absolute path to a fixture file, which overrides searching
+the usual directories.
 
 .. seealso::
 
