@@ -575,3 +575,25 @@ class Report(models.Model):
 
     def __unicode__(self):
         return self.title
+
+
+class MainPrepopulated(models.Model):
+    name = models.CharField(max_length=100)
+    pubdate = models.DateField()
+    status = models.CharField(
+        max_length=20,
+        choices=(('option one', 'Option One'),
+                 ('option two', 'Option Two')))
+    slug1 = models.SlugField()
+    slug2 = models.SlugField()
+
+class RelatedPrepopulated(models.Model):
+    parent = models.ForeignKey(MainPrepopulated)
+    name = models.CharField(max_length=75)
+    pubdate = models.DateField()
+    status = models.CharField(
+        max_length=20,
+        choices=(('option one', 'Option One'),
+                 ('option two', 'Option Two')))
+    slug1 = models.SlugField(max_length=50)
+    slug2 = models.SlugField(max_length=60)

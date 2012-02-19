@@ -17,7 +17,8 @@ from django.contrib.admin.models import LogEntry, DELETION
 from django.contrib.admin.sites import LOGIN_FORM_KEY
 from django.contrib.admin.util import quote
 from django.contrib.admin.views.main import IS_POPUP_VAR
-from django.contrib.auth import REDIRECT_FIELD_NAME, admin
+from django.contrib.admin.tests import AdminSeleniumWebDriverTestCase
+from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.models import Group, User, Permission, UNUSABLE_PASSWORD
 from django.contrib.contenttypes.models import ContentType
 from django.forms.util import ErrorList
@@ -40,7 +41,7 @@ from .models import (Article, BarAccount, CustomArticle, EmptyModel, FooAccount,
     FoodDelivery, RowLevelChangePermissionModel, Paper, CoverLetter, Story,
     OtherStory, ComplexSortedPerson, Parent, Child, AdminOrderedField,
     AdminOrderedModelMethod, AdminOrderedAdminMethod, AdminOrderedCallable,
-    Report)
+    Report, MainPrepopulated, RelatedPrepopulated)
 
 
 ERROR_MESSAGE = "Please enter the correct username and password \
@@ -2891,6 +2892,110 @@ class PrePopulatedTest(TestCase):
         """
         response = self.client.get('/test_admin/admin/admin_views/prepopulatedpostlargeslug/add/')
         self.assertContains(response, "maxLength: 1000") # instead of 1,000
+
+
+class SeleniumPrePopulatedTests(AdminSeleniumWebDriverTestCase):
+    urls = "regressiontests.admin_views.urls"
+    fixtures = ['admin-views-users.xml']
+
+    def test_basic(self):
+        """
+        Ensure that the Javascript-automated prepopulated fields work with the
+        main form and with stacked and tabular inlines.
+        Refs #13068, #9264, #9983, #9784.
+        """
+        self.admin_login(username='super', password='secret', login_url='/test_admin/admin/')
+        self.selenium.get('%s%s' % (self.live_server_url,
+            '/test_admin/admin/admin_views/mainprepopulated/add/'))
+
+        # Main form ----------------------------------------------------------
+        self.selenium.find_element_by_css_selector('#id_pubdate').send_keys('2012-02-18')
+        self.select_option('#id_status', 'option two')
+        self.selenium.find_element_by_css_selector('#id_name').send_keys(u' this is the mAin nÀMë and it\'s awεšome')
+        slug1 = self.selenium.find_element_by_css_selector('#id_slug1').get_attribute('value')
+        slug2 = self.selenium.find_element_by_css_selector('#id_slug2').get_attribute('value')
+        self.assertEqual(slug1, 'main-name-and-its-awesome-2012-02-18')
+        self.assertEqual(slug2, 'option-two-main-name-and-its-awesome')
+
+        # Stacked inlines ----------------------------------------------------
+        # Initial inline
+        self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-0-pubdate').send_keys('2011-12-17')
+        self.select_option('#id_relatedprepopulated_set-0-status', 'option one')
+        self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-0-name').send_keys(u' here is a sŤāÇkeð   inline !  ')
+        slug1 = self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-0-slug1').get_attribute('value')
+        slug2 = self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-0-slug2').get_attribute('value')
+        self.assertEqual(slug1, 'here-stacked-inline-2011-12-17')
+        self.assertEqual(slug2, 'option-one-here-stacked-inline')
+
+        # Add an inline
+        self.selenium.find_element_by_css_selector('#relatedprepopulated_set-group .add-row a').click()
+        self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-1-pubdate').send_keys('1999-01-25')
+        self.select_option('#id_relatedprepopulated_set-1-status', 'option two')
+        self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-1-name').send_keys(u' now you haVe anöther   sŤāÇkeð  inline with a very ... loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooog text... ')
+        slug1 = self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-1-slug1').get_attribute('value')
+        slug2 = self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-1-slug2').get_attribute('value')
+        self.assertEqual(slug1, 'now-you-have-another-stacked-inline-very-loooooooo') # 50 characters maximum for slug1 field
+        self.assertEqual(slug2, 'option-two-now-you-have-another-stacked-inline-very-looooooo') # 60 characters maximum for slug2 field
+
+        # Tabular inlines ----------------------------------------------------
+        # Initial inline
+        self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-2-0-pubdate').send_keys('1234-12-07')
+        self.select_option('#id_relatedprepopulated_set-2-0-status', 'option two')
+        self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-2-0-name').send_keys(u'And now, with a tÃbűlaŘ inline !!!')
+        slug1 = self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-2-0-slug1').get_attribute('value')
+        slug2 = self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-2-0-slug2').get_attribute('value')
+        self.assertEqual(slug1, 'and-now-tabular-inline-1234-12-07')
+        self.assertEqual(slug2, 'option-two-and-now-tabular-inline')
+
+        # Add an inline
+        self.selenium.find_element_by_css_selector('#relatedprepopulated_set-2-group .add-row a').click()
+        self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-2-1-pubdate').send_keys('1981-08-22')
+        self.select_option('#id_relatedprepopulated_set-2-1-status', 'option one')
+        self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-2-1-name').send_keys(u'a tÃbűlaŘ inline with ignored ;"&*^\%$#@-/`~ characters')
+        slug1 = self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-2-1-slug1').get_attribute('value')
+        slug2 = self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-2-1-slug2').get_attribute('value')
+        self.assertEqual(slug1, 'tabular-inline-ignored-characters-1981-08-22')
+        self.assertEqual(slug2, 'option-one-tabular-inline-ignored-characters')
+
+        # Save and check that everything is properly stored in the database
+        self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+        self.assertEqual(MainPrepopulated.objects.all().count(), 1)
+        MainPrepopulated.objects.get(
+            name=u' this is the mAin nÀMë and it\'s awεšome',
+            pubdate='2012-02-18',
+            status='option two',
+            slug1='main-name-and-its-awesome-2012-02-18',
+            slug2='option-two-main-name-and-its-awesome',
+        )
+        self.assertEqual(RelatedPrepopulated.objects.all().count(), 4)
+        RelatedPrepopulated.objects.get(
+            name=u' here is a sŤāÇkeð   inline !  ',
+            pubdate='2011-12-17',
+            status='option one',
+            slug1='here-stacked-inline-2011-12-17',
+            slug2='option-one-here-stacked-inline',
+        )
+        RelatedPrepopulated.objects.get(
+            name=u' now you haVe anöther   sŤāÇkeð  inline with a very ... loooooooooooooooooo', # 75 characters in name field
+            pubdate='1999-01-25',
+            status='option two',
+            slug1='now-you-have-another-stacked-inline-very-loooooooo',
+            slug2='option-two-now-you-have-another-stacked-inline-very-looooooo',
+        )
+        RelatedPrepopulated.objects.get(
+            name=u'And now, with a tÃbűlaŘ inline !!!',
+            pubdate='1234-12-07',
+            status='option two',
+            slug1='and-now-tabular-inline-1234-12-07',
+            slug2='option-two-and-now-tabular-inline',
+        )
+        RelatedPrepopulated.objects.get(
+            name=u'a tÃbűlaŘ inline with ignored ;"&*^\%$#@-/`~ characters',
+            pubdate='1981-08-22',
+            status='option one',
+            slug1='tabular-inline-ignored-characters-1981-08-22',
+            slug2='option-one-tabular-inline-ignored-characters',
+        )
 
 class ReadonlyTest(TestCase):
     urls = "regressiontests.admin_views.urls"

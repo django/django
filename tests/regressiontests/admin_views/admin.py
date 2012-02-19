@@ -26,7 +26,7 @@ from .models import (Article, Chapter, Account, Media, Child, Parent, Picture,
     CoverLetter, Story, OtherStory, Book, Promo, ChapterXtra1, Pizza, Topping,
     Album, Question, Answer, ComplexSortedPerson, PrePopulatedPostLargeSlug,
     AdminOrderedField, AdminOrderedModelMethod, AdminOrderedAdminMethod,
-    AdminOrderedCallable, Report, Color2)
+    AdminOrderedCallable, Report, Color2, MainPrepopulated, RelatedPrepopulated)
 
 
 def callable_year(dt_value):
@@ -532,6 +532,38 @@ class CustomTemplateBooleanFieldListFilter(BooleanFieldListFilter):
 class CustomTemplateFilterColorAdmin(admin.ModelAdmin):
     list_filter = (('warm', CustomTemplateBooleanFieldListFilter),)
 
+
+# For Selenium Prepopulated tests -------------------------------------
+class RelatedPrepopulatedInline1(admin.StackedInline):
+    fieldsets = (
+        (None, {
+            'fields': (('pubdate', 'status'), ('name', 'slug1', 'slug2',),)
+        }),
+    )
+    model = RelatedPrepopulated
+    extra = 1
+    prepopulated_fields = {'slug1': ['name', 'pubdate'],
+                           'slug2': ['status', 'name']}
+
+class RelatedPrepopulatedInline2(admin.TabularInline):
+    model = RelatedPrepopulated
+    extra = 1
+    prepopulated_fields = {'slug1': ['name', 'pubdate'],
+                           'slug2': ['status', 'name']}
+
+class MainPrepopulatedAdmin(admin.ModelAdmin):
+    inlines = [RelatedPrepopulatedInline1, RelatedPrepopulatedInline2]
+    fieldsets = (
+        (None, {
+            'fields': (('pubdate', 'status'), ('name', 'slug1', 'slug2',),)
+        }),
+    )
+    prepopulated_fields = {'slug1': ['name', 'pubdate'],
+                           'slug2': ['status', 'name']}
+
+
+
+
 site = admin.AdminSite(name="admin")
 site.register(Article, ArticleAdmin)
 site.register(CustomArticle, CustomArticleAdmin)
@@ -576,6 +608,7 @@ site.register(CoverLetter, CoverLetterAdmin)
 site.register(Story, StoryAdmin)
 site.register(OtherStory, OtherStoryAdmin)
 site.register(Report, ReportAdmin)
+site.register(MainPrepopulated, MainPrepopulatedAdmin)
 
 # We intentionally register Promo and ChapterXtra1 but not Chapter nor ChapterXtra2.
 # That way we cover all four cases:
