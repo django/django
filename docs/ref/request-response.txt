@@ -223,6 +223,10 @@ Methods
                                 parts = request.META[field].split(',')
                                 request.META[field] = parts[-1].strip()
 
+        This middleware should be positionned before any other middleware that
+        relies on the value of :meth:`~HttpRequest.get_host()`, for instance
+        :class:`~django.middleware.common.CommonMiddleware` or
+        :class:`~django.middleware.csrf.CsrfViewMiddleware`.
 
 .. method:: HttpRequest.get_full_path()
 
