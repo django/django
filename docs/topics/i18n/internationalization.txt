@@ -763,7 +763,8 @@ The ``set_language`` redirect view
 .. function:: set_language(request)
 
 As a convenience, Django comes with a view, :func:`django.views.i18n.set_language`,
-that sets a user's language preference and redirects back to the previous page.
+that sets a user's language preference and redirects to a given URL or, by default,
+back to the previous page.
 
 Activate this view by adding the following line to your URLconf::
 
@@ -792,7 +793,7 @@ Here's example HTML template code:
 
     <form action="/i18n/setlang/" method="post">
     {% csrf_token %}
-    <input name="next" type="hidden" value="/next/page/" />
+    <input name="next" type="hidden" value="{{ redirect_to }}" />
     <select name="language">
     {% get_language_info_list for LANGUAGES as languages %}
     {% for language in languages %}
@@ -801,3 +802,6 @@ Here's example HTML template code:
     </select>
     <input type="submit" value="Go" />
     </form>
+
+In this example, Django looks up the URL of the page to which the user will be
+redirected in the ``redirect_to`` context variable.
