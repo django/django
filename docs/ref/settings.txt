@@ -982,9 +982,12 @@ FIXTURE_DIRS
 
 Default: ``()`` (Empty tuple)
 
-List of locations of the fixture data files, in search order. Note that
-these paths should use Unix-style forward slashes, even on Windows. See
-:doc:`/topics/testing`.
+List of directories searched for fixture files, in addition to the
+``fixtures`` directory of each application, in search order.
+
+Note that these paths should use Unix-style forward slashes, even on Windows.
+
+See :ref:`initial-data-via-fixtures` and :ref:`topics-testing-fixtures`.
 
 FORCE_SCRIPT_NAME
 ------------------
@@ -1746,8 +1749,10 @@ TEMPLATE_DIRS
 
 Default: ``()`` (Empty tuple)
 
-List of locations of the template source files, in search order. Note that
-these paths should use Unix-style forward slashes, even on Windows.
+List of locations of the template source files searched by
+:class:`django.template.loaders.filesystem.Loader`, in search order.
+
+Note that these paths should use Unix-style forward slashes, even on Windows.
 
 See :doc:`/topics/templates`.
 
