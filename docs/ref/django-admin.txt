@@ -371,15 +371,11 @@ fixture type are discovered (for example, if ``mydata.json`` and
 installation will be aborted, and any data installed in the call to
 ``loaddata`` will be removed from the database.
 
-.. admonition:: MySQL and Fixtures
+.. admonition:: MySQL with MyISAM and fixtures
 
-    Unfortunately, MySQL isn't capable of completely supporting all the
-    features of Django fixtures. If you use MyISAM tables, MySQL doesn't
-    support transactions or constraints, so you won't get a rollback if
-    multiple transaction files are found, or validation of fixture data.
-    If you use InnoDB tables, you won't be able to have any forward
-    references in your data files - MySQL doesn't provide a mechanism to
-    defer checking of row constraints until a transaction is committed.
+    The MyISAM storage engine of MySQL doesn't support transactions or
+    constraints, so you won't get a rollback if multiple transaction files are
+    found, or validation of fixture data, if you use MyISAM tables.
 
 Database-specific fixtures
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
