@@ -619,11 +619,13 @@ Default::
     '%b %d, %Y', '%d %b %Y', '%d %b, %Y', '%B %d %Y',
     '%B %d, %Y', '%d %B %Y', '%d %B, %Y')
 
-A tuple of formats that will be accepted when inputting data on a date
-field. Formats will be tried in order, using the first valid.
-Note that these format strings are specified in Python's datetime_ module
-syntax, that is different from the one used by Django for formatting dates
-to be displayed.
+A tuple of formats that will be accepted when inputting data on a date field.
+Formats will be tried in order, using the first valid. Note that these format
+strings are specified in Python's datetime_ module syntax, that is different
+from the one used by Django for formatting dates to be displayed.
+
+When :setting:`USE_L10N` is ``True``, the locale-dictated format has higher
+precedence and will be applied instead.
 
 See also :setting:`DATETIME_INPUT_FORMATS` and :setting:`TIME_INPUT_FORMATS`.
 
@@ -660,10 +662,12 @@ Default::
     '%m/%d/%y %H:%M:%S', '%m/%d/%y %H:%M', '%m/%d/%y')
 
 A tuple of formats that will be accepted when inputting data on a datetime
-field. Formats will be tried in order, using the first valid.
-Note that these format strings are specified in Python's datetime_ module
-syntax, that is different from the one used by Django for formatting dates
-to be displayed.
+field. Formats will be tried in order, using the first valid. Note that these
+format strings are specified in Python's datetime_ module syntax, that is
+different from the one used by Django for formatting dates to be displayed.
+
+When :setting:`USE_L10N` is ``True``, the locale-dictated format has higher
+precedence and will be applied instead.
 
 See also :setting:`DATE_INPUT_FORMATS` and :setting:`TIME_INPUT_FORMATS`.
 
@@ -1836,11 +1840,13 @@ TIME_INPUT_FORMATS
 
 Default: ``('%H:%M:%S', '%H:%M')``
 
-A tuple of formats that will be accepted when inputting data on a time
-field. Formats will be tried in order, using the first valid.
-Note that these format strings are specified in Python's datetime_ module
-syntax, that is different from the one used by Django for formatting dates
-to be displayed.
+A tuple of formats that will be accepted when inputting data on a time field.
+Formats will be tried in order, using the first valid. Note that these format
+strings are specified in Python's datetime_ module syntax, that is different
+from the one used by Django for formatting dates to be displayed.
+
+When :setting:`USE_L10N` is ``True``, the locale-dictated format has higher
+precedence and will be applied instead.
 
 See also :setting:`DATE_INPUT_FORMATS` and :setting:`DATETIME_INPUT_FORMATS`.
 
