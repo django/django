@@ -1,5 +1,4 @@
 import sys
-from selenium.common.exceptions import NoSuchElementException
 
 from django.test import LiveServerTestCase
 from django.utils.importlib import import_module
@@ -79,6 +78,7 @@ class AdminSeleniumWebDriverTestCase(LiveServerTestCase):
         Helper function to select the <OPTION> that has the value `value` and
         that is in the <SELECT> widget identified by the CSS selector `selector`.
         """
+        from selenium.common.exceptions import NoSuchElementException
         options = self.selenium.find_elements_by_css_selector('%s option' % selector)
         for option in options:
             if option.get_attribute('value') == value:
