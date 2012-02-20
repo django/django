@@ -6,6 +6,13 @@ Settings
     :local:
     :depth: 1
 
+.. warning::
+
+    Be careful when you override settings, especially when the default value
+    is a non-empty tuple or dict, like :setting:`MIDDLEWARE_CLASSES` and
+    :setting:`TEMPLATE_CONTEXT_PROCESSORS`. Make sure you keep the components
+    required by the features of Django you wish to use.
+
 Available settings
 ==================
 
