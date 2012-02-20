@@ -584,6 +584,8 @@ This approach applies the decorator on a per-instance basis. If you
 want every instance of a view to be decorated, you need to take a
 different approach.
 
+.. _decorating-class-based-views:
+
 Decorating the class
 --------------------
 

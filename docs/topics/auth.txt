@@ -1174,9 +1174,16 @@ The permission_required decorator
 Limiting access to generic views
 --------------------------------
 
-To limit access to a :doc:`generic view </ref/generic-views>`, write a thin
-wrapper around the view, and point your URLconf to your wrapper instead of the
-generic view itself. For example::
+Controlling access to a :doc:`class-based generic view </ref/class-based-views>`
+is done by decorating the :meth:`View.dispatch <django.views.generic.base.View.dispatch>`
+method on the class. See :ref:`decorating-class-based-views` for the details.
+
+Function-based generic views
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To limit access to a :doc:`function-based generic view </ref/generic-views>`,
+write a thin wrapper around the view, and point your URLconf to your wrapper
+instead of the generic view itself. For example::
 
     from django.views.generic.date_based import object_detail
 
