@@ -2122,10 +2122,10 @@ Avg
 
 .. class:: Avg(field)
 
-    Returns the mean value of the given field.
+    Returns the mean value of the given field, which must be numeric.
 
     * Default alias: ``<field>__avg``
-    * Return type: float
+    * Return type: ``float``
 
 Count
 ~~~~~
@@ -2135,14 +2135,15 @@ Count
     Returns the number of objects that are related through the provided field.
 
     * Default alias: ``<field>__count``
-    * Return type: integer
+    * Return type: ``int``
 
     Has one optional argument:
 
     .. attribute:: distinct
 
-        If distinct=True, the count will only include unique instances. This has
-        the SQL equivalent of ``COUNT(DISTINCT field)``. Default value is ``False``.
+        If ``distinct=True``, the count will only include unique instances.
+        This is the SQL equivalent of ``COUNT(DISTINCT <field>)``. The default
+        value is ``False``.
 
 Max
 ~~~
@@ -2172,7 +2173,7 @@ StdDev
     Returns the standard deviation of the data in the provided field.
 
     * Default alias: ``<field>__stddev``
-    * Return type: float
+    * Return type: ``float``
 
     Has one optional argument:
 
@@ -2183,9 +2184,10 @@ StdDev
 
     .. admonition:: SQLite
 
-        SQLite doesn't provide ``StdDev`` out of the box. An implementation is
-        available as an extension module for SQLite. Consult the SQlite
-        documentation for instructions on obtaining and installing this extension.
+        SQLite doesn't provide ``StdDev`` out of the box. An implementation
+        is available as an extension module for SQLite. Consult the `SQlite
+        documentation`_ for instructions on obtaining and installing this
+        extension.
 
 Sum
 ~~~
@@ -2205,7 +2207,7 @@ Variance
     Returns the variance of the data in the provided field.
 
     * Default alias: ``<field>__variance``
-    * Return type: float
+    * Return type: ``float``
 
     Has one optional argument:
 
