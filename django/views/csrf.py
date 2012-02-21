@@ -60,6 +60,8 @@ CSRF_FAILURE_TEMPLATE = """
   ensure:</p>
 
   <ul>
+    <li>Your browser is accepting cookies.</li>
+
     <li>The view function uses <a
     href='http://docs.djangoproject.com/en/dev/ref/templates/api/#subclassing-context-requestcontext'><code>RequestContext</code></a>
     for the template, instead of <code>Context</code>.</li>
