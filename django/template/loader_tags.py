@@ -1,5 +1,6 @@
 from django.conf import settings
-from django.template.base import TemplateSyntaxError, Library, Node, TextNode, token_kwargs
+from django.template.base import TemplateSyntaxError, Library, Node, TextNode,\
+    token_kwargs, Variable
 from django.template.loader import get_template
 from django.utils.safestring import mark_safe
 
@@ -74,26 +75,23 @@ class BlockNode(Node):
 class ExtendsNode(Node):
     must_be_first = True
 
-    def __init__(self, nodelist, parent_name, parent_name_expr, template_dirs=None):
+    def __init__(self, nodelist, parent_name, template_dirs=None):
         self.nodelist = nodelist
-        self.parent_name, self.parent_name_expr = parent_name, parent_name_expr
+        self.parent_name = parent_name
         self.template_dirs = template_dirs
         self.blocks = dict([(n.name, n) for n in nodelist.get_nodes_by_type(BlockNode)])
 
     def __repr__(self):
-        if self.parent_name_expr:
-            return "<ExtendsNode: extends %s>" % self.parent_name_expr.token
-        return '<ExtendsNode: extends "%s">' % self.parent_name
+        return '<ExtendsNode: extends %s>' % self.parent_name.token
 
     def get_parent(self, context):
-        if self.parent_name_expr:
-            parent = self.parent_name_expr.resolve(context)
-        else:
-            parent = self.parent_name
+        parent = self.parent_name.resolve(context)
         if not parent:
             error_msg = "Invalid template name in 'extends' tag: %r." % parent
-            if self.parent_name_expr:
-                error_msg += " Got this from the '%s' variable." % self.parent_name_expr.token
+            if self.parent_name.filters or\
+                    isinstance(self.parent_name.var, Variable):
+                error_msg += " Got this from the '%s' variable." %\
+                    self.parent_name.token
             raise TemplateSyntaxError(error_msg)
         if hasattr(parent, 'render'):
             return parent # parent is a Template object
@@ -212,15 +210,11 @@ def do_extends(parser, token):
     bits = token.split_contents()
     if len(bits) != 2:
         raise TemplateSyntaxError("'%s' takes one argument" % bits[0])
-    parent_name, parent_name_expr = None, None
-    if bits[1][0] in ('"', "'") and bits[1][-1] == bits[1][0]:
-        parent_name = bits[1][1:-1]
-    else:
-        parent_name_expr = parser.compile_filter(bits[1])
+    parent_name = parser.compile_filter(bits[1])
     nodelist = parser.parse()
     if nodelist.get_nodes_by_type(ExtendsNode):
         raise TemplateSyntaxError("'%s' cannot appear more than once in the same template" % bits[0])
-    return ExtendsNode(nodelist, parent_name, parent_name_expr)
+    return ExtendsNode(nodelist, parent_name)
 
 @register.tag('include')
 def do_include(parser, token):

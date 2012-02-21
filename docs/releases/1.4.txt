@@ -1031,6 +1031,17 @@ If you depended on the output of this command -- if you parsed it, for example
 management commands in a script, use
 :djadmin:`manage.py help --commands <help>` instead.
 
+``extends`` template tag
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Previously, the :ttag:`extends` tag used a buggy method of parsing arguments,
+which could lead to it erroneously considering an argument as a string literal
+when it wasn't.  It now utilises ``parser.compile_filter`` like other tags.
+
+The internals of the tag aren't part of the official stable API, but in the
+interests of full disclosure, the ``ExtendsNode.__init__`` definition has
+changed which may break any custom tags that use this node class.
+
 Features deprecated in 1.4
 ==========================
 

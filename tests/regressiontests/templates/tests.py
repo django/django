@@ -1204,6 +1204,9 @@ class Templates(unittest.TestCase):
             'inheritance40': ("{% extends 'inheritance33' %}{% block opt %}new{{ block.super }}{% endblock %}", {'optional': 1}, '1new23'),
             'inheritance41': ("{% extends 'inheritance36' %}{% block opt %}new{{ block.super }}{% endblock %}", {'numbers': '123'}, '_new1_new2_new3_'),
 
+            # Expression starting and ending with a quote
+            'inheritance42': ("{% extends 'inheritance02'|cut:' ' %}", {}, '1234'),
+
             ### LOADING TAG LIBRARIES #################################################
             'load01': ("{% load testtags subpackage.echo %}{% echo test %} {% echo2 \"test\" %}", {}, "test test"),
             'load02': ("{% load subpackage.echo %}{% echo2 \"test\" %}", {}, "test"),
