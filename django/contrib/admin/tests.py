@@ -18,9 +18,9 @@ class AdminSeleniumWebDriverTestCase(LiveServerTestCase):
             mod = import_module(module)
             WebDriver = getattr(mod, attr)
             cls.selenium = WebDriver()
-        except Exception:
+        except Exception, e:
             raise SkipTest('Selenium webdriver "%s" not installed or not '
-                           'operational.' % cls.webdriver_class)
+                           'operational: %s' % (cls.webdriver_class, str(e)))
         super(AdminSeleniumWebDriverTestCase, cls).setUpClass()
 
     @classmethod
