@@ -2894,7 +2894,8 @@ class PrePopulatedTest(TestCase):
         self.assertContains(response, "maxLength: 1000") # instead of 1,000
 
 
-class SeleniumPrePopulatedTests(AdminSeleniumWebDriverTestCase):
+class SeleniumPrePopulatedFirefoxTests(AdminSeleniumWebDriverTestCase):
+    webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
     urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml']
 
@@ -2996,6 +2997,11 @@ class SeleniumPrePopulatedTests(AdminSeleniumWebDriverTestCase):
             slug1='tabular-inline-ignored-characters-1981-08-22',
             slug2='option-one-tabular-inline-ignored-characters',
         )
+
+
+class SeleniumPrePopulatedChromeTests(SeleniumPrePopulatedFirefoxTests):
+    webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
+
 
 class ReadonlyTest(TestCase):
     urls = "regressiontests.admin_views.urls"

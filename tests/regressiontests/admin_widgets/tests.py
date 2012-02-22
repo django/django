@@ -438,7 +438,7 @@ class SeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
         self.assertEqual(
             self.get_css_value('#calendarbox0', 'display'), 'block')
         # Press the ESC key
-        self.selenium.find_element_by_tag_name('html').send_keys([Keys.ESCAPE])
+        self.selenium.find_element_by_tag_name('body').send_keys([Keys.ESCAPE])
         # Check that the date picker is hidden again
         self.assertEqual(
             self.get_css_value('#calendarbox0', 'display'), 'none')
@@ -453,7 +453,10 @@ class SeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
         self.assertEqual(
             self.get_css_value('#clockbox0', 'display'), 'block')
         # Press the ESC key
-        self.selenium.find_element_by_tag_name('html').send_keys([Keys.ESCAPE])
+        self.selenium.find_element_by_tag_name('body').send_keys([Keys.ESCAPE])
         # Check that the time picker is hidden again
         self.assertEqual(
             self.get_css_value('#clockbox0', 'display'), 'none')
+
+class SeleniumChromeTests(SeleniumFirefoxTests):
+    webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
