@@ -7,7 +7,7 @@ from django.db.models.query_utils import select_related_descend
 from django.db.models.sql.constants import *
 from django.db.models.sql.datastructures import EmptyResultSet
 from django.db.models.sql.expressions import SQLEvaluator
-from django.db.models.sql.query import get_proxied_model, get_order_dir, Query
+from django.db.models.sql.query import get_order_dir, Query
 from django.db.utils import DatabaseError
 
 
@@ -266,7 +266,7 @@ class SQLCompiler(object):
         aliases = set()
         only_load = self.deferred_to_columns()
         # Skip all proxy to the root proxied model
-        proxied_model = get_proxied_model(opts)
+        proxied_model = opts.concrete_model
 
         if start_alias:
             seen = {None: start_alias}

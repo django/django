@@ -17,11 +17,7 @@ class ContentTypeManager(models.Manager):
         return ct
 
     def _get_opts(self, model):
-        opts = model._meta
-        while opts.proxy:
-            model = opts.proxy_for_model
-            opts = model._meta
-        return opts
+        return model._meta.concrete_model._meta
 
     def _get_from_cache(self, opts):
         key = (opts.app_label, opts.object_name.lower())

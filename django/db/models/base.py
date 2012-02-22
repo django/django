@@ -122,9 +122,10 @@ class ModelBase(type):
             if (new_class._meta.local_fields or
                     new_class._meta.local_many_to_many):
                 raise FieldError("Proxy model '%s' contains model fields." % name)
-            while base._meta.proxy:
-                base = base._meta.proxy_for_model
             new_class._meta.setup_proxy(base)
+            new_class._meta.concrete_model = base._meta.concrete_model
+        else:
+            new_class._meta.concrete_model = new_class
 
         # Do the appropriate setup for any model parents.
         o2o_map = dict([(f.rel.to, f) for f in new_class._meta.local_fields
@@ -149,9 +150,7 @@ class ModelBase(type):
                                         (field.name, name, base.__name__))
             if not base._meta.abstract:
                 # Concrete classes...
-                while base._meta.proxy:
-                    # Skip over a proxy class to the "real" base it proxies.
-                    base = base._meta.proxy_for_model
+                base = base._meta.concrete_model
                 if base in o2o_map:
                     field = o2o_map[base]
                 elif not is_proxy:

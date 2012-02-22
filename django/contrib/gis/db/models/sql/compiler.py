@@ -2,7 +2,6 @@ from itertools import izip
 from django.db.backends.util import truncate_name, typecast_timestamp
 from django.db.models.sql import compiler
 from django.db.models.sql.constants import TABLE_NAME, MULTI
-from django.db.models.sql.query import get_proxied_model
 
 SQLCompiler = compiler.SQLCompiler
 
@@ -116,7 +115,7 @@ class GeoSQLCompiler(compiler.SQLCompiler):
         aliases = set()
         only_load = self.deferred_to_columns()
         # Skip all proxy to the root proxied model
-        proxied_model = get_proxied_model(opts)
+        proxied_model = opts.concrete_model
 
         if start_alias:
             seen = {None: start_alias}

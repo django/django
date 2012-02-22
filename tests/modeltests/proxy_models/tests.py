@@ -232,6 +232,12 @@ class ProxyModelTests(TestCase):
         resp = [u.name for u in UserProxyProxy.objects.all()]
         self.assertEqual(resp, ['Bruce'])
 
+    def test_proxy_for_model(self):
+        self.assertEqual(UserProxy, UserProxyProxy._meta.proxy_for_model)
+
+    def test_concrete_model(self):
+        self.assertEqual(User, UserProxyProxy._meta.concrete_model)
+
     def test_proxy_delete(self):
         """
         Proxy objects can be deleted

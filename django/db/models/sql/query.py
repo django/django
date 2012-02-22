@@ -575,10 +575,7 @@ class Query(object):
             return
         orig_opts = self.model._meta
         seen = {}
-        if orig_opts.proxy:
-            must_include = {orig_opts.proxy_for_model: set([orig_opts.pk])}
-        else:
-            must_include = {self.model: set([orig_opts.pk])}
+        must_include = {orig_opts.concrete_model: set([orig_opts.pk])}
         for field_name in field_names:
             parts = field_name.split(LOOKUP_SEP)
             cur_model = self.model
@@ -586,7 +583,7 @@ class Query(object):
             for name in parts[:-1]:
                 old_model = cur_model
                 source = opts.get_field_by_name(name)[0]
-                cur_model = opts.get_field_by_name(name)[0].rel.to
+                cur_model = source.rel.to
                 opts = cur_model._meta
                 # Even if we're "just passing through" this model, we must add
                 # both the current model's pk and the related reference field
@@ -946,7 +943,7 @@ class Query(object):
         seen = {None: root_alias}
 
         # Skip all proxy to the root proxied model
-        proxied_model = get_proxied_model(opts)
+        proxied_model = opts.concrete_model
 
         for field, model in opts.get_fields_with_model():
             if model not in seen:
@@ -1325,7 +1322,7 @@ class Query(object):
             if model:
                 # The field lives on a base class of the current model.
                 # Skip the chain of proxy to the concrete proxied model
-                proxied_model = get_proxied_model(opts)
+                proxied_model = opts.concrete_model
 
                 for int_model in opts.get_base_chain(model):
                     if int_model is proxied_model:
@@ -1990,11 +1987,3 @@ def add_to_dict(data, key, value):
         data[key].add(value)
     else:
         data[key] = set([value])
-
-def get_proxied_model(opts):
-    int_opts = opts
-    proxied_model = None
-    while int_opts.proxy:
-        proxied_model = int_opts.proxy_for_model
-        int_opts = proxied_model._meta
-    return proxied_model

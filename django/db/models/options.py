@@ -40,7 +40,16 @@ class Options(object):
         self.abstract = False
         self.managed = True
         self.proxy = False
+        # For any class which is a proxy (including automatically created
+        # classes for deferred object loading) the proxy_for_model tells
+        # which class this model is proxying. Note that proxy_for_model
+        # can create a chain of proxy models. For non-proxy models the
+        # variable is always None.
         self.proxy_for_model = None
+        # For any non-abstract class the concrete class is the model
+        # in the end of the proxy_for_model chain. In particular, for
+        # concrete models the concrete_model is always the class itself.
+        self.concrete_model = None
         self.parents = SortedDict()
         self.duplicate_targets = {}
         self.auto_created = False
