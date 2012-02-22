@@ -18,6 +18,13 @@ class SettingsTests(unittest.TestCase):
     def test_settings_delete_wrapped(self):
         self.assertRaises(TypeError, delattr, settings, '_wrapped')
 
+    def test_allowed_include_roots_string(self):
+        """
+        ALLOWED_INCLUDE_ROOTS is not allowed to be incorrectly set to a string
+        rather than a tuple.
+        """
+        self.assertRaises(ValueError, setattr, settings,
+            'ALLOWED_INCLUDE_ROOTS', '/var/www/ssi/')
 
 class TrailingSlashURLTests(unittest.TestCase):
     settings_module = settings

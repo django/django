@@ -70,6 +70,9 @@ class BaseSettings(object):
         if name in ("MEDIA_URL", "STATIC_URL") and value and not value.endswith('/'):
             warnings.warn('If set, %s must end with a slash' % name,
                           PendingDeprecationWarning)
+        elif name == "ALLOWED_INCLUDE_ROOTS" and isinstance(value, basestring):
+            raise ValueError("The ALLOWED_INCLUDE_ROOTS setting must be set "
+                "to a tuple, not a string.")
         object.__setattr__(self, name, value)
 
 

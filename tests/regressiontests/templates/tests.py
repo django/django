@@ -412,7 +412,9 @@ class Templates(unittest.TestCase):
 
         #Set ALLOWED_INCLUDE_ROOTS so that ssi works.
         old_allowed_include_roots = settings.ALLOWED_INCLUDE_ROOTS
-        settings.ALLOWED_INCLUDE_ROOTS = os.path.dirname(os.path.abspath(__file__))
+        settings.ALLOWED_INCLUDE_ROOTS = (
+            os.path.dirname(os.path.abspath(__file__)),
+        )
 
         # Warm the URL reversing cache. This ensures we don't pay the cost
         # warming the cache during one of the tests.
