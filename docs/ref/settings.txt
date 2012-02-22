@@ -2111,12 +2111,6 @@ If Django doesn't set the ``TZ`` environment variable, it's up to you
 to ensure your processes are running in the correct environment.
 
 .. note::
-    When time zone support is enabled (:setting:`USE_TZ = True <USE_TZ>`),
-    Django needs a definition of the default time zone. Therefore, you must
-    either install pytz_ (which is recommended) or set :setting:`TIME_ZONE`
-    to the system time zone.
-
-.. note::
     Django cannot reliably use alternate time zones in a Windows environment.
     If you're running Django on Windows, :setting:`TIME_ZONE` must be set to
     match the system time zone.
