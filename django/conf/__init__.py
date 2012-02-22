@@ -73,6 +73,9 @@ class BaseSettings(object):
         elif name == "ADMIN_MEDIA_PREFIX":
             warnings.warn("The ADMIN_MEDIA_PREFIX setting has been removed; "
                           "use STATIC_URL instead.", DeprecationWarning)
+        elif name == "ALLOWED_INCLUDE_ROOTS" and isinstance(value, basestring):
+            raise ValueError("The ALLOWED_INCLUDE_ROOTS setting must be set "
+                "to a tuple, not a string.")
         object.__setattr__(self, name, value)
 
 
@@ -98,7 +101,8 @@ class Settings(BaseSettings):
         for setting in dir(mod):
             if setting == setting.upper():
                 setting_value = getattr(mod, setting)
-                if setting in tuple_settings and type(setting_value) == str:
+                if setting in tuple_settings and \
+                        isinstance(setting_value, basestring):
                     setting_value = (setting_value,) # In case the user forgot the comma.
                 setattr(self, setting, setting_value)
 
