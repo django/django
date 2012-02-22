@@ -10,6 +10,7 @@ from itertools import repeat
 from django.utils import tree
 from django.db.models.fields import Field
 from django.db.models.sql.datastructures import EmptyResultSet, FullResultSet
+from django.db.models.sql.aggregates import Aggregate
 
 # Connection types
 AND = 'AND'
@@ -30,9 +31,8 @@ class WhereNode(tree.Node):
     the correct SQL).
 
     The children in this tree are usually either Q-like objects or lists of
-    [table_alias, field_name, db_type, lookup_type, value_annotation,
-    params]. However, a child could also be any class with as_sql() and
-    relabel_aliases() methods.
+    [table_alias, field_name, db_type, lookup_type, value_annotation, params].
+    However, a child could also be any class with as_sql() and relabel_aliases() methods.
     """
     default = AND
 
@@ -54,25 +54,22 @@ class WhereNode(tree.Node):
             # emptiness and transform any non-empty values correctly.
             value = list(value)
 
-        # The "annotation" parameter is used to pass auxilliary information
+        # The "value_annotation" parameter is used to pass auxilliary information
         # about the value(s) to the query construction. Specifically, datetime
         # and empty values need special handling. Other types could be used
         # here in the future (using Python types is suggested for consistency).
         if isinstance(value, datetime.datetime):
-            annotation = datetime.datetime
+            value_annotation = datetime.datetime
         elif hasattr(value, 'value_annotation'):
-            annotation = value.value_annotation
+            value_annotation = value.value_annotation
         else:
-            annotation = bool(value)
+            value_annotation = bool(value)
 
         if hasattr(obj, "prepare"):
             value = obj.prepare(lookup_type, value)
-            super(WhereNode, self).add((obj, lookup_type, annotation, value),
-                connector)
-            return
 
-        super(WhereNode, self).add((obj, lookup_type, annotation, value),
-                connector)
+        super(WhereNode, self).add(
+                (obj, lookup_type, value_annotation, value), connector)
 
     def as_sql(self, qn, connection):
         """
@@ -132,21 +129,26 @@ class WhereNode(tree.Node):
 
     def make_atom(self, child, qn, connection):
         """
-        Turn a tuple (table_alias, column_name, db_type, lookup_type,
-        value_annot, params) into valid SQL.
+        Turn a tuple (Constraint(table_alias, column_name, db_type),
+        lookup_type, value_annotation, params) into valid SQL.
+
+        The first item of the tuple may also be an Aggregate.
 
         Returns the string for the SQL fragment and the parameters to use for
         it.
         """
-        lvalue, lookup_type, value_annot, params_or_value = child
-        if hasattr(lvalue, 'process'):
+        lvalue, lookup_type, value_annotation, params_or_value = child
+        if isinstance(lvalue, Constraint):
             try:
                 lvalue, params = lvalue.process(lookup_type, params_or_value, connection)
             except EmptyShortCircuit:
                 raise EmptyResultSet
+        elif isinstance(lvalue, Aggregate):
+            params = lvalue.field.get_db_prep_lookup(lookup_type, params_or_value, connection)
         else:
-            params = Field().get_db_prep_lookup(lookup_type, params_or_value,
-                connection=connection, prepared=True)
+            raise TypeError("'make_atom' expects a Constraint or an Aggregate "
+                            "as the first item of its 'child' argument.")
+
         if isinstance(lvalue, tuple):
             # A direct database column lookup.
             field_sql = self.sql_for_columns(lvalue, qn, connection)
@@ -154,7 +156,7 @@ class WhereNode(tree.Node):
             # A smart object with an as_sql() method.
             field_sql = lvalue.as_sql(qn, connection)
 
-        if value_annot is datetime.datetime:
+        if value_annotation is datetime.datetime:
             cast_sql = connection.ops.datetime_cast_sql()
         else:
             cast_sql = '%s'
@@ -168,7 +170,7 @@ class WhereNode(tree.Node):
         if (len(params) == 1 and params[0] == '' and lookup_type == 'exact'
             and connection.features.interprets_empty_strings_as_nulls):
             lookup_type = 'isnull'
-            value_annot = True
+            value_annotation = True
 
         if lookup_type in connection.operators:
             format = "%s %%s %%s" % (connection.ops.lookup_cast(lookup_type),)
@@ -177,7 +179,7 @@ class WhereNode(tree.Node):
                               extra), params)
 
         if lookup_type == 'in':
-            if not value_annot:
+            if not value_annotation:
                 raise EmptyResultSet
             if extra:
                 return ('%s IN %s' % (field_sql, extra), params)
@@ -206,7 +208,7 @@ class WhereNode(tree.Node):
                     params)
         elif lookup_type == 'isnull':
             return ('%s IS %sNULL' % (field_sql,
-                (not value_annot and 'NOT ' or '')), ())
+                (not value_annotation and 'NOT ' or '')), ())
         elif lookup_type == 'search':
             return (connection.ops.fulltext_search_sql(field_sql), params)
         elif lookup_type in ('regex', 'iregex'):

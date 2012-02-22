@@ -2,18 +2,11 @@
 Classes to represent the default SQL aggregate functions
 """
 
-class AggregateField(object):
-    """An internal field mockup used to identify aggregates in the
-    data-conversion parts of the database backend.
-    """
-    def __init__(self, internal_type):
-        self.internal_type = internal_type
+from django.db.models.fields import IntegerField, FloatField
 
-    def get_internal_type(self):
-        return self.internal_type
-
-ordinal_aggregate_field = AggregateField('IntegerField')
-computed_aggregate_field = AggregateField('FloatField')
+# Fake fields used to identify aggregate types in data-conversion operations.
+ordinal_aggregate_field = IntegerField()
+computed_aggregate_field = FloatField()
 
 class Aggregate(object):
     """

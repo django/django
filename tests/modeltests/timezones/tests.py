@@ -25,7 +25,7 @@ from django.utils.tzinfo import FixedOffset
 from django.utils.unittest import skipIf, skipUnless
 
 from .forms import EventForm, EventSplitForm, EventModelForm
-from .models import Event, MaybeEvent, Timestamp
+from .models import Event, MaybeEvent, Session, SessionEvent, Timestamp
 
 
 # These tests use the EAT (Eastern Africa Time) and ICT (Indochina Time)
@@ -231,6 +231,28 @@ class LegacyDatabaseTests(BaseDateTimeTests):
             'dt__max': datetime.datetime(2011, 9, 1, 23, 20, 20),
         })
 
+    def test_query_annotation(self):
+        # Only min and max make sense for datetimes.
+        morning = Session.objects.create(name='morning')
+        afternoon = Session.objects.create(name='afternoon')
+        SessionEvent.objects.create(dt=datetime.datetime(2011, 9, 1, 23, 20, 20), session=afternoon)
+        SessionEvent.objects.create(dt=datetime.datetime(2011, 9, 1, 13, 20, 30), session=afternoon)
+        SessionEvent.objects.create(dt=datetime.datetime(2011, 9, 1, 3, 20, 40), session=morning)
+        morning_min_dt = datetime.datetime(2011, 9, 1, 3, 20, 40)
+        afternoon_min_dt = datetime.datetime(2011, 9, 1, 13, 20, 30)
+        self.assertQuerysetEqual(
+                Session.objects.annotate(dt=Min('events__dt')).order_by('dt'),
+                [morning_min_dt, afternoon_min_dt],
+                transform=lambda d: d.dt)
+        self.assertQuerysetEqual(
+                Session.objects.annotate(dt=Min('events__dt')).filter(dt__lt=afternoon_min_dt),
+                [morning_min_dt],
+                transform=lambda d: d.dt)
+        self.assertQuerysetEqual(
+                Session.objects.annotate(dt=Min('events__dt')).filter(dt__gte=afternoon_min_dt),
+                [afternoon_min_dt],
+                transform=lambda d: d.dt)
+
     def test_query_dates(self):
         Event.objects.create(dt=datetime.datetime(2011, 1, 1, 1, 30, 0))
         Event.objects.create(dt=datetime.datetime(2011, 1, 1, 4, 30, 0))
@@ -411,6 +433,28 @@ class NewDatabaseTests(BaseDateTimeTests):
             'dt__min': datetime.datetime(2011, 9, 1, 3, 20, 40, tzinfo=EAT),
             'dt__max': datetime.datetime(2011, 9, 1, 23, 20, 20, tzinfo=EAT),
         })
+
+    def test_query_annotation(self):
+        # Only min and max make sense for datetimes.
+        morning = Session.objects.create(name='morning')
+        afternoon = Session.objects.create(name='afternoon')
+        SessionEvent.objects.create(dt=datetime.datetime(2011, 9, 1, 23, 20, 20, tzinfo=EAT), session=afternoon)
+        SessionEvent.objects.create(dt=datetime.datetime(2011, 9, 1, 13, 20, 30, tzinfo=EAT), session=afternoon)
+        SessionEvent.objects.create(dt=datetime.datetime(2011, 9, 1, 3, 20, 40, tzinfo=EAT), session=morning)
+        morning_min_dt = datetime.datetime(2011, 9, 1, 3, 20, 40, tzinfo=EAT)
+        afternoon_min_dt = datetime.datetime(2011, 9, 1, 13, 20, 30, tzinfo=EAT)
+        self.assertQuerysetEqual(
+                Session.objects.annotate(dt=Min('events__dt')).order_by('dt'),
+                [morning_min_dt, afternoon_min_dt],
+                transform=lambda d: d.dt)
+        self.assertQuerysetEqual(
+                Session.objects.annotate(dt=Min('events__dt')).filter(dt__lt=afternoon_min_dt),
+                [morning_min_dt],
+                transform=lambda d: d.dt)
+        self.assertQuerysetEqual(
+                Session.objects.annotate(dt=Min('events__dt')).filter(dt__gte=afternoon_min_dt),
+                [afternoon_min_dt],
+                transform=lambda d: d.dt)
 
     def test_query_dates(self):
         # Same comment as in test_query_date_related_filters.
