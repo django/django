@@ -7,6 +7,13 @@ import struct
 import hashlib
 import binascii
 import operator
+
+import random
+try:
+    random = random.SystemRandom()
+except NotImplementedError:
+    pass
+
 from django.conf import settings
 
 
@@ -43,13 +50,8 @@ def get_random_string(length=12,
     Returns a random string of length characters from the set of a-z, A-Z, 0-9.
 
     The default length of 12 with the a-z, A-Z, 0-9 character set returns
-    a 71-bit salt. log_2((26+26+10)^12) =~ 71 bits
+    a 71-bit value. log_2((26+26+10)^12) =~ 71 bits
     """
-    import random
-    try:
-        random = random.SystemRandom()
-    except NotImplementedError:
-        pass
     return ''.join([random.choice(allowed_chars) for i in range(length)])
 
 
