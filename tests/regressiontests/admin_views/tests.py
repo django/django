@@ -2911,7 +2911,7 @@ class SeleniumPrePopulatedFirefoxTests(AdminSeleniumWebDriverTestCase):
 
         # Main form ----------------------------------------------------------
         self.selenium.find_element_by_css_selector('#id_pubdate').send_keys('2012-02-18')
-        self.select_option('#id_status', 'option two')
+        self.get_select_option('#id_status', 'option two').click()
         self.selenium.find_element_by_css_selector('#id_name').send_keys(u' this is the mAin nÀMë and it\'s awεšome')
         slug1 = self.selenium.find_element_by_css_selector('#id_slug1').get_attribute('value')
         slug2 = self.selenium.find_element_by_css_selector('#id_slug2').get_attribute('value')
@@ -2921,7 +2921,7 @@ class SeleniumPrePopulatedFirefoxTests(AdminSeleniumWebDriverTestCase):
         # Stacked inlines ----------------------------------------------------
         # Initial inline
         self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-0-pubdate').send_keys('2011-12-17')
-        self.select_option('#id_relatedprepopulated_set-0-status', 'option one')
+        self.get_select_option('#id_relatedprepopulated_set-0-status', 'option one').click()
         self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-0-name').send_keys(u' here is a sŤāÇkeð   inline !  ')
         slug1 = self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-0-slug1').get_attribute('value')
         slug2 = self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-0-slug2').get_attribute('value')
@@ -2931,7 +2931,7 @@ class SeleniumPrePopulatedFirefoxTests(AdminSeleniumWebDriverTestCase):
         # Add an inline
         self.selenium.find_element_by_css_selector('#relatedprepopulated_set-group .add-row a').click()
         self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-1-pubdate').send_keys('1999-01-25')
-        self.select_option('#id_relatedprepopulated_set-1-status', 'option two')
+        self.get_select_option('#id_relatedprepopulated_set-1-status', 'option two').click()
         self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-1-name').send_keys(u' now you haVe anöther   sŤāÇkeð  inline with a very ... loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooog text... ')
         slug1 = self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-1-slug1').get_attribute('value')
         slug2 = self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-1-slug2').get_attribute('value')
@@ -2941,7 +2941,7 @@ class SeleniumPrePopulatedFirefoxTests(AdminSeleniumWebDriverTestCase):
         # Tabular inlines ----------------------------------------------------
         # Initial inline
         self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-2-0-pubdate').send_keys('1234-12-07')
-        self.select_option('#id_relatedprepopulated_set-2-0-status', 'option two')
+        self.get_select_option('#id_relatedprepopulated_set-2-0-status', 'option two').click()
         self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-2-0-name').send_keys(u'And now, with a tÃbűlaŘ inline !!!')
         slug1 = self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-2-0-slug1').get_attribute('value')
         slug2 = self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-2-0-slug2').get_attribute('value')
@@ -2951,7 +2951,7 @@ class SeleniumPrePopulatedFirefoxTests(AdminSeleniumWebDriverTestCase):
         # Add an inline
         self.selenium.find_element_by_css_selector('#relatedprepopulated_set-2-group .add-row a').click()
         self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-2-1-pubdate').send_keys('1981-08-22')
-        self.select_option('#id_relatedprepopulated_set-2-1-status', 'option one')
+        self.get_select_option('#id_relatedprepopulated_set-2-1-status', 'option one').click()
         self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-2-1-name').send_keys(u'a tÃbűlaŘ inline with ignored ;"&*^\%$#@-/`~ characters')
         slug1 = self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-2-1-slug1').get_attribute('value')
         slug2 = self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-2-1-slug2').get_attribute('value')

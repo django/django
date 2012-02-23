@@ -99,3 +99,21 @@ class Advisor(models.Model):
     """
     name = models.CharField(max_length=20)
     companies = models.ManyToManyField(Company)
+
+
+class Student(models.Model):
+    name = models.CharField(max_length=255)
+
+    def __unicode__(self):
+        return self.name
+
+    class Meta:
+        ordering = ('name',)
+
+class School(models.Model):
+    name = models.CharField(max_length=255)
+    students = models.ManyToManyField(Student, related_name='current_schools')
+    alumni = models.ManyToManyField(Student, related_name='previous_schools')
+
+    def __unicode__(self):
+        return self.name

@@ -25,6 +25,11 @@ class CarTireAdmin(admin.ModelAdmin):
 class EventAdmin(admin.ModelAdmin):
     raw_id_fields = ['band']
 
+
+class SchoolAdmin(admin.ModelAdmin):
+    filter_vertical = ('students',)
+    filter_horizontal = ('alumni',)
+
 site = WidgetAdmin(name='widget-admin')
 
 site.register(models.User)
@@ -41,3 +46,5 @@ site.register(models.Inventory)
 site.register(models.Bee)
 
 site.register(models.Advisor)
+
+site.register(models.School, SchoolAdmin)

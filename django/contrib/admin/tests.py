@@ -73,15 +73,25 @@ class AdminSeleniumWebDriverTestCase(LiveServerTestCase):
         return self.selenium.execute_script(
             'return django.jQuery("%s").css("%s")' % (selector, attribute))
 
-    def select_option(self, selector, value):
+    def get_select_option(self, selector, value):
         """
-        Helper function to select the <OPTION> that has the value `value` and
-        that is in the <SELECT> widget identified by the CSS selector `selector`.
+        Returns the <OPTION> with the value `value` inside the <SELECT> widget
+        identified by the CSS selector `selector`.
         """
         from selenium.common.exceptions import NoSuchElementException
         options = self.selenium.find_elements_by_css_selector('%s option' % selector)
         for option in options:
             if option.get_attribute('value') == value:
-                option.click()
-                return
+                return option
         raise NoSuchElementException('Option "%s" not found in "%s"' % (value, selector))
+
+    def assertSelectOptions(self, selector, values):
+        """
+        Asserts that the <SELECT> widget identified by `selector` has the
+        options with the given `values`.
+        """
+        options = self.selenium.find_elements_by_css_selector('%s option' % selector)
+        actual_values = []
+        for option in options:
+            actual_values.append(option.get_attribute('value'))
+        self.assertEqual(values, actual_values)

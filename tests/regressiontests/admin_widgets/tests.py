@@ -410,7 +410,8 @@ class RelatedFieldWidgetWrapperTests(DjangoTestCase):
         self.assertFalse(w.can_add_related)
 
 
-class SeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
+
+class DateTimePickerSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
     webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
     fixtures = ['admin-widgets-users.xml']
     urls = "regressiontests.admin_widgets.urls"
@@ -458,5 +459,132 @@ class SeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
         self.assertEqual(
             self.get_css_value('#clockbox0', 'display'), 'none')
 
-class SeleniumChromeTests(SeleniumFirefoxTests):
+class DateTimePickerSeleniumChromeTests(DateTimePickerSeleniumFirefoxTests):
+    webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
+
+
+class HorizontalVerticalFilterSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
+    webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
+    fixtures = ['admin-widgets-users.xml']
+    urls = "regressiontests.admin_widgets.urls"
+
+    def setUp(self):
+        self.lisa = models.Student.objects.create(name='Lisa')
+        self.john = models.Student.objects.create(name='John')
+        self.bob = models.Student.objects.create(name='Bob')
+        self.peter = models.Student.objects.create(name='Peter')
+        self.jenny = models.Student.objects.create(name='Jenny')
+        self.jason = models.Student.objects.create(name='Jason')
+        self.cliff = models.Student.objects.create(name='Cliff')
+        self.arthur = models.Student.objects.create(name='Arthur')
+        self.school = models.School.objects.create(name='School of Awesome')
+        super(HorizontalVerticalFilterSeleniumFirefoxTests, self).setUp()
+
+    def execute_basic_operations(self, field_name, mode):
+        from_box = '#id_%s_from' % field_name
+        to_box = '#id_%s_to' % field_name
+        choose_link = 'id_%s_add_link' % field_name
+        choose_all_link = 'id_%s_add_all_link' % field_name
+        remove_link = 'id_%s_remove_link' % field_name
+        remove_all_link = 'id_%s_remove_all_link' % field_name
+
+        # Initial positions ---------------------------------------------------
+        self.assertSelectOptions(from_box,
+                        [str(self.arthur.id), str(self.bob.id),
+                         str(self.cliff.id), str(self.jason.id),
+                         str(self.jenny.id), str(self.john.id)])
+        self.assertSelectOptions(to_box,
+                        [str(self.lisa.id), str(self.peter.id)])
+
+        # Click 'Choose all' --------------------------------------------------
+        if mode == 'horizontal':
+            self.selenium.find_element_by_id(choose_all_link).click()
+        elif mode == 'vertical':
+            # There 's no 'Choose all' button in vertical mode, so individually
+            # select all options and click 'Choose'.
+            for option in self.selenium.find_elements_by_css_selector(from_box + ' option'):
+                option.click()
+            self.selenium.find_element_by_id(choose_link).click()
+        self.assertSelectOptions(from_box, [])
+        self.assertSelectOptions(to_box,
+                        [str(self.lisa.id), str(self.peter.id),
+                         str(self.arthur.id), str(self.bob.id),
+                         str(self.cliff.id), str(self.jason.id),
+                         str(self.jenny.id), str(self.john.id)])
+
+        # Click 'Remove all' --------------------------------------------------
+        if mode == 'horizontal':
+            self.selenium.find_element_by_id(remove_all_link).click()
+        elif mode == 'vertical':
+            # There 's no 'Remove all' button in vertical mode, so individually
+            # select all options and click 'Remove'.
+            for option in self.selenium.find_elements_by_css_selector(to_box + ' option'):
+                option.click()
+            self.selenium.find_element_by_id(remove_link).click()
+        self.assertSelectOptions(from_box,
+                        [str(self.lisa.id), str(self.peter.id),
+                         str(self.arthur.id), str(self.bob.id),
+                         str(self.cliff.id), str(self.jason.id),
+                         str(self.jenny.id), str(self.john.id)])
+        self.assertSelectOptions(to_box, [])
+
+        # Choose some options ------------------------------------------------
+        self.get_select_option(from_box, str(self.lisa.id)).click()
+        self.get_select_option(from_box, str(self.jason.id)).click()
+        self.get_select_option(from_box, str(self.bob.id)).click()
+        self.get_select_option(from_box, str(self.john.id)).click()
+        self.selenium.find_element_by_id(choose_link).click()
+
+        self.assertSelectOptions(from_box,
+                        [str(self.peter.id), str(self.arthur.id),
+                         str(self.cliff.id), str(self.jenny.id)])
+        self.assertSelectOptions(to_box,
+                        [str(self.lisa.id), str(self.bob.id),
+                         str(self.jason.id), str(self.john.id)])
+
+        # Remove some options -------------------------------------------------
+        self.get_select_option(to_box, str(self.lisa.id)).click()
+        self.get_select_option(to_box, str(self.bob.id)).click()
+        self.selenium.find_element_by_id(remove_link).click()
+
+        self.assertSelectOptions(from_box,
+                        [str(self.peter.id), str(self.arthur.id),
+                         str(self.cliff.id), str(self.jenny.id),
+                         str(self.lisa.id), str(self.bob.id)])
+        self.assertSelectOptions(to_box,
+                        [str(self.jason.id), str(self.john.id)])
+
+        # Choose some more options --------------------------------------------
+        self.get_select_option(from_box, str(self.arthur.id)).click()
+        self.get_select_option(from_box, str(self.cliff.id)).click()
+        self.selenium.find_element_by_id(choose_link).click()
+
+        self.assertSelectOptions(from_box,
+                        [str(self.peter.id), str(self.jenny.id),
+                         str(self.lisa.id), str(self.bob.id)])
+        self.assertSelectOptions(to_box,
+                        [str(self.jason.id), str(self.john.id),
+                         str(self.arthur.id), str(self.cliff.id)])
+
+    def test_basic(self):
+        self.school.students = [self.lisa, self.peter]
+        self.school.alumni = [self.lisa, self.peter]
+        self.school.save()
+
+        self.admin_login(username='super', password='secret', login_url='/')
+        self.selenium.get(
+            '%s%s' % (self.live_server_url, '/admin_widgets/school/%s/' % self.school.id))
+
+        self.execute_basic_operations('students', 'vertical')
+        self.execute_basic_operations('alumni', 'horizontal')
+
+        # Save and check that everything is properly stored in the database ---
+        self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+        self.school = models.School.objects.get(id=self.school.id) # Reload from database
+        self.assertEqual(list(self.school.students.all()),
+                         [self.arthur, self.cliff, self.jason, self.john])
+        self.assertEqual(list(self.school.alumni.all()),
+                         [self.arthur, self.cliff, self.jason, self.john])
+
+class HorizontalVerticalFilterSeleniumChromeTests(HorizontalVerticalFilterSeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
