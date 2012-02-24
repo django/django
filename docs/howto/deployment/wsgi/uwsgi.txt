@@ -7,12 +7,7 @@ How to use Django with uWSGI
 uWSGI_ is a fast, self-healing and developer/sysadmin-friendly application
 container server coded in pure C.
 
-It also provides a fast `caching framework`_ but its documentation is not the
-purpose of this document.
-
 .. _uWSGI: http://projects.unbit.it/uwsgi/
-.. _caching framework: http://projects.unbit.it/uwsgi/wiki/CachingFramework
-
 
 Prerequisite: uWSGI
 ===================
@@ -27,89 +22,27 @@ line. For example::
     # or install LTS (long term support)
     pip install http://projects.unbit.it/downloads/uwsgi-lts.tar.gz
 
-.. _installation procedures: http://projects0.unbit.it/uwsgi/wiki/Install
-
-Prerequisite: general concept
-=============================
+.. _installation procedures: http://projects.unbit.it/uwsgi/wiki/Install
 
 uWSGI model
 -----------
 
 uWSGI operates on a client-server model. Your Web server (ie. nginx, Apache)
 communicates with a django-uwsgi "worker" process to serve dynamic content.
-The Web server can communicate with the uWSGI process either:
+See uWSGI's `background documentation`_ for more detail.
 
-* directly by the uWSGI protocol through a socket created by uWSGI,
-* or by proxying HTTP requests to the minimalist HTTP server built in uWSGI.
+.. _background documentation: http://projects.unbit.it/uwsgi/wiki/Background
 
-In the first case: the Web server can do uWSGI protocol (often with a
-module). It can then use either a Unix domain socket (a "named pipe" on Win32
-systems), or it can use a TCP socket. What you choose is a matterr of
-preference. Usually, a TCP socket is easier because connecting to a port
-doesn't require special permissions.
+Configuring and starting the uWSGI server for Django
+----------------------------------------------------
 
-In the second case, the Web server doesn't need to speak the uWSGI protocol. It
-just needs to be able to proxy HTTP requests to the HTTP server built-in uWSGI.
-The procedure is the same as proxying to any HTTP server. Note that the Web
-server is a "reverse proxy" in this case.
+uWSGI supports multiple ways to configure the process, see uWSGI's
+`configuration documentation`_ and `examples`_
 
-Configuring the uWSGI server
-----------------------------
+.. _configuration documentation: http://projects.unbit.it/uwsgi/wiki/Doc
+.. _examples: http://projects.unbit.it/uwsgi/wiki/Example
 
-In any case, when you set up your Web server, you'll just need to point its
-uwsgi or proxy module to the host/port or socket you specified when starting
-the uWSGI server.
-
-.. admonition:: Choosing the socket
-
-    The easiest is to set the socket to a high level (>49152) local port like
-    127.0.0.1:49152. If the socket is a file, the system administrator must
-    ensure that the Web server process has read, write and execute privileges
-    on that file.
-
-uWSGI is highly configurable and thus there are many ways to start the
-process. For example, uwsgi version 0.9.6.8 provides a hundred switches.  This
-guide demonstrates the most important of them, but is not a substitute the
-official manual and online documentation.
-
-uWSGI supports configuration through:
-
-* environment variables
-* command line switches
-* ldap
-* ini files
-* xml files
-* yaml files
-
-Managing the uWSGI server
--------------------------
-
-The system administrator controls the worker process pool by sending signals
-to the master process. For example, the unix kill command sends such signals.
-uWSGI can write the master process id to a "pidfile". A "pidfile" is a plain
-text file containing just a process id.
-
-Starting the server
--------------------
-
-Starting an uWSGI server is the role of the system administrator, like
-starting the Web server. It is *not* the role of the Web server to start the
-uWSGI server. This means:
-
-* the uWSGI server can be restarted or reloaded independently from the Web
-  server,
-* (except with Cherokee), it is the role of the system administrator to make
-  uWSGI start on boot or reboot: either through tools like supervisor or
-  daemontools, either directly at init level in a file like /etc/rc.local or
-  /etc/conf.d/local
-
-Managing uWSGI
-==============
-
-Starting the server
--------------------
-
-Example command line for a Web server that understands the uWSGI protocol::
+An example command to start a uWSGI server::
 
     uwsgi --chdir=/path/to/your/project
         --module='mysite.wsgi:application' \
@@ -156,110 +89,8 @@ Example ini configuration file usage::
 
     uwsgi --ini uwsgi.ini
 
-Read more `uWSGI configuration examples
-<http://projects.unbit.it/uwsgi/wiki/Example>`_.
 
-.. admonition:: Massive application hosting
+See the uWSGI docs on `managing the uWSGI process`_ for information on
+starting, stoping, and reloading the uWSGI workers.
 
-    `uWSGI emperor <http://projects.unbit.it/uwsgi/wiki/Emperor>`_ is a special
-    uWSGI process that can manage many master processes at once.
-
-Reloading the daemon
---------------------
-
-As mentioned above, the uWSGI master process is one of the core components of
-the uWSGI stack. The signal to brutally reload all the workers and the master
-process is SIGTERM. Example command to brutally reload the uWSGI processes::
-
-    kill -TERM `cat /tmp/project-master.pid`
-
-Patching the daemon
--------------------
-
-One of the great advantages of uWSGI is its ability to gradually restart each
-worker without losing any requests.
-
-For example, uWSGI can be signaled that worker should reload the code after
-handling their current request (if any) from bash::
-
-    # using kill to send the signal
-    kill -HUP `cat /tmp/project-master.pid`
-
-    # if uwsgi was started with --touch-reload=/tmp/somefile
-    touch /tmp/somefile
-
-Or from Python::
-
-    uwsgi.reload()
-
-Stopping the daemon
--------------------
-
-If you have the process running in the foreground, it's easy enough to stop it:
-Simply hitting ``Ctrl-C`` will stop and quit the uWSGI server. However, when
-you're dealing with background processes, you'll need to resort to the Unix
-``kill`` command.
-
-The ``kill`` is used to send a signal to the uWSGI master process. The
-`uWSGI signals are documented online
-<http://projects.unbit.it/uwsgi/wiki/uWSGISignals>`_. Example command to
-completely stop the uWSGI stack::
-
-    kill -INT `cat /tmp/project-master.pid`
-
-HTTP server configuration
-=========================
-
-Nginx setup
------------
-
-Nginx provides the `uwsgi module <http://wiki.nginx.org/HttpUwsgiModule>`_ by
-default since nginx 0.8.40. Configuring Nginx to use an uWSGI server is as
-simple as setting it up to proxy requests::
-
-    location / {
-        uwsgi_pass 127.0.0.1:49152;
-        # in case of a socket file:
-        # uwsgi_pass unix:/tmp/yourproject.sock;
-    }
-
-Note that default uwsgi parameters should be included somewhere in your Nginx
-configuration. For example::
-
-    http {
-        include       uwsgi_params;
-        # [...] normal nginx configuration here
-    }
-
-Cherokee setup
---------------
-
-Cherokee setup is documented in the `official Cherokee uWSGI documentation
-<http://www.cherokee-project.com/doc/cookbook_uwsgi.html>`_.
-
-Lighttpd setup
---------------
-
-`Lighttpd uwsgi module <http://projects.unbit.it/uwsgi/wiki/RunOnLighttpd>`_ is
-still experimental.
-
-Troubleshooting
-===============
-
-As usual, the first thing to do is to check the logs. This implies:
-
-* the web server log, which will indicate if it couldn't connect to the uWSGI
-  process,
-* the uWSGI log, which will indicate if an exception was thrown.
-
-Typical gotchas:
-
-* If the socket is a file, the Web server process should have read, write and
-  execute permissions on the socket file. The ``--chmod-socket`` option can do
-  it.
-* In some cases, for instance if uWSGI was started without ``--vacuum`` or
-  killed with ``SIGKILL``, it won't remove the socket and pidfile when it is
-  interrupted. It is safe to remove them manually and to start uWSGI again in
-  that case.
-* uWSGI can start the process in the foreground, this will make errors easily
-  visible to the system administrator.
+.. _managing the uWSGI process: http://projects.unbit.it/uwsgi/wiki/Management
