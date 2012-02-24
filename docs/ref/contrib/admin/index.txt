@@ -1045,11 +1045,10 @@ provided some extra mapping data that would not otherwise be available::
             pass
 
         def change_view(self, request, object_id, extra_context=None):
-            my_context = {
-                'osm_data': self.get_osm_info(),
-            }
+            extra_context = extra_context or {}
+            extra_context['osm_data'] = self.get_osm_info()
             return super(MyModelAdmin, self).change_view(request, object_id,
-                extra_context=my_context)
+                extra_context=extra_context)
 
 ``ModelAdmin`` media definitions
 --------------------------------
