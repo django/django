@@ -230,7 +230,7 @@ templates. In your Django settings, you specify a list of directories to check
 for templates. If a template doesn't exist in the first directory, it checks the
 second, and so on.
 
-Let's say the ``news/article_detail.html`` template was found. Here's what that
+Let's say the ``news/year_archive.html`` template was found. Here's what that
 might look like:
 
 .. code-block:: html+django
