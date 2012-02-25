@@ -45,7 +45,7 @@ and the `Wikipedia article`_.
 Glossary
 ========
 
-First lets define some terms that will help us to handle a common language:
+First let's define some terms that will help us to handle a common language:
 
 .. glossary::
 
