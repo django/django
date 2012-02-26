@@ -656,7 +656,7 @@ In case your ``ADMIN_MEDIA_PREFIX`` is set to an specific domain (e.g.
 
 .. warning::
 
-    If you're implicitely relying on the path of the admin static files on
+    If you're implicitly relying on the path of the admin static files on
     your server's file system when you deploy your site, you have to update
     that path. The files were moved from :file:`django/contrib/admin/media/`
     to :file:`django/contrib/admin/static/admin/`.
