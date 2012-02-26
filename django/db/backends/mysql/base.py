@@ -176,6 +176,12 @@ class DatabaseFeatures(BaseDatabaseFeatures):
 class DatabaseOperations(BaseDatabaseOperations):
     compiler_module = "django.db.backends.mysql.compiler"
 
+    def convert_values(self, value, field):
+        if (field and field.get_internal_type() in ("BooleanField", "NullBooleanField") and
+            value in (0, 1)):
+            value = bool(value)
+        return value
+
     def date_extract_sql(self, lookup_type, field_name):
         # http://dev.mysql.com/doc/mysql/en/date-and-time-functions.html
         if lookup_type == 'week_day':
