@@ -32,6 +32,9 @@ class UTC(tzinfo):
     Used only when pytz isn't available.
     """
 
+    def __repr__(self):
+        return "<UTC>"
+
     def utcoffset(self, dt):
         return ZERO
 
@@ -59,6 +62,9 @@ class LocalTimezone(tzinfo):
             self.DSTOFFSET = self.STDOFFSET
         self.DSTDIFF = self.DSTOFFSET - self.STDOFFSET
         tzinfo.__init__(self)
+
+    def __repr__(self):
+        return "<LocalTimezone>"
 
     def utcoffset(self, dt):
         if self._isdst(dt):

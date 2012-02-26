@@ -18,8 +18,8 @@ automatically-generated admin site.
     displayed on the public site. Django solves the problem of creating a
     unified interface for site administrators to edit content.
 
-    The admin isn't necessarily intended to be used by site visitors; it's for
-    site managers.
+    The admin isn't intended to be used by site visitors; it's for site
+    managers.
 
 Activate the admin site
 =======================
@@ -27,7 +27,7 @@ Activate the admin site
 The Django admin site is not activated by default -- it's an opt-in thing. To
 activate the admin site for your installation, do these three things:
 
-* Add ``"django.contrib.admin"`` to your :setting:`INSTALLED_APPS` setting.
+* Uncomment ``"django.contrib.admin"`` in the :setting:`INSTALLED_APPS` setting.
 
 * Run ``python manage.py syncdb``. Since you have added a new application
   to :setting:`INSTALLED_APPS`, the database tables need to be updated.
@@ -101,7 +101,7 @@ the Django admin index page:
 .. image:: _images/admin02t.png
    :alt: Django admin index page
 
-You should see a few other types of editable content, including groups, users
+You should see a few types of editable content, including groups, users
 and sites. These are core features Django ships with by default.
 
 Make the poll app modifiable in the admin
@@ -168,6 +168,11 @@ The bottom part of the page gives you a couple of options:
   type of object.
 
 * Delete -- Displays a delete confirmation page.
+
+If the value of "Date published" doesn't match the time when you created the
+poll in Tutorial 1, it probably means you forgot to set the correct value for
+the :setting:`TIME_ZONE` setting. Change it, reload the page, and check that
+the correct value appears.
 
 Change the "Date published" by clicking the "Today" and "Now" shortcuts. Then
 click "Save and continue editing." Then click "History" in the upper right.
@@ -337,12 +342,12 @@ columns, on the change list page for the object::
         # ...
         list_display = ('question', 'pub_date')
 
-Just for good measure, let's also include the ``was_published_today`` custom
+Just for good measure, let's also include the ``was_published_recently`` custom
 method from Tutorial 1::
 
     class PollAdmin(admin.ModelAdmin):
         # ...
-        list_display = ('question', 'pub_date', 'was_published_today')
+        list_display = ('question', 'pub_date', 'was_published_recently')
 
 Now the poll change list page looks like this:
 
@@ -350,17 +355,22 @@ Now the poll change list page looks like this:
    :alt: Polls change list page, updated
 
 You can click on the column headers to sort by those values -- except in the
-case of the ``was_published_today`` header, because sorting by the output of
-an arbitrary method is not supported. Also note that the column header for
-``was_published_today`` is, by default, the name of the method (with
-underscores replaced with spaces). But you can change that by giving that
-method (in ``models.py``) a ``short_description`` attribute::
+case of the ``was_published_recently`` header, because sorting by the output
+of an arbitrary method is not supported. Also note that the column header for
+``was_published_recently`` is, by default, the name of the method (with
+underscores replaced with spaces), and that each line contains the string
+representation of the output.
+
+You can improve that by giving that method (in ``models.py``) a few
+attributes, as follows::
 
     class Poll(models.Model):
         # ...
-        def was_published_today(self):
-            return self.pub_date.date() == datetime.date.today()
-        was_published_today.short_description = 'Published today?'
+        def was_published_recently(self):
+            return self.pub_date >= timezone.now() - datetime.timedelta(days=1)
+        was_published_recently.admin_order_field = 'pub_date'
+        was_published_recently.boolean = True
+        was_published_recently.short_description = 'Published recently?'
 
 Edit your admin.py file again and add an improvement to the Poll change list page: Filters. Add the
 following line to ``PollAdmin``::
@@ -374,9 +384,9 @@ That adds a "Filter" sidebar that lets people filter the change list by the
    :alt: Polls change list page, updated
 
 The type of filter displayed depends on the type of field you're filtering on.
-Because ``pub_date`` is a DateTimeField, Django knows to give the default
-filter options for DateTimeFields: "Any date," "Today," "Past 7 days,"
-"This month," "This year."
+Because ``pub_date`` is a :class:`~django.db.models.fields.DateTimeField`,
+Django knows to give appropriate filter options: "Any date," "Today," "Past 7
+days," "This month," "This year."
 
 This is shaping up well. Let's add some search capability::
 
@@ -397,7 +407,7 @@ At top level, it displays all available years. Then it drills down to months
 and, ultimately, days.
 
 Now's also a good time to note that change lists give you free pagination. The
-default is to display 50 items per page. Change-list pagination, search boxes,
+default is to display 100 items per page. Change-list pagination, search boxes,
 filters, date-hierarchies and column-header-ordering all work together like you
 think they should.
 
