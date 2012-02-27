@@ -607,14 +607,22 @@ class AdminViewFormUrlTest(TestCase):
             self.assertTrue('custom_filter_template.html' in [t.name for t in response.templates])
 
 
-class AdminJavaScriptTest(AdminViewBasicTest):
+class AdminJavaScriptTest(TestCase):
+    fixtures = ['admin-views-users.xml']
+
     urls = "regressiontests.admin_views.urls"
+
+    def setUp(self):
+        self.client.login(username='super', password='secret')
+
+    def tearDown(self):
+        self.client.logout()
 
     def testSingleWidgetFirsFieldFocus(self):
         """
         JavaScript-assisted auto-focus on first field.
         """
-        response = self.client.get('/test_admin/%s/admin_views/picture/add/' % self.urlbit)
+        response = self.client.get('/test_admin/%s/admin_views/picture/add/' % 'admin')
         self.assertContains(
             response,
             '<script type="text/javascript">document.getElementById("id_name").focus();</script>'
@@ -625,7 +633,7 @@ class AdminJavaScriptTest(AdminViewBasicTest):
         JavaScript-assisted auto-focus should work if a model/ModelAdmin setup
         is such that the first form field has a MultiWidget.
         """
-        response = self.client.get('/test_admin/%s/admin_views/reservation/add/' % self.urlbit)
+        response = self.client.get('/test_admin/%s/admin_views/reservation/add/' % 'admin')
         self.assertContains(
             response,
             '<script type="text/javascript">document.getElementById("id_start_date_0").focus();</script>'
@@ -640,7 +648,7 @@ class AdminJavaScriptTest(AdminViewBasicTest):
         """
         with override_settings(DEBUG=False):
             response = self.client.get(
-                '/test_admin/%s/admin_views/section/add/' % self.urlbit)
+                '/test_admin/%s/admin_views/section/add/' % 'admin')
             self.assertNotContains(response, 'jquery.js')
             self.assertContains(response, 'jquery.min.js')
             self.assertNotContains(response, 'prepopulate.js')
@@ -653,7 +661,7 @@ class AdminJavaScriptTest(AdminViewBasicTest):
             self.assertContains(response, 'inlines.min.js')
         with override_settings(DEBUG=True):
             response = self.client.get(
-                '/test_admin/%s/admin_views/section/add/' % self.urlbit)
+                '/test_admin/%s/admin_views/section/add/' % 'admin')
             self.assertContains(response, 'jquery.js')
             self.assertNotContains(response, 'jquery.min.js')
             self.assertContains(response, 'prepopulate.js')
