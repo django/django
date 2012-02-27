@@ -366,7 +366,7 @@ all the views that need it, enable the middleware and use
 CsrfViewMiddleware.process_view not used
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-There are cases when ``CsrfViewMiddleware.process_view``` may not have run
+There are cases when ``CsrfViewMiddleware.process_view`` may not have run
 before your view is run - 404 and 500 handlers, for example - but you still
 need the CSRF token in a form.
 
