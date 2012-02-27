@@ -349,6 +349,8 @@ Utilities
 
 .. function:: ensure_csrf_cookie(view)
 
+    .. versionadded:: 1.4
+
     This decorator forces a view to send the CSRF cookie.
 
 Scenarios
