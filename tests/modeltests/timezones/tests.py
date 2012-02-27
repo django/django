@@ -263,6 +263,15 @@ class LegacyDatabaseTests(BaseDateTimeTests):
         self.assertQuerysetEqual(Event.objects.dates('dt', 'day'),
                 [datetime.datetime(2011, 1, 1)], transform=lambda d: d)
 
+    def test_raw_sql(self):
+        # Regression test for #17755
+        dt = datetime.datetime(2011, 9, 1, 13, 20, 30)
+        event = Event.objects.create(dt=dt)
+        self.assertQuerysetEqual(
+                Event.objects.raw('SELECT * FROM timezones_event WHERE dt = %s', [dt]),
+                [event],
+                transform=lambda d: d)
+
 LegacyDatabaseTests = override_settings(USE_TZ=False)(LegacyDatabaseTests)
 
 
@@ -471,6 +480,15 @@ class NewDatabaseTests(BaseDateTimeTests):
         self.assertQuerysetEqual(Event.objects.dates('dt', 'day'),
                 [datetime.datetime(2010, 12, 31, tzinfo=UTC),
                  datetime.datetime(2011, 1, 1, tzinfo=UTC)],
+                transform=lambda d: d)
+
+    def test_raw_sql(self):
+        # Regression test for #17755
+        dt = datetime.datetime(2011, 9, 1, 13, 20, 30, tzinfo=EAT)
+        event = Event.objects.create(dt=dt)
+        self.assertQuerysetEqual(
+                Event.objects.raw('SELECT * FROM timezones_event WHERE dt = %s', [dt]),
+                [event],
                 transform=lambda d: d)
 
     def test_null_datetime(self):

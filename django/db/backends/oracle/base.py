@@ -52,7 +52,7 @@ from django.db.backends.oracle.client import DatabaseClient
 from django.db.backends.oracle.creation import DatabaseCreation
 from django.db.backends.oracle.introspection import DatabaseIntrospection
 from django.utils.encoding import smart_str, force_unicode
-from django.utils.timezone import is_aware, is_naive, utc
+from django.utils import timezone
 
 DatabaseError = Database.DatabaseError
 IntegrityError = Database.IntegrityError
@@ -339,9 +339,9 @@ WHEN (new.%(col_name)s IS NULL)
             return None
 
         # Oracle doesn't support tz-aware datetimes
-        if is_aware(value):
+        if timezone.is_aware(value):
             if settings.USE_TZ:
-                value = value.astimezone(utc).replace(tzinfo=None)
+                value = value.astimezone(timezone.utc).replace(tzinfo=None)
             else:
                 raise ValueError("Oracle backend does not support timezone-aware datetimes when USE_TZ is False.")
 
@@ -355,7 +355,7 @@ WHEN (new.%(col_name)s IS NULL)
             return datetime.datetime.strptime(value, '%H:%M:%S')
 
         # Oracle doesn't support tz-aware times
-        if is_aware(value):
+        if timezone.is_aware(value):
             raise ValueError("Oracle backend does not support timezone-aware times.")
 
         return datetime.datetime(1900, 1, 1, value.hour, value.minute,
@@ -561,6 +561,17 @@ class OracleParam(object):
     """
 
     def __init__(self, param, cursor, strings_only=False):
+        # With raw SQL queries, datetimes can reach this function
+        # without being converted by DateTimeField.get_db_prep_value.
+        if settings.USE_TZ and isinstance(param, datetime.datetime):
+            if timezone.is_naive(param):
+                warnings.warn(u"Oracle received a naive datetime (%s)"
+                              u" while time zone support is active." % param,
+                              RuntimeWarning)
+                default_timezone = timezone.get_default_timezone()
+                param = timezone.make_aware(param, default_timezone)
+            param = param.astimezone(timezone.utc).replace(tzinfo=None)
+
         if hasattr(param, 'bind_parameter'):
             self.smart_str = param.bind_parameter(cursor)
         else:
@@ -783,8 +794,8 @@ def _rowfactory(row, cursor):
         # of "dates" queries, which are returned as DATETIME.
         elif desc[1] in (Database.TIMESTAMP, Database.DATETIME):
             # Confirm that dt is naive before overwriting its tzinfo.
-            if settings.USE_TZ and value is not None and is_naive(value):
-                value = value.replace(tzinfo=utc)
+            if settings.USE_TZ and value is not None and timezone.is_naive(value):
+                value = value.replace(tzinfo=timezone.utc)
         elif desc[1] in (Database.STRING, Database.FIXED_CHAR,
                          Database.LONG_STRING):
             value = to_unicode(value)

@@ -19,7 +19,7 @@ from django.db.backends.sqlite3.creation import DatabaseCreation
 from django.db.backends.sqlite3.introspection import DatabaseIntrospection
 from django.utils.dateparse import parse_date, parse_datetime, parse_time
 from django.utils.safestring import SafeString
-from django.utils.timezone import is_aware, is_naive, utc
+from django.utils import timezone
 
 try:
     try:
@@ -37,9 +37,21 @@ IntegrityError = Database.IntegrityError
 def parse_datetime_with_timezone_support(value):
     dt = parse_datetime(value)
     # Confirm that dt is naive before overwriting its tzinfo.
-    if dt is not None and settings.USE_TZ and is_naive(dt):
-        dt = dt.replace(tzinfo=utc)
+    if dt is not None and settings.USE_TZ and timezone.is_naive(dt):
+        dt = dt.replace(tzinfo=timezone.utc)
     return dt
+
+def adapt_datetime_with_timezone_support(value):
+    # Equivalent to DateTimeField.get_db_prep_value. Used only by raw SQL.
+    if settings.USE_TZ:
+        if timezone.is_naive(value):
+            warnings.warn(u"SQLite received a naive datetime (%s)"
+                          u" while time zone support is active." % value,
+                          RuntimeWarning)
+            default_timezone = timezone.get_default_timezone()
+            value = timezone.make_aware(value, default_timezone)
+        value = value.astimezone(timezone.utc).replace(tzinfo=None)
+    return value.isoformat(" ")
 
 Database.register_converter("bool", lambda s: str(s) == '1')
 Database.register_converter("time", parse_time)
@@ -48,13 +60,14 @@ Database.register_converter("datetime", parse_datetime_with_timezone_support)
 Database.register_converter("timestamp", parse_datetime_with_timezone_support)
 Database.register_converter("TIMESTAMP", parse_datetime_with_timezone_support)
 Database.register_converter("decimal", util.typecast_decimal)
+Database.register_adapter(datetime.datetime, adapt_datetime_with_timezone_support)
 Database.register_adapter(decimal.Decimal, util.rev_typecast_decimal)
 if Database.version_info >= (2, 4, 1):
     # Starting in 2.4.1, the str type is not accepted anymore, therefore,
     # we convert all str objects to Unicode
     # As registering a adapter for a primitive type causes a small
     # slow-down, this adapter is only registered for sqlite3 versions
-    # needing it.
+    # needing it (Python 2.6 and up).
     Database.register_adapter(str, lambda s: s.decode('utf-8'))
     Database.register_adapter(SafeString, lambda s: s.decode('utf-8'))
 
@@ -147,9 +160,9 @@ class DatabaseOperations(BaseDatabaseOperations):
             return None
 
         # SQLite doesn't support tz-aware datetimes
-        if is_aware(value):
+        if timezone.is_aware(value):
             if settings.USE_TZ:
-                value = value.astimezone(utc).replace(tzinfo=None)
+                value = value.astimezone(timezone.utc).replace(tzinfo=None)
             else:
                 raise ValueError("SQLite backend does not support timezone-aware datetimes when USE_TZ is False.")
 
@@ -160,7 +173,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             return None
 
         # SQLite doesn't support tz-aware datetimes
-        if is_aware(value):
+        if timezone.is_aware(value):
             raise ValueError("SQLite backend does not support timezone-aware times.")
 
         return unicode(value)
