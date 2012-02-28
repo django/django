@@ -40,8 +40,12 @@ class DatabaseCreation(BaseDatabaseCreation):
         'URLField':                     'VARCHAR2(%(max_length)s)',
     }
 
+    # This dictionary stores the original values of user and passwd, which are
+    # changed during the tests. It's stored at the class level because the
+    # test database is created and destroyed by different connections (#17786).
+    remember = {}
+
     def __init__(self, connection):
-        self.remember = {}
         super(DatabaseCreation, self).__init__(connection)
 
     def _create_test_db(self, verbosity=1, autoclobber=False):
