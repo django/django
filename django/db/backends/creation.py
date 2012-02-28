@@ -353,7 +353,7 @@ class BaseDatabaseCreation(object):
     def destroy_test_db(self, old_database_name, verbosity=1):
         """
         Destroy a test database, prompting the user for confirmation if the
-        database already exists. Returns the name of the test database created.
+        database already exists.
         """
         self.connection.close()
         test_database_name = self.connection.settings_dict['NAME']
@@ -367,7 +367,7 @@ class BaseDatabaseCreation(object):
         # Temporarily use a new connection and a copy of the settings dict.
         # This prevents the production database from being exposed to potential
         # child threads while (or after) the test database is destroyed.
-        # Refs #10868.
+        # Refs #10868 and #17786.
         settings_dict = self.connection.settings_dict.copy()
         settings_dict['NAME'] = old_database_name
         backend = load_backend(settings_dict['ENGINE'])
