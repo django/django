@@ -871,6 +871,9 @@ could be generated, which, depending on the database, might have performance
 problems of its own when it comes to parsing or executing the SQL query. Always
 profile for your use case!
 
+Note that if you use ``iterator()`` to run the query, ``prefetch_related()``
+calls will be ignored since these two optimizations do not make sense together.
+
 extra
 ~~~~~
 
@@ -1429,6 +1432,9 @@ performance and a significant reduction in memory.
 
 Note that using ``iterator()`` on a ``QuerySet`` which has already been
 evaluated will force it to evaluate again, repeating the query.
+
+Also, use of ``iterator()`` causes previous ``prefetch_related()`` calls to be
+ignored since these two optimizations do not make sense together.
 
 latest
 ~~~~~~
