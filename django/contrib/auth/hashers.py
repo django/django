@@ -36,7 +36,7 @@ def check_password(password, encoded, setter=None, preferred='default'):
     encoded = smart_str(encoded)
 
     if len(encoded) == 32 and '$' not in encoded:
-        hasher = get_hasher('md5')
+        hasher = get_hasher('unsalted_md5')
     else:
         algorithm = encoded.split('$', 1)[0]
         hasher = get_hasher(algorithm)
@@ -69,11 +69,13 @@ def make_password(password, salt=None, hasher='default'):
     return hasher.encode(password, salt)
 
 
-def load_hashers():
+def load_hashers(password_hashers=None):
     global HASHERS
     global PREFERRED_HASHER
     hashers = []
-    for backend in settings.PASSWORD_HASHERS:
+    if not password_hashers:
+        password_hashers = settings.PASSWORD_HASHERS
+    for backend in password_hashers:
         try:
             mod_path, cls_name = backend.rsplit('.', 1)
             mod = importlib.import_module(mod_path)
@@ -301,6 +303,34 @@ class SHA1PasswordHasher(BasePasswordHasher):
 
 class MD5PasswordHasher(BasePasswordHasher):
     """
+    The Salted MD5 password hashing algorithm (not recommended)
+    """
+    algorithm = "md5"
+
+    def encode(self, password, salt):
+        assert password
+        assert salt and '$' not in salt
+        hash = hashlib.md5(salt + password).hexdigest()
+        return "%s$%s$%s" % (self.algorithm, salt, hash)
+
+    def verify(self, password, encoded):
+        algorithm, salt, hash = encoded.split('$', 2)
+        assert algorithm == self.algorithm
+        encoded_2 = self.encode(password, salt)
+        return constant_time_compare(encoded, encoded_2)
+
+    def safe_summary(self, encoded):
+        algorithm, salt, hash = encoded.split('$', 2)
+        assert algorithm == self.algorithm
+        return SortedDict([
+            (_('algorithm'), algorithm),
+            (_('salt'), mask_hash(salt, show=2)),
+            (_('hash'), mask_hash(hash)),
+        ])
+
+
+class UnsaltedMD5PasswordHasher(BasePasswordHasher):
+    """
     I am an incredibly insecure algorithm you should *never* use;
     stores unsalted MD5 hashes without the algorithm prefix.
 
@@ -308,7 +338,7 @@ class MD5PasswordHasher(BasePasswordHasher):
     this way. Some older Django installs still have these values
     lingering around so we need to handle and upgrade them properly.
     """
-    algorithm = "md5"
+    algorithm = "unsalted_md5"
 
     def salt(self):
         return ''

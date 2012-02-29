@@ -20,7 +20,7 @@ except ImportError:
 
 class TestUtilsHashPass(unittest.TestCase):
     def setUp(self):
-        load_hashers()
+        load_hashers(password_hashers=default_hashers)
 
     def test_simple(self):
         encoded = make_password('letmein')
@@ -47,6 +47,14 @@ class TestUtilsHashPass(unittest.TestCase):
 
     def test_md5(self):
         encoded = make_password('letmein', 'seasalt', 'md5')
+        self.assertEqual(encoded, 
+                         'md5$seasalt$f5531bef9f3687d0ccf0f617f0e25573')
+        self.assertTrue(is_password_usable(encoded))
+        self.assertTrue(check_password(u'letmein', encoded))
+        self.assertFalse(check_password('letmeinz', encoded))
+
+    def test_unsalted_md5(self):
+        encoded = make_password('letmein', 'seasalt', 'unsalted_md5')
         self.assertEqual(encoded, '0d107d09f5bbe40cade3de5c71e9e9b7')
         self.assertTrue(is_password_usable(encoded))
         self.assertTrue(check_password(u'letmein', encoded))
@@ -123,6 +131,3 @@ class TestUtilsHashPass(unittest.TestCase):
                 state['upgraded'] = True
             self.assertFalse(check_password('WRONG', encoded, setter))
             self.assertFalse(state['upgraded'])
-
-
-TestUtilsHashPass = override_settings(PASSWORD_HASHERS=default_hashers)(TestUtilsHashPass)
