@@ -185,10 +185,9 @@ class GeoSQLCompiler(compiler.SQLCompiler):
                                self.query.extra_select_fields.get(a, None),
                                self.connection)
                   for v, a in izip(row[rn_offset:index_start], aliases)]
-
-        if self.connection.ops.oracle or self.connection.ops.mysql or getattr(self.query, 'geo_values', False):
-            # We resolve the rest of the columns if we're on MySQL, Oracle or
-            # if the `geo_values` attribute is defined.
+        if self.connection.ops.oracle or getattr(self.query, 'geo_values', False):
+            # We resolve the rest of the columns if we're on Oracle or if
+            # the `geo_values` attribute is defined.
             for value, field in map(None, row[index_start:], fields):
                 values.append(self.query.convert_values(value, field, self.connection))
         else:

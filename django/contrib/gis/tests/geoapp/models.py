@@ -34,10 +34,6 @@ class Track(models.Model):
     objects = models.GeoManager()
     def __unicode__(self): return self.name
 
-class Truth(models.Model):
-    val = models.BooleanField()
-    objects = models.GeoManager()
-
 if not spatialite:
     class Feature(models.Model):
         name = models.CharField(max_length=20)

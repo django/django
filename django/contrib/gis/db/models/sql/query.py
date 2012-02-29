@@ -56,8 +56,8 @@ class GeoQuery(sql.Query):
         extra selection objects into Geometry and Distance objects.
         TODO: Make converted objects 'lazy' for less overhead.
         """
-        if connection.ops.oracle or connection.ops.mysql:
-            # On MySQL and Oracle, call their version of `convert_values` first.
+        if connection.ops.oracle:
+            # Running through Oracle's first.
             value = super(GeoQuery, self).convert_values(value, field or GeomField(), connection)
 
         if value is None:
