@@ -23,9 +23,8 @@ if (version < (1,2,1) or (version[:3] == (1, 2, 1) and
     from django.core.exceptions import ImproperlyConfigured
     raise ImproperlyConfigured("MySQLdb-1.2.1p2 or newer is required; you have %s" % Database.__version__)
 
-from MySQLdb.converters import conversions
+from MySQLdb.converters import conversions, Thing2Literal
 from MySQLdb.constants import FIELD_TYPE, CLIENT
-from _mysql import string_literal
 
 from django.db import utils
 from django.db.backends import *
@@ -66,7 +65,7 @@ def adapt_datetime_with_timezone_support(value, conv):
             default_timezone = timezone.get_default_timezone()
             value = timezone.make_aware(value, default_timezone)
         value = value.astimezone(timezone.utc).replace(tzinfo=None)
-    return string_literal(value.strftime("%Y-%m-%d %H:%M:%S"), conv)
+    return Thing2Literal(value.strftime("%Y-%m-%d %H:%M:%S"), conv)
 
 # MySQLdb-1.2.1 returns TIME columns as timedelta -- they are more like
 # timedelta in terms of actual behavior as they are signed and include days --
