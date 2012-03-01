@@ -1749,6 +1749,7 @@ Controls where Django stores session data. Valid values are:
 * ``'django.contrib.sessions.backends.file'``
 * ``'django.contrib.sessions.backends.cache'``
 * ``'django.contrib.sessions.backends.cached_db'``
+* ``'django.contrib.sessions.backends.signed_cookies'``
 
 See :doc:`/topics/http/sessions`.
 
