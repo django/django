@@ -107,8 +107,10 @@ class Command(NoArgsCommand):
                     prefixed_path = os.path.join(storage.prefix, path)
                 else:
                     prefixed_path = path
-                found_files[prefixed_path] = (storage, path)
-                handler(path, prefixed_path, storage)
+
+                if prefixed_path not in found_files:
+                    found_files[prefixed_path] = (storage, path)
+                    handler(path, prefixed_path, storage)
 
         # Here we check if the storage backend has a post_process
         # method and pass it the list of modified files.
@@ -207,7 +209,9 @@ Type 'yes' to continue, or 'no' to cancel: """
             self.clear_dir(os.path.join(path, d))
 
     def delete_file(self, path, prefixed_path, source_storage):
-        # Checks if the target file should be deleted if it already exists
+        """
+        Checks if the target file should be deleted if it already exists
+        """
         if self.storage.exists(prefixed_path):
             try:
                 # When was the target file modified last time?
