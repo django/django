@@ -35,7 +35,7 @@ For more documentation, read the source code in
 .. _Markdown: http://en.wikipedia.org/wiki/Markdown
 .. _reST (reStructured Text): http://en.wikipedia.org/wiki/ReStructuredText
 .. _PyTextile: http://loopcore.com/python-textile/
-.. _Python-markdown: http://www.freewisdom.org/projects/python-markdown
+.. _Python-markdown: http://pypi.python.org/pypi/Markdown
 .. _doc-utils: http://docutils.sf.net/
 
 reStructured Text
