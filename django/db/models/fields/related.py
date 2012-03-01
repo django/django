@@ -239,7 +239,7 @@ class SingleRelatedObjectDescriptor(object):
     def get_prefetch_query_set(self, instances):
         vals = set(instance._get_pk_val() for instance in instances)
         params = {'%s__pk__in' % self.related.field.name: vals}
-        return (self.get_query_set(),
+        return (self.get_query_set(instance=instances[0]),
                 attrgetter(self.related.field.attname),
                 lambda obj: obj._get_pk_val(),
                 True,
@@ -322,7 +322,7 @@ class ReverseSingleRelatedObjectDescriptor(object):
             params = {'%s__pk__in' % self.field.rel.field_name: vals}
         else:
             params = {'%s__in' % self.field.rel.field_name: vals}
-        return (self.get_query_set().filter(**params),
+        return (self.get_query_set(instance=instances[0]).filter(**params),
                 attrgetter(self.field.rel.field_name),
                 attrgetter(self.field.attname),
                 True,
@@ -461,7 +461,7 @@ class ForeignRelatedObjectsDescriptor(object):
                     return super(RelatedManager, self).get_query_set().using(db).filter(**self.core_filters)
 
             def get_prefetch_query_set(self, instances):
-                db = self._db or router.db_for_read(self.model)
+                db = self._db or router.db_for_read(self.model, instance=instances[0])
                 query = {'%s__%s__in' % (rel_field.name, attname):
                              set(getattr(obj, attname) for obj in instances)}
                 qs = super(RelatedManager, self).get_query_set().using(db).filter(**query)
@@ -543,8 +543,9 @@ def create_many_related_manager(superclass, rel):
                 return super(ManyRelatedManager, self).get_query_set().using(db)._next_is_sticky().filter(**self.core_filters)
 
         def get_prefetch_query_set(self, instances):
+            instance = instances[0]
             from django.db import connections
-            db = self._db or router.db_for_read(self.model)
+            db = self._db or router.db_for_read(instance.__class__, instance=instance)
             query = {'%s__pk__in' % self.query_field_name:
                          set(obj._get_pk_val() for obj in instances)}
             qs = super(ManyRelatedManager, self).get_query_set().using(db)._next_is_sticky().filter(**query)

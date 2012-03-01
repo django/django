@@ -321,7 +321,7 @@ def create_generic_related_manager(superclass):
                 return super(GenericRelatedObjectManager, self).get_query_set().using(db).filter(**self.core_filters)
 
         def get_prefetch_query_set(self, instances):
-            db = self._db or router.db_for_read(self.model)
+            db = self._db or router.db_for_read(self.model, instance=instances[0])
             query = {
                 '%s__pk' % self.content_type_field_name: self.content_type.id,
                 '%s__in' % self.object_id_field_name:

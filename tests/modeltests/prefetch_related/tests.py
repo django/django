@@ -483,3 +483,92 @@ class NullableTest(TestCase):
             bulk = Employee.objects.prefetch_related('serfs').in_bulk([boss1.pk, boss2.pk])
             for b in bulk.values():
                 list(b.serfs.all())
+
+
+class MultiDbTests(TestCase):
+    multi_db = True
+
+    def test_using_is_honored_m2m(self):
+        B = Book.objects.using('other')
+        A = Author.objects.using('other')
+        book1 = B.create(title="Poems")
+        book2 = B.create(title="Jane Eyre")
+        book3 = B.create(title="Wuthering Heights")
+        book4 = B.create(title="Sense and Sensibility")
+
+        author1 = A.create(name="Charlotte", first_book=book1)
+        author2 = A.create(name="Anne", first_book=book1)
+        author3 = A.create(name="Emily", first_book=book1)
+        author4 = A.create(name="Jane", first_book=book4)
+
+        book1.authors.add(author1, author2, author3)
+        book2.authors.add(author1)
+        book3.authors.add(author3)
+        book4.authors.add(author4)
+
+        # Forward
+        qs1 = B.prefetch_related('authors')
+        with self.assertNumQueries(2, using='other'):
+            books = "".join(["%s (%s)\n" %
+                             (book.title, ", ".join(a.name for a in book.authors.all()))
+                             for book in qs1])
+        self.assertEqual(books,
+                         "Poems (Charlotte, Anne, Emily)\n"
+                         "Jane Eyre (Charlotte)\n"
+                         "Wuthering Heights (Emily)\n"
+                         "Sense and Sensibility (Jane)\n")
+
+        # Reverse
+        qs2 = A.prefetch_related('books')
+        with self.assertNumQueries(2, using='other'):
+            authors = "".join(["%s: %s\n" %
+                               (author.name, ", ".join(b.title for b in author.books.all()))
+                               for author in qs2])
+        self.assertEquals(authors,
+                          "Charlotte: Poems, Jane Eyre\n"
+                          "Anne: Poems\n"
+                          "Emily: Poems, Wuthering Heights\n"
+                          "Jane: Sense and Sensibility\n")
+
+    def test_using_is_honored_fkey(self):
+        B = Book.objects.using('other')
+        A = Author.objects.using('other')
+        book1 = B.create(title="Poems")
+        book2 = B.create(title="Sense and Sensibility")
+
+        author1 = A.create(name="Charlotte Bronte", first_book=book1)
+        author2 = A.create(name="Jane Austen", first_book=book2)
+
+        # Forward
+        with self.assertNumQueries(2, using='other'):
+            books = ", ".join(a.first_book.title for a in A.prefetch_related('first_book'))
+        self.assertEqual("Poems, Sense and Sensibility", books)
+
+        # Reverse
+        with self.assertNumQueries(2, using='other'):
+            books = "".join("%s (%s)\n" %
+                            (b.title, ", ".join(a.name for a in b.first_time_authors.all()))
+                            for b in B.prefetch_related('first_time_authors'))
+        self.assertEqual(books,
+                         "Poems (Charlotte Bronte)\n"
+                         "Sense and Sensibility (Jane Austen)\n")
+
+    def test_using_is_honored_inheritance(self):
+        B = BookWithYear.objects.using('other')
+        A = AuthorWithAge.objects.using('other')
+        book1 = B.create(title="Poems", published_year=2010)
+        book2 = B.create(title="More poems", published_year=2011)
+        author1 = A.create(name='Jane', first_book=book1, age=50)
+        author2 = A.create(name='Tom', first_book=book1, age=49)
+
+        # parent link
+        with self.assertNumQueries(2, using='other'):
+            authors = ", ".join(a.author.name for a in A.prefetch_related('author'))
+
+        self.assertEqual(authors, "Jane, Tom")
+
+        # child link
+        with self.assertNumQueries(2, using='other'):
+            ages = ", ".join(str(a.authorwithage.age) for a in A.prefetch_related('authorwithage'))
+
+        self.assertEqual(ages, "50, 49")
