@@ -4,7 +4,7 @@ Comparing two html documents.
 import re
 from HTMLParser import HTMLParseError
 from django.utils.encoding import force_unicode
-from django.utils.htmlparser import HTMLParser
+from django.utils.html_parser import HTMLParser
 
 
 WHITESPACE = re.compile('\s+')
