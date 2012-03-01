@@ -245,6 +245,58 @@ class TestBuildStaticExcludeNoDefaultIgnore(BuildStaticTestCase, TestDefaults):
         self.assertFileContains('test/CVS', 'should be ignored')
 
 
+class TestCollectionFilesOverride(BuildStaticTestCase):
+    """
+    Test overriding duplicated files by ``collectstatic`` management command.
+    Check for proper handling of apps order in INSTALLED_APPS even if file
+    modification dates are in different order:
+
+        'regressiontests.staticfiles_tests.apps.test',
+        'regressiontests.staticfiles_tests.apps.no_label',
+    """
+    def setUp(self):
+        self.orig_path = os.path.join(TEST_ROOT, 'apps', 'no_label', 'static', 'file2.txt')
+        # get modification and access times for no_label/static/file2.txt
+        self.orig_mtime = os.path.getmtime(self.orig_path)
+        self.orig_atime = os.path.getatime(self.orig_path)
+
+        # prepare duplicate of file2.txt from no_label app
+        # this file will have modification time older than no_label/static/file2.txt
+        # anyway it should be taken to STATIC_ROOT because 'test' app is before
+        # 'no_label' app in INSTALLED_APPS
+        self.testfile_path = os.path.join(TEST_ROOT, 'apps', 'test', 'static', 'file2.txt')
+        f = open(self.testfile_path, 'w+')
+        f.write('duplicate of file2.txt')
+        f.close()
+        os.utime(self.testfile_path, (self.orig_atime - 1, self.orig_mtime - 1))
+        super(TestCollectionFilesOverride, self).setUp()
+
+    def tearDown(self):
+        if os.path.exists(self.testfile_path):
+            os.unlink(self.testfile_path)
+        # set back original modification time
+        os.utime(self.orig_path, (self.orig_atime, self.orig_mtime))
+
+    def test_override(self):
+        self.assertFileContains('file2.txt', 'duplicate of file2.txt')
+
+        # run collectstatic again
+        self.run_collectstatic()
+
+        self.assertFileContains('file2.txt', 'duplicate of file2.txt')
+
+        # and now change modification time of no_label/static/file2.txt
+        # test app is first in INSTALLED_APPS so file2.txt should remain unmodified
+        mtime = os.path.getmtime(self.testfile_path)
+        atime = os.path.getatime(self.testfile_path)
+        os.utime(self.orig_path, (mtime + 1, atime + 1))
+
+        # run collectstatic again
+        self.run_collectstatic()
+
+        self.assertFileContains('file2.txt', 'duplicate of file2.txt')
+
+
 class TestNoFilesCreated(object):
 
     def test_no_files_created(self):

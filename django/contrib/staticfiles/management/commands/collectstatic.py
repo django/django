@@ -76,6 +76,7 @@ Type 'yes' to continue, or 'no' to cancel: """)
             if confirm != 'yes':
                 raise CommandError("Collecting static files cancelled.")
 
+        processed_files = []
         for finder in finders.get_finders():
             for path, storage in finder.list(ignore_patterns):
                 # Prefix the relative path if the source storage contains it
@@ -83,10 +84,13 @@ Type 'yes' to continue, or 'no' to cancel: """)
                     prefixed_path = os.path.join(storage.prefix, path)
                 else:
                     prefixed_path = path
+                if prefixed_path in processed_files:
+                    continue
                 if symlink:
                     self.link_file(path, prefixed_path, storage, **options)
                 else:
                     self.copy_file(path, prefixed_path, storage, **options)
+                processed_files.append(prefixed_path)
 
         actual_count = len(self.copied_files) + len(self.symlinked_files)
         unmodified_count = len(self.unmodified_files)
@@ -196,9 +200,7 @@ Type 'yes' to continue, or 'no' to cancel: """)
                     os.makedirs(os.path.dirname(full_path))
                 except OSError:
                     pass
-                shutil.copy2(source_path, full_path)
-            else:
-                source_file = source_storage.open(path)
-                self.storage.save(prefixed_path, source_file)
+            source_file = source_storage.open(path)
+            self.storage.save(prefixed_path, source_file)
         if not prefixed_path in self.copied_files:
             self.copied_files.append(prefixed_path)
