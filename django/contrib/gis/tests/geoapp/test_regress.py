@@ -7,7 +7,7 @@ from django.contrib.gis.shortcuts import render_to_kmz
 from django.db.models import Count
 from django.test import TestCase
 
-from .models import City, PennsylvaniaCity, State
+from .models import City, PennsylvaniaCity, State, Truth
 
 
 class GeoRegressionTests(TestCase):
@@ -64,3 +64,17 @@ class GeoRegressionTests(TestCase):
         "Regression for #16409. Make sure defer() and only() work with annotate()"
         self.assertIsInstance(list(City.objects.annotate(Count('point')).defer('name')), list)
         self.assertIsInstance(list(City.objects.annotate(Count('point')).only('name')), list)
+
+    def test07_boolean_conversion(self):
+        "Testing Boolean value conversion with the spatial backend, see #15169."
+        t1 = Truth.objects.create(val=True)
+        t2 = Truth.objects.create(val=False)
+
+        val1 = Truth.objects.get(pk=1).val
+        val2 = Truth.objects.get(pk=2).val
+        # verify types -- should't be 0/1
+        self.assertIsInstance(val1, bool)
+        self.assertIsInstance(val2, bool)
+        # verify values
+        self.assertEqual(val1, True)
+        self.assertEqual(val2, False)
