@@ -760,18 +760,20 @@ Django provides two functions in :mod:`django.contrib.auth`:
 Manually managing a user's password
 -----------------------------------
 
-.. currentmodule:: django.contrib.auth.utils
+.. currentmodule:: django.contrib.auth.hashers
 
 .. versionadded:: 1.4
-    The :mod:`django.contrib.auth.utils` module provides a set of functions
+    The :mod:`django.contrib.auth.hashers` module provides a set of functions
     to create and validate hashed password. You can use them independently
     from the ``User`` model.
 
 .. function:: check_password()
 
+    .. versionadded:: 1.4
+
     If you'd like to manually authenticate a user by comparing a plain-text
     password to the hashed password in the database, use the convenience
-    function :func:`django.contrib.auth.utils.check_password`. It takes two
+    function :func:`django.contrib.auth.hashers.check_password`. It takes two
     arguments: the plain-text password to check, and the full value of a
     user's ``password`` field in the database to check against, and returns
     ``True`` if they match, ``False`` otherwise.
@@ -785,14 +787,14 @@ Manually managing a user's password
     Currently supported algorithms are: ``'sha1'``, ``'md5'`` and ``'crypt'``
     if you have the ``crypt`` library installed. If the second argument is
     ``None``, an unusable password is returned (a one that will be never
-    accepted by :func:`django.contrib.auth.utils.check_password`).
+    accepted by :func:`django.contrib.auth.hashers.check_password`).
 
 .. function:: is_password_usable()
 
    .. versionadded:: 1.4
 
    Checks if the given string is a hashed password that has a chance
-   of being verified against :func:`django.contrib.auth.utils.check_password`.
+   of being verified against :func:`django.contrib.auth.hashers.check_password`.
 
 
 How to log a user out

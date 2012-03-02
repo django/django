@@ -536,7 +536,7 @@ Django 1.4 also includes several smaller improvements worth noting:
   page.
 
 * The :func:`django.contrib.auth.models.check_password` function has been moved
-  to the :mod:`django.contrib.auth.utils` module. Importing it from the old
+  to the :mod:`django.contrib.auth.hashers` module. Importing it from the old
   location will still work, but you should update your imports.
 
 * The :djadmin:`collectstatic` management command now has a ``--clear`` option
