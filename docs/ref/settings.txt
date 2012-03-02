@@ -1339,6 +1339,26 @@ The URL where requests are redirected after login when the
 This is used by the :func:`~django.contrib.auth.decorators.login_required`
 decorator, for example.
 
+.. _`note on LOGIN_REDIRECT_URL setting`:
+
+.. note::
+    You can use :func:`~django.core.urlresolvers.reverse_lazy` to reference
+    URLs by their name instead of providing a hardcoded value. Assuming a
+    ``urls.py`` with an URL pattern named ``home``::
+
+        urlpatterns = patterns('',
+            url('^welcome/$', 'test_app.views.home', name='home'),
+        )
+
+    You can use :func:`~django.core.urlresolvers.reverse_lazy` like this::
+
+        from django.core.urlresolvers import reverse_lazy
+
+        LOGIN_REDIRECT_URL = reverse_lazy('home')
+
+    This also works fine with localized URLs using
+    :func:`~django.conf.urls.i18n.i18n_patterns`.
+
 .. setting:: LOGIN_URL
 
 LOGIN_URL
@@ -1349,6 +1369,9 @@ Default: ``'/accounts/login/'``
 The URL where requests are redirected for login, especially when using the
 :func:`~django.contrib.auth.decorators.login_required` decorator.
 
+.. note::
+    See the `note on LOGIN_REDIRECT_URL setting`_
+
 .. setting:: LOGOUT_URL
 
 LOGOUT_URL
@@ -1357,6 +1380,9 @@ LOGOUT_URL
 Default: ``'/accounts/logout/'``
 
 LOGIN_URL counterpart.
+
+.. note::
+    See the `note on LOGIN_REDIRECT_URL setting`_
 
 .. setting:: MANAGERS
 

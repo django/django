@@ -888,6 +888,8 @@ reverse_lazy()
 
 A lazily evaluated version of `reverse()`_.
 
+.. function:: reverse_lazy(viewname, [urlconf=None, args=None, kwargs=None, current_app=None])
+
 It is useful for when you need to use a URL reversal before your project's
 URLConf is loaded. Some common cases where this function is necessary are:
 
