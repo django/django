@@ -24,6 +24,15 @@ probably already have it installed.
 
 .. _jython: http://jython.org/
 
+.. admonition:: Python on Windows
+
+    On Windows, you might need to adjust your ``PATH`` environment variable
+    to include paths to Python executable and additional scripts. For example,
+    if your Python is installed in ``C:\Python27\``, the following paths need
+    to be added to ``PATH``::
+
+        C:\Python27\;C:\Python27\Scripts;
+
 Install Apache and mod_wsgi
 =============================
 
@@ -210,7 +219,7 @@ Installing an official release
 4. If you're using Linux, Mac OS X or some other flavor of Unix, enter
    the command ``sudo python setup.py install`` at the shell prompt.
    If you're using Windows, start up a command shell with administrator
-   privileges and run the command ``setup.py install``.
+   privileges and run the command ``python setup.py install``.
 
 These commands will install Django in your Python installation's
 ``site-packages`` directory.
