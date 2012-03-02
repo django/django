@@ -280,7 +280,9 @@ Manager functions
     .. method:: models.UserManager.create_user(username, email=None, password=None)
 
         .. versionchanged:: 1.4
-           The ``email`` parameter was made optional.
+           The ``email`` parameter was made optional. The username
+           parameter is now checked for emptiness and raises a
+           :exc:`ValueError` in case of a negative result.
 
         Creates, saves and returns a :class:`~django.contrib.auth.models.User`.
 

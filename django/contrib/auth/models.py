@@ -149,6 +149,8 @@ class UserManager(models.Manager):
         Creates and saves a User with the given username, email and password.
         """
         now = timezone.now()
+        if not username:
+            raise ValueError('The given username must be set')
         email = UserManager.normalize_email(email)
         user = self.model(username=username, email=email,
                           is_staff=False, is_active=True, is_superuser=False,
