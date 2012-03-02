@@ -33,9 +33,12 @@ class LocaleMiddleware(object):
             language_path = '/%s%s' % (language, request.path_info)
             if settings.APPEND_SLASH and not language_path.endswith('/'):
                 language_path = language_path + '/'
+
             if is_valid_path(language_path, urlconf):
-                return HttpResponseRedirect(
-                    '/%s%s' % (language, request.get_full_path()))
+                language_url = "%s://%s/%s%s" % (
+                    request.is_secure() and 'https' or 'http',
+                    request.get_host(), language, request.get_full_path())
+                return HttpResponseRedirect(language_url)
         translation.deactivate()
 
         patch_vary_headers(response, ('Accept-Language',))

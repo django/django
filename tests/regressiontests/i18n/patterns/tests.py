@@ -182,12 +182,10 @@ class URLRedirectWithoutTrailingSlashTests(URLTestCaseBase):
         self.assertRedirects(response, '/not-prefixed/', 301)
 
     def test_en_redirect(self):
-        response = self.client.get('/account/register', HTTP_ACCEPT_LANGUAGE='en')
+        response = self.client.get('/account/register', HTTP_ACCEPT_LANGUAGE='en', follow=True)
         # target status code of 301 because of CommonMiddleware redirecting
-        self.assertRedirects(response, '/en/account/register', 302, target_status_code=301)
-
-        response = self.client.get(response['location'])
-        self.assertRedirects(response, '/en/account/register/', 301)
+        self.assertIn(('http://testserver/en/account/register/', 301), response.redirect_chain)
+        self.assertRedirects(response, '/en/account/register/', 302)
 
 
 class URLRedirectWithoutTrailingSlashSettingTests(URLTestCaseBase):
