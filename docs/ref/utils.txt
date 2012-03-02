@@ -591,12 +591,18 @@ For a complete discussion on the usage of the following see the
     * ``False`` = left-to-right layout
     * ``True`` = right-to-left layout
 
-.. function:: get_language_from_request(request)
+.. function:: get_language_from_request(request, check_path=False)
+
+    .. versionchanged:: 1.4
 
     Analyzes the request to find what language the user wants the system to show.
     Only languages listed in settings.LANGUAGES are taken into account. If the user
     requests a sublanguage where we have a main language, we send out the main
     language.
+
+    If ``check_path`` is ``True`` the function first checks the requested URL
+    whether its path begins with a language code listed in the
+    :setting:`LANGUAGES` setting.
 
 .. function:: to_locale(language)
 
