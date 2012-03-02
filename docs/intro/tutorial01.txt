@@ -222,7 +222,8 @@ your database connection settings.
 If you're new to databases, we recommend simply using SQLite by setting
 :setting:`ENGINE` to ``'django.db.backends.sqlite3'`` and :setting:`NAME` to
 the place where you'd like to store the database. SQLite is included as part
-of Python 2.5 and later, so you won't need to install anything else.
+of Python 2.5 and later, so you won't need to install anything else to support
+your database.
 
 .. note::
 
@@ -234,11 +235,10 @@ of Python 2.5 and later, so you won't need to install anything else.
     database file will be created automatically when it is needed.
 
 While you're editing :file:`settings.py`, set :setting:`TIME_ZONE` to your
-time zone. The default value isn't correct for you, unless you happen to live
-near Chicago.
+time zone. The default value is the Central time zone in the U.S. (Chicago).
 
-Also, take note of the :setting:`INSTALLED_APPS` setting towards the bottom of
-the file. That variable holds the names of all Django applications that are
+Also, note the :setting:`INSTALLED_APPS` setting toward the bottom of
+the file. That holds the names of all Django applications that are
 activated in this Django instance. Apps can be used in multiple projects, and
 you can package and distribute them for use by others in their projects.
 
@@ -510,10 +510,10 @@ Now, run :djadmin:`syncdb` again to create those model tables in your database:
 
     python manage.py syncdb
 
-The :djadmin:`syncdb` command runs the sql from :djadmin:`sqlall` on your
+The :djadmin:`syncdb` command runs the SQL from :djadmin:`sqlall` on your
 database for all apps in :setting:`INSTALLED_APPS` that don't already exist in
 your database. This creates all the tables, initial data and indexes for any
-apps you have added to your project since the last time you ran syncdb.
+apps you've added to your project since the last time you ran syncdb.
 :djadmin:`syncdb` can be called as often as you like, and it will only ever
 create the tables that don't exist.
 
@@ -638,7 +638,7 @@ demonstration::
 
 Note the addition of ``import datetime`` and ``from django.utils import
 timezone``, to reference Python's standard :mod:`datetime` module and Django's
-time zone-related utilities in :mod:`django.utils.timezone` respectively. If
+time-zone-related utilities in :mod:`django.utils.timezone`, respectively. If
 you aren't familiar with time zone handling in Python, you can learn more in
 the :doc:`time zone support docs </topics/i18n/timezones>`.
 

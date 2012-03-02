@@ -155,13 +155,13 @@ MySQL has several `storage engines`_ (previously called table types). You can
 change the default storage engine in the server configuration.
 
 Until MySQL 5.5.4, the default engine was MyISAM_ [#]_. The main drawbacks of
-MyISAM are that it doesn't support transactions or enforce foreign keys
+MyISAM are that it doesn't support transactions or enforce foreign-key
 constraints. On the plus side, it's currently the only engine that supports
 full-text indexing and searching.
 
 Since MySQL 5.5.5, the default storage engine is InnoDB_. This engine is fully
 transactional and supports foreign key references. It's probably the best
-choice at this point in time.
+choice at this point.
 
 .. versionchanged:: 1.4
 

@@ -13,7 +13,7 @@ from .models import City, PennsylvaniaCity, State
 class GeoRegressionTests(TestCase):
 
     def test01_update(self):
-        "Testing GeoQuerySet.update(), see #10411."
+        "Testing GeoQuerySet.update(). See #10411."
         pnt = City.objects.get(name='Pueblo').point
         bak = pnt.clone()
         pnt.y += 0.005
@@ -25,7 +25,7 @@ class GeoRegressionTests(TestCase):
         self.assertEqual(bak, City.objects.get(name='Pueblo').point)
 
     def test02_kmz(self):
-        "Testing `render_to_kmz` with non-ASCII data, see #11624."
+        "Testing `render_to_kmz` with non-ASCII data. See #11624."
         name = '\xc3\x85land Islands'.decode('iso-8859-1')
         places = [{'name' : name,
                   'description' : name,
@@ -36,7 +36,7 @@ class GeoRegressionTests(TestCase):
     @no_spatialite
     @no_mysql
     def test03_extent(self):
-        "Testing `extent` on a table with a single point, see #11827."
+        "Testing `extent` on a table with a single point. See #11827."
         pnt = City.objects.get(name='Pueblo').point
         ref_ext = (pnt.x, pnt.y, pnt.x, pnt.y)
         extent = City.objects.filter(name='Pueblo').extent()
@@ -44,14 +44,14 @@ class GeoRegressionTests(TestCase):
             self.assertAlmostEqual(ref_val, val, 4)
 
     def test04_unicode_date(self):
-        "Testing dates are converted properly, even on SpatiaLite, see #16408."
+        "Testing dates are converted properly, even on SpatiaLite. See #16408."
         founded = datetime(1857, 5, 23)
         mansfield = PennsylvaniaCity.objects.create(name='Mansfield', county='Tioga', point='POINT(-77.071445 41.823881)',
                                                     founded=founded)
         self.assertEqual(founded, PennsylvaniaCity.objects.dates('founded', 'day')[0])
 
     def test05_empty_count(self):
-         "Testing that PostGISAdapter.__eq__ does check empty strings, see #13670"
+         "Testing that PostGISAdapter.__eq__ does check empty strings. See #13670."
          # contrived example, but need a geo lookup paired with an id__in lookup
          pueblo = City.objects.get(name='Pueblo')
          state = State.objects.filter(poly__contains=pueblo.point)
@@ -61,6 +61,6 @@ class GeoRegressionTests(TestCase):
          self.assertEqual(cities_within_state.count(), 1)
 
     def test06_defer_or_only_with_annotate(self):
-        "Regression for #16409 - make sure defer() and only() work with annotate()"
+        "Regression for #16409. Make sure defer() and only() work with annotate()"
         self.assertIsInstance(list(City.objects.annotate(Count('point')).defer('name')), list)
         self.assertIsInstance(list(City.objects.annotate(Count('point')).only('name')), list)

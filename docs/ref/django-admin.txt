@@ -379,8 +379,8 @@ installation will be aborted, and any data installed in the call to
 .. admonition:: MySQL with MyISAM and fixtures
 
     The MyISAM storage engine of MySQL doesn't support transactions or
-    constraints, so you won't get a rollback if multiple transaction files are
-    found, or validation of fixture data, if you use MyISAM tables.
+    constraints, so if you use MyISAM, you won't get validation of fixture
+    data, or a rollback if multiple transaction files are found.
 
 Database-specific fixtures
 ~~~~~~~~~~~~~~~~~~~~~~~~~~

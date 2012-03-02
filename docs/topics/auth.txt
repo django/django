@@ -1461,9 +1461,9 @@ The permission_required decorator
 Limiting access to generic views
 --------------------------------
 
-Controlling access to a :doc:`class-based generic view </ref/class-based-views>`
-is done by decorating the :meth:`View.dispatch <django.views.generic.base.View.dispatch>`
-method on the class. See :ref:`decorating-class-based-views` for the details.
+To limit access to a :doc:`class-based generic view </ref/class-based-views>`,
+decorate the :meth:`View.dispatch <django.views.generic.base.View.dispatch>`
+method on the class. See :ref:`decorating-class-based-views` for details.
 
 Function-based generic views
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -621,8 +621,8 @@ SECRET_KEY setting is required
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Running Django with an empty or known :setting:`SECRET_KEY` disables many of
-Django's security protections, and can lead to remote-code-execution
-vulnerabilities; no Django site should ever be run without a
+Django's security protections and can lead to remote-code-execution
+vulnerabilities. No Django site should ever be run without a
 :setting:`SECRET_KEY`.
 
 In Django 1.4, starting Django with an empty :setting:`SECRET_KEY` will raise a
@@ -630,7 +630,6 @@ In Django 1.4, starting Django with an empty :setting:`SECRET_KEY` will raise a
 refuse to start. This is slightly accelerated from the usual deprecation path
 due to the severity of the consequences of running Django with no
 :setting:`SECRET_KEY`.
-
 
 django.contrib.admin
 ~~~~~~~~~~~~~~~~~~~~
@@ -1000,7 +999,7 @@ Session cookies now have the ``httponly`` flag by default
 Session cookies now include the ``httponly`` attribute by default to
 help reduce the impact of potential XSS attacks. As a consequence of
 this change, session cookie data, including sessionid, is no longer
-accessible from Javascript in many browsers. For strict backwards
+accessible from JavaScript in many browsers. For strict backwards
 compatibility, use ``SESSION_COOKIE_HTTPONLY = False`` in your
 settings file.
 
@@ -1055,11 +1054,11 @@ management commands in a script, use
 
 Previously, the :ttag:`extends` tag used a buggy method of parsing arguments,
 which could lead to it erroneously considering an argument as a string literal
-when it wasn't.  It now utilises ``parser.compile_filter`` like other tags.
+when it wasn't. It now uses ``parser.compile_filter``, like other tags.
 
 The internals of the tag aren't part of the official stable API, but in the
 interests of full disclosure, the ``ExtendsNode.__init__`` definition has
-changed which may break any custom tags that use this node class.
+changed, which may break any custom tags that use this class.
 
 Features deprecated in 1.4
 ==========================

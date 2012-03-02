@@ -73,10 +73,10 @@ The :meth:`~django.db.models.Model.save` method has no return value.
 .. seealso::
 
     :meth:`~django.db.models.Model.save` takes a number of advanced options not
-    described here.  See the documentation for
+    described here. See the documentation for
     :meth:`~django.db.models.Model.save` for complete details.
 
-    To create an object and save it all in one step see the
+    To create and save an object in a single step, use the
     :meth:`~django.db.models.query.QuerySet.create()` method.
 
 Saving changes to objects
@@ -98,9 +98,9 @@ Saving ``ForeignKey`` and ``ManyToManyField`` fields
 ----------------------------------------------------
 
 Updating a :class:`~django.db.models.ForeignKey` field works exactly the same
-way as saving a normal field; simply assign an object of the right type to the
-field in question.  This example updates the ``blog`` attribute of an ``Entry``
-instance ``entry``::
+way as saving a normal field -- simply assign an object of the right type to
+the field in question. This example updates the ``blog`` attribute of an
+``Entry`` instance ``entry``::
 
     >>> from blog.models import Entry
     >>> entry = Entry.objects.get(pk=1)
@@ -109,7 +109,7 @@ instance ``entry``::
     >>> entry.save()
 
 Updating a :class:`~django.db.models.ManyToManyField` works a little
-differently; use the
+differently -- use the
 :meth:`~django.db.models.fields.related.RelatedManager.add` method on the field
 to add a record to the relation. This example adds the ``Author`` instance
 ``joe`` to the ``entry`` object::
@@ -133,7 +133,7 @@ Django will complain if you try to assign or add an object of the wrong type.
 Retrieving objects
 ==================
 
-To retrieve objects from your database, you construct a
+To retrieve objects from your database, construct a
 :class:`~django.db.models.query.QuerySet` via a
 :class:`~django.db.models.Manager` on your model class.
 
@@ -164,14 +164,14 @@ default. Access it directly via the model class, like so::
 
 The :class:`~django.db.models.Manager` is the main source of ``QuerySets`` for
 a model. It acts as a "root" :class:`~django.db.models.query.QuerySet` that
-describes all objects in the model's database table.  For example,
+describes all objects in the model's database table. For example,
 ``Blog.objects`` is the initial :class:`~django.db.models.query.QuerySet` that
 contains all ``Blog`` objects in the database.
 
 Retrieving all objects
 ----------------------
 
-The simplest way to retrieve objects from a table is to get all of them.  To do
+The simplest way to retrieve objects from a table is to get all of them. To do
 this, use the :meth:`~django.db.models.query.QuerySet.all` method on a
 :class:`~django.db.models.Manager`::
 
@@ -551,7 +551,7 @@ entry that contains a tag with a name of *"music"* and a status of *"public"*.
 
 To handle both of these situations, Django has a consistent way of processing
 :meth:`~django.db.models.query.QuerySet.filter` and
-:meth:`~django.db.models.query.QuerySet.exclude` calls.  Everything inside a
+:meth:`~django.db.models.query.QuerySet.exclude` calls. Everything inside a
 single :meth:`~django.db.models.query.QuerySet.filter` call is applied
 simultaneously to filter out items matching all those requirements. Successive
 :meth:`~django.db.models.query.QuerySet.filter` calls further restrict the set
@@ -634,7 +634,7 @@ issue the query::
 .. versionadded:: 1.3
 
 For date and date/time fields, you can add or subtract a
-:class:`~datetime.timedelta` object.  The following would return all entries
+:class:`~datetime.timedelta` object. The following would return all entries
 that were modified more than 3 days after they were published::
 
     >>> from datetime import timedelta
@@ -942,7 +942,7 @@ a :class:`~django.db.models.query.QuerySet`. You can do this with the
 
 You can only set non-relation fields and :class:`~django.db.models.ForeignKey`
 fields using this method. To update a non-relation field, provide the new value
-as a constant.  To update :class:`~django.db.models.ForeignKey` fields, set the
+as a constant. To update :class:`~django.db.models.ForeignKey` fields, set the
 new value to be the new model instance you want to point to. For example::
 
     >>> b = Blog.objects.get(pk=1)
@@ -969,7 +969,7 @@ statement. It is a bulk operation for direct updates. It doesn't run any
 :meth:`~django.db.models.Model.save`). If you want to save every item in a
 :class:`~django.db.models.query.QuerySet` and make sure that the
 :meth:`~django.db.models.Model.save` method is called on each instance, you
-don't need any special function to handle that.  Just loop over them and call
+don't need any special function to handle that. Just loop over them and call
 :meth:`~django.db.models.Model.save`::
 
     for item in my_queryset:
@@ -1035,7 +1035,7 @@ Example::
 
 You can get and set via a foreign-key attribute. As you may expect, changes to
 the foreign key aren't saved to the database until you call
-:meth:`~django.db.models.Model.save`.  Example::
+:meth:`~django.db.models.Model.save`. Example::
 
     >>> e = Entry.objects.get(id=2)
     >>> e.blog = some_blog

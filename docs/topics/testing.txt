@@ -1477,13 +1477,13 @@ decorate the class::
 
 .. note::
 
-    When overriding settings make sure to also handle the cases in which your
-    app's code uses a cache or similar feature that retains state even if the
+    When overriding settings, make sure to handle the cases in which your app's
+    code uses a cache or similar feature that retains state even if the
     setting is changed. Django provides the
-    :data:`django.test.signals.setting_changed` signal to connect cleanup and
-    other state-resetting callbacks to. Note that this signal isn't currently
-    used by Django itself, so changing built-in settings may not yield the
-    results you expect.
+    :data:`django.test.signals.setting_changed` signal that lets you register
+    callbacks to clean up and otherwise reset state when settings are changed.
+    Note that this signal isn't currently used by Django itself, so changing
+    built-in settings may not yield the results you expect.
 
 Emptying the test outbox
 ~~~~~~~~~~~~~~~~~~~~~~~~

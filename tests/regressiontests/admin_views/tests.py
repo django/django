@@ -508,7 +508,7 @@ class AdminViewBasicTest(TestCase):
 
     def testI18NLanguageNonEnglishDefault(self):
         """
-        Check if the Javascript i18n view returns an empty language catalog
+        Check if the JavaScript i18n view returns an empty language catalog
         if the default language is non-English but the selected language
         is English. See #13388 and #3594 for more details.
         """
@@ -529,7 +529,7 @@ class AdminViewBasicTest(TestCase):
 
     def testL10NDeactivated(self):
         """
-        Check if L10N is deactivated, the Javascript i18n view doesn't
+        Check if L10N is deactivated, the JavaScript i18n view doesn't
         return localized date/time formats. Refs #14824.
         """
         with self.settings(LANGUAGE_CODE='ru', USE_L10N=False):
@@ -2862,7 +2862,7 @@ class NeverCacheTests(TestCase):
         self.assertEqual(get_max_age(response), None)
 
     def testJsi18n(self):
-        "Check the never-cache status of the Javascript i18n view"
+        "Check the never-cache status of the JavaScript i18n view"
         response = self.client.get('/test_admin/admin/jsi18n/')
         self.assertEqual(get_max_age(response), None)
 
@@ -2896,7 +2896,7 @@ class PrePopulatedTest(TestCase):
     def test_prepopulated_maxlength_localized(self):
         """
         Regression test for #15938: if USE_THOUSAND_SEPARATOR is set, make sure
-        that maxLength (in the javascript) is rendered without separators.
+        that maxLength (in the JavaScript) is rendered without separators.
         """
         response = self.client.get('/test_admin/admin/admin_views/prepopulatedpostlargeslug/add/')
         self.assertContains(response, "maxLength: 1000") # instead of 1,000
@@ -2909,7 +2909,7 @@ class SeleniumPrePopulatedFirefoxTests(AdminSeleniumWebDriverTestCase):
 
     def test_basic(self):
         """
-        Ensure that the Javascript-automated prepopulated fields work with the
+        Ensure that the JavaScript-automated prepopulated fields work with the
         main form and with stacked and tabular inlines.
         Refs #13068, #9264, #9983, #9784.
         """

@@ -18,7 +18,7 @@ automatically-generated admin site.
     displayed on the public site. Django solves the problem of creating a
     unified interface for site administrators to edit content.
 
-    The admin isn't intended to be used by site visitors; it's for site
+    The admin isn't intended to be used by site visitors. It's for site
     managers.
 
 Activate the admin site
@@ -171,7 +171,7 @@ The bottom part of the page gives you a couple of options:
 
 If the value of "Date published" doesn't match the time when you created the
 poll in Tutorial 1, it probably means you forgot to set the correct value for
-the :setting:`TIME_ZONE` setting. Change it, reload the page, and check that
+the :setting:`TIME_ZONE` setting. Change it, reload the page and check that
 the correct value appears.
 
 Change the "Date published" by clicking the "Today" and "Now" shortcuts. Then

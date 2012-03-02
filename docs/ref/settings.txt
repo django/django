@@ -9,9 +9,9 @@ Settings
 .. warning::
 
     Be careful when you override settings, especially when the default value
-    is a non-empty tuple or dict, like :setting:`MIDDLEWARE_CLASSES` and
-    :setting:`TEMPLATE_CONTEXT_PROCESSORS`. Make sure you keep the components
-    required by the features of Django you wish to use.
+    is a non-empty tuple or dictionary, such as :setting:`MIDDLEWARE_CLASSES`
+    and :setting:`TEMPLATE_CONTEXT_PROCESSORS`. Make sure you keep the
+    components required by the features of Django you wish to use.
 
 Available settings
 ==================
@@ -705,9 +705,9 @@ Default::
     '%B %d, %Y', '%d %B %Y', '%d %B, %Y')
 
 A tuple of formats that will be accepted when inputting data on a date field.
-Formats will be tried in order, using the first valid. Note that these format
-strings are specified in Python's datetime_ module syntax, that is different
-from the one used by Django for formatting dates to be displayed.
+Formats will be tried in order, using the first valid one. Note that these
+format strings use Python's datetime_ module syntax, not the format strings
+from the ``date`` Django template tag.
 
 When :setting:`USE_L10N` is ``True``, the locale-dictated format has higher
 precedence and will be applied instead.
@@ -747,9 +747,9 @@ Default::
     '%m/%d/%y %H:%M:%S', '%m/%d/%y %H:%M', '%m/%d/%y')
 
 A tuple of formats that will be accepted when inputting data on a datetime
-field. Formats will be tried in order, using the first valid. Note that these
-format strings are specified in Python's datetime_ module syntax, that is
-different from the one used by Django for formatting dates to be displayed.
+field. Formats will be tried in order, using the first valid one. Note that
+these format strings use Python's datetime_ module syntax, not the format
+strings from the ``date`` Django template tag.
 
 When :setting:`USE_L10N` is ``True``, the locale-dictated format has higher
 precedence and will be applied instead.
@@ -1344,7 +1344,7 @@ decorator, for example.
 .. note::
     You can use :func:`~django.core.urlresolvers.reverse_lazy` to reference
     URLs by their name instead of providing a hardcoded value. Assuming a
-    ``urls.py`` with an URL pattern named ``home``::
+    ``urls.py`` with an URLpattern named ``home``::
 
         urlpatterns = patterns('',
             url('^welcome/$', 'test_app.views.home', name='home'),
@@ -2082,9 +2082,9 @@ TIME_INPUT_FORMATS
 Default: ``('%H:%M:%S', '%H:%M')``
 
 A tuple of formats that will be accepted when inputting data on a time field.
-Formats will be tried in order, using the first valid. Note that these format
-strings are specified in Python's datetime_ module syntax, that is different
-from the one used by Django for formatting dates to be displayed.
+Formats will be tried in order, using the first valid one. Note that these
+format strings use Python's datetime_ module syntax, not the format strings
+from the ``date`` Django template tag.
 
 When :setting:`USE_L10N` is ``True``, the locale-dictated format has higher
 precedence and will be applied instead.
