@@ -1112,8 +1112,11 @@ Session cookies now have the ``httponly`` flag by default
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Session cookies now include the ``httponly`` attribute by default to
-help reduce the impact of potential XSS attacks. For strict backwards
-compatibility, use ``SESSION_COOKIE_HTTPONLY = False`` in your settings file.
+help reduce the impact of potential XSS attacks. As a consequence of
+this change, session cookie data, including sessionid, is no longer
+accessible from Javascript in many browsers. For strict backwards
+compatibility, use ``SESSION_COOKIE_HTTPONLY = False`` in your
+settings file.
 
 Wildcard expansion of application names in `INSTALLED_APPS`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
