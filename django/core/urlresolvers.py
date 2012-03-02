@@ -518,3 +518,17 @@ def get_urlconf(default=None):
     changed from the default one.
     """
     return getattr(_urlconfs, "value", default)
+
+def is_valid_path(path, urlconf=None):
+    """
+    Returns True if the given path resolves against the default URL resolver,
+    False otherwise.
+
+    This is a convenience method to make working with "is this a match?" cases
+    easier, avoiding unnecessarily indented try...except blocks.
+    """
+    try:
+        resolve(path, urlconf)
+        return True
+    except Resolver404:
+        return False

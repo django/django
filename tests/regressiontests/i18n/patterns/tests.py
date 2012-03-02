@@ -144,37 +144,29 @@ class URLRedirectTests(URLTestCaseBase):
 
     def test_en_redirect(self):
         response = self.client.get('/account/register/', HTTP_ACCEPT_LANGUAGE='en')
-        self.assertRedirects(response, 'http://testserver/en/account/register/')
+        self.assertRedirects(response, '/en/account/register/')
 
         response = self.client.get(response['location'])
         self.assertEqual(response.status_code, 200)
 
     def test_en_redirect_wrong_url(self):
         response = self.client.get('/profiel/registeren/', HTTP_ACCEPT_LANGUAGE='en')
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['location'], 'http://testserver/en/profiel/registeren/')
-
-        response = self.client.get(response['location'])
         self.assertEqual(response.status_code, 404)
 
     def test_nl_redirect(self):
         response = self.client.get('/profiel/registeren/', HTTP_ACCEPT_LANGUAGE='nl')
-        self.assertRedirects(response, 'http://testserver/nl/profiel/registeren/')
+        self.assertRedirects(response, '/nl/profiel/registeren/')
 
         response = self.client.get(response['location'])
         self.assertEqual(response.status_code, 200)
 
     def test_nl_redirect_wrong_url(self):
         response = self.client.get('/account/register/', HTTP_ACCEPT_LANGUAGE='nl')
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['location'], 'http://testserver/nl/account/register/')
-
-        response = self.client.get(response['location'])
         self.assertEqual(response.status_code, 404)
 
     def test_pt_br_redirect(self):
         response = self.client.get('/conta/registre-se/', HTTP_ACCEPT_LANGUAGE='pt-br')
-        self.assertRedirects(response, 'http://testserver/pt-br/conta/registre-se/')
+        self.assertRedirects(response, '/pt-br/conta/registre-se/')
 
         response = self.client.get(response['location'])
         self.assertEqual(response.status_code, 200)
@@ -187,17 +179,15 @@ class URLRedirectWithoutTrailingSlashTests(URLTestCaseBase):
     """
     def test_not_prefixed_redirect(self):
         response = self.client.get('/not-prefixed', HTTP_ACCEPT_LANGUAGE='en')
-        self.assertEqual(response.status_code, 301)
-        self.assertEqual(response['location'], 'http://testserver/not-prefixed/')
+        self.assertRedirects(response, '/not-prefixed/', 301)
 
     def test_en_redirect(self):
         response = self.client.get('/account/register', HTTP_ACCEPT_LANGUAGE='en')
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['location'], 'http://testserver/en/account/register')
+        # target status code of 301 because of CommonMiddleware redirecting
+        self.assertRedirects(response, '/en/account/register', 302, target_status_code=301)
 
         response = self.client.get(response['location'])
-        self.assertEqual(response.status_code, 301)
-        self.assertEqual(response['location'], 'http://testserver/en/account/register/')
+        self.assertRedirects(response, '/en/account/register/', 301)
 
 
 class URLRedirectWithoutTrailingSlashSettingTests(URLTestCaseBase):
@@ -208,20 +198,15 @@ class URLRedirectWithoutTrailingSlashSettingTests(URLTestCaseBase):
     @override_settings(APPEND_SLASH=False)
     def test_not_prefixed_redirect(self):
         response = self.client.get('/not-prefixed', HTTP_ACCEPT_LANGUAGE='en')
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['location'], 'http://testserver/en/not-prefixed')
-
-        response = self.client.get(response['location'])
         self.assertEqual(response.status_code, 404)
 
     @override_settings(APPEND_SLASH=False)
     def test_en_redirect(self):
-        response = self.client.get('/account/register', HTTP_ACCEPT_LANGUAGE='en')
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['location'], 'http://testserver/en/account/register')
+        response = self.client.get('/account/register-without-slash', HTTP_ACCEPT_LANGUAGE='en')
+        self.assertRedirects(response, '/en/account/register-without-slash', 302)
 
         response = self.client.get(response['location'])
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 200)
 
 
 class URLResponseTests(URLTestCaseBase):
