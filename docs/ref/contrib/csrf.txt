@@ -91,7 +91,7 @@ that allow headers to be set on every request. In jQuery, you can use the
 
 .. code-block:: javascript
 
-    $(document).ajaxSend(function(event, xhr, settings) {
+    jQuery(document).ajaxSend(function(event, xhr, settings) {
         function getCookie(name) {
             var cookieValue = null;
             if (document.cookie && document.cookie != '') {
