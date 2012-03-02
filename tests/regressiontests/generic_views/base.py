@@ -283,6 +283,13 @@ class RedirectViewTest(unittest.TestCase):
         self.assertEqual(response.status_code, 301)
         self.assertEqual(response['Location'], '/bar/?pork=spam')
 
+    def test_include_urlencoded_args(self):
+        "GET arguments can be URL-encoded when included in the redirected URL"
+        response = RedirectView.as_view(url='/bar/', query_string=True)(
+            self.rf.get('/foo/?unicode=%E2%9C%93'))
+        self.assertEqual(response.status_code, 301)
+        self.assertEqual(response['Location'], '/bar/?unicode=%E2%9C%93')
+
     def test_parameter_substitution(self):
         "Redirection URLs can be parameterized"
         response = RedirectView.as_view(url='/bar/%(object_id)d/')(self.rf.get('/foo/42/'), object_id=42)
