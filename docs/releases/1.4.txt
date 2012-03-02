@@ -617,6 +617,21 @@ Django 1.4 also includes several smaller improvements worth noting:
 Backwards incompatible changes in 1.4
 =====================================
 
+SECRET_KEY setting is required
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Running Django with an empty or known :setting:`SECRET_KEY` disables many of
+Django's security protections, and can lead to remote-code-execution
+vulnerabilities; no Django site should ever be run without a
+:setting:`SECRET_KEY`.
+
+In Django 1.4, starting Django with an empty :setting:`SECRET_KEY` will raise a
+`DeprecationWarning`. In Django 1.5, it will raise an exception and Django will
+refuse to start. This is slightly accelerated from the usual deprecation path
+due to the severity of the consequences of running Django with no
+:setting:`SECRET_KEY`.
+
+
 django.contrib.admin
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -755,6 +770,7 @@ instance:
 
   * Time period: The amount of time you expect user to take filling out
     such forms.
+
 
 django.contrib.flatpages
 ~~~~~~~~~~~~~~~~~~~~~~~~
