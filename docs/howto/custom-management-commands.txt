@@ -243,6 +243,11 @@ the :meth:`~BaseCommand.handle` method must be implemented.
     :class:`CommandError`, intercept it and print it sensibly to
     stderr.
 
+.. admonition:: Calling a management command in your code
+
+    ``execute()`` should not be called directly from your code to execute a
+    command. Use :ref:`call_command <call-command>` instead.
+
 .. method:: BaseCommand.handle(*args, **options)
 
     The actual logic of the command. Subclasses must implement this method.
