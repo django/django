@@ -685,7 +685,7 @@ Usage
    the datetime in UTC returned by :func:`django.utils.timezone.now` will be
    sufficient.
 
-   For the shake of completeness, if you really wanted the current time in the
+   For the sake of completeness, if you really wanted the current time in the
    local time zone, here's how you would obtain it::
 
        >>> import datetime
