@@ -14,13 +14,15 @@ Prerequisite: uWSGI
 
 The uWSGI wiki describes several `installation procedures`_. Using pip, the
 Python package manager, you can install any uWSGI version with a single
-command. For example::
+command. For example:
+
+.. code-block:: bash
 
     # Install current stable version.
-    pip install uwsgi
+    $ sudo pip install uwsgi
 
     # Or install LTS (long term support).
-    pip install http://projects.unbit.it/downloads/uwsgi-lts.tar.gz
+    $ sudo pip install http://projects.unbit.it/downloads/uwsgi-lts.tar.gz
 
 .. _installation procedures: http://projects.unbit.it/uwsgi/wiki/Install
 

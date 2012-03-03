@@ -18,8 +18,8 @@ special `integration with Django`_.
 Installing Gunicorn
 ===================
 
-Installing gunicorn is as easy as ``pip install gunicorn``. For more details,
-see the `gunicorn documentation`_.
+Installing gunicorn is as easy as ``sudo pip install gunicorn``. For more
+details, see the `gunicorn documentation`_.
 
 .. _gunicorn documentation: http://gunicorn.org/install.html
 

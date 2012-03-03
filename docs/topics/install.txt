@@ -197,33 +197,62 @@ It's easy, no matter which way you choose.
 Installing a distribution-specific package
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Check the :doc:`distribution specific notes </misc/distributions>` to see if your
-platform/distribution provides official Django packages/installers.
+Check the :doc:`distribution specific notes </misc/distributions>` to see if
+your platform/distribution provides official Django packages/installers.
 Distribution-provided packages will typically allow for automatic installation
 of dependencies and easy upgrade paths.
 
 .. _installing-official-release:
 
-Installing an official release
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Installing an official release with ``pip``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This is the recommended way to install Django.
+
+1. Install pip_. The easiest is to use the `standalone pip installer`_. If your
+   distribution has ``pip`` already installed, make sure it isn't too outdated.
+
+2. (optional) Take a look at virtualenv_ and virtualenvwrapper_. These tools
+   provide isolated Python environments, which are more practical than
+   installing packages system-wide. They also allow installing packages
+   without administrator privileges. It's up to you to decide if you want to
+   learn and use them.
+
+3. If you're using Linux, Mac OS X or some other flavor of Unix, enter the
+   command ``sudo pip install Django`` at the shell prompt. If you're using
+   Windows, start up a command shell with administrator privileges and run
+   the command ``pip install Django``. This will install Django in your Python
+   installation's ``site-packages`` directory.
+
+   If you're using a virtualenv, you don't need ``sudo`` or administrator
+   privileges, and this will install Django in the virtualenv's
+   ``site-packages`` directory.
+
+
+.. _pip: http://www.pip-installer.org/
+.. _virtualenv: http://www.virtualenv.org/
+.. _virtualenvwrapper: http://www.doughellmann.com/docs/virtualenvwrapper/
+.. _standalone pip installer: http://www.pip-installer.org/en/latest/installing.html#using-the-installer
+
+Installing an official release manually
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 1. Download the latest release from our `download page`_.
 
-2. Untar the downloaded file (e.g. ``tar xzvf Django-NNN.tar.gz``,
-   where ``NNN`` is the version number of the latest release).
+2. Untar the downloaded file (e.g. ``tar xzvf Django-X.Y.tar.gz``,
+   where ``X.Y`` is the version number of the latest release).
    If you're using Windows, you can download the command-line tool
    bsdtar_ to do this, or you can use a GUI-based tool such as 7-zip_.
 
-3. Change into the directory created in step 2 (e.g. ``cd Django-NNN``).
+3. Change into the directory created in step 2 (e.g. ``cd Django-X.Y``).
 
-4. If you're using Linux, Mac OS X or some other flavor of Unix, enter
-   the command ``sudo python setup.py install`` at the shell prompt.
-   If you're using Windows, start up a command shell with administrator
-   privileges and run the command ``python setup.py install``.
+4. If you're using Linux, Mac OS X or some other flavor of Unix, enter the
+   command ``sudo python setup.py install`` at the shell prompt. If you're
+   using Windows, start up a command shell with administrator privileges and
+   run the command ``python setup.py install``. This will install Django in
+   your Python installation's ``site-packages`` directory.
 
-These commands will install Django in your Python installation's
-``site-packages`` directory.
-
+.. _download page: http://www.djangoproject.com/download/
 .. _bsdtar: http://gnuwin32.sourceforge.net/packages/bsdtar.htm
 .. _7-zip: http://www.7-zip.org/
 
@@ -269,7 +298,7 @@ latest bug fixes and improvements, follow these instructions:
        # Git (requires version 1.6.6 or later)
        git clone https://github.com/django/django.git
        # or (works with all versions)
-       git clone git://github.com/django/django.git       
+       git clone git://github.com/django/django.git
 
        # Mercurial
        hg clone https://bitbucket.org/django/django
@@ -310,16 +339,19 @@ latest bug fixes and improvements, follow these instructions:
 
    On Windows systems, the same result can be achieved by copying the file
    ``django-trunk/django/bin/django-admin.py`` to somewhere on your system
-   path, for example ``C:\Python24\Scripts``.
+   path, for example ``C:\Python27\Scripts``.
 
-You *don't* have to run ``python setup.py install``, because you've already
-carried out the equivalent actions in steps 3 and 4.
+.. warning::
+
+    You mustn't run ``sudo python setup.py install``, because you've already
+    carried out the equivalent actions in steps 3 and 4. Furthermore, this is
+    known to cause problems when updating to a more recent version of Django.
 
 When you want to update your copy of the Django source code, just run the
 command ``svn update`` from within the ``django-trunk`` directory. When you do
-this, Subversion will automatically download any changes.
+this, Subversion will automatically download any changes. The equivalent
+command for Git is ``git pull``, and for Mercurial ``hg pull --update``.
 
-.. _`download page`: http://www.djangoproject.com/download/
 .. _Subversion: http://subversion.tigris.org/
 .. _Git: http://git-scm.com/
 .. _Mercurial: http://mercurial.selenic.com/

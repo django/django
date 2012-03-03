@@ -40,7 +40,9 @@ Python and Django
 -----------------
 
 Because GeoDjango is included with Django, please refer to Django's
-:doc:`installation instructions </intro/install>` for details on how to install.
+:ref:`installation instructions <installing-official-release>` for details on
+how to install.
+
 
 .. _spatial_database:
 
@@ -837,13 +839,12 @@ psycopg2
 After you've installed the KyngChaos binaries and modified your ``PATH``, as
 described above, ``psycopg2`` may be installed using the following command::
 
-    $ sudo python easy_install psycopg2
+    $ sudo pip install psycopg2
 
 .. note::
 
-   To use ``easy_install`` you'll need to install Python's `setuptools`_.
-
-.. _setuptools: http://pypi.python.org/pypi/setuptools
+    If you don't have ``pip``, follow the the :ref:`installation instructions
+    <installing-official-release>` to install it.
 
 .. _pysqlite2_kyngchaos:
 
@@ -961,8 +962,7 @@ Ubuntu 10.04 uses PostGIS 1.4, while Ubuntu 10.10 uses PostGIS 1.5 (with
 geography support).  The installation commands are::
 
     $ sudo apt-get install binutils gdal-bin libproj-dev postgresql-8.4-postgis \
-         postgresql-server-dev-8.4 python-psycopg2 python-setuptools
-    $ sudo easy_install Django
+         postgresql-server-dev-8.4 python-psycopg2
 
 .. _ibex:
 
@@ -972,13 +972,7 @@ geography support).  The installation commands are::
 Use the synaptic package manager to install the following packages::
 
     $ sudo apt-get install binutils gdal-bin postgresql-8.3-postgis \
-        postgresql-server-dev-8.3 python-psycopg2 python-setuptools
-
-Afterwards, you may install Django with Python's ``easy_install`` script (the
-Ubuntu package ``python-django`` uses an older version missing several
-important bug fixes for GeoDjango)::
-
-    $ sudo easy_install Django
+        postgresql-server-dev-8.3 python-psycopg2
 
 That's it!  For the curious, the required binary prerequisites packages are:
 
@@ -990,7 +984,6 @@ That's it!  For the curious, the required binary prerequisites packages are:
 * ``libgdal1-1.5.0``: for GDAL 1.5.0 library
 * ``proj``: for PROJ 4.6.0 -- but no datum shifting files, see note below
 * ``python-psycopg2``
-* ``python-setuptools``: for ``easy_install``
 
 Optional packages to consider:
 
@@ -1060,7 +1053,6 @@ Required package information:
 * ``postgresql-8.1``
 * ``postgresql-server-dev-8.1``: for ``pg_config``
 * ``python-psycopg2``
-* ``python-setuptools``: for ``easy_install``
 
 Optional packages:
 
