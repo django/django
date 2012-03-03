@@ -91,7 +91,7 @@ class IntrospectionTests(TestCase):
 
     # Oracle forces null=True under the hood in some cases (see
     # https://docs.djangoproject.com/en/dev/ref/databases/#null-and-empty-strings)
-    # so its idea about null_ok in cursor.drescription is different from ours
+    # so its idea about null_ok in cursor.description is different from ours.
     @skipIfDBFeature('interprets_empty_strings_as_nulls')
     def test_get_table_description_nullable(self):
         cursor = connection.cursor()
