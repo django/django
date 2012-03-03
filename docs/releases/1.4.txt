@@ -484,17 +484,17 @@ project, read the :ref:`migration guide <time-zones-migration-guide>`.
 HTML comparisons in tests
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The :class:`~django.test.testcase.TestCase` base class now has some helpers to
+The base classes in :mod:`django.test` now have some helpers to
 compare HTML without tripping over irrelevant differences in whitespace,
 argument quoting/ordering and closing of self-closing tags. You can either
 compare HTML directly with the new
-:meth:`~django.test.testcase.TestCase.assertHTMLEqual` and
-:meth:`~django.test.testcase.TestCase.assertHTMLNotEqual` assertions, or use
+:meth:`~django.test.SimpleTestCase.assertHTMLEqual` and
+:meth:`~django.test.SimpleTestCase.assertHTMLNotEqual` assertions, or use
 the ``html=True`` flag with
-:meth:`~django.test.testcase.TestCase.assertContains` and
-:meth:`~django.test.testcase.TestCase.assertNotContains` to test whether the
-client's response contains a given HTML fragment. See the :ref:`assertion
-documentation<assertions>` for more.
+:meth:`~django.test.TestCase.assertContains` and
+:meth:`~django.test.TestCase.assertNotContains` to test whether the
+client's response contains a given HTML fragment. See the :ref:`assertions
+documentation <assertions>` for more.
 
 Two new date format strings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -613,6 +613,12 @@ Django 1.4 also includes several smaller improvements worth noting:
 * The sitemaps framework can now handle HTTPS links using the new
   :attr:`Sitemap.protocol <django.contrib.sitemaps.Sitemap.protocol>` class
   attribute.
+
+* A new :class:`django.test.SimpleTestCase` subclass of
+  :class:`unittest.TestCase`
+  that is comparatively lighter than :class:`django.test.TestCase` and
+  company. It can be useful in testing scenarios where e.g. no database
+  interaction is needed. See :ref:`testcase_hierarchy_diagram`.
 
 Backwards incompatible changes in 1.4
 =====================================
@@ -1016,8 +1022,8 @@ wild, because they would confuse browsers too.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 It's now possible to check whether a template was used within a block of
-code with :meth:`~django.test.testcase.TestCase.assertTemplateUsed` and
-:meth:`~django.test.testcase.TestCase.assertTemplateNotUsed`. And they
+code with :meth:`~django.test.test.TestCase.assertTemplateUsed` and
+:meth:`~django.test.test.TestCase.assertTemplateNotUsed`. And they
 can be used as a context manager::
 
     with self.assertTemplateUsed('index.html'):
