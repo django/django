@@ -479,7 +479,8 @@ Reasons for using this feature include:
 
 Time zone support is enabled by default in new projects created with
 :djadmin:`startproject`. If you want to use this feature in an existing
-project, read the :ref:`migration guide <time-zones-migration-guide>`.
+project, read the :ref:`migration guide <time-zones-migration-guide>`. If you
+encounter problems, there's a helpful :ref:`FAQ <time-zones-faq>`.
 
 HTML comparisons in tests
 ~~~~~~~~~~~~~~~~~~~~~~~~~
