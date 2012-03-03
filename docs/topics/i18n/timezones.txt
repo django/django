@@ -380,8 +380,8 @@ Migration guide
 Here's how to migrate a project that was started before Django supported time
 zones.
 
-Data
-----
+Database
+--------
 
 PostgreSQL
 ~~~~~~~~~~
@@ -428,14 +428,41 @@ code: :func:`~django.utils.timezone.now`,
 :func:`~django.utils.timezone.make_naive`.
 
 Finally, in order to help you locate code that needs upgrading, Django raises
-a warning when you attempt to save a naive datetime to the database. During
-development, you can turn such warnings into exceptions and get a traceback
-by adding the following to your settings file::
+a warning when you attempt to save a naive datetime to the database::
+
+    RuntimeWarning: DateTimeField received a naive datetime (2012-01-01 00:00:00) while time zone support is active.
+
+During development, you can turn such warnings into exceptions and get a
+traceback by adding the following to your settings file::
 
     import warnings
     warnings.filterwarnings(
             'error', r"DateTimeField received a naive datetime",
             RuntimeWarning, r'django\.db\.models\.fields')
+
+Fixtures
+--------
+
+When serializing an aware datetime, the UTC offset is included, like this::
+
+    "2011-09-01T13:20:30+03:00"
+
+For a naive datetime, it obviously isn't::
+
+    "2011-09-01T13:20:30"
+
+For models with :class:`~django.db.models.DateTimeField`\ s, this difference
+makes it impossible to write a fixture that works both with and without time
+zone support.
+
+Fixtures generated with ``USE_TZ = False``, or before Django 1.4, use the
+"naive" format. If your project contains such fixtures, after you enable time
+zone support, you'll see :exc:`RuntimeWarning`\ s when you load them. To get
+rid of the warnings, you must convert your fixtures to the "aware" format.
+
+You can regenerate fixtures with :djadmin:`loaddata` then :djadmin:`dumpdata`.
+Or, if they're small enough, you can simply edit them to add the UTC offset
+that matches your :setting:`TIME_ZONE` to each serialized datetime.
 
 .. _pytz: http://pytz.sourceforge.net/
 .. _these issues: http://pytz.sourceforge.net/#problems-with-localtime
