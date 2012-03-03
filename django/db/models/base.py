@@ -20,7 +20,7 @@ from django.db.models.options import Options
 from django.db.models import signals
 from django.db.models.loading import register_models, get_model
 from django.utils.translation import ugettext_lazy as _
-from django.utils.functional import curry
+from django.utils.functional import curry, Promise
 from django.utils.encoding import smart_str, force_unicode
 from django.utils.text import get_text_list, capfirst
 
@@ -297,10 +297,14 @@ class Model(object):
             # is *not* consumed. We rely on this, so don't change the order
             # without changing the logic.
             for val, field in izip(args, fields_iter):
+                if isinstance(val, Promise):
+                    val = force_unicode(val)
                 setattr(self, field.attname, val)
         else:
             # Slower, kwargs-ready version.
             for val, field in izip(args, fields_iter):
+                if isinstance(val, Promise):
+                    val = force_unicode(val)
                 setattr(self, field.attname, val)
                 kwargs.pop(field.name, None)
                 # Maintain compatibility with existing calls.
@@ -354,6 +358,8 @@ class Model(object):
                 # checked) by the RelatedObjectDescriptor.
                 setattr(self, field.name, rel_obj)
             else:
+                if isinstance(val, Promise):
+                    val = force_unicode(val)
                 setattr(self, field.attname, val)
 
         if kwargs:
