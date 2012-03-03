@@ -3,7 +3,7 @@ from __future__ import absolute_import
 from functools import update_wrapper
 
 from django.db import connection
-from django.test import TestCase, skipUnlessDBFeature
+from django.test import TestCase, skipUnlessDBFeature, skipIfDBFeature
 
 from .models import Reporter, Article
 
@@ -89,6 +89,10 @@ class IntrospectionTests(TestCase):
             ['IntegerField', 'CharField', 'CharField', 'CharField', 'BigIntegerField']
         )
 
+    # Oracle forces null=True under the hood in some cases (see
+    # https://docs.djangoproject.com/en/dev/ref/databases/#null-and-empty-strings)
+    # so its idea about null_ok in cursor.drescription is different from ours
+    @skipIfDBFeature('interprets_empty_strings_as_nulls')
     def test_get_table_description_nullable(self):
         cursor = connection.cursor()
         desc = connection.introspection.get_table_description(cursor, Reporter._meta.db_table)
