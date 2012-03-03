@@ -40,9 +40,9 @@ from .models import (BooleanData, CharData, DateData, DateTimeData, EmailData,
     DecimalPKData, FloatPKData, IntegerPKData, IPAddressPKData,
     GenericIPAddressPKData, PhonePKData, PositiveIntegerPKData,
     PositiveSmallIntegerPKData, SlugPKData, SmallPKData, USStatePKData,
-    AutoNowDateTimeData, ModifyingSaveData, InheritAbstractModel,
-    ExplicitInheritBaseModel, InheritBaseModel, BigIntegerData, LengthModel,
-    Tag, ComplexModel)
+    AutoNowDateTimeData, ModifyingSaveData, InheritAbstractModel, BaseModel,
+    ExplicitInheritBaseModel, InheritBaseModel, ProxyBaseModel, BigIntegerData,
+    LengthModel, Tag, ComplexModel)
 
 # A set of functions that can be used to recreate
 # test data objects of various kinds.
@@ -407,6 +407,14 @@ class SerializerTests(TestCase):
         with self.assertRaises(DeserializationError):
             for obj in serializers.deserialize("yaml", "{"):
                 pass
+
+    def test_serialize_proxy_model(self):
+        BaseModel.objects.create(parent_data=1)
+        base_objects  = BaseModel.objects.all()
+        proxy_objects = ProxyBaseModel.objects.all()
+        base_data  = serializers.serialize("json", base_objects)
+        proxy_data = serializers.serialize("json", proxy_objects)
+        self.assertEqual(base_data, proxy_data.replace('proxy', ''))
 
 
 def serializerTest(format, self):

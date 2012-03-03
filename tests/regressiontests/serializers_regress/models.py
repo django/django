@@ -259,6 +259,10 @@ class ExplicitInheritBaseModel(BaseModel):
     parent = models.OneToOneField(BaseModel)
     child_data = models.IntegerField()
 
+class ProxyBaseModel(BaseModel):
+    class Meta:
+        proxy = True
+
 class LengthModel(models.Model):
     data = models.IntegerField()
 

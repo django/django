@@ -41,7 +41,10 @@ class Serializer(object):
         self.start_serialization()
         for obj in queryset:
             self.start_object(obj)
-            for field in obj._meta.local_fields:
+            # Use the concrete parent class' _meta instead of the object's _meta
+            # This is to avoid local_fields problems for proxy models. Refs #17717.
+            concrete_class = obj._meta.proxy_for_model or obj.__class__
+            for field in concrete_class._meta.local_fields:
                 if field.serialize:
                     if field.rel is None:
                         if self.selected_fields is None or field.attname in self.selected_fields:
@@ -49,7 +52,7 @@ class Serializer(object):
                     else:
                         if self.selected_fields is None or field.attname[:-3] in self.selected_fields:
                             self.handle_fk_field(obj, field)
-            for field in obj._meta.many_to_many:
+            for field in concrete_class._meta.many_to_many:
                 if field.serialize:
                     if self.selected_fields is None or field.attname in self.selected_fields:
                         self.handle_m2m_field(obj, field)
