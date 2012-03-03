@@ -666,11 +666,6 @@ For a complete discussion on the usage of the following see the
     ``None``, the :ref:`current time zone <default-current-time-zone>` is unset
     on entry with :func:`deactivate()` instead.
 
-.. function:: localtime(value, use_tz=None)
-
-    This function is used by the template engine to convert datetimes to local
-    time where appropriate.
-
 .. function:: now()
 
     Returns an aware or naive :class:`~datetime.datetime` that represents the
