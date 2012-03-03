@@ -12,6 +12,7 @@ from django.core.exceptions import SuspiciousOperation
 from django.core.files import temp as tempfile
 from django.core.urlresolvers import reverse
 # Register auth models with the admin.
+from django.contrib import admin
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 from django.contrib.admin.models import LogEntry, DELETION
 from django.contrib.admin.sites import LOGIN_FORM_KEY
@@ -41,7 +42,7 @@ from .models import (Article, BarAccount, CustomArticle, EmptyModel, FooAccount,
     FoodDelivery, RowLevelChangePermissionModel, Paper, CoverLetter, Story,
     OtherStory, ComplexSortedPerson, Parent, Child, AdminOrderedField,
     AdminOrderedModelMethod, AdminOrderedAdminMethod, AdminOrderedCallable,
-    Report, MainPrepopulated, RelatedPrepopulated)
+    Report, MainPrepopulated, RelatedPrepopulated, UnorderedObject)
 
 
 ERROR_MESSAGE = "Please enter the correct username and password \
@@ -272,9 +273,12 @@ class AdminViewBasicTest(TestCase):
         )
 
     def testChangeListSortingPreserveQuerySetOrdering(self):
-        # If no ordering on ModelAdmin, or query string, the underlying order of
-        # the queryset should not be changed.
-
+        """
+        If no ordering is defined in `ModelAdmin.ordering` or in the query
+        string, then the underlying order of the queryset should not be
+        changed, even if it is defined in `Modeladmin.queryset()`.
+        Refs #11868, #7309.
+        """
         p1 = Person.objects.create(name="Amy", gender=1, alive=True, age=80)
         p2 = Person.objects.create(name="Bob", gender=1, alive=True, age=70)
         p3 = Person.objects.create(name="Chris", gender=2, alive=False, age=60)
@@ -1880,6 +1884,23 @@ class AdminViewListEditable(TestCase):
         self.assertEqual(Category.objects.get(id=2).order, 13)
         self.assertEqual(Category.objects.get(id=3).order, 1)
         self.assertEqual(Category.objects.get(id=4).order, 0)
+
+    def test_list_editable_pagination(self):
+        """
+        Ensure that pagination works for list_editable items.
+        Refs #16819.
+        """
+        UnorderedObject.objects.create(id=1, name='Unordered object #1')
+        UnorderedObject.objects.create(id=2, name='Unordered object #2')
+        UnorderedObject.objects.create(id=3, name='Unordered object #3')
+        response = self.client.get('/test_admin/admin/admin_views/unorderedobject/')
+        self.assertContains(response, 'Unordered object #1')
+        self.assertContains(response, 'Unordered object #2')
+        self.assertNotContains(response, 'Unordered object #3')
+        response = self.client.get('/test_admin/admin/admin_views/unorderedobject/?p=1')
+        self.assertNotContains(response, 'Unordered object #1')
+        self.assertNotContains(response, 'Unordered object #2')
+        self.assertContains(response, 'Unordered object #3')
 
     def test_list_editable_action_submit(self):
         # List editable changes should not be executed if the action "Go" button is

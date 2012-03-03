@@ -597,3 +597,12 @@ class RelatedPrepopulated(models.Model):
                  ('option two', 'Option Two')))
     slug1 = models.SlugField(max_length=50)
     slug2 = models.SlugField(max_length=60)
+
+
+class UnorderedObject(models.Model):
+    """
+    Model without any defined `Meta.ordering`.
+    Refs #16819.
+    """
+    name = models.CharField(max_length=255)
+    bool = models.BooleanField(default=True)

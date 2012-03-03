@@ -14,7 +14,8 @@ from .admin import (ChildAdmin, QuartetAdmin, BandAdmin, ChordsBandAdmin,
     FilteredChildAdmin, CustomPaginator, site as custom_site,
     SwallowAdmin)
 from .models import (Child, Parent, Genre, Band, Musician, Group, Quartet,
-    Membership, ChordsMusician, ChordsBand, Invitation, Swallow)
+    Membership, ChordsMusician, ChordsBand, Invitation, Swallow,
+    UnorderedObject, OrderedObject)
 
 
 class ChangeListTests(TestCase):
@@ -430,3 +431,92 @@ class ChangeListTests(TestCase):
         self.assertContains(response, unicode(swallow.load))
         self.assertContains(response, unicode(swallow.speed))
 
+    def test_deterministic_order_for_unordered_model(self):
+        """
+        Ensure that the primary key is systematically used in the ordering of
+        the changelist's results to guarantee a deterministic order, even
+        when the Model doesn't have any default ordering defined.
+        Refs #17198.
+        """
+        superuser = self._create_superuser('superuser')
+
+        for counter in range(1, 51):
+            UnorderedObject.objects.create(id=counter, bool=True)
+
+        class UnorderedObjectAdmin(admin.ModelAdmin):
+            list_per_page = 10
+
+        def check_results_order(reverse=False):
+            admin.site.register(UnorderedObject, UnorderedObjectAdmin)
+            model_admin = UnorderedObjectAdmin(UnorderedObject, admin.site)
+            counter = 51 if reverse else 0
+            for page in range (0, 5):
+                request = self._mocked_authenticated_request('/unorderedobject/?p=%s' % page, superuser)
+                response = model_admin.changelist_view(request)
+                for result in response.context_data['cl'].result_list:
+                    counter += -1 if reverse else 1
+                    self.assertEqual(result.id, counter)
+            admin.site.unregister(UnorderedObject)
+
+        # When no order is defined at all, everything is ordered by 'pk'.
+        check_results_order()
+
+        # When an order field is defined but multiple records have the same
+        # value for that field, make sure everything gets ordered by pk as well.
+        UnorderedObjectAdmin.ordering = ['bool']
+        check_results_order()
+
+        # When order fields are defined, including the pk itself, use them.
+        UnorderedObjectAdmin.ordering = ['bool', '-pk']
+        check_results_order(reverse=True)
+        UnorderedObjectAdmin.ordering = ['bool', 'pk']
+        check_results_order()
+        UnorderedObjectAdmin.ordering = ['-id', 'bool']
+        check_results_order(reverse=True)
+        UnorderedObjectAdmin.ordering = ['id', 'bool']
+        check_results_order()
+
+    def test_deterministic_order_for_model_ordered_by_its_manager(self):
+        """
+        Ensure that the primary key is systematically used in the ordering of
+        the changelist's results to guarantee a deterministic order, even
+        when the Model has a manager that defines a default ordering.
+        Refs #17198.
+        """
+        superuser = self._create_superuser('superuser')
+
+        for counter in range(1, 51):
+            OrderedObject.objects.create(id=counter, bool=True, number=counter)
+
+        class OrderedObjectAdmin(admin.ModelAdmin):
+            list_per_page = 10
+
+        def check_results_order(reverse=False):
+            admin.site.register(OrderedObject, OrderedObjectAdmin)
+            model_admin = OrderedObjectAdmin(OrderedObject, admin.site)
+            counter = 51 if reverse else 0
+            for page in range (0, 5):
+                request = self._mocked_authenticated_request('/orderedobject/?p=%s' % page, superuser)
+                response = model_admin.changelist_view(request)
+                for result in response.context_data['cl'].result_list:
+                    counter += -1 if reverse else 1
+                    self.assertEqual(result.id, counter)
+            admin.site.unregister(OrderedObject)
+
+        # When no order is defined at all, use the model's default ordering (i.e. '-number')
+        check_results_order(reverse=True)
+
+        # When an order field is defined but multiple records have the same
+        # value for that field, make sure everything gets ordered by pk as well.
+        OrderedObjectAdmin.ordering = ['bool']
+        check_results_order()
+
+        # When order fields are defined, including the pk itself, use them.
+        OrderedObjectAdmin.ordering = ['bool', '-pk']
+        check_results_order(reverse=True)
+        OrderedObjectAdmin.ordering = ['bool', 'pk']
+        check_results_order()
+        OrderedObjectAdmin.ordering = ['-id', 'bool']
+        check_results_order(reverse=True)
+        OrderedObjectAdmin.ordering = ['id', 'bool']
+        check_results_order()

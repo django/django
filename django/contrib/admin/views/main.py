@@ -66,7 +66,6 @@ class ChangeList(object):
             self.list_editable = ()
         else:
             self.list_editable = list_editable
-        self.ordering = self.get_ordering(request)
         self.query = request.GET.get(SEARCH_VAR, '')
         self.query_set = self.get_query_set(request)
         self.get_results(request)
@@ -218,13 +217,18 @@ class ChangeList(object):
                 attr = getattr(self.model, field_name)
             return getattr(attr, 'admin_order_field', None)
 
-    def get_ordering(self, request):
+    def get_ordering(self, request, queryset):
+        """
+        Returns the list of ordering fields for the change list.
+        First we check the get_ordering() method in model admin, then we check
+        the object's default ordering. Then, any manually-specified ordering
+        from the query string overrides anything. Finally, a deterministic
+        order is guaranteed by ensuring the primary key is used as the last
+        ordering field.
+        """
         params = self.params
-        # For ordering, first check the if exists the "get_ordering" method
-        # in model admin, then check "ordering" parameter in the admin
-        # options, then check the object's default ordering. Finally, a
-        # manually-specified ordering from the query string overrides anything.
-        ordering = self.model_admin.get_ordering(request) or self._get_default_ordering()
+        ordering = list(self.model_admin.get_ordering(request)
+                        or self._get_default_ordering())
         if ORDER_VAR in params:
             # Clear ordering and used params
             ordering = []
@@ -239,6 +243,19 @@ class ChangeList(object):
                     ordering.append(pfx + order_field)
                 except (IndexError, ValueError):
                     continue # Invalid ordering specified, skip it.
+
+        # Add the given query's ordering fields, if any.
+        ordering.extend(queryset.query.order_by)
+
+        # Ensure that the primary key is systematically present in the list of
+        # ordering fields so we can guarantee a deterministic order across all
+        # database backends.
+        pk_name = self.lookup_opts.pk.name
+        if not (set(ordering) & set(['pk', '-pk', pk_name, '-' + pk_name])):
+            # The two sets do not intersect, meaning the pk isn't present. So
+            # we add it.
+            ordering.append('pk')
+
         return ordering
 
     def get_ordering_field_columns(self):
@@ -322,8 +339,8 @@ class ChangeList(object):
                             break
 
         # Set ordering.
-        if self.ordering:
-            qs = qs.order_by(*self.ordering)
+        ordering = self.get_ordering(request, qs)
+        qs = qs.order_by(*ordering)
 
         # Apply keyword searches.
         def construct_search(field_name):

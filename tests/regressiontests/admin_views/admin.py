@@ -26,7 +26,8 @@ from .models import (Article, Chapter, Account, Media, Child, Parent, Picture,
     CoverLetter, Story, OtherStory, Book, Promo, ChapterXtra1, Pizza, Topping,
     Album, Question, Answer, ComplexSortedPerson, PrePopulatedPostLargeSlug,
     AdminOrderedField, AdminOrderedModelMethod, AdminOrderedAdminMethod,
-    AdminOrderedCallable, Report, Color2, MainPrepopulated, RelatedPrepopulated)
+    AdminOrderedCallable, Report, Color2, UnorderedObject, MainPrepopulated,
+    RelatedPrepopulated)
 
 
 def callable_year(dt_value):
@@ -562,6 +563,11 @@ class MainPrepopulatedAdmin(admin.ModelAdmin):
                            'slug2': ['status', 'name']}
 
 
+class UnorderedObjectAdmin(admin.ModelAdmin):
+    list_display = ['name']
+    list_editable = ['name']
+    list_per_page = 2
+
 
 
 site = admin.AdminSite(name="admin")
@@ -609,6 +615,7 @@ site.register(Story, StoryAdmin)
 site.register(OtherStory, OtherStoryAdmin)
 site.register(Report, ReportAdmin)
 site.register(MainPrepopulated, MainPrepopulatedAdmin)
+site.register(UnorderedObject, UnorderedObjectAdmin)
 
 # We intentionally register Promo and ChapterXtra1 but not Chapter nor ChapterXtra2.
 # That way we cover all four cases:
