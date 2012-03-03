@@ -624,14 +624,14 @@ class NamedUrlWizardView(WizardView):
             # URL step name and storage step name are equal, render!
             return self.render(self.get_form(
                 data=self.storage.current_step_data,
-                files=self.storage.current_step_data,
+                files=self.storage.current_step_files,
             ), **kwargs)
 
         elif step_url in self.get_form_list():
             self.storage.current_step = step_url
             return self.render(self.get_form(
                 data=self.storage.current_step_data,
-                files=self.storage.current_step_data,
+                files=self.storage.current_step_files,
             ), **kwargs)
 
         # invalid step name, reset to first and redirect.

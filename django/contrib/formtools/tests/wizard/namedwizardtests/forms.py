@@ -1,4 +1,8 @@
+import os
+import tempfile
+
 from django import forms
+from django.core.files.storage import FileSystemStorage
 from django.forms.formsets import formset_factory
 from django.http import HttpResponse
 from django.template import Template, Context
@@ -6,6 +10,9 @@ from django.template import Template, Context
 from django.contrib.auth.models import User
 
 from django.contrib.formtools.wizard.views import NamedUrlWizardView
+
+temp_storage_location = tempfile.mkdtemp(dir=os.environ.get('DJANGO_TEST_TEMP_DIR'))
+temp_storage = FileSystemStorage(location=temp_storage_location)
 
 class Page1(forms.Form):
     name = forms.CharField(max_length=100)
@@ -15,6 +22,7 @@ class Page1(forms.Form):
 class Page2(forms.Form):
     address1 = forms.CharField(max_length=100)
     address2 = forms.CharField(max_length=100)
+    file1 = forms.FileField()
 
 class Page3(forms.Form):
     random_crap = forms.CharField(max_length=100)
@@ -22,6 +30,8 @@ class Page3(forms.Form):
 Page4 = formset_factory(Page3, extra=2)
 
 class ContactWizard(NamedUrlWizardView):
+    file_storage = temp_storage
+
     def done(self, form_list, **kwargs):
         c = Context({
             'form_list': [x.cleaned_data for x in form_list],
