@@ -624,7 +624,8 @@ class HorizontalVerticalFilterSeleniumFirefoxTests(AdminSeleniumWebDriverTestCas
         for field_name in ['students', 'alumni']:
             from_box = '#id_%s_from' % field_name
             to_box = '#id_%s_to' % field_name
-            choose_link = 'id_%s_add_link' % field_name
+            choose_link = '#id_%s_add_link' % field_name
+            remove_link = '#id_%s_remove_link' % field_name
             input = self.selenium.find_element_by_css_selector('#id_%s_input' % field_name)
 
             # Initial values
@@ -648,21 +649,40 @@ class HorizontalVerticalFilterSeleniumFirefoxTests(AdminSeleniumWebDriverTestCas
                          str(self.cliff.id), str(self.jason.id),
                          str(self.jenny.id), str(self.john.id)])
 
+            # -----------------------------------------------------------------
             # Check that chosing a filtered option sends it properly to the
             # 'to' box.
             input.send_keys('a')
             self.assertSelectOptions(from_box, [str(self.arthur.id), str(self.jason.id)])
             self.get_select_option(from_box, str(self.jason.id)).click()
-            self.selenium.find_element_by_id(choose_link).click()
+            self.selenium.find_element_by_css_selector(choose_link).click()
             self.assertSelectOptions(from_box, [str(self.arthur.id)])
+            self.assertSelectOptions(to_box,
+                        [str(self.lisa.id), str(self.peter.id),
+                         str(self.jason.id)])
+
+            self.get_select_option(to_box, str(self.lisa.id)).click()
+            self.selenium.find_element_by_css_selector(remove_link).click()
+            self.assertSelectOptions(from_box,
+                        [str(self.arthur.id), str(self.lisa.id)])
+            self.assertSelectOptions(to_box,
+                        [str(self.peter.id), str(self.jason.id)])
+
             input.send_keys([Keys.BACK_SPACE]) # Clear text box
             self.assertSelectOptions(from_box,
                         [str(self.arthur.id), str(self.bob.id),
                          str(self.cliff.id), str(self.jenny.id),
-                         str(self.john.id)])
+                         str(self.john.id), str(self.lisa.id)])
             self.assertSelectOptions(to_box,
-                        [str(self.lisa.id), str(self.peter.id),
-                         str(self.jason.id)])
+                        [str(self.peter.id), str(self.jason.id)])
+
+        # Save and check that everything is properly stored in the database ---
+        self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+        self.school = models.School.objects.get(id=self.school.id) # Reload from database
+        self.assertEqual(list(self.school.students.all()),
+                         [self.jason, self.peter])
+        self.assertEqual(list(self.school.alumni.all()),
+                         [self.jason, self.peter])
 
 class HorizontalVerticalFilterSeleniumChromeTests(HorizontalVerticalFilterSeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
