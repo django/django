@@ -480,7 +480,19 @@ class HorizontalVerticalFilterSeleniumFirefoxTests(AdminSeleniumWebDriverTestCas
         self.school = models.School.objects.create(name='School of Awesome')
         super(HorizontalVerticalFilterSeleniumFirefoxTests, self).setUp()
 
-    def execute_basic_operations(self, field_name, mode):
+    def assertActiveButtons(self, mode, field_name, choose, remove,
+                             choose_all=None, remove_all=None):
+        choose_link = '#id_%s_add_link' % field_name
+        choose_all_link = '#id_%s_add_all_link' % field_name
+        remove_link = '#id_%s_remove_link' % field_name
+        remove_all_link = '#id_%s_remove_all_link' % field_name
+        self.assertEqual(self.has_css_class(choose_link, 'active'), choose)
+        self.assertEqual(self.has_css_class(remove_link, 'active'), remove)
+        if mode == 'horizontal':
+            self.assertEqual(self.has_css_class(choose_all_link, 'active'), choose_all)
+            self.assertEqual(self.has_css_class(remove_all_link, 'active'), remove_all)
+
+    def execute_basic_operations(self, mode, field_name):
         from_box = '#id_%s_from' % field_name
         to_box = '#id_%s_to' % field_name
         choose_link = 'id_%s_add_link' % field_name
@@ -495,6 +507,7 @@ class HorizontalVerticalFilterSeleniumFirefoxTests(AdminSeleniumWebDriverTestCas
                          str(self.jenny.id), str(self.john.id)])
         self.assertSelectOptions(to_box,
                         [str(self.lisa.id), str(self.peter.id)])
+        self.assertActiveButtons(mode, field_name, False, False, True, True)
 
         # Click 'Choose all' --------------------------------------------------
         if mode == 'horizontal':
@@ -511,6 +524,7 @@ class HorizontalVerticalFilterSeleniumFirefoxTests(AdminSeleniumWebDriverTestCas
                          str(self.arthur.id), str(self.bob.id),
                          str(self.cliff.id), str(self.jason.id),
                          str(self.jenny.id), str(self.john.id)])
+        self.assertActiveButtons(mode, field_name, False, False, False, True)
 
         # Click 'Remove all' --------------------------------------------------
         if mode == 'horizontal':
@@ -527,13 +541,16 @@ class HorizontalVerticalFilterSeleniumFirefoxTests(AdminSeleniumWebDriverTestCas
                          str(self.cliff.id), str(self.jason.id),
                          str(self.jenny.id), str(self.john.id)])
         self.assertSelectOptions(to_box, [])
+        self.assertActiveButtons(mode, field_name, False, False, True, False)
 
         # Choose some options ------------------------------------------------
         self.get_select_option(from_box, str(self.lisa.id)).click()
         self.get_select_option(from_box, str(self.jason.id)).click()
         self.get_select_option(from_box, str(self.bob.id)).click()
         self.get_select_option(from_box, str(self.john.id)).click()
+        self.assertActiveButtons(mode, field_name, True, False, True, False)
         self.selenium.find_element_by_id(choose_link).click()
+        self.assertActiveButtons(mode, field_name, False, False, True, True)
 
         self.assertSelectOptions(from_box,
                         [str(self.peter.id), str(self.arthur.id),
@@ -545,7 +562,9 @@ class HorizontalVerticalFilterSeleniumFirefoxTests(AdminSeleniumWebDriverTestCas
         # Remove some options -------------------------------------------------
         self.get_select_option(to_box, str(self.lisa.id)).click()
         self.get_select_option(to_box, str(self.bob.id)).click()
+        self.assertActiveButtons(mode, field_name, False, True, True, True)
         self.selenium.find_element_by_id(remove_link).click()
+        self.assertActiveButtons(mode, field_name, False, False, True, True)
 
         self.assertSelectOptions(from_box,
                         [str(self.peter.id), str(self.arthur.id),
@@ -575,8 +594,8 @@ class HorizontalVerticalFilterSeleniumFirefoxTests(AdminSeleniumWebDriverTestCas
         self.selenium.get(
             '%s%s' % (self.live_server_url, '/admin_widgets/school/%s/' % self.school.id))
 
-        self.execute_basic_operations('students', 'vertical')
-        self.execute_basic_operations('alumni', 'horizontal')
+        self.execute_basic_operations('vertical', 'students')
+        self.execute_basic_operations('horizontal', 'alumni')
 
         # Save and check that everything is properly stored in the database ---
         self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
@@ -585,6 +604,65 @@ class HorizontalVerticalFilterSeleniumFirefoxTests(AdminSeleniumWebDriverTestCas
                          [self.arthur, self.cliff, self.jason, self.john])
         self.assertEqual(list(self.school.alumni.all()),
                          [self.arthur, self.cliff, self.jason, self.john])
+
+    def test_filter(self):
+        """
+        Ensure that typing in the search box filters out options displayed in
+        the 'from' box.
+        """
+        from selenium.webdriver.common.keys import Keys
+
+        self.school.students = [self.lisa, self.peter]
+        self.school.alumni = [self.lisa, self.peter]
+        self.school.save()
+
+        self.admin_login(username='super', password='secret', login_url='/')
+        self.selenium.get(
+            '%s%s' % (self.live_server_url, '/admin_widgets/school/%s/' % self.school.id))
+
+
+        for field_name in ['students', 'alumni']:
+            from_box = '#id_%s_from' % field_name
+            to_box = '#id_%s_to' % field_name
+            choose_link = 'id_%s_add_link' % field_name
+            input = self.selenium.find_element_by_css_selector('#id_%s_input' % field_name)
+
+            # Initial values
+            self.assertSelectOptions(from_box,
+                        [str(self.arthur.id), str(self.bob.id),
+                         str(self.cliff.id), str(self.jason.id),
+                         str(self.jenny.id), str(self.john.id)])
+
+            # Typing in some characters filters out non-matching options
+            input.send_keys('a')
+            self.assertSelectOptions(from_box, [str(self.arthur.id), str(self.jason.id)])
+            input.send_keys('R')
+            self.assertSelectOptions(from_box, [str(self.arthur.id)])
+
+            # Clearing the text box makes the other options reappear
+            input.send_keys([Keys.BACK_SPACE])
+            self.assertSelectOptions(from_box, [str(self.arthur.id), str(self.jason.id)])
+            input.send_keys([Keys.BACK_SPACE])
+            self.assertSelectOptions(from_box,
+                        [str(self.arthur.id), str(self.bob.id),
+                         str(self.cliff.id), str(self.jason.id),
+                         str(self.jenny.id), str(self.john.id)])
+
+            # Check that chosing a filtered option sends it properly to the
+            # 'to' box.
+            input.send_keys('a')
+            self.assertSelectOptions(from_box, [str(self.arthur.id), str(self.jason.id)])
+            self.get_select_option(from_box, str(self.jason.id)).click()
+            self.selenium.find_element_by_id(choose_link).click()
+            self.assertSelectOptions(from_box, [str(self.arthur.id)])
+            input.send_keys([Keys.BACK_SPACE]) # Clear text box
+            self.assertSelectOptions(from_box,
+                        [str(self.arthur.id), str(self.bob.id),
+                         str(self.cliff.id), str(self.jenny.id),
+                         str(self.john.id)])
+            self.assertSelectOptions(to_box,
+                        [str(self.lisa.id), str(self.peter.id),
+                         str(self.jason.id)])
 
 class HorizontalVerticalFilterSeleniumChromeTests(HorizontalVerticalFilterSeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'

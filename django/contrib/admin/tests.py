@@ -95,3 +95,11 @@ class AdminSeleniumWebDriverTestCase(LiveServerTestCase):
         for option in options:
             actual_values.append(option.get_attribute('value'))
         self.assertEqual(values, actual_values)
+
+    def has_css_class(self, selector, klass):
+        """
+        Returns True if the element identified by `selector` has the CSS class
+        `klass`.
+        """
+        return (self.selenium.find_element_by_css_selector(selector)
+                .get_attribute('class').find(klass) != -1)
