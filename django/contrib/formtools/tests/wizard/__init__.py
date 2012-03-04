@@ -15,4 +15,5 @@ from django.contrib.formtools.tests.wizard.wizardtests.tests import (
     CookieWizardTests,
     WizardTestKwargs,
     WizardTestGenericViewInterface,
+    WizardFormKwargsOverrideTests,
 )

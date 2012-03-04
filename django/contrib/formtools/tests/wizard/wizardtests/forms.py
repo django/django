@@ -2,8 +2,10 @@ import os
 import tempfile
 
 from django import forms
+from django.contrib.auth.models import User
 from django.core.files.storage import FileSystemStorage
 from django.forms.formsets import formset_factory
+from django.forms.models import modelformset_factory
 from django.http import HttpResponse
 from django.template import Template, Context
 
@@ -49,6 +51,13 @@ class ContactWizard(WizardView):
         if self.storage.current_step == 'form2':
             context.update({'another_var': True})
         return context
+
+class UserForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ('username', 'email')
+
+UserFormSet = modelformset_factory(User, form=UserForm)
 
 class SessionContactWizard(ContactWizard):
     storage_name = 'django.contrib.formtools.wizard.storage.session.SessionStorage'

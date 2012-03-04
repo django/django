@@ -7,6 +7,7 @@ from django.test.client import RequestFactory
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.formtools.wizard.views import CookieWizardView
+from django.contrib.formtools.tests.wizard.forms import UserForm, UserFormSet
 
 
 class WizardTests(object):
@@ -331,3 +332,48 @@ class WizardTestGenericViewInterface(TestCase):
         response = view(factory.get('/'))
         self.assertEquals(response.context_data['test_key'], 'test_value')
         self.assertEquals(response.context_data['another_key'], 'another_value')
+
+
+class WizardFormKwargsOverrideTests(TestCase):
+    def setUp(self):
+        super(WizardFormKwargsOverrideTests, self).setUp()
+        self.rf = RequestFactory()
+
+        # Create two users so we can filter by is_staff when handing our
+        # wizard a queryset keyword argument.
+        self.normal_user = User.objects.create(username='test1', email='normal@example.com')
+        self.staff_user = User.objects.create(username='test2', email='staff@example.com', is_staff=True)
+
+    def test_instance_is_maintained(self):
+        self.assertEqual(2, User.objects.count())
+        queryset = User.objects.get(pk=self.staff_user.pk)
+
+        class InstanceOverrideWizard(CookieWizardView):
+            def get_form_kwargs(self, step):
+                return {'instance': queryset}
+
+        view = InstanceOverrideWizard.as_view([UserForm])
+        response = view(self.rf.get('/'))
+
+        form = response.context_data['wizard']['form']
+
+        self.assertNotEqual(form.instance.pk, None)
+        self.assertEqual(form.instance.pk, self.staff_user.pk)
+        self.assertEqual('staff@example.com', form.initial.get('email', None))
+
+    def test_queryset_is_maintained(self):
+        queryset = User.objects.filter(pk=self.staff_user.pk)
+
+        class QuerySetOverrideWizard(CookieWizardView):
+            def get_form_kwargs(self, step):
+                return {'queryset': queryset}
+
+        view = QuerySetOverrideWizard.as_view([UserFormSet])
+        response = view(self.rf.get('/'))
+
+        formset = response.context_data['wizard']['form']
+
+        self.assertNotEqual(formset.queryset, None)
+        self.assertEqual(formset.initial_form_count(), 1)
+        self.assertEqual(['staff@example.com'],
+            list(formset.queryset.values_list('email', flat=True)))
