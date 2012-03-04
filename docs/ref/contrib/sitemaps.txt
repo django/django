@@ -359,7 +359,7 @@ Context variables
 ------------------
 
 When customizing the templates for the :func:`~django.contrib.sitemaps.views.index`
-and ~:func:`django.contrib.sitemaps.views.sitemaps` views, you can rely on the
+and :func:`~django.contrib.sitemaps.views.sitemaps` views, you can rely on the
 following context variables.
 
 Index
