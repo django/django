@@ -495,8 +495,8 @@ class TestCollectionCachedStorage(BaseCollectionTestCase,
         collectstatic_cmd = CollectstaticCommand()
         collectstatic_cmd.set_options(**collectstatic_args)
         stats = collectstatic_cmd.collect()
-        self.assertTrue(u'cached/css/window.css' in stats['post_processed'])
-        self.assertTrue(u'cached/css/img/window.png' in stats['unmodified'])
+        self.assertTrue(os.path.join('cached', 'css', 'window.css') in stats['post_processed'])
+        self.assertTrue(os.path.join('cached', 'css', 'img', 'window.png') in stats['unmodified'])
 
 # we set DEBUG to False here since the template tag wouldn't work otherwise
 TestCollectionCachedStorage = override_settings(**dict(TEST_SETTINGS,
