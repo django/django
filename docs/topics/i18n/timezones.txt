@@ -32,9 +32,9 @@ interacting with end users.
 
 Time zone support is disabled by default. To enable it, set :setting:`USE_TZ =
 True <USE_TZ>` in your settings file. Installing pytz_ is highly recommended,
-but not mandatory. It's as simple as::
+but not mandatory. It's as simple as:
 
-.. code-block::
+.. code-block:: bash
 
     $ sudo pip install pytz
 
