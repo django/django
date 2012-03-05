@@ -51,7 +51,7 @@ Defines a block that can be overridden by child templates. See
 comment
 ^^^^^^^
 
-Ignores everything between ``{% comment %}`` and ``{% endcomment %}``
+Ignores everything between ``{% comment %}`` and ``{% endcomment %}``.
 
 .. templatetag:: csrf_token
 

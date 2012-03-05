@@ -1155,7 +1155,7 @@ Template tags can work in tandem. For instance, the standard
 To create a template tag such as this, use ``parser.parse()`` in your
 compilation function.
 
-Here's how the standard :ttag:`{% comment %}<comment>` tag is implemented:
+Here's how a simplified ``{% comment %}`` tag might be implemented:
 
 .. code-block:: python
 
@@ -1167,6 +1167,14 @@ Here's how the standard :ttag:`{% comment %}<comment>` tag is implemented:
     class CommentNode(template.Node):
         def render(self, context):
             return ''
+
+.. note::
+    The actual implementation of :ttag:`{% comment %}<comment>` is slightly
+    different in that it allows broken template tags to appear between
+    ``{% comment %}`` and ``{% endcomment %}``. It does so by calling
+    ``parser.skip_past('endcomment')`` instead of ``parser.parse(('endcomment',))``
+    followed by ``parser.delete_first_token()``, thus avoiding the generation of a
+    node list.
 
 ``parser.parse()`` takes a tuple of names of block tags ''to parse until''. It
 returns an instance of ``django.template.NodeList``, which is a list of
