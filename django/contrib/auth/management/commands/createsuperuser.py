@@ -6,10 +6,12 @@ import getpass
 import re
 import sys
 from optparse import make_option
+
 from django.contrib.auth.models import User
 from django.contrib.auth.management import get_default_username
 from django.core import exceptions
 from django.core.management.base import BaseCommand, CommandError
+from django.db import DEFAULT_DB_ALIAS
 from django.utils.translation import ugettext as _
 
 RE_VALID_USERNAME = re.compile('[\w.@+-]+$')
@@ -19,9 +21,11 @@ EMAIL_RE = re.compile(
     r'|^"([\001-\010\013\014\016-\037!#-\[\]-\177]|\\[\001-\011\013\014\016-\177])*"' # quoted-string
     r')@(?:[A-Z0-9-]+\.)+[A-Z]{2,6}$', re.IGNORECASE)  # domain
 
+
 def is_valid_email(value):
     if not EMAIL_RE.search(value):
         raise exceptions.ValidationError(_('Enter a valid e-mail address.'))
+
 
 class Command(BaseCommand):
     option_list = BaseCommand.option_list + (
@@ -34,6 +38,9 @@ class Command(BaseCommand):
                   'You must use --username and --email with --noinput, and '
                   'superusers created with --noinput will not be able to log '
                   'in until they\'re given a valid password.')),
+        make_option('--database', action='store', dest='database',
+            default=DEFAULT_DB_ALIAS, help='Nominates a database to save the user to. '
+                    'Defaults to the "default" database.'),
     )
     help = 'Used to create a superuser.'
 
@@ -42,6 +49,7 @@ class Command(BaseCommand):
         email = options.get('email', None)
         interactive = options.get('interactive')
         verbosity = int(options.get('verbosity', 1))
+        database = options.get('database')
 
         # Do quick and dirty validation if --noinput
         if not interactive:
@@ -77,7 +85,7 @@ class Command(BaseCommand):
                         username = None
                         continue
                     try:
-                        User.objects.get(username=username)
+                        User.objects.using(database).get(username=username)
                     except User.DoesNotExist:
                         break
                     else:
@@ -114,7 +122,7 @@ class Command(BaseCommand):
                 sys.stderr.write("\nOperation cancelled.\n")
                 sys.exit(1)
 
-        User.objects.create_superuser(username, email, password)
+        User.objects.db_manager(database).create_superuser(username, email, password)
         if verbosity >= 1:
           self.stdout.write("Superuser created successfully.\n")
 

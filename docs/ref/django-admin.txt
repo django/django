@@ -1197,6 +1197,12 @@ the user given as parameter. If they both match, the new password will be
 changed immediately. If you do not supply a user, the command will attempt to
 change the password whose username matches the current user.
 
+.. versionadded:: 1.4
+.. django-admin-option:: --database
+
+The ``--database`` option can be used to specify the database to query for the
+user. If it is not supplied the ``default`` database will be used.
+
 Example usage::
 
     django-admin.py changepassword ringo
@@ -1226,6 +1232,12 @@ The username and email address for the new account can be supplied by
 using the ``--username`` and ``--email`` arguments on the command
 line. If either of those is not supplied, ``createsuperuser`` will prompt for
 it when running interactively.
+
+.. versionadded:: 1.4
+.. django-admin-option:: --database
+
+The ``--database`` option can be used to specify the database into which the 
+superuser object will be saved.
 
 ``django.contrib.gis``
 ----------------------
