@@ -55,6 +55,8 @@ class FRLocalFlavorTests(SimpleTestCase):
 <option value="17">17 - Charente-Maritime</option>
 <option value="18">18 - Cher</option>
 <option value="19">19 - Corrèze</option>
+<option value="2A">2A - Corse-du-Sud</option>
+<option value="2B">2B - Haute-Corse</option>
 <option value="21">21 - Côte-d&#39;Or</option>
 <option value="22">22 - Côtes-d&#39;Armor</option>
 <option value="23">23 - Creuse</option>
@@ -62,10 +64,8 @@ class FRLocalFlavorTests(SimpleTestCase):
 <option value="25">25 - Doubs</option>
 <option value="26">26 - Drôme</option>
 <option value="27">27 - Eure</option>
-<option value="28">28 - Eure-et-Loire</option>
+<option value="28">28 - Eure-et-Loir</option>
 <option value="29">29 - Finistère</option>
-<option value="2A">2A - Corse-du-Sud</option>
-<option value="2B">2B - Haute-Corse</option>
 <option value="30">30 - Gard</option>
 <option value="31">31 - Haute-Garonne</option>
 <option value="32">32 - Gers</option>
@@ -111,7 +111,7 @@ class FRLocalFlavorTests(SimpleTestCase):
 <option value="72">72 - Sarthe</option>
 <option value="73">73 - Savoie</option>
 <option value="74">74 - Haute-Savoie</option>
-<option value="75">75 - Paris</option>
+<option value="75" selected="selected">75 - Paris</option>
 <option value="76">76 - Seine-Maritime</option>
 <option value="77">77 - Seine-et-Marne</option>
 <option value="78">78 - Yvelines</option>
@@ -138,9 +138,12 @@ class FRLocalFlavorTests(SimpleTestCase):
 <option value="974">974 - La Réunion</option>
 <option value="975">975 - Saint-Pierre-et-Miquelon</option>
 <option value="976">976 - Mayotte</option>
-<option value="984">984 - Terres Australes et Antarctiques</option>
+<option value="977">977 - Saint-Barthélemy</option>
+<option value="978">978 - Saint-Martin</option>
+<option value="984">984 - Terres australes et antarctiques françaises</option>
 <option value="986">986 - Wallis et Futuna</option>
-<option value="987">987 - Polynésie Française</option>
+<option value="987">987 - Polynésie française</option>
 <option value="988">988 - Nouvelle-Calédonie</option>
+<option value="989">989 - Île de Clipperton</option>
 </select>'''
-        self.assertHTMLEqual(f.render('dep', 'Paris'), out)
+        self.assertHTMLEqual(f.render('dep', '75'), out)
