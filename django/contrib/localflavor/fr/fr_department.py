@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 
+# See the "Code officiel géographique" on the INSEE website <www.insee.fr>.
+
 DEPARTMENT_CHOICES = (
+    # Metropolitan departments
     ('01', u'01 - Ain'),
     ('02', u'02 - Aisne'),
     ('03', u'03 - Allier'),
@@ -20,6 +23,8 @@ DEPARTMENT_CHOICES = (
     ('17', u'17 - Charente-Maritime'),
     ('18', u'18 - Cher'),
     ('19', u'19 - Corrèze'),
+    ('2A', u'2A - Corse-du-Sud'),
+    ('2B', u'2B - Haute-Corse'),
     ('21', u'21 - Côte-d\'Or'),
     ('22', u'22 - Côtes-d\'Armor'),
     ('23', u'23 - Creuse'),
@@ -27,10 +32,8 @@ DEPARTMENT_CHOICES = (
     ('25', u'25 - Doubs'),
     ('26', u'26 - Drôme'),
     ('27', u'27 - Eure'),
-    ('28', u'28 - Eure-et-Loire'),
+    ('28', u'28 - Eure-et-Loir'),
     ('29', u'29 - Finistère'),
-    ('2A', u'2A - Corse-du-Sud'),
-    ('2B', u'2B - Haute-Corse'),
     ('30', u'30 - Gard'),
     ('31', u'31 - Haute-Garonne'),
     ('32', u'32 - Gers'),
@@ -97,14 +100,18 @@ DEPARTMENT_CHOICES = (
     ('93', u'93 - Seine-Saint-Denis'),
     ('94', u'94 - Val-de-Marne'),
     ('95', u'95 - Val-d\'Oise'),
+    # Overseas departments, communities, and other territories
     ('971', u'971 - Guadeloupe'),
     ('972', u'972 - Martinique'),
     ('973', u'973 - Guyane'),
     ('974', u'974 - La Réunion'),
     ('975', u'975 - Saint-Pierre-et-Miquelon'),
     ('976', u'976 - Mayotte'),
-    ('984', u'984 - Terres Australes et Antarctiques'),
+    ('977', u'977 - Saint-Barthélemy'),
+    ('978', u'978 - Saint-Martin'),
+    ('984', u'984 - Terres australes et antarctiques françaises'),
     ('986', u'986 - Wallis et Futuna'),
-    ('987', u'987 - Polynésie Française'),
+    ('987', u'987 - Polynésie française'),
     ('988', u'988 - Nouvelle-Calédonie'),
+    ('989', u'989 - Île de Clipperton'),
 )
