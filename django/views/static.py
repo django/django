@@ -51,7 +51,7 @@ def serve(request, path, document_root=None, show_indexes=False):
             return directory_index(newpath, fullpath)
         raise Http404(_(u"Directory indexes are not allowed here."))
     if not os.path.exists(fullpath):
-        raise Http404(_(u'"%s" does not exist') % fullpath)
+        raise Http404(_(u'"%(path)s" does not exist') % {'path': fullpath})
     # Respect the If-Modified-Since header.
     statobj = os.stat(fullpath)
     mimetype, encoding = mimetypes.guess_type(fullpath)
