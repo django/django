@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-12-22 23:56+0100\n"
+"POT-Creation-Date: 2012-03-05 02:25+0100\n"
 "PO-Revision-Date: 2010-05-13 15:35+0200\n"
 "Last-Translator: Django team\n"
 "Language-Team: English <en@li.org>\n"
@@ -12,6 +12,15 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#: views.py:7
+msgid "No feeds are registered."
+msgstr ""
+
+#: views.py:17
+#, python-format
+msgid "Slug %r isn't registered."
+msgstr ""
 
 #: db/models/fields.py:50
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
@@ -61,4 +70,19 @@ msgstr ""
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."
+msgstr ""
+
+#: sitemaps/views.py:44
+#, python-format
+msgid "No sitemap available for section: %r"
+msgstr ""
+
+#: sitemaps/views.py:58
+#, python-format
+msgid "Page %s empty"
+msgstr ""
+
+#: sitemaps/views.py:60
+#, python-format
+msgid "No page '%s'"
 msgstr ""
