@@ -11,6 +11,7 @@ from django.db import models
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.encoding import smart_unicode
 from django.utils.translation import ugettext_lazy as _
+from django.utils import timezone
 
 from django.contrib.admin.util import (get_model_from_relation,
     reverse_field_path, get_limit_choices_to_from_path, prepare_lookup_value)
@@ -282,44 +283,49 @@ class DateFieldListFilter(FieldListFilter):
         self.field_generic = '%s__' % field_path
         self.date_params = dict([(k, v) for k, v in params.items()
                                  if k.startswith(self.field_generic)])
-        today = datetime.date.today()
-        one_week_ago = today - datetime.timedelta(days=7)
-        today_str = str(today)
+
+        now = timezone.now()
+        # When time zone support is enabled, convert "now" to the user's time
+        # zone so Django's definition of "Today" matches what the user expects.
+        if now.tzinfo is not None:
+            current_tz = timezone.get_current_timezone()
+            now = now.astimezone(current_tz)
+            if hasattr(current_tz, 'normalize'):
+                # available for pytz time zones
+                now = current_tz.normalize(now)
+
         if isinstance(field, models.DateTimeField):
-            today_str += ' 23:59:59'
-        self.lookup_kwarg_year = '%s__year' % field_path
-        self.lookup_kwarg_month = '%s__month' % field_path
-        self.lookup_kwarg_day = '%s__day' % field_path
-        self.lookup_kwarg_past_7_days_gte = '%s__gte' % field_path
-        self.lookup_kwarg_past_7_days_lte = '%s__lte' % field_path
+            today = now.replace(hour=0, minute=0, second=0, microsecond=0)
+        else:       # field is a models.DateField
+            today = now.date()
+        tomorrow = today + datetime.timedelta(days=1)
+    
+        self.lookup_kwarg_since = '%s__gte' % field_path
+        self.lookup_kwarg_until = '%s__lt' % field_path
         self.links = (
             (_('Any date'), {}),
             (_('Today'), {
-                self.lookup_kwarg_year: str(today.year),
-                self.lookup_kwarg_month: str(today.month),
-                self.lookup_kwarg_day: str(today.day),
+                self.lookup_kwarg_since: str(today),
+                self.lookup_kwarg_until: str(tomorrow),
             }),
             (_('Past 7 days'), {
-                self.lookup_kwarg_past_7_days_gte: str(one_week_ago),
-                self.lookup_kwarg_past_7_days_lte: today_str,
+                self.lookup_kwarg_since: str(today - datetime.timedelta(days=7)),
+                self.lookup_kwarg_until: str(tomorrow),
             }),
             (_('This month'), {
-                self.lookup_kwarg_year: str(today.year),
-                self.lookup_kwarg_month: str(today.month),
+                self.lookup_kwarg_since: str(today.replace(day=1)),
+                self.lookup_kwarg_until: str(tomorrow),
             }),
             (_('This year'), {
-                self.lookup_kwarg_year: str(today.year),
+                self.lookup_kwarg_since: str(today.replace(month=1, day=1)),
+                self.lookup_kwarg_until: str(tomorrow),
             }),
         )
         super(DateFieldListFilter, self).__init__(
             field, request, params, model, model_admin, field_path)
 
     def expected_parameters(self):
-        return [
-            self.lookup_kwarg_year, self.lookup_kwarg_month,
-            self.lookup_kwarg_day, self.lookup_kwarg_past_7_days_gte,
-            self.lookup_kwarg_past_7_days_lte
-        ]
+        return [self.lookup_kwarg_since, self.lookup_kwarg_until]
 
     def choices(self, cl):
         for title, param_dict in self.links:
