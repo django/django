@@ -52,7 +52,7 @@ copyright = 'Django Software Foundation and contributors'
 # The short X.Y version.
 version = '1.4'
 # The full version, including alpha/beta/rc tags.
-release = '1.4 beta 1'
+release = '1.4 rc 1'
 # The next version to be released
 django_next_version = '1.4'
 
