@@ -394,6 +394,7 @@ class SeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
         Ensure that the "Add another XXX" link correctly adds items to the
         inline form.
         """
+        from selenium.common.exceptions import TimeoutException
         self.admin_login(username='super', password='secret')
         self.selenium.get('%s%s' % (self.live_server_url,
             '/admin/admin_inlines/profilecollection/add/'))
@@ -401,14 +402,14 @@ class SeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
         # Check that there's only one inline to start with and that it has the
         # correct ID.
         self.failUnlessEqual(len(self.selenium.find_elements_by_css_selector(
-            '#profile_set-group table tr.dynamic-profile_set')), 1)
-        self.failUnlessEqual(self.selenium.find_element_by_css_selector(
-            '.dynamic-profile_set:nth-of-type(1)').get_attribute('id'),
+            '.dynamic-profile_set')), 1)
+        self.failUnlessEqual(self.selenium.find_elements_by_css_selector(
+            '.dynamic-profile_set')[0].get_attribute('id'),
             'profile_set-0')
         self.failUnlessEqual(len(self.selenium.find_elements_by_css_selector(
-            'form#profilecollection_form tr.dynamic-profile_set#profile_set-0 input[name=profile_set-0-first_name]')), 1)
+            '.dynamic-profile_set#profile_set-0 input[name=profile_set-0-first_name]')), 1)
         self.failUnlessEqual(len(self.selenium.find_elements_by_css_selector(
-            'form#profilecollection_form tr.dynamic-profile_set#profile_set-0 input[name=profile_set-0-last_name]')), 1)
+            '.dynamic-profile_set#profile_set-0 input[name=profile_set-0-last_name]')), 1)
 
         # Add an inline
         self.selenium.find_element_by_link_text('Add another Profile').click()
@@ -416,24 +417,24 @@ class SeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
         # Check that the inline has been added, that it has the right id, and
         # that it contains the right fields.
         self.failUnlessEqual(len(self.selenium.find_elements_by_css_selector(
-            '#profile_set-group table tr.dynamic-profile_set')), 2)
-        self.failUnlessEqual(self.selenium.find_element_by_css_selector(
-            '.dynamic-profile_set:nth-of-type(2)').get_attribute('id'), 'profile_set-1')
+            '.dynamic-profile_set')), 2)
+        self.failUnlessEqual(self.selenium.find_elements_by_css_selector(
+            '.dynamic-profile_set')[1].get_attribute('id'), 'profile_set-1')
         self.failUnlessEqual(len(self.selenium.find_elements_by_css_selector(
-            'form#profilecollection_form tr.dynamic-profile_set#profile_set-1 input[name=profile_set-1-first_name]')), 1)
+            '.dynamic-profile_set#profile_set-1 input[name=profile_set-1-first_name]')), 1)
         self.failUnlessEqual(len(self.selenium.find_elements_by_css_selector(
-            'form#profilecollection_form tr.dynamic-profile_set#profile_set-1 input[name=profile_set-1-last_name]')), 1)
+            '.dynamic-profile_set#profile_set-1 input[name=profile_set-1-last_name]')), 1)
 
         # Let's add another one to be sure
         self.selenium.find_element_by_link_text('Add another Profile').click()
         self.failUnlessEqual(len(self.selenium.find_elements_by_css_selector(
-            '#profile_set-group table tr.dynamic-profile_set')), 3)
-        self.failUnlessEqual(self.selenium.find_element_by_css_selector(
-            '.dynamic-profile_set:nth-of-type(3)').get_attribute('id'), 'profile_set-2')
+            '.dynamic-profile_set')), 3)
+        self.failUnlessEqual(self.selenium.find_elements_by_css_selector(
+            '.dynamic-profile_set')[2].get_attribute('id'), 'profile_set-2')
         self.failUnlessEqual(len(self.selenium.find_elements_by_css_selector(
-            'form#profilecollection_form tr.dynamic-profile_set#profile_set-2 input[name=profile_set-2-first_name]')), 1)
+            '.dynamic-profile_set#profile_set-2 input[name=profile_set-2-first_name]')), 1)
         self.failUnlessEqual(len(self.selenium.find_elements_by_css_selector(
-            'form#profilecollection_form tr.dynamic-profile_set#profile_set-2 input[name=profile_set-2-last_name]')), 1)
+            '.dynamic-profile_set#profile_set-2 input[name=profile_set-2-last_name]')), 1)
 
         # Enter some data and click 'Save'
         self.selenium.find_element_by_name('profile_set-0-first_name').send_keys('0 first name 1')
@@ -442,10 +443,17 @@ class SeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
         self.selenium.find_element_by_name('profile_set-1-last_name').send_keys('1 last name 2')
         self.selenium.find_element_by_name('profile_set-2-first_name').send_keys('2 first name 1')
         self.selenium.find_element_by_name('profile_set-2-last_name').send_keys('2 last name 2')
+
         self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
 
-        # Wait for the next page to be loaded.
-        self.wait_loaded_tag('body')
+        try:
+            # Wait for the next page to be loaded.
+            self.wait_loaded_tag('body')
+        except TimeoutException:
+            # IE7 occasionnally returns an error "Internet Explorer cannot
+            # display the webpage" and doesn't load the next page. We just
+            # ignore it.
+            pass
 
         # Check that the objects have been created in the database
         self.assertEqual(ProfileCollection.objects.all().count(), 1)
@@ -492,3 +500,6 @@ class SeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
 
 class SeleniumChromeTests(SeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
+
+class SeleniumIETests(SeleniumFirefoxTests):
+    webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'

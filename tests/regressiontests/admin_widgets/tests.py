@@ -462,6 +462,9 @@ class DateTimePickerSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
 class DateTimePickerSeleniumChromeTests(DateTimePickerSeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
 
+class DateTimePickerSeleniumIETests(DateTimePickerSeleniumFirefoxTests):
+    webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
+
 
 class HorizontalVerticalFilterSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
     webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
@@ -515,7 +518,7 @@ class HorizontalVerticalFilterSeleniumFirefoxTests(AdminSeleniumWebDriverTestCas
         elif mode == 'vertical':
             # There 's no 'Choose all' button in vertical mode, so individually
             # select all options and click 'Choose'.
-            for option in self.selenium.find_elements_by_css_selector(from_box + ' option'):
+            for option in self.selenium.find_elements_by_css_selector(from_box + ' > option'):
                 option.click()
             self.selenium.find_element_by_id(choose_link).click()
         self.assertSelectOptions(from_box, [])
@@ -532,7 +535,7 @@ class HorizontalVerticalFilterSeleniumFirefoxTests(AdminSeleniumWebDriverTestCas
         elif mode == 'vertical':
             # There 's no 'Remove all' button in vertical mode, so individually
             # select all options and click 'Remove'.
-            for option in self.selenium.find_elements_by_css_selector(to_box + ' option'):
+            for option in self.selenium.find_elements_by_css_selector(to_box + ' > option'):
                 option.click()
             self.selenium.find_element_by_id(remove_link).click()
         self.assertSelectOptions(from_box,
@@ -686,3 +689,6 @@ class HorizontalVerticalFilterSeleniumFirefoxTests(AdminSeleniumWebDriverTestCas
 
 class HorizontalVerticalFilterSeleniumChromeTests(HorizontalVerticalFilterSeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
+
+class HorizontalVerticalFilterSeleniumIETests(HorizontalVerticalFilterSeleniumFirefoxTests):
+    webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'

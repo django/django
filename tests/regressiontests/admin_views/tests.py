@@ -2934,6 +2934,7 @@ class SeleniumPrePopulatedFirefoxTests(AdminSeleniumWebDriverTestCase):
         main form and with stacked and tabular inlines.
         Refs #13068, #9264, #9983, #9784.
         """
+        from selenium.common.exceptions import TimeoutException
         self.admin_login(username='super', password='secret', login_url='/test_admin/admin/')
         self.selenium.get('%s%s' % (self.live_server_url,
             '/test_admin/admin/admin_views/mainprepopulated/add/'))
@@ -2958,7 +2959,7 @@ class SeleniumPrePopulatedFirefoxTests(AdminSeleniumWebDriverTestCase):
         self.assertEqual(slug2, 'option-one-here-stacked-inline')
 
         # Add an inline
-        self.selenium.find_element_by_css_selector('#relatedprepopulated_set-group .add-row a').click()
+        self.selenium.find_elements_by_link_text('Add another Related Prepopulated')[0].click()
         self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-1-pubdate').send_keys('1999-01-25')
         self.get_select_option('#id_relatedprepopulated_set-1-status', 'option two').click()
         self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-1-name').send_keys(u' now you haVe anöther   sŤāÇkeð  inline with a very ... loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooog text... ')
@@ -2978,7 +2979,7 @@ class SeleniumPrePopulatedFirefoxTests(AdminSeleniumWebDriverTestCase):
         self.assertEqual(slug2, 'option-two-and-now-tabular-inline')
 
         # Add an inline
-        self.selenium.find_element_by_css_selector('#relatedprepopulated_set-2-group .add-row a').click()
+        self.selenium.find_elements_by_link_text('Add another Related Prepopulated')[1].click()
         self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-2-1-pubdate').send_keys('1981-08-22')
         self.get_select_option('#id_relatedprepopulated_set-2-1-status', 'option one').click()
         self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-2-1-name').send_keys(u'a tÃbűlaŘ inline with ignored ;"&*^\%$#@-/`~ characters')
@@ -2989,6 +2990,16 @@ class SeleniumPrePopulatedFirefoxTests(AdminSeleniumWebDriverTestCase):
 
         # Save and check that everything is properly stored in the database
         self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+
+        try:
+            # Wait for the next page to be loaded.
+            self.wait_loaded_tag('body')
+        except TimeoutException:
+            # IE7 occasionnally returns an error "Internet Explorer cannot
+            # display the webpage" and doesn't load the next page. We just
+            # ignore it.
+            pass
+
         self.assertEqual(MainPrepopulated.objects.all().count(), 1)
         MainPrepopulated.objects.get(
             name=u' this is the mAin nÀMë and it\'s awεšome',
@@ -3030,6 +3041,9 @@ class SeleniumPrePopulatedFirefoxTests(AdminSeleniumWebDriverTestCase):
 
 class SeleniumPrePopulatedChromeTests(SeleniumPrePopulatedFirefoxTests):
     webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
+
+class SeleniumPrePopulatedIETests(SeleniumPrePopulatedFirefoxTests):
+    webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
 
 
 class ReadonlyTest(TestCase):
