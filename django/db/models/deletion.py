@@ -144,6 +144,7 @@ class Collector(object):
                             reverse_dependency=reverse_dependency)
         if not new_objs:
             return
+
         model = new_objs[0].__class__
 
         # Recursively collect parent models, but not their related objects.
@@ -157,7 +158,8 @@ class Collector(object):
                              reverse_dependency=True)
 
         if collect_related:
-            for related in model._meta.get_all_related_objects(include_hidden=True):
+            for related in model._meta.get_all_related_objects(
+                    include_hidden=True, include_proxy_eq=True):
                 field = related.field
                 if related.model._meta.auto_created:
                     self.add_batch(related.model, field, new_objs)

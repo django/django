@@ -359,12 +359,15 @@ class Options(object):
     def get_delete_permission(self):
         return 'delete_%s' % self.object_name.lower()
 
-    def get_all_related_objects(self, local_only=False, include_hidden=False):
+    def get_all_related_objects(self, local_only=False, include_hidden=False,
+                                include_proxy_eq=False):
         return [k for k, v in self.get_all_related_objects_with_model(
-                local_only=local_only, include_hidden=include_hidden)]
+                local_only=local_only, include_hidden=include_hidden,
+                include_proxy_eq=include_proxy_eq)]
 
     def get_all_related_objects_with_model(self, local_only=False,
-                                           include_hidden=False):
+                                           include_hidden=False,
+                                           include_proxy_eq=False):
         """
         Returns a list of (related-object, model) pairs. Similar to
         get_fields_with_model().
@@ -378,8 +381,9 @@ class Options(object):
             predicates.append(lambda k, v: not v)
         if not include_hidden:
             predicates.append(lambda k, v: not k.field.rel.is_hidden())
-        return filter(lambda t: all([p(*t) for p in predicates]),
-                      self._related_objects_cache.items())
+        cache = (self._related_objects_proxy_cache if include_proxy_eq
+                 else self._related_objects_cache)
+        return filter(lambda t: all([p(*t) for p in predicates]), cache.items())
 
     def _fill_related_objects_cache(self):
         cache = SortedDict()
@@ -392,11 +396,18 @@ class Options(object):
                     cache[obj] = parent
                 else:
                     cache[obj] = model
+        # Collect also objects which are in relation to some proxy child/parent of self.
+        proxy_cache = cache.copy()
         for klass in get_models(include_auto_created=True, only_installed=False):
             for f in klass._meta.local_fields:
-                if f.rel and not isinstance(f.rel.to, basestring) and self == f.rel.to._meta:
-                    cache[RelatedObject(f.rel.to, klass, f)] = None
+                if f.rel and not isinstance(f.rel.to, basestring):
+                    if self == f.rel.to._meta:
+                        cache[RelatedObject(f.rel.to, klass, f)] = None
+                        proxy_cache[RelatedObject(f.rel.to, klass, f)] = None
+                    elif self.concrete_model == f.rel.to._meta.concrete_model:
+                        proxy_cache[RelatedObject(f.rel.to, klass, f)] = None
         self._related_objects_cache = cache
+        self._related_objects_proxy_cache = proxy_cache
 
     def get_all_related_many_to_many_objects(self, local_only=False):
         try:

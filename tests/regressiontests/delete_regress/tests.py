@@ -8,7 +8,7 @@ from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 
 from .models import (Book, Award, AwardNote, Person, Child, Toy, PlayedWith,
     PlayedWithNote, Email, Researcher, Food, Eaten, Policy, Version, Location,
-    Item)
+    Item, Image, File, Photo, FooFile, FooImage, FooPhoto)
 
 
 # Can't run this test under SQLite, because you can't
@@ -147,3 +147,99 @@ class LargeDeleteTests(TestCase):
             track = Book.objects.create(pagecount=x+100)
         Book.objects.all().delete()
         self.assertEqual(Book.objects.count(), 0)
+
+
+
+class ProxyDeleteTest(TestCase):
+    """
+    Tests on_delete behaviour for proxy models. Deleting the *proxy*
+    instance bubbles through to its non-proxy and *all* referring objects
+    are deleted.
+
+    See #16128.
+
+    """
+
+    def setUp(self):
+        # Create an Image
+        self.test_image = Image()
+        self.test_image.save()
+        foo_image = FooImage(my_image=self.test_image)
+        foo_image.save()
+
+        # Get the Image instance as a File
+        test_file = File.objects.get(pk=self.test_image.pk)
+        foo_file = FooFile(my_file=test_file)
+        foo_file.save()
+
+
+    def test_delete(self):
+        Image.objects.all().delete()
+
+        # An Image deletion == File deletion
+        self.assertEqual(len(Image.objects.all()), 0)
+        self.assertEqual(len(File.objects.all()), 0)
+
+        # The Image deletion cascaded and *all* references to it are deleted.
+        self.assertEqual(len(FooImage.objects.all()), 0)
+        self.assertEqual(len(FooFile.objects.all()), 0)
+
+
+
+class ProxyOfProxyDeleteTest(ProxyDeleteTest):
+    """
+    Tests on_delete behaviour for proxy-of-proxy models. Deleting the *proxy*
+    instance should bubble through to its proxy and non-proxy variants.
+    Deleting *all* referring objects.
+
+    See #16128.
+
+    """
+
+    def setUp(self):
+        # Create the Image, FooImage and FooFile instances
+        super(ProxyOfProxyDeleteTest, self).setUp()
+
+        # Get the Image as a Photo
+        test_photo = Photo.objects.get(pk=self.test_image.pk)
+        foo_photo = FooPhoto(my_photo=test_photo)
+        foo_photo.save()
+
+
+    def test_delete(self):
+        Photo.objects.all().delete()
+
+        # A Photo deletion == Image deletion == File deletion
+        self.assertEqual(len(Photo.objects.all()), 0)
+        self.assertEqual(len(Image.objects.all()), 0)
+        self.assertEqual(len(File.objects.all()), 0)
+
+        # The Photo deletion should have cascaded and deleted *all*
+        # references to it.
+        self.assertEqual(len(FooPhoto.objects.all()), 0)
+        self.assertEqual(len(FooFile.objects.all()), 0)
+        self.assertEqual(len(FooImage.objects.all()), 0)
+
+
+
+class ProxyParentDeleteTest(ProxyDeleteTest):
+    """
+    Tests on_delete cascade behaviour for proxy models. Deleting the
+    *non-proxy* instance of a model should delete objects referencing the
+    proxy.
+
+    See #16128.
+
+    """
+
+    def test_delete(self):
+        File.objects.all().delete()
+
+        # A File deletion == Image deletion
+        self.assertEqual(len(File.objects.all()), 0)
+        self.assertEqual(len(Image.objects.all()), 0)
+
+        # The File deletion should have cascaded and deleted *all* references
+        # to it.
+        self.assertEqual(len(FooFile.objects.all()), 0)
+        self.assertEqual(len(FooImage.objects.all()), 0)
