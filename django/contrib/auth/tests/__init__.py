@@ -12,8 +12,6 @@ from django.contrib.auth.tests.remote_user import (RemoteUserTest,
 from django.contrib.auth.tests.management import (
     GetDefaultUsernameTestCase,
     ChangepasswordManagementCommandTestCase,
-    MultiDBChangepasswordManagementCommandTestCase,
-    MultiDBCreatesuperuserTestCase,
 )
 from django.contrib.auth.tests.models import (ProfileTestCase, NaturalKeysTestCase,
     LoadDataWithoutNaturalKeysTestCase, LoadDataWithNaturalKeysTestCase,
