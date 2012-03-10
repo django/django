@@ -86,7 +86,7 @@ Example ini configuration file::
     pidfile=/tmp/project-master.pid
     vacuum=True
     max-requests=5000
-    deamonize=/var/log/uwsgi/yourproject.log
+    daemonize=/var/log/uwsgi/yourproject.log
 
 Example ini configuration file usage::
 
