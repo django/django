@@ -25,7 +25,7 @@ class Command(AppCommand):
             'This command has been deprecated. The command ``flush`` can be used to delete everything. You can also use ALTER TABLE or DROP TABLE statements manually.',
             DeprecationWarning
         )
-        using = options.get('database', DEFAULT_DB_ALIAS)
+        using = options.get('database')
         connection = connections[using]
 
         app_name = app.__name__.split('.')[-2]

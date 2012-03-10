@@ -20,7 +20,7 @@ class Command(LabelCommand):
     requires_model_validation = False
 
     def handle_label(self, tablename, **options):
-        db = options.get('database', DEFAULT_DB_ALIAS)
+        db = options.get('database')
         cache = BaseDatabaseCache(tablename, {})
         if not router.allow_syncdb(db, cache.cache_model_class):
             return
