@@ -1198,7 +1198,6 @@ changed immediately. If you do not supply a user, the command will attempt to
 change the password whose username matches the current user.
 
 .. versionadded:: 1.4
-.. django-admin-option:: --database
 
 The ``--database`` option can be used to specify the database to query for the
 user. If it is not supplied the ``default`` database will be used.
@@ -1234,9 +1233,8 @@ line. If either of those is not supplied, ``createsuperuser`` will prompt for
 it when running interactively.
 
 .. versionadded:: 1.4
-.. django-admin-option:: --database
 
-The ``--database`` option can be used to specify the database into which the 
+The ``--database`` option can be used to specify the database into which the
 superuser object will be saved.
 
 ``django.contrib.gis``
