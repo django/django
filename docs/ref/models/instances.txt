@@ -578,7 +578,7 @@ For every :class:`~django.db.models.DateField` and
 <django.db.models.Field.null>`, the object will have ``get_next_by_FOO()`` and
 ``get_previous_by_FOO()`` methods, where ``FOO`` is the name of the field. This
 returns the next and previous object with respect to the date field, raising
-the appropriate :exc:`~django.db.DoesNotExist` exception when appropriate.
+a :exc:`~django.db.DoesNotExist` exception when appropriate.
 
 Both methods accept optional keyword arguments, which should be in the format
 described in :ref:`Field lookups <field-lookups>`.
