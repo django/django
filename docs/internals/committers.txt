@@ -243,7 +243,7 @@ Karen Tracey
 
     Carl lives in Rapid City, SD, USA.
 
-.. _Carl Meyer: http://www.oddbird.net/about/#hcard-carl
+.. _Carl Meyer: http://www.oddbird.net/
 .. _OddBird: http://www.oddbird.net/
 
 Ramiro Morales
