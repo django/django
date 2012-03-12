@@ -42,7 +42,8 @@ from .models import (BooleanData, CharData, DateData, DateTimeData, EmailData,
     PositiveSmallIntegerPKData, SlugPKData, SmallPKData, USStatePKData,
     AutoNowDateTimeData, ModifyingSaveData, InheritAbstractModel, BaseModel,
     ExplicitInheritBaseModel, InheritBaseModel, ProxyBaseModel,
-    ProxyProxyBaseModel, BigIntegerData, LengthModel, Tag, ComplexModel)
+    ProxyProxyBaseModel, BigIntegerData, LengthModel, Tag, ComplexModel,
+    NaturalKeyAnchor, FKDataNaturalKey)
 
 # A set of functions that can be used to recreate
 # test data objects of various kinds.
@@ -353,6 +354,12 @@ The end."""),
     (data_obj, 1005, LengthModel, 1),
 ]
 
+natural_key_test_data = [
+    (data_obj, 1100, NaturalKeyAnchor, "Natural Key Anghor"),
+    (fk_obj, 1101, FKDataNaturalKey, 1100),
+    (fk_obj, 1102, FKDataNaturalKey, None),
+]
+
 # Because Oracle treats the empty string as NULL, Oracle is expected to fail
 # when field.empty_strings_allowed is True and the value is None; skip these
 # tests.
@@ -452,6 +459,35 @@ def serializerTest(format, self):
     for klass, count in instance_count.items():
         self.assertEqual(count, klass.objects.count())
 
+def naturalKeySerializerTest(format, self):
+    # Create all the objects defined in the test data
+    objects = []
+    instance_count = {}
+    for (func, pk, klass, datum) in natural_key_test_data:
+        with connection.constraint_checks_disabled():
+            objects.extend(func[0](pk, klass, datum))
+
+    # Get a count of the number of objects created for each class
+    for klass in instance_count:
+        instance_count[klass] = klass.objects.count()
+
+    # Serialize the test database
+    serialized_data = serializers.serialize(format, objects, indent=2,
+        use_natural_keys=True)
+
+    for obj in serializers.deserialize(format, serialized_data):
+        obj.save()
+
+    # Assert that the deserialized data is the same
+    # as the original source
+    for (func, pk, klass, datum) in natural_key_test_data:
+        func[1](self, pk, klass, datum)
+
+    # Assert that the number of objects deserialized is the
+    # same as the number that was serialized.
+    for klass, count in instance_count.items():
+        self.assertEqual(count, klass.objects.count())
+
 def fieldsTest(format, self):
     obj = ComplexModel(field1='first', field2='second', field3='third')
     obj.save_base(raw=True)
@@ -482,6 +518,8 @@ def streamTest(format, self):
 
 for format in serializers.get_serializer_formats():
     setattr(SerializerTests, 'test_' + format + '_serializer', curry(serializerTest, format))
+    setattr(SerializerTests, 'test_' + format + '_natural_key_serializer', curry(naturalKeySerializerTest, format))
     setattr(SerializerTests, 'test_' + format + '_serializer_fields', curry(fieldsTest, format))
     if format != 'python':
         setattr(SerializerTests, 'test_' + format + '_serializer_stream', curry(streamTest, format))
+

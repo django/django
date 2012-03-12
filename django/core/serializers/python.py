@@ -47,7 +47,10 @@ class Serializer(base.Serializer):
     def handle_fk_field(self, obj, field):
         if self.use_natural_keys and hasattr(field.rel.to, 'natural_key'):
             related = getattr(obj, field.name)
-            value = related.natural_key()
+            if related:
+                value = related.natural_key()
+            else:
+                value = None
         else:
             value = getattr(obj, field.get_attname())
         self._current[field.name] = value
