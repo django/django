@@ -14,7 +14,6 @@ __all__ = [
     'get_language',  'get_language_from_request',
     'get_language_info', 'get_language_bidi',
     'check_for_language', 'to_locale', 'templatize', 'string_concat',
-    'get_date_formats', 'get_partial_date_formats',
     'gettext', 'gettext_lazy', 'gettext_noop',
     'ugettext', 'ugettext_lazy', 'ugettext_noop',
     'ngettext', 'ngettext_lazy',
@@ -131,12 +130,6 @@ def get_language():
 
 def get_language_bidi():
     return _trans.get_language_bidi()
-
-def get_date_formats():
-    return _trans.get_date_formats()
-
-def get_partial_date_formats():
-    return _trans.get_partial_date_formats()
 
 def check_for_language(lang_code):
     return _trans.check_for_language(lang_code)
