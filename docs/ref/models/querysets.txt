@@ -1377,7 +1377,7 @@ This has a number of caveats though:
     maximum is defined by the SQLITE_MAX_VARIABLE_NUMBER_ compilation option,
     which defaults to 999. For instance, if your model has 8 fields (including
     the primary key), you cannot create more than 999 // 8 = 124 instances at
-    a time. If you exceed this limit, you will get an exception::
+    a time. If you exceed this limit, you'll get an exception::
 
         django.db.utils.DatabaseError: too many SQL variables
 

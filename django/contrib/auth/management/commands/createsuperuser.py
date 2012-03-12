@@ -39,8 +39,7 @@ class Command(BaseCommand):
                   'superusers created with --noinput will not be able to log '
                   'in until they\'re given a valid password.')),
         make_option('--database', action='store', dest='database',
-            default=DEFAULT_DB_ALIAS, help='Nominates a database to save the user to. '
-                    'Defaults to the "default" database.'),
+            default=DEFAULT_DB_ALIAS, help='Specifies the database to use. Default is "default".'),
     )
     help = 'Used to create a superuser.'
 

@@ -9,8 +9,7 @@ from django.db import DEFAULT_DB_ALIAS
 class Command(BaseCommand):
     option_list = BaseCommand.option_list + (
         make_option('--database', action='store', dest='database',
-            default=DEFAULT_DB_ALIAS, help='Nominates a database to query for the user. '
-                    'Defaults to the "default" database.'),
+            default=DEFAULT_DB_ALIAS, help='Specifies the database to use. Default is "default".'),
     )
     help = "Change a user's password for django.contrib.auth."
 

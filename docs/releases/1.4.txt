@@ -617,9 +617,9 @@ Django 1.4 also includes several smaller improvements worth noting:
 
 * A new :class:`django.test.SimpleTestCase` subclass of
   :class:`unittest.TestCase`
-  that is comparatively lighter than :class:`django.test.TestCase` and
-  company. It can be useful in testing scenarios where e.g. no database
-  interaction is needed. See :ref:`testcase_hierarchy_diagram`.
+  that's lighter than :class:`django.test.TestCase` and company. It can be
+  useful in tests that don't need to hit a database. See
+  :ref:`testcase_hierarchy_diagram`.
 
 Backwards incompatible changes in 1.4
 =====================================

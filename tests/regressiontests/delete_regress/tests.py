@@ -152,7 +152,7 @@ class LargeDeleteTests(TestCase):
 
 class ProxyDeleteTest(TestCase):
     """
-    Tests on_delete behaviour for proxy models. Deleting the *proxy*
+    Tests on_delete behavior for proxy models. Deleting the *proxy*
     instance bubbles through to its non-proxy and *all* referring objects
     are deleted.
 
@@ -188,7 +188,7 @@ class ProxyDeleteTest(TestCase):
 
 class ProxyOfProxyDeleteTest(ProxyDeleteTest):
     """
-    Tests on_delete behaviour for proxy-of-proxy models. Deleting the *proxy*
+    Tests on_delete behavior for proxy-of-proxy models. Deleting the *proxy*
     instance should bubble through to its proxy and non-proxy variants.
     Deleting *all* referring objects.
 
@@ -224,7 +224,7 @@ class ProxyOfProxyDeleteTest(ProxyDeleteTest):
 
 class ProxyParentDeleteTest(ProxyDeleteTest):
     """
-    Tests on_delete cascade behaviour for proxy models. Deleting the
+    Tests on_delete cascade behavior for proxy models. Deleting the
     *non-proxy* instance of a model should delete objects referencing the
     proxy.
 

@@ -1199,8 +1199,8 @@ change the password whose username matches the current user.
 
 .. versionadded:: 1.4
 
-The ``--database`` option can be used to specify the database to query for the
-user. If it is not supplied the ``default`` database will be used.
+Use the ``--database`` option to specify the database to query for the user. If
+it's not supplied, Django will use the ``default`` database.
 
 Example usage::
 
@@ -1234,8 +1234,8 @@ it when running interactively.
 
 .. versionadded:: 1.4
 
-The ``--database`` option can be used to specify the database into which the
-superuser object will be saved.
+Use the ``--database`` option to specify the database into which the superuser
+object will be saved.
 
 ``django.contrib.gis``
 ----------------------

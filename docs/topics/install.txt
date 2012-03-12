@@ -210,24 +210,25 @@ Installing an official release with ``pip``
 This is the recommended way to install Django.
 
 1. Install pip_. The easiest is to use the `standalone pip installer`_. If your
-   distribution has ``pip`` already installed, make sure it isn't too outdated.
+   distribution already has ``pip`` installed, you might need to update it if
+   it's outdated. (If it's outdated, you'll know because installation won't
+   work.)
 
 2. (optional) Take a look at virtualenv_ and virtualenvwrapper_. These tools
    provide isolated Python environments, which are more practical than
-   installing packages system-wide. They also allow installing packages
+   installing packages systemwide. They also allow installing packages
    without administrator privileges. It's up to you to decide if you want to
    learn and use them.
 
 3. If you're using Linux, Mac OS X or some other flavor of Unix, enter the
    command ``sudo pip install Django`` at the shell prompt. If you're using
-   Windows, start up a command shell with administrator privileges and run
+   Windows, start a command shell with administrator privileges and run
    the command ``pip install Django``. This will install Django in your Python
    installation's ``site-packages`` directory.
 
    If you're using a virtualenv, you don't need ``sudo`` or administrator
    privileges, and this will install Django in the virtualenv's
    ``site-packages`` directory.
-
 
 .. _pip: http://www.pip-installer.org/
 .. _virtualenv: http://www.virtualenv.org/
@@ -248,7 +249,7 @@ Installing an official release manually
 
 4. If you're using Linux, Mac OS X or some other flavor of Unix, enter the
    command ``sudo python setup.py install`` at the shell prompt. If you're
-   using Windows, start up a command shell with administrator privileges and
+   using Windows, start a command shell with administrator privileges and
    run the command ``python setup.py install``. This will install Django in
    your Python installation's ``site-packages`` directory.
 
@@ -343,7 +344,7 @@ latest bug fixes and improvements, follow these instructions:
 
 .. warning::
 
-    You mustn't run ``sudo python setup.py install``, because you've already
+    Don't run ``sudo python setup.py install``, because you've already
     carried out the equivalent actions in steps 3 and 4. Furthermore, this is
     known to cause problems when updating to a more recent version of Django.
 
