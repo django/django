@@ -454,9 +454,8 @@ infrastructure available to Django applications described in the
 
 These translations are contributed by Django users worldwide. If you find an
 incorrect translation or want to discuss specific translations, go to the
-`translation team`_ page for that language. If you would like to help out
-with translating or add a language that isn't yet translated, here's what
-to do:
+`Django project page`_ on `Transifex`_. If you would like to help out with
+translating or add a language that isn't yet translated, here's what to do:
 
     * Join the `Django i18n mailing list`_ and introduce yourself.
 
@@ -464,12 +463,12 @@ to do:
 
     * Signup at `Transifex`_ and visit the `Django project page`_.
 
-    * On the "`Translation Teams`_" page, choose the language team you want
-      to work with, **or** -- in case the language team doesn't exist yet --
-      request a new team by clicking on the "Request a new team" button
-      and select the appropriate language.
+    * On the `Django project page`_ page, choose the language you want
+      to work on, **or** -- in case the language doesn't exist yet --
+      request a new language team by clicking on the "Request language"
+      link and select the appropriate language.
 
-    * Then, click the "Join this Team" button to become a member of this team.
+    * Then, click the "Join Team" button to become a member of this team.
       Every team has at least one coordinator who is responsible to review
       your membership request. You can of course also contact the team
       coordinator to clarify procedural problems and handle the actual
@@ -499,8 +498,6 @@ to do:
 .. _Django i18n mailing list: http://groups.google.com/group/django-i18n/
 .. _Transifex: http://www.transifex.net/
 .. _Django project page: http://www.transifex.net/projects/p/django/
-.. _translation teams: http://www.transifex.net/projects/p/django/teams/
-.. _translation team: http://www.transifex.net/projects/p/django/teams/
 .. _Transifex Help: http://help.transifex.net/
 
 Submitting javascript patches
