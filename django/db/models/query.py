@@ -1266,7 +1266,7 @@ def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
         return None
 
     if only_load:
-        load_fields = only_load.get(klass)
+        load_fields = only_load.get(klass) or set()
         # When we create the object, we will also be creating populating
         # all the parent classes, so traverse the parent classes looking
         # for fields that must be included on load.

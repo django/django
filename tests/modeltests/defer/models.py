@@ -22,3 +22,7 @@ class Child(Primary):
 
 class BigChild(Primary):
     other = models.CharField(max_length=50)
+
+class ChildProxy(Child):
+    class Meta:
+        proxy=True

@@ -3,7 +3,7 @@ from __future__ import absolute_import
 from django.db.models.query_utils import DeferredAttribute
 from django.test import TestCase
 
-from .models import Secondary, Primary, Child, BigChild
+from .models import Secondary, Primary, Child, BigChild, ChildProxy
 
 
 class DeferTests(TestCase):
@@ -145,3 +145,7 @@ class DeferTests(TestCase):
         obj.name = "bb"
         obj.save()
 
+    def test_defer_proxy(self):
+        # using select related and only should not result in Exception
+        for obj in ChildProxy.objects.all().select_related().only('id'):
+            continue
