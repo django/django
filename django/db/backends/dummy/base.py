@@ -12,7 +12,9 @@ from django.db.backends import *
 from django.db.backends.creation import BaseDatabaseCreation
 
 def complain(*args, **kwargs):
-    raise ImproperlyConfigured("You haven't set the database ENGINE setting yet.")
+    raise ImproperlyConfigured("settings.DATABASES is improperly configured. "
+                               "Please supply the ENGINE value. Check "
+                               "settings documentation for more details.")
 
 def ignore(*args, **kwargs):
     pass
