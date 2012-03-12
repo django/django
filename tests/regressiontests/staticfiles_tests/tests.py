@@ -7,10 +7,12 @@ import posixpath
 import shutil
 import sys
 import tempfile
+import warnings
 from StringIO import StringIO
 
 from django.template import loader, Context
 from django.conf import settings
+from django.core.cache.backends.base import BaseCache, CacheKeyWarning
 from django.core.exceptions import ImproperlyConfigured
 from django.core.files.storage import default_storage
 from django.core.management import call_command
@@ -497,6 +499,20 @@ class TestCollectionCachedStorage(BaseCollectionTestCase,
         stats = collectstatic_cmd.collect()
         self.assertTrue(os.path.join('cached', 'css', 'window.css') in stats['post_processed'])
         self.assertTrue(os.path.join('cached', 'css', 'img', 'window.png') in stats['unmodified'])
+
+    def test_cache_key_memcache_validation(self):
+        """
+        Handle cache key creation correctly, see #17861.
+        """
+        name = "/some crazy/long filename/ with spaces Here and ?#%#$/other/stuff/some crazy/long filename/ with spaces Here and ?#%#$/other/stuff/some crazy/long filename/ with spaces Here and ?#%#$/other/stuff/some crazy/long filename/ with spaces Here and ?#%#$/other/stuff/some crazy/long filename/ with spaces Here and ?#%#$/other/stuff/some crazy/" + chr(22) + chr(180)
+        cache_key = storage.staticfiles_storage.cache_key(name)
+        self.save_warnings_state()
+        cache_validator = BaseCache({})
+        warnings.filterwarnings('error', category=CacheKeyWarning)
+        cache_validator.validate_key(cache_key)
+        self.restore_warnings_state()
+        self.assertEqual(cache_key, 'staticfiles:e95bbc36387084582df2a70750d7b351')
+
 
 # we set DEBUG to False here since the template tag wouldn't work otherwise
 TestCollectionCachedStorage = override_settings(**dict(TEST_SETTINGS,
