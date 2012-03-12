@@ -29,7 +29,7 @@ class ReadOnlyPasswordHashWidget(forms.Widget):
         encoded = smart_str(encoded)
 
         if len(encoded) == 32 and '$' not in encoded:
-            hasher = get_hasher('md5')
+            hasher = get_hasher('unsalted_md5')
         else:
             algorithm = encoded.split('$', 1)[0]
             hasher = get_hasher(algorithm)
