@@ -1078,6 +1078,16 @@ The internals of the tag aren't part of the official stable API, but in the
 interests of full disclosure, the ``ExtendsNode.__init__`` definition has
 changed, which may break any custom tags that use this class.
 
+Loading some incomplete fixtures no longer works
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Prior to 1.4, a default value was inserted for fixture objects that were missing
+a specific date or datetime value when auto_now or auto_now_add was set for the
+field. This was something that should not have worked, and in 1.4 loading such
+incomplete fixtures will fail. Because fixtures are a raw import, they should
+explicitly specify all field values, regardless of field options on the model.
+
+
 Features deprecated in 1.4
 ==========================
 
