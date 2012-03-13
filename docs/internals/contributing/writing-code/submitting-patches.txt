@@ -162,5 +162,5 @@ minified scripts when submitting patches for Django's javascript.
 
 .. _Closure Compiler: http://code.google.com/closure/compiler/
 .. _django-developers: http://groups.google.com/group/django-developers
-.. _list of tickets with patches: http://code.djangoproject.com/query?status=new&status=assigned&status=reopened&has_patch=1&order=priority
-.. _ticket tracker: http://code.djangoproject.com/newticket
+.. _list of tickets with patches: https://code.djangoproject.com/query?status=new&status=assigned&status=reopened&has_patch=1&order=priority
+.. _ticket tracker: https://code.djangoproject.com/newticket

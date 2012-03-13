@@ -12,7 +12,7 @@ repository. This document covers the way the code repository is laid
 out and how to work with and find things in it.
 
 
-.. _an official packaged release of Django: http://www.djangoproject.com/download/
+.. _an official packaged release of Django: https://www.djangoproject.com/download/
 
 
 High-level overview
@@ -27,13 +27,13 @@ systems, and `a free online book`_ is available to help you get up to
 speed with using Subversion.
 
 The Django Subversion repository is located online at
-`code.djangoproject.com/svn <http://code.djangoproject.com/svn/>`_. `A
+`code.djangoproject.com/svn <https://code.djangoproject.com/svn/>`_. `A
 friendly Web-based interface for browsing the code`_ is also
 available, though when using Subversion you'll always want to use the
 repository address instead. At the top level of the repository are two
 directories: ``django`` contains the full source code for all Django
 releases, while ``djangoproject.com`` contains the source code and
-templates for the `djangoproject.com <http://www.djangoproject.com/>`_
+templates for the `djangoproject.com <https://www.djangoproject.com/>`_
 Web site. For trying out in-development Django code, or contributing
 to Django, you'll always want to check out code from some location in
 the ``django`` directory.
@@ -58,7 +58,7 @@ into three areas:
 
 .. _Subversion: http://subversion.tigris.org/
 .. _a free online book: http://svnbook.red-bean.com/
-.. _A friendly Web-based interface for browsing the code: http://code.djangoproject.com/browser/
+.. _A friendly Web-based interface for browsing the code: https://code.djangoproject.com/browser/
 
 
 Working with Django's trunk
@@ -70,7 +70,7 @@ developing new features, you'll want to get the code from trunk. You
 can get a complete copy of this code (a "Subversion checkout") by
 typing::
 
-    svn co http://code.djangoproject.com/svn/django/trunk/
+    svn co https://code.djangoproject.com/svn/django/trunk/
 
 Note that this will get *all* of Django: in addition to the top-level
 ``django`` module containing Python code, you'll also get a copy of

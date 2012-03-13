@@ -1899,7 +1899,7 @@ A full authorization implementation can be found in
 `django/contrib/auth/backends.py`_, which is the default backend and queries
 the ``auth_permission`` table most of the time.
 
-.. _django/contrib/auth/backends.py: http://code.djangoproject.com/browser/django/trunk/django/contrib/auth/backends.py
+.. _django/contrib/auth/backends.py: https://code.djangoproject.com/browser/django/trunk/django/contrib/auth/backends.py
 
 .. _anonymous_auth:
 

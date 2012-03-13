@@ -361,7 +361,7 @@ Then, you can help out by:
 
     You can also find more :doc:`new-contributors`.
 
-    .. _Reports page: http://code.djangoproject.com/wiki/Reports
+    .. _Reports page: https://code.djangoproject.com/wiki/Reports
 
 However, we do ask the following of all general community members working in
 the ticket database:
@@ -384,10 +384,10 @@ the ticket database:
   or post a message to `django-developers`_. It's okay to be unsure,
   but your input is still valuable.
 
-.. _Trac: http://code.djangoproject.com/
+.. _Trac: https://code.djangoproject.com/
 .. _django-developers: http://groups.google.com/group/django-developers
-.. _i18n branch: http://code.djangoproject.com/browser/django/branches/i18n
-.. _`tags/releases`: http://code.djangoproject.com/browser/django/tags/releases
-.. _`easy pickings`: http://code.djangoproject.com/query?status=!closed&easy=1
-.. _`creating an account on Trac`: http://www.djangoproject.com/accounts/register/
-.. _password reset page: http://www.djangoproject.com/accounts/password/reset/
+.. _i18n branch: https://code.djangoproject.com/browser/django/branches/i18n
+.. _`tags/releases`: https://code.djangoproject.com/browser/django/tags/releases
+.. _`easy pickings`: https://code.djangoproject.com/query?status=!closed&easy=1
+.. _`creating an account on Trac`: https://www.djangoproject.com/accounts/register/
+.. _password reset page: https://www.djangoproject.com/accounts/password/reset/

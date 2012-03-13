@@ -346,7 +346,7 @@ verification. Consult :doc:`the Django CSRF documentation
 </ref/contrib/csrf>` for details on how to handle CSRF verification in
 AJAX requests.
 
-.. _security issues: http://www.djangoproject.com/weblog/2011/feb/08/security/
+.. _security issues: https://www.djangoproject.com/weblog/2011/feb/08/security/
 
 Restricted filters in admin interface
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -464,7 +464,7 @@ would be well advised to seek out a better, less naive approach to the
 problem.
 
 .. _Scunthorpe problem: http://en.wikipedia.org/wiki/Scunthorpe_problem
-.. _commit that implemented this change: http://code.djangoproject.com/changeset/13996
+.. _commit that implemented this change: https://code.djangoproject.com/changeset/13996
 
 Localflavor changes
 ~~~~~~~~~~~~~~~~~~~
@@ -791,7 +791,7 @@ form validation. The previously undocumented method
 in favor of a new :attr:`~django.contrib.admin.AdminSite.login_form`
 attribute.
 
-.. _r12634: http://code.djangoproject.com/changeset/12634
+.. _r12634: https://code.djangoproject.com/changeset/12634
 
 ``reset`` and ``sqlreset`` management commands
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -101,7 +101,7 @@ If you've been relying on this middleware, the easiest upgrade path is:
 * Introduce your modified version of ``SetRemoteAddrFromForwardedFor`` as a
   piece of middleware in your own project.
 
-__ http://code.djangoproject.com/browser/django/trunk/django/middleware/http.py?rev=11000#L33
+__ https://code.djangoproject.com/browser/django/trunk/django/middleware/http.py?rev=11000#L33
 
 Names of uploaded files are available later
 -------------------------------------------

@@ -619,7 +619,7 @@ Django 1.4 also includes several smaller improvements worth noting:
   ``'API'``, ``'TOKEN'``, ``'KEY'`` were added, ``'PASSWORD'`` was changed to
   ``'PASS'``.
 
-.. _django/views/debug.py: http://code.djangoproject.com/browser/django/trunk/django/views/debug.py
+.. _django/views/debug.py: https://code.djangoproject.com/browser/django/trunk/django/views/debug.py
 
 
 Backwards incompatible changes in 1.4
@@ -1167,7 +1167,7 @@ Django team by trying out the beta codebase in a safe test environment and
 reporting any bugs or issues you encounter. The Django ticket tracker is the
 central place to search for open issues:
 
-* http://code.djangoproject.com/timeline
+* https://code.djangoproject.com/timeline
 
 Please open new tickets if no existing ticket corresponds to a problem you're
 running into.

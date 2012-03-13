@@ -61,4 +61,4 @@ highlights:
   documentation, including both corrections to existing documents and
   expanded and new documentation.
 
-.. _the Subversion log of the 1.0.X branch: http://code.djangoproject.com/log/django/branches/releases/1.0.X
+.. _the Subversion log of the 1.0.X branch: https://code.djangoproject.com/log/django/branches/releases/1.0.X

@@ -485,7 +485,7 @@ that returns the url patterns available to that instance. It is this attribute
 that you ``include()`` into your projects ``urlpatterns`` when you deploy the
 admin instance.
 
-.. _`Django Web site`: http://www.djangoproject.com/
+.. _`Django Web site`: https://www.djangoproject.com/
 
 Captured parameters
 -------------------

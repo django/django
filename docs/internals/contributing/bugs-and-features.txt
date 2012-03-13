@@ -207,7 +207,7 @@ or contentious issues -- including, most notably, votes on new core
 committers -- may be held in private.
 
 
-.. _searching: http://code.djangoproject.com/search
+.. _searching: https://code.djangoproject.com/search
 .. _custom queries: https://code.djangoproject.com/query
 .. _django-developers: http://groups.google.com/group/django-developers
 .. _django-users: http://groups.google.com/group/django-users

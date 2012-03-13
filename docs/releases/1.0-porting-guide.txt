@@ -213,7 +213,7 @@ New (1.0)::
     * The new admin comes with a ton of new features; you can read about them in
       the :doc:`admin documentation </ref/contrib/admin/index>`.
 
-    __ http://code.djangoproject.com/wiki/NewformsAdminBranch
+    __ https://code.djangoproject.com/wiki/NewformsAdminBranch
 
 URLs
 ----

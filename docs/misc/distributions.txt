@@ -19,7 +19,7 @@ you're using a Linux distro and don't know how to find out if a package
 is available, then now is a good time to learn.  The Django Wiki contains
 a list of `Third Party Distributions`_ to help you out.
 
-.. _`Third Party Distributions`: http://code.djangoproject.com/wiki/Distributions
+.. _`Third Party Distributions`: https://code.djangoproject.com/wiki/Distributions
 
 
 For distributors

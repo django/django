@@ -72,7 +72,7 @@ installation instructions for each platform.
 .. _Apache: http://httpd.apache.org/
 .. _nginx: http://nginx.net/
 .. _mod_wsgi: http://code.google.com/p/modwsgi/
-.. _server-arrangements wiki page: http://code.djangoproject.com/wiki/ServerArrangements
+.. _server-arrangements wiki page: https://code.djangoproject.com/wiki/ServerArrangements
 
 .. _database-installation:
 
@@ -253,7 +253,7 @@ Installing an official release manually
    run the command ``python setup.py install``. This will install Django in
    your Python installation's ``site-packages`` directory.
 
-.. _download page: http://www.djangoproject.com/download/
+.. _download page: https://www.djangoproject.com/download/
 .. _bsdtar: http://gnuwin32.sourceforge.net/packages/bsdtar.htm
 .. _7-zip: http://www.7-zip.org/
 
@@ -273,8 +273,8 @@ Installing the development version
     (For stable releases, any necessary changes are documented in the
     release notes.)
 
-.. _the development timeline: http://code.djangoproject.com/timeline
-.. _the list of backwards-incompatible changes: http://code.djangoproject.com/wiki/BackwardsIncompatibleChanges
+.. _the development timeline: https://code.djangoproject.com/timeline
+.. _the list of backwards-incompatible changes: https://code.djangoproject.com/wiki/BackwardsIncompatibleChanges
 
 If you'd like to be able to update your Django code occasionally with the
 latest bug fixes and improvements, follow these instructions:
@@ -290,7 +290,7 @@ latest bug fixes and improvements, follow these instructions:
    .. code-block:: bash
 
        # Subversion
-       svn co http://code.djangoproject.com/svn/django/trunk/ django-trunk
+       svn co https://code.djangoproject.com/svn/django/trunk/ django-trunk
 
    Mirrors of the Subversion repository can be obtained like so:
 

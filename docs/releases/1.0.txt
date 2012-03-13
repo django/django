@@ -42,7 +42,7 @@ detailed porting guide:
    1.0-porting-guide
 
 A complete list of backwards-incompatible changes can be found at
-http://code.djangoproject.com/wiki/BackwardsIncompatibleChanges.
+https://code.djangoproject.com/wiki/BackwardsIncompatibleChanges.
 
 What's new in Django 1.0
 ========================
@@ -109,7 +109,7 @@ the ORM's internals. A guide to the changes, including backwards-incompatible
 modifications and mentions of new features opened up by this refactoring, is
 `available on the Django wiki`__.
 
-__ http://code.djangoproject.com/wiki/QuerysetRefactorBranch
+__ https://code.djangoproject.com/wiki/QuerysetRefactorBranch
 
 Automatic escaping of template variables
 ----------------------------------------

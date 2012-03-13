@@ -57,7 +57,7 @@ An improved Django ORM
     features opened up by this refactoring, is available on the Django
     wiki:
 
-    * http://code.djangoproject.com/wiki/QuerysetRefactorBranch
+    * https://code.djangoproject.com/wiki/QuerysetRefactorBranch
 
 Automatic escaping of template variables
     To provide improved security against cross-site scripting (XSS)
@@ -84,7 +84,7 @@ Django 1.0 release, and a comprehensive list of backwards-incompatible
 changes is also available on the Django wiki for those who want to
 begin developing and testing their upgrade process:
 
-* http://code.djangoproject.com/wiki/BackwardsIncompatibleChanges
+* https://code.djangoproject.com/wiki/BackwardsIncompatibleChanges
 
 
 The Django 1.0 roadmap
@@ -123,7 +123,7 @@ Of course, like any estimated timeline, this is subject to change as
 requirements dictate. The latest information will always be available
 on the Django project wiki:
 
-* http://code.djangoproject.com/wiki/VersionOneRoadmap
+* https://code.djangoproject.com/wiki/VersionOneRoadmap
 
 
 What you can do to help
@@ -136,7 +136,7 @@ codebase in a safe test environment and reporting any bugs or issues
 you encounter. The Django ticket tracker is the central place to
 search for open issues:
 
-* http://code.djangoproject.com/timeline
+* https://code.djangoproject.com/timeline
 
 Please open new tickets if no existing ticket corresponds to a problem
 you're running into.

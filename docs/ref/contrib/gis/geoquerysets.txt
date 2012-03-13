@@ -736,7 +736,7 @@ the distance from the `Tasmanian`__ city of Hobart to every other
     in kilometers.  See the :ref:`ref-measure` for usage details and the list of
     :ref:`supported_units`.
 
-__ http://code.djangoproject.com/browser/django/trunk/django/contrib/gis/tests/distapp/models.py
+__ https://code.djangoproject.com/browser/django/trunk/django/contrib/gis/tests/distapp/models.py
 __ http://en.wikipedia.org/wiki/Tasmania
 
 ``length``

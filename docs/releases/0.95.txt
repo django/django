@@ -91,8 +91,8 @@ reasonably routine and only need to be done once. A list of the necessary
 changes is described in the `Removing The Magic`_ wiki page. There is also an
 easy checklist_ for reference when undertaking the porting operation.
 
-.. _Removing The Magic: http://code.djangoproject.com/wiki/RemovingTheMagic
-.. _checklist: http://code.djangoproject.com/wiki/MagicRemovalCheatSheet
+.. _Removing The Magic: https://code.djangoproject.com/wiki/RemovingTheMagic
+.. _checklist: https://code.djangoproject.com/wiki/MagicRemovalCheatSheet
 
 Problem reports and getting help
 ================================
@@ -113,7 +113,7 @@ there's a #django channel on irc.freenode.net that is regularly populated by
 Django users and developers from around the world. Friendly people are usually
 available at any hour of the day -- to help, or just to chat.
 
-.. _Django Web site: http://www.djangoproject.com/
+.. _Django Web site: https://www.djangoproject.com/
 .. _django-users: http://groups.google.com/group/django-users
 
 Thanks for using Django!

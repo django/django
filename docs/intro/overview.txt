@@ -320,5 +320,5 @@ The next obvious steps are for you to `download Django`_, read :doc:`the
 tutorial </intro/tutorial01>` and join `the community`_. Thanks for your
 interest!
 
-.. _download Django: http://www.djangoproject.com/download/
-.. _the community: http://www.djangoproject.com/community/
+.. _download Django: https://www.djangoproject.com/download/
+.. _the community: https://www.djangoproject.com/community/

@@ -76,7 +76,7 @@ release candidate in a safe testing environment and reporting any bugs
 or issues you encounter. The Django ticket tracker is the central
 place to search for open issues:
 
-* http://code.djangoproject.com/timeline
+* https://code.djangoproject.com/timeline
 
 Please open a new ticket only if no existing ticket corresponds to a
 problem you're running into.

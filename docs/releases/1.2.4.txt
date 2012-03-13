@@ -70,7 +70,7 @@ not be concerned about the data loss bug, or the manual configuration of
 documentation on :ref:`controlling the creation order of test
 databases <topics-testing-creation-dependencies>` for details.
 
-.. _original problem report: http://code.djangoproject.com/ticket/14415
+.. _original problem report: https://code.djangoproject.com/ticket/14415
 
 GeoDjango
 =========

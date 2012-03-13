@@ -98,7 +98,7 @@ Of course, like any estimated timeline, this is subject to change as
 requirements dictate. The latest information will always be available
 on the Django project wiki:
 
-* http://code.djangoproject.com/wiki/VersionOneRoadmap
+* https://code.djangoproject.com/wiki/VersionOneRoadmap
 
 
 What you can do to help
@@ -111,7 +111,7 @@ codebase in a safe test environment and reporting any bugs or issues
 you encounter. The Django ticket tracker is the central place to
 search for open issues:
 
-* http://code.djangoproject.com/timeline
+* https://code.djangoproject.com/timeline
 
 Please open new tickets if no existing ticket corresponds to a problem
 you're running into.

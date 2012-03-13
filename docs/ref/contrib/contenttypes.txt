@@ -350,7 +350,7 @@ a "reverse" generic relationship to enable an additional API. For example::
 ``Bookmark`` instances will each have a ``tags`` attribute, which can
 be used to retrieve their associated ``TaggedItems``::
 
-    >>> b = Bookmark(url='http://www.djangoproject.com/')
+    >>> b = Bookmark(url='https://www.djangoproject.com/')
     >>> b.save()
     >>> t1 = TaggedItem(content_object=b, tag='django')
     >>> t1.save()
@@ -377,7 +377,7 @@ referred to above used fields named ``content_type_fk`` and
 Of course, if you don't add the reverse relationship, you can do the
 same types of lookups manually::
 
-    >>> b = Bookmark.objects.get(url='http://www.djangoproject.com/')
+    >>> b = Bookmark.objects.get(url='https://www.djangoproject.com/')
     >>> bookmark_type = ContentType.objects.get_for_model(b)
     >>> TaggedItem.objects.filter(content_type__pk=bookmark_type.id,
     ...                           object_id=b.id)

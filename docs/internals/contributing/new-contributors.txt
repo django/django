@@ -49,9 +49,9 @@ Start with these easy tasks to discover Django's development process.
       several that are useful for triaging tickets and reviewing patches as
       suggested above.
 
-      .. _reports page: http://code.djangoproject.com/wiki/Reports
+      .. _reports page: https://code.djangoproject.com/wiki/Reports
 
-.. _unreviewed ticket: http://code.djangoproject.com/query?status=!closed&stage=Unreviewed
+.. _unreviewed ticket: https://code.djangoproject.com/query?status=!closed&stage=Unreviewed
 
 
 Guidelines
@@ -118,7 +118,7 @@ some advice to make your work on Django more useful and rewarding.
   writing the very first tests for that feature, not that you get a pass from
   writing tests altogether.
 
-.. _easy pickings: http://code.djangoproject.com/query?status=!closed&easy=1
+.. _easy pickings: https://code.djangoproject.com/query?status=!closed&easy=1
 
 .. _new-contributors-faq:
 

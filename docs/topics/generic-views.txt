@@ -38,7 +38,7 @@ Django ships with generic views to do the following:
 
 * Present date-based objects in year/month/day archive pages,
   associated detail, and "latest" pages. The Django Weblog's
-  (http://www.djangoproject.com/weblog/) year, month, and
+  (https://www.djangoproject.com/weblog/) year, month, and
   day archives are built with these, as would be a typical
   newspaper's archives.
 

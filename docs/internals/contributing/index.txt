@@ -62,8 +62,8 @@ Browse the following sections to find out how:
 .. _django-users: http://groups.google.com/group/django-users
 .. _posting guidelines: https://code.djangoproject.com/wiki/UsingTheMailingList
 .. _#django IRC channel: irc://irc.freenode.net/django
-.. _community page: http://www.djangoproject.com/community/
-.. _register it here: http://www.djangoproject.com/community/add/blogs/
+.. _community page: https://www.djangoproject.com/community/
+.. _register it here: https://www.djangoproject.com/community/add/blogs/
 .. _django-developers: http://groups.google.com/group/django-developers
-.. _ticket tracker: http://code.djangoproject.com/newticket
-.. _easy pickings: http://code.djangoproject.com/query?status=!closed&easy=1
+.. _ticket tracker: https://code.djangoproject.com/newticket
+.. _easy pickings: https://code.djangoproject.com/query?status=!closed&easy=1

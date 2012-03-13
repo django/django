@@ -96,7 +96,7 @@ Django's documentation is kept in the same source control system as its code. It
 lives in the `django/trunk/docs`_ directory of our Subversion repository. Each
 document online is a separate text file in the repository.
 
-.. _django/trunk/docs: http://code.djangoproject.com/browser/django/trunk/docs
+.. _django/trunk/docs: https://code.djangoproject.com/browser/django/trunk/docs
 
 Where to get it
 ===============
@@ -124,7 +124,7 @@ rather than asking broad tech-support questions. If you need help with your
 particular Django setup, try the `django-users mailing list`_ or the `#django
 IRC channel`_ instead.
 
-.. _ticket system: http://code.djangoproject.com/simpleticket?component=Documentation
+.. _ticket system: https://code.djangoproject.com/simpleticket?component=Documentation
 .. _django-users mailing list: http://groups.google.com/group/django-users
 .. _#django IRC channel: irc://irc.freenode.net/django
 
@@ -148,7 +148,7 @@ shell command:
 
 .. code-block:: bash
 
-    $ svn co http://code.djangoproject.com/svn/django/trunk/docs/ django_docs
+    $ svn co https://code.djangoproject.com/svn/django/trunk/docs/ django_docs
 
 One low-tech way of taking advantage of the text documentation is by using the
 Unix ``grep`` utility to search for a phrase in all of the documentation. For

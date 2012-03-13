@@ -176,7 +176,7 @@ Technically, the docs on Django's site are generated from the latest development
 versions of those reST documents, so the docs on the Django site may offer more
 information than the docs that come with the latest Django release.
 
-.. _stored in revision control: http://code.djangoproject.com/browser/django/trunk/docs
+.. _stored in revision control: https://code.djangoproject.com/browser/django/trunk/docs
 
 Where can I find Django developers for hire?
 --------------------------------------------
@@ -188,4 +188,4 @@ You might also be interested in posting a job to http://djangogigs.com/ .
 If you want to find Django-capable people in your local area, try
 http://djangopeople.net/ .
 
-.. _developers for hire page: http://code.djangoproject.com/wiki/DevelopersForHire
+.. _developers for hire page: https://code.djangoproject.com/wiki/DevelopersForHire

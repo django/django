@@ -147,7 +147,7 @@ Via the Python API
     which lives in `django/contrib/flatpages/models.py`_. You can access
     flatpage objects via the :doc:`Django database API </topics/db/queries>`.
 
-.. _django/contrib/flatpages/models.py: http://code.djangoproject.com/browser/django/trunk/django/contrib/flatpages/models.py
+.. _django/contrib/flatpages/models.py: https://code.djangoproject.com/browser/django/trunk/django/contrib/flatpages/models.py
 
 .. currentmodule:: django.contrib.flatpages
 

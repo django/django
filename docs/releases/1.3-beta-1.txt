@@ -135,7 +135,7 @@ form validation. The previously undocumented method
 in favor of a new :attr:`~django.contrib.admin.AdminSite.login_form`
 attribute.
 
-.. _r12634: http://code.djangoproject.com/changeset/12634
+.. _r12634: https://code.djangoproject.com/changeset/12634
 
 Changes to ``USStateField``
 ===========================
@@ -209,7 +209,7 @@ Django team by trying out the beta codebase in a safe test environment and
 reporting any bugs or issues you encounter. The Django ticket tracker is the
 central place to search for open issues:
 
-* http://code.djangoproject.com/timeline
+* https://code.djangoproject.com/timeline
 
 Please open new tickets if no existing ticket corresponds to a problem you're
 running into.

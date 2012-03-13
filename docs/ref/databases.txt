@@ -345,7 +345,7 @@ storage engine, you have a couple of options.
 * Another method for changing the storage engine is described in
   AlterModelOnSyncDB_.
 
-.. _AlterModelOnSyncDB: http://code.djangoproject.com/wiki/AlterModelOnSyncDB
+.. _AlterModelOnSyncDB: https://code.djangoproject.com/wiki/AlterModelOnSyncDB
 
 Table names
 -----------
@@ -455,7 +455,7 @@ Versions of SQLite 3.3.5 and older contains the following bugs:
   DecimalFields.
 
 .. _handling: http://www.sqlite.org/cvstrac/tktview?tn=1768
-.. _aggregation: http://code.djangoproject.com/ticket/10031
+.. _aggregation: https://code.djangoproject.com/ticket/10031
 
 SQLite 3.3.6 was released in April 2006, so most current binary distributions
 for different platforms include newer version of SQLite usable from Python

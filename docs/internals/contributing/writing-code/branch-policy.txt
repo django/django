@@ -43,7 +43,7 @@ for feature branches:
 .. _git: http://git-scm.com/
 .. _mercurial: http://mercurial.selenic.com/
 .. _bazaar: http://bazaar.canonical.com/
-.. _django branches: http://code.djangoproject.com/wiki/DjangoBranches
+.. _django branches: https://code.djangoproject.com/wiki/DjangoBranches
 
 Branch rules
 ------------
@@ -104,7 +104,7 @@ To get the latest version of a branch's code, check it out using Subversion:
 
 .. code-block:: bash
 
-    svn co http://code.djangoproject.com/svn/django/branches/<branch>/
+    svn co https://code.djangoproject.com/svn/django/branches/<branch>/
 
 ...where ``<branch>`` is the branch's name. See the `list of branch names`_.
 
@@ -114,7 +114,7 @@ conversion, execute this command from within your ``django`` directory:
 
 .. code-block:: bash
 
-    svn switch http://code.djangoproject.com/svn/django/branches/<branch>/
+    svn switch https://code.djangoproject.com/svn/django/branches/<branch>/
 
 The advantage of using ``svn switch`` instead of ``svn co`` is that the
 ``switch`` command retains any changes you might have made to your local copy
@@ -125,7 +125,7 @@ disadvantage is that it may cause conflicts with your local changes if the
 (Note that if you use ``svn switch``, you don't need to point Python at the
 new version, as explained in the next section.)
 
-.. _list of branch names: http://code.djangoproject.com/browser/django/branches
+.. _list of branch names: https://code.djangoproject.com/browser/django/branches
 
 .. _pointing-python-at-the-new-django-version:
 
@@ -156,12 +156,12 @@ uncomment the line for the branch you want to use ('trunk' in this example) and
 make sure all other lines are commented::
 
     # Trunk is a svn checkout of:
-    #   http://code.djangoproject.com/svn/django/trunk/
+    #   https://code.djangoproject.com/svn/django/trunk/
     #
     /path/to/trunk
 
     # <branch> is a svn checkout of:
-    #   http://code.djangoproject.com/svn/django/branches/<branch>/
+    #   https://code.djangoproject.com/svn/django/branches/<branch>/
     #
     #/path/to/<branch>
 

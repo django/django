@@ -10,8 +10,8 @@ How do I get started?
 #. Check out the rest of the :doc:`documentation </index>`, and `ask questions`_ if you
    run into trouble.
 
-.. _`Download the code`: http://www.djangoproject.com/download/
-.. _ask questions: http://www.djangoproject.com/community/
+.. _`Download the code`: https://www.djangoproject.com/download/
+.. _ask questions: https://www.djangoproject.com/community/
 
 What are Django's prerequisites?
 --------------------------------
@@ -33,7 +33,7 @@ also need a database engine. PostgreSQL_ is recommended, because we're
 PostgreSQL fans, and MySQL_, `SQLite 3`_, and Oracle_ are also supported.
 
 .. _Python: http://www.python.org/
-.. _server arrangements wiki page: http://code.djangoproject.com/wiki/ServerArrangements
+.. _server arrangements wiki page: https://code.djangoproject.com/wiki/ServerArrangements
 .. _PostgreSQL: http://www.postgresql.org/
 .. _MySQL: http://www.mysql.com/
 .. _`SQLite 3`: http://www.sqlite.org/
@@ -96,7 +96,7 @@ Will Django run under shared hosting (like TextDrive or Dreamhost)?
 
 See our `Django-friendly Web hosts`_ page.
 
-.. _`Django-friendly Web hosts`: http://code.djangoproject.com/wiki/DjangoFriendlyWebHosts
+.. _`Django-friendly Web hosts`: https://code.djangoproject.com/wiki/DjangoFriendlyWebHosts
 
 Should I use the stable version or development version?
 -------------------------------------------------------

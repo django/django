@@ -253,4 +253,4 @@ all their hard work:
   that went into 0.96 -- but everyone who's contributed to Django is listed
   in AUTHORS_.
 
-.. _AUTHORS: http://code.djangoproject.com/browser/django/trunk/AUTHORS
+.. _AUTHORS: https://code.djangoproject.com/browser/django/trunk/AUTHORS

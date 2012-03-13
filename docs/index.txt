@@ -29,7 +29,7 @@ Having trouble? We'd like to help!
 .. _post a question: http://groups.google.com/group/django-users/
 .. _#django IRC channel: irc://irc.freenode.net/django
 .. _IRC logs: http://django-irc-logs.com/
-.. _ticket tracker: http://code.djangoproject.com/
+.. _ticket tracker: https://code.djangoproject.com/
 
 First steps
 ===========

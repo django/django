@@ -140,4 +140,4 @@ discovered, please follow these guidelines:
   branch without permission if the commit breaks the release branch.
 
 .. _django-developers: http://groups.google.com/group/django-developers
-.. _ticket tracker: http://code.djangoproject.com/newticket
+.. _ticket tracker: https://code.djangoproject.com/newticket

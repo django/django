@@ -666,7 +666,7 @@ community!  You can:
   and specify the component as "GIS".
 
 __ http://groups.google.com/group/geodjango
-__ http://code.djangoproject.com/simpleticket
+__ https://code.djangoproject.com/simpleticket
 
 .. _libsettings:
 

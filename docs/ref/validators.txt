@@ -98,7 +98,7 @@ to, or in lieu of custom ``field.clean()`` methods.
     :param verify_exists: Sets :attr:`verify_exists`. Defaults to ``False``.
     :param validator_user_agent: Sets :attr:`validator_user_agent`. Defaults to
         :setting:`URL_VALIDATOR_USER_AGENT` or, if that setting is set to a
-        null value, ``"Django (http://www.djangoproject.com/)"``.
+        null value, ``"Django (https://www.djangoproject.com/)"``.
 
     .. attribute:: verify_exists
 
