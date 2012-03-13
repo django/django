@@ -427,11 +427,13 @@ class TestCollectionCachedStorage(BaseCollectionTestCase,
 
     def test_template_tag_denorm(self):
         relpath = self.cached_file_path("cached/denorm.css")
-        self.assertEqual(relpath, "cached/denorm.363de96e9b4b.css")
+        self.assertEqual(relpath, "cached/denorm.c5bd139ad821.css")
         with storage.staticfiles_storage.open(relpath) as relfile:
             content = relfile.read()
             self.assertNotIn("..//cached///styles.css", content)
             self.assertIn("/static/cached/styles.93b1147e8552.css", content)
+            self.assertNotIn("url(img/relative.png )", content)
+            self.assertIn("/static/cached/img/relative.acae32e4532b.png", content)
 
     def test_template_tag_relative(self):
         relpath = self.cached_file_path("cached/relative.css")
