@@ -5,6 +5,7 @@ from datetime import datetime
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.fields import FieldDoesNotExist
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
+from django.utils.translation import ugettext_lazy
 
 from .models import Article
 
@@ -553,3 +554,27 @@ class ModelTest(TestCase):
             pub_date__year=2008).extra(
                 select={'dashed-value': '1', 'undashedvalue': '2'})
         self.assertEqual(articles[0].undashedvalue, 2)
+
+    def test_create_relation_with_ugettext_lazy(self):
+        """
+        Test that ugettext_lazy objects work when saving model instances
+        through various methods. Refs #10498.
+        """
+        notlazy = u'test'
+        lazy = ugettext_lazy(notlazy)
+        reporter = Article.objects.create(headline=lazy, pub_date=datetime.now())
+        article = Article.objects.get()
+        self.assertEqual(article.headline, notlazy)
+        # test that assign + save works with Promise objecs
+        article.headline = lazy
+        article.save()
+        self.assertEqual(article.headline, notlazy)
+        # test .update()
+        Article.objects.update(headline=lazy)
+        article = Article.objects.get()
+        self.assertEqual(article.headline, notlazy)
+        # still test bulk_create()
+        Article.objects.all().delete()
+        Article.objects.bulk_create([Article(headline=lazy, pub_date=datetime.now())])
+        article = Article.objects.get()
+        self.assertEqual(article.headline, notlazy)

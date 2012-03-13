@@ -8,6 +8,8 @@ from django.db.models.sql.constants import *
 from django.db.models.sql.datastructures import Date
 from django.db.models.sql.query import Query
 from django.db.models.sql.where import AND, Constraint
+from django.utils.functional import Promise
+from django.utils.encoding import force_unicode
 
 
 __all__ = ['DeleteQuery', 'UpdateQuery', 'InsertQuery', 'DateQuery',
@@ -38,7 +40,7 @@ class DeleteQuery(Query):
         for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
             where = self.where_class()
             where.add((Constraint(None, field.column, field), 'in',
-                    pk_list[offset : offset + GET_ITERATOR_CHUNK_SIZE]), AND)
+                    pk_list[offset:offset + GET_ITERATOR_CHUNK_SIZE]), AND)
             self.do_query(self.model._meta.db_table, where, using=using)
 
 class UpdateQuery(Query):
@@ -67,14 +69,13 @@ class UpdateQuery(Query):
         return super(UpdateQuery, self).clone(klass,
                 related_updates=self.related_updates.copy(), **kwargs)
 
-
     def update_batch(self, pk_list, values, using):
         pk_field = self.model._meta.pk
         self.add_update_values(values)
         for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
             self.where = self.where_class()
             self.where.add((Constraint(None, pk_field.column, pk_field), 'in',
-                    pk_list[offset : offset + GET_ITERATOR_CHUNK_SIZE]),
+                    pk_list[offset:offset + GET_ITERATOR_CHUNK_SIZE]),
                     AND)
             self.get_compiler(using).execute_sql(None)
 
@@ -101,6 +102,10 @@ class UpdateQuery(Query):
         Used by add_update_values() as well as the "fast" update path when
         saving models.
         """
+        # Check that no Promise object passes to the query. Refs #10498.
+        values_seq = [(value[0], value[1], force_unicode(value[2]))
+                      if isinstance(value[2], Promise) else value
+                      for value in values_seq]
         self.values.extend(values_seq)
 
     def add_related_update(self, model, field, value):
@@ -159,6 +164,12 @@ class InsertQuery(Query):
         into the query, for example.
         """
         self.fields = fields
+        # Check that no Promise object reaches the DB. Refs #10498.
+        for field in fields:
+            for obj in objs:
+                value = getattr(obj, field.attname)
+                if isinstance(value, Promise):
+                    setattr(obj, field.attname, force_unicode(value))
         self.objs = objs
         self.raw = raw
 
