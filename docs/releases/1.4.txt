@@ -961,6 +961,15 @@ and we enforce protection on everything else.
 If you're using PUT or DELETE methods in AJAX applications, please see the
 :ref:`instructions about using AJAX and CSRF <csrf-ajax>`.
 
+Password reset view now accepts ``subject_template_name``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``password_reset`` view in ``django.contrib.auth`` now accepts a
+``subject_template_name`` parameter, which is passed to the password save form
+as a keyword argument. If you are using this view with a custom password reset
+form, then you will need to ensure your form's ``save()`` method accepts this
+keyword argument.
+
 ``django.core.template_loaders``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
