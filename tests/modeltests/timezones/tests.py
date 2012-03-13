@@ -63,8 +63,6 @@ class BaseDateTimeTests(TestCase):
             self._old_tz = os.environ.get('TZ')
             os.environ['TZ'] = 'Africa/Nairobi'
             time.tzset()
-        # Create a new cursor, for test cases that change the value of USE_TZ.
-        connection.close()
 
     @classmethod
     def tearDownClass(self):
