@@ -477,9 +477,12 @@ setting_changed
 .. data:: django.test.signals.setting_changed
    :module:
 
-Sent when some :ref:`settings are overridden <overriding-settings>` with the
+This signal is sent when the value of a setting is changed through the
 :meth:`django.test.TestCase.setting` context manager or the
 :func:`django.test.utils.override_settings` decorator/context manager.
+
+It's actually sent twice: when the new value is applied ("setup") and when the
+original value is restored ("teardown").
 
 Arguments sent with this signal:
 
@@ -487,10 +490,11 @@ Arguments sent with this signal:
     The settings handler.
 
 ``setting``
-    Same as sender
+    The name of the setting.
 
 ``value``
-    The new setting value.
+    The value of the setting after the change. For settings that initially
+    don't exist, in the "teardown" phase, ``value`` is ``None``.
 
 template_rendered
 -----------------

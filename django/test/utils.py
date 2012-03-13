@@ -167,15 +167,6 @@ def restore_template_loaders():
     delattr(loader, RESTORE_LOADERS_ATTR)
 
 
-class OverrideSettingsHolder(UserSettingsHolder):
-    """
-    A custom setting holder that sends a signal upon change.
-    """
-    def __setattr__(self, name, value):
-        UserSettingsHolder.__setattr__(self, name, value)
-        setting_changed.send(sender=self.__class__, setting=name, value=value)
-
-
 class override_settings(object):
     """
     Acts as either a decorator, or a context manager. If it's a decorator it
@@ -215,10 +206,18 @@ class override_settings(object):
         return inner
 
     def enable(self):
-        override = OverrideSettingsHolder(settings._wrapped)
+        override = UserSettingsHolder(settings._wrapped)
         for key, new_value in self.options.items():
             setattr(override, key, new_value)
         settings._wrapped = override
+        for key, new_value in self.options.items():
+            setting_changed.send(sender=settings._wrapped.__class__,
+                                 setting=key, value=new_value)
 
     def disable(self):
         settings._wrapped = self.wrapped
+        for key in self.options:
+            new_value = getattr(settings, key, None)
+            setting_changed.send(sender=settings._wrapped.__class__,
+                                 setting=key, value=new_value)
+

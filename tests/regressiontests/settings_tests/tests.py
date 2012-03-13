@@ -132,6 +132,7 @@ class SettingsTests(TestCase):
         self.assertRaises(AttributeError, getattr, settings, 'TEST')
         with self.settings(TEST='override'):
             self.assertEqual(testvalue, 'override')
+        self.assertEqual(testvalue, None)
 
     @override_settings(TEST='override')
     def test_signal_callback_decorator(self):
