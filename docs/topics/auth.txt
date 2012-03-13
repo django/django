@@ -727,6 +727,9 @@ Django provides two functions in :mod:`django.contrib.auth`:
     using Django's session framework, so, as mentioned above, you'll need to
     make sure to have the session middleware installed.
 
+    Note that data set during the anonymous session is retained when the user
+    logs in.
+
     This example shows how you might use both
     :func:`~django.contrib.auth.authenticate()` and
     :func:`~django.contrib.auth.login()`::

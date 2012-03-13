@@ -55,7 +55,8 @@ def authenticate(**credentials):
 def login(request, user):
     """
     Persist a user id and a backend in the request. This way a user doesn't
-    have to reauthenticate on every request.
+    have to reauthenticate on every request. Note that data set during
+    the anonymous session is retained when the user logs in.
     """
     if user is None:
         user = request.user
