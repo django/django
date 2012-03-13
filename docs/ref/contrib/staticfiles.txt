@@ -327,7 +327,7 @@ CachedStaticFilesStorage
 
     .. code-block:: css+django
 
-        @import url("/static/admin/css/base.27e20196a850.css");
+        @import url("../admin/css/base.27e20196a850.css");
 
     To enable the ``CachedStaticFilesStorage`` you have to make sure the
     following requirements are met:

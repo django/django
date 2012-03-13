@@ -165,9 +165,11 @@ class CachedFilesMixin(object):
                     start, end = 1, sub_level - 1
             joined_result = '/'.join(name_parts[:-start] + url_parts[end:])
             hashed_url = self.url(unquote(joined_result), force=True)
+            file_name = hashed_url.split('/')[-1:]
+            relative_url = '/'.join(url.split('/')[:-1] + file_name)
 
-            # Return the hashed and normalized version to the file
-            return 'url("%s")' % unquote(hashed_url)
+            # Return the hashed version to the file
+            return 'url("%s")' % unquote(relative_url)
         return converter
 
     def post_process(self, paths, dry_run=False, **options):
