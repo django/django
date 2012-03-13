@@ -11,6 +11,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
 from django.test import simple
 from django.test.simple import DjangoTestSuiteRunner, get_tests
+from django.test.testcases import connections_support_transactions
 from django.test.utils import get_warnings_state, restore_warnings_state
 from django.utils import unittest
 from django.utils.importlib import import_module
@@ -262,3 +263,38 @@ class ModulesTestsPackages(unittest.TestCase):
         "Test for #12658 - Tests with ImportError's shouldn't fail silently"
         module = import_module(TEST_APP_ERROR)
         self.assertRaises(ImportError, get_tests, module)
+
+
+class Sqlite3InMemoryTestDbs(unittest.TestCase):
+    def test_transaction_support(self):
+        """Ticket #16329: sqlite3 in-memory test databases"""
+        from django import db
+        old_db_connections = db.connections
+        for option in ('NAME', 'TEST_NAME'):
+            try:
+                db.connections = db.ConnectionHandler({
+                    'default': {
+                        'ENGINE': 'django.db.backends.sqlite3',
+                        option: ':memory:',
+                    },
+                    'other': {
+                        'ENGINE': 'django.db.backends.sqlite3',
+                        option: ':memory:',
+                    },
+                })
+                other = db.connections['other']
+                self.assertEqual(other.features.supports_transactions, None)
+                DjangoTestSuiteRunner(verbosity=0).setup_databases()
+                # Transaction support should be properly initialised for the 'other' DB
+                self.assertNotEqual(
+                    other.features.supports_transactions,
+                    None,
+                    "DATABASES setting '%s' option set to sqlite3's ':memory:' value causes problems with transaction support detection." % option
+                )
+                # And all the DBs should report that they support transactions
+                self.assertTrue(
+                    connections_support_transactions(),
+                    "DATABASES setting '%s' option set to sqlite3's ':memory:' value causes problems with transaction support detection." % option
+                )
+            finally:
+                db.connections = old_db_connections
