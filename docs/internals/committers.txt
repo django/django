@@ -342,6 +342,19 @@ Honza Král
 .. _Aymeric Augustin: http://myks.org/
 .. _management consulting company: http://www.polyconseil.fr/
 
+`Claude Paroz`_
+    Claude is a former teacher who fell in love with free software at the
+    beginning of the 21st century. He's now working as freelancer in Web
+    development in his native Switzerland. He has found in Django a perfect
+    match for his needs of a stable, clean, documented and well-maintained Web
+    framework.
+
+    He's also helping the GNOME Translation Project as maintainer of the
+    Django-based `l10n.gnome.org`_.
+
+.. _Claude Paroz: http://www.2xlibre.net
+.. _l10n.gnome.org: http://l10n.gnome.org
+
 Specialists
 -----------
 

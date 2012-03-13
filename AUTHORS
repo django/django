@@ -28,6 +28,7 @@ The PRIMARY AUTHORS are (and/or have been):
     * Paul McMillan
     * Julien Phalip
     * Aymeric Augustin
+    * Claude Paroz
 
 More information on the main contributors to Django can be found in
 docs/internals/committers.txt.
@@ -398,7 +399,6 @@ answer newbie questions, and generally made Django that much better:
     oggie rob <oz.robharvey@gmail.com>
     oggy <ognjen.maric@gmail.com>
     Jay Parlar <parlar@gmail.com>
-    Claude Paroz <claude@2xlibre.net>
     Carlos Eduardo de Paula <carlosedp@gmail.com>
     John Paulett <john@paulett.org>
     pavithran s <pavithran.s@gmail.com>
