@@ -190,7 +190,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                     # Set the time zone in autocommit mode (see #17062)
                     self.connection.set_isolation_level(
                             psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT)
-                    self.connection.cursor().execute("SET TIME ZONE %s", [tz])
+                    self.connection.cursor().execute(
+                            self.ops.set_time_zone_sql(), [tz])
             self.connection.set_isolation_level(self.isolation_level)
             self._get_pg_version()
             connection_created.send(sender=self.__class__, connection=self)

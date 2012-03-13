@@ -710,6 +710,14 @@ class BaseDatabaseOperations(object):
         """
         raise NotImplementedError
 
+    def set_time_zone_sql(self):
+        """
+        Returns the SQL that will set the connection's time zone.
+
+        Returns '' if the backend doesn't support time zones.
+        """
+        return ''
+
     def sql_flush(self, style, tables, sequences):
         """
         Returns a list of SQL statements required to remove all data from
