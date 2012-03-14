@@ -1,37 +1,43 @@
 # This file is distributed under the same license as the Django package.
 #
+# Translators:
+# Antoni Aloy <antoni.aloy@trespams.com>, 2011.
+# Carles Barrobés <carles@barrobes.com>, 2011, 2012.
+# el_libre como el chaval <el.libre@gmail.com>, 2011.
+# Jannis Leidel <jannis@leidel.info>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-15 13:18-0400\n"
-"PO-Revision-Date: 2011-03-04 18:43+0000\n"
-"Last-Translator: Jannis <jannis@leidel.info>\n"
-"Language-Team: Catalan <None>\n"
+"POT-Creation-Date: 2012-03-14 00:20-0700\n"
+"PO-Revision-Date: 2012-03-08 12:24+0000\n"
+"Last-Translator: Carles Barrobés <carles@barrobes.com>\n"
+"Language-Team: Catalan (http://www.transifex.net/projects/p/django/language/"
+"ca/)\n"
+"Language: ca\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: ca\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
-#: ar/forms.py:28
+#: ar/forms.py:30
 msgid "Enter a postal code in the format NNNN or ANNNNAAA."
 msgstr "Introduïu un codi postal en el format NNNN o ANNNNAAA."
 
-#: ar/forms.py:50 br/forms.py:92 br/forms.py:131 pe/forms.py:24 pe/forms.py:52
+#: ar/forms.py:52 br/forms.py:95 br/forms.py:134 pe/forms.py:27 pe/forms.py:55
 msgid "This field requires only numbers."
 msgstr "Aquest camp precisa només números."
 
-#: ar/forms.py:51
+#: ar/forms.py:53
 msgid "This field requires 7 or 8 digits."
 msgstr "Aquest camp precisa 7 o 8 dígits."
 
-#: ar/forms.py:80
+#: ar/forms.py:82
 msgid "Enter a valid CUIT in XX-XXXXXXXX-X or XXXXXXXXXXXX format."
 msgstr ""
 "Introduïu un número CUIT vàlid en el format XX-XXXXXXXX-X o XXXXXXXXXXXX."
 
-#: ar/forms.py:81
+#: ar/forms.py:83
 msgid "Invalid CUIT."
 msgstr "CUIT invàlid."
 
@@ -71,7 +77,7 @@ msgstr "Vorarlberg"
 msgid "Vienna"
 msgstr "Viena"
 
-#: at/forms.py:22 ch/forms.py:17 no/forms.py:13
+#: at/forms.py:22 ch/forms.py:22 no/forms.py:19
 msgid "Enter a zip code in the format XXXX."
 msgstr "Introduïu un codi zip en el format XXXX."
 
@@ -81,9 +87,21 @@ msgstr ""
 "Introduïu un número vàlid de la Seguretat Social Austríaca en el format XXXX "
 "XXXXXX."
 
-#: au/forms.py:17
-msgid "Enter a 4 digit post code."
-msgstr "Introduïu un codi postal de 4 dígits."
+#: au/forms.py:26
+msgid "Enter a 4 digit postcode."
+msgstr "Introdueix el codi postal de 4 digits"
+
+#: au/models.py:9
+msgid "Australian State"
+msgstr "Estat australià"
+
+#: au/models.py:19
+msgid "Australian Postcode"
+msgstr "Codo postal australià"
+
+#: au/models.py:33
+msgid "Australian Phone number"
+msgstr "Telèfon australià"
 
 #: be/be_provinces.py:5
 msgid "Antwerp"
@@ -141,11 +159,11 @@ msgstr "Regió flamenca"
 msgid "Wallonia"
 msgstr "Valònia"
 
-#: be/forms.py:23
+#: be/forms.py:25
 msgid "Enter a valid postal code in the range and format 1XXX - 9XXX."
 msgstr "Introduïu un codi postal vàlid en el rang i format 1XXX - 9XXX."
 
-#: be/forms.py:46
+#: be/forms.py:48
 msgid ""
 "Enter a valid phone number in one of the formats 0x xxx xx xx, 0xx xx xx xx, "
 "04xx xx xx xx, 0x/xxx.xx.xx, 0xx/xx.xx.xx, 04xx/xx.xx.xx, 0x.xxx.xx.xx, 0xx."
@@ -155,15 +173,15 @@ msgstr ""
 "xx xx, 04xx xx xx xx, 0x/xxx.xx.xx, 0xx/xx.xx.xx, 04xx/xx.xx.xx, 0x.xxx.xx."
 "xx, 0xx.xx.xx.xx, 04xx.xx.xx.xx, 0xxxxxxxx o 04xxxxxxxx."
 
-#: br/forms.py:17
+#: br/forms.py:22
 msgid "Enter a zip code in the format XXXXX-XXX."
 msgstr "Introduïu un codi zip en el format XXXXX-XXX."
 
-#: br/forms.py:26
+#: br/forms.py:31
 msgid "Phone numbers must be in XX-XXXX-XXXX format."
 msgstr "El número de telèfon ha d'estar en el format XX-XXXX-XXXX."
 
-#: br/forms.py:54
+#: br/forms.py:58
 msgid ""
 "Select a valid brazilian state. That state is not one of the available "
 "states."
@@ -171,27 +189,27 @@ msgstr ""
 "Seleccioneu un estat brasiler vàlid. Aquest estat no és un dels estats "
 "disponibles."
 
-#: br/forms.py:90
+#: br/forms.py:93
 msgid "Invalid CPF number."
 msgstr "Número CPF invàlid."
 
-#: br/forms.py:91
+#: br/forms.py:94
 msgid "This field requires at most 11 digits or 14 characters."
 msgstr "Aquest camp precisa com a màxim 11 dígits o 14 caràcters."
 
-#: br/forms.py:130
+#: br/forms.py:133
 msgid "Invalid CNPJ number."
 msgstr "Número CNPJ invàlid."
 
-#: br/forms.py:132
+#: br/forms.py:135
 msgid "This field requires at least 14 digits"
 msgstr "Aquest camp precisa almenys 14 dígits."
 
-#: ca/forms.py:25
+#: ca/forms.py:29
 msgid "Enter a postal code in the format XXX XXX."
 msgstr "Introduïu un codi postal en el format XXX XXX."
 
-#: ca/forms.py:96
+#: ca/forms.py:110
 msgid "Enter a valid Canadian Social Insurance number in XXX-XXX-XXX format."
 msgstr ""
 "Introduïu un número vàlid de la Seguretat Social de Canadà en el format XXX-"
@@ -301,7 +319,7 @@ msgstr "Zug"
 msgid "Zurich"
 msgstr "Zuric"
 
-#: ch/forms.py:65
+#: ch/forms.py:68
 msgid ""
 "Enter a valid Swiss identity or passport card number in X1234567<0 or "
 "1234567890 format."
@@ -309,17 +327,45 @@ msgstr ""
 "Introduïu un número d'identificació o de passaport Suïssos en els formats "
 "1234567890 o X1234567<0."
 
-#: cl/forms.py:30
+#: cl/forms.py:32
 msgid "Enter a valid Chilean RUT."
 msgstr "Introduïu un RUT Xilè vàlid."
 
-#: cl/forms.py:31
+#: cl/forms.py:33
 msgid "Enter a valid Chilean RUT. The format is XX.XXX.XXX-X."
 msgstr "Introduïu un RUT Xilè vàlid. El format és XX.XXX.XXX-X"
 
-#: cl/forms.py:32
+#: cl/forms.py:34
 msgid "The Chilean RUT is not valid."
 msgstr "El RUT Xilè no és vàlid."
+
+#: cn/forms.py:84
+msgid "Enter a post code in the format XXXXXX."
+msgstr "Introdueix el codi postal en format XXXXX"
+
+#: cn/forms.py:105
+msgid "ID Card Number consists of 15 or 18 digits."
+msgstr "L'identificador de tarja ha de tenir 15 o 18 dígits"
+
+#: cn/forms.py:106
+msgid "Invalid ID Card Number: Wrong checksum"
+msgstr "Nombre de tarja invàlid: suma de comprovació incorrecta"
+
+#: cn/forms.py:107
+msgid "Invalid ID Card Number: Wrong birthdate"
+msgstr "Nombre de tarja invàlid: data de naixement errònia"
+
+#: cn/forms.py:108
+msgid "Invalid ID Card Number: Wrong location code"
+msgstr "Nombre de tarja d'identificació  invàlid: codi d'ubicació incorrecta"
+
+#: cn/forms.py:193
+msgid "Enter a valid phone number."
+msgstr "Introdueix un telèfon vàlid"
+
+#: cn/forms.py:210
+msgid "Enter a valid cell number."
+msgstr "Escriu un número correcte de mòbil"
 
 #: cz/cz_regions.py:8
 msgid "Prague"
@@ -377,25 +423,25 @@ msgstr "Regió Zlin"
 msgid "Moravian-Silesian Region"
 msgstr "Regió Moràvia-Silesiana"
 
-#: cz/forms.py:28 sk/forms.py:30
+#: cz/forms.py:32 sk/forms.py:33
 msgid "Enter a postal code in the format XXXXX or XXX XX."
 msgstr "Introduïu un codi postal en el format XXXXX o XXX XX."
 
-#: cz/forms.py:48
+#: cz/forms.py:52
 msgid "Enter a birth number in the format XXXXXX/XXXX or XXXXXXXXXX."
 msgstr ""
 "Introduïu un número de naixement en el format XXXXXX/XXXX o XXXXXXXXXX."
 
-#: cz/forms.py:49
+#: cz/forms.py:53
 msgid "Invalid optional parameter Gender, valid values are 'f' and 'm'"
 msgstr ""
 "El paràmetre opcional 'Gènere' és invàlid, els valors vàlids son 'f' i 'm'."
 
-#: cz/forms.py:50
+#: cz/forms.py:54
 msgid "Enter a valid birth number."
 msgstr "Introduïu un número de naixement vàlid."
 
-#: cz/forms.py:111
+#: cz/forms.py:115
 msgid "Enter a valid IC number."
 msgstr "Introduïu un número de IC vàlid."
 
@@ -463,11 +509,11 @@ msgstr "Slesvig-Holstein"
 msgid "Thuringia"
 msgstr "Turíngia"
 
-#: de/forms.py:15 fi/forms.py:13 fr/forms.py:16
+#: de/forms.py:20 fi/forms.py:18 fr/forms.py:20
 msgid "Enter a zip code in the format XXXXX."
 msgstr "Introduïu un codi zip en el format XXXXX."
 
-#: de/forms.py:42
+#: de/forms.py:46
 msgid ""
 "Enter a valid German identity card number in XXXXXXXXXXX-XXXXXXX-XXXXXXX-X "
 "format."
@@ -739,11 +785,11 @@ msgstr "Comunitat Foral de Navarra"
 msgid "Valencian Community"
 msgstr "Comunitat Valenciana"
 
-#: es/forms.py:20
+#: es/forms.py:26
 msgid "Enter a valid postal code in the range and format 01XXX - 52XXX."
 msgstr "Introduïu un codi postal en rang i format 01XXX - 52XXX."
 
-#: es/forms.py:40
+#: es/forms.py:46
 msgid ""
 "Enter a valid phone number in one of the formats 6XXXXXXXX, 8XXXXXXXX or "
 "9XXXXXXXX."
@@ -751,58 +797,466 @@ msgstr ""
 "Introduïu un número de telèfon vàlid en un dels formats 6XXXXXXXX, 8XXXXXXXX "
 "o 9XXXXXXXX."
 
-#: es/forms.py:67
+#: es/forms.py:73
 msgid "Please enter a valid NIF, NIE, or CIF."
 msgstr "Si us plau, introduïu un NIF, NIE o CIF vàlid."
 
-#: es/forms.py:68
+#: es/forms.py:74
 msgid "Please enter a valid NIF or NIE."
 msgstr "Si us plau, introduïu un NIF o NIE vàlid."
 
-#: es/forms.py:69
+#: es/forms.py:75
 msgid "Invalid checksum for NIF."
 msgstr "Verificació del NIF invàlida."
 
-#: es/forms.py:70
+#: es/forms.py:76
 msgid "Invalid checksum for NIE."
 msgstr "Verificació del NIE invàlida."
 
-#: es/forms.py:71
+#: es/forms.py:77
 msgid "Invalid checksum for CIF."
 msgstr "Verificació del CIF invàlida."
 
-#: es/forms.py:143
+#: es/forms.py:149
 msgid ""
 "Please enter a valid bank account number in format XXXX-XXXX-XX-XXXXXXXXXX."
 msgstr ""
 "Introduïu un número de compte bancari vàlid en el format XXXX-XXXX-XX-"
 "XXXXXXXXXX."
 
-#: es/forms.py:144
+#: es/forms.py:150
 msgid "Invalid checksum for bank account number."
 msgstr "Verificació del número de compte bancari invàlida."
 
-#: fi/forms.py:29
+#: fi/forms.py:33
 msgid "Enter a valid Finnish social security number."
 msgstr "Introduïu un número vàlid de la seguretat social finlandesa."
 
-#: fr/forms.py:31
+#: fr/forms.py:35
 msgid "Phone numbers must be in 0X XX XX XX XX format."
 msgstr "Els números de telèfon han de estar en el format 0X XX XX XX XX."
 
-#: id/forms.py:28
-msgid "Enter a valid post code"
+#: gb/forms.py:25
+msgid "Enter a valid postcode."
 msgstr "Introduïu un codi postal vàlid."
 
-#: id/forms.py:68 nl/forms.py:53
-msgid "Enter a valid phone number"
-msgstr "Introduïu un número de telèfon vàlid."
+#: gb/gb_regions.py:11
+msgid "Bedfordshire"
+msgstr "Bedfordshire"
 
-#: id/forms.py:107
+#: gb/gb_regions.py:12
+msgid "Buckinghamshire"
+msgstr "Buckinghamshire"
+
+#: gb/gb_regions.py:14
+msgid "Cheshire"
+msgstr "Cheshire"
+
+#: gb/gb_regions.py:15
+msgid "Cornwall and Isles of Scilly"
+msgstr "Cornwall and Isles of Scilly"
+
+#: gb/gb_regions.py:16
+msgid "Cumbria"
+msgstr "Cumbria"
+
+#: gb/gb_regions.py:17
+msgid "Derbyshire"
+msgstr "Derbyshire"
+
+#: gb/gb_regions.py:18
+msgid "Devon"
+msgstr "Devon"
+
+#: gb/gb_regions.py:19
+msgid "Dorset"
+msgstr "Dorset"
+
+#: gb/gb_regions.py:20
+msgid "Durham"
+msgstr "Durham"
+
+#: gb/gb_regions.py:21
+msgid "East Sussex"
+msgstr "East Sussex"
+
+#: gb/gb_regions.py:22
+msgid "Essex"
+msgstr "Essex"
+
+#: gb/gb_regions.py:23
+msgid "Gloucestershire"
+msgstr "Gloucestershire"
+
+#: gb/gb_regions.py:24
+msgid "Greater London"
+msgstr "Greater London"
+
+#: gb/gb_regions.py:25
+msgid "Greater Manchester"
+msgstr "Greater Manchester"
+
+#: gb/gb_regions.py:26
+msgid "Hampshire"
+msgstr "Hampshire"
+
+#: gb/gb_regions.py:27
+msgid "Hertfordshire"
+msgstr "Hertfordshire"
+
+#: gb/gb_regions.py:28
+msgid "Kent"
+msgstr "Kent"
+
+#: gb/gb_regions.py:29
+msgid "Lancashire"
+msgstr "Lancashire"
+
+#: gb/gb_regions.py:30
+msgid "Leicestershire"
+msgstr "Leicestershire"
+
+#: gb/gb_regions.py:31
+msgid "Lincolnshire"
+msgstr "Lincolnshire"
+
+#: gb/gb_regions.py:32
+msgid "Merseyside"
+msgstr "Merseyside"
+
+#: gb/gb_regions.py:33
+msgid "Norfolk"
+msgstr "Norfolk"
+
+#: gb/gb_regions.py:34
+msgid "North Yorkshire"
+msgstr "North Yorkshire"
+
+#: gb/gb_regions.py:35
+msgid "Northamptonshire"
+msgstr "Northamptonshire"
+
+#: gb/gb_regions.py:36
+msgid "Northumberland"
+msgstr "Northumberland"
+
+#: gb/gb_regions.py:37
+msgid "Nottinghamshire"
+msgstr "Nottinghamshire"
+
+#: gb/gb_regions.py:38
+msgid "Oxfordshire"
+msgstr "Oxfordshire"
+
+#: gb/gb_regions.py:39
+msgid "Shropshire"
+msgstr "Shropshire"
+
+#: gb/gb_regions.py:40
+msgid "Somerset"
+msgstr "Somerset"
+
+#: gb/gb_regions.py:41
+msgid "South Yorkshire"
+msgstr "South Yorkshire"
+
+#: gb/gb_regions.py:42
+msgid "Staffordshire"
+msgstr "Staffordshire"
+
+#: gb/gb_regions.py:43
+msgid "Suffolk"
+msgstr "Suffolk"
+
+#: gb/gb_regions.py:44
+msgid "Surrey"
+msgstr "Surrey"
+
+#: gb/gb_regions.py:45
+msgid "Tyne and Wear"
+msgstr "Tyne and Wear"
+
+#: gb/gb_regions.py:46
+msgid "Warwickshire"
+msgstr "Warwickshire"
+
+#: gb/gb_regions.py:47
+msgid "West Midlands"
+msgstr "West Midlands"
+
+#: gb/gb_regions.py:48
+msgid "West Sussex"
+msgstr "West Sussex"
+
+#: gb/gb_regions.py:49
+msgid "West Yorkshire"
+msgstr "West Yorkshire"
+
+#: gb/gb_regions.py:50
+msgid "Wiltshire"
+msgstr "Wiltshire"
+
+#: gb/gb_regions.py:51
+msgid "Worcestershire"
+msgstr "Worcestershire"
+
+#: gb/gb_regions.py:55
+msgid "County Antrim"
+msgstr "County Antrim"
+
+#: gb/gb_regions.py:56
+msgid "County Armagh"
+msgstr "County Armagh"
+
+#: gb/gb_regions.py:57
+msgid "County Down"
+msgstr "County Down"
+
+#: gb/gb_regions.py:58
+msgid "County Fermanagh"
+msgstr "County Fermanagh"
+
+#: gb/gb_regions.py:59
+msgid "County Londonderry"
+msgstr "County Londonderry"
+
+#: gb/gb_regions.py:60
+msgid "County Tyrone"
+msgstr "County Tyrone"
+
+#: gb/gb_regions.py:64
+msgid "Clwyd"
+msgstr "Clwyd"
+
+#: gb/gb_regions.py:65
+msgid "Dyfed"
+msgstr "Dyfed"
+
+#: gb/gb_regions.py:66
+msgid "Gwent"
+msgstr "Gwent"
+
+#: gb/gb_regions.py:67
+msgid "Gwynedd"
+msgstr "Gwynedd"
+
+#: gb/gb_regions.py:68
+msgid "Mid Glamorgan"
+msgstr "Mid Glamorgan"
+
+#: gb/gb_regions.py:69
+msgid "Powys"
+msgstr "Powys"
+
+#: gb/gb_regions.py:70
+msgid "South Glamorgan"
+msgstr "Glamorgan Sud"
+
+#: gb/gb_regions.py:71
+msgid "West Glamorgan"
+msgstr "Glamorgan Oest"
+
+#: gb/gb_regions.py:75
+msgid "Borders"
+msgstr "Borders"
+
+#: gb/gb_regions.py:76
+msgid "Central Scotland"
+msgstr "Escòcia central"
+
+#: gb/gb_regions.py:77
+msgid "Dumfries and Galloway"
+msgstr "Dumfries and Galloway"
+
+#: gb/gb_regions.py:78
+msgid "Fife"
+msgstr "Fife"
+
+#: gb/gb_regions.py:79
+msgid "Grampian"
+msgstr "Grampian"
+
+#: gb/gb_regions.py:80
+msgid "Highland"
+msgstr "Highland"
+
+#: gb/gb_regions.py:81
+msgid "Lothian"
+msgstr "Lothian"
+
+#: gb/gb_regions.py:82
+msgid "Orkney Islands"
+msgstr "Illes Orkney"
+
+#: gb/gb_regions.py:83
+msgid "Shetland Islands"
+msgstr "Illes Shetland"
+
+#: gb/gb_regions.py:84
+msgid "Strathclyde"
+msgstr "Strathclyde"
+
+#: gb/gb_regions.py:85
+msgid "Tayside"
+msgstr "Tayside"
+
+#: gb/gb_regions.py:86
+msgid "Western Isles"
+msgstr "Illes Occidentals"
+
+#: gb/gb_regions.py:90
+msgid "England"
+msgstr "Anglaterra"
+
+#: gb/gb_regions.py:91
+msgid "Northern Ireland"
+msgstr "Irlanda del Nord"
+
+#: gb/gb_regions.py:92
+msgid "Scotland"
+msgstr "Escòcia"
+
+#: gb/gb_regions.py:93
+msgid "Wales"
+msgstr "Gal·les"
+
+#: hr/forms.py:75
+msgid "Enter a valid 13 digit JMBG"
+msgstr "Introdueixi un codi JMBG de 13 dígits"
+
+#: hr/forms.py:76
+msgid "Error in date segment"
+msgstr "Error en el segment data"
+
+#: hr/forms.py:123
+msgid "Enter a valid 11 digit OIB"
+msgstr "Introdueixi un codi OIB d'11 dígits"
+
+#: hr/forms.py:152 id/forms.py:112
 msgid "Enter a valid vehicle license plate number"
 msgstr "Introduïu un número de matrícula vàlid."
 
-#: id/forms.py:170
+#: hr/forms.py:153
+msgid "Enter a valid location code"
+msgstr "Escriu un codi de localització vàlid"
+
+#: hr/forms.py:154
+msgid "Number part cannot be zero"
+msgstr "La part d'un nombre no pot ser 0"
+
+#: hr/forms.py:190
+msgid "Enter a valid 5 digit postal code"
+msgstr "Escriu un codi postal de 5 xifres vàlid"
+
+#: hr/forms.py:218 id/forms.py:72 nl/forms.py:56
+msgid "Enter a valid phone number"
+msgstr "Introduïu un número de telèfon vàlid."
+
+#: hr/forms.py:219
+msgid "Enter a valid area or mobile network code"
+msgstr "Escriu un codi d'àrea o prefix mòbil correcte"
+
+#: hr/forms.py:220
+msgid "The phone nubmer is too long"
+msgstr "El número de telèfon és massa llarg"
+
+#: hr/forms.py:258
+msgid "Enter a valid 19 digit JMBAG starting with 601983"
+msgstr "Introdueix un codi JMBAG vàlid de 19 dígits que comenci per 601983"
+
+#: hr/forms.py:259
+msgid "Card issue number cannot be zero"
+msgstr "El nombre d'expedició de la tarja no pot ser zero"
+
+#: hr/hr_choices.py:12
+msgid "Grad Zagreb"
+msgstr "Grad Zagreb"
+
+#: hr/hr_choices.py:13
+msgid "Bjelovarsko-bilogorska županija"
+msgstr "Bjelovarsko-bilogorska županija"
+
+#: hr/hr_choices.py:14
+msgid "Brodsko-posavska županija"
+msgstr "Brodsko-posavska županija"
+
+#: hr/hr_choices.py:15
+msgid "Dubrovačko-neretvanska županija"
+msgstr "Dubrovačko-neretvanska županija"
+
+#: hr/hr_choices.py:16
+msgid "Istarska županija"
+msgstr "Istarska županija"
+
+#: hr/hr_choices.py:17
+msgid "Karlovačka županija"
+msgstr "Karlovačka županija"
+
+#: hr/hr_choices.py:18
+msgid "Koprivničko-križevačka županija"
+msgstr "Koprivničko-križevačka županija"
+
+#: hr/hr_choices.py:19
+msgid "Krapinsko-zagorska županija"
+msgstr "Koprivnica-Krizevci"
+
+#: hr/hr_choices.py:20
+msgid "Ličko-senjska županija"
+msgstr "Ličko-senjska županija"
+
+#: hr/hr_choices.py:21
+msgid "Međimurska županija"
+msgstr "Međimurska županija"
+
+#: hr/hr_choices.py:22
+msgid "Osječko-baranjska županija"
+msgstr "Osječko-baranjska županija"
+
+#: hr/hr_choices.py:23
+msgid "Požeško-slavonska županija"
+msgstr "Požeško-slavonska županija"
+
+#: hr/hr_choices.py:24
+msgid "Primorsko-goranska županija"
+msgstr "Primorsko-goranska županija"
+
+#: hr/hr_choices.py:25
+msgid "Sisačko-moslavačka županija"
+msgstr "Sisačko-moslavačka županija"
+
+#: hr/hr_choices.py:26
+msgid "Splitsko-dalmatinska županija"
+msgstr "Splitsko-dalmatinska županija"
+
+#: hr/hr_choices.py:27
+msgid "Šibensko-kninska županija"
+msgstr "Šibensko-kninska županija"
+
+#: hr/hr_choices.py:28
+msgid "Varaždinska županija"
+msgstr "Varaždinska županija"
+
+#: hr/hr_choices.py:29
+msgid "Virovitičko-podravska županija"
+msgstr "Virovitičko-podravska županija"
+
+#: hr/hr_choices.py:30
+msgid "Vukovarsko-srijemska županija"
+msgstr "Vukovarsko-srijemska županija"
+
+#: hr/hr_choices.py:31
+msgid "Zadarska županija"
+msgstr "Zadarska županija"
+
+#: hr/hr_choices.py:32
+msgid "Zagrebačka županija"
+msgstr "Zagrebačka županija"
+
+#: id/forms.py:31
+msgid "Enter a valid post code"
+msgstr "Introduïu un codi postal vàlid."
+
+#: id/forms.py:176
 msgid "Enter a valid NIK/KTP number"
 msgstr "Introduïu un número NIK/KTP vàlid."
 
@@ -1206,34 +1660,42 @@ msgstr "Introduïu un codi postal amb el format XXXXX"
 msgid "Enter a valid ID number."
 msgstr "Introduïu un número de ID vàlid."
 
-#: in_/forms.py:15
-msgid "Enter a zip code in the format XXXXXXX."
-msgstr "Introduïu un codi postal en el format XXXXXXX."
+#: in_/forms.py:41
+msgid "Enter a zip code in the format XXXXXX or XXX XXX."
+msgstr "Escriu un codi postal en format XXXXXX o XXX XXX"
 
-#: is_/forms.py:18
+#: in_/forms.py:64
+msgid "Enter an Indian state or territory."
+msgstr "Introdueix un estat o territori de l'India"
+
+#: in_/forms.py:103
+msgid "Phone numbers must be in 02X-8X or 03X-7X or 04X-6X format."
+msgstr "Els números de telèfon han de tenir el format 02X-8X, 03X-7X o 04X-6X."
+
+#: is_/forms.py:22
 msgid ""
 "Enter a valid Icelandic identification number. The format is XXXXXX-XXXX."
 msgstr ""
 "Introduïu un número vàlid d'identificació d'Islàndia. El format és XXXXXX-"
 "XXXX."
 
-#: is_/forms.py:19
+#: is_/forms.py:23
 msgid "The Icelandic identification number is not valid."
 msgstr "El número d'identificació d'Islàndia no és vàlid."
 
-#: it/forms.py:15
+#: it/forms.py:21
 msgid "Enter a valid zip code."
 msgstr "Introduïu un codi zip vàlid."
 
-#: it/forms.py:44
+#: it/forms.py:48
 msgid "Enter a valid Social Security number."
 msgstr "Introduïu un número valid de la Seguretat Social."
 
-#: it/forms.py:69
+#: it/forms.py:73
 msgid "Enter a valid VAT number."
 msgstr "Introduïu un número d'IVA (VAT) vàlid."
 
-#: jp/forms.py:16
+#: jp/forms.py:19
 msgid "Enter a postal code in the format XXXXXXX or XXX-XXXX."
 msgstr "Introduïu un codi postal en el format XXXXXXX o XX-XXXX."
 
@@ -1429,139 +1891,544 @@ msgstr "Okinawa"
 msgid "Enter a valid Kuwaiti Civil ID number"
 msgstr "Introduïu un número d'Identitat Kuwaitià vàlid"
 
-#: mx/mx_states.py:12
+#: mk/forms.py:18
+msgid ""
+"Identity card numbers must contain either 4 to 7 digits or an uppercase "
+"letter and 7 digits."
+msgstr ""
+"Les targes d'identitat han de tenir 4 o 7 dígits o una lletra majúscula i 7 "
+"dígits."
+
+#: mk/forms.py:57 si/forms.py:24
+msgid "This field should contain exactly 13 digits."
+msgstr "Aquest camp ha de tenir exactament 13 dígits."
+
+#: mk/forms.py:58
+msgid "The first 7 digits of the UMCN must represent a valid past date."
+msgstr ""
+"Els 7 primers dígits de l'UMCM han de representar una data passada vàlida"
+
+#: mk/forms.py:59
+msgid "The UMCN is not valid."
+msgstr "El UMCN no es vàlid"
+
+#: mk/mk_choices.py:8
+msgid "Aerodrom"
+msgstr "Aerodrom"
+
+#: mk/mk_choices.py:9
+msgid "Aračinovo"
+msgstr "Aračinovo"
+
+#: mk/mk_choices.py:10
+msgid "Berovo"
+msgstr "Berovo"
+
+#: mk/mk_choices.py:11
+msgid "Bitola"
+msgstr "Bitola"
+
+#: mk/mk_choices.py:12
+msgid "Bogdanci"
+msgstr "Bogdanci"
+
+#: mk/mk_choices.py:13
+msgid "Bogovinje"
+msgstr "Bogovinje"
+
+#: mk/mk_choices.py:14
+msgid "Bosilovo"
+msgstr "Bosilovo"
+
+#: mk/mk_choices.py:15
+msgid "Brvenica"
+msgstr "Brvenica"
+
+#: mk/mk_choices.py:16
+msgid "Butel"
+msgstr "Butel"
+
+#: mk/mk_choices.py:17
+msgid "Valandovo"
+msgstr "Valandovo"
+
+#: mk/mk_choices.py:18
+msgid "Vasilevo"
+msgstr "Vasileva"
+
+#: mk/mk_choices.py:19
+msgid "Vevčani"
+msgstr "Vevcani"
+
+#: mk/mk_choices.py:20
+msgid "Veles"
+msgstr "Veles"
+
+#: mk/mk_choices.py:21
+msgid "Vinica"
+msgstr "Vinica"
+
+#: mk/mk_choices.py:22
+msgid "Vraneštica"
+msgstr "Vraneštica"
+
+#: mk/mk_choices.py:23
+msgid "Vrapčište"
+msgstr "Vrapčište"
+
+#: mk/mk_choices.py:24
+msgid "Gazi Baba"
+msgstr "Gazi Baba"
+
+#: mk/mk_choices.py:25
+msgid "Gevgelija"
+msgstr "Gevgelija"
+
+#: mk/mk_choices.py:26
+msgid "Gostivar"
+msgstr "Gostivar"
+
+#: mk/mk_choices.py:27
+msgid "Gradsko"
+msgstr "Gradsko"
+
+#: mk/mk_choices.py:28
+msgid "Debar"
+msgstr "Debar"
+
+#: mk/mk_choices.py:29
+msgid "Debarca"
+msgstr "Debarca"
+
+#: mk/mk_choices.py:30
+msgid "Delčevo"
+msgstr "Delčevo"
+
+#: mk/mk_choices.py:31
+msgid "Demir Kapija"
+msgstr "Demir Kapija"
+
+#: mk/mk_choices.py:32
+msgid "Demir Hisar"
+msgstr "Demir Hisar"
+
+#: mk/mk_choices.py:33
+msgid "Dolneni"
+msgstr "Dolneni"
+
+#: mk/mk_choices.py:34
+msgid "Drugovo"
+msgstr "Drugovo"
+
+#: mk/mk_choices.py:35
+msgid "Gjorče Petrov"
+msgstr "Gjorče Petrov"
+
+#: mk/mk_choices.py:36
+msgid "Želino"
+msgstr "Želino"
+
+#: mk/mk_choices.py:37
+msgid "Zajas"
+msgstr "Zajas"
+
+#: mk/mk_choices.py:38
+msgid "Zelenikovo"
+msgstr "Zelenikovo"
+
+#: mk/mk_choices.py:39
+msgid "Zrnovci"
+msgstr "Zrnovci"
+
+#: mk/mk_choices.py:40
+msgid "Ilinden"
+msgstr "Ilinden"
+
+#: mk/mk_choices.py:41
+msgid "Jegunovce"
+msgstr "Jegunovce"
+
+#: mk/mk_choices.py:42
+msgid "Kavadarci"
+msgstr "Kavadarci"
+
+#: mk/mk_choices.py:43
+msgid "Karbinci"
+msgstr "Karbinci"
+
+#: mk/mk_choices.py:44
+msgid "Karpoš"
+msgstr "Karpoš"
+
+#: mk/mk_choices.py:45
+msgid "Kisela Voda"
+msgstr "Kisela Voda"
+
+#: mk/mk_choices.py:46
+msgid "Kičevo"
+msgstr "Kičevo"
+
+#: mk/mk_choices.py:47
+msgid "Konče"
+msgstr "Konče"
+
+#: mk/mk_choices.py:48
+msgid "Koćani"
+msgstr "Koćani"
+
+#: mk/mk_choices.py:49
+msgid "Kratovo"
+msgstr "Kratovo"
+
+#: mk/mk_choices.py:50
+msgid "Kriva Palanka"
+msgstr "Kriva Palanka"
+
+#: mk/mk_choices.py:51
+msgid "Krivogaštani"
+msgstr "Krivogaštani"
+
+#: mk/mk_choices.py:52
+msgid "Kruševo"
+msgstr "Kruševo"
+
+#: mk/mk_choices.py:53
+msgid "Kumanovo"
+msgstr "Kumanovo"
+
+#: mk/mk_choices.py:54
+msgid "Lipkovo"
+msgstr "Lipkovo"
+
+#: mk/mk_choices.py:55
+msgid "Lozovo"
+msgstr "Lozovo"
+
+#: mk/mk_choices.py:56
+msgid "Mavrovo i Rostuša"
+msgstr "Mavrovo i Rostuša"
+
+#: mk/mk_choices.py:57
+msgid "Makedonska Kamenica"
+msgstr "Makedonska Kamenica"
+
+#: mk/mk_choices.py:58
+msgid "Makedonski Brod"
+msgstr "Makedonski Brod"
+
+#: mk/mk_choices.py:59
+msgid "Mogila"
+msgstr "Mogila"
+
+#: mk/mk_choices.py:60
+msgid "Negotino"
+msgstr "Negotino"
+
+#: mk/mk_choices.py:61
+msgid "Novaci"
+msgstr "Novaci"
+
+#: mk/mk_choices.py:62
+msgid "Novo Selo"
+msgstr "Novo Selo"
+
+#: mk/mk_choices.py:63
+msgid "Oslomej"
+msgstr "Oslomej"
+
+#: mk/mk_choices.py:64
+msgid "Ohrid"
+msgstr "Ohrid"
+
+#: mk/mk_choices.py:65
+msgid "Petrovec"
+msgstr "Petrovec"
+
+#: mk/mk_choices.py:66
+msgid "Pehčevo"
+msgstr "Pehčevo"
+
+#: mk/mk_choices.py:67
+msgid "Plasnica"
+msgstr "Plasnica"
+
+#: mk/mk_choices.py:68
+msgid "Prilep"
+msgstr "Prilep"
+
+#: mk/mk_choices.py:69
+msgid "Probištip"
+msgstr "Probištip"
+
+#: mk/mk_choices.py:70
+msgid "Radoviš"
+msgstr "Radoviš"
+
+#: mk/mk_choices.py:71
+msgid "Rankovce"
+msgstr "Rankovce"
+
+#: mk/mk_choices.py:72
+msgid "Resen"
+msgstr "Resen"
+
+#: mk/mk_choices.py:73
+msgid "Rosoman"
+msgstr "Vraneštica"
+
+#: mk/mk_choices.py:74
+msgid "Saraj"
+msgstr "Saraj"
+
+#: mk/mk_choices.py:75
+msgid "Sveti Nikole"
+msgstr "Sveti Nikole"
+
+#: mk/mk_choices.py:76
+msgid "Sopište"
+msgstr "Sopište"
+
+#: mk/mk_choices.py:77
+msgid "Star Dojran"
+msgstr "Star Dojran"
+
+#: mk/mk_choices.py:78
+msgid "Staro Nagoričane"
+msgstr "Staro Nagoričane"
+
+#: mk/mk_choices.py:79
+msgid "Struga"
+msgstr "Struga"
+
+#: mk/mk_choices.py:80
+msgid "Strumica"
+msgstr "Strumica"
+
+#: mk/mk_choices.py:81
+msgid "Studeničani"
+msgstr "Studeničani"
+
+#: mk/mk_choices.py:82
+msgid "Tearce"
+msgstr "Tearce"
+
+#: mk/mk_choices.py:83
+msgid "Tetovo"
+msgstr "Tetovo"
+
+#: mk/mk_choices.py:84
+msgid "Centar"
+msgstr "Centar"
+
+#: mk/mk_choices.py:85
+msgid "Centar-Župa"
+msgstr "Centar-Župa"
+
+#: mk/mk_choices.py:86
+msgid "Čair"
+msgstr "Cair"
+
+#: mk/mk_choices.py:87
+msgid "Čaška"
+msgstr "Čaška"
+
+#: mk/mk_choices.py:88
+msgid "Češinovo-Obleševo"
+msgstr "Češinovo-Obleševo"
+
+#: mk/mk_choices.py:89
+msgid "Čučer-Sandevo"
+msgstr "Čučer-Sandevo"
+
+#: mk/mk_choices.py:90
+msgid "Štip"
+msgstr "Štip"
+
+#: mk/mk_choices.py:91
+msgid "Šuto Orizari"
+msgstr "Šuto Orizari"
+
+#: mk/models.py:11
+msgid "Macedonian identity card number"
+msgstr "Tajra d'identificació macedònia"
+
+#: mk/models.py:25
+msgid "A Macedonian municipality (2 character code)"
+msgstr "Un municipi de Macedònia (2 codi de caràcters)"
+
+#: mk/models.py:35
+msgid "Unique master citizen number (13 digits)"
+msgstr "Identificació de ciutadà (13 dígits)"
+
+#: mx/forms.py:65
+msgid "Enter a valid zip code in the format XXXXX."
+msgstr "Entreu un codi postal vàlid amb el format XXXXX."
+
+#: mx/forms.py:108
+msgid "Enter a valid RFC."
+msgstr "Entreu un RFC vàlid."
+
+#: mx/forms.py:109
+msgid "Invalid checksum for RFC."
+msgstr "Suma de verificació invàlida per RFC."
+
+#: mx/forms.py:189
+msgid "Enter a valid CURP."
+msgstr "Entreu un CURP vàlid."
+
+#: mx/forms.py:190
+msgid "Invalid checksum for CURP."
+msgstr "Suma de verificació invàlida per CURP."
+
+#: mx/models.py:14
+msgid "Mexico state (three uppercase letters)"
+msgstr "Estat mexicà (tres lletres majúscules)"
+
+#: mx/models.py:27
+msgid "Mexico zip code"
+msgstr "Codi postal mexicà"
+
+#: mx/models.py:44
+msgid "Mexican RFC"
+msgstr "RFC mexicà"
+
+#: mx/models.py:61
+msgid "Mexican CURP"
+msgstr "CURP mexicà"
+
+#: mx/mx_states.py:13
 msgid "Aguascalientes"
 msgstr "Aguascalientes"
 
-#: mx/mx_states.py:13
+#: mx/mx_states.py:14
 msgid "Baja California"
 msgstr "Baixa Califòrnia"
 
-#: mx/mx_states.py:14
+#: mx/mx_states.py:15
 msgid "Baja California Sur"
 msgstr "Baixa Califòrnia Sud"
 
-#: mx/mx_states.py:15
+#: mx/mx_states.py:16
 msgid "Campeche"
 msgstr "Campeche"
 
-#: mx/mx_states.py:16
+#: mx/mx_states.py:17
 msgid "Chihuahua"
 msgstr "Chihuahua"
 
-#: mx/mx_states.py:17
+#: mx/mx_states.py:18
 msgid "Chiapas"
 msgstr "Chiapas"
 
-#: mx/mx_states.py:18
+#: mx/mx_states.py:19
 msgid "Coahuila"
 msgstr "Coahuila"
 
-#: mx/mx_states.py:19
+#: mx/mx_states.py:20
 msgid "Colima"
 msgstr "Colima"
 
-#: mx/mx_states.py:20
+#: mx/mx_states.py:21
 msgid "Distrito Federal"
 msgstr "Districte Federal"
 
-#: mx/mx_states.py:21
+#: mx/mx_states.py:22
 msgid "Durango"
 msgstr "Durango"
 
-#: mx/mx_states.py:22
+#: mx/mx_states.py:23
 msgid "Guerrero"
 msgstr "Guerrero"
 
-#: mx/mx_states.py:23
+#: mx/mx_states.py:24
 msgid "Guanajuato"
 msgstr "Guanajuato"
 
-#: mx/mx_states.py:24
+#: mx/mx_states.py:25
 msgid "Hidalgo"
 msgstr "Hidalgo"
 
-#: mx/mx_states.py:25
+#: mx/mx_states.py:26
 msgid "Jalisco"
 msgstr "Jalisco"
 
-#: mx/mx_states.py:26
+#: mx/mx_states.py:27
 msgid "Estado de México"
 msgstr "Estat de Mèxic"
 
-#: mx/mx_states.py:27
+#: mx/mx_states.py:28
 msgid "Michoacán"
 msgstr "Michoacán"
 
-#: mx/mx_states.py:28
+#: mx/mx_states.py:29
 msgid "Morelos"
 msgstr "Morelos"
 
-#: mx/mx_states.py:29
+#: mx/mx_states.py:30
 msgid "Nayarit"
 msgstr "Nayarit"
 
-#: mx/mx_states.py:30
+#: mx/mx_states.py:31
 msgid "Nuevo León"
 msgstr "Nuevo León"
 
-#: mx/mx_states.py:31
+#: mx/mx_states.py:32
 msgid "Oaxaca"
 msgstr "Oaxaca"
 
-#: mx/mx_states.py:32
+#: mx/mx_states.py:33
 msgid "Puebla"
 msgstr "Puebla"
 
-#: mx/mx_states.py:33
+#: mx/mx_states.py:34
 msgid "Querétaro"
 msgstr "Querétaro"
 
-#: mx/mx_states.py:34
+#: mx/mx_states.py:35
 msgid "Quintana Roo"
 msgstr "Quintana Roo"
 
-#: mx/mx_states.py:35
+#: mx/mx_states.py:36
 msgid "Sinaloa"
 msgstr "Sinaloa"
 
-#: mx/mx_states.py:36
+#: mx/mx_states.py:37
 msgid "San Luis Potosí"
 msgstr "San Luis Potosí"
 
-#: mx/mx_states.py:37
+#: mx/mx_states.py:38
 msgid "Sonora"
 msgstr "Sonora"
 
-#: mx/mx_states.py:38
+#: mx/mx_states.py:39
 msgid "Tabasco"
 msgstr "Tabasco"
 
-#: mx/mx_states.py:39
+#: mx/mx_states.py:40
 msgid "Tamaulipas"
 msgstr "Tamaulipas"
 
-#: mx/mx_states.py:40
+#: mx/mx_states.py:41
 msgid "Tlaxcala"
 msgstr "Tlaxcala"
 
-#: mx/mx_states.py:41
+#: mx/mx_states.py:42
 msgid "Veracruz"
 msgstr "Veracruz"
 
-#: mx/mx_states.py:42
+#: mx/mx_states.py:43
 msgid "Yucatán"
 msgstr "Yucatán"
 
-#: mx/mx_states.py:43
+#: mx/mx_states.py:44
 msgid "Zacatecas"
 msgstr "Zacatecas"
 
-#: nl/forms.py:22
+#: nl/forms.py:26
 msgid "Enter a valid postal code"
 msgstr "Introduïu un codi postal vàlid."
 
-#: nl/forms.py:79
+#: nl/forms.py:82
 msgid "Enter a valid SoFi number"
 msgstr "Introduïu un número SoFi vàlid."
 
@@ -1609,46 +2476,59 @@ msgstr "Zeeland"
 msgid "Zuid-Holland"
 msgstr "Zuid-Holland"
 
-#: no/forms.py:34
+#: no/forms.py:39
 msgid "Enter a valid Norwegian social security number."
 msgstr "Introduïu un número de la seguretat social Noruega vàlid."
 
-#: pe/forms.py:25
+#: pe/forms.py:28
 msgid "This field requires 8 digits."
 msgstr "Aquest camp precisa 8 dígits."
 
-#: pe/forms.py:53
+#: pe/forms.py:56
 msgid "This field requires 11 digits."
 msgstr "Aquest camp precisa 11 dígits."
 
-#: pl/forms.py:39
+#: pl/forms.py:42
 msgid "National Identification Number consists of 11 digits."
 msgstr "El número d'identidicació nacional està compost de 11 digits."
 
-#: pl/forms.py:40
+#: pl/forms.py:43
 msgid "Wrong checksum for the National Identification Number."
 msgstr "Verificació del número d'identificació nacional invàlida."
 
-#: pl/forms.py:74
-msgid ""
-"Enter a tax number field (NIP) in the format XXX-XXX-XX-XX or XX-XX-XXX-XXX."
-msgstr "Introduïu un número NIP en el format XXX-XXX-XX-XX o XX-XX-XXX-XXX."
+#: pl/forms.py:79
+msgid "National ID Card Number consists of 3 letters and 6 digits."
+msgstr ""
+"El nombre de la tarja d'identificació nacional consisteix en 3 lletres i 6 "
+"dígits"
 
-#: pl/forms.py:75
+#: pl/forms.py:80
+msgid "Wrong checksum for the National ID Card Number."
+msgstr "Suma de comprovació incorrecta pel nombre d'identificació nacional"
+
+#: pl/forms.py:131
+msgid ""
+"Enter a tax number field (NIP) in the format XXX-XXX-XX-XX, XXX-XX-XX-XXX or "
+"XXXXXXXXXX."
+msgstr ""
+"Entreu un número tributari (NIP) en el format XXX-XXX-XX-XX, XXX-XX-XX-XXX o "
+"XXXXXXXXXX."
+
+#: pl/forms.py:132
 msgid "Wrong checksum for the Tax Number (NIP)."
 msgstr "Verificació del número tributari (NIP) invàlida."
 
-#: pl/forms.py:114
+#: pl/forms.py:171
 msgid "National Business Register Number (REGON) consists of 9 or 14 digits."
 msgstr ""
 "El número nacional de registre de negocis (REGON) està compost de 9 o 14 "
 "dígits."
 
-#: pl/forms.py:115
+#: pl/forms.py:172
 msgid "Wrong checksum for the National Business Register Number (REGON)."
 msgstr "Verificació del número nacional de registre de negocis invàlida."
 
-#: pl/forms.py:155
+#: pl/forms.py:212
 msgid "Enter a postal code in the format XX-XXX."
 msgstr "Introduïu un codi postal en el format XX-XXX."
 
@@ -1724,39 +2604,415 @@ msgstr "Introduïu un codi postal en el format XXXX-XXX."
 msgid "Phone numbers must have 9 digits, or start by + or 00."
 msgstr "Els números de telèfon han de tenir 9 dígits, o començar per + o 00."
 
-#: ro/forms.py:19
+#: ro/forms.py:20
 msgid "Enter a valid CIF."
 msgstr "Introduïu un CIF vàlid."
 
-#: ro/forms.py:56
+#: ro/forms.py:57
 msgid "Enter a valid CNP."
 msgstr "Introduïu un CNP vàlid."
 
-#: ro/forms.py:143
+#: ro/forms.py:142
 msgid "Enter a valid IBAN in ROXX-XXXX-XXXX-XXXX-XXXX-XXXX format"
 msgstr "Introduïu un IBAN vàlid en el format ROXX-XXXX-XXXX-XXXX-XXXX-XXXX."
 
-#: ro/forms.py:175
+#: ro/forms.py:174
 msgid "Phone numbers must be in XXXX-XXXXXX format."
 msgstr "El número de telèfon ha d'estar en el format XXXX-XXXXXX."
 
-#: ro/forms.py:200
+#: ro/forms.py:199
 msgid "Enter a valid postal code in the format XXXXXX"
 msgstr "Introduïu un codi postal vàlid en el format XXXXXX."
 
-#: se/forms.py:50
+#: ru/forms.py:37
+msgid "Enter a postal code in the format XXXXXX."
+msgstr "Introdueixi un codi posta en format XXXXXX."
+
+#: ru/forms.py:50
+msgid "Enter a passport number in the format XXXX XXXXXX."
+msgstr "Introdueixi un número de passaport en format XXXX XXXXXX."
+
+#: ru/forms.py:63
+msgid "Enter a passport number in the format XX XXXXXXX."
+msgstr "Introdueixi un número de passaport en format XX XXXXXXX."
+
+#: ru/ru_regions.py:10
+msgid "Central Federal County"
+msgstr "Central Federal County"
+
+#: ru/ru_regions.py:11
+msgid "South Federal County"
+msgstr "South Federal County"
+
+#: ru/ru_regions.py:12
+msgid "North-West Federal County"
+msgstr "North-West Federal County"
+
+#: ru/ru_regions.py:13
+msgid "Far-East Federal County"
+msgstr "Far-East Federal County"
+
+#: ru/ru_regions.py:14
+msgid "Siberian Federal County"
+msgstr "Siberian Federal County"
+
+#: ru/ru_regions.py:15
+msgid "Ural Federal County"
+msgstr "Ural Federal del Comtat"
+
+#: ru/ru_regions.py:16
+msgid "Privolzhsky Federal County"
+msgstr "Privolzhsky Federal del Comtat"
+
+#: ru/ru_regions.py:17
+msgid "North-Caucasian Federal County"
+msgstr "North-Caucasian Federal County"
+
+#: ru/ru_regions.py:21
+msgid "Moskva"
+msgstr "Moskva"
+
+#: ru/ru_regions.py:22
+msgid "Saint-Peterburg"
+msgstr "Saint-Peterburg"
+
+#: ru/ru_regions.py:23
+msgid "Moskovskaya oblast'"
+msgstr "Moskovskaya Oblast '"
+
+#: ru/ru_regions.py:24
+msgid "Adygeya, Respublika"
+msgstr "Adygeya, Respublika"
+
+#: ru/ru_regions.py:25
+msgid "Bashkortostan, Respublika"
+msgstr "Bashkortostan, Respublika"
+
+#: ru/ru_regions.py:26
+msgid "Buryatia, Respublika"
+msgstr "Buryatia, Respublika"
+
+#: ru/ru_regions.py:27
+msgid "Altay, Respublika"
+msgstr "Altay, Respublika"
+
+#: ru/ru_regions.py:28
+msgid "Dagestan, Respublika"
+msgstr "Dagestan, Respublika"
+
+#: ru/ru_regions.py:29
+msgid "Ingushskaya Respublika"
+msgstr "Ingushskaya Respublika"
+
+#: ru/ru_regions.py:30
+msgid "Kabardino-Balkarskaya Respublika"
+msgstr "Kabardino-Balkarskaya Respublika"
+
+#: ru/ru_regions.py:31
+msgid "Kalmykia, Respublika"
+msgstr "Kalmykia, Respublika"
+
+#: ru/ru_regions.py:32
+msgid "Karachaevo-Cherkesskaya Respublika"
+msgstr "Karachaevo-Cherkesskaya Respublika"
+
+#: ru/ru_regions.py:33
+msgid "Karelia, Respublika"
+msgstr "Karelia, Respublika"
+
+#: ru/ru_regions.py:34
+msgid "Komi, Respublika"
+msgstr "Komi, Respublika"
+
+#: ru/ru_regions.py:35
+msgid "Mariy Ehl, Respublika"
+msgstr "Mariy Ehl, Respublika"
+
+#: ru/ru_regions.py:36
+msgid "Mordovia, Respublika"
+msgstr "Mordovia, Respublika"
+
+#: ru/ru_regions.py:37
+msgid "Sakha, Respublika (Yakutiya)"
+msgstr "Sakha, Respublika (Yakutiya)"
+
+#: ru/ru_regions.py:38
+msgid "Severnaya Osetia, Respublika (Alania)"
+msgstr "Severnaya Osetia, Respublika (Alania)"
+
+#: ru/ru_regions.py:39
+msgid "Tatarstan, Respublika"
+msgstr "Tatarstan, Respublika"
+
+#: ru/ru_regions.py:40
+msgid "Tyva, Respublika (Tuva)"
+msgstr "Tyva, Respublika (Tuva)"
+
+#: ru/ru_regions.py:41
+msgid "Udmurtskaya Respublika"
+msgstr "Udmurtskaya Respublika"
+
+#: ru/ru_regions.py:42
+msgid "Khakassiya, Respublika"
+msgstr "Khakassiya, Respublika"
+
+#: ru/ru_regions.py:43
+msgid "Chechenskaya Respublika"
+msgstr "Chechenskaya Respublika"
+
+#: ru/ru_regions.py:44
+msgid "Chuvashskaya Respublika"
+msgstr "Chuvashskaya Respublika"
+
+#: ru/ru_regions.py:45
+msgid "Altayskiy Kray"
+msgstr "Altayskiy Kray"
+
+#: ru/ru_regions.py:46
+msgid "Zabaykalskiy Kray"
+msgstr "Zabaykalskiy Kray"
+
+#: ru/ru_regions.py:47
+msgid "Kamchatskiy Kray"
+msgstr "Kamchatskiy Kray"
+
+#: ru/ru_regions.py:48
+msgid "Krasnodarskiy Kray"
+msgstr "Krasnodarskiy Kray"
+
+#: ru/ru_regions.py:49
+msgid "Krasnoyarskiy Kray"
+msgstr "Krasnoyarskiy Kray"
+
+#: ru/ru_regions.py:50
+msgid "Permskiy Kray"
+msgstr "Permskiy Kray"
+
+#: ru/ru_regions.py:51
+msgid "Primorskiy Kray"
+msgstr "Primorskiy Kray"
+
+#: ru/ru_regions.py:52
+msgid "Stavropol'siyy Kray"
+msgstr "Stavropol'siyy Kray"
+
+#: ru/ru_regions.py:53
+msgid "Khabarovskiy Kray"
+msgstr "Khabarovskiy Kray"
+
+#: ru/ru_regions.py:54
+msgid "Amurskaya oblast'"
+msgstr "Amurskaya oblast'"
+
+#: ru/ru_regions.py:55
+msgid "Arkhangel'skaya oblast'"
+msgstr "Arkhangel'skaya oblast'"
+
+#: ru/ru_regions.py:56
+msgid "Astrakhanskaya oblast'"
+msgstr "Astrakhanskaya oblast'"
+
+#: ru/ru_regions.py:57
+msgid "Belgorodskaya oblast'"
+msgstr "Belgorodskaya oblast'"
+
+#: ru/ru_regions.py:58
+msgid "Bryanskaya oblast'"
+msgstr "Bryanskaya oblast'"
+
+#: ru/ru_regions.py:59
+msgid "Vladimirskaya oblast'"
+msgstr "Vladimirskaya oblast'"
+
+#: ru/ru_regions.py:60
+msgid "Volgogradskaya oblast'"
+msgstr "Volgogradskaya oblast'"
+
+#: ru/ru_regions.py:61
+msgid "Vologodskaya oblast'"
+msgstr "Vologodskaya oblast'"
+
+#: ru/ru_regions.py:62
+msgid "Voronezhskaya oblast'"
+msgstr "Voronezhskaya oblast'"
+
+#: ru/ru_regions.py:63
+msgid "Ivanovskaya oblast'"
+msgstr "Ivanovskaya oblast'"
+
+#: ru/ru_regions.py:64
+msgid "Irkutskaya oblast'"
+msgstr "Irkutskaya oblast'"
+
+#: ru/ru_regions.py:65
+msgid "Kaliningradskaya oblast'"
+msgstr "Kaliningradskaya oblast'"
+
+#: ru/ru_regions.py:66
+msgid "Kaluzhskaya oblast'"
+msgstr "Kaluzhskaya oblast'"
+
+#: ru/ru_regions.py:67
+msgid "Kemerovskaya oblast'"
+msgstr "Kemerovskaya oblast'"
+
+#: ru/ru_regions.py:68
+msgid "Kirovskaya oblast'"
+msgstr "Kirovskaya oblast'"
+
+#: ru/ru_regions.py:69
+msgid "Kostromskaya oblast'"
+msgstr "Kostromskaya oblast'"
+
+#: ru/ru_regions.py:70
+msgid "Kurganskaya oblast'"
+msgstr "Kurganskaya oblast'"
+
+#: ru/ru_regions.py:71
+msgid "Kurskaya oblast'"
+msgstr "Kurskaya oblast'"
+
+#: ru/ru_regions.py:72
+msgid "Leningradskaya oblast'"
+msgstr "Leningradskaya oblast'"
+
+#: ru/ru_regions.py:73
+msgid "Lipeckaya oblast'"
+msgstr "Lipeckaya oblast'"
+
+#: ru/ru_regions.py:74
+msgid "Magadanskaya oblast'"
+msgstr "Magadanskaya oblast'"
+
+#: ru/ru_regions.py:75
+msgid "Murmanskaya oblast'"
+msgstr "Murmanskaya oblast'"
+
+#: ru/ru_regions.py:76
+msgid "Nizhegorodskaja oblast'"
+msgstr "Nizhegorodskaja oblast '"
+
+#: ru/ru_regions.py:77
+msgid "Novgorodskaya oblast'"
+msgstr "Novgorodskaya oblast'"
+
+#: ru/ru_regions.py:78
+msgid "Novosibirskaya oblast'"
+msgstr "Novosibirskaya oblast'"
+
+#: ru/ru_regions.py:79
+msgid "Omskaya oblast'"
+msgstr "Omskaya oblast'"
+
+#: ru/ru_regions.py:80
+msgid "Orenburgskaya oblast'"
+msgstr "Orenburgskaya oblast'"
+
+#: ru/ru_regions.py:81
+msgid "Orlovskaya oblast'"
+msgstr "Orlovskaya oblast '"
+
+#: ru/ru_regions.py:82
+msgid "Penzenskaya oblast'"
+msgstr "Penzenskaya oblast '"
+
+#: ru/ru_regions.py:83
+msgid "Pskovskaya oblast'"
+msgstr "Pskovskaya oblast'"
+
+#: ru/ru_regions.py:84
+msgid "Rostovskaya oblast'"
+msgstr "Rostovskaya oblast'"
+
+#: ru/ru_regions.py:85
+msgid "Rjazanskaya oblast'"
+msgstr "Rjazanskaya oblast'"
+
+#: ru/ru_regions.py:86
+msgid "Samarskaya oblast'"
+msgstr "Samarskaya oblast'"
+
+#: ru/ru_regions.py:87
+msgid "Saratovskaya oblast'"
+msgstr "Saratovskaya oblast'"
+
+#: ru/ru_regions.py:88
+msgid "Sakhalinskaya oblast'"
+msgstr "Sakhalinskaya oblast'"
+
+#: ru/ru_regions.py:89
+msgid "Sverdlovskaya oblast'"
+msgstr "Sverdlovskaya oblast'"
+
+#: ru/ru_regions.py:90
+msgid "Smolenskaya oblast'"
+msgstr "Smolenskaya oblast'"
+
+#: ru/ru_regions.py:91
+msgid "Tambovskaya oblast'"
+msgstr "Tambovskaya oblast'"
+
+#: ru/ru_regions.py:92
+msgid "Tverskaya oblast'"
+msgstr "Tverskaya oblast'"
+
+#: ru/ru_regions.py:93
+msgid "Tomskaya oblast'"
+msgstr "Tomskaya oblast '"
+
+#: ru/ru_regions.py:94
+msgid "Tul'skaya oblast'"
+msgstr "Tul'skaya oblast '"
+
+#: ru/ru_regions.py:95
+msgid "Tyumenskaya oblast'"
+msgstr "Tyumenskaya oblast '"
+
+#: ru/ru_regions.py:96
+msgid "Ul'ianovskaya oblast'"
+msgstr "Ul'ianovskaya oblast '"
+
+#: ru/ru_regions.py:97
+msgid "Chelyabinskaya oblast'"
+msgstr "Chelyabinskaya oblast '"
+
+#: ru/ru_regions.py:98
+msgid "Yaroslavskaya oblast'"
+msgstr "Yaroslavl Oblast '"
+
+#: ru/ru_regions.py:99
+msgid "Evreyskaya avtonomnaja oblast'"
+msgstr "Evreyskaya avtonomnaja oblast '"
+
+#: ru/ru_regions.py:100
+msgid "Neneckiy autonomnyy okrug"
+msgstr "Neneckiy autonomnyy okrug"
+
+#: ru/ru_regions.py:101
+msgid "Khanty-Mansiyskiy avtonomnyy okrug - Yugra"
+msgstr "Khanty-Mansiyskiy avtonomnyy okrug - Yugra"
+
+#: ru/ru_regions.py:102
+msgid "Chukotskiy avtonomnyy okrug"
+msgstr "Chukotskiy avtonomnyy okrug"
+
+#: ru/ru_regions.py:103
+msgid "Yamalo-Neneckiy avtonomnyy okrug"
+msgstr "Yamalo-Neneckiy avtonomnyy okrug"
+
+#: se/forms.py:54
 msgid "Enter a valid Swedish organisation number."
 msgstr "Introduïu un número d'organització Sueca vàlid."
 
-#: se/forms.py:107
+#: se/forms.py:111
 msgid "Enter a valid Swedish personal identity number."
 msgstr "Introduïu un número d'identitat personal suec vàlid."
 
-#: se/forms.py:108
+#: se/forms.py:112
 msgid "Co-ordination numbers are not allowed."
 msgstr "No es permeten números de coordinació."
 
-#: se/forms.py:150
+#: se/forms.py:154
 msgid "Enter a Swedish postal code in the format XXXXX."
 msgstr "Introduïu un codi postal suec en el format XXXXX."
 
@@ -1843,6 +3099,24 @@ msgstr "Västernorrland"
 #: se/se_counties.py:35
 msgid "Jämtland"
 msgstr "Jämtland"
+
+#: si/forms.py:25
+msgid "The first 7 digits of the EMSO must represent a valid past date."
+msgstr ""
+"Els 7 primers dígits de l'EMSO han de representar una data vàlida en el "
+"passat."
+
+#: si/forms.py:26
+msgid "The EMSO is not valid."
+msgstr "L'EMSO no és vàlid."
+
+#: si/forms.py:86
+msgid "Enter a valid tax number in form SIXXXXXXXX"
+msgstr "Entreu un número vàlid per a impostos en el format SIXXXXXXXX"
+
+#: si/forms.py:151
+msgid "Enter phone number in form +386XXXXXXXX or 0XXXXXXXX."
+msgstr "Entreu un número de telèfon en el format +386XXXXXXXX o 0XXXXXXXX."
 
 #: sk/sk_districts.py:8
 msgid "Banska Bystrica"
@@ -2192,342 +3466,58 @@ msgstr "Regió de Trnava"
 msgid "Zilina region"
 msgstr "Regió de Zilina"
 
-#: tr/forms.py:16
+#: tr/forms.py:21
 msgid "Enter a postal code in the format XXXXX."
 msgstr "Introduïu un codi postal amb el format XXXXX."
 
-#: tr/forms.py:37
+#: tr/forms.py:42
 msgid "Phone numbers must be in 0XXX XXX XXXX format."
 msgstr "Els números de telèfon han de tenir el format 0XXX XXX XXXX."
 
-#: tr/forms.py:64
+#: tr/forms.py:69
 msgid "Enter a valid Turkish Identification number."
 msgstr "Introduïu un número d'identificació turc vàlid."
 
-#: tr/forms.py:65
+#: tr/forms.py:70
 msgid "Turkish Identification number must be 11 digits."
 msgstr "Els números d'identificació turcs han de tenir 11 dígits."
 
-#: uk/forms.py:21
-msgid "Enter a valid postcode."
-msgstr "Introduïu un codi postal vàlid."
-
-#: uk/uk_regions.py:11
-msgid "Bedfordshire"
-msgstr "Bedfordshire"
-
-#: uk/uk_regions.py:12
-msgid "Buckinghamshire"
-msgstr "Buckinghamshire"
-
-#: uk/uk_regions.py:14
-msgid "Cheshire"
-msgstr "Cheshire"
-
-#: uk/uk_regions.py:15
-msgid "Cornwall and Isles of Scilly"
-msgstr "Cornwall and Isles of Scilly"
-
-#: uk/uk_regions.py:16
-msgid "Cumbria"
-msgstr "Cumbria"
-
-#: uk/uk_regions.py:17
-msgid "Derbyshire"
-msgstr "Derbyshire"
-
-#: uk/uk_regions.py:18
-msgid "Devon"
-msgstr "Devon"
-
-#: uk/uk_regions.py:19
-msgid "Dorset"
-msgstr "Dorset"
-
-#: uk/uk_regions.py:20
-msgid "Durham"
-msgstr "Durham"
-
-#: uk/uk_regions.py:21
-msgid "East Sussex"
-msgstr "East Sussex"
-
-#: uk/uk_regions.py:22
-msgid "Essex"
-msgstr "Essex"
-
-#: uk/uk_regions.py:23
-msgid "Gloucestershire"
-msgstr "Gloucestershire"
-
-#: uk/uk_regions.py:24
-msgid "Greater London"
-msgstr "Greater London"
-
-#: uk/uk_regions.py:25
-msgid "Greater Manchester"
-msgstr "Greater Manchester"
-
-#: uk/uk_regions.py:26
-msgid "Hampshire"
-msgstr "Hampshire"
-
-#: uk/uk_regions.py:27
-msgid "Hertfordshire"
-msgstr "Hertfordshire"
-
-#: uk/uk_regions.py:28
-msgid "Kent"
-msgstr "Kent"
-
-#: uk/uk_regions.py:29
-msgid "Lancashire"
-msgstr "Lancashire"
-
-#: uk/uk_regions.py:30
-msgid "Leicestershire"
-msgstr "Leicestershire"
-
-#: uk/uk_regions.py:31
-msgid "Lincolnshire"
-msgstr "Lincolnshire"
-
-#: uk/uk_regions.py:32
-msgid "Merseyside"
-msgstr "Merseyside"
-
-#: uk/uk_regions.py:33
-msgid "Norfolk"
-msgstr "Norfolk"
-
-#: uk/uk_regions.py:34
-msgid "North Yorkshire"
-msgstr "North Yorkshire"
-
-#: uk/uk_regions.py:35
-msgid "Northamptonshire"
-msgstr "Northamptonshire"
-
-#: uk/uk_regions.py:36
-msgid "Northumberland"
-msgstr "Northumberland"
-
-#: uk/uk_regions.py:37
-msgid "Nottinghamshire"
-msgstr "Nottinghamshire"
-
-#: uk/uk_regions.py:38
-msgid "Oxfordshire"
-msgstr "Oxfordshire"
-
-#: uk/uk_regions.py:39
-msgid "Shropshire"
-msgstr "Shropshire"
-
-#: uk/uk_regions.py:40
-msgid "Somerset"
-msgstr "Somerset"
-
-#: uk/uk_regions.py:41
-msgid "South Yorkshire"
-msgstr "South Yorkshire"
-
-#: uk/uk_regions.py:42
-msgid "Staffordshire"
-msgstr "Staffordshire"
-
-#: uk/uk_regions.py:43
-msgid "Suffolk"
-msgstr "Suffolk"
-
-#: uk/uk_regions.py:44
-msgid "Surrey"
-msgstr "Surrey"
-
-#: uk/uk_regions.py:45
-msgid "Tyne and Wear"
-msgstr "Tyne and Wear"
-
-#: uk/uk_regions.py:46
-msgid "Warwickshire"
-msgstr "Warwickshire"
-
-#: uk/uk_regions.py:47
-msgid "West Midlands"
-msgstr "West Midlands"
-
-#: uk/uk_regions.py:48
-msgid "West Sussex"
-msgstr "West Sussex"
-
-#: uk/uk_regions.py:49
-msgid "West Yorkshire"
-msgstr "West Yorkshire"
-
-#: uk/uk_regions.py:50
-msgid "Wiltshire"
-msgstr "Wiltshire"
-
-#: uk/uk_regions.py:51
-msgid "Worcestershire"
-msgstr "Worcestershire"
-
-#: uk/uk_regions.py:55
-msgid "County Antrim"
-msgstr "County Antrim"
-
-#: uk/uk_regions.py:56
-msgid "County Armagh"
-msgstr "County Armagh"
-
-#: uk/uk_regions.py:57
-msgid "County Down"
-msgstr "County Down"
-
-#: uk/uk_regions.py:58
-msgid "County Fermanagh"
-msgstr "County Fermanagh"
-
-#: uk/uk_regions.py:59
-msgid "County Londonderry"
-msgstr "County Londonderry"
-
-#: uk/uk_regions.py:60
-msgid "County Tyrone"
-msgstr "County Tyrone"
-
-#: uk/uk_regions.py:64
-msgid "Clwyd"
-msgstr "Clwyd"
-
-#: uk/uk_regions.py:65
-msgid "Dyfed"
-msgstr "Dyfed"
-
-#: uk/uk_regions.py:66
-msgid "Gwent"
-msgstr "Gwent"
-
-#: uk/uk_regions.py:67
-msgid "Gwynedd"
-msgstr "Gwynedd"
-
-#: uk/uk_regions.py:68
-msgid "Mid Glamorgan"
-msgstr "Mid Glamorgan"
-
-#: uk/uk_regions.py:69
-msgid "Powys"
-msgstr "Powys"
-
-#: uk/uk_regions.py:70
-msgid "South Glamorgan"
-msgstr "Glamorgan Sud"
-
-#: uk/uk_regions.py:71
-msgid "West Glamorgan"
-msgstr "Glamorgan Oest"
-
-#: uk/uk_regions.py:75
-msgid "Borders"
-msgstr "Borders"
-
-#: uk/uk_regions.py:76
-msgid "Central Scotland"
-msgstr "Escòcia central"
-
-#: uk/uk_regions.py:77
-msgid "Dumfries and Galloway"
-msgstr "Dumfries and Galloway"
-
-#: uk/uk_regions.py:78
-msgid "Fife"
-msgstr "Fife"
-
-#: uk/uk_regions.py:79
-msgid "Grampian"
-msgstr "Grampian"
-
-#: uk/uk_regions.py:80
-msgid "Highland"
-msgstr "Highland"
-
-#: uk/uk_regions.py:81
-msgid "Lothian"
-msgstr "Lothian"
-
-#: uk/uk_regions.py:82
-msgid "Orkney Islands"
-msgstr "Illes Orkney"
-
-#: uk/uk_regions.py:83
-msgid "Shetland Islands"
-msgstr "Illes Shetland"
-
-#: uk/uk_regions.py:84
-msgid "Strathclyde"
-msgstr "Strathclyde"
-
-#: uk/uk_regions.py:85
-msgid "Tayside"
-msgstr "Tayside"
-
-#: uk/uk_regions.py:86
-msgid "Western Isles"
-msgstr "Illes Occidentals"
-
-#: uk/uk_regions.py:90
-msgid "England"
-msgstr "Anglaterra"
-
-#: uk/uk_regions.py:91
-msgid "Northern Ireland"
-msgstr "Irlanda del Nord"
-
-#: uk/uk_regions.py:92
-msgid "Scotland"
-msgstr "Escòcia"
-
-#: uk/uk_regions.py:93
-msgid "Wales"
-msgstr "Gal·les"
-
-#: us/forms.py:17
+#: us/forms.py:21
 msgid "Enter a zip code in the format XXXXX or XXXXX-XXXX."
 msgstr "Introduïu un codi postal en el format XXXXX o XXXXX-XXXX."
 
-#: us/forms.py:26
+#: us/forms.py:30
 msgid "Phone numbers must be in XXX-XXX-XXXX format."
 msgstr "Els números de telèfon han d'estar en el format XXX-XXX-XXXX."
 
-#: us/forms.py:55
+#: us/forms.py:59
 msgid "Enter a valid U.S. Social Security number in XXX-XX-XXXX format."
 msgstr ""
 "Introduïu un número vàlid de la Seguretat Social dels E.U.A. en el format "
 "XXX-XX-XXXX."
 
-#: us/forms.py:88
+#: us/forms.py:92
 msgid "Enter a U.S. state or territory."
 msgstr "Introduïu un estat o territori dels E.U.A."
 
-#: us/models.py:9
+#: us/models.py:8
 msgid "U.S. state (two uppercase letters)"
 msgstr "Estat dels E.U.A. (dues lletres majúscules)"
 
-#: us/models.py:18
+#: us/models.py:17
 msgid "U.S. postal code (two uppercase letters)"
 msgstr "Codi postal dels EUA (dues lletres majúscules)"
 
-#: us/models.py:27
+#: us/models.py:26
 msgid "Phone number"
 msgstr "Número de telèfon"
 
-#: uy/forms.py:28
+#: uy/forms.py:29
 msgid "Enter a valid CI number in X.XXX.XXX-X,XXXXXXX-X or XXXXXXXX format."
 msgstr ""
 "Introduïu un número CI vàlid en el format X.XXX.XXX-X,XXXXXXX-X o XXXXXXXX."
 
-#: uy/forms.py:30
+#: uy/forms.py:31
 msgid "Enter a valid CI number."
 msgstr "Introduïu un número CI vàlid."
 
