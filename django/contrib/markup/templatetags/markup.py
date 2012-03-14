@@ -11,6 +11,8 @@ markup syntaxes to HTML; currently there is support for:
     * reStructuredText, which requires docutils from http://docutils.sf.net/
 """
 
+import warnings
+
 from django import template
 from django.conf import settings
 from django.utils.encoding import smart_str, force_unicode
@@ -65,10 +67,21 @@ def markdown(value, arg=''):
 
             # Unicode support only in markdown v1.7 or above. Version_info
             # exist only in markdown v1.6.2rc-2 or above.
-            if getattr(markdown, "version_info", None) < (1,7):
+            markdown_vers = getattr(markdown, "version_info", None)
+            if markdown_vers < (1,7):
                 return mark_safe(force_unicode(markdown.markdown(smart_str(value), extensions, safe_mode=safe_mode)))
             else:
-                return mark_safe(markdown.markdown(force_unicode(value), extensions, safe_mode=safe_mode))
+                if markdown_vers >= (2,1):
+                    if safe_mode:
+                        return mark_safe(markdown.markdown(force_unicode(value), extensions, safe_mode=safe_mode, enable_attributes=False))
+                    else:
+                        return mark_safe(markdown.markdown(force_unicode(value), extensions, safe_mode=safe_mode))
+                else:
+                    warnings.warn("Versions of markdown prior to 2.1 do not "
+                            "support disabling of attributes, no "
+                            "attributes have been removed and the result "
+                            "is insecure.")
+                    return mark_safe(markdown.markdown(force_unicode(value), extensions, safe_mode=safe_mode))
         else:
             return mark_safe(force_unicode(markdown.markdown(smart_str(value))))
 markdown.is_safe = True
