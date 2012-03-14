@@ -1,0 +1,36 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-03-14 00:17-0700\n"
+"PO-Revision-Date: 2012-02-14 13:42+0000\n"
+"Last-Translator: sagarchalise <chalisesagar@gmail.com>\n"
+"Language-Team: Nepali (http://www.transifex.net/projects/p/django/language/"
+"ne/)\n"
+"Language: ne\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+
+#: templates/formtools/wizard/wizard_form.html:15
+msgid "first step"
+msgstr ""
+
+#: templates/formtools/wizard/wizard_form.html:16
+msgid "prev step"
+msgstr ""
+
+#: templates/formtools/wizard/wizard_form.html:18
+msgid "submit"
+msgstr ""
+
+#: wizard/legacy.py:159
+msgid ""
+"We apologize, but your form has expired. Please continue filling out the "
+"form from this page."
+msgstr ""
+"क्षमापार्थी छौं तर तपाईको फारम अवधि सिद्धिएको छ । यहि पृष्ठबाट फारम भर्नुहोला ।"

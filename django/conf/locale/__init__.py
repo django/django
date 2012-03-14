@@ -269,6 +269,12 @@ LANG_INFO = {
         'name': 'Norwegian Bokmal',
         'name_local': u'Norsk (bokm\xe5l)',
     },
+    'ne': {
+        'bidi': False,
+        'code': 'ne',
+        'name': 'Nepali',
+        'name_local': u'\u0928\u0947\u092a\u093e\u0932\u0940',
+    },
     'nl': {
         'bidi': False,
         'code': 'nl',
