@@ -1,17 +1,20 @@
 # This file is distributed under the same license as the Django package.
 #
+# Translators:
+# Jannis Leidel <jannis@leidel.info>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-15 13:15-0400\n"
-"PO-Revision-Date: 2011-03-04 18:43+0000\n"
-"Last-Translator: Jannis <jannis@leidel.info>\n"
-"Language-Team: Tamil <None>\n"
+"POT-Creation-Date: 2012-03-14 00:15-0700\n"
+"PO-Revision-Date: 2012-02-14 13:24+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: Tamil (http://www.transifex.net/projects/p/django/language/"
+"ta/)\n"
+"Language: ta\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: ta\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: admin.py:12
@@ -69,30 +72,34 @@ msgstr ""
 msgid "Latest comments on %(site_name)s"
 msgstr ""
 
-#: forms.py:109
+#: forms.py:96
 msgid "Name"
 msgstr ""
 
-#: forms.py:110
+#: forms.py:97
 msgid "Email address"
 msgstr ""
 
-#: forms.py:111
+#: forms.py:98
 msgid "URL"
 msgstr "URL"
 
-#: forms.py:112
+#: forms.py:99
 msgid "Comment"
 msgstr ""
 
-#: forms.py:191
+#: forms.py:177
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
 msgstr[0] "வார்த்தைகளை அளன்து பேசுங்கள்! %s என்ற வார்த்தை இங்கு அனுமதி இல்லை"
 msgstr[1] "வார்த்தைகளை அளந்து பேசுங்கள்! %s என்ற வார்த்தைகள் இங்கு அனுமதி இல்லை"
 
-#: forms.py:198
+#: forms.py:181 templates/comments/preview.html:16
+msgid "and"
+msgstr "மற்றும்"
+
+#: forms.py:186
 msgid ""
 "If you enter anything in this field your comment will be treated as spam"
 msgstr ""
@@ -280,10 +287,6 @@ msgid "Please correct the error below"
 msgid_plural "Please correct the errors below"
 msgstr[0] ""
 msgstr[1] ""
-
-#: templates/comments/preview.html:16
-msgid "and"
-msgstr "மற்றும்"
 
 #: templates/comments/preview.html:16
 msgid "Post your comment"

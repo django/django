@@ -1,19 +1,23 @@
 # This file is distributed under the same license as the Django package.
 #
+# Translators:
+# Denis Darii <sinednx@gmail.com>, 2011.
+# Jannis Leidel <jannis@leidel.info>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-20 21:05+0100\n"
-"PO-Revision-Date: 2011-03-04 18:43+0000\n"
-"Last-Translator: dnx <sinednx@gmail.com>\n"
-"Language-Team: Russian <>\n"
+"POT-Creation-Date: 2012-03-14 00:15-0700\n"
+"PO-Revision-Date: 2012-02-14 13:24+0000\n"
+"Last-Translator: Denis Darii <sinednx@gmail.com>\n"
+"Language-Team: Russian (http://www.transifex.net/projects/p/django/language/"
+"ru/)\n"
+"Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: ru\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
-"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
 
 #: admin.py:12
 msgid "Content"
@@ -29,7 +33,6 @@ msgid_plural "flagged"
 msgstr[0] "выбран"
 msgstr[1] "выбраны"
 msgstr[2] "выбраны"
-msgstr[3] "выбраны"
 
 #: admin.py:43
 msgid "Flag selected comments"
@@ -41,7 +44,6 @@ msgid_plural "approved"
 msgstr[0] "одобренный"
 msgstr[1] "одобренные"
 msgstr[2] "одобренные"
-msgstr[3] "одобренные"
 
 #: admin.py:48
 msgid "Approve selected comments"
@@ -53,7 +55,6 @@ msgid_plural "removed"
 msgstr[0] "удален"
 msgstr[1] "удалены"
 msgstr[2] "удалены"
-msgstr[3] "удалены"
 
 #: admin.py:53
 msgid "Remove selected comments"
@@ -66,7 +67,6 @@ msgid_plural "%(count)s comments were successfully %(action)s."
 msgstr[0] "%(count)s комментарий был успешно %(action)s."
 msgstr[1] "%(count)s комментариев были успешно %(action)s."
 msgstr[2] "%(count)s комментариев были успешно %(action)s."
-msgstr[3] "%(count)s комментариев были успешно %(action)s."
 
 #: feeds.py:13
 #, python-format
@@ -78,32 +78,35 @@ msgstr "Комментарии %(site_name)s"
 msgid "Latest comments on %(site_name)s"
 msgstr "Последние комментарии на %(site_name)s"
 
-#: forms.py:109
+#: forms.py:96
 msgid "Name"
 msgstr "Имя"
 
-#: forms.py:110
+#: forms.py:97
 msgid "Email address"
 msgstr "Адрес электронной почты"
 
-#: forms.py:111
+#: forms.py:98
 msgid "URL"
 msgstr "URL"
 
-#: forms.py:112
+#: forms.py:99
 msgid "Comment"
 msgstr "Комментарий"
 
-#: forms.py:191
+#: forms.py:177
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
 msgstr[0] "Следите за своими словами! Слово %s не позволенно здесь."
 msgstr[1] "Следите за своими словами! Слова %s не позволенны здесь."
 msgstr[2] "Следите за своими словами! Слова %s не позволенны здесь."
-msgstr[3] "Следите за своими словами! Слова %s не позволенны здесь."
 
-#: forms.py:198
+#: forms.py:181 templates/comments/preview.html:16
+msgid "and"
+msgstr "и"
+
+#: forms.py:186
 msgid ""
 "If you enter anything in this field your comment will be treated as spam"
 msgstr ""
@@ -297,11 +300,6 @@ msgid_plural "Please correct the errors below"
 msgstr[0] "Пожалуйста, исправьте ошибку ниже"
 msgstr[1] "Пожалуйста, исправьте ошибки ниже"
 msgstr[2] "Пожалуйста, исправьте ошибки ниже"
-msgstr[3] "Пожалуйста, исправьте ошибки ниже"
-
-#: templates/comments/preview.html:16
-msgid "and"
-msgstr "и"
 
 #: templates/comments/preview.html:16
 msgid "Post your comment"

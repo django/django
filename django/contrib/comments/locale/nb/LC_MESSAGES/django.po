@@ -1,17 +1,22 @@
 # This file is distributed under the same license as the Django package.
 #
+# Translators:
+# Jannis Leidel <jannis@leidel.info>, 2011.
+#   <jonklo@gmail.com>, 2012.
+#   <sigurdga-transifex@sigurdga.no>, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-15 13:15-0400\n"
-"PO-Revision-Date: 2011-03-04 18:42+0000\n"
-"Last-Translator: Jannis <jannis@leidel.info>\n"
-"Language-Team: Norwegian Bokmål <>\n"
+"POT-Creation-Date: 2012-03-14 00:15-0700\n"
+"PO-Revision-Date: 2012-03-12 21:43+0000\n"
+"Last-Translator: sigurdga <sigurdga-transifex@sigurdga.no>\n"
+"Language-Team: Norwegian Bokmål (http://www.transifex.net/projects/p/django/"
+"language/nb/)\n"
+"Language: nb\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: nb\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: admin.py:12
@@ -69,30 +74,34 @@ msgstr "%(site_name)s kommentarer"
 msgid "Latest comments on %(site_name)s"
 msgstr "Siste kommentarer fra %(site_name)s"
 
-#: forms.py:109
+#: forms.py:96
 msgid "Name"
 msgstr "Navn"
 
-#: forms.py:110
+#: forms.py:97
 msgid "Email address"
 msgstr "E-postadresse"
 
-#: forms.py:111
+#: forms.py:98
 msgid "URL"
 msgstr "Nettadresse"
 
-#: forms.py:112
+#: forms.py:99
 msgid "Comment"
 msgstr "Kommentar"
 
-#: forms.py:191
+#: forms.py:177
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
 msgstr[0] "Pass munnen din! Ordet %s er ikke tillatt her."
 msgstr[1] "Pass munnen din! Ordene %s er ikke tillatt her."
 
-#: forms.py:198
+#: forms.py:181 templates/comments/preview.html:16
+msgid "and"
+msgstr "og"
+
+#: forms.py:186
 msgid ""
 "If you enter anything in this field your comment will be treated as spam"
 msgstr ""
@@ -141,7 +150,7 @@ msgstr "er tilgjengelig for alle"
 #: models.py:62
 msgid ""
 "Uncheck this box to make the comment effectively disappear from the site."
-msgstr "Avmerk denne boksen for å fjerne kommentaren fra siden."
+msgstr "Fjern avhuking av denne boksen for å fjerne kommentaren fra siden."
 
 #: models.py:64
 msgid "is removed"
@@ -152,8 +161,8 @@ msgid ""
 "Check this box if the comment is inappropriate. A \"This comment has been "
 "removed\" message will be displayed instead."
 msgstr ""
-"Huk av denne hvis kommentaren er upassende. Meldingen \"Denne kommentaren "
-"har blitt fjernet\" vil bli vist i stedet."
+"Huk av denne hvis kommentaren er upassende. Meldingen «Denne kommentaren har "
+"blitt fjernet» vil bli vist i stedet."
 
 #: models.py:77
 msgid "comments"
@@ -236,7 +245,7 @@ msgstr "Fjern en kommentar"
 
 #: templates/comments/delete.html:7
 msgid "Really remove this comment?"
-msgstr "Fjerne denne kommentaren?"
+msgstr "Fjern denne kommentaren?"
 
 #: templates/comments/delete.html:12
 msgid "Remove"
@@ -287,10 +296,6 @@ msgid "Please correct the error below"
 msgid_plural "Please correct the errors below"
 msgstr[0] "Vennligst korriger feilen under"
 msgstr[1] "Vennligst korriger feilene under"
-
-#: templates/comments/preview.html:16
-msgid "and"
-msgstr "og"
 
 #: templates/comments/preview.html:16
 msgid "Post your comment"

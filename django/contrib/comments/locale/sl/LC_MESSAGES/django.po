@@ -1,17 +1,20 @@
 # This file is distributed under the same license as the Django package.
 #
+# Translators:
+# Jannis Leidel <jannis@leidel.info>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-15 13:15-0400\n"
-"PO-Revision-Date: 2011-03-04 18:43+0000\n"
-"Last-Translator: Jannis <jannis@leidel.info>\n"
-"Language-Team: Slovenian <None>\n"
+"POT-Creation-Date: 2012-03-14 00:15-0700\n"
+"PO-Revision-Date: 2012-02-14 13:24+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: Slovenian (http://www.transifex.net/projects/p/django/"
+"language/sl/)\n"
+"Language: sl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: sl\n"
 "Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n"
 "%100==4 ? 2 : 3)\n"
 
@@ -78,23 +81,23 @@ msgstr "%(site_name)s komentarji"
 msgid "Latest comments on %(site_name)s"
 msgstr "Zadnji komentarji na %(site_name)s"
 
-#: forms.py:109
+#: forms.py:96
 msgid "Name"
 msgstr "Ime"
 
-#: forms.py:110
+#: forms.py:97
 msgid "Email address"
 msgstr "E-poštni naslov"
 
-#: forms.py:111
+#: forms.py:98
 msgid "URL"
 msgstr "URL (spletni naslov)"
 
-#: forms.py:112
+#: forms.py:99
 msgid "Comment"
 msgstr "Komentar"
 
-#: forms.py:191
+#: forms.py:177
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
@@ -103,7 +106,11 @@ msgstr[1] "Pazite na jezik! Besedi %s tu nista dovoljeni."
 msgstr[2] "Pazite na jezik! Besede %s tu niso dovoljene."
 msgstr[3] "Pazite na jezik! Besede %s tu niso dovoljene."
 
-#: forms.py:198
+#: forms.py:181 templates/comments/preview.html:16
+msgid "and"
+msgstr "in"
+
+#: forms.py:186
 msgid ""
 "If you enter anything in this field your comment will be treated as spam"
 msgstr "Če v to polje vnesete karkoli, bo vaš komentar označen kot nezaželen"
@@ -299,10 +306,6 @@ msgstr[0] "Prosimo, odpravite sledečo napako"
 msgstr[1] "Prosimo, odpravite sledeči napaki"
 msgstr[2] "Prosimo, odpravite sledeče napake"
 msgstr[3] "Prosimo, odpravite sledeče napake"
-
-#: templates/comments/preview.html:16
-msgid "and"
-msgstr "in"
 
 #: templates/comments/preview.html:16
 msgid "Post your comment"

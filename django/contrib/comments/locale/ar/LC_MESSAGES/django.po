@@ -1,17 +1,21 @@
 # This file is distributed under the same license as the Django package.
 #
+# Translators:
+# Jannis Leidel <jannis@leidel.info>, 2011.
+# Ossama Khayat <okhayat@gmail.com>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-20 21:05+0100\n"
-"PO-Revision-Date: 2011-03-17 17:51+0000\n"
-"Last-Translator: okhayat <okhayat@gmail.com>\n"
-"Language-Team: Arabic <None>\n"
+"POT-Creation-Date: 2012-03-14 00:15-0700\n"
+"PO-Revision-Date: 2012-02-14 13:24+0000\n"
+"Last-Translator: Ossama Khayat <okhayat@gmail.com>\n"
+"Language-Team: Arabic (http://www.transifex.net/projects/p/django/language/"
+"ar/)\n"
+"Language: ar\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: ar\n"
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
 "&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5\n"
 
@@ -86,23 +90,23 @@ msgstr "تعليقات %(site_name)s"
 msgid "Latest comments on %(site_name)s"
 msgstr "آخر التعليقات على %(site_name)s"
 
-#: forms.py:109
+#: forms.py:96
 msgid "Name"
 msgstr "الاسم"
 
-#: forms.py:110
+#: forms.py:97
 msgid "Email address"
 msgstr "عنوان بريد إلكتروني"
 
-#: forms.py:111
+#: forms.py:98
 msgid "URL"
 msgstr "رابط"
 
-#: forms.py:112
+#: forms.py:99
 msgid "Comment"
 msgstr "تعليق"
 
-#: forms.py:191
+#: forms.py:177
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
@@ -113,7 +117,11 @@ msgstr[3] "احفظ لسانك! الكلمة %s ممنوعة هنا."
 msgstr[4] "احفظ لسانك! الكلمة %s ممنوعة هنا."
 msgstr[5] "احفظ لسانك! الكلمة %s ممنوعة هنا."
 
-#: forms.py:198
+#: forms.py:181 templates/comments/preview.html:16
+msgid "and"
+msgstr "و"
+
+#: forms.py:186
 msgid ""
 "If you enter anything in this field your comment will be treated as spam"
 msgstr "إن كتبت أي شيء في هذا الحقل فسيُعتبر تعليقك غير مرغوب به"
@@ -306,10 +314,6 @@ msgstr[2] "رجاءً صحح الخطأين أدناه"
 msgstr[3] "رجاءً صحح الأخطاء أدناه"
 msgstr[4] "رجاءً صحح الأخطاء أدناه"
 msgstr[5] "رجاءً صحح الأخطاء أدناه"
-
-#: templates/comments/preview.html:16
-msgid "and"
-msgstr "و"
 
 #: templates/comments/preview.html:16
 msgid "Post your comment"

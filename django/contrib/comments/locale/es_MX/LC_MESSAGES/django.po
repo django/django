@@ -1,17 +1,20 @@
 # This file is distributed under the same license as the Django package.
 #
+# Translators:
+# Abraham Estrada <abraham.estrada@gmail.com>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-15 13:14-0400\n"
-"PO-Revision-Date: 2011-03-04 18:43+0000\n"
-"Last-Translator: Jannis <jannis@leidel.info>\n"
-"Language-Team: Spanish (Mexican) <None>\n"
+"POT-Creation-Date: 2012-03-14 00:15-0700\n"
+"PO-Revision-Date: 2012-02-14 13:24+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: Spanish (Mexico) (http://www.transifex.net/projects/p/django/"
+"language/es_MX/)\n"
+"Language: es_MX\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: es_MX\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: admin.py:12
@@ -56,8 +59,8 @@ msgstr "Eliminar comentarios seleccionados"
 #, python-format
 msgid "1 comment was successfully %(action)s."
 msgid_plural "%(count)s comments were successfully %(action)s."
-msgstr[0] "%(count)s comentarios fueron %(action)s satisfactoriamente."
-msgstr[1] ""
+msgstr[0] ""
+msgstr[1] "%(count)s comentarios fueron %(action)s satisfactoriamente."
 
 #: feeds.py:13
 #, python-format
@@ -69,30 +72,34 @@ msgstr "comentarios en %(site_name)s"
 msgid "Latest comments on %(site_name)s"
 msgstr "Últimos comentarios en %(site_name)s "
 
-#: forms.py:109
+#: forms.py:96
 msgid "Name"
 msgstr "Nombre"
 
-#: forms.py:110
+#: forms.py:97
 msgid "Email address"
 msgstr "Dirección de correo electrónico"
 
-#: forms.py:111
+#: forms.py:98
 msgid "URL"
 msgstr "URL"
 
-#: forms.py:112
+#: forms.py:99
 msgid "Comment"
 msgstr "Comentario"
 
-#: forms.py:191
+#: forms.py:177
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
 msgstr[0] "¡Controla tu lenguaje! Aquí no admitimos la palabra %s."
 msgstr[1] "¡Controla tu lenguaje! Aquí no admitimos las palabras %s."
 
-#: forms.py:198
+#: forms.py:181 templates/comments/preview.html:16
+msgid "and"
+msgstr "y"
+
+#: forms.py:186
 msgid ""
 "If you enter anything in this field your comment will be treated as spam"
 msgstr "Si introduce algo en este campo su comentario será tratado como spam"
@@ -286,10 +293,6 @@ msgid "Please correct the error below"
 msgid_plural "Please correct the errors below"
 msgstr[0] "Por favor corrija el error"
 msgstr[1] "Por favor corrija los errores"
-
-#: templates/comments/preview.html:16
-msgid "and"
-msgstr "y"
 
 #: templates/comments/preview.html:16
 msgid "Post your comment"
