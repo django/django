@@ -110,6 +110,7 @@ LANGUAGES = (
     ('te', gettext_noop('Telugu')),
     ('th', gettext_noop('Thai')),
     ('tr', gettext_noop('Turkish')),
+    ('tt', gettext_noop('Tatar')),
     ('uk', gettext_noop('Ukrainian')),
     ('ur', gettext_noop('Urdu')),
     ('vi', gettext_noop('Vietnamese')),

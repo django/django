@@ -395,6 +395,12 @@ LANG_INFO = {
         'name': 'Turkish',
         'name_local': u'T\xfcrk\xe7e',
     },
+    'tt': {
+        'bidi': False,
+        'code': 'tt',
+        'name': 'Tatar',
+        'name_local': u'\u0422\u0430\u0442\u0430\u0440\u0447\u0430',
+    },
     'uk': {
         'bidi': False,
         'code': 'uk',
