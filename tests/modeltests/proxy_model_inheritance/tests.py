@@ -13,7 +13,7 @@ import sys
 
 from django.conf import settings
 from django.core.management import call_command
-from django.db.models.loading import load_app
+from django.db.models.loading import cache, load_app
 from django.test import TransactionTestCase
 from django.test.utils import override_settings
 
@@ -28,6 +28,12 @@ class ProxyModelInheritanceTests(TransactionTestCase):
 
     def tearDown(self):
         sys.path = self.old_sys_path
+        del cache.app_store[cache.app_labels['app1']]
+        del cache.app_store[cache.app_labels['app2']]
+        del cache.app_labels['app1']
+        del cache.app_labels['app2']
+        del cache.app_models['app1']
+        del cache.app_models['app2']
 
     def test_table_exists(self):
         call_command('syncdb', verbosity=0)
