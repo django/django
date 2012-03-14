@@ -536,7 +536,7 @@ binary, so relinking that command may be necessary as well.
 Please don't forget to run ``compress.py`` and include the ``diff`` of the
 minified scripts when submitting patches for Django's javascript.
 
-.. _Closure Compiler: http://code.google.com/closure/compiler/
+.. _Closure Compiler: https://developers.google.com/closure/compiler/
 
 Django conventions
 ==================
@@ -869,7 +869,7 @@ repository:
 
       For the curious: We're using a `Trac post-commit hook`_ for this.
 
-      .. _Trac post-commit hook: http://trac.edgewall.org/browser/trunk/contrib/trac-post-commit-hook
+      .. _Trac post-commit hook: http://trac.edgewall.org/browser/trunk/contrib/trac-svn-post-commit-hook.cmd
 
     * If your commit references a ticket in the Django `ticket tracker`_ but
       does *not* close the ticket, include the phrase "Refs #abc", where "abc"
