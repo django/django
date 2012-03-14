@@ -483,6 +483,8 @@ probably use:
 Again, this only scratches the surface. A complete reference can be found in the
 :ref:`field lookup reference <field-lookups>`.
 
+.. _lookups-that-span-relationships:
+
 Lookups that span relationships
 -------------------------------
 
