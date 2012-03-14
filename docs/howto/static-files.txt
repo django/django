@@ -469,8 +469,8 @@ For details on how you'd write one of these backends,
     storage backends for many common file storage APIs (including `S3`__).
 
 __ http://s3.amazonaws.com/
-__ http://code.welldev.org/django-storages/
-__ http://code.welldev.org/django-storages/wiki/S3Storage
+__ http://code.larlet.fr/django-storages/
+__ http://django-storages.readthedocs.org/en/latest/backends/amazon-S3.html
 
 Upgrading from ``django-staticfiles``
 =====================================

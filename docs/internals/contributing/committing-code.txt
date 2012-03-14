@@ -83,7 +83,7 @@ repository:
 
   For the curious: we're using a `Trac post-commit hook`_ for this.
 
-  .. _Trac post-commit hook: http://trac.edgewall.org/browser/trunk/contrib/trac-post-commit-hook
+  .. _Trac post-commit hook: http://trac.edgewall.org/browser/trunk/contrib/trac-svn-post-commit-hook.cmd
 
 * If your commit references a ticket in the Django `ticket tracker`_ but
   does *not* close the ticket, include the phrase "Refs #abc", where "abc"
