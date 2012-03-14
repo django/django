@@ -1,607 +1,668 @@
 # This file is distributed under the same license as the Django package.
 #
+# Translators:
+# Alex Gaynor <alex.gaynor@gmail.com>, 2011, 2012.
+# Jannis Leidel <jannis@leidel.info>, 2011.
+# Meir Kriheli <meir@mksoft.co.il>, 2011.
+# Meir Kriheli <mkriheli@gmail.com>, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-20 20:59+0100\n"
-"PO-Revision-Date: 2011-03-19 10:21+0000\n"
-"Last-Translator: mksoft <meir@mksoft.co.il>\n"
-"Language-Team: Hebrew <>\n"
+"POT-Creation-Date: 2012-03-14 00:07-0700\n"
+"PO-Revision-Date: 2012-03-08 12:00+0000\n"
+"Last-Translator: Meir Kriheli <mkriheli@gmail.com>\n"
+"Language-Team: Hebrew (http://www.transifex.net/projects/p/django/language/"
+"he/)\n"
+"Language: he\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: he\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
-#: conf/global_settings.py:44
+#: conf/global_settings.py:48
 msgid "Arabic"
 msgstr "ערבית"
 
-#: conf/global_settings.py:45
+#: conf/global_settings.py:49
 msgid "Azerbaijani"
 msgstr "אזרית"
 
-#: conf/global_settings.py:46
+#: conf/global_settings.py:50
 msgid "Bulgarian"
 msgstr "בולגרית"
 
-#: conf/global_settings.py:47
+#: conf/global_settings.py:51
 msgid "Bengali"
 msgstr "בנגאלית"
 
-#: conf/global_settings.py:48
+#: conf/global_settings.py:52
 msgid "Bosnian"
 msgstr "בוסנית"
 
-#: conf/global_settings.py:49
+#: conf/global_settings.py:53
 msgid "Catalan"
 msgstr "קאטלונית"
 
-#: conf/global_settings.py:50
+#: conf/global_settings.py:54
 msgid "Czech"
 msgstr "צ'כית"
 
-#: conf/global_settings.py:51
+#: conf/global_settings.py:55
 msgid "Welsh"
 msgstr "וולשית"
 
-#: conf/global_settings.py:52
+#: conf/global_settings.py:56
 msgid "Danish"
 msgstr "דנית"
 
-#: conf/global_settings.py:53
+#: conf/global_settings.py:57
 msgid "German"
 msgstr "גרמנית"
 
-#: conf/global_settings.py:54
+#: conf/global_settings.py:58
 msgid "Greek"
 msgstr "יוונית"
 
-#: conf/global_settings.py:55
+#: conf/global_settings.py:59
 msgid "English"
 msgstr "אנגלית"
 
-#: conf/global_settings.py:56
+#: conf/global_settings.py:60
 msgid "British English"
 msgstr "אנגלית בריטית"
 
-#: conf/global_settings.py:57
+#: conf/global_settings.py:61
 msgid "Spanish"
 msgstr "ספרדית"
 
-#: conf/global_settings.py:58
+#: conf/global_settings.py:62
 msgid "Argentinian Spanish"
 msgstr "ספרדית ארגנטינית"
 
-#: conf/global_settings.py:59
+#: conf/global_settings.py:63
 msgid "Mexican Spanish"
 msgstr "ספרדית מקסיקנית"
 
-#: conf/global_settings.py:60
-#, fuzzy
+#: conf/global_settings.py:64
 msgid "Nicaraguan Spanish"
-msgstr "ספרדית מקסיקנית"
+msgstr "ספרדית ניקרגואה"
 
-#: conf/global_settings.py:61
+#: conf/global_settings.py:65
 msgid "Estonian"
 msgstr "אסטונית"
 
-#: conf/global_settings.py:62
+#: conf/global_settings.py:66
 msgid "Basque"
 msgstr "בסקית"
 
-#: conf/global_settings.py:63
+#: conf/global_settings.py:67
 msgid "Persian"
 msgstr "פרסית"
 
-#: conf/global_settings.py:64
+#: conf/global_settings.py:68
 msgid "Finnish"
 msgstr "פינית"
 
-#: conf/global_settings.py:65
+#: conf/global_settings.py:69
 msgid "French"
 msgstr "צרפתית"
 
-#: conf/global_settings.py:66
+#: conf/global_settings.py:70
 msgid "Frisian"
 msgstr "פריזית"
 
-#: conf/global_settings.py:67
+#: conf/global_settings.py:71
 msgid "Irish"
 msgstr "אירית"
 
-#: conf/global_settings.py:68
+#: conf/global_settings.py:72
 msgid "Galician"
 msgstr "גאליציאנית"
 
-#: conf/global_settings.py:69
+#: conf/global_settings.py:73
 msgid "Hebrew"
 msgstr "עברית"
 
-#: conf/global_settings.py:70
+#: conf/global_settings.py:74
 msgid "Hindi"
 msgstr "הינדי"
 
-#: conf/global_settings.py:71
+#: conf/global_settings.py:75
 msgid "Croatian"
 msgstr "קרואטית"
 
-#: conf/global_settings.py:72
+#: conf/global_settings.py:76
 msgid "Hungarian"
 msgstr "הונגרית"
 
-#: conf/global_settings.py:73
+#: conf/global_settings.py:77
 msgid "Indonesian"
 msgstr "אינדונזית"
 
-#: conf/global_settings.py:74
+#: conf/global_settings.py:78
 msgid "Icelandic"
 msgstr "איסלנדית"
 
-#: conf/global_settings.py:75
+#: conf/global_settings.py:79
 msgid "Italian"
 msgstr "איטלקית"
 
-#: conf/global_settings.py:76
+#: conf/global_settings.py:80
 msgid "Japanese"
 msgstr "יפנית"
 
-#: conf/global_settings.py:77
+#: conf/global_settings.py:81
 msgid "Georgian"
 msgstr "גיאורגית"
 
-#: conf/global_settings.py:78
+#: conf/global_settings.py:82
 msgid "Khmer"
 msgstr "חמר"
 
-#: conf/global_settings.py:79
+#: conf/global_settings.py:83
 msgid "Kannada"
 msgstr "קאנאדה"
 
-#: conf/global_settings.py:80
+#: conf/global_settings.py:84
 msgid "Korean"
 msgstr "קוריאנית"
 
-#: conf/global_settings.py:81
+#: conf/global_settings.py:85
 msgid "Lithuanian"
 msgstr "ליטאית"
 
-#: conf/global_settings.py:82
+#: conf/global_settings.py:86
 msgid "Latvian"
 msgstr "לטבית"
 
-#: conf/global_settings.py:83
+#: conf/global_settings.py:87
 msgid "Macedonian"
 msgstr "מקדונית"
 
-#: conf/global_settings.py:84
+#: conf/global_settings.py:88
 msgid "Malayalam"
 msgstr "מלאיאלאם"
 
-#: conf/global_settings.py:85
+#: conf/global_settings.py:89
 msgid "Mongolian"
 msgstr "מונגולי"
 
-#: conf/global_settings.py:86
+#: conf/global_settings.py:90
 msgid "Dutch"
 msgstr "הולנדית"
 
-#: conf/global_settings.py:87
-msgid "Norwegian"
-msgstr "נורווגית"
-
-#: conf/global_settings.py:88
+#: conf/global_settings.py:91
 msgid "Norwegian Bokmal"
 msgstr "נורבגית ספרותית"
 
-#: conf/global_settings.py:89
+#: conf/global_settings.py:92
 msgid "Norwegian Nynorsk"
 msgstr "נורבגית חדשה"
 
-#: conf/global_settings.py:90
+#: conf/global_settings.py:93
 msgid "Punjabi"
 msgstr "פנג'אבי"
 
-#: conf/global_settings.py:91
+#: conf/global_settings.py:94
 msgid "Polish"
 msgstr "פולנית"
 
-#: conf/global_settings.py:92
+#: conf/global_settings.py:95
 msgid "Portuguese"
 msgstr "פורטוגזית"
 
-#: conf/global_settings.py:93
+#: conf/global_settings.py:96
 msgid "Brazilian Portuguese"
 msgstr "פורטוגזית ברזילאית"
 
-#: conf/global_settings.py:94
+#: conf/global_settings.py:97
 msgid "Romanian"
 msgstr "רומנית"
 
-#: conf/global_settings.py:95
+#: conf/global_settings.py:98
 msgid "Russian"
 msgstr "רוסית"
 
-#: conf/global_settings.py:96
+#: conf/global_settings.py:99
 msgid "Slovak"
 msgstr "סלובקית"
 
-#: conf/global_settings.py:97
+#: conf/global_settings.py:100
 msgid "Slovenian"
 msgstr "סלובנית"
 
-#: conf/global_settings.py:98
+#: conf/global_settings.py:101
 msgid "Albanian"
 msgstr "אלבנית"
 
-#: conf/global_settings.py:99
+#: conf/global_settings.py:102
 msgid "Serbian"
 msgstr "סרבית"
 
-#: conf/global_settings.py:100
+#: conf/global_settings.py:103
 msgid "Serbian Latin"
 msgstr "סרבית לטינית"
 
-#: conf/global_settings.py:101
+#: conf/global_settings.py:104
 msgid "Swedish"
 msgstr "שוודית"
 
-#: conf/global_settings.py:102
+#: conf/global_settings.py:105
 msgid "Tamil"
 msgstr "טמילית"
 
-#: conf/global_settings.py:103
+#: conf/global_settings.py:106
 msgid "Telugu"
 msgstr "טלגו"
 
-#: conf/global_settings.py:104
+#: conf/global_settings.py:107
 msgid "Thai"
 msgstr "תאילנדית"
 
-#: conf/global_settings.py:105
+#: conf/global_settings.py:108
 msgid "Turkish"
 msgstr "טורקית"
 
-#: conf/global_settings.py:106
+#: conf/global_settings.py:109
 msgid "Ukrainian"
 msgstr "אוקראינית"
 
-#: conf/global_settings.py:107
+#: conf/global_settings.py:110
 msgid "Urdu"
 msgstr "אורדו"
 
-#: conf/global_settings.py:108
+#: conf/global_settings.py:111
 msgid "Vietnamese"
 msgstr "וייטנאמית"
 
-#: conf/global_settings.py:109
+#: conf/global_settings.py:112
 msgid "Simplified Chinese"
 msgstr "סינית פשוטה"
 
-#: conf/global_settings.py:110
+#: conf/global_settings.py:113
 msgid "Traditional Chinese"
 msgstr "סינית מסורתית"
 
-#: core/validators.py:21 forms/fields.py:67
+#: core/validators.py:24 forms/fields.py:51
 msgid "Enter a valid value."
 msgstr "יש להזין ערך חוקי."
 
-#: core/validators.py:89 forms/fields.py:575
+#: core/validators.py:99 forms/fields.py:601
 msgid "This URL appears to be a broken link."
 msgstr "ה־URL הזה נראה כקישור שבור."
 
-#: core/validators.py:94 forms/fields.py:574
+#: core/validators.py:131 forms/fields.py:600
 msgid "Enter a valid URL."
 msgstr "יש להזין URL חוקי."
 
-#: core/validators.py:138 forms/fields.py:449
+#: core/validators.py:165 forms/fields.py:474
 msgid "Enter a valid e-mail address."
 msgstr "יש להזין כתובת דוא\"ל חוקית."
 
-#: core/validators.py:141 forms/fields.py:958
+#: core/validators.py:168 forms/fields.py:1023
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr "יש להזין ערך המכיל אותיות, ספרות, קווים תחתונים ומקפים בלבד."
 
-#: core/validators.py:144 forms/fields.py:951
+#: core/validators.py:171 core/validators.py:188 forms/fields.py:997
 msgid "Enter a valid IPv4 address."
 msgstr "יש להזין כתובת IPv4 חוקית."
 
-#: core/validators.py:147 db/models/fields/__init__.py:575
+#: core/validators.py:175 core/validators.py:189
+msgid "Enter a valid IPv6 address."
+msgstr "יש להזין כתובת IPv6 חוקית."
+
+#: core/validators.py:184 core/validators.py:187
+msgid "Enter a valid IPv4 or IPv6 address."
+msgstr "יש להזין כתובת IPv4 או IPv6 חוקית."
+
+#: core/validators.py:209 db/models/fields/__init__.py:638
 msgid "Enter only digits separated by commas."
 msgstr "יש להזין רק ספרות מופרדות בפסיקים."
 
-#: core/validators.py:153
+#: core/validators.py:215
 #, python-format
 msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
 msgstr "יש לוודא שערך זה הינו %(limit_value)s (כרגע %(show_value)s)."
 
-#: core/validators.py:171 forms/fields.py:222 forms/fields.py:275
+#: core/validators.py:233 forms/fields.py:209 forms/fields.py:262
 #, python-format
 msgid "Ensure this value is less than or equal to %(limit_value)s."
 msgstr "יש לוודא שערך זה פחות מ או שווה ל־%(limit_value)s ."
 
-#: core/validators.py:176 forms/fields.py:223 forms/fields.py:276
+#: core/validators.py:238 forms/fields.py:210 forms/fields.py:263
 #, python-format
 msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr "יש לוודא שהערך גדול מ או שווה ל־%(limit_value)s."
 
-#: core/validators.py:182
+#: core/validators.py:244
 #, python-format
 msgid ""
-"Ensure this value has at least %(limit_value)d characters (it has %"
-"(show_value)d)."
+"Ensure this value has at least %(limit_value)d characters (it has "
+"%(show_value)d)."
 msgstr ""
 "יש לוודא שערך זה מכיל לפחות %(limit_value)d תווים (מכיל %(show_value)d)."
 
-#: core/validators.py:188
+#: core/validators.py:250
 #, python-format
 msgid ""
-"Ensure this value has at most %(limit_value)d characters (it has %"
-"(show_value)d)."
+"Ensure this value has at most %(limit_value)d characters (it has "
+"%(show_value)d)."
 msgstr ""
 "יש לוודא שערך זה מכיל %(limit_value)d תווים לכל היותר (מכיל %(show_value)d)."
 
-#: db/models/base.py:769
+#: db/models/base.py:764
 #, python-format
 msgid "%(field_name)s must be unique for %(date_field)s %(lookup)s."
 msgstr "%(field_name)s חייב להיות ייחודי ל%(lookup)s של ה־%(date_field)s"
 
-#: db/models/base.py:784 db/models/base.py:792
+#: db/models/base.py:787 forms/models.py:577
+msgid "and"
+msgstr "ו"
+
+#: db/models/base.py:788 db/models/fields/__init__.py:65
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(model_name)s·עם·%(field_label)s·זה קיימת כבר."
 
-#: db/models/base.py:791 forms/models.py:562
-msgid "and"
-msgstr "ו"
-
-#: db/models/fields/__init__.py:63
+#: db/models/fields/__init__.py:62
 #, python-format
 msgid "Value %r is not a valid choice."
 msgstr "ערך %r אינו אפשרות חוקית."
 
-#: db/models/fields/__init__.py:64
+#: db/models/fields/__init__.py:63
 msgid "This field cannot be null."
 msgstr "שדה זה אינו יכול להיות ריק."
 
-#: db/models/fields/__init__.py:65
+#: db/models/fields/__init__.py:64
 msgid "This field cannot be blank."
 msgstr "שדה זה אינו יכול להיות ריק."
 
-#: db/models/fields/__init__.py:70
+#: db/models/fields/__init__.py:71
 #, python-format
 msgid "Field of type: %(field_type)s"
 msgstr "שדה מסוג: %(field_type)s"
 
-#: db/models/fields/__init__.py:451 db/models/fields/__init__.py:871
-#: db/models/fields/__init__.py:980 db/models/fields/__init__.py:991
-#: db/models/fields/__init__.py:1018
+#: db/models/fields/__init__.py:506 db/models/fields/__init__.py:961
 msgid "Integer"
 msgstr "מספר שלם"
 
-#: db/models/fields/__init__.py:455 db/models/fields/__init__.py:869
-msgid "This value must be an integer."
-msgstr "ערך זה חייב להיות מספר שלם."
+#: db/models/fields/__init__.py:510 db/models/fields/__init__.py:959
+#, python-format
+msgid "'%s' value must be an integer."
+msgstr "הערך  '%s' חייב להיות מספר שלם."
 
-#: db/models/fields/__init__.py:493
-msgid "This value must be either True or False."
-msgstr "ערך זה חייב להיות אמת או שקר."
+#: db/models/fields/__init__.py:552
+#, python-format
+msgid "'%s' value must be either True or False."
+msgstr "הערך  '%s' חייב להיות אמת או שקר."
 
-#: db/models/fields/__init__.py:495
+#: db/models/fields/__init__.py:554
 msgid "Boolean (Either True or False)"
 msgstr "בוליאני (אמת או שקר)"
 
-#: db/models/fields/__init__.py:542 db/models/fields/__init__.py:1001
+#: db/models/fields/__init__.py:605
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr "מחרוזת (עד %(max_length)s תווים)"
 
-#: db/models/fields/__init__.py:570
+#: db/models/fields/__init__.py:633
 msgid "Comma-separated integers"
 msgstr "מספרים שלמים מופרדים בפסיקים"
 
-#: db/models/fields/__init__.py:584
+#: db/models/fields/__init__.py:647
+#, python-format
+msgid "'%s' value has an invalid date format. It must be in YYYY-MM-DD format."
+msgstr "הערך '%s' מכיל תאריך בפורמט לא חוקי. חייב להיות בפורמט YYYY-MM-DD."
+
+#: db/models/fields/__init__.py:649 db/models/fields/__init__.py:734
+#, python-format
+msgid ""
+"'%s' value has the correct format (YYYY-MM-DD) but it is an invalid date."
+msgstr "הערך '%s' בפורמט הנכון (YYYY-MM-DD), אך אינו תאריך חוקי."
+
+#: db/models/fields/__init__.py:652
 msgid "Date (without time)"
 msgstr "תאריך (ללא שעה)"
 
-#: db/models/fields/__init__.py:588
-msgid "Enter a valid date in YYYY-MM-DD format."
-msgstr "יש להזין תאריך במבנה YYYY-MM-DD."
-
-#: db/models/fields/__init__.py:589
+#: db/models/fields/__init__.py:732
 #, python-format
-msgid "Invalid date: %s"
-msgstr "תאריך שגוי: %s"
+msgid ""
+"'%s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
+"uuuuuu]][TZ] format."
+msgstr ""
+"התחביר של ערך '%s' אינו חוקי. התחביר חייב להיות YYYY-MM-DD HH:MM[:ss[."
+"uuuuuu]][TZ]."
 
-#: db/models/fields/__init__.py:670
-msgid "Enter a valid date/time in YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format."
-msgstr "נא להזין תאריך\\שעה חוקיים בתבנית YYYY-MM-DD HH:MM[:ss[.uuuuuu]]."
+#: db/models/fields/__init__.py:736
+#, python-format
+msgid ""
+"'%s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]) but "
+"it is an invalid date/time."
+msgstr ""
+"התחביר של ערך '%s' חוקי (YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]) אך אינו תאריך/"
+"זמן חוקי."
 
-#: db/models/fields/__init__.py:672
+#: db/models/fields/__init__.py:740
 msgid "Date (with time)"
 msgstr "תאריך (כולל שעה)"
 
-#: db/models/fields/__init__.py:746
-msgid "This value must be a decimal number."
-msgstr "ערך זה חייב להיות מספר עשרוני."
+#: db/models/fields/__init__.py:831
+#, python-format
+msgid "'%s' value must be a decimal number."
+msgstr "הערך '%s' חייב להיות מספר עשרוני."
 
-#: db/models/fields/__init__.py:748
+#: db/models/fields/__init__.py:833
 msgid "Decimal number"
 msgstr "מספר עשרוני"
 
-#: db/models/fields/__init__.py:803
+#: db/models/fields/__init__.py:890
 msgid "E-mail address"
 msgstr "כתובת דוא\"ל"
 
-#: db/models/fields/__init__.py:818 db/models/fields/files.py:220
-#: db/models/fields/files.py:326
+#: db/models/fields/__init__.py:906
 msgid "File path"
 msgstr "נתיב קובץ"
 
-#: db/models/fields/__init__.py:841
-msgid "This value must be a float."
-msgstr "על הערך הזה להיות ערך מספר עשרוני."
+#: db/models/fields/__init__.py:930
+#, python-format
+msgid "'%s' value must be a float."
+msgstr "הערך '%s' חייב להיות מספר עם נקודה צפה."
 
-#: db/models/fields/__init__.py:843
+#: db/models/fields/__init__.py:932
 msgid "Floating point number"
 msgstr "מספר עשרוני"
 
-#: db/models/fields/__init__.py:902
+#: db/models/fields/__init__.py:993
 msgid "Big (8 byte) integer"
 msgstr "מספר שלם גדול (8 בתים)"
 
-#: db/models/fields/__init__.py:915
+#: db/models/fields/__init__.py:1007
+msgid "IPv4 address"
+msgstr "כתובת IPv4"
+
+#: db/models/fields/__init__.py:1023
 msgid "IP address"
 msgstr "כתובת IP"
 
-#: db/models/fields/__init__.py:931
-msgid "This value must be either None, True or False."
-msgstr "ערך זה חייב להיות כלום, אמת או שקר."
+#: db/models/fields/__init__.py:1065
+#, python-format
+msgid "'%s' value must be either None, True or False."
+msgstr "הערך '%s' חייב להיות None‏, True או False."
 
-#: db/models/fields/__init__.py:933
+#: db/models/fields/__init__.py:1067
 msgid "Boolean (Either True, False or None)"
 msgstr "בוליאני (אמת, שקר או כלום)"
 
-#: db/models/fields/__init__.py:1024
+#: db/models/fields/__init__.py:1116
+msgid "Positive integer"
+msgstr "מספר שלם חיובי"
+
+#: db/models/fields/__init__.py:1127
+msgid "Positive small integer"
+msgstr "מספר שלם חיובי קטן"
+
+#: db/models/fields/__init__.py:1138
+#, python-format
+msgid "Slug (up to %(max_length)s)"
+msgstr ""
+
+#: db/models/fields/__init__.py:1156
+msgid "Small integer"
+msgstr "מספר שלם קטן"
+
+#: db/models/fields/__init__.py:1162
 msgid "Text"
 msgstr "טקסט"
 
-#: db/models/fields/__init__.py:1040
+#: db/models/fields/__init__.py:1180
+#, python-format
+msgid ""
+"'%s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] format."
+msgstr ""
+
+#: db/models/fields/__init__.py:1182
+#, python-format
+msgid ""
+"'%s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an invalid "
+"time."
+msgstr ""
+
+#: db/models/fields/__init__.py:1185
 msgid "Time"
 msgstr "זמן"
 
-#: db/models/fields/__init__.py:1044
-msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
-msgstr "נא להזין זמן חוקי בתבנית HH:MM[:ss[.uuuuuu]]."
-
-#: db/models/fields/__init__.py:1120
+#: db/models/fields/__init__.py:1249
 msgid "URL"
 msgstr "URL"
 
-#: db/models/fields/__init__.py:1136
-msgid "XML text"
-msgstr "טקסט XML"
+#: db/models/fields/files.py:214
+msgid "File"
+msgstr "קובץ"
 
-#: db/models/fields/related.py:815
+#: db/models/fields/files.py:321
+msgid "Image"
+msgstr "תמונה"
+
+#: db/models/fields/related.py:903
 #, python-format
 msgid "Model %(model)s with pk %(pk)r does not exist."
 msgstr "מודל %(model)s עם מפתח ראשי %(pk)r אינו קיים."
 
-#: db/models/fields/related.py:817
+#: db/models/fields/related.py:905
 msgid "Foreign Key (type determined by related field)"
 msgstr "Foreign Key (הסוג נקבע לפי השדה המקושר)"
 
-#: db/models/fields/related.py:941
+#: db/models/fields/related.py:1033
 msgid "One-to-one relationship"
 msgstr "יחס של אחד לאחד"
 
-#: db/models/fields/related.py:1003
+#: db/models/fields/related.py:1096
 msgid "Many-to-many relationship"
 msgstr "יחס של רבים לרבים"
 
-#: db/models/fields/related.py:1023
+#: db/models/fields/related.py:1120
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 "יש להחזיק את \"Control\", או \"Command\" על מק, לחוץ כדי לבחור יותר מאחד."
 
-#: forms/fields.py:66
+#: forms/fields.py:50
 msgid "This field is required."
 msgstr "יש להזין תוכן בשדה זה."
 
-#: forms/fields.py:221
+#: forms/fields.py:208
 msgid "Enter a whole number."
 msgstr "נא להזין מספר שלם."
 
-#: forms/fields.py:253 forms/fields.py:274
+#: forms/fields.py:240 forms/fields.py:261
 msgid "Enter a number."
 msgstr "נא להזין מספר."
 
-#: forms/fields.py:277
+#: forms/fields.py:264
 #, python-format
 msgid "Ensure that there are no more than %s digits in total."
 msgstr "נא לוודא שאין יותר מ־%s ספרות סה\"כ"
 
-#: forms/fields.py:278
+#: forms/fields.py:265
 #, python-format
 msgid "Ensure that there are no more than %s decimal places."
 msgstr "נא לוודא שאין יותר מ־%s ספרות אחרי הנקודה"
 
-#: forms/fields.py:279
+#: forms/fields.py:266
 #, python-format
 msgid "Ensure that there are no more than %s digits before the decimal point."
 msgstr "נא לוודא שאין יותר מ־%s ספרות לפני הנקודה העשרונית"
 
-#: forms/fields.py:342 forms/fields.py:918
+#: forms/fields.py:365 forms/fields.py:963
 msgid "Enter a valid date."
 msgstr "יש להזין תאריך חוקי."
 
-#: forms/fields.py:370 forms/fields.py:919
+#: forms/fields.py:388 forms/fields.py:964
 msgid "Enter a valid time."
 msgstr "יש להזין שעה חוקית."
 
-#: forms/fields.py:396
+#: forms/fields.py:409
 msgid "Enter a valid date/time."
 msgstr "יש להזין תאריך ושעה חוקיים."
 
-#: forms/fields.py:460
+#: forms/fields.py:485
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "לא נשלח שום קובץ. נא לבדוק את סוג הקידוד של הטופס."
 
-#: forms/fields.py:461
+#: forms/fields.py:486
 msgid "No file was submitted."
 msgstr "לא נשלח שום קובץ"
 
-#: forms/fields.py:462
+#: forms/fields.py:487
 msgid "The submitted file is empty."
 msgstr "הקובץ שנשלח ריק."
 
-#: forms/fields.py:463
+#: forms/fields.py:488
 #, python-format
 msgid ""
 "Ensure this filename has at most %(max)d characters (it has %(length)d)."
 msgstr "על שם הקובץ להיות לא יותר מ־%(max)d תווים (יש לו%(length)d)."
 
-#: forms/fields.py:464
+#: forms/fields.py:489
 msgid "Please either submit a file or check the clear checkbox, not both."
 msgstr "נא לשים קובץ או סימן את התיבה לניקוי, לא שניהם."
 
-#: forms/fields.py:518
+#: forms/fields.py:544
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
 msgstr "נא להעלות תמונה חוקית. הקובץ שהעלת אינו תמונה או מכיל תמונה מקולקלת."
 
-#: forms/fields.py:650 forms/fields.py:725
+#: forms/fields.py:689 forms/fields.py:769
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr "יש לבחור אפשרות חוקית. %(value)s אינו בין האפשרויות הזמינות."
 
-#: forms/fields.py:726 forms/fields.py:814 forms/models.py:985
+#: forms/fields.py:770 forms/fields.py:858 forms/models.py:999
 msgid "Enter a list of values."
 msgstr "יש להזין רשימת ערכים"
 
-#: forms/formsets.py:305 forms/formsets.py:307
+#: forms/formsets.py:317 forms/formsets.py:319
 msgid "Order"
 msgstr "מיון"
 
-#: forms/formsets.py:309
+#: forms/formsets.py:321
 msgid "Delete"
 msgstr "מחיקה"
 
-#: forms/models.py:556
+#: forms/models.py:571
 #, python-format
 msgid "Please correct the duplicate data for %(field)s."
 msgstr "נא לתקן את הערכים הכפולים ל%(field)s."
 
-#: forms/models.py:560
+#: forms/models.py:575
 #, python-format
 msgid "Please correct the duplicate data for %(field)s, which must be unique."
 msgstr "נא לתקן את הערכים הכפולים ל%(field)s, שערכים בו חייבים להיות ייחודיים."
 
-#: forms/models.py:566
+#: forms/models.py:581
 #, python-format
 msgid ""
 "Please correct the duplicate data for %(field_name)s which must be unique "
@@ -610,109 +671,116 @@ msgstr ""
 "נא לתקן את הערכים הכפולים %(field_name)s, שחייבים להיות ייחודיים ל%(lookup)s "
 "של %(date_field)s."
 
-#: forms/models.py:574
+#: forms/models.py:589
 msgid "Please correct the duplicate values below."
 msgstr "נא לתקן את הערכים הכפולים למטה."
 
-#: forms/models.py:835
+#: forms/models.py:849
 msgid "The inline foreign key did not match the parent instance primary key."
 msgstr "המפתח הזר ה־inline לא התאים למפתח הראשי של האב."
 
-#: forms/models.py:896
+#: forms/models.py:910
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "יש לבחור אפשרות חוקית; אפשרות זו אינה אחת מהזמינות."
 
-#: forms/models.py:986
+#: forms/models.py:1000
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "יש לבחור אפשרות חוקית. %s אינו בין האפשרויות הזמינות."
 
-#: forms/models.py:988
+#: forms/models.py:1002
 #, python-format
 msgid "\"%s\" is not a valid value for a primary key."
 msgstr "\"%s\" איננו חוקי כמפתח ראשי."
 
-#: forms/widgets.py:299
+#: forms/util.py:70
+#, python-format
+msgid ""
+"%(datetime)s couldn't be interpreted in time zone %(current_timezone)s; it "
+"may be ambiguous or it may not exist."
+msgstr ""
+
+#: forms/widgets.py:325
 msgid "Currently"
 msgstr "עכשיו"
 
-#: forms/widgets.py:300
+#: forms/widgets.py:326
 msgid "Change"
 msgstr "שינוי"
 
-#: forms/widgets.py:301
+#: forms/widgets.py:327
 msgid "Clear"
 msgstr "לסלק"
 
-#: forms/widgets.py:548
+#: forms/widgets.py:582
 msgid "Unknown"
 msgstr "לא ידוע"
 
-#: forms/widgets.py:548
+#: forms/widgets.py:583
 msgid "Yes"
 msgstr "כן"
 
-#: forms/widgets.py:548
+#: forms/widgets.py:584
 msgid "No"
 msgstr "לא"
 
-#: template/defaultfilters.py:777
+#: template/defaultfilters.py:797
 msgid "yes,no,maybe"
 msgstr "כן,לא,אולי"
 
-#: template/defaultfilters.py:805 template/defaultfilters.py:810
+#: template/defaultfilters.py:825 template/defaultfilters.py:830
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "בית %(size)d "
 msgstr[1] "%(size)d בתים"
 
-#: template/defaultfilters.py:812
+#: template/defaultfilters.py:832
 #, python-format
 msgid "%s KB"
 msgstr "%s ק\"ב"
 
-#: template/defaultfilters.py:814
+#: template/defaultfilters.py:834
 #, python-format
 msgid "%s MB"
 msgstr "%s מ\"ב"
 
-#: template/defaultfilters.py:816
+#: template/defaultfilters.py:836
 #, python-format
 msgid "%s GB"
 msgstr "%s ג\"ב"
 
-#: template/defaultfilters.py:818
+#: template/defaultfilters.py:838
 #, python-format
 msgid "%s TB"
 msgstr "%s ט\"ב"
 
-#: template/defaultfilters.py:819
+#: template/defaultfilters.py:839
 #, python-format
 msgid "%s PB"
 msgstr "%s פ\"ב"
 
-#: utils/dateformat.py:42
+#: utils/dateformat.py:45
 msgid "p.m."
 msgstr "אחר הצהריים"
 
-#: utils/dateformat.py:43
+#: utils/dateformat.py:46
 msgid "a.m."
 msgstr "בבוקר"
 
-#: utils/dateformat.py:48
+#: utils/dateformat.py:51
 msgid "PM"
 msgstr "אחר הצהריים"
 
-#: utils/dateformat.py:49
+#: utils/dateformat.py:52
 msgid "AM"
 msgstr "בבוקר"
 
-#: utils/dateformat.py:98
+#: utils/dateformat.py:101
 msgid "midnight"
 msgstr "חצות"
 
-#: utils/dateformat.py:100
+#: utils/dateformat.py:103
 msgid "noon"
 msgstr "12 בצהריים"
 
@@ -988,84 +1056,84 @@ msgctxt "alt. month"
 msgid "December"
 msgstr "דצמבר"
 
-#: utils/text.py:136
+#: utils/text.py:65
+#, python-format
+msgctxt "String to return when truncating text"
+msgid "%(truncated_text)s..."
+msgstr "%(truncated_text)s..."
+
+#: utils/text.py:234
 msgid "or"
 msgstr "או"
 
 #. Translators: This string is used as a separator between list elements
-#: utils/text.py:153
+#: utils/text.py:251
 msgid ", "
 msgstr ", "
 
-#: utils/timesince.py:21
+#: utils/timesince.py:20
 msgid "year"
 msgid_plural "years"
 msgstr[0] "שנה"
 msgstr[1] "שנים"
 
-#: utils/timesince.py:22
+#: utils/timesince.py:21
 msgid "month"
 msgid_plural "months"
 msgstr[0] "חודש"
 msgstr[1] "חודשים"
 
-#: utils/timesince.py:23
+#: utils/timesince.py:22
 msgid "week"
 msgid_plural "weeks"
 msgstr[0] "שבוע"
 msgstr[1] "שבועות"
 
-#: utils/timesince.py:24
+#: utils/timesince.py:23
 msgid "day"
 msgid_plural "days"
 msgstr[0] "יום"
 msgstr[1] "ימים"
 
-#: utils/timesince.py:25
+#: utils/timesince.py:24
 msgid "hour"
 msgid_plural "hours"
 msgstr[0] "שעה"
 msgstr[1] "שעות"
 
-#: utils/timesince.py:26
+#: utils/timesince.py:25
 msgid "minute"
 msgid_plural "minutes"
 msgstr[0] "דקה"
 msgstr[1] "דקות"
 
-#: utils/timesince.py:45
+#: utils/timesince.py:41
 msgid "minutes"
 msgstr "דקות"
 
-#: utils/timesince.py:50
+#: utils/timesince.py:46
 #, python-format
 msgid "%(number)d %(type)s"
 msgstr "%(number)d %(type)s"
 
-#: utils/timesince.py:56
+#: utils/timesince.py:52
 #, python-format
 msgid ", %(number)d %(type)s"
 msgstr ", %(number)d %(type)s"
 
-#: utils/translation/trans_real.py:578
-msgid "DATE_FORMAT"
-msgstr "d.m.Y"
+#: views/static.py:52
+msgid "Directory indexes are not allowed here."
+msgstr "אינדקסים על תיקיה אסורים כאן."
 
-#: utils/translation/trans_real.py:579
-msgid "DATETIME_FORMAT"
-msgstr "d.m.‏Y H:i:s"
+#: views/static.py:54
+#, python-format
+msgid "\"%(path)s\" does not exist"
+msgstr "\"%(path)s\" אינו קיים"
 
-#: utils/translation/trans_real.py:580
-msgid "TIME_FORMAT"
-msgstr "H:i:s"
-
-#: utils/translation/trans_real.py:601
-msgid "YEAR_MONTH_FORMAT"
-msgstr "m.Y"
-
-#: utils/translation/trans_real.py:602
-msgid "MONTH_DAY_FORMAT"
-msgstr "d.m"
+#: views/static.py:95
+#, python-format
+msgid "Index of %(directory)s"
+msgstr "אינדקס של %(directory)s"
 
 #: views/generic/create_update.py:121
 #, python-format
@@ -1098,12 +1166,12 @@ msgstr "לא צויין יום"
 msgid "No week specified"
 msgstr "לא צויין שבוע"
 
-#: views/generic/dates.py:198 views/generic/dates.py:214
+#: views/generic/dates.py:198 views/generic/dates.py:215
 #, python-format
 msgid "No %(verbose_name_plural)s available"
 msgstr "לא נמצאו %(verbose_name_plural)s"
 
-#: views/generic/dates.py:466
+#: views/generic/dates.py:467
 #, python-format
 msgid ""
 "Future %(verbose_name_plural)s not available because %(class_name)s."
@@ -1112,7 +1180,7 @@ msgstr ""
 "לא נמצאו %(verbose_name_plural)s בזמן עתיד מאחר ש-%(class_name)s."
 "allow_future מוגדר False."
 
-#: views/generic/dates.py:500
+#: views/generic/dates.py:501
 #, python-format
 msgid "Invalid date string '%(datestr)s' given format '%(format)s'"
 msgstr "מחרוזת תאריך לא חוקית '%(datestr)s' בהתחשב בתחביר '%(format)s'"
@@ -1122,16 +1190,16 @@ msgstr "מחרוזת תאריך לא חוקית '%(datestr)s' בהתחשב בת�
 msgid "No %(verbose_name)s found matching the query"
 msgstr "לא נמצא/ה %(verbose_name)s התואם/ת לשאילתה"
 
-#: views/generic/list.py:47
+#: views/generic/list.py:45
 msgid "Page is not 'last', nor can it be converted to an int."
 msgstr "העמוד אינו 'last', או אינו ניתן להמרה למספר."
 
-#: views/generic/list.py:52
+#: views/generic/list.py:50
 #, python-format
 msgid "Invalid page (%(page_number)s)"
 msgstr "עמוד לא חוקי (%(page_number)s)"
 
-#: views/generic/list.py:119
+#: views/generic/list.py:117
 #, python-format
 msgid "Empty list and '%(class_name)s.allow_empty' is False."
 msgstr "רשימה ריקה -ו'%(class_name)s.allow_empty' מוגדר False."

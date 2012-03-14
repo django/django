@@ -1,565 +1,625 @@
 # This file is distributed under the same license as the Django package.
 #
+# Translators:
+# Jaehong Kim <mixe@korea.com>, 2011.
+# Jannis Leidel <jannis@leidel.info>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-15 13:09-0400\n"
-"PO-Revision-Date: 2011-03-06 03:47+0000\n"
-"Last-Translator: mixe <mixe@korea.com>\n"
-"Language-Team: Korean <None>\n"
+"POT-Creation-Date: 2012-03-14 00:08-0700\n"
+"PO-Revision-Date: 2012-03-08 12:00+0000\n"
+"Last-Translator: Jaehong Kim <mixe@korea.com>\n"
+"Language-Team: Korean (http://www.transifex.net/projects/p/django/language/"
+"ko/)\n"
+"Language: ko\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: ko\n"
 "Plural-Forms: nplurals=1; plural=0\n"
 
-#: conf/global_settings.py:44
+#: conf/global_settings.py:48
 msgid "Arabic"
 msgstr "아랍어"
 
-#: conf/global_settings.py:45
+#: conf/global_settings.py:49
 msgid "Azerbaijani"
 msgstr "아제르바이잔어"
 
-#: conf/global_settings.py:46
+#: conf/global_settings.py:50
 msgid "Bulgarian"
 msgstr "불가리어"
 
-#: conf/global_settings.py:47
+#: conf/global_settings.py:51
 msgid "Bengali"
 msgstr "방글라데시어"
 
-#: conf/global_settings.py:48
+#: conf/global_settings.py:52
 msgid "Bosnian"
 msgstr "보스니아어"
 
-#: conf/global_settings.py:49
+#: conf/global_settings.py:53
 msgid "Catalan"
 msgstr "카탈로니아어"
 
-#: conf/global_settings.py:50
+#: conf/global_settings.py:54
 msgid "Czech"
 msgstr "체코어"
 
-#: conf/global_settings.py:51
+#: conf/global_settings.py:55
 msgid "Welsh"
 msgstr "웨일즈어"
 
-#: conf/global_settings.py:52
+#: conf/global_settings.py:56
 msgid "Danish"
 msgstr "덴마크어"
 
-#: conf/global_settings.py:53
+#: conf/global_settings.py:57
 msgid "German"
 msgstr "독일어"
 
-#: conf/global_settings.py:54
+#: conf/global_settings.py:58
 msgid "Greek"
 msgstr "그리스어"
 
-#: conf/global_settings.py:55
+#: conf/global_settings.py:59
 msgid "English"
 msgstr "영어"
 
-#: conf/global_settings.py:56
+#: conf/global_settings.py:60
 msgid "British English"
 msgstr "영어 (영국)"
 
-#: conf/global_settings.py:57
+#: conf/global_settings.py:61
 msgid "Spanish"
 msgstr "스페인어"
 
-#: conf/global_settings.py:58
+#: conf/global_settings.py:62
 msgid "Argentinian Spanish"
 msgstr "아르헨티나 스페인어"
 
-#: conf/global_settings.py:59
+#: conf/global_settings.py:63
 msgid "Mexican Spanish"
 msgstr "멕시컨 스페인어"
 
-#: conf/global_settings.py:60
+#: conf/global_settings.py:64
+msgid "Nicaraguan Spanish"
+msgstr ""
+
+#: conf/global_settings.py:65
 msgid "Estonian"
 msgstr "에스토니아어"
 
-#: conf/global_settings.py:61
+#: conf/global_settings.py:66
 msgid "Basque"
 msgstr "바스크어"
 
-#: conf/global_settings.py:62
+#: conf/global_settings.py:67
 msgid "Persian"
 msgstr "페르시아어"
 
-#: conf/global_settings.py:63
+#: conf/global_settings.py:68
 msgid "Finnish"
 msgstr "핀란드어"
 
-#: conf/global_settings.py:64
+#: conf/global_settings.py:69
 msgid "French"
 msgstr "프랑스어"
 
-#: conf/global_settings.py:65
+#: conf/global_settings.py:70
 msgid "Frisian"
 msgstr "프리슬란트어"
 
-#: conf/global_settings.py:66
+#: conf/global_settings.py:71
 msgid "Irish"
 msgstr "아일랜드어"
 
-#: conf/global_settings.py:67
+#: conf/global_settings.py:72
 msgid "Galician"
 msgstr "갈리시아어"
 
-#: conf/global_settings.py:68
+#: conf/global_settings.py:73
 msgid "Hebrew"
 msgstr "히브리어"
 
-#: conf/global_settings.py:69
+#: conf/global_settings.py:74
 msgid "Hindi"
 msgstr "힌두어"
 
-#: conf/global_settings.py:70
+#: conf/global_settings.py:75
 msgid "Croatian"
 msgstr "크로아티아어"
 
-#: conf/global_settings.py:71
+#: conf/global_settings.py:76
 msgid "Hungarian"
 msgstr "헝가리어"
 
-#: conf/global_settings.py:72
+#: conf/global_settings.py:77
 msgid "Indonesian"
 msgstr "인도네시아어"
 
-#: conf/global_settings.py:73
+#: conf/global_settings.py:78
 msgid "Icelandic"
 msgstr "아이슬란드어"
 
-#: conf/global_settings.py:74
+#: conf/global_settings.py:79
 msgid "Italian"
 msgstr "이탈리아어"
 
-#: conf/global_settings.py:75
+#: conf/global_settings.py:80
 msgid "Japanese"
 msgstr "일본어"
 
-#: conf/global_settings.py:76
+#: conf/global_settings.py:81
 msgid "Georgian"
 msgstr "조지아어"
 
-#: conf/global_settings.py:77
+#: conf/global_settings.py:82
 msgid "Khmer"
 msgstr "크메르어"
 
-#: conf/global_settings.py:78
+#: conf/global_settings.py:83
 msgid "Kannada"
 msgstr "칸나다어"
 
-#: conf/global_settings.py:79
+#: conf/global_settings.py:84
 msgid "Korean"
 msgstr "한국어"
 
-#: conf/global_settings.py:80
+#: conf/global_settings.py:85
 msgid "Lithuanian"
 msgstr "리투아니아어"
 
-#: conf/global_settings.py:81
+#: conf/global_settings.py:86
 msgid "Latvian"
 msgstr "라트비아어"
 
-#: conf/global_settings.py:82
+#: conf/global_settings.py:87
 msgid "Macedonian"
 msgstr "마케도니아어"
 
-#: conf/global_settings.py:83
+#: conf/global_settings.py:88
 msgid "Malayalam"
 msgstr "말레이지아어"
 
-#: conf/global_settings.py:84
+#: conf/global_settings.py:89
 msgid "Mongolian"
 msgstr "몽고어"
 
-#: conf/global_settings.py:85
+#: conf/global_settings.py:90
 msgid "Dutch"
 msgstr "네덜란드어"
 
-#: conf/global_settings.py:86
-msgid "Norwegian"
-msgstr "노르웨이어"
-
-#: conf/global_settings.py:87
+#: conf/global_settings.py:91
 msgid "Norwegian Bokmal"
 msgstr "노르웨이어 (보크몰)"
 
-#: conf/global_settings.py:88
+#: conf/global_settings.py:92
 msgid "Norwegian Nynorsk"
 msgstr "노르웨이어 (뉘노르스크)"
 
-#: conf/global_settings.py:89
+#: conf/global_settings.py:93
 msgid "Punjabi"
 msgstr "펀자브어"
 
-#: conf/global_settings.py:90
+#: conf/global_settings.py:94
 msgid "Polish"
 msgstr "폴란드어"
 
-#: conf/global_settings.py:91
+#: conf/global_settings.py:95
 msgid "Portuguese"
 msgstr "포르투갈어"
 
-#: conf/global_settings.py:92
+#: conf/global_settings.py:96
 msgid "Brazilian Portuguese"
 msgstr "브라질 포르투갈어"
 
-#: conf/global_settings.py:93
+#: conf/global_settings.py:97
 msgid "Romanian"
 msgstr "루마니아어"
 
-#: conf/global_settings.py:94
+#: conf/global_settings.py:98
 msgid "Russian"
 msgstr "러시아어"
 
-#: conf/global_settings.py:95
+#: conf/global_settings.py:99
 msgid "Slovak"
 msgstr "슬로바키아어"
 
-#: conf/global_settings.py:96
+#: conf/global_settings.py:100
 msgid "Slovenian"
 msgstr "슬로베니아어"
 
-#: conf/global_settings.py:97
+#: conf/global_settings.py:101
 msgid "Albanian"
 msgstr "알바니아어"
 
-#: conf/global_settings.py:98
+#: conf/global_settings.py:102
 msgid "Serbian"
 msgstr "세르비아어"
 
-#: conf/global_settings.py:99
+#: conf/global_settings.py:103
 msgid "Serbian Latin"
 msgstr "세르비아어"
 
-#: conf/global_settings.py:100
+#: conf/global_settings.py:104
 msgid "Swedish"
 msgstr "스웨덴어"
 
-#: conf/global_settings.py:101
+#: conf/global_settings.py:105
 msgid "Tamil"
 msgstr "타밀어"
 
-#: conf/global_settings.py:102
+#: conf/global_settings.py:106
 msgid "Telugu"
 msgstr "텔루구어"
 
-#: conf/global_settings.py:103
+#: conf/global_settings.py:107
 msgid "Thai"
 msgstr "태국어"
 
-#: conf/global_settings.py:104
+#: conf/global_settings.py:108
 msgid "Turkish"
 msgstr "터키어"
 
-#: conf/global_settings.py:105
+#: conf/global_settings.py:109
 msgid "Ukrainian"
 msgstr "우크라이나어"
 
-#: conf/global_settings.py:106
+#: conf/global_settings.py:110
 msgid "Urdu"
 msgstr "우르드어"
 
-#: conf/global_settings.py:107
+#: conf/global_settings.py:111
 msgid "Vietnamese"
 msgstr "베트남어"
 
-#: conf/global_settings.py:108
+#: conf/global_settings.py:112
 msgid "Simplified Chinese"
 msgstr "중국어 간체"
 
-#: conf/global_settings.py:109
+#: conf/global_settings.py:113
 msgid "Traditional Chinese"
 msgstr "중국어 번체"
 
-#: core/validators.py:21 forms/fields.py:67
+#: core/validators.py:24 forms/fields.py:51
 msgid "Enter a valid value."
 msgstr "올바른 값을 입력하세요."
 
-#: core/validators.py:89 forms/fields.py:575
+#: core/validators.py:99 forms/fields.py:601
 msgid "This URL appears to be a broken link."
 msgstr "해당 URL의 링크가 잘못 되어 있습니다."
 
-#: core/validators.py:94 forms/fields.py:574
+#: core/validators.py:131 forms/fields.py:600
 msgid "Enter a valid URL."
 msgstr "올바른 URL을 입력하세요."
 
-#: core/validators.py:138 forms/fields.py:449
+#: core/validators.py:165 forms/fields.py:474
 msgid "Enter a valid e-mail address."
 msgstr "올바른 이메일 주소를 입력하세요."
 
-#: core/validators.py:141 forms/fields.py:958
+#: core/validators.py:168 forms/fields.py:1023
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr "문자, 숫자, '_', '-'만 가능합니다."
 
-#: core/validators.py:144 forms/fields.py:951
+#: core/validators.py:171 core/validators.py:188 forms/fields.py:997
 msgid "Enter a valid IPv4 address."
 msgstr "올바른 IPv4 주소를 입력하세요."
 
-#: core/validators.py:147 db/models/fields/__init__.py:575
+#: core/validators.py:175 core/validators.py:189
+msgid "Enter a valid IPv6 address."
+msgstr ""
+
+#: core/validators.py:184 core/validators.py:187
+msgid "Enter a valid IPv4 or IPv6 address."
+msgstr ""
+
+#: core/validators.py:209 db/models/fields/__init__.py:638
 msgid "Enter only digits separated by commas."
 msgstr "콤마로 구분된 숫자만 입력하세요."
 
-#: core/validators.py:153
+#: core/validators.py:215
 #, python-format
 msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
 msgstr ""
 "%(limit_value)s 안의 값을 입력해 주세요. (입력하신 값은 %(show_value)s입니"
 "다.)"
 
-#: core/validators.py:171 forms/fields.py:222 forms/fields.py:275
+#: core/validators.py:233 forms/fields.py:209 forms/fields.py:262
 #, python-format
 msgid "Ensure this value is less than or equal to %(limit_value)s."
 msgstr "%(limit_value)s 이하의 값을 입력해 주세요."
 
-#: core/validators.py:176 forms/fields.py:223 forms/fields.py:276
+#: core/validators.py:238 forms/fields.py:210 forms/fields.py:263
 #, python-format
 msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr "%(limit_value)s 이상의 값을 입력해 주세요."
 
-#: core/validators.py:182
+#: core/validators.py:244
 #, python-format
 msgid ""
-"Ensure this value has at least %(limit_value)d characters (it has %"
-"(show_value)d)."
+"Ensure this value has at least %(limit_value)d characters (it has "
+"%(show_value)d)."
 msgstr ""
 "%(limit_value)d글자 이상 입력해 주세요. (입력하신 내용은 %(show_value)d글자입"
 "니다.)"
 
-#: core/validators.py:188
+#: core/validators.py:250
 #, python-format
 msgid ""
-"Ensure this value has at most %(limit_value)d characters (it has %"
-"(show_value)d)."
+"Ensure this value has at most %(limit_value)d characters (it has "
+"%(show_value)d)."
 msgstr ""
 "%(limit_value)d글자 이하로 입력해 주세요. (입력하신 내용은 %(show_value)d글자"
 "입니다)"
 
-#: db/models/base.py:769
+#: db/models/base.py:764
 #, python-format
 msgid "%(field_name)s must be unique for %(date_field)s %(lookup)s."
 msgstr ""
 "%(field_name)s(은)는 반드시 %(date_field)s %(lookup)s에 대해 유일해야 합니다."
 
-#: db/models/base.py:784 db/models/base.py:792
+#: db/models/base.py:787 forms/models.py:577
+msgid "and"
+msgstr "또한"
+
+#: db/models/base.py:788 db/models/fields/__init__.py:65
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(model_name)s의 %(field_label)s(은)는 이미 존재합니다."
 
-#: db/models/base.py:791 forms/models.py:562
-msgid "and"
-msgstr "또한"
-
-#: db/models/fields/__init__.py:63
+#: db/models/fields/__init__.py:62
 #, python-format
 msgid "Value %r is not a valid choice."
 msgstr "%r은 올바른 선택사항이 아닙니다."
 
-#: db/models/fields/__init__.py:64
+#: db/models/fields/__init__.py:63
 msgid "This field cannot be null."
 msgstr "이 필드는 null 값은 사용할 수 없습니다. "
 
-#: db/models/fields/__init__.py:65
+#: db/models/fields/__init__.py:64
 msgid "This field cannot be blank."
 msgstr "이 필드는 null 값은 사용할 수 없습니다. "
 
-#: db/models/fields/__init__.py:70
+#: db/models/fields/__init__.py:71
 #, python-format
 msgid "Field of type: %(field_type)s"
 msgstr "%(field_type)s 형식 필드"
 
-#: db/models/fields/__init__.py:451 db/models/fields/__init__.py:871
-#: db/models/fields/__init__.py:980 db/models/fields/__init__.py:991
-#: db/models/fields/__init__.py:1018
+#: db/models/fields/__init__.py:506 db/models/fields/__init__.py:961
 msgid "Integer"
 msgstr "정수"
 
-#: db/models/fields/__init__.py:455 db/models/fields/__init__.py:869
-msgid "This value must be an integer."
-msgstr "정수 값을 사용하세요."
+#: db/models/fields/__init__.py:510 db/models/fields/__init__.py:959
+#, python-format
+msgid "'%s' value must be an integer."
+msgstr ""
 
-#: db/models/fields/__init__.py:493
-msgid "This value must be either True or False."
-msgstr "True 또는 False 값을 사용하세요."
+#: db/models/fields/__init__.py:552
+#, python-format
+msgid "'%s' value must be either True or False."
+msgstr ""
 
-#: db/models/fields/__init__.py:495
+#: db/models/fields/__init__.py:554
 msgid "Boolean (Either True or False)"
 msgstr "boolean(참 또는 거짓)"
 
-#: db/models/fields/__init__.py:542 db/models/fields/__init__.py:1001
+#: db/models/fields/__init__.py:605
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr "문자열(%(max_length)s 글자까지)"
 
-#: db/models/fields/__init__.py:570
+#: db/models/fields/__init__.py:633
 msgid "Comma-separated integers"
 msgstr "정수(콤마로 구분)"
 
-#: db/models/fields/__init__.py:584
+#: db/models/fields/__init__.py:647
+#, python-format
+msgid "'%s' value has an invalid date format. It must be in YYYY-MM-DD format."
+msgstr ""
+
+#: db/models/fields/__init__.py:649 db/models/fields/__init__.py:734
+#, python-format
+msgid ""
+"'%s' value has the correct format (YYYY-MM-DD) but it is an invalid date."
+msgstr ""
+
+#: db/models/fields/__init__.py:652
 msgid "Date (without time)"
 msgstr "날짜(시간 제외)"
 
-#: db/models/fields/__init__.py:588
-msgid "Enter a valid date in YYYY-MM-DD format."
-msgstr "날짜는 YYYY-MM-DD 형식으로 입력하세요."
-
-#: db/models/fields/__init__.py:589
+#: db/models/fields/__init__.py:732
 #, python-format
-msgid "Invalid date: %s"
-msgstr "날짜가 부적절합니다.: %s"
+msgid ""
+"'%s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
+"uuuuuu]][TZ] format."
+msgstr ""
 
-#: db/models/fields/__init__.py:670
-msgid "Enter a valid date/time in YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format."
-msgstr "날짜/시각을 YYYY-MM-DD HH:MM[:ss[.uuuuuu]] 형식으로 입력하세요."
+#: db/models/fields/__init__.py:736
+#, python-format
+msgid ""
+"'%s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]) but "
+"it is an invalid date/time."
+msgstr ""
 
-#: db/models/fields/__init__.py:672
+#: db/models/fields/__init__.py:740
 msgid "Date (with time)"
 msgstr "날짜(시간 포함)"
 
-#: db/models/fields/__init__.py:746
-msgid "This value must be a decimal number."
-msgstr "십진수 실수(decimal) 값을 사용하세요."
+#: db/models/fields/__init__.py:831
+#, python-format
+msgid "'%s' value must be a decimal number."
+msgstr ""
 
-#: db/models/fields/__init__.py:748
+#: db/models/fields/__init__.py:833
 msgid "Decimal number"
 msgstr "10진수"
 
-#: db/models/fields/__init__.py:803
+#: db/models/fields/__init__.py:890
 msgid "E-mail address"
 msgstr "이메일 주소"
 
-#: db/models/fields/__init__.py:818 db/models/fields/files.py:220
-#: db/models/fields/files.py:326
+#: db/models/fields/__init__.py:906
 msgid "File path"
 msgstr "파일 경로"
 
-#: db/models/fields/__init__.py:841
-msgid "This value must be a float."
-msgstr "부동소수점 실수(float) 값을 사용해 주세요."
+#: db/models/fields/__init__.py:930
+#, python-format
+msgid "'%s' value must be a float."
+msgstr ""
 
-#: db/models/fields/__init__.py:843
+#: db/models/fields/__init__.py:932
 msgid "Floating point number"
 msgstr "부동소수점 숫자"
 
-#: db/models/fields/__init__.py:902
+#: db/models/fields/__init__.py:993
 msgid "Big (8 byte) integer"
 msgstr "큰 정수 (8 byte)"
 
-#: db/models/fields/__init__.py:915
+#: db/models/fields/__init__.py:1007
+msgid "IPv4 address"
+msgstr ""
+
+#: db/models/fields/__init__.py:1023
 msgid "IP address"
 msgstr "IP 주소"
 
-#: db/models/fields/__init__.py:931
-msgid "This value must be either None, True or False."
-msgstr "None, True 또는 False 값을 사용하세요."
+#: db/models/fields/__init__.py:1065
+#, python-format
+msgid "'%s' value must be either None, True or False."
+msgstr ""
 
-#: db/models/fields/__init__.py:933
+#: db/models/fields/__init__.py:1067
 msgid "Boolean (Either True, False or None)"
 msgstr "boolean (참, 거짓 또는 none)"
 
-#: db/models/fields/__init__.py:1024
+#: db/models/fields/__init__.py:1116
+msgid "Positive integer"
+msgstr ""
+
+#: db/models/fields/__init__.py:1127
+msgid "Positive small integer"
+msgstr ""
+
+#: db/models/fields/__init__.py:1138
+#, python-format
+msgid "Slug (up to %(max_length)s)"
+msgstr ""
+
+#: db/models/fields/__init__.py:1156
+msgid "Small integer"
+msgstr ""
+
+#: db/models/fields/__init__.py:1162
 msgid "Text"
 msgstr "텍스트"
 
-#: db/models/fields/__init__.py:1040
+#: db/models/fields/__init__.py:1180
+#, python-format
+msgid ""
+"'%s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] format."
+msgstr ""
+
+#: db/models/fields/__init__.py:1182
+#, python-format
+msgid ""
+"'%s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an invalid "
+"time."
+msgstr ""
+
+#: db/models/fields/__init__.py:1185
 msgid "Time"
 msgstr "시각"
 
-#: db/models/fields/__init__.py:1044
-msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
-msgstr "시각은 HH:MM[:ss[.uuuuuu]] 형식으로 입력하세요."
-
-#: db/models/fields/__init__.py:1120
+#: db/models/fields/__init__.py:1249
 msgid "URL"
 msgstr "URL"
 
-#: db/models/fields/__init__.py:1136
-msgid "XML text"
-msgstr "XML 텍스트"
+#: db/models/fields/files.py:214
+msgid "File"
+msgstr ""
 
-#: db/models/fields/related.py:815
+#: db/models/fields/files.py:321
+msgid "Image"
+msgstr ""
+
+#: db/models/fields/related.py:903
 #, python-format
 msgid "Model %(model)s with pk %(pk)r does not exist."
 msgstr "Primary key %(pk)r에 대한 모델 %(model)s가 존재하지 않습니다."
 
-#: db/models/fields/related.py:817
+#: db/models/fields/related.py:905
 msgid "Foreign Key (type determined by related field)"
 msgstr "외래 키 (연관 필드에 의해 형식 결정)"
 
-#: db/models/fields/related.py:941
+#: db/models/fields/related.py:1033
 msgid "One-to-one relationship"
 msgstr "일대일 관계"
 
-#: db/models/fields/related.py:1003
+#: db/models/fields/related.py:1096
 msgid "Many-to-many relationship"
 msgstr "다대다 관계"
 
-#: db/models/fields/related.py:1023
+#: db/models/fields/related.py:1120
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 "복수 선택 시에는 \"Control\" 키를 누른 상태에서 선택해 주세요.(Mac은 "
 "\"Command\" 키)"
 
-#: forms/fields.py:66
+#: forms/fields.py:50
 msgid "This field is required."
 msgstr "필수 항목입니다."
 
-#: forms/fields.py:221
+#: forms/fields.py:208
 msgid "Enter a whole number."
 msgstr "정수를 입력하세요."
 
-#: forms/fields.py:253 forms/fields.py:274
+#: forms/fields.py:240 forms/fields.py:261
 msgid "Enter a number."
 msgstr "숫자를 입력하세요."
 
-#: forms/fields.py:277
+#: forms/fields.py:264
 #, python-format
 msgid "Ensure that there are no more than %s digits in total."
 msgstr "전체 자릿수가 %s 개를 넘지 않도록 해주세요."
 
-#: forms/fields.py:278
+#: forms/fields.py:265
 #, python-format
 msgid "Ensure that there are no more than %s decimal places."
 msgstr "전체 유효자리 개수가 %s 개를 넘지 않도록 해주세요."
 
-#: forms/fields.py:279
+#: forms/fields.py:266
 #, python-format
 msgid "Ensure that there are no more than %s digits before the decimal point."
 msgstr "소숫점 앞의 자릿수가 %s 개를 넘지 않도록 해주세요."
 
-#: forms/fields.py:342 forms/fields.py:918
+#: forms/fields.py:365 forms/fields.py:963
 msgid "Enter a valid date."
 msgstr "올바른 날짜를 입력하세요."
 
-#: forms/fields.py:370 forms/fields.py:919
+#: forms/fields.py:388 forms/fields.py:964
 msgid "Enter a valid time."
 msgstr "올바른 시각을 입력하세요."
 
-#: forms/fields.py:396
+#: forms/fields.py:409
 msgid "Enter a valid date/time."
 msgstr "올바른 날짜/시각을 입력하세요."
 
-#: forms/fields.py:460
+#: forms/fields.py:485
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "등록된 파일이 없습니다. 인코딩 형식을 확인하세요."
 
-#: forms/fields.py:461
+#: forms/fields.py:486
 msgid "No file was submitted."
 msgstr "파일이 전송되지 않았습니다."
 
-#: forms/fields.py:462
+#: forms/fields.py:487
 msgid "The submitted file is empty."
 msgstr "입력하신 파일은 빈 파일입니다."
 
-#: forms/fields.py:463
+#: forms/fields.py:488
 #, python-format
 msgid ""
 "Ensure this filename has at most %(max)d characters (it has %(length)d)."
@@ -567,11 +627,11 @@ msgstr ""
 "파일 이름은 %(max)d 글자 이하로 입력해 주세요. (입력하신 내용은 %(length)d 자"
 "입니다)"
 
-#: forms/fields.py:464
+#: forms/fields.py:489
 msgid "Please either submit a file or check the clear checkbox, not both."
 msgstr "파일을 보내거나 취소 체크박스를 체크하세요. 또는 둘다 비워두세요."
 
-#: forms/fields.py:518
+#: forms/fields.py:544
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
@@ -579,34 +639,34 @@ msgstr ""
 "올바른 이미지를 업로드하세요. 업로드하신 파일은 이미지 파일이 아니거나 파일"
 "이 깨져 있습니다."
 
-#: forms/fields.py:650 forms/fields.py:725
+#: forms/fields.py:689 forms/fields.py:769
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr "올바르게 선택해 주세요. %(value)s (이)가 선택가능항목에 없습니다."
 
-#: forms/fields.py:726 forms/fields.py:814 forms/models.py:985
+#: forms/fields.py:770 forms/fields.py:858 forms/models.py:999
 msgid "Enter a list of values."
 msgstr "리스트를 입력하세요."
 
-#: forms/formsets.py:305 forms/formsets.py:307
+#: forms/formsets.py:317 forms/formsets.py:319
 msgid "Order"
 msgstr "순서:"
 
-#: forms/formsets.py:309
+#: forms/formsets.py:321
 msgid "Delete"
 msgstr "삭제"
 
-#: forms/models.py:556
+#: forms/models.py:571
 #, python-format
 msgid "Please correct the duplicate data for %(field)s."
 msgstr "%(field)s의 중복된 데이터를 고쳐주세요."
 
-#: forms/models.py:560
+#: forms/models.py:575
 #, python-format
 msgid "Please correct the duplicate data for %(field)s, which must be unique."
 msgstr "%(field)s의 중복된 데이터를 고쳐주세요. 유일한 값이어야 합니다."
 
-#: forms/models.py:566
+#: forms/models.py:581
 #, python-format
 msgid ""
 "Please correct the duplicate data for %(field_name)s which must be unique "
@@ -615,108 +675,115 @@ msgstr ""
 "%(field_name)s의 값은 %(date_field)s의 %(lookup)s에 대해 유일해야 합니다. 중"
 "복된 데이터를 고쳐주세요."
 
-#: forms/models.py:574
+#: forms/models.py:589
 msgid "Please correct the duplicate values below."
 msgstr "아래의 중복된 값들을 고쳐주세요."
 
-#: forms/models.py:835
+#: forms/models.py:849
 msgid "The inline foreign key did not match the parent instance primary key."
 msgstr "부모 오브젝트의 primary key와 inline foreign key가 맞지 않습니다."
 
-#: forms/models.py:896
+#: forms/models.py:910
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "올바르게 선택해 주세요. 선택하신 것이 선택가능항목에 없습니다."
 
-#: forms/models.py:986
+#: forms/models.py:1000
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "올바르게 선택해 주세요. %s (이)가 선택가능항목에 없습니다."
 
-#: forms/models.py:988
+#: forms/models.py:1002
 #, python-format
 msgid "\"%s\" is not a valid value for a primary key."
 msgstr "\"%s\"은 primary key로 적합하지 않습니다."
 
-#: forms/widgets.py:299
+#: forms/util.py:70
+#, python-format
+msgid ""
+"%(datetime)s couldn't be interpreted in time zone %(current_timezone)s; it "
+"may be ambiguous or it may not exist."
+msgstr ""
+
+#: forms/widgets.py:325
 msgid "Currently"
 msgstr "현재"
 
-#: forms/widgets.py:300
+#: forms/widgets.py:326
 msgid "Change"
 msgstr "변경"
 
-#: forms/widgets.py:301
+#: forms/widgets.py:327
 msgid "Clear"
 msgstr "취소"
 
-#: forms/widgets.py:548
+#: forms/widgets.py:582
 msgid "Unknown"
 msgstr "알 수 없습니다."
 
-#: forms/widgets.py:548
+#: forms/widgets.py:583
 msgid "Yes"
 msgstr "예"
 
-#: forms/widgets.py:548
+#: forms/widgets.py:584
 msgid "No"
 msgstr "아니오"
 
-#: template/defaultfilters.py:777
+#: template/defaultfilters.py:797
 msgid "yes,no,maybe"
 msgstr "예,아니오,아마도"
 
-#: template/defaultfilters.py:805 template/defaultfilters.py:810
+#: template/defaultfilters.py:825 template/defaultfilters.py:830
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d 바이트"
 
-#: template/defaultfilters.py:812
+#: template/defaultfilters.py:832
 #, python-format
 msgid "%s KB"
 msgstr "%s KB"
 
-#: template/defaultfilters.py:814
+#: template/defaultfilters.py:834
 #, python-format
 msgid "%s MB"
 msgstr "%s MB"
 
-#: template/defaultfilters.py:816
+#: template/defaultfilters.py:836
 #, python-format
 msgid "%s GB"
 msgstr "%s GB"
 
-#: template/defaultfilters.py:818
+#: template/defaultfilters.py:838
 #, python-format
 msgid "%s TB"
 msgstr "%s TB"
 
-#: template/defaultfilters.py:819
+#: template/defaultfilters.py:839
 #, python-format
 msgid "%s PB"
 msgstr "%s PB"
 
-#: utils/dateformat.py:42
+#: utils/dateformat.py:45
 msgid "p.m."
 msgstr "오후"
 
-#: utils/dateformat.py:43
+#: utils/dateformat.py:46
 msgid "a.m."
 msgstr "오전"
 
-#: utils/dateformat.py:48
+#: utils/dateformat.py:51
 msgid "PM"
 msgstr "오후"
 
-#: utils/dateformat.py:49
+#: utils/dateformat.py:52
 msgid "AM"
 msgstr "오전"
 
-#: utils/dateformat.py:98
+#: utils/dateformat.py:101
 msgid "midnight"
 msgstr "자정"
 
-#: utils/dateformat.py:100
+#: utils/dateformat.py:103
 msgid "noon"
 msgstr "정오"
 
@@ -992,78 +1059,78 @@ msgctxt "alt. month"
 msgid "December"
 msgstr "12월"
 
-#: utils/text.py:136
+#: utils/text.py:65
+#, python-format
+msgctxt "String to return when truncating text"
+msgid "%(truncated_text)s..."
+msgstr ""
+
+#: utils/text.py:234
 msgid "or"
 msgstr "또는"
 
 #. Translators: This string is used as a separator between list elements
-#: utils/text.py:153
+#: utils/text.py:251
 msgid ", "
 msgstr ","
 
-#: utils/timesince.py:21
+#: utils/timesince.py:20
 msgid "year"
 msgid_plural "years"
 msgstr[0] "년"
 
-#: utils/timesince.py:22
+#: utils/timesince.py:21
 msgid "month"
 msgid_plural "months"
 msgstr[0] "개월"
 
-#: utils/timesince.py:23
+#: utils/timesince.py:22
 msgid "week"
 msgid_plural "weeks"
 msgstr[0] "주"
 
-#: utils/timesince.py:24
+#: utils/timesince.py:23
 msgid "day"
 msgid_plural "days"
 msgstr[0] "일"
 
-#: utils/timesince.py:25
+#: utils/timesince.py:24
 msgid "hour"
 msgid_plural "hours"
 msgstr[0] "시간"
 
-#: utils/timesince.py:26
+#: utils/timesince.py:25
 msgid "minute"
 msgid_plural "minutes"
 msgstr[0] "분"
 
-#: utils/timesince.py:45
+#: utils/timesince.py:41
 msgid "minutes"
 msgstr "분"
 
-#: utils/timesince.py:50
+#: utils/timesince.py:46
 #, python-format
 msgid "%(number)d %(type)s"
 msgstr "%(number)d%(type)s"
 
-#: utils/timesince.py:56
+#: utils/timesince.py:52
 #, python-format
 msgid ", %(number)d %(type)s"
 msgstr ", %(number)d%(type)s"
 
-#: utils/translation/trans_real.py:568
-msgid "DATE_FORMAT"
-msgstr "Y년 n월 j일"
+#: views/static.py:52
+msgid "Directory indexes are not allowed here."
+msgstr ""
 
-#: utils/translation/trans_real.py:569
-msgid "DATETIME_FORMAT"
-msgstr "Y년 n월 j일 H:i:s"
+#: views/static.py:54
+#, python-format
+msgid "\"%(path)s\" does not exist"
+msgstr ""
 
-#: utils/translation/trans_real.py:570
-msgid "TIME_FORMAT"
-msgstr "H:i:s"
-
-#: utils/translation/trans_real.py:591
-msgid "YEAR_MONTH_FORMAT"
-msgstr "Y년 n월"
-
-#: utils/translation/trans_real.py:592
-msgid "MONTH_DAY_FORMAT"
-msgstr "n월 j일"
+#: views/static.py:95
+#, python-format
+msgid "Index of %(directory)s"
+msgstr ""
 
 #: views/generic/create_update.py:121
 #, python-format
@@ -1096,12 +1163,12 @@ msgstr "날짜가 없습니다."
 msgid "No week specified"
 msgstr "주가 없습니다."
 
-#: views/generic/dates.py:198 views/generic/dates.py:214
+#: views/generic/dates.py:198 views/generic/dates.py:215
 #, python-format
 msgid "No %(verbose_name_plural)s available"
 msgstr " %(verbose_name_plural)s를 사용할 수 없습니다."
 
-#: views/generic/dates.py:466
+#: views/generic/dates.py:467
 #, python-format
 msgid ""
 "Future %(verbose_name_plural)s not available because %(class_name)s."
@@ -1110,7 +1177,7 @@ msgstr ""
 "Future 모듈 %(verbose_name_plural)s을 사용할 수 없습니다. %(class_name)s."
 "allow_future가 False 입니다."
 
-#: views/generic/dates.py:500
+#: views/generic/dates.py:501
 #, python-format
 msgid "Invalid date string '%(datestr)s' given format '%(format)s'"
 msgstr "날짜 문자열 '%(datestr)s'이 표준 형식 '%(format)s'과 다릅니다."
@@ -1120,16 +1187,16 @@ msgstr "날짜 문자열 '%(datestr)s'이 표준 형식 '%(format)s'과 다릅�
 msgid "No %(verbose_name)s found matching the query"
 msgstr "쿼리 결과에 %(verbose_name)s가 없습니다."
 
-#: views/generic/list.py:47
+#: views/generic/list.py:45
 msgid "Page is not 'last', nor can it be converted to an int."
 msgstr "'마지막' 페이지가 아니거나, 정수형으로 변환할 수 없습니다."
 
-#: views/generic/list.py:52
+#: views/generic/list.py:50
 #, python-format
 msgid "Invalid page (%(page_number)s)"
 msgstr "잘못된 페이지 (%(page_number)s)"
 
-#: views/generic/list.py:119
+#: views/generic/list.py:117
 #, python-format
 msgid "Empty list and '%(class_name)s.allow_empty' is False."
 msgstr "빈 리스트이고 '%(class_name)s.allow_empty'가 False입니다."

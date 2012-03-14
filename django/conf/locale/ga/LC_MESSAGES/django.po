@@ -1,569 +1,630 @@
 # This file is distributed under the same license as the Django package.
 #
+# Translators:
+# Jannis Leidel <jannis@leidel.info>, 2011.
+# Michael Thornhill <michael@maithu.com>, 2011.
+# Séamus Ó Cúile <seamus.ocuile@oegaillimh.ie>, 2011.
+# Seán de Búrca <leftmostcat@gmail.com>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-15 13:08-0400\n"
-"PO-Revision-Date: 2011-03-10 15:16+0000\n"
-"Last-Translator: seamus <seamus.ocuile@oegaillimh.ie>\n"
-"Language-Team: Irish <None>\n"
+"POT-Creation-Date: 2012-03-14 00:07-0700\n"
+"PO-Revision-Date: 2012-03-08 12:00+0000\n"
+"Last-Translator: leftmostcat <leftmostcat@gmail.com>\n"
+"Language-Team: Irish (http://www.transifex.net/projects/p/django/language/"
+"ga/)\n"
+"Language: ga\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: ga\n"
 "Plural-Forms: nplurals=5; plural=(n==1 ? 0 : n==2 ? 1 : n<7 ? 2 : n<11 ? 3 : "
 "4)\n"
 
-#: conf/global_settings.py:44
+#: conf/global_settings.py:48
 msgid "Arabic"
 msgstr "Araibis"
 
-#: conf/global_settings.py:45
+#: conf/global_settings.py:49
 msgid "Azerbaijani"
 msgstr "Asarbaiseáinis"
 
-#: conf/global_settings.py:46
+#: conf/global_settings.py:50
 msgid "Bulgarian"
 msgstr "Bulgáiris"
 
-#: conf/global_settings.py:47
+#: conf/global_settings.py:51
 msgid "Bengali"
 msgstr "Beangáilis"
 
-#: conf/global_settings.py:48
+#: conf/global_settings.py:52
 msgid "Bosnian"
-msgstr "Boisniais"
+msgstr "Boisnis"
 
-#: conf/global_settings.py:49
+#: conf/global_settings.py:53
 msgid "Catalan"
 msgstr "Catalóinis"
 
-#: conf/global_settings.py:50
+#: conf/global_settings.py:54
 msgid "Czech"
 msgstr "Seicis"
 
-#: conf/global_settings.py:51
+#: conf/global_settings.py:55
 msgid "Welsh"
 msgstr "Breatnais"
 
-#: conf/global_settings.py:52
+#: conf/global_settings.py:56
 msgid "Danish"
 msgstr "Danmhairgis "
 
-#: conf/global_settings.py:53
+#: conf/global_settings.py:57
 msgid "German"
 msgstr "Gearmáinis"
 
-#: conf/global_settings.py:54
+#: conf/global_settings.py:58
 msgid "Greek"
 msgstr "Gréigis"
 
-#: conf/global_settings.py:55
+#: conf/global_settings.py:59
 msgid "English"
 msgstr "Béarla"
 
-#: conf/global_settings.py:56
+#: conf/global_settings.py:60
 msgid "British English"
 msgstr "Béarla na Breataine"
 
-#: conf/global_settings.py:57
+#: conf/global_settings.py:61
 msgid "Spanish"
 msgstr "Spáinnis"
 
-#: conf/global_settings.py:58
+#: conf/global_settings.py:62
 msgid "Argentinian Spanish"
 msgstr "Spáinnis na hAirgintíne"
 
-#: conf/global_settings.py:59
+#: conf/global_settings.py:63
 msgid "Mexican Spanish"
 msgstr "Spáinnis Mheicsiceo "
 
-#: conf/global_settings.py:60
+#: conf/global_settings.py:64
+msgid "Nicaraguan Spanish"
+msgstr "Spáinnis Nicearagua"
+
+#: conf/global_settings.py:65
 msgid "Estonian"
 msgstr "Eastóinis"
 
-#: conf/global_settings.py:61
+#: conf/global_settings.py:66
 msgid "Basque"
 msgstr "Bascais"
 
-#: conf/global_settings.py:62
+#: conf/global_settings.py:67
 msgid "Persian"
 msgstr "Peirsis"
 
-#: conf/global_settings.py:63
+#: conf/global_settings.py:68
 msgid "Finnish"
 msgstr "Fionlainnis"
 
-#: conf/global_settings.py:64
+#: conf/global_settings.py:69
 msgid "French"
 msgstr "Fraincis"
 
-#: conf/global_settings.py:65
+#: conf/global_settings.py:70
 msgid "Frisian"
-msgstr "Frisianais"
+msgstr "Freaslainnis"
 
-#: conf/global_settings.py:66
+#: conf/global_settings.py:71
 msgid "Irish"
 msgstr "Gaeilge"
 
-#: conf/global_settings.py:67
+#: conf/global_settings.py:72
 msgid "Galician"
 msgstr "Gailísis"
 
-#: conf/global_settings.py:68
+#: conf/global_settings.py:73
 msgid "Hebrew"
 msgstr "Eabhrais"
 
-#: conf/global_settings.py:69
+#: conf/global_settings.py:74
 msgid "Hindi"
 msgstr "Hiondúis"
 
-#: conf/global_settings.py:70
+#: conf/global_settings.py:75
 msgid "Croatian"
 msgstr "Cróitis"
 
-#: conf/global_settings.py:71
+#: conf/global_settings.py:76
 msgid "Hungarian"
 msgstr "Ungáiris"
 
-#: conf/global_settings.py:72
+#: conf/global_settings.py:77
 msgid "Indonesian"
 msgstr "Indinéisis"
 
-#: conf/global_settings.py:73
+#: conf/global_settings.py:78
 msgid "Icelandic"
-msgstr "Mórlainnis"
+msgstr "Íoslainnis"
 
-#: conf/global_settings.py:74
+#: conf/global_settings.py:79
 msgid "Italian"
 msgstr "Iodáilis"
 
-#: conf/global_settings.py:75
+#: conf/global_settings.py:80
 msgid "Japanese"
 msgstr "Seapáinis"
 
-#: conf/global_settings.py:76
+#: conf/global_settings.py:81
 msgid "Georgian"
-msgstr "Seoirseach"
+msgstr "Seoirsis"
 
-#: conf/global_settings.py:77
+#: conf/global_settings.py:82
 msgid "Khmer"
 msgstr "Ciméiris"
 
-#: conf/global_settings.py:78
+#: conf/global_settings.py:83
 msgid "Kannada"
 msgstr "Cannadais"
 
-#: conf/global_settings.py:79
+#: conf/global_settings.py:84
 msgid "Korean"
 msgstr "Cóiréis"
 
-#: conf/global_settings.py:80
+#: conf/global_settings.py:85
 msgid "Lithuanian"
 msgstr "Liotuáinis"
 
-#: conf/global_settings.py:81
+#: conf/global_settings.py:86
 msgid "Latvian"
 msgstr "Laitvis"
 
-#: conf/global_settings.py:82
+#: conf/global_settings.py:87
 msgid "Macedonian"
 msgstr "Macadóinis"
 
-#: conf/global_settings.py:83
+#: conf/global_settings.py:88
 msgid "Malayalam"
 msgstr "Mailéalaimis"
 
-#: conf/global_settings.py:84
+#: conf/global_settings.py:89
 msgid "Mongolian"
 msgstr "Mongóilis"
 
-#: conf/global_settings.py:85
+#: conf/global_settings.py:90
 msgid "Dutch"
 msgstr "Ollainnis"
 
-#: conf/global_settings.py:86
-msgid "Norwegian"
-msgstr "Ioruais"
-
-#: conf/global_settings.py:87
+#: conf/global_settings.py:91
 msgid "Norwegian Bokmal"
-msgstr "Bokmal Ioruais"
+msgstr "Ioruais Bokmål"
 
-#: conf/global_settings.py:88
+#: conf/global_settings.py:92
 msgid "Norwegian Nynorsk"
-msgstr "Nynorsk Ioruais"
+msgstr "Ioruais Nynorsk"
 
-#: conf/global_settings.py:89
+#: conf/global_settings.py:93
 msgid "Punjabi"
 msgstr "Puinseáibis"
 
-#: conf/global_settings.py:90
+#: conf/global_settings.py:94
 msgid "Polish"
 msgstr "Polainnis"
 
-#: conf/global_settings.py:91
+#: conf/global_settings.py:95
 msgid "Portuguese"
 msgstr "Portaingéilis"
 
-#: conf/global_settings.py:92
+#: conf/global_settings.py:96
 msgid "Brazilian Portuguese"
-msgstr "Portaingéilis Bhrasaíleach"
+msgstr "Portaingéilis na Brasaíle"
 
-#: conf/global_settings.py:93
+#: conf/global_settings.py:97
 msgid "Romanian"
 msgstr "Rómáinis"
 
-#: conf/global_settings.py:94
+#: conf/global_settings.py:98
 msgid "Russian"
 msgstr "Rúisis"
 
-#: conf/global_settings.py:95
+#: conf/global_settings.py:99
 msgid "Slovak"
 msgstr "Slóvaicis"
 
-#: conf/global_settings.py:96
+#: conf/global_settings.py:100
 msgid "Slovenian"
 msgstr "Slóivéinis"
 
-#: conf/global_settings.py:97
+#: conf/global_settings.py:101
 msgid "Albanian"
-msgstr "Albanian"
+msgstr "Albáinis"
 
-#: conf/global_settings.py:98
+#: conf/global_settings.py:102
 msgid "Serbian"
 msgstr "Seirbis"
 
-#: conf/global_settings.py:99
+#: conf/global_settings.py:103
 msgid "Serbian Latin"
-msgstr "Laidin Seirbiach"
+msgstr "Seirbis (Laidineach)"
 
-#: conf/global_settings.py:100
+#: conf/global_settings.py:104
 msgid "Swedish"
 msgstr "Sualainnis"
 
-#: conf/global_settings.py:101
+#: conf/global_settings.py:105
 msgid "Tamil"
 msgstr "Tamailis"
 
-#: conf/global_settings.py:102
+#: conf/global_settings.py:106
 msgid "Telugu"
 msgstr "Teileagúis"
 
-#: conf/global_settings.py:103
+#: conf/global_settings.py:107
 msgid "Thai"
-msgstr "Tamailis"
+msgstr "Téalainnis"
 
-#: conf/global_settings.py:104
+#: conf/global_settings.py:108
 msgid "Turkish"
 msgstr "Tuircis"
 
-#: conf/global_settings.py:105
+#: conf/global_settings.py:109
 msgid "Ukrainian"
 msgstr "Úcráinis"
 
-#: conf/global_settings.py:106
+#: conf/global_settings.py:110
 msgid "Urdu"
 msgstr "Urdais"
 
-#: conf/global_settings.py:107
+#: conf/global_settings.py:111
 msgid "Vietnamese"
-msgstr "Vitneaimis"
+msgstr "Vítneamais"
 
-#: conf/global_settings.py:108
+#: conf/global_settings.py:112
 msgid "Simplified Chinese"
-msgstr "Sínis"
+msgstr "Sínis Simplithe"
 
-#: conf/global_settings.py:109
+#: conf/global_settings.py:113
 msgid "Traditional Chinese"
-msgstr "Sínis Tradisúinta"
+msgstr "Sínis Traidisiúnta"
 
-#: core/validators.py:21 forms/fields.py:67
+#: core/validators.py:24 forms/fields.py:51
 msgid "Enter a valid value."
-msgstr "Cuir luach bailí isteach."
+msgstr "Iontráil luach bailí"
 
-#: core/validators.py:89 forms/fields.py:575
+#: core/validators.py:99 forms/fields.py:601
 msgid "This URL appears to be a broken link."
 msgstr "Dealraíonn sé gur nasc briste é an URL seo."
 
-#: core/validators.py:94 forms/fields.py:574
+#: core/validators.py:131 forms/fields.py:600
 msgid "Enter a valid URL."
-msgstr "Cuir URL bailí isteach."
+msgstr "Iontráil URL bailí."
 
-#: core/validators.py:138 forms/fields.py:449
+#: core/validators.py:165 forms/fields.py:474
 msgid "Enter a valid e-mail address."
-msgstr "Cuir isteach seoladh ríomhphoist bhailí."
+msgstr "Iontráil seoladh ríomhphoist bailí."
 
-#: core/validators.py:141 forms/fields.py:958
+#: core/validators.py:168 forms/fields.py:1023
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
-"Cuir 'slug' bailí isteach atá déanta as litreacha, uimhreacha, fostríoca nó "
+"Iontráil 'slug' bailí a chuimsíonn litreacha, uimhreacha, fostríoca nó "
 "fleiscíní."
 
-#: core/validators.py:144 forms/fields.py:951
+#: core/validators.py:171 core/validators.py:188 forms/fields.py:997
 msgid "Enter a valid IPv4 address."
-msgstr "Cuir seoladh bailí IPv4 isteach."
+msgstr "Iontráil seoladh IPv4 bailí."
 
-#: core/validators.py:147 db/models/fields/__init__.py:575
+#: core/validators.py:175 core/validators.py:189
+msgid "Enter a valid IPv6 address."
+msgstr ""
+
+#: core/validators.py:184 core/validators.py:187
+msgid "Enter a valid IPv4 or IPv6 address."
+msgstr ""
+
+#: core/validators.py:209 db/models/fields/__init__.py:638
 msgid "Enter only digits separated by commas."
-msgstr "Ná cuir isteach ach digití scartha ag camóga."
+msgstr "Ná hiontráil ach digití atá deighilte le camóga."
 
-#: core/validators.py:153
+#: core/validators.py:215
 #, python-format
 msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
 msgstr ""
-"Bí cinnte nach bhfuil níos lú ná %(limit_value)s (it is %(show_value)s)."
+"Cinntigh go bhfuil an luach seo %(limit_value)s (tá sé %(show_value)s)."
 
-#: core/validators.py:171 forms/fields.py:222 forms/fields.py:275
+#: core/validators.py:233 forms/fields.py:209 forms/fields.py:262
 #, python-format
 msgid "Ensure this value is less than or equal to %(limit_value)s."
 msgstr ""
-"Bí cinnte go bhfuil an luach seo cothrom le nó níos lú ná %(limit_value)s."
+"Cinntigh go bhfuil an luach seo níos lú ná nó cothrom le %(limit_value)s."
 
-#: core/validators.py:176 forms/fields.py:223 forms/fields.py:276
+#: core/validators.py:238 forms/fields.py:210 forms/fields.py:263
 #, python-format
 msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr ""
-"Bí cinnte go bhfuil an luach seo cothrom le nó níos mó ná %(limit_value)s."
+"Cinntigh go bhfuil an luach seo níos mó ná nó cothrom le %(limit_value)s."
 
-#: core/validators.py:182
+#: core/validators.py:244
 #, python-format
 msgid ""
-"Ensure this value has at least %(limit_value)d characters (it has %"
-"(show_value)d)."
+"Ensure this value has at least %(limit_value)d characters (it has "
+"%(show_value)d)."
 msgstr ""
-"Bí cinnte nach bhfuil níos lú ná %(limit_value)d carachtar sa luach seo (it "
-"has %(show_value)d)."
+"Cinntigh nach bhfuil níos lú ná %(limit_value)d carachtar ag an luach seo "
+"(tá %(show_value)d aige)."
 
-#: core/validators.py:188
+#: core/validators.py:250
 #, python-format
 msgid ""
-"Ensure this value has at most %(limit_value)d characters (it has %"
-"(show_value)d)."
+"Ensure this value has at most %(limit_value)d characters (it has "
+"%(show_value)d)."
 msgstr ""
-"Bí cinnte nach bhfuil níos mó ná %(limit_value)d carachtar sa luach seo %"
-"(show_value)d)."
+"Cinntigh nach bhfuil níos mó ná %(limit_value)d carachtar ag an luach seo "
+"(tá %(show_value)d aige)."
 
-#: db/models/base.py:769
+#: db/models/base.py:764
 #, python-format
 msgid "%(field_name)s must be unique for %(date_field)s %(lookup)s."
-msgstr "Ní mór a bheith %(field_name)s uathúil don %(date_field)s %(lookup)s."
+msgstr "Ní mór a bheith %(field_name)s uathúil ar %(date_field)s %(lookup)s."
 
-#: db/models/base.py:784 db/models/base.py:792
+#: db/models/base.py:787 forms/models.py:577
+msgid "and"
+msgstr "agus"
+
+#: db/models/base.py:788 db/models/fields/__init__.py:65
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "Tá %(model_name)s leis an %(field_label)s seo ann cheana."
 
-#: db/models/base.py:791 forms/models.py:562
-msgid "and"
-msgstr "agus"
-
-#: db/models/fields/__init__.py:63
+#: db/models/fields/__init__.py:62
 #, python-format
 msgid "Value %r is not a valid choice."
-msgstr "Níl %r luach rogha bailí."
+msgstr "Ní rogha bailí é an luach %r."
 
-#: db/models/fields/__init__.py:64
+#: db/models/fields/__init__.py:63
 msgid "This field cannot be null."
 msgstr "Ní cheadaítear luach nialasach sa réimse seo."
 
-#: db/models/fields/__init__.py:65
+#: db/models/fields/__init__.py:64
 msgid "This field cannot be blank."
 msgstr "Ní cheadaítear luach nialasach sa réimse seo."
 
-#: db/models/fields/__init__.py:70
+#: db/models/fields/__init__.py:71
 #, python-format
 msgid "Field of type: %(field_type)s"
 msgstr "Réimse de Cineál: %(field_type)s"
 
-#: db/models/fields/__init__.py:451 db/models/fields/__init__.py:871
-#: db/models/fields/__init__.py:980 db/models/fields/__init__.py:991
-#: db/models/fields/__init__.py:1018
+#: db/models/fields/__init__.py:506 db/models/fields/__init__.py:961
 msgid "Integer"
 msgstr "Slánuimhir"
 
-#: db/models/fields/__init__.py:455 db/models/fields/__init__.py:869
-msgid "This value must be an integer."
-msgstr "Ní mór don luach seo a bheith ina shlánuimhir."
+#: db/models/fields/__init__.py:510 db/models/fields/__init__.py:959
+#, python-format
+msgid "'%s' value must be an integer."
+msgstr ""
 
-#: db/models/fields/__init__.py:493
-msgid "This value must be either True or False."
-msgstr "Ní mór don luach seo a bheith Fíor nó Bréagach."
+#: db/models/fields/__init__.py:552
+#, python-format
+msgid "'%s' value must be either True or False."
+msgstr ""
 
-#: db/models/fields/__init__.py:495
+#: db/models/fields/__init__.py:554
 msgid "Boolean (Either True or False)"
 msgstr "Boole"
 
-#: db/models/fields/__init__.py:542 db/models/fields/__init__.py:1001
+#: db/models/fields/__init__.py:605
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr "Teaghrán (suas go %(max_length)s)"
 
-#: db/models/fields/__init__.py:570
+#: db/models/fields/__init__.py:633
 msgid "Comma-separated integers"
 msgstr "Slánuimhireacha camóg-scartha"
 
-#: db/models/fields/__init__.py:584
+#: db/models/fields/__init__.py:647
+#, python-format
+msgid "'%s' value has an invalid date format. It must be in YYYY-MM-DD format."
+msgstr ""
+
+#: db/models/fields/__init__.py:649 db/models/fields/__init__.py:734
+#, python-format
+msgid ""
+"'%s' value has the correct format (YYYY-MM-DD) but it is an invalid date."
+msgstr ""
+
+#: db/models/fields/__init__.py:652
 msgid "Date (without time)"
 msgstr "Dáta (gan am)"
 
-#: db/models/fields/__init__.py:588
-msgid "Enter a valid date in YYYY-MM-DD format."
-msgstr "Cuir dáta bailí isteach, san fhormáid BBBB-MM-LL."
-
-#: db/models/fields/__init__.py:589
+#: db/models/fields/__init__.py:732
 #, python-format
-msgid "Invalid date: %s"
-msgstr "Dáta neamhbhailí: %s"
-
-#: db/models/fields/__init__.py:670
-msgid "Enter a valid date/time in YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format."
+msgid ""
+"'%s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
+"uuuuuu]][TZ] format."
 msgstr ""
-"Cuir dáta/am bailí isteach, san fhormáid BBBB-MM-LL UU:NN[:ss[.uuuuuu]]."
 
-#: db/models/fields/__init__.py:672
+#: db/models/fields/__init__.py:736
+#, python-format
+msgid ""
+"'%s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]) but "
+"it is an invalid date/time."
+msgstr ""
+
+#: db/models/fields/__init__.py:740
 msgid "Date (with time)"
 msgstr "Dáta (le am)"
 
-#: db/models/fields/__init__.py:746
-msgid "This value must be a decimal number."
-msgstr "Ní mór don luach seo a bheith ina uimhir dheachúlach."
+#: db/models/fields/__init__.py:831
+#, python-format
+msgid "'%s' value must be a decimal number."
+msgstr ""
 
-#: db/models/fields/__init__.py:748
+#: db/models/fields/__init__.py:833
 msgid "Decimal number"
 msgstr "Uimhir deachúlach"
 
-#: db/models/fields/__init__.py:803
+#: db/models/fields/__init__.py:890
 msgid "E-mail address"
-msgstr "R-phost"
+msgstr "Seoladh ríomhphoist"
 
-#: db/models/fields/__init__.py:818 db/models/fields/files.py:220
-#: db/models/fields/files.py:326
+#: db/models/fields/__init__.py:906
 msgid "File path"
 msgstr "Conair comhaid"
 
-#: db/models/fields/__init__.py:841
-msgid "This value must be a float."
-msgstr "Ní mór go mbeadh an luach snámhpointe."
+#: db/models/fields/__init__.py:930
+#, python-format
+msgid "'%s' value must be a float."
+msgstr ""
 
-#: db/models/fields/__init__.py:843
+#: db/models/fields/__init__.py:932
 msgid "Floating point number"
 msgstr "Snámhphointe"
 
-#: db/models/fields/__init__.py:902
+#: db/models/fields/__init__.py:993
 msgid "Big (8 byte) integer"
 msgstr "Mór (8 byte) slánuimhi"
 
-#: db/models/fields/__init__.py:915
+#: db/models/fields/__init__.py:1007
+msgid "IPv4 address"
+msgstr ""
+
+#: db/models/fields/__init__.py:1023
 msgid "IP address"
-msgstr "Seol IP"
+msgstr "Seoladh IP"
 
-#: db/models/fields/__init__.py:931
-msgid "This value must be either None, True or False."
-msgstr "Ní mór don luach seo a bheith Faic, Fíor nó Bréagach."
+#: db/models/fields/__init__.py:1065
+#, python-format
+msgid "'%s' value must be either None, True or False."
+msgstr ""
 
-#: db/models/fields/__init__.py:933
+#: db/models/fields/__init__.py:1067
 msgid "Boolean (Either True, False or None)"
 msgstr "Boole (Fíor, Bréagach nó Dada)"
 
-#: db/models/fields/__init__.py:1024
+#: db/models/fields/__init__.py:1116
+msgid "Positive integer"
+msgstr ""
+
+#: db/models/fields/__init__.py:1127
+msgid "Positive small integer"
+msgstr ""
+
+#: db/models/fields/__init__.py:1138
+#, python-format
+msgid "Slug (up to %(max_length)s)"
+msgstr ""
+
+#: db/models/fields/__init__.py:1156
+msgid "Small integer"
+msgstr ""
+
+#: db/models/fields/__init__.py:1162
 msgid "Text"
-msgstr "téacs"
+msgstr "Téacs"
 
-#: db/models/fields/__init__.py:1040
+#: db/models/fields/__init__.py:1180
+#, python-format
+msgid ""
+"'%s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] format."
+msgstr ""
+
+#: db/models/fields/__init__.py:1182
+#, python-format
+msgid ""
+"'%s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an invalid "
+"time."
+msgstr ""
+
+#: db/models/fields/__init__.py:1185
 msgid "Time"
-msgstr "am"
+msgstr "Am"
 
-#: db/models/fields/__init__.py:1044
-msgid "Enter a valid time in HH:MM[:ss[.uuuuuu]] format."
-msgstr "Cuir am bailí isteach san fhormáid UU:NN[:ss[.uuuuuu]]."
-
-#: db/models/fields/__init__.py:1120
+#: db/models/fields/__init__.py:1249
 msgid "URL"
 msgstr "URL"
 
-#: db/models/fields/__init__.py:1136
-msgid "XML text"
-msgstr "Téacs XML"
+#: db/models/fields/files.py:214
+msgid "File"
+msgstr ""
 
-#: db/models/fields/related.py:815
+#: db/models/fields/files.py:321
+msgid "Image"
+msgstr ""
+
+#: db/models/fields/related.py:903
 #, python-format
 msgid "Model %(model)s with pk %(pk)r does not exist."
 msgstr "Níl %(model)s le eochair %(pk)r ann."
 
-#: db/models/fields/related.py:817
+#: db/models/fields/related.py:905
 msgid "Foreign Key (type determined by related field)"
 msgstr "Eochair Eachtracha (cineál a chinnfear de réir réimse a bhaineann)"
 
-#: db/models/fields/related.py:941
+#: db/models/fields/related.py:1033
 msgid "One-to-one relationship"
 msgstr "Duine-le-duine caidreamh"
 
-#: db/models/fields/related.py:1003
+#: db/models/fields/related.py:1096
 msgid "Many-to-many relationship"
 msgstr "Go leor le go leor caidreamh"
 
-#: db/models/fields/related.py:1023
+#: db/models/fields/related.py:1120
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 "Ar ríomhaire Mac, coinnigh an eochair \"Control\" nó \"Command\" síos chun "
 "níos mó ná rud amháin a roghnú."
 
-#: forms/fields.py:66
+#: forms/fields.py:50
 msgid "This field is required."
 msgstr "Tá an réimse seo riachtanach."
 
-#: forms/fields.py:221
+#: forms/fields.py:208
 msgid "Enter a whole number."
-msgstr "Cuir slánuimhir isteach."
+msgstr "Iontráil slánuimhir."
 
-#: forms/fields.py:253 forms/fields.py:274
+#: forms/fields.py:240 forms/fields.py:261
 msgid "Enter a number."
-msgstr "Cuir uimhir isteach."
+msgstr "Iontráil uimhir."
 
-#: forms/fields.py:277
+#: forms/fields.py:264
 #, python-format
 msgid "Ensure that there are no more than %s digits in total."
 msgstr "Bí cinnte nach bhfuil níos mó ná %s digit ann."
 
-#: forms/fields.py:278
+#: forms/fields.py:265
 #, python-format
 msgid "Ensure that there are no more than %s decimal places."
 msgstr "Bí cinnte nach bhfuil níos mó ná %s ionad deachúlach ann."
 
-#: forms/fields.py:279
+#: forms/fields.py:266
 #, python-format
 msgid "Ensure that there are no more than %s digits before the decimal point."
 msgstr "Bí cinnte nach bhfuil níos mó ná %s digit roimh an bpointe deachúlach."
 
-#: forms/fields.py:342 forms/fields.py:918
+#: forms/fields.py:365 forms/fields.py:963
 msgid "Enter a valid date."
-msgstr "Cuir dáta bailí isteach."
+msgstr "Iontráil dáta bailí."
 
-#: forms/fields.py:370 forms/fields.py:919
+#: forms/fields.py:388 forms/fields.py:964
 msgid "Enter a valid time."
-msgstr "Cuir am bailí isteach."
+msgstr "Iontráil am bailí."
 
-#: forms/fields.py:396
+#: forms/fields.py:409
 msgid "Enter a valid date/time."
-msgstr "Cuir dáta/am bailí isteach."
+msgstr "Iontráil dáta/am bailí."
 
-#: forms/fields.py:460
+#: forms/fields.py:485
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Níor seoladh comhad. Deimhnigh cineál an ionchódaithe ar an bhfoirm."
 
-#: forms/fields.py:461
+#: forms/fields.py:486
 msgid "No file was submitted."
 msgstr "Níor seoladh aon chomhad."
 
-#: forms/fields.py:462
+#: forms/fields.py:487
 msgid "The submitted file is empty."
 msgstr "Tá an comhad a seoladh folamh."
 
-#: forms/fields.py:463
+#: forms/fields.py:488
 #, python-format
 msgid ""
 "Ensure this filename has at most %(max)d characters (it has %(length)d)."
@@ -571,13 +632,13 @@ msgstr ""
 "Cinntiú go bhfuil níos lú ná %(max)d carachtair (tá sé %(length)d) ag ainm "
 "an chomhaid seo."
 
-#: forms/fields.py:464
+#: forms/fields.py:489
 msgid "Please either submit a file or check the clear checkbox, not both."
 msgstr ""
 "Cuir ceachtar isteach comhad nó an ticbhosca soiléir, ní féidir an dá "
 "sheiceáil."
 
-#: forms/fields.py:518
+#: forms/fields.py:544
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
@@ -585,36 +646,36 @@ msgstr ""
 "Uasluchtaigh íomhá bhailí. Níorbh íomhá é an comhad a d'uasluchtaigh tú, nó "
 "b'íomhá thruaillithe é."
 
-#: forms/fields.py:650 forms/fields.py:725
+#: forms/fields.py:689 forms/fields.py:769
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr "Déan rogha bhailí. Ní ceann de na roghanna é %(value)s."
 
-#: forms/fields.py:726 forms/fields.py:814 forms/models.py:985
+#: forms/fields.py:770 forms/fields.py:858 forms/models.py:999
 msgid "Enter a list of values."
 msgstr "Cuir liosta de luachanna isteach."
 
-#: forms/formsets.py:305 forms/formsets.py:307
+#: forms/formsets.py:317 forms/formsets.py:319
 msgid "Order"
 msgstr "Ord"
 
-#: forms/formsets.py:309
+#: forms/formsets.py:321
 msgid "Delete"
-msgstr "Cealaigh"
+msgstr "Scrios"
 
-#: forms/models.py:556
+#: forms/models.py:571
 #, python-format
 msgid "Please correct the duplicate data for %(field)s."
 msgstr "Le do thoil ceartaigh an sonra dúbail le %(field)s."
 
-#: forms/models.py:560
+#: forms/models.py:575
 #, python-format
 msgid "Please correct the duplicate data for %(field)s, which must be unique."
 msgstr ""
 "Ceart le do thoil na sonraí a dhúbailt le haghaidh %(field)s, chaithfidh a "
 "bheith uathúil."
 
-#: forms/models.py:566
+#: forms/models.py:581
 #, python-format
 msgid ""
 "Please correct the duplicate data for %(field_name)s which must be unique "
@@ -623,114 +684,121 @@ msgstr ""
 "Ceart le do thoil na sonraí a dhúbailt le haghaidh %(field_name)s ní mór a "
 "bheith uaithúil le haghaidh an %(lookup)s i %(date_field)s."
 
-#: forms/models.py:574
+#: forms/models.py:589
 msgid "Please correct the duplicate values below."
 msgstr "Le do thoil ceartaigh na luachanna dúbail thíos."
 
-#: forms/models.py:835
+#: forms/models.py:849
 msgid "The inline foreign key did not match the parent instance primary key."
 msgstr ""
 "Ní raibh an eochair eachtrach comhoiriúnach leis an tuismitheoir ásc príomh-"
 "eochair."
 
-#: forms/models.py:896
+#: forms/models.py:910
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "Déan rogha bhailí. Ní ceann de na roghanna é do roghasa."
 
-#: forms/models.py:986
+#: forms/models.py:1000
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "Déan rogha bhailí. Ní ceann de na roghanna é %s."
 
-#: forms/models.py:988
+#: forms/models.py:1002
 #, python-format
 msgid "\"%s\" is not a valid value for a primary key."
 msgstr "Níl \"%s\" luach bailí le príomh-eochair."
 
-#: forms/widgets.py:299
+#: forms/util.py:70
+#, python-format
+msgid ""
+"%(datetime)s couldn't be interpreted in time zone %(current_timezone)s; it "
+"may be ambiguous or it may not exist."
+msgstr ""
+
+#: forms/widgets.py:325
 msgid "Currently"
 msgstr "Faoi láthair"
 
-#: forms/widgets.py:300
+#: forms/widgets.py:326
 msgid "Change"
 msgstr "Athraigh"
 
-#: forms/widgets.py:301
+#: forms/widgets.py:327
 msgid "Clear"
 msgstr "Glan"
 
-#: forms/widgets.py:548
+#: forms/widgets.py:582
 msgid "Unknown"
-msgstr "Gan aithne"
+msgstr "Anaithnid"
 
-#: forms/widgets.py:548
+#: forms/widgets.py:583
 msgid "Yes"
 msgstr "Tá"
 
-#: forms/widgets.py:548
+#: forms/widgets.py:584
 msgid "No"
 msgstr "Níl"
 
-#: template/defaultfilters.py:777
+#: template/defaultfilters.py:797
 msgid "yes,no,maybe"
 msgstr "tá, níl, b'fhéidir"
 
-#: template/defaultfilters.py:805 template/defaultfilters.py:810
+#: template/defaultfilters.py:825 template/defaultfilters.py:830
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d bheart"
 msgstr[1] "%(size)d bheart"
 msgstr[2] "%(size)d bheart"
-msgstr[3] "%(size)d beart"
+msgstr[3] "%(size)d mbeart"
 msgstr[4] "%(size)d beart"
 
-#: template/defaultfilters.py:812
+#: template/defaultfilters.py:832
 #, python-format
 msgid "%s KB"
 msgstr "%s KB"
 
-#: template/defaultfilters.py:814
+#: template/defaultfilters.py:834
 #, python-format
 msgid "%s MB"
 msgstr "%s MB"
 
-#: template/defaultfilters.py:816
+#: template/defaultfilters.py:836
 #, python-format
 msgid "%s GB"
 msgstr "%s GB"
 
-#: template/defaultfilters.py:818
+#: template/defaultfilters.py:838
 #, python-format
 msgid "%s TB"
 msgstr "%s TB"
 
-#: template/defaultfilters.py:819
+#: template/defaultfilters.py:839
 #, python-format
 msgid "%s PB"
 msgstr "%s PB"
 
-#: utils/dateformat.py:42
+#: utils/dateformat.py:45
 msgid "p.m."
-msgstr "p.m."
+msgstr "i.n."
 
-#: utils/dateformat.py:43
+#: utils/dateformat.py:46
 msgid "a.m."
-msgstr "a.m."
+msgstr "r.n."
 
-#: utils/dateformat.py:48
+#: utils/dateformat.py:51
 msgid "PM"
-msgstr "PM"
+msgstr "IN"
 
-#: utils/dateformat.py:49
+#: utils/dateformat.py:52
 msgid "AM"
-msgstr "AM"
+msgstr "RN"
 
-#: utils/dateformat.py:98
+#: utils/dateformat.py:101
 msgid "midnight"
 msgstr "meán oíche"
 
-#: utils/dateformat.py:100
+#: utils/dateformat.py:103
 msgid "noon"
 msgstr "nóin"
 
@@ -764,43 +832,43 @@ msgstr "Domhnach"
 
 #: utils/dates.py:10
 msgid "Mon"
-msgstr "Lua"
+msgstr "Luan"
 
 #: utils/dates.py:10
 msgid "Tue"
-msgstr "Mai"
+msgstr "Máirt"
 
 #: utils/dates.py:10
 msgid "Wed"
-msgstr "Céa"
+msgstr "Céad"
 
 #: utils/dates.py:10
 msgid "Thu"
-msgstr "Déa"
+msgstr "Déar"
 
 #: utils/dates.py:10
 msgid "Fri"
-msgstr "Aoi"
+msgstr "Aoine"
 
 #: utils/dates.py:11
 msgid "Sat"
-msgstr "Sat"
+msgstr "Sath"
 
 #: utils/dates.py:11
 msgid "Sun"
-msgstr "Dom"
+msgstr "Domh"
 
 #: utils/dates.py:18
 msgid "January"
-msgstr "Mí Eanair"
+msgstr "Eanáir"
 
 #: utils/dates.py:18
 msgid "February"
-msgstr "Mí Feabhra"
+msgstr "Feabhra"
 
 #: utils/dates.py:18
 msgid "March"
-msgstr "Mí Márta"
+msgstr "Márta"
 
 #: utils/dates.py:18
 msgid "April"
@@ -812,11 +880,11 @@ msgstr "Bealtaine"
 
 #: utils/dates.py:18
 msgid "June"
-msgstr "Mí an Mheithimh"
+msgstr "Meitheamh"
 
 #: utils/dates.py:19
 msgid "July"
-msgstr "Mí Iúil"
+msgstr "Iúil"
 
 #: utils/dates.py:19
 msgid "August"
@@ -836,7 +904,7 @@ msgstr "Samhain"
 
 #: utils/dates.py:20
 msgid "December"
-msgstr "Mí na Nollag"
+msgstr "Nollaig"
 
 #: utils/dates.py:23
 msgid "jan"
@@ -844,11 +912,11 @@ msgstr "ean"
 
 #: utils/dates.py:23
 msgid "feb"
-msgstr "fea"
+msgstr "feabh"
 
 #: utils/dates.py:23
 msgid "mar"
-msgstr "loit"
+msgstr "márta"
 
 #: utils/dates.py:23
 msgid "apr"
@@ -856,35 +924,35 @@ msgstr "aib"
 
 #: utils/dates.py:23
 msgid "may"
-msgstr "bealtaine"
+msgstr "beal"
 
 #: utils/dates.py:23
 msgid "jun"
-msgstr "mei"
+msgstr "meith"
 
 #: utils/dates.py:24
 msgid "jul"
-msgstr "iui"
+msgstr "iúil"
 
 #: utils/dates.py:24
 msgid "aug"
-msgstr "lun"
+msgstr "lún"
 
 #: utils/dates.py:24
 msgid "sep"
-msgstr "mea"
+msgstr "mfómh"
 
 #: utils/dates.py:24
 msgid "oct"
-msgstr "dei"
+msgstr "dfómh"
 
 #: utils/dates.py:24
 msgid "nov"
-msgstr "sam"
+msgstr "samh"
 
 #: utils/dates.py:24
 msgid "dec"
-msgstr "nol"
+msgstr "noll"
 
 #: utils/dates.py:31
 msgctxt "abbrev. month"
@@ -894,7 +962,7 @@ msgstr "Ean."
 #: utils/dates.py:32
 msgctxt "abbrev. month"
 msgid "Feb."
-msgstr "Fea."
+msgstr "Feabh."
 
 #: utils/dates.py:33
 msgctxt "abbrev. month"
@@ -904,17 +972,17 @@ msgstr "Márta"
 #: utils/dates.py:34
 msgctxt "abbrev. month"
 msgid "April"
-msgstr "Aibreán"
+msgstr "Aib."
 
 #: utils/dates.py:35
 msgctxt "abbrev. month"
 msgid "May"
-msgstr "Bealtaine"
+msgstr "Beal."
 
 #: utils/dates.py:36
 msgctxt "abbrev. month"
 msgid "June"
-msgstr "Meitheamh"
+msgstr "Meith."
 
 #: utils/dates.py:37
 msgctxt "abbrev. month"
@@ -929,179 +997,179 @@ msgstr "Lún."
 #: utils/dates.py:39
 msgctxt "abbrev. month"
 msgid "Sept."
-msgstr "Meá."
+msgstr "MFómh."
 
 #: utils/dates.py:40
 msgctxt "abbrev. month"
 msgid "Oct."
-msgstr "Dei."
+msgstr "DFómh."
 
 #: utils/dates.py:41
 msgctxt "abbrev. month"
 msgid "Nov."
-msgstr "Sam."
+msgstr "Samh."
 
 #: utils/dates.py:42
 msgctxt "abbrev. month"
 msgid "Dec."
-msgstr "Nol."
+msgstr "Noll."
 
 #: utils/dates.py:45
 msgctxt "alt. month"
 msgid "January"
-msgstr "Eanáir"
+msgstr "Mí Eanáir"
 
 #: utils/dates.py:46
 msgctxt "alt. month"
 msgid "February"
-msgstr "Feabhra"
+msgstr "Mí Feabhra"
 
 #: utils/dates.py:47
 msgctxt "alt. month"
 msgid "March"
-msgstr "Márta"
+msgstr "Mí na Márta"
 
 #: utils/dates.py:48
 msgctxt "alt. month"
 msgid "April"
-msgstr "Aibreán"
+msgstr "Mí Aibreáin"
 
 #: utils/dates.py:49
 msgctxt "alt. month"
 msgid "May"
-msgstr "Bealtaine"
+msgstr "Mí na Bealtaine"
 
 #: utils/dates.py:50
 msgctxt "alt. month"
 msgid "June"
-msgstr "Meitheamh"
+msgstr "Mí an Mheithimh"
 
 #: utils/dates.py:51
 msgctxt "alt. month"
 msgid "July"
-msgstr "Iúil"
+msgstr "Mí Iúil"
 
 #: utils/dates.py:52
 msgctxt "alt. month"
 msgid "August"
-msgstr "Lúnasa"
+msgstr "Mí Lúnasa"
 
 #: utils/dates.py:53
 msgctxt "alt. month"
 msgid "September"
-msgstr "Meán Fómhair"
+msgstr "Mí Mheán Fómhair"
 
 #: utils/dates.py:54
 msgctxt "alt. month"
 msgid "October"
-msgstr "Deireadh Fómhair"
+msgstr "Mí Dheireadh Fómhair"
 
 #: utils/dates.py:55
 msgctxt "alt. month"
 msgid "November"
-msgstr "Samhain"
+msgstr "Mí na Samhna"
 
 #: utils/dates.py:56
 msgctxt "alt. month"
 msgid "December"
-msgstr "Nollaig"
+msgstr "Mí na Nollag"
 
-#: utils/text.py:136
+#: utils/text.py:65
+#, python-format
+msgctxt "String to return when truncating text"
+msgid "%(truncated_text)s..."
+msgstr ""
+
+#: utils/text.py:234
 msgid "or"
 msgstr "nó"
 
 #. Translators: This string is used as a separator between list elements
-#: utils/text.py:153
+#: utils/text.py:251
 msgid ", "
 msgstr ", "
 
-#: utils/timesince.py:21
+#: utils/timesince.py:20
 msgid "year"
 msgid_plural "years"
 msgstr[0] "bliain"
 msgstr[1] "bliain"
-msgstr[2] "bliain"
-msgstr[3] "bliain"
+msgstr[2] "bliana"
+msgstr[3] "mbliana"
 msgstr[4] "bliana"
 
-#: utils/timesince.py:22
+#: utils/timesince.py:21
 msgid "month"
 msgid_plural "months"
-msgstr[0] "mí"
-msgstr[1] "mí"
-msgstr[2] "mí"
+msgstr[0] "mhí"
+msgstr[1] "mhí"
+msgstr[2] "mhí"
 msgstr[3] "mí"
-msgstr[4] "míosa"
+msgstr[4] "mí"
 
-#: utils/timesince.py:23
+#: utils/timesince.py:22
 msgid "week"
 msgid_plural "weeks"
 msgstr[0] "seachtain"
-msgstr[1] "seachtain"
-msgstr[2] "seachtain"
+msgstr[1] "sheachtain"
+msgstr[2] "sheachtain"
 msgstr[3] "seachtain"
 msgstr[4] "seachtain"
 
-#: utils/timesince.py:24
+#: utils/timesince.py:23
 msgid "day"
 msgid_plural "days"
 msgstr[0] "lá"
 msgstr[1] "lá"
 msgstr[2] "lá"
 msgstr[3] "lá"
-msgstr[4] "laethanta"
+msgstr[4] "lá"
 
-#: utils/timesince.py:25
+#: utils/timesince.py:24
 msgid "hour"
 msgid_plural "hours"
 msgstr[0] "uair"
 msgstr[1] "uair"
 msgstr[2] "uair"
-msgstr[3] "uair"
+msgstr[3] "n-uair"
 msgstr[4] "uair"
 
-#: utils/timesince.py:26
+#: utils/timesince.py:25
 msgid "minute"
 msgid_plural "minutes"
-msgstr[0] "nóimead"
+msgstr[0] "nóiméad"
 msgstr[1] "nóiméad"
 msgstr[2] "nóiméad"
 msgstr[3] "nóiméad"
 msgstr[4] "nóiméad"
 
-#: utils/timesince.py:45
+#: utils/timesince.py:41
 msgid "minutes"
 msgstr "nóiméad"
 
-#: utils/timesince.py:50
+#: utils/timesince.py:46
 #, python-format
 msgid "%(number)d %(type)s"
 msgstr "%(number)d %(type)s"
 
-#: utils/timesince.py:56
+#: utils/timesince.py:52
 #, python-format
 msgid ", %(number)d %(type)s"
 msgstr ", %(number)d %(type)s"
 
-#: utils/translation/trans_real.py:568
-msgid "DATE_FORMAT"
-msgstr "N j, Y"
+#: views/static.py:52
+msgid "Directory indexes are not allowed here."
+msgstr ""
 
-#: utils/translation/trans_real.py:569
-msgid "DATETIME_FORMAT"
-msgstr "DATETIME_FORMAT"
+#: views/static.py:54
+#, python-format
+msgid "\"%(path)s\" does not exist"
+msgstr ""
 
-#: utils/translation/trans_real.py:570
-msgid "TIME_FORMAT"
-msgstr "P"
-
-#: utils/translation/trans_real.py:591
-msgid "YEAR_MONTH_FORMAT"
-msgstr "F Y"
-
-#: utils/translation/trans_real.py:592
-msgid "MONTH_DAY_FORMAT"
-msgstr "F j"
+#: views/static.py:95
+#, python-format
+msgid "Index of %(directory)s"
+msgstr ""
 
 #: views/generic/create_update.py:121
 #, python-format
@@ -1120,56 +1188,56 @@ msgstr "Scriosadh %(verbose_name)s."
 
 #: views/generic/dates.py:33
 msgid "No year specified"
-msgstr "Níl blian sonraithe"
+msgstr "Bliain gan sonrú"
 
 #: views/generic/dates.py:58
 msgid "No month specified"
-msgstr "Níl mí sonraithe"
+msgstr "Mí gan sonrú"
 
 #: views/generic/dates.py:99
 msgid "No day specified"
-msgstr "Níl lá sonraithe"
+msgstr "Lá gan sonrú"
 
 #: views/generic/dates.py:138
 msgid "No week specified"
-msgstr "Níl seachtain sonraithe"
+msgstr "Seachtain gan sonrú"
 
-#: views/generic/dates.py:198 views/generic/dates.py:214
+#: views/generic/dates.py:198 views/generic/dates.py:215
 #, python-format
 msgid "No %(verbose_name_plural)s available"
-msgstr "Níl %(verbose_name_plural)s ar fáil"
+msgstr "Gan %(verbose_name_plural)s ar fáil"
 
-#: views/generic/dates.py:466
+#: views/generic/dates.py:467
 #, python-format
 msgid ""
 "Future %(verbose_name_plural)s not available because %(class_name)s."
 "allow_future is False."
 msgstr ""
-"Níl sa Todhchaí %(verbose_name_plural)s ar fáil toisc go bhfuil %(class_name)"
-"s.allow_future Bréagach."
+"Níl %(verbose_name_plural)s sa todhchaí ar fáil mar tá  %(class_name)s."
+"allow_future Bréagach."
 
-#: views/generic/dates.py:500
+#: views/generic/dates.py:501
 #, python-format
 msgid "Invalid date string '%(datestr)s' given format '%(format)s'"
 msgstr ""
-"Dáta neamhbhailí '%(datestr)s' le hadhaigh an fhormáid seo  '%(format)s'"
+"Teaghrán dáta neamhbhailí '%(datestr)s' nuair formáid '%(format)s' á húsáid"
 
 #: views/generic/detail.py:51
 #, python-format
 msgid "No %(verbose_name)s found matching the query"
 msgstr "Níl bhfuarthas %(verbose_name)s le hadhaigh an iarratas"
 
-#: views/generic/list.py:47
+#: views/generic/list.py:45
 msgid "Page is not 'last', nor can it be converted to an int."
 msgstr ""
-"Níl an leathanach 'deireanach', agus ní féidir é a thiontú go dtí slánuimhir."
+"Ní 'deireanach' é an leathanach, agus ní féidir é a thiontú go slánuimhir."
 
-#: views/generic/list.py:52
+#: views/generic/list.py:50
 #, python-format
 msgid "Invalid page (%(page_number)s)"
 msgstr "Leathanach neamhbhailí (%(page_number)s)"
 
-#: views/generic/list.py:119
+#: views/generic/list.py:117
 #, python-format
 msgid "Empty list and '%(class_name)s.allow_empty' is False."
-msgstr "Liosta Folamh agus tá '%(class_name)s .allow_empty' Bréagach."
+msgstr "Liosta folamh agus tá '%(class_name)s .allow_empty' Bréagach."
