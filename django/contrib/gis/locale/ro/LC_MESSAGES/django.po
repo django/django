@@ -1,19 +1,32 @@
 # This file is distributed under the same license as the Django package.
 #
+# Translators:
+# Daniel Ursache-Dogariu <contact@danniel.net>, 2011.
+# Denis Darii <sinednx@gmail.com>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-15 13:17-0400\n"
-"PO-Revision-Date: 2011-03-14 17:11+0000\n"
-"Last-Translator: danniel <contact@danniel.net>\n"
-"Language-Team: Romanian <None>\n"
+"POT-Creation-Date: 2012-03-14 00:19-0700\n"
+"PO-Revision-Date: 2012-03-08 12:32+0000\n"
+"Last-Translator: Daniel Ursache-Dogariu <contact@danniel.net>\n"
+"Language-Team: Romanian (http://www.transifex.net/projects/p/django/language/"
+"ro/)\n"
+"Language: ro\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: ro\n"
 "Plural-Forms: nplurals=3; plural=(n==1?0:(((n%100>19)||((n%100==0)&&(n!=0)))?"
 "2:1))\n"
+
+#: views.py:7
+msgid "No feeds are registered."
+msgstr ""
+
+#: views.py:17
+#, python-format
+msgid "Slug %r isn't registered."
+msgstr ""
 
 #: db/models/fields.py:50
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
@@ -67,3 +80,18 @@ msgid ""
 msgstr ""
 "A avut loc o eroare la transformarea geometriei în SRID-ul  câmpului "
 "geometric al formularului."
+
+#: sitemaps/views.py:44
+#, python-format
+msgid "No sitemap available for section: %r"
+msgstr ""
+
+#: sitemaps/views.py:58
+#, python-format
+msgid "Page %s empty"
+msgstr ""
+
+#: sitemaps/views.py:60
+#, python-format
+msgid "No page '%s'"
+msgstr ""

@@ -1,65 +1,94 @@
 # This file is distributed under the same license as the Django package.
 #
+# Translators:
+# Ali Ismayilov <ali@ismailov.info>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-15 13:15-0400\n"
-"PO-Revision-Date: 2011-03-04 18:46+0000\n"
-"Last-Translator: Jannis <jannis@leidel.info>\n"
-"Language-Team: Azerbaijani <None>\n"
+"POT-Creation-Date: 2012-03-14 00:17-0700\n"
+"PO-Revision-Date: 2012-03-08 12:32+0000\n"
+"Last-Translator: Ali Ismayilov <ali@ismailov.info>\n"
+"Language-Team: Azerbaijani (http://www.transifex.net/projects/p/django/"
+"language/az/)\n"
+"Language: az\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: az\n"
 "Plural-Forms: nplurals=1; plural=0\n"
+
+#: views.py:7
+msgid "No feeds are registered."
+msgstr ""
+
+#: views.py:17
+#, python-format
+msgid "Slug %r isn't registered."
+msgstr ""
 
 #: db/models/fields.py:50
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
 msgstr ""
+"Əsas GIS sahəsi OpenGIS Müəyyənləşdirmə Həndəsəsi tipinə uyğunlaşdırılır."
 
 #: db/models/fields.py:270
 msgid "Point"
-msgstr ""
+msgstr "Nöqtə"
 
 #: db/models/fields.py:274
 msgid "Line string"
-msgstr ""
+msgstr "Xətt"
 
 #: db/models/fields.py:278
 msgid "Polygon"
-msgstr ""
+msgstr "Poliqon"
 
 #: db/models/fields.py:282
 msgid "Multi-point"
-msgstr ""
+msgstr "Nöqtələr"
 
 #: db/models/fields.py:286
 msgid "Multi-line string"
-msgstr ""
+msgstr "Xətlər"
 
 #: db/models/fields.py:290
 msgid "Multi polygon"
-msgstr ""
+msgstr "Poliqonlar"
 
 #: db/models/fields.py:294
 msgid "Geometry collection"
-msgstr ""
+msgstr "Fiqurlar çoxluğu"
 
 #: forms/fields.py:17
 msgid "No geometry value provided."
-msgstr ""
+msgstr "Həndəsi qiyməti verilməyib."
 
 #: forms/fields.py:18
 msgid "Invalid geometry value."
-msgstr ""
+msgstr "Həndəsi qiyməti düzgün deyil."
 
 #: forms/fields.py:19
 msgid "Invalid geometry type."
-msgstr ""
+msgstr "Həndəsi tipi düzgün deyil."
 
 #: forms/fields.py:20
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."
+msgstr ""
+"Fiquru vərəqənin fiqur sahəsinin SRID qiymətinə çevirərkən xəta baş verdi."
+
+#: sitemaps/views.py:44
+#, python-format
+msgid "No sitemap available for section: %r"
+msgstr ""
+
+#: sitemaps/views.py:58
+#, python-format
+msgid "Page %s empty"
+msgstr ""
+
+#: sitemaps/views.py:60
+#, python-format
+msgid "No page '%s'"
 msgstr ""

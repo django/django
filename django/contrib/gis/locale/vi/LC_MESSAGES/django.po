@@ -1,18 +1,31 @@
 # This file is distributed under the same license as the Django package.
 #
+# Translators:
+# Tran  <hongdiepkien@gmail.com>, 2011.
+# Tran Van <vantxm@yahoo.co.uk>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-20 21:08+0100\n"
-"PO-Revision-Date: 2011-03-19 09:03+0000\n"
-"Last-Translator: vant <vantxm@yahoo.co.uk>\n"
-"Language-Team: Vietnamese <None>\n"
+"POT-Creation-Date: 2012-03-14 00:19-0700\n"
+"PO-Revision-Date: 2012-03-08 12:32+0000\n"
+"Last-Translator: Tran Van <vantxm@yahoo.co.uk>\n"
+"Language-Team: Vietnamese (http://www.transifex.net/projects/p/django/"
+"language/vi/)\n"
+"Language: vi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: vi\n"
 "Plural-Forms: nplurals=1; plural=0\n"
+
+#: views.py:7
+msgid "No feeds are registered."
+msgstr ""
+
+#: views.py:17
+#, python-format
+msgid "Slug %r isn't registered."
+msgstr ""
 
 #: db/models/fields.py:50
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
@@ -62,4 +75,19 @@ msgstr "Kiểu hình dạng không phù hợp"
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."
+msgstr ""
+
+#: sitemaps/views.py:44
+#, python-format
+msgid "No sitemap available for section: %r"
+msgstr ""
+
+#: sitemaps/views.py:58
+#, python-format
+msgid "Page %s empty"
+msgstr ""
+
+#: sitemaps/views.py:60
+#, python-format
+msgid "No page '%s'"
 msgstr ""
