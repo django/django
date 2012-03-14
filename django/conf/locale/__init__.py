@@ -365,6 +365,12 @@ LANG_INFO = {
         'name': 'Swedish',
         'name_local': u'Svenska',
     },
+    'sw': {
+        'bidi': False,
+        'code': 'sw',
+        'name': 'Swahili',
+        'name_local': u'Kiswahili',
+    },
     'ta': {
         'bidi': False,
         'code': 'ta',
