@@ -1,93 +1,112 @@
 # This file is distributed under the same license as the Django package.
 #
+# Translators:
+# Mansoorulhaq Mansoor <mansoorulhaq1986@gmail.com>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-15 13:14-0400\n"
-"PO-Revision-Date: 2011-03-15 15:28+0000\n"
-"Last-Translator: Django team\n"
-"Language-Team: Urdu <None>\n"
+"POT-Creation-Date: 2012-03-14 00:14-0700\n"
+"PO-Revision-Date: 2012-02-14 13:06+0000\n"
+"Last-Translator: Mansoorulhaq Mansoor <mansoorulhaq1986@gmail.com>\n"
+"Language-Team: Urdu (http://www.transifex.net/projects/p/django/language/"
+"ur/)\n"
+"Language: ur\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: ur\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
-#: views.py:63 views.py:65 views.py:67
+#: views.py:57 views.py:59 views.py:61
 msgid "tag:"
-msgstr ""
+msgstr "ٹیگ :"
 
-#: views.py:98 views.py:100 views.py:102
+#: views.py:92 views.py:94 views.py:96
 msgid "filter:"
-msgstr ""
+msgstr "فلٹر:"
 
-#: views.py:162 views.py:164 views.py:166
+#: views.py:155 views.py:157 views.py:159
 msgid "view:"
-msgstr ""
+msgstr "ویو:"
+
+#: views.py:187
+#, python-format
+msgid "App %r not found"
+msgstr "ایپلیکیشن %r نہیں ملی"
 
 #: views.py:194
 #, python-format
-msgid "App %r not found"
-msgstr ""
-
-#: views.py:201
-#, python-format
 msgid "Model %(model_name)r not found in app %(app_label)r"
-msgstr ""
+msgstr "ماڈل %(model_name)r ایپ %(app_label)r میں نہیں ملا"
 
-#: views.py:213
+#: views.py:206
 #, python-format
 msgid "the related `%(app_label)s.%(data_type)s` object"
-msgstr ""
+msgstr "متعلقہ `%(app_label)s.%(data_type)s`اوبجیکٹ"
 
-#: views.py:213 views.py:232 views.py:237 views.py:251 views.py:265
-#: views.py:270
+#: views.py:206 views.py:225 views.py:230 views.py:244 views.py:258
+#: views.py:263
 msgid "model:"
-msgstr ""
+msgstr "model:"
 
-#: views.py:228 views.py:260
+#: views.py:221 views.py:253
 #, python-format
 msgid "related `%(app_label)s.%(object_name)s` objects"
-msgstr ""
+msgstr "متعلقہ `%(app_label)s.%(object_name)s` اوبجیکٹس"
 
-#: views.py:232 views.py:265
+#: views.py:225 views.py:258
 #, python-format
 msgid "all %s"
-msgstr ""
+msgstr "تمام %s"
 
-#: views.py:237 views.py:270
+#: views.py:230 views.py:263
 #, python-format
 msgid "number of %s"
-msgstr ""
+msgstr "%sکی تعداد "
 
-#: views.py:275
+#: views.py:268
 #, python-format
 msgid "Fields on %s objects"
-msgstr ""
+msgstr "%s اوبجیکٹ پر فیلڈز"
 
-#: views.py:365
+#: views.py:360
 #, python-format
 msgid "%s does not appear to be a urlpattern object"
-msgstr ""
+msgstr "%s بطور urlpattern ظاہر نہیں ہو رہا۔"
 
-#: templates/admin_doc/bookmarklets.html:3
+#: templates/admin_doc/bookmarklets.html:7 templates/admin_doc/index.html:7
+#: templates/admin_doc/missing_docutils.html:7
+#: templates/admin_doc/model_detail.html:15
+#: templates/admin_doc/model_index.html:9
+#: templates/admin_doc/template_detail.html:7
+#: templates/admin_doc/template_filter_index.html:8
+#: templates/admin_doc/template_tag_index.html:8
+#: templates/admin_doc/view_detail.html:7
+#: templates/admin_doc/view_index.html:8
 msgid "Home"
-msgstr ""
+msgstr "صفحۂ اول"
 
-#: templates/admin_doc/bookmarklets.html:3
+#: templates/admin_doc/bookmarklets.html:8 templates/admin_doc/index.html:8
+#: templates/admin_doc/missing_docutils.html:8
+#: templates/admin_doc/model_detail.html:16
+#: templates/admin_doc/model_index.html:10
+#: templates/admin_doc/template_detail.html:8
+#: templates/admin_doc/template_filter_index.html:9
+#: templates/admin_doc/template_tag_index.html:9
+#: templates/admin_doc/view_detail.html:8
+#: templates/admin_doc/view_index.html:9
 msgid "Documentation"
-msgstr ""
+msgstr "طریق استعمال"
 
-#: templates/admin_doc/bookmarklets.html:3
+#: templates/admin_doc/bookmarklets.html:9
 msgid "Bookmarklets"
-msgstr ""
+msgstr "بک مارک لیٹس"
 
-#: templates/admin_doc/bookmarklets.html:4
+#: templates/admin_doc/bookmarklets.html:12
 msgid "Documentation bookmarklets"
-msgstr ""
+msgstr "طریق استعمال کے بک مارک لیٹس"
 
-#: templates/admin_doc/bookmarklets.html:8
+#: templates/admin_doc/bookmarklets.html:16
 msgid ""
 "\n"
 "<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
@@ -97,39 +116,77 @@ msgid ""
 "as \"internal\" (talk to your system administrator if you aren't sure if\n"
 "your computer is \"internal\").</p>\n"
 msgstr ""
+"\n"
+"<p class=\"help\">بک مارک لیٹس کی تنصیب کے لئے،لنک کو اپنے بک مارکس ٹولبار\n"
+"کی طرف ڈریگ کریں، یا لنک پر دائیں کلک کریں اسے اپنے بک مارکس میں جمع کریں۔ "
+"اب آپ\n"
+"سائٹ کے کسی بھی صفحے سے بک مارک لیٹ منتخب کر سکتے ہیں۔ نوٹ کریں کہ ان میں \n"
+"سے کچھ بک مارک لیٹس کے لئے آپ کو ضرورت ہے کہ آپ سائٹ کو ایسے کمپیوٹر سے دیکھ "
+"رہے\n"
+"جو بطور \"internal\" ڈیزائن کیا گیا ہو۔ (اگر آپ کو یقین نہ ہو کہ آپ کا "
+"کمپیوٹر \"internal\" ہے تو اپنے\n"
+"سسٹم کے منتظم سے رابطہ کریں)۔ </p>\n"
 
-#: templates/admin_doc/bookmarklets.html:18
+#: templates/admin_doc/bookmarklets.html:26
 msgid "Documentation for this page"
-msgstr ""
+msgstr "اس صفحے کا طریق استعمال"
 
-#: templates/admin_doc/bookmarklets.html:19
+#: templates/admin_doc/bookmarklets.html:27
 msgid ""
 "Jumps you from any page to the documentation for the view that generates "
 "that page."
 msgstr ""
+"آپ کو لے جاتا ہے کسی بھی صفحے سے طریق استعمال کی طرف اس ویو کے لئے جو اس "
+"صفحے کو بناتا ہے۔"
 
-#: templates/admin_doc/bookmarklets.html:21
+#: templates/admin_doc/bookmarklets.html:29
 msgid "Show object ID"
-msgstr ""
+msgstr "اوبجیکٹ کی آئی ڈی دکھائیں"
 
-#: templates/admin_doc/bookmarklets.html:22
+#: templates/admin_doc/bookmarklets.html:30
 msgid ""
 "Shows the content-type and unique ID for pages that represent a single "
 "object."
 msgstr ""
+"مضمون کی قسم اور منفرد آئی ڈی دکھاتا ہے ان صفحوں کے لئے جو سنگل اوبجیکٹ کی "
+"نمائندگی کرتے ہیں۔"
 
-#: templates/admin_doc/bookmarklets.html:24
+#: templates/admin_doc/bookmarklets.html:32
 msgid "Edit this object (current window)"
-msgstr ""
+msgstr "اس اوبجیکٹ کو ایڈٹ کریں (موجودہ ونڈو)"
 
-#: templates/admin_doc/bookmarklets.html:25
+#: templates/admin_doc/bookmarklets.html:33
 msgid "Jumps to the admin page for pages that represent a single object."
 msgstr ""
+"منتظم کے صفحے کی طرف جمپ کرتا ھے ان صفحوں کے لئے سنگل اوبجیکٹ کی نمائندگی "
+"کرتے ہیں۔"
 
-#: templates/admin_doc/bookmarklets.html:27
+#: templates/admin_doc/bookmarklets.html:35
 msgid "Edit this object (new window)"
+msgstr "اس اوبجیکٹ کو ایڈٹ کریں (نئی ونڈو)"
+
+#: templates/admin_doc/bookmarklets.html:36
+msgid "As above, but opens the admin page in a new window."
+msgstr "اوپر کی طرح ھے۔ لیکن منتظم کے صفحے کو نئی ونڈو میں کھولتا ھے۔"
+
+#: templates/admin_doc/model_detail.html:17
+#: templates/admin_doc/model_index.html:11
+msgid "Models"
 msgstr ""
 
-#: templates/admin_doc/bookmarklets.html:28
-msgid "As above, but opens the admin page in a new window."
+#: templates/admin_doc/template_detail.html:9
+msgid "Templates"
+msgstr ""
+
+#: templates/admin_doc/template_filter_index.html:10
+msgid "Filters"
+msgstr ""
+
+#: templates/admin_doc/template_tag_index.html:10
+msgid "Tags"
+msgstr ""
+
+#: templates/admin_doc/view_detail.html:9
+#: templates/admin_doc/view_index.html:10
+msgid "Views"
 msgstr ""

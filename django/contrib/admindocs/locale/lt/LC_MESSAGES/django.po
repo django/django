@@ -1,94 +1,115 @@
 # This file is distributed under the same license as the Django package.
 #
+# Translators:
+# Jannis Leidel <jannis@leidel.info>, 2011.
+# lauris <lauris@runbox.com>, 2011.
+# Simonas Simas <simonas@kazlauskas.me>, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-15 13:14-0400\n"
-"PO-Revision-Date: 2011-03-06 09:22+0000\n"
-"Last-Translator: lauris <lauris@runbox.com>\n"
-"Language-Team: Lithuanian <None>\n"
+"POT-Creation-Date: 2012-03-14 00:14-0700\n"
+"PO-Revision-Date: 2012-03-09 15:11+0000\n"
+"Last-Translator: Simonas Simas <simonas@kazlauskas.me>\n"
+"Language-Team: Lithuanian (http://www.transifex.net/projects/p/django/"
+"language/lt/)\n"
+"Language: lt\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: lt\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n%"
-"100<10 || n%100>=20) ? 1 : 2)\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n"
+"%100<10 || n%100>=20) ? 1 : 2)\n"
 
-#: views.py:63 views.py:65 views.py:67
+#: views.py:57 views.py:59 views.py:61
 msgid "tag:"
 msgstr "žyme:"
 
-#: views.py:98 views.py:100 views.py:102
+#: views.py:92 views.py:94 views.py:96
 msgid "filter:"
 msgstr "filtras:"
 
-#: views.py:162 views.py:164 views.py:166
+#: views.py:155 views.py:157 views.py:159
 msgid "view:"
 msgstr "vaizdas:"
 
-#: views.py:194
+#: views.py:187
 #, python-format
 msgid "App %r not found"
 msgstr "Programa %r nerasta"
 
-#: views.py:201
+#: views.py:194
 #, python-format
 msgid "Model %(model_name)r not found in app %(app_label)r"
 msgstr "Modelis %(model_name)r programoje %(app_label)r nerastas"
 
-#: views.py:213
+#: views.py:206
 #, python-format
 msgid "the related `%(app_label)s.%(data_type)s` object"
 msgstr "susijęs `%(app_label)s.%(data_type)s` objektas"
 
-#: views.py:213 views.py:232 views.py:237 views.py:251 views.py:265
-#: views.py:270
+#: views.py:206 views.py:225 views.py:230 views.py:244 views.py:258
+#: views.py:263
 msgid "model:"
 msgstr "modelis:"
 
-#: views.py:228 views.py:260
+#: views.py:221 views.py:253
 #, python-format
 msgid "related `%(app_label)s.%(object_name)s` objects"
 msgstr "susiję`%(app_label)s.%(object_name)s` objektai"
 
-#: views.py:232 views.py:265
+#: views.py:225 views.py:258
 #, python-format
 msgid "all %s"
 msgstr "visi %s"
 
-#: views.py:237 views.py:270
+#: views.py:230 views.py:263
 #, python-format
 msgid "number of %s"
 msgstr "%s skaičius"
 
-#: views.py:275
+#: views.py:268
 #, python-format
 msgid "Fields on %s objects"
 msgstr "Objekto %s laukai"
 
-#: views.py:365
+#: views.py:360
 #, python-format
 msgid "%s does not appear to be a urlpattern object"
 msgstr "%s neatrodo kaip urlpattern objektas"
 
-#: templates/admin_doc/bookmarklets.html:3
+#: templates/admin_doc/bookmarklets.html:7 templates/admin_doc/index.html:7
+#: templates/admin_doc/missing_docutils.html:7
+#: templates/admin_doc/model_detail.html:15
+#: templates/admin_doc/model_index.html:9
+#: templates/admin_doc/template_detail.html:7
+#: templates/admin_doc/template_filter_index.html:8
+#: templates/admin_doc/template_tag_index.html:8
+#: templates/admin_doc/view_detail.html:7
+#: templates/admin_doc/view_index.html:8
 msgid "Home"
 msgstr "Pradinis"
 
-#: templates/admin_doc/bookmarklets.html:3
+#: templates/admin_doc/bookmarklets.html:8 templates/admin_doc/index.html:8
+#: templates/admin_doc/missing_docutils.html:8
+#: templates/admin_doc/model_detail.html:16
+#: templates/admin_doc/model_index.html:10
+#: templates/admin_doc/template_detail.html:8
+#: templates/admin_doc/template_filter_index.html:9
+#: templates/admin_doc/template_tag_index.html:9
+#: templates/admin_doc/view_detail.html:8
+#: templates/admin_doc/view_index.html:9
 msgid "Documentation"
 msgstr "Dokumentacija"
 
-#: templates/admin_doc/bookmarklets.html:3
+#: templates/admin_doc/bookmarklets.html:9
 msgid "Bookmarklets"
 msgstr "Greitosios žymės"
 
-#: templates/admin_doc/bookmarklets.html:4
+#: templates/admin_doc/bookmarklets.html:12
 msgid "Documentation bookmarklets"
 msgstr "Doumentacijos greitosios žymės"
 
-#: templates/admin_doc/bookmarklets.html:8
+#: templates/admin_doc/bookmarklets.html:16
 msgid ""
 "\n"
 "<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
@@ -109,11 +130,11 @@ msgstr ""
 "(pasitarkite su administratorium, jei nežinai ar tavo kompiuteris yra "
 "vidinis).</p>\n"
 
-#: templates/admin_doc/bookmarklets.html:18
+#: templates/admin_doc/bookmarklets.html:26
 msgid "Documentation for this page"
 msgstr "Šio puslapio dokumentacija"
 
-#: templates/admin_doc/bookmarklets.html:19
+#: templates/admin_doc/bookmarklets.html:27
 msgid ""
 "Jumps you from any page to the documentation for the view that generates "
 "that page."
@@ -121,29 +142,51 @@ msgstr ""
 "Pereina iš bet kurio puslapio į jo view funkcijos dokumentaciją, kuri "
 "sukūria tą puslapį"
 
-#: templates/admin_doc/bookmarklets.html:21
+#: templates/admin_doc/bookmarklets.html:29
 msgid "Show object ID"
 msgstr "Parodyti objekto ID"
 
-#: templates/admin_doc/bookmarklets.html:22
+#: templates/admin_doc/bookmarklets.html:30
 msgid ""
 "Shows the content-type and unique ID for pages that represent a single "
 "object."
 msgstr ""
 "Parodyti content-type ir unikalų puslapių ID, kuris parodo vieną objektą."
 
-#: templates/admin_doc/bookmarklets.html:24
+#: templates/admin_doc/bookmarklets.html:32
 msgid "Edit this object (current window)"
 msgstr "Redaguoti šį objektą (einamajame lange)"
 
-#: templates/admin_doc/bookmarklets.html:25
+#: templates/admin_doc/bookmarklets.html:33
 msgid "Jumps to the admin page for pages that represent a single object."
 msgstr "Pereina į administravimo puslapį, kuris parodo vieną objektą."
 
-#: templates/admin_doc/bookmarklets.html:27
+#: templates/admin_doc/bookmarklets.html:35
 msgid "Edit this object (new window)"
 msgstr "Redaguoti šį objektą (naujame lange)"
 
-#: templates/admin_doc/bookmarklets.html:28
+#: templates/admin_doc/bookmarklets.html:36
 msgid "As above, but opens the admin page in a new window."
 msgstr "Kaip ir viršuje, bet administravimo puslapį atidaro naujame lange."
+
+#: templates/admin_doc/model_detail.html:17
+#: templates/admin_doc/model_index.html:11
+msgid "Models"
+msgstr "Modeliai"
+
+#: templates/admin_doc/template_detail.html:9
+msgid "Templates"
+msgstr "Šablonai"
+
+#: templates/admin_doc/template_filter_index.html:10
+msgid "Filters"
+msgstr "Filtrai"
+
+#: templates/admin_doc/template_tag_index.html:10
+msgid "Tags"
+msgstr "Gairės"
+
+#: templates/admin_doc/view_detail.html:9
+#: templates/admin_doc/view_index.html:10
+msgid "Views"
+msgstr "Rodiniai"

@@ -1,93 +1,113 @@
 # This file is distributed under the same license as the Django package.
 #
+# Translators:
+# chandankumar(ciypro) <chandankumar.093047@gmail.com>, 2012.
+# Jannis Leidel <jannis@leidel.info>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-15 13:14-0400\n"
-"PO-Revision-Date: 2011-03-04 18:37+0000\n"
-"Last-Translator: Jannis <jannis@leidel.info>\n"
-"Language-Team: Hindi <None>\n"
+"POT-Creation-Date: 2012-03-14 00:14-0700\n"
+"PO-Revision-Date: 2012-03-04 14:36+0000\n"
+"Last-Translator: Chandan kumar <chandankumar.093047@gmail.com>\n"
+"Language-Team: Hindi (http://www.transifex.net/projects/p/django/language/"
+"hi/)\n"
+"Language: hi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: hi\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
-#: views.py:63 views.py:65 views.py:67
+#: views.py:57 views.py:59 views.py:61
 msgid "tag:"
 msgstr "टैग:"
 
-#: views.py:98 views.py:100 views.py:102
+#: views.py:92 views.py:94 views.py:96
 msgid "filter:"
 msgstr "छन्नी:"
 
-#: views.py:162 views.py:164 views.py:166
+#: views.py:155 views.py:157 views.py:159
 msgid "view:"
 msgstr "दृष्टि:"
 
-#: views.py:194
+#: views.py:187
 #, python-format
 msgid "App %r not found"
 msgstr "%r अनुप्रयोग लापता है"
 
-#: views.py:201
+#: views.py:194
 #, python-format
 msgid "Model %(model_name)r not found in app %(app_label)r"
 msgstr "%(model_name)r मॉडल %(app_label)r अनुप्रयोग में लापता है"
 
-#: views.py:213
+#: views.py:206
 #, python-format
 msgid "the related `%(app_label)s.%(data_type)s` object"
 msgstr "`%(app_label)s.%(data_type)s` संबंधित वस्तु"
 
-#: views.py:213 views.py:232 views.py:237 views.py:251 views.py:265
-#: views.py:270
+#: views.py:206 views.py:225 views.py:230 views.py:244 views.py:258
+#: views.py:263
 msgid "model:"
 msgstr "मॉडल :"
 
-#: views.py:228 views.py:260
+#: views.py:221 views.py:253
 #, python-format
 msgid "related `%(app_label)s.%(object_name)s` objects"
 msgstr "`%(app_label)s.%(object_name)s` संबंधित वस्तु"
 
-#: views.py:232 views.py:265
+#: views.py:225 views.py:258
 #, python-format
 msgid "all %s"
 msgstr "सभी %s"
 
-#: views.py:237 views.py:270
+#: views.py:230 views.py:263
 #, python-format
 msgid "number of %s"
 msgstr "%s संख्या"
 
-#: views.py:275
+#: views.py:268
 #, python-format
 msgid "Fields on %s objects"
 msgstr "%s वस्तु पर क्षेत्र"
 
-#: views.py:365
+#: views.py:360
 #, python-format
 msgid "%s does not appear to be a urlpattern object"
 msgstr "%s सही यू.आऱ.एल प्रतिरूप वस्तु नहीं है"
 
-#: templates/admin_doc/bookmarklets.html:3
+#: templates/admin_doc/bookmarklets.html:7 templates/admin_doc/index.html:7
+#: templates/admin_doc/missing_docutils.html:7
+#: templates/admin_doc/model_detail.html:15
+#: templates/admin_doc/model_index.html:9
+#: templates/admin_doc/template_detail.html:7
+#: templates/admin_doc/template_filter_index.html:8
+#: templates/admin_doc/template_tag_index.html:8
+#: templates/admin_doc/view_detail.html:7
+#: templates/admin_doc/view_index.html:8
 msgid "Home"
 msgstr "गृह"
 
-#: templates/admin_doc/bookmarklets.html:3
+#: templates/admin_doc/bookmarklets.html:8 templates/admin_doc/index.html:8
+#: templates/admin_doc/missing_docutils.html:8
+#: templates/admin_doc/model_detail.html:16
+#: templates/admin_doc/model_index.html:10
+#: templates/admin_doc/template_detail.html:8
+#: templates/admin_doc/template_filter_index.html:9
+#: templates/admin_doc/template_tag_index.html:9
+#: templates/admin_doc/view_detail.html:8
+#: templates/admin_doc/view_index.html:9
 msgid "Documentation"
 msgstr "दस्तावेज़ीकरण"
 
-#: templates/admin_doc/bookmarklets.html:3
+#: templates/admin_doc/bookmarklets.html:9
 msgid "Bookmarklets"
 msgstr "बुकमार्कलेट्स"
 
-#: templates/admin_doc/bookmarklets.html:4
+#: templates/admin_doc/bookmarklets.html:12
 msgid "Documentation bookmarklets"
 msgstr "प्रलेखन बुकमार्कलेट्स"
 
-#: templates/admin_doc/bookmarklets.html:8
+#: templates/admin_doc/bookmarklets.html:16
 msgid ""
 "\n"
 "<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
@@ -97,39 +117,71 @@ msgid ""
 "as \"internal\" (talk to your system administrator if you aren't sure if\n"
 "your computer is \"internal\").</p>\n"
 msgstr ""
+"\n"
+"<p class=\"help\">पृष्ठचिन्हक स्थापित करने के लिए,अपने बुकमार्क टूलबार के लिए लिंक\n"
+"को खींचें,या लिंक पर दायाँ क्लिक करें और इसे आपके बुकमार्क्स में जोड़ें. अब आप इस साइट में \n"
+"किसी भी पृष्ठ से बुकमार्कलेट का चयन कर सकते हैं.  ध्यान दें इनमें से कुछ पृष्ठचिन्हको को\n"
+"आपकी आवश्यकता है जो \"आंतरिक\" (अपने सिस्टम व्यवस्थापक से बात करे अगर आपको यकीन नहीं "
+"है\n"
+"कि आपका कंप्यूटर \"आंतरिक\" है)  रूप में निर्दिष्ट कंप्यूटर से\n"
+"साइट को देखना चाहते है.</p>\n"
 
-#: templates/admin_doc/bookmarklets.html:18
+#: templates/admin_doc/bookmarklets.html:26
 msgid "Documentation for this page"
 msgstr "इस पृष्ठ की प्रलेखन"
 
-#: templates/admin_doc/bookmarklets.html:19
+#: templates/admin_doc/bookmarklets.html:27
 msgid ""
 "Jumps you from any page to the documentation for the view that generates "
 "that page."
-msgstr ""
+msgstr "दृश्य जो उस पृष्ठ को उत्पन्न करता है के प्रलेखन के लिए किसी भी पृष्ठ पर जा सकते है."
 
-#: templates/admin_doc/bookmarklets.html:21
+#: templates/admin_doc/bookmarklets.html:29
 msgid "Show object ID"
 msgstr "वस्तु आइ.डी दिखाओ"
 
-#: templates/admin_doc/bookmarklets.html:22
+#: templates/admin_doc/bookmarklets.html:30
 msgid ""
 "Shows the content-type and unique ID for pages that represent a single "
 "object."
 msgstr ""
+"पृष्ठों के लिए सामग्री प्रकार और अनोखी आईडी जो एक एकल वस्तु का प्रतिनिधित्व करते हैं को "
+"दर्शाते है."
 
-#: templates/admin_doc/bookmarklets.html:24
+#: templates/admin_doc/bookmarklets.html:32
 msgid "Edit this object (current window)"
 msgstr "इस वस्तु को संपादन करें (इस खिडकी में)"
 
-#: templates/admin_doc/bookmarklets.html:25
+#: templates/admin_doc/bookmarklets.html:33
 msgid "Jumps to the admin page for pages that represent a single object."
-msgstr ""
+msgstr "पृष्ठों के लिए एडमिन प्रष्ट जो एक एकल वस्तु का प्रतिनिधित्व करते हैं से जाये. "
 
-#: templates/admin_doc/bookmarklets.html:27
+#: templates/admin_doc/bookmarklets.html:35
 msgid "Edit this object (new window)"
 msgstr "इस वस्तु को संपादन करें (नये खिडकी में)"
 
-#: templates/admin_doc/bookmarklets.html:28
+#: templates/admin_doc/bookmarklets.html:36
 msgid "As above, but opens the admin page in a new window."
-msgstr ""
+msgstr "जैसा कि ऊपर में,लेकिन एक नई विंडों में एडमिन पृष्ठ को खोलता है."
+
+#: templates/admin_doc/model_detail.html:17
+#: templates/admin_doc/model_index.html:11
+msgid "Models"
+msgstr "मॉडल"
+
+#: templates/admin_doc/template_detail.html:9
+msgid "Templates"
+msgstr "प्रारूप"
+
+#: templates/admin_doc/template_filter_index.html:10
+msgid "Filters"
+msgstr "फ़िल्टर्स"
+
+#: templates/admin_doc/template_tag_index.html:10
+msgid "Tags"
+msgstr "टैग्स"
+
+#: templates/admin_doc/view_detail.html:9
+#: templates/admin_doc/view_index.html:10
+msgid "Views"
+msgstr "दृश्य"

@@ -1,93 +1,113 @@
 # This file is distributed under the same license as the Django package.
 #
+# Translators:
+# Ali Nikneshan <ali@nikneshan.com>, 2011.
+# Jannis Leidel <jannis@leidel.info>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-15 13:13-0400\n"
-"PO-Revision-Date: 2011-03-04 18:37+0000\n"
-"Last-Translator: Jannis <jannis@leidel.info>\n"
-"Language-Team: Persian <None>\n"
+"POT-Creation-Date: 2012-03-14 00:14-0700\n"
+"PO-Revision-Date: 2012-02-14 13:06+0000\n"
+"Last-Translator: Ali Nikneshan <ali@nikneshan.com>\n"
+"Language-Team: Persian (http://www.transifex.net/projects/p/django/language/"
+"fa/)\n"
+"Language: fa\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: fa\n"
 "Plural-Forms: nplurals=1; plural=0\n"
 
-#: views.py:63 views.py:65 views.py:67
+#: views.py:57 views.py:59 views.py:61
 msgid "tag:"
 msgstr "برچسب:"
 
-#: views.py:98 views.py:100 views.py:102
+#: views.py:92 views.py:94 views.py:96
 msgid "filter:"
 msgstr "فیلتر"
 
-#: views.py:162 views.py:164 views.py:166
+#: views.py:155 views.py:157 views.py:159
 msgid "view:"
 msgstr "نمایش:"
 
-#: views.py:194
+#: views.py:187
 #, python-format
 msgid "App %r not found"
 msgstr "برنامهٔ %r یافت نشد"
 
-#: views.py:201
+#: views.py:194
 #, python-format
 msgid "Model %(model_name)r not found in app %(app_label)r"
 msgstr "مدل %(model_name)r در برنامهٔ %(app_label)r یافت نشد"
 
-#: views.py:213
+#: views.py:206
 #, python-format
 msgid "the related `%(app_label)s.%(data_type)s` object"
 msgstr "شیء «%(app_label)s.%(data_type)s» مرتبط"
 
-#: views.py:213 views.py:232 views.py:237 views.py:251 views.py:265
-#: views.py:270
+#: views.py:206 views.py:225 views.py:230 views.py:244 views.py:258
+#: views.py:263
 msgid "model:"
 msgstr "مدل:"
 
-#: views.py:228 views.py:260
+#: views.py:221 views.py:253
 #, python-format
 msgid "related `%(app_label)s.%(object_name)s` objects"
 msgstr "اشیاء «%(app_label)s.%(object_name)s» مرتبط"
 
-#: views.py:232 views.py:265
+#: views.py:225 views.py:258
 #, python-format
 msgid "all %s"
 msgstr "همهٔ %s"
 
-#: views.py:237 views.py:270
+#: views.py:230 views.py:263
 #, python-format
 msgid "number of %s"
 msgstr "تعداد %s"
 
-#: views.py:275
+#: views.py:268
 #, python-format
 msgid "Fields on %s objects"
 msgstr "فیلدهای شیء %s"
 
-#: views.py:365
+#: views.py:360
 #, python-format
 msgid "%s does not appear to be a urlpattern object"
 msgstr "به نظر نمی رسد %s یک شیء از نوع urlpattern باشد"
 
-#: templates/admin_doc/bookmarklets.html:3
+#: templates/admin_doc/bookmarklets.html:7 templates/admin_doc/index.html:7
+#: templates/admin_doc/missing_docutils.html:7
+#: templates/admin_doc/model_detail.html:15
+#: templates/admin_doc/model_index.html:9
+#: templates/admin_doc/template_detail.html:7
+#: templates/admin_doc/template_filter_index.html:8
+#: templates/admin_doc/template_tag_index.html:8
+#: templates/admin_doc/view_detail.html:7
+#: templates/admin_doc/view_index.html:8
 msgid "Home"
 msgstr "آغازه"
 
-#: templates/admin_doc/bookmarklets.html:3
+#: templates/admin_doc/bookmarklets.html:8 templates/admin_doc/index.html:8
+#: templates/admin_doc/missing_docutils.html:8
+#: templates/admin_doc/model_detail.html:16
+#: templates/admin_doc/model_index.html:10
+#: templates/admin_doc/template_detail.html:8
+#: templates/admin_doc/template_filter_index.html:9
+#: templates/admin_doc/template_tag_index.html:9
+#: templates/admin_doc/view_detail.html:8
+#: templates/admin_doc/view_index.html:9
 msgid "Documentation"
 msgstr "مستندات"
 
-#: templates/admin_doc/bookmarklets.html:3
+#: templates/admin_doc/bookmarklets.html:9
 msgid "Bookmarklets"
-msgstr ""
+msgstr "Bookmarklet ها"
 
-#: templates/admin_doc/bookmarklets.html:4
+#: templates/admin_doc/bookmarklets.html:12
 msgid "Documentation bookmarklets"
-msgstr ""
+msgstr "مستندات bookmarklet ها"
 
-#: templates/admin_doc/bookmarklets.html:8
+#: templates/admin_doc/bookmarklets.html:16
 msgid ""
 "\n"
 "<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
@@ -98,40 +118,62 @@ msgid ""
 "your computer is \"internal\").</p>\n"
 msgstr ""
 
-#: templates/admin_doc/bookmarklets.html:18
+#: templates/admin_doc/bookmarklets.html:26
 msgid "Documentation for this page"
 msgstr "مستندات این صفحه"
 
-#: templates/admin_doc/bookmarklets.html:19
+#: templates/admin_doc/bookmarklets.html:27
 msgid ""
 "Jumps you from any page to the documentation for the view that generates "
 "that page."
 msgstr ""
 "شما را از هر صفحه‌ای که باشید به مستندات نمایی که صفحه را ایجاد کرده می‌برد"
 
-#: templates/admin_doc/bookmarklets.html:21
+#: templates/admin_doc/bookmarklets.html:29
 msgid "Show object ID"
 msgstr "نمایش مشخصهٔ شیء"
 
-#: templates/admin_doc/bookmarklets.html:22
+#: templates/admin_doc/bookmarklets.html:30
 msgid ""
 "Shows the content-type and unique ID for pages that represent a single "
 "object."
 msgstr ""
 "نمایش محتوا و مشخصهٔ منحصر به فرد برای صفحاتی که یک شیء را نمایش می‌دهند."
 
-#: templates/admin_doc/bookmarklets.html:24
+#: templates/admin_doc/bookmarklets.html:32
 msgid "Edit this object (current window)"
 msgstr "ویرایش این شیء (پنجرهٔ کنونی)"
 
-#: templates/admin_doc/bookmarklets.html:25
+#: templates/admin_doc/bookmarklets.html:33
 msgid "Jumps to the admin page for pages that represent a single object."
 msgstr "پرش به صفحهٔ مدیر برای صفحاتی که یک شیء را نمایش می‌دهند."
 
-#: templates/admin_doc/bookmarklets.html:27
+#: templates/admin_doc/bookmarklets.html:35
 msgid "Edit this object (new window)"
 msgstr "ویرایش این شیء (پنجرهٔ جدید)"
 
-#: templates/admin_doc/bookmarklets.html:28
+#: templates/admin_doc/bookmarklets.html:36
 msgid "As above, but opens the admin page in a new window."
 msgstr "مانند بالا، اما صفحهٔ مدیر را در پنجرهٔ جدیدی باز می‌کند."
+
+#: templates/admin_doc/model_detail.html:17
+#: templates/admin_doc/model_index.html:11
+msgid "Models"
+msgstr ""
+
+#: templates/admin_doc/template_detail.html:9
+msgid "Templates"
+msgstr ""
+
+#: templates/admin_doc/template_filter_index.html:10
+msgid "Filters"
+msgstr ""
+
+#: templates/admin_doc/template_tag_index.html:10
+msgid "Tags"
+msgstr ""
+
+#: templates/admin_doc/view_detail.html:9
+#: templates/admin_doc/view_index.html:10
+msgid "Views"
+msgstr ""
