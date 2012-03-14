@@ -77,6 +77,12 @@ LANG_INFO = {
         'name': 'British English',
         'name_local': u'British English',
     },
+    'eo': {
+        'bidi': False,
+        'code': 'eo',
+        'name': 'Esperanto',
+        'name_local': u'Esperanto',
+    },
     'es': {
         'bidi': False,
         'code': 'es',
