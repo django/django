@@ -1,31 +1,39 @@
 # This file is distributed under the same license as the Django package.
 #
+# Translators:
+# Jannis Leidel <jannis@leidel.info>, 2011.
+# Nicola Larosa <transifex@teknico.net>, 2011, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-15 13:15-0400\n"
-"PO-Revision-Date: 2011-03-08 17:27+0000\n"
-"Last-Translator: teknico <transifex@teknico.net>\n"
-"Language-Team: Italian <>\n"
+"POT-Creation-Date: 2012-03-14 00:16-0700\n"
+"PO-Revision-Date: 2012-03-08 12:31+0000\n"
+"Last-Translator: Nicola Larosa <transifex@teknico.net>\n"
+"Language-Team: Italian (http://www.transifex.net/projects/p/django/language/"
+"it/)\n"
+"Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: it\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
-#: admin.py:8 models.py:7
+#: admin.py:10
+msgid "Advanced options"
+msgstr "Opzioni avanzate"
+
+#: forms.py:7 models.py:7
 msgid "URL"
 msgstr "URL"
 
-#: admin.py:9
+#: forms.py:8
 msgid ""
 "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
 msgstr ""
 "Esempio: '/about/contact/'. Assicurati di inserire le barre diagonali "
 "iniziali e finali."
 
-#: admin.py:11
+#: forms.py:10
 msgid ""
 "This value must contain only letters, numbers, dots, underscores, dashes, "
 "slashes or tildes."
@@ -33,9 +41,18 @@ msgstr ""
 "Questo valore deve contenere solo lettere, numeri, punti, underscore, "
 "trattini, barre diagonali o tilde."
 
-#: admin.py:22
-msgid "Advanced options"
-msgstr "Opzioni avanzate"
+#: forms.py:19
+msgid "URL is missing a leading slash."
+msgstr "Manca una barra iniziale nella URL."
+
+#: forms.py:23
+msgid "URL is missing a trailing slash."
+msgstr "Manca una barra finale nella URL."
+
+#: forms.py:38
+#, python-format
+msgid "Flatpage with url %(url)s already exists for site %(site)s"
+msgstr "La flatpage con url %(url)s esiste già per il sito %(site)s"
 
 #: models.py:8
 msgid "title"

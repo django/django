@@ -1,39 +1,56 @@
 # This file is distributed under the same license as the Django package.
 #
+# Translators:
+# Jannis Leidel <jannis@leidel.info>, 2011.
+# Ossama Khayat <okhayat@gmail.com>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-20 21:05+0100\n"
-"PO-Revision-Date: 2011-03-17 17:52+0000\n"
-"Last-Translator: okhayat <okhayat@gmail.com>\n"
-"Language-Team: Arabic <None>\n"
+"POT-Creation-Date: 2012-03-14 00:16-0700\n"
+"PO-Revision-Date: 2012-03-08 12:31+0000\n"
+"Last-Translator: Ossama Khayat <okhayat@gmail.com>\n"
+"Language-Team: Arabic (http://www.transifex.net/projects/p/django/language/"
+"ar/)\n"
+"Language: ar\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: ar\n"
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
 "&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5\n"
 
-#: admin.py:8 models.py:7
+#: admin.py:10
+msgid "Advanced options"
+msgstr "خيارات متقدّمة"
+
+#: forms.py:7 models.py:7
 msgid "URL"
 msgstr "رابط"
 
-#: admin.py:9
+#: forms.py:8
 msgid ""
 "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
 msgstr "مثال: '/about/contact/'. تأكد من وضع شرطات في البداية والنهاية."
 
-#: admin.py:11
+#: forms.py:10
 msgid ""
 "This value must contain only letters, numbers, dots, underscores, dashes, "
 "slashes or tildes."
 msgstr ""
 "يجب أن تحتوي هذه القيمة الأحرف والأرقام والنقاط وعلامات _ و - و / أو ~ فقط."
 
-#: admin.py:22
-msgid "Advanced options"
-msgstr "خيارات متقدّمة"
+#: forms.py:19
+msgid "URL is missing a leading slash."
+msgstr ""
+
+#: forms.py:23
+msgid "URL is missing a trailing slash."
+msgstr ""
+
+#: forms.py:38
+#, python-format
+msgid "Flatpage with url %(url)s already exists for site %(site)s"
+msgstr ""
 
 #: models.py:8
 msgid "title"

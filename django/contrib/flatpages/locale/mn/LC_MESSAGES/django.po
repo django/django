@@ -1,30 +1,38 @@
 # This file is distributed under the same license as the Django package.
 #
+# Translators:
+# Jannis Leidel <jannis@leidel.info>, 2011.
+# Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2011, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-15 13:15-0400\n"
-"PO-Revision-Date: 2011-03-04 18:46+0000\n"
-"Last-Translator: Ankhbayar <l.ankhbayar@gmail.com>\n"
-"Language-Team: Mongolian <>\n"
+"POT-Creation-Date: 2012-03-14 00:16-0700\n"
+"PO-Revision-Date: 2012-03-11 05:32+0000\n"
+"Last-Translator: Анхбаяр Анхаа <l.ankhbayar@gmail.com>\n"
+"Language-Team: Mongolian (http://www.transifex.net/projects/p/django/"
+"language/mn/)\n"
+"Language: mn\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: mn\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
-#: admin.py:8 models.py:7
+#: admin.py:10
+msgid "Advanced options"
+msgstr "Дээд хэрэглээний сонголтууд"
+
+#: forms.py:7 models.py:7
 msgid "URL"
 msgstr "URL"
 
-#: admin.py:9
+#: forms.py:8
 msgid ""
 "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
 msgstr ""
 "Жишээ: '/about/contact/'. Хөтлөх буюу зам заах ташуу зураас байх хэрэгтэй."
 
-#: admin.py:11
+#: forms.py:10
 msgid ""
 "This value must contain only letters, numbers, dots, underscores, dashes, "
 "slashes or tildes."
@@ -32,9 +40,18 @@ msgstr ""
 "Энэ хэсэгт зөвхөн үсэг, тоо, цэг, доогуур зураас, налуу зураасууд бичих "
 "боломжтой. "
 
-#: admin.py:22
-msgid "Advanced options"
-msgstr "Дээд хэрэглээний сонголтууд"
+#: forms.py:19
+msgid "URL is missing a leading slash."
+msgstr "URL ийн эхний slash ийг мартсан байна."
+
+#: forms.py:23
+msgid "URL is missing a trailing slash."
+msgstr "URL ийн арийн slash ийг мартсан байна"
+
+#: forms.py:38
+#, python-format
+msgid "Flatpage with url %(url)s already exists for site %(site)s"
+msgstr "Хуудасны хаяг %(url)s  %(site)s  дээр давхардаж байна."
 
 #: models.py:8
 msgid "title"

@@ -1,32 +1,40 @@
 # This file is distributed under the same license as the Django package.
 #
+# Translators:
+# Jannis Leidel <jannis@leidel.info>, 2011.
+# Janos Guljas <janos@resenje.org>, 2011, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-15 13:15-0400\n"
-"PO-Revision-Date: 2011-03-04 18:46+0000\n"
-"Last-Translator: Jannis <jannis@leidel.info>\n"
-"Language-Team: Serbian <None>\n"
+"POT-Creation-Date: 2012-03-14 00:16-0700\n"
+"PO-Revision-Date: 2012-03-08 12:31+0000\n"
+"Last-Translator: Janos Guljas <janos@resenje.org>\n"
+"Language-Team: Serbian (http://www.transifex.net/projects/p/django/language/"
+"sr/)\n"
+"Language: sr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: sr\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
-"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
 
-#: admin.py:8 models.py:7
+#: admin.py:10
+msgid "Advanced options"
+msgstr "Напредна подешавања"
+
+#: forms.py:7 models.py:7
 msgid "URL"
 msgstr "URL"
 
-#: admin.py:9
+#: forms.py:8
 msgid ""
 "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
 msgstr ""
 "Пример: '/about/contact/'. Пазите на то да постоје и почетне и завршне косе "
 "црте."
 
-#: admin.py:11
+#: forms.py:10
 msgid ""
 "This value must contain only letters, numbers, dots, underscores, dashes, "
 "slashes or tildes."
@@ -34,9 +42,18 @@ msgstr ""
 "Унета вредност може садржати само слова, бројке, тачке, доње црте, црте, "
 "знаке разломка или тилде."
 
-#: admin.py:22
-msgid "Advanced options"
-msgstr "Напредна подешавања"
+#: forms.py:19
+msgid "URL is missing a leading slash."
+msgstr "Недостаје коса црта на почетку URL-а."
+
+#: forms.py:23
+msgid "URL is missing a trailing slash."
+msgstr "Недостаје коса црта на крају URL-а."
+
+#: forms.py:38
+#, python-format
+msgid "Flatpage with url %(url)s already exists for site %(site)s"
+msgstr "Страница са адресом %(url)s већ постоји за сајт %(site)s"
 
 #: models.py:8
 msgid "title"

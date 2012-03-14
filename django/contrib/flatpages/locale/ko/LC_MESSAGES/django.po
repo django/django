@@ -1,38 +1,55 @@
 # This file is distributed under the same license as the Django package.
 #
+# Translators:
+# Jaehong Kim <mixe@korea.com>, 2011.
+# Jannis Leidel <jannis@leidel.info>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-15 13:15-0400\n"
-"PO-Revision-Date: 2011-03-06 03:26+0000\n"
-"Last-Translator: mixe <mixe@korea.com>\n"
-"Language-Team: Korean <None>\n"
+"POT-Creation-Date: 2012-03-14 00:16-0700\n"
+"PO-Revision-Date: 2012-03-08 12:31+0000\n"
+"Last-Translator: Jaehong Kim <mixe@korea.com>\n"
+"Language-Team: Korean (http://www.transifex.net/projects/p/django/language/"
+"ko/)\n"
+"Language: ko\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: ko\n"
 "Plural-Forms: nplurals=1; plural=0\n"
 
-#: admin.py:8 models.py:7
+#: admin.py:10
+msgid "Advanced options"
+msgstr "고급 옵션"
+
+#: forms.py:7 models.py:7
 msgid "URL"
 msgstr "URL"
 
-#: admin.py:9
+#: forms.py:8
 msgid ""
 "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
 msgstr "앞, 뒤에 슬래시(/)를 넣으세요. 예:'/about/contact/' "
 
-#: admin.py:11
+#: forms.py:10
 msgid ""
 "This value must contain only letters, numbers, dots, underscores, dashes, "
 "slashes or tildes."
 msgstr ""
 "이 문자열은 문자, 수자, 점, 언더스코어, 대쉬, 슬래쉬, 틸드만 사용해야 합니다."
 
-#: admin.py:22
-msgid "Advanced options"
-msgstr "고급 옵션"
+#: forms.py:19
+msgid "URL is missing a leading slash."
+msgstr ""
+
+#: forms.py:23
+msgid "URL is missing a trailing slash."
+msgstr ""
+
+#: forms.py:38
+#, python-format
+msgid "Flatpage with url %(url)s already exists for site %(site)s"
+msgstr ""
 
 #: models.py:8
 msgid "title"

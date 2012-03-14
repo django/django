@@ -1,37 +1,55 @@
 # This file is distributed under the same license as the Django package.
 #
+# Translators:
+# Chandan kumar <chandankumar.093047@gmail.com>, 2012.
+# Jannis Leidel <jannis@leidel.info>, 2011.
+# Sandeep Satavlekar <sandysat@gmail.com>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-15 13:15-0400\n"
-"PO-Revision-Date: 2011-03-06 19:21+0000\n"
-"Last-Translator: sandeepsatavlekar <sandysat@gmail.com>\n"
-"Language-Team: Hindi <None>\n"
+"POT-Creation-Date: 2012-03-14 00:16-0700\n"
+"PO-Revision-Date: 2012-03-08 12:31+0000\n"
+"Last-Translator: Chandan kumar <chandankumar.093047@gmail.com>\n"
+"Language-Team: Hindi (http://www.transifex.net/projects/p/django/language/"
+"hi/)\n"
+"Language: hi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: hi\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
-#: admin.py:8 models.py:7
+#: admin.py:10
+msgid "Advanced options"
+msgstr "उन्नत विकल्प"
+
+#: forms.py:7 models.py:7
 msgid "URL"
 msgstr "URL"
 
-#: admin.py:9
+#: forms.py:8
 msgid ""
 "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
 msgstr "अग्रणी है और अनुगामी स्लैश का होना सुनिश्चित करें. उदाहरण: '/about/contact/'"
 
-#: admin.py:11
+#: forms.py:10
 msgid ""
 "This value must contain only letters, numbers, dots, underscores, dashes, "
 "slashes or tildes."
 msgstr "इस मूल्य में सिर्फ वर्णाक्षर, अंक, बिंदु, रेखांकन, डैश, स्लैश और टिल्ड्स ही होने चाहिए"
 
-#: admin.py:22
-msgid "Advanced options"
-msgstr "उन्नत विकल्प"
+#: forms.py:19
+msgid "URL is missing a leading slash."
+msgstr ""
+
+#: forms.py:23
+msgid "URL is missing a trailing slash."
+msgstr ""
+
+#: forms.py:38
+#, python-format
+msgid "Flatpage with url %(url)s already exists for site %(site)s"
+msgstr "%(site)s साइट के लिए %(url)s यूआरएल के साथ चपटापृष्ट मौजूद है."
 
 #: models.py:8
 msgid "title"
