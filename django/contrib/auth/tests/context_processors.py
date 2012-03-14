@@ -29,6 +29,8 @@ class AuthContextProcessorTests(TestCase):
         response = self.client.get('/auth_processor_no_attr_access/')
         self.assertContains(response, "Session not accessed")
 
+        context._standard_context_processors = None
+
     @override_settings(
         MIDDLEWARE_CLASSES=global_settings.MIDDLEWARE_CLASSES,
         TEMPLATE_CONTEXT_PROCESSORS=global_settings.TEMPLATE_CONTEXT_PROCESSORS,
@@ -42,6 +44,8 @@ class AuthContextProcessorTests(TestCase):
 
         response = self.client.get('/auth_processor_attr_access/')
         self.assertContains(response, "Session accessed")
+
+        context._standard_context_processors = None
 
     def test_perms_attrs(self):
         self.client.login(username='super', password='secret')
