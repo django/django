@@ -1,0 +1,281 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+#   <germanilyin@gmail.com>, 2011.
+#   <zhazira.mt@gmail.com>, 2011.
+msgid ""
+msgstr ""
+"Project-Id-Version: Django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-03-14 00:15-0700\n"
+"PO-Revision-Date: 2012-03-08 12:07+0000\n"
+"Last-Translator: yun_man_ger <germanilyin@gmail.com>\n"
+"Language-Team: Kazakh (http://www.transifex.net/projects/p/django/language/"
+"kk/)\n"
+"Language: kk\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0\n"
+
+#: admin.py:41
+msgid "Personal info"
+msgstr "Жеке мағлұмат"
+
+#: admin.py:42
+msgid "Permissions"
+msgstr "Рұқсаттар"
+
+#: admin.py:44
+msgid "Important dates"
+msgstr "Маңызды даталар"
+
+#: admin.py:125
+msgid "Password changed successfully."
+msgstr "Құпия сөз ойдағыдай өзгертілді."
+
+#: admin.py:135
+#, python-format
+msgid "Change password: %s"
+msgstr "Құпия сөзді өзгерту: %s"
+
+#: forms.py:58
+msgid "A user with that username already exists."
+msgstr "Осындай атаумен қолданушы бар."
+
+#: forms.py:59 forms.py:247 forms.py:304
+msgid "The two password fields didn't match."
+msgstr "Енгізілген құпия сөздер бірдей емес."
+
+#: forms.py:61 forms.py:106 forms.py:135
+msgid "Username"
+msgstr "Қолданушы атауы"
+
+#: forms.py:63 forms.py:107
+msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr ""
+"Міндетті. 30 немесе одан кем символ. Тек әріптер, цифрлар және @/./+/-/_."
+
+#: forms.py:66 forms.py:110
+msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
+msgstr "Бұл мән тек әріптерді, цифрлерді және @/./+/-/_ құрайды."
+
+#: forms.py:68 forms.py:112 forms.py:136 forms.py:306
+msgid "Password"
+msgstr "Құпия сөз"
+
+#: forms.py:70
+msgid "Password confirmation"
+msgstr "Құпия сөз құптамасы"
+
+#: forms.py:72
+msgid "Enter the same password as above, for verification."
+msgstr "Тексеру үшін құпия сөзді үстіндегідей енгізіңіз."
+
+#: forms.py:113
+msgid ""
+"Raw passwords are not stored, so there is no way to see this user's "
+"password, but you can change the password using <a href=\"password/\">this "
+"form</a>."
+msgstr ""
+
+#: forms.py:139
+msgid ""
+"Please enter a correct username and password. Note that both fields are case-"
+"sensitive."
+msgstr ""
+"Дұрыс қолданушы атауын және құпия сөзді енгізіңіз. Жолақтын екеуі де үлкен-"
+"кішілігін ескерілетін болғанын байқаңыз."
+
+#: forms.py:141
+msgid ""
+"Your Web browser doesn't appear to have cookies enabled. Cookies are "
+"required for logging in."
+msgstr ""
+"Cіздің веб-шолғышыңызде cookies доғарылған сияқты. Кіру үшін Сookies-ті қосу "
+"керек."
+
+#: forms.py:143
+msgid "This account is inactive."
+msgstr "Бұл тіркелгі белсенді емес."
+
+#: forms.py:187
+msgid ""
+"That e-mail address doesn't have an associated user account. Are you sure "
+"you've registered?"
+msgstr ""
+"e-mail адреске сәйкес келетін тіркелгі жоқ. Тіркелгендігіңізге сенімдісіз бе?"
+
+#: forms.py:189
+msgid ""
+"The user account associated with this e-mail address cannot reset the "
+"password."
+msgstr ""
+"Бұл email адреспен байланыстырылған пайдаланушы құпия сөзді өзгерте алмайды."
+
+#: forms.py:192
+msgid "E-mail"
+msgstr "E-mail"
+
+#: forms.py:249
+msgid "New password"
+msgstr "Жаңа құпия сөз"
+
+#: forms.py:251
+msgid "New password confirmation"
+msgstr "Жаңа құпия сөз құптамасы"
+
+#: forms.py:280
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr "Ескі құпия сөз қате енгізілді. Қайтадан енгізіңіз."
+
+#: forms.py:283
+msgid "Old password"
+msgstr "Ескі құпия сөз"
+
+#: forms.py:308
+msgid "Password (again)"
+msgstr "Құпия сөз (қайтадан)"
+
+#: hashers.py:218 hashers.py:269 hashers.py:298 hashers.py:326 hashers.py:355
+#: hashers.py:389
+msgid "algorithm"
+msgstr ""
+
+#: hashers.py:219
+msgid "iterations"
+msgstr ""
+
+#: hashers.py:220 hashers.py:271 hashers.py:299 hashers.py:327 hashers.py:390
+msgid "salt"
+msgstr ""
+
+#: hashers.py:221 hashers.py:300 hashers.py:328 hashers.py:356 hashers.py:391
+msgid "hash"
+msgstr ""
+
+#: hashers.py:270
+msgid "work factor"
+msgstr ""
+
+#: hashers.py:272
+msgid "checksum"
+msgstr ""
+
+#: models.py:66 models.py:113
+msgid "name"
+msgstr "атау"
+
+#: models.py:68
+msgid "codename"
+msgstr "кодтық атау"
+
+#: models.py:72
+msgid "permission"
+msgstr "рұқсат"
+
+#: models.py:73 models.py:115
+msgid "permissions"
+msgstr "рұқсаттар"
+
+#: models.py:120
+msgid "group"
+msgstr "топ"
+
+#: models.py:121 models.py:250
+msgid "groups"
+msgstr "топтар"
+
+#: models.py:232
+msgid "username"
+msgstr "Қолданушы атауы"
+
+#: models.py:233
+msgid ""
+"Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
+msgstr ""
+"Міндетті. 30 немесе одан кем символ. Тек әріптер, цифрлар және @/./+/-/_."
+
+#: models.py:235
+msgid "first name"
+msgstr "аты"
+
+#: models.py:236
+msgid "last name"
+msgstr "жөні"
+
+#: models.py:237
+msgid "e-mail address"
+msgstr "e-mail адрес"
+
+#: models.py:238
+msgid "password"
+msgstr "құпия сөз"
+
+#: models.py:239
+msgid "staff status"
+msgstr "қызметкер мәртебесі"
+
+#: models.py:240
+msgid "Designates whether the user can log into this admin site."
+msgstr "Қолданушының басқарушы сайтына кіре алатындығын білдіреді."
+
+#: models.py:242
+msgid "active"
+msgstr "белсенді"
+
+#: models.py:243
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr ""
+"Қолданушы белсенді болуын білдіреді. Тіркілгіні өшірмей мынаны алып тастаңыз."
+
+#: models.py:245
+msgid "superuser status"
+msgstr "әкімші мәртебесі"
+
+#: models.py:246
+msgid ""
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+msgstr "Бұл қолданушының бүкіл рұқсаттарымен тағайындалатындығын білдіреді."
+
+#: models.py:248
+msgid "last login"
+msgstr "соңғы кіруі"
+
+#: models.py:249
+msgid "date joined"
+msgstr "тіркелген күн-айы"
+
+#: models.py:251
+msgid ""
+"The groups this user belongs to. A user will get all permissions granted to "
+"each of his/her group."
+msgstr ""
+
+#: models.py:255
+msgid "user permissions"
+msgstr "қолданушы рұқсаттары"
+
+#: models.py:260
+msgid "user"
+msgstr "қолданушы"
+
+#: models.py:261
+msgid "users"
+msgstr "қолданушылар"
+
+#: views.py:93
+msgid "Logged out"
+msgstr "Шығу орындалды"
+
+#: management/commands/createsuperuser.py:27
+msgid "Enter a valid e-mail address."
+msgstr "Дұрыс e-mail адресті енгізіңіз."
+
+#: templates/registration/password_reset_subject.txt:2
+#, python-format
+msgid "Password reset on %(site_name)s"
+msgstr "%(site_name)s торапта құпия сөзді өзгерту"

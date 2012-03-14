@@ -209,6 +209,12 @@ LANG_INFO = {
         'name': 'Georgian',
         'name_local': u'\u10e5\u10d0\u10e0\u10d7\u10e3\u10da\u10d8',
     },
+    'kk': {
+        'bidi': False,
+        'code': 'kk',
+        'name': 'Kazakh',
+        'name_local': u'\u049a\u0430\u0437\u0430\u049b',
+    },
     'km': {
         'bidi': False,
         'code': 'km',
