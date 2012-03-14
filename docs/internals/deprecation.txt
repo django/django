@@ -196,6 +196,11 @@ these changes.
   filesystem path to a ``locale`` directory containing non-app-specific
   translations in its value.
 
+* The Markup contrib app will no longer support versions of Python-Markdown
+  library earlier than 2.1. An accelerated timeline was used as this was
+  a security related deprecation.
+
+
 1.6
 ---
 

@@ -1096,6 +1096,16 @@ field. This was something that should not have worked, and in 1.4 loading such
 incomplete fixtures will fail. Because fixtures are a raw import, they should
 explicitly specify all field values, regardless of field options on the model.
 
+Attributes disabled in markdown when safe mode set
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Prior to Django 1.4, attributes were included in any markdown output regardless
+of safe mode setting of the filter. With version > 2.1 of the Python-Markdown
+library, an enable_attributes option was added. When the safe argument is
+passed to the markdown filter, both the ``safe_mode=True`` and
+``enable_attributes=False`` options are set. If using a version of the
+Python-Markdown library less than 2.1, a warning is issued that the output is
+insecure.
 
 Features deprecated in 1.4
 ==========================
@@ -1262,3 +1272,12 @@ each request to a site map now creates a new Paginator object and calls the
 ``items()`` method is doing, this may have a negative performance impact.
 To mitigate the performance impact, consider using the :doc:`caching
 framework </topics/cache>` within your ``Sitemap`` subclass.
+
+Versions of Python-Markdown earlier than 2.1
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Versions of Python-Markdown earlier than 2.1 do not support the option to
+disable attributes. As a security issue, earlier versions of this library will
+not be supported by the markup contrib app in 1.5 under an accelerated
+deprecation timeline.
+

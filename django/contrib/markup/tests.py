@@ -58,6 +58,20 @@ Paragraph 2 with a link_
         pattern = re.compile("""<p>Paragraph 1\s*</p>\s*<h2>\s*An h2</h2>""")
         self.assertTrue(pattern.match(rendered))
 
+    @unittest.skipUnless(markdown, 'markdown no installed')
+    def test_markdown_attribute_disable(self):
+        t = Template("{% load markup %}{{ markdown_content|markdown:'safe' }}")
+        markdown_content = "{@onclick=alert('hi')}some paragraph"
+        rendered = t.render(Context({'markdown_content':markdown_content})).strip()
+        self.assertTrue('@' in rendered)
+
+    @unittest.skipUnless(markdown, 'markdown no installed')
+    def test_markdown_attribute_enable(self):
+        t = Template("{% load markup %}{{ markdown_content|markdown }}")
+        markdown_content = "{@onclick=alert('hi')}some paragraph"
+        rendered = t.render(Context({'markdown_content':markdown_content})).strip()
+        self.assertFalse('@' in rendered)
+
     @unittest.skipIf(markdown, 'markdown is installed')
     def test_no_markdown(self):
         t = Template("{% load markup %}{{ markdown_content|markdown }}")
