@@ -1,88 +1,90 @@
 # This file is distributed under the same license as the Django package.
 #
+# Translators:
+# Jannis Leidel <jannis@leidel.info>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-15 13:14-0400\n"
-"PO-Revision-Date: 2011-03-04 18:41+0000\n"
-"Last-Translator: Jannis <jannis@leidel.info>\n"
-"Language-Team: Korean <None>\n"
+"POT-Creation-Date: 2012-03-14 00:15-0700\n"
+"PO-Revision-Date: 2012-03-08 12:07+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: Korean (http://www.transifex.net/projects/p/django/language/"
+"ko/)\n"
+"Language: ko\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: ko\n"
 "Plural-Forms: nplurals=1; plural=0\n"
 
-#: admin.py:28
+#: admin.py:41
 msgid "Personal info"
 msgstr "개인정보"
 
-#: admin.py:29
+#: admin.py:42
 msgid "Permissions"
 msgstr "권한"
 
-#: admin.py:30
+#: admin.py:44
 msgid "Important dates"
 msgstr "중요한 일정"
 
-#: admin.py:31
-msgid "Groups"
-msgstr "그룹"
-
-#: admin.py:113
+#: admin.py:125
 msgid "Password changed successfully."
 msgstr "비밀번호가 변경되었습니다."
 
-#: admin.py:123
+#: admin.py:135
 #, python-format
 msgid "Change password: %s"
 msgstr "비밀번호 변경: %s"
 
-#: forms.py:14 forms.py:48 forms.py:66
+#: forms.py:58
+msgid "A user with that username already exists."
+msgstr "해당 사용자명은 이미 존재합니다."
+
+#: forms.py:59 forms.py:247 forms.py:304
+msgid "The two password fields didn't match."
+msgstr "비밀번호가 일치하지 않습니다."
+
+#: forms.py:61 forms.py:106 forms.py:135
 msgid "Username"
 msgstr "사용자명"
 
-#: forms.py:15 forms.py:49
+#: forms.py:63 forms.py:107
 msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
 "필수항목입니다. 30자 이내로 입력하세요. (알파벳, 숫자, @/./+/-/_만 가능)"
 
-#: forms.py:16 forms.py:50
+#: forms.py:66 forms.py:110
 msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
 msgstr "알파벳, 숫자 및 @/./+/-/_만 가능합니다."
 
-#: forms.py:17 forms.py:67 forms.py:193
+#: forms.py:68 forms.py:112 forms.py:136 forms.py:306
 msgid "Password"
 msgstr "비밀번호"
 
-#: forms.py:18
+#: forms.py:70
 msgid "Password confirmation"
 msgstr "비밀번호 확인"
 
-#: forms.py:19
+#: forms.py:72
 msgid "Enter the same password as above, for verification."
 msgstr "확인을 위해 위와 동일한 비밀번호를 입력하세요. "
 
-#: forms.py:31
-msgid "A user with that username already exists."
-msgstr "해당 사용자명은 이미 존재합니다."
+#: forms.py:113
+msgid ""
+"Raw passwords are not stored, so there is no way to see this user's "
+"password, but you can change the password using <a href=\"password/\">this "
+"form</a>."
+msgstr ""
 
-#: forms.py:37 forms.py:163 forms.py:205
-msgid "The two password fields didn't match."
-msgstr "비밀번호가 일치하지 않습니다."
-
-#: forms.py:87
+#: forms.py:139
 msgid ""
 "Please enter a correct username and password. Note that both fields are case-"
 "sensitive."
 msgstr "사용자명과 비밀번호를 입력하세요. (대소문자 구별)"
 
-#: forms.py:89
-msgid "This account is inactive."
-msgstr "이 계정은 유효하지 않습니다."
-
-#: forms.py:96
+#: forms.py:141
 msgid ""
 "Your Web browser doesn't appear to have cookies enabled. Cookies are "
 "required for logging in."
@@ -90,112 +92,135 @@ msgstr ""
 "사용하시는 브라우저가 쿠키를 허용하지 않습니다.로그인하기 위해서는 쿠키 사용"
 "이 필요합니다."
 
-#: forms.py:108
-msgid "E-mail"
-msgstr "이메일 주소"
+#: forms.py:143
+msgid "This account is inactive."
+msgstr "이 계정은 유효하지 않습니다."
 
-#: forms.py:117
+#: forms.py:187
 msgid ""
 "That e-mail address doesn't have an associated user account. Are you sure "
 "you've registered?"
 msgstr ""
 "이메일주소와 일치하는 사용자가 없습니다.이 이메일주소로 등록하셨습니까?"
 
-#: forms.py:143
-#, python-format
-msgid "Password reset on %s"
-msgstr "%s에 대한 비밀번호 초기화"
+#: forms.py:189
+msgid ""
+"The user account associated with this e-mail address cannot reset the "
+"password."
+msgstr ""
 
-#: forms.py:151
+#: forms.py:192
+msgid "E-mail"
+msgstr "이메일 주소"
+
+#: forms.py:249
 msgid "New password"
 msgstr "새 비밀번호:"
 
-#: forms.py:152
+#: forms.py:251
 msgid "New password confirmation"
 msgstr "새 비밀번호 확인:"
 
-#: forms.py:177
-msgid "Old password"
-msgstr "기존 비밀번호:"
-
-#: forms.py:185
+#: forms.py:280
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr "기존 비밀번호를 잘못 입력하셨습니다. 다시 입력해 주세요."
 
-#: forms.py:194
+#: forms.py:283
+msgid "Old password"
+msgstr "기존 비밀번호:"
+
+#: forms.py:308
 msgid "Password (again)"
 msgstr "비밀번호 (확인)"
 
-#: models.py:76 models.py:104
+#: hashers.py:218 hashers.py:269 hashers.py:298 hashers.py:326 hashers.py:355
+#: hashers.py:389
+msgid "algorithm"
+msgstr ""
+
+#: hashers.py:219
+msgid "iterations"
+msgstr ""
+
+#: hashers.py:220 hashers.py:271 hashers.py:299 hashers.py:327 hashers.py:390
+msgid "salt"
+msgstr ""
+
+#: hashers.py:221 hashers.py:300 hashers.py:328 hashers.py:356 hashers.py:391
+msgid "hash"
+msgstr ""
+
+#: hashers.py:270
+msgid "work factor"
+msgstr ""
+
+#: hashers.py:272
+msgid "checksum"
+msgstr ""
+
+#: models.py:66 models.py:113
 msgid "name"
 msgstr "이름"
 
-#: models.py:78
+#: models.py:68
 msgid "codename"
 msgstr "코드명"
 
-#: models.py:82
+#: models.py:72
 msgid "permission"
 msgstr "허가"
 
-#: models.py:83 models.py:105
+#: models.py:73 models.py:115
 msgid "permissions"
 msgstr "허가"
 
-#: models.py:108
+#: models.py:120
 msgid "group"
 msgstr "그룹"
 
-#: models.py:109 models.py:216
+#: models.py:121 models.py:250
 msgid "groups"
 msgstr "그룹"
 
-#: models.py:206
+#: models.py:232
 msgid "username"
 msgstr "사용자명"
 
-#: models.py:206
+#: models.py:233
 msgid ""
 "Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
 msgstr ""
 "필수항목입니다. 30자 이내로 입력하세요. (알파벳, 숫자, @/./+/-/_만 가능)"
 
-#: models.py:207
+#: models.py:235
 msgid "first name"
 msgstr "이름"
 
-#: models.py:208
+#: models.py:236
 msgid "last name"
 msgstr "성"
 
-#: models.py:209
+#: models.py:237
 msgid "e-mail address"
 msgstr "이메일 주소"
 
-#: models.py:210
+#: models.py:238
 msgid "password"
 msgstr "비밀번호"
 
-#: models.py:210
-msgid ""
-"Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
-"password form</a>."
-msgstr ""
-"'[algo]$[salt]$[hexdigest]' 또는 <a href=\"password/\">비밀번호 변경</a>"
-
-#: models.py:211
+#: models.py:239
 msgid "staff status"
 msgstr "스태프 권한"
 
-#: models.py:211
+#: models.py:240
 msgid "Designates whether the user can log into this admin site."
 msgstr "사용자가 관리사이트에 로그인이 가능한지를 나타냅니다."
 
-#: models.py:212
+#: models.py:242
 msgid "active"
 msgstr "활성"
 
-#: models.py:212
+#: models.py:243
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
@@ -203,50 +228,51 @@ msgstr ""
 "사용자가 'Django 관리'에 로그인이 가능한지를 나타냅니다.계정을 삭제하는 대신 "
 "이것을 선택 해제하세요."
 
-#: models.py:213
+#: models.py:245
 msgid "superuser status"
 msgstr "최상위 사용자 권한"
 
-#: models.py:213
+#: models.py:246
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
 msgstr "해당 사용자에게 모든 권한을 허가합니다."
 
-#: models.py:214
+#: models.py:248
 msgid "last login"
 msgstr "마지막 로그인"
 
-#: models.py:215
+#: models.py:249
 msgid "date joined"
 msgstr "등록일"
 
-#: models.py:217
+#: models.py:251
 msgid ""
-"In addition to the permissions manually assigned, this user will also get "
-"all permissions granted to each group he/she is in."
-msgstr "해당 사용자에게 속해있는 그룹의 모든 권한을 허가합니다."
+"The groups this user belongs to. A user will get all permissions granted to "
+"each of his/her group."
+msgstr ""
 
-#: models.py:218
+#: models.py:255
 msgid "user permissions"
 msgstr "사용자 권한"
 
-#: models.py:222
+#: models.py:260
 msgid "user"
 msgstr "사용자"
 
-#: models.py:223
+#: models.py:261
 msgid "users"
 msgstr "사용자(들)"
 
-#: models.py:406
-msgid "message"
-msgstr "메시지"
-
-#: views.py:91
+#: views.py:93
 msgid "Logged out"
 msgstr "로그 아웃"
 
-#: management/commands/createsuperuser.py:23
+#: management/commands/createsuperuser.py:27
 msgid "Enter a valid e-mail address."
 msgstr "올바른 이메일 주소를 입력하세요."
+
+#: templates/registration/password_reset_subject.txt:2
+#, python-format
+msgid "Password reset on %(site_name)s"
+msgstr ""

@@ -1,90 +1,96 @@
 # This file is distributed under the same license as the Django package.
 #
+# Translators:
+# Jannis Leidel <jannis@leidel.info>, 2011.
+# Shinya Okano <tokibito@gmail.com>, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-15 13:14-0400\n"
-"PO-Revision-Date: 2011-03-04 18:41+0000\n"
-"Last-Translator: Jannis <jannis@leidel.info>\n"
-"Language-Team: Japanese <None>\n"
+"POT-Creation-Date: 2012-03-14 00:15-0700\n"
+"PO-Revision-Date: 2012-03-08 14:16+0000\n"
+"Last-Translator: Shinya Okano <tokibito@gmail.com>\n"
+"Language-Team: Japanese (http://www.transifex.net/projects/p/django/language/"
+"ja/)\n"
+"Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: ja\n"
 "Plural-Forms: nplurals=1; plural=0\n"
 
-#: admin.py:28
+#: admin.py:41
 msgid "Personal info"
 msgstr "個人情報"
 
-#: admin.py:29
+#: admin.py:42
 msgid "Permissions"
 msgstr "パーミッション"
 
-#: admin.py:30
+#: admin.py:44
 msgid "Important dates"
 msgstr "重要な日程"
 
-#: admin.py:31
-msgid "Groups"
-msgstr "グループ"
-
-#: admin.py:113
+#: admin.py:125
 msgid "Password changed successfully."
 msgstr "パスワードを変更しました"
 
-#: admin.py:123
+#: admin.py:135
 #, python-format
 msgid "Change password: %s"
 msgstr "パスワードの変更: %s"
 
-#: forms.py:14 forms.py:48 forms.py:66
+#: forms.py:58
+msgid "A user with that username already exists."
+msgstr "同じユーザ名が既に登録済みです。"
+
+#: forms.py:59 forms.py:247 forms.py:304
+msgid "The two password fields didn't match."
+msgstr "確認用パスワードが一致しません。"
+
+#: forms.py:61 forms.py:106 forms.py:135
 msgid "Username"
 msgstr "ユーザ名"
 
-#: forms.py:15 forms.py:49
+#: forms.py:63 forms.py:107
 msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
 "この項目は必須です。半角アルファベット、半角数字、@/./+/-/_ で30文字以下にし"
 "てください。"
 
-#: forms.py:16 forms.py:50
+#: forms.py:66 forms.py:110
 msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
 msgstr "半角の英数字および次の記号 @/./+/-/_ 以外は使用できません。"
 
-#: forms.py:17 forms.py:67 forms.py:193
+#: forms.py:68 forms.py:112 forms.py:136 forms.py:306
 msgid "Password"
 msgstr "パスワード"
 
-#: forms.py:18
+#: forms.py:70
 msgid "Password confirmation"
 msgstr "パスワードの確認"
 
-#: forms.py:19
+#: forms.py:72
 msgid "Enter the same password as above, for verification."
 msgstr "確認のため、再度パスワードを入力してください。"
 
-#: forms.py:31
-msgid "A user with that username already exists."
-msgstr "同じユーザ名が既に登録済みです。"
+#: forms.py:113
+msgid ""
+"Raw passwords are not stored, so there is no way to see this user's "
+"password, but you can change the password using <a href=\"password/\">this "
+"form</a>."
+msgstr ""
+"生のパスワードが格納されているので、このユーザのパスワードは参照できません"
+"が、 <a href=\"password/\">このフォーム</a> を使用してパスワードを変更できま"
+"す 。"
 
-#: forms.py:37 forms.py:163 forms.py:205
-msgid "The two password fields didn't match."
-msgstr "確認用パスワードが一致しません。"
-
-#: forms.py:87
+#: forms.py:139
 msgid ""
 "Please enter a correct username and password. Note that both fields are case-"
 "sensitive."
 msgstr ""
 "正しいユーザ名とパスワードを入力してください (大文字小文字は区別します) 。"
 
-#: forms.py:89
-msgid "This account is inactive."
-msgstr "アカウントが無効です。"
-
-#: forms.py:96
+#: forms.py:141
 msgid ""
 "Your Web browser doesn't appear to have cookies enabled. Cookies are "
 "required for logging in."
@@ -92,113 +98,137 @@ msgstr ""
 "お使いのブラウザはクッキーを有効にしていないようです。ログインにはクッキーが"
 "必要です。"
 
-#: forms.py:108
-msgid "E-mail"
-msgstr "メールアドレス"
+#: forms.py:143
+msgid "This account is inactive."
+msgstr "アカウントが無効です。"
 
-#: forms.py:117
+#: forms.py:187
 msgid ""
 "That e-mail address doesn't have an associated user account. Are you sure "
 "you've registered?"
 msgstr "メールアドレスの一致するユーザはいません。本当に登録しましたか？"
 
-#: forms.py:143
-#, python-format
-msgid "Password reset on %s"
-msgstr "%s のパスワードのリセット"
+#: forms.py:189
+msgid ""
+"The user account associated with this e-mail address cannot reset the "
+"password."
+msgstr ""
+"この電子メールアドレスに関連付けられたユーザーアカウントはパスワードをリセッ"
+"トすることはできません。"
 
-#: forms.py:151
+#: forms.py:192
+msgid "E-mail"
+msgstr "メールアドレス"
+
+#: forms.py:249
 msgid "New password"
 msgstr "新しいパスワード"
 
-#: forms.py:152
+#: forms.py:251
 msgid "New password confirmation"
 msgstr "新しいパスワード(確認用)"
 
-#: forms.py:177
-msgid "Old password"
-msgstr "元のパスワード"
-
-#: forms.py:185
+#: forms.py:280
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr "元のパスワードが間違っています。もう一度入力してください。"
 
-#: forms.py:194
+#: forms.py:283
+msgid "Old password"
+msgstr "元のパスワード"
+
+#: forms.py:308
 msgid "Password (again)"
 msgstr "パスワード(確認用)"
 
-#: models.py:76 models.py:104
+#: hashers.py:218 hashers.py:269 hashers.py:298 hashers.py:326 hashers.py:355
+#: hashers.py:389
+msgid "algorithm"
+msgstr "アルゴリズム"
+
+#: hashers.py:219
+msgid "iterations"
+msgstr "イテレーション"
+
+#: hashers.py:220 hashers.py:271 hashers.py:299 hashers.py:327 hashers.py:390
+msgid "salt"
+msgstr "ソルト"
+
+#: hashers.py:221 hashers.py:300 hashers.py:328 hashers.py:356 hashers.py:391
+msgid "hash"
+msgstr "ハッシュ"
+
+#: hashers.py:270
+msgid "work factor"
+msgstr "ワークファクター"
+
+#: hashers.py:272
+msgid "checksum"
+msgstr "チェックサム"
+
+#: models.py:66 models.py:113
 msgid "name"
 msgstr "名前"
 
-#: models.py:78
+#: models.py:68
 msgid "codename"
 msgstr "コード名"
 
-#: models.py:82
+#: models.py:72
 msgid "permission"
 msgstr "パーミッション"
 
-#: models.py:83 models.py:105
+#: models.py:73 models.py:115
 msgid "permissions"
 msgstr "パーミッション"
 
-#: models.py:108
+#: models.py:120
 msgid "group"
 msgstr "グループ"
 
-#: models.py:109 models.py:216
+#: models.py:121 models.py:250
 msgid "groups"
 msgstr "グループ"
 
-#: models.py:206
+#: models.py:232
 msgid "username"
 msgstr "ユーザ名"
 
-#: models.py:206
+#: models.py:233
 msgid ""
 "Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
 msgstr ""
 "この項目は必須です。半角アルファベット、半角数字、次の記号 @/./+/-/_ で30文字"
 "以下にしてください。"
 
-#: models.py:207
+#: models.py:235
 msgid "first name"
 msgstr "名"
 
-#: models.py:208
+#: models.py:236
 msgid "last name"
 msgstr "姓"
 
-#: models.py:209
+#: models.py:237
 msgid "e-mail address"
 msgstr "メールアドレス"
 
-#: models.py:210
+#: models.py:238
 msgid "password"
 msgstr "パスワード"
 
-#: models.py:210
-msgid ""
-"Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
-"password form</a>."
-msgstr ""
-"'[algo]$[salt]$[hexdigest]'形式か、<a href=\"password/\">パスワード変更フォー"
-"ム</a>を使ってください。"
-
-#: models.py:211
+#: models.py:239
 msgid "staff status"
 msgstr "スタッフ権限"
 
-#: models.py:211
+#: models.py:240
 msgid "Designates whether the user can log into this admin site."
 msgstr "ユーザが管理サイトにログイン可能かどうかを示します。"
 
-#: models.py:212
+#: models.py:242
 msgid "active"
 msgstr "有効"
 
-#: models.py:212
+#: models.py:243
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
@@ -206,52 +236,53 @@ msgstr ""
 "ユーザがアクティブかどうかを示します。アカウントを消す代わりに選択を解除して"
 "ください。"
 
-#: models.py:213
+#: models.py:245
 msgid "superuser status"
 msgstr "スーパーユーザ権限"
 
-#: models.py:213
+#: models.py:246
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
 msgstr "全ての権限を持っているとみなされます。"
 
-#: models.py:214
+#: models.py:248
 msgid "last login"
 msgstr "最終ログイン"
 
-#: models.py:215
+#: models.py:249
 msgid "date joined"
 msgstr "登録日"
 
-#: models.py:217
+#: models.py:251
 msgid ""
-"In addition to the permissions manually assigned, this user will also get "
-"all permissions granted to each group he/she is in."
+"The groups this user belongs to. A user will get all permissions granted to "
+"each of his/her group."
 msgstr ""
-"手動で付与したパーミッションに加え、所属しているグループに付与された全ての"
-"パーミッションを獲得します。"
+"このユーザーが所属するグループ。ユーザーはグループのそれぞれに付与されている"
+"すべての権限を持ちます。"
 
-#: models.py:218
+#: models.py:255
 msgid "user permissions"
 msgstr "ユーザパーミッション"
 
-#: models.py:222
+#: models.py:260
 msgid "user"
 msgstr "ユーザ"
 
-#: models.py:223
+#: models.py:261
 msgid "users"
 msgstr "ユーザ"
 
-#: models.py:406
-msgid "message"
-msgstr "メッセージ"
-
-#: views.py:91
+#: views.py:93
 msgid "Logged out"
 msgstr "ログアウト"
 
-#: management/commands/createsuperuser.py:23
+#: management/commands/createsuperuser.py:27
 msgid "Enter a valid e-mail address."
 msgstr "有効なメールアドレスを入力してください。"
+
+#: templates/registration/password_reset_subject.txt:2
+#, python-format
+msgid "Password reset on %(site_name)s"
+msgstr "%(site_name)s のパスワードリセット"

@@ -1,81 +1,91 @@
 # This file is distributed under the same license as the Django package.
 #
+# Translators:
+#   <claude@2xlibre.net>, 2011, 2012.
+# Jannis Leidel <jannis@leidel.info>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-15 13:14-0400\n"
-"PO-Revision-Date: 2011-03-04 18:41+0000\n"
-"Last-Translator: Jannis <jannis@leidel.info>\n"
-"Language-Team: French <None>\n"
+"POT-Creation-Date: 2012-03-14 00:14-0700\n"
+"PO-Revision-Date: 2012-03-08 12:07+0000\n"
+"Last-Translator: claudep <claude@2xlibre.net>\n"
+"Language-Team: French (http://www.transifex.net/projects/p/django/language/"
+"fr/)\n"
+"Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: fr\n"
 "Plural-Forms: nplurals=2; plural=(n > 1)\n"
 
-#: admin.py:28
+#: admin.py:41
 msgid "Personal info"
 msgstr "Information personnelle"
 
-#: admin.py:29
+#: admin.py:42
 msgid "Permissions"
 msgstr "Permissions"
 
-#: admin.py:30
+#: admin.py:44
 msgid "Important dates"
 msgstr "Dates importantes"
 
-#: admin.py:31
-msgid "Groups"
-msgstr "Groupes"
-
-#: admin.py:113
+#: admin.py:125
 msgid "Password changed successfully."
 msgstr "Mot de passe modifié avec succès"
 
-#: admin.py:123
+#: admin.py:135
 #, python-format
 msgid "Change password: %s"
 msgstr "Modifier le mot de passe : %s"
 
-#: forms.py:14 forms.py:48 forms.py:66
+#: forms.py:58
+msgid "A user with that username already exists."
+msgstr "Un utilisateur avec ce nom existe déjà."
+
+#: forms.py:59 forms.py:247 forms.py:304
+msgid "The two password fields didn't match."
+msgstr "Les deux mots de passe ne correspondent pas."
+
+#: forms.py:61 forms.py:106 forms.py:135
 msgid "Username"
 msgstr "Nom d'utilisateur"
 
-#: forms.py:15 forms.py:49
+#: forms.py:63 forms.py:107
 msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
 "Requis. 30 caractères maximum. Uniquement des lettres, nombres et les "
 "caractères « @ », « . », « + », « - » et « _ »."
 
-#: forms.py:16 forms.py:50
+#: forms.py:66 forms.py:110
 msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
 msgstr ""
 "Cette valeur peut uniquement contenir des lettres, nombres et les caractères "
 "« @ », « . », « + », « - » et « _ »."
 
-#: forms.py:17 forms.py:67 forms.py:193
+#: forms.py:68 forms.py:112 forms.py:136 forms.py:306
 msgid "Password"
 msgstr "Mot de passe"
 
-#: forms.py:18
+#: forms.py:70
 msgid "Password confirmation"
-msgstr "Confirmation de votre mot de passe"
+msgstr "Confirmation du mot de passe"
 
-#: forms.py:19
+#: forms.py:72
 msgid "Enter the same password as above, for verification."
 msgstr "Saisissez le même mot de passe que précédemment, pour vérification."
 
-#: forms.py:31
-msgid "A user with that username already exists."
-msgstr "Un utilisateur avec ce nom existe déjà."
+#: forms.py:113
+msgid ""
+"Raw passwords are not stored, so there is no way to see this user's "
+"password, but you can change the password using <a href=\"password/\">this "
+"form</a>."
+msgstr ""
+"Les mots de passe ne sont pas enregistrés en clair, ce qui ne permet pas "
+"d'afficher le mot de passe de cet utilisateur, mais il est possible de le "
+"changer en utilisant <a href=\"password/\">ce formulaire</a>. "
 
-#: forms.py:37 forms.py:163 forms.py:205
-msgid "The two password fields didn't match."
-msgstr "Les deux mots de passe ne correspondent pas."
-
-#: forms.py:87
+#: forms.py:139
 msgid ""
 "Please enter a correct username and password. Note that both fields are case-"
 "sensitive."
@@ -84,11 +94,7 @@ msgstr ""
 "chacun de ces champs est sensible à la casse (différenciation des majuscules/"
 "minuscules)."
 
-#: forms.py:89
-msgid "This account is inactive."
-msgstr "Ce compte est inactif."
-
-#: forms.py:96
+#: forms.py:141
 msgid ""
 "Your Web browser doesn't appear to have cookies enabled. Cookies are "
 "required for logging in."
@@ -96,11 +102,11 @@ msgstr ""
 "Votre navigateur ne semble pas avoir activé les cookies. Les cookies sont "
 "nécessaires pour se connecter."
 
-#: forms.py:108
-msgid "E-mail"
-msgstr "Courriel"
+#: forms.py:143
+msgid "This account is inactive."
+msgstr "Ce compte est inactif."
 
-#: forms.py:117
+#: forms.py:187
 msgid ""
 "That e-mail address doesn't have an associated user account. Are you sure "
 "you've registered?"
@@ -108,103 +114,127 @@ msgstr ""
 "Cette adresse électronique ne correspond à aucun compte utilisateur. Êtes-"
 "vous sûr de vous être enregistré ?"
 
-#: forms.py:143
-#, python-format
-msgid "Password reset on %s"
-msgstr "Mise à jour du mot de passe sur %s"
+#: forms.py:189
+msgid ""
+"The user account associated with this e-mail address cannot reset the "
+"password."
+msgstr ""
+"Le compte associé à cette adresse électronique ne peut pas réinitialiser son "
+"mot de passe."
 
-#: forms.py:151
+#: forms.py:192
+msgid "E-mail"
+msgstr "Courriel"
+
+#: forms.py:249
 msgid "New password"
 msgstr "Nouveau mot de passe"
 
-#: forms.py:152
+#: forms.py:251
 msgid "New password confirmation"
 msgstr "Confirmation du nouveau mot de passe"
 
-#: forms.py:177
-msgid "Old password"
-msgstr "Ancien mot de passe"
-
-#: forms.py:185
+#: forms.py:280
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr "Votre ancien mot de passe est incorrect. Veuillez le rectifier."
 
-#: forms.py:194
+#: forms.py:283
+msgid "Old password"
+msgstr "Ancien mot de passe"
+
+#: forms.py:308
 msgid "Password (again)"
 msgstr "Mot de passe (à nouveau)"
 
-#: models.py:76 models.py:104
+#: hashers.py:218 hashers.py:269 hashers.py:298 hashers.py:326 hashers.py:355
+#: hashers.py:389
+msgid "algorithm"
+msgstr "algorithme"
+
+#: hashers.py:219
+msgid "iterations"
+msgstr "itérations"
+
+#: hashers.py:220 hashers.py:271 hashers.py:299 hashers.py:327 hashers.py:390
+msgid "salt"
+msgstr "salage"
+
+#: hashers.py:221 hashers.py:300 hashers.py:328 hashers.py:356 hashers.py:391
+msgid "hash"
+msgstr "empreinte"
+
+#: hashers.py:270
+msgid "work factor"
+msgstr "facteur travail"
+
+#: hashers.py:272
+msgid "checksum"
+msgstr "somme de contrôle"
+
+#: models.py:66 models.py:113
 msgid "name"
 msgstr "nom"
 
-#: models.py:78
+#: models.py:68
 msgid "codename"
 msgstr "nom de code"
 
-#: models.py:82
+#: models.py:72
 msgid "permission"
 msgstr "permission"
 
-#: models.py:83 models.py:105
+#: models.py:73 models.py:115
 msgid "permissions"
 msgstr "permissions"
 
-#: models.py:108
+#: models.py:120
 msgid "group"
 msgstr "groupe"
 
-#: models.py:109 models.py:216
+#: models.py:121 models.py:250
 msgid "groups"
 msgstr "groupes"
 
-#: models.py:206
+#: models.py:232
 msgid "username"
 msgstr "nom d'utilisateur"
 
-#: models.py:206
+#: models.py:233
 msgid ""
 "Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
 msgstr ""
 "Requis. 30 caractères maximum. Uniquement des lettres, nombres et les "
 "caractères « @ », « . », « + », « - » et « _ »."
 
-#: models.py:207
+#: models.py:235
 msgid "first name"
 msgstr "prénom"
 
-#: models.py:208
+#: models.py:236
 msgid "last name"
 msgstr "nom"
 
-#: models.py:209
+#: models.py:237
 msgid "e-mail address"
 msgstr "adresse électronique"
 
-#: models.py:210
+#: models.py:238
 msgid "password"
 msgstr "mot de passe"
 
-#: models.py:210
-msgid ""
-"Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
-"password form</a>."
-msgstr ""
-"Utilisez « [algo]$[salt]$[hexdigest] » ou le <a href=\"password/\">formulaire "
-"de changement de mot de passe</a>."
-
-#: models.py:211
+#: models.py:239
 msgid "staff status"
 msgstr "statut équipe"
 
-#: models.py:211
+#: models.py:240
 msgid "Designates whether the user can log into this admin site."
 msgstr "Précise si l'utilisateur peut se connecter à ce site d'administration."
 
-#: models.py:212
+#: models.py:242
 msgid "active"
 msgstr "actif"
 
-#: models.py:212
+#: models.py:243
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
@@ -212,11 +242,11 @@ msgstr ""
 "Précise si l'utilisateur doit être considéré comme actif. Décochez ceci "
 "plutôt que de supprimer le compte."
 
-#: models.py:213
+#: models.py:245
 msgid "superuser status"
 msgstr "statut super-utilisateur"
 
-#: models.py:213
+#: models.py:246
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
@@ -224,43 +254,43 @@ msgstr ""
 "Précise que l'utilisateur possède toutes les permissions sans les assigner "
 "explicitement."
 
-#: models.py:214
+#: models.py:248
 msgid "last login"
 msgstr "dernière connexion"
 
-#: models.py:215
+#: models.py:249
 msgid "date joined"
 msgstr "date d'inscription"
 
-#: models.py:217
+#: models.py:251
 msgid ""
-"In addition to the permissions manually assigned, this user will also get "
-"all permissions granted to each group he/she is in."
+"The groups this user belongs to. A user will get all permissions granted to "
+"each of his/her group."
 msgstr ""
-"En plus des permissions qui lui sont manuellement assignées, cet utilisateur "
-"recevra aussi toutes les permissions de tous les groupes auxquels il "
-"appartient. "
+"Les groupes dont fait partie cet utilisateur. Celui-ci obtient tous les "
+"droits de tous ses groupes."
 
-#: models.py:218
+#: models.py:255
 msgid "user permissions"
 msgstr "permissions de l'utilisateur"
 
-#: models.py:222
+#: models.py:260
 msgid "user"
 msgstr "utilisateur"
 
-#: models.py:223
+#: models.py:261
 msgid "users"
 msgstr "utilisateurs"
 
-#: models.py:406
-msgid "message"
-msgstr "message"
-
-#: views.py:91
+#: views.py:93
 msgid "Logged out"
 msgstr "Déconnecté"
 
-#: management/commands/createsuperuser.py:23
+#: management/commands/createsuperuser.py:27
 msgid "Enter a valid e-mail address."
 msgstr "Entrez une adresse de courriel valide."
+
+#: templates/registration/password_reset_subject.txt:2
+#, python-format
+msgid "Password reset on %(site_name)s"
+msgstr "Mot de passe réinitialisé sur %(site_name)s"

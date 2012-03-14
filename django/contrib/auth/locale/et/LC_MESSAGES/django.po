@@ -1,80 +1,87 @@
 # This file is distributed under the same license as the Django package.
 #
+# Translators:
+# Jannis Leidel <jannis@leidel.info>, 2011.
+# madisvain <madisvain@gmail.com>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-15 13:14-0400\n"
-"PO-Revision-Date: 2011-03-07 21:13+0000\n"
+"POT-Creation-Date: 2012-03-14 00:14-0700\n"
+"PO-Revision-Date: 2012-03-08 12:07+0000\n"
 "Last-Translator: madisvain <madisvain@gmail.com>\n"
-"Language-Team: Estonian <>\n"
+"Language-Team: Estonian (http://www.transifex.net/projects/p/django/language/"
+"et/)\n"
+"Language: et\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: et\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
-#: admin.py:28
+#: admin.py:41
 msgid "Personal info"
 msgstr "Isiklikud andmd"
 
-#: admin.py:29
+#: admin.py:42
 msgid "Permissions"
 msgstr "Õigused"
 
-#: admin.py:30
+#: admin.py:44
 msgid "Important dates"
 msgstr "Tähtsad kuupäevad"
 
-#: admin.py:31
-msgid "Groups"
-msgstr "Grupid"
-
-#: admin.py:113
+#: admin.py:125
 msgid "Password changed successfully."
 msgstr "Salasõna edukalt muudetud."
 
-#: admin.py:123
+#: admin.py:135
 #, python-format
 msgid "Change password: %s"
 msgstr "Muuda salasõna: %s"
 
-#: forms.py:14 forms.py:48 forms.py:66
+#: forms.py:58
+msgid "A user with that username already exists."
+msgstr "Sama kasutajatunnusega kasutaja on juba olemas."
+
+#: forms.py:59 forms.py:247 forms.py:304
+msgid "The two password fields didn't match."
+msgstr "Kaks sisestatud parooli ei olnud identsed."
+
+#: forms.py:61 forms.py:106 forms.py:135
 msgid "Username"
 msgstr "Kasutajatunnus"
 
-#: forms.py:15 forms.py:49
+#: forms.py:63 forms.py:107
 msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
 "Nõutav. 30 märki või vähem. Ainult tähed, numbrid ja /./+/-/_ tähemärgid."
 
-#: forms.py:16 forms.py:50
+#: forms.py:66 forms.py:110
 msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
 msgstr ""
 "See väärtust võib sisaldada ainult tähti, numbreid ja/./+/-/_ tähemärke."
 
-#: forms.py:17 forms.py:67 forms.py:193
+#: forms.py:68 forms.py:112 forms.py:136 forms.py:306
 msgid "Password"
 msgstr "Salasõna"
 
-#: forms.py:18
+#: forms.py:70
 msgid "Password confirmation"
 msgstr "Salasõna kinnitus"
 
-#: forms.py:19
+#: forms.py:72
 msgid "Enter the same password as above, for verification."
 msgstr ""
 "Sisestage sama salasõna uuesti veendumaks, et sisestamisel ei tekkinud vigu"
 
-#: forms.py:31
-msgid "A user with that username already exists."
-msgstr "Sama kasutajatunnusega kasutaja on juba olemas."
+#: forms.py:113
+msgid ""
+"Raw passwords are not stored, so there is no way to see this user's "
+"password, but you can change the password using <a href=\"password/\">this "
+"form</a>."
+msgstr ""
 
-#: forms.py:37 forms.py:163 forms.py:205
-msgid "The two password fields didn't match."
-msgstr "Kaks sisestatud parooli ei olnud identsed."
-
-#: forms.py:87
+#: forms.py:139
 msgid ""
 "Please enter a correct username and password. Note that both fields are case-"
 "sensitive."
@@ -82,11 +89,7 @@ msgstr ""
 "Palun sisestage korrektne kasutajatunnus ja salasõna. Mõlemad väljad on "
 "tõstutundlikud."
 
-#: forms.py:89
-msgid "This account is inactive."
-msgstr "See konto ei ole aktiivne."
-
-#: forms.py:96
+#: forms.py:141
 msgid ""
 "Your Web browser doesn't appear to have cookies enabled. Cookies are "
 "required for logging in."
@@ -94,11 +97,11 @@ msgstr ""
 "Teie veebibrauser ei aktsepteeri küpsiseid, aga küpsised on sisselogimiseks "
 "vajalikud."
 
-#: forms.py:108
-msgid "E-mail"
-msgstr "E-posti aadress"
+#: forms.py:143
+msgid "This account is inactive."
+msgstr "See konto ei ole aktiivne."
 
-#: forms.py:117
+#: forms.py:187
 msgid ""
 "That e-mail address doesn't have an associated user account. Are you sure "
 "you've registered?"
@@ -106,102 +109,124 @@ msgstr ""
 "Selle e-posti aadressiga ei ole seotud ühtegi kasutajakontot. Veenduge, et "
 "olete registreerunud."
 
-#: forms.py:143
-#, python-format
-msgid "Password reset on %s"
-msgstr "Salasõna vahetatud saidil %s"
+#: forms.py:189
+msgid ""
+"The user account associated with this e-mail address cannot reset the "
+"password."
+msgstr ""
 
-#: forms.py:151
+#: forms.py:192
+msgid "E-mail"
+msgstr "E-posti aadress"
+
+#: forms.py:249
 msgid "New password"
 msgstr "Uus salasõna"
 
-#: forms.py:152
+#: forms.py:251
 msgid "New password confirmation"
 msgstr "Uue salasõna kinnitus"
 
-#: forms.py:177
-msgid "Old password"
-msgstr "Vana salasõna"
-
-#: forms.py:185
+#: forms.py:280
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr "Te sisestasite oma vana parooli vigaselt. Palun sisestage see uuesti."
 
-#: forms.py:194
+#: forms.py:283
+msgid "Old password"
+msgstr "Vana salasõna"
+
+#: forms.py:308
 msgid "Password (again)"
 msgstr "Salasõna (uuesti)"
 
-#: models.py:76 models.py:104
+#: hashers.py:218 hashers.py:269 hashers.py:298 hashers.py:326 hashers.py:355
+#: hashers.py:389
+msgid "algorithm"
+msgstr ""
+
+#: hashers.py:219
+msgid "iterations"
+msgstr ""
+
+#: hashers.py:220 hashers.py:271 hashers.py:299 hashers.py:327 hashers.py:390
+msgid "salt"
+msgstr ""
+
+#: hashers.py:221 hashers.py:300 hashers.py:328 hashers.py:356 hashers.py:391
+msgid "hash"
+msgstr ""
+
+#: hashers.py:270
+msgid "work factor"
+msgstr ""
+
+#: hashers.py:272
+msgid "checksum"
+msgstr ""
+
+#: models.py:66 models.py:113
 msgid "name"
 msgstr "nimi"
 
-#: models.py:78
+#: models.py:68
 msgid "codename"
 msgstr "koodnimi"
 
-#: models.py:82
+#: models.py:72
 msgid "permission"
 msgstr "õigus"
 
-#: models.py:83 models.py:105
+#: models.py:73 models.py:115
 msgid "permissions"
 msgstr "õigused"
 
-#: models.py:108
+#: models.py:120
 msgid "group"
 msgstr "grupp"
 
-#: models.py:109 models.py:216
+#: models.py:121 models.py:250
 msgid "groups"
 msgstr "grupid"
 
-#: models.py:206
+#: models.py:232
 msgid "username"
 msgstr "kasutajatunnus"
 
-#: models.py:206
+#: models.py:233
 msgid ""
 "Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
 msgstr "Nõutav. 30 märki või vähem. Tähted, numbreid ja/./+/-/_ tähemärgid."
 
-#: models.py:207
+#: models.py:235
 msgid "first name"
 msgstr "eesnimi"
 
-#: models.py:208
+#: models.py:236
 msgid "last name"
 msgstr "perenimi"
 
-#: models.py:209
+#: models.py:237
 msgid "e-mail address"
 msgstr "e-posti aadress"
 
-#: models.py:210
+#: models.py:238
 msgid "password"
 msgstr "salasõna"
 
-#: models.py:210
-msgid ""
-"Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
-"password form</a>."
-msgstr ""
-"Formaat '[algoritm]$[sool]$[kuueteistkümnendtulend]' või kasutage <a href="
-"\"password/\">salasõna muutmise vormi</a>."
-
-#: models.py:211
+#: models.py:239
 msgid "staff status"
 msgstr "personalistaatus"
 
-#: models.py:211
+#: models.py:240
 msgid "Designates whether the user can log into this admin site."
 msgstr ""
 "Määrab, kas kasutaja saab sisse logida sellesse admininistreerimisliidesesse."
 
-#: models.py:212
+#: models.py:242
 msgid "active"
 msgstr "aktiivne"
 
-#: models.py:212
+#: models.py:243
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
@@ -209,52 +234,51 @@ msgstr ""
 "Määrab, kas see konto on aktiivne. Kustutamise asemel lihtsalt deaktiveerige "
 "konto."
 
-#: models.py:213
+#: models.py:245
 msgid "superuser status"
 msgstr "superkasutaja staatus"
 
-#: models.py:213
+#: models.py:246
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
 msgstr "Määrab, kas see kasutaja omab automaatselt ja alati kõiki õigus."
 
-#: models.py:214
+#: models.py:248
 msgid "last login"
 msgstr "viimane sisenemine"
 
-#: models.py:215
+#: models.py:249
 msgid "date joined"
 msgstr "liitumise kuupäev"
 
-#: models.py:217
+#: models.py:251
 msgid ""
-"In addition to the permissions manually assigned, this user will also get "
-"all permissions granted to each group he/she is in."
+"The groups this user belongs to. A user will get all permissions granted to "
+"each of his/her group."
 msgstr ""
-"Lisaks neile õigustele, mis kasutajale on määratud, omab kasutaja ka neid "
-"õigusi, mis on nendel gruppidel, millesse ta kuulub."
 
-#: models.py:218
+#: models.py:255
 msgid "user permissions"
 msgstr "kasutajaõigused"
 
-#: models.py:222
+#: models.py:260
 msgid "user"
 msgstr "kasutaja"
 
-#: models.py:223
+#: models.py:261
 msgid "users"
 msgstr "kasutajad"
 
-#: models.py:406
-msgid "message"
-msgstr "sõnum"
-
-#: views.py:91
+#: views.py:93
 msgid "Logged out"
 msgstr "Välja logitud"
 
-#: management/commands/createsuperuser.py:23
+#: management/commands/createsuperuser.py:27
 msgid "Enter a valid e-mail address."
 msgstr "Sisestage korrektne e-posti aadress:"
+
+#: templates/registration/password_reset_subject.txt:2
+#, python-format
+msgid "Password reset on %(site_name)s"
+msgstr ""

@@ -1,246 +1,275 @@
 # This file is distributed under the same license as the Django package.
 #
+# Translators:
+# Jannis Leidel <jannis@leidel.info>, 2011.
+# Kowit Charoenratchatabhan <kowito@gmail.com>, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-15 13:14-0400\n"
-"PO-Revision-Date: 2011-03-04 18:41+0000\n"
-"Last-Translator: Jannis <jannis@leidel.info>\n"
-"Language-Team: Thai <>\n"
+"POT-Creation-Date: 2012-03-14 00:15-0700\n"
+"PO-Revision-Date: 2012-03-09 04:27+0000\n"
+"Last-Translator: Kowit Charoenratchatabhan <kowito@gmail.com>\n"
+"Language-Team: Thai (http://www.transifex.net/projects/p/django/language/"
+"th/)\n"
+"Language: th\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: th\n"
 "Plural-Forms: nplurals=1; plural=0\n"
 
-#: admin.py:28
+#: admin.py:41
 msgid "Personal info"
 msgstr "ข้อมูลส่วนตัว"
 
-#: admin.py:29
+#: admin.py:42
 msgid "Permissions"
 msgstr "สิทธิ์"
 
-#: admin.py:30
+#: admin.py:44
 msgid "Important dates"
 msgstr "วันที่ที่สำคัญ"
 
-#: admin.py:31
-msgid "Groups"
-msgstr "กลุ่ม"
-
-#: admin.py:113
+#: admin.py:125
 msgid "Password changed successfully."
 msgstr "เปลี่ยนรหัสผ่านสำเร็จแล้ว"
 
-#: admin.py:123
+#: admin.py:135
 #, python-format
 msgid "Change password: %s"
 msgstr "เปลี่ยนรหัสผ่าน: %s "
 
-#: forms.py:14 forms.py:48 forms.py:66
-msgid "Username"
-msgstr "ชื่อผู้ใช้"
-
-#: forms.py:15 forms.py:49
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr ""
-
-#: forms.py:16 forms.py:50
-msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
-msgstr ""
-
-#: forms.py:17 forms.py:67 forms.py:193
-msgid "Password"
-msgstr "รหัสผ่าน"
-
-#: forms.py:18
-msgid "Password confirmation"
-msgstr "ยืนยันรหัสผ่าน"
-
-#: forms.py:19
-msgid "Enter the same password as above, for verification."
-msgstr "ใส่รหัสผ่านเหมือนด้านบน เพื่อตรวจสอบความถูกต้อง"
-
-#: forms.py:31
+#: forms.py:58
 msgid "A user with that username already exists."
 msgstr "ชื่อผู้ใช้นั้นได้ถูกใช้ไปแล้ว"
 
-#: forms.py:37 forms.py:163 forms.py:205
+#: forms.py:59 forms.py:247 forms.py:304
 msgid "The two password fields didn't match."
 msgstr "รหัสผ่านไม่ตรงกัน"
 
-#: forms.py:87
+#: forms.py:61 forms.py:106 forms.py:135
+msgid "Username"
+msgstr "ชื่อผู้ใช้"
+
+#: forms.py:63 forms.py:107
+msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr ""
+"จำเป็น ต้องการไม่เกิน 30 ตัวอักษร ต้องเป็นตัวอักษรตัวเลขและเครื่องหมาย @/./+/-/_ เท่านั้น"
+
+#: forms.py:66 forms.py:110
+msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
+msgstr "ค่านี้ต้องเป็นตัวอักษรตัวเลขและเครื่องหมาย @/./+/-/_ เท่านั้น"
+
+#: forms.py:68 forms.py:112 forms.py:136 forms.py:306
+msgid "Password"
+msgstr "รหัสผ่าน"
+
+#: forms.py:70
+msgid "Password confirmation"
+msgstr "ยืนยันรหัสผ่าน"
+
+#: forms.py:72
+msgid "Enter the same password as above, for verification."
+msgstr "ใส่รหัสผ่านเหมือนด้านบน เพื่อตรวจสอบความถูกต้อง"
+
+#: forms.py:113
+msgid ""
+"Raw passwords are not stored, so there is no way to see this user's "
+"password, but you can change the password using <a href=\"password/\">this "
+"form</a>."
+msgstr ""
+"รหัสผ่านที่ดิบจะไม่เก็บไว้ เพื่อไม่ให้มีวิธีการดูรหัสผ่านของผู้ใช้นี้ แต่คุณสามารถเปลี่ยนรหัสผ่านโดยใช้ <a "
+"href=\"password/\">แบบฟอร์มนี้</a> ."
+
+#: forms.py:139
 msgid ""
 "Please enter a correct username and password. Note that both fields are case-"
 "sensitive."
 msgstr "กรุณาใส่ชื่อผู้ใช้และรหัสผ่านให้ถูกต้อง มีการแยกแยะตัวพิมพ์ใหญ่-เล็ก"
 
-#: forms.py:89
-msgid "This account is inactive."
-msgstr "บัญชีนี้ไม่ทำงาน"
-
-#: forms.py:96
+#: forms.py:141
 msgid ""
 "Your Web browser doesn't appear to have cookies enabled. Cookies are "
 "required for logging in."
 msgstr "เว็บเบราเซอร์ของคุณไม่สามารถใช้งานระบบคุกกี้ได้ จำเป็นต้องใช้ระบบคุกกี้ในการเข้าสู่ระบบ"
 
-#: forms.py:108
-msgid "E-mail"
-msgstr "อีเมล"
+#: forms.py:143
+msgid "This account is inactive."
+msgstr "บัญชีนี้ไม่ทำงาน"
 
-#: forms.py:117
+#: forms.py:187
 msgid ""
 "That e-mail address doesn't have an associated user account. Are you sure "
 "you've registered?"
 msgstr "อีเมลนี้ไม่ตรงกับบัญชีใดๆในระบบ คุณแน่ใจหรือว่าคุณได้ลงทะเบียนแล้ว"
 
-#: forms.py:143
-#, python-format
-msgid "Password reset on %s"
-msgstr "ตั้งค่ารหัสผ่านใหม่บน %s"
+#: forms.py:189
+msgid ""
+"The user account associated with this e-mail address cannot reset the "
+"password."
+msgstr "บัญชีผู้ใช้ที่เกี่ยวข้องกับที่อยู่อีเมล์นี้ไม่สามารถตั้งค่ารหัสผ่าน"
 
-#: forms.py:151
+#: forms.py:192
+msgid "E-mail"
+msgstr "อีเมล"
+
+#: forms.py:249
 msgid "New password"
 msgstr "รหัสผ่านใหม่"
 
-#: forms.py:152
+#: forms.py:251
 msgid "New password confirmation"
 msgstr "ยืนยันการตั้งรหัสผ่านใหม่"
 
-#: forms.py:177
-msgid "Old password"
-msgstr "รหัสผ่านเก่า"
-
-#: forms.py:185
+#: forms.py:280
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr "ใส่รหัสผ่านเก่าผิด กรุณาใส่รหัสผ่านอีกครั้ง"
 
-#: forms.py:194
+#: forms.py:283
+msgid "Old password"
+msgstr "รหัสผ่านเก่า"
+
+#: forms.py:308
 msgid "Password (again)"
 msgstr "รหัสผ่าน (อีกครั้ง)"
 
-#: models.py:76 models.py:104
+#: hashers.py:218 hashers.py:269 hashers.py:298 hashers.py:326 hashers.py:355
+#: hashers.py:389
+msgid "algorithm"
+msgstr "algorithm"
+
+#: hashers.py:219
+msgid "iterations"
+msgstr "iterations"
+
+#: hashers.py:220 hashers.py:271 hashers.py:299 hashers.py:327 hashers.py:390
+msgid "salt"
+msgstr "salt"
+
+#: hashers.py:221 hashers.py:300 hashers.py:328 hashers.py:356 hashers.py:391
+msgid "hash"
+msgstr "hash"
+
+#: hashers.py:270
+msgid "work factor"
+msgstr "ปัจจัยการทำงาน"
+
+#: hashers.py:272
+msgid "checksum"
+msgstr "checksum"
+
+#: models.py:66 models.py:113
 msgid "name"
 msgstr "ชื่อ"
 
-#: models.py:78
+#: models.py:68
 msgid "codename"
 msgstr "รหัสชื่อ"
 
-#: models.py:82
+#: models.py:72
 msgid "permission"
 msgstr "สิทธิ์"
 
-#: models.py:83 models.py:105
+#: models.py:73 models.py:115
 msgid "permissions"
 msgstr "สิทธิ์"
 
-#: models.py:108
+#: models.py:120
 msgid "group"
 msgstr "กลุ่ม"
 
-#: models.py:109 models.py:216
+#: models.py:121 models.py:250
 msgid "groups"
 msgstr "กลุ่ม"
 
-#: models.py:206
+#: models.py:232
 msgid "username"
 msgstr "ชื่อผู้ใช้"
 
-#: models.py:206
+#: models.py:233
 msgid ""
 "Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
-msgstr ""
+msgstr "จำเป็น ต้องการไม่เกิน 30 ตัวอักษร ต้องเป็นตัวอักษรตัวเลขและตัวอักษร @/./+/-/_"
 
-#: models.py:207
+#: models.py:235
 msgid "first name"
 msgstr "ชื่อ"
 
-#: models.py:208
+#: models.py:236
 msgid "last name"
 msgstr "นามสกุล"
 
-#: models.py:209
+#: models.py:237
 msgid "e-mail address"
 msgstr "อีเมล"
 
-#: models.py:210
+#: models.py:238
 msgid "password"
 msgstr "รหัสผ่าน"
 
-#: models.py:210
-msgid ""
-"Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
-"password form</a>."
-msgstr ""
-"ใช้ '[algo]$[salt]$[hexdigest]'หรือใช้ <a href=\"password/\">แบบฟอร์มเปลี่ยนรหัสผ่าน "
-"</a>."
-
-#: models.py:211
+#: models.py:239
 msgid "staff status"
 msgstr "สถานะของพนักงาน"
 
-#: models.py:211
+#: models.py:240
 msgid "Designates whether the user can log into this admin site."
 msgstr "กำหนดผู้ที่จะเข้ามาใช้งานในส่วนของผู้ดูแลระบบ"
 
-#: models.py:212
+#: models.py:242
 msgid "active"
 msgstr "ใช้งานได้"
 
-#: models.py:212
+#: models.py:243
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
 msgstr "กำหนดให้ผู้ใช้มีสถานะที่สามารถเข้ามาใช้งานได้ เลือกออกแทนที่จะลบชื่อผู้ใช้ทิ้งไป "
 
-#: models.py:213
+#: models.py:245
 msgid "superuser status"
 msgstr "สถานะผู้ใช้พิเศษ"
 
-#: models.py:213
+#: models.py:246
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
 msgstr "กำหนดสิทธิ์ทุกอย่างให้ผู้ใช้ โดยไม่ต้องการมอบหมายอย่างเป็นทางการ"
 
-#: models.py:214
+#: models.py:248
 msgid "last login"
 msgstr "เข้าสู่ระบบครั้งสุดท้าย"
 
-#: models.py:215
+#: models.py:249
 msgid "date joined"
 msgstr "วันที่เข้าร่วม"
 
-#: models.py:217
+#: models.py:251
 msgid ""
-"In addition to the permissions manually assigned, this user will also get "
-"all permissions granted to each group he/she is in."
-msgstr "ด้วยสิทธิ์ที่ได้รับ ผู้ใช้นี้ยังได้รับสิทธิ์ให้ใช้อำนาจได้กับกลุ่มของตนเองอีกด้วย"
+"The groups this user belongs to. A user will get all permissions granted to "
+"each of his/her group."
+msgstr "กลุ่มที่ผู้ใช้อยู่ ผู้ใช้จะได้รับสิทธิ์ทั้งหมดที่กลุ่มของเขาได้รับ"
 
-#: models.py:218
+#: models.py:255
 msgid "user permissions"
 msgstr "สิทธิ์ของผู้ใช้"
 
-#: models.py:222
+#: models.py:260
 msgid "user"
 msgstr "ผู้ใช้"
 
-#: models.py:223
+#: models.py:261
 msgid "users"
 msgstr "ผู้ใช้"
 
-#: models.py:406
-msgid "message"
-msgstr "ข้อความ"
-
-#: views.py:91
+#: views.py:93
 msgid "Logged out"
 msgstr "ออกจากระบบ"
 
-#: management/commands/createsuperuser.py:23
+#: management/commands/createsuperuser.py:27
 msgid "Enter a valid e-mail address."
 msgstr "กรุณาใส่อีเมลที่ถูกต้อง"
+
+#: templates/registration/password_reset_subject.txt:2
+#, python-format
+msgid "Password reset on %(site_name)s"
+msgstr "รีเซ็ตรหัสผ่านบน %(site_name)s"

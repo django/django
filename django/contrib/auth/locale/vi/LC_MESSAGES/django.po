@@ -1,98 +1,101 @@
 # This file is distributed under the same license as the Django package.
 #
+# Translators:
+# Jannis Leidel <jannis@leidel.info>, 2011.
+# Tran  <hongdiepkien@gmail.com>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-15 13:14-0400\n"
-"PO-Revision-Date: 2011-03-10 21:56+0000\n"
-"Last-Translator: greenfire <hongdiepkien@gmail.com>\n"
-"Language-Team: Vietnamese <None>\n"
+"POT-Creation-Date: 2012-03-14 00:15-0700\n"
+"PO-Revision-Date: 2012-03-08 12:07+0000\n"
+"Last-Translator: Tran <hongdiepkien@gmail.com>\n"
+"Language-Team: Vietnamese (http://www.transifex.net/projects/p/django/"
+"language/vi/)\n"
+"Language: vi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: vi\n"
 "Plural-Forms: nplurals=1; plural=0\n"
 
-#: admin.py:28
+#: admin.py:41
 msgid "Personal info"
 msgstr "Thông tin cá nhân"
 
-#: admin.py:29
+#: admin.py:42
 msgid "Permissions"
 msgstr "Quyền"
 
-#: admin.py:30
+#: admin.py:44
 msgid "Important dates"
 msgstr "Những ngày quan trọng"
 
-#: admin.py:31
-msgid "Groups"
-msgstr "Các nhóm"
-
-#: admin.py:113
+#: admin.py:125
 msgid "Password changed successfully."
 msgstr "Mật khẩu thay đổi thành công"
 
-#: admin.py:123
+#: admin.py:135
 #, python-format
 msgid "Change password: %s"
 msgstr "Thay đổi mật khẩu: %s"
 
-#: forms.py:14 forms.py:48 forms.py:66
-msgid "Username"
-msgstr "Tên đăng nhập"
-
-#: forms.py:15 forms.py:49
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr "Yêu cầu. 30 ký tự hoặc ít hơn. Chỉ là chữ cái, chữ số và @/./+/-/_."
-
-#: forms.py:16 forms.py:50
-msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
-msgstr "Giá trị này có thể chứa chữ cái, số và ký tự @/./+/-/_."
-
-#: forms.py:17 forms.py:67 forms.py:193
-msgid "Password"
-msgstr "Mật khẩu"
-
-#: forms.py:18
-msgid "Password confirmation"
-msgstr "Xác nhận mật khẩu"
-
-#: forms.py:19
-msgid "Enter the same password as above, for verification."
-msgstr "Nhập dãy mật mã trên để xác minh lại"
-
-#: forms.py:31
+#: forms.py:58
 msgid "A user with that username already exists."
 msgstr "Tên đăng nhập đã được sử dụng"
 
-#: forms.py:37 forms.py:163 forms.py:205
+#: forms.py:59 forms.py:247 forms.py:304
 msgid "The two password fields didn't match."
 msgstr "Hai trường mật khẩu không giống nhau"
 
-#: forms.py:87
+#: forms.py:61 forms.py:106 forms.py:135
+msgid "Username"
+msgstr "Tên đăng nhập"
+
+#: forms.py:63 forms.py:107
+msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr "Yêu cầu. 30 ký tự hoặc ít hơn. Chỉ là chữ cái, chữ số và @/./+/-/_."
+
+#: forms.py:66 forms.py:110
+msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
+msgstr "Giá trị này có thể chứa chữ cái, số và ký tự @/./+/-/_."
+
+#: forms.py:68 forms.py:112 forms.py:136 forms.py:306
+msgid "Password"
+msgstr "Mật khẩu"
+
+#: forms.py:70
+msgid "Password confirmation"
+msgstr "Xác nhận mật khẩu"
+
+#: forms.py:72
+msgid "Enter the same password as above, for verification."
+msgstr "Nhập dãy mật mã trên để xác minh lại"
+
+#: forms.py:113
+msgid ""
+"Raw passwords are not stored, so there is no way to see this user's "
+"password, but you can change the password using <a href=\"password/\">this "
+"form</a>."
+msgstr ""
+
+#: forms.py:139
 msgid ""
 "Please enter a correct username and password. Note that both fields are case-"
 "sensitive."
 msgstr "Hãy nhập đúng tên đăng nhập và mật khẩu. Chú ý chữ hoa, chữ thường."
 
-#: forms.py:89
-msgid "This account is inactive."
-msgstr "Tài khoản này chưa được kích hoạt."
-
-#: forms.py:96
+#: forms.py:141
 msgid ""
 "Your Web browser doesn't appear to have cookies enabled. Cookies are "
 "required for logging in."
 msgstr ""
 "Trình duyệt web của bạn không bật cookie. Cookies được yêu cầu để đăng nhập"
 
-#: forms.py:108
-msgid "E-mail"
-msgstr "E-mail"
+#: forms.py:143
+msgid "This account is inactive."
+msgstr "Tài khoản này chưa được kích hoạt."
 
-#: forms.py:117
+#: forms.py:187
 msgid ""
 "That e-mail address doesn't have an associated user account. Are you sure "
 "you've registered?"
@@ -100,152 +103,173 @@ msgstr ""
 "Không tìm thấy địa chỉ email này trong các tài khoản đã có. Bạn có chắc là "
 "đã đăng kí không?"
 
-#: forms.py:143
-#, python-format
-msgid "Password reset on %s"
-msgstr "Đặt lại mật khẩu trên %s"
+#: forms.py:189
+msgid ""
+"The user account associated with this e-mail address cannot reset the "
+"password."
+msgstr ""
 
-#: forms.py:151
+#: forms.py:192
+msgid "E-mail"
+msgstr "E-mail"
+
+#: forms.py:249
 msgid "New password"
 msgstr "Mật khẩu mới"
 
-#: forms.py:152
+#: forms.py:251
 msgid "New password confirmation"
 msgstr "Xác nhận mật khẩu mới"
 
-#: forms.py:177
-msgid "Old password"
-msgstr "Mật khẩu cũ"
-
-#: forms.py:185
+#: forms.py:280
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr "Mật khẩu cũ không chính xác. Hãy nhập lại lần nữa"
 
-#: forms.py:194
+#: forms.py:283
+msgid "Old password"
+msgstr "Mật khẩu cũ"
+
+#: forms.py:308
 msgid "Password (again)"
 msgstr "Nhập lại mật khẩu"
 
-#: models.py:76 models.py:104
+#: hashers.py:218 hashers.py:269 hashers.py:298 hashers.py:326 hashers.py:355
+#: hashers.py:389
+msgid "algorithm"
+msgstr ""
+
+#: hashers.py:219
+msgid "iterations"
+msgstr ""
+
+#: hashers.py:220 hashers.py:271 hashers.py:299 hashers.py:327 hashers.py:390
+msgid "salt"
+msgstr ""
+
+#: hashers.py:221 hashers.py:300 hashers.py:328 hashers.py:356 hashers.py:391
+msgid "hash"
+msgstr ""
+
+#: hashers.py:270
+msgid "work factor"
+msgstr ""
+
+#: hashers.py:272
+msgid "checksum"
+msgstr ""
+
+#: models.py:66 models.py:113
 msgid "name"
 msgstr "Tên"
 
-#: models.py:78
+#: models.py:68
 msgid "codename"
 msgstr "tên mã"
 
-#: models.py:82
+#: models.py:72
 msgid "permission"
 msgstr "cho phép"
 
-#: models.py:83 models.py:105
+#: models.py:73 models.py:115
 msgid "permissions"
 msgstr "cho phép"
 
-#: models.py:108
+#: models.py:120
 msgid "group"
 msgstr "Nhóm"
 
-#: models.py:109 models.py:216
+#: models.py:121 models.py:250
 msgid "groups"
 msgstr "Các nhóm"
 
-#: models.py:206
+#: models.py:232
 msgid "username"
 msgstr "Tên đăng nhập"
 
-#: models.py:206
+#: models.py:233
 msgid ""
 "Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
 msgstr "Yêu cầu. 30 ký tự hoặc ít hơn. Chữ cái, số và ký tự @/./+/-/_"
 
-#: models.py:207
+#: models.py:235
 msgid "first name"
 msgstr "Tên"
 
-#: models.py:208
+#: models.py:236
 msgid "last name"
 msgstr "Họ"
 
-#: models.py:209
+#: models.py:237
 msgid "e-mail address"
 msgstr "Địa chỉ email"
 
-#: models.py:210
+#: models.py:238
 msgid "password"
 msgstr "Mật khẩu"
 
-#: models.py:210
-msgid ""
-"Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
-"password form</a>."
-msgstr ""
-"Sử dụng '[algo]$[salt]$[hexdigest]' hoặc sử dụng <a href=\"password/\">thay "
-"đổi form mật khẩu </a> ."
-
-#: models.py:211
+#: models.py:239
 msgid "staff status"
 msgstr "tình trạng nhân viên"
 
-#: models.py:211
+#: models.py:240
 msgid "Designates whether the user can log into this admin site."
 msgstr "Chỉ định người dùng nào được phép truy cập vào trang admin."
 
-#: models.py:212
+#: models.py:242
 msgid "active"
 msgstr "Kích hoạt"
 
-#: models.py:212
+#: models.py:243
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
 msgstr ""
 
-#: models.py:213
+#: models.py:245
 msgid "superuser status"
 msgstr ""
 
-#: models.py:213
+#: models.py:246
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
 msgstr ""
 
-#: models.py:214
+#: models.py:248
 msgid "last login"
 msgstr "Lần cuối đăng nhập"
 
-#: models.py:215
+#: models.py:249
 msgid "date joined"
 msgstr "Ngày tham gia"
 
-#: models.py:217
+#: models.py:251
 msgid ""
-"In addition to the permissions manually assigned, this user will also get "
-"all permissions granted to each group he/she is in."
+"The groups this user belongs to. A user will get all permissions granted to "
+"each of his/her group."
 msgstr ""
-"Bên cạnh các quyền đã mặc định khi đăng kí, người dùng sẽ được cấp thêm các "
-"quyền của các nhóm mà người đó tham gia vào."
 
-#: models.py:218
+#: models.py:255
 msgid "user permissions"
 msgstr "quyền của người sử dụng"
 
-#: models.py:222
+#: models.py:260
 msgid "user"
 msgstr "Người dùng"
 
-#: models.py:223
+#: models.py:261
 msgid "users"
 msgstr "người sử dụng"
 
-#: models.py:406
-msgid "message"
-msgstr "Tin nhắn"
-
-#: views.py:91
+#: views.py:93
 msgid "Logged out"
 msgstr "Đã thoát"
 
-#: management/commands/createsuperuser.py:23
+#: management/commands/createsuperuser.py:27
 msgid "Enter a valid e-mail address."
 msgstr "Hãy nhập địa chỉ email hợp lệ."
+
+#: templates/registration/password_reset_subject.txt:2
+#, python-format
+msgid "Password reset on %(site_name)s"
+msgstr ""

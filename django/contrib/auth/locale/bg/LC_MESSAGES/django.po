@@ -1,258 +1,285 @@
 # This file is distributed under the same license as the Django package.
 #
+# Translators:
+# Boris Chervenkov <office@sentido.bg>, 2012.
+# Jannis Leidel <jannis@leidel.info>, 2011.
+# Todor Lubenov <tlubenov@gmail.com>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-15 13:14-0400\n"
-"PO-Revision-Date: 2011-03-10 05:42+0000\n"
-"Last-Translator: tlubenov <tlubenov@gmail.com>\n"
-"Language-Team: Bulgarian <None>\n"
+"POT-Creation-Date: 2012-03-14 00:14-0700\n"
+"PO-Revision-Date: 2012-03-08 12:07+0000\n"
+"Last-Translator: Boris Chervenkov <office@sentido.bg>\n"
+"Language-Team: Bulgarian (http://www.transifex.net/projects/p/django/"
+"language/bg/)\n"
+"Language: bg\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: bg\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
-#: admin.py:28
+#: admin.py:41
 msgid "Personal info"
 msgstr "Лична информация"
 
-#: admin.py:29
+#: admin.py:42
 msgid "Permissions"
 msgstr "Права"
 
-#: admin.py:30
+#: admin.py:44
 msgid "Important dates"
 msgstr "Важни дати"
 
-#: admin.py:31
-msgid "Groups"
-msgstr "Групи"
-
-#: admin.py:113
+#: admin.py:125
 msgid "Password changed successfully."
-msgstr "Паролата бе успешно сменена.  "
+msgstr "Паролата беше променена успешно.  "
 
-#: admin.py:123
+#: admin.py:135
 #, python-format
 msgid "Change password: %s"
-msgstr "Смени парола: %s"
+msgstr "Промени парола: %s"
 
-#: forms.py:14 forms.py:48 forms.py:66
-msgid "Username"
-msgstr "Потребител"
-
-#: forms.py:15 forms.py:49
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr "Задължително. 30 знака или по-малко. Букви, цифри и @/./+/-/_ ."
-
-#: forms.py:16 forms.py:50
-msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
-msgstr "Тази стойност може да съдържа само букви, цифри и  @/./+/-/_ символи."
-
-#: forms.py:17 forms.py:67 forms.py:193
-msgid "Password"
-msgstr "Парола"
-
-#: forms.py:18
-msgid "Password confirmation"
-msgstr "Потвърждение на паролата"
-
-#: forms.py:19
-msgid "Enter the same password as above, for verification."
-msgstr "Въведете същата парола още веднъж за проверка.  "
-
-#: forms.py:31
+#: forms.py:58
 msgid "A user with that username already exists."
 msgstr "Потребител с това потребителско име вече съществува.  "
 
-#: forms.py:37 forms.py:163 forms.py:205
+#: forms.py:59 forms.py:247 forms.py:304
 msgid "The two password fields didn't match."
 msgstr "Двете полета за паролата не съвпадат.  "
 
-#: forms.py:87
+#: forms.py:61 forms.py:106 forms.py:135
+msgid "Username"
+msgstr "Потребител"
+
+#: forms.py:63 forms.py:107
+msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr "Задължително. 30 знака или по-малко. Букви, цифри и @/./+/-/_ ."
+
+#: forms.py:66 forms.py:110
+msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
+msgstr "Тази стойност може да съдържа само букви, цифри и  @/./+/-/_ символи."
+
+#: forms.py:68 forms.py:112 forms.py:136 forms.py:306
+msgid "Password"
+msgstr "Парола"
+
+#: forms.py:70
+msgid "Password confirmation"
+msgstr "Потвърждение на паролата"
+
+#: forms.py:72
+msgid "Enter the same password as above, for verification."
+msgstr "Въведете същата парола още веднъж за проверка.  "
+
+#: forms.py:113
+msgid ""
+"Raw passwords are not stored, so there is no way to see this user's "
+"password, but you can change the password using <a href=\"password/\">this "
+"form</a>."
+msgstr ""
+
+#: forms.py:139
 msgid ""
 "Please enter a correct username and password. Note that both fields are case-"
 "sensitive."
 msgstr ""
-"Въведете правилно потребителско име и парола.  И двете полета правят разлика "
+"Въведете правилно потребителско име и парола. И двете полета правят разлика "
 "между малки и големи букви!"
 
-#: forms.py:89
-msgid "This account is inactive."
-msgstr "Този акаунт е деактивиран."
-
-#: forms.py:96
+#: forms.py:141
 msgid ""
 "Your Web browser doesn't appear to have cookies enabled. Cookies are "
 "required for logging in."
 msgstr ""
-"Браузерът, който използвате не поддържа cookies, а те са необходими за да "
-"можете да се логнете.  "
+"Браузърът, който използвате не поддържа cookies, а те са необходими за да "
+"можете да се впишете.  "
 
-#: forms.py:108
-msgid "E-mail"
-msgstr "Е-поща"
+#: forms.py:143
+msgid "This account is inactive."
+msgstr "Този профил е неактивен."
 
-#: forms.py:117
+#: forms.py:187
 msgid ""
 "That e-mail address doesn't have an associated user account. Are you sure "
 "you've registered?"
 msgstr ""
-"С този email адрес няма обвързан потребителски акаунт.  Сигурни ли сте, че "
+"Няма обвързан потребителски профил с този email адрес. Сигурни ли сте, че "
 "сте се регистрирали?"
 
-#: forms.py:143
-#, python-format
-msgid "Password reset on %s"
-msgstr "Паролата се сменя на %s"
+#: forms.py:189
+msgid ""
+"The user account associated with this e-mail address cannot reset the "
+"password."
+msgstr ""
+"Потребителският профил, свързан с този email адрес, не може да променя "
+"паролата."
 
-#: forms.py:151
+#: forms.py:192
+msgid "E-mail"
+msgstr "Email адрес"
+
+#: forms.py:249
 msgid "New password"
 msgstr "Нова парола"
 
-#: forms.py:152
+#: forms.py:251
 msgid "New password confirmation"
 msgstr "потвърждение на нова паролата"
 
-#: forms.py:177
+#: forms.py:280
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr "Въвели сте погрешна стара парола. Въведете я отново.  "
+
+#: forms.py:283
 msgid "Old password"
 msgstr "Стара парола"
 
-#: forms.py:185
-msgid "Your old password was entered incorrectly. Please enter it again."
-msgstr "Въвели сте погрешна стара парола.  Въведете я пак.  "
-
-#: forms.py:194
+#: forms.py:308
 msgid "Password (again)"
-msgstr "Парола (пак)"
+msgstr "Парола (отново)"
 
-#: models.py:76 models.py:104
+#: hashers.py:218 hashers.py:269 hashers.py:298 hashers.py:326 hashers.py:355
+#: hashers.py:389
+msgid "algorithm"
+msgstr ""
+
+#: hashers.py:219
+msgid "iterations"
+msgstr ""
+
+#: hashers.py:220 hashers.py:271 hashers.py:299 hashers.py:327 hashers.py:390
+msgid "salt"
+msgstr ""
+
+#: hashers.py:221 hashers.py:300 hashers.py:328 hashers.py:356 hashers.py:391
+msgid "hash"
+msgstr ""
+
+#: hashers.py:270
+msgid "work factor"
+msgstr ""
+
+#: hashers.py:272
+msgid "checksum"
+msgstr ""
+
+#: models.py:66 models.py:113
 msgid "name"
 msgstr "име"
 
-#: models.py:78
+#: models.py:68
 msgid "codename"
 msgstr "код"
 
-#: models.py:82
+#: models.py:72
 msgid "permission"
 msgstr "право"
 
-#: models.py:83 models.py:105
+#: models.py:73 models.py:115
 msgid "permissions"
 msgstr "права"
 
-#: models.py:108
+#: models.py:120
 msgid "group"
 msgstr "група"
 
-#: models.py:109 models.py:216
+#: models.py:121 models.py:250
 msgid "groups"
 msgstr "групи"
 
-#: models.py:206
+#: models.py:232
 msgid "username"
 msgstr "потребител"
 
-#: models.py:206
+#: models.py:233
 msgid ""
 "Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
 msgstr "Задължително. 30 знака или по-малко. Букви, цифри и символи @/./+/-/_"
 
-#: models.py:207
+#: models.py:235
 msgid "first name"
 msgstr "собствено име"
 
-#: models.py:208
+#: models.py:236
 msgid "last name"
 msgstr "фамилно име"
 
-#: models.py:209
+#: models.py:237
 msgid "e-mail address"
-msgstr "e-mail адрес"
+msgstr "email адрес"
 
-#: models.py:210
+#: models.py:238
 msgid "password"
 msgstr "парола"
 
-#: models.py:210
-msgid ""
-"Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
-"password form</a>."
-msgstr ""
-"Въведете '[algo]$[salt]$[hexdigest]' или използвайте <a href=\"password/"
-"\">формата за смяна на парола</a>."
-
-#: models.py:211
+#: models.py:239
 msgid "staff status"
-msgstr "персонал"
+msgstr "статус на персонал"
 
-#: models.py:211
+#: models.py:240
 msgid "Designates whether the user can log into this admin site."
 msgstr "Указва дали този потребител има достъп до административния панел."
 
-#: models.py:212
+#: models.py:242
 msgid "active"
 msgstr "активен"
 
-#: models.py:212
+#: models.py:243
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
 msgstr ""
-"Означава дали този потребител трябва да се разглежда като активен. "
-"Премахване на избора на това, вместо изтриване на профила."
+"Указва дали този потребител трябва да се третира като активен. Премахнете на "
+"избора на това, вместо да триете профила."
 
-#: models.py:213
+#: models.py:245
 msgid "superuser status"
 msgstr "статут на супер-потребител"
 
-#: models.py:213
+#: models.py:246
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
 msgstr ""
-"Указва, че този потребител има всички права (без да има нужда да се указват "
-"изрично)."
+"Указва, че този потребител има всички права (без да има нужда да се "
+"изброяват изрично)."
 
-#: models.py:214
+#: models.py:248
 msgid "last login"
-msgstr "последен логин"
+msgstr "последно вписване"
 
-#: models.py:215
+#: models.py:249
 msgid "date joined"
 msgstr "дата на регистриране"
 
-#: models.py:217
+#: models.py:251
 msgid ""
-"In addition to the permissions manually assigned, this user will also get "
-"all permissions granted to each group he/she is in."
+"The groups this user belongs to. A user will get all permissions granted to "
+"each of his/her group."
 msgstr ""
-"Освен ръчно указаните права, този потребител също ще получи правата на всяка "
-"група, към която принадлежи.  "
 
-#: models.py:218
+#: models.py:255
 msgid "user permissions"
-msgstr "потребителски права"
+msgstr "права на потребител"
 
-#: models.py:222
+#: models.py:260
 msgid "user"
 msgstr "потребител"
 
-#: models.py:223
+#: models.py:261
 msgid "users"
 msgstr "потребители"
 
-#: models.py:406
-msgid "message"
-msgstr "съобщение"
-
-#: views.py:91
+#: views.py:93
 msgid "Logged out"
 msgstr "Извън системата"
 
-#: management/commands/createsuperuser.py:23
+#: management/commands/createsuperuser.py:27
 msgid "Enter a valid e-mail address."
-msgstr "Въведете валиден e-mail адрес.  "
+msgstr "Въведете валиден email адрес.  "
+
+#: templates/registration/password_reset_subject.txt:2
+#, python-format
+msgid "Password reset on %(site_name)s"
+msgstr "Променена парола на %(site_name)s"

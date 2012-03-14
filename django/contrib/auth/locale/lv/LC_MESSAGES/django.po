@@ -1,78 +1,84 @@
 # This file is distributed under the same license as the Django package.
 #
+# Translators:
+# Jannis Leidel <jannis@leidel.info>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-15 13:14-0400\n"
-"PO-Revision-Date: 2011-03-04 18:41+0000\n"
-"Last-Translator: Jannis <jannis@leidel.info>\n"
-"Language-Team: Latvian <None>\n"
+"POT-Creation-Date: 2012-03-14 00:15-0700\n"
+"PO-Revision-Date: 2012-03-08 12:07+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: Latvian (http://www.transifex.net/projects/p/django/language/"
+"lv/)\n"
+"Language: lv\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: lv\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : "
 "2)\n"
 
-#: admin.py:28
+#: admin.py:41
 msgid "Personal info"
 msgstr "Personīgā informācija"
 
-#: admin.py:29
+#: admin.py:42
 msgid "Permissions"
 msgstr "Tiesības"
 
-#: admin.py:30
+#: admin.py:44
 msgid "Important dates"
 msgstr "Svarīgi datumi"
 
-#: admin.py:31
-msgid "Groups"
-msgstr "Grupas"
-
-#: admin.py:113
+#: admin.py:125
 msgid "Password changed successfully."
 msgstr "Paroles nomainīta sekmīgi."
 
-#: admin.py:123
+#: admin.py:135
 #, python-format
 msgid "Change password: %s"
 msgstr "Paroles maiņa: %s"
 
-#: forms.py:14 forms.py:48 forms.py:66
-msgid "Username"
-msgstr "Lietotāja vārds"
-
-#: forms.py:15 forms.py:49
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr "Obligāts. 30 vai mazāk zīmes. Tikai burti, cipari un  @/./+/-/_ ."
-
-#: forms.py:16 forms.py:50
-msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
-msgstr "Šī vērtība var saturēt tikai burtus, ciparus un @/./+/-/_ simbolus"
-
-#: forms.py:17 forms.py:67 forms.py:193
-msgid "Password"
-msgstr "Parole"
-
-#: forms.py:18
-msgid "Password confirmation"
-msgstr "Paroles apstiprinājums"
-
-#: forms.py:19
-msgid "Enter the same password as above, for verification."
-msgstr "Pārbaudei atkārtoti ievadiet to pašu paroli kā augstāk."
-
-#: forms.py:31
+#: forms.py:58
 msgid "A user with that username already exists."
 msgstr "Lietotājs ar šādu lietotāja vārdu jau eksistē."
 
-#: forms.py:37 forms.py:163 forms.py:205
+#: forms.py:59 forms.py:247 forms.py:304
 msgid "The two password fields didn't match."
 msgstr "Paroles lauki nesakrita."
 
-#: forms.py:87
+#: forms.py:61 forms.py:106 forms.py:135
+msgid "Username"
+msgstr "Lietotāja vārds"
+
+#: forms.py:63 forms.py:107
+msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr "Obligāts. 30 vai mazāk zīmes. Tikai burti, cipari un  @/./+/-/_ ."
+
+#: forms.py:66 forms.py:110
+msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
+msgstr "Šī vērtība var saturēt tikai burtus, ciparus un @/./+/-/_ simbolus"
+
+#: forms.py:68 forms.py:112 forms.py:136 forms.py:306
+msgid "Password"
+msgstr "Parole"
+
+#: forms.py:70
+msgid "Password confirmation"
+msgstr "Paroles apstiprinājums"
+
+#: forms.py:72
+msgid "Enter the same password as above, for verification."
+msgstr "Pārbaudei atkārtoti ievadiet to pašu paroli kā augstāk."
+
+#: forms.py:113
+msgid ""
+"Raw passwords are not stored, so there is no way to see this user's "
+"password, but you can change the password using <a href=\"password/\">this "
+"form</a>."
+msgstr ""
+
+#: forms.py:139
 msgid ""
 "Please enter a correct username and password. Note that both fields are case-"
 "sensitive."
@@ -80,11 +86,7 @@ msgstr ""
 "Lūdzu ievadiet lietotājvārdu un paroli. Ievērojiet, ka abi lauki ir "
 "reģistrjūtīgi."
 
-#: forms.py:89
-msgid "This account is inactive."
-msgstr "Šis konts nav aktīvs."
-
-#: forms.py:96
+#: forms.py:141
 msgid ""
 "Your Web browser doesn't appear to have cookies enabled. Cookies are "
 "required for logging in."
@@ -92,11 +94,11 @@ msgstr ""
 "Izskatās, ka izmantotajam pārlūkam nav ieslēgtas sīkdatnes (cookies). Tās ir "
 "obligātas, lai pieslēgtos."
 
-#: forms.py:108
-msgid "E-mail"
-msgstr "E-pasts"
+#: forms.py:143
+msgid "This account is inactive."
+msgstr "Šis konts nav aktīvs."
 
-#: forms.py:117
+#: forms.py:187
 msgid ""
 "That e-mail address doesn't have an associated user account. Are you sure "
 "you've registered?"
@@ -104,154 +106,175 @@ msgstr ""
 "Šim e-pastam nav registrēta lietotāja konta. Vai tiešām esat "
 "piereģistrējušies?"
 
-#: forms.py:143
-#, python-format
-msgid "Password reset on %s"
-msgstr "Paroles pārstatīšana(reset) uz %s"
+#: forms.py:189
+msgid ""
+"The user account associated with this e-mail address cannot reset the "
+"password."
+msgstr ""
 
-#: forms.py:151
+#: forms.py:192
+msgid "E-mail"
+msgstr "E-pasts"
+
+#: forms.py:249
 msgid "New password"
 msgstr "Jaunā parole"
 
-#: forms.py:152
+#: forms.py:251
 msgid "New password confirmation"
 msgstr "Jaunās parole vēlreiz"
 
-#: forms.py:177
-msgid "Old password"
-msgstr "Vecā parole"
-
-#: forms.py:185
+#: forms.py:280
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr ""
 "Jūsu iepriekšējā parole netika ievadīta korekti. Lūdzu ievadiet to atkārtoti."
 
-#: forms.py:194
+#: forms.py:283
+msgid "Old password"
+msgstr "Vecā parole"
+
+#: forms.py:308
 msgid "Password (again)"
 msgstr "Parole (vēlreiz)"
 
-#: models.py:76 models.py:104
+#: hashers.py:218 hashers.py:269 hashers.py:298 hashers.py:326 hashers.py:355
+#: hashers.py:389
+msgid "algorithm"
+msgstr ""
+
+#: hashers.py:219
+msgid "iterations"
+msgstr ""
+
+#: hashers.py:220 hashers.py:271 hashers.py:299 hashers.py:327 hashers.py:390
+msgid "salt"
+msgstr ""
+
+#: hashers.py:221 hashers.py:300 hashers.py:328 hashers.py:356 hashers.py:391
+msgid "hash"
+msgstr ""
+
+#: hashers.py:270
+msgid "work factor"
+msgstr ""
+
+#: hashers.py:272
+msgid "checksum"
+msgstr ""
+
+#: models.py:66 models.py:113
 msgid "name"
 msgstr "nosaukums"
 
-#: models.py:78
+#: models.py:68
 msgid "codename"
 msgstr "kods"
 
-#: models.py:82
+#: models.py:72
 msgid "permission"
 msgstr "tiesība"
 
-#: models.py:83 models.py:105
+#: models.py:73 models.py:115
 msgid "permissions"
 msgstr "tiesības"
 
-#: models.py:108
+#: models.py:120
 msgid "group"
 msgstr "grupa"
 
-#: models.py:109 models.py:216
+#: models.py:121 models.py:250
 msgid "groups"
 msgstr "grupas"
 
-#: models.py:206
+#: models.py:232
 msgid "username"
 msgstr "lietotāja vārds"
 
-#: models.py:206
+#: models.py:233
 msgid ""
 "Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
 msgstr "Obligāts. 30 vai mazāk zīmes. Tikai burti, cipari un @/./+/-/_ simboli"
 
-#: models.py:207
+#: models.py:235
 msgid "first name"
 msgstr "vārds"
 
-#: models.py:208
+#: models.py:236
 msgid "last name"
 msgstr "uzvārds"
 
-#: models.py:209
+#: models.py:237
 msgid "e-mail address"
 msgstr "e-pasta adrese"
 
-#: models.py:210
+#: models.py:238
 msgid "password"
 msgstr "parole"
 
-#: models.py:210
-msgid ""
-"Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
-"password form</a>."
-msgstr ""
-"Lietojiet '[algo]$[salt]$[hexdigest]', vai arī <a href=\"password/\">paroles "
-"maiņas formu</a>."
-
-#: models.py:211
+#: models.py:239
 msgid "staff status"
 msgstr "personāla statuss"
 
-#: models.py:211
+#: models.py:240
 msgid "Designates whether the user can log into this admin site."
 msgstr ""
 "Atzīmējiet, ja vēlaties, lai lietotājs var pieslēgties administrācijas lapā."
 
-#: models.py:212
+#: models.py:242
 msgid "active"
 msgstr "aktīvs"
 
-#: models.py:212
+#: models.py:243
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
 msgstr "Nosaka, vai lietotājs ir aktīvs. Atceliet šo konta dzēšanas vietā."
 
-#: models.py:213
+#: models.py:245
 msgid "superuser status"
 msgstr "superlietotāja statuss"
 
-#: models.py:213
+#: models.py:246
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
 msgstr "Lietotājam ir visas tiesības arī bez to atsevišķas piešķiršanas."
 
-#: models.py:214
+#: models.py:248
 msgid "last login"
 msgstr "pēdējoreiz pieslēdzies"
 
-#: models.py:215
+#: models.py:249
 msgid "date joined"
 msgstr "datums, kad pievienojies"
 
-#: models.py:217
+#: models.py:251
 msgid ""
-"In addition to the permissions manually assigned, this user will also get "
-"all permissions granted to each group he/she is in."
+"The groups this user belongs to. A user will get all permissions granted to "
+"each of his/her group."
 msgstr ""
-"Papildus manuāli piešķirtajām atļaujām, šis lietotājs papildus iegūs arī "
-"visas tiesības, kas piešķirtas arī lietotāja grupām."
 
-#: models.py:218
+#: models.py:255
 msgid "user permissions"
 msgstr "lietotāja tiesības"
 
-#: models.py:222
+#: models.py:260
 msgid "user"
 msgstr "lietotājs"
 
-#: models.py:223
+#: models.py:261
 msgid "users"
 msgstr "lietotāji"
 
-#: models.py:406
-msgid "message"
-msgstr "ziņa"
-
-#: views.py:91
+#: views.py:93
 msgid "Logged out"
 msgstr "Atslēdzies"
 
-#: management/commands/createsuperuser.py:23
+#: management/commands/createsuperuser.py:27
 msgid "Enter a valid e-mail address."
 msgstr "Ievadiet korektu e-pasta adresi."
+
+#: templates/registration/password_reset_subject.txt:2
+#, python-format
+msgid "Password reset on %(site_name)s"
+msgstr ""

@@ -1,79 +1,89 @@
 # This file is distributed under the same license as the Django package.
 #
+# Translators:
+# Jannis Leidel <jannis@leidel.info>, 2011.
+# Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2011, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-15 13:14-0400\n"
-"PO-Revision-Date: 2011-03-04 18:41+0000\n"
-"Last-Translator: Ankhbayar <l.ankhbayar@gmail.com>\n"
-"Language-Team: Mongolian <>\n"
+"POT-Creation-Date: 2012-03-14 00:15-0700\n"
+"PO-Revision-Date: 2012-03-08 12:07+0000\n"
+"Last-Translator: Анхбаяр Анхаа <l.ankhbayar@gmail.com>\n"
+"Language-Team: Mongolian (http://www.transifex.net/projects/p/django/"
+"language/mn/)\n"
+"Language: mn\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: mn\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
-#: admin.py:28
+#: admin.py:41
 msgid "Personal info"
 msgstr "Хувийн мэдээлэл"
 
-#: admin.py:29
+#: admin.py:42
 msgid "Permissions"
 msgstr "Эрхүүд"
 
-#: admin.py:30
+#: admin.py:44
 msgid "Important dates"
 msgstr "Чухал огноо"
 
-#: admin.py:31
-msgid "Groups"
-msgstr "Бүлгүүд"
-
-#: admin.py:113
+#: admin.py:125
 msgid "Password changed successfully."
 msgstr "Нууц үг амжилттай өөрчлөгдлөө."
 
-#: admin.py:123
+#: admin.py:135
 #, python-format
 msgid "Change password: %s"
 msgstr "Нууц үг өөрчлөх: %s"
 
-#: forms.py:14 forms.py:48 forms.py:66
+#: forms.py:58
+msgid "A user with that username already exists."
+msgstr "Ийм хэрэглэгчийн нэртэй хэрэглэгч өмнө нь бүртгүүлсэн байна."
+
+#: forms.py:59 forms.py:247 forms.py:304
+msgid "The two password fields didn't match."
+msgstr "Хоёр нууц үг зөрж байна."
+
+#: forms.py:61 forms.py:106 forms.py:135
 msgid "Username"
 msgstr "Хэрэглэгчийн нэр"
 
-#: forms.py:15 forms.py:49
+#: forms.py:63 forms.py:107
 msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
 "Заавал. 30 ба түүнээс бага үсэгтэй. Зөвхөн латин үсэг, тоо болон @/./+/-/_ "
 "тэмдэгтүүдийг зөвшөөрнө."
 
-#: forms.py:16 forms.py:50
+#: forms.py:66 forms.py:110
 msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
 msgstr "Энэ утга дотор зөвхөн үсэг, тоо болон @/./+/-/_ тэмдэгтүүд байж болно."
 
-#: forms.py:17 forms.py:67 forms.py:193
+#: forms.py:68 forms.py:112 forms.py:136 forms.py:306
 msgid "Password"
 msgstr "Нууц үг "
 
-#: forms.py:18
+#: forms.py:70
 msgid "Password confirmation"
 msgstr "Нууц үгийн баталгаа"
 
-#: forms.py:19
+#: forms.py:72
 msgid "Enter the same password as above, for verification."
 msgstr "Батлахын тулд дээрх нууц үгээ ахин хийнэ үү."
 
-#: forms.py:31
-msgid "A user with that username already exists."
-msgstr "Ийм хэрэглэгчийн нэртэй хэрэглэгч өмнө нь бүртгүүлсэн байна."
+#: forms.py:113
+msgid ""
+"Raw passwords are not stored, so there is no way to see this user's "
+"password, but you can change the password using <a href=\"password/\">this "
+"form</a>."
+msgstr ""
+"Жинхэн нууц үгүүдийг хадгалдаггүй учраас хэрэглэгчийн нууц үгийг харах "
+"боломжгүй юм. Гэхдээ та нууц үгийг <a href=\"password/\">цонхоор</a> өөрчлөх "
+"боломжтой."
 
-#: forms.py:37 forms.py:163 forms.py:205
-msgid "The two password fields didn't match."
-msgstr "Хоёр нууц үг зөрж байна."
-
-#: forms.py:87
+#: forms.py:139
 msgid ""
 "Please enter a correct username and password. Note that both fields are case-"
 "sensitive."
@@ -81,11 +91,7 @@ msgstr ""
 "Хэрэглэгчийн нэр, нууц үгээ зөв оруулна уу. Том жижиг үсгийн ялгааг гаргах "
 "хэрэгтэй."
 
-#: forms.py:89
-msgid "This account is inactive."
-msgstr "Энэ бүртгэл идэвхгүй байна."
-
-#: forms.py:96
+#: forms.py:141
 msgid ""
 "Your Web browser doesn't appear to have cookies enabled. Cookies are "
 "required for logging in."
@@ -93,11 +99,11 @@ msgstr ""
 "Та вэб хөтчөө cookie ажиллахаар тохируулаагүй юм шиг байна. Нэвтрэхэд cookie "
 "шаардлагатай байдаг."
 
-#: forms.py:108
-msgid "E-mail"
-msgstr "Цахим шуудан"
+#: forms.py:143
+msgid "This account is inactive."
+msgstr "Энэ бүртгэл идэвхгүй байна."
 
-#: forms.py:117
+#: forms.py:187
 msgid ""
 "That e-mail address doesn't have an associated user account. Are you sure "
 "you've registered?"
@@ -105,104 +111,127 @@ msgstr ""
 "Цахим шуудангийн энэ хаягт хэрэглэгчийн бүртгэл байхгүй байна. Та "
 "бүртгүүлсэн гэдэгтээ итгэлтэй байна уу?"
 
-#: forms.py:143
-#, python-format
-msgid "Password reset on %s"
-msgstr "Нууц үг %s дээр хийгдсэн"
+#: forms.py:189
+msgid ""
+"The user account associated with this e-mail address cannot reset the "
+"password."
+msgstr ""
+"Энэ email хаягаар бүртгүүлсэн хэрэглэгчийн нууц үгийг сэргээх боломжгүй."
 
-#: forms.py:151
+#: forms.py:192
+msgid "E-mail"
+msgstr "Цахим шуудан"
+
+#: forms.py:249
 msgid "New password"
 msgstr "Шинэ нууц үг"
 
-#: forms.py:152
+#: forms.py:251
 msgid "New password confirmation"
 msgstr "Шинэ нууц үгийн баталгаа"
 
-#: forms.py:177
-msgid "Old password"
-msgstr "Хуучин нууц үг"
-
-#: forms.py:185
+#: forms.py:280
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr "Хуучин нууц үгээ буруу оруулсан байна. Ахин оруулна уу."
 
-#: forms.py:194
+#: forms.py:283
+msgid "Old password"
+msgstr "Хуучин нууц үг"
+
+#: forms.py:308
 msgid "Password (again)"
 msgstr "Нууц үг (ахиад)"
 
-#: models.py:76 models.py:104
+#: hashers.py:218 hashers.py:269 hashers.py:298 hashers.py:326 hashers.py:355
+#: hashers.py:389
+msgid "algorithm"
+msgstr "Алгоритм"
+
+#: hashers.py:219
+msgid "iterations"
+msgstr "давталтууд"
+
+#: hashers.py:220 hashers.py:271 hashers.py:299 hashers.py:327 hashers.py:390
+msgid "salt"
+msgstr "давс"
+
+#: hashers.py:221 hashers.py:300 hashers.py:328 hashers.py:356 hashers.py:391
+msgid "hash"
+msgstr "хаш"
+
+#: hashers.py:270
+msgid "work factor"
+msgstr "ажлын байгуулагч"
+
+#: hashers.py:272
+msgid "checksum"
+msgstr "checksum"
+
+#: models.py:66 models.py:113
 msgid "name"
 msgstr "нэр"
 
-#: models.py:78
+#: models.py:68
 msgid "codename"
 msgstr "Код"
 
-#: models.py:82
+#: models.py:72
 msgid "permission"
 msgstr "зөвшөөрөл"
 
-#: models.py:83 models.py:105
+#: models.py:73 models.py:115
 msgid "permissions"
 msgstr "зөвшөөрлүүд"
 
-#: models.py:108
+#: models.py:120
 msgid "group"
 msgstr "бүлэг "
 
-#: models.py:109 models.py:216
+#: models.py:121 models.py:250
 msgid "groups"
 msgstr "бүлгүүд"
 
-#: models.py:206
+#: models.py:232
 msgid "username"
 msgstr "хэрэглэгчийн нэр"
 
-#: models.py:206
+#: models.py:233
 msgid ""
 "Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
 msgstr ""
 "Заавал. 30 болон түүнээс бага тэмдэгт. Үсэг, тоо болон @/./+/-/_ тэмдэгтүүд "
 "ашиглана уу."
 
-#: models.py:207
+#: models.py:235
 msgid "first name"
 msgstr "нэр"
 
-#: models.py:208
+#: models.py:236
 msgid "last name"
 msgstr "овог"
 
-#: models.py:209
+#: models.py:237
 msgid "e-mail address"
 msgstr "цахим шуудангийн хаяг"
 
-#: models.py:210
+#: models.py:238
 msgid "password"
 msgstr "нууц үг"
 
-#: models.py:210
-msgid ""
-"Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
-"password form</a>."
-msgstr ""
-"Формат нь '[algo]$[salt]$[hexdigest]' эсвэл <a href=\"password/\">нууц үг "
-"солих цонх </a> хэрэглэнэ үү."
-
-#: models.py:211
+#: models.py:239
 msgid "staff status"
 msgstr "Хэрэглэгчдийн төлөв"
 
-#: models.py:211
+#: models.py:240
 msgid "Designates whether the user can log into this admin site."
 msgstr ""
 "Уг удирдлагын сайт руу хэрэглэгч нэвтрэх боломжтой эсэхийг тодорхойлно."
 
-#: models.py:212
+#: models.py:242
 msgid "active"
 msgstr "идэвхтэй"
 
-#: models.py:212
+#: models.py:243
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
@@ -210,52 +239,53 @@ msgstr ""
 "Энэ хэрэглэгчийг идэвхтэй болгох эсэхийг тодорхойлно. Бүртгэлийг нь устгахын "
 "оронд сонгохгүй байхад л хангалттай."
 
-#: models.py:213
+#: models.py:245
 msgid "superuser status"
 msgstr "Удирдлагын төлөв"
 
-#: models.py:213
+#: models.py:246
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
 msgstr "Энэ хэрэглэгчид бүх зөвшөөрөл байгааг ил тод харуулалгүй тодорхойлно. "
 
-#: models.py:214
+#: models.py:248
 msgid "last login"
 msgstr "сүүлд нэвтэрсэн"
 
-#: models.py:215
+#: models.py:249
 msgid "date joined"
 msgstr "бүртгүүлсэн огноо"
 
-#: models.py:217
+#: models.py:251
 msgid ""
-"In addition to the permissions manually assigned, this user will also get "
-"all permissions granted to each group he/she is in."
+"The groups this user belongs to. A user will get all permissions granted to "
+"each of his/her group."
 msgstr ""
-"Энэ хэрэглэгч зөвшөөрлийг гар ажиллагаагаар авахаас гадна өөрийн байгаа "
-"бүлэг бүртээ зөвшөөрөл олгуулна."
+"Бүлэгүүд энэ хэрэглэгчийнхээс тусдаа. Хэрэглэгчид нь сонгосон бүлэгт "
+"олгогдсон бүх эрх зөвшөөрөгдөх болно."
 
-#: models.py:218
+#: models.py:255
 msgid "user permissions"
 msgstr "хэрэглэгчийн эрхүүд"
 
-#: models.py:222
+#: models.py:260
 msgid "user"
 msgstr "хэрэглэгч "
 
-#: models.py:223
+#: models.py:261
 msgid "users"
 msgstr "хэрэглэгчид"
 
-#: models.py:406
-msgid "message"
-msgstr "мэдээлэл"
-
-#: views.py:91
+#: views.py:93
 msgid "Logged out"
 msgstr "Гарсан"
 
-#: management/commands/createsuperuser.py:23
+#: management/commands/createsuperuser.py:27
 msgid "Enter a valid e-mail address."
 msgstr "Хүчинтэй цахим шуудангийн хаяг оруул"
+
+#: templates/registration/password_reset_subject.txt:2
+#, python-format
+msgid "Password reset on %(site_name)s"
+msgstr "%(site_name)s cайт дээрх нууц үг сэргээлт"

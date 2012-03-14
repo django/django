@@ -1,82 +1,92 @@
 # This file is distributed under the same license as the Django package.
 #
+# Translators:
+# Jannis Leidel <jannis@leidel.info>, 2011.
+# Sergey Lysach <sergikoff88@gmail.com>, 2011, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-15 13:14-0400\n"
-"PO-Revision-Date: 2011-03-04 18:41+0000\n"
-"Last-Translator: sergikoff <sergikoff88@gmail.com>\n"
-"Language-Team: Ukrainian <>\n"
+"POT-Creation-Date: 2012-03-14 00:15-0700\n"
+"PO-Revision-Date: 2012-03-11 16:52+0000\n"
+"Last-Translator: Sergey Lysach <sergikoff88@gmail.com>\n"
+"Language-Team: Ukrainian (http://www.transifex.net/projects/p/django/"
+"language/uk/)\n"
+"Language: uk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: uk\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
-"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
 
-#: admin.py:28
+#: admin.py:41
 msgid "Personal info"
 msgstr "Персональна інформація"
 
-#: admin.py:29
+#: admin.py:42
 msgid "Permissions"
 msgstr "Дозволи"
 
-#: admin.py:30
+#: admin.py:44
 msgid "Important dates"
 msgstr "Важливі дати"
 
-#: admin.py:31
-msgid "Groups"
-msgstr "Групи"
-
-#: admin.py:113
+#: admin.py:125
 msgid "Password changed successfully."
 msgstr "Пароль успішно змінено."
 
-#: admin.py:123
+#: admin.py:135
 #, python-format
 msgid "Change password: %s"
 msgstr "Змінити пароль: %s"
 
-#: forms.py:14 forms.py:48 forms.py:66
+#: forms.py:58
+msgid "A user with that username already exists."
+msgstr "Користувач з таким ім'ям вже існує."
+
+#: forms.py:59 forms.py:247 forms.py:304
+msgid "The two password fields didn't match."
+msgstr "Паролі у двох полях не співпадають."
+
+#: forms.py:61 forms.py:106 forms.py:135
 msgid "Username"
 msgstr "Користувач"
 
-#: forms.py:15 forms.py:49
+#: forms.py:63 forms.py:107
 msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
 "Обов'язкове поле. 30 або менше символів . Тільки букви, цифри, а також "
 "символи: @/./+/-/_"
 
-#: forms.py:16 forms.py:50
+#: forms.py:66 forms.py:110
 msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
 msgstr ""
 "Значення цього поля може складатися лише з літер, цифр, а також з символів: "
 "@/./+/-/_"
 
-#: forms.py:17 forms.py:67 forms.py:193
+#: forms.py:68 forms.py:112 forms.py:136 forms.py:306
 msgid "Password"
 msgstr "Пароль"
 
-#: forms.py:18
+#: forms.py:70
 msgid "Password confirmation"
 msgstr "Підтвердження паролю"
 
-#: forms.py:19
+#: forms.py:72
 msgid "Enter the same password as above, for verification."
 msgstr "Повторіть пароль для перевірки."
 
-#: forms.py:31
-msgid "A user with that username already exists."
-msgstr "Користувач з таким ім'ям вже існує."
+#: forms.py:113
+msgid ""
+"Raw passwords are not stored, so there is no way to see this user's "
+"password, but you can change the password using <a href=\"password/\">this "
+"form</a>."
+msgstr ""
+"Паролі не зберігаються у відкритому вигляді, тому не має можливості "
+"переглянути пароль цього користувача, але ви можете змінити пароль за "
+"допомогою <a href=\"password/\">цієї форми</a>."
 
-#: forms.py:37 forms.py:163 forms.py:205
-msgid "The two password fields didn't match."
-msgstr "Паролі у двох полях не співпадають."
-
-#: forms.py:87
+#: forms.py:139
 msgid ""
 "Please enter a correct username and password. Note that both fields are case-"
 "sensitive."
@@ -84,11 +94,7 @@ msgstr ""
 "Будь-ласка введіть правильне ім'я та пароль. Зауважте, що обидва поля "
 "розрізняють великі і маленькі літери."
 
-#: forms.py:89
-msgid "This account is inactive."
-msgstr "Цей запис користувача не активний."
-
-#: forms.py:96
+#: forms.py:141
 msgid ""
 "Your Web browser doesn't appear to have cookies enabled. Cookies are "
 "required for logging in."
@@ -96,11 +102,11 @@ msgstr ""
 "Схоже, що у вашому браузері на увімкнені cookies. Cookies необхідні для "
 "входу."
 
-#: forms.py:108
-msgid "E-mail"
-msgstr "E-mail"
+#: forms.py:143
+msgid "This account is inactive."
+msgstr "Цей запис користувача не активний."
 
-#: forms.py:117
+#: forms.py:187
 msgid ""
 "That e-mail address doesn't have an associated user account. Are you sure "
 "you've registered?"
@@ -108,61 +114,93 @@ msgstr ""
 "Ця e-mail адреса не пов'язана з користувацьким запитом. Ви впевнені, що ви "
 "реєструвалися?"
 
-#: forms.py:143
-#, python-format
-msgid "Password reset on %s"
-msgstr "Пароль перевстановлено %s"
+#: forms.py:189
+msgid ""
+"The user account associated with this e-mail address cannot reset the "
+"password."
+msgstr ""
+"Акаунт користувача, пов'язаний з цією адресою електронної пошти не може "
+"скидувати пароль."
 
-#: forms.py:151
+#: forms.py:192
+msgid "E-mail"
+msgstr "E-mail"
+
+#: forms.py:249
 msgid "New password"
 msgstr "Новий пароль"
 
-#: forms.py:152
+#: forms.py:251
 msgid "New password confirmation"
 msgstr "Новий пароль (підтвердження):"
 
-#: forms.py:177
-msgid "Old password"
-msgstr "Старий пароль"
-
-#: forms.py:185
+#: forms.py:280
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr ""
 "Старий пароль було введено неправильно. Будь ласка, введіть його знову."
 
-#: forms.py:194
+#: forms.py:283
+msgid "Old password"
+msgstr "Старий пароль"
+
+#: forms.py:308
 msgid "Password (again)"
 msgstr "Зміна пароля"
 
-#: models.py:76 models.py:104
+#: hashers.py:218 hashers.py:269 hashers.py:298 hashers.py:326 hashers.py:355
+#: hashers.py:389
+msgid "algorithm"
+msgstr "алгоритм"
+
+#: hashers.py:219
+msgid "iterations"
+msgstr "ітерації"
+
+#: hashers.py:220 hashers.py:271 hashers.py:299 hashers.py:327 hashers.py:390
+msgid "salt"
+msgstr "сіль"
+
+#: hashers.py:221 hashers.py:300 hashers.py:328 hashers.py:356 hashers.py:391
+msgid "hash"
+msgstr "хеш"
+
+#: hashers.py:270
+msgid "work factor"
+msgstr "робочий фактор"
+
+#: hashers.py:272
+msgid "checksum"
+msgstr "контрольна сума"
+
+#: models.py:66 models.py:113
 msgid "name"
 msgstr "ім'я"
 
-#: models.py:78
+#: models.py:68
 msgid "codename"
 msgstr "код"
 
-#: models.py:82
+#: models.py:72
 msgid "permission"
 msgstr "дозвіл"
 
-#: models.py:83 models.py:105
+#: models.py:73 models.py:115
 msgid "permissions"
 msgstr "дозволи"
 
-#: models.py:108
+#: models.py:120
 msgid "group"
 msgstr "група"
 
-#: models.py:109 models.py:216
+#: models.py:121 models.py:250
 msgid "groups"
 msgstr "групи"
 
-#: models.py:206
+#: models.py:232
 msgid "username"
 msgstr "ім'я користувача"
 
-#: models.py:206
+#: models.py:233
 msgid ""
 "Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
 msgstr ""
@@ -170,43 +208,35 @@ msgstr ""
 "Обов'язкове поле. 30 або менше символів. Тільки букви, цифри, а також "
 "символи: @/./+/-/_"
 
-#: models.py:207
+#: models.py:235
 msgid "first name"
 msgstr "ім'я"
 
-#: models.py:208
+#: models.py:236
 msgid "last name"
 msgstr "прізвище"
 
-#: models.py:209
+#: models.py:237
 msgid "e-mail address"
 msgstr "e-mail адреса"
 
-#: models.py:210
+#: models.py:238
 msgid "password"
 msgstr "пароль"
 
-#: models.py:210
-msgid ""
-"Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
-"password form</a>."
-msgstr ""
-"Використайте '[algo]$[salt]$[hexdigest]' або використайте <a href=\"password/"
-"\">форму зміни паролю</a>."
-
-#: models.py:211
+#: models.py:239
 msgid "staff status"
 msgstr "статус персоналу"
 
-#: models.py:211
+#: models.py:240
 msgid "Designates whether the user can log into this admin site."
 msgstr "Визначає, чи може користувач увійти до цього сайту адміністрування."
 
-#: models.py:212
+#: models.py:242
 msgid "active"
 msgstr "активний"
 
-#: models.py:212
+#: models.py:243
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
@@ -214,52 +244,53 @@ msgstr ""
 "Визначає, чи можна цього користувача вважати діючим. Заберіть галочку, "
 "замість відалення запису користувача."
 
-#: models.py:213
+#: models.py:245
 msgid "superuser status"
 msgstr "статус суперкористувача"
 
-#: models.py:213
+#: models.py:246
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
 msgstr "Визначає, що цей користувач має всі дозволи без їх точного зазначення."
 
-#: models.py:214
+#: models.py:248
 msgid "last login"
 msgstr "останній вхід"
 
-#: models.py:215
+#: models.py:249
 msgid "date joined"
 msgstr "дата приєднання"
 
-#: models.py:217
+#: models.py:251
 msgid ""
-"In addition to the permissions manually assigned, this user will also get "
-"all permissions granted to each group he/she is in."
+"The groups this user belongs to. A user will get all permissions granted to "
+"each of his/her group."
 msgstr ""
-"На додаток до прав, які призначені вручну, цей користувач також отримує усі "
-"права, що має група, в якій він знаходиться."
+"Групи, до котрих належить користувач. Користувач отримає всі дозволи, що "
+"вказані в кожній з його/її груп."
 
-#: models.py:218
+#: models.py:255
 msgid "user permissions"
 msgstr "дозволи користувача"
 
-#: models.py:222
+#: models.py:260
 msgid "user"
 msgstr "користувач"
 
-#: models.py:223
+#: models.py:261
 msgid "users"
 msgstr "користувачі"
 
-#: models.py:406
-msgid "message"
-msgstr "повідомлення"
-
-#: views.py:91
+#: views.py:93
 msgid "Logged out"
 msgstr "Вихід"
 
-#: management/commands/createsuperuser.py:23
+#: management/commands/createsuperuser.py:27
 msgid "Enter a valid e-mail address."
 msgstr "Уведіть коректну e-mail адресу."
+
+#: templates/registration/password_reset_subject.txt:2
+#, python-format
+msgid "Password reset on %(site_name)s"
+msgstr "Скидання пароля на %(site_name)s"
