@@ -4,80 +4,107 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-15 13:13-0400\n"
+"POT-Creation-Date: 2012-03-14 00:13-0700\n"
 "PO-Revision-Date: 2011-03-06 21:35+0000\n"
 "Last-Translator: janos <janos@resenje.org>\n"
 "Language-Team: Serbian (Latin) <None>\n"
+"Language: sr@latin\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: sr@latin\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
-"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
 
-#: media/js/SelectFilter2.js:45
-#, perl-format
+#: static/admin/js/SelectFilter2.js:45
+#, c-format
 msgid "Available %s"
 msgstr "Dostupni %s"
 
-#: media/js/SelectFilter2.js:52
+#: static/admin/js/SelectFilter2.js:46
+#, c-format
+msgid ""
+"This is the list of available %s. You may choose some by selecting them in "
+"the box below and then clicking the \"Choose\" arrow between the two boxes."
+msgstr ""
+
+#: static/admin/js/SelectFilter2.js:53
+#, c-format
+msgid "Type into this box to filter down the list of available %s."
+msgstr ""
+
+#: static/admin/js/SelectFilter2.js:57
 msgid "Filter"
 msgstr "Filter"
 
-#: media/js/SelectFilter2.js:59
+#: static/admin/js/SelectFilter2.js:61
 msgid "Choose all"
 msgstr "Dodaj sve"
 
-#: media/js/SelectFilter2.js:64
-msgid "Add"
-msgstr "Dodaj"
+#: static/admin/js/SelectFilter2.js:61
+#, c-format
+msgid "Click to choose all %s at once."
+msgstr ""
 
-#: media/js/SelectFilter2.js:66
+#: static/admin/js/SelectFilter2.js:67
+#, fuzzy
+msgid "Choose"
+msgstr "Dodaj sve"
+
+#: static/admin/js/SelectFilter2.js:69
 msgid "Remove"
 msgstr "Ukloni"
 
-#: media/js/SelectFilter2.js:71
-#, perl-format
+#: static/admin/js/SelectFilter2.js:75
+#, c-format
 msgid "Chosen %s"
 msgstr "Odabrani %s"
 
-#: media/js/SelectFilter2.js:72
-msgid "Select your choice(s) and click "
-msgstr "Napravite izbor i kliknite "
+#: static/admin/js/SelectFilter2.js:76
+#, c-format
+msgid ""
+"This is the list of chosen %s. You may remove some by selecting them in the "
+"box below and then clicking the \"Remove\" arrow between the two boxes."
+msgstr ""
 
-#: media/js/SelectFilter2.js:77
-msgid "Clear all"
-msgstr "Vrati sve"
+#: static/admin/js/SelectFilter2.js:80
+#, fuzzy
+msgid "Remove all"
+msgstr "Ukloni"
 
-#: media/js/actions.js:18 media/js/actions.min.js:1
+#: static/admin/js/SelectFilter2.js:80
+#, c-format
+msgid "Click to remove all chosen %s at once."
+msgstr ""
+
+#: static/admin/js/actions.js:18 static/admin/js/actions.min.js:1
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
 msgstr[0] "%(sel)s od %(cnt)s izabran"
 msgstr[1] "%(sel)s od %(cnt)s izabrana"
 msgstr[2] "%(sel)s od %(cnt)s izabranih"
 
-#: media/js/actions.js:109 media/js/actions.min.js:5
+#: static/admin/js/actions.js:109 static/admin/js/actions.min.js:5
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
 "action, your unsaved changes will be lost."
 msgstr ""
 "Imate nesačivane izmene. Ako pokrenete akciju, izmene će biti izgubljene."
 
-#: media/js/actions.js:121 media/js/actions.min.js:6
+#: static/admin/js/actions.js:121 static/admin/js/actions.min.js:6
 msgid ""
 "You have selected an action, but you haven't saved your changes to "
 "individual fields yet. Please click OK to save. You'll need to re-run the "
 "action."
 msgstr "Izabrali ste akciju ali niste sačuvali promene polja."
 
-#: media/js/actions.js:123 media/js/actions.min.js:6
+#: static/admin/js/actions.js:123 static/admin/js/actions.min.js:6
 msgid ""
 "You have selected an action, and you haven't made any changes on individual "
 "fields. You're probably looking for the Go button rather than the Save "
 "button."
 msgstr "Izabrali ste akciju ali niste izmenili ni jedno polje."
 
-#: media/js/calendar.js:24 media/js/dateparse.js:32
+#: static/admin/js/calendar.js:26
 msgid ""
 "January February March April May June July August September October November "
 "December"
@@ -85,66 +112,62 @@ msgstr ""
 "januar februar mart april maj jun jul avgust septembar oktobar novembar "
 "decembar"
 
-#: media/js/calendar.js:25
+#: static/admin/js/calendar.js:27
 msgid "S M T W T F S"
 msgstr "N P U S Č P S"
 
-#: media/js/collapse.js:9 media/js/collapse.js.py:21
-#: media/js/collapse.min.js:1
+#: static/admin/js/collapse.js:8 static/admin/js/collapse.js.c:19
+#: static/admin/js/collapse.min.js:1
 msgid "Show"
 msgstr "Pokaži"
 
-#: media/js/collapse.js:16 media/js/collapse.min.js:1
+#: static/admin/js/collapse.js:15 static/admin/js/collapse.min.js:1
 msgid "Hide"
 msgstr "Sakrij"
 
-#: media/js/dateparse.js:33
-msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
-msgstr "nedelja ponedeljak utorak sreda četvrtak petak subota"
-
-#: media/js/admin/DateTimeShortcuts.js:49
-#: media/js/admin/DateTimeShortcuts.js:84
+#: static/admin/js/admin/DateTimeShortcuts.js:49
+#: static/admin/js/admin/DateTimeShortcuts.js:85
 msgid "Now"
 msgstr "Trenutno vreme"
 
-#: media/js/admin/DateTimeShortcuts.js:53
+#: static/admin/js/admin/DateTimeShortcuts.js:53
 msgid "Clock"
 msgstr "Sat"
 
-#: media/js/admin/DateTimeShortcuts.js:80
+#: static/admin/js/admin/DateTimeShortcuts.js:81
 msgid "Choose a time"
 msgstr "Odabir vremena"
 
-#: media/js/admin/DateTimeShortcuts.js:85
+#: static/admin/js/admin/DateTimeShortcuts.js:86
 msgid "Midnight"
 msgstr "Ponoć"
 
-#: media/js/admin/DateTimeShortcuts.js:86
+#: static/admin/js/admin/DateTimeShortcuts.js:87
 msgid "6 a.m."
 msgstr "18č"
 
-#: media/js/admin/DateTimeShortcuts.js:87
+#: static/admin/js/admin/DateTimeShortcuts.js:88
 msgid "Noon"
 msgstr "Podne"
 
-#: media/js/admin/DateTimeShortcuts.js:91
-#: media/js/admin/DateTimeShortcuts.js:188
+#: static/admin/js/admin/DateTimeShortcuts.js:92
+#: static/admin/js/admin/DateTimeShortcuts.js:204
 msgid "Cancel"
 msgstr "Poništi"
 
-#: media/js/admin/DateTimeShortcuts.js:133
-#: media/js/admin/DateTimeShortcuts.js:182
+#: static/admin/js/admin/DateTimeShortcuts.js:144
+#: static/admin/js/admin/DateTimeShortcuts.js:197
 msgid "Today"
 msgstr "Danas"
 
-#: media/js/admin/DateTimeShortcuts.js:137
+#: static/admin/js/admin/DateTimeShortcuts.js:148
 msgid "Calendar"
 msgstr "Kalendar"
 
-#: media/js/admin/DateTimeShortcuts.js:180
+#: static/admin/js/admin/DateTimeShortcuts.js:195
 msgid "Yesterday"
 msgstr "Juče"
 
-#: media/js/admin/DateTimeShortcuts.js:184
+#: static/admin/js/admin/DateTimeShortcuts.js:199
 msgid "Tomorrow"
 msgstr "Sutra"

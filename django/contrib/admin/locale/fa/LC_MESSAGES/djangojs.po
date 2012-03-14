@@ -1,59 +1,89 @@
 # This file is distributed under the same license as the Django package.
 #
+# Translators:
+# Ali Nikneshan <ali@nikneshan.com>, 2011.
+# Jannis Leidel <jannis@leidel.info>, 2011.
+# Sina Cheraghi <sinacher@gmail.com>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-15 13:13-0400\n"
-"PO-Revision-Date: 2011-03-06 14:51+0000\n"
-"Last-Translator: sinacher <sinacher@gmail.com>\n"
-"Language-Team: Persian <None>\n"
+"POT-Creation-Date: 2012-03-14 00:13-0700\n"
+"PO-Revision-Date: 2012-03-08 10:42+0000\n"
+"Last-Translator: Sina Cheraghi <sinacher@gmail.com>\n"
+"Language-Team: Persian (http://www.transifex.net/projects/p/django/language/"
+"fa/)\n"
+"Language: fa\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: fa\n"
 "Plural-Forms: nplurals=1; plural=0\n"
 
-#: media/js/SelectFilter2.js:45
-#, perl-format
+#: static/admin/js/SelectFilter2.js:45
+#, c-format
 msgid "Available %s"
 msgstr "%s موجود"
 
-#: media/js/SelectFilter2.js:52
+#: static/admin/js/SelectFilter2.js:46
+#, c-format
+msgid ""
+"This is the list of available %s. You may choose some by selecting them in "
+"the box below and then clicking the \"Choose\" arrow between the two boxes."
+msgstr ""
+
+#: static/admin/js/SelectFilter2.js:53
+#, c-format
+msgid "Type into this box to filter down the list of available %s."
+msgstr ""
+
+#: static/admin/js/SelectFilter2.js:57
 msgid "Filter"
 msgstr "فیلتر"
 
-#: media/js/SelectFilter2.js:59
+#: static/admin/js/SelectFilter2.js:61
 msgid "Choose all"
 msgstr "انتخاب همه"
 
-#: media/js/SelectFilter2.js:64
-msgid "Add"
-msgstr "اضافه کردن"
+#: static/admin/js/SelectFilter2.js:61
+#, c-format
+msgid "Click to choose all %s at once."
+msgstr ""
 
-#: media/js/SelectFilter2.js:66
+#: static/admin/js/SelectFilter2.js:67
+msgid "Choose"
+msgstr ""
+
+#: static/admin/js/SelectFilter2.js:69
 msgid "Remove"
 msgstr "حذف"
 
-#: media/js/SelectFilter2.js:71
-#, perl-format
+#: static/admin/js/SelectFilter2.js:75
+#, c-format
 msgid "Chosen %s"
 msgstr "%s انتخاب شده"
 
-#: media/js/SelectFilter2.js:72
-msgid "Select your choice(s) and click "
-msgstr "موارد مورد نظر را انتخاب کرده و کلیک کنید "
+#: static/admin/js/SelectFilter2.js:76
+#, c-format
+msgid ""
+"This is the list of chosen %s. You may remove some by selecting them in the "
+"box below and then clicking the \"Remove\" arrow between the two boxes."
+msgstr ""
 
-#: media/js/SelectFilter2.js:77
-msgid "Clear all"
-msgstr "پاک کردن همه"
+#: static/admin/js/SelectFilter2.js:80
+msgid "Remove all"
+msgstr ""
 
-#: media/js/actions.js:18 media/js/actions.min.js:1
+#: static/admin/js/SelectFilter2.js:80
+#, c-format
+msgid "Click to remove all chosen %s at once."
+msgstr ""
+
+#: static/admin/js/actions.js:18 static/admin/js/actions.min.js:1
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
 msgstr[0] " %(sel)s از %(cnt)s انتخاب شده است."
 
-#: media/js/actions.js:109 media/js/actions.min.js:5
+#: static/admin/js/actions.js:109 static/admin/js/actions.min.js:5
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
 "action, your unsaved changes will be lost."
@@ -61,7 +91,7 @@ msgstr ""
 "شما تغییراتی در بعضی فیلدهای قابل تغییر انجام داده اید. اگر کاری انجام "
 "دهید،  تغییرات از دست خواهند رفت"
 
-#: media/js/actions.js:121 media/js/actions.min.js:6
+#: static/admin/js/actions.js:121 static/admin/js/actions.min.js:6
 msgid ""
 "You have selected an action, but you haven't saved your changes to "
 "individual fields yet. Please click OK to save. You'll need to re-run the "
@@ -71,7 +101,7 @@ msgstr ""
 "اید. لطفا OK را فشار دهید تا ذخیره شود.\n"
 "شما باید عملیات را دوباره انجام دهید."
 
-#: media/js/actions.js:123 media/js/actions.min.js:6
+#: static/admin/js/actions.js:123 static/admin/js/actions.min.js:6
 msgid ""
 "You have selected an action, and you haven't made any changes on individual "
 "fields. You're probably looking for the Go button rather than the Save "
@@ -80,72 +110,68 @@ msgstr ""
 "شما عملی را انجام داده اید، ولی تغییری انجام نداده اید. احتمالا دنبال کلید "
 "Go به جای Save میگردید."
 
-#: media/js/calendar.js:24 media/js/dateparse.js:32
+#: static/admin/js/calendar.js:26
 msgid ""
 "January February March April May June July August September October November "
 "December"
 msgstr "ژانویه فوریه مارس آوریل مه ژوئن ژوئیه اوت سپتامبر اکتبر نوامبر دسامبر"
 
-#: media/js/calendar.js:25
+#: static/admin/js/calendar.js:27
 msgid "S M T W T F S"
 msgstr "یکشنبه دوشنبه سه‌شنبه چهارشنبه پنجشنبه جمعه شنبه"
 
-#: media/js/collapse.js:9 media/js/collapse.js.py:21
-#: media/js/collapse.min.js:1
+#: static/admin/js/collapse.js:8 static/admin/js/collapse.js.c:19
+#: static/admin/js/collapse.min.js:1
 msgid "Show"
 msgstr "نمایش"
 
-#: media/js/collapse.js:16 media/js/collapse.min.js:1
+#: static/admin/js/collapse.js:15 static/admin/js/collapse.min.js:1
 msgid "Hide"
 msgstr "پنهان کردن"
 
-#: media/js/dateparse.js:33
-msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
-msgstr "یکشنبه دوشنبه سه‌شنبه چهارشنبه پنجشنبه جمعه شنبه"
-
-#: media/js/admin/DateTimeShortcuts.js:49
-#: media/js/admin/DateTimeShortcuts.js:84
+#: static/admin/js/admin/DateTimeShortcuts.js:49
+#: static/admin/js/admin/DateTimeShortcuts.js:85
 msgid "Now"
 msgstr "حالا"
 
-#: media/js/admin/DateTimeShortcuts.js:53
+#: static/admin/js/admin/DateTimeShortcuts.js:53
 msgid "Clock"
 msgstr "ساعت"
 
-#: media/js/admin/DateTimeShortcuts.js:80
+#: static/admin/js/admin/DateTimeShortcuts.js:81
 msgid "Choose a time"
 msgstr "یک زمان انتخاب کنید"
 
-#: media/js/admin/DateTimeShortcuts.js:85
+#: static/admin/js/admin/DateTimeShortcuts.js:86
 msgid "Midnight"
 msgstr "نیمه‌شب"
 
-#: media/js/admin/DateTimeShortcuts.js:86
+#: static/admin/js/admin/DateTimeShortcuts.js:87
 msgid "6 a.m."
 msgstr "۶ صبح"
 
-#: media/js/admin/DateTimeShortcuts.js:87
+#: static/admin/js/admin/DateTimeShortcuts.js:88
 msgid "Noon"
 msgstr "ظهر"
 
-#: media/js/admin/DateTimeShortcuts.js:91
-#: media/js/admin/DateTimeShortcuts.js:188
+#: static/admin/js/admin/DateTimeShortcuts.js:92
+#: static/admin/js/admin/DateTimeShortcuts.js:204
 msgid "Cancel"
 msgstr "انصراف"
 
-#: media/js/admin/DateTimeShortcuts.js:133
-#: media/js/admin/DateTimeShortcuts.js:182
+#: static/admin/js/admin/DateTimeShortcuts.js:144
+#: static/admin/js/admin/DateTimeShortcuts.js:197
 msgid "Today"
 msgstr "امروز"
 
-#: media/js/admin/DateTimeShortcuts.js:137
+#: static/admin/js/admin/DateTimeShortcuts.js:148
 msgid "Calendar"
 msgstr "تقویم"
 
-#: media/js/admin/DateTimeShortcuts.js:180
+#: static/admin/js/admin/DateTimeShortcuts.js:195
 msgid "Yesterday"
 msgstr "دیروز"
 
-#: media/js/admin/DateTimeShortcuts.js:184
+#: static/admin/js/admin/DateTimeShortcuts.js:199
 msgid "Tomorrow"
 msgstr "فردا"

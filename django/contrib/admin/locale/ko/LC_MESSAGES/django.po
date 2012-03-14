@@ -1,88 +1,83 @@
 # This file is distributed under the same license as the Django package.
 #
+# Translators:
+# Jaehong Kim <mixe@korea.com>, 2011.
+# Jannis Leidel <jannis@leidel.info>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-20 21:03+0100\n"
-"PO-Revision-Date: 2011-03-06 03:24+0000\n"
-"Last-Translator: mixe <mixe@korea.com>\n"
-"Language-Team: Korean <None>\n"
+"POT-Creation-Date: 2012-03-14 00:12-0700\n"
+"PO-Revision-Date: 2012-03-08 12:29+0000\n"
+"Last-Translator: Jaehong Kim <mixe@korea.com>\n"
+"Language-Team: Korean (http://www.transifex.net/projects/p/django/language/"
+"ko/)\n"
+"Language: ko\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: ko\n"
 "Plural-Forms: nplurals=1; plural=0\n"
 
-#: actions.py:49
+#: actions.py:48
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "%(count)d개의 %(items)s (을)를 성공적으로 삭제하였습니다."
 
-#: actions.py:61 options.py:1219
+#: actions.py:60 options.py:1297
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr "%(name)s를 삭제할 수 없습니다."
 
-#: actions.py:63 options.py:1221
+#: actions.py:62 options.py:1299
 msgid "Are you sure?"
 msgstr "확실합니까?"
 
-#: actions.py:85
+#: actions.py:83
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
 msgstr "선택된 %(verbose_name_plural)s (을)를 삭제합니다."
 
-#: filterspecs.py:54
-#, python-format
-msgid ""
-"<h3>By %s:</h3>\n"
-"<ul>\n"
-msgstr ""
-"<h3>%s(으)로:</h3>\n"
-"<ul>\n"
-
-#: filterspecs.py:104 filterspecs.py:139 filterspecs.py:168 filterspecs.py:258
+#: filters.py:101 filters.py:191 filters.py:231 filters.py:268 filters.py:378
 msgid "All"
 msgstr "모두"
 
-#: filterspecs.py:139
+#: filters.py:232
 msgid "Yes"
 msgstr "예"
 
-#: filterspecs.py:139
+#: filters.py:233
 msgid "No"
 msgstr "아니오"
 
-#: filterspecs.py:150
+#: filters.py:247
 msgid "Unknown"
 msgstr "알 수 없습니다."
 
-#: filterspecs.py:196
+#: filters.py:306
 msgid "Any date"
 msgstr "언제나"
 
-#: filterspecs.py:197
+#: filters.py:307
 msgid "Today"
 msgstr "오늘"
 
-#: filterspecs.py:200
+#: filters.py:311
 msgid "Past 7 days"
 msgstr "지난 7일"
 
-#: filterspecs.py:203
+#: filters.py:315
 msgid "This month"
 msgstr "이번 달"
 
-#: filterspecs.py:205
+#: filters.py:319
 msgid "This year"
 msgstr "이번 해"
 
 #: forms.py:9
 msgid ""
-"Please enter a correct username and password. Note that both fields are case-"
-"sensitive."
-msgstr "사용자명과 비밀번호를 입력하세요. (대소문자 구별)"
+"Please enter the correct username and password for a staff account. Note "
+"that both fields are case-sensitive."
+msgstr ""
 
 #: forms.py:18
 msgid "Please log in again, because your session has expired."
@@ -93,7 +88,7 @@ msgstr "로그인 세션이 끊겼습니다. 다시 로그인 하세요."
 msgid "Your e-mail address is not your username. Try '%s' instead."
 msgstr "이메일 주소와 사용자명은 다릅니다. '%s'를 사용하세요."
 
-#: helpers.py:19
+#: helpers.py:20
 msgid "Action:"
 msgstr "액션:"
 
@@ -117,72 +112,91 @@ msgstr "액션 플래그"
 msgid "change message"
 msgstr "메시지 변경"
 
-#: models.py:28
+#: models.py:30
 msgid "log entry"
 msgstr "로그 엔트리"
 
-#: models.py:29
+#: models.py:31
 msgid "log entries"
 msgstr "로그 엔트리"
 
-#: options.py:147 options.py:162
+#: models.py:40
+#, python-format
+msgid "Added \"%(object)s\"."
+msgstr ""
+
+#: models.py:42
+#, python-format
+msgid "Changed \"%(object)s\" - %(changes)s"
+msgstr ""
+
+#: models.py:44
+#, python-format
+msgid "Deleted \"%(object)s.\""
+msgstr ""
+
+#: models.py:46
+msgid "LogEntry Object"
+msgstr ""
+
+#: options.py:150 options.py:166
 msgid "None"
 msgstr "없음"
 
-#: options.py:627
+#: options.py:673
 #, python-format
 msgid "Changed %s."
 msgstr "%s (이)가 변경되었습니다."
 
-#: options.py:627 options.py:637
+#: options.py:673 options.py:683
 msgid "and"
 msgstr "또한"
 
-#: options.py:632
+#: options.py:678
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" (을)를 추가하였습니다."
 
-#: options.py:636
+#: options.py:682
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "%(list)s에 대한 %(name)s \"%(object)s\" (을)를 변경하였습니다."
 
-#: options.py:641
+#: options.py:687
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" (을)를 삭제하였습니다."
 
-#: options.py:645
+#: options.py:691
 msgid "No fields changed."
 msgstr "변경된 필드가 없습니다."
 
-#: options.py:717
+#: options.py:774
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" (이)가 추가되었습니다."
 
-#: options.py:721 options.py:761
+#: options.py:778 options.py:826
 msgid "You may edit it again below."
 msgstr "계속해서 편집하실 수 있습니다."
 
-#: options.py:731 options.py:771
+#: options.py:790 options.py:839
 #, python-format
 msgid "You may add another %s below."
 msgstr "계속해서 다른 %s (을)를 추가하세요."
 
-#: options.py:759
+#: options.py:824
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" (이)가 변경되었습니다."
 
-#: options.py:767
+#: options.py:832
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr "%(name)s \"%(obj)s\" (이)가 추가되었습니다. 계속해서 편집하세요."
 
-#: options.py:827 options.py:1085
+#: options.py:901 options.py:1161
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
@@ -190,84 +204,84 @@ msgstr ""
 "항목들에 액션을 적용하기 위해선 먼저 항목들이 선택되어 있어야 합니다. 아무 항"
 "목도 변경되지 않았습니다."
 
-#: options.py:846
+#: options.py:920
 msgid "No action selected."
 msgstr "액션이 선택되지 않았습니다."
 
-#: options.py:927
+#: options.py:1000
 #, python-format
 msgid "Add %s"
 msgstr "%s 추가"
 
-#: options.py:953 options.py:1194
+#: options.py:1025 options.py:1269
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "Primary key %(key)r에 대한 오브젝트 %(name)s(이)가 존재하지 않습니다."
 
-#: options.py:1018
+#: options.py:1091
 #, python-format
 msgid "Change %s"
 msgstr "%s 변경"
 
-#: options.py:1065
+#: options.py:1140
 msgid "Database error"
 msgstr "데이터베이스 오류"
 
-#: options.py:1127
+#: options.py:1203
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s개의 %(name)s(이)가 변경되었습니다."
 
-#: options.py:1154
+#: options.py:1230
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "모두 %(total_count)s개가 선택되었습니다."
 
-#: options.py:1159
+#: options.py:1235
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "%(cnt)s 중 아무것도 선택되지 않았습니다."
 
-#: options.py:1210
+#: options.py:1285
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\"(이)가 삭제되었습니다."
 
-#: options.py:1255
+#: options.py:1332
 #, python-format
 msgid "Change history: %s"
 msgstr "변경 히스토리: %s"
 
-#: sites.py:319 templates/admin/login.html:42
-#: templates/registration/password_reset_complete.html:14
-#: views/decorators.py:26
+#: sites.py:315 tests.py:61 templates/admin/login.html:49
+#: templates/registration/password_reset_complete.html:20
+#: views/decorators.py:23
 msgid "Log in"
 msgstr "로그인"
 
-#: sites.py:375
+#: sites.py:380
 msgid "Site administration"
 msgstr "사이트 관리"
 
-#: sites.py:419
+#: sites.py:432
 #, python-format
 msgid "%s administration"
 msgstr "%s 사이트 관리"
 
-#: widgets.py:75
+#: widgets.py:87
 msgid "Date:"
 msgstr "날짜:"
 
-#: widgets.py:75
+#: widgets.py:87
 msgid "Time:"
 msgstr "시각:"
 
-#: widgets.py:140
+#: widgets.py:161
 msgid "Lookup"
 msgstr "찾아보기"
 
-#: widgets.py:246
+#: widgets.py:267
 msgid "Add Another"
 msgstr "하나 더 추가하기"
 
@@ -279,36 +293,36 @@ msgstr "해당 페이지가 없습니다."
 msgid "We're sorry, but the requested page could not be found."
 msgstr "죄송합니다, 요청하신 페이지를 찾을 수 없습니다."
 
-#: templates/admin/500.html:4 templates/admin/app_index.html:8
-#: templates/admin/base.html:55 templates/admin/change_form.html:19
-#: templates/admin/change_list.html:42
-#: templates/admin/delete_confirmation.html:6
-#: templates/admin/delete_selected_confirmation.html:6
-#: templates/admin/invalid_setup.html:4 templates/admin/object_history.html:6
-#: templates/admin/auth/user/change_password.html:12
-#: templates/registration/logged_out.html:4
-#: templates/registration/password_change_done.html:5
-#: templates/registration/password_change_form.html:6
-#: templates/registration/password_reset_complete.html:4
-#: templates/registration/password_reset_confirm.html:4
-#: templates/registration/password_reset_done.html:4
-#: templates/registration/password_reset_form.html:4
+#: templates/admin/500.html:7 templates/admin/app_index.html:8
+#: templates/admin/base.html:45 templates/admin/change_form.html:21
+#: templates/admin/change_list.html:43
+#: templates/admin/delete_confirmation.html:8
+#: templates/admin/delete_selected_confirmation.html:8
+#: templates/admin/invalid_setup.html:7 templates/admin/object_history.html:8
+#: templates/admin/auth/user/change_password.html:15
+#: templates/registration/logged_out.html:5
+#: templates/registration/password_change_done.html:7
+#: templates/registration/password_change_form.html:8
+#: templates/registration/password_reset_complete.html:7
+#: templates/registration/password_reset_confirm.html:7
+#: templates/registration/password_reset_done.html:7
+#: templates/registration/password_reset_form.html:7
 msgid "Home"
 msgstr "홈"
 
-#: templates/admin/500.html:4
+#: templates/admin/500.html:8
 msgid "Server error"
 msgstr "서버 오류"
 
-#: templates/admin/500.html:6
+#: templates/admin/500.html:12
 msgid "Server error (500)"
 msgstr "서버 오류 (500)"
 
-#: templates/admin/500.html:9
+#: templates/admin/500.html:15
 msgid "Server Error <em>(500)</em>"
 msgstr "서버 오류 <em>(500)</em>"
 
-#: templates/admin/500.html:10
+#: templates/admin/500.html:16
 msgid ""
 "There's been an error. It's been reported to the site administrators via e-"
 "mail and should be fixed shortly. Thanks for your patience."
@@ -337,7 +351,7 @@ msgstr "%(total_count)s개의 %(module_name)s 모두를 선택합니다."
 msgid "Clear selection"
 msgstr "선택을 해제합니다."
 
-#: templates/admin/app_index.html:10 templates/admin/index.html:19
+#: templates/admin/app_index.html:11 templates/admin/index.html:19
 #, python-format
 msgid "%(name)s"
 msgstr "%(name)s"
@@ -352,15 +366,15 @@ msgstr "환영합니다,"
 msgid "Documentation"
 msgstr "문서"
 
-#: templates/admin/base.html:41
-#: templates/admin/auth/user/change_password.html:16
-#: templates/admin/auth/user/change_password.html:49
+#: templates/admin/base.html:35
+#: templates/admin/auth/user/change_password.html:19
+#: templates/admin/auth/user/change_password.html:53
 #: templates/registration/password_change_done.html:4
 #: templates/registration/password_change_form.html:5
 msgid "Change password"
 msgstr "비밀번호 변경"
 
-#: templates/admin/base.html:48
+#: templates/admin/base.html:36
 #: templates/registration/password_change_done.html:4
 #: templates/registration/password_change_form.html:5
 msgid "Log out"
@@ -374,43 +388,56 @@ msgstr "Django 사이트 관리"
 msgid "Django administration"
 msgstr "Django 관리"
 
-#: templates/admin/change_form.html:22 templates/admin/index.html:29
+#: templates/admin/change_form.html:24 templates/admin/index.html:29
 msgid "Add"
 msgstr "추가"
 
-#: templates/admin/change_form.html:31 templates/admin/object_history.html:10
+#: templates/admin/change_form.html:34 templates/admin/object_history.html:12
 msgid "History"
 msgstr "히스토리"
 
-#: templates/admin/change_form.html:32
+#: templates/admin/change_form.html:35
 #: templates/admin/edit_inline/stacked.html:9
-#: templates/admin/edit_inline/tabular.html:28
+#: templates/admin/edit_inline/tabular.html:30
 msgid "View on site"
 msgstr "사이트에서 보기"
 
-#: templates/admin/change_form.html:43 templates/admin/change_list.html:73
-#: templates/admin/login.html:17
-#: templates/admin/auth/user/change_password.html:25
-#: templates/registration/password_change_form.html:16
+#: templates/admin/change_form.html:46 templates/admin/change_list.html:69
+#: templates/admin/login.html:18
+#: templates/admin/auth/user/change_password.html:29
+#: templates/registration/password_change_form.html:21
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "아래의 오류를 수정하십시오."
 
-#: templates/admin/change_list.html:64
+#: templates/admin/change_list.html:60
 #, python-format
 msgid "Add %(name)s"
 msgstr "%(name)s 추가"
 
-#: templates/admin/change_list.html:84
+#: templates/admin/change_list.html:80
 msgid "Filter"
 msgstr "필터"
 
-#: templates/admin/delete_confirmation.html:10
+#: templates/admin/change_list_results.html:17
+msgid "Remove from sorting"
+msgstr ""
+
+#: templates/admin/change_list_results.html:18
+#, python-format
+msgid "Sorting priority: %(priority_number)s"
+msgstr ""
+
+#: templates/admin/change_list_results.html:19
+msgid "Toggle sorting"
+msgstr ""
+
+#: templates/admin/delete_confirmation.html:12
 #: templates/admin/submit_line.html:4
 msgid "Delete"
 msgstr "삭제"
 
-#: templates/admin/delete_confirmation.html:17
+#: templates/admin/delete_confirmation.html:19
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
@@ -421,7 +448,7 @@ msgstr ""
 "하고자 했으나, 지금 사용하시는 계정은 다음 타입의 오브젝트를 제거할 권한이 없"
 "습니다. :"
 
-#: templates/admin/delete_confirmation.html:25
+#: templates/admin/delete_confirmation.html:27
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
@@ -430,7 +457,7 @@ msgstr ""
 "%(object_name)s '%(escaped_object)s'를 삭제하려면 다음 보호상태의 연관 오브젝"
 "트를 삭제해야 합니다."
 
-#: templates/admin/delete_confirmation.html:33
+#: templates/admin/delete_confirmation.html:35
 #, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
@@ -439,16 +466,16 @@ msgstr ""
 "정말로 %(object_name)s \"%(escaped_object)s\"(을)를 삭제하시겠습니까? 다음의 "
 "관련 항목들이 모두 삭제됩니다. :"
 
-#: templates/admin/delete_confirmation.html:38
-#: templates/admin/delete_selected_confirmation.html:43
+#: templates/admin/delete_confirmation.html:40
+#: templates/admin/delete_selected_confirmation.html:45
 msgid "Yes, I'm sure"
 msgstr "네, 확실합니다."
 
-#: templates/admin/delete_selected_confirmation.html:9
+#: templates/admin/delete_selected_confirmation.html:11
 msgid "Delete multiple objects"
 msgstr "여러 개의 오브젝트 삭제"
 
-#: templates/admin/delete_selected_confirmation.html:16
+#: templates/admin/delete_selected_confirmation.html:18
 #, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would result in deleting related "
@@ -458,7 +485,7 @@ msgstr ""
 "연관 오브젝트 삭제로 선택한 %(objects_name)s의 삭제 중, 그러나 당신의 계정은 "
 "다음 오브젝트의 삭제 권한이 없습니다. "
 
-#: templates/admin/delete_selected_confirmation.html:24
+#: templates/admin/delete_selected_confirmation.html:26
 #, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would require deleting the following "
@@ -466,7 +493,7 @@ msgid ""
 msgstr ""
 "%(objects_name)s를 삭제하려면 다음 보호상태의 오브젝트를 삭제해야 합니다."
 
-#: templates/admin/delete_selected_confirmation.html:32
+#: templates/admin/delete_selected_confirmation.html:34
 #, python-format
 msgid ""
 "Are you sure you want to delete the selected %(objects_name)s? All of the "
@@ -509,7 +536,7 @@ msgstr "이용할 수 없습니다."
 msgid "Unknown content"
 msgstr "내용 형식이 지정되지 않았습니다."
 
-#: templates/admin/invalid_setup.html:7
+#: templates/admin/invalid_setup.html:13
 msgid ""
 "Something's wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
@@ -518,27 +545,31 @@ msgstr ""
 "데이터베이스 설정에 문제가 발생했습니다. 해당 데이터베이스 테이블이 생성되었"
 "는지, 해당 유저가 데이터베이스를 읽어 들일 수 있는지 확인하세요."
 
-#: templates/admin/login.html:33
+#: templates/admin/login.html:34
 msgid "Username:"
 msgstr "사용자명"
 
-#: templates/admin/login.html:37
+#: templates/admin/login.html:38
 msgid "Password:"
 msgstr "비밀번호"
 
-#: templates/admin/object_history.html:22
+#: templates/admin/login.html:45
+msgid "Forgotten your password or username?"
+msgstr ""
+
+#: templates/admin/object_history.html:24
 msgid "Date/time"
 msgstr "날짜/시간"
 
-#: templates/admin/object_history.html:23
+#: templates/admin/object_history.html:25
 msgid "User"
 msgstr "사용자"
 
-#: templates/admin/object_history.html:24
+#: templates/admin/object_history.html:26
 msgid "Action"
 msgstr "액션"
 
-#: templates/admin/object_history.html:38
+#: templates/admin/object_history.html:40
 msgid ""
 "This object doesn't have a change history. It probably wasn't added via this "
 "admin site."
@@ -554,17 +585,17 @@ msgstr "모두 표시"
 msgid "Save"
 msgstr "저장"
 
-#: templates/admin/search_form.html:8
+#: templates/admin/search_form.html:7
 msgid "Search"
 msgstr "검색"
 
-#: templates/admin/search_form.html:10
+#: templates/admin/search_form.html:9
 #, python-format
 msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
 msgstr[0] "결과 %(counter)s개 나옴"
 
-#: templates/admin/search_form.html:10
+#: templates/admin/search_form.html:9
 #, python-format
 msgid "%(full_result_count)s total"
 msgstr "총 %(full_result_count)s건"
@@ -592,64 +623,64 @@ msgstr ""
 msgid "Enter a username and password."
 msgstr "유저명과 암호를 입력하세요."
 
-#: templates/admin/auth/user/change_password.html:29
+#: templates/admin/auth/user/change_password.html:33
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "<strong>%(username)s</strong> 새로운 비밀번호를 입력하세요."
 
-#: templates/admin/auth/user/change_password.html:36
+#: templates/admin/auth/user/change_password.html:40
 msgid "Password"
 msgstr "비밀번호"
 
-#: templates/admin/auth/user/change_password.html:42
-#: templates/registration/password_change_form.html:38
+#: templates/admin/auth/user/change_password.html:46
+#: templates/registration/password_change_form.html:43
 msgid "Password (again)"
 msgstr "비밀번호 (확인)"
 
-#: templates/admin/auth/user/change_password.html:43
+#: templates/admin/auth/user/change_password.html:47
 msgid "Enter the same password as above, for verification."
 msgstr "확인을 위해 위와 동일한 비밀번호를 입력하세요. "
 
 #: templates/admin/edit_inline/stacked.html:67
-#: templates/admin/edit_inline/tabular.html:113
+#: templates/admin/edit_inline/tabular.html:115
 #, python-format
 msgid "Add another %(verbose_name)s"
 msgstr "%(verbose_name)s 더 추가하기"
 
 #: templates/admin/edit_inline/stacked.html:70
-#: templates/admin/edit_inline/tabular.html:116
+#: templates/admin/edit_inline/tabular.html:118
 msgid "Remove"
 msgstr "삭제하기"
 
-#: templates/admin/edit_inline/tabular.html:15
+#: templates/admin/edit_inline/tabular.html:17
 msgid "Delete?"
 msgstr "삭제"
 
-#: templates/registration/logged_out.html:8
+#: templates/registration/logged_out.html:9
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "사이트를 이용해 주셔서 고맙습니다."
 
-#: templates/registration/logged_out.html:10
+#: templates/registration/logged_out.html:11
 msgid "Log in again"
 msgstr "다시 로그인하기"
 
-#: templates/registration/password_change_done.html:5
-#: templates/registration/password_change_form.html:6
-#: templates/registration/password_change_form.html:8
-#: templates/registration/password_change_form.html:20
+#: templates/registration/password_change_done.html:8
+#: templates/registration/password_change_form.html:9
+#: templates/registration/password_change_form.html:13
+#: templates/registration/password_change_form.html:25
 msgid "Password change"
 msgstr "비밀번호 변경"
 
-#: templates/registration/password_change_done.html:7
-#: templates/registration/password_change_done.html:11
+#: templates/registration/password_change_done.html:12
+#: templates/registration/password_change_done.html:16
 msgid "Password change successful"
 msgstr "비밀번호를 변경하였습니다."
 
-#: templates/registration/password_change_done.html:13
+#: templates/registration/password_change_done.html:18
 msgid "Your password was changed."
 msgstr "비밀번호가 변경되었습니다."
 
-#: templates/registration/password_change_form.html:22
+#: templates/registration/password_change_form.html:27
 msgid ""
 "Please enter your old password, for security's sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
@@ -657,46 +688,46 @@ msgstr ""
 "보안상 필요하오니 기존에 사용하시던 비밀번호를 입력해 주세요. 새로운 비밀번호"
 "는 정확히 입력했는지 확인할 수 있도록 두 번 입력하시기 바랍니다."
 
-#: templates/registration/password_change_form.html:28
+#: templates/registration/password_change_form.html:33
 msgid "Old password"
 msgstr "기존 비밀번호:"
 
-#: templates/registration/password_change_form.html:33
+#: templates/registration/password_change_form.html:38
 msgid "New password"
 msgstr "새 비밀번호:"
 
-#: templates/registration/password_change_form.html:44
-#: templates/registration/password_reset_confirm.html:21
+#: templates/registration/password_change_form.html:49
+#: templates/registration/password_reset_confirm.html:27
 msgid "Change my password"
 msgstr "비밀번호 변경"
 
-#: templates/registration/password_reset_complete.html:4
-#: templates/registration/password_reset_confirm.html:6
-#: templates/registration/password_reset_done.html:4
-#: templates/registration/password_reset_form.html:4
-#: templates/registration/password_reset_form.html:6
-#: templates/registration/password_reset_form.html:10
+#: templates/registration/password_reset_complete.html:8
+#: templates/registration/password_reset_confirm.html:12
+#: templates/registration/password_reset_done.html:8
+#: templates/registration/password_reset_form.html:8
+#: templates/registration/password_reset_form.html:12
+#: templates/registration/password_reset_form.html:16
 msgid "Password reset"
 msgstr "비밀번호 초기화"
 
-#: templates/registration/password_reset_complete.html:6
-#: templates/registration/password_reset_complete.html:10
+#: templates/registration/password_reset_complete.html:12
+#: templates/registration/password_reset_complete.html:16
 msgid "Password reset complete"
 msgstr "비밀번호가 초기화 완료"
 
-#: templates/registration/password_reset_complete.html:12
+#: templates/registration/password_reset_complete.html:18
 msgid "Your password has been set.  You may go ahead and log in now."
 msgstr "비밀번호가 설정되었습니다. 이제 로그인하세요."
 
-#: templates/registration/password_reset_confirm.html:4
+#: templates/registration/password_reset_confirm.html:8
 msgid "Password reset confirmation"
 msgstr "비밀번호 초기화 확인"
 
-#: templates/registration/password_reset_confirm.html:12
+#: templates/registration/password_reset_confirm.html:18
 msgid "Enter new password"
 msgstr "새 비밀번호 입력"
 
-#: templates/registration/password_reset_confirm.html:14
+#: templates/registration/password_reset_confirm.html:20
 msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
@@ -704,19 +735,19 @@ msgstr ""
 "새로운 비밀번호를 정확히 입력했는지 확인할 수 있도록두 번 입력하시기 바랍니"
 "다."
 
-#: templates/registration/password_reset_confirm.html:18
+#: templates/registration/password_reset_confirm.html:24
 msgid "New password:"
 msgstr "새로운 비밀번호:"
 
-#: templates/registration/password_reset_confirm.html:20
+#: templates/registration/password_reset_confirm.html:26
 msgid "Confirm password:"
 msgstr "새로운 비밀번호(확인):"
 
-#: templates/registration/password_reset_confirm.html:26
+#: templates/registration/password_reset_confirm.html:32
 msgid "Password reset unsuccessful"
 msgstr "비밀번호가 초기화를 실패하였습니다."
 
-#: templates/registration/password_reset_confirm.html:28
+#: templates/registration/password_reset_confirm.html:34
 msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
@@ -724,12 +755,12 @@ msgstr ""
 "비밀번호 초기화 링크가 이미 사용되어 올바르지 않습니다.비밀번호 초기화을 다"
 "시 해주세요."
 
-#: templates/registration/password_reset_done.html:6
-#: templates/registration/password_reset_done.html:10
+#: templates/registration/password_reset_done.html:12
+#: templates/registration/password_reset_done.html:16
 msgid "Password reset successful"
 msgstr "비밀번호가 초기화되었습니다."
 
-#: templates/registration/password_reset_done.html:12
+#: templates/registration/password_reset_done.html:18
 msgid ""
 "We've e-mailed you instructions for setting your password to the e-mail "
 "address you submitted. You should be receiving it shortly."
@@ -760,7 +791,7 @@ msgstr "사이트를 이용해 주셔서 고맙습니다."
 msgid "The %(site_name)s team"
 msgstr "%(site_name)s 팀"
 
-#: templates/registration/password_reset_form.html:12
+#: templates/registration/password_reset_form.html:18
 msgid ""
 "Forgotten your password? Enter your e-mail address below, and we'll e-mail "
 "instructions for setting a new one."
@@ -768,28 +799,28 @@ msgstr ""
 "비밀번호를 잊으셨나요? 아래에 메일 주소를 입력하시면, 새 비밀번호 설정 방법"
 "을 안내하는 메일을 보내드립니다."
 
-#: templates/registration/password_reset_form.html:16
+#: templates/registration/password_reset_form.html:22
 msgid "E-mail address:"
 msgstr "이메일 주소:"
 
-#: templates/registration/password_reset_form.html:16
+#: templates/registration/password_reset_form.html:22
 msgid "Reset my password"
 msgstr "비밀번호 초기화"
 
-#: templatetags/admin_list.py:290
+#: templatetags/admin_list.py:336
 msgid "All dates"
 msgstr "언제나"
 
-#: views/main.py:27
+#: views/main.py:30
 msgid "(None)"
 msgstr "(없음)"
 
-#: views/main.py:66
+#: views/main.py:73
 #, python-format
 msgid "Select %s"
 msgstr "%s 선택"
 
-#: views/main.py:66
+#: views/main.py:75
 #, python-format
 msgid "Select %s to change"
 msgstr "변경할 %s 선택"

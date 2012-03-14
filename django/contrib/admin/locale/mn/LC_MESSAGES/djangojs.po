@@ -1,67 +1,97 @@
 # This file is distributed under the same license as the Django package.
 #
+# Translators:
+#   <mnts26@gmail.com>, 2012.
+# Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2011, 2012.
+# Ганзориг БП <ganzo.bp@gmail.com>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-15 13:13-0400\n"
-"PO-Revision-Date: 2011-03-04 18:14+0000\n"
-"Last-Translator: Ankhbayar <l.ankhbayar@gmail.com>\n"
-"Language-Team: Mongolian <>\n"
+"POT-Creation-Date: 2012-03-14 00:13-0700\n"
+"PO-Revision-Date: 2012-03-11 05:39+0000\n"
+"Last-Translator: Анхбаяр Анхаа <l.ankhbayar@gmail.com>\n"
+"Language-Team: Mongolian (http://www.transifex.net/projects/p/django/"
+"language/mn/)\n"
+"Language: mn\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: mn\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
-#: media/js/SelectFilter2.js:45
-#, perl-format
+#: static/admin/js/SelectFilter2.js:45
+#, c-format
 msgid "Available %s"
 msgstr "Боломжтой %s"
 
-#: media/js/SelectFilter2.js:52
+#: static/admin/js/SelectFilter2.js:46
+#, c-format
+msgid ""
+"This is the list of available %s. You may choose some by selecting them in "
+"the box below and then clicking the \"Choose\" arrow between the two boxes."
+msgstr ""
+
+#: static/admin/js/SelectFilter2.js:53
+#, c-format
+msgid "Type into this box to filter down the list of available %s."
+msgstr "Энэ нүдэнд бичээд дараах %s жагсаалтаас шүүнэ үү. "
+
+#: static/admin/js/SelectFilter2.js:57
 msgid "Filter"
 msgstr "Шүүлтүүр"
 
-#: media/js/SelectFilter2.js:59
+#: static/admin/js/SelectFilter2.js:61
 msgid "Choose all"
-msgstr "Бүгдийг сонго"
+msgstr "Бүгдийг нь сонгох"
 
-#: media/js/SelectFilter2.js:64
-msgid "Add"
-msgstr "Нэм"
+#: static/admin/js/SelectFilter2.js:61
+#, c-format
+msgid "Click to choose all %s at once."
+msgstr "Бүгдийг сонгох бол %s дарна уу"
 
-#: media/js/SelectFilter2.js:66
+#: static/admin/js/SelectFilter2.js:67
+msgid "Choose"
+msgstr "Сонгох"
+
+#: static/admin/js/SelectFilter2.js:69
 msgid "Remove"
 msgstr "Хас"
 
-#: media/js/SelectFilter2.js:71
-#, perl-format
+#: static/admin/js/SelectFilter2.js:75
+#, c-format
 msgid "Chosen %s"
 msgstr "Сонгогдсон %s"
 
-#: media/js/SelectFilter2.js:72
-msgid "Select your choice(s) and click "
-msgstr "Сонголтуудаас сонгоод дарна уу "
+#: static/admin/js/SelectFilter2.js:76
+#, c-format
+msgid ""
+"This is the list of chosen %s. You may remove some by selecting them in the "
+"box below and then clicking the \"Remove\" arrow between the two boxes."
+msgstr ""
 
-#: media/js/SelectFilter2.js:77
-msgid "Clear all"
-msgstr "Бүгдийг цэвэрлэ"
+#: static/admin/js/SelectFilter2.js:80
+msgid "Remove all"
+msgstr "Бүгдийг арилгах"
 
-#: media/js/actions.js:18 media/js/actions.min.js:1
+#: static/admin/js/SelectFilter2.js:80
+#, c-format
+msgid "Click to remove all chosen %s at once."
+msgstr "%s ийн сонгоод бүгдийг нь арилгана"
+
+#: static/admin/js/actions.js:18 static/admin/js/actions.min.js:1
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
 msgstr[0] "%(sel)s ээс %(cnt)s сонгосон"
 msgstr[1] "%(sel)s ээс %(cnt)s сонгосон"
 
-#: media/js/actions.js:109 media/js/actions.min.js:5
+#: static/admin/js/actions.js:109 static/admin/js/actions.min.js:5
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
 "action, your unsaved changes will be lost."
 msgstr ""
 "Хадгалаагүй өөрчлөлтүүд байна. Энэ үйлдэлийг хийвэл өөрчлөлтүүд устах болно."
 
-#: media/js/actions.js:121 media/js/actions.min.js:6
+#: static/admin/js/actions.js:121 static/admin/js/actions.min.js:6
 msgid ""
 "You have selected an action, but you haven't saved your changes to "
 "individual fields yet. Please click OK to save. You'll need to re-run the "
@@ -71,7 +101,7 @@ msgstr ""
 "талбаруудад нь оруулагүй байна. OK дарж сануулна уу. Энэ үйлдлийг та дахин "
 "хийх шаардлагатай."
 
-#: media/js/actions.js:123 media/js/actions.min.js:6
+#: static/admin/js/actions.js:123 static/admin/js/actions.min.js:6
 msgid ""
 "You have selected an action, and you haven't made any changes on individual "
 "fields. You're probably looking for the Go button rather than the Save "
@@ -80,72 +110,68 @@ msgstr ""
 "Та 1 үйлдлийг сонгосон байна бас та ямарваа өөрчлөлт оруулсангүй. Та Save "
 "товчлуур биш Go товчлуурыг хайж байгаа бололтой."
 
-#: media/js/calendar.js:24 media/js/dateparse.js:32
+#: static/admin/js/calendar.js:26
 msgid ""
 "January February March April May June July August September October November "
 "December"
 msgstr "Хулгана Үхэр Бар Туулай Луу Могой Морь Хонь Бич Тахиа Нохой Гахай"
 
-#: media/js/calendar.js:25
+#: static/admin/js/calendar.js:27
 msgid "S M T W T F S"
 msgstr "Ня Да Мя Лх Пү Ба Бя"
 
-#: media/js/collapse.js:9 media/js/collapse.js.py:21
-#: media/js/collapse.min.js:1
+#: static/admin/js/collapse.js:8 static/admin/js/collapse.js.c:19
+#: static/admin/js/collapse.min.js:1
 msgid "Show"
 msgstr "Үзэх"
 
-#: media/js/collapse.js:16 media/js/collapse.min.js:1
+#: static/admin/js/collapse.js:15 static/admin/js/collapse.min.js:1
 msgid "Hide"
 msgstr "Нуух"
 
-#: media/js/dateparse.js:33
-msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
-msgstr "Ням Даваа Мягмар Лхагва Пүрэв Баасан Бямба"
-
-#: media/js/admin/DateTimeShortcuts.js:49
-#: media/js/admin/DateTimeShortcuts.js:84
+#: static/admin/js/admin/DateTimeShortcuts.js:49
+#: static/admin/js/admin/DateTimeShortcuts.js:85
 msgid "Now"
 msgstr "Одоо"
 
-#: media/js/admin/DateTimeShortcuts.js:53
+#: static/admin/js/admin/DateTimeShortcuts.js:53
 msgid "Clock"
 msgstr "Цаг"
 
-#: media/js/admin/DateTimeShortcuts.js:80
+#: static/admin/js/admin/DateTimeShortcuts.js:81
 msgid "Choose a time"
 msgstr "Цаг сонгох"
 
-#: media/js/admin/DateTimeShortcuts.js:85
+#: static/admin/js/admin/DateTimeShortcuts.js:86
 msgid "Midnight"
 msgstr "Шөнө дунд"
 
-#: media/js/admin/DateTimeShortcuts.js:86
+#: static/admin/js/admin/DateTimeShortcuts.js:87
 msgid "6 a.m."
 msgstr "6 цаг"
 
-#: media/js/admin/DateTimeShortcuts.js:87
+#: static/admin/js/admin/DateTimeShortcuts.js:88
 msgid "Noon"
 msgstr "Үд дунд"
 
-#: media/js/admin/DateTimeShortcuts.js:91
-#: media/js/admin/DateTimeShortcuts.js:188
+#: static/admin/js/admin/DateTimeShortcuts.js:92
+#: static/admin/js/admin/DateTimeShortcuts.js:204
 msgid "Cancel"
 msgstr "Болих"
 
-#: media/js/admin/DateTimeShortcuts.js:133
-#: media/js/admin/DateTimeShortcuts.js:182
+#: static/admin/js/admin/DateTimeShortcuts.js:144
+#: static/admin/js/admin/DateTimeShortcuts.js:197
 msgid "Today"
 msgstr "Өнөөдөр"
 
-#: media/js/admin/DateTimeShortcuts.js:137
+#: static/admin/js/admin/DateTimeShortcuts.js:148
 msgid "Calendar"
 msgstr "Хуанли"
 
-#: media/js/admin/DateTimeShortcuts.js:180
+#: static/admin/js/admin/DateTimeShortcuts.js:195
 msgid "Yesterday"
 msgstr "Өчигдөр"
 
-#: media/js/admin/DateTimeShortcuts.js:184
+#: static/admin/js/admin/DateTimeShortcuts.js:199
 msgid "Tomorrow"
 msgstr "Маргааш"

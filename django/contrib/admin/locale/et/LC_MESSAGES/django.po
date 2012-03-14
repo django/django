@@ -1,90 +1,83 @@
 # This file is distributed under the same license as the Django package.
 #
+# Translators:
+# eallik <eallik@gmail.com>, 2011.
+# Jannis Leidel <jannis@leidel.info>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-20 21:03+0100\n"
-"PO-Revision-Date: 2011-03-07 21:13+0000\n"
+"POT-Creation-Date: 2012-03-14 00:11-0700\n"
+"PO-Revision-Date: 2012-03-08 12:29+0000\n"
 "Last-Translator: eallik <eallik@gmail.com>\n"
-"Language-Team: Estonian <>\n"
+"Language-Team: Estonian (http://www.transifex.net/projects/p/django/language/"
+"et/)\n"
+"Language: et\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: et\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
-#: actions.py:49
+#: actions.py:48
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "%(count)d %(items)s kustutamine õnnestus"
 
-#: actions.py:61 options.py:1219
+#: actions.py:60 options.py:1297
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr "Ei saa kustutada %(name)s"
 
-#: actions.py:63 options.py:1221
+#: actions.py:62 options.py:1299
 msgid "Are you sure?"
 msgstr "Kas olete kindel?"
 
-#: actions.py:85
+#: actions.py:83
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
 msgstr "Kustuta valitud %(verbose_name_plural)s"
 
-#: filterspecs.py:54
-#, python-format
-msgid ""
-"<h3>By %s:</h3>\n"
-"<ul>\n"
-msgstr ""
-"<h3>%s:</h3>\n"
-"<ul>\n"
-
-#: filterspecs.py:104 filterspecs.py:139 filterspecs.py:168 filterspecs.py:258
+#: filters.py:101 filters.py:191 filters.py:231 filters.py:268 filters.py:378
 msgid "All"
 msgstr "Kõik"
 
-#: filterspecs.py:139
+#: filters.py:232
 msgid "Yes"
 msgstr "Jah"
 
-#: filterspecs.py:139
+#: filters.py:233
 msgid "No"
 msgstr "Ei"
 
-#: filterspecs.py:150
+#: filters.py:247
 msgid "Unknown"
 msgstr "Tundmatu"
 
-#: filterspecs.py:196
+#: filters.py:306
 msgid "Any date"
 msgstr "Suvaline kuupäev"
 
-#: filterspecs.py:197
+#: filters.py:307
 msgid "Today"
 msgstr "Täna"
 
-#: filterspecs.py:200
+#: filters.py:311
 msgid "Past 7 days"
 msgstr "Viimased 7 päeva"
 
-#: filterspecs.py:203
+#: filters.py:315
 msgid "This month"
 msgstr "Käesolev kuu"
 
-#: filterspecs.py:205
+#: filters.py:319
 msgid "This year"
 msgstr "Käesolev aasta"
 
 #: forms.py:9
 msgid ""
-"Please enter a correct username and password. Note that both fields are case-"
-"sensitive."
+"Please enter the correct username and password for a staff account. Note "
+"that both fields are case-sensitive."
 msgstr ""
-"Palun sisestage korrektne kasutajatunnus ja salasõna. Mõlemad väljad on "
-"tõstutundlikud."
 
 #: forms.py:18
 msgid "Please log in again, because your session has expired."
@@ -95,7 +88,7 @@ msgstr "Teie sessioon on aegunud. Palun logige uuesti sisse."
 msgid "Your e-mail address is not your username. Try '%s' instead."
 msgstr "Teie e-posti aadress ei ole Teie kasutajatunnus. Proovige '%s'."
 
-#: helpers.py:19
+#: helpers.py:20
 msgid "Action:"
 msgstr "Toiming:"
 
@@ -119,72 +112,91 @@ msgstr "toimingu lipp"
 msgid "change message"
 msgstr "muudatuse tekst"
 
-#: models.py:28
+#: models.py:30
 msgid "log entry"
 msgstr "logisissekanne"
 
-#: models.py:29
+#: models.py:31
 msgid "log entries"
 msgstr "logisissekanded"
 
-#: options.py:147 options.py:162
+#: models.py:40
+#, python-format
+msgid "Added \"%(object)s\"."
+msgstr ""
+
+#: models.py:42
+#, python-format
+msgid "Changed \"%(object)s\" - %(changes)s"
+msgstr ""
+
+#: models.py:44
+#, python-format
+msgid "Deleted \"%(object)s.\""
+msgstr ""
+
+#: models.py:46
+msgid "LogEntry Object"
+msgstr ""
+
+#: options.py:150 options.py:166
 msgid "None"
 msgstr "Puudub"
 
-#: options.py:627
+#: options.py:673
 #, python-format
 msgid "Changed %s."
 msgstr "Muutsin %s."
 
-#: options.py:627 options.py:637
+#: options.py:673 options.py:683
 msgid "and"
 msgstr "ja"
 
-#: options.py:632
+#: options.py:678
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "Lisatud %(name)s \"%(object)s\"."
 
-#: options.py:636
+#: options.py:682
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "Muudetud %(list)s objektil %(name)s \"%(object)s\"."
 
-#: options.py:641
+#: options.py:687
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "Kustutatud %(name)s \"%(object)s\"."
 
-#: options.py:645
+#: options.py:691
 msgid "No fields changed."
 msgstr "Ühtegi välja ei muudetud."
 
-#: options.py:717
+#: options.py:774
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" lisamine õnnestus."
 
-#: options.py:721 options.py:761
+#: options.py:778 options.py:826
 msgid "You may edit it again below."
 msgstr "Võite jätkata redigeerimist."
 
-#: options.py:731 options.py:771
+#: options.py:790 options.py:839
 #, python-format
 msgid "You may add another %s below."
 msgstr "Võite jätkata uue %s lisamisega."
 
-#: options.py:759
+#: options.py:824
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" muutmine õnnestus."
 
-#: options.py:767
+#: options.py:832
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr "%(name)s \"%(obj)s\" lisamine õnnestus. Te võite seda muuta."
 
-#: options.py:827 options.py:1085
+#: options.py:901 options.py:1161
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
@@ -192,86 +204,86 @@ msgstr ""
 "Palun märgistage elemendid, millega soovite toiminguid sooritada. Ühtegi "
 "elementi ei muudetud."
 
-#: options.py:846
+#: options.py:920
 msgid "No action selected."
 msgstr "Toiming valimata."
 
-#: options.py:927
+#: options.py:1000
 #, python-format
 msgid "Add %s"
 msgstr "Lisa %s"
 
-#: options.py:953 options.py:1194
+#: options.py:1025 options.py:1269
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "%(name)s objekt primaarvõtmega %(key)r ei eksisteeri."
 
-#: options.py:1018
+#: options.py:1091
 #, python-format
 msgid "Change %s"
 msgstr "Muuda %s"
 
-#: options.py:1065
+#: options.py:1140
 msgid "Database error"
 msgstr "Andmebaasi viga"
 
-#: options.py:1127
+#: options.py:1203
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s muutmine õnnestus."
 msgstr[1] "%(count)s %(name)s muutmine õnnestus."
 
-#: options.py:1154
+#: options.py:1230
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "%(total_count)s valitud"
 msgstr[1] "Kõik %(total_count)s valitud"
 
-#: options.py:1159
+#: options.py:1235
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "valitud 0/%(cnt)s"
 
-#: options.py:1210
+#: options.py:1285
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" kustutati."
 
-#: options.py:1255
+#: options.py:1332
 #, python-format
 msgid "Change history: %s"
 msgstr "Muudatuste ajalugu: %s"
 
-#: sites.py:319 templates/admin/login.html:42
-#: templates/registration/password_reset_complete.html:14
-#: views/decorators.py:26
+#: sites.py:315 tests.py:61 templates/admin/login.html:49
+#: templates/registration/password_reset_complete.html:20
+#: views/decorators.py:23
 msgid "Log in"
 msgstr "Sisene"
 
-#: sites.py:375
+#: sites.py:380
 msgid "Site administration"
 msgstr "Saidi administreerimine"
 
-#: sites.py:419
+#: sites.py:432
 #, python-format
 msgid "%s administration"
 msgstr "%s - administreerimine"
 
-#: widgets.py:75
+#: widgets.py:87
 msgid "Date:"
 msgstr "Kuupäev:"
 
-#: widgets.py:75
+#: widgets.py:87
 msgid "Time:"
 msgstr "Aeg:"
 
-#: widgets.py:140
+#: widgets.py:161
 msgid "Lookup"
 msgstr "Otsi"
 
-#: widgets.py:246
+#: widgets.py:267
 msgid "Add Another"
 msgstr "Lisa Uus"
 
@@ -283,36 +295,36 @@ msgstr "Lehte ei leitud"
 msgid "We're sorry, but the requested page could not be found."
 msgstr "Vabandame, kuid soovitud lehte ei leitud."
 
-#: templates/admin/500.html:4 templates/admin/app_index.html:8
-#: templates/admin/base.html:55 templates/admin/change_form.html:19
-#: templates/admin/change_list.html:42
-#: templates/admin/delete_confirmation.html:6
-#: templates/admin/delete_selected_confirmation.html:6
-#: templates/admin/invalid_setup.html:4 templates/admin/object_history.html:6
-#: templates/admin/auth/user/change_password.html:12
-#: templates/registration/logged_out.html:4
-#: templates/registration/password_change_done.html:5
-#: templates/registration/password_change_form.html:6
-#: templates/registration/password_reset_complete.html:4
-#: templates/registration/password_reset_confirm.html:4
-#: templates/registration/password_reset_done.html:4
-#: templates/registration/password_reset_form.html:4
+#: templates/admin/500.html:7 templates/admin/app_index.html:8
+#: templates/admin/base.html:45 templates/admin/change_form.html:21
+#: templates/admin/change_list.html:43
+#: templates/admin/delete_confirmation.html:8
+#: templates/admin/delete_selected_confirmation.html:8
+#: templates/admin/invalid_setup.html:7 templates/admin/object_history.html:8
+#: templates/admin/auth/user/change_password.html:15
+#: templates/registration/logged_out.html:5
+#: templates/registration/password_change_done.html:7
+#: templates/registration/password_change_form.html:8
+#: templates/registration/password_reset_complete.html:7
+#: templates/registration/password_reset_confirm.html:7
+#: templates/registration/password_reset_done.html:7
+#: templates/registration/password_reset_form.html:7
 msgid "Home"
 msgstr "Kodu"
 
-#: templates/admin/500.html:4
+#: templates/admin/500.html:8
 msgid "Server error"
 msgstr "Serveri viga"
 
-#: templates/admin/500.html:6
+#: templates/admin/500.html:12
 msgid "Server error (500)"
 msgstr "Serveri viga (500)"
 
-#: templates/admin/500.html:9
+#: templates/admin/500.html:15
 msgid "Server Error <em>(500)</em>"
 msgstr "Serveri Viga <em>(500)</em>"
 
-#: templates/admin/500.html:10
+#: templates/admin/500.html:16
 msgid ""
 "There's been an error. It's been reported to the site administrators via e-"
 "mail and should be fixed shortly. Thanks for your patience."
@@ -342,7 +354,7 @@ msgstr "Märgista kõik %(total_count)s %(module_name)s"
 msgid "Clear selection"
 msgstr "Tühjenda valik"
 
-#: templates/admin/app_index.html:10 templates/admin/index.html:19
+#: templates/admin/app_index.html:11 templates/admin/index.html:19
 #, python-format
 msgid "%(name)s"
 msgstr "%(name)s"
@@ -357,15 +369,15 @@ msgstr "Tere tulemast,"
 msgid "Documentation"
 msgstr "Dokumentatsioon"
 
-#: templates/admin/base.html:41
-#: templates/admin/auth/user/change_password.html:16
-#: templates/admin/auth/user/change_password.html:49
+#: templates/admin/base.html:35
+#: templates/admin/auth/user/change_password.html:19
+#: templates/admin/auth/user/change_password.html:53
 #: templates/registration/password_change_done.html:4
 #: templates/registration/password_change_form.html:5
 msgid "Change password"
 msgstr "Muuda salasõna"
 
-#: templates/admin/base.html:48
+#: templates/admin/base.html:36
 #: templates/registration/password_change_done.html:4
 #: templates/registration/password_change_form.html:5
 msgid "Log out"
@@ -379,44 +391,57 @@ msgstr "Django administreerimisliides"
 msgid "Django administration"
 msgstr "Django administreerimisliides"
 
-#: templates/admin/change_form.html:22 templates/admin/index.html:29
+#: templates/admin/change_form.html:24 templates/admin/index.html:29
 msgid "Add"
 msgstr "Lisa"
 
-#: templates/admin/change_form.html:31 templates/admin/object_history.html:10
+#: templates/admin/change_form.html:34 templates/admin/object_history.html:12
 msgid "History"
 msgstr "Ajalugu"
 
-#: templates/admin/change_form.html:32
+#: templates/admin/change_form.html:35
 #: templates/admin/edit_inline/stacked.html:9
-#: templates/admin/edit_inline/tabular.html:28
+#: templates/admin/edit_inline/tabular.html:30
 msgid "View on site"
 msgstr "Näita lehel"
 
-#: templates/admin/change_form.html:43 templates/admin/change_list.html:73
-#: templates/admin/login.html:17
-#: templates/admin/auth/user/change_password.html:25
-#: templates/registration/password_change_form.html:16
+#: templates/admin/change_form.html:46 templates/admin/change_list.html:69
+#: templates/admin/login.html:18
+#: templates/admin/auth/user/change_password.html:29
+#: templates/registration/password_change_form.html:21
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "Palun parandage allolev viga"
 msgstr[1] "Palun parandage allolevad vead"
 
-#: templates/admin/change_list.html:64
+#: templates/admin/change_list.html:60
 #, python-format
 msgid "Add %(name)s"
 msgstr "Lisa %(name)s"
 
-#: templates/admin/change_list.html:84
+#: templates/admin/change_list.html:80
 msgid "Filter"
 msgstr "Filtreeri"
 
-#: templates/admin/delete_confirmation.html:10
+#: templates/admin/change_list_results.html:17
+msgid "Remove from sorting"
+msgstr ""
+
+#: templates/admin/change_list_results.html:18
+#, python-format
+msgid "Sorting priority: %(priority_number)s"
+msgstr ""
+
+#: templates/admin/change_list_results.html:19
+msgid "Toggle sorting"
+msgstr ""
+
+#: templates/admin/delete_confirmation.html:12
 #: templates/admin/submit_line.html:4
 msgid "Delete"
 msgstr "Kustuta"
 
-#: templates/admin/delete_confirmation.html:17
+#: templates/admin/delete_confirmation.html:19
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
@@ -427,7 +452,7 @@ msgstr ""
 "kustutada lisaks ka kõik seotud objecktid, aga teil puudub õigus järgnevat "
 "tüüpi objektide kustutamiseks:"
 
-#: templates/admin/delete_confirmation.html:25
+#: templates/admin/delete_confirmation.html:27
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
@@ -436,26 +461,26 @@ msgstr ""
 "Et kustutada %(object_name)s '%(escaped_object)s', on vaja kustutada "
 "järgmised kaitstud seotud objektid:"
 
-#: templates/admin/delete_confirmation.html:33
+#: templates/admin/delete_confirmation.html:35
 #, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
 "All of the following related items will be deleted:"
 msgstr ""
-"Kas olete kindel, et soovite kustutada objekti %(object_name)s \"%"
-"(escaped_object)s\"? Kõik järgnevad seotud objektid kustutatakse koos "
+"Kas olete kindel, et soovite kustutada objekti %(object_name)s "
+"\"%(escaped_object)s\"? Kõik järgnevad seotud objektid kustutatakse koos "
 "sellega:"
 
-#: templates/admin/delete_confirmation.html:38
-#: templates/admin/delete_selected_confirmation.html:43
+#: templates/admin/delete_confirmation.html:40
+#: templates/admin/delete_selected_confirmation.html:45
 msgid "Yes, I'm sure"
 msgstr "Jah, olen kindel"
 
-#: templates/admin/delete_selected_confirmation.html:9
+#: templates/admin/delete_selected_confirmation.html:11
 msgid "Delete multiple objects"
 msgstr "Kustuta mitu objekti"
 
-#: templates/admin/delete_selected_confirmation.html:16
+#: templates/admin/delete_selected_confirmation.html:18
 #, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would result in deleting related "
@@ -465,7 +490,7 @@ msgstr ""
 "Kui kustutada valitud %(objects_name)s, peaks kustutama ka seotud objektid, "
 "aga sinu kasutajakontol pole õigusi järgmiste objektitüüpide kustutamiseks:"
 
-#: templates/admin/delete_selected_confirmation.html:24
+#: templates/admin/delete_selected_confirmation.html:26
 #, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would require deleting the following "
@@ -474,7 +499,7 @@ msgstr ""
 "Et kustutada valitud %(objects_name)s, on vaja kustutada ka järgmised "
 "kaitstud seotud objektid:"
 
-#: templates/admin/delete_selected_confirmation.html:32
+#: templates/admin/delete_selected_confirmation.html:34
 #, python-format
 msgid ""
 "Are you sure you want to delete the selected %(objects_name)s? All of the "
@@ -517,7 +542,7 @@ msgstr "Ei leitud ühtegi"
 msgid "Unknown content"
 msgstr "Tundmatu sisu"
 
-#: templates/admin/invalid_setup.html:7
+#: templates/admin/invalid_setup.html:13
 msgid ""
 "Something's wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
@@ -527,27 +552,31 @@ msgstr ""
 "andmebaasitabelid on loodud  ning et andmebaas on vastava kasutaja poolt "
 "loetav."
 
-#: templates/admin/login.html:33
+#: templates/admin/login.html:34
 msgid "Username:"
 msgstr "Kasutajatunnus:"
 
-#: templates/admin/login.html:37
+#: templates/admin/login.html:38
 msgid "Password:"
 msgstr "Salasõna:"
 
-#: templates/admin/object_history.html:22
+#: templates/admin/login.html:45
+msgid "Forgotten your password or username?"
+msgstr ""
+
+#: templates/admin/object_history.html:24
 msgid "Date/time"
 msgstr "Kuupäev/kellaaeg"
 
-#: templates/admin/object_history.html:23
+#: templates/admin/object_history.html:25
 msgid "User"
 msgstr "Kasutaja"
 
-#: templates/admin/object_history.html:24
+#: templates/admin/object_history.html:26
 msgid "Action"
 msgstr "Toiming"
 
-#: templates/admin/object_history.html:38
+#: templates/admin/object_history.html:40
 msgid ""
 "This object doesn't have a change history. It probably wasn't added via this "
 "admin site."
@@ -563,18 +592,18 @@ msgstr "Näita kõiki"
 msgid "Save"
 msgstr "Salvesta"
 
-#: templates/admin/search_form.html:8
+#: templates/admin/search_form.html:7
 msgid "Search"
 msgstr "Otsing"
 
-#: templates/admin/search_form.html:10
+#: templates/admin/search_form.html:9
 #, python-format
 msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
 msgstr[0] "%(counter)s tulemus"
 msgstr[1] "%(counter)s tulemust"
 
-#: templates/admin/search_form.html:10
+#: templates/admin/search_form.html:9
 #, python-format
 msgid "%(full_result_count)s total"
 msgstr "Kokku %(full_result_count)s"
@@ -603,65 +632,65 @@ msgstr ""
 msgid "Enter a username and password."
 msgstr "Sisestage kasutajanimi ja salasõna."
 
-#: templates/admin/auth/user/change_password.html:29
+#: templates/admin/auth/user/change_password.html:33
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Sisestage uus salasõna kasutajale <strong>%(username)s</strong>"
 
-#: templates/admin/auth/user/change_password.html:36
+#: templates/admin/auth/user/change_password.html:40
 msgid "Password"
 msgstr "Salasõna"
 
-#: templates/admin/auth/user/change_password.html:42
-#: templates/registration/password_change_form.html:38
+#: templates/admin/auth/user/change_password.html:46
+#: templates/registration/password_change_form.html:43
 msgid "Password (again)"
 msgstr "Salasõna (uuesti)"
 
-#: templates/admin/auth/user/change_password.html:43
+#: templates/admin/auth/user/change_password.html:47
 msgid "Enter the same password as above, for verification."
 msgstr ""
 "Sisestage sama salasõna uuesti veendumaks, et sisestamisel ei tekkinud vigu"
 
 #: templates/admin/edit_inline/stacked.html:67
-#: templates/admin/edit_inline/tabular.html:113
+#: templates/admin/edit_inline/tabular.html:115
 #, python-format
 msgid "Add another %(verbose_name)s"
 msgstr "Lisa veel üks %(verbose_name)s"
 
 #: templates/admin/edit_inline/stacked.html:70
-#: templates/admin/edit_inline/tabular.html:116
+#: templates/admin/edit_inline/tabular.html:118
 msgid "Remove"
 msgstr "Eemalda"
 
-#: templates/admin/edit_inline/tabular.html:15
+#: templates/admin/edit_inline/tabular.html:17
 msgid "Delete?"
 msgstr "Kustutan?"
 
-#: templates/registration/logged_out.html:8
+#: templates/registration/logged_out.html:9
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Tänan, et veetsite aega meie lehel."
 
-#: templates/registration/logged_out.html:10
+#: templates/registration/logged_out.html:11
 msgid "Log in again"
 msgstr "Logi uuesti sisse"
 
-#: templates/registration/password_change_done.html:5
-#: templates/registration/password_change_form.html:6
-#: templates/registration/password_change_form.html:8
-#: templates/registration/password_change_form.html:20
+#: templates/registration/password_change_done.html:8
+#: templates/registration/password_change_form.html:9
+#: templates/registration/password_change_form.html:13
+#: templates/registration/password_change_form.html:25
 msgid "Password change"
 msgstr "Salasõna muutmine"
 
-#: templates/registration/password_change_done.html:7
-#: templates/registration/password_change_done.html:11
+#: templates/registration/password_change_done.html:12
+#: templates/registration/password_change_done.html:16
 msgid "Password change successful"
 msgstr "Salasõna muutmine õnnestus"
 
-#: templates/registration/password_change_done.html:13
+#: templates/registration/password_change_done.html:18
 msgid "Your password was changed."
 msgstr "Teie salasõna on vahetatud."
 
-#: templates/registration/password_change_form.html:22
+#: templates/registration/password_change_form.html:27
 msgid ""
 "Please enter your old password, for security's sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
@@ -670,46 +699,46 @@ msgstr ""
 "uus salasõna.Veendumaks, et uue salasõna sisestamisel ei tekkinud vigu, "
 "palun sisestage see kaks korda."
 
-#: templates/registration/password_change_form.html:28
+#: templates/registration/password_change_form.html:33
 msgid "Old password"
 msgstr "Vana salasõna"
 
-#: templates/registration/password_change_form.html:33
+#: templates/registration/password_change_form.html:38
 msgid "New password"
 msgstr "Uus salasõna"
 
-#: templates/registration/password_change_form.html:44
-#: templates/registration/password_reset_confirm.html:21
+#: templates/registration/password_change_form.html:49
+#: templates/registration/password_reset_confirm.html:27
 msgid "Change my password"
 msgstr "Muuda salasõna"
 
-#: templates/registration/password_reset_complete.html:4
-#: templates/registration/password_reset_confirm.html:6
-#: templates/registration/password_reset_done.html:4
-#: templates/registration/password_reset_form.html:4
-#: templates/registration/password_reset_form.html:6
-#: templates/registration/password_reset_form.html:10
+#: templates/registration/password_reset_complete.html:8
+#: templates/registration/password_reset_confirm.html:12
+#: templates/registration/password_reset_done.html:8
+#: templates/registration/password_reset_form.html:8
+#: templates/registration/password_reset_form.html:12
+#: templates/registration/password_reset_form.html:16
 msgid "Password reset"
 msgstr "Uue parooli loomine"
 
-#: templates/registration/password_reset_complete.html:6
-#: templates/registration/password_reset_complete.html:10
+#: templates/registration/password_reset_complete.html:12
+#: templates/registration/password_reset_complete.html:16
 msgid "Password reset complete"
 msgstr "Uue salasõna loomine valmis"
 
-#: templates/registration/password_reset_complete.html:12
+#: templates/registration/password_reset_complete.html:18
 msgid "Your password has been set.  You may go ahead and log in now."
 msgstr "Teie salasõna on määratud. Võite nüüd sisse logida."
 
-#: templates/registration/password_reset_confirm.html:4
+#: templates/registration/password_reset_confirm.html:8
 msgid "Password reset confirmation"
 msgstr "Uue salasõna loomise kinnitamine"
 
-#: templates/registration/password_reset_confirm.html:12
+#: templates/registration/password_reset_confirm.html:18
 msgid "Enter new password"
 msgstr "Sisestage uus salasõna"
 
-#: templates/registration/password_reset_confirm.html:14
+#: templates/registration/password_reset_confirm.html:20
 msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
@@ -717,19 +746,19 @@ msgstr ""
 "Palun sisestage uus salasõna kaks korda, et saaksime veenduda, et "
 "sisestamisel ei tekkinud vigu."
 
-#: templates/registration/password_reset_confirm.html:18
+#: templates/registration/password_reset_confirm.html:24
 msgid "New password:"
 msgstr "Uus salasõna:"
 
-#: templates/registration/password_reset_confirm.html:20
+#: templates/registration/password_reset_confirm.html:26
 msgid "Confirm password:"
 msgstr "Kinnita salasõna:"
 
-#: templates/registration/password_reset_confirm.html:26
+#: templates/registration/password_reset_confirm.html:32
 msgid "Password reset unsuccessful"
 msgstr "Uue salasõna loomine ebaõnnestus"
 
-#: templates/registration/password_reset_confirm.html:28
+#: templates/registration/password_reset_confirm.html:34
 msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
@@ -737,12 +766,12 @@ msgstr ""
 "Uue salasõna loomise link ei olnud korrektne. Võimalik, et seda on varem "
 "kasutatud. Esitage uue salasõna taotlus uuesti."
 
-#: templates/registration/password_reset_done.html:6
-#: templates/registration/password_reset_done.html:10
+#: templates/registration/password_reset_done.html:12
+#: templates/registration/password_reset_done.html:16
 msgid "Password reset successful"
 msgstr "Uue parooli loomine õnnestus"
 
-#: templates/registration/password_reset_done.html:12
+#: templates/registration/password_reset_done.html:18
 msgid ""
 "We've e-mailed you instructions for setting your password to the e-mail "
 "address you submitted. You should be receiving it shortly."
@@ -776,7 +805,7 @@ msgstr "Täname meie lehte külastamast!"
 msgid "The %(site_name)s team"
 msgstr "%(site_name)s meeskond"
 
-#: templates/registration/password_reset_form.html:12
+#: templates/registration/password_reset_form.html:18
 msgid ""
 "Forgotten your password? Enter your e-mail address below, and we'll e-mail "
 "instructions for setting a new one."
@@ -784,28 +813,28 @@ msgstr ""
 "Unustasid parool? Sisesta oma e-posti aadress ning me saadame sulle juhised "
 "uue parooli määramiseks."
 
-#: templates/registration/password_reset_form.html:16
+#: templates/registration/password_reset_form.html:22
 msgid "E-mail address:"
 msgstr "E-posti aadress:"
 
-#: templates/registration/password_reset_form.html:16
+#: templates/registration/password_reset_form.html:22
 msgid "Reset my password"
 msgstr "Reseti parool"
 
-#: templatetags/admin_list.py:290
+#: templatetags/admin_list.py:336
 msgid "All dates"
 msgstr "Kõik kuupäevad"
 
-#: views/main.py:27
+#: views/main.py:30
 msgid "(None)"
 msgstr "(Puudub)"
 
-#: views/main.py:66
+#: views/main.py:73
 #, python-format
 msgid "Select %s"
 msgstr "Vali %s"
 
-#: views/main.py:66
+#: views/main.py:75
 #, python-format
 msgid "Select %s to change"
 msgstr "Vali %s mida muuta"

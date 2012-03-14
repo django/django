@@ -1,710 +1,776 @@
 # This file is distributed under the same license as the Django package.
 #
+# Translators:
+# Ali Ismayilov <ali@ismailov.info>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-15 13:12-0400\n"
-"PO-Revision-Date: 2011-03-04 18:44+0000\n"
-"Last-Translator: Jannis <jannis@leidel.info>\n"
-"Language-Team: Azerbaijani <None>\n"
+"POT-Creation-Date: 2012-03-14 00:11-0700\n"
+"PO-Revision-Date: 2012-03-08 12:29+0000\n"
+"Last-Translator: Ali Ismayilov <ali@ismailov.info>\n"
+"Language-Team: Azerbaijani (http://www.transifex.net/projects/p/django/"
+"language/az/)\n"
+"Language: az\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: az\n"
 "Plural-Forms: nplurals=1; plural=0\n"
 
-#: actions.py:49
+#: actions.py:48
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
-msgstr ""
+msgstr "%(count)d %(items)s uğurla silindi."
 
-#: actions.py:61 options.py:1219
+#: actions.py:60 options.py:1297
 #, python-format
 msgid "Cannot delete %(name)s"
-msgstr ""
+msgstr "%(name)s silinmir"
 
-#: actions.py:63 options.py:1221
+#: actions.py:62 options.py:1299
 msgid "Are you sure?"
-msgstr ""
+msgstr "Əminsiniz?"
 
-#: actions.py:85
+#: actions.py:83
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
-msgstr ""
+msgstr "Seçilmiş %(verbose_name_plural)s-ləri sil"
 
-#: filterspecs.py:54
-#, python-format
-msgid ""
-"<h3>By %s:</h3>\n"
-"<ul>\n"
-msgstr ""
-
-#: filterspecs.py:104 filterspecs.py:136 filterspecs.py:205 filterspecs.py:257
+#: filters.py:101 filters.py:191 filters.py:231 filters.py:268 filters.py:378
 msgid "All"
-msgstr ""
+msgstr "Hamısı"
 
-#: filterspecs.py:164
-msgid "Any date"
-msgstr ""
-
-#: filterspecs.py:165
-msgid "Today"
-msgstr ""
-
-#: filterspecs.py:168
-msgid "Past 7 days"
-msgstr ""
-
-#: filterspecs.py:171
-msgid "This month"
-msgstr ""
-
-#: filterspecs.py:173
-msgid "This year"
-msgstr ""
-
-#: filterspecs.py:205
+#: filters.py:232
 msgid "Yes"
-msgstr ""
+msgstr "Hə"
 
-#: filterspecs.py:205
+#: filters.py:233
 msgid "No"
-msgstr ""
+msgstr "Yox"
 
-#: filterspecs.py:216
+#: filters.py:247
 msgid "Unknown"
-msgstr ""
+msgstr "Bilinmir"
+
+#: filters.py:306
+msgid "Any date"
+msgstr "İstənilən tarix"
+
+#: filters.py:307
+msgid "Today"
+msgstr "Bu gün"
+
+#: filters.py:311
+msgid "Past 7 days"
+msgstr "Son 7 gündə"
+
+#: filters.py:315
+msgid "This month"
+msgstr "Bu ay"
+
+#: filters.py:319
+msgid "This year"
+msgstr "Bu il"
 
 #: forms.py:9
 msgid ""
-"Please enter a correct username and password. Note that both fields are case-"
-"sensitive."
+"Please enter the correct username and password for a staff account. Note "
+"that both fields are case-sensitive."
 msgstr ""
 
 #: forms.py:18
 msgid "Please log in again, because your session has expired."
-msgstr ""
+msgstr "Yenidən daxil olun, çünki seansın vaxtı bitmişdir."
 
 #: forms.py:37
 #, python-format
 msgid "Your e-mail address is not your username. Try '%s' instead."
-msgstr ""
+msgstr "Sizin e-poçt ünvanınız istifadəçi adınız deyil. \"%s\" isə yoxlayın."
 
-#: helpers.py:19
+#: helpers.py:20
 msgid "Action:"
-msgstr ""
+msgstr "Əməliyyat:"
 
 #: models.py:19
 msgid "action time"
-msgstr ""
+msgstr "əməliyyat vaxtı"
 
 #: models.py:22
 msgid "object id"
-msgstr ""
+msgstr "obyekt id"
 
 #: models.py:23
 msgid "object repr"
-msgstr ""
+msgstr "obyekt repr"
 
 #: models.py:24
 msgid "action flag"
-msgstr ""
+msgstr "bayraq"
 
 #: models.py:25
 msgid "change message"
-msgstr ""
+msgstr "dəyişmə mesajı"
 
-#: models.py:28
+#: models.py:30
 msgid "log entry"
-msgstr ""
+msgstr "loq yazısı"
 
-#: models.py:29
+#: models.py:31
 msgid "log entries"
+msgstr "loq yazıları"
+
+#: models.py:40
+#, python-format
+msgid "Added \"%(object)s\"."
 msgstr ""
 
-#: options.py:147 options.py:162
+#: models.py:42
+#, python-format
+msgid "Changed \"%(object)s\" - %(changes)s"
+msgstr ""
+
+#: models.py:44
+#, python-format
+msgid "Deleted \"%(object)s.\""
+msgstr ""
+
+#: models.py:46
+msgid "LogEntry Object"
+msgstr ""
+
+#: options.py:150 options.py:166
 msgid "None"
-msgstr ""
+msgstr "Heç nə"
 
-#: options.py:627
+#: options.py:673
 #, python-format
 msgid "Changed %s."
-msgstr ""
+msgstr "%s dəyişdi."
 
-#: options.py:627 options.py:637
+#: options.py:673 options.py:683
 msgid "and"
-msgstr ""
+msgstr "və"
 
-#: options.py:632
+#: options.py:678
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
-msgstr ""
+msgstr "%(name)s \"%(object)s\" əlavə olundu."
 
-#: options.py:636
+#: options.py:682
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr ""
+msgstr " %(list)s %(name)s \"%(object)s\" üçün dəyişdi."
 
-#: options.py:641
+#: options.py:687
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
-msgstr ""
+msgstr "%(name)s \"%(object)s\" siyahısından silindi."
 
-#: options.py:645
+#: options.py:691
 msgid "No fields changed."
-msgstr ""
+msgstr "Heç bir sahə dəyişmədi."
 
-#: options.py:717
+#: options.py:774
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr ""
+msgstr "%(name)s \"%(obj)s\" siyahısına uğurla əlavə edildi."
 
-#: options.py:721 options.py:761
+#: options.py:778 options.py:826
 msgid "You may edit it again below."
-msgstr ""
+msgstr "Aşağıda yenə dəyişiklik apara bilərsiniz."
 
-#: options.py:731 options.py:771
+#: options.py:790 options.py:839
 #, python-format
 msgid "You may add another %s below."
-msgstr ""
+msgstr "Aşağıda yeni %s əlavə edə bilərsiniz."
 
-#: options.py:759
+#: options.py:824
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr ""
+msgstr "%(name)s \"%(obj)s\" siyahısında uğurla dəyişdirildi."
 
-#: options.py:767
+#: options.py:832
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr ""
+"%(name)s \"%(obj)s\" siyahısına uğurla əlavə olundu. Yenə onu aşağıda "
+"redaktə edə bilərsiniz."
 
-#: options.py:827 options.py:1085
+#: options.py:901 options.py:1161
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr ""
+"Biz elementlər üzərində nəsə əməliyyat aparmaq üçün siz onları seçməlisiniz. "
+"Heç bir element dəyişmədi."
 
-#: options.py:846
+#: options.py:920
 msgid "No action selected."
-msgstr ""
+msgstr "Heç bir əməliyyat seçilmədi."
 
-#: options.py:927
+#: options.py:1000
 #, python-format
 msgid "Add %s"
-msgstr ""
+msgstr "%s əlavə et"
 
-#: options.py:953 options.py:1194
+#: options.py:1025 options.py:1269
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
+msgstr "%(key)r əsas açarı ilə %(name)s mövcud deyil."
 
-#: options.py:1018
+#: options.py:1091
 #, python-format
 msgid "Change %s"
-msgstr ""
+msgstr "%s dəyiş"
 
-#: options.py:1065
+#: options.py:1140
 msgid "Database error"
-msgstr ""
+msgstr "Bazada xəta"
 
-#: options.py:1127
+#: options.py:1203
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
-msgstr[0] ""
+msgstr[0] "%(count)s %(name)s uğurla dəyişdirildi."
 
-#: options.py:1154
+#: options.py:1230
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
-msgstr[0] ""
+msgstr[0] "%(total_count)s - hamısı seçilib"
 
-#: options.py:1159
+#: options.py:1235
 #, python-format
 msgid "0 of %(cnt)s selected"
-msgstr ""
+msgstr "%(cnt)s-dan 0 seçilib"
 
-#: options.py:1210
+#: options.py:1285
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr ""
+msgstr "%(name)s \"%(obj)s\" uğurla silindi."
 
-#: options.py:1255
+#: options.py:1332
 #, python-format
 msgid "Change history: %s"
-msgstr ""
+msgstr "Dəyişmə tarixi: %s"
 
-#: sites.py:319 templates/admin/login.html:42
-#: templates/registration/password_reset_complete.html:14
-#: views/decorators.py:26
+#: sites.py:315 tests.py:61 templates/admin/login.html:49
+#: templates/registration/password_reset_complete.html:20
+#: views/decorators.py:23
 msgid "Log in"
-msgstr ""
+msgstr "Daxil ol"
 
-#: sites.py:375
+#: sites.py:380
 msgid "Site administration"
-msgstr ""
+msgstr "Sayt administrasiyası"
 
-#: sites.py:419
+#: sites.py:432
 #, python-format
 msgid "%s administration"
-msgstr ""
+msgstr "%s administrasiyası"
 
-#: widgets.py:75
+#: widgets.py:87
 msgid "Date:"
-msgstr ""
+msgstr "Tarix:"
 
-#: widgets.py:75
+#: widgets.py:87
 msgid "Time:"
-msgstr ""
+msgstr "Vaxt:"
 
-#: widgets.py:140
+#: widgets.py:161
 msgid "Lookup"
-msgstr ""
+msgstr "Sorğu"
 
-#: widgets.py:246
+#: widgets.py:267
 msgid "Add Another"
-msgstr ""
+msgstr "Yenisini əlavə et"
 
 #: templates/admin/404.html:4 templates/admin/404.html.py:8
 msgid "Page not found"
-msgstr ""
+msgstr "Səhifə tapılmadı"
 
 #: templates/admin/404.html:10
 msgid "We're sorry, but the requested page could not be found."
-msgstr ""
+msgstr "Üzrlər, amma soruşduğunuz sayt tapılmadı."
 
-#: templates/admin/500.html:4 templates/admin/app_index.html:8
-#: templates/admin/base.html:55 templates/admin/change_form.html:19
-#: templates/admin/change_list.html:42
-#: templates/admin/delete_confirmation.html:6
-#: templates/admin/delete_selected_confirmation.html:6
-#: templates/admin/invalid_setup.html:4 templates/admin/object_history.html:6
-#: templates/admin/auth/user/change_password.html:12
-#: templates/registration/logged_out.html:4
-#: templates/registration/password_change_done.html:5
-#: templates/registration/password_change_form.html:6
-#: templates/registration/password_reset_complete.html:4
-#: templates/registration/password_reset_confirm.html:4
-#: templates/registration/password_reset_done.html:4
-#: templates/registration/password_reset_form.html:4
+#: templates/admin/500.html:7 templates/admin/app_index.html:8
+#: templates/admin/base.html:45 templates/admin/change_form.html:21
+#: templates/admin/change_list.html:43
+#: templates/admin/delete_confirmation.html:8
+#: templates/admin/delete_selected_confirmation.html:8
+#: templates/admin/invalid_setup.html:7 templates/admin/object_history.html:8
+#: templates/admin/auth/user/change_password.html:15
+#: templates/registration/logged_out.html:5
+#: templates/registration/password_change_done.html:7
+#: templates/registration/password_change_form.html:8
+#: templates/registration/password_reset_complete.html:7
+#: templates/registration/password_reset_confirm.html:7
+#: templates/registration/password_reset_done.html:7
+#: templates/registration/password_reset_form.html:7
 msgid "Home"
-msgstr ""
+msgstr "Ev"
 
-#: templates/admin/500.html:4
+#: templates/admin/500.html:8
 msgid "Server error"
-msgstr ""
+msgstr "Serverdə xəta"
 
-#: templates/admin/500.html:6
+#: templates/admin/500.html:12
 msgid "Server error (500)"
-msgstr ""
+msgstr "Serverdə xəta (500)"
 
-#: templates/admin/500.html:9
+#: templates/admin/500.html:15
 msgid "Server Error <em>(500)</em>"
-msgstr ""
+msgstr "Serverdə xəta <em>(500)</em>"
 
-#: templates/admin/500.html:10
+#: templates/admin/500.html:16
 msgid ""
 "There's been an error. It's been reported to the site administrators via e-"
 "mail and should be fixed shortly. Thanks for your patience."
 msgstr ""
+"Xəta baş verib. Bu haqda sayt administratorlarına e-poçt vasitəsilə xəbər "
+"edilmişdir. Xəta tezliklə aradan qaldırılmalıdır."
 
 #: templates/admin/actions.html:4
 msgid "Run the selected action"
-msgstr ""
+msgstr "Seçdiyim əməliyyatı yerinə yetir"
 
 #: templates/admin/actions.html:4
 msgid "Go"
-msgstr ""
+msgstr "Getdik"
 
 #: templates/admin/actions.html:11
 msgid "Click here to select the objects across all pages"
-msgstr ""
+msgstr "Bütün səhifələr üzrə obyektləri seçmək üçün bura tıqlayın"
 
 #: templates/admin/actions.html:11
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
-msgstr ""
+msgstr "Bütün %(total_count)s sayda %(module_name)s seç"
 
 #: templates/admin/actions.html:13
 msgid "Clear selection"
-msgstr ""
+msgstr "Seçimi təmizlə"
 
-#: templates/admin/app_index.html:10 templates/admin/index.html:19
+#: templates/admin/app_index.html:11 templates/admin/index.html:19
 #, python-format
 msgid "%(name)s"
-msgstr ""
+msgstr "%(name)s"
 
 #: templates/admin/base.html:28
 msgid "Welcome,"
-msgstr ""
+msgstr "Xoş gördük,"
 
 #: templates/admin/base.html:33
 #: templates/registration/password_change_done.html:4
 #: templates/registration/password_change_form.html:5
 msgid "Documentation"
-msgstr ""
+msgstr "Sənədləşdirmə"
 
-#: templates/admin/base.html:41
-#: templates/admin/auth/user/change_password.html:16
-#: templates/admin/auth/user/change_password.html:49
+#: templates/admin/base.html:35
+#: templates/admin/auth/user/change_password.html:19
+#: templates/admin/auth/user/change_password.html:53
 #: templates/registration/password_change_done.html:4
 #: templates/registration/password_change_form.html:5
 msgid "Change password"
-msgstr ""
+msgstr "Parolu dəyiş"
 
-#: templates/admin/base.html:48
+#: templates/admin/base.html:36
 #: templates/registration/password_change_done.html:4
 #: templates/registration/password_change_form.html:5
 msgid "Log out"
-msgstr ""
+msgstr "Çıx"
 
 #: templates/admin/base_site.html:4
 msgid "Django site admin"
-msgstr ""
+msgstr "Django sayt administratoru"
 
 #: templates/admin/base_site.html:7
 msgid "Django administration"
-msgstr ""
+msgstr "Django administrasiya"
 
-#: templates/admin/change_form.html:22 templates/admin/index.html:29
+#: templates/admin/change_form.html:24 templates/admin/index.html:29
 msgid "Add"
-msgstr ""
+msgstr "Əlavə et"
 
-#: templates/admin/change_form.html:31 templates/admin/object_history.html:10
+#: templates/admin/change_form.html:34 templates/admin/object_history.html:12
 msgid "History"
-msgstr ""
+msgstr "Tarix"
 
-#: templates/admin/change_form.html:32
+#: templates/admin/change_form.html:35
 #: templates/admin/edit_inline/stacked.html:9
-#: templates/admin/edit_inline/tabular.html:28
+#: templates/admin/edit_inline/tabular.html:30
 msgid "View on site"
-msgstr ""
+msgstr "Saytda göstər"
 
-#: templates/admin/change_form.html:43 templates/admin/change_list.html:73
-#: templates/admin/login.html:17
-#: templates/admin/auth/user/change_password.html:25
-#: templates/registration/password_change_form.html:16
+#: templates/admin/change_form.html:46 templates/admin/change_list.html:69
+#: templates/admin/login.html:18
+#: templates/admin/auth/user/change_password.html:29
+#: templates/registration/password_change_form.html:21
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] ""
+"one: Aşağıdakı səhvi düzəltməyi xahiş edirik.\n"
+"other: Aşağıdakı səhvləri düzəltməyi xahiş edirik."
 
-#: templates/admin/change_list.html:64
+#: templates/admin/change_list.html:60
 #, python-format
 msgid "Add %(name)s"
-msgstr ""
+msgstr "%(name)s əlavə et"
 
-#: templates/admin/change_list.html:84
+#: templates/admin/change_list.html:80
 msgid "Filter"
+msgstr "Süzgəc"
+
+#: templates/admin/change_list_results.html:17
+msgid "Remove from sorting"
 msgstr ""
 
-#: templates/admin/delete_confirmation.html:10
+#: templates/admin/change_list_results.html:18
+#, python-format
+msgid "Sorting priority: %(priority_number)s"
+msgstr ""
+
+#: templates/admin/change_list_results.html:19
+msgid "Toggle sorting"
+msgstr ""
+
+#: templates/admin/delete_confirmation.html:12
 #: templates/admin/submit_line.html:4
 msgid "Delete"
-msgstr ""
+msgstr "Sil"
 
-#: templates/admin/delete_confirmation.html:17
+#: templates/admin/delete_confirmation.html:19
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
+"%(object_name)s \"%(escaped_object)s\" obyektini sildikdə onun bağlı olduğu "
+"obyektlər də silinməlidir. Ancaq sizin hesabın aşağıdakı tip obyektləri "
+"silməyə səlahiyyəti çatmır:"
 
-#: templates/admin/delete_confirmation.html:25
+#: templates/admin/delete_confirmation.html:27
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
 "following protected related objects:"
 msgstr ""
+"%(object_name)s \"%(escaped_object)s\" obyektini silmək üçün aşağıdakı "
+"qorunan obyektlər də silinməlidir:"
 
-#: templates/admin/delete_confirmation.html:33
+#: templates/admin/delete_confirmation.html:35
 #, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
 "All of the following related items will be deleted:"
 msgstr ""
+"%(object_name)s \"%(escaped_object)s\" obyektini silməkdə əminsiniz? Ona "
+"bağlı olan aşağıdakı obyektlər də silinəcək:"
 
-#: templates/admin/delete_confirmation.html:38
-#: templates/admin/delete_selected_confirmation.html:43
+#: templates/admin/delete_confirmation.html:40
+#: templates/admin/delete_selected_confirmation.html:45
 msgid "Yes, I'm sure"
-msgstr ""
+msgstr "Hə, əminəm"
 
-#: templates/admin/delete_selected_confirmation.html:9
+#: templates/admin/delete_selected_confirmation.html:11
 msgid "Delete multiple objects"
-msgstr ""
+msgstr "Bir neçə obyekt sil"
 
-#: templates/admin/delete_selected_confirmation.html:16
+#: templates/admin/delete_selected_confirmation.html:18
 #, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would result in deleting related "
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
 msgstr ""
+"%(objects_name)s obyektini silmək üçün ona bağlı obyektlər də silinməlidir. "
+"Ancaq sizin hesabınızın aşağıdakı tip obyektləri silmək səlahiyyətinə malik "
+"deyil:"
 
-#: templates/admin/delete_selected_confirmation.html:24
+#: templates/admin/delete_selected_confirmation.html:26
 #, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would require deleting the following "
 "protected related objects:"
 msgstr ""
+"%(objects_name)s obyektini silmək üçün aşağıdakı qorunan obyektlər də "
+"silinməlidir:"
 
-#: templates/admin/delete_selected_confirmation.html:32
+#: templates/admin/delete_selected_confirmation.html:34
 #, python-format
 msgid ""
 "Are you sure you want to delete the selected %(objects_name)s? All of the "
 "following objects and their related items will be deleted:"
 msgstr ""
+"Seçdiyiniz %(objects_name)s obyektini silməkdə əminsiniz? Aşağıdakı bütün "
+"obyektlər və ona bağlı digər obyektlər də silinəcək:"
 
 #: templates/admin/filter.html:2
 #, python-format
 msgid " By %(filter_title)s "
-msgstr ""
+msgstr " %(filter_title)s görə "
 
 #: templates/admin/index.html:18
 #, python-format
 msgid "Models available in the %(name)s application."
-msgstr ""
+msgstr "%(name)s tətbiqetməsində mövcud olan modellər"
 
 #: templates/admin/index.html:35
 msgid "Change"
-msgstr ""
+msgstr "Dəyiş"
 
 #: templates/admin/index.html:45
 msgid "You don't have permission to edit anything."
-msgstr ""
+msgstr "Üzrlər, amma sizin nəyisə dəyişməyə səlahiyyətiniz çatmır."
 
 #: templates/admin/index.html:53
 msgid "Recent Actions"
-msgstr ""
+msgstr "Son əməliyyatlar"
 
 #: templates/admin/index.html:54
 msgid "My Actions"
-msgstr ""
+msgstr "Mənim etdiklərim"
 
 #: templates/admin/index.html:58
 msgid "None available"
-msgstr ""
+msgstr "Heç nə yoxdur"
 
 #: templates/admin/index.html:72
 msgid "Unknown content"
-msgstr ""
+msgstr "Naməlum"
 
-#: templates/admin/invalid_setup.html:7
+#: templates/admin/invalid_setup.html:13
 msgid ""
 "Something's wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
 "the appropriate user."
 msgstr ""
+"Bazanın qurulması ilə nəsə problem var. Lazımi cədvəllərin bazada "
+"yaradıldığını və uyğun istifadəçinin bazadan oxuya bildiyini yoxlayın."
 
-#: templates/admin/login.html:33
+#: templates/admin/login.html:34
 msgid "Username:"
-msgstr ""
+msgstr "İstifadəçi adı:"
 
-#: templates/admin/login.html:37
+#: templates/admin/login.html:38
 msgid "Password:"
-msgstr ""
+msgstr "Parol:"
 
-#: templates/admin/object_history.html:22
-msgid "Date/time"
-msgstr ""
-
-#: templates/admin/object_history.html:23
-msgid "User"
+#: templates/admin/login.html:45
+msgid "Forgotten your password or username?"
 msgstr ""
 
 #: templates/admin/object_history.html:24
-msgid "Action"
-msgstr ""
+msgid "Date/time"
+msgstr "Tarix/vaxt"
 
-#: templates/admin/object_history.html:38
+#: templates/admin/object_history.html:25
+msgid "User"
+msgstr "İstifadəçi"
+
+#: templates/admin/object_history.html:26
+msgid "Action"
+msgstr "Əməliyyat"
+
+#: templates/admin/object_history.html:40
 msgid ""
 "This object doesn't have a change history. It probably wasn't added via this "
 "admin site."
 msgstr ""
+"Bu obyektin dəyişməsinə aid tarix mövcud deyil. Yəqin ki, o, bu admin saytı "
+"vasitəsilə yaradılmayıb."
 
 #: templates/admin/pagination.html:10
 msgid "Show all"
-msgstr ""
+msgstr "Hamısını göstər"
 
 #: templates/admin/pagination.html:11 templates/admin/submit_line.html:3
 msgid "Save"
-msgstr ""
+msgstr "Yadda saxla"
 
-#: templates/admin/search_form.html:8
+#: templates/admin/search_form.html:7
 msgid "Search"
-msgstr ""
+msgstr "Axtar"
 
-#: templates/admin/search_form.html:10
+#: templates/admin/search_form.html:9
 #, python-format
 msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
-msgstr[0] ""
+msgstr[0] "%(counter)s nəticə"
 
-#: templates/admin/search_form.html:10
+#: templates/admin/search_form.html:9
 #, python-format
 msgid "%(full_result_count)s total"
-msgstr ""
+msgstr "Hamısı birlikdə %(full_result_count)s"
 
 #: templates/admin/submit_line.html:5
 msgid "Save as new"
-msgstr ""
+msgstr "Yenisi kimi yadda saxla"
 
 #: templates/admin/submit_line.html:6
 msgid "Save and add another"
-msgstr ""
+msgstr "Yadda saxla və yenisini əlavə et"
 
 #: templates/admin/submit_line.html:7
 msgid "Save and continue editing"
-msgstr ""
+msgstr "Yadda saxla və redaktəyə davam et"
 
 #: templates/admin/auth/user/add_form.html:6
 msgid ""
 "First, enter a username and password. Then, you'll be able to edit more user "
 "options."
 msgstr ""
+"Əvvəlcə istifadəçi adını və parolu daxil edin. Ondan sonra daha çox "
+"istifadəçi imkanlarını redaktə edə biləcəksiniz."
 
 #: templates/admin/auth/user/add_form.html:8
 msgid "Enter a username and password."
-msgstr ""
+msgstr "İstifadəçi adını və parolu daxil edin."
 
-#: templates/admin/auth/user/change_password.html:29
+#: templates/admin/auth/user/change_password.html:33
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
-msgstr ""
+msgstr "<strong>%(username)s</strong> üçün yeni parol daxil edin."
 
-#: templates/admin/auth/user/change_password.html:36
+#: templates/admin/auth/user/change_password.html:40
 msgid "Password"
-msgstr ""
+msgstr "Parol"
 
-#: templates/admin/auth/user/change_password.html:42
-#: templates/registration/password_change_form.html:38
+#: templates/admin/auth/user/change_password.html:46
+#: templates/registration/password_change_form.html:43
 msgid "Password (again)"
-msgstr ""
+msgstr "Parol (bir daha)"
 
-#: templates/admin/auth/user/change_password.html:43
+#: templates/admin/auth/user/change_password.html:47
 msgid "Enter the same password as above, for verification."
-msgstr ""
+msgstr "Yuxarıdakı parolu yenidən daxil edin, dəqiqləşdirmək üçün"
 
 #: templates/admin/edit_inline/stacked.html:67
-#: templates/admin/edit_inline/tabular.html:113
+#: templates/admin/edit_inline/tabular.html:115
 #, python-format
 msgid "Add another %(verbose_name)s"
-msgstr ""
+msgstr "Daha bir %(verbose_name)s əlavə et"
 
 #: templates/admin/edit_inline/stacked.html:70
-#: templates/admin/edit_inline/tabular.html:116
+#: templates/admin/edit_inline/tabular.html:118
 msgid "Remove"
-msgstr ""
+msgstr "Yığışdır"
 
-#: templates/admin/edit_inline/tabular.html:15
+#: templates/admin/edit_inline/tabular.html:17
 msgid "Delete?"
-msgstr ""
+msgstr "Silək?"
 
-#: templates/registration/logged_out.html:8
+#: templates/registration/logged_out.html:9
 msgid "Thanks for spending some quality time with the Web site today."
-msgstr ""
+msgstr "Sayt ilə səmərəli vaxt keçirdiyiniz üçün təşəkkür."
 
-#: templates/registration/logged_out.html:10
+#: templates/registration/logged_out.html:11
 msgid "Log in again"
-msgstr ""
+msgstr "Yenidən daxil ol"
 
-#: templates/registration/password_change_done.html:5
-#: templates/registration/password_change_form.html:6
-#: templates/registration/password_change_form.html:8
-#: templates/registration/password_change_form.html:20
+#: templates/registration/password_change_done.html:8
+#: templates/registration/password_change_form.html:9
+#: templates/registration/password_change_form.html:13
+#: templates/registration/password_change_form.html:25
 msgid "Password change"
-msgstr ""
+msgstr "Parol dəyişmək"
 
-#: templates/registration/password_change_done.html:7
-#: templates/registration/password_change_done.html:11
+#: templates/registration/password_change_done.html:12
+#: templates/registration/password_change_done.html:16
 msgid "Password change successful"
-msgstr ""
+msgstr "Parol uğurla dəyişdi"
 
-#: templates/registration/password_change_done.html:13
+#: templates/registration/password_change_done.html:18
 msgid "Your password was changed."
-msgstr ""
+msgstr "Sizin parolunuz dəyişdi."
 
-#: templates/registration/password_change_form.html:22
+#: templates/registration/password_change_form.html:27
 msgid ""
 "Please enter your old password, for security's sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
 msgstr ""
-
-#: templates/registration/password_change_form.html:28
-msgid "Old password"
-msgstr ""
+"Yoxlama üçün köhnə parolunuzu daxil edin. Sonra isə yeni parolu iki dəfə "
+"daxil edin ki, səhv etmədiyinizə əmin olaq."
 
 #: templates/registration/password_change_form.html:33
+msgid "Old password"
+msgstr "Köhnə parol"
+
+#: templates/registration/password_change_form.html:38
 msgid "New password"
-msgstr ""
+msgstr "Yeni parol"
 
-#: templates/registration/password_change_form.html:44
-#: templates/registration/password_reset_confirm.html:21
+#: templates/registration/password_change_form.html:49
+#: templates/registration/password_reset_confirm.html:27
 msgid "Change my password"
-msgstr ""
+msgstr "Mənim parolumu dəyiş"
 
-#: templates/registration/password_reset_complete.html:4
-#: templates/registration/password_reset_confirm.html:6
-#: templates/registration/password_reset_done.html:4
-#: templates/registration/password_reset_form.html:4
-#: templates/registration/password_reset_form.html:6
-#: templates/registration/password_reset_form.html:10
+#: templates/registration/password_reset_complete.html:8
+#: templates/registration/password_reset_confirm.html:12
+#: templates/registration/password_reset_done.html:8
+#: templates/registration/password_reset_form.html:8
+#: templates/registration/password_reset_form.html:12
+#: templates/registration/password_reset_form.html:16
 msgid "Password reset"
-msgstr ""
-
-#: templates/registration/password_reset_complete.html:6
-#: templates/registration/password_reset_complete.html:10
-msgid "Password reset complete"
-msgstr ""
+msgstr "Parolun sıfırlanması"
 
 #: templates/registration/password_reset_complete.html:12
+#: templates/registration/password_reset_complete.html:16
+msgid "Password reset complete"
+msgstr "Parolun sıfırlanması başa çatdı"
+
+#: templates/registration/password_reset_complete.html:18
 msgid "Your password has been set.  You may go ahead and log in now."
-msgstr ""
+msgstr "Yeni parol artıq qüvvədədir.  Yenidən daxil ola bilərsiniz."
 
-#: templates/registration/password_reset_confirm.html:4
+#: templates/registration/password_reset_confirm.html:8
 msgid "Password reset confirmation"
-msgstr ""
+msgstr "Parolun sıfırlanması üçün təsdiq"
 
-#: templates/registration/password_reset_confirm.html:12
+#: templates/registration/password_reset_confirm.html:18
 msgid "Enter new password"
-msgstr ""
+msgstr "Yeni parolu daxil edin"
 
-#: templates/registration/password_reset_confirm.html:14
+#: templates/registration/password_reset_confirm.html:20
 msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
-msgstr ""
+msgstr "Yeni parolu iki dəfə daxil edin ki, səhv etmədiyinizə əmin olaq."
 
-#: templates/registration/password_reset_confirm.html:18
+#: templates/registration/password_reset_confirm.html:24
 msgid "New password:"
-msgstr ""
-
-#: templates/registration/password_reset_confirm.html:20
-msgid "Confirm password:"
-msgstr ""
+msgstr "Yeni parol:"
 
 #: templates/registration/password_reset_confirm.html:26
-msgid "Password reset unsuccessful"
-msgstr ""
+msgid "Confirm password:"
+msgstr "Yeni parol (bir daha):"
 
-#: templates/registration/password_reset_confirm.html:28
+#: templates/registration/password_reset_confirm.html:32
+msgid "Password reset unsuccessful"
+msgstr "Parolun sıfırlanması baş tutmadı"
+
+#: templates/registration/password_reset_confirm.html:34
 msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
 msgstr ""
-
-#: templates/registration/password_reset_done.html:6
-#: templates/registration/password_reset_done.html:10
-msgid "Password reset successful"
-msgstr ""
+"Parolun sıfırlanması üçün olan keçid, yəqin ki, artıq istifadə olunub.  "
+"Parolu sıfırlamaq üçün yenə müraciət edin."
 
 #: templates/registration/password_reset_done.html:12
+#: templates/registration/password_reset_done.html:16
+msgid "Password reset successful"
+msgstr "Parolun sıfırlanması uğurla başa çatdı."
+
+#: templates/registration/password_reset_done.html:18
 msgid ""
 "We've e-mailed you instructions for setting your password to the e-mail "
 "address you submitted. You should be receiving it shortly."
 msgstr ""
+"Parolunuzu dəyişmək üçün təlimatları qeydiyyat zamanı göstərdiyiniz e-poçt "
+"ünvanına göndərdik. İndi gələcək."
 
 #: templates/registration/password_reset_email.html:2
 #, python-format
@@ -712,52 +778,56 @@ msgid ""
 "You're receiving this e-mail because you requested a password reset for your "
 "user account at %(site_name)s."
 msgstr ""
+"%(site_name)s saytındakı hesabınızın parolunu dəyişmək istədiyiniz üçün bu "
+"məktubu almısınız."
 
 #: templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
-msgstr ""
+msgstr "Növbəti səhifəyə keçid alın və yeni parolu seçin:"
 
 #: templates/registration/password_reset_email.html:8
 msgid "Your username, in case you've forgotten:"
-msgstr ""
+msgstr "Sizin istifadəçi adınız:"
 
 #: templates/registration/password_reset_email.html:10
 msgid "Thanks for using our site!"
-msgstr ""
+msgstr "Bizim saytdan istifadə etdiyiniz üçün təşəkkür edirik!"
 
 #: templates/registration/password_reset_email.html:12
 #, python-format
 msgid "The %(site_name)s team"
-msgstr ""
+msgstr "%(site_name)s komandası"
 
-#: templates/registration/password_reset_form.html:12
+#: templates/registration/password_reset_form.html:18
 msgid ""
 "Forgotten your password? Enter your e-mail address below, and we'll e-mail "
 "instructions for setting a new one."
 msgstr ""
+"Parolu unutmusunuz? E-poçt ünvanınızı aşağıda qeyd edin və biz sizə yeni "
+"parol əldə etmək haqda təlimatları göndərcəyik."
 
-#: templates/registration/password_reset_form.html:16
+#: templates/registration/password_reset_form.html:22
 msgid "E-mail address:"
-msgstr ""
+msgstr "E-poçt  ünvanı:"
 
-#: templates/registration/password_reset_form.html:16
+#: templates/registration/password_reset_form.html:22
 msgid "Reset my password"
-msgstr ""
+msgstr "Parolumu sıfırla"
 
-#: templatetags/admin_list.py:290
+#: templatetags/admin_list.py:336
 msgid "All dates"
-msgstr ""
+msgstr "Bütün tarixlərdə"
 
-#: views/main.py:27
+#: views/main.py:30
 msgid "(None)"
-msgstr ""
+msgstr "(Heç nə)"
 
-#: views/main.py:66
+#: views/main.py:73
 #, python-format
 msgid "Select %s"
-msgstr ""
+msgstr "%s seç"
 
-#: views/main.py:66
+#: views/main.py:75
 #, python-format
 msgid "Select %s to change"
-msgstr ""
+msgstr "%s dəyişmək üçün seç"

@@ -1,60 +1,90 @@
 # This file is distributed under the same license as the Django package.
 #
+# Translators:
+# Chandan kumar <chandankumar.093047@gmail.com>, 2012.
+# Jannis Leidel <jannis@leidel.info>, 2011.
+# Sandeep Satavlekar <sandysat@gmail.com>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-15 13:13-0400\n"
-"PO-Revision-Date: 2011-03-06 18:20+0000\n"
-"Last-Translator: sandeepsatavlekar <sandysat@gmail.com>\n"
-"Language-Team: Hindi <None>\n"
+"POT-Creation-Date: 2012-03-14 00:13-0700\n"
+"PO-Revision-Date: 2012-03-08 10:42+0000\n"
+"Last-Translator: Chandan kumar <chandankumar.093047@gmail.com>\n"
+"Language-Team: Hindi (http://www.transifex.net/projects/p/django/language/"
+"hi/)\n"
+"Language: hi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: hi\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
-#: media/js/SelectFilter2.js:45
-#, perl-format
+#: static/admin/js/SelectFilter2.js:45
+#, c-format
 msgid "Available %s"
 msgstr "उपलब्ध %s"
 
-#: media/js/SelectFilter2.js:52
+#: static/admin/js/SelectFilter2.js:46
+#, c-format
+msgid ""
+"This is the list of available %s. You may choose some by selecting them in "
+"the box below and then clicking the \"Choose\" arrow between the two boxes."
+msgstr ""
+
+#: static/admin/js/SelectFilter2.js:53
+#, c-format
+msgid "Type into this box to filter down the list of available %s."
+msgstr ""
+
+#: static/admin/js/SelectFilter2.js:57
 msgid "Filter"
 msgstr "छानना"
 
-#: media/js/SelectFilter2.js:59
+#: static/admin/js/SelectFilter2.js:61
 msgid "Choose all"
 msgstr "सारे चुनें"
 
-#: media/js/SelectFilter2.js:64
-msgid "Add"
-msgstr "जोड़ना"
+#: static/admin/js/SelectFilter2.js:61
+#, c-format
+msgid "Click to choose all %s at once."
+msgstr ""
 
-#: media/js/SelectFilter2.js:66
+#: static/admin/js/SelectFilter2.js:67
+msgid "Choose"
+msgstr ""
+
+#: static/admin/js/SelectFilter2.js:69
 msgid "Remove"
 msgstr "हटाना"
 
-#: media/js/SelectFilter2.js:71
-#, perl-format
+#: static/admin/js/SelectFilter2.js:75
+#, c-format
 msgid "Chosen %s"
 msgstr "%s चुना गया हैं"
 
-#: media/js/SelectFilter2.js:72
-msgid "Select your choice(s) and click "
-msgstr "आपके पसंद चुनिये और क्लिक करें"
+#: static/admin/js/SelectFilter2.js:76
+#, c-format
+msgid ""
+"This is the list of chosen %s. You may remove some by selecting them in the "
+"box below and then clicking the \"Remove\" arrow between the two boxes."
+msgstr ""
 
-#: media/js/SelectFilter2.js:77
-msgid "Clear all"
-msgstr "सारे हटाओ"
+#: static/admin/js/SelectFilter2.js:80
+msgid "Remove all"
+msgstr "सभी को हटाएँ"
 
-#: media/js/actions.js:18 media/js/actions.min.js:1
+#: static/admin/js/SelectFilter2.js:80
+#, c-format
+msgid "Click to remove all chosen %s at once."
+msgstr ""
+
+#: static/admin/js/actions.js:18 static/admin/js/actions.min.js:1
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
 msgstr[0] "%(cnt)s में से %(sel)s चुना गया हैं"
 msgstr[1] "%(cnt)s में से %(sel)s चुने गए हैं"
 
-#: media/js/actions.js:109 media/js/actions.min.js:5
+#: static/admin/js/actions.js:109 static/admin/js/actions.min.js:5
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
 "action, your unsaved changes will be lost."
@@ -62,7 +92,7 @@ msgstr ""
 "स्वतंत्र सम्पादनक्षम क्षेत्र/स्तम्भ में किये हुए बदल अभी रक्षित नहीं हैं | अगर आप कुछ कार्रवाई "
 "करते हो तो वे  खो जायेंगे |"
 
-#: media/js/actions.js:121 media/js/actions.min.js:6
+#: static/admin/js/actions.js:121 static/admin/js/actions.min.js:6
 msgid ""
 "You have selected an action, but you haven't saved your changes to "
 "individual fields yet. Please click OK to save. You'll need to re-run the "
@@ -72,7 +102,7 @@ msgstr ""
 "नहीं किये हैं| उन्हें सुरक्षित करने के लिए कृपया 'ओके' क्लिक करे | आप को चुनी हुई कार्रवाई "
 "दोबारा चलानी होगी |"
 
-#: media/js/actions.js:123 media/js/actions.min.js:6
+#: static/admin/js/actions.js:123 static/admin/js/actions.min.js:6
 msgid ""
 "You have selected an action, and you haven't made any changes on individual "
 "fields. You're probably looking for the Go button rather than the Save "
@@ -81,72 +111,68 @@ msgstr ""
 "आप ने कार्रवाई चुनी हैं, और आप ने स्वतंत्र सम्पादनक्षम क्षेत्र/स्तम्भ में बदल नहीं किये हैं|  "
 "संभवतः 'सेव' बटन के बजाय आप 'गो' बटन ढून्ढ रहे हो |"
 
-#: media/js/calendar.js:24 media/js/dateparse.js:32
+#: static/admin/js/calendar.js:26
 msgid ""
 "January February March April May June July August September October November "
 "December"
 msgstr "जनवरी फ़रवरी मार्च अप्रैल मई जून जुलाई अगस्त सेप्टम्बर अक्टूबर नवंबर दिसम्‍बर"
 
-#: media/js/calendar.js:25
+#: static/admin/js/calendar.js:27
 msgid "S M T W T F S"
 msgstr "आ सो म बु गु शु श"
 
-#: media/js/collapse.js:9 media/js/collapse.js.py:21
-#: media/js/collapse.min.js:1
+#: static/admin/js/collapse.js:8 static/admin/js/collapse.js.c:19
+#: static/admin/js/collapse.min.js:1
 msgid "Show"
 msgstr "दिखाओ"
 
-#: media/js/collapse.js:16 media/js/collapse.min.js:1
+#: static/admin/js/collapse.js:15 static/admin/js/collapse.min.js:1
 msgid "Hide"
 msgstr "  छिपाओ"
 
-#: media/js/dateparse.js:33
-msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
-msgstr "रविवार सोमवार मंगलवार बुधवार गुरूवार शुक्रवार शनिवार"
-
-#: media/js/admin/DateTimeShortcuts.js:49
-#: media/js/admin/DateTimeShortcuts.js:84
+#: static/admin/js/admin/DateTimeShortcuts.js:49
+#: static/admin/js/admin/DateTimeShortcuts.js:85
 msgid "Now"
 msgstr "अब"
 
-#: media/js/admin/DateTimeShortcuts.js:53
+#: static/admin/js/admin/DateTimeShortcuts.js:53
 msgid "Clock"
 msgstr "घड़ी"
 
-#: media/js/admin/DateTimeShortcuts.js:80
+#: static/admin/js/admin/DateTimeShortcuts.js:81
 msgid "Choose a time"
 msgstr "एक समय चुनें"
 
-#: media/js/admin/DateTimeShortcuts.js:85
+#: static/admin/js/admin/DateTimeShortcuts.js:86
 msgid "Midnight"
 msgstr "मध्यरात्री"
 
-#: media/js/admin/DateTimeShortcuts.js:86
+#: static/admin/js/admin/DateTimeShortcuts.js:87
 msgid "6 a.m."
 msgstr "सुबह 6 बजे"
 
-#: media/js/admin/DateTimeShortcuts.js:87
+#: static/admin/js/admin/DateTimeShortcuts.js:88
 msgid "Noon"
 msgstr "दोपहर"
 
-#: media/js/admin/DateTimeShortcuts.js:91
-#: media/js/admin/DateTimeShortcuts.js:188
+#: static/admin/js/admin/DateTimeShortcuts.js:92
+#: static/admin/js/admin/DateTimeShortcuts.js:204
 msgid "Cancel"
 msgstr "रद्द करें"
 
-#: media/js/admin/DateTimeShortcuts.js:133
-#: media/js/admin/DateTimeShortcuts.js:182
+#: static/admin/js/admin/DateTimeShortcuts.js:144
+#: static/admin/js/admin/DateTimeShortcuts.js:197
 msgid "Today"
 msgstr "आज"
 
-#: media/js/admin/DateTimeShortcuts.js:137
+#: static/admin/js/admin/DateTimeShortcuts.js:148
 msgid "Calendar"
 msgstr "तिथि-पत्र "
 
-#: media/js/admin/DateTimeShortcuts.js:180
+#: static/admin/js/admin/DateTimeShortcuts.js:195
 msgid "Yesterday"
 msgstr "कल (बीता)"
 
-#: media/js/admin/DateTimeShortcuts.js:184
+#: static/admin/js/admin/DateTimeShortcuts.js:199
 msgid "Tomorrow"
 msgstr "कल"
