@@ -324,7 +324,7 @@ This logging configuration does the following things:
           higher message to ``/dev/null``.
 
         * ``console``, a StreamHandler, which will print any ``DEBUG``
-          message to stdout. This handler uses the `simple` output
+          message to stderr. This handler uses the `simple` output
           format.
 
         * ``mail_admins``, an AdminEmailHandler, which will e-mail any
