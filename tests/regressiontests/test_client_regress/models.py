@@ -13,7 +13,7 @@ from django.template import (TemplateDoesNotExist, TemplateSyntaxError,
 import django.template.context
 from django.test import Client, TestCase
 from django.test.client import encode_file, RequestFactory
-from django.test.utils import ContextList, override_settings
+from django.test.utils import ContextList
 from django.template.response import SimpleTemplateResponse
 from django.http import HttpResponse
 
@@ -562,18 +562,6 @@ class SessionEngineTests(TestCase):
         response = self.client.get("/test_client/login_protected_view/")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['user'].username, 'testclient')
-
-
-class NoSessionsAppInstalled(SessionEngineTests):
-    """#7836 - Test client can exercise sessions even when 'django.contrib.sessions' isn't installed."""
-
-    # Remove the 'session' contrib app from INSTALLED_APPS
-    @override_settings(INSTALLED_APPS=tuple(filter(lambda a: a!='django.contrib.sessions', settings.INSTALLED_APPS)))
-    def test_session(self):
-        # This request sets a session variable.
-        response = self.client.get('/test_client_regress/set_session/')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(self.client.session['session_var'], 'YES')
 
 
 class URLEscapingTests(TestCase):
