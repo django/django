@@ -49,3 +49,10 @@ class CommentManagerTests(CommentTestCase):
         author_comments = list(Comment.objects.for_model(Author.objects.get(pk=1)))
         self.assertEqual(article_comments, [c1, c3])
         self.assertEqual(author_comments, [c2])
+
+    def testPrefetchRelated(self):
+        c1, c2, c3, c4 = self.createSomeComments()
+        # one for comments, one for Articles, one for Author
+        with self.assertNumQueries(3):
+            qs = Comment.objects.prefetch_related('content_object')
+            [c.content_object for c in qs]

@@ -5,7 +5,7 @@ from django.test import TestCase
 
 from .models import (Author, Book, Reader, Qualification, Teacher, Department,
     TaggedItem, Bookmark, AuthorAddress, FavoriteAuthors, AuthorWithAge,
-    BookWithYear, Person, House, Room, Employee)
+    BookWithYear, Person, House, Room, Employee, Comment)
 
 
 class PrefetchRelatedTests(TestCase):
@@ -253,6 +253,14 @@ class GenericRelationTests(TestCase):
         with self.assertNumQueries(3):
             qs = TaggedItem.objects.prefetch_related('content_object')
             list(qs)
+
+    def test_prefetch_GFK_nonint_pk(self):
+        Comment.objects.create(comment="awesome", content_object=self.book1)
+
+        # 1 for Comment table, 1 for Book table
+        with self.assertNumQueries(2):
+            qs = Comment.objects.prefetch_related('content_object')
+            [c.content_object for c in qs]
 
     def test_traverse_GFK(self):
         """

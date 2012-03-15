@@ -85,16 +85,16 @@ class GenericForeignKey(object):
             ret_val.extend(ct.get_all_objects_for_this_type(pk__in=fkeys))
 
         # For doing the join in Python, we have to match both the FK val and the
-        # content type, so the 'attr' vals we return need to be callables that
-        # will return a (fk, class) pair.
+        # content type, so we use a callable that returns a (fk, class) pair.
         def gfk_key(obj):
             ct_id = getattr(obj, ct_attname)
             if ct_id is None:
                 return None
             else:
-                return (getattr(obj, self.fk_field),
-                        self.get_content_type(id=ct_id,
-                                              using=obj._state.db).model_class())
+                model = self.get_content_type(id=ct_id,
+                                              using=obj._state.db).model_class()
+                return (model._meta.pk.get_prep_value(getattr(obj, self.fk_field)),
+                        model)
 
         return (ret_val,
                 lambda obj: (obj._get_pk_val(), obj.__class__),
