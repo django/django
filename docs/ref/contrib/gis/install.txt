@@ -128,7 +128,7 @@ is required.
     to compile software from source.  This is typically included on your
     OS X installation DVDs.
 
-.. _Apple Developer Tools: http://developer.apple.com/tools/xcode/
+.. _Apple Developer Tools: https://developer.apple.com/technologies/tools/
 
 .. _geosbuild:
 
@@ -743,6 +743,7 @@ Mac OS X
 Because of the variety of packaging systems available for OS X, users have
 several different options for installing GeoDjango. These options are:
 
+* :ref:`homebrew`
 * :ref:`kyngchaos`
 * :ref:`fink`
 * :ref:`macports`
@@ -778,6 +779,25 @@ __ http://python.org/ftp/python/2.6.2/python-2.6.2-macosx2009-04-16.dmg
     ``python`` is entered at the command-line::
 
         export PATH=/Library/Frameworks/Python.framework/Versions/Current/bin:$PATH
+
+.. _homebrew:
+
+Homebrew
+^^^^^^^^
+
+`Homebrew`__ provides "recipes" for building binaries and packages from source.
+It provides recipes for the GeoDjango prerequisites on Macintosh computers
+running OS X. Because Homebrew still builds the software from source, the
+`Apple Developer Tools`_ are required.
+
+Summary::
+
+    $ brew install postgresql
+    $ brew install postgis
+    $ brew install gdal
+    $ brew install libgeoip
+
+__ http://mxcl.github.com/homebrew/
 
 .. _kyngchaos:
 
