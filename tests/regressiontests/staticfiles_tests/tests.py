@@ -319,6 +319,7 @@ class TestCollectionFilesOverride(CollectionTestCase):
             os.unlink(self.testfile_path)
         # set back original modification time
         os.utime(self.orig_path, (self.orig_atime, self.orig_mtime))
+        super(TestCollectionFilesOverride, self).tearDown()
 
     def test_ordering_override(self):
         """
