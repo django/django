@@ -1783,8 +1783,9 @@ processing at the first positive match.
 
     Once a user has authenticated, Django stores which backend was used to
     authenticate the user in the user's session, and re-uses the same backend
-    for subsequent authentication attempts for that user. This effectively means
-    that authentication sources are cached, so if you change
+    for the duration of that session whenever access to the currently
+    authenticated user is needed. This effectively means that authentication
+    sources are cached on a per-session basis, so if you change
     :setting:`AUTHENTICATION_BACKENDS`, you'll need to clear out session data if
     you need to force users to re-authenticate using different methods. A simple
     way to do that is simply to execute ``Session.objects.all().delete()``.
