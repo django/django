@@ -62,17 +62,19 @@ improvements and optimizations to the Python language since version 2.5, and
 will help ease the process of dropping support for older Python versions on
 the road to Python 3.
 
-Can I use Django with Python 2.4?
----------------------------------
+What Python version can I use with Django?
+------------------------------------------
 
-As of Django 1.4, no.
-
-Django 1.3 and earlier supported Python 2.4. Django 1.4 (the current development
-version, which hasn't been officially released) and newer version require
-Python 2.5 or greater (but not 3.x; see the next question.)
-
-We highly recommend you upgrade Python if possible, but Django 1.3.x will
-continue to support Python 2.4.
+============== ===============
+Django version Python versions
+============== ===============
+1.0            2.3, 2.4, 2.5, 2.6
+1.1            2.3, 2.4, 2.5, 2.6
+1.2            2.4, 2.5, 2.6, 2.7
+1.3            2.4, 2.5, 2.6, 2.7
+**1.4**        **2.5, 2.6, 2.7**
+*1.5 (future)* *2.6, 2.7, 3.x (experimental)*
+============== ===============
 
 Can I use Django with Python 3?
 -------------------------------
