@@ -100,8 +100,8 @@ the ``geodjango`` project:
 Configure ``settings.py``
 -------------------------
 
-The ``geodjango`` project settings are stored in the ``settings.py`` file. Edit
-the database connection settings appropriately::
+The ``geodjango`` project settings are stored in the ``geodjango/settings.py``
+file. Edit the database connection settings appropriately::
 
     DATABASES = {
         'default': {
@@ -110,10 +110,6 @@ the database connection settings appropriately::
              'USER': 'geo',
          }
     }
-
-.. note::
-
-    These database settings are for Django 1.2 and above.
 
 In addition, modify the :setting:`INSTALLED_APPS` setting to include
 :mod:`django.contrib.admin`, :mod:`django.contrib.gis`,
@@ -124,6 +120,8 @@ and ``world`` (our newly created application)::
         'django.contrib.contenttypes',
         'django.contrib.sessions',
         'django.contrib.sites',
+        'django.contrib.messages',
+        'django.contrib.staticfiles',
         'django.contrib.admin',
         'django.contrib.gis',
         'world'
@@ -362,7 +360,7 @@ tutorial, then we can determine the path using Python's built-in
 Now, the world borders shapefile may be opened using GeoDjango's
 :class:`~django.contrib.gis.gdal.DataSource` interface::
 
-    >>> from django.contrib.gis.gdal import *
+    >>> from django.contrib.gis.gdal import DataSource
     >>> ds = DataSource(world_shp)
     >>> print ds
     / ... /geodjango/world/data/TM_WORLD_BORDERS-0.3.shp (ESRI Shapefile)
@@ -648,7 +646,7 @@ example, the coordinate will be expressed in terms of `EPSG SRID 32140`__,
 a coordinate system specific to south Texas **only** and in units of
 **meters** and not degrees::
 
-    >>> from django.contrib.gis.geos import *
+    >>> from django.contrib.gis.geos import Point, GEOSGeometry
     >>> pnt = Point(954158.1, 4215137.1, srid=32140)
 
 Note that ``pnt`` may also be constructed with EWKT, an "extended" form of
@@ -729,7 +727,7 @@ Let's dive in again -- create a file called ``admin.py`` inside the
 
     admin.site.register(WorldBorder, admin.GeoModelAdmin)
 
-Next, edit your ``urls.py`` in the ``geodjango`` project folder to look
+Next, edit your ``urls.py`` in the ``geodjango`` application folder to look
 as follows::
 
     from django.conf.urls import patterns, url, include
@@ -738,7 +736,7 @@ as follows::
     admin.autodiscover()
 
     urlpatterns = patterns('',
-        (r'^admin/', include(admin.site.urls)),
+        url(r'^admin/', include(admin.site.urls)),
     )
 
 Start up the Django development server:
