@@ -152,28 +152,35 @@ class LargeDeleteTests(TestCase):
 
 class ProxyDeleteTest(TestCase):
     """
-    Tests on_delete behavior for proxy models. Deleting the *proxy*
-    instance bubbles through to its non-proxy and *all* referring objects
-    are deleted.
+    Tests on_delete behavior for proxy models.
 
     See #16128.
 
     """
-
-    def setUp(self):
+    def create_image(self):
+        """Return an Image referenced by both a FooImage and a FooFile."""
         # Create an Image
-        self.test_image = Image()
-        self.test_image.save()
-        foo_image = FooImage(my_image=self.test_image)
+        test_image = Image()
+        test_image.save()
+        foo_image = FooImage(my_image=test_image)
         foo_image.save()
 
         # Get the Image instance as a File
-        test_file = File.objects.get(pk=self.test_image.pk)
+        test_file = File.objects.get(pk=test_image.pk)
         foo_file = FooFile(my_file=test_file)
         foo_file.save()
 
+        return test_image
 
-    def test_delete(self):
+
+    def test_delete_proxy(self):
+        """
+        Deleting the *proxy* instance bubbles through to its non-proxy and
+        *all* referring objects are deleted.
+
+        """
+        self.create_image()
+
         Image.objects.all().delete()
 
         # An Image deletion == File deletion
@@ -185,28 +192,19 @@ class ProxyDeleteTest(TestCase):
         self.assertEqual(len(FooFile.objects.all()), 0)
 
 
+    def test_delete_proxy_of_proxy(self):
+        """
+        Deleting a proxy-of-proxy instance should bubble through to its proxy
+        and non-proxy parents, deleting *all* referring objects.
 
-class ProxyOfProxyDeleteTest(ProxyDeleteTest):
-    """
-    Tests on_delete behavior for proxy-of-proxy models. Deleting the *proxy*
-    instance should bubble through to its proxy and non-proxy variants.
-    Deleting *all* referring objects.
-
-    See #16128.
-
-    """
-
-    def setUp(self):
-        # Create the Image, FooImage and FooFile instances
-        super(ProxyOfProxyDeleteTest, self).setUp()
+        """
+        test_image = self.create_image()
 
         # Get the Image as a Photo
-        test_photo = Photo.objects.get(pk=self.test_image.pk)
+        test_photo = Photo.objects.get(pk=test_image.pk)
         foo_photo = FooPhoto(my_photo=test_photo)
         foo_photo.save()
 
-
-    def test_delete(self):
         Photo.objects.all().delete()
 
         # A Photo deletion == Image deletion == File deletion
@@ -221,18 +219,14 @@ class ProxyOfProxyDeleteTest(ProxyDeleteTest):
         self.assertEqual(len(FooImage.objects.all()), 0)
 
 
+    def test_delete_concrete_parent(self):
+        """
+        Deleting an instance of a concrete model should also delete objects
+        referencing its proxy subclass.
 
-class ProxyParentDeleteTest(ProxyDeleteTest):
-    """
-    Tests on_delete cascade behavior for proxy models. Deleting the
-    *non-proxy* instance of a model should delete objects referencing the
-    proxy.
+        """
+        self.create_image()
 
-    See #16128.
-
-    """
-
-    def test_delete(self):
         File.objects.all().delete()
 
         # A File deletion == Image deletion
