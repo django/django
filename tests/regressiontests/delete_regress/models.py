@@ -90,4 +90,6 @@ class FooFile(models.Model):
 class FooPhoto(models.Model):
     my_photo = models.ForeignKey(Photo)
 
-
+class FooFileProxy(FooFile):
+    class Meta:
+        proxy = True
