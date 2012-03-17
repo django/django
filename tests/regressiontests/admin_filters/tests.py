@@ -56,7 +56,7 @@ class DecadeListFilterWithNoneReturningLookups(DecadeListFilterWithTitleAndParam
 class DecadeListFilterWithFailingQueryset(DecadeListFilterWithTitleAndParameter):
 
     def queryset(self, request, queryset):
-        raise Exception
+        raise 1/0
 
 class DecadeListFilterWithQuerysetBasedLookups(DecadeListFilterWithTitleAndParameter):
 
@@ -76,6 +76,7 @@ class DecadeListFilterParameterEndsWith__In(DecadeListFilter):
 class DecadeListFilterParameterEndsWith__Isnull(DecadeListFilter):
     title = 'publication decade'
     parameter_name = 'decade__isnull' # Ends with '__isnull"
+
 
 class CustomUserAdmin(UserAdmin):
     list_filter = ('books_authored', 'books_contributed')
@@ -111,6 +112,8 @@ class DecadeFilterBookAdminParameterEndsWith__In(ModelAdmin):
 
 class DecadeFilterBookAdminParameterEndsWith__Isnull(ModelAdmin):
     list_filter = (DecadeListFilterParameterEndsWith__Isnull,)
+
+
 
 class ListFiltersTests(TestCase):
 
@@ -542,14 +545,13 @@ class ListFiltersTests(TestCase):
 
     def test_filter_with_failing_queryset(self):
         """
-        Ensure that a filter's failing queryset is interpreted as if incorrect
-        lookup parameters were passed (therefore causing a 302 redirection to
-        the changelist).
-        Refs #16716, #16714.
+        Ensure that when a filter's queryset method fails, it fails loudly and
+        the corresponding exception doesn't get swallowed.
+        Refs #17828.
         """
         modeladmin = DecadeFilterBookAdminWithFailingQueryset(Book, site)
         request = self.request_factory.get('/', {})
-        self.assertRaises(IncorrectLookupParameters, self.get_changelist, request, Book, modeladmin)
+        self.assertRaises(ZeroDivisionError, self.get_changelist, request, Book, modeladmin)
 
     def test_simplelistfilter_with_queryset_based_lookups(self):
         modeladmin = DecadeFilterBookAdminWithQuerysetBasedLookups(Book, site)

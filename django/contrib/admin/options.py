@@ -247,7 +247,12 @@ class BaseModelAdmin(object):
         # the pk attribute name.
         pk_attr_name = None
         for part in parts[:-1]:
-            field, _, _, _ = model._meta.get_field_by_name(part)
+            try:
+                field, _, _, _ = model._meta.get_field_by_name(part)
+            except FieldDoesNotExist:
+                # Lookups on non-existants fields are ok, since they're ignored
+                # later.
+                return True
             if hasattr(field, 'rel'):
                 model = field.rel.to
                 pk_attr_name = model._meta.pk.name
@@ -259,17 +264,10 @@ class BaseModelAdmin(object):
         if pk_attr_name and len(parts) > 1 and parts[-1] == pk_attr_name:
             parts.pop()
 
-        try:
-            self.model._meta.get_field_by_name(parts[0])
-        except FieldDoesNotExist:
-            # Lookups on non-existants fields are ok, since they're ignored
-            # later.
+        if len(parts) == 1:
             return True
-        else:
-            if len(parts) == 1:
-                return True
-            clean_lookup = LOOKUP_SEP.join(parts)
-            return clean_lookup in self.list_filter or clean_lookup == self.date_hierarchy
+        clean_lookup = LOOKUP_SEP.join(parts)
+        return clean_lookup in self.list_filter or clean_lookup == self.date_hierarchy
 
     def has_add_permission(self, request):
         """

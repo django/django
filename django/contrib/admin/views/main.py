@@ -3,6 +3,7 @@ import operator
 from django.core.exceptions import SuspiciousOperation, ImproperlyConfigured
 from django.core.paginator import InvalidPage
 from django.db import models
+from django.db.models.fields import FieldDoesNotExist
 from django.utils.datastructures import SortedDict
 from django.utils.encoding import force_unicode, smart_str
 from django.utils.translation import ugettext, ugettext_lazy
@@ -130,13 +131,16 @@ class ChangeList(object):
         # have been removed from lookup_params, which now only contains other
         # parameters passed via the query string. We now loop through the
         # remaining parameters both to ensure that all the parameters are valid
-        # fields and to determine if at least one of them needs distinct().
-        for key, value in lookup_params.items():
-            lookup_params[key] = prepare_lookup_value(key, value)
-            use_distinct = (use_distinct or
-                            lookup_needs_distinct(self.lookup_opts, key))
-
-        return filter_specs, bool(filter_specs), lookup_params, use_distinct
+        # fields and to determine if at least one of them needs distinct(). If
+        # the lookup parameters aren't real fields, then bail out.
+        try:
+            for key, value in lookup_params.items():
+                lookup_params[key] = prepare_lookup_value(key, value)
+                use_distinct = (use_distinct or
+                                lookup_needs_distinct(self.lookup_opts, key))
+            return filter_specs, bool(filter_specs), lookup_params, use_distinct
+        except FieldDoesNotExist, e:
+            raise IncorrectLookupParameters(e)
 
     def get_query_string(self, new_params=None, remove=None):
         if new_params is None: new_params = {}
@@ -292,18 +296,18 @@ class ChangeList(object):
         return ordering_fields
 
     def get_query_set(self, request):
+        # First, we collect all the declared list filters.
+        (self.filter_specs, self.has_filters, remaining_lookup_params,
+         use_distinct) = self.get_filters(request)
+
+        # Then, we let every list filter modify the queryset to its liking.
+        qs = self.root_query_set
+        for filter_spec in self.filter_specs:
+            new_qs = filter_spec.queryset(request, qs)
+            if new_qs is not None:
+                qs = new_qs
+
         try:
-            # First, we collect all the declared list filters.
-            (self.filter_specs, self.has_filters, remaining_lookup_params,
-             use_distinct) = self.get_filters(request)
-
-            # Then, we let every list filter modify the qs to its liking.
-            qs = self.root_query_set
-            for filter_spec in self.filter_specs:
-                new_qs = filter_spec.queryset(request, qs)
-                if new_qs is not None:
-                    qs = new_qs
-
             # Finally, we apply the remaining lookup parameters from the query
             # string (i.e. those that haven't already been processed by the
             # filters).
@@ -317,8 +321,7 @@ class ChangeList(object):
             # have any other way of validating lookup parameters. They might be
             # invalid if the keyword arguments are incorrect, or if the values
             # are not in the correct type, so we might get FieldError,
-            # ValueError, ValidationError, or ? from a custom field that raises
-            # yet something else when handed impossible data.
+            # ValueError, ValidationError, or ?.
             raise IncorrectLookupParameters(e)
 
         # Use select_related() if one of the list_display options is a field
