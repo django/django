@@ -902,21 +902,6 @@ Like all :class:`CharField` subclasses, :class:`URLField` takes the optional
 :attr:`~CharField.max_length`argument. If you don't specify
 :attr:`~CharField.max_length`, a default of 200 is used.
 
-``XMLField``
-------------
-
-.. deprecated:: 1.3
-   ``XMLField`` is deprecated. Use TextField instead.
-
-.. class:: XMLField(schema_path=None, [**options])
-
-A :class:`TextField` that stores XML data and a path to a schema. Takes one
-optional argument:
-
-.. attribute:: schema_path
-
-    The filesystem path to a schema for the field.
-
 
 Relationship fields
 ===================
