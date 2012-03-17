@@ -431,8 +431,13 @@ FormMixin
 
     .. method:: get_initial()
 
-        Retrieve initial data for the form. By default, returns
+        Retrieve initial data for the form. By default, returns a copy of
         :attr:`.initial`.
+
+    .. admonition:: Changed in 1.4
+
+        In Django 1.3, this method was returning the :attr:`initial` class
+        variable itself.
 
     .. method:: get_form_class()
 

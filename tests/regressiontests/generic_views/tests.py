@@ -5,6 +5,6 @@ from .dates import (ArchiveIndexViewTests, YearArchiveViewTests,
     MonthArchiveViewTests, WeekArchiveViewTests, DayArchiveViewTests,
     DateDetailViewTests)
 from .detail import DetailViewTest
-from .edit import (ModelFormMixinTests, CreateViewTests, UpdateViewTests,
-    DeleteViewTests)
+from .edit import (FormMixinTests, ModelFormMixinTests, CreateViewTests,
+    UpdateViewTests, DeleteViewTests)
 from .list import ListViewTests

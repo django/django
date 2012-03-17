@@ -5,10 +5,19 @@ from django.core.urlresolvers import reverse
 from django import forms
 from django.test import TestCase
 from django.utils.unittest import expectedFailure
+from django.views.generic.edit import FormMixin
 
 from . import views
 from .models import Artist, Author
 
+
+class FormMixinTests(TestCase):
+     def test_initial_data(self):
+         """ Test instance independence of initial data dict (see #16138) """
+         initial_1 = FormMixin().get_initial()
+         initial_1['foo'] = 'bar'
+         initial_2 = FormMixin().get_initial()
+         self.assertNotEqual(initial_1, initial_2)
 
 class ModelFormMixinTests(TestCase):
     def test_get_form(self):

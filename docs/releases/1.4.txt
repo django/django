@@ -1107,6 +1107,15 @@ passed to the markdown filter, both the ``safe_mode=True`` and
 Python-Markdown library less than 2.1, a warning is issued that the output is
 insecure.
 
+FormMixin get_initial returns an instance-specific dictionary
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In Django 1.3, the ``get_initial`` method of the
+:class:`django.views.generic.edit.FormMixin` class was returning the
+class ``initial`` dictionary. This has been fixed to return a copy of this
+dictionary, so form instances can modify their initial data without messing
+with the class variable.
+
 Features deprecated in 1.4
 ==========================
 
