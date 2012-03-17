@@ -8,6 +8,7 @@ Requires cx_Oracle: http://cx-oracle.sourceforge.net/
 import datetime
 import decimal
 import sys
+import warnings
 
 
 def _setup_environment(environ):

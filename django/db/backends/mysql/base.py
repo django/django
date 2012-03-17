@@ -7,6 +7,7 @@ Requires MySQLdb: http://sourceforge.net/projects/mysql-python
 import datetime
 import re
 import sys
+import warnings
 
 try:
     import MySQLdb as Database
@@ -39,8 +40,7 @@ from django.utils import timezone
 # Raise exceptions for database warnings if DEBUG is on
 from django.conf import settings
 if settings.DEBUG:
-    from warnings import filterwarnings
-    filterwarnings("error", category=Database.Warning)
+    warnings.filterwarnings("error", category=Database.Warning)
 
 DatabaseError = Database.DatabaseError
 IntegrityError = Database.IntegrityError
