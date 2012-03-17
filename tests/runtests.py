@@ -152,7 +152,7 @@ def django_tests(verbosity, interactive, failfast, test_labels):
 
     # If GeoDjango is used, add it's tests that aren't a part of
     # an application (e.g., GEOS, GDAL, Distance objects).
-    if geodjango(settings):
+    if geodjango(settings) and (not test_labels or 'gis' in test_labels):
         from django.contrib.gis.tests import geodjango_suite
         extra_tests.append(geodjango_suite(apps=False))
 
