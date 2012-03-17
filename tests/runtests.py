@@ -117,6 +117,7 @@ def setup(verbosity, test_labels):
     if geodjango(settings):
         from django.contrib.gis.tests import geo_apps
         test_modules.extend(geo_apps(runtests=True))
+        settings.INSTALLED_APPS.extend(['django.contrib.gis', 'django.contrib.sitemaps'])
 
     for module_dir, module_name in test_modules:
         module_label = '.'.join([module_dir, module_name])
