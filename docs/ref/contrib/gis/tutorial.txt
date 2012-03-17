@@ -753,7 +753,7 @@ the vertexes to the desired position.
 .. _OpenLayers: http://openlayers.org/
 .. _Open Street Map: http://openstreetmap.org/
 .. _Vector Map Level 0: http://earth-info.nga.mil/publications/vmap0.html
-.. _Metacarta: http://metacarta.com
+.. _OSGeo: http://www.osgeo.org
 
 .. _osmgeoadmin-intro:
 
@@ -764,7 +764,7 @@ With the :class:`~django.contrib.gis.admin.OSMGeoAdmin`, GeoDjango uses
 a `Open Street Map`_ layer in the admin.
 This provides more context (including street and thoroughfare details) than
 available with the :class:`~django.contrib.gis.admin.GeoModelAdmin`
-(which uses the `Vector Map Level 0`_ WMS data set hosted at `Metacarta`_).
+(which uses the `Vector Map Level 0`_ WMS data set hosted at `OSGeo`_).
 
 First, there are some important requirements and limitations:
 

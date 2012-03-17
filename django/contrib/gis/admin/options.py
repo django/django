@@ -33,7 +33,7 @@ class GeoModelAdmin(ModelAdmin):
     map_template = 'gis/admin/openlayers.html'
     openlayers_url = 'http://openlayers.org/api/2.11/OpenLayers.js'
     point_zoom = num_zoom - 6
-    wms_url = 'http://labs.metacarta.com/wms/vmap0'
+    wms_url = 'http://vmap0.tiles.osgeo.org/wms/vmap0'
     wms_layer = 'basic'
     wms_name = 'OpenLayers WMS'
     debug = False
