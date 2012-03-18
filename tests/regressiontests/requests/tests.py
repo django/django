@@ -12,6 +12,7 @@ from django.http import HttpRequest, HttpResponse, parse_cookie, build_request_r
 from django.test.utils import get_warnings_state, restore_warnings_state
 from django.utils import unittest
 from django.utils.http import cookie_date
+from django.utils.timezone import utc
 
 
 class RequestsTests(unittest.TestCase):
@@ -202,6 +203,15 @@ class RequestsTests(unittest.TestCase):
         # 1 second larger. To avoid the problem, put in a quick sleep,
         # which guarantees that there will be a time difference.
         expires = datetime.utcnow() + timedelta(seconds=10)
+        time.sleep(0.001)
+        response.set_cookie('datetime', expires=expires)
+        datetime_cookie = response.cookies['datetime']
+        self.assertEqual(datetime_cookie['max-age'], 10)
+
+    def test_aware_expiration(self):
+        "Cookie accepts an aware datetime as expiration time"
+        response = HttpResponse()
+        expires = (datetime.utcnow() + timedelta(seconds=10)).replace(tzinfo=utc)
         time.sleep(0.001)
         response.set_cookie('datetime', expires=expires)
         datetime_cookie = response.cookies['datetime']

@@ -121,6 +121,7 @@ from django.http.utils import *
 from django.utils.datastructures import MultiValueDict, ImmutableList
 from django.utils.encoding import smart_str, iri_to_uri, force_unicode
 from django.utils.http import cookie_date
+from django.utils import timezone
 
 RESERVED_CHARS="!*'();:@&=+$,/?%#[]"
 
@@ -641,13 +642,18 @@ class HttpResponse(object):
         """
         Sets a cookie.
 
-        ``expires`` can be a string in the correct format or a
-        ``datetime.datetime`` object in UTC. If ``expires`` is a datetime
-        object then ``max_age`` will be calculated.
+        ``expires`` can be:
+        - a string in the correct format,
+        - a naive ``datetime.datetime`` object in UTC,
+        - an aware ``datetime.datetime`` object in any time zone.
+        If it is a ``datetime.datetime`` object then ``max_age`` will be calculated.
+
         """
         self.cookies[key] = value
         if expires is not None:
             if isinstance(expires, datetime.datetime):
+                if timezone.is_aware(expires):
+                    expires = timezone.make_naive(expires, timezone.utc)
                 delta = expires - expires.utcnow()
                 # Add one second so the date matches exactly (a fraction of
                 # time gets lost between converting to a timedelta and
