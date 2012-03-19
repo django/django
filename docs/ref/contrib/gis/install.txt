@@ -972,14 +972,26 @@ Ubuntu & Debian GNU/Linux
 Ubuntu
 ^^^^^^
 
+11.10
+~~~~~
+
+In Ubuntu 11.10, PostgreSQL was upgraded to 9.1. The installation commands are:
+
+.. code-block:: bash
+
+    $ sudo apt-get install binutils gdal-bin libproj-dev postgresql-9.1-postgis \
+         postgresql-server-dev-9.1 python-psycopg2
+
 .. _ubuntu10:
 
-10.04 and 10.10
-~~~~~~~~~~~~~~~
+10.04 through 11.04
+~~~~~~~~~~~~~~~~~~~
 
-In Ubuntu 10 PostgreSQL was upgraded to 8.4 and GDAL was upgraded to 1.6.
+In Ubuntu 10.04, PostgreSQL was upgraded to 8.4 and GDAL was upgraded to 1.6.
 Ubuntu 10.04 uses PostGIS 1.4, while Ubuntu 10.10 uses PostGIS 1.5 (with
-geography support).  The installation commands are::
+geography support).  The installation commands are:
+
+.. code-block:: bash
 
     $ sudo apt-get install binutils gdal-bin libproj-dev postgresql-8.4-postgis \
          postgresql-server-dev-8.4 python-psycopg2
@@ -989,7 +1001,9 @@ geography support).  The installation commands are::
 8.10
 ~~~~
 
-Use the synaptic package manager to install the following packages::
+Use the synaptic package manager to install the following packages:
+
+.. code-block:: bash
 
     $ sudo apt-get install binutils gdal-bin postgresql-8.3-postgis \
         postgresql-server-dev-8.3 python-psycopg2
@@ -1018,7 +1032,9 @@ Optional packages to consider:
     geographic admin because the ``null`` datum grid is not available for
     transforming geometries to the spherical mercator projection. A solution
     is to download the datum-shifting files, create the grid file, and
-    install it yourself::
+    install it yourself:
+
+    .. code-block:: bash
 
         $ wget http://download.osgeo.org/proj/proj-datumgrid-1.4.tar.gz
         $ mkdir nad
@@ -1059,7 +1075,9 @@ some packages must be built from source to work properly with GeoDjango.
 Binary packages
 ~~~~~~~~~~~~~~~
 The following command will install acceptable binary packages, as well as
-the development tools necessary to build the rest of the requirements::
+the development tools necessary to build the rest of the requirements:
+
+.. code-block:: bash
 
     $ sudo apt-get install binutils bzip2 gcc g++ flex make postgresql-8.1 \
         postgresql-server-dev-8.1 python-ctypes python-psycopg2 python-setuptools
@@ -1090,7 +1108,9 @@ directions carefully.
 ^^^^^^^^^^^
 
 This version is comparable to Ubuntu :ref:`ibex`, so the command
-is very similar::
+is very similar:
+
+.. code-block:: bash
 
     $ sudo apt-get install binutils libgdal1-1.5.0 postgresql-8.3 \
         postgresql-8.3-postgis postgresql-server-dev-8.3 \
@@ -1111,7 +1131,9 @@ Post-installation notes
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 If the PostgreSQL database cluster was not initiated after installing, then it
-can be created (and started) with the following command::
+can be created (and started) with the following command:
+
+.. code-block:: bash
 
     $ sudo pg_createcluster --start 8.3 main
 
@@ -1121,7 +1143,9 @@ the starting and stopping of PostgreSQL.
 In addition, the SQL files for PostGIS are placed in a different location on
 Debian 5.0 . Thus when :ref:`spatialdb_template` either:
 
-* Create a symbolic link to these files::
+* Create a symbolic link to these files:
+
+.. code-block:: bash
 
     $ sudo ln -s /usr/share/postgresql-8.3-postgis/{lwpostgis,spatial_ref_sys}.sql \
         /usr/share/postgresql/8.3
