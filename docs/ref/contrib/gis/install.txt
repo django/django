@@ -1145,12 +1145,13 @@ Debian 5.0 . Thus when :ref:`spatialdb_template` either:
 
 * Create a symbolic link to these files:
 
-.. code-block:: bash
+  .. code-block:: bash
 
     $ sudo ln -s /usr/share/postgresql-8.3-postgis/{lwpostgis,spatial_ref_sys}.sql \
         /usr/share/postgresql/8.3
 
-  If not running PostgreSQL 8.3, then  replace ``8.3`` in the command above with the correct version.
+  If not running PostgreSQL 8.3, then  replace ``8.3`` in the command above with
+  the correct version.
 
 * Or use the :download:`create_template_postgis-debian.sh` to create the spatial database.
 
