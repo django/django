@@ -1,10 +1,12 @@
 from __future__ import with_statement
 import os
+from django.contrib.auth.models import User
+from django.contrib.auth.forms import (UserCreationForm, AuthenticationForm,
+    PasswordChangeForm, SetPasswordForm, UserChangeForm, PasswordResetForm)
 from django.core import mail
 from django.forms.fields import Field, EmailField
-from django.contrib.auth.models import User
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm,  PasswordChangeForm, SetPasswordForm, UserChangeForm, PasswordResetForm
 from django.test import TestCase
+from django.test.utils import override_settings
 from django.utils.encoding import force_unicode
 from django.utils import translation
 
@@ -74,6 +76,8 @@ class UserCreationFormTest(TestCase):
         u = form.save()
         self.assertEqual(repr(u), '<User: jsmith@example.com>')
 
+UserCreationFormTest = override_settings(USE_TZ=False)(UserCreationFormTest)
+
 
 class AuthenticationFormTest(TestCase):
 
@@ -125,6 +129,8 @@ class AuthenticationFormTest(TestCase):
         self.assertTrue(form.is_valid())
         self.assertEqual(form.non_field_errors(), [])
 
+AuthenticationFormTest = override_settings(USE_TZ=False)(AuthenticationFormTest)
+
 
 class SetPasswordFormTest(TestCase):
 
@@ -150,6 +156,8 @@ class SetPasswordFormTest(TestCase):
             }
         form = SetPasswordForm(user, data)
         self.assertTrue(form.is_valid())
+
+SetPasswordFormTest = override_settings(USE_TZ=False)(SetPasswordFormTest)
 
 
 class PasswordChangeFormTest(TestCase):
@@ -198,6 +206,8 @@ class PasswordChangeFormTest(TestCase):
         self.assertEqual(PasswordChangeForm(user, {}).fields.keys(),
                          ['old_password', 'new_password1', 'new_password2'])
 
+PasswordChangeFormTest = override_settings(USE_TZ=False)(PasswordChangeFormTest)
+
 
 class UserChangeFormTest(TestCase):
 
@@ -225,6 +235,8 @@ class UserChangeFormTest(TestCase):
 
         # Just check we can create it
         form = MyUserForm({})
+
+UserChangeFormTest = override_settings(USE_TZ=False)(UserChangeFormTest)
 
 
 class PasswordResetFormTest(TestCase):
@@ -304,3 +316,5 @@ class PasswordResetFormTest(TestCase):
         self.assertFalse(form.is_valid())
         self.assertEqual(form["email"].errors,
                          [u"The user account associated with this e-mail address cannot reset the password."])
+
+PasswordResetFormTest = override_settings(USE_TZ=False)(PasswordResetFormTest)

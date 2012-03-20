@@ -97,7 +97,8 @@ class AuthContextProcessorTests(TestCase):
         self.assertEqual(user, response.context['user'])
 
 AuthContextProcessorTests = override_settings(
-    TEMPLATE_DIRS = (
+    TEMPLATE_DIRS=(
             os.path.join(os.path.dirname(__file__), 'templates'),
-        )
+        ),
+    USE_TZ=False,                           # required for loading the fixture
 )(AuthContextProcessorTests)

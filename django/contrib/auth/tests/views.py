@@ -12,6 +12,7 @@ from django.http import QueryDict
 from django.utils.encoding import force_unicode
 from django.utils.html import escape
 from django.test import TestCase
+from django.test.utils import override_settings
 
 from django.contrib.auth import SESSION_KEY, REDIRECT_FIELD_NAME
 from django.contrib.auth.forms import (AuthenticationForm, PasswordChangeForm,
@@ -51,6 +52,8 @@ class AuthViewsTestCase(TestCase):
 
     def assertContainsEscaped(self, response, text, **kwargs):
         return self.assertContains(response, escape(force_unicode(text)), **kwargs)
+
+AuthViewsTestCase = override_settings(USE_TZ=False)(AuthViewsTestCase)
 
 
 class AuthViewNamedURLTests(AuthViewsTestCase):

@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.test import TestCase
-from django.contrib.auth.models import (Group, User,
+from django.test.utils import override_settings
+svn from django.contrib.auth.models import (Group, User,
     SiteProfileNotAvailable, UserManager)
 
 
@@ -37,6 +38,8 @@ class ProfileTestCase(TestCase):
         settings.AUTH_PROFILE_MODULE = 'foo.bar'
         self.assertRaises(SiteProfileNotAvailable, user.get_profile)
 
+ProfileTestCase = override_settings(USE_TZ=False)(ProfileTestCase)
+
 
 class NaturalKeysTestCase(TestCase):
     fixtures = ['authtestdata.json']
@@ -50,6 +53,8 @@ class NaturalKeysTestCase(TestCase):
         users_group = Group.objects.create(name='users')
         self.assertEquals(Group.objects.get_by_natural_key('users'), users_group)
 
+NaturalKeysTestCase = override_settings(USE_TZ=False)(NaturalKeysTestCase)
+
 
 class LoadDataWithoutNaturalKeysTestCase(TestCase):
     fixtures = ['regular.json']
@@ -59,6 +64,8 @@ class LoadDataWithoutNaturalKeysTestCase(TestCase):
         group = Group.objects.get(name='my_group')
         self.assertEquals(group, user.groups.get())
 
+LoadDataWithoutNaturalKeysTestCase = override_settings(USE_TZ=False)(LoadDataWithoutNaturalKeysTestCase)
+
 
 class LoadDataWithNaturalKeysTestCase(TestCase):
     fixtures = ['natural.json']
@@ -67,6 +74,8 @@ class LoadDataWithNaturalKeysTestCase(TestCase):
         user = User.objects.get(username='my_username')
         group = Group.objects.get(name='my_group')
         self.assertEquals(group, user.groups.get())
+
+LoadDataWithNaturalKeysTestCase = override_settings(USE_TZ=False)(LoadDataWithNaturalKeysTestCase)
 
 
 class UserManagerTestCase(TestCase):
