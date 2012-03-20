@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
-svn from django.contrib.auth.models import (Group, User,
+from django.contrib.auth.models import (Group, User,
     SiteProfileNotAvailable, UserManager)
 
 
