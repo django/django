@@ -44,6 +44,9 @@ class MyPerson(Person):
     class Meta:
         proxy = True
         ordering = ["name"]
+        permissions = (
+            ("display_users", "May display users information"),
+        )
 
     objects = SubManager()
     other = PersonManager()

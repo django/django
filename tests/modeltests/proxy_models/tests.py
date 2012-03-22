@@ -167,6 +167,13 @@ class ProxyModelTests(TestCase):
         resp = [p.name for p in OtherPerson._default_manager.all()]
         self.assertEqual(resp, ['barney', 'wilma'])
 
+    def test_permissions_created(self):
+        from django.contrib.auth.models import Permission
+        try:
+            Permission.objects.get(name="May display users information")
+        except Permission.DoesNotExist:
+            self.fail("The permission 'May display users information' has not been created")
+
     def test_proxy_model_signals(self):
         """
         Test save signals for proxy models
