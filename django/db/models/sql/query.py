@@ -100,7 +100,7 @@ class Query(object):
 
     def __init__(self, model, where=WhereNode):
         self.model = model
-        self.alias_refcount = {}
+        self.alias_refcount = SortedDict()
         self.alias_map = {}     # Maps alias to join information
         self.table_map = {}     # Maps table names to list of aliases.
         self.join_map = {}
@@ -819,7 +819,7 @@ class Query(object):
         assert current < ord('Z')
         prefix = chr(current + 1)
         self.alias_prefix = prefix
-        change_map = {}
+        change_map = SortedDict()
         for pos, alias in enumerate(self.tables):
             if alias in exceptions:
                 continue
