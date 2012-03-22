@@ -65,7 +65,6 @@ class UserCreationFormTest(TestCase):
 
     def test_success(self):
         # The success case.
-
         data = {
             'username': 'jsmith@example.com',
             'password1': 'test123',
@@ -235,6 +234,25 @@ class UserChangeFormTest(TestCase):
 
         # Just check we can create it
         form = MyUserForm({})
+
+    def test_bug_17944_empty_password(self):
+        user = User.objects.get(username='empty_password')
+        form = UserChangeForm(instance=user)
+        # Just check that no error is raised.
+        form.as_table()
+
+    def test_bug_17944_unmanageable_password(self):
+        user = User.objects.get(username='unmanageable_password')
+        form = UserChangeForm(instance=user)
+        # Just check that no error is raised.
+        form.as_table()
+
+    def test_bug_17944_unknown_password_algorithm(self):
+        user = User.objects.get(username='unknown_password')
+        form = UserChangeForm(instance=user)
+        # Just check that no error is raised.
+        form.as_table()
+
 
 UserChangeFormTest = override_settings(USE_TZ=False)(UserChangeFormTest)
 

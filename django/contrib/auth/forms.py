@@ -29,14 +29,18 @@ class ReadOnlyPasswordHashWidget(forms.Widget):
         encoded = smart_str(encoded)
 
         if len(encoded) == 32 and '$' not in encoded:
-            hasher = get_hasher('unsalted_md5')
+            algorithm = 'unsalted_md5'
         else:
             algorithm = encoded.split('$', 1)[0]
-            hasher = get_hasher(algorithm)
 
-        summary = ""
-        for key, value in hasher.safe_summary(encoded).iteritems():
-            summary += "<strong>%(key)s</strong>: %(value)s " % {"key": ugettext(key), "value": value}
+        try:
+            hasher = get_hasher(algorithm)
+        except ValueError:
+            summary = "<strong>%s</strong>" % ugettext("Invalid password format or unknown hashing algorithm.")
+        else:
+            summary = ""
+            for key, value in hasher.safe_summary(encoded).iteritems():
+                summary += "<strong>%(key)s</strong>: %(value)s " % {"key": ugettext(key), "value": value}
 
         return mark_safe("<div%(attrs)s>%(summary)s</div>" % {"attrs": flatatt(final_attrs), "summary": summary})
 
