@@ -1,14 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# chandankumar(ciypro) <chandankumar.093047@gmail.com>, 2012.
 # Sandeep Satavlekar <sandysat@gmail.com>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-14 00:18-0700\n"
-"PO-Revision-Date: 2012-03-08 12:32+0000\n"
-"Last-Translator: Sandeep Satavlekar <sandysat@gmail.com>\n"
+"POT-Creation-Date: 2012-03-23 02:39+0100\n"
+"PO-Revision-Date: 2012-03-15 13:44+0000\n"
+"Last-Translator: Chandan kumar <chandankumar.093047@gmail.com>\n"
 "Language-Team: Hindi (http://www.transifex.net/projects/p/django/language/"
 "hi/)\n"
 "Language: hi\n"
@@ -19,12 +20,12 @@ msgstr ""
 
 #: views.py:7
 msgid "No feeds are registered."
-msgstr ""
+msgstr "कोई फ़ीड पंजीकृत नहीं हैं."
 
 #: views.py:17
 #, python-format
 msgid "Slug %r isn't registered."
-msgstr ""
+msgstr "स्लग %r पंजीकृत नहीं है."
 
 #: db/models/fields.py:50
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
@@ -80,14 +81,14 @@ msgstr ""
 #: sitemaps/views.py:44
 #, python-format
 msgid "No sitemap available for section: %r"
-msgstr ""
+msgstr "अनुभाग के लिए कोई साइटमैप उपलब्ध नहीं: %r"
 
 #: sitemaps/views.py:58
 #, python-format
 msgid "Page %s empty"
-msgstr ""
+msgstr "पृष्ठ %s खाली"
 
 #: sitemaps/views.py:60
 #, python-format
 msgid "No page '%s'"
-msgstr ""
+msgstr "कोई पृष्ठ '%s' नहीं "

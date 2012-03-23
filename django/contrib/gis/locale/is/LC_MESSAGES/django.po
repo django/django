@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Hafsteinn Einarsson <haffi67@gmail.com>, 2011.
+# Hafsteinn Einarsson <haffi67@gmail.com>, 2011, 2012.
 # Jannis Leidel <jannis@leidel.info>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-14 00:18-0700\n"
-"PO-Revision-Date: 2012-03-08 12:32+0000\n"
+"POT-Creation-Date: 2012-03-23 02:39+0100\n"
+"PO-Revision-Date: 2012-03-19 14:50+0000\n"
 "Last-Translator: Hafsteinn Einarsson <haffi67@gmail.com>\n"
 "Language-Team: Icelandic (http://www.transifex.net/projects/p/django/"
 "language/is/)\n"
@@ -20,12 +20,12 @@ msgstr ""
 
 #: views.py:7
 msgid "No feeds are registered."
-msgstr ""
+msgstr "Engir listar (feeds) eru skráðir"
 
 #: views.py:17
 #, python-format
 msgid "Slug %r isn't registered."
-msgstr ""
+msgstr "Slögg %r er ekki skráður"
 
 #: db/models/fields.py:50
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
@@ -80,14 +80,14 @@ msgstr "Villa kom upp við að varpa rúmgildi í SRID reitsins."
 #: sitemaps/views.py:44
 #, python-format
 msgid "No sitemap available for section: %r"
-msgstr ""
+msgstr "Ekkert veftré tiltækt fyrir: %r"
 
 #: sitemaps/views.py:58
 #, python-format
 msgid "Page %s empty"
-msgstr ""
+msgstr "Síða %s tóm"
 
 #: sitemaps/views.py:60
 #, python-format
 msgid "No page '%s'"
-msgstr ""
+msgstr "Engin síða %s"

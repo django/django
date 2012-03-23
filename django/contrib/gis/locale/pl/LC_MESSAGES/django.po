@@ -1,14 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+#   <angular.circle@gmail.com>, 2012.
 # Jannis Leidel <jannis@leidel.info>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-14 00:19-0700\n"
-"PO-Revision-Date: 2012-03-08 12:32+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2012-03-23 02:40+0100\n"
+"PO-Revision-Date: 2012-03-21 13:06+0000\n"
+"Last-Translator: angularcircle <angular.circle@gmail.com>\n"
 "Language-Team: Polish (http://www.transifex.net/projects/p/django/language/"
 "pl/)\n"
 "Language: pl\n"
@@ -20,12 +21,12 @@ msgstr ""
 
 #: views.py:7
 msgid "No feeds are registered."
-msgstr ""
+msgstr "Kanał informacyjny (RSS/ATOM) nie został zarejestrowany."
 
 #: views.py:17
 #, python-format
 msgid "Slug %r isn't registered."
-msgstr ""
+msgstr "Slug '%r' nie został zarejestrowany."
 
 #: db/models/fields.py:50
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
@@ -83,14 +84,14 @@ msgstr ""
 #: sitemaps/views.py:44
 #, python-format
 msgid "No sitemap available for section: %r"
-msgstr ""
+msgstr "Mapa strony dla sekcji '%r' nie jest dostępna"
 
 #: sitemaps/views.py:58
 #, python-format
 msgid "Page %s empty"
-msgstr ""
+msgstr "Strona '%s' jest pusta"
 
 #: sitemaps/views.py:60
 #, python-format
 msgid "No page '%s'"
-msgstr ""
+msgstr "Brak strony '%s'"

@@ -2,14 +2,15 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011.
+# Kristóf Gruber <>, 2012.
 # Szilveszter Farkas <szilveszter.farkas@gmail.com>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-14 00:18-0700\n"
-"PO-Revision-Date: 2012-03-08 12:32+0000\n"
-"Last-Translator: Szilveszter Farkas <szilveszter.farkas@gmail.com>\n"
+"POT-Creation-Date: 2012-03-23 02:39+0100\n"
+"PO-Revision-Date: 2012-03-19 19:17+0000\n"
+"Last-Translator: Kristóf Gruber <>\n"
 "Language-Team: Hungarian (http://www.transifex.net/projects/p/django/"
 "language/hu/)\n"
 "Language: hu\n"
@@ -20,12 +21,12 @@ msgstr ""
 
 #: views.py:7
 msgid "No feeds are registered."
-msgstr ""
+msgstr "Nincs regisztrált feed."
 
 #: views.py:17
 #, python-format
 msgid "Slug %r isn't registered."
-msgstr ""
+msgstr "%r slug nincs regisztrálva."
 
 #: db/models/fields.py:50
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
@@ -81,14 +82,14 @@ msgstr "Hiba történt a geometriai transzformáció során."
 #: sitemaps/views.py:44
 #, python-format
 msgid "No sitemap available for section: %r"
-msgstr ""
+msgstr "%r szekcióhoz nincsen oldaltérkép"
 
 #: sitemaps/views.py:58
 #, python-format
 msgid "Page %s empty"
-msgstr ""
+msgstr "'%s' oldal üres"
 
 #: sitemaps/views.py:60
 #, python-format
 msgid "No page '%s'"
-msgstr ""
+msgstr "'%s' oldal nem létezik"

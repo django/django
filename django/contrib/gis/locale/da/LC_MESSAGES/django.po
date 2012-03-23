@@ -1,15 +1,17 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Erik Wognsen <r4mses@gmail.com>, 2012.
 # Finn Gruwier <finn@gruwier.dk>, 2011.
 # Jannis Leidel <jannis@leidel.info>, 2011.
+# Kristian Øllegaard <kristian@oellegaard.com>, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-14 00:17-0700\n"
-"PO-Revision-Date: 2012-03-08 12:32+0000\n"
-"Last-Translator: Finn Gruwier <finn@gruwier.dk>\n"
+"POT-Creation-Date: 2012-03-23 02:38+0100\n"
+"PO-Revision-Date: 2012-03-19 18:19+0000\n"
+"Last-Translator: Kristian Øllegaard <kristian@oellegaard.com>\n"
 "Language-Team: Danish (http://www.transifex.net/projects/p/django/language/"
 "da/)\n"
 "Language: da\n"
@@ -20,12 +22,12 @@ msgstr ""
 
 #: views.py:7
 msgid "No feeds are registered."
-msgstr ""
+msgstr "Ingen feeds registrerede."
 
 #: views.py:17
 #, python-format
 msgid "Slug %r isn't registered."
-msgstr ""
+msgstr "\"Slug\" %r er ikke registreret."
 
 #: db/models/fields.py:50
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
@@ -82,14 +84,14 @@ msgstr ""
 #: sitemaps/views.py:44
 #, python-format
 msgid "No sitemap available for section: %r"
-msgstr ""
+msgstr "Intet sitemap tilgængelig for sektion: %r"
 
 #: sitemaps/views.py:58
 #, python-format
 msgid "Page %s empty"
-msgstr ""
+msgstr "Siden %s er tom"
 
 #: sitemaps/views.py:60
 #, python-format
 msgid "No page '%s'"
-msgstr ""
+msgstr "Ingen side hedder '%s'"
