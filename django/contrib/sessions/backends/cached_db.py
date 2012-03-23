@@ -21,7 +21,13 @@ class SessionStore(DBStore):
         return KEY_PREFIX + self._get_or_create_session_key()
 
     def load(self):
-        data = cache.get(self.cache_key, None)
+        try:
+            data = cache.get(self.cache_key, None)
+        except Exception as e:
+            e_type = str(type(e))
+            if e_type != "<class 'memcache.MemcachedKeyLengthError'>":
+                raise e
+            data = None
         if data is None:
             data = super(SessionStore, self).load()
             cache.set(self.cache_key, data, settings.SESSION_COOKIE_AGE)

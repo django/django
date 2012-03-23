@@ -16,7 +16,13 @@ class SessionStore(SessionBase):
         return KEY_PREFIX + self._get_or_create_session_key()
 
     def load(self):
-        session_data = self._cache.get(self.cache_key)
+        try:
+            session_data = self._cache.get(self.cache_key, None)
+        except Exception as e:
+            e_type = str(type(e))
+            if e_type != "<class 'memcache.MemcachedKeyLengthError'>":
+                raise e
+            session_data = None
         if session_data is not None:
             return session_data
         self.create()
