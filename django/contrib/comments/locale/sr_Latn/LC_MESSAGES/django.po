@@ -1,13 +1,17 @@
 # This file is distributed under the same license as the Django package.
 #
+# Translators:
+# Jannis Leidel <jannis@leidel.info>, 2011.
+# Janos Guljas <janos@resenje.org>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-14 00:15-0700\n"
-"PO-Revision-Date: 2011-03-04 18:43+0000\n"
-"Last-Translator: Jannis <jannis@leidel.info>\n"
-"Language-Team: Serbian (Latin) <None>\n"
+"POT-Creation-Date: 2012-03-23 02:37+0100\n"
+"PO-Revision-Date: 2012-02-14 13:24+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: Serbian (Latin) (http://www.transifex.net/projects/p/django/"
+"language/sr@latin/)\n"
 "Language: sr@latin\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
