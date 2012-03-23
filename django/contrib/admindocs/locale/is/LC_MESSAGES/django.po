@@ -1,14 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Hafsteinn Einarsson <haffi67@gmail.com>, 2012.
 # Jannis Leidel <jannis@leidel.info>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-14 00:14-0700\n"
-"PO-Revision-Date: 2012-02-14 13:06+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2012-03-23 02:36+0100\n"
+"PO-Revision-Date: 2012-03-19 14:46+0000\n"
+"Last-Translator: Hafsteinn Einarsson <haffi67@gmail.com>\n"
 "Language-Team: Icelandic (http://www.transifex.net/projects/p/django/"
 "language/is/)\n"
 "Language: is\n"
@@ -171,21 +172,21 @@ msgstr "Eins og að ofan en opnar stjórnunarsíðuna í nýjum glugga."
 #: templates/admin_doc/model_detail.html:17
 #: templates/admin_doc/model_index.html:11
 msgid "Models"
-msgstr ""
+msgstr "Módel"
 
 #: templates/admin_doc/template_detail.html:9
 msgid "Templates"
-msgstr ""
+msgstr "Sniðmát"
 
 #: templates/admin_doc/template_filter_index.html:10
 msgid "Filters"
-msgstr ""
+msgstr "Síur"
 
 #: templates/admin_doc/template_tag_index.html:10
 msgid "Tags"
-msgstr ""
+msgstr "Tögg"
 
 #: templates/admin_doc/view_detail.html:9
 #: templates/admin_doc/view_index.html:10
 msgid "Views"
-msgstr ""
+msgstr "Ásýndir"

@@ -1,13 +1,17 @@
 # This file is distributed under the same license as the Django package.
 #
+# Translators:
+# Jannis Leidel <jannis@leidel.info>, 2011.
+# Janos Guljas <janos@resenje.org>, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-14 00:14-0700\n"
-"PO-Revision-Date: 2011-03-04 18:37+0000\n"
-"Last-Translator: Jannis <jannis@leidel.info>\n"
-"Language-Team: Serbian (Latin) <None>\n"
+"POT-Creation-Date: 2012-03-23 02:36+0100\n"
+"PO-Revision-Date: 2012-03-02 21:00+0000\n"
+"Last-Translator: Janos Guljas <janos@resenje.org>\n"
+"Language-Team: Serbian (Latin) (http://www.transifex.net/projects/p/django/"
+"language/sr@latin/)\n"
 "Language: sr@latin\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -166,24 +170,22 @@ msgstr ""
 
 #: templates/admin_doc/model_detail.html:17
 #: templates/admin_doc/model_index.html:11
-#, fuzzy
 msgid "Models"
-msgstr "model:"
+msgstr "Modeli"
 
 #: templates/admin_doc/template_detail.html:9
 msgid "Templates"
-msgstr ""
+msgstr "Šabloni"
 
 #: templates/admin_doc/template_filter_index.html:10
-#, fuzzy
 msgid "Filters"
-msgstr "filter:"
+msgstr "Filteri"
 
 #: templates/admin_doc/template_tag_index.html:10
 msgid "Tags"
-msgstr ""
+msgstr "Tagovi"
 
 #: templates/admin_doc/view_detail.html:9
 #: templates/admin_doc/view_index.html:10
 msgid "Views"
-msgstr ""
+msgstr "Vjuevi"

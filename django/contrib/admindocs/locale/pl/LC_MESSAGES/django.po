@@ -1,14 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+#   <angular.circle@gmail.com>, 2012.
 # Jannis Leidel <jannis@leidel.info>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-14 00:14-0700\n"
-"PO-Revision-Date: 2012-02-14 13:06+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2012-03-23 02:36+0100\n"
+"PO-Revision-Date: 2012-03-21 12:49+0000\n"
+"Last-Translator: angularcircle <angular.circle@gmail.com>\n"
 "Language-Team: Polish (http://www.transifex.net/projects/p/django/language/"
 "pl/)\n"
 "Language: pl\n"
@@ -170,21 +171,21 @@ msgstr "Jak wyżej, tyle że otwiera nowe okno."
 #: templates/admin_doc/model_detail.html:17
 #: templates/admin_doc/model_index.html:11
 msgid "Models"
-msgstr ""
+msgstr "Modele"
 
 #: templates/admin_doc/template_detail.html:9
 msgid "Templates"
-msgstr ""
+msgstr "Szablony"
 
 #: templates/admin_doc/template_filter_index.html:10
 msgid "Filters"
-msgstr ""
+msgstr "Filtry"
 
 #: templates/admin_doc/template_tag_index.html:10
 msgid "Tags"
-msgstr ""
+msgstr "Tagi"
 
 #: templates/admin_doc/view_detail.html:9
 #: templates/admin_doc/view_index.html:10
 msgid "Views"
-msgstr ""
+msgstr "Widoki"

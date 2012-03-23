@@ -2,13 +2,14 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011.
+# Ramiro Morales <cramm0@gmail.com>, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-14 00:14-0700\n"
-"PO-Revision-Date: 2012-02-14 13:06+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2012-03-23 02:36+0100\n"
+"PO-Revision-Date: 2012-03-16 01:43+0000\n"
+"Last-Translator: Ramiro Morales <cramm0@gmail.com>\n"
 "Language-Team: Spanish (Argentina) (http://www.transifex.net/projects/p/"
 "django/language/es_AR/)\n"
 "Language: es_AR\n"
@@ -170,21 +171,21 @@ msgstr "Ídem, pero abre la página de administración en una nueva ventana."
 #: templates/admin_doc/model_detail.html:17
 #: templates/admin_doc/model_index.html:11
 msgid "Models"
-msgstr ""
+msgstr "Modelos"
 
 #: templates/admin_doc/template_detail.html:9
 msgid "Templates"
-msgstr ""
+msgstr "Plantillas"
 
 #: templates/admin_doc/template_filter_index.html:10
 msgid "Filters"
-msgstr ""
+msgstr "Filtros"
 
 #: templates/admin_doc/template_tag_index.html:10
 msgid "Tags"
-msgstr ""
+msgstr "Etiquetas"
 
 #: templates/admin_doc/view_detail.html:9
 #: templates/admin_doc/view_index.html:10
 msgid "Views"
-msgstr ""
+msgstr "Vistas"
