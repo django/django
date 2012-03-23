@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-14 00:16-0700\n"
-"PO-Revision-Date: 2012-03-13 19:54+0000\n"
+"POT-Creation-Date: 2012-03-23 02:37+0100\n"
+"PO-Revision-Date: 2012-03-14 19:04+0000\n"
 "Last-Translator: Antoni Aloy <antoni.aloy@trespams.com>\n"
 "Language-Team: Spanish (Castilian) (http://www.transifex.net/projects/p/"
 "django/language/es/)\n"
@@ -39,9 +39,9 @@ msgstr ""
 #: views.py:19
 #, python-format
 msgid "Content type %(ct_id)s object %(obj_id)s doesn't exist"
-msgstr ""
+msgstr "El objeto de tipo de contenido %(ct_id)s objeto %(obj_id)s  no existe"
 
 #: views.py:25
 #, python-format
 msgid "%(ct_name)s objects don't have a get_absolute_url() method"
-msgstr ""
+msgstr "El objeto %(ct_name)s no tiene un método get_absolute_url () "

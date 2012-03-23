@@ -1,14 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Hafsteinn Einarsson <haffi67@gmail.com>, 2012.
 # Jannis Leidel <jannis@leidel.info>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-14 00:16-0700\n"
-"PO-Revision-Date: 2012-03-08 11:45+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2012-03-23 02:37+0100\n"
+"PO-Revision-Date: 2012-03-19 14:48+0000\n"
+"Last-Translator: Hafsteinn Einarsson <haffi67@gmail.com>\n"
 "Language-Team: Icelandic (http://www.transifex.net/projects/p/django/"
 "language/is/)\n"
 "Language: is\n"
@@ -32,14 +33,14 @@ msgstr "efnistög"
 #: views.py:15
 #, python-format
 msgid "Content type %(ct_id)s object has no associated model"
-msgstr ""
+msgstr "Gerð innihalds %(ct_id)s hefur ekkert tengt módel"
 
 #: views.py:19
 #, python-format
 msgid "Content type %(ct_id)s object %(obj_id)s doesn't exist"
-msgstr ""
+msgstr "Gerð innihalds %(ct_id)s hlutar %(obj_id)s er ekki til"
 
 #: views.py:25
 #, python-format
 msgid "%(ct_name)s objects don't have a get_absolute_url() method"
-msgstr ""
+msgstr "%(ct_name)s hlutir hafa ekki get_absolute_url () aðferð"

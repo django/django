@@ -1,14 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Guilherme Gondim <semente+transifex@taurinus.org>, 2012.
 # Jannis Leidel <jannis@leidel.info>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-14 00:16-0700\n"
-"PO-Revision-Date: 2012-03-08 11:45+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2012-03-23 02:37+0100\n"
+"PO-Revision-Date: 2012-03-19 18:27+0000\n"
+"Last-Translator: Guilherme Gondim <semente+transifex@taurinus.org>\n"
 "Language-Team: Portuguese (Brazil) <django-l10n-portuguese@googlegroups."
 "com>\n"
 "Language: pt_BR\n"
@@ -32,14 +33,14 @@ msgstr "tipos de conteúdo"
 #: views.py:15
 #, python-format
 msgid "Content type %(ct_id)s object has no associated model"
-msgstr ""
+msgstr "Objeto do tipo de conteúdo %(ct_id)s não tem nenhum model associado"
 
 #: views.py:19
 #, python-format
 msgid "Content type %(ct_id)s object %(obj_id)s doesn't exist"
-msgstr ""
+msgstr "Objeto %(obj_id)s do tipo de conteúdo %(ct_id)s não existe"
 
 #: views.py:25
 #, python-format
 msgid "%(ct_name)s objects don't have a get_absolute_url() method"
-msgstr ""
+msgstr "Objetos %(ct_name)s não tem um método get_absolute_url()"
