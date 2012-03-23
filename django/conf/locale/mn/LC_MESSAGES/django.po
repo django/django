@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-14 00:08-0700\n"
+"POT-Creation-Date: 2012-03-23 02:31+0100\n"
 "PO-Revision-Date: 2012-03-08 16:12+0000\n"
 "Last-Translator: Анхбаяр Анхаа <l.ankhbayar@gmail.com>\n"
 "Language-Team: Mongolian (http://www.transifex.net/projects/p/django/"
@@ -76,214 +76,234 @@ msgid "British English"
 msgstr "Британи Англи"
 
 #: conf/global_settings.py:61
+msgid "Esperanto"
+msgstr ""
+
+#: conf/global_settings.py:62
 msgid "Spanish"
 msgstr "Испани"
 
-#: conf/global_settings.py:62
+#: conf/global_settings.py:63
 msgid "Argentinian Spanish"
 msgstr "Аргентинийн Испани"
 
-#: conf/global_settings.py:63
+#: conf/global_settings.py:64
 msgid "Mexican Spanish"
 msgstr "Мексикийн Испани"
 
-#: conf/global_settings.py:64
+#: conf/global_settings.py:65
 msgid "Nicaraguan Spanish"
 msgstr "Никрагуан Испани"
 
-#: conf/global_settings.py:65
+#: conf/global_settings.py:66
 msgid "Estonian"
 msgstr "Эстони"
 
-#: conf/global_settings.py:66
+#: conf/global_settings.py:67
 msgid "Basque"
 msgstr "Баск"
 
-#: conf/global_settings.py:67
+#: conf/global_settings.py:68
 msgid "Persian"
 msgstr "Перс"
 
-#: conf/global_settings.py:68
+#: conf/global_settings.py:69
 msgid "Finnish"
 msgstr "Финлянд"
 
-#: conf/global_settings.py:69
+#: conf/global_settings.py:70
 msgid "French"
 msgstr "Франц"
 
-#: conf/global_settings.py:70
+#: conf/global_settings.py:71
 msgid "Frisian"
 msgstr "Фриз"
 
-#: conf/global_settings.py:71
+#: conf/global_settings.py:72
 msgid "Irish"
 msgstr "Ирланд"
 
-#: conf/global_settings.py:72
+#: conf/global_settings.py:73
 msgid "Galician"
 msgstr "Галици"
 
-#: conf/global_settings.py:73
+#: conf/global_settings.py:74
 msgid "Hebrew"
 msgstr "Еврэй"
 
-#: conf/global_settings.py:74
+#: conf/global_settings.py:75
 msgid "Hindi"
 msgstr "Хинди"
 
-#: conf/global_settings.py:75
+#: conf/global_settings.py:76
 msgid "Croatian"
 msgstr "Хорват"
 
-#: conf/global_settings.py:76
+#: conf/global_settings.py:77
 msgid "Hungarian"
 msgstr "Унгар"
 
-#: conf/global_settings.py:77
+#: conf/global_settings.py:78
 msgid "Indonesian"
 msgstr "Индонези"
 
-#: conf/global_settings.py:78
+#: conf/global_settings.py:79
 msgid "Icelandic"
 msgstr "Исланд"
 
-#: conf/global_settings.py:79
+#: conf/global_settings.py:80
 msgid "Italian"
 msgstr "Итали"
 
-#: conf/global_settings.py:80
+#: conf/global_settings.py:81
 msgid "Japanese"
 msgstr "Япон"
 
-#: conf/global_settings.py:81
+#: conf/global_settings.py:82
 msgid "Georgian"
 msgstr "Гүрж"
 
-#: conf/global_settings.py:82
+#: conf/global_settings.py:83
+msgid "Kazakh"
+msgstr ""
+
+#: conf/global_settings.py:84
 msgid "Khmer"
 msgstr "Кхмер"
 
-#: conf/global_settings.py:83
+#: conf/global_settings.py:85
 msgid "Kannada"
 msgstr "Канад"
 
-#: conf/global_settings.py:84
+#: conf/global_settings.py:86
 msgid "Korean"
 msgstr "Солонгос"
 
-#: conf/global_settings.py:85
+#: conf/global_settings.py:87
 msgid "Lithuanian"
 msgstr "Литва"
 
-#: conf/global_settings.py:86
+#: conf/global_settings.py:88
 msgid "Latvian"
 msgstr "Латви"
 
-#: conf/global_settings.py:87
+#: conf/global_settings.py:89
 msgid "Macedonian"
 msgstr "Македон"
 
-#: conf/global_settings.py:88
+#: conf/global_settings.py:90
 msgid "Malayalam"
 msgstr "Малайз"
 
-#: conf/global_settings.py:89
+#: conf/global_settings.py:91
 msgid "Mongolian"
 msgstr "Монгол"
 
-#: conf/global_settings.py:90
-msgid "Dutch"
-msgstr "Голланд"
-
-#: conf/global_settings.py:91
+#: conf/global_settings.py:92
 msgid "Norwegian Bokmal"
 msgstr "Норвеги бокмал"
 
-#: conf/global_settings.py:92
+#: conf/global_settings.py:93
+msgid "Nepali"
+msgstr ""
+
+#: conf/global_settings.py:94
+msgid "Dutch"
+msgstr "Голланд"
+
+#: conf/global_settings.py:95
 msgid "Norwegian Nynorsk"
 msgstr "Норвегийн нюнорск"
 
-#: conf/global_settings.py:93
+#: conf/global_settings.py:96
 msgid "Punjabi"
 msgstr "Панжаби"
 
-#: conf/global_settings.py:94
+#: conf/global_settings.py:97
 msgid "Polish"
 msgstr "Польш"
 
-#: conf/global_settings.py:95
+#: conf/global_settings.py:98
 msgid "Portuguese"
 msgstr "Португал"
 
-#: conf/global_settings.py:96
+#: conf/global_settings.py:99
 msgid "Brazilian Portuguese"
 msgstr "Бразилийн Португали"
 
-#: conf/global_settings.py:97
+#: conf/global_settings.py:100
 msgid "Romanian"
 msgstr "Румын"
 
-#: conf/global_settings.py:98
+#: conf/global_settings.py:101
 msgid "Russian"
 msgstr "Орос"
 
-#: conf/global_settings.py:99
+#: conf/global_settings.py:102
 msgid "Slovak"
 msgstr "Словак"
 
-#: conf/global_settings.py:100
+#: conf/global_settings.py:103
 msgid "Slovenian"
 msgstr "Словен"
 
-#: conf/global_settings.py:101
+#: conf/global_settings.py:104
 msgid "Albanian"
 msgstr "Альбани"
 
-#: conf/global_settings.py:102
+#: conf/global_settings.py:105
 msgid "Serbian"
 msgstr "Серби"
 
-#: conf/global_settings.py:103
+#: conf/global_settings.py:106
 msgid "Serbian Latin"
 msgstr "Серби латин"
 
-#: conf/global_settings.py:104
+#: conf/global_settings.py:107
 msgid "Swedish"
 msgstr "Щвед"
 
-#: conf/global_settings.py:105
+#: conf/global_settings.py:108
+msgid "Swahili"
+msgstr ""
+
+#: conf/global_settings.py:109
 msgid "Tamil"
 msgstr "Тамил"
 
-#: conf/global_settings.py:106
+#: conf/global_settings.py:110
 msgid "Telugu"
 msgstr "Тэлүгү"
 
-#: conf/global_settings.py:107
+#: conf/global_settings.py:111
 msgid "Thai"
 msgstr "Тайланд"
 
-#: conf/global_settings.py:108
+#: conf/global_settings.py:112
 msgid "Turkish"
 msgstr "Турк"
 
-#: conf/global_settings.py:109
+#: conf/global_settings.py:113
+msgid "Tatar"
+msgstr ""
+
+#: conf/global_settings.py:114
 msgid "Ukrainian"
 msgstr "Украйн"
 
-#: conf/global_settings.py:110
+#: conf/global_settings.py:115
 msgid "Urdu"
 msgstr "Урду"
 
-#: conf/global_settings.py:111
+#: conf/global_settings.py:116
 msgid "Vietnamese"
 msgstr "Вьетнам"
 
-#: conf/global_settings.py:112
+#: conf/global_settings.py:117
 msgid "Simplified Chinese"
 msgstr "Хятад (хялбаршуулсан) "
 
-#: conf/global_settings.py:113
+#: conf/global_settings.py:118
 msgid "Traditional Chinese"
 msgstr "Хятад (уламжлалт)"
 

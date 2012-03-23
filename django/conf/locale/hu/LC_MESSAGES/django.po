@@ -8,9 +8,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-14 00:07-0700\n"
-"PO-Revision-Date: 2012-03-08 12:00+0000\n"
-"Last-Translator: János Péter Ronkay <transifex@hangya.net>\n"
+"POT-Creation-Date: 2012-03-23 02:30+0100\n"
+"PO-Revision-Date: 2012-03-19 20:01+0000\n"
+"Last-Translator: istvanf <istvan.farkas@gmail.com>\n"
 "Language-Team: Hungarian (http://www.transifex.net/projects/p/django/"
 "language/hu/)\n"
 "Language: hu\n"
@@ -72,214 +72,234 @@ msgid "British English"
 msgstr "Brit angol"
 
 #: conf/global_settings.py:61
+msgid "Esperanto"
+msgstr ""
+
+#: conf/global_settings.py:62
 msgid "Spanish"
 msgstr "Spanyol"
 
-#: conf/global_settings.py:62
+#: conf/global_settings.py:63
 msgid "Argentinian Spanish"
 msgstr "Argentin spanyol"
 
-#: conf/global_settings.py:63
+#: conf/global_settings.py:64
 msgid "Mexican Spanish"
 msgstr "Mexikói spanyol"
 
-#: conf/global_settings.py:64
+#: conf/global_settings.py:65
 msgid "Nicaraguan Spanish"
 msgstr "Nicaraguai spanyol"
 
-#: conf/global_settings.py:65
+#: conf/global_settings.py:66
 msgid "Estonian"
 msgstr "Észt"
 
-#: conf/global_settings.py:66
+#: conf/global_settings.py:67
 msgid "Basque"
 msgstr "Baszk "
 
-#: conf/global_settings.py:67
+#: conf/global_settings.py:68
 msgid "Persian"
 msgstr "Perzsa"
 
-#: conf/global_settings.py:68
+#: conf/global_settings.py:69
 msgid "Finnish"
 msgstr "Finn"
 
-#: conf/global_settings.py:69
+#: conf/global_settings.py:70
 msgid "French"
 msgstr "Francia"
 
-#: conf/global_settings.py:70
+#: conf/global_settings.py:71
 msgid "Frisian"
 msgstr "Fríz"
 
-#: conf/global_settings.py:71
+#: conf/global_settings.py:72
 msgid "Irish"
 msgstr "Ír"
 
-#: conf/global_settings.py:72
+#: conf/global_settings.py:73
 msgid "Galician"
 msgstr "Gall"
 
-#: conf/global_settings.py:73
+#: conf/global_settings.py:74
 msgid "Hebrew"
 msgstr "Héber"
 
-#: conf/global_settings.py:74
+#: conf/global_settings.py:75
 msgid "Hindi"
 msgstr "Hindi"
 
-#: conf/global_settings.py:75
+#: conf/global_settings.py:76
 msgid "Croatian"
 msgstr "Horvát"
 
-#: conf/global_settings.py:76
+#: conf/global_settings.py:77
 msgid "Hungarian"
 msgstr "Magyar"
 
-#: conf/global_settings.py:77
+#: conf/global_settings.py:78
 msgid "Indonesian"
 msgstr "Indonéz"
 
-#: conf/global_settings.py:78
+#: conf/global_settings.py:79
 msgid "Icelandic"
 msgstr "Izlandi"
 
-#: conf/global_settings.py:79
+#: conf/global_settings.py:80
 msgid "Italian"
 msgstr "Olasz"
 
-#: conf/global_settings.py:80
+#: conf/global_settings.py:81
 msgid "Japanese"
 msgstr "Japán"
 
-#: conf/global_settings.py:81
+#: conf/global_settings.py:82
 msgid "Georgian"
 msgstr "Grúz"
 
-#: conf/global_settings.py:82
+#: conf/global_settings.py:83
+msgid "Kazakh"
+msgstr ""
+
+#: conf/global_settings.py:84
 msgid "Khmer"
 msgstr "Khmer"
 
-#: conf/global_settings.py:83
+#: conf/global_settings.py:85
 msgid "Kannada"
 msgstr "Kannada"
 
-#: conf/global_settings.py:84
+#: conf/global_settings.py:86
 msgid "Korean"
 msgstr "Koreai"
 
-#: conf/global_settings.py:85
+#: conf/global_settings.py:87
 msgid "Lithuanian"
 msgstr "Litván"
 
-#: conf/global_settings.py:86
+#: conf/global_settings.py:88
 msgid "Latvian"
 msgstr "Lett"
 
-#: conf/global_settings.py:87
+#: conf/global_settings.py:89
 msgid "Macedonian"
 msgstr "Macedón"
 
-#: conf/global_settings.py:88
+#: conf/global_settings.py:90
 msgid "Malayalam"
 msgstr "Malajálam"
 
-#: conf/global_settings.py:89
+#: conf/global_settings.py:91
 msgid "Mongolian"
 msgstr "Mongol"
 
-#: conf/global_settings.py:90
-msgid "Dutch"
-msgstr "Holland"
-
-#: conf/global_settings.py:91
+#: conf/global_settings.py:92
 msgid "Norwegian Bokmal"
 msgstr "Bokmål norvég"
 
-#: conf/global_settings.py:92
+#: conf/global_settings.py:93
+msgid "Nepali"
+msgstr ""
+
+#: conf/global_settings.py:94
+msgid "Dutch"
+msgstr "Holland"
+
+#: conf/global_settings.py:95
 msgid "Norwegian Nynorsk"
 msgstr "Nynorsk norvég"
 
-#: conf/global_settings.py:93
+#: conf/global_settings.py:96
 msgid "Punjabi"
 msgstr "Punjabi"
 
-#: conf/global_settings.py:94
+#: conf/global_settings.py:97
 msgid "Polish"
 msgstr "Lengyel"
 
-#: conf/global_settings.py:95
+#: conf/global_settings.py:98
 msgid "Portuguese"
 msgstr "Portugál"
 
-#: conf/global_settings.py:96
+#: conf/global_settings.py:99
 msgid "Brazilian Portuguese"
 msgstr "Brazíliai portugál"
 
-#: conf/global_settings.py:97
+#: conf/global_settings.py:100
 msgid "Romanian"
 msgstr "Román"
 
-#: conf/global_settings.py:98
+#: conf/global_settings.py:101
 msgid "Russian"
 msgstr "Orosz"
 
-#: conf/global_settings.py:99
+#: conf/global_settings.py:102
 msgid "Slovak"
 msgstr "Szlovák"
 
-#: conf/global_settings.py:100
+#: conf/global_settings.py:103
 msgid "Slovenian"
 msgstr "Szlovén"
 
-#: conf/global_settings.py:101
+#: conf/global_settings.py:104
 msgid "Albanian"
 msgstr "Albán"
 
-#: conf/global_settings.py:102
+#: conf/global_settings.py:105
 msgid "Serbian"
 msgstr "Szerb"
 
-#: conf/global_settings.py:103
+#: conf/global_settings.py:106
 msgid "Serbian Latin"
 msgstr "Latin betűs szerb"
 
-#: conf/global_settings.py:104
+#: conf/global_settings.py:107
 msgid "Swedish"
 msgstr "Svéd"
 
-#: conf/global_settings.py:105
+#: conf/global_settings.py:108
+msgid "Swahili"
+msgstr ""
+
+#: conf/global_settings.py:109
 msgid "Tamil"
 msgstr "Tamil"
 
-#: conf/global_settings.py:106
+#: conf/global_settings.py:110
 msgid "Telugu"
 msgstr "Telugu"
 
-#: conf/global_settings.py:107
+#: conf/global_settings.py:111
 msgid "Thai"
 msgstr "Thai"
 
-#: conf/global_settings.py:108
+#: conf/global_settings.py:112
 msgid "Turkish"
 msgstr "Török"
 
-#: conf/global_settings.py:109
+#: conf/global_settings.py:113
+msgid "Tatar"
+msgstr ""
+
+#: conf/global_settings.py:114
 msgid "Ukrainian"
 msgstr "Ukrán"
 
-#: conf/global_settings.py:110
+#: conf/global_settings.py:115
 msgid "Urdu"
 msgstr "urdu"
 
-#: conf/global_settings.py:111
+#: conf/global_settings.py:116
 msgid "Vietnamese"
 msgstr "Vietnámi"
 
-#: conf/global_settings.py:112
+#: conf/global_settings.py:117
 msgid "Simplified Chinese"
 msgstr "Egyszerű kínai"
 
-#: conf/global_settings.py:113
+#: conf/global_settings.py:118
 msgid "Traditional Chinese"
 msgstr "Hagyományos kínai"
 
@@ -398,12 +418,12 @@ msgstr "Egész"
 #: db/models/fields/__init__.py:510 db/models/fields/__init__.py:959
 #, python-format
 msgid "'%s' value must be an integer."
-msgstr ""
+msgstr "'%s' értéknek egész számnak kell lennie."
 
 #: db/models/fields/__init__.py:552
 #, python-format
 msgid "'%s' value must be either True or False."
-msgstr ""
+msgstr "'%s' érték csak igaz (True) vagy hamis (False) lehet."
 
 #: db/models/fields/__init__.py:554
 msgid "Boolean (Either True or False)"
@@ -422,12 +442,16 @@ msgstr "Vesszővel elválasztott egészek"
 #, python-format
 msgid "'%s' value has an invalid date format. It must be in YYYY-MM-DD format."
 msgstr ""
+"'%s' érték érvénytelen dátum formátumban van. A dátumnak YYYY-MM-DD "
+"formátumban kell lennie."
 
 #: db/models/fields/__init__.py:649 db/models/fields/__init__.py:734
 #, python-format
 msgid ""
 "'%s' value has the correct format (YYYY-MM-DD) but it is an invalid date."
 msgstr ""
+"'%s' érték megfelelő formátumban van (YYYY-MM-DD), de a megadott dátum "
+"érvénytelen."
 
 #: db/models/fields/__init__.py:652
 msgid "Date (without time)"
@@ -439,6 +463,8 @@ msgid ""
 "'%s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
+"'%s' érték érvénytelen dátum formátumban van. A dátumnak YYYY-MM-DD HH:MM[:ss"
+"[.uuuuuu]][TZ] formátumban kell lennie."
 
 #: db/models/fields/__init__.py:736
 #, python-format
@@ -446,6 +472,8 @@ msgid ""
 "'%s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]) but "
 "it is an invalid date/time."
 msgstr ""
+"'%s' érték megfelelő formátumban van (YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]), "
+"de a megadott dátum/idő érvénytelen."
 
 #: db/models/fields/__init__.py:740
 msgid "Date (with time)"
@@ -454,7 +482,7 @@ msgstr "Dátum (idővel)"
 #: db/models/fields/__init__.py:831
 #, python-format
 msgid "'%s' value must be a decimal number."
-msgstr ""
+msgstr "'%s' értéknek decimálisnak kell lennie."
 
 #: db/models/fields/__init__.py:833
 msgid "Decimal number"
@@ -471,7 +499,7 @@ msgstr "Elérési út"
 #: db/models/fields/__init__.py:930
 #, python-format
 msgid "'%s' value must be a float."
-msgstr ""
+msgstr "'%s' értéknek lebegőpontos számnak kell lennie."
 
 #: db/models/fields/__init__.py:932
 msgid "Floating point number"
@@ -492,7 +520,7 @@ msgstr "IP cím"
 #: db/models/fields/__init__.py:1065
 #, python-format
 msgid "'%s' value must be either None, True or False."
-msgstr ""
+msgstr "'%s' érték csak semmi (None), igaz (True) vagy hamis (False) lehet."
 
 #: db/models/fields/__init__.py:1067
 msgid "Boolean (Either True, False or None)"
@@ -509,7 +537,7 @@ msgstr "Pozitív kis egész"
 #: db/models/fields/__init__.py:1138
 #, python-format
 msgid "Slug (up to %(max_length)s)"
-msgstr ""
+msgstr "URL-barát cím (%(max_length)s hosszig)"
 
 #: db/models/fields/__init__.py:1156
 msgid "Small integer"
@@ -524,6 +552,8 @@ msgstr "Szöveg"
 msgid ""
 "'%s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] format."
 msgstr ""
+"'%s' érték formátuma érvénytelen. Az időnek HH:MM[:ss[.uuuuuu]] formátumban "
+"kell lennie."
 
 #: db/models/fields/__init__.py:1182
 #, python-format
@@ -531,6 +561,8 @@ msgid ""
 "'%s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an invalid "
 "time."
 msgstr ""
+"'%s' formátuma megfelelő (HH:MM[:ss[.uuuuuu]]), de a megadott időpont "
+"érvénytelen."
 
 #: db/models/fields/__init__.py:1185
 msgid "Time"
@@ -718,6 +750,8 @@ msgid ""
 "%(datetime)s couldn't be interpreted in time zone %(current_timezone)s; it "
 "may be ambiguous or it may not exist."
 msgstr ""
+"%(datetime)s értelmezhetetlen a megadott %(current_timezone)s időzónában; "
+"vagy félreérthető, vagy nem létezik."
 
 #: forms/widgets.py:325
 msgid "Currently"
@@ -913,11 +947,11 @@ msgstr "jan"
 
 #: utils/dates.py:23
 msgid "feb"
-msgstr "febr"
+msgstr "feb"
 
 #: utils/dates.py:23
 msgid "mar"
-msgstr "márc"
+msgstr "már"
 
 #: utils/dates.py:23
 msgid "apr"
@@ -941,7 +975,7 @@ msgstr "aug"
 
 #: utils/dates.py:24
 msgid "sep"
-msgstr "szept"
+msgstr "sze"
 
 #: utils/dates.py:24
 msgid "oct"
@@ -1079,7 +1113,7 @@ msgstr "december"
 #, python-format
 msgctxt "String to return when truncating text"
 msgid "%(truncated_text)s..."
-msgstr ""
+msgstr "%(truncated_text)s..."
 
 #: utils/text.py:234
 msgid "or"
@@ -1142,17 +1176,17 @@ msgstr ", %(number)d %(type)s"
 
 #: views/static.py:52
 msgid "Directory indexes are not allowed here."
-msgstr ""
+msgstr "A könyvtárak listázása itt nincs engedélyezve."
 
 #: views/static.py:54
 #, python-format
 msgid "\"%(path)s\" does not exist"
-msgstr ""
+msgstr "\"%(path)s\" nem létezik"
 
 #: views/static.py:95
 #, python-format
 msgid "Index of %(directory)s"
-msgstr ""
+msgstr "A %(directory)s könyvtár tartalma"
 
 #: views/generic/create_update.py:121
 #, python-format

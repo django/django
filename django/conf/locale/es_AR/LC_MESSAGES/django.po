@@ -2,13 +2,13 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011.
-# Ramiro Morales <cramm0@gmail.com>, 2011.
+# Ramiro Morales <cramm0@gmail.com>, 2011, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-14 00:06-0700\n"
-"PO-Revision-Date: 2012-03-08 12:00+0000\n"
+"POT-Creation-Date: 2012-03-23 02:29+0100\n"
+"PO-Revision-Date: 2012-03-14 19:50+0000\n"
 "Last-Translator: Ramiro Morales <cramm0@gmail.com>\n"
 "Language-Team: Spanish (Argentina) (http://www.transifex.net/projects/p/"
 "django/language/es_AR/)\n"
@@ -71,214 +71,234 @@ msgid "British English"
 msgstr "inglés británico"
 
 #: conf/global_settings.py:61
+msgid "Esperanto"
+msgstr ""
+
+#: conf/global_settings.py:62
 msgid "Spanish"
 msgstr "español"
 
-#: conf/global_settings.py:62
+#: conf/global_settings.py:63
 msgid "Argentinian Spanish"
 msgstr "español de Argentina"
 
-#: conf/global_settings.py:63
+#: conf/global_settings.py:64
 msgid "Mexican Spanish"
 msgstr "Español de México"
 
-#: conf/global_settings.py:64
-msgid "Nicaraguan Spanish"
-msgstr ""
-
 #: conf/global_settings.py:65
+msgid "Nicaraguan Spanish"
+msgstr "Español (Nicaragua)"
+
+#: conf/global_settings.py:66
 msgid "Estonian"
 msgstr "estonio"
 
-#: conf/global_settings.py:66
+#: conf/global_settings.py:67
 msgid "Basque"
 msgstr "vasco"
 
-#: conf/global_settings.py:67
+#: conf/global_settings.py:68
 msgid "Persian"
 msgstr "persa"
 
-#: conf/global_settings.py:68
+#: conf/global_settings.py:69
 msgid "Finnish"
 msgstr "finlandés"
 
-#: conf/global_settings.py:69
+#: conf/global_settings.py:70
 msgid "French"
 msgstr "francés"
 
-#: conf/global_settings.py:70
+#: conf/global_settings.py:71
 msgid "Frisian"
 msgstr "frisón"
 
-#: conf/global_settings.py:71
+#: conf/global_settings.py:72
 msgid "Irish"
 msgstr "irlandés"
 
-#: conf/global_settings.py:72
+#: conf/global_settings.py:73
 msgid "Galician"
 msgstr "gallego"
 
-#: conf/global_settings.py:73
+#: conf/global_settings.py:74
 msgid "Hebrew"
 msgstr "hebreo"
 
-#: conf/global_settings.py:74
+#: conf/global_settings.py:75
 msgid "Hindi"
 msgstr "hindi"
 
-#: conf/global_settings.py:75
+#: conf/global_settings.py:76
 msgid "Croatian"
 msgstr "croata"
 
-#: conf/global_settings.py:76
+#: conf/global_settings.py:77
 msgid "Hungarian"
 msgstr "húngaro"
 
-#: conf/global_settings.py:77
+#: conf/global_settings.py:78
 msgid "Indonesian"
 msgstr "indonesio"
 
-#: conf/global_settings.py:78
+#: conf/global_settings.py:79
 msgid "Icelandic"
 msgstr "islandés"
 
-#: conf/global_settings.py:79
+#: conf/global_settings.py:80
 msgid "Italian"
 msgstr "italiano"
 
-#: conf/global_settings.py:80
+#: conf/global_settings.py:81
 msgid "Japanese"
 msgstr "japonés"
 
-#: conf/global_settings.py:81
+#: conf/global_settings.py:82
 msgid "Georgian"
 msgstr "georgiano"
 
-#: conf/global_settings.py:82
+#: conf/global_settings.py:83
+msgid "Kazakh"
+msgstr ""
+
+#: conf/global_settings.py:84
 msgid "Khmer"
 msgstr "jémer"
 
-#: conf/global_settings.py:83
+#: conf/global_settings.py:85
 msgid "Kannada"
 msgstr "canarés"
 
-#: conf/global_settings.py:84
+#: conf/global_settings.py:86
 msgid "Korean"
 msgstr "coreano"
 
-#: conf/global_settings.py:85
+#: conf/global_settings.py:87
 msgid "Lithuanian"
 msgstr "lituano"
 
-#: conf/global_settings.py:86
+#: conf/global_settings.py:88
 msgid "Latvian"
 msgstr "letón"
 
-#: conf/global_settings.py:87
+#: conf/global_settings.py:89
 msgid "Macedonian"
 msgstr "macedonio"
 
-#: conf/global_settings.py:88
+#: conf/global_settings.py:90
 msgid "Malayalam"
 msgstr "Malayalam"
 
-#: conf/global_settings.py:89
+#: conf/global_settings.py:91
 msgid "Mongolian"
 msgstr "mongol"
 
-#: conf/global_settings.py:90
-msgid "Dutch"
-msgstr "holandés"
-
-#: conf/global_settings.py:91
+#: conf/global_settings.py:92
 msgid "Norwegian Bokmal"
 msgstr "bokmål"
 
-#: conf/global_settings.py:92
+#: conf/global_settings.py:93
+msgid "Nepali"
+msgstr ""
+
+#: conf/global_settings.py:94
+msgid "Dutch"
+msgstr "holandés"
+
+#: conf/global_settings.py:95
 msgid "Norwegian Nynorsk"
 msgstr "nynorsk"
 
-#: conf/global_settings.py:93
+#: conf/global_settings.py:96
 msgid "Punjabi"
 msgstr "Panyabí"
 
-#: conf/global_settings.py:94
+#: conf/global_settings.py:97
 msgid "Polish"
 msgstr "polaco"
 
-#: conf/global_settings.py:95
+#: conf/global_settings.py:98
 msgid "Portuguese"
 msgstr "portugués"
 
-#: conf/global_settings.py:96
+#: conf/global_settings.py:99
 msgid "Brazilian Portuguese"
 msgstr "portugués de Brasil"
 
-#: conf/global_settings.py:97
+#: conf/global_settings.py:100
 msgid "Romanian"
 msgstr "rumano"
 
-#: conf/global_settings.py:98
+#: conf/global_settings.py:101
 msgid "Russian"
 msgstr "ruso"
 
-#: conf/global_settings.py:99
+#: conf/global_settings.py:102
 msgid "Slovak"
 msgstr "eslovaco"
 
-#: conf/global_settings.py:100
+#: conf/global_settings.py:103
 msgid "Slovenian"
 msgstr "esloveno"
 
-#: conf/global_settings.py:101
+#: conf/global_settings.py:104
 msgid "Albanian"
 msgstr "albanés"
 
-#: conf/global_settings.py:102
+#: conf/global_settings.py:105
 msgid "Serbian"
 msgstr "serbio"
 
-#: conf/global_settings.py:103
+#: conf/global_settings.py:106
 msgid "Serbian Latin"
 msgstr "Latín de Serbia"
 
-#: conf/global_settings.py:104
+#: conf/global_settings.py:107
 msgid "Swedish"
 msgstr "sueco"
 
-#: conf/global_settings.py:105
+#: conf/global_settings.py:108
+msgid "Swahili"
+msgstr ""
+
+#: conf/global_settings.py:109
 msgid "Tamil"
 msgstr "tamil"
 
-#: conf/global_settings.py:106
+#: conf/global_settings.py:110
 msgid "Telugu"
 msgstr "telugu"
 
-#: conf/global_settings.py:107
+#: conf/global_settings.py:111
 msgid "Thai"
 msgstr "tailandés"
 
-#: conf/global_settings.py:108
+#: conf/global_settings.py:112
 msgid "Turkish"
 msgstr "turco"
 
-#: conf/global_settings.py:109
+#: conf/global_settings.py:113
+msgid "Tatar"
+msgstr ""
+
+#: conf/global_settings.py:114
 msgid "Ukrainian"
 msgstr "ucraniano"
 
-#: conf/global_settings.py:110
+#: conf/global_settings.py:115
 msgid "Urdu"
 msgstr "urdu"
 
-#: conf/global_settings.py:111
+#: conf/global_settings.py:116
 msgid "Vietnamese"
 msgstr "vietnamita"
 
-#: conf/global_settings.py:112
+#: conf/global_settings.py:117
 msgid "Simplified Chinese"
 msgstr "chino simplificado"
 
-#: conf/global_settings.py:113
+#: conf/global_settings.py:118
 msgid "Traditional Chinese"
 msgstr "chino tradicional"
 
@@ -309,11 +329,11 @@ msgstr "Introduzca una dirección IPv4 válida"
 
 #: core/validators.py:175 core/validators.py:189
 msgid "Enter a valid IPv6 address."
-msgstr ""
+msgstr "Introduzca una dirección IPv6 válida."
 
 #: core/validators.py:184 core/validators.py:187
 msgid "Enter a valid IPv4 or IPv6 address."
-msgstr ""
+msgstr "Introduzca una dirección IPv4 o IPv6 válida."
 
 #: core/validators.py:209 db/models/fields/__init__.py:638
 msgid "Enter only digits separated by commas."
@@ -395,12 +415,12 @@ msgstr "Entero"
 #: db/models/fields/__init__.py:510 db/models/fields/__init__.py:959
 #, python-format
 msgid "'%s' value must be an integer."
-msgstr ""
+msgstr "El valor de '%s' debe ser un número entero."
 
 #: db/models/fields/__init__.py:552
 #, python-format
 msgid "'%s' value must be either True or False."
-msgstr ""
+msgstr "El valor de '%s' debe ser Verdadero o Falso."
 
 #: db/models/fields/__init__.py:554
 msgid "Boolean (Either True or False)"
@@ -419,12 +439,16 @@ msgstr "Enteros separados por comas"
 #, python-format
 msgid "'%s' value has an invalid date format. It must be in YYYY-MM-DD format."
 msgstr ""
+"El valor de '%s' tiene un formato de fecha inválido. El mismo debe usar el "
+"formato AAAA-MM-DD."
 
 #: db/models/fields/__init__.py:649 db/models/fields/__init__.py:734
 #, python-format
 msgid ""
 "'%s' value has the correct format (YYYY-MM-DD) but it is an invalid date."
 msgstr ""
+"El valor de '%s' tiene un formato de fecha correcto (AAAA-MM-DD) pero "
+"representa una fecha inválida."
 
 #: db/models/fields/__init__.py:652
 msgid "Date (without time)"
@@ -436,6 +460,8 @@ msgid ""
 "'%s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
+"El valor de '%s' tiene un formato inválido. El mismo debe usar el formato "
+"AAAA-MM-DD HH:MM[:ss[.uuuuuu]][TZ]."
 
 #: db/models/fields/__init__.py:736
 #, python-format
@@ -443,6 +469,8 @@ msgid ""
 "'%s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]) but "
 "it is an invalid date/time."
 msgstr ""
+"El valor de '%s' tiene un formato correcto (AAAA-MM-DD HH:MM[:ss[.uuuuuu]]"
+"[TZ]) pero representa una fecha/hora invalida."
 
 #: db/models/fields/__init__.py:740
 msgid "Date (with time)"
@@ -451,7 +479,7 @@ msgstr "Fecha (con hora)"
 #: db/models/fields/__init__.py:831
 #, python-format
 msgid "'%s' value must be a decimal number."
-msgstr ""
+msgstr "El valor de '%s' debe ser un número decimal."
 
 #: db/models/fields/__init__.py:833
 msgid "Decimal number"
@@ -468,7 +496,7 @@ msgstr "Ruta de archivo"
 #: db/models/fields/__init__.py:930
 #, python-format
 msgid "'%s' value must be a float."
-msgstr ""
+msgstr "El valor de '%s' debe ser un número de coma flotante."
 
 #: db/models/fields/__init__.py:932
 msgid "Floating point number"
@@ -480,7 +508,7 @@ msgstr "Entero grande (8 bytes)"
 
 #: db/models/fields/__init__.py:1007
 msgid "IPv4 address"
-msgstr ""
+msgstr "Dirección IPv4"
 
 #: db/models/fields/__init__.py:1023
 msgid "IP address"
@@ -489,7 +517,7 @@ msgstr "Dirección IP"
 #: db/models/fields/__init__.py:1065
 #, python-format
 msgid "'%s' value must be either None, True or False."
-msgstr ""
+msgstr "El valor de '%s' debe ser None, Verdadero o Falso."
 
 #: db/models/fields/__init__.py:1067
 msgid "Boolean (Either True, False or None)"
@@ -497,20 +525,20 @@ msgstr "Booleano (Verdadero, Falso o Nulo)"
 
 #: db/models/fields/__init__.py:1116
 msgid "Positive integer"
-msgstr ""
+msgstr "Entero positivo"
 
 #: db/models/fields/__init__.py:1127
 msgid "Positive small integer"
-msgstr ""
+msgstr "Entero pequeño positivo"
 
 #: db/models/fields/__init__.py:1138
 #, python-format
 msgid "Slug (up to %(max_length)s)"
-msgstr ""
+msgstr "Slug (de hasta %(max_length)s caracteres)"
 
 #: db/models/fields/__init__.py:1156
 msgid "Small integer"
-msgstr ""
+msgstr "Entero pequeño"
 
 #: db/models/fields/__init__.py:1162
 msgid "Text"
@@ -521,6 +549,8 @@ msgstr "Texto"
 msgid ""
 "'%s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] format."
 msgstr ""
+"El valor de '%s' tiene un formato inválido. El mismo debe usar el formato HH:"
+"MM[:ss[.uuuuuu]]."
 
 #: db/models/fields/__init__.py:1182
 #, python-format
@@ -528,6 +558,8 @@ msgid ""
 "'%s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an invalid "
 "time."
 msgstr ""
+"El valor de '%s' tiene un formato correcto (HH:MM[:ss[.uuuuuu]]) pero "
+"representa una hora inválida."
 
 #: db/models/fields/__init__.py:1185
 msgid "Time"
@@ -539,11 +571,11 @@ msgstr "URL"
 
 #: db/models/fields/files.py:214
 msgid "File"
-msgstr ""
+msgstr "Archivo"
 
 #: db/models/fields/files.py:321
 msgid "Image"
-msgstr ""
+msgstr "Imagen"
 
 #: db/models/fields/related.py:903
 #, python-format
@@ -713,6 +745,8 @@ msgid ""
 "%(datetime)s couldn't be interpreted in time zone %(current_timezone)s; it "
 "may be ambiguous or it may not exist."
 msgstr ""
+"%(datetime)s no puede ser interpretado en la zona horaria "
+"%(current_timezone)s; ya que podría ser ambiguo o podría no existir."
 
 #: forms/widgets.py:325
 msgid "Currently"
@@ -1074,7 +1108,7 @@ msgstr "Diciembre"
 #, python-format
 msgctxt "String to return when truncating text"
 msgid "%(truncated_text)s..."
-msgstr ""
+msgstr "%(truncated_text)s..."
 
 #: utils/text.py:234
 msgid "or"
@@ -1138,16 +1172,18 @@ msgstr ", %(number)d %(type)s"
 #: views/static.py:52
 msgid "Directory indexes are not allowed here."
 msgstr ""
+"No está habilitada la generación de listados de directorios en esta "
+"ubicación."
 
 #: views/static.py:54
 #, python-format
 msgid "\"%(path)s\" does not exist"
-msgstr ""
+msgstr "\"%(path)s\" no existe"
 
 #: views/static.py:95
 #, python-format
 msgid "Index of %(directory)s"
-msgstr ""
+msgstr "Listado de %(directory)s"
 
 #: views/generic/create_update.py:121
 #, python-format

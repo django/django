@@ -2,16 +2,16 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011.
-# Michael Thornhill <michael@maithu.com>, 2011.
+# Michael Thornhill <michael@maithu.com>, 2011, 2012.
 # Séamus Ó Cúile <seamus.ocuile@oegaillimh.ie>, 2011.
 # Seán de Búrca <leftmostcat@gmail.com>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-14 00:07-0700\n"
-"PO-Revision-Date: 2012-03-08 12:00+0000\n"
-"Last-Translator: leftmostcat <leftmostcat@gmail.com>\n"
+"POT-Creation-Date: 2012-03-23 02:30+0100\n"
+"PO-Revision-Date: 2012-03-16 12:04+0000\n"
+"Last-Translator: Michael Thornhill <michael@maithu.com>\n"
 "Language-Team: Irish (http://www.transifex.net/projects/p/django/language/"
 "ga/)\n"
 "Language: ga\n"
@@ -74,214 +74,234 @@ msgid "British English"
 msgstr "Béarla na Breataine"
 
 #: conf/global_settings.py:61
+msgid "Esperanto"
+msgstr ""
+
+#: conf/global_settings.py:62
 msgid "Spanish"
 msgstr "Spáinnis"
 
-#: conf/global_settings.py:62
+#: conf/global_settings.py:63
 msgid "Argentinian Spanish"
 msgstr "Spáinnis na hAirgintíne"
 
-#: conf/global_settings.py:63
+#: conf/global_settings.py:64
 msgid "Mexican Spanish"
 msgstr "Spáinnis Mheicsiceo "
 
-#: conf/global_settings.py:64
+#: conf/global_settings.py:65
 msgid "Nicaraguan Spanish"
 msgstr "Spáinnis Nicearagua"
 
-#: conf/global_settings.py:65
+#: conf/global_settings.py:66
 msgid "Estonian"
 msgstr "Eastóinis"
 
-#: conf/global_settings.py:66
+#: conf/global_settings.py:67
 msgid "Basque"
 msgstr "Bascais"
 
-#: conf/global_settings.py:67
+#: conf/global_settings.py:68
 msgid "Persian"
 msgstr "Peirsis"
 
-#: conf/global_settings.py:68
+#: conf/global_settings.py:69
 msgid "Finnish"
 msgstr "Fionlainnis"
 
-#: conf/global_settings.py:69
+#: conf/global_settings.py:70
 msgid "French"
 msgstr "Fraincis"
 
-#: conf/global_settings.py:70
+#: conf/global_settings.py:71
 msgid "Frisian"
 msgstr "Freaslainnis"
 
-#: conf/global_settings.py:71
+#: conf/global_settings.py:72
 msgid "Irish"
 msgstr "Gaeilge"
 
-#: conf/global_settings.py:72
+#: conf/global_settings.py:73
 msgid "Galician"
 msgstr "Gailísis"
 
-#: conf/global_settings.py:73
+#: conf/global_settings.py:74
 msgid "Hebrew"
 msgstr "Eabhrais"
 
-#: conf/global_settings.py:74
+#: conf/global_settings.py:75
 msgid "Hindi"
 msgstr "Hiondúis"
 
-#: conf/global_settings.py:75
+#: conf/global_settings.py:76
 msgid "Croatian"
 msgstr "Cróitis"
 
-#: conf/global_settings.py:76
+#: conf/global_settings.py:77
 msgid "Hungarian"
 msgstr "Ungáiris"
 
-#: conf/global_settings.py:77
+#: conf/global_settings.py:78
 msgid "Indonesian"
 msgstr "Indinéisis"
 
-#: conf/global_settings.py:78
+#: conf/global_settings.py:79
 msgid "Icelandic"
 msgstr "Íoslainnis"
 
-#: conf/global_settings.py:79
+#: conf/global_settings.py:80
 msgid "Italian"
 msgstr "Iodáilis"
 
-#: conf/global_settings.py:80
+#: conf/global_settings.py:81
 msgid "Japanese"
 msgstr "Seapáinis"
 
-#: conf/global_settings.py:81
+#: conf/global_settings.py:82
 msgid "Georgian"
 msgstr "Seoirsis"
 
-#: conf/global_settings.py:82
+#: conf/global_settings.py:83
+msgid "Kazakh"
+msgstr ""
+
+#: conf/global_settings.py:84
 msgid "Khmer"
 msgstr "Ciméiris"
 
-#: conf/global_settings.py:83
+#: conf/global_settings.py:85
 msgid "Kannada"
 msgstr "Cannadais"
 
-#: conf/global_settings.py:84
+#: conf/global_settings.py:86
 msgid "Korean"
 msgstr "Cóiréis"
 
-#: conf/global_settings.py:85
+#: conf/global_settings.py:87
 msgid "Lithuanian"
 msgstr "Liotuáinis"
 
-#: conf/global_settings.py:86
+#: conf/global_settings.py:88
 msgid "Latvian"
 msgstr "Laitvis"
 
-#: conf/global_settings.py:87
+#: conf/global_settings.py:89
 msgid "Macedonian"
 msgstr "Macadóinis"
 
-#: conf/global_settings.py:88
+#: conf/global_settings.py:90
 msgid "Malayalam"
 msgstr "Mailéalaimis"
 
-#: conf/global_settings.py:89
+#: conf/global_settings.py:91
 msgid "Mongolian"
 msgstr "Mongóilis"
 
-#: conf/global_settings.py:90
-msgid "Dutch"
-msgstr "Ollainnis"
-
-#: conf/global_settings.py:91
+#: conf/global_settings.py:92
 msgid "Norwegian Bokmal"
 msgstr "Ioruais Bokmål"
 
-#: conf/global_settings.py:92
+#: conf/global_settings.py:93
+msgid "Nepali"
+msgstr ""
+
+#: conf/global_settings.py:94
+msgid "Dutch"
+msgstr "Ollainnis"
+
+#: conf/global_settings.py:95
 msgid "Norwegian Nynorsk"
 msgstr "Ioruais Nynorsk"
 
-#: conf/global_settings.py:93
+#: conf/global_settings.py:96
 msgid "Punjabi"
 msgstr "Puinseáibis"
 
-#: conf/global_settings.py:94
+#: conf/global_settings.py:97
 msgid "Polish"
 msgstr "Polainnis"
 
-#: conf/global_settings.py:95
+#: conf/global_settings.py:98
 msgid "Portuguese"
 msgstr "Portaingéilis"
 
-#: conf/global_settings.py:96
+#: conf/global_settings.py:99
 msgid "Brazilian Portuguese"
 msgstr "Portaingéilis na Brasaíle"
 
-#: conf/global_settings.py:97
+#: conf/global_settings.py:100
 msgid "Romanian"
 msgstr "Rómáinis"
 
-#: conf/global_settings.py:98
+#: conf/global_settings.py:101
 msgid "Russian"
 msgstr "Rúisis"
 
-#: conf/global_settings.py:99
+#: conf/global_settings.py:102
 msgid "Slovak"
 msgstr "Slóvaicis"
 
-#: conf/global_settings.py:100
+#: conf/global_settings.py:103
 msgid "Slovenian"
 msgstr "Slóivéinis"
 
-#: conf/global_settings.py:101
+#: conf/global_settings.py:104
 msgid "Albanian"
 msgstr "Albáinis"
 
-#: conf/global_settings.py:102
+#: conf/global_settings.py:105
 msgid "Serbian"
 msgstr "Seirbis"
 
-#: conf/global_settings.py:103
+#: conf/global_settings.py:106
 msgid "Serbian Latin"
 msgstr "Seirbis (Laidineach)"
 
-#: conf/global_settings.py:104
+#: conf/global_settings.py:107
 msgid "Swedish"
 msgstr "Sualainnis"
 
-#: conf/global_settings.py:105
+#: conf/global_settings.py:108
+msgid "Swahili"
+msgstr ""
+
+#: conf/global_settings.py:109
 msgid "Tamil"
 msgstr "Tamailis"
 
-#: conf/global_settings.py:106
+#: conf/global_settings.py:110
 msgid "Telugu"
 msgstr "Teileagúis"
 
-#: conf/global_settings.py:107
+#: conf/global_settings.py:111
 msgid "Thai"
 msgstr "Téalainnis"
 
-#: conf/global_settings.py:108
+#: conf/global_settings.py:112
 msgid "Turkish"
 msgstr "Tuircis"
 
-#: conf/global_settings.py:109
+#: conf/global_settings.py:113
+msgid "Tatar"
+msgstr ""
+
+#: conf/global_settings.py:114
 msgid "Ukrainian"
 msgstr "Úcráinis"
 
-#: conf/global_settings.py:110
+#: conf/global_settings.py:115
 msgid "Urdu"
 msgstr "Urdais"
 
-#: conf/global_settings.py:111
+#: conf/global_settings.py:116
 msgid "Vietnamese"
 msgstr "Vítneamais"
 
-#: conf/global_settings.py:112
+#: conf/global_settings.py:117
 msgid "Simplified Chinese"
 msgstr "Sínis Simplithe"
 
-#: conf/global_settings.py:113
+#: conf/global_settings.py:118
 msgid "Traditional Chinese"
 msgstr "Sínis Traidisiúnta"
 
@@ -314,11 +334,11 @@ msgstr "Iontráil seoladh IPv4 bailí."
 
 #: core/validators.py:175 core/validators.py:189
 msgid "Enter a valid IPv6 address."
-msgstr ""
+msgstr "Cuir seoladh bailí IPv6 isteach."
 
 #: core/validators.py:184 core/validators.py:187
 msgid "Enter a valid IPv4 or IPv6 address."
-msgstr ""
+msgstr "Cuir seoladh bailí IPv4 nó IPv6 isteach."
 
 #: core/validators.py:209 db/models/fields/__init__.py:638
 msgid "Enter only digits separated by commas."
@@ -399,12 +419,12 @@ msgstr "Slánuimhir"
 #: db/models/fields/__init__.py:510 db/models/fields/__init__.py:959
 #, python-format
 msgid "'%s' value must be an integer."
-msgstr ""
+msgstr "Ní mór don luach '%s' a bheith ina shlánuimhir."
 
 #: db/models/fields/__init__.py:552
 #, python-format
 msgid "'%s' value must be either True or False."
-msgstr ""
+msgstr "Ní mór don luach '%s' a bheith Fíor nó Bréagach."
 
 #: db/models/fields/__init__.py:554
 msgid "Boolean (Either True or False)"
@@ -423,12 +443,15 @@ msgstr "Slánuimhireacha camóg-scartha"
 #, python-format
 msgid "'%s' value has an invalid date format. It must be in YYYY-MM-DD format."
 msgstr ""
+"Tá an luach '%s' i bhformáid dáta neamhbhailí. Caithfidh sé a bheith i "
+"bhformáid YYYY-MM-DD."
 
 #: db/models/fields/__init__.py:649 db/models/fields/__init__.py:734
 #, python-format
 msgid ""
 "'%s' value has the correct format (YYYY-MM-DD) but it is an invalid date."
 msgstr ""
+"Tá an formáid ceart (YYYY-MM-DD) ag an luach '%s' ach tá an dáta neamhbhailí"
 
 #: db/models/fields/__init__.py:652
 msgid "Date (without time)"
@@ -440,6 +463,8 @@ msgid ""
 "'%s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
+"Tá an luach '%s' i bhformáid neamhbhailí. Caithfidh sé a bheith i bhformáid "
+"YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]."
 
 #: db/models/fields/__init__.py:736
 #, python-format
@@ -447,6 +472,8 @@ msgid ""
 "'%s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]) but "
 "it is an invalid date/time."
 msgstr ""
+"Tá an formáid ceart (YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]) ag an luach '%s' "
+"ach tá an dáta/am neamhbhailí"
 
 #: db/models/fields/__init__.py:740
 msgid "Date (with time)"
@@ -455,7 +482,7 @@ msgstr "Dáta (le am)"
 #: db/models/fields/__init__.py:831
 #, python-format
 msgid "'%s' value must be a decimal number."
-msgstr ""
+msgstr "Ní mór don luach '%s' a bheith ina uimhir dheachúlach."
 
 #: db/models/fields/__init__.py:833
 msgid "Decimal number"
@@ -472,7 +499,7 @@ msgstr "Conair comhaid"
 #: db/models/fields/__init__.py:930
 #, python-format
 msgid "'%s' value must be a float."
-msgstr ""
+msgstr "Ní mór don luach '%s' a bheith ina uimhir snámhpointe."
 
 #: db/models/fields/__init__.py:932
 msgid "Floating point number"
@@ -484,7 +511,7 @@ msgstr "Mór (8 byte) slánuimhi"
 
 #: db/models/fields/__init__.py:1007
 msgid "IPv4 address"
-msgstr ""
+msgstr "Seoladh IPv4"
 
 #: db/models/fields/__init__.py:1023
 msgid "IP address"
@@ -493,7 +520,7 @@ msgstr "Seoladh IP"
 #: db/models/fields/__init__.py:1065
 #, python-format
 msgid "'%s' value must be either None, True or False."
-msgstr ""
+msgstr "Ní mór don luach '%s' a bheith Faic, Fíor nó Bréagach."
 
 #: db/models/fields/__init__.py:1067
 msgid "Boolean (Either True, False or None)"
@@ -501,20 +528,20 @@ msgstr "Boole (Fíor, Bréagach nó Dada)"
 
 #: db/models/fields/__init__.py:1116
 msgid "Positive integer"
-msgstr ""
+msgstr "Slánuimhir dearfach"
 
 #: db/models/fields/__init__.py:1127
 msgid "Positive small integer"
-msgstr ""
+msgstr "Slánuimhir beag dearfach"
 
 #: db/models/fields/__init__.py:1138
 #, python-format
 msgid "Slug (up to %(max_length)s)"
-msgstr ""
+msgstr "Slug (suas go %(max_length)s)"
 
 #: db/models/fields/__init__.py:1156
 msgid "Small integer"
-msgstr ""
+msgstr "Slánuimhir beag"
 
 #: db/models/fields/__init__.py:1162
 msgid "Text"
@@ -525,6 +552,8 @@ msgstr "Téacs"
 msgid ""
 "'%s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] format."
 msgstr ""
+"Tá an luach '%s' i bhformáid neamhbhailí. Caithfidh sé a bheith i bhformáid "
+"HH:MM[:ss[.uuuuuu]]."
 
 #: db/models/fields/__init__.py:1182
 #, python-format
@@ -532,6 +561,8 @@ msgid ""
 "'%s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an invalid "
 "time."
 msgstr ""
+"Tá an formáid ceart (HH:MM[:ss[.uuuuuu]]) ag an luach '%s' ach tá an am "
+"neamhbhailí"
 
 #: db/models/fields/__init__.py:1185
 msgid "Time"
@@ -543,11 +574,11 @@ msgstr "URL"
 
 #: db/models/fields/files.py:214
 msgid "File"
-msgstr ""
+msgstr "Comhaid"
 
 #: db/models/fields/files.py:321
 msgid "Image"
-msgstr ""
+msgstr "Íomhá"
 
 #: db/models/fields/related.py:903
 #, python-format
@@ -714,6 +745,8 @@ msgid ""
 "%(datetime)s couldn't be interpreted in time zone %(current_timezone)s; it "
 "may be ambiguous or it may not exist."
 msgstr ""
+"Ní féidir an %(datetime)s a léirmhíniú i gcrios ama %(current_timezone)s; "
+"B'fhéidir go bhfuil sé débhríoch nó nach bhfuil sé ann."
 
 #: forms/widgets.py:325
 msgid "Currently"
@@ -1078,7 +1111,7 @@ msgstr "Mí na Nollag"
 #, python-format
 msgctxt "String to return when truncating text"
 msgid "%(truncated_text)s..."
-msgstr ""
+msgstr "%(truncated_text)s..."
 
 #: utils/text.py:234
 msgid "or"
@@ -1159,17 +1192,17 @@ msgstr ", %(number)d %(type)s"
 
 #: views/static.py:52
 msgid "Directory indexes are not allowed here."
-msgstr ""
+msgstr "Níl innéacsanna chomhadlann cheadaítear anseo."
 
 #: views/static.py:54
 #, python-format
 msgid "\"%(path)s\" does not exist"
-msgstr ""
+msgstr "Níl %(path)s ann."
 
 #: views/static.py:95
 #, python-format
 msgid "Index of %(directory)s"
-msgstr ""
+msgstr "Innéacs de %(directory)s"
 
 #: views/generic/create_update.py:121
 #, python-format

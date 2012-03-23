@@ -2,16 +2,16 @@
 #
 # Translators:
 # Eduardo Carvalho <eduardocereto@gmail.com>, 2011.
-# Guilherme Gondim <semente+transifex@taurinus.org>, 2011.
+# Guilherme Gondim <semente+transifex@taurinus.org>, 2011, 2012.
 # Jannis Leidel <jannis@leidel.info>, 2011.
 # Sandro  <sandrossv@hotmail.com>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-14 00:09-0700\n"
-"PO-Revision-Date: 2012-03-08 12:00+0000\n"
-"Last-Translator: Eduardo Carvalho <eduardocereto@gmail.com>\n"
+"POT-Creation-Date: 2012-03-23 02:32+0100\n"
+"PO-Revision-Date: 2012-03-19 18:35+0000\n"
+"Last-Translator: Guilherme Gondim <semente+transifex@taurinus.org>\n"
 "Language-Team: Portuguese (Brazil) <django-l10n-portuguese@googlegroups."
 "com>\n"
 "Language: pt_BR\n"
@@ -38,7 +38,7 @@ msgstr "Bengali"
 
 #: conf/global_settings.py:52
 msgid "Bosnian"
-msgstr "Bósnia"
+msgstr "Bósnio"
 
 #: conf/global_settings.py:53
 msgid "Catalan"
@@ -73,214 +73,234 @@ msgid "British English"
 msgstr "Inglês Britânico"
 
 #: conf/global_settings.py:61
+msgid "Esperanto"
+msgstr ""
+
+#: conf/global_settings.py:62
 msgid "Spanish"
 msgstr "Espanhol"
 
-#: conf/global_settings.py:62
+#: conf/global_settings.py:63
 msgid "Argentinian Spanish"
 msgstr "Espanhol Argentino"
 
-#: conf/global_settings.py:63
+#: conf/global_settings.py:64
 msgid "Mexican Spanish"
 msgstr "Espanhol Mexicano"
 
-#: conf/global_settings.py:64
+#: conf/global_settings.py:65
 msgid "Nicaraguan Spanish"
 msgstr "Espanhol Nicaraguense"
 
-#: conf/global_settings.py:65
+#: conf/global_settings.py:66
 msgid "Estonian"
 msgstr "Estoniano"
 
-#: conf/global_settings.py:66
+#: conf/global_settings.py:67
 msgid "Basque"
 msgstr "Basco"
 
-#: conf/global_settings.py:67
+#: conf/global_settings.py:68
 msgid "Persian"
 msgstr "Persa"
 
-#: conf/global_settings.py:68
+#: conf/global_settings.py:69
 msgid "Finnish"
 msgstr "Finlandês"
 
-#: conf/global_settings.py:69
+#: conf/global_settings.py:70
 msgid "French"
 msgstr "Francês"
 
-#: conf/global_settings.py:70
+#: conf/global_settings.py:71
 msgid "Frisian"
 msgstr "Frísia"
 
-#: conf/global_settings.py:71
+#: conf/global_settings.py:72
 msgid "Irish"
 msgstr "Irlandês"
 
-#: conf/global_settings.py:72
+#: conf/global_settings.py:73
 msgid "Galician"
 msgstr "Galiciano"
 
-#: conf/global_settings.py:73
+#: conf/global_settings.py:74
 msgid "Hebrew"
 msgstr "Hebraico"
 
-#: conf/global_settings.py:74
+#: conf/global_settings.py:75
 msgid "Hindi"
 msgstr "Hindi"
 
-#: conf/global_settings.py:75
+#: conf/global_settings.py:76
 msgid "Croatian"
 msgstr "Croata"
 
-#: conf/global_settings.py:76
+#: conf/global_settings.py:77
 msgid "Hungarian"
 msgstr "Húngaro"
 
-#: conf/global_settings.py:77
+#: conf/global_settings.py:78
 msgid "Indonesian"
 msgstr "Indonésio"
 
-#: conf/global_settings.py:78
+#: conf/global_settings.py:79
 msgid "Icelandic"
 msgstr "Islandês"
 
-#: conf/global_settings.py:79
+#: conf/global_settings.py:80
 msgid "Italian"
 msgstr "Italiano"
 
-#: conf/global_settings.py:80
+#: conf/global_settings.py:81
 msgid "Japanese"
 msgstr "Japonês"
 
-#: conf/global_settings.py:81
+#: conf/global_settings.py:82
 msgid "Georgian"
 msgstr "Georgiano"
 
-#: conf/global_settings.py:82
+#: conf/global_settings.py:83
+msgid "Kazakh"
+msgstr ""
+
+#: conf/global_settings.py:84
 msgid "Khmer"
 msgstr "Khmer"
 
-#: conf/global_settings.py:83
+#: conf/global_settings.py:85
 msgid "Kannada"
 msgstr "Canarês"
 
-#: conf/global_settings.py:84
+#: conf/global_settings.py:86
 msgid "Korean"
 msgstr "Coreano"
 
-#: conf/global_settings.py:85
+#: conf/global_settings.py:87
 msgid "Lithuanian"
 msgstr "Lituano"
 
-#: conf/global_settings.py:86
+#: conf/global_settings.py:88
 msgid "Latvian"
 msgstr "Letão"
 
-#: conf/global_settings.py:87
+#: conf/global_settings.py:89
 msgid "Macedonian"
 msgstr "Macedônio"
 
-#: conf/global_settings.py:88
+#: conf/global_settings.py:90
 msgid "Malayalam"
 msgstr "Malaiala"
 
-#: conf/global_settings.py:89
+#: conf/global_settings.py:91
 msgid "Mongolian"
 msgstr "Mongol"
 
-#: conf/global_settings.py:90
-msgid "Dutch"
-msgstr "Neerlandês"
-
-#: conf/global_settings.py:91
+#: conf/global_settings.py:92
 msgid "Norwegian Bokmal"
 msgstr "Dano-norueguês"
 
-#: conf/global_settings.py:92
+#: conf/global_settings.py:93
+msgid "Nepali"
+msgstr ""
+
+#: conf/global_settings.py:94
+msgid "Dutch"
+msgstr "Neerlandês"
+
+#: conf/global_settings.py:95
 msgid "Norwegian Nynorsk"
 msgstr "Novo Norueguês"
 
-#: conf/global_settings.py:93
+#: conf/global_settings.py:96
 msgid "Punjabi"
 msgstr "Punjabi"
 
-#: conf/global_settings.py:94
+#: conf/global_settings.py:97
 msgid "Polish"
 msgstr "Polonês"
 
-#: conf/global_settings.py:95
+#: conf/global_settings.py:98
 msgid "Portuguese"
 msgstr "Português"
 
-#: conf/global_settings.py:96
+#: conf/global_settings.py:99
 msgid "Brazilian Portuguese"
 msgstr "Português Brasileiro"
 
-#: conf/global_settings.py:97
+#: conf/global_settings.py:100
 msgid "Romanian"
 msgstr "Romeno"
 
-#: conf/global_settings.py:98
+#: conf/global_settings.py:101
 msgid "Russian"
 msgstr "Russo"
 
-#: conf/global_settings.py:99
+#: conf/global_settings.py:102
 msgid "Slovak"
 msgstr "Eslovaco"
 
-#: conf/global_settings.py:100
+#: conf/global_settings.py:103
 msgid "Slovenian"
 msgstr "Esloveno"
 
-#: conf/global_settings.py:101
+#: conf/global_settings.py:104
 msgid "Albanian"
 msgstr "Albanesa"
 
-#: conf/global_settings.py:102
+#: conf/global_settings.py:105
 msgid "Serbian"
 msgstr "Sérvio"
 
-#: conf/global_settings.py:103
+#: conf/global_settings.py:106
 msgid "Serbian Latin"
 msgstr "Sérvio Latino"
 
-#: conf/global_settings.py:104
+#: conf/global_settings.py:107
 msgid "Swedish"
 msgstr "Sueco"
 
-#: conf/global_settings.py:105
+#: conf/global_settings.py:108
+msgid "Swahili"
+msgstr ""
+
+#: conf/global_settings.py:109
 msgid "Tamil"
 msgstr "Tâmil"
 
-#: conf/global_settings.py:106
+#: conf/global_settings.py:110
 msgid "Telugu"
 msgstr "Telugu"
 
-#: conf/global_settings.py:107
+#: conf/global_settings.py:111
 msgid "Thai"
 msgstr "Tailandês"
 
-#: conf/global_settings.py:108
+#: conf/global_settings.py:112
 msgid "Turkish"
 msgstr "Turco"
 
-#: conf/global_settings.py:109
+#: conf/global_settings.py:113
+msgid "Tatar"
+msgstr ""
+
+#: conf/global_settings.py:114
 msgid "Ukrainian"
 msgstr "Ucraniano"
 
-#: conf/global_settings.py:110
+#: conf/global_settings.py:115
 msgid "Urdu"
 msgstr "Urdu"
 
-#: conf/global_settings.py:111
+#: conf/global_settings.py:116
 msgid "Vietnamese"
 msgstr "Vietnamita"
 
-#: conf/global_settings.py:112
+#: conf/global_settings.py:117
 msgid "Simplified Chinese"
 msgstr "Chinês Simplificado"
 
-#: conf/global_settings.py:113
+#: conf/global_settings.py:118
 msgid "Traditional Chinese"
 msgstr "Chinês Tradicional"
 
@@ -313,11 +333,11 @@ msgstr "Informe um endereço IPv4 válido."
 
 #: core/validators.py:175 core/validators.py:189
 msgid "Enter a valid IPv6 address."
-msgstr ""
+msgstr "Insira um endereço IPv6 válido."
 
 #: core/validators.py:184 core/validators.py:187
 msgid "Enter a valid IPv4 or IPv6 address."
-msgstr ""
+msgstr "Insira um endereço IPv4 ou IPv6 válido."
 
 #: core/validators.py:209 db/models/fields/__init__.py:638
 msgid "Enter only digits separated by commas."
@@ -395,12 +415,12 @@ msgstr "Inteiro"
 #: db/models/fields/__init__.py:510 db/models/fields/__init__.py:959
 #, python-format
 msgid "'%s' value must be an integer."
-msgstr ""
+msgstr "O valor de '%s' precisa ser um inteiro."
 
 #: db/models/fields/__init__.py:552
 #, python-format
 msgid "'%s' value must be either True or False."
-msgstr ""
+msgstr "O valor de '%s' deve ser True ou False."
 
 #: db/models/fields/__init__.py:554
 msgid "Boolean (Either True or False)"
@@ -419,12 +439,15 @@ msgstr "Inteiros separados por vírgula"
 #, python-format
 msgid "'%s' value has an invalid date format. It must be in YYYY-MM-DD format."
 msgstr ""
+"O valor de '%s' tem um formato de data inválido. A data deve estar no "
+"formato AAAA-MM-DD."
 
 #: db/models/fields/__init__.py:649 db/models/fields/__init__.py:734
 #, python-format
 msgid ""
 "'%s' value has the correct format (YYYY-MM-DD) but it is an invalid date."
 msgstr ""
+"O valor de '%s' tem o formato correto (AAAA-MM-DD), mas a data é inválida."
 
 #: db/models/fields/__init__.py:652
 msgid "Date (without time)"
@@ -436,6 +459,8 @@ msgid ""
 "'%s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
+"O valor de '%s' tem um formato inválido. O formato deve ser AAAA-MM-DD HH:MM"
+"[:ss[.uuuuuu]][TZ]."
 
 #: db/models/fields/__init__.py:736
 #, python-format
@@ -443,6 +468,8 @@ msgid ""
 "'%s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]) but "
 "it is an invalid date/time."
 msgstr ""
+"O valor de '%s' tem o formato correto (AAAA-MM-DD HH:MM[:ss[.uuuuuu]] [TZ]), "
+"mas é uma data/hora inválida."
 
 #: db/models/fields/__init__.py:740
 msgid "Date (with time)"
@@ -451,7 +478,7 @@ msgstr "Data e hora"
 #: db/models/fields/__init__.py:831
 #, python-format
 msgid "'%s' value must be a decimal number."
-msgstr ""
+msgstr "O valor de '%s' deve ser um número decimal."
 
 #: db/models/fields/__init__.py:833
 msgid "Decimal number"
@@ -468,7 +495,7 @@ msgstr "Caminho de arquivo"
 #: db/models/fields/__init__.py:930
 #, python-format
 msgid "'%s' value must be a float."
-msgstr ""
+msgstr "O valor de '%s' deve ser um float."
 
 #: db/models/fields/__init__.py:932
 msgid "Floating point number"
@@ -480,7 +507,7 @@ msgstr "Inteiro grande (8 byte)"
 
 #: db/models/fields/__init__.py:1007
 msgid "IPv4 address"
-msgstr ""
+msgstr "Endereço IPv4"
 
 #: db/models/fields/__init__.py:1023
 msgid "IP address"
@@ -489,7 +516,7 @@ msgstr "Endereço IP"
 #: db/models/fields/__init__.py:1065
 #, python-format
 msgid "'%s' value must be either None, True or False."
-msgstr ""
+msgstr "O valor de '%s' deve ser None, True ou False."
 
 #: db/models/fields/__init__.py:1067
 msgid "Boolean (Either True, False or None)"
@@ -497,20 +524,20 @@ msgstr "Booleano (Verdadeiro, Falso ou Nada)"
 
 #: db/models/fields/__init__.py:1116
 msgid "Positive integer"
-msgstr ""
+msgstr "Inteiro positivo"
 
 #: db/models/fields/__init__.py:1127
 msgid "Positive small integer"
-msgstr ""
+msgstr "Inteiro curto positivo"
 
 #: db/models/fields/__init__.py:1138
 #, python-format
 msgid "Slug (up to %(max_length)s)"
-msgstr ""
+msgstr "Slug (até %(max_length)s)"
 
 #: db/models/fields/__init__.py:1156
 msgid "Small integer"
-msgstr ""
+msgstr "Inteiro curto"
 
 #: db/models/fields/__init__.py:1162
 msgid "Text"
@@ -521,6 +548,8 @@ msgstr "Texto"
 msgid ""
 "'%s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] format."
 msgstr ""
+"O valor de '%s' tem um formato inválido. Deve estar no formato HH:MM[:ss[."
+"uuuuuu]]."
 
 #: db/models/fields/__init__.py:1182
 #, python-format
@@ -528,6 +557,8 @@ msgid ""
 "'%s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an invalid "
 "time."
 msgstr ""
+"O valor de '%s' tem o formato correto (HH:MM[:ss[.uuuuuu]]), Mas é um "
+"horário inválido."
 
 #: db/models/fields/__init__.py:1185
 msgid "Time"
@@ -539,11 +570,11 @@ msgstr "URL"
 
 #: db/models/fields/files.py:214
 msgid "File"
-msgstr ""
+msgstr "Arquivo"
 
 #: db/models/fields/files.py:321
 msgid "Image"
-msgstr ""
+msgstr "Imagem"
 
 #: db/models/fields/related.py:903
 #, python-format
@@ -708,6 +739,8 @@ msgid ""
 "%(datetime)s couldn't be interpreted in time zone %(current_timezone)s; it "
 "may be ambiguous or it may not exist."
 msgstr ""
+" %(datetime)s não pôde ser interpretado no fuso horário "
+"%(current_timezone)s; pode estar ambíguo ou pode não existir."
 
 #: forms/widgets.py:325
 msgid "Currently"
@@ -1069,7 +1102,7 @@ msgstr "Dezembro"
 #, python-format
 msgctxt "String to return when truncating text"
 msgid "%(truncated_text)s..."
-msgstr ""
+msgstr " %(truncated_text)s..."
 
 #: utils/text.py:234
 msgid "or"
@@ -1132,17 +1165,17 @@ msgstr ", %(number)d %(type)s"
 
 #: views/static.py:52
 msgid "Directory indexes are not allowed here."
-msgstr ""
+msgstr "Índices de diretório não são permitidos aqui."
 
 #: views/static.py:54
 #, python-format
 msgid "\"%(path)s\" does not exist"
-msgstr ""
+msgstr "\"%(path)s\" não existe"
 
 #: views/static.py:95
 #, python-format
 msgid "Index of %(directory)s"
-msgstr ""
+msgstr "Índice de %(directory)s "
 
 #: views/generic/create_update.py:121
 #, python-format
