@@ -1,5 +1,6 @@
 [main]
 host = https://www.transifex.net
+lang_map = sr@latin:sr_Latn
 
 [django.core]
 file_filter = django/conf/locale/<lang>/LC_MESSAGES/django.po
