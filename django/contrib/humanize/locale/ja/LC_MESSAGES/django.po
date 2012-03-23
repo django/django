@@ -2,14 +2,15 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011.
+# Jonas Obrist <me@ojii.ch>, 2012.
 # Shinya Okano <tokibito@gmail.com>, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-14 00:19-0700\n"
-"PO-Revision-Date: 2012-03-08 14:27+0000\n"
-"Last-Translator: Shinya Okano <tokibito@gmail.com>\n"
+"POT-Creation-Date: 2012-03-23 02:41+0100\n"
+"PO-Revision-Date: 2012-03-19 13:00+0000\n"
+"Last-Translator: Jonas Obrist <me@ojii.ch>\n"
 "Language-Team: Japanese (http://www.transifex.net/projects/p/django/language/"
 "ja/)\n"
 "Language: ja\n"
@@ -56,7 +57,7 @@ msgstr[0] "%(value).1f 百万"
 #, python-format
 msgid "%(value)s million"
 msgid_plural "%(value)s million"
-msgstr[0] ""
+msgstr[0] "%(value)s百万"
 
 #: templatetags/humanize.py:57
 #, python-format
@@ -68,7 +69,7 @@ msgstr[0] "%(value).1f 十億"
 #, python-format
 msgid "%(value)s billion"
 msgid_plural "%(value)s billion"
-msgstr[0] ""
+msgstr[0] "%(value)s十億"
 
 #: templatetags/humanize.py:61
 #, python-format

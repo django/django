@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-14 00:19-0700\n"
+"POT-Creation-Date: 2012-03-23 02:40+0100\n"
 "PO-Revision-Date: 2012-03-06 20:32+0000\n"
 "Last-Translator: Abraham Estrada <abraham.estrada@gmail.com>\n"
 "Language-Team: Spanish (Mexico) (http://www.transifex.net/projects/p/django/"
@@ -256,14 +256,14 @@ msgstr[1] "hace %(count)s segundos"
 #, python-format
 msgid "a minute ago"
 msgid_plural "%(count)s minutes ago"
-msgstr[0] "Hace %(count)s minuto"
+msgstr[0] "Hace un minuto"
 msgstr[1] "Hace %(count)s minutos"
 
 #: templatetags/humanize.py:201
 #, python-format
 msgid "an hour ago"
 msgid_plural "%(count)s hours ago"
-msgstr[0] "Hace %(count)s hora"
+msgstr[0] "Hace una hora"
 msgstr[1] "Hace %(count)s horas"
 
 #: templatetags/humanize.py:207

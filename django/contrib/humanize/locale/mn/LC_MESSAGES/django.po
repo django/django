@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-14 00:19-0700\n"
+"POT-Creation-Date: 2012-03-23 02:41+0100\n"
 "PO-Revision-Date: 2012-02-15 12:39+0000\n"
 "Last-Translator: Анхбаяр Анхаа <l.ankhbayar@gmail.com>\n"
 "Language-Team: Mongolian (http://www.transifex.net/projects/p/django/"
@@ -257,14 +257,14 @@ msgstr[1] "%(count)s секундын өмнө"
 #, python-format
 msgid "a minute ago"
 msgid_plural "%(count)s minutes ago"
-msgstr[0] "%(count)s минутын өмнө"
+msgstr[0] "минутын өмнө"
 msgstr[1] "%(count)s минутын өмнө"
 
 #: templatetags/humanize.py:201
 #, python-format
 msgid "an hour ago"
 msgid_plural "%(count)s hours ago"
-msgstr[0] "%(count)s цагын өмнө"
+msgstr[0] "цагын өмнө"
 msgstr[1] "%(count)s цагын өмнө"
 
 #: templatetags/humanize.py:207

@@ -1,15 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Attila Nagy <>, 2012.
 # Jannis Leidel <jannis@leidel.info>, 2011.
 # János Péter Ronkay <transifex@hangya.net>, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-14 00:19-0700\n"
-"PO-Revision-Date: 2012-03-06 11:23+0000\n"
-"Last-Translator: János Péter Ronkay <transifex@hangya.net>\n"
+"POT-Creation-Date: 2012-03-23 02:41+0100\n"
+"PO-Revision-Date: 2012-03-19 20:34+0000\n"
+"Last-Translator: istvanf <istvan.farkas@gmail.com>\n"
 "Language-Team: Hungarian (http://www.transifex.net/projects/p/django/"
 "language/hu/)\n"
 "Language: hu\n"
@@ -240,7 +241,7 @@ msgstr "kilenc"
 #, python-format
 msgctxt "naturaltime"
 msgid "%(delta)s ago"
-msgstr ""
+msgstr " %(delta)s ezelőtt"
 
 #: templatetags/humanize.py:188 templatetags/humanize.py:210
 msgid "now"
@@ -271,7 +272,7 @@ msgstr[1] "%(count)s órával ezelőtt"
 #, python-format
 msgctxt "naturaltime"
 msgid "%(delta)s from now"
-msgstr ""
+msgstr "%(delta)s mostantól"
 
 #: templatetags/humanize.py:213
 #, python-format
