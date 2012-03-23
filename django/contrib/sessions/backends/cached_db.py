@@ -24,10 +24,9 @@ class SessionStore(DBStore):
     def load(self):
         try:
             data = cache.get(self.cache_key, None)
-        except Exception, e:
-            e_type = str(type(e))
-            if e_type != "<class 'memcache.MemcachedKeyLengthError'>":
-                raise e
+        except Exception:
+            # Some backends (e.g. memcache) raise an exception on invalid
+            # cache keys. If this happens, reset the session. See #17810.
             data = None
         if data is None:
             data = super(SessionStore, self).load()
