@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-14 00:15-0700\n"
-"PO-Revision-Date: 2012-03-08 12:07+0000\n"
+"POT-Creation-Date: 2012-03-23 02:36+0100\n"
+"PO-Revision-Date: 2012-03-15 14:00+0000\n"
 "Last-Translator: Chandan kumar <chandankumar.093047@gmail.com>\n"
 "Language-Team: Hindi (http://www.transifex.net/projects/p/django/language/"
 "hi/)\n"
@@ -40,46 +40,49 @@ msgstr "शब्दकूट बदली कामयाब"
 msgid "Change password: %s"
 msgstr "शब्दकूट बदलें: %s"
 
-#: forms.py:58
+#: forms.py:62
 msgid "A user with that username already exists."
 msgstr "इस नाम के साथ प्रवोक्ता अस्तित्व है"
 
-#: forms.py:59 forms.py:247 forms.py:304
+#: forms.py:63 forms.py:251 forms.py:308
 msgid "The two password fields didn't match."
 msgstr "यह दो शब्दकूट क्षेत्रों का मेल नहीं होता "
 
-#: forms.py:61 forms.py:106 forms.py:135
+#: forms.py:65 forms.py:110 forms.py:139
 msgid "Username"
 msgstr "प्रवोक्ता नाम"
 
-#: forms.py:63 forms.py:107
+#: forms.py:67 forms.py:111
 msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr "जरूरी है | 30 या कम | केवल वर्णों, अक्षर, अंक और @/./+/-/_ |"
 
-#: forms.py:66 forms.py:110
+#: forms.py:70 forms.py:114
 msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
 msgstr "यह मूल्य केवल अक्षर, संख्या और @/./+/-/_ हो सकते हैं |"
 
-#: forms.py:68 forms.py:112 forms.py:136 forms.py:306
+#: forms.py:72 forms.py:116 forms.py:140 forms.py:310
 msgid "Password"
 msgstr "कूटशब्द"
 
-#: forms.py:70
+#: forms.py:74
 msgid "Password confirmation"
 msgstr "कूटशब्द पुष्टि"
 
-#: forms.py:72
+#: forms.py:76
 msgid "Enter the same password as above, for verification."
 msgstr "सत्याप्ती के लिए ऊपर दर्ज किए शब्दकूट को फिर से प्रवेश करें"
 
-#: forms.py:113
+#: forms.py:117
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
 "password, but you can change the password using <a href=\"password/\">this "
 "form</a>."
 msgstr ""
+"अधूरे कूटशब्द का संग्रह नहीं होता है, तो वहाँ इस उपयोगकर्ता के कूटशब्द को देखने के लिए कोई "
+"तरीका नहीं है, लेकिन आप <a href=\"password/\"> इस प्रपत्र</a> का उपयोग करते हुए "
+"कूटशब्द बदल सकते हैं."
 
-#: forms.py:139
+#: forms.py:143
 msgid ""
 "Please enter a correct username and password. Note that both fields are case-"
 "sensitive."
@@ -87,18 +90,18 @@ msgstr ""
 "एक सही उपयोगकर्ता नाम और  कूटशब्द दर्ज करें. कृपया ध्यान दें कि दोनों क्षेत्र मामले के प्रति "
 "संवेदनशील होते हैं."
 
-#: forms.py:141
+#: forms.py:145
 msgid ""
 "Your Web browser doesn't appear to have cookies enabled. Cookies are "
 "required for logging in."
 msgstr ""
 "ऐसा लग रहा हैं की आप के वेब-ब्राउज़र में कुकीज़ सक्षम नहीं हैं | प्रवेश हेतु कुकीज़ आवश्यक हैं |"
 
-#: forms.py:143
+#: forms.py:147
 msgid "This account is inactive."
 msgstr "यस खाता सुस्त है"
 
-#: forms.py:187
+#: forms.py:191
 msgid ""
 "That e-mail address doesn't have an associated user account. Are you sure "
 "you've registered?"
@@ -106,60 +109,60 @@ msgstr ""
 "उस इ-मेल पते से जुड़ा कोई उपयोगकर्ता खता नहीं हैं | क्या आप को यकीन हैं की आप  ने पंजीकरण "
 "किया हैं?"
 
-#: forms.py:189
+#: forms.py:193
 msgid ""
 "The user account associated with this e-mail address cannot reset the "
 "password."
 msgstr "इस ई - मेल पते के साथ जुड़े उपयोगकर्ता खाता पासवर्ड को रीसेट नहीं कर सकते है."
 
-#: forms.py:192
+#: forms.py:196
 msgid "E-mail"
 msgstr "ईमेल"
 
-#: forms.py:249
+#: forms.py:253
 msgid "New password"
 msgstr "नया शब्दकूट"
 
-#: forms.py:251
+#: forms.py:255
 msgid "New password confirmation"
 msgstr "नया शब्दकूट पुष्टि"
 
-#: forms.py:280
+#: forms.py:284
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr "आपने पुराना शब्दकूट गलत दर्ज किया है । कृपया फिर से दर्ज करें"
 
-#: forms.py:283
+#: forms.py:287
 msgid "Old password"
 msgstr "पुराना शब्दकूट"
 
-#: forms.py:308
+#: forms.py:312
 msgid "Password (again)"
 msgstr "शब्दकूट (दुबारा)"
 
 #: hashers.py:218 hashers.py:269 hashers.py:298 hashers.py:326 hashers.py:355
 #: hashers.py:389
 msgid "algorithm"
-msgstr ""
+msgstr "अलगोरिथम"
 
 #: hashers.py:219
 msgid "iterations"
-msgstr ""
+msgstr "पुनरूक्तियाँ"
 
 #: hashers.py:220 hashers.py:271 hashers.py:299 hashers.py:327 hashers.py:390
 msgid "salt"
-msgstr ""
+msgstr "साल्ट"
 
 #: hashers.py:221 hashers.py:300 hashers.py:328 hashers.py:356 hashers.py:391
 msgid "hash"
-msgstr ""
+msgstr "हैश"
 
 #: hashers.py:270
 msgid "work factor"
-msgstr ""
+msgstr "कार्य फ़ैक्टर"
 
 #: hashers.py:272
 msgid "checksum"
-msgstr ""
+msgstr "चेकसम"
 
 #: models.py:66 models.py:113
 msgid "name"
@@ -255,6 +258,8 @@ msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
 "each of his/her group."
 msgstr ""
+"समूह के अंतर्गत यह उपयोगकर्ता आता है. उपयोगकर्ता उसकी / उसके समूह के प्रत्येक के लिए दी गई "
+"अनुमति प्राप्त होगा."
 
 #: models.py:255
 msgid "user permissions"

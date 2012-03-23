@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-14 00:15-0700\n"
+"POT-Creation-Date: 2012-03-23 02:37+0100\n"
 "PO-Revision-Date: 2012-03-09 04:27+0000\n"
 "Last-Translator: Kowit Charoenratchatabhan <kowito@gmail.com>\n"
 "Language-Team: Thai (http://www.transifex.net/projects/p/django/language/"
@@ -39,40 +39,40 @@ msgstr "เปลี่ยนรหัสผ่านสำเร็จแล้
 msgid "Change password: %s"
 msgstr "เปลี่ยนรหัสผ่าน: %s "
 
-#: forms.py:58
+#: forms.py:62
 msgid "A user with that username already exists."
 msgstr "ชื่อผู้ใช้นั้นได้ถูกใช้ไปแล้ว"
 
-#: forms.py:59 forms.py:247 forms.py:304
+#: forms.py:63 forms.py:251 forms.py:308
 msgid "The two password fields didn't match."
 msgstr "รหัสผ่านไม่ตรงกัน"
 
-#: forms.py:61 forms.py:106 forms.py:135
+#: forms.py:65 forms.py:110 forms.py:139
 msgid "Username"
 msgstr "ชื่อผู้ใช้"
 
-#: forms.py:63 forms.py:107
+#: forms.py:67 forms.py:111
 msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
 "จำเป็น ต้องการไม่เกิน 30 ตัวอักษร ต้องเป็นตัวอักษรตัวเลขและเครื่องหมาย @/./+/-/_ เท่านั้น"
 
-#: forms.py:66 forms.py:110
+#: forms.py:70 forms.py:114
 msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
 msgstr "ค่านี้ต้องเป็นตัวอักษรตัวเลขและเครื่องหมาย @/./+/-/_ เท่านั้น"
 
-#: forms.py:68 forms.py:112 forms.py:136 forms.py:306
+#: forms.py:72 forms.py:116 forms.py:140 forms.py:310
 msgid "Password"
 msgstr "รหัสผ่าน"
 
-#: forms.py:70
+#: forms.py:74
 msgid "Password confirmation"
 msgstr "ยืนยันรหัสผ่าน"
 
-#: forms.py:72
+#: forms.py:76
 msgid "Enter the same password as above, for verification."
 msgstr "ใส่รหัสผ่านเหมือนด้านบน เพื่อตรวจสอบความถูกต้อง"
 
-#: forms.py:113
+#: forms.py:117
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
 "password, but you can change the password using <a href=\"password/\">this "
@@ -81,55 +81,55 @@ msgstr ""
 "รหัสผ่านที่ดิบจะไม่เก็บไว้ เพื่อไม่ให้มีวิธีการดูรหัสผ่านของผู้ใช้นี้ แต่คุณสามารถเปลี่ยนรหัสผ่านโดยใช้ <a "
 "href=\"password/\">แบบฟอร์มนี้</a> ."
 
-#: forms.py:139
+#: forms.py:143
 msgid ""
 "Please enter a correct username and password. Note that both fields are case-"
 "sensitive."
 msgstr "กรุณาใส่ชื่อผู้ใช้และรหัสผ่านให้ถูกต้อง มีการแยกแยะตัวพิมพ์ใหญ่-เล็ก"
 
-#: forms.py:141
+#: forms.py:145
 msgid ""
 "Your Web browser doesn't appear to have cookies enabled. Cookies are "
 "required for logging in."
 msgstr "เว็บเบราเซอร์ของคุณไม่สามารถใช้งานระบบคุกกี้ได้ จำเป็นต้องใช้ระบบคุกกี้ในการเข้าสู่ระบบ"
 
-#: forms.py:143
+#: forms.py:147
 msgid "This account is inactive."
 msgstr "บัญชีนี้ไม่ทำงาน"
 
-#: forms.py:187
+#: forms.py:191
 msgid ""
 "That e-mail address doesn't have an associated user account. Are you sure "
 "you've registered?"
 msgstr "อีเมลนี้ไม่ตรงกับบัญชีใดๆในระบบ คุณแน่ใจหรือว่าคุณได้ลงทะเบียนแล้ว"
 
-#: forms.py:189
+#: forms.py:193
 msgid ""
 "The user account associated with this e-mail address cannot reset the "
 "password."
 msgstr "บัญชีผู้ใช้ที่เกี่ยวข้องกับที่อยู่อีเมล์นี้ไม่สามารถตั้งค่ารหัสผ่าน"
 
-#: forms.py:192
+#: forms.py:196
 msgid "E-mail"
 msgstr "อีเมล"
 
-#: forms.py:249
+#: forms.py:253
 msgid "New password"
 msgstr "รหัสผ่านใหม่"
 
-#: forms.py:251
+#: forms.py:255
 msgid "New password confirmation"
 msgstr "ยืนยันการตั้งรหัสผ่านใหม่"
 
-#: forms.py:280
+#: forms.py:284
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr "ใส่รหัสผ่านเก่าผิด กรุณาใส่รหัสผ่านอีกครั้ง"
 
-#: forms.py:283
+#: forms.py:287
 msgid "Old password"
 msgstr "รหัสผ่านเก่า"
 
-#: forms.py:308
+#: forms.py:312
 msgid "Password (again)"
 msgstr "รหัสผ่าน (อีกครั้ง)"
 

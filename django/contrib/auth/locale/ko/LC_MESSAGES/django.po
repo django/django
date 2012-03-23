@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-14 00:15-0700\n"
+"POT-Creation-Date: 2012-03-23 02:36+0100\n"
 "PO-Revision-Date: 2012-03-08 12:07+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Korean (http://www.transifex.net/projects/p/django/language/"
@@ -38,53 +38,53 @@ msgstr "비밀번호가 변경되었습니다."
 msgid "Change password: %s"
 msgstr "비밀번호 변경: %s"
 
-#: forms.py:58
+#: forms.py:62
 msgid "A user with that username already exists."
 msgstr "해당 사용자명은 이미 존재합니다."
 
-#: forms.py:59 forms.py:247 forms.py:304
+#: forms.py:63 forms.py:251 forms.py:308
 msgid "The two password fields didn't match."
 msgstr "비밀번호가 일치하지 않습니다."
 
-#: forms.py:61 forms.py:106 forms.py:135
+#: forms.py:65 forms.py:110 forms.py:139
 msgid "Username"
 msgstr "사용자명"
 
-#: forms.py:63 forms.py:107
+#: forms.py:67 forms.py:111
 msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
 "필수항목입니다. 30자 이내로 입력하세요. (알파벳, 숫자, @/./+/-/_만 가능)"
 
-#: forms.py:66 forms.py:110
+#: forms.py:70 forms.py:114
 msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
 msgstr "알파벳, 숫자 및 @/./+/-/_만 가능합니다."
 
-#: forms.py:68 forms.py:112 forms.py:136 forms.py:306
+#: forms.py:72 forms.py:116 forms.py:140 forms.py:310
 msgid "Password"
 msgstr "비밀번호"
 
-#: forms.py:70
+#: forms.py:74
 msgid "Password confirmation"
 msgstr "비밀번호 확인"
 
-#: forms.py:72
+#: forms.py:76
 msgid "Enter the same password as above, for verification."
 msgstr "확인을 위해 위와 동일한 비밀번호를 입력하세요. "
 
-#: forms.py:113
+#: forms.py:117
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
 "password, but you can change the password using <a href=\"password/\">this "
 "form</a>."
 msgstr ""
 
-#: forms.py:139
+#: forms.py:143
 msgid ""
 "Please enter a correct username and password. Note that both fields are case-"
 "sensitive."
 msgstr "사용자명과 비밀번호를 입력하세요. (대소문자 구별)"
 
-#: forms.py:141
+#: forms.py:145
 msgid ""
 "Your Web browser doesn't appear to have cookies enabled. Cookies are "
 "required for logging in."
@@ -92,44 +92,44 @@ msgstr ""
 "사용하시는 브라우저가 쿠키를 허용하지 않습니다.로그인하기 위해서는 쿠키 사용"
 "이 필요합니다."
 
-#: forms.py:143
+#: forms.py:147
 msgid "This account is inactive."
 msgstr "이 계정은 유효하지 않습니다."
 
-#: forms.py:187
+#: forms.py:191
 msgid ""
 "That e-mail address doesn't have an associated user account. Are you sure "
 "you've registered?"
 msgstr ""
 "이메일주소와 일치하는 사용자가 없습니다.이 이메일주소로 등록하셨습니까?"
 
-#: forms.py:189
+#: forms.py:193
 msgid ""
 "The user account associated with this e-mail address cannot reset the "
 "password."
 msgstr ""
 
-#: forms.py:192
+#: forms.py:196
 msgid "E-mail"
 msgstr "이메일 주소"
 
-#: forms.py:249
+#: forms.py:253
 msgid "New password"
 msgstr "새 비밀번호:"
 
-#: forms.py:251
+#: forms.py:255
 msgid "New password confirmation"
 msgstr "새 비밀번호 확인:"
 
-#: forms.py:280
+#: forms.py:284
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr "기존 비밀번호를 잘못 입력하셨습니다. 다시 입력해 주세요."
 
-#: forms.py:283
+#: forms.py:287
 msgid "Old password"
 msgstr "기존 비밀번호:"
 
-#: forms.py:308
+#: forms.py:312
 msgid "Password (again)"
 msgstr "비밀번호 (확인)"
 

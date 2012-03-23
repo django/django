@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-14 00:15-0700\n"
+"POT-Creation-Date: 2012-03-23 02:37+0100\n"
 "PO-Revision-Date: 2012-03-11 16:52+0000\n"
 "Last-Translator: Sergey Lysach <sergikoff88@gmail.com>\n"
 "Language-Team: Ukrainian (http://www.transifex.net/projects/p/django/"
@@ -40,43 +40,43 @@ msgstr "Пароль успішно змінено."
 msgid "Change password: %s"
 msgstr "Змінити пароль: %s"
 
-#: forms.py:58
+#: forms.py:62
 msgid "A user with that username already exists."
 msgstr "Користувач з таким ім'ям вже існує."
 
-#: forms.py:59 forms.py:247 forms.py:304
+#: forms.py:63 forms.py:251 forms.py:308
 msgid "The two password fields didn't match."
 msgstr "Паролі у двох полях не співпадають."
 
-#: forms.py:61 forms.py:106 forms.py:135
+#: forms.py:65 forms.py:110 forms.py:139
 msgid "Username"
 msgstr "Користувач"
 
-#: forms.py:63 forms.py:107
+#: forms.py:67 forms.py:111
 msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
 "Обов'язкове поле. 30 або менше символів . Тільки букви, цифри, а також "
 "символи: @/./+/-/_"
 
-#: forms.py:66 forms.py:110
+#: forms.py:70 forms.py:114
 msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
 msgstr ""
 "Значення цього поля може складатися лише з літер, цифр, а також з символів: "
 "@/./+/-/_"
 
-#: forms.py:68 forms.py:112 forms.py:136 forms.py:306
+#: forms.py:72 forms.py:116 forms.py:140 forms.py:310
 msgid "Password"
 msgstr "Пароль"
 
-#: forms.py:70
+#: forms.py:74
 msgid "Password confirmation"
 msgstr "Підтвердження паролю"
 
-#: forms.py:72
+#: forms.py:76
 msgid "Enter the same password as above, for verification."
 msgstr "Повторіть пароль для перевірки."
 
-#: forms.py:113
+#: forms.py:117
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
 "password, but you can change the password using <a href=\"password/\">this "
@@ -86,7 +86,7 @@ msgstr ""
 "переглянути пароль цього користувача, але ви можете змінити пароль за "
 "допомогою <a href=\"password/\">цієї форми</a>."
 
-#: forms.py:139
+#: forms.py:143
 msgid ""
 "Please enter a correct username and password. Note that both fields are case-"
 "sensitive."
@@ -94,7 +94,7 @@ msgstr ""
 "Будь-ласка введіть правильне ім'я та пароль. Зауважте, що обидва поля "
 "розрізняють великі і маленькі літери."
 
-#: forms.py:141
+#: forms.py:145
 msgid ""
 "Your Web browser doesn't appear to have cookies enabled. Cookies are "
 "required for logging in."
@@ -102,11 +102,11 @@ msgstr ""
 "Схоже, що у вашому браузері на увімкнені cookies. Cookies необхідні для "
 "входу."
 
-#: forms.py:143
+#: forms.py:147
 msgid "This account is inactive."
 msgstr "Цей запис користувача не активний."
 
-#: forms.py:187
+#: forms.py:191
 msgid ""
 "That e-mail address doesn't have an associated user account. Are you sure "
 "you've registered?"
@@ -114,7 +114,7 @@ msgstr ""
 "Ця e-mail адреса не пов'язана з користувацьким запитом. Ви впевнені, що ви "
 "реєструвалися?"
 
-#: forms.py:189
+#: forms.py:193
 msgid ""
 "The user account associated with this e-mail address cannot reset the "
 "password."
@@ -122,28 +122,28 @@ msgstr ""
 "Акаунт користувача, пов'язаний з цією адресою електронної пошти не може "
 "скидувати пароль."
 
-#: forms.py:192
+#: forms.py:196
 msgid "E-mail"
 msgstr "E-mail"
 
-#: forms.py:249
+#: forms.py:253
 msgid "New password"
 msgstr "Новий пароль"
 
-#: forms.py:251
+#: forms.py:255
 msgid "New password confirmation"
 msgstr "Новий пароль (підтвердження):"
 
-#: forms.py:280
+#: forms.py:284
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr ""
 "Старий пароль було введено неправильно. Будь ласка, введіть його знову."
 
-#: forms.py:283
+#: forms.py:287
 msgid "Old password"
 msgstr "Старий пароль"
 
-#: forms.py:308
+#: forms.py:312
 msgid "Password (again)"
 msgstr "Зміна пароля"
 

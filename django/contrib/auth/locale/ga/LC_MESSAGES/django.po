@@ -2,13 +2,14 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011.
+# Michael Thornhill <michael@maithu.com>, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-14 00:14-0700\n"
-"PO-Revision-Date: 2012-03-08 12:07+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2012-03-23 02:36+0100\n"
+"PO-Revision-Date: 2012-03-16 12:17+0000\n"
+"Last-Translator: Michael Thornhill <michael@maithu.com>\n"
 "Language-Team: Irish (http://www.transifex.net/projects/p/django/language/"
 "ga/)\n"
 "Language: ga\n"
@@ -39,50 +40,53 @@ msgstr "Focal faire aithraithe rathúil"
 msgid "Change password: %s"
 msgstr "Athraigh focal faire: %s"
 
-#: forms.py:58
+#: forms.py:62
 msgid "A user with that username already exists."
 msgstr "In ann do úsáideoir leis an ainm úsáideora."
 
-#: forms.py:59 forms.py:247 forms.py:304
+#: forms.py:63 forms.py:251 forms.py:308
 msgid "The two password fields didn't match."
 msgstr "Níl an dá focla faire comhoiriúnigh"
 
-#: forms.py:61 forms.py:106 forms.py:135
+#: forms.py:65 forms.py:110 forms.py:139
 msgid "Username"
 msgstr "Ainm úsaideoir"
 
-#: forms.py:63 forms.py:107
+#: forms.py:67 forms.py:111
 msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
 "Riachtanach. 30 carachtair nó níos lú. Litreacha, digite agus @/./+/-/_ "
 "amháin."
 
-#: forms.py:66 forms.py:110
+#: forms.py:70 forms.py:114
 msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
 msgstr ""
 "Cathaigh litreacha, digite agus na carachtair @/./+/-/_ amhain le hadhaigh "
 "an méid seo."
 
-#: forms.py:68 forms.py:112 forms.py:136 forms.py:306
+#: forms.py:72 forms.py:116 forms.py:140 forms.py:310
 msgid "Password"
 msgstr "Focal faire"
 
-#: forms.py:70
+#: forms.py:74
 msgid "Password confirmation"
 msgstr "Focal faire deimhniú"
 
-#: forms.py:72
+#: forms.py:76
 msgid "Enter the same password as above, for verification."
 msgstr "Iontráíl an focal faire céanna mar thuas, le fíorúchán."
 
-#: forms.py:113
+#: forms.py:117
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
 "password, but you can change the password using <a href=\"password/\">this "
 "form</a>."
 msgstr ""
+"Níl focail fairí amh stóráilailte, agus mar sin níl aon bhealach focal faire "
+"an úsaideora a fheiceáil, ach is féidir leat athrú ar an focal faire leis <a "
+"href=\"password/\">an bhfoirm seo</a>."
 
-#: forms.py:139
+#: forms.py:143
 msgid ""
 "Please enter a correct username and password. Note that both fields are case-"
 "sensitive."
@@ -90,7 +94,7 @@ msgstr ""
 "Le do thoil, iontráil aihm úsaideora agus focal faire ceart. Bí cúramach go "
 "bhfuil an beirt acu cásíogair."
 
-#: forms.py:141
+#: forms.py:145
 msgid ""
 "Your Web browser doesn't appear to have cookies enabled. Cookies are "
 "required for logging in."
@@ -98,11 +102,11 @@ msgstr ""
 "Feictear nach bhfuil do brabhsálaí réidh le cuaiche a glacadh. Tá cuaiche ag "
 "teastail le logáil isteach."
 
-#: forms.py:143
+#: forms.py:147
 msgid "This account is inactive."
 msgstr "Tá an cuntas seo neamhghníomhach."
 
-#: forms.py:187
+#: forms.py:191
 msgid ""
 "That e-mail address doesn't have an associated user account. Are you sure "
 "you've registered?"
@@ -110,61 +114,63 @@ msgstr ""
 "Níl cuntas in éineacht leis an r-phost sin. An bhfuil tú cinnte go bhfuil tú "
 "cláraithe?"
 
-#: forms.py:189
+#: forms.py:193
 msgid ""
 "The user account associated with this e-mail address cannot reset the "
 "password."
 msgstr ""
+"Ní féidir leis an cuntas úsáideora a bhaineann leis an seoladh r-phoist a "
+"athshocrú an focal faire."
 
-#: forms.py:192
+#: forms.py:196
 msgid "E-mail"
 msgstr "R-phost"
 
-#: forms.py:249
+#: forms.py:253
 msgid "New password"
 msgstr "Focal faire nua"
 
-#: forms.py:251
+#: forms.py:255
 msgid "New password confirmation"
 msgstr "Deimnhiú focal faire nua"
 
-#: forms.py:280
+#: forms.py:284
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr ""
 "Cuireadh do sean-focal faire isteach go mícheart. Iontráil isteach é arís."
 
-#: forms.py:283
+#: forms.py:287
 msgid "Old password"
 msgstr "Sean-focal faire "
 
-#: forms.py:308
+#: forms.py:312
 msgid "Password (again)"
 msgstr "Focal faire (arís)"
 
 #: hashers.py:218 hashers.py:269 hashers.py:298 hashers.py:326 hashers.py:355
 #: hashers.py:389
 msgid "algorithm"
-msgstr ""
+msgstr "algartam"
 
 #: hashers.py:219
 msgid "iterations"
-msgstr ""
+msgstr "atriallta"
 
 #: hashers.py:220 hashers.py:271 hashers.py:299 hashers.py:327 hashers.py:390
 msgid "salt"
-msgstr ""
+msgstr "salann"
 
 #: hashers.py:221 hashers.py:300 hashers.py:328 hashers.py:356 hashers.py:391
 msgid "hash"
-msgstr ""
+msgstr "haiseáil"
 
 #: hashers.py:270
 msgid "work factor"
-msgstr ""
+msgstr "fachtóir oibre"
 
 #: hashers.py:272
 msgid "checksum"
-msgstr ""
+msgstr "suim sheiceála"
 
 #: models.py:66 models.py:113
 msgid "name"
@@ -264,6 +270,8 @@ msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
 "each of his/her group."
 msgstr ""
+"Na grúpaí a mbaineann leis an úsáideoir seo. Gheobhaidh úsáideor na ceadanna "
+"a deonaíodh do gach ceann den a  grúpa."
 
 #: models.py:255
 msgid "user permissions"
@@ -288,4 +296,4 @@ msgstr "Cuir isteach seoladh ríomhphoist bhailí."
 #: templates/registration/password_reset_subject.txt:2
 #, python-format
 msgid "Password reset on %(site_name)s"
-msgstr ""
+msgstr "Athshocraigh focal faire ar %(site_name)s"

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-14 00:15-0700\n"
+"POT-Creation-Date: 2012-03-23 02:36+0100\n"
 "PO-Revision-Date: 2012-03-08 12:07+0000\n"
 "Last-Translator: Daniel Ursache-Dogariu <contact@danniel.net>\n"
 "Language-Team: Romanian (http://www.transifex.net/projects/p/django/language/"
@@ -41,48 +41,48 @@ msgstr "Parolă schimbată cu succes."
 msgid "Change password: %s"
 msgstr "Schimbă parola: %s"
 
-#: forms.py:58
+#: forms.py:62
 msgid "A user with that username already exists."
 msgstr "Un utilizator cu acest nume de utilizator există deja."
 
-#: forms.py:59 forms.py:247 forms.py:304
+#: forms.py:63 forms.py:251 forms.py:308
 msgid "The two password fields didn't match."
 msgstr "Cele două câmpuri pentru parole nu coincid."
 
-#: forms.py:61 forms.py:106 forms.py:135
+#: forms.py:65 forms.py:110 forms.py:139
 msgid "Username"
 msgstr "Nume utilizator"
 
-#: forms.py:63 forms.py:107
+#: forms.py:67 forms.py:111
 msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
 "Obligatoriu. 30 de caractere sau mai puține. Numai litere, cifre și @/./+/-/"
 "_."
 
-#: forms.py:66 forms.py:110
+#: forms.py:70 forms.py:114
 msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
 msgstr "Această valoare poate conține numai litere, cifre şi @/./+/-/_."
 
-#: forms.py:68 forms.py:112 forms.py:136 forms.py:306
+#: forms.py:72 forms.py:116 forms.py:140 forms.py:310
 msgid "Password"
 msgstr "Parolă"
 
-#: forms.py:70
+#: forms.py:74
 msgid "Password confirmation"
 msgstr "Confirmare parolă"
 
-#: forms.py:72
+#: forms.py:76
 msgid "Enter the same password as above, for verification."
 msgstr "Introduceți aceeași parolă, pentru verificare."
 
-#: forms.py:113
+#: forms.py:117
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
 "password, but you can change the password using <a href=\"password/\">this "
 "form</a>."
 msgstr ""
 
-#: forms.py:139
+#: forms.py:143
 msgid ""
 "Please enter a correct username and password. Note that both fields are case-"
 "sensitive."
@@ -90,7 +90,7 @@ msgstr ""
 "Introduceți un nume de utilizator și o parolă corectă. Ambele câmpuri sunt "
 "sensibile la majuscule."
 
-#: forms.py:141
+#: forms.py:145
 msgid ""
 "Your Web browser doesn't appear to have cookies enabled. Cookies are "
 "required for logging in."
@@ -98,11 +98,11 @@ msgstr ""
 "Navigatorul dumneavoastră nu pare să aibă activat suportul pentru cookies. "
 "Acesta este necesar pentru autentificare."
 
-#: forms.py:143
+#: forms.py:147
 msgid "This account is inactive."
 msgstr "Acest cont este inactiv."
 
-#: forms.py:187
+#: forms.py:191
 msgid ""
 "That e-mail address doesn't have an associated user account. Are you sure "
 "you've registered?"
@@ -110,33 +110,33 @@ msgstr ""
 "Adresa de e-mail nu are asociat un cont de utilizator. Sigur v-ați "
 "înregistrat?"
 
-#: forms.py:189
+#: forms.py:193
 msgid ""
 "The user account associated with this e-mail address cannot reset the "
 "password."
 msgstr ""
 
-#: forms.py:192
+#: forms.py:196
 msgid "E-mail"
 msgstr "E-mail"
 
-#: forms.py:249
+#: forms.py:253
 msgid "New password"
 msgstr "Parolă nouă"
 
-#: forms.py:251
+#: forms.py:255
 msgid "New password confirmation"
 msgstr "Confirmarea parolă nouă"
 
-#: forms.py:280
+#: forms.py:284
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr "Parola veche a fost introdusă greșit. Introduceți-o din nou."
 
-#: forms.py:283
+#: forms.py:287
 msgid "Old password"
 msgstr "Parolă veche"
 
-#: forms.py:308
+#: forms.py:312
 msgid "Password (again)"
 msgstr "Parolă (din nou)"
 

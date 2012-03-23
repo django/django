@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-14 00:15-0700\n"
+"POT-Creation-Date: 2012-03-23 02:36+0100\n"
 "PO-Revision-Date: 2012-03-08 12:07+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Malayalam (http://www.transifex.net/projects/p/django/"
@@ -38,48 +38,48 @@ msgstr "പാസ് വേര്‍ഡ് മാറ്റിയിരിക്�
 msgid "Change password: %s"
 msgstr "പാസ് വേര്‍ഡ് മാറ്റുക: %s"
 
-#: forms.py:58
+#: forms.py:62
 msgid "A user with that username already exists."
 msgstr "ആ പേരുള്ള ഒരു ഉപയോക്താവ് നിലവിലുണ്ട്."
 
-#: forms.py:59 forms.py:247 forms.py:304
+#: forms.py:63 forms.py:251 forms.py:308
 msgid "The two password fields didn't match."
 msgstr "പാസ് വേര്‍ഡ് നല്കിയ കള്ളികള്‍ രണ്ടും തമ്മില്‍ സാമ്യമില്ല."
 
-#: forms.py:61 forms.py:106 forms.py:135
+#: forms.py:65 forms.py:110 forms.py:139
 msgid "Username"
 msgstr "യൂസര്‍ നാമം (ഉപയോക്ത്രു നാമം)"
 
-#: forms.py:63 forms.py:107
+#: forms.py:67 forms.py:111
 msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
 "നിര്‍ബന്ധം. 30 ഓ അതില്‍ കുറവോ ചിഹ്നങ്ങള്‍. അക്ഷരങ്ങള്‍, അക്കങ്ങള്‍, പിന്നെ @/./+/-/_എന്നിവയും "
 "മാത്രം."
 
-#: forms.py:66 forms.py:110
+#: forms.py:70 forms.py:114
 msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
 msgstr "അക്ഷരങ്ങള്‍, അക്കങ്ങള്‍, പിന്നെ @/./+/-/_എന്നിവയും മാത്രം."
 
-#: forms.py:68 forms.py:112 forms.py:136 forms.py:306
+#: forms.py:72 forms.py:116 forms.py:140 forms.py:310
 msgid "Password"
 msgstr "പാസ് വേര്‍ഡ്"
 
-#: forms.py:70
+#: forms.py:74
 msgid "Password confirmation"
 msgstr "പാസ് വേര്‍ഡ് ഉറപ്പാക്കല്‍"
 
-#: forms.py:72
+#: forms.py:76
 msgid "Enter the same password as above, for verification."
 msgstr "പാസ് വേര്‍ഡ് മുകളിലെ പോലെ തന്നെ നല്കുക. (ഉറപ്പു വരുത്താനാണ്.)"
 
-#: forms.py:113
+#: forms.py:117
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
 "password, but you can change the password using <a href=\"password/\">this "
 "form</a>."
 msgstr ""
 
-#: forms.py:139
+#: forms.py:143
 msgid ""
 "Please enter a correct username and password. Note that both fields are case-"
 "sensitive."
@@ -87,51 +87,51 @@ msgstr ""
 "ദയവായി ശരിയായ യൂസര്‍നാമവും പാസ്വേര്ഡും നല്കുക. ഇംഗ്ളീഷ് അക്ഷരങ്ങള്‍ വല്യക്ഷരമാണോ അല്ലയോ എന്നത് "
 "ശ്രദ്ധിക്കണം"
 
-#: forms.py:141
+#: forms.py:145
 msgid ""
 "Your Web browser doesn't appear to have cookies enabled. Cookies are "
 "required for logging in."
 msgstr ""
 "നിങ്ങളുടെ വെബ്-ബ്രൗസറിലെ കുക്കീസൊന്നും പ്രവര്‍ത്തിക്കുന്നില്ല. ഇതിലേക്ക് പ്രവേശിക്കാന്‍ അവ ആവശ്യമാണ്."
 
-#: forms.py:143
+#: forms.py:147
 msgid "This account is inactive."
 msgstr "ഈ അക്കൗണ്ട് മരവിപ്പിച്ചതാണ്."
 
-#: forms.py:187
+#: forms.py:191
 msgid ""
 "That e-mail address doesn't have an associated user account. Are you sure "
 "you've registered?"
 msgstr ""
 "ആ ഇ-മെയിലുമായി ബന്ധപ്പെട്ട യൂസര് അക്കൗണ്ടൊന്നും നിലവിലില്ല. രജിസ്റ്റര്‍ ചെയ്തെന്നു തീര്‍ച്ചയാണോ?"
 
-#: forms.py:189
+#: forms.py:193
 msgid ""
 "The user account associated with this e-mail address cannot reset the "
 "password."
 msgstr ""
 
-#: forms.py:192
+#: forms.py:196
 msgid "E-mail"
 msgstr "ഇ-മെയില്‍"
 
-#: forms.py:249
+#: forms.py:253
 msgid "New password"
 msgstr "പുതിയ പാസ് വേര്‍ഡ്"
 
-#: forms.py:251
+#: forms.py:255
 msgid "New password confirmation"
 msgstr "പുതിയ പാസ് വേര്‍ഡ് ഉറപ്പാക്കല്‍"
 
-#: forms.py:280
+#: forms.py:284
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr "നിങ്ങളുടെ പഴയ പാസ് വേര്‍ഡ് തെറ്റായാണ് നല്കിയത്. തിരുത്തുക."
 
-#: forms.py:283
+#: forms.py:287
 msgid "Old password"
 msgstr "പഴയ പാസ് വേര്‍ഡ്"
 
-#: forms.py:308
+#: forms.py:312
 msgid "Password (again)"
 msgstr "പാസ് വേര്‍ഡ് (വീണ്ടും)"
 
