@@ -34,7 +34,7 @@ out the :ref:`timezone migration guide <time-zones-migration-guide>` and the
 Other notable new features in Django 1.4 include:
 
 * A number of ORM improvements, including `SELECT FOR UPDATE support`_,
-  the ability to `bulk insert <Model.objects.bulk_create in the ORM>`_
+  the ability to `bulk insert <#model-objects-bulk-create-in-the-orm>`_
   large datasets for improved performance, and
   `QuerySet.prefetch_related`_, a method to batch-load related objects
   in areas where :meth:`~django.db.models.QuerySet.select_related` does't
@@ -51,7 +51,7 @@ Other notable new features in Django 1.4 include:
 
 * `Support for in-browser testing frameworks`_ (like Selenium_).
 
-* ... and a whole lot more; `see below <what's new in django 1.4>`_!
+* ... and a whole lot more; `see below <#what-s-new-in-django-1-4>`_!
 
 Wherever possible we try to introduce new features in a backwards-compatible
 manner per :doc:`our API stability policy </misc/api-stability>` policy.
