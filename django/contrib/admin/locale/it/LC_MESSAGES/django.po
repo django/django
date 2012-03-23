@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-14 00:12-0700\n"
+"POT-Creation-Date: 2012-03-23 02:34+0100\n"
 "PO-Revision-Date: 2012-03-08 12:29+0000\n"
 "Last-Translator: Nicola Larosa <transifex@teknico.net>\n"
 "Language-Team: Italian (http://www.transifex.net/projects/p/django/language/"
@@ -24,12 +24,12 @@ msgstr ""
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "Cancellati/e con successo %(count)d %(items)s."
 
-#: actions.py:60 options.py:1297
+#: actions.py:60 options.py:1295
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr "Impossibile cancellare %(name)s "
 
-#: actions.py:62 options.py:1299
+#: actions.py:62 options.py:1297
 msgid "Are you sure?"
 msgstr "Sei sicuro?"
 
@@ -146,54 +146,54 @@ msgstr "Oggetto LogEntry"
 msgid "None"
 msgstr "Nessuno"
 
-#: options.py:673
+#: options.py:671
 #, python-format
 msgid "Changed %s."
 msgstr "%s modificato/a."
 
-#: options.py:673 options.py:683
+#: options.py:671 options.py:681
 msgid "and"
 msgstr "e"
 
-#: options.py:678
+#: options.py:676
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "Aggiunto/a %(name)s \"%(object)s\"."
 
-#: options.py:682
+#: options.py:680
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "Cambiato %(list)s per %(name)s \"%(object)s\"."
 
-#: options.py:687
+#: options.py:685
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "Cancellato/a %(name)s \"%(object)s\"."
 
-#: options.py:691
+#: options.py:689
 msgid "No fields changed."
 msgstr "Nessun campo modificato."
 
-#: options.py:774
+#: options.py:772
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" aggiunto/a correttamente."
 
-#: options.py:778 options.py:826
+#: options.py:776 options.py:824
 msgid "You may edit it again below."
 msgstr "È possibile modificare nuovamente qui sotto."
 
-#: options.py:790 options.py:839
+#: options.py:788 options.py:837
 #, python-format
 msgid "You may add another %s below."
 msgstr "Puoi aggiungere un altro/a %s qui sotto."
 
-#: options.py:824
+#: options.py:822
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" modificato/a correttamente."
 
-#: options.py:832
+#: options.py:830
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
@@ -201,7 +201,7 @@ msgstr ""
 "%(name)s \"%(obj)s\" aggiunto/a correttamente. Puoi modificare ancora qui "
 "sotto."
 
-#: options.py:901 options.py:1161
+#: options.py:899 options.py:1159
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
@@ -209,54 +209,54 @@ msgstr ""
 "Occorre selezionare degli oggetti per potervi eseguire azioni. Nessun "
 "oggetto è stato cambiato."
 
-#: options.py:920
+#: options.py:918
 msgid "No action selected."
 msgstr "Nessuna azione selezionata."
 
-#: options.py:1000
+#: options.py:998
 #, python-format
 msgid "Add %s"
 msgstr "Aggiungi %s"
 
-#: options.py:1025 options.py:1269
+#: options.py:1023 options.py:1267
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "L'oggetto %(name)s con chiave primaria %(key)r non esiste."
 
-#: options.py:1091
+#: options.py:1089
 #, python-format
 msgid "Change %s"
 msgstr "Modifica %s"
 
-#: options.py:1140
+#: options.py:1138
 msgid "Database error"
 msgstr "Errore nel database"
 
-#: options.py:1203
+#: options.py:1201
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s modificato/a correttamente."
 msgstr[1] "%(count)s %(name)s modificati/e correttamente."
 
-#: options.py:1230
+#: options.py:1228
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "%(total_count)s selezionato/a"
 msgstr[1] "Tutti i %(total_count)s selezionati/e"
 
-#: options.py:1235
+#: options.py:1233
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "0 di %(cnt)s selezionati/e"
 
-#: options.py:1285
+#: options.py:1283
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" cancellato/a correttamente."
 
-#: options.py:1332
+#: options.py:1330
 #, python-format
 msgid "Change history: %s"
 msgstr "Tracciato delle modifiche: %s"
@@ -828,16 +828,16 @@ msgstr "Reimposta la mia password"
 msgid "All dates"
 msgstr "Tutte le date"
 
-#: views/main.py:30
+#: views/main.py:31
 msgid "(None)"
 msgstr "(Nessuno)"
 
-#: views/main.py:73
+#: views/main.py:74
 #, python-format
 msgid "Select %s"
 msgstr "Scegli %s"
 
-#: views/main.py:75
+#: views/main.py:76
 #, python-format
 msgid "Select %s to change"
 msgstr "Scegli %s da modificare"

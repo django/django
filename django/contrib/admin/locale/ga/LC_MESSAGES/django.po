@@ -2,13 +2,13 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011.
-# Michael Thornhill <michael@maithu.com>, 2011.
+# Michael Thornhill <michael@maithu.com>, 2011, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-14 00:12-0700\n"
-"PO-Revision-Date: 2012-03-08 12:29+0000\n"
+"POT-Creation-Date: 2012-03-23 02:34+0100\n"
+"PO-Revision-Date: 2012-03-16 11:42+0000\n"
 "Last-Translator: Michael Thornhill <michael@maithu.com>\n"
 "Language-Team: Irish (http://www.transifex.net/projects/p/django/language/"
 "ga/)\n"
@@ -24,12 +24,12 @@ msgstr ""
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "D'éirigh le scriosadh %(count)d %(items)s."
 
-#: actions.py:60 options.py:1297
+#: actions.py:60 options.py:1295
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr "Ní féidir scriosadh %(name)s "
 
-#: actions.py:62 options.py:1299
+#: actions.py:62 options.py:1297
 msgid "Are you sure?"
 msgstr "An bhfuil tú cinnte?"
 
@@ -79,6 +79,8 @@ msgid ""
 "Please enter the correct username and password for a staff account. Note "
 "that both fields are case-sensitive."
 msgstr ""
+"Le do thoil, iontráil ainm úsaideora agus focal faire ceart. Bí cúramach go "
+"bhfuil an beirt acu cásíogair."
 
 #: forms.py:18
 msgid "Please log in again, because your session has expired."
@@ -124,74 +126,74 @@ msgstr "loga iontrálacha"
 #: models.py:40
 #, python-format
 msgid "Added \"%(object)s\"."
-msgstr ""
+msgstr "\"%(object)s\" curtha isteach."
 
 #: models.py:42
 #, python-format
 msgid "Changed \"%(object)s\" - %(changes)s"
-msgstr ""
+msgstr "\"%(object)s\" - %(changes)s aithrithe"
 
 #: models.py:44
 #, python-format
 msgid "Deleted \"%(object)s.\""
-msgstr ""
+msgstr "\"%(object)s.\" scrioste"
 
 #: models.py:46
 msgid "LogEntry Object"
-msgstr ""
+msgstr "Oibiacht LogEntry"
 
 #: options.py:150 options.py:166
 msgid "None"
 msgstr "Dada"
 
-#: options.py:673
+#: options.py:671
 #, python-format
 msgid "Changed %s."
 msgstr "Athraithe %s"
 
-#: options.py:673 options.py:683
+#: options.py:671 options.py:681
 msgid "and"
 msgstr "agus"
 
-#: options.py:678
+#: options.py:676
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "Suimithe %(name)s \"%(object)s\"."
 
-#: options.py:682
+#: options.py:680
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "Athraithe %(list)s le %(name)s \"%(object)s\"."
 
-#: options.py:687
+#: options.py:685
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "Scriosaithe %(name)s \"%(object)s\"."
 
-#: options.py:691
+#: options.py:689
 msgid "No fields changed."
 msgstr "Dada réimse aithraithe"
 
-#: options.py:774
+#: options.py:772
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "Bhí  %(name)s \"%(obj)s\" breisithe go rathúil"
 
-#: options.py:778 options.py:826
+#: options.py:776 options.py:824
 msgid "You may edit it again below."
 msgstr "Is féidir leat é a cuir in eagar thíos."
 
-#: options.py:790 options.py:839
+#: options.py:788 options.py:837
 #, python-format
 msgid "You may add another %s below."
 msgstr "Is féidir le ceann eile %s a cuir le thíos."
 
-#: options.py:824
+#: options.py:822
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "Bhí an %(name)s \"%(obj)s\" aithraithe to rathúil"
 
-#: options.py:832
+#: options.py:830
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
@@ -199,7 +201,7 @@ msgstr ""
 "Chuir an %(name)s·\"%(obj)s\"·go rathúil.·Is féidir leat é a cuir in eagar "
 "thíos."
 
-#: options.py:901 options.py:1161
+#: options.py:899 options.py:1159
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
@@ -207,30 +209,30 @@ msgstr ""
 "Ní mór Míreanna a roghnú chun caingne a dhéanamh orthu. Níl aon mhíreanna a "
 "athrú."
 
-#: options.py:920
+#: options.py:918
 msgid "No action selected."
 msgstr "Uimh gníomh roghnaithe."
 
-#: options.py:1000
+#: options.py:998
 #, python-format
 msgid "Add %s"
 msgstr "Cuir %s le"
 
-#: options.py:1025 options.py:1269
+#: options.py:1023 options.py:1267
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "Níl réad le hainm %(name)s agus eochair %(key)r ann."
 
-#: options.py:1091
+#: options.py:1089
 #, python-format
 msgid "Change %s"
 msgstr "Aithrigh %s"
 
-#: options.py:1140
+#: options.py:1138
 msgid "Database error"
 msgstr "Botún bunachar sonraí"
 
-#: options.py:1203
+#: options.py:1201
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
@@ -240,7 +242,7 @@ msgstr[2] "%(count)s %(name)s athraithe go rathúil"
 msgstr[3] "%(count)s %(name)s athraithe go rathúil"
 msgstr[4] "%(count)s %(name)s athraithe go rathúil"
 
-#: options.py:1230
+#: options.py:1228
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
@@ -250,17 +252,17 @@ msgstr[2] "Gach %(total_count)s roghnaithe"
 msgstr[3] "Gach %(total_count)s roghnaithe"
 msgstr[4] "Gach %(total_count)s roghnaithe"
 
-#: options.py:1235
+#: options.py:1233
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "0 as %(cnt)s roghnaithe."
 
-#: options.py:1285
+#: options.py:1283
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "Bhí %(name)s \"%(obj)s\" scrioste go rathúil."
 
-#: options.py:1332
+#: options.py:1330
 #, python-format
 msgid "Change history: %s"
 msgstr "Athraigh stáir %s"
@@ -437,16 +439,16 @@ msgstr "Scagaire"
 
 #: templates/admin/change_list_results.html:17
 msgid "Remove from sorting"
-msgstr ""
+msgstr "Bain as sórtáil"
 
 #: templates/admin/change_list_results.html:18
 #, python-format
 msgid "Sorting priority: %(priority_number)s"
-msgstr ""
+msgstr "Sórtáil tosaíocht: %(priority_number)s"
 
 #: templates/admin/change_list_results.html:19
 msgid "Toggle sorting"
-msgstr ""
+msgstr "Toggle sórtáil"
 
 #: templates/admin/delete_confirmation.html:12
 #: templates/admin/submit_line.html:4
@@ -573,7 +575,7 @@ msgstr "Focal faire:"
 
 #: templates/admin/login.html:45
 msgid "Forgotten your password or username?"
-msgstr ""
+msgstr "Dearmad déanta ar do focal faire nó ainm úsaideora"
 
 #: templates/admin/object_history.html:24
 msgid "Date/time"
@@ -842,16 +844,16 @@ msgstr "Athsocraigh mo focal faire"
 msgid "All dates"
 msgstr "Gach dáta"
 
-#: views/main.py:30
+#: views/main.py:31
 msgid "(None)"
 msgstr "(Dada)"
 
-#: views/main.py:73
+#: views/main.py:74
 #, python-format
 msgid "Select %s"
 msgstr "Roghnaigh %s"
 
-#: views/main.py:75
+#: views/main.py:76
 #, python-format
 msgid "Select %s to change"
 msgstr "Roghnaigh %s a athrú"

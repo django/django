@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-14 00:12-0700\n"
+"POT-Creation-Date: 2012-03-23 02:34+0100\n"
 "PO-Revision-Date: 2012-03-08 12:29+0000\n"
 "Last-Translator: Azat Khasanshin <lordofbazuks@gmail.com>\n"
 "Language-Team: Tatar (http://www.transifex.net/projects/p/django/language/"
@@ -22,12 +22,12 @@ msgstr ""
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "%(count)d %(items)s уңышлы рәвештә бетерелгән."
 
-#: actions.py:60 options.py:1297
+#: actions.py:60 options.py:1295
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr "%(name)s бетереп булмады"
 
-#: actions.py:62 options.py:1299
+#: actions.py:62 options.py:1297
 msgid "Are you sure?"
 msgstr "Сез инанып карар кылдыгызмы?"
 
@@ -144,54 +144,54 @@ msgstr ""
 msgid "None"
 msgstr "Юк"
 
-#: options.py:673
+#: options.py:671
 #, python-format
 msgid "Changed %s."
 msgstr "%s үзгәртелгән."
 
-#: options.py:673 options.py:683
+#: options.py:671 options.py:681
 msgid "and"
 msgstr "һәм"
 
-#: options.py:678
+#: options.py:676
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" өстәлгән."
 
-#: options.py:682
+#: options.py:680
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" өчен %(list)s үзгәртелгән."
 
-#: options.py:687
+#: options.py:685
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" бетерелгән."
 
-#: options.py:691
+#: options.py:689
 msgid "No fields changed."
 msgstr "Үзгәртелгән кырлар юк."
 
-#: options.py:774
+#: options.py:772
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" үңышлы рәвештә өстәлгән."
 
-#: options.py:778 options.py:826
+#: options.py:776 options.py:824
 msgid "You may edit it again below."
 msgstr "Астарак сез аны тагын бер кат төзәтә аласыз."
 
-#: options.py:790 options.py:839
+#: options.py:788 options.py:837
 #, python-format
 msgid "You may add another %s below."
 msgstr "Астарак сез тагын бер %s өсти аласыз."
 
-#: options.py:824
+#: options.py:822
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" уңышлы рәвештә үзгәртелгән."
 
-#: options.py:832
+#: options.py:830
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
@@ -199,7 +199,7 @@ msgstr ""
 "%(name)s \"%(obj)s\" үңышлы рәвештә өстәлгән. Астарак сез аны тагын бер кат "
 "төзәтә аласыз."
 
-#: options.py:901 options.py:1161
+#: options.py:899 options.py:1159
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
@@ -207,52 +207,52 @@ msgstr ""
 "Элементар өстеннән гамәл кылу өчен алар сайланган булырга тиеш. Элементлар "
 "үзгәртелмәгән."
 
-#: options.py:920
+#: options.py:918
 msgid "No action selected."
 msgstr "Гамәл сайланмаган."
 
-#: options.py:1000
+#: options.py:998
 #, python-format
 msgid "Add %s"
 msgstr "%s өстәргә"
 
-#: options.py:1025 options.py:1269
+#: options.py:1023 options.py:1267
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "%(key)r беренчел ачкыч белән булган %(name)s юк."
 
-#: options.py:1091
+#: options.py:1089
 #, python-format
 msgid "Change %s"
 msgstr "%s үзгәртергә"
 
-#: options.py:1140
+#: options.py:1138
 msgid "Database error"
 msgstr "Бирелмәләр базасы хатасы"
 
-#: options.py:1203
+#: options.py:1201
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s уңышлы рәвештә үзгәртелгән."
 
-#: options.py:1230
+#: options.py:1228
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "%(total_count)s сайланган"
 
-#: options.py:1235
+#: options.py:1233
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "Барлык %(cnt)s объектан 0 сайланган"
 
-#: options.py:1285
+#: options.py:1283
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" уңышлы рәвештә бетерелгән."
 
-#: options.py:1332
+#: options.py:1330
 #, python-format
 msgid "Change history: %s"
 msgstr "Үзгәртү тарихы: %s"
@@ -818,16 +818,16 @@ msgstr "Серсүземне торгызырга"
 msgid "All dates"
 msgstr "Бөтен көннәр"
 
-#: views/main.py:30
+#: views/main.py:31
 msgid "(None)"
 msgstr "(Юк)"
 
-#: views/main.py:73
+#: views/main.py:74
 #, python-format
 msgid "Select %s"
 msgstr "%s сайлагыз"
 
-#: views/main.py:75
+#: views/main.py:76
 #, python-format
 msgid "Select %s to change"
 msgstr "Үзгәртү өчен %s сайлагыз"

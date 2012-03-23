@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-14 00:13-0700\n"
-"PO-Revision-Date: 2012-03-11 05:39+0000\n"
+"POT-Creation-Date: 2012-03-23 02:35+0100\n"
+"PO-Revision-Date: 2012-03-15 04:32+0000\n"
 "Last-Translator: Анхбаяр Анхаа <l.ankhbayar@gmail.com>\n"
 "Language-Team: Mongolian (http://www.transifex.net/projects/p/django/"
 "language/mn/)\n"
@@ -30,6 +30,8 @@ msgid ""
 "This is the list of available %s. You may choose some by selecting them in "
 "the box below and then clicking the \"Choose\" arrow between the two boxes."
 msgstr ""
+"Энэ %s жагсаалт нь боломжит утгын жагсаалт. Та аль нэгийг нь сонгоод \"Сонгох"
+"\" дээр дарж нөгөө хэсэгт оруулах боломжтой."
 
 #: static/admin/js/SelectFilter2.js:53
 #, c-format
@@ -68,6 +70,8 @@ msgid ""
 "This is the list of chosen %s. You may remove some by selecting them in the "
 "box below and then clicking the \"Remove\" arrow between the two boxes."
 msgstr ""
+"Энэ %s сонгогдсон утгуудыг жагсаалт. Та аль нэгийг нь хасахыг хүсвэл сонгоох "
+"\"Хас\" дээр дарна уу."
 
 #: static/admin/js/SelectFilter2.js:80
 msgid "Remove all"

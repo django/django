@@ -4,13 +4,14 @@
 # angularcircle <angular.circle@gmail.com>, 2011.
 # Jannis Leidel <jannis@leidel.info>, 2011.
 # konryd <konryd@gmail.com>, 2011.
+# Roman Barczyński <rombar@gmail.com>, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-14 00:13-0700\n"
-"PO-Revision-Date: 2012-03-08 10:42+0000\n"
-"Last-Translator: angularcircle <angular.circle@gmail.com>\n"
+"POT-Creation-Date: 2012-03-23 02:35+0100\n"
+"PO-Revision-Date: 2012-03-19 16:08+0000\n"
+"Last-Translator: Roman Barczyński <rombar@gmail.com>\n"
 "Language-Team: Polish (http://www.transifex.net/projects/p/django/language/"
 "pl/)\n"
 "Language: pl\n"
@@ -31,11 +32,13 @@ msgid ""
 "This is the list of available %s. You may choose some by selecting them in "
 "the box below and then clicking the \"Choose\" arrow between the two boxes."
 msgstr ""
+"To jest lista dostępnych %s. Aby wybrać pozycje zaznacz je i kliknij "
+"strzałkę \"Wybierz\" pomiędzy listami."
 
 #: static/admin/js/SelectFilter2.js:53
 #, c-format
 msgid "Type into this box to filter down the list of available %s."
-msgstr ""
+msgstr "Pisz tutaj aby wyfiltrować listę dostępnych %s."
 
 #: static/admin/js/SelectFilter2.js:57
 msgid "Filter"
@@ -48,11 +51,11 @@ msgstr "Wybierz wszystko"
 #: static/admin/js/SelectFilter2.js:61
 #, c-format
 msgid "Click to choose all %s at once."
-msgstr ""
+msgstr "Kliknij aby wybrać wszystkie %s na raz."
 
 #: static/admin/js/SelectFilter2.js:67
 msgid "Choose"
-msgstr ""
+msgstr "Wybierz"
 
 #: static/admin/js/SelectFilter2.js:69
 msgid "Remove"
@@ -69,15 +72,17 @@ msgid ""
 "This is the list of chosen %s. You may remove some by selecting them in the "
 "box below and then clicking the \"Remove\" arrow between the two boxes."
 msgstr ""
+"To jest lista wybranych %s. Aby usunąć zaznacz pozycje wybrane do usunięcia "
+"i kliknij strzałkę \"Usuń\" pomiędzy listami."
 
 #: static/admin/js/SelectFilter2.js:80
 msgid "Remove all"
-msgstr ""
+msgstr "Usuń wszystkie"
 
 #: static/admin/js/SelectFilter2.js:80
 #, c-format
 msgid "Click to remove all chosen %s at once."
-msgstr ""
+msgstr "Kliknij aby usunąć wszystkie wybrane %s na raz."
 
 #: static/admin/js/actions.js:18 static/admin/js/actions.min.js:1
 msgid "%(sel)s of %(cnt)s selected"

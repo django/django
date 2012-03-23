@@ -2,6 +2,7 @@
 #
 # Translators:
 # aljosa <aljosa.mohorovic@gmail.com>, 2011.
+# Bojan Mihelač <bmihelac@mihelac.org>, 2012.
 # Davor Lučić <r.dav.lc@gmail.com>, 2011.
 # Jannis Leidel <jannis@leidel.info>, 2011.
 # Ylodi <stjepan@gmail.com>, 2011.
@@ -9,9 +10,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-14 00:12-0700\n"
-"PO-Revision-Date: 2012-03-08 12:29+0000\n"
-"Last-Translator: aljosa <aljosa.mohorovic@gmail.com>\n"
+"POT-Creation-Date: 2012-03-23 02:34+0100\n"
+"PO-Revision-Date: 2012-03-19 16:18+0000\n"
+"Last-Translator: Bojan Mihelač <bmihelac@mihelac.org>\n"
 "Language-Team: Croatian (http://www.transifex.net/projects/p/django/language/"
 "hr/)\n"
 "Language: hr\n"
@@ -26,12 +27,12 @@ msgstr ""
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "Uspješno izbrisano %(count)d %(items)s."
 
-#: actions.py:60 options.py:1297
+#: actions.py:60 options.py:1295
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr "Nije moguće izbrisati %(name)s"
 
-#: actions.py:62 options.py:1299
+#: actions.py:62 options.py:1297
 msgid "Are you sure?"
 msgstr "Jeste li sigurni?"
 
@@ -81,6 +82,8 @@ msgid ""
 "Please enter the correct username and password for a staff account. Note "
 "that both fields are case-sensitive."
 msgstr ""
+"Molimo unesite ispravno korisničko ime i lozinku za korisnički račun "
+"osoblja.  Uzmite u obzir da oba polja razlikuju velika/mala slova."
 
 #: forms.py:18
 msgid "Please log in again, because your session has expired."
@@ -126,80 +129,80 @@ msgstr "zapisi"
 #: models.py:40
 #, python-format
 msgid "Added \"%(object)s\"."
-msgstr ""
+msgstr "Dodano \"%(object)s\"."
 
 #: models.py:42
 #, python-format
 msgid "Changed \"%(object)s\" - %(changes)s"
-msgstr ""
+msgstr "Promijenjeno \"%(object)s\" - %(changes)s"
 
 #: models.py:44
 #, python-format
 msgid "Deleted \"%(object)s.\""
-msgstr ""
+msgstr "Obrisano \"%(object)s.\""
 
 #: models.py:46
 msgid "LogEntry Object"
-msgstr ""
+msgstr "Log zapis"
 
 #: options.py:150 options.py:166
 msgid "None"
 msgstr "Nijedan"
 
-#: options.py:673
+#: options.py:671
 #, python-format
 msgid "Changed %s."
 msgstr "Promijenjeno %s."
 
-#: options.py:673 options.py:683
+#: options.py:671 options.py:681
 msgid "and"
 msgstr "i"
 
-#: options.py:678
+#: options.py:676
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "Dodano %(name)s \"%(object)s\"."
 
-#: options.py:682
+#: options.py:680
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "Promijeni %(list)s za %(name)s \"%(object)s\"."
 
-#: options.py:687
+#: options.py:685
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "Izbrisani %(name)s \"%(object)s\"."
 
-#: options.py:691
+#: options.py:689
 msgid "No fields changed."
 msgstr "Nije bilo promjena polja."
 
-#: options.py:774
+#: options.py:772
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" uspješno je dodano."
 
-#: options.py:778 options.py:826
+#: options.py:776 options.py:824
 msgid "You may edit it again below."
 msgstr "Možete ponovo urediti unos dolje."
 
-#: options.py:790 options.py:839
+#: options.py:788 options.py:837
 #, python-format
 msgid "You may add another %s below."
 msgstr "Možete dodati još jedan %s ispod."
 
-#: options.py:824
+#: options.py:822
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" uspješno promijenjeno."
 
-#: options.py:832
+#: options.py:830
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr "%(name)s \"%(obj)s\" uspješno dodan. Možete ponovo urediti unos dolje."
 
-#: options.py:901 options.py:1161
+#: options.py:899 options.py:1159
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
@@ -207,30 +210,30 @@ msgstr ""
 "Unosi moraju biti odabrani da bi se nad njima mogle izvršiti akcije. Nijedan "
 "unos nije promijenjen."
 
-#: options.py:920
+#: options.py:918
 msgid "No action selected."
 msgstr "Nije odabrana akcija."
 
-#: options.py:1000
+#: options.py:998
 #, python-format
 msgid "Add %s"
 msgstr "Novi unos (%s)"
 
-#: options.py:1025 options.py:1269
+#: options.py:1023 options.py:1267
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "Unos %(name)s sa primarnim ključem %(key)r ne postoji."
 
-#: options.py:1091
+#: options.py:1089
 #, python-format
 msgid "Change %s"
 msgstr "Promijeni %s"
 
-#: options.py:1140
+#: options.py:1138
 msgid "Database error"
 msgstr "Pogreška u bazi"
 
-#: options.py:1203
+#: options.py:1201
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
@@ -238,7 +241,7 @@ msgstr[0] "%(count)s %(name)s uspješno promijenjen."
 msgstr[1] "%(count)s %(name)s uspješno promijenjeno."
 msgstr[2] "%(count)s %(name)s uspješno promijenjeno."
 
-#: options.py:1230
+#: options.py:1228
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
@@ -246,17 +249,17 @@ msgstr[0] "%(total_count)s odabrano"
 msgstr[1] "Svih %(total_count)s odabrano"
 msgstr[2] "Svih %(total_count)s odabrano"
 
-#: options.py:1235
+#: options.py:1233
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "0 od %(cnt)s odabrano"
 
-#: options.py:1285
+#: options.py:1283
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" uspješno izbrisan."
 
-#: options.py:1332
+#: options.py:1330
 #, python-format
 msgid "Change history: %s"
 msgstr "Promijeni povijest: %s"
@@ -430,16 +433,16 @@ msgstr "Filter"
 
 #: templates/admin/change_list_results.html:17
 msgid "Remove from sorting"
-msgstr ""
+msgstr "Odstrani iz sortiranja"
 
 #: templates/admin/change_list_results.html:18
 #, python-format
 msgid "Sorting priority: %(priority_number)s"
-msgstr ""
+msgstr "Prioritet sortiranja: %(priority_number)s"
 
 #: templates/admin/change_list_results.html:19
 msgid "Toggle sorting"
-msgstr ""
+msgstr "Preklopi sortiranje"
 
 #: templates/admin/delete_confirmation.html:12
 #: templates/admin/submit_line.html:4
@@ -565,7 +568,7 @@ msgstr "Lozinka:"
 
 #: templates/admin/login.html:45
 msgid "Forgotten your password or username?"
-msgstr ""
+msgstr "Zaboravili ste lozinku ili korisničko ime?"
 
 #: templates/admin/object_history.html:24
 msgid "Date/time"
@@ -827,16 +830,16 @@ msgstr "Resetiraj moju lozinku"
 msgid "All dates"
 msgstr "Svi datumi"
 
-#: views/main.py:30
+#: views/main.py:31
 msgid "(None)"
 msgstr "(Nijedan)"
 
-#: views/main.py:73
+#: views/main.py:74
 #, python-format
 msgid "Select %s"
 msgstr "Odaberi %s"
 
-#: views/main.py:75
+#: views/main.py:76
 #, python-format
 msgid "Select %s to change"
 msgstr "Odaberi za promjenu - %s"

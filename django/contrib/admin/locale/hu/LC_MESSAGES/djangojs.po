@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Attila Nagy <>, 2012.
 # Jannis Leidel <jannis@leidel.info>, 2011.
 # János Péter Ronkay <transifex@hangya.net>, 2011.
 # Szilveszter Farkas <szilveszter.farkas@gmail.com>, 2011.
@@ -8,9 +9,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-14 00:13-0700\n"
-"PO-Revision-Date: 2012-03-08 10:42+0000\n"
-"Last-Translator: Szilveszter Farkas <szilveszter.farkas@gmail.com>\n"
+"POT-Creation-Date: 2012-03-23 02:35+0100\n"
+"PO-Revision-Date: 2012-03-19 19:28+0000\n"
+"Last-Translator: Attila Nagy <>\n"
 "Language-Team: Hungarian (http://www.transifex.net/projects/p/django/"
 "language/hu/)\n"
 "Language: hu\n"
@@ -51,7 +52,7 @@ msgstr ""
 
 #: static/admin/js/SelectFilter2.js:67
 msgid "Choose"
-msgstr ""
+msgstr "Választás"
 
 #: static/admin/js/SelectFilter2.js:69
 msgid "Remove"
@@ -71,7 +72,7 @@ msgstr ""
 
 #: static/admin/js/SelectFilter2.js:80
 msgid "Remove all"
-msgstr ""
+msgstr "Összes törlése"
 
 #: static/admin/js/SelectFilter2.js:80
 #, c-format

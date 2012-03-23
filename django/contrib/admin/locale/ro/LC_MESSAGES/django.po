@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-14 00:12-0700\n"
+"POT-Creation-Date: 2012-03-23 02:34+0100\n"
 "PO-Revision-Date: 2012-03-08 12:29+0000\n"
 "Last-Translator: Ionel Cristian Mărieș <ionel.mc@gmail.com>\n"
 "Language-Team: Romanian (http://www.transifex.net/projects/p/django/language/"
@@ -26,12 +26,12 @@ msgstr ""
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "%(count)d %(items)s eliminate cu succes."
 
-#: actions.py:60 options.py:1297
+#: actions.py:60 options.py:1295
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr "Nu se poate șterge %(name)s"
 
-#: actions.py:62 options.py:1299
+#: actions.py:62 options.py:1297
 msgid "Are you sure?"
 msgstr "Sigur?"
 
@@ -151,54 +151,54 @@ msgstr "Obiect LogEntry"
 msgid "None"
 msgstr "Nimic"
 
-#: options.py:673
+#: options.py:671
 #, python-format
 msgid "Changed %s."
 msgstr "S-a schimbat %s."
 
-#: options.py:673 options.py:683
+#: options.py:671 options.py:681
 msgid "and"
 msgstr "și"
 
-#: options.py:678
+#: options.py:676
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "S-a adăugat %(name)s \"%(object)s\"."
 
-#: options.py:682
+#: options.py:680
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "S-a schimbat %(list)s în %(name)s \"%(object)s\"."
 
-#: options.py:687
+#: options.py:685
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "S-a șters %(name)s \"%(object)s\"."
 
-#: options.py:691
+#: options.py:689
 msgid "No fields changed."
 msgstr "Niciun câmp modificat."
 
-#: options.py:774
+#: options.py:772
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" a fost adăugat cu succes."
 
-#: options.py:778 options.py:826
+#: options.py:776 options.py:824
 msgid "You may edit it again below."
 msgstr "Puteți edita din nou mai jos."
 
-#: options.py:790 options.py:839
+#: options.py:788 options.py:837
 #, python-format
 msgid "You may add another %s below."
 msgstr "Puteți adăuga înca un/o %s mai jos."
 
-#: options.py:824
+#: options.py:822
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" a fost modificat(ă) cu succes."
 
-#: options.py:832
+#: options.py:830
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
@@ -206,7 +206,7 @@ msgstr ""
 "%(name)s \"%(obj)s\" a fost adăugat(ă) cu succes. Puteți edita din nou mai "
 "jos."
 
-#: options.py:901 options.py:1161
+#: options.py:899 options.py:1159
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
@@ -214,30 +214,30 @@ msgstr ""
 "Itemii trebuie selectați pentru a putea îndeplini sarcini asupra lor. Niciun "
 "item nu a fost modificat."
 
-#: options.py:920
+#: options.py:918
 msgid "No action selected."
 msgstr "Nicio acțiune selectată."
 
-#: options.py:1000
+#: options.py:998
 #, python-format
 msgid "Add %s"
 msgstr "Adaugă %s"
 
-#: options.py:1025 options.py:1269
+#: options.py:1023 options.py:1267
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "Obiectul %(name)s ce are cheie primară %(key)r nu există."
 
-#: options.py:1091
+#: options.py:1089
 #, python-format
 msgid "Change %s"
 msgstr "Schimbă %s"
 
-#: options.py:1140
+#: options.py:1138
 msgid "Database error"
 msgstr "Eroare de bază de date"
 
-#: options.py:1203
+#: options.py:1201
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
@@ -245,7 +245,7 @@ msgstr[0] "%(count)s %(name)s s-a modificat cu succes."
 msgstr[1] "%(count)s %(name)s s-au modificat cu succes."
 msgstr[2] "%(count)s de %(name)s s-au modificat cu succes."
 
-#: options.py:1230
+#: options.py:1228
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
@@ -253,17 +253,17 @@ msgstr[0] "%(total_count)s selectat(ă)"
 msgstr[1] "Toate %(total_count)s selectate"
 msgstr[2] "Toate %(total_count)s selectate"
 
-#: options.py:1235
+#: options.py:1233
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "0 din %(cnt)s  selectat"
 
-#: options.py:1285
+#: options.py:1283
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" eliminat(ă) cu succes."
 
-#: options.py:1332
+#: options.py:1330
 #, python-format
 msgid "Change history: %s"
 msgstr "Istoric schimbări: %s"
@@ -839,16 +839,16 @@ msgstr "Resetează-mi parola"
 msgid "All dates"
 msgstr "Toate datele"
 
-#: views/main.py:30
+#: views/main.py:31
 msgid "(None)"
 msgstr "(Nimic)"
 
-#: views/main.py:73
+#: views/main.py:74
 #, python-format
 msgid "Select %s"
 msgstr "Selectează %s"
 
-#: views/main.py:75
+#: views/main.py:76
 #, python-format
 msgid "Select %s to change"
 msgstr "Selectează %s pentru schimbare"

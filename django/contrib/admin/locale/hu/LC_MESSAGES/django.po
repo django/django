@@ -3,14 +3,15 @@
 # Translators:
 #   <gabor@20y.hu>, 2011.
 # Jannis Leidel <jannis@leidel.info>, 2011.
+# Kristóf Gruber <>, 2012.
 # Szilveszter Farkas <szilveszter.farkas@gmail.com>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-14 00:12-0700\n"
-"PO-Revision-Date: 2012-03-08 12:29+0000\n"
-"Last-Translator: slink <gabor@20y.hu>\n"
+"POT-Creation-Date: 2012-03-23 02:34+0100\n"
+"PO-Revision-Date: 2012-03-19 19:23+0000\n"
+"Last-Translator: Kristóf Gruber <>\n"
 "Language-Team: Hungarian (http://www.transifex.net/projects/p/django/"
 "language/hu/)\n"
 "Language: hu\n"
@@ -24,12 +25,12 @@ msgstr ""
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "%(count)d %(items)s sikeresen törölve lett."
 
-#: actions.py:60 options.py:1297
+#: actions.py:60 options.py:1295
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr "%(name)s törlése nem sikerült"
 
-#: actions.py:62 options.py:1299
+#: actions.py:62 options.py:1297
 msgid "Are you sure?"
 msgstr "Biztos benne?"
 
@@ -124,80 +125,80 @@ msgstr "naplóbejegyzések"
 #: models.py:40
 #, python-format
 msgid "Added \"%(object)s\"."
-msgstr ""
+msgstr "\"%(object)s\" hozzáadva."
 
 #: models.py:42
 #, python-format
 msgid "Changed \"%(object)s\" - %(changes)s"
-msgstr ""
+msgstr "\"%(object)s\" megváltoztatva: %(changes)s"
 
 #: models.py:44
 #, python-format
 msgid "Deleted \"%(object)s.\""
-msgstr ""
+msgstr "\"%(object)s\" törölve."
 
 #: models.py:46
 msgid "LogEntry Object"
-msgstr ""
+msgstr "Napló bejegyzés objektum"
 
 #: options.py:150 options.py:166
 msgid "None"
 msgstr "Egyik sem"
 
-#: options.py:673
+#: options.py:671
 #, python-format
 msgid "Changed %s."
 msgstr "%s módosítva."
 
-#: options.py:673 options.py:683
+#: options.py:671 options.py:681
 msgid "and"
 msgstr "és"
 
-#: options.py:678
+#: options.py:676
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "\"%(object)s\" %(name)s létrehozva."
 
-#: options.py:682
+#: options.py:680
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "\"%(object)s\" %(name)s tulajdonságai (%(list)s) megváltoztak."
 
-#: options.py:687
+#: options.py:685
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "\"%(object)s\" %(name)s törlésre került."
 
-#: options.py:691
+#: options.py:689
 msgid "No fields changed."
 msgstr "Egy mező sem változott."
 
-#: options.py:774
+#: options.py:772
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "\"%(obj)s\" %(name)s sikeresen létrehozva."
 
-#: options.py:778 options.py:826
+#: options.py:776 options.py:824
 msgid "You may edit it again below."
 msgstr "Alább ismét szerkesztheti."
 
-#: options.py:790 options.py:839
+#: options.py:788 options.py:837
 #, python-format
 msgid "You may add another %s below."
 msgstr "Alább hozzáadhat egy másikat ebből: %s."
 
-#: options.py:824
+#: options.py:822
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "\"%(obj)s\" %(name)s sikeresen módosítva."
 
-#: options.py:832
+#: options.py:830
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr "\"%(obj)s\" %(name)s sikeresen létrehozva. Alább ismét szerkesztheted."
 
-#: options.py:901 options.py:1161
+#: options.py:899 options.py:1159
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
@@ -205,54 +206,54 @@ msgstr ""
 "A műveletek végrehajtásához ki kell választani legalább egy elemet. Semmi "
 "sem lett módosítva."
 
-#: options.py:920
+#: options.py:918
 msgid "No action selected."
 msgstr "Nem választott ki műveletet."
 
-#: options.py:1000
+#: options.py:998
 #, python-format
 msgid "Add %s"
 msgstr "Új %s"
 
-#: options.py:1025 options.py:1269
+#: options.py:1023 options.py:1267
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "%(name)s objektum %(key)r elsődleges kulccsal nem létezik."
 
-#: options.py:1091
+#: options.py:1089
 #, python-format
 msgid "Change %s"
 msgstr "%s módosítása"
 
-#: options.py:1140
+#: options.py:1138
 msgid "Database error"
 msgstr "Adatbázis hiba"
 
-#: options.py:1203
+#: options.py:1201
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s sikeresen módosítva lett."
 msgstr[1] "%(count)s %(name)s sikeresen módosítva lett."
 
-#: options.py:1230
+#: options.py:1228
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "%(total_count)s kiválasztva"
 msgstr[1] "%(total_count)s kiválasztva"
 
-#: options.py:1235
+#: options.py:1233
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "0 kiválasztva ennyiből: %(cnt)s"
 
-#: options.py:1285
+#: options.py:1283
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "\"%(obj)s\" %(name)s sikeresen törölve."
 
-#: options.py:1332
+#: options.py:1330
 #, python-format
 msgid "Change history: %s"
 msgstr "Változások története: %s"
@@ -425,16 +426,16 @@ msgstr "Szűrő"
 
 #: templates/admin/change_list_results.html:17
 msgid "Remove from sorting"
-msgstr ""
+msgstr "Eltávolítás a rendezésből"
 
 #: templates/admin/change_list_results.html:18
 #, python-format
 msgid "Sorting priority: %(priority_number)s"
-msgstr ""
+msgstr "Prioritás rendezésnél: %(priority_number)s"
 
 #: templates/admin/change_list_results.html:19
 msgid "Toggle sorting"
-msgstr ""
+msgstr "Rendezés megfordítása"
 
 #: templates/admin/delete_confirmation.html:12
 #: templates/admin/submit_line.html:4
@@ -562,7 +563,7 @@ msgstr "Jelszó:"
 
 #: templates/admin/login.html:45
 msgid "Forgotten your password or username?"
-msgstr ""
+msgstr "Elfelejtetted a jelszavad vagy felhasználó neved?"
 
 #: templates/admin/object_history.html:24
 msgid "Date/time"
@@ -824,16 +825,16 @@ msgstr "Jelszavam törlése"
 msgid "All dates"
 msgstr "Minden dátum"
 
-#: views/main.py:30
+#: views/main.py:31
 msgid "(None)"
 msgstr "(nincs)"
 
-#: views/main.py:73
+#: views/main.py:74
 #, python-format
 msgid "Select %s"
 msgstr "Kiválasztás %s"
 
-#: views/main.py:75
+#: views/main.py:76
 #, python-format
 msgid "Select %s to change"
 msgstr "Válasszon ki egyet a módosításhoz (%s)"

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-14 00:11-0700\n"
+"POT-Creation-Date: 2012-03-23 02:34+0100\n"
 "PO-Revision-Date: 2012-03-08 12:29+0000\n"
 "Last-Translator: Yorgos Pagles <y.pagles@gmail.com>\n"
 "Language-Team: Greek (http://www.transifex.net/projects/p/django/language/"
@@ -24,12 +24,12 @@ msgstr ""
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "Επιτυχημένη διαγραφή %(count)d %(items)s."
 
-#: actions.py:60 options.py:1297
+#: actions.py:60 options.py:1295
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr "Αδύνατη τη διαγραφή του %(name)s"
 
-#: actions.py:62 options.py:1299
+#: actions.py:62 options.py:1297
 msgid "Are you sure?"
 msgstr "Είστε σίγουροι;"
 
@@ -149,54 +149,54 @@ msgstr "LogEntry Object"
 msgid "None"
 msgstr "Κανένα"
 
-#: options.py:673
+#: options.py:671
 #, python-format
 msgid "Changed %s."
 msgstr "Έγινε επεξεργασία του %s."
 
-#: options.py:673 options.py:683
+#: options.py:671 options.py:681
 msgid "and"
 msgstr "και"
 
-#: options.py:678
+#: options.py:676
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "Προστέθηκε %(name)s \"%(object)s\"."
 
-#: options.py:682
+#: options.py:680
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "Έγινε επεξεργασία %(list)s για %(name)s \"%(object)s\"."
 
-#: options.py:687
+#: options.py:685
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "Διαγράφη %(name)s \"%(object)s\"."
 
-#: options.py:691
+#: options.py:689
 msgid "No fields changed."
 msgstr "Κανένα πεδίο δεν άλλαξε."
 
-#: options.py:774
+#: options.py:772
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "Το %(name)s \"%(obj)s\" αποθηκεύτηκε με επιτυχία."
 
-#: options.py:778 options.py:826
+#: options.py:776 options.py:824
 msgid "You may edit it again below."
 msgstr "Μπορείτε να το επεξεργαστείτε ξανά παρακάτω."
 
-#: options.py:790 options.py:839
+#: options.py:788 options.py:837
 #, python-format
 msgid "You may add another %s below."
 msgstr "Μπορείτε να προσθέσετε ακόμα ένα %s παρακάτω."
 
-#: options.py:824
+#: options.py:822
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "Το %(name)s \"%(obj)s\" αλλάχτηκε με επιτυχία."
 
-#: options.py:832
+#: options.py:830
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
@@ -204,7 +204,7 @@ msgstr ""
 "Το %(name)s \"%(obj)s\" αποθηκεύτηκε με επιτυχία. Μπορείτε να το "
 "επεξεργαστείτε πάλι παρακάτω."
 
-#: options.py:901 options.py:1161
+#: options.py:899 options.py:1159
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
@@ -213,54 +213,54 @@ msgstr ""
 "αντικείμενο. Πρέπει να επιλέξετε ένα ή περισσότερα αντικείμενα για να "
 "πραγματοποιήσετε ενέργειες σε αυτά."
 
-#: options.py:920
+#: options.py:918
 msgid "No action selected."
 msgstr "Δεν έχει επιλεγεί ενέργεια."
 
-#: options.py:1000
+#: options.py:998
 #, python-format
 msgid "Add %s"
 msgstr "Προσθήκη %s"
 
-#: options.py:1025 options.py:1269
+#: options.py:1023 options.py:1267
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr " Το αντικείμενο %(name)s  με πρωτεύον κλειδί %(key)r δεν βρέθηκε."
 
-#: options.py:1091
+#: options.py:1089
 #, python-format
 msgid "Change %s"
 msgstr "Αλλαγή του %s"
 
-#: options.py:1140
+#: options.py:1138
 msgid "Database error"
 msgstr "Σφάλμα βάσης δεδομένων"
 
-#: options.py:1203
+#: options.py:1201
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s άλλαξε επιτυχώς."
 msgstr[1] "%(count)s %(name)s άλλαξαν επιτυχώς."
 
-#: options.py:1230
+#: options.py:1228
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "Επιλέχθηκε %(total_count)s"
 msgstr[1] "Επιλέχθηκαν και τα %(total_count)s"
 
-#: options.py:1235
+#: options.py:1233
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "Επιλέγησαν 0 από %(cnt)s"
 
-#: options.py:1285
+#: options.py:1283
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "Το %(name)s \"%(obj)s\" διαγράφηκε με επιτυχία."
 
-#: options.py:1332
+#: options.py:1330
 #, python-format
 msgid "Change history: %s"
 msgstr "Ιστορικό αλλαγών: %s"
@@ -849,16 +849,16 @@ msgstr "Επαναφορά του συνθηματικού μου"
 msgid "All dates"
 msgstr "Όλες οι ημερομηνίες"
 
-#: views/main.py:30
+#: views/main.py:31
 msgid "(None)"
 msgstr "(Κενό)"
 
-#: views/main.py:73
+#: views/main.py:74
 #, python-format
 msgid "Select %s"
 msgstr "Επιλέξτε %s"
 
-#: views/main.py:75
+#: views/main.py:76
 #, python-format
 msgid "Select %s to change"
 msgstr "Επιλέξτε %s προς αλλαγή"

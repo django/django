@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-14 00:11-0700\n"
+"POT-Creation-Date: 2012-03-23 02:34+0100\n"
 "PO-Revision-Date: 2012-03-08 12:29+0000\n"
 "Last-Translator: Baptiste <bapdarth@yahoo.fr>\n"
 "Language-Team: Esperanto (http://www.transifex.net/projects/p/django/"
@@ -23,12 +23,12 @@ msgstr ""
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "Sukcese %(count)d %(items)s forigitaj."
 
-#: actions.py:60 options.py:1297
+#: actions.py:60 options.py:1295
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr "Ne povas forigi %(name)s"
 
-#: actions.py:62 options.py:1299
+#: actions.py:62 options.py:1297
 msgid "Are you sure?"
 msgstr "Ĉu certas?"
 
@@ -145,54 +145,54 @@ msgstr "Protokolera objekto"
 msgid "None"
 msgstr "Neniu"
 
-#: options.py:673
+#: options.py:671
 #, python-format
 msgid "Changed %s."
 msgstr "Ŝanĝita %s."
 
-#: options.py:673 options.py:683
+#: options.py:671 options.py:681
 msgid "and"
 msgstr "kaj"
 
-#: options.py:678
+#: options.py:676
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "Aldonita %(name)s \"%(object)s\"."
 
-#: options.py:682
+#: options.py:680
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "Ŝanĝita %(list)s por %(name)s \"%(object)s\"."
 
-#: options.py:687
+#: options.py:685
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "Forigita %(name)s \"%(object)s\"."
 
-#: options.py:691
+#: options.py:689
 msgid "No fields changed."
 msgstr "Neniu kampo ŝanĝita."
 
-#: options.py:774
+#: options.py:772
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "La %(name)s \"%(obj)s\" estis aldonita sukcese."
 
-#: options.py:778 options.py:826
+#: options.py:776 options.py:824
 msgid "You may edit it again below."
 msgstr "Vi devus ĝin redakti denove sube."
 
-#: options.py:790 options.py:839
+#: options.py:788 options.py:837
 #, python-format
 msgid "You may add another %s below."
 msgstr "Vi devus aldoni alia %s sube."
 
-#: options.py:824
+#: options.py:822
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "La %(name)s \"%(obj)s\" estis ŝanĝita sukcese."
 
-#: options.py:832
+#: options.py:830
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
@@ -200,7 +200,7 @@ msgstr ""
 "La %(name)s \"%(obj)s\" estis aldonita sukcese. Vi devus ĝin redakti denove "
 "sube."
 
-#: options.py:901 options.py:1161
+#: options.py:899 options.py:1159
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
@@ -208,54 +208,54 @@ msgstr ""
 "Elementoj devas esti elektitaj por elfari agojn sur ilin. Neniu elemento "
 "estis ŝanĝita."
 
-#: options.py:920
+#: options.py:918
 msgid "No action selected."
 msgstr "Neniu ago elektita."
 
-#: options.py:1000
+#: options.py:998
 #, python-format
 msgid "Add %s"
 msgstr "Aldoni %s"
 
-#: options.py:1025 options.py:1269
+#: options.py:1023 options.py:1267
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "%(name)s objekto kun ĉefŝlosilo %(key)r ne ekzistas."
 
-#: options.py:1091
+#: options.py:1089
 #, python-format
 msgid "Change %s"
 msgstr "Ŝanĝi %s"
 
-#: options.py:1140
+#: options.py:1138
 msgid "Database error"
 msgstr "Datumbaza eraro"
 
-#: options.py:1203
+#: options.py:1201
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s estis ŝanĝita sukcese."
 msgstr[1] "%(count)s %(name)s estis ŝanĝitaj sukcese."
 
-#: options.py:1230
+#: options.py:1228
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "%(total_count)s elektitaj"
 msgstr[1] "Ĉiuj %(total_count)s elektitaj"
 
-#: options.py:1235
+#: options.py:1233
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "0 el %(cnt)s elektita"
 
-#: options.py:1285
+#: options.py:1283
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "La %(name)s \"%(obj)s\" estis forigita sukcese."
 
-#: options.py:1332
+#: options.py:1330
 #, python-format
 msgid "Change history: %s"
 msgstr "Ŝanĝa historio: %s"
@@ -826,16 +826,16 @@ msgstr "Rekomencigi mian pasvorton"
 msgid "All dates"
 msgstr "Ĉiuj datoj"
 
-#: views/main.py:30
+#: views/main.py:31
 msgid "(None)"
 msgstr "(Neniu)"
 
-#: views/main.py:73
+#: views/main.py:74
 #, python-format
 msgid "Select %s"
 msgstr "Elekti %s"
 
-#: views/main.py:75
+#: views/main.py:76
 #, python-format
 msgid "Select %s to change"
 msgstr "Elekti %s por ŝanĝi"

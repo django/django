@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-14 00:11-0700\n"
+"POT-Creation-Date: 2012-03-23 02:34+0100\n"
 "PO-Revision-Date: 2012-03-08 12:29+0000\n"
 "Last-Translator: Ali Ismayilov <ali@ismailov.info>\n"
 "Language-Team: Azerbaijani (http://www.transifex.net/projects/p/django/"
@@ -22,12 +22,12 @@ msgstr ""
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "%(count)d %(items)s uğurla silindi."
 
-#: actions.py:60 options.py:1297
+#: actions.py:60 options.py:1295
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr "%(name)s silinmir"
 
-#: actions.py:62 options.py:1299
+#: actions.py:62 options.py:1297
 msgid "Are you sure?"
 msgstr "Əminsiniz?"
 
@@ -142,54 +142,54 @@ msgstr ""
 msgid "None"
 msgstr "Heç nə"
 
-#: options.py:673
+#: options.py:671
 #, python-format
 msgid "Changed %s."
 msgstr "%s dəyişdi."
 
-#: options.py:673 options.py:683
+#: options.py:671 options.py:681
 msgid "and"
 msgstr "və"
 
-#: options.py:678
+#: options.py:676
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" əlavə olundu."
 
-#: options.py:682
+#: options.py:680
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr " %(list)s %(name)s \"%(object)s\" üçün dəyişdi."
 
-#: options.py:687
+#: options.py:685
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" siyahısından silindi."
 
-#: options.py:691
+#: options.py:689
 msgid "No fields changed."
 msgstr "Heç bir sahə dəyişmədi."
 
-#: options.py:774
+#: options.py:772
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" siyahısına uğurla əlavə edildi."
 
-#: options.py:778 options.py:826
+#: options.py:776 options.py:824
 msgid "You may edit it again below."
 msgstr "Aşağıda yenə dəyişiklik apara bilərsiniz."
 
-#: options.py:790 options.py:839
+#: options.py:788 options.py:837
 #, python-format
 msgid "You may add another %s below."
 msgstr "Aşağıda yeni %s əlavə edə bilərsiniz."
 
-#: options.py:824
+#: options.py:822
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" siyahısında uğurla dəyişdirildi."
 
-#: options.py:832
+#: options.py:830
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
@@ -197,7 +197,7 @@ msgstr ""
 "%(name)s \"%(obj)s\" siyahısına uğurla əlavə olundu. Yenə onu aşağıda "
 "redaktə edə bilərsiniz."
 
-#: options.py:901 options.py:1161
+#: options.py:899 options.py:1159
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
@@ -205,52 +205,52 @@ msgstr ""
 "Biz elementlər üzərində nəsə əməliyyat aparmaq üçün siz onları seçməlisiniz. "
 "Heç bir element dəyişmədi."
 
-#: options.py:920
+#: options.py:918
 msgid "No action selected."
 msgstr "Heç bir əməliyyat seçilmədi."
 
-#: options.py:1000
+#: options.py:998
 #, python-format
 msgid "Add %s"
 msgstr "%s əlavə et"
 
-#: options.py:1025 options.py:1269
+#: options.py:1023 options.py:1267
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "%(key)r əsas açarı ilə %(name)s mövcud deyil."
 
-#: options.py:1091
+#: options.py:1089
 #, python-format
 msgid "Change %s"
 msgstr "%s dəyiş"
 
-#: options.py:1140
+#: options.py:1138
 msgid "Database error"
 msgstr "Bazada xəta"
 
-#: options.py:1203
+#: options.py:1201
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s uğurla dəyişdirildi."
 
-#: options.py:1230
+#: options.py:1228
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "%(total_count)s - hamısı seçilib"
 
-#: options.py:1235
+#: options.py:1233
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "%(cnt)s-dan 0 seçilib"
 
-#: options.py:1285
+#: options.py:1283
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" uğurla silindi."
 
-#: options.py:1332
+#: options.py:1330
 #, python-format
 msgid "Change history: %s"
 msgstr "Dəyişmə tarixi: %s"
@@ -818,16 +818,16 @@ msgstr "Parolumu sıfırla"
 msgid "All dates"
 msgstr "Bütün tarixlərdə"
 
-#: views/main.py:30
+#: views/main.py:31
 msgid "(None)"
 msgstr "(Heç nə)"
 
-#: views/main.py:73
+#: views/main.py:74
 #, python-format
 msgid "Select %s"
 msgstr "%s seç"
 
-#: views/main.py:75
+#: views/main.py:76
 #, python-format
 msgid "Select %s to change"
 msgstr "%s dəyişmək üçün seç"

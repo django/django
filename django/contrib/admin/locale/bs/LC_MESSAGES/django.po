@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-14 00:11-0700\n"
+"POT-Creation-Date: 2012-03-23 02:34+0100\n"
 "PO-Revision-Date: 2012-03-08 12:29+0000\n"
 "Last-Translator: Filip Dupanović <filip.dupanovic@gmail.com>\n"
 "Language-Team: Bosnian (http://www.transifex.net/projects/p/django/language/"
@@ -24,12 +24,12 @@ msgstr ""
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "Uspješno izbrisano %(count)d %(items)s."
 
-#: actions.py:60 options.py:1297
+#: actions.py:60 options.py:1295
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr ""
 
-#: actions.py:62 options.py:1299
+#: actions.py:62 options.py:1297
 msgid "Are you sure?"
 msgstr "Da li ste sigurni?"
 
@@ -144,54 +144,54 @@ msgstr ""
 msgid "None"
 msgstr "Nijedan"
 
-#: options.py:673
+#: options.py:671
 #, python-format
 msgid "Changed %s."
 msgstr "Promijenjeno %s."
 
-#: options.py:673 options.py:683
+#: options.py:671 options.py:681
 msgid "and"
 msgstr "i"
 
-#: options.py:678
+#: options.py:676
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "Dodano %(name)s \"%(object)s\"."
 
-#: options.py:682
+#: options.py:680
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "Promijeni %(list)s za %(name)s \"%(object)s\"."
 
-#: options.py:687
+#: options.py:685
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "Izbrisani %(name)s \"%(object)s\"."
 
-#: options.py:691
+#: options.py:689
 msgid "No fields changed."
 msgstr "Nije bilo izmjena polja."
 
-#: options.py:774
+#: options.py:772
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "Objekat „%(obj)s“ klase %(name)s sačuvan je uspješno."
 
-#: options.py:778 options.py:826
+#: options.py:776 options.py:824
 msgid "You may edit it again below."
 msgstr "Dole možete ponovo unositi izmjene."
 
-#: options.py:790 options.py:839
+#: options.py:788 options.py:837
 #, python-format
 msgid "You may add another %s below."
 msgstr "Dole možete dodati novi objekat klase %s"
 
-#: options.py:824
+#: options.py:822
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "Objekat „%(obj)s“ klase %(name)s izmjenjen je uspješno."
 
-#: options.py:832
+#: options.py:830
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
@@ -199,7 +199,7 @@ msgstr ""
 "Objekat „%(obj)s“ klase %(name)s dodat je uspješno. Dole možete unjeti "
 "dodatne izmjene."
 
-#: options.py:901 options.py:1161
+#: options.py:899 options.py:1159
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
@@ -207,30 +207,30 @@ msgstr ""
 "Predmeti moraju biti izabrani da bi se mogla obaviti akcija nad njima. "
 "Nijedan predmet nije bio izmjenjen."
 
-#: options.py:920
+#: options.py:918
 msgid "No action selected."
 msgstr "Nijedna akcija nije izabrana."
 
-#: options.py:1000
+#: options.py:998
 #, python-format
 msgid "Add %s"
 msgstr "Dodaj objekat klase %s"
 
-#: options.py:1025 options.py:1269
+#: options.py:1023 options.py:1267
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "Objekat klase %(name)s sa primarnim ključem %(key)r ne postoji."
 
-#: options.py:1091
+#: options.py:1089
 #, python-format
 msgid "Change %s"
 msgstr "Izmjeni objekat klase %s"
 
-#: options.py:1140
+#: options.py:1138
 msgid "Database error"
 msgstr "Greška u bazi podataka"
 
-#: options.py:1203
+#: options.py:1201
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
@@ -238,7 +238,7 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: options.py:1230
+#: options.py:1228
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
@@ -246,17 +246,17 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: options.py:1235
+#: options.py:1233
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "0 od %(cnt)s izabrani"
 
-#: options.py:1285
+#: options.py:1283
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "Objekat „%(obj)s“ klase %(name)s obrisan je uspješno."
 
-#: options.py:1332
+#: options.py:1330
 #, python-format
 msgid "Change history: %s"
 msgstr "Historijat izmjena: %s"
@@ -818,16 +818,16 @@ msgstr "Resetuj moju lozinku"
 msgid "All dates"
 msgstr "Svi datumi"
 
-#: views/main.py:30
+#: views/main.py:31
 msgid "(None)"
 msgstr ""
 
-#: views/main.py:73
+#: views/main.py:74
 #, python-format
 msgid "Select %s"
 msgstr "Odaberi objekat klase %s"
 
-#: views/main.py:75
+#: views/main.py:76
 #, python-format
 msgid "Select %s to change"
 msgstr "Odaberi objekat klase %s za izmjenu"

@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-14 00:13-0700\n"
-"PO-Revision-Date: 2012-03-08 10:42+0000\n"
+"POT-Creation-Date: 2012-03-23 02:35+0100\n"
+"PO-Revision-Date: 2012-03-15 12:59+0000\n"
 "Last-Translator: Chandan kumar <chandankumar.093047@gmail.com>\n"
 "Language-Team: Hindi (http://www.transifex.net/projects/p/django/language/"
 "hi/)\n"
@@ -30,11 +30,13 @@ msgid ""
 "This is the list of available %s. You may choose some by selecting them in "
 "the box below and then clicking the \"Choose\" arrow between the two boxes."
 msgstr ""
+"यह उपलब्ध %s की सूची है. आप उन्हें नीचे दिए गए बॉक्स में से चयन करके कुछ को चुन सकते हैं और "
+"उसके बाद दो बॉक्स के बीच \"चुनें\" तीर पर क्लिक करें."
 
 #: static/admin/js/SelectFilter2.js:53
 #, c-format
 msgid "Type into this box to filter down the list of available %s."
-msgstr ""
+msgstr "इस बॉक्स में टाइप करने के लिए नीचे उपलब्ध %s की सूची को फ़िल्टर करें."
 
 #: static/admin/js/SelectFilter2.js:57
 msgid "Filter"
@@ -42,16 +44,16 @@ msgstr "छानना"
 
 #: static/admin/js/SelectFilter2.js:61
 msgid "Choose all"
-msgstr "सारे चुनें"
+msgstr "सभी चुनें"
 
 #: static/admin/js/SelectFilter2.js:61
 #, c-format
 msgid "Click to choose all %s at once."
-msgstr ""
+msgstr "एक ही बार में सभी %s को चुनने के लिए क्लिक करें."
 
 #: static/admin/js/SelectFilter2.js:67
 msgid "Choose"
-msgstr ""
+msgstr "चुनें"
 
 #: static/admin/js/SelectFilter2.js:69
 msgid "Remove"
@@ -60,7 +62,7 @@ msgstr "हटाना"
 #: static/admin/js/SelectFilter2.js:75
 #, c-format
 msgid "Chosen %s"
-msgstr "%s चुना गया हैं"
+msgstr "चुनें %s"
 
 #: static/admin/js/SelectFilter2.js:76
 #, c-format
@@ -68,6 +70,8 @@ msgid ""
 "This is the list of chosen %s. You may remove some by selecting them in the "
 "box below and then clicking the \"Remove\" arrow between the two boxes."
 msgstr ""
+"यह उपलब्ध %s की सूची है. आप उन्हें नीचे दिए गए बॉक्स में से चयन करके कुछ को हटा सकते हैं और "
+"उसके बाद दो बॉक्स के बीच \"हटायें\" तीर पर क्लिक करें."
 
 #: static/admin/js/SelectFilter2.js:80
 msgid "Remove all"
@@ -76,7 +80,7 @@ msgstr "सभी को हटाएँ"
 #: static/admin/js/SelectFilter2.js:80
 #, c-format
 msgid "Click to remove all chosen %s at once."
-msgstr ""
+msgstr "एक ही बार में सभी %s को हटाने के लिए क्लिक करें."
 
 #: static/admin/js/actions.js:18 static/admin/js/actions.min.js:1
 msgid "%(sel)s of %(cnt)s selected"
