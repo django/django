@@ -2,13 +2,14 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011.
+# Ramiro Morales <cramm0@gmail.com>, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-14 00:16-0700\n"
-"PO-Revision-Date: 2012-02-14 13:42+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2012-03-23 02:38+0100\n"
+"PO-Revision-Date: 2012-03-14 20:04+0000\n"
+"Last-Translator: Ramiro Morales <cramm0@gmail.com>\n"
 "Language-Team: Spanish (Argentina) (http://www.transifex.net/projects/p/"
 "django/language/es_AR/)\n"
 "Language: es_AR\n"
@@ -19,15 +20,15 @@ msgstr ""
 
 #: templates/formtools/wizard/wizard_form.html:15
 msgid "first step"
-msgstr ""
+msgstr "primer paso"
 
 #: templates/formtools/wizard/wizard_form.html:16
 msgid "prev step"
-msgstr ""
+msgstr "paso previo"
 
 #: templates/formtools/wizard/wizard_form.html:18
 msgid "submit"
-msgstr ""
+msgstr "enviar"
 
 #: wizard/legacy.py:159
 msgid ""

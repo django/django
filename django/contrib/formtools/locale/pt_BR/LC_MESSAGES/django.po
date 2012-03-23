@@ -1,14 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Guilherme Gondim <semente+transifex@taurinus.org>, 2012.
 # Jannis Leidel <jannis@leidel.info>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-14 00:17-0700\n"
-"PO-Revision-Date: 2012-02-14 13:42+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2012-03-23 02:38+0100\n"
+"PO-Revision-Date: 2012-03-19 17:01+0000\n"
+"Last-Translator: Guilherme Gondim <semente+transifex@taurinus.org>\n"
 "Language-Team: Portuguese (Brazil) <django-l10n-portuguese@googlegroups."
 "com>\n"
 "Language: pt_BR\n"
@@ -19,15 +20,15 @@ msgstr ""
 
 #: templates/formtools/wizard/wizard_form.html:15
 msgid "first step"
-msgstr ""
+msgstr "primeiro passo"
 
 #: templates/formtools/wizard/wizard_form.html:16
 msgid "prev step"
-msgstr ""
+msgstr "passo anterior"
 
 #: templates/formtools/wizard/wizard_form.html:18
 msgid "submit"
-msgstr ""
+msgstr "enviar"
 
 #: wizard/legacy.py:159
 msgid ""
