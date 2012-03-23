@@ -2,13 +2,14 @@
 #
 # Translators:
 # Ali Ismayilov <ali@ismailov.info>, 2011.
+# Dimitris Glezos <glezos@indifex.com>, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-14 00:16-0700\n"
-"PO-Revision-Date: 2012-03-08 12:31+0000\n"
-"Last-Translator: Ali Ismayilov <ali@ismailov.info>\n"
+"POT-Creation-Date: 2012-03-23 02:37+0100\n"
+"PO-Revision-Date: 2012-03-22 16:33+0000\n"
+"Last-Translator: Dimitris Glezos <glezos@indifex.com>\n"
 "Language-Team: Azerbaijani (http://www.transifex.net/projects/p/django/"
 "language/az/)\n"
 "Language: az\n"

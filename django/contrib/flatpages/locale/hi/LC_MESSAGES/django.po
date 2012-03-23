@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-14 00:16-0700\n"
-"PO-Revision-Date: 2012-03-08 12:31+0000\n"
+"POT-Creation-Date: 2012-03-23 02:37+0100\n"
+"PO-Revision-Date: 2012-03-15 13:39+0000\n"
 "Last-Translator: Chandan kumar <chandankumar.093047@gmail.com>\n"
 "Language-Team: Hindi (http://www.transifex.net/projects/p/django/language/"
 "hi/)\n"
@@ -40,11 +40,11 @@ msgstr "इस मूल्य में सिर्फ वर्णाक्�
 
 #: forms.py:19
 msgid "URL is missing a leading slash."
-msgstr ""
+msgstr "यूआरएल से प्रमुख स्लैश गायब है."
 
 #: forms.py:23
 msgid "URL is missing a trailing slash."
-msgstr ""
+msgstr "यूआरएल से अनुगामी स्लैश गायब है."
 
 #: forms.py:38
 #, python-format

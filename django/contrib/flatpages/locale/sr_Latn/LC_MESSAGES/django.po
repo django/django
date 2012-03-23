@@ -1,13 +1,17 @@
 # This file is distributed under the same license as the Django package.
 #
+# Translators:
+# Jannis Leidel <jannis@leidel.info>, 2011.
+# Janos Guljas <janos@resenje.org>, 2011, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-14 00:16-0700\n"
-"PO-Revision-Date: 2011-03-04 18:46+0000\n"
-"Last-Translator: Jannis <jannis@leidel.info>\n"
-"Language-Team: Serbian (Latin) <None>\n"
+"POT-Creation-Date: 2012-03-23 02:37+0100\n"
+"PO-Revision-Date: 2012-03-08 12:31+0000\n"
+"Last-Translator: Janos Guljas <janos@resenje.org>\n"
+"Language-Team: Serbian (Latin) (http://www.transifex.net/projects/p/django/"
+"language/sr@latin/)\n"
 "Language: sr@latin\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -40,16 +44,16 @@ msgstr ""
 
 #: forms.py:19
 msgid "URL is missing a leading slash."
-msgstr ""
+msgstr "Nedostaje kosa crta na početku URL-a."
 
 #: forms.py:23
 msgid "URL is missing a trailing slash."
-msgstr ""
+msgstr "Nedostaje kosa crta na kraju URL-a."
 
 #: forms.py:38
 #, python-format
 msgid "Flatpage with url %(url)s already exists for site %(site)s"
-msgstr ""
+msgstr "Stranica sa adresom %(url)s već postoji za sajt %(site)s"
 
 #: models.py:8
 msgid "title"

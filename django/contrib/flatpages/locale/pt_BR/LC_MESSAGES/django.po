@@ -2,14 +2,15 @@
 #
 # Translators:
 # Eduardo Carvalho <eduardocereto@gmail.com>, 2011.
+# Guilherme Gondim <semente+transifex@taurinus.org>, 2012.
 # Jannis Leidel <jannis@leidel.info>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-14 00:16-0700\n"
-"PO-Revision-Date: 2012-03-08 12:31+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2012-03-23 02:37+0100\n"
+"PO-Revision-Date: 2012-03-19 18:06+0000\n"
+"Last-Translator: Guilherme Gondim <semente+transifex@taurinus.org>\n"
 "Language-Team: Portuguese (Brazil) <django-l10n-portuguese@googlegroups."
 "com>\n"
 "Language: pt_BR\n"
@@ -41,16 +42,16 @@ msgstr ""
 
 #: forms.py:19
 msgid "URL is missing a leading slash."
-msgstr ""
+msgstr "Está faltando uma barra no início da URL."
 
 #: forms.py:23
 msgid "URL is missing a trailing slash."
-msgstr ""
+msgstr "Está faltando uma barra no final da URL."
 
 #: forms.py:38
 #, python-format
 msgid "Flatpage with url %(url)s already exists for site %(site)s"
-msgstr ""
+msgstr "Uma Flatpage com a URL %(url)s já existe para o site %(site)s "
 
 #: models.py:8
 msgid "title"
@@ -66,7 +67,7 @@ msgstr "habilitar comentários"
 
 #: models.py:11
 msgid "template name"
-msgstr "nome do modelo"
+msgstr "nome do template"
 
 #: models.py:12
 msgid ""

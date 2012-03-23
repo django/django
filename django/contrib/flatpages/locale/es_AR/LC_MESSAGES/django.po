@@ -2,14 +2,14 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011.
-# Ramiro Morales <cramm0@gmail.com>, 2011.
+# Ramiro Morales <cramm0@gmail.com>, 2011, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-14 00:16-0700\n"
-"PO-Revision-Date: 2012-03-08 12:31+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2012-03-23 02:37+0100\n"
+"PO-Revision-Date: 2012-03-16 01:47+0000\n"
+"Last-Translator: Ramiro Morales <cramm0@gmail.com>\n"
 "Language-Team: Spanish (Argentina) (http://www.transifex.net/projects/p/"
 "django/language/es_AR/)\n"
 "Language: es_AR\n"
@@ -43,16 +43,16 @@ msgstr ""
 
 #: forms.py:19
 msgid "URL is missing a leading slash."
-msgstr ""
+msgstr "A la URL le falta una / al principio"
 
 #: forms.py:23
 msgid "URL is missing a trailing slash."
-msgstr ""
+msgstr "A la URL le falta una / al final"
 
 #: forms.py:38
 #, python-format
 msgid "Flatpage with url %(url)s already exists for site %(site)s"
-msgstr ""
+msgstr "Ya existe una flatpage con url %(url)s para el sitio %(site)s"
 
 #: models.py:8
 msgid "title"

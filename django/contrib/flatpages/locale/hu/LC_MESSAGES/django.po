@@ -7,9 +7,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-14 00:16-0700\n"
-"PO-Revision-Date: 2012-03-08 12:31+0000\n"
-"Last-Translator: Szilveszter Farkas <szilveszter.farkas@gmail.com>\n"
+"POT-Creation-Date: 2012-03-23 02:37+0100\n"
+"PO-Revision-Date: 2012-03-19 20:14+0000\n"
+"Last-Translator: istvanf <istvan.farkas@gmail.com>\n"
 "Language-Team: Hungarian (http://www.transifex.net/projects/p/django/"
 "language/hu/)\n"
 "Language: hu\n"
@@ -41,16 +41,16 @@ msgstr ""
 
 #: forms.py:19
 msgid "URL is missing a leading slash."
-msgstr ""
+msgstr "AZ URL-ből hiányzik a kezdő perjel."
 
 #: forms.py:23
 msgid "URL is missing a trailing slash."
-msgstr ""
+msgstr "AZ URL-ből hiányzik a záró perjel."
 
 #: forms.py:38
 #, python-format
 msgid "Flatpage with url %(url)s already exists for site %(site)s"
-msgstr ""
+msgstr "%(site)s honlapon már létezik egyszerű oldal ezzel az URL-lel: %(url)s"
 
 #: models.py:8
 msgid "title"
