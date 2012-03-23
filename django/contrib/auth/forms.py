@@ -36,7 +36,7 @@ class ReadOnlyPasswordHashWidget(forms.Widget):
         try:
             hasher = get_hasher(algorithm)
         except ValueError:
-            summary = "<strong>%s</strong>" % ugettext("Invalid password format or unknown hashing algorithm.")
+            summary = "<strong>Invalid password format or unknown hashing algorithm.</strong>"
         else:
             summary = ""
             for key, value in hasher.safe_summary(encoded).iteritems():
