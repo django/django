@@ -8,6 +8,7 @@ from django.core.cache import cache
 
 KEY_PREFIX = "django.contrib.sessions.cached_db"
 
+
 class SessionStore(DBStore):
     """
     Implements cached, database backed sessions.
@@ -23,7 +24,7 @@ class SessionStore(DBStore):
     def load(self):
         try:
             data = cache.get(self.cache_key, None)
-        except Exception as e:
+        except Exception, e:
             e_type = str(type(e))
             if e_type != "<class 'memcache.MemcachedKeyLengthError'>":
                 raise e

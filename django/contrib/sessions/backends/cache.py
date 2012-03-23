@@ -3,6 +3,7 @@ from django.core.cache import cache
 
 KEY_PREFIX = "django.contrib.sessions.cache"
 
+
 class SessionStore(SessionBase):
     """
     A cache-based session store.
@@ -18,7 +19,7 @@ class SessionStore(SessionBase):
     def load(self):
         try:
             session_data = self._cache.get(self.cache_key, None)
-        except Exception as e:
+        except Exception, e:
             e_type = str(type(e))
             if e_type != "<class 'memcache.MemcachedKeyLengthError'>":
                 raise e
