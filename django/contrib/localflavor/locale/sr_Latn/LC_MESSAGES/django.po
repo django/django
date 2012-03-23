@@ -1,13 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
+# Translators:
+# Jannis Leidel <jannis@leidel.info>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-14 00:21-0700\n"
-"PO-Revision-Date: 2011-03-04 18:43+0000\n"
-"Last-Translator: Jannis <jannis@leidel.info>\n"
-"Language-Team: Serbian (Latin) <None>\n"
+"POT-Creation-Date: 2012-03-23 02:42+0100\n"
+"PO-Revision-Date: 2012-03-08 12:24+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: Serbian (Latin) (http://www.transifex.net/projects/p/django/"
+"language/sr@latin/)\n"
 "Language: sr@latin\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -81,9 +84,8 @@ msgstr ""
 "Unesite važeći austrijski broj socijalnog osiguranja u formatu XXXX XXXXXX."
 
 #: au/forms.py:26
-#, fuzzy
 msgid "Enter a 4 digit postcode."
-msgstr "Unesite četvorocifreni poštanski broj"
+msgstr ""
 
 #: au/models.py:9
 msgid "Australian State"
@@ -94,9 +96,8 @@ msgid "Australian Postcode"
 msgstr ""
 
 #: au/models.py:33
-#, fuzzy
 msgid "Australian Phone number"
-msgstr "Broj telefona"
+msgstr ""
 
 #: be/be_provinces.py:5
 msgid "Antwerp"
@@ -326,9 +327,8 @@ msgid "The Chilean RUT is not valid."
 msgstr ""
 
 #: cn/forms.py:84
-#, fuzzy
 msgid "Enter a post code in the format XXXXXX."
-msgstr "Unesite poštanski broj u formatu XXXX."
+msgstr ""
 
 #: cn/forms.py:105
 msgid "ID Card Number consists of 15 or 18 digits."
@@ -347,14 +347,12 @@ msgid "Invalid ID Card Number: Wrong location code"
 msgstr ""
 
 #: cn/forms.py:193
-#, fuzzy
 msgid "Enter a valid phone number."
-msgstr "Nevažeći CPF broj"
+msgstr ""
 
 #: cn/forms.py:210
-#, fuzzy
 msgid "Enter a valid cell number."
-msgstr "Nevažeći CPF broj"
+msgstr ""
 
 #: cz/cz_regions.py:8
 msgid "Prague"
@@ -1118,18 +1116,16 @@ msgid "Enter a valid vehicle license plate number"
 msgstr ""
 
 #: hr/forms.py:153
-#, fuzzy
 msgid "Enter a valid location code"
-msgstr "Unesite četvorocifreni poštanski broj"
+msgstr ""
 
 #: hr/forms.py:154
 msgid "Number part cannot be zero"
 msgstr ""
 
 #: hr/forms.py:190
-#, fuzzy
 msgid "Enter a valid 5 digit postal code"
-msgstr "Unesite četvorocifreni poštanski broj"
+msgstr ""
 
 #: hr/forms.py:218 id/forms.py:72 nl/forms.py:56
 msgid "Enter a valid phone number"
@@ -1644,18 +1640,16 @@ msgid "Enter a valid ID number."
 msgstr ""
 
 #: in_/forms.py:41
-#, fuzzy
 msgid "Enter a zip code in the format XXXXXX or XXX XXX."
-msgstr "Unesite poštanski broj u formatu XXXXX-XXX."
+msgstr ""
 
 #: in_/forms.py:64
 msgid "Enter an Indian state or territory."
 msgstr ""
 
 #: in_/forms.py:103
-#, fuzzy
 msgid "Phone numbers must be in 02X-8X or 03X-7X or 04X-6X format."
-msgstr "Broj telefona mora biti u formatu XX-XXXX-XXXX."
+msgstr ""
 
 #: is_/forms.py:22
 msgid ""
@@ -2241,9 +2235,8 @@ msgid "Unique master citizen number (13 digits)"
 msgstr ""
 
 #: mx/forms.py:65
-#, fuzzy
 msgid "Enter a valid zip code in the format XXXXX."
-msgstr "Unesite poštanski broj u formatu XXXX."
+msgstr ""
 
 #: mx/forms.py:108
 msgid "Enter a valid RFC."
@@ -2254,18 +2247,16 @@ msgid "Invalid checksum for RFC."
 msgstr ""
 
 #: mx/forms.py:189
-#, fuzzy
 msgid "Enter a valid CURP."
-msgstr "Nevažeći CUIT"
+msgstr ""
 
 #: mx/forms.py:190
 msgid "Invalid checksum for CURP."
 msgstr ""
 
 #: mx/models.py:14
-#, fuzzy
 msgid "Mexico state (three uppercase letters)"
-msgstr "Država u SAD (dva velika slova)"
+msgstr ""
 
 #: mx/models.py:27
 msgid "Mexico zip code"
@@ -2488,11 +2479,10 @@ msgid "Wrong checksum for the National ID Card Number."
 msgstr ""
 
 #: pl/forms.py:131
-#, fuzzy
 msgid ""
 "Enter a tax number field (NIP) in the format XXX-XXX-XX-XX, XXX-XX-XX-XXX or "
 "XXXXXXXXXX."
-msgstr "Unestie važeći CUIT u formatu XX-XXXXXXXX-X or XXXXXXXXXXXX."
+msgstr ""
 
 #: pl/forms.py:132
 msgid "Wrong checksum for the Tax Number (NIP)."
@@ -2603,19 +2593,16 @@ msgid "Enter a valid postal code in the format XXXXXX"
 msgstr ""
 
 #: ru/forms.py:37
-#, fuzzy
 msgid "Enter a postal code in the format XXXXXX."
-msgstr "Unesite poštanski broj u formatu XXXX."
+msgstr ""
 
 #: ru/forms.py:50
-#, fuzzy
 msgid "Enter a passport number in the format XXXX XXXXXX."
-msgstr "Unesite poštanski broj u formatu XXXXX-XXX."
+msgstr ""
 
 #: ru/forms.py:63
-#, fuzzy
 msgid "Enter a passport number in the format XX XXXXXXX."
-msgstr "Unesite poštanski broj u formatu XXXXX-XXX."
+msgstr ""
 
 #: ru/ru_regions.py:10
 msgid "Central Federal County"
@@ -3090,9 +3077,8 @@ msgid "The EMSO is not valid."
 msgstr ""
 
 #: si/forms.py:86
-#, fuzzy
 msgid "Enter a valid tax number in form SIXXXXXXXX"
-msgstr "Unesite poštanski broj u formatu XXXXX-XXX."
+msgstr ""
 
 #: si/forms.py:151
 msgid "Enter phone number in form +386XXXXXXXX or 0XXXXXXXX."
