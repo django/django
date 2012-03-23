@@ -5,9 +5,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-14 00:22-0700\n"
-"PO-Revision-Date: 2011-01-19 16:38+0000\n"
-"Last-Translator: Django team\n"
+"POT-Creation-Date: 2012-03-23 02:43+0100\n"
+"PO-Revision-Date: 2012-03-16 18:53+0000\n"
+"Last-Translator: machaku <bmachaku@gmail.com>\n"
 "Language-Team: Swahili (http://www.transifex.net/projects/p/django/language/"
 "sw/)\n"
 "Language: sw\n"
@@ -18,28 +18,31 @@ msgstr ""
 
 #: models.py:7
 msgid "redirect from"
-msgstr ""
+msgstr "elekeza upya kutoka"
 
 #: models.py:8
 msgid ""
 "This should be an absolute path, excluding the domain name. Example: '/"
 "events/search/'."
 msgstr ""
+"Hii inatakiwa kuwa njia kamili, ukiondo jina la domeini. Mfano:'/matukio/"
+"tafuta/'."
 
 #: models.py:9
 msgid "redirect to"
-msgstr ""
+msgstr "elekeza upya kwenda"
 
 #: models.py:10
 msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
 "'http://'."
 msgstr ""
+"Hii inaweza kuwa njia kamili (kama hapo juu) or URL kamili yenye 'http://'."
 
 #: models.py:13
 msgid "redirect"
-msgstr ""
+msgstr "maelekezo upya"
 
 #: models.py:14
 msgid "redirects"
-msgstr ""
+msgstr "maelekezo upya"
