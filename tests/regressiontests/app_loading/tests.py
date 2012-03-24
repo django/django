@@ -5,7 +5,7 @@ import time
 
 from django.conf import Settings
 from django.db.models.loading import cache, load_app
-from django.utils.unittest import TestCase
+from django.utils.unittest import TestCase, skipIf
 
 
 class InstalledAppsGlobbingTest(TestCase):
@@ -14,6 +14,8 @@ class InstalledAppsGlobbingTest(TestCase):
         sys.path.append(os.path.dirname(os.path.abspath(__file__)))
         self.OLD_TZ = os.environ.get("TZ")
 
+    @skipIf('test_settings' in sys.modules,
+            'A toplevel module named test_settings already exists')
     def test_globbing(self):
         settings = Settings('test_settings')
         self.assertEqual(settings.INSTALLED_APPS, ['parent.app', 'parent.app1', 'parent.app_2'])
