@@ -132,7 +132,13 @@ class DatabaseCache(BaseDatabaseCache):
             cursor.execute("SELECT COUNT(*) FROM %s" % table)
             num = cursor.fetchone()[0]
             if num > self._max_entries:
-                cursor.execute("SELECT cache_key FROM %s ORDER BY cache_key LIMIT 1 OFFSET %%s" % table, [num / self._cull_frequency])
+                cull_num = num / self._cull_frequency
+                if connections[db].vendor == 'oracle':
+                    # Special case for Oracle because it doesn't support LIMIT + OFFSET
+                    cursor.execute("SELECT cache_key FROM (SELECT ROW_NUMBER() OVER (ORDER BY cache_key) AS counter, cache_key FROM %s) WHERE counter > %%s AND COUNTER <= %%s" % table, [cull_num, cull_num + 1])
+		else:
+                    # This isn't standard SQL, it's likely to break with some non officially supported databases             
+                    cursor.execute("SELECT cache_key FROM %s ORDER BY cache_key LIMIT 1 OFFSET %%s" % table, [cull_num])
                 cursor.execute("DELETE FROM %s WHERE cache_key < %%s" % table, [cursor.fetchone()[0]])
 
     def clear(self):
