@@ -22,7 +22,7 @@ def ssi(parser, token):
 
         {% ssi "/home/html/ljworld.com/includes/right_generic.html" parsed %}
     """
-    bits = token.contents.split()
+    bits = token.split_contents()
     parsed = False
     if len(bits) not in (2, 3):
         raise TemplateSyntaxError("'ssi' tag takes one argument: the path to"
