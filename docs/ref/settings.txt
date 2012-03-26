@@ -2131,8 +2131,10 @@ environment variable under the following conditions:
   :ref:`manually configuring settings
   <settings-without-django-settings-module>`, or
 
-* If you specify ``TIME_ZONE = None``. This will cause Django to fall
-  back to using the system time zone.
+* If you specify ``TIME_ZONE = None``. This will cause Django to fall back to
+  using the system timezone. However, this is discouraged when :setting:`USE_TZ
+  = True <USE_TZ>`, because it makes conversions between local time and UTC
+  less reliable.
 
 If Django doesn't set the ``TZ`` environment variable, it's up to you
 to ensure your processes are running in the correct environment.
