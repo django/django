@@ -9,6 +9,7 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils.encoding import force_unicode
 from django.utils import translation
+from django.utils.translation import ugettext as _
 
 
 class UserCreationFormTest(TestCase):
@@ -333,6 +334,6 @@ class PasswordResetFormTest(TestCase):
         form = PasswordResetForm(data)
         self.assertFalse(form.is_valid())
         self.assertEqual(form["email"].errors,
-                         [u"The user account associated with this e-mail address cannot reset the password."])
+                         [_(u"The user account associated with this e-mail address cannot reset the password.")])
 
 PasswordResetFormTest = override_settings(USE_TZ=False)(PasswordResetFormTest)
