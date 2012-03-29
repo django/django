@@ -247,8 +247,9 @@ class BaseCommand(object):
             else:
                 self.stderr.write(smart_str(self.style.ERROR('Error: %s\n' % e)))
             sys.exit(1)
-        if saved_lang is not None:
-            translation.activate(saved_lang)
+        finally:
+            if saved_lang is not None:
+                translation.activate(saved_lang)
 
     def validate(self, app=None, display_num_errors=False):
         """
