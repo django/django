@@ -890,6 +890,9 @@ class EmailField(CharField):
     description = _("E-mail address")
 
     def __init__(self, *args, **kwargs):
+        # max_length should be overridden to 254 characters to be fully 
+        # compliant with RFCs 3696 and 5321
+
         kwargs['max_length'] = kwargs.get('max_length', 75)
         CharField.__init__(self, *args, **kwargs)
 
