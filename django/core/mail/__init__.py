@@ -78,7 +78,8 @@ def send_mass_mail(datatuple, fail_silently=False, auth_user=None,
     connection = connection or get_connection(username=auth_user,
                                     password=auth_password,
                                     fail_silently=fail_silently)
-    messages = [EmailMessage(subject, message, sender, recipient)
+    messages = [EmailMessage(subject, message, sender, recipient,
+                             connection=connection)
                 for subject, message, sender, recipient in datatuple]
     return connection.send_messages(messages)
 
