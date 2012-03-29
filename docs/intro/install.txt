@@ -86,7 +86,7 @@ Then at the Python prompt, try to import Django::
 
     >>> import django
     >>> print django.get_version()
-    1.3
+    1.4
 
 
 That's it!
