@@ -34,7 +34,7 @@ class CHPhoneNumberField(Field):
     '0XX XXX XX XX'.
     """
     default_error_messages = {
-        'invalid': 'Phone numbers must be in 0XX XXX XX XX format.',
+        'invalid': _('Phone numbers must be in 0XX XXX XX XX format.'),
     }
 
     def clean(self, value):
