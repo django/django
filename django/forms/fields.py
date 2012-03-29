@@ -577,8 +577,8 @@ class ImageField(FileField):
 
             # Since we're about to use the file again we have to reset the
             # file object if possible.
-            if hasattr(file, 'reset'):
-                file.reset()
+            if hasattr(file, 'seek') and callable(file.seek):
+                file.seek(0)
 
             # verify() is the only method that can spot a corrupt PNG,
             #  but it must be called immediately after the constructor
