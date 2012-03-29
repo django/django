@@ -555,8 +555,9 @@ can be made; see :ref:`the model field reference <ref-onetoone>` for details.
 
 .. seealso::
 
-:class:`~django.db.models.OneToOneField` fields also accept one optional argument
-described in the :ref:`model field reference <ref-onetoone>`.
+    :class:`~django.db.models.OneToOneField` fields also accept one specific,
+    optional ``parent_link`` argument described in the :ref:`model field
+    reference <ref-onetoone>`.
 
 :class:`~django.db.models.OneToOneField` classes used to automatically become
 the primary key on a model. This is no longer true (although you can manually
