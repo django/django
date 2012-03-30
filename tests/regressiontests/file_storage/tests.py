@@ -2,7 +2,6 @@
 import errno
 import os
 import shutil
-import sys
 import tempfile
 import time
 from datetime import datetime, timedelta
@@ -470,12 +469,7 @@ class FileStoragePathParsing(unittest.TestCase):
         self.storage.save('dotted.path/.test', ContentFile("2"))
 
         self.assertTrue(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/.test')))
-        # Before 2.6, a leading dot was treated as an extension, and so
-        # underscore gets added to beginning instead of end.
-        if sys.version_info < (2, 6):
-            self.assertTrue(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/_1.test')))
-        else:
-            self.assertTrue(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/.test_1')))
+        self.assertTrue(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/.test_1')))
 
 class DimensionClosingBug(unittest.TestCase):
     """

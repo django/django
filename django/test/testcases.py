@@ -1035,12 +1035,8 @@ class LiveServerThread(threading.Thread):
                     self.httpd = StoppableWSGIServer(
                         (self.host, port), QuietWSGIRequestHandler)
                 except WSGIServerException, e:
-                    if sys.version_info < (2, 6):
-                        error_code = e.args[0].args[0]
-                    else:
-                        error_code = e.args[0].errno
                     if (index + 1 < len(self.possible_ports) and
-                        error_code == errno.EADDRINUSE):
+                        e.args[0].errno == errno.EADDRINUSE):
                         # This port is already in use, so we go on and try with
                         # the next one in the list.
                         continue

@@ -1,4 +1,3 @@
-import platform
 import re
 import urllib
 import urllib2
@@ -123,10 +122,7 @@ class URLValidator(RegexValidator):
                 else:
                     handlers.append(urllib2.HTTPSHandler())
                 map(opener.add_handler, handlers)
-                if platform.python_version_tuple() >= (2, 6):
-                    opener.open(req, timeout=10)
-                else:
-                    opener.open(req)
+                opener.open(req, timeout=10)
             except ValueError:
                 raise ValidationError(_(u'Enter a valid URL.'), code='invalid')
             except: # urllib2.URLError, httplib.InvalidURL, etc.
