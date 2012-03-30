@@ -26,7 +26,8 @@ class HTTPSSitemapTests(SitemapTestsBase):
 </urlset>
 """ % (self.base_url, date.today()))
 
-#@override_settings(SECURE_PROXY_SSL_HEADER=False)
+
+@override_settings(SECURE_PROXY_SSL_HEADER=False)
 class HTTPSDetectionSitemapTests(SitemapTestsBase):
     extra = {'wsgi.url_scheme': 'https'}
 
@@ -47,5 +48,3 @@ class HTTPSDetectionSitemapTests(SitemapTestsBase):
 <url><loc>%s/location/</loc><lastmod>%s</lastmod><changefreq>never</changefreq><priority>0.5</priority></url>
 </urlset>
 """ % (self.base_url.replace('http://', 'https://'), date.today()))
-
-HTTPSDetectionSitemapTests = override_settings(SECURE_PROXY_SSL_HEADER=False)(HTTPSDetectionSitemapTests)

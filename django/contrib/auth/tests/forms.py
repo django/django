@@ -11,6 +11,7 @@ from django.utils import translation
 from django.utils.translation import ugettext as _
 
 
+@override_settings(USE_TZ=False)
 class UserCreationFormTest(TestCase):
 
     fixtures = ['authtestdata.json']
@@ -75,9 +76,8 @@ class UserCreationFormTest(TestCase):
         u = form.save()
         self.assertEqual(repr(u), '<User: jsmith@example.com>')
 
-UserCreationFormTest = override_settings(USE_TZ=False)(UserCreationFormTest)
 
-
+@override_settings(USE_TZ=False)
 class AuthenticationFormTest(TestCase):
 
     fixtures = ['authtestdata.json']
@@ -128,9 +128,8 @@ class AuthenticationFormTest(TestCase):
         self.assertTrue(form.is_valid())
         self.assertEqual(form.non_field_errors(), [])
 
-AuthenticationFormTest = override_settings(USE_TZ=False)(AuthenticationFormTest)
 
-
+@override_settings(USE_TZ=False)
 class SetPasswordFormTest(TestCase):
 
     fixtures = ['authtestdata.json']
@@ -156,9 +155,8 @@ class SetPasswordFormTest(TestCase):
         form = SetPasswordForm(user, data)
         self.assertTrue(form.is_valid())
 
-SetPasswordFormTest = override_settings(USE_TZ=False)(SetPasswordFormTest)
 
-
+@override_settings(USE_TZ=False)
 class PasswordChangeFormTest(TestCase):
 
     fixtures = ['authtestdata.json']
@@ -205,9 +203,8 @@ class PasswordChangeFormTest(TestCase):
         self.assertEqual(PasswordChangeForm(user, {}).fields.keys(),
                          ['old_password', 'new_password1', 'new_password2'])
 
-PasswordChangeFormTest = override_settings(USE_TZ=False)(PasswordChangeFormTest)
 
-
+@override_settings(USE_TZ=False)
 class UserChangeFormTest(TestCase):
 
     fixtures = ['authtestdata.json']
@@ -254,9 +251,7 @@ class UserChangeFormTest(TestCase):
         form.as_table()
 
 
-UserChangeFormTest = override_settings(USE_TZ=False)(UserChangeFormTest)
-
-
+@override_settings(USE_TZ=False)
 class PasswordResetFormTest(TestCase):
 
     fixtures = ['authtestdata.json']
@@ -334,5 +329,3 @@ class PasswordResetFormTest(TestCase):
         self.assertFalse(form.is_valid())
         self.assertEqual(form["email"].errors,
                          [_(u"The user account associated with this e-mail address cannot reset the password.")])
-
-PasswordResetFormTest = override_settings(USE_TZ=False)(PasswordResetFormTest)

@@ -98,9 +98,9 @@ class BaseStaticFilesTestCase(object):
         self.assertRaises(exc, self.assertStaticRenders, path, result, **kwargs)
 
 
+@override_settings(**TEST_SETTINGS)
 class StaticFilesTestCase(BaseStaticFilesTestCase, TestCase):
     pass
-StaticFilesTestCase = override_settings(**TEST_SETTINGS)(StaticFilesTestCase)
 
 
 class BaseCollectionTestCase(BaseStaticFilesTestCase):
@@ -343,17 +343,21 @@ class TestCollectionFilesOverride(CollectionTestCase):
         self.assertFileContains('file2.txt', 'duplicate of file2.txt')
 
 
+@override_settings(
+    STATICFILES_STORAGE='regressiontests.staticfiles_tests.storage.DummyStorage',
+)
 class TestCollectionNonLocalStorage(CollectionTestCase, TestNoFilesCreated):
     """
     Tests for #15035
     """
     pass
 
-TestCollectionNonLocalStorage = override_settings(
-    STATICFILES_STORAGE='regressiontests.staticfiles_tests.storage.DummyStorage',
-)(TestCollectionNonLocalStorage)
 
-
+# we set DEBUG to False here since the template tag wouldn't work otherwise
+@override_settings(**dict(TEST_SETTINGS,
+    STATICFILES_STORAGE='django.contrib.staticfiles.storage.CachedStaticFilesStorage',
+    DEBUG=False,
+))
 class TestCollectionCachedStorage(BaseCollectionTestCase,
         BaseStaticFilesTestCase, TestCase):
     """
@@ -514,12 +518,6 @@ class TestCollectionCachedStorage(BaseCollectionTestCase,
         self.restore_warnings_state()
         self.assertEqual(cache_key, 'staticfiles:e95bbc36387084582df2a70750d7b351')
 
-
-# we set DEBUG to False here since the template tag wouldn't work otherwise
-TestCollectionCachedStorage = override_settings(**dict(TEST_SETTINGS,
-    STATICFILES_STORAGE='django.contrib.staticfiles.storage.CachedStaticFilesStorage',
-    DEBUG=False,
-))(TestCollectionCachedStorage)
 
 if sys.platform != 'win32':
 

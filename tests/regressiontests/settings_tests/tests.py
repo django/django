@@ -6,7 +6,7 @@ from django.test import TransactionTestCase, TestCase, signals
 from django.test.utils import override_settings
 
 
-# @override_settings(TEST='override')
+@override_settings(TEST='override')
 class FullyDecoratedTranTestCase(TransactionTestCase):
 
     def test_override(self):
@@ -22,9 +22,8 @@ class FullyDecoratedTranTestCase(TransactionTestCase):
     def test_decorated_testcase_module(self):
         self.assertEquals(FullyDecoratedTranTestCase.__module__, __name__)
 
-FullyDecoratedTranTestCase = override_settings(TEST='override')(FullyDecoratedTranTestCase)
 
-# @override_settings(TEST='override')
+@override_settings(TEST='override')
 class FullyDecoratedTestCase(TestCase):
 
     def test_override(self):
@@ -33,8 +32,6 @@ class FullyDecoratedTestCase(TestCase):
     @override_settings(TEST='override2')
     def test_method_override(self):
         self.assertEqual(settings.TEST, 'override2')
-
-FullyDecoratedTestCase = override_settings(TEST='override')(FullyDecoratedTestCase)
 
 
 class ClassDecoratedTestCaseSuper(TestCase):
@@ -47,6 +44,7 @@ class ClassDecoratedTestCaseSuper(TestCase):
         pass
 
 
+@override_settings(TEST='override')
 class ClassDecoratedTestCase(ClassDecoratedTestCaseSuper):
     def test_override(self):
         self.assertEqual(settings.TEST, 'override')
@@ -66,7 +64,6 @@ class ClassDecoratedTestCase(ClassDecoratedTestCaseSuper):
         except RuntimeError, e:
             self.fail()
 
-ClassDecoratedTestCase = override_settings(TEST='override')(ClassDecoratedTestCase)
 
 class SettingGetter(object):
     def __init__(self):

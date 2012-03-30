@@ -38,6 +38,7 @@ def stored_cookie_messages_count(storage, response):
     return len(data)
 
 
+@override_settings(SESSION_COOKIE_DOMAIN='.lawrence.com')
 class CookieTest(BaseTest):
     storage_class = CookieStorage
 
@@ -130,6 +131,3 @@ class CookieTest(BaseTest):
         value = encoder.encode(messages)
         decoded_messages = json.loads(value, cls=MessageDecoder)
         self.assertEqual(messages, decoded_messages)
-
-CookieTest = override_settings(
-        SESSION_COOKIE_DOMAIN='.lawrence.com')(CookieTest)

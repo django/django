@@ -287,7 +287,9 @@ class DatabaseSessionTests(SessionTestsMixin, TestCase):
         self.assertEqual(self.session['y'], 2)
 
 
-DatabaseSessionWithTimeZoneTests = override_settings(USE_TZ=True)(DatabaseSessionTests)
+@override_settings(USE_TZ=True)
+class DatabaseSessionWithTimeZoneTests(DatabaseSessionTests):
+    pass
 
 
 class CacheDBSessionTests(SessionTestsMixin, TestCase):
@@ -308,7 +310,9 @@ class CacheDBSessionTests(SessionTestsMixin, TestCase):
         restore_warnings_state(warnings_state)
 
 
-CacheDBSessionWithTimeZoneTests = override_settings(USE_TZ=True)(CacheDBSessionTests)
+@override_settings(USE_TZ=True)
+class CacheDBSessionWithTimeZoneTests(CacheDBSessionTests):
+    pass
 
 
 # Don't need DB flushing for these tests, so can use unittest.TestCase as base class

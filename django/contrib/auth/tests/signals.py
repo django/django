@@ -3,6 +3,7 @@ from django.test.utils import override_settings
 from django.contrib.auth import signals
 
 
+@override_settings(USE_TZ=False)
 class SignalTestCase(TestCase):
     urls = 'django.contrib.auth.tests.urls'
     fixtures = ['authtestdata.json']
@@ -46,5 +47,3 @@ class SignalTestCase(TestCase):
         self.client.get('/logout/next_page/')
         self.assertEqual(len(self.logged_out), 1)
         self.assertEqual(self.logged_out[0].username, 'testclient')
-
-SignalTestCase = override_settings(USE_TZ=False)(SignalTestCase)

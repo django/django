@@ -5,6 +5,10 @@ from django.test import TestCase
 from django.test.utils import override_settings
 
 
+@override_settings(
+    STATIC_URL=None,
+    MEDIA_URL='http://media.example.com/media/',
+)
 class FormsMediaTestCase(TestCase):
     """Tests for the media handling on widgets and forms"""
 
@@ -451,12 +455,11 @@ class FormsMediaTestCase(TestCase):
 <link href="/path/to/css3" type="text/css" media="all" rel="stylesheet" />
 <link href="/some/form/css" type="text/css" media="all" rel="stylesheet" />""")
 
-FormsMediaTestCase = override_settings(
-    STATIC_URL=None,
+
+@override_settings(
+    STATIC_URL='http://media.example.com/static/',
     MEDIA_URL='http://media.example.com/media/',
-)(FormsMediaTestCase)
-
-
+)
 class StaticFormsMediaTestCase(TestCase):
     """Tests for the media handling on widgets and forms"""
 
@@ -902,9 +905,3 @@ class StaticFormsMediaTestCase(TestCase):
 <link href="/path/to/css2" type="text/css" media="all" rel="stylesheet" />
 <link href="/path/to/css3" type="text/css" media="all" rel="stylesheet" />
 <link href="/some/form/css" type="text/css" media="all" rel="stylesheet" />""")
-
-
-StaticFormsMediaTestCase = override_settings(
-    STATIC_URL='http://media.example.com/static/',
-    MEDIA_URL='http://media.example.com/media/',
-)(StaticFormsMediaTestCase)

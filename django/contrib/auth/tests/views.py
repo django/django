@@ -18,6 +18,7 @@ from django.contrib.auth.forms import (AuthenticationForm, PasswordChangeForm,
                 SetPasswordForm, PasswordResetForm)
 
 
+@override_settings(USE_TZ=False)
 class AuthViewsTestCase(TestCase):
     """
     Helper base class for all the follow test cases.
@@ -51,8 +52,6 @@ class AuthViewsTestCase(TestCase):
 
     def assertContainsEscaped(self, response, text, **kwargs):
         return self.assertContains(response, escape(force_unicode(text)), **kwargs)
-
-AuthViewsTestCase = override_settings(USE_TZ=False)(AuthViewsTestCase)
 
 
 class AuthViewNamedURLTests(AuthViewsTestCase):

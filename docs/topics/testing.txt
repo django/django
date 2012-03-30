@@ -1450,13 +1450,12 @@ The decorator can also be applied to test case classes::
     from django.test import TestCase
     from django.test.utils import override_settings
 
+    @override_settings(LOGIN_URL='/other/login/')
     class LoginTestCase(TestCase):
 
         def test_login(self):
             response = self.client.get('/sekrit/')
             self.assertRedirects(response, '/other/login/?next=/sekrit/')
-
-    LoginTestCase = override_settings(LOGIN_URL='/other/login/')(LoginTestCase)
 
 .. note::
 
@@ -1466,19 +1465,6 @@ The decorator can also be applied to test case classes::
     different name than ``LoginTestCase``, you may be surprised to find that
     the original ``LoginTestCase`` is still equally affected by the
     decorator.
-
-On Python 2.6 and higher you can also use the well known decorator syntax to
-decorate the class::
-
-    from django.test import TestCase
-    from django.test.utils import override_settings
-
-    @override_settings(LOGIN_URL='/other/login/')
-    class LoginTestCase(TestCase):
-
-        def test_login(self):
-            response = self.client.get('/sekrit/')
-            self.assertRedirects(response, '/other/login/?next=/sekrit/')
 
 .. note::
 

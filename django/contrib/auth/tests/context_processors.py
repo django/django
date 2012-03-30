@@ -8,6 +8,12 @@ from django.test import TestCase
 from django.test.utils import override_settings
 
 
+@override_settings(
+    TEMPLATE_DIRS=(
+            os.path.join(os.path.dirname(__file__), 'templates'),
+        ),
+    USE_TZ=False,                           # required for loading the fixture
+)
 class AuthContextProcessorTests(TestCase):
     """
     Tests for the ``django.contrib.auth.context_processors.auth`` processor
@@ -95,10 +101,3 @@ class AuthContextProcessorTests(TestCase):
         # See bug #12060
         self.assertEqual(response.context['user'], user)
         self.assertEqual(user, response.context['user'])
-
-AuthContextProcessorTests = override_settings(
-    TEMPLATE_DIRS=(
-            os.path.join(os.path.dirname(__file__), 'templates'),
-        ),
-    USE_TZ=False,                           # required for loading the fixture
-)(AuthContextProcessorTests)

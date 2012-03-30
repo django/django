@@ -18,7 +18,7 @@ from django.test import TransactionTestCase
 from django.test.utils import override_settings
 
 
-# @override_settings(INSTALLED_APPS=('app1', 'app2'))
+@override_settings(INSTALLED_APPS=('app1', 'app2'))
 class ProxyModelInheritanceTests(TransactionTestCase):
 
     def setUp(self):
@@ -41,5 +41,3 @@ class ProxyModelInheritanceTests(TransactionTestCase):
         from .app2.models import NiceModel
         self.assertEqual(NiceModel.objects.all().count(), 0)
         self.assertEqual(ProxyModel.objects.all().count(), 0)
-
-ProxyModelInheritanceTests = override_settings(INSTALLED_APPS=('app1', 'app2'))(ProxyModelInheritanceTests)

@@ -9,21 +9,7 @@ from django.template import Template, Context
 from django.utils import translation
 
 
-class URLTestCaseBase(TestCase):
-    """
-    TestCase base-class for the URL tests.
-    """
-    urls = 'regressiontests.i18n.patterns.urls.default'
-
-    def setUp(self):
-        # Make sure the cache is empty before we are doing our tests.
-        clear_url_caches()
-
-    def tearDown(self):
-        # Make sure we will leave an empty cache for other testcases.
-        clear_url_caches()
-
-URLTestCaseBase = override_settings(
+@override_settings(
     USE_I18N=True,
     LOCALE_PATHS=(
         os.path.join(os.path.dirname(__file__), 'locale'),
@@ -41,7 +27,20 @@ URLTestCaseBase = override_settings(
         'django.middleware.locale.LocaleMiddleware',
         'django.middleware.common.CommonMiddleware',
     ),
-)(URLTestCaseBase)
+)
+class URLTestCaseBase(TestCase):
+    """
+    TestCase base-class for the URL tests.
+    """
+    urls = 'regressiontests.i18n.patterns.urls.default'
+
+    def setUp(self):
+        # Make sure the cache is empty before we are doing our tests.
+        clear_url_caches()
+
+    def tearDown(self):
+        # Make sure we will leave an empty cache for other testcases.
+        clear_url_caches()
 
 
 class URLPrefixTests(URLTestCaseBase):

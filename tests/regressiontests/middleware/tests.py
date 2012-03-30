@@ -584,6 +584,7 @@ class GZipMiddlewareTest(TestCase):
         self.assertEqual(r.get('Content-Encoding'), None)
 
 
+@override_settings(USE_ETAGS=True)
 class ETagGZipMiddlewareTest(TestCase):
     """
     Tests if the ETag middleware behaves correctly with GZip middleware.
@@ -610,6 +611,3 @@ class ETagGZipMiddlewareTest(TestCase):
         nogzip_etag = response.get('ETag')
 
         self.assertNotEqual(gzip_etag, nogzip_etag)
-ETagGZipMiddlewareTest = override_settings(
-    USE_ETAGS=True,
-)(ETagGZipMiddlewareTest)

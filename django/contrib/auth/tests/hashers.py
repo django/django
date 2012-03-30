@@ -4,7 +4,6 @@ from django.contrib.auth.hashers import (is_password_usable,
     PBKDF2SHA1PasswordHasher, get_hasher, UNUSABLE_PASSWORD)
 from django.utils import unittest
 from django.utils.unittest import skipUnless
-from django.test.utils import override_settings
 
 
 try:
@@ -19,6 +18,7 @@ except ImportError:
 
 
 class TestUtilsHashPass(unittest.TestCase):
+
     def setUp(self):
         load_hashers(password_hashers=default_hashers)
 
