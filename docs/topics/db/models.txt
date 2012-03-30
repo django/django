@@ -319,6 +319,9 @@ whatever you want. For example::
     For details on accessing backwards-related objects, see the
     :ref:`Following relationships backward example <backwards-related-objects>`.
 
+    For sample code, see the :doc:`Many-to-one relationship model example
+    </topics/db/examples/many_to_one>`.
+
 
 Many-to-many relationships
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -366,10 +369,13 @@ form would let users select the toppings.
 
 .. seealso::
 
-    :class:`~django.db.models.ManyToManyField` fields also accept a number of
-    extra arguments which are explained in :ref:`the model field reference
-    <manytomany-arguments>`. These options help define how the relationship
-    should work; all are optional.
+    See the :doc:`Many-to-many relationship model example
+    </topics/db/examples/many_to_many>` for a full example.
+
+:class:`~django.db.models.ManyToManyField` fields also accept a number of
+extra arguments which are explained in :ref:`the model field reference
+<manytomany-arguments>`. These options help define how the relationship
+should work; all are optional.
 
 .. _intermediary-manytomany:
 
@@ -555,9 +561,12 @@ can be made; see :ref:`the model field reference <ref-onetoone>` for details.
 
 .. seealso::
 
-    :class:`~django.db.models.OneToOneField` fields also accept one specific,
-    optional ``parent_link`` argument described in the :ref:`model field
-    reference <ref-onetoone>`.
+    See the :doc:`One-to-one relationship model example
+    </topics/db/examples/one_to_one>` for a full example.
+
+:class:`~django.db.models.OneToOneField` fields also accept one specific,
+optional ``parent_link`` argument described in the :ref:`model field
+reference <ref-onetoone>`.
 
 :class:`~django.db.models.OneToOneField` classes used to automatically become
 the primary key on a model. This is no longer true (although you can manually
