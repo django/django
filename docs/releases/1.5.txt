@@ -1,0 +1,41 @@
+============================================
+Django 1.5 release notes - UNDER DEVELOPMENT
+============================================
+
+These release notes cover the `new features`_, as well
+as some `backwards incompatible changes`_ you'll want to be aware of
+when upgrading from Django 1.4 or older versions. We've also dropped some
+features, which are detailed in :doc:`our deprecation plan
+</internals/deprecation>`, and we've `begun the deprecation process for some
+features`_.
+
+.. _`new features`: `What's new in Django 1.5`_
+.. _`backwards incompatible changes`: `Backwards incompatible changes in 1.5`_
+.. _`begun the deprecation process for some features`: `Features deprecated in 1.5`_
+
+Python compatibility
+====================
+
+Django 1.5 has dropped support for Python 2.5. Python 2.6 is now the minimum
+required Python version. Django is tested and supported on Python 2.6 and
+2.7.
+
+This change should affect only a small number of Django users, as most
+operating-system vendors today are shipping Python 2.6 or newer as their default
+version. If you're still using Python 2.5, however, you'll need to stick to
+Django 1.4 until you can upgrade. Per :doc:`our support policy
+</internals/release-process>`, Django 1.4 will continue to receive security
+support until the release of Django 1.6.
+
+As Jython does currently not offer any version compatible with Python 2.6,
+Django 1.5 does not run on Jython.
+
+What's new in Django 1.5
+========================
+
+Backwards incompatible changes in 1.5
+=====================================
+
+Features deprecated in 1.5
+==========================
+

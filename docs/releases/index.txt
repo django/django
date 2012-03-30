@@ -15,6 +15,13 @@ Final releases
 ==============
 
 
+1.5 release
+-----------
+.. toctree::
+   :maxdepth: 1
+
+   1.5
+
 1.4 release
 -----------
 .. toctree::
