@@ -1,4 +1,3 @@
-from __future__ import with_statement
 import cgi
 import errno
 import mimetypes

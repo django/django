@@ -1,5 +1,3 @@
-from __future__ import with_statement
-
 import warnings
 from django.conf import settings, UserSettingsHolder
 from django.core import mail

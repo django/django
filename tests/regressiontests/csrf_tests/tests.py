@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import with_statement
 
 from django.conf import settings
 from django.core.context_processors import csrf

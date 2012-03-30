@@ -1,5 +1,3 @@
-from __future__ import with_statement
-
 import os
 try:
     from cStringIO import StringIO

@@ -6,8 +6,6 @@ Synchronization primitives:
 (Contributed to Django by eugene@lazutkin.com)
 """
 
-from __future__ import with_statement
-
 import contextlib
 try:
     import threading

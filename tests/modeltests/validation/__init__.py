@@ -1,5 +1,3 @@
-from __future__ import with_statement
-
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 

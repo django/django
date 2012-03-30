@@ -1,4 +1,4 @@
-from __future__ import with_statement, absolute_import
+from __future__ import absolute_import
 
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase

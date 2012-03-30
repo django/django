@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import with_statement
 from django.forms import *
 from django.test import TestCase
 from django.utils.translation import ugettext_lazy, override

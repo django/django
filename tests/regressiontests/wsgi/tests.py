@@ -1,5 +1,3 @@
-from __future__ import with_statement
-
 from django.core.exceptions import ImproperlyConfigured
 from django.core.servers.basehttp import get_internal_wsgi_application
 from django.core.wsgi import get_wsgi_application

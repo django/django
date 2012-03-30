@@ -1,4 +1,4 @@
-from __future__ import with_statement, absolute_import
+from __future__ import absolute_import
 
 from django.contrib.comments.forms import CommentForm
 from django.contrib.comments.models import Comment

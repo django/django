@@ -1,5 +1,3 @@
-from __future__ import with_statement
-
 import time
 import warnings
 from datetime import datetime, timedelta

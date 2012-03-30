@@ -11,7 +11,6 @@ called, a commit is made.
 Managed transactions don't do those commits, but will need some kind of manual
 or implicit commits or rollbacks.
 """
-from __future__ import with_statement
 
 from functools import wraps
 

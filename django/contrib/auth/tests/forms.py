@@ -1,4 +1,3 @@
-from __future__ import with_statement
 import os
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import (UserCreationForm, AuthenticationForm,

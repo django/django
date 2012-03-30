@@ -1,6 +1,4 @@
-# This is necessary in Python 2.5 to enable the with statement, in 2.6
-# and up it is no longer necessary.
-from __future__ import with_statement, absolute_import
+from __future__ import absolute_import
 
 # -*- coding: utf-8 -*-
 from datetime import datetime

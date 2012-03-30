@@ -1,4 +1,3 @@
-from __future__ import with_statement
 import re
 
 from django.template import (Node, Variable, TemplateSyntaxError,

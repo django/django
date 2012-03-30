@@ -1,5 +1,3 @@
-from __future__ import with_statement
-
 from django.conf import settings
 from django.contrib.flatpages.forms import FlatpageForm
 from django.contrib.flatpages.models import FlatPage
