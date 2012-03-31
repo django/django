@@ -245,7 +245,7 @@ class BaseModelAdmin(object):
         # if foo has been specificially included in the lookup list; so
         # drop __id if it is the last part. However, first we need to find
         # the pk attribute name.
-        pk_attr_name = None
+        rel_name = None
         for part in parts[:-1]:
             try:
                 field, _, _, _ = model._meta.get_field_by_name(part)
@@ -255,13 +255,13 @@ class BaseModelAdmin(object):
                 return True
             if hasattr(field, 'rel'):
                 model = field.rel.to
-                pk_attr_name = model._meta.pk.name
+                rel_name = field.rel.get_related_field().name
             elif isinstance(field, RelatedObject):
                 model = field.model
-                pk_attr_name = model._meta.pk.name
+                rel_name = model._meta.pk.name
             else:
-                pk_attr_name = None
-        if pk_attr_name and len(parts) > 1 and parts[-1] == pk_attr_name:
+                rel_name = None
+        if rel_name and len(parts) > 1 and parts[-1] == rel_name:
             parts.pop()
 
         if len(parts) == 1:

@@ -155,7 +155,10 @@ class FieldListFilter(ListFilter):
 class RelatedFieldListFilter(FieldListFilter):
     def __init__(self, field, request, params, model, model_admin, field_path):
         other_model = get_model_from_relation(field)
-        rel_name = other_model._meta.pk.name
+        if hasattr(field, 'rel'):
+            rel_name = field.rel.get_related_field().name
+        else:
+            rel_name = other_model._meta.pk.name
         self.lookup_kwarg = '%s__%s__exact' % (field_path, rel_name)
         self.lookup_kwarg_isnull = '%s__isnull' % field_path
         self.lookup_val = request.GET.get(self.lookup_kwarg, None)

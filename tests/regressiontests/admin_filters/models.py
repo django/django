@@ -13,3 +13,18 @@ class Book(models.Model):
 
     def __unicode__(self):
         return self.title
+
+
+class Department(models.Model):
+    code = models.CharField(max_length=4, unique=True)
+    description = models.CharField(max_length=50, blank=True, null=True)
+
+    def __unicode__(self):
+        return self.description
+
+class Employee(models.Model):
+    department = models.ForeignKey(Department, to_field="code")
+    name = models.CharField(max_length=100)
+
+    def __unicode__(self):
+        return self.name
