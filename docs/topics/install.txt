@@ -330,7 +330,7 @@ latest bug fixes and improvements, follow these instructions:
 
    .. code-block:: bash
 
-       ln -s WORKING-DIR/django-trunk/django/bin/django-admin.py /usr/local/bin
+       ln -s -t /usr/local/bin WORKING-DIR/django-trunk/django/bin/django-admin.py
 
    (In the above line, change WORKING-DIR to match the full path to your new
    ``django-trunk`` directory.)
