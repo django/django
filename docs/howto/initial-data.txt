@@ -124,10 +124,9 @@ Each SQL file, if given, is expected to contain valid SQL statements
 which will insert the desired data (e.g., properly-formatted
 ``INSERT`` statements separated by semicolons).
 
-The SQL files are read by the :djadmin:`sqlcustom`, :djadmin:`sqlreset`,
-:djadmin:`sqlall` and :djadmin:`reset` commands in :doc:`manage.py
-</ref/django-admin>`. Refer to the :doc:`manage.py documentation
-</ref/django-admin>` for more information.
+The SQL files are read by the :djadmin:`sqlcustom` and :djadmin:`sqlall`
+commands in :doc:`manage.py </ref/django-admin>`. Refer to the :doc:`manage.py
+documentation </ref/django-admin>` for more information.
 
 Note that if you have multiple SQL data files, there's no guarantee of
 the order in which they're executed. The only thing you can assume is

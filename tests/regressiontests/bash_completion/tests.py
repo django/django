@@ -66,7 +66,7 @@ class BashCompletionTests(unittest.TestCase):
         "Subcommands can be autocompleted"
         self._user_input('django-admin.py sql')
         output = self._run_autocomplete()
-        self.assertEqual(output, ['sql sqlall sqlclear sqlcustom sqlflush sqlindexes sqlinitialdata sqlreset sqlsequencereset'])
+        self.assertEqual(output, ['sql sqlall sqlclear sqlcustom sqlflush sqlindexes sqlinitialdata sqlsequencereset'])
 
     def test_help(self):
         "No errors, just an empty list if there are no autocomplete options"

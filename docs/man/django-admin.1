@@ -65,11 +65,6 @@ Runs over the entire source tree of the current directory and pulls out all
 strings marked for translation. It creates (or updates) a message file in the
 conf/locale (in the django tree) or locale (for project and application) directory.
 .TP
-.BI "reset [" "appname ..." "]"
-Executes
-.B sqlreset
-for the given app(s) in the current database.
-.TP
 .BI "runfcgi [" "KEY=val" "] [" "KEY=val" "] " "..."
 Runs this project as a FastCGI application. Requires flup. Use
 .B runfcgi help
@@ -106,10 +101,6 @@ Prints the CREATE INDEX SQL statements for the given model module name(s).
 .TP
 .BI "sqlinitialdata [" "appname ..." "]"
 Prints the initial INSERT SQL statements for the given app name(s).
-.TP
-.BI "sqlreset [" "appname ..." "]"
-Prints the DROP TABLE SQL, then the CREATE TABLE SQL, for the given app
-name(s).
 .TP
 .BI "sqlsequencereset [" "appname ..." "]"
 Prints the SQL statements for resetting PostgreSQL sequences for the

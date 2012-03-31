@@ -310,9 +310,8 @@ class ManagementUtility(object):
                 from django.core.servers.fastcgi import FASTCGI_OPTIONS
                 options += [(k, 1) for k in FASTCGI_OPTIONS]
             # special case: add the names of installed apps to options
-            elif cwords[0] in ('dumpdata', 'reset', 'sql', 'sqlall',
-                               'sqlclear', 'sqlcustom', 'sqlindexes',
-                               'sqlreset', 'sqlsequencereset', 'test'):
+            elif cwords[0] in ('dumpdata', 'sql', 'sqlall', 'sqlclear',
+                    'sqlcustom', 'sqlindexes', 'sqlsequencereset', 'test'):
                 try:
                     from django.conf import settings
                     # Get the last part of the dotted path as the app name.
