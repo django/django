@@ -172,39 +172,6 @@ class PreviewTests(FormToolsTestCase):
         self.assertNotEqual(response.content, success_string)
 
 
-class SecurityHashTests(unittest.TestCase):
-    def setUp(self):
-        self._warnings_state = get_warnings_state()
-        warnings.filterwarnings('ignore', category=DeprecationWarning,
-                                module='django.contrib.formtools.utils')
-
-    def tearDown(self):
-        restore_warnings_state(self._warnings_state)
-
-    def test_textfield_hash(self):
-        """
-        Regression test for #10034: the hash generation function should ignore
-        leading/trailing whitespace so as to be friendly to broken browsers that
-        submit it (usually in textareas).
-        """
-        f1 = HashTestForm({'name': 'joe', 'bio': 'Nothing notable.'})
-        f2 = HashTestForm({'name': '  joe', 'bio': 'Nothing notable.  '})
-        hash1 = utils.security_hash(None, f1)
-        hash2 = utils.security_hash(None, f2)
-        self.assertEqual(hash1, hash2)
-
-    def test_empty_permitted(self):
-        """
-        Regression test for #10643: the security hash should allow forms with
-        empty_permitted = True, or forms where data has not changed.
-        """
-        f1 = HashTestBlankForm({})
-        f2 = HashTestForm({}, empty_permitted=True)
-        hash1 = utils.security_hash(None, f1)
-        hash2 = utils.security_hash(None, f2)
-        self.assertEqual(hash1, hash2)
-
-
 class FormHmacTests(unittest.TestCase):
     """
     Same as SecurityHashTests, but with form_hmac
