@@ -2168,7 +2168,7 @@ utility methods in the ``django.test.utils`` module.
 
     Performs any global pre-test setup, such as the installing the
     instrumentation of the template rendering system and setting up
-    the dummy ``SMTPConnection``.
+    the dummy email outbox.
 
 .. function:: teardown_test_environment()
 
