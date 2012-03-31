@@ -484,10 +484,10 @@ A :class:`CharField` that checks that the value is a valid email address.
 .. admonition:: Incompliance to RFCs
 
     The default 75 character ``max_length`` is not capable of storing all
-    possible RFC3696/5321-compliant email addresses. In order to store all 
-    possible valid email addresses, a ``max_length`` of 254 is required. 
-    The default ``max_length`` of 75 exists for historical reasons. The 
-    default has not been changed in order to maintain backwards 
+    possible RFC3696/5321-compliant email addresses. In order to store all
+    possible valid email addresses, a ``max_length`` of 254 is required.
+    The default ``max_length`` of 75 exists for historical reasons. The
+    default has not been changed in order to maintain backwards
     compatibility with existing uses of :class:`EmailField`.
 
 ``FileField``
@@ -887,23 +887,9 @@ shortcuts.
 ``URLField``
 ------------
 
-.. class:: URLField([verify_exists=False, max_length=200, **options])
+.. class:: URLField([max_length=200, **options])
 
-A :class:`CharField` for a URL. Has one extra optional argument:
-
-.. deprecated:: 1.4
-   ``verify_exists`` is deprecated for security reasons as of 1.4 and will be
-   removed in Django 1.5. Prior to 1.3.1, the default value was ``True``.
-
-.. attribute:: URLField.verify_exists
-
-    If ``True``, the URL given will be checked for existence (i.e.,
-    the URL actually loads and doesn't give a 404 response) using a
-    ``HEAD`` request. Redirects are allowed, but will not be followed.
-
-    Note that when you're using the single-threaded development server,
-    validating a URL being served by the same server will hang. This should not
-    be a problem for multithreaded servers.
+A :class:`CharField` for a URL.
 
 The admin represents this as an ``<input type="text">`` (a single-line input).
 

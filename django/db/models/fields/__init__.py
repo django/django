@@ -890,7 +890,7 @@ class EmailField(CharField):
     description = _("E-mail address")
 
     def __init__(self, *args, **kwargs):
-        # max_length should be overridden to 254 characters to be fully 
+        # max_length should be overridden to 254 characters to be fully
         # compliant with RFCs 3696 and 5321
 
         kwargs['max_length'] = kwargs.get('max_length', 75)
@@ -1251,12 +1251,10 @@ class TimeField(Field):
 class URLField(CharField):
     description = _("URL")
 
-    def __init__(self, verbose_name=None, name=None, verify_exists=False,
-                 **kwargs):
+    def __init__(self, verbose_name=None, name=None, **kwargs):
         kwargs['max_length'] = kwargs.get('max_length', 200)
         CharField.__init__(self, verbose_name, name, **kwargs)
-        self.validators.append(
-            validators.URLValidator(verify_exists=verify_exists))
+        self.validators.append(validators.URLValidator())
 
     def formfield(self, **kwargs):
         # As with CharField, this will cause URL validation to be performed

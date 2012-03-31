@@ -88,26 +88,10 @@ to, or in lieu of custom ``field.clean()`` methods.
 
 ``URLValidator``
 ----------------
-.. class:: URLValidator([verify_exists=False, validator_user_agent=URL_VALIDATOR_USER_AGENT])
+.. class:: URLValidator()
 
-    A :class:`RegexValidator` that ensures a value looks like a URL and
-    optionally verifies that the URL actually exists (i.e., doesn't return a
-    404 status code). Raises an error code of ``'invalid'`` if it doesn't look
-    like a URL, and a code of ``'invalid_link'`` if it doesn't exist.
-
-    :param verify_exists: Sets :attr:`verify_exists`. Defaults to ``False``.
-    :param validator_user_agent: Sets :attr:`validator_user_agent`. Defaults to
-        :setting:`URL_VALIDATOR_USER_AGENT` or, if that setting is set to a
-        null value, ``"Django (https://www.djangoproject.com/)"``.
-
-    .. attribute:: verify_exists
-
-        If set to ``True``, this validator checks that the URL actually exists.
-
-    .. attribute:: validator_user_agent
-
-        If :attr:`verify_exists` is ``True``, Django uses this value as the
-        "User-agent" for the request.
+    A :class:`RegexValidator` that ensures a value looks like a URL, and raises
+    an error code of ``'invalid'`` if it doesn't.
 
 ``validate_email``
 ------------------

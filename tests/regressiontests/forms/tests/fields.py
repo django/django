@@ -27,10 +27,8 @@ __init__(). For example, CharField has a max_length option.
 import datetime
 import re
 import os
-import urllib2
 import warnings
 from decimal import Decimal
-from functools import wraps
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms import *
@@ -46,32 +44,6 @@ def fix_os_paths(x):
         return [fix_os_paths(y) for y in x]
     else:
         return x
-
-
-def verify_exists_urls(existing_urls=()):
-    """
-    Patches urllib to simulate the availability of some urls even when there
-    is no Internet connection. This hack should be removed alongside with
-    `URLField.verify_exists` in Django 1.5.
-    """
-    def decorator(func):
-        @wraps(func)
-        def wrapper(*args, **kwargs):
-            from django.core import validators
-            # patch urllib2.OpenerDirector
-            original_open = validators.urllib2.OpenerDirector.open
-            def custom_open(self, req, data=None, timeout=None):
-                if req.get_full_url() in existing_urls:
-                    return True
-                raise Exception()
-            try:
-                urllib2.OpenerDirector.open = custom_open
-                func(*args, **kwargs)
-            finally:
-                # unpatch urllib2.OpenerDirector
-                validators.urllib2.OpenerDirector.open = original_open
-        return wrapper
-    return decorator
 
 
 class FieldsTests(SimpleTestCase):
@@ -651,30 +623,6 @@ class FieldsTests(SimpleTestCase):
         self.assertRaisesMessage(ValidationError, "[u'Enter a valid URL.']", f.clean, 'http://example.')
         self.assertRaisesMessage(ValidationError, "[u'Enter a valid URL.']", f.clean, 'http://.com')
 
-    @verify_exists_urls(('http://www.google.com/',))
-    def test_urlfield_3(self):
-        f = URLField(verify_exists=True)
-        self.assertEqual(u'http://www.google.com/', f.clean('http://www.google.com'))
-        self.assertRaisesMessage(ValidationError, "[u'Enter a valid URL.']", f.clean, 'http://example')
-        self.assertRaises(ValidationError, f.clean, 'http://www.broken.djangoproject.com') # bad domain
-        self.assertRaises(ValidationError, f.clean, 'http://qa-dev.w3.org/link-testsuite/http.php?code=405') # Method not allowed
-        try:
-            f.clean('http://www.broken.djangoproject.com') # bad domain
-        except ValidationError, e:
-            self.assertEqual("[u'This URL appears to be a broken link.']", str(e))
-        self.assertRaises(ValidationError, f.clean, 'http://qa-dev.w3.org/link-testsuite/http.php?code=400') # good domain, bad page
-        try:
-            f.clean('http://google.com/we-love-microsoft.html') # good domain, bad page
-        except ValidationError, e:
-            self.assertEqual("[u'This URL appears to be a broken link.']", str(e))
-
-    @verify_exists_urls(('http://www.google.com/',))
-    def test_urlfield_4(self):
-        f = URLField(verify_exists=True, required=False)
-        self.assertEqual(u'', f.clean(''))
-        self.assertEqual(u'http://www.google.com/', f.clean('http://www.google.com'))
-
-    @verify_exists_urls(('http://example.com/',))
     def test_urlfield_5(self):
         f = URLField(min_length=15, max_length=20)
         self.assertRaisesMessage(ValidationError, "[u'Ensure this value has at least 15 characters (it has 13).']", f.clean, 'http://f.com')
@@ -698,7 +646,7 @@ class FieldsTests(SimpleTestCase):
         self.assertEqual(u'http://example.com/?some_param=some_value', f.clean('http://example.com?some_param=some_value'))
 
     def test_urlfield_9(self):
-        f = URLField(verify_exists=False)
+        f = URLField()
         urls = (
             u'http://עברית.idn.icann.org/',
             u'http://sãopaulo.com/',
@@ -721,13 +669,6 @@ class FieldsTests(SimpleTestCase):
             f.clean(u'http://broken.עברית.idn.icann.org/')
         except ValidationError, e:
             self.assertEqual("[u'This URL appears to be a broken link.']", str(e))
-
-    @verify_exists_urls((u'http://xn--hxargifdar.idn.icann.org/%CE%91%CF%81%CF%87%CE%B9%CE%BA%CE%AE_%CF%83%CE%B5%CE%BB%CE%AF%CE%B4%CE%B1',))
-    def test_urlfield_10(self):
-        # UTF-8 in the domain.
-        f = URLField(verify_exists=True)
-        url = u'http://\u03b5\u03bb\u03bb\u03b7\u03bd\u03b9\u03ba\u03ac.idn.icann.org/\u0391\u03c1\u03c7\u03b9\u03ba\u03ae_\u03c3\u03b5\u03bb\u03af\u03b4\u03b1'
-        self.assertEqual(url, f.clean(url))
 
     def test_urlfield_not_string(self):
         f = URLField(required=False)

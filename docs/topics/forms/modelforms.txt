@@ -106,8 +106,7 @@ Model field                      Form field
 
 ``TimeField``                    ``TimeField``
 
-``URLField``                     ``URLField`` with ``verify_exists`` set
-                                 to the model field's ``verify_exists``
+``URLField``                     ``URLField``
 ===============================  ========================================
 
 .. versionadded:: 1.2

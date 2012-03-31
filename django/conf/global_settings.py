@@ -403,11 +403,6 @@ THOUSAND_SEPARATOR = ','
 # Hint: you really don't!
 TRANSACTIONS_MANAGED = False
 
-# The User-Agent string to use when checking for URL validity through the
-# isExistingURL validator.
-from django import get_version
-URL_VALIDATOR_USER_AGENT = "Django/%s (https://www.djangoproject.com)" % get_version()
-
 # The tablespaces to use for each model when not specified otherwise.
 DEFAULT_TABLESPACE = ''
 DEFAULT_INDEX_TABLESPACE = ''

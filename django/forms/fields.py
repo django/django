@@ -598,14 +598,11 @@ class ImageField(FileField):
 class URLField(CharField):
     default_error_messages = {
         'invalid': _(u'Enter a valid URL.'),
-        'invalid_link': _(u'This URL appears to be a broken link.'),
     }
 
-    def __init__(self, max_length=None, min_length=None, verify_exists=False,
-            validator_user_agent=validators.URL_VALIDATOR_USER_AGENT, *args, **kwargs):
-        super(URLField, self).__init__(max_length, min_length, *args,
-                                       **kwargs)
-        self.validators.append(validators.URLValidator(verify_exists=verify_exists, validator_user_agent=validator_user_agent))
+    def __init__(self, max_length=None, min_length=None, *args, **kwargs):
+        super(URLField, self).__init__(max_length, min_length, *args, **kwargs)
+        self.validators.append(validators.URLValidator())
 
     def to_python(self, value):
 

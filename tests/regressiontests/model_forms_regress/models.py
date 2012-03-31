@@ -57,7 +57,7 @@ class Author1(models.Model):
     full_name = models.CharField(max_length=255)
 
 class Homepage(models.Model):
-    url = models.URLField(verify_exists=False)
+    url = models.URLField()
 
 class Document(models.Model):
     myfile = models.FileField(upload_to='unused', blank=True)

@@ -16,7 +16,7 @@ class Media(models.Model):
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
     content_object = generic.GenericForeignKey()
-    url = models.URLField(verify_exists=False)
+    url = models.URLField()
     description = models.CharField(max_length=100, blank=True)
     keywords = models.CharField(max_length=100, blank=True)
 

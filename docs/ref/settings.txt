@@ -2148,18 +2148,6 @@ to ensure your processes are running in the correct environment.
 
 .. _pytz: http://pytz.sourceforge.net/
 
-.. setting:: URL_VALIDATOR_USER_AGENT
-
-URL_VALIDATOR_USER_AGENT
-------------------------
-
-Default: ``Django/<version> (https://www.djangoproject.com/)``
-
-The string to use as the ``User-Agent`` header when checking to see if
-URLs exist (see the ``verify_exists`` option on
-:class:`~django.db.models.URLField`). This setting was deprecated in
-1.3.1 along with ``verify_exists`` and will be removed in 1.4.
-
 .. setting:: USE_ETAGS
 
 USE_ETAGS
@@ -2344,3 +2332,12 @@ IGNORABLE_404_STARTS
 
 .. deprecated:: 1.4
    This setting has been superseded by :setting:`IGNORABLE_404_URLS`.
+
+.. setting:: URL_VALIDATOR_USER_AGENT
+
+URL_VALIDATOR_USER_AGENT
+------------------------
+
+.. deprecated:: 1.5
+    This value was used as the ``User-Agent`` header when checking if a URL
+    exists, a feature that was removed due to security and performance issues.

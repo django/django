@@ -789,7 +789,7 @@ For each field, we describe the default widget used if you don't specify
     * Empty value: ``''`` (an empty string)
     * Normalizes to: A Unicode object.
     * Validates that the given value is a valid URL.
-    * Error message keys: ``required``, ``invalid``, ``invalid_link``
+    * Error message keys: ``required``, ``invalid``
 
     Takes the following optional arguments:
 
@@ -797,20 +797,6 @@ For each field, we describe the default widget used if you don't specify
     .. attribute:: min_length
 
     These are the same as ``CharField.max_length`` and ``CharField.min_length``.
-
-    .. attribute:: verify_exists
-
-        If ``True``, the validator will attempt to load the given URL, raising
-        ``ValidationError`` if the page gives a 404. Defaults to ``False``.
-
-        .. deprecated:: 1.4
-            ``verify_exists`` was deprecated for security reasons and will be removed in
-            Django 1.5. This deprecation also removes ``validator_user_agent``.
-
-    .. attribute:: validator_user_agent
-
-        String used as the user-agent used when checking for a URL's existence.
-        Defaults to the value of the :setting:`URL_VALIDATOR_USER_AGENT` setting.
 
 .. versionchanged:: 1.2
    The URLField previously did not recognize URLs as valid that contained an IDN

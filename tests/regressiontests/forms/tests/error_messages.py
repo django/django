@@ -7,8 +7,6 @@ from django.forms import *
 from django.test import TestCase
 from django.utils.safestring import mark_safe
 
-from .fields import verify_exists_urls
-
 
 class AssertFormErrorsMixin(object):
     def assertFormErrors(self, expected, the_callable, *args, **kwargs):
@@ -143,17 +141,14 @@ class FormsErrorMessagesTestCase(TestCase, AssertFormErrorsMixin):
         self.assertFormErrors([u'EMPTY FILE'], f.clean, SimpleUploadedFile('name', None))
         self.assertFormErrors([u'EMPTY FILE'], f.clean, SimpleUploadedFile('name', ''))
 
-    @verify_exists_urls()
     def test_urlfield(self):
         e = {
             'required': 'REQUIRED',
             'invalid': 'INVALID',
-            'invalid_link': 'INVALID LINK',
         }
-        f = URLField(verify_exists=True, error_messages=e)
+        f = URLField(error_messages=e)
         self.assertFormErrors([u'REQUIRED'], f.clean, '')
         self.assertFormErrors([u'INVALID'], f.clean, 'abc.c')
-        self.assertFormErrors([u'INVALID LINK'], f.clean, 'http://www.broken.djangoproject.com')
 
     def test_booleanfield(self):
         e = {
