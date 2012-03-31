@@ -3,7 +3,6 @@ import sys
 import os
 import re
 import mimetypes
-import warnings
 from copy import copy
 from urlparse import urlparse, urlsplit
 try:
@@ -411,17 +410,6 @@ class Client(RequestFactory):
             # backwards-compatibility implications.
             if response.context and len(response.context) == 1:
                 response.context = response.context[0]
-
-            # Provide a backwards-compatible (but pending deprecation) response.template
-            def _get_template(self):
-                warnings.warn("response.template is deprecated; use response.templates instead (which is always a list)",
-                              DeprecationWarning, stacklevel=2)
-                if not self.templates:
-                    return None
-                elif len(self.templates) == 1:
-                    return self.templates[0]
-                return self.templates
-            response.__class__.template = property(_get_template)
 
             # Update persistent cookie data.
             if response.cookies:
