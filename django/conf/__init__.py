@@ -12,6 +12,7 @@ import time     # Needed for Windows
 import warnings
 
 from django.conf import global_settings
+from django.core.exceptions import ImproperlyConfigured
 from django.utils.functional import LazyObject, empty
 from django.utils import importlib
 
@@ -107,7 +108,7 @@ class Settings(BaseSettings):
                 setattr(self, setting, setting_value)
 
         if not self.SECRET_KEY:
-            warnings.warn("The SECRET_KEY setting must not be empty.", DeprecationWarning)
+            raise ImproperlyConfigured("The SECRET_KEY setting must not be empty.")
 
         if hasattr(time, 'tzset') and self.TIME_ZONE:
             # When we can, attempt to validate the timezone. If we can't find
