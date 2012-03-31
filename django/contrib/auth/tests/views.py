@@ -18,28 +18,22 @@ from django.contrib.auth.forms import (AuthenticationForm, PasswordChangeForm,
                 SetPasswordForm, PasswordResetForm)
 
 
-@override_settings(USE_TZ=False)
+@override_settings(
+    LANGUAGES=(
+        ('en', 'English'),
+    ),
+    LANGUAGE_CODE='en',
+    TEMPLATE_DIRS = (
+        os.path.join(os.path.dirname(__file__), 'templates'),
+    ),
+    USE_TZ=False,
+)
 class AuthViewsTestCase(TestCase):
     """
     Helper base class for all the follow test cases.
     """
     fixtures = ['authtestdata.json']
     urls = 'django.contrib.auth.tests.urls'
-
-    def setUp(self):
-        self.old_LANGUAGES = settings.LANGUAGES
-        self.old_LANGUAGE_CODE = settings.LANGUAGE_CODE
-        settings.LANGUAGES = (('en', 'English'),)
-        settings.LANGUAGE_CODE = 'en'
-        self.old_TEMPLATE_DIRS = settings.TEMPLATE_DIRS
-        settings.TEMPLATE_DIRS = (
-            os.path.join(os.path.dirname(__file__), 'templates'),
-        )
-
-    def tearDown(self):
-        settings.LANGUAGES = self.old_LANGUAGES
-        settings.LANGUAGE_CODE = self.old_LANGUAGE_CODE
-        settings.TEMPLATE_DIRS = self.old_TEMPLATE_DIRS
 
     def login(self, password='password'):
         response = self.client.post('/login/', {

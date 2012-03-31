@@ -3,28 +3,28 @@ from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, User
 from django.template import Template, Context, TemplateSyntaxError
 from django.test import TestCase
+from django.test.utils import override_settings
 
+
+@override_settings(
+    MIDDLEWARE_CLASSES=(
+        'django.middleware.common.CommonMiddleware',
+        'django.contrib.sessions.middleware.SessionMiddleware',
+        'django.middleware.csrf.CsrfViewMiddleware',
+        'django.contrib.auth.middleware.AuthenticationMiddleware',
+        'django.contrib.messages.middleware.MessageMiddleware',
+        'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
+    ),
+    TEMPLATE_DIRS=(
+        os.path.join(os.path.dirname(__file__), 'templates'),
+    ),
+)
 class FlatpageTemplateTagTests(TestCase):
     fixtures = ['sample_flatpages']
     urls = 'django.contrib.flatpages.tests.urls'
 
     def setUp(self):
-        self.old_MIDDLEWARE_CLASSES = settings.MIDDLEWARE_CLASSES
-        flatpage_middleware_class = 'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware'
-        if flatpage_middleware_class not in settings.MIDDLEWARE_CLASSES:
-            settings.MIDDLEWARE_CLASSES += (flatpage_middleware_class,)
-        self.old_TEMPLATE_DIRS = settings.TEMPLATE_DIRS
-        settings.TEMPLATE_DIRS = (
-            os.path.join(
-                os.path.dirname(__file__),
-                'templates'
-            ),
-        )
         self.me = User.objects.create_user('testuser', 'test@example.com', 's3krit')
-
-    def tearDown(self):
-        settings.MIDDLEWARE_CLASSES = self.old_MIDDLEWARE_CLASSES
-        settings.TEMPLATE_DIRS = self.old_TEMPLATE_DIRS
 
     def test_get_flatpages_tag(self):
         "The flatpage template tag retrives unregistered prefixed flatpages by default"

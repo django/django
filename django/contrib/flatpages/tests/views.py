@@ -3,30 +3,26 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.flatpages.models import FlatPage
 from django.test import TestCase
+from django.test.utils import override_settings
 
+
+@override_settings(
+    LOGIN_URL='/accounts/login/',
+    MIDDLEWARE_CLASSES=(
+        'django.middleware.common.CommonMiddleware',
+        'django.contrib.sessions.middleware.SessionMiddleware',
+        'django.middleware.csrf.CsrfViewMiddleware',
+        'django.contrib.auth.middleware.AuthenticationMiddleware',
+        'django.contrib.messages.middleware.MessageMiddleware',
+        # no 'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware'
+    ),
+    TEMPLATE_DIRS=(
+        os.path.join(os.path.dirname(__file__), 'templates'),
+    ),
+)
 class FlatpageViewTests(TestCase):
     fixtures = ['sample_flatpages']
     urls = 'django.contrib.flatpages.tests.urls'
-
-    def setUp(self):
-        self.old_MIDDLEWARE_CLASSES = settings.MIDDLEWARE_CLASSES
-        flatpage_middleware_class = 'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware'
-        if flatpage_middleware_class in settings.MIDDLEWARE_CLASSES:
-            settings.MIDDLEWARE_CLASSES = tuple(m for m in settings.MIDDLEWARE_CLASSES if m != flatpage_middleware_class)
-        self.old_TEMPLATE_DIRS = settings.TEMPLATE_DIRS
-        settings.TEMPLATE_DIRS = (
-            os.path.join(
-                os.path.dirname(__file__),
-                'templates'
-            ),
-        )
-        self.old_LOGIN_URL = settings.LOGIN_URL
-        settings.LOGIN_URL = '/accounts/login/'
-
-    def tearDown(self):
-        settings.MIDDLEWARE_CLASSES = self.old_MIDDLEWARE_CLASSES
-        settings.TEMPLATE_DIRS = self.old_TEMPLATE_DIRS
-        settings.LOGIN_URL = self.old_LOGIN_URL
 
     def test_view_flatpage(self):
         "A flatpage can be served through a view"
@@ -75,32 +71,24 @@ class FlatpageViewTests(TestCase):
         self.assertContains(response, "<p>Isn't it special!</p>")
 
 
+@override_settings(
+    APPEND_SLASH = True,
+    LOGIN_URL='/accounts/login/',
+    MIDDLEWARE_CLASSES=(
+        'django.middleware.common.CommonMiddleware',
+        'django.contrib.sessions.middleware.SessionMiddleware',
+        'django.middleware.csrf.CsrfViewMiddleware',
+        'django.contrib.auth.middleware.AuthenticationMiddleware',
+        'django.contrib.messages.middleware.MessageMiddleware',
+        # no 'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware'
+    ),
+    TEMPLATE_DIRS=(
+        os.path.join(os.path.dirname(__file__), 'templates'),
+    ),
+)
 class FlatpageViewAppendSlashTests(TestCase):
     fixtures = ['sample_flatpages']
     urls = 'django.contrib.flatpages.tests.urls'
-
-    def setUp(self):
-        self.old_MIDDLEWARE_CLASSES = settings.MIDDLEWARE_CLASSES
-        flatpage_middleware_class = 'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware'
-        if flatpage_middleware_class in settings.MIDDLEWARE_CLASSES:
-            settings.MIDDLEWARE_CLASSES = tuple(m for m in settings.MIDDLEWARE_CLASSES if m != flatpage_middleware_class)
-        self.old_TEMPLATE_DIRS = settings.TEMPLATE_DIRS
-        settings.TEMPLATE_DIRS = (
-            os.path.join(
-                os.path.dirname(__file__),
-                'templates'
-            ),
-        )
-        self.old_LOGIN_URL = settings.LOGIN_URL
-        settings.LOGIN_URL = '/accounts/login/'
-        self.old_APPEND_SLASH = settings.APPEND_SLASH
-        settings.APPEND_SLASH = True
-
-    def tearDown(self):
-        settings.MIDDLEWARE_CLASSES = self.old_MIDDLEWARE_CLASSES
-        settings.TEMPLATE_DIRS = self.old_TEMPLATE_DIRS
-        settings.LOGIN_URL = self.old_LOGIN_URL
-        settings.APPEND_SLASH = self.old_APPEND_SLASH
 
     def test_redirect_view_flatpage(self):
         "A flatpage can be served through a view and should add a slash"
