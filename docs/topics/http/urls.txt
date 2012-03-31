@@ -1020,6 +1020,4 @@ find the base URL of the Django project within its Web server
 (normally, :func:`~django.core.urlresolvers.reverse` takes care of this for
 you). In that case, you can call ``get_script_prefix()``, which will return the
 script prefix portion of the URL for your Django project. If your Django
-project is at the root of its Web server, this is always ``"/"``, but it can be
-changed, for instance  by using ``django.root`` (see :doc:`How to use
-Django with Apache and mod_python </howto/deployment/modpython>`).
+project is at the root of its Web server, this is always ``"/"``.

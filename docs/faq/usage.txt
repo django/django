@@ -13,15 +13,6 @@ Make sure that:
 
 * The module doesn't contain syntax errors (of course).
 
-* If you're using mod_python but *not* using Django's request handler,
-  you'll need to work around a mod_python bug related to the use of
-  ``SetEnv``; before you import anything from Django you'll need to do
-  the following::
-
-        os.environ.update(req.subprocess_env)
-
-  (where ``req`` is the mod_python request object).
-
 I can't stand your template language. Do I have to use it?
 ----------------------------------------------------------
 

@@ -4,7 +4,6 @@ from datetime import datetime, timedelta
 from StringIO import StringIO
 
 from django.conf import settings
-from django.core.handlers.modpython import ModPythonRequest
 from django.core.handlers.wsgi import WSGIRequest, LimitedStream
 from django.http import HttpRequest, HttpResponse, parse_cookie, build_request_repr, UnreadablePostError
 from django.test.utils import get_warnings_state, restore_warnings_state
@@ -53,41 +52,6 @@ class RequestsTests(unittest.TestCase):
         self.assertEqual(build_request_repr(request), repr(request))
         self.assertEqual(build_request_repr(request, path_override='/otherpath/', GET_override={u'a': u'b'}, POST_override={u'c': u'd'}, COOKIES_override={u'e': u'f'}, META_override={u'g': u'h'}),
                          u"<WSGIRequest\npath:/otherpath/,\nGET:{u'a': u'b'},\nPOST:{u'c': u'd'},\nCOOKIES:{u'e': u'f'},\nMETA:{u'g': u'h'}>")
-
-    def test_modpythonrequest(self):
-        class FakeModPythonRequest(ModPythonRequest):
-           def __init__(self, *args, **kwargs):
-               super(FakeModPythonRequest, self).__init__(*args, **kwargs)
-               self._get = self._post = self._meta = self._cookies = {}
-
-        class Dummy:
-            def get_options(self):
-                return {}
-
-        req = Dummy()
-        req.uri = 'bogus'
-        request = FakeModPythonRequest(req)
-        self.assertEqual(request.path, 'bogus')
-        self.assertEqual(request.GET.keys(), [])
-        self.assertEqual(request.POST.keys(), [])
-        self.assertEqual(request.COOKIES.keys(), [])
-        self.assertEqual(request.META.keys(), [])
-
-    def test_modpythonrequest_repr(self):
-        class Dummy:
-            def get_options(self):
-                return {}
-        req = Dummy()
-        req.uri = '/somepath/'
-        request = ModPythonRequest(req)
-        request._get = {u'get-key': u'get-value'}
-        request._post = {u'post-key': u'post-value'}
-        request._cookies = {u'post-key': u'post-value'}
-        request._meta = {u'post-key': u'post-value'}
-        self.assertEqual(repr(request), u"<ModPythonRequest\npath:/somepath/,\nGET:{u'get-key': u'get-value'},\nPOST:{u'post-key': u'post-value'},\nCOOKIES:{u'post-key': u'post-value'},\nMETA:{u'post-key': u'post-value'}>")
-        self.assertEqual(build_request_repr(request), repr(request))
-        self.assertEqual(build_request_repr(request, path_override='/otherpath/', GET_override={u'a': u'b'}, POST_override={u'c': u'd'}, COOKIES_override={u'e': u'f'}, META_override={u'g': u'h'}),
-                         u"<ModPythonRequest\npath:/otherpath/,\nGET:{u'a': u'b'},\nPOST:{u'c': u'd'},\nCOOKIES:{u'e': u'f'},\nMETA:{u'g': u'h'}>")
 
     def test_parse_cookie(self):
         self.assertEqual(parse_cookie('invalid:key=true'), {})

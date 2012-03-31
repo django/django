@@ -13,11 +13,9 @@ Deploying GeoDjango
 Apache
 ======
 In this section there are some example ``VirtualHost`` directives for
-when deploying using either ``mod_python`` or ``mod_wsgi``.  At this
-time, we recommend ``mod_wsgi``, as it is now officially recommended
-way to deploy Django applications with Apache.  Moreover, if
-``mod_python`` is used, then a prefork version of Apache must also be
-used.  As long as ``mod_wsgi`` is configured correctly, it does not
+when deploying using ``mod_wsgi``, which is now officially the recommended
+way to deploy Django applications with Apache.
+As long as ``mod_wsgi`` is configured correctly, it does not
 matter whether the version of Apache is prefork or worker.
 
 .. note::
@@ -55,42 +53,6 @@ Example::
 
 For more information, please consult Django's
 :doc:`mod_wsgi documentation </howto/deployment/wsgi/modwsgi>`.
-
-``mod_python``
---------------
-
-.. warning::
-    Support for mod_python will be deprecated in a future release of Django. If
-    you are configuring a new deployment, you are strongly encouraged to
-    consider using :doc:`mod_wsgi </howto/deployment/wsgi/modwsgi>` or any of
-    the other :doc:`supported servers </howto/deployment/index>`.
-
-Example::
-
-    <VirtualHost *:80>
-
-      <Location "/">
-        SetHandler mod_python
-        PythonHandler django.core.handlers.modpython
-        SetEnv DJANGO_SETTINGS_MODULE world.settings
-        PythonDebug On
-        PythonPath "['/var/www/apps'] + sys.path"
-      </Location>
-
-      Alias /media/ "/usr/lib/python2.6/site-packages/django/contrib/admin/media/"
-      <Location "/media">
-        SetHandler None
-      </Location>
-
-    </VirtualHost>
-
-.. warning::
-
-   When using ``mod_python`` you *must* be using a prefork version of Apache, or
-   else your GeoDjango application may crash Apache.
-
-For more information, please consult Django's
-:doc:`mod_python documentation </howto/deployment/modpython>`.
 
 Lighttpd
 ========

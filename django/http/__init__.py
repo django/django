@@ -9,16 +9,11 @@ import warnings
 
 from pprint import pformat
 from urllib import urlencode, quote
-from urlparse import urljoin
+from urlparse import urljoin, parse_qsl
 try:
     from cStringIO import StringIO
 except ImportError:
     from StringIO import StringIO
-try:
-    # The mod_python version is more efficient, so try importing it first.
-    from mod_python.util import parse_qsl
-except ImportError:
-    from urlparse import parse_qsl
 
 import Cookie
 # Some versions of Python 2.7 and later won't need this encoding bug fix:
@@ -348,7 +343,7 @@ class HttpRequest(object):
     ## File-like and iterator interface.
     ##
     ## Expects self._stream to be set to an appropriate source of bytes by
-    ## a corresponding request subclass (WSGIRequest or ModPythonRequest).
+    ## a corresponding request subclass (e.g. WSGIRequest).
     ## Also when request data has already been read by request.POST or
     ## request.body, self._stream points to a StringIO instance
     ## containing that data.

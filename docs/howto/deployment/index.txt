@@ -11,7 +11,6 @@ ways to easily deploy Django:
 
    wsgi/index
    fastcgi
-   mod_python (deprecated) <modpython>
 
 If you're new to deploying Django and/or Python, we'd recommend you try
 :doc:`mod_wsgi </howto/deployment/wsgi/modwsgi>` first. In most cases it'll be
@@ -22,6 +21,6 @@ the easiest, fastest, and most stable deployment choice.
     * `Chapter 12 of the Django Book (second edition)`_ discusses deployment
       and especially scaling in more detail. However, note that this edition
       was written against Django version 1.1 and has not been updated since
-      :doc:`mod_python </howto/deployment/modpython>` was deprecated.
+      `mod_python` was first deprecated, then completely removed in Django 1.5.
 
 .. _chapter 12 of the django book (second edition): http://djangobook.com/en/2.0/chapter12/
