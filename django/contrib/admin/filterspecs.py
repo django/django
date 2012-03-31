@@ -74,9 +74,12 @@ class RelatedFilterSpec(FilterSpec):
             self.lookup_title = other_model._meta.verbose_name
         else:
             self.lookup_title = f.verbose_name # use field name
-        rel_name = other_model._meta.pk.name
+        if hasattr(f, 'rel'):
+            rel_name = f.rel.get_related_field().name
+        else:
+            rel_name = other_model._meta.pk.name
         self.lookup_kwarg = '%s__%s__exact' % (self.field_path, rel_name)
-        self.lookup_kwarg_isnull = '%s__isnull' % (self.field_path)
+        self.lookup_kwarg_isnull = '%s__isnull' % self.field_path
         self.lookup_val = request.GET.get(self.lookup_kwarg, None)
         self.lookup_val_isnull = request.GET.get(
                                       self.lookup_kwarg_isnull, None)
@@ -176,7 +179,7 @@ FilterSpec.register(lambda f: bool(f.choices), ChoicesFilterSpec)
 
 class DateFieldFilterSpec(FilterSpec):
     def __init__(self, f, request, params, model, model_admin,
-                 field_path=None): 
+                 field_path=None):
         super(DateFieldFilterSpec, self).__init__(f, request, params, model,
                                                   model_admin,
                                                   field_path=field_path)
