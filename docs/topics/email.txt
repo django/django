@@ -423,17 +423,6 @@ want to specify it explicitly, put the following in your settings::
 
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
-.. admonition:: SMTPConnection objects
-
-    Prior to version 1.2, Django provided a
-    :class:`~django.core.mail.SMTPConnection` class. This class provided a way
-    to directly control the use of SMTP to send email. This class has been
-    deprecated in favor of the generic email backend API.
-
-    For backwards compatibility :class:`~django.core.mail.SMTPConnection` is
-    still available in ``django.core.mail`` as an alias for the SMTP backend.
-    New code should use :meth:`~django.core.mail.get_connection` instead.
-
 .. _topic-email-console-backend:
 
 Console backend
@@ -607,18 +596,3 @@ the email body. You then only need to set the :setting:`EMAIL_HOST` and
 
 For a more detailed discussion of testing and processing of emails locally,
 see the Python documentation for the :mod:`smtpd` module.
-
-SMTPConnection
-==============
-
-.. class:: SMTPConnection
-
-.. deprecated:: 1.2
-
-The ``SMTPConnection`` class has been deprecated in favor of the generic email
-backend API.
-
-For backwards compatibility ``SMTPConnection`` is still available in
-``django.core.mail`` as an alias for the :ref:`SMTP backend
-<topic-email-smtp-backend>`. New code should use
-:meth:`~django.core.mail.get_connection` instead.
