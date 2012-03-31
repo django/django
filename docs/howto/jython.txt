@@ -4,7 +4,7 @@ Running Django on Jython
 
 .. index:: Jython, Java, JVM
 
-.. admonition::
+.. admonition:: Python 2.6 support
 
     Django 1.5 has dropped support for Python 2.5. Until Jython provides a new
     version that supports 2.6, Django 1.5 is no more compatible with Jython.
