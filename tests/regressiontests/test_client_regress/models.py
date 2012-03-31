@@ -3,7 +3,6 @@
 Regression tests for the Test Client, especially the customized assertions.
 """
 import os
-import warnings
 
 from django.conf import settings
 from django.core.exceptions import SuspiciousOperation
@@ -938,27 +937,6 @@ class RequestHeadersTest(TestCase):
         self.assertEqual(response.content, "HTTP_X_ARG_CHECK: Testing 123")
         self.assertRedirects(response, '/test_client_regress/check_headers/',
             status_code=301, target_status_code=200)
-
-class ResponseTemplateDeprecationTests(TestCase):
-    """
-    Response.template still works backwards-compatibly, but with pending deprecation warning. Refs #12226.
-
-    """
-    def setUp(self):
-        self.save_warnings_state()
-        warnings.filterwarnings('ignore', category=DeprecationWarning)
-
-    def tearDown(self):
-        self.restore_warnings_state()
-
-    def test_response_template_data(self):
-        response = self.client.get("/test_client_regress/request_data/", data={'foo':'whiz'})
-        self.assertEqual(response.template.__class__, Template)
-        self.assertEqual(response.template.name, 'base.html')
-
-    def test_response_no_template(self):
-        response = self.client.get("/test_client_regress/request_methods/")
-        self.assertEqual(response.template, None)
 
 
 class ReadLimitedStreamTest(TestCase):
