@@ -40,7 +40,6 @@ from .patterns.tests import (URLRedirectWithoutTrailingSlashTests,
     URLTranslationTests, URLDisabledTests, URLTagTests, URLTestCaseBase,
     URLRedirectWithoutTrailingSlashSettingTests, URLNamespaceTests,
     URLPrefixTests, URLResponseTests, URLRedirectTests, PathUnusedTests)
-from .test_warnings import DeprecationWarningTests
 
 
 here = os.path.dirname(os.path.abspath(__file__))
@@ -868,29 +867,6 @@ class LocalePathsResolutionOrderI18NTests(ResolutionOrderI18NTests):
         extended_apps = list(settings.INSTALLED_APPS) + ['regressiontests.i18n.resolution']
         with self.settings(INSTALLED_APPS=extended_apps):
             self.assertUgettext('Time', 'LOCALE_PATHS')
-
-    def test_locale_paths_override_project_translation(self):
-        with self.settings(SETTINGS_MODULE='regressiontests'):
-            self.assertUgettext('Date/time', 'LOCALE_PATHS')
-
-class ProjectResolutionOrderI18NTests(ResolutionOrderI18NTests):
-
-    def setUp(self):
-        self.old_settings_module = settings.SETTINGS_MODULE
-        settings.SETTINGS_MODULE = 'regressiontests'
-        super(ProjectResolutionOrderI18NTests, self).setUp()
-
-    def tearDown(self):
-        settings.SETTINGS_MODULE = self.old_settings_module
-        super(ProjectResolutionOrderI18NTests, self).tearDown()
-
-    def test_project_translation(self):
-        self.assertUgettext('Date/time', 'PROJECT')
-
-    def test_project_override_app_translation(self):
-        extended_apps = list(settings.INSTALLED_APPS) + ['regressiontests.i18n.resolution']
-        with self.settings(INSTALLED_APPS=extended_apps):
-            self.assertUgettext('Date/time', 'PROJECT')
 
 class DjangoFallbackResolutionOrderI18NTests(ResolutionOrderI18NTests):
 

@@ -111,13 +111,6 @@ def translation(language):
 
     globalpath = os.path.join(os.path.dirname(sys.modules[settings.__module__].__file__), 'locale')
 
-    if settings.SETTINGS_MODULE is not None:
-        parts = settings.SETTINGS_MODULE.split('.')
-        project = import_module(parts[0])
-        projectpath = os.path.join(os.path.dirname(project.__file__), 'locale')
-    else:
-        projectpath = None
-
     def _fetch(lang, fallback=None):
 
         global _translations
@@ -162,11 +155,6 @@ def translation(language):
 
             if os.path.isdir(apppath):
                 res = _merge(apppath)
-
-        localepaths = [os.path.normpath(path) for path in settings.LOCALE_PATHS]
-        if (projectpath and os.path.isdir(projectpath) and
-                os.path.normpath(projectpath) not in localepaths):
-            res = _merge(projectpath)
 
         for localepath in reversed(settings.LOCALE_PATHS):
             if os.path.isdir(localepath):
