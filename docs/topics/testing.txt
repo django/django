@@ -1591,10 +1591,6 @@ your test suite.
 
     You can use this as a context manager, like this::
 
-        # This is necessary in Python 2.5 to enable the with statement.
-        # In 2.6 and up, it's not necessary.
-        from __future__ import with_statement
-
         with self.assertTemplateUsed('index.html'):
             render_to_string('index.html')
         with self.assertTemplateUsed(template_name='index.html'):
@@ -1656,12 +1652,7 @@ your test suite.
 
         self.assertNumQueries(7, lambda: my_function(using=7))
 
-    If you're using Python 2.5 or greater you can also use this as a context
-    manager::
-
-        # This is necessary in Python 2.5 to enable the with statement, in 2.6
-        # and up it is no longer necessary.
-        from __future__ import with_statement
+    You can also use this as a context manager::
 
         with self.assertNumQueries(2):
             Person.objects.create(name="Aaron")

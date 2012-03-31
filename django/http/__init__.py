@@ -18,17 +18,9 @@ try:
     # The mod_python version is more efficient, so try importing it first.
     from mod_python.util import parse_qsl
 except ImportError:
-    try:
-        # Python 2.6 and greater
-        from urlparse import parse_qsl
-    except ImportError:
-        # Python 2.5. Works on Python 2.6 but raises PendingDeprecationWarning
-        from cgi import parse_qsl
+    from urlparse import parse_qsl
 
 import Cookie
-# httponly support exists in Python 2.6's Cookie library,
-# but not in Python 2.5.
-_morsel_supports_httponly = 'httponly' in Cookie.Morsel._reserved
 # Some versions of Python 2.7 and later won't need this encoding bug fix:
 _cookie_encodes_correctly = Cookie.SimpleCookie().value_encode(';') == (';', '"\\073"')
 # See ticket #13007, http://bugs.python.org/issue2193 and http://trac.edgewall.org/ticket/2256
@@ -39,28 +31,10 @@ try:
 except Cookie.CookieError:
     _cookie_allows_colon_in_names = False
 
-if _morsel_supports_httponly and _cookie_encodes_correctly and _cookie_allows_colon_in_names:
+if _cookie_encodes_correctly and _cookie_allows_colon_in_names:
     SimpleCookie = Cookie.SimpleCookie
 else:
-    if not _morsel_supports_httponly:
-        class Morsel(Cookie.Morsel):
-            def __setitem__(self, K, V):
-                K = K.lower()
-                if K == "httponly":
-                    if V:
-                        # The superclass rejects httponly as a key,
-                        # so we jump to the grandparent.
-                        super(Cookie.Morsel, self).__setitem__(K, V)
-                else:
-                    super(Morsel, self).__setitem__(K, V)
-
-            def OutputString(self, attrs=None):
-                output = super(Morsel, self).OutputString(attrs)
-                if "httponly" in self:
-                    output += "; httponly"
-                return output
-    else:
-        Morsel = Cookie.Morsel
+    Morsel = Cookie.Morsel
 
     class SimpleCookie(Cookie.SimpleCookie):
         if not _cookie_encodes_correctly:
@@ -88,7 +62,7 @@ else:
 
                 return val, encoded
 
-        if not _cookie_allows_colon_in_names or not _morsel_supports_httponly:
+        if not _cookie_allows_colon_in_names:
             def load(self, rawdata):
                 self.bad_cookies = set()
                 super(SimpleCookie, self).load(rawdata)

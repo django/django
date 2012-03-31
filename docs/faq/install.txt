@@ -16,9 +16,8 @@ How do I get started?
 What are Django's prerequisites?
 --------------------------------
 
-Django requires Python_, specifically any version of Python from 2.5
-through 2.7. No other Python libraries are required for basic Django
-usage.
+Django requires Python_, specifically Python 2.6 or 2.7.
+No other Python libraries are required for basic Django usage.
 
 For a development environment -- if you just want to experiment with Django --
 you don't need to have a separate Web server installed; Django comes with its
@@ -39,15 +38,14 @@ PostgreSQL fans, and MySQL_, `SQLite 3`_, and Oracle_ are also supported.
 .. _`SQLite 3`: http://www.sqlite.org/
 .. _Oracle: http://www.oracle.com/
 
-Do I lose anything by using Python 2.5 versus newer Python versions, such as Python 2.6 or 2.7?
------------------------------------------------------------------------------------------------
+Do I lose anything by using Python 2.6 versus newer Python versions, such as Python 2.7?
+----------------------------------------------------------------------------------------
 
-Not in the core framework. Currently, Django itself officially supports any
-version of Python from 2.5 through 2.7, inclusive. However, newer versions of
+Not in the core framework. Currently, Django itself officially supports
+Python 2.6 and 2.7. However, newer versions of
 Python are often faster, have more features, and are better supported. If you
 use a newer version of Python you will also have access to some APIs that
-aren't available under older versions of Python. For example, since Python 2.6,
-you can use the advanced string formatting described in :pep:`3101`.
+aren't available under older versions of Python.
 
 Third-party applications for use with Django are, of course, free to set their
 own version requirements.
@@ -58,7 +56,7 @@ versions as part of a migration which will end with Django running on Python 3
 
 All else being equal, we recommend that you use the latest 2.x release
 (currently Python 2.7). This will let you take advantage of the numerous
-improvements and optimizations to the Python language since version 2.5, and
+improvements and optimizations to the Python language since version 2.6, and
 will help ease the process of dropping support for older Python versions on
 the road to Python 3.
 

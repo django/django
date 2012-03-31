@@ -25,12 +25,7 @@ try:
     # The mod_python version is more efficient, so try importing it first.
     from mod_python.util import parse_qsl
 except ImportError:
-    try:
-        # Python 2.6 and greater
-        from urlparse import parse_qsl
-    except ImportError:
-        # Python 2.5.  Works on Python 2.6 but raises PendingDeprecationWarning
-        from cgi import parse_qsl
+    from urlparse import parse_qsl
 
 __all__ = [
     'get_cache', 'cache', 'DEFAULT_CACHE_ALIAS'

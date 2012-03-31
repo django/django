@@ -37,8 +37,8 @@ Example::
       WSGIProcessGroup geodjango
       WSGIScriptAlias / /home/geo/geodjango/world.wsgi
 
-      Alias /media/ "/usr/lib/python2.5/site-packages/django/contrib/admin/media/"
-      <Directory "/usr/lib/python2.5/site-packages/django/contrib/admin/media/">
+      Alias /media/ "/usr/lib/python2.6/site-packages/django/contrib/admin/media/"
+      <Directory "/usr/lib/python2.6/site-packages/django/contrib/admin/media/">
         Order allow,deny
         Options Indexes
         Allow from all
@@ -77,7 +77,7 @@ Example::
         PythonPath "['/var/www/apps'] + sys.path"
       </Location>
 
-      Alias /media/ "/usr/lib/python2.5/site-packages/django/contrib/admin/media/"
+      Alias /media/ "/usr/lib/python2.6/site-packages/django/contrib/admin/media/"
       <Location "/media">
         SetHandler None
       </Location>

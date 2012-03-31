@@ -93,9 +93,7 @@ These functions, described in detail below, can be used in two different ways:
             # this code executes inside a transaction
             # ...
 
-Both techniques work with all supported version of Python. However, in Python
-2.5, you must add ``from __future__ import with_statement`` at the beginning
-of your module if you are using the ``with`` statement.
+Both techniques work with all supported version of Python.
 
 .. _decorator: http://docs.python.org/glossary.html#term-decorator
 .. _context manager: http://docs.python.org/glossary.html#term-context-manager

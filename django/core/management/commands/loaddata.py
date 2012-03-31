@@ -12,7 +12,7 @@ from django.core.management.color import no_style
 from django.db import (connections, router, transaction, DEFAULT_DB_ALIAS,
       IntegrityError, DatabaseError)
 from django.db.models import get_apps
-from django.utils.itercompat import product
+from itertools import product
 
 try:
     import bz2

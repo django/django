@@ -25,8 +25,6 @@ class FormsWidgetTestCase(TestCase):
         self.assertHTMLEqual(w.render('email', 'some "quoted" & ampersanded value'), u'<input type="text" name="email" value="some &quot;quoted&quot; &amp; ampersanded value" />')
         self.assertHTMLEqual(w.render('email', 'test@example.com', attrs={'class': 'fun'}), u'<input type="text" name="email" value="test@example.com" class="fun" />')
 
-        # Note that doctest in Python 2.4 (and maybe 2.5?) doesn't support non-ascii
-        # characters in output, so we're displaying the repr() here.
         self.assertHTMLEqual(w.render('email', 'ŠĐĆŽćžšđ', attrs={'class': 'fun'}), u'<input type="text" name="email" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" class="fun" />')
 
         # You can also pass 'attrs' to the constructor:

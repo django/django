@@ -407,10 +407,7 @@ class SessionMiddlewareTests(unittest.TestCase):
 
         # Handle the response through the middleware
         response = middleware.process_response(request, response)
-        # If it isn't in the cookie, that's fine (Python 2.5)
-        if 'httponly' in settings.SESSION_COOKIE_NAME:
-            self.assertFalse(
-               response.cookies[settings.SESSION_COOKIE_NAME]['httponly'])
+        self.assertFalse(response.cookies[settings.SESSION_COOKIE_NAME]['httponly'])
 
         self.assertNotIn('httponly',
                          str(response.cookies[settings.SESSION_COOKIE_NAME]))

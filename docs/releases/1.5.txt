@@ -39,3 +39,8 @@ Backwards incompatible changes in 1.5
 Features deprecated in 1.5
 ==========================
 
+itercompat.product
+~~~~~~~~~~~~~~~~~~
+
+The :func:`~django.utils.itercompat.product` function has been deprecated. Use
+the builtin `itertools.product` instead.
