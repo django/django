@@ -3,9 +3,7 @@ Tests for django test runner
 """
 from __future__ import absolute_import
 
-import StringIO
 from optparse import make_option
-import warnings
 
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
@@ -13,7 +11,6 @@ from django import db
 from django.test import simple
 from django.test.simple import DjangoTestSuiteRunner, get_tests
 from django.test.testcases import connections_support_transactions
-from django.test.utils import get_warnings_state, restore_warnings_state
 from django.utils import unittest
 from django.utils.importlib import import_module
 
