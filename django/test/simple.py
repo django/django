@@ -10,23 +10,12 @@ from django.utils import unittest
 from django.utils.importlib import import_module
 from django.utils.module_loading import module_has_submodule
 
-__all__ = ('DjangoTestRunner', 'DjangoTestSuiteRunner')
+__all__ = ('DjangoTestSuiteRunner')
 
 # The module name for tests outside models.py
 TEST_MODULE = 'tests'
 
 doctestOutputChecker = OutputChecker()
-
-
-class DjangoTestRunner(unittest.TextTestRunner):
-    def __init__(self, *args, **kwargs):
-        import warnings
-        warnings.warn(
-            "DjangoTestRunner is deprecated; it's functionality is "
-            "indistinguishable from TextTestRunner",
-            DeprecationWarning
-        )
-        super(DjangoTestRunner, self).__init__(*args, **kwargs)
 
 
 def get_tests(app_module):

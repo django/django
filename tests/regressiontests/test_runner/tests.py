@@ -24,35 +24,6 @@ TEST_APP_OK = 'regressiontests.test_runner.valid_app.models'
 TEST_APP_ERROR = 'regressiontests.test_runner.invalid_app.models'
 
 
-class DjangoTestRunnerTests(unittest.TestCase):
-    def setUp(self):
-        self._warnings_state = get_warnings_state()
-        warnings.filterwarnings('ignore', category=DeprecationWarning,
-                                module='django.test.simple')
-
-    def tearDown(self):
-        restore_warnings_state(self._warnings_state)
-
-    def test_failfast(self):
-        class MockTestOne(unittest.TestCase):
-            def runTest(self):
-                assert False
-        class MockTestTwo(unittest.TestCase):
-            def runTest(self):
-                assert False
-
-        suite = unittest.TestSuite([MockTestOne(), MockTestTwo()])
-        mock_stream = StringIO.StringIO()
-        dtr = simple.DjangoTestRunner(verbosity=0, failfast=False, stream=mock_stream)
-        result = dtr.run(suite)
-        self.assertEqual(2, result.testsRun)
-        self.assertEqual(2, len(result.failures))
-
-        dtr = simple.DjangoTestRunner(verbosity=0, failfast=True, stream=mock_stream)
-        result = dtr.run(suite)
-        self.assertEqual(1, result.testsRun)
-        self.assertEqual(1, len(result.failures))
-
 class DependencyOrderingTests(unittest.TestCase):
 
     def test_simple_dependencies(self):
