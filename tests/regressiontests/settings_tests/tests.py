@@ -1,6 +1,7 @@
 import os
 
 from django.conf import settings, global_settings
+from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpRequest
 from django.test import TransactionTestCase, TestCase, signals
 from django.test.utils import override_settings
@@ -185,21 +186,25 @@ class TrailingSlashURLTests(TestCase):
 
     def test_no_end_slash(self):
         """
-        MEDIA_URL raises an DeprecationWarning error if it doesn't end in a
-        slash.
+        MEDIA_URL and STATIC_URL raise an ImproperlyConfigured exception
+        if they doesn't end in a slash.
         """
-        import warnings
-        warnings.filterwarnings('error', 'If set, MEDIA_URL must end with a slash', DeprecationWarning)
-
         def setattr_settings(settings_module, attr, value):
             setattr(settings_module, attr, value)
 
-        self.assertRaises(DeprecationWarning, setattr_settings,
+        self.assertRaises(ImproperlyConfigured, setattr_settings,
                           self.settings_module, 'MEDIA_URL', '/foo')
 
-        self.assertRaises(DeprecationWarning, setattr_settings,
+        self.assertRaises(ImproperlyConfigured, setattr_settings,
                           self.settings_module, 'MEDIA_URL',
                           'http://media.foo.com')
+
+        self.assertRaises(ImproperlyConfigured, setattr_settings,
+                          self.settings_module, 'STATIC_URL', '/foo')
+
+        self.assertRaises(ImproperlyConfigured, setattr_settings,
+                          self.settings_module, 'STATIC_URL',
+                          'http://static.foo.com')
 
     def test_double_slash(self):
         """
