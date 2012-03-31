@@ -76,11 +76,6 @@ else:
                     dict.__setitem__(self, key, Cookie.Morsel())
 
 
-class CompatCookie(SimpleCookie):
-    def __init__(self, *args, **kwargs):
-        super(CompatCookie, self).__init__(*args, **kwargs)
-        warnings.warn("CompatCookie is deprecated. Use django.http.SimpleCookie instead.", DeprecationWarning)
-
 from django.conf import settings
 from django.core import signing
 from django.core.exceptions import ImproperlyConfigured
