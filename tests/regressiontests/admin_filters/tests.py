@@ -4,7 +4,6 @@ import datetime
 
 from django.contrib.admin import (site, ModelAdmin, SimpleListFilter,
     BooleanFieldListFilter)
-from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.admin.views.main import ChangeList
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
@@ -13,7 +12,7 @@ from django.test import TestCase, RequestFactory
 from django.test.utils import override_settings
 from django.utils.encoding import force_unicode
 
-from .models import Book
+from .models import Book, Department, Employee
 
 
 def select_by(dictlist, key, value):
@@ -113,6 +112,9 @@ class DecadeFilterBookAdminParameterEndsWith__In(ModelAdmin):
 class DecadeFilterBookAdminParameterEndsWith__Isnull(ModelAdmin):
     list_filter = (DecadeListFilterParameterEndsWith__Isnull,)
 
+class EmployeeAdmin(ModelAdmin):
+    list_display = ['name', 'department']
+    list_filter = ['department']
 
 
 class ListFiltersTests(TestCase):
@@ -634,3 +636,63 @@ class ListFiltersTests(TestCase):
         self.assertEqual(choices[2]['display'], u'the 1990\'s')
         self.assertEqual(choices[2]['selected'], True)
         self.assertEqual(choices[2]['query_string'], '?decade__isnull=the+90s')
+
+    def test_fk_with_to_field(self):
+        """
+        Ensure that a filter on a FK respects the FK's to_field attribute.
+        Refs #17972.
+        """
+        modeladmin = EmployeeAdmin(Employee, site)
+
+        dev = Department.objects.create(code='DEV', description='Development')
+        design = Department.objects.create(code='DSN', description='Design')
+        john = Employee.objects.create(name='John Blue', department=dev)
+        jack = Employee.objects.create(name='Jack Red', department=design)
+
+        request = self.request_factory.get('/', {})
+        changelist = self.get_changelist(request, Employee, modeladmin)
+
+        # Make sure the correct queryset is returned
+        queryset = changelist.get_query_set(request)
+        self.assertEqual(list(queryset), [john, jack])
+
+        filterspec = changelist.get_filters(request)[0][-1]
+        self.assertEqual(force_unicode(filterspec.title), u'department')
+        choices = list(filterspec.choices(changelist))
+
+        self.assertEqual(choices[0]['display'], u'All')
+        self.assertEqual(choices[0]['selected'], True)
+        self.assertEqual(choices[0]['query_string'], '?')
+
+        self.assertEqual(choices[1]['display'], u'Development')
+        self.assertEqual(choices[1]['selected'], False)
+        self.assertEqual(choices[1]['query_string'], '?department__code__exact=DEV')
+
+        self.assertEqual(choices[2]['display'], u'Design')
+        self.assertEqual(choices[2]['selected'], False)
+        self.assertEqual(choices[2]['query_string'], '?department__code__exact=DSN')
+
+        # Filter by Department=='Development' --------------------------------
+
+        request = self.request_factory.get('/', {'department__code__exact': 'DEV'})
+        changelist = self.get_changelist(request, Employee, modeladmin)
+
+        # Make sure the correct queryset is returned
+        queryset = changelist.get_query_set(request)
+        self.assertEqual(list(queryset), [john])
+
+        filterspec = changelist.get_filters(request)[0][-1]
+        self.assertEqual(force_unicode(filterspec.title), u'department')
+        choices = list(filterspec.choices(changelist))
+
+        self.assertEqual(choices[0]['display'], u'All')
+        self.assertEqual(choices[0]['selected'], False)
+        self.assertEqual(choices[0]['query_string'], '?')
+
+        self.assertEqual(choices[1]['display'], u'Development')
+        self.assertEqual(choices[1]['selected'], True)
+        self.assertEqual(choices[1]['query_string'], '?department__code__exact=DEV')
+
+        self.assertEqual(choices[2]['display'], u'Design')
+        self.assertEqual(choices[2]['selected'], False)
+        self.assertEqual(choices[2]['query_string'], '?department__code__exact=DSN')
