@@ -157,25 +157,35 @@ class SettingsTests(TestCase):
 
 
 class TrailingSlashURLTests(TestCase):
+    """
+    Tests for the MEDIA_URL and STATIC_URL settings.
+
+    They must end with a slash to ensure there's a deterministic way to build
+    paths in templates.
+    """
     settings_module = settings
 
     def setUp(self):
         self._original_media_url = self.settings_module.MEDIA_URL
+        self._original_static_url = self.settings_module.STATIC_URL
 
     def tearDown(self):
         self.settings_module.MEDIA_URL = self._original_media_url
+        self.settings_module.STATIC_URL = self._original_static_url
 
     def test_blank(self):
         """
-        If blank, no DeprecationWarning error will be raised, even though it
-        doesn't end in a slash.
+        The empty string is accepted, even though it doesn't end in a slash.
         """
         self.settings_module.MEDIA_URL = ''
         self.assertEqual('', self.settings_module.MEDIA_URL)
 
+        self.settings_module.STATIC_URL = ''
+        self.assertEqual('', self.settings_module.STATIC_URL)
+
     def test_end_slash(self):
         """
-        MEDIA_URL works if you end in a slash.
+        It works if the value ends in a slash.
         """
         self.settings_module.MEDIA_URL = '/foo/'
         self.assertEqual('/foo/', self.settings_module.MEDIA_URL)
@@ -184,31 +194,33 @@ class TrailingSlashURLTests(TestCase):
         self.assertEqual('http://media.foo.com/',
                          self.settings_module.MEDIA_URL)
 
+        self.settings_module.STATIC_URL = '/foo/'
+        self.assertEqual('/foo/', self.settings_module.STATIC_URL)
+
+        self.settings_module.STATIC_URL = 'http://static.foo.com/'
+        self.assertEqual('http://static.foo.com/',
+                         self.settings_module.STATIC_URL)
+
     def test_no_end_slash(self):
         """
-        MEDIA_URL and STATIC_URL raise an ImproperlyConfigured exception
-        if they doesn't end in a slash.
+        An ImproperlyConfigured exception is raised if the value doesn't end
+        in a slash.
         """
-        def setattr_settings(settings_module, attr, value):
-            setattr(settings_module, attr, value)
+        with self.assertRaises(ImproperlyConfigured):
+            self.settings_module.MEDIA_URL = '/foo'
 
-        self.assertRaises(ImproperlyConfigured, setattr_settings,
-                          self.settings_module, 'MEDIA_URL', '/foo')
+        with self.assertRaises(ImproperlyConfigured):
+            self.settings_module.MEDIA_URL = 'http://media.foo.com'
 
-        self.assertRaises(ImproperlyConfigured, setattr_settings,
-                          self.settings_module, 'MEDIA_URL',
-                          'http://media.foo.com')
+        with self.assertRaises(ImproperlyConfigured):
+            self.settings_module.STATIC_URL = '/foo'
 
-        self.assertRaises(ImproperlyConfigured, setattr_settings,
-                          self.settings_module, 'STATIC_URL', '/foo')
-
-        self.assertRaises(ImproperlyConfigured, setattr_settings,
-                          self.settings_module, 'STATIC_URL',
-                          'http://static.foo.com')
+        with self.assertRaises(ImproperlyConfigured):
+            self.settings_module.STATIC_URL = 'http://static.foo.com'
 
     def test_double_slash(self):
         """
-        If a MEDIA_URL ends in more than one slash, presume they know what
+        If the value ends in more than one slash, presume they know what
         they're doing.
         """
         self.settings_module.MEDIA_URL = '/stupid//'
@@ -217,6 +229,14 @@ class TrailingSlashURLTests(TestCase):
         self.settings_module.MEDIA_URL = 'http://media.foo.com/stupid//'
         self.assertEqual('http://media.foo.com/stupid//',
                          self.settings_module.MEDIA_URL)
+
+        self.settings_module.STATIC_URL = '/stupid//'
+        self.assertEqual('/stupid//', self.settings_module.STATIC_URL)
+
+        self.settings_module.STATIC_URL = 'http://static.foo.com/stupid//'
+        self.assertEqual('http://static.foo.com/stupid//',
+                         self.settings_module.STATIC_URL)
+
 
 class SecureProxySslHeaderTest(TestCase):
     settings_module = settings
