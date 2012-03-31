@@ -42,9 +42,6 @@ class URLValidator(RegexValidator):
         r'(?::\d+)?' # optional port
         r'(?:/?|[/?]\S+)$', re.IGNORECASE)
 
-    def __init__(self):
-        super(URLValidator, self).__init__()
-
     def __call__(self, value):
         try:
             super(URLValidator, self).__call__(value)

@@ -662,13 +662,8 @@ class FieldsTests(SimpleTestCase):
             u'http://العربية.idn.icann.org/',
         )
         for url in urls:
-            # Valid and existent IDN
+            # Valid IDN
             self.assertEqual(url, f.clean(url))
-        # Valid but non-existent IDN
-        try:
-            f.clean(u'http://broken.עברית.idn.icann.org/')
-        except ValidationError, e:
-            self.assertEqual("[u'This URL appears to be a broken link.']", str(e))
 
     def test_urlfield_not_string(self):
         f = URLField(required=False)
