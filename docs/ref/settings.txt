@@ -1711,7 +1711,7 @@ domain cookie. See the :doc:`/topics/http/sessions`.
 SESSION_COOKIE_HTTPONLY
 -----------------------
 
-Default: ``False``
+Default: ``True``
 
 Whether to use HTTPOnly flag on the session cookie. If this is set to
 ``True``, client-side JavaScript will not to be able to access the
@@ -1724,6 +1724,9 @@ useful way to mitigate the risk of client side script accessing the
 protected cookie data.
 
 .. _HTTPOnly: http://www.owasp.org/index.php/HTTPOnly
+
+.. versionchanged:: 1.4
+    The default value of the setting was changed from ``False`` to ``True``.
 
 .. setting:: SESSION_COOKIE_NAME
 
