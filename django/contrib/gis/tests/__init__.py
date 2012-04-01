@@ -2,10 +2,6 @@ from django.conf import settings
 from django.test.simple import build_suite, DjangoTestSuiteRunner
 from django.utils import unittest
 
-def run_tests(*args, **kwargs):
-    from django.test.simple import run_tests as base_run_tests
-    return base_run_tests(*args, **kwargs)
-
 
 def geo_apps(namespace=True, runtests=False):
     """
