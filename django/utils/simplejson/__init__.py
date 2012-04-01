@@ -129,7 +129,8 @@ if not use_system_version:
 
         use_system_version = True
         # Make sure we copy over the version. See #17071
-        __version__ = json.__version__
+        from json import __version__ as json_version
+        __version__ = json_version
     except (ImportError, NameError):
         pass
 
