@@ -24,11 +24,7 @@ The high-level framework
 
 .. versionchanged:: 1.2
    The high-level feeds framework was refactored in Django 1.2. The
-   pre-1.2 interface still exists, but it has been deprecated, and
-   will be removed in Django 1.4. If you need to maintain an old-style
-   Django feed, please consult the Django 1.1 documentation. For
-   details on updating to use the new high-level feed framework, see
-   the :ref:`Django 1.2 release notes <1.2-updating-feeds>`.
+   pre-1.2 interface has been removed in Django 1.4.
 
 Overview
 --------
