@@ -341,18 +341,7 @@ class BaseTemporalField(Field):
                 try:
                     return self.strptime(value, format)
                 except ValueError:
-                    if format.endswith('.%f'):
-                        # Compatibility with datetime in pythons < 2.6.
-                        # See: http://docs.python.org/library/datetime.html#strftime-and-strptime-behavior
-                        if value.count('.') != format.count('.'):
-                            continue
-                        try:
-                            datetime_str, usecs_str = value.rsplit('.', 1)
-                            usecs = int(usecs_str[:6].ljust(6, '0'))
-                            dt = datetime.datetime.strptime(datetime_str, format[:-3])
-                            return dt.replace(microsecond=usecs)
-                        except ValueError:
-                            continue
+                    continue
         raise ValidationError(self.error_messages['invalid'])
 
     def strptime(self, value, format):
