@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
+
 import errno
 import os
 import shutil
@@ -17,12 +19,13 @@ except ImportError:
 
 from django.conf import settings
 from django.core.exceptions import SuspiciousOperation, ImproperlyConfigured
-from django.core.files.base import ContentFile
+from django.core.files.base import File, ContentFile
 from django.core.files.images import get_image_dimensions
 from django.core.files.storage import FileSystemStorage, get_storage_class
 from django.core.files.uploadedfile import UploadedFile
 from django.test import SimpleTestCase
 from django.utils import unittest
+from ..servers.tests import LiveServerBase
 
 # Try to import PIL in either of the two ways it can end up installed.
 # Checking for the existence of Image is enough for CPython, but
@@ -544,6 +547,42 @@ class ContentFileTestCase(unittest.TestCase):
     def test_content_file_default_name(self):
         self.assertEqual(ContentFile("content").name, None)
 
-    def test_content_file_custome_name(self):
+    def test_content_file_custom_name(self):
         name = "I can have a name too!"
         self.assertEqual(ContentFile("content", name=name).name, name)
+
+class NoNameFileTestCase(unittest.TestCase):
+    """
+    Other examples of unnamed files may be tempfile.SpooledTemporaryFile or
+    urllib.urlopen()
+    """
+    def test_noname_file_default_name(self):
+        self.assertEqual(File(StringIO('A file with no name')).name, None)
+
+    def test_noname_file_get_size(self):
+        self.assertEqual(File(StringIO('A file with no name')).size, 19)
+
+class FileLikeObjectTestCase(LiveServerBase):
+    """
+    Test file-like objects (#15644).
+    """
+    def setUp(self):
+        self.temp_dir = tempfile.mkdtemp()
+        self.storage = FileSystemStorage(location=self.temp_dir)
+
+    def tearDown(self):
+        shutil.rmtree(self.temp_dir)
+
+    def test_urllib2_urlopen(self):
+        """
+        Test the File storage API with a file like object coming from urllib2.urlopen()
+        """
+
+        file_like_object = self.urlopen('/example_view/')
+        f = File(file_like_object)
+        stored_filename = self.storage.save("remote_file.html", f)
+
+        stored_file = self.storage.open(stored_filename)
+        remote_file = self.urlopen('/example_view/')
+
+        self.assertEqual(stored_file.read(), remote_file.read())
