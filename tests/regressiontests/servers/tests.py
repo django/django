@@ -211,5 +211,8 @@ class LiveServerDatabase(LiveServerBase):
         Refs #2879.
         """
         self.urlopen('/create_model_instance/')
-        names = [person.name for person in Person.objects.all()]
-        self.assertEquals(names, ['jane', 'robert', 'emily'])
+        self.assertQuerysetEqual(
+            Person.objects.all().order_by('pk'),
+            ['jane', 'robert', 'emily'],
+            lambda b: b.name
+        )
