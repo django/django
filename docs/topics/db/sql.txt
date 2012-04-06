@@ -229,8 +229,8 @@ is required. For example::
 
         return row
 
-If you are using more than one database you can use
-``django.db.connections`` to obtain the connection (and cursor) for a
+If you are using :doc:`more than one database </topics/db/multi-db>`, you can
+use ``django.db.connections`` to obtain the connection (and cursor) for a
 specific database. ``django.db.connections`` is a dictionary-like
 object that allows you to retrieve a specific connection using its
 alias::
