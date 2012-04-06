@@ -270,6 +270,16 @@ more::
             context['book_list'] = Book.objects.all()
             return context
 
+.. note::
+
+    Generally, get_context_data will merge the context data of all parent classes
+    with those of the current class.  To preserve this behavior in your own classes
+    where you want to alter the context, you should be sure to call
+    get_context_data on the super class. When no two classes try to define the same
+    key, this will give the expected results. However if any class attempts to
+    override a key after parent classes have set it (after the call to super), any
+    children of that class will also need to explictly set it after super if they
+    want to be sure to override all parents.
 
 Viewing subsets of objects
 --------------------------

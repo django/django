@@ -1,12 +1,12 @@
 from django.forms import models as model_forms
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponseRedirect
-from django.views.generic.base import TemplateResponseMixin, View
+from django.views.generic.base import TemplateResponseMixin, ContextMixin, View
 from django.views.generic.detail import (SingleObjectMixin,
                         SingleObjectTemplateResponseMixin, BaseDetailView)
 
 
-class FormMixin(object):
+class FormMixin(ContextMixin):
     """
     A mixin that provides a way to show and handle a form in a request.
     """
@@ -43,9 +43,6 @@ class FormMixin(object):
                 'data': self.request.POST,
                 'files': self.request.FILES,
             })
-        return kwargs
-
-    def get_context_data(self, **kwargs):
         return kwargs
 
     def get_success_url(self):
@@ -113,13 +110,14 @@ class ModelFormMixin(FormMixin, SingleObjectMixin):
         return super(ModelFormMixin, self).form_valid(form)
 
     def get_context_data(self, **kwargs):
-        context = kwargs
+        context = {}
         if self.object:
             context['object'] = self.object
             context_object_name = self.get_context_object_name(self.object)
             if context_object_name:
                 context[context_object_name] = self.object
-        return context
+        context.update(kwargs)
+        return super(ModelFormMixin, self).get_context_data(**context)
 
 
 class ProcessFormView(View):

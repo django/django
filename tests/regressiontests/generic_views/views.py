@@ -14,10 +14,9 @@ class CustomTemplateView(generic.TemplateView):
     template_name = 'generic_views/about.html'
 
     def get_context_data(self, **kwargs):
-        return {
-            'params': kwargs,
-            'key': 'value'
-        }
+        context = super(CustomTemplateView, self).get_context_data(**kwargs)
+        context.update({'key': 'value'})
+        return context
 
 
 class ObjectDetail(generic.DetailView):
@@ -184,3 +183,18 @@ class BookDetailGetObjectCustomQueryset(BookDetail):
     def get_object(self, queryset=None):
         return super(BookDetailGetObjectCustomQueryset,self).get_object(
             queryset=Book.objects.filter(pk=2))
+
+class CustomContextView(generic.detail.SingleObjectMixin, generic.View):
+    model = Book
+    object = Book(name='dummy')
+
+    def get_object(self):
+        return Book(name="dummy")
+
+    def get_context_data(self, **kwargs):
+        context = {'custom_key': 'custom_value'}
+        context.update(kwargs)
+        return super(CustomContextView, self).get_context_data(**context)
+
+    def get_context_object_name(self, obj):
+        return "test_name"

@@ -8,6 +8,16 @@ from django.utils.decorators import classonlymethod
 logger = getLogger('django.request')
 
 
+class ContextMixin(object):
+    """
+    A default context mixin that passes the keyword arguments received by
+    get_context_data as the template context.
+    """
+
+    def get_context_data(self, **kwargs):
+        return kwargs
+
+
 class View(object):
     """
     Intentionally simple parent class for all views. Only implements
@@ -110,17 +120,13 @@ class TemplateResponseMixin(object):
             return [self.template_name]
 
 
-class TemplateView(TemplateResponseMixin, View):
+class TemplateView(TemplateResponseMixin, ContextMixin, View):
     """
-    A view that renders a template.
+    A view that renders a template.  This view is different from all the others
+    insofar as it also passes ``kwargs`` as ``params`` to the template context.
     """
-    def get_context_data(self, **kwargs):
-        return {
-            'params': kwargs
-        }
-
     def get(self, request, *args, **kwargs):
-        context = self.get_context_data(**kwargs)
+        context = self.get_context_data(params=kwargs)
         return self.render_to_response(context)
 
 
