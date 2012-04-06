@@ -215,7 +215,7 @@ model names.
 .. versionadded:: 1.2
 
 The :djadminopt:`--database` option can be used to specify the database
-onto which the data will be loaded.
+from which data will be dumped.
 
 .. django-admin-option:: --natural
 
