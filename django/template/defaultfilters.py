@@ -419,7 +419,7 @@ def force_escape(value):
     characters (as opposed to "escape", which marks the content for later
     possible escaping).
     """
-    return mark_safe(escape(value))
+    return escape(value)
 
 @register.filter("linebreaks", is_safe=True, needs_autoescape=True)
 @stringfilter

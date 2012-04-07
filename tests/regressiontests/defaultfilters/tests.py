@@ -6,6 +6,7 @@ import decimal
 from django.template.defaultfilters import *
 from django.test import TestCase
 from django.utils import unittest, translation
+from django.utils.safestring import SafeData
 
 
 class DefaultFiltersTests(TestCase):
@@ -328,9 +329,10 @@ class DefaultFiltersTests(TestCase):
                           u'a string to be mangled')
 
     def test_force_escape(self):
+        escaped = force_escape(u'<some html & special characters > here')
         self.assertEqual(
-            force_escape(u'<some html & special characters > here'),
-            u'&lt;some html &amp; special characters &gt; here')
+            escaped, u'&lt;some html &amp; special characters &gt; here')
+        self.assertTrue(isinstance(escaped, SafeData))
         self.assertEqual(
             force_escape(u'<some html & special characters > here ĐÅ€£'),
             u'&lt;some html &amp; special characters &gt; here'\
