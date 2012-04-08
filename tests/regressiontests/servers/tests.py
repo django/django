@@ -2,76 +2,14 @@
 Tests for django.core.servers.
 """
 import os
-from urlparse import urljoin
 import urllib2
 
-import django
-from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.test import TestCase, LiveServerTestCase
-from django.core.handlers.wsgi import WSGIHandler
-from django.core.servers.basehttp import AdminMediaHandler, WSGIServerException
+from django.test import LiveServerTestCase
+from django.core.servers.basehttp import WSGIServerException
 from django.test.utils import override_settings
 
 from .models import Person
-
-class AdminMediaHandlerTests(TestCase):
-
-    def setUp(self):
-        self.admin_media_url = urljoin(settings.STATIC_URL, 'admin/')
-        self.admin_media_file_path = os.path.abspath(
-            os.path.join(django.__path__[0], 'contrib', 'admin', 'static', 'admin')
-        )
-        self.handler = AdminMediaHandler(WSGIHandler())
-
-    def test_media_urls(self):
-        """
-        Tests that URLs that look like absolute file paths after the
-        settings.STATIC_URL don't turn into absolute file paths.
-        """
-        # Cases that should work on all platforms.
-        data = (
-            ('%scss/base.css' % self.admin_media_url, ('css', 'base.css')),
-        )
-        # Cases that should raise an exception.
-        bad_data = ()
-
-        # Add platform-specific cases.
-        if os.sep == '/':
-            data += (
-                # URL, tuple of relative path parts.
-                ('%s\\css/base.css' % self.admin_media_url, ('\\css', 'base.css')),
-            )
-            bad_data += (
-                '%s/css/base.css' % self.admin_media_url,
-                '%s///css/base.css' % self.admin_media_url,
-                '%s../css/base.css' % self.admin_media_url,
-            )
-        elif os.sep == '\\':
-            bad_data += (
-                '%sC:\css/base.css' % self.admin_media_url,
-                '%s/\\css/base.css' % self.admin_media_url,
-                '%s\\css/base.css' % self.admin_media_url,
-                '%s\\\\css/base.css' % self.admin_media_url
-            )
-        for url, path_tuple in data:
-            try:
-                output = self.handler.file_path(url)
-            except ValueError:
-                self.fail("Got a ValueError exception, but wasn't expecting"
-                          " one. URL was: %s" % url)
-            rel_path = os.path.join(*path_tuple)
-            desired = os.path.join(self.admin_media_file_path, rel_path)
-            self.assertEqual(
-                os.path.normcase(output), os.path.normcase(desired),
-                "Got: %s, Expected: %s, URL was: %s" % (output, desired, url))
-        for url in bad_data:
-            try:
-                output = self.handler.file_path(url)
-            except ValueError:
-                continue
-            self.fail('URL: %s should have caused a ValueError exception.'
-                      % url)
 
 
 TEST_ROOT = os.path.dirname(__file__)

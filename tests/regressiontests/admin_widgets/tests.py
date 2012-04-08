@@ -20,8 +20,8 @@ from . import models
 from .widgetadmin import site as widget_admin_site
 
 
-admin_media_prefix = lambda: {
-    'ADMIN_MEDIA_PREFIX': "%sadmin/" % settings.STATIC_URL,
+admin_static_prefix = lambda: {
+    'ADMIN_STATIC_PREFIX': "%sadmin/" % settings.STATIC_URL,
 }
 
 class AdminFormfieldForDBFieldTests(TestCase):
@@ -196,14 +196,14 @@ class FilteredSelectMultipleWidgetTest(DjangoTestCase):
         w = widgets.FilteredSelectMultiple('test', False)
         self.assertHTMLEqual(
             conditional_escape(w.render('test', 'test')),
-            '<select multiple="multiple" name="test" class="selectfilter">\n</select><script type="text/javascript">addEvent(window, "load", function(e) {SelectFilter.init("id_test", "test", 0, "%(ADMIN_MEDIA_PREFIX)s"); });</script>\n' % admin_media_prefix()
+            '<select multiple="multiple" name="test" class="selectfilter">\n</select><script type="text/javascript">addEvent(window, "load", function(e) {SelectFilter.init("id_test", "test", 0, "%(ADMIN_STATIC_PREFIX)s"); });</script>\n' % admin_static_prefix()
         )
 
     def test_stacked_render(self):
         w = widgets.FilteredSelectMultiple('test', True)
         self.assertHTMLEqual(
             conditional_escape(w.render('test', 'test')),
-            '<select multiple="multiple" name="test" class="selectfilterstacked">\n</select><script type="text/javascript">addEvent(window, "load", function(e) {SelectFilter.init("id_test", "test", 1, "%(ADMIN_MEDIA_PREFIX)s"); });</script>\n' % admin_media_prefix()
+            '<select multiple="multiple" name="test" class="selectfilterstacked">\n</select><script type="text/javascript">addEvent(window, "load", function(e) {SelectFilter.init("id_test", "test", 1, "%(ADMIN_STATIC_PREFIX)s"); });</script>\n' % admin_static_prefix()
         )
 
 class AdminDateWidgetTest(DjangoTestCase):
@@ -292,7 +292,7 @@ class ForeignKeyRawIdWidgetTest(DjangoTestCase):
         w = widgets.ForeignKeyRawIdWidget(rel, widget_admin_site)
         self.assertHTMLEqual(
             conditional_escape(w.render('test', band.pk, attrs={})),
-            '<input type="text" name="test" value="%(bandpk)s" class="vForeignKeyRawIdAdminField" /><a href="/widget_admin/admin_widgets/band/?t=id" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="%(ADMIN_MEDIA_PREFIX)simg/selector-search.gif" width="16" height="16" alt="Lookup" /></a>&nbsp;<strong>Linkin Park</strong>' % dict(admin_media_prefix(), bandpk=band.pk)
+            '<input type="text" name="test" value="%(bandpk)s" class="vForeignKeyRawIdAdminField" /><a href="/widget_admin/admin_widgets/band/?t=id" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="%(ADMIN_STATIC_PREFIX)simg/selector-search.gif" width="16" height="16" alt="Lookup" /></a>&nbsp;<strong>Linkin Park</strong>' % dict(admin_static_prefix(), bandpk=band.pk)
         )
 
     def test_relations_to_non_primary_key(self):
@@ -307,7 +307,7 @@ class ForeignKeyRawIdWidgetTest(DjangoTestCase):
         w = widgets.ForeignKeyRawIdWidget(rel, widget_admin_site)
         self.assertHTMLEqual(
             w.render('test', core.parent_id, attrs={}),
-            '<input type="text" name="test" value="86" class="vForeignKeyRawIdAdminField" /><a href="/widget_admin/admin_widgets/inventory/?t=barcode" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="%(ADMIN_MEDIA_PREFIX)simg/selector-search.gif" width="16" height="16" alt="Lookup" /></a>&nbsp;<strong>Apple</strong>' % admin_media_prefix()
+            '<input type="text" name="test" value="86" class="vForeignKeyRawIdAdminField" /><a href="/widget_admin/admin_widgets/inventory/?t=barcode" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="%(ADMIN_STATIC_PREFIX)simg/selector-search.gif" width="16" height="16" alt="Lookup" /></a>&nbsp;<strong>Apple</strong>' % admin_static_prefix()
         )
 
     def test_fk_related_model_not_in_admin(self):
@@ -349,7 +349,7 @@ class ForeignKeyRawIdWidgetTest(DjangoTestCase):
         )
         self.assertHTMLEqual(
             w.render('test', child_of_hidden.parent_id, attrs={}),
-            '<input type="text" name="test" value="93" class="vForeignKeyRawIdAdminField" /><a href="/widget_admin/admin_widgets/inventory/?t=barcode" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="%(ADMIN_MEDIA_PREFIX)simg/selector-search.gif" width="16" height="16" alt="Lookup" /></a>&nbsp;<strong>Hidden</strong>' % admin_media_prefix()
+            '<input type="text" name="test" value="93" class="vForeignKeyRawIdAdminField" /><a href="/widget_admin/admin_widgets/inventory/?t=barcode" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="%(ADMIN_STATIC_PREFIX)simg/selector-search.gif" width="16" height="16" alt="Lookup" /></a>&nbsp;<strong>Hidden</strong>' % admin_static_prefix()
         )
 
 
@@ -365,12 +365,12 @@ class ManyToManyRawIdWidgetTest(DjangoTestCase):
         w = widgets.ManyToManyRawIdWidget(rel, widget_admin_site)
         self.assertHTMLEqual(
             conditional_escape(w.render('test', [m1.pk, m2.pk], attrs={})),
-            '<input type="text" name="test" value="%(m1pk)s,%(m2pk)s" class="vManyToManyRawIdAdminField" /><a href="/widget_admin/admin_widgets/member/" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="/static/admin/img/selector-search.gif" width="16" height="16" alt="Lookup" /></a>' % dict(admin_media_prefix(), m1pk=m1.pk, m2pk=m2.pk)
+            '<input type="text" name="test" value="%(m1pk)s,%(m2pk)s" class="vManyToManyRawIdAdminField" /><a href="/widget_admin/admin_widgets/member/" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="/static/admin/img/selector-search.gif" width="16" height="16" alt="Lookup" /></a>' % dict(admin_static_prefix(), m1pk=m1.pk, m2pk=m2.pk)
         )
 
         self.assertHTMLEqual(
             conditional_escape(w.render('test', [m1.pk])),
-            '<input type="text" name="test" value="%(m1pk)s" class="vManyToManyRawIdAdminField" /><a href="/widget_admin/admin_widgets/member/" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="%(ADMIN_MEDIA_PREFIX)simg/selector-search.gif" width="16" height="16" alt="Lookup" /></a>' % dict(admin_media_prefix(), m1pk=m1.pk)
+            '<input type="text" name="test" value="%(m1pk)s" class="vManyToManyRawIdAdminField" /><a href="/widget_admin/admin_widgets/member/" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="%(ADMIN_STATIC_PREFIX)simg/selector-search.gif" width="16" height="16" alt="Lookup" /></a>' % dict(admin_static_prefix(), m1pk=m1.pk)
         )
 
         self.assertEqual(w._has_changed(None, None), False)

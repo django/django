@@ -1095,12 +1095,12 @@ class ManageTestCommand(AdminScriptTestCase):
 
 class ManageRunserver(AdminScriptTestCase):
     def setUp(self):
-        from django.core.management.commands.runserver import BaseRunserverCommand
+        from django.core.management.commands.runserver import Command
 
         def monkey_run(*args, **options):
             return
 
-        self.cmd = BaseRunserverCommand()
+        self.cmd = Command()
         self.cmd.run = monkey_run
 
     def assertServerSettings(self, addr, port, ipv6=None, raw_ipv6=False):

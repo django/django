@@ -22,10 +22,6 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import color_style
 from django.core.wsgi import get_wsgi_application
 from django.utils.importlib import import_module
-from django.utils._os import safe_join
-from django.views import static
-
-from django.contrib.staticfiles import handlers
 
 __all__ = ['WSGIServer', 'WSGIRequestHandler']
 
@@ -131,7 +127,7 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
 
     def __init__(self, *args, **kwargs):
         from django.conf import settings
-        self.admin_media_prefix = urlparse.urljoin(settings.STATIC_URL, 'admin/')
+        self.admin_static_prefix = urlparse.urljoin(settings.STATIC_URL, 'admin/')
         # We set self.path to avoid crashes in log_message() on unsupported
         # requests (like "OPTIONS").
         self.path = ''
@@ -173,7 +169,7 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
 
     def log_message(self, format, *args):
         # Don't bother logging requests for admin images or the favicon.
-        if (self.path.startswith(self.admin_media_prefix)
+        if (self.path.startswith(self.admin_static_prefix)
                 or self.path == '/favicon.ico'):
             return
 
@@ -198,48 +194,6 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
             msg = self.style.HTTP_SERVER_ERROR(msg)
 
         sys.stderr.write(msg)
-
-
-class AdminMediaHandler(handlers.StaticFilesHandler):
-    """
-    WSGI middleware that intercepts calls to the admin media directory, as
-    defined by the STATIC_URL setting, and serves those images.
-    Use this ONLY LOCALLY, for development! This hasn't been tested for
-    security and is not super efficient.
-
-    This is pending for deprecation since 1.3.
-    """
-    def get_base_dir(self):
-        return os.path.join(django.__path__[0], 'contrib', 'admin', 'static', 'admin')
-
-    def get_base_url(self):
-        from django.conf import settings
-        return urlparse.urljoin(settings.STATIC_URL, 'admin/')
-
-    def file_path(self, url):
-        """
-        Returns the path to the media file on disk for the given URL.
-
-        The passed URL is assumed to begin with ``self.base_url``.  If the
-        resulting file path is outside the media directory, then a ValueError
-        is raised.
-        """
-        relative_url = url[len(self.base_url[2]):]
-        relative_path = urllib.url2pathname(relative_url)
-        return safe_join(self.base_dir, relative_path)
-
-    def serve(self, request):
-        document_root, path = os.path.split(self.file_path(request.path))
-        return static.serve(request, path, document_root=document_root)
-
-    def _should_handle(self, path):
-        """
-        Checks if the path should be handled. Ignores the path if:
-
-        * the host is provided as part of the base_url
-        * the request's path isn't under the base path
-        """
-        return path.startswith(self.base_url[2]) and not self.base_url[1]
 
 
 def run(addr, port, wsgi_handler, ipv6=False, threading=False):

@@ -58,7 +58,7 @@ This provides a few Django-specific niceties:
 * validates installed models
 
 * allows an ``--adminmedia`` option for passing in the location of the
-  admin media files, mimicing the behavior of runserver.
+  admin media files.
 
 See Gunicorn's `deployment documentation`_ for additional tips on starting and
 maintaining the Gunicorn server.

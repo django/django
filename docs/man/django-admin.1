@@ -70,7 +70,7 @@ Runs this project as a FastCGI application. Requires flup. Use
 .B runfcgi help
 for help on the KEY=val pairs.
 .TP
-.BI "runserver [" "\-\-noreload" "] [" "\-\-nothreading" "] [" "\-\-nostatic" "] [" "\-\-insecure" "] [" "\-\-ipv6" "] [" "\-\-adminmedia=ADMIN_MEDIA_PATH" "] [" "port|ipaddr:port" "]"
+.BI "runserver [" "\-\-noreload" "] [" "\-\-nothreading" "] [" "\-\-nostatic" "] [" "\-\-insecure" "] [" "\-\-ipv6" "] [" "port|ipaddr:port" "]"
 Starts a lightweight Web server for development.
 .TP
 .BI "shell [" "\-\-plain" "]"
@@ -168,9 +168,6 @@ Enables IPv6 addresses.
 .TP
 .I \-\-verbosity=VERBOSITY
 Verbosity level: 0=minimal output, 1=normal output, 2=all output.
-.TP
-.I \-\-adminmedia=ADMIN_MEDIA_PATH
-Specifies the directory from which to serve admin media when using the development server.
 .TP
 .I \-\-traceback
 By default, django-admin.py will show a simple error message whenever an

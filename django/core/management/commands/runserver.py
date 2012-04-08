@@ -5,7 +5,7 @@ import sys
 import socket
 
 from django.core.management.base import BaseCommand, CommandError
-from django.core.servers.basehttp import AdminMediaHandler, run, WSGIServerException, get_internal_wsgi_application
+from django.core.servers.basehttp import run, WSGIServerException, get_internal_wsgi_application
 from django.utils import autoreload
 
 naiveip_re = re.compile(r"""^(?:
@@ -17,7 +17,7 @@ naiveip_re = re.compile(r"""^(?:
 DEFAULT_PORT = "8000"
 
 
-class BaseRunserverCommand(BaseCommand):
+class Command(BaseCommand):
     option_list = BaseCommand.option_list + (
         make_option('--ipv6', '-6', action='store_true', dest='use_ipv6', default=False,
             help='Tells Django to use a IPv6 address.'),
@@ -128,15 +128,6 @@ class BaseRunserverCommand(BaseCommand):
                 self.stdout.write("%s\n" % shutdown_message)
             sys.exit(0)
 
-class Command(BaseRunserverCommand):
-    option_list = BaseRunserverCommand.option_list + (
-        make_option('--adminmedia', dest='admin_media_path', default='',
-            help='Specifies the directory from which to serve admin media.'),
-    )
 
-    def get_handler(self, *args, **options):
-        """
-        Serves admin media like old-school (deprecation pending).
-        """
-        handler = super(Command, self).get_handler(*args, **options)
-        return AdminMediaHandler(handler, options.get('admin_media_path'))
+# Kept for backward compatibility
+BaseRunserverCommand = Command
