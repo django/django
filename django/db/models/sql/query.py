@@ -104,7 +104,6 @@ class Query(object):
         self.alias_map = {}     # Maps alias to join information
         self.table_map = {}     # Maps table names to list of aliases.
         self.join_map = {}
-        self.rev_join_map = {}  # Reverse of join_map.
         self.quote_cache = {}
         self.default_cols = True
         self.default_ordering = True
@@ -244,7 +243,6 @@ class Query(object):
         obj.alias_map = self.alias_map.copy()
         obj.table_map = self.table_map.copy()
         obj.join_map = self.join_map.copy()
-        obj.rev_join_map = self.rev_join_map.copy()
         obj.quote_cache = {}
         obj.default_cols = self.default_cols
         obj.default_ordering = self.default_ordering
@@ -463,18 +461,19 @@ class Query(object):
         change_map = {}
         used = set()
         conjunction = (connector == AND)
+        # Add the joins in the rhs query into the new query.
         first = True
         for alias in rhs.tables:
             if not rhs.alias_refcount[alias]:
                 # An unused alias.
                 continue
-            promote = (rhs.alias_map[alias][JOIN_TYPE] == self.LOUTER)
-            lhs, table, lhs_col, col = rhs.rev_join_map[alias]
+            table, _, join_type, lhs, lhs_col, col, _ = rhs.alias_map[alias]
+            promote = join_type == self.LOUTER
             # If the left side of the join was already relabeled, use the
             # updated alias.
             lhs = change_map.get(lhs, lhs)
             new_alias = self.join((lhs, table, lhs_col, col),
-                    (conjunction and not first), used, promote, not conjunction)
+                    conjunction and not first, used, promote, not conjunction)
             used.add(new_alias)
             change_map[alias] = new_alias
             first = False
@@ -766,16 +765,12 @@ class Query(object):
                     col.relabel_aliases(change_map)
 
         # 2. Rename the alias in the internal table/alias datastructures.
+        for k, aliases in self.join_map.items():
+            aliases = tuple([change_map.get(a, a) for a in aliases])
+            self.join_map[k] = aliases
         for old_alias, new_alias in change_map.iteritems():
             alias_data = list(self.alias_map[old_alias])
             alias_data[RHS_ALIAS] = new_alias
-
-            t = self.rev_join_map[old_alias]
-            data = list(self.join_map[t])
-            data[data.index(old_alias)] = new_alias
-            self.join_map[t] = tuple(data)
-            self.rev_join_map[new_alias] = t
-            del self.rev_join_map[old_alias]
             self.alias_refcount[new_alias] = self.alias_refcount[old_alias]
             del self.alias_refcount[old_alias]
             self.alias_map[new_alias] = tuple(alias_data)
@@ -923,7 +918,6 @@ class Query(object):
             self.join_map[t_ident] += (alias,)
         else:
             self.join_map[t_ident] = (alias,)
-        self.rev_join_map[alias] = t_ident
         return alias
 
     def setup_inherited_models(self):
