@@ -938,7 +938,7 @@ Summary::
     $ sudo port install geos
     $ sudo port install proj
     $ sudo port install postgis
-    $ sudo port install gdal
+    $ sudo port install gdal +geos
     $ sudo port install libgeoip
 
 .. note::
