@@ -446,35 +446,35 @@ class ChangeListTests(TestCase):
         class UnorderedObjectAdmin(admin.ModelAdmin):
             list_per_page = 10
 
-        def check_results_order(reverse=False):
+        def check_results_order(ascending=False):
             admin.site.register(UnorderedObject, UnorderedObjectAdmin)
             model_admin = UnorderedObjectAdmin(UnorderedObject, admin.site)
-            counter = 51 if reverse else 0
+            counter = 0 if ascending else 51
             for page in range (0, 5):
                 request = self._mocked_authenticated_request('/unorderedobject/?p=%s' % page, superuser)
                 response = model_admin.changelist_view(request)
                 for result in response.context_data['cl'].result_list:
-                    counter += -1 if reverse else 1
+                    counter += 1 if ascending else -1
                     self.assertEqual(result.id, counter)
             admin.site.unregister(UnorderedObject)
 
-        # When no order is defined at all, everything is ordered by 'pk'.
+        # When no order is defined at all, everything is ordered by '-pk'.
         check_results_order()
 
         # When an order field is defined but multiple records have the same
-        # value for that field, make sure everything gets ordered by pk as well.
+        # value for that field, make sure everything gets ordered by -pk as well.
         UnorderedObjectAdmin.ordering = ['bool']
         check_results_order()
 
         # When order fields are defined, including the pk itself, use them.
         UnorderedObjectAdmin.ordering = ['bool', '-pk']
-        check_results_order(reverse=True)
+        check_results_order()
         UnorderedObjectAdmin.ordering = ['bool', 'pk']
-        check_results_order()
+        check_results_order(ascending=True)
         UnorderedObjectAdmin.ordering = ['-id', 'bool']
-        check_results_order(reverse=True)
-        UnorderedObjectAdmin.ordering = ['id', 'bool']
         check_results_order()
+        UnorderedObjectAdmin.ordering = ['id', 'bool']
+        check_results_order(ascending=True)
 
     def test_deterministic_order_for_model_ordered_by_its_manager(self):
         """
@@ -491,32 +491,32 @@ class ChangeListTests(TestCase):
         class OrderedObjectAdmin(admin.ModelAdmin):
             list_per_page = 10
 
-        def check_results_order(reverse=False):
+        def check_results_order(ascending=False):
             admin.site.register(OrderedObject, OrderedObjectAdmin)
             model_admin = OrderedObjectAdmin(OrderedObject, admin.site)
-            counter = 51 if reverse else 0
+            counter = 0 if ascending else 51
             for page in range (0, 5):
                 request = self._mocked_authenticated_request('/orderedobject/?p=%s' % page, superuser)
                 response = model_admin.changelist_view(request)
                 for result in response.context_data['cl'].result_list:
-                    counter += -1 if reverse else 1
+                    counter += 1 if ascending else -1
                     self.assertEqual(result.id, counter)
             admin.site.unregister(OrderedObject)
 
-        # When no order is defined at all, use the model's default ordering (i.e. '-number')
-        check_results_order(reverse=True)
+        # When no order is defined at all, use the model's default ordering (i.e. 'number')
+        check_results_order(ascending=True)
 
         # When an order field is defined but multiple records have the same
-        # value for that field, make sure everything gets ordered by pk as well.
+        # value for that field, make sure everything gets ordered by -pk as well.
         OrderedObjectAdmin.ordering = ['bool']
         check_results_order()
 
         # When order fields are defined, including the pk itself, use them.
         OrderedObjectAdmin.ordering = ['bool', '-pk']
-        check_results_order(reverse=True)
+        check_results_order()
         OrderedObjectAdmin.ordering = ['bool', 'pk']
-        check_results_order()
+        check_results_order(ascending=True)
         OrderedObjectAdmin.ordering = ['-id', 'bool']
-        check_results_order(reverse=True)
-        OrderedObjectAdmin.ordering = ['id', 'bool']
         check_results_order()
+        OrderedObjectAdmin.ordering = ['id', 'bool']
+        check_results_order(ascending=True)

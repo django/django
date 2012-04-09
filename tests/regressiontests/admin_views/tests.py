@@ -1894,13 +1894,13 @@ class AdminViewListEditable(TestCase):
         UnorderedObject.objects.create(id=2, name='Unordered object #2')
         UnorderedObject.objects.create(id=3, name='Unordered object #3')
         response = self.client.get('/test_admin/admin/admin_views/unorderedobject/')
-        self.assertContains(response, 'Unordered object #1')
-        self.assertContains(response, 'Unordered object #2')
-        self.assertNotContains(response, 'Unordered object #3')
-        response = self.client.get('/test_admin/admin/admin_views/unorderedobject/?p=1')
-        self.assertNotContains(response, 'Unordered object #1')
-        self.assertNotContains(response, 'Unordered object #2')
         self.assertContains(response, 'Unordered object #3')
+        self.assertContains(response, 'Unordered object #2')
+        self.assertNotContains(response, 'Unordered object #1')
+        response = self.client.get('/test_admin/admin/admin_views/unorderedobject/?p=1')
+        self.assertNotContains(response, 'Unordered object #3')
+        self.assertNotContains(response, 'Unordered object #2')
+        self.assertContains(response, 'Unordered object #1')
 
     def test_list_editable_action_submit(self):
         # List editable changes should not be executed if the action "Go" button is
