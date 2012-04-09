@@ -281,7 +281,8 @@ class ExtraWhere(object):
         self.params = params
 
     def as_sql(self, qn=None, connection=None):
-        return " AND ".join(self.sqls), tuple(self.params or ())
+        sqls = ["(%s)" % sql for sql in self.sqls]
+        return " AND ".join(sqls), tuple(self.params or ())
 
 class Constraint(object):
     """

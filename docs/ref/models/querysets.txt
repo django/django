@@ -968,11 +968,11 @@ of the arguments is required, but you should use at least one of them.
 
   Example::
 
-      Entry.objects.extra(where=['id IN (3, 4, 5, 20)'])
+      Entry.objects.extra(where=["foo='a' OR bar = 'a'", "baz = 'a'"])
 
   ...translates (roughly) into the following SQL::
 
-      SELECT * FROM blog_entry WHERE id IN (3, 4, 5, 20);
+      SELECT * FROM blog_entry WHERE (foo='a' OR bar='a') AND (baz='a')
 
   Be careful when using the ``tables`` parameter if you're specifying
   tables that are already used in the query. When you add extra tables
