@@ -18,6 +18,7 @@ from .fi.tests import FILocalFlavorTests
 from .fr.tests import FRLocalFlavorTests
 from .gb.tests import GBLocalFlavorTests
 from .generic.tests import GenericLocalFlavorTests
+from .hk.tests import HKLocalFlavorTests
 from .hr.tests import HRLocalFlavorTests
 from .id.tests import IDLocalFlavorTests
 from .ie.tests import IELocalFlavorTests
