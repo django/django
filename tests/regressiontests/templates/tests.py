@@ -37,8 +37,8 @@ from .parser import ParserTests
 from .unicode import UnicodeTests
 from .nodelist import NodelistTest, ErrorIndexTest
 from .smartif import SmartIfTests
-from .response import (TemplateResponseTest, BaseTemplateResponseTest,
-    CacheMiddlewareTest, SimpleTemplateResponseTest, CustomURLConfTest)
+from .response import (TemplateResponseTest, CacheMiddlewareTest,
+    SimpleTemplateResponseTest, CustomURLConfTest)
 
 try:
     from .loaders import RenderToStringTest, EggLoaderTest
@@ -1738,7 +1738,7 @@ class TemplateTagLoading(unittest.TestCase):
         t = template.Template(ttext)
 
 
-class RequestContextTests(BaseTemplateResponseTest):
+class RequestContextTests(unittest.TestCase):
 
     def setUp(self):
         templates = {

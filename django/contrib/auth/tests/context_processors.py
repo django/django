@@ -30,12 +30,8 @@ class AuthContextProcessorTests(TestCase):
         Tests that the session is not accessed simply by including
         the auth context processor
         """
-        context._standard_context_processors = None
-
         response = self.client.get('/auth_processor_no_attr_access/')
         self.assertContains(response, "Session not accessed")
-
-        context._standard_context_processors = None
 
     @override_settings(
         MIDDLEWARE_CLASSES=global_settings.MIDDLEWARE_CLASSES,
@@ -46,12 +42,8 @@ class AuthContextProcessorTests(TestCase):
         Tests that the session is accessed if the auth context processor
         is used and relevant attributes accessed.
         """
-        context._standard_context_processors = None
-
         response = self.client.get('/auth_processor_attr_access/')
         self.assertContains(response, "Session accessed")
-
-        context._standard_context_processors = None
 
     def test_perms_attrs(self):
         self.client.login(username='super', password='secret')

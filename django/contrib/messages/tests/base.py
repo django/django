@@ -259,8 +259,7 @@ class BaseTest(TestCase):
                               args=(level,))
             response = self.client.post(add_url, data, follow=True)
             self.assertRedirects(response, show_url)
-            self.assertTrue('messages' in response.context)
-            self.assertEqual(list(response.context['messages']), [])
+            self.assertFalse('messages' in response.context)
 
     def stored_messages_count(self, storage, response):
         """

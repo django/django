@@ -2,7 +2,12 @@ import warnings
 
 from django.conf import settings
 from django.test import TestCase
+from django.test.utils import override_settings
 
+@override_settings(
+    TEMPLATE_CONTEXT_PROCESSORS=('django.core.context_processors.static',),
+    STATIC_URL='/path/to/static/media/',
+)
 class ShortcutTests(TestCase):
     urls = 'regressiontests.views.generic_urls'
 
@@ -11,20 +16,8 @@ class ShortcutTests(TestCase):
         warnings.filterwarnings('ignore', category=DeprecationWarning,
                                 module='django.views.generic.simple')
 
-        self.old_STATIC_URL = settings.STATIC_URL
-        self.old_TEMPLATE_CONTEXT_PROCESSORS = settings.TEMPLATE_CONTEXT_PROCESSORS
-
-        settings.STATIC_URL = '/path/to/static/media/'
-        settings.TEMPLATE_CONTEXT_PROCESSORS = (
-            'django.core.context_processors.static'
-        )
-
     def tearDown(self):
         self.restore_warnings_state()
-
-    def tearDown(self):
-        settings.STATIC_URL = self.old_STATIC_URL
-        settings.TEMPLATE_CONTEXT_PROCESSORS = self.old_TEMPLATE_CONTEXT_PROCESSORS
 
     def test_render_to_response(self):
         response = self.client.get('/shortcuts/render_to_response/')
@@ -74,4 +67,3 @@ class ShortcutTests(TestCase):
 
     def test_render_with_current_app_conflict(self):
         self.assertRaises(ValueError, self.client.get, '/shortcuts/render/current_app_conflict/')
-

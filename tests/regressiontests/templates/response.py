@@ -3,13 +3,12 @@ import pickle
 import time
 from datetime import datetime
 
-from django.utils import unittest
 from django.test import RequestFactory, TestCase
 from django.conf import settings
-import django.template.context
 from django.template import Template, Context
 from django.template.response import (TemplateResponse, SimpleTemplateResponse,
                                       ContentNotRenderedError)
+from django.test.utils import override_settings
 
 def test_processor(request):
     return {'processors': 'yes'}
@@ -22,32 +21,7 @@ class CustomURLConfMiddleware(object):
         request.urlconf = 'regressiontests.templates.alternate_urls'
 
 
-class BaseTemplateResponseTest(unittest.TestCase):
-    # tests rely on fact that global context
-    # processors should only work when RequestContext is used.
-
-    def setUp(self):
-        self.factory = RequestFactory()
-        self._old_processors = settings.TEMPLATE_CONTEXT_PROCESSORS
-        self._old_TEMPLATE_DIRS = settings.TEMPLATE_DIRS
-        settings.TEMPLATE_CONTEXT_PROCESSORS = [test_processor_name]
-        settings.TEMPLATE_DIRS = (
-            os.path.join(
-                os.path.dirname(__file__),
-                'templates'
-            ),
-        )
-        # Force re-evaluation of the contex processor list
-        django.template.context._standard_context_processors = None
-
-    def tearDown(self):
-        settings.TEMPLATE_DIRS = self._old_TEMPLATE_DIRS
-        settings.TEMPLATE_CONTEXT_PROCESSORS = self._old_processors
-        # Force re-evaluation of the contex processor list
-        django.template.context._standard_context_processors = None
-
-
-class SimpleTemplateResponseTest(BaseTemplateResponseTest):
+class SimpleTemplateResponseTest(TestCase):
 
     def _response(self, template='foo', *args, **kwargs):
         return SimpleTemplateResponse(Template(template), *args, **kwargs)
@@ -213,7 +187,14 @@ class SimpleTemplateResponseTest(BaseTemplateResponseTest):
         unpickled_response = pickle.loads(pickled_response)
         repickled_response = pickle.dumps(unpickled_response)
 
-class TemplateResponseTest(BaseTemplateResponseTest):
+@override_settings(
+    TEMPLATE_CONTEXT_PROCESSORS=[test_processor_name],
+    TEMPLATE_DIRS=(os.path.join(os.path.dirname(__file__),'templates')),
+)
+class TemplateResponseTest(TestCase):
+
+    def setUp(self):
+        self.factory = RequestFactory()
 
     def _response(self, template='foo', *args, **kwargs):
         return TemplateResponse(self.factory.get('/'), Template(template),

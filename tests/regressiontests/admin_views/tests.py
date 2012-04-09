@@ -6,7 +6,7 @@ import re
 import datetime
 import urlparse
 
-from django.conf import settings
+from django.conf import settings, global_settings
 from django.core import mail
 from django.core.exceptions import SuspiciousOperation
 from django.core.files import temp as tempfile
@@ -23,7 +23,6 @@ from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.models import Group, User, Permission, UNUSABLE_PASSWORD
 from django.contrib.contenttypes.models import ContentType
 from django.forms.util import ErrorList
-from django.template import context as context_module
 from django.template.response import TemplateResponse
 from django.test import TestCase
 from django.utils import formats, translation, unittest
@@ -3364,25 +3363,17 @@ class ValidXHTMLTests(TestCase):
     urlbit = 'admin'
 
     def setUp(self):
-        self._context_processors = None
-        self._use_i18n, settings.USE_I18N = settings.USE_I18N, False
-        if 'django.core.context_processors.i18n' in settings.TEMPLATE_CONTEXT_PROCESSORS:
-            self._context_processors = settings.TEMPLATE_CONTEXT_PROCESSORS
-            cp = list(settings.TEMPLATE_CONTEXT_PROCESSORS)
-            cp.remove('django.core.context_processors.i18n')
-            settings.TEMPLATE_CONTEXT_PROCESSORS = tuple(cp)
-            # Force re-evaluation of the contex processor list
-            context_module._standard_context_processors = None
         self.client.login(username='super', password='secret')
 
     def tearDown(self):
         self.client.logout()
-        if self._context_processors is not None:
-            settings.TEMPLATE_CONTEXT_PROCESSORS = self._context_processors
-            # Force re-evaluation of the contex processor list
-            context_module._standard_context_processors = None
-        settings.USE_I18N = self._use_i18n
 
+    @override_settings(
+        TEMPLATE_CONTEXT_PROCESSORS=filter(
+            lambda t:t!='django.core.context_processors.i18n',
+            global_settings.TEMPLATE_CONTEXT_PROCESSORS),
+        USE_I18N=False,
+    )
     def testLangNamePresent(self):
         response = self.client.get('/test_admin/%s/admin_views/' % self.urlbit)
         self.assertFalse(' lang=""' in response.content)

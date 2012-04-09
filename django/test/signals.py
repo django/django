@@ -1,11 +1,13 @@
 from django.conf import settings
 from django.db import connections
-from django.dispatch import Signal
+from django.dispatch import receiver, Signal
+from django.template import context
 
 template_rendered = Signal(providing_args=["template", "context"])
 
 setting_changed = Signal(providing_args=["setting", "value"])
 
+@receiver(setting_changed)
 def update_connections_time_zone(**kwargs):
     if kwargs['setting'] == 'USE_TZ' and settings.TIME_ZONE != 'UTC':
         USE_TZ, TIME_ZONE = kwargs['value'], settings.TIME_ZONE
@@ -20,4 +22,7 @@ def update_connections_time_zone(**kwargs):
         if tz_sql:
             conn.cursor().execute(tz_sql, [tz])
 
-setting_changed.connect(update_connections_time_zone)
+@receiver(setting_changed)
+def clear_context_processors_cache(**kwargs):
+    if kwargs['setting'] == 'TEMPLATE_CONTEXT_PROCESSORS':
+        context._standard_context_processors = None
