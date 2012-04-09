@@ -258,7 +258,7 @@ class ChangeList(object):
         if not (set(ordering) & set(['pk', '-pk', pk_name, '-' + pk_name])):
             # The two sets do not intersect, meaning the pk isn't present. So
             # we add it.
-            ordering.append('pk')
+            ordering.append('-pk')
 
         return ordering
 

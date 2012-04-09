@@ -654,7 +654,7 @@ class ListFiltersTests(TestCase):
 
         # Make sure the correct queryset is returned
         queryset = changelist.get_query_set(request)
-        self.assertEqual(list(queryset), [john, jack])
+        self.assertEqual(list(queryset), [jack, john])
 
         filterspec = changelist.get_filters(request)[0][-1]
         self.assertEqual(force_unicode(filterspec.title), u'department')
