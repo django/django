@@ -154,9 +154,10 @@ class Collector(object):
 
         model = new_objs[0].__class__
 
-        # Recursively collect parent models, but not their related objects.
-        # These will be found by meta.get_all_related_objects()
-        for parent_model, ptr in model._meta.parents.iteritems():
+        # Recursively collect concrete model's parent models, but not their
+        # related objects. These will be found by meta.get_all_related_objects()
+        concrete_model = model._meta.concrete_model
+        for ptr in concrete_model._meta.parents.itervalues():
             if ptr:
                 parent_objs = [getattr(obj, ptr.name) for obj in new_objs]
                 self.collect(parent_objs, source=model,
