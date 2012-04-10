@@ -79,4 +79,32 @@ class ReverseSelectRelatedTestCase(TestCase):
         p1 = Product.objects.create(name="Django Plushie", image=im)
         p2 = Product.objects.create(name="Talking Django Plushie")
 
-        self.assertEqual(len(Product.objects.select_related("image")), 2)
+        with self.assertNumQueries(1):
+            result = sorted(Product.objects.select_related("image"), key=lambda x: x.name)
+            self.assertEqual([p.name for p in result], ["Django Plushie", "Talking Django Plushie"])
+
+            self.assertEqual(p1.image, im)
+            # Check for ticket #13839
+            self.assertIsNone(p2.image)
+
+    def test_missing_reverse(self):
+        """
+        Ticket #13839: select_related() should NOT cache None
+        for missing objects on a reverse 1-1 relation.
+        """
+        with self.assertNumQueries(1):
+            user = User.objects.select_related('userprofile').get(username='bob')
+            with self.assertRaises(UserProfile.DoesNotExist):
+                user.userprofile
+
+    def test_nullable_missing_reverse(self):
+        """
+        Ticket #13839: select_related() should NOT cache None
+        for missing objects on a reverse 0-1 relation.
+        """
+        Image.objects.create(name="imag1")
+
+        with self.assertNumQueries(1):
+            image = Image.objects.select_related('product').get()
+            with self.assertRaises(Product.DoesNotExist):
+                image.product

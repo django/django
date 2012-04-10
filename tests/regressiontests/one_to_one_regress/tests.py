@@ -132,3 +132,73 @@ class OneToOneRegressionTests(TestCase):
                 Target.objects.exclude(pointer2=None),
                 []
         )
+
+    def test_reverse_object_does_not_exist_cache(self):
+        """
+        Regression for #13839 and #17439.
+
+        DoesNotExist on a reverse one-to-one relation is cached.
+        """
+        p = Place(name='Zombie Cats', address='Not sure')
+        p.save()
+        with self.assertNumQueries(1):
+            with self.assertRaises(Restaurant.DoesNotExist):
+                p.restaurant
+        with self.assertNumQueries(0):
+            with self.assertRaises(Restaurant.DoesNotExist):
+                p.restaurant
+
+    def test_reverse_object_cached_when_related_is_accessed(self):
+        """
+        Regression for #13839 and #17439.
+
+        The target of a one-to-one relation is cached
+        when the origin is accessed through the reverse relation.
+        """
+        # Use a fresh object without caches
+        r = Restaurant.objects.get(pk=self.r1.pk)
+        p = r.place
+        with self.assertNumQueries(0):
+            self.assertEqual(p.restaurant, r)
+
+    def test_related_object_cached_when_reverse_is_accessed(self):
+        """
+        Regression for #13839 and #17439.
+
+        The origin of a one-to-one relation is cached
+        when the target is accessed through the reverse relation.
+        """
+        # Use a fresh object without caches
+        p = Place.objects.get(pk=self.p1.pk)
+        r = p.restaurant
+        with self.assertNumQueries(0):
+            self.assertEqual(r.place, p)
+
+    def test_reverse_object_cached_when_related_is_set(self):
+        """
+        Regression for #13839 and #17439.
+
+        The target of a one-to-one relation is always cached.
+        """
+        p = Place(name='Zombie Cats', address='Not sure')
+        p.save()
+        self.r1.place = p
+        self.r1.save()
+        with self.assertNumQueries(0):
+            self.assertEqual(p.restaurant, self.r1)
+
+    def test_reverse_object_cached_when_related_is_unset(self):
+        """
+        Regression for #13839 and #17439.
+
+        The target of a one-to-one relation is always cached.
+        """
+        b = UndergroundBar(place=self.p1, serves_cocktails=True)
+        b.save()
+        with self.assertNumQueries(0):
+            self.assertEqual(self.p1.undergroundbar, b)
+        b.place = None
+        b.save()
+        with self.assertNumQueries(0):
+            with self.assertRaises(UndergroundBar.DoesNotExist):
+                self.p1.undergroundbar
