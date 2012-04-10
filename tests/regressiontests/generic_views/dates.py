@@ -78,6 +78,15 @@ class ArchiveIndexViewTests(TestCase):
         self.assertEqual(res.context['page_obj'].number, 2)
         self.assertEqual(list(res.context['latest']), list(Book.objects.all()[10:20]))
 
+    def test_paginated_archive_view_does_not_load_entire_table(self):
+        # Regression test for #18087
+        self._make_books(20, base_date=datetime.date.today())
+        # 1 query for years list + 1 query for books
+        with self.assertNumQueries(2):
+            self.client.get('/dates/books/')
+        # same as above + 1 query to test if books exist
+        with self.assertNumQueries(3):
+            self.client.get('/dates/books/paginated/')
 
 class YearArchiveViewTests(TestCase):
     fixtures = ['generic-views-test-data.json']

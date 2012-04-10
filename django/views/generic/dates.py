@@ -190,14 +190,19 @@ class BaseDateListView(MultipleObjectMixin, DateMixin, View):
         date_field = self.get_date_field()
         allow_future = self.get_allow_future()
         allow_empty = self.get_allow_empty()
+        paginate_by = self.get_paginate_by(qs)
 
         if not allow_future:
             qs = qs.filter(**{'%s__lte' % date_field: timezone.now()})
 
-        if not allow_empty and not qs:
-            raise Http404(_(u"No %(verbose_name_plural)s available") % {
-                    'verbose_name_plural': force_unicode(qs.model._meta.verbose_name_plural)
-            })
+        if not allow_empty:
+            # When pagination is enabled, it's better to do a cheap query
+            # than to load the unpaginated queryset in memory.
+            is_empty = not bool(qs) if paginate_by is None else not qs.exists()
+            if is_empty:
+                raise Http404(_(u"No %(verbose_name_plural)s available") % {
+                        'verbose_name_plural': force_unicode(qs.model._meta.verbose_name_plural)
+                })
 
         return qs
 
