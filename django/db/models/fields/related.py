@@ -239,7 +239,7 @@ class SingleRelatedObjectDescriptor(object):
     def get_prefetch_query_set(self, instances):
         vals = set(instance._get_pk_val() for instance in instances)
         params = {'%s__pk__in' % self.related.field.name: vals}
-        return (self.get_query_set(instance=instances[0]),
+        return (self.get_query_set(instance=instances[0]).filter(**params),
                 attrgetter(self.related.field.attname),
                 lambda obj: obj._get_pk_val(),
                 True,
