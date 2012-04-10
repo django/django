@@ -1,7 +1,9 @@
 from __future__ import absolute_import
 
 from django.contrib.contenttypes.models import ContentType
+from django.db import connection
 from django.test import TestCase
+from django.test.utils import override_settings
 
 from .models import (Author, Book, Reader, Qualification, Teacher, Department,
     TaggedItem, Bookmark, AuthorAddress, FavoriteAuthors, AuthorWithAge,
@@ -356,9 +358,14 @@ class MultiTableInheritanceTest(TestCase):
         with self.assertNumQueries(2):
             [a.author for a in AuthorWithAge.objects.prefetch_related('author')]
 
+    @override_settings(DEBUG=True)
     def test_child_link_prefetch(self):
         with self.assertNumQueries(2):
             l = [a.authorwithage for a in Author.objects.prefetch_related('authorwithage')]
+
+        # Regression for #18090: the prefetching query must include an IN clause.
+        self.assertIn('authorwithage', connection.queries[-1]['sql'])
+        self.assertIn(' IN ', connection.queries[-1]['sql'])
 
         self.assertEqual(l, [a.authorwithage for a in Author.objects.all()])
 
