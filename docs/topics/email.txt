@@ -290,8 +290,8 @@ The class has the following methods:
   override this method to put the content you want into the MIME object.
 
 * ``recipients()`` returns a list of all the recipients of the message,
-  whether they're recorded in the ``to`` or ``bcc`` attributes. This is
-  another method you might need to override when subclassing, because the
+  whether they're recorded in the ``to``, ``cc`` or ``bcc`` attributes. This
+  is another method you might need to override when subclassing, because the
   SMTP server needs to be told the full list of recipients when the message
   is sent. If you add another way to specify recipients in your class, they
   need to be returned from this method as well.
