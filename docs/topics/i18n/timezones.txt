@@ -307,12 +307,6 @@ time zone is unset, the default time zone applies.
         Server time: {{ value }}
     {% endtimezone %}
 
-.. note::
-
-    In the second block, ``None`` resolves to the Python object ``None``
-    because it isn't defined in the template context, not because it's the
-    string ``None``.
-
 .. templatetag:: get_current_timezone
 
 get_current_timezone

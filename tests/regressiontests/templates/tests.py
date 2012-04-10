@@ -372,13 +372,11 @@ class Templates(unittest.TestCase):
         with self.assertRaises(urlresolvers.NoReverseMatch):
             t.render(c)
 
-
-    @override_settings(DEBUG=True, TEMPLATE_DEBUG = True)
+    @override_settings(DEBUG=True, TEMPLATE_DEBUG=True)
     def test_no_wrapped_exception(self):
         """
         The template system doesn't wrap exceptions, but annotates them.
         Refs #16770
-
         """
         c = Context({"coconuts": lambda: 42 / 0})
         t = Template("{{ coconuts }}")
@@ -386,7 +384,6 @@ class Templates(unittest.TestCase):
             t.render(c)
 
         self.assertEqual(cm.exception.django_template_source[1], (0, 14))
-
 
     def test_invalid_block_suggestion(self):
         # See #7876
@@ -609,6 +606,10 @@ class Templates(unittest.TestCase):
 
             # Call methods returned from dictionary lookups
             'basic-syntax38': ('{{ var.callable }}', {"var": {"callable": lambda: "foo bar"}}, "foo bar"),
+
+            'builtins01': ('{{ True }}', {}, "True"),
+            'builtins02': ('{{ False }}', {}, "False"),
+            'builtins03': ('{{ None }}', {}, "None"),
 
             # List-index syntax allows a template to access a certain item of a subscriptable object.
             'list-index01': ("{{ var.1 }}", {"var": ["first item", "second item"]}, "second item"),

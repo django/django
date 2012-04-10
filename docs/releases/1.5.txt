@@ -33,6 +33,14 @@ Django 1.5 does not run on Jython.
 What's new in Django 1.5
 ========================
 
+Minor features
+~~~~~~~~~~~~~~
+
+Django 1.5 also includes several smaller improvements worth noting:
+
+* The template engine now interprets ``True``, ``False`` and ``None`` as the
+  corresponding Python objects.
+
 Backwards incompatible changes in 1.5
 =====================================
 

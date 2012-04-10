@@ -111,6 +111,9 @@ template::
     >>> t.render(c)
     "My name is Dolores."
 
+Variables and lookups
+~~~~~~~~~~~~~~~~~~~~~
+
 Variable names must consist of any letter (A-Z), any digit (0-9), an underscore
 (but they must not start with an underscore) or a dot.
 
@@ -225,7 +228,6 @@ straight lookups. Here are some things to keep in mind:
      if your variable is not callable (allowing you to access attributes of
      the callable, for example).
 
-
 .. _invalid-template-variables:
 
 How invalid variables are handled
@@ -262,6 +264,16 @@ be replaced with the name of the invalid variable.
     Generally, :setting:`TEMPLATE_STRING_IF_INVALID` should only be enabled
     in order to debug a specific template problem, then cleared
     once debugging is complete.
+
+Builtin variables
+~~~~~~~~~~~~~~~~~
+
+Every context contains ``True``, ``False`` and ``None``. As you would expect,
+these variables resolve to the corresponding Python objects.
+
+.. versionadded:: 1.5
+    Before Django 1.5, these variables weren't a special case, and they
+    resolved to ``None`` unless you defined them in the context.
 
 Playing with Context objects
 ----------------------------

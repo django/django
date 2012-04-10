@@ -18,7 +18,10 @@ class BaseContext(object):
         self._reset_dicts(dict_)
 
     def _reset_dicts(self, value=None):
-        self.dicts = [value or {}]
+        builtins = {'True': True, 'False': False, 'None': None}
+        if value:
+            builtins.update(value)
+        self.dicts = [builtins]
 
     def __copy__(self):
         duplicate = copy(super(BaseContext, self))
