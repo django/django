@@ -292,6 +292,10 @@ class DefaultFiltersTests(TestCase):
         self.assertEqual(urlize('email@.stream.ru'),
             u'email@.stream.ru')
 
+        # Check urlize accepts uppercased URL schemes - see #18071
+        self.assertEqual(urlize('HTTPS://github.com/'),
+            u'<a href="https://github.com/" rel="nofollow">HTTPS://github.com/</a>')
+
     def test_wordcount(self):
         self.assertEqual(wordcount(''), 0)
         self.assertEqual(wordcount(u'oneword'), 1)
