@@ -422,8 +422,6 @@ class HTMLEqualTests(TestCase):
             self.assertHTMLEqual('', '<p>')
         with self.assertRaises(HTMLParseError):
             parse_html('</p>')
-        with self.assertRaises(HTMLParseError):
-            parse_html('<!--')
 
     def test_contains_html(self):
         response = HttpResponse('''<body>
