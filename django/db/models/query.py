@@ -6,6 +6,7 @@ import copy
 import itertools
 import sys
 
+from django.core import exceptions
 from django.db import connections, router, transaction, IntegrityError
 from django.db.models.fields import AutoField
 from django.db.models.query_utils import (Q, select_related_descend,
@@ -1677,12 +1678,19 @@ def prefetch_related_objects(result_cache, related_lookups):
                 # (e.g. via select_related), or hopefully some other property
                 # that doesn't support prefetching but needs to be traversed.
 
-                # We replace the current list of parent objects with that list.
-                obj_list = [getattr(obj, attr) for obj in obj_list]
-
-                # Filter out 'None' so that we can continue with nullable
-                # relations.
-                obj_list = [obj for obj in obj_list if obj is not None]
+                # We replace the current list of parent objects with the list
+                # of related objects, filtering out empty or missing values so
+                # that we can continue with nullable or reverse relations.
+                new_obj_list = []
+                for obj in obj_list:
+                    try:
+                        new_obj = getattr(obj, attr)
+                    except exceptions.ObjectDoesNotExist:
+                        continue
+                    if new_obj is None:
+                        continue
+                    new_obj_list.append(new_obj)
+                obj_list = new_obj_list
 
 
 def get_prefetcher(instance, attr):
@@ -1778,8 +1786,7 @@ def prefetch_one_level(instances, prefetcher, attname):
         vals = rel_obj_cache.get(instance_attr_val, [])
         if single:
             # Need to assign to single cache on instance
-            if vals:
-                setattr(obj, cache_name, vals[0])
+            setattr(obj, cache_name, vals[0] if vals else None)
         else:
             # Multi, attribute represents a manager with an .all() method that
             # returns a QuerySet

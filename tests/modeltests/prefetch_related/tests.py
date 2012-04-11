@@ -68,6 +68,14 @@ class PrefetchRelatedTests(TestCase):
 
         self.assertQuerysetEqual(self.book2.authors.all(), [u"<Author: Charlotte>"])
 
+    def test_onetoone_reverse_no_match(self):
+        # Regression for #17439
+        with self.assertNumQueries(2):
+            book = Book.objects.prefetch_related('bookwithyear').all()[0]
+        with self.assertNumQueries(0):
+            with self.assertRaises(BookWithYear.DoesNotExist):
+                book.bookwithyear
+
     def test_survives_clone(self):
         with self.assertNumQueries(2):
             lists = [list(b.first_time_authors.all())
