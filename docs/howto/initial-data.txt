@@ -163,4 +163,4 @@ Backend-specific SQL data is executed before non-backend-specific SQL
 data. For example, if your app contains the files ``sql/person.sql``
 and ``sql/person.sqlite3.sql`` and you're installing the app on
 SQLite, Django will execute the contents of
-``sql/person.sqlite.sql`` first, then ``sql/person.sql``.
+``sql/person.sqlite3.sql`` first, then ``sql/person.sql``.
