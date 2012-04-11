@@ -65,8 +65,8 @@ def markdown(value, arg=''):
                 safe_mode = True
             else:
                 safe_mode = False
-            python_markdown_deprecation = "The use of Python-Markdown "
-            "< 2.1 in Django is deprecated; please update to the current version"
+            python_markdown_deprecation = ("The use of Python-Markdown "
+            "< 2.1 in Django is deprecated; please update to the current version")
             # Unicode support only in markdown v1.7 or above. Version_info
             # exist only in markdown v1.6.2rc-2 or above.
             markdown_vers = getattr(markdown, "version_info", None)
