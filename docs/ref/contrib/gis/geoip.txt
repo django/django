@@ -40,7 +40,7 @@ Example
 Assuming you have the GeoIP C library installed, here is an example of its
 usage::
 
-     >>> from django.contrib.gis.utils import GeoIP
+     >>> from django.contrib.gis.geoip import GeoIP
      >>> g = GeoIP()
      >>> g.country('google.com')
      {'country_code': 'US', 'country_name': 'United States'}
