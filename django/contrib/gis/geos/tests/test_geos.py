@@ -891,63 +891,19 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
             gdal.HAS_GDAL = old_has_gdal
 
     def test23_transform_nosrid(self):
-        """ Testing `transform` method (no SRID) """
-        # Raise a warning if SRID <0/None.
-        import warnings
-        print "\nBEGIN - expecting Warnings; safe to ignore.\n"
+        """ Testing `transform` method (no SRID or negative SRID) """
 
-        # Test for do-nothing behavior.
-        try:
-            # Keeping line-noise down by only printing the relevant
-            # warnings once.
-            warnings.simplefilter('once', UserWarning)
-            warnings.simplefilter('once', FutureWarning)
+        g = GEOSGeometry('POINT (-104.609 38.255)', srid=None)
+        self.assertRaises(GEOSException, g.transform, 2774)
 
-            g = GEOSGeometry('POINT (-104.609 38.255)', srid=None)
-            g.transform(2774)
-            self.assertEqual(g.tuple, (-104.609, 38.255))
-            self.assertEqual(g.srid, None)
+        g = GEOSGeometry('POINT (-104.609 38.255)', srid=None)
+        self.assertRaises(GEOSException, g.transform, 2774, clone=True)
 
-            g = GEOSGeometry('POINT (-104.609 38.255)', srid=None)
-            g1 = g.transform(2774, clone=True)
-            self.assertTrue(g1 is None)
+        g = GEOSGeometry('POINT (-104.609 38.255)', srid=-1)
+        self.assertRaises(GEOSException, g.transform, 2774)
 
-            g = GEOSGeometry('POINT (-104.609 38.255)', srid=-1)
-            g.transform(2774)
-            self.assertEqual(g.tuple, (-104.609, 38.255))
-            self.assertEqual(g.srid, -1)
-
-            g = GEOSGeometry('POINT (-104.609 38.255)', srid=-1)
-            g1 = g.transform(2774, clone=True)
-            self.assertTrue(g1 is None)
-
-        finally:
-            warnings.simplefilter('default', UserWarning)
-            warnings.simplefilter('default', FutureWarning)
-
-        print "\nEND - expecting Warnings; safe to ignore.\n"
-
-
-        # test warning is raised
-        try:
-            warnings.simplefilter('error', FutureWarning)
-            warnings.simplefilter('ignore', UserWarning)
-
-            g = GEOSGeometry('POINT (-104.609 38.255)', srid=None)
-            self.assertRaises(FutureWarning, g.transform, 2774)
-
-            g = GEOSGeometry('POINT (-104.609 38.255)', srid=None)
-            self.assertRaises(FutureWarning, g.transform, 2774, clone=True)
-
-            g = GEOSGeometry('POINT (-104.609 38.255)', srid=-1)
-            self.assertRaises(FutureWarning, g.transform, 2774)
-
-            g = GEOSGeometry('POINT (-104.609 38.255)', srid=-1)
-            self.assertRaises(FutureWarning, g.transform, 2774, clone=True)
-        finally:
-            warnings.simplefilter('default', FutureWarning)
-            warnings.simplefilter('default', UserWarning)
-
+        g = GEOSGeometry('POINT (-104.609 38.255)', srid=-1)
+        self.assertRaises(GEOSException, g.transform, 2774, clone=True)
 
     def test23_transform_nogdal(self):
         """ Testing `transform` method (GDAL not available) """

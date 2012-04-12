@@ -3,7 +3,6 @@
  inherit from this object.
 """
 # Python, ctypes and types dependencies.
-import warnings
 from ctypes import addressof, byref, c_double
 
 # super-class for mutable list behavior
@@ -507,11 +506,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
                 return
 
         if (srid is None) or (srid < 0):
-            warnings.warn("Calling transform() with no SRID set does no transformation!",
-                          stacklevel=2)
-            warnings.warn("Calling transform() with no SRID will raise GEOSException in v1.5",
-                          FutureWarning, stacklevel=2)
-            return
+            raise GEOSException("Calling transform() with no SRID set is not supported")
 
         if not gdal.HAS_GDAL:
             raise GEOSException("GDAL library is not available to transform() geometry.")
