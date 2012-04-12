@@ -58,6 +58,10 @@ class ManyToOneRegressionTests(TestCase):
         self.assertRaises(ValueError, Child, name='xyzzy', parent=None)
         self.assertRaises(ValueError, Child.objects.create, name='xyzzy', parent=None)
 
+        # Trying to assign to unbound attribute raises AttributeError
+        self.assertRaisesRegexp(AttributeError, "must be accessed via instance",
+            Child.parent.__set__, None, p)
+
         # Creation using keyword argument should cache the related object.
         p = Parent.objects.get(name="Parent")
         c = Child(parent=p)

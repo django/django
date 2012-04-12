@@ -364,7 +364,7 @@ class ReverseSingleRelatedObjectDescriptor(object):
 
     def __set__(self, instance, value):
         if instance is None:
-            raise AttributeError("%s must be accessed via instance" % self._field.name)
+            raise AttributeError("%s must be accessed via instance" % self.field.name)
 
         # If null=True, we can assign null here, but otherwise the value needs
         # to be an instance of the related class.
