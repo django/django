@@ -427,6 +427,8 @@ checking passwords stored with PBKDF2SHA1, bcrypt_, SHA1_, etc. The next few
 sections describe a couple of common ways advanced users may want to modify this
 setting.
 
+.. _bcrypt_usage:
+
 Using bcrypt with Django
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -772,7 +774,7 @@ Manually managing a user's password
     to create and validate hashed password. You can use them independently
     from the ``User`` model.
 
-.. function:: check_password()
+.. function:: check_password(password, encoded)
 
     .. versionadded:: 1.4
 
@@ -783,18 +785,22 @@ Manually managing a user's password
     user's ``password`` field in the database to check against, and returns
     ``True`` if they match, ``False`` otherwise.
 
-.. function:: make_password()
+.. function:: make_password(password[, salt, hashers])
 
     .. versionadded:: 1.4
 
     Creates a hashed password in the format used by this application. It takes
-    two arguments: hashing algorithm to use and the password in plain-text.
-    Currently supported algorithms are: ``'sha1'``, ``'md5'`` and ``'crypt'``
-    if you have the ``crypt`` library installed. If the second argument is
+    one mandatory argument: the password in plain-text. Optionally, you can
+    provide a salt and a hashing algorithm to use, if you don't want to use the
+    defaults (first entry of ``PASSWORD_HASHERS`` setting).
+    Currently supported algorithms are: ``'pbkdf2_sha256'``, ``'pbkdf2_sha1'``,
+    ``'bcrypt'`` (see :ref:`bcrypt_usage`), ``'sha1'``, ``'md5'``,
+    ``'unsalted_md5'`` (only for backward compatibility) and ``'crypt'``
+    if you have the ``crypt`` library installed. If the password argument is
     ``None``, an unusable password is returned (a one that will be never
     accepted by :func:`django.contrib.auth.hashers.check_password`).
 
-.. function:: is_password_usable()
+.. function:: is_password_usable(encoded_password)
 
    .. versionadded:: 1.4
 
