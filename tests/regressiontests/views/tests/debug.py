@@ -40,8 +40,8 @@ class DebugViewTests(TestCase):
             'file_data.txt': SimpleUploadedFile('file_data.txt', 'haha'),
         }
         response = self.client.post('/raises/', data)
-        self.assertTrue('file_data.txt' in response.content)
-        self.assertFalse('haha' in response.content)
+        self.assertContains(response, 'file_data.txt', status_code=500)
+        self.assertNotContains(response, 'haha', status_code=500)
 
     def test_403(self):
         # Ensure no 403.html template exists to test the default case.

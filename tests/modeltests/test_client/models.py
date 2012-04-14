@@ -75,7 +75,7 @@ class ClientTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['data'], '37')
         self.assertEqual(response.templates[0].name, 'POST Template')
-        self.assertTrue('Data received' in response.content)
+        self.assertContains(response, 'Data received')
 
     def test_response_headers(self):
         "Check the value of HTTP headers returned in a response"

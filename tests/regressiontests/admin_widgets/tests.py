@@ -131,8 +131,8 @@ class AdminFormfieldForDBFieldWithRequestTests(DjangoTestCase):
         """
         self.client.login(username="super", password="secret")
         response = self.client.get("/widget_admin/admin_widgets/cartire/add/")
-        self.assertTrue("BMW M3" not in response.content)
-        self.assertTrue("Volkswagon Passat" in response.content)
+        self.assertNotContains(response, "BMW M3")
+        self.assertContains(response, "Volkswagon Passat")
 
 
 class AdminForeignKeyWidgetChangeList(DjangoTestCase):
@@ -147,7 +147,7 @@ class AdminForeignKeyWidgetChangeList(DjangoTestCase):
 
     def test_changelist_foreignkey(self):
         response = self.client.get('%s/admin_widgets/car/' % self.admin_root)
-        self.assertTrue('%s/auth/user/add/' % self.admin_root in response.content)
+        self.assertContains(response, '%s/auth/user/add/' % self.admin_root)
 
 
 class AdminForeignKeyRawIdWidget(DjangoTestCase):

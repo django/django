@@ -114,8 +114,7 @@ class PasswordResetTest(AuthViewsTestCase):
         url, path = self._test_confirm_start()
         response = self.client.get(path)
         # redirect to a 'complete' page:
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue("Please enter your new password" in response.content)
+        self.assertContains(response, "Please enter your new password")
 
     def test_confirm_invalid(self):
         url, path = self._test_confirm_start()
@@ -124,20 +123,17 @@ class PasswordResetTest(AuthViewsTestCase):
         path = path[:-5] + ("0" * 4) + path[-1]
 
         response = self.client.get(path)
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue("The password reset link was invalid" in response.content)
+        self.assertContains(response, "The password reset link was invalid")
 
     def test_confirm_invalid_user(self):
         # Ensure that we get a 200 response for a non-existant user, not a 404
         response = self.client.get('/reset/123456-1-1/')
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue("The password reset link was invalid" in response.content)
+        self.assertContains(response, "The password reset link was invalid")
 
     def test_confirm_overflow_user(self):
         # Ensure that we get a 200 response for a base36 user id that overflows int
         response = self.client.get('/reset/zzzzzzzzzzzzz-1-1/')
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue("The password reset link was invalid" in response.content)
+        self.assertContains(response, "The password reset link was invalid")
 
     def test_confirm_invalid_post(self):
         # Same as test_confirm_invalid, but trying
@@ -165,14 +161,12 @@ class PasswordResetTest(AuthViewsTestCase):
 
         # Check we can't use the link again
         response = self.client.get(path)
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue("The password reset link was invalid" in response.content)
+        self.assertContains(response, "The password reset link was invalid")
 
     def test_confirm_different_passwords(self):
         url, path = self._test_confirm_start()
         response = self.client.post(path, {'new_password1': 'anewpassword',
                                            'new_password2': 'x'})
-        self.assertEqual(response.status_code, 200)
         self.assertContainsEscaped(response, SetPasswordForm.error_messages['password_mismatch'])
 
 
@@ -183,7 +177,6 @@ class ChangePasswordTest(AuthViewsTestCase):
             'username': 'testclient',
             'password': password,
         })
-        self.assertEqual(response.status_code, 200)
         self.assertContainsEscaped(response, AuthenticationForm.error_messages['invalid_login'])
 
     def logout(self):
@@ -196,7 +189,6 @@ class ChangePasswordTest(AuthViewsTestCase):
             'new_password1': 'password1',
             'new_password2': 'password1',
         })
-        self.assertEqual(response.status_code, 200)
         self.assertContainsEscaped(response, PasswordChangeForm.error_messages['password_incorrect'])
 
     def test_password_change_fails_with_mismatched_passwords(self):
@@ -206,7 +198,6 @@ class ChangePasswordTest(AuthViewsTestCase):
             'new_password1': 'password1',
             'new_password2': 'donuts',
         })
-        self.assertEqual(response.status_code, 200)
         self.assertContainsEscaped(response, SetPasswordForm.error_messages['password_mismatch'])
 
     def test_password_change_succeeds(self):
@@ -363,8 +354,7 @@ class LogoutTest(AuthViewsTestCase):
         "Logout without next_page option renders the default template"
         self.login()
         response = self.client.get('/logout/')
-        self.assertEqual(200, response.status_code)
-        self.assertTrue('Logged out' in response.content)
+        self.assertContains(response, 'Logged out')
         self.confirm_logged_out()
 
     def test_14377(self):
