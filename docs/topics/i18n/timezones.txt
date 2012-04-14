@@ -199,7 +199,7 @@ Create a view that can set the current timezone::
 
     def set_timezone(request):
         if request.method == 'POST':
-            request.session[session_key] = pytz.timezone(request.POST['timezone'])
+            request.session['django_timezone'] = pytz.timezone(request.POST['timezone'])
             return redirect('/')
         else:
             return render(request, 'template.html', {'timezones': pytz.common_timezones})
