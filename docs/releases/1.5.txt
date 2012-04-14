@@ -44,6 +44,14 @@ Django 1.5 also includes several smaller improvements worth noting:
 Backwards incompatible changes in 1.5
 =====================================
 
+.. warning::
+
+    In addition to the changes outlined in this section, be sure to review the
+    :doc:`deprecation plan </internals/deprecation>` for any features that
+    have been removed. If you have not updated your code within the
+    deprecation timeline for a given feature, its removal may appear as a
+    backwards incompatible change.
+
 Features deprecated in 1.5
 ==========================
 
