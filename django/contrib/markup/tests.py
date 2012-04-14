@@ -37,7 +37,7 @@ Paragraph 2 with a link_
 
 .. _link: http://www.example.com/"""
 
-    @unittest.skipUnless(textile, 'texttile not installed')
+    @unittest.skipUnless(textile, 'textile not installed')
     def test_textile(self):
         t = Template("{% load markup %}{{ textile_content|textile }}")
         rendered = t.render(Context({'textile_content':self.textile_content})).strip()
@@ -45,13 +45,13 @@ Paragraph 2 with a link_
 
 <p>Paragraph 2 with &#8220;quotes&#8221; and <code>code</code></p>""")
 
-    @unittest.skipIf(textile, 'texttile is installed')
+    @unittest.skipIf(textile, 'textile is installed')
     def test_no_textile(self):
         t = Template("{% load markup %}{{ textile_content|textile }}")
         rendered = t.render(Context({'textile_content':self.textile_content})).strip()
         self.assertEqual(rendered, escape(self.textile_content))
 
-    @unittest.skipUnless(markdown, 'markdown not installed')
+    @unittest.skipUnless(markdown and markdown_version >= (2,1), 'markdown >= 2.1 not installed')
     def test_markdown(self):
         t = Template("{% load markup %}{{ markdown_content|markdown }}")
         rendered = t.render(Context({'markdown_content':self.markdown_content})).strip()

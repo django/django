@@ -9,7 +9,7 @@ Django provides template filters that implement the following markup
 languages:
 
 * ``textile`` -- implements `Textile`_ -- requires `PyTextile`_
-* ``markdown`` -- implements `Markdown`_ -- requires `Python-markdown`_
+* ``markdown`` -- implements `Markdown`_ -- requires `Python-markdown`_ (>=2.1)
 * ``restructuredtext`` -- implements `reST (reStructured Text)`_
   -- requires `doc-utils`_
 
@@ -53,13 +53,13 @@ Markdown
 
 The Python Markdown library supports options named "safe_mode" and
 "enable_attributes". Both relate to the security of the output. To enable both
-options in tandem, the markdown filter supports the "safe" argument.
+options in tandem, the markdown filter supports the "safe" argument::
 
     {{ markdown_content_var|markdown:"safe" }}
 
 .. warning::
 
     Versions of the Python-Markdown library prior to 2.1 do not support the
-    optional disabling of attributes and by default they will be included in
-    any output from the markdown filter - a warning is issued if this is the
-    case.
+    optional disabling of attributes. This is a security flaw. Therefore,
+    ``django.contrib.markup`` has dropped support for versions of
+    Python-Markdown < 2.1 in Django 1.5.

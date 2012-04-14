@@ -11,8 +11,6 @@ markup syntaxes to HTML; currently there is support for:
     * reStructuredText, which requires docutils from http://docutils.sf.net/
 """
 
-import warnings
-
 from django import template
 from django.conf import settings
 from django.utils.encoding import smart_str, force_unicode
@@ -56,35 +54,21 @@ def markdown(value, arg=''):
             raise template.TemplateSyntaxError("Error in 'markdown' filter: The Python markdown library isn't installed.")
         return force_unicode(value)
     else:
-        # markdown.version was first added in 1.6b. The only version of markdown
-        # to fully support extensions before 1.6b was the shortlived 1.6a.
-        if hasattr(markdown, 'version'):
-            extensions = [e for e in arg.split(",") if e]
-            if len(extensions) > 0 and extensions[0] == "safe":
-                extensions = extensions[1:]
-                safe_mode = True
-            else:
-                safe_mode = False
-            python_markdown_deprecation = "The use of Python-Markdown "
-            "< 2.1 in Django is deprecated; please update to the current version"
-            # Unicode support only in markdown v1.7 or above. Version_info
-            # exist only in markdown v1.6.2rc-2 or above.
-            markdown_vers = getattr(markdown, "version_info", None)
-            if markdown_vers < (1,7):
-                warnings.warn(python_markdown_deprecation, DeprecationWarning)
-                return mark_safe(force_unicode(markdown.markdown(smart_str(value), extensions, safe_mode=safe_mode)))
-            else:
-                if markdown_vers >= (2,1):
-                    if safe_mode:
-                        return mark_safe(markdown.markdown(force_unicode(value), extensions, safe_mode=safe_mode, enable_attributes=False))
-                    else:
-                        return mark_safe(markdown.markdown(force_unicode(value), extensions, safe_mode=safe_mode))
-                else:
-                    warnings.warn(python_markdown_deprecation, DeprecationWarning)
-                    return mark_safe(markdown.markdown(force_unicode(value), extensions, safe_mode=safe_mode))
+        markdown_vers = getattr(markdown, "version_info", 0)
+        if markdown_vers < (2, 1):
+            if settings.DEBUG:
+                raise template.TemplateSyntaxError(
+                    "Error in 'markdown' filter: Django does not support versions of the Python markdown library < 2.1.")
+            return force_unicode(value)
         else:
-            warnings.warn(python_markdown_deprecation, DeprecationWarning)
-            return mark_safe(force_unicode(markdown.markdown(smart_str(value))))
+            extensions = [e for e in arg.split(",") if e]
+            if extensions and extensions[0] == "safe":
+                extensions = extensions[1:]
+                return mark_safe(markdown.markdown(
+                    force_unicode(value), extensions, safe_mode=True, enable_attributes=False))
+            else:
+                return mark_safe(markdown.markdown(
+                    force_unicode(value), extensions, safe_mode=False))
 
 @register.filter(is_safe=True)
 def restructuredtext(value):
