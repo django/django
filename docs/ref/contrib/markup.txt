@@ -46,6 +46,15 @@ When using the ``restructuredtext`` markup filter you can define a
 override the default writer settings. See the `restructuredtext writer
 settings`_ for details on what these settings are.
 
+.. warning::
+
+   reStructured Text has features that allow raw HTML to be included, and that
+   allow arbitrary files to be included. These can lead to XSS vulnerabilities
+   and leaking of private information. It is your responsibility to check the
+   features of this library and configure appropriately to avoid this. See the
+   `Deploying Docutils Securely
+   <http://docutils.sourceforge.net/docs/howto/security.html>`_ documentation.
+
 .. _restructuredtext writer settings: http://docutils.sourceforge.net/docs/user/config.html#html4css1-writer
 
 Markdown
