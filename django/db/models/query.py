@@ -363,10 +363,14 @@ class QuerySet(object):
         if num == 1:
             return clone._result_cache[0]
         if not num:
-            raise self.model.DoesNotExist("%s matching query does not exist."
-                    % self.model._meta.object_name)
-        raise self.model.MultipleObjectsReturned("get() returned more than one %s -- it returned %s! Lookup parameters were %s"
-                % (self.model._meta.object_name, num, kwargs))
+            raise self.model.DoesNotExist(
+                "%s matching query does not exist. "
+                "Lookup parameters were %s" %
+                (self.model._meta.object_name, kwargs))
+        raise self.model.MultipleObjectsReturned(
+            "get() returned more than one %s -- it returned %s! "
+            "Lookup parameters were %s" %
+            (self.model._meta.object_name, num, kwargs))
 
     def create(self, **kwargs):
         """

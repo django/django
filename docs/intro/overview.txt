@@ -93,7 +93,7 @@ access your data. The API is created on the fly, no code generation necessary::
     >>> Reporter.objects.get(id=2)
     Traceback (most recent call last):
         ...
-    DoesNotExist: Reporter matching query does not exist.
+    DoesNotExist: Reporter matching query does not exist. Lookup parameters were {'id': 2}
 
     # Create an article.
     >>> from datetime import datetime

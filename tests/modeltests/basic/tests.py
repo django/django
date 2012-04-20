@@ -83,14 +83,23 @@ class ModelTest(TestCase):
         # parameters don't match any object.
         self.assertRaisesRegexp(
             ObjectDoesNotExist,
-            "Article matching query does not exist.",
+            "Article matching query does not exist. Lookup parameters were "
+            "{'id__exact': 2000}",
             Article.objects.get,
             id__exact=2000,
         )
-
+        # To avoid dict-ordering related errors check only one lookup
+        # in single assert.
         self.assertRaisesRegexp(
             ObjectDoesNotExist,
-            "Article matching query does not exist.",
+            ".*'pub_date__year': 2005.*",
+            Article.objects.get,
+            pub_date__year=2005,
+            pub_date__month=8,
+        )
+        self.assertRaisesRegexp(
+            ObjectDoesNotExist,
+            ".*'pub_date__month': 8.*",
             Article.objects.get,
             pub_date__year=2005,
             pub_date__month=8,
@@ -98,7 +107,8 @@ class ModelTest(TestCase):
 
         self.assertRaisesRegexp(
             ObjectDoesNotExist,
-            "Article matching query does not exist.",
+            "Article matching query does not exist. Lookup parameters were "
+            "{'pub_date__week_day': 6}",
             Article.objects.get,
             pub_date__week_day=6,
         )
