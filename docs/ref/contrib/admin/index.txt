@@ -1240,9 +1240,13 @@ Other methods
 
     Django view for the model instance addition page. See note below.
 
-.. method:: ModelAdmin.change_view(self, request, object_id, extra_context=None)
+.. method:: ModelAdmin.change_view(self, request, object_id, form_url='', extra_context=None)
 
     Django view for the model instance edition page. See note below.
+
+    .. versionchanged:: 1.4
+
+    The ``form_url`` parameter was added.
 
 .. method:: ModelAdmin.changelist_view(self, request, extra_context=None)
 
