@@ -744,7 +744,7 @@ automates the process: ``render_to_string()`` in
 returns the resulting string::
 
     from django.template.loader import render_to_string
-    rendered = render_to_string('my_template.html', { 'foo': 'bar' })
+    rendered = render_to_string('my_template.html', {'foo': 'bar'})
 
 The ``render_to_string`` shortcut takes one required argument --
 ``template_name``, which should be the name of the template to load
