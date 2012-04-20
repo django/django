@@ -163,3 +163,10 @@ class BusStation(Station):
 
 class TrainStation(Station):
     zone = models.IntegerField()
+
+class User(models.Model):
+    username = models.CharField(max_length=30, unique=True)
+
+class Profile(User):
+    profile_id = models.AutoField(primary_key=True)
+    extra = models.CharField(max_length=30, blank=True)

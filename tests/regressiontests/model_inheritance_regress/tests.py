@@ -6,6 +6,7 @@ from __future__ import absolute_import
 
 import datetime
 from operator import attrgetter
+from django import forms
 
 from django.test import TestCase
 
@@ -13,7 +14,7 @@ from .models import (Place, Restaurant, ItalianRestaurant, ParkingLot,
     ParkingLot2, ParkingLot3, Supplier, Wholesaler, Child, SelfRefParent,
     SelfRefChild, ArticleWithAuthor, M2MChild, QualityControl, DerivedM,
     Person, BirthdayParty, BachelorParty, MessyBachelorParty,
-    InternalCertificationAudit, BusStation, TrainStation)
+    InternalCertificationAudit, BusStation, TrainStation, User, Profile)
 
 
 class ModelInheritanceTest(TestCase):
@@ -408,3 +409,17 @@ class ModelInheritanceTest(TestCase):
         )
         self.assertIs(BusStation._meta.pk.model, BusStation)
         self.assertIs(TrainStation._meta.pk.model, TrainStation)
+
+    def test_inherited_unique_field_with_form(self):
+        """
+        Test that a model which has different primary key for the parent model
+        passes unique field checking correctly. Refs #17615.
+        """
+        class ProfileForm(forms.ModelForm):
+            class Meta:
+                model = Profile
+        User.objects.create(username="user_only")
+        p = Profile.objects.create(username="user_with_profile")
+        form = ProfileForm({'username': "user_with_profile", 'extra': "hello"},
+                           instance=p)
+        self.assertTrue(form.is_valid())
