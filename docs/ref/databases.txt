@@ -148,6 +148,8 @@ procedures, but Django currently doesn't use stored procedures.
 .. _MySQL 4.1: http://dev.mysql.com/doc/refman/4.1/en/index.html
 .. _MySQL 5.0: http://dev.mysql.com/doc/refman/5.0/en/index.html
 
+.. _mysql-storage-engines:
+
 Storage engines
 ---------------
 
@@ -359,6 +361,21 @@ models, so this is mainly a consideration if you are overriding the table name
 via the :class:`~django.db.models.Options.db_table` parameter.
 
 .. _known issues: http://bugs.mysql.com/bug.php?id=48875
+
+Savepoints
+----------
+
+Both the Django ORM and MySQL (when using the InnoDB :ref:`storage engine
+<mysql-storage-engines>`) support database :ref:`savepoints
+<topics-db-transactions-savepoints>`, but this feature wasn't available in
+Django until version 1.4 when such supports was added.
+
+If you use the MyISAM storage engine please be aware of the fact that you will
+receive database-generated errors if you try to use the :ref:`savepoint-related
+methods of the transactions API <topics-db-transactions-savepoints>`. The reason
+for this is that detecting the storage engine of a MySQL database/table is an
+expensive operation so it was decided it isn't worth to dynamically convert
+these methods in no-op's based in the results of such detection.
 
 Notes on specific fields
 ------------------------
