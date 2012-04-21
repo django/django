@@ -15,11 +15,13 @@ except ImportError, e:
     from django.core.exceptions import ImproperlyConfigured
     raise ImproperlyConfigured("Error loading MySQLdb module: %s" % e)
 
+from django.utils.functional import cached_property
+
 # We want version (1, 2, 1, 'final', 2) or later. We can't just use
 # lexicographic ordering in this check because then (1, 2, 1, 'gamma')
 # inadvertently passes the version test.
 version = Database.version_info
-if (version < (1,2,1) or (version[:3] == (1, 2, 1) and
+if (version < (1, 2, 1) or (version[:3] == (1, 2, 1) and
         (len(version) < 5 or version[3] != 'final' or version[4] < 2))):
     from django.core.exceptions import ImproperlyConfigured
     raise ImproperlyConfigured("MySQLdb-1.2.1p2 or newer is required; you have %s" % Database.__version__)
@@ -163,6 +165,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_timezones = False
     requires_explicit_null_ordering_when_grouping = True
     allows_primary_key_0 = False
+    uses_savepoints = True
 
     def __init__(self, connection):
         super(DatabaseFeatures, self).__init__(connection)
@@ -387,8 +390,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             self.connection = Database.connect(**kwargs)
             self.connection.encoders[SafeUnicode] = self.connection.encoders[unicode]
             self.connection.encoders[SafeString] = self.connection.encoders[str]
-            self.features.uses_savepoints = \
-                self.get_server_version() >= (5, 0, 3)
             connection_created.send(sender=self.__class__, connection=self)
         cursor = self.connection.cursor()
         if new_connection:
@@ -405,10 +406,11 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         except Database.NotSupportedError:
             pass
 
-    def get_server_version(self):
+    @cached_property
+    def mysql_version(self):
         if not self.server_version:
             if not self._valid_connection():
-                self.cursor()
+                self.cursor().close()
             m = server_version_re.match(self.connection.get_server_info())
             if not m:
                 raise Exception('Unable to determine MySQL version from version string %r' % self.connection.get_server_info())

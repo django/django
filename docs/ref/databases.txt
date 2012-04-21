@@ -122,30 +122,23 @@ lookups that use the ``LIKE`` operator in their SQL, as is done with the
 MySQL notes
 ===========
 
-Django expects the database to support transactions, referential integrity, and
-Unicode (UTF-8 encoding). Fortunately, MySQL_ has all these features as
-available as far back as 3.23. While it may be possible to use 3.23 or 4.0,
-you'll probably have less trouble if you use 4.1 or 5.0.
+Version support
+---------------
 
-MySQL 4.1
----------
-
-`MySQL 4.1`_ has greatly improved support for character sets. It is possible to
-set different default character sets on the database, table, and column.
-Previous versions have only a server-wide character set setting. It's also the
-first version where the character set can be changed on the fly. 4.1 also has
-support for views, but Django currently doesn't use views.
-
-MySQL 5.0
----------
+Django supports MySQL 5.0.3 and higher.
 
 `MySQL 5.0`_ adds the ``information_schema`` database, which contains detailed
-data on all database schema. Django's ``inspectdb`` feature uses this
-``information_schema`` if it's available. 5.0 also has support for stored
-procedures, but Django currently doesn't use stored procedures.
+data on all database schema. Django's ``inspectdb`` feature uses this feature.
+
+.. versionchanged:: 1.5
+    The minimum version requirement of MySQL 5.0.3 was set in Django 1.5.
+
+Django expects the database to support Unicode (UTF-8 encoding) and delegates to
+it the task of enforcing transactions and referential integrity. It is important
+to be aware of the fact that the two latter ones aren't actually enforced by
+MySQL when using the MyISAM storage engine, see the next section.
 
 .. _MySQL: http://www.mysql.com/
-.. _MySQL 4.1: http://dev.mysql.com/doc/refman/4.1/en/index.html
 .. _MySQL 5.0: http://dev.mysql.com/doc/refman/5.0/en/index.html
 
 Storage engines
@@ -380,10 +373,6 @@ Any fields that are stored with ``VARCHAR`` column types have their
 for the field. This affects :class:`~django.db.models.CharField`,
 :class:`~django.db.models.SlugField` and
 :class:`~django.db.models.CommaSeparatedIntegerField`.
-
-Furthermore, if you are using a version of MySQL prior to 5.0.3, all of those
-column types have a maximum length restriction of 255 characters, regardless
-of whether ``unique=True`` is specified or not.
 
 DateTime fields
 ~~~~~~~~~~~~~~~

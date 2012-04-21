@@ -65,27 +65,14 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         key columns in given table.
         """
         key_columns = []
-        try:
-            cursor.execute("""
-                SELECT column_name, referenced_table_name, referenced_column_name
-                FROM information_schema.key_column_usage
-                WHERE table_name = %s
-                    AND table_schema = DATABASE()
-                    AND referenced_table_name IS NOT NULL
-                    AND referenced_column_name IS NOT NULL""", [table_name])
-            key_columns.extend(cursor.fetchall())
-        except (ProgrammingError, OperationalError):
-            # Fall back to "SHOW CREATE TABLE", for previous MySQL versions.
-            # Go through all constraints and save the equal matches.
-            cursor.execute("SHOW CREATE TABLE %s" % self.connection.ops.quote_name(table_name))
-            for row in cursor.fetchall():
-                pos = 0
-                while True:
-                    match = foreign_key_re.search(row[1], pos)
-                    if match == None:
-                        break
-                    pos = match.end()
-                    key_columns.append(match.groups())
+        cursor.execute("""
+            SELECT column_name, referenced_table_name, referenced_column_name
+            FROM information_schema.key_column_usage
+            WHERE table_name = %s
+                AND table_schema = DATABASE()
+                AND referenced_table_name IS NOT NULL
+                AND referenced_column_name IS NOT NULL""", [table_name])
+        key_columns.extend(cursor.fetchall())
         return key_columns
 
     def get_primary_key_column(self, cursor, table_name):
