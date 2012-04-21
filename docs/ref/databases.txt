@@ -128,7 +128,7 @@ Version support
 Django supports MySQL 5.0.3 and higher.
 
 `MySQL 5.0`_ adds the ``information_schema`` database, which contains detailed
-data on all database schema. Django's ``inspectdb`` feature uses this feature.
+data on all database schema. Django's ``inspectdb`` feature uses it.
 
 .. versionchanged:: 1.5
     The minimum version requirement of MySQL 5.0.3 was set in Django 1.5.
@@ -140,6 +140,8 @@ MySQL when using the MyISAM storage engine, see the next section.
 
 .. _MySQL: http://www.mysql.com/
 .. _MySQL 5.0: http://dev.mysql.com/doc/refman/5.0/en/index.html
+
+.. _mysql-storage-engines:
 
 Storage engines
 ---------------
@@ -352,6 +354,21 @@ models, so this is mainly a consideration if you are overriding the table name
 via the :class:`~django.db.models.Options.db_table` parameter.
 
 .. _known issues: http://bugs.mysql.com/bug.php?id=48875
+
+Savepoints
+----------
+
+Both the Django ORM and MySQL (when using the InnoDB :ref:`storage engine
+<mysql-storage-engines>`) support database :ref:`savepoints
+<topics-db-transactions-savepoints>`, but this feature wasn't available in
+Django until version 1.4 when such supports was added.
+
+If you use the MyISAM storage engine please be aware of the fact that you will
+receive database-generated errors if you try to use the :ref:`savepoint-related
+methods of the transactions API <topics-db-transactions-savepoints>`. The reason
+for this is that detecting the storage engine of a MySQL database/table is an
+expensive operation so it was decided it isn't worth to dynamically convert
+these methods in no-op's based in the results of such detection.
 
 Notes on specific fields
 ------------------------
