@@ -555,6 +555,23 @@ For each field, we describe the default widget used if you don't specify
         A regular expression pattern; only files with names matching this expression
         will be allowed as choices.
 
+    .. attribute:: allow_files
+
+        .. versionadded:: 1.5
+
+        Optional.  Either ``True`` or ``False``.  Default is ``True``.  Specifies
+        whether files in the specified location should be included.  Either this or
+        :attr:`allow_folders` must be ``True``.
+
+    .. attribute:: allow_folders
+
+        .. versionadded:: 1.5
+
+        Optional.  Either ``True`` or ``False``.  Default is ``False``.  Specifies
+        whether folders in the specified location should be included.  Either this or
+        :attr:`allow_files` must be ``True``.
+
+
 ``FloatField``
 ~~~~~~~~~~~~~~
 

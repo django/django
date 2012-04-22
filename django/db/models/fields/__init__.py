@@ -909,8 +909,9 @@ class FilePathField(Field):
     description = _("File path")
 
     def __init__(self, verbose_name=None, name=None, path='', match=None,
-                 recursive=False, **kwargs):
+                 recursive=False, allow_files=True, allow_folders=False, **kwargs):
         self.path, self.match, self.recursive = path, match, recursive
+        self.allow_files, self.allow_folders =  allow_files, allow_folders
         kwargs['max_length'] = kwargs.get('max_length', 100)
         Field.__init__(self, verbose_name, name, **kwargs)
 
@@ -920,6 +921,8 @@ class FilePathField(Field):
             'match': self.match,
             'recursive': self.recursive,
             'form_class': forms.FilePathField,
+            'allow_files': self.allow_files,
+            'allow_folders': self.allow_folders,
         }
         defaults.update(kwargs)
         return super(FilePathField, self).formfield(**defaults)

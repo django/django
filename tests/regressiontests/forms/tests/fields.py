@@ -981,6 +981,42 @@ class FieldsTests(SimpleTestCase):
             self.assertEqual(exp[1], got[1])
             self.assertTrue(got[0].endswith(exp[0]))
 
+    def test_filepathfield_folders(self):
+        path = forms.__file__
+        path = os.path.dirname(path) + '/'
+        f = FilePathField(path=path, allow_folders=True, allow_files=False)
+        f.choices.sort()
+        expected = [
+            ('/django/forms/extras', 'extras'),
+        ]
+        for exp, got in zip(expected, fix_os_paths(f.choices)):
+            self.assertEqual(exp[1], got[1])
+            self.assert_(got[0].endswith(exp[0]))
+
+        f = FilePathField(path=path, allow_folders=True, allow_files=True)
+        f.choices.sort()
+        expected = [
+            ('/django/forms/__init__.py', '__init__.py'),
+            ('/django/forms/__init__.pyc', '__init__.pyc'),
+            ('/django/forms/extras', 'extras'),
+            ('/django/forms/fields.py', 'fields.py'),
+            ('/django/forms/fields.pyc', 'fields.pyc'),
+            ('/django/forms/forms.py', 'forms.py'),
+            ('/django/forms/forms.pyc', 'forms.pyc'),
+            ('/django/forms/formsets.py', 'formsets.py'),
+            ('/django/forms/formsets.pyc', 'formsets.pyc'),
+            ('/django/forms/models.py', 'models.py'),
+            ('/django/forms/models.pyc', 'models.pyc'),
+            ('/django/forms/util.py', 'util.py'),
+            ('/django/forms/util.pyc', 'util.pyc'),
+            ('/django/forms/widgets.py', 'widgets.py'),
+            ('/django/forms/widgets.pyc', 'widgets.pyc')
+        ]
+        for exp, got in zip(expected, fix_os_paths(f.choices)):
+            self.assertEqual(exp[1], got[1])
+            self.assertEqual(exp[1], got[1])
+
+
     # SplitDateTimeField ##########################################################
 
     def test_splitdatetimefield_1(self):

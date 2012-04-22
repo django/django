@@ -89,6 +89,8 @@ def get_validation_errors(outfile, app=None):
                         e.add(opts, '"%s": To use ImageFields, you need to install the Python Imaging Library. Get it at http://www.pythonware.com/products/pil/ .' % f.name)
             if isinstance(f, models.BooleanField) and getattr(f, 'null', False):
                 e.add(opts, '"%s": BooleanFields do not accept null values. Use a NullBooleanField instead.' % f.name)
+            if isinstance(f, models.FilePathField) and not (f.allow_files or f.allow_folders):
+                e.add(opts, '"%s": FilePathFields must have either allow_files or allow_folders set to True.' % f.name)
             if f.choices:
                 if isinstance(f.choices, basestring) or not is_iterable(f.choices):
                     e.add(opts, '"%s": "choices" should be iterable (e.g., a tuple or list).' % f.name)
