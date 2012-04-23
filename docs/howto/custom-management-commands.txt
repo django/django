@@ -95,7 +95,16 @@ must be added to :attr:`~BaseCommand.option_list` like this:
                 default=False,
                 help='Delete poll instead of closing it'),
             )
-        # ...
+
+        def handle(self, *args, **options):
+            # ...
+            if options['delete']:
+                poll.delete()
+            # ...
+
+The option (``delete`` in our example) is available in the options dict
+parameter of the handle method. See the :py:mod:`optparse` Python documentation
+for more about ``make_option`` usage.
 
 In addition to being able to add custom command line options, all
 :doc:`management commands</ref/django-admin>` can accept some
