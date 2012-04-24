@@ -315,15 +315,12 @@ def include_is_allowed(filepath):
     return False
 
 class SsiNode(Node):
-    def __init__(self, filepath, parsed, legacy_filepath=True):
+    def __init__(self, filepath, parsed):
         self.filepath = filepath
         self.parsed = parsed
-        self.legacy_filepath = legacy_filepath
 
     def render(self, context):
-        filepath = self.filepath
-        if not self.legacy_filepath:
-            filepath = filepath.resolve(context)
+        filepath = self.filepath.resolve(context)
 
         if not include_is_allowed(filepath):
             if settings.DEBUG:
@@ -385,9 +382,8 @@ class TemplateTagNode(Node):
         return self.mapping.get(self.tagtype, '')
 
 class URLNode(Node):
-    def __init__(self, view_name, args, kwargs, asvar, legacy_view_name=True):
+    def __init__(self, view_name, args, kwargs, asvar):
         self.view_name = view_name
-        self.legacy_view_name = legacy_view_name
         self.args = args
         self.kwargs = kwargs
         self.asvar = asvar
@@ -398,9 +394,7 @@ class URLNode(Node):
         kwargs = dict([(smart_str(k, 'ascii'), v.resolve(context))
                        for k, v in self.kwargs.items()])
 
-        view_name = self.view_name
-        if not self.legacy_view_name:
-            view_name = view_name.resolve(context)
+        view_name = self.view_name.resolve(context)
 
         # Try to look up the URL twice: once given the view name, and again
         # relative to what we guess is the "main" app. If they both fail,
@@ -969,19 +963,14 @@ def ssi(parser, token):
     of another file -- which must be specified using an absolute path --
     in the current page::
 
-        {% ssi /home/html/ljworld.com/includes/right_generic.html %}
+        {% ssi "/home/html/ljworld.com/includes/right_generic.html" %}
 
     If the optional "parsed" parameter is given, the contents of the included
     file are evaluated as template code, with the current context::
 
-        {% ssi /home/html/ljworld.com/includes/right_generic.html parsed %}
+        {% ssi "/home/html/ljworld.com/includes/right_generic.html" parsed %}
     """
-
-    import warnings
-    warnings.warn('The syntax for the ssi template tag is changing. Load the `ssi` tag from the `future` tag library to start using the new behavior.',
-                  category=DeprecationWarning)
-
-    bits = token.contents.split()
+    bits = token.split_contents()
     parsed = False
     if len(bits) not in (2, 3):
         raise TemplateSyntaxError("'ssi' tag takes one argument: the path to"
@@ -992,7 +981,8 @@ def ssi(parser, token):
         else:
             raise TemplateSyntaxError("Second (optional) argument to %s tag"
                                       " must be 'parsed'" % bits[0])
-    return SsiNode(bits[1], parsed, legacy_filepath=True)
+    filepath = parser.compile_filter(bits[1])
+    return SsiNode(filepath, parsed)
 
 @register.tag
 def load(parser, token):
@@ -1201,17 +1191,21 @@ def url(parser, token):
     This is a way to define links that aren't tied to a particular URL
     configuration::
 
-        {% url path.to.some_view arg1 arg2 %}
+        {% url "path.to.some_view" arg1 arg2 %}
 
         or
 
-        {% url path.to.some_view name1=value1 name2=value2 %}
+        {% url "path.to.some_view" name1=value1 name2=value2 %}
 
-    The first argument is a path to a view. It can be an absolute python path
+    The first argument is a path to a view. It can be an absolute Python path
     or just ``app_name.view_name`` without the project name if the view is
-    located inside the project.  Other arguments are comma-separated values
-    that will be filled in place of positional and keyword arguments in the
-    URL. All arguments for the URL should be present.
+    located inside the project.
+
+    Other arguments are space-separated values that will be filled in place of
+    positional and keyword arguments in the URL. Don't mix positional and
+    keyword arguments.
+
+    All arguments for the URL should be present.
 
     For example if you have a view ``app_name.client`` taking client's id and
     the corresponding line in a URLconf looks like this::
@@ -1225,20 +1219,39 @@ def url(parser, token):
 
     then in a template you can create a link for a certain client like this::
 
-        {% url app_name.client client.id %}
+        {% url "app_name.client" client.id %}
 
     The URL will look like ``/clients/client/123/``.
+
+    The first argument can also be a named URL instead of the Python path to
+    the view callable. For example if the URLconf entry looks like this::
+
+        url('^client/(\d+)/$', name='client-detail-view')
+
+    then in the template you can use::
+
+        {% url "client-detail-view" client.id %}
+
+    There is even another possible value type for the first argument. It can be
+    the name of a template variable that will be evaluated to obtain the view
+    name or the URL name, e.g.::
+
+        {% with view_path="app_name.client" %}
+        {% url view_path client.id %}
+        {% endwith %}
+
+        or,
+
+        {% with url_name="client-detail-view" %}
+        {% url url_name client.id %}
+        {% endwith %}
+
     """
-
-    import warnings
-    warnings.warn('The syntax for the url template tag is changing. Load the `url` tag from the `future` tag library to start using the new behavior.',
-                  category=DeprecationWarning)
-
     bits = token.split_contents()
     if len(bits) < 2:
         raise TemplateSyntaxError("'%s' takes at least one argument"
                                   " (path to a view)" % bits[0])
-    viewname = bits[1]
+    viewname = parser.compile_filter(bits[1])
     args = []
     kwargs = {}
     asvar = None
@@ -1247,38 +1260,6 @@ def url(parser, token):
         asvar = bits[-1]
         bits = bits[:-2]
 
-    # Backwards compatibility: check for the old comma separated format
-    # {% url urlname arg1,arg2 %}
-    # Initial check - that the first space separated bit has a comma in it
-    if bits and ',' in bits[0]:
-        check_old_format = True
-        # In order to *really* be old format, there must be a comma
-        # in *every* space separated bit, except the last.
-        for bit in bits[1:-1]:
-            if ',' not in bit:
-                # No comma in this bit. Either the comma we found
-                # in bit 1 was a false positive (e.g., comma in a string),
-                # or there is a syntax problem with missing commas
-                check_old_format = False
-                break
-    else:
-        # No comma found - must be new format.
-        check_old_format = False
-
-    if check_old_format:
-        # Confirm that this is old format by trying to parse the first
-        # argument. An exception will be raised if the comma is
-        # unexpected (i.e. outside of a static string).
-        match = kwarg_re.match(bits[0])
-        if match:
-            value = match.groups()[1]
-            try:
-                parser.compile_filter(value)
-            except TemplateSyntaxError:
-                bits = ''.join(bits).split(',')
-
-    # Now all the bits are parsed into new format,
-    # process them as template vars
     if len(bits):
         for bit in bits:
             match = kwarg_re.match(bit)
@@ -1290,7 +1271,7 @@ def url(parser, token):
             else:
                 args.append(parser.compile_filter(value))
 
-    return URLNode(viewname, args, kwargs, asvar, legacy_view_name=True)
+    return URLNode(viewname, args, kwargs, asvar)
 
 @register.tag
 def widthratio(parser, token):

@@ -208,7 +208,7 @@ Include a form in ``template.html`` that will ``POST`` to this view:
 
 .. code-block:: html+django
 
-    {% load tz %}{% load url from future %}
+    {% load tz %}
     <form action="{% url 'set_timezone' %}" method="POST">
         {% csrf_token %}
         <label for="timezone">Time zone:</label>

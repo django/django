@@ -279,3 +279,6 @@ these changes.
   goal of removing all ``django.contrib`` references from the core
   Django codebase. The old shortcut will be removed in the 2.0
   release.
+
+* ``ssi`` and ``url`` template tags will be removed from the ``future`` template
+  tag library (used during the 1.3/1.4 deprecation period).

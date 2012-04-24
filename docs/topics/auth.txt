@@ -1020,7 +1020,6 @@ The login_required decorator
     .. code-block:: html+django
 
         {% extends "base.html" %}
-        {% load url from future %}
 
         {% block content %}
 
@@ -1242,7 +1241,6 @@ includes a few other useful built-in views located in
 
     .. code-block:: html+django
 
-        {% load url from future %}
         Someone asked for password reset for email {{ email }}. Follow the link below:
         {{ protocol}}://{{ site_name }}{% url 'auth_password_reset_confirm' uidb36=uid token=token %}
 

@@ -2034,7 +2034,6 @@ To allow easier reversing of the admin urls in templates, Django provides an
 .. code-block:: html+django
 
     {% load admin_urls %}
-    {% load url from future %}
     <a href="{% url opts|admin_urlname:'add' %}">Add user</a>
     <a href="{% url opts|admin_urlname:'delete' user.pk %}">Delete this user</a>
 
