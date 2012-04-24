@@ -276,6 +276,13 @@ class DatabaseOperations(BaseDatabaseOperations):
         else:
             return []
 
+    def validate_autopk_value(self, value):
+        # MySQLism: zero in AUTO_INCREMENT field does not work. Refs #17653.
+        if value == 0:
+            raise ValueError('The database backend does not accept 0 as a '
+                             'value for AutoField.')
+        return value
+
     def value_to_db_datetime(self, value):
         if value is None:
             return None

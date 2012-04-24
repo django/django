@@ -770,6 +770,14 @@ class BaseDatabaseOperations(object):
     # need not necessarily be implemented using "LIKE" in the backend.
     prep_for_iexact_query = prep_for_like_query
 
+    def validate_autopk_value(self, value):
+        """
+        Certain backends do not accept some values for "serial" fields
+        (for example zero in MySQL). This method will raise a ValueError
+        if the value is invalid, otherwise returns validated value.
+        """
+        return value
+
     def value_to_db_date(self, value):
         """
         Transform a date value to an object compatible with what is expected

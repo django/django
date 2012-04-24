@@ -13,7 +13,8 @@ from django.db import (backend, connection, connections, DEFAULT_DB_ALIAS,
 from django.db.backends.signals import connection_created
 from django.db.backends.postgresql_psycopg2 import version as pg_version
 from django.db.utils import ConnectionHandler, DatabaseError, load_backend
-from django.test import TestCase, skipUnlessDBFeature, TransactionTestCase
+from django.test import (TestCase, skipUnlessDBFeature, skipIfDBFeature,
+    TransactionTestCase)
 from django.test.utils import override_settings
 from django.utils import unittest
 
@@ -642,3 +643,15 @@ class BackendLoadingTests(TestCase):
         self.assertRaisesRegexp(ImproperlyConfigured,
             "Try using django.db.backends.sqlite3 instead",
             load_backend, 'sqlite3')
+
+
+class MySQLPKZeroTests(TestCase):
+    """
+    Zero as id for AutoField should raise exception in MySQL, because MySQL
+    does not allow zero for automatic primary key.
+    """
+
+    @skipIfDBFeature('allows_primary_key_0')
+    def test_zero_as_autoval(self):
+        with self.assertRaises(ValueError):
+            models.Square.objects.create(id=0, root=0, square=1)
