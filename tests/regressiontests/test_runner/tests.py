@@ -8,13 +8,15 @@ from optparse import make_option
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
 from django import db
-from django.test import simple
+from django.db import connection
+from django.test import simple, TransactionTestCase
 from django.test.simple import DjangoTestSuiteRunner, get_tests
 from django.test.testcases import connections_support_transactions
 from django.utils import unittest
 from django.utils.importlib import import_module
 
 from ..admin_scripts.tests import AdminScriptTestCase
+from .models import Person
 
 
 TEST_APP_OK = 'regressiontests.test_runner.valid_app.models'
@@ -281,3 +283,24 @@ class Sqlite3InMemoryTestDbs(unittest.TestCase):
                 self.assertTrue(connections_support_transactions(), msg)
             finally:
                 db.connections = old_db_connections
+
+
+class AutoIncrementResetTest(TransactionTestCase):
+    """
+    Here we test creating the same model two times in different test methods,
+    and check that both times they get "1" as their PK value. That is, we test
+    that AutoField values start from 1 for each transactional test case.
+    """
+    @unittest.skipIf(connection.vendor == 'oracle',
+                     "Oracle's auto-increment fields are not reset between "
+                     "tests")
+    def test_autoincrement_reset1(self):
+        p = Person.objects.create(first_name='Jack', last_name='Smith')
+        self.assertEquals(p.pk, 1)
+
+    @unittest.skipIf(connection.vendor == 'oracle',
+                     "Oracle's auto-increment fields are not reset between "
+                     "tests")
+    def test_autoincrement_reset2(self):
+        p = Person.objects.create(first_name='Jack', last_name='Smith')
+        self.assertEquals(p.pk, 1)

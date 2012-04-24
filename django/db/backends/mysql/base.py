@@ -261,15 +261,17 @@ class DatabaseOperations(BaseDatabaseOperations):
                 sql.append('%s %s;' % (style.SQL_KEYWORD('TRUNCATE'), style.SQL_FIELD(self.quote_name(table))))
             sql.append('SET FOREIGN_KEY_CHECKS = 1;')
 
-            # 'ALTER TABLE table AUTO_INCREMENT = 1;'... style SQL statements
-            # to reset sequence indices
-            sql.extend(["%s %s %s %s %s;" % \
-                (style.SQL_KEYWORD('ALTER'),
-                 style.SQL_KEYWORD('TABLE'),
-                 style.SQL_TABLE(self.quote_name(sequence['table'])),
-                 style.SQL_KEYWORD('AUTO_INCREMENT'),
-                 style.SQL_FIELD('= 1'),
-                ) for sequence in sequences])
+            # Truncate already resets the AUTO_INCREMENT field from
+            # MySQL version 5.0.13 onwards. Refs #16961.
+            if self.connection.mysql_version < (5,0,13):
+                sql.extend(
+                    ["%s %s %s %s %s;" % \
+                     (style.SQL_KEYWORD('ALTER'),
+                      style.SQL_KEYWORD('TABLE'),
+                      style.SQL_TABLE(self.quote_name(sequence['table'])),
+                      style.SQL_KEYWORD('AUTO_INCREMENT'),
+                      style.SQL_FIELD('= 1'),
+                     ) for sequence in sequences])
             return sql
         else:
             return []

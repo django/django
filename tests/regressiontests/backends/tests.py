@@ -61,9 +61,33 @@ class OracleChecks(unittest.TestCase):
     def test_client_encoding(self):
         # If the backend is Oracle, test that the client encoding is set
         # correctly.  This was broken under Cygwin prior to r14781.
-        c = connection.cursor()  # Ensure the connection is initialized.
+        connection.cursor()  # Ensure the connection is initialized.
         self.assertEqual(connection.connection.encoding, "UTF-8")
         self.assertEqual(connection.connection.nencoding, "UTF-8")
+
+class MySQLTests(TestCase):
+    @unittest.skipUnless(connection.vendor == 'mysql',
+                        "Test valid only for MySQL")
+    def test_autoincrement(self):
+        """
+        Check that auto_increment fields are reset correctly by sql_flush().
+        Before MySQL version 5.0.13 TRUNCATE did not do auto_increment reset.
+        Refs #16961.
+        """
+        statements = connection.ops.sql_flush(no_style(),
+                                              tables=['test'],
+                                              sequences=[{
+                                                  'table': 'test',
+                                                  'col': 'somecol',
+                                              }])
+        found_reset = False
+        for sql in statements:
+            found_reset = found_reset or 'ALTER TABLE' in sql
+        if connection.mysql_version < (5,0,13):
+            self.assertTrue(found_reset)
+        else:
+            self.assertFalse(found_reset)
+
 
 class DateQuotingTest(TestCase):
 
