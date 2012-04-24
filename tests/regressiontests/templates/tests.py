@@ -1623,15 +1623,6 @@ class Templates(unittest.TestCase):
             'static-statictag01': ('{% load static %}{% static "admin/base.css" %}', {}, urljoin(settings.STATIC_URL, 'admin/base.css')),
             'static-statictag02': ('{% load static %}{% static base_css %}', {'base_css': 'admin/base.css'}, urljoin(settings.STATIC_URL, 'admin/base.css')),
         }
-        # Until Django 1.5, the ssi tag takes an unquoted constant in argument,
-        # and there's no way to escape spaces. As a consequence it's impossible
-        # to include a file if its absolute path contains a space, as
-        # demonstrated by tests old-ssi08 and old-ssi09.
-        # If the patch to the Django chekout contains a space, the following
-        # tests will raise an exception too.
-        if ' ' in basedir:
-            for test_name in 'old-ssi01', 'old-ssi02', 'old-ssi06', 'old-ssi07':
-                tests[test_name] = tests[test_name][:-1] + (template.TemplateSyntaxError,)
         return tests
 
 class TemplateTagLoading(unittest.TestCase):
