@@ -193,31 +193,35 @@ def reorder_suite(suite, classes):
 
 
 def dependency_ordered(test_databases, dependencies):
-    """Reorder test_databases into an order that honors the dependencies
+    """
+    Reorder test_databases into an order that honors the dependencies
     described in TEST_DEPENDENCIES.
     """
     ordered_test_databases = []
     resolved_databases = set()
+
+    # Maps db signature to dependencies of all it's aliases
+    dependencies_map = {}
+
+    # sanity check - no DB can depend on it's own alias
+    for sig, (_, aliases) in test_databases:
+        all_deps = set()
+        for alias in aliases:
+            all_deps.update(dependencies.get(alias, []))
+        if not all_deps.isdisjoint(aliases):
+            raise ImproperlyConfigured(
+                "Circular dependency: databases %r depend on each other, "
+                "but are aliases." % aliases)
+        dependencies_map[sig] = all_deps
+
     while test_databases:
         changed = False
         deferred = []
 
-        while test_databases:
-            signature, (db_name, aliases) = test_databases.pop()
-            dependencies_satisfied = True
-            for alias in aliases:
-                if alias in dependencies:
-                    if all(a in resolved_databases
-                           for a in dependencies[alias]):
-                        # all dependencies for this alias are satisfied
-                        dependencies.pop(alias)
-                        resolved_databases.add(alias)
-                    else:
-                        dependencies_satisfied = False
-                else:
-                    resolved_databases.add(alias)
-
-            if dependencies_satisfied:
+        # Try to find a DB that has all it's dependencies met
+        for signature, (db_name, aliases) in test_databases:
+            if dependencies_map[signature].issubset(resolved_databases):
+                resolved_databases.update(aliases)
                 ordered_test_databases.append((signature, (db_name, aliases)))
                 changed = True
             else:
@@ -282,9 +286,9 @@ class DjangoTestSuiteRunner(object):
                 # we only need to create the test database once.
                 item = test_databases.setdefault(
                     connection.creation.test_db_signature(),
-                    (connection.settings_dict['NAME'], [])
+                    (connection.settings_dict['NAME'], set())
                 )
-                item[1].append(alias)
+                item[1].add(alias)
 
                 if 'TEST_DEPENDENCIES' in connection.settings_dict:
                     dependencies[alias] = (
@@ -297,26 +301,20 @@ class DjangoTestSuiteRunner(object):
         # Second pass -- actually create the databases.
         old_names = []
         mirrors = []
+
         for signature, (db_name, aliases) in dependency_ordered(
             test_databases.items(), dependencies):
+            test_db_name = None
             # Actually create the database for the first connection
-            connection = connections[aliases[0]]
-            old_names.append((connection, db_name, True))
-            test_db_name = connection.creation.create_test_db(
-                self.verbosity, autoclobber=not self.interactive)
-            for alias in aliases[1:]:
+
+            for alias in aliases:
                 connection = connections[alias]
-                if db_name:
-                    old_names.append((connection, db_name, False))
-                    connection.settings_dict['NAME'] = test_db_name
+                old_names.append((connection, db_name, True))
+                if test_db_name is None:
+                    test_db_name = connection.creation.create_test_db(
+                            self.verbosity, autoclobber=not self.interactive)
                 else:
-                    # If settings_dict['NAME'] isn't defined, we have a backend
-                    # where the name isn't important -- e.g., SQLite, which
-                    # uses :memory:. Force create the database instead of
-                    # assuming it's a duplicate.
-                    old_names.append((connection, db_name, True))
-                    connection.creation.create_test_db(
-                        self.verbosity, autoclobber=not self.interactive)
+                    connection.settings_dict['NAME'] = test_db_name
 
         for alias, mirror_alias in mirrored_aliases.items():
             mirrors.append((alias, connections[alias].settings_dict['NAME']))
