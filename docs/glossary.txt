@@ -16,7 +16,7 @@ Glossary
         A higher-order :term:`view` function that provides an abstract/generic
         implementation of a common idiom or pattern found in view development.
 
-        See :doc:`/ref/generic-views`.
+        See :doc:`/ref/class-based-views`.
 
     model
         Models store your application's data.

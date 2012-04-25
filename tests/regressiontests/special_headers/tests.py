@@ -1,5 +1,3 @@
-import warnings
-
 from django.contrib.auth.models import User
 from django.test import TestCase
 
@@ -7,14 +5,6 @@ from django.test import TestCase
 class SpecialHeadersTest(TestCase):
     fixtures = ['data.xml']
     urls = 'regressiontests.special_headers.urls'
-
-    def setUp(self):
-        self.save_warnings_state()
-        warnings.filterwarnings('ignore', category=DeprecationWarning,
-                                module='django.views.generic.list_detail')
-
-    def tearDown(self):
-        self.restore_warnings_state()
 
     def test_xheaders(self):
         user = User.objects.get(username='super')

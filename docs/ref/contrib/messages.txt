@@ -274,10 +274,6 @@ example::
                          fail_silently=True)
     messages.info(request, 'Hello world.', fail_silently=True)
 
-Internally, Django uses this functionality in the create, update, and delete
-:doc:`generic views </topics/http/generic-views>` so that they work even if the
-message framework is disabled.
-
 .. note::
    Setting ``fail_silently=True`` only hides the ``MessageFailure`` that would
    otherwise occur when the messages framework disabled and one attempts to

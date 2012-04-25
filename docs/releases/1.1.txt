@@ -396,8 +396,8 @@ Other new features and changes introduced since Django 1.0 include:
   which return the list of hidden -- i.e., ``<input type="hidden">`` -- and
   visible fields on the form, respectively.
 
-* The ``redirect_to`` generic view (see :doc:`the generic views documentation
-  </ref/generic-views>`) now accepts an additional keyword argument
+* The ``redirect_to`` generic view
+  now accepts an additional keyword argument
   ``permanent``. If ``permanent`` is ``True``, the view will emit an HTTP
   permanent redirect (status code 301). If ``False``, the view will emit an HTTP
   temporary redirect (status code 302).

@@ -2,4 +2,4 @@
 Generic views
 =============
 
-See :doc:`/ref/generic-views`.
+See :doc:`/ref/class-based-views`.

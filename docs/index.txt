@@ -195,7 +195,6 @@ Other batteries included
 * :doc:`Unicode in Django <ref/unicode>`
 * :doc:`Web design helpers <ref/contrib/webdesign>`
 * :doc:`Validators <ref/validators>`
-* Function-based generic views (Deprecated) :doc:`Overview<topics/generic-views>` | :doc:`Built-in generic views<ref/generic-views>` | :doc:`Migration guide<topics/generic-views-migration>`
 
 The Django open-source project
 ==============================

@@ -416,8 +416,8 @@ Old::
     from django.conf.urls import patterns, url, include
 
     urlpatterns = patterns('',
-        (r'^$', 'django.views.generic.date_based.archive_index'),
-        (r'^(?P<year>\d{4})/(?P<month>[a-z]{3})/$', 'django.views.generic.date_based.archive_month'),
+        (r'^$', 'myapp.views.app_index'),
+        (r'^(?P<year>\d{4})/(?P<month>[a-z]{3})/$', 'myapp.views.month_display'),
         (r'^tag/(?P<tag>\w+)/$', 'weblog.views.tag'),
     )
 
@@ -425,9 +425,9 @@ New::
 
     from django.conf.urls import patterns, url, include
 
-    urlpatterns = patterns('django.views.generic.date_based',
-        (r'^$', 'archive_index'),
-        (r'^(?P<year>\d{4})/(?P<month>[a-z]{3})/$','archive_month'),
+    urlpatterns = patterns('myapp.views',
+        (r'^$', 'app_index'),
+        (r'^(?P<year>\d{4})/(?P<month>[a-z]{3})/$','month_display'),
     )
 
     urlpatterns += patterns('weblog.views',
@@ -579,7 +579,7 @@ In this example, for a request to ``/blog/2005/``, Django will call the
 
     year='2005', foo='bar'
 
-This technique is used in :doc:`generic views </ref/generic-views>` and in the
+This technique is used in the
 :doc:`syndication framework </ref/contrib/syndication>` to pass metadata and
 options to views.
 

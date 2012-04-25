@@ -240,16 +240,16 @@ The sitemap framework provides a couple convenience classes for common cases:
 
 .. class:: GenericSitemap
 
-    The :class:`django.contrib.sitemaps.GenericSitemap` class works with any
-    :doc:`generic views </ref/generic-views>` you already have.
-    To use it, create an instance, passing in the same :data:`info_dict` you pass to
-    the generic views. The only requirement is that the dictionary have a
-    :data:`queryset` entry. It may also have a :data:`date_field` entry that specifies a
-    date field for objects retrieved from the :data:`queryset`. This will be used for
-    the :attr:`~Sitemap.lastmod` attribute in the generated sitemap. You may
-    also pass :attr:`~Sitemap.priority` and :attr:`~Sitemap.changefreq`
-    keyword arguments to the :class:`~django.contrib.sitemaps.GenericSitemap`
-    constructor to specify these attributes for all URLs.
+    The :class:`django.contrib.sitemaps.GenericSitemap` class allows you to
+    create a sitemap by passing it a dictionary which has to contain at least
+    a :data:`queryset` entry. This queryset will be used to generate the items
+    of the sitemap. It may also have a :data:`date_field` entry that
+    specifies a date field for objects retrieved from the :data:`queryset`.
+    This will be used for the :attr:`~Sitemap.lastmod` attribute in the
+    generated sitemap. You may also pass :attr:`~Sitemap.priority` and
+    :attr:`~Sitemap.changefreq` keyword arguments to the
+    :class:`~django.contrib.sitemaps.GenericSitemap`  constructor to specify
+    these attributes for all URLs.
 
 Example
 -------

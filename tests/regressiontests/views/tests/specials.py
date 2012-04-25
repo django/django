@@ -1,6 +1,4 @@
 # coding: utf-8
-import warnings 
-
 from django.test import TestCase
 
 
@@ -10,14 +8,6 @@ class URLHandling(TestCase):
     """
     urls = 'regressiontests.views.generic_urls'
     redirect_target = "/%E4%B8%AD%E6%96%87/target/"
-
-    def setUp(self):
-        self.save_warnings_state()
-        warnings.filterwarnings('ignore', category=DeprecationWarning,
-                                module='django.views.generic.simple')
-
-    def tearDown(self):
-        self.restore_warnings_state()
 
     def test_combining_redirect(self):
         """

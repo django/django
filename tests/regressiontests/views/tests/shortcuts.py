@@ -1,5 +1,3 @@
-import warnings
-
 from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -10,14 +8,6 @@ from django.test.utils import override_settings
 )
 class ShortcutTests(TestCase):
     urls = 'regressiontests.views.generic_urls'
-
-    def setUp(self):
-        self.save_warnings_state()
-        warnings.filterwarnings('ignore', category=DeprecationWarning,
-                                module='django.views.generic.simple')
-
-    def tearDown(self):
-        self.restore_warnings_state()
 
     def test_render_to_response(self):
         response = self.client.get('/shortcuts/render_to_response/')

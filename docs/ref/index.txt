@@ -24,11 +24,3 @@ API Reference
    unicode
    utils
    validators
-
-Deprecated features
--------------------
-
-.. toctree::
-   :maxdepth: 1
-
-   generic-views

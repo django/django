@@ -54,7 +54,7 @@ of 1.0. This includes these APIs:
 - :doc:`HTTP request/response handling </topics/http/index>`, including file
   uploads, middleware, sessions, URL resolution, view, and shortcut APIs.
 
-- :doc:`Generic views </topics/http/generic-views>`.
+- :doc:`Generic views </topics/class-based-views>`.
 
 - :doc:`Internationalization </topics/i18n/index>`.
 
