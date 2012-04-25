@@ -45,7 +45,7 @@ look like this:
 .. code-block:: python
 
     from django.core.management.base import BaseCommand, CommandError
-    from example.polls.models import Poll
+    from polls.models import Poll
 
     class Command(BaseCommand):
         args = '<poll_id poll_id ...>'
