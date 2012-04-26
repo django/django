@@ -76,7 +76,7 @@ LibHead = """
 /* gettext library */
 
 (function (globals) {
-  var catalog = new Array();
+  var catalog = {};
 """
 
 LibFoot = """
@@ -123,7 +123,7 @@ LibFormatHead = """
 /* formatting library */
 
 (function (globals) {
-  var formats = new Array();
+  var formats = {};
 
 """
 
