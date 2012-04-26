@@ -82,4 +82,4 @@ The full error: %s""" % (connection.settings_dict['NAME'], e))
             call_command('loaddata', 'initial_data', **kwargs)
 
         else:
-            print "Flush cancelled."
+            self.stdout.write("Flush cancelled.\n")
