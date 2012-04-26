@@ -75,68 +75,72 @@ function npgettext(context, singular, plural, count) { return (count == 1) ? sin
 LibHead = """
 /* gettext library */
 
-var catalog = new Array();
+(function (globals) {
+  var catalog = new Array();
 """
 
 LibFoot = """
 
-function gettext(msgid) {
-  var value = catalog[msgid];
-  if (typeof(value) == 'undefined') {
-    return msgid;
-  } else {
-    return (typeof(value) == 'string') ? value : value[0];
+  globals.gettext = function (msgid) {
+    var value = catalog[msgid];
+    if (typeof(value) == 'undefined') {
+      return msgid;
+    } else {
+      return (typeof(value) == 'string') ? value : value[0];
+    }
   }
-}
 
-function ngettext(singular, plural, count) {
-  value = catalog[singular];
-  if (typeof(value) == 'undefined') {
-    return (count == 1) ? singular : plural;
-  } else {
-    return value[pluralidx(count)];
+  globals.ngettext = function (singular, plural, count) {
+    value = catalog[singular];
+    if (typeof(value) == 'undefined') {
+      return (count == 1) ? singular : plural;
+    } else {
+      return value[pluralidx(count)];
+    }
   }
-}
 
-function gettext_noop(msgid) { return msgid; }
+  globals.gettext_noop = function (msgid) { return msgid; }
 
-function pgettext(context, msgid) {
-  var value = gettext(context + '\\x04' + msgid);
-  if (value.indexOf('\\x04') != -1) {
-    value = msgid;
+  globals.pgettext = function (context, msgid) {
+    var value = gettext(context + '\\x04' + msgid);
+    if (value.indexOf('\\x04') != -1) {
+      value = msgid;
+    }
+    return value;
   }
-  return value;
-}
 
-function npgettext(context, singular, plural, count) {
-  var value = ngettext(context + '\\x04' + singular, context + '\\x04' + plural, count);
-  if (value.indexOf('\\x04') != -1) {
-    value = ngettext(singular, plural, count);
+  globals.npgettext = function (context, singular, plural, count) {
+    var value = ngettext(context + '\\x04' + singular, context + '\\x04' + plural, count);
+    if (value.indexOf('\\x04') != -1) {
+      value = ngettext(singular, plural, count);
+    }
+    return value;
   }
-  return value;
-}
+}(this));
 """
 
 LibFormatHead = """
 /* formatting library */
 
-var formats = new Array();
+(function (globals) {
+  var formats = new Array();
 
 """
 
 LibFormatFoot = """
-function get_format(format_type) {
+  globals.get_format = function (format_type) {
     var value = formats[format_type];
     if (typeof(value) == 'undefined') {
       return format_type;
     } else {
       return value;
     }
-}
+  }
+}(this));
 """
 
 SimplePlural = """
-function pluralidx(count) { return (count == 1) ? 0 : 1; }
+  globals.pluralidx = function (count) { return (count == 1) ? 0 : 1; }
 """
 
 InterPolate = r"""
@@ -150,14 +154,14 @@ function interpolate(fmt, obj, named) {
 """
 
 PluralIdx = r"""
-function pluralidx(n) {
-  var v=%s;
-  if (typeof(v) == 'boolean') {
-    return v ? 1 : 0;
-  } else {
-    return v;
+  globals.pluralidx = function (n) {
+    var v=%s;
+    if (typeof(v) == 'boolean') {
+      return v ? 1 : 0;
+    } else {
+      return v;
+    }
   }
-}
 """
 
 def null_javascript_catalog(request, domain=None, packages=None):
@@ -262,13 +266,13 @@ def javascript_catalog(request, domain='djangojs', packages=None):
         if k == '':
             continue
         if isinstance(k, six.string_types):
-            csrc.append("catalog['%s'] = '%s';\n" % (javascript_quote(k), javascript_quote(v)))
+            csrc.append("  catalog['%s'] = '%s';\n" % (javascript_quote(k), javascript_quote(v)))
         elif isinstance(k, tuple):
             if k[0] not in pdict:
                 pdict[k[0]] = k[1]
             else:
                 pdict[k[0]] = max(k[1], pdict[k[0]])
-            csrc.append("catalog['%s'][%d] = '%s';\n" % (javascript_quote(k[0]), k[1], javascript_quote(v)))
+            csrc.append("  catalog['%s'][%d] = '%s';\n" % (javascript_quote(k[0]), k[1], javascript_quote(v)))
         else:
             raise TypeError(k)
     csrc.sort()
