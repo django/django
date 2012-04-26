@@ -1,5 +1,3 @@
-import warnings
-
 from django.contrib.localflavor.cz.forms import (CZPostalCodeField,
     CZRegionSelect, CZBirthNumberField, CZICNumberField)
 
@@ -8,17 +6,6 @@ from django.test import SimpleTestCase
 
 
 class CZLocalFlavorTests(SimpleTestCase):
-    def setUp(self):
-        self.save_warnings_state()
-        warnings.filterwarnings(
-            "ignore",
-            category=DeprecationWarning,
-            module='django.contrib.localflavor.cz.forms'
-        )
-
-    def tearDown(self):
-        self.restore_warnings_state()
-
     def test_CZRegionSelect(self):
         f = CZRegionSelect()
         out = u'''<select name="regions">
@@ -74,20 +61,6 @@ class CZLocalFlavorTests(SimpleTestCase):
             '990101/0011': error_invalid,
         }
         self.assertFieldOutput(CZBirthNumberField, valid, invalid)
-
-        # These tests should go away in 1.4.
-        # http://code.djangoproject.com/ticket/14593
-        f = CZBirthNumberField()
-        self.assertEqual(f.clean('880523/1237', 'm'), '880523/1237'),
-        self.assertEqual(f.clean('885523/1231', 'f'), '885523/1231')
-        self.assertRaisesRegexp(ValidationError, unicode(error_invalid),
-            f.clean, '881523/0000', 'm')
-        self.assertRaisesRegexp(ValidationError, unicode(error_invalid),
-            f.clean, '885223/0000', 'm')
-        self.assertRaisesRegexp(ValidationError, unicode(error_invalid),
-            f.clean, '881523/0000', 'f')
-        self.assertRaisesRegexp(ValidationError, unicode(error_invalid),
-            f.clean, '885223/0000', 'f')
 
     def test_CZICNumberField(self):
         error_invalid = [u'Enter a valid IC number.']

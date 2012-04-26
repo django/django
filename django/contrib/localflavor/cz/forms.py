@@ -50,7 +50,6 @@ class CZBirthNumberField(Field):
     """
     default_error_messages = {
         'invalid_format': _(u'Enter a birth number in the format XXXXXX/XXXX or XXXXXXXXXX.'),
-        'invalid_gender': _(u'Invalid optional parameter Gender, valid values are \'f\' and \'m\''),
         'invalid': _(u'Enter a valid birth number.'),
     }
 
@@ -73,22 +72,10 @@ class CZBirthNumberField(Field):
         # Birth number is in format YYMMDD. Females have month value raised by 50.
         # In case that all possible number are already used (for given date),
         # the month field is raised by 20.
-        if gender is not None:
-            import warnings
-            warnings.warn(
-                "Support for validating the gender of a CZ Birth number has been deprecated.",
-                DeprecationWarning)
-            if gender == 'f':
-                female_const = 50
-            elif gender == 'm':
-                female_const = 0
-            else:
-                raise ValidationError(self.error_messages['invalid_gender'])
-
-            month = int(birth[2:4]) - female_const
-            if (not 1 <= month <= 12):
-                if (not 1 <= (month - 20) <= 12):
-                    raise ValidationError(self.error_messages['invalid'])
+        month = int(birth[2:4])
+        if (not 1 <= month <= 12) and (not 21 <= month <= 32) and \
+                (not 51 <= month <= 62) and (not 71 <= month <= 82):
+            raise ValidationError(self.error_messages['invalid'])
 
         day = int(birth[4:6])
         if not (1 <= day <= 31):
