@@ -125,7 +125,7 @@ LibFormatFoot = """
 function get_format(format_type) {
     var value = formats[format_type];
     if (typeof(value) == 'undefined') {
-      return msgid;
+      return format_type;
     } else {
       return value;
     }
