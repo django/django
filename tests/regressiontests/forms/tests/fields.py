@@ -48,14 +48,6 @@ def fix_os_paths(x):
 
 class FieldsTests(SimpleTestCase):
 
-    def setUp(self):
-        self.save_warnings_state()
-        warnings.filterwarnings('ignore', category=DeprecationWarning,
-                                module='django.core.validators')
-
-    def tearDown(self):
-        self.restore_warnings_state()
-
     def test_field_sets_widget_is_required(self):
         self.assertTrue(Field(required=True).widget.is_required)
         self.assertFalse(Field(required=False).widget.is_required)
