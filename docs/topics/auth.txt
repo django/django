@@ -1831,8 +1831,6 @@ object the first time a user authenticates::
         ADMIN_PASSWORD = 'sha1$4e987$afbcf42e21bd417fb71db8c66b321e9fc33051de'
         """
 
-        supports_inactive_user = False
-
         def authenticate(self, username=None, password=None):
             login_valid = (settings.ADMIN_LOGIN == username)
             pwd_valid = check_password(password, settings.ADMIN_PASSWORD)
@@ -1931,15 +1929,8 @@ The support for anonymous users in the permission system allows for
 anonymous users to have permissions to do something while inactive
 authenticated users do not.
 
-To enable this on your own backend, you must set the class attribute
-``supports_inactive_user`` to ``True``.
-
-A nonexisting ``supports_inactive_user`` attribute will raise a
-``PendingDeprecationWarning`` if used in Django 1.3. In Django 1.4, this
-warning will be updated to a ``DeprecationWarning`` which will be displayed
-loudly. Additionally ``supports_inactive_user`` will be set to ``False``.
-Django 1.5 will assume that every backend supports inactive users being
-passed to the authorization methods.
+Do not forget to test for the ``is_active`` attribute of the user in your own
+backend permission methods.
 
 
 Handling object permissions

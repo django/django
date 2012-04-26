@@ -1,6 +1,6 @@
 from django.contrib.auth.tests.auth_backends import (BackendTest,
     RowlevelBackendTest, AnonymousUserBackendTest, NoBackendsTest,
-    InActiveUserBackendTest, NoInActiveUserBackendTest)
+    InActiveUserBackendTest)
 from django.contrib.auth.tests.basic import BasicTestCase
 from django.contrib.auth.tests.context_processors import AuthContextProcessorTests
 from django.contrib.auth.tests.decorators import LoginRequiredTestCase

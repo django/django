@@ -104,12 +104,6 @@ class TestObj(object):
 
 
 class SimpleRowlevelBackend(object):
-    supports_inactive_user = False
-
-    # This class also supports tests for anonymous user permissions, and
-    # inactive user permissions via subclasses which just set the
-    # 'supports_anonymous_user' or 'supports_inactive_user' attribute.
-
     def has_perm(self, user, perm, obj=None):
         if not obj:
             return # We only support row level perms
@@ -196,16 +190,12 @@ class RowlevelBackendTest(TestCase):
         self.assertEqual(self.user3.get_group_permissions(TestObj()), set(['group_perm']))
 
 
-class AnonymousUserBackend(SimpleRowlevelBackend):
-    supports_inactive_user = False
-
-
 class AnonymousUserBackendTest(TestCase):
     """
     Tests for AnonymousUser delegating to backend.
     """
 
-    backend = 'django.contrib.auth.tests.auth_backends.AnonymousUserBackend'
+    backend = 'django.contrib.auth.tests.auth_backends.SimpleRowlevelBackend'
 
     def setUp(self):
         self.curr_auth = settings.AUTHENTICATION_BACKENDS
@@ -243,20 +233,11 @@ class NoBackendsTest(TestCase):
         self.assertRaises(ImproperlyConfigured, self.user.has_perm, ('perm', TestObj(),))
 
 
-class InActiveUserBackend(SimpleRowlevelBackend):
-    supports_inactive_user = True
-
-
-class NoInActiveUserBackend(SimpleRowlevelBackend):
-    supports_inactive_user = False
-
-
 class InActiveUserBackendTest(TestCase):
     """
-    Tests for a inactive user delegating to backend if it has 'supports_inactive_user' = True
+    Tests for a inactive user
     """
-
-    backend = 'django.contrib.auth.tests.auth_backends.InActiveUserBackend'
+    backend = 'django.contrib.auth.tests.auth_backends.SimpleRowlevelBackend'
 
     def setUp(self):
         self.curr_auth = settings.AUTHENTICATION_BACKENDS
@@ -275,29 +256,3 @@ class InActiveUserBackendTest(TestCase):
     def test_has_module_perms(self):
         self.assertEqual(self.user1.has_module_perms("app1"), False)
         self.assertEqual(self.user1.has_module_perms("app2"), False)
-
-
-class NoInActiveUserBackendTest(TestCase):
-    """
-    Tests that an inactive user does not delegate to backend if it has 'supports_inactive_user' = False
-    """
-    backend = 'django.contrib.auth.tests.auth_backends.NoInActiveUserBackend'
-
-    def setUp(self):
-        self.curr_auth = settings.AUTHENTICATION_BACKENDS
-        settings.AUTHENTICATION_BACKENDS = tuple(self.curr_auth) + (self.backend,)
-        self.user1 = User.objects.create_user('test', 'test@example.com', 'test')
-        self.user1.is_active = False
-        self.user1.save()
-
-    def tearDown(self):
-        settings.AUTHENTICATION_BACKENDS = self.curr_auth
-
-    def test_has_perm(self):
-        self.assertEqual(self.user1.has_perm('perm', TestObj()), False)
-        self.assertEqual(self.user1.has_perm('inactive', TestObj()), False)
-
-    def test_has_module_perms(self):
-        self.assertEqual(self.user1.has_module_perms("app1"), False)
-        self.assertEqual(self.user1.has_module_perms("app2"), False)
-

@@ -1,4 +1,3 @@
-from warnings import warn
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.importlib import import_module
 from django.contrib.auth.signals import user_logged_in, user_logged_out
@@ -20,11 +19,6 @@ def load_backend(path):
         cls = getattr(mod, attr)
     except AttributeError:
         raise ImproperlyConfigured('Module "%s" does not define a "%s" authentication backend' % (module, attr))
-
-    if not hasattr(cls, 'supports_inactive_user'):
-        warn("Authentication backends without a `supports_inactive_user` attribute are deprecated. Please define it in %s." % cls,
-             DeprecationWarning)
-        cls.supports_inactive_user = False
     return cls()
 
 def get_backends():

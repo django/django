@@ -5,7 +5,6 @@ class ModelBackend(object):
     """
     Authenticates against django.contrib.auth.models.User.
     """
-    supports_inactive_user = True
 
     # TODO: Model, login attribute name and password attribute name should be
     # configurable.
