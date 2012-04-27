@@ -41,8 +41,10 @@ class Command(NoArgsCommand):
         yield ''
         yield 'from %s import models' % self.db_module
         yield ''
+        known_models = []
         for table_name in connection.introspection.get_table_list(cursor):
             yield 'class %s(models.Model):' % table2model(table_name)
+            known_models.append(table2model(table_name))
             try:
                 relations = connection.introspection.get_relations(cursor, table_name)
             except NotImplementedError:
@@ -83,7 +85,12 @@ class Command(NoArgsCommand):
 
                 if i in relations:
                     rel_to = relations[i][1] == table_name and "'self'" or table2model(relations[i][1])
-                    field_type = 'ForeignKey(%s' % rel_to
+
+                    if rel_to in known_models:
+                        field_type = 'ForeignKey(%s' % rel_to
+                    else:
+                        field_type = "ForeignKey('%s'" % rel_to
+
                     if att_name.endswith('_id'):
                         att_name = att_name[:-3]
                     else:

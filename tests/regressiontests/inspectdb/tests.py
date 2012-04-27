@@ -12,7 +12,8 @@ class InspectDBTestCase(TestCase):
         call_command('inspectdb', stdout=out)
         error_message = "inspectdb generated an attribute name which is a python keyword"
         self.assertNotIn("from = models.ForeignKey(InspectdbPeople)", out.getvalue(), msg=error_message)
-        self.assertIn("from_field = models.ForeignKey(InspectdbPeople)", out.getvalue())
+        # As InspectdbPeople model is defined after InspectdbMessage, it should be quoted
+        self.assertIn("from_field = models.ForeignKey('InspectdbPeople')", out.getvalue())
         self.assertIn("people_pk = models.ForeignKey(InspectdbPeople, primary_key=True)",
             out.getvalue())
         self.assertIn("people_unique = models.ForeignKey(InspectdbPeople, unique=True)",
