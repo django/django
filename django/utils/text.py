@@ -271,7 +271,7 @@ def phone2numeric(phone):
          'n': '6', 'o': '6', 'p': '7', 'q': '7', 'r': '7', 's': '7', 't': '8',
          'u': '8', 'v': '8', 'w': '9', 'x': '9', 'y': '9', 'z': '9',
         }
-    return u''.join(char2number.get(c,c) for c in phone.lower())
+    return u''.join(char2number.get(c, c) for c in phone.lower())
 phone2numeric = allow_lazy(phone2numeric)
 
 # From http://www.xhaus.com/alan/python/httpcomp.html#gzip
