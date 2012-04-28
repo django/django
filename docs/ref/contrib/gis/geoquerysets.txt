@@ -714,7 +714,7 @@ the distance from the `Tasmanian`__ city of Hobart to every other
 :class:`PointField` in the ``AustraliaCity`` queryset is calculated::
 
     >>> pnt = AustraliaCity.objects.get(name='Hobart').point
-    >>> for city in AustraliaCity.objects.distance(pnt): print city.name, city.distance
+    >>> for city in AustraliaCity.objects.distance(pnt): print(city.name, city.distance)
     Wollongong 990071.220408 m
     Shellharbour 972804.613941 m
     Thirroul 1002334.36351 m
@@ -874,9 +874,9 @@ Example::
 
     >>> qs = Zipcode.objects.all().transform() # Transforms to WGS84
     >>> qs = Zipcode.objects.all().transform(32140) # Transforming to "NAD83 / Texas South Central"
-    >>> print qs[0].poly.srid
+    >>> print(qs[0].poly.srid)
     32140
-    >>> print qs[0].poly
+    >>> print(qs[0].poly)
     POLYGON ((234055.1698884720099159 4937796.9232223574072123 ...
 
 ``translate``
@@ -990,7 +990,7 @@ Attaches a ``gml`` attribute to every model in the queryset that contains the
 Example::
 
     >>> qs = Zipcode.objects.all().gml()
-    >>> print qs[0].gml
+    >>> print(qs[0].gml)
     <gml:Polygon srsName="EPSG:4326"><gml:OuterBoundaryIs>-147.78711,70.245363 ...  -147.78711,70.245363</gml:OuterBoundaryIs></gml:Polygon>
 
 =====================  =====================================================
@@ -1023,7 +1023,7 @@ necessary.
 Example::
 
     >>> qs = Zipcode.objects.all().kml()
-    >>> print qs[0].kml
+    >>> print(qs[0].kml)
     <Polygon><outerBoundaryIs><LinearRing><coordinates>-103.04135,36.217596,0 ... -103.04135,36.217596,0</coordinates></LinearRing></outerBoundaryIs></Polygon>
 
 =====================  =====================================================
@@ -1128,7 +1128,7 @@ lower left coordinate and the upper right coordinate.
 Example::
 
     >>> qs = City.objects.filter(name__in=('Houston', 'Dallas'))
-    >>> print qs.extent()
+    >>> print(qs.extent())
     (-96.8016128540039, 29.7633724212646, -95.3631439208984, 32.782058715820)
 
 ``extent3d``
@@ -1146,7 +1146,7 @@ the lower left coordinate and upper right coordinate.
 Example::
 
     >>> qs = City.objects.filter(name__in=('Houston', 'Dallas'))
-    >>> print qs.extent3d()
+    >>> print(qs.extent3d())
     (-96.8016128540039, 29.7633724212646, 0, -95.3631439208984, 32.782058715820, 0)
 
 ``make_line``
@@ -1161,7 +1161,7 @@ Returns a ``LineString`` constructed from the point field geometries in the
 
 Example::
 
-     >>> print City.objects.filter(name__in=('Houston', 'Dallas')).make_line()
+     >>> print(City.objects.filter(name__in=('Houston', 'Dallas')).make_line())
      LINESTRING (-95.3631510000000020 29.7633739999999989, -96.8016109999999941 32.7820570000000018)
 
 ``unionagg``

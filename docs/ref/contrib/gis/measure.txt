@@ -22,41 +22,41 @@ instantiated in units of kilometers (``km``) and miles (``mi``)::
 
     >>> from django.contrib.gis.measure import Distance, D
     >>> d1 = Distance(km=5)
-    >>> print d1
+    >>> print(d1)
     5.0 km
     >>> d2 = D(mi=5) # `D` is an alias for `Distance`
-    >>> print d2
+    >>> print(d2)
     5.0 mi
 
 Conversions are easy, just access the preferred unit attribute to get a
 converted distance quantity::
 
-    >>> print d1.mi # Converting 5 kilometers to miles
+    >>> print(d1.mi) # Converting 5 kilometers to miles
     3.10685596119
-    >>> print d2.km # Converting 5 miles to kilometers
+    >>> print(d2.km) # Converting 5 miles to kilometers
     8.04672
 
 Moreover, arithmetic operations may be performed between the distance
 objects::
 
-    >>> print d1 + d2 # Adding 5 miles to 5 kilometers
+    >>> print(d1 + d2) # Adding 5 miles to 5 kilometers
     13.04672 km
-    >>> print d2 - d1 # Subtracting 5 kilometers from 5 miles
+    >>> print(d2 - d1) # Subtracting 5 kilometers from 5 miles
     1.89314403881 mi
 
 Two :class:`Distance` objects multiplied together will yield an :class:`Area`
 object, which uses squared units of measure::
 
     >>> a = d1 * d2 # Returns an Area object.
-    >>> print a
+    >>> print(a)
     40.2336 sq_km
 
 To determine what the attribute abbreviation of a unit is, the ``unit_attname``
 class method may be used::
 
-    >>> print Distance.unit_attname('US Survey Foot')
+    >>> print(Distance.unit_attname('US Survey Foot'))
     survey_ft
-    >>> print Distance.unit_attname('centimeter')
+    >>> print(Distance.unit_attname('centimeter'))
     cm
 
 .. _supported_units:
@@ -127,7 +127,7 @@ Measurement API
    Returns the distance value in units corresponding to the given unit
    attribute.  For example::
 
-       >>> print dist.km
+       >>> print(dist.km)
        8.04672
 
    .. classmethod:: unit_attname(unit_name)
@@ -159,7 +159,7 @@ Measurement API
    Returns the area value in units corresponding to the given unit
    attribute.  For example::
 
-       >>> print a.sq_km
+       >>> print(a.sq_km)
        12.949940551680001
 
    .. classmethod:: unit_attname(unit_name)

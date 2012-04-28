@@ -134,7 +134,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
     def test01d_errors(self):
         "Testing the Error handlers."
         # string-based
-        print "\nBEGIN - expecting GEOS_ERROR; safe to ignore.\n"
+        print("\nBEGIN - expecting GEOS_ERROR; safe to ignore.\n")
         for err in self.geometries.errors:
             try:
                 g = fromstr(err.wkt)
@@ -144,7 +144,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         # Bad WKB
         self.assertRaises(GEOSException, GEOSGeometry, buffer('0'))
 
-        print "\nEND - expecting GEOS_ERROR; safe to ignore.\n"
+        print("\nEND - expecting GEOS_ERROR; safe to ignore.\n")
 
         class NotAGeometry(object):
             pass
@@ -439,7 +439,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
     def test05b_multipolygons(self):
         "Testing MultiPolygon objects."
-        print "\nBEGIN - expecting GEOS_NOTICE; safe to ignore.\n"
+        print("\nBEGIN - expecting GEOS_NOTICE; safe to ignore.\n")
         prev = fromstr('POINT (0 0)')
         for mp in self.geometries.multipolygons:
             mpoly = fromstr(mp.wkt)
@@ -458,7 +458,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
                     self.assertEqual(p.valid, True)
                 self.assertEqual(mpoly.wkt, MultiPolygon(*tuple(poly.clone() for poly in mpoly)).wkt)
 
-        print "\nEND - expecting GEOS_NOTICE; safe to ignore.\n"
+        print("\nEND - expecting GEOS_NOTICE; safe to ignore.\n")
 
     def test06a_memory_hijinks(self):
         "Testing Geometry __del__() on rings and polygons."
@@ -995,7 +995,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         self.assertTrue(isinstance(g.valid_reason, basestring))
         self.assertEqual(g.valid_reason, "Valid Geometry")
 
-        print "\nBEGIN - expecting GEOS_NOTICE; safe to ignore.\n"
+        print("\nBEGIN - expecting GEOS_NOTICE; safe to ignore.\n")
 
         g = GEOSGeometry("LINESTRING(0 0, 0 0)")
 
@@ -1003,7 +1003,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         self.assertTrue(isinstance(g.valid_reason, basestring))
         self.assertTrue(g.valid_reason.startswith("Too few points in geometry component"))
 
-        print "\nEND - expecting GEOS_NOTICE; safe to ignore.\n"
+        print("\nEND - expecting GEOS_NOTICE; safe to ignore.\n")
 
     def test28_geos_version(self):
         "Testing the GEOS version regular expression."

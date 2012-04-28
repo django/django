@@ -24,7 +24,7 @@ def gather_stats(p):
             prof = stats.load(os.path.join(p, f))
         else:
             continue
-        print "Processing %s" % f
+        print("Processing %s" % f)
         if path in profiles:
             profiles[path].add(prof)
         else:

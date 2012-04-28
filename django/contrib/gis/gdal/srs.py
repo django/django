@@ -4,7 +4,7 @@
   Example:
   >>> from django.contrib.gis.gdal import SpatialReference
   >>> srs = SpatialReference('WGS84')
-  >>> print srs
+  >>> print(srs)
   GEOGCS["WGS 84",
       DATUM["WGS_1984",
           SPHEROID["WGS 84",6378137,298.257223563,
@@ -16,14 +16,14 @@
       UNIT["degree",0.01745329251994328,
           AUTHORITY["EPSG","9122"]],
       AUTHORITY["EPSG","4326"]]
-  >>> print srs.proj
+  >>> print(srs.proj)
   +proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs
-  >>> print srs.ellipsoid
+  >>> print(srs.ellipsoid)
   (6378137.0, 6356752.3142451793, 298.25722356300003)
-  >>> print srs.projected, srs.geographic
+  >>> print(srs.projected, srs.geographic)
   False True
   >>> srs.import_epsg(32140)
-  >>> print srs.name
+  >>> print(srs.name)
   NAD83 / Texas South Central
 """
 from ctypes import byref, c_char_p, c_int
@@ -103,19 +103,19 @@ class SpatialReference(GDALBase):
 
         >>> wkt = 'GEOGCS["WGS 84", DATUM["WGS_1984, ... AUTHORITY["EPSG","4326"]]')
         >>> srs = SpatialReference(wkt) # could also use 'WGS84', or 4326
-        >>> print srs['GEOGCS']
+        >>> print(srs['GEOGCS'])
         WGS 84
-        >>> print srs['DATUM']
+        >>> print(srs['DATUM'])
         WGS_1984
-        >>> print srs['AUTHORITY']
+        >>> print(srs['AUTHORITY'])
         EPSG
-        >>> print srs['AUTHORITY', 1] # The authority value
+        >>> print(srs['AUTHORITY', 1]) # The authority value
         4326
-        >>> print srs['TOWGS84', 4] # the fourth value in this wkt
+        >>> print(srs['TOWGS84', 4]) # the fourth value in this wkt
         0
-        >>> print srs['UNIT|AUTHORITY'] # For the units authority, have to use the pipe symbole.
+        >>> print(srs['UNIT|AUTHORITY']) # For the units authority, have to use the pipe symbole.
         EPSG
-        >>> print srs['UNIT|AUTHORITY', 1] # The authority value for the untis
+        >>> print(srs['UNIT|AUTHORITY', 1]) # The authority value for the untis
         9122
         """
         if isinstance(target, tuple):

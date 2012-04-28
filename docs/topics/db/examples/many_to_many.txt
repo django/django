@@ -263,14 +263,14 @@ Bulk delete some Publications - references to deleted publications should go::
 Bulk delete some articles - references to deleted objects should go::
 
     >>> q = Article.objects.filter(headline__startswith='Django')
-    >>> print q
+    >>> print(q)
     [<Article: Django lets you build Web apps easily>]
     >>> q.delete()
 
 After the delete, the QuerySet cache needs to be cleared, and the referenced
 objects should be gone::
 
-    >>> print q
+    >>> print(q)
     []
     >>> p1.article_set.all()
     [<Article: NASA uses Python>]

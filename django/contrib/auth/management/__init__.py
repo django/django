@@ -54,7 +54,7 @@ def create_permissions(app, created_models, verbosity, **kwargs):
     auth_app.Permission.objects.bulk_create(objs)
     if verbosity >= 2:
         for obj in objs:
-            print "Adding permission '%s'" % obj
+            print("Adding permission '%s'" % obj)
 
 
 def create_superuser(app, created_models, verbosity, db, **kwargs):

@@ -126,7 +126,7 @@ def setup(verbosity, test_labels):
         # this module and add it to the list to test.
         if not test_labels or module_name in test_labels_set:
             if verbosity >= 2:
-                print "Importing application %s" % module_name
+                print("Importing application %s" % module_name)
             mod = load_app(module_label)
             if mod:
                 if module_label not in settings.INSTALLED_APPS:
@@ -178,7 +178,7 @@ def bisect_tests(bisection_label, options, test_labels):
         from django.db.models.loading import get_apps
         test_labels = [app.__name__.split('.')[-2] for app in get_apps()]
 
-    print '***** Bisecting test suite:',' '.join(test_labels)
+    print('***** Bisecting test suite: %s' % ' '.join(test_labels))
 
     # Make sure the bisection point isn't in the test list
     # Also remove tests that need to be run in specific combinations
@@ -202,44 +202,44 @@ def bisect_tests(bisection_label, options, test_labels):
         midpoint = len(test_labels)/2
         test_labels_a = test_labels[:midpoint] + [bisection_label]
         test_labels_b = test_labels[midpoint:] + [bisection_label]
-        print '***** Pass %da: Running the first half of the test suite' % iteration
-        print '***** Test labels:',' '.join(test_labels_a)
+        print('***** Pass %da: Running the first half of the test suite' % iteration)
+        print('***** Test labels: %s' % ' '.join(test_labels_a))
         failures_a = subprocess.call(subprocess_args + test_labels_a)
 
-        print '***** Pass %db: Running the second half of the test suite' % iteration
-        print '***** Test labels:',' '.join(test_labels_b)
-        print
+        print('***** Pass %db: Running the second half of the test suite' % iteration)
+        print('***** Test labels: %s' % ' '.join(test_labels_b))
+        print('')
         failures_b = subprocess.call(subprocess_args + test_labels_b)
 
         if failures_a and not failures_b:
-            print "***** Problem found in first half. Bisecting again..."
+            print("***** Problem found in first half. Bisecting again...")
             iteration = iteration + 1
             test_labels = test_labels_a[:-1]
         elif failures_b and not failures_a:
-            print "***** Problem found in second half. Bisecting again..."
+            print("***** Problem found in second half. Bisecting again...")
             iteration = iteration + 1
             test_labels = test_labels_b[:-1]
         elif failures_a and failures_b:
-            print "***** Multiple sources of failure found"
+            print("***** Multiple sources of failure found")
             break
         else:
-            print "***** No source of failure found... try pair execution (--pair)"
+            print("***** No source of failure found... try pair execution (--pair)")
             break
 
     if len(test_labels) == 1:
-        print "***** Source of error:",test_labels[0]
+        print("***** Source of error: %s" % test_labels[0])
     teardown(state)
 
 def paired_tests(paired_test, options, test_labels):
     state = setup(int(options.verbosity), test_labels)
 
     if not test_labels:
-        print ""
+        print("")
         # Get the full list of test labels to use for bisection
         from django.db.models.loading import get_apps
         test_labels = [app.__name__.split('.')[-2] for app in get_apps()]
 
-    print '***** Trying paired execution'
+    print('***** Trying paired execution')
 
     # Make sure the constant member of the pair isn't in the test list
     # Also remove tests that need to be run in specific combinations
@@ -259,14 +259,14 @@ def paired_tests(paired_test, options, test_labels):
         subprocess_args.append('--noinput')
 
     for i, label in enumerate(test_labels):
-        print '***** %d of %d: Check test pairing with %s' % (
-            i+1, len(test_labels), label)
+        print('***** %d of %d: Check test pairing with %s' % (
+              i + 1, len(test_labels), label))
         failures = subprocess.call(subprocess_args + [label, paired_test])
         if failures:
-            print '***** Found problem pair with',label
+            print('***** Found problem pair with %s' % label)
             return
 
-    print '***** No problem pair found'
+    print('***** No problem pair found')
     teardown(state)
 
 if __name__ == "__main__":

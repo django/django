@@ -40,7 +40,7 @@ This is best illustrated with an example. Suppose you've got the following model
 You could then execute custom SQL like so::
 
     >>> for p in Person.objects.raw('SELECT * FROM myapp_person'):
-    ...     print p
+    ...     print(p)
     John Smith
     Jane Jones
 
@@ -128,8 +128,8 @@ The ``Person`` objects returned by this query will be deferred model instances
 fields that are omitted from the query will be loaded on demand. For example::
 
     >>> for p in Person.objects.raw('SELECT id, first_name FROM myapp_person'):
-    ...     print p.first_name, # This will be retrieved by the original query
-    ...     print p.last_name # This will be retrieved on demand
+    ...     print(p.first_name, # This will be retrieved by the original query
+    ...           p.last_name) # This will be retrieved on demand
     ...
     John Smith
     Jane Jones
@@ -153,7 +153,7 @@ of people with their ages calculated by the database::
 
     >>> people = Person.objects.raw('SELECT *, age(birth_date) AS age FROM myapp_person')
     >>> for p in people:
-    ...     print "%s is %s." % (p.first_name, p.age)
+    ...     print("%s is %s." % (p.first_name, p.age))
     John is 37.
     Jane is 42.
     ...

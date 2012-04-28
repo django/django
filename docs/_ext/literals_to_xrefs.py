@@ -136,10 +136,10 @@ def colorize(text='', opts=(), **kwargs):
         colorize('hello', fg='red', bg='blue', opts=('blink',))
         colorize()
         colorize('goodbye', opts=('underscore',))
-        print colorize('first line', fg='red', opts=('noreset',))
-        print 'this should be red too'
-        print colorize('and so should this')
-        print 'this should not be red'
+        print(colorize('first line', fg='red', opts=('noreset',)))
+        print('this should be red too')
+        print(colorize('and so should this'))
+        print('this should not be red')
     """
     color_names = ('black', 'red', 'green', 'yellow', 'blue', 'magenta', 'cyan', 'white')
     foreground = dict([(color_names[x], '3%s' % x) for x in range(8)])
@@ -168,4 +168,4 @@ if __name__ == '__main__':
     try:
         fixliterals(sys.argv[1])
     except (KeyboardInterrupt, SystemExit):
-        print
+        print('')

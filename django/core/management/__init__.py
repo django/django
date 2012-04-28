@@ -299,7 +299,7 @@ class ManagementUtility(object):
 
         # subcommand
         if cword == 1:
-            print ' '.join(sorted(filter(lambda x: x.startswith(curr), subcommands)))
+            print(' '.join(sorted(filter(lambda x: x.startswith(curr), subcommands))))
         # subcommand options
         # special case: the 'help' subcommand has no options
         elif cwords[0] in subcommands and cwords[0] != 'help':
@@ -333,7 +333,7 @@ class ManagementUtility(object):
                 # append '=' to options which require args
                 if option[1]:
                     opt_label += '='
-                print opt_label
+                print(opt_label)
         sys.exit(1)
 
     def execute(self):

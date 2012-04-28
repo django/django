@@ -69,7 +69,7 @@ takes one argument -- the raw template code::
 
     >>> from django.template import Template
     >>> t = Template("My name is {{ my_name }}.")
-    >>> print t
+    >>> print(t)
     <django.template.Template instance>
 
 .. admonition:: Behind the scenes

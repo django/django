@@ -112,7 +112,7 @@ We've specified ``auto_id=False`` to simplify the output::
     ...     url = forms.URLField(label='Your Web site', required=False)
     ...     comment = forms.CharField()
     >>> f = CommentForm(auto_id=False)
-    >>> print f
+    >>> print(f)
     <tr><th>Your name:</th><td><input type="text" name="name" /></td></tr>
     <tr><th>Your Web site:</th><td><input type="text" name="url" /></td></tr>
     <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
@@ -135,7 +135,7 @@ field is initialized to a particular value. For example::
     ...     url = forms.URLField(initial='http://')
     ...     comment = forms.CharField()
     >>> f = CommentForm(auto_id=False)
-    >>> print f
+    >>> print(f)
     <tr><th>Name:</th><td><input type="text" name="name" value="Your name" /></td></tr>
     <tr><th>Url:</th><td><input type="text" name="url" value="http://" /></td></tr>
     <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
@@ -150,7 +150,7 @@ and the HTML output will include any validation errors::
     ...     comment = forms.CharField()
     >>> default_data = {'name': 'Your name', 'url': 'http://'}
     >>> f = CommentForm(default_data, auto_id=False)
-    >>> print f
+    >>> print(f)
     <tr><th>Name:</th><td><input type="text" name="name" value="Your name" /></td></tr>
     <tr><th>Url:</th><td><ul class="errorlist"><li>Enter a valid URL.</li></ul><input type="text" name="url" value="http://" /></td></tr>
     <tr><th>Comment:</th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="comment" /></td></tr>
@@ -179,7 +179,7 @@ Instead of a constant, you can also pass any callable::
     >>> import datetime
     >>> class DateForm(forms.Form):
     ...     day = forms.DateField(initial=datetime.date.today)
-    >>> print DateForm()
+    >>> print(DateForm())
     <tr><th>Day:</th><td><input type="text" name="day" value="12/23/2008" /><td></tr>
 
 The callable will be evaluated only when the unbound form is displayed, not when it is defined.
@@ -211,17 +211,17 @@ fields. We've specified ``auto_id=False`` to simplify the output::
     ...     sender = forms.EmailField(help_text='A valid email address, please.')
     ...     cc_myself = forms.BooleanField(required=False)
     >>> f = HelpTextContactForm(auto_id=False)
-    >>> print f.as_table()
+    >>> print(f.as_table())
     <tr><th>Subject:</th><td><input type="text" name="subject" maxlength="100" /><br /><span class="helptext">100 characters max.</span></td></tr>
     <tr><th>Message:</th><td><input type="text" name="message" /></td></tr>
     <tr><th>Sender:</th><td><input type="text" name="sender" /><br />A valid email address, please.</td></tr>
     <tr><th>Cc myself:</th><td><input type="checkbox" name="cc_myself" /></td></tr>
-    >>> print f.as_ul()
+    >>> print(f.as_ul()))
     <li>Subject: <input type="text" name="subject" maxlength="100" /> <span class="helptext">100 characters max.</span></li>
     <li>Message: <input type="text" name="message" /></li>
     <li>Sender: <input type="text" name="sender" /> A valid email address, please.</li>
     <li>Cc myself: <input type="checkbox" name="cc_myself" /></li>
-    >>> print f.as_p()
+    >>> print(f.as_p())
     <p>Subject: <input type="text" name="subject" maxlength="100" /> <span class="helptext">100 characters max.</span></p>
     <p>Message: <input type="text" name="message" /></p>
     <p>Sender: <input type="text" name="sender" /> A valid email address, please.</p>

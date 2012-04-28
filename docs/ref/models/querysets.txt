@@ -29,7 +29,7 @@ You can evaluate a ``QuerySet`` in the following ways:
   the headline of all entries in the database::
 
       for e in Entry.objects.all():
-          print e.headline
+          print(e.headline)
 
 * **Slicing.** As explained in :ref:`limiting-querysets`, a ``QuerySet`` can
   be sliced, using Python's array-slicing syntax. Slicing an unevaluated
@@ -71,7 +71,7 @@ You can evaluate a ``QuerySet`` in the following ways:
   ``True``, otherwise ``False``. For example::
 
       if Entry.objects.filter(headline="Test"):
-         print "There is at least one Entry with the headline Test"
+         print("There is at least one Entry with the headline Test")
 
   Note: *Don't* use this if all you want to do is determine if at least one
   result exists, and don't need the actual objects. It's more efficient to
@@ -1251,7 +1251,7 @@ The :exc:`~django.core.exceptions.DoesNotExist` exception inherits from
         e = Entry.objects.get(id=3)
         b = Blog.objects.get(id=1)
     except ObjectDoesNotExist:
-        print "Either the entry or blog doesn't exist."
+        print("Either the entry or blog doesn't exist.")
 
 create
 ~~~~~~

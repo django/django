@@ -6,7 +6,7 @@ Usage:
 >>> import datetime
 >>> d = datetime.datetime.now()
 >>> df = DateFormat(d)
->>> print df.format('jS F Y H:i')
+>>> print(df.format('jS F Y H:i'))
 7th October 2003 11:39
 >>>
 """

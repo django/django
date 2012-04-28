@@ -362,24 +362,24 @@ Now, the world borders shapefile may be opened using GeoDjango's
 
     >>> from django.contrib.gis.gdal import DataSource
     >>> ds = DataSource(world_shp)
-    >>> print ds
+    >>> print(ds)
     / ... /geodjango/world/data/TM_WORLD_BORDERS-0.3.shp (ESRI Shapefile)
 
 Data source objects can have different layers of geospatial features; however,
 shapefiles are only allowed to have one layer::
 
-    >>> print len(ds)
+    >>> print(len(ds))
     1
     >>> lyr = ds[0]
-    >>> print lyr
+    >>> print(lyr)
     TM_WORLD_BORDERS-0.3
 
 You can see what the geometry type of the layer is and how many features it
 contains::
 
-    >>> print lyr.geom_type
+    >>> print(lyr.geom_type)
     Polygon
-    >>> print len(lyr)
+    >>> print(len(lyr))
     246
 
 .. note::
@@ -397,7 +397,7 @@ system associated with it -- if it does, the ``srs`` attribute will return a
 :class:`~django.contrib.gis.gdal.SpatialReference` object::
 
     >>> srs = lyr.srs
-    >>> print srs
+    >>> print(srs)
     GEOGCS["GCS_WGS_1984",
         DATUM["WGS_1984",
             SPHEROID["WGS_1984",6378137.0,298.257223563]],
@@ -413,7 +413,7 @@ latitude.
 In addition, shapefiles also support attribute fields that may contain
 additional data.  Here are the fields on the World Borders layer:
 
-    >>> print lyr.fields
+    >>> print(lyr.fields)
     ['FIPS', 'ISO2', 'ISO3', 'UN', 'NAME', 'AREA', 'POP2005', 'REGION', 'SUBREGION', 'LON', 'LAT']
 
 Here we are examining the OGR types (e.g., whether a field is an integer or
@@ -428,7 +428,7 @@ feature's attribute fields (whose **values** are accessed via ``get()``
 method)::
 
     >>> for feat in lyr:
-    ...    print feat.get('NAME'), feat.geom.num_points
+    ...    print(feat.get('NAME'), feat.geom.num_points)
     ...
     Guernsey 18
     Jersey 26
@@ -443,16 +443,16 @@ method)::
 And individual features may be retrieved by their feature ID::
 
     >>> feat = lyr[234]
-    >>> print feat.get('NAME')
+    >>> print(feat.get('NAME'))
     San Marino
 
 Here the boundary geometry for San Marino is extracted and looking
 exported to WKT and GeoJSON::
 
     >>> geom = feat.geom
-    >>> print geom.wkt
+    >>> print(geom.wkt)
     POLYGON ((12.415798 43.957954,12.450554 ...
-    >>> print geom.json
+    >>> print(geom.json)
     { "type": "Polygon", "coordinates": [ [ [ 12.415798, 43.957954 ], [ 12.450554, 43.979721 ], ...
 
 
@@ -659,7 +659,7 @@ in transformation SQL, allowing the developer to work at a higher level
 of abstraction::
 
     >>> qs = WorldBorder.objects.filter(mpoly__intersects=pnt)
-    >>> print qs.query # Generating the SQL
+    >>> print(qs.query) # Generating the SQL
     SELECT "world_worldborder"."id", "world_worldborder"."name", "world_worldborder"."area",
     "world_worldborder"."pop2005", "world_worldborder"."fips", "world_worldborder"."iso2",
     "world_worldborder"."iso3", "world_worldborder"."un", "world_worldborder"."region",

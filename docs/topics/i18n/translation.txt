@@ -436,7 +436,7 @@ languages::
 
     >>> from django.utils.translation import get_language_info
     >>> li = get_language_info('de')
-    >>> print li['name'], li['name_local'], li['bidi']
+    >>> print(li['name'], li['name_local'], li['bidi'])
     German Deutsch False
 
 The ``name`` and ``name_local`` attributes of the dictionary contain the name of

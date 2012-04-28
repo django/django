@@ -68,8 +68,8 @@ def ogrinspect(*args, **kwargs):
     shp_file = 'data/mapping_hacks/world_borders.shp'
     model_name = 'WorldBorders'
 
-    print ogrinspect(shp_file, model_name, multi_geom=True, srid=4326,
-                     geom_name='shapes', blank=True)
+    print(ogrinspect(shp_file, model_name, multi_geom=True, srid=4326,
+                     geom_name='shapes', blank=True))
 
     Required Arguments
      `datasource` => string or DataSource object to file pointer

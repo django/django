@@ -327,7 +327,7 @@ Once the object has been saved, you must reload the object in order to access
 the actual value that was applied to the updated field::
 
     >>> product = Products.objects.get(pk=product.pk)
-    >>> print product.number_sold
+    >>> print(product.number_sold)
     42
 
 For more details, see the documentation on :ref:`F() expressions

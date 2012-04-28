@@ -319,29 +319,29 @@ def main(pythonpaths):
         found = search_python_list(python_code, to_search)
 
         # Display:
-        print t.absolute_filename
+        print(t.absolute_filename)
         for r in t.relative_filenames:
-            print u"  AKA %s" % r
-        print u"  POST forms: %s" % num_post_forms
-        print u"  With token: %s" % (num_post_forms - len(form_lines_without_token))
+            print("  AKA %s" % r)
+        print("  POST forms: %s" % num_post_forms)
+        print("  With token: %s" % (num_post_forms - len(form_lines_without_token)))
         if form_lines_without_token:
-            print u"  Without token:"
+            print("  Without token:")
             for ln in form_lines_without_token:
-                print "%s:%d:" % (t.absolute_filename, ln)
-        print
-        print u"  Searching for:"
+                print("%s:%d:" % (t.absolute_filename, ln))
+        print('')
+        print("  Searching for:")
         for r in to_search:
-            print u"    " + r
-        print
-        print u"  Found:"
+            print("    " + r)
+        print('')
+        print("  Found:")
         if len(found) == 0:
-            print "    Nothing"
+            print("    Nothing")
         else:
             for fn, ln in found:
-                print "%s:%d:" % (fn, ln)
+                print("%s:%d:" % (fn, ln))
 
-        print
-        print "----"
+        print('')
+        print("----")
 
 
 parser = OptionParser(usage=USAGE)
@@ -356,7 +356,7 @@ if __name__ == '__main__':
     settings = getattr(options, 'settings', None)
     if settings is None:
         if os.environ.get("DJANGO_SETTINGS_MODULE", None) is None:
-            print "You need to set DJANGO_SETTINGS_MODULE or use the '--settings' parameter"
+            print("You need to set DJANGO_SETTINGS_MODULE or use the '--settings' parameter")
             sys.exit(1)
     else:
         os.environ["DJANGO_SETTINGS_MODULE"] = settings

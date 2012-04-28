@@ -114,7 +114,7 @@ __ http://www.gdal.org/ogr/ogr_formats.html
    information about each layer in a :class:`DataSource`::
 
        >>> for layer in ds:
-       ...     print 'Layer "%s": %i %ss' % (layer.name, len(layer), layer.geom_type.name)
+       ...     print('Layer "%s": %i %ss' % (layer.name, len(layer), layer.geom_type.name))
        ...
        Layer "cities": 3 Points
 
@@ -200,7 +200,7 @@ __ http://www.gdal.org/ogr/ogr_formats.html
    Property that returns the :class:`SpatialReference` associated
    with this layer::
 
-       >>> print layer.srs
+       >>> print(layer.srs)
        GEOGCS["GCS_WGS_1984",
            DATUM["WGS_1984",
                SPHEROID["WGS_1984",6378137,298.257223563]],
@@ -220,9 +220,9 @@ __ http://www.gdal.org/ogr/ogr_formats.html
    other than ``None``, only features that intersect the filter will be
    returned when iterating over the layer::
 
-       >>> print layer.spatial_filter
+       >>> print(layer.spatial_filter)
        None
-       >>> print len(layer)
+       >>> print(len(layer))
        3
        >>> [feat.get('Name') for feat in layer]
        ['Pueblo', 'Lawrence', 'Houston']
@@ -814,7 +814,7 @@ systems and coordinate transformation::
        >>> gt1 = OGRGeomType(3)             # Using an integer for the type
        >>> gt2 = OGRGeomType('Polygon')     # Using a string
        >>> gt3 = OGRGeomType('POLYGON')     # It's case-insensitive
-       >>> print gt1 == 3, gt1 == 'Polygon' # Equivalence works w/non-OGRGeomType objects
+       >>> print(gt1 == 3, gt1 == 'Polygon') # Equivalence works w/non-OGRGeomType objects
        True True
 
    .. attribute:: name
@@ -927,19 +927,19 @@ Coordinate System Objects
 
        >>> wkt = 'GEOGCS["WGS 84", DATUM["WGS_1984, ... AUTHORITY["EPSG","4326"]]')
        >>> srs = SpatialReference(wkt) # could also use 'WGS84', or 4326
-       >>> print srs['GEOGCS']
+       >>> print(srs['GEOGCS'])
        WGS 84
-       >>> print srs['DATUM']
+       >>> print(srs['DATUM'])
        WGS_1984
-       >>> print srs['AUTHORITY']
+       >>> print(srs['AUTHORITY'])
        EPSG
-       >>> print srs['AUTHORITY', 1] # The authority value
+       >>> print(srs['AUTHORITY', 1]) # The authority value
        4326
-       >>> print srs['TOWGS84', 4] # the fourth value in this wkt
+       >>> print(srs['TOWGS84', 4]) # the fourth value in this wkt
        0
-       >>> print srs['UNIT|AUTHORITY'] # For the units authority, have to use the pipe symbol.
+       >>> print(srs['UNIT|AUTHORITY']) # For the units authority, have to use the pipe symbol.
        EPSG
-       >>> print srs['UNIT|AUTHORITY', 1] # The authority value for the units
+       >>> print(srs['UNIT|AUTHORITY', 1]) # The authority value for the units
        9122
 
    .. method:: attr_value(target, index=0)

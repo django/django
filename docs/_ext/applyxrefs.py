@@ -77,9 +77,9 @@ def main(argv=None):
         target_found, lines = has_target(fn)
         if not target_found:
             if testing:
-                print '%s: %s' % (fn, lines[0]),
+                print('%s: %s' % (fn, lines[0]))
             else:
-                print "Adding xref to %s" % fn
+                print("Adding xref to %s" % fn)
                 process_file(fn, lines)
         else:
             print "Skipping %s: already has a xref" % fn

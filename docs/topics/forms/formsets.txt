@@ -24,7 +24,7 @@ would with a regular form::
 
     >>> formset = ArticleFormSet()
     >>> for form in formset:
-    ...     print form.as_table()
+    ...     print(form.as_table())
     <tr><th><label for="id_form-0-title">Title:</label></th><td><input type="text" name="form-0-title" id="id_form-0-title" /></td></tr>
     <tr><th><label for="id_form-0-pub_date">Pub date:</label></th><td><input type="text" name="form-0-pub_date" id="id_form-0-pub_date" /></td></tr>
 
@@ -42,7 +42,7 @@ the formset you iterated over the ``forms`` attribute::
 
     >>> formset = ArticleFormSet()
     >>> for form in formset.forms:
-    ...     print form.as_table()
+    ...     print(form.as_table())
 
 Iterating over ``formset.forms`` will render the forms in the order
 they were created. The default formset iterator also renders the forms
@@ -71,7 +71,7 @@ example::
     ... ])
 
     >>> for form in formset:
-    ...     print form.as_table()
+    ...     print(form.as_table())
     <tr><th><label for="id_form-0-title">Title:</label></th><td><input type="text" name="form-0-title" value="Django is now open source" id="id_form-0-title" /></td></tr>
     <tr><th><label for="id_form-0-pub_date">Pub date:</label></th><td><input type="text" name="form-0-pub_date" value="2008-05-12" id="id_form-0-pub_date" /></td></tr>
     <tr><th><label for="id_form-1-title">Title:</label></th><td><input type="text" name="form-1-title" id="id_form-1-title" /></td></tr>
@@ -98,7 +98,7 @@ limit the maximum number of empty forms the formset will display::
     >>> ArticleFormSet = formset_factory(ArticleForm, extra=2, max_num=1)
     >>> formset = ArticleFormset()
     >>> for form in formset:
-    ...     print form.as_table()
+    ...     print(form.as_table())
     <tr><th><label for="id_form-0-title">Title:</label></th><td><input type="text" name="form-0-title" id="id_form-0-title" /></td></tr>
     <tr><th><label for="id_form-0-pub_date">Pub date:</label></th><td><input type="text" name="form-0-pub_date" id="id_form-0-pub_date" /></td></tr>
 
@@ -283,7 +283,7 @@ Lets you create a formset with the ability to order::
     ...     {'title': u'Article #2', 'pub_date': datetime.date(2008, 5, 11)},
     ... ])
     >>> for form in formset:
-    ...     print form.as_table()
+    ...     print(form.as_table())
     <tr><th><label for="id_form-0-title">Title:</label></th><td><input type="text" name="form-0-title" value="Article #1" id="id_form-0-title" /></td></tr>
     <tr><th><label for="id_form-0-pub_date">Pub date:</label></th><td><input type="text" name="form-0-pub_date" value="2008-05-10" id="id_form-0-pub_date" /></td></tr>
     <tr><th><label for="id_form-0-ORDER">Order:</label></th><td><input type="text" name="form-0-ORDER" value="1" id="id_form-0-ORDER" /></td></tr>
@@ -321,7 +321,7 @@ happen when the user changes these values::
     >>> formset.is_valid()
     True
     >>> for form in formset.ordered_forms:
-    ...     print form.cleaned_data
+    ...     print(form.cleaned_data)
     {'pub_date': datetime.date(2008, 5, 1), 'ORDER': 0, 'title': u'Article #3'}
     {'pub_date': datetime.date(2008, 5, 11), 'ORDER': 1, 'title': u'Article #2'}
     {'pub_date': datetime.date(2008, 5, 10), 'ORDER': 2, 'title': u'Article #1'}
@@ -339,7 +339,7 @@ Lets you create a formset with the ability to delete::
     ...     {'title': u'Article #2', 'pub_date': datetime.date(2008, 5, 11)},
     ... ])
     >>> for form in formset:
-    ....    print form.as_table()
+    ....    print(form.as_table())
     <input type="hidden" name="form-TOTAL_FORMS" value="3" id="id_form-TOTAL_FORMS" /><input type="hidden" name="form-INITIAL_FORMS" value="2" id="id_form-INITIAL_FORMS" /><input type="hidden" name="form-MAX_NUM_FORMS" id="id_form-MAX_NUM_FORMS" />
     <tr><th><label for="id_form-0-title">Title:</label></th><td><input type="text" name="form-0-title" value="Article #1" id="id_form-0-title" /></td></tr>
     <tr><th><label for="id_form-0-pub_date">Pub date:</label></th><td><input type="text" name="form-0-pub_date" value="2008-05-10" id="id_form-0-pub_date" /></td></tr>
@@ -393,7 +393,7 @@ default fields/attributes of the order and deletion fields::
     >>> ArticleFormSet = formset_factory(ArticleForm, formset=BaseArticleFormSet)
     >>> formset = ArticleFormSet()
     >>> for form in formset:
-    ...     print form.as_table()
+    ...     print(form.as_table())
     <tr><th><label for="id_form-0-title">Title:</label></th><td><input type="text" name="form-0-title" id="id_form-0-title" /></td></tr>
     <tr><th><label for="id_form-0-pub_date">Pub date:</label></th><td><input type="text" name="form-0-pub_date" id="id_form-0-pub_date" /></td></tr>
     <tr><th><label for="id_form-0-my_field">My field:</label></th><td><input type="text" name="form-0-my_field" id="id_form-0-my_field" /></td></tr>

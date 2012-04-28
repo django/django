@@ -964,7 +964,7 @@ information about the URL pattern that matches a URL::
     # Resolve a URL
     match = resolve('/some/path/')
     # Print the URL pattern that matches the URL
-    print match.url_name
+    print(match.url_name)
 
 A :class:`ResolverMatch` object can also be assigned to a triple::
 

@@ -215,18 +215,18 @@ the content of the response manually::
     # Set up a rendered TemplateResponse
     >>> t = TemplateResponse(request, 'original.html', {})
     >>> t.render()
-    >>> print t.content
+    >>> print(t.content)
     Original content
 
     # Re-rendering doesn't change content
     >>> t.template_name = 'new.html'
     >>> t.render()
-    >>> print t.content
+    >>> print(t.content)
     Original content
 
     # Assigning content does change, no render() call required
     >>> t.content = t.rendered_content
-    >>> print t.content
+    >>> print(t.content)
     New content
 
 Post-render callbacks

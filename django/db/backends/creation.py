@@ -256,8 +256,8 @@ class BaseDatabaseCreation(object):
             test_db_repr = ''
             if verbosity >= 2:
                 test_db_repr = " ('%s')" % test_database_name
-            print "Creating test database for alias '%s'%s..." % (
-                self.connection.alias, test_db_repr)
+            print("Creating test database for alias '%s'%s..." % (
+                self.connection.alias, test_db_repr))
 
         self._create_test_db(verbosity, autoclobber)
 
@@ -339,8 +339,8 @@ class BaseDatabaseCreation(object):
             if autoclobber or confirm == 'yes':
                 try:
                     if verbosity >= 1:
-                        print ("Destroying old test database '%s'..."
-                               % self.connection.alias)
+                        print("Destroying old test database '%s'..."
+                              % self.connection.alias)
                     cursor.execute(
                         "DROP DATABASE %s" % qn(test_database_name))
                     cursor.execute(
@@ -351,7 +351,7 @@ class BaseDatabaseCreation(object):
                         "Got an error recreating the test database: %s\n" % e)
                     sys.exit(2)
             else:
-                print "Tests cancelled."
+                print("Tests cancelled.")
                 sys.exit(1)
 
         return test_database_name
@@ -367,8 +367,8 @@ class BaseDatabaseCreation(object):
             test_db_repr = ''
             if verbosity >= 2:
                 test_db_repr = " ('%s')" % test_database_name
-            print "Destroying test database for alias '%s'%s..." % (
-                self.connection.alias, test_db_repr)
+            print("Destroying test database for alias '%s'%s..." % (
+                self.connection.alias, test_db_repr))
 
         # Temporarily use a new connection and a copy of the settings dict.
         # This prevents the production database from being exposed to potential

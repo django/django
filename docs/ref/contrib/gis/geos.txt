@@ -231,7 +231,7 @@ Property that may be used to retrieve or set the SRID associated with the
 geometry.  For example::
 
     >>> pnt = Point(5, 23)
-    >>> print pnt.srid
+    >>> print(pnt.srid)
     None
     >>> pnt.srid = 4326
     >>> pnt.srid

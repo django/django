@@ -18,7 +18,7 @@ def create_default_site(app, created_models, verbosity, db, **kwargs):
         # the next id will be 1, so we coerce it. See #15573 and #16353. This
         # can also crop up outside of tests - see #15346.
         if verbosity >= 2:
-            print "Creating example.com Site object"
+            print("Creating example.com Site object")
         Site(pk=1, domain="example.com", name="example.com").save(using=db)
 
         # We set an explicit pk instead of relying on auto-incrementation,
@@ -26,7 +26,7 @@ def create_default_site(app, created_models, verbosity, db, **kwargs):
         sequence_sql = connections[db].ops.sequence_reset_sql(no_style(), [Site])
         if sequence_sql:
             if verbosity >= 2:
-                print "Resetting sequence"
+                print("Resetting sequence")
             cursor = connections[db].cursor()
             for command in sequence_sql:
                 cursor.execute(command)

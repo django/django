@@ -55,7 +55,7 @@ We'd like to be able to do things like this in our models (we assume the
 ``hand`` attribute on the model is an instance of ``Hand``)::
 
     example = MyModel.objects.get(pk=1)
-    print example.hand.north
+    print(example.hand.north)
 
     new_hand = Hand(north, east, south, west)
     example.hand = new_hand

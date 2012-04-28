@@ -22,19 +22,19 @@ def ogrinfo(data_source, num_features=10):
         raise Exception('Data source parameter must be a string or a DataSource object.')
 
     for i, layer in enumerate(data_source):
-        print "data source : %s" % data_source.name
-        print "==== layer %s" % i
-        print "  shape type: %s" % GEO_CLASSES[layer.geom_type.num].__name__
-        print "  # features: %s" % len(layer)
-        print "         srs: %s" % layer.srs
+        print("data source : %s" % data_source.name)
+        print("==== layer %s" % i)
+        print("  shape type: %s" % GEO_CLASSES[layer.geom_type.num].__name__)
+        print("  # features: %s" % len(layer))
+        print("         srs: %s" % layer.srs)
         extent_tup = layer.extent.tuple
-        print "      extent: %s - %s" % (extent_tup[0:2], extent_tup[2:4])
-        print "Displaying the first %s features ====" % num_features
+        print("      extent: %s - %s" % (extent_tup[0:2], extent_tup[2:4]))
+        print("Displaying the first %s features ====" % num_features)
 
         width = max(*map(len,layer.fields))
         fmt = " %%%ss: %%s" % width
         for j, feature in enumerate(layer[:num_features]):
-            print "=== Feature %s" % j
+            print("=== Feature %s" % j)
             for fld_name in layer.fields:
                 type_name = feature[fld_name].type_name
                 output = fmt % (fld_name, type_name)
@@ -47,7 +47,7 @@ def ogrinfo(data_source, num_features=10):
                     output += val_fmt % val
                 else:
                     output += ' (None)'
-                print output
+                print(output)
 
 # For backwards compatibility.
 sample = ogrinfo

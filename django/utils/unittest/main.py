@@ -99,7 +99,7 @@ class TestProgram(object):
 
     def usageExit(self, msg=None):
         if msg:
-            print msg
+            print(msg)
         usage = {'progName': self.progName, 'catchbreak': '', 'failfast': '',
                  'buffer': ''}
         if self.failfast != False:
@@ -108,7 +108,7 @@ class TestProgram(object):
             usage['catchbreak'] = CATCHBREAK
         if self.buffer != False:
             usage['buffer'] = BUFFEROUTPUT
-        print self.USAGE % usage
+        print(self.USAGE % usage)
         sys.exit(2)
 
     def parseArgs(self, argv):

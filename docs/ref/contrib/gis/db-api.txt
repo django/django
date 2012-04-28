@@ -76,7 +76,7 @@ transform procedure::
     >>> z = Zipcode(code=78212, poly=poly_3084)
     >>> z.save()
     >>> from django.db import connection
-    >>> print connection.queries[-1]['sql'] # printing the last SQL statement executed (requires DEBUG=True)
+    >>> print(connection.queries[-1]['sql']) # printing the last SQL statement executed (requires DEBUG=True)
     INSERT INTO "geoapp_zipcode" ("code", "poly") VALUES (78212, ST_Transform(ST_GeomFromWKB('\\001 ... ', 3084), 4326))
 
 Thus, geometry parameters may be passed in using the ``GEOSGeometry`` object, WKT

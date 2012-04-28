@@ -7,5 +7,5 @@ class Command(AppCommand):
     args = '[appname ...]'
 
     def handle_app(self, app, **options):
-        print 'EXECUTE:AppCommand app=%s, options=%s' % (app, sorted(options.items()))
+        print('EXECUTE:AppCommand app=%s, options=%s' % (app, sorted(options.items())))
 

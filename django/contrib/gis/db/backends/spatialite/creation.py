@@ -24,7 +24,7 @@ class SpatiaLiteCreation(DatabaseCreation):
             test_db_repr = ''
             if verbosity >= 2:
                 test_db_repr = " ('%s')" % test_database_name
-            print "Creating test database for alias '%s'%s..." % (self.connection.alias, test_db_repr)
+            print("Creating test database for alias '%s'%s..." % (self.connection.alias, test_db_repr))
 
         self._create_test_db(verbosity, autoclobber)
 

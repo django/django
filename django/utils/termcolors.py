@@ -33,10 +33,10 @@ def colorize(text='', opts=(), **kwargs):
         colorize('hello', fg='red', bg='blue', opts=('blink',))
         colorize()
         colorize('goodbye', opts=('underscore',))
-        print colorize('first line', fg='red', opts=('noreset',))
-        print 'this should be red too'
-        print colorize('and so should this')
-        print 'this should not be red'
+        print(colorize('first line', fg='red', opts=('noreset',)))
+        print('this should be red too')
+        print(colorize('and so should this'))
+        print('this should not be red')
     """
     code_list = []
     if text == '' and len(opts) == 1 and opts[0] == 'reset':
@@ -59,7 +59,7 @@ def make_style(opts=(), **kwargs):
 
     Example:
         bold_red = make_style(opts=('bold',), fg='red')
-        print bold_red('hello')
+        print(bold_red('hello'))
         KEYWORD = make_style(fg='yellow')
         COMMENT = make_style(fg='blue', opts=('bold',))
     """

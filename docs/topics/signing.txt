@@ -64,7 +64,7 @@ If the signature or value have been altered in any way, a
     >>> try:
     ...    original = signer.unsign(value)
     ... except signing.BadSignature:
-    ...    print "Tampering detected!"
+    ...    print("Tampering detected!")
 
 By default, the ``Signer`` class uses the :setting:`SECRET_KEY` setting to
 generate signatures. You can use a different secret by passing it to the

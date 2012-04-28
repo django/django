@@ -284,10 +284,10 @@ actually run the query until the :class:`~django.db.models.query.QuerySet` is
     >>> q = Entry.objects.filter(headline__startswith="What")
     >>> q = q.filter(pub_date__lte=datetime.now())
     >>> q = q.exclude(body_text__icontains="food")
-    >>> print q
+    >>> print(q)
 
 Though this looks like three database hits, in fact it hits the database only
-once, at the last line (``print q``). In general, the results of a
+once, at the last line (``print(q)``). In general, the results of a
 :class:`~django.db.models.query.QuerySet` aren't fetched from the database
 until you "ask" for them. When you do, the
 :class:`~django.db.models.query.QuerySet` is *evaluated* by accessing the
@@ -720,8 +720,8 @@ your :class:`~django.db.models.query.QuerySet`\s correctly. For example, the
 following will create two :class:`~django.db.models.query.QuerySet`\s, evaluate
 them, and throw them away::
 
-    >>> print [e.headline for e in Entry.objects.all()]
-    >>> print [e.pub_date for e in Entry.objects.all()]
+    >>> print([e.headline for e in Entry.objects.all()])
+    >>> print([e.pub_date for e in Entry.objects.all()])
 
 That means the same database query will be executed twice, effectively doubling
 your database load. Also, there's a possibility the two lists may not include
@@ -732,8 +732,8 @@ To avoid this problem, simply save the
 :class:`~django.db.models.query.QuerySet` and reuse it::
 
     >>> queryset = Entry.objects.all()
-    >>> print [p.headline for p in queryset] # Evaluate the query set.
-    >>> print [p.pub_date for p in queryset] # Re-use the cache from the evaluation.
+    >>> print([p.headline for p in queryset]) # Evaluate the query set.
+    >>> print([p.pub_date for p in queryset]) # Re-use the cache from the evaluation.
 
 .. _complex-lookups-with-q:
 
@@ -1055,16 +1055,16 @@ related object is accessed. Subsequent accesses to the foreign key on the same
 object instance are cached. Example::
 
     >>> e = Entry.objects.get(id=2)
-    >>> print e.blog  # Hits the database to retrieve the associated Blog.
-    >>> print e.blog  # Doesn't hit the database; uses cached version.
+    >>> print(e.blog)  # Hits the database to retrieve the associated Blog.
+    >>> print(e.blog)  # Doesn't hit the database; uses cached version.
 
 Note that the :meth:`~django.db.models.query.QuerySet.select_related`
 :class:`~django.db.models.query.QuerySet` method recursively prepopulates the
 cache of all one-to-many relationships ahead of time. Example::
 
     >>> e = Entry.objects.select_related().get(id=2)
-    >>> print e.blog  # Doesn't hit the database; uses cached version.
-    >>> print e.blog  # Doesn't hit the database; uses cached version.
+    >>> print(e.blog)  # Doesn't hit the database; uses cached version.
+    >>> print(e.blog)  # Doesn't hit the database; uses cached version.
 
 .. _backwards-related-objects:
 

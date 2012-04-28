@@ -39,7 +39,7 @@ def update_contenttypes(app, created_models, verbosity=2, **kwargs):
     ])
     if verbosity >= 2:
         for ct in cts:
-            print "Adding content type '%s | %s'" % (ct.app_label, ct.model)
+            print("Adding content type '%s | %s'" % (ct.app_label, ct.model))
 
     # Confirm that the content type is stale before deletion.
     if to_remove:
@@ -63,11 +63,11 @@ If you're unsure, answer 'no'.
         if ok_to_delete == 'yes':
             for ct in to_remove:
                 if verbosity >= 2:
-                    print "Deleting stale content type '%s | %s'" % (ct.app_label, ct.model)
+                    print("Deleting stale content type '%s | %s'" % (ct.app_label, ct.model))
                 ct.delete()
         else:
             if verbosity >= 2:
-                print "Stale content types remain."
+                print("Stale content types remain.")
 
 def update_all_contenttypes(verbosity=2, **kwargs):
     for app in get_apps():

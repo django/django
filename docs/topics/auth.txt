@@ -714,11 +714,11 @@ Django provides two functions in :mod:`django.contrib.auth`:
         user = authenticate(username='john', password='secret')
         if user is not None:
             if user.is_active:
-                print "You provided a correct username and password!"
+                print("You provided a correct username and password!")
             else:
-                print "Your account has been disabled!"
+                print("Your account has been disabled!")
         else:
-            print "Your username and password were incorrect."
+            print("Your username and password were incorrect.")
 
 .. function:: login()
 

@@ -83,7 +83,7 @@ function or method:
 .. code-block:: python
 
     def my_callback(sender, **kwargs):
-        print "Request finished!"
+        print("Request finished!")
 
 Notice that the function takes a ``sender`` argument, along with wildcard
 keyword arguments (``**kwargs``); all signal handlers must take these arguments.
@@ -125,7 +125,7 @@ receiver:
 
     @receiver(request_finished)
     def my_callback(sender, **kwargs):
-        print "Request finished!"
+        print("Request finished!")
 
 Now, our ``my_callback`` function will be called each time a request finishes.
 

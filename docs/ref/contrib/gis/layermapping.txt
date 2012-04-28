@@ -39,13 +39,13 @@ Example
     >>> from django.contrib.gis.gdal import DataSource
     >>> ds = DataSource('test_poly.shp')
     >>> layer = ds[0]
-    >>> print layer.fields # Exploring the fields in the layer, we only want the 'str' field.
+    >>> print(layer.fields) # Exploring the fields in the layer, we only want the 'str' field.
     ['float', 'int', 'str']
-    >>> print len(layer) # getting the number of features in the layer (should be 3)
+    >>> print(len(layer)) # getting the number of features in the layer (should be 3)
     3
-    >>> print layer.geom_type # Should be 'Polygon'
+    >>> print(layer.geom_type) # Should be 'Polygon'
     Polygon
-    >>> print layer.srs # WGS84 in WKT
+    >>> print(layer.srs) # WGS84 in WKT
     GEOGCS["GCS_WGS_1984",
         DATUM["WGS_1984",
             SPHEROID["WGS_1984",6378137,298.257223563]],

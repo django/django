@@ -13,21 +13,21 @@
   >>> from django.contrib.gis.gdal import OGRGeometry, OGRGeomType, SpatialReference
   >>> wkt1, wkt2 = 'POINT(-90 30)', 'POLYGON((0 0, 5 0, 5 5, 0 5)'
   >>> pnt = OGRGeometry(wkt1)
-  >>> print pnt
+  >>> print(pnt)
   POINT (-90 30)
   >>> mpnt = OGRGeometry(OGRGeomType('MultiPoint'), SpatialReference('WGS84'))
   >>> mpnt.add(wkt1)
   >>> mpnt.add(wkt1)
-  >>> print mpnt
+  >>> print(mpnt)
   MULTIPOINT (-90 30,-90 30)
-  >>> print mpnt.srs.name
+  >>> print(mpnt.srs.name)
   WGS 84
-  >>> print mpnt.srs.proj
+  >>> print(mpnt.srs.proj)
   +proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs
   >>> mpnt.transform_to(SpatialReference('NAD27'))
-  >>> print mpnt.proj
+  >>> print(mpnt.proj)
   +proj=longlat +ellps=clrk66 +datum=NAD27 +no_defs
-  >>> print mpnt
+  >>> print(mpnt)
   MULTIPOINT (-89.999930378602485 29.999797886557641,-89.999930378602485 29.999797886557641)
 
   The OGRGeomType class is to make it easy to specify an OGR geometry type:
@@ -35,8 +35,8 @@
   >>> gt1 = OGRGeomType(3) # Using an integer for the type
   >>> gt2 = OGRGeomType('Polygon') # Using a string
   >>> gt3 = OGRGeomType('POLYGON') # It's case-insensitive
-  >>> print gt1 == 3, gt1 == 'Polygon' # Equivalence works w/non-OGRGeomType objects
-  True
+  >>> print(gt1 == 3, gt1 == 'Polygon') # Equivalence works w/non-OGRGeomType objects
+  True True
 """
 # Python library requisites.
 import sys

@@ -64,7 +64,7 @@ named ``media``. The media for a CalendarWidget instance can be retrieved
 through this property::
 
     >>> w = CalendarWidget()
-    >>> print w.media
+    >>> print(w.media)
     <link href="http://media.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" />
     <script type="text/javascript" src="http://media.example.com/animations.js"></script>
     <script type="text/javascript" src="http://media.example.com/actions.js"></script>
@@ -139,7 +139,7 @@ basic Calendar widget from the example above::
     ...         js = ('whizbang.js',)
 
     >>> w = FancyCalendarWidget()
-    >>> print w.media
+    >>> print(w.media)
     <link href="http://media.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" />
     <link href="http://media.example.com/fancy.css" type="text/css" media="all" rel="stylesheet" />
     <script type="text/javascript" src="http://media.example.com/animations.js"></script>
@@ -159,7 +159,7 @@ declaration to the media declaration::
     ...         js = ('whizbang.js',)
 
     >>> w = FancyCalendarWidget()
-    >>> print w.media
+    >>> print(w.media)
     <link href="http://media.example.com/fancy.css" type="text/css" media="all" rel="stylesheet" />
     <script type="text/javascript" src="http://media.example.com/whizbang.js"></script>
 
@@ -221,7 +221,7 @@ was ``None``::
     ...         js = ('animations.js', 'http://othersite.com/actions.js')
 
     >>> w = CalendarWidget()
-    >>> print w.media
+    >>> print(w.media)
     <link href="/css/pretty.css" type="text/css" media="all" rel="stylesheet" />
     <script type="text/javascript" src="http://uploads.example.com/animations.js"></script>
     <script type="text/javascript" src="http://othersite.com/actions.js"></script>
@@ -229,7 +229,7 @@ was ``None``::
 But if :setting:`STATIC_URL` is ``'http://static.example.com/'``::
 
     >>> w = CalendarWidget()
-    >>> print w.media
+    >>> print(w.media)
     <link href="/css/pretty.css" type="text/css" media="all" rel="stylesheet" />
     <script type="text/javascript" src="http://static.example.com/animations.js"></script>
     <script type="text/javascript" src="http://othersite.com/actions.js"></script>
@@ -252,12 +252,12 @@ If you only want media of a particular type, you can use the subscript operator
 to filter out a medium of interest. For example::
 
     >>> w = CalendarWidget()
-    >>> print w.media
+    >>> print(w.media)
     <link href="http://media.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" />
     <script type="text/javascript" src="http://media.example.com/animations.js"></script>
     <script type="text/javascript" src="http://media.example.com/actions.js"></script>
 
-    >>> print w.media['css']
+    >>> print(w.media)['css']
     <link href="http://media.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" />
 
 When you use the subscript operator, the value that is returned is a new
@@ -282,7 +282,7 @@ the resulting Media object contains the union of the media from both files::
 
     >>> w1 = CalendarWidget()
     >>> w2 = OtherWidget()
-    >>> print w1.media + w2.media
+    >>> print(w1.media + w2.media)
     <link href="http://media.example.com/pretty.css" type="text/css" media="all" rel="stylesheet" />
     <script type="text/javascript" src="http://media.example.com/animations.js"></script>
     <script type="text/javascript" src="http://media.example.com/actions.js"></script>
