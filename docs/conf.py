@@ -87,11 +87,6 @@ show_authors = False
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'trac'
 
-# Sphinx will recurse into subversion configuration folders and try to read
-# any document file within. These should be ignored.
-# Note: exclude_dirnames is new in Sphinx 0.5
-exclude_dirnames = ['.svn']
-
 # Links to Python's docs should reference the most recent version of the 2.x
 # branch, which is located at this URL.
 intersphinx_mapping = {
