@@ -93,10 +93,10 @@ reasons:
   Django APIs or behaviors change.
 
 Django's documentation is kept in the same source control system as its code. It
-lives in the `django/trunk/docs`_ directory of our Subversion repository. Each
-document online is a separate text file in the repository.
+lives in the `docs`_ directory of our Git repository. Each document online is a
+separate text file in the repository.
 
-.. _django/trunk/docs: https://code.djangoproject.com/browser/django/trunk/docs
+.. _docs: https://github.com/django/django/tree/master/docs
 
 Where to get it
 ===============
@@ -138,17 +138,9 @@ If you're using an official release of Django, note that the zipped package
 (tarball) of the code includes a ``docs/`` directory, which contains all the
 documentation for that release.
 
-If you're using the development version of Django (aka the Subversion "trunk"),
-note that the ``docs/`` directory contains all of the documentation. You can
-``svn update`` it, just as you ``svn update`` the Python code, in order to get
-the latest changes.
-
-You can check out the latest Django documentation from Subversion using this
-shell command:
-
-.. code-block:: bash
-
-    $ svn co https://code.djangoproject.com/svn/django/trunk/docs/ django_docs
+If you're using the development version of Django (aka "trunk"), note that the
+``docs/`` directory contains all of the documentation. You can update your
+Git checkout to get the latest changes.
 
 One low-tech way of taking advantage of the text documentation is by using the
 Unix ``grep`` utility to search for a phrase in all of the documentation. For
@@ -202,22 +194,22 @@ __ http://www.gnu.org/software/make/
 Differences between versions
 ============================
 
-As previously mentioned, the text documentation in our Subversion repository
+As previously mentioned, the text documentation in our Git repository
 contains the "latest and greatest" changes and additions. These changes often
 include documentation of new features added in the Django development version
--- the Subversion ("trunk") version of Django. For that reason, it's worth
+-- the Git ("trunk") version of Django. For that reason, it's worth
 pointing out our policy on keeping straight the documentation for various
 versions of the framework.
 
 We follow this policy:
 
 * The primary documentation on djangoproject.com is an HTML version of the
-  latest docs in Subversion. These docs always correspond to the latest
+  latest docs in Git. These docs always correspond to the latest
   official Django release, plus whatever features we've added/changed in
   the framework *since* the latest release.
 
 * As we add features to Django's development version, we try to update the
-  documentation in the same Subversion commit transaction.
+  documentation in the same Git commit transaction.
 
 * To distinguish feature changes/additions in the docs, we use the phrase:
   "New in version X.Y", being X.Y the next release version (hence, the one
