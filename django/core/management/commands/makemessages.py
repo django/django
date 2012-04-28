@@ -264,7 +264,7 @@ def make_messages(locale=None, domain='django', verbosity=1, all=False,
         extensions=None, symlinks=False, ignore_patterns=None, no_wrap=False,
         no_location=False, no_obsolete=False, stdout=sys.stdout):
     """
-    Uses the ``locale/`` directory from the Django SVN tree or an
+    Uses the ``locale/`` directory from the Django Git tree or an
     application/project to process all files with translatable literals for
     the :param domain: domain and :param locale: locale.
     """
@@ -287,9 +287,9 @@ def make_messages(locale=None, domain='django', verbosity=1, all=False,
     elif os.path.isdir('locale'):
         localedir = os.path.abspath('locale')
     else:
-        raise CommandError("This script should be run from the Django SVN "
+        raise CommandError("This script should be run from the Django Git "
                 "tree or your project or app tree. If you did indeed run it "
-                "from the SVN checkout or your project or application, "
+                "from the Git checkout or your project or application, "
                 "maybe you are just missing the conf/locale (in the django "
                 "tree) or locale (for project and application) directory? It "
                 "is not created automatically, you have to create it by hand "

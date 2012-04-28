@@ -21,7 +21,7 @@ def compile_messages(stderr, locale=None):
     basedirs = set(map(os.path.abspath, filter(os.path.isdir, basedirs)))
 
     if not basedirs:
-        raise CommandError("This script should be run from the Django SVN tree or your project or app tree, or with the settings module specified.")
+        raise CommandError("This script should be run from the Django Git checkout or your project or app tree, or with the settings module specified.")
 
     for basedir in basedirs:
         if locale:
