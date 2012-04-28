@@ -42,7 +42,7 @@ class Command(NoArgsCommand):
         yield 'from %s import models' % self.db_module
         yield ''
         known_models = []
-        for table_name in connection.introspection.get_table_list(cursor):
+        for table_name in connection.introspection.table_names(cursor):
             yield 'class %s(models.Model):' % table2model(table_name)
             known_models.append(table2model(table_name))
             try:
