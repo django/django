@@ -295,7 +295,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         """
         cursor = self.cursor()
         if table_names is None:
-            table_names = self.introspection.get_table_list(cursor)
+            table_names = self.introspection.table_names(cursor)
         for table_name in table_names:
             primary_key_column_name = self.introspection.get_primary_key_column(cursor, table_name)
             if not primary_key_column_name:
