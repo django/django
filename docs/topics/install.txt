@@ -279,35 +279,17 @@ Installing the development version
 If you'd like to be able to update your Django code occasionally with the
 latest bug fixes and improvements, follow these instructions:
 
-1. Make sure that you have Subversion_, Git_, or Mercurial_ installed, and
-   that you can run its commands from a shell. (Enter ``svn help``,
-   ``git help``, or ``hg help`` at a shell prompt to test this.) Note that
-   the Subversion repository is the canonical source for the official
-   Git and Mercurial repositories and as such will always be the most up-to-date.
+1. Make sure that you have Git_ installed and that you can run its commands
+   from a shell. (Enter ``git help`` at a shell prompt to test this.)
 
-2. Check out Django's main development branch (the 'trunk') like so:
+2. Check out Django's main development branch (the 'trunk' or 'master') like
+   so:
 
    .. code-block:: bash
 
-       # Subversion
-       svn co https://code.djangoproject.com/svn/django/trunk/ django-trunk
+       git clone git://github.com/django/django.git django-trunk
 
-   Mirrors of the Subversion repository can be obtained like so:
-
-   .. code-block:: bash
-
-       # Git (requires version 1.6.6 or later)
-       git clone https://github.com/django/django.git
-       # or (works with all versions)
-       git clone git://github.com/django/django.git
-
-       # Mercurial
-       hg clone https://bitbucket.org/django/django
-
-   .. warning ::
-
-        These mirrors should be updated every 5 minutes but aren't guaranteed
-        to be up-to-date since they are hosted on external services.
+   This will create a directory ``django-trunk`` in your current directory.
 
 3. Next, make sure that the Python interpreter can load Django's code. The most
    convenient way to do this is to `modify Python's search path`_. Add a ``.pth``
@@ -349,11 +331,8 @@ latest bug fixes and improvements, follow these instructions:
     known to cause problems when updating to a more recent version of Django.
 
 When you want to update your copy of the Django source code, just run the
-command ``svn update`` from within the ``django-trunk`` directory. When you do
-this, Subversion will automatically download any changes. The equivalent
-command for Git is ``git pull``, and for Mercurial ``hg pull --update``.
+command ``git pull`` from within the ``django-trunk`` directory. When you do
+this, Git will automatically download any changes.
 
-.. _Subversion: http://subversion.tigris.org/
 .. _Git: http://git-scm.com/
-.. _Mercurial: http://mercurial.selenic.com/
 .. _`modify Python's search path`: http://docs.python.org/install/index.html#modifying-python-s-search-path
