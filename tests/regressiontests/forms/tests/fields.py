@@ -974,11 +974,9 @@ class FieldsTests(SimpleTestCase):
             self.assertTrue(got[0].endswith(exp[0]))
 
     def test_filepathfield_folders(self):
-        skip_svn = r'[^(\.svn)]'
-
         path = forms.__file__
         path = os.path.dirname(path) + '/'
-        f = FilePathField(path=path, allow_folders=True, allow_files=False, match=skip_svn)
+        f = FilePathField(path=path, allow_folders=True, allow_files=False)
         f.choices.sort()
         expected = [
             ('/django/forms/extras', 'extras'),
@@ -987,7 +985,7 @@ class FieldsTests(SimpleTestCase):
             self.assertEqual(exp[1], got[1])
             self.assert_(got[0].endswith(exp[0]))
 
-        f = FilePathField(path=path, allow_folders=True, allow_files=True, match=skip_svn)
+        f = FilePathField(path=path, allow_folders=True, allow_files=True)
         f.choices.sort()
         expected = [
             ('/django/forms/__init__.py', '__init__.py'),
