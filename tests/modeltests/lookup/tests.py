@@ -468,13 +468,13 @@ class LookupTests(TestCase):
         try:
             Article.objects.filter(pub_date_year='2005').count()
             self.fail('FieldError not raised')
-        except FieldError, ex:
+        except FieldError as ex:
             self.assertEqual(str(ex), "Cannot resolve keyword 'pub_date_year' "
                              "into field. Choices are: author, headline, id, pub_date, tag")
         try:
             Article.objects.filter(headline__starts='Article')
             self.fail('FieldError not raised')
-        except FieldError, ex:
+        except FieldError as ex:
             self.assertEqual(str(ex), "Join on field 'headline' not permitted. "
                              "Did you misspell 'starts' for the lookup type?")
 

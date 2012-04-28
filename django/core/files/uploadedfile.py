@@ -75,7 +75,7 @@ class TemporaryUploadedFile(UploadedFile):
     def close(self):
         try:
             return self.file.close()
-        except OSError, e:
+        except OSError as e:
             if e.errno != 2:
                 # Means the file was moved or deleted before the tempfile
                 # could unlink it.  Still sets self.file.close_called and

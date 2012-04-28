@@ -57,7 +57,7 @@ class DatabaseCreation(BaseDatabaseCreation):
                 if autoclobber or confirm == 'yes':
                   try:
                       os.remove(test_database_name)
-                  except Exception, e:
+                  except Exception as e:
                       sys.stderr.write("Got an error deleting the old test database: %s\n" % e)
                       sys.exit(2)
                 else:

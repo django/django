@@ -156,7 +156,7 @@ class NestedObjects(Collector):
                 self.add_edge(None, obj)
         try:
             return super(NestedObjects, self).collect(objs, source_attr=source_attr, **kwargs)
-        except models.ProtectedError, e:
+        except models.ProtectedError as e:
             self.protected.update(e.protected_objects)
 
     def related_objects(self, related, objs):

@@ -15,7 +15,7 @@ def get_storage(import_path):
     module, classname = import_path[:dot], import_path[dot + 1:]
     try:
         mod = import_module(module)
-    except ImportError, e:
+    except ImportError as e:
         raise ImproperlyConfigured('Error importing module %s: "%s"' %
                                    (module, e))
     try:

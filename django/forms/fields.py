@@ -132,7 +132,7 @@ class Field(object):
         for v in self.validators:
             try:
                 v(value)
-            except ValidationError, e:
+            except ValidationError as e:
                 if hasattr(e, 'code') and e.code in self.error_messages:
                     message = self.error_messages[e.code]
                     if e.params:
@@ -884,7 +884,7 @@ class MultiValueField(Field):
                 raise ValidationError(self.error_messages['required'])
             try:
                 clean_data.append(field.clean(field_value))
-            except ValidationError, e:
+            except ValidationError as e:
                 # Collect all validation errors in a single list, which we'll
                 # raise at the end of clean(), rather than raising a single
                 # exception for the first error we encounter.

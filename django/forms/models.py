@@ -324,13 +324,13 @@ class BaseModelForm(BaseForm):
         # Clean the model instance's fields.
         try:
             self.instance.clean_fields(exclude=exclude)
-        except ValidationError, e:
+        except ValidationError as e:
             self._update_errors(e.message_dict)
 
         # Call the model instance's clean method.
         try:
             self.instance.clean()
-        except ValidationError, e:
+        except ValidationError as e:
             self._update_errors({NON_FIELD_ERRORS: e.messages})
 
         # Validate uniqueness if needed.
@@ -345,7 +345,7 @@ class BaseModelForm(BaseForm):
         exclude = self._get_validation_exclusions()
         try:
             self.instance.validate_unique(exclude=exclude)
-        except ValidationError, e:
+        except ValidationError as e:
             self._update_errors(e.message_dict)
 
     def save(self, commit=True):

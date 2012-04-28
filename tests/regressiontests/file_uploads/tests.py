@@ -304,7 +304,7 @@ class FileUploadTests(TestCase):
         # it raises when there is an attempt to read more than the available bytes:
         try:
             client.FakePayload('a').read(2)
-        except Exception, reference_error:
+        except Exception as reference_error:
             pass
 
         # install the custom handler that tries to access request.POST
@@ -312,12 +312,12 @@ class FileUploadTests(TestCase):
 
         try:
             response = self.client.post('/file_uploads/upload_errors/', post_data)
-        except reference_error.__class__, err:
+        except reference_error.__class__ as err:
             self.failIf(
                 str(err) == str(reference_error),
                 "Caught a repeated exception that'll cause an infinite loop in file uploads."
             )
-        except Exception, err:
+        except Exception as err:
             # CustomUploadError is the error that should have been raised
             self.assertEqual(err.__class__, uploadhandler.CustomUploadError)
 
@@ -374,9 +374,9 @@ class DirectoryCreationTests(unittest.TestCase):
         os.chmod(temp_storage.location, 0500)
         try:
             self.obj.testfile.save('foo.txt', SimpleUploadedFile('foo.txt', 'x'))
-        except OSError, err:
+        except OSError as err:
             self.assertEqual(err.errno, errno.EACCES)
-        except Exception, err:
+        except Exception:
             self.fail("OSError [Errno %s] not raised." % errno.EACCES)
 
     def test_not_a_directory(self):
@@ -386,7 +386,7 @@ class DirectoryCreationTests(unittest.TestCase):
         fd.close()
         try:
             self.obj.testfile.save('foo.txt', SimpleUploadedFile('foo.txt', 'x'))
-        except IOError, err:
+        except IOError as err:
             # The test needs to be done on a specific string as IOError
             # is raised even without the patch (just not early enough)
             self.assertEqual(err.args[0],

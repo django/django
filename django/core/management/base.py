@@ -214,7 +214,7 @@ class BaseCommand(object):
                 from django.utils import translation
                 saved_lang = translation.get_language()
                 translation.activate('en-us')
-            except ImportError, e:
+            except ImportError as e:
                 # If settings should be available, but aren't,
                 # raise the error and quit.
                 if show_traceback:
@@ -240,7 +240,7 @@ class BaseCommand(object):
                 self.stdout.write(output)
                 if self.output_transaction:
                     self.stdout.write('\n' + self.style.SQL_KEYWORD("COMMIT;") + '\n')
-        except CommandError, e:
+        except CommandError as e:
             if show_traceback:
                 traceback.print_exc()
             else:
@@ -297,7 +297,7 @@ class AppCommand(BaseCommand):
             raise CommandError('Enter at least one appname.')
         try:
             app_list = [models.get_app(app_label) for app_label in app_labels]
-        except (ImproperlyConfigured, ImportError), e:
+        except (ImproperlyConfigured, ImportError) as e:
             raise CommandError("%s. Are you sure your INSTALLED_APPS setting is correct?" % e)
         output = []
         for app in app_list:

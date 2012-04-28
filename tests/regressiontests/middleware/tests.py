@@ -88,7 +88,7 @@ class CommonMiddlewareTest(TestCase):
             request)
         try:
             CommonMiddleware().process_request(request)
-        except RuntimeError, e:
+        except RuntimeError as e:
             self.assertTrue('end in a slash' in str(e))
         settings.DEBUG = False
 
@@ -202,7 +202,7 @@ class CommonMiddlewareTest(TestCase):
           request)
       try:
           CommonMiddleware().process_request(request)
-      except RuntimeError, e:
+      except RuntimeError as e:
           self.assertTrue('end in a slash' in str(e))
       settings.DEBUG = False
 

@@ -12,5 +12,5 @@ class TestFieldWithValidators(TestCase):
         self.assertRaises(ValidationError, field.clean, 'not int nor mail')
         try:
             field.clean('not int nor mail')
-        except ValidationError, e:
+        except ValidationError as e:
             self.assertEqual(2, len(e.messages))

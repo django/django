@@ -44,7 +44,7 @@ class BasicFieldTests(test.TestCase):
         nullboolean = NullBooleanModel(nbfield=None)
         try:
             nullboolean.full_clean()
-        except ValidationError, e:
+        except ValidationError as e:
             self.fail("NullBooleanField failed validation with value of None: %s" % e.messages)
 
     def test_field_repr(self):

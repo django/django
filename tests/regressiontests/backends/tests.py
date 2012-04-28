@@ -569,7 +569,7 @@ class ThreadTests(TestCase):
                 connections['default'] = main_thread_connection
                 try:
                     models.Person.objects.get(first_name="John", last_name="Doe")
-                except DatabaseError, e:
+                except DatabaseError as e:
                     exceptions.append(e)
             t = threading.Thread(target=runner, args=[connections['default']])
             t.start()
@@ -607,7 +607,7 @@ class ThreadTests(TestCase):
             def runner2(other_thread_connection):
                 try:
                     other_thread_connection.close()
-                except DatabaseError, e:
+                except DatabaseError as e:
                     exceptions.add(e)
             t2 = threading.Thread(target=runner2, args=[connections['default']])
             t2.start()
@@ -624,7 +624,7 @@ class ThreadTests(TestCase):
             def runner2(other_thread_connection):
                 try:
                     other_thread_connection.close()
-                except DatabaseError, e:
+                except DatabaseError as e:
                     exceptions.add(e)
             # Enable thread sharing
             connections['default'].allow_thread_sharing = True

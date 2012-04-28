@@ -52,7 +52,7 @@ class ErrorIndexTest(TestCase):
             template = get_template_from_string(source)
             try:
                 template.render(context)
-            except (RuntimeError, TypeError), e:
+            except (RuntimeError, TypeError) as e:
                 error_source_index = e.django_template_source[1]
                 self.assertEqual(error_source_index,
                                  expected_error_source_index)

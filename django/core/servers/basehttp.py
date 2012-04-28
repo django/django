@@ -48,13 +48,13 @@ def get_internal_wsgi_application():
     module_name, attr = app_path.rsplit('.', 1)
     try:
         mod = import_module(module_name)
-    except ImportError, e:
+    except ImportError as e:
         raise ImproperlyConfigured(
             "WSGI application '%s' could not be loaded; "
             "could not import module '%s': %s" % (app_path, module_name, e))
     try:
         app = getattr(mod, attr)
-    except AttributeError, e:
+    except AttributeError as e:
         raise ImproperlyConfigured(
             "WSGI application '%s' could not be loaded; "
             "can't find '%s' in module '%s': %s"
@@ -118,7 +118,7 @@ class WSGIServer(simple_server.WSGIServer, object):
         """Override server_bind to store the server name."""
         try:
             super(WSGIServer, self).server_bind()
-        except Exception, e:
+        except Exception as e:
             raise WSGIServerException(e)
         self.setup_environ()
 

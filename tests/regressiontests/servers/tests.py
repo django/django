@@ -102,7 +102,7 @@ class LiveServerViews(LiveServerBase):
         """
         try:
             self.urlopen('/')
-        except urllib2.HTTPError, err:
+        except urllib2.HTTPError as err:
             self.assertEquals(err.code, 404, 'Expected 404 response')
         else:
             self.fail('Expected 404 response')

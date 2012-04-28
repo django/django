@@ -11,7 +11,7 @@ import warnings
 
 try:
     import MySQLdb as Database
-except ImportError, e:
+except ImportError as e:
     from django.core.exceptions import ImproperlyConfigured
     raise ImproperlyConfigured("Error loading MySQLdb module: %s" % e)
 
@@ -114,29 +114,29 @@ class CursorWrapper(object):
     def execute(self, query, args=None):
         try:
             return self.cursor.execute(query, args)
-        except Database.IntegrityError, e:
+        except Database.IntegrityError as e:
             raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
-        except Database.OperationalError, e:
+        except Database.OperationalError as e:
             # Map some error codes to IntegrityError, since they seem to be
             # misclassified and Django would prefer the more logical place.
             if e[0] in self.codes_for_integrityerror:
                 raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
             raise utils.DatabaseError, utils.DatabaseError(*tuple(e)), sys.exc_info()[2]
-        except Database.DatabaseError, e:
+        except Database.DatabaseError as e:
             raise utils.DatabaseError, utils.DatabaseError(*tuple(e)), sys.exc_info()[2]
 
     def executemany(self, query, args):
         try:
             return self.cursor.executemany(query, args)
-        except Database.IntegrityError, e:
+        except Database.IntegrityError as e:
             raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
-        except Database.OperationalError, e:
+        except Database.OperationalError as e:
             # Map some error codes to IntegrityError, since they seem to be
             # misclassified and Django would prefer the more logical place.
             if e[0] in self.codes_for_integrityerror:
                 raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
             raise utils.DatabaseError, utils.DatabaseError(*tuple(e)), sys.exc_info()[2]
-        except Database.DatabaseError, e:
+        except Database.DatabaseError as e:
             raise utils.DatabaseError, utils.DatabaseError(*tuple(e)), sys.exc_info()[2]
 
     def __getattr__(self, attr):

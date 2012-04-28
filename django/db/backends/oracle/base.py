@@ -18,7 +18,7 @@ def _setup_environment(environ):
     if platform.system().upper().startswith('CYGWIN'):
         try:
             import ctypes
-        except ImportError, e:
+        except ImportError as e:
             from django.core.exceptions import ImproperlyConfigured
             raise ImproperlyConfigured("Error loading ctypes: %s; "
                                        "the Oracle backend requires ctypes to "
@@ -41,7 +41,7 @@ _setup_environment([
 
 try:
     import cx_Oracle as Database
-except ImportError, e:
+except ImportError as e:
     from django.core.exceptions import ImproperlyConfigured
     raise ImproperlyConfigured("Error loading cx_Oracle module: %s" % e)
 
@@ -532,11 +532,11 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         if self.connection is not None:
             try:
                 return self.connection.commit()
-            except Database.IntegrityError, e:
+            except Database.IntegrityError as e:
                 # In case cx_Oracle implements (now or in a future version)
                 # raising this specific exception
                 raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
-            except Database.DatabaseError, e:
+            except Database.DatabaseError as e:
                 # cx_Oracle 5.0.4 raises a cx_Oracle.DatabaseError exception
                 # with the following attributes and values:
                 #  code = 2091
@@ -673,9 +673,9 @@ class FormatStylePlaceholderCursor(object):
         self._guess_input_sizes([params])
         try:
             return self.cursor.execute(query, self._param_generator(params))
-        except Database.IntegrityError, e:
+        except Database.IntegrityError as e:
             raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
-        except Database.DatabaseError, e:
+        except Database.DatabaseError as e:
             # cx_Oracle <= 4.4.0 wrongly raises a DatabaseError for ORA-01400.
             if hasattr(e.args[0], 'code') and e.args[0].code == 1400 and not isinstance(e, IntegrityError):
                 raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
@@ -702,9 +702,9 @@ class FormatStylePlaceholderCursor(object):
         try:
             return self.cursor.executemany(query,
                                 [self._param_generator(p) for p in formatted])
-        except Database.IntegrityError, e:
+        except Database.IntegrityError as e:
             raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
-        except Database.DatabaseError, e:
+        except Database.DatabaseError as e:
             # cx_Oracle <= 4.4.0 wrongly raises a DatabaseError for ORA-01400.
             if hasattr(e.args[0], 'code') and e.args[0].code == 1400 and not isinstance(e, IntegrityError):
                 raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]

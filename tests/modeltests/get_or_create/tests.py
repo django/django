@@ -60,7 +60,7 @@ class GetOrCreateTests(TestCase):
         # the actual traceback. Refs #16340.
         try:
             ManualPrimaryKeyTest.objects.get_or_create(id=1, data="Different")
-        except IntegrityError, e:
+        except IntegrityError as e:
             formatted_traceback = traceback.format_exc()
             self.assertIn('obj.save', formatted_traceback)
 

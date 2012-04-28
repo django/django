@@ -166,7 +166,7 @@ class FileSystemStorage(Storage):
         if not os.path.exists(directory):
             try:
                 os.makedirs(directory)
-            except OSError, e:
+            except OSError as e:
                 if e.errno != errno.EEXIST:
                     raise
         if not os.path.isdir(directory):
@@ -197,7 +197,7 @@ class FileSystemStorage(Storage):
                     finally:
                         locks.unlock(fd)
                         os.close(fd)
-            except OSError, e:
+            except OSError as e:
                 if e.errno == errno.EEXIST:
                     # Ooops, the file exists. We need a new file name.
                     name = self.get_available_name(name)
@@ -222,7 +222,7 @@ class FileSystemStorage(Storage):
         if os.path.exists(name):
             try:
                 os.remove(name)
-            except OSError, e:
+            except OSError as e:
                 if e.errno != errno.ENOENT:
                     raise
 
@@ -273,7 +273,7 @@ def get_storage_class(import_path=None):
     module, classname = import_path[:dot], import_path[dot+1:]
     try:
         mod = import_module(module)
-    except ImportError, e:
+    except ImportError as e:
         raise ImproperlyConfigured('Error importing storage module %s: "%s"' % (module, e))
     try:
         return getattr(mod, classname)

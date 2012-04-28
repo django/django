@@ -290,7 +290,7 @@ class HttpRequest(object):
                 raise Exception("You cannot access body after reading from request's data stream")
             try:
                 self._body = self.read()
-            except IOError, e:
+            except IOError as e:
                 raise UnreadablePostError, e, sys.exc_traceback
             self._stream = StringIO(self._body)
         return self._body
@@ -556,7 +556,7 @@ class HttpResponse(object):
             if isinstance(value, unicode):
                 try:
                     value = value.encode('us-ascii')
-                except UnicodeError, e:
+                except UnicodeError as e:
                     e.reason += ', HTTP response headers must be in US-ASCII format'
                     raise
             else:

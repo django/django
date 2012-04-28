@@ -204,10 +204,11 @@ def load_handler(path, *args, **kwargs):
     module, attr = path[:i], path[i+1:]
     try:
         mod = importlib.import_module(module)
-    except ImportError, e:
+    except ImportError as e:
         raise ImproperlyConfigured('Error importing upload handler module %s: "%s"' % (module, e))
-    except ValueError, e:
-        raise ImproperlyConfigured('Error importing upload handler module. Is FILE_UPLOAD_HANDLERS a correctly defined list or tuple?')
+    except ValueError:
+        raise ImproperlyConfigured('Error importing upload handler module.'
+            'Is FILE_UPLOAD_HANDLERS a correctly defined list or tuple?')
     try:
         cls = getattr(mod, attr)
     except AttributeError:

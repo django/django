@@ -378,7 +378,7 @@ class Client(RequestFactory):
 
             try:
                 response = self.handler(environ)
-            except TemplateDoesNotExist, e:
+            except TemplateDoesNotExist as e:
                 # If the view raises an exception, Django will attempt to show
                 # the 500.html template. If that template is not available,
                 # we should ignore the error in favor of re-raising the

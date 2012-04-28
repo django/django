@@ -13,7 +13,7 @@ class AssertFormErrorsMixin(object):
         try:
             the_callable(*args, **kwargs)
             self.fail("Testing the 'clean' method on %s failed to raise a ValidationError.")
-        except ValidationError, e:
+        except ValidationError as e:
             self.assertEqual(e.messages, expected)
 
 class FormsErrorMessagesTestCase(TestCase, AssertFormErrorsMixin):

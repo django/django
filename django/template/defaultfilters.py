@@ -892,5 +892,5 @@ def pprint(value):
     """A wrapper around pprint.pprint -- for debugging, really."""
     try:
         return pformat(value)
-    except Exception, e:
+    except Exception as e:
         return u"Error in formatting: %s" % force_unicode(e, errors="replace")

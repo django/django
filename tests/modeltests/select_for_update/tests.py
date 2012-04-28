@@ -169,10 +169,8 @@ class SelectForUpdateTests(TransactionTestCase):
             people[0].name = 'Fred'
             people[0].save()
             transaction.commit()
-        except DatabaseError, e:
+        except DatabaseError as e:
             status.append(e)
-        except Exception, e:
-            raise
         finally:
             # This method is run in a separate thread. It uses its own
             # database connection. Close it without waiting for the GC.
@@ -246,7 +244,7 @@ class SelectForUpdateTests(TransactionTestCase):
                         )
                     )
                 )
-            except DatabaseError, e:
+            except DatabaseError as e:
                 status.append(e)
             finally:
                 # This method is run in a separate thread. It uses its own

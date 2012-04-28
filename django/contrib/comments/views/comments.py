@@ -66,7 +66,7 @@ def post_comment(request, next=None, using=None):
         return CommentPostBadRequest(
             "No object matching content-type %r and object PK %r exists." % \
                 (escape(ctype), escape(object_pk)))
-    except (ValueError, ValidationError), e:
+    except (ValueError, ValidationError) as e:
         return CommentPostBadRequest(
             "Attempting go get content-type %r and object PK %r exists raised %s" % \
                 (escape(ctype), escape(object_pk), e.__class__.__name__))

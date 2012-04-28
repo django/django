@@ -20,7 +20,7 @@ from django.utils.timezone import utc
 try:
     import psycopg2 as Database
     import psycopg2.extensions
-except ImportError, e:
+except ImportError as e:
     from django.core.exceptions import ImproperlyConfigured
     raise ImproperlyConfigured("Error loading psycopg2 module: %s" % e)
 
@@ -50,17 +50,17 @@ class CursorWrapper(object):
     def execute(self, query, args=None):
         try:
             return self.cursor.execute(query, args)
-        except Database.IntegrityError, e:
+        except Database.IntegrityError as e:
             raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
-        except Database.DatabaseError, e:
+        except Database.DatabaseError as e:
             raise utils.DatabaseError, utils.DatabaseError(*tuple(e)), sys.exc_info()[2]
 
     def executemany(self, query, args):
         try:
             return self.cursor.executemany(query, args)
-        except Database.IntegrityError, e:
+        except Database.IntegrityError as e:
             raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
-        except Database.DatabaseError, e:
+        except Database.DatabaseError as e:
             raise utils.DatabaseError, utils.DatabaseError(*tuple(e)), sys.exc_info()[2]
 
     def __getattr__(self, attr):
@@ -233,5 +233,5 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         if self.connection is not None:
             try:
                 return self.connection.commit()
-            except Database.IntegrityError, e:
+            except Database.IntegrityError as e:
                 raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]

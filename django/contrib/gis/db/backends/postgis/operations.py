@@ -107,9 +107,7 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
                                        'Was the database created from a spatial database '
                                        'template?' % self.connection.settings_dict['NAME']
                                        )
-        except Exception, e:
-            # TODO: Raise helpful exceptions as they become known.
-            raise
+        # TODO: Raise helpful exceptions as they become known.
 
         # PostGIS-specific operators. The commented descriptions of these
         # operators come from Section 7.6 of the PostGIS 1.4 documentation.

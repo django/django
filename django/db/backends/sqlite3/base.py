@@ -24,9 +24,9 @@ from django.utils import timezone
 try:
     try:
         from pysqlite2 import dbapi2 as Database
-    except ImportError, e1:
+    except ImportError:
         from sqlite3 import dbapi2 as Database
-except ImportError, exc:
+except ImportError as exc:
     from django.core.exceptions import ImproperlyConfigured
     raise ImproperlyConfigured("Error loading either pysqlite2 or sqlite3 modules (tried in that order): %s" % exc)
 
@@ -335,18 +335,18 @@ class SQLiteCursorWrapper(Database.Cursor):
         query = self.convert_query(query)
         try:
             return Database.Cursor.execute(self, query, params)
-        except Database.IntegrityError, e:
+        except Database.IntegrityError as e:
             raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
-        except Database.DatabaseError, e:
+        except Database.DatabaseError as e:
             raise utils.DatabaseError, utils.DatabaseError(*tuple(e)), sys.exc_info()[2]
 
     def executemany(self, query, param_list):
         query = self.convert_query(query)
         try:
             return Database.Cursor.executemany(self, query, param_list)
-        except Database.IntegrityError, e:
+        except Database.IntegrityError as e:
             raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
-        except Database.DatabaseError, e:
+        except Database.DatabaseError as e:
             raise utils.DatabaseError, utils.DatabaseError(*tuple(e)), sys.exc_info()[2]
 
     def convert_query(self, query):

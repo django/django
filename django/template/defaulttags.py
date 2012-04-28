@@ -183,7 +183,7 @@ class ForNode(Node):
                 for node in self.nodelist_loop:
                     try:
                         nodelist.append(node.render(context))
-                    except Exception, e:
+                    except Exception as e:
                         if not hasattr(e, 'django_template_source'):
                             e.django_template_source = node.source
                         raise
@@ -337,7 +337,7 @@ class SsiNode(Node):
             try:
                 t = Template(output, name=filepath)
                 return t.render(context)
-            except TemplateSyntaxError, e:
+            except TemplateSyntaxError as e:
                 if settings.DEBUG:
                     return "[Included template had syntax error: %s]" % e
                 else:
@@ -403,7 +403,7 @@ class URLNode(Node):
         url = ''
         try:
             url = reverse(view_name, args=args, kwargs=kwargs, current_app=context.current_app)
-        except NoReverseMatch, e:
+        except NoReverseMatch as e:
             if settings.SETTINGS_MODULE:
                 project_name = settings.SETTINGS_MODULE.split('.')[0]
                 try:
@@ -1005,7 +1005,7 @@ def load(parser, token):
         try:
             taglib = bits[-1]
             lib = get_library(taglib)
-        except InvalidTemplateLibrary, e:
+        except InvalidTemplateLibrary as e:
             raise TemplateSyntaxError("'%s' is not a valid tag library: %s" %
                                       (taglib, e))
         else:
@@ -1028,7 +1028,7 @@ def load(parser, token):
             try:
                 lib = get_library(taglib)
                 parser.add_library(lib)
-            except InvalidTemplateLibrary, e:
+            except InvalidTemplateLibrary as e:
                 raise TemplateSyntaxError("'%s' is not a valid tag library: %s" %
                                           (taglib, e))
     return LoadNode()

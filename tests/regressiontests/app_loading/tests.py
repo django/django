@@ -61,7 +61,7 @@ class EggLoadingTest(TestCase):
         self.assertRaises(ImportError, load_app, 'broken_app')
         try:
             load_app('broken_app')
-        except ImportError, e:
+        except ImportError as e:
             # Make sure the message is indicating the actual
             # problem in the broken app.
             self.assertTrue("modelz" in e.args[0])

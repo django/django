@@ -62,32 +62,20 @@ class DistanceTest(unittest.TestCase):
         d4 -= d1
         self.assertEqual(d4.m, -200)
 
-        try:
+        with self.assertRaises(TypeError):
             d5 = d1 + 1
-        except TypeError, e:
-            pass
-        else:
             self.fail('Distance + number should raise TypeError')
 
-        try:
+        with self.assertRaises(TypeError):
             d5 = d1 - 1
-        except TypeError, e:
-            pass
-        else:
             self.fail('Distance - number should raise TypeError')
 
-        try:
+        with self.assertRaises(TypeError):
             d1 += 1
-        except TypeError, e:
-            pass
-        else:
             self.fail('Distance += number should raise TypeError')
 
-        try:
+        with self.assertRaises(TypeError):
             d1 -= 1
-        except TypeError, e:
-            pass
-        else:
             self.fail('Distance -= number should raise TypeError')
 
     def testMultiplication(self):
@@ -110,25 +98,16 @@ class DistanceTest(unittest.TestCase):
         self.assertTrue(isinstance(a5, Area))
         self.assertEqual(a5.sq_m, 100*10)
 
-        try:
+        with self.assertRaises(TypeError):
             d1 *= D(m=1)
-        except TypeError, e:
-            pass
-        else:
             self.fail('Distance *= Distance should raise TypeError')
 
-        try:
+        with self.assertRaises(TypeError):
             d5 = d1 / D(m=1)
-        except TypeError, e:
-            pass
-        else:
             self.fail('Distance / Distance should raise TypeError')
 
-        try:
+        with self.assertRaises(TypeError):
             d1 /= D(m=1)
-        except TypeError, e:
-            pass
-        else:
             self.fail('Distance /= Distance should raise TypeError')
 
     def testUnitConversions(self):
@@ -217,32 +196,20 @@ class AreaTest(unittest.TestCase):
         a4 -= a1
         self.assertEqual(a4.sq_m, -200)
 
-        try:
+        with self.assertRaises(TypeError):
             a5 = a1 + 1
-        except TypeError, e:
-            pass
-        else:
             self.fail('Area + number should raise TypeError')
 
-        try:
+        with self.assertRaises(TypeError):
             a5 = a1 - 1
-        except TypeError, e:
-            pass
-        else:
             self.fail('Area - number should raise TypeError')
 
-        try:
+        with self.assertRaises(TypeError):
             a1 += 1
-        except TypeError, e:
-            pass
-        else:
             self.fail('Area += number should raise TypeError')
 
-        try:
+        with self.assertRaises(TypeError):
             a1 -= 1
-        except TypeError, e:
-            pass
-        else:
             self.fail('Area -= number should raise TypeError')
 
     def testMultiplication(self):
@@ -261,32 +228,20 @@ class AreaTest(unittest.TestCase):
         a4 /= 5
         self.assertEqual(a4.sq_m, 10)
 
-        try:
+        with self.assertRaises(TypeError):
             a5 = a1 * A(sq_m=1)
-        except TypeError, e:
-            pass
-        else:
             self.fail('Area * Area should raise TypeError')
 
-        try:
+        with self.assertRaises(TypeError):
             a1 *= A(sq_m=1)
-        except TypeError, e:
-            pass
-        else:
             self.fail('Area *= Area should raise TypeError')
 
-        try:
+        with self.assertRaises(TypeError):
             a5 = a1 / A(sq_m=1)
-        except TypeError, e:
-            pass
-        else:
             self.fail('Area / Area should raise TypeError')
 
-        try:
+        with self.assertRaises(TypeError):
             a1 /= A(sq_m=1)
-        except TypeError, e:
-            pass
-        else:
             self.fail('Area /= Area should raise TypeError')
 
     def testUnitConversions(self):

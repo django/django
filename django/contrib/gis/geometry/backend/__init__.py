@@ -6,10 +6,10 @@ geom_backend = getattr(settings, 'GEOMETRY_BACKEND', 'geos')
 
 try:
     module = import_module('.%s' % geom_backend, 'django.contrib.gis.geometry.backend')
-except ImportError, e:
+except ImportError:
     try:
         module = import_module(geom_backend)
-    except ImportError, e_user:
+    except ImportError:
         raise ImproperlyConfigured('Could not import user-defined GEOMETRY_BACKEND '
                                    '"%s".' % geom_backend)
 

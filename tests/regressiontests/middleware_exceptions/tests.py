@@ -118,13 +118,13 @@ class BaseMiddlewareExceptionTest(TestCase):
     def assert_exceptions_handled(self, url, errors, extra_error=None):
         try:
             response = self.client.get(url)
-        except TestException, e:
+        except TestException:
             # Test client intentionally re-raises any exceptions being raised
             # during request handling. Hence actual testing that exception was
             # properly handled is done by relying on got_request_exception
             # signal being sent.
             pass
-        except Exception, e:
+        except Exception as e:
             if type(extra_error) != type(e):
                 self.fail("Unexpected exception: %s" % e)
         self.assertEqual(len(self.exceptions), len(errors))

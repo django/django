@@ -62,7 +62,7 @@ class ClassDecoratedTestCase(ClassDecoratedTestCaseSuper):
         """
         try:
             super(ClassDecoratedTestCase, self).test_max_recursion_error()
-        except RuntimeError, e:
+        except RuntimeError:
             self.fail()
 
 

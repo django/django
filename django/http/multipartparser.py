@@ -196,7 +196,7 @@ class MultiPartParser(object):
                                 # We only special-case base64 transfer encoding
                                 try:
                                     chunk = str(chunk).decode('base64')
-                                except Exception, e:
+                                except Exception as e:
                                     # Since this is only a chunk, any error is an unfixable error.
                                     raise MultiPartParserError("Could not decode base64 data: %r" % e)
 
@@ -209,7 +209,7 @@ class MultiPartParser(object):
                                     # If the chunk received by the handler is None, then don't continue.
                                     break
 
-                    except SkipFile, e:
+                    except SkipFile:
                         # Just use up the rest of this file...
                         exhaust(field_stream)
                     else:
@@ -218,7 +218,7 @@ class MultiPartParser(object):
                 else:
                     # If this is neither a FIELD or a FILE, just exhaust the stream.
                     exhaust(stream)
-        except StopUpload, e:
+        except StopUpload as e:
             if not e.connection_reset:
                 exhaust(self._input_data)
         else:

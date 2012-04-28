@@ -150,7 +150,7 @@ def get_standard_processors():
             module, attr = path[:i], path[i+1:]
             try:
                 mod = import_module(module)
-            except ImportError, e:
+            except ImportError as e:
                 raise ImproperlyConfigured('Error importing request processor module %s: "%s"' % (module, e))
             try:
                 func = getattr(mod, attr)

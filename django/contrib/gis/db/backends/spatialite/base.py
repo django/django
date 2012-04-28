@@ -56,7 +56,7 @@ class DatabaseWrapper(SQLiteDatabaseWrapper):
             cur = self.connection.cursor(factory=SQLiteCursorWrapper)
             try:
                 cur.execute("SELECT load_extension(%s)", (self.spatialite_lib,))
-            except Exception, msg:
+            except Exception as msg:
                 raise ImproperlyConfigured('Unable to load the SpatiaLite library extension '
                                            '"%s" because: %s' % (self.spatialite_lib, msg))
             return cur

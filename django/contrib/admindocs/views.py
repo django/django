@@ -318,7 +318,7 @@ def load_all_installed_template_libraries():
         for library_name in libraries:
             try:
                 lib = template.get_library(library_name)
-            except template.InvalidTemplateLibrary, e:
+            except template.InvalidTemplateLibrary:
                 pass
 
 def get_return_data_type(func_name):

@@ -9,7 +9,7 @@ if os.name == 'posix':
         try:
             if os.fork() > 0:
                 sys.exit(0)     # kill off parent
-        except OSError, e:
+        except OSError as e:
             sys.stderr.write("fork #1 failed: (%d) %s\n" % (e.errno, e.strerror))
             sys.exit(1)
         os.setsid()
@@ -20,7 +20,7 @@ if os.name == 'posix':
         try:
             if os.fork() > 0:
                 os._exit(0)
-        except OSError, e:
+        except OSError as e:
             sys.stderr.write("fork #2 failed: (%d) %s\n" % (e.errno, e.strerror))
             os._exit(1)
 

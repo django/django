@@ -37,7 +37,7 @@ class Command(NoArgsCommand):
         for app_name in settings.INSTALLED_APPS:
             try:
                 import_module('.management', app_name)
-            except ImportError, exc:
+            except ImportError as exc:
                 # This is slightly hackish. We want to ignore ImportErrors
                 # if the "management" module itself is missing -- but we don't
                 # want to ignore the exception if the management module exists
@@ -125,7 +125,7 @@ class Command(NoArgsCommand):
                         try:
                             for sql in custom_sql:
                                 cursor.execute(sql)
-                        except Exception, e:
+                        except Exception as e:
                             self.stderr.write("Failed to install custom SQL for %s.%s model: %s\n" % \
                                                 (app_name, model._meta.object_name, e))
                             if show_traceback:
@@ -150,7 +150,7 @@ class Command(NoArgsCommand):
                         try:
                             for sql in index_sql:
                                 cursor.execute(sql)
-                        except Exception, e:
+                        except Exception as e:
                             self.stderr.write("Failed to install index for %s.%s model: %s\n" % \
                                                 (app_name, model._meta.object_name, e))
                             transaction.rollback_unless_managed(using=db)

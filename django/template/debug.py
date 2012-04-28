@@ -72,7 +72,7 @@ class DebugNodeList(NodeList):
     def render_node(self, node, context):
         try:
             return node.render(context)
-        except Exception, e:
+        except Exception as e:
             if not hasattr(e, 'django_template_source'):
                 e.django_template_source = node.source
             raise
@@ -87,7 +87,7 @@ class DebugVariableNode(VariableNode):
             output = force_unicode(output)
         except UnicodeDecodeError:
             return ''
-        except Exception, e:
+        except Exception as e:
             if not hasattr(e, 'django_template_source'):
                 e.django_template_source = self.source
             raise

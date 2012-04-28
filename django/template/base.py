@@ -265,7 +265,7 @@ class Parser(object):
                     self.invalid_block_tag(token, command, parse_until)
                 try:
                     compiled_result = compile_func(self, token)
-                except TemplateSyntaxError, e:
+                except TemplateSyntaxError as e:
                     if not self.compile_function_error(token, e):
                         raise
                 self.extend_nodelist(nodelist, compiled_result, token)
@@ -774,7 +774,7 @@ class Variable(object):
                             # GOTCHA: This will also catch any TypeError
                             # raised in the function itself.
                             current = settings.TEMPLATE_STRING_IF_INVALID  # invalid method call
-        except Exception, e:
+        except Exception as e:
             if getattr(e, 'silent_variable_failure', False):
                 current = settings.TEMPLATE_STRING_IF_INVALID
             else:
@@ -1237,7 +1237,7 @@ def import_library(taglib_module):
     """
     try:
         mod = import_module(taglib_module)
-    except ImportError, e:
+    except ImportError as e:
         # If the ImportError is because the taglib submodule does not exist,
         # that's not an error that should be raised. If the submodule exists
         # and raised an ImportError on the attempt to load it, that we want

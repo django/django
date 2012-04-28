@@ -30,7 +30,7 @@ def get_connection(backend=None, fail_silently=False, **kwds):
     try:
         mod_name, klass_name = path.rsplit('.', 1)
         mod = import_module(mod_name)
-    except ImportError, e:
+    except ImportError as e:
         raise ImproperlyConfigured(('Error importing email backend module %s: "%s"'
                                     % (mod_name, e)))
     try:

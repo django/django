@@ -1112,7 +1112,7 @@ class Query(object):
                     parts, opts, alias, True, allow_many, allow_explicit_fk=True,
                     can_reuse=can_reuse, negate=negate,
                     process_extras=process_extras)
-        except MultiJoin, e:
+        except MultiJoin as e:
             self.split_exclude(filter_expr, LOOKUP_SEP.join(parts[:e.level]),
                     can_reuse)
             return

@@ -190,7 +190,7 @@ class Command(BaseCommand):
                                             models.add(obj.object.__class__)
                                             try:
                                                 obj.save(using=using)
-                                            except (DatabaseError, IntegrityError), e:
+                                            except (DatabaseError, IntegrityError) as e:
                                                 msg = "Could not load %(app_label)s.%(object_name)s(pk=%(pk)s): %(error_msg)s" % {
                                                         'app_label': obj.object._meta.app_label,
                                                         'object_name': obj.object._meta.object_name,

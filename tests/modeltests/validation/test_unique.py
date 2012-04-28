@@ -115,19 +115,19 @@ class PerformUniqueChecksTest(TestCase):
         p = FlexibleDatePost(title="Django 1.0 is released")
         try:
             p.full_clean()
-        except ValidationError, e:
+        except ValidationError:
             self.fail("unique_for_date checks shouldn't trigger when the associated DateField is None.")
 
         p = FlexibleDatePost(slug="Django 1.0")
         try:
             p.full_clean()
-        except ValidationError, e:
+        except ValidationError:
             self.fail("unique_for_year checks shouldn't trigger when the associated DateField is None.")
 
         p = FlexibleDatePost(subtitle="Finally")
         try:
             p.full_clean()
-        except ValidationError, e:
+        except ValidationError:
             self.fail("unique_for_month checks shouldn't trigger when the associated DateField is None.")
 
     def test_unique_errors(self):

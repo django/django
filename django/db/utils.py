@@ -22,7 +22,7 @@ def load_backend(backend_name):
     # Look for a fully qualified database backend name
     try:
         return import_module('.base', backend_name)
-    except ImportError, e_user:
+    except ImportError as e_user:
         # The database backend wasn't found. Display a helpful error message
         # listing all possible (built-in) database backends.
         backend_dir = os.path.join(os.path.dirname(__file__), 'backends')
@@ -112,7 +112,7 @@ class ConnectionRouter(object):
                 try:
                     module_name, klass_name = r.rsplit('.', 1)
                     module = import_module(module_name)
-                except ImportError, e:
+                except ImportError as e:
                     raise ImproperlyConfigured('Error importing database router %s: "%s"' % (klass_name, e))
                 try:
                     router_class = getattr(module, klass_name)

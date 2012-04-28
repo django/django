@@ -77,7 +77,7 @@ def get_exception_reporter_filter(request):
         modname, classname = modpath.rsplit('.', 1)
         try:
             mod = import_module(modname)
-        except ImportError, e:
+        except ImportError as e:
             raise ImproperlyConfigured(
             'Error importing default exception reporter filter %s: "%s"' % (modpath, e))
         try:

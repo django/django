@@ -298,7 +298,7 @@ class RegexURLResolver(LocaleRegexProvider):
             for pattern in self.url_patterns:
                 try:
                     sub_match = pattern.resolve(new_path)
-                except Resolver404, e:
+                except Resolver404 as e:
                     sub_tried = e.args[0].get('tried')
                     if sub_tried is not None:
                         tried.extend([[pattern] + t for t in sub_tried])
@@ -358,7 +358,7 @@ class RegexURLResolver(LocaleRegexProvider):
             raise ValueError("Don't mix *args and **kwargs in call to reverse()!")
         try:
             lookup_view = get_callable(lookup_view, True)
-        except (ImportError, AttributeError), e:
+        except (ImportError, AttributeError) as e:
             raise NoReverseMatch("Error importing '%s': %s." % (lookup_view, e))
         possibilities = self.reverse_dict.getlist(lookup_view)
         prefix_norm, prefix_args = normalize(_prefix)[0]
@@ -462,7 +462,7 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, prefix=None, current
                 extra, resolver = resolver.namespace_dict[ns]
                 resolved_path.append(ns)
                 ns_pattern = ns_pattern + extra
-            except KeyError, key:
+            except KeyError as key:
                 if resolved_path:
                     raise NoReverseMatch(
                         "%s is not a registered namespace inside '%s'" %

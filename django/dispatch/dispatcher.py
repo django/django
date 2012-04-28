@@ -205,7 +205,7 @@ class Signal(object):
         for receiver in self._live_receivers(_make_id(sender)):
             try:
                 response = receiver(signal=self, sender=sender, **named)
-            except Exception, err:
+            except Exception as err:
                 responses.append((receiver, err))
             else:
                 responses.append((receiver, response))

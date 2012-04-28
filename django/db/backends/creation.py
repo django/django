@@ -329,7 +329,7 @@ class BaseDatabaseCreation(object):
         try:
             cursor.execute(
                 "CREATE DATABASE %s %s" % (qn(test_database_name), suffix))
-        except Exception, e:
+        except Exception as e:
             sys.stderr.write(
                 "Got an error creating the test database: %s\n" % e)
             if not autoclobber:
@@ -346,7 +346,7 @@ class BaseDatabaseCreation(object):
                     cursor.execute(
                         "CREATE DATABASE %s %s" % (qn(test_database_name),
                                                    suffix))
-                except Exception, e:
+                except Exception as e:
                     sys.stderr.write(
                         "Got an error recreating the test database: %s\n" % e)
                     sys.exit(2)

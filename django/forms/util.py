@@ -66,7 +66,7 @@ def from_current_timezone(value):
         current_timezone = timezone.get_current_timezone()
         try:
             return timezone.make_aware(value, current_timezone)
-        except Exception, e:
+        except Exception:
             raise ValidationError(_('%(datetime)s couldn\'t be interpreted '
                                     'in time zone %(current_timezone)s; it '
                                     'may be ambiguous or it may not exist.')

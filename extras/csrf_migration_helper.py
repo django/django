@@ -173,7 +173,7 @@ class Template(object):
             fd = open(self.absolute_filename)
             try:
                 content = fd.read().decode(TEMPLATE_ENCODING)
-            except UnicodeDecodeError, e:
+            except UnicodeDecodeError as e:
                 message = '%s in %s' % (
                     e[4], self.absolute_filename.encode('UTF-8', 'ignore'))
                 raise UnicodeDecodeError(*(e.args[:4] + (message,)))

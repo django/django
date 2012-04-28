@@ -81,7 +81,7 @@ class TemplateCommand(BaseCommand):
             top_dir = path.join(os.getcwd(), name)
             try:
                 os.makedirs(top_dir)
-            except OSError, e:
+            except OSError as e:
                 if e.errno == errno.EEXIST:
                     message = "'%s' already exists" % top_dir
                 else:
@@ -231,7 +231,7 @@ class TemplateCommand(BaseCommand):
         try:
             the_path, info = urllib.urlretrieve(url,
                                                 path.join(tempdir, filename))
-        except IOError, e:
+        except IOError as e:
             raise CommandError("couldn't download URL %s to %s: %s" %
                                (url, filename, e))
 
@@ -286,7 +286,7 @@ class TemplateCommand(BaseCommand):
         try:
             archive.extract(filename, tempdir)
             return tempdir
-        except (archive.ArchiveException, IOError), e:
+        except (archive.ArchiveException, IOError) as e:
             raise CommandError("couldn't extract file %s to %s: %s" %
                                (filename, tempdir, e))
 

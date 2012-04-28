@@ -77,12 +77,12 @@ def get_cookie_signer(salt='django.core.signing.get_cookie_signer'):
     module, attr = modpath.rsplit('.', 1)
     try:
         mod = import_module(module)
-    except ImportError, e:
+    except ImportError as e:
         raise ImproperlyConfigured(
             'Error importing cookie signer %s: "%s"' % (modpath, e))
     try:
         Signer = getattr(mod, attr)
-    except AttributeError, e:
+    except AttributeError as e:
         raise ImproperlyConfigured(
             'Error importing cookie signer %s: "%s"' % (modpath, e))
     return Signer('django.http.cookies' + settings.SECRET_KEY, salt=salt)

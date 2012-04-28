@@ -87,7 +87,7 @@ class Command(LabelCommand):
         # Getting the OGR DataSource from the string parameter.
         try:
             ds = gdal.DataSource(data_source)
-        except gdal.OGRException, msg:
+        except gdal.OGRException as msg:
             raise CommandError(msg)
 
         # Whether the user wants to generate the LayerMapping dictionary as well.

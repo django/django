@@ -384,9 +384,9 @@ class ModelTest(TestCase):
         try:
             Article.objects.all()[0:1] & Article.objects.all()[4:5]
             self.fail('Should raise an AssertionError')
-        except AssertionError, e:
+        except AssertionError as e:
             self.assertEqual(str(e), "Cannot combine queries once a slice has been taken.")
-        except Exception, e:
+        except Exception as e:
             self.fail('Should raise an AssertionError, not %s' % e)
 
         # Negative slices are not supported, due to database constraints.
@@ -394,15 +394,15 @@ class ModelTest(TestCase):
         try:
             Article.objects.all()[-1]
             self.fail('Should raise an AssertionError')
-        except AssertionError, e:
+        except AssertionError as e:
             self.assertEqual(str(e), "Negative indexing is not supported.")
-        except Exception, e:
+        except Exception as e:
             self.fail('Should raise an AssertionError, not %s' % e)
 
         error = None
         try:
             Article.objects.all()[0:-5]
-        except Exception, e:
+        except Exception as e:
             error = e
         self.assertTrue(isinstance(error, AssertionError))
         self.assertEqual(str(error), "Negative indexing is not supported.")

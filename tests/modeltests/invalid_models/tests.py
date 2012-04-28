@@ -35,7 +35,7 @@ class InvalidModelTestCase(unittest.TestCase):
 
         try:
             module = load_app("modeltests.invalid_models.invalid_models")
-        except Exception, e:
+        except Exception:
             self.fail('Unable to load invalid model module')
 
         count = get_validation_errors(self.stdout, module)

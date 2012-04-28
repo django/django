@@ -89,7 +89,7 @@ def make_middleware_decorator(middleware_class):
                         return result
                 try:
                     response = view_func(request, *args, **kwargs)
-                except Exception, e:
+                except Exception as e:
                     if hasattr(middleware, 'process_exception'):
                         result = middleware.process_exception(request, e)
                         if result is not None:

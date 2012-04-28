@@ -10,13 +10,13 @@ class ValidationMessagesTest(TestCase):
         self.assertRaises(ValidationError, f.clean, 'foo', None)
         try:
             f.clean('foo', None)
-        except ValidationError, e:
+        except ValidationError as e:
             self.assertEqual(e.messages, [u"'foo' value must be an integer."])
         # primary_key must be True. Refs #12467.
         self.assertRaises(AssertionError, models.AutoField, 'primary_key', False)
         try:
             models.AutoField(primary_key=False)
-        except AssertionError, e:
+        except AssertionError as e:
             self.assertEqual(str(e), "AutoFields must have primary_key=True.")
 
     def test_integer_field_raises_error_message(self):
@@ -24,7 +24,7 @@ class ValidationMessagesTest(TestCase):
         self.assertRaises(ValidationError, f.clean, 'foo', None)
         try:
             f.clean('foo', None)
-        except ValidationError, e:
+        except ValidationError as e:
             self.assertEqual(e.messages, [u"'foo' value must be an integer."])
 
     def test_boolean_field_raises_error_message(self):
@@ -32,7 +32,7 @@ class ValidationMessagesTest(TestCase):
         self.assertRaises(ValidationError, f.clean, 'foo', None)
         try:
             f.clean('foo', None)
-        except ValidationError, e:
+        except ValidationError as e:
             self.assertEqual(e.messages,
                         [u"'foo' value must be either True or False."])
 
@@ -41,7 +41,7 @@ class ValidationMessagesTest(TestCase):
         self.assertRaises(ValidationError, f.clean, 'foo', None)
         try:
             f.clean('foo', None)
-        except ValidationError, e:
+        except ValidationError as e:
             self.assertEqual(e.messages, [u"'foo' value must be a float."])
 
     def test_decimal_field_raises_error_message(self):
@@ -49,7 +49,7 @@ class ValidationMessagesTest(TestCase):
         self.assertRaises(ValidationError, f.clean, 'foo', None)
         try:
             f.clean('foo', None)
-        except ValidationError, e:
+        except ValidationError as e:
             self.assertEqual(e.messages,
                         [u"'foo' value must be a decimal number."])
 
@@ -58,7 +58,7 @@ class ValidationMessagesTest(TestCase):
         self.assertRaises(ValidationError, f.clean, 'foo', None)
         try:
             f.clean('foo', None)
-        except ValidationError, e:
+        except ValidationError as e:
             self.assertEqual(e.messages,
                         [u"'foo' value must be either None, True or False."])
 
@@ -67,7 +67,7 @@ class ValidationMessagesTest(TestCase):
         self.assertRaises(ValidationError, f.clean, 'foo', None)
         try:
             f.clean('foo', None)
-        except ValidationError, e:
+        except ValidationError as e:
             self.assertEqual(e.messages, [
                 u"'foo' value has an invalid date format. "
                 u"It must be in YYYY-MM-DD format."])
@@ -75,7 +75,7 @@ class ValidationMessagesTest(TestCase):
         self.assertRaises(ValidationError, f.clean, 'aaaa-10-10', None)
         try:
             f.clean('aaaa-10-10', None)
-        except ValidationError, e:
+        except ValidationError as e:
             self.assertEqual(e.messages, [
                 u"'aaaa-10-10' value has an invalid date format. "
                 u"It must be in YYYY-MM-DD format."])
@@ -83,7 +83,7 @@ class ValidationMessagesTest(TestCase):
         self.assertRaises(ValidationError, f.clean, '2011-13-10', None)
         try:
             f.clean('2011-13-10', None)
-        except ValidationError, e:
+        except ValidationError as e:
             self.assertEqual(e.messages, [
                 u"'2011-13-10' value has the correct format (YYYY-MM-DD) "
                 u"but it is an invalid date."])
@@ -91,7 +91,7 @@ class ValidationMessagesTest(TestCase):
         self.assertRaises(ValidationError, f.clean, '2011-10-32', None)
         try:
             f.clean('2011-10-32', None)
-        except ValidationError, e:
+        except ValidationError as e:
             self.assertEqual(e.messages, [
                 u"'2011-10-32' value has the correct format (YYYY-MM-DD) "
                 u"but it is an invalid date."])
@@ -102,7 +102,7 @@ class ValidationMessagesTest(TestCase):
         self.assertRaises(ValidationError, f.clean, 'foo', None)
         try:
             f.clean('foo', None)
-        except ValidationError, e:
+        except ValidationError as e:
             self.assertEqual(e.messages, [
                 u"'foo' value has an invalid format. It must be "
                 u"in YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ] format."])
@@ -111,7 +111,7 @@ class ValidationMessagesTest(TestCase):
         self.assertRaises(ValidationError, f.clean, '2011-10-32', None)
         try:
             f.clean('2011-10-32', None)
-        except ValidationError, e:
+        except ValidationError as e:
             self.assertEqual(e.messages, [
                 u"'2011-10-32' value has the correct format "
                 u"(YYYY-MM-DD) but it is an invalid date."])
@@ -120,7 +120,7 @@ class ValidationMessagesTest(TestCase):
         self.assertRaises(ValidationError, f.clean, '2011-10-32 10:10', None)
         try:
             f.clean('2011-10-32 10:10', None)
-        except ValidationError, e:
+        except ValidationError as e:
             self.assertEqual(e.messages, [
                 u"'2011-10-32 10:10' value has the correct format "
                 u"(YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]) "
@@ -132,7 +132,7 @@ class ValidationMessagesTest(TestCase):
         self.assertRaises(ValidationError, f.clean, 'foo', None)
         try:
             f.clean('foo', None)
-        except ValidationError, e:
+        except ValidationError as e:
             self.assertEqual(e.messages, [
                 u"'foo' value has an invalid format. It must be in "
                 u"HH:MM[:ss[.uuuuuu]] format."])
@@ -140,7 +140,7 @@ class ValidationMessagesTest(TestCase):
         self.assertRaises(ValidationError, f.clean, '25:50', None)
         try:
             f.clean('25:50', None)
-        except ValidationError, e:
+        except ValidationError as e:
             self.assertEqual(e.messages, [
                 u"'25:50' value has the correct format "
                 u"(HH:MM[:ss[.uuuuuu]]) but it is an invalid time."])

@@ -333,7 +333,7 @@ class InvalidFieldAndFactory(TestCase):
                 class Meta:
                     model = Person
                     fields = ('name', 'no-field')
-        except FieldError, e:
+        except FieldError as e:
             # Make sure the exception contains some reference to the
             # field responsible for the problem.
             self.assertTrue('no-field' in e.args[0])

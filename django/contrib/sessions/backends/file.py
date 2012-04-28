@@ -90,7 +90,7 @@ class SessionStore(SessionBase):
             fd = os.open(session_file_name, flags)
             os.close(fd)
 
-        except OSError, e:
+        except OSError as e:
             if must_create and e.errno == errno.EEXIST:
                 raise CreateError
             raise

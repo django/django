@@ -56,7 +56,7 @@ class StaticFilesHandler(WSGIHandler):
         if self._should_handle(request.path):
             try:
                 return self.serve(request)
-            except Http404, e:
+            except Http404 as e:
                 if settings.DEBUG:
                     from django.views import debug
                     return debug.technical_404_response(request, e)

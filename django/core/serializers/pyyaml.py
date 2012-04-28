@@ -57,6 +57,6 @@ def Deserializer(stream_or_string, **options):
             yield obj
     except GeneratorExit:
         raise
-    except Exception, e:
+    except Exception as e:
         # Map to deserializer error
         raise DeserializationError(e)

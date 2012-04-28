@@ -1626,7 +1626,7 @@ class DebugRunner(DocTestRunner):
          ...                                    {}, 'foo', 'foo.py', 0)
          >>> try:
          ...     runner.run(test)
-         ... except UnexpectedException, failure:
+         ... except UnexpectedException as failure:
          ...     pass
 
          >>> failure.test is test
@@ -1654,7 +1654,7 @@ class DebugRunner(DocTestRunner):
 
          >>> try:
          ...    runner.run(test)
-         ... except DocTestFailure, failure:
+         ... except DocTestFailure as failure:
          ...    pass
 
        DocTestFailure objects provide access to the test:
@@ -2164,7 +2164,7 @@ class DocTestCase(unittest.TestCase):
              >>> case = DocTestCase(test)
              >>> try:
              ...     case.debug()
-             ... except UnexpectedException, failure:
+             ... except UnexpectedException as failure:
              ...     pass
 
            The UnexpectedException contains the test, the example, and
@@ -2193,7 +2193,7 @@ class DocTestCase(unittest.TestCase):
 
              >>> try:
              ...    case.debug()
-             ... except DocTestFailure, failure:
+             ... except DocTestFailure as failure:
              ...    pass
 
            DocTestFailure objects provide access to the test:

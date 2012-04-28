@@ -430,7 +430,7 @@ class LayerMapping(object):
 
             # Creating the CoordTransform object
             return CoordTransform(self.source_srs, target_srs)
-        except Exception, msg:
+        except Exception as msg:
             raise LayerMapError('Could not translate between the data source and model geometry: %s' % msg)
 
     def geometry_field(self):
@@ -514,7 +514,7 @@ class LayerMapping(object):
                 # Getting the keyword arguments
                 try:
                     kwargs = self.feature_kwargs(feat)
-                except LayerMapError, msg:
+                except LayerMapError as msg:
                     # Something borked the validation
                     if strict: raise
                     elif not silent:
@@ -553,7 +553,7 @@ class LayerMapping(object):
                         if verbose: stream.write('%s: %s\n' % (is_update and 'Updated' or 'Saved', m))
                     except SystemExit:
                         raise
-                    except Exception, msg:
+                    except Exception as msg:
                         if self.transaction_mode == 'autocommit':
                             # Rolling back the transaction so that other model saves
                             # will work.

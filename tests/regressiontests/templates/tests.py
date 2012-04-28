@@ -41,7 +41,7 @@ from .response import (TemplateResponseTest, CacheMiddlewareTest,
 
 try:
     from .loaders import RenderToStringTest, EggLoaderTest
-except ImportError, e:
+except ImportError as e:
     if "pkg_resources" in e.message:
         pass # If setuptools isn't installed, that's fine. Just move on.
     else:
@@ -274,7 +274,7 @@ class Templates(unittest.TestCase):
             try:
                 tmpl = loader.select_template([load_name])
                 r = tmpl.render(template.Context({}))
-            except template.TemplateDoesNotExist, e:
+            except template.TemplateDoesNotExist as e:
                 settings.TEMPLATE_DEBUG = old_td
                 self.assertEqual(e.args[0], 'missing.html')
             self.assertEqual(r, None, 'Template rendering unexpectedly succeeded, produced: ->%r<-' % r)
@@ -307,7 +307,7 @@ class Templates(unittest.TestCase):
             r = None
             try:
                 r = tmpl.render(template.Context({}))
-            except template.TemplateDoesNotExist, e:
+            except template.TemplateDoesNotExist as e:
                 settings.TEMPLATE_DEBUG = old_td
                 self.assertEqual(e.args[0], 'missing.html')
             self.assertEqual(r, None, 'Template rendering unexpectedly succeeded, produced: ->%r<-' % r)
@@ -334,7 +334,7 @@ class Templates(unittest.TestCase):
             r = None
             try:
                 r = tmpl.render(template.Context({}))
-            except template.TemplateDoesNotExist, e:
+            except template.TemplateDoesNotExist as e:
                 self.assertEqual(e.args[0], 'missing.html')
             self.assertEqual(r, None, 'Template rendering unexpectedly succeeded, produced: ->%r<-' % r)
 
@@ -343,7 +343,7 @@ class Templates(unittest.TestCase):
             tmpl = loader.get_template(load_name)
             try:
                 tmpl.render(template.Context({}))
-            except template.TemplateDoesNotExist, e:
+            except template.TemplateDoesNotExist as e:
                 self.assertEqual(e.args[0], 'missing.html')
             self.assertEqual(r, None, 'Template rendering unexpectedly succeeded, produced: ->%r<-' % r)
         finally:
@@ -384,7 +384,7 @@ class Templates(unittest.TestCase):
         from django.template import Template, TemplateSyntaxError
         try:
             t = Template("{% if 1 %}lala{% endblock %}{% endif %}")
-        except TemplateSyntaxError, e:
+        except TemplateSyntaxError as e:
             self.assertEqual(e.args[0], "Invalid block tag: 'endblock', expected 'elif', 'else' or 'endif'")
 
     def test_templates(self):
@@ -1638,7 +1638,7 @@ class TemplateTagLoading(unittest.TestCase):
         self.assertRaises(template.TemplateSyntaxError, template.Template, ttext)
         try:
             template.Template(ttext)
-        except template.TemplateSyntaxError, e:
+        except template.TemplateSyntaxError as e:
             self.assertTrue('ImportError' in e.args[0])
             self.assertTrue('Xtemplate' in e.args[0])
 
@@ -1650,7 +1650,7 @@ class TemplateTagLoading(unittest.TestCase):
         self.assertRaises(template.TemplateSyntaxError, template.Template, ttext)
         try:
             template.Template(ttext)
-        except template.TemplateSyntaxError, e:
+        except template.TemplateSyntaxError as e:
             self.assertTrue('ImportError' in e.args[0])
             self.assertTrue('Xtemplate' in e.args[0])
 

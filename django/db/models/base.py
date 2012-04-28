@@ -805,14 +805,14 @@ class Model(object):
 
         try:
             self.clean_fields(exclude=exclude)
-        except ValidationError, e:
+        except ValidationError as e:
             errors = e.update_error_dict(errors)
 
         # Form.clean() is run even if other validation fails, so do the
         # same with Model.clean() for consistency.
         try:
             self.clean()
-        except ValidationError, e:
+        except ValidationError as e:
             errors = e.update_error_dict(errors)
 
         # Run unique checks, but only for fields that passed validation.
@@ -821,7 +821,7 @@ class Model(object):
                 exclude.append(name)
         try:
             self.validate_unique(exclude=exclude)
-        except ValidationError, e:
+        except ValidationError as e:
             errors = e.update_error_dict(errors)
 
         if errors:
@@ -846,7 +846,7 @@ class Model(object):
                 continue
             try:
                 setattr(self, f.attname, f.clean(raw_value, self))
-            except ValidationError, e:
+            except ValidationError as e:
                 errors[f.name] = e.messages
 
         if errors:

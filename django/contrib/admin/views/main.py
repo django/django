@@ -139,7 +139,7 @@ class ChangeList(object):
                 use_distinct = (use_distinct or
                                 lookup_needs_distinct(self.lookup_opts, key))
             return filter_specs, bool(filter_specs), lookup_params, use_distinct
-        except FieldDoesNotExist, e:
+        except FieldDoesNotExist as e:
             raise IncorrectLookupParameters(e)
 
     def get_query_string(self, new_params=None, remove=None):
@@ -316,7 +316,7 @@ class ChangeList(object):
             # Allow certain types of errors to be re-raised as-is so that the
             # caller can treat them in a special way.
             raise
-        except Exception, e:
+        except Exception as e:
             # Every other error is caught with a naked except, because we don't
             # have any other way of validating lookup parameters. They might be
             # invalid if the keyword arguments are incorrect, or if the values

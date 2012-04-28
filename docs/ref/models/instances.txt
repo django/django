@@ -72,7 +72,7 @@ Example::
 
     try:
         article.full_clean()
-    except ValidationError, e:
+    except ValidationError as e:
         # Do something based on the errors contained in e.message_dict.
         # Display them to a user, or handle them programatically.
 
@@ -112,7 +112,7 @@ instead of to a specific field::
     from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
     try:
         article.full_clean()
-    except ValidationError, e:
+    except ValidationError as e:
         non_field_errors = e.message_dict[NON_FIELD_ERRORS]
 
 Finally, ``full_clean()`` will check any unique constraints on your model.

@@ -122,7 +122,7 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
             self.spatial_version = version
         except ImproperlyConfigured:
             raise
-        except Exception, msg:
+        except Exception as msg:
             raise ImproperlyConfigured('Cannot determine the SpatiaLite version for the "%s" '
                                        'database (error was "%s").  Was the SpatiaLite initialization '
                                        'SQL loaded on this database?' %

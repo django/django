@@ -10,7 +10,7 @@ def get_storage(path, *args, **kwargs):
     module, attr = path[:i], path[i+1:]
     try:
         mod = import_module(module)
-    except ImportError, e:
+    except ImportError as e:
         raise MissingStorageModule(
             'Error loading storage %s: "%s"' % (module, e))
     try:

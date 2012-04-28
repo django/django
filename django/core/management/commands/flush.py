@@ -55,7 +55,7 @@ Are you sure you want to do this?
                 cursor = connection.cursor()
                 for sql in sql_list:
                     cursor.execute(sql)
-            except Exception, e:
+            except Exception as e:
                 transaction.rollback_unless_managed(using=db)
                 raise CommandError("""Database %s couldn't be flushed. Possible reasons:
   * The database isn't running or isn't configured correctly.

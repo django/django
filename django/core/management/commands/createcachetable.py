@@ -54,7 +54,7 @@ class Command(LabelCommand):
         curs = connection.cursor()
         try:
             curs.execute("\n".join(full_statement))
-        except DatabaseError, e:
+        except DatabaseError as e:
             self.stderr.write(
                 self.style.ERROR("Cache table '%s' could not be created.\nThe error was: %s.\n" %
                     (tablename, e)))

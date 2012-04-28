@@ -16,7 +16,7 @@ class OracleIntrospection(DatabaseIntrospection):
                 cursor.execute('SELECT "DIMINFO", "SRID" FROM "USER_SDO_GEOM_METADATA" WHERE "TABLE_NAME"=%s AND "COLUMN_NAME"=%s',
                                (table_name.upper(), geo_col.upper()))
                 row = cursor.fetchone()
-            except Exception, msg:
+            except Exception as msg:
                 raise Exception('Could not find entry in USER_SDO_GEOM_METADATA corresponding to "%s"."%s"\n'
                                 'Error message: %s.' % (table_name, geo_col, msg))
 

@@ -206,7 +206,7 @@ class QuerySet(object):
             qs = self._clone()
             qs.query.set_limits(k, k + 1)
             return list(qs)[0]
-        except self.model.DoesNotExist, e:
+        except self.model.DoesNotExist as e:
             raise IndexError(e.args)
 
     def __and__(self, other):
@@ -454,7 +454,7 @@ class QuerySet(object):
                 obj.save(force_insert=True, using=self.db)
                 transaction.savepoint_commit(sid, using=self.db)
                 return obj, True
-            except IntegrityError, e:
+            except IntegrityError as e:
                 transaction.savepoint_rollback(sid, using=self.db)
                 exc_info = sys.exc_info()
                 try:

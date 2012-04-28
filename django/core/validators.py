@@ -45,7 +45,7 @@ class URLValidator(RegexValidator):
     def __call__(self, value):
         try:
             super(URLValidator, self).__call__(value)
-        except ValidationError, e:
+        except ValidationError as e:
             # Trivial case failed. Try for possible IDN domain
             if value:
                 value = smart_unicode(value)
@@ -73,7 +73,7 @@ class EmailValidator(RegexValidator):
     def __call__(self, value):
         try:
             super(EmailValidator, self).__call__(value)
-        except ValidationError, e:
+        except ValidationError as e:
             # Trivial case failed. Try for possible IDN domain-part
             if value and u'@' in value:
                 parts = value.split(u'@')

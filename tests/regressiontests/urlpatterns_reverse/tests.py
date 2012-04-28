@@ -161,7 +161,7 @@ class URLPatternReverse(TestCase):
         for name, expected, args, kwargs in test_data:
             try:
                 got = reverse(name, args=args, kwargs=kwargs)
-            except NoReverseMatch, e:
+            except NoReverseMatch:
                 self.assertEqual(expected, NoReverseMatch)
             else:
                 self.assertEqual(got, expected)
@@ -207,7 +207,7 @@ class ResolverTests(unittest.TestCase):
         try:
             resolve('/included/non-existent-url', urlconf=urls)
             self.fail('resolve did not raise a 404')
-        except Resolver404, e:
+        except Resolver404 as e:
             # make sure we at least matched the root ('/') url resolver:
             self.assertTrue('tried' in e.args[0])
             tried = e.args[0]['tried']

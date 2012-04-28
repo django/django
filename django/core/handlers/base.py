@@ -43,7 +43,7 @@ class BaseHandler(object):
                 raise exceptions.ImproperlyConfigured('%s isn\'t a middleware module' % middleware_path)
             try:
                 mod = import_module(mw_module)
-            except ImportError, e:
+            except ImportError as e:
                 raise exceptions.ImproperlyConfigured('Error importing middleware %s: "%s"' % (mw_module, e))
             try:
                 mw_class = getattr(mod, mw_classname)
@@ -109,7 +109,7 @@ class BaseHandler(object):
                 if response is None:
                     try:
                         response = callback(request, *callback_args, **callback_kwargs)
-                    except Exception, e:
+                    except Exception as e:
                         # If the view raised an exception, run it through exception
                         # middleware, and if the exception middleware returns a
                         # response, use that. Otherwise, reraise the exception.
@@ -135,7 +135,7 @@ class BaseHandler(object):
                         response = middleware_method(request, response)
                     response = response.render()
 
-            except http.Http404, e:
+            except http.Http404 as e:
                 logger.warning('Not Found: %s', request.path,
                             extra={
                                 'status_code': 404,

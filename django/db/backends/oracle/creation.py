@@ -62,7 +62,7 @@ class DatabaseCreation(BaseDatabaseCreation):
         if self._test_database_create():
             try:
                 self._execute_test_db_creation(cursor, parameters, verbosity)
-            except Exception, e:
+            except Exception as e:
                 sys.stderr.write("Got an error creating the test database: %s\n" % e)
                 if not autoclobber:
                     confirm = raw_input("It appears the test database, %s, already exists. Type 'yes' to delete it, or 'no' to cancel: " % TEST_NAME)
@@ -72,7 +72,7 @@ class DatabaseCreation(BaseDatabaseCreation):
                             print "Destroying old test database '%s'..." % self.connection.alias
                         self._execute_test_db_destruction(cursor, parameters, verbosity)
                         self._execute_test_db_creation(cursor, parameters, verbosity)
-                    except Exception, e:
+                    except Exception as e:
                         sys.stderr.write("Got an error recreating the test database: %s\n" % e)
                         sys.exit(2)
                 else:
@@ -84,7 +84,7 @@ class DatabaseCreation(BaseDatabaseCreation):
                 print "Creating test user..."
             try:
                 self._create_test_user(cursor, parameters, verbosity)
-            except Exception, e:
+            except Exception as e:
                 sys.stderr.write("Got an error creating the test user: %s\n" % e)
                 if not autoclobber:
                     confirm = raw_input("It appears the test user, %s, already exists. Type 'yes' to delete it, or 'no' to cancel: " % TEST_USER)
@@ -96,7 +96,7 @@ class DatabaseCreation(BaseDatabaseCreation):
                         if verbosity >= 1:
                             print "Creating test user..."
                         self._create_test_user(cursor, parameters, verbosity)
-                    except Exception, e:
+                    except Exception as e:
                         sys.stderr.write("Got an error recreating the test user: %s\n" % e)
                         sys.exit(2)
                 else:
@@ -197,7 +197,7 @@ class DatabaseCreation(BaseDatabaseCreation):
                 print stmt
             try:
                 cursor.execute(stmt)
-            except Exception, err:
+            except Exception as err:
                 sys.stderr.write("Failed (%s)\n" % (err))
                 raise
 
