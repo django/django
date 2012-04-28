@@ -46,9 +46,8 @@ We've also recorded an `audio clip of the pronunciation`_.
 Is Django stable?
 -----------------
 
-Yes. World Online has been using Django for more than three years. Sites built
-on Django have weathered traffic spikes of over one million hits an hour and a
-number of Slashdottings. Yes, it's quite stable.
+Yes, it's quite stable. World Online has been using Django for many years. Sites built on 
+Django have weathered traffic spikes of over one million hits an hour. 
 
 Does Django scale?
 ------------------
