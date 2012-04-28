@@ -449,7 +449,7 @@ class Model(object):
             return getattr(self, field_name)
         return getattr(self, field.attname)
 
-    def save(self, force_insert=False, force_update=False, using=None):
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         """
         Saves the current instance. Override this in a subclass if you want to
         control the saving process.
@@ -460,12 +460,29 @@ class Model(object):
         """
         if force_insert and force_update:
             raise ValueError("Cannot force both insert and updating in model saving.")
-        self.save_base(using=using, force_insert=force_insert, force_update=force_update)
+
+        if update_fields is not None:
+            if not isinstance(update_fields, (list, tuple)):
+                raise ValueError("update_fields must be a list or tuple")
+
+            # if update_fields is empty, does nothink
+            if len(update_fields) == 0:
+                return
+
+            field_names = self._meta.get_all_field_names()
+            for field_name in update_fields:
+                if field_name not in field_names:
+                    raise ValueError("%s field does not exist in this model" % (field_name))
+
+            force_update = True
+
+        self.save_base(using=using, force_insert=force_insert, 
+                        force_update=force_update, update_fields=update_fields)
 
     save.alters_data = True
 
     def save_base(self, raw=False, cls=None, origin=None, force_insert=False,
-            force_update=False, using=None):
+            force_update=False, using=None, update_fields=None):
         """
         Does the heavy-lifting involved in saving. Subclasses shouldn't need to
         override this method. It's separate from save() in order to hide the
@@ -483,7 +500,8 @@ class Model(object):
             meta = cls._meta
 
         if origin and not meta.auto_created:
-            signals.pre_save.send(sender=origin, instance=self, raw=raw, using=using)
+            signals.pre_save.send(sender=origin, instance=self, raw=raw, using=using,
+                                                            update_fields=update_fields)
 
         # If we are in a raw save, save the object exactly as presented.
         # That means that we don't try to be smart about saving attributes
@@ -503,7 +521,7 @@ class Model(object):
                 if field and getattr(self, parent._meta.pk.attname) is None and getattr(self, field.attname) is not None:
                     setattr(self, parent._meta.pk.attname, getattr(self, field.attname))
 
-                self.save_base(cls=parent, origin=org, using=using)
+                self.save_base(cls=parent, origin=org, using=using, update_fields=update_fields)
 
                 if field:
                     setattr(self, field.attname, self._get_pk_val(parent._meta))
@@ -512,6 +530,9 @@ class Model(object):
 
         if not meta.proxy:
             non_pks = [f for f in meta.local_fields if not f.primary_key]
+
+            if update_fields: 
+                non_pks = [f for f in non_pks if f.name in update_fields] 
 
             # First, try an UPDATE. If that doesn't update anything, do an INSERT.
             pk_val = self._get_pk_val(meta)
@@ -561,8 +582,8 @@ class Model(object):
 
         # Signal that the save is complete
         if origin and not meta.auto_created:
-            signals.post_save.send(sender=origin, instance=self,
-                created=(not record_exists), raw=raw, using=using)
+            signals.post_save.send(sender=origin, instance=self, created=(not record_exists), 
+                                                update_fields=update_fields, raw=raw, using=using)
 
 
     save_base.alters_data = True
