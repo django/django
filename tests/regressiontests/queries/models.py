@@ -346,3 +346,9 @@ class OneToOneCategory(models.Model):
 
     def __unicode__(self):
         return "one2one " + self.new_name
+
+class NullableName(models.Model):
+    name = models.CharField(max_length=20, null=True)
+    
+    class Meta:
+        ordering = ['id']
