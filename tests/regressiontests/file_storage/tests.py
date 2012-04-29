@@ -23,6 +23,7 @@ from django.core.files.base import File, ContentFile
 from django.core.files.images import get_image_dimensions
 from django.core.files.storage import FileSystemStorage, get_storage_class
 from django.core.files.uploadedfile import UploadedFile
+from django.core.files.move import file_move_safe
 from django.test import SimpleTestCase
 from django.utils import unittest
 from ..servers.tests import LiveServerBase
@@ -586,3 +587,24 @@ class FileLikeObjectTestCase(LiveServerBase):
         remote_file = self.urlopen('/example_view/')
 
         self.assertEqual(stored_file.read(), remote_file.read())
+
+class MoveTestCase(unittest.TestCase):
+    """
+    Test django.core.files.move.
+    """
+    def setUp(self):
+        self.file_a = tempfile.mkstemp()
+        self.file_b = tempfile.mkstemp()
+
+    def tearDown(self):
+        os.close(self.file_a[0])
+        os.close(self.file_b[0])
+        os.remove(self.file_a[1])
+        os.remove(self.file_b[1])
+
+    def test_overwrite_existing_file(self):
+        """
+        Test that file_move_safe raises an IOError if you try to overwrite an
+        existing file without passing in allow_overwrite=True.
+        """
+        self.assertRaises(IOError, file_move_safe, self.file_a[1], self.file_b[1])
