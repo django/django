@@ -50,32 +50,8 @@ requires_tz_support = skipUnless(TZ_SUPPORT,
         "time zone, but your operating system isn't able to do that.")
 
 
-class BaseDateTimeTests(TestCase):
-
-    @classmethod
-    def setUpClass(self):
-        self._old_time_zone = settings.TIME_ZONE
-        settings.TIME_ZONE = connection.settings_dict['TIME_ZONE'] = 'Africa/Nairobi'
-        timezone._localtime = None
-        if TZ_SUPPORT:
-            self._old_tz = os.environ.get('TZ')
-            os.environ['TZ'] = 'Africa/Nairobi'
-            time.tzset()
-
-    @classmethod
-    def tearDownClass(self):
-        settings.TIME_ZONE = connection.settings_dict['TIME_ZONE'] = self._old_time_zone
-        timezone._localtime = None
-        if TZ_SUPPORT:
-            if self._old_tz is None:
-                del os.environ['TZ']
-            else:
-                os.environ['TZ'] = self._old_tz
-            time.tzset()
-
-
-@override_settings(USE_TZ=False)
-class LegacyDatabaseTests(BaseDateTimeTests):
+@override_settings(TIME_ZONE='Africa/Nairobi', USE_TZ=False)
+class LegacyDatabaseTests(TestCase):
 
     def test_naive_datetime(self):
         dt = datetime.datetime(2011, 9, 1, 13, 20, 30)
@@ -269,8 +245,8 @@ class LegacyDatabaseTests(BaseDateTimeTests):
                 transform=lambda d: d)
 
 
-@override_settings(USE_TZ=True)
-class NewDatabaseTests(BaseDateTimeTests):
+@override_settings(TIME_ZONE='Africa/Nairobi', USE_TZ=True)
+class NewDatabaseTests(TestCase):
 
     @requires_tz_support
     def test_naive_datetime(self):
@@ -486,7 +462,8 @@ class NewDatabaseTests(BaseDateTimeTests):
         self.assertEqual(e.dt, None)
 
 
-class SerializationTests(BaseDateTimeTests):
+@override_settings(TIME_ZONE='Africa/Nairobi')
+class SerializationTests(TestCase):
 
     # Backend-specific notes:
     # - JSON supports only milliseconds, microseconds will be truncated.
@@ -639,8 +616,9 @@ class SerializationTests(BaseDateTimeTests):
             obj = serializers.deserialize('yaml', data).next().object
             self.assertEqual(obj.dt.replace(tzinfo=UTC), dt)
 
-@override_settings(DATETIME_FORMAT='c', USE_L10N=False, USE_TZ=True)
-class TemplateTests(BaseDateTimeTests):
+
+@override_settings(DATETIME_FORMAT='c', TIME_ZONE='Africa/Nairobi', USE_L10N=False, USE_TZ=True)
+class TemplateTests(TestCase):
 
     @requires_tz_support
     def test_localtime_templatetag_and_filters(self):
@@ -723,10 +701,8 @@ class TemplateTests(BaseDateTimeTests):
         tpl = Template("{% load tz %}{{ dt|localtime }}|{{ dt|utc }}")
         ctx = Context({'dt': datetime.datetime(2011, 9, 1, 12, 20, 30)})
 
-        timezone._localtime = None
         with self.settings(TIME_ZONE='Europe/Paris'):
             self.assertEqual(tpl.render(ctx), "2011-09-01T12:20:30+02:00|2011-09-01T10:20:30+00:00")
-        timezone._localtime = None
 
         # Use a pytz timezone as argument
         tpl = Template("{% load tz %}{{ dt|timezone:tz }}")
@@ -864,11 +840,9 @@ class TemplateTests(BaseDateTimeTests):
         tpl = Template("{% load tz %}{{ dt }}")
         ctx = Context({'dt': datetime.datetime(2011, 9, 1, 12, 20, 30, tzinfo=EAT)})
 
-        timezone._localtime = None
         with self.settings(TIME_ZONE=None):
             # the actual value depends on the system time zone of the host
             self.assertTrue(tpl.render(ctx).startswith("2011"))
-        timezone._localtime = None
 
     @requires_tz_support
     def test_now_template_tag_uses_current_time_zone(self):
@@ -879,8 +853,8 @@ class TemplateTests(BaseDateTimeTests):
             self.assertEqual(tpl.render(Context({})), "+0700")
 
 
-@override_settings(DATETIME_FORMAT='c', USE_L10N=False, USE_TZ=False)
-class LegacyFormsTests(BaseDateTimeTests):
+@override_settings(DATETIME_FORMAT='c', TIME_ZONE='Africa/Nairobi', USE_L10N=False, USE_TZ=False)
+class LegacyFormsTests(TestCase):
 
     def test_form(self):
         form = EventForm({'dt': u'2011-09-01 13:20:30'})
@@ -914,8 +888,8 @@ class LegacyFormsTests(BaseDateTimeTests):
         self.assertEqual(e.dt, datetime.datetime(2011, 9, 1, 13, 20, 30))
 
 
-@override_settings(DATETIME_FORMAT='c', USE_L10N=False, USE_TZ=True)
-class NewFormsTests(BaseDateTimeTests):
+@override_settings(DATETIME_FORMAT='c', TIME_ZONE='Africa/Nairobi', USE_L10N=False, USE_TZ=True)
+class NewFormsTests(TestCase):
 
     @requires_tz_support
     def test_form(self):
@@ -960,8 +934,8 @@ class NewFormsTests(BaseDateTimeTests):
         self.assertEqual(e.dt, datetime.datetime(2011, 9, 1, 10, 20, 30, tzinfo=UTC))
 
 
-@override_settings(DATETIME_FORMAT='c', USE_L10N=False, USE_TZ=True)
-class AdminTests(BaseDateTimeTests):
+@override_settings(DATETIME_FORMAT='c', TIME_ZONE='Africa/Nairobi', USE_L10N=False, USE_TZ=True)
+class AdminTests(TestCase):
 
     urls = 'modeltests.timezones.urls'
     fixtures = ['tz_users.xml']
@@ -1012,7 +986,8 @@ class AdminTests(BaseDateTimeTests):
         self.assertContains(response, t.created.astimezone(ICT).isoformat())
 
 
-class UtilitiesTests(BaseDateTimeTests):
+@override_settings(TIME_ZONE='Africa/Nairobi')
+class UtilitiesTests(TestCase):
 
     def test_make_aware(self):
         self.assertEqual(

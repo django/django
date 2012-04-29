@@ -95,7 +95,6 @@ utc = pytz.utc if pytz else UTC()
 
 # In order to avoid accessing the settings at compile time,
 # wrap the expression in a function and cache the result.
-# If you change settings.TIME_ZONE in tests, reset _localtime to None.
 _localtime = None
 
 def get_default_timezone():
