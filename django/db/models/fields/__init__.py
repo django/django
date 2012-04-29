@@ -85,11 +85,6 @@ class Field(object):
         self.primary_key = primary_key
         self.max_length, self._unique = max_length, unique
         self.blank, self.null = blank, null
-        # Oracle treats the empty string ('') as null, so coerce the null
-        # option whenever '' is a possible value.
-        if (self.empty_strings_allowed and
-            connection.features.interprets_empty_strings_as_nulls):
-            self.null = True
         self.rel = rel
         self.default = default
         self.editable = editable

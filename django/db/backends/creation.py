@@ -50,7 +50,13 @@ class BaseDatabaseCreation(object):
             # Make the definition (e.g. 'foo VARCHAR(30)') for this field.
             field_output = [style.SQL_FIELD(qn(f.column)),
                 style.SQL_COLTYPE(col_type)]
-            if not f.null:
+            # Oracle treats the empty string ('') as null, so coerce the null
+            # option whenever '' is a possible value.
+            null = f.null
+            if (f.empty_strings_allowed and not f.primary_key and
+                    self.connection.features.interprets_empty_strings_as_nulls):
+                null = True
+            if not null:
                 field_output.append(style.SQL_KEYWORD('NOT NULL'))
             if f.primary_key:
                 field_output.append(style.SQL_KEYWORD('PRIMARY KEY'))

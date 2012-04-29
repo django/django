@@ -1930,3 +1930,25 @@ class NullInExcludeTest(TestCase):
         self.assertQuerysetEqual(
             NullableName.objects.exclude(name__in=[None]),
             ['i1'], attrgetter('name'))
+
+class EmptyStringsAsNullTest(TestCase):
+    """
+    Test that filtering on non-null character fields works as expected.
+    The reason for these tests is that Oracle treats '' as NULL, and this
+    can cause problems in query construction. Refs #17957.
+    """
+
+    def setUp(self):
+        self.nc = NamedCategory.objects.create(name='')
+
+    def test_direct_exclude(self):
+        self.assertQuerysetEqual(
+            NamedCategory.objects.exclude(name__in=['nonexisting']),
+            [self.nc.pk], attrgetter('pk')
+        )
+
+    def test_joined_exclude(self):
+        self.assertQuerysetEqual(
+            DumbCategory.objects.exclude(namedcategory__name__in=['nonexisting']),
+            [self.nc.pk], attrgetter('pk')
+        )

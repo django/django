@@ -685,11 +685,11 @@ NULL and empty strings
 
 Django generally prefers to use the empty string ('') rather than
 NULL, but Oracle treats both identically. To get around this, the
-Oracle backend coerces the ``null=True`` option on fields that have
-the empty string as a possible value. When fetching from the database,
-it is assumed that a NULL value in one of these fields really means
-the empty string, and the data is silently converted to reflect this
-assumption.
+Oracle backend ignores an explicit ``null`` option on fields that
+have the empty string as a possible value and generates DDL as if
+``null=True``. When fetching from the database, it is assumed that
+a ``NULL`` value in one of these fields really means the empty
+string, and the data is silently converted to reflect this assumption.
 
 ``TextField`` limitations
 -------------------------
