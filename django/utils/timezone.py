@@ -206,7 +206,7 @@ class override(object):
 
 # Templates
 
-def localtime(value, use_tz=None):
+def template_localtime(value, use_tz=None):
     """
     Checks if value is a datetime and converts it to local time if necessary.
 
@@ -215,19 +215,29 @@ def localtime(value, use_tz=None):
 
     This function is designed for use by the template engine.
     """
-    if (isinstance(value, datetime)
+    should_convert = (isinstance(value, datetime)
         and (settings.USE_TZ if use_tz is None else use_tz)
         and not is_naive(value)
-        and getattr(value, 'convert_to_local_time', True)):
-        timezone = get_current_timezone()
-        value = value.astimezone(timezone)
-        if hasattr(timezone, 'normalize'):
-            # available for pytz time zones
-            value = timezone.normalize(value)
-    return value
+        and getattr(value, 'convert_to_local_time', True))
+    return localtime(value) if should_convert else value
 
 
 # Utilities
+
+def localtime(value, timezone=None):
+    """
+    Converts an aware datetime.datetime to local time.
+
+    Local time is defined by the current time zone, unless another time zone
+    is specified.
+    """
+    if timezone is None:
+        timezone = get_current_timezone()
+    value = value.astimezone(timezone)
+    if hasattr(timezone, 'normalize'):
+        # available for pytz time zones
+        value = timezone.normalize(value)
+    return value
 
 def now():
     """

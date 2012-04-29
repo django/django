@@ -41,6 +41,9 @@ Django 1.5 also includes several smaller improvements worth noting:
 * The template engine now interprets ``True``, ``False`` and ``None`` as the
   corresponding Python objects.
 
+* :mod:`django.utils.timezone` provides a helper for converting aware
+  datetimes between time zones, see :func:`~django.utils.timezone.localtime`.
+
 Backwards incompatible changes in 1.5
 =====================================
 

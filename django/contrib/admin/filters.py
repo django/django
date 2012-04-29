@@ -290,19 +290,15 @@ class DateFieldListFilter(FieldListFilter):
         now = timezone.now()
         # When time zone support is enabled, convert "now" to the user's time
         # zone so Django's definition of "Today" matches what the user expects.
-        if now.tzinfo is not None:
-            current_tz = timezone.get_current_timezone()
-            now = now.astimezone(current_tz)
-            if hasattr(current_tz, 'normalize'):
-                # available for pytz time zones
-                now = current_tz.normalize(now)
+        if timezone.is_aware(now):
+            now = timezone.localtime(now)
 
         if isinstance(field, models.DateTimeField):
             today = now.replace(hour=0, minute=0, second=0, microsecond=0)
         else:       # field is a models.DateField
             today = now.date()
         tomorrow = today + datetime.timedelta(days=1)
-    
+
         self.lookup_kwarg_since = '%s__gte' % field_path
         self.lookup_kwarg_until = '%s__lt' % field_path
         self.links = (

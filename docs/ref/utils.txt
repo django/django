@@ -666,6 +666,16 @@ For a complete discussion on the usage of the following see the
     ``None``, the :ref:`current time zone <default-current-time-zone>` is unset
     on entry with :func:`deactivate()` instead.
 
+.. versionadded:: 1.5
+
+.. function:: localtime(value, timezone=None)
+
+    Converts an aware :class:`~datetime.datetime` to a different time zone,
+    by default the :ref:`current time zone <default-current-time-zone>`.
+
+    This function doesn't work on naive datetimes; use :func:`make_aware`
+    instead.
+
 .. function:: now()
 
     Returns an aware or naive :class:`~datetime.datetime` that represents the

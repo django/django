@@ -72,11 +72,7 @@ def do_timezone(value, arg):
     else:
         return ''
 
-    # Convert and prevent further conversion
-    result = value.astimezone(tz)
-    if hasattr(tz, 'normalize'):
-        # available for pytz time zones
-        result = tz.normalize(result)
+    result = timezone.localtime(value, tz)
 
     # HACK: the convert_to_local_time flag will prevent
     #       automatic conversion of the value to local time.
