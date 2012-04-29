@@ -186,6 +186,8 @@ these changes.
   library earlier than 2.1. An accelerated timeline was used as this was
   a security related deprecation.
 
+* The ``CACHE_BACKEND`` setting will be removed. The cache backend(s) should be
+  specified in the :setting:`CACHES` setting.
 
 1.6
 ---

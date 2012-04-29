@@ -464,11 +464,12 @@ SESSION_FILE_PATH = None                                # Directory to store ses
 # CACHE #
 #########
 
-# New format
+# The cache backends to use.
 CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    }
 }
-# The cache backend to use.  See the docstring in django.core.cache for the
-# possible values.
 CACHE_MIDDLEWARE_KEY_PREFIX = ''
 CACHE_MIDDLEWARE_SECONDS = 600
 CACHE_MIDDLEWARE_ALIAS = 'default'

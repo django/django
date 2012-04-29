@@ -2311,15 +2311,6 @@ ADMIN_MEDIA_PREFIX
    integration. See the :doc:`Django 1.4 release notes</releases/1.4>` for
    more information.
 
-.. setting:: CACHE_BACKEND
-
-CACHE_BACKEND
--------------
-
-.. deprecated:: 1.3
-   This setting has been replaced by :setting:`BACKEND <CACHES-BACKEND>` in
-   :setting:`CACHES`.
-
 .. setting:: IGNORABLE_404_ENDS
 
 IGNORABLE_404_ENDS
