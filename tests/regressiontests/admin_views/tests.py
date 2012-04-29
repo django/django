@@ -584,11 +584,8 @@ class AdminViewBasicTest(TestCase):
         user.save()
 
         response = self.client.get('/test_admin/admin/')
-        if reverse('admin:password_change') in response.content:
-            self.fail('The "change password" link should not be displayed if a user does not have a usable password.')
-
-        user.password = password
-        user.save()
+        self.assertFalse(reverse('admin:password_change') in response.content,
+            msg='The "change password" link should not be displayed if a user does not have a usable password.')
 
 
 class AdminViewFormUrlTest(TestCase):
