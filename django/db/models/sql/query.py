@@ -1193,14 +1193,15 @@ class Query(object):
                             entry.negate()
                             self.where.add(entry, AND)
                             break
-                if not (lookup_type == 'in'
-                            and not hasattr(value, 'as_sql')
-                            and not hasattr(value, '_as_sql')
-                            and not value) and field.null:
-                    # Leaky abstraction artifact: We have to specifically
-                    # exclude the "foo__in=[]" case from this handling, because
-                    # it's short-circuited in the Where class.
-                    # We also need to handle the case where a subquery is provided
+                if field.null:
+                    # In SQL NULL = anyvalue returns unknown, and NOT unknown
+                    # is still unknown. However, in Python None = anyvalue is False
+                    # (and not False is True...), and we want to return this Python's
+                    # view of None handling. So we need to specifically exclude the
+                    # NULL values, and because we are inside NOT branch they will
+                    # be included in the final resultset. We are essentially creating
+                    # SQL like this here: NOT (col IS NOT NULL), where the first NOT
+                    # is added in upper layers of the code.
                     self.where.add((Constraint(alias, col, None), 'isnull', False), AND)
 
         if can_reuse is not None:
