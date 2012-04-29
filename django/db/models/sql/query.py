@@ -104,7 +104,6 @@ class Query(object):
         self.alias_map = {}     # Maps alias to join information
         self.table_map = {}     # Maps table names to list of aliases.
         self.join_map = {}
-        self.quote_cache = {}
         self.default_cols = True
         self.default_ordering = True
         self.standard_ordering = True
@@ -243,7 +242,6 @@ class Query(object):
         obj.alias_map = self.alias_map.copy()
         obj.table_map = self.table_map.copy()
         obj.join_map = self.join_map.copy()
-        obj.quote_cache = {}
         obj.default_cols = self.default_cols
         obj.default_ordering = self.default_ordering
         obj.standard_ordering = self.standard_ordering
