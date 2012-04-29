@@ -1807,8 +1807,7 @@ class ConditionalTests(BaseQuerysetTest):
         # Test that the "in" lookup works with lists of 1000 items or more.
         Number.objects.all().delete()
         numbers = range(2500)
-        for num in numbers:
-            _ = Number.objects.create(num=num)
+        Number.objects.bulk_create(Number(num=num) for num in numbers)
         self.assertEqual(
             Number.objects.filter(num__in=numbers[:1000]).count(),
             1000
