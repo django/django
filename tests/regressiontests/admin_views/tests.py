@@ -572,6 +572,24 @@ class AdminViewBasicTest(TestCase):
         except SuspiciousOperation:
             self.fail("Filters should be allowed if they are defined on a ForeignKey pointing to this model")
 
+    def test_hide_change_password(self):
+        """
+        Tests if the "change password" link in the admin is hidden if the User
+        does not have a usable password set.
+        (against 9bea85795705d015cdadc82c68b99196a8554f5c)
+        """
+        user = User.objects.get(username='super')
+        password = user.password
+        user.set_unusable_password()
+        user.save()
+
+        response = self.client.get('/test_admin/admin/')
+        if reverse('admin:password_change') in response.content:
+            self.fail('The "change password" link should not be displayed if a user does not have a usable password.')
+
+        user.password = password
+        user.save()
+
 
 class AdminViewFormUrlTest(TestCase):
     urls = "regressiontests.admin_views.urls"
