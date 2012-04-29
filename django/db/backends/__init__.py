@@ -898,10 +898,23 @@ class BaseDatabaseIntrospection(object):
         """
         return name
 
-    def table_names(self):
-        "Returns a list of names of all tables that exist in the database."
-        cursor = self.connection.cursor()
-        return self.get_table_list(cursor)
+    def table_names(self, cursor=None):
+        """
+        Returns a list of names of all tables that exist in the database.
+        The returned table list is sorted by Python's default sorting. We
+        do NOT use database's ORDER BY here to avoid subtle differences
+        in sorting order between databases.
+        """
+        if cursor is None:
+            cursor = self.connection.cursor()
+        return sorted(self.get_table_list(cursor))
+
+    def get_table_list(self, cursor):
+        """
+        Returns an unsorted list of names of all tables that exist in the
+        database.
+        """
+        raise NotImplementedError
 
     def django_table_names(self, only_existing=False):
         """

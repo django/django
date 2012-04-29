@@ -63,7 +63,7 @@ def sql_delete(app, style, connection):
 
     # Figure out which tables already exist
     if cursor:
-        table_names = connection.introspection.get_table_list(cursor)
+        table_names = connection.introspection.table_names(cursor)
     else:
         table_names = []
 

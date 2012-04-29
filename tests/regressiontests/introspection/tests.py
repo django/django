@@ -40,6 +40,7 @@ class IntrospectionTests(TestCase):
 
     def test_table_names(self):
         tl = connection.introspection.table_names()
+        self.assertEqual(tl, sorted(tl))
         self.assertTrue(Reporter._meta.db_table in tl,
                      "'%s' isn't in table_list()." % Reporter._meta.db_table)
         self.assertTrue(Article._meta.db_table in tl,
