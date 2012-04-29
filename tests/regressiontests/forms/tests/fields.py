@@ -25,6 +25,7 @@ Other than that, the Field subclasses have class-specific options for
 __init__(). For example, CharField has a max_length option.
 """
 import datetime
+import pickle
 import re
 import os
 import urllib2
@@ -761,6 +762,9 @@ class FieldsTests(SimpleTestCase):
         self.assertEqual(False, f.clean('False'))
         self.assertEqual(False, f.clean('false'))
         self.assertEqual(False, f.clean('FaLsE'))
+
+    def test_boolean_picklable(self):
+        self.assertIsInstance(pickle.loads(pickle.dumps(BooleanField())), BooleanField)
 
     # ChoiceField #################################################################
 
