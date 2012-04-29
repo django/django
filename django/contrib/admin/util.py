@@ -1,3 +1,6 @@
+import datetime
+import decimal
+
 from django.db import models
 from django.db.models.sql.constants import LOOKUP_SEP
 from django.db.models.deletion import Collector
@@ -323,11 +326,29 @@ def display_for_field(value, field):
         return EMPTY_CHANGELIST_VALUE
     elif isinstance(field, models.DateTimeField):
         return formats.localize(timezone.localtime(value))
-    elif isinstance(field, models.DateField) or isinstance(field, models.TimeField):
+    elif isinstance(field, (models.DateField, models.TimeField)):
         return formats.localize(value)
     elif isinstance(field, models.DecimalField):
         return formats.number_format(value, field.decimal_places)
     elif isinstance(field, models.FloatField):
+        return formats.number_format(value)
+    else:
+        return smart_unicode(value)
+
+
+def display_for_value(value, boolean=False):
+    from django.contrib.admin.templatetags.admin_list import _boolean_icon
+    from django.contrib.admin.views.main import EMPTY_CHANGELIST_VALUE
+
+    if boolean:
+        return _boolean_icon(value)
+    elif value is None:
+        return EMPTY_CHANGELIST_VALUE
+    elif isinstance(value, datetime.datetime):
+        return formats.localize(timezone.localtime(value))
+    elif isinstance(value, (datetime.date, datetime.time)):
+        return formats.localize(value)
+    elif isinstance(value, (decimal.Decimal, float, int, long)):
         return formats.number_format(value)
     else:
         return smart_unicode(value)

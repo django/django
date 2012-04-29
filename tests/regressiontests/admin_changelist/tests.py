@@ -1,5 +1,7 @@
 from __future__ import absolute_import
 
+import datetime
+
 from django.contrib import admin
 from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.admin.views.main import ChangeList, SEARCH_VAR, ALL_VAR
@@ -7,14 +9,15 @@ from django.contrib.auth.models import User
 from django.template import Context, Template
 from django.test import TestCase
 from django.test.client import RequestFactory
+from django.utils import formats
 
 from .admin import (ChildAdmin, QuartetAdmin, BandAdmin, ChordsBandAdmin,
     GroupAdmin, ParentAdmin, DynamicListDisplayChildAdmin,
     DynamicListDisplayLinksChildAdmin, CustomPaginationAdmin,
     FilteredChildAdmin, CustomPaginator, site as custom_site,
     SwallowAdmin)
-from .models import (Child, Parent, Genre, Band, Musician, Group, Quartet,
-    Membership, ChordsMusician, ChordsBand, Invitation, Swallow,
+from .models import (Event, Child, Parent, Genre, Band, Musician, Group,
+    Quartet, Membership, ChordsMusician, ChordsBand, Invitation, Swallow,
     UnorderedObject, OrderedObject)
 
 
@@ -324,6 +327,19 @@ class ChangeListTests(TestCase):
         self.assertEqual(cl.query_set.count(), 30)
         self.assertEqual(cl.paginator.count, 30)
         self.assertEqual(cl.paginator.page_range, [1, 2, 3])
+
+    def test_computed_list_display_localization(self):
+        """
+        Regression test for #13196: output of functions should be  localized
+        in the changelist.
+        """
+        User.objects.create_superuser(
+            username='super', email='super@localhost', password='secret')
+        self.client.login(username='super', password='secret')
+        event = Event.objects.create(date=datetime.date.today())
+        response = self.client.get('/admin/admin_changelist/event/')
+        self.assertContains(response, formats.localize(event.date))
+        self.assertNotContains(response, unicode(event.date))
 
     def test_dynamic_list_display(self):
         """

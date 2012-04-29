@@ -1,6 +1,7 @@
 import datetime
 
-from django.contrib.admin.util import lookup_field, display_for_field, label_for_field
+from django.contrib.admin.util import (lookup_field, display_for_field,
+    display_for_value, label_for_field)
 from django.contrib.admin.views.main import (ALL_VAR, EMPTY_CHANGELIST_VALUE,
     ORDER_VAR, PAGE_VAR, SEARCH_VAR)
 from django.contrib.admin.templatetags.admin_static import static
@@ -184,15 +185,15 @@ def items_for_result(cl, result, form):
                 boolean = getattr(attr, 'boolean', False)
                 if boolean:
                     allow_tags = True
-                    result_repr = _boolean_icon(value)
-                else:
-                    result_repr = smart_unicode(value)
+                result_repr = display_for_value(value, boolean)
                 # Strip HTML tags in the resulting text, except if the
                 # function has an "allow_tags" attribute set to True.
                 if not allow_tags:
                     result_repr = escape(result_repr)
                 else:
                     result_repr = mark_safe(result_repr)
+                if isinstance(value, (datetime.date, datetime.time)):
+                    row_class = ' class="nowrap"'
             else:
                 if isinstance(f.rel, models.ManyToOneRel):
                     field_val = getattr(result, f.name)
@@ -202,9 +203,7 @@ def items_for_result(cl, result, form):
                         result_repr = escape(field_val)
                 else:
                     result_repr = display_for_field(value, f)
-                if isinstance(f, models.DateField)\
-                or isinstance(f, models.TimeField)\
-                or isinstance(f, models.ForeignKey):
+                if isinstance(f, (models.DateField, models.TimeField, models.ForeignKey)):
                     row_class = ' class="nowrap"'
         if force_unicode(result_repr) == '':
             result_repr = mark_safe('&nbsp;')

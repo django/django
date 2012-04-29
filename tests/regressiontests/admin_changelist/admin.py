@@ -3,8 +3,8 @@ from __future__ import absolute_import
 from django.contrib import admin
 from django.core.paginator import Paginator
 
-from .models import (Child, Parent, Genre, Band, Musician, Group, Quartet,
-    Membership, ChordsMusician, ChordsBand, Invitation, Swallow)
+from .models import (Event, Child, Parent, Genre, Band, Musician, Group,
+    Quartet, Membership, ChordsMusician, ChordsBand, Invitation, Swallow)
 
 
 site = admin.AdminSite(name="admin")
@@ -13,6 +13,15 @@ class CustomPaginator(Paginator):
     def __init__(self, queryset, page_size, orphans=0, allow_empty_first_page=True):
         super(CustomPaginator, self).__init__(queryset, 5, orphans=2,
             allow_empty_first_page=allow_empty_first_page)
+
+
+class EventAdmin(admin.ModelAdmin):
+    list_display = ['event_date_func']
+
+    def event_date_func(self, event):
+        return event.date
+
+site.register(Event, EventAdmin)
 
 
 class ParentAdmin(admin.ModelAdmin):
