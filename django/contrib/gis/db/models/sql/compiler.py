@@ -1,7 +1,7 @@
 from itertools import izip
 from django.db.backends.util import truncate_name, typecast_timestamp
 from django.db.models.sql import compiler
-from django.db.models.sql.constants import TABLE_NAME, MULTI
+from django.db.models.sql.constants import MULTI
 
 SQLCompiler = compiler.SQLCompiler
 
@@ -35,7 +35,7 @@ class GeoSQLCompiler(compiler.SQLCompiler):
             for col, field in izip(self.query.select, self.query.select_fields):
                 if isinstance(col, (list, tuple)):
                     alias, column = col
-                    table = self.query.alias_map[alias][TABLE_NAME]
+                    table = self.query.alias_map[alias].table_name
                     if table in only_load and column not in only_load[table]:
                         continue
                     r = self.get_field_select(field, alias, column)
@@ -138,7 +138,7 @@ class GeoSQLCompiler(compiler.SQLCompiler):
                 # aliases will have already been set up in pre_sql_setup(), so
                 # we can save time here.
                 alias = self.query.included_inherited_models[model]
-            table = self.query.alias_map[alias][TABLE_NAME]
+            table = self.query.alias_map[alias].table_name
             if table in only_load and field.column not in only_load[table]:
                 continue
             if as_pairs:

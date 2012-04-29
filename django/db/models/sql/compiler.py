@@ -188,7 +188,7 @@ class SQLCompiler(object):
             for col in self.query.select:
                 if isinstance(col, (list, tuple)):
                     alias, column = col
-                    table = self.query.alias_map[alias][TABLE_NAME]
+                    table = self.query.alias_map[alias].table_name
                     if table in only_load and column not in only_load[table]:
                         continue
                     r = '%s.%s' % (qn(alias), qn(column))
@@ -289,7 +289,7 @@ class SQLCompiler(object):
                 # aliases will have already been set up in pre_sql_setup(), so
                 # we can save time here.
                 alias = self.query.included_inherited_models[model]
-            table = self.query.alias_map[alias][TABLE_NAME]
+            table = self.query.alias_map[alias].table_name
             if table in only_load and field.column not in only_load[table]:
                 continue
             if as_pairs:
@@ -432,7 +432,7 @@ class SQLCompiler(object):
             # Firstly, avoid infinite loops.
             if not already_seen:
                 already_seen = set()
-            join_tuple = tuple([self.query.alias_map[j][TABLE_NAME] for j in joins])
+            join_tuple = tuple([self.query.alias_map[j].table_name for j in joins])
             if join_tuple in already_seen:
                 raise FieldError('Infinite loop caused by ordering.')
             already_seen.add(join_tuple)
@@ -470,7 +470,7 @@ class SQLCompiler(object):
         # Ordering or distinct must not affect the returned set, and INNER
         # JOINS for nullable fields could do this.
         self.query.promote_alias_chain(joins,
-            self.query.alias_map[joins[0]][JOIN_TYPE] == self.query.LOUTER)
+            self.query.alias_map[joins[0]].join_type == self.query.LOUTER)
         return field, col, alias, joins, opts
 
     def _final_join_removal(self, col, alias):
@@ -485,11 +485,11 @@ class SQLCompiler(object):
         if alias:
             while 1:
                 join = self.query.alias_map[alias]
-                if col != join[RHS_JOIN_COL]:
+                if col != join.rhs_join_col:
                     break
                 self.query.unref_alias(alias)
-                alias = join[LHS_ALIAS]
-                col = join[LHS_JOIN_COL]
+                alias = join.lhs_alias
+                col = join.lhs_join_col
         return col, alias
 
     def get_from_clause(self):
@@ -641,7 +641,7 @@ class SQLCompiler(object):
                     alias_chain.append(alias)
                     for (dupe_opts, dupe_col) in dupe_set:
                         self.query.update_dupe_avoidance(dupe_opts, dupe_col, alias)
-                if self.query.alias_map[root_alias][JOIN_TYPE] == self.query.LOUTER:
+                if self.query.alias_map[root_alias].join_type == self.query.LOUTER:
                     self.query.promote_alias_chain(alias_chain, True)
             else:
                 alias = root_alias
@@ -659,7 +659,7 @@ class SQLCompiler(object):
             columns, aliases = self.get_default_columns(start_alias=alias,
                     opts=f.rel.to._meta, as_pairs=True)
             self.query.related_select_cols.extend(columns)
-            if self.query.alias_map[alias][JOIN_TYPE] == self.query.LOUTER:
+            if self.query.alias_map[alias].join_type == self.query.LOUTER:
                 self.query.promote_alias_chain(aliases, True)
             self.query.related_select_fields.extend(f.rel.to._meta.fields)
             if restricted:

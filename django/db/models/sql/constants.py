@@ -1,3 +1,4 @@
+from collections import namedtuple
 import re
 
 # Valid query types (a dictionary is used for speedy lookups).
@@ -5,7 +6,7 @@ QUERY_TERMS = dict([(x, None) for x in (
     'exact', 'iexact', 'contains', 'icontains', 'gt', 'gte', 'lt', 'lte', 'in',
     'startswith', 'istartswith', 'endswith', 'iendswith', 'range', 'year',
     'month', 'day', 'week_day', 'isnull', 'search', 'regex', 'iregex',
-    )])
+)])
 
 # Size of each "chunk" for get_iterator calls.
 # Larger values are slightly faster at the expense of more storage space.
@@ -17,13 +18,9 @@ LOOKUP_SEP = '__'
 # Constants to make looking up tuple values clearer.
 # Join lists (indexes into the tuples that are values in the alias_map
 # dictionary in the Query class).
-TABLE_NAME = 0
-RHS_ALIAS = 1
-JOIN_TYPE = 2
-LHS_ALIAS = 3
-LHS_JOIN_COL = 4
-RHS_JOIN_COL = 5
-NULLABLE = 6
+JoinInfo = namedtuple('JoinInfo',
+                      'table_name rhs_alias join_type lhs_alias '
+                      'lhs_join_col rhs_join_col nullable')
 
 # How many results to expect from a cursor.execute call
 MULTI = 'multi'
@@ -32,6 +29,5 @@ SINGLE = 'single'
 ORDER_PATTERN = re.compile(r'\?|[-+]?[.\w]+$')
 ORDER_DIR = {
     'ASC': ('ASC', 'DESC'),
-    'DESC': ('DESC', 'ASC')}
-
-
+    'DESC': ('DESC', 'ASC'),
+}
