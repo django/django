@@ -143,9 +143,10 @@ You can use ``register.filter()`` as a decorator instead:
 If you leave off the ``name`` argument, as in the second example above, Django
 will use the function's name as the filter name.
 
-Finally, ``register.filter()`` also accepts two keyword arguments, ``is_safe``
-and ``needs_autoescape``, described in :ref:`filters and auto-escaping
-<filters-auto-escaping>` below.
+Finally, ``register.filter()`` also accepts three keyword arguments,
+``is_safe``, ``needs_autoescape``, and ``expects_localtime``. These arguments
+are described in :ref:`filters and auto-escaping <filters-auto-escaping>` and
+:ref:`filters and time zones <filters-timezones>` below.
 
 Template filters that expect strings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -369,7 +370,7 @@ objects, you'll usually register it with the ``expects_localtime`` flag set to
 
 When this flag is set, if the first argument to your filter is a time zone
 aware datetime, Django will convert it to the current time zone before passing
-to your filter when appropriate, according to :ref:`rules for time zones
+it to your filter when appropriate, according to :ref:`rules for time zones
 conversions in templates <time-zones-in-templates>`.
 
 Writing custom template tags
