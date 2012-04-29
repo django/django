@@ -23,12 +23,12 @@ required Python version. Django is tested and supported on Python 2.6 and
 This change should affect only a small number of Django users, as most
 operating-system vendors today are shipping Python 2.6 or newer as their default
 version. If you're still using Python 2.5, however, you'll need to stick to
-Django 1.4 until you can upgrade. Per :doc:`our support policy
+Django 1.4 until you can upgrade your Python version. Per :doc:`our support policy
 </internals/release-process>`, Django 1.4 will continue to receive security
 support until the release of Django 1.6.
 
-As Jython does currently not offer any version compatible with Python 2.6,
-Django 1.5 does not run on Jython.
+Django 1.5 does not run on Jython, because Jython doesn't currently offer any
+version compatible with Python 2.6.
 
 What's new in Django 1.5
 ========================
@@ -42,7 +42,7 @@ Django 1.5 also includes several smaller improvements worth noting:
   corresponding Python objects.
 
 * :mod:`django.utils.timezone` provides a helper for converting aware
-  datetimes between time zones, see :func:`~django.utils.timezone.localtime`.
+  datetimes between time zones. See :func:`~django.utils.timezone.localtime`.
 
 Backwards incompatible changes in 1.5
 =====================================
@@ -51,7 +51,7 @@ Backwards incompatible changes in 1.5
 
     In addition to the changes outlined in this section, be sure to review the
     :doc:`deprecation plan </internals/deprecation>` for any features that
-    have been removed. If you have not updated your code within the
+    have been removed. If you haven't updated your code within the
     deprecation timeline for a given feature, its removal may appear as a
     backwards incompatible change.
 
@@ -61,14 +61,13 @@ Features deprecated in 1.5
 ``django.utils.simplejson``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Since Django 1.5 drops support for Python 2.5, all supported versions of
-Python provide the :mod:`json` module in their standard library. This module
-is actually a version of ``simplejson`` distributed by Python, so Django no
-longer needs to provide a copy. Any use of :mod:`django.utils.simplejson` can
-be safely changed to :mod:`json`.
+Since Django 1.5 drops support for Python 2.5, we can now rely on the
+:mod:`json` module being in Python's standard library -- so we've removed
+our own copy of ``simplejson``. You can safely change any use of
+:mod:`django.utils.simplejson` to :mod:`json`.
 
 ``itercompat.product``
 ~~~~~~~~~~~~~~~~~~~~~~
 
 The :func:`~django.utils.itercompat.product` function has been deprecated. Use
-the builtin `itertools.product` instead.
+the built-in `itertools.product` instead.
