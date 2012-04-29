@@ -1,4 +1,5 @@
 import difflib
+import json
 import os
 import re
 import sys
@@ -33,7 +34,7 @@ from django.test.signals import template_rendered
 from django.test.utils import (get_warnings_state, restore_warnings_state,
     override_settings)
 from django.test.utils import ContextList
-from django.utils import simplejson, unittest as ut2
+from django.utils import unittest as ut2
 from django.utils.encoding import smart_str, force_unicode
 from django.utils.unittest.util import safe_repr
 from django.views.static import serve
@@ -189,8 +190,8 @@ class OutputChecker(doctest.OutputChecker):
         """
         want, got = self._strip_quotes(want, got)
         try:
-            want_json = simplejson.loads(want)
-            got_json = simplejson.loads(got)
+            want_json = json.loads(want)
+            got_json = json.loads(got)
         except Exception:
             return False
         return want_json == got_json

@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 
 # -*- coding: utf-8 -*-
+import json
 from datetime import datetime
 from xml.dom import minidom
 from StringIO import StringIO
@@ -9,7 +10,7 @@ from django.conf import settings
 from django.core import serializers
 from django.db import transaction, connection
 from django.test import TestCase, TransactionTestCase, Approximate
-from django.utils import simplejson, unittest
+from django.utils import unittest
 
 from .models import (Category, Author, Article, AuthorProfile, Actor, Movie,
     Score, Player, Team)
@@ -354,7 +355,7 @@ class JsonSerializerTestCase(SerializersTestBase, TestCase):
     @staticmethod
     def _validate_output(serial_str):
         try:
-            simplejson.loads(serial_str)
+            json.loads(serial_str)
         except Exception:
             return False
         else:
@@ -363,7 +364,7 @@ class JsonSerializerTestCase(SerializersTestBase, TestCase):
     @staticmethod
     def _get_pk_values(serial_str):
         ret_list = []
-        serial_list = simplejson.loads(serial_str)
+        serial_list = json.loads(serial_str)
         for obj_dict in serial_list:
             ret_list.append(obj_dict["pk"])
         return ret_list
@@ -371,7 +372,7 @@ class JsonSerializerTestCase(SerializersTestBase, TestCase):
     @staticmethod
     def _get_field_values(serial_str, field_name):
         ret_list = []
-        serial_list = simplejson.loads(serial_str)
+        serial_list = json.loads(serial_str)
         for obj_dict in serial_list:
             if field_name in obj_dict["fields"]:
                 ret_list.append(obj_dict["fields"][field_name])

@@ -3,10 +3,10 @@ This module has the mock object definitions used to hold reference geometry
 for the GEOS and GDAL tests.
 """
 import gzip
+import json
 import os
 
 from django.contrib import gis
-from django.utils import simplejson
 
 
 # This global used to store reference geometry data.
@@ -100,6 +100,6 @@ class TestDataMixin(object):
         if GEOMETRIES is None:
             # Load up the test geometry data from fixture into global.
             gzf = gzip.GzipFile(os.path.join(TEST_DATA, 'geometries.json.gz'))
-            geometries = simplejson.loads(gzf.read())
+            geometries = json.loads(gzf.read())
             GEOMETRIES = TestGeomSet(**strconvert(geometries))
         return GEOMETRIES

@@ -143,15 +143,13 @@ Identifier  Information
 ==========  ==============================================================
 ``xml``     Serializes to and from a simple XML dialect.
 
-``json``    Serializes to and from JSON_ (using a version of simplejson_
-            bundled with Django).
+``json``    Serializes to and from JSON_.
 
 ``yaml``    Serializes to YAML (YAML Ain't a Markup Language). This
             serializer is only available if PyYAML_ is installed.
 ==========  ==============================================================
 
 .. _json: http://json.org/
-.. _simplejson: http://undefined.org/python/#simplejson
 .. _PyYAML: http://www.pyyaml.org/
 
 Notes for specific serialization formats
@@ -169,28 +167,21 @@ For example::
     json_serializer = serializers.get_serializer("json")()
     json_serializer.serialize(queryset, ensure_ascii=False, stream=response)
 
-The Django source code includes the simplejson_ module. However, if you're
-using Python 2.6 or later (which includes a builtin version of the module), Django will
-use the builtin ``json`` module automatically. If you have a system installed
-version that includes the C-based speedup extension, or your system version is
-more recent than the version shipped with Django (currently, 2.0.7), the
-system version will be used instead of the version included with Django.
+Be aware that not all Django output can be passed unmodified to :mod:`json`.
+In particular, :ref:`lazy translation objects <lazy-translations>` need a
+`special encoder`_ written for them. Something like this will work::
 
-Be aware that if you're serializing using that module directly, not all Django
-output can be passed unmodified to simplejson. In particular, :ref:`lazy
-translation objects <lazy-translations>` need a `special encoder`_ written for
-them. Something like this will work::
-
+    import json
     from django.utils.functional import Promise
     from django.utils.encoding import force_unicode
 
-    class LazyEncoder(simplejson.JSONEncoder):
+    class LazyEncoder(json.JSONEncoder):
         def default(self, obj):
             if isinstance(obj, Promise):
                 return force_unicode(obj)
             return super(LazyEncoder, self).default(obj)
 
-.. _special encoder: http://svn.red-bean.com/bob/simplejson/tags/simplejson-1.7/docs/index.html
+.. _special encoder: http://docs.python.org/library/json.html#encoders-and-decoders
 
 .. _topics-serialization-natural-keys:
 

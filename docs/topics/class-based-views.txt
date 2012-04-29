@@ -501,8 +501,8 @@ different rendering behavior.
 
 For example, a simple JSON mixin might look something like this::
 
+    import json
     from django import http
-    from django.utils import simplejson as json
 
     class JSONResponseMixin(object):
         def render_to_response(self, context):

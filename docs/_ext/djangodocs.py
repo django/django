@@ -1,20 +1,11 @@
 """
 Sphinx plugins for Django documentation.
 """
+import json
 import os
 import re
 
 from docutils import nodes, transforms
-try:
-    import json
-except ImportError:
-    try:
-        import simplejson as json
-    except ImportError:
-        try:
-            from django.utils import simplejson as json
-        except ImportError:
-            json = None
 
 from sphinx import addnodes, roles, __version__ as sphinx_ver
 from sphinx.builders.html import StandaloneHTMLBuilder
@@ -210,9 +201,6 @@ class DjangoStandaloneHTMLBuilder(StandaloneHTMLBuilder):
 
     def finish(self):
         super(DjangoStandaloneHTMLBuilder, self).finish()
-        if json is None:
-            self.warn("cannot create templatebuiltins.js due to missing simplejson dependency")
-            return
         self.info(bold("writing templatebuiltins.js..."))
         xrefs = self.env.domaindata["std"]["objects"]
         templatebuiltins = {

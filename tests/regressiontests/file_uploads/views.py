@@ -1,11 +1,11 @@
 from __future__ import absolute_import
 
 import hashlib
+import json
 import os
 
 from django.core.files.uploadedfile import UploadedFile
 from django.http import HttpResponse, HttpResponseServerError
-from django.utils import simplejson
 
 from .models import FileModel, UPLOAD_TO
 from .tests import UNICODE_FILENAME
@@ -88,14 +88,14 @@ def file_upload_echo(request):
     Simple view to echo back info about uploaded files for tests.
     """
     r = dict([(k, f.name) for k, f in request.FILES.items()])
-    return HttpResponse(simplejson.dumps(r))
+    return HttpResponse(json.dumps(r))
 
 def file_upload_echo_content(request):
     """
     Simple view to echo back the content of uploaded files for tests.
     """
     r = dict([(k, f.read()) for k, f in request.FILES.items()])
-    return HttpResponse(simplejson.dumps(r))
+    return HttpResponse(json.dumps(r))
 
 def file_upload_quota(request):
     """
@@ -120,7 +120,7 @@ def file_upload_getlist_count(request):
 
     for key in request.FILES.keys():
         file_counts[key] = len(request.FILES.getlist(key))
-    return HttpResponse(simplejson.dumps(file_counts))
+    return HttpResponse(json.dumps(file_counts))
 
 def file_upload_errors(request):
     request.upload_handlers.insert(0, ErroringUploadHandler())

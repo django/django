@@ -6,7 +6,6 @@ include MANIFEST.in
 include django/contrib/gis/gdal/LICENSE
 include django/contrib/gis/geos/LICENSE
 include django/dispatch/license.txt
-include django/utils/simplejson/LICENSE.txt
 recursive-include docs *
 recursive-include scripts *
 recursive-include extras *

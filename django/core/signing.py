@@ -33,12 +33,13 @@ There are 65 url-safe characters: the 64 used by url-safe base64 and the ':'.
 These functions make use of all of them.
 """
 import base64
+import json
 import time
 import zlib
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.utils import baseconv, simplejson
+from django.utils import baseconv
 from django.utils.crypto import constant_time_compare, salted_hmac
 from django.utils.encoding import force_unicode, smart_str
 from django.utils.importlib import import_module
@@ -89,14 +90,14 @@ def get_cookie_signer(salt='django.core.signing.get_cookie_signer'):
 
 class JSONSerializer(object):
     """
-    Simple wrapper around simplejson to be used in signing.dumps and
+    Simple wrapper around json to be used in signing.dumps and
     signing.loads.
     """
     def dumps(self, obj):
-        return simplejson.dumps(obj, separators=(',', ':'))
+        return json.dumps(obj, separators=(',', ':'))
 
     def loads(self, data):
-        return simplejson.loads(data)
+        return json.loads(data)
 
 
 def dumps(obj, key=None, salt='django.core.signing', serializer=JSONSerializer, compress=False):

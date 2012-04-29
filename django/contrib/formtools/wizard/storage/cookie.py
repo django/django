@@ -1,6 +1,7 @@
+import json
+
 from django.core.exceptions import SuspiciousOperation
 from django.core.signing import BadSignature
-from django.utils import simplejson as json
 
 from django.contrib.formtools.wizard import storage
 

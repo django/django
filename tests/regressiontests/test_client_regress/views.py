@@ -1,3 +1,4 @@
+import json
 import warnings
 
 from django.conf import settings
@@ -5,7 +6,6 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.exceptions import SuspiciousOperation
 from django.shortcuts import render_to_response
-from django.utils import simplejson
 from django.utils.encoding import smart_str
 from django.core.serializers.json import DjangoJSONEncoder
 from django.test.client import CONTENT_TYPE_RE
@@ -81,8 +81,8 @@ def return_json_file(request):
         charset = settings.DEFAULT_CHARSET
 
     # This just checks that the uploaded data is JSON
-    obj_dict = simplejson.loads(request.body.decode(charset))
-    obj_json = simplejson.dumps(obj_dict, encoding=charset,
+    obj_dict = json.loads(request.body.decode(charset))
+    obj_json = json.dumps(obj_dict, encoding=charset,
                                 cls=DjangoJSONEncoder,
                                 ensure_ascii=False)
     response = HttpResponse(smart_str(obj_json, encoding=charset), status=200,

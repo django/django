@@ -491,7 +491,7 @@ class AssertFieldOutputTests(SimpleTestCase):
 __test__ = {"API_TEST": r"""
 # Some checks of the doctest output normalizer.
 # Standard doctests do fairly
->>> from django.utils import simplejson
+>>> import json
 >>> from django.utils.xmlutils import SimplerXMLGenerator
 >>> from StringIO import StringIO
 
@@ -502,7 +502,7 @@ __test__ = {"API_TEST": r"""
 ...     return 42
 
 >>> def produce_json():
-...     return simplejson.dumps(['foo', {'bar': ('baz', None, 1.0, 2), 'whiz': 42}])
+...     return json.dumps(['foo', {'bar': ('baz', None, 1.0, 2), 'whiz': 42}])
 
 >>> def produce_xml():
 ...     stream = StringIO()

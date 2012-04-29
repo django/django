@@ -58,8 +58,17 @@ Backwards incompatible changes in 1.5
 Features deprecated in 1.5
 ==========================
 
-itercompat.product
-~~~~~~~~~~~~~~~~~~
+``django.utils.simplejson``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Since Django 1.5 drops support for Python 2.5, all supported versions of
+Python provide the :mod:`json` module in their standard library. This module
+is actually a version of ``simplejson`` distributed by Python, so Django no
+longer needs to provide a copy. Any use of :mod:`django.utils.simplejson` can
+be safely changed to :mod:`json`.
+
+``itercompat.product``
+~~~~~~~~~~~~~~~~~~~~~~
 
 The :func:`~django.utils.itercompat.product` function has been deprecated. Use
 the builtin `itertools.product` instead.
