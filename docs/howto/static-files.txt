@@ -424,7 +424,7 @@ Here's how this might look in a fabfile::
     @roles('static')
     def deploy_static():
         local('./manage.py collectstatic')
-        project.rysnc_project(
+        project.rsync_project(
             remote_dir = env.remote_static_root,
             local_dir = env.local_static_root,
             delete = True
