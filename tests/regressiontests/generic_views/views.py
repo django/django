@@ -7,7 +7,7 @@ from django.utils.decorators import method_decorator
 from django.views import generic
 
 from .forms import AuthorForm
-from .models import Artist, Author, Book, Page
+from .models import Artist, Author, Book, Page, BookSigning
 
 
 class CustomTemplateView(generic.TemplateView):
@@ -198,3 +198,31 @@ class CustomContextView(generic.detail.SingleObjectMixin, generic.View):
 
     def get_context_object_name(self, obj):
         return "test_name"
+
+class BookSigningConfig(object):
+    model = BookSigning
+    date_field = 'event_date'
+    # use the same templates as for books
+    def get_template_names(self):
+        return ['generic_views/book%s.html' % self.template_name_suffix]
+
+class BookSigningArchive(BookSigningConfig, generic.ArchiveIndexView):
+    pass
+
+class BookSigningYearArchive(BookSigningConfig, generic.YearArchiveView):
+    pass
+
+class BookSigningMonthArchive(BookSigningConfig, generic.MonthArchiveView):
+    pass
+
+class BookSigningWeekArchive(BookSigningConfig, generic.WeekArchiveView):
+    pass
+
+class BookSigningDayArchive(BookSigningConfig, generic.DayArchiveView):
+    pass
+
+class BookSigningTodayArchive(BookSigningConfig, generic.TodayArchiveView):
+    pass
+
+class BookSigningDetail(BookSigningConfig, generic.DateDetailView):
+    context_object_name = 'book'

@@ -748,6 +748,12 @@ DateMixin
         ``QuerySet``'s model that the date-based archive should use to
         determine the objects on the page.
 
+        When :doc:`time zone support </topics/i18n/timezones>` is enabled and
+        ``date_field`` is a ``DateTimeField``, dates are assumed to be in the
+        current time zone. As a consequence, if you have implemented per-user
+        time zone selection, users living in different time zones may view a
+        different set of objects at the same URL.
+
     .. attribute:: allow_future
 
         A boolean specifying whether to include "future" objects on this page,

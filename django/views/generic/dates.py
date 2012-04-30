@@ -1,8 +1,10 @@
 import datetime
+from django.conf import settings
 from django.db import models
 from django.core.exceptions import ImproperlyConfigured
 from django.http import Http404
 from django.utils.encoding import force_unicode
+from django.utils.functional import cached_property
 from django.utils.translation import ugettext as _
 from django.utils import timezone
 from django.views.generic.base import View
@@ -164,6 +166,51 @@ class DateMixin(object):
         """
         return self.allow_future
 
+    # Note: the following three methods only work in subclasses that also
+    # inherit SingleObjectMixin or MultipleObjectMixin.
+
+    @cached_property
+    def uses_datetime_field(self):
+        """
+        Return `True` if the date field is a `DateTimeField` and `False`
+        if it's a `DateField`.
+        """
+        model = self.get_queryset().model if self.model is None else self.model
+        field = model._meta.get_field(self.get_date_field())
+        return isinstance(field, models.DateTimeField)
+
+    def _make_date_lookup_arg(self, value):
+        """
+        Convert a date into a datetime when the date field is a DateTimeField.
+
+        When time zone support is enabled, `date` is assumed to be in the
+        current time zone, so that displayed items are consistent with the URL.
+        """
+        if self.uses_datetime_field:
+            value = datetime.datetime.combine(value, datetime.time.min)
+            if settings.USE_TZ:
+                value = timezone.make_aware(value, timezone.get_current_timezone())
+        return value
+
+    def _make_single_date_lookup(self, date):
+        """
+        Get the lookup kwargs for filtering on a single date.
+
+        If the date field is a DateTimeField, we can't just filter on
+        date_field=date because that doesn't take the time into account.
+        """
+        date_field = self.get_date_field()
+        if self.uses_datetime_field:
+            since = self._make_date_lookup_arg(date)
+            until = self._make_date_lookup_arg(date + datetime.timedelta(days=1))
+            return {
+                '%s__gte' % date_field: since,
+                '%s__lt' % date_field: until,
+            }
+        else:
+            # Skip self._make_date_lookup_arg, it's a no-op in this branch.
+            return {date_field: date}
+
 
 class BaseDateListView(MultipleObjectMixin, DateMixin, View):
     """
@@ -180,7 +227,7 @@ class BaseDateListView(MultipleObjectMixin, DateMixin, View):
 
     def get_dated_items(self):
         """
-        Obtain the list of dates and itesm
+        Obtain the list of dates and items.
         """
         raise NotImplementedError('A DateView must provide an implementation of get_dated_items()')
 
@@ -196,7 +243,8 @@ class BaseDateListView(MultipleObjectMixin, DateMixin, View):
         paginate_by = self.get_paginate_by(qs)
 
         if not allow_future:
-            qs = qs.filter(**{'%s__lte' % date_field: timezone.now()})
+            now = timezone.now() if self.uses_datetime_field else datetime.date.today()
+            qs = qs.filter(**{'%s__lte' % date_field: now})
 
         if not allow_empty:
             # When pagination is enabled, it's better to do a cheap query
@@ -224,6 +272,7 @@ class BaseDateListView(MultipleObjectMixin, DateMixin, View):
                           {'verbose_name_plural': name})
 
         return date_list
+
 
 class BaseArchiveIndexView(BaseDateListView):
     """
@@ -265,15 +314,23 @@ class BaseYearArchiveView(YearMixin, BaseDateListView):
         """
         Return (date_list, items, extra_context) for this request.
         """
-        # Yes, no error checking: the URLpattern ought to validate this; it's
-        # an error if it doesn't.
         year = self.get_year()
+
         date_field = self.get_date_field()
-        qs = self.get_dated_queryset(**{date_field+'__year': year})
+        date = _date_from_string(year, self.get_year_format())
+
+        since = self._make_date_lookup_arg(date)
+        until = self._make_date_lookup_arg(datetime.date(date.year + 1, 1, 1))
+        lookup_kwargs = {
+            '%s__gte' % date_field: since,
+            '%s__lt' % date_field: until,
+        }
+
+        qs = self.get_dated_queryset(**lookup_kwargs)
         date_list = self.get_date_list(qs, 'month')
 
         if self.get_make_object_list():
-            object_list = qs.order_by('-'+date_field)
+            object_list = qs.order_by('-' + date_field)
         else:
             # We need this to be a queryset since parent classes introspect it
             # to find information about the model.
@@ -312,14 +369,14 @@ class BaseMonthArchiveView(YearMixin, MonthMixin, BaseDateListView):
                                  month, self.get_month_format())
 
         # Construct a date-range lookup.
-        first_day = date.replace(day=1)
-        if first_day.month == 12:
-            last_day = first_day.replace(year=first_day.year + 1, month=1)
+        since = self._make_date_lookup_arg(date)
+        if date.month == 12:
+            until = self._make_date_lookup_arg(datetime.date(date.year + 1, 1, 1))
         else:
-            last_day = first_day.replace(month=first_day.month + 1)
+            until = self._make_date_lookup_arg(datetime.date(date.year, date.month + 1, 1))
         lookup_kwargs = {
-            '%s__gte' % date_field: first_day,
-            '%s__lt' % date_field: last_day,
+            '%s__gte' % date_field: since,
+            '%s__lt' % date_field: until,
         }
 
         qs = self.get_dated_queryset(**lookup_kwargs)
@@ -362,11 +419,11 @@ class BaseWeekArchiveView(YearMixin, WeekMixin, BaseDateListView):
                                  week, week_format)
 
         # Construct a date-range lookup.
-        first_day = date
-        last_day = date + datetime.timedelta(days=7)
+        since = self._make_date_lookup_arg(date)
+        until = self._make_date_lookup_arg(date + datetime.timedelta(days=7))
         lookup_kwargs = {
-            '%s__gte' % date_field: first_day,
-            '%s__lt' % date_field: last_day,
+            '%s__gte' % date_field: since,
+            '%s__lt' % date_field: until,
         }
 
         qs = self.get_dated_queryset(**lookup_kwargs)
@@ -404,11 +461,7 @@ class BaseDayArchiveView(YearMixin, MonthMixin, DayMixin, BaseDateListView):
         Do the actual heavy lifting of getting the dated items; this accepts a
         date object so that TodayArchiveView can be trivial.
         """
-        date_field = self.get_date_field()
-
-        field = self.get_queryset().model._meta.get_field(date_field)
-        lookup_kwargs = _date_lookup_for_field(field, date)
-
+        lookup_kwargs = self._make_single_date_lookup(date)
         qs = self.get_dated_queryset(**lookup_kwargs)
 
         return (None, qs, {
@@ -474,10 +527,8 @@ class BaseDateDetailView(YearMixin, MonthMixin, DayMixin, DateMixin, BaseDetailV
         # Filter down a queryset from self.queryset using the date from the
         # URL. This'll get passed as the queryset to DetailView.get_object,
         # which'll handle the 404
-        date_field = self.get_date_field()
-        field = qs.model._meta.get_field(date_field)
-        lookup = _date_lookup_for_field(field, date)
-        qs = qs.filter(**lookup)
+        lookup_kwargs = self._make_single_date_lookup(date)
+        qs = qs.filter(**lookup_kwargs)
 
         return super(BaseDetailView, self).get_object(queryset=qs)
 
@@ -490,10 +541,10 @@ class DateDetailView(SingleObjectTemplateResponseMixin, BaseDateDetailView):
     template_name_suffix = '_detail'
 
 
-def _date_from_string(year, year_format, month, month_format, day='', day_format='', delim='__'):
+def _date_from_string(year, year_format, month='', month_format='', day='', day_format='', delim='__'):
     """
     Helper: get a datetime.date object given a format string and a year,
-    month, and possibly day; raise a 404 for an invalid date.
+    month, and day (only year is mandatory). Raise a 404 for an invalid date.
     """
     format = delim.join((year_format, month_format, day_format))
     datestr = delim.join((year, month, day))
@@ -548,10 +599,10 @@ def _get_next_prev_month(generic_view, naive_result, is_previous, use_first_day)
         # Construct a lookup and an ordering depending on whether we're doing
         # a previous date or a next date lookup.
         if is_previous:
-            lookup = {'%s__lte' % date_field: naive_result}
+            lookup = {'%s__lte' % date_field: generic_view._make_date_lookup_arg(naive_result)}
             ordering = '-%s' % date_field
         else:
-            lookup = {'%s__gte' % date_field: naive_result}
+            lookup = {'%s__gte' % date_field: generic_view._make_date_lookup_arg(naive_result)}
             ordering = date_field
 
         qs = generic_view.get_queryset().filter(**lookup).order_by(ordering)
@@ -564,7 +615,9 @@ def _get_next_prev_month(generic_view, naive_result, is_previous, use_first_day)
             result = None
 
     # Convert datetimes to a dates
-    if hasattr(result, 'date'):
+    if result and generic_view.uses_datetime_field:
+        if settings.USE_TZ:
+            result = timezone.localtime(result)
         result = result.date()
 
     # For month views, we always want to have a date that's the first of the
@@ -577,20 +630,3 @@ def _get_next_prev_month(generic_view, naive_result, is_previous, use_first_day)
         return result
     else:
         return None
-
-
-def _date_lookup_for_field(field, date):
-    """
-    Get the lookup kwargs for looking up a date against a given Field. If the
-    date field is a DateTimeField, we can't just do filter(df=date) because
-    that doesn't take the time into account. So we need to make a range lookup
-    in those cases.
-    """
-    if isinstance(field, models.DateTimeField):
-        date_range = (
-            datetime.datetime.combine(date, datetime.time.min),
-            datetime.datetime.combine(date, datetime.time.max)
-        )
-        return {'%s__range' % field.name: date_range}
-    else:
-        return {field.name: date}

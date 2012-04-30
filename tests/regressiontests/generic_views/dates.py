@@ -4,8 +4,18 @@ import datetime
 
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
+from django.test.utils import override_settings
+from django.utils import timezone
 
-from .models import Book
+from .models import Book, BookSigning
+
+
+import warnings
+warnings.filterwarnings(
+        'error', r"DateTimeField received a naive datetime",
+        RuntimeWarning, r'django\.db\.models\.fields')
+
+
 
 
 class ArchiveIndexViewTests(TestCase):
@@ -88,6 +98,18 @@ class ArchiveIndexViewTests(TestCase):
         with self.assertNumQueries(3):
             self.client.get('/dates/books/paginated/')
 
+    def test_datetime_archive_view(self):
+        BookSigning.objects.create(event_date=datetime.datetime(2008, 4, 2, 12, 0))
+        res = self.client.get('/dates/booksignings/')
+        self.assertEqual(res.status_code, 200)
+
+    @override_settings(USE_TZ=True, TIME_ZONE='Africa/Nairobi')
+    def test_aware_datetime_archive_view(self):
+        BookSigning.objects.create(event_date=datetime.datetime(2008, 4, 2, 12, 0, tzinfo=timezone.utc))
+        res = self.client.get('/dates/booksignings/')
+        self.assertEqual(res.status_code, 200)
+
+
 class YearArchiveViewTests(TestCase):
     fixtures = ['generic-views-test-data.json']
     urls = 'regressiontests.generic_views.urls'
@@ -140,6 +162,18 @@ class YearArchiveViewTests(TestCase):
     def test_year_view_invalid_pattern(self):
         res = self.client.get('/dates/books/no_year/')
         self.assertEqual(res.status_code, 404)
+
+    def test_datetime_year_view(self):
+        BookSigning.objects.create(event_date=datetime.datetime(2008, 4, 2, 12, 0))
+        res = self.client.get('/dates/booksignings/2008/')
+        self.assertEqual(res.status_code, 200)
+
+    @override_settings(USE_TZ=True, TIME_ZONE='Africa/Nairobi')
+    def test_aware_datetime_year_view(self):
+        BookSigning.objects.create(event_date=datetime.datetime(2008, 4, 2, 12, 0, tzinfo=timezone.utc))
+        res = self.client.get('/dates/booksignings/2008/')
+        self.assertEqual(res.status_code, 200)
+
 
 class MonthArchiveViewTests(TestCase):
     fixtures = ['generic-views-test-data.json']
@@ -245,6 +279,21 @@ class MonthArchiveViewTests(TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.context['previous_month'], datetime.date(2010,9,1))
 
+    def test_datetime_month_view(self):
+        BookSigning.objects.create(event_date=datetime.datetime(2008, 2, 1, 12, 0))
+        BookSigning.objects.create(event_date=datetime.datetime(2008, 4, 2, 12, 0))
+        BookSigning.objects.create(event_date=datetime.datetime(2008, 6, 3, 12, 0))
+        res = self.client.get('/dates/booksignings/2008/apr/')
+        self.assertEqual(res.status_code, 200)
+
+    @override_settings(USE_TZ=True, TIME_ZONE='Africa/Nairobi')
+    def test_aware_datetime_month_view(self):
+        BookSigning.objects.create(event_date=datetime.datetime(2008, 2, 1, 12, 0, tzinfo=timezone.utc))
+        BookSigning.objects.create(event_date=datetime.datetime(2008, 4, 2, 12, 0, tzinfo=timezone.utc))
+        BookSigning.objects.create(event_date=datetime.datetime(2008, 6, 3, 12, 0, tzinfo=timezone.utc))
+        res = self.client.get('/dates/booksignings/2008/apr/')
+        self.assertEqual(res.status_code, 200)
+
 
 class WeekArchiveViewTests(TestCase):
     fixtures = ['generic-views-test-data.json']
@@ -299,6 +348,18 @@ class WeekArchiveViewTests(TestCase):
         res = self.client.get('/dates/books/2008/week/39/monday/')
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.context['week'], datetime.date(2008, 9, 29))
+
+    def test_datetime_week_view(self):
+        BookSigning.objects.create(event_date=datetime.datetime(2008, 4, 2, 12, 0))
+        res = self.client.get('/dates/booksignings/2008/week/13/')
+        self.assertEqual(res.status_code, 200)
+
+    @override_settings(USE_TZ=True, TIME_ZONE='Africa/Nairobi')
+    def test_aware_datetime_week_view(self):
+        BookSigning.objects.create(event_date=datetime.datetime(2008, 4, 2, 12, 0, tzinfo=timezone.utc))
+        res = self.client.get('/dates/booksignings/2008/week/13/')
+        self.assertEqual(res.status_code, 200)
+
 
 class DayArchiveViewTests(TestCase):
     fixtures = ['generic-views-test-data.json']
@@ -388,6 +449,26 @@ class DayArchiveViewTests(TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.context['day'], datetime.date.today())
 
+    def test_datetime_day_view(self):
+        BookSigning.objects.create(event_date=datetime.datetime(2008, 4, 2, 12, 0))
+        res = self.client.get('/dates/booksignings/2008/apr/2/')
+        self.assertEqual(res.status_code, 200)
+
+    @override_settings(USE_TZ=True, TIME_ZONE='Africa/Nairobi')
+    def test_aware_datetime_day_view(self):
+        BookSigning.objects.create(event_date=datetime.datetime(2008, 4, 2, 12, 0, tzinfo=timezone.utc))
+        res = self.client.get('/dates/booksignings/2008/apr/2/')
+        self.assertEqual(res.status_code, 200)
+        # 2008-04-02T00:00:00+03:00 (beginning of day) > 2008-04-01T22:00:00+00:00 (book signing event date)
+        BookSigning.objects.filter(pk=1).update(event_date=datetime.datetime(2008, 4, 1, 22, 0, tzinfo=timezone.utc))
+        res = self.client.get('/dates/booksignings/2008/apr/2/')
+        self.assertEqual(res.status_code, 200)
+        # 2008-04-03T00:00:00+03:00 (end of day) > 2008-04-02T22:00:00+00:00 (book signing event date)
+        BookSigning.objects.filter(pk=1).update(event_date=datetime.datetime(2008, 4, 2, 22, 0, tzinfo=timezone.utc))
+        res = self.client.get('/dates/booksignings/2008/apr/2/')
+        self.assertEqual(res.status_code, 404)
+
+
 class DateDetailViewTests(TestCase):
     fixtures = ['generic-views-test-data.json']
     urls = 'regressiontests.generic_views.urls'
@@ -440,4 +521,23 @@ class DateDetailViewTests(TestCase):
 
         res = self.client.get(
             '/dates/books/get_object_custom_queryset/2008/oct/01/1/')
+        self.assertEqual(res.status_code, 404)
+
+    def test_datetime_date_detail(self):
+        BookSigning.objects.create(event_date=datetime.datetime(2008, 4, 2, 12, 0))
+        res = self.client.get('/dates/booksignings/2008/apr/2/1/')
+        self.assertEqual(res.status_code, 200)
+
+    @override_settings(USE_TZ=True, TIME_ZONE='Africa/Nairobi')
+    def test_aware_datetime_date_detail(self):
+        BookSigning.objects.create(event_date=datetime.datetime(2008, 4, 2, 12, 0, tzinfo=timezone.utc))
+        res = self.client.get('/dates/booksignings/2008/apr/2/1/')
+        self.assertEqual(res.status_code, 200)
+        # 2008-04-02T00:00:00+03:00 (beginning of day) > 2008-04-01T22:00:00+00:00 (book signing event date)
+        BookSigning.objects.filter(pk=1).update(event_date=datetime.datetime(2008, 4, 1, 22, 0, tzinfo=timezone.utc))
+        res = self.client.get('/dates/booksignings/2008/apr/2/1/')
+        self.assertEqual(res.status_code, 200)
+        # 2008-04-03T00:00:00+03:00 (end of day) > 2008-04-02T22:00:00+00:00 (book signing event date)
+        BookSigning.objects.filter(pk=1).update(event_date=datetime.datetime(2008, 4, 2, 22, 0, tzinfo=timezone.utc))
+        res = self.client.get('/dates/booksignings/2008/apr/2/1/')
         self.assertEqual(res.status_code, 404)

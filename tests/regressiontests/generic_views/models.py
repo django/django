@@ -42,3 +42,6 @@ class Book(models.Model):
 class Page(models.Model):
     content = models.TextField()
     template = models.CharField(max_length=300)
+
+class BookSigning(models.Model):
+    event_date = models.DateTimeField()
