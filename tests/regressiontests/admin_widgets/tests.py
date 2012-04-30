@@ -12,6 +12,7 @@ from django.core.files.storage import default_storage
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db.models import DateField
 from django.test import TestCase as DjangoTestCase
+from django.test.utils import override_settings
 from django.utils import translation
 from django.utils.html import conditional_escape
 from django.utils.unittest import TestCase
@@ -122,6 +123,7 @@ class AdminFormfieldForDBFieldTests(TestCase):
         self.assertFormfield(models.Album, 'backside_art', widgets.AdminFileWidget)
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminFormfieldForDBFieldWithRequestTests(DjangoTestCase):
     fixtures = ["admin-widgets-users.xml"]
 
@@ -135,6 +137,7 @@ class AdminFormfieldForDBFieldWithRequestTests(DjangoTestCase):
         self.assertContains(response, "Volkswagon Passat")
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminForeignKeyWidgetChangeList(DjangoTestCase):
     fixtures = ["admin-widgets-users.xml"]
     admin_root = '/widget_admin'
@@ -150,6 +153,7 @@ class AdminForeignKeyWidgetChangeList(DjangoTestCase):
         self.assertContains(response, '%s/auth/user/add/' % self.admin_root)
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminForeignKeyRawIdWidget(DjangoTestCase):
     fixtures = ["admin-widgets-users.xml"]
     admin_root = '/widget_admin'
@@ -411,6 +415,7 @@ class RelatedFieldWidgetWrapperTests(DjangoTestCase):
 
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class DateTimePickerSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
     webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
     fixtures = ['admin-widgets-users.xml']
@@ -466,6 +471,7 @@ class DateTimePickerSeleniumIETests(DateTimePickerSeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class HorizontalVerticalFilterSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
     webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
     fixtures = ['admin-widgets-users.xml']

@@ -47,6 +47,7 @@ from .models import (Article, BarAccount, CustomArticle, EmptyModel, FooAccount,
 ERROR_MESSAGE = "Please enter the correct username and password \
 for a staff account. Note that both fields are case-sensitive."
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminViewBasicTest(TestCase):
     fixtures = ['admin-views-users.xml', 'admin-views-colors.xml',
                 'admin-views-fabrics.xml', 'admin-views-books.xml']
@@ -588,6 +589,7 @@ class AdminViewBasicTest(TestCase):
             msg='The "change password" link should not be displayed if a user does not have a usable password.')
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminViewFormUrlTest(TestCase):
     urls = "regressiontests.admin_views.urls"
     fixtures = ["admin-views-users.xml"]
@@ -619,6 +621,7 @@ class AdminViewFormUrlTest(TestCase):
             self.assertTrue('custom_filter_template.html' in [t.name for t in response.templates])
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminJavaScriptTest(TestCase):
     fixtures = ['admin-views-users.xml']
 
@@ -686,6 +689,7 @@ class AdminJavaScriptTest(TestCase):
             self.assertNotContains(response, 'inlines.min.js')
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class SaveAsTests(TestCase):
     urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml','admin-views-person.xml']
@@ -775,6 +779,7 @@ def get_perm(Model, perm):
     ct = ContentType.objects.get_for_model(Model)
     return Permission.objects.get(content_type=ct, codename=perm)
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminViewPermissionsTest(TestCase):
     """Tests for Admin Views Permissions."""
 
@@ -1179,6 +1184,7 @@ class AdminViewPermissionsTest(TestCase):
         self.assertContains(response, 'id="login-form"')
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminViewsNoUrlTest(TestCase):
     """Regression test for #17333"""
 
@@ -1210,6 +1216,7 @@ class AdminViewsNoUrlTest(TestCase):
         self.client.get('/test_admin/admin/logout/')
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminViewDeletedObjectsTest(TestCase):
     urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml', 'deleted-objects.xml']
@@ -1326,6 +1333,7 @@ class AdminViewDeletedObjectsTest(TestCase):
         response = self.client.get('/test_admin/admin/admin_views/plot/%s/delete/' % quote(3))
         self.assertContains(response, should_contain)
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminViewStringPrimaryKeyTest(TestCase):
     urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml', 'string-primary-key.xml']
@@ -1418,6 +1426,7 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         self.assertContains(response, should_contain)
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class SecureViewTests(TestCase):
     urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml']
@@ -1576,6 +1585,7 @@ class SecureViewTests(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['Location'], 'http://example.com/users/super/')
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminViewUnicodeTest(TestCase):
     urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-unicode.xml']
@@ -1630,6 +1640,7 @@ class AdminViewUnicodeTest(TestCase):
         self.assertRedirects(response, '/test_admin/admin/admin_views/book/')
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminViewListEditable(TestCase):
     urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml', 'admin-views-person.xml']
@@ -2004,6 +2015,7 @@ class AdminViewListEditable(TestCase):
         self.assertContains(response, '<th><a href="%d/">%d</a></th>' % (story2.id, story2.id), 1)
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminSearchTest(TestCase):
     urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users', 'multiple-child-classes',
@@ -2051,6 +2063,7 @@ class AdminSearchTest(TestCase):
         self.assertNotContains(response, "Guido")
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminInheritedInlinesTest(TestCase):
     urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml',]
@@ -2137,6 +2150,7 @@ class AdminInheritedInlinesTest(TestCase):
         self.assertEqual(BarAccount.objects.all()[0].username, "%s-1" % bar_user)
         self.assertEqual(Persona.objects.all()[0].accounts.count(), 2)
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminActionsTest(TestCase):
     urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml', 'admin-views-actions.xml']
@@ -2355,6 +2369,7 @@ class AdminActionsTest(TestCase):
         self.assertEqual(response.context["action_form"], None)
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class TestCustomChangeList(TestCase):
     urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml']
@@ -2383,6 +2398,7 @@ class TestCustomChangeList(TestCase):
         self.assertNotContains(response, 'First Gadget')
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class TestInlineNotEditable(TestCase):
     urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml']
@@ -2401,6 +2417,7 @@ class TestInlineNotEditable(TestCase):
         response = self.client.get('/test_admin/admin/admin_views/parent/add/')
         self.assertEqual(response.status_code, 200)
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminCustomQuerysetTest(TestCase):
     urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml']
@@ -2456,6 +2473,7 @@ class AdminCustomQuerysetTest(TestCase):
         # Message should contain non-ugly model name. Instance representation is set by model's __unicode__()
         self.assertContains(response, '<li class="info">The cover letter &quot;John Doe II&quot; was changed successfully.</li>', html=True)
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminInlineFileUploadTest(TestCase):
     urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml', 'admin-views-actions.xml']
@@ -2502,6 +2520,7 @@ class AdminInlineFileUploadTest(TestCase):
         self.assertTrue(response._container[0].find("Currently:") > -1)
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminInlineTests(TestCase):
     urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml']
@@ -2820,6 +2839,7 @@ class AdminInlineTests(TestCase):
         self.assertEqual(Category.objects.get(id=4).order, 0)
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class NeverCacheTests(TestCase):
     urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml', 'admin-views-colors.xml', 'admin-views-fabrics.xml']
@@ -2893,6 +2913,7 @@ class NeverCacheTests(TestCase):
         self.assertEqual(get_max_age(response), None)
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class PrePopulatedTest(TestCase):
     urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml']
@@ -2928,6 +2949,7 @@ class PrePopulatedTest(TestCase):
         self.assertContains(response, "maxLength: 1000") # instead of 1,000
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class SeleniumPrePopulatedFirefoxTests(AdminSeleniumWebDriverTestCase):
     webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
     urls = "regressiontests.admin_views.urls"
@@ -3051,6 +3073,7 @@ class SeleniumPrePopulatedIETests(SeleniumPrePopulatedFirefoxTests):
     webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class ReadonlyTest(TestCase):
     urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml']
@@ -3124,6 +3147,7 @@ class ReadonlyTest(TestCase):
         self.assertEquals(response.status_code, 404)
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class RawIdFieldsTest(TestCase):
     urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml']
@@ -3157,6 +3181,7 @@ class RawIdFieldsTest(TestCase):
         self.assertContains(response2, "Spain")
         self.assertNotContains(response2, "England")
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class UserAdminTest(TestCase):
     """
     Tests user CRUD functionality.
@@ -3257,6 +3282,7 @@ class UserAdminTest(TestCase):
         self.assertEqual(response.context['form_url'], 'pony')
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class GroupAdminTest(TestCase):
     """
     Tests group CRUD functionality.
@@ -3288,6 +3314,7 @@ class GroupAdminTest(TestCase):
             self.assertEqual(response.status_code, 200)
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class CSSTest(TestCase):
     urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml']
@@ -3321,6 +3348,7 @@ except ImportError:
     docutils = None
 
 @unittest.skipUnless(docutils, "no docutils installed.")
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminDocsTest(TestCase):
     urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml']
@@ -3363,6 +3391,7 @@ class AdminDocsTest(TestCase):
         self.assertContains(response, '<li><a href="#built_in-add">add</a></li>', html=True)
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class ValidXHTMLTests(TestCase):
     urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml']
@@ -3386,6 +3415,7 @@ class ValidXHTMLTests(TestCase):
         self.assertNotContains(response, ' xml:lang=""')
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class DateHierarchyTests(TestCase):
     urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml']
@@ -3512,6 +3542,7 @@ class DateHierarchyTests(TestCase):
             self.assert_non_localized_year(response, 2003)
             self.assert_non_localized_year(response, 2005)
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminCustomSaveRelatedTests(TestCase):
     """
     Ensure that one can easily customize the way related objects are saved.
@@ -3580,6 +3611,7 @@ class AdminCustomSaveRelatedTests(TestCase):
         self.assertEqual([u'Catherine Stone', u'Paul Stone'], children_names)
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminViewLogoutTest(TestCase):
     urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml']
