@@ -160,4 +160,5 @@ class Command(NoArgsCommand):
         # Load initial_data fixtures (unless that has been disabled)
         if load_initial_data:
             from django.core.management import call_command
-            call_command('loaddata', 'initial_data', verbosity=verbosity, database=db)
+            call_command('loaddata', 'initial_data', verbosity=verbosity,
+                         database=db, skip_validation=True)
