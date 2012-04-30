@@ -1,6 +1,8 @@
 import hashlib
 
+from django.dispatch import receiver
 from django.conf import settings
+from django.test.signals import setting_changed
 from django.utils import importlib
 from django.utils.datastructures import SortedDict
 from django.utils.encoding import smart_str
@@ -13,6 +15,13 @@ from django.utils.translation import ugettext_noop as _
 UNUSABLE_PASSWORD = '!'  # This will never be a valid encoded hash
 HASHERS = None  # lazily loaded from PASSWORD_HASHERS
 PREFERRED_HASHER = None  # defaults to first item in PASSWORD_HASHERS
+
+@receiver(setting_changed)
+def reset_hashers(**kwargs):
+    if kwargs['setting'] == 'PASSWORD_HASHERS':
+        global HASHERS, PREFERRED_HASHER
+        HASHERS = None
+        PREFERRED_HASHER = None
 
 
 def is_password_usable(encoded):
