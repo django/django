@@ -128,6 +128,12 @@ class SortedDict(dict):
         return self.__class__([(key, copy.deepcopy(value, memo))
                                for key, value in self.iteritems()])
 
+    def __copy__(self):
+        # The Python's default copy implementation will alter the state
+        # of self. The reason for this seems complex but is likely related to
+        # subclassing dict.
+        return self.copy()
+
     def __setitem__(self, key, value):
         if key not in self:
             self.keyOrder.append(key)
@@ -200,9 +206,7 @@ class SortedDict(dict):
     def copy(self):
         """Returns a copy of this object."""
         # This way of initializing the copy means it works for subclasses, too.
-        obj = self.__class__(self)
-        obj.keyOrder = self.keyOrder[:]
-        return obj
+        return self.__class__(self)
 
     def __repr__(self):
         """

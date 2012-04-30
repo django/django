@@ -111,6 +111,12 @@ class SortedDictTests(SimpleTestCase):
             {7: 'seven', 1: 'one', 9: 'nine'}
         )
 
+    def test_copy(self):
+        orig = SortedDict(((1, "one"), (0, "zero"), (2, "two")))
+        copied = copy.copy(orig)
+        self.assertEqual(orig.keys(), [1, 0, 2])
+        self.assertEqual(copied.keys(), [1, 0, 2])
+
     def test_clear(self):
         self.d1.clear()
         self.assertEqual(self.d1, {})
