@@ -634,11 +634,11 @@ class Templates(unittest.TestCase):
             # Chained filters
             'filter-syntax02': ("{{ var|upper|lower }}", {"var": "Django is the greatest!"}, "django is the greatest!"),
 
-            # Raise TemplateSyntaxError for space between a variable and filter pipe
-            'filter-syntax03': ("{{ var |upper }}", {}, template.TemplateSyntaxError),
+            # Allow spaces before the filter pipe
+            'filter-syntax03': ("{{ var |upper }}", {"var": "Django is the greatest!"}, "DJANGO IS THE GREATEST!"),
 
-            # Raise TemplateSyntaxError for space after a filter pipe
-            'filter-syntax04': ("{{ var| upper }}", {}, template.TemplateSyntaxError),
+            # Allow spaces after the filter pipe
+            'filter-syntax04': ("{{ var| upper }}", {"var": "Django is the greatest!"}, "DJANGO IS THE GREATEST!"),
 
             # Raise TemplateSyntaxError for a nonexistent filter
             'filter-syntax05': ("{{ var|does_not_exist }}", {}, template.TemplateSyntaxError),
