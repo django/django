@@ -85,15 +85,19 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         return None
 
     def get_indexes(self, cursor, table_name):
-        """
-        Returns a dictionary of fieldname -> infodict for the given table,
-        where each infodict is in the format:
-            {'primary_key': boolean representing whether it's the primary key,
-             'unique': boolean representing whether it's a unique index}
-        """
         cursor.execute("SHOW INDEX FROM %s" % self.connection.ops.quote_name(table_name))
+        # Do a two-pass search for indexes: on first pass check which indexes
+        # are multicolumn, on second pass check which single-column indexes
+        # are present.
+        rows = list(cursor.fetchall())
+        multicol_indexes = set()
+        for row in rows:
+            if row[3] > 1:
+                multicol_indexes.add(row[2])
         indexes = {}
-        for row in cursor.fetchall():
+        for row in rows:
+            if row[2] in multicol_indexes:
+                continue
             indexes[row[4]] = {'primary_key': (row[2] == 'PRIMARY'), 'unique': not bool(row[1])}
         return indexes
 

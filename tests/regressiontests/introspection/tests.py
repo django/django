@@ -137,6 +137,15 @@ class IntrospectionTests(TestCase):
         indexes = connection.introspection.get_indexes(cursor, Article._meta.db_table)
         self.assertEqual(indexes['reporter_id'], {'unique': False, 'primary_key': False})
 
+    def test_get_indexes_multicol(self):
+        """
+        Test that multicolumn indexes are not included in the introspection
+        results.
+        """
+        cursor = connection.cursor()
+        indexes = connection.introspection.get_indexes(cursor, Reporter._meta.db_table)
+        self.assertNotIn('first_name', indexes)
+        self.assertIn('id', indexes)
 
 def datatype(dbtype, description):
     """Helper to convert a data type into a string."""
