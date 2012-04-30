@@ -997,6 +997,17 @@ class BaseDatabaseIntrospection(object):
         """
         raise NotImplementedError
 
+    def get_indexes(self, cursor, table_name):
+        """
+        Returns a dictionary of indexed fieldname -> infodict for the given
+        table, where each infodict is in the format:
+            {'primary_key': boolean representing whether it's the primary key,
+             'unique': boolean representing whether it's a unique index}
+
+        Only single-column indexes are introspected.
+        """
+        raise NotImplementedError
+
 class BaseDatabaseClient(object):
     """
     This class encapsulates all backend-specific methods for opening a
