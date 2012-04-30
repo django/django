@@ -9,7 +9,7 @@ from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.measure import Area, Distance
 
 
-ALL_TERMS = dict([(x, None) for x in (
+ALL_TERMS = set([
             'bbcontains', 'bboverlaps', 'contained', 'contains',
             'contains_properly', 'coveredby', 'covers', 'crosses', 'disjoint',
             'distance_gt', 'distance_gte', 'distance_lt', 'distance_lte',
@@ -18,7 +18,7 @@ ALL_TERMS = dict([(x, None) for x in (
             'left', 'right', 'overlaps_left', 'overlaps_right',
             'overlaps_above', 'overlaps_below',
             'strictly_above', 'strictly_below'
-            )])
+            ])
 ALL_TERMS.update(sql.constants.QUERY_TERMS)
 
 class GeoQuery(sql.Query):

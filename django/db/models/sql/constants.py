@@ -2,11 +2,11 @@ from collections import namedtuple
 import re
 
 # Valid query types (a dictionary is used for speedy lookups).
-QUERY_TERMS = dict([(x, None) for x in (
+QUERY_TERMS = set([
     'exact', 'iexact', 'contains', 'icontains', 'gt', 'gte', 'lt', 'lte', 'in',
     'startswith', 'istartswith', 'endswith', 'iendswith', 'range', 'year',
     'month', 'day', 'week_day', 'isnull', 'search', 'regex', 'iregex',
-)])
+])
 
 # Size of each "chunk" for get_iterator calls.
 # Larger values are slightly faster at the expense of more storage space.
