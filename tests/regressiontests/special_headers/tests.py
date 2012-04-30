@@ -1,7 +1,9 @@
 from django.contrib.auth.models import User
 from django.test import TestCase
+from django.test.utils import override_settings
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class SpecialHeadersTest(TestCase):
     fixtures = ['data.xml']
     urls = 'regressiontests.special_headers.urls'

@@ -25,10 +25,11 @@ from __future__ import absolute_import
 from django.conf import settings
 from django.core import mail
 from django.test import Client, TestCase, RequestFactory
+from django.test.utils import override_settings
 
 from .views import get_view
 
-
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class ClientTest(TestCase):
     fixtures = ['testdata.json']
 
