@@ -62,16 +62,19 @@ class MonthMixin(object):
         """
         Get the next valid month.
         """
-        first_day, last_day = _month_bounds(date)
-        next = (last_day + datetime.timedelta(days=1)).replace(day=1)
+        # next must be the first day of the next month.
+        if date.month == 12:
+            next = date.replace(year=date.year + 1, month=1, day=1)
+        else:
+            next = date.replace(month=date.month + 1, day=1)
         return _get_next_prev_month(self, next, is_previous=False, use_first_day=True)
 
     def get_previous_month(self, date):
         """
         Get the previous valid month.
         """
-        first_day, last_day = _month_bounds(date)
-        prev = (first_day - datetime.timedelta(days=1))
+        # prev must be the last day of the previous month.
+        prev = date.replace(day=1) - datetime.timedelta(days=1)
         return _get_next_prev_month(self, prev, is_previous=True, use_first_day=True)
 
 
@@ -309,7 +312,11 @@ class BaseMonthArchiveView(YearMixin, MonthMixin, BaseDateListView):
                                  month, self.get_month_format())
 
         # Construct a date-range lookup.
-        first_day, last_day = _month_bounds(date)
+        first_day = date.replace(day=1)
+        if first_day.month == 12:
+            last_day = first_day.replace(year=first_day.year + 1, month=1)
+        else:
+            last_day = first_day.replace(month=first_day.month + 1)
         lookup_kwargs = {
             '%s__gte' % date_field: first_day,
             '%s__lt' % date_field: last_day,
@@ -497,19 +504,6 @@ def _date_from_string(year, year_format, month, month_format, day='', day_format
             'datestr': datestr,
             'format': format,
         })
-
-
-def _month_bounds(date):
-    """
-    Helper: return the first and last days of the month for the given date.
-    """
-    first_day = date.replace(day=1)
-    if first_day.month == 12:
-        last_day = first_day.replace(year=first_day.year + 1, month=1)
-    else:
-        last_day = first_day.replace(month=first_day.month + 1)
-
-    return first_day, last_day
 
 
 def _get_next_prev_month(generic_view, naive_result, is_previous, use_first_day):
