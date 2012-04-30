@@ -61,7 +61,7 @@ def rmtree_errorhandler(func, path, exc_info):
     continue without problems.
     """
     exctype, value = exc_info[:2]
-    # lookin for a windows error
+    # looking for a windows error
     if exctype is not WindowsError or 'Access is denied' not in str(value):
         raise
     # file type should currently be read only
