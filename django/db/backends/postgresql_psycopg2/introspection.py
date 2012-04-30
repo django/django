@@ -65,12 +65,6 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         return relations
 
     def get_indexes(self, cursor, table_name):
-        """
-        Returns a dictionary of fieldname -> infodict for the given table,
-        where each infodict is in the format:
-            {'primary_key': boolean representing whether it's the primary key,
-             'unique': boolean representing whether it's a unique index}
-        """
         # This query retrieves each index on the given table, including the
         # first associated field name
         cursor.execute("""
