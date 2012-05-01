@@ -41,6 +41,10 @@ Django 1.5 also includes several smaller improvements worth noting:
 * The template engine now interprets ``True``, ``False`` and ``None`` as the
   corresponding Python objects.
 
+* :meth:`Model.save() <django.db.models.Model.save()>` has a new argument
+  ``update_fields``. Using this argument allows restricting the set of fields
+  to update when saving model instances.
+
 Backwards incompatible changes in 1.5
 =====================================
 
