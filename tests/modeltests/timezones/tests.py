@@ -23,7 +23,7 @@ from django.utils.tzinfo import FixedOffset
 from django.utils.unittest import skipIf, skipUnless
 
 from .forms import EventForm, EventSplitForm, EventModelForm
-from .models import Event, MaybeEvent, Session, SessionEvent, Timestamp
+from .models import Event, MaybeEvent, Session, SessionEvent, Timestamp, AllDayEvent
 
 
 # These tests use the EAT (Eastern Africa Time) and ICT (Indochina Time)
@@ -244,6 +244,14 @@ class LegacyDatabaseTests(TestCase):
                 [event],
                 transform=lambda d: d)
 
+    def test_filter_date_field_with_aware_datetime(self):
+        # Regression test for #17742
+        day = datetime.date(2011, 9, 1)
+        event = AllDayEvent.objects.create(day=day)
+        # This is 2011-09-02T01:30:00+03:00 in EAT
+        dt = datetime.datetime(2011, 9, 1, 22, 30, 0, tzinfo=UTC)
+        self.assertTrue(AllDayEvent.objects.filter(day__gte=dt).exists())
+
 
 @override_settings(TIME_ZONE='Africa/Nairobi', USE_TZ=True)
 class NewDatabaseTests(TestCase):
@@ -456,8 +464,16 @@ class NewDatabaseTests(TestCase):
                 [event],
                 transform=lambda d: d)
 
+    def test_filter_date_field_with_aware_datetime(self):
+        # Regression test for #17742
+        day = datetime.date(2011, 9, 1)
+        event = AllDayEvent.objects.create(day=day)
+        # This is 2011-09-02T01:30:00+03:00 in EAT
+        dt = datetime.datetime(2011, 9, 1, 22, 30, 0, tzinfo=UTC)
+        self.assertFalse(AllDayEvent.objects.filter(day__gte=dt).exists())
+
     def test_null_datetime(self):
-        # Regression for #17294
+        # Regression test for #17294
         e = MaybeEvent.objects.create()
         self.assertEqual(e.dt, None)
 

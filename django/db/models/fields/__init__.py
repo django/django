@@ -667,6 +667,11 @@ class DateField(Field):
         if value is None:
             return value
         if isinstance(value, datetime.datetime):
+            if settings.USE_TZ and timezone.is_aware(value):
+                # Convert aware datetimes to the current time zone
+                # before casting them to dates (#17742).
+                default_timezone = timezone.get_default_timezone()
+                value = timezone.make_naive(value, default_timezone)
             return value.date()
         if isinstance(value, datetime.date):
             return value

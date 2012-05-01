@@ -16,3 +16,6 @@ class SessionEvent(models.Model):
 class Timestamp(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+
+class AllDayEvent(models.Model):
+    day = models.DateField()
