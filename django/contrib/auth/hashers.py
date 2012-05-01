@@ -16,7 +16,7 @@ PREFERRED_HASHER = None  # defaults to first item in PASSWORD_HASHERS
 
 
 def is_password_usable(encoded):
-    return (encoded is not None and encoded != UNUSABLE_PASSWORD)
+    return (encoded is not None and encoded != UNUSABLE_PASSWORD and ('$' in encoded or len(encoded) == 32))
 
 
 def check_password(password, encoded, setter=None, preferred='default'):
@@ -35,7 +35,7 @@ def check_password(password, encoded, setter=None, preferred='default'):
     password = smart_str(password)
     encoded = smart_str(encoded)
 
-    if len(encoded) == 32 and '$' not in encoded:
+    if '$' not in encoded:
         hasher = get_hasher('unsalted_md5')
     else:
         algorithm = encoded.split('$', 1)[0]

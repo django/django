@@ -90,6 +90,11 @@ class TestUtilsHashPass(unittest.TestCase):
             make_password('letmein', hasher='lolcat')
         self.assertRaises(ValueError, doit)
 
+    def test_bad_encoded_pasword(self):
+        encoded = 'letmeinbadencoded'
+        self.assertFalse(is_password_usable(encoded))
+
+
     def test_low_level_pkbdf2(self):
         hasher = PBKDF2PasswordHasher()
         encoded = hasher.encode('letmein', 'seasalt')
