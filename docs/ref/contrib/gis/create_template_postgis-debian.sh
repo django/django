@@ -38,7 +38,7 @@ psql -d template_postgis -f $POSTGIS_SQL_PATH/spatial_ref_sys.sql && \
 psql -d template_postgis -c "GRANT ALL ON geometry_columns TO PUBLIC;" && \
 psql -d template_postgis -c "GRANT ALL ON spatial_ref_sys TO PUBLIC;"
 
-if ((GEOGRAPHY))
+if [ $GEOGRAPHY -eq 1 ]
 then
     psql -d template_postgis -c "GRANT ALL ON geography_columns TO PUBLIC;"
 fi
