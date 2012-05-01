@@ -468,13 +468,14 @@ class TransactionTestCase(SimpleTestCase):
         else:
             databases = [DEFAULT_DB_ALIAS]
         for db in databases:
-            call_command('flush', verbosity=0, interactive=False, database=db)
+            call_command('flush', verbosity=0, interactive=False, database=db,
+                         skip_validation=True)
 
             if hasattr(self, 'fixtures'):
                 # We have to use this slightly awkward syntax due to the fact
                 # that we're using *args and **kwargs together.
                 call_command('loaddata', *self.fixtures,
-                             **{'verbosity': 0, 'database': db})
+                             **{'verbosity': 0, 'database': db, 'skip_validation': True})
 
     def _urlconf_setup(self):
         if hasattr(self, 'urls'):
@@ -826,7 +827,8 @@ class TestCase(TransactionTestCase):
                              **{
                                 'verbosity': 0,
                                 'commit': False,
-                                'database': db
+                                'database': db,
+                                 'skip_validation': True,
                              })
 
     def _fixture_teardown(self):
