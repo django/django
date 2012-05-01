@@ -10,6 +10,10 @@ from django.db import models
 class DumbCategory(models.Model):
     pass
 
+class ProxyCategory(DumbCategory):
+    class Meta:
+        proxy = True
+
 class NamedCategory(DumbCategory):
     name = models.CharField(max_length=10)
 

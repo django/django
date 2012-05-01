@@ -933,21 +933,16 @@ class Query(object):
         whereas column determination is a later part, and side-effect, of
         as_sql()).
         """
-        opts = self.model._meta
+        # Skip all proxy models
+        opts = self.model._meta.concrete_model._meta
         root_alias = self.tables[0]
         seen = {None: root_alias}
 
-        # Skip all proxy to the root proxied model
-        proxied_model = opts.concrete_model
-
         for field, model in opts.get_fields_with_model():
             if model not in seen:
-                if model is proxied_model:
-                    seen[model] = root_alias
-                else:
-                    link_field = opts.get_ancestor_link(model)
-                    seen[model] = self.join((root_alias, model._meta.db_table,
-                            link_field.column, model._meta.pk.column))
+                link_field = opts.get_ancestor_link(model)
+                seen[model] = self.join((root_alias, model._meta.db_table,
+                        link_field.column, model._meta.pk.column))
         self.included_inherited_models = seen
 
     def remove_inherited_models(self):
