@@ -13,6 +13,7 @@ from django.test.utils import override_settings
             os.path.join(os.path.dirname(__file__), 'templates'),
         ),
     USE_TZ=False,                           # required for loading the fixture
+    PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
 )
 class AuthContextProcessorTests(TestCase):
     """

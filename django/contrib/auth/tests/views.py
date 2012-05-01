@@ -27,6 +27,7 @@ from django.contrib.auth.forms import (AuthenticationForm, PasswordChangeForm,
         os.path.join(os.path.dirname(__file__), 'templates'),
     ),
     USE_TZ=False,
+    PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
 )
 class AuthViewsTestCase(TestCase):
     """
