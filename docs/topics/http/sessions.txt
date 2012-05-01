@@ -457,6 +457,11 @@ table. Django updates this row each time the session data changes. If the user
 logs out manually, Django deletes the row. But if the user does *not* log out,
 the row never gets deleted.
 
+..warning:: 
+   If you haven't run this command before on a large site,
+   it might cause performance issues. Verify the size of the
+   session table before running this script.
+
 Django provides a sample clean-up script: ``django-admin.py cleanup``.
 That script deletes any session in the session table whose ``expire_date`` is
 in the past -- but your application may have different requirements.
