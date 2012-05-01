@@ -123,6 +123,10 @@ Arguments sent with this signal:
 ``using``
     The database alias being used.
 
+``update_fields``
+    List or tuple of fields to update explicitly specified in the ``save()`` method.
+    ``None`` if you do not use this parameter when you call ``save()``.
+
 post_save
 ---------
 
@@ -153,6 +157,10 @@ Arguments sent with this signal:
 
 ``using``
     The database alias being used.
+
+``update_fields``
+    List or tuple of fields to update explicitly specified in the ``save()`` method.
+    ``None`` if you do not use this parameter when you call ``save()``.
 
 pre_delete
 ----------
