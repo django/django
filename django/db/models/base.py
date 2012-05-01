@@ -2,6 +2,7 @@ import copy
 import sys
 from functools import update_wrapper
 from itertools import izip
+from sets import ImmutableSet
 
 import django.db.models.manager     # Imported to register signal handler.
 from django.conf import settings
@@ -11,7 +12,7 @@ from django.core import validators
 from django.db.models.fields import AutoField, FieldDoesNotExist
 from django.db.models.fields.related import (ManyToOneRel,
     OneToOneField, add_lazy_relation)
-from django.db import (connections, router, transaction, DatabaseError,
+from django.db import (router, transaction, DatabaseError,
     DEFAULT_DB_ALIAS)
 from django.db.models.query import Q
 from django.db.models.query_utils import DeferredAttribute
@@ -458,31 +459,29 @@ class Model(object):
         that the "save" must be an SQL insert or update (or equivalent for
         non-SQL backends), respectively. Normally, they should not be set.
         """
-        if force_insert and force_update:
+        if force_insert and (force_update or update_fields):
             raise ValueError("Cannot force both insert and updating in model saving.")
 
         if update_fields is not None:
-            if not isinstance(update_fields, (list, tuple)):
-                raise ValueError("update_fields must be a list or tuple")
-
-            # if update_fields is empty, does nothink
+            # If update_fields is empty, skip the save. We do also check for
+            # no-op saves later on for inheritance cases. This bailout is
+            # still needed for skipping signal sending.
             if len(update_fields) == 0:
                 return
+            update_fields = ImmutableSet(update_fields)
 
-            field_names = self._meta.get_all_field_names()
-            for field_name in update_fields:
-                if field_name not in field_names:
-                    raise ValueError("%s field does not exist in this model" % (field_name))
+            field_names = set(self._meta.get_all_field_names())
+            not_model_fields = update_fields.difference(field_names)
+            if not_model_fields:
+                raise ValueError("The following fields do not exist in this model: %s"
+                                 % ', '.join(not_model_fields))
 
-            force_update = True
-
-        self.save_base(using=using, force_insert=force_insert, 
-                        force_update=force_update, update_fields=update_fields)
-
+        self.save_base(using=using, force_insert=force_insert,
+                       force_update=force_update, update_fields=update_fields)
     save.alters_data = True
 
     def save_base(self, raw=False, cls=None, origin=None, force_insert=False,
-            force_update=False, using=None, update_fields=None):
+                  force_update=False, using=None, update_fields=None):
         """
         Does the heavy-lifting involved in saving. Subclasses shouldn't need to
         override this method. It's separate from save() in order to hide the
@@ -490,7 +489,8 @@ class Model(object):
         ('raw', 'cls', and 'origin').
         """
         using = using or router.db_for_write(self.__class__, instance=self)
-        assert not (force_insert and force_update)
+        assert not (force_insert and (force_update or update_fields))
+        assert not update_fields or len(update_fields) > 0
         if cls is None:
             cls = self.__class__
             meta = cls._meta
@@ -501,7 +501,7 @@ class Model(object):
 
         if origin and not meta.auto_created:
             signals.pre_save.send(sender=origin, instance=self, raw=raw, using=using,
-                                                            update_fields=update_fields)
+                                  update_fields=update_fields)
 
         # If we are in a raw save, save the object exactly as presented.
         # That means that we don't try to be smart about saving attributes
@@ -531,8 +531,8 @@ class Model(object):
         if not meta.proxy:
             non_pks = [f for f in meta.local_fields if not f.primary_key]
 
-            if update_fields: 
-                non_pks = [f for f in non_pks if f.name in update_fields] 
+            if update_fields:
+                non_pks = [f for f in non_pks if f.name in update_fields]
 
             # First, try an UPDATE. If that doesn't update anything, do an INSERT.
             pk_val = self._get_pk_val(meta)
@@ -541,7 +541,7 @@ class Model(object):
             manager = cls._base_manager
             if pk_set:
                 # Determine whether a record with the primary key already exists.
-                if (force_update or (not force_insert and
+                if ((force_update or update_fields) or (not force_insert and
                         manager.using(using).filter(pk=pk_val).exists())):
                     # It does already exist, so do an UPDATE.
                     if force_update or non_pks:
@@ -550,6 +550,8 @@ class Model(object):
                             rows = manager.using(using).filter(pk=pk_val)._update(values)
                             if force_update and not rows:
                                 raise DatabaseError("Forced update did not affect any rows.")
+                            if update_fields and not rows:
+                                raise DatabaseError("Save with update_fields did not affect any rows.")
                 else:
                     record_exists = False
             if not pk_set or not record_exists:
@@ -562,7 +564,7 @@ class Model(object):
 
                 fields = meta.local_fields
                 if not pk_set:
-                    if force_update:
+                    if force_update or update_fields:
                         raise ValueError("Cannot force an update in save() with no primary key.")
                     fields = [f for f in fields if not isinstance(f, AutoField)]
 
@@ -582,8 +584,8 @@ class Model(object):
 
         # Signal that the save is complete
         if origin and not meta.auto_created:
-            signals.post_save.send(sender=origin, instance=self, created=(not record_exists), 
-                                                update_fields=update_fields, raw=raw, using=using)
+            signals.post_save.send(sender=origin, instance=self, created=(not record_exists),
+                                   update_fields=update_fields, raw=raw, using=using)
 
 
     save_base.alters_data = True

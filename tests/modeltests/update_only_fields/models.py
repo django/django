@@ -15,7 +15,7 @@ class Person(models.Model):
 
 class Employee(Person):
     employee_num = models.IntegerField(default=0)
-    profile = models.ForeignKey('Profile', related_name='profiles')
+    profile = models.ForeignKey('Profile', related_name='profiles', null=True)
 
 
 class Profile(models.Model):
