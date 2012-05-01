@@ -198,9 +198,9 @@ class BaseCommand(object):
         """
         Try to execute this command, performing model validation if
         needed (as controlled by the attribute
-        ``self.requires_model_validation``). If the command raises a
-        ``CommandError``, intercept it and print it sensibly to
-        stderr.
+        ``self.requires_model_validation``, except if force-skipped). If the
+        command raises a ``CommandError``, intercept it and print it sensibly
+        to stderr.
         """
         show_traceback = options.get('traceback', False)
 
@@ -226,7 +226,7 @@ class BaseCommand(object):
         try:
             self.stdout = options.get('stdout', sys.stdout)
             self.stderr = options.get('stderr', sys.stderr)
-            if self.requires_model_validation:
+            if self.requires_model_validation and not options.get('skip_validation'):
                 self.validate()
             output = self.handle(*args, **options)
             if output:
