@@ -17,7 +17,13 @@ class ContentTypeManager(models.Manager):
         return ct
 
     def _get_opts(self, model):
-        return model._meta.concrete_model._meta
+        if model._deferred:
+            # Deferred models shouldn't have their own content type since
+            # they're only dynamic wrappers to allow field deferring.
+            # We make sure to retreive options from the model they are proxying
+            # which can also be a proxy.
+            model = model._meta.proxy_for_model
+        return model._meta
 
     def _get_from_cache(self, opts):
         key = (opts.app_label, opts.object_name.lower())
