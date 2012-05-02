@@ -118,9 +118,11 @@ class Field(object):
         messages.update(error_messages or {})
         self.error_messages = messages
 
-    def __cmp__(self, other):
+    def __lt__(self, other):
         # This is needed because bisect does not take a comparison function.
-        return cmp(self.creation_counter, other.creation_counter)
+        if isinstance(other, Field):
+            return self.creation_counter < other.creation_counter
+        return NotImplemented
 
     def __deepcopy__(self, memodict):
         # We don't have to deepcopy very much here, since most things are not
