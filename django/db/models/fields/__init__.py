@@ -12,7 +12,7 @@ from django import forms
 from django.core import exceptions, validators
 from django.utils.datastructures import DictWrapper
 from django.utils.dateparse import parse_date, parse_datetime, parse_time
-from django.utils.functional import curry
+from django.utils.functional import curry, total_ordering
 from django.utils.text import capfirst
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
@@ -45,6 +45,7 @@ class FieldDoesNotExist(Exception):
 #
 #     getattr(obj, opts.pk.attname)
 
+@total_ordering
 class Field(object):
     """Base class for all field types"""
 
@@ -117,6 +118,12 @@ class Field(object):
             messages.update(getattr(c, 'default_error_messages', {}))
         messages.update(error_messages or {})
         self.error_messages = messages
+
+    def __eq__(self, other):
+        # Needed for @total_ordering
+        if isinstance(other, Field):
+            return self.creation_counter == other.creation_counter
+        return NotImplemented
 
     def __lt__(self, other):
         # This is needed because bisect does not take a comparison function.
