@@ -9,6 +9,7 @@ from django.contrib.contenttypes.generic import (
     generic_inlineformset_factory, GenericTabularInline)
 from django.forms.models import ModelForm
 from django.test import TestCase
+from django.test.utils import override_settings
 
 # local test models
 from .admin import MediaInline, MediaPermanentInline
@@ -16,6 +17,7 @@ from .models import (Episode, EpisodeExtra, EpisodeMaxNum, Media,
     EpisodePermanent, Category)
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class GenericAdminViewTest(TestCase):
     urls = "regressiontests.generic_inline_admin.urls"
     fixtures = ['users.xml']
@@ -128,6 +130,7 @@ class GenericAdminViewTest(TestCase):
         formset = inline_formset(instance=e)
         self.assertTrue(formset.get_queryset().ordered)
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class GenericInlineAdminParametersTest(TestCase):
     urls = "regressiontests.generic_inline_admin.urls"
     fixtures = ['users.xml']
@@ -181,6 +184,7 @@ class GenericInlineAdminParametersTest(TestCase):
         self.assertEqual(formset.initial_form_count(), 1)
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class GenericInlineAdminWithUniqueTogetherTest(TestCase):
     urls = "regressiontests.generic_inline_admin.urls"
     fixtures = ['users.xml']

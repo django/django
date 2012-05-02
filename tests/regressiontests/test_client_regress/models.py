@@ -12,7 +12,7 @@ from django.template import (TemplateDoesNotExist, TemplateSyntaxError,
 import django.template.context
 from django.test import Client, TestCase
 from django.test.client import encode_file, RequestFactory
-from django.test.utils import ContextList
+from django.test.utils import ContextList, override_settings
 from django.template.response import SimpleTemplateResponse
 from django.http import HttpResponse
 
@@ -163,6 +163,7 @@ class AssertContainsTests(TestCase):
         response = HttpResponse('Hello')
         self.assertNotContains(response, 'Bye')
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AssertTemplateUsedTests(TestCase):
     fixtures = ['testdata.json']
 
@@ -522,6 +523,7 @@ class AssertFormErrorTests(TestCase):
         except AssertionError as e:
             self.assertIn("abc: The form 'form' in context 0 does not contain the non-field error 'Some error.' (actual errors: )", str(e))
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class LoginTests(TestCase):
     fixtures = ['testdata']
 
@@ -542,6 +544,7 @@ class LoginTests(TestCase):
         self.assertRedirects(response, "http://testserver/test_client_regress/get_view/")
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class SessionEngineTests(TestCase):
     fixtures = ['testdata']
 
@@ -588,6 +591,7 @@ class URLEscapingTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, 'Hi, Arthur')
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class ExceptionTests(TestCase):
     fixtures = ['testdata.json']
 
@@ -661,6 +665,7 @@ class zzUrlconfSubstitutionTests(TestCase):
         url = reverse('arg_view', args=['somename'])
         self.assertEqual(url, '/test_client_regress/arg_view/somename/')
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class ContextTests(TestCase):
     fixtures = ['testdata']
 
@@ -707,6 +712,7 @@ class ContextTests(TestCase):
             django.template.context._standard_context_processors = None
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class SessionTests(TestCase):
     fixtures = ['testdata.json']
 

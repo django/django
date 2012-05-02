@@ -4,6 +4,7 @@ from django.contrib.auth.models import User, Permission
 from django.contrib.comments import signals
 from django.contrib.comments.models import Comment, CommentFlag
 from django.contrib.contenttypes.models import ContentType
+from django.conf import settings
 
 from . import CommentTestCase
 

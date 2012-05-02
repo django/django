@@ -3,10 +3,12 @@ from __future__ import absolute_import
 from django.core.urlresolvers import reverse
 from django.template.response import TemplateResponse
 from django.test import TestCase
+from django.test.utils import override_settings
 
 from .models import Action
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminCustomUrlsTest(TestCase):
     fixtures = ['users.json', 'actions.json']
 
