@@ -105,8 +105,8 @@ class MXRFCField(RegexField):
         http://es.wikipedia.org/wiki/Registro_Federal_de_Contribuyentes_(M%C3%A9xico)
     """
     default_error_messages = {
-        'invalid': _('Enter a valid RFC.'),
-        'invalid_checksum': _('Invalid checksum for RFC.'),
+        'invalid': _(u'Enter a valid RFC.'),
+        'invalid_checksum': _(u'Invalid checksum for RFC.'),
     }
 
     def __init__(self, min_length=9, max_length=13, *args, **kwargs):
@@ -186,7 +186,7 @@ class MXCURPField(RegexField):
         http://www.condusef.gob.mx/index.php/clave-unica-de-registro-de-poblacion-curp
     """
     default_error_messages = {
-        'invalid': _('Enter a valid CURP.'),
+        'invalid': _(u'Enter a valid CURP.'),
         'invalid_checksum': _(u'Invalid checksum for CURP.'),
     }
 
@@ -248,7 +248,7 @@ class MXSocialSecurityNumberField(RegexField):
         <reference here>
     """
     default_error_messages = {
-        'invalid': _('Enter a valid Social Security Number.'),
+        'invalid': _(u'Enter a valid Social Security Number.'),
         'invalid_checksum': _(u'Invalid checksum for Social Security Number.'),
     }
 
@@ -275,4 +275,4 @@ class MXSocialSecurityNumberField(RegexField):
 
         if checksum == 10:
             return u'0'
-        return checksum
+        return unicode(checksum)

@@ -2,7 +2,7 @@
 from __future__ import absolute_import
 
 from django.contrib.localflavor.mx.forms import (MXZipCodeField, MXRFCField,
-    MXStateSelect, MXCURPField)
+    MXStateSelect, MXCURPField, MXSocialSecurityNumberField)
 from django.test import SimpleTestCase
 
 from .forms import MXPersonProfileForm
@@ -30,12 +30,14 @@ class MXLocalFlavorTests(SimpleTestCase):
             'rfc': 'invalid rfc',
             'curp': 'invalid curp',
             'zip_code': 'xxx',
+            'ssn': 'invalid ssn',
         })
         self.assertFalse(form.is_valid())
         self.assertEqual(form.errors['state'], [u'Select a valid choice. Invalid state is not one of the available choices.'])
         self.assertEqual(form.errors['rfc'], [u'Enter a valid RFC.'])
         self.assertEqual(form.errors['curp'], [u'Ensure this value has at least 18 characters (it has 12).', u'Enter a valid CURP.'])
         self.assertEqual(form.errors['zip_code'], [u'Enter a valid zip code in the format XXXXX.'])
+        self.assertEqual(form.errors['ssn'], [u'Enter a valid Social Security Number.'])
 
     def test_field_blank_option(self):
         """Test that the empty option is there."""
@@ -196,3 +198,17 @@ class MXLocalFlavorTests(SimpleTestCase):
             'OOMG890727HMNRSR07': error_checksum,
         }
         self.assertFieldOutput(MXCURPField, valid, invalid)
+
+    def test_MXSocialSecurityNumberField(self):
+        error_format = [u'Enter a valid Social Security Number.']
+        error_checksum = [u'Invalid checksum for Social Security Number.']
+        valid = {
+            '': u'',
+        }
+        invalid = {
+            # Invalid format
+            '': error_format,
+            # Incorrect checksum
+            '': error_checksum,
+        }
+        self.assertFieldOutput(MXSocialSecurityNumberField, valid, invalid)
