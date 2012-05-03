@@ -79,7 +79,6 @@ class MXSocialSecurityNumberField(CharField):
     description = _("Mexican Social Security Number")
 
     def __init__(self, *args, **kwargs):
-        kwargs['min_length'] = 11
         kwargs['max_length'] = 11
         super(MXSocialSecurityNumberField, self).__init__(*args, **kwargs)
 
