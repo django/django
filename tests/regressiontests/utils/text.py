@@ -73,6 +73,7 @@ class TestUtilsText(SimpleTestCase):
 
     def test_old_truncate_words(self):
         with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always')
             self.assertEqual(u'The quick brown fox jumped over the lazy dog.',
                 text.truncate_words(u'The quick brown fox jumped over the lazy dog.', 10))
             self.assertEqual(u'The quick brown fox ...',
@@ -83,6 +84,7 @@ class TestUtilsText(SimpleTestCase):
 
     def test_old_truncate_html_words(self):
         with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always')
             self.assertEqual(u'<p><strong><em>The quick brown fox jumped over the lazy dog.</em></strong></p>',
                 text.truncate_html_words('<p><strong><em>The quick brown fox jumped over the lazy dog.</em></strong></p>', 10))
             self.assertEqual(u'<p><strong><em>The quick brown fox ...</em></strong></p>',
