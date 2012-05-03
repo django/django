@@ -80,7 +80,7 @@ class SelectForUpdateTests(TransactionTestCase):
         return bool(sql.find(for_update_sql) > -1)
 
     def check_exc(self, exc):
-        self.failUnless(isinstance(exc, DatabaseError))
+        self.assertTrue(isinstance(exc, DatabaseError))
 
     @skipUnlessDBFeature('has_select_for_update')
     def test_for_update_sql_generated(self):
@@ -217,7 +217,7 @@ class SelectForUpdateTests(TransactionTestCase):
 
         # Check the thread has finished. Assuming it has, we should
         # find that it has updated the person's name.
-        self.failIf(thread.isAlive())
+        self.assertFalse(thread.isAlive())
 
         # We must commit the transaction to ensure that MySQL gets a fresh read,
         # since by default it runs in REPEATABLE READ mode

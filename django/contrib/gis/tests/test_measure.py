@@ -45,7 +45,7 @@ class DistanceTest(unittest.TestCase):
     def testAccessInvalid(self):
         "Testing access in invalid units"
         d = D(m=100)
-        self.failIf(hasattr(d, 'banana'))
+        self.assertFalse(hasattr(d, 'banana'))
 
     def testAddition(self):
         "Test addition & subtraction"
@@ -133,7 +133,7 @@ class DistanceTest(unittest.TestCase):
         self.assertTrue(d2 > d1)
         self.assertTrue(d1 == d1)
         self.assertTrue(d1 < d2)
-        self.failIf(d3)
+        self.assertFalse(d3)
 
     def testUnitsStr(self):
         "Testing conversion to strings"
@@ -179,7 +179,7 @@ class AreaTest(unittest.TestCase):
     def testAccessInvaliA(self):
         "Testing access in invalid units"
         a = A(sq_m=100)
-        self.failIf(hasattr(a, 'banana'))
+        self.assertFalse(hasattr(a, 'banana'))
 
     def testAddition(self):
         "Test addition & subtraction"
@@ -267,7 +267,7 @@ class AreaTest(unittest.TestCase):
         self.assertTrue(a2 > a1)
         self.assertTrue(a1 == a1)
         self.assertTrue(a1 < a2)
-        self.failIf(a3)
+        self.assertFalse(a3)
 
     def testUnitsStr(self):
         "Testing conversion to strings"
