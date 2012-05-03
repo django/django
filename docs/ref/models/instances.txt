@@ -135,7 +135,7 @@ Saving objects
 
 To save an object back to the database, call ``save()``:
 
-.. method:: Model.save([force_insert=False, force_update=False, using=DEFAULT_DB_ALIAS])
+.. method:: Model.save([force_insert=False, force_update=False, using=DEFAULT_DB_ALIAS, update_fields=None])
 
 .. versionadded:: 1.2
    The ``using`` argument was added.
@@ -333,6 +333,25 @@ the actual value that was applied to the updated field::
 For more details, see the documentation on :ref:`F() expressions
 <query-expressions>` and their :ref:`use in update queries
 <topics-db-queries-update>`.
+
+Specifying which fields to save
+-------------------------------
+
+.. versionadded:: 1.5
+
+If ``save()`` is passed a list of field names as keyword argument
+``update_fields``, only the fields named in that list will be saved to the
+database. This may be desirable if you want to update just one or a few fields
+on an object, as there will be a slight performance benefit from preventing
+all of the model fields from being updated in the database. For example:
+
+    product.name = 'Name changed again'
+    product.save(update_fields=['name'])
+
+
+The ``update_fields`` argument can be any iterable containing strings. An
+not None, but empty ``update_fields`` skips the save completely (no signals
+sent). Specifying ``update_fields`` will force an update.
 
 Deleting objects
 ================

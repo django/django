@@ -44,6 +44,10 @@ Django 1.5 also includes several smaller improvements worth noting:
 * :mod:`django.utils.timezone` provides a helper for converting aware
   datetimes between time zones. See :func:`~django.utils.timezone.localtime`.
 
+* :meth:`Model.save() <django.db.models.Model.save()>` has a new argument
+  ``update_fields``. Using this argument allows restricting the set of fields
+  to update when saving model instances.
+
 Backwards incompatible changes in 1.5
 =====================================
 
