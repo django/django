@@ -70,7 +70,7 @@ class DecoratorsTest(TestCase):
 
     def setUp(self):
         self.warning_state = get_warnings_state()
-        warnings.filterwarnings('ignore', category=PendingDeprecationWarning,
+        warnings.filterwarnings('ignore', category=DeprecationWarning,
                                 module='django.views.decorators.cache')
 
     def tearDown(self):

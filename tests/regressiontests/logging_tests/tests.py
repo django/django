@@ -1,9 +1,10 @@
 import copy
+import warnings
 
 from django.conf import compat_patch_logging_config
 from django.core import mail
 from django.test import TestCase, RequestFactory
-from django.test.utils import override_settings
+from django.test.utils import override_settings, get_warnings_state, restore_warnings_state
 from django.utils.log import CallbackFilter, RequireDebugFalse, getLogger
 
 
@@ -40,7 +41,13 @@ class PatchLoggingConfigTest(TestCase):
 
         """
         config = copy.deepcopy(OLD_LOGGING)
-        compat_patch_logging_config(config)
+
+        warnings_state = get_warnings_state()
+        warnings.filterwarnings('ignore', category=DeprecationWarning, module='django.conf')
+        try:
+            compat_patch_logging_config(config)
+        finally:
+            restore_warnings_state(warnings_state)
 
         self.assertEqual(
             config["handlers"]["mail_admins"]["filters"],

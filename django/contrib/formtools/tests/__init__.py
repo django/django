@@ -7,6 +7,7 @@ from django.conf import settings
 from django.contrib.formtools import preview, utils
 from django.contrib.formtools.wizard import FormWizard
 from django.test import TestCase
+from django.test.utils import get_warnings_state, restore_warnings_state
 from django.test.utils import override_settings
 from django.utils import unittest
 
@@ -40,11 +41,19 @@ class PreviewTests(TestCase):
 
     def setUp(self):
         super(PreviewTests, self).setUp()
+        self.save_warnings_state()
+        warnings.filterwarnings('ignore', category=DeprecationWarning,
+                                module='django.contrib.formtools.wizard.legacy')
+
         # Create a FormPreview instance to share between tests
         self.preview = preview.FormPreview(TestForm)
         input_template = '<input type="hidden" name="%s" value="%s" />'
         self.input = input_template % (self.preview.unused_name('stage'), "%d")
         self.test_data = {'field1':u'foo', 'field1_':u'asdf'}
+
+    def tearDown(self):
+        super(PreviewTests, self).tearDown()
+        self.restore_warnings_state()
 
     def test_unused_name(self):
         """

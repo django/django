@@ -18,18 +18,16 @@ def is_iterable(x):
         return True
 
 def product(*args, **kwds):
-    # PendingDeprecationWarning in 1.5, remove this comment when the Deprecations
-    # will have been advanced for 1.5
     warnings.warn("django.utils.itercompat.product is deprecated; use the native version instead",
                   PendingDeprecationWarning)
     return itertools.product(*args, **kwds)
 
 def all(iterable):
     warnings.warn("django.utils.itercompat.all is deprecated; use the native version instead",
-                  PendingDeprecationWarning)
+                  DeprecationWarning)
     return __builtin__.all(iterable)
 
 def any(iterable):
     warnings.warn("django.utils.itercompat.any is deprecated; use the native version instead",
-                  PendingDeprecationWarning)
+                  DeprecationWarning)
     return __builtin__.any(iterable)

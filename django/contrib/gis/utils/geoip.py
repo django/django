@@ -10,5 +10,5 @@ if HAS_GEOIP:
         def __init__(self, *args, **kwargs):
             warnings.warn('GeoIP class has been moved to `django.contrib.gis.geoip`, and '
                           'this shortcut will disappear in Django v1.6.',
-                          PendingDeprecationWarning, stacklevel=2)
+                          DeprecationWarning, stacklevel=2)
             super(GeoIP, self).__init__(*args, **kwargs)

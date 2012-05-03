@@ -53,7 +53,7 @@ def stringfilter(func):
             warnings.warn("Setting the %s attribute of a template filter "
                           "function is deprecated; use @register.filter(%s=%s) "
                           "instead" % (attr, attr, getattr(func, attr)),
-                          PendingDeprecationWarning)
+                          DeprecationWarning)
             setattr(_dec, attr, getattr(func, attr))
 
     return wraps(func)(_dec)

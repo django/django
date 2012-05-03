@@ -1442,12 +1442,18 @@ def hello_world_view(request, value):
 )
 class CacheMiddlewareTest(TestCase):
 
+    # The following tests will need to be modified in Django 1.6 to not use
+    # deprecated ways of using the cache_page decorator that will be removed in
+    # such version
     def setUp(self):
         self.factory = RequestFactory()
         self.default_cache = get_cache('default')
         self.other_cache = get_cache('other')
+        self.save_warnings_state()
+        warnings.filterwarnings('ignore', category=DeprecationWarning, module='django.views.decorators.cache')
 
     def tearDown(self):
+        self.restore_warnings_state()
         self.default_cache.clear()
         self.other_cache.clear()
 
