@@ -806,7 +806,7 @@ It is also important to remember that when running with :setting:`DEBUG`
 turned on, Django will remember every SQL query it executes. This is useful
 when you're debugging, but it'll rapidly consume memory on a production server.
 
-.. _django/views/debug.py: https://code.djangoproject.com/browser/django/trunk/django/views/debug.py
+.. _django/views/debug.py: https://github.com/django/django/tree/master/django/django/views/debug.py
 
 DEBUG_PROPAGATE_EXCEPTIONS
 --------------------------
@@ -1237,7 +1237,7 @@ and including a copy here would inevitably become rapidly out of date. You can
 see the current list of translated languages by looking in
 ``django/conf/global_settings.py`` (or view the `online source`_).
 
-.. _online source: https://code.djangoproject.com/browser/django/trunk/django/conf/global_settings.py
+.. _online source: https://github.com/django/django/tree/master/django/django/conf/global_settings.py
 
 The list is a tuple of two-tuples in the format ``(language code, language
 name)``, the ``language code`` part should be a
