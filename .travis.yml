@@ -4,4 +4,4 @@ python:
   - 2.7
 script: python ./tests/runtests.py --settings=test_sqlite
 install:
-  - python setup.py install
+  - python setup.py install &> /dev/null
