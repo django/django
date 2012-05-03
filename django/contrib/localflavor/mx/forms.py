@@ -266,7 +266,7 @@ class MXSocialSecurityNumberField(RegexField):
             raise ValidationError(self.default_error_messages['invalid_checksum'])
         return value
 
-    def __checksum(value):
+    def __checksum(self, value):
         multipliers = [1 if i % 2 == 0 else 2 for i in xrange(10)]
 
         s = [int(v) * m for v, m in zip(value, multipliers)]
