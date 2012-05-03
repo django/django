@@ -352,6 +352,7 @@ class CacheSessionTests(SessionTestsMixin, unittest.TestCase):
 
     def test_load_overlong_key(self):
         with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
             self.session._session_key = (string.ascii_letters + string.digits) * 20
             self.assertEqual(self.session.load(), {})
             self.assertEqual(len(w), 1)

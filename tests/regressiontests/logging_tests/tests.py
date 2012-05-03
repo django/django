@@ -43,6 +43,7 @@ class PatchLoggingConfigTest(TestCase):
         config = copy.deepcopy(OLD_LOGGING)
 
         with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
             compat_patch_logging_config(config)
             self.assertEqual(len(w), 1)
 

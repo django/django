@@ -415,6 +415,7 @@ class RequestsTests(unittest.TestCase):
                                'wsgi.input': ExplodingStringIO(payload)})
 
         with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
             with self.assertRaises(UnreadablePostError):
                 request.raw_post_data
             self.assertEqual(len(w), 1)
