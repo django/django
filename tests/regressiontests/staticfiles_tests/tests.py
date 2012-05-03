@@ -6,7 +6,6 @@ import posixpath
 import shutil
 import sys
 import tempfile
-import warnings
 from StringIO import StringIO
 
 from django.template import loader, Context
@@ -511,11 +510,8 @@ class TestCollectionCachedStorage(BaseCollectionTestCase,
         """
         name = "/some crazy/long filename/ with spaces Here and ?#%#$/other/stuff/some crazy/long filename/ with spaces Here and ?#%#$/other/stuff/some crazy/long filename/ with spaces Here and ?#%#$/other/stuff/some crazy/long filename/ with spaces Here and ?#%#$/other/stuff/some crazy/long filename/ with spaces Here and ?#%#$/other/stuff/some crazy/" + chr(22) + chr(180)
         cache_key = storage.staticfiles_storage.cache_key(name)
-        self.save_warnings_state()
         cache_validator = BaseCache({})
-        warnings.filterwarnings('error', category=CacheKeyWarning)
         cache_validator.validate_key(cache_key)
-        self.restore_warnings_state()
         self.assertEqual(cache_key, 'staticfiles:e95bbc36387084582df2a70750d7b351')
 
 

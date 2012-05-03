@@ -28,7 +28,6 @@ import datetime
 import pickle
 import re
 import os
-import warnings
 from decimal import Decimal
 
 from django.core.files.uploadedfile import SimpleUploadedFile

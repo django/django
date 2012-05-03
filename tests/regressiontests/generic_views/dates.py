@@ -10,14 +10,6 @@ from django.utils import timezone
 from .models import Book, BookSigning
 
 
-import warnings
-warnings.filterwarnings(
-        'error', r"DateTimeField received a naive datetime",
-        RuntimeWarning, r'django\.db\.models\.fields')
-
-
-
-
 class ArchiveIndexViewTests(TestCase):
     fixtures = ['generic-views-test-data.json']
     urls = 'regressiontests.generic_views.urls'

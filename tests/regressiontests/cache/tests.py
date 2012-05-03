@@ -466,20 +466,19 @@ class BaseCacheTests(object):
 
         old_func = self.cache.key_func
         self.cache.key_func = func
-        # On Python 2.6+ we could use the catch_warnings context
-        # manager to test this warning nicely. Since we can't do that
-        # yet, the cleanest option is to temporarily ask for
-        # CacheKeyWarning to be raised as an exception.
-        _warnings_state = get_warnings_state()
-        warnings.simplefilter("error", CacheKeyWarning)
 
         try:
-            # memcached does not allow whitespace or control characters in keys
-            self.assertRaises(CacheKeyWarning, self.cache.set, 'key with spaces', 'value')
-            # memcached limits key length to 250
-            self.assertRaises(CacheKeyWarning, self.cache.set, 'a' * 251, 'value')
+            with warnings.catch_warnings(record=True) as w:
+                # memcached does not allow whitespace or control characters in keys
+                self.cache.set('key with spaces', 'value')
+                self.assertEqual(len(w), 2)
+                self.assertTrue(isinstance(w[0].message, CacheKeyWarning))
+            with warnings.catch_warnings(record=True) as w:
+                # memcached limits key length to 250
+                self.cache.set('a' * 251, 'value')
+                self.assertEqual(len(w), 1)
+                self.assertTrue(isinstance(w[0].message, CacheKeyWarning))
         finally:
-            restore_warnings_state(_warnings_state)
             self.cache.key_func = old_func
 
     def test_cache_versioning_get_set(self):
@@ -1450,7 +1449,8 @@ class CacheMiddlewareTest(TestCase):
         self.default_cache = get_cache('default')
         self.other_cache = get_cache('other')
         self.save_warnings_state()
-        warnings.filterwarnings('ignore', category=DeprecationWarning, module='django.views.decorators.cache')
+        warnings.filterwarnings('ignore', category=DeprecationWarning,
+            module='django.views.decorators.cache')
 
     def tearDown(self):
         self.restore_warnings_state()

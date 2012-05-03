@@ -12,11 +12,10 @@ from django.contrib.sessions.backends.file import SessionStore as FileSession
 from django.contrib.sessions.backends.signed_cookies import SessionStore as CookieSession
 from django.contrib.sessions.models import Session
 from django.contrib.sessions.middleware import SessionMiddleware
-from django.core.cache.backends.base import CacheKeyWarning
 from django.core.exceptions import ImproperlyConfigured, SuspiciousOperation
 from django.http import HttpResponse
 from django.test import TestCase, RequestFactory
-from django.test.utils import override_settings, get_warnings_state, restore_warnings_state
+from django.test.utils import override_settings
 from django.utils import timezone
 from django.utils import unittest
 
@@ -302,12 +301,10 @@ class CacheDBSessionTests(SessionTestsMixin, TestCase):
             self.assertTrue(self.session.exists(self.session.session_key))
 
     def test_load_overlong_key(self):
-        warnings_state = get_warnings_state()
-        warnings.filterwarnings('ignore',
-                                category=CacheKeyWarning)
-        self.session._session_key = (string.ascii_letters + string.digits) * 20
-        self.assertEqual(self.session.load(), {})
-        restore_warnings_state(warnings_state)
+        with warnings.catch_warnings(record=True) as w:
+            self.session._session_key = (string.ascii_letters + string.digits) * 20
+            self.assertEqual(self.session.load(), {})
+            self.assertEqual(len(w), 1)
 
 
 @override_settings(USE_TZ=True)
@@ -353,12 +350,10 @@ class CacheSessionTests(SessionTestsMixin, unittest.TestCase):
     backend = CacheSession
 
     def test_load_overlong_key(self):
-        warnings_state = get_warnings_state()
-        warnings.filterwarnings('ignore',
-                                category=CacheKeyWarning)
-        self.session._session_key = (string.ascii_letters + string.digits) * 20
-        self.assertEqual(self.session.load(), {})
-        restore_warnings_state(warnings_state)
+        with warnings.catch_warnings(record=True) as w:
+            self.session._session_key = (string.ascii_letters + string.digits) * 20
+            self.assertEqual(self.session.load(), {})
+            self.assertEqual(len(w), 1)
 
 
 class SessionMiddlewareTests(unittest.TestCase):

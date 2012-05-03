@@ -8,13 +8,6 @@ class TestUtilsText(SimpleTestCase):
 
     # In Django 1.6 truncate_words() and truncate_html_words() will be removed
     # so these tests will need to be adapted accordingly
-    def setUp(self):
-        self.save_warnings_state()
-        warnings.filterwarnings('ignore', category=DeprecationWarning, module='django.utils.text')
-
-    def tearDown(self):
-        self.restore_warnings_state()
-
     def test_truncate_chars(self):
         truncator = text.Truncator(
             u'The quick brown fox jumped over the lazy dog.'
@@ -79,22 +72,26 @@ class TestUtilsText(SimpleTestCase):
             'id="mylink">brown...</a></p>', truncator.words(3, '...', html=True))
 
     def test_old_truncate_words(self):
-        self.assertEqual(u'The quick brown fox jumped over the lazy dog.',
-            text.truncate_words(u'The quick brown fox jumped over the lazy dog.', 10))
-        self.assertEqual(u'The quick brown fox ...',
-            text.truncate_words('The quick brown fox jumped over the lazy dog.', 4))
-        self.assertEqual(u'The quick brown fox ....',
-            text.truncate_words('The quick brown fox jumped over the lazy dog.', 4, '....'))
+        with warnings.catch_warnings(record=True) as w:
+            self.assertEqual(u'The quick brown fox jumped over the lazy dog.',
+                text.truncate_words(u'The quick brown fox jumped over the lazy dog.', 10))
+            self.assertEqual(u'The quick brown fox ...',
+                text.truncate_words('The quick brown fox jumped over the lazy dog.', 4))
+            self.assertEqual(u'The quick brown fox ....',
+                text.truncate_words('The quick brown fox jumped over the lazy dog.', 4, '....'))
+            self.assertEqual(len(w), 3)
 
     def test_old_truncate_html_words(self):
-        self.assertEqual(u'<p><strong><em>The quick brown fox jumped over the lazy dog.</em></strong></p>',
-            text.truncate_html_words('<p><strong><em>The quick brown fox jumped over the lazy dog.</em></strong></p>', 10))
-        self.assertEqual(u'<p><strong><em>The quick brown fox ...</em></strong></p>',
-            text.truncate_html_words('<p><strong><em>The quick brown fox jumped over the lazy dog.</em></strong></p>', 4))
-        self.assertEqual(u'<p><strong><em>The quick brown fox ....</em></strong></p>',
-            text.truncate_html_words('<p><strong><em>The quick brown fox jumped over the lazy dog.</em></strong></p>', 4, '....'))
-        self.assertEqual(u'<p><strong><em>The quick brown fox</em></strong></p>',
-            text.truncate_html_words('<p><strong><em>The quick brown fox jumped over the lazy dog.</em></strong></p>', 4, None))
+        with warnings.catch_warnings(record=True) as w:
+            self.assertEqual(u'<p><strong><em>The quick brown fox jumped over the lazy dog.</em></strong></p>',
+                text.truncate_html_words('<p><strong><em>The quick brown fox jumped over the lazy dog.</em></strong></p>', 10))
+            self.assertEqual(u'<p><strong><em>The quick brown fox ...</em></strong></p>',
+                text.truncate_html_words('<p><strong><em>The quick brown fox jumped over the lazy dog.</em></strong></p>', 4))
+            self.assertEqual(u'<p><strong><em>The quick brown fox ....</em></strong></p>',
+                text.truncate_html_words('<p><strong><em>The quick brown fox jumped over the lazy dog.</em></strong></p>', 4, '....'))
+            self.assertEqual(u'<p><strong><em>The quick brown fox</em></strong></p>',
+                text.truncate_html_words('<p><strong><em>The quick brown fox jumped over the lazy dog.</em></strong></p>', 4, None))
+            self.assertEqual(len(w), 4)
 
     def test_wrap(self):
         digits = '1234 67 9'

@@ -6,7 +6,6 @@ from StringIO import StringIO
 from django.conf import settings
 from django.core.handlers.wsgi import WSGIRequest, LimitedStream
 from django.http import HttpRequest, HttpResponse, parse_cookie, build_request_repr, UnreadablePostError
-from django.test.utils import get_warnings_state, restore_warnings_state
 from django.utils import unittest
 from django.utils.http import cookie_date
 from django.utils.timezone import utc
@@ -398,13 +397,9 @@ class RequestsTests(unittest.TestCase):
             'wsgi.input': StringIO(payload)
         })
 
-        warnings_state = get_warnings_state()
-        warnings.filterwarnings('ignore', category=DeprecationWarning, module='django.http')
-        try:
+        with warnings.catch_warnings(record=True) as w:
             self.assertEqual(request.body, request.raw_post_data)
-        finally:
-            restore_warnings_state(warnings_state)
-
+            self.assertEqual(len(w), 1)
 
     def test_POST_connection_error(self):
         """
@@ -420,10 +415,7 @@ class RequestsTests(unittest.TestCase):
                                'CONTENT_LENGTH': len(payload),
                                'wsgi.input': ExplodingStringIO(payload)})
 
-        warnings_state = get_warnings_state()
-        warnings.filterwarnings('ignore', category=DeprecationWarning, module='django.http')
-        try:
+        with warnings.catch_warnings(record=True) as w:
             with self.assertRaises(UnreadablePostError):
                 request.raw_post_data
-        finally:
-            restore_warnings_state(warnings_state)
+            self.assertEqual(len(w), 1)
