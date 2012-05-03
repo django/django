@@ -297,7 +297,7 @@ class HttpRequest(object):
 
     @property
     def raw_post_data(self):
-        warnings.warn('HttpRequest.raw_post_data has been deprecated. Use HttpRequest.body instead.', PendingDeprecationWarning)
+        warnings.warn('HttpRequest.raw_post_data has been deprecated. Use HttpRequest.body instead.', DeprecationWarning)
         return self.body
 
     def _mark_post_parse_error(self):

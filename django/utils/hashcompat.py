@@ -6,7 +6,7 @@ interface to the md5 and sha constructors, depending on system version.
 
 import warnings
 warnings.warn("django.utils.hashcompat is deprecated; use hashlib instead",
-              PendingDeprecationWarning)
+              DeprecationWarning)
 
 import hashlib
 md5_constructor = hashlib.md5

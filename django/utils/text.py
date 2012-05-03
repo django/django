@@ -206,14 +206,14 @@ class Truncator(SimpleLazyObject):
 
 def truncate_words(s, num, end_text='...'):
     warnings.warn('This function has been deprecated. Use the Truncator class '
-        'in django.utils.text instead.', category=PendingDeprecationWarning)
+        'in django.utils.text instead.', category=DeprecationWarning)
     truncate = end_text and ' %s' % end_text or ''
     return Truncator(s).words(num, truncate=truncate)
 truncate_words = allow_lazy(truncate_words, unicode)
 
 def truncate_html_words(s, num, end_text='...'):
     warnings.warn('This function has been deprecated. Use the Truncator class '
-        'in django.utils.text instead.', category=PendingDeprecationWarning)
+        'in django.utils.text instead.', category=DeprecationWarning)
     truncate = end_text and ' %s' % end_text or ''
     return Truncator(s).words(num, truncate=truncate, html=True)
 truncate_html_words = allow_lazy(truncate_html_words, unicode)

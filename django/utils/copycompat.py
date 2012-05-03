@@ -7,7 +7,7 @@ import types
 import warnings
 
 warnings.warn("django.utils.copycompat is deprecated; use the native copy module instead",
-              PendingDeprecationWarning)
+              DeprecationWarning)
 
 # Monkeypatch copy's deepcopy registry to handle functions correctly.
 if (hasattr(copy, '_deepcopy_dispatch') and types.FunctionType not in copy._deepcopy_dispatch):

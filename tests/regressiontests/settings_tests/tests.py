@@ -1,4 +1,5 @@
 import os
+import warnings
 
 from django.conf import settings, global_settings
 from django.core.exceptions import ImproperlyConfigured
@@ -274,10 +275,14 @@ class EnvironmentVariableTest(TestCase):
     Ensures proper settings file is used in setup_environ if
     DJANGO_SETTINGS_MODULE is set in the environment.
     """
+    # Decide what to do with these tests when setup_environ() gets removed in Django 1.6
     def setUp(self):
         self.original_value = os.environ.get('DJANGO_SETTINGS_MODULE')
+        self.save_warnings_state()
+        warnings.filterwarnings('ignore', category=DeprecationWarning, module='django.core.management')
 
     def tearDown(self):
+        self.restore_warnings_state()
         if self.original_value:
             os.environ['DJANGO_SETTINGS_MODULE'] = self.original_value
         elif 'DJANGO_SETTINGS_MODULE' in os.environ:

@@ -420,5 +420,10 @@ class RequestsTests(unittest.TestCase):
                                'CONTENT_LENGTH': len(payload),
                                'wsgi.input': ExplodingStringIO(payload)})
 
-        with self.assertRaises(UnreadablePostError):
-            request.raw_post_data
+        warnings_state = get_warnings_state()
+        warnings.filterwarnings('ignore', category=DeprecationWarning, module='django.http')
+        try:
+            with self.assertRaises(UnreadablePostError):
+                request.raw_post_data
+        finally:
+            restore_warnings_state(warnings_state)

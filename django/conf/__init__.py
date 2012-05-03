@@ -181,7 +181,7 @@ def compat_patch_logging_config(logging_config):
             "handler: adding implicit debug-false-only filter. "
             "See http://docs.djangoproject.com/en/dev/releases/1.4/"
             "#request-exceptions-are-now-always-logged",
-            PendingDeprecationWarning)
+            DeprecationWarning)
 
         filter_name = "require_debug_false"
 

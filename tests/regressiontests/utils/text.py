@@ -1,9 +1,19 @@
 # -*- coding: utf-8 -*-
-import unittest
+import warnings
 
+from django.test import SimpleTestCase
 from django.utils import text
 
-class TestUtilsText(unittest.TestCase):
+class TestUtilsText(SimpleTestCase):
+
+    # In Django 1.6 truncate_words() and truncate_html_words() will be removed
+    # so these tests will need to be adapted accordingly
+    def setUp(self):
+        self.save_warnings_state()
+        warnings.filterwarnings('ignore', category=DeprecationWarning, module='django.utils.text')
+
+    def tearDown(self):
+        self.restore_warnings_state()
 
     def test_truncate_chars(self):
         truncator = text.Truncator(
