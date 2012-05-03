@@ -17,7 +17,6 @@ This is the list of inconvenient words according to the `Anexo IV` of the
 document described in the next link:
     http://www.sisi.org.mx/jspsi/documentos/2005/seguimiento/06101/0610100162005_065.doc
 """
-
 RFC_INCONVENIENT_WORDS = [
     u'BUEI', u'BUEY', u'CACA', u'CACO', u'CAGA', u'CAGO', u'CAKA', u'CAKO',
     u'COGE', u'COJA', u'COJE', u'COJI', u'COJO', u'CULO', u'FETO', u'GUEY',
@@ -45,6 +44,7 @@ CURP_INCONVENIENT_WORDS = [
    u'TETA', u'VACA', u'VAGA', u'VAGO', u'VAKA', u'VUEI', u'VUEY', u'WUEI',
    u'WUEY',
 ]
+
 
 class MXStateSelect(Select):
     """
@@ -223,3 +223,56 @@ class MXCURPField(RegexField):
     def _has_inconvenient_word(self, curp):
         first_four = curp[:4]
         return first_four in CURP_INCONVENIENT_WORDS
+
+
+class MXSocialSecurityNumberField(RegexField):
+    """
+    A field that validates a Mexican Social Security Number.
+
+    The Social Security Number is integrated by a juxtaposition of digits
+    following the next pattern:
+
+    =====  =======================================
+    Index  Required numbers
+    =====  =======================================
+    1-2    The number of the branch office where the Social Security Number
+           was designated.
+    3-4    The year of inscription to the Social Security.
+    5-6    The year of birth of the Social Security Number owner.
+    7-10   The progressive number of procedure for the IMSS.
+           (This digit is provided exclusively by the Institute as it regards
+            the Folio number of such procedure).
+    11     The verification digit.
+
+    More info about this:
+        <reference here>
+    """
+    default_error_messages = {
+        'invalid': _('Enter a valid Social Security Number.'),
+        'invalid_checksum': _(u'Invalid checksum for Social Security Number.'),
+    }
+
+    def __init__(self, min_length=11, max_length=11, *args, **kwargs):
+        ssn_re = ur'^\d{11}$'
+        ssn_re = re.compile(ssn_re)
+        super(MXSocialSecurityNumberField, self).__init__(ssn_re,
+            min_length=min_length, max_length=max_length, *args, **kwargs)
+
+    def clean(self, value):
+        value = super(MXSocialSecurityNumberField, self).clean(value)
+        if value in EMPTY_VALUES:
+            return u''
+        if value[-1] != self.__checksum(value[:-1]):
+            raise ValidationError(self.default_error_messages['invalid_checksum'])
+        return value
+
+    def __checksum(value):
+        multipliers = [1 if i % 2 == 0 else 2 for i in xrange(10)]
+
+        s = [int(v) * m for v, m in zip(value, multipliers)]
+        s = sum(map(int, ''.join(map(str, s))))
+        checksum = 10 - s % 10
+
+        if checksum == 10:
+            return u'0'
+        return checksum
