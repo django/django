@@ -926,7 +926,7 @@ with the ``--name`` option. The :class:`template context
     To work around this problem, you can use the :ttag:`templatetag`
     templatetag to "escape" the various parts of the template syntax.
 
-.. _source: https://github.com/django/django/tree/master/django/django/conf/app_template/
+.. _source: https://github.com/django/django/tree/master/django/conf/app_template/
 
 startproject <projectname> [destination]
 ----------------------------------------
@@ -980,7 +980,7 @@ with the ``--name`` option. The :class:`template context
 Please also see the :ref:`rendering warning <render_warning>` as mentioned
 for :djadmin:`startapp`.
 
-.. _`template source`: https://github.com/django/django/tree/master/django/django/conf/project_template/
+.. _`template source`: https://github.com/django/django/tree/master/django/conf/project_template/
 
 syncdb
 ------
