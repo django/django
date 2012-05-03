@@ -341,7 +341,7 @@ class MultiTableInheritanceTest(TestCase):
             qs = AuthorWithAge.objects.prefetch_related('addresses')
             addresses = [[unicode(address) for address in obj.addresses.all()]
                          for obj in qs]
-        self.assertEquals(addresses, [[unicode(self.authorAddress)], [], []])
+        self.assertEqual(addresses, [[unicode(self.authorAddress)], [], []])
 
     def test_m2m_to_inheriting_model(self):
         qs = AuthorWithAge.objects.prefetch_related('books_with_year')
@@ -351,7 +351,7 @@ class MultiTableInheritanceTest(TestCase):
         qs = AuthorWithAge.objects.all()
         lst2 = [[unicode(book) for book in author.books_with_year.all()]
                 for author in qs]
-        self.assertEquals(lst, lst2)
+        self.assertEqual(lst, lst2)
 
         qs = BookWithYear.objects.prefetch_related('aged_authors')
         with self.assertNumQueries(2):
@@ -360,7 +360,7 @@ class MultiTableInheritanceTest(TestCase):
         qs = BookWithYear.objects.all()
         lst2 = [[unicode(author) for author in book.aged_authors.all()]
                for book in qs]
-        self.assertEquals(lst, lst2)
+        self.assertEqual(lst, lst2)
 
     def test_parent_link_prefetch(self):
         with self.assertNumQueries(2):
@@ -402,7 +402,7 @@ class ForeignKeyToFieldTest(TestCase):
             qs = Author.objects.prefetch_related('addresses')
             addresses = [[unicode(address) for address in obj.addresses.all()]
                          for obj in qs]
-        self.assertEquals(addresses, [[unicode(self.authorAddress)], [], []])
+        self.assertEqual(addresses, [[unicode(self.authorAddress)], [], []])
 
     def test_m2m(self):
         with self.assertNumQueries(3):
@@ -411,7 +411,7 @@ class ForeignKeyToFieldTest(TestCase):
                  [unicode(i_like) for i_like in author.favorite_authors.all()],
                  [unicode(likes_me) for likes_me in author.favors_me.all()]
                 ) for author in qs]
-            self.assertEquals(
+            self.assertEqual(
                 favorites,
                 [
                     ([unicode(self.author2)],[unicode(self.author3)]),
@@ -549,7 +549,7 @@ class MultiDbTests(TestCase):
             authors = "".join(["%s: %s\n" %
                                (author.name, ", ".join(b.title for b in author.books.all()))
                                for author in qs2])
-        self.assertEquals(authors,
+        self.assertEqual(authors,
                           "Charlotte: Poems, Jane Eyre\n"
                           "Anne: Poems\n"
                           "Emily: Poems, Wuthering Heights\n"
