@@ -315,6 +315,7 @@ try:
     from functools import total_ordering
 except ImportError:
     # For Python < 2.7
+    # Code borrowed from python 2.7.3 stdlib
     def total_ordering(cls):
         """Class decorator that fills in missing ordering methods"""
         convert = {
