@@ -956,23 +956,23 @@ class ReadLimitedStreamTest(TestCase):
     def test_body_from_empty_request(self):
         """HttpRequest.body on a test client GET request should return
         the empty string."""
-        self.assertEquals(self.client.get("/test_client_regress/body/").content, '')
+        self.assertEqual(self.client.get("/test_client_regress/body/").content, '')
 
     def test_read_from_empty_request(self):
         """HttpRequest.read() on a test client GET request should return the
         empty string."""
-        self.assertEquals(self.client.get("/test_client_regress/read_all/").content, '')
+        self.assertEqual(self.client.get("/test_client_regress/read_all/").content, '')
 
     def test_read_numbytes_from_empty_request(self):
         """HttpRequest.read(LARGE_BUFFER) on a test client GET request should
         return the empty string."""
-        self.assertEquals(self.client.get("/test_client_regress/read_buffer/").content, '')
+        self.assertEqual(self.client.get("/test_client_regress/read_buffer/").content, '')
 
     def test_read_from_nonempty_request(self):
         """HttpRequest.read() on a test client PUT request with some payload
         should return that payload."""
         payload = 'foobar'
-        self.assertEquals(self.client.put("/test_client_regress/read_all/",
+        self.assertEqual(self.client.put("/test_client_regress/read_all/",
                                           data=payload,
                                           content_type='text/plain').content, payload)
 
@@ -980,7 +980,7 @@ class ReadLimitedStreamTest(TestCase):
         """HttpRequest.read(LARGE_BUFFER) on a test client PUT request with
         some payload should return that payload."""
         payload = 'foobar'
-        self.assertEquals(self.client.put("/test_client_regress/read_buffer/",
+        self.assertEqual(self.client.put("/test_client_regress/read_buffer/",
                                           data=payload,
                                           content_type='text/plain').content, payload)
 

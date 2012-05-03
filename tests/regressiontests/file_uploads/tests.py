@@ -202,7 +202,7 @@ class FileUploadTests(TestCase):
             'wsgi.input': client.FakePayload(payload),
         }
         got = json.loads(self.client.request(**r).content)
-        self.assertEquals(got, {})
+        self.assertEqual(got, {})
 
     def test_empty_multipart_handled_gracefully(self):
         """
@@ -217,7 +217,7 @@ class FileUploadTests(TestCase):
             'wsgi.input': client.FakePayload(''),
         }
         got = json.loads(self.client.request(**r).content)
-        self.assertEquals(got, {})
+        self.assertEqual(got, {})
 
     def test_custom_upload_handler(self):
         # A small file (under the 5M quota)
@@ -313,7 +313,7 @@ class FileUploadTests(TestCase):
         try:
             response = self.client.post('/file_uploads/upload_errors/', post_data)
         except reference_error.__class__ as err:
-            self.failIf(
+            self.assertFalse(
                 str(err) == str(reference_error),
                 "Caught a repeated exception that'll cause an infinite loop in file uploads."
             )

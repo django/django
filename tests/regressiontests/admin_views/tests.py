@@ -3144,7 +3144,7 @@ class ReadonlyTest(TestCase):
     def test_user_password_change_limited_queryset(self):
         su = User.objects.filter(is_superuser=True)[0]
         response = self.client.get('/test_admin/admin2/auth/user/%s/password/' % su.pk)
-        self.assertEquals(response.status_code, 404)
+        self.assertEqual(response.status_code, 404)
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))

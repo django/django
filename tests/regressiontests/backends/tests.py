@@ -521,7 +521,7 @@ class ThreadTests(TestCase):
             t = threading.Thread(target=runner)
             t.start()
             t.join()
-        self.assertEquals(len(connections_set), 3)
+        self.assertEqual(len(connections_set), 3)
         # Finish by closing the connections opened by the other threads (the
         # connection opened in the main thread will automatically be closed on
         # teardown).
@@ -548,7 +548,7 @@ class ThreadTests(TestCase):
             t = threading.Thread(target=runner)
             t.start()
             t.join()
-        self.assertEquals(len(connections_set), 6)
+        self.assertEqual(len(connections_set), 6)
         # Finish by closing the connections opened by the other threads (the
         # connection opened in the main thread will automatically be closed on
         # teardown).

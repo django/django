@@ -303,7 +303,7 @@ class WizardTestGenericViewInterface(TestCase):
         view = TestWizard.as_view([forms.Form])
 
         response = view(factory.get('/'))
-        self.assertEquals(response.context_data['test_key'], 'test_value')
+        self.assertEqual(response.context_data['test_key'], 'test_value')
 
     def test_get_context_data_with_mixin(self):
         class AnotherMixin(object):
@@ -329,8 +329,8 @@ class WizardTestGenericViewInterface(TestCase):
         view = TestWizard.as_view([forms.Form])
 
         response = view(factory.get('/'))
-        self.assertEquals(response.context_data['test_key'], 'test_value')
-        self.assertEquals(response.context_data['another_key'], 'another_value')
+        self.assertEqual(response.context_data['test_key'], 'test_value')
+        self.assertEqual(response.context_data['another_key'], 'another_value')
 
 
 class WizardFormKwargsOverrideTests(TestCase):

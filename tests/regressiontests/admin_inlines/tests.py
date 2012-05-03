@@ -405,14 +405,14 @@ class SeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
 
         # Check that there's only one inline to start with and that it has the
         # correct ID.
-        self.failUnlessEqual(len(self.selenium.find_elements_by_css_selector(
+        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
             '.dynamic-profile_set')), 1)
-        self.failUnlessEqual(self.selenium.find_elements_by_css_selector(
+        self.assertEqual(self.selenium.find_elements_by_css_selector(
             '.dynamic-profile_set')[0].get_attribute('id'),
             'profile_set-0')
-        self.failUnlessEqual(len(self.selenium.find_elements_by_css_selector(
+        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
             '.dynamic-profile_set#profile_set-0 input[name=profile_set-0-first_name]')), 1)
-        self.failUnlessEqual(len(self.selenium.find_elements_by_css_selector(
+        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
             '.dynamic-profile_set#profile_set-0 input[name=profile_set-0-last_name]')), 1)
 
         # Add an inline
@@ -420,24 +420,24 @@ class SeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
 
         # Check that the inline has been added, that it has the right id, and
         # that it contains the right fields.
-        self.failUnlessEqual(len(self.selenium.find_elements_by_css_selector(
+        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
             '.dynamic-profile_set')), 2)
-        self.failUnlessEqual(self.selenium.find_elements_by_css_selector(
+        self.assertEqual(self.selenium.find_elements_by_css_selector(
             '.dynamic-profile_set')[1].get_attribute('id'), 'profile_set-1')
-        self.failUnlessEqual(len(self.selenium.find_elements_by_css_selector(
+        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
             '.dynamic-profile_set#profile_set-1 input[name=profile_set-1-first_name]')), 1)
-        self.failUnlessEqual(len(self.selenium.find_elements_by_css_selector(
+        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
             '.dynamic-profile_set#profile_set-1 input[name=profile_set-1-last_name]')), 1)
 
         # Let's add another one to be sure
         self.selenium.find_element_by_link_text('Add another Profile').click()
-        self.failUnlessEqual(len(self.selenium.find_elements_by_css_selector(
+        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
             '.dynamic-profile_set')), 3)
-        self.failUnlessEqual(self.selenium.find_elements_by_css_selector(
+        self.assertEqual(self.selenium.find_elements_by_css_selector(
             '.dynamic-profile_set')[2].get_attribute('id'), 'profile_set-2')
-        self.failUnlessEqual(len(self.selenium.find_elements_by_css_selector(
+        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
             '.dynamic-profile_set#profile_set-2 input[name=profile_set-2-first_name]')), 1)
-        self.failUnlessEqual(len(self.selenium.find_elements_by_css_selector(
+        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
             '.dynamic-profile_set#profile_set-2 input[name=profile_set-2-last_name]')), 1)
 
         # Enter some data and click 'Save'
@@ -473,17 +473,17 @@ class SeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
         self.selenium.find_element_by_link_text('Add another Profile').click()
         self.selenium.find_element_by_link_text('Add another Profile').click()
         self.selenium.find_element_by_link_text('Add another Profile').click()
-        self.failUnlessEqual(len(self.selenium.find_elements_by_css_selector(
+        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
             '#profile_set-group table tr.dynamic-profile_set')), 5)
-        self.failUnlessEqual(len(self.selenium.find_elements_by_css_selector(
+        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
             'form#profilecollection_form tr.dynamic-profile_set#profile_set-0')), 1)
-        self.failUnlessEqual(len(self.selenium.find_elements_by_css_selector(
+        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
             'form#profilecollection_form tr.dynamic-profile_set#profile_set-1')), 1)
-        self.failUnlessEqual(len(self.selenium.find_elements_by_css_selector(
+        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
             'form#profilecollection_form tr.dynamic-profile_set#profile_set-2')), 1)
-        self.failUnlessEqual(len(self.selenium.find_elements_by_css_selector(
+        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
             'form#profilecollection_form tr.dynamic-profile_set#profile_set-3')), 1)
-        self.failUnlessEqual(len(self.selenium.find_elements_by_css_selector(
+        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
             'form#profilecollection_form tr.dynamic-profile_set#profile_set-4')), 1)
 
         # Click on a few delete buttons
@@ -492,13 +492,13 @@ class SeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
         self.selenium.find_element_by_css_selector(
             'form#profilecollection_form tr.dynamic-profile_set#profile_set-2 td.delete a').click()
         # Verify that they're gone and that the IDs have been re-sequenced
-        self.failUnlessEqual(len(self.selenium.find_elements_by_css_selector(
+        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
             '#profile_set-group table tr.dynamic-profile_set')), 3)
-        self.failUnlessEqual(len(self.selenium.find_elements_by_css_selector(
+        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
             'form#profilecollection_form tr.dynamic-profile_set#profile_set-0')), 1)
-        self.failUnlessEqual(len(self.selenium.find_elements_by_css_selector(
+        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
             'form#profilecollection_form tr.dynamic-profile_set#profile_set-1')), 1)
-        self.failUnlessEqual(len(self.selenium.find_elements_by_css_selector(
+        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
             'form#profilecollection_form tr.dynamic-profile_set#profile_set-2')), 1)
 
 
