@@ -122,7 +122,7 @@ class DecoratorsTest(TestCase):
         """
         def my_view(request):
             return "response"
-        with warnings.catch_warnings(record=True) as w:
+        with warnings.catch_warnings(record=True):
             my_view_cached = cache_page(my_view, 123)
             self.assertEqual(my_view_cached(HttpRequest()), "response")
             my_view_cached2 = cache_page(my_view, 123, key_prefix="test")
@@ -131,7 +131,6 @@ class DecoratorsTest(TestCase):
             self.assertEqual(my_view_cached3(HttpRequest()), "response")
             my_view_cached4 = cache_page()(my_view)
             self.assertEqual(my_view_cached4(HttpRequest()), "response")
-            self.assertEqual(len(w), 4)
 
     def test_require_safe_accepts_only_safe_methods(self):
         """

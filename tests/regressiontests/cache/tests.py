@@ -469,11 +469,13 @@ class BaseCacheTests(object):
 
         try:
             with warnings.catch_warnings(record=True) as w:
+                warnings.simplefilter("always")
                 # memcached does not allow whitespace or control characters in keys
                 self.cache.set('key with spaces', 'value')
                 self.assertEqual(len(w), 2)
                 self.assertTrue(isinstance(w[0].message, CacheKeyWarning))
             with warnings.catch_warnings(record=True) as w:
+                warnings.simplefilter("always")
                 # memcached limits key length to 250
                 self.cache.set('a' * 251, 'value')
                 self.assertEqual(len(w), 1)

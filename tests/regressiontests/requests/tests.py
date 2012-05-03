@@ -397,9 +397,8 @@ class RequestsTests(unittest.TestCase):
             'wsgi.input': StringIO(payload)
         })
 
-        with warnings.catch_warnings(record=True) as w:
+        with warnings.catch_warnings(record=True):
             self.assertEqual(request.body, request.raw_post_data)
-            self.assertEqual(len(w), 1)
 
     def test_POST_connection_error(self):
         """
