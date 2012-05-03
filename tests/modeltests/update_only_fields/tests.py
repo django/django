@@ -2,7 +2,8 @@ from __future__ import absolute_import
 
 from django.test import TestCase
 from django.db.models.signals import pre_save, post_save
-from .models import Person, Employee, ProxyEmployee, Profile
+from .models import Person, Employee, ProxyEmployee, Profile, Account
+
 
 class UpdateOnlyFieldsTests(TestCase):
     def test_update_fields_basic(self):
@@ -16,6 +17,19 @@ class UpdateOnlyFieldsTests(TestCase):
         s = Person.objects.get(pk=s.pk)
         self.assertEqual(s.gender, 'F')
         self.assertEqual(s.name, 'Ian')
+
+    def test_update_fields_m2n(self):
+        profile_boss = Profile.objects.create(name='Boss', salary=3000)
+        e1 = Employee.objects.create(name='Sara', gender='F',
+            employee_num=1, profile=profile_boss)
+
+        a1 = Account.objects.create(num=1)
+        a2 = Account.objects.create(num=2)
+
+        e1.accounts = [a1,a2]
+
+        with self.assertRaises(ValueError):
+            e1.save(update_fields=['accounts'])
 
     def test_update_fields_inheritance(self):
         profile_boss = Profile.objects.create(name='Boss', salary=3000)

@@ -6,6 +6,10 @@ GENDER_CHOICES = (
     ('F', 'Female'),
 )
 
+class Account(models.Model):
+    num = models.IntegerField()
+
+
 class Person(models.Model):
     name = models.CharField(max_length=20)
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
@@ -13,9 +17,11 @@ class Person(models.Model):
     def __unicode__(self):
         return self.name
 
+
 class Employee(Person):
     employee_num = models.IntegerField(default=0)
     profile = models.ForeignKey('Profile', related_name='profiles', null=True)
+    accounts = models.ManyToManyField('Account', related_name='employees', blank=True, null=True)
 
 
 class Profile(models.Model):

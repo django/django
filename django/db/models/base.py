@@ -468,12 +468,13 @@ class Model(object):
             # still needed for skipping signal sending.
             if len(update_fields) == 0:
                 return
-            update_fields = ImmutableSet(update_fields)
 
-            field_names = set(self._meta.get_all_field_names())
+            update_fields = ImmutableSet(update_fields)
+            field_names = set([field.name for field in self._meta.fields if not field.primary_key])
             not_model_fields = update_fields.difference(field_names)
+
             if not_model_fields:
-                raise ValueError("The following fields do not exist in this model: %s"
+                raise ValueError("The following fields do not exist in this model or is m2n field: %s"
                                  % ', '.join(not_model_fields))
 
         self.save_base(using=using, force_insert=force_insert,
