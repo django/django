@@ -243,9 +243,6 @@ class MXSocialSecurityNumberField(RegexField):
            (This digit is provided exclusively by the Institute as it regards
             the Folio number of such procedure).
     11     The verification digit.
-
-    More info about this:
-        <reference here>
     """
     default_error_messages = {
         'invalid': _(u'Enter a valid Social Security Number.'),
