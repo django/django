@@ -468,8 +468,6 @@ class TransactionTestCase(SimpleTestCase):
         else:
             databases = [DEFAULT_DB_ALIAS]
         for db in databases:
-            call_command('flush', verbosity=0, interactive=False, database=db,
-                         skip_validation=True)
 
             if hasattr(self, 'fixtures'):
                 # We have to use this slightly awkward syntax due to the fact
@@ -532,7 +530,13 @@ class TransactionTestCase(SimpleTestCase):
             conn.close()
 
     def _fixture_teardown(self):
-        pass
+        if getattr(self, 'multi_db', False):
+            databases = connections
+        else:
+            databases = [DEFAULT_DB_ALIAS]
+        for db in databases:
+            call_command('flush', verbosity=0, interactive=False, database=db,
+                         skip_validation=True)
 
     def _urlconf_teardown(self):
         if hasattr(self, '_old_root_urlconf'):
