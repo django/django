@@ -11,6 +11,7 @@ from django.forms.util import flatatt
 from django.template.defaultfilters import capfirst
 from django.utils.encoding import force_unicode, smart_unicode
 from django.utils.html import escape, conditional_escape
+from django.utils.py3 import string_types, text_type
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
@@ -49,7 +50,7 @@ class AdminForm(object):
         try:
             fieldset_name, fieldset_options = self.fieldsets[0]
             field_name = fieldset_options['fields'][0]
-            if not isinstance(field_name, basestring):
+            if not isinstance(field_name, string_types):
                 field_name = field_name[0]
             return self.form[field_name]
         except (KeyError, IndexError):
@@ -190,7 +191,7 @@ class AdminReadonlyField(object):
                 if value is None:
                     result_repr = EMPTY_CHANGELIST_VALUE
                 elif isinstance(f.rel, ManyToManyRel):
-                    result_repr = ", ".join(map(unicode, value.all()))
+                    result_repr = ", ".join(map(text_type, value.all()))
                 else:
                     result_repr = display_for_field(value, f)
         return conditional_escape(result_repr)

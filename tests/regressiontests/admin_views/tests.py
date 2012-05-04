@@ -30,6 +30,7 @@ from django.utils.cache import get_max_age
 from django.utils.encoding import iri_to_uri
 from django.utils.html import escape
 from django.utils.http import urlencode
+from django.utils.py3 import text_type
 from django.test.utils import override_settings
 
 # local test models
@@ -2506,12 +2507,12 @@ class AdminInlineFileUploadTest(TestCase):
             "pictures-TOTAL_FORMS": "2",
             "pictures-INITIAL_FORMS": "1",
             "pictures-MAX_NUM_FORMS": "0",
-            "pictures-0-id": unicode(self.picture.id),
-            "pictures-0-gallery": unicode(self.gallery.id),
+            "pictures-0-id": text_type(self.picture.id),
+            "pictures-0-gallery": text_type(self.gallery.id),
             "pictures-0-name": "Test Picture",
             "pictures-0-image": "",
             "pictures-1-id": "",
-            "pictures-1-gallery": str(self.gallery.id),
+            "pictures-1-gallery": text_type(self.gallery.id),
             "pictures-1-name": "Test Picture 2",
             "pictures-1-image": "",
         }

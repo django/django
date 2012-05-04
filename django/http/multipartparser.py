@@ -11,6 +11,7 @@ from django.conf import settings
 from django.core.exceptions import SuspiciousOperation
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_unicode
+from django.utils.py3 import text_type
 from django.utils.text import unescape_entities
 from django.core.files.uploadhandler import StopUpload, SkipFile, StopFutureHandlers
 
@@ -77,7 +78,7 @@ class MultiPartParser(object):
             # This means we shouldn't continue...raise an error.
             raise MultiPartParserError("Invalid content length: %r" % content_length)
 
-        if isinstance(boundary, unicode):
+        if isinstance(boundary, text_type):
             boundary = boundary.encode('ascii')
         self._boundary = boundary
         self._input_data = input_data

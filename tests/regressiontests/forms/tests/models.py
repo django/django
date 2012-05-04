@@ -8,6 +8,7 @@ from django.db import models
 from django.forms import Form, ModelForm, FileField, ModelChoiceField
 from django.forms.models import ModelFormMetaclass
 from django.test import TestCase
+from django.utils.py3 import text_type
 
 from ..models import (ChoiceOptionModel, ChoiceFieldModel, FileModel, Group,
     BoundaryModel, Defaults)
@@ -40,7 +41,7 @@ class ModelFormCallableModelDefault(TestCase):
 
         choices = list(ChoiceFieldForm().fields['choice'].choices)
         self.assertEqual(len(choices), 1)
-        self.assertEqual(choices[0], (option.pk, unicode(option)))
+        self.assertEqual(choices[0], (option.pk, text_type(option)))
 
     def test_callable_initial_value(self):
         "The initial value for a callable default returning a queryset is the pk (refs #13769)"

@@ -3,6 +3,7 @@ Tests for the order_with_respect_to Meta attribute.
 """
 
 from django.db import models
+from django.utils.py3 import text_type
 
 
 class Question(models.Model):
@@ -16,7 +17,7 @@ class Answer(models.Model):
         order_with_respect_to = 'question'
 
     def __unicode__(self):
-        return unicode(self.text)
+        return text_type(self.text)
 
 class Post(models.Model):
     title = models.CharField(max_length=200)

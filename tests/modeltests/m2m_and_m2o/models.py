@@ -6,6 +6,7 @@ Make sure to set ``related_name`` if you use relationships to the same table.
 from __future__ import unicode_literals
 
 from django.db import models
+from django.utils.py3 import text_type
 
 
 class User(models.Model):
@@ -17,7 +18,7 @@ class Issue(models.Model):
     client = models.ForeignKey(User, related_name='test_issue_client')
 
     def __unicode__(self):
-        return unicode(self.num)
+        return text_type(self.num)
 
     class Meta:
         ordering = ('num',)

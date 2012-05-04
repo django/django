@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.py3 import text_type
 
 
 class Article(models.Model):
@@ -22,7 +23,7 @@ class Count(models.Model):
     parent = models.ForeignKey('self', null=True)
 
     def __unicode__(self):
-        return unicode(self.num)
+        return text_type(self.num)
 
 class Event(models.Model):
     date = models.DateTimeField(auto_now_add=True)

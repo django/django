@@ -1,6 +1,7 @@
 """
 Common checksum routines (used in multiple localflavor/ cases, for example).
 """
+from django.utils.py3 import string_types
 
 __all__ = ['luhn',]
 
@@ -12,7 +13,7 @@ def luhn(candidate):
     algorithm (used in validation of, for example, credit cards).
     Both numeric and string candidates are accepted.
     """
-    if not isinstance(candidate, basestring):
+    if not isinstance(candidate, string_types):
         candidate = str(candidate)
     try:
         evens = sum([int(c) for c in candidate[-1::-2]])

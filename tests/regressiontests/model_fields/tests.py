@@ -9,6 +9,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.fields.files import FieldFile
 from django.utils import unittest
+from django.utils.py3 import integer_types
 
 from .models import (Foo, Bar, Whiz, BigD, BigS, Image, BigInt, Post,
     NullBooleanModel, BooleanModel, Document, RenamedField)
@@ -305,11 +306,11 @@ class BigIntegerFieldTests(test.TestCase):
 
     def test_types(self):
         b = BigInt(value = 0)
-        self.assertTrue(isinstance(b.value, (int, long)))
+        self.assertTrue(isinstance(b.value, integer_types))
         b.save()
-        self.assertTrue(isinstance(b.value, (int, long)))
+        self.assertTrue(isinstance(b.value, integer_types))
         b = BigInt.objects.all()[0]
-        self.assertTrue(isinstance(b.value, (int, long)))
+        self.assertTrue(isinstance(b.value, integer_types))
 
     def test_coercing(self):
         BigInt.objects.create(value ='10')

@@ -7,6 +7,7 @@ import codecs
 from decimal import Decimal
 
 from django.utils.functional import Promise
+from django.utils.py3 import integer_types, string_types, text_type
 
 class DjangoUnicodeDecodeError(UnicodeDecodeError):
     def __init__(self, obj, *args):
@@ -45,9 +46,8 @@ def is_protected_type(obj):
     Objects of protected types are preserved as-is when passed to
     force_unicode(strings_only=True).
     """
-    return isinstance(obj, (
+    return isinstance(obj, integer_types + (
         type(None),
-        int, long,
         datetime.datetime, datetime.date, datetime.time,
         float, Decimal)
     )
@@ -62,17 +62,17 @@ def force_unicode(s, encoding='utf-8', strings_only=False, errors='strict'):
     # Handle the common case first, saves 30-40% in performance when s
     # is an instance of unicode. This function gets called often in that
     # setting.
-    if isinstance(s, unicode):
+    if isinstance(s, text_type):
         return s
     if strings_only and is_protected_type(s):
         return s
     try:
-        if not isinstance(s, basestring,):
+        if not isinstance(s, string_types):
             if hasattr(s, '__unicode__'):
-                s = unicode(s)
+                s = s.__unicode__()
             else:
                 try:
-                    s = unicode(str(s), encoding, errors)
+                    s = text_type(str(s), encoding, errors)
                 except UnicodeEncodeError:
                     if not isinstance(s, Exception):
                         raise
@@ -84,8 +84,8 @@ def force_unicode(s, encoding='utf-8', strings_only=False, errors='strict'):
                     # output should be.
                     s = ' '.join([force_unicode(arg, encoding, strings_only,
                             errors) for arg in s])
-        elif not isinstance(s, unicode):
-            # Note: We use .decode() here, instead of unicode(s, encoding,
+        elif not isinstance(s, text_type):
+            # Note: We use .decode() here, instead of text_type(s, encoding,
             # errors), so that if s is a SafeString, it ends up being a
             # SafeUnicode at the end.
             s = s.decode(encoding, errors)
@@ -111,8 +111,8 @@ def smart_str(s, encoding='utf-8', strings_only=False, errors='strict'):
     if strings_only and (s is None or isinstance(s, int)):
         return s
     if isinstance(s, Promise):
-        return unicode(s).encode(encoding, errors)
-    elif not isinstance(s, basestring):
+        return text_type(s).encode(encoding, errors)
+    elif not isinstance(s, string_types):
         try:
             return str(s)
         except UnicodeEncodeError:
@@ -122,8 +122,8 @@ def smart_str(s, encoding='utf-8', strings_only=False, errors='strict'):
                 # further exception.
                 return ' '.join([smart_str(arg, encoding, strings_only,
                         errors) for arg in s])
-            return unicode(s).encode(encoding, errors)
-    elif isinstance(s, unicode):
+            return text_type(s).encode(encoding, errors)
+    elif isinstance(s, text_type):
         return s.encode(encoding, errors)
     elif s and encoding != 'utf-8':
         return s.decode('utf-8', errors).encode(encoding, errors)

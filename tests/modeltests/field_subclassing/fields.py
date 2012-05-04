@@ -4,6 +4,7 @@ import json
 
 from django.db import models
 from django.utils.encoding import force_unicode
+from django.utils.py3 import text_type, string_types
 
 
 class Small(object):
@@ -18,7 +19,7 @@ class Small(object):
         return '%s%s' % (force_unicode(self.first), force_unicode(self.second))
 
     def __str__(self):
-        return unicode(self).encode('utf-8')
+        return text_type(self).encode('utf-8')
 
 class SmallField(models.Field):
     """
@@ -41,7 +42,7 @@ class SmallField(models.Field):
         return Small(value[0], value[1])
 
     def get_db_prep_save(self, value, connection):
-        return unicode(value)
+        return text_type(value)
 
     def get_prep_lookup(self, lookup_type, value):
         if lookup_type == 'exact':
@@ -66,7 +67,7 @@ class JSONField(models.TextField):
         if not value:
             return None
 
-        if isinstance(value, basestring):
+        if isinstance(value, string_types):
             value = json.loads(value)
         return value
 

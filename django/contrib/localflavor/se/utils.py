@@ -1,5 +1,7 @@
 import datetime
 
+from django.utils.py3 import text_type
+
 def id_number_checksum(gd):
     """
     Calculates a Swedish ID number checksum, using the
@@ -65,7 +67,7 @@ def validate_id_birthday(gd, fix_coordination_number_day=True):
 
 def format_personal_id_number(birth_day, gd):
     # birth_day.strftime cannot be used, since it does not support dates < 1900
-    return unicode(str(birth_day.year) + gd['month'] + gd['day'] + gd['serial'] + gd['checksum'])
+    return text_type(str(birth_day.year) + gd['month'] + gd['day'] + gd['serial'] + gd['checksum'])
 
 def format_organisation_number(gd):
     if gd['century'] is None:
@@ -73,7 +75,7 @@ def format_organisation_number(gd):
     else:
         century = gd['century']
 
-    return unicode(century + gd['year'] + gd['month'] + gd['day'] + gd['serial'] + gd['checksum'])
+    return text_type(century + gd['year'] + gd['month'] + gd['day'] + gd['serial'] + gd['checksum'])
 
 def valid_organisation(gd):
     return gd['century'] in (None, 16) and \

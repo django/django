@@ -1,5 +1,6 @@
 from django.contrib.gis.geos import fromstr, Point, LineString, LinearRing, Polygon
 from django.utils.functional import total_ordering
+from django.utils.py3 import string_types
 from django.utils.safestring import mark_safe
 
 
@@ -98,7 +99,7 @@ class GPolygon(GOverlayBase):
           fill_opacity:
             The opacity of the polygon fill.  Defaults to 0.4.
         """
-        if isinstance(poly, basestring): poly = fromstr(poly)
+        if isinstance(poly, string_types): poly = fromstr(poly)
         if isinstance(poly, (tuple, list)): poly = Polygon(poly)
         if not isinstance(poly, Polygon):
             raise TypeError('GPolygon may only initialize on GEOS Polygons.')
@@ -148,7 +149,7 @@ class GPolyline(GOverlayBase):
             The opacity of the polyline, between 0 and 1.  Defaults to 1.
         """
         # If a GEOS geometry isn't passed in, try to contsruct one.
-        if isinstance(geom, basestring): geom = fromstr(geom)
+        if isinstance(geom, string_types): geom = fromstr(geom)
         if isinstance(geom, (tuple, list)): geom = Polygon(geom)
         # Generating the lat/lng coordinate pairs.
         if isinstance(geom, (LineString, LinearRing)):
@@ -278,7 +279,7 @@ class GMarker(GOverlayBase):
            Draggable option for GMarker, disabled by default.
         """
         # If a GEOS geometry isn't passed in, try to construct one.
-        if isinstance(geom, basestring): geom = fromstr(geom)
+        if isinstance(geom, string_types): geom = fromstr(geom)
         if isinstance(geom, (tuple, list)): geom = Point(geom)
         if isinstance(geom, Point):
             self.latlng = self.latlng_from_coords(geom.coords)

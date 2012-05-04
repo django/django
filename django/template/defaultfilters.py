@@ -16,6 +16,7 @@ from django.utils.encoding import force_unicode, iri_to_uri
 from django.utils.html import (conditional_escape, escapejs, fix_ampersands,
     escape, urlize as urlize_impl, linebreaks, strip_tags)
 from django.utils.http import urlquote
+from django.utils.py3 import text_type
 from django.utils.text import Truncator, wrap, phone2numeric
 from django.utils.safestring import mark_safe, SafeData, mark_for_escaping
 from django.utils.timesince import timesince, timeuntil
@@ -176,7 +177,7 @@ def floatformat(text, arg=-1):
         # and `exponent` from `Decimal.as_tuple()` directly.
         sign, digits, exponent = d.quantize(exp, ROUND_HALF_UP,
             Context(prec=prec)).as_tuple()
-        digits = [unicode(digit) for digit in reversed(digits)]
+        digits = [text_type(digit) for digit in reversed(digits)]
         while len(digits) <= abs(exponent):
             digits.append('0')
         digits.insert(-exponent, '.')
@@ -200,7 +201,7 @@ def linenumbers(value, autoescape=None):
     lines = value.split('\n')
     # Find the maximum width of the line count, for use with zero padding
     # string format command
-    width = unicode(len(unicode(len(lines))))
+    width = text_type(len(text_type(len(lines))))
     if not autoescape or isinstance(value, SafeData):
         for i, line in enumerate(lines):
             lines[i] = ("%0" + width  + "d. %s") % (i + 1, line)
@@ -234,7 +235,7 @@ def slugify(value):
     and converts spaces to hyphens.
     """
     value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore')
-    value = unicode(re.sub('[^\w\s-]', '', value).strip().lower())
+    value = text_type(re.sub('[^\w\s-]', '', value).strip().lower())
     return mark_safe(re.sub('[-\s]+', '-', value))
 
 @register.filter(is_safe=True)
@@ -249,7 +250,7 @@ def stringformat(value, arg):
     of Python string formatting
     """
     try:
-        return ("%" + unicode(arg)) % value
+        return ("%" + text_type(arg)) % value
     except (ValueError, TypeError):
         return ""
 

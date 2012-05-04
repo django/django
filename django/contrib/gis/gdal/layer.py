@@ -14,6 +14,8 @@ from django.contrib.gis.gdal.srs import SpatialReference
 # GDAL ctypes function prototypes.
 from django.contrib.gis.gdal.prototypes import ds as capi, geom as geom_api, srs as srs_api
 
+from django.utils.py3 import integer_types
+
 # For more information, see the OGR C API source code:
 #  http://www.gdal.org/ogr/ogr__api_8h.html
 #
@@ -39,7 +41,7 @@ class Layer(GDALBase):
 
     def __getitem__(self, index):
         "Gets the Feature at the specified index."
-        if isinstance(index, (int, long)):
+        if isinstance(index, integer_types):
             # An integer index was given -- we cannot do a check based on the
             # number of features because the beginning and ending feature IDs
             # are not guaranteed to be 0 and len(layer)-1, respectively.

@@ -11,6 +11,7 @@ from django.contrib.gis.tests.utils import (
     no_mysql, no_oracle, no_spatialite,
     mysql, oracle, postgis, spatialite)
 from django.test import TestCase
+from django.utils.py3 import text_type
 
 from .models import Country, City, PennsylvaniaCity, State, Track
 
@@ -663,7 +664,7 @@ class GeoModelTest(TestCase):
         # Let's try and break snap_to_grid() with bad combinations of arguments.
         for bad_args in ((), range(3), range(5)):
             self.assertRaises(ValueError, Country.objects.snap_to_grid, *bad_args)
-        for bad_args in (('1.0',), (1.0, None), tuple(map(unicode, range(4)))):
+        for bad_args in (('1.0',), (1.0, None), tuple(map(text_type, range(4)))):
             self.assertRaises(TypeError, Country.objects.snap_to_grid, *bad_args)
 
         # Boundary for San Marino, courtesy of Bjorn Sandvik of thematicmapping.org

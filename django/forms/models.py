@@ -15,6 +15,7 @@ from django.forms.widgets import (SelectMultiple, HiddenInput,
     MultipleHiddenInput, media_property)
 from django.utils.encoding import smart_unicode, force_unicode
 from django.utils.datastructures import SortedDict
+from django.utils.py3 import text_type
 from django.utils.text import get_text_list, capfirst
 from django.utils.translation import ugettext_lazy as _, ugettext
 
@@ -574,7 +575,7 @@ class BaseModelFormSet(BaseFormSet):
         else:
             return ugettext("Please correct the duplicate data for %(field)s, "
                 "which must be unique.") % {
-                    "field": get_text_list(unique_check, unicode(_("and"))),
+                    "field": get_text_list(unique_check, text_type(_("and"))),
                 }
 
     def get_date_error_message(self, date_check):
@@ -582,7 +583,7 @@ class BaseModelFormSet(BaseFormSet):
             "which must be unique for the %(lookup)s in %(date_field)s.") % {
             'field_name': date_check[2],
             'date_field': date_check[3],
-            'lookup': unicode(date_check[1]),
+            'lookup': text_type(date_check[1]),
         }
 
     def get_form_error(self):

@@ -29,7 +29,7 @@ class Stuff(models.Model):
     owner = models.ForeignKey(User, null=True)
 
     def __unicode__(self):
-        return unicode(self.name) + ' is owned by ' + unicode(self.owner)
+        return '%s is owned by %s' % (self.name, self.owner)
 
 
 class Absolute(models.Model):

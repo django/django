@@ -3,6 +3,7 @@ from __future__ import absolute_import
 from django.db.models import signals
 from django.dispatch import receiver
 from django.test import TestCase
+from django.utils.py3 import text_type
 
 from .models import Person, Car
 
@@ -144,7 +145,7 @@ class SignalTests(TestCase):
             Person.objects.all(), [
                 "James Jones",
             ],
-            unicode
+            text_type
         )
 
         signals.post_delete.disconnect(post_delete_test)

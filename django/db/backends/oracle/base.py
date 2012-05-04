@@ -10,6 +10,7 @@ import decimal
 import sys
 import warnings
 
+from django.utils.py3 import long_type, string_types, text_type
 
 def _setup_environment(environ):
     import platform
@@ -201,7 +202,7 @@ WHEN (new.%(col_name)s IS NULL)
         return "DROP SEQUENCE %s;" % self.quote_name(self._get_sequence_name(table))
 
     def fetch_returned_insert_id(self, cursor):
-        return long(cursor._insert_id_var.getvalue())
+        return long_type(cursor._insert_id_var.getvalue())
 
     def field_cast_sql(self, db_type):
         if db_type and db_type.endswith('LOB'):
@@ -347,13 +348,13 @@ WHEN (new.%(col_name)s IS NULL)
             else:
                 raise ValueError("Oracle backend does not support timezone-aware datetimes when USE_TZ is False.")
 
-        return unicode(value)
+        return text_type(value)
 
     def value_to_db_time(self, value):
         if value is None:
             return None
 
-        if isinstance(value, basestring):
+        if isinstance(value, string_types):
             return datetime.datetime.strptime(value, '%H:%M:%S')
 
         # Oracle doesn't support tz-aware times
@@ -582,7 +583,7 @@ class OracleParam(object):
         if hasattr(param, 'input_size'):
             # If parameter has `input_size` attribute, use that.
             self.input_size = param.input_size
-        elif isinstance(param, basestring) and len(param) > 4000:
+        elif isinstance(param, string_types) and len(param) > 4000:
             # Mark any string param greater than 4000 characters as a CLOB.
             self.input_size = Database.CLOB
         else:
@@ -810,7 +811,7 @@ def to_unicode(s):
     Convert strings to Unicode objects (and return all other data types
     unchanged).
     """
-    if isinstance(s, basestring):
+    if isinstance(s, string_types):
         return force_unicode(s)
     return s
 

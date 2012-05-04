@@ -14,6 +14,7 @@ from django import forms
 from django.test import TestCase
 from django.utils import unittest
 from django.utils.formats import localize
+from django.utils.py3 import text_type
 from django.utils.safestring import mark_safe
 
 from .models import Article, Count, Event, Location
@@ -249,17 +250,17 @@ class UtilTests(unittest.TestCase):
 
         log_entry.action_flag = admin.models.ADDITION
         self.assertTrue(
-            unicode(log_entry).startswith('Added ')
+            text_type(log_entry).startswith('Added ')
         )
 
         log_entry.action_flag = admin.models.CHANGE
         self.assertTrue(
-            unicode(log_entry).startswith('Changed ')
+            text_type(log_entry).startswith('Changed ')
         )
 
         log_entry.action_flag = admin.models.DELETION
         self.assertTrue(
-            unicode(log_entry).startswith('Deleted ')
+            text_type(log_entry).startswith('Deleted ')
         )
 
     def test_safestring_in_field_label(self):

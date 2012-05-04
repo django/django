@@ -14,6 +14,7 @@ from django.core.serializers.base import DeserializationError
 from django.core.serializers.python import Serializer as PythonSerializer
 from django.core.serializers.python import Deserializer as PythonDeserializer
 from django.utils.encoding import smart_str
+from django.utils.py3 import text_type
 from django.utils.timezone import is_aware
 
 class Serializer(PythonSerializer):
@@ -64,7 +65,7 @@ def Deserializer(stream_or_string, **options):
     """
     if isinstance(stream_or_string, bytes):
         stream = BytesIO(stream_or_string)
-    elif isinstance(stream_or_string, unicode):
+    elif isinstance(stream_or_string, text_type):
         stream = BytesIO(smart_str(stream_or_string))
     else:
         stream = stream_or_string

@@ -10,6 +10,7 @@ from __future__ import unicode_literals
 from decimal import Decimal
 
 from django.db import models
+from django.utils.py3 import text_type
 
 
 class Category(models.Model):
@@ -100,7 +101,7 @@ class TeamField(models.CharField):
         super(TeamField, self).__init__(max_length=100)
 
     def get_db_prep_save(self, value, connection):
-        return unicode(value.title)
+        return text_type(value.title)
 
     def to_python(self, value):
         if isinstance(value, Team):

@@ -28,6 +28,7 @@
 from django.core.exceptions import ImproperlyConfigured
 from django.template.base import Origin, Template, Context, TemplateDoesNotExist, add_to_builtins
 from django.utils.importlib import import_module
+from django.utils.py3 import string_types
 from django.conf import settings
 
 template_source_loaders = None
@@ -89,7 +90,7 @@ def find_template_loader(loader):
         loader, args = loader[0], loader[1:]
     else:
         args = []
-    if isinstance(loader, basestring):
+    if isinstance(loader, string_types):
         module, attr = loader.rsplit('.', 1)
         try:
             mod = import_module(module)

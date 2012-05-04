@@ -1,4 +1,5 @@
 from django.contrib.gis.gdal.error import OGRException
+from django.utils.py3 import string_types
 
 #### OGRGeomType ####
 class OGRGeomType(object):
@@ -32,7 +33,7 @@ class OGRGeomType(object):
         "Figures out the correct OGR Type based upon the input."
         if isinstance(type_input, OGRGeomType):
             num = type_input.num
-        elif isinstance(type_input, basestring):
+        elif isinstance(type_input, string_types):
             type_input = type_input.lower()
             if type_input == 'geometry': type_input='unknown'
             num = self._str_types.get(type_input, None)
@@ -59,7 +60,7 @@ class OGRGeomType(object):
         """
         if isinstance(other, OGRGeomType):
             return self.num == other.num
-        elif isinstance(other, basestring):
+        elif isinstance(other, string_types):
             return self.name.lower() == other.lower()
         elif isinstance(other, int):
             return self.num == other

@@ -1,5 +1,6 @@
 from django.contrib.gis.gdal import OGRGeomType
 from django.db.backends.sqlite3.introspection import DatabaseIntrospection, FlexibleFieldLookupDict
+from django.utils.py3 import string_types
 
 class GeoFlexibleFieldLookupDict(FlexibleFieldLookupDict):
     """
@@ -43,7 +44,7 @@ class SpatiaLiteIntrospection(DatabaseIntrospection):
             field_params = {}
             if srid != 4326:
                 field_params['srid'] = srid
-            if isinstance(dim, basestring) and 'Z' in dim:
+            if isinstance(dim, string_types) and 'Z' in dim:
                 field_params['dim'] = 3
         finally:
             cursor.close()

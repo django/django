@@ -11,6 +11,7 @@ from django.utils.safestring import SafeData, mark_safe
 from django.utils.encoding import smart_str, force_unicode
 from django.utils.functional import allow_lazy
 from django.utils.text import normalize_newlines
+from django.utils.py3 import text_type
 
 # Configuration for urlize() function.
 TRAILING_PUNCTUATION = ['.', ',', ':', ';']
@@ -36,7 +37,7 @@ def escape(html):
     Returns the given HTML with ampersands, quotes and angle brackets encoded.
     """
     return mark_safe(force_unicode(html).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;'))
-escape = allow_lazy(escape, unicode)
+escape = allow_lazy(escape, text_type)
 
 _base_js_escapes = (
     ('\\', '\\u005C'),
@@ -61,7 +62,7 @@ def escapejs(value):
     for bad, good in _js_escapes:
         value = mark_safe(force_unicode(value).replace(bad, good))
     return value
-escapejs = allow_lazy(escapejs, unicode)
+escapejs = allow_lazy(escapejs, text_type)
 
 def conditional_escape(html):
     """
@@ -81,7 +82,7 @@ def linebreaks(value, autoescape=False):
     else:
         paras = ['<p>%s</p>' % p.replace('\n', '<br />') for p in paras]
     return '\n\n'.join(paras)
-linebreaks = allow_lazy(linebreaks, unicode)
+linebreaks = allow_lazy(linebreaks, text_type)
 
 def strip_tags(value):
     """Returns the given HTML with all tags stripped."""
@@ -91,17 +92,17 @@ strip_tags = allow_lazy(strip_tags)
 def strip_spaces_between_tags(value):
     """Returns the given HTML with spaces between tags removed."""
     return re.sub(r'>\s+<', '><', force_unicode(value))
-strip_spaces_between_tags = allow_lazy(strip_spaces_between_tags, unicode)
+strip_spaces_between_tags = allow_lazy(strip_spaces_between_tags, text_type)
 
 def strip_entities(value):
     """Returns the given HTML with all entities (&something;) stripped."""
     return re.sub(r'&(?:\w+|#\d+);', '', force_unicode(value))
-strip_entities = allow_lazy(strip_entities, unicode)
+strip_entities = allow_lazy(strip_entities, text_type)
 
 def fix_ampersands(value):
     """Returns the given HTML with all unencoded ampersands encoded correctly."""
     return unencoded_ampersands_re.sub('&amp;', force_unicode(value))
-fix_ampersands = allow_lazy(fix_ampersands, unicode)
+fix_ampersands = allow_lazy(fix_ampersands, text_type)
 
 def smart_urlquote(url):
     "Quotes a URL if it isn't already quoted."
@@ -195,7 +196,7 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
         elif autoescape:
             words[i] = escape(word)
     return ''.join(words)
-urlize = allow_lazy(urlize, unicode)
+urlize = allow_lazy(urlize, text_type)
 
 def clean_html(text):
     """
@@ -229,4 +230,4 @@ def clean_html(text):
     # of the text.
     text = trailing_empty_content_re.sub('', text)
     return text
-clean_html = allow_lazy(clean_html, unicode)
+clean_html = allow_lazy(clean_html, text_type)
