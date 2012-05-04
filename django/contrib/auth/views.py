@@ -11,10 +11,10 @@ from django.views.decorators.csrf import csrf_protect
 
 # Avoid shadowing the login() and logout() views below.
 from django.contrib.auth import REDIRECT_FIELD_NAME, login as auth_login, logout as auth_logout
+from django.contrib.auth import confirm_password_reset
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm, PasswordResetForm, SetPasswordForm, PasswordChangeForm
 from django.contrib.auth.tokens import default_token_generator
-from django.contrib.auth.utils import confirm_password_reset
 from django.contrib.sites.models import get_current_site
 
 
