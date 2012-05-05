@@ -4,10 +4,7 @@ from __future__ import absolute_import
 
 import os
 import re
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from StringIO import StringIO
+from io import BytesIO
 
 from django.core import management
 from django.core.management.base import CommandError
@@ -119,7 +116,7 @@ class TestFixtures(TestCase):
         Test for ticket #4371 -- Loading data of an unknown format should fail
         Validate that error conditions are caught correctly
         """
-        stderr = StringIO()
+        stderr = BytesIO()
         management.call_command(
             'loaddata',
             'bad_fixture1.unkn',
@@ -138,7 +135,7 @@ class TestFixtures(TestCase):
         using explicit filename.
         Validate that error conditions are caught correctly
         """
-        stderr = StringIO()
+        stderr = BytesIO()
         management.call_command(
             'loaddata',
             'bad_fixture2.xml',
@@ -157,7 +154,7 @@ class TestFixtures(TestCase):
         without file extension.
         Validate that error conditions are caught correctly
         """
-        stderr = StringIO()
+        stderr = BytesIO()
         management.call_command(
             'loaddata',
             'bad_fixture2',
@@ -175,7 +172,7 @@ class TestFixtures(TestCase):
         Test for ticket #4371 -- Loading a fixture file with no data returns an error.
         Validate that error conditions are caught correctly
         """
-        stderr = StringIO()
+        stderr = BytesIO()
         management.call_command(
             'loaddata',
             'empty',
@@ -194,7 +191,7 @@ class TestFixtures(TestCase):
         loading is aborted.
         Validate that error conditions are caught correctly
         """
-        stderr = StringIO()
+        stderr = BytesIO()
         management.call_command(
             'loaddata',
             'empty',
@@ -211,7 +208,7 @@ class TestFixtures(TestCase):
         """
         (Regression for #9011 - error message is correct)
         """
-        stderr = StringIO()
+        stderr = BytesIO()
         management.call_command(
             'loaddata',
             'bad_fixture2',
@@ -317,7 +314,7 @@ class TestFixtures(TestCase):
         )
         animal.save()
 
-        stdout = StringIO()
+        stdout = BytesIO()
         management.call_command(
             'dumpdata',
             'fixtures_regress.animal',
@@ -346,7 +343,7 @@ class TestFixtures(TestCase):
         """
         Regression for #11428 - Proxy models aren't included when you dumpdata
         """
-        stdout = StringIO()
+        stdout = BytesIO()
         # Create an instance of the concrete class
         widget = Widget.objects.create(name='grommet')
         management.call_command(
@@ -379,7 +376,7 @@ class TestFixtures(TestCase):
         """
         Regression for #3615 - Ensure data with nonexistent child key references raises error
         """
-        stderr = StringIO()
+        stderr = BytesIO()
         management.call_command(
             'loaddata',
             'forward_ref_bad_data.json',
@@ -414,7 +411,7 @@ class TestFixtures(TestCase):
         """
         Regression for #7043 - Error is quickly reported when no fixtures is provided in the command line.
         """
-        stderr = StringIO()
+        stderr = BytesIO()
         management.call_command(
             'loaddata',
             verbosity=0,
@@ -426,7 +423,7 @@ class TestFixtures(TestCase):
         )
 
     def test_loaddata_not_existant_fixture_file(self):
-        stdout_output = StringIO()
+        stdout_output = BytesIO()
         management.call_command(
             'loaddata',
             'this_fixture_doesnt_exist',
@@ -511,7 +508,7 @@ class NaturalKeyFixtureTests(TestCase):
             commit=False
             )
 
-        stdout = StringIO()
+        stdout = BytesIO()
         management.call_command(
             'dumpdata',
             'fixtures_regress.book',

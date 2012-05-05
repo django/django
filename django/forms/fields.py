@@ -10,10 +10,7 @@ import os
 import re
 import urlparse
 from decimal import Decimal, DecimalException
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from StringIO import StringIO
+from io import BytesIO
 
 from django.core import validators
 from django.core.exceptions import ValidationError
@@ -554,9 +551,9 @@ class ImageField(FileField):
             file = data.temporary_file_path()
         else:
             if hasattr(data, 'read'):
-                file = StringIO(data.read())
+                file = BytesIO(data.read())
             else:
-                file = StringIO(data['content'])
+                file = BytesIO(data['content'])
 
         try:
             # load() is the only method that can spot a truncated JPEG,

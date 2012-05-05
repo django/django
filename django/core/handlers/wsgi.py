@@ -1,9 +1,6 @@
 import sys
+from io import BytesIO
 from threading import Lock
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from StringIO import StringIO
 
 from django import http
 from django.core import signals
@@ -116,7 +113,7 @@ class LimitedStream(object):
             if not chunk:
                 break
             self.buffer += chunk
-        sio = StringIO(self.buffer)
+        sio = BytesIO(self.buffer)
         if size:
             line = sio.readline(size)
         else:

@@ -7,10 +7,7 @@ import shutil
 import tempfile
 import time
 from datetime import datetime, timedelta
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from StringIO import StringIO
+from io import BytesIO
 
 try:
     import threading
@@ -483,7 +480,7 @@ class DimensionClosingBug(unittest.TestCase):
         """
         Open files passed into get_image_dimensions() should stay opened.
         """
-        empty_io = StringIO()
+        empty_io = BytesIO()
         try:
             get_image_dimensions(empty_io)
         finally:
@@ -557,10 +554,10 @@ class NoNameFileTestCase(unittest.TestCase):
     urllib.urlopen()
     """
     def test_noname_file_default_name(self):
-        self.assertEqual(File(StringIO('A file with no name')).name, None)
+        self.assertEqual(File(BytesIO(b'A file with no name')).name, None)
 
     def test_noname_file_get_size(self):
-        self.assertEqual(File(StringIO('A file with no name')).size, 19)
+        self.assertEqual(File(BytesIO(b'A file with no name')).size, 19)
 
 class FileLikeObjectTestCase(LiveServerBase):
     """

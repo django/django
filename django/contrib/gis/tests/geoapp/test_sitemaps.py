@@ -1,9 +1,6 @@
 from __future__ import absolute_import
 
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from StringIO import StringIO
+from io import BytesIO
 from xml.dom import minidom
 import zipfile
 
@@ -66,7 +63,7 @@ class GeoSitemapTest(TestCase):
                     kml_doc = minidom.parseString(self.client.get(kml_url).content)
                 elif kml_type == 'kmz':
                     # Have to decompress KMZ before parsing.
-                    buf = StringIO(self.client.get(kml_url).content)
+                    buf = BytesIO(self.client.get(kml_url).content)
                     zf = zipfile.ZipFile(buf)
                     self.assertEqual(1, len(zf.filelist))
                     self.assertEqual('doc.kml', zf.filelist[0].filename)

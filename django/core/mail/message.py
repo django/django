@@ -9,15 +9,12 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email.header import Header
 from email.utils import formatdate, getaddresses, formataddr, parseaddr
+from io import BytesIO
 
 from django.conf import settings
 from django.core.mail.utils import DNS_NAME
 from django.utils.encoding import smart_str, force_unicode
 
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from StringIO import StringIO
 
 # Don't BASE64-encode UTF-8 messages so that we avoid unwanted attention from
 # some spam filters.
@@ -132,7 +129,7 @@ class SafeMIMEText(MIMEText):
         This overrides the default as_string() implementation to not mangle
         lines that begin with 'From '. See bug #13433 for details.
         """
-        fp = StringIO()
+        fp = BytesIO()
         g = Generator(fp, mangle_from_ = False)
         g.flatten(self, unixfrom=unixfrom)
         return fp.getvalue()
@@ -156,7 +153,7 @@ class SafeMIMEMultipart(MIMEMultipart):
         This overrides the default as_string() implementation to not mangle
         lines that begin with 'From '. See bug #13433 for details.
         """
-        fp = StringIO()
+        fp = BytesIO()
         g = Generator(fp, mangle_from_ = False)
         g.flatten(self, unixfrom=unixfrom)
         return fp.getvalue()

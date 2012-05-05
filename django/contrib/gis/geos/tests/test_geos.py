@@ -203,12 +203,12 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
     def test01k_fromfile(self):
         "Testing the fromfile() factory."
-        from StringIO import StringIO
+        from io import BytesIO
         ref_pnt = GEOSGeometry('POINT(5 23)')
 
-        wkt_f = StringIO()
+        wkt_f = BytesIO()
         wkt_f.write(ref_pnt.wkt)
-        wkb_f = StringIO()
+        wkb_f = BytesIO()
         wkb_f.write(str(ref_pnt.wkb))
 
         # Other tests use `fromfile()` on string filenames so those

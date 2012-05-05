@@ -5,12 +5,8 @@ import os
 import re
 import sys
 import gettext as gettext_module
+from io import BytesIO
 from threading import local
-
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from StringIO import StringIO
 
 from django.utils.importlib import import_module
 from django.utils.safestring import mark_safe, SafeData
@@ -442,7 +438,7 @@ def templatize(src, origin=None):
     """
     from django.template import (Lexer, TOKEN_TEXT, TOKEN_VAR, TOKEN_BLOCK,
             TOKEN_COMMENT, TRANSLATOR_COMMENT_MARK)
-    out = StringIO()
+    out = BytesIO()
     message_context = None
     intrans = False
     inplural = False
@@ -453,16 +449,16 @@ def templatize(src, origin=None):
     for t in Lexer(src, origin).tokenize():
         if incomment:
             if t.token_type == TOKEN_BLOCK and t.contents == 'endcomment':
-                content = ''.join(comment)
+                content = b''.join(comment)
                 translators_comment_start = None
                 for lineno, line in enumerate(content.splitlines(True)):
                     if line.lstrip().startswith(TRANSLATOR_COMMENT_MARK):
                         translators_comment_start = lineno
                 for lineno, line in enumerate(content.splitlines(True)):
                     if translators_comment_start is not None and lineno >= translators_comment_start:
-                        out.write(' # %s' % line)
+                        out.write(b' # %s' % line)
                     else:
-                        out.write(' #\n')
+                        out.write(b' #\n')
                 incomment = False
                 comment = []
             else:
@@ -474,18 +470,18 @@ def templatize(src, origin=None):
                 if endbmatch:
                     if inplural:
                         if message_context:
-                            out.write(' npgettext(%r, %r, %r,count) ' % (message_context, ''.join(singular), ''.join(plural)))
+                            out.write(b' npgettext(%r, %r, %r,count) ' % (message_context, ''.join(singular), ''.join(plural)))
                         else:
-                            out.write(' ngettext(%r, %r, count) ' % (''.join(singular), ''.join(plural)))
+                            out.write(b' ngettext(%r, %r, count) ' % (''.join(singular), ''.join(plural)))
                         for part in singular:
                             out.write(blankout(part, 'S'))
                         for part in plural:
                             out.write(blankout(part, 'P'))
                     else:
                         if message_context:
-                            out.write(' pgettext(%r, %r) ' % (message_context, ''.join(singular)))
+                            out.write(b' pgettext(%r, %r) ' % (message_context, ''.join(singular)))
                         else:
-                            out.write(' gettext(%r) ' % ''.join(singular))
+                            out.write(b' gettext(%r) ' % ''.join(singular))
                         for part in singular:
                             out.write(blankout(part, 'S'))
                     message_context = None
@@ -531,10 +527,10 @@ def templatize(src, origin=None):
                             message_context = message_context.strip('"')
                         elif message_context[0] == "'":
                             message_context = message_context.strip("'")
-                        out.write(' pgettext(%r, %r) ' % (message_context, g))
+                        out.write(b' pgettext(%r, %r) ' % (message_context, g))
                         message_context = None
                     else:
-                        out.write(' gettext(%r) ' % g)
+                        out.write(b' gettext(%r) ' % g)
                 elif bmatch:
                     for fmatch in constant_re.findall(t.contents):
                         out.write(' _(%s) ' % fmatch)
@@ -552,7 +548,7 @@ def templatize(src, origin=None):
                     plural = []
                 elif cmatches:
                     for cmatch in cmatches:
-                        out.write(' _(%s) ' % cmatch)
+                        out.write(b' _(%s) ' % cmatch)
                 elif t.contents == 'comment':
                     incomment = True
                 else:
@@ -561,14 +557,14 @@ def templatize(src, origin=None):
                 parts = t.contents.split('|')
                 cmatch = constant_re.match(parts[0])
                 if cmatch:
-                    out.write(' _(%s) ' % cmatch.group(1))
+                    out.write(b' _(%s) ' % cmatch.group(1))
                 for p in parts[1:]:
                     if p.find(':_(') >= 0:
-                        out.write(' %s ' % p.split(':',1)[1])
+                        out.write(b' %s ' % p.split(':',1)[1])
                     else:
                         out.write(blankout(p, 'F'))
             elif t.token_type == TOKEN_COMMENT:
-                out.write(' # %s' % t.contents)
+                out.write(b' # %s' % t.contents)
             else:
                 out.write(blankout(t.contents, 'X'))
     return out.getvalue()

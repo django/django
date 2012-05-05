@@ -104,15 +104,11 @@ Complex PDFs
 ============
 
 If you're creating a complex PDF document with ReportLab, consider using the
-:mod:`cStringIO` library as a temporary holding place for your PDF file. This
+:mod:`io` library as a temporary holding place for your PDF file. This
 library provides a file-like object interface that is particularly efficient.
-Here's the above "Hello World" example rewritten to use :mod:`cStringIO`::
+Here's the above "Hello World" example rewritten to use :mod:`io`::
 
-    # Fall back to StringIO in environments where cStringIO is not available
-    try:
-        from cStringIO import StringIO
-    except ImportError:
-        from StringIO import StringIO
+    from io import BytesIO
     from reportlab.pdfgen import canvas
     from django.http import HttpResponse
 
@@ -121,9 +117,9 @@ Here's the above "Hello World" example rewritten to use :mod:`cStringIO`::
         response = HttpResponse(mimetype='application/pdf')
         response['Content-Disposition'] = 'attachment; filename=somefilename.pdf'
 
-        buffer = StringIO()
+        buffer = BytesIO()
 
-        # Create the PDF object, using the StringIO object as its "file."
+        # Create the PDF object, using the BytesIO object as its "file."
         p = canvas.Canvas(buffer)
 
         # Draw things on the PDF. Here's where the PDF generation happens.
@@ -134,7 +130,7 @@ Here's the above "Hello World" example rewritten to use :mod:`cStringIO`::
         p.showPage()
         p.save()
 
-        # Get the value of the StringIO buffer and write it to the response.
+        # Get the value of the BytesIO buffer and write it to the response.
         pdf = buffer.getvalue()
         buffer.close()
         response.write(pdf)

@@ -4,11 +4,8 @@ import os
 import re
 import mimetypes
 from copy import copy
+from io import BytesIO
 from urlparse import urlparse, urlsplit
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from StringIO import StringIO
 
 from django.conf import settings
 from django.contrib.auth import authenticate, login
@@ -35,13 +32,13 @@ CONTENT_TYPE_RE = re.compile('.*; charset=([\w\d-]+);?')
 
 class FakePayload(object):
     """
-    A wrapper around StringIO that restricts what can be read since data from
+    A wrapper around BytesIO that restricts what can be read since data from
     the network can't be seeked and cannot be read outside of its content
     length. This makes sure that views can't do anything under the test client
     that wouldn't work in Real Life.
     """
     def __init__(self, content):
-        self.__content = StringIO(content)
+        self.__content = BytesIO(content)
         self.__len = len(content)
 
     def read(self, num_bytes=None):
@@ -175,7 +172,7 @@ class RequestFactory(object):
     def __init__(self, **defaults):
         self.defaults = defaults
         self.cookies = SimpleCookie()
-        self.errors = StringIO()
+        self.errors = BytesIO()
 
     def _base_environ(self, **request):
         """

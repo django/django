@@ -1,8 +1,5 @@
 import os
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from StringIO import StringIO
+from io import BytesIO
 
 from django.core.management import CommandError
 from django.core.management.commands.compilemessages import compile_messages
@@ -31,7 +28,7 @@ class PoFileTests(MessageCompilationTests):
         # We don't use the django.core.management infrastructure (call_command()
         # et al) because CommandError's cause exit(1) there. We test the
         # underlying compile_messages function instead
-        out = StringIO()
+        out = BytesIO()
         self.assertRaises(CommandError, compile_messages, out, locale=self.LOCALE)
         self.assertFalse(os.path.exists(self.MO_FILE))
 
@@ -51,7 +48,7 @@ class PoFileContentsTests(MessageCompilationTests):
         # We don't use the django.core.management infrastructure (call_command()
         # et al) because CommandError's cause exit(1) there. We test the
         # underlying compile_messages function instead
-        out = StringIO()
+        out = BytesIO()
         compile_messages(out, locale=self.LOCALE)
         self.assertTrue(os.path.exists(self.MO_FILE))
 
@@ -70,7 +67,7 @@ class PercentRenderingTests(MessageCompilationTests):
         # We don't use the django.core.management infrastructure (call_command()
         # et al) because CommandError's cause exit(1) there. We test the
         # underlying compile_messages function instead
-        out = StringIO()
+        out = BytesIO()
         compile_messages(out, locale=self.LOCALE)
         with translation.override(self.LOCALE):
             t = Template('{% load i18n %}{% trans "Looks like a str fmt spec %% o but shouldn\'t be interpreted as such" %}')

@@ -10,10 +10,7 @@ from __future__ import absolute_import
 
 import datetime
 import decimal
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from StringIO import StringIO
+from io import BytesIO
 
 try:
     import yaml
@@ -504,7 +501,7 @@ def streamTest(format, self):
     obj.save_base(raw=True)
 
     # Serialize the test database to a stream
-    stream = StringIO()
+    stream = BytesIO()
     serializers.serialize(format, [obj], indent=2, stream=stream)
 
     # Serialize normally for a comparison

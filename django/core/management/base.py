@@ -6,6 +6,7 @@ be executed through ``django-admin.py`` or ``manage.py``).
 import os
 import sys
 
+from io import BytesIO
 from optparse import make_option, OptionParser
 import traceback
 
@@ -258,11 +259,7 @@ class BaseCommand(object):
 
         """
         from django.core.management.validation import get_validation_errors
-        try:
-            from cStringIO import StringIO
-        except ImportError:
-            from StringIO import StringIO
-        s = StringIO()
+        s = BytesIO()
         num_errors = get_validation_errors(s, app)
         if num_errors:
             s.seek(0)

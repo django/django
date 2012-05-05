@@ -174,8 +174,8 @@ class SyndicationFeed(object):
         """
         Returns the feed in the given encoding as a string.
         """
-        from StringIO import StringIO
-        s = StringIO()
+        from io import BytesIO
+        s = BytesIO()
         self.write(s, encoding)
         return s.getvalue()
 
