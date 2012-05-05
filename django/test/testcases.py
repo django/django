@@ -442,6 +442,8 @@ class SimpleTestCase(ut2.TestCase):
 
 
 class TransactionTestCase(SimpleTestCase):
+    reset_sequences = False
+
     # The class we'll use for the test client self.client.
     # Can be overridden in derived classes.
     client_class = Client
@@ -468,6 +470,9 @@ class TransactionTestCase(SimpleTestCase):
         else:
             databases = [DEFAULT_DB_ALIAS]
         for db in databases:
+            if self.reset_sequences:
+                call_command('flush', verbosity=0, interactive=False, database=db,
+                             skip_validation=True)
 
             if hasattr(self, 'fixtures'):
                 # We have to use this slightly awkward syntax due to the fact
@@ -809,6 +814,8 @@ class TestCase(TransactionTestCase):
     def _fixture_setup(self):
         if not connections_support_transactions():
             return super(TestCase, self)._fixture_setup()
+
+        assert not self.reset_sequences, 'reset_sequences cannot be used on TestCase instances'
 
         # If the test case has a multi_db=True flag, setup all databases.
         # Otherwise, just use default.
