@@ -10,8 +10,8 @@ Example Usage::
 
     >>> from django.core.files import locks
     >>> with open('./file', 'wb') as f:
-    >>>     locks.lock(f, locks.LOCK_EX)
-    >>>     f.write('Django')
+    ...     locks.lock(f, locks.LOCK_EX)
+    ...     f.write('Django')
 """
 
 __all__ = ('LOCK_EX','LOCK_SH','LOCK_NB','lock','unlock')

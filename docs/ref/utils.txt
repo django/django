@@ -240,7 +240,7 @@ Sample usage::
     ...     description="Testing."
     ... )
     >>> with open('test.rss', 'w') as fp:
-    >>>     feed.write(fp, 'utf-8')
+    ...     feed.write(fp, 'utf-8')
 
 For simplifying the selection of a generator use ``feedgenerator.DefaultFeed``
 which is currently ``Rss201rev2Feed``

@@ -16,7 +16,7 @@ Sample usage:
 ...     description="Testing."
 ... )
 >>> with open('test.rss', 'w') as fp:
->>>     feed.write(fp, 'utf-8')
+...     feed.write(fp, 'utf-8')
 
 For definitions of the different versions of RSS, see:
 http://diveintomark.org/archives/2004/02/04/incompatible-rss

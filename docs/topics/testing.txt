@@ -771,7 +771,7 @@ arguments at time of construction:
 
             >>> c = Client()
             >>> with open('wishlist.doc') as fp:
-            >>>     c.post('/customers/wishes/', {'name': 'fred', 'attachment': fp})
+            ...     c.post('/customers/wishes/', {'name': 'fred', 'attachment': fp})
 
         (The name ``attachment`` here is not relevant; use whatever name your
         file-processing code expects.)
