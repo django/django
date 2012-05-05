@@ -55,6 +55,34 @@ Backwards incompatible changes in 1.5
     deprecation timeline for a given feature, its removal may appear as a
     backwards incompatible change.
 
+Database flushing in ``django.test.TransactionTestCase``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Previously, the test database was truncated before each test run in a
+:class:`~django.test.TransactionTestCase` test. In order to be able to run
+tests in any order and to make sure tests are always isolated from each other,
+:class:`~django.test.TransactionTestCase` will now reset the database *after*
+each test run, rather than *before*.
+
+The ordinary :class:`~django.test.TestCase` does not reset primary key
+sequences after it has been run, so :class:`~django.test.TransactionTestCase`
+tests that depend on hard coded primary key values might break.
+
+The best way to solve this problem is to not use hard coded primary key values
+in tests. If you have existing tests with hard coded primary key values, the new
+:attr:`~django.test.TransactionTestCase.reset_sequences` attribute can be used
+for those tests, to force resetting database sequences prior to
+:class:`~django.test.TransactionTestCase` test runs.
+
+Ordering of tests
+~~~~~~~~~~~~~~~~~
+In order to make sure doctests does not leave database state behind for
+unittests that expect a clean database, doctests are always runned after other
+tests. This should not cause any problems unless you have existing doctests
+which assumes a :class:`~django.test.TransactionTestCase` left some
+database state behind earlier. Such tests are already very fragile, and must
+now be changed to be able to run independently.
+
+
 Features deprecated in 1.5
 ==========================
 
