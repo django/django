@@ -183,6 +183,7 @@ Other batteries included
 * :doc:`Logging <topics/logging>`
 * :doc:`Messages <ref/contrib/messages>`
 * :doc:`Pagination <topics/pagination>`
+* :doc:`Python 3 compatibility <topics/python3>`
 * :doc:`Redirects <ref/contrib/redirects>`
 * :doc:`Security <topics/security>`
 * :doc:`Serialization <topics/serialization>`
