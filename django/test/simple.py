@@ -5,7 +5,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db.models import get_app, get_apps
 from django.test import _doctest as doctest
 from django.test.utils import setup_test_environment, teardown_test_environment
-from django.test.testcases import OutputChecker, DocTestRunner, TestCase
+from django.test.testcases import OutputChecker, DocTestRunner
 from django.utils import unittest
 from django.utils.importlib import import_module
 from django.utils.module_loading import module_has_submodule
@@ -263,7 +263,7 @@ class DjangoTestSuiteRunner(object):
             for test in extra_tests:
                 suite.addTest(test)
 
-        return reorder_suite(suite, (TestCase,))
+        return reorder_suite(suite, (unittest.TestCase,))
 
     def setup_databases(self, **kwargs):
         from django.db import connections, DEFAULT_DB_ALIAS
