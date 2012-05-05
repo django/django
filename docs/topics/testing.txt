@@ -1140,9 +1140,34 @@ back at the end of the test.  It also prevents the code under test from issuing
 any commit or rollback operations on the database, to ensure that the rollback
 at the end of the test restores the database to its initial state. In order to
 guarantee that all ``TestCase`` code starts with a clean database, the Django
-test runner runs all ``TestCase`` tests first, before any other tests (e.g.
+test runner runs all unittests tests first, before any other tests (e.g.
 doctests) that may alter the database without restoring it to its original
 state.
+
+.. note::
+    .. versionchanged:: 1.5
+
+    Prior to 1.5, ``TransactionTestCase`` flushed the database tables *before*
+    each test. In Django 1.5, this is instead done *after* the test has been run.
+
+    When the flush took place before the test, it was guaranteed that primary
+    keys started at 1 in :class:`~django.test.TransactionTestCase` tests.
+
+    Tests should not depend on this behaviour, but for legacy tests that do, the
+    :attr:`~TransactionTestCase.reset_sequences` attribute can be used until
+    the test has been properly updated.
+
+    The order of tests has also changed, before Django 1.5,
+    :class:`~django.test.TestCase` tests always ran first, before any other
+    tests. All unittests (including :class:`~django.utils.unittest.TestCase`,
+    :class:`~django.test.SimpleTestCase`, :class:`~django.test.TestCase` and
+    :class:`~django.test.TransactionTestCase`) are now runned before any
+    doctests.
+
+    doctests that depended on state that was left in the database from a
+    :class:`~django.test.TransactionTestCase` test must be updated to be able
+    to run independently.
+
 
 When running on a database that does not support rollback (e.g. MySQL with the
 MyISAM storage engine), ``TestCase`` falls back to initializing the database
