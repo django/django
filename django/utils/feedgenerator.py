@@ -15,9 +15,8 @@ Sample usage:
 ...     link=u"http://www.holovaty.com/test/",
 ...     description="Testing."
 ... )
->>> fp = open('test.rss', 'w')
->>> feed.write(fp, 'utf-8')
->>> fp.close()
+>>> with open('test.rss', 'w') as fp:
+>>>     feed.write(fp, 'utf-8')
 
 For definitions of the different versions of RSS, see:
 http://diveintomark.org/archives/2004/02/04/incompatible-rss

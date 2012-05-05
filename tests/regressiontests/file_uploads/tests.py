@@ -24,11 +24,12 @@ UNICODE_FILENAME = u'test-0123456789_中文_Orléans.jpg'
 
 class FileUploadTests(TestCase):
     def test_simple_upload(self):
-        post_data = {
-            'name': 'Ringo',
-            'file_field': open(__file__),
-        }
-        response = self.client.post('/file_uploads/upload/', post_data)
+        with open(__file__) as fp:
+            post_data = {
+                'name': 'Ringo',
+                'file_field': fp,
+            }
+            response = self.client.post('/file_uploads/upload/', post_data)
         self.assertEqual(response.status_code, 200)
 
     def test_large_upload(self):
@@ -87,17 +88,16 @@ class FileUploadTests(TestCase):
         tdir = tempfile.gettempdir()
 
         # This file contains chinese symbols and an accented char in the name.
-        file1 = open(os.path.join(tdir, UNICODE_FILENAME.encode('utf-8')), 'w+b')
-        file1.write('b' * (2 ** 10))
-        file1.seek(0)
+        with open(os.path.join(tdir, UNICODE_FILENAME.encode('utf-8')), 'w+b') as file1:
+            file1.write('b' * (2 ** 10))
+            file1.seek(0)
 
-        post_data = {
-            'file_unicode': file1,
-            }
+            post_data = {
+                'file_unicode': file1,
+                }
 
-        response = self.client.post('/file_uploads/unicode_name/', post_data)
+            response = self.client.post('/file_uploads/unicode_name/', post_data)
 
-        file1.close()
         try:
             os.unlink(file1.name)
         except:
@@ -294,10 +294,6 @@ class FileUploadTests(TestCase):
                 p = request.POST
                 return ret
 
-        post_data = {
-            'name': 'Ringo',
-            'file_field': open(__file__),
-        }
         # Maybe this is a little more complicated that it needs to be; but if
         # the django.test.client.FakePayload.read() implementation changes then
         # this test would fail.  So we need to know exactly what kind of error
@@ -310,16 +306,21 @@ class FileUploadTests(TestCase):
         # install the custom handler that tries to access request.POST
         self.client.handler = POSTAccessingHandler()
 
-        try:
-            response = self.client.post('/file_uploads/upload_errors/', post_data)
-        except reference_error.__class__ as err:
-            self.assertFalse(
-                str(err) == str(reference_error),
-                "Caught a repeated exception that'll cause an infinite loop in file uploads."
-            )
-        except Exception as err:
-            # CustomUploadError is the error that should have been raised
-            self.assertEqual(err.__class__, uploadhandler.CustomUploadError)
+        with open(__file__) as fp:
+            post_data = {
+                'name': 'Ringo',
+                'file_field': fp,
+            }
+            try:
+                response = self.client.post('/file_uploads/upload_errors/', post_data)
+            except reference_error.__class__ as err:
+                self.assertFalse(
+                    str(err) == str(reference_error),
+                    "Caught a repeated exception that'll cause an infinite loop in file uploads."
+                )
+            except Exception as err:
+                # CustomUploadError is the error that should have been raised
+                self.assertEqual(err.__class__, uploadhandler.CustomUploadError)
 
     def test_filename_case_preservation(self):
         """
@@ -382,8 +383,7 @@ class DirectoryCreationTests(unittest.TestCase):
     def test_not_a_directory(self):
         """The correct IOError is raised when the upload directory name exists but isn't a directory"""
         # Create a file with the upload directory name
-        fd = open(UPLOAD_TO, 'w')
-        fd.close()
+        open(UPLOAD_TO, 'w').close()
         try:
             self.obj.testfile.save('foo.txt', SimpleUploadedFile('foo.txt', 'x'))
         except IOError as err:

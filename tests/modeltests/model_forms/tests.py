@@ -1242,8 +1242,10 @@ class OldFormForXTests(TestCase):
         # it comes to validation. This specifically tests that #6302 is fixed for
         # both file fields and image fields.
 
-        image_data = open(os.path.join(os.path.dirname(__file__), "test.png"), 'rb').read()
-        image_data2 = open(os.path.join(os.path.dirname(__file__), "test2.png"), 'rb').read()
+        with open(os.path.join(os.path.dirname(__file__), "test.png"), 'rb') as fp:
+            image_data = fp.read()
+        with open(os.path.join(os.path.dirname(__file__), "test2.png"), 'rb') as fp:
+            image_data2 = fp.read()
 
         f = ImageFileForm(
                 data={'description': u'An image'},

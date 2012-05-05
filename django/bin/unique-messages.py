@@ -22,7 +22,8 @@ def unique_messages():
                 cmd = 'msguniq "%s.po"' % pf
                 stdout = os.popen(cmd)
                 msg = stdout.read()
-                open('%s.po' % pf, 'w').write(msg)
+                with open('%s.po' % pf, 'w') as fp:
+                    fp.write(msg)
 
 if __name__ == "__main__":
     unique_messages()

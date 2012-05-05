@@ -265,7 +265,8 @@ class EmailMessage(object):
     def attach_file(self, path, mimetype=None):
         """Attaches a file from the filesystem."""
         filename = os.path.basename(path)
-        content = open(path, 'rb').read()
+        with open(path, 'rb') as f:
+            content = f.read()
         self.attach(filename, content, mimetype)
 
     def _create_message(self, msg):

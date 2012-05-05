@@ -226,7 +226,8 @@ def _load_testfile(filename, package, module_relative):
                 # get_data() opens files as 'rb', so one must do the equivalent
                 # conversion as universal newlines would do.
                 return file_contents.replace(os.linesep, '\n'), filename
-    return open(filename).read(), filename
+    with open(filename) as fp:
+        return fp.read(), filename
 
 def _indent(s, indent=4):
     """
@@ -2519,9 +2520,8 @@ def debug_script(src, pm=False, globs=None):
     # docs say, a file so created cannot be opened by name a second time
     # on modern Windows boxes, and execfile() needs to open it.
     srcfilename = tempfile.mktemp(".py", "doctestdebug")
-    f = open(srcfilename, 'w')
-    f.write(src)
-    f.close()
+    with open(srcfilename, 'w') as fp:
+        fp.write(src)
 
     try:
         if globs:

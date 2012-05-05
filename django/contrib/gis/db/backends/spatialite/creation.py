@@ -120,12 +120,9 @@ class SpatiaLiteCreation(DatabaseCreation):
 
             # Opening up the SpatiaLite SQL initialization file and executing
             # as a script.
-            sql_fh = open(spatialite_sql, 'r')
-            try:
+            with open(spatialite_sql, 'r') as sql_fh:
                 cur = self.connection._cursor()
                 cur.executescript(sql_fh.read())
-            finally:
-                sql_fh.close()
 
     def spatialite_init_file(self):
         # SPATIALITE_SQL may be placed in settings to tell GeoDjango

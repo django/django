@@ -112,7 +112,8 @@ def copy_plural_forms(msgs, locale, domain, verbosity, stdout=sys.stdout):
     for domain in domains:
         django_po = os.path.join(django_dir, 'conf', 'locale', locale, 'LC_MESSAGES', '%s.po' % domain)
         if os.path.exists(django_po):
-            m = plural_forms_re.search(open(django_po, 'rU').read())
+            with open(django_po, 'rU') as fp:
+                m = plural_forms_re.search(fp.read())
             if m:
                 if verbosity > 1:
                     stdout.write("copying plural forms: %s\n" % m.group('value'))
@@ -141,11 +142,8 @@ def write_pot_file(potfile, msgs, file, work_file, is_templatized):
         msgs = '\n'.join(dropwhile(len, msgs.split('\n')))
     else:
         msgs = msgs.replace('charset=CHARSET', 'charset=UTF-8')
-    f = open(potfile, 'ab')
-    try:
-        f.write(msgs)
-    finally:
-        f.close()
+    with open(potfile, 'ab') as fp:
+        fp.write(msgs)
 
 def process_file(file, dirpath, potfile, domain, verbosity,
                  extensions, wrap, location, stdout=sys.stdout):
@@ -164,15 +162,13 @@ def process_file(file, dirpath, potfile, domain, verbosity,
     if domain == 'djangojs' and file_ext in extensions:
         is_templatized = True
         orig_file = os.path.join(dirpath, file)
-        src_data = open(orig_file).read()
+        with open(orig_file) as fp:
+            src_data = fp.read()
         src_data = prepare_js_for_gettext(src_data)
         thefile = '%s.c' % file
         work_file = os.path.join(dirpath, thefile)
-        f = open(work_file, "w")
-        try:
-            f.write(src_data)
-        finally:
-            f.close()
+        with open(work_file, "w") as fp:
+            fp.write(src_data)
         cmd = (
             'xgettext -d %s -L C %s %s --keyword=gettext_noop '
             '--keyword=gettext_lazy --keyword=ngettext_lazy:1,2 '
@@ -184,14 +180,12 @@ def process_file(file, dirpath, potfile, domain, verbosity,
         orig_file = os.path.join(dirpath, file)
         is_templatized = file_ext in extensions
         if is_templatized:
-            src_data = open(orig_file, "rU").read()
+            with open(orig_file, "rU") as fp:
+                src_data = fp.read()
             thefile = '%s.py' % file
             content = templatize(src_data, orig_file[2:])
-            f = open(os.path.join(dirpath, thefile), "w")
-            try:
-                f.write(content)
-            finally:
-                f.close()
+            with open(os.path.join(dirpath, thefile), "w") as fp:
+                fp.write(content)
         work_file = os.path.join(dirpath, thefile)
         cmd = (
             'xgettext -d %s -L Python %s %s --keyword=gettext_noop '
@@ -232,11 +226,8 @@ def write_po_file(pofile, potfile, domain, locale, verbosity, stdout,
         os.unlink(potfile)
         raise CommandError("errors happened while running msguniq\n%s" % errors)
     if os.path.exists(pofile):
-        f = open(potfile, 'w')
-        try:
-            f.write(msgs)
-        finally:
-            f.close()
+        with open(potfile, 'w') as fp:
+            fp.write(msgs)
         msgs, errors = _popen('msgmerge %s %s -q "%s" "%s"' %
                                 (wrap, location, pofile, potfile))
         if errors:
@@ -247,11 +238,8 @@ def write_po_file(pofile, potfile, domain, locale, verbosity, stdout,
         msgs = copy_plural_forms(msgs, locale, domain, verbosity, stdout)
     msgs = msgs.replace(
         "#. #-#-#-#-#  %s.pot (PACKAGE VERSION)  #-#-#-#-#\n" % domain, "")
-    f = open(pofile, 'wb')
-    try:
-        f.write(msgs)
-    finally:
-        f.close()
+    with open(pofile, 'wb') as fp:
+        fp.write(msgs)
     os.unlink(potfile)
     if no_obsolete:
         msgs, errors = _popen('msgattrib %s %s -o "%s" --no-obsolete "%s"' %

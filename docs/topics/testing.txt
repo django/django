@@ -770,9 +770,8 @@ arguments at time of construction:
         wish to upload as a value. For example::
 
             >>> c = Client()
-            >>> f = open('wishlist.doc')
-            >>> c.post('/customers/wishes/', {'name': 'fred', 'attachment': f})
-            >>> f.close()
+            >>> with open('wishlist.doc') as fp:
+            >>>     c.post('/customers/wishes/', {'name': 'fred', 'attachment': fp})
 
         (The name ``attachment`` here is not relevant; use whatever name your
         file-processing code expects.)

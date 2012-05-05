@@ -59,8 +59,7 @@ def file_move_safe(old_file_name, new_file_name, chunk_size = 1024*64, allow_ove
         pass
 
     # first open the old file, so that it won't go away
-    old_file = open(old_file_name, 'rb')
-    try:
+    with open(old_file_name, 'rb') as old_file:
         # now open the new file, not forgetting allow_overwrite
         fd = os.open(new_file_name, os.O_WRONLY | os.O_CREAT | getattr(os, 'O_BINARY', 0) |
                                     (not allow_overwrite and os.O_EXCL or 0))
@@ -73,8 +72,6 @@ def file_move_safe(old_file_name, new_file_name, chunk_size = 1024*64, allow_ove
         finally:
             locks.unlock(fd)
             os.close(fd)
-    finally:
-        old_file.close()
     copystat(old_file_name, new_file_name)
 
     try:

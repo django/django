@@ -328,9 +328,8 @@ class SsiNode(Node):
             else:
                 return '' # Fail silently for invalid includes.
         try:
-            fp = open(filepath, 'r')
-            output = fp.read()
-            fp.close()
+            with open(filepath, 'r') as fp:
+                output = fp.read()
         except IOError:
             output = ''
         if self.parsed:
