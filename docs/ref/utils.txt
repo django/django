@@ -239,9 +239,8 @@ Sample usage::
     ...     link=u"http://www.holovaty.com/test/",
     ...     description="Testing."
     ... )
-    >>> fp = open('test.rss', 'w')
-    >>> feed.write(fp, 'utf-8')
-    >>> fp.close()
+    >>> with open('test.rss', 'w') as fp:
+    >>>     feed.write(fp, 'utf-8')
 
 For simplifying the selection of a generator use ``feedgenerator.DefaultFeed``
 which is currently ``Rss201rev2Feed``

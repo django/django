@@ -61,6 +61,7 @@ def get_test_modules():
         for f in os.listdir(dirpath):
             if (f.startswith('__init__') or
                 f.startswith('.') or
+                f == '__pycache__' or
                 f.startswith('sql') or
                 os.path.basename(f) in REGRESSION_SUBDIRS_TO_SKIP):
                 continue

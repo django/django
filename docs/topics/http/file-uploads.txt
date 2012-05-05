@@ -101,10 +101,9 @@ objects; see `UploadedFile objects`_ for a complete reference.
 Putting it all together, here's a common way you might handle an uploaded file::
 
     def handle_uploaded_file(f):
-        destination = open('some/file/name.txt', 'wb+')
-        for chunk in f.chunks():
-            destination.write(chunk)
-        destination.close()
+        with open('some/file/name.txt', 'wb+') as destination:
+            for chunk in f.chunks():
+                destination.write(chunk)
 
 Looping over ``UploadedFile.chunks()`` instead of using ``read()`` ensures that
 large files don't overwhelm your system's memory.

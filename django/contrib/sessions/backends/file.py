@@ -47,18 +47,15 @@ class SessionStore(SessionBase):
     def load(self):
         session_data = {}
         try:
-            session_file = open(self._key_to_file(), "rb")
-            try:
+            with open(self._key_to_file(), "rb") as session_file:
                 file_data = session_file.read()
-                # Don't fail if there is no data in the session file.
-                # We may have opened the empty placeholder file.
-                if file_data:
-                    try:
-                        session_data = self.decode(file_data)
-                    except (EOFError, SuspiciousOperation):
-                        self.create()
-            finally:
-                session_file.close()
+            # Don't fail if there is no data in the session file.
+            # We may have opened the empty placeholder file.
+            if file_data:
+                try:
+                    session_data = self.decode(file_data)
+                except (EOFError, SuspiciousOperation):
+                    self.create()
         except IOError:
             self.create()
         return session_data

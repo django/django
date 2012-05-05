@@ -517,7 +517,8 @@ class FileBackendTests(BaseEmailBackendTests, TestCase):
     def get_mailbox_content(self):
         messages = []
         for filename in os.listdir(self.tmp_dir):
-            session = open(os.path.join(self.tmp_dir, filename)).read().split('\n' + ('-' * 79) + '\n')
+            with open(os.path.join(self.tmp_dir, filename)) as fp:
+                session = fp.read().split('\n' + ('-' * 79) + '\n')
             messages.extend(email.message_from_string(m) for m in session if m)
         return messages
 
@@ -528,7 +529,8 @@ class FileBackendTests(BaseEmailBackendTests, TestCase):
         connection.send_messages([msg])
 
         self.assertEqual(len(os.listdir(self.tmp_dir)), 1)
-        message = email.message_from_file(open(os.path.join(self.tmp_dir, os.listdir(self.tmp_dir)[0])))
+        with open(os.path.join(self.tmp_dir, os.listdir(self.tmp_dir)[0])) as fp:
+            message = email.message_from_file(fp)
         self.assertEqual(message.get_content_type(), 'text/plain')
         self.assertEqual(message.get('subject'), 'Subject')
         self.assertEqual(message.get('from'), 'from@example.com')

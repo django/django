@@ -38,7 +38,8 @@ ALWAYS_SKIP = [
 ]
 
 def fixliterals(fname):
-    data = open(fname).read()
+    with open(fname) as fp:
+        data = fp.read()
     
     last = 0
     new = []
@@ -101,7 +102,8 @@ def fixliterals(fname):
         lastvalues[m.group(1)] = replace_value
     
     new.append(data[last:])
-    open(fname, "w").write("".join(new))
+    with open(fname, "w") as fp:
+        fp.write("".join(new))
     
     storage["lastvalues"] = lastvalues
     storage.close()

@@ -170,14 +170,13 @@ class Template(object):
         try:
             return self._content
         except AttributeError:
-            fd = open(self.absolute_filename)
-            try:
-                content = fd.read().decode(TEMPLATE_ENCODING)
-            except UnicodeDecodeError as e:
-                message = '%s in %s' % (
-                    e[4], self.absolute_filename.encode('UTF-8', 'ignore'))
-                raise UnicodeDecodeError(*(e.args[:4] + (message,)))
-            fd.close()
+            with open(self.absolute_filename) as fd:
+                try:
+                    content = fd.read().decode(TEMPLATE_ENCODING)
+                except UnicodeDecodeError as e:
+                    message = '%s in %s' % (
+                        e[4], self.absolute_filename.encode('UTF-8', 'ignore'))
+                    raise UnicodeDecodeError(*(e.args[:4] + (message,)))
             self._content = content
             return content
     content = property(content)
@@ -271,9 +270,8 @@ def get_python_code(paths):
             for f in filenames:
                 if len([True for e in PYTHON_SOURCE_EXTENSIONS if f.endswith(e)]) > 0:
                     fn = os.path.join(dirpath, f)
-                    fd = open(fn)
-                    content = [l.decode(PYTHON_ENCODING) for l in fd.readlines()]
-                    fd.close()
+                    with open(fn) as fd:
+                        content = [l.decode(PYTHON_ENCODING) for l in fd.readlines()]
                     retval.append((fn, content))
     return retval
 

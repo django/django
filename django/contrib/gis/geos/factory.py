@@ -7,10 +7,10 @@ def fromfile(file_h):
     """
     # If given a file name, get a real handle.
     if isinstance(file_h, basestring): 
-        file_h = open(file_h, 'rb')
-
-    # Reading in the file's contents,
-    buf = file_h.read()
+        with open(file_h, 'rb') as file_h:
+            buf = file_h.read()
+    else:
+        buf = file_h.read()
 
     # If we get WKB need to wrap in buffer(), so run through regexes.
     if wkt_regex.match(buf) or hex_regex.match(buf):

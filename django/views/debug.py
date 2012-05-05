@@ -333,11 +333,8 @@ class ExceptionReporter(object):
                 source = source.splitlines()
         if source is None:
             try:
-                f = open(filename)
-                try:
-                    source = f.readlines()
-                finally:
-                    f.close()
+                with open(filename) as fp:
+                    source = fp.readlines()
             except (OSError, IOError):
                 pass
         if source is None:
