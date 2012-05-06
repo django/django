@@ -24,6 +24,7 @@ admin_static_prefix = lambda: {
     'ADMIN_STATIC_PREFIX': "%sadmin/" % settings.STATIC_URL,
 }
 
+
 class AdminFormfieldForDBFieldTests(TestCase):
     """
     Tests for correct behavior of ModelAdmin.formfield_for_dbfield
@@ -93,7 +94,7 @@ class AdminFormfieldForDBFieldTests(TestCase):
 
     def testRadioFieldsForeignKey(self):
         ff = self.assertFormfield(models.Event, 'band', widgets.AdminRadioSelect,
-                                  radio_fields={'band':admin.VERTICAL})
+                                  radio_fields={'band': admin.VERTICAL})
         self.assertEqual(ff.empty_label, None)
 
     def testManyToMany(self):
@@ -116,7 +117,7 @@ class AdminFormfieldForDBFieldTests(TestCase):
 
     def testChoicesWithRadioFields(self):
         self.assertFormfield(models.Member, 'gender', widgets.AdminRadioSelect,
-                             radio_fields={'gender':admin.VERTICAL})
+                             radio_fields={'gender': admin.VERTICAL})
 
     def testInheritance(self):
         self.assertFormfield(models.Album, 'backside_art', widgets.AdminFileWidget)
@@ -206,6 +207,7 @@ class FilteredSelectMultipleWidgetTest(DjangoTestCase):
             '<select multiple="multiple" name="test" class="selectfilterstacked">\n</select><script type="text/javascript">addEvent(window, "load", function(e) {SelectFilter.init("id_test", "test", 1, "%(ADMIN_STATIC_PREFIX)s"); });</script>\n' % admin_static_prefix()
         )
 
+
 class AdminDateWidgetTest(DjangoTestCase):
     def test_attrs(self):
         """
@@ -224,6 +226,7 @@ class AdminDateWidgetTest(DjangoTestCase):
             '<input value="2007-12-01" type="text" class="myDateField" name="test" size="20" />',
         )
 
+
 class AdminTimeWidgetTest(DjangoTestCase):
     def test_attrs(self):
         """
@@ -241,6 +244,17 @@ class AdminTimeWidgetTest(DjangoTestCase):
             conditional_escape(w.render('test', datetime(2007, 12, 1, 9, 30))),
             '<input value="09:30:00" type="text" class="myTimeField" name="test" size="20" />',
         )
+
+
+class AdminURLFieldWidgetTest(DjangoTestCase):
+    def test_link_after_url_input(self):
+        w = widgets.AdminURLFieldWidget()
+
+        self.assertHTMLEqual(
+            conditional_escape(w.render('test', 'http://www.djangoproject.com/')),
+            '<input type="text" class="vURLField" value="http://www.djangoproject.com/" name="test" /> <a class="openlink" href="http://www.djangoproject.com/" target="_blank">Open link</a>',
+        )
+
 
 class AdminSplitDateTimeWidgetTest(DjangoTestCase):
     def test_render(self):
@@ -272,7 +286,7 @@ class AdminFileWidgetTest(DjangoTestCase):
         w = widgets.AdminFileWidget()
         self.assertHTMLEqual(
             conditional_escape(w.render('test', album.cover_art)),
-            '<p class="file-upload">Currently: <a href="%(STORAGE_URL)salbums/hybrid_theory.jpg">albums\hybrid_theory.jpg</a> <span class="clearable-file-input"><input type="checkbox" name="test-clear" id="test-clear_id" /> <label for="test-clear_id">Clear</label></span><br />Change: <input type="file" name="test" /></p>' % { 'STORAGE_URL': default_storage.url('') },
+            '<p class="file-upload">Currently: <a href="%(STORAGE_URL)salbums/hybrid_theory.jpg">albums\hybrid_theory.jpg</a> <span class="clearable-file-input"><input type="checkbox" name="test-clear" id="test-clear_id" /> <label for="test-clear_id">Clear</label></span><br />Change: <input type="file" name="test" /></p>' % {'STORAGE_URL': default_storage.url('')},
         )
 
         self.assertHTMLEqual(
@@ -401,6 +415,7 @@ class ManyToManyRawIdWidgetTest(DjangoTestCase):
             '<input type="text" name="company_widget2" value="%(c1pk)s" />' % {'c1pk': c1.pk}
         )
 
+
 class RelatedFieldWidgetWrapperTests(DjangoTestCase):
     def test_no_can_add_related(self):
         rel = models.Individual._meta.get_field('parent').rel
@@ -408,7 +423,6 @@ class RelatedFieldWidgetWrapperTests(DjangoTestCase):
         # Used to fail with a name error.
         w = widgets.RelatedFieldWidgetWrapper(w, rel, widget_admin_site)
         self.assertFalse(w.can_add_related)
-
 
 
 class DateTimePickerSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
@@ -459,8 +473,10 @@ class DateTimePickerSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
         self.assertEqual(
             self.get_css_value('#clockbox0', 'display'), 'none')
 
+
 class DateTimePickerSeleniumChromeTests(DateTimePickerSeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
+
 
 class DateTimePickerSeleniumIETests(DateTimePickerSeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
@@ -602,7 +618,7 @@ class HorizontalVerticalFilterSeleniumFirefoxTests(AdminSeleniumWebDriverTestCas
 
         # Save and check that everything is properly stored in the database ---
         self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
-        self.school = models.School.objects.get(id=self.school.id) # Reload from database
+        self.school = models.School.objects.get(id=self.school.id)  # Reload from database
         self.assertEqual(list(self.school.students.all()),
                          [self.arthur, self.cliff, self.jason, self.john])
         self.assertEqual(list(self.school.alumni.all()),
@@ -622,7 +638,6 @@ class HorizontalVerticalFilterSeleniumFirefoxTests(AdminSeleniumWebDriverTestCas
         self.admin_login(username='super', password='secret', login_url='/')
         self.selenium.get(
             '%s%s' % (self.live_server_url, '/admin_widgets/school/%s/' % self.school.id))
-
 
         for field_name in ['students', 'alumni']:
             from_box = '#id_%s_from' % field_name
@@ -671,7 +686,7 @@ class HorizontalVerticalFilterSeleniumFirefoxTests(AdminSeleniumWebDriverTestCas
             self.assertSelectOptions(to_box,
                         [str(self.peter.id), str(self.jason.id)])
 
-            input.send_keys([Keys.BACK_SPACE]) # Clear text box
+            input.send_keys([Keys.BACK_SPACE])  # Clear text box
             self.assertSelectOptions(from_box,
                         [str(self.arthur.id), str(self.bob.id),
                          str(self.cliff.id), str(self.jenny.id),
@@ -681,14 +696,16 @@ class HorizontalVerticalFilterSeleniumFirefoxTests(AdminSeleniumWebDriverTestCas
 
         # Save and check that everything is properly stored in the database ---
         self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
-        self.school = models.School.objects.get(id=self.school.id) # Reload from database
+        self.school = models.School.objects.get(id=self.school.id)  # Reload from database
         self.assertEqual(list(self.school.students.all()),
                          [self.jason, self.peter])
         self.assertEqual(list(self.school.alumni.all()),
                          [self.jason, self.peter])
 
+
 class HorizontalVerticalFilterSeleniumChromeTests(HorizontalVerticalFilterSeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
+
 
 class HorizontalVerticalFilterSeleniumIETests(HorizontalVerticalFilterSeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
