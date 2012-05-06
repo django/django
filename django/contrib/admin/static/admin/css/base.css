@@ -236,6 +236,10 @@ p img, h1 img, h2 img, h3 img, h4 img, td img {
     white-space: nowrap;
 }
 
+div.form-row a.openlink {
+    margin-left: 4px;
+}
+
 /* TABLES */
 
 table {
