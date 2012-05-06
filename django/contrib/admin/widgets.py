@@ -319,7 +319,7 @@ class AdminURLFieldWidget(forms.TextInput):
         output = super(AdminURLFieldWidget, self).render(name, value, attrs=attrs)
 
         if value is not None:
-            output += '<a class="openlink" href="%(href)s" target="_blank"> %(name)s</a>' % {
+            output += ' <a class="openlink" href="%(href)s" target="_blank">%(name)s</a>' % {
                 'href': value,
                 'name': _('Open link'),
             }
