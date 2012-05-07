@@ -1,6 +1,7 @@
 import copy
 import operator
 from functools import wraps, update_wrapper
+import sys
 
 
 # You can't trivially replace this `functools.partial` because this binds to
@@ -311,11 +312,13 @@ def partition(predicate, values):
         results[predicate(item)].append(item)
     return results
 
-try:
+if sys.version_info >= (2,7,2):
     from functools import total_ordering
-except ImportError:
-    # For Python < 2.7
-    # Code borrowed from python 2.7.3 stdlib
+else:
+    # For Python < 2.7.2. Python 2.6 does not have total_ordering, and
+    # total_ordering in 2.7 versions prior to 2.7.2 is buggy. See
+    # http://bugs.python.org/issue10042 for details. For these versions use
+    # code borrowed from Python 2.7.3.
     def total_ordering(cls):
         """Class decorator that fills in missing ordering methods"""
         convert = {
