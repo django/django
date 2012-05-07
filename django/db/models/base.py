@@ -1,7 +1,7 @@
 import copy
 import sys
 from functools import update_wrapper
-from itertools import izip
+from future_builtins import zip
 
 import django.db.models.manager     # Imported to register signal handler.
 from django.conf import settings
@@ -292,15 +292,15 @@ class Model(object):
 
         fields_iter = iter(self._meta.fields)
         if not kwargs:
-            # The ordering of the izip calls matter - izip throws StopIteration
+            # The ordering of the zip calls matter - zip throws StopIteration
             # when an iter throws it. So if the first iter throws it, the second
             # is *not* consumed. We rely on this, so don't change the order
             # without changing the logic.
-            for val, field in izip(args, fields_iter):
+            for val, field in zip(args, fields_iter):
                 setattr(self, field.attname, val)
         else:
             # Slower, kwargs-ready version.
-            for val, field in izip(args, fields_iter):
+            for val, field in zip(args, fields_iter):
                 setattr(self, field.attname, val)
                 kwargs.pop(field.name, None)
                 # Maintain compatibility with existing calls.

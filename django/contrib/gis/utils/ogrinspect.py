@@ -5,7 +5,7 @@ models for GeoDjango and/or mapping dictionaries for use with the
 
 Author: Travis Pinney, Dane Springmeyer, & Justin Bronn
 """
-from itertools import izip
+from future_builtins import zip
 # Requires GDAL to use.
 from django.contrib.gis.gdal import DataSource
 from django.contrib.gis.gdal.field import OFTDate, OFTDateTime, OFTInteger, OFTReal, OFTString, OFTTime
@@ -165,7 +165,7 @@ def _ogrinspect(data_source, model_name, geom_name='geom', layer_key=0, srid=Non
 
     yield 'class %s(models.Model):' % model_name
 
-    for field_name, width, precision, field_type in izip(ogr_fields, layer.field_widths, layer.field_precisions, layer.field_types):
+    for field_name, width, precision, field_type in zip(ogr_fields, layer.field_widths, layer.field_precisions, layer.field_types):
         # The model field name.
         mfield = field_name.lower()
         if mfield[-1:] == '_': mfield += 'field'

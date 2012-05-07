@@ -1,4 +1,4 @@
-from itertools import izip
+from future_builtins import zip
 
 from django.core.exceptions import FieldError
 from django.db import transaction
@@ -882,7 +882,7 @@ class SQLInsertCompiler(SQLCompiler):
             placeholders = [["%s"] * len(fields)]
         else:
             placeholders = [
-                [self.placeholder(field, v) for field, v in izip(fields, val)]
+                [self.placeholder(field, v) for field, v in zip(fields, val)]
                 for val in values
             ]
         if self.return_id and self.connection.features.can_return_id_from_insert:
@@ -899,7 +899,7 @@ class SQLInsertCompiler(SQLCompiler):
         else:
             return [
                 (" ".join(result + ["VALUES (%s)" % ", ".join(p)]), vals)
-                for p, vals in izip(placeholders, params)
+                for p, vals in zip(placeholders, params)
             ]
 
     def execute_sql(self, return_id=False):
