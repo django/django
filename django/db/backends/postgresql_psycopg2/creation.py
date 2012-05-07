@@ -10,6 +10,7 @@ class DatabaseCreation(BaseDatabaseCreation):
     # be interpolated against the values of Field.__dict__ before being output.
     # If a column type is set to None, it won't be included in the output.
     data_types = {
+        'UnsignedAutoField': 'bigserial',
         'AutoField':         'serial',
         'BooleanField':      'boolean',
         'CharField':         'varchar(%(max_length)s)',

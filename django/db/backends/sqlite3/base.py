@@ -191,7 +191,8 @@ class DatabaseOperations(BaseDatabaseOperations):
         internal_type = field.get_internal_type()
         if internal_type == 'DecimalField':
             return util.typecast_decimal(field.format_number(value))
-        elif internal_type and internal_type.endswith('IntegerField') or internal_type == 'AutoField':
+        elif (internal_type and internal_type.endswith('IntegerField')
+                or internal_type.endswith('AutoField')):
             return int(value)
         elif internal_type == 'DateField':
             return parse_date(value)
