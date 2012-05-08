@@ -44,6 +44,13 @@ reasons or when trying to avoid overwriting concurrent changes.
 See the :meth:`Model.save() <django.db.models.Model.save()>` documentation for
 more details.
 
+``{% verbatim %}`` template tag
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To make it easier to deal with javascript templates which collide with Django's
+syntax, you can now use the :ttag:`verbatim` block tag to avoid parsing the
+tag's content.
+
 Minor features
 ~~~~~~~~~~~~~~
 

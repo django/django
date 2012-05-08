@@ -1059,6 +1059,29 @@ This will follow the normal :ref:`namespaced URL resolution strategy
 <topics-http-reversing-url-namespaces>`, including using any hints provided
 by the context as to the current application.
 
+.. templatetag:: verbatim
+
+verbatim
+^^^^^^^^
+
+.. versionadded:: 1.5
+
+Stops the template engine rendering the contents of this block tag.
+
+A common use is to allow a Javascript template layer that collides with
+Django's syntax. For example::
+
+    {% verbatim %}
+        {{if dying}}Still alive.{{/if}}
+    {% endverbatim %}
+
+You can also specify an alternate closing tag::
+
+    {% verbatim finished %}
+        The verbatim tag looks like this:
+        {% verbatim %}{% endverbatim %}
+    {% finished %}
+
 .. templatetag:: widthratio
 
 widthratio
