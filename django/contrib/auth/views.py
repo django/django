@@ -4,7 +4,6 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, QueryDict
 from django.template.response import TemplateResponse
-from django.utils.http import base36_to_int
 from django.utils.translation import ugettext as _
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
@@ -12,9 +11,9 @@ from django.views.decorators.csrf import csrf_protect
 
 # Avoid shadowing the login() and logout() views below.
 from django.contrib.auth import REDIRECT_FIELD_NAME, login as auth_login, logout as auth_logout
+from django.contrib.auth import confirm_password_reset
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm, PasswordResetForm, SetPasswordForm, PasswordChangeForm
-from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.models import get_current_site
 
@@ -194,14 +193,9 @@ def password_reset_confirm(request, uidb36=None, token=None,
     assert uidb36 is not None and token is not None # checked by URLconf
     if post_reset_redirect is None:
         post_reset_redirect = reverse('django.contrib.auth.views.password_reset_complete')
-    try:
-        uid_int = base36_to_int(uidb36)
-        user = User.objects.get(id=uid_int)
-    except (ValueError, User.DoesNotExist):
-        user = None
+    user, validlink = confirm_password_reset(uidb36, token, token_generator=token_generator)
 
-    if user is not None and token_generator.check_token(user, token):
-        validlink = True
+    if user is not None and validlink:
         if request.method == 'POST':
             form = set_password_form(user, request.POST)
             if form.is_valid():
@@ -210,7 +204,6 @@ def password_reset_confirm(request, uidb36=None, token=None,
         else:
             form = set_password_form(None)
     else:
-        validlink = False
         form = None
     context = {
         'form': form,
