@@ -44,7 +44,7 @@ class CAPostalCodeField(CharField):
 class CAPhoneNumberField(Field):
     """Canadian phone number field."""
     default_error_messages = {
-        'invalid': u'Phone numbers must be in XXX-XXX-XXXX format.',
+        'invalid': _(u'Phone numbers must be in XXX-XXX-XXXX format.'),
     }
 
     def clean(self, value):
@@ -66,7 +66,7 @@ class CAProvinceField(Field):
     abbreviation for the given province.
     """
     default_error_messages = {
-        'invalid': u'Enter a Canadian province or territory.',
+        'invalid': _(u'Enter a Canadian province or territory.'),
     }
 
     def clean(self, value):
