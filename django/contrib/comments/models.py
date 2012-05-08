@@ -92,7 +92,7 @@ class Comment(BaseCommentAbstractModel):
         This dict will have ``name``, ``email``, and ``url`` fields.
         """
         if not hasattr(self, "_userinfo"):
-            self._userinfo = {
+            userinfo = {
                 "name"  : self.user_name,
                 "email" : self.user_email,
                 "url"   : self.user_url
@@ -100,15 +100,16 @@ class Comment(BaseCommentAbstractModel):
             if self.user_id:
                 u = self.user
                 if u.email:
-                    self._userinfo["email"] = u.email
+                    userinfo["email"] = u.email
 
                 # If the user has a full name, use that for the user name.
                 # However, a given user_name overrides the raw user.username,
                 # so only use that if this comment has no associated name.
                 if u.get_full_name():
-                    self._userinfo["name"] = self.user.get_full_name()
+                    userinfo["name"] = self.user.get_full_name()
                 elif not self.user_name:
-                    self._userinfo["name"] = u.username
+                    userinfo["name"] = u.username
+            self._userinfo = userinfo
         return self._userinfo
     userinfo = property(_get_userinfo, doc=_get_userinfo.__doc__)
 
