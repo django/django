@@ -320,7 +320,7 @@ class AdminURLFieldWidget(forms.TextInput):
 
         if value is not None:
             output += ' <a class="openlink" href="%(href)s" target="_blank">%(name)s</a>' % {
-                'href': value,
+                'href': escape(value),
                 'name': _('Open link'),
             }
         return mark_safe(output)
