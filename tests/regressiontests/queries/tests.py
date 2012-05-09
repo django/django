@@ -19,7 +19,7 @@ from .models import (Annotation, Article, Author, Celebrity, Child, Cover,
     ManagedModel, Member, NamedCategory, Note, Number, Plaything, PointerA,
     Ranking, Related, Report, ReservedName, Tag, TvChef, Valid, X, Food, Eaten,
     Node, ObjectA, ObjectB, ObjectC, CategoryItem, SimpleCategory,
-    SpecialCategory, OneToOneCategory, NullableName)
+    SpecialCategory, OneToOneCategory, NullableName, ProxyCategory)
 
 
 class BaseQuerysetTest(TestCase):
@@ -1952,3 +1952,15 @@ class EmptyStringsAsNullTest(TestCase):
             DumbCategory.objects.exclude(namedcategory__name__in=['nonexisting']),
             [self.nc.pk], attrgetter('pk')
         )
+
+class ProxyQueryCleanupTest(TestCase):
+    def test_evaluated_proxy_count(self):
+        """
+        Test that generating the query string doesn't alter the query's state
+        in irreversible ways. Refs #18248.
+        """
+        ProxyCategory.objects.create()
+        qs = ProxyCategory.objects.all()
+        self.assertEqual(qs.count(), 1)
+        str(qs.query)
+        self.assertEqual(qs.count(), 1)
