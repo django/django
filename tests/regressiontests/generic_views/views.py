@@ -234,6 +234,15 @@ class NonModel(object):
     _meta = None
 
 
+class NonQuerySet(object):
+    model = NonModel
+
+    def __getitem__(self, i):
+        if i == 0:
+            return self.model()
+        raise IndexError
+
+
 class NonModelDetail(generic.DetailView):
 
     template_name = 'generic_views/detail.html'
@@ -241,3 +250,9 @@ class NonModelDetail(generic.DetailView):
 
     def get_object(self, queryset=None):
         return NonModel()
+
+
+class NonQuerySetList(generic.ListView):
+
+    template_name = 'generic_views/list.html'
+    queryset = NonQuerySet()

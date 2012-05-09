@@ -144,6 +144,9 @@ urlpatterns = patterns('',
         views.AuthorList.as_view(paginate_by=5, paginator_class=views.CustomPaginator)),
     (r'^list/authors/paginated/custom_constructor/$',
         views.AuthorListCustomPaginator.as_view()),
+    (r'^list/nonqueryset/$',
+        views.NonQuerySetList.as_view()),
+
 
     # YearArchiveView
     # Mixing keyword and possitional captures below is intentional; the views
