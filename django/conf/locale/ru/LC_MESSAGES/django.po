@@ -786,22 +786,22 @@ msgstr[2] "%(size)d байт"
 #: template/defaultfilters.py:832
 #, python-format
 msgid "%s KB"
-msgstr "%s KБ"
+msgstr "%s КБ"
 
 #: template/defaultfilters.py:834
 #, python-format
 msgid "%s MB"
-msgstr "%s MБ"
+msgstr "%s МБ"
 
 #: template/defaultfilters.py:836
 #, python-format
 msgid "%s GB"
-msgstr "%s GБ"
+msgstr "%s ГБ"
 
 #: template/defaultfilters.py:838
 #, python-format
 msgid "%s TB"
-msgstr "%s TБ"
+msgstr "%s ТБ"
 
 #: template/defaultfilters.py:839
 #, python-format
