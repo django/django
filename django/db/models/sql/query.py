@@ -1140,10 +1140,10 @@ class Query(object):
             # join list) an outer join.
             join_it = iter(join_list)
             table_it = iter(self.tables)
-            join_it.next(), table_it.next()
+            next(join_it), next(table_it)
             unconditional = False
             for join in join_it:
-                table = table_it.next()
+                table = next(table_it)
                 # Once we hit an outer join, all subsequent joins must
                 # also be promoted, regardless of whether they have been
                 # promoted as a result of this pass through the tables.
@@ -1774,7 +1774,7 @@ class Query(object):
                 entry_params = []
                 pos = entry.find("%s")
                 while pos != -1:
-                    entry_params.append(param_iter.next())
+                    entry_params.append(next(param_iter))
                     pos = entry.find("%s", pos + 2)
                 select_pairs[name] = (entry, entry_params)
             # This is order preserving, since self.extra_select is a SortedDict.

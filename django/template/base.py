@@ -173,7 +173,7 @@ class Token(object):
                 sentinal = bit[2] + ')'
                 trans_bit = [bit]
                 while not bit.endswith(sentinal):
-                    bit = bits.next()
+                    bit = next(bits)
                     trans_bit.append(bit)
                 bit = ' '.join(trans_bit)
             split.append(bit)

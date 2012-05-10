@@ -46,9 +46,9 @@ class Point(GEOSGeometry):
 
         cs = capi.create_cs(c_uint(1), c_uint(ndim))
         i = iter(coords)
-        capi.cs_setx(cs, 0, i.next())
-        capi.cs_sety(cs, 0, i.next())
-        if ndim == 3: capi.cs_setz(cs, 0, i.next())
+        capi.cs_setx(cs, 0, next(i))
+        capi.cs_sety(cs, 0, next(i))
+        if ndim == 3: capi.cs_setz(cs, 0, next(i))
 
         return capi.create_point(cs)
 

@@ -39,7 +39,7 @@ class ROCIFField(RegexField):
         key_iter = iter(key)
         checksum = 0
         for digit in value[1:]:
-            checksum += int(digit) * int(key_iter.next())
+            checksum += int(digit) * int(next(key_iter))
         checksum = checksum * 10 % 11
         if checksum == 10:
             checksum = 0
@@ -79,7 +79,7 @@ class ROCNPField(RegexField):
         checksum = 0
         value_iter = iter(value)
         for digit in key:
-            checksum += int(digit) * int(value_iter.next())
+            checksum += int(digit) * int(next(value_iter))
         checksum %= 11
         if checksum == 10:
             checksum = 1

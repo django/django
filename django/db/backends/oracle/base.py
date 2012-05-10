@@ -754,7 +754,7 @@ class CursorIterator(object):
         return self
 
     def next(self):
-        return _rowfactory(self.iter.next(), self.cursor)
+        return _rowfactory(next(self.iter), self.cursor)
 
 
 def _rowfactory(row, cursor):

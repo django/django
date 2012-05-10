@@ -668,7 +668,7 @@ class HttpResponse(object):
         return self
 
     def next(self):
-        chunk = self._iterator.next()
+        chunk = next(self._iterator)
         if isinstance(chunk, unicode):
             chunk = chunk.encode(self._charset)
         return str(chunk)

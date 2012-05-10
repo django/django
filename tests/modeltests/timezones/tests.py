@@ -493,23 +493,23 @@ class SerializationTests(TestCase):
 
         data = serializers.serialize('python', [Event(dt=dt)])
         self.assertEqual(data[0]['fields']['dt'], dt)
-        obj = serializers.deserialize('python', data).next().object
+        obj = next(serializers.deserialize('python', data)).object
         self.assertEqual(obj.dt, dt)
 
         data = serializers.serialize('json', [Event(dt=dt)])
         self.assertIn('"fields": {"dt": "2011-09-01T13:20:30"}', data)
-        obj = serializers.deserialize('json', data).next().object
+        obj = next(serializers.deserialize('json', data)).object
         self.assertEqual(obj.dt, dt)
 
         data = serializers.serialize('xml', [Event(dt=dt)])
         self.assertIn('<field type="DateTimeField" name="dt">2011-09-01T13:20:30</field>', data)
-        obj = serializers.deserialize('xml', data).next().object
+        obj = next(serializers.deserialize('xml', data)).object
         self.assertEqual(obj.dt, dt)
 
         if 'yaml' in serializers.get_serializer_formats():
             data = serializers.serialize('yaml', [Event(dt=dt)])
             self.assertIn("- fields: {dt: !!timestamp '2011-09-01 13:20:30'}", data)
-            obj = serializers.deserialize('yaml', data).next().object
+            obj = next(serializers.deserialize('yaml', data)).object
             self.assertEqual(obj.dt, dt)
 
     def test_naive_datetime_with_microsecond(self):
@@ -517,23 +517,23 @@ class SerializationTests(TestCase):
 
         data = serializers.serialize('python', [Event(dt=dt)])
         self.assertEqual(data[0]['fields']['dt'], dt)
-        obj = serializers.deserialize('python', data).next().object
+        obj = next(serializers.deserialize('python', data)).object
         self.assertEqual(obj.dt, dt)
 
         data = serializers.serialize('json', [Event(dt=dt)])
         self.assertIn('"fields": {"dt": "2011-09-01T13:20:30.405"}', data)
-        obj = serializers.deserialize('json', data).next().object
+        obj = next(serializers.deserialize('json', data)).object
         self.assertEqual(obj.dt, dt.replace(microsecond=405000))
 
         data = serializers.serialize('xml', [Event(dt=dt)])
         self.assertIn('<field type="DateTimeField" name="dt">2011-09-01T13:20:30.405060</field>', data)
-        obj = serializers.deserialize('xml', data).next().object
+        obj = next(serializers.deserialize('xml', data)).object
         self.assertEqual(obj.dt, dt)
 
         if 'yaml' in serializers.get_serializer_formats():
             data = serializers.serialize('yaml', [Event(dt=dt)])
             self.assertIn("- fields: {dt: !!timestamp '2011-09-01 13:20:30.405060'}", data)
-            obj = serializers.deserialize('yaml', data).next().object
+            obj = next(serializers.deserialize('yaml', data)).object
             self.assertEqual(obj.dt, dt)
 
     def test_aware_datetime_with_microsecond(self):
@@ -541,23 +541,23 @@ class SerializationTests(TestCase):
 
         data = serializers.serialize('python', [Event(dt=dt)])
         self.assertEqual(data[0]['fields']['dt'], dt)
-        obj = serializers.deserialize('python', data).next().object
+        obj = next(serializers.deserialize('python', data)).object
         self.assertEqual(obj.dt, dt)
 
         data = serializers.serialize('json', [Event(dt=dt)])
         self.assertIn('"fields": {"dt": "2011-09-01T17:20:30.405+07:00"}', data)
-        obj = serializers.deserialize('json', data).next().object
+        obj = next(serializers.deserialize('json', data)).object
         self.assertEqual(obj.dt, dt.replace(microsecond=405000))
 
         data = serializers.serialize('xml', [Event(dt=dt)])
         self.assertIn('<field type="DateTimeField" name="dt">2011-09-01T17:20:30.405060+07:00</field>', data)
-        obj = serializers.deserialize('xml', data).next().object
+        obj = next(serializers.deserialize('xml', data)).object
         self.assertEqual(obj.dt, dt)
 
         if 'yaml' in serializers.get_serializer_formats():
             data = serializers.serialize('yaml', [Event(dt=dt)])
             self.assertIn("- fields: {dt: !!timestamp '2011-09-01 17:20:30.405060+07:00'}", data)
-            obj = serializers.deserialize('yaml', data).next().object
+            obj = next(serializers.deserialize('yaml', data)).object
             self.assertEqual(obj.dt.replace(tzinfo=UTC), dt)
 
     def test_aware_datetime_in_utc(self):
@@ -565,23 +565,23 @@ class SerializationTests(TestCase):
 
         data = serializers.serialize('python', [Event(dt=dt)])
         self.assertEqual(data[0]['fields']['dt'], dt)
-        obj = serializers.deserialize('python', data).next().object
+        obj = next(serializers.deserialize('python', data)).object
         self.assertEqual(obj.dt, dt)
 
         data = serializers.serialize('json', [Event(dt=dt)])
         self.assertIn('"fields": {"dt": "2011-09-01T10:20:30Z"}', data)
-        obj = serializers.deserialize('json', data).next().object
+        obj = next(serializers.deserialize('json', data)).object
         self.assertEqual(obj.dt, dt)
 
         data = serializers.serialize('xml', [Event(dt=dt)])
         self.assertIn('<field type="DateTimeField" name="dt">2011-09-01T10:20:30+00:00</field>', data)
-        obj = serializers.deserialize('xml', data).next().object
+        obj = next(serializers.deserialize('xml', data)).object
         self.assertEqual(obj.dt, dt)
 
         if 'yaml' in serializers.get_serializer_formats():
             data = serializers.serialize('yaml', [Event(dt=dt)])
             self.assertIn("- fields: {dt: !!timestamp '2011-09-01 10:20:30+00:00'}", data)
-            obj = serializers.deserialize('yaml', data).next().object
+            obj = next(serializers.deserialize('yaml', data)).object
             self.assertEqual(obj.dt.replace(tzinfo=UTC), dt)
 
     def test_aware_datetime_in_local_timezone(self):
@@ -589,23 +589,23 @@ class SerializationTests(TestCase):
 
         data = serializers.serialize('python', [Event(dt=dt)])
         self.assertEqual(data[0]['fields']['dt'], dt)
-        obj = serializers.deserialize('python', data).next().object
+        obj = next(serializers.deserialize('python', data)).object
         self.assertEqual(obj.dt, dt)
 
         data = serializers.serialize('json', [Event(dt=dt)])
         self.assertIn('"fields": {"dt": "2011-09-01T13:20:30+03:00"}', data)
-        obj = serializers.deserialize('json', data).next().object
+        obj = next(serializers.deserialize('json', data)).object
         self.assertEqual(obj.dt, dt)
 
         data = serializers.serialize('xml', [Event(dt=dt)])
         self.assertIn('<field type="DateTimeField" name="dt">2011-09-01T13:20:30+03:00</field>', data)
-        obj = serializers.deserialize('xml', data).next().object
+        obj = next(serializers.deserialize('xml', data)).object
         self.assertEqual(obj.dt, dt)
 
         if 'yaml' in serializers.get_serializer_formats():
             data = serializers.serialize('yaml', [Event(dt=dt)])
             self.assertIn("- fields: {dt: !!timestamp '2011-09-01 13:20:30+03:00'}", data)
-            obj = serializers.deserialize('yaml', data).next().object
+            obj = next(serializers.deserialize('yaml', data)).object
             self.assertEqual(obj.dt.replace(tzinfo=UTC), dt)
 
     def test_aware_datetime_in_other_timezone(self):
@@ -613,23 +613,23 @@ class SerializationTests(TestCase):
 
         data = serializers.serialize('python', [Event(dt=dt)])
         self.assertEqual(data[0]['fields']['dt'], dt)
-        obj = serializers.deserialize('python', data).next().object
+        obj = next(serializers.deserialize('python', data)).object
         self.assertEqual(obj.dt, dt)
 
         data = serializers.serialize('json', [Event(dt=dt)])
         self.assertIn('"fields": {"dt": "2011-09-01T17:20:30+07:00"}', data)
-        obj = serializers.deserialize('json', data).next().object
+        obj = next(serializers.deserialize('json', data)).object
         self.assertEqual(obj.dt, dt)
 
         data = serializers.serialize('xml', [Event(dt=dt)])
         self.assertIn('<field type="DateTimeField" name="dt">2011-09-01T17:20:30+07:00</field>', data)
-        obj = serializers.deserialize('xml', data).next().object
+        obj = next(serializers.deserialize('xml', data)).object
         self.assertEqual(obj.dt, dt)
 
         if 'yaml' in serializers.get_serializer_formats():
             data = serializers.serialize('yaml', [Event(dt=dt)])
             self.assertIn("- fields: {dt: !!timestamp '2011-09-01 17:20:30+07:00'}", data)
-            obj = serializers.deserialize('yaml', data).next().object
+            obj = next(serializers.deserialize('yaml', data)).object
             self.assertEqual(obj.dt.replace(tzinfo=UTC), dt)
 
 

@@ -569,7 +569,7 @@ A naive implementation of ``CycleNode`` might look something like this:
         def __init__(self, cyclevars):
             self.cycle_iter = itertools.cycle(cyclevars)
         def render(self, context):
-            return self.cycle_iter.next()
+            return next(self.cycle_iter)
 
 But, suppose we have two templates rendering the template snippet from above at
 the same time:
@@ -603,7 +603,7 @@ Let's refactor our ``CycleNode`` implementation to use the ``render_context``:
             if self not in context.render_context:
                 context.render_context[self] = itertools.cycle(self.cyclevars)
             cycle_iter = context.render_context[self]
-            return cycle_iter.next()
+            return next(cycle_iter)
 
 Note that it's perfectly safe to store global information that will not change
 throughout the life of the ``Node`` as an attribute. In the case of

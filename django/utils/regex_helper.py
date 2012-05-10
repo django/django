@@ -75,7 +75,7 @@ def normalize(pattern):
     # at the next character and possibly go around without consuming another
     # one at the top of the loop.
     try:
-        ch, escaped = pattern_iter.next()
+        ch, escaped = next(pattern_iter)
     except StopIteration:
         return zip([u''],  [[]])
 
@@ -105,14 +105,14 @@ def normalize(pattern):
                 result = result[:start] + [inner]
             elif ch == '[':
                 # Replace ranges with the first character in the range.
-                ch, escaped = pattern_iter.next()
+                ch, escaped = next(pattern_iter)
                 result.append(ch)
-                ch, escaped = pattern_iter.next()
+                ch, escaped = next(pattern_iter)
                 while escaped or ch != ']':
-                    ch, escaped = pattern_iter.next()
+                    ch, escaped = next(pattern_iter)
             elif ch == '(':
                 # Some kind of group.
-                ch, escaped = pattern_iter.next()
+                ch, escaped = next(pattern_iter)
                 if ch != '?' or escaped:
                     # A positional group
                     name = "_%d" % num_args
@@ -120,7 +120,7 @@ def normalize(pattern):
                     result.append(Group(((u"%%(%s)s" % name), name)))
                     walk_to_end(ch, pattern_iter)
                 else:
-                    ch, escaped = pattern_iter.next()
+                    ch, escaped = next(pattern_iter)
                     if ch in "iLmsu#":
                         # All of these are ignorable. Walk to the end of the
                         # group.
@@ -133,7 +133,7 @@ def normalize(pattern):
                         # we cannot reverse.
                         raise ValueError("Non-reversible reg-exp portion: '(?%s'" % ch)
                     else:
-                        ch, escaped = pattern_iter.next()
+                        ch, escaped = next(pattern_iter)
                         if ch not in ('<', '='):
                             raise ValueError("Non-reversible reg-exp portion: '(?P%s'" % ch)
                         # We are in a named capturing group. Extra the name and
@@ -144,10 +144,10 @@ def normalize(pattern):
                         else:
                             terminal_char = ')'
                         name = []
-                        ch, escaped = pattern_iter.next()
+                        ch, escaped = next(pattern_iter)
                         while ch != terminal_char:
                             name.append(ch)
-                            ch, escaped = pattern_iter.next()
+                            ch, escaped = next(pattern_iter)
                         param = ''.join(name)
                         # Named backreferences have already consumed the
                         # parenthesis.
@@ -183,7 +183,7 @@ def normalize(pattern):
                 result.append(ch)
 
             if consume_next:
-                ch, escaped = pattern_iter.next()
+                ch, escaped = next(pattern_iter)
             else:
                 consume_next = True
     except StopIteration:
@@ -208,7 +208,7 @@ def next_char(input_iter):
         if ch != '\\':
             yield ch, False
             continue
-        ch = input_iter.next()
+        ch = next(input_iter)
         representative = ESCAPE_MAPPINGS.get(ch, ch)
         if representative is None:
             continue
@@ -245,7 +245,7 @@ def get_quantifier(ch, input_iter):
     """
     if ch in '*?+':
         try:
-            ch2, escaped = input_iter.next()
+            ch2, escaped = next(input_iter)
         except StopIteration:
             ch2 = None
         if ch2 == '?':
@@ -256,14 +256,14 @@ def get_quantifier(ch, input_iter):
 
     quant = []
     while ch != '}':
-        ch, escaped = input_iter.next()
+        ch, escaped = next(input_iter)
         quant.append(ch)
     quant = quant[:-1]
     values = ''.join(quant).split(',')
 
     # Consume the trailing '?', if necessary.
     try:
-        ch, escaped = input_iter.next()
+        ch, escaped = next(input_iter)
     except StopIteration:
         ch = None
     if ch == '?':

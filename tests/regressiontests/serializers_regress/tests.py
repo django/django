@@ -489,7 +489,7 @@ def fieldsTest(format, self):
 
     # Serialize then deserialize the test database
     serialized_data = serializers.serialize(format, [obj], indent=2, fields=('field1','field3'))
-    result = serializers.deserialize(format, serialized_data).next()
+    result = next(serializers.deserialize(format, serialized_data))
 
     # Check that the deserialized object contains data in only the serialized fields.
     self.assertEqual(result.object.field1, 'first')

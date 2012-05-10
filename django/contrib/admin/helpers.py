@@ -53,7 +53,7 @@ class AdminForm(object):
         except (KeyError, IndexError):
             pass
         try:
-            return iter(self.form).next()
+            return next(iter(self.form))
         except StopIteration:
             return None
 

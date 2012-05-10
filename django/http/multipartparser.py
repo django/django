@@ -291,7 +291,7 @@ class LazyStream(object):
             while remaining != 0:
                 assert remaining > 0, 'remaining bytes to read should never go negative'
 
-                chunk = self.next()
+                chunk = next(self)
 
                 emitting = chunk[:remaining]
                 self.unget(chunk[remaining:])
@@ -313,7 +313,7 @@ class LazyStream(object):
             output = self._leftover
             self._leftover = ''
         else:
-            output = self._producer.next()
+            output = next(self._producer)
             self._unget_history = []
         self.position += len(output)
         return output
@@ -410,7 +410,7 @@ class BoundaryIter(object):
     before the boundary, throw away the boundary bytes themselves, and push the
     post-boundary bytes back on the stream.
 
-    The future calls to .next() after locating the boundary will raise a
+    The future calls to next() after locating the boundary will raise a
     StopIteration exception.
     """
 

@@ -26,7 +26,7 @@ def wrap(text, width):
     text = force_unicode(text)
     def _generator():
         it = iter(text.split(' '))
-        word = it.next()
+        word = next(it)
         yield word
         pos = len(word) - word.rfind('\n') - 1
         for word in it:

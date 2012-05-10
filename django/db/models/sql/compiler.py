@@ -1082,7 +1082,7 @@ def empty_iter():
     """
     Returns an iterator containing no results.
     """
-    yield iter([]).next()
+    yield next(iter([]))
 
 
 def order_modified_iter(cursor, trim, sentinel):

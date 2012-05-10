@@ -128,7 +128,7 @@ class QuerySet(object):
         if self._result_cache is not None:
             return bool(self._result_cache)
         try:
-            iter(self).next()
+            next(iter(self))
         except StopIteration:
             return False
         return True
@@ -877,7 +877,7 @@ class QuerySet(object):
         if self._iter:
             try:
                 for i in range(num or ITER_CHUNK_SIZE):
-                    self._result_cache.append(self._iter.next())
+                    self._result_cache.append(next(self._iter))
             except StopIteration:
                 self._iter = None
 
@@ -1147,7 +1147,7 @@ class EmptyQuerySet(QuerySet):
     def iterator(self):
         # This slightly odd construction is because we need an empty generator
         # (it raises StopIteration immediately).
-        yield iter([]).next()
+        yield next(iter([]))
 
     def all(self):
         """

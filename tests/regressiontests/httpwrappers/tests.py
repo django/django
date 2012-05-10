@@ -281,7 +281,7 @@ class HttpResponseTests(unittest.TestCase):
         my_iter = r.__iter__()
         while True:
             try:
-                result.append(my_iter.next())
+                result.append(next(my_iter))
             except StopIteration:
                 break
         #'\xde\x9e' == unichr(1950).encode('utf-8')
