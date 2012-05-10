@@ -404,6 +404,7 @@ class User(models.Model):
 
 class AnonymousUser(object):
     id = None
+    pk = None
     username = ''
     is_staff = False
     is_active = False
