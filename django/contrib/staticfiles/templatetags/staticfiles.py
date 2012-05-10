@@ -10,4 +10,7 @@ def static(path):
     A template tag that returns the URL to a file
     using staticfiles' storage backend
     """
-    return staticfiles_storage.url(path)
+    try:
+        return staticfiles_storage.url(path)
+    except ValueError:
+        return ''
