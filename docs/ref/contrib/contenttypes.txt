@@ -328,7 +328,7 @@ Due to the way :class:`~django.contrib.contenttypes.generic.GenericForeignKey`
 is implemented, you cannot use such fields directly with filters (``filter()``
 and ``exclude()``, for example) via the database API. Because a
 :class:`~django.contrib.contenttypes.generic.GenericForeignKey` isn't a
-normal field objects, these examples will *not* work::
+normal field object, these examples will *not* work::
 
     # This will fail
     >>> TaggedItem.objects.filter(content_object=guido)
