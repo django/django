@@ -93,6 +93,7 @@ class CALocalFlavorTests(SimpleTestCase):
             'BC': 'BC',
             'nova scotia': 'NS',
             '  manitoba ': 'MB',
+            'pq': 'QC',
         }
         invalid = {
             'T2S 2H7': error_format,

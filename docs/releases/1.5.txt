@@ -44,6 +44,9 @@ Django 1.5 also includes several smaller improvements worth noting:
 * :mod:`django.utils.timezone` provides a helper for converting aware
   datetimes between time zones. See :func:`~django.utils.timezone.localtime`.
 
+* In the localflavor for Canada, "pq" was added to the acceptable codes for
+  Quebec. It's an old abbreviation.
+
 Backwards incompatible changes in 1.5
 =====================================
 
