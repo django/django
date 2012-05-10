@@ -29,36 +29,41 @@ hard_coded_bullets_re = re.compile(r'((?:<p>(?:%s).*?[a-zA-Z].*?</p>\s*)+)' % '|
 trailing_empty_content_re = re.compile(r'(?:<p>(?:&nbsp;|\s|<br \/>)*?</p>\s*)+\Z')
 del x # Temporary variable
 
+_html_escapes = {
+    ord('&'): u'&amp;',
+    ord('<'): u'&lt;',
+    ord('>'): u'&gt;',
+    ord('"'): u'&quot;',
+    ord("'"): u'&#39;'
+}
+
 def escape(html):
     """
     Returns the given HTML with ampersands, quotes and angle brackets encoded.
     """
-    return mark_safe(force_unicode(html).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;'))
+    return mark_safe(force_unicode(html).translate(_html_escapes))
 escape = allow_lazy(escape, unicode)
 
-_base_js_escapes = (
-    ('\\', r'\u005C'),
-    ('\'', r'\u0027'),
-    ('"', r'\u0022'),
-    ('>', r'\u003E'),
-    ('<', r'\u003C'),
-    ('&', r'\u0026'),
-    ('=', r'\u003D'),
-    ('-', r'\u002D'),
-    (';', r'\u003B'),
-    (u'\u2028', r'\u2028'),
-    (u'\u2029', r'\u2029')
-)
+_js_escapes = {
+    ord('\\'): u'\\u005C',
+    ord('\''): u'\\u0027',
+    ord('"'): u'\\u0022',
+    ord('>'): u'\\u003E',
+    ord('<'): u'\\u003C',
+    ord('&'): u'\\u0026',
+    ord('='): u'\\u003D',
+    ord('-'): u'\\u002D',
+    ord(';'): u'\\u003B',
+    ord(u'\u2028'): u'\\u2028',
+    ord(u'\u2029'): u'\\u2029'
+}
 
 # Escape every ASCII character with a value less than 32.
-_js_escapes = (_base_js_escapes +
-               tuple([('%c' % z, '\\u%04X' % z) for z in range(32)]))
+_js_escapes.update((ord('%c' % z), u'\\u%04X' % z) for z in range(32))
 
 def escapejs(value):
     """Hex encodes characters for use in JavaScript strings."""
-    for bad, good in _js_escapes:
-        value = mark_safe(force_unicode(value).replace(bad, good))
-    return value
+    return mark_safe(force_unicode(value).translate(_js_escapes))
 escapejs = allow_lazy(escapejs, unicode)
 
 def conditional_escape(html):
