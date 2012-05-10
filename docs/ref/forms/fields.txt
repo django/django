@@ -934,8 +934,12 @@ objects (in the case of ``ModelMultipleChoiceField``) into the
     * Validates that the given id exists in the queryset.
     * Error message keys: ``required``, ``invalid_choice``
 
-    Allows the selection of a single model object, suitable for
-    representing a foreign key.  A single argument is required:
+    Allows the selection of a single model object, suitable for representing a
+    foreign key. Note that the default widget for ``ModelChoiceField`` becomes
+    impractical when the number of entries increases. You should avoid using it
+    for more than 100 items.
+
+    A single argument is required:
 
     .. attribute:: queryset
 
