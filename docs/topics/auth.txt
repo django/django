@@ -1242,7 +1242,7 @@ includes a few other useful built-in views located in
     .. code-block:: html+django
 
         Someone asked for password reset for email {{ email }}. Follow the link below:
-        {{ protocol}}://{{ domain }}{% url 'auth_password_reset_confirm' uidb36=uid token=token %}
+        {{ protocol}}://{{ domain }}{% url 'password_reset_confirm' uidb36=uid token=token %}
 
     The same template context is used for subject template. Subject must be
     single line plain text string.
