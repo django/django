@@ -8,7 +8,6 @@ class ScriptnameMiddleware(object):
             scriptname = '/' + scriptname
         if scriptname.endswith('/'):
             scriptname = scriptname[:-1]
-        print 'scriptname:', scriptname
         self.scriptname = scriptname
     
     def __call__(self, environ, start_response):
@@ -17,11 +16,10 @@ class ScriptnameMiddleware(object):
         
         path_info = environ.get('PATH_INFO', '')
         if not path_info.startswith(self.scriptname+'/'):
-            start_response('302 Found', [
-                ('Location', (self.scriptname+('' if path_info.startswith('/') else '/')+path_info)),
-                ('Content-Length', '0'),
+            start_response('404 Not Found', [
+                ('Content-Length', str(41+len(self.scriptname)) ),
             ])
-            return ''
+            return '404 Not Found, running under scriptname: %s' % self.scriptname
         
         environ['PATH_INFO'] = path_info[len(self.scriptname):]
         environ['SCRIPT_NAME'] = self.scriptname

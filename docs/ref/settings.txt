@@ -1581,6 +1581,16 @@ object. See :ref:`how-django-processes-a-request` for details.
 
 .. setting:: SECRET_KEY
 
+RUNSERVER_SCRIPTNAME
+-----------------------
+
+.. versionadded:: 1.4
+
+Default: Not defined
+
+Run the development server with the scriptname set by default.
+See :ref:`runserver-scriptname` for detauls.
+
 SECRET_KEY
 ----------
 

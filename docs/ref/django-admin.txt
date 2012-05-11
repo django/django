@@ -730,6 +730,19 @@ Port 8000 on IPv6 address of host ``localhost``::
 
     django-admin.py runserver -6 localhost:8000
 
+.. _runserver-scriptname:
+    
+.. django-admin-option:: --scriptname
+
+.. versionadded:: 1.5
+
+Use the ``--scriptname`` option to tell Django to run as if the
+the website is not mounted under the root of the webserver.
+
+Example usage::
+
+    django-admin.py runserver --scriptname=django
+
 Serving static files with the development server
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

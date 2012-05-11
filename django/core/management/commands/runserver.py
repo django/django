@@ -51,10 +51,13 @@ class Command(BaseCommand):
         if scriptname:
             # Only wrap if a scriptname is set (RUNSERVER_SCRIPTNAME can also be cleared to give an empty scriptname as a parameter to runserver)
             handler = ScriptnameMiddleware(handler, scriptname)
-        
+            if options['verbosity'] >= 1:
+                print 'Scriptname: %s' % handler.scriptname
+                        
         return handler
         
     def handle(self, addrport='', *args, **options):
+        options['verbosity'] = int(options.get('verbosity', 1))
         self.use_ipv6 = options.get('use_ipv6')
         if self.use_ipv6 and not socket.has_ipv6:
             raise CommandError('Your Python does not support IPv6.')
