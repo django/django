@@ -6,6 +6,7 @@ import socket
 
 from django.core.management.base import BaseCommand, CommandError
 from django.core.servers.basehttp import run, WSGIServerException, get_internal_wsgi_application
+from django.core.handlers.scriptname import ScriptnameMiddleware
 from django.utils import autoreload
 
 naiveip_re = re.compile(r"""^(?:
@@ -25,6 +26,8 @@ class Command(BaseCommand):
             help='Tells Django to NOT use threading.'),
         make_option('--noreload', action='store_false', dest='use_reloader', default=True,
             help='Tells Django to NOT use the auto-reloader.'),
+        make_option('--scriptname', dest='scriptname', default=None,
+            help='Run the project with a scriptname'),
     )
     help = "Starts a lightweight Web server for development."
     args = '[optional port number, or ipaddr:port]'
@@ -36,9 +39,25 @@ class Command(BaseCommand):
         """
         Returns the default WSGI handler for the runner.
         """
-        return get_internal_wsgi_application()
-
+        return self.wrap_scriptname(get_internal_wsgi_application(), *args, **options)
+        
+    def wrap_scriptname(self, handler, *args, **options):
+        if options['scriptname'] is None:
+            from django.conf import settings
+            scriptname = getattr(settings, 'RUNSERVER_SCRIPTNAME', None)
+        else:
+            scriptname = options['scriptname']
+            
+        if scriptname:
+            # Only wrap if a scriptname is set (RUNSERVER_SCRIPTNAME can also be cleared to give an empty scriptname as a parameter to runserver)
+            handler = ScriptnameMiddleware(handler, scriptname)
+            if options['verbosity'] >= 1:
+                print 'Scriptname: %s' % handler.scriptname
+                        
+        return handler
+        
     def handle(self, addrport='', *args, **options):
+        options['verbosity'] = int(options.get('verbosity', 1))
         self.use_ipv6 = options.get('use_ipv6')
         if self.use_ipv6 and not socket.has_ipv6:
             raise CommandError('Your Python does not support IPv6.')
