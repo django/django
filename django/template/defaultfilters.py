@@ -557,9 +557,9 @@ def random(value):
     """Returns a random item from the list."""
     return random_module.choice(value)
 
-@register.filter("slice", is_safe=True)
+@register.filter("slice_patch", is_safe=True)
 def slice_filter(value, arg):
-    """
+    """ 
     Returns a slice of the list.
 
     Uses the same syntax as Python's list slicing; see
@@ -568,15 +568,20 @@ def slice_filter(value, arg):
     """
     try:
         bits = []
-        for x in arg.split(u':'):
-            if len(x) == 0:
-                bits.append(None)
-            else:
-                bits.append(int(x))
-        return value[*bits]
+        args = arg.split(u':')
+        if len(args) == 1:
+            return value[int(args[0])]
+        else:
+            for x in args:
+                if len(x) == 0:
+                    bits.append(None)
+                else:
+                    bits.append(int(x))
+            return value[slice(*bits)]
 
     except (ValueError, TypeError):
         return value # Fail silently.
+
 
 @register.filter(is_safe=True, needs_autoescape=True)
 def unordered_list(value, autoescape=None):
