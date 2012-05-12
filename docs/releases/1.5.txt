@@ -33,6 +33,17 @@ version compatible with Python 2.6.
 What's new in Django 1.5
 ========================
 
+Support for saving a subset of model's fields
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The method :meth:`Model.save() <django.db.models.Model.save()>` has a new
+keyword argument ``update_fields``. By using this argument it is possible to
+save only a select list of model's fields. This can be useful for performance
+reasons or when trying to avoid overwriting concurrent changes.
+
+See the :meth:`Model.save() <django.db.models.Model.save()>` documentation for
+more details.
+
 Minor features
 ~~~~~~~~~~~~~~
 

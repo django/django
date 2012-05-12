@@ -5,8 +5,8 @@ class_prepared = Signal(providing_args=["class"])
 pre_init = Signal(providing_args=["instance", "args", "kwargs"])
 post_init = Signal(providing_args=["instance"])
 
-pre_save = Signal(providing_args=["instance", "raw", "using"])
-post_save = Signal(providing_args=["instance", "raw", "created", "using"])
+pre_save = Signal(providing_args=["instance", "raw", "using", "update_fields"])
+post_save = Signal(providing_args=["instance", "raw", "created", "using", "update_fields"])
 
 pre_delete = Signal(providing_args=["instance", "using"])
 post_delete = Signal(providing_args=["instance", "using"])
