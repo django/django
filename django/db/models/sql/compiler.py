@@ -1015,6 +1015,12 @@ class SQLUpdateCompiler(SQLCompiler):
         query.extra = {}
         query.select = []
         query.add_fields([query.model._meta.pk.name])
+        # Recheck the count - it is possible that fiddling with the select
+        # fields above removes tables from the query. Refs #18304.
+        count = query.count_active_tables()
+        if not self.query.related_updates and count == 1:
+            return
+
         must_pre_select = count > 1 and not self.connection.features.update_can_self_select
 
         # Now we adjust the current query: reset the where clause and get rid
