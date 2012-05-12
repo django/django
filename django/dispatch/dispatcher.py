@@ -6,8 +6,8 @@ from django.dispatch import saferef
 WEAKREF_TYPES = (weakref.ReferenceType, saferef.BoundMethodWeakref)
 
 def _make_id(target):
-    if hasattr(target, 'im_func'):
-        return (id(target.im_self), id(target.im_func))
+    if hasattr(target, '__func__'):
+        return (id(target.__self__), id(target.__func__))
     return id(target)
 
 class Signal(object):

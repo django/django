@@ -220,7 +220,7 @@ class MethodDecoratorTests(TestCase):
         self.assertEqual(getattr(Test.method, 'myattr2', False), True)
 
         self.assertEqual(Test.method.__doc__, 'A method')
-        self.assertEqual(Test.method.im_func.__name__, 'method')
+        self.assertEqual(Test.method.__func__.__name__, 'method')
 
 
 class XFrameOptionsDecoratorsTests(TestCase):
