@@ -4,6 +4,8 @@ from django.test import TestCase, skipUnlessDBFeature
 from django.db.models.signals import pre_save, post_save
 from .models import Person, Employee, ProxyEmployee, Profile, Account
 
+from django.db import connection
+
 
 class UpdateOnlyFieldsTests(TestCase):
     def test_update_fields_basic(self):
@@ -17,6 +19,51 @@ class UpdateOnlyFieldsTests(TestCase):
         s = Person.objects.get(pk=s.pk)
         self.assertEqual(s.gender, 'F')
         self.assertEqual(s.name, 'Ian')
+
+    def test_update_fields_defered(self):
+        s = Person.objects.create(name='Sara', gender='F', pid=22)
+        self.assertEqual(s.gender, 'F')
+            
+        s1 = Person.objects.defer("gender", "pid").get(pk=s.pk)
+        s1.name = "Emily"
+        s1.gender = "M"
+
+        with self.assertNumQueries(1):
+            s1.save()
+
+        s2 = Person.objects.get(pk=s1.pk)
+        self.assertEqual(s2.name, "Emily")
+        self.assertEqual(s2.gender, "M")
+
+    def test_update_fields_only_1(self):
+        s = Person.objects.create(name='Sara', gender='F')
+        self.assertEqual(s.gender, 'F')
+
+        s1 = Person.objects.only('name').get(pk=s.pk)
+        s1.name = "Emily"
+        s1.gender = "M"
+
+        with self.assertNumQueries(1):
+            s1.save()
+
+        s2 = Person.objects.get(pk=s1.pk)
+        self.assertEqual(s2.name, "Emily")
+        self.assertEqual(s2.gender, "M")
+
+    def test_update_fields_only_2(self):
+        s = Person.objects.create(name='Sara', gender='F', pid=22)
+        self.assertEqual(s.gender, 'F')
+
+        s1 = Person.objects.only('name').get(pk=s.pk)
+        s1.name = "Emily"
+        s1.gender = "M"
+
+        with self.assertNumQueries(2):
+            s1.save(update_fields=['pid'])
+
+        s2 = Person.objects.get(pk=s1.pk)
+        self.assertEqual(s2.name, "Sara")
+        self.assertEqual(s2.gender, "F")
 
     def test_update_fields_m2m(self):
         profile_boss = Profile.objects.create(name='Boss', salary=3000)
