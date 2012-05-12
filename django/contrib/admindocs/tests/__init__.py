@@ -1,9 +1,11 @@
+from __future__ import absolute_import
+
 from django.contrib.admindocs import views
 from django.db.models import fields as builtin_fields
 from django.utils import unittest
 from django.utils.translation import ugettext as _
 
-import fields
+from . import fields
 
 
 class TestFieldType(unittest.TestCase):
