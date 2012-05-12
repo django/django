@@ -270,6 +270,7 @@ class ModelState(object):
     """
     def __init__(self, db=None):
         self.db = db
+        self.deferred_fields = None
         # If true, uniqueness validation checks will consider this a new, as-yet-unsaved object.
         # Necessary for correct validation of new instances of objects with explicit (non-auto) PKs.
         # This impacts validation only; it has no effect on the actual save.
@@ -448,6 +449,7 @@ class Model(object):
         that the "save" must be an SQL insert or update (or equivalent for
         non-SQL backends), respectively. Normally, they should not be set.
         """
+        using = using or router.db_for_write(self.__class__, instance=self)
         if force_insert and (force_update or update_fields):
             raise ValueError("Cannot force both insert and updating in model saving.")
 
@@ -475,6 +477,21 @@ class Model(object):
                                  "model or are m2m fields: %s"
                                  % ', '.join(non_model_fields))
 
+        # If saving to the same database, and this model is deferred, then
+        # automatically do a "update_fields" save on the loaded fields.
+        elif not force_insert and self._deferred and using == self._state.db:
+            field_names = set([])
+            for field in self._meta.fields:
+                if not field.primary_key:
+                    field_names.add(field.name)
+
+                    if field.name != field.attname:
+                        field_names.add(field.attname)
+
+            loaded_fields = field_names.difference(self._state.deferred_fields)
+            if loaded_fields:
+                update_fields = frozenset(loaded_fields)
+
         self.save_base(using=using, force_insert=force_insert,
                        force_update=force_update, update_fields=update_fields)
     save.alters_data = True
@@ -487,7 +504,9 @@ class Model(object):
         need for overrides of save() to pass around internal-only parameters
         ('raw', 'cls', and 'origin').
         """
-        using = using or router.db_for_write(self.__class__, instance=self)
+        if raw:
+            using = using or router.db_for_write(self.__class__, instance=self)
+        assert using is not None
         assert not (force_insert and (force_update or update_fields))
         assert update_fields is None or len(update_fields) > 0
         if cls is None:
@@ -508,6 +527,7 @@ class Model(object):
         # attributes we have been given to the class we have been given.
         # We also go through this process to defer the save of proxy objects
         # to their actual underlying model.
+
         if not raw or meta.proxy:
             if meta.proxy:
                 org = cls

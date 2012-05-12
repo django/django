@@ -112,9 +112,13 @@ class DeferredAttribute(object):
         """
         instance.__dict__[self.field_name] = value
 
+        # If attr is modified, remove this field from defererd field list.
+        if instance._state.deferred_fields and self.field_name in instance._state.deferred_fields:
+            instance._state.deferred_fields.remove(self.field_name)
+
     def _check_parent_chain(self, instance, name):
         """
-        Check if the field value can be fetched from a parent field already 
+        Check if the field value can be fetched from a parent field already
         loaded in the instance. This can be done if the to-be fetched
         field is a primary key field.
         """
