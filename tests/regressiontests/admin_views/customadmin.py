@@ -24,6 +24,9 @@ class Admin2(admin.AdminSite):
     def index(self, request, extra_context=None):
         return super(Admin2, self).index(request, {'foo': '*bar*'})
 
+    def password_change(self, request, extra_context={'EXTRA_CONTEXT': 'this is some extra context'}):
+        return super(Admin2, self).password_change(request, extra_context)
+
     def get_urls(self):
         return patterns('',
             (r'^my_view/$', self.admin_view(self.my_view)),

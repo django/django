@@ -763,6 +763,13 @@ class CustomModelAdminTest(AdminViewBasicTest):
         self.assertTemplateUsed(request, 'custom_admin/password_change_form.html')
         self.assertTrue('Hello from a custom password change form template' in request.content)
 
+    def testCustomAdminSitePasswordChangeWithExtraContext(self):
+        "#17890: Test support for extra_context in password_change"
+        request = self.client.get('/test_admin/admin2/password_change/')
+        self.assertIsInstance(request, TemplateResponse)
+        self.assertTemplateUsed(request, 'custom_admin/password_change_form.html')
+        self.assertTrue('this is some extra context' in request.content)
+
     def testCustomAdminSitePasswordChangeDoneTemplate(self):
         request = self.client.get('/test_admin/admin2/password_change/done/')
         self.assertIsInstance(request, TemplateResponse)
