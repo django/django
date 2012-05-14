@@ -69,7 +69,7 @@ class MonthMixin(object):
             next = date.replace(year=date.year + 1, month=1, day=1)
         else:
             next = date.replace(month=date.month + 1, day=1)
-        return _get_next_prev_month(self, next, is_previous=False, use_first_day=True)
+        return _get_next_prev(self, next, is_previous=False, period='month')
 
     def get_previous_month(self, date):
         """
@@ -77,7 +77,7 @@ class MonthMixin(object):
         """
         # prev must be the last day of the previous month.
         prev = date.replace(day=1) - datetime.timedelta(days=1)
-        return _get_next_prev_month(self, prev, is_previous=True, use_first_day=True)
+        return _get_next_prev(self, prev, is_previous=True, period='month')
 
 
 class DayMixin(object):
@@ -109,14 +109,14 @@ class DayMixin(object):
         Get the next valid day.
         """
         next = date + datetime.timedelta(days=1)
-        return _get_next_prev_month(self, next, is_previous=False, use_first_day=False)
+        return _get_next_prev(self, next, is_previous=False, period='day')
 
     def get_previous_day(self, date):
         """
         Get the previous valid day.
         """
         prev = date - datetime.timedelta(days=1)
-        return _get_next_prev_month(self, prev, is_previous=True, use_first_day=False)
+        return _get_next_prev(self, prev, is_previous=True, period='day')
 
 
 class WeekMixin(object):
@@ -143,6 +143,30 @@ class WeekMixin(object):
                     raise Http404(_(u"No week specified"))
         return week
 
+    def get_next_week(self, date):
+        """
+        Get the next valid week.
+        """
+        # next must be the first day of the next week.
+        next = date + datetime.timedelta(days=7 - self._get_weekday(date))
+        return _get_next_prev(self, next, is_previous=False, period='week')
+
+    def get_previous_week(self, date):
+        """
+        Get the previous valid week.
+        """
+        # prev must be the last day of the previous week.
+        prev = date - datetime.timedelta(days=self._get_weekday(date) + 1)
+        return _get_next_prev(self, prev, is_previous=True, period='week')
+
+    def _get_weekday(self, date):
+        week_format = self.get_week_format()
+        if week_format == '%W':                 # week starts on Monday
+            return date.weekday()
+        elif week_format == '%U':               # week starts on Sunday
+            return (date.weekday() + 1) % 7
+        else:
+            raise ValueError("unknown week format: %s" % week_format)
 
 class DateMixin(object):
     """
@@ -428,7 +452,11 @@ class BaseWeekArchiveView(YearMixin, WeekMixin, BaseDateListView):
 
         qs = self.get_dated_queryset(**lookup_kwargs)
 
-        return (None, qs, {'week': date})
+        return (None, qs, {
+            'week': date,
+            'next_week': self.get_next_week(date),
+            'previous_week': self.get_previous_week(date),
+        })
 
 
 class WeekArchiveView(MultipleObjectTemplateResponseMixin, BaseWeekArchiveView):
@@ -557,7 +585,7 @@ def _date_from_string(year, year_format, month='', month_format='', day='', day_
         })
 
 
-def _get_next_prev_month(generic_view, naive_result, is_previous, use_first_day):
+def _get_next_prev(generic_view, naive_result, is_previous, period):
     """
     Helper: Get the next or the previous valid date. The idea is to allow
     links on month/day views to never be 404s by never providing a date
@@ -620,10 +648,15 @@ def _get_next_prev_month(generic_view, naive_result, is_previous, use_first_day)
             result = timezone.localtime(result)
         result = result.date()
 
-    # For month views, we always want to have a date that's the first of the
-    # month for consistency's sake.
-    if result and use_first_day:
-        result = result.replace(day=1)
+    if result:
+        if period == 'month':
+            # first day of the month
+            result = result.replace(day=1)
+        elif period == 'week':
+            # monday of the week
+            result = result - datetime.timedelta(days=generic_view._get_weekday(result))
+        elif period != 'day':
+            raise ValueError('invalid period: %s' % period)
 
     # Check against future dates.
     if result and (allow_future or result < datetime.date.today()):

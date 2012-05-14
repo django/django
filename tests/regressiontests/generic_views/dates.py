@@ -196,7 +196,7 @@ class MonthArchiveViewTests(TestCase):
         self.assertEqual(list(res.context['book_list']), [])
         self.assertEqual(res.context['month'], datetime.date(2000, 1, 1))
 
-        # Since it's allow empty, next/prev are allowed to be empty months (#7164)
+        # Since allow_empty=True, next/prev are allowed to be empty months (#7164)
         self.assertEqual(res.context['next_month'], datetime.date(2000, 2, 1))
         self.assertEqual(res.context['previous_month'], datetime.date(1999, 12, 1))
 
@@ -222,7 +222,7 @@ class MonthArchiveViewTests(TestCase):
         self.assertEqual(list(res.context['book_list']), [b])
         self.assertEqual(res.context['month'], future)
 
-        # Since it's allow_future but not allow_empty, next/prev are not
+        # Since allow_future = True but not allow_empty, next/prev are not
         # allowed to be empty months (#7164)
         self.assertEqual(res.context['next_month'], None)
         self.assertEqual(res.context['previous_month'], datetime.date(2008, 10, 1))
@@ -298,17 +298,35 @@ class WeekArchiveViewTests(TestCase):
         self.assertEqual(res.context['book_list'][0], Book.objects.get(pubdate=datetime.date(2008, 10, 1)))
         self.assertEqual(res.context['week'], datetime.date(2008, 9, 28))
 
+        # Since allow_empty=False, next/prev weeks must be valid
+        self.assertEqual(res.context['next_week'], None)
+        self.assertEqual(res.context['previous_week'], datetime.date(2006, 4, 30))
+
     def test_week_view_allow_empty(self):
+        # allow_empty = False, empty week
         res = self.client.get('/dates/books/2008/week/12/')
         self.assertEqual(res.status_code, 404)
 
+        # allow_empty = True, empty month
         res = self.client.get('/dates/books/2008/week/12/allow_empty/')
         self.assertEqual(res.status_code, 200)
         self.assertEqual(list(res.context['book_list']), [])
+        self.assertEqual(res.context['week'], datetime.date(2008, 3, 23))
+
+        # Since allow_empty=True, next/prev are allowed to be empty weeks
+        self.assertEqual(res.context['next_week'], datetime.date(2008, 3, 30))
+        self.assertEqual(res.context['previous_week'], datetime.date(2008, 3, 16))
+
+        # allow_empty but not allow_future: next_week should be empty
+        url = datetime.date.today().strftime('/dates/books/%Y/week/%U/allow_empty/').lower()
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.context['next_week'], None)
 
     def test_week_view_allow_future(self):
         # January 7th always falls in week 1, given Python's definition of week numbers
         future = datetime.date(datetime.date.today().year + 1, 1, 7)
+        future_sunday = future - datetime.timedelta(days=(future.weekday() + 1) % 7)
         b = Book.objects.create(name="The New New Testement", pages=600, pubdate=future)
 
         res = self.client.get('/dates/books/%s/week/1/' % future.year)
@@ -317,6 +335,19 @@ class WeekArchiveViewTests(TestCase):
         res = self.client.get('/dates/books/%s/week/1/allow_future/' % future.year)
         self.assertEqual(res.status_code, 200)
         self.assertEqual(list(res.context['book_list']), [b])
+        self.assertEqual(res.context['week'], future_sunday)
+
+        # Since allow_future = True but not allow_empty, next/prev are not
+        # allowed to be empty weeks
+        self.assertEqual(res.context['next_week'], None)
+        self.assertEqual(res.context['previous_week'], datetime.date(2008, 9, 28))
+
+        # allow_future, but not allow_empty, with a current week. So next
+        # should be in the future
+        res = self.client.get('/dates/books/2008/week/39/allow_future/')
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.context['next_week'], future_sunday)
+        self.assertEqual(res.context['previous_week'], datetime.date(2006, 4, 30))
 
     def test_week_view_paginated(self):
         week_start = datetime.date(2008, 9, 28)
