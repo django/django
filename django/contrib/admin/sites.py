@@ -256,7 +256,7 @@ class AdminSite(object):
     def urls(self):
         return self.get_urls(), self.app_name, self.name
 
-    def password_change(self, request):
+    def password_change(self, request, extra_context=None):
         """
         Handles the "change password" task -- both form display and validation.
         """
@@ -264,7 +264,8 @@ class AdminSite(object):
         url = reverse('admin:password_change_done', current_app=self.name)
         defaults = {
             'current_app': self.name,
-            'post_change_redirect': url
+            'post_change_redirect': url,
+            'extra_context': extra_context
         }
         if self.password_change_template is not None:
             defaults['template_name'] = self.password_change_template
