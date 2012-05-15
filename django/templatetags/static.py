@@ -1,5 +1,6 @@
 from urlparse import urljoin
 from django import template
+from django.template.base import kwarg_re, Node, TemplateSyntaxError
 from django.utils.encoding import iri_to_uri
 
 register = template.Library()
@@ -84,8 +85,27 @@ def get_media_prefix(parser, token):
     """
     return PrefixNode.handle_token(parser, token, "MEDIA_URL")
 
-@register.simple_tag
-def static(path):
+
+class StaticNode(Node):
+    def __init__(self, path, asvar):
+        self.path = path
+        self.asvar = asvar
+
+    def render(self, context):
+        from django.core.urlresolvers import reverse, NoReverseMatch
+        
+        path = self.path.resolve(context)
+        url = urljoin(PrefixNode.handle_simple("STATIC_URL"), path)
+
+        if self.asvar:
+            context[self.asvar] = url
+            return ''
+        
+        return url
+
+
+@register.tag
+def static(parser, token):
     """
     Joins the given path with the STATIC_URL setting.
 
@@ -97,6 +117,33 @@ def static(path):
 
         {% static "myapp/css/base.css" %}
         {% static variable_with_path %}
+        {% static variable_with_path as varname %}
 
     """
-    return urljoin(PrefixNode.handle_simple("STATIC_URL"), path)
+
+    bits = token.split_contents()
+
+    if len(bits) < 2:
+        raise TemplateSyntaxError("'%s' takes at least one argument"
+                                  " (path to a view)" % bits[0])
+    path = parser.compile_filter(bits[1])
+    asvar = None
+
+    if len(bits) >= 2 and bits[-2] == 'as':
+        asvar = bits[-1]
+        bits = bits[:-2]
+    
+    if len(bits) != 2:
+        raise TemplateSyntaxError("Too many arguments")
+
+    bit = bits[-1]
+    match = kwarg_re.match(bit)
+    if not match:
+        raise TemplateSyntaxError("Malformed arguments")
+    
+    name, value = match.groups()
+    if name:
+        raise TemplateSyntaxError("Malformed arguments, this tag not supports keyword args")
+    
+    path = parser.compile_filter(value)
+    return StaticNode(path, asvar)
