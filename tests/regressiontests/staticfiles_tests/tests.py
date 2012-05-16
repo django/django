@@ -10,7 +10,7 @@ from StringIO import StringIO
 
 from django.template import loader, Context
 from django.conf import settings
-from django.core.cache.backends.base import BaseCache, CacheKeyWarning
+from django.core.cache.backends.base import BaseCache
 from django.core.exceptions import ImproperlyConfigured
 from django.core.files.storage import default_storage
 from django.core.management import call_command
@@ -514,6 +514,44 @@ class TestCollectionCachedStorage(BaseCollectionTestCase,
         cache_validator.validate_key(cache_key)
         self.assertEqual(cache_key, 'staticfiles:e95bbc36387084582df2a70750d7b351')
 
+
+# we set DEBUG to False here since the template tag wouldn't work otherwise
+@override_settings(**dict(TEST_SETTINGS,
+    STATICFILES_STORAGE='regressiontests.staticfiles_tests.storage.SimpleCachedStaticFilesStorage',
+    DEBUG=False,
+))
+class TestCollectionSimpleCachedStorage(BaseCollectionTestCase,
+        BaseStaticFilesTestCase, TestCase):
+    """
+    Tests for the Cache busting storage
+    """
+    def cached_file_path(self, path):
+        fullpath = self.render_template(self.static_template_snippet(path))
+        return fullpath.replace(settings.STATIC_URL, '')
+
+    def test_template_tag_return(self):
+        """
+        Test the CachedStaticFilesStorage backend.
+        """
+        self.assertStaticRaises(ValueError,
+                                "does/not/exist.png",
+                                "/static/does/not/exist.png")
+        self.assertStaticRenders("test/file.txt",
+                                 "/static/test/file.deploy12345.txt")
+        self.assertStaticRenders("cached/styles.css",
+                                 "/static/cached/styles.deploy12345.css")
+        self.assertStaticRenders("path/",
+                                 "/static/path/")
+        self.assertStaticRenders("path/?query",
+                                 "/static/path/?query")
+
+    def test_template_tag_simple_content(self):
+        relpath = self.cached_file_path("cached/styles.css")
+        self.assertEqual(relpath, "cached/styles.deploy12345.css")
+        with storage.staticfiles_storage.open(relpath) as relfile:
+            content = relfile.read()
+            self.assertNotIn("cached/other.css", content)
+            self.assertIn("other.deploy12345.css", content)
 
 if sys.platform != 'win32':
 

@@ -348,6 +348,15 @@ CachedStaticFilesStorage
     :setting:`CACHES` setting named ``'staticfiles'``. It falls back to using
     the ``'default'`` cache backend.
 
+    .. method:: file_hash(name, content=None)
+
+    .. versionadded:: 1.5
+
+    The method that is used when creating the hashed name of a file.
+    Needs to return a hash for the given file name and content.
+    By default it calculates a MD5 hash from the content's chunks as
+    mentioned above.
+
 .. _`far future Expires headers`: http://developer.yahoo.com/performance/rules.html#expires
 .. _`@import`: http://www.w3.org/TR/CSS2/cascade.html#at-import
 .. _`url()`: http://www.w3.org/TR/CSS2/syndata.html#uri
