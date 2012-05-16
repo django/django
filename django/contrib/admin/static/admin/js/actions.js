@@ -124,7 +124,7 @@
 				}
 			}
 		});
-	}
+	};
 	/* Setup plugin defaults */
 	$.fn.actions.defaults = {
 		actionContainer: "div.actions",
@@ -135,5 +135,5 @@
 		acrossClears: "div.actions span.clear",
 		allToggle: "#action-toggle",
 		selectedClass: "selected"
-	}
+	};
 })(django.jQuery);
