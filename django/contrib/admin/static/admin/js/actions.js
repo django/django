@@ -81,7 +81,7 @@
 		});
 		lastChecked = null;
 		$(actionCheckboxes).click(function(event) {
-			if (!event) { var event = window.event; }
+			if (!event) { event = window.event; }
 			var target = event.target ? event.target : event.srcElement;
 			if (lastChecked && $.data(lastChecked) != $.data(target) && event.shiftKey == true) {
 				var inrange = false;
