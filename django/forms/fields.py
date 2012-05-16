@@ -932,12 +932,16 @@ class FilePathField(ChoiceField):
                             self.choices.append((f, f.replace(path, "", 1)))
                 if self.allow_folders:
                     for f in dirs:
+                        if f == '__pycache__':
+                            continue
                         if self.match is None or self.match_re.search(f):
                             f = os.path.join(root, f)
                             self.choices.append((f, f.replace(path, "", 1)))
         else:
             try:
                 for f in sorted(os.listdir(self.path)):
+                    if f == '__pycache__':
+                        continue
                     full_file = os.path.join(self.path, f)
                     if (((self.allow_files and os.path.isfile(full_file)) or
                         (self.allow_folders and os.path.isdir(full_file))) and
