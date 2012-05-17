@@ -446,6 +446,13 @@ class DayArchiveViewTests(TestCase):
         self.assertEqual(res.context['next_day'], future)
         self.assertEqual(res.context['previous_day'], datetime.date(2006, 5, 1))
 
+        # allow_future for yesterday, next_day is today (#17192)
+        today = datetime.date.today()
+        yesterday = today - datetime.timedelta(days=1)
+        res = self.client.get('/dates/books/%s/allow_empty_and_future/'
+                              % yesterday.strftime('%Y/%b/%d').lower())
+        self.assertEqual(res.context['next_day'], today)
+
     def test_day_view_paginated(self):
         res = self.client.get('/dates/books/2008/oct/1/')
         self.assertEqual(res.status_code, 200)
