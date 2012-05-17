@@ -79,14 +79,22 @@ class View(object):
         return handler(request, *args, **kwargs)
 
     def http_method_not_allowed(self, request, *args, **kwargs):
-        allowed_methods = [m for m in self.http_method_names if hasattr(self, m)]
         logger.warning('Method Not Allowed (%s): %s', request.method, request.path,
             extra={
                 'status_code': 405,
                 'request': self.request
             }
         )
-        return http.HttpResponseNotAllowed(allowed_methods)
+        return http.HttpResponseNotAllowed(self._allowed_methods())
+
+    def options(self, request, *args, **kwargs):
+        response = http.HttpResponse()
+        response['Allow'] = ', '.join(self._allowed_methods())
+        response['Content-Length'] = 0
+        return response
+
+    def _allowed_methods(self):
+        return [m.upper() for m in self.http_method_names if hasattr(self, m)]
 
 
 class TemplateResponseMixin(object):

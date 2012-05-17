@@ -173,6 +173,58 @@ class ViewTest(unittest.TestCase):
         """
         self.assertTrue(DecoratedDispatchView.as_view().is_decorated)
 
+    def test_head_no_get(self):
+        """
+        Test that a view class with no get responds to a HEAD request with HTTP
+        405.
+        """
+        request = self.rf.head('/')
+        view = PostOnlyView.as_view()
+        self.assertEqual(405, view(request).status_code)
+
+    def test_options(self):
+        """
+        Test that views respond to HTTP OPTIONS requests with an Allow header
+        appropriate for the methods implemented by the view class.
+        """
+        request = self.rf.options('/')
+        view = SimpleView.as_view()
+        response = view(request)
+        self.assertEqual(200, response.status_code)
+        self.assertTrue(response['Allow'])
+
+    def test_options_for_get_view(self):
+        """
+        Test that a view implementing GET allows GET and HEAD.
+        """
+        request = self.rf.options('/')
+        view = SimpleView.as_view()
+        response = view(request)
+        self._assert_allows(response, 'GET', 'HEAD')
+
+    def test_options_for_get_and_post_view(self):
+        """
+        Test that a view implementing GET and POST allows GET, HEAD, and POST.
+        """
+        request = self.rf.options('/')
+        view = SimplePostView.as_view()
+        response = view(request)
+        self._assert_allows(response, 'GET', 'HEAD', 'POST')
+
+    def test_options_for_post_view(self):
+        """
+        Test that a view implementing POST allows POST.
+        """
+        request = self.rf.options('/')
+        view = PostOnlyView.as_view()
+        response = view(request)
+        self._assert_allows(response, 'POST')
+
+    def _assert_allows(self, response, *expected_methods):
+        "Assert allowed HTTP methods reported in the Allow response header"
+        response_allows = set(response['Allow'].split(', '))
+        self.assertEqual(set(expected_methods + ('OPTIONS',)), response_allows)
+
 
 class TemplateViewTest(TestCase):
     urls = 'regressiontests.generic_views.urls'
