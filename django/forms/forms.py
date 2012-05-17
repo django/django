@@ -74,7 +74,7 @@ class BaseForm(StrAndUnicode):
     # class, not to the Form class.
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
                  initial=None, error_class=ErrorList, label_suffix=':',
-                 empty_permitted=False):
+                 empty_permitted=False, bound_field_class=BoundField):
         self.is_bound = data is not None or files is not None
         self.data = data or {}
         self.files = files or {}
@@ -86,6 +86,7 @@ class BaseForm(StrAndUnicode):
         self.empty_permitted = empty_permitted
         self._errors = None # Stores the errors after clean() has been called.
         self._changed_data = None
+        self.bound_field_class = bound_field_class
 
         # The base_fields class attribute is the *class-wide* definition of
         # fields. Because a particular *instance* of the class might want to
@@ -107,7 +108,7 @@ class BaseForm(StrAndUnicode):
             field = self.fields[name]
         except KeyError:
             raise KeyError('Key %r not found in Form' % name)
-        return BoundField(self, field, name)
+        return bound_field_class(self, field, name)
 
     def _get_errors(self):
         "Returns an ErrorDict for the data provided for the form"
