@@ -1,5 +1,6 @@
 from django.core.paginator import Paginator, InvalidPage
 from django.core.exceptions import ImproperlyConfigured
+from django.db.models.query import QuerySet
 from django.http import Http404
 from django.utils.encoding import smart_str
 from django.utils.translation import ugettext as _
@@ -76,7 +77,7 @@ class MultipleObjectMixin(ContextMixin):
         """
         if self.context_object_name:
             return self.context_object_name
-        elif hasattr(object_list, 'model'):
+        elif isinstance(object_list, QuerySet):
             return smart_str('%s_list' % object_list.model._meta.object_name.lower())
         else:
             return None
@@ -149,7 +150,7 @@ class MultipleObjectTemplateResponseMixin(TemplateResponseMixin):
         # app and model name. This name gets put at the end of the template
         # name list so that user-supplied names override the automatically-
         # generated ones.
-        if hasattr(self.object_list, 'model'):
+        if isinstance(self.object_list, QuerySet):
             opts = self.object_list.model._meta
             names.append("%s/%s%s.html" % (opts.app_label, opts.object_name.lower(), self.template_name_suffix))
 

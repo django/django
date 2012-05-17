@@ -52,6 +52,8 @@ urlpatterns = patterns('',
         views.AuthorDetail.as_view()),
     (r'^detail/author/invalid/qs/$',
         views.AuthorDetail.as_view(queryset=None)),
+    (r'^detail/nonmodel/1/$',
+        views.NonModelDetail.as_view()),
 
     # Create/UpdateView
     (r'^edit/artists/create/$',
@@ -144,6 +146,9 @@ urlpatterns = patterns('',
         views.AuthorList.as_view(paginate_by=5, paginator_class=views.CustomPaginator)),
     (r'^list/authors/paginated/custom_constructor/$',
         views.AuthorListCustomPaginator.as_view()),
+    (r'^list/nonqueryset/$',
+        views.NonQuerySetList.as_view()),
+
 
     # YearArchiveView
     # Mixing keyword and possitional captures below is intentional; the views

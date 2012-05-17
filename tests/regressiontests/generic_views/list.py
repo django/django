@@ -174,3 +174,6 @@ class ListViewTests(TestCase):
         for i in range(n):
             Author.objects.create(name='Author %02i' % i, slug='a%s' % i)
 
+    def test_non_queryset_list(self):
+        res = self.client.get('/list/nonqueryset/')
+        self.assertEqual(res.status_code, 200)
