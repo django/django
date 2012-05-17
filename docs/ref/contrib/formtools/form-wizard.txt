@@ -186,6 +186,7 @@ Here's a full example template:
 .. code-block:: html+django
 
     {% extends "base.html" %}
+    {% load i18n %}
 
     {% block head %}
     {{ wizard.form.media }}
