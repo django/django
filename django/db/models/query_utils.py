@@ -109,6 +109,10 @@ class DeferredAttribute(object):
         never be a database lookup involved.
         """
         instance.__dict__[self.field_name] = value
+        
+        # If attr is modified, remove this field from defererd field list.
+        if instance._meta.deferred_fields and self.field_name in instance._meta.deferred_fields:
+            instance._meta.deferred_fields.remove(self.field_name)
 
 def select_related_descend(field, restricted, requested, reverse=False):
     """
@@ -149,6 +153,7 @@ def deferred_class_factory(model, attrs):
     class Meta:
         proxy = True
         app_label = model._meta.app_label
+        deferred_fields = set(attrs)
 
     # The app_cache wants a unique name for each model, otherwise the new class
     # won't be created (we get an old one back). Therefore, we generate the

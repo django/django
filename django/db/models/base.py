@@ -479,6 +479,14 @@ class Model(object):
                                  "model or are m2m fields: %s"
                                  % ', '.join(non_model_fields))
 
+        elif self._meta.deferred_fields:
+            field_names = set([field.name for field in self._meta.fields 
+                                if not field.primary_key])
+            non_deferred_fields = field_names.difference(self._meta.deferred_fields)
+
+            if non_deferred_fields:
+                update_fields = frozenset(non_deferred_fields)
+
         self.save_base(using=using, force_insert=force_insert,
                        force_update=force_update, update_fields=update_fields)
     save.alters_data = True

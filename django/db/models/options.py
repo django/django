@@ -17,7 +17,7 @@ get_verbose_name = lambda class_name: re.sub('(((?<=[a-z])[A-Z])|([A-Z](?![A-Z]|
 DEFAULT_NAMES = ('verbose_name', 'verbose_name_plural', 'db_table', 'ordering',
                  'unique_together', 'permissions', 'get_latest_by',
                  'order_with_respect_to', 'app_label', 'db_tablespace',
-                 'abstract', 'managed', 'proxy', 'auto_created')
+                 'abstract', 'managed', 'proxy', 'auto_created', 'deferred_fields')
 
 class Options(object):
     def __init__(self, meta, app_label=None):
@@ -53,6 +53,7 @@ class Options(object):
         self.parents = SortedDict()
         self.duplicate_targets = {}
         self.auto_created = False
+        self.deferred_fields = None
 
         # To handle various inheritance situations, we need to track where
         # managers came from (concrete or abstract base classes).
