@@ -1,4 +1,3 @@
-import time
 from datetime import datetime, timedelta
 try:
     import cPickle as pickle
@@ -6,7 +5,6 @@ except ImportError:
     import pickle
 
 from django.conf import settings
-from django.core.exceptions import SuspiciousOperation
 from django.utils.crypto import get_random_string
 from django.utils.crypto import salted_hmac
 from django.utils import timezone
