@@ -1,4 +1,3 @@
-import base64
 import time
 from datetime import datetime, timedelta
 try:
@@ -8,10 +7,10 @@ except ImportError:
 
 from django.conf import settings
 from django.core.exceptions import SuspiciousOperation
-from django.utils.crypto import constant_time_compare
 from django.utils.crypto import get_random_string
 from django.utils.crypto import salted_hmac
 from django.utils import timezone
+from django.core import signing
 
 class CreateError(Exception):
     """
@@ -31,6 +30,7 @@ class SessionBase(object):
         self._session_key = session_key
         self.accessed = False
         self.modified = False
+        self.signer = signing.TimestampSigner()
 
     def __contains__(self, key):
         return key in self._session
@@ -76,23 +76,20 @@ class SessionBase(object):
 
     def encode(self, session_dict):
         "Returns the given session dictionary pickled and encoded as a string."
-        pickled = pickle.dumps(session_dict, pickle.HIGHEST_PROTOCOL)
-        hash = self._hash(pickled)
-        return base64.encodestring(hash + ":" + pickled)
+        serialized = pickle.dumps(session_dict)
+        return self.signer.sign(serialized)
 
     def decode(self, session_data):
-        encoded_data = base64.decodestring(session_data)
         try:
-            # could produce ValueError if there is no ':'
-            hash, pickled = encoded_data.split(':', 1)
-            expected_hash = self._hash(pickled)
-            if not constant_time_compare(hash, expected_hash):
-                raise SuspiciousOperation("Session data corrupted")
-            else:
-                return pickle.loads(pickled)
+            serialized = str(self.signer.unsign(session_data,
+                                                settings.SESSION_COOKIE_AGE))
+            return pickle.loads(serialized)
+
         except Exception:
-            # ValueError, SuspiciousOperation, unpickling exceptions. If any of
-            # these happen, just return an empty dictionary (an empty session).
+            # ValueError, SuspiciousOperation, BadSignature, unpickling
+            # exceptions. If any of these happen, just return an empty
+            # dictionary (an empty session).
+            self.modified = True
             return {}
 
     def update(self, dict_):
