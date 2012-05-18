@@ -8,6 +8,9 @@ See also http://www.aryehleib.com/MutableLists.html
 
 Author: Aryeh Leib Taurog.
 """
+from django.utils.functional import total_ordering
+
+@total_ordering
 class ListMixin(object):
     """
     A base class which provides complete list interface.
@@ -143,20 +146,28 @@ class ListMixin(object):
                 self.extend(cache)
         return self
 
-    def __cmp__(self, other):
-        'cmp'
+    def __eq__(self, other):
+        for i in range(len(self)):
+            try:
+                c = self[i] == other[i]
+            except IndexError:
+                # must be other is shorter
+                return False
+            if not c:
+                return False
+        return True
+
+    def __lt__(self, other):
         slen = len(self)
         for i in range(slen):
             try:
-                c = cmp(self[i], other[i])
+                c = self[i] < other[i]
             except IndexError:
                 # must be other is shorter
-                return 1
-            else:
-                # elements not equal
-                if c: return c
-
-        return cmp(slen, len(other))
+                return False
+            if c:
+                return c
+        return slen < len(other)
 
     ### Public list interface Methods ###
     ## Non-mutating ##

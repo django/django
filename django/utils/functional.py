@@ -58,6 +58,7 @@ def lazy(func, *resultclasses):
     function is evaluated on every access.
     """
 
+    @total_ordering
     class __proxy__(Promise):
         """
         Encapsulate a function call and act as a proxy for methods that are
@@ -124,17 +125,23 @@ def lazy(func, *resultclasses):
         def __str_cast(self):
             return str(func(*self.__args, **self.__kw))
 
-        def __cmp__(self, rhs):
+        def __cast(self):
             if self._delegate_str:
-                s = str(func(*self.__args, **self.__kw))
+                return self.__str_cast()
             elif self._delegate_unicode:
-                s = unicode(func(*self.__args, **self.__kw))
+                return self.__unicode_cast()
             else:
-                s = func(*self.__args, **self.__kw)
-            if isinstance(rhs, Promise):
-                return -cmp(rhs, s)
-            else:
-                return cmp(s, rhs)
+                return func(*self.__args, **self.__kw)
+
+        def __eq__(self, other):
+            if isinstance(other, Promise):
+                other = other.__cast()
+            return self.__cast() == other
+
+        def __lt__(self, other):
+            if isinstance(other, Promise):
+                other = other.__cast()
+            return self.__cast() < other
 
         def __mod__(self, rhs):
             if self._delegate_str:

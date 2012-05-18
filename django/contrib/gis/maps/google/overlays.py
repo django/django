@@ -1,5 +1,7 @@
-from django.utils.safestring import mark_safe
 from django.contrib.gis.geos import fromstr, Point, LineString, LinearRing, Polygon
+from django.utils.functional import total_ordering
+from django.utils.safestring import mark_safe
+
 
 class GEvent(object):
     """
@@ -166,6 +168,7 @@ class GPolyline(GOverlayBase):
         return '%s, "%s", %s, %s' % (self.latlngs, self.color, self.weight, self.opacity)
 
 
+@total_ordering
 class GIcon(object):
     """
     Creates a GIcon object to pass into a Gmarker object.
@@ -231,8 +234,11 @@ class GIcon(object):
         self.iconanchor = iconanchor
         self.infowindowanchor = infowindowanchor
 
-    def __cmp__(self, other):
-        return cmp(self.varname, other.varname)
+    def __eq__(self, other):
+        return self.varname == other.varname
+
+    def __lt__(self, other):
+        return self.varname < other.varname
     
     def __hash__(self):
         # XOR with hash of GIcon type so that hash('varname') won't 
