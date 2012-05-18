@@ -24,8 +24,9 @@ class TestTransactionClosing(TransactionTestCase):
         @commit_on_success
         def raw_sql():
             "Write a record using raw sql under a commit_on_success decorator"
-            cursor = connection.cursor()
-            cursor.execute("INSERT into transactions_regress_mod (id,fld) values (17,18)")
+            with connection.ops.identity_insert_enabled('transactions_regress_mod'):
+                cursor = connection.cursor()
+                cursor.execute("INSERT into transactions_regress_mod (id,fld) values (17,18)")
 
         raw_sql()
         # Rollback so that if the decorator didn't commit, the record is unwritten
@@ -115,10 +116,11 @@ class TestTransactionClosing(TransactionTestCase):
             (reference). All this under commit_on_success, so the second insert should
             be committed.
             """
-            cursor = connection.cursor()
-            cursor.execute("INSERT into transactions_regress_mod (id,fld) values (1,2)")
-            transaction.rollback()
-            cursor.execute("INSERT into transactions_regress_mod (id,fld) values (1,2)")
+            with connection.ops.identity_insert_enabled('transactions_regress_mod'):
+                cursor = connection.cursor()
+                cursor.execute("INSERT into transactions_regress_mod (id,fld) values (1,2)")
+                transaction.rollback()
+                cursor.execute("INSERT into transactions_regress_mod (id,fld) values (1,2)")
 
         reuse_cursor_ref()
         # Rollback so that if the decorator didn't commit, the record is unwritten

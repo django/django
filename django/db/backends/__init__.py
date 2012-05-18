@@ -876,6 +876,33 @@ class BaseDatabaseOperations(object):
         conn = ' %s ' % connector
         return conn.join(sub_expressions)
 
+    @contextmanager
+    def identity_insert_enabled(self, table):
+        enabled = self.enable_identity_insert(table)        
+        try:
+            yield
+        finally:
+            if enabled:
+                self.disable_identity_insert(table)
+
+    def enable_identity_insert(self, table):
+        """
+        Backends can implement as needed to enable inserts in to
+        the identity column.
+        
+        Should return True if identity inserts have been enabled.
+        """
+        pass
+    
+    def disable_identity_insert(self, table):
+        """
+        Backends can implement as needed to disable inserts in to
+        the identity column.
+        
+        Should return True if identity inserts have been disabled.
+        """
+        pass
+
 class BaseDatabaseIntrospection(object):
     """
     This class encapsulates all backend-specific introspection utilities
