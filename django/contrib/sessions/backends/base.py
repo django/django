@@ -26,6 +26,10 @@ class SessionBase(object):
     TEST_COOKIE_NAME = 'testcookie'
     TEST_COOKIE_VALUE = 'worked'
 
+    # Session_key should not be case sensitive because some backends can store
+    # it on case insensitive file systems.
+    VALID_KEY_CHARS = "abcdefghijklmnopqrstuvwxyz0123456789"
+
     def __init__(self, session_key=None):
         self._session_key = session_key
         self.accessed = False
@@ -127,12 +131,8 @@ class SessionBase(object):
 
     def _get_new_session_key(self):
         "Returns session key that isn't being used."
-        # Todo: move to 0-9a-z charset in 1.5
-        hex_chars = '1234567890abcdef'
-        # session_key should not be case sensitive because some backends
-        # can store it on case insensitive file systems.
         while True:
-            session_key = get_random_string(32, hex_chars)
+            session_key = get_random_string(32, self.VALID_KEY_CHARS)
             if not self.exists(session_key):
                 break
         return session_key
