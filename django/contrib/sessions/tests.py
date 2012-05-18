@@ -352,6 +352,21 @@ class FileSessionTests(SessionTestsMixin, unittest.TestCase):
         self.assertRaises(SuspiciousOperation,
                           self.backend("a/b/c").load)
 
+    # This test fails with cookie (which is fine I suppose) and cache backends,
+    # thats why added it to file tests only.
+    @override_settings(SESSION_COOKIE_AGE=0)
+    def test_onload_expiry_check(self):
+        """
+        Test to ensure that expiry of session is checked on-load
+        """
+
+        # Setup a test cookie
+        self.session.set_test_cookie()
+        self.assertTrue(self.session.test_cookie_worked())
+
+        self.session.load()
+        # The test data should be absent now, as the cookie age is 0
+        self.assertFalse(self.session.test_cookie_worked())
 
 class CacheSessionTests(SessionTestsMixin, unittest.TestCase):
 
