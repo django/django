@@ -72,6 +72,10 @@ class SessionStore(SessionBase):
         except Session.DoesNotExist:
             pass
 
+    @classmethod
+    def cleanup(cls):
+        Session.objects.filter(expire_date__lt=timezone.now()).delete()
+        transaction.commit_unless_managed()
 
 # At bottom to avoid circular import
 from django.contrib.sessions.models import Session

@@ -140,3 +140,18 @@ class SessionStore(SessionBase):
 
     def clean(self):
         pass
+
+    @classmethod
+    def cleanup(cls):
+        storage_path = getattr(settings, "SESSION_FILE_PATH", tempfile.gettempdir())
+        file_prefix = settings.SESSION_COOKIE_NAME
+
+        # Get all file sessions stored
+        sessions = [cls(session_file[len(file_prefix):])
+                        for session_file in os.listdir(storage_path)
+                        if session_file.startswith(file_prefix)]
+
+        # Cleanup all empty sessions
+        for session in sessions:
+            if not session.load():
+                session.delete()
