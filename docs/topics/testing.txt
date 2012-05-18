@@ -1129,19 +1129,44 @@ behavior, you should use a Django ``TransactionTestCase``.
 ``TransactionTestCase`` and ``TestCase`` are identical except for the manner
 in which the database is reset to a known state and the ability for test code
 to test the effects of commit and rollback. A ``TransactionTestCase`` resets
-the database before the test runs by truncating all tables and reloading
-initial data. A ``TransactionTestCase`` may call commit and rollback and
-observe the effects of these calls on the database.
+the database after the test runs by truncating all tables. A
+``TransactionTestCase`` may call commit and rollback and observe the effects
+of these calls on the database.
 
-A ``TestCase``, on the other hand, does not truncate tables and reload initial
-data at the beginning of a test. Instead, it encloses the test code in a
-database transaction that is rolled back at the end of the test.  It also
-prevents the code under test from issuing any commit or rollback operations
-on the database, to ensure that the rollback at the end of the test restores
-the database to its initial state. In order to guarantee that all ``TestCase``
-code starts with a clean database, the Django test runner runs all ``TestCase``
-tests first, before any other tests (e.g. doctests) that may alter the
-database without restoring it to its original state.
+A ``TestCase``, on the other hand, does not truncate tables after a test.
+Instead, it encloses the test code in a database transaction that is rolled
+back at the end of the test.  It also prevents the code under test from issuing
+any commit or rollback operations on the database, to ensure that the rollback
+at the end of the test restores the database to its initial state. In order to
+guarantee that all ``TestCase`` code starts with a clean database, the Django
+test runner runs all unittests tests first, before any other tests (e.g.
+doctests) that may alter the database without restoring it to its original
+state.
+
+.. note::
+    .. versionchanged:: 1.5
+
+    Prior to 1.5, ``TransactionTestCase`` flushed the database tables *before*
+    each test. In Django 1.5, this is instead done *after* the test has been run.
+
+    When the flush took place before the test, it was guaranteed that primary
+    keys started at 1 in :class:`~django.test.TransactionTestCase` tests.
+
+    Tests should not depend on this behaviour, but for legacy tests that do, the
+    :attr:`~TransactionTestCase.reset_sequences` attribute can be used until
+    the test has been properly updated.
+
+    The order of tests has also changed, before Django 1.5,
+    :class:`~django.test.TestCase` tests always ran first, before any other
+    tests. All unittests (including :class:`~django.utils.unittest.TestCase`,
+    :class:`~django.test.SimpleTestCase`, :class:`~django.test.TestCase` and
+    :class:`~django.test.TransactionTestCase`) are now runned before any
+    doctests.
+
+    doctests that depended on state that was left in the database from a
+    :class:`~django.test.TransactionTestCase` test must be updated to be able
+    to run independently.
+
 
 When running on a database that does not support rollback (e.g. MySQL with the
 MyISAM storage engine), ``TestCase`` falls back to initializing the database
@@ -1160,6 +1185,27 @@ by truncating tables and reloading initial data.
     quick fix is to switch the ``TestCase`` to a ``TransactionTestCase``.
     A better long-term fix, that allows the test to take advantage of the
     speed benefit of ``TestCase``, is to fix the underlying test problem.
+
+.. attribute:: TransactionTestCase.reset_sequences
+
+.. versionadded:: 1.5
+
+Setting ``reset_sequences = True`` on a ``TransactionTestCase`` will make
+sure sequences are always reset before the test run::
+
+    class TestsThatDependsOnPrimaryKeySequences(TransactionTestCase):
+        reset_sequences = True
+
+        def test_animal_pk(self):
+            lion = Animal.objects.create(name="lion", sound="roar")
+            # lion.pk is guaranteed to always be 1
+            self.assertEqual(lion.pk, 1)
+
+Unless you are explicitly testing primary keys sequence numbers, it is
+recommended that you do not hard code primary key values in tests.
+
+Using ``reset_sequences = True`` will slow down the test, since the primary
+key reset is an relatively expensive database operation.
 
 .. class:: SimpleTestCase()
 
