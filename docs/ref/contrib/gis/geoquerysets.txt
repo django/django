@@ -941,7 +941,7 @@ of the geometry field in each model converted to the requested output format.
 ``geohash``
 ~~~~~~~~~~~
 
-.. method:: GeoQuerySet.geohash(preceision=20, **kwargs)
+.. method:: GeoQuerySet.geohash(precision=20, **kwargs)
 
 .. versionadded:: 1.2
 
