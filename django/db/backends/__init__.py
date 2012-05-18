@@ -414,10 +414,11 @@ class BaseDatabaseFeatures(object):
 
     def confirm(self):
         "Perform manual checks of any database features that might vary between installs"
-        self._confirmed = True
-        self.supports_transactions = self._supports_transactions()
-        self.supports_stddev = self._supports_stddev()
-        self.can_introspect_foreign_keys = self._can_introspect_foreign_keys()
+        if not self._confirmed:
+            self._confirmed = True
+            self.supports_transactions = self._supports_transactions()
+            self.supports_stddev = self._supports_stddev()
+            self.can_introspect_foreign_keys = self._can_introspect_foreign_keys()
 
     def _supports_transactions(self):
         "Confirm support for transactions"
@@ -439,8 +440,9 @@ class BaseDatabaseFeatures(object):
 
         try:
             self.connection.ops.check_aggregate_support(StdDevPop())
+            return True
         except NotImplementedError:
-            self.supports_stddev = False
+            return False
 
     def _can_introspect_foreign_keys(self):
         "Confirm support for introspected foreign keys"
