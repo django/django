@@ -8,6 +8,7 @@ import hashlib
 import binascii
 import operator
 import time
+from functools import reduce
 
 # Use the system PRNG if possible
 import random
