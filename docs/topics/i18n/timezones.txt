@@ -656,7 +656,7 @@ Usage
        >>> from django.utils.dateparse import parse_datetime
        >>> naive = parse_datetime("2012-02-21 10:28:45")
        >>> import pytz
-       >>> pytz.timezone("Europe/Helsinki").localize(naive)
+       >>> pytz.timezone("Europe/Helsinki").localize(naive, is_dst=None)
        datetime.datetime(2012, 2, 21, 10, 28, 45, tzinfo=<DstTzInfo 'Europe/Helsinki' EET+2:00:00 STD>)
 
    Note that ``localize`` is a pytz extension to the :class:`~datetime.tzinfo`
