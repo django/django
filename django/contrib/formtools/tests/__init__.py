@@ -156,9 +156,6 @@ class PreviewTests(TestCase):
 
 
 class FormHmacTests(unittest.TestCase):
-    """
-    Same as SecurityHashTests, but with form_hmac
-    """
 
     def test_textfield_hash(self):
         """
@@ -166,8 +163,8 @@ class FormHmacTests(unittest.TestCase):
         leading/trailing whitespace so as to be friendly to broken browsers that
         submit it (usually in textareas).
         """
-        f1 = HashTestForm({'name': 'joe', 'bio': 'Nothing notable.'})
-        f2 = HashTestForm({'name': '  joe', 'bio': 'Nothing notable.  '})
+        f1 = HashTestForm({'name': u'joe', 'bio': u'Nothing notable.'})
+        f2 = HashTestForm({'name': u'  joe', 'bio': u'Nothing notable.  '})
         hash1 = utils.form_hmac(f1)
         hash2 = utils.form_hmac(f2)
         self.assertEqual(hash1, hash2)
