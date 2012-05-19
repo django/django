@@ -106,7 +106,7 @@ class ModelFormCallableModelDefault(TestCase):
 class FormsModelTestCase(TestCase):
     def test_unicode_filename(self):
         # FileModel with unicode filename and data #########################
-        f = FileForm(data={}, files={'file1': SimpleUploadedFile('我隻氣墊船裝滿晒鱔.txt', 'मेरी मँडराने वाली नाव सर्पमीनों से भरी ह')}, auto_id=False)
+        f = FileForm(data={}, files={'file1': SimpleUploadedFile('我隻氣墊船裝滿晒鱔.txt', u'मेरी मँडराने वाली नाव सर्पमीनों से भरी ह'.encode('utf-8'))}, auto_id=False)
         self.assertTrue(f.is_valid())
         self.assertTrue('file1' in f.cleaned_data)
         m = FileModel.objects.create(file=f.cleaned_data['file1'])
@@ -177,7 +177,7 @@ class RelatedModelFormTests(TestCase):
         class Meta:
             model=A
 
-        self.assertRaises(ValueError, ModelFormMetaclass, 'Form', (ModelForm,), {'Meta': Meta})
+        self.assertRaises(ValueError, ModelFormMetaclass, b'Form', (ModelForm,), {'Meta': Meta})
 
         class B(models.Model):
             pass
@@ -195,4 +195,4 @@ class RelatedModelFormTests(TestCase):
         class Meta:
             model=A
 
-        self.assertTrue(issubclass(ModelFormMetaclass('Form', (ModelForm,), {'Meta': Meta}), ModelForm))
+        self.assertTrue(issubclass(ModelFormMetaclass(b'Form', (ModelForm,), {'Meta': Meta}), ModelForm))

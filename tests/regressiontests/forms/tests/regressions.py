@@ -54,10 +54,11 @@ class FormsRegressionsTestCase(TestCase):
 
         # Testing choice validation with UTF-8 bytestrings as input (these are the
         # Russian abbreviations "мес." and "шт.".
-        UNITS = (('\xd0\xbc\xd0\xb5\xd1\x81.', '\xd0\xbc\xd0\xb5\xd1\x81.'), ('\xd1\x88\xd1\x82.', '\xd1\x88\xd1\x82.'))
+        UNITS = ((b'\xd0\xbc\xd0\xb5\xd1\x81.', b'\xd0\xbc\xd0\xb5\xd1\x81.'),
+                 (b'\xd1\x88\xd1\x82.', b'\xd1\x88\xd1\x82.'))
         f = ChoiceField(choices=UNITS)
         self.assertEqual(f.clean(u'\u0448\u0442.'), u'\u0448\u0442.')
-        self.assertEqual(f.clean('\xd1\x88\xd1\x82.'), u'\u0448\u0442.')
+        self.assertEqual(f.clean(b'\xd1\x88\xd1\x82.'), u'\u0448\u0442.')
 
         # Translated error messages used to be buggy.
         with override('ru'):

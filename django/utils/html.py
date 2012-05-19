@@ -116,7 +116,7 @@ def smart_urlquote(url):
     # contains a % not followed by two hexadecimal digits. See #9655.
     if '%' not in url or unquoted_percents_re.search(url):
         # See http://bugs.python.org/issue2637
-        url = urllib.quote(smart_str(url), safe='!*\'();:@&=+$,/?#[]~')
+        url = urllib.quote(smart_str(url), safe=b'!*\'();:@&=+$,/?#[]~')
 
     return force_unicode(url)
 

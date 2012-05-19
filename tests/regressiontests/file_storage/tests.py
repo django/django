@@ -127,7 +127,7 @@ class FileStorageTests(unittest.TestCase):
         """
         self.assertFalse(self.storage.exists('test.file'))
 
-        f = ContentFile('custom contents')
+        f = ContentFile(b'custom contents')
         f_name = self.storage.save('test.file', f)
         atime = self.storage.accessed_time(f_name)
 
@@ -143,7 +143,7 @@ class FileStorageTests(unittest.TestCase):
         """
         self.assertFalse(self.storage.exists('test.file'))
 
-        f = ContentFile('custom contents')
+        f = ContentFile(b'custom contents')
         f_name = self.storage.save('test.file', f)
         ctime = self.storage.created_time(f_name)
 
@@ -160,7 +160,7 @@ class FileStorageTests(unittest.TestCase):
         """
         self.assertFalse(self.storage.exists('test.file'))
 
-        f = ContentFile('custom contents')
+        f = ContentFile(b'custom contents')
         f_name = self.storage.save('test.file', f)
         mtime = self.storage.modified_time(f_name)
 
@@ -177,7 +177,7 @@ class FileStorageTests(unittest.TestCase):
         """
         self.assertFalse(self.storage.exists('test.file'))
 
-        f = ContentFile('custom contents')
+        f = ContentFile(b'custom contents')
         f.name = 'test.file'
 
         storage_f_name = self.storage.save(None, f)
@@ -194,11 +194,11 @@ class FileStorageTests(unittest.TestCase):
         """
         self.assertFalse(self.storage.exists('path/to'))
         self.storage.save('path/to/test.file',
-            ContentFile('file saved with path'))
+            ContentFile(b'file saved with path'))
 
         self.assertTrue(self.storage.exists('path/to'))
         self.assertEqual(self.storage.open('path/to/test.file').read(),
-            'file saved with path')
+            b'file saved with path')
 
         self.assertTrue(os.path.exists(
             os.path.join(self.temp_dir, 'path', 'to', 'test.file')))
@@ -211,7 +211,7 @@ class FileStorageTests(unittest.TestCase):
         """
         self.assertFalse(self.storage.exists('test.file'))
 
-        f = ContentFile('custom contents')
+        f = ContentFile(b'custom contents')
         f_name = self.storage.save('test.file', f)
 
         self.assertEqual(self.storage.path(f_name),
@@ -246,8 +246,8 @@ class FileStorageTests(unittest.TestCase):
         self.assertFalse(self.storage.exists('storage_test_2'))
         self.assertFalse(self.storage.exists('storage_dir_1'))
 
-        f = self.storage.save('storage_test_1', ContentFile('custom content'))
-        f = self.storage.save('storage_test_2', ContentFile('custom content'))
+        f = self.storage.save('storage_test_1', ContentFile(b'custom content'))
+        f = self.storage.save('storage_test_2', ContentFile(b'custom content'))
         os.mkdir(os.path.join(self.temp_dir, 'storage_dir_1'))
 
         dirs, files = self.storage.listdir('')
@@ -304,18 +304,18 @@ class FileStorageTests(unittest.TestCase):
             os.makedirs = fake_makedirs
 
             self.storage.save('normal/test.file',
-                ContentFile('saved normally'))
+                ContentFile(b'saved normally'))
             self.assertEqual(self.storage.open('normal/test.file').read(),
-                'saved normally')
+                b'saved normally')
 
             self.storage.save('raced/test.file',
-                ContentFile('saved with race'))
+                ContentFile(b'saved with race'))
             self.assertEqual(self.storage.open('raced/test.file').read(),
-                'saved with race')
+                b'saved with race')
 
             # Check that OSErrors aside from EEXIST are still raised.
             self.assertRaises(OSError,
-                self.storage.save, 'error/test.file', ContentFile('not saved'))
+                self.storage.save, 'error/test.file', ContentFile(b'not saved'))
         finally:
             os.makedirs = real_makedirs
 
@@ -341,16 +341,16 @@ class FileStorageTests(unittest.TestCase):
         try:
             os.remove = fake_remove
 
-            self.storage.save('normal.file', ContentFile('delete normally'))
+            self.storage.save('normal.file', ContentFile(b'delete normally'))
             self.storage.delete('normal.file')
             self.assertFalse(self.storage.exists('normal.file'))
 
-            self.storage.save('raced.file', ContentFile('delete with race'))
+            self.storage.save('raced.file', ContentFile(b'delete with race'))
             self.storage.delete('raced.file')
             self.assertFalse(self.storage.exists('normal.file'))
 
             # Check that OSErrors aside from ENOENT are still raised.
-            self.storage.save('error.file', ContentFile('delete with error'))
+            self.storage.save('error.file', ContentFile(b'delete with error'))
             self.assertRaises(OSError, self.storage.delete, 'error.file')
         finally:
             os.remove = real_remove
@@ -374,9 +374,9 @@ class CustomStorageTests(FileStorageTests):
     storage_class = CustomStorage
 
     def test_custom_get_available_name(self):
-        first = self.storage.save('custom_storage', ContentFile('custom contents'))
+        first = self.storage.save('custom_storage', ContentFile(b'custom contents'))
         self.assertEqual(first, 'custom_storage')
-        second = self.storage.save('custom_storage', ContentFile('more contents'))
+        second = self.storage.save('custom_storage', ContentFile(b'more contents'))
         self.assertEqual(second, 'custom_storage.2')
         self.storage.delete(first)
         self.storage.delete(second)
@@ -410,7 +410,7 @@ class FileSaveRaceConditionTest(unittest.TestCase):
         shutil.rmtree(self.storage_dir)
 
     def save_file(self, name):
-        name = self.storage.save(name, SlowFile("Data"))
+        name = self.storage.save(name, SlowFile(b"Data"))
 
     def test_race_condition(self):
         self.thread.start()
@@ -433,7 +433,7 @@ class FileStoragePermissions(unittest.TestCase):
         shutil.rmtree(self.storage_dir)
 
     def test_file_upload_permissions(self):
-        name = self.storage.save("the_file", ContentFile("data"))
+        name = self.storage.save("the_file", ContentFile(b"data"))
         actual_mode = os.stat(self.storage.path(name))[0] & 0777
         self.assertEqual(actual_mode, 0666)
 
@@ -453,8 +453,8 @@ class FileStoragePathParsing(unittest.TestCase):
         sure we still mangle the file name instead of the directory name.
         """
 
-        self.storage.save('dotted.path/test', ContentFile("1"))
-        self.storage.save('dotted.path/test', ContentFile("2"))
+        self.storage.save('dotted.path/test', ContentFile(b"1"))
+        self.storage.save('dotted.path/test', ContentFile(b"2"))
 
         self.assertFalse(os.path.exists(os.path.join(self.storage_dir, 'dotted_.path')))
         self.assertTrue(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/test')))
@@ -465,8 +465,8 @@ class FileStoragePathParsing(unittest.TestCase):
         File names with a dot as their first character don't have an extension,
         and the underscore should get added to the end.
         """
-        self.storage.save('dotted.path/.test', ContentFile("1"))
-        self.storage.save('dotted.path/.test', ContentFile("2"))
+        self.storage.save('dotted.path/.test', ContentFile(b"1"))
+        self.storage.save('dotted.path/.test', ContentFile(b"2"))
 
         self.assertTrue(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/.test')))
         self.assertTrue(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/.test_1')))
@@ -542,11 +542,11 @@ class ContentFileTestCase(unittest.TestCase):
     Test that the constructor of ContentFile accepts 'name' (#16590).
     """
     def test_content_file_default_name(self):
-        self.assertEqual(ContentFile("content").name, None)
+        self.assertEqual(ContentFile(b"content").name, None)
 
     def test_content_file_custom_name(self):
         name = "I can have a name too!"
-        self.assertEqual(ContentFile("content", name=name).name, name)
+        self.assertEqual(ContentFile(b"content", name=name).name, name)
 
 class NoNameFileTestCase(unittest.TestCase):
     """

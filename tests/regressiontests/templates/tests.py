@@ -192,17 +192,17 @@ class Templates(unittest.TestCase):
         test_template_sources('../dir1blah', template_dirs, [])
 
         # UTF-8 bytestrings are permitted.
-        test_template_sources('\xc3\x85ngstr\xc3\xb6m', template_dirs,
+        test_template_sources(b'\xc3\x85ngstr\xc3\xb6m', template_dirs,
                               [u'/dir1/Ångström', u'/dir2/Ångström'])
         # Unicode strings are permitted.
         test_template_sources(u'Ångström', template_dirs,
                               [u'/dir1/Ångström', u'/dir2/Ångström'])
-        test_template_sources(u'Ångström', ['/Straße'], [u'/Straße/Ångström'])
-        test_template_sources('\xc3\x85ngstr\xc3\xb6m', ['/Straße'],
+        test_template_sources(u'Ångström', [b'/Stra\xc3\x9fe'], [u'/Straße/Ångström'])
+        test_template_sources(b'\xc3\x85ngstr\xc3\xb6m', [b'/Stra\xc3\x9fe'],
                               [u'/Straße/Ångström'])
         # Invalid UTF-8 encoding in bytestrings is not. Should raise a
         # semi-useful error message.
-        test_template_sources('\xc3\xc3', template_dirs, UnicodeDecodeError)
+        test_template_sources(b'\xc3\xc3', template_dirs, UnicodeDecodeError)
 
         # Case insensitive tests (for win32). Not run unless we're on
         # a case insensitive operating system.
@@ -1239,11 +1239,11 @@ class Templates(unittest.TestCase):
             'i18n02': ('{% load i18n %}{% trans "xxxyyyxxx" %}', {}, "xxxyyyxxx"),
 
             # simple translation of a variable
-            'i18n03': ('{% load i18n %}{% blocktrans %}{{ anton }}{% endblocktrans %}', {'anton': '\xc3\x85'}, u"Å"),
+            'i18n03': ('{% load i18n %}{% blocktrans %}{{ anton }}{% endblocktrans %}', {'anton': b'\xc3\x85'}, u"Å"),
 
             # simple translation of a variable and filter
-            'i18n04': ('{% load i18n %}{% blocktrans with berta=anton|lower %}{{ berta }}{% endblocktrans %}', {'anton': '\xc3\x85'}, u'å'),
-            'legacyi18n04': ('{% load i18n %}{% blocktrans with anton|lower as berta %}{{ berta }}{% endblocktrans %}', {'anton': '\xc3\x85'}, u'å'),
+            'i18n04': ('{% load i18n %}{% blocktrans with berta=anton|lower %}{{ berta }}{% endblocktrans %}', {'anton': b'\xc3\x85'}, u'å'),
+            'legacyi18n04': ('{% load i18n %}{% blocktrans with anton|lower as berta %}{{ berta }}{% endblocktrans %}', {'anton': b'\xc3\x85'}, u'å'),
 
             # simple translation of a string with interpolation
             'i18n05': ('{% load i18n %}{% blocktrans %}xxx{{ anton }}xxx{% endblocktrans %}', {'anton': 'yyy'}, "xxxyyyxxx"),

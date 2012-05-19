@@ -387,8 +387,8 @@ class TestCollectionCachedStorage(BaseCollectionTestCase,
         self.assertEqual(relpath, "cached/styles.93b1147e8552.css")
         with storage.staticfiles_storage.open(relpath) as relfile:
             content = relfile.read()
-            self.assertNotIn("cached/other.css", content)
-            self.assertIn("other.d41d8cd98f00.css", content)
+            self.assertNotIn(b"cached/other.css", content)
+            self.assertIn(b"other.d41d8cd98f00.css", content)
 
     def test_path_with_querystring(self):
         relpath = self.cached_file_path("cached/styles.css?spam=eggs")
@@ -397,8 +397,8 @@ class TestCollectionCachedStorage(BaseCollectionTestCase,
         with storage.staticfiles_storage.open(
                 "cached/styles.93b1147e8552.css") as relfile:
             content = relfile.read()
-            self.assertNotIn("cached/other.css", content)
-            self.assertIn("other.d41d8cd98f00.css", content)
+            self.assertNotIn(b"cached/other.css", content)
+            self.assertIn(b"other.d41d8cd98f00.css", content)
 
     def test_path_with_fragment(self):
         relpath = self.cached_file_path("cached/styles.css#eggs")
@@ -406,62 +406,62 @@ class TestCollectionCachedStorage(BaseCollectionTestCase,
         with storage.staticfiles_storage.open(
                 "cached/styles.93b1147e8552.css") as relfile:
             content = relfile.read()
-            self.assertNotIn("cached/other.css", content)
-            self.assertIn("other.d41d8cd98f00.css", content)
+            self.assertNotIn(b"cached/other.css", content)
+            self.assertIn(b"other.d41d8cd98f00.css", content)
 
     def test_path_with_querystring_and_fragment(self):
         relpath = self.cached_file_path("cached/css/fragments.css")
         self.assertEqual(relpath, "cached/css/fragments.75433540b096.css")
         with storage.staticfiles_storage.open(relpath) as relfile:
             content = relfile.read()
-            self.assertIn('fonts/font.a4b0478549d0.eot?#iefix', content)
-            self.assertIn('fonts/font.b8d603e42714.svg#webfontIyfZbseF', content)
-            self.assertIn('data:font/woff;charset=utf-8;base64,d09GRgABAAAAADJoAA0AAAAAR2QAAQAAAAAAAAAAAAA', content)
-            self.assertIn('#default#VML', content)
+            self.assertIn(b'fonts/font.a4b0478549d0.eot?#iefix', content)
+            self.assertIn(b'fonts/font.b8d603e42714.svg#webfontIyfZbseF', content)
+            self.assertIn(b'data:font/woff;charset=utf-8;base64,d09GRgABAAAAADJoAA0AAAAAR2QAAQAAAAAAAAAAAAA', content)
+            self.assertIn(b'#default#VML', content)
 
     def test_template_tag_absolute(self):
         relpath = self.cached_file_path("cached/absolute.css")
         self.assertEqual(relpath, "cached/absolute.23f087ad823a.css")
         with storage.staticfiles_storage.open(relpath) as relfile:
             content = relfile.read()
-            self.assertNotIn("/static/cached/styles.css", content)
-            self.assertIn("/static/cached/styles.93b1147e8552.css", content)
-            self.assertIn('/static/cached/img/relative.acae32e4532b.png', content)
+            self.assertNotIn(b"/static/cached/styles.css", content)
+            self.assertIn(b"/static/cached/styles.93b1147e8552.css", content)
+            self.assertIn(b'/static/cached/img/relative.acae32e4532b.png', content)
 
     def test_template_tag_denorm(self):
         relpath = self.cached_file_path("cached/denorm.css")
         self.assertEqual(relpath, "cached/denorm.c5bd139ad821.css")
         with storage.staticfiles_storage.open(relpath) as relfile:
             content = relfile.read()
-            self.assertNotIn("..//cached///styles.css", content)
-            self.assertIn("../cached/styles.93b1147e8552.css", content)
-            self.assertNotIn("url(img/relative.png )", content)
-            self.assertIn('url("img/relative.acae32e4532b.png', content)
+            self.assertNotIn(b"..//cached///styles.css", content)
+            self.assertIn(b"../cached/styles.93b1147e8552.css", content)
+            self.assertNotIn(b"url(img/relative.png )", content)
+            self.assertIn(b'url("img/relative.acae32e4532b.png', content)
 
     def test_template_tag_relative(self):
         relpath = self.cached_file_path("cached/relative.css")
         self.assertEqual(relpath, "cached/relative.2217ea7273c2.css")
         with storage.staticfiles_storage.open(relpath) as relfile:
             content = relfile.read()
-            self.assertNotIn("../cached/styles.css", content)
-            self.assertNotIn('@import "styles.css"', content)
-            self.assertNotIn('url(img/relative.png)', content)
-            self.assertIn('url("img/relative.acae32e4532b.png")', content)
-            self.assertIn("../cached/styles.93b1147e8552.css", content)
+            self.assertNotIn(b"../cached/styles.css", content)
+            self.assertNotIn(b'@import "styles.css"', content)
+            self.assertNotIn(b'url(img/relative.png)', content)
+            self.assertIn(b'url("img/relative.acae32e4532b.png")', content)
+            self.assertIn(b"../cached/styles.93b1147e8552.css", content)
 
     def test_template_tag_deep_relative(self):
         relpath = self.cached_file_path("cached/css/window.css")
         self.assertEqual(relpath, "cached/css/window.9db38d5169f3.css")
         with storage.staticfiles_storage.open(relpath) as relfile:
             content = relfile.read()
-            self.assertNotIn('url(img/window.png)', content)
-            self.assertIn('url("img/window.acae32e4532b.png")', content)
+            self.assertNotIn(b'url(img/window.png)', content)
+            self.assertIn(b'url("img/window.acae32e4532b.png")', content)
 
     def test_template_tag_url(self):
         relpath = self.cached_file_path("cached/url.css")
         self.assertEqual(relpath, "cached/url.615e21601e4b.css")
         with storage.staticfiles_storage.open(relpath) as relfile:
-            self.assertIn("https://", relfile.read())
+            self.assertIn(b"https://", relfile.read())
 
     def test_cache_invalidation(self):
         name = "cached/styles.css"
@@ -508,7 +508,7 @@ class TestCollectionCachedStorage(BaseCollectionTestCase,
         """
         Handle cache key creation correctly, see #17861.
         """
-        name = "/some crazy/long filename/ with spaces Here and ?#%#$/other/stuff/some crazy/long filename/ with spaces Here and ?#%#$/other/stuff/some crazy/long filename/ with spaces Here and ?#%#$/other/stuff/some crazy/long filename/ with spaces Here and ?#%#$/other/stuff/some crazy/long filename/ with spaces Here and ?#%#$/other/stuff/some crazy/" + chr(22) + chr(180)
+        name = b"/some crazy/long filename/ with spaces Here and ?#%#$/other/stuff/some crazy/long filename/ with spaces Here and ?#%#$/other/stuff/some crazy/long filename/ with spaces Here and ?#%#$/other/stuff/some crazy/long filename/ with spaces Here and ?#%#$/other/stuff/some crazy/long filename/ with spaces Here and ?#%#$/other/stuff/some crazy/" + chr(22) + chr(180)
         cache_key = storage.staticfiles_storage.cache_key(name)
         cache_validator = BaseCache({})
         cache_validator.validate_key(cache_key)

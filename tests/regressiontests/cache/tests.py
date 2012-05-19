@@ -822,7 +822,7 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
     def test_second_call_doesnt_crash(self):
         err = StringIO.StringIO()
         management.call_command('createcachetable', self._table_name, verbosity=0, interactive=False, stderr=err)
-        self.assertTrue("Cache table 'test cache table' could not be created" in err.getvalue())
+        self.assertTrue(b"Cache table 'test cache table' could not be created" in err.getvalue())
 
 
 @override_settings(USE_TZ=True)

@@ -22,7 +22,7 @@ def csrf(request):
             # In order to be able to provide debugging info in the
             # case of misconfiguration, we use a sentinel value
             # instead of returning an empty dict.
-            return 'NOTPROVIDED'
+            return b'NOTPROVIDED'
         else:
             return token
     _get_val = lazy(_get_val, str)

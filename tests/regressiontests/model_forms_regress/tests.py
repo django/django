@@ -394,7 +394,7 @@ class FileFieldTests(unittest.TestCase):
         form = DocumentForm()
         self.assertTrue('name="myfile"' in unicode(form))
         self.assertTrue('myfile-clear' not in unicode(form))
-        form = DocumentForm(files={'myfile': SimpleUploadedFile('something.txt', 'content')})
+        form = DocumentForm(files={'myfile': SimpleUploadedFile('something.txt', b'content')})
         self.assertTrue(form.is_valid())
         doc = form.save(commit=False)
         self.assertEqual(doc.myfile.name, 'something.txt')
@@ -411,11 +411,11 @@ class FileFieldTests(unittest.TestCase):
         includes the current file and the clear checkbox.
 
         """
-        form = DocumentForm(files={'myfile': SimpleUploadedFile('something.txt', 'content')})
+        form = DocumentForm(files={'myfile': SimpleUploadedFile('something.txt', b'content')})
         self.assertTrue(form.is_valid())
         doc = form.save(commit=False)
         form = DocumentForm(instance=doc,
-                            files={'myfile': SimpleUploadedFile('something.txt', 'content')},
+                            files={'myfile': SimpleUploadedFile('something.txt', b'content')},
                             data={'myfile-clear': 'true'})
         self.assertTrue(not form.is_valid())
         self.assertEqual(form.errors['myfile'],

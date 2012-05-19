@@ -125,7 +125,7 @@ class ContentFile(File):
     A File-like object that takes just raw content, rather than an actual file.
     """
     def __init__(self, content, name=None):
-        content = content or ''
+        content = content or b''
         super(ContentFile, self).__init__(BytesIO(content), name=name)
         self.size = len(content)
 

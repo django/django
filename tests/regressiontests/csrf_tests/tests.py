@@ -47,7 +47,7 @@ class TestingHttpRequest(HttpRequest):
 class CsrfViewMiddlewareTest(TestCase):
     # The csrf token is potentially from an untrusted source, so could have
     # characters that need dealing with.
-    _csrf_id_cookie = "<1>\xc2\xa1"
+    _csrf_id_cookie = b"<1>\xc2\xa1"
     _csrf_id = "1"
 
     def _get_GET_no_csrf_cookie_request(self):

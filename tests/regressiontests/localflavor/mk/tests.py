@@ -92,7 +92,7 @@ class MKLocalFlavorTests(SimpleTestCase):
         """
         Test that the empty option is there.
         """
-        municipality_select_html = """\
+        municipality_select_html = b"""\
 <select name="municipality" id="id_municipality">
 <option value="">---------</option>
 <option value="AD">Aerodrom</option>

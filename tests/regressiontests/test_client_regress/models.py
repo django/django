@@ -122,14 +122,14 @@ class AssertContainsTests(TestCase):
         #Regression test for #10183
         r = self.client.get('/test_client_regress/check_unicode/')
         self.assertContains(r, u'さかき')
-        self.assertContains(r, '\xe5\xb3\xa0'.decode('utf-8'))
+        self.assertContains(r, b'\xe5\xb3\xa0'.decode('utf-8'))
 
     def test_unicode_not_contains(self):
         "Unicode characters can be searched for, and not found in template context"
         #Regression test for #10183
         r = self.client.get('/test_client_regress/check_unicode/')
         self.assertNotContains(r, u'はたけ')
-        self.assertNotContains(r, '\xe3\x81\xaf\xe3\x81\x9f\xe3\x81\x91'.decode('utf-8'))
+        self.assertNotContains(r, b'\xe3\x81\xaf\xe3\x81\x9f\xe3\x81\x91'.decode('utf-8'))
 
     def test_assert_contains_renders_template_response(self):
         """ Test that we can pass in an unrendered SimpleTemplateReponse
@@ -571,25 +571,25 @@ class URLEscapingTests(TestCase):
         "Get a view that has a simple string argument"
         response = self.client.get(reverse('arg_view', args=['Slartibartfast']))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, 'Howdy, Slartibartfast')
+        self.assertEqual(response.content, b'Howdy, Slartibartfast')
 
     def test_argument_with_space_get(self):
         "Get a view that has a string argument that requires escaping"
         response = self.client.get(reverse('arg_view', args=['Arthur Dent']))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, 'Hi, Arthur')
+        self.assertEqual(response.content, b'Hi, Arthur')
 
     def test_simple_argument_post(self):
         "Post for a view that has a simple string argument"
         response = self.client.post(reverse('arg_view', args=['Slartibartfast']))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, 'Howdy, Slartibartfast')
+        self.assertEqual(response.content, b'Howdy, Slartibartfast')
 
     def test_argument_with_space_post(self):
         "Post for a view that has a string argument that requires escaping"
         response = self.client.post(reverse('arg_view', args=['Arthur Dent']))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, 'Hi, Arthur')
+        self.assertEqual(response.content, b'Hi, Arthur')
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class ExceptionTests(TestCase):
@@ -721,17 +721,17 @@ class SessionTests(TestCase):
         # The session doesn't exist to start.
         response = self.client.get('/test_client_regress/check_session/')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, 'NO')
+        self.assertEqual(response.content, b'NO')
 
         # This request sets a session variable.
         response = self.client.get('/test_client_regress/set_session/')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, 'set_session')
+        self.assertEqual(response.content, b'set_session')
 
         # Check that the session has been modified
         response = self.client.get('/test_client_regress/check_session/')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, 'YES')
+        self.assertEqual(response.content, b'YES')
 
         # Log in
         login = self.client.login(username='testclient',password='password')
@@ -740,7 +740,7 @@ class SessionTests(TestCase):
         # Session should still contain the modified value
         response = self.client.get('/test_client_regress/check_session/')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, 'YES')
+        self.assertEqual(response.content, b'YES')
 
     def test_logout(self):
         """Logout should work whether the user is logged in or not (#9978)."""
@@ -755,39 +755,39 @@ class RequestMethodTests(TestCase):
         "Request a view via request method GET"
         response = self.client.get('/test_client_regress/request_methods/')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, 'request method: GET')
+        self.assertEqual(response.content, b'request method: GET')
 
     def test_post(self):
         "Request a view via request method POST"
         response = self.client.post('/test_client_regress/request_methods/')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, 'request method: POST')
+        self.assertEqual(response.content, b'request method: POST')
 
     def test_head(self):
         "Request a view via request method HEAD"
         response = self.client.head('/test_client_regress/request_methods/')
         self.assertEqual(response.status_code, 200)
         # A HEAD request doesn't return any content.
-        self.assertNotEqual(response.content, 'request method: HEAD')
-        self.assertEqual(response.content, '')
+        self.assertNotEqual(response.content, b'request method: HEAD')
+        self.assertEqual(response.content, b'')
 
     def test_options(self):
         "Request a view via request method OPTIONS"
         response = self.client.options('/test_client_regress/request_methods/')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, 'request method: OPTIONS')
+        self.assertEqual(response.content, b'request method: OPTIONS')
 
     def test_put(self):
         "Request a view via request method PUT"
         response = self.client.put('/test_client_regress/request_methods/')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, 'request method: PUT')
+        self.assertEqual(response.content, b'request method: PUT')
 
     def test_delete(self):
         "Request a view via request method DELETE"
         response = self.client.delete('/test_client_regress/request_methods/')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, 'request method: DELETE')
+        self.assertEqual(response.content, b'request method: DELETE')
 
 class RequestMethodStringDataTests(TestCase):
     def test_post(self):
@@ -796,7 +796,7 @@ class RequestMethodStringDataTests(TestCase):
         data = u'{"test": "json"}'
         response = self.client.post('/test_client_regress/request_methods/', data=data, content_type='application/json')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, 'request method: POST')
+        self.assertEqual(response.content, b'request method: POST')
 
     def test_put(self):
         "Request a view with string data via request method PUT"
@@ -804,7 +804,7 @@ class RequestMethodStringDataTests(TestCase):
         data = u'{"test": "json"}'
         response = self.client.put('/test_client_regress/request_methods/', data=data, content_type='application/json')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, 'request method: PUT')
+        self.assertEqual(response.content, b'request method: PUT')
 
 class QueryStringTests(TestCase):
     def test_get_like_requests(self):
@@ -913,34 +913,34 @@ class DummyFile(object):
 class UploadedFileEncodingTest(TestCase):
     def test_file_encoding(self):
         encoded_file = encode_file('TEST_BOUNDARY', 'TEST_KEY', DummyFile('test_name.bin'))
-        self.assertEqual('--TEST_BOUNDARY', encoded_file[0])
-        self.assertEqual('Content-Disposition: form-data; name="TEST_KEY"; filename="test_name.bin"', encoded_file[1])
-        self.assertEqual('TEST_FILE_CONTENT', encoded_file[-1])
+        self.assertEqual(b'--TEST_BOUNDARY', encoded_file[0])
+        self.assertEqual(b'Content-Disposition: form-data; name="TEST_KEY"; filename="test_name.bin"', encoded_file[1])
+        self.assertEqual(b'TEST_FILE_CONTENT', encoded_file[-1])
 
     def test_guesses_content_type_on_file_encoding(self):
-        self.assertEqual('Content-Type: application/octet-stream',
+        self.assertEqual(b'Content-Type: application/octet-stream',
                          encode_file('IGNORE', 'IGNORE', DummyFile("file.bin"))[2])
-        self.assertEqual('Content-Type: text/plain',
+        self.assertEqual(b'Content-Type: text/plain',
                          encode_file('IGNORE', 'IGNORE', DummyFile("file.txt"))[2])
         self.assertIn(encode_file('IGNORE', 'IGNORE', DummyFile("file.zip"))[2], (
-                        'Content-Type: application/x-compress',
-                        'Content-Type: application/x-zip',
-                        'Content-Type: application/x-zip-compressed',
-                        'Content-Type: application/zip',))
-        self.assertEqual('Content-Type: application/octet-stream',
+                        b'Content-Type: application/x-compress',
+                        b'Content-Type: application/x-zip',
+                        b'Content-Type: application/x-zip-compressed',
+                        b'Content-Type: application/zip',))
+        self.assertEqual(b'Content-Type: application/octet-stream',
                          encode_file('IGNORE', 'IGNORE', DummyFile("file.unknown"))[2])
 
 class RequestHeadersTest(TestCase):
     def test_client_headers(self):
         "A test client can receive custom headers"
         response = self.client.get("/test_client_regress/check_headers/", HTTP_X_ARG_CHECK='Testing 123')
-        self.assertEqual(response.content, "HTTP_X_ARG_CHECK: Testing 123")
+        self.assertEqual(response.content, b"HTTP_X_ARG_CHECK: Testing 123")
         self.assertEqual(response.status_code, 200)
 
     def test_client_headers_redirect(self):
         "Test client headers are preserved through redirects"
         response = self.client.get("/test_client_regress/check_headers_redirect/", follow=True, HTTP_X_ARG_CHECK='Testing 123')
-        self.assertEqual(response.content, "HTTP_X_ARG_CHECK: Testing 123")
+        self.assertEqual(response.content, b"HTTP_X_ARG_CHECK: Testing 123")
         self.assertRedirects(response, '/test_client_regress/check_headers/',
             status_code=301, target_status_code=200)
 
@@ -956,22 +956,22 @@ class ReadLimitedStreamTest(TestCase):
     def test_body_from_empty_request(self):
         """HttpRequest.body on a test client GET request should return
         the empty string."""
-        self.assertEqual(self.client.get("/test_client_regress/body/").content, '')
+        self.assertEqual(self.client.get("/test_client_regress/body/").content, b'')
 
     def test_read_from_empty_request(self):
         """HttpRequest.read() on a test client GET request should return the
         empty string."""
-        self.assertEqual(self.client.get("/test_client_regress/read_all/").content, '')
+        self.assertEqual(self.client.get("/test_client_regress/read_all/").content, b'')
 
     def test_read_numbytes_from_empty_request(self):
         """HttpRequest.read(LARGE_BUFFER) on a test client GET request should
         return the empty string."""
-        self.assertEqual(self.client.get("/test_client_regress/read_buffer/").content, '')
+        self.assertEqual(self.client.get("/test_client_regress/read_buffer/").content, b'')
 
     def test_read_from_nonempty_request(self):
         """HttpRequest.read() on a test client PUT request with some payload
         should return that payload."""
-        payload = 'foobar'
+        payload = b'foobar'
         self.assertEqual(self.client.put("/test_client_regress/read_all/",
                                           data=payload,
                                           content_type='text/plain').content, payload)
@@ -979,7 +979,7 @@ class ReadLimitedStreamTest(TestCase):
     def test_read_numbytes_from_nonempty_request(self):
         """HttpRequest.read(LARGE_BUFFER) on a test client PUT request with
         some payload should return that payload."""
-        payload = 'foobar'
+        payload = b'foobar'
         self.assertEqual(self.client.put("/test_client_regress/read_buffer/",
                                           data=payload,
                                           content_type='text/plain').content, payload)

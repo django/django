@@ -540,27 +540,27 @@ class FieldsTests(SimpleTestCase):
         self.assertRaisesMessage(ValidationError, "[u'This field is required.']", f.clean, None)
         self.assertRaisesMessage(ValidationError, "[u'This field is required.']", f.clean, None, '')
         self.assertEqual('files/test2.pdf', f.clean(None, 'files/test2.pdf'))
-        self.assertRaisesMessage(ValidationError, "[u'No file was submitted. Check the encoding type on the form.']", f.clean, SimpleUploadedFile('', ''))
-        self.assertRaisesMessage(ValidationError, "[u'No file was submitted. Check the encoding type on the form.']", f.clean, SimpleUploadedFile('', ''), '')
+        self.assertRaisesMessage(ValidationError, "[u'No file was submitted. Check the encoding type on the form.']", f.clean, SimpleUploadedFile('', b''))
+        self.assertRaisesMessage(ValidationError, "[u'No file was submitted. Check the encoding type on the form.']", f.clean, SimpleUploadedFile('', b''), '')
         self.assertEqual('files/test3.pdf', f.clean(None, 'files/test3.pdf'))
         self.assertRaisesMessage(ValidationError, "[u'No file was submitted. Check the encoding type on the form.']", f.clean, 'some content that is not a file')
         self.assertRaisesMessage(ValidationError, "[u'The submitted file is empty.']", f.clean, SimpleUploadedFile('name', None))
-        self.assertRaisesMessage(ValidationError, "[u'The submitted file is empty.']", f.clean, SimpleUploadedFile('name', ''))
-        self.assertEqual(SimpleUploadedFile, type(f.clean(SimpleUploadedFile('name', 'Some File Content'))))
-        self.assertEqual(SimpleUploadedFile, type(f.clean(SimpleUploadedFile('我隻氣墊船裝滿晒鱔.txt', 'मेरी मँडराने वाली नाव सर्पमीनों से भरी ह'))))
-        self.assertEqual(SimpleUploadedFile, type(f.clean(SimpleUploadedFile('name', 'Some File Content'), 'files/test4.pdf')))
+        self.assertRaisesMessage(ValidationError, "[u'The submitted file is empty.']", f.clean, SimpleUploadedFile('name', b''))
+        self.assertEqual(SimpleUploadedFile, type(f.clean(SimpleUploadedFile('name', b'Some File Content'))))
+        self.assertEqual(SimpleUploadedFile, type(f.clean(SimpleUploadedFile('我隻氣墊船裝滿晒鱔.txt', u'मेरी मँडराने वाली नाव सर्पमीनों से भरी ह'.encode('utf-8')))))
+        self.assertEqual(SimpleUploadedFile, type(f.clean(SimpleUploadedFile('name', b'Some File Content'), 'files/test4.pdf')))
 
     def test_filefield_2(self):
         f = FileField(max_length = 5)
-        self.assertRaisesMessage(ValidationError, "[u'Ensure this filename has at most 5 characters (it has 18).']", f.clean, SimpleUploadedFile('test_maxlength.txt', 'hello world'))
+        self.assertRaisesMessage(ValidationError, "[u'Ensure this filename has at most 5 characters (it has 18).']", f.clean, SimpleUploadedFile('test_maxlength.txt', b'hello world'))
         self.assertEqual('files/test1.pdf', f.clean('', 'files/test1.pdf'))
         self.assertEqual('files/test2.pdf', f.clean(None, 'files/test2.pdf'))
-        self.assertEqual(SimpleUploadedFile, type(f.clean(SimpleUploadedFile('name', 'Some File Content'))))
+        self.assertEqual(SimpleUploadedFile, type(f.clean(SimpleUploadedFile('name', b'Some File Content'))))
 
     def test_filefield_3(self):
         f = FileField(allow_empty_file=True)
         self.assertEqual(SimpleUploadedFile,
-                         type(f.clean(SimpleUploadedFile('name', ''))))
+                         type(f.clean(SimpleUploadedFile('name', b''))))
 
     # URLField ##################################################################
 

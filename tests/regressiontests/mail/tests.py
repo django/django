@@ -86,7 +86,7 @@ class MailTests(TestCase):
         """
         headers = {"date": "Fri, 09 Nov 2001 01:08:47 -0000", "Message-ID": "foo"}
         email = EmailMessage('subject', 'content', 'from@example.com', ['to@example.com'], headers=headers)
-        self.assertEqual(email.message().as_string(), 'Content-Type: text/plain; charset="utf-8"\nMIME-Version: 1.0\nContent-Transfer-Encoding: 7bit\nSubject: subject\nFrom: from@example.com\nTo: to@example.com\ndate: Fri, 09 Nov 2001 01:08:47 -0000\nMessage-ID: foo\n\ncontent')
+        self.assertEqual(email.message().as_string(), b'Content-Type: text/plain; charset="utf-8"\nMIME-Version: 1.0\nContent-Transfer-Encoding: 7bit\nSubject: subject\nFrom: from@example.com\nTo: to@example.com\ndate: Fri, 09 Nov 2001 01:08:47 -0000\nMessage-ID: foo\n\ncontent')
 
     def test_from_header(self):
         """
@@ -168,7 +168,7 @@ class MailTests(TestCase):
         email = EmailMessage('Subject', 'Firstname Sürname is a great guy.', 'from@example.com', ['other@example.com'])
         email.encoding = 'iso-8859-1'
         message = email.message()
-        self.assertTrue(message.as_string().startswith('Content-Type: text/plain; charset="iso-8859-1"\nMIME-Version: 1.0\nContent-Transfer-Encoding: quoted-printable\nSubject: Subject\nFrom: from@example.com\nTo: other@example.com'))
+        self.assertTrue(message.as_string().startswith(b'Content-Type: text/plain; charset="iso-8859-1"\nMIME-Version: 1.0\nContent-Transfer-Encoding: quoted-printable\nSubject: Subject\nFrom: from@example.com\nTo: other@example.com'))
         self.assertEqual(message.get_payload(), 'Firstname S=FCrname is a great guy.')
 
         # Make sure MIME attachments also works correctly with other encodings than utf-8
@@ -177,8 +177,8 @@ class MailTests(TestCase):
         msg = EmailMultiAlternatives('Subject', text_content, 'from@example.com', ['to@example.com'])
         msg.encoding = 'iso-8859-1'
         msg.attach_alternative(html_content, "text/html")
-        self.assertEqual(msg.message().get_payload(0).as_string(), 'Content-Type: text/plain; charset="iso-8859-1"\nMIME-Version: 1.0\nContent-Transfer-Encoding: quoted-printable\n\nFirstname S=FCrname is a great guy.')
-        self.assertEqual(msg.message().get_payload(1).as_string(), 'Content-Type: text/html; charset="iso-8859-1"\nMIME-Version: 1.0\nContent-Transfer-Encoding: quoted-printable\n\n<p>Firstname S=FCrname is a <strong>great</strong> guy.</p>')
+        self.assertEqual(msg.message().get_payload(0).as_string(), b'Content-Type: text/plain; charset="iso-8859-1"\nMIME-Version: 1.0\nContent-Transfer-Encoding: quoted-printable\n\nFirstname S=FCrname is a great guy.')
+        self.assertEqual(msg.message().get_payload(1).as_string(), b'Content-Type: text/html; charset="iso-8859-1"\nMIME-Version: 1.0\nContent-Transfer-Encoding: quoted-printable\n\n<p>Firstname S=FCrname is a <strong>great</strong> guy.</p>')
 
     def test_attachments(self):
         """Regression test for #9367"""
@@ -188,7 +188,7 @@ class MailTests(TestCase):
         html_content = '<p>This is an <strong>important</strong> message.</p>'
         msg = EmailMultiAlternatives(subject, text_content, from_email, [to], headers=headers)
         msg.attach_alternative(html_content, "text/html")
-        msg.attach("an attachment.pdf", "%PDF-1.4.%...", mimetype="application/pdf")
+        msg.attach("an attachment.pdf", b"%PDF-1.4.%...", mimetype="application/pdf")
         msg_str = msg.message().as_string()
         message = email.message_from_string(msg_str)
         self.assertTrue(message.is_multipart())
@@ -205,7 +205,7 @@ class MailTests(TestCase):
         content = 'This is the message.'
         msg = EmailMessage(subject, content, from_email, [to], headers=headers)
         # Unicode in file name
-        msg.attach(u"une pièce jointe.pdf", "%PDF-1.4.%...", mimetype="application/pdf")
+        msg.attach(u"une pièce jointe.pdf", b"%PDF-1.4.%...", mimetype="application/pdf")
         msg_str = msg.message().as_string()
         message = email.message_from_string(msg_str)
         payload = message.get_payload()
@@ -289,31 +289,31 @@ class MailTests(TestCase):
         # Regression for #13433 - Make sure that EmailMessage doesn't mangle
         # 'From ' in message body.
         email = EmailMessage('Subject', 'From the future', 'bounce@example.com', ['to@example.com'], headers={'From': 'from@example.com'})
-        self.assertFalse('>From the future' in email.message().as_string())
+        self.assertFalse(b'>From the future' in email.message().as_string())
 
     def test_dont_base64_encode(self):
         # Ticket #3472
         # Shouldn't use Base64 encoding at all
         msg = EmailMessage('Subject', 'UTF-8 encoded body', 'bounce@example.com', ['to@example.com'], headers={'From': 'from@example.com'})
-        self.assertFalse('Content-Transfer-Encoding: base64' in msg.message().as_string())
+        self.assertFalse(b'Content-Transfer-Encoding: base64' in msg.message().as_string())
 
         # Ticket #11212
         # Shouldn't use quoted printable, should detect it can represent content with 7 bit data
         msg = EmailMessage('Subject', 'Body with only ASCII characters.', 'bounce@example.com', ['to@example.com'], headers={'From': 'from@example.com'})
         s = msg.message().as_string()
-        self.assertFalse('Content-Transfer-Encoding: quoted-printable' in s)
-        self.assertTrue('Content-Transfer-Encoding: 7bit' in s)
+        self.assertFalse(b'Content-Transfer-Encoding: quoted-printable' in s)
+        self.assertTrue(b'Content-Transfer-Encoding: 7bit' in s)
 
         # Shouldn't use quoted printable, should detect it can represent content with 8 bit data
         msg = EmailMessage('Subject', 'Body with latin characters: àáä.', 'bounce@example.com', ['to@example.com'], headers={'From': 'from@example.com'})
         s = msg.message().as_string()
-        self.assertFalse('Content-Transfer-Encoding: quoted-printable' in s)
-        self.assertTrue('Content-Transfer-Encoding: 8bit' in s)
+        self.assertFalse(b'Content-Transfer-Encoding: quoted-printable' in s)
+        self.assertTrue(b'Content-Transfer-Encoding: 8bit' in s)
 
         msg = EmailMessage('Subject', u'Body with non latin characters: А Б В Г Д Е Ж Ѕ З И І К Л М Н О П.', 'bounce@example.com', ['to@example.com'], headers={'From': 'from@example.com'})
         s = msg.message().as_string()
-        self.assertFalse('Content-Transfer-Encoding: quoted-printable' in s)
-        self.assertTrue('Content-Transfer-Encoding: 8bit' in s)
+        self.assertFalse(b'Content-Transfer-Encoding: quoted-printable' in s)
+        self.assertTrue(b'Content-Transfer-Encoding: 8bit' in s)
 
 
 class BaseEmailBackendTests(object):
@@ -438,7 +438,7 @@ class BaseEmailBackendTests(object):
         email = EmailMessage('Subject', 'Content', 'from@example.com', ['to@example.com'], cc=['cc@example.com'])
         mail.get_connection().send_messages([email])
         message = self.get_the_message()
-        self.assertStartsWith(message.as_string(), 'Content-Type: text/plain; charset="utf-8"\nMIME-Version: 1.0\nContent-Transfer-Encoding: 7bit\nSubject: Subject\nFrom: from@example.com\nTo: to@example.com\nCc: cc@example.com\nDate: ')
+        self.assertStartsWith(message.as_string(), b'Content-Type: text/plain; charset="utf-8"\nMIME-Version: 1.0\nContent-Transfer-Encoding: 7bit\nSubject: Subject\nFrom: from@example.com\nTo: to@example.com\nCc: cc@example.com\nDate: ')
 
     def test_idn_send(self):
         """
@@ -517,8 +517,8 @@ class FileBackendTests(BaseEmailBackendTests, TestCase):
     def get_mailbox_content(self):
         messages = []
         for filename in os.listdir(self.tmp_dir):
-            with open(os.path.join(self.tmp_dir, filename)) as fp:
-                session = fp.read().split('\n' + ('-' * 79) + '\n')
+            with open(os.path.join(self.tmp_dir, filename), 'rb') as fp:
+                session = fp.read().split(b'\n' + (b'-' * 79) + b'\n')
             messages.extend(email.message_from_string(m) for m in session if m)
         return messages
 
@@ -569,7 +569,7 @@ class ConsoleBackendTests(BaseEmailBackendTests, TestCase):
         self.stream = sys.stdout = StringIO()
 
     def get_mailbox_content(self):
-        messages = self.stream.getvalue().split('\n' + ('-' * 79) + '\n')
+        messages = self.stream.getvalue().split(b'\n' + (b'-' * 79) + b'\n')
         return [email.message_from_string(m) for m in messages if m]
 
     def test_console_stream_kwarg(self):

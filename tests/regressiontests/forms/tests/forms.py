@@ -1463,17 +1463,17 @@ class FormsTestCase(TestCase):
         f = FileForm(data={}, files={}, auto_id=False)
         self.assertHTMLEqual(f.as_table(), '<tr><th>File1:</th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="file" name="file1" /></td></tr>')
 
-        f = FileForm(data={}, files={'file1': SimpleUploadedFile('name', '')}, auto_id=False)
+        f = FileForm(data={}, files={'file1': SimpleUploadedFile('name', b'')}, auto_id=False)
         self.assertHTMLEqual(f.as_table(), '<tr><th>File1:</th><td><ul class="errorlist"><li>The submitted file is empty.</li></ul><input type="file" name="file1" /></td></tr>')
 
         f = FileForm(data={}, files={'file1': 'something that is not a file'}, auto_id=False)
         self.assertHTMLEqual(f.as_table(), '<tr><th>File1:</th><td><ul class="errorlist"><li>No file was submitted. Check the encoding type on the form.</li></ul><input type="file" name="file1" /></td></tr>')
 
-        f = FileForm(data={}, files={'file1': SimpleUploadedFile('name', 'some content')}, auto_id=False)
+        f = FileForm(data={}, files={'file1': SimpleUploadedFile('name', b'some content')}, auto_id=False)
         self.assertHTMLEqual(f.as_table(), '<tr><th>File1:</th><td><input type="file" name="file1" /></td></tr>')
         self.assertTrue(f.is_valid())
 
-        f = FileForm(data={}, files={'file1': SimpleUploadedFile('我隻氣墊船裝滿晒鱔.txt', 'मेरी मँडराने वाली नाव सर्पमीनों से भरी ह')}, auto_id=False)
+        f = FileForm(data={}, files={'file1': SimpleUploadedFile('我隻氣墊船裝滿晒鱔.txt', u'मेरी मँडराने वाली नाव सर्पमीनों से भरी ह'.encode('utf-8'))}, auto_id=False)
         self.assertHTMLEqual(f.as_table(), '<tr><th>File1:</th><td><input type="file" name="file1" /></td></tr>')
 
     def test_basic_processing_in_view(self):

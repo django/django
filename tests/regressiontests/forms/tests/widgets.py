@@ -1182,7 +1182,7 @@ class ClearableFileInputTests(TestCase):
         """
         widget = ClearableFileInput()
         widget.is_required = True
-        f = SimpleUploadedFile('something.txt', 'content')
+        f = SimpleUploadedFile('something.txt', b'content')
         self.assertEqual(widget.value_from_datadict(
                 data={'myfile-clear': True},
                 files={'myfile': f},

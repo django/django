@@ -54,7 +54,7 @@ class StringLookupTests(TestCase):
         self.assertEqual(Foo.objects.get(friend__contains=u'\xe7'), fx)
 
         # We can also do the above query using UTF-8 strings.
-        self.assertEqual(Foo.objects.get(friend__contains='\xc3\xa7'), fx)
+        self.assertEqual(Foo.objects.get(friend__contains=b'\xc3\xa7'), fx)
 
     def test_queries_on_textfields(self):
         """

@@ -28,7 +28,7 @@ class HandlerTests(unittest.TestCase):
     def test_bad_path_info(self):
         """Tests for bug #15672 ('request' referenced before assignment)"""
         environ = RequestFactory().get('/').environ
-        environ['PATH_INFO'] = '\xed'
+        environ['PATH_INFO'] = b'\xed'
         handler = WSGIHandler()
         response = handler(environ, lambda *a, **k: None)
         self.assertEqual(response.status_code, 400)

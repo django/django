@@ -18,7 +18,7 @@ _cookie_encodes_correctly = Cookie.SimpleCookie().value_encode(';') == (';', '"\
 # See ticket #13007, http://bugs.python.org/issue2193 and http://trac.edgewall.org/ticket/2256
 _tc = Cookie.SimpleCookie()
 try:
-    _tc.load('foo:bar=1')
+    _tc.load(b'foo:bar=1')
     _cookie_allows_colon_in_names = True
 except Cookie.CookieError:
     _cookie_allows_colon_in_names = False
@@ -650,8 +650,8 @@ class HttpResponse(object):
 
     def _get_content(self):
         if self.has_header('Content-Encoding'):
-            return ''.join([str(e) for e in self._container])
-        return ''.join([smart_str(e, self._charset) for e in self._container])
+            return b''.join([str(e) for e in self._container])
+        return b''.join([smart_str(e, self._charset) for e in self._container])
 
     def _set_content(self, value):
         if hasattr(value, '__iter__'):
