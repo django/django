@@ -266,10 +266,10 @@ class WizardTests(TestCase):
         Form should advance if the hash is present and good, as calculated using
         current method.
         """
-        data = {"0-field": "test",
-                "1-field": "test2",
-                "hash_0": "7e9cea465f6a10a6fb47fcea65cb9a76350c9a5c",
-                "wizard_step": "1"}
+        data = {"0-field": u"test",
+                "1-field": u"test2",
+                "hash_0": u"cd13b1db3e8f55174bc5745a1b1a53408d4fd1ca",
+                "wizard_step": u"1"}
         response = self.client.post('/wizard1/', data)
         self.assertEqual(2, response.context['step0'])
 
@@ -291,18 +291,18 @@ class WizardTests(TestCase):
                     reached[0] = True
 
         wizard = WizardWithProcessStep([WizardPageOneForm])
-        data = {"0-field": "test",
-                "1-field": "test2",
-                "hash_0": "7e9cea465f6a10a6fb47fcea65cb9a76350c9a5c",
-                "wizard_step": "1"}
+        data = {"0-field": u"test",
+                "1-field": u"test2",
+                "hash_0": u"cd13b1db3e8f55174bc5745a1b1a53408d4fd1ca",
+                "wizard_step": u"1"}
         wizard(DummyRequest(POST=data))
         self.assertTrue(reached[0])
 
-        data = {"0-field": "test",
-                "1-field": "test2",
-                "hash_0": "7e9cea465f6a10a6fb47fcea65cb9a76350c9a5c",
-                "hash_1": "d5b434e3934cc92fee4bd2964c4ebc06f81d362d",
-                "wizard_step": "2"}
+        data = {"0-field": u"test",
+                "1-field": u"test2",
+                "hash_0": "cd13b1db3e8f55174bc5745a1b1a53408d4fd1ca",
+                "hash_1": u"1e6f6315da42e62f33a30640ec7e007ad3fbf1a1",
+                "wizard_step": u"2"}
         self.assertRaises(http.Http404, wizard, DummyRequest(POST=data))
 
     def test_14498(self):
@@ -321,10 +321,10 @@ class WizardTests(TestCase):
         wizard = WizardWithProcessStep([WizardPageOneForm,
                                         WizardPageTwoForm,
                                         WizardPageThreeForm])
-        data = {"0-field": "test",
-                "1-field": "test2",
-                "hash_0": "7e9cea465f6a10a6fb47fcea65cb9a76350c9a5c",
-                "wizard_step": "1"}
+        data = {"0-field": u"test",
+                "1-field": u"test2",
+                "hash_0": u"cd13b1db3e8f55174bc5745a1b1a53408d4fd1ca",
+                "wizard_step": u"1"}
         wizard(DummyRequest(POST=data))
         self.assertTrue(reached[0])
 
@@ -345,10 +345,10 @@ class WizardTests(TestCase):
         wizard = Wizard([WizardPageOneForm,
                          WizardPageTwoForm])
 
-        data = {"0-field": "test",
-                "1-field": "test2",
-                "hash_0": "7e9cea465f6a10a6fb47fcea65cb9a76350c9a5c",
-                "wizard_step": "1"}
+        data = {"0-field": u"test",
+                "1-field": u"test2",
+                "hash_0": u"cd13b1db3e8f55174bc5745a1b1a53408d4fd1ca",
+                "wizard_step": u"1"}
         wizard(DummyRequest(POST=data))
         self.assertTrue(reached[0])
 
@@ -371,10 +371,10 @@ class WizardTests(TestCase):
         wizard = WizardWithProcessStep([WizardPageOneForm,
                                         WizardPageTwoForm,
                                         WizardPageThreeForm])
-        data = {"0-field": "test",
-                "1-field": "test2",
-                "hash_0": "7e9cea465f6a10a6fb47fcea65cb9a76350c9a5c",
-                "wizard_step": "1"}
+        data = {"0-field": u"test",
+                "1-field": u"test2",
+                "hash_0": u"cd13b1db3e8f55174bc5745a1b1a53408d4fd1ca",
+                "wizard_step": u"1"}
         wizard(DummyRequest(POST=data))
         self.assertTrue(reached[0])
 
