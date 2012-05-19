@@ -45,6 +45,29 @@ def handle_default_options(options):
         sys.path.insert(0, options.pythonpath)
 
 
+class OutputWrapper(object):
+    """
+    Wrapper around stdout/stderr
+    """
+    def __init__(self, out, style_func=None):
+        self._out = out
+        self.style_func = None
+        if hasattr(out, 'isatty') and out.isatty():
+            self.style_func = style_func
+
+    def __getattr__(self, name):
+        return getattr(self._out, name)
+
+    def write(self, msg, style_func=None, ending='\n'):
+        if ending and not msg.endswith(ending):
+            msg += ending
+        if style_func is not None:
+            msg = style_func(msg)
+        elif self.style_func is not None:
+            msg = self.style_func(msg)
+        self._out.write(smart_str(msg))
+
+
 class BaseCommand(object):
     """
     The base class from which all management commands ultimately
@@ -210,6 +233,9 @@ class BaseCommand(object):
         # But only do this if we can assume we have a working settings file,
         # because django.utils.translation requires settings.
         saved_lang = None
+        self.stdout = OutputWrapper(options.get('stdout', sys.stdout))
+        self.stderr = OutputWrapper(options.get('stderr', sys.stderr), self.style.ERROR)
+
         if self.can_import_settings:
             try:
                 from django.utils import translation
@@ -221,12 +247,10 @@ class BaseCommand(object):
                 if show_traceback:
                     traceback.print_exc()
                 else:
-                    sys.stderr.write(smart_str(self.style.ERROR('Error: %s\n' % e)))
+                    self.stderr.write('Error: %s' % e)
                 sys.exit(1)
 
         try:
-            self.stdout = options.get('stdout', sys.stdout)
-            self.stderr = options.get('stderr', sys.stderr)
             if self.requires_model_validation and not options.get('skip_validation'):
                 self.validate()
             output = self.handle(*args, **options)
@@ -237,15 +261,15 @@ class BaseCommand(object):
                     from django.db import connections, DEFAULT_DB_ALIAS
                     connection = connections[options.get('database', DEFAULT_DB_ALIAS)]
                     if connection.ops.start_transaction_sql():
-                        self.stdout.write(self.style.SQL_KEYWORD(connection.ops.start_transaction_sql()) + '\n')
+                        self.stdout.write(self.style.SQL_KEYWORD(connection.ops.start_transaction_sql()))
                 self.stdout.write(output)
                 if self.output_transaction:
-                    self.stdout.write('\n' + self.style.SQL_KEYWORD("COMMIT;") + '\n')
+                    self.stdout.write('\n' + self.style.SQL_KEYWORD("COMMIT;"))
         except CommandError as e:
             if show_traceback:
                 traceback.print_exc()
             else:
-                self.stderr.write(smart_str(self.style.ERROR('Error: %s\n' % e)))
+                self.stderr.write('Error: %s' % e)
             sys.exit(1)
         finally:
             if saved_lang is not None:
@@ -266,7 +290,7 @@ class BaseCommand(object):
             error_text = s.read()
             raise CommandError("One or more models did not validate:\n%s" % error_text)
         if display_num_errors:
-            self.stdout.write("%s error%s found\n" % (num_errors, num_errors != 1 and 's' or ''))
+            self.stdout.write("%s error%s found" % (num_errors, num_errors != 1 and 's' or ''))
 
     def handle(self, *args, **options):
         """

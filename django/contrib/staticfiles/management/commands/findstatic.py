@@ -23,9 +23,7 @@ class Command(LabelCommand):
                 result = [result]
             output = u'\n  '.join(
                 (smart_unicode(os.path.realpath(path)) for path in result))
-            self.stdout.write(
-                smart_str(u"Found '%s' here:\n  %s\n" % (path, output)))
+            self.stdout.write(u"Found '%s' here:\n  %s" % (path, output))
         else:
             if verbosity >= 1:
-                self.stderr.write(
-                    smart_str("No matching file found for '%s'.\n" % path))
+                self.stderr.write("No matching file found for '%s'." % path)

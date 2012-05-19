@@ -109,8 +109,9 @@ class Command(BaseCommand):
                     objects.extend(model._default_manager.using(using).all())
 
         try:
-            return serializers.serialize(format, objects, indent=indent,
-                        use_natural_keys=use_natural_keys)
+            self.stdout.write(serializers.serialize(format, objects,
+                              indent=indent, use_natural_keys=use_natural_keys),
+                              ending='')
         except Exception as e:
             if show_traceback:
                 raise

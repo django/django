@@ -56,8 +56,8 @@ class Command(LabelCommand):
             curs.execute("\n".join(full_statement))
         except DatabaseError as e:
             self.stderr.write(
-                self.style.ERROR("Cache table '%s' could not be created.\nThe error was: %s.\n" %
-                    (tablename, e)))
+                "Cache table '%s' could not be created.\nThe error was: %s." %
+                    (tablename, e))
             transaction.rollback_unless_managed(using=db)
         else:
             for statement in index_output:

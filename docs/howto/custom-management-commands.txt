@@ -61,7 +61,7 @@ look like this:
                 poll.opened = False
                 poll.save()
 
-                self.stdout.write('Successfully closed poll "%s"\n' % poll_id)
+                self.stdout.write('Successfully closed poll "%s"' % poll_id)
 
 .. note::
     When you are using management commands and wish to provide console

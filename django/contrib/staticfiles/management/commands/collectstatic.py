@@ -4,7 +4,7 @@ from optparse import make_option
 
 from django.core.files.storage import FileSystemStorage
 from django.core.management.base import CommandError, NoArgsCommand
-from django.utils.encoding import smart_str, smart_unicode
+from django.utils.encoding import smart_unicode
 from django.utils.datastructures import SortedDict
 
 from django.contrib.staticfiles import finders, storage
@@ -178,15 +178,12 @@ Type 'yes' to continue, or 'no' to cancel: """
                                    ', %s post-processed'
                                    % post_processed_count or ''),
             }
-            self.stdout.write(smart_str(summary))
+            self.stdout.write(summary)
 
     def log(self, msg, level=2):
         """
         Small log helper
         """
-        msg = smart_str(msg)
-        if not msg.endswith("\n"):
-            msg += "\n"
         if self.verbosity >= level:
             self.stdout.write(msg)
 

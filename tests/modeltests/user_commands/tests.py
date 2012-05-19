@@ -11,13 +11,13 @@ class CommandTests(TestCase):
         out = StringIO()
         management.call_command('dance', stdout=out)
         self.assertEqual(out.getvalue(),
-            "I don't feel like dancing Rock'n'Roll.")
+            "I don't feel like dancing Rock'n'Roll.\n")
 
     def test_command_style(self):
         out = StringIO()
         management.call_command('dance', style='Jive', stdout=out)
         self.assertEqual(out.getvalue(),
-            "I don't feel like dancing Jive.")
+            "I don't feel like dancing Jive.\n")
 
     def test_language_preserved(self):
         out = StringIO()
