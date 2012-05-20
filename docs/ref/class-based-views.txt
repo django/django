@@ -1255,6 +1255,14 @@ WeekArchiveView
     * ``week``: A ``datetime.date`` object representing the first day of
       the given week.
 
+    * ``next_week``: A ``datetime.date`` object representing the first day
+      of the next week. If the next week is in the future, this will be
+      ``None``.
+
+    * ``previous_week``: A ``datetime.date`` object representing the first
+      day of the previous week. Unlike ``next_week``, this will never be
+      ``None``.
+
     **Notes**
 
     * Uses a default ``template_name_suffix`` of ``_archive_week``.
