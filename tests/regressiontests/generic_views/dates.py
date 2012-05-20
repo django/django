@@ -86,9 +86,14 @@ class ArchiveIndexViewTests(TestCase):
         # 1 query for years list + 1 query for books
         with self.assertNumQueries(2):
             self.client.get('/dates/books/')
-        # same as above + 1 query to test if books exist
-        with self.assertNumQueries(3):
+        # same as above + 1 query to test if books exist + 1 query to count them
+        with self.assertNumQueries(4):
             self.client.get('/dates/books/paginated/')
+
+    def test_no_duplicate_query(self):
+        # Regression test for #18354
+        with self.assertNumQueries(2):
+            self.client.get('/dates/books/reverse/')
 
     def test_datetime_archive_view(self):
         BookSigning.objects.create(event_date=datetime.datetime(2008, 4, 2, 12, 0))
@@ -154,6 +159,11 @@ class YearArchiveViewTests(TestCase):
     def test_year_view_invalid_pattern(self):
         res = self.client.get('/dates/books/no_year/')
         self.assertEqual(res.status_code, 404)
+
+    def test_no_duplicate_query(self):
+        # Regression test for #18354
+        with self.assertNumQueries(2):
+            self.client.get('/dates/books/2008/reverse/')
 
     def test_datetime_year_view(self):
         BookSigning.objects.create(event_date=datetime.datetime(2008, 4, 2, 12, 0))

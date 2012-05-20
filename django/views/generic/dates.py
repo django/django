@@ -315,7 +315,7 @@ class BaseDateListView(MultipleObjectMixin, DateMixin, View):
         """
         raise NotImplementedError('A DateView must provide an implementation of get_dated_items()')
 
-    def get_dated_queryset(self, **lookup):
+    def get_dated_queryset(self, ordering=None, **lookup):
         """
         Get a queryset properly filtered according to `allow_future` and any
         extra lookup kwargs.
@@ -325,6 +325,9 @@ class BaseDateListView(MultipleObjectMixin, DateMixin, View):
         allow_future = self.get_allow_future()
         allow_empty = self.get_allow_empty()
         paginate_by = self.get_paginate_by(qs)
+
+        if ordering is not None:
+            qs = qs.order_by(ordering)
 
         if not allow_future:
             now = timezone.now() if self.uses_datetime_field else timezone_today()
@@ -370,15 +373,13 @@ class BaseArchiveIndexView(BaseDateListView):
         """
         Return (date_list, items, extra_context) for this request.
         """
-        qs = self.get_dated_queryset()
+        qs = self.get_dated_queryset(ordering='-%s' % self.get_date_field())
         date_list = self.get_date_list(qs, 'year')
 
-        if date_list:
-            object_list = qs.order_by('-' + self.get_date_field())
-        else:
-            object_list = qs.none()
+        if not date_list:
+            qs = qs.none()
 
-        return (date_list, object_list, {})
+        return (date_list, qs, {})
 
 
 class ArchiveIndexView(MultipleObjectTemplateResponseMixin, BaseArchiveIndexView):
@@ -410,17 +411,15 @@ class BaseYearArchiveView(YearMixin, BaseDateListView):
             '%s__lt' % date_field: until,
         }
 
-        qs = self.get_dated_queryset(**lookup_kwargs)
+        qs = self.get_dated_queryset(ordering='-%s' % date_field, **lookup_kwargs)
         date_list = self.get_date_list(qs, 'month')
 
-        if self.get_make_object_list():
-            object_list = qs.order_by('-' + date_field)
-        else:
+        if not self.get_make_object_list():
             # We need this to be a queryset since parent classes introspect it
             # to find information about the model.
-            object_list = qs.none()
+            qs = qs.none()
 
-        return (date_list, object_list, {'year': year})
+        return (date_list, qs, {'year': year})
 
     def get_make_object_list(self):
         """

@@ -4,6 +4,7 @@ from django.conf.urls import patterns, url
 from django.views.decorators.cache import cache_page
 from django.views.generic import TemplateView
 
+from . import models
 from . import views
 
 
@@ -108,6 +109,8 @@ urlpatterns = patterns('',
         views.BookArchive.as_view(queryset=None)),
     (r'^dates/books/paginated/$',
         views.BookArchive.as_view(paginate_by=10)),
+    (r'^dates/books/reverse/$',
+        views.BookArchive.as_view(queryset=models.Book.objects.order_by('pubdate'))),
     (r'^dates/booksignings/$',
         views.BookSigningArchive.as_view()),
 
@@ -160,6 +163,8 @@ urlpatterns = patterns('',
         views.BookYearArchive.as_view(make_object_list=True, paginate_by=30)),
     (r'^dates/books/no_year/$',
         views.BookYearArchive.as_view()),
+    (r'^dates/books/(?P<year>\d{4})/reverse/$',
+        views.BookYearArchive.as_view(queryset=models.Book.objects.order_by('pubdate'))),
     (r'^dates/booksignings/(?P<year>\d{4})/$',
         views.BookSigningYearArchive.as_view()),
 
