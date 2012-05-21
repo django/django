@@ -864,11 +864,11 @@ View
 
     .. admonition:: Thread safety with view arguments
 
-        Arguments passed to a view are shared between every instance of a view.
+        Arguments passed a view are shared between every instance of a view.
         This means that you shoudn't use a list, dictionary, or any other
-        variable object as an argument to a view. If you did, the actions of
-        one user visiting your view could have an effect on subsequent users
-        visiting the same view.
+        mutable object as an argument to a view. If you did and the shared object
+        is changed, the actions of one user visiting your view could have an effect
+        on subsequent users visiting the same view.
 
     .. method:: dispatch(request, *args, **kwargs)
 
