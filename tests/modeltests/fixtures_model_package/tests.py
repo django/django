@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django.core import management
 from django.test import TestCase
 
@@ -12,9 +14,9 @@ class SampleTestCase(TestCase):
         self.assertEqual(Article.objects.count(), 3)
         self.assertQuerysetEqual(
             Article.objects.all(),[
-                u"Django conquers world!",
-                u"Copyright is fine the way it is",
-                u"Poker has no place on ESPN",
+                "Django conquers world!",
+                "Copyright is fine the way it is",
+                "Poker has no place on ESPN",
             ],
             lambda a: a.headline
         )
@@ -26,7 +28,7 @@ class FixtureTestCase(TestCase):
         # syncdb introduces 1 initial data object from initial_data.json
         self.assertQuerysetEqual(
             Book.objects.all(), [
-                u'Achieving self-awareness of Python programs'
+                'Achieving self-awareness of Python programs'
             ],
             lambda a: a.name
         )
@@ -37,8 +39,8 @@ class FixtureTestCase(TestCase):
         management.call_command("loaddata", "fixture1.json", verbosity=0, commit=False)
         self.assertQuerysetEqual(
             Article.objects.all(), [
-                u"Time to reform copyright",
-                u"Poker has no place on ESPN",
+                "Time to reform copyright",
+                "Poker has no place on ESPN",
             ],
             lambda a: a.headline,
         )
@@ -48,9 +50,9 @@ class FixtureTestCase(TestCase):
         management.call_command("loaddata", "fixture2.json", verbosity=0, commit=False)
         self.assertQuerysetEqual(
             Article.objects.all(), [
-                u"Django conquers world!",
-                u"Copyright is fine the way it is",
-                u"Poker has no place on ESPN",
+                "Django conquers world!",
+                "Copyright is fine the way it is",
+                "Poker has no place on ESPN",
             ],
             lambda a: a.headline,
         )
@@ -59,9 +61,9 @@ class FixtureTestCase(TestCase):
         management.call_command("loaddata", "unknown.json", verbosity=0, commit=False)
         self.assertQuerysetEqual(
             Article.objects.all(), [
-                u"Django conquers world!",
-                u"Copyright is fine the way it is",
-                u"Poker has no place on ESPN",
+                "Django conquers world!",
+                "Copyright is fine the way it is",
+                "Poker has no place on ESPN",
             ],
             lambda a: a.headline,
         )

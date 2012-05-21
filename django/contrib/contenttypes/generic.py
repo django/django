@@ -1,6 +1,7 @@
 """
 Classes allowing "generic" relations through ContentType and object-id fields.
 """
+from __future__ import unicode_literals
 
 from collections import defaultdict
 from functools import partial
@@ -131,7 +132,7 @@ class GenericForeignKey(object):
 
     def __set__(self, instance, value):
         if instance is None:
-            raise AttributeError(u"%s must be accessed via instance" % self.related.opts.object_name)
+            raise AttributeError("%s must be accessed via instance" % self.related.opts.object_name)
 
         ct = None
         fk = None

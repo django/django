@@ -1,6 +1,8 @@
 """
 PT-specific Form helpers
 """
+from __future__ import unicode_literals
+
 import re
 
 from django.core.validators import EMPTY_VALUES
@@ -24,7 +26,7 @@ class PTZipCodeField(RegexField):
     def clean(self,value):
         cleaned = super(PTZipCodeField, self).clean(value)
         if len(cleaned) == 7:
-           return u'%s-%s' % (cleaned[:4],cleaned[4:])
+           return '%s-%s' % (cleaned[:4],cleaned[4:])
         else:
            return cleaned
         
@@ -40,9 +42,9 @@ class PTPhoneNumberField(Field):
     def clean(self, value):
         super(PTPhoneNumberField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
         value = re.sub('(\.|\s)', '', smart_unicode(value))
         m = phone_digits_re.search(value)
         if m:
-            return u'%s' % value
+            return '%s' % value
         raise ValidationError(self.error_messages['invalid'])

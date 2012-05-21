@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.utils.unittest import TestCase
 
@@ -96,9 +98,9 @@ class PaginatorTests(TestCase):
             ((eleven, 10, 1, True), (11, 1, [1])),
             # Non-integer inputs
             ((ten, '4', 1, False), (10, 3, [1, 2, 3])),
-            ((ten, u'4', 1, False), (10, 3, [1, 2, 3])),
+            ((ten, '4', 1, False), (10, 3, [1, 2, 3])),
             ((ten, 4, '1', False), (10, 3, [1, 2, 3])),
-            ((ten, 4, u'1', False), (10, 3, [1, 2, 3])),
+            ((ten, 4, '1', False), (10, 3, [1, 2, 3])),
         )
         for params, output in tests:
             self.check_paginator(params, output)

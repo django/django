@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django import forms, http
 from django.conf import settings
 from django.test import TestCase
@@ -64,22 +66,22 @@ class TestWizard(WizardView):
 class FormTests(TestCase):
     def test_form_init(self):
         testform = TestWizard.get_initkwargs([Step1, Step2])
-        self.assertEqual(testform['form_list'], {u'0': Step1, u'1': Step2})
+        self.assertEqual(testform['form_list'], {'0': Step1, '1': Step2})
 
         testform = TestWizard.get_initkwargs([('start', Step1), ('step2', Step2)])
         self.assertEqual(
-            testform['form_list'], {u'start': Step1, u'step2': Step2})
+            testform['form_list'], {'start': Step1, 'step2': Step2})
 
         testform = TestWizard.get_initkwargs([Step1, Step2, ('finish', Step3)])
         self.assertEqual(
-            testform['form_list'], {u'0': Step1, u'1': Step2, u'finish': Step3})
+            testform['form_list'], {'0': Step1, '1': Step2, 'finish': Step3})
 
     def test_first_step(self):
         request = get_request()
 
         testform = TestWizard.as_view([Step1, Step2])
         response, instance = testform(request)
-        self.assertEqual(instance.steps.current, u'0')
+        self.assertEqual(instance.steps.current, '0')
 
         testform = TestWizard.as_view([('start', Step1), ('step2', Step2)])
         response, instance = testform(request)

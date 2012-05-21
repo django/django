@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 # This file is distributed under the same license as the Django package.
 #
+from __future__ import unicode_literals
 
 # The *_FORMAT strings use the Django date format syntax,
 # see http://docs.djangoproject.com/en/dev/ref/templates/builtins/#date
@@ -39,5 +40,5 @@ DATETIME_INPUT_FORMATS = (
     '%d.%m.%y',              # '25.10.06'
 )
 DECIMAL_SEPARATOR = ','
-THOUSAND_SEPARATOR = u'\xa0' # non-breaking space
+THOUSAND_SEPARATOR = '\xa0' # non-breaking space
 NUMBER_GROUPING = 3

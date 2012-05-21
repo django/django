@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 
@@ -14,10 +16,10 @@ class GeometryField(forms.Field):
     widget = forms.Textarea
 
     default_error_messages = {
-        'no_geom' : _(u'No geometry value provided.'),
-        'invalid_geom' : _(u'Invalid geometry value.'),
-        'invalid_geom_type' : _(u'Invalid geometry type.'),
-        'transform_error' : _(u'An error occurred when transforming the geometry '
+        'no_geom' : _('No geometry value provided.'),
+        'invalid_geom' : _('Invalid geometry value.'),
+        'invalid_geom_type' : _('Invalid geometry type.'),
+        'transform_error' : _('An error occurred when transforming the geometry '
                               'to the SRID of the geometry form field.'),
         }
 

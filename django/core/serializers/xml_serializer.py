@@ -2,6 +2,8 @@
 XML serializer.
 """
 
+from __future__ import unicode_literals
+
 from django.conf import settings
 from django.core.serializers import base
 from django.db import models, DEFAULT_DB_ALIAS
@@ -289,4 +291,4 @@ def getInnerText(node):
             inner_text.extend(getInnerText(child))
         else:
            pass
-    return u"".join(inner_text)
+    return "".join(inner_text)

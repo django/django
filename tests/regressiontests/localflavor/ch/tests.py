@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django.contrib.localflavor.ch.forms import (CHZipCodeField,
     CHPhoneNumberField, CHIdentityCardNumberField, CHStateSelect)
 
@@ -7,7 +9,7 @@ from django.test import SimpleTestCase
 class CHLocalFlavorTests(SimpleTestCase):
     def test_CHStateSelect(self):
         f = CHStateSelect()
-        out = u'''<select name="state">
+        out = '''<select name="state">
 <option value="AG" selected="selected">Aargau</option>
 <option value="AI">Appenzell Innerrhoden</option>
 <option value="AR">Appenzell Ausserrhoden</option>
@@ -38,7 +40,7 @@ class CHLocalFlavorTests(SimpleTestCase):
         self.assertHTMLEqual(f.render('state', 'AG'), out)
 
     def test_CHZipCodeField(self):
-        error_format = [u'Enter a zip code in the format XXXX.']
+        error_format = ['Enter a zip code in the format XXXX.']
         valid = {
             '1234': '1234',
             '0000': '0000',
@@ -50,7 +52,7 @@ class CHLocalFlavorTests(SimpleTestCase):
         self.assertFieldOutput(CHZipCodeField, valid, invalid)
 
     def test_CHPhoneNumberField(self):
-        error_format = [u'Phone numbers must be in 0XX XXX XX XX format.']
+        error_format = ['Phone numbers must be in 0XX XXX XX XX format.']
         valid = {
             '012 345 67 89': '012 345 67 89',
             '0123456789': '012 345 67 89',
@@ -62,7 +64,7 @@ class CHLocalFlavorTests(SimpleTestCase):
         self.assertFieldOutput(CHPhoneNumberField, valid, invalid)
 
     def test_CHIdentityCardNumberField(self):
-        error_format = [u'Enter a valid Swiss identity or passport card number in X1234567<0 or 1234567890 format.']
+        error_format = ['Enter a valid Swiss identity or passport card number in X1234567<0 or 1234567890 format.']
         valid = {
             'C1234567<0': 'C1234567<0',
             '2123456700': '2123456700',

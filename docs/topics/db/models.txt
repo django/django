@@ -156,11 +156,11 @@ ones:
     A choices list looks like this::
 
         YEAR_IN_SCHOOL_CHOICES = (
-            (u'FR', u'Freshman'),
-            (u'SO', u'Sophomore'),
-            (u'JR', u'Junior'),
-            (u'SR', u'Senior'),
-            (u'GR', u'Graduate'),
+            ('FR', 'Freshman'),
+            ('SO', 'Sophomore'),
+            ('JR', 'Junior'),
+            ('SR', 'Senior'),
+            ('GR', 'Graduate'),
         )
 
     The first element in each tuple is the value that will be stored in the
@@ -173,8 +173,8 @@ ones:
 
         class Person(models.Model):
             GENDER_CHOICES = (
-                (u'M', u'Male'),
-                (u'F', u'Female'),
+                ('M', 'Male'),
+                ('F', 'Female'),
             )
             name = models.CharField(max_length=60)
             gender = models.CharField(max_length=2, choices=GENDER_CHOICES)

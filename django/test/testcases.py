@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import difflib
 import json
 import os
@@ -85,7 +87,7 @@ def assert_and_parse_html(self, html, user_msg, msg):
     try:
         dom = parse_html(html)
     except HTMLParseError as e:
-        standardMsg = u'%s\n%s' % (msg, e.msg)
+        standardMsg = '%s\n%s' % (msg, e.msg)
         self.fail(self._formatMessage(user_msg, standardMsg))
     return dom
 
@@ -205,10 +207,6 @@ class OutputChecker(doctest.OutputChecker):
         "foo"
         >>> o._strip_quotes('"foo"')
         "foo"
-        >>> o._strip_quotes("u'foo'")
-        "foo"
-        >>> o._strip_quotes('u"foo"')
-        "foo"
         """
         def is_quoted_string(s):
             s = s.strip()
@@ -292,7 +290,7 @@ class _AssertTemplateUsedContext(object):
         return self.template_name in self.rendered_template_names
 
     def message(self):
-        return u'%s was not rendered.' % self.template_name
+        return '%s was not rendered.' % self.template_name
 
     def __enter__(self):
         template_rendered.connect(self.on_template_render)
@@ -306,9 +304,9 @@ class _AssertTemplateUsedContext(object):
         if not self.test():
             message = self.message()
             if len(self.rendered_templates) == 0:
-                message += u' No template was rendered.'
+                message += ' No template was rendered.'
             else:
-                message += u' Following templates were rendered: %s' % (
+                message += ' Following templates were rendered: %s' % (
                     ', '.join(self.rendered_template_names))
             self.test_case.fail(message)
 
@@ -318,7 +316,7 @@ class _AssertTemplateNotUsedContext(_AssertTemplateUsedContext):
         return self.template_name not in self.rendered_template_names
 
     def message(self):
-        return u'%s was rendered.' % self.template_name
+        return '%s was rendered.' % self.template_name
 
 
 class SimpleTestCase(ut2.TestCase):
@@ -359,7 +357,7 @@ class SimpleTestCase(ut2.TestCase):
                 re.escape(expected_message), callable_obj, *args, **kwargs)
 
     def assertFieldOutput(self, fieldclass, valid, invalid, field_args=None,
-            field_kwargs=None, empty_value=u''):
+            field_kwargs=None, empty_value=''):
         """
         Asserts that a form field behaves correctly with various inputs.
 
@@ -415,9 +413,9 @@ class SimpleTestCase(ut2.TestCase):
         significant. The passed-in arguments must be valid HTML.
         """
         dom1 = assert_and_parse_html(self, html1, msg,
-            u'First argument is not valid HTML:')
+            'First argument is not valid HTML:')
         dom2 = assert_and_parse_html(self, html2, msg,
-            u'Second argument is not valid HTML:')
+            'Second argument is not valid HTML:')
 
         if dom1 != dom2:
             standardMsg = '%s != %s' % (
@@ -431,9 +429,9 @@ class SimpleTestCase(ut2.TestCase):
     def assertHTMLNotEqual(self, html1, html2, msg=None):
         """Asserts that two HTML snippets are not semantically equivalent."""
         dom1 = assert_and_parse_html(self, html1, msg,
-            u'First argument is not valid HTML:')
+            'First argument is not valid HTML:')
         dom2 = assert_and_parse_html(self, html2, msg,
-            u'Second argument is not valid HTML:')
+            'Second argument is not valid HTML:')
 
         if dom1 == dom2:
             standardMsg = '%s == %s' % (
@@ -620,14 +618,14 @@ class TransactionTestCase(SimpleTestCase):
         self.assertEqual(response.status_code, status_code,
             msg_prefix + "Couldn't retrieve content: Response code was %d"
             " (expected %d)" % (response.status_code, status_code))
-        text = smart_str(text, response._charset)
+        enc_text = smart_str(text, response._charset)
         content = response.content
         if html:
             content = assert_and_parse_html(self, content, None,
-                u"Response's content is not valid HTML:")
-            text = assert_and_parse_html(self, text, None,
-                u"Second argument is not valid HTML:")
-        real_count = content.count(text)
+                "Response's content is not valid HTML:")
+            enc_text = assert_and_parse_html(self, enc_text, None,
+                "Second argument is not valid HTML:")
+        real_count = content.count(enc_text)
         if count is not None:
             self.assertEqual(real_count, count,
                 msg_prefix + "Found %d instances of '%s' in response"
@@ -656,14 +654,14 @@ class TransactionTestCase(SimpleTestCase):
         self.assertEqual(response.status_code, status_code,
             msg_prefix + "Couldn't retrieve content: Response code was %d"
             " (expected %d)" % (response.status_code, status_code))
-        text = smart_str(text, response._charset)
+        enc_text = smart_str(text, response._charset)
         content = response.content
         if html:
             content = assert_and_parse_html(self, content, None,
-                u'Response\'s content is not valid HTML:')
-            text = assert_and_parse_html(self, text, None,
-                u'Second argument is not valid HTML:')
-        self.assertEqual(content.count(text), 0,
+                'Response\'s content is not valid HTML:')
+            enc_text = assert_and_parse_html(self, enc_text, None,
+                'Second argument is not valid HTML:')
+        self.assertEqual(content.count(enc_text), 0,
             msg_prefix + "Response should not contain '%s'" % text)
 
     def assertFormError(self, response, form, field, errors, msg_prefix=''):
@@ -723,7 +721,7 @@ class TransactionTestCase(SimpleTestCase):
         the response. Also usable as context manager.
         """
         if response is None and template_name is None:
-            raise TypeError(u'response and/or template_name argument must be provided')
+            raise TypeError('response and/or template_name argument must be provided')
 
         if msg_prefix:
             msg_prefix += ": "
@@ -742,7 +740,7 @@ class TransactionTestCase(SimpleTestCase):
         self.assertTrue(template_name in template_names,
             msg_prefix + "Template '%s' was not a template used to render"
             " the response. Actual template(s) used: %s" %
-                (template_name, u', '.join(template_names)))
+                (template_name, ', '.join(template_names)))
 
     def assertTemplateNotUsed(self, response=None, template_name=None, msg_prefix=''):
         """
@@ -750,7 +748,7 @@ class TransactionTestCase(SimpleTestCase):
         rendering the response. Also usable as context manager.
         """
         if response is None and template_name is None:
-            raise TypeError(u'response and/or template_name argument must be provided')
+            raise TypeError('response and/or template_name argument must be provided')
 
         if msg_prefix:
             msg_prefix += ": "

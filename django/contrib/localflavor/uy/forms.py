@@ -3,7 +3,7 @@
 UY-specific form helpers.
 """
 
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 from django.core.validators import EMPTY_VALUES
 from django.forms.fields import Select, RegexField
@@ -47,7 +47,7 @@ class UYCIField(RegexField):
 
         value = super(UYCIField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
         match = self.regex.match(value)
         if not match:
             raise ValidationError(self.error_messages['invalid'])

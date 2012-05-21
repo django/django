@@ -1,5 +1,5 @@
 # coding: utf-8
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import os
 import re
@@ -119,11 +119,11 @@ class AdminViewBasicTest(TestCase):
         A smoke test to ensure POST on add_view works.
         """
         post_data = {
-            "name": u"Another Section",
+            "name": "Another Section",
             # inline data
-            "article_set-TOTAL_FORMS": u"3",
-            "article_set-INITIAL_FORMS": u"0",
-            "article_set-MAX_NUM_FORMS": u"0",
+            "article_set-TOTAL_FORMS": "3",
+            "article_set-INITIAL_FORMS": "0",
+            "article_set-MAX_NUM_FORMS": "0",
         }
         response = self.client.post('/test_admin/%s/admin_views/section/add/' % self.urlbit, post_data)
         self.assertEqual(response.status_code, 302) # redirect somewhere
@@ -133,56 +133,56 @@ class AdminViewBasicTest(TestCase):
         Ensure http response from a popup is properly escaped.
         """
         post_data = {
-            '_popup': u'1',
-            'title': u'title with a new\nline',
-            'content': u'some content',
-            'date_0': u'2010-09-10',
-            'date_1': u'14:55:39',
+            '_popup': '1',
+            'title': 'title with a new\nline',
+            'content': 'some content',
+            'date_0': '2010-09-10',
+            'date_1': '14:55:39',
         }
         response = self.client.post('/test_admin/%s/admin_views/article/add/' % self.urlbit, post_data)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'dismissAddAnotherPopup')
-        self.assertContains(response, 'title with a new\u000Aline')
+        self.assertContains(response, 'title with a new\\u000Aline')
 
     # Post data for edit inline
     inline_post_data = {
-        "name": u"Test section",
+        "name": "Test section",
         # inline data
-        "article_set-TOTAL_FORMS": u"6",
-        "article_set-INITIAL_FORMS": u"3",
-        "article_set-MAX_NUM_FORMS": u"0",
-        "article_set-0-id": u"1",
+        "article_set-TOTAL_FORMS": "6",
+        "article_set-INITIAL_FORMS": "3",
+        "article_set-MAX_NUM_FORMS": "0",
+        "article_set-0-id": "1",
         # there is no title in database, give one here or formset will fail.
-        "article_set-0-title": u"Norske bostaver æøå skaper problemer",
-        "article_set-0-content": u"&lt;p&gt;Middle content&lt;/p&gt;",
-        "article_set-0-date_0": u"2008-03-18",
-        "article_set-0-date_1": u"11:54:58",
-        "article_set-0-section": u"1",
-        "article_set-1-id": u"2",
-        "article_set-1-title": u"Need a title.",
-        "article_set-1-content": u"&lt;p&gt;Oldest content&lt;/p&gt;",
-        "article_set-1-date_0": u"2000-03-18",
-        "article_set-1-date_1": u"11:54:58",
-        "article_set-2-id": u"3",
-        "article_set-2-title": u"Need a title.",
-        "article_set-2-content": u"&lt;p&gt;Newest content&lt;/p&gt;",
-        "article_set-2-date_0": u"2009-03-18",
-        "article_set-2-date_1": u"11:54:58",
-        "article_set-3-id": u"",
-        "article_set-3-title": u"",
-        "article_set-3-content": u"",
-        "article_set-3-date_0": u"",
-        "article_set-3-date_1": u"",
-        "article_set-4-id": u"",
-        "article_set-4-title": u"",
-        "article_set-4-content": u"",
-        "article_set-4-date_0": u"",
-        "article_set-4-date_1": u"",
-        "article_set-5-id": u"",
-        "article_set-5-title": u"",
-        "article_set-5-content": u"",
-        "article_set-5-date_0": u"",
-        "article_set-5-date_1": u"",
+        "article_set-0-title": "Norske bostaver æøå skaper problemer",
+        "article_set-0-content": "&lt;p&gt;Middle content&lt;/p&gt;",
+        "article_set-0-date_0": "2008-03-18",
+        "article_set-0-date_1": "11:54:58",
+        "article_set-0-section": "1",
+        "article_set-1-id": "2",
+        "article_set-1-title": "Need a title.",
+        "article_set-1-content": "&lt;p&gt;Oldest content&lt;/p&gt;",
+        "article_set-1-date_0": "2000-03-18",
+        "article_set-1-date_1": "11:54:58",
+        "article_set-2-id": "3",
+        "article_set-2-title": "Need a title.",
+        "article_set-2-content": "&lt;p&gt;Newest content&lt;/p&gt;",
+        "article_set-2-date_0": "2009-03-18",
+        "article_set-2-date_1": "11:54:58",
+        "article_set-3-id": "",
+        "article_set-3-title": "",
+        "article_set-3-content": "",
+        "article_set-3-date_0": "",
+        "article_set-3-date_1": "",
+        "article_set-4-id": "",
+        "article_set-4-title": "",
+        "article_set-4-content": "",
+        "article_set-4-date_0": "",
+        "article_set-4-date_1": "",
+        "article_set-5-id": "",
+        "article_set-5-title": "",
+        "article_set-5-content": "",
+        "article_set-5-date_0": "",
+        "article_set-5-date_1": "",
     }
 
     def testBasicEditPost(self):
@@ -198,12 +198,12 @@ class AdminViewBasicTest(TestCase):
         """
         post_data = self.inline_post_data.copy()
         post_data.update({
-            '_saveasnew': u'Save+as+new',
-            "article_set-1-section": u"1",
-            "article_set-2-section": u"1",
-            "article_set-3-section": u"1",
-            "article_set-4-section": u"1",
-            "article_set-5-section": u"1",
+            '_saveasnew': 'Save+as+new',
+            "article_set-1-section": "1",
+            "article_set-2-section": "1",
+            "article_set-3-section": "1",
+            "article_set-4-section": "1",
+            "article_set-5-section": "1",
         })
         response = self.client.post('/test_admin/%s/admin_views/section/1/' % self.urlbit, post_data)
         self.assertEqual(response.status_code, 302) # redirect somewhere
@@ -1029,14 +1029,13 @@ class AdminViewPermissionsTest(TestCase):
         # one error in form should produce singular error message, multiple errors plural
         change_dict['title'] = ''
         post = self.client.post('/test_admin/admin/admin_views/article/1/', change_dict)
-        self.assertEqual(request.status_code, 200)
-        self.assertTrue('Please correct the error below.' in post.content,
-                        'Singular error message not found in response to post with one error.')
+        self.assertContains(post, 'Please correct the error below.',
+            msg_prefix='Singular error message not found in response to post with one error')
+
         change_dict['content'] = ''
         post = self.client.post('/test_admin/admin/admin_views/article/1/', change_dict)
-        self.assertEqual(request.status_code, 200)
-        self.assertTrue('Please correct the errors below.' in post.content,
-                        'Plural error message not found in response to post with multiple errors.')
+        self.assertContains(post, 'Please correct the errors below.',
+            msg_prefix='Plural error message not found in response to post with multiple errors')
         self.client.get('/test_admin/admin/logout/')
 
         # Test redirection when using row-level change permissions. Refs #11513.
@@ -1167,7 +1166,7 @@ class AdminViewPermissionsTest(TestCase):
         self.assertEqual(mail.outbox[0].subject, 'Greetings from a deleted object')
         article_ct = ContentType.objects.get_for_model(Article)
         logged = LogEntry.objects.get(content_type=article_ct, action_flag=DELETION)
-        self.assertEqual(logged.object_id, u'1')
+        self.assertEqual(logged.object_id, '1')
         self.client.get('/test_admin/admin/logout/')
 
     def testDisabledPermissionsWhenLoggedIn(self):
@@ -1601,29 +1600,29 @@ class AdminViewUnicodeTest(TestCase):
         A test to ensure that POST on edit_view handles non-ascii characters.
         """
         post_data = {
-            "name": u"Test lærdommer",
+            "name": "Test lærdommer",
             # inline data
-            "chapter_set-TOTAL_FORMS": u"6",
-            "chapter_set-INITIAL_FORMS": u"3",
-            "chapter_set-MAX_NUM_FORMS": u"0",
-            "chapter_set-0-id": u"1",
-            "chapter_set-0-title": u"Norske bostaver æøå skaper problemer",
-            "chapter_set-0-content": u"&lt;p&gt;Svært frustrerende med UnicodeDecodeError&lt;/p&gt;",
-            "chapter_set-1-id": u"2",
-            "chapter_set-1-title": u"Kjærlighet.",
-            "chapter_set-1-content": u"&lt;p&gt;La kjærligheten til de lidende seire.&lt;/p&gt;",
-            "chapter_set-2-id": u"3",
-            "chapter_set-2-title": u"Need a title.",
-            "chapter_set-2-content": u"&lt;p&gt;Newest content&lt;/p&gt;",
-            "chapter_set-3-id": u"",
-            "chapter_set-3-title": u"",
-            "chapter_set-3-content": u"",
-            "chapter_set-4-id": u"",
-            "chapter_set-4-title": u"",
-            "chapter_set-4-content": u"",
-            "chapter_set-5-id": u"",
-            "chapter_set-5-title": u"",
-            "chapter_set-5-content": u"",
+            "chapter_set-TOTAL_FORMS": "6",
+            "chapter_set-INITIAL_FORMS": "3",
+            "chapter_set-MAX_NUM_FORMS": "0",
+            "chapter_set-0-id": "1",
+            "chapter_set-0-title": "Norske bostaver æøå skaper problemer",
+            "chapter_set-0-content": "&lt;p&gt;Svært frustrerende med UnicodeDecodeError&lt;/p&gt;",
+            "chapter_set-1-id": "2",
+            "chapter_set-1-title": "Kjærlighet.",
+            "chapter_set-1-content": "&lt;p&gt;La kjærligheten til de lidende seire.&lt;/p&gt;",
+            "chapter_set-2-id": "3",
+            "chapter_set-2-title": "Need a title.",
+            "chapter_set-2-content": "&lt;p&gt;Newest content&lt;/p&gt;",
+            "chapter_set-3-id": "",
+            "chapter_set-3-title": "",
+            "chapter_set-3-content": "",
+            "chapter_set-4-id": "",
+            "chapter_set-4-title": "",
+            "chapter_set-4-content": "",
+            "chapter_set-5-id": "",
+            "chapter_set-5-title": "",
+            "chapter_set-5-content": "",
         }
 
         response = self.client.post('/test_admin/admin/admin_views/book/1/', post_data)
@@ -1940,8 +1939,8 @@ class AdminViewListEditable(TestCase):
             "form-2-id": "3",
 
             "index": "0",
-            "_selected_action": [u'3'],
-            "action": [u'', u'delete_selected'],
+            "_selected_action": ['3'],
+            "action": ['', 'delete_selected'],
         }
         self.client.post('/test_admin/admin/admin_views/person/', data)
 
@@ -1967,8 +1966,8 @@ class AdminViewListEditable(TestCase):
             "form-2-id": "3",
 
             "_save": "Save",
-            "_selected_action": [u'1'],
-            "action": [u'', u'delete_selected'],
+            "_selected_action": ['1'],
+            "action": ['', 'delete_selected'],
         }
         self.client.post('/test_admin/admin/admin_views/person/', data)
 
@@ -2077,8 +2076,8 @@ class AdminInheritedInlinesTest(TestCase):
     def testInline(self):
         "Ensure that inline models which inherit from a common parent are correctly handled by admin."
 
-        foo_user = u"foo username"
-        bar_user = u"bar username"
+        foo_user = "foo username"
+        bar_user = "bar username"
 
         name_re = re.compile('name="(.*?)"')
 
@@ -2090,15 +2089,15 @@ class AdminInheritedInlinesTest(TestCase):
 
         # test the add case
         post_data = {
-            "name": u"Test Name",
+            "name": "Test Name",
             # inline data
-            "accounts-TOTAL_FORMS": u"1",
-            "accounts-INITIAL_FORMS": u"0",
-            "accounts-MAX_NUM_FORMS": u"0",
+            "accounts-TOTAL_FORMS": "1",
+            "accounts-INITIAL_FORMS": "0",
+            "accounts-MAX_NUM_FORMS": "0",
             "accounts-0-username": foo_user,
-            "accounts-2-TOTAL_FORMS": u"1",
-            "accounts-2-INITIAL_FORMS": u"0",
-            "accounts-2-MAX_NUM_FORMS": u"0",
+            "accounts-2-TOTAL_FORMS": "1",
+            "accounts-2-INITIAL_FORMS": "0",
+            "accounts-2-MAX_NUM_FORMS": "0",
             "accounts-2-0-username": bar_user,
         }
 
@@ -2123,19 +2122,19 @@ class AdminInheritedInlinesTest(TestCase):
         self.assertEqual(len(names), len(set(names)))
 
         post_data = {
-            "name": u"Test Name",
+            "name": "Test Name",
 
             "accounts-TOTAL_FORMS": "2",
-            "accounts-INITIAL_FORMS": u"1",
-            "accounts-MAX_NUM_FORMS": u"0",
+            "accounts-INITIAL_FORMS": "1",
+            "accounts-MAX_NUM_FORMS": "0",
 
             "accounts-0-username": "%s-1" % foo_user,
             "accounts-0-account_ptr": str(foo_id),
             "accounts-0-persona": str(persona_id),
 
-            "accounts-2-TOTAL_FORMS": u"2",
-            "accounts-2-INITIAL_FORMS": u"1",
-            "accounts-2-MAX_NUM_FORMS": u"0",
+            "accounts-2-TOTAL_FORMS": "2",
+            "accounts-2-INITIAL_FORMS": "1",
+            "accounts-2-MAX_NUM_FORMS": "0",
 
             "accounts-2-0-username": "%s-1" % bar_user,
             "accounts-2-0-account_ptr": str(bar_id),
@@ -2387,7 +2386,7 @@ class TestCustomChangeList(TestCase):
         Validate that a custom ChangeList class can be used (#9749)
         """
         # Insert some data
-        post_data = {"name": u"First Gadget"}
+        post_data = {"name": "First Gadget"}
         response = self.client.post('/test_admin/%s/admin_views/gadget/add/' % self.urlbit, post_data)
         self.assertEqual(response.status_code, 302) # redirect somewhere
         # Hit the page once to get messages out of the queue message list
@@ -2444,12 +2443,12 @@ class AdminCustomQuerysetTest(TestCase):
 
     def test_add_model_modeladmin_only_qs(self):
         # only() is used in ModelAdmin.queryset()
-        p = Paper.objects.create(title=u"My Paper Title")
+        p = Paper.objects.create(title="My Paper Title")
         self.assertEqual(Paper.objects.count(), 1)
         response = self.client.get('/test_admin/admin/admin_views/paper/%s/' % p.pk)
         self.assertEqual(response.status_code, 200)
         post_data = {
-            "title": u"My Modified Paper Title",
+            "title": "My Modified Paper Title",
             "_save": "Save",
         }
         response = self.client.post('/test_admin/admin/admin_views/paper/%s/' % p.pk,
@@ -2459,12 +2458,12 @@ class AdminCustomQuerysetTest(TestCase):
         self.assertContains(response, '<li class="info">The paper &quot;Paper_Deferred_author object&quot; was changed successfully.</li>', html=True)
 
         # defer() is used in ModelAdmin.queryset()
-        cl = CoverLetter.objects.create(author=u"John Doe")
+        cl = CoverLetter.objects.create(author="John Doe")
         self.assertEqual(CoverLetter.objects.count(), 1)
         response = self.client.get('/test_admin/admin/admin_views/coverletter/%s/' % cl.pk)
         self.assertEqual(response.status_code, 200)
         post_data = {
-            "author": u"John Doe II",
+            "author": "John Doe II",
             "_save": "Save",
         }
         response = self.client.post('/test_admin/admin/admin_views/coverletter/%s/' % cl.pk,
@@ -2503,10 +2502,10 @@ class AdminInlineFileUploadTest(TestCase):
         Test that inline file uploads correctly display prior data (#10002).
         """
         post_data = {
-            "name": u"Test Gallery",
-            "pictures-TOTAL_FORMS": u"2",
-            "pictures-INITIAL_FORMS": u"1",
-            "pictures-MAX_NUM_FORMS": u"0",
+            "name": "Test Gallery",
+            "pictures-TOTAL_FORMS": "2",
+            "pictures-INITIAL_FORMS": "1",
+            "pictures-MAX_NUM_FORMS": "0",
             "pictures-0-id": unicode(self.picture.id),
             "pictures-0-gallery": unicode(self.gallery.id),
             "pictures-0-name": "Test Picture",
@@ -2527,11 +2526,11 @@ class AdminInlineTests(TestCase):
 
     def setUp(self):
         self.post_data = {
-            "name": u"Test Name",
+            "name": "Test Name",
 
             "widget_set-TOTAL_FORMS": "3",
-            "widget_set-INITIAL_FORMS": u"0",
-            "widget_set-MAX_NUM_FORMS": u"0",
+            "widget_set-INITIAL_FORMS": "0",
+            "widget_set-MAX_NUM_FORMS": "0",
             "widget_set-0-id": "",
             "widget_set-0-owner": "1",
             "widget_set-0-name": "",
@@ -2543,8 +2542,8 @@ class AdminInlineTests(TestCase):
             "widget_set-2-name": "",
 
             "doohickey_set-TOTAL_FORMS": "3",
-            "doohickey_set-INITIAL_FORMS": u"0",
-            "doohickey_set-MAX_NUM_FORMS": u"0",
+            "doohickey_set-INITIAL_FORMS": "0",
+            "doohickey_set-MAX_NUM_FORMS": "0",
             "doohickey_set-0-owner": "1",
             "doohickey_set-0-code": "",
             "doohickey_set-0-name": "",
@@ -2556,8 +2555,8 @@ class AdminInlineTests(TestCase):
             "doohickey_set-2-name": "",
 
             "grommet_set-TOTAL_FORMS": "3",
-            "grommet_set-INITIAL_FORMS": u"0",
-            "grommet_set-MAX_NUM_FORMS": u"0",
+            "grommet_set-INITIAL_FORMS": "0",
+            "grommet_set-MAX_NUM_FORMS": "0",
             "grommet_set-0-code": "",
             "grommet_set-0-owner": "1",
             "grommet_set-0-name": "",
@@ -2569,8 +2568,8 @@ class AdminInlineTests(TestCase):
             "grommet_set-2-name": "",
 
             "whatsit_set-TOTAL_FORMS": "3",
-            "whatsit_set-INITIAL_FORMS": u"0",
-            "whatsit_set-MAX_NUM_FORMS": u"0",
+            "whatsit_set-INITIAL_FORMS": "0",
+            "whatsit_set-MAX_NUM_FORMS": "0",
             "whatsit_set-0-owner": "1",
             "whatsit_set-0-index": "",
             "whatsit_set-0-name": "",
@@ -2582,8 +2581,8 @@ class AdminInlineTests(TestCase):
             "whatsit_set-2-name": "",
 
             "fancydoodad_set-TOTAL_FORMS": "3",
-            "fancydoodad_set-INITIAL_FORMS": u"0",
-            "fancydoodad_set-MAX_NUM_FORMS": u"0",
+            "fancydoodad_set-INITIAL_FORMS": "0",
+            "fancydoodad_set-MAX_NUM_FORMS": "0",
             "fancydoodad_set-0-doodad_ptr": "",
             "fancydoodad_set-0-owner": "1",
             "fancydoodad_set-0-name": "",
@@ -2969,7 +2968,7 @@ class SeleniumPrePopulatedFirefoxTests(AdminSeleniumWebDriverTestCase):
         # Main form ----------------------------------------------------------
         self.selenium.find_element_by_css_selector('#id_pubdate').send_keys('2012-02-18')
         self.get_select_option('#id_status', 'option two').click()
-        self.selenium.find_element_by_css_selector('#id_name').send_keys(u' this is the mAin nÀMë and it\'s awεšome')
+        self.selenium.find_element_by_css_selector('#id_name').send_keys(' this is the mAin nÀMë and it\'s awεšome')
         slug1 = self.selenium.find_element_by_css_selector('#id_slug1').get_attribute('value')
         slug2 = self.selenium.find_element_by_css_selector('#id_slug2').get_attribute('value')
         self.assertEqual(slug1, 'main-name-and-its-awesome-2012-02-18')
@@ -2979,7 +2978,7 @@ class SeleniumPrePopulatedFirefoxTests(AdminSeleniumWebDriverTestCase):
         # Initial inline
         self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-0-pubdate').send_keys('2011-12-17')
         self.get_select_option('#id_relatedprepopulated_set-0-status', 'option one').click()
-        self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-0-name').send_keys(u' here is a sŤāÇkeð   inline !  ')
+        self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-0-name').send_keys(' here is a sŤāÇkeð   inline !  ')
         slug1 = self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-0-slug1').get_attribute('value')
         slug2 = self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-0-slug2').get_attribute('value')
         self.assertEqual(slug1, 'here-stacked-inline-2011-12-17')
@@ -2989,7 +2988,7 @@ class SeleniumPrePopulatedFirefoxTests(AdminSeleniumWebDriverTestCase):
         self.selenium.find_elements_by_link_text('Add another Related Prepopulated')[0].click()
         self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-1-pubdate').send_keys('1999-01-25')
         self.get_select_option('#id_relatedprepopulated_set-1-status', 'option two').click()
-        self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-1-name').send_keys(u' now you haVe anöther   sŤāÇkeð  inline with a very ... loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooog text... ')
+        self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-1-name').send_keys(' now you haVe anöther   sŤāÇkeð  inline with a very ... loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooog text... ')
         slug1 = self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-1-slug1').get_attribute('value')
         slug2 = self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-1-slug2').get_attribute('value')
         self.assertEqual(slug1, 'now-you-have-another-stacked-inline-very-loooooooo') # 50 characters maximum for slug1 field
@@ -2999,7 +2998,7 @@ class SeleniumPrePopulatedFirefoxTests(AdminSeleniumWebDriverTestCase):
         # Initial inline
         self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-2-0-pubdate').send_keys('1234-12-07')
         self.get_select_option('#id_relatedprepopulated_set-2-0-status', 'option two').click()
-        self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-2-0-name').send_keys(u'And now, with a tÃbűlaŘ inline !!!')
+        self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-2-0-name').send_keys('And now, with a tÃbűlaŘ inline !!!')
         slug1 = self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-2-0-slug1').get_attribute('value')
         slug2 = self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-2-0-slug2').get_attribute('value')
         self.assertEqual(slug1, 'and-now-tabular-inline-1234-12-07')
@@ -3009,7 +3008,7 @@ class SeleniumPrePopulatedFirefoxTests(AdminSeleniumWebDriverTestCase):
         self.selenium.find_elements_by_link_text('Add another Related Prepopulated')[1].click()
         self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-2-1-pubdate').send_keys('1981-08-22')
         self.get_select_option('#id_relatedprepopulated_set-2-1-status', 'option one').click()
-        self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-2-1-name').send_keys(u'a tÃbűlaŘ inline with ignored ;"&*^\%$#@-/`~ characters')
+        self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-2-1-name').send_keys('a tÃbűlaŘ inline with ignored ;"&*^\%$#@-/`~ characters')
         slug1 = self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-2-1-slug1').get_attribute('value')
         slug2 = self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-2-1-slug2').get_attribute('value')
         self.assertEqual(slug1, 'tabular-inline-ignored-characters-1981-08-22')
@@ -3029,7 +3028,7 @@ class SeleniumPrePopulatedFirefoxTests(AdminSeleniumWebDriverTestCase):
 
         self.assertEqual(MainPrepopulated.objects.all().count(), 1)
         MainPrepopulated.objects.get(
-            name=u' this is the mAin nÀMë and it\'s awεšome',
+            name=' this is the mAin nÀMë and it\'s awεšome',
             pubdate='2012-02-18',
             status='option two',
             slug1='main-name-and-its-awesome-2012-02-18',
@@ -3037,28 +3036,28 @@ class SeleniumPrePopulatedFirefoxTests(AdminSeleniumWebDriverTestCase):
         )
         self.assertEqual(RelatedPrepopulated.objects.all().count(), 4)
         RelatedPrepopulated.objects.get(
-            name=u' here is a sŤāÇkeð   inline !  ',
+            name=' here is a sŤāÇkeð   inline !  ',
             pubdate='2011-12-17',
             status='option one',
             slug1='here-stacked-inline-2011-12-17',
             slug2='option-one-here-stacked-inline',
         )
         RelatedPrepopulated.objects.get(
-            name=u' now you haVe anöther   sŤāÇkeð  inline with a very ... loooooooooooooooooo', # 75 characters in name field
+            name=' now you haVe anöther   sŤāÇkeð  inline with a very ... loooooooooooooooooo', # 75 characters in name field
             pubdate='1999-01-25',
             status='option two',
             slug1='now-you-have-another-stacked-inline-very-loooooooo',
             slug2='option-two-now-you-have-another-stacked-inline-very-looooooo',
         )
         RelatedPrepopulated.objects.get(
-            name=u'And now, with a tÃbűlaŘ inline !!!',
+            name='And now, with a tÃbűlaŘ inline !!!',
             pubdate='1234-12-07',
             status='option two',
             slug1='and-now-tabular-inline-1234-12-07',
             slug2='option-two-and-now-tabular-inline',
         )
         RelatedPrepopulated.objects.get(
-            name=u'a tÃbűlaŘ inline with ignored ;"&*^\%$#@-/`~ characters',
+            name='a tÃbűlaŘ inline with ignored ;"&*^\%$#@-/`~ characters',
             pubdate='1981-08-22',
             status='option one',
             slug1='tabular-inline-ignored-characters-1981-08-22',
@@ -3230,7 +3229,7 @@ class UserAdminTest(TestCase):
         adminform = response.context['adminform']
         self.assertTrue('password' not in adminform.form.errors)
         self.assertEqual(adminform.form.errors['password2'],
-                          [u"The two password fields didn't match."])
+                          ["The two password fields didn't match."])
 
     def test_user_fk_popup(self):
         """Quick user addition in a FK popup shouldn't invoke view for further user customization"""
@@ -3569,7 +3568,7 @@ class AdminCustomSaveRelatedTests(TestCase):
         children_names = list(Child.objects.order_by('name').values_list('name', flat=True))
 
         self.assertEqual('Josh Stone', Parent.objects.latest('id').name)
-        self.assertEqual([u'Catherine Stone', u'Paul Stone'], children_names)
+        self.assertEqual(['Catherine Stone', 'Paul Stone'], children_names)
 
     def test_should_be_able_to_edit_related_objects_on_change_view(self):
         parent = Parent.objects.create(name='Josh Stone')
@@ -3589,7 +3588,7 @@ class AdminCustomSaveRelatedTests(TestCase):
         children_names = list(Child.objects.order_by('name').values_list('name', flat=True))
 
         self.assertEqual('Josh Stone', Parent.objects.latest('id').name)
-        self.assertEqual([u'Catherine Stone', u'Paul Stone'], children_names)
+        self.assertEqual(['Catherine Stone', 'Paul Stone'], children_names)
 
     def test_should_be_able_to_edit_related_objects_on_changelist_view(self):
         parent = Parent.objects.create(name='Josh Rock')
@@ -3608,7 +3607,7 @@ class AdminCustomSaveRelatedTests(TestCase):
         children_names = list(Child.objects.order_by('name').values_list('name', flat=True))
 
         self.assertEqual('Josh Stone', Parent.objects.latest('id').name)
-        self.assertEqual([u'Catherine Stone', u'Paul Stone'], children_names)
+        self.assertEqual(['Catherine Stone', 'Paul Stone'], children_names)
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))

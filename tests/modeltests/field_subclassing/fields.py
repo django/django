@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import json
 
 from django.db import models
@@ -13,7 +15,7 @@ class Small(object):
         self.first, self.second = first, second
 
     def __unicode__(self):
-        return u'%s%s' % (force_unicode(self.first), force_unicode(self.second))
+        return '%s%s' % (force_unicode(self.first), force_unicode(self.second))
 
     def __str__(self):
         return unicode(self).encode('utf-8')

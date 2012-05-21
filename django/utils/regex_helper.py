@@ -5,6 +5,7 @@ Used internally by Django and not intended for external use.
 This is not, and is not intended to be, a complete reg-exp decompiler. It
 should be good enough for a large class of URLS, however.
 """
+from __future__ import unicode_literals
 
 # Mapping of an escape character to a representative of that class. So, e.g.,
 # "\w" is replaced by "x" in a reverse URL. A value of None means to ignore
@@ -13,12 +14,12 @@ ESCAPE_MAPPINGS = {
     "A": None,
     "b": None,
     "B": None,
-    "d": u"0",
-    "D": u"x",
-    "s": u" ",
-    "S": u"x",
-    "w": u"x",
-    "W": u"!",
+    "d": "0",
+    "D": "x",
+    "s": " ",
+    "S": "x",
+    "w": "x",
+    "W": "!",
     "Z": None,
 }
 
@@ -77,7 +78,7 @@ def normalize(pattern):
     try:
         ch, escaped = next(pattern_iter)
     except StopIteration:
-        return zip([u''],  [[]])
+        return zip([''],  [[]])
 
     try:
         while True:
@@ -85,7 +86,7 @@ def normalize(pattern):
                 result.append(ch)
             elif ch == '.':
                 # Replace "any character" with an arbitrary representative.
-                result.append(u".")
+                result.append(".")
             elif ch == '|':
                 # FIXME: One day we'll should do this, but not in 1.0.
                 raise NotImplementedError
@@ -117,7 +118,7 @@ def normalize(pattern):
                     # A positional group
                     name = "_%d" % num_args
                     num_args += 1
-                    result.append(Group(((u"%%(%s)s" % name), name)))
+                    result.append(Group((("%%(%s)s" % name), name)))
                     walk_to_end(ch, pattern_iter)
                 else:
                     ch, escaped = next(pattern_iter)
@@ -152,10 +153,10 @@ def normalize(pattern):
                         # Named backreferences have already consumed the
                         # parenthesis.
                         if terminal_char != ')':
-                            result.append(Group(((u"%%(%s)s" % param), param)))
+                            result.append(Group((("%%(%s)s" % param), param)))
                             walk_to_end(ch, pattern_iter)
                         else:
-                            result.append(Group(((u"%%(%s)s" % param), None)))
+                            result.append(Group((("%%(%s)s" % param), None)))
             elif ch in "*?+{":
                 # Quanitifers affect the previous item in the result list.
                 count, ch = get_quantifier(ch, pattern_iter)
@@ -190,7 +191,7 @@ def normalize(pattern):
         pass
     except NotImplementedError:
         # A case of using the disjunctive form. No results for you!
-        return zip([u''],  [[]])
+        return zip([''],  [[]])
 
     return zip(*flatten_result(result))
 
@@ -290,20 +291,20 @@ def flatten_result(source):
     Each of the two lists will be of the same length.
     """
     if source is None:
-        return [u''], [[]]
+        return [''], [[]]
     if isinstance(source, Group):
         if source[1] is None:
             params = []
         else:
             params = [source[1]]
         return [source[0]], [params]
-    result = [u'']
+    result = ['']
     result_args = [[]]
     pos = last = 0
     for pos, elt in enumerate(source):
         if isinstance(elt, basestring):
             continue
-        piece = u''.join(source[last:pos])
+        piece = ''.join(source[last:pos])
         if isinstance(elt, Group):
             piece += elt[0]
             param = elt[1]
@@ -331,7 +332,7 @@ def flatten_result(source):
             result = new_result
             result_args = new_args
     if pos >= last:
-        piece = u''.join(source[last:])
+        piece = ''.join(source[last:])
         for i in range(len(result)):
             result[i] += piece
     return result, result_args

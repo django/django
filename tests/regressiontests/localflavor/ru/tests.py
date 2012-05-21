@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django.contrib.localflavor.ru.forms import *
 
 from django.test import SimpleTestCase
@@ -6,7 +8,7 @@ from django.test import SimpleTestCase
 class RULocalFlavorTests(SimpleTestCase):
 
     def test_RUPassportNumberField(self):
-        error = [u'Enter a passport number in the format XXXX XXXXXX.']
+        error = ['Enter a passport number in the format XXXX XXXXXX.']
         valid = {
             '1981 211204': '1981 211204',
             '0305 967876': '0305 967876',
@@ -19,7 +21,7 @@ class RULocalFlavorTests(SimpleTestCase):
         self.assertFieldOutput(RUPassportNumberField, valid, invalid)
 
     def test_RUAlienPassportNumberField(self):
-        error = [u'Enter a passport number in the format XX XXXXXXX.']
+        error = ['Enter a passport number in the format XX XXXXXXX.']
         valid = {
             '19 8111204': '19 8111204',
             '03 0567876': '03 0567876',
@@ -32,7 +34,7 @@ class RULocalFlavorTests(SimpleTestCase):
         self.assertFieldOutput(RUAlienPassportNumberField, valid, invalid)
 
     def test_RUPostalCodeField(self):
-        error = [u'Enter a postal code in the format XXXXXX.']
+        error = ['Enter a postal code in the format XXXXXX.']
         valid = {
             '987654': '987654',
             '123456': '123456'
@@ -46,7 +48,7 @@ class RULocalFlavorTests(SimpleTestCase):
 
     def test_RUCountySelect(self):
         f = RUCountySelect()
-        out = u'''<select name="county">
+        out = '''<select name="county">
 <option value="Central Federal County">Central Federal County</option>
 <option value="South Federal County">South Federal County</option>
 <option value="North-West Federal County">North-West Federal County</option>
@@ -60,7 +62,7 @@ class RULocalFlavorTests(SimpleTestCase):
 
     def test_RURegionSelect(self):
         f = RURegionSelect()
-        out = u'''<select name="region">
+        out = '''<select name="region">
 <option value="77">Moskva</option>
 <option value="78">Saint-Peterburg</option>
 <option value="50">Moskovskaya oblast&#39;</option>

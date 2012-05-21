@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django.conf import settings
 from django.contrib.flatpages.forms import FlatpageForm
 from django.contrib.flatpages.models import FlatPage
@@ -57,7 +59,7 @@ class FlatpageAdminFormTests(TestCase):
 
         self.assertEqual(
             f.errors,
-            {'__all__': [u'Flatpage with url /myflatpage1/ already exists for site example.com']})
+            {'__all__': ['Flatpage with url /myflatpage1/ already exists for site example.com']})
 
     def test_flatpage_admin_form_edit(self):
         """
@@ -89,5 +91,5 @@ class FlatpageAdminFormTests(TestCase):
 
         self.assertEqual(
             f.errors,
-            {'sites': [u'This field is required.']})
+            {'sites': ['This field is required.']})
 

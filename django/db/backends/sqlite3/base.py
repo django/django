@@ -4,6 +4,7 @@ SQLite3 backend for django.
 Works with either the pysqlite2 module or the sqlite3 module in the
 standard library.
 """
+from __future__ import unicode_literals
 
 import datetime
 import decimal
@@ -45,8 +46,8 @@ def adapt_datetime_with_timezone_support(value):
     # Equivalent to DateTimeField.get_db_prep_value. Used only by raw SQL.
     if settings.USE_TZ:
         if timezone.is_naive(value):
-            warnings.warn(u"SQLite received a naive datetime (%s)"
-                          u" while time zone support is active." % value,
+            warnings.warn("SQLite received a naive datetime (%s)"
+                          " while time zone support is active." % value,
                           RuntimeWarning)
             default_timezone = timezone.get_default_timezone()
             value = timezone.make_aware(value, default_timezone)
@@ -118,7 +119,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         # values differently. So instead we register our own function that
         # formats the datetime combined with the delta in a manner suitable
         # for comparisons.
-        return  u'django_format_dtdelta(%s, "%s", "%d", "%d", "%d")' % (sql,
+        return  'django_format_dtdelta(%s, "%s", "%d", "%d", "%d")' % (sql,
             connector, timedelta.days, timedelta.seconds, timedelta.microseconds)
 
     def date_trunc_sql(self, lookup_type, field_name):

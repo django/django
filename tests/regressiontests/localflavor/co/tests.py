@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django.contrib.localflavor.co.forms import CODepartmentSelect
 
 from django.test import SimpleTestCase
@@ -5,7 +7,7 @@ from django.test import SimpleTestCase
 class COLocalFlavorTests(SimpleTestCase):
     def test_CODepartmentSelect(self):
         d = CODepartmentSelect()
-        out = u"""<select name="department">
+        out = """<select name="department">
 <option value="AMA">Amazonas</option>
 <option value="ANT">Antioquia</option>
 <option value="ARA">Arauca</option>

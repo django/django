@@ -2,6 +2,7 @@
 These classes are light wrappers around Django's database API that provide
 convenience functionality and permalink functions for the databrowse app.
 """
+from __future__ import unicode_literals
 
 from django.db import models
 from django.utils import formats
@@ -61,7 +62,7 @@ class EasyField(object):
         self.model, self.field = easy_model, field
 
     def __repr__(self):
-        return smart_str(u'<EasyField for %s.%s>' % (self.model.model._meta.object_name, self.field.name))
+        return smart_str('<EasyField for %s.%s>' % (self.model.model._meta.object_name, self.field.name))
 
     def choices(self):
         for value, label in self.field.choices:
@@ -79,7 +80,7 @@ class EasyChoice(object):
         self.value, self.label = value, label
 
     def __repr__(self):
-        return smart_str(u'<EasyChoice for %s.%s>' % (self.model.model._meta.object_name, self.field.name))
+        return smart_str('<EasyChoice for %s.%s>' % (self.model.model._meta.object_name, self.field.name))
 
     def url(self):
         return mark_safe('%s%s/%s/%s/%s/' % (self.model.site.root_url, self.model.model._meta.app_label, self.model.model._meta.module_name, self.field.field.name, iri_to_uri(self.value)))
@@ -89,12 +90,12 @@ class EasyInstance(object):
         self.model, self.instance = easy_model, instance
 
     def __repr__(self):
-        return smart_str(u'<EasyInstance for %s (%s)>' % (self.model.model._meta.object_name, self.instance._get_pk_val()))
+        return smart_str('<EasyInstance for %s (%s)>' % (self.model.model._meta.object_name, self.instance._get_pk_val()))
 
     def __unicode__(self):
         val = smart_unicode(self.instance)
         if len(val) > DISPLAY_SIZE:
-            return val[:DISPLAY_SIZE] + u'...'
+            return val[:DISPLAY_SIZE] + '...'
         return val
 
     def __str__(self):
@@ -136,7 +137,7 @@ class EasyInstanceField(object):
         self.raw_value = getattr(instance.instance, field.name)
 
     def __repr__(self):
-        return smart_str(u'<EasyInstanceField for %s.%s>' % (self.model.model._meta.object_name, self.field.name))
+        return smart_str('<EasyInstanceField for %s.%s>' % (self.model.model._meta.object_name, self.field.name))
 
     def values(self):
         """

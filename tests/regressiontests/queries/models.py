@@ -2,6 +2,8 @@
 Various complex queries that have been problematic in the past.
 """
 
+from __future__ import unicode_literals
+
 import threading
 
 from django.db import models
@@ -294,14 +296,14 @@ class Eaten(models.Model):
     meal = models.CharField(max_length=20)
 
     def __unicode__(self):
-        return u"%s at %s" % (self.food, self.meal)
+        return "%s at %s" % (self.food, self.meal)
 
 class Node(models.Model):
     num = models.IntegerField(unique=True)
     parent = models.ForeignKey("self", to_field="num", null=True)
 
     def __unicode__(self):
-        return u"%s" % self.num
+        return "%s" % self.num
 
 # Bug #12252
 class ObjectA(models.Model):

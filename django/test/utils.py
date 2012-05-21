@@ -219,3 +219,5 @@ class override_settings(object):
             setting_changed.send(sender=settings._wrapped.__class__,
                                  setting=key, value=new_value)
 
+def str_prefix(s):
+    return s % {'_': 'u'}

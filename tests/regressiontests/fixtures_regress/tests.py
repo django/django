@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # Unittests for fixtures.
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import os
 import re
@@ -85,7 +85,7 @@ class TestFixtures(TestCase):
             verbosity=0,
             commit=False
         )
-        self.assertEqual(Stuff.objects.all()[0].name, u'')
+        self.assertEqual(Stuff.objects.all()[0].name, '')
         self.assertEqual(Stuff.objects.all()[0].owner, None)
 
     def test_absolute_path(self):
@@ -385,7 +385,7 @@ class TestFixtures(TestCase):
             stderr=stderr,
         )
         self.assertTrue(
-            stderr.getvalue().startswith('Problem installing fixture')
+            stderr.getvalue().decode('utf-8').startswith('Problem installing fixture')
         )
 
     _cur_dir = os.path.dirname(os.path.abspath(__file__))

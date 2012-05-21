@@ -2,7 +2,7 @@
 India-specific Form helpers.
 """
 
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import re
 
@@ -38,7 +38,7 @@ phone_digits_re = re.compile(r"""
 
 class INZipCodeField(RegexField):
     default_error_messages = {
-        'invalid': _(u'Enter a zip code in the format XXXXXX or XXX XXX.'),
+        'invalid': _('Enter a zip code in the format XXXXXX or XXX XXX.'),
     }
 
     def __init__(self, max_length=None, min_length=None, *args, **kwargs):
@@ -48,7 +48,7 @@ class INZipCodeField(RegexField):
     def clean(self, value):
         super(INZipCodeField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
         # Convert to "NNNNNN" if "NNN NNN" given
         value = re.sub(r'^(\d{3})\s(\d{3})$', r'\1\2', value)
         return value
@@ -61,13 +61,13 @@ class INStateField(Field):
     registration abbreviation for the given state or union territory
     """
     default_error_messages = {
-        'invalid': _(u'Enter an Indian state or territory.'),
+        'invalid': _('Enter an Indian state or territory.'),
     }
 
     def clean(self, value):
         super(INStateField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
         try:
             value = value.strip().lower()
         except AttributeError:
@@ -106,10 +106,10 @@ class INPhoneNumberField(CharField):
     def clean(self, value):
         super(INPhoneNumberField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
         value = smart_unicode(value)
         m = phone_digits_re.match(value)
         if m:
-            return u'%s' % (value)
+            return '%s' % (value)
         raise ValidationError(self.error_messages['invalid'])
 

@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import copy
 import datetime
 import decimal
@@ -60,16 +62,16 @@ class Field(object):
     auto_creation_counter = -1
     default_validators = [] # Default set of validators
     default_error_messages = {
-        'invalid_choice': _(u'Value %r is not a valid choice.'),
-        'null': _(u'This field cannot be null.'),
-        'blank': _(u'This field cannot be blank.'),
-        'unique': _(u'%(model_name)s with this %(field_label)s '
-                    u'already exists.'),
+        'invalid_choice': _('Value %r is not a valid choice.'),
+        'null': _('This field cannot be null.'),
+        'blank': _('This field cannot be blank.'),
+        'unique': _('%(model_name)s with this %(field_label)s '
+                    'already exists.'),
     }
 
     # Generic field type description, usually overriden by subclasses
     def _description(self):
-        return _(u'Field of type: %(field_type)s') % {
+        return _('Field of type: %(field_type)s') % {
             'field_type': self.__class__.__name__
         }
     description = property(_description)
@@ -511,7 +513,7 @@ class AutoField(Field):
 
     empty_strings_allowed = False
     default_error_messages = {
-        'invalid': _(u"'%s' value must be an integer."),
+        'invalid': _("'%s' value must be an integer."),
     }
 
     def __init__(self, *args, **kwargs):
@@ -559,7 +561,7 @@ class AutoField(Field):
 class BooleanField(Field):
     empty_strings_allowed = False
     default_error_messages = {
-        'invalid': _(u"'%s' value must be either True or False."),
+        'invalid': _("'%s' value must be either True or False."),
     }
     description = _("Boolean (Either True or False)")
 
@@ -645,7 +647,7 @@ class CommaSeparatedIntegerField(CharField):
     def formfield(self, **kwargs):
         defaults = {
             'error_messages': {
-                'invalid': _(u'Enter only digits separated by commas.'),
+                'invalid': _('Enter only digits separated by commas.'),
             }
         }
         defaults.update(kwargs)
@@ -654,10 +656,10 @@ class CommaSeparatedIntegerField(CharField):
 class DateField(Field):
     empty_strings_allowed = False
     default_error_messages = {
-        'invalid': _(u"'%s' value has an invalid date format. It must be "
-                     u"in YYYY-MM-DD format."),
-        'invalid_date': _(u"'%s' value has the correct format (YYYY-MM-DD) "
-                          u"but it is an invalid date."),
+        'invalid': _("'%s' value has an invalid date format. It must be "
+                     "in YYYY-MM-DD format."),
+        'invalid_date': _("'%s' value has the correct format (YYYY-MM-DD) "
+                          "but it is an invalid date."),
     }
     description = _("Date (without time)")
 
@@ -744,13 +746,13 @@ class DateField(Field):
 class DateTimeField(DateField):
     empty_strings_allowed = False
     default_error_messages = {
-        'invalid': _(u"'%s' value has an invalid format. It must be in "
-                     u"YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ] format."),
-        'invalid_date': _(u"'%s' value has the correct format "
-                          u"(YYYY-MM-DD) but it is an invalid date."),
-        'invalid_datetime': _(u"'%s' value has the correct format "
-                              u"(YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]) "
-                              u"but it is an invalid date/time."),
+        'invalid': _("'%s' value has an invalid format. It must be in "
+                     "YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ] format."),
+        'invalid_date': _("'%s' value has the correct format "
+                          "(YYYY-MM-DD) but it is an invalid date."),
+        'invalid_datetime': _("'%s' value has the correct format "
+                              "(YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]) "
+                              "but it is an invalid date/time."),
     }
     description = _("Date (with time)")
 
@@ -771,8 +773,8 @@ class DateTimeField(DateField):
                 # local time. This won't work during DST change, but we can't
                 # do much about it, so we let the exceptions percolate up the
                 # call stack.
-                warnings.warn(u"DateTimeField received a naive datetime (%s)"
-                              u" while time zone support is active." % value,
+                warnings.warn("DateTimeField received a naive datetime (%s)"
+                              " while time zone support is active." % value,
                               RuntimeWarning)
                 default_timezone = timezone.get_default_timezone()
                 value = timezone.make_aware(value, default_timezone)
@@ -818,8 +820,8 @@ class DateTimeField(DateField):
             # For backwards compatibility, interpret naive datetimes in local
             # time. This won't work during DST change, but we can't do much
             # about it, so we let the exceptions percolate up the call stack.
-            warnings.warn(u"DateTimeField received a naive datetime (%s)"
-                          u" while time zone support is active." % value,
+            warnings.warn("DateTimeField received a naive datetime (%s)"
+                          " while time zone support is active." % value,
                           RuntimeWarning)
             default_timezone = timezone.get_default_timezone()
             value = timezone.make_aware(value, default_timezone)
@@ -843,7 +845,7 @@ class DateTimeField(DateField):
 class DecimalField(Field):
     empty_strings_allowed = False
     default_error_messages = {
-        'invalid': _(u"'%s' value must be a decimal number."),
+        'invalid': _("'%s' value must be a decimal number."),
     }
     description = _("Decimal number")
 
@@ -1198,10 +1200,10 @@ class TextField(Field):
 class TimeField(Field):
     empty_strings_allowed = False
     default_error_messages = {
-        'invalid': _(u"'%s' value has an invalid format. It must be in "
-                     u"HH:MM[:ss[.uuuuuu]] format."),
-        'invalid_time': _(u"'%s' value has the correct format "
-                          u"(HH:MM[:ss[.uuuuuu]]) but it is an invalid time."),
+        'invalid': _("'%s' value has an invalid format. It must be in "
+                     "HH:MM[:ss[.uuuuuu]] format."),
+        'invalid_time': _("'%s' value has the correct format "
+                          "(HH:MM[:ss[.uuuuuu]]) but it is an invalid time."),
     }
     description = _("Time")
 

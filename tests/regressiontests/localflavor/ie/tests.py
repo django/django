@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django.contrib.localflavor.ie.forms import IECountySelect
 
 from django.test import SimpleTestCase
@@ -6,7 +8,7 @@ from django.test import SimpleTestCase
 class IELocalFlavorTests(SimpleTestCase):
     def test_IECountySelect(self):
         f = IECountySelect()
-        out = u'''<select name="counties">
+        out = '''<select name="counties">
 <option value="antrim">Antrim</option>
 <option value="armagh">Armagh</option>
 <option value="carlow">Carlow</option>

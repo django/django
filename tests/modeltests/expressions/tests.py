@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 from django.core.exceptions import FieldError
 from django.db.models import F
@@ -77,17 +77,17 @@ class ExpressionsTests(TestCase):
             company_query, [
                 {
                     'num_chairs': 2302,
-                    'name': u'Example Inc.',
+                    'name': 'Example Inc.',
                     'num_employees': 2300
                 },
                 {
                     'num_chairs': 5,
-                    'name': u'Foobar Ltd.',
+                    'name': 'Foobar Ltd.',
                     'num_employees': 3
                 },
                 {
                     'num_chairs': 34,
-                    'name': u'Test GmbH',
+                    'name': 'Test GmbH',
                     'num_employees': 32
                 }
             ],
@@ -102,17 +102,17 @@ class ExpressionsTests(TestCase):
             company_query, [
                 {
                     'num_chairs': 6900,
-                    'name': u'Example Inc.',
+                    'name': 'Example Inc.',
                     'num_employees': 2300
                 },
                 {
                     'num_chairs': 9,
-                    'name': u'Foobar Ltd.',
+                    'name': 'Foobar Ltd.',
                     'num_employees': 3
                 },
                 {
                     'num_chairs': 96,
-                    'name': u'Test GmbH',
+                    'name': 'Test GmbH',
                     'num_employees': 32
                 }
             ],
@@ -127,17 +127,17 @@ class ExpressionsTests(TestCase):
             company_query, [
                 {
                     'num_chairs': 5294600,
-                    'name': u'Example Inc.',
+                    'name': 'Example Inc.',
                     'num_employees': 2300
                 },
                 {
                     'num_chairs': 15,
-                    'name': u'Foobar Ltd.',
+                    'name': 'Foobar Ltd.',
                     'num_employees': 3
                 },
                 {
                     'num_chairs': 1088,
-                    'name': u'Test GmbH',
+                    'name': 'Test GmbH',
                     'num_employees': 32
                 }
             ],

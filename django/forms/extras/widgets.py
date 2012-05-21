@@ -1,6 +1,7 @@
 """
 Extra HTML Widget classes
 """
+from __future__ import unicode_literals
 
 import datetime
 import re
@@ -90,7 +91,7 @@ class SelectDateWidget(Widget):
                 output.append(month_html)
             elif field == 'day':
                 output.append(day_html)
-        return mark_safe(u'\n'.join(output))
+        return mark_safe('\n'.join(output))
 
     def id_for_label(self, id_):
         first_select = None

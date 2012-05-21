@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from datetime import date
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -65,7 +67,7 @@ class HTTPSitemapTests(SitemapTestsBase):
         # Localization should be active
         settings.USE_L10N = True
         activate('fr')
-        self.assertEqual(u'0,3', localize(0.3))
+        self.assertEqual('0,3', localize(0.3))
 
         # Retrieve the sitemap. Check that priorities
         # haven't been rendered in localized format
