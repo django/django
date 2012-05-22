@@ -91,7 +91,7 @@ class Command(BaseCommand):
         self.validate(display_num_errors=True)
         self.stdout.write((
             "Django version %(version)s, using settings %(settings)r\n"
-            "Development server is running at http://%(addr)s:%(port)s/\n"
+            "Development server is starting at http://%(addr)s:%(port)s/\n"
             "Quit the server with %(quit_command)s.\n"
         ) % {
             "version": self.get_version(),
