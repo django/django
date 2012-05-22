@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import datetime
 
 from django.db import models
@@ -34,7 +36,7 @@ class BookWithCustomPK(models.Model):
     title = models.CharField(max_length=100)
 
     def __unicode__(self):
-        return u'%s: %s' % (self.my_pk, self.title)
+        return '%s: %s' % (self.my_pk, self.title)
 
 class Editor(models.Model):
     name = models.CharField(max_length=100)
@@ -57,7 +59,7 @@ class AlternateBook(Book):
     notes = models.CharField(max_length=100)
 
     def __unicode__(self):
-        return u'%s - %s' % (self.title, self.notes)
+        return '%s - %s' % (self.title, self.notes)
 
 class AuthorMeeting(models.Model):
     name = models.CharField(max_length=100)
@@ -119,7 +121,7 @@ class Price(models.Model):
     quantity = models.PositiveIntegerField()
 
     def __unicode__(self):
-        return u"%s for %s" % (self.quantity, self.price)
+        return "%s for %s" % (self.quantity, self.price)
 
     class Meta:
         unique_together = (('price', 'quantity'),)
@@ -147,7 +149,7 @@ class Revision(models.Model):
         unique_together = (("repository", "revision"),)
 
     def __unicode__(self):
-        return u"%s (%s)" % (self.revision, unicode(self.repository))
+        return "%s (%s)" % (self.revision, unicode(self.repository))
 
 # models for testing callable defaults (see bug #7975). If you define a model
 # with a callable default value, you cannot rely on the initial value in a

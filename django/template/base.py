@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import re
 from functools import partial
@@ -824,7 +824,7 @@ class NodeList(list):
             else:
                 bit = node
             bits.append(force_unicode(bit))
-        return mark_safe(u''.join(bits))
+        return mark_safe(''.join(bits))
 
     def get_nodes_by_type(self, nodetype):
         "Return a list of all nodes of the given type"
@@ -994,8 +994,8 @@ def parse_bits(parser, bits, params, varargs, varkw, defaults,
     if unhandled_params:
         # Some positional arguments were not supplied
         raise TemplateSyntaxError(
-            u"'%s' did not receive value(s) for the argument(s): %s" %
-            (name, u", ".join([u"'%s'" % p for p in unhandled_params])))
+            "'%s' did not receive value(s) for the argument(s): %s" %
+            (name, ", ".join(["'%s'" % p for p in unhandled_params])))
     return args, kwargs
 
 def generic_tag_compiler(parser, token, params, varargs, varkw, defaults,

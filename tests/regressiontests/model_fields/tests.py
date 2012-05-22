@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import datetime
 from decimal import Decimal
@@ -78,8 +78,8 @@ class DecimalFieldTests(test.TestCase):
 
     def test_format(self):
         f = models.DecimalField(max_digits=5, decimal_places=1)
-        self.assertEqual(f._format(f.to_python(2)), u'2.0')
-        self.assertEqual(f._format(f.to_python('2.6')), u'2.6')
+        self.assertEqual(f._format(f.to_python(2)), '2.0')
+        self.assertEqual(f._format(f.to_python('2.6')), '2.6')
         self.assertEqual(f._format(None), None)
 
     def test_get_db_prep_lookup(self):
@@ -92,7 +92,7 @@ class DecimalFieldTests(test.TestCase):
         We should be able to filter decimal fields using strings (#8023)
         """
         Foo.objects.create(id=1, a='abc', d=Decimal("12.34"))
-        self.assertEqual(list(Foo.objects.filter(d=u'1.23')), [])
+        self.assertEqual(list(Foo.objects.filter(d='1.23')), [])
 
     def test_save_without_float_conversion(self):
         """
@@ -168,7 +168,7 @@ class BooleanFieldTests(unittest.TestCase):
         Test that BooleanField with choices and defaults doesn't generate a
         formfield with the blank option (#9640, #10549).
         """
-        choices = [(1, u'Si'), (2, 'No')]
+        choices = [(1, 'Si'), (2, 'No')]
         f = models.BooleanField(choices=choices, default=1, null=True)
         self.assertEqual(f.formfield().choices, [('', '---------')] + choices)
 

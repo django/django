@@ -3,7 +3,7 @@
 PE-specific Form helpers.
 """
 
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 from django.contrib.localflavor.pe.pe_region import REGION_CHOICES
 from django.core.validators import EMPTY_VALUES
@@ -38,7 +38,7 @@ class PEDNIField(CharField):
         """
         value = super(PEDNIField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
         if not value.isdigit():
             raise ValidationError(self.error_messages['invalid'])
         if len(value) != 8:
@@ -66,7 +66,7 @@ class PERUCField(RegexField):
         """
         value = super(PERUCField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
         if not value.isdigit():
             raise ValidationError(self.error_messages['invalid'])
         if len(value) != 11:

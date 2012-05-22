@@ -207,7 +207,7 @@ class FileDescriptor(object):
 class FileField(Field):
 
     default_error_messages = {
-        'max_length': _(u'Filename is %(extra)d characters too long.')
+        'max_length': _('Filename is %(extra)d characters too long.')
     }
 
     # The class to wrap instance attributes in. Accessing the file object off

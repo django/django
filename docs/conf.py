@@ -11,6 +11,8 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
+from __future__ import unicode_literals
+
 import sys
 import os
 
@@ -197,8 +199,8 @@ modindex_common_prefix = ["django."]
 # (source start file, target name, title, author, document class [howto/manual]).
 #latex_documents = []
 latex_documents = [
-  ('contents', 'django.tex', u'Django Documentation',
-   u'Django Software Foundation', 'manual'),
+  ('contents', 'django.tex', 'Django Documentation',
+   'Django Software Foundation', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -237,10 +239,10 @@ man_pages = [
 # -- Options for Epub output ---------------------------------------------------
 
 # Bibliographic Dublin Core info.
-epub_title = u'Django'
-epub_author = u'Django Software Foundation'
-epub_publisher = u'Django Software Foundation'
-epub_copyright = u'2010, Django Software Foundation'
+epub_title = 'Django'
+epub_author = 'Django Software Foundation'
+epub_publisher = 'Django Software Foundation'
+epub_copyright = '2010, Django Software Foundation'
 
 # The language of the text. It defaults to the language option
 # or en if the language is not set.

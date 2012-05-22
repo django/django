@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import datetime
 
@@ -178,100 +178,100 @@ class ExtraRegressTests(TestCase):
 
         self.assertEqual(
             list(TestObject.objects.extra(select=SortedDict((('foo','first'), ('bar','second'), ('whiz','third')))).values()),
-            [{'bar': u'second', 'third': u'third', 'second': u'second', 'whiz': u'third', 'foo': u'first', 'id': obj.pk, 'first': u'first'}]
+            [{'bar': 'second', 'third': 'third', 'second': 'second', 'whiz': 'third', 'foo': 'first', 'id': obj.pk, 'first': 'first'}]
         )
 
         # Extra clauses after an empty values clause are still included
         self.assertEqual(
             list(TestObject.objects.values().extra(select=SortedDict((('foo','first'), ('bar','second'), ('whiz','third'))))),
-            [{'bar': u'second', 'third': u'third', 'second': u'second', 'whiz': u'third', 'foo': u'first', 'id': obj.pk, 'first': u'first'}]
+            [{'bar': 'second', 'third': 'third', 'second': 'second', 'whiz': 'third', 'foo': 'first', 'id': obj.pk, 'first': 'first'}]
         )
 
         # Extra columns are ignored if not mentioned in the values() clause
         self.assertEqual(
             list(TestObject.objects.extra(select=SortedDict((('foo','first'), ('bar','second'), ('whiz','third')))).values('first', 'second')),
-            [{'second': u'second', 'first': u'first'}]
+            [{'second': 'second', 'first': 'first'}]
         )
 
         # Extra columns after a non-empty values() clause are ignored
         self.assertEqual(
             list(TestObject.objects.values('first', 'second').extra(select=SortedDict((('foo','first'), ('bar','second'), ('whiz','third'))))),
-            [{'second': u'second', 'first': u'first'}]
+            [{'second': 'second', 'first': 'first'}]
         )
 
         # Extra columns can be partially returned
         self.assertEqual(
             list(TestObject.objects.extra(select=SortedDict((('foo','first'), ('bar','second'), ('whiz','third')))).values('first', 'second', 'foo')),
-            [{'second': u'second', 'foo': u'first', 'first': u'first'}]
+            [{'second': 'second', 'foo': 'first', 'first': 'first'}]
         )
 
         # Also works if only extra columns are included
         self.assertEqual(
             list(TestObject.objects.extra(select=SortedDict((('foo','first'), ('bar','second'), ('whiz','third')))).values('foo', 'whiz')),
-            [{'foo': u'first', 'whiz': u'third'}]
+            [{'foo': 'first', 'whiz': 'third'}]
         )
 
         # Values list works the same way
         # All columns are returned for an empty values_list()
         self.assertEqual(
             list(TestObject.objects.extra(select=SortedDict((('foo','first'), ('bar','second'), ('whiz','third')))).values_list()),
-            [(u'first', u'second', u'third', obj.pk, u'first', u'second', u'third')]
+            [('first', 'second', 'third', obj.pk, 'first', 'second', 'third')]
         )
 
         # Extra columns after an empty values_list() are still included
         self.assertEqual(
             list(TestObject.objects.values_list().extra(select=SortedDict((('foo','first'), ('bar','second'), ('whiz','third'))))),
-            [(u'first', u'second', u'third', obj.pk, u'first', u'second', u'third')]
+            [('first', 'second', 'third', obj.pk, 'first', 'second', 'third')]
         )
 
         # Extra columns ignored completely if not mentioned in values_list()
         self.assertEqual(
             list(TestObject.objects.extra(select=SortedDict((('foo','first'), ('bar','second'), ('whiz','third')))).values_list('first', 'second')),
-            [(u'first', u'second')]
+            [('first', 'second')]
         )
 
         # Extra columns after a non-empty values_list() clause are ignored completely
         self.assertEqual(
             list(TestObject.objects.values_list('first', 'second').extra(select=SortedDict((('foo','first'), ('bar','second'), ('whiz','third'))))),
-            [(u'first', u'second')]
+            [('first', 'second')]
         )
 
         self.assertEqual(
             list(TestObject.objects.extra(select=SortedDict((('foo','first'), ('bar','second'), ('whiz','third')))).values_list('second', flat=True)),
-            [u'second']
+            ['second']
         )
 
         # Only the extra columns specified in the values_list() are returned
         self.assertEqual(
             list(TestObject.objects.extra(select=SortedDict((('foo','first'), ('bar','second'), ('whiz','third')))).values_list('first', 'second', 'whiz')),
-            [(u'first', u'second', u'third')]
+            [('first', 'second', 'third')]
         )
 
         # ...also works if only extra columns are included
         self.assertEqual(
             list(TestObject.objects.extra(select=SortedDict((('foo','first'), ('bar','second'), ('whiz','third')))).values_list('foo','whiz')),
-            [(u'first', u'third')]
+            [('first', 'third')]
         )
 
         self.assertEqual(
             list(TestObject.objects.extra(select=SortedDict((('foo','first'), ('bar','second'), ('whiz','third')))).values_list('whiz', flat=True)),
-            [u'third']
+            ['third']
         )
 
         # ... and values are returned in the order they are specified
         self.assertEqual(
             list(TestObject.objects.extra(select=SortedDict((('foo','first'), ('bar','second'), ('whiz','third')))).values_list('whiz','foo')),
-            [(u'third', u'first')]
+            [('third', 'first')]
         )
 
         self.assertEqual(
             list(TestObject.objects.extra(select=SortedDict((('foo','first'), ('bar','second'), ('whiz','third')))).values_list('first','id')),
-            [(u'first', obj.pk)]
+            [('first', obj.pk)]
         )
 
         self.assertEqual(
             list(TestObject.objects.extra(select=SortedDict((('foo','first'), ('bar','second'), ('whiz','third')))).values_list('whiz', 'first', 'bar', 'id')),
-            [(u'third', u'first', u'second', obj.pk)]
+            [('third', 'first', 'second', obj.pk)]
         )
 
     def test_regression_10847(self):

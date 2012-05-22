@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import errno
 import os
@@ -251,9 +251,9 @@ class FileStorageTests(unittest.TestCase):
         os.mkdir(os.path.join(self.temp_dir, 'storage_dir_1'))
 
         dirs, files = self.storage.listdir('')
-        self.assertEqual(set(dirs), set([u'storage_dir_1']))
+        self.assertEqual(set(dirs), set(['storage_dir_1']))
         self.assertEqual(set(files),
-                         set([u'storage_test_1', u'storage_test_2']))
+                         set(['storage_test_1', 'storage_test_2']))
 
         self.storage.delete('storage_test_1')
         self.storage.delete('storage_test_2')
@@ -388,7 +388,7 @@ class UnicodeFileNameTests(unittest.TestCase):
         out the encoding situation between doctest and this file, but the actual
         repr doesn't matter; it just shouldn't return a unicode object.
         """
-        uf = UploadedFile(name=u'¿Cómo?',content_type='text')
+        uf = UploadedFile(name='¿Cómo?',content_type='text')
         self.assertEqual(type(uf.__repr__()), str)
 
 # Tests for a race condition on file saving (#4948).

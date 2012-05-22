@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import copy
 import warnings
 
@@ -215,8 +217,8 @@ class AdminEmailHandlerTest(TestCase):
         AdminErrorHandler to fail.
         Refs #17281.
         """
-        message = u'Message \r\n with newlines'
-        expected_subject = u'ERROR: Message \\r\\n with newlines'
+        message = 'Message \r\n with newlines'
+        expected_subject = 'ERROR: Message \\r\\n with newlines'
 
         self.assertEqual(len(mail.outbox), 0)
 

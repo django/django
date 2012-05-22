@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import re
 
@@ -44,9 +44,9 @@ class AULocalflavorTests(SimpleTestCase):
         form = AustralianPlaceForm({'state':'NSW', 'name':'Wollongong'})
         self.assertFalse(form.is_valid())
         self.assertEqual(
-            form.errors['state_required'], [u'This field is required.'])
+            form.errors['state_required'], ['This field is required.'])
         self.assertEqual(
-            form.errors['postcode_required'], [u'This field is required.'])
+            form.errors['postcode_required'], ['This field is required.'])
 
     def test_field_blank_option(self):
         """ Test that the empty option is there. """
@@ -66,7 +66,7 @@ class AULocalflavorTests(SimpleTestCase):
 
     def test_AUStateSelect(self):
         f = AUStateSelect()
-        out = u'''<select name="state">
+        out = '''<select name="state">
 <option value="ACT">Australian Capital Territory</option>
 <option value="NSW" selected="selected">New South Wales</option>
 <option value="NT">Northern Territory</option>
@@ -79,19 +79,19 @@ class AULocalflavorTests(SimpleTestCase):
         self.assertHTMLEqual(f.render('state', 'NSW'), out)
 
     def test_AUPostCodeField(self):
-        error_format = [u'Enter a 4 digit postcode.']
+        error_format = ['Enter a 4 digit postcode.']
         valid = {
             '1234': '1234',
             '2000': '2000',
         }
         invalid = {
             'abcd': error_format,
-            '20001': [u'Ensure this value has at most 4 characters (it has 5).'] + error_format,
+            '20001': ['Ensure this value has at most 4 characters (it has 5).'] + error_format,
         }
         self.assertFieldOutput(AUPostCodeField, valid, invalid)
 
     def test_AUPhoneNumberField(self):
-        error_format = [u'Phone numbers must contain 10 digits.']
+        error_format = ['Phone numbers must contain 10 digits.']
         valid = {
             '1234567890': '1234567890',
             '0213456789': '0213456789',

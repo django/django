@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 from django.contrib.admin.tests import AdminSeleniumWebDriverTestCase
 from django.contrib.admin.helpers import InlineAdminForm
@@ -67,7 +67,7 @@ class TestInline(TestCase):
             'shoppingweakness_set-TOTAL_FORMS': 1,
             'shoppingweakness_set-INITIAL_FORMS': 0,
             'shoppingweakness_set-MAX_NUM_FORMS': 0,
-            '_save': u'Save',
+            '_save': 'Save',
             'person': person.id,
             'max_weight': 0,
             'shoppingweakness_set-0-item': item.id,
@@ -85,7 +85,7 @@ class TestInline(TestCase):
             'title_set-TOTAL_FORMS': 1,
             'title_set-INITIAL_FORMS': 0,
             'title_set-MAX_NUM_FORMS': 0,
-            '_save': u'Save',
+            '_save': 'Save',
             'title_set-0-title1': 'a title',
             'title_set-0-title2': 'a different title',
         }
@@ -235,8 +235,8 @@ class TestInlinePermissions(TestCase):
         permission = Permission.objects.get(codename='change_holder2', content_type=self.holder_ct)
         self.user.user_permissions.add(permission)
 
-        author = Author.objects.create(pk=1, name=u'The Author')
-        book = author.books.create(name=u'The inline Book')
+        author = Author.objects.create(pk=1, name='The Author')
+        book = author.books.create(name='The inline Book')
         self.author_change_url = '/admin/admin_inlines/author/%i/' % author.id
         # Get the ID of the automatically created intermediate model for thw Author-Book m2m
         author_book_auto_m2m_intermediate = Author.books.through.objects.get(author=author, book=book)

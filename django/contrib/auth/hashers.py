@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import hashlib
 
 from django.dispatch import receiver

@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import datetime
 from operator import attrgetter
@@ -38,7 +38,7 @@ class ModelTests(TestCase):
 
         # Empty strings should be returned as Unicode
         a = Article.objects.get(pk=a.pk)
-        self.assertEqual(a.misc_data, u'')
+        self.assertEqual(a.misc_data, '')
         self.assertIs(type(a.misc_data), unicode)
 
     def test_long_textfield(self):

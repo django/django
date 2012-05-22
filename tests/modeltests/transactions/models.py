@@ -7,6 +7,8 @@ commit-on-success behavior. Alternatively, you can manage the transaction
 manually.
 """
 
+from __future__ import unicode_literals
+
 from django.db import models
 
 
@@ -19,4 +21,4 @@ class Reporter(models.Model):
         ordering = ('first_name', 'last_name')
 
     def __unicode__(self):
-        return u"%s %s" % (self.first_name, self.last_name)
+        return "%s %s" % (self.first_name, self.last_name)

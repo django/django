@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django.contrib.localflavor.is_.forms import (ISIdNumberField,
     ISPhoneNumberField, ISPostalCodeSelect)
 
@@ -7,7 +9,7 @@ from django.test import SimpleTestCase
 class ISLocalFlavorTests(SimpleTestCase):
     def test_ISPostalCodeSelect(self):
         f = ISPostalCodeSelect()
-        out = u'''<select name="foo">
+        out = '''<select name="foo">
 <option value="101">101 Reykjav\xedk</option>
 <option value="103">103 Reykjav\xedk</option>
 <option value="104">104 Reykjav\xedk</option>
@@ -159,10 +161,10 @@ class ISLocalFlavorTests(SimpleTestCase):
         self.assertHTMLEqual(f.render('foo', 'bar'), out)
 
     def test_ISIdNumberField(self):
-        error_atleast = [u'Ensure this value has at least 10 characters (it has 9).']
-        error_invalid = [u'Enter a valid Icelandic identification number. The format is XXXXXX-XXXX.']
-        error_atmost = [u'Ensure this value has at most 11 characters (it has 12).']
-        error_notvalid = [u'The Icelandic identification number is not valid.']
+        error_atleast = ['Ensure this value has at least 10 characters (it has 9).']
+        error_invalid = ['Enter a valid Icelandic identification number. The format is XXXXXX-XXXX.']
+        error_atmost = ['Ensure this value has at most 11 characters (it has 12).']
+        error_notvalid = ['The Icelandic identification number is not valid.']
         valid = {
             '2308803449': '230880-3449',
             '230880-3449': '230880-3449',
@@ -179,9 +181,9 @@ class ISLocalFlavorTests(SimpleTestCase):
         self.assertFieldOutput(ISIdNumberField, valid, invalid)
 
     def test_ISPhoneNumberField(self):
-        error_invalid = [u'Enter a valid value.']
-        error_atleast = [u'Ensure this value has at least 7 characters (it has 6).']
-        error_atmost = [u'Ensure this value has at most 8 characters (it has 9).']
+        error_invalid = ['Enter a valid value.']
+        error_atleast = ['Ensure this value has at least 7 characters (it has 6).']
+        error_atmost = ['Ensure this value has at most 8 characters (it has 9).']
         valid = {
             '1234567': '1234567',
             '123 4567': '1234567',

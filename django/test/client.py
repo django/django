@@ -146,7 +146,7 @@ def encode_file(boundary, key, file):
     if content_type is None:
         content_type = 'application/octet-stream'
     return [
-        '--' + boundary,
+        '--' + to_str(boundary),
         'Content-Disposition: form-data; name="%s"; filename="%s"' \
             % (to_str(key), to_str(os.path.basename(file.name))),
         'Content-Type: %s' % content_type,

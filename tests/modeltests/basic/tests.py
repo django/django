@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 from datetime import datetime
 
@@ -187,7 +187,7 @@ class ModelTest(TestCase):
         # the default.
         a6 = Article(pub_date=datetime(2005, 7, 31))
         a6.save()
-        self.assertEqual(a6.headline, u'Default headline')
+        self.assertEqual(a6.headline, 'Default headline')
 
         # For DateTimeFields, Django saves as much precision (in seconds)
         # as you give it.
@@ -466,7 +466,7 @@ class ModelTest(TestCase):
         )
         a101.save()
         a101 = Article.objects.get(pk=101)
-        self.assertEqual(a101.headline, u'Article 101')
+        self.assertEqual(a101.headline, 'Article 101')
 
     def test_create_method(self):
         # You can create saved objects in a single step
@@ -493,12 +493,12 @@ class ModelTest(TestCase):
     def test_unicode_data(self):
         # Unicode data works, too.
         a = Article(
-            headline=u'\u6797\u539f \u3081\u3050\u307f',
+            headline='\u6797\u539f \u3081\u3050\u307f',
             pub_date=datetime(2005, 7, 28),
         )
         a.save()
         self.assertEqual(Article.objects.get(pk=a.id).headline,
-            u'\u6797\u539f \u3081\u3050\u307f')
+            '\u6797\u539f \u3081\u3050\u307f')
 
     def test_hash_function(self):
         # Model instances have a hash function, so they can be used in sets
@@ -557,7 +557,7 @@ class ModelTest(TestCase):
                 select={'dashed-value': '1'}
             ).values('headline', 'dashed-value')
         self.assertEqual([sorted(d.items()) for d in dicts],
-            [[('dashed-value', 1), ('headline', u'Article 11')], [('dashed-value', 1), ('headline', u'Article 12')]])
+            [[('dashed-value', 1), ('headline', 'Article 11')], [('dashed-value', 1), ('headline', 'Article 12')]])
 
     def test_extra_method_select_argument_with_dashes(self):
         # If you use 'select' with extra() and names containing dashes on a
@@ -586,7 +586,7 @@ class ModelTest(TestCase):
         Test that ugettext_lazy objects work when saving model instances
         through various methods. Refs #10498.
         """
-        notlazy = u'test'
+        notlazy = 'test'
         lazy = ugettext_lazy(notlazy)
         reporter = Article.objects.create(headline=lazy, pub_date=datetime.now())
         article = Article.objects.get()

@@ -1,5 +1,7 @@
 # Tests for contrib/localflavor/ CN Form Fields
 
+from __future__ import unicode_literals
+
 from django.contrib.localflavor.cn.forms import (CNProvinceSelect,
         CNPostCodeField, CNIDCardField, CNPhoneNumberField, CNCellNumberField)
 from django.test import SimpleTestCase
@@ -7,7 +9,7 @@ from django.test import SimpleTestCase
 class CNLocalFlavorTests(SimpleTestCase):
     def test_CNProvinceSelect(self):
         f = CNProvinceSelect()
-        correct_output = u'''<select name="provinces">
+        correct_output = '''<select name="provinces">
 <option value="anhui">\u5b89\u5fbd</option>
 <option value="beijing">\u5317\u4eac</option>
 <option value="chongqing">\u91cd\u5e86</option>
@@ -46,9 +48,9 @@ class CNLocalFlavorTests(SimpleTestCase):
         self.assertHTMLEqual(f.render('provinces', 'hubei'), correct_output)
 
     def test_CNPostCodeField(self):
-        error_format = [u'Enter a post code in the format XXXXXX.']
+        error_format = ['Enter a post code in the format XXXXXX.']
         valid = {
-                '091209': u'091209'
+                '091209': '091209'
         }
         invalid = {
                 '09120': error_format,
@@ -59,17 +61,17 @@ class CNLocalFlavorTests(SimpleTestCase):
     def test_CNIDCardField(self):
         valid = {
                 # A valid 1st generation ID Card Number.
-                '110101491001001': u'110101491001001',
+                '110101491001001': '110101491001001',
                 # A valid 2nd generation ID Card number.
-                '11010119491001001X': u'11010119491001001X',
+                '11010119491001001X': '11010119491001001X',
                 # Another valid 2nd gen ID Number with a case change
-                '11010119491001001x': u'11010119491001001X'
+                '11010119491001001x': '11010119491001001X'
         }
 
-        wrong_format = [u'ID Card Number consists of 15 or 18 digits.']
-        wrong_location = [u'Invalid ID Card Number: Wrong location code']
-        wrong_bday = [u'Invalid ID Card Number: Wrong birthdate']
-        wrong_checksum = [u'Invalid ID Card Number: Wrong checksum']
+        wrong_format = ['ID Card Number consists of 15 or 18 digits.']
+        wrong_location = ['Invalid ID Card Number: Wrong location code']
+        wrong_bday = ['Invalid ID Card Number: Wrong birthdate']
+        wrong_checksum = ['Invalid ID Card Number: Wrong checksum']
 
         invalid = {
                 'abcdefghijklmnop': wrong_format,
@@ -83,13 +85,13 @@ class CNLocalFlavorTests(SimpleTestCase):
         self.assertFieldOutput(CNIDCardField, valid, invalid)
 
     def test_CNPhoneNumberField(self):
-        error_format = [u'Enter a valid phone number.']
+        error_format = ['Enter a valid phone number.']
         valid = {
-                '010-12345678': u'010-12345678',
-                '010-1234567': u'010-1234567',
-                '0101-12345678': u'0101-12345678',
-                '0101-1234567': u'0101-1234567',
-                '010-12345678-020':u'010-12345678-020'
+                '010-12345678': '010-12345678',
+                '010-1234567': '010-1234567',
+                '0101-12345678': '0101-12345678',
+                '0101-1234567': '0101-1234567',
+                '010-12345678-020':'010-12345678-020'
         }
         invalid = {
                 '01x-12345678': error_format,
@@ -101,9 +103,9 @@ class CNLocalFlavorTests(SimpleTestCase):
         self.assertFieldOutput(CNPhoneNumberField, valid, invalid)
 
     def test_CNCellNumberField(self):
-        error_format = [u'Enter a valid cell number.']
+        error_format = ['Enter a valid cell number.']
         valid = {
-                '13012345678': u'13012345678',
+                '13012345678': '13012345678',
         }
         invalid = {
                 '130123456789': error_format,

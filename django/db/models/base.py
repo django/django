@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import copy
 import sys
 from functools import update_wrapper
@@ -373,7 +375,7 @@ class Model(object):
             u = unicode(self)
         except (UnicodeEncodeError, UnicodeDecodeError):
             u = '[Bad Unicode data]'
-        return smart_str(u'<%s: %s>' % (self.__class__.__name__, u))
+        return smart_str('<%s: %s>' % (self.__class__.__name__, u))
 
     def __str__(self):
         if hasattr(self, '__unicode__'):
@@ -792,7 +794,7 @@ class Model(object):
 
     def date_error_message(self, lookup_type, field, unique_for):
         opts = self._meta
-        return _(u"%(field_name)s must be unique for %(date_field)s %(lookup)s.") % {
+        return _("%(field_name)s must be unique for %(date_field)s %(lookup)s.") % {
             'field_name': unicode(capfirst(opts.get_field(field).verbose_name)),
             'date_field': unicode(capfirst(opts.get_field(unique_for).verbose_name)),
             'lookup': lookup_type,
@@ -816,7 +818,7 @@ class Model(object):
         else:
             field_labels = map(lambda f: capfirst(opts.get_field(f).verbose_name), unique_check)
             field_labels = get_text_list(field_labels, _('and'))
-            return _(u"%(model_name)s with this %(field_label)s already exists.") %  {
+            return _("%(model_name)s with this %(field_label)s already exists.") %  {
                 'model_name': unicode(model_name),
                 'field_label': unicode(field_labels)
             }

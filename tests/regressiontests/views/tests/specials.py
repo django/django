@@ -1,4 +1,6 @@
 # coding: utf-8
+from __future__ import unicode_literals
+
 from django.test import TestCase
 
 
@@ -17,7 +19,7 @@ class URLHandling(TestCase):
         characters so this test ensures the creation of the full path with a
         base non-ASCII part is handled correctly.
         """
-        response = self.client.get(u'/中文/')
+        response = self.client.get('/中文/')
         self.assertRedirects(response, self.redirect_target)
 
     def test_nonascii_redirect(self):

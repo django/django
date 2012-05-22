@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 from django import forms
 from django.forms.formsets import BaseFormSet, DELETION_FIELD_NAME
@@ -22,13 +22,13 @@ class InlineFormsetTests(TestCase):
 
         # Now create a new User and UserSite instance
         data = {
-            'serial': u'1',
-            'username': u'apollo13',
-            'usersite_set-TOTAL_FORMS': u'1',
-            'usersite_set-INITIAL_FORMS': u'0',
-            'usersite_set-MAX_NUM_FORMS': u'0',
-            'usersite_set-0-data': u'10',
-            'usersite_set-0-user': u'apollo13'
+            'serial': '1',
+            'username': 'apollo13',
+            'usersite_set-TOTAL_FORMS': '1',
+            'usersite_set-INITIAL_FORMS': '0',
+            'usersite_set-MAX_NUM_FORMS': '0',
+            'usersite_set-0-data': '10',
+            'usersite_set-0-user': 'apollo13'
         }
         user = User()
         form = Form(data)
@@ -42,47 +42,47 @@ class InlineFormsetTests(TestCase):
             form_set.save()
             usersite = UserSite.objects.all().values()
             self.assertEqual(usersite[0]['data'], 10)
-            self.assertEqual(usersite[0]['user_id'], u'apollo13')
+            self.assertEqual(usersite[0]['user_id'], 'apollo13')
         else:
             self.fail('Errors found on formset:%s' % form_set.errors)
 
         # Now update the UserSite instance
         data = {
-            'usersite_set-TOTAL_FORMS': u'1',
-            'usersite_set-INITIAL_FORMS': u'1',
-            'usersite_set-MAX_NUM_FORMS': u'0',
+            'usersite_set-TOTAL_FORMS': '1',
+            'usersite_set-INITIAL_FORMS': '1',
+            'usersite_set-MAX_NUM_FORMS': '0',
             'usersite_set-0-id': unicode(usersite[0]['id']),
-            'usersite_set-0-data': u'11',
-            'usersite_set-0-user': u'apollo13'
+            'usersite_set-0-data': '11',
+            'usersite_set-0-user': 'apollo13'
         }
         form_set = FormSet(data, instance=user)
         if form_set.is_valid():
             form_set.save()
             usersite = UserSite.objects.all().values()
             self.assertEqual(usersite[0]['data'], 11)
-            self.assertEqual(usersite[0]['user_id'], u'apollo13')
+            self.assertEqual(usersite[0]['user_id'], 'apollo13')
         else:
             self.fail('Errors found on formset:%s' % form_set.errors)
 
         # Now add a new UserSite instance
         data = {
-            'usersite_set-TOTAL_FORMS': u'2',
-            'usersite_set-INITIAL_FORMS': u'1',
-            'usersite_set-MAX_NUM_FORMS': u'0',
+            'usersite_set-TOTAL_FORMS': '2',
+            'usersite_set-INITIAL_FORMS': '1',
+            'usersite_set-MAX_NUM_FORMS': '0',
             'usersite_set-0-id': unicode(usersite[0]['id']),
-            'usersite_set-0-data': u'11',
-            'usersite_set-0-user': u'apollo13',
-            'usersite_set-1-data': u'42',
-            'usersite_set-1-user': u'apollo13'
+            'usersite_set-0-data': '11',
+            'usersite_set-0-user': 'apollo13',
+            'usersite_set-1-data': '42',
+            'usersite_set-1-user': 'apollo13'
         }
         form_set = FormSet(data, instance=user)
         if form_set.is_valid():
             form_set.save()
             usersite = UserSite.objects.all().values().order_by('data')
             self.assertEqual(usersite[0]['data'], 11)
-            self.assertEqual(usersite[0]['user_id'], u'apollo13')
+            self.assertEqual(usersite[0]['user_id'], 'apollo13')
             self.assertEqual(usersite[1]['data'], 42)
-            self.assertEqual(usersite[1]['user_id'], u'apollo13')
+            self.assertEqual(usersite[1]['user_id'], 'apollo13')
         else:
             self.fail('Errors found on formset:%s' % form_set.errors)
 
@@ -98,11 +98,11 @@ class InlineFormsetTests(TestCase):
 
         # Now create a new Restaurant and Manager instance
         data = {
-            'name': u"Guido's House of Pasta",
-            'manager_set-TOTAL_FORMS': u'1',
-            'manager_set-INITIAL_FORMS': u'0',
-            'manager_set-MAX_NUM_FORMS': u'0',
-            'manager_set-0-name': u'Guido Van Rossum'
+            'name': "Guido's House of Pasta",
+            'manager_set-TOTAL_FORMS': '1',
+            'manager_set-INITIAL_FORMS': '0',
+            'manager_set-MAX_NUM_FORMS': '0',
+            'manager_set-0-name': 'Guido Van Rossum'
         }
         restaurant = User()
         form = Form(data)
@@ -121,11 +121,11 @@ class InlineFormsetTests(TestCase):
 
         # Now update the Manager instance
         data = {
-            'manager_set-TOTAL_FORMS': u'1',
-            'manager_set-INITIAL_FORMS': u'1',
-            'manager_set-MAX_NUM_FORMS': u'0',
+            'manager_set-TOTAL_FORMS': '1',
+            'manager_set-INITIAL_FORMS': '1',
+            'manager_set-MAX_NUM_FORMS': '0',
             'manager_set-0-id': unicode(manager[0]['id']),
-            'manager_set-0-name': u'Terry Gilliam'
+            'manager_set-0-name': 'Terry Gilliam'
         }
         form_set = FormSet(data, instance=restaurant)
         if form_set.is_valid():
@@ -137,12 +137,12 @@ class InlineFormsetTests(TestCase):
 
         # Now add a new Manager instance
         data = {
-            'manager_set-TOTAL_FORMS': u'2',
-            'manager_set-INITIAL_FORMS': u'1',
-            'manager_set-MAX_NUM_FORMS': u'0',
+            'manager_set-TOTAL_FORMS': '2',
+            'manager_set-INITIAL_FORMS': '1',
+            'manager_set-MAX_NUM_FORMS': '0',
             'manager_set-0-id': unicode(manager[0]['id']),
-            'manager_set-0-name': u'Terry Gilliam',
-            'manager_set-1-name': u'John Cleese'
+            'manager_set-0-name': 'Terry Gilliam',
+            'manager_set-1-name': 'John Cleese'
         }
         form_set = FormSet(data, instance=restaurant)
         if form_set.is_valid():
@@ -185,12 +185,12 @@ class InlineFormsetTests(TestCase):
 
         # Add a new host, modify previous host, and save-as-new
         data = {
-            'host_set-TOTAL_FORMS': u'2',
-            'host_set-INITIAL_FORMS': u'1',
-            'host_set-MAX_NUM_FORMS': u'0',
+            'host_set-TOTAL_FORMS': '2',
+            'host_set-INITIAL_FORMS': '1',
+            'host_set-MAX_NUM_FORMS': '0',
             'host_set-0-id': unicode(host1.id),
-            'host_set-0-hostname': u'tranquility.hub.dal.net',
-            'host_set-1-hostname': u'matrix.de.eu.dal.net'
+            'host_set-0-hostname': 'tranquility.hub.dal.net',
+            'host_set-1-hostname': 'matrix.de.eu.dal.net'
         }
 
         # To save a formset as new, it needs a new hub instance
@@ -212,7 +212,7 @@ class InlineFormsetTests(TestCase):
         formset = FormSet(instance=user, initial=[{'data': 41}, {'data': 42}])
         self.assertEqual(formset.forms[0].initial['data'], 7)
         self.assertEqual(formset.extra_forms[0].initial['data'], 41)
-        self.assertTrue(u'value="42"' in formset.extra_forms[1].as_p())
+        self.assertTrue('value="42"' in formset.extra_forms[1].as_p())
 
 
 class FormsetTests(TestCase):
@@ -222,15 +222,15 @@ class FormsetTests(TestCase):
         '''
         Formset = modelformset_factory(User)
         data = {
-            'form-TOTAL_FORMS': u'2',
-            'form-INITIAL_FORMS': u'0',
-            'form-MAX_NUM_FORMS': u'0',
+            'form-TOTAL_FORMS': '2',
+            'form-INITIAL_FORMS': '0',
+            'form-MAX_NUM_FORMS': '0',
             'form-0-id': '',
-            'form-0-username': u'apollo13',
-            'form-0-serial': u'1',
+            'form-0-username': 'apollo13',
+            'form-0-serial': '1',
             'form-1-id': '',
-            'form-1-username': u'apollo13',
-            'form-1-serial': u'2',
+            'form-1-username': 'apollo13',
+            'form-1-serial': '2',
         }
         formset = Formset(data)
         # check if the returned error classes are correct
@@ -244,17 +244,17 @@ class FormsetTests(TestCase):
     def test_initial_data(self):
         User.objects.create(username="bibi", serial=1)
         Formset = modelformset_factory(User, extra=2)
-        formset = Formset(initial=[{'username': u'apollo11'}, {'username': u'apollo12'}])
+        formset = Formset(initial=[{'username': 'apollo11'}, {'username': 'apollo12'}])
         self.assertEqual(formset.forms[0].initial['username'], "bibi")
         self.assertEqual(formset.extra_forms[0].initial['username'], "apollo11")
-        self.assertTrue(u'value="apollo12"' in formset.extra_forms[1].as_p())
+        self.assertTrue('value="apollo12"' in formset.extra_forms[1].as_p())
 
     def test_extraneous_query_is_not_run(self):
         Formset = modelformset_factory(Network)
-        data = {u'test-TOTAL_FORMS': u'1',
-                u'test-INITIAL_FORMS': u'0',
-                u'test-MAX_NUM_FORMS': u'',
-                u'test-0-name': u'Random Place', }
+        data = {'test-TOTAL_FORMS': '1',
+                'test-INITIAL_FORMS': '0',
+                'test-MAX_NUM_FORMS': '',
+                'test-0-name': 'Random Place', }
         with self.assertNumQueries(1):
             formset = Formset(data, prefix="test")
             formset.save()

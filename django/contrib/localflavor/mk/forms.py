@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import datetime
 
@@ -15,14 +15,14 @@ class MKIdentityCardNumberField(RegexField):
     A Macedonian ID card number. Accepts both old and new format.
     """
     default_error_messages = {
-        'invalid': _(u'Identity card numbers must contain'
+        'invalid': _('Identity card numbers must contain'
                      ' either 4 to 7 digits or an uppercase letter and 7 digits.'),
     }
 
     def __init__(self, *args, **kwargs):
         kwargs['min_length'] = None
         kwargs['max_length'] = 8
-        regex = ur'(^[A-Z]{1}\d{7}$)|(^\d{4,7}$)'
+        regex = r'(^[A-Z]{1}\d{7}$)|(^\d{4,7}$)'
         super(MKIdentityCardNumberField, self).__init__(regex, *args, **kwargs)
 
 
@@ -54,9 +54,9 @@ class UMCNField(RegexField):
     * The last digit of the UMCN passes a checksum test
     """
     default_error_messages = {
-        'invalid': _(u'This field should contain exactly 13 digits.'),
-        'date': _(u'The first 7 digits of the UMCN must represent a valid past date.'),
-        'checksum': _(u'The UMCN is not valid.'),
+        'invalid': _('This field should contain exactly 13 digits.'),
+        'date': _('The first 7 digits of the UMCN must represent a valid past date.'),
+        'checksum': _('The UMCN is not valid.'),
     }
 
     def __init__(self, *args, **kwargs):
@@ -68,7 +68,7 @@ class UMCNField(RegexField):
         value = super(UMCNField, self).clean(value)
 
         if value in EMPTY_VALUES:
-            return u''
+            return ''
 
         if not self._validate_date_part(value):
             raise ValidationError(self.error_messages['date'])

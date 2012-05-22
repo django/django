@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import sys
 import os
 import gzip
@@ -12,6 +14,7 @@ from django.core.management.color import no_style
 from django.db import (connections, router, transaction, DEFAULT_DB_ALIAS,
       IntegrityError, DatabaseError)
 from django.db.models import get_apps
+from django.utils.encoding import force_unicode
 from itertools import product
 
 try:
@@ -195,7 +198,7 @@ class Command(BaseCommand):
                                                         'app_label': obj.object._meta.app_label,
                                                         'object_name': obj.object._meta.object_name,
                                                         'pk': obj.object.pk,
-                                                        'error_msg': e
+                                                        'error_msg': force_unicode(e)
                                                     }
                                                 raise e.__class__, e.__class__(msg), sys.exc_info()[2]
 
@@ -231,9 +234,10 @@ class Command(BaseCommand):
                 traceback.print_exc()
             else:
                 self.stderr.write(
-                    "Problem installing fixture '%s': %s" %
-                         (full_path, ''.join(traceback.format_exception(sys.exc_type,
-                             sys.exc_value, sys.exc_traceback))))
+                    "Problem installing fixture '%s': %s" % (
+                        full_path,
+                        force_unicode(b''.join(traceback.format_exception(*sys.exc_info())))
+                    ))
             return
 
 

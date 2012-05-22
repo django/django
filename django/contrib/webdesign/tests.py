@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import unicode_literals
+
 import unittest
 
 from django.contrib.webdesign.lorem_ipsum import *
@@ -9,7 +11,7 @@ from django.template import loader, Context
 class WebdesignTest(unittest.TestCase):
 
     def test_words(self):
-        self.assertEqual(words(7), u'lorem ipsum dolor sit amet consectetur adipisicing')
+        self.assertEqual(words(7), 'lorem ipsum dolor sit amet consectetur adipisicing')
 
     def test_paragraphs(self):
         self.assertEqual(paragraphs(1),
@@ -18,4 +20,4 @@ class WebdesignTest(unittest.TestCase):
     def test_lorem_tag(self):
         t = loader.get_template_from_string("{% load webdesign %}{% lorem 3 w %}")
         self.assertEqual(t.render(Context({})),
-                         u'lorem ipsum dolor')
+                         'lorem ipsum dolor')

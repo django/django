@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 # -*- coding: utf-8 -*-
 import json
@@ -162,8 +162,8 @@ class SerializersTestBase(object):
 
     def test_serialize_unicode(self):
         """Tests that unicode makes the roundtrip intact"""
-        actor_name = u"Za\u017c\u00f3\u0142\u0107"
-        movie_title = u'G\u0119\u015bl\u0105 ja\u017a\u0144'
+        actor_name = "Za\u017c\u00f3\u0142\u0107"
+        movie_title = 'G\u0119\u015bl\u0105 ja\u017a\u0144'
         ac = Actor(name=actor_name)
         mv = Movie(title=movie_title, actor=ac)
         ac.save()

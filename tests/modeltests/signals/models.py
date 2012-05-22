@@ -2,6 +2,8 @@
 Testing signals before/after saving and deleting.
 """
 
+from __future__ import unicode_literals
+
 from django.db import models
 
 
@@ -10,11 +12,11 @@ class Person(models.Model):
     last_name = models.CharField(max_length=20)
 
     def __unicode__(self):
-        return u"%s %s" % (self.first_name, self.last_name)
+        return "%s %s" % (self.first_name, self.last_name)
 
 class Car(models.Model):
     make = models.CharField(max_length=20)
     model = models.CharField(max_length=20)
 
     def __unicode__(self):
-        return u"%s %s" % (self.make, self.model)
+        return "%s %s" % (self.make, self.model)

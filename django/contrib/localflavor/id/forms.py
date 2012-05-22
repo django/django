@@ -2,7 +2,7 @@
 ID-specific Form helpers
 """
 
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import re
 import time
@@ -34,7 +34,7 @@ class IDPostCodeField(Field):
     def clean(self, value):
         super(IDPostCodeField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
 
         value = value.strip()
         if not postcode_re.search(value):
@@ -47,7 +47,7 @@ class IDPostCodeField(Field):
         if value[0] == '1' and value[4] != '0':
             raise ValidationError(self.error_messages['invalid'])
 
-        return u'%s' % (value, )
+        return '%s' % (value, )
 
 
 class IDProvinceSelect(Select):
@@ -75,7 +75,7 @@ class IDPhoneNumberField(Field):
     def clean(self, value):
         super(IDPhoneNumberField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
 
         phone_number = re.sub(r'[\-\s\(\)]', '', smart_unicode(value))
 
@@ -117,7 +117,7 @@ class IDLicensePlateField(Field):
         from django.contrib.localflavor.id.id_choices import LICENSE_PLATE_PREFIX_CHOICES
         super(IDLicensePlateField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
 
         plate_number = re.sub(r'\s+', ' ',
             smart_unicode(value.strip())).upper()
@@ -179,7 +179,7 @@ class IDNationalIdentityNumberField(Field):
     def clean(self, value):
         super(IDNationalIdentityNumberField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
 
         value = re.sub(r'[\s.]', '', smart_unicode(value))
 

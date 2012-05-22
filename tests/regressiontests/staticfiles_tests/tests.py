@@ -1,4 +1,5 @@
 # -*- encoding: utf-8 -*-
+from __future__ import unicode_literals
 
 import codecs
 import os
@@ -56,9 +57,9 @@ class BaseStaticFilesTestCase(object):
         testfiles_path = os.path.join(TEST_ROOT, 'apps', 'test', 'static', 'test')
         # To make sure SVN doesn't hangs itself with the non-ASCII characters
         # during checkout, we actually create one file dynamically.
-        self._nonascii_filepath = os.path.join(testfiles_path, u'fi\u015fier.txt')
+        self._nonascii_filepath = os.path.join(testfiles_path, 'fi\u015fier.txt')
         with codecs.open(self._nonascii_filepath, 'w', 'utf-8') as f:
-            f.write(u"fi\u015fier in the app dir")
+            f.write("fi\u015fier in the app dir")
         # And also create the stupid hidden file to dwarf the setup.py's
         # package data handling.
         self._hidden_filepath = os.path.join(testfiles_path, '.hidden')
@@ -76,7 +77,7 @@ class BaseStaticFilesTestCase(object):
 
     def assertFileContains(self, filepath, text):
         self.assertIn(text, self._get_file(smart_unicode(filepath)),
-                        u"'%s' not in '%s'" % (text, filepath))
+                        "'%s' not in '%s'" % (text, filepath))
 
     def assertFileNotFound(self, filepath):
         self.assertRaises(IOError, self._get_file, filepath)
@@ -173,13 +174,13 @@ class TestDefaults(object):
         """
         Can find a file with non-ASCII character in an app static/ directory.
         """
-        self.assertFileContains(u'test/fişier.txt', u'fişier in the app dir')
+        self.assertFileContains('test/fişier.txt', 'fişier in the app dir')
 
     def test_camelcase_filenames(self):
         """
         Can find a file with capital letters.
         """
-        self.assertFileContains(u'test/camelCase.txt', u'camelCase')
+        self.assertFileContains('test/camelCase.txt', 'camelCase')
 
 
 class TestFindStatic(CollectionTestCase, TestDefaults):

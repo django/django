@@ -3,7 +3,7 @@ Oracle database backend for Django.
 
 Requires cx_Oracle: http://cx-oracle.sourceforge.net/
 """
-
+from __future__ import unicode_literals
 
 import datetime
 import decimal
@@ -159,7 +159,7 @@ WHEN (new.%(col_name)s IS NULL)
         # string instead of null, but only if the field accepts the
         # empty string.
         if value is None and field and field.empty_strings_allowed:
-            value = u''
+            value = ''
         # Convert 1 or 0 to True or False
         elif value in (1, 0) and field and field.get_internal_type() in ('BooleanField', 'NullBooleanField'):
             value = bool(value)
@@ -234,7 +234,7 @@ WHEN (new.%(col_name)s IS NULL)
 
     def process_clob(self, value):
         if value is None:
-            return u''
+            return ''
         return force_unicode(value.read())
 
     def quote_name(self, name):
@@ -566,8 +566,8 @@ class OracleParam(object):
         # without being converted by DateTimeField.get_db_prep_value.
         if settings.USE_TZ and isinstance(param, datetime.datetime):
             if timezone.is_naive(param):
-                warnings.warn(u"Oracle received a naive datetime (%s)"
-                              u" while time zone support is active." % param,
+                warnings.warn("Oracle received a naive datetime (%s)"
+                              " while time zone support is active." % param,
                               RuntimeWarning)
                 default_timezone = timezone.get_default_timezone()
                 param = timezone.make_aware(param, default_timezone)
