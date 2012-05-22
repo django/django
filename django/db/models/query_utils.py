@@ -6,8 +6,6 @@ large and/or so that they can be used by other modules without getting into
 circular import difficulties.
 """
 
-import weakref
-
 from django.db.backends import util
 from django.utils import tree
 
@@ -70,8 +68,6 @@ class DeferredAttribute(object):
     """
     def __init__(self, field_name, model):
         self.field_name = field_name
-        self.model_ref = weakref.ref(model)
-        self.loaded = False
 
     def __get__(self, instance, owner):
         """
@@ -79,25 +75,27 @@ class DeferredAttribute(object):
         Returns the cached value.
         """
         from django.db.models.fields import FieldDoesNotExist
+        # Fetch the non-deferred model
+        non_deferred_model = instance._meta.proxy_for_model
+        opts = non_deferred_model._meta
 
         assert instance is not None
-        cls = self.model_ref()
         data = instance.__dict__
         if data.get(self.field_name, self) is self:
             # self.field_name is the attname of the field, but only() takes the
             # actual name, so we need to translate it here.
             try:
-                cls._meta.get_field_by_name(self.field_name)
-                name = self.field_name
+                f = opts.get_field_by_name(self.field_name)[0]
             except FieldDoesNotExist:
-                name = [f.name for f in cls._meta.fields
-                    if f.attname == self.field_name][0]
+                f = [f for f in opts.fields
+                     if f.attname == self.field_name][0]
+            name = f.name
             # We use only() instead of values() here because we want the
             # various data coersion methods (to_python(), etc.) to be called
             # here.
             val = getattr(
-                cls._base_manager.filter(pk=instance.pk).only(name).using(
-                    instance._state.db).get(),
+                non_deferred_model._base_manager.only(name).using(
+                    instance._state.db).get(pk=instance.pk),
                 self.field_name
             )
             data[self.field_name] = val
