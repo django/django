@@ -399,6 +399,9 @@ class BaseDatabaseFeatures(object):
     # in the SQL standard.
     supports_tablespaces = False
 
+    # Does the backend reset sequences between tests?
+    supports_sequence_reset = True
+
     # Features that need to be confirmed at runtime
     # Cache whether the confirmation has been performed.
     _confirmed = False

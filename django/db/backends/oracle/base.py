@@ -83,6 +83,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     ignores_nulls_in_unique_constraints = False
     has_bulk_insert = True
     supports_tablespaces = True
+    supports_sequence_reset = False
 
 class DatabaseOperations(BaseDatabaseOperations):
     compiler_module = "django.db.backends.oracle.compiler"
