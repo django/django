@@ -152,6 +152,8 @@ As we can see, ``formset.errors`` is a list whose entries correspond to the
 forms in the formset. Validation was performed for each of the two forms, and
 the expected error message appears for the second item.
 
+.. versionadded:: 1.4
+
 We can also check if form data differs from the initial data (i.e. the form was
 sent without any data)::
 
