@@ -165,7 +165,7 @@ following at your shell prompt (not the interactive Python prompt):
 
 .. code-block:: bash
 
-    python -c "import sys; sys.path = sys.path[1:]; import django; print django.__path__"
+    python -c "import sys; sys.path = sys.path[1:]; import django; print(django.__path__)"
 
 
 .. _install-django-code:
@@ -339,7 +339,7 @@ system, and the location in which Python was installed. To find your system's
 
 .. code-block:: bash
 
-    python -c "from distutils.sysconfig import get_python_lib; print get_python_lib()"
+    python -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())"
 
 (Note that this should be run from a shell prompt, not a Python interactive
 prompt.)
