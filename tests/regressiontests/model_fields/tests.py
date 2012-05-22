@@ -216,7 +216,7 @@ class BooleanFieldTests(unittest.TestCase):
         # Verify that when an extra clause exists, the boolean
         # conversions are applied with an offset
         b5 = BooleanModel.objects.all().extra(
-            select={'string_length': 'LENGTH(string)'})[0]
+            select={'string_col': 'string'})[0]
         self.assertFalse(isinstance(b5.pk, bool))
 
 class ChoicesTests(test.TestCase):
