@@ -13,9 +13,19 @@ It'll consist of two parts:
 * An admin site that lets you add, change and delete polls.
 
 We'll assume you have :doc:`Django installed </intro/install>` already. You can
-tell Django is installed by running the Python interactive interpreter and
-typing ``import django``. If that command runs successfully, with no errors,
-Django is installed.
+tell Django is installed and which version by running the following command:
+
+.. code-block:: bash
+
+    python -c "import django; print(django.get_version())"
+
+You should see either the version of your Django installation or an error
+telling "No module named django". Check also that the version number matches
+the version of this tutorial. If they don't match, you can refer to the
+tutorial for your version of Django or update Django to the newest version.
+
+See :doc:`How to install Django </topics/install>` for advice on how to remove
+older versions of Django and install a newer one.
 
 .. admonition:: Where to get help:
 
