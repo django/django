@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import base64
 import time
 from datetime import datetime, timedelta
+
 try:
     from django.utils.six.moves import cPickle as pickle
 except ImportError:
@@ -12,6 +13,7 @@ from django.conf import settings
 from django.core.exceptions import SuspiciousOperation
 from django.utils.crypto import get_random_string
 from django.utils.crypto import salted_hmac
+from django.utils.crypto import constant_time_compare
 from django.utils import timezone
 from django.utils.encoding import force_bytes
 from django.core import signing
@@ -89,8 +91,27 @@ class SessionBase(object):
 
     def decode(self, session_data):
         try:
-            serialized = str(self.signer.unsign(session_data,
-                                                settings.SESSION_COOKIE_AGE))
+            try:
+                serialized = str(self.signer.unsign(session_data,
+                                                    settings.SESSION_COOKIE_AGE))
+
+            except signing.SignatureExpired:
+                # An expired signature means not a compatibility issue so raise
+                # it.
+                raise
+
+            except signing.BadSignature:
+                # For compatibility, try to use the previous decoding method in
+                # case of a signing exception with already existing sessions.
+                encoded_data = base64.decodestring(session_data)
+                hash, serialized = encoded_data.split(':', 1)
+                expected_hash = self._hash(serialized)
+                if not constant_time_compare(hash, expected_hash):
+                    raise SuspiciousOperation("Session data corrupted")
+
+                # Ensure that the session is encoded with new method again.
+                self.modified = True
+
             return pickle.loads(serialized)
 
         except Exception:
