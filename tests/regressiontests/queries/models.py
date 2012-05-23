@@ -264,7 +264,7 @@ class SingleObject(models.Model):
         return self.name
 
 class RelatedObject(models.Model):
-    single = models.ForeignKey(SingleObject)
+    single = models.ForeignKey(SingleObject, null=True)
 
     class Meta:
         ordering = ['single']
