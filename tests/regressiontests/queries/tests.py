@@ -19,7 +19,8 @@ from .models import (Annotation, Article, Author, Celebrity, Child, Cover,
     ManagedModel, Member, NamedCategory, Note, Number, Plaything, PointerA,
     Ranking, Related, Report, ReservedName, Tag, TvChef, Valid, X, Food, Eaten,
     Node, ObjectA, ObjectB, ObjectC, CategoryItem, SimpleCategory,
-    SpecialCategory, OneToOneCategory, NullableName, ProxyCategory)
+    SpecialCategory, OneToOneCategory, NullableName, ProxyCategory,
+    SingleObject, RelatedObject)
 
 
 class BaseQuerysetTest(TestCase):
@@ -1321,10 +1322,31 @@ class NullableRelOrderingTests(TestCase):
     def test_ticket10028(self):
         # Ordering by model related to nullable relations(!) should use outer
         # joins, so that all results are included.
-        _ = Plaything.objects.create(name="p1")
+        Plaything.objects.create(name="p1")
         self.assertQuerysetEqual(
             Plaything.objects.all(),
             ['<Plaything: p1>']
+        )
+
+    def test_join_already_in_query(self):
+        # Ordering by model related to nullable relations should not change
+        # the join type of already existing joins.
+        Plaything.objects.create(name="p1")
+        s = SingleObject.objects.create(name='s')
+        r = RelatedObject.objects.create(single=s)
+        Plaything.objects.create(name="p2", others=r)
+        qs = Plaything.objects.all().filter(others__isnull=False).order_by('pk')
+        self.assertTrue('INNER' in str(qs.query))
+        qs = qs.order_by('others__single__name')
+        # The ordering by others__single__pk will add one new join (to single)
+        # and that join must be LEFT join. The already existing join to related
+        # objects must be kept INNER. So, we have both a INNER and a LEFT join
+        # in the query.
+        self.assertTrue('LEFT' in str(qs.query))
+        self.assertTrue('INNER' in str(qs.query))
+        self.assertQuerysetEqual(
+            qs,
+            ['<Plaything: p2>']
         )
 
 
