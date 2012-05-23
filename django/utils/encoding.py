@@ -1,4 +1,3 @@
-import types
 import urllib
 import locale
 import datetime
@@ -45,7 +44,7 @@ def is_protected_type(obj):
     force_unicode(strings_only=True).
     """
     return isinstance(obj, (
-        types.NoneType,
+        type(None),
         int, long,
         datetime.datetime, datetime.date, datetime.time,
         float, Decimal)
@@ -107,7 +106,7 @@ def smart_str(s, encoding='utf-8', strings_only=False, errors='strict'):
 
     If strings_only is True, don't convert (some) non-string-like objects.
     """
-    if strings_only and isinstance(s, (types.NoneType, int)):
+    if strings_only and (s is None or isinstance(s, int)):
         return s
     if isinstance(s, Promise):
         return unicode(s).encode(encoding, errors)
