@@ -19,7 +19,7 @@ class GeoConstraint(Constraint):
             # Make sure the F Expression destination field exists, and
             # set an `srid` attribute with the same as that of the
             # destination.
-            geo_fld = GeoWhereNode._check_geo_field(value.opts, value.expression.name)
+            geo_fld = value.field
             if not geo_fld:
                 raise ValueError('No geographic field found in expression.')
             value.srid = geo_fld.srid

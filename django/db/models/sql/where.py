@@ -66,7 +66,7 @@ class WhereNode(tree.Node):
         else:
             value_annotation = bool(value)
 
-        if hasattr(obj, "prepare"):
+        if isinstance(obj, Constraint):
             value = obj.prepare(lookup_type, value)
 
         super(WhereNode, self).add(
@@ -153,9 +153,10 @@ class WhereNode(tree.Node):
         if isinstance(lvalue, tuple):
             # A direct database column lookup.
             field_sql = self.sql_for_columns(lvalue, qn, connection)
+            fs_params = []
         else:
             # A smart object with an as_sql() method.
-            field_sql = lvalue.as_sql(qn, connection)
+            field_sql, fs_params = lvalue.as_sql(qn, connection)
 
         if value_annotation is datetime.datetime:
             cast_sql = connection.ops.datetime_cast_sql()
@@ -167,6 +168,7 @@ class WhereNode(tree.Node):
             cast_sql = ''
         else:
             extra = ''
+        params = list(fs_params)+list(params)
 
         if (len(params) == 1 and params[0] == '' and lookup_type == 'exact'
             and connection.features.interprets_empty_strings_as_nulls):

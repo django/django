@@ -145,12 +145,11 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
                 # we are using < 2.4.0-RC4
                 pass
 
-    def check_aggregate_support(self, aggregate):
+    def check_aggregate_support(self, agg_name):
         """
         Checks if the given aggregate name is supported (that is, if it's
         in `self.valid_aggregates`).
         """
-        agg_name = aggregate.__class__.__name__
         return agg_name in self.valid_aggregates
 
     def convert_geom(self, wkt, geo_field):
@@ -275,17 +274,25 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
 
         return (version, major, minor1, minor2)
 
-    def spatial_aggregate_sql(self, agg):
+    def expression_sql(self, function_type):
+        """
+        Returns the SQL template and function for the given function_type.
+        """
+        try:
+            return super(SpatiaLiteOperations, self).expression_sql(function_type)
+        except NotImplementedError:
+            return self.spatial_aggregate_sql(function_type)
+
+    def spatial_aggregate_sql(self, agg_name):
         """
         Returns the spatial aggregate SQL template and function for the
         given Aggregate instance.
         """
-        agg_name = agg.__class__.__name__
-        if not self.check_aggregate_support(agg):
-            raise NotImplementedError('%s spatial aggregate is not implmented for this backend.' % agg_name)
+        if not self.check_aggregate_support(agg_name):
+            raise NotImplementedError('%s spatial aggregate is not implemented for this backend.' % agg_name)
         agg_name = agg_name.lower()
         if agg_name == 'union': agg_name += 'agg'
-        sql_template = self.select % '%(function)s(%(field)s)'
+        sql_template = self.select % '%(function)s(%%s)'
         sql_function = getattr(self, agg_name)
         return sql_template, sql_function
 

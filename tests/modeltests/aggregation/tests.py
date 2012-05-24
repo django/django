@@ -4,6 +4,7 @@ import datetime
 from decimal import Decimal
 
 from django.db.models import Avg, Sum, Count, Max, Min
+from django.db.models import F
 from django.test import TestCase, Approximate
 
 from .models import Author, Publisher, Book, Store
@@ -62,6 +63,36 @@ class BaseAggregateTestCase(TestCase):
         vals = Store.objects.filter(name="Amazon.com").aggregate(amazon_mean=Avg("books__rating"))
         self.assertEqual(len(vals), 1)
         self.assertAlmostEqual(vals["amazon_mean"], 4.08, places=2)
+
+    def test_aggregate_f_expression(self):
+        vals = Book.objects.all().aggregate(price_per_page=Avg(F('price')*1.0/F('pages')))
+        self.assertEqual(len(vals), 1)
+        self.assertAlmostEqual(vals["price_per_page"], 0.0745110754864109, places=2)
+
+    def test_annotate_f_expression(self):
+        self.assertQuerysetEqual(
+            Book.objects.all().annotate(price_per_page=F('price')*1.0/F('pages')).order_by('pk'), [
+                Decimal('0.07'),
+                Decimal('0.04'),
+                Decimal('0.10'),
+                Decimal('0.08'),
+                Decimal('0.07'),
+                Decimal('0.08'),
+            ],
+            lambda b: b.price_per_page
+        )
+
+        self.assertQuerysetAlmostEqual(
+            Publisher.objects.all().annotate(price_per_page=Avg(F('book__price')*1.0/F('book__pages'))).order_by('pk'), [
+                0.0830403803131991,
+                0.0437310606060606,
+                0.0789867238768299,
+                0.0792811839323467,
+                None,
+            ],
+            lambda p: p.price_per_page,
+            places=4
+        )
 
     def test_annotate_basic(self):
         self.assertQuerysetEqual(

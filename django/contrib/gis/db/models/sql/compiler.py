@@ -25,6 +25,7 @@ class GeoSQLCompiler(compiler.SQLCompiler):
         qn2 = self.connection.ops.quote_name
         result = ['(%s) AS %s' % (self.get_extra_select_format(alias) % col[0], qn2(alias))
                   for alias, col in self.query.extra_select.iteritems()]
+        query_params = []
         aliases = set(self.query.extra_select.keys())
         if with_aliases:
             col_aliases = aliases.copy()
@@ -68,15 +69,17 @@ class GeoSQLCompiler(compiler.SQLCompiler):
             aliases.update(new_aliases)
 
         max_name_length = self.connection.ops.max_name_length()
-        result.extend([
+        for alias, aggregate in self.query.aggregate_select.items(): 
+            sql, params = aggregate.as_sql(qn, self.connection) 
+            result.append( 
                 '%s%s' % (
-                    self.get_extra_select_format(alias) % aggregate.as_sql(qn, self.connection),
+                    self.get_extra_select_format(alias) % sql,
                     alias is not None
                         and ' AS %s' % qn(truncate_name(alias, max_name_length))
                         or ''
-                    )
-                for alias, aggregate in self.query.aggregate_select.items()
-        ])
+                )
+            )
+            query_params.extend(params)
 
         # This loop customized for GeoQuery.
         for (table, col), field in zip(self.query.related_select_cols, self.query.related_select_fields):
@@ -92,7 +95,7 @@ class GeoSQLCompiler(compiler.SQLCompiler):
                 col_aliases.add(col)
 
         self._select_aliases = aliases
-        return result
+        return result, query_params
 
     def get_default_columns(self, with_aliases=False, col_aliases=None,
             start_alias=None, opts=None, as_pairs=False, local_only=False):

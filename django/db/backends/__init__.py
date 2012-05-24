@@ -851,7 +851,7 @@ class BaseDatabaseOperations(object):
         """
         internal_type = field.get_internal_type()
         if internal_type == 'DecimalField':
-            return value
+            return util.typecast_decimal(field.format_number(value))
         elif internal_type and internal_type.endswith('IntegerField') or internal_type == 'AutoField':
             return int(value)
         elif internal_type in ('DateField', 'DateTimeField', 'TimeField'):
@@ -870,14 +870,45 @@ class BaseDatabaseOperations(object):
         """
         pass
 
-    def combine_expression(self, connector, sub_expressions):
+    def expression_sql(self, function_type):
+        """The SQL function and template of a specific SQL function or
+        operation for this backend.
+        """
+        infix_template = '%%s %(function)s %%s'
+        prefix_template = '%(function)s(%%s)'
+        count_template = '%(function)s(%(distinct)s%%s)'
+        try:
+            return {
+                '+': (infix_template, '+'),
+                '-': (infix_template, '-'),
+                '*': (infix_template, '*'),
+                '/': (infix_template, '/'),
+                '%%': (infix_template, '%%%%'),
+                '&': (infix_template, '&'),
+                '|': (infix_template, '|'),
+                'Avg': (prefix_template, 'AVG'),
+                'Count': (count_template, 'COUNT'),
+                'Max': (prefix_template, 'MAX'),
+                'Min': (prefix_template, 'MIN'),
+                'StdDevSamp': (prefix_template, 'STDDEV_SAMP'),
+                'StdDevPop': (prefix_template, 'STDDEV_POP'),
+                'Sum': (prefix_template, 'SUM'),
+                'VarianceSamp': (prefix_template, 'VAR_SAMP'),
+                'VariancePop': (prefix_template, 'VAR_POP'),
+                }[function_type]
+        except KeyError:
+            raise NotImplementedError('"%s" is not implemented for this backend.' % function_type)
+
+    def combine_expression(self, connector, sub_expressions, **extra):
         """Combine a list of subexpressions into a single expression, using
         the provided connecting operator. This is required because operators
         can vary between backends (e.g., Oracle with %% and &) and between
         subexpression types (e.g., date expressions)
         """
-        conn = ' %s ' % connector
-        return conn.join(sub_expressions)
+        sql_template, sql_function = self.expression_sql(connector)
+        params = {'function':sql_function}
+        params.update(extra)
+        return sql_template % params % tuple(sub_expressions)
 
 class BaseDatabaseIntrospection(object):
     """
