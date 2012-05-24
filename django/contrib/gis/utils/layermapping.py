@@ -332,7 +332,7 @@ class LayerMapping(object):
                 val = unicode(ogr_field.value, self.encoding)
             else:
                 val = ogr_field.value
-                if len(val) > model_field.max_length:
+                if model_field.max_length and len(val) > model_field.max_length:
                     raise InvalidString('%s model field maximum string length is %s, given %s characters.' %
                                         (model_field.name, model_field.max_length, len(val)))
         elif isinstance(ogr_field, OFTReal) and isinstance(model_field, models.DecimalField):

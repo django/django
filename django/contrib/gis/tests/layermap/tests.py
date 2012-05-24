@@ -272,3 +272,12 @@ class LayerMapTest(TestCase):
         lm = LayerMapping(Invalid, invalid_shp, invalid_mapping,
                           source_srs=4326)
         lm.save(silent=True)
+
+    def test_textfield(self):
+        "Tests that String content fits also in a TextField"
+        mapping = copy(city_mapping)
+        mapping['name_txt'] = 'Name'
+        lm = LayerMapping(City, city_shp, mapping)
+        lm.save(silent=True, strict=True)
+        self.assertEqual(City.objects.count(), 3)
+        self.assertEqual(City.objects.all().order_by('name_txt')[0].name_txt, "Houston")
