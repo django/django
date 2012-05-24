@@ -41,6 +41,7 @@ class QuerySet(object):
         self._for_write = False
         self._prefetch_related_lookups = []
         self._prefetch_done = False
+        self._known_related_object = None       # (attname, rel_obj)
 
     ########################
     # PYTHON MAGIC METHODS #
@@ -282,9 +283,10 @@ class QuerySet(object):
                     init_list.append(field.attname)
             model_cls = deferred_class_factory(self.model, skip)
 
-        # Cache db and model outside the loop
+        # Cache db, model and known_related_object outside the loop
         db = self.db
         model = self.model
+        kro_attname, kro_instance = self._known_related_object or (None, None)
         compiler = self.query.get_compiler(using=db)
         if fill_cache:
             klass_info = get_klass_info(model, max_depth=max_depth,
@@ -294,12 +296,12 @@ class QuerySet(object):
                 obj, _ = get_cached_row(row, index_start, db, klass_info,
                                         offset=len(aggregate_select))
             else:
+                # Omit aggregates in object creation.
+                row_data = row[index_start:aggregate_start]
                 if skip:
-                    row_data = row[index_start:aggregate_start]
                     obj = model_cls(**dict(zip(init_list, row_data)))
                 else:
-                    # Omit aggregates in object creation.
-                    obj = model(*row[index_start:aggregate_start])
+                    obj = model(*row_data)
 
                 # Store the source database of the object
                 obj._state.db = db
@@ -313,7 +315,11 @@ class QuerySet(object):
             # Add the aggregates to the model
             if aggregate_select:
                 for i, aggregate in enumerate(aggregate_select):
-                    setattr(obj, aggregate, row[i+aggregate_start])
+                    setattr(obj, aggregate, row[i + aggregate_start])
+
+            # Add the known related object to the model, if there is one
+            if kro_instance:
+                setattr(obj, kro_attname, kro_instance)
 
             yield obj
 
@@ -864,6 +870,7 @@ class QuerySet(object):
         c = klass(model=self.model, query=query, using=self._db)
         c._for_write = self._for_write
         c._prefetch_related_lookups = self._prefetch_related_lookups[:]
+        c._known_related_object = self._known_related_object
         c.__dict__.update(kwargs)
         if setup and hasattr(c, '_setup_query'):
             c._setup_query()
@@ -1781,9 +1788,7 @@ def prefetch_one_level(instances, prefetcher, attname):
     rel_obj_cache = {}
     for rel_obj in all_related_objects:
         rel_attr_val = rel_obj_attr(rel_obj)
-        if rel_attr_val not in rel_obj_cache:
-            rel_obj_cache[rel_attr_val] = []
-        rel_obj_cache[rel_attr_val].append(rel_obj)
+        rel_obj_cache.setdefault(rel_attr_val, []).append(rel_obj)
 
     for obj in instances:
         instance_attr_val = instance_attr(obj)

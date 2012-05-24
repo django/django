@@ -44,6 +44,24 @@ reasons or when trying to avoid overwriting concurrent changes.
 See the :meth:`Model.save() <django.db.models.Model.save()>` documentation for
 more details.
 
+Caching of related model instances
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When traversing relations, the ORM will avoid re-fetching objects that were
+previously loaded. For example, with the tutorial's models::
+
+    >>> first_poll = Poll.objects.all()[0]
+    >>> first_choice = first_poll.choice_set.all()[0]
+    >>> first_choice.poll is first_poll
+    True
+
+In Django 1.5, the third line no longer triggers a new SQL query to fetch
+``first_choice.poll``; it was set when by the second line.
+
+For one-to-one relationships, both sides can be cached. For many-to-one
+relationships, only the single side of the relationship can be cached. This
+is particularly helpful in combination with ``prefetch_related``.
+
 Minor features
 ~~~~~~~~~~~~~~
 
