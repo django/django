@@ -46,18 +46,17 @@ class WhereNode(tree.Node):
     """
     default = AND
 
-    def add(self, data, connector):
+    def _prepare_data(self, data):
         """
-        Add a node to the where-tree. If the data is a list or tuple, it is
-        expected to be of the form (obj, lookup_type, value), where obj is
-        a Constraint object, and is then slightly munged before being stored
-        (to avoid storing any reference to field objects). Otherwise, the 'data'
-        is stored unchanged and can be any class with an 'as_sql()' method.
+        Prepare data for addition to the tree. If the data is a list or tuple,
+        it is expected to be of the form (obj, lookup_type, value), where obj
+        is a Constraint object, and is then slightly munged before being
+        stored (to avoid storing any reference to field objects). Otherwise,
+        the 'data' is stored unchanged and can be any class with an 'as_sql()'
+        method.
         """
         if not isinstance(data, (list, tuple)):
-            super(WhereNode, self).add(data, connector)
-            return
-
+            return data
         obj, lookup_type, value = data
         if isinstance(value, collections.Iterator):
             # Consume any generators immediately, so that we can determine
@@ -78,9 +77,7 @@ class WhereNode(tree.Node):
 
         if hasattr(obj, "prepare"):
             value = obj.prepare(lookup_type, value)
-
-        super(WhereNode, self).add(
-                (obj, lookup_type, value_annotation, value), connector)
+        return (obj, lookup_type, value_annotation, value)
 
     def as_sql(self, qn, connection):
         """
@@ -153,6 +150,18 @@ class WhereNode(tree.Node):
             elif len(result) > 1:
                 sql_string = '(%s)' % sql_string
         return sql_string, result_params
+
+    def get_cols(self):
+        cols = []
+        for child in self.children:
+            if hasattr(child, 'get_cols'):
+                cols.extend(child.get_cols())
+            else:
+                if isinstance(child[0], Constraint):
+                    cols.append((child[0].alias, child[0].col))
+                if hasattr(child[3], 'get_cols'):
+                    cols.extend(child[3].get_cols())
+        return cols
 
     def make_atom(self, child, qn, connection):
         """
@@ -284,7 +293,6 @@ class WhereNode(tree.Node):
         with empty subtree_parents). Childs must be either (Contraint, lookup,
         value) tuples, or objects supporting .clone().
         """
-        assert not self.subtree_parents
         clone = self.__class__._new_instance(
             children=[], connector=self.connector, negated=self.negated)
         for child in self.children:

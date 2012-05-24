@@ -45,7 +45,7 @@ class DeleteQuery(Query):
         for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
             where = self.where_class()
             where.add((Constraint(None, field.column, field), 'in',
-                    pk_list[offset:offset + GET_ITERATOR_CHUNK_SIZE]), AND)
+                       pk_list[offset:offset + GET_ITERATOR_CHUNK_SIZE]), AND)
             self.do_query(self.model._meta.db_table, where, using=using)
 
     def delete_qs(self, query, using):
@@ -117,8 +117,8 @@ class UpdateQuery(Query):
         for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
             self.where = self.where_class()
             self.where.add((Constraint(None, pk_field.column, pk_field), 'in',
-                    pk_list[offset:offset + GET_ITERATOR_CHUNK_SIZE]),
-                    AND)
+                            pk_list[offset:offset + GET_ITERATOR_CHUNK_SIZE]),
+                           AND)
             self.get_compiler(using).execute_sql(None)
 
     def add_update_values(self, values):

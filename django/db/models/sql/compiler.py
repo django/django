@@ -87,6 +87,7 @@ class SQLCompiler(object):
 
         where, w_params = self.query.where.as_sql(qn=qn, connection=self.connection)
         having, h_params = self.query.having.as_sql(qn=qn, connection=self.connection)
+        having_group_by = self.query.having.get_cols()
         params = []
         for val in six.itervalues(self.query.extra_select):
             params.extend(val[1])
@@ -107,7 +108,7 @@ class SQLCompiler(object):
             result.append('WHERE %s' % where)
             params.extend(w_params)
 
-        grouping, gb_params = self.get_grouping(ordering_group_by)
+        grouping, gb_params = self.get_grouping(having_group_by, ordering_group_by)
         if grouping:
             if distinct_fields:
                 raise NotImplementedError(
@@ -534,7 +535,7 @@ class SQLCompiler(object):
                 first = False
         return result, from_params
 
-    def get_grouping(self, ordering_group_by):
+    def get_grouping(self, having_group_by, ordering_group_by):
         """
         Returns a tuple representing the SQL elements in the "group by" clause.
         """
@@ -551,7 +552,7 @@ class SQLCompiler(object):
                 ]
                 select_cols = []
             seen = set()
-            cols = self.query.group_by + select_cols
+            cols = self.query.group_by + having_group_by + select_cols
             for col in cols:
                 col_params = ()
                 if isinstance(col, (list, tuple)):
