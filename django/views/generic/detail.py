@@ -1,6 +1,5 @@
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 from django.http import Http404
-from django.utils.encoding import smart_str
 from django.utils.translation import ugettext as _
 from django.views.generic.base import TemplateResponseMixin, ContextMixin, View
 
@@ -81,7 +80,7 @@ class SingleObjectMixin(ContextMixin):
         if self.context_object_name:
             return self.context_object_name
         elif hasattr(obj, '_meta'):
-            return smart_str(obj._meta.object_name.lower())
+            return obj._meta.object_name.lower()
         else:
             return None
 
