@@ -71,6 +71,18 @@ Backwards incompatible changes in 1.5
     deprecation timeline for a given feature, its removal may appear as a
     backwards incompatible change.
 
+Context in year archive class-based views
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For consistency with the other date-based generic views,
+:class:`~django.views.generic.dates.YearArchiveView` now passes ``year`` in
+the context as a :class:`datetime.date` rather than a string.  If you are
+using ``{{ year }}`` in your templates, you must replace it with ``{{
+year|date:"Y" }}``.
+
+``next_year`` and ``previous_year`` were also added in the context. They are
+calculated according to ``allow_empty`` and ``allow_future``.
+
 Features deprecated in 1.5
 ==========================
 
@@ -86,4 +98,4 @@ our own copy of ``simplejson``. You can safely change any use of
 ~~~~~~~~~~~~~~~~~~~~~~
 
 The :func:`~django.utils.itercompat.product` function has been deprecated. Use
-the built-in `itertools.product` instead.
+the built-in :func:`itertools.product` instead.
