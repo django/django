@@ -475,3 +475,25 @@ class MyObject(models.Model):
     parent = models.ForeignKey('self', null=True, blank=True, related_name='children')
     data = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
+
+# Models for #17600 regressions
+@python_2_unicode_compatible
+class Order(models.Model):
+    id = models.IntegerField(primary_key=True)
+
+    class Meta:
+        ordering = ('pk', )
+
+    def __str__(self):
+        return '%s' % self.pk
+
+@python_2_unicode_compatible
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order, related_name='items')
+    status = models.IntegerField()
+
+    class Meta:
+        ordering = ('pk', )
+
+    def __str__(self):
+        return '%s' % self.pk
