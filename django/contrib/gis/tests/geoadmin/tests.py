@@ -31,5 +31,5 @@ class GeoAdminTest(TestCase):
         result = geoadmin.get_map_widget(City._meta.get_field('point'))(
             ).render('point', Point(-79.460734, 40.18476))
         self.assertIn(
-            """geodjango_point.layers.base = new OpenLayers.Layer.WMS("OpenLayers WMS", "http://labs.metacarta.com/wms/vmap0", {layers: \'basic\', format: 'image/jpeg'});""",
+            """geodjango_point.layers.base = new OpenLayers.Layer.WMS("OpenLayers WMS", "http://vmap0.tiles.osgeo.org/wms/vmap0", {layers: \'basic\', format: 'image/jpeg'});""",
             result)
