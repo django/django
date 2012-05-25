@@ -844,6 +844,39 @@ class Queries1Tests(BaseQuerysetTest):
         )
         Tag._meta.ordering = original_ordering
 
+    def test_exclude(self):
+        self.assertQuerysetEqual(
+            Item.objects.exclude(tags__name='t4'),
+            [repr(i) for i in Item.objects.filter(~Q(tags__name='t4'))])
+        self.assertQuerysetEqual(
+            Item.objects.exclude(Q(tags__name='t4')|Q(tags__name='t3')),
+            [repr(i) for i in Item.objects.filter(~(Q(tags__name='t4')|Q(tags__name='t3')))])
+        self.assertQuerysetEqual(
+            Item.objects.exclude(Q(tags__name='t4')|~Q(tags__name='t3')),
+            [repr(i) for i in Item.objects.filter(~(Q(tags__name='t4')|~Q(tags__name='t3')))])
+
+    def test_nested_exclude(self):
+        self.assertQuerysetEqual(
+            Item.objects.exclude(~Q(tags__name='t4')),
+            [repr(i) for i in Item.objects.filter(~~Q(tags__name='t4'))])
+
+    def test_double_exclude(self):
+        self.assertQuerysetEqual(
+            Item.objects.filter(Q(tags__name='t4')),
+            [repr(i) for i in Item.objects.filter(~~Q(tags__name='t4'))])
+        self.assertQuerysetEqual(
+            Item.objects.filter(Q(tags__name='t4')),
+            [repr(i) for i in Item.objects.filter(~Q(~Q(tags__name='t4')))])
+
+    @unittest.expectedFailure
+    def test_exclude_in(self):
+        self.assertQuerysetEqual(
+            Item.objects.exclude(Q(tags__name__in=['t4', 't3'])),
+            [repr(i) for i in Item.objects.filter(~Q(tags__name__in=['t4', 't3']))])
+        self.assertQuerysetEqual(
+            Item.objects.filter(Q(tags__name__in=['t4', 't3'])),
+            [repr(i) for i in Item.objects.filter(~~Q(tags__name__in=['t4', 't3']))])
+
 class Queries2Tests(TestCase):
     def setUp(self):
         Number.objects.create(num=4)
