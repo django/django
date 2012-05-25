@@ -276,11 +276,11 @@ in that window and click "Save," Django will save the poll to the database and
 dynamically add it as the selected choice on the "Add choice" form you're
 looking at.
 
-But, really, this is an inefficient way of adding Choice objects to the system.
+But, really, this is an inefficient way of adding ``Choice`` objects to the system.
 It'd be better if you could add a bunch of Choices directly when you create the
-Poll object. Let's make that happen.
+``Poll`` object. Let's make that happen.
 
-Remove the ``register()`` call for the Choice model. Then, edit the ``Poll``
+Remove the ``register()`` call for the ``Choice`` model. Then, edit the ``Poll``
 registration code to read::
 
     class ChoiceInline(admin.StackedInline):
@@ -296,7 +296,7 @@ registration code to read::
 
     admin.site.register(Poll, PollAdmin)
 
-This tells Django: "Choice objects are edited on the Poll admin page. By
+This tells Django: "``Choice`` objects are edited on the ``Poll`` admin page. By
 default, provide enough fields for 3 choices."
 
 Load the "Add poll" page to see how that looks, you may need to restart your development server:
@@ -309,7 +309,7 @@ by ``extra`` -- and each time you come back to the "Change" page for an
 already-created object, you get another three extra slots.
 
 One small problem, though. It takes a lot of screen space to display all the
-fields for entering related Choice objects. For that reason, Django offers a
+fields for entering related ``Choice`` objects. For that reason, Django offers a
 tabular way of displaying inline related objects; you just need to change
 the ``ChoiceInline`` declaration to read::
 
@@ -397,7 +397,7 @@ search terms, Django will search the ``question`` field. You can use as many
 fields as you'd like -- although because it uses a ``LIKE`` query behind the
 scenes, keep it reasonable, to keep your database happy.
 
-Finally, because Poll objects have dates, it'd be convenient to be able to
+Finally, because ``Poll`` objects have dates, it'd be convenient to be able to
 drill down by date. Add this line::
 
     date_hierarchy = 'pub_date'
