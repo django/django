@@ -568,6 +568,23 @@ Whether to save the session data on every request. If this is ``False``
 (default), then the session data will only be saved if it has been modified --
 that is, if any of its dictionary values have been assigned or deleted.
 
+SESSION_KEEP_COMPATIBLE
+-----------------------
+
+Default: ``False``
+
+Wheather to continue support for existing sessions, which were created with
+older mechanism. This is useful if you want the existing sessions not to
+invalidate. If set to True, the legacy sessions will be gradually converted to
+the signed sessions, after that this setting can be set to ``False`` again.
+
+.. warning::
+
+    Setting this to ``True`` will make you susceptible to all the security risks
+    from the previous mechanism which lacked data signing. Use this if you don't
+    want all the users to automatically logout after a django upgrade.
+
+
 .. _Django settings: ../settings/
 
 Technical details
