@@ -36,6 +36,7 @@ class GeoModelAdmin(ModelAdmin):
     wms_url = 'http://vmap0.tiles.osgeo.org/wms/vmap0'
     wms_layer = 'basic'
     wms_name = 'OpenLayers WMS'
+    wms_options = {'format': 'image/jpeg'}
     debug = False
     widget = OpenLayersWidget
 
@@ -76,6 +77,12 @@ class GeoModelAdmin(ModelAdmin):
         class OLMap(self.widget):
             template = self.map_template
             geom_type = db_field.geom_type
+
+            wms_options = ''
+            if self.wms_options:
+                wms_options = ["%s: '%s'" % pair for pair in self.wms_options.items()]
+                wms_options = ', %s' % ', '.join(wms_options)
+
             params = {'default_lon' : self.default_lon,
                       'default_lat' : self.default_lat,
                       'default_zoom' : self.default_zoom,
@@ -106,6 +113,7 @@ class GeoModelAdmin(ModelAdmin):
                       'wms_url' : self.wms_url,
                       'wms_layer' : self.wms_layer,
                       'wms_name' : self.wms_name,
+                      'wms_options' : wms_options,
                       'debug' : self.debug,
                       }
         return OLMap
