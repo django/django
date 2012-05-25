@@ -96,21 +96,15 @@ class SessionBase(object):
                                                     settings.SESSION_COOKIE_AGE))
 
             except signing.SignatureExpired:
-                # An expired signature means not a compatibility issue so raise
-                # it.
+                # An expired signature means it is not a compatibility issue so
+                # raise it.
                 raise
 
             except signing.BadSignature:
-                # For compatibility, try to use the previous decoding method in
-                # case of a signing exception with already existing sessions.
-                encoded_data = base64.decodestring(session_data)
-                hash, serialized = encoded_data.split(':', 1)
-                expected_hash = self._hash(serialized)
-                if not constant_time_compare(hash, expected_hash):
-                    raise SuspiciousOperation("Session data corrupted")
-
-                # Ensure that the session is encoded with new method again.
-                self.modified = True
+                if getattr(settings, 'SESSION_KEEP_COMPATIBLE'):
+                    return self.decode_legacy(session_data)
+                else:
+                    raise
 
             return pickle.loads(serialized)
 
@@ -119,6 +113,28 @@ class SessionBase(object):
             # exceptions. If any of these happen, just return an empty
             # dictionary (an empty session).
             self.modified = True
+            return {}
+
+    def encode_legacy(self, session_dict):
+        "Encoding mechanism used earlier. Deprecated"
+        pickled = pickle.dumps(session_dict, pickle.HIGHEST_PROTOCOL)
+        hash = self._hash(pickled)
+        return base64.encodestring(hash + ":" + pickled)
+
+    def decode_legacy(self, session_data):
+        "Decoding mechanism used earlier. Deprecated"
+        encoded_data = base64.decodestring(session_data)
+        try:
+            # could produce ValueError if there is no ':'
+            hash, pickled = encoded_data.split(':', 1)
+            expected_hash = self._hash(pickled)
+            if not constant_time_compare(hash, expected_hash):
+                raise SuspiciousOperation("Session data corrupted")
+            else:
+                return pickle.loads(pickled)
+        except Exception:
+            # ValueError, SuspiciousOperation, unpickling exceptions. If any of
+            # these happen, just return an empty dictionary (an empty session).
             return {}
 
     def update(self, dict_):

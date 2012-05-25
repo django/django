@@ -258,6 +258,26 @@ class SessionTestsMixin(object):
         encoded = self.session.encode(data)
         self.assertEqual(self.session.decode(encoded), data)
 
+    def test_decode_legacy(self):
+        # Ensure we can decode what we encode
+        data = {'a test key': 'a test value'}
+        encoded = self.session.encode_legacy(data)
+        self.assertEqual(self.session.decode_legacy(encoded), data)
+
+    def test_decode_compatibility_disabled(self):
+        # Test that session data encoded with legacy mechanisms is reset when
+        # compatibility is disabled
+        data = {'a test key': 'a test value'}
+        encoded = self.session.encode_legacy(data)
+        self.assertEqual(self.session.decode(encoded), {})
+
+    @override_settings(SESSION_KEEP_COMPATIBLE=True)
+    def test_decode_compatibility_enabled(self):
+        # Test that session data encoded with legacy mechanisms is not reset
+        # when compatibility is enabled
+        data = {'a test key': 'a test value'}
+        encoded = self.session.encode_legacy(data)
+        self.assertEqual(self.session.decode(encoded), data)
 
 class DatabaseSessionTests(SessionTestsMixin, TestCase):
 
