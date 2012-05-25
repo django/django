@@ -155,7 +155,6 @@ def encode_file(boundary, key, file):
     ]
 
 
-
 class RequestFactory(object):
     """
     Class that lets you create mock Request objects for use in testing.
@@ -227,7 +226,7 @@ class RequestFactory(object):
             return urllib.unquote(parsed[2])
 
     def get(self, path, data={}, **extra):
-        "Construct a GET request"
+        "Construct a GET request."
 
         parsed = urlparse(path)
         r = {
@@ -270,48 +269,38 @@ class RequestFactory(object):
         r.update(extra)
         return self.request(**r)
 
-    def options(self, path, data={}, **extra):
-        "Constrict an OPTIONS request"
+    def options(self, path, data='', content_type='application/octet-stream',
+            **extra):
+        "Construct an OPTIONS request."
+        return self.generic('OPTIONS', path, data, content_type, **extra)
 
-        parsed = urlparse(path)
-        r = {
-            'PATH_INFO':       self._get_path(parsed),
-            'QUERY_STRING':    urlencode(data, doseq=True) or parsed[4],
-            'REQUEST_METHOD': 'OPTIONS',
-        }
-        r.update(extra)
-        return self.request(**r)
-
-    def put(self, path, data={}, content_type=MULTIPART_CONTENT,
+    def put(self, path, data='', content_type='application/octet-stream',
             **extra):
         "Construct a PUT request."
+        return self.generic('PUT', path, data, content_type, **extra)
 
-        put_data = self._encode_data(data, content_type)
+    def delete(self, path, data='', content_type='application/octet-stream',
+            **extra):
+        "Construct a DELETE request."
+        return self.generic('DELETE', path, data, content_type, **extra)
 
+    def generic(self, method, path,
+                data='', content_type='application/octet-stream', **extra):
         parsed = urlparse(path)
+        data = smart_str(data, settings.DEFAULT_CHARSET)
         r = {
-            'CONTENT_LENGTH': len(put_data),
-            'CONTENT_TYPE':   content_type,
             'PATH_INFO':      self._get_path(parsed),
             'QUERY_STRING':   parsed[4],
-            'REQUEST_METHOD': 'PUT',
-            'wsgi.input':     FakePayload(put_data),
+            'REQUEST_METHOD': method,
         }
+        if data:
+            r.update({
+                'CONTENT_LENGTH': len(data),
+                'CONTENT_TYPE':   content_type,
+                'wsgi.input':     FakePayload(data),
+            })
         r.update(extra)
         return self.request(**r)
-
-    def delete(self, path, data={}, **extra):
-        "Construct a DELETE request."
-
-        parsed = urlparse(path)
-        r = {
-            'PATH_INFO':       self._get_path(parsed),
-            'QUERY_STRING':    urlencode(data, doseq=True) or parsed[4],
-            'REQUEST_METHOD': 'DELETE',
-        }
-        r.update(extra)
-        return self.request(**r)
-
 
 class Client(RequestFactory):
     """
@@ -445,30 +434,35 @@ class Client(RequestFactory):
             response = self._handle_redirects(response, **extra)
         return response
 
-    def options(self, path, data={}, follow=False, **extra):
+    def options(self, path, data='', content_type='application/octet-stream',
+            follow=False, **extra):
         """
         Request a response from the server using OPTIONS.
         """
-        response = super(Client, self).options(path, data=data, **extra)
+        response = super(Client, self).options(path,
+                data=data, content_type=content_type, **extra)
         if follow:
             response = self._handle_redirects(response, **extra)
         return response
 
-    def put(self, path, data={}, content_type=MULTIPART_CONTENT,
+    def put(self, path, data='', content_type='application/octet-stream',
             follow=False, **extra):
         """
         Send a resource to the server using PUT.
         """
-        response = super(Client, self).put(path, data=data, content_type=content_type, **extra)
+        response = super(Client, self).put(path,
+                data=data, content_type=content_type, **extra)
         if follow:
             response = self._handle_redirects(response, **extra)
         return response
 
-    def delete(self, path, data={}, follow=False, **extra):
+    def delete(self, path, data='', content_type='application/octet-stream',
+            follow=False, **extra):
         """
         Send a DELETE request to the server.
         """
-        response = super(Client, self).delete(path, data=data, **extra)
+        response = super(Client, self).delete(path,
+                data=data, content_type=content_type, **extra)
         if follow:
             response = self._handle_redirects(response, **extra)
         return response

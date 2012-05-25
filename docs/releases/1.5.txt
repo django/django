@@ -56,7 +56,7 @@ previously loaded. For example, with the tutorial's models::
     True
 
 In Django 1.5, the third line no longer triggers a new SQL query to fetch
-``first_choice.poll``; it was set when by the second line.
+``first_choice.poll``; it was set by the second line.
 
 For one-to-one relationships, both sides can be cached. For many-to-one
 relationships, only the single side of the relationship can be cached. This
@@ -100,6 +100,26 @@ year|date:"Y" }}``.
 
 ``next_year`` and ``previous_year`` were also added in the context. They are
 calculated according to ``allow_empty`` and ``allow_future``.
+
+OPTIONS, PUT and DELETE requests in the test client
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Unlike GET and POST, these HTTP methods aren't implemented by web browsers.
+Rather, they're used in APIs, which transfer data in various formats such as
+JSON or XML. Since such requests may contain arbitrary data, Django doesn't
+attempt to decode their body.
+
+However, the test client used to build a query string for OPTIONS and DELETE
+requests like for GET, and a request body for PUT requests like for POST. This
+encoding was arbitrary and inconsistent with Django's behavior when it
+receives the requests, so it was removed in Django 1.5.
+
+If you were using the ``data`` parameter in an OPTIONS or a DELETE request,
+you must convert it to a query string and append it to the ``path`` parameter.
+
+If you were using the ``data`` parameter in a PUT request without a
+``content_type``, you must encode your data before passing it to the test
+client and set the ``content_type`` argument.
 
 Features deprecated in 1.5
 ==========================
