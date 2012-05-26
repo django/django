@@ -63,10 +63,10 @@ class ConditionalGet(TestCase):
 
     def testIfMatch(self):
         self.client.defaults['HTTP_IF_MATCH'] = '"%s"' % ETAG
-        response = self.client.put('/condition/etag/', {'data': ''})
+        response = self.client.put('/condition/etag/')
         self.assertEqual(response.status_code, 200)
         self.client.defaults['HTTP_IF_MATCH'] = '"%s"' % EXPIRED_ETAG
-        response = self.client.put('/condition/etag/', {'data': ''})
+        response = self.client.put('/condition/etag/')
         self.assertEqual(response.status_code, 412)
 
     def testBothHeaders(self):

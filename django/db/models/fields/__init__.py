@@ -1,3 +1,4 @@
+import collections
 import copy
 import datetime
 import decimal
@@ -436,7 +437,7 @@ class Field(object):
         return bound_field_class(self, fieldmapping, original)
 
     def _get_choices(self):
-        if hasattr(self._choices, 'next'):
+        if isinstance(self._choices, collections.Iterator):
             choices, self._choices = tee(self._choices)
             return choices
         else:

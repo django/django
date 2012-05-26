@@ -185,25 +185,6 @@ class TestFixtures(TestCase):
             "No fixture data found for 'empty'. (File format may be invalid.)\n"
         )
 
-    def test_abort_loaddata_on_error(self):
-        """
-        Test for ticket #4371 -- If any of the fixtures contain an error,
-        loading is aborted.
-        Validate that error conditions are caught correctly
-        """
-        stderr = BytesIO()
-        management.call_command(
-            'loaddata',
-            'empty',
-            verbosity=0,
-            commit=False,
-            stderr=stderr,
-        )
-        self.assertEqual(
-            stderr.getvalue(),
-            "No fixture data found for 'empty'. (File format may be invalid.)\n"
-        )
-
     def test_error_message(self):
         """
         (Regression for #9011 - error message is correct)

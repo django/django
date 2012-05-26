@@ -111,7 +111,7 @@ OpenLayers.Projection.addTransform("EPSG:4326", "EPSG:3857", OpenLayers.Layer.Sp
     // The admin map for this geometry field.
     {{ module }}.map = new OpenLayers.Map('{{ id }}_map', options);
     // Base Layer
-    {{ module }}.layers.base = {% block base_layer %}new OpenLayers.Layer.WMS( "{{ wms_name }}", "{{ wms_url }}", {layers: '{{ wms_layer }}'} );{% endblock %}
+    {{ module }}.layers.base = {% block base_layer %}new OpenLayers.Layer.WMS("{{ wms_name }}", "{{ wms_url }}", {layers: '{{ wms_layer }}'{{ wms_options|safe }}});{% endblock %}
     {{ module }}.map.addLayer({{ module }}.layers.base);
     {% block extra_layers %}{% endblock %}
     {% if is_linestring %}OpenLayers.Feature.Vector.style["default"]["strokeWidth"] = 3; // Default too thin for linestrings. {% endif %}

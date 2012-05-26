@@ -5,7 +5,7 @@ from optparse import make_option
 from django.core.management.base import BaseCommand, CommandError
 
 def has_bom(fn):
-    with open(fn, 'r') as f:
+    with open(fn, 'rb') as f:
         sample = f.read(4)
     return sample[:3] == '\xef\xbb\xbf' or \
             sample.startswith(codecs.BOM_UTF16_LE) or \

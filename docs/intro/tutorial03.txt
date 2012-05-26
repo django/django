@@ -400,7 +400,7 @@ like:
     <h1>{{ poll.question }}</h1>
     <ul>
     {% for choice in poll.choice_set.all %}
-        <li>{{ choice.choice }}</li>
+        <li>{{ choice.choice_text }}</li>
     {% endfor %}
     </ul>
 
@@ -412,7 +412,7 @@ list-index lookup.
 
 Method-calling happens in the :ttag:`{% for %}<for>` loop:
 ``poll.choice_set.all`` is interpreted as the Python code
-``poll.choice_set.all()``, which returns an iterable of Choice objects and is
+``poll.choice_set.all()``, which returns an iterable of ``Choice`` objects and is
 suitable for use in the :ttag:`{% for %}<for>` tag.
 
 See the :doc:`template guide </topics/templates>` for more about templates.

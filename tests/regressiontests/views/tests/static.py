@@ -29,7 +29,7 @@ class StaticTests(TestCase):
         for filename in media_files:
             response = self.client.get('/views/%s/%s' % (self.prefix, filename))
             file_path = path.join(media_dir, filename)
-            with open(file_path) as fp:
+            with open(file_path, 'rb') as fp:
                 self.assertEqual(fp.read(), response.content)
             self.assertEqual(len(response.content), int(response['Content-Length']))
             self.assertEqual(mimetypes.guess_type(file_path)[1], response.get('Content-Encoding', None))
@@ -41,14 +41,14 @@ class StaticTests(TestCase):
     def test_copes_with_empty_path_component(self):
         file_name = 'file.txt'
         response = self.client.get('/views/%s//%s' % (self.prefix, file_name))
-        with open(path.join(media_dir, file_name)) as fp:
+        with open(path.join(media_dir, file_name), 'rb') as fp:
             self.assertEqual(fp.read(), response.content)
 
     def test_is_modified_since(self):
         file_name = 'file.txt'
         response = self.client.get('/views/%s/%s' % (self.prefix, file_name),
             HTTP_IF_MODIFIED_SINCE='Thu, 1 Jan 1970 00:00:00 GMT')
-        with open(path.join(media_dir, file_name)) as fp:
+        with open(path.join(media_dir, file_name), 'rb') as fp:
             self.assertEqual(fp.read(), response.content)
 
     def test_not_modified_since(self):
@@ -71,7 +71,7 @@ class StaticTests(TestCase):
         invalid_date = 'Mon, 28 May 999999999999 28:25:26 GMT'
         response = self.client.get('/views/%s/%s' % (self.prefix, file_name),
                                    HTTP_IF_MODIFIED_SINCE=invalid_date)
-        with open(path.join(media_dir, file_name)) as fp:
+        with open(path.join(media_dir, file_name), 'rb') as fp:
             self.assertEqual(fp.read(), response.content)
         self.assertEqual(len(response.content),
                           int(response['Content-Length']))
@@ -86,7 +86,7 @@ class StaticTests(TestCase):
         invalid_date = ': 1291108438, Wed, 20 Oct 2010 14:05:00 GMT'
         response = self.client.get('/views/%s/%s' % (self.prefix, file_name),
                                    HTTP_IF_MODIFIED_SINCE=invalid_date)
-        with open(path.join(media_dir, file_name)) as fp:
+        with open(path.join(media_dir, file_name), 'rb') as fp:
             self.assertEqual(fp.read(), response.content)
         self.assertEqual(len(response.content),
                           int(response['Content-Length']))

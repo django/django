@@ -37,6 +37,18 @@ class YearMixin(object):
                     raise Http404(_(u"No year specified"))
         return year
 
+    def get_next_year(self, date):
+        """
+        Get the next valid year.
+        """
+        return _get_next_prev(self, date, is_previous=False, period='year')
+
+    def get_previous_year(self, date):
+        """
+        Get the previous valid year.
+        """
+        return _get_next_prev(self, date, is_previous=True, period='year')
+
     def _get_next_year(self, date):
         """
         Return the start date of the next interval.
@@ -419,7 +431,11 @@ class BaseYearArchiveView(YearMixin, BaseDateListView):
             # to find information about the model.
             qs = qs.none()
 
-        return (date_list, qs, {'year': year})
+        return (date_list, qs, {
+            'year': date,
+            'next_year': self.get_next_year(date),
+            'previous_year': self.get_previous_year(date),
+        })
 
     def get_make_object_list(self):
         """

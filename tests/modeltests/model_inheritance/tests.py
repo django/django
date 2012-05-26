@@ -275,3 +275,21 @@ class ModelInheritanceTests(TestCase):
     def test_mixin_init(self):
         m = MixinModel()
         self.assertEqual(m.other_attr, 1)
+
+    def test_update_query_counts(self):
+        """
+        Test that update queries do not generate non-necessary queries.
+        Refs #18304.
+        """
+        c = Chef.objects.create(name="Albert")
+        ir = ItalianRestaurant.objects.create(
+            name="Ristorante Miron",
+            address="1234 W. Ash",
+            serves_hot_dogs=False,
+            serves_pizza=False,
+            serves_gnocchi=True,
+            rating=4,
+            chef=c
+        )
+        with self.assertNumQueries(6):
+            ir.save()
