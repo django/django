@@ -97,8 +97,9 @@ class BaseCommand(object):
        output and, if the command is intended to produce a block of
        SQL statements, will be wrapped in ``BEGIN`` and ``COMMIT``.
 
-    4. If ``handle()`` raised a ``CommandError``, ``execute()`` will
-       instead print an error message to ``stderr``.
+    4. If ``handle()`` or ``execute()`` raised any exception (e.g.
+       ``CommandError``), ``run_from_argv()`` will  instead print an error
+       message to ``stderr``.
 
     Thus, the ``handle()`` method is typically the starting point for
     subclasses; many built-in commands and command types either place
@@ -210,23 +211,27 @@ class BaseCommand(object):
     def run_from_argv(self, argv):
         """
         Set up any environment changes requested (e.g., Python path
-        and Django settings), then run this command.
-
+        and Django settings), then run this command. If the
+        command raises a ``CommandError``, intercept it and print it sensibly
+        to stderr.
         """
         parser = self.create_parser(argv[0], argv[1])
         options, args = parser.parse_args(argv[2:])
         handle_default_options(options)
-        self.execute(*args, **options.__dict__)
+        try:
+            self.execute(*args, **options.__dict__)
+        except Exception as e:
+            if options.traceback:
+                self.stderr.write(traceback.format_exc())
+            self.stderr.write('%s: %s' % (e.__class__.__name__, e))
+            sys.exit(1)
 
     def execute(self, *args, **options):
         """
         Try to execute this command, performing model validation if
         needed (as controlled by the attribute
-        ``self.requires_model_validation``, except if force-skipped). If the
-        command raises a ``CommandError``, intercept it and print it sensibly
-        to stderr.
+        ``self.requires_model_validation``, except if force-skipped).
         """
-        show_traceback = options.get('traceback', False)
 
         # Switch to English, because django-admin.py creates database content
         # like permissions, and those shouldn't contain any translations.
@@ -237,18 +242,9 @@ class BaseCommand(object):
         self.stderr = OutputWrapper(options.get('stderr', sys.stderr), self.style.ERROR)
 
         if self.can_import_settings:
-            try:
-                from django.utils import translation
-                saved_lang = translation.get_language()
-                translation.activate('en-us')
-            except ImportError as e:
-                # If settings should be available, but aren't,
-                # raise the error and quit.
-                if show_traceback:
-                    traceback.print_exc()
-                else:
-                    self.stderr.write('Error: %s' % e)
-                sys.exit(1)
+            from django.utils import translation
+            saved_lang = translation.get_language()
+            translation.activate('en-us')
 
         try:
             if self.requires_model_validation and not options.get('skip_validation'):
@@ -265,12 +261,6 @@ class BaseCommand(object):
                 self.stdout.write(output)
                 if self.output_transaction:
                     self.stdout.write('\n' + self.style.SQL_KEYWORD("COMMIT;"))
-        except CommandError as e:
-            if show_traceback:
-                traceback.print_exc()
-            else:
-                self.stderr.write('Error: %s' % e)
-            sys.exit(1)
         finally:
             if saved_lang is not None:
                 translation.activate(saved_lang)

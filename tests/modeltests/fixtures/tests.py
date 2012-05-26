@@ -185,14 +185,14 @@ class FixtureLoadingTests(TestCase):
             exclude_list=['fixtures.Article', 'fixtures.Book', 'sites'])
 
         # Excluding a bogus app should throw an error
-        self.assertRaises(SystemExit,
+        self.assertRaises(management.CommandError,
                           self._dumpdata_assert,
                           ['fixtures', 'sites'],
                           '',
                           exclude_list=['foo_app'])
 
         # Excluding a bogus model should throw an error
-        self.assertRaises(SystemExit,
+        self.assertRaises(management.CommandError,
                           self._dumpdata_assert,
                           ['fixtures', 'sites'],
                           '',

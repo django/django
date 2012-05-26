@@ -1,3 +1,4 @@
+import sys
 from StringIO import StringIO
 
 from django.core import management
@@ -26,4 +27,20 @@ class CommandTests(TestCase):
             self.assertEqual(translation.get_language(), 'fr')
 
     def test_explode(self):
+        """ Test that an unknown command raises CommandError """
         self.assertRaises(CommandError, management.call_command, ('explode',))
+
+    def test_system_exit(self):
+        """ Exception raised in a command should raise CommandError with
+            call_command, but SystemExit when run from command line
+        """
+        with self.assertRaises(CommandError):
+            management.call_command('dance', example="raise")
+        old_stderr = sys.stderr
+        sys.stderr = err = StringIO()
+        try:
+            with self.assertRaises(SystemExit):
+                management.ManagementUtility(['manage.py', 'dance', '--example=raise']).execute()
+        finally:
+            sys.stderr = old_stderr
+        self.assertIn("CommandError", err.getvalue())
