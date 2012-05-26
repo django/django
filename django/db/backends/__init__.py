@@ -433,15 +433,24 @@ class BaseDatabaseFeatures(object):
 
     def _supports_transactions(self):
         "Confirm support for transactions"
-        cursor = self.connection.cursor()
-        cursor.execute('CREATE TABLE ROLLBACK_TEST (X INT)')
-        self.connection._commit()
-        cursor.execute('INSERT INTO ROLLBACK_TEST (X) VALUES (8)')
-        self.connection._rollback()
-        cursor.execute('SELECT COUNT(X) FROM ROLLBACK_TEST')
-        count, = cursor.fetchone()
-        cursor.execute('DROP TABLE ROLLBACK_TEST')
-        self.connection._commit()
+        try:
+            # Make sure to run inside a managed transaction block,
+            # otherwise autocommit will cause the confimation to
+            # fail.
+            self.connection.enter_transaction_management()
+            self.connection.managed(True)
+            cursor = self.connection.cursor()
+            cursor.execute('CREATE TABLE ROLLBACK_TEST (X INT)')
+            self.connection._commit()
+            cursor.execute('INSERT INTO ROLLBACK_TEST (X) VALUES (8)')
+            self.connection._rollback()
+            cursor.execute('SELECT COUNT(X) FROM ROLLBACK_TEST')
+            count, = cursor.fetchone()
+            cursor.execute('DROP TABLE ROLLBACK_TEST')
+            self.connection._commit()
+            self.connection._dirty = False
+        finally:
+            self.connection.leave_transaction_management()
         return count == 0
 
     def _supports_stddev(self):
