@@ -6,8 +6,6 @@ large and/or so that they can be used by other modules without getting into
 circular import difficulties.
 """
 
-import weakref
-
 from django.db.backends import util
 from django.utils import tree
 
@@ -70,8 +68,6 @@ class DeferredAttribute(object):
     """
     def __init__(self, field_name, model):
         self.field_name = field_name
-        self.model_ref = weakref.ref(model)
-        self.loaded = False
 
     def __get__(self, instance, owner):
         """
@@ -79,27 +75,33 @@ class DeferredAttribute(object):
         Returns the cached value.
         """
         from django.db.models.fields import FieldDoesNotExist
+        # Fetch the non-deferred model
+        non_deferred_model = instance._meta.proxy_for_model
+        opts = non_deferred_model._meta
 
         assert instance is not None
-        cls = self.model_ref()
         data = instance.__dict__
         if data.get(self.field_name, self) is self:
             # self.field_name is the attname of the field, but only() takes the
             # actual name, so we need to translate it here.
             try:
-                cls._meta.get_field_by_name(self.field_name)
-                name = self.field_name
+                f = opts.get_field_by_name(self.field_name)[0]
             except FieldDoesNotExist:
-                name = [f.name for f in cls._meta.fields
-                    if f.attname == self.field_name][0]
-            # We use only() instead of values() here because we want the
-            # various data coersion methods (to_python(), etc.) to be called
-            # here.
-            val = getattr(
-                cls._base_manager.filter(pk=instance.pk).only(name).using(
-                    instance._state.db).get(),
-                self.field_name
-            )
+                f = [f for f in opts.fields
+                     if f.attname == self.field_name][0]
+            name = f.name
+            # Lets see if the field is part of the parent chain. If so we
+            # might be able to reuse the already loaded value. Refs #18343.
+            val = self._check_parent_chain(instance, opts, name)
+            if val is None:
+                # We use only() instead of values() here because we want the
+                # various data coersion methods (to_python(), etc.) to be
+                # called here.
+                val = getattr(
+                    non_deferred_model._base_manager.only(name).using(
+                        instance._state.db).get(pk=instance.pk),
+                    self.field_name
+                )
             data[self.field_name] = val
         return data[self.field_name]
 
@@ -109,6 +111,28 @@ class DeferredAttribute(object):
         never be a database lookup involved.
         """
         instance.__dict__[self.field_name] = value
+
+    def _check_parent_chain(self, instance, opts, name):
+        """
+        Check if the field is part of any parent chain in the model.
+        If so, return the child field's value. This is done so that
+        if we have parent_ptr_id already in the model, and we are
+        fetching the id field, we will not need to refetch the id
+        value which is guaranteed to be the same as the parent_ptr_id
+        value.
+        """
+        for parent, field in opts.parents.items():
+            # If fetching field 'id', and the 'id' value is found here, we
+            # will continue to fetch the instance's parent_ptr_id. It might
+            # be also a deferred field, and we end up here again, now fetching
+            # parent_ptr_id value instead.
+            if parent._meta.pk.attname == name:
+                return getattr(instance, field.attname)
+            ret = self._check_parent_chain(instance, parent._meta, name)
+            if ret:
+                return ret
+        return None
+
 
 def select_related_descend(field, restricted, requested, reverse=False):
     """

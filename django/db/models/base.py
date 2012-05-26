@@ -404,7 +404,6 @@ class Model(object):
         # and as a result, the super call will cause an infinite recursion.
         # See #10547 and #12121.
         defers = []
-        pk_val = None
         if self._deferred:
             from django.db.models.query_utils import deferred_class_factory
             factory = deferred_class_factory
@@ -412,12 +411,7 @@ class Model(object):
                 if isinstance(self.__class__.__dict__.get(field.attname),
                         DeferredAttribute):
                     defers.append(field.attname)
-                    if pk_val is None:
-                        # The pk_val and model values are the same for all
-                        # DeferredAttribute classes, so we only need to do this
-                        # once.
-                        obj = self.__class__.__dict__[field.attname]
-                        model = obj.model_ref()
+            model = self._meta.proxy_for_model
         else:
             factory = simple_class_factory
         return (model_unpickle, (model, defers, factory), data)
