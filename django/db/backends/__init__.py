@@ -65,6 +65,9 @@ class BaseDatabaseWrapper(object):
         A hook for backend-specific changes required when leaving manual
         transaction handling. Will usually be implemented only when
         _enter_transaction_management() is also required.
+
+        Passed the state the transaction is going into in the `managed`
+        flag.
         """
         pass
 
@@ -104,20 +107,22 @@ class BaseDatabaseWrapper(object):
 
     def leave_transaction_management(self):
         """
-        Leaves transaction management for a running thread. A dirty flag is carried
-        over to the surrounding block, as a commit will commit all changes, even
-        those from outside. (Commits are on connection level.)
+        Leaves transaction management. A dirty flag is carried over to the
+        surrounding block, as a commit will commit all changes, even those
+        from outside. (Commits are on connection level.)
         """
-        self._leave_transaction_management(self.is_managed())
         if self.transaction_state:
             del self.transaction_state[-1]
         else:
-            raise TransactionManagementError("This code isn't under transaction "
-                "management")
+            raise TransactionManagementError(
+                "This code isn't under transaction management")
+        # We will pass the next status (after leaving the previous state
+        # behind) to subclass hook.
+        self._leave_transaction_management(self.is_managed())
         if self._dirty:
             self.rollback()
-            raise TransactionManagementError("Transaction managed block ended with "
-                "pending COMMIT/ROLLBACK")
+            raise TransactionManagementError(
+                "Transaction managed block ended with pending COMMIT/ROLLBACK")
         self._dirty = False
 
     def validate_thread_sharing(self):
@@ -175,6 +180,9 @@ class BaseDatabaseWrapper(object):
         """
         if self.transaction_state:
             return self.transaction_state[-1]
+        # Note that this setting isn't documented, and is only used here, and
+        # in append. It so happens that the transation_state stack always
+        # contains only False values.
         return settings.TRANSACTIONS_MANAGED
 
     def managed(self, flag=True):
