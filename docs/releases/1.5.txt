@@ -168,6 +168,15 @@ number was inside the existing page range.
 It does check it now and raises an :exc:`InvalidPage` exception when the number
 is either too low or too high.
 
+Behavior of autocommit database option on PostgreSQL changed
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+PostgreSQL's autocommit option didn't work as advertised previously. It did
+work for single transaction block, but after the first block was left the
+autocommit behavior was never restored. This bug is now fixed in 1.5. While
+this is only a bug fix, it is worth checking your applications behavior if
+you are using PostgreSQL together with the autocommit option.
+
 Features deprecated in 1.5
 ==========================
 

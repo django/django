@@ -109,16 +109,18 @@ class BaseDatabaseWrapper(object):
         over to the surrounding block, as a commit will commit all changes, even
         those from outside. (Commits are on connection level.)
         """
-        self._leave_transaction_management(self.is_managed())
         if self.transaction_state:
             del self.transaction_state[-1]
         else:
-            raise TransactionManagementError("This code isn't under transaction "
-                "management")
+            raise TransactionManagementError(
+                "This code isn't under transaction management")
+        # We will pass the next status (after leaving the previous state
+        # behind) to subclass hook.
+        self._leave_transaction_management(self.is_managed())
         if self._dirty:
             self.rollback()
-            raise TransactionManagementError("Transaction managed block ended with "
-                "pending COMMIT/ROLLBACK")
+            raise TransactionManagementError(
+                "Transaction managed block ended with pending COMMIT/ROLLBACK")
         self._dirty = False
 
     def validate_thread_sharing(self):
@@ -176,6 +178,8 @@ class BaseDatabaseWrapper(object):
         """
         if self.transaction_state:
             return self.transaction_state[-1]
+        # Note that this setting isn't documented, and is only used here, and
+        # in enter_transaction_management()
         return settings.TRANSACTIONS_MANAGED
 
     def managed(self, flag=True):
