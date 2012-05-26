@@ -21,13 +21,38 @@ class Serializer(PythonSerializer):
     """
     internal_use_only = False
 
-    def end_serialization(self):
+    def start_serialization(self):
         if json.__version__.split('.') >= ['2', '1', '3']:
             # Use JS strings to represent Python Decimal instances (ticket #16850)
             self.options.update({'use_decimal': False})
-        json.dump(self.objects, self.stream, cls=DjangoJSONEncoder, **self.options)
+        self._current = None
+        self.json_kwargs = self.options.copy()
+        self.json_kwargs.pop('stream', None)
+        self.json_kwargs.pop('fields', None)
+        self.stream.write("[")
+
+    def end_serialization(self):
+        if self.options.get("indent"):
+            self.stream.write("\n")
+        self.stream.write("]")
+        if self.options.get("indent"):
+            self.stream.write("\n")
+
+    def end_object(self, obj):
+        # self._current has the field data
+        indent = self.options.get("indent")
+        if not self.first:
+            self.stream.write(",")
+            if not indent:
+                self.stream.write(" ")
+        if indent:
+            self.stream.write("\n")
+        json.dump(self.get_dump_object(obj), self.stream,
+                  cls=DjangoJSONEncoder, **self.json_kwargs)
+        self._current = None
 
     def getvalue(self):
+        # overwrite PythonSerializer.getvalue() with base Serializer.getvalue()
         if callable(getattr(self.stream, 'getvalue', None)):
             return self.stream.getvalue()
 
