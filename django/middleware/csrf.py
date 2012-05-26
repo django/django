@@ -5,9 +5,7 @@ This module provides a middleware that implements protection
 against request forgeries from other sites.
 """
 
-import hashlib
 import re
-import random
 
 from django.conf import settings
 from django.core.urlresolvers import get_callable
