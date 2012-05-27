@@ -842,6 +842,11 @@ Mexico (``mx``)
 
 .. _curp: http://www.condusef.gob.mx/index.php/clave-unica-de-registro-de-poblacion-curp
 
+.. class:: mx.forms.MXSocialSecurityNumberField
+
+   A field that validates a Mexican Social Security Number(NSS) for *Instituto Mexicano del Seguro Social*.
+
+
 .. class:: mx.forms.MXStateSelect
 
     A ``Select`` widget that uses a list of Mexican states as its choices.
@@ -873,6 +878,11 @@ Mexico (``mx``)
 
     A model field that forms represent as a ``forms.MXCURPField`` field and
     stores the value of a valid Mexican CURP.
+
+.. class:: mx.models.MXSocialSecurityNumberField
+
+    A model field that forms represent as a ``forms.MXSocialSecurityNumberField`` field and
+    stores the eleven-digit Mexican Social Security Number for *Instituto Mexicano del Seguro Social*.
 
 Additionally, a choice tuple is provided in ``django.contrib.localflavor.mx.mx_states``,
 allowing customized model and form fields, and form presentations, for subsets of

@@ -3,7 +3,8 @@ from django.db.models.fields import CharField
 
 from django.contrib.localflavor.mx.mx_states import STATE_CHOICES
 from django.contrib.localflavor.mx.forms import (MXRFCField as MXRFCFormField,
-    MXZipCodeField as MXZipCodeFormField, MXCURPField as MXCURPFormField)
+    MXZipCodeField as MXZipCodeFormField, MXCURPField as MXCURPFormField,
+    MXSocialSecurityNumberField as MXSocialSecurityNumberFormField)
 
 
 class MXStateField(CharField):
@@ -68,3 +69,20 @@ class MXCURPField(CharField):
         defaults = {'form_class': MXCURPFormField}
         defaults.update(kwargs)
         return super(MXCURPField, self).formfield(**defaults)
+
+
+class MXSocialSecurityNumberField(CharField):
+    """
+    A model field that forms represent as a forms.MXSocialSecurityNumberField
+    field and stores the value of a valid Mexican Social Security Number.
+    """
+    description = _("Mexican Social Security Number")
+
+    def __init__(self, *args, **kwargs):
+        kwargs['max_length'] = 11
+        super(MXSocialSecurityNumberField, self).__init__(*args, **kwargs)
+
+    def formfield(self, **kwargs):
+        defaults = {'form_class': MXSocialSecurityNumberFormField}
+        defaults.update(kwargs)
+        return super(MXSocialSecurityNumberField, self).formfield(**defaults)

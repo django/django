@@ -2,7 +2,7 @@
 from __future__ import absolute_import
 
 from django.contrib.localflavor.mx.forms import (MXZipCodeField, MXRFCField,
-    MXStateSelect, MXCURPField)
+    MXStateSelect, MXCURPField, MXSocialSecurityNumberField)
 from django.test import SimpleTestCase
 
 from .forms import MXPersonProfileForm
@@ -16,6 +16,7 @@ class MXLocalFlavorTests(SimpleTestCase):
             'rfc': 'toma880125kv3',
             'curp': 'toma880125hmnrrn02',
             'zip_code': '58120',
+            'ssn': '53987417457',
         })
 
     def test_get_display_methods(self):
@@ -30,12 +31,14 @@ class MXLocalFlavorTests(SimpleTestCase):
             'rfc': 'invalid rfc',
             'curp': 'invalid curp',
             'zip_code': 'xxx',
+            'ssn': 'invalid ssn',
         })
         self.assertFalse(form.is_valid())
         self.assertEqual(form.errors['state'], [u'Select a valid choice. Invalid state is not one of the available choices.'])
         self.assertEqual(form.errors['rfc'], [u'Enter a valid RFC.'])
         self.assertEqual(form.errors['curp'], [u'Ensure this value has at least 18 characters (it has 12).', u'Enter a valid CURP.'])
         self.assertEqual(form.errors['zip_code'], [u'Enter a valid zip code in the format XXXXX.'])
+        self.assertEqual(form.errors['ssn'], [u'Enter a valid Social Security Number.'])
 
     def test_field_blank_option(self):
         """Test that the empty option is there."""
@@ -196,3 +199,46 @@ class MXLocalFlavorTests(SimpleTestCase):
             'OOMG890727HMNRSR07': error_checksum,
         }
         self.assertFieldOutput(MXCURPField, valid, invalid)
+
+    def test_MXSocialSecurityNumberField(self):
+        error_format = [u'Enter a valid Social Security Number.']
+        error_checksum = [u'Invalid checksum for Social Security Number.']
+        valid = {
+            '53987417457': u'53987417457',
+            '53916912966': u'53916912966',
+            '53986504172': u'53986504172',
+            '17300426925': u'17300426925',
+            '53067407212': u'53067407212',
+            '53018000538': u'53018000538',
+            '10836311612': u'10836311612',
+            '37007910666': u'37007910666',
+            '53055700974': u'53055700974',
+            '17303364941': u'17303364941',
+            '53078528469': u'53078528469',
+        }
+        invalid = {
+            # Invalid format
+            '5398741A457': error_format,
+            '53487G12031': error_format,
+            '530P8028702': error_format,
+            '173004K6925': error_format,
+            '5306T407212': error_format,
+            '53018N00538': error_format,
+            'E0836311612': error_format,
+            '3700U910666': error_format,
+            '530557 0974': error_format,
+            '173033?4941': error_format,
+            '53#88417917': error_format,
+            # Incorrect checksum
+            '53987417451': error_checksum,
+            '53018522942': error_checksum,
+            '53897239693': error_checksum,
+            '01704423244': error_checksum,
+            '53855919735': error_checksum,
+            '53926201296': error_checksum,
+            '53017919037': error_checksum,
+            '53884201248': error_checksum,
+            '42805762629': error_checksum,
+            '53563800130': error_checksum,
+        }
+        self.assertFieldOutput(MXSocialSecurityNumberField, valid, invalid)
