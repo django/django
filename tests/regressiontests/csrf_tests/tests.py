@@ -333,3 +333,23 @@ class CsrfViewMiddlewareTest(TestCase):
         resp2 = CsrfViewMiddleware().process_response(req, resp)
         self.assertTrue(resp2.cookies.get(settings.CSRF_COOKIE_NAME, False))
         self.assertTrue('Cookie' in resp2.get('Vary',''))
+
+    def test_good_origin_header(self):
+        """
+        Test if a good origin header is accepted.
+        """
+        req = self._get_POST_request_with_token()
+        req.META['HTTP_HOST'] = 'www.example.com'
+        req.META['HTTP_ORIGIN'] = 'http://www.example.com'
+        req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+        self.assertEqual(None, req2)
+
+    def test_bad_origin_header(self):
+        """
+        Test if a bad origin header is rejected.
+        """
+        req = self._get_POST_request_with_token()
+        req.META['HTTP_HOST'] = 'www.example.com'
+        req.META['HTTP_ORIGIN'] = 'http://www.evil.com'
+        req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+        self.assertEqual(403, req2.status_code)

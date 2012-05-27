@@ -20,6 +20,7 @@ REASON_NO_REFERER = "Referer checking failed - no Referer."
 REASON_BAD_REFERER = "Referer checking failed - %s does not match %s."
 REASON_NO_CSRF_COOKIE = "CSRF cookie not set."
 REASON_BAD_TOKEN = "CSRF token missing or incorrect."
+REASON_BAD_ORIGIN = "Origin checking failed - %s does not match %s."
 
 CSRF_KEY_LENGTH = 32
 
@@ -104,6 +105,7 @@ class CsrfViewMiddleware(object):
 
         # Assume that anything not defined as 'safe' by RC2616 needs protection
         if request.method not in ('GET', 'HEAD', 'OPTIONS', 'TRACE'):
+
             if getattr(request, '_dont_enforce_csrf_checks', False):
                 # Mechanism to turn off CSRF checks for test suite.
                 # It comes after the creation of CSRF cookies, so that
@@ -111,6 +113,23 @@ class CsrfViewMiddleware(object):
                 # (e.g. cookies are sent, etc.), but before any
                 # branches that call reject().
                 return self._accept(request)
+
+            host = request.META.get('HTTP_HOST', '')
+            origin = request.META.get('HTTP_ORIGIN')
+            cookie_domain = getattr(settings, 'CSRF_COOKIE_DOMAIN') or host
+
+            if origin is not None:
+                # TODO: Fix this check to be like browser cookie check
+                if not origin.endswith(cookie_domain):
+                    reason = REASON_BAD_ORIGIN % (origin, cookie_domain)
+                    logger.warning('Forbidden (%s): %s',
+                                   reason, request.path,
+                        extra={
+                            'status_code': 403,
+                            'request': request,
+                        }
+                    )
+                    return self._reject(request, reason)
 
             if request.is_secure():
                 # Suppose user visits http://example.com/
@@ -140,7 +159,7 @@ class CsrfViewMiddleware(object):
                     return self._reject(request, REASON_NO_REFERER)
 
                 # Note that request.get_host() includes the port.
-                good_referer = 'https://%s/' % request.get_host()
+                good_referer = 'https://%s/' % host
                 if not same_origin(referer, good_referer):
                     reason = REASON_BAD_REFERER % (referer, good_referer)
                     logger.warning('Forbidden (%s): %s', reason, request.path,
