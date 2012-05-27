@@ -65,6 +65,14 @@ class OracleChecks(unittest.TestCase):
         self.assertEqual(connection.connection.encoding, "UTF-8")
         self.assertEqual(connection.connection.nencoding, "UTF-8")
 
+class MySQLTests(TestCase):
+    @unittest.skipUnless(connection.vendor == 'mysql',
+                        "Test valid only for MySQL")
+    def test_server_version_connections(self):
+        connection.close()
+        connection.get_server_version()
+        self.assertTrue(connection.connection is None)
+
 class DateQuotingTest(TestCase):
 
     def test_django_date_trunc(self):
