@@ -6,7 +6,7 @@ import posixpath
 import shutil
 import sys
 import tempfile
-from StringIO import StringIO
+from io import BytesIO
 
 from django.template import loader, Context
 from django.conf import settings
@@ -187,30 +187,22 @@ class TestFindStatic(CollectionTestCase, TestDefaults):
     Test ``findstatic`` management command.
     """
     def _get_file(self, filepath):
-        _stdout = sys.stdout
-        sys.stdout = StringIO()
-        try:
-            call_command('findstatic', filepath, all=False, verbosity='0')
-            sys.stdout.seek(0)
-            lines = [l.strip() for l in sys.stdout.readlines()]
-            contents = codecs.open(
-                smart_unicode(lines[1].strip()), "r", "utf-8").read()
-        finally:
-            sys.stdout = _stdout
+        out = BytesIO()
+        call_command('findstatic', filepath, all=False, verbosity=0, stdout=out)
+        out.seek(0)
+        lines = [l.strip() for l in out.readlines()]
+        contents = codecs.open(
+            smart_unicode(lines[1].strip()), "r", "utf-8").read()
         return contents
 
     def test_all_files(self):
         """
         Test that findstatic returns all candidate files if run without --first.
         """
-        _stdout = sys.stdout
-        sys.stdout = StringIO()
-        try:
-            call_command('findstatic', 'test/file.txt', verbosity='0')
-            sys.stdout.seek(0)
-            lines = [l.strip() for l in sys.stdout.readlines()]
-        finally:
-            sys.stdout = _stdout
+        out = BytesIO()
+        call_command('findstatic', 'test/file.txt', verbosity=0, stdout=out)
+        out.seek(0)
+        lines = [l.strip() for l in out.readlines()]
         self.assertEqual(len(lines), 3)  # three because there is also the "Found <file> here" line
         self.assertIn('project', lines[1])
         self.assertIn('apps', lines[2])
