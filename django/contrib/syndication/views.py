@@ -16,8 +16,6 @@ def add_domain(domain, url, secure=False):
     elif not (url.startswith('http://')
             or url.startswith('https://')
             or url.startswith('mailto:')):
-        # 'url' must already be ASCII and URL-quoted, so no need for encoding
-        # conversions here.
         url = iri_to_uri(u'%s://%s%s' % (protocol, domain, url))
     return url
 
