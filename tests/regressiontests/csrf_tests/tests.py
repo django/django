@@ -7,6 +7,7 @@ from django.middleware.csrf import CsrfViewMiddleware, CSRF_KEY_LENGTH
 from django.template import RequestContext, Template
 from django.test import TestCase
 from django.views.decorators.csrf import csrf_exempt, requires_csrf_token, ensure_csrf_cookie
+from django.test.utils import override_settings
 
 
 # Response/views used for CsrfResponseMiddleware and CsrfViewMiddleware tests
@@ -334,9 +335,42 @@ class CsrfViewMiddlewareTest(TestCase):
         self.assertTrue(resp2.cookies.get(settings.CSRF_COOKIE_NAME, False))
         self.assertTrue('Cookie' in resp2.get('Vary',''))
 
+    @override_settings(CSRF_COOKIE_DOMAIN='.example.com')
     def test_good_origin_header(self):
         """
-        Test if a good origin header is accepted.
+        Test if a good origin header is accepted for across subdomain settings.
+        """
+        req = self._get_POST_request_with_token()
+        req.META['HTTP_HOST'] = 'www.example.com'
+        req.META['HTTP_ORIGIN'] = 'http://www.example.com'
+        req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+        self.assertEqual(None, req2)
+
+    @override_settings(CSRF_COOKIE_DOMAIN='www.example.com')
+    def test_good_origin_header_2(self):
+        """
+        Test if a good origin header is accepted for a single subdomain.
+        """
+        req = self._get_POST_request_with_token()
+        req.META['HTTP_HOST'] = 'www.example.com'
+        req.META['HTTP_ORIGIN'] = 'http://www.example.com'
+        req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+        self.assertEqual(None, req2)
+
+    @override_settings(CSRF_COOKIE_DOMAIN='example.com')
+    def test_good_origin_header_3(self):
+        """
+        Test if a good origin header is accepted for a no subdomain.
+        """
+        req = self._get_POST_request_with_token()
+        req.META['HTTP_HOST'] = 'example.com'
+        req.META['HTTP_ORIGIN'] = 'http://example.com'
+        req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+        self.assertEqual(None, req2)
+
+    def test_good_origin_header_4(self):
+        """
+        Test if a good origin header is accepted for no cookie setting.
         """
         req = self._get_POST_request_with_token()
         req.META['HTTP_HOST'] = 'www.example.com'
@@ -346,7 +380,28 @@ class CsrfViewMiddlewareTest(TestCase):
 
     def test_bad_origin_header(self):
         """
-        Test if a bad origin header is rejected.
+        Test if a bad origin header is rejected for different domain.
+        """
+        req = self._get_POST_request_with_token()
+        req.META['HTTP_HOST'] = 'www.example.com'
+        req.META['HTTP_ORIGIN'] = 'http://www.evil.com'
+        req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+        self.assertEqual(403, req2.status_code)
+
+    @override_settings(CSRF_COOKIE_DOMAIN='example.com')
+    def test_bad_origin_header_2(self):
+        """
+        Test if a bad origin header is rejected for subdomains.
+        """
+        req = self._get_POST_request_with_token()
+        req.META['HTTP_HOST'] = 'www.example.com'
+        req.META['HTTP_ORIGIN'] = 'http://www.example.com'
+        req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+        self.assertEqual(403, req2.status_code)
+
+    def test_bad_origin_header_3(self):
+        """
+        Test if a bad origin header is rejected with no cookie setting.
         """
         req = self._get_POST_request_with_token()
         req.META['HTTP_HOST'] = 'www.example.com'

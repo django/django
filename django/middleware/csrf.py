@@ -116,12 +116,25 @@ class CsrfViewMiddleware(object):
 
             host = request.META.get('HTTP_HOST', '')
             origin = request.META.get('HTTP_ORIGIN')
-            cookie_domain = getattr(settings, 'CSRF_COOKIE_DOMAIN') or host
+            good_origin = settings.CSRF_COOKIE_DOMAIN or host
 
+            # If origin header exists, use it to check for csrf attacks.
+            # Origin header is being compared to None here as we need to reject
+            # requests with origin header as '' too, which otherwise is treated
+            # as null.
             if origin is not None:
-                # TODO: Fix this check to be like browser cookie check
-                if not origin.endswith(cookie_domain):
-                    reason = REASON_BAD_ORIGIN % (origin, cookie_domain)
+
+                # If the good origin starts with a dot (.), it means the cookie
+                # is supposed to work across all the subdomains, i.e.  an
+                # endswith test and a count of dots should be fine here.
+                # In case case the actual and the good origin are the same, then
+                # too it passes.
+                if  not ((good_origin.startswith('.')
+                          and good_origin.count('.') is origin.count('.')
+                          and origin.endswith(good_origin))
+                         or origin[origin.find('://')+3:] == good_origin):
+
+                    reason = REASON_BAD_ORIGIN % (origin, good_origin)
                     logger.warning('Forbidden (%s): %s',
                                    reason, request.path,
                         extra={
