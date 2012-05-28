@@ -17,5 +17,11 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: template.html:3
+# Note: Intentional: variable name is translated.
 msgid "My name is %(person)s."
 msgstr "Mon nom est %(personne)s."
+
+#: template.html:3
+# Note: Intentional: the variable name is badly formatted (missing 's' at the end)
+msgid "My other name is %(person)s."
+msgstr "Mon autre nom est %(person)."
