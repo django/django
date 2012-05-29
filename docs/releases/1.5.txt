@@ -69,6 +69,16 @@ To make it easier to deal with javascript templates which collide with Django's
 syntax, you can now use the :ttag:`verbatim` block tag to avoid parsing the
 tag's content.
 
+Retreival of ``ContentType`` instances associated with proxy models
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The methods :meth:`ContentTypeManager.get_for_model() <django.contrib.contenttypes.models.ContentTypeManager.get_for_model()>` 
+and :meth:`ContentTypeManager.get_for_models() <django.contrib.contenttypes.models.ContentTypeManager.get_for_models()>` 
+have a new keyword argument – respectively ``for_concrete_model`` and ``for_concrete_models``. 
+By passing ``False`` using this argument it is now possible to retreive the
+:class:`ContentType <django.contrib.contenttypes.models.ContentType>` 
+associated with proxy models.
+
 Minor features
 ~~~~~~~~~~~~~~
 

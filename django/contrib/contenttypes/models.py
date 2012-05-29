@@ -16,20 +16,24 @@ class ContentTypeManager(models.Manager):
             self._add_to_cache(self.db, ct)
         return ct
 
-    def _get_opts(self, model):
-        return model._meta.concrete_model._meta
+    def _get_opts(self, model, for_concrete_model):
+        if for_concrete_model:
+            model = model._meta.concrete_model
+        elif model._deferred:
+            model = model._meta.proxy_for_model
+        return model._meta
 
     def _get_from_cache(self, opts):
         key = (opts.app_label, opts.object_name.lower())
         return self.__class__._cache[self.db][key]
 
-    def get_for_model(self, model):
+    def get_for_model(self, model, for_concrete_model=True):
         """
         Returns the ContentType object for a given model, creating the
         ContentType if necessary. Lookups are cached so that subsequent lookups
         for the same model don't hit the database.
         """
-        opts = self._get_opts(model)
+        opts = self._get_opts(model, for_concrete_model)
         try:
             ct = self._get_from_cache(opts)
         except KeyError:
@@ -45,10 +49,11 @@ class ContentTypeManager(models.Manager):
 
         return ct
 
-    def get_for_models(self, *models):
+    def get_for_models(self, *models, **kwargs):
         """
         Given *models, returns a dictionary mapping {model: content_type}.
         """
+        for_concrete_models = kwargs.pop('for_concrete_models', True)
         # Final results
         results = {}
         # models that aren't already in the cache
@@ -56,7 +61,7 @@ class ContentTypeManager(models.Manager):
         needed_models = set()
         needed_opts = set()
         for model in models:
-            opts = self._get_opts(model)
+            opts = self._get_opts(model, for_concrete_models)
             try:
                 ct = self._get_from_cache(opts)
             except KeyError:
