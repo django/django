@@ -91,7 +91,7 @@ class ModelBase(type):
         # Bail out early if we have already created this class.
         m = get_model(new_class._meta.app_label, name,
                       seed_cache=False, only_installed=False)
-        if m is not None:
+        if m is not None and not new_class._meta._skip_app_cache:
             return m
 
         # Add all attributes to the class.
@@ -196,6 +196,9 @@ class ModelBase(type):
             return new_class
 
         new_class._prepare()
+        if new_class._meta._skip_app_cache:
+            return new_class
+
         register_models(new_class._meta.app_label, new_class)
 
         # Because of the way imports happen (recursively), we may or may not be
