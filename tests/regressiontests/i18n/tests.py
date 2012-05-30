@@ -270,16 +270,30 @@ class TranslationTests(TestCase):
         self.assertEqual(to_language('sr_Lat'), 'sr-lat')
 
     @override_settings(LOCALE_PATHS=(os.path.join(here, 'other', 'locale'),))
-    def test_bad_placeholder(self):
+    def test_bad_placeholder_1(self):
         """
         Error in translation file should not crash template rendering
         (%(person)s is translated as %(personne)s in fr.po)
+        Refs #16516.
         """
         from django.template import Template, Context
         with translation.override('fr'):
             t = Template('{% load i18n %}{% blocktrans %}My name is {{ person }}.{% endblocktrans %}')
             rendered = t.render(Context({'person': 'James'}))
             self.assertEqual(rendered, 'My name is James.')
+
+    @override_settings(LOCALE_PATHS=(os.path.join(here, 'other', 'locale'),))
+    def test_bad_placeholder_2(self):
+        """
+        Error in translation file should not crash template rendering
+        (%(person) misses a 's' in fr.po, causing the string formatting to fail)
+        Refs #18393.
+        """
+        from django.template import Template, Context
+        with translation.override('fr'):
+            t = Template('{% load i18n %}{% blocktrans %}My other name is {{ person }}.{% endblocktrans %}')
+            rendered = t.render(Context({'person': 'James'}))
+            self.assertEqual(rendered, 'My other name is James.')
 
 
 class FormattingTests(TestCase):
