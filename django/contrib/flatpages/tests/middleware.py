@@ -19,9 +19,10 @@ from django.test.utils import override_settings
     TEMPLATE_DIRS=(
         os.path.join(os.path.dirname(__file__), 'templates'),
     ),
+    SITE_ID=1,
 )
 class FlatpageMiddlewareTests(TestCase):
-    fixtures = ['sample_flatpages']
+    fixtures = ['sample_flatpages', 'example_site']
     urls = 'django.contrib.flatpages.tests.urls'
 
     def test_view_flatpage(self):
@@ -75,7 +76,7 @@ class FlatpageMiddlewareTests(TestCase):
             enable_comments=False,
             registration_required=False,
         )
-        fp.sites.add(1)
+        fp.sites.add(settings.SITE_ID)
 
         response = self.client.get('/some.very_special~chars-here/')
         self.assertEqual(response.status_code, 200)
@@ -96,9 +97,10 @@ class FlatpageMiddlewareTests(TestCase):
     TEMPLATE_DIRS=(
         os.path.join(os.path.dirname(__file__), 'templates'),
     ),
+    SITE_ID=1,
 )
 class FlatpageMiddlewareAppendSlashTests(TestCase):
-    fixtures = ['sample_flatpages']
+    fixtures = ['sample_flatpages', 'example_site']
     urls = 'django.contrib.flatpages.tests.urls'
 
     def test_redirect_view_flatpage(self):
@@ -130,7 +132,7 @@ class FlatpageMiddlewareAppendSlashTests(TestCase):
             enable_comments=False,
             registration_required=False,
         )
-        fp.sites.add(1)
+        fp.sites.add(settings.SITE_ID)
 
         response = self.client.get('/some.very_special~chars-here')
         self.assertRedirects(response, '/some.very_special~chars-here/', status_code=301)
@@ -144,7 +146,7 @@ class FlatpageMiddlewareAppendSlashTests(TestCase):
             enable_comments=False,
             registration_required=False,
         )
-        fp.sites.add(1)
+        fp.sites.add(settings.SITE_ID)
 
         response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
