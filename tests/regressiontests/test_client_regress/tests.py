@@ -17,14 +17,10 @@ from django.template.response import SimpleTemplateResponse
 from django.http import HttpResponse
 
 
+@override_settings(
+    TEMPLATE_DIRS=(os.path.join(os.path.dirname(__file__), 'templates'),)
+)
 class AssertContainsTests(TestCase):
-    def setUp(self):
-        self.old_templates = settings.TEMPLATE_DIRS
-        settings.TEMPLATE_DIRS = (os.path.join(os.path.dirname(__file__), 'templates'),)
-
-    def tearDown(self):
-        settings.TEMPLATE_DIRS = self.old_templates
-
     def test_contains(self):
         "Responses can be inspected for content, including counting repeated substrings"
         response = self.client.get('/test_client_regress/no_template_view/')
@@ -544,16 +540,12 @@ class LoginTests(TestCase):
         self.assertRedirects(response, "http://testserver/test_client_regress/get_view/")
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+@override_settings(
+    PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+    SESSION_ENGINE='regressiontests.test_client_regress.session'
+)
 class SessionEngineTests(TestCase):
     fixtures = ['testdata']
-
-    def setUp(self):
-        self.old_SESSION_ENGINE = settings.SESSION_ENGINE
-        settings.SESSION_ENGINE = 'regressiontests.test_client_regress.session'
-
-    def tearDown(self):
-        settings.SESSION_ENGINE = self.old_SESSION_ENGINE
 
     def test_login(self):
         "A session engine that modifies the session key can be used to log in"
@@ -616,6 +608,8 @@ class ExceptionTests(TestCase):
         except SuspiciousOperation:
             self.fail("Staff should be able to visit this page")
 
+
+@override_settings(TEMPLATE_DIRS=())
 class TemplateExceptionTests(TestCase):
     def setUp(self):
         # Reset the loaders so they don't try to render cached templates.
@@ -623,11 +617,6 @@ class TemplateExceptionTests(TestCase):
             for template_loader in loader.template_source_loaders:
                 if hasattr(template_loader, 'reset'):
                     template_loader.reset()
-        self.old_templates = settings.TEMPLATE_DIRS
-        settings.TEMPLATE_DIRS = ()
-
-    def tearDown(self):
-        settings.TEMPLATE_DIRS = self.old_templates
 
     def test_no_404_template(self):
         "Missing templates are correctly reported by test client"
@@ -980,11 +969,8 @@ class RequestFactoryStateTest(TestCase):
     # run the tests individually, and if any are failing it is confusing to run
     # them with any other set of tests.
 
-    def setUp(self):
-        self.factory = RequestFactory()
-
     def common_test_that_should_always_pass(self):
-        request = self.factory.get('/')
+        request = RequestFactory().get('/')
         request.session = {}
         self.assertFalse(hasattr(request, 'user'))
 
@@ -1007,11 +993,8 @@ class RequestFactoryEnvironmentTests(TestCase):
     are set correctly in RequestFactory.
     """
 
-    def setUp(self):
-        self.factory = RequestFactory()
-
     def test_should_set_correct_env_variables(self):
-        request = self.factory.get('/path/')
+        request = RequestFactory().get('/path/')
 
         self.assertEqual(request.META.get('REMOTE_ADDR'), '127.0.0.1')
         self.assertEqual(request.META.get('SERVER_NAME'), 'testserver')
