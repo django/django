@@ -12,7 +12,8 @@ class File(FileProxyMixin):
         if name is None:
             name = getattr(file, 'name', None)
         self.name = name
-        self.mode = getattr(file, 'mode', None)
+        if hasattr(file, 'mode'):
+            self.mode = file.mode
 
     def __str__(self):
         return smart_str(self.name or '')
