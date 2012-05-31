@@ -478,6 +478,14 @@ class FieldsTests(SimpleTestCase):
         self.assertRaisesMessage(ValidationError, "[u'Ensure this value has at most 10 characters (it has 11).']", f.clean, '12345678901')
         self.assertRaisesMessage(ValidationError, "[u'Enter a valid value.']", f.clean, '12345a')
 
+    def test_regexfield_6(self):
+        """
+        Ensure that it works with unicode characters.
+        Refs #.
+        """
+        f = RegexField('^\w+$')
+        self.assertEqual(u'éèøçÎÎ你好', f.clean(u'éèøçÎÎ你好'))
+
     def test_change_regex_after_init(self):
         f = RegexField('^[a-z]+$')
         f.regex = '^\d+$'
