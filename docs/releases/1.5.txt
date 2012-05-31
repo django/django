@@ -128,6 +128,15 @@ If you were using the ``data`` parameter in a PUT request without a
 ``content_type``, you must encode your data before passing it to the test
 client and set the ``content_type`` argument.
 
+Behavior of autocommit database option on PostgreSQL changed
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When using  PostgreSQL and autocommit option, the option previously had effect
+before first entering a transaction managed block. After that block was left,
+the autocommit behavior was never restored. This bug is now fixed in 1.5.
+While this is only a bug fix, it is worth checking your applications behavior
+if you are using PostgreSQL together with the autocommit option.
+
 Features deprecated in 1.5
 ==========================
 
