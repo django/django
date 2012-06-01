@@ -62,6 +62,16 @@ For one-to-one relationships, both sides can be cached. For many-to-one
 relationships, only the single side of the relationship can be cached. This
 is particularly helpful in combination with ``prefetch_related``.
 
+Retreival of ``ContentType`` instances associated with proxy models
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The methods :meth:`ContentTypeManager.get_for_model() <django.contrib.contenttypes.models.ContentTypeManager.get_for_model()>` 
+and :meth:`ContentTypeManager.get_for_models() <django.contrib.contenttypes.models.ContentTypeManager.get_for_models()>` 
+have a new keyword argument – respectively ``for_concrete_model`` and ``for_concrete_models``. 
+By passing ``False`` using this argument it is now possible to retreive the
+:class:`ContentType <django.contrib.contenttypes.models.ContentType>` 
+associated with proxy models.
+
 Minor features
 ~~~~~~~~~~~~~~
 
