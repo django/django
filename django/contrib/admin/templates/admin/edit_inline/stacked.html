@@ -28,13 +28,6 @@
                 $(this).html($(this).html().replace(/(#\d+)/g, "#" + count));
             });
         };
-        var reinitDateTimeShortCuts = function() {
-            // Reinitialize the calendar and clock widgets by force, yuck.
-            if (typeof DateTimeShortcuts != "undefined") {
-                $(".datetimeshortcuts").remove();
-                DateTimeShortcuts.init();
-            }
-        };
         var updateSelectFilter = function() {
             // If any SelectFilter widgets were added, instantiate a new instance.
             if (typeof SelectFilter != "undefined"){
@@ -72,7 +65,6 @@
             removed: updateInlineLabel,
             added: (function(row) {
                 initPrepopulatedFields(row);
-                reinitDateTimeShortCuts();
                 updateSelectFilter();
                 updateInlineLabel(row);
             })

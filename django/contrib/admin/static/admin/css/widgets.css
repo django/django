@@ -377,7 +377,8 @@ span.clearable-file-input label {
     right: 0;
 }
 
-.calendar-cancel {
+.calendar-cancel,
+.clock-cancel {
     margin: 0 !important;
     padding: 0 !important;
     font-size: 10px;
