@@ -147,14 +147,6 @@
         .filter(":odd").addClass("row2");
     };
 
-    var reinitDateTimeShortCuts = function() {
-      // Reinitialize the calendar and clock widgets by force
-      if (typeof DateTimeShortcuts != "undefined") {
-        $(".datetimeshortcuts").remove();
-        DateTimeShortcuts.init();
-      }
-    };
-
     var updateSelectFilter = function() {
       // If any SelectFilter widgets are a part of the new form,
       // instantiate a new SelectFilter instance for it.
@@ -195,7 +187,6 @@
       removed: alternatingRows,
       added: function(row) {
         initPrepopulatedFields(row);
-        reinitDateTimeShortCuts();
         updateSelectFilter();
         alternatingRows(row);
       }
@@ -212,14 +203,6 @@
         var count = i + 1;
         $(this).html($(this).html().replace(/(#\d+)/g, "#" + count));
       });
-    };
-
-    var reinitDateTimeShortCuts = function() {
-      // Reinitialize the calendar and clock widgets by force, yuck.
-      if (typeof DateTimeShortcuts != "undefined") {
-        $(".datetimeshortcuts").remove();
-        DateTimeShortcuts.init();
-      }
     };
 
     var updateSelectFilter = function() {
@@ -261,7 +244,6 @@
       removed: updateInlineLabel,
       added: (function(row) {
         initPrepopulatedFields(row);
-        reinitDateTimeShortCuts();
         updateSelectFilter();
         updateInlineLabel(row);
       })

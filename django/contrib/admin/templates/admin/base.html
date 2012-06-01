@@ -14,6 +14,21 @@
 
 <body class="{% if is_popup %}popup {% endif %}{% block bodyclass %}{% endblock %}">
 
+<script type="text/javascript">
+    if (typeof(django) != "undefined" && typeof(django.jQuery) != "undefined") {
+        (function($) {
+            $('body').data('admin_media_prefix', "{% filter escapejs %}{% static "admin/" %}{% endfilter %}");
+            {# TODO: templatetag admin_datetimeshortcuts (?) to render the following from django.conf.settings #}
+            $('body').data('datetimeshortcuts_defaults', {
+                enable_calendar: true,
+                enable_today: true,
+                enable_clock: true,
+                enable_now: true
+            });
+        })(django.jQuery);
+    }
+</script>
+
 <!-- Container -->
 <div id="container">
 
