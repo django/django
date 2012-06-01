@@ -678,7 +678,7 @@ class DateField(Field):
             return value
         if isinstance(value, datetime.datetime):
             if settings.USE_TZ and timezone.is_aware(value):
-                # Convert aware datetimes to the current time zone
+                # Convert aware datetimes to the default time zone
                 # before casting them to dates (#17742).
                 default_timezone = timezone.get_default_timezone()
                 value = timezone.make_naive(value, default_timezone)
