@@ -1,11 +1,3 @@
-.. note::
-   This repository contains the version of Django which runs on both Python 2.x
-   and 3.x from a single codebase. Recent test results can be seen at
-   
-   https://gist.github.com/1373553
-
-   The single codebase is in the *django3* branch.
-
 Django is a high-level Python Web framework that encourages rapid development
 and clean, pragmatic design. Thanks for checking it out.
 
