@@ -609,7 +609,6 @@ class ExceptionTests(TestCase):
             self.fail("Staff should be able to visit this page")
 
 
-@override_settings(TEMPLATE_DIRS=())
 class TemplateExceptionTests(TestCase):
     def setUp(self):
         # Reset the loaders so they don't try to render cached templates.
@@ -618,6 +617,7 @@ class TemplateExceptionTests(TestCase):
                 if hasattr(template_loader, 'reset'):
                     template_loader.reset()
 
+    @override_settings(TEMPLATE_DIRS=(),)
     def test_no_404_template(self):
         "Missing templates are correctly reported by test client"
         try:
@@ -626,9 +626,11 @@ class TemplateExceptionTests(TestCase):
         except TemplateDoesNotExist:
             pass
 
+    @override_settings(
+        TEMPLATE_DIRS=(os.path.join(os.path.dirname(__file__), 'bad_templates'),)
+    )
     def test_bad_404_template(self):
         "Errors found when rendering 404 error templates are re-raised"
-        settings.TEMPLATE_DIRS = (os.path.join(os.path.dirname(__file__), 'bad_templates'),)
         try:
             response = self.client.get("/no_such_view/")
             self.fail("Should get error about syntax error in template")
