@@ -500,14 +500,14 @@ class FileBackendTests(BaseEmailBackendTests, TestCase):
     email_backend = 'django.core.mail.backends.filebased.EmailBackend'
 
     def setUp(self):
+        super(FileBackendTests, self).setUp()
         self.tmp_dir = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, self.tmp_dir)
-        self.settings_override = override_settings(EMAIL_FILE_PATH=self.tmp_dir)
-        self.settings_override.enable()
-        super(FileBackendTests, self).setUp()
+        self._settings_override = override_settings(EMAIL_FILE_PATH=self.tmp_dir)
+        self._settings_override.enable()
 
     def tearDown(self):
-        self.settings_override.disable()
+        self._settings_override.disable()
         super(FileBackendTests, self).tearDown()
 
     def flush_mailbox(self):
@@ -644,15 +644,15 @@ class SMTPBackendTests(BaseEmailBackendTests, TestCase):
     @classmethod
     def setUpClass(cls):
         cls.server = FakeSMTPServer(('127.0.0.1', 0), None)
-        cls.settings_override = override_settings(
+        cls._settings_override = override_settings(
             EMAIL_HOST="127.0.0.1",
             EMAIL_PORT=cls.server.socket.getsockname()[1])
-        cls.settings_override.enable()
+        cls._settings_override.enable()
         cls.server.start()
 
     @classmethod
     def tearDownClass(cls):
-        cls.settings_override.disable()
+        cls._settings_override.disable()
         cls.server.stop()
 
     def setUp(self):
