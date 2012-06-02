@@ -28,9 +28,6 @@ class InspectDBTestCase(TestCase):
         call_command('inspectdb',
                      table_name_filter=lambda tn:tn.startswith('inspectdb_'),
                      stdout=out)
-        f = open('/home/ramiro/models2.py', 'w')
-        f.write(out.getvalue())
-        f.close()
         error_message = "inspectdb generated an attribute name which is a python keyword"
         self.assertNotIn("from = models.ForeignKey(InspectdbPeople)", out.getvalue(), msg=error_message)
         # As InspectdbPeople model is defined after InspectdbMessage, it should be quoted
