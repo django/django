@@ -279,13 +279,13 @@ class Query(object):
         obj.select = self.select[:]
         obj.related_select_cols = []
         obj.tables = self.tables[:]
-        obj.where = copy.deepcopy(self.where, memo=memo)
+        obj.where = self.where.clone()
         obj.where_class = self.where_class
         if self.group_by is None:
             obj.group_by = None
         else:
             obj.group_by = self.group_by[:]
-        obj.having = copy.deepcopy(self.having, memo=memo)
+        obj.having = self.having.clone()
         obj.order_by = self.order_by[:]
         obj.low_mark, obj.high_mark = self.low_mark, self.high_mark
         obj.distinct = self.distinct
@@ -293,7 +293,9 @@ class Query(object):
         obj.select_for_update = self.select_for_update
         obj.select_for_update_nowait = self.select_for_update_nowait
         obj.select_related = self.select_related
-        obj.aggregates = copy.deepcopy(self.aggregates, memo=memo)
+        obj.related_select_cols = []
+        obj.aggregates = SortedDict((k, v.clone())
+                                    for k, v in self.aggregates.items())
         if self.aggregate_select_mask is None:
             obj.aggregate_select_mask = None
         else:
@@ -316,7 +318,7 @@ class Query(object):
             obj._extra_select_cache = self._extra_select_cache.copy()
         obj.extra_tables = self.extra_tables
         obj.extra_order_by = self.extra_order_by
-        obj.deferred_loading = copy.deepcopy(self.deferred_loading, memo=memo)
+        obj.deferred_loading = copy.copy(self.deferred_loading[0]), self.deferred_loading[1]
         if self.filter_is_sticky and self.used_aliases:
             obj.used_aliases = self.used_aliases.copy()
         else:
@@ -549,7 +551,7 @@ class Query(object):
         # Now relabel a copy of the rhs where-clause and add it to the current
         # one.
         if rhs.where:
-            w = copy.deepcopy(rhs.where)
+            w = rhs.where.clone()
             w.relabel_aliases(change_map)
             if not self.where:
                 # Since 'self' matches everything, add an explicit "include
@@ -571,7 +573,7 @@ class Query(object):
                 new_col = change_map.get(col[0], col[0]), col[1]
                 self.select.append(SelectInfo(new_col, field))
             else:
-                item = copy.deepcopy(col)
+                item = col.clone()
                 item.relabel_aliases(change_map)
                 self.select.append(SelectInfo(item, field))
 

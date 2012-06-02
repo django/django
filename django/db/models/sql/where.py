@@ -10,7 +10,7 @@ from itertools import repeat
 
 from django.utils import tree
 from django.db.models.fields import Field
-from django.db.models.sql.datastructures import EmptyResultSet
+from django.db.models.sql.datastructures import EmptyResultSet, Empty
 from django.db.models.sql.aggregates import Aggregate
 from django.utils.six.moves import xrange
 
@@ -272,6 +272,23 @@ class WhereNode(tree.Node):
                 if hasattr(child[3], 'relabel_aliases'):
                     child[3].relabel_aliases(change_map)
 
+    def clone(self):
+        """
+        Creates a clone of the tree. Must only be called on root nodes (nodes
+        with empty subtree_parents). Childs must be either (Contraint, lookup,
+        value) tuples, or objects supporting .clone().
+        """
+        assert not self.subtree_parents
+        clone = self.__class__._new_instance(
+            children=[], connector=self.connector, negated=self.negated)
+        for child in self.children:
+            if isinstance(child, tuple):
+                clone.children.append(
+                    (child[0].clone(), child[1], child[2], child[3]))
+            else:
+                clone.children.append(child.clone())
+        return clone
+
 class EmptyWhere(WhereNode):
 
     def add(self, data, connector):
@@ -291,6 +308,9 @@ class EverythingNode(object):
     def relabel_aliases(self, change_map, node=None):
         return
 
+    def clone(self):
+        return self
+
 class NothingNode(object):
     """
     A node that matches nothing.
@@ -301,6 +321,9 @@ class NothingNode(object):
     def relabel_aliases(self, change_map, node=None):
         return
 
+    def clone(self):
+        return self
+
 class ExtraWhere(object):
     def __init__(self, sqls, params):
         self.sqls = sqls
@@ -309,6 +332,9 @@ class ExtraWhere(object):
     def as_sql(self, qn=None, connection=None):
         sqls = ["(%s)" % sql for sql in self.sqls]
         return " AND ".join(sqls), tuple(self.params or ())
+
+    def clone(self):
+        return self
 
 class Constraint(object):
     """
@@ -374,3 +400,9 @@ class Constraint(object):
     def relabel_aliases(self, change_map):
         if self.alias in change_map:
             self.alias = change_map[self.alias]
+
+    def clone(self):
+        new = Empty()
+        new.__class__ = self.__class__
+        new.alias, new.col, new.field = self.alias, self.col, self.field
+        return new
