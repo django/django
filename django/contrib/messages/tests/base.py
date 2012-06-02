@@ -1,5 +1,5 @@
 from django import http
-from django.conf import settings
+from django.conf import settings, global_settings
 from django.contrib.messages import constants, utils, get_level, set_level
 from django.contrib.messages.api import MessageFailure
 from django.contrib.messages.storage import default_storage, base
@@ -57,6 +57,7 @@ class BaseTest(TestCase):
     def setUp(self):
         self.settings_override = override_settings_tags(
             TEMPLATE_DIRS   = (),
+            TEMPLATE_CONTEXT_PROCESSORS = global_settings.TEMPLATE_CONTEXT_PROCESSORS,
             MESSAGE_TAGS    = '',
             MESSAGE_STORAGE = '%s.%s' % (self.storage_class.__module__,
                                          self.storage_class.__name__),
