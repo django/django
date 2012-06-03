@@ -994,7 +994,7 @@ class FieldsTests(SimpleTestCase):
         ]
         for exp, got in zip(expected, fix_os_paths(f.choices)):
             self.assertEqual(exp[1], got[1])
-            self.assert_(got[0].endswith(exp[0]))
+            self.assertTrue(got[0].endswith(exp[0]))
 
         f = FilePathField(path=path, allow_folders=True, allow_files=True)
         f.choices.sort()
@@ -1017,7 +1017,7 @@ class FieldsTests(SimpleTestCase):
         ]
         for exp, got in zip(expected, fix_os_paths(f.choices)):
             self.assertEqual(exp[1], got[1])
-            self.assert_(got[0].endswith(exp[0]))
+            self.assertTrue(got[0].endswith(exp[0]))
 
 
     # SplitDateTimeField ##########################################################
