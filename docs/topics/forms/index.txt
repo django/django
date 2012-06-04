@@ -99,7 +99,7 @@ The standard pattern for processing a form in a view looks like this:
        else:
            form = ContactForm() # An unbound form
 
-       return render_to_response('contact.html', {
+       return render(request, 'contact.html', {
            'form': form,
        })
 
