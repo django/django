@@ -1,7 +1,6 @@
 import re
 import urllib
 
-from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.mail import send_mail
 from django.core import validators
@@ -269,12 +268,6 @@ class AbstractBaseUser(models.Model):
 
     def get_short_name(self):
         raise NotImplementedError()
-
-
-def get_user_model():
-    "Return the User model that is active in this project"
-    app_label, model_name = settings.AUTH_USER_MODEL.split('.')
-    return models.get_model(app_label, model_name)
 
 
 class User(AbstractBaseUser):

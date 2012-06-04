@@ -1,8 +1,8 @@
 import getpass
 from optparse import make_option
 
+from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand, CommandError
-from django.contrib.auth.models import get_user_model
 from django.db import DEFAULT_DB_ALIAS
 
 

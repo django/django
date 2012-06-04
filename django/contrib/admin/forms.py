@@ -9,6 +9,7 @@ from django.utils.translation import ugettext_lazy, ugettext as _
 ERROR_MESSAGE = ugettext_lazy("Please enter the correct username and password "
         "for a staff account. Note that both fields are case-sensitive.")
 
+
 class AdminAuthenticationForm(AuthenticationForm):
     """
     A custom authentication form used in the admin app.

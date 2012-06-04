@@ -2,7 +2,7 @@ from functools import update_wrapper
 from django.http import Http404, HttpResponseRedirect
 from django.contrib.admin import ModelAdmin, actions
 from django.contrib.admin.forms import AdminAuthenticationForm
-from django.contrib.auth import REDIRECT_FIELD_NAME
+from django.contrib.auth import REDIRECT_FIELD_NAME, get_user_model
 from django.contrib.contenttypes import views as contenttype_views
 from django.views.decorators.csrf import csrf_protect
 from django.db.models.base import ModelBase
@@ -79,20 +79,23 @@ class AdminSite(object):
             if model in self._registry:
                 raise AlreadyRegistered('The model %s is already registered' % model.__name__)
 
-            # If we got **options then dynamically construct a subclass of
-            # admin_class with those **options.
-            if options:
-                # For reasons I don't quite understand, without a __module__
-                # the created class appears to "live" in the wrong place,
-                # which causes issues later on.
-                options['__module__'] = __name__
-                admin_class = type("%sAdmin" % model.__name__, (admin_class,), options)
+            # Ignore the registration if the model has been
+            # swapped out.
+            if not model._meta.swapped:
+                # If we got **options then dynamically construct a subclass of
+                # admin_class with those **options.
+                if options:
+                    # For reasons I don't quite understand, without a __module__
+                    # the created class appears to "live" in the wrong place,
+                    # which causes issues later on.
+                    options['__module__'] = __name__
+                    admin_class = type("%sAdmin" % model.__name__, (admin_class,), options)
 
-            # Validate (which might be a no-op)
-            validate(admin_class, model)
+                # Validate (which might be a no-op)
+                validate(admin_class, model)
 
-            # Instantiate the admin class to save in the registry
-            self._registry[model] = admin_class(model, self)
+                # Instantiate the admin class to save in the registry
+                self._registry[model] = admin_class(model, self)
 
     def unregister(self, model_or_iterable):
         """
@@ -317,6 +320,7 @@ class AdminSite(object):
             REDIRECT_FIELD_NAME: request.get_full_path(),
         }
         context.update(extra_context or {})
+
         defaults = {
             'extra_context': context,
             'current_app': self.name,

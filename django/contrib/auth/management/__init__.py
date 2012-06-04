@@ -5,10 +5,9 @@ import getpass
 import locale
 import unicodedata
 
-from django.contrib.auth import models as auth_app
+from django.contrib.auth import models as auth_app, get_user_model
 from django.core import exceptions
 from django.db.models import get_models, signals
-from django.contrib.auth.models import User, get_user_model
 
 
 def _get_permission_codename(action, opts):
@@ -106,7 +105,7 @@ def get_default_username(check_db=True):
     """
     # If the User model has been swapped out, we can't make any assumptions
     # about the default user name.
-    if User._meta.swapped:
+    if auth_app.User._meta.swapped:
         return ''
 
     default_username = get_system_username()
@@ -118,15 +117,15 @@ def get_default_username(check_db=True):
 
     # Run the username validator
     try:
-        User._meta.get_field('username').run_validators(default_username)
+        auth_app.User._meta.get_field('username').run_validators(default_username)
     except exceptions.ValidationError:
         return ''
 
     # Don't return the default username if it is already taken.
     if check_db and default_username:
         try:
-            User.objects.get(username=default_username)
-        except User.DoesNotExist:
+            auth_app.User.objects.get(username=default_username)
+        except auth_app.User.DoesNotExist:
             pass
         else:
             return ''
