@@ -2,6 +2,7 @@ from __future__ import absolute_import
 
 import sys
 
+from django import forms
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import get_resolver
 from django.http import HttpResponse, HttpResponseRedirect
@@ -13,6 +14,7 @@ from django.views.decorators.debug import (sensitive_post_parameters,
 from django.utils.log import getLogger
 
 from . import BrokenException, except_args
+from .models import Article
 
 
 
