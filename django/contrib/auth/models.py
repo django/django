@@ -93,6 +93,7 @@ class GroupManager(models.Manager):
     def get_by_natural_key(self, name):
         return self.get(name=name)
 
+
 class Group(models.Model):
     """
     Groups are a generic way of categorizing users to apply permissions, or
@@ -197,8 +198,6 @@ def _user_get_all_permissions(user, obj):
 
 
 def _user_has_perm(user, perm, obj):
-    anon = user.is_anonymous()
-    active = user.is_active
     for backend in auth.get_backends():
         if hasattr(backend, "has_perm"):
             if obj is not None:
@@ -211,8 +210,6 @@ def _user_has_perm(user, perm, obj):
 
 
 def _user_has_module_perms(user, app_label):
-    anon = user.is_anonymous()
-    active = user.is_active
     for backend in auth.get_backends():
         if hasattr(backend, "has_module_perms"):
             if backend.has_module_perms(user, app_label):
@@ -220,7 +217,54 @@ def _user_has_module_perms(user, app_label):
     return False
 
 
-class User(models.Model):
+class AbstractBaseUser(models.Model):
+    password = models.CharField(_('password'), max_length=128)
+
+    class Meta:
+        abstract = True
+
+    def is_anonymous(self):
+        """
+        Always returns False. This is a way of comparing User objects to
+        anonymous users.
+        """
+        return False
+
+    def is_authenticated(self):
+        """
+        Always return True. This is a way to tell if the user has been
+        authenticated in templates.
+        """
+        return True
+
+    def set_password(self, raw_password):
+        self.password = make_password(raw_password)
+
+    def check_password(self, raw_password):
+        """
+        Returns a boolean of whether the raw_password was correct. Handles
+        hashing formats behind the scenes.
+        """
+        def setter(raw_password):
+            self.set_password(raw_password)
+            self.save()
+        return check_password(raw_password, self.password, setter)
+
+    def set_unusable_password(self):
+        # Sets a value that will never be a valid hash
+        self.password = make_password(None)
+
+    def has_usable_password(self):
+        return is_password_usable(self.password)
+
+    def get_full_name(self):
+        raise NotImplementedError()
+
+    def get_short_name(self):
+        raise NotImplementedError()
+
+
+class User(AbstractBaseUser):
     """
     Users within the Django authentication system are represented by this
     model.
@@ -233,7 +277,6 @@ class User(models.Model):
     first_name = models.CharField(_('first name'), max_length=30, blank=True)
     last_name = models.CharField(_('last name'), max_length=30, blank=True)
     email = models.EmailField(_('e-mail address'), blank=True)
-    password = models.CharField(_('password'), max_length=128)
     is_staff = models.BooleanField(_('staff status'), default=False,
         help_text=_('Designates whether the user can log into this admin '
                     'site.'))
@@ -257,6 +300,7 @@ class User(models.Model):
     class Meta:
         verbose_name = _('user')
         verbose_name_plural = _('users')
+        swappable = 'AUTH_USER_MODEL'
 
     def __unicode__(self):
         return self.username
@@ -267,46 +311,12 @@ class User(models.Model):
     def get_absolute_url(self):
         return "/users/%s/" % urllib.quote(smart_str(self.username))
 
-    def is_anonymous(self):
-        """
-        Always returns False. This is a way of comparing User objects to
-        anonymous users.
-        """
-        return False
-
-    def is_authenticated(self):
-        """
-        Always return True. This is a way to tell if the user has been
-        authenticated in templates.
-        """
-        return True
-
     def get_full_name(self):
         """
         Returns the first_name plus the last_name, with a space in between.
         """
         full_name = u'%s %s' % (self.first_name, self.last_name)
         return full_name.strip()
-
-    def set_password(self, raw_password):
-        self.password = make_password(raw_password)
-
-    def check_password(self, raw_password):
-        """
-        Returns a boolean of whether the raw_password was correct. Handles
-        hashing formats behind the scenes.
-        """
-        def setter(raw_password):
-            self.set_password(raw_password)
-            self.save()
-        return check_password(raw_password, self.password, setter)
-
-    def set_unusable_password(self):
-        # Sets a value that will never be a valid hash
-        self.password = make_password(None)
-
-    def has_usable_password(self):
-        return is_password_usable(self.password)
 
     def get_group_permissions(self, obj=None):
         """
@@ -428,7 +438,7 @@ class AnonymousUser(object):
         return not self.__eq__(other)
 
     def __hash__(self):
-        return 1 # instances always return the same hash value
+        return 1  # instances always return the same hash value
 
     def save(self):
         raise NotImplementedError

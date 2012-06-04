@@ -1,5 +1,6 @@
 from django.core.management.base import NoArgsCommand
 
+
 class Command(NoArgsCommand):
     help = "Validates all installed models."
 

@@ -3,6 +3,7 @@ import sys
 from django.core.management.color import color_style
 from django.utils.itercompat import is_iterable
 
+
 class ModelErrorCollection:
     def __init__(self, outfile=sys.stdout):
         self.errors = []
@@ -12,6 +13,7 @@ class ModelErrorCollection:
     def add(self, context, error):
         self.errors.append((context, error))
         self.outfile.write(self.style.ERROR("%s: %s\n" % (context, error)))
+
 
 def get_validation_errors(outfile, app=None):
     """
@@ -54,7 +56,7 @@ def get_validation_errors(outfile, app=None):
                     e.add(opts, '"%s": CharFields require a "max_length" attribute that is a positive integer.' % f.name)
             if isinstance(f, models.DecimalField):
                 decimalp_ok, mdigits_ok = False, False
-                decimalp_msg ='"%s": DecimalFields require a "decimal_places" attribute that is a non-negative integer.'
+                decimalp_msg = '"%s": DecimalFields require a "decimal_places" attribute that is a non-negative integer.'
                 try:
                     decimal_places = int(f.decimal_places)
                     if decimal_places < 0:
@@ -121,6 +123,10 @@ def get_validation_errors(outfile, app=None):
                 if isinstance(f.rel.to, (str, unicode)):
                     continue
 
+                # Make sure the model we're related hasn't been swapped out
+                if f.rel.to._meta.swapped:
+                    e.add(opts, "'%s' defines a relation with the model '%s.%s', which has been swapped out. Update the relation to point at settings.%s." % (f.name, f.rel.to._meta.app_label, f.rel.to._meta.object_name, f.rel.to._meta.swappable))
+
                 # Make sure the related field specified by a ForeignKey is unique
                 if not f.rel.to._meta.get_field(f.rel.field_name).unique:
                     e.add(opts, "Field '%s' under model '%s' must have a unique=True constraint." % (f.rel.field_name, f.rel.to.__name__))
@@ -163,6 +169,10 @@ def get_validation_errors(outfile, app=None):
                 if isinstance(f.rel.to, (str, unicode)):
                     continue
 
+            # Make sure the model we're related hasn't been swapped out
+            if f.rel.to._meta.swapped:
+                e.add(opts, "'%s' defines a relation with the model '%s.%s', which has been swapped out. Update the relation to point at settings.%s." % (f.name, f.rel.to._meta.app_label, f.rel.to._meta.object_name, f.rel.to._meta.swappable))
+
             # Check that the field is not set to unique.  ManyToManyFields do not support unique.
             if f.unique:
                 e.add(opts, "ManyToManyFields cannot be unique.  Remove the unique argument on '%s'." % f.name)
@@ -174,7 +184,7 @@ def get_validation_errors(outfile, app=None):
                 seen_from, seen_to, seen_self = False, False, 0
                 for inter_field in f.rel.through._meta.fields:
                     rel_to = getattr(inter_field.rel, 'to', None)
-                    if from_model == to_model: # relation to self
+                    if from_model == to_model:  # relation to self
                         if rel_to == from_model:
                             seen_self += 1
                         if seen_self > 2:
@@ -276,7 +286,8 @@ def get_validation_errors(outfile, app=None):
         # Check ordering attribute.
         if opts.ordering:
             for field_name in opts.ordering:
-                if field_name == '?': continue
+                if field_name == '?':
+                    continue
                 if field_name.startswith('-'):
                     field_name = field_name[1:]
                 if opts.order_with_respect_to and field_name == '_order':

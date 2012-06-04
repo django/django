@@ -3,7 +3,7 @@ import sys
 from functools import update_wrapper
 from future_builtins import zip
 
-import django.db.models.manager     # Imported to register signal handler.
+import django.db.models.manager  # Imported to register signal handler.
 from django.conf import settings
 from django.core.exceptions import (ObjectDoesNotExist,
     MultipleObjectsReturned, FieldError, ValidationError, NON_FIELD_ERRORS)
@@ -230,6 +230,7 @@ class ModelBase(type):
         if opts.order_with_respect_to:
             cls.get_next_in_order = curry(cls._get_next_or_previous_in_order, is_next=True)
             cls.get_previous_in_order = curry(cls._get_next_or_previous_in_order, is_next=False)
+
             # defer creating accessors on the foreign class until we are
             # certain it has been created
             def make_foreign_order_accessors(field, model, cls):
@@ -260,6 +261,7 @@ class ModelBase(type):
 
         signals.class_prepared.send(sender=cls)
 
+
 class ModelState(object):
     """
     A class for storing instance state
@@ -270,6 +272,7 @@ class ModelState(object):
         # Necessary for correct validation of new instances of objects with explicit (non-auto) PKs.
         # This impacts validation only; it has no effect on the actual save.
         self.adding = True
+
 
 class Model(object):
     __metaclass__ = ModelBase
@@ -585,7 +588,6 @@ class Model(object):
             signals.post_save.send(sender=origin, instance=self, created=(not record_exists),
                                    update_fields=update_fields, raw=raw, using=using)
 
-
     save_base.alters_data = True
 
     def delete(self, using=None):
@@ -609,7 +611,7 @@ class Model(object):
         order = not is_next and '-' or ''
         param = smart_str(getattr(self, field.attname))
         q = Q(**{'%s__%s' % (field.name, op): param})
-        q = q|Q(**{field.name: param, 'pk__%s' % op: self.pk})
+        q = q | Q(**{field.name: param, 'pk__%s' % op: self.pk})
         qs = self.__class__._default_manager.using(self._state.db).filter(**kwargs).filter(q).order_by('%s%s' % (order, field.name), '%spk' % order)
         try:
             return qs[0]
@@ -802,7 +804,7 @@ class Model(object):
             field = opts.get_field(field_name)
             field_label = capfirst(field.verbose_name)
             # Insert the error into the error dict, very sneaky
-            return field.error_messages['unique'] %  {
+            return field.error_messages['unique'] % {
                 'model_name': unicode(model_name),
                 'field_label': unicode(field_label)
             }
@@ -810,7 +812,7 @@ class Model(object):
         else:
             field_labels = map(lambda f: capfirst(opts.get_field(f).verbose_name), unique_check)
             field_labels = get_text_list(field_labels, _('and'))
-            return _(u"%(model_name)s with this %(field_label)s already exists.") %  {
+            return _(u"%(model_name)s with this %(field_label)s already exists.") % {
                 'model_name': unicode(model_name),
                 'field_label': unicode(field_labels)
             }
@@ -915,6 +917,7 @@ def get_absolute_url(opts, func, self, *args, **kwargs):
 class Empty(object):
     pass
 
+
 def simple_class_factory(model, attrs):
     """Used to unpickle Models without deferred fields.
 
@@ -924,6 +927,7 @@ def simple_class_factory(model, attrs):
     """
     return model
 
+
 def model_unpickle(model, attrs, factory):
     """
     Used to unpickle Model subclasses with deferred fields.
@@ -931,6 +935,7 @@ def model_unpickle(model, attrs, factory):
     cls = factory(model, attrs)
     return cls.__new__(cls)
 model_unpickle.__safe_for_unpickle__ = True
+
 
 def subclass_exception(name, parents, module):
     return type(name, parents, {'__module__': module})

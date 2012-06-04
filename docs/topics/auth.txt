@@ -1723,6 +1723,13 @@ Fields
         group.permissions.remove(permission, permission, ...)
         group.permissions.clear()
 
+.. _auth-custom-user:
+
+Customizing the User model
+==========================
+
+TODO
+
 .. _authentication-backends:
 
 Other authentication sources

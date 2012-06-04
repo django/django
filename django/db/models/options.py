@@ -17,7 +17,8 @@ get_verbose_name = lambda class_name: re.sub('(((?<=[a-z])[A-Z])|([A-Z](?![A-Z]|
 DEFAULT_NAMES = ('verbose_name', 'verbose_name_plural', 'db_table', 'ordering',
                  'unique_together', 'permissions', 'get_latest_by',
                  'order_with_respect_to', 'app_label', 'db_tablespace',
-                 'abstract', 'managed', 'proxy', 'auto_created')
+                 'abstract', 'managed', 'proxy', 'swappable', 'auto_created')
+
 
 class Options(object):
     def __init__(self, meta, app_label=None):
@@ -27,8 +28,8 @@ class Options(object):
         self.verbose_name_plural = None
         self.db_table = ''
         self.ordering = []
-        self.unique_together =  []
-        self.permissions =  []
+        self.unique_together = []
+        self.permissions = []
         self.object_name, self.app_label = None, app_label
         self.get_latest_by = None
         self.order_with_respect_to = None
@@ -50,6 +51,7 @@ class Options(object):
         # in the end of the proxy_for_model chain. In particular, for
         # concrete models, the concrete_model is always the class itself.
         self.concrete_model = None
+        self.swappable = None
         self.parents = SortedDict()
         self.duplicate_targets = {}
         self.auto_created = False
@@ -212,6 +214,14 @@ class Options(object):
         activate(lang)
         return raw
     verbose_name_raw = property(verbose_name_raw)
+
+    def _swapped(self):
+        """
+        Has this model been swapped out for another?
+        """
+        model_label = '%s.%s' % (self.app_label, self.object_name)
+        return self.swappable and getattr(settings, self.swappable, None) not in (None, model_label)
+    swapped = property(_swapped)
 
     def _fields(self):
         """

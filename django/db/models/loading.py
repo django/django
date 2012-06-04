@@ -13,6 +13,7 @@ import threading
 __all__ = ('get_apps', 'get_app', 'get_models', 'get_model', 'register_models',
         'load_app', 'app_cache_ready')
 
+
 class AppCache(object):
     """
     A cache that stores installed applications and their models. Used to
