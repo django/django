@@ -318,6 +318,7 @@ class ModelAdmin(BaseModelAdmin):
     search_fields = ()
     date_hierarchy = None
     save_as = False
+    no_index = False
     save_on_top = False
     paginator = Paginator
     inlines = []

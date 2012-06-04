@@ -606,3 +606,19 @@ class UnorderedObject(models.Model):
     """
     name = models.CharField(max_length=255)
     bool = models.BooleanField(default=True)
+
+
+class Stuff(models.Model):
+    """
+    Model to test no_index=True/False setting no_index=True on this model's
+    registered ModelAdmin will exclude it from the index but still allow it to
+    be added via the "+" button when referenced via ForeignKey
+    """
+    name = models.IntegerField(default=1)
+
+
+class StuffBox(models.Model):
+    """
+    The "+" button should show up next to `stuff` when adding a StuffBox
+    """
+    stuff = models.ForeignKey(Stuff)

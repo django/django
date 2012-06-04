@@ -740,6 +740,17 @@ subclass::
     regardless of this setting if one of the ``list_display`` fields is a
     ``ForeignKey``.
 
+.. attribute:: ModelAdmin.no_index
+
+    .. versionadded:: 1.5
+
+    Set `no_index` to True to hide this Model from the admin index and the 
+    module's index. This is useful if you want the to be able to add the model 
+    via the ForeignKey's inline editing capabilities but do not wish to see it 
+    in the admin indexes.
+
+    Defaults to True.
+
 .. attribute:: ModelAdmin.ordering
 
     Set ``ordering`` to specify how lists of objects should be ordered in the
