@@ -155,9 +155,20 @@ class SafeExceptionReporterFilter(ExceptionReporterFilter):
         Replaces the values of variables marked as sensitive with
         stars (*********).
         """
-        func_name = tb_frame.f_code.co_name
-        func = tb_frame.f_globals.get(func_name)
-        sensitive_variables = getattr(func, 'sensitive_variables', [])
+        # Loop through the frame's callers to see if the sensitive_variables
+        # decorator was used.
+        current_frame = tb_frame.f_back
+        sensitive_variables = None
+        while current_frame is not None:
+            if (current_frame.f_code.co_name == 'sensitive_variables_wrapper'
+                and 'sensitive_variables_wrapper' in current_frame.f_locals):
+                # The sensitive_variables decorator was used, so we take note
+                # of the sensitive variables' names.
+                wrapper = current_frame.f_locals['sensitive_variables_wrapper']
+                sensitive_variables = getattr(wrapper, 'sensitive_variables', None)
+                break
+            current_frame = current_frame.f_back
+
         cleansed = []
         if self.is_active(request) and sensitive_variables:
             if sensitive_variables == '__ALL__':
