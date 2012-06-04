@@ -1605,7 +1605,8 @@ method.
 
 This takes some explanation. By default, ``is_secure()`` is able to determine
 whether a request is secure by looking at whether the requested URL uses
-"https://".
+"https://". This is important for Django's CSRF protection, and may be used
+by your own code or third-party apps.
 
 If your Django app is behind a proxy, though, the proxy may be "swallowing" the
 fact that a request is HTTPS, using a non-HTTPS connection between the proxy
@@ -1635,7 +1636,7 @@ available in ``request.META``.)
 
 .. warning::
 
-    **You will probably open security holes in your site if you set this without knowing what you're doing. Seriously.**
+    **You will probably open security holes in your site if you set this without knowing what you're doing. And if you fail to set it when you should. Seriously.**
 
     Make sure ALL of the following are true before setting this (assuming the
     values from the example above):
