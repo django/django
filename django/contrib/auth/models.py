@@ -1,7 +1,10 @@
+import re
 import urllib
 
+from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.mail import send_mail
+from django.core import validators
 from django.db import models
 from django.db.models.manager import EmptyManager
 from django.utils.crypto import get_random_string
@@ -128,7 +131,7 @@ class Group(models.Model):
         return (self.name,)
 
 
-class UserManager(models.Manager):
+class BaseUserManager(models.Manager):
 
     @classmethod
     def normalize_email(cls, email):
@@ -144,6 +147,24 @@ class UserManager(models.Manager):
         else:
             email = '@'.join([email_name, domain_part.lower()])
         return email
+
+    def make_random_password(self, length=10,
+                             allowed_chars='abcdefghjkmnpqrstuvwxyz'
+                                           'ABCDEFGHJKLMNPQRSTUVWXYZ'
+                                           '23456789'):
+        """
+        Generates a random password with the given length and given
+        allowed_chars. Note that the default value of allowed_chars does not
+        have "I" or "O" or letters and digits that look similar -- just to
+        avoid confusion.
+        """
+        return get_random_string(length, allowed_chars)
+
+    def get_by_natural_key(self, username):
+        return self.get(**{getattr(self, 'USERNAME_FIELD', 'username'): username})
+
+
+class UserManager(BaseUserManager):
 
     def create_user(self, username, email=None, password=None):
         """
@@ -168,21 +189,6 @@ class UserManager(models.Manager):
         u.is_superuser = True
         u.save(using=self._db)
         return u
-
-    def make_random_password(self, length=10,
-                             allowed_chars='abcdefghjkmnpqrstuvwxyz'
-                                           'ABCDEFGHJKLMNPQRSTUVWXYZ'
-                                           '23456789'):
-        """
-        Generates a random password with the given length and given
-        allowed_chars. Note that the default value of allowed_chars does not
-        have "I" or "O" or letters and digits that look similar -- just to
-        avoid confusion.
-        """
-        return get_random_string(length, allowed_chars)
-
-    def get_by_natural_key(self, username):
-        return self.get(username=username)
 
 
 # A few helper functions for common logic between User and AnonymousUser.
@@ -219,6 +225,7 @@ def _user_has_module_perms(user, app_label):
 
 class AbstractBaseUser(models.Model):
     password = models.CharField(_('password'), max_length=128)
+    last_login = models.DateTimeField(_('last login'), default=timezone.now)
 
     class Meta:
         abstract = True
@@ -264,6 +271,12 @@ class AbstractBaseUser(models.Model):
         raise NotImplementedError()
 
 
+def get_user_model():
+    "Return the User model that is active in this project"
+    app_label, model_name = settings.AUTH_USER_MODEL.split('.')
+    return models.get_model(app_label, model_name)
+
+
 class User(AbstractBaseUser):
     """
     Users within the Django authentication system are represented by this
@@ -273,10 +286,13 @@ class User(AbstractBaseUser):
     """
     username = models.CharField(_('username'), max_length=30, unique=True,
         help_text=_('Required. 30 characters or fewer. Letters, numbers and '
-                    '@/./+/-/_ characters'))
+                    '@/./+/-/_ characters'),
+        validators=[
+            validators.RegexValidator(re.compile('^[\w.@+-]+$'), _(u'Enter a valid username.'), 'invalid')
+        ])
     first_name = models.CharField(_('first name'), max_length=30, blank=True)
     last_name = models.CharField(_('last name'), max_length=30, blank=True)
-    email = models.EmailField(_('e-mail address'), blank=True)
+    email = models.EmailField(_('email address'), blank=True)
     is_staff = models.BooleanField(_('staff status'), default=False,
         help_text=_('Designates whether the user can log into this admin '
                     'site.'))
@@ -286,7 +302,6 @@ class User(AbstractBaseUser):
     is_superuser = models.BooleanField(_('superuser status'), default=False,
         help_text=_('Designates that this user has all permissions without '
                     'explicitly assigning them.'))
-    last_login = models.DateTimeField(_('last login'), default=timezone.now)
     date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
     groups = models.ManyToManyField(Group, verbose_name=_('groups'),
         blank=True, help_text=_('The groups this user belongs to. A user will '
@@ -295,6 +310,7 @@ class User(AbstractBaseUser):
     user_permissions = models.ManyToManyField(Permission,
         verbose_name=_('user permissions'), blank=True,
         help_text='Specific permissions for this user.')
+
     objects = UserManager()
 
     class Meta:
@@ -317,6 +333,10 @@ class User(AbstractBaseUser):
         """
         full_name = u'%s %s' % (self.first_name, self.last_name)
         return full_name.strip()
+
+    def get_short_name(self):
+        "Returns the short name for the user."
+        return self.first_name
 
     def get_group_permissions(self, obj=None):
         """

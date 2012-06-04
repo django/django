@@ -1,13 +1,7 @@
 from django.test import TestCase
-from django.utils.unittest import skipUnless
 from django.contrib.auth.models import User, AnonymousUser
 from django.core.management import call_command
 from StringIO import StringIO
-
-try:
-    import crypt as crypt_module
-except ImportError:
-    crypt_module = None
 
 
 class BasicTestCase(TestCase):
@@ -35,7 +29,7 @@ class BasicTestCase(TestCase):
         self.assertFalse(u.is_superuser)
 
         # Check API-based user creation with no password
-        u2 = User.objects.create_user('testuser2', 'test2@example.com')
+        User.objects.create_user('testuser2', 'test2@example.com')
         self.assertFalse(u.has_usable_password())
 
     def test_user_no_email(self):
@@ -66,48 +60,3 @@ class BasicTestCase(TestCase):
         self.assertTrue(super.is_superuser)
         self.assertTrue(super.is_active)
         self.assertTrue(super.is_staff)
-
-    def test_createsuperuser_management_command(self):
-        "Check the operation of the createsuperuser management command"
-        # We can use the management command to create a superuser
-        new_io = StringIO()
-        call_command("createsuperuser",
-            interactive=False,
-            username="joe",
-            email="joe@somewhere.org",
-            stdout=new_io
-        )
-        command_output = new_io.getvalue().strip()
-        self.assertEqual(command_output, 'Superuser created successfully.')
-        u = User.objects.get(username="joe")
-        self.assertEqual(u.email, 'joe@somewhere.org')
-
-        # created password should be unusable
-        self.assertFalse(u.has_usable_password())
-
-        # We can supress output on the management command
-        new_io = StringIO()
-        call_command("createsuperuser",
-            interactive=False,
-            username="joe2",
-            email="joe2@somewhere.org",
-            verbosity=0,
-            stdout=new_io
-        )
-        command_output = new_io.getvalue().strip()
-        self.assertEqual(command_output, '')
-        u = User.objects.get(username="joe2")
-        self.assertEqual(u.email, 'joe2@somewhere.org')
-        self.assertFalse(u.has_usable_password())
-
-
-        new_io = StringIO()
-        call_command("createsuperuser",
-            interactive=False,
-            username="joe+admin@somewhere.org",
-            email="joe@somewhere.org",
-            stdout=new_io
-        )
-        u = User.objects.get(username="joe+admin@somewhere.org")
-        self.assertEqual(u.email, 'joe@somewhere.org')
-        self.assertFalse(u.has_usable_password())
