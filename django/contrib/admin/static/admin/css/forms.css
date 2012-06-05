@@ -226,6 +226,10 @@ body.popup .submit-row {
     width: 5em;
 }
 
+.vBigIntegerField {
+    width: 10em;
+}
+
 .vForeignKeyRawIdAdminField {
     width: 5em;
 }
