@@ -49,7 +49,7 @@ FORMFIELD_FOR_DBFIELD_DEFAULTS = {
     models.TextField:       {'widget': widgets.AdminTextareaWidget},
     models.URLField:        {'widget': widgets.AdminURLFieldWidget},
     models.IntegerField:    {'widget': widgets.AdminIntegerFieldWidget},
-    models.BigIntegerField: {'widget': widgets.AdminIntegerFieldWidget},
+    models.BigIntegerField: {'widget': widgets.AdminBigIntegerFieldWidget},
     models.CharField:       {'widget': widgets.AdminTextInputWidget},
     models.ImageField:      {'widget': widgets.AdminFileWidget},
     models.FileField:       {'widget': widgets.AdminFileWidget},
