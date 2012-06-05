@@ -34,11 +34,11 @@ class Command(BaseCommand):
         using = options.get('database')
 
         connection = connections[using]
-        self.style = no_style()
 
         if not len(fixture_labels):
             self.stderr.write(
-                self.style.ERROR("No database fixture specified. Please provide the path of at least one fixture in the command line.\n")
+                "No database fixture specified. Please provide the path of at "
+                "least one fixture in the command line."
             )
             return
 
@@ -124,11 +124,11 @@ class Command(BaseCommand):
 
                     if formats:
                         if verbosity >= 2:
-                            self.stdout.write("Loading '%s' fixtures...\n" % fixture_name)
+                            self.stdout.write("Loading '%s' fixtures..." % fixture_name)
                     else:
                         self.stderr.write(
-                            self.style.ERROR("Problem installing fixture '%s': %s is not a known serialization format.\n" %
-                                (fixture_name, format)))
+                            "Problem installing fixture '%s': %s is not a known serialization format." %
+                                (fixture_name, format))
                         if commit:
                             transaction.rollback(using=using)
                             transaction.leave_transaction_management(using=using)
@@ -141,7 +141,7 @@ class Command(BaseCommand):
 
                     for fixture_dir in fixture_dirs:
                         if verbosity >= 2:
-                            self.stdout.write("Checking %s for fixtures...\n" % humanize(fixture_dir))
+                            self.stdout.write("Checking %s for fixtures..." % humanize(fixture_dir))
 
                         label_found = False
                         for combo in product([using, None], formats, compression_formats):
@@ -154,7 +154,7 @@ class Command(BaseCommand):
                             )
 
                             if verbosity >= 3:
-                                self.stdout.write("Trying %s for %s fixture '%s'...\n" % \
+                                self.stdout.write("Trying %s for %s fixture '%s'..." % \
                                     (humanize(fixture_dir), file_name, fixture_name))
                             full_path = os.path.join(fixture_dir, file_name)
                             open_method = compression_types[compression_format]
@@ -162,13 +162,13 @@ class Command(BaseCommand):
                                 fixture = open_method(full_path, 'r')
                             except IOError:
                                 if verbosity >= 2:
-                                    self.stdout.write("No %s fixture '%s' in %s.\n" % \
+                                    self.stdout.write("No %s fixture '%s' in %s." % \
                                         (format, fixture_name, humanize(fixture_dir)))
                             else:
                                 try:
                                     if label_found:
-                                        self.stderr.write(self.style.ERROR("Multiple fixtures named '%s' in %s. Aborting.\n" %
-                                            (fixture_name, humanize(fixture_dir))))
+                                        self.stderr.write("Multiple fixtures named '%s' in %s. Aborting." %
+                                            (fixture_name, humanize(fixture_dir)))
                                         if commit:
                                             transaction.rollback(using=using)
                                             transaction.leave_transaction_management(using=using)
@@ -178,7 +178,7 @@ class Command(BaseCommand):
                                     objects_in_fixture = 0
                                     loaded_objects_in_fixture = 0
                                     if verbosity >= 2:
-                                        self.stdout.write("Installing %s fixture '%s' from %s.\n" % \
+                                        self.stdout.write("Installing %s fixture '%s' from %s." % \
                                             (format, fixture_name, humanize(fixture_dir)))
 
                                     objects = serializers.deserialize(format, fixture, using=using)
@@ -209,8 +209,8 @@ class Command(BaseCommand):
                                 # error was encountered during fixture loading.
                                 if objects_in_fixture == 0:
                                     self.stderr.write(
-                                        self.style.ERROR("No fixture data found for '%s'. (File format may be invalid.)\n" %
-                                            (fixture_name)))
+                                        "No fixture data found for '%s'. (File format may be invalid.)" %
+                                            (fixture_name))
                                     if commit:
                                         transaction.rollback(using=using)
                                         transaction.leave_transaction_management(using=using)
@@ -231,16 +231,16 @@ class Command(BaseCommand):
                 traceback.print_exc()
             else:
                 self.stderr.write(
-                    self.style.ERROR("Problem installing fixture '%s': %s\n" %
+                    "Problem installing fixture '%s': %s" %
                          (full_path, ''.join(traceback.format_exception(sys.exc_type,
-                             sys.exc_value, sys.exc_traceback)))))
+                             sys.exc_value, sys.exc_traceback))))
             return
 
 
         # If we found even one object in a fixture, we need to reset the
         # database sequences.
         if loaded_object_count > 0:
-            sequence_sql = connection.ops.sequence_reset_sql(self.style, models)
+            sequence_sql = connection.ops.sequence_reset_sql(no_style(), models)
             if sequence_sql:
                 if verbosity >= 2:
                     self.stdout.write("Resetting sequences\n")
@@ -253,10 +253,10 @@ class Command(BaseCommand):
 
         if verbosity >= 1:
             if fixture_object_count == loaded_object_count:
-                self.stdout.write("Installed %d object(s) from %d fixture(s)\n" % (
+                self.stdout.write("Installed %d object(s) from %d fixture(s)" % (
                     loaded_object_count, fixture_count))
             else:
-                self.stdout.write("Installed %d object(s) (of %d) from %d fixture(s)\n" % (
+                self.stdout.write("Installed %d object(s) (of %d) from %d fixture(s)" % (
                     loaded_object_count, fixture_object_count, fixture_count))
 
         # Close the DB connection. This is required as a workaround for an

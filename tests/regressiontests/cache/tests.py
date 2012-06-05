@@ -7,7 +7,6 @@ from __future__ import absolute_import
 import hashlib
 import os
 import re
-import StringIO
 import tempfile
 import time
 import warnings
@@ -820,9 +819,14 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
         self.perform_cull_test(50, 18)
 
     def test_second_call_doesnt_crash(self):
-        err = StringIO.StringIO()
-        management.call_command('createcachetable', self._table_name, verbosity=0, interactive=False, stderr=err)
-        self.assertTrue("Cache table 'test cache table' could not be created" in err.getvalue())
+        with self.assertRaisesRegexp(management.CommandError,
+                "Cache table 'test cache table' could not be created"):
+            management.call_command(
+               'createcachetable',
+                self._table_name,
+                verbosity=0,
+                interactive=False
+            )
 
 
 @override_settings(USE_TZ=True)

@@ -790,9 +790,10 @@ templating functions, call :func:`django.conf.settings.configure()` with any
 settings you wish to specify. You might want to consider setting at least
 :setting:`TEMPLATE_DIRS` (if you're going to use template loaders),
 :setting:`DEFAULT_CHARSET` (although the default of ``utf-8`` is probably fine)
-and :setting:`TEMPLATE_DEBUG`. All available settings are described in the
-:doc:`settings documentation </ref/settings>`, and any setting starting with
-``TEMPLATE_`` is of obvious interest.
+and :setting:`TEMPLATE_DEBUG`. If you plan to use the :ttag:`url` template tag,
+you will also need to set the :setting:`ROOT_URLCONF` setting. All available
+settings are described in the :doc:`settings documentation </ref/settings>`,
+and any setting starting with ``TEMPLATE_`` is of obvious interest.
 
 .. _topic-template-alternate-language:
 

@@ -1,3 +1,4 @@
+import collections
 import copy
 import datetime
 import decimal
@@ -16,7 +17,7 @@ from django.utils.functional import curry, total_ordering
 from django.utils.text import capfirst
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
-from django.utils.encoding import smart_unicode, force_unicode, smart_str
+from django.utils.encoding import smart_unicode, force_unicode
 from django.utils.ipv6 import clean_ipv6_address
 
 class NOT_PROVIDED:
@@ -436,7 +437,7 @@ class Field(object):
         return bound_field_class(self, fieldmapping, original)
 
     def _get_choices(self):
-        if hasattr(self._choices, 'next'):
+        if isinstance(self._choices, collections.Iterator):
             choices, self._choices = tee(self._choices)
             return choices
         else:
@@ -529,7 +530,7 @@ class AutoField(Field):
         try:
             return int(value)
         except (TypeError, ValueError):
-            msg = self.error_messages['invalid'] % str(value)
+            msg = self.error_messages['invalid'] % value
             raise exceptions.ValidationError(msg)
 
     def validate(self, value, model_instance):
@@ -581,7 +582,7 @@ class BooleanField(Field):
             return True
         if value in ('f', 'False', '0'):
             return False
-        msg = self.error_messages['invalid'] % str(value)
+        msg = self.error_messages['invalid'] % value
         raise exceptions.ValidationError(msg)
 
     def get_prep_lookup(self, lookup_type, value):
@@ -677,15 +678,13 @@ class DateField(Field):
             return value
         if isinstance(value, datetime.datetime):
             if settings.USE_TZ and timezone.is_aware(value):
-                # Convert aware datetimes to the current time zone
+                # Convert aware datetimes to the default time zone
                 # before casting them to dates (#17742).
                 default_timezone = timezone.get_default_timezone()
                 value = timezone.make_naive(value, default_timezone)
             return value.date()
         if isinstance(value, datetime.date):
             return value
-
-        value = smart_str(value)
 
         try:
             parsed = parse_date(value)
@@ -778,8 +777,6 @@ class DateTimeField(DateField):
                 value = timezone.make_aware(value, default_timezone)
             return value
 
-        value = smart_str(value)
-
         try:
             parsed = parse_datetime(value)
             if parsed is not None:
@@ -861,7 +858,7 @@ class DecimalField(Field):
         try:
             return decimal.Decimal(value)
         except decimal.InvalidOperation:
-            msg = self.error_messages['invalid'] % str(value)
+            msg = self.error_messages['invalid'] % value
             raise exceptions.ValidationError(msg)
 
     def _format(self, value):
@@ -966,7 +963,7 @@ class FloatField(Field):
         try:
             return float(value)
         except (TypeError, ValueError):
-            msg = self.error_messages['invalid'] % str(value)
+            msg = self.error_messages['invalid'] % value
             raise exceptions.ValidationError(msg)
 
     def formfield(self, **kwargs):
@@ -1001,7 +998,7 @@ class IntegerField(Field):
         try:
             return int(value)
         except (TypeError, ValueError):
-            msg = self.error_messages['invalid'] % str(value)
+            msg = self.error_messages['invalid'] % value
             raise exceptions.ValidationError(msg)
 
     def formfield(self, **kwargs):
@@ -1106,7 +1103,7 @@ class NullBooleanField(Field):
             return True
         if value in ('f', 'False', '0'):
             return False
-        msg = self.error_messages['invalid'] % str(value)
+        msg = self.error_messages['invalid'] % value
         raise exceptions.ValidationError(msg)
 
     def get_prep_lookup(self, lookup_type, value):
@@ -1226,8 +1223,6 @@ class TimeField(Field):
             # information), but this can be a side-effect of interacting with a
             # database backend (e.g. Oracle), so we'll be accommodating.
             return value.time()
-
-        value = smart_str(value)
 
         try:
             parsed = parse_time(value)

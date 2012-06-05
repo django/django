@@ -38,6 +38,8 @@ and Geoff Biggs' PhD work on dimensioned units for robotics.
 __all__ = ['A', 'Area', 'D', 'Distance']
 from decimal import Decimal
 
+from django.utils.functional import total_ordering
+
 class MeasureBase(object):
     def default_units(self, kwargs):
         """
@@ -84,6 +86,7 @@ class MeasureBase(object):
         else:
             raise Exception('Could not find a unit keyword associated with "%s"' % unit_str)
 
+@total_ordering
 class Distance(MeasureBase):
     UNITS = {
         'chain' : 20.1168,
@@ -178,9 +181,15 @@ class Distance(MeasureBase):
     def __str__(self):
         return '%s %s' % (getattr(self, self._default_unit), self._default_unit)
 
-    def __cmp__(self, other):
+    def __eq__(self, other):
         if isinstance(other, Distance):
-            return cmp(self.m, other.m)
+            return self.m == other.m
+        else:
+            return NotImplemented
+
+    def __lt__(self, other):
+        if isinstance(other, Distance):
+            return self.m < other.m
         else:
             return NotImplemented
 
@@ -244,6 +253,7 @@ class Distance(MeasureBase):
     def __nonzero__(self):
         return bool(self.m)
 
+@total_ordering
 class Area(MeasureBase):
     # Getting the square units values and the alias dictionary.
     UNITS = dict([('sq_%s' % k, v ** 2) for k, v in Distance.UNITS.items()])
@@ -267,9 +277,15 @@ class Area(MeasureBase):
     def __str__(self):
         return '%s %s' % (getattr(self, self._default_unit), self._default_unit)
 
-    def __cmp__(self, other):
+    def __eq__(self, other):
         if isinstance(other, Area):
-            return cmp(self.sq_m, other.sq_m)
+            return self.sq_m == other.sq_m
+        else:
+            return NotImplemented
+
+    def __lt__(self, other):
+        if isinstance(other, Area):
+            return self.sq_m < other.sq_m
         else:
             return NotImplemented
 

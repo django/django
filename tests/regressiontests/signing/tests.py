@@ -12,8 +12,8 @@ class TestSigner(TestCase):
         signer = signing.Signer('predictable-secret')
         signer2 = signing.Signer('predictable-secret2')
         for s in (
-            'hello',
-            '3098247:529:087:',
+            b'hello',
+            b'3098247:529:087:',
             u'\u2019'.encode('utf-8'),
         ):
             self.assertEqual(
@@ -69,7 +69,7 @@ class TestSigner(TestCase):
         "dumps and loads be reversible for any JSON serializable object"
         objects = (
             ['a', 'list'],
-            'a string',
+            b'a string',
             u'a unicode string \u2019',
             {'a': 'dictionary'},
         )

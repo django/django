@@ -1,5 +1,5 @@
 from ctypes import c_void_p
-from types import NoneType
+
 from django.contrib.gis.geos.error import GEOSException
 
 # Trying to import GDAL libraries, if available.  Have to place in
@@ -41,7 +41,7 @@ class GEOSBase(object):
     def _set_ptr(self, ptr):
         # Only allow the pointer to be set with pointers of the
         # compatible type or None (NULL).
-        if isinstance(ptr, (self.ptr_type, NoneType)):
+        if ptr is None or isinstance(ptr, self.ptr_type):
             self._ptr = ptr
         else:
             raise TypeError('Incompatible pointer type')

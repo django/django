@@ -52,7 +52,7 @@ class Loader(BaseLoader):
     def load_template_source(self, template_name, template_dirs=None):
         for filepath in self.get_template_sources(template_name, template_dirs):
             try:
-                with open(filepath) as fp:
+                with open(filepath, 'rb') as fp:
                     return (fp.read().decode(settings.FILE_CHARSET), filepath)
             except IOError:
                 pass

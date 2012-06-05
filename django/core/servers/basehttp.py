@@ -146,25 +146,23 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
         env['PATH_INFO'] = urllib.unquote(path)
         env['QUERY_STRING'] = query
         env['REMOTE_ADDR'] = self.client_address[0]
+        env['CONTENT_TYPE'] = self.headers.get('content-type', 'text/plain')
 
-        if self.headers.typeheader is None:
-            env['CONTENT_TYPE'] = self.headers.type
-        else:
-            env['CONTENT_TYPE'] = self.headers.typeheader
-
-        length = self.headers.getheader('content-length')
+        length = self.headers.get('content-length')
         if length:
             env['CONTENT_LENGTH'] = length
 
-        for h in self.headers.headers:
-            k,v = h.split(':',1)
-            k=k.replace('-','_').upper(); v=v.strip()
-            if k in env:
-                continue                    # skip content length, type,etc.
-            if 'HTTP_'+k in env:
-                env['HTTP_'+k] += ','+v     # comma-separate multiple headers
+        for key, value in self.headers.items():
+            key = key.replace('-','_').upper()
+            value = value.strip()
+            if key in env:
+                # Skip content length, type, etc.
+                continue
+            if 'HTTP_' + key in env:
+                # Comma-separate multiple headers
+                env['HTTP_' + key] += ',' + value
             else:
-                env['HTTP_'+k] = v
+                env['HTTP_' + key] = value
         return env
 
     def log_message(self, format, *args):

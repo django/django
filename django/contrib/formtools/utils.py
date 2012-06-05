@@ -1,7 +1,5 @@
-try:
-    import cPickle as pickle
-except ImportError:
-    import pickle
+# Do not try cPickle here (see #18340)
+import pickle
 
 from django.utils.crypto import salted_hmac
 

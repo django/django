@@ -1126,7 +1126,7 @@ class OldFormForXTests(TestCase):
 
         f = TextFileForm(
                 data={'description': u'Assistance'},
-                files={'file': SimpleUploadedFile('test1.txt', 'hello world')})
+                files={'file': SimpleUploadedFile('test1.txt', b'hello world')})
         self.assertEqual(f.is_valid(), True)
         self.assertEqual(type(f.cleaned_data['file']), SimpleUploadedFile)
         instance = f.save()
@@ -1135,7 +1135,7 @@ class OldFormForXTests(TestCase):
         instance.file.delete()
         f = TextFileForm(
                 data={'description': u'Assistance'},
-                files={'file': SimpleUploadedFile('test1.txt', 'hello world')})
+                files={'file': SimpleUploadedFile('test1.txt', b'hello world')})
         self.assertEqual(f.is_valid(), True)
         self.assertEqual(type(f.cleaned_data['file']), SimpleUploadedFile)
         instance = f.save()
@@ -1144,7 +1144,7 @@ class OldFormForXTests(TestCase):
         # Check if the max_length attribute has been inherited from the model.
         f = TextFileForm(
                 data={'description': u'Assistance'},
-                files={'file': SimpleUploadedFile('test-maxlength.txt', 'hello world')})
+                files={'file': SimpleUploadedFile('test-maxlength.txt', b'hello world')})
         self.assertEqual(f.is_valid(), False)
 
         # Edit an instance that already has the file defined in the model. This will not
@@ -1165,7 +1165,7 @@ class OldFormForXTests(TestCase):
 
         f = TextFileForm(
                 data={'description': u'Assistance'},
-                files={'file': SimpleUploadedFile('test2.txt', 'hello world')}, instance=instance)
+                files={'file': SimpleUploadedFile('test2.txt', b'hello world')}, instance=instance)
         self.assertEqual(f.is_valid(), True)
         instance = f.save()
         self.assertEqual(instance.file.name, 'tests/test2.txt')
@@ -1174,7 +1174,7 @@ class OldFormForXTests(TestCase):
         instance.file.delete()
         f = TextFileForm(
                 data={'description': u'Assistance'},
-                files={'file': SimpleUploadedFile('test2.txt', 'hello world')})
+                files={'file': SimpleUploadedFile('test2.txt', b'hello world')})
         self.assertEqual(f.is_valid(), True)
         instance = f.save()
         self.assertEqual(instance.file.name, 'tests/test2.txt')
@@ -1193,7 +1193,7 @@ class OldFormForXTests(TestCase):
 
         f = TextFileForm(
                 data={'description': u'Assistance'},
-                files={'file': SimpleUploadedFile('test3.txt', 'hello world')}, instance=instance)
+                files={'file': SimpleUploadedFile('test3.txt', b'hello world')}, instance=instance)
         self.assertEqual(f.is_valid(), True)
         instance = f.save()
         self.assertEqual(instance.file.name, 'tests/test3.txt')
@@ -1215,7 +1215,7 @@ class OldFormForXTests(TestCase):
 
         f = TextFileForm(
                 data={'description': u'Assistance'},
-                files={'file': SimpleUploadedFile('test3.txt', 'hello world')})
+                files={'file': SimpleUploadedFile('test3.txt', b'hello world')})
         self.assertEqual(f.is_valid(), True)
         instance = f.save()
         self.assertEqual(instance.file.name, 'tests/test3.txt')

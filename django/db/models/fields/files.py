@@ -3,6 +3,7 @@ import os
 
 from django import forms
 from django.db.models.fields import Field
+from django.core.exceptions import ValidationError
 from django.core.files.base import File
 from django.core.files.storage import default_storage
 from django.core.files.images import ImageFile
@@ -204,6 +205,11 @@ class FileDescriptor(object):
         instance.__dict__[self.field.name] = value
 
 class FileField(Field):
+
+    default_error_messages = {
+        'max_length': _(u'Filename is %(extra)d characters too long.')
+    }
+
     # The class to wrap instance attributes in. Accessing the file object off
     # the instance will always return an instance of attr_class.
     attr_class = FieldFile
@@ -225,6 +231,21 @@ class FileField(Field):
 
         kwargs['max_length'] = kwargs.get('max_length', 100)
         super(FileField, self).__init__(verbose_name, name, **kwargs)
+
+    def validate(self, value, model_instance):
+        """
+        Validates that the generated file name still fits within max_length.
+        """
+        # The generated file name stored in the database is generally longer
+        # than the uploaded file name. Using the length of generated name in
+        # the error message would be confusing. However, in the common case
+        # (ie. upload_to='path/to/upload/dir'), the length of the generated
+        # name equals the length of the uploaded name plus a constant. Thus
+        # we can tell the user how much shorter the name should be (roughly).
+        length = len(self.generate_filename(model_instance, value.name))
+        if self.max_length and length > self.max_length:
+            error_values = {'extra': length - self.max_length}
+            raise ValidationError(self.error_messages['max_length'] % error_values)
 
     def get_internal_type(self):
         return "FileField"

@@ -78,14 +78,14 @@ class LimitedStream(object):
     def __init__(self, stream, limit, buf_size=64 * 1024 * 1024):
         self.stream = stream
         self.remaining = limit
-        self.buffer = ''
+        self.buffer = b''
         self.buf_size = buf_size
 
     def _read_limited(self, size=None):
         if size is None or size > self.remaining:
             size = self.remaining
         if size == 0:
-            return ''
+            return b''
         result = self.stream.read(size)
         self.remaining -= len(result)
         return result
@@ -93,17 +93,17 @@ class LimitedStream(object):
     def read(self, size=None):
         if size is None:
             result = self.buffer + self._read_limited()
-            self.buffer = ''
+            self.buffer = b''
         elif size < len(self.buffer):
             result = self.buffer[:size]
             self.buffer = self.buffer[size:]
         else: # size >= len(self.buffer)
             result = self.buffer + self._read_limited(size - len(self.buffer))
-            self.buffer = ''
+            self.buffer = b''
         return result
 
     def readline(self, size=None):
-        while '\n' not in self.buffer and \
+        while b'\n' not in self.buffer and \
               (size is None or len(self.buffer) < size):
             if size:
                 # since size is not None here, len(self.buffer) < size

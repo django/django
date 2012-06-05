@@ -174,7 +174,7 @@ class QueryDictTests(unittest.TestCase):
         QueryDicts must be able to handle invalid input encoding (in this
         case, bad UTF-8 encoding).
         """
-        q = QueryDict('foo=bar&foo=\xff')
+        q = QueryDict(b'foo=bar&foo=\xff')
         self.assertEqual(q['foo'], u'\ufffd')
         self.assertEqual(q.getlist('foo'), [u'bar', u'\ufffd'])
 
@@ -198,7 +198,7 @@ class QueryDictTests(unittest.TestCase):
 
     def test_non_default_encoding(self):
         """#13572 - QueryDict with a non-default encoding"""
-        q = QueryDict('sbb=one', encoding='rot_13')
+        q = QueryDict(b'sbb=one', encoding='rot_13')
         self.assertEqual(q.encoding , 'rot_13' )
         self.assertEqual(q.items() , [(u'foo', u'bar')] )
         self.assertEqual(q.urlencode() , 'sbb=one' )
@@ -285,8 +285,8 @@ class HttpResponseTests(unittest.TestCase):
             except StopIteration:
                 break
         #'\xde\x9e' == unichr(1950).encode('utf-8')
-        self.assertEqual(result, ['1', '2', '3', '\xde\x9e'])
-        self.assertEqual(r.content, '123\xde\x9e')
+        self.assertEqual(result, ['1', '2', '3', b'\xde\x9e'])
+        self.assertEqual(r.content, b'123\xde\x9e')
 
         #with Content-Encoding header
         r = HttpResponse([1,1,2,4,8])
@@ -321,7 +321,7 @@ class CookieTests(unittest.TestCase):
         Test that we haven't broken normal encoding
         """
         c = SimpleCookie()
-        c['test'] = "\xf0"
+        c['test'] = b"\xf0"
         c2 = SimpleCookie()
         c2.load(c.output())
         self.assertEqual(c['test'].value, c2['test'].value)

@@ -8,8 +8,7 @@ from optparse import make_option
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
 from django import db
-from django.db import connection
-from django.test import simple, TransactionTestCase
+from django.test import simple, TransactionTestCase, skipUnlessDBFeature
 from django.test.simple import DjangoTestSuiteRunner, get_tests
 from django.test.testcases import connections_support_transactions
 from django.utils import unittest
@@ -291,16 +290,12 @@ class AutoIncrementResetTest(TransactionTestCase):
     and check that both times they get "1" as their PK value. That is, we test
     that AutoField values start from 1 for each transactional test case.
     """
-    @unittest.skipIf(connection.vendor == 'oracle',
-                     "Oracle's auto-increment fields are not reset between "
-                     "tests")
+    @skipUnlessDBFeature('supports_sequence_reset')
     def test_autoincrement_reset1(self):
         p = Person.objects.create(first_name='Jack', last_name='Smith')
         self.assertEqual(p.pk, 1)
 
-    @unittest.skipIf(connection.vendor == 'oracle',
-                     "Oracle's auto-increment fields are not reset between "
-                     "tests")
+    @skipUnlessDBFeature('supports_sequence_reset')
     def test_autoincrement_reset2(self):
         p = Person.objects.create(first_name='Jack', last_name='Smith')
         self.assertEqual(p.pk, 1)

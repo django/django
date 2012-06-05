@@ -154,34 +154,19 @@ If you are upgrading your installation of Django from a previous version,
 you will need to uninstall the old Django version before installing the
 new version.
 
-If you installed Django using ``setup.py install``, uninstalling
-is as simple as deleting the ``django`` directory from your Python
-``site-packages``.
+If you installed Django using pip_ or ``easy_install`` previously, installing
+with pip_ or ``easy_install`` again will automatically take care of the old
+version, so you don't need to do it yourself.
 
-If you installed Django from a Python egg, remove the Django ``.egg`` file,
-and remove the reference to the egg in the file named ``easy-install.pth``.
-This file should also be located in your ``site-packages`` directory.
+If you previously installed Django using ``python setup.py install``,
+uninstalling is as simple as deleting the ``django`` directory from your Python
+``site-packages``. To find the directory you need to remove, you can run the
+following at your shell prompt (not the interactive Python prompt):
 
-.. _finding-site-packages:
+.. code-block:: bash
 
-.. admonition:: Where are my ``site-packages`` stored?
+    python -c "import sys; sys.path = sys.path[1:]; import django; print(django.__path__)"
 
-    The location of the ``site-packages`` directory depends on the operating
-    system, and the location in which Python was installed. To find out your
-    system's ``site-packages`` location, execute the following:
-
-    .. code-block:: bash
-
-        python -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())"
-
-    (Note that this should be run from a shell prompt, not a Python interactive
-    prompt.)
-
-    Some Debian-based Linux distributions have separate ``site-packages``
-    directories for user-installed packages, such as when installing Django
-    from a downloaded tarball. The command  listed above will give you the
-    system's ``site-packages``, the user's directory can be found in
-    ``/usr/local/lib/`` instead of ``/usr/lib/``.
 
 .. _install-django-code:
 
@@ -253,6 +238,15 @@ Installing an official release manually
    run the command ``python setup.py install``. This will install Django in
    your Python installation's ``site-packages`` directory.
 
+   .. admonition:: Removing an old version
+
+       If you use this installation technique, it is particularly important
+       that you :ref:`remove any existing
+       installations<removing-old-versions-of-django>` of Django
+       first. Otherwise, you can end up with a broken installation that
+       includes files from previous versions that have since been removed from
+       Django.
+
 .. _download page: https://www.djangoproject.com/download/
 .. _bsdtar: http://gnuwin32.sourceforge.net/packages/bsdtar.htm
 .. _7-zip: http://www.7-zip.org/
@@ -291,44 +285,26 @@ latest bug fixes and improvements, follow these instructions:
 
    This will create a directory ``django-trunk`` in your current directory.
 
-3. Next, make sure that the Python interpreter can load Django's code. The most
-   convenient way to do this is to `modify Python's search path`_. Add a ``.pth``
-   file containing the full path to the ``django-trunk`` directory to your
-   system's ``site-packages`` directory. For example, on a Unix-like system:
+3. Make sure that the Python interpreter can load Django's code. The most
+   convenient way to do this is via pip_. Run the following command:
 
    .. code-block:: bash
 
-       echo WORKING-DIR/django-trunk > SITE-PACKAGES-DIR/django.pth
+       sudo pip install -e django-trunk/
 
-   (In the above line, change ``SITE-PACKAGES-DIR`` to match the location of
-   your system's ``site-packages`` directory, as explained in the
-   :ref:`Where are my site-packages stored? <finding-site-packages>` section
-   above. Change ``WORKING-DIR/django-trunk`` to match the full path to your
-   new ``django-trunk`` directory.)
+   (If using a virtualenv_ you can omit ``sudo``.)
 
-4. On Unix-like systems, create a symbolic link to the file
-   ``django-trunk/django/bin/django-admin.py`` in a directory on your system
-   path, such as ``/usr/local/bin``. For example:
+   This will make Django's code importable, and will also make the
+   ``django-admin.py`` utility command available. In other words, you're all
+   set!
 
-   .. code-block:: bash
-
-       ln -s WORKING-DIR/django-trunk/django/bin/django-admin.py /usr/local/bin/
-
-   (In the above line, change WORKING-DIR to match the full path to your new
-   ``django-trunk`` directory.)
-
-   This simply lets you type ``django-admin.py`` from within any directory,
-   rather than having to qualify the command with the full path to the file.
-
-   On Windows systems, the same result can be achieved by copying the file
-   ``django-trunk/django/bin/django-admin.py`` to somewhere on your system
-   path, for example ``C:\Python27\Scripts``.
+   If you don't have pip_ available, see the alternative instructions for
+   `installing the development version without pip`_.
 
 .. warning::
 
     Don't run ``sudo python setup.py install``, because you've already
-    carried out the equivalent actions in steps 3 and 4. Furthermore, this is
-    known to cause problems when updating to a more recent version of Django.
+    carried out the equivalent actions in step 3.
 
 When you want to update your copy of the Django source code, just run the
 command ``git pull`` from within the ``django-trunk`` directory. When you do
@@ -336,3 +312,61 @@ this, Git will automatically download any changes.
 
 .. _Git: http://git-scm.com/
 .. _`modify Python's search path`: http://docs.python.org/install/index.html#modifying-python-s-search-path
+.. _installing-the-development-version-without-pip:
+
+Installing the development version without pip
+----------------------------------------------
+
+If you don't have pip_, you can instead manually `modify Python's search
+path`_.
+
+First follow steps 1 and 2 above, so that you have a ``django-trunk`` directory
+with a checkout of Django's latest code in it. Then add a ``.pth`` file
+containing the full path to the ``django-trunk`` directory to your system's
+``site-packages`` directory. For example, on a Unix-like system:
+
+.. code-block:: bash
+
+    echo WORKING-DIR/django-trunk > SITE-PACKAGES-DIR/django.pth
+
+In the above line, change ``WORKING-DIR/django-trunk`` to match the full path
+to your new ``django-trunk`` directory, and change ``SITE-PACKAGES-DIR`` to
+match the location of your system's ``site-packages`` directory.
+
+The location of the ``site-packages`` directory depends on the operating
+system, and the location in which Python was installed. To find your system's
+``site-packages`` location, execute the following:
+
+.. code-block:: bash
+
+    python -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())"
+
+(Note that this should be run from a shell prompt, not a Python interactive
+prompt.)
+
+Some Debian-based Linux distributions have separate ``site-packages``
+directories for user-installed packages, such as when installing Django from
+a downloaded tarball. The command listed above will give you the system's
+``site-packages``, the user's directory can be found in ``/usr/local/lib/``
+instead of ``/usr/lib/``.
+
+Next you need to make the ``django-admin.py`` utility available in your
+shell PATH.
+
+On Unix-like systems, create a symbolic link to the file
+``django-trunk/django/bin/django-admin.py`` in a directory on your system
+path, such as ``/usr/local/bin``. For example:
+
+.. code-block:: bash
+
+    ln -s WORKING-DIR/django-trunk/django/bin/django-admin.py /usr/local/bin/
+
+(In the above line, change WORKING-DIR to match the full path to your new
+``django-trunk`` directory.)
+
+This simply lets you type ``django-admin.py`` from within any directory,
+rather than having to qualify the command with the full path to the file.
+
+On Windows systems, the same result can be achieved by copying the file
+``django-trunk/django/bin/django-admin.py`` to somewhere on your system
+path, for example ``C:\Python27\Scripts``.

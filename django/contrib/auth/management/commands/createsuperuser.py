@@ -80,7 +80,7 @@ class Command(BaseCommand):
                     if default_username and username == '':
                         username = default_username
                     if not RE_VALID_USERNAME.match(username):
-                        sys.stderr.write("Error: That username is invalid. Use only letters, digits and underscores.\n")
+                        self.stderr.write("Error: That username is invalid. Use only letters, digits and underscores.")
                         username = None
                         continue
                     try:
@@ -88,7 +88,7 @@ class Command(BaseCommand):
                     except User.DoesNotExist:
                         break
                     else:
-                        sys.stderr.write("Error: That username is already taken.\n")
+                        self.stderr.write("Error: That username is already taken.")
                         username = None
 
                 # Get an email
@@ -98,7 +98,7 @@ class Command(BaseCommand):
                     try:
                         is_valid_email(email)
                     except exceptions.ValidationError:
-                        sys.stderr.write("Error: That e-mail address is invalid.\n")
+                        self.stderr.write("Error: That e-mail address is invalid.")
                         email = None
                     else:
                         break
@@ -109,19 +109,19 @@ class Command(BaseCommand):
                         password = getpass.getpass()
                         password2 = getpass.getpass('Password (again): ')
                         if password != password2:
-                            sys.stderr.write("Error: Your passwords didn't match.\n")
+                            self.stderr.write("Error: Your passwords didn't match.")
                             password = None
                             continue
                     if password.strip() == '':
-                        sys.stderr.write("Error: Blank passwords aren't allowed.\n")
+                        self.stderr.write("Error: Blank passwords aren't allowed.")
                         password = None
                         continue
                     break
             except KeyboardInterrupt:
-                sys.stderr.write("\nOperation cancelled.\n")
+                self.stderr.write("\nOperation cancelled.")
                 sys.exit(1)
 
         User.objects.db_manager(database).create_superuser(username, email, password)
         if verbosity >= 1:
-          self.stdout.write("Superuser created successfully.\n")
+          self.stdout.write("Superuser created successfully.")
 

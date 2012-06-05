@@ -1,7 +1,6 @@
 from django.core.paginator import Paginator, InvalidPage
 from django.core.exceptions import ImproperlyConfigured
 from django.http import Http404
-from django.utils.encoding import smart_str
 from django.utils.translation import ugettext as _
 from django.views.generic.base import TemplateResponseMixin, ContextMixin, View
 
@@ -16,7 +15,7 @@ class MultipleObjectMixin(ContextMixin):
 
     def get_queryset(self):
         """
-        Get the list of items for this view. This must be an interable, and may
+        Get the list of items for this view. This must be an iterable, and may
         be a queryset (in which qs-specific behavior will be enabled).
         """
         if self.queryset is not None:
@@ -77,7 +76,7 @@ class MultipleObjectMixin(ContextMixin):
         if self.context_object_name:
             return self.context_object_name
         elif hasattr(object_list, 'model'):
-            return smart_str('%s_list' % object_list.model._meta.object_name.lower())
+            return '%s_list' % object_list.model._meta.object_name.lower()
         else:
             return None
 
@@ -113,9 +112,19 @@ class BaseListView(MultipleObjectMixin, View):
     def get(self, request, *args, **kwargs):
         self.object_list = self.get_queryset()
         allow_empty = self.get_allow_empty()
-        if not allow_empty and len(self.object_list) == 0:
-            raise Http404(_(u"Empty list and '%(class_name)s.allow_empty' is False.")
-                          % {'class_name': self.__class__.__name__})
+
+        if not allow_empty:
+            # When pagination is enabled and object_list is a queryset,
+            # it's better to do a cheap query than to load the unpaginated
+            # queryset in memory.
+            if (self.get_paginate_by(self.object_list) is not None
+                and hasattr(self.object_list, 'exists')):
+                is_empty = not self.object_list.exists()
+            else:
+                is_empty = len(self.object_list) == 0
+            if is_empty:
+                raise Http404(_(u"Empty list and '%(class_name)s.allow_empty' is False.")
+                        % {'class_name': self.__class__.__name__})
         context = self.get_context_data(object_list=self.object_list)
         return self.render_to_response(context)
 
@@ -126,7 +135,7 @@ class MultipleObjectTemplateResponseMixin(TemplateResponseMixin):
     def get_template_names(self):
         """
         Return a list of template names to be used for the request. Must return
-        a list. May not be called if get_template is overridden.
+        a list. May not be called if render_to_response is overridden.
         """
         try:
             names = super(MultipleObjectTemplateResponseMixin, self).get_template_names()

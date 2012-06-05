@@ -22,7 +22,7 @@ tutorial, so that the template contains an HTML ``<form>`` element:
     {% csrf_token %}
     {% for choice in poll.choice_set.all %}
         <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}" />
-        <label for="choice{{ forloop.counter }}">{{ choice.choice }}</label><br />
+        <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br />
     {% endfor %}
     <input type="submit" value="Vote" />
     </form>
@@ -168,7 +168,7 @@ Now, create a ``results.html`` template:
 
     <ul>
     {% for choice in poll.choice_set.all %}
-        <li>{{ choice.choice }} -- {{ choice.votes }} vote{{ choice.votes|pluralize }}</li>
+        <li>{{ choice.choice_text }} -- {{ choice.votes }} vote{{ choice.votes|pluralize }}</li>
     {% endfor %}
     </ul>
 

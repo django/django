@@ -86,9 +86,14 @@ class ArchiveIndexViewTests(TestCase):
         # 1 query for years list + 1 query for books
         with self.assertNumQueries(2):
             self.client.get('/dates/books/')
-        # same as above + 1 query to test if books exist
-        with self.assertNumQueries(3):
+        # same as above + 1 query to test if books exist + 1 query to count them
+        with self.assertNumQueries(4):
             self.client.get('/dates/books/paginated/')
+
+    def test_no_duplicate_query(self):
+        # Regression test for #18354
+        with self.assertNumQueries(2):
+            self.client.get('/dates/books/reverse/')
 
     def test_datetime_archive_view(self):
         BookSigning.objects.create(event_date=datetime.datetime(2008, 4, 2, 12, 0))
@@ -110,8 +115,12 @@ class YearArchiveViewTests(TestCase):
         res = self.client.get('/dates/books/2008/')
         self.assertEqual(res.status_code, 200)
         self.assertEqual(list(res.context['date_list']), [datetime.datetime(2008, 10, 1)])
-        self.assertEqual(res.context['year'], '2008')
+        self.assertEqual(res.context['year'], datetime.date(2008, 1, 1))
         self.assertTemplateUsed(res, 'generic_views/book_archive_year.html')
+
+        # Since allow_empty=False, next/prev years must be valid (#7164)
+        self.assertEqual(res.context['next_year'], None)
+        self.assertEqual(res.context['previous_year'], datetime.date(2006, 1, 1))
 
     def test_year_view_make_object_list(self):
         res = self.client.get('/dates/books/2006/make_object_list/')
@@ -128,6 +137,10 @@ class YearArchiveViewTests(TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(list(res.context['date_list']), [])
         self.assertEqual(list(res.context['book_list']), [])
+
+        # Since allow_empty=True, next/prev are allowed to be empty years (#7164)
+        self.assertEqual(res.context['next_year'], datetime.date(2000, 1, 1))
+        self.assertEqual(res.context['previous_year'], datetime.date(1998, 1, 1))
 
     def test_year_view_allow_future(self):
         # Create a new book in the future
@@ -154,6 +167,11 @@ class YearArchiveViewTests(TestCase):
     def test_year_view_invalid_pattern(self):
         res = self.client.get('/dates/books/no_year/')
         self.assertEqual(res.status_code, 404)
+
+    def test_no_duplicate_query(self):
+        # Regression test for #18354
+        with self.assertNumQueries(4):
+            self.client.get('/dates/books/2008/reverse/')
 
     def test_datetime_year_view(self):
         BookSigning.objects.create(event_date=datetime.datetime(2008, 4, 2, 12, 0))
@@ -445,6 +463,13 @@ class DayArchiveViewTests(TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.context['next_day'], future)
         self.assertEqual(res.context['previous_day'], datetime.date(2006, 5, 1))
+
+        # allow_future for yesterday, next_day is today (#17192)
+        today = datetime.date.today()
+        yesterday = today - datetime.timedelta(days=1)
+        res = self.client.get('/dates/books/%s/allow_empty_and_future/'
+                              % yesterday.strftime('%Y/%b/%d').lower())
+        self.assertEqual(res.context['next_day'], today)
 
     def test_day_view_paginated(self):
         res = self.client.get('/dates/books/2008/oct/1/')

@@ -27,12 +27,15 @@ class Serializer(base.Serializer):
         self._current = {}
 
     def end_object(self, obj):
-        self.objects.append({
-            "model"  : smart_unicode(obj._meta),
-            "pk"     : smart_unicode(obj._get_pk_val(), strings_only=True),
-            "fields" : self._current
-        })
+        self.objects.append(self.get_dump_object(obj))
         self._current = None
+
+    def get_dump_object(self, obj):
+        return {
+            "pk": smart_unicode(obj._get_pk_val(), strings_only=True),
+            "model": smart_unicode(obj._meta),
+            "fields": self._current
+        }
 
     def handle_field(self, obj, field):
         value = field._get_val_from_obj(obj)

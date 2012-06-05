@@ -190,7 +190,7 @@ class HumanizeTests(TestCase):
         orig_humanize_datetime = humanize.datetime
         orig_timesince_datetime = timesince.datetime
         humanize.datetime = MockDateTime
-        timesince.datetime = new.module("mock_datetime")
+        timesince.datetime = new.module(b"mock_datetime")
         timesince.datetime.datetime = MockDateTime
 
         try:

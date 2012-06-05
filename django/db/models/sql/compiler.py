@@ -455,6 +455,9 @@ class SQLCompiler(object):
             alias = self.query.get_initial_alias()
         field, target, opts, joins, _, _ = self.query.setup_joins(pieces,
                 opts, alias, False)
+        # We will later on need to promote those joins that were added to the
+        # query afresh above.
+        joins_to_promote = [j for j in joins if self.query.alias_refcount[j] < 2]
         alias = joins[-1]
         col = target.column
         if not field.rel:
@@ -466,8 +469,9 @@ class SQLCompiler(object):
         # Must use left outer joins for nullable fields and their relations.
         # Ordering or distinct must not affect the returned set, and INNER
         # JOINS for nullable fields could do this.
-        self.query.promote_alias_chain(joins,
-            self.query.alias_map[joins[0]].join_type == self.query.LOUTER)
+        if joins_to_promote:
+            self.query.promote_alias_chain(joins_to_promote,
+                self.query.alias_map[joins_to_promote[0]].join_type == self.query.LOUTER)
         return field, col, alias, joins, opts
 
     def _final_join_removal(self, col, alias):
@@ -1015,6 +1019,12 @@ class SQLUpdateCompiler(SQLCompiler):
         query.extra = {}
         query.select = []
         query.add_fields([query.model._meta.pk.name])
+        # Recheck the count - it is possible that fiddling with the select
+        # fields above removes tables from the query. Refs #18304.
+        count = query.count_active_tables()
+        if not self.query.related_updates and count == 1:
+            return
+
         must_pre_select = count > 1 and not self.connection.features.update_can_self_select
 
         # Now we adjust the current query: reset the where clause and get rid

@@ -89,6 +89,12 @@ class MySQLTests(TestCase):
         else:
             self.assertFalse(found_reset)
 
+    @unittest.skipUnless(connection.vendor == 'mysql',
+                        "Test valid only for MySQL")
+    def test_server_version_connections(self):
+        connection.close()
+        connection.mysql_version
+        self.assertTrue(connection.connection is None)
 
 class DateQuotingTest(TestCase):
 
@@ -396,6 +402,12 @@ class BackendTestCase(TestCase):
         self.assertTrue(hasattr(connection, 'ops'))
         self.assertTrue(hasattr(connection.ops, 'connection'))
         self.assertEqual(connection, connection.ops.connection)
+
+    def test_supports_needed_confirm(self):
+        connection.features.confirm()
+        self.assertIn(connection.features.supports_transactions, (True, False))
+        self.assertIn(connection.features.supports_stddev, (True, False))
+        self.assertIn(connection.features.can_introspect_foreign_keys, (True, False))
 
     def test_duplicate_table_error(self):
         """ Test that creating an existing table returns a DatabaseError """

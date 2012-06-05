@@ -10,13 +10,12 @@ from django.test import TestCase, RequestFactory
 from django.test.utils import (setup_test_template_loader,
                                restore_template_loaders)
 from django.core.urlresolvers import reverse
-from django.template import TemplateSyntaxError
 from django.views.debug import ExceptionReporter
 from django.core import mail
 
 from .. import BrokenException, except_args
 from ..views import (sensitive_view, non_sensitive_view, paranoid_view,
-    custom_exception_reporter_filter_view)
+    custom_exception_reporter_filter_view, sensitive_method_view)
 
 
 class DebugViewTests(TestCase):
@@ -238,7 +237,8 @@ class ExceptionReportTestMixin(object):
                       'hash-brown-key': 'hash-brown-value',
                       'bacon-key': 'bacon-value',}
 
-    def verify_unsafe_response(self, view, check_for_vars=True):
+    def verify_unsafe_response(self, view, check_for_vars=True,
+                               check_for_POST_params=True):
         """
         Asserts that potentially sensitive info are displayed in the response.
         """
@@ -250,13 +250,14 @@ class ExceptionReportTestMixin(object):
             self.assertContains(response, 'scrambled', status_code=500)
             self.assertContains(response, 'sauce', status_code=500)
             self.assertContains(response, 'worcestershire', status_code=500)
+        if check_for_POST_params:
+            for k, v in self.breakfast_data.items():
+                # All POST parameters are shown.
+                self.assertContains(response, k, status_code=500)
+                self.assertContains(response, v, status_code=500)
 
-        for k, v in self.breakfast_data.items():
-            # All POST parameters are shown.
-            self.assertContains(response, k, status_code=500)
-            self.assertContains(response, v, status_code=500)
-
-    def verify_safe_response(self, view, check_for_vars=True):
+    def verify_safe_response(self, view, check_for_vars=True,
+                             check_for_POST_params=True):
         """
         Asserts that certain sensitive info are not displayed in the response.
         """
@@ -269,18 +270,19 @@ class ExceptionReportTestMixin(object):
             # Sensitive variable's name is shown but not its value.
             self.assertContains(response, 'sauce', status_code=500)
             self.assertNotContains(response, 'worcestershire', status_code=500)
+        if check_for_POST_params:
+            for k, v in self.breakfast_data.items():
+                # All POST parameters' names are shown.
+                self.assertContains(response, k, status_code=500)
+            # Non-sensitive POST parameters' values are shown.
+            self.assertContains(response, 'baked-beans-value', status_code=500)
+            self.assertContains(response, 'hash-brown-value', status_code=500)
+            # Sensitive POST parameters' values are not shown.
+            self.assertNotContains(response, 'sausage-value', status_code=500)
+            self.assertNotContains(response, 'bacon-value', status_code=500)
 
-        for k, v in self.breakfast_data.items():
-            # All POST parameters' names are shown.
-            self.assertContains(response, k, status_code=500)
-        # Non-sensitive POST parameters' values are shown.
-        self.assertContains(response, 'baked-beans-value', status_code=500)
-        self.assertContains(response, 'hash-brown-value', status_code=500)
-        # Sensitive POST parameters' values are not shown.
-        self.assertNotContains(response, 'sausage-value', status_code=500)
-        self.assertNotContains(response, 'bacon-value', status_code=500)
-
-    def verify_paranoid_response(self, view, check_for_vars=True):
+    def verify_paranoid_response(self, view, check_for_vars=True,
+                                 check_for_POST_params=True):
         """
         Asserts that no variables or POST parameters are displayed in the response.
         """
@@ -292,14 +294,14 @@ class ExceptionReportTestMixin(object):
             self.assertNotContains(response, 'scrambled', status_code=500)
             self.assertContains(response, 'sauce', status_code=500)
             self.assertNotContains(response, 'worcestershire', status_code=500)
+        if check_for_POST_params:
+            for k, v in self.breakfast_data.items():
+                # All POST parameters' names are shown.
+                self.assertContains(response, k, status_code=500)
+                # No POST parameters' values are shown.
+                self.assertNotContains(response, v, status_code=500)
 
-        for k, v in self.breakfast_data.items():
-            # All POST parameters' names are shown.
-            self.assertContains(response, k, status_code=500)
-            # No POST parameters' values are shown.
-            self.assertNotContains(response, v, status_code=500)
-
-    def verify_unsafe_email(self, view):
+    def verify_unsafe_email(self, view, check_for_POST_params=True):
         """
         Asserts that potentially sensitive info are displayed in the email report.
         """
@@ -314,12 +316,13 @@ class ExceptionReportTestMixin(object):
             self.assertNotIn('scrambled', email.body)
             self.assertNotIn('sauce', email.body)
             self.assertNotIn('worcestershire', email.body)
-            for k, v in self.breakfast_data.items():
-                # All POST parameters are shown.
-                self.assertIn(k, email.body)
-                self.assertIn(v, email.body)
+            if check_for_POST_params:
+                for k, v in self.breakfast_data.items():
+                    # All POST parameters are shown.
+                    self.assertIn(k, email.body)
+                    self.assertIn(v, email.body)
 
-    def verify_safe_email(self, view):
+    def verify_safe_email(self, view, check_for_POST_params=True):
         """
         Asserts that certain sensitive info are not displayed in the email report.
         """
@@ -334,15 +337,16 @@ class ExceptionReportTestMixin(object):
             self.assertNotIn('scrambled', email.body)
             self.assertNotIn('sauce', email.body)
             self.assertNotIn('worcestershire', email.body)
-            for k, v in self.breakfast_data.items():
-                # All POST parameters' names are shown.
-                self.assertIn(k, email.body)
-            # Non-sensitive POST parameters' values are shown.
-            self.assertIn('baked-beans-value', email.body)
-            self.assertIn('hash-brown-value', email.body)
-            # Sensitive POST parameters' values are not shown.
-            self.assertNotIn('sausage-value', email.body)
-            self.assertNotIn('bacon-value', email.body)
+            if check_for_POST_params:
+                for k, v in self.breakfast_data.items():
+                    # All POST parameters' names are shown.
+                    self.assertIn(k, email.body)
+                # Non-sensitive POST parameters' values are shown.
+                self.assertIn('baked-beans-value', email.body)
+                self.assertIn('hash-brown-value', email.body)
+                # Sensitive POST parameters' values are not shown.
+                self.assertNotIn('sausage-value', email.body)
+                self.assertNotIn('bacon-value', email.body)
 
     def verify_paranoid_email(self, view):
         """
@@ -424,6 +428,24 @@ class ExceptionReporterFilterTests(TestCase, ExceptionReportTestMixin):
         with self.settings(DEBUG=False):
             self.verify_unsafe_response(custom_exception_reporter_filter_view)
             self.verify_unsafe_email(custom_exception_reporter_filter_view)
+
+    def test_sensitive_method(self):
+        """
+        Ensure that the sensitive_variables decorator works with object
+        methods.
+        Refs #18379.
+        """
+        with self.settings(DEBUG=True):
+            self.verify_unsafe_response(sensitive_method_view,
+                                        check_for_POST_params=False)
+            self.verify_unsafe_email(sensitive_method_view,
+                                     check_for_POST_params=False)
+
+        with self.settings(DEBUG=False):
+            self.verify_safe_response(sensitive_method_view,
+                                      check_for_POST_params=False)
+            self.verify_safe_email(sensitive_method_view,
+                                   check_for_POST_params=False)
 
 
 class AjaxResponseExceptionReporterFilter(TestCase, ExceptionReportTestMixin):

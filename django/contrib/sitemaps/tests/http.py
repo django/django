@@ -1,14 +1,18 @@
+import os
 from datetime import date
+
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sitemaps import Sitemap, GenericSitemap
 from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured
+from django.test.utils import override_settings
 from django.utils.unittest import skipUnless
 from django.utils.formats import localize
 from django.utils.translation import activate, deactivate
 
 from .base import SitemapTestsBase
+
 
 class HTTPSitemapTests(SitemapTestsBase):
 
@@ -21,6 +25,9 @@ class HTTPSitemapTests(SitemapTestsBase):
 </sitemapindex>
 """ % self.base_url)
 
+    @override_settings(
+        TEMPLATE_DIRS=(os.path.join(os.path.dirname(__file__), 'templates'),)
+    )
     def test_simple_sitemap_custom_index(self):
         "A simple sitemap index can be rendered with a custom template"
         response = self.client.get('/simple/custom-index.xml')
@@ -49,6 +56,9 @@ class HTTPSitemapTests(SitemapTestsBase):
 </urlset>
 """ % (self.base_url, date.today()))
 
+    @override_settings(
+        TEMPLATE_DIRS=(os.path.join(os.path.dirname(__file__), 'templates'),)
+    )
     def test_simple_custom_sitemap(self):
         "A simple sitemap can be rendered with a custom template"
         response = self.client.get('/simple/custom-sitemap.xml')
@@ -60,10 +70,9 @@ class HTTPSitemapTests(SitemapTestsBase):
 """ % (self.base_url, date.today()))
 
     @skipUnless(settings.USE_I18N, "Internationalization is not enabled")
+    @override_settings(USE_L10N=True)
     def test_localized_priority(self):
         "The priority value should not be localized (Refs #14164)"
-        # Localization should be active
-        settings.USE_L10N = True
         activate('fr')
         self.assertEqual(u'0,3', localize(0.3))
 

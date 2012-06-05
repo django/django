@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+import gzip
 import shutil
 import tempfile
 
@@ -8,11 +9,12 @@ from django.core.files import File
 from django.core.files.base import ContentFile
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
+from django.utils import unittest
 
 from .models import Storage, temp_storage, temp_storage_location
 
 
-class FileTests(TestCase):
+class FileStorageTests(TestCase):
     def tearDown(self):
         shutil.rmtree(temp_storage_location)
 
@@ -106,6 +108,8 @@ class FileTests(TestCase):
         obj3.default.delete()
         obj4.random.delete()
 
+
+class FileTests(unittest.TestCase):
     def test_context_manager(self):
         orig_file = tempfile.TemporaryFile()
         base_file = File(orig_file)
@@ -114,3 +118,10 @@ class FileTests(TestCase):
             self.assertFalse(f.closed)
         self.assertTrue(f.closed)
         self.assertTrue(orig_file.closed)
+
+    def test_file_mode(self):
+        # Should not set mode to None if it is not present.
+        # See #14681, stdlib gzip module crashes if mode is set to None
+        file = SimpleUploadedFile("mode_test.txt", "content")
+        self.assertFalse(hasattr(file, 'mode'))
+        g = gzip.GzipFile(fileobj=file)

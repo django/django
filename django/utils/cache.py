@@ -23,7 +23,7 @@ import time
 
 from django.conf import settings
 from django.core.cache import get_cache
-from django.utils.encoding import smart_str, iri_to_uri, force_unicode
+from django.utils.encoding import iri_to_uri, force_unicode
 from django.utils.http import http_date
 from django.utils.timezone import get_current_timezone_name
 from django.utils.translation import get_language
@@ -53,7 +53,7 @@ def patch_cache_control(response, **kwargs):
         if t[1] is True:
             return t[0]
         else:
-            return t[0] + '=' + smart_str(t[1])
+            return '%s=%s' % (t[0], t[1])
 
     if response.has_header('Cache-Control'):
         cc = cc_delim_re.split(response['Cache-Control'])

@@ -96,7 +96,7 @@ The ``ContentFile`` Class
 
         from django.core.files.base import ContentFile
 
-        f1 = ContentFile("my string content")
+        f1 = ContentFile(b"my string content")
         f2 = ContentFile(u"my unicode content encoded as UTF-8".encode('UTF-8'))
 
 .. currentmodule:: django.core.files.images

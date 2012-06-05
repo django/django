@@ -18,6 +18,10 @@ class CustomField(TestCase):
         self.assertEqual(d.data, [1, 2, 3])
 
         d = DataModel.objects.defer("data").get(pk=d.pk)
+        self.assertTrue(isinstance(d.data, list))
+        self.assertEqual(d.data, [1, 2, 3])
+        # Refetch for save
+        d = DataModel.objects.defer("data").get(pk=d.pk)
         d.save()
 
         d = DataModel.objects.get(pk=d.pk)

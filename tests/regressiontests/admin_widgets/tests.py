@@ -280,7 +280,7 @@ class AdminFileWidgetTest(DjangoTestCase):
         )
 
         self.assertHTMLEqual(
-            conditional_escape(w.render('test', SimpleUploadedFile('test', 'content'))),
+            conditional_escape(w.render('test', SimpleUploadedFile('test', b'content'))),
             '<input type="file" name="test" />',
         )
 

@@ -155,12 +155,12 @@ class BoundMethodWeakref(object):
     def __nonzero__( self ):
         """Whether we are still a valid reference"""
         return self() is not None
-    
-    def __cmp__( self, other ):
+
+    def __eq__(self, other):
         """Compare with another reference"""
-        if not isinstance (other,self.__class__):
-            return cmp( self.__class__, type(other) )
-        return cmp( self.key, other.key)
+        if not isinstance(other, self.__class__):
+            return self.__class__ == type(other)
+        return self.key == other.key
     
     def __call__(self):
         """Return a strong reference to the bound method

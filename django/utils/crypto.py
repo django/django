@@ -8,6 +8,7 @@ import hashlib
 import binascii
 import operator
 import time
+from functools import reduce
 
 # Use the system PRNG if possible
 import random
@@ -23,8 +24,8 @@ except NotImplementedError:
 from django.conf import settings
 
 
-_trans_5c = "".join([chr(x ^ 0x5C) for x in xrange(256)])
-_trans_36 = "".join([chr(x ^ 0x36) for x in xrange(256)])
+_trans_5c = b"".join([chr(x ^ 0x5C) for x in xrange(256)])
+_trans_36 = b"".join([chr(x ^ 0x36) for x in xrange(256)])
 
 
 def salted_hmac(key_salt, value, secret=None):
@@ -148,11 +149,11 @@ def pbkdf2(password, salt, iterations, dklen=0, digest=None):
 
     def F(i):
         def U():
-            u = salt + struct.pack('>I', i)
+            u = salt + struct.pack(b'>I', i)
             for j in xrange(int(iterations)):
                 u = _fast_hmac(password, u, digest).digest()
                 yield _bin_to_long(u)
         return _long_to_bin(reduce(operator.xor, U()), hex_format_string)
 
     T = [F(x) for x in range(1, l + 1)]
-    return ''.join(T[:-1]) + T[-1][:r]
+    return b''.join(T[:-1]) + T[-1][:r]

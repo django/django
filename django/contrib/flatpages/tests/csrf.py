@@ -18,9 +18,10 @@ from django.test.utils import override_settings
     TEMPLATE_DIRS=(
         os.path.join(os.path.dirname(__file__), 'templates'),
     ),
+    SITE_ID=1,
 )
 class FlatpageCSRFTests(TestCase):
-    fixtures = ['sample_flatpages']
+    fixtures = ['sample_flatpages', 'example_site']
     urls = 'django.contrib.flatpages.tests.urls'
 
     def setUp(self):

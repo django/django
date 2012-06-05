@@ -478,6 +478,14 @@ class FieldsTests(SimpleTestCase):
         self.assertRaisesMessage(ValidationError, "[u'Ensure this value has at most 10 characters (it has 11).']", f.clean, '12345678901')
         self.assertRaisesMessage(ValidationError, "[u'Enter a valid value.']", f.clean, '12345a')
 
+    def test_regexfield_6(self):
+        """
+        Ensure that it works with unicode characters.
+        Refs #.
+        """
+        f = RegexField('^\w+$')
+        self.assertEqual(u'éèøçÎÎ你好', f.clean(u'éèøçÎÎ你好'))
+
     def test_change_regex_after_init(self):
         f = RegexField('^[a-z]+$')
         f.regex = '^\d+$'
@@ -540,27 +548,27 @@ class FieldsTests(SimpleTestCase):
         self.assertRaisesMessage(ValidationError, "[u'This field is required.']", f.clean, None)
         self.assertRaisesMessage(ValidationError, "[u'This field is required.']", f.clean, None, '')
         self.assertEqual('files/test2.pdf', f.clean(None, 'files/test2.pdf'))
-        self.assertRaisesMessage(ValidationError, "[u'No file was submitted. Check the encoding type on the form.']", f.clean, SimpleUploadedFile('', ''))
-        self.assertRaisesMessage(ValidationError, "[u'No file was submitted. Check the encoding type on the form.']", f.clean, SimpleUploadedFile('', ''), '')
+        self.assertRaisesMessage(ValidationError, "[u'No file was submitted. Check the encoding type on the form.']", f.clean, SimpleUploadedFile('', b''))
+        self.assertRaisesMessage(ValidationError, "[u'No file was submitted. Check the encoding type on the form.']", f.clean, SimpleUploadedFile('', b''), '')
         self.assertEqual('files/test3.pdf', f.clean(None, 'files/test3.pdf'))
         self.assertRaisesMessage(ValidationError, "[u'No file was submitted. Check the encoding type on the form.']", f.clean, 'some content that is not a file')
         self.assertRaisesMessage(ValidationError, "[u'The submitted file is empty.']", f.clean, SimpleUploadedFile('name', None))
-        self.assertRaisesMessage(ValidationError, "[u'The submitted file is empty.']", f.clean, SimpleUploadedFile('name', ''))
-        self.assertEqual(SimpleUploadedFile, type(f.clean(SimpleUploadedFile('name', 'Some File Content'))))
-        self.assertEqual(SimpleUploadedFile, type(f.clean(SimpleUploadedFile('我隻氣墊船裝滿晒鱔.txt', 'मेरी मँडराने वाली नाव सर्पमीनों से भरी ह'))))
-        self.assertEqual(SimpleUploadedFile, type(f.clean(SimpleUploadedFile('name', 'Some File Content'), 'files/test4.pdf')))
+        self.assertRaisesMessage(ValidationError, "[u'The submitted file is empty.']", f.clean, SimpleUploadedFile('name', b''))
+        self.assertEqual(SimpleUploadedFile, type(f.clean(SimpleUploadedFile('name', b'Some File Content'))))
+        self.assertEqual(SimpleUploadedFile, type(f.clean(SimpleUploadedFile('我隻氣墊船裝滿晒鱔.txt', u'मेरी मँडराने वाली नाव सर्पमीनों से भरी ह'.encode('utf-8')))))
+        self.assertEqual(SimpleUploadedFile, type(f.clean(SimpleUploadedFile('name', b'Some File Content'), 'files/test4.pdf')))
 
     def test_filefield_2(self):
         f = FileField(max_length = 5)
-        self.assertRaisesMessage(ValidationError, "[u'Ensure this filename has at most 5 characters (it has 18).']", f.clean, SimpleUploadedFile('test_maxlength.txt', 'hello world'))
+        self.assertRaisesMessage(ValidationError, "[u'Ensure this filename has at most 5 characters (it has 18).']", f.clean, SimpleUploadedFile('test_maxlength.txt', b'hello world'))
         self.assertEqual('files/test1.pdf', f.clean('', 'files/test1.pdf'))
         self.assertEqual('files/test2.pdf', f.clean(None, 'files/test2.pdf'))
-        self.assertEqual(SimpleUploadedFile, type(f.clean(SimpleUploadedFile('name', 'Some File Content'))))
+        self.assertEqual(SimpleUploadedFile, type(f.clean(SimpleUploadedFile('name', b'Some File Content'))))
 
     def test_filefield_3(self):
         f = FileField(allow_empty_file=True)
         self.assertEqual(SimpleUploadedFile,
-                         type(f.clean(SimpleUploadedFile('name', ''))))
+                         type(f.clean(SimpleUploadedFile('name', b''))))
 
     # URLField ##################################################################
 
@@ -977,39 +985,30 @@ class FieldsTests(SimpleTestCase):
             self.assertTrue(got[0].endswith(exp[0]))
 
     def test_filepathfield_folders(self):
-        path = forms.__file__
-        path = os.path.dirname(path) + '/'
+        path = os.path.dirname(__file__) + '/filepath_test_files/'
         f = FilePathField(path=path, allow_folders=True, allow_files=False)
         f.choices.sort()
         expected = [
-            ('/django/forms/extras', 'extras'),
+            ('/tests/regressiontests/forms/tests/filepath_test_files/directory', 'directory'),
         ]
         for exp, got in zip(expected, fix_os_paths(f.choices)):
             self.assertEqual(exp[1], got[1])
-            self.assert_(got[0].endswith(exp[0]))
+            self.assertTrue(got[0].endswith(exp[0]))
 
         f = FilePathField(path=path, allow_folders=True, allow_files=True)
         f.choices.sort()
         expected = [
-            ('/django/forms/__init__.py', '__init__.py'),
-            ('/django/forms/__init__.pyc', '__init__.pyc'),
-            ('/django/forms/extras', 'extras'),
-            ('/django/forms/fields.py', 'fields.py'),
-            ('/django/forms/fields.pyc', 'fields.pyc'),
-            ('/django/forms/forms.py', 'forms.py'),
-            ('/django/forms/forms.pyc', 'forms.pyc'),
-            ('/django/forms/formsets.py', 'formsets.py'),
-            ('/django/forms/formsets.pyc', 'formsets.pyc'),
-            ('/django/forms/models.py', 'models.py'),
-            ('/django/forms/models.pyc', 'models.pyc'),
-            ('/django/forms/util.py', 'util.py'),
-            ('/django/forms/util.pyc', 'util.pyc'),
-            ('/django/forms/widgets.py', 'widgets.py'),
-            ('/django/forms/widgets.pyc', 'widgets.pyc')
+            ('/tests/regressiontests/forms/tests/filepath_test_files/.dot-file', '.dot-file'),
+            ('/tests/regressiontests/forms/tests/filepath_test_files/directory', 'directory'),
+            ('/tests/regressiontests/forms/tests/filepath_test_files/fake-image.jpg', 'fake-image.jpg'),
+            ('/tests/regressiontests/forms/tests/filepath_test_files/real-text-file.txt', 'real-text-file.txt'),
         ]
-        for exp, got in zip(expected, fix_os_paths(f.choices)):
+
+        actual = fix_os_paths(f.choices)
+        self.assertEqual(len(expected), len(actual))
+        for exp, got in zip(expected, actual):
             self.assertEqual(exp[1], got[1])
-            self.assertEqual(exp[1], got[1])
+            self.assertTrue(got[0].endswith(exp[0]))
 
 
     # SplitDateTimeField ##########################################################

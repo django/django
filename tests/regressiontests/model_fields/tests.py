@@ -208,7 +208,7 @@ class BooleanFieldTests(unittest.TestCase):
         # Verify that when an extra clause exists, the boolean
         # conversions are applied with an offset
         b5 = BooleanModel.objects.all().extra(
-            select={'string_length': 'LENGTH(string)'})[0]
+            select={'string_col': 'string'})[0]
         self.assertFalse(isinstance(b5.pk, bool))
 
 class ChoicesTests(test.TestCase):
@@ -365,3 +365,15 @@ class FileFieldTests(unittest.TestCase):
         field = d._meta.get_field('myfile')
         field.save_form_data(d, 'else.txt')
         self.assertEqual(d.myfile, 'else.txt')
+
+    def test_max_length(self):
+        """
+        Test that FileField validates the length of the generated file name
+        that will be stored in the database. Regression for #9893.
+
+        """
+        # upload_to = 'unused', so file names are saved as 'unused/xxxxx'.
+        # max_length = 100, so names longer than 93 characters are rejected.
+        Document(myfile=93 * 'x').full_clean()
+        with self.assertRaises(ValidationError):
+            Document(myfile=94 * 'x').full_clean()

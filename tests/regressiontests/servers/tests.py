@@ -113,7 +113,7 @@ class LiveServerViews(LiveServerBase):
         Refs #2879.
         """
         f = self.urlopen('/example_view/')
-        self.assertEqual(f.read(), 'example view')
+        self.assertEqual(f.read(), b'example view')
 
     def test_static_files(self):
         """
@@ -121,7 +121,7 @@ class LiveServerViews(LiveServerBase):
         Refs #2879.
         """
         f = self.urlopen('/static/example_static_file.txt')
-        self.assertEqual(f.read(), 'example static file\n')
+        self.assertEqual(f.read().rstrip(b'\r\n'), b'example static file')
 
     def test_media_files(self):
         """
@@ -129,7 +129,7 @@ class LiveServerViews(LiveServerBase):
         Refs #2879.
         """
         f = self.urlopen('/media/example_media_file.txt')
-        self.assertEqual(f.read(), 'example media file\n')
+        self.assertEqual(f.read().rstrip(b'\r\n'), b'example media file')
 
 
 class LiveServerDatabase(LiveServerBase):

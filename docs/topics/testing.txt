@@ -805,45 +805,56 @@ arguments at time of construction:
 
     .. method:: Client.head(path, data={}, follow=False, **extra)
 
-        Makes a HEAD request on the provided ``path`` and returns a ``Response``
-        object. Useful for testing RESTful interfaces. Acts just like
-        :meth:`Client.get` except it does not return a message body.
+        Makes a HEAD request on the provided ``path`` and returns a
+        ``Response`` object. This method works just like :meth:`Client.get`,
+        including the ``follow`` and ``extra`` arguments, except it does not
+        return a message body.
 
-        If you set ``follow`` to ``True`` the client will follow any redirects
-        and a ``redirect_chain`` attribute will be set in the response object
-        containing tuples of the intermediate urls and status codes.
-
-    .. method:: Client.options(path, data={}, follow=False, **extra)
+    .. method:: Client.options(path, data='', content_type='application/octet-stream', follow=False, **extra)
 
         Makes an OPTIONS request on the provided ``path`` and returns a
         ``Response`` object. Useful for testing RESTful interfaces.
 
-        If you set ``follow`` to ``True`` the client will follow any redirects
-        and a ``redirect_chain`` attribute will be set in the response object
-        containing tuples of the intermediate urls and status codes.
+        When ``data`` is provided, it is used as the request body, and
+        a ``Content-Type`` header is set to ``content_type``.
 
-        The ``extra`` argument acts the same as for :meth:`Client.get`.
+        .. versionchanged:: 1.5
+            :meth:`Client.options` used to process ``data`` like
+            :meth:`Client.get`.
 
-    .. method:: Client.put(path, data={}, content_type=MULTIPART_CONTENT, follow=False, **extra)
+        The ``follow`` and ``extra`` arguments act the same as for
+        :meth:`Client.get`.
+
+    .. method:: Client.put(path, data='', content_type='application/octet-stream', follow=False, **extra)
 
         Makes a PUT request on the provided ``path`` and returns a
-        ``Response`` object. Useful for testing RESTful interfaces. Acts just
-        like :meth:`Client.post` except with the PUT request method.
+        ``Response`` object. Useful for testing RESTful interfaces.
 
-        If you set ``follow`` to ``True`` the client will follow any redirects
-        and a ``redirect_chain`` attribute will be set in the response object
-        containing tuples of the intermediate urls and status codes.
+        When ``data`` is provided, it is used as the request body, and
+        a ``Content-Type`` header is set to ``content_type``.
 
-    .. method:: Client.delete(path, follow=False, **extra)
+        .. versionchanged:: 1.5
+            :meth:`Client.put` used to process ``data`` like
+            :meth:`Client.post`.
+
+        The ``follow`` and ``extra`` arguments act the same as for
+        :meth:`Client.get`.
+
+    .. method:: Client.delete(path, data='', content_type='application/octet-stream', follow=False, **extra)
 
         Makes an DELETE request on the provided ``path`` and returns a
         ``Response`` object. Useful for testing RESTful interfaces.
 
-        If you set ``follow`` to ``True`` the client will follow any redirects
-        and a ``redirect_chain`` attribute will be set in the response object
-        containing tuples of the intermediate urls and status codes.
+        When ``data`` is provided, it is used as the request body, and
+        a ``Content-Type`` header is set to ``content_type``.
 
-        The ``extra`` argument acts the same as for :meth:`Client.get`.
+        .. versionchanged:: 1.5
+            :meth:`Client.delete` used to process ``data`` like
+            :meth:`Client.get`.
+
+        The ``follow`` and ``extra`` arguments act the same as for
+        :meth:`Client.get`.
+
 
     .. method:: Client.login(**credentials)
 

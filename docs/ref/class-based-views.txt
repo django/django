@@ -1171,7 +1171,15 @@ YearArchiveView
       have objects available according to ``queryset``, represented as
       ``datetime.datetime`` objects, in ascending order.
 
-    * ``year``: The given year, as a four-character string.
+    * ``year``: A ``datetime.date`` object representing the given year.
+
+    * ``next_year``: A ``datetime.date`` object representing the first day
+      of the next year. If the next year is in the future, this will be
+      ``None``.
+
+    * ``previous_year``: A ``datetime.date`` object representing the first
+      day of the previous year. Unlike ``next_year``, this will never be
+      ``None``.
 
     **Notes**
 
@@ -1254,6 +1262,14 @@ WeekArchiveView
 
     * ``week``: A ``datetime.date`` object representing the first day of
       the given week.
+
+    * ``next_week``: A ``datetime.date`` object representing the first day
+      of the next week. If the next week is in the future, this will be
+      ``None``.
+
+    * ``previous_week``: A ``datetime.date`` object representing the first
+      day of the previous week. Unlike ``next_week``, this will never be
+      ``None``.
 
     **Notes**
 
