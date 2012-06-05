@@ -245,6 +245,14 @@ prompts.
 The :djadminopt:`--database` option may be used to specify the database
 to flush.
 
+--no-initial-data
+~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.5
+
+Use ``--no-initial-data`` to avoid loading the initial_data fixture.
+
+
 inspectdb
 ---------
 
@@ -1023,6 +1031,13 @@ prompts.
 
 The :djadminopt:`--database` option can be used to specify the database to
 synchronize.
+
+--no-initial-data
+~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.5
+
+Use ``--no-initial-data`` to avoid loading the initial_data fixture.
 
 test <app or test identifier>
 -----------------------------
