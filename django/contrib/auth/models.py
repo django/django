@@ -235,14 +235,16 @@ class User(models.Model):
     email = models.EmailField(_('e-mail address'), blank=True)
     password = models.CharField(_('password'), max_length=128)
     is_staff = models.BooleanField(_('staff status'), default=False,
-        help_text=_('Designates whether the user can log into this admin '
-                    'site.'))
+        db_index=True, help_text=_('Designates whether the user can log '
+                                   'into this admin site.'))
     is_active = models.BooleanField(_('active'), default=True,
-        help_text=_('Designates whether this user should be treated as '
-                    'active. Unselect this instead of deleting accounts.'))
+        db_index=True, help_text=_('Designates whether this user should be '
+                                   'treated as active. Unselect this instead '
+                                   'of deleting accounts.'))
     is_superuser = models.BooleanField(_('superuser status'), default=False,
-        help_text=_('Designates that this user has all permissions without '
-                    'explicitly assigning them.'))
+        db_index=True, help_text=_('Designates that this user has '
+                                   'all permissions without explicitly '
+                                   'assigning them.'))
     last_login = models.DateTimeField(_('last login'), default=timezone.now)
     date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
     groups = models.ManyToManyField(Group, verbose_name=_('groups'),
