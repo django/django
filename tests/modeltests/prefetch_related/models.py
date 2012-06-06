@@ -68,6 +68,9 @@ class Reader(models.Model):
     class Meta:
         ordering = ['id']
 
+class BookReview(models.Model):
+    book = models.ForeignKey(BookWithYear)
+    notes = models.TextField(null=True, blank=True)
 
 ## Models for default manager tests
 

@@ -329,10 +329,10 @@ class ReverseSingleRelatedObjectDescriptor(object):
             return QuerySet(self.field.rel.to).using(db)
 
     def get_prefetch_query_set(self, instances):
-        rel_obj_attr = attrgetter(self.field.rel.field_name)
+        other_field = self.field.rel.get_related_field()
+        rel_obj_attr = attrgetter(other_field.attname)
         instance_attr = attrgetter(self.field.attname)
         instances_dict = dict((instance_attr(inst), inst) for inst in instances)
-        other_field = self.field.rel.get_related_field()
         if other_field.rel:
             params = {'%s__pk__in' % self.field.rel.field_name: instances_dict.keys()}
         else:
