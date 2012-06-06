@@ -334,7 +334,6 @@ Once you have ``MytypeField``, you can use it in any model, just like any other
 
     class Person(models.Model):
         name = models.CharField(max_length=80)
-        gender = models.CharField(max_length=1)
         something_else = MytypeField()
 
 If you aim to build a database-agnostic application, you should account for

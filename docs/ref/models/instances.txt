@@ -572,25 +572,29 @@ might have some of the following methods:
 
 For every field that has :attr:`~django.db.models.Field.choices` set, the
 object will have a ``get_FOO_display()`` method, where ``FOO`` is the name of
-the field. This method returns the "human-readable" value of the field. For
-example, in the following model::
+the field. This method returns the "human-readable" value of the field.
 
-    GENDER_CHOICES = (
-        ('M', 'Male'),
-        ('F', 'Female'),
-    )
-    class Person(models.Model):
-        name = models.CharField(max_length=20)
-        gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
+For example::
 
-...each ``Person`` instance will have a ``get_gender_display()`` method. Example::
+        from django.db import models
 
-    >>> p = Person(name='John', gender='M')
-    >>> p.save()
-    >>> p.gender
-    'M'
-    >>> p.get_gender_display()
-    'Male'
+        class Person(models.Model):
+            SHIRT_SIZES = (
+                (u'S', u'Small'),
+                (u'M', u'Medium'),
+                (u'L', u'Large'),
+            )
+            name = models.CharField(max_length=60)
+            shirt_size = models.CharField(max_length=2, choices=SHIRT_SIZES)
+
+    ::
+
+        >>> p = Person(name="Fred Flintstone", shirt_size="L")
+        >>> p.save()
+        >>> p.shirt_size
+        u'L'
+        >>> p.get_shirt_size_display()
+        u'Large'
 
 .. method:: Model.get_next_by_FOO(\**kwargs)
 .. method:: Model.get_previous_by_FOO(\**kwargs)
