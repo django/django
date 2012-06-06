@@ -483,7 +483,7 @@ class ForeignRelatedObjectsDescriptor(object):
                     return qs
 
             def get_prefetch_query_set(self, instances):
-                rel_obj_attr = attrgetter(rel_field.get_attname())
+                rel_obj_attr = attrgetter(rel_field.attname)
                 instance_attr = attrgetter(attname)
                 instances_dict = dict((instance_attr(inst), inst) for inst in instances)
                 db = self._db or router.db_for_read(self.model, instance=instances[0])
