@@ -40,9 +40,6 @@ def check_password(password, encoded, setter=None, preferred='default'):
         return False
 
     preferred = get_hasher(preferred)
-    raw_password = password
-    password = smart_str(password)
-    encoded = smart_str(encoded)
 
     if len(encoded) == 32 and '$' not in encoded:
         hasher = get_hasher('unsalted_md5')
@@ -53,7 +50,7 @@ def check_password(password, encoded, setter=None, preferred='default'):
     must_update = hasher.algorithm != preferred.algorithm
     is_correct = hasher.verify(password, encoded)
     if setter and is_correct and must_update:
-        setter(raw_password)
+        setter(password)
     return is_correct
 
 
@@ -69,11 +66,9 @@ def make_password(password, salt=None, hasher='default'):
         return UNUSABLE_PASSWORD
 
     hasher = get_hasher(hasher)
-    password = smart_str(password)
 
     if not salt:
         salt = hasher.salt()
-    salt = smart_str(salt)
 
     return hasher.encode(password, salt)
 
@@ -291,7 +286,7 @@ class SHA1PasswordHasher(BasePasswordHasher):
     def encode(self, password, salt):
         assert password
         assert salt and '$' not in salt
-        hash = hashlib.sha1(salt + password).hexdigest()
+        hash = hashlib.sha1(smart_str(salt + password)).hexdigest()
         return "%s$%s$%s" % (self.algorithm, salt, hash)
 
     def verify(self, password, encoded):
@@ -319,7 +314,7 @@ class MD5PasswordHasher(BasePasswordHasher):
     def encode(self, password, salt):
         assert password
         assert salt and '$' not in salt
-        hash = hashlib.md5(salt + password).hexdigest()
+        hash = hashlib.md5(smart_str(salt + password)).hexdigest()
         return "%s$%s$%s" % (self.algorithm, salt, hash)
 
     def verify(self, password, encoded):
@@ -353,7 +348,7 @@ class UnsaltedMD5PasswordHasher(BasePasswordHasher):
         return ''
 
     def encode(self, password, salt):
-        return hashlib.md5(password).hexdigest()
+        return hashlib.md5(smart_str(password)).hexdigest()
 
     def verify(self, password, encoded):
         encoded_2 = self.encode(password, '')

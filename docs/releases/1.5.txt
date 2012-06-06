@@ -128,6 +128,15 @@ If you were using the ``data`` parameter in a PUT request without a
 ``content_type``, you must encode your data before passing it to the test
 client and set the ``content_type`` argument.
 
+String types of hasher method parameters
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you have written a :ref:`custom password hasher <auth_password_storage>`,
+your ``encode()``, ``verify()`` or ``safe_summary()`` methods should accept
+Unicode parameters (``password``, ``salt`` or ``encoded``). If any of the
+hashing methods need byte strings, you can use the
+:func:`~django.utils.encoding.smart_str` utility to encode the strings.
+
 Features deprecated in 1.5
 ==========================
 

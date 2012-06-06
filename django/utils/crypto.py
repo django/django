@@ -22,6 +22,7 @@ except NotImplementedError:
     using_sysrandom = False
 
 from django.conf import settings
+from django.utils.encoding import smart_str
 
 
 _trans_5c = b"".join([chr(x ^ 0x5C) for x in xrange(256)])
@@ -137,6 +138,8 @@ def pbkdf2(password, salt, iterations, dklen=0, digest=None):
     assert iterations > 0
     if not digest:
         digest = hashlib.sha256
+    password = smart_str(password)
+    salt = smart_str(salt)
     hlen = digest().digest_size
     if not dklen:
         dklen = hlen

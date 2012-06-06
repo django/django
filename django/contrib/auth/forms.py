@@ -1,7 +1,6 @@
 from django import forms
 from django.forms.util import flatatt
 from django.template import loader
-from django.utils.encoding import smart_str
 from django.utils.http import int_to_base36
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext, ugettext_lazy as _
@@ -25,8 +24,6 @@ class ReadOnlyPasswordHashWidget(forms.Widget):
             return "None"
 
         final_attrs = self.build_attrs(attrs)
-
-        encoded = smart_str(encoded)
 
         if len(encoded) == 32 and '$' not in encoded:
             algorithm = 'unsalted_md5'
