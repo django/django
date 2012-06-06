@@ -27,34 +27,12 @@ class TestNoInitialDataLoading(TestCase):
         management.call_command(
             'syncdb',
             verbosity=0,
-            commit=False
-        )
-        self.assertQuerysetEqual(
-            Book.objects.all(), [
-                u'Achieving self-awareness of Python programs'
-            ],
-            lambda a: a.name
-        )
-
-        Book.objects.all().delete()
-
-        management.call_command(
-            'syncdb',
-            verbosity=0,
-            commit=False,
             load_initial_data=False
         )
         self.assertQuerysetEqual(Book.objects.all(), [])
 
     def test_flush(self):
-        Book.objects.all().delete()
-
-        management.call_command(
-            'flush',
-            verbosity=0,
-            interactive=False,
-            commit=False
-        )
+        # Test presence of fixture (flush called by TransactionTestCase)
         self.assertQuerysetEqual(
             Book.objects.all(), [
                 u'Achieving self-awareness of Python programs'
@@ -62,12 +40,9 @@ class TestNoInitialDataLoading(TestCase):
             lambda a: a.name
         )
 
-        Book.objects.all().delete()
-
         management.call_command(
             'flush',
             verbosity=0,
-            commit=False,
             interactive=False,
             load_initial_data=False
         )
