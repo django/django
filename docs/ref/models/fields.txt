@@ -103,20 +103,26 @@ element is the human-readable name for the option.
 The choices list can be defined either as part of your model class::
 
     class Foo(models.Model):
-        GENDER_CHOICES = (
-            ('M', 'Male'),
-            ('F', 'Female'),
+        YEAR_IN_SCHOOL_CHOICES = (
+            ('FR', 'Freshman'),
+            ('SO', 'Sophomore'),
+            ('JR', 'Junior'),
+            ('SR', 'Senior'),
+            ('GR', 'Graduate'),
         )
-        gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
+        year_in_school = models.CharField(max_length=2, choices=YEAR_IN_SCHOOL_CHOICES)
 
 or outside your model class altogether::
 
-    GENDER_CHOICES = (
-        ('M', 'Male'),
-        ('F', 'Female'),
+    YEAR_IN_SCHOOL_CHOICES = (
+        ('FR', 'Freshman'),
+        ('SO', 'Sophomore'),
+        ('JR', 'Junior'),
+        ('SR', 'Senior'),
+        ('GR', 'Graduate'),
     )
     class Foo(models.Model):
-        gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
+        year_in_school = models.CharField(max_length=2, choices=YEAR_IN_SCHOOL_CHOICES)
 
 You can also collect your available choices into named groups that can
 be used for organizational purposes::

@@ -172,21 +172,22 @@ ones:
         from django.db import models
 
         class Person(models.Model):
-            GENDER_CHOICES = (
-                (u'M', u'Male'),
-                (u'F', u'Female'),
+            SHIRT_SIZES = (
+                (u'S', u'Small'),
+                (u'M', u'Medium'),
+                (u'L', u'Large'),
             )
             name = models.CharField(max_length=60)
-            gender = models.CharField(max_length=2, choices=GENDER_CHOICES)
+            shirt_size = models.CharField(max_length=2, choices=SHIRT_SIZES)
 
     ::
 
-        >>> p = Person(name="Fred Flintstone", gender="M")
+        >>> p = Person(name="Fred Flintstone", shirt_size="L")
         >>> p.save()
-        >>> p.gender
-        u'M'
-        >>> p.get_gender_display()
-        u'Male'
+        >>> p.shirt_size
+        u'L'
+        >>> p.get_shirt_size_display()
+        u'Large'
 
 :attr:`~Field.default`
     The default value for the field. This can be a value or a callable
