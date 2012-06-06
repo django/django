@@ -68,7 +68,7 @@ Basic usage
 
    .. code-block:: html+django
 
-       <img src="{{ STATIC_URL }}images/hi.jpg" />
+       <img src="{{ STATIC_URL }}images/hi.jpg" alt="Hi!" />
 
    See :ref:`staticfiles-in-templates` for more details, **including** an
    alternate method using a template tag.
@@ -131,7 +131,7 @@ You could, of course, simply hardcode the path to you assets in the templates:
 
 .. code-block:: html
 
-    <img src="http://static.example.com/static/myimage.jpg" />
+    <img src="http://static.example.com/static/myimage.jpg" alt="Sample image" />
 
 Of course, there are some serious problems with this: it doesn't work well in
 development, and it makes it *very* hard to change where you've deployed your
@@ -167,7 +167,7 @@ Once that's done, you can refer to :setting:`STATIC_URL` in your templates:
 
 .. code-block:: html+django
 
-     <img src="{{ STATIC_URL }}images/hi.jpg" />
+     <img src="{{ STATIC_URL }}images/hi.jpg" alt="Hi!" />
 
 If ``{{ STATIC_URL }}`` isn't working in your template, you're probably not
 using :class:`~django.template.RequestContext` when rendering the template.
@@ -193,7 +193,7 @@ tag. It builds the URL for the given relative path by using the configured
 .. code-block:: html+django
 
     {% load staticfiles %}
-    <img src="{% static "images/hi.jpg" %}" />
+    <img src="{% static "images/hi.jpg" %}" alt="Hi!"/>
 
 It is also able to consume standard context variables, e.g. assuming a
 ``user_stylesheet`` variable is passed to the template:

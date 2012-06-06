@@ -683,7 +683,7 @@ directory on the filesystem. Has three special arguments, of which the first is
     Optional. A regular expression, as a string, that :class:`FilePathField`
     will use to filter filenames. Note that the regex will be applied to the
     base filename, not the full path. Example: ``"foo.*\.txt$"``, which will
-    match a file called ``foo23.txt`` but not ``bar.txt`` or ``foo23.gif``.
+    match a file called ``foo23.txt`` but not ``bar.txt`` or ``foo23.png``.
 
 .. attribute:: FilePathField.recursive
 
@@ -714,9 +714,9 @@ base filename, not the full path. So, this example::
 
     FilePathField(path="/home/images", match="foo.*", recursive=True)
 
-...will match ``/home/images/foo.gif`` but not ``/home/images/foo/bar.gif``
+...will match ``/home/images/foo.png`` but not ``/home/images/foo/bar.png``
 because the :attr:`~FilePathField.match` applies to the base filename
-(``foo.gif`` and ``bar.gif``).
+(``foo.png`` and ``bar.png``).
 
 By default, :class:`FilePathField` instances are
 created as ``varchar(100)`` columns in your database. As with other fields, you

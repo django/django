@@ -279,7 +279,7 @@ Here's what the "base.html" template might look like:
         <title>{% block title %}{% endblock %}</title>
     </head>
     <body>
-        <img src="sitelogo.gif" alt="Logo" />
+        <img src="sitelogo.png" alt="Logo" />
         {% block content %}{% endblock %}
     </body>
     </html>

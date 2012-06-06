@@ -1069,7 +1069,8 @@ value to a maximum value, and then applies that ratio to a constant.
 
 For example::
 
-    <img src="bar.gif" height="10" width="{% widthratio this_value max_value 100 %}" />
+    <img src="bar.png" alt="Bar"
+         height="10" width="{% widthratio this_value max_value 100 %}" />
 
 Above, if ``this_value`` is 175 and ``max_value`` is 200, the image in the
 above example will be 88 pixels wide (because 175/200 = .875; .875 * 100 = 87.5
@@ -2361,7 +2362,7 @@ using :class:`~django.template.RequestContext` or not.
 .. code-block:: html+django
 
     {% load static %}
-    <img src="{% static "images/hi.jpg" %}" />
+    <img src="{% static "images/hi.jpg" %}" alt="Hi!" />
 
 It is also able to consume standard context variables, e.g. assuming a
 ``user_stylesheet`` variable is passed to the template:
@@ -2380,7 +2381,7 @@ It is also able to consume standard context variables, e.g. assuming a
     :ref:`using a cloud service to serve static files<staticfiles-from-cdn>`::
 
         {% load static from staticfiles %}
-        <img src="{% static "images/hi.jpg" %}" />
+        <img src="{% static "images/hi.jpg" %}" alt="Hi!" />
 
 .. templatetag:: get_static_prefix
 
@@ -2395,7 +2396,7 @@ into the template, you can use the :ttag:`get_static_prefix` template tag
 instead::
 
     {% load static %}
-    <img src="{% get_static_prefix %}images/hi.jpg" />
+    <img src="{% get_static_prefix %}images/hi.jpg" alt="Hi!" />
 
 There's also a second form you can use to avoid extra processing if you need
 the value multiple times::
@@ -2403,8 +2404,8 @@ the value multiple times::
     {% load static %}
     {% get_static_prefix as STATIC_PREFIX %}
 
-    <img src="{{ STATIC_PREFIX }}images/hi.jpg" />
-    <img src="{{ STATIC_PREFIX }}images/hi2.jpg" />
+    <img src="{{ STATIC_PREFIX }}images/hi.jpg" alt="Hi!" />
+    <img src="{{ STATIC_PREFIX }}images/hi2.jpg" alt="Hello!" />
 
 .. templatetag:: get_media_prefix
 
