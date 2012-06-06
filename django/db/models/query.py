@@ -1296,7 +1296,7 @@ def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
         # Build the list of fields that *haven't* been requested
         for field, model in klass._meta.get_fields_with_model():
             if field.name not in load_fields:
-                skip.add(field.name)
+                skip.add(field.attname)
             elif local_only and model is not None:
                 continue
             else:
@@ -1327,7 +1327,7 @@ def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
 
     related_fields = []
     for f in klass._meta.fields:
-        if select_related_descend(f, restricted, requested):
+        if select_related_descend(f, restricted, requested, load_fields):
             if restricted:
                 next = requested[f.name]
             else:
@@ -1339,7 +1339,8 @@ def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
     reverse_related_fields = []
     if restricted:
         for o in klass._meta.get_all_related_objects():
-            if o.field.unique and select_related_descend(o.field, restricted, requested, reverse=True):
+            if o.field.unique and select_related_descend(o.field, restricted, requested,
+                                                         only_load.get(o.model), reverse=True):
                 next = requested[o.field.related_query_name()]
                 klass_info = get_klass_info(o.model, max_depth=max_depth, cur_depth=cur_depth+1,
                                             requested=next, only_load=only_load, local_only=True)
