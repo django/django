@@ -1403,7 +1403,7 @@ class AdminViewStringPrimaryKeyTest(TestCase):
 
     def test_url_conflicts_with_add(self):
         "A model with a primary key that ends with add should be visible"
-        add_model = ModelWithStringPrimaryKey(id="i have something to add")
+        add_model = ModelWithStringPrimaryKey(pk="i have something to add")
         add_model.save()
         response = self.client.get('/test_admin/admin/admin_views/modelwithstringprimarykey/%s/' % quote(add_model.pk))
         should_contain = """<h1>Change model with string primary key</h1>"""
@@ -1411,7 +1411,7 @@ class AdminViewStringPrimaryKeyTest(TestCase):
 
     def test_url_conflicts_with_delete(self):
         "A model with a primary key that ends with delete should be visible"
-        delete_model = ModelWithStringPrimaryKey(id="delete")
+        delete_model = ModelWithStringPrimaryKey(pk="delete")
         delete_model.save()
         response = self.client.get('/test_admin/admin/admin_views/modelwithstringprimarykey/%s/' % quote(delete_model.pk))
         should_contain = """<h1>Change model with string primary key</h1>"""
@@ -1419,10 +1419,18 @@ class AdminViewStringPrimaryKeyTest(TestCase):
 
     def test_url_conflicts_with_history(self):
         "A model with a primary key that ends with history should be visible"
-        history_model = ModelWithStringPrimaryKey(id="history")
+        history_model = ModelWithStringPrimaryKey(pk="history")
         history_model.save()
         response = self.client.get('/test_admin/admin/admin_views/modelwithstringprimarykey/%s/' % quote(history_model.pk))
         should_contain = """<h1>Change model with string primary key</h1>"""
+        self.assertContains(response, should_contain)
+
+    def test_shortcut_view_with_escaping(self):
+        "'View on site should' work properly with char fields"
+        model = ModelWithStringPrimaryKey(pk='abc_123')
+        model.save()
+        response = self.client.get('/test_admin/admin/admin_views/modelwithstringprimarykey/%s/' % quote(model.pk))
+        should_contain = '/%s/" class="viewsitelink">' % model.pk
         self.assertContains(response, should_contain)
 
 
