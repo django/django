@@ -109,7 +109,7 @@ If not provided, all locales are processed.
 
 Example usage::
 
-    django-admin.py compilemessages --locale=br_PT
+    django-admin.py compilemessages --locale=pt_BR
 
 createcachetable
 ----------------
@@ -426,7 +426,7 @@ Use the :djadminopt:`--locale` option to specify the locale to process.
 
 Example usage::
 
-    django-admin.py makemessages --locale=br_PT
+    django-admin.py makemessages --locale=pt_BR
 
 .. django-admin-option:: --domain
 
