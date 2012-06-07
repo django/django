@@ -1,11 +1,11 @@
-=========================
-Class-based generic views
-=========================
+=================
+Class-based views
+=================
 
 .. versionadded:: 1.3
 
 .. note::
-    Prior to Django 1.3, generic views were implemented as functions. The
+    Prior to Django 1.3, class based views were implemented as functions. The
     function-based implementation has been removed in favor of the
     class-based approach described here.
 
@@ -14,7 +14,7 @@ again and again. Django tries to take away some of that monotony at the model
 and template layers, but Web developers also experience this boredom at the view
 level.
 
-A general introduction to class-based generic views can be found in the
+A general introduction to class-based views can be found in the
 :doc:`topic guide </topics/class-based-views>`.
 
 This reference contains details of Django's built-in class based views, along with
@@ -25,18 +25,19 @@ additional-information dictionary.
 Fundamental class based views
 =============================
 
-The following three views provide much of the functionality needed to create
-Django views. They may not provide all the capabilities that required for
-projects, in which case there are Mixins and Generic class based views.
+The following three classes provide much of the functionality needed to create
+Django views. You may think of them as *base* views, which can be used by
+themselves or inherited from.  They may not provide all the capabilities required
+for projects, in which case there are Mixins and Generic class based views.
 
 .. currentmodule:: django.views.generic.base
 
 View
 ----
-.. class:: View()
+.. class:: django.views.generic.base.View()
 
-    The master class-based base view. All other generic class-based views
-    inherit from this base class.
+    The master class-based base view. All other class-based views inherit from
+    this base class.
 
     Each request served by a :class:`~django.views.generic.base.View` has an
     independent state; therefore, it is safe to store state variables on the
@@ -86,7 +87,7 @@ View
 
 TemplateView
 ------------
-.. class:: TemplateView()
+.. class:: django.views.generic.base.TemplateView()
 
     Renders a given template, passing it a ``{{ params }}`` template variable,
     which is a dictionary of the parameters captured in the URL.
@@ -111,7 +112,7 @@ TemplateView
 
 RedirectView
 ------------
-.. class:: RedirectView()
+.. class:: django.views.generic.base.RedirectView()
 
     Redirects to a given URL.
 
