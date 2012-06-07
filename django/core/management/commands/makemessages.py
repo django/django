@@ -304,7 +304,7 @@ def make_messages(locale=None, domain='django', verbosity=1, all=False,
 
     locales = []
     if locale is not None:
-        locales.append(str(locale))
+        locales += locale.split(',') if not isinstance(locale, list) else locale
     elif all:
         locale_dirs = filter(os.path.isdir, glob.glob('%s/*' % localedir))
         locales = [os.path.basename(l) for l in locale_dirs]
@@ -341,8 +341,8 @@ def make_messages(locale=None, domain='django', verbosity=1, all=False,
 
 class Command(NoArgsCommand):
     option_list = NoArgsCommand.option_list + (
-        make_option('--locale', '-l', default=None, dest='locale',
-            help='Creates or updates the message files for the given locale (e.g. pt_BR).'),
+        make_option('--locale', '-l', default=None, dest='locale', action='append',
+            help='Creates or updates the message files for the given locale(s) (e.g. pt_BR). Can be used multiple times, accepts a comma-separated list of locale names.'),
         make_option('--domain', '-d', default='django', dest='domain',
             help='The domain of the message files (default: "django").'),
         make_option('--all', '-a', action='store_true', dest='all',
