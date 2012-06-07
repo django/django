@@ -1,46 +1,25 @@
-=========================
-Class-based generic views
-=========================
+=================
+Class-based views
+=================
 
 .. versionadded:: 1.3
 
-.. note::
-    Prior to Django 1.3, generic views were implemented as functions. The
-    function-based implementation has been removed in favor of the
-    class-based approach described here.
+A view is a callable which takes a request and returns a response. This can be
+more than just a function, and Django provides an example of some classes which
+can be used as views. These allow you to structure your views and reuse code by
+harnessing inheritance and mixins. There are also some generic views for simple
+tasks which we'll get to later, but you may want to deisgn your own structure
+of reusable views which suits your use case.
 
-Writing Web applications can be monotonous, because we repeat certain patterns
-again and again. Django tries to take away some of that monotony at the model
-and template layers, but Web developers also experience this boredom at the view
-level.
+Basic examples
+==============
 
-Django's *generic views* were developed to ease that pain. They take certain
-common idioms and patterns found in view development and abstract them so that
-you can quickly write common views of data without having to write too much
-code.
-
-We can recognize certain common tasks, like displaying a list of objects, and
-write code that displays a list of *any* object. Then the model in question can
-be passed as an extra argument to the URLconf.
-
-Django ships with generic views to do the following:
-
-* Perform common "simple" tasks: redirect to a different page and
-  render a given template.
-
-* Display list and detail pages for a single object. If we were creating an
-  application to manage conferences then a ``TalkListView`` and a
-  ``RegisteredUserListView`` would be examples of list views. A single
-  talk page is an example of what we call a "detail" view.
-
-* Present date-based objects in year/month/day archive pages,
-  associated detail, and "latest" pages.
-
-* Allow users to create, update, and delete objects -- with or
-  without authorization.
-
-Taken together, these views provide easy interfaces to perform the most common
-tasks developers encounter.
+Django provides base view classes which will suit a wide range of applications.
+All views inherit from the `~django.views.generic.base.View` class, which
+handles linking the view in to the URLs, HTTP method dispatching and other
+simple features. `~django.views.generic.base.RedirectView` is for a simple HTTP
+redirect, and `~django.views.generic.base.TemplateView` extends the base class
+to make it also render a template.
 
 
 Simple usage
@@ -89,6 +68,46 @@ method call itself::
 A similar overriding pattern can be used for the ``url`` attribute on
 :class:`~django.views.generic.base.RedirectView`, another simple
 generic view.
+
+
+=========================
+Class-based generic views
+=========================
+
+.. note::
+    Prior to Django 1.3, generic views were implemented as functions. The
+    function-based implementation has been removed in favor of the
+    class-based approach described here.
+
+Writing Web applications can be monotonous, because we repeat certain patterns
+again and again. Django tries to take away some of that monotony at the model
+and template layers, but Web developers also experience this boredom at the view
+level.
+
+Django's *generic views* were developed to ease that pain. They take certain
+common idioms and patterns found in view development and abstract them so that
+you can quickly write common views of data without having to write too much
+code.
+
+We can recognize certain common tasks, like displaying a list of objects, and
+write code that displays a list of *any* object. Then the model in question can
+be passed as an extra argument to the URLconf.
+
+Django ships with generic views to do the following:
+
+* Display list and detail pages for a single object. If we were creating an
+  application to manage conferences then a ``TalkListView`` and a
+  ``RegisteredUserListView`` would be examples of list views. A single
+  talk page is an example of what we call a "detail" view.
+
+* Present date-based objects in year/month/day archive pages,
+  associated detail, and "latest" pages.
+
+* Allow users to create, update, and delete objects -- with or
+  without authorization.
+
+Taken together, these views provide easy interfaces to perform the most common
+tasks developers encounter.
 
 
 Generic views of objects
