@@ -312,7 +312,7 @@ commonly used groups of widgets:
 
         .. versionchanged:: 1.5
             The ``check_test()`` method used to silently catch all exceptions
-            raised during its call, this is not the case anymore.
+            raised during its call. This is not the case anymore.
 
 ``Select``
 ~~~~~~~~~~
