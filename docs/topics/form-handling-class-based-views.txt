@@ -115,3 +115,51 @@ Example of full add/edit/delete for one model::
     If you wish to have separate templates for ``CreateView`` and ``UpdateView``, you
     can set either :attr:`template_name` or :attr:`template_name_suffix` on
     your view class.
+
+Models and request.user
+-----------------------
+
+To track the user that created an object using a ``CreateView``, you can do the
+following...
+
+First, add the foreign key relation to the model::
+
+    # models.py
+    from django import models
+    from django.contrib.auth import User
+
+    class Author(models.Model):
+        name = models.CharField(max_length=200)
+        created_by = models.ForeignKey(User)
+
+        def get_absolute_url(self):
+            return '/author/%s/' % self.pk
+
+Create a custom ``ModelForm`` in order to exclude the ``created_by`` field and
+prevent the user from editing it:
+
+.. code-block:: python
+
+    # forms.py
+    from django import forms
+    from myapp.models import Author
+    
+    class AuthorForm(forms.ModelForm):
+        class Meta:
+            model = Author
+            exclude = ('created_by',)
+
+In the view, use the custom ``form_class`` and override ``form_valid`` to add the user::
+
+    # views.py
+    from django.views.generic.edit import CreateView
+    from myapp.models import Author
+    from myapp.forms import AuthorForm
+    
+    class AuthorCreate(CreateView):
+        form_class = AuthorForm
+        model = Author
+
+        def form_valid(self, form):
+            form.instance.created_by = self.request.user
+            return super(AuthorCreate, self).form_valid(form)
