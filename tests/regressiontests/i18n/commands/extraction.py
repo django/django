@@ -269,7 +269,7 @@ class NoLocationExtractorTests(ExtractorTests):
             self.assertTrue('#: templates/test.html:55' in po_contents)
 
 
-class MultipleLocalesTestCase(ExtractorTests):
+class ExtractionMultipleLocalesTestCase(ExtractorTests):
     PO_FILE_PT = 'locale/pt/LC_MESSAGES/django.po'
     PO_FILE_DE = 'locale/de/LC_MESSAGES/django.po'
     LOCALES = ['pt', 'de', 'ch']

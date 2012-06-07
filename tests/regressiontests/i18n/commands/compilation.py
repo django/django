@@ -74,8 +74,8 @@ class PercentRenderingTests(MessageCompilationTests):
             self.assertEqual(rendered, 'IT translation of Completed 50%% of all the tasks')
 
 
-class MultipleLocalesTestCase(TestCase):
-    MO_FILE_DE = None
+class CompilationMultipleLocalesTestCase(TestCase):
+    MO_FILE_HR = None
     MO_FILE_FR = None
     
     def setUp(self):
@@ -85,13 +85,13 @@ class MultipleLocalesTestCase(TestCase):
             os.path.dirname(os.path.abspath(__file__)), 'locale'
         )
         settings.LOCALE_PATHS = [self.localedir]
-        self.MO_FILE_DE = os.path.join(self.localedir, 'de/LC_MESSAGES/django.mo')
+        self.MO_FILE_HR = os.path.join(self.localedir, 'hr/LC_MESSAGES/django.mo')
         self.MO_FILE_FR = os.path.join(self.localedir, 'fr/LC_MESSAGES/django.mo')
         
     def tearDown(self):
         settings.LOCALE_PATHS = self._old_locale_paths
         self.stderr.close()
-        self._rmfile(os.path.join(self.localedir, self.MO_FILE_DE))
+        self._rmfile(os.path.join(self.localedir, self.MO_FILE_HR))
         self._rmfile(os.path.join(self.localedir, self.MO_FILE_FR))
         
     def _rmfile(self, filepath):
@@ -100,13 +100,13 @@ class MultipleLocalesTestCase(TestCase):
             
     def test_one_locale(self):
         command = compilemessages.Command()
-        command.execute(locale='de', stderr=self.stderr)
+        command.execute(locale='hr', stderr=self.stderr)
         
-        self.assertTrue(os.path.exists(self.MO_FILE_DE))
+        self.assertTrue(os.path.exists(self.MO_FILE_HR))
         
     def test_multiple_locales(self):
         command = compilemessages.Command()
-        command.execute(locale=['de', 'fr'], stderr=self.stderr)
+        command.execute(locale=['hr', 'fr'], stderr=self.stderr)
         
-        self.assertTrue(os.path.exists(self.MO_FILE_DE))
+        self.assertTrue(os.path.exists(self.MO_FILE_HR))
         self.assertTrue(os.path.exists(self.MO_FILE_FR))
