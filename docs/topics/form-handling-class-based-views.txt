@@ -87,6 +87,7 @@ Example of full add/edit/delete for one model::
 
     class AuthorDelete(DeleteView):
         model = Author
+        success_url = '/authors/'
 
     # urls.py
     from django.conf.urls import patterns, url
