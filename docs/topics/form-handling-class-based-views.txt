@@ -64,6 +64,11 @@ You don't even need to provide a success_url for ``CreateView`` or
 If you want to use a custom ``ModelForm`` (to add extra constraints or validation)
 simply set :attr:`form_class` to your custom form class.
 
+.. note::
+    When specifying a custom form class, you must still specify the model,
+    even though the form_class may be a ModelForm.
+    (See https://code.djangoproject.com/ticket/15125)
+
 Example of full add/edit/delete for one model::
 
     # models.py
