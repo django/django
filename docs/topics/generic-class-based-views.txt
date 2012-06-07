@@ -224,6 +224,8 @@ more::
     children of that class will also need to explictly set it after super if they
     want to be sure to override all parents.
 
+.. _generic-views-list-subsets:
+
 Viewing subsets of objects
 --------------------------
 
@@ -394,7 +396,11 @@ custom view:
 
     urlpatterns = patterns('',
         #...
-        **(r'^authors/(?P<pk>\\d+)/$', AuthorDetailView.as_view()),**
+        **url(
+            r'^authors/(?P<pk>\\d+)/$',
+            AuthorDetailView.as_view(),
+            name='author-detail'
+        ),**
     )
 
 Then we'd write our new view -- ``get_object`` is the method that retrieves the
