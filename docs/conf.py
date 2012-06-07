@@ -18,6 +18,10 @@ import os
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "_ext")))
+sys.path.insert(0, os.path.abspath('../'))
+
+from django.conf import settings
+settings.configure()
 
 # -- General configuration -----------------------------------------------------
 
@@ -26,7 +30,7 @@ needs_sphinx = '1.0'
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ["djangodocs", "sphinx.ext.intersphinx"]
+extensions = ["djangodocs", "sphinx.ext.intersphinx", 'sphinx.ext.autodoc']
 
 # Add any paths that contain templates here, relative to this directory.
 # templates_path = []

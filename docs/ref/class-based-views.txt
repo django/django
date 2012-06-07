@@ -9,6 +9,7 @@ Class-based views
     function-based implementation has been removed in favor of the
     class-based approach described here.
 
+
 Writing Web applications can be monotonous, because we repeat certain patterns
 again and again. Django tries to take away some of that monotony at the model
 and template layers, but Web developers also experience this boredom at the view
@@ -59,9 +60,14 @@ this means that every request on ``MyView`` is able to interrogate
 
 .. currentmodule:: django.views.generic.base
 
+
+
 View
 ~~~~
-.. class:: View()
+.. autoclass:: django.views.generic.base.View
+    :members:
+    :undoc-members:
+    :inherited-members:
 
     The master class-based base view. All other class-based views inherit from
     this base class.
@@ -75,29 +81,6 @@ View
         1. dispatch()
         2. http_method_not_allowed()
 
-    **Methods**
-
-    .. method:: dispatch(request, *args, **kwargs)
-
-        The ``view`` part of the view -- the method that accepts a ``request``
-        argument plus arguments, and returns a HTTP response.
-
-        The default implementation will inspect the HTTP method and attempt to
-        delegate to a method that matches the HTTP method; a ``GET`` will be
-        delegated to :meth:`~View.get()`, a ``POST`` to :meth:`~View.post()`,
-        and so on.
-
-        The default implementation also sets ``request``, ``args`` and
-        ``kwargs`` as instance variables, so any method on the view can know
-        the full details of the request that was made to invoke the view.
-
-    .. method:: http_method_not_allowed(request, *args, **kwargs)
-
-        If the view was called with HTTP method it doesn't support, this method
-        is called instead.
-
-        The default implementation returns ``HttpResponseNotAllowed`` with list
-        of allowed methods in plain text.
 
     **Example views.py**::
 
@@ -123,10 +106,39 @@ View
                 name    = "my_view",
             ),
         )
+        
+    **Methods**
+
+    .. method:: dispatch(request, *args, **kwargs)
+
+        The ``view`` part of the view -- the method that accepts a ``request``
+        argument plus arguments, and returns a HTTP response.
+
+        The default implementation will inspect the HTTP method and attempt to
+        delegate to a method that matches the HTTP method; a ``GET`` will be
+        delegated to :meth:`~View.get()`, a ``POST`` to :meth:`~View.post()`,
+        and so on.
+
+        The default implementation also sets ``request``, ``args`` and
+        ``kwargs`` as instance variables, so any method on the view can know
+        the full details of the request that was made to invoke the view.
+
+    .. method:: http_method_not_allowed(request, *args, **kwargs)
+
+        If the view was called with HTTP method it doesn't support, this method
+        is called instead.
+
+        The default implementation returns ``HttpResponseNotAllowed`` with list
+        of allowed methods in plain text.   
+        
+    **Autoclass methods**
 
 TemplateView
 ~~~~~~~~~~~~
-.. class:: TemplateView()
+.. autoclass:: django.views.generic.base.TemplateView
+    :members:
+    :undoc-members:
+    :inherited-members:
 
     Renders a given template, passing it a ``{{ params }}`` template variable,
     which is a dictionary of the parameters captured in the URL.
@@ -145,22 +157,6 @@ TemplateView
         1. dispatch()
         2. http_method_not_allowed()
         3. get_context_data()
-
-    **Methods and Attributes**
-
-    .. attribute:: template_name
-
-        The full name of a template to use.
-
-    .. method:: get_context_data(**kwargs)
-
-        Return a context data dictionary consisting of the contents of
-        ``kwargs`` stored in the context variable ``params``.
-
-    **Context**
-
-    * ``params``: The dictionary of keyword arguments captured from the URL
-      pattern that served the view.
       
     **Example views.py**::
 
@@ -190,11 +186,32 @@ TemplateView
                 view    = HomePageView.as_view(),
                 name    = "home",
             ),
-        )                
+        )
+
+    **Methods and Attributes**
+
+    .. attribute:: template_name
+
+        The full name of a template to use.
+
+    .. method:: get_context_data(**kwargs)
+
+        Return a context data dictionary consisting of the contents of
+        ``kwargs`` stored in the context variable ``params``.
+
+    **Context**
+
+    * ``params``: The dictionary of keyword arguments captured from the URL
+      pattern that served the view.
+
+    **Autoclass methods**
 
 RedirectView
 ~~~~~~~~~~~~
-.. class:: RedirectView()
+.. autoclass:: django.views.generic.base.RedirectView
+    :members:
+    :undoc-members:
+    :inherited-members:
 
     Redirects to a given URL.
 
@@ -207,47 +224,19 @@ RedirectView
     If the given URL is ``None``, Django will return an ``HttpResponseGone``
     (410).
     
+    **Classpath**
+    
+    `django.views.generic.base.RedirectView`
+    
     **Ancestors (MRO)**
     
-    * :class:`django.views.generic.base.RedirectView`
+    * :class:`django.views.generic.base.View`
     
     **Method Flowchart**
 
         1. dispatch()
         2. http_method_not_allowed()
         3. get_redirect_url()
-
-    **Methods and Attributes**
-
-    .. attribute:: url
-
-        The URL to redirect to, as a string. Or ``None`` to raise a 410 (Gone)
-        HTTP error.
-
-    .. attribute:: permanent
-
-        Whether the redirect should be permanent. The only difference here is
-        the HTTP status code returned. If ``True``, then the redirect will use
-        status code 301. If ``False``, then the redirect will use status code
-        302. By default, ``permanent`` is ``True``.
-
-    .. attribute:: query_string
-
-        Whether to pass along the GET query string to the new location. If
-        ``True``, then the query string is appended to the URL. If ``False``,
-        then the query string is discarded. By default, ``query_string`` is
-        ``False``.
-
-    .. method:: get_redirect_url(**kwargs)
-
-        Constructs the target URL for redirection.
-
-        The default implementation uses :attr:`~RedirectView.url` as a starting
-        string, performs expansion of ``%`` parameters in that string, as well
-        as the appending of query string if requested by
-        :attr:`~RedirectView.query_string`. Subclasses may implement any
-        behavior they wish, as long as the method returns a redirect-ready URL
-        string.
 
     **Example views.py**::
 
@@ -288,7 +277,41 @@ RedirectView
                 ),
                 name = "go_to_django",
             ),
-        )        
+        )
+
+    **Methods and Attributes**
+
+    .. attribute:: url
+
+        The URL to redirect to, as a string. Or ``None`` to raise a 410 (Gone)
+        HTTP error.
+
+    .. attribute:: permanent
+
+        Whether the redirect should be permanent. The only difference here is
+        the HTTP status code returned. If ``True``, then the redirect will use
+        status code 301. If ``False``, then the redirect will use status code
+        302. By default, ``permanent`` is ``True``.
+
+    .. attribute:: query_string
+
+        Whether to pass along the GET query string to the new location. If
+        ``True``, then the query string is appended to the URL. If ``False``,
+        then the query string is discarded. By default, ``query_string`` is
+        ``False``.
+
+    .. method:: get_redirect_url(**kwargs)
+
+        Constructs the target URL for redirection.
+
+        The default implementation uses :attr:`~RedirectView.url` as a starting
+        string, performs expansion of ``%`` parameters in that string, as well
+        as the appending of query string if requested by
+        :attr:`~RedirectView.query_string`. Subclasses may implement any
+        behavior they wish, as long as the method returns a redirect-ready URL
+        string.        
+
+    **Autoclass methods**
 
 Generic views
 =============
@@ -302,24 +325,84 @@ instance; see :doc:`/topics/db/queries` for more information about ``QuerySet``
 objects.
 
 
-Detail views
-------------
+Display views
+--------------
+
+The two following generic class based views are designed to display data. They 
+are typically the most commonly used generic class based views.
 
 .. currentmodule:: django.views.generic.detail
 
 DetailView
 ~~~~~~~~~~
-.. class:: DetailView()
-
-    A page representing an individual object.
+.. autoclass:: django.views.generic.detail.DetailView
+    :members:
+    :undoc-members:
+    :inherited-members:
 
     While this view is executing, ``self.object`` will contain the object that
     the view is operating upon.
-
-    **Mixins**
-
-    * :class:`django.views.generic.detail.SingleObjectMixin`
+    
+    **Classpath**
+    
+    `django.views.generic.detail.DetailView`
+    
+    **Ancestors (MRO)**
+    
     * :class:`django.views.generic.detail.SingleObjectTemplateResponseMixin`
+    * :class:`django.views.generic.base.TemplateResponseMixin`
+    * :class:`django.views.generic.detail.BaseDetailView`
+    * :class:`django.views.generic.detail.SingleObjectMixin`
+    * :class:`django.views.generic.base.View`
+
+    **Method Flowchart**
+
+    1. dispatch()
+    2. http_method_not_allowed()
+    3. get_template_names()
+    4. get_slug_field()
+    5. get_queryset()
+    6. get_object
+    7. get_context_object_name()
+    8. get_context_data()
+    9. get()        
+    10. render_to_response()
+
+    **Example views.py**::
+
+        from datetime import datetime
+
+        from django.views.generic.detail import DetailView
+
+        from articles.models import Article
+
+        class ArticleDetailView(DetailView):
+        
+            model = Article
+
+            def get_context_data(self, **kwargs):
+                context = super(ArticleDetailView, self).get_context_data(**kwargs)
+                context['now'] = datetime.now()
+                return context
+
+    **Example urls.py**::
+    
+        from django.conf.urls.defaults import patterns, url
+    
+        from article.views import ArticleDetailView
+
+        urlpatterns = patterns("",
+
+            url(
+                regex   = r"r^(?P<slug>[-_\w]+)/$",
+                view    = ArticleDetailView.as_view(),
+                name    = "article_detail"
+            ),
+        )    
+
+    **Methods and Attributes**
+    
+    .. Comment: Autoclass called at top of this class will publish this data.
 
 List views
 ----------
