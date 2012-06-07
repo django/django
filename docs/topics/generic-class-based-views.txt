@@ -403,7 +403,7 @@ object -- so we simply override it and wrap the call::
 
     from django.views.generic import DetailView
     from django.shortcuts import get_object_or_404
-    from django.utils.timezone import now
+    from django.utils import timezone
     from books.models import Author
 
     class AuthorDetailView(DetailView):
@@ -414,7 +414,7 @@ object -- so we simply override it and wrap the call::
             # Call the superclass
             object = super(AuthorDetailView, self).get_object()
             # Record the last accessed date
-            object.last_accessed = now()
+            object.last_accessed = timezone.now()
             object.save()
             # Return the object
             return object
