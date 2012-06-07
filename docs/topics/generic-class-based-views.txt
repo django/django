@@ -123,9 +123,9 @@ might look like the following::
 
 That's really all there is to it. All the cool features of generic views come
 from changing the attributes set on the generic view. The
-:doc:`generic views reference</ref/class-based-views>` documents all the generic
-views and their options in detail; the rest of this document will consider
-some of the common ways you might customize and extend generic views.
+:doc:`generic views reference</ref/class-based-views/index>` documents all the
+generic views and their options in detail; the rest of this document will 
+consider some of the common ways you might customize and extend generic views.
 
 
 Extending generic views
@@ -248,8 +248,8 @@ Specifying ``model = Publisher`` is really just shorthand for saying
 to define a filtered list of objects you can be more specific about the
 objects that will be visible in the view (see :doc:`/topics/db/queries`
 for more information about :class:`QuerySet` objects, and see the
-:doc:`class-based views reference </ref/class-based-views>` for the complete
-details).
+:doc:`class-based views reference </ref/class-based-views/index>` for the
+complete details).
 
 To pick a simple example, we might want to order a list of books by
 publication date, with the most recent first::
@@ -295,7 +295,8 @@ We'll deal with this problem in the next section.
     If you get a 404 when requesting ``/books/acme/``, check to ensure you
     actually have a Publisher with the name 'ACME Publishing'.  Generic
     views have an ``allow_empty`` parameter for this case.  See the
-    :doc:`class-based-views reference</ref/class-based-views>` for more details.
+    :doc:`class-based-views reference</ref/class-based-views/index>` for more
+    details.
 
 
 Dynamic filtering

@@ -1,0 +1,122 @@
+====================================
+Generic Display Class Based Views
+====================================
+
+
+Display views
+--------------
+
+The two following generic class based views are designed to display data. On
+many projects they are typically the most commonly used views.
+
+.. currentmodule:: django.views.generic.detail
+
+DetailView
+~~~~~~~~~~
+.. autoclass:: django.views.generic.detail.DetailView
+    :members:
+    :undoc-members:
+    :inherited-members:
+
+    While this view is executing, ``self.object`` will contain the object that
+    the view is operating upon.
+    
+    **Classpath**
+    
+    `django.views.generic.detail.DetailView`
+    
+    **Ancestors (MRO)**
+    
+    * :class:`django.views.generic.detail.SingleObjectTemplateResponseMixin`
+    * :class:`django.views.generic.base.TemplateResponseMixin`
+    * :class:`django.views.generic.detail.BaseDetailView`
+    * :class:`django.views.generic.detail.SingleObjectMixin`
+    * :class:`django.views.generic.base.View`
+
+    **Method Flowchart**
+
+    1. dispatch()
+    2. http_method_not_allowed()
+    3. get_template_names()
+    4. get_slug_field()
+    5. get_queryset()
+    6. get_object
+    7. get_context_object_name()
+    8. get_context_data()
+    9. get()
+    10. render_to_response()
+
+    **Example views.py**::
+
+        from datetime import datetime
+
+        from django.views.generic.detail import DetailView
+
+        from articles.models import Article
+
+        class ArticleDetailView(DetailView):
+        
+            model = Article
+
+            def get_context_data(self, **kwargs):
+                context = super(ArticleDetailView, self).get_context_data(**kwargs)
+                context['now'] = datetime.now()
+                return context
+
+    **Example urls.py**::
+    
+        from django.conf.urls.defaults import patterns, url
+    
+        from article.views import ArticleDetailView
+
+        urlpatterns = patterns("",
+
+            url(
+                regex   = r"r^(?P<slug>[-_\w]+)/$",
+                view    = ArticleDetailView.as_view(),
+                name    = "article_detail"
+            ),
+        )    
+
+    **Methods and Attributes**
+    
+    .. Comment: Autoclass called at top of this class will publish this data.
+
+
+.. currentmodule:: django.views.generic.list
+
+ListView
+~~~~~~~~
+.. autoclass:: django.views.generic.list.ListView
+    :members:
+    :undoc-members:
+    :inherited-members:
+
+    A page representing a list of objects.
+
+    While this view is executing, ``self.object_list`` will contain the list of
+    objects (usually, but not necessarily a queryset) that the view is
+    operating upon.
+
+    **Mixins**
+
+    * :class:`django.views.generic.list.MultipleObjectMixin`
+    * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
+    * :class:`django.views.generic.base.TemplateResponseMixin`
+    * :class:`django.views.generic.list.BaseListView`
+    * :class:`django.views.generic.list.MultipleObjectMixin`
+    * :class:`django.views.generic.base.View`
+    
+    **Method Flowchart**
+
+    1. dispatch()
+    2. http_method_not_allowed()
+    3. get_template_names()
+    4. get_queryset()
+    5. get_objects
+    6. get_context_data()
+    7. get()
+    8. render_to_response()
+
+    **Methods and Attributes**
+
