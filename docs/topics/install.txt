@@ -107,7 +107,7 @@ database bindings are installed.
 
   If you're on Windows, check out the unofficial `compiled Windows version`_.
 
-* If you're using MySQL, you'll need MySQLdb_, version 1.2.1p2 or higher. You
+* If you're using MySQL, you'll need the ``MySQL-python`` package, version 1.2.1p2 or higher. You
   will also want to read the database-specific :ref:`notes for the MySQL
   backend <mysql-notes>`.
 
@@ -135,7 +135,6 @@ Django will need permission to create a test database.
 .. _MySQL: http://www.mysql.com/
 .. _psycopg: http://initd.org/pub/software/psycopg/
 .. _compiled Windows version: http://stickpeople.com/projects/python/win-psycopg/
-.. _MySQLdb: http://sourceforge.net/projects/mysql-python
 .. _SQLite: http://www.sqlite.org/
 .. _pysqlite: http://trac.edgewall.org/wiki/PySqlite
 .. _cx_Oracle: http://cx-oracle.sourceforge.net/
