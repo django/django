@@ -107,7 +107,12 @@ The view layer
 
 * **Class based views:**
   :doc:`Overview<topics/class-based-views>` |
-  :doc:`Built-in generic views<ref/class-based-views>`
+  :doc:`Generic views<topics/generic-class-based-views>` |
+  :doc:`Date-based generic views<topics/date-based-generic-views>` |
+  :doc:`Form handling<topics/form-handling-class-based-views>` |
+  :doc:`Mixin overview<topics/mixins-class-based-views>` |
+  :doc:`Built-in class-based views<ref/class-based-views>` |
+  :doc:`Built-in view mixins<ref/class-based-view-mixins>`
 
 * **Advanced:**
   :doc:`Generating CSV <howto/outputting-csv>` |
