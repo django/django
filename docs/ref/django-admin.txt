@@ -104,12 +104,12 @@ compilemessages
 Compiles .po files created with ``makemessages`` to .mo files for use with
 the builtin gettext support. See :doc:`/topics/i18n/index`.
 
-Use the :djadminopt:`--locale` option to specify the locale to process.
+Use the :djadminopt:`--locale` option to specify the locale(s) to process.
 If not provided, all locales are processed.
 
 Example usage::
 
-    django-admin.py compilemessages --locale=br_PT
+    django-admin.py compilemessages --locale=pt_BR --locale=fr
 
 createcachetable
 ----------------
@@ -422,11 +422,16 @@ Separate multiple extensions with commas or use -e or --extension multiple times
 
     django-admin.py makemessages --locale=de --extension=html,txt --extension xml
 
-Use the :djadminopt:`--locale` option to specify the locale to process.
+Use the :djadminopt:`--locale` option to specify the locale(s) to process.
 
 Example usage::
 
-    django-admin.py makemessages --locale=br_PT
+    django-admin.py makemessages --locale=pt_BR --locale=fr
+    
+You can also use commas to separate multiple locales::
+
+    django-admin.py makemessages --locale=de,fr,pt_BR
+
 
 .. django-admin-option:: --domain
 
@@ -436,6 +441,12 @@ Currently supported:
 * ``django`` for all ``*.py``, ``*.html`` and ``*.txt`` files (default)
 * ``djangojs`` for ``*.js`` files
 
+
+Example usage::
+
+    django-admin.py makemessages --domain=django --domain=djangojs
+    
+    
 .. django-admin-option:: --symlinks
 
 Use the ``--symlinks`` or ``-s`` option to follow symlinks to directories when
