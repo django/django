@@ -502,11 +502,7 @@ class CheckboxInput(Widget):
 
     def render(self, name, value, attrs=None):
         final_attrs = self.build_attrs(attrs, type='checkbox', name=name)
-        try:
-            result = self.check_test(value)
-        except: # Silently catch exceptions
-            result = False
-        if result:
+        if self.check_test(value):
             final_attrs['checked'] = 'checked'
         if not (value is True or value is False or value is None or value == ''):
             # Only add the 'value' attribute if a value is non-empty.

@@ -213,13 +213,9 @@ class FormsWidgetTestCase(TestCase):
         self.assertHTMLEqual(w.render('greeting', 'hello there'), u'<input checked="checked" type="checkbox" name="greeting" value="hello there" />')
         self.assertHTMLEqual(w.render('greeting', 'hello & goodbye'), u'<input checked="checked" type="checkbox" name="greeting" value="hello &amp; goodbye" />')
 
-        # A subtlety: If the 'check_test' argument cannot handle a value and raises any
-        # exception during its __call__, then the exception will be swallowed and the box
-        # will not be checked. In this example, the 'check_test' assumes the value has a
-        # startswith() method, which fails for the values True, False and None.
-        self.assertHTMLEqual(w.render('greeting', True), u'<input type="checkbox" name="greeting" />')
-        self.assertHTMLEqual(w.render('greeting', False), u'<input type="checkbox" name="greeting" />')
-        self.assertHTMLEqual(w.render('greeting', None), u'<input type="checkbox" name="greeting" />')
+        # Ticket #17888: calling check_test shouldn't swallow exceptions
+        with self.assertRaises(AttributeError):
+            w.render('greeting', True)
 
         # The CheckboxInput widget will return False if the key is not found in the data
         # dictionary (because HTML form submission doesn't send any result for unchecked
