@@ -1,3 +1,5 @@
+.. _Generic views:
+
 =========================
 Class-based generic views
 =========================
@@ -100,12 +102,7 @@ inferred template will be ``"books/publisher_list.html"`` -- the "books" part
 comes from the name of the app that defines the model, while the "publisher"
 bit is just the lowercased version of the model's name.
 
-.. note::
-    Thus, when (for example) the
-    :class:`django.template.loaders.app_directories.Loader` template loader is
-    enabled in :setting:`TEMPLATE_LOADERS`, a template location could be::
-
-        /path/to/project/books/templates/books/publisher_list.html
+.. note:: Thus, when (for example) the :class:`django.template.loaders.app_directories.Loader` template loader is enabled in :setting:`TEMPLATE_LOADERS`, a template location could be: /path/to/project/books/templates/books/publisher_list.html
 
 .. highlightlang:: html+django
 

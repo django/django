@@ -1,2 +1,173 @@
+===================================
 Using Mixins with class based views
 ===================================
+
+.. versionadded:: 1.3
+
+Django's built-in class based views provide a lot of functionality,
+but some of it you may want to use separately. For instance, you may
+want to write a view that renders a template to make the HTTP
+response, but you can't use
+:class:`~django.views.generic.base.TemplateView`; perhaps you need to
+render a template only on `POST`, with `GET` doing something else
+entirely. While you could use
+:class:`~django.template.response.TemplateResponse` directly, this
+will likely result in duplicate code.
+
+For this reason, Django also provides a number of mixins that provide
+more discrete functionality. Template rendering, for instance, is
+encapsulated in the
+:class:`~django.views.generic.base.TemplateResponseMixin`. The Django
+reference documentation contains :doc:`full documentation of all the
+mixins <../ref/class-based-view-mixins>`.
+
+Context and template responses
+==============================
+
+Two central mixins are provided that help in providing a consistent
+interface to working with templates in class based views.
+
+:class:`~django.views.generic.base.TemplateResponseMixin`
+    Everywhere that wants to make a
+    :class:`~django.template.response.TemplateResponse` will call the
+    :meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`
+    method that :class:`TemplateResponseMixin` provides.  Most of the time
+    this will be called for you (for instance, it is called by the
+    ``get()`` method implemented by both
+    :class:`~django.views.generic.base.TemplateView` and
+    :class:`~django.views.generic.base.DetailView`); similarly, it's
+    unlikely that you'll need to override it, although if you want
+    your response to return something not rendered via a Django
+    template then you'll want to do it. For an example of this, see
+    the :ref:`JSONResponseMixin example <jsonresponsemixin-example>`.
+
+    ``render_to_response`` itself calls
+    :meth:`~django.views.generic.base.TemplateResponseMixin.get_template_names`,
+    which by default will just look up
+    :attr:`~django.views.generic.base.TemplateResponseMixin.template_name`
+    on the class based view; two other mixins
+    (:class:`~django.views.generic.detail.SingleObjectTemplateResponseMixin`
+    and
+    :class:`~django.views.generic.list.MultipleObjectTemplateResponseMixin`)
+    override this to provide more flexible defaults when dealing with
+    actual objects.
+
+.. versionadded:: 1.4
+
+:class:`~django.views.generic.base.ContextMixin`
+    Everywhere that needs context data, such as for rendering a
+    template (including :class:`TemplateResponseMixin` above), should call
+    :meth:`~django.views.generic.base.ContextMixin.get_context_data`
+    passing any data they want to ensure is in there as keyword
+    arguments. ``get_context_data`` returns a dictionary; in
+    :class:`ContextMixin` it simply returns its keyword arguments, but it
+    is common to override this to add more members to the dictionary.
+
+Building up Django's generic class based views
+===============================================
+
+Let's look at how two of Django's generic class based views are built
+out of mixins providing discrete functionality. We'll consider
+:class:`~django.views.generic.detail.DetailView`, which renders a
+"detail" view of an object, and
+:class:`~django.views.generic.list.ListView`, which will render a list
+of objects, typically from a queryset, and optionally paginate
+them. This will introduce us to four mixins which between them provide
+useful functionality when working with either a single Django object,
+or multiple objects.
+
+There are also mixins involved in the generic edit views
+(:class:`~django.views.generic.edit.FormView`, and the model-specific
+views :class:`~django.views.generic.edit.CreateView`,
+:class:`~django.views.generic.edit.UpdateView` and
+:class:`~django.views.generic.edit.DeleteView`), and in the
+:doc:`date-based generic views<date-based-generic-views>`. These are
+covered in the :doc:`mixin reference
+documentation<../ref/class-based-view-mixins>`.
+
+DetailView: working with a single Django object
+-----------------------------------------------
+
+To show the detail of an object, we basically need to do two things:
+we need to look up the object and then we need to make a
+:class:`TemplateResponse` with a suitable template, and that object as
+context.
+
+To get the object, :class:`~django.views.generic.detail.DetailView`
+relies on :class:`~django.views.generic.detail.SingleObjectMixin`,
+which provides a
+:meth:`~django.views.generic.detail.SingleObjectMixin.get_object`
+method that figures out the object based on the URL of the request (it
+looks for ``pk`` and ``slug`` keyword arguments as declared in the
+URLConf, and looks the object up either from the
+:attr:`~django.views.generic.detail.SingleObjectMixin.model` attribute
+on the view, or the
+:attr:`~django.views.generic.detail.SingleObjectMixin.queryset`
+attribute if that's provided). :class:`SingleObjectMixin` also overrides
+:meth:`~django.views.generic.base.ContextMixin.get_context_data`,
+which is used across all Django's built in class based views to supply
+context data for template renders.
+
+To then make a :class:`TemplateResponse`, :class:`DetailView` uses
+:class:`~django.views.generic.detail.SingleObjectTemplateResponseMixin`,
+which extends
+:class:`~django.views.generic.base.TemplateResponseMixin`, overriding
+:meth:`get_template_names()` as discussed above. It actually provides
+a fairly sophisticated set of options, but the main one that most
+people are going to use is ``<app_label>/<object_name>_detail.html``. The
+``_detail`` part can be changed by setting
+:attr:`~django.views.generic.detail.SingleObjectTemplateResponseMixin.template_name_suffix`
+on a subclass to something else. (For instance, the :doc:`generic edit
+views<form-handling-class-based-views>` use ``_form`` for create and
+update views, and ``_confirm_delete`` for delete views.)
+
+ListView: working with many Django objects
+------------------------------------------
+
+Lists of objects follow roughly the same pattern: we need a (possibly
+paginated) list of objects, typically a :class:`QuerySet`, and then we need
+to make a :class:`TemplateResponse` with a suitable template using
+that list of objects.
+
+To get the objects, :class:`~django.views.generic.list.ListView` uses
+:class:`~django.views.generic.list.MultipleObjectMixin`, which
+provides both
+:meth:`~django.views.generic.list.MultipleObjectMixin.get_queryset`
+and
+:meth:`~django.views.generic.list.MultipleObjectMixin.paginate_queryset`. Unlike
+with :class:`SingleObjectMixin`, there's no need to key off parts of
+the URL to figure out the queryset to work with, so the default just
+uses the
+:attr:`~django.views.generic.list.MultipleObjectMixin.queryset` or
+:attr:`~django.views.generic.list.MultipleObjectMixin.model` attribute
+on the view class. A common reason to override
+:meth:`~django.views.generic.list.MultipleObjectMixin.get_queryset`
+here would be to dynamically vary the objects, such as depending on
+the current user or to exclude posts in the future for a blog.
+
+:class:`MultipleObjectMixin` also overrides
+:meth:`~django.views.generic.base.ContextMixin.get_context_data` to
+include appropriate context variables for pagination (providing
+dummies if paginated is disabled). It relies on ``object_list`` being
+passed in as a keyword argument, which :class:`ListView` arranges for
+it.
+
+To make a :class:`TemplateResponse`, :class:`ListView` then uses
+:class:`~django.views.generic.list.MultipleObjectTemplateResponseMixin`;
+as with :class:`SingleObjectTemplateResponseMixin` above, this
+overrides
+:meth:`get_template_names()`
+to provide :meth:`a range of options
+<~django.views.generic.list.MultipleObjectTempalteResponseMixin>`,
+with the most commonly-used being ``<app_label>/<object_name>_list.html``, with
+the ``_list`` part again being taken from the
+:attr:`~django.views.generic.list.MultipleObjectTemplateResponseMixin.template_name_suffix`
+attribute. (The :doc:`date based generic
+views<date-based-generic-views>` use suffixes such as ``_archive``,
+``_archive_year`` and so on to use different templates for the various
+specialised date-based list views.)
+
+Using Django's class based view mixins
+======================================
+
+TODO: write this.

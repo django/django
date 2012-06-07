@@ -101,11 +101,13 @@ View
 
     **Example views.py**::
 
-        from django.views.generic.base import View
+        from django.http import HttpResponse
+        from django.views.generic import View
 
         class MyView(View):
-            # TODO - find an actual example of this view
-            pass
+
+            def get(self, request, *args, **kwargs):
+                return HttpResponse('Hello, World!')
 
     **Example urls.py**::
     
@@ -290,6 +292,10 @@ RedirectView
 
 Generic views
 =============
+
+Django’s generic views were developed to ease that pain. They take certain
+common idioms and patterns found in view development and abstract them so that
+you can quickly write common views of data without having to write too much code
 
 Most generic views require the ``queryset`` key, which is a ``QuerySet``
 instance; see :doc:`/topics/db/queries` for more information about ``QuerySet``
