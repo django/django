@@ -84,6 +84,8 @@ person will be responsible for making sure that bug fixes are applied to both
 trunk and the maintained micro-release branch. This person will also work with
 the release manager to decide when to release the micro releases.
 
+.. _backwards-compatibility-policy:
+
 Supported versions
 ==================
 
