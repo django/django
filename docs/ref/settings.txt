@@ -314,7 +314,7 @@ Default: ``None``
 The domain to be used when setting the CSRF cookie.  This can be useful for
 easily allowing cross-subdomain requests to be excluded from the normal cross
 site request forgery protection.  It should be set to a string such as
-``".lawrence.com"`` to allow a POST request from a form on one subdomain to be
+``".example.com"`` to allow a POST request from a form on one subdomain to be
 accepted by accepted by a view served from another subdomain.
 
 Please note that the presence of this setting does not imply that Django's CSRF
@@ -1404,7 +1404,7 @@ Default: ``''`` (Empty string)
 Absolute path to the directory that holds media for this installation, used
 for :doc:`managing stored files </topics/files>`.
 
-Example: ``"/home/media/media.lawrence.com/"``
+Example: ``"/var/www/example.com/media/"``
 
 See also :setting:`MEDIA_URL`.
 
@@ -1418,7 +1418,7 @@ Default: ``''`` (Empty string)
 URL that handles the media served from :setting:`MEDIA_ROOT`, used
 for :doc:`managing stored files </topics/files>`.
 
-Example: ``"http://media.lawrence.com/"``
+Example: ``"http://media.example.com/"``
 
 .. versionchanged:: 1.3
    It must end in a slash if set to a non-empty value.
@@ -1704,7 +1704,7 @@ SESSION_COOKIE_DOMAIN
 Default: ``None``
 
 The domain to use for session cookies. Set this to a string such as
-``".lawrence.com"`` for cross-domain cookies, or use ``None`` for a standard
+``".example.com"`` for cross-domain cookies, or use ``None`` for a standard
 domain cookie. See the :doc:`/topics/http/sessions`.
 
 .. setting:: SESSION_COOKIE_HTTPONLY
@@ -1885,7 +1885,7 @@ Default: ``''`` (Empty string)
 The absolute path to the directory where :djadmin:`collectstatic` will collect
 static files for deployment.
 
-Example: ``"/home/example.com/static/"``
+Example: ``"/var/www/example.com/static/"``
 
 If the :doc:`staticfiles</ref/contrib/staticfiles>` contrib app is enabled
 (default) the :djadmin:`collectstatic` management command will collect static
@@ -1915,7 +1915,7 @@ Default: ``None``
 
 URL to use when referring to static files located in :setting:`STATIC_ROOT`.
 
-Example: ``"/site_media/static/"`` or ``"http://static.example.com/"``
+Example: ``"/static/"`` or ``"http://static.example.com/"``
 
 If not ``None``, this will be used as the base path for
 :ref:`media definitions<form-media-paths>` and the

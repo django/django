@@ -39,7 +39,7 @@ def stored_cookie_messages_count(storage, response):
     return len(data)
 
 
-@override_settings(SESSION_COOKIE_DOMAIN='.lawrence.com')
+@override_settings(SESSION_COOKIE_DOMAIN='.example.com')
 class CookieTest(BaseTest):
     storage_class = CookieStorage
 
@@ -65,7 +65,7 @@ class CookieTest(BaseTest):
         storage.add(constants.INFO, 'test')
         storage.update(response)
         self.assertTrue('test' in response.cookies['messages'].value)
-        self.assertEqual(response.cookies['messages']['domain'], '.lawrence.com')
+        self.assertEqual(response.cookies['messages']['domain'], '.example.com')
         self.assertEqual(response.cookies['messages']['expires'], '')
 
         # Test after the messages have been consumed
@@ -76,7 +76,7 @@ class CookieTest(BaseTest):
             pass # Iterate through the storage to simulate consumption of messages.
         storage.update(response)
         self.assertEqual(response.cookies['messages'].value, '')
-        self.assertEqual(response.cookies['messages']['domain'], '.lawrence.com')
+        self.assertEqual(response.cookies['messages']['domain'], '.example.com')
         self.assertEqual(response.cookies['messages']['expires'], 'Thu, 01-Jan-1970 00:00:00 GMT')
 
     def test_get_bad_cookie(self):
