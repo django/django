@@ -113,9 +113,10 @@ TemplateView
     
     ``django.views.generic.base.TemplateView``    
 
-    **Mixins**
+    **Method Resolution Order**
 
     * :class:`django.views.generic.base.TemplateResponseMixin`
+    * :class:`django.views.generic.base.View`
     
     **Methods and Attributes**
 
@@ -163,6 +164,12 @@ RedirectView
 
     If the given URL is ``None``, Django will return an ``HttpResponseGone``
     (410).
+    
+    **Method Resolution Order**
+    
+    * :class:`django.views.generic.base.View`
+    
+    **Methods and Attributes**
 
     .. attribute:: url
 
