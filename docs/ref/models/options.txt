@@ -244,12 +244,12 @@ Django quotes column and table names behind the scenes.
 
         unique_together = (("driver", "restaurant"),)
 
-    This is a list of lists of fields that must be unique when considered together.
+    This is a tuple of tuples that must be unique when considered together.
     It's used in the Django admin and is enforced at the database level (i.e., the
     appropriate ``UNIQUE`` statements are included in the ``CREATE TABLE``
     statement).
 
-    For convenience, unique_together can be a single list when dealing with a single
+    For convenience, unique_together can be a single tuple when dealing with a single
     set of fields::
 
         unique_together = ("driver", "restaurant")
