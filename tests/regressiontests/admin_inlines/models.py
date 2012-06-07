@@ -139,6 +139,31 @@ class SottoCapo(models.Model):
     name = models.CharField(max_length=100)
     capo_famiglia = models.ForeignKey(CapoFamiglia, related_name='+')
 
+# Models for #18433
+
+class ParentModelWithCustomPk(models.Model):
+    my_own_pk = models.CharField(max_length=100, primary_key=True)
+    name = models.CharField(max_length=100)
+
+
+class ChildModel1(models.Model):
+    my_own_pk = models.CharField(max_length=100, primary_key=True)
+    name = models.CharField(max_length=100)
+    parent = models.ForeignKey(ParentModelWithCustomPk)
+
+    def get_absolute_url(self):
+        return '/child_model1/'
+
+
+class ChildModel2(models.Model):
+    my_own_pk = models.CharField(max_length=100, primary_key=True)
+    name = models.CharField(max_length=100)
+    parent = models.ForeignKey(ParentModelWithCustomPk)
+
+    def get_absolute_url(self):
+        return '/child_model2/'
+
+
 # Other models
 
 class ProfileCollection(models.Model):
