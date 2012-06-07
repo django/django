@@ -275,12 +275,12 @@ RedirectView
         urlpatterns = patterns("",
 
             url(
-                regex   = r"^r/(?P<pk>\d+)/$",
+                regex   = r"r^(?P<pk>\d+)/$",
                 view    = ArticleCounterRedirectView.as_view(),
                 name    = "article_counter"
             ),
             url(
-                regex   = r"^$",
+                regex   = r"^go-to-django/$",
                 view    = RedirectView.as_view(
                     url = "http://djangoproject.com"
                 ),
