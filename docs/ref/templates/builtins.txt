@@ -58,10 +58,8 @@ Ignores everything between ``{% comment %}`` and ``{% endcomment %}``.
 csrf_token
 ^^^^^^^^^^
 
-In the Django 1.1.X series, this is a no-op tag that returns an empty string
-for future compatibility purposes.  In Django 1.2 and later, it is used for
-CSRF protection, as described in the documentation for :doc:`Cross Site Request
-Forgeries </ref/contrib/csrf>`.
+This tag is used for CSRF protection, as described in the documentation for
+:doc:`Cross Site Request Forgeries </ref/contrib/csrf>`.
 
 .. templatetag:: cycle
 
@@ -410,8 +408,6 @@ variables or to negate a given variable::
         There are some athletes and absolutely no coaches.
     {% endif %}
 
-.. versionchanged:: 1.2
-
 Use of both ``and`` and ``or`` clauses within the same tag is allowed, with
 ``and`` having higher precedence than ``or`` e.g.::
 
@@ -425,9 +421,6 @@ will be interpreted like:
 
 Use of actual brackets in the :ttag:`if` tag is invalid syntax.  If you need
 them to indicate precedence, you should use nested :ttag:`if` tags.
-
-.. versionadded:: 1.2
-
 
 :ttag:`if` tags may also use the operators ``==``, ``!=``, ``<``, ``>``,
 ``<=``, ``>=`` and ``in`` which work as follows:
@@ -637,9 +630,8 @@ You cannot check for equality with Python objects such as ``True`` or
 ``False``.  If you need to test if something is true or false, use the
 :ttag:`if` tag instead.
 
-.. versionadded:: 1.2
-   An alternative to the ``ifequal`` tag is to use the :ttag:`if` tag and the
-   ``==`` operator.
+An alternative to the ``ifequal`` tag is to use the :ttag:`if` tag and the
+``==`` operator.
 
 .. templatetag:: ifnotequal
 
@@ -649,9 +641,8 @@ ifnotequal
 Just like :ttag:`ifequal`, except it tests that the two arguments are not
 equal.
 
-.. versionadded:: 1.2
-   An alternative to the ``ifnotequal`` tag is to use the :ttag:`if` tag and
-   the ``!=`` operator.
+An alternative to the ``ifnotequal`` tag is to use the :ttag:`if` tag and
+the ``!=`` operator.
 
 .. templatetag:: include
 
@@ -1127,9 +1118,6 @@ For example::
 
 If ``value`` is ``4``, then the output will be ``6``.
 
-.. versionchanged:: 1.2
-   The following behavior didn't exist in previous Django versions.
-
 This filter will first try to coerce both values to integers. If this fails,
 it'll attempt to add the values together anyway. This will work on some data
 types (strings, list, etc.) and fail on others. If it fails, the result will
@@ -1289,10 +1277,6 @@ Z                 Time zone offset in seconds. The          ``-43200`` to ``4320
                   UTC is always positive.
 ================  ========================================  =====================
 
-.. versionadded:: 1.2
-
-The ``c`` and ``u`` format specification characters were added in Django 1.2.
-
 .. versionadded:: 1.4
 
 The ``e`` and ``o`` format specification characters were added in Django 1.4.
@@ -1325,9 +1309,6 @@ When used without a format string::
 
 ...the formatting string defined in the :setting:`DATE_FORMAT` setting will be
 used, without applying any localization.
-
-.. versionchanged:: 1.2
-    Predefined formats can now be influenced by the current locale.
 
 .. templatefilter:: default
 
@@ -1984,9 +1965,6 @@ When used without a format string::
 
 ...the formatting string defined in the :setting:`TIME_FORMAT` setting will be
 used, without applying any localization.
-
-.. versionchanged:: 1.2
-    Predefined formats can now be influenced by the current locale.
 
 .. templatefilter:: timesince
 

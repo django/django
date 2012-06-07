@@ -1,8 +1,6 @@
 Form and field validation
 =========================
 
-.. versionchanged:: 1.2
-
 Form validation happens when the data is cleaned. If you want to customize
 this process, there are various places you can change, each one serving a
 different purpose. Three types of cleaning methods are run during form
@@ -175,7 +173,6 @@ previous features.
 
 Using validators
 ~~~~~~~~~~~~~~~~
-.. versionadded:: 1.2
 
 Django's form (and model) fields support use of simple utility functions and
 classes known as validators. These can be passed to a field's constructor, via

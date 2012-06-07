@@ -188,11 +188,6 @@ In particular, :ref:`lazy translation objects <lazy-translations>` need a
 Natural keys
 ------------
 
-.. versionadded:: 1.2
-
-   The ability to use natural keys when serializing/deserializing data was
-   added in the 1.2 release.
-
 The default serialization strategy for foreign keys and many-to-many relations
 is to serialize the value of the primary key(s) of the objects in the relation.
 This strategy works well for most objects, but it can cause difficulty in some

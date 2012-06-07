@@ -372,21 +372,11 @@ and return a dictionary of items to be merged into the context. By default,
     "django.core.context_processors.static",
     "django.contrib.messages.context_processors.messages")
 
-.. versionadded:: 1.2
-   In addition to these, ``RequestContext`` always uses
-   ``django.core.context_processors.csrf``.  This is a security
-   related context processor required by the admin and other contrib apps, and,
-   in case of accidental misconfiguration, it is deliberately hardcoded in and
-   cannot be turned off by the :setting:`TEMPLATE_CONTEXT_PROCESSORS` setting.
-
-.. versionadded:: 1.2
-   The ``'messages'`` context processor was added.  For more information, see
-   the :doc:`messages documentation </ref/contrib/messages>`.
-
-.. versionchanged:: 1.2
-    The auth context processor was moved in this release from its old location
-    ``django.core.context_processors.auth`` to
-    ``django.contrib.auth.context_processors.auth``.
+In addition to these, ``RequestContext`` always uses
+``django.core.context_processors.csrf``.  This is a security
+related context processor required by the admin and other contrib apps, and,
+in case of accidental misconfiguration, it is deliberately hardcoded in and
+cannot be turned off by the :setting:`TEMPLATE_CONTEXT_PROCESSORS` setting.
 
 Each processor is applied in order. That means, if one processor adds a
 variable to the context and a second processor adds a variable with the same
@@ -447,10 +437,6 @@ If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
   ``django.contrib.auth.context_processors.PermWrapper``, representing the
   permissions that the currently logged-in user has.
 
-.. versionchanged:: 1.2
-    This context processor was moved in this release from
-    ``django.core.context_processors.auth`` to its current location.
-
 .. versionchanged:: 1.3
     Prior to version 1.3, ``PermWrapper`` was located in
     ``django.contrib.auth.context_processors``.
@@ -503,8 +489,6 @@ value of the :setting:`STATIC_URL` setting.
 django.core.context_processors.csrf
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. versionadded:: 1.2
-
 This processor adds a token that is needed by the :ttag:`csrf_token` template
 tag for protection against :doc:`Cross Site Request Forgeries
 </ref/contrib/csrf>`.
@@ -526,15 +510,6 @@ If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
 * ``messages`` -- A list of messages (as strings) that have been set
   via the user model (using ``user.message_set.create``) or through
   the :doc:`messages framework </ref/contrib/messages>`.
-
-.. versionadded:: 1.2
-   This template context variable was previously supplied by the ``'auth'``
-   context processor.  For backwards compatibility the ``'auth'`` context
-   processor will continue to supply the ``messages`` variable until Django
-   1.4.  If you use the ``messages`` variable, your project will work with
-   either (or both) context processors, but it is recommended to add
-   ``django.contrib.messages.context_processors.messages`` so your project
-   will be prepared for the future upgrade.
 
 Writing your own context processors
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -656,11 +631,6 @@ Some of these other loaders are disabled by default, but you can activate them
 by editing your :setting:`TEMPLATE_LOADERS` setting. :setting:`TEMPLATE_LOADERS`
 should be a tuple of strings, where each string represents a template loader
 class. Here are the template loaders that come with Django:
-
-.. versionchanged:: 1.2
-    Template loaders were based on callables (usually functions) before Django
-    1.2, starting with the 1.2 release there is a new class-based API, all the
-    loaders described below implement this new API.
 
 ``django.template.loaders.filesystem.Loader``
     Loads templates from the filesystem, according to :setting:`TEMPLATE_DIRS`.
@@ -799,8 +769,6 @@ and any setting starting with ``TEMPLATE_`` is of obvious interest.
 
 Using an alternative template language
 ======================================
-
-.. versionadded:: 1.2
 
 The Django ``Template`` and ``Loader`` classes implement a simple API for
 loading and rendering templates. By providing some simple wrapper classes that

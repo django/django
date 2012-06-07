@@ -109,9 +109,6 @@ Model field                      Form field
 ``URLField``                     ``URLField``
 ===============================  ========================================
 
-.. versionadded:: 1.2
-    The ``BigIntegerField`` is new in Django 1.2.
-
 
 As you might expect, the ``ForeignKey`` and ``ManyToManyField`` model field
 types are special cases:
@@ -361,9 +358,6 @@ Since the Author model has only 3 fields, 'name', 'title', and
 
 Overriding the default field types or widgets
 ---------------------------------------------
-
-.. versionadded:: 1.2
-    The ``widgets`` attribute is new in Django 1.2.
 
 The default field types, as described in the `Field types`_ table above, are
 sensible defaults. If you have a ``DateField`` in your model, chances are you'd
@@ -670,8 +664,6 @@ are saved properly.
 Limiting the number of editable objects
 ---------------------------------------
 
-.. versionchanged:: 1.2
-
 As with regular formsets, you can use the ``max_num`` and ``extra`` parameters
 to ``modelformset_factory`` to limit the number of extra forms displayed.
 
@@ -697,8 +689,6 @@ so long as the total number of forms does not exceed ``max_num``::
     <tr><th><label for="id_form-1-name">Name:</label></th><td><input id="id_form-1-name" type="text" name="form-1-name" value="Paul Verlaine" maxlength="100" /><input type="hidden" name="form-1-id" value="3" id="id_form-1-id" /></td></tr>
     <tr><th><label for="id_form-2-name">Name:</label></th><td><input id="id_form-2-name" type="text" name="form-2-name" value="Walt Whitman" maxlength="100" /><input type="hidden" name="form-2-id" value="2" id="id_form-2-id" /></td></tr>
     <tr><th><label for="id_form-3-name">Name:</label></th><td><input id="id_form-3-name" type="text" name="form-3-name" maxlength="100" /><input type="hidden" name="form-3-id" id="id_form-3-id" /></td></tr>
-
-.. versionchanged:: 1.2
 
 A ``max_num`` value of ``None`` (the default) puts no limit on the number of
 forms displayed.

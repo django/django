@@ -18,8 +18,6 @@ __ `executing custom SQL directly`_
 Performing raw queries
 ======================
 
-.. versionadded:: 1.2
-
 The ``raw()`` manager method can be used to perform raw SQL queries that
 return model instances:
 

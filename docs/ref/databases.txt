@@ -373,15 +373,6 @@ these methods in no-op's based in the results of such detection.
 Notes on specific fields
 ------------------------
 
-Boolean fields
-~~~~~~~~~~~~~~
-
-.. versionchanged:: 1.2
-
-In previous versions of Django when running under MySQL ``BooleanFields`` would
-return their data as ``ints``, instead of true ``bools``.  See the release
-notes for a complete description of the change.
-
 Character fields
 ~~~~~~~~~~~~~~~~
 

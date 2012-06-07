@@ -142,9 +142,6 @@ See the :doc:`markup documentation </ref/contrib/markup>`.
 messages
 ========
 
-.. versionchanged:: 1.2
-    The messages framework was added.
-
 A framework for storing and retrieving temporary cookie- or session-based
 messages
 

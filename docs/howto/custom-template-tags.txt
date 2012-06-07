@@ -540,8 +540,6 @@ tag is used inside a :ttag:`{% autoescape off %}<autoescape>` block.
 Thread-safety considerations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. versionadded:: 1.2
-
 Once a node is parsed, its ``render`` method may be called any number of times.
 Since Django is sometimes run in multi-threaded environments, a single node may
 be simultaneously rendering with different contexts in response to two separate

@@ -127,8 +127,6 @@ should be considered non-trivial, just ask.
 Javascript patches
 ------------------
 
-.. versionadded:: 1.2
-
 Django's admin system leverages the jQuery framework to increase the
 capabilities of the admin interface. In conjunction, there is an emphasis on
 admin javascript performance and minimizing overall admin media file size.

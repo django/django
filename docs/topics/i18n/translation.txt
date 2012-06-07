@@ -1039,8 +1039,6 @@ Django comes with a tool, :djadmin:`django-admin.py makemessages
     commands from the GNU gettext toolset: ``xgettext``, ``msgfmt``,
     ``msgmerge`` and ``msguniq``.
 
-    .. versionchanged:: 1.2
-
     The minimum version of the ``gettext`` utilities supported is 0.15.
 
 To create or update a message file, run this command::

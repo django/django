@@ -163,8 +163,6 @@ field.
 ``dim``
 -------
 
-.. versionadded:: 1.2
-
 .. attribute:: GeometryField.dim
 
 This option may be used for customizing the coordinate dimension of the
@@ -179,8 +177,6 @@ three-dimensonal support.
 
 ``geography``
 -------------
-
-.. versionadded:: 1.2
 
 .. attribute:: GeometryField.geography
 

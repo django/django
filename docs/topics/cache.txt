@@ -83,12 +83,6 @@ two most common are `python-memcached`_ and `pylibmc`_.
 .. _`python-memcached`: ftp://ftp.tummy.com/pub/python-memcached/
 .. _`pylibmc`: http://sendapatch.se/projects/pylibmc/
 
-.. versionchanged:: 1.2
-    In Django 1.0 and 1.1, you could also use ``cmemcache`` as a binding.
-    However, support for this library was deprecated in 1.2 due to
-    a lack of maintenance on the ``cmemcache`` library itself. Support for
-    ``cmemcache`` will be removed completely in Django 1.4.
-
 .. versionchanged:: 1.3
     Support for ``pylibmc`` was added.
 
@@ -493,8 +487,6 @@ more on these decorators.
 
 .. _i18n-cache-key:
 
-.. versionadded:: 1.2
-
 If :setting:`USE_I18N` is set to ``True`` then the generated cache key will
 include the name of the active :term:`language<language code>` -- see also
 :ref:`how-django-discovers-language-preference`). This allows you to easily
@@ -737,8 +729,6 @@ actually exist in the cache (and haven't expired)::
     >>> cache.get_many(['a', 'b', 'c'])
     {'a': 1, 'b': 2, 'c': 3}
 
-.. versionadded:: 1.2
-
 To set multiple values more efficiently, use ``set_many()`` to pass a dictionary
 of key-value pairs::
 
@@ -753,14 +743,10 @@ clearing the cache for a particular object::
 
     >>> cache.delete('a')
 
-.. versionadded:: 1.2
-
 If you want to clear a bunch of keys at once, ``delete_many()`` can take a list
 of keys to be cleared::
 
     >>> cache.delete_many(['a', 'b', 'c'])
-
-.. versionadded:: 1.2
 
 Finally, if you want to delete all the keys in the cache, use
 ``cache.clear()``.  Be careful with this; ``clear()`` will remove *everything*

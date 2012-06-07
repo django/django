@@ -156,9 +156,6 @@ Message middleware
 
 .. class:: MessageMiddleware
 
-.. versionadded:: 1.2
-   ``MessageMiddleware`` was added.
-
 Enables cookie- and session-based message support. See the
 :doc:`messages documentation </ref/contrib/messages>`.
 
