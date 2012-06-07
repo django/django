@@ -1,3 +1,5 @@
+.. _Generic views:
+
 =========================
 Class-based generic views
 =========================
