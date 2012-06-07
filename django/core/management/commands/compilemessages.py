@@ -28,10 +28,14 @@ def compile_messages(stderr, locale=None):
 
     for basedir in basedirs:
         if locale:
-            basedir = os.path.join(basedir, locale, 'LC_MESSAGES')
-        for dirpath, dirnames, filenames in os.walk(basedir):
-            for f in filenames:
-                if f.endswith('.po'):
+            dirs = [os.path.join(basedir, l, 'LC_MESSAGES') for l in (locale if isinstance(locale, list) else [locale])]
+        else:
+            dirs = [basedir]
+        for ldir in dirs:
+            for dirpath, dirnames, filenames in os.walk(ldir):
+                for f in filenames:
+                    if not f.endswith('.po'):
+                        continue
                     stderr.write('processing file %s in %s\n' % (f, dirpath))
                     fn = os.path.join(dirpath, f)
                     if has_bom(fn):
@@ -53,8 +57,8 @@ def compile_messages(stderr, locale=None):
 
 class Command(BaseCommand):
     option_list = BaseCommand.option_list + (
-        make_option('--locale', '-l', dest='locale',
-            help='The locale to process. Default is to process all.'),
+        make_option('--locale', '-l', dest='locale', action='append',
+                    help='locale(s) to process (e.g. de_AT). Default is to process all. Can be used multiple times, accepts a comma-separated list of locale names.'),
     )
     help = 'Compiles .po files to .mo files for use with builtin gettext support.'
 

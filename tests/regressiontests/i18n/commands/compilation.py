@@ -68,3 +68,34 @@ class PercentRenderingTests(MessageCompilationTests):
             t = Template('{% load i18n %}{% trans "Completed 50%% of all the tasks" %}')
             rendered = t.render(Context({}))
             self.assertEqual(rendered, 'IT translation of Completed 50%% of all the tasks')
+
+
+@override_settings(LOCALE_PATHS=(os.path.join(test_dir, 'locale'),))
+class MultipleLocaleCompilationTests(MessageCompilationTests):
+    MO_FILE_HR = None
+    MO_FILE_FR = None
+
+    def setUp(self):
+        super(MultipleLocaleCompilationTests, self).setUp()
+        self.localedir = os.path.join(test_dir, 'locale')
+        self.MO_FILE_HR = os.path.join(self.localedir, 'hr/LC_MESSAGES/django.mo')
+        self.MO_FILE_FR = os.path.join(self.localedir, 'fr/LC_MESSAGES/django.mo')
+        self.addCleanup(self._rmfile, os.path.join(self.localedir, self.MO_FILE_HR))
+        self.addCleanup(self._rmfile, os.path.join(self.localedir, self.MO_FILE_FR))
+
+    def _rmfile(self, filepath):
+        if os.path.exists(filepath):
+            os.remove(filepath)
+
+    def test_one_locale(self):
+        os.chdir(test_dir)
+        call_command('compilemessages', locale='hr', stderr=StringIO())
+
+        self.assertTrue(os.path.exists(self.MO_FILE_HR))
+
+    def test_multiple_locales(self):
+        os.chdir(test_dir)
+        call_command('compilemessages', locale=['hr', 'fr'], stderr=StringIO())
+
+        self.assertTrue(os.path.exists(self.MO_FILE_HR))
+        self.assertTrue(os.path.exists(self.MO_FILE_FR))

@@ -107,12 +107,21 @@ compilemessages
 Compiles .po files created with ``makemessages`` to .mo files for use with
 the builtin gettext support. See :doc:`/topics/i18n/index`.
 
-Use the :djadminopt:`--locale` option to specify the locale to process.
-If not provided, all locales are processed.
+Use the :djadminopt:`--locale` option (or its shorter version ``-l``) to
+specify the locale(s) to process. If not provided, all locales are processed.
 
 Example usage::
 
     django-admin.py compilemessages --locale=pt_BR
+    django-admin.py compilemessages --locale=pt_BR --locale=fr
+    django-admin.py compilemessages -l pt_BR
+    django-admin.py compilemessages -l pt_BR -l fr
+    django-admin.py compilemessages --locale=pt_BR,fr
+    django-admin.py compilemessages -l pt_BR,fr
+
+.. versionchanged:: 1.6
+
+Added the ability to specify multiple locales.
 
 createcachetable
 ----------------
@@ -422,11 +431,24 @@ Separate multiple extensions with commas or use -e or --extension multiple times
 
     django-admin.py makemessages --locale=de --extension=html,txt --extension xml
 
-Use the :djadminopt:`--locale` option to specify the locale to process.
+Use the :djadminopt:`--locale` option (or its shorter version ``-l``) to
+specify the locale(s) to process.
 
 Example usage::
 
     django-admin.py makemessages --locale=pt_BR
+    django-admin.py makemessages --locale=pt_BR --locale=fr
+    django-admin.py makemessages -l pt_BR
+    django-admin.py makemessages -l pt_BR -l fr
+
+You can also use commas to separate multiple locales::
+
+    django-admin.py makemessages --locale=de,fr,pt_BR
+    django-admin.py makemessages -l de,fr,pt_BR
+
+.. versionchanged:: 1.6
+
+Added the ability to specify multiple locales.
 
 .. django-admin-option:: --domain
 

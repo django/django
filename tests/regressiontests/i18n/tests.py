@@ -32,10 +32,11 @@ if can_run_extraction_tests:
     from .commands.extraction import (ExtractorTests, BasicExtractorTests,
         JavascriptExtractorTests, IgnoredExtractorTests, SymlinkExtractorTests,
         CopyPluralFormsExtractorTests, NoWrapExtractorTests,
-        NoLocationExtractorTests, KeepPotFileExtractorTests)
+        NoLocationExtractorTests, KeepPotFileExtractorTests,
+        MultipleLocaleExtractionTests)
 if can_run_compilation_tests:
     from .commands.compilation import (PoFileTests, PoFileContentsTests,
-        PercentRenderingTests)
+        PercentRenderingTests, MultipleLocaleCompilationTests)
 from .contenttypes.tests import ContentTypeTests
 from .forms import I18nForm, SelectDateForm, SelectDateWidget, CompanyForm
 from .models import Company, TestModel
