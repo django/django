@@ -106,7 +106,11 @@ class TemplateResponseMixin(object):
 
     def render_to_response(self, context, **response_kwargs):
         """
-        Returns a response with a template rendered with the given context.
+        Returns a response, using the `response_class` for this
+        view, with a template rendered with the given context.
+
+        If any keyword arguments are provided, they will be
+        passed to the constructor of the response class.
         """
         return self.response_class(
             request = self.request,
