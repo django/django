@@ -30,38 +30,47 @@ Django views. You may think of them as *base* views, which can be used by
 themselves or inherited from.  They may not provide all the capabilities required
 for projects, in which case there are Mixins and Generic class based views.
 
+Specification
+-------------
+
+Each request served by a class based view has an independent state; therefore,
+it is safe to store state variables on the instance (i.e., ``self.foo = 3`` is
+a thread-safe operation).
+
+A class-based view is deployed into a URL pattern using the
+:meth:`~View.as_view()` classmethod::
+
+    urlpatterns = patterns('',
+            (r'^view/$', MyView.as_view(size=42)),
+        )
+
+.. admonition:: Thread safety with view arguments
+
+    Arguments passed to a view are shared between every instance of a view.
+    This means that you shoudn't use a list, dictionary, or any other
+    variable object as an argument to a view. If you did, the actions of
+    one user visiting your view could have an effect on subsequent users
+    visiting the same view.
+
+Any argument passed into :meth:`~View.as_view()` will be assigned onto the
+instance that is used to service a request. Using the previous example,
+this means that every request on ``MyView`` is able to interrogate
+``self.size``.
+
 .. currentmodule:: django.views.generic.base
 
 View
-----
-.. class:: django.views.generic.base.View()
+~~~~
+.. class:: View()
 
     The master class-based base view. All other class-based views inherit from
     this base class.
+    
+    **Classpath**
 
-    Each request served by a :class:`~django.views.generic.base.View` has an
-    independent state; therefore, it is safe to store state variables on the
-    instance (i.e., ``self.foo = 3`` is a thread-safe operation).
-
-    A class-based view is deployed into a URL pattern using the
-    :meth:`~View.as_view()` classmethod::
-
-        urlpatterns = patterns('',
-                (r'^view/$', MyView.as_view(size=42)),
-            )
-
-    Any argument passed into :meth:`~View.as_view()` will be assigned onto the
-    instance that is used to service a request. Using the previous example,
-    this means that every request on ``MyView`` is able to interrogate
-    ``self.size``.
-
-    .. admonition:: Thread safety with view arguments
-
-        Arguments passed to a view are shared between every instance of a view.
-        This means that you shoudn't use a list, dictionary, or any other
-        variable object as an argument to a view. If you did, the actions of
-        one user visiting your view could have an effect on subsequent users
-        visiting the same view.
+    ``django.views.generic.base.View``
+    
+    **Methods**
 
     .. method:: dispatch(request, *args, **kwargs)
 
@@ -85,16 +94,30 @@ View
         The default implementation returns ``HttpResponseNotAllowed`` with list
         of allowed methods in plain text.
 
+    **Example**::
+
+        from django.views.generic.base import View
+
+        class MyView(View):
+            # TODO - find an actual example of this view
+            pass
+
 TemplateView
-------------
-.. class:: django.views.generic.base.TemplateView()
+~~~~~~~~~~~~
+.. class:: TemplateView()
 
     Renders a given template, passing it a ``{{ params }}`` template variable,
     which is a dictionary of the parameters captured in the URL.
+    
+    **Classpath**
+    
+    ``django.views.generic.base.TemplateView``    
 
     **Mixins**
 
     * :class:`django.views.generic.base.TemplateResponseMixin`
+    
+    **Methods and Attributes**
 
     .. attribute:: template_name
 
@@ -109,9 +132,25 @@ TemplateView
 
     * ``params``: The dictionary of keyword arguments captured from the URL
       pattern that served the view.
+      
+      
+    **Example**::
+
+        from django.views.generic.base import TemplateView
+        
+        from articles.models import Article
+
+        class HomePageView(TemplateView):
+
+            template_name = "home.html"
+            
+            def get_context_data(self, **kwargs):
+                context = super(HomePageView, self).get_context_data(**kwargs)
+                context['latest_articles'] = Article.objects.all()[:5]
+                return context
 
 RedirectView
-------------
+~~~~~~~~~~~~
 .. class:: django.views.generic.base.RedirectView()
 
     Redirects to a given URL.
