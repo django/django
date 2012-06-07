@@ -1,2 +1,111 @@
-Form handling in Class Based Views
-==================================
+Form handling with Class Based Views
+====================================
+
+Form processing generally has 3 paths:
+
+* Initial GET (blank or prepopulated form)
+* POST with invalid data
+* POST with valid data
+
+Dealing with this using function-based views often results in a lot of
+repeated boilerplate code (see 'Using a form in a view'). To help avoid this,
+Django provides a collection of generic Class Based Views for form processing.
+
+Basic Forms
+-----------
+
+Given a simple contact form::
+
+    # forms.py
+    from django import forms
+
+    class ContactForm(forms.Form):
+        name = forms.CharField()
+        message = forms.CharField(widget=forms.Textarea)
+
+        def send_email(self):
+            # send email using the self.cleaned_data dictionary
+            pass
+
+The view can be constructed using a FormView::
+
+    # views.py
+    from myapp.forms import ContactForm
+    from django.views.generic.edit import FormView
+
+    class ContactView(FormView):
+        template_name = 'contact.html'
+        form_class = ContactForm
+        success_url = '/thanks/'
+
+        def form_valid(self, form):
+            form.send_email()
+            return super(ContactView, self).form_valid(form)
+
+Notes:
+
+* FormView inherits ``TemplateResponseMixin`` so ``template_name`` can be used here
+* The default implementation for ``form_valid`` simply redirects to the success_url
+
+Model Forms
+-----------
+
+Generic views really shine when working with models.
+These generic views will automatically create a ModelForm, so long as
+they can work out which model class to use:
+
+* If the ``model`` attribute is given, that model class will be used
+* If ``get_object`` returns an object, the class of that object will be used
+* If a ``queryset`` is given, the model for that queryset will be used
+
+You don't even need to provide a success_url for ``CreateView`` or
+``UpdateView`` - they will use ``model.get_absolute_url()`` if available.
+
+If you want to use a custom ``ModelForm`` (to add extra constraints or validation)
+simply set :attr:`form_class` to your custom form class.
+
+Example of full add/edit/delete for one model::
+
+    # models.py
+    from django import models
+
+    class Author(models.Model):
+        name = models.CharField(max_length=200)
+
+        def get_absolute_url(self):
+            return '/author/%s/' % self.pk
+   
+    # views.py
+    from myapp.models import Author
+    from django.views.generic.edit import CreateView, UpdateView, DeleteView
+
+    class AuthorCreate(CreateView):
+        model = Author
+
+    class AuthorUpdate(UpdateView):
+        model = Author
+
+    class AuthorDelete(DeleteView):
+        model = Author
+
+    # urls.py
+    from django.conf.urls import patterns, url
+    from myapp.views import AuthorCreate, AuthorUpdate, AuthorDelete
+
+    urlpatterns = patterns('',
+        url(r'author/add/$', AuthorCreate.as_view(), name='author_add'),
+        url(r'author/(?P<pk>\d+)/$', AuthorUpdate.as_view(), name='author_update'),
+        url(r'author/(?P<pk>\d+)/delete/$', AuthorDelete.as_view(), name='author_delete'),
+    )
+        
+.. note::
+    These views inherit ``SingleObjectTemplateResponseMixin`` which uses
+    ``template_name_prefix`` to construct the ``template_name`` based on the model.
+    In this example:
+
+    * ``CreateView`` and ``UpdateView`` use ``myapp/author_form.html``
+    * ``DeleteView`` uses ``myapp/author_confirm_delete.html``
+
+    If you wish to have separate templates for ``CreateView`` and ``UpdateView``, you
+    can set either :attr:`template_name` or :attr:`template_name_suffix` on
+    your view class.
