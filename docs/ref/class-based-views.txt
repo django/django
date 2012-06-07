@@ -301,6 +301,7 @@ Most generic views require the ``queryset`` key, which is a ``QuerySet``
 instance; see :doc:`/topics/db/queries` for more information about ``QuerySet``
 objects.
 
+
 Detail views
 ------------
 
@@ -308,18 +309,12 @@ Detail views
 
 DetailView
 ~~~~~~~~~~
-.. class:: BaseDetailView()
 .. class:: DetailView()
 
     A page representing an individual object.
 
     While this view is executing, ``self.object`` will contain the object that
     the view is operating upon.
-
-    :class:`~django.views.generic.base.BaseDetailView` implements the same
-    behavior as :class:`~django.views.generic.base.DetailView`, but doesn't
-    include the
-    :class:`~django.views.generic.detail.SingleObjectTemplateResponseMixin`.
 
     **Mixins**
 
@@ -333,7 +328,6 @@ List views
 
 ListView
 ~~~~~~~~
-.. class:: BaseListView()
 .. class:: ListView()
 
     A page representing a list of objects.
@@ -341,11 +335,6 @@ ListView
     While this view is executing, ``self.object_list`` will contain the list of
     objects (usually, but not necessarily a queryset) that the view is
     operating upon.
-
-    :class:`~django.views.generic.list.BaseListView` implements the same
-    behavior as :class:`~django.views.generic.list.ListView`, but doesn't
-    include the
-    :class:`~django.views.generic.list.MultipleObjectTemplateResponseMixin`.
 
     **Mixins**
 
@@ -360,15 +349,10 @@ Editing views
 
 FormView
 ~~~~~~~~
-.. class:: BaseFormView()
 .. class:: FormView()
 
     A view that displays a form. On error, redisplays the form with validation
     errors; on success, redirects to a new URL.
-
-    :class:`~django.views.generic.edit.BaseFormView` implements the same
-    behavior as :class:`~django.views.generic.edit.FormView`, but doesn't
-    include the :class:`~django.views.generic.base.TemplateResponseMixin`.
 
     **Mixins**
 
@@ -377,15 +361,10 @@ FormView
 
 CreateView
 ~~~~~~~~~~
-.. class:: BaseCreateView()
 .. class:: CreateView()
 
     A view that displays a form for creating an object, redisplaying the form
     with validation errors (if there are any) and saving the object.
-
-    :class:`~django.views.generic.edit.BaseCreateView` implements the same
-    behavior as :class:`~django.views.generic.edit.CreateView`, but doesn't
-    include the :class:`~django.views.generic.base.TemplateResponseMixin`.
 
     **Mixins**
 
@@ -394,17 +373,12 @@ CreateView
 
 UpdateView
 ~~~~~~~~~~
-.. class:: BaseUpdateView()
 .. class:: UpdateView()
 
     A view that displays a form for editing an existing object, redisplaying
     the form with validation errors (if there are any) and saving changes to
     the object. This uses a form automatically generated from the object's
     model class (unless a form class is manually specified).
-
-    :class:`~django.views.generic.edit.BaseUpdateView` implements the same
-    behavior as :class:`~django.views.generic.edit.UpdateView`, but doesn't
-    include the :class:`~django.views.generic.base.TemplateResponseMixin`.
 
     **Mixins**
 
@@ -413,17 +387,12 @@ UpdateView
 
 DeleteView
 ~~~~~~~~~~
-.. class:: BaseDeleteView()
 .. class:: DeleteView()
 
     A view that displays a confirmation page and deletes an existing object.
     The given object will only be deleted if the request method is ``POST``. If
     this view is fetched via ``GET``, it will display a confirmation page that
     should contain a form that POSTs to the same URL.
-
-    :class:`~django.views.generic.edit.BaseDeleteView` implements the same
-    behavior as :class:`~django.views.generic.edit.DeleteView`, but doesn't
-    include the :class:`~django.views.generic.base.TemplateResponseMixin`.
 
     **Mixins**
 
@@ -445,17 +414,11 @@ are views for displaying drilldown pages for date-based data.
 
 ArchiveIndexView
 ~~~~~~~~~~~~~~~~
-.. class:: BaseArchiveIndexView()
 .. class:: ArchiveIndexView()
 
     A top-level index page showing the "latest" objects, by date. Objects with
     a date in the *future* are not included unless you set ``allow_future`` to
     ``True``.
-
-    :class:`~django.views.generic.dates.BaseArchiveIndexView` implements the
-    same behavior as :class:`~django.views.generic.dates.ArchiveIndexView`, but
-    doesn't include the
-    :class:`~django.views.generic.list.MultipleObjectTemplateResponseMixin`.
 
     **Mixins**
 
@@ -469,17 +432,11 @@ ArchiveIndexView
 
 YearArchiveView
 ~~~~~~~~~~~~~~~
-.. class:: BaseYearArchiveView()
 .. class:: YearArchiveView()
 
     A yearly archive page showing all available months in a given year. Objects
     with a date in the *future* are not displayed unless you set
     ``allow_future`` to ``True``.
-
-    :class:`~django.views.generic.dates.BaseYearArchiveView` implements the
-    same behavior as :class:`~django.views.generic.dates.YearArchiveView`, but
-    doesn't include the
-    :class:`~django.views.generic.list.MultipleObjectTemplateResponseMixin`.
 
     **Mixins**
 
@@ -526,18 +483,11 @@ YearArchiveView
 
 MonthArchiveView
 ~~~~~~~~~~~~~~~~
-.. class:: BaseMonthArchiveView()
 .. class:: MonthArchiveView()
 
     A monthly archive page showing all objects in a given month. Objects with a
     date in the *future* are not displayed unless you set ``allow_future`` to
     ``True``.
-
-    :class:`~django.views.generic.dates.BaseMonthArchiveView` implements
-    the same behavior as
-    :class:`~django.views.generic.dates.MonthArchiveView`, but doesn't
-    include the
-    :class:`~django.views.generic.list.MultipleObjectTemplateResponseMixin`.
 
     **Mixins**
 
@@ -573,17 +523,11 @@ MonthArchiveView
 
 WeekArchiveView
 ~~~~~~~~~~~~~~~
-.. class:: BaseWeekArchiveView()
 .. class:: WeekArchiveView()
 
     A weekly archive page showing all objects in a given week. Objects with a
     date in the *future* are not displayed unless you set ``allow_future`` to
     ``True``.
-
-    :class:`~django.views.generic.dates.BaseWeekArchiveView` implements the
-    same behavior as :class:`~django.views.generic.dates.WeekArchiveView`, but
-    doesn't include the
-    :class:`~django.views.generic.list.MultipleObjectTemplateResponseMixin`.
 
     **Mixins**
 
@@ -616,17 +560,11 @@ WeekArchiveView
 
 DayArchiveView
 ~~~~~~~~~~~~~~
-.. class:: BaseDayArchiveView()
 .. class:: DayArchiveView()
 
     A day archive page showing all objects in a given day. Days in the future
     throw a 404 error, regardless of whether any objects exist for future days,
     unless you set ``allow_future`` to ``True``.
-
-    :class:`~django.views.generic.dates.BaseDayArchiveView` implements the same
-    behavior as :class:`~django.views.generic.dates.DayArchiveView`, but
-    doesn't include the
-    :class:`~django.views.generic.list.MultipleObjectTemplateResponseMixin`.
 
     **Mixins**
 
@@ -665,17 +603,11 @@ DayArchiveView
 
 TodayArchiveView
 ~~~~~~~~~~~~~~~~
-.. class:: BaseTodayArchiveView()
 .. class:: TodayArchiveView()
 
     A day archive page showing all objects for *today*. This is exactly the
     same as :class:`django.views.generic.dates.DayArchiveView`, except today's
     date is used instead of the ``year``/``month``/``day`` arguments.
-
-    :class:`~django.views.generic.dates.BaseTodayArchiveView` implements the
-    same behavior as :class:`~django.views.generic.dates.TodayArchiveView`, but
-    doesn't include the
-    :class:`~django.views.generic.list.MultipleObjectTemplateResponseMixin`.
 
     **Mixins**
 
@@ -684,17 +616,11 @@ TodayArchiveView
 
 DateDetailView
 ~~~~~~~~~~~~~~
-.. class:: BaseDateDetailView()
 .. class:: DateDetailView()
 
     A page representing an individual object. If the object has a date value in
     the future, the view will throw a 404 error by default, unless you set
     ``allow_future`` to ``True``.
-
-    :class:`~django.views.generic.dates.BaseDateDetailView` implements the same
-    behavior as :class:`~django.views.generic.dates.DateDetailView`, but
-    doesn't include the
-    :class:`~django.views.generic.detail.SingleObjectTemplateResponseMixin`.
 
     **Mixins**
 
@@ -704,3 +630,6 @@ DateDetailView
     * :class:`django.views.generic.dates.YearMixin`
     * :class:`django.views.generic.dates.MonthMixin`
     * :class:`django.views.generic.dates.DayMixin`
+
+.. note:: All of the generic views listed above have matching Base* views that only
+    differ in that the they do not include the :class:`~django.views.generic.detail.SingleObjectTemplateResponseMixin`.
