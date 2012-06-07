@@ -25,3 +25,4 @@ API Reference
    unicode
    utils
    validators
+   views/index
