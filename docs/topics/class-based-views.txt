@@ -145,26 +145,32 @@ be using these models::
         publisher = models.ForeignKey(Publisher)
         publication_date = models.DateField()
 
-To build a list page of all publishers, we'd use a URLconf along these lines::
+Now we need to define a view::
 
-    from django.conf.urls import patterns, url, include
+    # views.py
     from django.views.generic import ListView
     from books.models import Publisher
 
+    class PublisherList(ListView):
+        model = Publisher
+
+Finally hook that view into your urls::
+
+    # urls.py
+    from django.conf.urls import patterns, url, include
+    from books.views import PublisherList
+
     urlpatterns = patterns('',
-        (r'^publishers/$', ListView.as_view(
-            model=Publisher,
-        )),
+        url(r'^publishers/$', PublisherList.as_view()),
     )
 
 That's all the Python code we need to write. We still need to write a template,
-however. We could explicitly tell the view which template to use
-by including a ``template_name`` key in the arguments to as_view, but in
-the absence of an explicit template Django will infer one from the object's
-name. In this case, the inferred template will be
-``"books/publisher_list.html"`` -- the "books" part comes from the name of the
-app that defines the model, while the "publisher" bit is just the lowercased
-version of the model's name.
+however. We could explicitly tell the view which template to use by adding a
+``template_name`` attribute to the view, but in the absence of an explicit
+template Django will infer one from the object's name. In this case, the
+inferred template will be ``"books/publisher_list.html"`` -- the "books" part
+comes from the name of the app that defines the model, while the "publisher"
+bit is just the lowercased version of the model's name.
 
 .. note::
     Thus, when (for example) the
@@ -191,7 +197,7 @@ might look like the following::
     {% endblock %}
 
 That's really all there is to it. All the cool features of generic views come
-from changing the "info" dictionary passed to the generic view. The
+from changing the attributes set on the generic view. The
 :doc:`generic views reference</ref/class-based-views>` documents all the generic
 views and their options in detail; the rest of this document will consider
 some of the common ways you might customize and extend generic views.
