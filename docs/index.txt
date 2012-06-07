@@ -111,7 +111,7 @@ The view layer
   :doc:`Date-based generic views<topics/date-based-generic-views>` |
   :doc:`Form handling<topics/form-handling-class-based-views>` |
   :doc:`Mixin overview<topics/mixins-class-based-views>` |
-  :doc:`Built-in class-based views<ref/class-based-views>` |
+  :doc:`Built-in class-based views<ref/class-based-views/index>` |
   :doc:`Built-in view mixins<ref/class-based-view-mixins>`
 
 * **Advanced:**

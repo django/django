@@ -1,0 +1,62 @@
+====================================
+Generic Editing Class Based Views
+====================================
+
+.. currentmodule:: django.views.generic.edit
+
+FormView
+~~~~~~~~
+.. class:: FormView()
+
+    A view that displays a form. On error, redisplays the form with validation
+    errors; on success, redirects to a new URL.
+
+    **Mixins**
+
+    * :class:`django.views.generic.edit.FormMixin`
+    * :class:`django.views.generic.edit.ProcessFormView`
+
+CreateView
+~~~~~~~~~~
+.. class:: CreateView()
+
+    A view that displays a form for creating an object, redisplaying the form
+    with validation errors (if there are any) and saving the object.
+
+    **Mixins**
+
+    * :class:`django.views.generic.edit.ModelFormMixin`
+    * :class:`django.views.generic.edit.ProcessFormView`
+
+UpdateView
+~~~~~~~~~~
+.. class:: UpdateView()
+
+    A view that displays a form for editing an existing object, redisplaying
+    the form with validation errors (if there are any) and saving changes to
+    the object. This uses a form automatically generated from the object's
+    model class (unless a form class is manually specified).
+
+    **Mixins**
+
+    * :class:`django.views.generic.edit.ModelFormMixin`
+    * :class:`django.views.generic.edit.ProcessFormView`
+
+DeleteView
+~~~~~~~~~~
+.. class:: DeleteView()
+
+    A view that displays a confirmation page and deletes an existing object.
+    The given object will only be deleted if the request method is ``POST``. If
+    this view is fetched via ``GET``, it will display a confirmation page that
+    should contain a form that POSTs to the same URL.
+
+    **Mixins**
+
+    * :class:`django.views.generic.edit.DeletionMixin`
+    * :class:`django.views.generic.detail.BaseDetailView`
+
+    **Notes**
+
+    * The delete confirmation page displayed to a GET request uses a
+      ``template_name_suffix`` of ``'_confirm_delete'``.

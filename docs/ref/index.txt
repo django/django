@@ -13,7 +13,7 @@ API Reference
    exceptions
    files/index
    forms/index
-   class-based-views
+   class-based-views/index
    class-based-view-mixins
    middleware
    models/index
