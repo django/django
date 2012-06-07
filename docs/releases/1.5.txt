@@ -62,6 +62,13 @@ For one-to-one relationships, both sides can be cached. For many-to-one
 relationships, only the single side of the relationship can be cached. This
 is particularly helpful in combination with ``prefetch_related``.
 
+``{% verbatim %}`` template tag
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To make it easier to deal with javascript templates which collide with Django's
+syntax, you can now use the :ttag:`verbatim` block tag to avoid parsing the
+tag's content.
+
 Minor features
 ~~~~~~~~~~~~~~
 
