@@ -131,25 +131,31 @@ The distinction between :ref:`ref-forms-api-bound-unbound` is important:
 Handling file uploads with a form
 ---------------------------------
 
-To see how to handle file uploads with your form see
-:ref:`binding-uploaded-files` for more information.
+To see how to handle file uploads with your form, see
+:ref:`binding-uploaded-files`.
 
 Processing the data from a form
 -------------------------------
 
-Once ``is_valid()`` returns ``True``, you can process the form submission safe
-in the knowledge that it conforms to the validation rules defined by your form.
-While you could access ``request.POST`` directly at this point, it is better to
-access ``form.cleaned_data``. This data has not only been validated but will
-also be converted in to the relevant Python types for you. In the above example,
-``cc_myself`` will be a boolean value. Likewise, fields such as ``IntegerField``
-and ``FloatField`` convert values to a Python int and float respectively. Note
-that read-only fields are not available in ``form.cleaned_data`` (and setting
-a value in a custom ``clean()`` method won't have any effect) because these
+Once ``is_valid()`` returns ``True``, the successfully validated form data will
+be in the ``form.cleaned_data`` dictionary. This data will also converted nicely
+into Python types for you.
+
+.. note::
+
+   You can still access the unvalidated data directly from ``request.POST`` at
+   this point, but the validated data is better.
+
+In the above example, ``cc_myself`` will be a boolean value. Likewise, fields
+such as ``IntegerField`` and ``FloatField`` convert values to a Python int and
+float respectively.
+
+Read-only fields are not available in ``form.cleaned_data`` (and setting
+a value in a custom ``clean()`` method won't have any effect). These
 fields are displayed as text rather than as input elements, and thus are not
 posted back to the server.
 
-Extending the above example, here's how the form data could be processed:
+Extending the earlier example, here's how the form data could be processed:
 
 .. code-block:: python
 
@@ -167,7 +173,9 @@ Extending the above example, here's how the form data could be processed:
         send_mail(subject, message, sender, recipients)
         return HttpResponseRedirect('/thanks/') # Redirect after POST
 
-For more on sending email from Django, see :doc:`/topics/email`.
+.. tip::
+
+   For more on sending email from Django, see :doc:`/topics/email`.
 
 Displaying a form using a template
 ----------------------------------
