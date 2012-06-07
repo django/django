@@ -39,6 +39,8 @@ The view can be constructed using a FormView::
         success_url = '/thanks/'
 
         def form_valid(self, form):
+            # This method is called when valid form data has been POSTed.
+            # It should return an HttpResponse.
             form.send_email()
             return super(ContactView, self).form_valid(form)
 
@@ -57,6 +59,11 @@ they can work out which model class to use:
 * If the ``model`` attribute is given, that model class will be used
 * If ``get_object`` returns an object, the class of that object will be used
 * If a ``queryset`` is given, the model for that queryset will be used
+
+Model views provide a ``form_valid`` implementation that saves the model
+automatically.
+You can override/extend this method if you have any special requirements
+(see below for examples).
 
 You don't even need to provide a success_url for ``CreateView`` or
 ``UpdateView`` - they will use ``model.get_absolute_url()`` if available.
