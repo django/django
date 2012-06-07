@@ -79,19 +79,19 @@ At this point, you can work on the code and continue as above.
 GitHub provides a one-click merge functionality for pull requests. This should
 only be used if the pull request is 100% ready, and you have checked it for
 errors (or trust the request maker enough to skip checks). Currently, it isn't
-possible to control that the tests pass and that the docs build without
-downloading the changes to your developement environment.
+possible to check that the tests pass and that the docs build without
+downloading the changes to your development environment.
 
 When rewriting the commit history of a pull request, the goal is to make
-Django's commit history is as usable as possible:
+Django's commit history as usable as possible:
 
 * If a patch contains back-and-forth commits, then rewrite those into one.
   Typically, a commit can add some code, and a second commit can fix
   stylistic issues introduced in the first commit.
 
 * Separate changes to different commits by logical grouping: if you do a
-  stylistic cleanup at the same time you do other changes to a file,
-  separating the changes to two different commits will make reviewing
+  stylistic cleanup at the same time as you do other changes to a file,
+  separating the changes into two different commits will make reviewing
   history easier.
 
 * Beware of merges of upstream branches in the pull requests.
@@ -100,11 +100,11 @@ Django's commit history is as usable as possible:
   tests nor the docs should emit warnings.
 
 * Trivial and small patches usually are best done in one commit. Medium to
-  large work should be split in multiple commits if possible.
+  large work should be split into multiple commits if possible.
 
 Practicality beats purity, so it is up to each committer to decide how much
 history mangling to do for a pull request. The main points are engaging the
-community, getting work done, and having an usable commit history.
+community, getting work done, and having a usable commit history.
 
 .. _committing-guidlines:
 
@@ -194,7 +194,7 @@ Django's Git repository:
 
     [1.3.x] Fixed #17028 - Changed diveintopython.org -> diveintopython.net.
 
-    Backport of 80c0cbf1c97047daed2c5b41b296bbc56fe1d7e3 from trunk.
+    Backport of 80c0cbf1c97047daed2c5b41b296bbc56fe1d7e3 from master.
 
 Reverting commits
 -----------------
