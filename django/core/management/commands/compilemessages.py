@@ -24,34 +24,38 @@ def compile_messages(stderr, locale=None):
         raise CommandError("This script should be run from the Django Git checkout or your project or app tree, or with the settings module specified.")
 
     for basedir in basedirs:
+        dirs = [basedir]
         if locale:
-            basedir = os.path.join(basedir, locale, 'LC_MESSAGES')
-        for dirpath, dirnames, filenames in os.walk(basedir):
-            for f in filenames:
-                if f.endswith('.po'):
-                    stderr.write('processing file %s in %s\n' % (f, dirpath))
-                    fn = os.path.join(dirpath, f)
-                    if has_bom(fn):
-                        raise CommandError("The %s file has a BOM (Byte Order Mark). Django only supports .po files encoded in UTF-8 and without any BOM." % fn)
-                    pf = os.path.splitext(fn)[0]
-                    # Store the names of the .mo and .po files in an environment
-                    # variable, rather than doing a string replacement into the
-                    # command, so that we can take advantage of shell quoting, to
-                    # quote any malicious characters/escaping.
-                    # See http://cyberelk.net/tim/articles/cmdline/ar01s02.html
-                    os.environ['djangocompilemo'] = pf + '.mo'
-                    os.environ['djangocompilepo'] = pf + '.po'
-                    if sys.platform == 'win32': # Different shell-variable syntax
-                        cmd = 'msgfmt --check-format -o "%djangocompilemo%" "%djangocompilepo%"'
-                    else:
-                        cmd = 'msgfmt --check-format -o "$djangocompilemo" "$djangocompilepo"'
-                    os.system(cmd)
+            dirs = [os.path.join(basedir, l, 'LC_MESSAGES') for l in (locale if isinstance(locale, list) else [locale])]
+            
+        
+        for dir in dirs:
+            for dirpath, dirnames, filenames in os.walk(dir):
+                for f in filenames:
+                    if f.endswith('.po'):
+                        stderr.write('processing file %s in %s\n' % (f, dirpath))
+                        fn = os.path.join(dirpath, f)
+                        if has_bom(fn):
+                            raise CommandError("The %s file has a BOM (Byte Order Mark). Django only supports .po files encoded in UTF-8 and without any BOM." % fn)
+                        pf = os.path.splitext(fn)[0]
+                        # Store the names of the .mo and .po files in an environment
+                        # variable, rather than doing a string replacement into the
+                        # command, so that we can take advantage of shell quoting, to
+                        # quote any malicious characters/escaping.
+                        # See http://cyberelk.net/tim/articles/cmdline/ar01s02.html
+                        os.environ['djangocompilemo'] = pf + '.mo'
+                        os.environ['djangocompilepo'] = pf + '.po'
+                        if sys.platform == 'win32': # Different shell-variable syntax
+                            cmd = 'msgfmt --check-format -o "%djangocompilemo%" "%djangocompilepo%"'
+                        else:
+                            cmd = 'msgfmt --check-format -o "$djangocompilemo" "$djangocompilepo"'
+                        os.system(cmd)
 
 
 class Command(BaseCommand):
     option_list = BaseCommand.option_list + (
-        make_option('--locale', '-l', dest='locale',
-            help='The locale to process. Default is to process all.'),
+        make_option('--locale', '-l', dest='locale', action="append",
+            help='A locale to process. Default is to process all.'),
     )
     help = 'Compiles .po files to .mo files for use with builtin gettext support.'
 

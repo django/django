@@ -248,7 +248,7 @@ def write_po_file(pofile, potfile, domain, locale, verbosity, stdout,
             raise CommandError(
                 "errors happened while running msgattrib\n%s" % errors)
 
-def make_messages(locale=None, domain='django', verbosity=1, all=False,
+def make_messages(locale=None, domain=None, verbosity=1, all=False,
         extensions=None, symlinks=False, ignore_patterns=None, no_wrap=False,
         no_location=False, no_obsolete=False, stdout=sys.stdout):
     """
@@ -283,10 +283,15 @@ def make_messages(locale=None, domain='django', verbosity=1, all=False,
                 "is not created automatically, you have to create it by hand "
                 "if you want to enable i18n for your project or application.")
 
-    if domain not in ('django', 'djangojs'):
+    if domain is None:
+        domains = ['django']
+    else:
+        domains = [domain] if not isinstance(domain, list) else domain
+
+    if any(d not in ('django', 'djangojs') for d in domains):
         raise CommandError("currently makemessages only supports domains 'django' and 'djangojs'")
 
-    if (locale is None and not all) or domain is None:
+    if (locale is None and not all) or not domains:
         message = "Type '%s help %s' for usage information." % (os.path.basename(sys.argv[0]), sys.argv[1])
         raise CommandError(message)
 
@@ -302,7 +307,7 @@ def make_messages(locale=None, domain='django', verbosity=1, all=False,
 
     locales = []
     if locale is not None:
-        locales.append(locale)
+        locales += locale.split(',') if not isinstance(locale, list) else locale
     elif all:
         locale_dirs = filter(os.path.isdir, glob.glob('%s/*' % localedir))
         locales = [os.path.basename(l) for l in locale_dirs]
@@ -317,28 +322,31 @@ def make_messages(locale=None, domain='django', verbosity=1, all=False,
         if not os.path.isdir(basedir):
             os.makedirs(basedir)
 
-        pofile = os.path.join(basedir, '%s.po' % domain)
-        potfile = os.path.join(basedir, '%s.pot' % domain)
-
-        if os.path.exists(potfile):
-            os.unlink(potfile)
-
-        for dirpath, file in find_files(".", ignore_patterns, verbosity,
-                stdout, symlinks=symlinks):
-            process_file(file, dirpath, potfile, domain, verbosity, extensions,
-                    wrap, location, stdout)
-
-        if os.path.exists(potfile):
-            write_po_file(pofile, potfile, domain, locale, verbosity, stdout,
-                    not invoked_for_django, wrap, location, no_obsolete)
+        for domain in domains:
+            if verbosity > 1:
+                stdout.write("processing domain %s\n" % domain)
+            pofile = os.path.join(basedir, '%s.po' % domain)
+            potfile = os.path.join(basedir, '%s.pot' % domain)
+    
+            if os.path.exists(potfile):
+                os.unlink(potfile)
+    
+            for dirpath, file in find_files(".", ignore_patterns, verbosity,
+                    stdout, symlinks=symlinks):
+                process_file(file, dirpath, potfile, domain, verbosity, extensions,
+                        wrap, location, stdout)
+    
+            if os.path.exists(potfile):
+                write_po_file(pofile, potfile, domain, locale, verbosity, stdout,
+                        not invoked_for_django, wrap, location, no_obsolete)
 
 
 class Command(NoArgsCommand):
     option_list = NoArgsCommand.option_list + (
-        make_option('--locale', '-l', default=None, dest='locale',
-            help='Creates or updates the message files for the given locale (e.g. pt_BR).'),
-        make_option('--domain', '-d', default='django', dest='domain',
-            help='The domain of the message files (default: "django").'),
+        make_option('--locale', '-l', default=None, dest='locale', action='append',
+            help='Creates or updates the message files for the given locale(s) (e.g. pt_BR).'),
+        make_option('--domain', '-d', default=None, dest='domain', action='append',
+            help='The domain(s) of the message files (default: "django").'),
         make_option('--all', '-a', action='store_true', dest='all',
             default=False, help='Updates the message files for all existing locales.'),
         make_option('--extension', '-e', dest='extensions',
