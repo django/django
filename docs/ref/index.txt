@@ -14,6 +14,7 @@ API Reference
    files/index
    forms/index
    class-based-views
+   class-based-view-mixins
    middleware
    models/index
    request-response

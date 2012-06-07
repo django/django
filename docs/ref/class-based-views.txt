@@ -17,25 +17,22 @@ level.
 A general introduction to class-based generic views can be found in the
 :doc:`topic guide </topics/class-based-views>`.
 
-This reference contains details of Django's built-in generic views, along with
-a list of the keyword arguments that each generic view expects. Remember that
+This reference contains details of Django's built-in class based views, along with
+a list of the keyword arguments that each class based view expects. Remember that
 arguments may either come from the URL pattern or from the ``extra_context``
 additional-information dictionary.
 
-Most generic views require the ``queryset`` key, which is a ``QuerySet``
-instance; see :doc:`/topics/db/queries` for more information about ``QuerySet``
-objects.
+Fundamental class based views
+=============================
 
-Generic views
-=============
-
-Simple generic views
---------------------
+The following three views provide much of the functionality needed to create
+Django views. They may not provide all the capabilities that required for
+projects, in which case there are Mixins and Generic class based views.
 
 .. currentmodule:: django.views.generic.base
 
 View
-~~~~
+----
 .. class:: View()
 
     The master class-based base view. All other generic class-based views
@@ -88,7 +85,7 @@ View
         of allowed methods in plain text.
 
 TemplateView
-~~~~~~~~~~~~
+------------
 .. class:: TemplateView()
 
     Renders a given template, passing it a ``{{ params }}`` template variable,
@@ -113,7 +110,7 @@ TemplateView
       pattern that served the view.
 
 RedirectView
-~~~~~~~~~~~~
+------------
 .. class:: RedirectView()
 
     Redirects to a given URL.
@@ -156,6 +153,13 @@ RedirectView
         :attr:`~RedirectView.query_string`. Subclasses may implement any
         behavior they wish, as long as the method returns a redirect-ready URL
         string.
+
+Generic views
+=============
+
+Most generic views require the ``queryset`` key, which is a ``QuerySet``
+instance; see :doc:`/topics/db/queries` for more information about ``QuerySet``
+objects.
 
 Detail views
 ------------
