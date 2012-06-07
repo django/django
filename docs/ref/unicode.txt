@@ -65,7 +65,8 @@ Python 2 with unicode literals or Python 3::
 
     my_string = b"This is a bytestring"
     my_unicode = "This is an Unicode string"
-    
+
+See also :doc:`Python 3 compatibility </topics/python3>`.
 
 .. admonition:: Warning
 
