@@ -664,10 +664,32 @@ Note a few important things about how the test client works:
 Making requests
 ~~~~~~~~~~~~~~~
 
-Use the ``django.test.client.Client`` class to make requests. It requires no
-arguments at time of construction:
+Use the ``django.test.client.Client`` class to make requests.
 
 .. class:: Client()
+
+    It requires no arguments at time of construction but you can provide some
+    default values:
+
+    .. method:: Client.__init__(enforce_csrf_checks=False, **defaults)
+
+
+        Creates an instance of the test client. By default the test client 
+        will disable any CSRF checks performed by your site due to the default
+        ``enforce_csrf_checks`` value.
+
+        The ``defaults`` keywords argument parameter can be used to specify 
+        some default headers to be sent in the request. For example::
+
+            >>> c = Client(HTTP_USER_AGENT='Mozilla/5.0')
+
+        ...will send the HTTP header ``HTTP_USER_AGENT`` on further requests.
+
+        The values from the ``extra`` keywords argument on the 
+        :meth:`django.test.client.Client.get()`, 
+        :meth:`django.test.client.Client.post()`, 
+        :meth:`django.test.client.Client.delete()`
+        , etc. have precedence than those defaults provided.
 
     Once you have a ``Client`` instance, you can call any of the following
     methods:
