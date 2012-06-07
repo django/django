@@ -101,11 +101,13 @@ View
 
     **Example views.py**::
 
-        from django.views.generic.base import View
+        from django.http import HttpResponse
+        from django.views.generic import View
 
         class MyView(View):
-            # TODO - find an actual example of this view
-            pass
+
+            def get(self, request, *args, **kwargs):
+                return HttpResponse('Hello, World!')
 
     **Example urls.py**::
     
