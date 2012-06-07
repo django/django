@@ -94,11 +94,11 @@ generic view.
 Generic views of objects
 ========================
 
-:class:`~django.views.generic.base.TemplateView` certainly is useful,
-but Django's generic views really shine when it comes to presenting
-views of your database content. Because it's such a common task,
-Django comes with a handful of built-in generic views that make
-generating list and detail views of objects incredibly easy.
+:class:`~django.views.generic.base.TemplateView` certainly is useful, but
+Django's generic views really shine when it comes to presenting views of your
+database content. Because it's such a common task, Django comes with a handful
+of built-in generic views that make generating list and detail views of objects
+incredibly easy.
 
 Let's take a look at one of these generic views: the "object list" view. We'll
 be using these models::
