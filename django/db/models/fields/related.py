@@ -359,7 +359,7 @@ class ReverseSingleRelatedObjectDescriptor(object):
             else:
                 other_field = self.field.rel.get_related_field()
                 if other_field.rel:
-                    params = {'%s__pk' % self.field.rel.field_name: val}
+                    params = {'%s__%s' % (self.field.rel.field_name, other_field.rel.field_name): val}
                 else:
                     params = {'%s__exact' % self.field.rel.field_name: val}
                 qs = self.get_query_set(instance=instance)
