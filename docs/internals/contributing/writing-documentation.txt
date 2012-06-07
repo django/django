@@ -18,6 +18,17 @@ Documentation changes generally come in two forms:
 This section explains how writers can craft their documentation changes
 in the most useful and least error-prone ways.
 
+
+.. _getting-the-documentation-code:
+
+Getting the documentation code
+------------------------------
+To get started improving or writing documentation, get the development version
+of Django from the source code repository (see :ref:`installing-development-version`).
+The documentation is usually only revised in trunk, as it is frozen for
+existing releases (see :ref:`differences-between-doc-versions`).
+
+
 Getting started with Sphinx
 ---------------------------
 
@@ -311,3 +322,4 @@ look better:
   (that's a tilde) to get just the "last bit" of that path. So
   ``:class:`~django.contrib.contenttypes.models.ContentType``` will just
   display a link with the title "ContentType".
+
