@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 from django.contrib.contenttypes.models import ContentType
 from django.db import connection
@@ -66,7 +66,7 @@ class PrefetchRelatedTests(TestCase):
             lists = [list(b.first_time_authors.all())
                      for b in Book.objects.prefetch_related('first_time_authors')]
 
-        self.assertQuerysetEqual(self.book2.authors.all(), [u"<Author: Charlotte>"])
+        self.assertQuerysetEqual(self.book2.authors.all(), ["<Author: Charlotte>"])
 
     def test_onetoone_reverse_no_match(self):
         # Regression for #17439
@@ -125,10 +125,10 @@ class PrefetchRelatedTests(TestCase):
                      for a in qs]
             self.assertEqual(lists,
             [
-                [[u"Amy"], [u"Belinda"]],  # Charlotte - Poems, Jane Eyre
-                [[u"Amy"]],                # Anne - Poems
-                [[u"Amy"], []],            # Emily - Poems, Wuthering Heights
-                [[u"Amy", u"Belinda"]],    # Jane - Sense and Sense
+                [["Amy"], ["Belinda"]],  # Charlotte - Poems, Jane Eyre
+                [["Amy"]],                # Anne - Poems
+                [["Amy"], []],            # Emily - Poems, Wuthering Heights
+                [["Amy", "Belinda"]],    # Jane - Sense and Sense
             ])
 
     def test_overriding_prefetch(self):
@@ -139,10 +139,10 @@ class PrefetchRelatedTests(TestCase):
                      for a in qs]
             self.assertEqual(lists,
             [
-                [[u"Amy"], [u"Belinda"]],  # Charlotte - Poems, Jane Eyre
-                [[u"Amy"]],                # Anne - Poems
-                [[u"Amy"], []],            # Emily - Poems, Wuthering Heights
-                [[u"Amy", u"Belinda"]],    # Jane - Sense and Sense
+                [["Amy"], ["Belinda"]],  # Charlotte - Poems, Jane Eyre
+                [["Amy"]],                # Anne - Poems
+                [["Amy"], []],            # Emily - Poems, Wuthering Heights
+                [["Amy", "Belinda"]],    # Jane - Sense and Sense
             ])
         with self.assertNumQueries(3):
             qs = Author.objects.prefetch_related('books__read_by', 'books')
@@ -151,10 +151,10 @@ class PrefetchRelatedTests(TestCase):
                      for a in qs]
             self.assertEqual(lists,
             [
-                [[u"Amy"], [u"Belinda"]],  # Charlotte - Poems, Jane Eyre
-                [[u"Amy"]],                # Anne - Poems
-                [[u"Amy"], []],            # Emily - Poems, Wuthering Heights
-                [[u"Amy", u"Belinda"]],    # Jane - Sense and Sense
+                [["Amy"], ["Belinda"]],  # Charlotte - Poems, Jane Eyre
+                [["Amy"]],                # Anne - Poems
+                [["Amy"], []],            # Emily - Poems, Wuthering Heights
+                [["Amy", "Belinda"]],    # Jane - Sense and Sense
             ])
 
     def test_get(self):
@@ -166,7 +166,7 @@ class PrefetchRelatedTests(TestCase):
             author = Author.objects.prefetch_related('books__read_by').get(name="Charlotte")
             lists = [[unicode(r) for r in b.read_by.all()]
                       for b in author.books.all()]
-            self.assertEqual(lists, [[u"Amy"], [u"Belinda"]])  # Poems, Jane Eyre
+            self.assertEqual(lists, [["Amy"], ["Belinda"]])  # Poems, Jane Eyre
 
     def test_foreign_key_then_m2m(self):
         """
@@ -177,10 +177,10 @@ class PrefetchRelatedTests(TestCase):
             qs = Author.objects.select_related('first_book').prefetch_related('first_book__read_by')
             lists = [[unicode(r) for r in a.first_book.read_by.all()]
                      for a in qs]
-            self.assertEqual(lists, [[u"Amy"],
-                                     [u"Amy"],
-                                     [u"Amy"],
-                                     [u"Amy", "Belinda"]])
+            self.assertEqual(lists, [["Amy"],
+                                     ["Amy"],
+                                     ["Amy"],
+                                     ["Amy", "Belinda"]])
 
     def test_attribute_error(self):
         qs = Reader.objects.all().prefetch_related('books_read__xyz')

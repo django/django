@@ -4,6 +4,8 @@
 
 # The *_FORMAT strings use the Django date format syntax,
 # see http://docs.djangoproject.com/en/dev/ref/templates/builtins/#date
+from __future__ import unicode_literals
+
 DATE_FORMAT = 'j. F Y'
 TIME_FORMAT = 'H:i:s'
 DATETIME_FORMAT = 'j. F Y H:i:s'
@@ -39,5 +41,5 @@ DATETIME_INPUT_FORMATS = (
 # For details, please refer to http://www.bk.admin.ch/dokumentation/sprachen/04915/05016/index.html?lang=de
 # (in German) and the documentation
 DECIMAL_SEPARATOR = ','
-THOUSAND_SEPARATOR = u'\xa0' # non-breaking space
+THOUSAND_SEPARATOR = '\xa0' # non-breaking space
 NUMBER_GROUPING = 3

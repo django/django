@@ -6,7 +6,7 @@ test case that is capable of testing the capabilities of
 the serializers. This includes all valid data values, plus
 forward, backwards and self references.
 """
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import datetime
 import decimal
@@ -183,7 +183,7 @@ test_data = [
     (data_obj, 15, CharData, None),
     # (We use something that will fit into a latin1 database encoding here,
     # because that is still the default used on many system setups.)
-    (data_obj, 16, CharData, u'\xa5'),
+    (data_obj, 16, CharData, '\xa5'),
     (data_obj, 20, DateData, datetime.date(2006,6,16)),
     (data_obj, 21, DateData, None),
     (data_obj, 30, DateTimeData, datetime.datetime(2006,6,16,10,42,37)),

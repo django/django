@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django.contrib.auth.models import User
 from django.db import models
 
@@ -71,4 +73,4 @@ class CarDriver(models.Model):
     driver = models.ForeignKey('Driver', to_field='name')
 
     def __unicode__(self, ):
-        return u"pk=%s car=%s driver=%s" % (str(self.pk), self.car, self.driver)
+        return "pk=%s car=%s driver=%s" % (str(self.pk), self.car, self.driver)

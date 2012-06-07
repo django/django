@@ -2,6 +2,8 @@
 Testing of admin inline formsets.
 
 """
+from __future__ import unicode_literals
+
 from django.db import models
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
@@ -30,7 +32,7 @@ class Child(models.Model):
     parent = generic.GenericForeignKey()
 
     def __unicode__(self):
-        return u'I am %s, a child of %s' % (self.name, self.parent)
+        return 'I am %s, a child of %s' % (self.name, self.parent)
 
 
 class Book(models.Model):

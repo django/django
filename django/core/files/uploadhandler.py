@@ -2,6 +2,8 @@
 Base file upload handler classes, and the built-in concrete subclasses
 """
 
+from __future__ import unicode_literals
+
 from io import BytesIO
 
 from django.conf import settings
@@ -33,9 +35,9 @@ class StopUpload(UploadFileException):
 
     def __unicode__(self):
         if self.connection_reset:
-            return u'StopUpload: Halt current upload.'
+            return 'StopUpload: Halt current upload.'
         else:
-            return u'StopUpload: Consume request data, then halt.'
+            return 'StopUpload: Consume request data, then halt.'
 
 class SkipFile(UploadFileException):
     """

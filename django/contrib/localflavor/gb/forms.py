@@ -2,7 +2,7 @@
 GB-specific Form helpers
 """
 
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import re
 
@@ -22,7 +22,7 @@ class GBPostcodeField(CharField):
     The value is uppercased and a space added in the correct place, if required.
     """
     default_error_messages = {
-        'invalid': _(u'Enter a valid postcode.'),
+        'invalid': _('Enter a valid postcode.'),
     }
     outcode_pattern = '[A-PR-UWYZ]([0-9]{1,2}|([A-HIK-Y][0-9](|[0-9]|[ABEHMNPRVWXY]))|[0-9][A-HJKSTUW])'
     incode_pattern = '[0-9][ABD-HJLNP-UW-Z]{2}'
@@ -31,7 +31,7 @@ class GBPostcodeField(CharField):
 
     def clean(self, value):
         value = super(GBPostcodeField, self).clean(value)
-        if value == u'':
+        if value == '':
             return value
         postcode = value.upper().strip()
         # Put a single space before the incode (second part).

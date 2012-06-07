@@ -3,6 +3,7 @@ MySQL database backend for Django.
 
 Requires MySQLdb: http://sourceforge.net/projects/mysql-python
 """
+from __future__ import unicode_literals
 
 import datetime
 import re
@@ -61,8 +62,8 @@ def adapt_datetime_with_timezone_support(value, conv):
     # Equivalent to DateTimeField.get_db_prep_value. Used only by raw SQL.
     if settings.USE_TZ:
         if timezone.is_naive(value):
-            warnings.warn(u"SQLite received a naive datetime (%s)"
-                          u" while time zone support is active." % value,
+            warnings.warn("SQLite received a naive datetime (%s)"
+                          " while time zone support is active." % value,
                           RuntimeWarning)
             default_timezone = timezone.get_default_timezone()
             value = timezone.make_aware(value, default_timezone)

@@ -94,10 +94,11 @@ The ``ContentFile`` Class
     but unlike :class:`~django.core.files.File` it operates on string content,
     rather than an actual file. For example::
 
+        from __future__ import unicode_literals
         from django.core.files.base import ContentFile
 
         f1 = ContentFile(b"my string content")
-        f2 = ContentFile(u"my unicode content encoded as UTF-8".encode('UTF-8'))
+        f2 = ContentFile("my unicode content encoded as UTF-8".encode('UTF-8'))
 
 .. currentmodule:: django.core.files.images
 

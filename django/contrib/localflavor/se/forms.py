@@ -2,7 +2,7 @@
 """
 Swedish specific Form helpers
 """
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import re
 
@@ -58,7 +58,7 @@ class SEOrganisationNumberField(forms.CharField):
         value = super(SEOrganisationNumberField, self).clean(value)
 
         if value in EMPTY_VALUES:
-            return u''
+            return ''
 
         match = SWEDISH_ID_NUMBER.match(value)
         if not match:
@@ -116,7 +116,7 @@ class SEPersonalIdentityNumberField(forms.CharField):
         value = super(SEPersonalIdentityNumberField, self).clean(value)
 
         if value in EMPTY_VALUES:
-            return u''
+            return ''
 
         match = SWEDISH_ID_NUMBER.match(value)
         if match is None:

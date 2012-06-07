@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django import http
 from django.db import models
 from django.contrib.databrowse.datastructures import EasyModel
@@ -61,14 +63,14 @@ class CalendarPlugin(DatabrowsePlugin):
     def model_index_html(self, request, model, site):
         fields = self.field_dict(model)
         if not fields:
-            return u''
-        return mark_safe(u'<p class="filter"><strong>View calendar by:</strong> %s</p>' % \
-            u', '.join(['<a href="calendars/%s/">%s</a>' % (f.name, force_unicode(capfirst(f.verbose_name))) for f in fields.values()]))
+            return ''
+        return mark_safe('<p class="filter"><strong>View calendar by:</strong> %s</p>' % \
+            ', '.join(['<a href="calendars/%s/">%s</a>' % (f.name, force_unicode(capfirst(f.verbose_name))) for f in fields.values()]))
 
     def urls(self, plugin_name, easy_instance_field):
         if isinstance(easy_instance_field.field, models.DateField):
             d = easy_instance_field.raw_value
-            return [mark_safe(u'%s%s/%s/%s/%s/%s/' % (
+            return [mark_safe('%s%s/%s/%s/%s/%s/' % (
                 easy_instance_field.model.url(),
                 plugin_name, easy_instance_field.field.name,
                 str(d.year),

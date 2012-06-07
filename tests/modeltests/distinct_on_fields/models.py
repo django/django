@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django.db import models
 
 class Tag(models.Model):
@@ -36,4 +38,4 @@ class StaffTag(models.Model):
     tag = models.ForeignKey(Tag)
 
     def __unicode__(self):
-        return u"%s -> %s" % (self.tag, self.staff)
+        return "%s -> %s" % (self.tag, self.staff)

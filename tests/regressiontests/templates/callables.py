@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django import template
 from django.utils.unittest import TestCase
 
@@ -20,7 +22,7 @@ class CallableVariablesTests(TestCase):
         # ``my_doodad.__call__`` will be invoked first, yielding a dictionary
         # without a key ``value``.
         t = template.Template('{{ my_doodad.value }}')
-        self.assertEqual(t.render(c), u'')
+        self.assertEqual(t.render(c), '')
 
         # We can confirm that the doodad has been called
         self.assertEqual(my_doodad.num_calls, 1)
@@ -28,7 +30,7 @@ class CallableVariablesTests(TestCase):
         # But we can access keys on the dict that's returned
         # by ``__call__``, instead.
         t = template.Template('{{ my_doodad.the_value }}')
-        self.assertEqual(t.render(c), u'42')
+        self.assertEqual(t.render(c), '42')
         self.assertEqual(my_doodad.num_calls, 2)
 
     def test_alters_data(self):
@@ -48,9 +50,9 @@ class CallableVariablesTests(TestCase):
         # Since ``my_doodad.alters_data`` is True, the template system will not
         # try to call our doodad but will use TEMPLATE_STRING_IF_INVALID
         t = template.Template('{{ my_doodad.value }}')
-        self.assertEqual(t.render(c), u'')
+        self.assertEqual(t.render(c), '')
         t = template.Template('{{ my_doodad.the_value }}')
-        self.assertEqual(t.render(c), u'')
+        self.assertEqual(t.render(c), '')
 
         # Double-check that the object was really never called during the
         # template rendering.
@@ -75,9 +77,9 @@ class CallableVariablesTests(TestCase):
         # as normal, and we don't have access to the dict that it returns when
         # called.
         t = template.Template('{{ my_doodad.value }}')
-        self.assertEqual(t.render(c), u'42')
+        self.assertEqual(t.render(c), '42')
         t = template.Template('{{ my_doodad.the_value }}')
-        self.assertEqual(t.render(c), u'')
+        self.assertEqual(t.render(c), '')
 
         # Double-check that the object was really never called during the
         # template rendering.
@@ -102,9 +104,9 @@ class CallableVariablesTests(TestCase):
         c = template.Context({"my_doodad": my_doodad})
 
         t = template.Template('{{ my_doodad.value }}')
-        self.assertEqual(t.render(c), u'42')
+        self.assertEqual(t.render(c), '42')
         t = template.Template('{{ my_doodad.the_value }}')
-        self.assertEqual(t.render(c), u'')
+        self.assertEqual(t.render(c), '')
 
         # Double-check that the object was really never called during the
         # template rendering.

@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django.contrib.localflavor.br.forms import (BRZipCodeField,
     BRCNPJField, BRCPFField, BRPhoneNumberField, BRStateSelect,
     BRStateChoiceField)
@@ -7,7 +9,7 @@ from django.test import SimpleTestCase
 
 class BRLocalFlavorTests(SimpleTestCase):
     def test_BRZipCodeField(self):
-        error_format = [u'Enter a zip code in the format XXXXX-XXX.']
+        error_format = ['Enter a zip code in the format XXXXX-XXX.']
         valid = {
             '12345-123': '12345-123',
         }
@@ -21,8 +23,8 @@ class BRLocalFlavorTests(SimpleTestCase):
         self.assertFieldOutput(BRZipCodeField, valid, invalid)
 
     def test_BRCNPJField(self):
-        error_format = [u'Invalid CNPJ number.']
-        error_numbersonly = [u'This field requires only numbers.']
+        error_format = ['Invalid CNPJ number.']
+        error_numbersonly = ['This field requires only numbers.']
         valid = {
             '64.132.916/0001-88': '64.132.916/0001-88',
             '64-132-916/0001-88': '64-132-916/0001-88',
@@ -37,11 +39,11 @@ class BRLocalFlavorTests(SimpleTestCase):
         self.assertFieldOutput(BRCNPJField, valid, invalid)
 
     def test_BRCPFField(self):
-        error_format = [u'Invalid CPF number.']
-        error_numbersonly = [u'This field requires only numbers.']
-        error_atmost_chars = [u'Ensure this value has at most 14 characters (it has 15).']
-        error_atleast_chars = [u'Ensure this value has at least 11 characters (it has 10).']
-        error_atmost = [u'This field requires at most 11 digits or 14 characters.']
+        error_format = ['Invalid CPF number.']
+        error_numbersonly = ['This field requires only numbers.']
+        error_atmost_chars = ['Ensure this value has at most 14 characters (it has 15).']
+        error_atleast_chars = ['Ensure this value has at least 11 characters (it has 10).']
+        error_atmost = ['This field requires at most 11 digits or 14 characters.']
         valid = {
             '663.256.017-26': '663.256.017-26',
             '66325601726': '66325601726',
@@ -62,21 +64,21 @@ class BRLocalFlavorTests(SimpleTestCase):
     def test_BRPhoneNumberField(self):
         # TODO: this doesn't test for any invalid inputs.
         valid = {
-            '41-3562-3464': u'41-3562-3464',
-            '4135623464': u'41-3562-3464',
-            '41 3562-3464': u'41-3562-3464',
-            '41 3562 3464': u'41-3562-3464',
-            '(41) 3562 3464': u'41-3562-3464',
-            '41.3562.3464': u'41-3562-3464',
-            '41.3562-3464': u'41-3562-3464',
-            ' (41) 3562.3464': u'41-3562-3464',
+            '41-3562-3464': '41-3562-3464',
+            '4135623464': '41-3562-3464',
+            '41 3562-3464': '41-3562-3464',
+            '41 3562 3464': '41-3562-3464',
+            '(41) 3562 3464': '41-3562-3464',
+            '41.3562.3464': '41-3562-3464',
+            '41.3562-3464': '41-3562-3464',
+            ' (41) 3562.3464': '41-3562-3464',
         }
         invalid = {}
         self.assertFieldOutput(BRPhoneNumberField, valid, invalid)
 
     def test_BRStateSelect(self):
         f = BRStateSelect()
-        out = u'''<select name="states">
+        out = '''<select name="states">
 <option value="AC">Acre</option>
 <option value="AL">Alagoas</option>
 <option value="AP">Amap\xe1</option>
@@ -108,7 +110,7 @@ class BRLocalFlavorTests(SimpleTestCase):
         self.assertHTMLEqual(f.render('states', 'PR'), out)
 
     def test_BRStateChoiceField(self):
-        error_invalid = [u'Select a valid brazilian state. That state is not one of the available states.']
+        error_invalid = ['Select a valid brazilian state. That state is not one of the available states.']
         valid = {
             'AC': 'AC',
             'AL': 'AL',

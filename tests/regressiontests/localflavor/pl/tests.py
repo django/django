@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django.contrib.localflavor.pl.forms import (PLProvinceSelect,
     PLCountySelect, PLPostalCodeField, PLNIPField, PLPESELField, PLNationalIDCardNumberField, PLREGONField)
 
@@ -7,7 +9,7 @@ from django.test import SimpleTestCase
 class PLLocalFlavorTests(SimpleTestCase):
     def test_PLProvinceSelect(self):
         f = PLProvinceSelect()
-        out = u'''<select name="voivodeships">
+        out = '''<select name="voivodeships">
 <option value="lower_silesia">Lower Silesia</option>
 <option value="kuyavia-pomerania">Kuyavia-Pomerania</option>
 <option value="lublin">Lublin</option>
@@ -29,7 +31,7 @@ class PLLocalFlavorTests(SimpleTestCase):
 
     def test_PLCountrySelect(self):
         f = PLCountySelect()
-        out = u'''<select name="administrativeunit">
+        out = '''<select name="administrativeunit">
 <option value="wroclaw">Wroc\u0142aw</option>
 <option value="jeleniagora">Jelenia G\xf3ra</option>
 <option value="legnica">Legnica</option>
@@ -410,7 +412,7 @@ class PLLocalFlavorTests(SimpleTestCase):
         self.assertHTMLEqual(f.render('administrativeunit', 'katowice'), out)
 
     def test_PLPostalCodeField(self):
-        error_format = [u'Enter a postal code in the format XX-XXX.']
+        error_format = ['Enter a postal code in the format XX-XXX.']
         valid = {
             '41-403': '41-403',
         }
@@ -420,8 +422,8 @@ class PLLocalFlavorTests(SimpleTestCase):
         self.assertFieldOutput(PLPostalCodeField, valid, invalid)
 
     def test_PLNIPField(self):
-        error_format = [u'Enter a tax number field (NIP) in the format XXX-XXX-XX-XX, XXX-XX-XX-XXX or XXXXXXXXXX.']
-        error_checksum = [u'Wrong checksum for the Tax Number (NIP).']
+        error_format = ['Enter a tax number field (NIP) in the format XXX-XXX-XX-XX, XXX-XX-XX-XXX or XXXXXXXXXX.']
+        error_checksum = ['Wrong checksum for the Tax Number (NIP).']
         valid = {
             '646-241-41-24': '6462414124',
             '646-24-14-124': '6462414124',
@@ -429,14 +431,14 @@ class PLLocalFlavorTests(SimpleTestCase):
         }
         invalid = {
             '43-343-234-323': error_format,
-	    '64-62-414-124': error_format,
+	        '64-62-414-124': error_format,
             '646-241-41-23': error_checksum,
         }
         self.assertFieldOutput(PLNIPField, valid, invalid)
 
     def test_PLPESELField(self):
-        error_checksum = [u'Wrong checksum for the National Identification Number.']
-        error_format = [u'National Identification Number consists of 11 digits.']
+        error_checksum = ['Wrong checksum for the National Identification Number.']
+        error_format = ['National Identification Number consists of 11 digits.']
         valid = {
             '80071610614': '80071610614',
         }
@@ -448,8 +450,8 @@ class PLLocalFlavorTests(SimpleTestCase):
         self.assertFieldOutput(PLPESELField, valid, invalid)
 
     def test_PLNationalIDCardNumberField(self):
-        error_checksum = [u'Wrong checksum for the National ID Card Number.']
-        error_format = [u'National ID Card Number consists of 3 letters and 6 digits.']
+        error_checksum = ['Wrong checksum for the National ID Card Number.']
+        error_format = ['National ID Card Number consists of 3 letters and 6 digits.']
         valid = {
             'ABC123458': 'ABC123458',
             'abc123458': 'ABC123458',
@@ -463,8 +465,8 @@ class PLLocalFlavorTests(SimpleTestCase):
         self.assertFieldOutput(PLNationalIDCardNumberField, valid, invalid)
 
     def test_PLREGONField(self):
-        error_checksum = [u'Wrong checksum for the National Business Register Number (REGON).']
-        error_format = [u'National Business Register Number (REGON) consists of 9 or 14 digits.']
+        error_checksum = ['Wrong checksum for the National Business Register Number (REGON).']
+        error_format = ['National Business Register Number (REGON) consists of 9 or 14 digits.']
         valid = {
             '12345678512347': '12345678512347',
             '590096454': '590096454',

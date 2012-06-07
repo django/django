@@ -5,6 +5,7 @@ Regression tests for proper working of ForeignKey(null=True). Tests these bugs:
 xpected results
 
 """
+from __future__ import unicode_literals
 
 from django.db import models
 
@@ -18,7 +19,7 @@ class Article(models.Model):
     author = models.ForeignKey(Author, null=True)
 
     def __unicode__(self):
-        return u'Article titled: %s' % (self.title, )
+        return 'Article titled: %s' % (self.title, )
 
     class Meta:
         ordering = ['author__name', ]

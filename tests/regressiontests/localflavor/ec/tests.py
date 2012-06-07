@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django.contrib.localflavor.ec.forms import ECProvinceSelect
 
 from django.test import SimpleTestCase
@@ -5,7 +7,7 @@ from django.test import SimpleTestCase
 class ECLocalFlavorTests(SimpleTestCase):
     def test_ECProvinceSelect(self):
         p = ECProvinceSelect()
-        out = u"""<select name="province">
+        out = """<select name="province">
 <option value="A">Azuay</option>
 <option value="B">Bol\xedvar</option>
 <option value="F">Ca\xf1ar</option>

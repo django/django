@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django.db.backends import BaseDatabaseOperations
 
 
@@ -21,14 +23,14 @@ class DatabaseOperations(BaseDatabaseOperations):
         """
         modifiers = []
         if timedelta.days:
-            modifiers.append(u'%s days' % timedelta.days)
+            modifiers.append('%s days' % timedelta.days)
         if timedelta.seconds:
-            modifiers.append(u'%s seconds' % timedelta.seconds)
+            modifiers.append('%s seconds' % timedelta.seconds)
         if timedelta.microseconds:
-            modifiers.append(u'%s microseconds' % timedelta.microseconds)
-        mods = u' '.join(modifiers)
-        conn = u' %s ' % connector
-        return u'(%s)' % conn.join([sql, u'interval \'%s\'' % mods])
+            modifiers.append('%s microseconds' % timedelta.microseconds)
+        mods = ' '.join(modifiers)
+        conn = ' %s ' % connector
+        return '(%s)' % conn.join([sql, 'interval \'%s\'' % mods])
 
     def date_trunc_sql(self, lookup_type, field_name):
         # http://www.postgresql.org/docs/8.0/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC

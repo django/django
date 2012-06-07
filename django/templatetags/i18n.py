@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 import re
 
 from django.template import (Node, Variable, TemplateSyntaxError,
@@ -76,7 +77,7 @@ class TranslateNode(Node):
         self.message_context = message_context
         self.filter_expression = filter_expression
         if isinstance(self.filter_expression.var, basestring):
-            self.filter_expression.var = Variable(u"'%s'" %
+            self.filter_expression.var = Variable("'%s'" %
                                                   self.filter_expression.var)
 
     def render(self, context):
@@ -110,7 +111,7 @@ class BlockTranslateNode(Node):
             if token.token_type == TOKEN_TEXT:
                 result.append(token.contents)
             elif token.token_type == TOKEN_VAR:
-                result.append(u'%%(%s)s' % token.contents)
+                result.append('%%(%s)s' % token.contents)
                 vars.append(token.contents)
         return ''.join(result), vars
 
@@ -127,12 +128,12 @@ class BlockTranslateNode(Node):
         context.update(tmp_context)
         singular, vars = self.render_token_list(self.singular)
         # Escape all isolated '%'
-        singular = re.sub(u'%(?!\()', u'%%', singular)
+        singular = re.sub('%(?!\()', '%%', singular)
         if self.plural and self.countervar and self.counter:
             count = self.counter.resolve(context)
             context[self.countervar] = count
             plural, plural_vars = self.render_token_list(self.plural)
-            plural = re.sub(u'%(?!\()', u'%%', plural)
+            plural = re.sub('%(?!\()', '%%', plural)
             if message_context:
                 result = translation.npgettext(message_context, singular,
                                                plural, count)

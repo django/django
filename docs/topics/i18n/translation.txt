@@ -416,8 +416,8 @@ result is included in a string. For example::
 
     from django.utils.translation import string_concat
     ...
-    name = ugettext_lazy(u'John Lennon')
-    instrument = ugettext_lazy(u'guitar')
+    name = ugettext_lazy('John Lennon')
+    instrument = ugettext_lazy('guitar')
     result = string_concat(name, ': ', instrument)
 
 In this case, the lazy translations in ``result`` will only be converted to

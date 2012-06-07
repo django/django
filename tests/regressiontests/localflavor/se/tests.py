@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 from django.contrib.localflavor.se.forms import (SECountySelect,
     SEOrganisationNumberField, SEPersonalIdentityNumberField,
     SEPostalCodeField)
@@ -24,7 +26,7 @@ class SELocalFlavorTests(SimpleTestCase):
 
     def test_SECountySelect(self):
         f = SECountySelect()
-        out = u'''<select name="swedish_county">
+        out = '''<select name="swedish_county">
 <option value="AB">Stockholm</option>
 <option value="AC">V\xe4sterbotten</option>
 <option value="BD">Norrbotten</option>
@@ -50,7 +52,7 @@ class SELocalFlavorTests(SimpleTestCase):
         self.assertHTMLEqual(f.render('swedish_county', 'E'), out)
 
     def test_SEOrganizationNumberField(self):
-        error_invalid = [u'Enter a valid Swedish organisation number.']
+        error_invalid = ['Enter a valid Swedish organisation number.']
         valid = {
             '870512-1989': '198705121989',
             '19870512-1989': '198705121989',
@@ -95,8 +97,8 @@ class SELocalFlavorTests(SimpleTestCase):
         self.assertFieldOutput(SEOrganisationNumberField, valid, invalid)
 
     def test_SEPersonalIdentityNumberField(self):
-        error_invalid = [u'Enter a valid Swedish personal identity number.']
-        error_coord = [u'Co-ordination numbers are not allowed.']
+        error_invalid = ['Enter a valid Swedish personal identity number.']
+        error_coord = ['Co-ordination numbers are not allowed.']
         valid = {
             '870512-1989': '198705121989',
             '870512-2128': '198705122128',
@@ -148,7 +150,7 @@ class SELocalFlavorTests(SimpleTestCase):
             field_kwargs=kwargs)
 
     def test_SEPostalCodeField(self):
-        error_format = [u'Enter a Swedish postal code in the format XXXXX.']
+        error_format = ['Enter a Swedish postal code in the format XXXXX.']
         valid = {
             '589 37': '58937',
             '58937': '58937',

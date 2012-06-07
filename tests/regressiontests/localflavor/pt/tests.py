@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django.contrib.localflavor.pt.forms import PTZipCodeField, PTPhoneNumberField
 
 from django.test import SimpleTestCase
@@ -5,7 +7,7 @@ from django.test import SimpleTestCase
 
 class PTLocalFlavorTests(SimpleTestCase):
     def test_PTZipCodeField(self):
-        error_format = [u'Enter a zip code in the format XXXX-XXX.']
+        error_format = ['Enter a zip code in the format XXXX-XXX.']
         valid = {
             '3030-034': '3030-034',
             '1003456': '1003-456',
@@ -17,7 +19,7 @@ class PTLocalFlavorTests(SimpleTestCase):
         self.assertFieldOutput(PTZipCodeField, valid, invalid)
 
     def test_PTPhoneNumberField(self):
-        error_format = [u'Phone numbers must have 9 digits, or start by + or 00.']
+        error_format = ['Phone numbers must have 9 digits, or start by + or 00.']
         valid = {
             '917845189': '917845189',
             '91 784 5189': '917845189',

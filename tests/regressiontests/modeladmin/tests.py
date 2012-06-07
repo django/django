@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 from datetime import date
 
@@ -15,7 +15,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.forms.models import BaseModelFormSet
 from django.forms.widgets import Select
 from django.test import TestCase
-from django.test.utils import override_settings
+from django.test.utils import override_settings, str_prefix
 from django.utils import unittest
 
 from .models import Band, Concert, ValidationTestModel, ValidationTestInlineModel
@@ -387,13 +387,13 @@ class ModelAdminTests(TestCase):
             Select)
         self.assertEqual(
             list(cmafa.base_fields['main_band'].widget.choices),
-            [(u'', u'---------'), (self.band.id, u'The Doors')])
+            [('', '---------'), (self.band.id, 'The Doors')])
 
         self.assertEqual(
             type(cmafa.base_fields['opening_band'].widget.widget), Select)
         self.assertEqual(
             list(cmafa.base_fields['opening_band'].widget.choices),
-            [(u'', u'---------'), (self.band.id, u'The Doors')])
+            [('', '---------'), (self.band.id, 'The Doors')])
 
         self.assertEqual(type(cmafa.base_fields['day'].widget), Select)
         self.assertEqual(list(cmafa.base_fields['day'].widget.choices),
@@ -427,7 +427,7 @@ class ModelAdminTests(TestCase):
         self.assertEqual(cmafa.base_fields['main_band'].widget.attrs,
             {'class': 'radiolist inline'})
         self.assertEqual(list(cmafa.base_fields['main_band'].widget.choices),
-            [(self.band.id, u'The Doors')])
+            [(self.band.id, 'The Doors')])
 
         self.assertEqual(
             type(cmafa.base_fields['opening_band'].widget.widget),
@@ -436,7 +436,7 @@ class ModelAdminTests(TestCase):
             {'class': 'radiolist'})
         self.assertEqual(
             list(cmafa.base_fields['opening_band'].widget.choices),
-            [(u'', u'None'), (self.band.id, u'The Doors')])
+            [('', 'None'), (self.band.id, 'The Doors')])
 
         self.assertEqual(type(cmafa.base_fields['day'].widget),
             AdminRadioSelect)
@@ -450,7 +450,7 @@ class ModelAdminTests(TestCase):
         self.assertEqual(cmafa.base_fields['transport'].widget.attrs,
             {'class': 'radiolist inline'})
         self.assertEqual(list(cmafa.base_fields['transport'].widget.choices),
-            [('', u'None'), (1, 'Plane'), (2, 'Train'), (3, 'Bus')])
+            [('', 'None'), (1, 'Plane'), (2, 'Train'), (3, 'Bus')])
 
         class AdminConcertForm(forms.ModelForm):
             class Meta:
@@ -947,7 +947,7 @@ class ValidationTests(unittest.TestCase):
 
         self.assertRaisesRegexp(
             ImproperlyConfigured,
-            "ValidationTestModelAdmin.list_display\[0\], 'non_existent_field' is not a callable or an attribute of 'ValidationTestModelAdmin' or found in the model 'ValidationTestModel'.",
+            str_prefix("ValidationTestModelAdmin.list_display\[0\], %(_)s'non_existent_field' is not a callable or an attribute of 'ValidationTestModelAdmin' or found in the model 'ValidationTestModel'."),
             validate,
             ValidationTestModelAdmin,
             ValidationTestModel,
