@@ -545,6 +545,43 @@ failed and erroneous tests. If all the tests pass, the return code is 0. This
 feature is useful if you're using the test-runner script in a shell script and
 need to test for success or failure at that level.
 
+.. _topics-testing-code-coverage:
+
+Code Coverage
+-------------
+`Code coverage`_ is a measure of the parts of the code that are executed and the parts of the code not executed when a program is run. One important use of coverage tools is to identify sections of code that are not executed as part of the test suite. 
+
+When developing Django applications it is good practice to run ``coverage`` on the test suite to identify sections of the code base that need more test cases. 
+
+The most popular python coverage module is coverage.py_ and it can be installed with the standard pip command:
+
+.. _Code coverage: http://en.wikipedia.org/wiki/Code_coverage
+.. _coverage.py: http://pypi.python.org/pypi/coverage
+
+.. code-block:: bash
+
+    pip install coverage
+
+To run coverage just for a Django application use the ``--source`` flag to restrict the source files analyzed. For example, in order to test and analyze only ``myapp``: 
+
+.. code-block:: bash
+
+	coverage run --source=myapp manage.py test myapp
+
+Then either generate a quick report:
+
+.. code-block:: bash
+
+	coverage report
+
+Or generate a better looking and more informative html report with:
+
+.. code-block:: bash
+
+	coverage html
+
+The html report will be written by default to the ``htmlcov`` directory.
+
 Testing tools
 =============
 
