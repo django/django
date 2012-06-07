@@ -38,6 +38,30 @@ Taken together, these views provide easy interfaces to perform the most common
 tasks developers encounter.
 
 
+Extending generic views
+=======================
+
+There's no question that using generic views can speed up development
+substantially. In most projects, however, there comes a moment when the
+generic views no longer suffice. Indeed, the most common question asked by new
+Django developers is how to make generic views handle a wider array of
+situations.
+
+This is one of the reasons generic views were redesigned for the 1.3 release -
+previously, they were just view functions with a bewildering array of options;
+now, rather than passing in a large amount of configuration in the URLconf,
+the recommended way to extend generic views is to subclass them, and override
+their attributes or methods.
+
+That said, generic views will have a limit. If you find you're struggling to
+implement your view as a subclass of a generic view, then don't be afraid of
+writing the architecture you need for your own use case. The mixins from which
+class based views are built may be levered individually to get the
+functionality you want.
+
+More examples of generic views are available in some third party applications,
+or you could write your own as needed.
+
 Generic views of objects
 ========================
 
@@ -131,26 +155,10 @@ views and their options in detail; the rest of this document will consider
 some of the common ways you might customize and extend generic views.
 
 
-Extending generic views
-=======================
-
-.. highlightlang:: python
-
-There's no question that using generic views can speed up development
-substantially. In most projects, however, there comes a moment when the
-generic views no longer suffice. Indeed, the most common question asked by new
-Django developers is how to make generic views handle a wider array of
-situations.
-
-This is one of the reasons generic views were redesigned for the 1.3 release -
-previously, they were just view functions with a bewildering array of options;
-now, rather than passing in a large amount of configuration in the URLconf,
-the recommended way to extend generic views is to subclass them, and override
-their attributes or methods.
-
-
 Making "friendly" template contexts
 -----------------------------------
+
+.. highlightlang:: python
 
 You might have noticed that our sample publisher list template stores
 all the publishers in a variable named ``object_list``. While this
