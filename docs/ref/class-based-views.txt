@@ -70,6 +70,11 @@ View
 
     ``django.views.generic.base.View``
     
+    **Method Flowchart**
+
+        1. dispatch()
+        2. http_method_not_allowed()
+
     **Methods**
 
     .. method:: dispatch(request, *args, **kwargs)
@@ -94,13 +99,28 @@ View
         The default implementation returns ``HttpResponseNotAllowed`` with list
         of allowed methods in plain text.
 
-    **Example**::
+    **Example views.py**::
 
         from django.views.generic.base import View
 
         class MyView(View):
             # TODO - find an actual example of this view
             pass
+
+    **Example urls.py**::
+    
+        from django.conf.urls.defaults import patterns, url
+        
+        from myapp.views import MyView
+        
+        urlpatterns = patterns("",
+
+            url(
+                regex   = r"^mine/$",
+                view    = MyView.as_view(),
+                name    = "my_view",
+            ),
+        )
 
 TemplateView
 ~~~~~~~~~~~~
@@ -113,11 +133,17 @@ TemplateView
     
     ``django.views.generic.base.TemplateView``    
 
-    **Method Resolution Order**
+    **Ancestors (MRO)**
 
     * :class:`django.views.generic.base.TemplateResponseMixin`
     * :class:`django.views.generic.base.View`
     
+    **Method Flowchart**
+
+        1. dispatch()
+        2. http_method_not_allowed()
+        3. get_context_data()
+
     **Methods and Attributes**
 
     .. attribute:: template_name
@@ -134,8 +160,7 @@ TemplateView
     * ``params``: The dictionary of keyword arguments captured from the URL
       pattern that served the view.
       
-      
-    **Example**::
+    **Example views.py**::
 
         from django.views.generic.base import TemplateView
         
@@ -149,10 +174,25 @@ TemplateView
                 context = super(HomePageView, self).get_context_data(**kwargs)
                 context['latest_articles'] = Article.objects.all()[:5]
                 return context
+                
+    **Example urls.py**::
+
+        from django.conf.urls.defaults import patterns, url
+
+        from myapp.views import HomePageView
+
+        urlpatterns = patterns("",
+
+            url(
+                regex   = r"^$",
+                view    = HomePageView.as_view(),
+                name    = "home",
+            ),
+        )                
 
 RedirectView
 ~~~~~~~~~~~~
-.. class:: django.views.generic.base.RedirectView()
+.. class:: RedirectView()
 
     Redirects to a given URL.
 
@@ -165,10 +205,16 @@ RedirectView
     If the given URL is ``None``, Django will return an ``HttpResponseGone``
     (410).
     
-    **Method Resolution Order**
+    **Ancestors (MRO)**
     
-    * :class:`django.views.generic.base.View`
+    * :class:`django.views.generic.base.RedirectView`
     
+    **Method Flowchart**
+
+        1. dispatch()
+        2. http_method_not_allowed()
+        3. get_redirect_url()
+
     **Methods and Attributes**
 
     .. attribute:: url
@@ -200,6 +246,47 @@ RedirectView
         :attr:`~RedirectView.query_string`. Subclasses may implement any
         behavior they wish, as long as the method returns a redirect-ready URL
         string.
+
+    **Example views.py**::
+
+        from django.shortcuts import get_object_or_404
+        from django.views.generic.base import RedirectView
+        
+        from articles.models import Article
+
+        class ArticleCounterRedirectView(RedirectView):
+
+            permanent = True
+            query_string = True
+
+            def get_redirect_url(self, pk):
+                article = get_object_or_404(Article, pk=pk)
+                article.count += 1
+                article.save()
+                return reverse('product_detail', args=(pk, ))
+
+    **Example urls.py**::
+
+        from django.conf.urls.defaults import patterns, url
+        from django.views.generic.base import RedirectView
+        
+        from article.views import ArticleCounterRedirectView
+
+        urlpatterns = patterns("",
+
+            url(
+                regex   = r"^r/(?P<pk>\d+)/$",
+                view    = ArticleCounterRedirectView.as_view(),
+                name    = "article_counter"
+            ),
+            url(
+                regex   = r"^$",
+                view    = RedirectView.as_view(
+                    url = "http://djangoproject.com"
+                ),
+                name = "go_to_django",
+            ),
+        )        
 
 Generic views
 =============
