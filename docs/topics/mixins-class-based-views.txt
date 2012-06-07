@@ -1,0 +1,2 @@
+Using Mixins with class based views
+===================================
