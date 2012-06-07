@@ -673,10 +673,7 @@ Use the ``django.test.client.Client`` class to make requests.
 
     .. method:: Client.__init__(enforce_csrf_checks=False, **defaults)
 
-
-        Creates an instance of the test client. By default the test client 
-        will disable any CSRF checks performed by your site due to the default
-        ``enforce_csrf_checks`` value.
+        Creates an instance of the test client.
 
         The ``defaults`` keywords argument parameter can be used to specify 
         some default headers to be sent in the request. For example::
@@ -690,6 +687,9 @@ Use the ``django.test.client.Client`` class to make requests.
         :meth:`django.test.client.Client.post()`, 
         :meth:`django.test.client.Client.delete()`
         , etc. have precedence than those defaults provided.
+
+        By default the test client  will disable any CSRF checks performed by
+        your site due to the default ``enforce_csrf_checks`` value.
 
     Once you have a ``Client`` instance, you can call any of the following
     methods:
