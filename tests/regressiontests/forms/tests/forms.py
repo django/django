@@ -1583,9 +1583,9 @@ class FormsTestCase(TestCase):
         # Recall from above that passing the "auto_id" argument to a Form gives each
         # field an "id" attribute.
         t = Template('''<form action="">
-<p>{{ form.username.label_tag }}: {{ form.username }}</p>
-<p>{{ form.password1.label_tag }}: {{ form.password1 }}</p>
-<p>{{ form.password2.label_tag }}: {{ form.password2 }}</p>
+<p>{{ form.username.label_tag }} {{ form.username }}</p>
+<p>{{ form.password1.label_tag }} {{ form.password1 }}</p>
+<p>{{ form.password2.label_tag }} {{ form.password2 }}</p>
 <input type="submit" />
 </form>''')
         self.assertHTMLEqual(t.render(Context({'form': UserRegistration(auto_id=False)})), """<form action="">
@@ -1595,18 +1595,18 @@ class FormsTestCase(TestCase):
 <input type="submit" />
 </form>""")
         self.assertHTMLEqual(t.render(Context({'form': UserRegistration(auto_id='id_%s')})), """<form action="">
-<p><label for="id_username">Username</label>: <input id="id_username" type="text" name="username" maxlength="10" /></p>
-<p><label for="id_password1">Password1</label>: <input type="password" name="password1" id="id_password1" /></p>
-<p><label for="id_password2">Password2</label>: <input type="password" name="password2" id="id_password2" /></p>
+<p><label for="id_username">Username:</label> <input id="id_username" type="text" name="username" maxlength="10" /></p>
+<p><label for="id_password1">Password1:</label> <input type="password" name="password1" id="id_password1" /></p>
+<p><label for="id_password2">Password2:</label> <input type="password" name="password2" id="id_password2" /></p>
 <input type="submit" />
 </form>""")
 
         # User form.[field].help_text to output a field's help text. If the given field
         # does not have help text, nothing will be output.
         t = Template('''<form action="">
-<p>{{ form.username.label_tag }}: {{ form.username }}<br />{{ form.username.help_text }}</p>
-<p>{{ form.password1.label_tag }}: {{ form.password1 }}</p>
-<p>{{ form.password2.label_tag }}: {{ form.password2 }}</p>
+<p>{{ form.username.label_tag }} {{ form.username }}<br />{{ form.username.help_text }}</p>
+<p>{{ form.password1.label_tag }} {{ form.password1 }}</p>
+<p>{{ form.password2.label_tag }} {{ form.password2 }}</p>
 <input type="submit" />
 </form>''')
         self.assertHTMLEqual(t.render(Context({'form': UserRegistration(auto_id=False)})), """<form action="">
@@ -1626,9 +1626,9 @@ class FormsTestCase(TestCase):
             form_output.append(bf.label_tag(attrs={'class': 'pretty'}))
 
         expected_form_output = [
-            '<label for="id_username" class="pretty">Username</label>',
-            '<label for="id_password1" class="pretty">Password1</label>',
-            '<label for="id_password2" class="pretty">Password2</label>',
+            '<label for="id_username" class="pretty">Username:</label>',
+            '<label for="id_password1" class="pretty">Password1:</label>',
+            '<label for="id_password2" class="pretty">Password2:</label>',
         ]
         self.assertEqual(len(form_output), len(expected_form_output))
         for i in range(len(form_output)):
