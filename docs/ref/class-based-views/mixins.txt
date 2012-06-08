@@ -54,6 +54,13 @@ TemplateResponseMixin
 ~~~~~~~~~~~~~~~~~~~~~
 .. class:: TemplateResponseMixin()
 
+    Provides a mechanism to construct a
+    :class:`~django.template.response.TemplateResponse`, given
+    suitable context. The template to use is configurable and can be
+    further customized by subclasses.
+
+    **Methods and Attributes**
+
     .. attribute:: template_name
 
         The path to the template to use when rendering the view.
@@ -100,6 +107,11 @@ Single object mixins
 SingleObjectMixin
 ~~~~~~~~~~~~~~~~~
 .. class:: SingleObjectMixin()
+
+    Provides a mechanism for looking up an object associated with the
+    current HTTP request.
+
+    **Methods and Attributes**
 
     .. attribute:: model
 
@@ -194,6 +206,8 @@ SingleObjectTemplateResponseMixin
 
     * :class:`~django.views.generic.base.TemplateResponseMixin`
 
+    **Methods and Attributes**
+
     .. attribute:: template_name_field
 
         The field on the current object instance that can be used to determine
@@ -256,6 +270,8 @@ MultipleObjectMixin
 
     Note that ``page`` *must* be either a valid page number or the value
     ``last``; any other value for ``page`` will result in a 404 error.
+
+    **Methods and Attributes**
 
     .. attribute:: allow_empty
 
@@ -376,6 +392,8 @@ MultipleObjectTemplateResponseMixin
 
     * :class:`~django.views.generic.base.TemplateResponseMixin`
 
+    **Methods and Attributes**
+
     .. attribute:: template_name_suffix
 
         The suffix to append to the auto-generated candidate template name.
@@ -398,6 +416,8 @@ FormMixin
 .. class:: FormMixin()
 
     A mixin class that provides facilities for creating and displaying forms.
+
+    **Methods and Attributes**
 
     .. attribute:: initial
 
@@ -485,6 +505,8 @@ ModelFormMixin
     * :class:`django.views.generic.edit.FormMixin`
     * :class:`django.views.generic.detail.SingleObjectMixin`
 
+    **Methods and Attributes**
+
     .. attribute:: success_url
 
         The URL to redirect to when the form is successfully processed.
@@ -529,6 +551,8 @@ ProcessFormView
 
     A mixin that provides basic HTTP GET and POST workflow.
 
+    **Methods and Attributes**
+
     .. method:: get(request, *args, **kwargs)
 
         Constructs a form, then renders a response using a context that
@@ -546,6 +570,8 @@ DeletionMixin
 .. class:: DeletionMixin()
 
     Enables handling of the ``DELETE`` http action.
+
+    **Methods and Attributes**
 
     .. attribute:: success_url
 
@@ -570,6 +596,8 @@ YearMixin
 
     A mixin that can be used to retrieve and provide parsing information for a
     year component of a date.
+
+    **Methods and Attributes**
 
     .. attribute:: year_format
 
@@ -603,6 +631,8 @@ MonthMixin
 
     A mixin that can be used to retrieve and provide parsing information for a
     month component of a date.
+
+    **Methods and Attributes**
 
     .. attribute:: month_format
 
@@ -650,6 +680,8 @@ DayMixin
     A mixin that can be used to retrieve and provide parsing information for a
     day component of a date.
 
+    **Methods and Attributes**
+
     .. attribute:: day_format
 
         The :func:`~time.strftime` format to use when parsing the day. By default, this is
@@ -695,6 +727,8 @@ WeekMixin
     A mixin that can be used to retrieve and provide parsing information for a
     week component of a date.
 
+    **Methods and Attributes**
+
     .. attribute:: week_format
 
         The :func:`~time.strftime` format to use when parsing the week. By default, this is
@@ -727,6 +761,8 @@ DateMixin
 .. class:: DateMixin()
 
     A mixin class providing common behavior for all date-based views.
+
+    **Methods and Attributes**
 
     .. attribute:: date_field
 
@@ -783,6 +819,8 @@ BaseDateListView
 
     * :class:`~django.views.generic.dates.DateMixin`
     * :class:`~django.views.generic.list.MultipleObjectMixin`
+
+    **Methods and Attributes**
 
     .. attribute:: allow_empty
 

@@ -1471,7 +1471,7 @@ Limiting access to generic views
 To limit access to a :doc:`class-based generic view 
 </ref/class-based-views/index>`, decorate the :meth:`View.dispatch
 <django.views.generic.base.View.dispatch>` method on the class. See
- :ref:`decorating-class-based-views` for details.
+:ref:`decorating-class-based-views` for details.
 
 .. _permissions:
 

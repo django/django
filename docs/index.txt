@@ -106,13 +106,9 @@ The view layer
   :doc:`Custom storage <howto/custom-file-storage>`
 
 * **Class based views:**
-  :doc:`Overview<topics/class-based-views>` |
-  :doc:`Generic views<topics/generic-class-based-views>` |
-  :doc:`Date-based generic views<topics/date-based-generic-views>` |
-  :doc:`Form handling<topics/form-handling-class-based-views>` |
-  :doc:`Mixin overview<topics/mixins-class-based-views>` |
+  :doc:`Overview<topics/class-based-views/index>` |
   :doc:`Built-in class-based views<ref/class-based-views/index>` |
-  :doc:`Built-in view mixins<ref/class-based-view-mixins>`
+  :doc:`Built-in view mixins<ref/class-based-views/mixins>`
 
 * **Advanced:**
   :doc:`Generating CSV <howto/outputting-csv>` |
