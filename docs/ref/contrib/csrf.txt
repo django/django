@@ -478,6 +478,17 @@ Whether to use a secure cookie for the CSRF cookie. If this is set to ``True``,
 the cookie will be marked as "secure," which means browsers may ensure that the
 cookie is only sent under an HTTPS connection.
 
+CSRF_COOKIE_HTTPONLY
+------------------
+
+.. versionadded:: 1.5
+
+Default: ``True``
+
+Whether to use HttpOnly flag on the CSRF cookie. If this is set to
+``True``, client-side JavaScript will not to be able to access the
+session cookie.
+
 CSRF_FAILURE_VIEW
 -----------------
 
