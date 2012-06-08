@@ -307,8 +307,6 @@ See :doc:`/topics/cache`.
 CSRF_COOKIE_DOMAIN
 ------------------
 
-.. versionadded:: 1.2
-
 Default: ``None``
 
 The domain to be used when setting the CSRF cookie.  This can be useful for
@@ -325,8 +323,6 @@ protection is safe from cross-subdomain attacks by default - please see the
 
 CSRF_COOKIE_NAME
 ----------------
-
-.. versionadded:: 1.2
 
 Default: ``'csrftoken'``
 
@@ -367,8 +363,6 @@ cookie is only sent under an HTTPS connection.
 CSRF_FAILURE_VIEW
 -----------------
 
-.. versionadded:: 1.2
-
 Default: ``'django.views.csrf.csrf_failure'``
 
 A dotted path to the view function to be used when an incoming request
@@ -385,8 +379,6 @@ end users) indicating the reason the request was rejected.  See
 
 DATABASES
 ---------
-
-.. versionadded:: 1.2
 
 Default: ``{}`` (Empty dictionary)
 
@@ -429,12 +421,6 @@ You can use a database backend that doesn't ship with Django by setting
 ``mypackage.backends.whatever``). Writing a whole new database backend from
 scratch is left as an exercise to the reader; see the other backends for
 examples.
-
-.. note::
-    Prior to Django 1.2, you could use a short version of the backend name
-    to reference the built-in database backends (e.g., you could use
-    ``'sqlite3'`` to refer to the SQLite backend). This format has been
-    deprecated, and will be removed in Django 1.4.
 
 .. setting:: HOST
 
@@ -664,8 +650,6 @@ not provided, Django will use ``'test_' + NAME + '_temp'``.
 DATABASE_ROUTERS
 ----------------
 
-.. versionadded:: 1.2
-
 Default: ``[]`` (Empty list)
 
 The list of routers that will be used to determine which database
@@ -686,17 +670,12 @@ system. Note that if :setting:`USE_L10N` is set to ``True``, then the
 locale-dictated format has higher precedence and will be applied instead. See
 :tfilter:`allowed date format strings <date>`.
 
-.. versionchanged:: 1.2
-    This setting can now be overriden by setting :setting:`USE_L10N` to ``True``.
-
 See also :setting:`DATETIME_FORMAT`, :setting:`TIME_FORMAT` and :setting:`SHORT_DATE_FORMAT`.
 
 .. setting:: DATE_INPUT_FORMATS
 
 DATE_INPUT_FORMATS
 ------------------
-
-.. versionadded:: 1.2
 
 Default::
 
@@ -728,17 +707,12 @@ system. Note that if :setting:`USE_L10N` is set to ``True``, then the
 locale-dictated format has higher precedence and will be applied instead. See
 :tfilter:`allowed date format strings <date>`.
 
-.. versionchanged:: 1.2
-    This setting can now be overriden by setting :setting:`USE_L10N` to ``True``.
-
 See also :setting:`DATE_FORMAT`, :setting:`TIME_FORMAT` and :setting:`SHORT_DATETIME_FORMAT`.
 
 .. setting:: DATETIME_INPUT_FORMATS
 
 DATETIME_INPUT_FORMATS
 ----------------------
-
-.. versionadded:: 1.2
 
 Default::
 
@@ -822,8 +796,6 @@ site.
 
 DECIMAL_SEPARATOR
 -----------------
-
-.. versionadded:: 1.2
 
 Default: ``'.'`` (Dot)
 
@@ -926,8 +898,6 @@ This is only used if ``CommonMiddleware`` is installed (see
 EMAIL_BACKEND
 -------------
 
-.. versionadded:: 1.2
-
 Default: ``'django.core.mail.backends.smtp.EmailBackend'``
 
 The backend to use for sending emails. For the list of available backends see
@@ -937,8 +907,6 @@ The backend to use for sending emails. For the list of available backends see
 
 EMAIL_FILE_PATH
 ---------------
-
-.. versionadded:: 1.2
 
 Default: Not defined
 
@@ -1086,8 +1054,6 @@ See :doc:`/topics/files` for details.
 FIRST_DAY_OF_WEEK
 -----------------
 
-.. versionadded:: 1.2
-
 Default: ``0`` (Sunday)
 
 Number representing the first day of the week. This is especially useful
@@ -1126,8 +1092,6 @@ of the preferred value or not supplied at all.
 
 FORMAT_MODULE_PATH
 ------------------
-
-.. versionadded:: 1.2
 
 Default: ``None``
 
@@ -1426,8 +1390,6 @@ Example: ``"http://media.example.com/"``
 MESSAGE_LEVEL
 -------------
 
-.. versionadded:: 1.2
-
 Default: `messages.INFO`
 
 Sets the minimum message level that will be recorded by the messages
@@ -1437,8 +1399,6 @@ more details.
 MESSAGE_STORAGE
 ---------------
 
-.. versionadded:: 1.2
-
 Default: ``'django.contrib.messages.storage.user_messages.LegacyFallbackStorage'``
 
 Controls where Django stores message data.  See the
@@ -1446,8 +1406,6 @@ Controls where Django stores message data.  See the
 
 MESSAGE_TAGS
 ------------
-
-.. versionadded:: 1.2
 
 Default::
 
@@ -1475,11 +1433,6 @@ Default::
 
 A tuple of middleware classes to use. See :doc:`/topics/http/middleware`.
 
-.. versionchanged:: 1.2
-   ``'django.contrib.messages.middleware.MessageMiddleware'`` was added to the
-   default.  For more information, see the :doc:`messages documentation
-   </ref/contrib/messages>`.
-
 .. setting:: MONTH_DAY_FORMAT
 
 MONTH_DAY_FORMAT
@@ -1504,8 +1457,6 @@ See :tfilter:`allowed date format strings <date>`. See also
 
 NUMBER_GROUPING
 ----------------
-
-.. versionadded:: 1.2
 
 Default: ``0``
 
@@ -1820,8 +1771,6 @@ Whether to save the session data on every request. See
 SHORT_DATE_FORMAT
 -----------------
 
-.. versionadded:: 1.2
-
 Default: ``m/d/Y`` (e.g. ``12/31/2003``)
 
 An available formatting that can be used for displaying date fields on
@@ -1835,8 +1784,6 @@ See also :setting:`DATE_FORMAT` and :setting:`SHORT_DATETIME_FORMAT`.
 
 SHORT_DATETIME_FORMAT
 ---------------------
-
-.. versionadded:: 1.2
 
 Default: ``m/d/Y P`` (e.g. ``12/31/2003 4 p.m.``)
 
@@ -1944,16 +1891,6 @@ A tuple of callables that are used to populate the context in ``RequestContext``
 These callables take a request object as their argument and return a dictionary
 of items to be merged into the context.
 
-.. versionchanged:: 1.2
-   ``django.contrib.messages.context_processors.messages`` was added to the
-   default.  For more information, see the :doc:`messages documentation
-   </ref/contrib/messages>`.
-
-.. versionchanged:: 1.2
-    The auth context processor was moved in this release from its old location
-    ``django.core.context_processors.auth`` to
-    ``django.contrib.auth.context_processors.auth``.
-
 .. versionadded:: 1.3
     The ``django.core.context_processors.static`` context processor
     was added in this release.
@@ -2009,12 +1946,6 @@ used instead of a string. The first item in the tuple should be the ``Loader``'s
 module, subsequent items are passed to the ``Loader`` during initialization. See
 :doc:`/ref/templates/api`.
 
-.. versionchanged:: 1.2
-    The class-based API for template loaders was introduced in Django 1.2
-    although  the :setting:`TEMPLATE_LOADERS` setting will accept strings
-    that specify function-based loaders until compatibility with them is
-    completely removed in Django 1.4.
-
 .. setting:: TEMPLATE_STRING_IF_INVALID
 
 TEMPLATE_STRING_IF_INVALID
@@ -2032,9 +1963,6 @@ TEST_RUNNER
 
 Default: ``'django.test.simple.DjangoTestSuiteRunner'``
 
-.. versionchanged:: 1.2
-   Prior to 1.2, test runners were a function, not a class.
-
 The name of the class to use for starting the test suite. See
 :doc:`/topics/testing`.
 
@@ -2044,8 +1972,6 @@ The name of the class to use for starting the test suite. See
 
 THOUSAND_SEPARATOR
 ------------------
-
-.. versionadded:: 1.2
 
 Default: ``,`` (Comma)
 
@@ -2071,17 +1997,12 @@ system. Note that if :setting:`USE_L10N` is set to ``True``, then the
 locale-dictated format has higher precedence and will be applied instead. See
 :tfilter:`allowed date format strings <date>`.
 
-.. versionchanged:: 1.2
-    This setting can now be overriden by setting :setting:`USE_L10N` to ``True``.
-
 See also :setting:`DATE_FORMAT` and :setting:`DATETIME_FORMAT`.
 
 .. setting:: TIME_INPUT_FORMATS
 
 TIME_INPUT_FORMATS
 ------------------
-
-.. versionadded:: 1.2
 
 Default: ``('%H:%M:%S', '%H:%M')``
 
@@ -2103,9 +2024,6 @@ TIME_ZONE
 ---------
 
 Default: ``'America/Chicago'``
-
-.. versionchanged:: 1.2
-   ``None`` was added as an allowed value.
 
 .. versionchanged:: 1.4
    The meaning of this setting now depends on the value of :setting:`USE_TZ`.
@@ -2183,8 +2101,6 @@ See also :setting:`LANGUAGE_CODE`, :setting:`USE_L10N` and :setting:`USE_TZ`.
 USE_L10N
 --------
 
-.. versionadded:: 1.2
-
 Default: ``False``
 
 A boolean that specifies if localized formatting of data will be enabled by
@@ -2202,8 +2118,6 @@ See also :setting:`LANGUAGE_CODE`, :setting:`USE_I18N` and :setting:`USE_TZ`.
 
 USE_THOUSAND_SEPARATOR
 ----------------------
-
-.. versionadded:: 1.2
 
 Default: ``False``
 

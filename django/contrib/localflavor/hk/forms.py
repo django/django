@@ -1,7 +1,7 @@
 """
 Hong Kong specific Form helpers
 """
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import re
 
@@ -51,14 +51,14 @@ class HKPhoneNumberField(CharField):
         super(HKPhoneNumberField, self).clean(value)
 
         if value in EMPTY_VALUES:
-            return u''
+            return ''
 
         value = re.sub('(\(|\)|\s+|\+)', '', smart_unicode(value))
         m = hk_phone_digits_re.search(value)
         if not m:
             raise ValidationError(self.error_messages['invalid'])
 
-        value = u'%s-%s' % (m.group(1), m.group(2))
+        value = '%s-%s' % (m.group(1), m.group(2))
         for special in hk_special_numbers:
             if value.startswith(special):
                 raise ValidationError(self.error_messages['disguise'])

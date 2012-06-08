@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import os
 from datetime import date
 
@@ -74,7 +76,7 @@ class HTTPSitemapTests(SitemapTestsBase):
     def test_localized_priority(self):
         "The priority value should not be localized (Refs #14164)"
         activate('fr')
-        self.assertEqual(u'0,3', localize(0.3))
+        self.assertEqual('0,3', localize(0.3))
 
         # Retrieve the sitemap. Check that priorities
         # haven't been rendered in localized format

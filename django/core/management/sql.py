@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import os
 import re
 
@@ -160,9 +162,9 @@ def custom_sql_for_model(model, style, connection):
             with open(sql_file, 'U') as fp:
                 for statement in statements.split(fp.read().decode(settings.FILE_CHARSET)):
                     # Remove any comments from the file
-                    statement = re.sub(ur"--.*([\n\Z]|$)", "", statement)
+                    statement = re.sub(r"--.*([\n\Z]|$)", "", statement)
                     if statement.strip():
-                        output.append(statement + u";")
+                        output.append(statement + ";")
 
     return output
 

@@ -727,8 +727,6 @@ passed to ``select_related()``. This includes foreign keys that have
 It's an error to use both a list of fields and the ``depth`` parameter in the
 same ``select_related()`` call; they are conflicting options.
 
-.. versionchanged:: 1.2
-
 You can also refer to the reverse direction of a
 :class:`~django.db.models.OneToOneField` in the list of fields passed to
 ``select_related`` — that is, you can traverse a
@@ -1156,8 +1154,6 @@ using
 
 .. method:: using(alias)
 
-.. versionadded:: 1.2
-
 This method is for controlling which database the ``QuerySet`` will be
 evaluated against if you are using more than one database.  The only argument
 this method takes is the alias of a database, as defined in
@@ -1511,8 +1507,6 @@ exists
 ~~~~~~
 
 .. method:: exists()
-
-.. versionadded:: 1.2
 
 Returns ``True`` if the :class:`.QuerySet` contains any results, and ``False``
 if not. This tries to perform the query in the simplest and fastest way

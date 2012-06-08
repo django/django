@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django.db import models
 
 
@@ -5,14 +7,14 @@ class Poll(models.Model):
     question = models.CharField(max_length=200)
 
     def __unicode__(self):
-        return u"Q: %s " % self.question
+        return "Q: %s " % self.question
 
 class Choice(models.Model):
     poll = models.ForeignKey(Poll)
     choice = models.CharField(max_length=200)
 
     def __unicode__(self):
-        return u"Choice: %s in poll %s" % (self.choice, self.poll)
+        return "Choice: %s in poll %s" % (self.choice, self.poll)
 
 # A set of models with an inner one pointing to two outer ones.
 class OuterA(models.Model):

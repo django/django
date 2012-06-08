@@ -265,8 +265,6 @@ because it is not a part of the OGC specification (use the
 
 .. attribute:: GEOSGeometry.hexewkb
 
-.. versionadded:: 1.2
-
 Returns the EWKB of this Geometry in hexadecimal form.  This is an
 extension of the WKB specification that includes SRID and Z values
 that are a part of this geometry.
@@ -313,8 +311,6 @@ as a Python buffer.  SRID and Z values are not included, use the
 .. _ewkb:
 
 .. attribute:: GEOSGeometry.ewkb
-
-.. versionadded:: 1.2
 
 Return the EWKB representation of this Geometry as a Python buffer.
 This is an extension of the WKB specification that includes any SRID

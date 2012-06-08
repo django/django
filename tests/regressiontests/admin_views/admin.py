@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import tempfile
 import os
@@ -171,12 +171,12 @@ class PersonAdmin(admin.ModelAdmin):
 
 class FooAccount(Account):
     """A service-specific account of type Foo."""
-    servicename = u'foo'
+    servicename = 'foo'
 
 
 class BarAccount(Account):
     """A service-specific account of type Bar."""
-    servicename = u'bar'
+    servicename = 'bar'
 
 
 class FooAccountAdmin(admin.StackedInline):

@@ -2,7 +2,7 @@
 Norwegian-specific Form helpers
 """
 
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import re
 import datetime
@@ -36,13 +36,13 @@ class NOSocialSecurityNumber(Field):
     Algorithm is documented at http://no.wikipedia.org/wiki/Personnummer
     """
     default_error_messages = {
-        'invalid': _(u'Enter a valid Norwegian social security number.'),
+        'invalid': _('Enter a valid Norwegian social security number.'),
     }
 
     def clean(self, value):
         super(NOSocialSecurityNumber, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
 
         if not re.match(r'^\d{11}$', value):
             raise ValidationError(self.error_messages['invalid'])

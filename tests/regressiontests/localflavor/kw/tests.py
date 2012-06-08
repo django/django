@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django.contrib.localflavor.kw.forms import KWCivilIDNumberField
 
 from django.test import SimpleTestCase
@@ -5,7 +7,7 @@ from django.test import SimpleTestCase
 
 class KWLocalFlavorTests(SimpleTestCase):
     def test_KWCivilIDNumberField(self):
-        error_invalid = [u'Enter a valid Kuwaiti Civil ID number']
+        error_invalid = ['Enter a valid Kuwaiti Civil ID number']
         valid = {
             '282040701483': '282040701483',
         }

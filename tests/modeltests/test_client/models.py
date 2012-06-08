@@ -20,7 +20,7 @@ testing against the contexts and templates produced by a view,
 rather than the HTML rendered to the end-user.
 
 """
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 from django.conf import settings
 from django.core import mail
@@ -37,12 +37,12 @@ class ClientTest(TestCase):
         "GET a view"
         # The data is ignored, but let's check it doesn't crash the system
         # anyway.
-        data = {'var': u'\xf2'}
+        data = {'var': '\xf2'}
         response = self.client.get('/test_client/get_view/', data)
 
         # Check some response details
         self.assertContains(response, 'This is a test')
-        self.assertEqual(response.context['var'], u'\xf2')
+        self.assertEqual(response.context['var'], '\xf2')
         self.assertEqual(response.templates[0].name, 'GET Template')
 
     def test_get_post_view(self):

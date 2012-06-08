@@ -208,8 +208,6 @@ automatically generated from the model class. Default is ``True``.
 ``error_messages``
 ------------------
 
-.. versionadded:: 1.2
-
 .. attribute:: Field.error_messages
 
 The ``error_messages`` argument lets you override the default messages that the
@@ -309,8 +307,6 @@ underscores to spaces. See :ref:`Verbose field names <verbose-field-names>`.
 ``validators``
 -------------------
 
-.. versionadded:: 1.2
-
 .. attribute:: Field.validators
 
 A list of validators to run for this field. See the :doc:`validators
@@ -336,8 +332,6 @@ otherwise. See :ref:`automatic-primary-key-fields`.
 ``BigIntegerField``
 -------------------
 
-.. versionadded:: 1.2
-
 .. class:: BigIntegerField([**options])
 
 A 64 bit integer, much like an :class:`IntegerField` except that it is
@@ -356,11 +350,6 @@ The admin represents this as a checkbox.
 
 If you need to accept :attr:`~Field.null` values then use
 :class:`NullBooleanField` instead.
-
-.. versionchanged:: 1.2
-    In previous versions of Django when running under MySQL ``BooleanFields``
-    would return their data as ``ints``, instead of true ``bools``.  See the
-    release notes for a complete description of the change.
 
 ``CharField``
 -------------

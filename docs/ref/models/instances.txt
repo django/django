@@ -30,8 +30,6 @@ that, you need to :meth:`~Model.save()`.
 Validating objects
 ==================
 
-.. versionadded:: 1.2
-
 There are three steps involved in validating a model:
 
 1. Validate the model fields
@@ -136,9 +134,6 @@ Saving objects
 To save an object back to the database, call ``save()``:
 
 .. method:: Model.save([force_insert=False, force_update=False, using=DEFAULT_DB_ALIAS, update_fields=None])
-
-.. versionadded:: 1.2
-   The ``using`` argument was added.
 
 If you want customized saving behavior, you can override this ``save()``
 method. See :ref:`overriding-model-methods` for more details.
@@ -360,9 +355,6 @@ Deleting objects
 ================
 
 .. method:: Model.delete([using=DEFAULT_DB_ALIAS])
-
-.. versionadded:: 1.2
-   The ``using`` argument was added.
 
 Issues a SQL ``DELETE`` for the object. This only deletes the object in the
 database; the Python instance will still exist and will still have data in

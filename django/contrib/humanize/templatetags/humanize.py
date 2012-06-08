@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 import re
 from datetime import date, datetime, timedelta
 
@@ -23,8 +24,8 @@ def ordinal(value):
         return value
     suffixes = (_('th'), _('st'), _('nd'), _('rd'), _('th'), _('th'), _('th'), _('th'), _('th'), _('th'))
     if value % 100 in (11, 12, 13): # special case
-        return u"%d%s" % (value, suffixes[0])
-    return u"%d%s" % (value, suffixes[value % 10])
+        return "%d%s" % (value, suffixes[0])
+    return "%d%s" % (value, suffixes[value % 10])
 
 @register.filter(is_safe=True)
 def intcomma(value, use_l10n=True):
@@ -161,11 +162,11 @@ def naturalday(value, arg=None):
     today = datetime.now(tzinfo).date()
     delta = value - today
     if delta.days == 0:
-        return _(u'today')
+        return _('today')
     elif delta.days == 1:
-        return _(u'tomorrow')
+        return _('tomorrow')
     elif delta.days == -1:
-        return _(u'yesterday')
+        return _('yesterday')
     return defaultfilters.date(value, arg)
 
 @register.filter
@@ -185,20 +186,20 @@ def naturaltime(value):
                 'naturaltime', '%(delta)s ago'
             ) % {'delta': defaultfilters.timesince(value)}
         elif delta.seconds == 0:
-            return _(u'now')
+            return _('now')
         elif delta.seconds < 60:
             return ungettext(
-                u'a second ago', u'%(count)s seconds ago', delta.seconds
+                'a second ago', '%(count)s seconds ago', delta.seconds
             ) % {'count': delta.seconds}
         elif delta.seconds // 60 < 60:
             count = delta.seconds // 60
             return ungettext(
-                u'a minute ago', u'%(count)s minutes ago', count
+                'a minute ago', '%(count)s minutes ago', count
             ) % {'count': count}
         else:
             count = delta.seconds // 60 // 60
             return ungettext(
-                u'an hour ago', u'%(count)s hours ago', count
+                'an hour ago', '%(count)s hours ago', count
             ) % {'count': count}
     else:
         delta = value - now
@@ -207,18 +208,18 @@ def naturaltime(value):
                 'naturaltime', '%(delta)s from now'
             ) % {'delta': defaultfilters.timeuntil(value)}
         elif delta.seconds == 0:
-            return _(u'now')
+            return _('now')
         elif delta.seconds < 60:
             return ungettext(
-                u'a second from now', u'%(count)s seconds from now', delta.seconds
+                'a second from now', '%(count)s seconds from now', delta.seconds
             ) % {'count': delta.seconds}
         elif delta.seconds // 60 < 60:
             count = delta.seconds // 60
             return ungettext(
-                u'a minute from now', u'%(count)s minutes from now', count
+                'a minute from now', '%(count)s minutes from now', count
             ) % {'count': count}
         else:
             count = delta.seconds // 60 // 60
             return ungettext(
-                u'an hour from now', u'%(count)s hours from now', count
+                'an hour from now', '%(count)s hours from now', count
             ) % {'count': count}

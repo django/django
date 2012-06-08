@@ -1,6 +1,9 @@
 """
 Comparing two html documents.
 """
+
+from __future__ import unicode_literals
+
 import re
 from HTMLParser import HTMLParseError
 from django.utils.encoding import force_unicode
@@ -113,18 +116,18 @@ class Element(object):
         return self.children[key]
 
     def __unicode__(self):
-        output = u'<%s' % self.name
+        output = '<%s' % self.name
         for key, value in self.attributes:
             if value:
-                output += u' %s="%s"' % (key, value)
+                output += ' %s="%s"' % (key, value)
             else:
-                output += u' %s' % key
+                output += ' %s' % key
         if self.children:
-            output += u'>\n'
-            output += u''.join(unicode(c) for c in self.children)
-            output += u'\n</%s>' % self.name
+            output += '>\n'
+            output += ''.join(unicode(c) for c in self.children)
+            output += '\n</%s>' % self.name
         else:
-            output += u' />'
+            output += ' />'
         return output
 
     def __repr__(self):
@@ -136,7 +139,7 @@ class RootElement(Element):
         super(RootElement, self).__init__(None, ())
 
     def __unicode__(self):
-        return u''.join(unicode(c) for c in self.children)
+        return ''.join(unicode(c) for c in self.children)
 
 
 class Parser(HTMLParser):

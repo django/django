@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 import re
 import types
 from datetime import datetime, timedelta
 
 from django.core.exceptions import ValidationError
 from django.core.validators import *
+from django.test.utils import str_prefix
 from django.utils.unittest import TestCase
 
 
@@ -176,18 +179,18 @@ def create_simple_test_method(validator, expected, value, num):
 class TestSimpleValidators(TestCase):
     def test_single_message(self):
         v = ValidationError('Not Valid')
-        self.assertEqual(str(v), "[u'Not Valid']")
-        self.assertEqual(repr(v), "ValidationError([u'Not Valid'])")
+        self.assertEqual(str(v), str_prefix("[%(_)s'Not Valid']"))
+        self.assertEqual(repr(v), str_prefix("ValidationError([%(_)s'Not Valid'])"))
 
     def test_message_list(self):
         v = ValidationError(['First Problem', 'Second Problem'])
-        self.assertEqual(str(v), "[u'First Problem', u'Second Problem']")
-        self.assertEqual(repr(v), "ValidationError([u'First Problem', u'Second Problem'])")
+        self.assertEqual(str(v), str_prefix("[%(_)s'First Problem', %(_)s'Second Problem']"))
+        self.assertEqual(repr(v), str_prefix("ValidationError([%(_)s'First Problem', %(_)s'Second Problem'])"))
 
     def test_message_dict(self):
         v = ValidationError({'first': 'First Problem'})
-        self.assertEqual(str(v), "{'first': 'First Problem'}")
-        self.assertEqual(repr(v), "ValidationError({'first': 'First Problem'})")
+        self.assertEqual(str(v), str_prefix("{%(_)s'first': %(_)s'First Problem'}"))
+        self.assertEqual(repr(v), str_prefix("ValidationError({%(_)s'first': %(_)s'First Problem'})"))
 
 test_counter = 0
 for validator, value, expected in TEST_DATA:

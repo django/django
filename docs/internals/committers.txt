@@ -355,6 +355,16 @@ Honza Král
 .. _Claude Paroz: http://www.2xlibre.net
 .. _l10n.gnome.org: http://l10n.gnome.org
 
+Anssi Kääriäinen
+    Anssi works as a developer at Finnish National Institute for Health and
+    Welfare. He is also a computer science student at Aalto University. In his
+    work he uses Django for developing internal business applications and sees
+    Django as a great match for that use case.
+
+    Anssi is interested in developing the object relational mapper (ORM) and
+    all related features. He's also a fan of benckmarking and he tries keep
+    Django as fast as possible.
+
 Specialists
 -----------
 

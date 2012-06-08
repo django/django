@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*
+from __future__ import unicode_literals
 
 PROVINCE_CHOICES = (
     ('AG', 'Agrigento'),
@@ -45,7 +46,7 @@ PROVINCE_CHOICES = (
     ('IM', 'Imperia'),
     ('IS', 'Isernia'),
     ('SP', 'La Spezia'),
-    ('AQ', u'L’Aquila'),
+    ('AQ', 'L’Aquila'),
     ('LT', 'Latina'),
     ('LE', 'Lecce'),
     ('LC', 'Lecco'),

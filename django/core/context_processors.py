@@ -9,6 +9,7 @@ RequestContext.
 
 from django.conf import settings
 from django.middleware.csrf import get_token
+from django.utils.encoding import smart_str
 from django.utils.functional import lazy
 
 def csrf(request):
@@ -24,7 +25,7 @@ def csrf(request):
             # instead of returning an empty dict.
             return b'NOTPROVIDED'
         else:
-            return token
+            return smart_str(token)
     _get_val = lazy(_get_val, str)
 
     return {'csrf_token': _get_val() }

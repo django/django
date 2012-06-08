@@ -185,18 +185,14 @@ class FixtureLoadingTests(TestCase):
             exclude_list=['fixtures.Article', 'fixtures.Book', 'sites'])
 
         # Excluding a bogus app should throw an error
-        self.assertRaises(management.CommandError,
-                          self._dumpdata_assert,
-                          ['fixtures', 'sites'],
-                          '',
-                          exclude_list=['foo_app'])
+        with self.assertRaisesRegexp(management.CommandError,
+                "Unknown app in excludes: foo_app"):
+            self._dumpdata_assert(['fixtures', 'sites'], '', exclude_list=['foo_app'])
 
         # Excluding a bogus model should throw an error
-        self.assertRaises(management.CommandError,
-                          self._dumpdata_assert,
-                          ['fixtures', 'sites'],
-                          '',
-                          exclude_list=['fixtures.FooModel'])
+        with self.assertRaisesRegexp(management.CommandError,
+                "Unknown model in excludes: fixtures.FooModel"):
+            self._dumpdata_assert(['fixtures', 'sites'], '', exclude_list=['fixtures.FooModel'])
 
     def test_dumpdata_with_filtering_manager(self):
         spy1 = Spy.objects.create(name='Paul')

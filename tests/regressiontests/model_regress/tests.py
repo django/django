@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import datetime
 from operator import attrgetter
@@ -8,8 +8,7 @@ from django.test import TestCase, skipUnlessDBFeature
 from django.utils import tzinfo
 
 from .models import (Worker, Article, Party, Event, Department,
-    BrokenUnicodeMethod, NonAutoPK)
-
+    BrokenUnicodeMethod, NonAutoPK, Model1, Model2, Model3)
 
 
 class ModelTests(TestCase):
@@ -38,7 +37,7 @@ class ModelTests(TestCase):
 
         # Empty strings should be returned as Unicode
         a = Article.objects.get(pk=a.pk)
-        self.assertEqual(a.misc_data, u'')
+        self.assertEqual(a.misc_data, '')
         self.assertIs(type(a.misc_data), unicode)
 
     def test_long_textfield(self):
@@ -47,7 +46,7 @@ class ModelTests(TestCase):
         a = Article.objects.create(
             headline="Really, really big",
             pub_date=datetime.datetime.now(),
-            article_text = "ABCDE" * 1000
+            article_text="ABCDE" * 1000
         )
         a = Article.objects.get(pk=a.pk)
         self.assertEqual(len(a.article_text), 5000)
@@ -163,6 +162,19 @@ class ModelTests(TestCase):
             Article.objects.filter(headline="A headline").update(pub_date=dt1),
             1
         )
+
+    def test_chained_fks(self):
+        """
+        Regression for #18432: Chained foreign keys with to_field produce incorrect query
+        """
+
+        m1 = Model1.objects.create(pkey=1000)
+        m2 = Model2.objects.create(model1=m1)
+        m3 = Model3.objects.create(model2=m2)
+
+        # this is the actual test for #18432
+        m3 = Model3.objects.get(model2=1000)
+        m3.model2
 
 
 class ModelValidationTest(TestCase):

@@ -1,6 +1,5 @@
 #! -*- coding: utf-8 -*-
-
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import base64
 import errno
@@ -20,7 +19,7 @@ from . import uploadhandler
 from .models import FileModel, temp_storage, UPLOAD_TO
 
 
-UNICODE_FILENAME = u'test-0123456789_中文_Orléans.jpg'
+UNICODE_FILENAME = 'test-0123456789_中文_Orléans.jpg'
 
 class FileUploadTests(TestCase):
     def test_simple_upload(self):
@@ -71,7 +70,7 @@ class FileUploadTests(TestCase):
             base64.b64encode(test_string),
             '--' + client.BOUNDARY + '--',
             '',
-        ])
+        ]).encode('utf-8')
         r = {
             'CONTENT_LENGTH': len(payload),
             'CONTENT_TYPE':   client.MULTIPART_CONTENT,
@@ -140,7 +139,7 @@ class FileUploadTests(TestCase):
             '',
         ])
 
-        payload = "\r\n".join(payload)
+        payload = "\r\n".join(payload).encode('utf-8')
         r = {
             'CONTENT_LENGTH': len(payload),
             'CONTENT_TYPE':   client.MULTIPART_CONTENT,
@@ -167,7 +166,7 @@ class FileUploadTests(TestCase):
             'Oops.'
             '--' + client.BOUNDARY + '--',
             '',
-        ])
+        ]).encode('utf-8')
         r = {
             'CONTENT_LENGTH': len(payload),
             'CONTENT_TYPE':   client.MULTIPART_CONTENT,
@@ -192,7 +191,7 @@ class FileUploadTests(TestCase):
             'file contents'
             '--' + client.BOUNDARY + '--',
             '',
-        ])
+        ]).encode('utf-8')
         payload = payload[:-10]
         r = {
             'CONTENT_LENGTH': len(payload),
@@ -268,11 +267,11 @@ class FileUploadTests(TestCase):
 
         response = self.client.post('/file_uploads/getlist_count/', {
             'file1': file1,
-            'field1': u'test',
-            'field2': u'test3',
-            'field3': u'test5',
-            'field4': u'test6',
-            'field5': u'test7',
+            'field1': 'test',
+            'field2': 'test3',
+            'field3': 'test5',
+            'field4': 'test6',
+            'field5': 'test7',
             'file2': (file2, file2a)
         })
         got = json.loads(response.content)

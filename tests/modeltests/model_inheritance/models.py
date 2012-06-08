@@ -11,6 +11,7 @@ Model inheritance exists in two varieties:
 
 Both styles are demonstrated here.
 """
+from __future__ import unicode_literals
 
 from django.db import models
 
@@ -27,7 +28,7 @@ class CommonInfo(models.Model):
         ordering = ['name']
 
     def __unicode__(self):
-        return u'%s %s' % (self.__class__.__name__, self.name)
+        return '%s %s' % (self.__class__.__name__, self.name)
 
 class Worker(CommonInfo):
     job = models.CharField(max_length=50)
@@ -72,14 +73,14 @@ class Chef(models.Model):
     name = models.CharField(max_length=50)
 
     def __unicode__(self):
-        return u"%s the chef" % self.name
+        return "%s the chef" % self.name
 
 class Place(models.Model):
     name = models.CharField(max_length=50)
     address = models.CharField(max_length=80)
 
     def __unicode__(self):
-        return u"%s the place" % self.name
+        return "%s the place" % self.name
 
 class Rating(models.Model):
     rating = models.IntegerField(null=True, blank=True)
@@ -97,19 +98,19 @@ class Restaurant(Place, Rating):
         db_table = 'my_restaurant'
 
     def __unicode__(self):
-        return u"%s the restaurant" % self.name
+        return "%s the restaurant" % self.name
 
 class ItalianRestaurant(Restaurant):
     serves_gnocchi = models.BooleanField()
 
     def __unicode__(self):
-        return u"%s the italian restaurant" % self.name
+        return "%s the italian restaurant" % self.name
 
 class Supplier(Place):
     customers = models.ManyToManyField(Restaurant, related_name='provider')
 
     def __unicode__(self):
-        return u"%s the supplier" % self.name
+        return "%s the supplier" % self.name
 
 class ParkingLot(Place):
     # An explicit link to the parent (we can control the attribute name).
@@ -117,7 +118,7 @@ class ParkingLot(Place):
     main_site = models.ForeignKey(Place, related_name='lot')
 
     def __unicode__(self):
-        return u"%s the parking lot" % self.name
+        return "%s the parking lot" % self.name
 
 #
 # Abstract base classes with related models where the sub-class has the

@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django.conf import settings
 from django.contrib.sites.models import get_current_site
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
@@ -18,7 +20,7 @@ def add_domain(domain, url, secure=False):
             or url.startswith('mailto:')):
         # 'url' must already be ASCII and URL-quoted, so no need for encoding
         # conversions here.
-        url = iri_to_uri(u'%s://%s%s' % (protocol, domain, url))
+        url = iri_to_uri('%s://%s%s' % (protocol, domain, url))
     return url
 
 class FeedDoesNotExist(ObjectDoesNotExist):

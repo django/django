@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django.contrib.localflavor.cz.forms import (CZPostalCodeField,
     CZRegionSelect, CZBirthNumberField, CZICNumberField)
 
@@ -8,7 +10,7 @@ from django.test import SimpleTestCase
 class CZLocalFlavorTests(SimpleTestCase):
     def test_CZRegionSelect(self):
         f = CZRegionSelect()
-        out = u'''<select name="regions">
+        out = '''<select name="regions">
 <option value="PR">Prague</option>
 <option value="CE">Central Bohemian Region</option>
 <option value="SO">South Bohemian Region</option>
@@ -27,7 +29,7 @@ class CZLocalFlavorTests(SimpleTestCase):
         self.assertHTMLEqual(f.render('regions', 'TT'), out)
 
     def test_CZPostalCodeField(self):
-        error_format = [u'Enter a postal code in the format XXXXX or XXX XX.']
+        error_format = ['Enter a postal code in the format XXXXX or XXX XX.']
         valid = {
             '91909': '91909',
             '917 01': '91701',
@@ -42,8 +44,8 @@ class CZLocalFlavorTests(SimpleTestCase):
         self.assertFieldOutput(CZPostalCodeField, valid, invalid)
 
     def test_CZBirthNumberField(self):
-        error_format = [u'Enter a birth number in the format XXXXXX/XXXX or XXXXXXXXXX.']
-        error_invalid = [u'Enter a valid birth number.']
+        error_format = ['Enter a birth number in the format XXXXXX/XXXX or XXXXXXXXXX.']
+        error_invalid = ['Enter a valid birth number.']
         valid = {
             '880523/1237': '880523/1237',
             '8805231237': '8805231237',
@@ -63,7 +65,7 @@ class CZLocalFlavorTests(SimpleTestCase):
         self.assertFieldOutput(CZBirthNumberField, valid, invalid)
 
     def test_CZICNumberField(self):
-        error_invalid = [u'Enter a valid IC number.']
+        error_invalid = ['Enter a valid IC number.']
         valid ={
             '12345679': '12345679',
             '12345601': '12345601',

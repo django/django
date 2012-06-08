@@ -109,7 +109,7 @@ If not provided, all locales are processed.
 
 Example usage::
 
-    django-admin.py compilemessages --locale=br_PT
+    django-admin.py compilemessages --locale=pt_BR
 
 createcachetable
 ----------------
@@ -118,8 +118,6 @@ createcachetable
 
 Creates a cache table named ``tablename`` for use with the database cache
 backend. See :doc:`/topics/cache` for more information.
-
-.. versionadded:: 1.2
 
 The :djadminopt:`--database` option can be used to specify the database
 onto which the cachetable will be installed.
@@ -141,8 +139,6 @@ This command assumes the programs are on your ``PATH`` so that a simple call to
 the program name (``psql``, ``mysql``, ``sqlite3``) will find the program in
 the right place. There's no way to specify the location of the program
 manually.
-
-.. versionadded:: 1.2
 
 The :djadminopt:`--database` option can be used to specify the database
 onto which to open a shell.
@@ -212,14 +208,10 @@ name to ``dumpdata``, the dumped output will be restricted to that model,
 rather than the entire application. You can also mix application names and
 model names.
 
-.. versionadded:: 1.2
-
 The :djadminopt:`--database` option can be used to specify the database
 from which data will be dumped.
 
 .. django-admin-option:: --natural
-
-.. versionadded:: 1.2
 
 Use :ref:`natural keys <topics-serialization-natural-keys>` to represent
 any foreign key and many-to-many relationship with a model that provides
@@ -239,8 +231,6 @@ fixture will be re-installed.
 
 The :djadminopt:`--noinput` option may be provided to suppress all user
 prompts.
-
-.. versionadded:: 1.2
 
 The :djadminopt:`--database` option may be used to specify the database
 to flush.
@@ -296,8 +286,6 @@ needed.
 ``inspectdb`` works with PostgreSQL, MySQL and SQLite. Foreign-key detection
 only works in PostgreSQL and with certain types of MySQL tables.
 
-.. versionadded:: 1.2
-
 The :djadminopt:`--database` option may be used to specify the
 database to introspect.
 
@@ -307,8 +295,6 @@ loaddata <fixture fixture ...>
 .. django-admin:: loaddata
 
 Searches for and loads the contents of the named fixture into the database.
-
-.. versionadded:: 1.2
 
 The :djadminopt:`--database` option can be used to specify the database
 onto which the data will be loaded.
@@ -440,7 +426,7 @@ Use the :djadminopt:`--locale` option to specify the locale to process.
 
 Example usage::
 
-    django-admin.py makemessages --locale=br_PT
+    django-admin.py makemessages --locale=pt_BR
 
 .. django-admin-option:: --domain
 
@@ -451,8 +437,6 @@ Currently supported:
 * ``djangojs`` for ``*.js`` files
 
 .. django-admin-option:: --symlinks
-
-.. versionadded:: 1.2
 
 Use the ``--symlinks`` or ``-s`` option to follow symlinks to directories when
 looking for new translation strings.
@@ -768,8 +752,6 @@ sql <appname appname ...>
 
 Prints the CREATE TABLE SQL statements for the given app name(s).
 
-.. versionadded:: 1.2
-
 The :djadminopt:`--database` option can be used to specify the database for
 which to print the SQL.
 
@@ -783,8 +765,6 @@ Prints the CREATE TABLE and initial-data SQL statements for the given app name(s
 Refer to the description of ``sqlcustom`` for an explanation of how to
 specify initial data.
 
-.. versionadded:: 1.2
-
 The :djadminopt:`--database` option can be used to specify the database for
 which to print the SQL.
 
@@ -794,8 +774,6 @@ sqlclear <appname appname ...>
 .. django-admin:: sqlclear
 
 Prints the DROP TABLE SQL statements for the given app name(s).
-
-.. versionadded:: 1.2
 
 The :djadminopt:`--database` option can be used to specify the database for
 which to print the SQL.
@@ -821,8 +799,6 @@ table modifications, or insert any SQL functions into the database.
 
 Note that the order in which the SQL files are processed is undefined.
 
-.. versionadded:: 1.2
-
 The :djadminopt:`--database` option can be used to specify the database for
 which to print the SQL.
 
@@ -834,8 +810,6 @@ sqlflush
 Prints the SQL statements that would be executed for the :djadmin:`flush`
 command.
 
-.. versionadded:: 1.2
-
 The :djadminopt:`--database` option can be used to specify the database for
 which to print the SQL.
 
@@ -845,8 +819,6 @@ sqlindexes <appname appname ...>
 .. django-admin:: sqlindexes
 
 Prints the CREATE INDEX SQL statements for the given app name(s).
-
-.. versionadded:: 1.2
 
 The :djadminopt:`--database` option can be used to specify the database for
 which to print the SQL.
@@ -863,8 +835,6 @@ number for automatically incremented fields.
 
 Use this command to generate SQL which will fix cases where a sequence is out
 of sync with its automatically incremented field data.
-
-.. versionadded:: 1.2
 
 The :djadminopt:`--database` option can be used to specify the database for
 which to print the SQL.
@@ -1027,8 +997,6 @@ data files.
 The :djadminopt:`--noinput` option may be provided to suppress all user
 prompts.
 
-.. versionadded:: 1.2
-
 The :djadminopt:`--database` option can be used to specify the database to
 synchronize.
 
@@ -1047,7 +1015,6 @@ test <app or test identifier>
 Runs tests for all installed models. See :doc:`/topics/testing` for more
 information.
 
-.. versionadded:: 1.2
 .. django-admin-option:: --failfast
 
 The ``--failfast`` option can be used to stop running tests and report the
@@ -1154,8 +1121,6 @@ changepassword
 ~~~~~~~~~~~~~~
 
 .. django-admin:: changepassword
-
-.. versionadded:: 1.2
 
 This command is only available if Django's :doc:`authentication system
 </topics/auth>` (``django.contrib.auth``) is installed.
@@ -1316,8 +1281,6 @@ The following options are not available on every command, but they are common
 to a number of commands.
 
 .. django-admin-option:: --database
-
-.. versionadded:: 1.2
 
 Used to specify the database on which a command will operate. If not
 specified, this option will default to an alias of ``default``.

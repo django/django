@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import unittest
 
 from django.utils import html
@@ -113,11 +115,11 @@ class TestUtilsHtml(unittest.TestCase):
     def test_escapejs(self):
         f = html.escapejs
         items = (
-            (u'"double quotes" and \'single quotes\'', u'\\u0022double quotes\\u0022 and \\u0027single quotes\\u0027'),
-            (ur'\ : backslashes, too', u'\\u005C : backslashes, too'),
-            (u'and lots of whitespace: \r\n\t\v\f\b', u'and lots of whitespace: \\u000D\\u000A\\u0009\\u000B\\u000C\\u0008'),
-            (ur'<script>and this</script>', u'\\u003Cscript\\u003Eand this\\u003C/script\\u003E'),
-            (u'paragraph separator:\u2029and line separator:\u2028', u'paragraph separator:\\u2029and line separator:\\u2028'),
+            ('"double quotes" and \'single quotes\'', '\\u0022double quotes\\u0022 and \\u0027single quotes\\u0027'),
+            (r'\ : backslashes, too', '\\u005C : backslashes, too'),
+            ('and lots of whitespace: \r\n\t\v\f\b', 'and lots of whitespace: \\u000D\\u000A\\u0009\\u000B\\u000C\\u0008'),
+            (r'<script>and this</script>', '\\u003Cscript\\u003Eand this\\u003C/script\\u003E'),
+            ('paragraph separator:\u2029and line separator:\u2028', 'paragraph separator:\\u2029and line separator:\\u2028'),
         )
         for value, output in items:
             self.check_output(f, value, output)
@@ -125,11 +127,11 @@ class TestUtilsHtml(unittest.TestCase):
     def test_clean_html(self):
         f = html.clean_html
         items = (
-            (u'<p>I <i>believe</i> in <b>semantic markup</b>!</p>', u'<p>I <em>believe</em> in <strong>semantic markup</strong>!</p>'),
-            (u'I escape & I don\'t <a href="#" target="_blank">target</a>', u'I escape &amp; I don\'t <a href="#" >target</a>'),
-            (u'<p>I kill whitespace</p><br clear="all"><p>&nbsp;</p>', u'<p>I kill whitespace</p>'),
+            ('<p>I <i>believe</i> in <b>semantic markup</b>!</p>', '<p>I <em>believe</em> in <strong>semantic markup</strong>!</p>'),
+            ('I escape & I don\'t <a href="#" target="_blank">target</a>', 'I escape &amp; I don\'t <a href="#" >target</a>'),
+            ('<p>I kill whitespace</p><br clear="all"><p>&nbsp;</p>', '<p>I kill whitespace</p>'),
             # also a regression test for #7267: this used to raise an UnicodeDecodeError
-            (u'<p>* foo</p><p>* bar</p>', u'<ul>\n<li> foo</li><li> bar</li>\n</ul>'),
+            ('<p>* foo</p><p>* bar</p>', '<ul>\n<li> foo</li><li> bar</li>\n</ul>'),
         )
         for value, output in items:
             self.check_output(f, value, output)

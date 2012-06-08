@@ -365,8 +365,6 @@ subtype. For example::
 Email backends
 ==============
 
-.. versionadded:: 1.2
-
 The actual sending of an email is handled by the email backend.
 
 The email backend class has the following methods:

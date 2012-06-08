@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django.db import models
 
 
@@ -5,21 +7,21 @@ class Building(models.Model):
     name = models.CharField(max_length=10)
 
     def __unicode__(self):
-        return u"Building: %s" % self.name
+        return "Building: %s" % self.name
 
 class Device(models.Model):
     building = models.ForeignKey('Building')
     name = models.CharField(max_length=10)
 
     def __unicode__(self):
-        return u"device '%s' in building %s" % (self.name, self.building)
+        return "device '%s' in building %s" % (self.name, self.building)
 
 class Port(models.Model):
     device = models.ForeignKey('Device')
     port_number = models.CharField(max_length=10)
 
     def __unicode__(self):
-        return u"%s/%s" % (self.device.name, self.port_number)
+        return "%s/%s" % (self.device.name, self.port_number)
 
 class Connection(models.Model):
     start = models.ForeignKey(Port, related_name='connection_start',
@@ -27,7 +29,7 @@ class Connection(models.Model):
     end = models.ForeignKey(Port, related_name='connection_end', unique=True)
 
     def __unicode__(self):
-        return u"%s to %s" % (self.start, self.end)
+        return "%s to %s" % (self.start, self.end)
 
 # Another non-tree hierarchy that exercises code paths similar to the above
 # example, but in a slightly different configuration.

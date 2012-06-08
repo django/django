@@ -226,6 +226,10 @@ tags:
            Athlete: {{ athlete_list.0.name }}
         {% endif %}
 
+    While the above example works, be aware that most template filters return
+    strings, so mathematical comparisons using filters will generally not work
+    as you expect. :tfilter:`length` is an exception.
+
 :ttag:`block` and :ttag:`extends`
     Set up `template inheritance`_ (see below), a powerful way
     of cutting down on "boilerplate" in templates.

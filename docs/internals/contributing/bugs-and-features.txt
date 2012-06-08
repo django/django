@@ -149,9 +149,8 @@ description.
 
 As with most open-source projects, code talks. If you are willing to write the
 code for the feature yourself or, even better, if you've already written it,
-it's much more likely to be accepted. If it's a large feature that might need
-multiple developers, we're always happy to give you an experimental branch in
-our repository; see the :doc:`writing-code/branch-policy`.
+it's much more likely to be accepted. Just fork Django on GitHub, create a
+feature branch, and show us your work!
 
 See also: :ref:`documenting-new-features`.
 

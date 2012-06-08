@@ -624,8 +624,6 @@ features such as the geographic admin or KML sitemaps will not function properly
 Add Google projection to ``spatial_ref_sys`` table
 --------------------------------------------------
 
-.. versionchanged:: 1.2
-
 .. note::
 
     If you're running PostGIS 1.4 or above, you can skip this step. The entry

@@ -117,8 +117,6 @@ SpatiaLite  ``Contains(poly, geom)``
 contains_properly
 -----------------
 
-.. versionadded:: 1.2
-
 *Availability*: PostGIS
 
 Returns true if the lookup geometry intersects the interior of the
@@ -803,8 +801,6 @@ Geometry Editors
 
 .. method:: GeoQuerySet.force_rhr(**kwargs)
 
-.. versionadded:: 1.2
-
 *Availability*: PostGIS
 
 Returns a modified version of the polygon/multipolygon in which all
@@ -815,8 +811,6 @@ of the vertices follow the Right-Hand-Rule, and attaches as a
 ~~~~~~~~~~~~~~~~
 
 .. method:: GeoQuerySet.reverse_geom(**kwargs)
-
-.. versionadded:: 1.2
 
 *Availability*: PostGIS, Oracle
 
@@ -942,8 +936,6 @@ of the geometry field in each model converted to the requested output format.
 ~~~~~~~~~~~
 
 .. method:: GeoQuerySet.geohash(precision=20, **kwargs)
-
-.. versionadded:: 1.2
 
 Attaches a ``geohash`` attribute to every model the queryset
 containing the `GeoHash`__ representation of the geometry.
@@ -1136,8 +1128,6 @@ Example::
 
 .. method:: GeoQuerySet.extent3d(**kwargs)
 
-.. versionadded:: 1.2
-
 *Availability*: PostGIS
 
 Returns the 3D extent of the ``GeoQuerySet`` as a six-tuple, comprising
@@ -1223,8 +1213,6 @@ Returns the same as the :meth:`GeoQuerySet.extent` aggregate method.
 ~~~~~~~~~~~~
 
 .. class:: Extent3D(geo_field)
-
-.. versionadded:: 1.2
 
 Returns the same as the :meth:`GeoQuerySet.extent3d` aggregate method.
 

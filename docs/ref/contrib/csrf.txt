@@ -434,8 +434,6 @@ A number of settings can be used to control Django's CSRF behavior.
 CSRF_COOKIE_DOMAIN
 ------------------
 
-.. versionadded:: 1.2
-
 Default: ``None``
 
 The domain to be used when setting the CSRF cookie.  This can be useful for
@@ -449,8 +447,6 @@ mechanism is not safe against cross-subdomain attacks -- see `Limitations`_.
 
 CSRF_COOKIE_NAME
 ----------------
-
-.. versionadded:: 1.2
 
 Default: ``'csrftoken'``
 
@@ -484,8 +480,6 @@ cookie is only sent under an HTTPS connection.
 
 CSRF_FAILURE_VIEW
 -----------------
-
-.. versionadded:: 1.2
 
 Default: ``'django.views.csrf.csrf_failure'``
 

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms import *
@@ -24,9 +23,9 @@ class FormsErrorMessagesTestCase(TestCase, AssertFormErrorsMixin):
             'max_length': 'LENGTH %(show_value)s, MAX LENGTH %(limit_value)s',
         }
         f = CharField(min_length=5, max_length=10, error_messages=e)
-        self.assertFormErrors([u'REQUIRED'], f.clean, '')
-        self.assertFormErrors([u'LENGTH 4, MIN LENGTH 5'], f.clean, '1234')
-        self.assertFormErrors([u'LENGTH 11, MAX LENGTH 10'], f.clean, '12345678901')
+        self.assertFormErrors(['REQUIRED'], f.clean, '')
+        self.assertFormErrors(['LENGTH 4, MIN LENGTH 5'], f.clean, '1234')
+        self.assertFormErrors(['LENGTH 11, MAX LENGTH 10'], f.clean, '12345678901')
 
     def test_integerfield(self):
         e = {
@@ -36,10 +35,10 @@ class FormsErrorMessagesTestCase(TestCase, AssertFormErrorsMixin):
             'max_value': 'MAX VALUE IS %(limit_value)s',
         }
         f = IntegerField(min_value=5, max_value=10, error_messages=e)
-        self.assertFormErrors([u'REQUIRED'], f.clean, '')
-        self.assertFormErrors([u'INVALID'], f.clean, 'abc')
-        self.assertFormErrors([u'MIN VALUE IS 5'], f.clean, '4')
-        self.assertFormErrors([u'MAX VALUE IS 10'], f.clean, '11')
+        self.assertFormErrors(['REQUIRED'], f.clean, '')
+        self.assertFormErrors(['INVALID'], f.clean, 'abc')
+        self.assertFormErrors(['MIN VALUE IS 5'], f.clean, '4')
+        self.assertFormErrors(['MAX VALUE IS 10'], f.clean, '11')
 
     def test_floatfield(self):
         e = {
@@ -49,10 +48,10 @@ class FormsErrorMessagesTestCase(TestCase, AssertFormErrorsMixin):
             'max_value': 'MAX VALUE IS %(limit_value)s',
         }
         f = FloatField(min_value=5, max_value=10, error_messages=e)
-        self.assertFormErrors([u'REQUIRED'], f.clean, '')
-        self.assertFormErrors([u'INVALID'], f.clean, 'abc')
-        self.assertFormErrors([u'MIN VALUE IS 5'], f.clean, '4')
-        self.assertFormErrors([u'MAX VALUE IS 10'], f.clean, '11')
+        self.assertFormErrors(['REQUIRED'], f.clean, '')
+        self.assertFormErrors(['INVALID'], f.clean, 'abc')
+        self.assertFormErrors(['MIN VALUE IS 5'], f.clean, '4')
+        self.assertFormErrors(['MAX VALUE IS 10'], f.clean, '11')
 
     def test_decimalfield(self):
         e = {
@@ -65,15 +64,15 @@ class FormsErrorMessagesTestCase(TestCase, AssertFormErrorsMixin):
             'max_whole_digits': 'MAX DIGITS BEFORE DP IS %s',
         }
         f = DecimalField(min_value=5, max_value=10, error_messages=e)
-        self.assertFormErrors([u'REQUIRED'], f.clean, '')
-        self.assertFormErrors([u'INVALID'], f.clean, 'abc')
-        self.assertFormErrors([u'MIN VALUE IS 5'], f.clean, '4')
-        self.assertFormErrors([u'MAX VALUE IS 10'], f.clean, '11')
+        self.assertFormErrors(['REQUIRED'], f.clean, '')
+        self.assertFormErrors(['INVALID'], f.clean, 'abc')
+        self.assertFormErrors(['MIN VALUE IS 5'], f.clean, '4')
+        self.assertFormErrors(['MAX VALUE IS 10'], f.clean, '11')
 
         f2 = DecimalField(max_digits=4, decimal_places=2, error_messages=e)
-        self.assertFormErrors([u'MAX DIGITS IS 4'], f2.clean, '123.45')
-        self.assertFormErrors([u'MAX DP IS 2'], f2.clean, '1.234')
-        self.assertFormErrors([u'MAX DIGITS BEFORE DP IS 2'], f2.clean, '123.4')
+        self.assertFormErrors(['MAX DIGITS IS 4'], f2.clean, '123.45')
+        self.assertFormErrors(['MAX DP IS 2'], f2.clean, '1.234')
+        self.assertFormErrors(['MAX DIGITS BEFORE DP IS 2'], f2.clean, '123.4')
 
     def test_datefield(self):
         e = {
@@ -81,8 +80,8 @@ class FormsErrorMessagesTestCase(TestCase, AssertFormErrorsMixin):
             'invalid': 'INVALID',
         }
         f = DateField(error_messages=e)
-        self.assertFormErrors([u'REQUIRED'], f.clean, '')
-        self.assertFormErrors([u'INVALID'], f.clean, 'abc')
+        self.assertFormErrors(['REQUIRED'], f.clean, '')
+        self.assertFormErrors(['INVALID'], f.clean, 'abc')
 
     def test_timefield(self):
         e = {
@@ -90,8 +89,8 @@ class FormsErrorMessagesTestCase(TestCase, AssertFormErrorsMixin):
             'invalid': 'INVALID',
         }
         f = TimeField(error_messages=e)
-        self.assertFormErrors([u'REQUIRED'], f.clean, '')
-        self.assertFormErrors([u'INVALID'], f.clean, 'abc')
+        self.assertFormErrors(['REQUIRED'], f.clean, '')
+        self.assertFormErrors(['INVALID'], f.clean, 'abc')
 
     def test_datetimefield(self):
         e = {
@@ -99,8 +98,8 @@ class FormsErrorMessagesTestCase(TestCase, AssertFormErrorsMixin):
             'invalid': 'INVALID',
         }
         f = DateTimeField(error_messages=e)
-        self.assertFormErrors([u'REQUIRED'], f.clean, '')
-        self.assertFormErrors([u'INVALID'], f.clean, 'abc')
+        self.assertFormErrors(['REQUIRED'], f.clean, '')
+        self.assertFormErrors(['INVALID'], f.clean, 'abc')
 
     def test_regexfield(self):
         e = {
@@ -110,10 +109,10 @@ class FormsErrorMessagesTestCase(TestCase, AssertFormErrorsMixin):
             'max_length': 'LENGTH %(show_value)s, MAX LENGTH %(limit_value)s',
         }
         f = RegexField(r'^\d+$', min_length=5, max_length=10, error_messages=e)
-        self.assertFormErrors([u'REQUIRED'], f.clean, '')
-        self.assertFormErrors([u'INVALID'], f.clean, 'abcde')
-        self.assertFormErrors([u'LENGTH 4, MIN LENGTH 5'], f.clean, '1234')
-        self.assertFormErrors([u'LENGTH 11, MAX LENGTH 10'], f.clean, '12345678901')
+        self.assertFormErrors(['REQUIRED'], f.clean, '')
+        self.assertFormErrors(['INVALID'], f.clean, 'abcde')
+        self.assertFormErrors(['LENGTH 4, MIN LENGTH 5'], f.clean, '1234')
+        self.assertFormErrors(['LENGTH 11, MAX LENGTH 10'], f.clean, '12345678901')
 
     def test_emailfield(self):
         e = {
@@ -123,10 +122,10 @@ class FormsErrorMessagesTestCase(TestCase, AssertFormErrorsMixin):
             'max_length': 'LENGTH %(show_value)s, MAX LENGTH %(limit_value)s',
         }
         f = EmailField(min_length=8, max_length=10, error_messages=e)
-        self.assertFormErrors([u'REQUIRED'], f.clean, '')
-        self.assertFormErrors([u'INVALID'], f.clean, 'abcdefgh')
-        self.assertFormErrors([u'LENGTH 7, MIN LENGTH 8'], f.clean, 'a@b.com')
-        self.assertFormErrors([u'LENGTH 11, MAX LENGTH 10'], f.clean, 'aye@bee.com')
+        self.assertFormErrors(['REQUIRED'], f.clean, '')
+        self.assertFormErrors(['INVALID'], f.clean, 'abcdefgh')
+        self.assertFormErrors(['LENGTH 7, MIN LENGTH 8'], f.clean, 'a@b.com')
+        self.assertFormErrors(['LENGTH 11, MAX LENGTH 10'], f.clean, 'aye@bee.com')
 
     def test_filefield(self):
         e = {
@@ -136,10 +135,10 @@ class FormsErrorMessagesTestCase(TestCase, AssertFormErrorsMixin):
             'empty': 'EMPTY FILE',
         }
         f = FileField(error_messages=e)
-        self.assertFormErrors([u'REQUIRED'], f.clean, '')
-        self.assertFormErrors([u'INVALID'], f.clean, 'abc')
-        self.assertFormErrors([u'EMPTY FILE'], f.clean, SimpleUploadedFile('name', None))
-        self.assertFormErrors([u'EMPTY FILE'], f.clean, SimpleUploadedFile('name', ''))
+        self.assertFormErrors(['REQUIRED'], f.clean, '')
+        self.assertFormErrors(['INVALID'], f.clean, 'abc')
+        self.assertFormErrors(['EMPTY FILE'], f.clean, SimpleUploadedFile('name', None))
+        self.assertFormErrors(['EMPTY FILE'], f.clean, SimpleUploadedFile('name', ''))
 
     def test_urlfield(self):
         e = {
@@ -147,15 +146,15 @@ class FormsErrorMessagesTestCase(TestCase, AssertFormErrorsMixin):
             'invalid': 'INVALID',
         }
         f = URLField(error_messages=e)
-        self.assertFormErrors([u'REQUIRED'], f.clean, '')
-        self.assertFormErrors([u'INVALID'], f.clean, 'abc.c')
+        self.assertFormErrors(['REQUIRED'], f.clean, '')
+        self.assertFormErrors(['INVALID'], f.clean, 'abc.c')
 
     def test_booleanfield(self):
         e = {
             'required': 'REQUIRED',
         }
         f = BooleanField(error_messages=e)
-        self.assertFormErrors([u'REQUIRED'], f.clean, '')
+        self.assertFormErrors(['REQUIRED'], f.clean, '')
 
     def test_choicefield(self):
         e = {
@@ -163,8 +162,8 @@ class FormsErrorMessagesTestCase(TestCase, AssertFormErrorsMixin):
             'invalid_choice': '%(value)s IS INVALID CHOICE',
         }
         f = ChoiceField(choices=[('a', 'aye')], error_messages=e)
-        self.assertFormErrors([u'REQUIRED'], f.clean, '')
-        self.assertFormErrors([u'b IS INVALID CHOICE'], f.clean, 'b')
+        self.assertFormErrors(['REQUIRED'], f.clean, '')
+        self.assertFormErrors(['b IS INVALID CHOICE'], f.clean, 'b')
 
     def test_multiplechoicefield(self):
         e = {
@@ -173,9 +172,9 @@ class FormsErrorMessagesTestCase(TestCase, AssertFormErrorsMixin):
             'invalid_list': 'NOT A LIST',
         }
         f = MultipleChoiceField(choices=[('a', 'aye')], error_messages=e)
-        self.assertFormErrors([u'REQUIRED'], f.clean, '')
-        self.assertFormErrors([u'NOT A LIST'], f.clean, 'b')
-        self.assertFormErrors([u'b IS INVALID CHOICE'], f.clean, ['b'])
+        self.assertFormErrors(['REQUIRED'], f.clean, '')
+        self.assertFormErrors(['NOT A LIST'], f.clean, 'b')
+        self.assertFormErrors(['b IS INVALID CHOICE'], f.clean, ['b'])
 
     def test_splitdatetimefield(self):
         e = {
@@ -184,8 +183,8 @@ class FormsErrorMessagesTestCase(TestCase, AssertFormErrorsMixin):
             'invalid_time': 'INVALID TIME',
         }
         f = SplitDateTimeField(error_messages=e)
-        self.assertFormErrors([u'REQUIRED'], f.clean, '')
-        self.assertFormErrors([u'INVALID DATE', u'INVALID TIME'], f.clean, ['a', 'b'])
+        self.assertFormErrors(['REQUIRED'], f.clean, '')
+        self.assertFormErrors(['INVALID DATE', 'INVALID TIME'], f.clean, ['a', 'b'])
 
     def test_ipaddressfield(self):
         e = {
@@ -193,8 +192,8 @@ class FormsErrorMessagesTestCase(TestCase, AssertFormErrorsMixin):
             'invalid': 'INVALID IP ADDRESS',
         }
         f = IPAddressField(error_messages=e)
-        self.assertFormErrors([u'REQUIRED'], f.clean, '')
-        self.assertFormErrors([u'INVALID IP ADDRESS'], f.clean, '127.0.0')
+        self.assertFormErrors(['REQUIRED'], f.clean, '')
+        self.assertFormErrors(['INVALID IP ADDRESS'], f.clean, '127.0.0')
 
     def test_generic_ipaddressfield(self):
         e = {
@@ -202,8 +201,8 @@ class FormsErrorMessagesTestCase(TestCase, AssertFormErrorsMixin):
             'invalid': 'INVALID IP ADDRESS',
         }
         f = GenericIPAddressField(error_messages=e)
-        self.assertFormErrors([u'REQUIRED'], f.clean, '')
-        self.assertFormErrors([u'INVALID IP ADDRESS'], f.clean, '127.0.0')
+        self.assertFormErrors(['REQUIRED'], f.clean, '')
+        self.assertFormErrors(['INVALID IP ADDRESS'], f.clean, '127.0.0')
 
     def test_subclassing_errorlist(self):
         class TestForm(Form):
@@ -219,8 +218,8 @@ class FormsErrorMessagesTestCase(TestCase, AssertFormErrorsMixin):
                 return self.as_divs()
 
             def as_divs(self):
-                if not self: return u''
-                return mark_safe(u'<div class="error">%s</div>' % ''.join([u'<p>%s</p>' % e for e in self]))
+                if not self: return ''
+                return mark_safe('<div class="error">%s</div>' % ''.join(['<p>%s</p>' % e for e in self]))
 
         # This form should print errors the default way.
         form1 = TestForm({'first_name': 'John'})
@@ -247,8 +246,8 @@ class ModelChoiceFieldErrorMessagesTestCase(TestCase, AssertFormErrorsMixin):
             'invalid_choice': 'INVALID CHOICE',
         }
         f = ModelChoiceField(queryset=ChoiceModel.objects.all(), error_messages=e)
-        self.assertFormErrors([u'REQUIRED'], f.clean, '')
-        self.assertFormErrors([u'INVALID CHOICE'], f.clean, '4')
+        self.assertFormErrors(['REQUIRED'], f.clean, '')
+        self.assertFormErrors(['INVALID CHOICE'], f.clean, '4')
 
         # ModelMultipleChoiceField
         e = {
@@ -257,6 +256,6 @@ class ModelChoiceFieldErrorMessagesTestCase(TestCase, AssertFormErrorsMixin):
             'list': 'NOT A LIST OF VALUES',
         }
         f = ModelMultipleChoiceField(queryset=ChoiceModel.objects.all(), error_messages=e)
-        self.assertFormErrors([u'REQUIRED'], f.clean, '')
-        self.assertFormErrors([u'NOT A LIST OF VALUES'], f.clean, '3')
-        self.assertFormErrors([u'4 IS INVALID CHOICE'], f.clean, ['4'])
+        self.assertFormErrors(['REQUIRED'], f.clean, '')
+        self.assertFormErrors(['NOT A LIST OF VALUES'], f.clean, '3')
+        self.assertFormErrors(['4 IS INVALID CHOICE'], f.clean, ['4'])

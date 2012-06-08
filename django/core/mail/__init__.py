@@ -1,6 +1,7 @@
 """
 Tools for sending email.
 """
+from __future__ import unicode_literals
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -89,7 +90,7 @@ def mail_admins(subject, message, fail_silently=False, connection=None,
     """Sends a message to the admins, as defined by the ADMINS setting."""
     if not settings.ADMINS:
         return
-    mail = EmailMultiAlternatives(u'%s%s' % (settings.EMAIL_SUBJECT_PREFIX, subject),
+    mail = EmailMultiAlternatives('%s%s' % (settings.EMAIL_SUBJECT_PREFIX, subject),
                 message, settings.SERVER_EMAIL, [a[1] for a in settings.ADMINS],
                 connection=connection)
     if html_message:
@@ -102,7 +103,7 @@ def mail_managers(subject, message, fail_silently=False, connection=None,
     """Sends a message to the managers, as defined by the MANAGERS setting."""
     if not settings.MANAGERS:
         return
-    mail = EmailMultiAlternatives(u'%s%s' % (settings.EMAIL_SUBJECT_PREFIX, subject),
+    mail = EmailMultiAlternatives('%s%s' % (settings.EMAIL_SUBJECT_PREFIX, subject),
                 message, settings.SERVER_EMAIL, [a[1] for a in settings.MANAGERS],
                 connection=connection)
     if html_message:

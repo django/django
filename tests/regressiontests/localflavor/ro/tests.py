@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 from django.contrib.localflavor.ro.forms import (ROCIFField, ROCNPField,
     ROCountyField, ROCountySelect, ROIBANField, ROPhoneNumberField,
     ROPostalCodeField)
@@ -9,7 +11,7 @@ from django.test import SimpleTestCase
 class ROLocalFlavorTests(SimpleTestCase):
     def test_ROCountySelect(self):
         f = ROCountySelect()
-        out = u'''<select name="county">
+        out = '''<select name="county">
 <option value="AB">Alba</option>
 <option value="AR">Arad</option>
 <option value="AG">Arge\u015f</option>
@@ -56,12 +58,12 @@ class ROLocalFlavorTests(SimpleTestCase):
         self.assertHTMLEqual(f.render('county', 'CJ'), out)
 
     def test_ROCIFField(self):
-        error_invalid = [u'Enter a valid CIF.']
-        error_atmost = [u'Ensure this value has at most 10 characters (it has 11).']
-        error_atleast = [u'Ensure this value has at least 2 characters (it has 1).']
+        error_invalid = ['Enter a valid CIF.']
+        error_atmost = ['Ensure this value has at most 10 characters (it has 11).']
+        error_atleast = ['Ensure this value has at least 2 characters (it has 1).']
         valid = {
-            '21694681': u'21694681',
-            'RO21694681': u'21694681',
+            '21694681': '21694681',
+            'RO21694681': '21694681',
         }
         invalid = {
             '21694680': error_invalid,
@@ -71,9 +73,9 @@ class ROLocalFlavorTests(SimpleTestCase):
         self.assertFieldOutput(ROCIFField, valid, invalid)
 
     def test_ROCNPField(self):
-        error_invalid = [u'Enter a valid CNP.']
-        error_atleast = [u'Ensure this value has at least 13 characters (it has 10).']
-        error_atmost = [u'Ensure this value has at most 13 characters (it has 14).']
+        error_invalid = ['Enter a valid CNP.']
+        error_atleast = ['Ensure this value has at least 13 characters (it has 10).']
+        error_atmost = ['Ensure this value has at most 13 characters (it has 14).']
         valid = {
             '1981211204489': '1981211204489',
         }
@@ -87,12 +89,12 @@ class ROLocalFlavorTests(SimpleTestCase):
         self.assertFieldOutput(ROCNPField, valid, invalid)
 
     def test_ROCountyField(self):
-        error_format = [u'Enter a Romanian county code or name.']
+        error_format = ['Enter a Romanian county code or name.']
         valid = {
             'CJ': 'CJ',
             'cj': 'CJ',
-            u'Argeş': 'AG',
-            u'argeş': 'AG',
+            'Argeş': 'AG',
+            'argeş': 'AG',
         }
         invalid = {
             'Arges': error_format,
@@ -100,8 +102,8 @@ class ROLocalFlavorTests(SimpleTestCase):
         self.assertFieldOutput(ROCountyField, valid, invalid)
 
     def test_ROIBANField(self):
-        error_invalid = [u'Enter a valid IBAN in ROXX-XXXX-XXXX-XXXX-XXXX-XXXX format']
-        error_atleast = [u'Ensure this value has at least 24 characters (it has 23).']
+        error_invalid = ['Enter a valid IBAN in ROXX-XXXX-XXXX-XXXX-XXXX-XXXX format']
+        error_atleast = ['Ensure this value has at least 24 characters (it has 23).']
         valid = {
             'RO56RZBR0000060003291177': 'RO56RZBR0000060003291177',
             'RO56-RZBR-0000-0600-0329-1177': 'RO56RZBR0000060003291177',
@@ -114,9 +116,9 @@ class ROLocalFlavorTests(SimpleTestCase):
         self.assertFieldOutput(ROIBANField, valid, invalid)
 
     def test_ROPhoneNumberField(self):
-        error_format = [u'Phone numbers must be in XXXX-XXXXXX format.']
-        error_atleast = [u'Ensure this value has at least 10 characters (it has 9).']
-        error_invalid = [u'Phone numbers must be in XXXX-XXXXXX format.']
+        error_format = ['Phone numbers must be in XXXX-XXXXXX format.']
+        error_atleast = ['Ensure this value has at least 10 characters (it has 9).']
+        error_invalid = ['Phone numbers must be in XXXX-XXXXXX format.']
         valid = {
             '0264485936': '0264485936',
             '(0264)-485936': '0264485936',
@@ -128,9 +130,9 @@ class ROLocalFlavorTests(SimpleTestCase):
         self.assertFieldOutput(ROPhoneNumberField, valid, invalid)
 
     def test_ROPostalCodeField(self):
-        error_atleast = [u'Ensure this value has at least 6 characters (it has 5).']
-        error_atmost = [u'Ensure this value has at most 6 characters (it has 7).']
-        error_invalid = [u'Enter a valid postal code in the format XXXXXX']
+        error_atleast = ['Ensure this value has at least 6 characters (it has 5).']
+        error_atmost = ['Ensure this value has at most 6 characters (it has 7).']
+        error_invalid = ['Enter a valid postal code in the format XXXXXX']
 
         valid = {
             '400473': '400473',

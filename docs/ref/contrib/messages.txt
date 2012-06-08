@@ -12,9 +12,6 @@ in a subsequent request (usually the next one). Every message is tagged
 with a specific ``level`` that determines its priority (e.g., ``info``,
 ``warning``, or ``error``).
 
-.. versionadded:: 1.2
-   The messages framework was added.
-
 Enabling messages
 =================
 

@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django.conf import settings
 from django.contrib.auth.models import User, Group, Permission, AnonymousUser
 from django.contrib.contenttypes.models import ContentType
@@ -51,7 +53,7 @@ class BackendTest(TestCase):
 
         # reloading user to purge the _perm_cache
         user = User.objects.get(username='test')
-        self.assertEqual(user.get_all_permissions() == set([u'auth.test']), True)
+        self.assertEqual(user.get_all_permissions() == set(['auth.test']), True)
         self.assertEqual(user.get_group_permissions(), set([]))
         self.assertEqual(user.has_module_perms('Group'), False)
         self.assertEqual(user.has_module_perms('auth'), True)
@@ -62,7 +64,7 @@ class BackendTest(TestCase):
         user.user_permissions.add(perm)
         user.save()
         user = User.objects.get(username='test')
-        self.assertEqual(user.get_all_permissions(), set([u'auth.test2', u'auth.test', u'auth.test3']))
+        self.assertEqual(user.get_all_permissions(), set(['auth.test2', 'auth.test', 'auth.test3']))
         self.assertEqual(user.has_perm('test'), False)
         self.assertEqual(user.has_perm('auth.test'), True)
         self.assertEqual(user.has_perms(['auth.test2', 'auth.test3']), True)
@@ -72,9 +74,9 @@ class BackendTest(TestCase):
         group.save()
         user.groups.add(group)
         user = User.objects.get(username='test')
-        exp = set([u'auth.test2', u'auth.test', u'auth.test3', u'auth.test_group'])
+        exp = set(['auth.test2', 'auth.test', 'auth.test3', 'auth.test_group'])
         self.assertEqual(user.get_all_permissions(), exp)
-        self.assertEqual(user.get_group_permissions(), set([u'auth.test_group']))
+        self.assertEqual(user.get_group_permissions(), set(['auth.test_group']))
         self.assertEqual(user.has_perms(['auth.test3', 'auth.test_group']), True)
 
         user = AnonymousUser()

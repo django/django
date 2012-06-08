@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import os
 
 from django import forms
@@ -33,8 +35,8 @@ class WizardTests(object):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['wizard']['steps'].current, 'form1')
         self.assertEqual(response.context['wizard']['form'].errors,
-                         {'name': [u'This field is required.'],
-                          'user': [u'This field is required.']})
+                         {'name': ['This field is required.'],
+                          'user': ['This field is required.']})
 
     def test_form_post_success(self):
         response = self.client.post(self.wizard_url, self.wizard_step_data[0])
@@ -96,11 +98,11 @@ class WizardTests(object):
         self.assertEqual(all_data[1]['file1'].read(), open(__file__, 'rb').read())
         del all_data[1]['file1']
         self.assertEqual(all_data, [
-            {'name': u'Pony', 'thirsty': True, 'user': self.testuser},
-            {'address1': u'123 Main St', 'address2': u'Djangoland'},
-            {'random_crap': u'blah blah'},
-            [{'random_crap': u'blah blah'},
-             {'random_crap': u'blah blah'}]])
+            {'name': 'Pony', 'thirsty': True, 'user': self.testuser},
+            {'address1': '123 Main St', 'address2': 'Djangoland'},
+            {'random_crap': 'blah blah'},
+            [{'random_crap': 'blah blah'},
+             {'random_crap': 'blah blah'}]])
 
     def test_cleaned_data(self):
         response = self.client.get(self.wizard_url)
@@ -124,11 +126,11 @@ class WizardTests(object):
         self.assertEqual(all_data['file1'].read(), open(__file__, 'rb').read())
         del all_data['file1']
         self.assertEqual(all_data, {
-            'name': u'Pony', 'thirsty': True, 'user': self.testuser,
-            'address1': u'123 Main St', 'address2': u'Djangoland',
-            'random_crap': u'blah blah', 'formset-form4': [
-                {'random_crap': u'blah blah'},
-                {'random_crap': u'blah blah'}]})
+            'name': 'Pony', 'thirsty': True, 'user': self.testuser,
+            'address1': '123 Main St', 'address2': 'Djangoland',
+            'random_crap': 'blah blah', 'formset-form4': [
+                {'random_crap': 'blah blah'},
+                {'random_crap': 'blah blah'}]})
 
     def test_manipulated_data(self):
         response = self.client.get(self.wizard_url)

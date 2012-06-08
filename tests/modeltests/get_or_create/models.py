@@ -6,6 +6,8 @@ given parameters. If an object isn't found, it creates one with the given
 parameters.
 """
 
+from __future__ import unicode_literals
+
 from django.db import models
 
 
@@ -15,7 +17,7 @@ class Person(models.Model):
     birthday = models.DateField()
 
     def __unicode__(self):
-        return u'%s %s' % (self.first_name, self.last_name)
+        return '%s %s' % (self.first_name, self.last_name)
 
 class ManualPrimaryKeyTest(models.Model):
     id = models.IntegerField(primary_key=True)

@@ -26,8 +26,6 @@ SELECTs, etc. Each time your app hits the database, the query will be recorded.
 Note that the SQL recorded here may be :ref:`incorrectly quoted under SQLite
 <sqlite-connection-queries>`.
 
-.. versionadded:: 1.2
-
 If you are using :doc:`multiple databases</topics/db/multi-db>`, you can use the
 same interface on each member of the ``connections`` dictionary::
 
