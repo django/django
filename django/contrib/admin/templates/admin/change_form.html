@@ -3,8 +3,7 @@
 {% load admin_urls %}
 
 {% block extrahead %}{{ block.super }}
-{% url 'admin:jsi18n' as jsi18nurl %}
-<script type="text/javascript" src="{{ jsi18nurl|default:"../../../jsi18n/" }}"></script>
+<script type="text/javascript" src="{% url 'admin:jsi18n' %}"></script>
 {{ media }}
 {% endblock %}
 
