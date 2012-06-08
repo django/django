@@ -44,6 +44,8 @@ ContextMixin
     **classpath**
     
     `django.views.generic.base.ContextMixin`
+    
+    **Methods**
 
     .. method:: get_context_data(**kwargs)
 
@@ -52,18 +54,21 @@ ContextMixin
 
 TemplateResponseMixin
 ~~~~~~~~~~~~~~~~~~~~~
-.. class:: TemplateResponseMixin()
+.. autoclass:: django.views.generic.base.TemplateResponseMixin
+    :members:
+    :undoc-members:
+    :inherited-members:
 
     Provides a mechanism to construct a
     :class:`~django.template.response.TemplateResponse`, given
     suitable context. The template to use is configurable and can be
     further customized by subclasses.
 
+    **classpath**
+    
+    `django.views.generic.base.TemplateResponseMixin`
+    
     **Methods and Attributes**
-
-    .. attribute:: template_name
-
-        The path to the template to use when rendering the view.
 
     .. attribute:: response_class
 
@@ -97,6 +102,11 @@ TemplateResponseMixin
         If :attr:`TemplateResponseMixin.template_name` is specified, the
         default implementation will return a list containing
         :attr:`TemplateResponseMixin.template_name` (if it is specified).
+        
+    **Autodoc**        
+    
+    .. comment: TODO migrate the documentation above into the existing codebase
+        so we can get rid of the **Autodoc** header there.
 
 
 Single object mixins
@@ -106,7 +116,12 @@ Single object mixins
 
 SingleObjectMixin
 ~~~~~~~~~~~~~~~~~
-.. class:: SingleObjectMixin()
+.. autoclass:: django.views.generic.detail.SingleObjectMixin
+    :members:
+    :undoc-members:
+    :inherited-members:
+    
+    **Methods and Attributes**
 
     Provides a mechanism for looking up an object associated with the
     current HTTP request.
@@ -190,10 +205,18 @@ SingleObjectMixin
       ``context_object_name`` is specified, that variable will also be
       set in the context, with the same value as ``object``.
 
+     **Autodoc**
+
+     .. comment: TODO migrate the documentation above into the existing codebase
+         so we can get rid of the **Autodoc** header there.
+
 SingleObjectTemplateResponseMixin
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. class:: SingleObjectTemplateResponseMixin()
+.. autoclass:: django.views.generic.detail.SingleObjectTemplateResponseMixin
+    :members:
+    :undoc-members:
+    :inherited-members:
 
     A mixin class that performs template-based response rendering for views
     that operate upon a single object instance. Requires that the view it is
@@ -229,6 +252,11 @@ SingleObjectTemplateResponseMixin
         * the contents of the ``template_name_field`` field on the
           object instance that the view is operating upon (if available)
         * ``<app_label>/<object_name><template_name_suffix>.html``
+
+    **Autodoc**
+
+    .. comment: TODO migrate the documentation above into the existing codebase
+        so we can get rid of the **Autodoc** header there.
 
 Multiple object mixins
 ----------------------
@@ -270,6 +298,12 @@ MultipleObjectMixin
 
     Note that ``page`` *must* be either a valid page number or the value
     ``last``; any other value for ``page`` will result in a 404 error.
+    
+    **Extends**
+    
+    django.views.generic.base.ContextMixin
+    
+    **Methods and Attributes**
 
     **Methods and Attributes**
 
@@ -377,10 +411,14 @@ MultipleObjectMixin
     * ``page_obj``: An instance of
       :class:`django.core.paginator.Page`. If the page is not paginated,
       this context variable will be ``None``.
+      
 
 MultipleObjectTemplateResponseMixin
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.. class:: MultipleObjectTemplateResponseMixin()
+.. autoclass:: django.views.generic.list.MultipleObjectTemplateResponseMixin
+    :members:
+    :undoc-members:
+    :inherited-members:
 
     A mixin class that performs template-based response rendering for views
     that operate upon a list of object instances. Requires that the view it is
@@ -391,6 +429,8 @@ MultipleObjectTemplateResponseMixin
     **Extends**
 
     * :class:`~django.views.generic.base.TemplateResponseMixin`
+    
+    **Methods and Attributes**
 
     **Methods and Attributes**
 
@@ -405,6 +445,11 @@ MultipleObjectTemplateResponseMixin
 
         * the value of ``template_name`` on the view (if provided)
         * ``<app_label>/<object_name><template_name_suffix>.html``
+        
+        **Autodoc**
+
+        .. comment: TODO migrate the documentation above into the existing codebase
+            so we can get rid of the **Autodoc** header there.        
 
 Editing mixins
 --------------

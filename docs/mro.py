@@ -12,15 +12,13 @@ def print_mro(cls):
     """ If passed in a class will return a string that turns the MRO for
         that class into an attractive RestructuredText snippet.
     """
-    for item in cls.mro():
-        print(item)
+    print cls.mro()
         
-def clean(text=None):
-    if text is None:
-        items = open('hack.txt', 'r').read().splitlines()
-    else:
-        items = text.splitlines()
+def clean(text):
+    text = text.replace("[","").replace("]","")
+    items = text.split(',')
     for item in items:
+        item = item.strip()
         if item == "<type 'object'>":
             continue
         item = item.replace("'", "`")
