@@ -2,7 +2,7 @@ from __future__ import absolute_import, unicode_literals
 
 from django.test import TestCase
 
-from .models import Domain, Kingdom, Phylum, Klass, Order, Family, Genus, Species
+from .models import Domain, Kingdom, Phylum, Klass, Order, Family, Genus, Species, AlternativeName
 
 
 class SelectRelatedTests(TestCase):
@@ -160,3 +160,22 @@ class SelectRelatedTests(TestCase):
             Species.objects.select_related,
             'genus__family__order', depth=4
         )
+
+    def test_select_related_chaining(self):
+        '''
+        Regression for #16855
+        '''
+        name = AlternativeName.objects.create(name='Human')
+        human = Species.objects.get(name='sapiens')
+        human.alternative_name = name
+        human.save()
+
+        qs = Species.objects.select_related('genus')
+        qs = qs.select_related('alternative_name')
+        with self.assertNumQueries(1):
+            names = []
+            genus = []
+            for s in qs:
+                genus.append(s.genus.name)
+                if s.alternative_name:
+                    names.append(s.alternative_name.name)

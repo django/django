@@ -52,8 +52,14 @@ class Genus(models.Model):
     def __unicode__(self):
         return self.name
 
+class AlternativeName(models.Model):
+    name = models.CharField(max_length=50)
+    def __unicode__(self):
+        return self.name
+
 class Species(models.Model):
     name = models.CharField(max_length=50)
     genus = models.ForeignKey(Genus)
+    alternative_name = models.ForeignKey(AlternativeName, null=True)
     def __unicode__(self):
         return self.name
