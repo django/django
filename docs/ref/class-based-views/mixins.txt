@@ -1,11 +1,11 @@
 ===============================
-Class-based generic view mixins
+Class-based view mixins
 ===============================
 
 A mixin class is a way of using the inheritance capabilities of
-classes to compose a class out of smaller pieces of behavior. Django's
-class-based generic views are constructed by composing mixins into
-usable generic views.
+classes to compose a class out of smaller pieces of behavior. Most of Django's
+class-based views are constructed by composing mixins into usable generic
+views.
 
 For example, the :class:`~django.views.generic.base.detail.DetailView`
 is composed from:
@@ -40,6 +40,10 @@ Simple mixins
 ContextMixin
 ~~~~~~~~~~~~~~~~~~~~~
 .. class:: ContextMixin()
+
+    **classpath**
+    
+    `django.views.generic.base.ContextMixin`
 
     .. method:: get_context_data(**kwargs)
 

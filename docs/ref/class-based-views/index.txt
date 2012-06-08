@@ -11,6 +11,7 @@ Class Based Views API reference. For introductory material, see :doc:`/topics/cl
    generic-display
    generic-editing
    generic-date-based
+   mixins
 
 Specification
 -------------
