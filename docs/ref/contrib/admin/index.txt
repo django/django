@@ -1948,16 +1948,17 @@ accessible using Django's :ref:`URL reversing system <naming-url-patterns>`.
 
 The :class:`AdminSite` provides the following named URL patterns:
 
-======================  ========================  =============
-Page                    URL name                  Parameters
-======================  ========================  =============
-Index                   ``index``
-Logout                  ``logout``
-Password change         ``password_change``
-Password change done    ``password_change_done``
-i18n javascript         ``jsi18n``
-Application index page  ``app_list``              ``app_label``
-======================  ========================  =============
+=========================  ========================  ==================================
+Page                       URL name                  Parameters
+=========================  ========================  ==================================
+Index                      ``index``
+Logout                     ``logout``
+Password change            ``password_change``
+Password change done       ``password_change_done``
+i18n javascript            ``jsi18n``
+Application index page     ``app_list``              ``app_label``
+Redirect to object's page  ``view_on_site``          ``content_type_id``, ``object_id``
+=========================  ========================  ==================================
 
 Each :class:`ModelAdmin` instance provides an additional set of named URLs:
 
