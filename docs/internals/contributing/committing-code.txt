@@ -81,7 +81,7 @@ checkout the branch and work from there::
 Yet another alternative is to fetch the branch without adding the
 contributor's repository as a remote::
 
-    git fetch https://github.com/<contributor>/django.git
+    git fetch https://github.com/<contributor>/django.git <contributor's pull request branch>
     git checkout -b pull_xxxxx FETCH_HEAD
 
 At this point, you can work on the code and continue as above.
