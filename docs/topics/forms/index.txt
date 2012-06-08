@@ -289,7 +289,7 @@ loop::
         {% for field in form %}
             <div class="fieldWrapper">
                 {{ field.errors }}
-                {{ field.label_tag }}: {{ field }}
+                {{ field.label_tag }} {{ field }}
             </div>
         {% endfor %}
         <p><input type="submit" value="Send message" /></p>
@@ -303,8 +303,9 @@ templates:
     The label of the field, e.g. ``Email address``.
 
 ``{{ field.label_tag }}``
-    The field's label wrapped in the appropriate HTML ``<label>`` tag,
-    e.g. ``<label for="id_email">Email address</label>``
+    The field's label wrapped in the appropriate HTML ``<label>`` tag. This
+    includes the form's label_suffix, e.g. 
+    ``<label for="id_email">Email address:</label>``
 
 ``{{ field.value }}``
     The value of the field. e.g ``someone@example.com``
@@ -356,7 +357,7 @@ these two methods::
         {% for field in form.visible_fields %}
             <div class="fieldWrapper">
                 {{ field.errors }}
-                {{ field.label_tag }}: {{ field }}
+                {{ field.label_tag }} {{ field }}
             </div>
         {% endfor %}
         <p><input type="submit" value="Send message" /></p>
@@ -384,7 +385,7 @@ using the :ttag:`include` tag to reuse it in other templates::
     {% for field in form %}
         <div class="fieldWrapper">
             {{ field.errors }}
-            {{ field.label_tag }}: {{ field }}
+            {{ field.label_tag }} {{ field }}
         </div>
     {% endfor %}
 
