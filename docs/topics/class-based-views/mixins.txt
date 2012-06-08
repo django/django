@@ -6,8 +6,9 @@ Using Mixins with class based views
 
 .. caution::
 
-    This is an advanced topic. A working knowledge of Django's class
-    based views is advised before exploring these techniques.
+    This is an advanced topic. A working knowledge of :doc:`Django's
+    class based views<index>` is advised before exploring these
+    techniques.
 
 Django's built-in class based views provide a lot of functionality,
 but some of it you may want to use separately. For instance, you may
