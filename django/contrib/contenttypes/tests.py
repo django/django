@@ -151,14 +151,14 @@ class ContentTypesTests(TestCase):
         self.assertEqual(concrete_model_ct,
             ContentType.objects.get_for_model(DeferredConcreteModel,
                                               for_concrete_model=False))
-        
+
         self.assertEqual(concrete_model_ct,
             ContentType.objects.get_for_model(DeferredProxyModel))
 
         self.assertEqual(proxy_model_ct,
             ContentType.objects.get_for_model(DeferredProxyModel,
                                               for_concrete_model=False))
-        
+
     def test_get_for_concrete_models(self):
         """
         Make sure the `for_concrete_models` kwarg correctly works
@@ -185,7 +185,7 @@ class ContentTypesTests(TestCase):
         ConcreteModel.objects.create(name="Concrete")
         DeferredConcreteModel = ConcreteModel.objects.only('pk').get().__class__
         DeferredProxyModel = ProxyModel.objects.only('pk').get().__class__
-        
+
         cts = ContentType.objects.get_for_models(DeferredConcreteModel,
                                                  DeferredProxyModel)
         self.assertEqual(cts, {
@@ -200,7 +200,7 @@ class ContentTypesTests(TestCase):
             DeferredConcreteModel: concrete_model_ct,
             DeferredProxyModel: proxy_model_ct,
         })
-        
+
 
     def test_shortcut_view(self):
         """
