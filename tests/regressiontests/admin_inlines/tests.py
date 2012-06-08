@@ -11,7 +11,7 @@ from django.test.utils import override_settings
 from .admin import InnerInline
 from .models import (Holder, Inner, Holder2, Inner2, Holder3, Inner3, Person,
     OutfitItem, Fashionista, Teacher, Parent, Child, Author, Book, Profile,
-    ProfileCollection)
+    ProfileCollection, ParentModelWithCustomPk, ChildModel1, ChildModel2)
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
@@ -146,6 +146,21 @@ class TestInline(TestCase):
         self.assertContains(response,
                 '<input id="id_-2-0-name" type="text" class="vTextField" '
                 'name="-2-0-name" maxlength="100" />', html=True)
+
+    def test_custom_pk_shortcut(self):
+        """
+        Ensure that the "View on Site" link is correct for models with a
+        custom primary key field. Bug #18433.
+        """
+        parent = ParentModelWithCustomPk.objects.create(my_own_pk="foo", name="Foo")
+        child1 = ChildModel1.objects.create(my_own_pk="bar", name="Bar", parent=parent)
+        child2 = ChildModel2.objects.create(my_own_pk="baz", name="Baz", parent=parent)
+        response = self.client.get('/admin/admin_inlines/parentmodelwithcustompk/foo/')
+        child1_shortcut = 'r/%s/%s/'%(ContentType.objects.get_for_model(child1).pk, child1.pk)
+        child2_shortcut = 'r/%s/%s/'%(ContentType.objects.get_for_model(child2).pk, child2.pk)
+        self.assertContains(response, child1_shortcut)
+        self.assertContains(response, child2_shortcut)
+
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class TestInlineMedia(TestCase):
