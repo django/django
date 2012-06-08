@@ -1,6 +1,21 @@
 Working with Git and GitHub
 ===========================
 
+This section explains how the community can contribute code to Django via pull
+requests. If you're interested in how core developers handle them, see
+:doc:`../committing-code`.
+
+Below, we are going to show how to create a GitHub pull request containing the
+changes for Trac ticket #xxxxx. By creating a fully-ready pull request you
+will make the committers' job easier, meaning that your work is more likely to
+be merged into Django.
+
+You could also upload a traditional patch to Trac, but it's less practical for
+reviews.
+
+Installing Git
+--------------
+
 Django uses `Git`_ for its source control. You can `download
 <http://git-scm.com/download>`_ Git, but it's often easier to install with
 your operating system's package manager.
@@ -18,17 +33,9 @@ Note that ``user.name`` should be your real name, not your GitHub nick. GitHub
 should know the email you use in the ``user.email`` field, as this will be
 used to associate your commits with your GitHub account.
 
-Now we are going to show how to create a GitHub pull request containing the
-changes for Trac ticket #xxxxx. By creating a fully-ready pull request you
-will make the committers' job easier, meaning that your work is more likely to
-be merged into Django.
-
-You could also upload a traditional patch to Trac, but it's less practical for
-reviews.
-
 .. _Git: http://git-scm.com/
-.. _GitHub: https://github.com/
 .. _Git repository: https://github.com/django/django/
+.. _GitHub: https://github.com/
 
 Setting up local repository
 ---------------------------
