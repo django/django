@@ -1,11 +1,11 @@
 =============================
-Fundamental class based views
+Fundamental class-based views
 =============================
 
 The following three classes provide much of the functionality needed to create
 Django views. You may think of them as *base* views, which can be used by
 themselves or inherited from.  They may not provide all the capabilities required
-for projects, in which case there are Mixins and Generic class based views.
+for projects, in which case there are Mixins and Generic class-based views.
 
 .. currentmodule:: django.views.generic.base
 
@@ -83,7 +83,7 @@ View
 
     .. note:: 
     
-        Documentation on Class Based Views is a work in progress. The
+        Documentation on class-based views is a work in progress. The
         following descriptions of methods and attributes are a work in progress
         and will eventually subsume the **Methods and Attributes** described
         above.    
@@ -165,7 +165,7 @@ TemplateView
 
     .. note:: 
     
-        Documentation on Class Based Views is a work in progress. The
+        Documentation on class-based views is a work in progress. The
         following descriptions of methods and attributes are a work in progress
         and will eventually subsume the **Methods and Attributes** described
         above.
@@ -279,7 +279,7 @@ RedirectView
 
     .. note:: 
     
-        Documentation on Class Based Views is a work in progress. The
+        Documentation on class-based views is a work in progress. The
         following descriptions of methods and attributes are a work in progress
         and will eventually subsume the **Methods and Attributes** described
         above.

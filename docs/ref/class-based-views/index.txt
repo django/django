@@ -1,8 +1,9 @@
 ==================
-Class Based Views
+class-based views
 ==================
 
-Class Based Views API reference. For introductory material, see :doc:`/topics/class-based-views/index`.
+Class-based views API reference. For introductory material, see
+:doc:`/topics/class-based-views/index`.
 
 .. toctree::
    :maxdepth: 1
@@ -16,7 +17,7 @@ Class Based Views API reference. For introductory material, see :doc:`/topics/cl
 Specification
 -------------
 
-Each request served by a class based view has an independent state; therefore,
+Each request served by a class-based view has an independent state; therefore,
 it is safe to store state variables on the instance (i.e., ``self.foo = 3`` is
 a thread-safe operation).
 
@@ -40,15 +41,15 @@ instance that is used to service a request. Using the previous example,
 this means that every request on ``MyView`` is able to interrogate
 ``self.size``.
 
-Fundamental vs Generic class based views
+Fundamental vs Generic class-based views
 -----------------------------------------
 
-Fundamental class based views can be thought of as *base* views, which can be
+Fundamental class-based views can be thought of as *base* views, which can be
 used by themselves or inherited from.  They may not provide all the
 capabilities required for projects, in which case there are Mixins which extend
 what Fundamental views can do.
 
-Django’s generic views are built off of the Fundamental class based forms, and
+Django’s generic views are built off of the fundamental class-based forms, and
 were developed as a shortcut for common usage patterns such as displaying the
 details of an object. They take certain common idioms and patterns found in view
 development and abstract them so that you can quickly write common views of data

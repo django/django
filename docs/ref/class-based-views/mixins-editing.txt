@@ -90,7 +90,7 @@ FormMixin
     
     .. note:: 
     
-        Documentation on Class Based Views is a work in progress. The
+        Documentation on class-based views is a work in progress. The
         following descriptions of methods and attributes are a work in progress
         and will eventually subsume the **Methods and Attributes** described
         above.
@@ -166,7 +166,7 @@ ModelFormMixin
 
     .. note:: 
     
-        Documentation on Class Based Views is a work in progress. The
+        Documentation on class-based views is a work in progress. The
         following descriptions of methods and attributes are a work in progress
         and will eventually subsume the **Methods and Attributes** described
         above.
@@ -211,7 +211,7 @@ ProcessFormView
 
     .. note:: 
     
-        Documentation on Class Based Views is a work in progress. The
+        Documentation on class-based views is a work in progress. The
         following descriptions of methods and attributes are a work in progress
         and will eventually subsume the **Methods and Attributes** described
         above.
@@ -247,7 +247,7 @@ DeletionMixin
 
     .. note:: 
     
-        Documentation on Class Based Views is a work in progress. The
+        Documentation on class-based views is a work in progress. The
         following descriptions of methods and attributes are a work in progress
         and will eventually subsume the **Methods and Attributes** described
         above.
