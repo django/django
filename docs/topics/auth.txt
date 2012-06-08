@@ -64,11 +64,8 @@ Fields
 
     .. attribute:: models.User.username
 
-        Required. 30 characters or fewer. Alphanumeric characters only
-        (letters, digits and underscores).
-
-        .. versionchanged:: 1.2
-           Usernames may now contain ``@``, ``+``, ``.`` and ``-`` characters.
+        Required. 30 characters or fewer. Usernames may contain alphanumeric,
+        ``_``, ``@``, ``+``, ``.`` and ``-`` characters.
 
     .. attribute:: models.User.first_name
 
@@ -207,8 +204,6 @@ Methods
         Returns a set of permission strings that the user has, through his/her
         groups.
 
-        .. versionadded:: 1.2
-
         If ``obj`` is passed in, only returns the group permissions for
         this specific object.
 
@@ -216,8 +211,6 @@ Methods
 
         Returns a set of permission strings that the user has, both through
         group and user permissions.
-
-        .. versionadded:: 1.2
 
         If ``obj`` is passed in, only returns the permissions for this
         specific object.
@@ -229,8 +222,6 @@ Methods
         `permissions`_ section below). If the user is inactive, this method will
         always return ``False``.
 
-        .. versionadded:: 1.2
-
         If ``obj`` is passed in, this method won't check for a permission for
         the model, but for this specific object.
 
@@ -240,8 +231,6 @@ Methods
         where each perm is in the format
         ``"<app label>.<permission codename>"``. If the user is inactive,
         this method will always return ``False``.
-
-        .. versionadded:: 1.2
 
         If ``obj`` is passed in, this method won't check for permissions for
         the model, but for the specific object.
@@ -348,9 +337,6 @@ Django requires add *and* change permissions as a slight security measure.
 
 Changing passwords
 ~~~~~~~~~~~~~~~~~~
-
-.. versionadded:: 1.2
-   The ``manage.py changepassword`` command was added.
 
 :djadmin:`manage.py changepassword *username* <changepassword>` offers a method
 of changing a User's password from the command line. It prompts you to
@@ -1046,8 +1032,6 @@ The login_required decorator
 
         {% endblock %}
 
-    .. versionadded:: 1.2
-
     If you are using alternate authentication (see
     :ref:`authentication-backends`) you can pass a custom authentication form
     to the login view via the ``authentication_form`` parameter. This form must
@@ -1139,8 +1123,6 @@ includes a few other useful built-in views located in
 
     * ``post_change_redirect``: The URL to redirect to after a successful
       password change.
-
-      .. versionadded:: 1.2
 
     * ``password_change_form``: A custom "change password" form which must
       accept a ``user`` keyword argument. The form is responsible for
@@ -1899,8 +1881,6 @@ the ``auth_permission`` table most of the time.
 
 Authorization for anonymous users
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. versionchanged:: 1.2
 
 An anonymous user is one that is not authenticated i.e. they have provided no
 valid authentication details. However, that does not necessarily mean they are

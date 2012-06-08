@@ -1,4 +1,5 @@
 """Default tags used by the template system, available to all templates."""
+from __future__ import unicode_literals
 
 import sys
 import re
@@ -6,14 +7,14 @@ from datetime import datetime
 from itertools import groupby, cycle as itertools_cycle
 
 from django.conf import settings
-from django.template.base import (Node, NodeList, Template, Library,
+from django.template.base import (Node, NodeList, Template, Context, Library,
     TemplateSyntaxError, VariableDoesNotExist, InvalidTemplateLibrary,
     BLOCK_TAG_START, BLOCK_TAG_END, VARIABLE_TAG_START, VARIABLE_TAG_END,
     SINGLE_BRACE_START, SINGLE_BRACE_END, COMMENT_TAG_START, COMMENT_TAG_END,
     VARIABLE_ATTRIBUTE_SEPARATOR, get_library, token_kwargs, kwarg_re)
 from django.template.smartif import IfParser, Literal
 from django.template.defaultfilters import date
-from django.utils.encoding import smart_str, smart_unicode
+from django.utils.encoding import smart_unicode
 from django.utils.safestring import mark_safe
 from django.utils import timezone
 
@@ -43,9 +44,9 @@ class CsrfTokenNode(Node):
         csrf_token = context.get('csrf_token', None)
         if csrf_token:
             if csrf_token == 'NOTPROVIDED':
-                return mark_safe(u"")
+                return mark_safe("")
             else:
-                return mark_safe(u"<div style='display:none'><input type='hidden' name='csrfmiddlewaretoken' value='%s' /></div>" % csrf_token)
+                return mark_safe("<div style='display:none'><input type='hidden' name='csrfmiddlewaretoken' value='%s' /></div>" % csrf_token)
         else:
             # It's very probable that the token is missing because of
             # misconfiguration, so we raise a warning
@@ -53,7 +54,7 @@ class CsrfTokenNode(Node):
             if settings.DEBUG:
                 import warnings
                 warnings.warn("A {% csrf_token %} was used in a template, but the context did not provide the value.  This is usually caused by not using RequestContext.")
-            return u''
+            return ''
 
 class CycleNode(Node):
     def __init__(self, cyclevars, variable_name=None, silent=False):
@@ -102,7 +103,7 @@ class FirstOfNode(Node):
             value = var.resolve(context, True)
             if value:
                 return smart_unicode(value)
-        return u''
+        return ''
 
 class ForNode(Node):
     child_nodelists = ('nodelist_loop', 'nodelist_empty')
@@ -390,7 +391,7 @@ class URLNode(Node):
     def render(self, context):
         from django.core.urlresolvers import reverse, NoReverseMatch
         args = [arg.resolve(context) for arg in self.args]
-        kwargs = dict([(smart_str(k, 'ascii'), v.resolve(context))
+        kwargs = dict([(smart_unicode(k, 'ascii'), v.resolve(context))
                        for k, v in self.kwargs.items()])
 
         view_name = self.view_name.resolve(context)
@@ -424,6 +425,13 @@ class URLNode(Node):
             return ''
         else:
             return url
+
+class VerbatimNode(Node):
+    def __init__(self, content):
+        self.content = content
+
+    def render(self, context):
+        return self.content
 
 class WidthRatioNode(Node):
     def __init__(self, val_expr, max_expr, max_width):
@@ -479,7 +487,7 @@ def autoescape(parser, token):
     if len(args) != 2:
         raise TemplateSyntaxError("'autoescape' tag requires exactly one argument.")
     arg = args[1]
-    if arg not in (u'on', u'off'):
+    if arg not in ('on', 'off'):
         raise TemplateSyntaxError("'autoescape' argument should be 'on' or 'off'")
     nodelist = parser.parse(('endautoescape',))
     parser.delete_first_token()
@@ -1271,6 +1279,32 @@ def url(parser, token):
                 args.append(parser.compile_filter(value))
 
     return URLNode(viewname, args, kwargs, asvar)
+
+@register.tag
+def verbatim(parser, token):
+    """
+    Stops the template engine from rendering the contents of this block tag.
+
+    Usage::
+
+        {% verbatim %}
+            {% don't process this %}
+        {% endverbatim %}
+
+    You can also specify an alternate closing tag::
+
+        {% verbatim -- %}
+            ...
+        {% -- %}
+    """
+    bits = token.contents.split(' ', 1)
+    if len(bits) > 1:
+        closing_tag = bits[1]
+    else:
+        closing_tag = 'endverbatim'
+    nodelist = parser.parse((closing_tag,))
+    parser.delete_first_token()
+    return VerbatimNode(nodelist.render(Context()))
 
 @register.tag
 def widthratio(parser, token):

@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 from django.contrib.syndication import views
 from django.core.exceptions import ObjectDoesNotExist
@@ -105,21 +105,21 @@ class MyCustomAtom1Feed(feedgenerator.Atom1Feed):
     """
     def root_attributes(self):
         attrs = super(MyCustomAtom1Feed, self).root_attributes()
-        attrs[u'django'] = u'rocks'
+        attrs['django'] = 'rocks'
         return attrs
 
     def add_root_elements(self, handler):
         super(MyCustomAtom1Feed, self).add_root_elements(handler)
-        handler.addQuickElement(u'spam', u'eggs')
+        handler.addQuickElement('spam', 'eggs')
 
     def item_attributes(self, item):
         attrs = super(MyCustomAtom1Feed, self).item_attributes(item)
-        attrs[u'bacon'] = u'yum'
+        attrs['bacon'] = 'yum'
         return attrs
 
     def add_item_elements(self, handler, item):
         super(MyCustomAtom1Feed, self).add_item_elements(handler, item)
-        handler.addQuickElement(u'ministry', u'silly walks')
+        handler.addQuickElement('ministry', 'silly walks')
 
 
 class TestCustomFeed(TestAtomFeed):

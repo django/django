@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # Unittests for fixtures.
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import os
 import re
@@ -9,7 +9,7 @@ from io import BytesIO
 from django.core import management
 from django.core.management.base import CommandError
 from django.core.management.commands.dumpdata import sort_dependencies
-from django.db import transaction
+from django.db import transaction, IntegrityError
 from django.db.models import signals
 from django.test import (TestCase, TransactionTestCase, skipIfDBFeature,
     skipUnlessDBFeature)
@@ -85,7 +85,7 @@ class TestFixtures(TestCase):
             verbosity=0,
             commit=False
         )
-        self.assertEqual(Stuff.objects.all()[0].name, u'')
+        self.assertEqual(Stuff.objects.all()[0].name, '')
         self.assertEqual(Stuff.objects.all()[0].owner, None)
 
     def test_absolute_path(self):
@@ -116,18 +116,15 @@ class TestFixtures(TestCase):
         Test for ticket #4371 -- Loading data of an unknown format should fail
         Validate that error conditions are caught correctly
         """
-        stderr = BytesIO()
-        management.call_command(
-            'loaddata',
-            'bad_fixture1.unkn',
-            verbosity=0,
-            commit=False,
-            stderr=stderr,
-        )
-        self.assertEqual(
-            stderr.getvalue(),
-            "Problem installing fixture 'bad_fixture1': unkn is not a known serialization format.\n"
-        )
+        with self.assertRaisesRegexp(management.CommandError,
+                "Problem installing fixture 'bad_fixture1': "
+                "unkn is not a known serialization format."):
+            management.call_command(
+                'loaddata',
+                'bad_fixture1.unkn',
+                verbosity=0,
+                commit=False,
+            )
 
     def test_invalid_data(self):
         """
@@ -135,18 +132,14 @@ class TestFixtures(TestCase):
         using explicit filename.
         Validate that error conditions are caught correctly
         """
-        stderr = BytesIO()
-        management.call_command(
-            'loaddata',
-            'bad_fixture2.xml',
-            verbosity=0,
-            commit=False,
-            stderr=stderr,
-        )
-        self.assertEqual(
-            stderr.getvalue(),
-            "No fixture data found for 'bad_fixture2'. (File format may be invalid.)\n"
-        )
+        with self.assertRaisesRegexp(management.CommandError,
+                "No fixture data found for 'bad_fixture2'. \(File format may be invalid.\)"):
+            management.call_command(
+                'loaddata',
+                'bad_fixture2.xml',
+                verbosity=0,
+                commit=False,
+            )
 
     def test_invalid_data_no_ext(self):
         """
@@ -154,54 +147,42 @@ class TestFixtures(TestCase):
         without file extension.
         Validate that error conditions are caught correctly
         """
-        stderr = BytesIO()
-        management.call_command(
-            'loaddata',
-            'bad_fixture2',
-            verbosity=0,
-            commit=False,
-            stderr=stderr,
-        )
-        self.assertEqual(
-            stderr.getvalue(),
-            "No fixture data found for 'bad_fixture2'. (File format may be invalid.)\n"
-        )
+        with self.assertRaisesRegexp(management.CommandError,
+                "No fixture data found for 'bad_fixture2'. \(File format may be invalid.\)"):
+            management.call_command(
+                'loaddata',
+                'bad_fixture2',
+                verbosity=0,
+                commit=False,
+            )
 
     def test_empty(self):
         """
         Test for ticket #4371 -- Loading a fixture file with no data returns an error.
         Validate that error conditions are caught correctly
         """
-        stderr = BytesIO()
-        management.call_command(
-            'loaddata',
-            'empty',
-            verbosity=0,
-            commit=False,
-            stderr=stderr,
-        )
-        self.assertEqual(
-            stderr.getvalue(),
-            "No fixture data found for 'empty'. (File format may be invalid.)\n"
-        )
+        with self.assertRaisesRegexp(management.CommandError,
+                "No fixture data found for 'empty'. \(File format may be invalid.\)"):
+            management.call_command(
+                'loaddata',
+                'empty',
+                verbosity=0,
+                commit=False,
+            )
 
     def test_error_message(self):
         """
         (Regression for #9011 - error message is correct)
         """
-        stderr = BytesIO()
-        management.call_command(
-            'loaddata',
-            'bad_fixture2',
-            'animal',
-            verbosity=0,
-            commit=False,
-            stderr=stderr,
-        )
-        self.assertEqual(
-            stderr.getvalue(),
-            "No fixture data found for 'bad_fixture2'. (File format may be invalid.)\n"
-        )
+        with self.assertRaisesRegexp(management.CommandError,
+                "^No fixture data found for 'bad_fixture2'. \(File format may be invalid.\)$"):
+            management.call_command(
+                'loaddata',
+                'bad_fixture2',
+                'animal',
+                verbosity=0,
+                commit=False,
+            )
 
     def test_pg_sequence_resetting_checks(self):
         """
@@ -357,17 +338,14 @@ class TestFixtures(TestCase):
         """
         Regression for #3615 - Ensure data with nonexistent child key references raises error
         """
-        stderr = BytesIO()
-        management.call_command(
-            'loaddata',
-            'forward_ref_bad_data.json',
-            verbosity=0,
-            commit=False,
-            stderr=stderr,
-        )
-        self.assertTrue(
-            stderr.getvalue().startswith('Problem installing fixture')
-        )
+        with self.assertRaisesRegexp(IntegrityError,
+                "Problem installing fixture"):
+            management.call_command(
+                'loaddata',
+                'forward_ref_bad_data.json',
+                verbosity=0,
+                commit=False,
+            )
 
     _cur_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -392,16 +370,14 @@ class TestFixtures(TestCase):
         """
         Regression for #7043 - Error is quickly reported when no fixtures is provided in the command line.
         """
-        stderr = BytesIO()
-        management.call_command(
-            'loaddata',
-            verbosity=0,
-            commit=False,
-            stderr=stderr,
-        )
-        self.assertEqual(
-            stderr.getvalue(), 'No database fixture specified. Please provide the path of at least one fixture in the command line.\n'
-        )
+        with self.assertRaisesRegexp(management.CommandError,
+                "No database fixture specified. Please provide the path of "
+                "at least one fixture in the command line."):
+            management.call_command(
+                'loaddata',
+                verbosity=0,
+                commit=False,
+            )
 
     def test_loaddata_not_existant_fixture_file(self):
         stdout_output = BytesIO()

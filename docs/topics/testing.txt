@@ -291,9 +291,6 @@ label::
 
     $ ./manage.py test animals.AnimalTestCase.test_animals_can_speak
 
-.. versionadded:: 1.2
-   The ability to select individual doctests was added.
-
 You can use the same rules if you're using doctests. Django will use the
 test label as a path to the test method or class that you want to run.
 If your ``models.py`` or ``tests.py`` has a function with a doctest, or
@@ -310,9 +307,6 @@ name of the method to the label::
 If you're using a ``__test__`` dictionary to specify doctests for a
 module, Django will use the label as a key in the ``__test__`` dictionary
 for defined in ``models.py`` and ``tests.py``.
-
-.. versionadded:: 1.2
-   You can now trigger a graceful exit from a test run by pressing ``Ctrl-C``.
 
 If you press ``Ctrl-C`` while the tests are running, the test runner will
 wait for the currently running test to complete and then exit gracefully.
@@ -391,8 +385,6 @@ advanced settings.
 
 Testing master/slave configurations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. versionadded:: 1.2
 
 If you're testing a multiple database configuration with master/slave
 replication, this strategy of creating test databases poses a problem.
@@ -650,8 +642,6 @@ Note a few important things about how the test client works:
 * By default, the test client will disable any CSRF checks
   performed by your site.
 
-  .. versionadded:: 1.2.2
-
   If, for some reason, you *want* the test client to perform CSRF
   checks, you can create an instance of the test client that
   enforces CSRF checks. To do this, pass in the
@@ -664,10 +654,23 @@ Note a few important things about how the test client works:
 Making requests
 ~~~~~~~~~~~~~~~
 
-Use the ``django.test.client.Client`` class to make requests. It requires no
-arguments at time of construction:
+Use the ``django.test.client.Client`` class to make requests.
 
-.. class:: Client()
+.. class:: Client(enforce_csrf_checks=False, **defaults)
+
+    It requires no arguments at time of construction. However, you can use
+    keywords arguments to specify some default headers. For example, this will
+    send a ``User-Agent`` HTTP header in each request::
+
+        >>> c = Client(HTTP_USER_AGENT='Mozilla/5.0')
+
+    The values from the ``extra`` keywords arguments passed to
+    :meth:`~django.test.client.Client.get()`,
+    :meth:`~django.test.client.Client.post()`, etc. have precedence over
+    the defaults passed to the class constructor.
+
+    The ``enforce_csrf_checks`` argument can be used to test CSRF
+    protection (see above).
 
     Once you have a ``Client`` instance, you can call any of the following
     methods:
@@ -1376,8 +1379,6 @@ Multi-database support
 
 .. attribute:: TestCase.multi_db
 
-.. versionadded:: 1.2
-
 Django sets up a test database corresponding to every database that is
 defined in the :setting:`DATABASES` definition in your settings
 file. However, a big part of the time taken to run a Django TestCase
@@ -1500,9 +1501,6 @@ Assertions
 ~~~~~~~~~~
 
 .. currentmodule:: django.test
-
-.. versionchanged:: 1.2
-    Added ``msg_prefix`` argument.
 
 As Python's normal :class:`unittest.TestCase` class implements assertion methods
 such as :meth:`~unittest.TestCase.assertTrue` and
@@ -2010,9 +2008,6 @@ process to satisfy whatever testing requirements you may have.
 
 Defining a test runner
 ----------------------
-
-.. versionchanged:: 1.2
-   Prior to 1.2, test runners were a single function, not a class.
 
 .. currentmodule:: django.test.simple
 

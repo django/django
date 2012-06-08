@@ -6,7 +6,7 @@ By default, Django adds an ``"id"`` field to each model. But you can override
 this behavior by explicitly adding ``primary_key=True`` to a field.
 """
 
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 from django.db import models
 
@@ -21,7 +21,7 @@ class Employee(models.Model):
         ordering = ('last_name', 'first_name')
 
     def __unicode__(self):
-        return u"%s %s" % (self.first_name, self.last_name)
+        return "%s %s" % (self.first_name, self.last_name)
 
 class Business(models.Model):
     name = models.CharField(max_length=20, primary_key=True)

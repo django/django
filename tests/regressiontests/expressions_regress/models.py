@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 """
 Model for testing arithmetic expressions.
 """
@@ -9,7 +10,7 @@ class Number(models.Model):
     float = models.FloatField(null=True, db_column='the_float')
 
     def __unicode__(self):
-        return u'%i, %.3f' % (self.integer, self.float)
+        return '%i, %.3f' % (self.integer, self.float)
 
 class Experiment(models.Model):
     name = models.CharField(max_length=24)

@@ -115,6 +115,16 @@ class ProfileInline(admin.TabularInline):
     model = Profile
     extra = 1
 
+
+# admin for #18433
+class ChildModel1Inline(admin.TabularInline):
+    model = ChildModel1
+
+
+class ChildModel2Inline(admin.StackedInline):
+    model = ChildModel2
+
+
 site.register(TitleCollection, inlines=[TitleInline])
 # Test bug #12561 and #12778
 # only ModelAdmin media
@@ -131,3 +141,4 @@ site.register(Holder4, Holder4Admin)
 site.register(Author, AuthorAdmin)
 site.register(CapoFamiglia, inlines=[ConsigliereInline, SottoCapoInline])
 site.register(ProfileCollection, inlines=[ProfileInline])
+site.register(ParentModelWithCustomPk, inlines=[ChildModel1Inline, ChildModel2Inline])

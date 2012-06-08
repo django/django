@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django.contrib.localflavor.py.forms import (PyDepartmentSelect,
     PyNumberedDepartmentSelect)
 
@@ -6,7 +8,7 @@ from django.test import SimpleTestCase
 class PYLocalFlavorTests(SimpleTestCase):
     def test_PyDepartmentSelect(self):
         py = PyDepartmentSelect()
-        out = u'''<select name="department">
+        out = '''<select name="department">
 <option value="AG">Alto Paraguay</option>
 <option value="AA">Alto Paran\xe1</option>
 <option value="AM">Amambay</option>
@@ -30,7 +32,7 @@ class PYLocalFlavorTests(SimpleTestCase):
 
     def test_PyNumberedDepartmentSelect(self):
         py = PyNumberedDepartmentSelect()
-        out = u'''<select name="department">
+        out = '''<select name="department">
 <option value="CN">I Concepci\xf3n</option>
 <option value="SP">II San Pedro</option>
 <option value="CR">III Cordillera</option>

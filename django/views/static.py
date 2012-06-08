@@ -2,6 +2,7 @@
 Views and functions for serving static files. These are only to be used
 during development, and SHOULD NOT be used in a production setting.
 """
+from __future__ import unicode_literals
 
 import mimetypes
 import os
@@ -48,9 +49,9 @@ def serve(request, path, document_root=None, show_indexes=False):
     if os.path.isdir(fullpath):
         if show_indexes:
             return directory_index(newpath, fullpath)
-        raise Http404(_(u"Directory indexes are not allowed here."))
+        raise Http404(_("Directory indexes are not allowed here."))
     if not os.path.exists(fullpath):
-        raise Http404(_(u'"%(path)s" does not exist') % {'path': fullpath})
+        raise Http404(_('"%(path)s" does not exist') % {'path': fullpath})
     # Respect the If-Modified-Since header.
     statobj = os.stat(fullpath)
     mimetype, encoding = mimetypes.guess_type(fullpath)
@@ -91,7 +92,7 @@ DEFAULT_DIRECTORY_INDEX_TEMPLATE = """
   </body>
 </html>
 """
-template_translatable = ugettext_noop(u"Index of %(directory)s")
+template_translatable = ugettext_noop("Index of %(directory)s")
 
 def directory_index(path, fullpath):
     try:

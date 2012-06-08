@@ -1,5 +1,7 @@
 """HTML utilities suitable for global use."""
 
+from __future__ import unicode_literals
+
 import re
 import string
 import urllib
@@ -15,7 +17,7 @@ TRAILING_PUNCTUATION = ['.', ',', ':', ';']
 WRAPPING_PUNCTUATION = [('(', ')'), ('<', '>'), ('&lt;', '&gt;')]
 
 # List of possible strings used for bullets in bulleted lists.
-DOTS = [u'&middot;', u'*', u'\u2022', u'&#149;', u'&bull;', u'&#8226;']
+DOTS = ['&middot;', '*', '\u2022', '&#149;', '&bull;', '&#8226;']
 
 unencoded_ampersands_re = re.compile(r'&(?!(\w+|#\d+);)')
 unquoted_percents_re = re.compile(r'%(?![0-9A-Fa-f]{2})')
@@ -37,17 +39,17 @@ def escape(html):
 escape = allow_lazy(escape, unicode)
 
 _base_js_escapes = (
-    ('\\', r'\u005C'),
-    ('\'', r'\u0027'),
-    ('"', r'\u0022'),
-    ('>', r'\u003E'),
-    ('<', r'\u003C'),
-    ('&', r'\u0026'),
-    ('=', r'\u003D'),
-    ('-', r'\u002D'),
-    (';', r'\u003B'),
-    (u'\u2028', r'\u2028'),
-    (u'\u2029', r'\u2029')
+    ('\\', '\\u005C'),
+    ('\'', '\\u0027'),
+    ('"', '\\u0022'),
+    ('>', '\\u003E'),
+    ('<', '\\u003C'),
+    ('&', '\\u0026'),
+    ('=', '\\u003D'),
+    ('-', '\\u002D'),
+    (';', '\\u003B'),
+    ('\u2028', '\\u2028'),
+    ('\u2029', '\\u2029')
 )
 
 # Escape every ASCII character with a value less than 32.
@@ -75,10 +77,10 @@ def linebreaks(value, autoescape=False):
     value = normalize_newlines(value)
     paras = re.split('\n{2,}', value)
     if autoescape:
-        paras = [u'<p>%s</p>' % escape(p).replace('\n', '<br />') for p in paras]
+        paras = ['<p>%s</p>' % escape(p).replace('\n', '<br />') for p in paras]
     else:
-        paras = [u'<p>%s</p>' % p.replace('\n', '<br />') for p in paras]
-    return u'\n\n'.join(paras)
+        paras = ['<p>%s</p>' % p.replace('\n', '<br />') for p in paras]
+    return '\n\n'.join(paras)
 linebreaks = allow_lazy(linebreaks, unicode)
 
 def strip_tags(value):
@@ -192,7 +194,7 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
             words[i] = mark_safe(word)
         elif autoescape:
             words[i] = escape(word)
-    return u''.join(words)
+    return ''.join(words)
 urlize = allow_lazy(urlize, unicode)
 
 def clean_html(text):
@@ -218,13 +220,13 @@ def clean_html(text):
     text = html_gunk_re.sub('', text)
     # Convert hard-coded bullets into HTML unordered lists.
     def replace_p_tags(match):
-        s = match.group().replace(u'</p>', u'</li>')
+        s = match.group().replace('</p>', '</li>')
         for d in DOTS:
-            s = s.replace(u'<p>%s' % d, u'<li>')
-        return u'<ul>\n%s\n</ul>' % s
+            s = s.replace('<p>%s' % d, '<li>')
+        return '<ul>\n%s\n</ul>' % s
     text = hard_coded_bullets_re.sub(replace_p_tags, text)
     # Remove stuff like "<p>&nbsp;&nbsp;</p>", but only if it's at the bottom
     # of the text.
-    text = trailing_empty_content_re.sub(u'', text)
+    text = trailing_empty_content_re.sub('', text)
     return text
 clean_html = allow_lazy(clean_html, unicode)

@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 from django.contrib.localflavor.hr.forms import (HRCountySelect,
     HRPhoneNumberPrefixSelect, HRLicensePlatePrefixSelect, HRPhoneNumberField,
     HRLicensePlateField, HRPostalCodeField, HROIBField, HRJMBGField,
@@ -9,7 +11,7 @@ from django.test import SimpleTestCase
 class HRLocalFlavorTests(SimpleTestCase):
     def test_HRCountySelect(self):
         f = HRCountySelect()
-        out = u'''<select name="county">
+        out = '''<select name="county">
 <option value="GZG" selected="selected">Grad Zagreb</option>
 <option value="BBŽ">Bjelovarsko-bilogorska županija</option>
 <option value="BPŽ">Brodsko-posavska županija</option>
@@ -36,7 +38,7 @@ class HRLocalFlavorTests(SimpleTestCase):
 
     def test_HRPhoneNumberPrefixSelect(self):
         f = HRPhoneNumberPrefixSelect()
-        out = u'''<select name="phone">
+        out = '''<select name="phone">
 <option value="1" selected="selected">01</option>
 <option value="20">020</option>
 <option value="21">021</option>
@@ -68,7 +70,7 @@ class HRLocalFlavorTests(SimpleTestCase):
 
     def test_HRLicensePlatePrefixSelect(self):
         f = HRLicensePlatePrefixSelect()
-        out = u'''<select name="license">
+        out = '''<select name="license">
 <option value="BJ" selected="selected">BJ</option>
 <option value="BM">BM</option>
 <option value="ČK">ČK</option>
@@ -107,9 +109,9 @@ class HRLocalFlavorTests(SimpleTestCase):
         self.assertHTMLEqual(f.render('license', 'BJ'), out)
 
     def test_HRPhoneNumberField(self):
-        error_invalid = [u'Enter a valid phone number']
-        error_area = [u'Enter a valid area or mobile network code']
-        error_number = [u'The phone nubmer is too long']
+        error_invalid = ['Enter a valid phone number']
+        error_area = ['Enter a valid area or mobile network code']
+        error_number = ['The phone nubmer is too long']
         valid = {
             '+38511234567': '+38511234567',
             '0038511234567': '+38511234567',
@@ -126,12 +128,12 @@ class HRLocalFlavorTests(SimpleTestCase):
         self.assertFieldOutput(HRPhoneNumberField, valid, invalid)
 
     def test_HRLicensePlateField(self):
-        error_invalid = [u'Enter a valid vehicle license plate number']
-        error_area = [u'Enter a valid location code']
-        error_number = [u'Number part cannot be zero']
+        error_invalid = ['Enter a valid vehicle license plate number']
+        error_area = ['Enter a valid location code']
+        error_number = ['Number part cannot be zero']
         valid = {
-            'ZG 1234-AA': u'ZG 1234-AA',
-            'ZG 123-A': u'ZG 123-A',
+            'ZG 1234-AA': 'ZG 1234-AA',
+            'ZG 123-A': 'ZG 123-A',
         }
         invalid = {
             'PV12345': error_invalid,
@@ -141,7 +143,7 @@ class HRLocalFlavorTests(SimpleTestCase):
         self.assertFieldOutput(HRLicensePlateField, valid, invalid)
 
     def test_HRPostalCodeField(self):
-        error_invalid = [u'Enter a valid 5 digit postal code']
+        error_invalid = ['Enter a valid 5 digit postal code']
         valid = {
             '10000': '10000',
             '35410': '35410',
@@ -153,19 +155,19 @@ class HRLocalFlavorTests(SimpleTestCase):
         self.assertFieldOutput(HRPostalCodeField, valid, invalid)
 
     def test_HROIBField(self):
-        error_invalid = [u'Enter a valid 11 digit OIB']
+        error_invalid = ['Enter a valid 11 digit OIB']
         valid = {
             '12345678901': '12345678901',
         }
         invalid = {
-            '1234567890': [u'Ensure this value has at least 11 characters (it has 10).'] + error_invalid,
+            '1234567890': ['Ensure this value has at least 11 characters (it has 10).'] + error_invalid,
             'ABCDEFGHIJK': error_invalid,
         }
         self.assertFieldOutput(HROIBField, valid, invalid)
 
     def test_HRJMBGField(self):
-        error_invalid = [u'Enter a valid 13 digit JMBG']
-        error_date = [u'Error in date segment']
+        error_invalid = ['Enter a valid 13 digit JMBG']
+        error_date = ['Error in date segment']
         valid = {
             '1211984302155': '1211984302155',
             '2701984307107': '2701984307107',
@@ -178,8 +180,8 @@ class HRLocalFlavorTests(SimpleTestCase):
         self.assertFieldOutput(HRJMBGField, valid, invalid)
 
     def test_HRJMBAGField(self):
-        error_invalid = [u'Enter a valid 19 digit JMBAG starting with 601983']
-        error_copy = [u'Card issue number cannot be zero']
+        error_invalid = ['Enter a valid 19 digit JMBAG starting with 601983']
+        error_copy = ['Card issue number cannot be zero']
         valid = {
             '601983 11 0130185856 4': '6019831101301858564',
         }

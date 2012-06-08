@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 import datetime
 import new
 
@@ -89,8 +90,8 @@ class HumanizeTests(TestCase):
     def test_apnumber(self):
         test_list = [str(x) for x in range(1, 11)]
         test_list.append(None)
-        result_list = (u'one', u'two', u'three', u'four', u'five', u'six',
-                       u'seven', u'eight', u'nine', u'10', None)
+        result_list = ('one', 'two', 'three', 'four', 'five', 'six',
+                       'seven', 'eight', 'nine', '10', None)
 
         self.humanize_tester(test_list, result_list, 'apnumber')
 
@@ -99,12 +100,12 @@ class HumanizeTests(TestCase):
         yesterday = today - datetime.timedelta(days=1)
         tomorrow = today + datetime.timedelta(days=1)
         someday = today - datetime.timedelta(days=10)
-        notdate = u"I'm not a date value"
+        notdate = "I'm not a date value"
 
         test_list = (today, yesterday, tomorrow, someday, notdate, None)
         someday_result = defaultfilters.date(someday)
-        result_list = (_(u'today'), _(u'yesterday'), _(u'tomorrow'),
-                       someday_result, u"I'm not a date value", None)
+        result_list = (_('today'), _('yesterday'), _('tomorrow'),
+                       someday_result, "I'm not a date value", None)
         self.humanize_tester(test_list, result_list, 'naturalday')
 
     def test_naturalday_tz(self):

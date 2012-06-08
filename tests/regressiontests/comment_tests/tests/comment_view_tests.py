@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import re
 
@@ -54,7 +54,7 @@ class CommentViewTests(CommentTestCase):
         a = Article.objects.get(pk=1)
         data = self.getValidData(a)
         data["comment"] = "This is another comment"
-        data["object_pk"] = u'\ufffd'
+        data["object_pk"] = '\ufffd'
         response = self.client.post("/post/", data)
         self.assertEqual(response.status_code, 400)
 
@@ -258,7 +258,7 @@ class CommentViewTests(CommentTestCase):
         data["comment"] = "This is another comment"
         response = self.client.post("/post/", data)
         location = response["Location"]
-        broken_location = location + u"\ufffd"
+        broken_location = location + "\ufffd"
         response = self.client.get(broken_location)
         self.assertEqual(response.status_code, 200)
 

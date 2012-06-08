@@ -2,7 +2,7 @@
 FI-specific Form helpers
 """
 
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import re
 
@@ -36,7 +36,7 @@ class FISocialSecurityNumber(Field):
     def clean(self, value):
         super(FISocialSecurityNumber, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
 
         checkmarks = "0123456789ABCDEFHJKLMNPRSTUVWXY"
         result = re.match(r"""^
@@ -51,5 +51,5 @@ class FISocialSecurityNumber(Field):
         gd = result.groupdict()
         checksum = int(gd['date'] + gd['serial'])
         if checkmarks[checksum % len(checkmarks)] == gd['checksum'].upper():
-            return u'%s' % value.upper()
+            return '%s' % value.upper()
         raise ValidationError(self.error_messages['invalid'])

@@ -220,8 +220,6 @@ m2m_changed
 .. data:: django.db.models.signals.m2m_changed
    :module:
 
-.. versionadded:: 1.2
-
 Sent when a :class:`ManyToManyField` is changed on a model instance.
 Strictly speaking, this is not a model signal since it is sent by the
 :class:`ManyToManyField`, but since it complements the
@@ -543,9 +541,6 @@ connection_created
 
 .. data:: django.db.backends.signals.connection_created
    :module:
-
-.. versionchanged:: 1.2
-   The connection argument was added
 
 Sent when the database wrapper makes the initial connection to the
 database.  This is particularly useful if you'd like to send any post

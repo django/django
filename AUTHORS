@@ -29,6 +29,7 @@ The PRIMARY AUTHORS are (and/or have been):
     * Julien Phalip
     * Aymeric Augustin
     * Claude Paroz
+    * Anssi Kääriäinen
 
 More information on the main contributors to Django can be found in
 docs/internals/committers.txt.
@@ -136,9 +137,10 @@ answer newbie questions, and generally made Django that much better:
     Robert Coup
     Pete Crosier <pete.crosier@gmail.com>
     Matt Croydon <http://www.postneo.com/>
-    Leah Culver <leah.culver@gmail.com>
-    flavio.curella@gmail.com
     Jure Cuhalev <gandalf@owca.info>
+    Leah Culver <leah.culver@gmail.com>
+    Raúl Cumplido <raulcumplido@gmail.com>
+    flavio.curella@gmail.com
     John D'Agostino <john.dagostino@gmail.com>
     dackze+django@gmail.com
     Jim Dalton <jim.dalton@gmail.com>
@@ -230,6 +232,7 @@ answer newbie questions, and generally made Django that much better:
     Scot Hacker <shacker@birdhouse.org>
     dAniel hAhler
     hambaloney
+    Will Hardy <django@willhardy.com.au>
     Brian Harring <ferringb@gmail.com>
     Brant Harris
     Ronny Haryanto <http://ronny.haryan.to/>
@@ -274,7 +277,6 @@ answer newbie questions, and generally made Django that much better:
     jpellerin@gmail.com
     junzhang.jn@gmail.com
     Xia Kai <http://blog.xiaket.org/>
-    Anssi Kääriäinen
     Antti Kaihola <http://djangopeople.net/akaihola/>
     Peter van Kampen
     Bahadır Kandemir <bahadir@pardus.org.tr>
@@ -423,6 +425,7 @@ answer newbie questions, and generally made Django that much better:
     polpak@yahoo.com
     Ross Poulton <ross@rossp.org>
     Mihai Preda <mihai_preda@yahoo.com>
+    Daniele Procida <daniele@vurt.org>
     Matthias Pronk <django@masida.nl>
     Jyrki Pulliainen <jyrki.pulliainen@gmail.com>
     Thejaswi Puthraya <thejaswi.puthraya@gmail.com>
@@ -451,6 +454,7 @@ answer newbie questions, and generally made Django that much better:
     Armin Ronacher
     Daniel Roseman <http://roseman.org.uk/>
     Rozza <ross.lawley@gmail.com>
+    Audrey Roy <http://audreymroy.com/>
     Oliver Rutherfurd <http://rutherfurd.net/>
     ryankanno
     Gonzalo Saavedra <gonzalosaavedra@gmail.com>

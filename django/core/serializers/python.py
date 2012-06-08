@@ -3,6 +3,7 @@ A Python "serializer". Doesn't do much serializing per se -- just converts to
 and from basic Python data types (lists, dicts, strings, etc.). Useful as a basis for
 other serializers.
 """
+from __future__ import unicode_literals
 
 from django.conf import settings
 from django.core.serializers import base
@@ -138,5 +139,5 @@ def _get_model(model_identifier):
     except TypeError:
         Model = None
     if Model is None:
-        raise base.DeserializationError(u"Invalid model identifier: '%s'" % model_identifier)
+        raise base.DeserializationError("Invalid model identifier: '%s'" % model_identifier)
     return Model

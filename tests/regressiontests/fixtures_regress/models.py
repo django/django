@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 from django.contrib.auth.models import User
 from django.db import models
@@ -29,7 +29,7 @@ class Stuff(models.Model):
     owner = models.ForeignKey(User, null=True)
 
     def __unicode__(self):
-        return unicode(self.name) + u' is owned by ' + unicode(self.owner)
+        return unicode(self.name) + ' is owned by ' + unicode(self.owner)
 
 
 class Absolute(models.Model):
@@ -128,7 +128,7 @@ class Book(models.Model):
         ordering = ('name',)
 
     def __unicode__(self):
-        return u'%s by %s (available at %s)' % (
+        return '%s by %s (available at %s)' % (
             self.name,
             self.author.name,
             ', '.join(s.name for s in self.stores.all())
@@ -148,7 +148,7 @@ class NKChild(Parent):
         return self.data
 
     def __unicode__(self):
-        return u'NKChild %s:%s' % (self.name, self.data)
+        return 'NKChild %s:%s' % (self.name, self.data)
 
 
 class RefToNKChild(models.Model):
@@ -157,7 +157,7 @@ class RefToNKChild(models.Model):
     nk_m2m = models.ManyToManyField(NKChild, related_name='ref_m2ms')
 
     def __unicode__(self):
-        return u'%s: Reference to %s [%s]' % (
+        return '%s: Reference to %s [%s]' % (
             self.text,
             self.nk_fk,
             ', '.join(str(o) for o in self.nk_m2m.all())

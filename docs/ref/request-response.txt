@@ -28,7 +28,8 @@ HttpRequest objects
 Attributes
 ----------
 
-All attributes except ``session`` should be considered read-only.
+All attributes should be considered read-only, unless stated otherwise below.
+``session`` is a notable exception.
 
 .. attribute:: HttpRequest.body
 

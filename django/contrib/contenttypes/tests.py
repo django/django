@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import urllib
 
 from django.db import models
@@ -181,4 +183,4 @@ class ContentTypesTests(TestCase):
             app_label = 'contenttypes',
             model = 'OldModel',
         )
-        self.assertEqual(unicode(ct), u'Old model')
+        self.assertEqual(unicode(ct), 'Old model')

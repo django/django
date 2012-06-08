@@ -1,5 +1,5 @@
 # -*- coding:utf-8 -*-
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 from django.conf.urls import patterns, url
 from django.views.generic import RedirectView
@@ -32,16 +32,16 @@ urlpatterns = patterns('',
     (r'^accounts/logout/$', 'django.contrib.auth.views.logout'),
 
     # Special URLs for particular regression cases.
-    url(u'^中文/$', 'regressiontests.views.views.redirect'),
-    url(u'^中文/target/$', 'regressiontests.views.views.index_page'),
+    url('^中文/$', 'regressiontests.views.views.redirect'),
+    url('^中文/target/$', 'regressiontests.views.views.index_page'),
 )
 
 # rediriects, both temporary and permanent, with non-ASCII targets
 urlpatterns += patterns('',
     ('^nonascii_redirect/$', RedirectView.as_view(
-        url=u'/中文/target/', permanent=False)),
+        url='/中文/target/', permanent=False)),
     ('^permanent_nonascii_redirect/$', RedirectView.as_view(
-        url=u'/中文/target/', permanent=True)),
+        url='/中文/target/', permanent=True)),
 )
 
 urlpatterns += patterns('regressiontests.views.views',

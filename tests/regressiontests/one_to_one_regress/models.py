@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django.db import models
 
 
@@ -6,7 +8,7 @@ class Place(models.Model):
     address = models.CharField(max_length=80)
 
     def __unicode__(self):
-        return u"%s the place" % self.name
+        return "%s the place" % self.name
 
 class Restaurant(models.Model):
     place = models.OneToOneField(Place)
@@ -14,14 +16,14 @@ class Restaurant(models.Model):
     serves_pizza = models.BooleanField()
 
     def __unicode__(self):
-        return u"%s the restaurant" % self.place.name
+        return "%s the restaurant" % self.place.name
 
 class Bar(models.Model):
     place = models.OneToOneField(Place)
     serves_cocktails = models.BooleanField()
 
     def __unicode__(self):
-        return u"%s the bar" % self.place.name
+        return "%s the bar" % self.place.name
 
 class UndergroundBar(models.Model):
     place = models.OneToOneField(Place, null=True)
@@ -32,7 +34,7 @@ class Favorites(models.Model):
     restaurants = models.ManyToManyField(Restaurant)
 
     def __unicode__(self):
-        return u"Favorites for %s" % self.name
+        return "Favorites for %s" % self.name
 
 class Target(models.Model):
     pass

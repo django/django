@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import os
 from django.conf import settings
 from django.contrib.gis.geos import GEOSGeometry
@@ -99,13 +101,13 @@ class GeoIPTest(unittest.TestCase):
         "Testing that GeoIP strings are properly encoded, see #16553."
         g = GeoIP()
         d = g.city('62.224.93.23')
-        self.assertEqual(u'Sch\xf6mberg', d['city'])
+        self.assertEqual('Schümberg', d['city'])
 
     def test06_unicode_query(self):
         "Testing that GeoIP accepts unicode string queries, see #17059."
         g = GeoIP()
-        d = g.country(u'whitehouse.gov')
-        self.assertEqual(u'US', d['country_code'])
+        d = g.country('whitehouse.gov')
+        self.assertEqual('US', d['country_code'])
 
 
 def suite():

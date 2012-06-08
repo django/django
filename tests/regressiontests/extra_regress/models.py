@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import copy
 import datetime
 
@@ -11,7 +13,7 @@ class RevisionableModel(models.Model):
     when = models.DateTimeField(default=datetime.datetime.now)
 
     def __unicode__(self):
-        return u"%s (%s, %s)" % (self.title, self.id, self.base.id)
+        return "%s (%s, %s)" % (self.title, self.id, self.base.id)
 
     def save(self, *args, **kwargs):
         super(RevisionableModel, self).save(*args, **kwargs)
@@ -36,5 +38,5 @@ class TestObject(models.Model):
     third = models.CharField(max_length=20)
 
     def __unicode__(self):
-        return u'TestObject: %s,%s,%s' % (self.first,self.second,self.third)
+        return 'TestObject: %s,%s,%s' % (self.first,self.second,self.third)
 

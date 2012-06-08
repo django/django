@@ -4,6 +4,7 @@
 To execute arbitrary code around ``save()`` and ``delete()``, just subclass
 the methods.
 """
+from __future__ import unicode_literals
 
 from django.db import models
 
@@ -17,7 +18,7 @@ class Person(models.Model):
         self.data = []
 
     def __unicode__(self):
-        return u"%s %s" % (self.first_name, self.last_name)
+        return "%s %s" % (self.first_name, self.last_name)
 
     def save(self, *args, **kwargs):
         self.data.append("Before save")

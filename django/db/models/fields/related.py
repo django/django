@@ -329,10 +329,10 @@ class ReverseSingleRelatedObjectDescriptor(object):
             return QuerySet(self.field.rel.to).using(db)
 
     def get_prefetch_query_set(self, instances):
-        rel_obj_attr = attrgetter(self.field.rel.field_name)
+        other_field = self.field.rel.get_related_field()
+        rel_obj_attr = attrgetter(other_field.attname)
         instance_attr = attrgetter(self.field.attname)
         instances_dict = dict((instance_attr(inst), inst) for inst in instances)
-        other_field = self.field.rel.get_related_field()
         if other_field.rel:
             params = {'%s__pk__in' % self.field.rel.field_name: instances_dict.keys()}
         else:
@@ -359,7 +359,7 @@ class ReverseSingleRelatedObjectDescriptor(object):
             else:
                 other_field = self.field.rel.get_related_field()
                 if other_field.rel:
-                    params = {'%s__pk' % self.field.rel.field_name: val}
+                    params = {'%s__%s' % (self.field.rel.field_name, other_field.rel.field_name): val}
                 else:
                     params = {'%s__exact' % self.field.rel.field_name: val}
                 qs = self.get_query_set(instance=instance)
@@ -483,7 +483,7 @@ class ForeignRelatedObjectsDescriptor(object):
                     return qs
 
             def get_prefetch_query_set(self, instances):
-                rel_obj_attr = attrgetter(rel_field.get_attname())
+                rel_obj_attr = attrgetter(rel_field.attname)
                 instance_attr = attrgetter(attname)
                 instances_dict = dict((instance_attr(inst), inst) for inst in instances)
                 db = self._db or router.db_for_read(self.model, instance=instances[0])

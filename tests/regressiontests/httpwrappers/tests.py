@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import copy
 import pickle
 
@@ -59,8 +61,8 @@ class QueryDictTests(unittest.TestCase):
         self.assertFalse(q.has_key('bar'))
         self.assertFalse('bar' in q)
 
-        self.assertEqual(q.items(), [(u'foo', u'bar')])
-        self.assertEqual(q.lists(), [(u'foo', [u'bar'])])
+        self.assertEqual(q.items(), [('foo', 'bar')])
+        self.assertEqual(q.lists(), [('foo', ['bar'])])
         self.assertEqual(q.keys(), ['foo'])
         self.assertEqual(q.values(), ['bar'])
         self.assertEqual(len(q), 1)
@@ -79,7 +81,7 @@ class QueryDictTests(unittest.TestCase):
         self.assertEqual(q.urlencode(), 'next=%2Fa%26b%2F')
         self.assertEqual(q.urlencode(safe='/'), 'next=/a%26b/')
         q = QueryDict('', mutable=True)
-        q['next'] = u'/t\xebst&key/'
+        q['next'] = '/t\xebst&key/'
         self.assertEqual(q.urlencode(), 'next=%2Ft%C3%ABst%26key%2F')
         self.assertEqual(q.urlencode(safe='/'), 'next=/t%C3%ABst%26key/')
 
@@ -114,17 +116,17 @@ class QueryDictTests(unittest.TestCase):
         self.assertTrue(q.has_key('foo'))
         self.assertTrue('foo' in q)
 
-        self.assertEqual(q.items(),  [(u'foo', u'another'), (u'name', u'john')])
-        self.assertEqual(q.lists(), [(u'foo', [u'bar', u'baz', u'another']), (u'name', [u'john'])])
-        self.assertEqual(q.keys(), [u'foo', u'name'])
-        self.assertEqual(q.values(), [u'another', u'john'])
+        self.assertEqual(q.items(),  [('foo', 'another'), ('name', 'john')])
+        self.assertEqual(q.lists(), [('foo', ['bar', 'baz', 'another']), ('name', ['john'])])
+        self.assertEqual(q.keys(), ['foo', 'name'])
+        self.assertEqual(q.values(), ['another', 'john'])
         self.assertEqual(len(q), 2)
 
         q.update({'foo': 'hello'})
         self.assertEqual(q['foo'], 'hello')
         self.assertEqual(q.get('foo', 'not available'), 'hello')
-        self.assertEqual(q.getlist('foo'), [u'bar', u'baz', u'another', u'hello'])
-        self.assertEqual(q.pop('foo'), [u'bar', u'baz', u'another', u'hello'])
+        self.assertEqual(q.getlist('foo'), ['bar', 'baz', 'another', 'hello'])
+        self.assertEqual(q.pop('foo'), ['bar', 'baz', 'another', 'hello'])
         self.assertEqual(q.pop('foo', 'not there'), 'not there')
         self.assertEqual(q.get('foo', 'not there'), 'not there')
         self.assertEqual(q.setdefault('foo', 'bar'), 'bar')
@@ -140,12 +142,12 @@ class QueryDictTests(unittest.TestCase):
 
         q = QueryDict('vote=yes&vote=no')
 
-        self.assertEqual(q['vote'], u'no')
+        self.assertEqual(q['vote'], 'no')
         self.assertRaises(AttributeError, q.__setitem__, 'something', 'bar')
 
-        self.assertEqual(q.get('vote', 'default'), u'no')
+        self.assertEqual(q.get('vote', 'default'), 'no')
         self.assertEqual(q.get('foo', 'default'), 'default')
-        self.assertEqual(q.getlist('vote'), [u'yes', u'no'])
+        self.assertEqual(q.getlist('vote'), ['yes', 'no'])
         self.assertEqual(q.getlist('foo'), [])
 
         self.assertRaises(AttributeError, q.setlist, 'foo', ['bar', 'baz'])
@@ -156,10 +158,10 @@ class QueryDictTests(unittest.TestCase):
         self.assertEqual('vote' in q, True)
         self.assertEqual(q.has_key('foo'), False)
         self.assertEqual('foo' in q, False)
-        self.assertEqual(q.items(), [(u'vote', u'no')])
-        self.assertEqual(q.lists(), [(u'vote', [u'yes', u'no'])])
-        self.assertEqual(q.keys(), [u'vote'])
-        self.assertEqual(q.values(), [u'no'])
+        self.assertEqual(q.items(), [('vote', 'no')])
+        self.assertEqual(q.lists(), [('vote', ['yes', 'no'])])
+        self.assertEqual(q.keys(), ['vote'])
+        self.assertEqual(q.values(), ['no'])
         self.assertEqual(len(q), 1)
 
         self.assertRaises(AttributeError, q.update, {'foo': 'bar'})
@@ -175,8 +177,8 @@ class QueryDictTests(unittest.TestCase):
         case, bad UTF-8 encoding).
         """
         q = QueryDict(b'foo=bar&foo=\xff')
-        self.assertEqual(q['foo'], u'\ufffd')
-        self.assertEqual(q.getlist('foo'), [u'bar', u'\ufffd'])
+        self.assertEqual(q['foo'], '\ufffd')
+        self.assertEqual(q.getlist('foo'), ['bar', '\ufffd'])
 
     def test_pickle(self):
         q = QueryDict('')
@@ -194,17 +196,17 @@ class QueryDictTests(unittest.TestCase):
         x = QueryDict("a=1&a=2", mutable=True)
         y = QueryDict("a=3&a=4")
         x.update(y)
-        self.assertEqual(x.getlist('a'), [u'1', u'2', u'3', u'4'])
+        self.assertEqual(x.getlist('a'), ['1', '2', '3', '4'])
 
     def test_non_default_encoding(self):
         """#13572 - QueryDict with a non-default encoding"""
         q = QueryDict(b'sbb=one', encoding='rot_13')
         self.assertEqual(q.encoding , 'rot_13' )
-        self.assertEqual(q.items() , [(u'foo', u'bar')] )
+        self.assertEqual(q.items() , [('foo', 'bar')] )
         self.assertEqual(q.urlencode() , 'sbb=one' )
         q = q.copy()
         self.assertEqual(q.encoding , 'rot_13' )
-        self.assertEqual(q.items() , [(u'foo', u'bar')] )
+        self.assertEqual(q.items() , [('foo', 'bar')] )
         self.assertEqual(q.urlencode() , 'sbb=one' )
         self.assertEqual(copy.copy(q).encoding , 'rot_13' )
         self.assertEqual(copy.deepcopy(q).encoding , 'rot_13')
@@ -214,29 +216,29 @@ class HttpResponseTests(unittest.TestCase):
         r = HttpResponse()
 
         # If we insert a unicode value it will be converted to an ascii
-        r['value'] = u'test value'
+        r['value'] = 'test value'
         self.assertTrue(isinstance(r['value'], str))
 
         # An error is raised when a unicode object with non-ascii is assigned.
-        self.assertRaises(UnicodeEncodeError, r.__setitem__, 'value', u't\xebst value')
+        self.assertRaises(UnicodeEncodeError, r.__setitem__, 'value', 't\xebst value')
 
         # An error is raised when  a unicode object with non-ASCII format is
         # passed as initial mimetype or content_type.
         self.assertRaises(UnicodeEncodeError, HttpResponse,
-                content_type=u't\xebst value')
+                content_type='t\xebst value')
 
         # HttpResponse headers must be convertible to ASCII.
         self.assertRaises(UnicodeEncodeError, HttpResponse,
-                content_type=u't\xebst value')
+                content_type='t\xebst value')
 
         # The response also converts unicode keys to strings.)
-        r[u'test'] = 'testing key'
+        r['test'] = 'testing key'
         l = list(r.items())
         l.sort()
         self.assertEqual(l[1], ('test', 'testing key'))
 
         # It will also raise errors for keys with non-ascii data.
-        self.assertRaises(UnicodeEncodeError, r.__setitem__, u't\xebst key', 'value')
+        self.assertRaises(UnicodeEncodeError, r.__setitem__, 't\xebst key', 'value')
 
     def test_newlines_in_headers(self):
         # Bug #10188: Do not allow newlines in headers (CR or LF)
@@ -276,7 +278,7 @@ class HttpResponseTests(unittest.TestCase):
 
         #test retrieval explicitly using iter and odd inputs
         r = HttpResponse()
-        r.content = ['1', u'2', 3, unichr(1950)]
+        r.content = ['1', '2', 3, unichr(1950)]
         result = []
         my_iter = r.__iter__()
         while True:

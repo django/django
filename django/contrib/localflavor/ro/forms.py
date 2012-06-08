@@ -2,7 +2,7 @@
 """
 Romanian specific form helpers.
 """
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 from django.contrib.localflavor.ro.ro_counties import COUNTIES_CHOICES
 from django.core.validators import EMPTY_VALUES
@@ -30,7 +30,7 @@ class ROCIFField(RegexField):
         """
         value = super(ROCIFField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
         # strip RO part
         if value[0:2] == 'RO':
             value = value[2:]
@@ -67,7 +67,7 @@ class ROCNPField(RegexField):
         """
         value = super(ROCNPField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
         # check birthdate digits
         import datetime
         try:
@@ -100,13 +100,13 @@ class ROCountyField(Field):
         Arges => invalid
     """
     default_error_messages = {
-        'invalid': u'Enter a Romanian county code or name.',
+        'invalid': 'Enter a Romanian county code or name.',
     }
 
     def clean(self, value):
         super(ROCountyField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
         try:
             value = value.strip().upper()
         except AttributeError:
@@ -152,7 +152,7 @@ class ROIBANField(RegexField):
         """
         value = super(ROIBANField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
         value = value.replace('-','')
         value = value.replace(' ','')
         value = value.upper()
@@ -184,7 +184,7 @@ class ROPhoneNumberField(RegexField):
         """
         value = super(ROPhoneNumberField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
         value = value.replace('-','')
         value = value.replace('(','')
         value = value.replace(')','')

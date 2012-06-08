@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import time
 import warnings
 from datetime import datetime, timedelta
@@ -6,6 +8,7 @@ from StringIO import StringIO
 from django.conf import settings
 from django.core.handlers.wsgi import WSGIRequest, LimitedStream
 from django.http import HttpRequest, HttpResponse, parse_cookie, build_request_repr, UnreadablePostError
+from django.test.utils import str_prefix
 from django.utils import unittest
 from django.utils.http import cookie_date
 from django.utils.timezone import utc
@@ -21,15 +24,15 @@ class RequestsTests(unittest.TestCase):
 
     def test_httprequest_repr(self):
         request = HttpRequest()
-        request.path = u'/somepath/'
-        request.GET = {u'get-key': u'get-value'}
-        request.POST = {u'post-key': u'post-value'}
-        request.COOKIES = {u'post-key': u'post-value'}
-        request.META = {u'post-key': u'post-value'}
-        self.assertEqual(repr(request), u"<HttpRequest\npath:/somepath/,\nGET:{u'get-key': u'get-value'},\nPOST:{u'post-key': u'post-value'},\nCOOKIES:{u'post-key': u'post-value'},\nMETA:{u'post-key': u'post-value'}>")
+        request.path = '/somepath/'
+        request.GET = {'get-key': 'get-value'}
+        request.POST = {'post-key': 'post-value'}
+        request.COOKIES = {'post-key': 'post-value'}
+        request.META = {'post-key': 'post-value'}
+        self.assertEqual(repr(request), str_prefix("<HttpRequest\npath:/somepath/,\nGET:{%(_)s'get-key': %(_)s'get-value'},\nPOST:{%(_)s'post-key': %(_)s'post-value'},\nCOOKIES:{%(_)s'post-key': %(_)s'post-value'},\nMETA:{%(_)s'post-key': %(_)s'post-value'}>"))
         self.assertEqual(build_request_repr(request), repr(request))
-        self.assertEqual(build_request_repr(request, path_override='/otherpath/', GET_override={u'a': u'b'}, POST_override={u'c': u'd'}, COOKIES_override={u'e': u'f'}, META_override={u'g': u'h'}),
-                         u"<HttpRequest\npath:/otherpath/,\nGET:{u'a': u'b'},\nPOST:{u'c': u'd'},\nCOOKIES:{u'e': u'f'},\nMETA:{u'g': u'h'}>")
+        self.assertEqual(build_request_repr(request, path_override='/otherpath/', GET_override={'a': 'b'}, POST_override={'c': 'd'}, COOKIES_override={'e': 'f'}, META_override={'g': 'h'}),
+                         str_prefix("<HttpRequest\npath:/otherpath/,\nGET:{%(_)s'a': %(_)s'b'},\nPOST:{%(_)s'c': %(_)s'd'},\nCOOKIES:{%(_)s'e': %(_)s'f'},\nMETA:{%(_)s'g': %(_)s'h'}>"))
 
     def test_wsgirequest(self):
         request = WSGIRequest({'PATH_INFO': 'bogus', 'REQUEST_METHOD': 'bogus', 'wsgi.input': StringIO('')})
@@ -43,14 +46,14 @@ class RequestsTests(unittest.TestCase):
 
     def test_wsgirequest_repr(self):
         request = WSGIRequest({'PATH_INFO': '/somepath/', 'REQUEST_METHOD': 'get', 'wsgi.input': StringIO('')})
-        request.GET = {u'get-key': u'get-value'}
-        request.POST = {u'post-key': u'post-value'}
-        request.COOKIES = {u'post-key': u'post-value'}
-        request.META = {u'post-key': u'post-value'}
-        self.assertEqual(repr(request), u"<WSGIRequest\npath:/somepath/,\nGET:{u'get-key': u'get-value'},\nPOST:{u'post-key': u'post-value'},\nCOOKIES:{u'post-key': u'post-value'},\nMETA:{u'post-key': u'post-value'}>")
+        request.GET = {'get-key': 'get-value'}
+        request.POST = {'post-key': 'post-value'}
+        request.COOKIES = {'post-key': 'post-value'}
+        request.META = {'post-key': 'post-value'}
+        self.assertEqual(repr(request), str_prefix("<WSGIRequest\npath:/somepath/,\nGET:{%(_)s'get-key': %(_)s'get-value'},\nPOST:{%(_)s'post-key': %(_)s'post-value'},\nCOOKIES:{%(_)s'post-key': %(_)s'post-value'},\nMETA:{%(_)s'post-key': %(_)s'post-value'}>"))
         self.assertEqual(build_request_repr(request), repr(request))
-        self.assertEqual(build_request_repr(request, path_override='/otherpath/', GET_override={u'a': u'b'}, POST_override={u'c': u'd'}, COOKIES_override={u'e': u'f'}, META_override={u'g': u'h'}),
-                         u"<WSGIRequest\npath:/otherpath/,\nGET:{u'a': u'b'},\nPOST:{u'c': u'd'},\nCOOKIES:{u'e': u'f'},\nMETA:{u'g': u'h'}>")
+        self.assertEqual(build_request_repr(request, path_override='/otherpath/', GET_override={'a': 'b'}, POST_override={'c': 'd'}, COOKIES_override={'e': 'f'}, META_override={'g': 'h'}),
+                         str_prefix("<WSGIRequest\npath:/otherpath/,\nGET:{%(_)s'a': %(_)s'b'},\nPOST:{%(_)s'c': %(_)s'd'},\nCOOKIES:{%(_)s'e': %(_)s'f'},\nMETA:{%(_)s'g': %(_)s'h'}>"))
 
     def test_parse_cookie(self):
         self.assertEqual(parse_cookie('invalid:key=true'), {})
@@ -73,10 +76,10 @@ class RequestsTests(unittest.TestCase):
             # Check if X_FORWARDED_HOST is provided.
             request = HttpRequest()
             request.META = {
-                u'HTTP_X_FORWARDED_HOST': u'forward.com',
-                u'HTTP_HOST': u'example.com',
-                u'SERVER_NAME': u'internal.com',
-                u'SERVER_PORT': 80,
+                'HTTP_X_FORWARDED_HOST': 'forward.com',
+                'HTTP_HOST': 'example.com',
+                'SERVER_NAME': 'internal.com',
+                'SERVER_PORT': 80,
             }
             # X_FORWARDED_HOST is ignored.
             self.assertEqual(request.get_host(), 'example.com')
@@ -84,25 +87,25 @@ class RequestsTests(unittest.TestCase):
             # Check if X_FORWARDED_HOST isn't provided.
             request = HttpRequest()
             request.META = {
-                u'HTTP_HOST': u'example.com',
-                u'SERVER_NAME': u'internal.com',
-                u'SERVER_PORT': 80,
+                'HTTP_HOST': 'example.com',
+                'SERVER_NAME': 'internal.com',
+                'SERVER_PORT': 80,
             }
             self.assertEqual(request.get_host(), 'example.com')
 
             # Check if HTTP_HOST isn't provided.
             request = HttpRequest()
             request.META = {
-                u'SERVER_NAME': u'internal.com',
-                u'SERVER_PORT': 80,
+                'SERVER_NAME': 'internal.com',
+                'SERVER_PORT': 80,
             }
             self.assertEqual(request.get_host(), 'internal.com')
 
             # Check if HTTP_HOST isn't provided, and we're on a nonstandard port
             request = HttpRequest()
             request.META = {
-                u'SERVER_NAME': u'internal.com',
-                u'SERVER_PORT': 8042,
+                'SERVER_NAME': 'internal.com',
+                'SERVER_PORT': 8042,
             }
             self.assertEqual(request.get_host(), 'internal.com:8042')
 
@@ -117,10 +120,10 @@ class RequestsTests(unittest.TestCase):
             # Check if X_FORWARDED_HOST is provided.
             request = HttpRequest()
             request.META = {
-                u'HTTP_X_FORWARDED_HOST': u'forward.com',
-                u'HTTP_HOST': u'example.com',
-                u'SERVER_NAME': u'internal.com',
-                u'SERVER_PORT': 80,
+                'HTTP_X_FORWARDED_HOST': 'forward.com',
+                'HTTP_HOST': 'example.com',
+                'SERVER_NAME': 'internal.com',
+                'SERVER_PORT': 80,
             }
             # X_FORWARDED_HOST is obeyed.
             self.assertEqual(request.get_host(), 'forward.com')
@@ -128,25 +131,25 @@ class RequestsTests(unittest.TestCase):
             # Check if X_FORWARDED_HOST isn't provided.
             request = HttpRequest()
             request.META = {
-                u'HTTP_HOST': u'example.com',
-                u'SERVER_NAME': u'internal.com',
-                u'SERVER_PORT': 80,
+                'HTTP_HOST': 'example.com',
+                'SERVER_NAME': 'internal.com',
+                'SERVER_PORT': 80,
             }
             self.assertEqual(request.get_host(), 'example.com')
 
             # Check if HTTP_HOST isn't provided.
             request = HttpRequest()
             request.META = {
-                u'SERVER_NAME': u'internal.com',
-                u'SERVER_PORT': 80,
+                'SERVER_NAME': 'internal.com',
+                'SERVER_PORT': 80,
             }
             self.assertEqual(request.get_host(), 'internal.com')
 
             # Check if HTTP_HOST isn't provided, and we're on a nonstandard port
             request = HttpRequest()
             request.META = {
-                u'SERVER_NAME': u'internal.com',
-                u'SERVER_PORT': 8042,
+                'SERVER_NAME': 'internal.com',
+                'SERVER_PORT': 8042,
             }
             self.assertEqual(request.get_host(), 'internal.com:8042')
 
@@ -275,7 +278,7 @@ class RequestsTests(unittest.TestCase):
         request = WSGIRequest({'REQUEST_METHOD': 'POST',
                                'CONTENT_LENGTH': len(payload),
                                'wsgi.input': StringIO(payload)})
-        self.assertEqual(request.POST, {u'name': [u'value']})
+        self.assertEqual(request.POST, {'name': ['value']})
         self.assertEqual(request.body, b'name=value')
         self.assertEqual(request.read(), b'name=value')
 
@@ -305,12 +308,12 @@ class RequestsTests(unittest.TestCase):
                 '',
                 'value',
                 '--boundary--'
-                ''])
+                '']).encode('utf-8')
         request = WSGIRequest({'REQUEST_METHOD': 'POST',
                                'CONTENT_TYPE': 'multipart/form-data; boundary=boundary',
                                'CONTENT_LENGTH': len(payload),
                                'wsgi.input': StringIO(payload)})
-        self.assertEqual(request.POST, {u'name': [u'value']})
+        self.assertEqual(request.POST, {'name': ['value']})
         self.assertRaises(Exception, lambda: request.body)
 
     def test_POST_multipart_with_content_length_zero(self):
@@ -327,7 +330,7 @@ class RequestsTests(unittest.TestCase):
                 '',
                 'value',
                 '--boundary--'
-                ''])
+                '']).encode('utf-8')
         request = WSGIRequest({'REQUEST_METHOD': 'POST',
                                'CONTENT_TYPE': 'multipart/form-data; boundary=boundary',
                                'CONTENT_LENGTH': 0,
@@ -350,7 +353,7 @@ class RequestsTests(unittest.TestCase):
                                'CONTENT_LENGTH': len(payload),
                                'wsgi.input': StringIO(payload)})
         raw_data = request.body
-        self.assertEqual(request.POST, {u'name': [u'value']})
+        self.assertEqual(request.POST, {'name': ['value']})
 
     def test_POST_after_body_read_and_stream_read(self):
         """
@@ -363,7 +366,7 @@ class RequestsTests(unittest.TestCase):
                                'wsgi.input': StringIO(payload)})
         raw_data = request.body
         self.assertEqual(request.read(1), b'n')
-        self.assertEqual(request.POST, {u'name': [u'value']})
+        self.assertEqual(request.POST, {'name': ['value']})
 
     def test_POST_after_body_read_and_stream_read_multipart(self):
         """
@@ -376,7 +379,7 @@ class RequestsTests(unittest.TestCase):
                 '',
                 'value',
                 '--boundary--'
-                ''])
+                '']).encode('utf-8')
         request = WSGIRequest({'REQUEST_METHOD': 'POST',
                                'CONTENT_TYPE': 'multipart/form-data; boundary=boundary',
                                'CONTENT_LENGTH': len(payload),
@@ -384,7 +387,7 @@ class RequestsTests(unittest.TestCase):
         raw_data = request.body
         # Consume enough data to mess up the parsing:
         self.assertEqual(request.read(13), b'--boundary\r\nC')
-        self.assertEqual(request.POST, {u'name': [u'value']})
+        self.assertEqual(request.POST, {'name': ['value']})
 
     def test_raw_post_data_returns_body(self):
         """

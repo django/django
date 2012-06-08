@@ -23,7 +23,7 @@ class EnvelopeTest(unittest.TestCase):
         self.assertRaises(OGRException, Envelope, (0, 0, 5, 5, 3))
         self.assertRaises(OGRException, Envelope, ())
         self.assertRaises(ValueError, Envelope, 0, 'a', 5, 5)
-        self.assertRaises(TypeError, Envelope, u'foo')
+        self.assertRaises(TypeError, Envelope, 'foo')
         self.assertRaises(OGRException, Envelope, (1, 1, 0, 0))
         try:
             Envelope(0, 0, 0, 0)

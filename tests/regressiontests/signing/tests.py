@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import time
 
 from django.core import signing
@@ -14,7 +16,7 @@ class TestSigner(TestCase):
         for s in (
             b'hello',
             b'3098247:529:087:',
-            u'\u2019'.encode('utf-8'),
+            '\u2019'.encode('utf-8'),
         ):
             self.assertEqual(
                 signer.signature(s),
@@ -42,7 +44,7 @@ class TestSigner(TestCase):
             '3098247529087',
             '3098247:529:087:',
             'jkw osanteuh ,rcuh nthu aou oauh ,ud du',
-            u'\u2019',
+            '\u2019',
         )
         for example in examples:
             self.assertNotEqual(
@@ -70,7 +72,7 @@ class TestSigner(TestCase):
         objects = (
             ['a', 'list'],
             b'a string',
-            u'a unicode string \u2019',
+            'a unicode string \u2019',
             {'a': 'dictionary'},
         )
         for o in objects:
@@ -98,7 +100,7 @@ class TestSigner(TestCase):
 class TestTimestampSigner(TestCase):
 
     def test_timestamp_signer(self):
-        value = u'hello'
+        value = 'hello'
         _time = time.time
         time.time = lambda: 123456789
         try:

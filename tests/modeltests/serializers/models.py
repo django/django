@@ -5,6 +5,7 @@
 ``django.core.serializers`` provides interfaces to converting Django
 ``QuerySet`` objects to and from "flat" data (i.e. strings).
 """
+from __future__ import unicode_literals
 
 from decimal import Decimal
 
@@ -49,7 +50,7 @@ class AuthorProfile(models.Model):
     date_of_birth = models.DateField()
 
     def __unicode__(self):
-        return u"Profile of %s" % self.author
+        return "Profile of %s" % self.author
 
 
 class Actor(models.Model):
@@ -116,4 +117,4 @@ class Player(models.Model):
     team = TeamField()
 
     def __unicode__(self):
-        return u'%s (%d) playing for %s' % (self.name, self.rank, self.team.to_string())
+        return '%s (%d) playing for %s' % (self.name, self.rank, self.team.to_string())

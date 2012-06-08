@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 from xml.dom import minidom
 
@@ -199,7 +199,7 @@ class SyndicationFeedTest(FeedTestCase):
             link = item.getElementsByTagName('link')[0]
             if link.firstChild.wholeText == 'http://example.com/blog/4/':
                 title = item.getElementsByTagName('title')[0]
-                self.assertEqual(title.firstChild.wholeText, u'A &amp; B &lt; C &gt; D')
+                self.assertEqual(title.firstChild.wholeText, 'A &amp; B &lt; C &gt; D')
 
     def test_naive_datetime_conversion(self):
         """

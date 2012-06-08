@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import mimetypes
 import os
 import random
@@ -90,7 +92,7 @@ def forbid_multi_line_headers(name, val, encoding):
     else:
         if name.lower() == 'subject':
             val = Header(val)
-    return name, val
+    return smart_str(name), val
 
 
 def sanitize_address(addr, encoding):
@@ -101,8 +103,8 @@ def sanitize_address(addr, encoding):
     try:
         addr = addr.encode('ascii')
     except UnicodeEncodeError:  # IDN
-        if u'@' in addr:
-            localpart, domain = addr.split(u'@', 1)
+        if '@' in addr:
+            localpart, domain = addr.split('@', 1)
             localpart = str(Header(localpart, encoding))
             domain = domain.encode('idna')
             addr = '@'.join([localpart, domain])

@@ -1,6 +1,9 @@
+from __future__ import unicode_literals
+
 import copy
 import pickle
 
+from django.test.utils import str_prefix
 from django.utils.unittest import TestCase
 from django.utils.functional import SimpleLazyObject, empty
 
@@ -51,10 +54,11 @@ class TestUtilsSimpleLazyObject(TestCase):
         self.assertTrue("SimpleLazyObject" in repr(SimpleLazyObject(complex_object)))
 
     def test_str(self):
-        self.assertEqual("I am _ComplexObject('joe')", str(SimpleLazyObject(complex_object)))
+        self.assertEqual(str_prefix("I am _ComplexObject(%(_)s'joe')"),
+            str(SimpleLazyObject(complex_object)))
 
     def test_unicode(self):
-        self.assertEqual(u"joe", unicode(SimpleLazyObject(complex_object)))
+        self.assertEqual("joe", unicode(SimpleLazyObject(complex_object)))
 
     def test_class(self):
         # This is important for classes that use __class__ in things like

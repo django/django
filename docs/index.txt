@@ -184,6 +184,7 @@ Other batteries included
 * :doc:`Logging <topics/logging>`
 * :doc:`Messages <ref/contrib/messages>`
 * :doc:`Pagination <topics/pagination>`
+* :doc:`Python 3 compatibility <topics/python3>`
 * :doc:`Redirects <ref/contrib/redirects>`
 * :doc:`Security <topics/security>`
 * :doc:`Serialization <topics/serialization>`
@@ -204,7 +205,7 @@ The Django open-source project
   :doc:`How to get involved <internals/contributing/index>` |
   :doc:`The release process <internals/release-process>` |
   :doc:`Team of committers <internals/committers>` |
-  :doc:`The Django source code repository <internals/svn>`
+  :doc:`The Django source code repository <internals/git>`
 
 * **Design philosophies:**
   :doc:`Overview <misc/design-philosophies>`

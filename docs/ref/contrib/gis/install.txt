@@ -418,8 +418,8 @@ SpatiaLite library (``libspatialite``) and tools (``spatialite``)
 After SQLite has been built with the R*Tree module enabled, get the latest
 SpatiaLite library source and tools bundle from the `download page`__::
 
-    $ wget http://www.gaia-gis.it/spatialite/libspatialite-amalgamation-2.3.1.tar.gz
-    $ wget http://www.gaia-gis.it/spatialite/spatialite-tools-2.3.1.tar.gz
+    $ wget http://www.gaia-gis.it/gaia-sins/libspatialite-sources/libspatialite-amalgamation-2.3.1.tar.gz
+    $ wget http://www.gaia-gis.it/gaia-sins/libspatialite-sources/spatialite-tools-2.3.1.tar.gz
     $ tar xzf libspatialite-amalgamation-2.3.1.tar.gz
     $ tar xzf spatialite-tools-2.3.1.tar.gz
 
@@ -623,8 +623,6 @@ features such as the geographic admin or KML sitemaps will not function properly
 
 Add Google projection to ``spatial_ref_sys`` table
 --------------------------------------------------
-
-.. versionchanged:: 1.2
 
 .. note::
 

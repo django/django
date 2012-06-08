@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 from django.test import TestCase
 
@@ -147,13 +147,13 @@ class SelectRelatedTests(TestCase):
             world = Species.objects.filter(genus__name='Amanita')\
                 .select_related('genus__family')
             orders = [o.genus.family.order.name for o in world]
-            self.assertEqual(orders, [u'Agaricales'])
+            self.assertEqual(orders, ['Agaricales'])
 
     def test_field_traversal(self):
         with self.assertNumQueries(1):
             s = Species.objects.all().select_related('genus__family__order'
                 ).order_by('id')[0:1].get().genus.family.order.name
-            self.assertEqual(s, u'Diptera')
+            self.assertEqual(s, 'Diptera')
 
     def test_depth_fields_fails(self):
         self.assertRaises(TypeError,

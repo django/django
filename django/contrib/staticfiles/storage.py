@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 import hashlib
 import os
 import posixpath
@@ -46,8 +47,8 @@ class StaticFilesStorage(FileSystemStorage):
 class CachedFilesMixin(object):
     patterns = (
         ("*.css", (
-            r"""(url\(['"]{0,1}\s*(.*?)["']{0,1}\))""",
-            r"""(@import\s*["']\s*(.*?)["'])""",
+            br"""(url\(['"]{0,1}\s*(.*?)["']{0,1}\))""",
+            br"""(@import\s*["']\s*(.*?)["'])""",
         )),
     )
 
@@ -91,8 +92,8 @@ class CachedFilesMixin(object):
         root, ext = os.path.splitext(filename)
         file_hash = self.file_hash(clean_name, content)
         if file_hash is not None:
-            file_hash = u".%s" % file_hash
-        hashed_name = os.path.join(path, u"%s%s%s" %
+            file_hash = ".%s" % file_hash
+        hashed_name = os.path.join(path, "%s%s%s" %
                                    (root, file_hash, ext))
         unparsed_name = list(parsed_name)
         unparsed_name[2] = hashed_name
@@ -103,7 +104,7 @@ class CachedFilesMixin(object):
         return urlunsplit(unparsed_name)
 
     def cache_key(self, name):
-        return u'staticfiles:%s' % hashlib.md5(smart_str(name)).hexdigest()
+        return 'staticfiles:%s' % hashlib.md5(smart_str(name)).hexdigest()
 
     def url(self, name, force=False):
         """

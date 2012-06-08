@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 from . import ValidationTestCase
 from .models import ModelToValidate
@@ -15,5 +15,5 @@ class TestModelsWithValidators(ValidationTestCase):
         self.assertFieldFailsValidationWithMessage(
             mtv.full_clean,
             'f_with_custom_validator',
-            [u'This is not the answer to life, universe and everything!']
+            ['This is not the answer to life, universe and everything!']
         )

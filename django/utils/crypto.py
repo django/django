@@ -1,6 +1,7 @@
 """
 Django's standard crypto functions and utilities.
 """
+from __future__ import unicode_literals
 
 import hmac
 import struct
@@ -22,6 +23,7 @@ except NotImplementedError:
     using_sysrandom = False
 
 from django.conf import settings
+from django.utils.encoding import smart_str
 
 
 _trans_5c = b"".join([chr(x ^ 0x5C) for x in xrange(256)])
@@ -41,7 +43,7 @@ def salted_hmac(key_salt, value, secret=None):
     # We need to generate a derived key from our base key.  We can do this by
     # passing the key_salt and our base key through a pseudo-random function and
     # SHA1 works nicely.
-    key = hashlib.sha1(key_salt + secret).digest()
+    key = hashlib.sha1((key_salt + secret).encode('utf-8')).digest()
 
     # If len(key_salt + secret) > sha_constructor().block_size, the above
     # line is redundant and could be replaced by key = key_salt + secret, since
@@ -104,7 +106,7 @@ def _long_to_bin(x, hex_format_string):
     Convert a long integer into a binary string.
     hex_format_string is like "%020x" for padding 10 characters.
     """
-    return binascii.unhexlify(hex_format_string % x)
+    return binascii.unhexlify((hex_format_string % x).encode('ascii'))
 
 
 def _fast_hmac(key, msg, digest):
@@ -112,6 +114,7 @@ def _fast_hmac(key, msg, digest):
     A trimmed down version of Python's HMAC implementation
     """
     dig1, dig2 = digest(), digest()
+    key = smart_str(key)
     if len(key) > dig1.block_size:
         key = digest(key).digest()
     key += chr(0) * (dig1.block_size - len(key))
@@ -137,6 +140,8 @@ def pbkdf2(password, salt, iterations, dklen=0, digest=None):
     assert iterations > 0
     if not digest:
         digest = hashlib.sha256
+    password = smart_str(password)
+    salt = smart_str(salt)
     hlen = digest().digest_size
     if not dklen:
         dklen = hlen

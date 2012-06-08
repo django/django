@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django.http import HttpResponse, Http404
 from django.template import loader
 from django.contrib.sites.models import get_current_site
@@ -41,7 +43,7 @@ def sitemap(request, sitemaps, section=None):
     maps, urls = [], []
     if section is not None:
         if section not in sitemaps:
-            raise Http404(_(u"No sitemap available for section: %r") % section)
+            raise Http404(_("No sitemap available for section: %r") % section)
         maps.append(sitemaps[section])
     else:
         maps = sitemaps.values()
@@ -55,9 +57,9 @@ def sitemap(request, sitemaps, section=None):
             else:
                 urls.extend(site.get_urls(page=page, site=current_site))
         except EmptyPage:
-            raise Http404(_(u"Page %s empty") % page)
+            raise Http404(_("Page %s empty") % page)
         except PageNotAnInteger:
-            raise Http404(_(u"No page '%s'") % page)
+            raise Http404(_("No page '%s'") % page)
     xml = smart_str(loader.render_to_string('gis/sitemaps/geo_sitemap.xml', {'urlset': urls}))
     return HttpResponse(xml, content_type='application/xml')
 

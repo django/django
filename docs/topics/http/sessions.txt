@@ -503,7 +503,7 @@ SESSION_COOKIE_DOMAIN
 Default: ``None``
 
 The domain to use for session cookies. Set this to a string such as
-``".lawrence.com"`` (note the leading dot!) for cross-domain cookies, or use
+``".example.com"`` (note the leading dot!) for cross-domain cookies, or use
 ``None`` for a standard domain cookie.
 
 SESSION_COOKIE_HTTPONLY

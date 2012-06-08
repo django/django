@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 import os
 import datetime
 import tempfile
@@ -43,7 +45,7 @@ class ChoiceOptionModel(models.Model):
         ordering = ('name',)
 
     def __unicode__(self):
-        return u'ChoiceOption %d' % self.pk
+        return 'ChoiceOption %d' % self.pk
 
 
 class ChoiceFieldModel(models.Model):
@@ -68,7 +70,7 @@ class Group(models.Model):
     name = models.CharField(max_length=10)
 
     def __unicode__(self):
-        return u'%s' % self.name
+        return '%s' % self.name
 
 
 class Cheese(models.Model):

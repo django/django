@@ -1,6 +1,5 @@
-# coding: utf-8
-
-from __future__ import absolute_import
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import, unicode_literals
 
 from django.conf import settings
 from django.contrib import admin
@@ -66,11 +65,11 @@ class GenericAdminViewTest(TestCase):
         A smoke test to ensure POST on add_view works.
         """
         post_data = {
-            "name": u"This Week in Django",
+            "name": "This Week in Django",
             # inline data
-            "generic_inline_admin-media-content_type-object_id-TOTAL_FORMS": u"1",
-            "generic_inline_admin-media-content_type-object_id-INITIAL_FORMS": u"0",
-            "generic_inline_admin-media-content_type-object_id-MAX_NUM_FORMS": u"0",
+            "generic_inline_admin-media-content_type-object_id-TOTAL_FORMS": "1",
+            "generic_inline_admin-media-content_type-object_id-INITIAL_FORMS": "0",
+            "generic_inline_admin-media-content_type-object_id-MAX_NUM_FORMS": "0",
         }
         response = self.client.post('/generic_inline_admin/admin/generic_inline_admin/episode/add/', post_data)
         self.assertEqual(response.status_code, 302) # redirect somewhere
@@ -80,17 +79,17 @@ class GenericAdminViewTest(TestCase):
         A smoke test to ensure POST on edit_view works.
         """
         post_data = {
-            "name": u"This Week in Django",
+            "name": "This Week in Django",
             # inline data
-            "generic_inline_admin-media-content_type-object_id-TOTAL_FORMS": u"3",
-            "generic_inline_admin-media-content_type-object_id-INITIAL_FORMS": u"2",
-            "generic_inline_admin-media-content_type-object_id-MAX_NUM_FORMS": u"0",
-            "generic_inline_admin-media-content_type-object_id-0-id": u"%d" % self.mp3_media_pk,
-            "generic_inline_admin-media-content_type-object_id-0-url": u"http://example.com/podcast.mp3",
-            "generic_inline_admin-media-content_type-object_id-1-id": u"%d" % self.png_media_pk,
-            "generic_inline_admin-media-content_type-object_id-1-url": u"http://example.com/logo.png",
-            "generic_inline_admin-media-content_type-object_id-2-id": u"",
-            "generic_inline_admin-media-content_type-object_id-2-url": u"",
+            "generic_inline_admin-media-content_type-object_id-TOTAL_FORMS": "3",
+            "generic_inline_admin-media-content_type-object_id-INITIAL_FORMS": "2",
+            "generic_inline_admin-media-content_type-object_id-MAX_NUM_FORMS": "0",
+            "generic_inline_admin-media-content_type-object_id-0-id": "%d" % self.mp3_media_pk,
+            "generic_inline_admin-media-content_type-object_id-0-url": "http://example.com/podcast.mp3",
+            "generic_inline_admin-media-content_type-object_id-1-id": "%d" % self.png_media_pk,
+            "generic_inline_admin-media-content_type-object_id-1-url": "http://example.com/logo.png",
+            "generic_inline_admin-media-content_type-object_id-2-id": "",
+            "generic_inline_admin-media-content_type-object_id-2-url": "",
         }
         url = '/generic_inline_admin/admin/generic_inline_admin/episode/%d/' % self.episode_pk
         response = self.client.post(url, post_data)
@@ -198,11 +197,11 @@ class GenericInlineAdminWithUniqueTogetherTest(TestCase):
     def testAdd(self):
         category_id = Category.objects.create(name='male').pk
         post_data = {
-            "name": u"John Doe",
+            "name": "John Doe",
             # inline data
-            "generic_inline_admin-phonenumber-content_type-object_id-TOTAL_FORMS": u"1",
-            "generic_inline_admin-phonenumber-content_type-object_id-INITIAL_FORMS": u"0",
-            "generic_inline_admin-phonenumber-content_type-object_id-MAX_NUM_FORMS": u"0",
+            "generic_inline_admin-phonenumber-content_type-object_id-TOTAL_FORMS": "1",
+            "generic_inline_admin-phonenumber-content_type-object_id-INITIAL_FORMS": "0",
+            "generic_inline_admin-phonenumber-content_type-object_id-MAX_NUM_FORMS": "0",
             "generic_inline_admin-phonenumber-content_type-object_id-0-id": "",
             "generic_inline_admin-phonenumber-content_type-object_id-0-phone_number": "555-555-5555",
             "generic_inline_admin-phonenumber-content_type-object_id-0-category": "%s" % category_id,

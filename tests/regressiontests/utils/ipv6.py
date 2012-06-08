@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django.utils import unittest
 from django.utils.ipv6 import is_valid_ipv6_address, clean_ipv6_address
 
@@ -36,16 +38,16 @@ class TestUtilsIPv6(unittest.TestCase):
         self.assertFalse(is_valid_ipv6_address('::zzzz:0a0a'))
 
     def test_cleanes_plain_address(self):
-        self.assertEqual(clean_ipv6_address('DEAD::0:BEEF'), u'dead::beef')
-        self.assertEqual(clean_ipv6_address('2001:000:a:0000:0:fe:fe:beef'), u'2001:0:a::fe:fe:beef')
-        self.assertEqual(clean_ipv6_address('2001::a:0000:0:fe:fe:beef'), u'2001:0:a::fe:fe:beef')
+        self.assertEqual(clean_ipv6_address('DEAD::0:BEEF'), 'dead::beef')
+        self.assertEqual(clean_ipv6_address('2001:000:a:0000:0:fe:fe:beef'), '2001:0:a::fe:fe:beef')
+        self.assertEqual(clean_ipv6_address('2001::a:0000:0:fe:fe:beef'), '2001:0:a::fe:fe:beef')
 
     def test_cleanes_with_v4_mapping(self):
-        self.assertEqual(clean_ipv6_address('::ffff:0a0a:0a0a'), u'::ffff:10.10.10.10')
-        self.assertEqual(clean_ipv6_address('::ffff:1234:1234'), u'::ffff:18.52.18.52')
-        self.assertEqual(clean_ipv6_address('::ffff:18.52.18.52'), u'::ffff:18.52.18.52')
+        self.assertEqual(clean_ipv6_address('::ffff:0a0a:0a0a'), '::ffff:10.10.10.10')
+        self.assertEqual(clean_ipv6_address('::ffff:1234:1234'), '::ffff:18.52.18.52')
+        self.assertEqual(clean_ipv6_address('::ffff:18.52.18.52'), '::ffff:18.52.18.52')
 
     def test_unpacks_ipv4(self):
-        self.assertEqual(clean_ipv6_address('::ffff:0a0a:0a0a', unpack_ipv4=True), u'10.10.10.10')
-        self.assertEqual(clean_ipv6_address('::ffff:1234:1234', unpack_ipv4=True), u'18.52.18.52')
-        self.assertEqual(clean_ipv6_address('::ffff:18.52.18.52', unpack_ipv4=True), u'18.52.18.52')
+        self.assertEqual(clean_ipv6_address('::ffff:0a0a:0a0a', unpack_ipv4=True), '10.10.10.10')
+        self.assertEqual(clean_ipv6_address('::ffff:1234:1234', unpack_ipv4=True), '18.52.18.52')
+        self.assertEqual(clean_ipv6_address('::ffff:18.52.18.52', unpack_ipv4=True), '18.52.18.52')

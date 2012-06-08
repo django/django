@@ -1,8 +1,7 @@
 """
 Regression tests for Model inheritance behavior.
 """
-
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import datetime
 from operator import attrgetter
@@ -53,14 +52,14 @@ class ModelInheritanceTest(TestCase):
 
         dicts = list(Restaurant.objects.values('name','serves_hot_dogs'))
         self.assertEqual(dicts, [{
-            'name': u"Guido's House of Pasta",
+            'name': "Guido's House of Pasta",
             'serves_hot_dogs': True
         }])
 
         dicts = list(ItalianRestaurant.objects.values(
             'name','serves_hot_dogs','serves_gnocchi'))
         self.assertEqual(dicts, [{
-            'name': u"Guido's House of Pasta",
+            'name': "Guido's House of Pasta",
             'serves_gnocchi': True,
             'serves_hot_dogs': True,
         }])
@@ -68,7 +67,7 @@ class ModelInheritanceTest(TestCase):
         dicts = list(ParkingLot.objects.values('name','capacity'))
         self.assertEqual(dicts, [{
             'capacity': 100,
-            'name': u'Main St',
+            'name': 'Main St',
         }])
 
         # You can also update objects when using a raw save.
@@ -95,14 +94,14 @@ class ModelInheritanceTest(TestCase):
 
         dicts = list(Restaurant.objects.values('name','serves_hot_dogs'))
         self.assertEqual(dicts, [{
-            'name': u"Guido's All New House of Pasta",
+            'name': "Guido's All New House of Pasta",
             'serves_hot_dogs': False,
         }])
 
         dicts = list(ItalianRestaurant.objects.values(
             'name', 'serves_hot_dogs', 'serves_gnocchi'))
         self.assertEqual(dicts, [{
-            'name': u"Guido's All New House of Pasta",
+            'name': "Guido's All New House of Pasta",
             'serves_gnocchi': False,
             'serves_hot_dogs': False,
         }])
@@ -110,7 +109,7 @@ class ModelInheritanceTest(TestCase):
         dicts = list(ParkingLot.objects.values('name','capacity'))
         self.assertEqual(dicts, [{
             'capacity': 50,
-            'name': u'Derelict lot',
+            'name': 'Derelict lot',
         }])
 
         # If you try to raw_save a parent attribute onto a child object,
@@ -124,7 +123,7 @@ class ModelInheritanceTest(TestCase):
         dicts = list(ItalianRestaurant.objects.values(
             'name','serves_hot_dogs','serves_gnocchi'))
         self.assertEqual(dicts, [{
-            'name': u"Guido's All New House of Pasta",
+            'name': "Guido's All New House of Pasta",
             'serves_gnocchi': False,
             'serves_hot_dogs': False,
         }])
@@ -372,7 +371,7 @@ class ModelInheritanceTest(TestCase):
         # verbose_name.
         self.assertEqual(
                 InternalCertificationAudit._meta.verbose_name_plural,
-                u'Audits'
+                'Audits'
         )
 
     def test_inherited_nullable_exclude(self):

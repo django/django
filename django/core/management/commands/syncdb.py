@@ -2,6 +2,7 @@ from optparse import make_option
 import traceback
 
 from django.conf import settings
+from django.core.management import call_command
 from django.core.management.base import NoArgsCommand
 from django.core.management.color import no_style
 from django.core.management.sql import custom_sql_for_model, emit_post_sync_signal
@@ -27,7 +28,7 @@ class Command(NoArgsCommand):
         verbosity = int(options.get('verbosity'))
         interactive = options.get('interactive')
         show_traceback = options.get('traceback')
-        load_initial_data = options.get('load_initial_data', True)
+        load_initial_data = options.get('load_initial_data')
 
         self.style = no_style()
 
@@ -158,6 +159,5 @@ class Command(NoArgsCommand):
 
         # Load initial_data fixtures (unless that has been disabled)
         if load_initial_data:
-            from django.core.management import call_command
             call_command('loaddata', 'initial_data', verbosity=verbosity,
                          database=db, skip_validation=True)

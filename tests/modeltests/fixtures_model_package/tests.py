@@ -1,5 +1,8 @@
+from __future__ import unicode_literals
+
 from django.core import management
-from django.test import TestCase
+from django.db import transaction
+from django.test import TestCase, TransactionTestCase
 
 from .models import Article, Book
 
@@ -12,49 +15,29 @@ class SampleTestCase(TestCase):
         self.assertEqual(Article.objects.count(), 3)
         self.assertQuerysetEqual(
             Article.objects.all(),[
-                u"Django conquers world!",
-                u"Copyright is fine the way it is",
-                u"Poker has no place on ESPN",
+                "Django conquers world!",
+                "Copyright is fine the way it is",
+                "Poker has no place on ESPN",
             ],
             lambda a: a.headline
         )
 
 
-class TestNoInitialDataLoading(TestCase):
+class TestNoInitialDataLoading(TransactionTestCase):
     def test_syncdb(self):
-        Book.objects.all().delete()
+        with transaction.commit_manually():
+            Book.objects.all().delete()
 
-        management.call_command(
-            'syncdb',
-            verbosity=0,
-            commit=False
-        )
-        self.assertQuerysetEqual(
-            Book.objects.all(), [
-                u'Achieving self-awareness of Python programs'
-            ],
-            lambda a: a.name
-        )
-
-        Book.objects.all().delete()
-
-        management.call_command(
-            'syncdb',
-            verbosity=0,
-            commit=False,
-            load_initial_data=False
-        )
-        self.assertQuerysetEqual(Book.objects.all(), [])
+            management.call_command(
+                'syncdb',
+                verbosity=0,
+                load_initial_data=False
+            )
+            self.assertQuerysetEqual(Book.objects.all(), [])
+            transaction.rollback()
 
     def test_flush(self):
-        Book.objects.all().delete()
-
-        management.call_command(
-            'flush',
-            verbosity=0,
-            interactive=False,
-            commit=False
-        )
+        # Test presence of fixture (flush called by TransactionTestCase)
         self.assertQuerysetEqual(
             Book.objects.all(), [
                 u'Achieving self-awareness of Python programs'
@@ -62,16 +45,16 @@ class TestNoInitialDataLoading(TestCase):
             lambda a: a.name
         )
 
-        Book.objects.all().delete()
-
-        management.call_command(
-            'flush',
-            verbosity=0,
-            commit=False,
-            interactive=False,
-            load_initial_data=False
-        )
-        self.assertQuerysetEqual(Book.objects.all(), [])
+        with transaction.commit_manually():
+            management.call_command(
+                'flush',
+                verbosity=0,
+                interactive=False,
+                commit=False,
+                load_initial_data=False
+            )
+            self.assertQuerysetEqual(Book.objects.all(), [])
+            transaction.rollback()
 
 
 class FixtureTestCase(TestCase):
@@ -80,7 +63,7 @@ class FixtureTestCase(TestCase):
         # syncdb introduces 1 initial data object from initial_data.json
         self.assertQuerysetEqual(
             Book.objects.all(), [
-                u'Achieving self-awareness of Python programs'
+                'Achieving self-awareness of Python programs'
             ],
             lambda a: a.name
         )
@@ -91,8 +74,8 @@ class FixtureTestCase(TestCase):
         management.call_command("loaddata", "fixture1.json", verbosity=0, commit=False)
         self.assertQuerysetEqual(
             Article.objects.all(), [
-                u"Time to reform copyright",
-                u"Poker has no place on ESPN",
+                "Time to reform copyright",
+                "Poker has no place on ESPN",
             ],
             lambda a: a.headline,
         )
@@ -102,9 +85,9 @@ class FixtureTestCase(TestCase):
         management.call_command("loaddata", "fixture2.json", verbosity=0, commit=False)
         self.assertQuerysetEqual(
             Article.objects.all(), [
-                u"Django conquers world!",
-                u"Copyright is fine the way it is",
-                u"Poker has no place on ESPN",
+                "Django conquers world!",
+                "Copyright is fine the way it is",
+                "Poker has no place on ESPN",
             ],
             lambda a: a.headline,
         )
@@ -113,9 +96,9 @@ class FixtureTestCase(TestCase):
         management.call_command("loaddata", "unknown.json", verbosity=0, commit=False)
         self.assertQuerysetEqual(
             Article.objects.all(), [
-                u"Django conquers world!",
-                u"Copyright is fine the way it is",
-                u"Poker has no place on ESPN",
+                "Django conquers world!",
+                "Copyright is fine the way it is",
+                "Poker has no place on ESPN",
             ],
             lambda a: a.headline,
         )

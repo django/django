@@ -3,7 +3,7 @@
 AR-specific Form helpers.
 """
 
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 from django.contrib.localflavor.ar.ar_provinces import PROVINCE_CHOICES
 from django.core.validators import EMPTY_VALUES
@@ -37,11 +37,11 @@ class ARPostalCodeField(RegexField):
     def clean(self, value):
         value = super(ARPostalCodeField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
         if len(value) not in (4, 8):
             raise ValidationError(self.error_messages['invalid'])
         if len(value) == 8:
-            return u'%s%s%s' % (value[0].upper(), value[1:5], value[5:].upper())
+            return '%s%s%s' % (value[0].upper(), value[1:5], value[5:].upper())
         return value
 
 class ARDNIField(CharField):
@@ -63,7 +63,7 @@ class ARDNIField(CharField):
         """
         value = super(ARDNIField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
         if not value.isdigit():
             value = value.replace('.', '')
         if not value.isdigit():
@@ -94,7 +94,7 @@ class ARCUITField(RegexField):
         """
         value = super(ARCUITField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
         value, cd = self._canon(value)
         if self._calc_cd(value) != cd:
             raise ValidationError(self.error_messages['checksum'])
@@ -113,5 +113,5 @@ class ARCUITField(RegexField):
         if check_digit == None:
             check_digit = cuit[-1]
             cuit = cuit[:-1]
-        return u'%s-%s-%s' % (cuit[:2], cuit[2:], check_digit)
+        return '%s-%s-%s' % (cuit[:2], cuit[2:], check_digit)
 

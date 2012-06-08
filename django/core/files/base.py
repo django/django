@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import os
 from io import BytesIO
 
@@ -19,7 +21,7 @@ class File(FileProxyMixin):
         return smart_str(self.name or '')
 
     def __unicode__(self):
-        return smart_unicode(self.name or u'')
+        return smart_unicode(self.name or '')
 
     def __repr__(self):
         return "<%s: %s>" % (self.__class__.__name__, self or "None")

@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import time
 
 from django.core import signing
@@ -15,7 +17,7 @@ class SignedCookieTest(TestCase):
         request = HttpRequest()
         request.COOKIES['c'] = response.cookies['c'].value
         value = request.get_signed_cookie('c')
-        self.assertEqual(value, u'hello')
+        self.assertEqual(value, 'hello')
 
     def test_can_use_salt(self):
         response = HttpResponse()
@@ -23,7 +25,7 @@ class SignedCookieTest(TestCase):
         request = HttpRequest()
         request.COOKIES['a'] = response.cookies['a'].value
         value = request.get_signed_cookie('a', salt='one')
-        self.assertEqual(value, u'hello')
+        self.assertEqual(value, 'hello')
         self.assertRaises(signing.BadSignature,
             request.get_signed_cookie, 'a', salt='two')
 
@@ -43,7 +45,7 @@ class SignedCookieTest(TestCase):
         self.assertEqual(request.get_signed_cookie('c', default=None), None)
 
     def test_max_age_argument(self):
-        value = u'hello'
+        value = 'hello'
         _time = time.time
         time.time = lambda: 123456789
         try:
