@@ -100,6 +100,12 @@ mention:
 * Finally, it's important to call ``showPage()`` and ``save()`` on the PDF
   file.
 
+.. note::
+
+    ReportLab is not thread-safe. Some of our users have reported odd issues
+    with building PDF-generating Django views that are accessed by many people
+    at the same time.
+
 Complex PDFs
 ============
 
