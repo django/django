@@ -56,10 +56,9 @@ the recommended way to extend generic views is to subclass them, and override
 their attributes or methods.
 
 That said, generic views will have a limit. If you find you're struggling to
-implement your view as a subclass of a generic view, then don't be afraid of
-writing the architecture you need for your own use case. The mixins from which
-class based views are built may be levered individually to get the
-functionality you want.
+implement your view as a subclass of a generic view, then you may find it more
+effective to write just the code you need, using your own class based or
+functional views.
 
 More examples of generic views are available in some third party applications,
 or you could write your own as needed.
