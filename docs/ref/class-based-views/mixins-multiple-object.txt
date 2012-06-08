@@ -7,7 +7,10 @@ Multiple object mixins
 
 MultipleObjectMixin
 ~~~~~~~~~~~~~~~~~~~
-.. class:: MultipleObjectMixin()
+.. autoclass:: django.views.generic.list.MultipleObjectMixin
+    :members:
+    :undoc-members:
+    :inherited-members:
 
     A mixin that can be used to display a list of objects.
 
@@ -41,10 +44,13 @@ MultipleObjectMixin
     Note that ``page`` *must* be either a valid page number or the value
     ``last``; any other value for ``page`` will result in a 404 error.
 
+    **Classpath**
+
+    ``django.views.generic.list.MultipleObjectMixin``
+
     **Extends**
 
-    django.views.generic.base.ContextMixin
-
+    * :class:`django.views.generic.base.ContextMixin`
 
     **Methods and Attributes**
 
@@ -152,7 +158,15 @@ MultipleObjectMixin
     * ``page_obj``: An instance of
       :class:`django.core.paginator.Page`. If the page is not paginated,
       this context variable will be ``None``.
-      
+
+    **Autodoc**
+
+    .. note:: 
+    
+        Documentation on Class Based Views is a work in progress. The
+        following descriptions of methods and attributes are a work in progress
+        and will eventually subsume the **Methods and Attributes** described
+        above.
 
 MultipleObjectTemplateResponseMixin
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -167,11 +181,13 @@ MultipleObjectTemplateResponseMixin
     the view is operating on. ``self.object_list`` may be, but is not required
     to be, a :class:`~django.db.models.query.QuerySet`.
 
+    **Classpath**
+
+    ``django.views.generic.list.MultipleObjectTemplateResponseMixin``
+
     **Extends**
 
     * :class:`~django.views.generic.base.TemplateResponseMixin`
-    
-    **Methods and Attributes**
 
     **Methods and Attributes**
 
@@ -187,7 +203,11 @@ MultipleObjectTemplateResponseMixin
         * the value of ``template_name`` on the view (if provided)
         * ``<app_label>/<object_name><template_name_suffix>.html``
         
-        **Autodoc**
+    **Autodoc**
 
-        .. comment: TODO migrate the documentation above into the existing codebase
-            so we can get rid of the **Autodoc** header there.
+    .. note:: 
+    
+        Documentation on Class Based Views is a work in progress. The
+        following descriptions of methods and attributes are a work in progress
+        and will eventually subsume the **Methods and Attributes** described
+        above.

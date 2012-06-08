@@ -81,6 +81,13 @@ View
         
     **Autoclass methods**
 
+    .. note:: 
+    
+        Documentation on Class Based Views is a work in progress. The
+        following descriptions of methods and attributes are a work in progress
+        and will eventually subsume the **Methods and Attributes** described
+        above.    
+
 TemplateView
 ~~~~~~~~~~~~
 .. autoclass:: django.views.generic.base.TemplateView
@@ -155,6 +162,14 @@ TemplateView
 
     **Autoclass methods**
 
+
+    .. note:: 
+    
+        Documentation on Class Based Views is a work in progress. The
+        following descriptions of methods and attributes are a work in progress
+        and will eventually subsume the **Methods and Attributes** described
+        above.
+
 RedirectView
 ~~~~~~~~~~~~
 .. autoclass:: django.views.generic.base.RedirectView
@@ -175,7 +190,7 @@ RedirectView
     
     **Classpath**
     
-    `django.views.generic.base.RedirectView`
+    ``django.views.generic.base.RedirectView``
     
     **Ancestors (MRO)**
     
@@ -261,3 +276,10 @@ RedirectView
         string.        
 
     **Autoclass methods**
+
+    .. note:: 
+    
+        Documentation on Class Based Views is a work in progress. The
+        following descriptions of methods and attributes are a work in progress
+        and will eventually subsume the **Methods and Attributes** described
+        above.

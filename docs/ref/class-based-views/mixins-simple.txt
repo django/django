@@ -10,7 +10,7 @@ ContextMixin
 
     **classpath**
     
-    `django.views.generic.base.ContextMixin`
+    ``django.views.generic.base.ContextMixin``
     
     **Methods**
 
@@ -33,7 +33,7 @@ TemplateResponseMixin
 
     **classpath**
     
-    `django.views.generic.base.TemplateResponseMixin`
+    ``django.views.generic.base.TemplateResponseMixin``
     
     **Methods and Attributes**
 
@@ -72,5 +72,9 @@ TemplateResponseMixin
         
     **Autodoc**        
     
-    .. comment: TODO migrate the documentation above into the existing codebase
-        so we can get rid of the **Autodoc** header there.
+    .. note:: 
+    
+        Documentation on Class Based Views is a work in progress. The
+        following descriptions of methods and attributes are a work in progress
+        and will eventually subsume the **Methods and Attributes** described
+        above.

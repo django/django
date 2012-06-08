@@ -267,5 +267,3 @@ BaseDateListView
         'year')`` will return the list of years for which ``qs`` has entries.
         See :meth:`~django.db.models.query.QuerySet.dates()` for the
         ways that the ``date_type`` argument can be used.
-
-

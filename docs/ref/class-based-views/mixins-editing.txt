@@ -6,7 +6,10 @@ Editing mixins
 
 FormMixin
 ~~~~~~~~~
-.. class:: FormMixin()
+.. autoclass:: django.views.generic.edit.FormMixin
+    :members:
+    :undoc-members:
+    :inherited-members:
 
     A mixin class that provides facilities for creating and displaying forms.
 
@@ -79,9 +82,22 @@ FormMixin
         provide an implementation of :meth:`.form_valid` and
         :meth:`.form_invalid`.
 
+    **Autodoc**
+    
+    .. note:: 
+    
+        Documentation on Class Based Views is a work in progress. The
+        following descriptions of methods and attributes are a work in progress
+        and will eventually subsume the **Methods and Attributes** described
+        above.
+
+
 ModelFormMixin
 ~~~~~~~~~~~~~~
-.. class:: ModelFormMixin()
+.. autoclass:: django.views.generic.edit.ModelFormMixin
+    :members:
+    :undoc-members:
+    :inherited-members:
 
     A form mixin that works on ModelForms, rather than a standalone form.
 
@@ -137,10 +153,22 @@ ModelFormMixin
     .. method:: form_invalid()
 
         Renders a response, providing the invalid form as context.
+        
+    **Autodoc**
+
+    .. note:: 
+    
+        Documentation on Class Based Views is a work in progress. The
+        following descriptions of methods and attributes are a work in progress
+        and will eventually subsume the **Methods and Attributes** described
+        above.
 
 ProcessFormView
 ~~~~~~~~~~~~~~~
-.. class:: ProcessFormView()
+.. autoclass:: django.views.generic.edit.ProcessFormView
+    :members:
+    :undoc-members:
+    :inherited-members:
 
     A mixin that provides basic HTTP GET and POST workflow.
 
@@ -158,9 +186,21 @@ ProcessFormView
 
     The PUT action is also handled, as an analog of POST.
 
+    **Autodoc**
+
+    .. note:: 
+    
+        Documentation on Class Based Views is a work in progress. The
+        following descriptions of methods and attributes are a work in progress
+        and will eventually subsume the **Methods and Attributes** described
+        above.
+
 DeletionMixin
 ~~~~~~~~~~~~~
-.. class:: DeletionMixin()
+.. autoclass:: django.views.generic.edit.DeletionMixin
+    :members:
+    :undoc-members:
+    :inherited-members:
 
     Enables handling of the ``DELETE`` http action.
 
@@ -177,3 +217,12 @@ DeletionMixin
         successfully deleted. Returns
         :attr:`~django.views.generic.edit.DeletionMixin.success_url` by
         default.
+
+    **Autodoc**
+
+    .. note:: 
+    
+        Documentation on Class Based Views is a work in progress. The
+        following descriptions of methods and attributes are a work in progress
+        and will eventually subsume the **Methods and Attributes** described
+        above.

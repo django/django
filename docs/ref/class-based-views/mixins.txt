@@ -4,11 +4,6 @@ Class Based Views mixins
 
 Class Based Views API reference. For introductory material, see :doc:`/topics/class-based-views/mixins`.
 
-A mixin class is a way of using the inheritance capabilities of
-classes to compose a class out of smaller pieces of behavior. Most of Django's
-class-based views are constructed by composing mixins into usable generic
-views.
-
 .. toctree::
    :maxdepth: 1
 

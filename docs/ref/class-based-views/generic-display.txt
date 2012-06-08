@@ -19,7 +19,7 @@ DetailView
     
     **Classpath**
     
-    `django.views.generic.detail.DetailView`
+    ``django.views.generic.detail.DetailView``
     
     **Ancestors (MRO)**
     
@@ -93,6 +93,10 @@ ListView
     While this view is executing, ``self.object_list`` will contain the list of
     objects (usually, but not necessarily a queryset) that the view is
     operating upon.
+
+    **Classpath**
+
+    ``django.views.generic.list.ListVieww``
 
     **Mixins**
 

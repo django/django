@@ -10,11 +10,13 @@ SingleObjectMixin
     :members:
     :undoc-members:
     :inherited-members:
-    
-    **Methods and Attributes**
 
     Provides a mechanism for looking up an object associated with the
     current HTTP request.
+
+    **Classpath**
+
+    ``django.views.generic.detail.SingleObjectMixin``
 
     **Methods and Attributes**
 
@@ -95,10 +97,14 @@ SingleObjectMixin
       ``context_object_name`` is specified, that variable will also be
       set in the context, with the same value as ``object``.
 
-     **Autodoc**
+    **Autodoc**
 
-     .. comment: TODO migrate the documentation above into the existing codebase
-         so we can get rid of the **Autodoc** header there.
+    .. note:: 
+
+        Documentation on Class Based Views is a work in progress. The
+        following descriptions of methods and attributes are a work in progress
+        and will eventually subsume the **Methods and Attributes** described
+        above.
 
 SingleObjectTemplateResponseMixin
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -114,6 +120,10 @@ SingleObjectTemplateResponseMixin
     operating on. ``self.object`` will usually be, but is not required to be,
     an instance of a Django model. It may be ``None`` if the view is in the
     process of constructing a new instance.
+    
+    **Classpath**
+    
+    ``django.views.generic.detail.SingleObjectTemplateResponseMixin``
 
     **Extends**
 
@@ -145,5 +155,9 @@ SingleObjectTemplateResponseMixin
 
     **Autodoc**
 
-    .. comment: TODO migrate the documentation above into the existing codebase
-        so we can get rid of the **Autodoc** header there.
+    .. note:: 
+
+        Documentation on Class Based Views is a work in progress. The
+        following descriptions of methods and attributes are a work in progress
+        and will eventually subsume the **Methods and Attributes** described
+        above.
