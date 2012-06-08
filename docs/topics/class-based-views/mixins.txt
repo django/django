@@ -4,6 +4,11 @@ Using Mixins with class based views
 
 .. versionadded:: 1.3
 
+.. caution::
+
+    This is an advanced topic. A working knowledge of Django's class
+    based views is advised before exploring these techniques.
+
 Django's built-in class based views provide a lot of functionality,
 but some of it you may want to use separately. For instance, you may
 want to write a view that renders a template to make the HTTP
@@ -28,7 +33,7 @@ Two central mixins are provided that help in providing a consistent
 interface to working with templates in class based views.
 
 :class:`~django.views.generic.base.TemplateResponseMixin`
-    Everywhere that wants to make a
+    Everywhere that needs to make a
     :class:`~django.template.response.TemplateResponse` will call the
     :meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`
     method that :class:`TemplateResponseMixin` provides.  Most of the time
@@ -384,10 +389,14 @@ increasingly complex as you try to do so, and a good rule of thumb is:
 
 .. hint::
 
-    Only use mixins or views from one of the groups of generic class
-    based views: :doc:`detail<generic-display>`,
-    :doc:`editing<generic-editing>` and
-    :doc:`date<generic-date-based>`.
+    Each of your views should use only mixins or views from one of the
+    groups of generic class based views: :doc:`detail,
+    list<generic-display>`, :doc:`editing<generic-editing>` and
+    :doc:`date<generic-date-based>`. For example it's fine to combine
+    :class:`TemplateView` (built in view) with
+    :class:`MultipleObjectMixin` (generic list), but you're likely to
+    have problems combining :class:`SingleObjectMixin` (generic
+    detail) with :class:`MultipleObjectMixin` (generic list).
 
 To show what happens when you try to get more sophisticated, we show
 an example that sacrifices readability and maintainability when there
@@ -432,6 +441,11 @@ code so that on ``POST`` the form gets called appropriately.
 Our new :class:`AuthorDetail` looks like this:
 
 .. code-block:: python
+
+    # CAUTION: you almost certainly do not want to do this.
+    # It is provided as part of a discussion of problems you can
+    # run into when combining different generic class based view
+    # functionality that is not designed to be used together.
 
     from django import forms
     from django.http import HttpResponseForbidden
