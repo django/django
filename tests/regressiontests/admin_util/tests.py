@@ -272,7 +272,7 @@ class UtilTests(unittest.TestCase):
         self.assertEqual(helpers.AdminField(form, 'text', is_first=False).label_tag(),
                          '<label for="id_text" class="required inline"><i>text</i>:</label>')
         self.assertEqual(helpers.AdminField(form, 'cb', is_first=False).label_tag(),
-                         '<label for="id_cb" class="vCheckboxLabel required inline"><i>cb</i></label>')
+                         '<label for="id_cb" class="vCheckboxLabel required inline"><i>cb</i>:</label>')
 
         # normal strings needs to be escaped
         class MyForm(forms.Form):
@@ -283,4 +283,4 @@ class UtilTests(unittest.TestCase):
         self.assertEqual(helpers.AdminField(form, 'text', is_first=False).label_tag(),
                          '<label for="id_text" class="required inline">&amp;text:</label>')
         self.assertEqual(helpers.AdminField(form, 'cb', is_first=False).label_tag(),
-                         '<label for="id_cb" class="vCheckboxLabel required inline">&amp;cb</label>')
+                         '<label for="id_cb" class="vCheckboxLabel required inline">&amp;cb:</label>')
