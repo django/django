@@ -498,6 +498,8 @@ include ``%s`` -- then the library will act as if ``auto_id`` is ``True``.
 
 By default, ``auto_id`` is set to the string ``'id_%s'``.
 
+.. attribute:: Form.label_suffix
+
 Normally, a colon (``:``) will be appended after any label name when a form is
 rendered. It's possible to change the colon to another character, or omit it
 entirely, using the ``label_suffix`` parameter::
@@ -650,11 +652,16 @@ To separately render the label tag of a form field, you can call its
 
     >>> f = ContactForm(data)
     >>> print(f['message'].label_tag())
-    <label for="id_message">Message</label>
+    <label for="id_message">Message:</label>
 
 Optionally, you can provide the ``contents`` parameter which will replace the
 auto-generated label tag. An optional ``attrs`` dictionary may contain
 additional attributes for the ``<label>`` tag.
+
+.. versionchanged:: 1.6
+
+    The label now includes the form's :attr:`~django.forms.Form.label_suffix`
+    (a semicolon, by default).
 
 .. method:: BoundField.css_classes()
 
