@@ -224,8 +224,10 @@ class ProxyModelTests(TestCase):
         signals.post_save.disconnect(h6, sender=MyPersonProxy)
 
     def test_content_type(self):
+        # A model and a proxy of this model do not
+        # share the same ContentType see #17648
         ctype = ContentType.objects.get_for_model
-        self.assertTrue(ctype(Person) is ctype(OtherPerson))
+        self.assertFalse(ctype(Person) is ctype(OtherPerson))
 
     def test_user_userproxy_userproxyproxy(self):
         User.objects.create(name='Bruce')

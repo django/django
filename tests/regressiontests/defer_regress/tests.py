@@ -169,6 +169,14 @@ class DeferRegressionTest(TestCase):
         self.assertEqual(dp.name, proxy.name, msg=msg)
         self.assertEqual(dp.value, proxy.value, msg=msg)
 
+        # Instances of proxy models with deferred fields should
+        # return the content type of the proxy model (bug #17648)
+        ctype = ContentType.objects.get_for_model
+        c1 = ctype(Proxy.objects.all()[0])
+        c2 = ctype(Proxy.objects.defer("name")[0])
+        c3 = ctype(Proxy.objects.only("name")[0])
+        self.assertTrue(c1 is c2 is c3)
+
     def test_resolve_columns(self):
         rt = ResolveThis.objects.create(num=5.0, name='Foobar')
         qs = ResolveThis.objects.defer('num')
