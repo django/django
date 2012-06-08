@@ -2,10 +2,6 @@
 Generic Display Class Based Views
 ====================================
 
-
-Display views
---------------
-
 The two following generic class based views are designed to display data. On
 many projects they are typically the most commonly used views.
 
@@ -100,7 +96,7 @@ ListView
 
     **Mixins**
 
-    * :class:`django.views.generic.list.MultipleObjectMixin`
+    * :class:`django.views.generic.list.ListView`
     * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
     * :class:`django.views.generic.base.TemplateResponseMixin`
     * :class:`django.views.generic.list.BaseListView`

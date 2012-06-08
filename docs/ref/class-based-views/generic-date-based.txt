@@ -15,11 +15,17 @@ ArchiveIndexView
     a date in the *future* are not included unless you set ``allow_future`` to
     ``True``.
 
-    **Mixins**
+    **Ancestors (MRO)**
 
-    * :class:`django.views.generic.dates.BaseDateListView`
+    * :class:`django.views.generic.dates.ArchiveIndexView`
     * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
-
+    * :class:`django.views.generic.base.TemplateResponseMixin`
+    * :class:`django.views.generic.dates.BaseArchiveIndexView`
+    * :class:`django.views.generic.dates.BaseDateListView`
+    * :class:`django.views.generic.list.MultipleObjectMixin`
+    * :class:`django.views.generic.dates.DateMixin`
+    * :class:`django.views.generic.base.View`
+    
     **Notes**
 
     * Uses a default ``context_object_name`` of ``latest``.
@@ -33,11 +39,17 @@ YearArchiveView
     with a date in the *future* are not displayed unless you set
     ``allow_future`` to ``True``.
 
-    **Mixins**
+    **Ancestors (MRO)**
 
+    * :class:`django.views.generic.dates.YearArchiveView`
     * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
+    * :class:`django.views.generic.base.TemplateResponseMixin`
+    * :class:`django.views.generic.dates.BaseYearArchiveView`
     * :class:`django.views.generic.dates.YearMixin`
     * :class:`django.views.generic.dates.BaseDateListView`
+    * :class:`django.views.generic.list.MultipleObjectMixin`
+    * :class:`django.views.generic.dates.DateMixin`
+    * :class:`django.views.generic.base.View`
 
     .. attribute:: make_object_list
 
@@ -84,12 +96,18 @@ MonthArchiveView
     date in the *future* are not displayed unless you set ``allow_future`` to
     ``True``.
 
-    **Mixins**
+    **Ancestors (MRO)**
 
+    * :class:`django.views.generic.dates.MonthArchiveView`
     * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
+    * :class:`django.views.generic.base.TemplateResponseMixin`
+    * :class:`django.views.generic.dates.BaseMonthArchiveView`
     * :class:`django.views.generic.dates.YearMixin`
     * :class:`django.views.generic.dates.MonthMixin`
     * :class:`django.views.generic.dates.BaseDateListView`
+    * :class:`django.views.generic.list.MultipleObjectMixin`
+    * :class:`django.views.generic.dates.DateMixin`
+    * :class:`django.views.generic.base.View`
 
     **Context**
 
@@ -124,12 +142,18 @@ WeekArchiveView
     date in the *future* are not displayed unless you set ``allow_future`` to
     ``True``.
 
-    **Mixins**
+    **Ancestors (MRO)**
 
+    * :class:`django.views.generic.dates.WeekArchiveView`
     * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
+    * :class:`django.views.generic.base.TemplateResponseMixin`
+    * :class:`django.views.generic.dates.BaseWeekArchiveView`
     * :class:`django.views.generic.dates.YearMixin`
-    * :class:`django.views.generic.dates.MonthMixin`
+    * :class:`django.views.generic.dates.WeekMixin`
     * :class:`django.views.generic.dates.BaseDateListView`
+    * :class:`django.views.generic.list.MultipleObjectMixin`
+    * :class:`django.views.generic.dates.DateMixin`
+    * :class:`django.views.generic.base.View`
 
     **Context**
 
@@ -161,13 +185,19 @@ DayArchiveView
     throw a 404 error, regardless of whether any objects exist for future days,
     unless you set ``allow_future`` to ``True``.
 
-    **Mixins**
+    **Ancestors (MRO)**
 
+    * :class:`django.views.generic.dates.DayArchiveView`
     * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
+    * :class:`django.views.generic.base.TemplateResponseMixin`
+    * :class:`django.views.generic.dates.BaseDayArchiveView`
     * :class:`django.views.generic.dates.YearMixin`
     * :class:`django.views.generic.dates.MonthMixin`
     * :class:`django.views.generic.dates.DayMixin`
     * :class:`django.views.generic.dates.BaseDateListView`
+    * :class:`django.views.generic.list.MultipleObjectMixin`
+    * :class:`django.views.generic.dates.DateMixin`
+    * :class:`django.views.generic.base.View`
 
     **Context**
 
@@ -204,10 +234,20 @@ TodayArchiveView
     same as :class:`django.views.generic.dates.DayArchiveView`, except today's
     date is used instead of the ``year``/``month``/``day`` arguments.
 
-    **Mixins**
+    **Ancestors (MRO)**
 
+    * :class:`django.views.generic.dates.TodayArchiveView`
     * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
+    * :class:`django.views.generic.base.TemplateResponseMixin`
+    * :class:`django.views.generic.dates.BaseTodayArchiveView`
     * :class:`django.views.generic.dates.BaseDayArchiveView`
+    * :class:`django.views.generic.dates.YearMixin`
+    * :class:`django.views.generic.dates.MonthMixin`
+    * :class:`django.views.generic.dates.DayMixin`
+    * :class:`django.views.generic.dates.BaseDateListView`
+    * :class:`django.views.generic.list.MultipleObjectMixin`
+    * :class:`django.views.generic.dates.DateMixin`
+    * :class:`django.views.generic.base.View`
 
 DateDetailView
 ~~~~~~~~~~~~~~
@@ -217,14 +257,19 @@ DateDetailView
     the future, the view will throw a 404 error by default, unless you set
     ``allow_future`` to ``True``.
 
-    **Mixins**
+    **Ancestors (MRO)**
 
+    * :class:`django.views.generic.dates.DateDetailView`
     * :class:`django.views.generic.detail.SingleObjectTemplateResponseMixin`
-    * :class:`django.views.generic.detail.BaseDetailView`
-    * :class:`django.views.generic.dates.DateMixin`
+    * :class:`django.views.generic.base.TemplateResponseMixin`
+    * :class:`django.views.generic.dates.BaseDateDetailView`
     * :class:`django.views.generic.dates.YearMixin`
     * :class:`django.views.generic.dates.MonthMixin`
     * :class:`django.views.generic.dates.DayMixin`
+    * :class:`django.views.generic.dates.DateMixin`
+    * :class:`django.views.generic.detail.BaseDetailView`
+    * :class:`django.views.generic.detail.SingleObjectMixin`
+    * :class:`django.views.generic.base.View`
 
 .. note:: All of the generic views listed above have matching Base* views that only
     differ in that the they do not include the :class:`~django.views.generic.detail.SingleObjectTemplateResponseMixin`.
