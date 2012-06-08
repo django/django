@@ -2,6 +2,9 @@
 Generic Editing Class Based Views
 ====================================
 
+The views described here provide a foundation for editing content.
+
+
 .. currentmodule:: django.views.generic.edit
 
 FormView
@@ -14,10 +17,12 @@ FormView
     A view that displays a form. On error, redisplays the form with validation
     errors; on success, redirects to a new URL.
 
-    **Mixins**
+    **Ancestors (MRO)**
 
     * :class:`django.views.generic.edit.FormMixin`
     * :class:`django.views.generic.edit.ProcessFormView`
+    
+    **Methods and Attributes**
 
 CreateView
 ~~~~~~~~~~
@@ -29,10 +34,12 @@ CreateView
     A view that displays a form for creating an object, redisplaying the form
     with validation errors (if there are any) and saving the object.
 
-    **Mixins**
+    **Ancestors (MRO)**
 
     * :class:`django.views.generic.edit.ModelFormMixin`
     * :class:`django.views.generic.edit.ProcessFormView`
+    
+    **Methods and Attributes**
 
 UpdateView
 ~~~~~~~~~~
@@ -46,10 +53,12 @@ UpdateView
     the object. This uses a form automatically generated from the object's
     model class (unless a form class is manually specified).
 
-    **Mixins**
+    **Ancestors (MRO)**
 
     * :class:`django.views.generic.edit.ModelFormMixin`
     * :class:`django.views.generic.edit.ProcessFormView`
+    
+    **Methods and Attributes**
 
 DeleteView
 ~~~~~~~~~~
@@ -63,7 +72,7 @@ DeleteView
     this view is fetched via ``GET``, it will display a confirmation page that
     should contain a form that POSTs to the same URL.
 
-    **Mixins**
+    **Ancestors (MRO)**
 
     * :class:`django.views.generic.edit.DeletionMixin`
     * :class:`django.views.generic.detail.BaseDetailView`
@@ -72,3 +81,5 @@ DeleteView
 
     * The delete confirmation page displayed to a GET request uses a
       ``template_name_suffix`` of ``'_confirm_delete'``.
+      
+    **Methods and Attributes**

@@ -15,7 +15,7 @@ ArchiveIndexView
     a date in the *future* are not included unless you set ``allow_future`` to
     ``True``.
 
-    **Mixins**
+    **Ancestors (MRO)**
 
     * :class:`django.views.generic.dates.BaseDateListView`
     * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
@@ -33,7 +33,7 @@ YearArchiveView
     with a date in the *future* are not displayed unless you set
     ``allow_future`` to ``True``.
 
-    **Mixins**
+    **Ancestors (MRO)**
 
     * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
     * :class:`django.views.generic.dates.YearMixin`
@@ -84,7 +84,7 @@ MonthArchiveView
     date in the *future* are not displayed unless you set ``allow_future`` to
     ``True``.
 
-    **Mixins**
+    **Ancestors (MRO)**
 
     * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
     * :class:`django.views.generic.dates.YearMixin`
@@ -124,7 +124,7 @@ WeekArchiveView
     date in the *future* are not displayed unless you set ``allow_future`` to
     ``True``.
 
-    **Mixins**
+    **Ancestors (MRO)**
 
     * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
     * :class:`django.views.generic.dates.YearMixin`
@@ -161,7 +161,7 @@ DayArchiveView
     throw a 404 error, regardless of whether any objects exist for future days,
     unless you set ``allow_future`` to ``True``.
 
-    **Mixins**
+    **Ancestors (MRO)**
 
     * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
     * :class:`django.views.generic.dates.YearMixin`
@@ -204,7 +204,7 @@ TodayArchiveView
     same as :class:`django.views.generic.dates.DayArchiveView`, except today's
     date is used instead of the ``year``/``month``/``day`` arguments.
 
-    **Mixins**
+    **Ancestors (MRO)**
 
     * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
     * :class:`django.views.generic.dates.BaseDayArchiveView`
@@ -217,7 +217,7 @@ DateDetailView
     the future, the view will throw a 404 error by default, unless you set
     ``allow_future`` to ``True``.
 
-    **Mixins**
+    **Ancestors (MRO)**
 
     * :class:`django.views.generic.detail.SingleObjectTemplateResponseMixin`
     * :class:`django.views.generic.detail.BaseDetailView`
