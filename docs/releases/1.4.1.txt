@@ -1,0 +1,9 @@
+==========================
+Django 1.4.1 release notes
+==========================
+
+Fixed behaviour of RemoteUserMiddleware: force logout when the
+REMOTE_USER header disappears during a same browser session.
+
+.. _bug: https://code.djangoproject.com/ticket/17869
+
