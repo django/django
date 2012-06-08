@@ -29,6 +29,7 @@ The PRIMARY AUTHORS are (and/or have been):
     * Julien Phalip
     * Aymeric Augustin
     * Claude Paroz
+    * Anssi Kääriäinen
 
 More information on the main contributors to Django can be found in
 docs/internals/committers.txt.
@@ -276,7 +277,6 @@ answer newbie questions, and generally made Django that much better:
     jpellerin@gmail.com
     junzhang.jn@gmail.com
     Xia Kai <http://blog.xiaket.org/>
-    Anssi Kääriäinen
     Antti Kaihola <http://djangopeople.net/akaihola/>
     Peter van Kampen
     Bahadır Kandemir <bahadir@pardus.org.tr>
