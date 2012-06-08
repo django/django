@@ -108,7 +108,7 @@ The view layer
 * **Class based views:**
   :doc:`Overview<topics/class-based-views/index>` |
   :doc:`Built-in class-based views<ref/class-based-views/index>` |
-  :doc:`Built-in view mixins<ref/class-based-view-mixins>`
+  :doc:`Built-in view mixins<ref/class-based-views/mixins>`
 
 * **Advanced:**
   :doc:`Generating CSV <howto/outputting-csv>` |

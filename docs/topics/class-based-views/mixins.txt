@@ -19,7 +19,7 @@ more discrete functionality. Template rendering, for instance, is
 encapsulated in the
 :class:`~django.views.generic.base.TemplateResponseMixin`. The Django
 reference documentation contains :doc:`full documentation of all the
-mixins</ref/class-based-view-mixins>`.
+mixins</ref/class-based-views/mixins>`.
 
 Context and template responses
 ==============================
@@ -83,7 +83,7 @@ views :class:`~django.views.generic.edit.CreateView`,
 :class:`~django.views.generic.edit.DeleteView`), and in the
 :doc:`date-based generic views<generic-date-based>`. These are
 covered in the :doc:`mixin reference
-documentation</ref/class-based-view-mixins>`.
+documentation</ref/class-based-views/mixins>`.
 
 DetailView: working with a single Django object
 -----------------------------------------------
@@ -190,7 +190,7 @@ the box.
 
     The reference documentation for Django's :doc:`class based
     views</ref/class-based-views/index>` and :doc:`class based view
-    mixins</ref/class-based-view-mixins>` will help you in
+    mixins</ref/class-based-views/mixins>` will help you in
     understanding which attributes and methods are likely to cause
     conflict between different classes and mixins.
 
