@@ -155,7 +155,7 @@ the current user or to exclude posts in the future for a blog.
 :class:`MultipleObjectMixin` also overrides
 :meth:`~django.views.generic.base.ContextMixin.get_context_data` to
 include appropriate context variables for pagination (providing
-dummies if paginated is disabled). It relies on ``object_list`` being
+dummies if pagination is disabled). It relies on ``object_list`` being
 passed in as a keyword argument, which :class:`ListView` arranges for
 it.
 
