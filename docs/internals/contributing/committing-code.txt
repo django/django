@@ -76,6 +76,12 @@ checkout the branch and work from there::
     git remote add <contributor> https://github.com/<contributor>/django.git
     git checkout pull_xxxxx <contributor> <contributor's pull request branch>
 
+Yet another alternative is to fetch the branch without adding the
+contributor's repository as a remote::
+
+    git fetch https://github.com/<contributor>/django.git
+    git checkout -b pull_xxxxx FETCH_HEAD
+
 At this point, you can work on the code and continue as above.
 
 GitHub provides a one-click merge functionality for pull requests. This should
