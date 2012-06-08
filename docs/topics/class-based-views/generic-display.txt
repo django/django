@@ -365,6 +365,8 @@ use it in the template::
             context['publisher'] = self.publisher
             return context
 
+.. _generic-views-extra-work:
+
 Performing extra work
 ---------------------
 
