@@ -40,6 +40,30 @@ Taken together, these views provide easy interfaces to perform the most common
 tasks developers encounter.
 
 
+Extending generic views
+=======================
+
+There's no question that using generic views can speed up development
+substantially. In most projects, however, there comes a moment when the
+generic views no longer suffice. Indeed, the most common question asked by new
+Django developers is how to make generic views handle a wider array of
+situations.
+
+This is one of the reasons generic views were redesigned for the 1.3 release -
+previously, they were just view functions with a bewildering array of options;
+now, rather than passing in a large amount of configuration in the URLconf,
+the recommended way to extend generic views is to subclass them, and override
+their attributes or methods.
+
+That said, generic views will have a limit. If you find you're struggling to
+implement your view as a subclass of a generic view, then you may find it more
+effective to write just the code you need, using your own class based or
+functional views.
+
+More examples of generic views are available in some third party applications,
+or you could write your own as needed.
+
+
 Generic views of objects
 ========================
 
@@ -49,8 +73,14 @@ database content. Because it's such a common task, Django comes with a handful
 of built-in generic views that make generating list and detail views of objects
 incredibly easy.
 
-Let's take a look at one of these generic views: the "object list" view. We'll
-be using these models::
+Let's start by looking at some examples of showing a list of objects or an
+individual object.
+
+.. todo::
+
+    link here to the other topic pages (form handling, date based, mixins)
+
+We'll be using these models::
 
     # models.py
     from django.db import models
@@ -128,53 +158,33 @@ generic views and their options in detail; the rest of this document will
 consider some of the common ways you might customize and extend generic views.
 
 
-Extending generic views
-=======================
-
-.. highlightlang:: python
-
-There's no question that using generic views can speed up development
-substantially. In most projects, however, there comes a moment when the
-generic views no longer suffice. Indeed, the most common question asked by new
-Django developers is how to make generic views handle a wider array of
-situations.
-
-This is one of the reasons generic views were redesigned for the 1.3 release -
-previously, they were just view functions with a bewildering array of options;
-now, rather than passing in a large amount of configuration in the URLconf,
-the recommended way to extend generic views is to subclass them, and override
-their attributes or methods.
-
-
 Making "friendly" template contexts
 -----------------------------------
 
-You might have noticed that our sample publisher list template stores
-all the publishers in a variable named ``object_list``. While this
-works just fine, it isn't all that "friendly" to template authors:
-they have to "just know" that they're dealing with publishers here.
+.. highlightlang:: python
 
-Well, if you're dealing with a model object, this is already done for
-you. When you are dealing with an object or queryset, Django is able
-to populate the context using the verbose name (or the plural verbose
-name, in the case of a list of objects) of the object being displayed.
-This is provided in addition to the default ``object_list`` entry, but
-contains exactly the same data.
+You might have noticed that our sample publisher list template stores all the
+publishers in a variable named ``object_list``. While this works just fine, it
+isn't all that "friendly" to template authors: they have to "just know" that
+they're dealing with publishers here.
 
-If the verbose name (or plural verbose name) still isn't a good match,
-you can manually set the name of the context variable. The
-``context_object_name`` attribute on a generic view specifies the
-context variable to use. In this example, we'll override it in the
-URLconf, since it's a simple change:
+Well, if you're dealing with a model object, this is already done for you. When
+you are dealing with an object or queryset, Django is able to populate the
+context using the lower cased version of the model class' name. This is
+provided in addition to the default ``object_list`` entry, but contains exactly
+the same data, i.e. ``publisher_list``.
 
-.. parsed-literal::
+If the this still isn't a good match, you can manually set the name of the
+context variable. The ``context_object_name`` attribute on a generic view
+specifies the context variable to use::
 
-    urlpatterns = patterns('',
-        (r'^publishers/$', ListView.as_view(
-            model=Publisher,
-            **context_object_name="publisher_list",**
-        )),
-    )
+    # views.py
+    from django.views.generic import ListView
+    from books.models import Publisher
+
+    class PublisherList(ListView):
+        model = Publisher
+        context_object_name = 'my_favourite_publishers'
 
 Providing a useful ``context_object_name`` is always a good idea. Your
 coworkers who design templates will thank you.
@@ -187,23 +197,22 @@ Often you simply need to present some extra information beyond that
 provided by the generic view. For example, think of showing a list of
 all the books on each publisher detail page. The
 :class:`~django.views.generic.detail.DetailView` generic view provides
-the publisher to the context, but it seems there's no way to get
-additional information in that template.
+the publisher to the context, but how do we get additional information
+in that template.
 
 However, there is; you can subclass
 :class:`~django.views.generic.detail.DetailView` and provide your own
 implementation of the ``get_context_data`` method. The default
 implementation of this that comes with
 :class:`~django.views.generic.detail.DetailView` simply adds in the
-object being displayed to the template, but you can override it to show
+object being displayed to the template, but you can override it to send
 more::
 
     from django.views.generic import DetailView
     from books.models import Publisher, Book
 
-    class PublisherDetailView(DetailView):
+    class PublisherDetail(DetailView):
 
-        context_object_name = "publisher"
         model = Publisher
 
         def get_context_data(self, **kwargs):
@@ -222,7 +231,8 @@ more::
     key, this will give the expected results. However if any class attempts to
     override a key after parent classes have set it (after the call to super), any
     children of that class will also need to explictly set it after super if they
-    want to be sure to override all parents.
+    want to be sure to override all parents. If you're having trouble, review
+    the method resolution order of your view.
 
 .. _generic-views-list-subsets:
 
@@ -240,9 +250,9 @@ specify the list of objects using the ``queryset`` argument::
     from django.views.generic import DetailView
     from books.models import Publisher, Book
 
-    class PublisherDetailView(DetailView):
+    class PublisherDetail(DetailView):
 
-        context_object_name = "publisher"
+        context_object_name = 'publisher'
         queryset = Publisher.objects.all()
 
 Specifying ``model = Publisher`` is really just shorthand for saying
@@ -256,32 +266,26 @@ complete details).
 To pick a simple example, we might want to order a list of books by
 publication date, with the most recent first::
 
-    urlpatterns = patterns('',
-        (r'^publishers/$', ListView.as_view(
-            queryset=Publisher.objects.all(),
-            context_object_name="publisher_list",
-        )),
-        (r'^books/$', ListView.as_view(
-            queryset=Book.objects.order_by("-publication_date"),
-            context_object_name="book_list",
-        )),
-    )
+    from django.views.generic import ListView
+    from books.models import Book
 
+    class BookList(ListView):
+        queryset = Book.objects.order_by('-publication_date')
+        context_object_name = 'book_list'
 
 That's a pretty simple example, but it illustrates the idea nicely. Of course,
 you'll usually want to do more than just reorder objects. If you want to
 present a list of books by a particular publisher, you can use the same
-technique (here, illustrated using subclassing rather than by passing arguments
-in the URLconf)::
+technique::
 
     from django.views.generic import ListView
     from books.models import Book
 
     class AcmeBookListView(ListView):
 
-        context_object_name = "book_list"
-        queryset = Book.objects.filter(publisher__name="Acme Publishing")
-        template_name = "books/acme_list.html"
+        context_object_name = 'book_list'
+        queryset = Book.objects.filter(publisher__name='Acme Publishing')
+        template_name = 'books/acme_list.html'
 
 Notice that along with a filtered ``queryset``, we're also using a custom
 template name. If we didn't, the generic view would use the same template as the
@@ -321,26 +325,27 @@ various useful things are stored on ``self``; as well as the request
 
 Here, we have a URLconf with a single captured group::
 
-    from books.views import PublisherBookListView
+    # urls.py
+    from books.views import PublisherBookList
 
     urlpatterns = patterns('',
-        (r'^books/(\w+)/$', PublisherBookListView.as_view()),
+        (r'^books/([\w-]+)/$', PublisherBookList.as_view()),
     )
 
-Next, we'll write the ``PublisherBookListView`` view itself::
+Next, we'll write the ``PublisherBookList`` view itself::
 
+    # views.py
     from django.shortcuts import get_object_or_404
     from django.views.generic import ListView
     from books.models import Book, Publisher
 
-    class PublisherBookListView(ListView):
+    class PublisherBookList(ListView):
 
-        context_object_name = "book_list"
-        template_name = "books/books_by_publisher.html"
+        template_name = 'books/books_by_publisher.html'
 
         def get_queryset(self):
-            publisher = get_object_or_404(Publisher, name__iexact=self.args[0])
-            return Book.objects.filter(publisher=publisher)
+            self.publisher = get_object_or_404(Publisher, name=self.args[0])
+            return Book.objects.filter(publisher=self.publisher)
 
 As you can see, it's quite easy to add more logic to the queryset selection;
 if we wanted, we could use ``self.request.user`` to filter using the current
@@ -349,14 +354,7 @@ user, or other more complex logic.
 We can also add the publisher into the context at the same time, so we can
 use it in the template::
 
-    class PublisherBookListView(ListView):
-
-        context_object_name = "book_list"
-        template_name = "books/books_by_publisher.html"
-
-        def get_queryset(self):
-            self.publisher = get_object_or_404(Publisher, name__iexact=self.args[0])
-            return Book.objects.filter(publisher=self.publisher)
+        # ...
 
         def get_context_data(self, **kwargs):
             # Call the base implementation first to get a context
@@ -380,8 +378,7 @@ using to keep track of the last time anybody looked at that author::
 
     class Author(models.Model):
         salutation = models.CharField(max_length=10)
-        first_name = models.CharField(max_length=30)
-        last_name = models.CharField(max_length=40)
+        name = models.CharField(max_length=200)
         email = models.EmailField()
         headshot = models.ImageField(upload_to='/tmp')
         last_accessed = models.DateTimeField()
@@ -409,10 +406,10 @@ custom view:
 Then we'd write our new view -- ``get_object`` is the method that retrieves the
 object -- so we simply override it and wrap the call::
 
-    import datetime
-    from books.models import Author
     from django.views.generic import DetailView
     from django.shortcuts import get_object_or_404
+    from django.utils import timezone
+    from books.models import Author
 
     class AuthorDetailView(DetailView):
 
@@ -422,15 +419,10 @@ object -- so we simply override it and wrap the call::
             # Call the superclass
             object = super(AuthorDetailView, self).get_object()
             # Record the last accessed date
-            object.last_accessed = datetime.datetime.now()
+            object.last_accessed = timezone.now()
             object.save()
             # Return the object
             return object
-
-.. note::
-
-    This code won't actually work unless you create a
-    ``books/author_detail.html`` template.
 
 .. note::
 
@@ -438,5 +430,6 @@ object -- so we simply override it and wrap the call::
     name that ``DetailView`` uses to find the value of the primary key used to
     filter the queryset.
 
-    If you want to change it, you'll need to do your own ``get()`` call
-    on ``self.queryset`` using the new named parameter from ``self.kwargs``.
+    If you want to call the group something else, you can set ``pk_url_kwarg``
+    on the view. More details can be found in the reference for
+    ``~django.views.generic.detail.DetailView``
