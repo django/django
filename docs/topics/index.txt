@@ -12,6 +12,10 @@ Introductions to all the key parts of Django you'll need to know:
    forms/index
    templates
    class-based-views
+   generic-class-based-views
+   date-based-generic-views
+   form-handling-class-based-views
+   mixins-class-based-views
    files
    testing
    auth

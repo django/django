@@ -25,7 +25,7 @@ a response.
 Django provides a range of mixins. If you want to write your own
 generic views, you can build classes that compose these mixins in
 interesting ways. Alternatively, you can just use the pre-mixed
-`Generic views`_ that Django provides.
+:ref:`Generic views` that Django provides.
 
 .. note::
 
@@ -36,6 +36,15 @@ Simple mixins
 -------------
 
 .. currentmodule:: django.views.generic.base
+
+ContextMixin
+~~~~~~~~~~~~~~~~~~~~~
+.. class:: ContextMixin()
+
+    .. method:: get_context_data(**kwargs)
+
+        Returns a dictionary representing the template context. The
+        keyword arguments provided will make up the returned context.
 
 TemplateResponseMixin
 ~~~~~~~~~~~~~~~~~~~~~

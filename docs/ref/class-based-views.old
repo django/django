@@ -1,69 +1,113 @@
-=========================
-Class-based generic views
-=========================
+=================
+Class-based views
+=================
 
 .. versionadded:: 1.3
 
 .. note::
-    Prior to Django 1.3, generic views were implemented as functions. The
+    Prior to Django 1.3, class based views were implemented as functions. The
     function-based implementation has been removed in favor of the
     class-based approach described here.
+
 
 Writing Web applications can be monotonous, because we repeat certain patterns
 again and again. Django tries to take away some of that monotony at the model
 and template layers, but Web developers also experience this boredom at the view
 level.
 
-A general introduction to class-based generic views can be found in the
+A general introduction to class-based views can be found in the
 :doc:`topic guide </topics/class-based-views>`.
 
-This reference contains details of Django's built-in generic views, along with
-a list of the keyword arguments that each generic view expects. Remember that
+This reference contains details of Django's built-in class based views, along with
+a list of the keyword arguments that each class based view expects. Remember that
 arguments may either come from the URL pattern or from the ``extra_context``
 additional-information dictionary.
 
-Most generic views require the ``queryset`` key, which is a ``QuerySet``
-instance; see :doc:`/topics/db/queries` for more information about ``QuerySet``
-objects.
+Fundamental class based views
+=============================
 
-Generic views
-=============
+The following three classes provide much of the functionality needed to create
+Django views. You may think of them as *base* views, which can be used by
+themselves or inherited from.  They may not provide all the capabilities required
+for projects, in which case there are Mixins and Generic class based views.
 
-Simple generic views
---------------------
+Specification
+-------------
+
+Each request served by a class based view has an independent state; therefore,
+it is safe to store state variables on the instance (i.e., ``self.foo = 3`` is
+a thread-safe operation).
+
+A class-based view is deployed into a URL pattern using the
+:meth:`~View.as_view()` classmethod::
+
+    urlpatterns = patterns('',
+            (r'^view/$', MyView.as_view(size=42)),
+        )
+
+.. admonition:: Thread safety with view arguments
+
+    Arguments passed to a view are shared between every instance of a view.
+    This means that you shoudn't use a list, dictionary, or any other
+    variable object as an argument to a view. If you did, the actions of
+    one user visiting your view could have an effect on subsequent users
+    visiting the same view.
+
+Any argument passed into :meth:`~View.as_view()` will be assigned onto the
+instance that is used to service a request. Using the previous example,
+this means that every request on ``MyView`` is able to interrogate
+``self.size``.
 
 .. currentmodule:: django.views.generic.base
 
+
+
 View
 ~~~~
-.. class:: View()
+.. autoclass:: django.views.generic.base.View
+    :members:
+    :undoc-members:
+    :inherited-members:
 
-    The master class-based base view. All other generic class-based views
-    inherit from this base class.
+    The master class-based base view. All other class-based views inherit from
+    this base class.
+    
+    **Classpath**
 
-    Each request served by a :class:`~django.views.generic.base.View` has an
-    independent state; therefore, it is safe to store state variables on the
-    instance (i.e., ``self.foo = 3`` is a thread-safe operation).
+    ``django.views.generic.base.View``
+    
+    **Method Flowchart**
 
-    A class-based view is deployed into a URL pattern using the
-    :meth:`~View.as_view()` classmethod::
+        1. dispatch()
+        2. http_method_not_allowed()
 
-        urlpatterns = patterns('',
-                (r'^view/$', MyView.as_view(size=42)),
-            )
 
-    Any argument passed into :meth:`~View.as_view()` will be assigned onto the
-    instance that is used to service a request. Using the previous example,
-    this means that every request on ``MyView`` is able to interrogate
-    ``self.size``.
+    **Example views.py**::
 
-    .. admonition:: Thread safety with view arguments
+        from django.http import HttpResponse
+        from django.views.generic import View
 
-        Arguments passed to a view are shared between every instance of a view.
-        This means that you shoudn't use a list, dictionary, or any other
-        variable object as an argument to a view. If you did, the actions of
-        one user visiting your view could have an effect on subsequent users
-        visiting the same view.
+        class MyView(View):
+
+            def get(self, request, *args, **kwargs):
+                return HttpResponse('Hello, World!')
+
+    **Example urls.py**::
+    
+        from django.conf.urls.defaults import patterns, url
+        
+        from myapp.views import MyView
+        
+        urlpatterns = patterns("",
+
+            url(
+                regex   = r"^mine/$",
+                view    = MyView.as_view(),
+                name    = "my_view",
+            ),
+        )
+        
+    **Methods**
 
     .. method:: dispatch(request, *args, **kwargs)
 
@@ -85,18 +129,66 @@ View
         is called instead.
 
         The default implementation returns ``HttpResponseNotAllowed`` with list
-        of allowed methods in plain text.
+        of allowed methods in plain text.   
+        
+    **Autoclass methods**
 
 TemplateView
 ~~~~~~~~~~~~
-.. class:: TemplateView()
+.. autoclass:: django.views.generic.base.TemplateView
+    :members:
+    :undoc-members:
+    :inherited-members:
 
     Renders a given template, passing it a ``{{ params }}`` template variable,
     which is a dictionary of the parameters captured in the URL.
+    
+    **Classpath**
+    
+    ``django.views.generic.base.TemplateView``    
 
-    **Mixins**
+    **Ancestors (MRO)**
 
     * :class:`django.views.generic.base.TemplateResponseMixin`
+    * :class:`django.views.generic.base.View`
+    
+    **Method Flowchart**
+
+        1. dispatch()
+        2. http_method_not_allowed()
+        3. get_context_data()
+      
+    **Example views.py**::
+
+        from django.views.generic.base import TemplateView
+        
+        from articles.models import Article
+
+        class HomePageView(TemplateView):
+
+            template_name = "home.html"
+            
+            def get_context_data(self, **kwargs):
+                context = super(HomePageView, self).get_context_data(**kwargs)
+                context['latest_articles'] = Article.objects.all()[:5]
+                return context
+                
+    **Example urls.py**::
+
+        from django.conf.urls.defaults import patterns, url
+
+        from myapp.views import HomePageView
+
+        urlpatterns = patterns("",
+
+            url(
+                regex   = r"^$",
+                view    = HomePageView.as_view(),
+                name    = "home",
+            ),
+        )
+
+    **Methods and Attributes**
 
     .. attribute:: template_name
 
@@ -112,9 +204,14 @@ TemplateView
     * ``params``: The dictionary of keyword arguments captured from the URL
       pattern that served the view.
 
+    **Autoclass methods**
+
 RedirectView
 ~~~~~~~~~~~~
-.. class:: RedirectView()
+.. autoclass:: django.views.generic.base.RedirectView
+    :members:
+    :undoc-members:
+    :inherited-members:
 
     Redirects to a given URL.
 
@@ -126,6 +223,63 @@ RedirectView
 
     If the given URL is ``None``, Django will return an ``HttpResponseGone``
     (410).
+    
+    **Classpath**
+    
+    `django.views.generic.base.RedirectView`
+    
+    **Ancestors (MRO)**
+    
+    * :class:`django.views.generic.base.View`
+    
+    **Method Flowchart**
+
+        1. dispatch()
+        2. http_method_not_allowed()
+        3. get_redirect_url()
+
+    **Example views.py**::
+
+        from django.shortcuts import get_object_or_404
+        from django.views.generic.base import RedirectView
+        
+        from articles.models import Article
+
+        class ArticleCounterRedirectView(RedirectView):
+
+            permanent = True
+            query_string = True
+
+            def get_redirect_url(self, pk):
+                article = get_object_or_404(Article, pk=pk)
+                article.count += 1
+                article.save()
+                return reverse('product_detail', args=(pk, ))
+
+    **Example urls.py**::
+
+        from django.conf.urls.defaults import patterns, url
+        from django.views.generic.base import RedirectView
+        
+        from article.views import ArticleCounterRedirectView
+
+        urlpatterns = patterns("",
+
+            url(
+                regex   = r"r^(?P<pk>\d+)/$",
+                view    = ArticleCounterRedirectView.as_view(),
+                name    = "article_counter"
+            ),
+            url(
+                regex   = r"^go-to-django/$",
+                view    = RedirectView.as_view(
+                    url = "http://djangoproject.com"
+                ),
+                name = "go_to_django",
+            ),
+        )
+
+    **Methods and Attributes**
 
     .. attribute:: url
 
@@ -155,42 +309,110 @@ RedirectView
         as the appending of query string if requested by
         :attr:`~RedirectView.query_string`. Subclasses may implement any
         behavior they wish, as long as the method returns a redirect-ready URL
-        string.
+        string.        
 
-Detail views
-------------
+    **Autoclass methods**
+
+Generic views
+=============
+
+Django’s generic views were developed to ease that pain. They take certain
+common idioms and patterns found in view development and abstract them so that
+you can quickly write common views of data without having to write too much code
+
+Most generic views require the ``queryset`` key, which is a ``QuerySet``
+instance; see :doc:`/topics/db/queries` for more information about ``QuerySet``
+objects.
+
+
+Display views
+--------------
+
+The two following generic class based views are designed to display data. They 
+are typically the most commonly used generic class based views.
 
 .. currentmodule:: django.views.generic.detail
 
 DetailView
 ~~~~~~~~~~
-.. class:: BaseDetailView()
-.. class:: DetailView()
-
-    A page representing an individual object.
+.. autoclass:: django.views.generic.detail.DetailView
+    :members:
+    :undoc-members:
+    :inherited-members:
 
     While this view is executing, ``self.object`` will contain the object that
     the view is operating upon.
-
-    :class:`~django.views.generic.base.BaseDetailView` implements the same
-    behavior as :class:`~django.views.generic.base.DetailView`, but doesn't
-    include the
-    :class:`~django.views.generic.detail.SingleObjectTemplateResponseMixin`.
-
-    **Mixins**
-
-    * :class:`django.views.generic.detail.SingleObjectMixin`
+    
+    **Classpath**
+    
+    `django.views.generic.detail.DetailView`
+    
+    **Ancestors (MRO)**
+    
     * :class:`django.views.generic.detail.SingleObjectTemplateResponseMixin`
+    * :class:`django.views.generic.base.TemplateResponseMixin`
+    * :class:`django.views.generic.detail.BaseDetailView`
+    * :class:`django.views.generic.detail.SingleObjectMixin`
+    * :class:`django.views.generic.base.View`
 
-List views
-----------
+    **Method Flowchart**
+
+    1. dispatch()
+    2. http_method_not_allowed()
+    3. get_template_names()
+    4. get_slug_field()
+    5. get_queryset()
+    6. get_object
+    7. get_context_object_name()
+    8. get_context_data()
+    9. get()
+    10. render_to_response()
+
+    **Example views.py**::
+
+        from datetime import datetime
+
+        from django.views.generic.detail import DetailView
+
+        from articles.models import Article
+
+        class ArticleDetailView(DetailView):
+        
+            model = Article
+
+            def get_context_data(self, **kwargs):
+                context = super(ArticleDetailView, self).get_context_data(**kwargs)
+                context['now'] = datetime.now()
+                return context
+
+    **Example urls.py**::
+    
+        from django.conf.urls.defaults import patterns, url
+    
+        from article.views import ArticleDetailView
+
+        urlpatterns = patterns("",
+
+            url(
+                regex   = r"r^(?P<slug>[-_\w]+)/$",
+                view    = ArticleDetailView.as_view(),
+                name    = "article_detail"
+            ),
+        )    
+
+    **Methods and Attributes**
+    
+    .. Comment: Autoclass called at top of this class will publish this data.
+
 
 .. currentmodule:: django.views.generic.list
 
 ListView
 ~~~~~~~~
-.. class:: BaseListView()
-.. class:: ListView()
+.. autoclass:: django.views.generic.list.ListView
+    :members:
+    :undoc-members:
+    :inherited-members:
 
     A page representing a list of objects.
 
@@ -198,15 +420,27 @@ ListView
     objects (usually, but not necessarily a queryset) that the view is
     operating upon.
 
-    :class:`~django.views.generic.list.BaseListView` implements the same
-    behavior as :class:`~django.views.generic.list.ListView`, but doesn't
-    include the
-    :class:`~django.views.generic.list.MultipleObjectTemplateResponseMixin`.
-
     **Mixins**
 
     * :class:`django.views.generic.list.MultipleObjectMixin`
     * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
+    * :class:`django.views.generic.base.TemplateResponseMixin`
+    * :class:`django.views.generic.list.BaseListView`
+    * :class:`django.views.generic.list.MultipleObjectMixin`
+    * :class:`django.views.generic.base.View`
+    
+    **Method Flowchart**
+
+    1. dispatch()
+    2. http_method_not_allowed()
+    3. get_template_names()
+    4. get_queryset()
+    5. get_objects
+    6. get_context_data()
+    7. get()
+    8. render_to_response()
+
+    **Methods and Attributes**
 
 
 Editing views
@@ -216,15 +450,10 @@ Editing views
 
 FormView
 ~~~~~~~~
-.. class:: BaseFormView()
 .. class:: FormView()
 
     A view that displays a form. On error, redisplays the form with validation
     errors; on success, redirects to a new URL.
-
-    :class:`~django.views.generic.edit.BaseFormView` implements the same
-    behavior as :class:`~django.views.generic.edit.FormView`, but doesn't
-    include the :class:`~django.views.generic.base.TemplateResponseMixin`.
 
     **Mixins**
 
@@ -233,15 +462,10 @@ FormView
 
 CreateView
 ~~~~~~~~~~
-.. class:: BaseCreateView()
 .. class:: CreateView()
 
     A view that displays a form for creating an object, redisplaying the form
     with validation errors (if there are any) and saving the object.
-
-    :class:`~django.views.generic.edit.BaseCreateView` implements the same
-    behavior as :class:`~django.views.generic.edit.CreateView`, but doesn't
-    include the :class:`~django.views.generic.base.TemplateResponseMixin`.
 
     **Mixins**
 
@@ -250,17 +474,12 @@ CreateView
 
 UpdateView
 ~~~~~~~~~~
-.. class:: BaseUpdateView()
 .. class:: UpdateView()
 
     A view that displays a form for editing an existing object, redisplaying
     the form with validation errors (if there are any) and saving changes to
     the object. This uses a form automatically generated from the object's
     model class (unless a form class is manually specified).
-
-    :class:`~django.views.generic.edit.BaseUpdateView` implements the same
-    behavior as :class:`~django.views.generic.edit.UpdateView`, but doesn't
-    include the :class:`~django.views.generic.base.TemplateResponseMixin`.
 
     **Mixins**
 
@@ -269,17 +488,12 @@ UpdateView
 
 DeleteView
 ~~~~~~~~~~
-.. class:: BaseDeleteView()
 .. class:: DeleteView()
 
     A view that displays a confirmation page and deletes an existing object.
     The given object will only be deleted if the request method is ``POST``. If
     this view is fetched via ``GET``, it will display a confirmation page that
     should contain a form that POSTs to the same URL.
-
-    :class:`~django.views.generic.edit.BaseDeleteView` implements the same
-    behavior as :class:`~django.views.generic.edit.DeleteView`, but doesn't
-    include the :class:`~django.views.generic.base.TemplateResponseMixin`.
 
     **Mixins**
 
@@ -301,17 +515,11 @@ are views for displaying drilldown pages for date-based data.
 
 ArchiveIndexView
 ~~~~~~~~~~~~~~~~
-.. class:: BaseArchiveIndexView()
 .. class:: ArchiveIndexView()
 
     A top-level index page showing the "latest" objects, by date. Objects with
     a date in the *future* are not included unless you set ``allow_future`` to
     ``True``.
-
-    :class:`~django.views.generic.dates.BaseArchiveIndexView` implements the
-    same behavior as :class:`~django.views.generic.dates.ArchiveIndexView`, but
-    doesn't include the
-    :class:`~django.views.generic.list.MultipleObjectTemplateResponseMixin`.
 
     **Mixins**
 
@@ -325,17 +533,11 @@ ArchiveIndexView
 
 YearArchiveView
 ~~~~~~~~~~~~~~~
-.. class:: BaseYearArchiveView()
 .. class:: YearArchiveView()
 
     A yearly archive page showing all available months in a given year. Objects
     with a date in the *future* are not displayed unless you set
     ``allow_future`` to ``True``.
-
-    :class:`~django.views.generic.dates.BaseYearArchiveView` implements the
-    same behavior as :class:`~django.views.generic.dates.YearArchiveView`, but
-    doesn't include the
-    :class:`~django.views.generic.list.MultipleObjectTemplateResponseMixin`.
 
     **Mixins**
 
@@ -382,18 +584,11 @@ YearArchiveView
 
 MonthArchiveView
 ~~~~~~~~~~~~~~~~
-.. class:: BaseMonthArchiveView()
 .. class:: MonthArchiveView()
 
     A monthly archive page showing all objects in a given month. Objects with a
     date in the *future* are not displayed unless you set ``allow_future`` to
     ``True``.
-
-    :class:`~django.views.generic.dates.BaseMonthArchiveView` implements
-    the same behavior as
-    :class:`~django.views.generic.dates.MonthArchiveView`, but doesn't
-    include the
-    :class:`~django.views.generic.list.MultipleObjectTemplateResponseMixin`.
 
     **Mixins**
 
@@ -429,17 +624,11 @@ MonthArchiveView
 
 WeekArchiveView
 ~~~~~~~~~~~~~~~
-.. class:: BaseWeekArchiveView()
 .. class:: WeekArchiveView()
 
     A weekly archive page showing all objects in a given week. Objects with a
     date in the *future* are not displayed unless you set ``allow_future`` to
     ``True``.
-
-    :class:`~django.views.generic.dates.BaseWeekArchiveView` implements the
-    same behavior as :class:`~django.views.generic.dates.WeekArchiveView`, but
-    doesn't include the
-    :class:`~django.views.generic.list.MultipleObjectTemplateResponseMixin`.
 
     **Mixins**
 
@@ -472,17 +661,11 @@ WeekArchiveView
 
 DayArchiveView
 ~~~~~~~~~~~~~~
-.. class:: BaseDayArchiveView()
 .. class:: DayArchiveView()
 
     A day archive page showing all objects in a given day. Days in the future
     throw a 404 error, regardless of whether any objects exist for future days,
     unless you set ``allow_future`` to ``True``.
-
-    :class:`~django.views.generic.dates.BaseDayArchiveView` implements the same
-    behavior as :class:`~django.views.generic.dates.DayArchiveView`, but
-    doesn't include the
-    :class:`~django.views.generic.list.MultipleObjectTemplateResponseMixin`.
 
     **Mixins**
 
@@ -521,17 +704,11 @@ DayArchiveView
 
 TodayArchiveView
 ~~~~~~~~~~~~~~~~
-.. class:: BaseTodayArchiveView()
 .. class:: TodayArchiveView()
 
     A day archive page showing all objects for *today*. This is exactly the
     same as :class:`django.views.generic.dates.DayArchiveView`, except today's
     date is used instead of the ``year``/``month``/``day`` arguments.
-
-    :class:`~django.views.generic.dates.BaseTodayArchiveView` implements the
-    same behavior as :class:`~django.views.generic.dates.TodayArchiveView`, but
-    doesn't include the
-    :class:`~django.views.generic.list.MultipleObjectTemplateResponseMixin`.
 
     **Mixins**
 
@@ -540,17 +717,11 @@ TodayArchiveView
 
 DateDetailView
 ~~~~~~~~~~~~~~
-.. class:: BaseDateDetailView()
 .. class:: DateDetailView()
 
     A page representing an individual object. If the object has a date value in
     the future, the view will throw a 404 error by default, unless you set
     ``allow_future`` to ``True``.
-
-    :class:`~django.views.generic.dates.BaseDateDetailView` implements the same
-    behavior as :class:`~django.views.generic.dates.DateDetailView`, but
-    doesn't include the
-    :class:`~django.views.generic.detail.SingleObjectTemplateResponseMixin`.
 
     **Mixins**
 
@@ -560,3 +731,6 @@ DateDetailView
     * :class:`django.views.generic.dates.YearMixin`
     * :class:`django.views.generic.dates.MonthMixin`
     * :class:`django.views.generic.dates.DayMixin`
+
+.. note:: All of the generic views listed above have matching Base* views that only
+    differ in that the they do not include the :class:`~django.views.generic.detail.SingleObjectTemplateResponseMixin`.

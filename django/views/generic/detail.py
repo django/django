@@ -106,8 +106,13 @@ class SingleObjectTemplateResponseMixin(TemplateResponseMixin):
 
     def get_template_names(self):
         """
-        Return a list of template names to be used for the request. Must return
-        a list. May not be called if render_to_response is overridden.
+        Return a list of template names to be used for the request. May not be
+        called if render_to_response is overridden. Returns the following list:
+
+        * the value of ``template_name`` on the view (if provided)
+        * the contents of the ``template_name_field`` field on the
+          object instance that the view is operating upon (if available)
+        * ``<app_label>/<object_name><template_name_suffix>.html``        
         """
         try:
             names = super(SingleObjectTemplateResponseMixin, self).get_template_names()

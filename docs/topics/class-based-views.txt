@@ -69,6 +69,8 @@ A similar overriding pattern can be used for the ``url`` attribute on
 :class:`~django.views.generic.base.RedirectView`, another simple
 generic view.
 
+.. _jsonresponsemixin-example:
+
 More than just HTML
 -------------------
 
@@ -89,15 +91,20 @@ For example, a simple JSON mixin might look something like this::
     from django import http
 
     class JSONResponseMixin(object):
-        def render_to_response(self, context):
-            "Returns a JSON response containing 'context' as payload"
-            return self.get_json_response(self.convert_context_to_json(context))
+        """
+        A mixin that can be used to render a JSON response.
+        """
+        reponse_class = HTTPResponse
 
-        def get_json_response(self, content, **httpresponse_kwargs):
-            "Construct an `HttpResponse` object."
-            return http.HttpResponse(content,
-                                     content_type='application/json',
-                                     **httpresponse_kwargs)
+        def render_to_response(self, context, **response_kwargs):
+            """
+            Returns a JSON response, transforming 'context' to make the payload.
+            """
+            response_kwargs['content_type'] = 'application/json'
+            return self.response_class(
+                self.convert_context_to_json(context),
+                **response_kwargs
+            )
 
         def convert_context_to_json(self, context):
             "Convert the context dictionary into a JSON object"
