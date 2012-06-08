@@ -76,9 +76,7 @@ incredibly easy.
 Let's start by looking at some examples of showing a list of objects or an
 individual object.
 
-.. todo::
-
-    link here to the other topic pages (form handling, date based, mixins)
+.. comment: link here to the other topic pages (form handling, date based, mixins)
 
 We'll be using these models::
 
