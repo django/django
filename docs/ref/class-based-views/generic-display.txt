@@ -61,7 +61,7 @@ DetailView
 
     **Example urls.py**::
     
-        from django.conf.urls.defaults import patterns, url
+        from django.conf.urls import patterns, url
     
         from article.views import ArticleDetailView
 

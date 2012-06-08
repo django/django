@@ -42,7 +42,7 @@ View
 
     **Example urls.py**::
     
-        from django.conf.urls.defaults import patterns, url
+        from django.conf.urls import patterns, url
         
         from myapp.views import MyView
         
@@ -131,7 +131,7 @@ TemplateView
                 
     **Example urls.py**::
 
-        from django.conf.urls.defaults import patterns, url
+        from django.conf.urls import patterns, url
 
         from myapp.views import HomePageView
 
@@ -222,7 +222,7 @@ RedirectView
 
     **Example urls.py**::
 
-        from django.conf.urls.defaults import patterns, url
+        from django.conf.urls import patterns, url
         from django.views.generic.base import RedirectView
         
         from article.views import ArticleCounterRedirectView
