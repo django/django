@@ -47,6 +47,7 @@ class SingleObjectMixin(ContextMixin):
                                  % self.__class__.__name__)
 
         try:
+            # Get the single item from the filtered queryset
             obj = queryset.get()
         except ObjectDoesNotExist:
             raise Http404(_("No %(verbose_name)s found matching the query") %
@@ -87,6 +88,9 @@ class SingleObjectMixin(ContextMixin):
             return None
 
     def get_context_data(self, **kwargs):
+        """
+        Insert the single object into the context dict.
+        """
         context = {}
         context_object_name = self.get_context_object_name(self.object)
         if context_object_name:
@@ -96,6 +100,9 @@ class SingleObjectMixin(ContextMixin):
 
 
 class BaseDetailView(SingleObjectMixin, View):
+    """
+    A base view for displaying a single object
+    """
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
         context = self.get_context_data(object=self.object)
