@@ -302,7 +302,7 @@ loop::
         {% for field in form %}
             <div class="fieldWrapper">
                 {{ field.errors }}
-                {{ field.label_tag }}: {{ field }}
+                {{ field.label_tag }} {{ field }}
             </div>
         {% endfor %}
         <p><input type="submit" value="Send message" /></p>
@@ -316,8 +316,14 @@ attributes, which can be useful in your templates:
     The label of the field, e.g. ``Email address``.
 
 ``{{ field.label_tag }}``
-    The field's label wrapped in the appropriate HTML ``<label>`` tag,
-    e.g. ``<label for="id_email">Email address</label>``
+    The field's label wrapped in the appropriate HTML ``<label>`` tag.
+
+    .. versionchanged:: 1.6
+
+        This includes the form's :attr:`~django.forms.Form.label_suffix`. For
+        example, the default ``label_suffix`` is a semicolon::
+
+            <label for="id_email">Email address:</label>
 
 ``{{ field.value }}``
     The value of the field. e.g ``someone@example.com``
@@ -375,7 +381,7 @@ these two methods::
         {% for field in form.visible_fields %}
             <div class="fieldWrapper">
                 {{ field.errors }}
-                {{ field.label_tag }}: {{ field }}
+                {{ field.label_tag }} {{ field }}
             </div>
         {% endfor %}
         <p><input type="submit" value="Send message" /></p>
@@ -403,7 +409,7 @@ using the :ttag:`include` tag to reuse it in other templates::
     {% for field in form %}
         <div class="fieldWrapper">
             {{ field.errors }}
-            {{ field.label_tag }}: {{ field }}
+            {{ field.label_tag }} {{ field }}
         </div>
     {% endfor %}
 

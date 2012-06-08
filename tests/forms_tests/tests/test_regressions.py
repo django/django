@@ -45,8 +45,8 @@ class FormsRegressionsTestCase(TransRealMixin, TestCase):
             field_2 = CharField(max_length=10, label=ugettext_lazy('field_2'), widget=TextInput(attrs={'id': 'field_2_id'}))
 
         f = SomeForm()
-        self.assertHTMLEqual(f['field_1'].label_tag(), '<label for="id_field_1">field_1</label>')
-        self.assertHTMLEqual(f['field_2'].label_tag(), '<label for="field_2_id">field_2</label>')
+        self.assertHTMLEqual(f['field_1'].label_tag(), '<label for="id_field_1">field_1:</label>')
+        self.assertHTMLEqual(f['field_2'].label_tag(), '<label for="field_2_id">field_2:</label>')
 
         # Unicode decoding problems...
         GENDERS = (('\xc5', 'En tied\xe4'), ('\xf8', 'Mies'), ('\xdf', 'Nainen'))
