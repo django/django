@@ -4,10 +4,13 @@ The Django source code repository
 
 When deploying a Django application into a real production environment, you
 will almost always want to use `an official packaged release of Django`_.
+
 However, if you'd like to try out in-development code from an upcoming release
 or contribute to the development of Django, you'll need to obtain a clone of
-Django's source code repository. This document covers the way the code
-repository is laid out and how to work with and find things in it.
+Django's source code repository.
+
+This document covers the way the code repository is laid out and how to work
+with and find things in it.
 
 .. _an official packaged release of Django: https://www.djangoproject.com/download/
 
@@ -17,12 +20,14 @@ High-level overview
 The Django source code repository uses `Git`_ to track changes to the code
 over time, so you'll need a copy of the Git client (a program called ``git``)
 on your computer, and you'll want to familiarize yourself with the basics of
-how Git works. Git's web site offers downloads for various operating systems.
-The site contains also vast amounts of `documentation`_.
+how Git works.
+
+Git's web site offers downloads for various operating systems. The site also
+contains vast amounts of `documentation`_.
 
 The Django Git repository is located online at `github.com/django/django
-<https://github.com/django/django>`_. It contains the full source
-code for all Django releases, and you can browse it online.
+<https://github.com/django/django>`_. It contains the full source code for all
+Django releases, which you can browse online.
 
 The Git repository includes several `branches`_:
 
@@ -39,11 +44,10 @@ The Git repository includes several `branches`_:
 * ``attic/<project>`` branches were used to develop major or experimental new
   features without affecting the rest of Django's code.
 
-The Git repository also contains `tags`_. They identify snapshots of Django's
-code at various important points in its history. Mostly these are the exact
-revisions from which packaged Django releases were produced.
+The Git repository also contains `tags`_. These are the exact revisions from
+which packaged Django releases were produced, since version 1.0.
 
-The source code for `Djangoproject.com <https://www.djangoproject.com/>`_ Web
+The source code for the `Djangoproject.com <https://www.djangoproject.com/>`_ web
 site can be found at `github.com/django/djangoproject.com
 <https://github.com/django/djangoproject.com>`_.
 
@@ -52,8 +56,8 @@ site can be found at `github.com/django/djangoproject.com
 .. _branches: https://github.com/django/django/branches
 .. _tags: https://github.com/django/django/tags
 
-Working with Django's master branch
-===================================
+The master branch
+=================
 
 If you'd like to try out the in-development code for the next release of
 Django, or if you'd like to contribute to Django by fixing bugs or developing
@@ -76,15 +80,15 @@ over to :doc:`the documentation for contributing to Django
 </internals/contributing/index>`, which covers things like the preferred
 coding style and how to generate and submit a patch.
 
-Branches
-========
+Other branches
+==============
 
 Django uses branches for two main purposes:
 
 1. Development of major or experimental features, to keep them from
    affecting progress on other work in master.
 
-2. Security and bug-fix support for older releases of Django, during
+2. Security and bugfix support for older releases of Django, during
    their support lifetimes.
 
 Feature-development branches
@@ -154,9 +158,10 @@ part of Django itself, and so are no longer separately maintained:
 
 When Django moved from SVN to Git, the information about branch merges wasn't
 preserved in the source code repository. This means that the ``master`` branch
-of Django doesn't contain merge commits for the above branches. However, this
-information is `available as a grafts file`_. You can restore it by putting
-the following lines in ``.git/info/grafts`` in your local clone::
+of Django doesn't contain merge commits for the above branches.
+
+However, this information is `available as a grafts file`_. You can restore it
+by putting the following lines in ``.git/info/grafts`` in your local clone::
 
   ac64e91a0cadc57f4bc5cd5d66955832320ca7a1 553a20075e6991e7a60baee51ea68c8adc520d9a 0cb8e31823b2e9f05c4ae868c19f5f38e78a5f2e
   79e68c225b926302ebb29c808dda8afa49856f5c d0f57e7c7385a112cb9e19d314352fc5ed5b0747 aa239e3e5405933af6a29dac3cf587b59a099927
@@ -202,15 +207,18 @@ Support and bugfix branches
 ---------------------------
 
 In addition to fixing bugs in current master, the Django project provides
-official bug-fix support for the most recent released version of Django, and
-security support for the two most recently-released versions of Django. This
-support is provided via branches in which the necessary bug or security fixes
-are applied; the branches are then used as the basis for issuing bugfix or
-security releases.
+official bugfix support for the most recent released version of Django, and
+security support for the two most recently-released versions of Django.
+
+This support is provided via branches in which the necessary bug or security
+fixes are applied; the branches are then used as the basis for issuing bugfix
+or security releases.
 
 These branches can be found in the repository as ``stable/A.B.x``
 branches, and new branches will be created there after each new Django
-release. For example, shortly after the release of Django 1.0, the branch
+release.
+
+For example, shortly after the release of Django 1.0, the branch
 ``stable/1.0.x`` was created to receive bug fixes, and shortly after the
 release of Django 1.1 the branch ``stable/1.1.x`` was created.
 
@@ -222,7 +230,7 @@ used them to provide unofficial support for old Django releases.
 Tags
 ====
 
-Each Django release is tagged and signed by Django's release manage.
+Each Django release is tagged and signed by Django's release manager.
 
 The tags can be found on GitHub's `tags`_ page.
 

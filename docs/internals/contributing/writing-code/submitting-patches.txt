@@ -20,9 +20,10 @@ See the :doc:`working-with-git` for more details on how to use pull requests.
 
 In an open-source project with hundreds of contributors around the world, it's
 important to manage communication efficiently so that work doesn't get
-duplicated and contributors can be as effective as possible. Hence, our policy
-is for contributors to "claim" tickets in order to let other developers know
-that a particular bug or feature is being worked on.
+duplicated and contributors can be as effective as possible.
+
+Hence, our policy is for contributors to "claim" tickets in order to let other
+developers know that a particular bug or feature is being worked on.
 
 If you have identified a contribution you want to make and you're capable of
 fixing it (as measured by your coding ability, knowledge of Django internals
@@ -68,18 +69,23 @@ no longer monopolized and somebody else can claim it.
 If you've claimed a ticket and it's taking a long time (days or weeks) to code,
 keep everybody updated by posting comments on the ticket. If you don't provide
 regular updates, and you don't respond to a request for a progress report,
-your claim on the ticket may be revoked. As always, more communication is
-better than less communication!
+your claim on the ticket may be revoked.
+
+As always, more communication is better than less communication!
 
 Which tickets should be claimed?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Of course, going through the steps of claiming tickets is overkill in some
-cases. In the case of small changes, such as typos in the documentation or
+cases.
+
+In the case of small changes, such as typos in the documentation or
 small bugs that will only take a few minutes to fix, you don't need to jump
 through the hoops of claiming tickets. Just submit your patch and be done with
-it. Of course, it is always acceptable, regardless of the ticket's ownership
-status, to submit patches to a ticket if you happen to have a patch ready.
+it.
+
+Of course, it is *always* acceptable, regardless whether someone has claimed it
+or not, to submit patches to a ticket if you happen to have a patch ready.
 
 .. _patch-style:
 
@@ -90,12 +96,12 @@ Make sure that any contribution you do fulfills at least the following
 requirements:
 
 * The code required to fix a problem or add a feature is an essential part
-  of a patch, but it is not the only part. A good patch should also
-  include a regression test to validate the behavior that has been fixed
-  and to prevent the problem from arising again. Also, if some tickets are
-  relevant to the code that you've written, mention the ticket numbers in
+  of a patch, but it is not the only part. A good patch should also include a
+  :doc:`regression test <unit-tests>` to validate the behavior that has been
+  fixed and to prevent the problem from arising again. Also, if some tickets
+  are relevant to the code that you've written, mention the ticket numbers in
   some comments in the test so that one can easily trace back the relevant
-  discussions after your patch gets committed and the tickets get closed.
+  discussions after your patch gets committed, and the tickets get closed.
 
 * If the code associated with a patch adds a new feature, or modifies
   behavior of an existing feature, the patch should also contain
@@ -105,6 +111,7 @@ You can use either GitHub branches and pull requests or direct patches
 to publish your work. If you use the Git workflow, then you should
 announce your branch in the ticket by including a link to your branch.
 When you think your work is ready to be merged in create a pull request.
+
 See the :doc:`working-with-git` documentation for mode details.
 
 You can also use patches in Trac. When using this style, follow these
@@ -139,8 +146,10 @@ A "non-trivial" patch is one that is more than a simple bug fix. It's a patch
 that introduces Django functionality and makes some sort of design decision.
 
 If you provide a non-trivial patch, include evidence that alternatives have
-been discussed on `django-developers`_. If you're not sure whether your patch
-should be considered non-trivial, just ask.
+been discussed on `django-developers`_.
+
+If you're not sure whether your patch should be considered non-trivial, just
+ask.
 
 Javascript patches
 ------------------
@@ -156,6 +165,9 @@ code for future development (e.g. ``foo.js``), and a compressed version for
 production use (e.g. ``foo.min.js``). Any links to the file in the codebase
 should point to the compressed version.
 
+Compressing JavaScript
+~~~~~~~~~~~~~~~~~~~~~~
+
 To simplify the process of providing optimized javascript code, Django
 includes a handy script which should be used to create a "minified" version.
 This script is located at ``django/contrib/admin/static/js/compress.py``.
@@ -167,11 +179,11 @@ complete javascript patches will need to download and install the library
 independently.
 
 The Closure Compiler library requires Java version 6 or higher (Java 1.6 or
-higher on Mac OS X). Note that Mac OS X 10.5 and earlier did not ship with
+higher on Mac OS X. Note that Mac OS X 10.5 and earlier did not ship with
 Java 1.6 by default, so it may be necessary to upgrade your Java installation
 before the tool will be functional. Also note that even after upgrading Java,
 the default ``/usr/bin/java`` command may remain linked to the previous Java
-binary, so relinking that command may be necessary as well.
+binary, so relinking that command may be necessary as well.)
 
 Please don't forget to run ``compress.py`` and include the ``diff`` of the
 minified scripts when submitting patches for Django's javascript.

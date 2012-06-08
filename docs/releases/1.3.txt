@@ -830,7 +830,7 @@ now pending deprecation.
 ~~~~~~~~~~~~~~~~
 
 Previously, ``django.http`` exposed an undocumented ``CompatCookie`` class,
-which was a bug-fix wrapper around the standard library ``SimpleCookie``. As the
+which was a bugfix wrapper around the standard library ``SimpleCookie``. As the
 fixes are moving upstream, this is now deprecated - you should use ``from
 django.http import SimpleCookie`` instead.
 

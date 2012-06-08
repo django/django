@@ -69,7 +69,7 @@ the remaining features to be implemented for Django 1.0, and on the
 bugs that need to be resolved before the final release. As of this
 beta release, Django is in its final "feature freeze" for 1.0; feature
 requests will be deferred to later releases, and the development
-effort will be focused solely on bug-fixing and stability. Django is
+effort will be focused solely on bugfixing and stability. Django is
 also now in a "string freeze"; translatable strings (labels, error
 messages, etc.) in Django's codebase will not be changed prior to the
 release, in order to allow our translators to produce the final 1.0

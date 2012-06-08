@@ -21,7 +21,7 @@ Partial committers
     access to the subsystems that fall under their jurisdiction, and they're
     given a formal vote in questions that involve their subsystems. This type
     of access is likely to be given to someone who contributes a large
-    subframework to Django and wants to continue to maintain it.
+    sub-framework to Django and wants to continue to maintain it.
 
     Partial commit access is granted by the same process as full
     committers. However, the bar is set lower; proven expertise in the area
@@ -30,26 +30,28 @@ Partial committers
 Decisions on new committers will follow the process explained in
 :ref:`how-we-make-decisions`. To request commit access, please contact an
 existing committer privately. Public requests for commit access are potential
-flame-war starters, and will be ignored.
+flame-war starters, and will simply be ignored.
 
 Handling pull requests
 ----------------------
 
 Since Django is now hosted at GitHub, many patches are provided in the form of
-pull requests. When committing a pull request, make sure each individual
-commit matches the commit guidelines described below. Contributors are
-expected to provide the best pull requests possible. However, in practice,
-committers are more familiar with the commit guidelines, and they may have to
-rewrite the commit history.
+pull requests.
+
+When committing a pull request, make sure each individual commit matches the
+commit guidelines described below. Contributors are expected to provide the
+best pull requests possible. In practice however, committers - who will likely
+be more familiar with the commit guidelines - may decide to bring a commit up
+to standard themselves.
 
 Here is one way to commit a pull request::
 
     # Create a new branch tracking upstream/master -- upstream is assumed
     # to be django/django.
-    git checkout -b pull_xxxx upstream/master
+    git checkout -b pull_xxxxx upstream/master
 
     # Download the patches from github and apply them.
-    curl https://github.com/django/django/pull/XXXX.patch | git am
+    curl https://github.com/django/django/pull/xxxxx.patch | git am
 
 At this point, you can work on the code. Use ``git rebase -i`` and ``git
 commit --amend`` to make sure the commits have the expected level of quality.
@@ -59,20 +61,20 @@ Once you're ready::
     git checkout master
     git pull upstream master
     # Merge the work as "fast-forward" to master, to avoid a merge commit.
-    git merge --ff-only pull_xx
+    git merge --ff-only pull_xxxxx
     # Check that only the changes you expect will be pushed to upstream.
     git push --dry-run upstream master
     # Push!
     git push upstream master
 
-    # Get rid of the pull_xxxx branch.
-    git branch -d pull_xxxx
+    # Get rid of the pull_xxxxx branch.
+    git branch -d pull_xxxxx
 
-An alternative is to add the contributor's repository as a new remote, do a
-checkout of the branch and work from there::
+An alternative is to add the contributor's repository as a new remote,
+checkout the branch and work from there::
 
     git remote add <contributor> https://github.com/<contributor>/django.git
-    git checkout pull_xxxx <contributor> <contributor's pull request branch>
+    git checkout pull_xxxxx <contributor> <contributor's pull request branch>
 
 At this point, you can work on the code and continue as above.
 
@@ -151,7 +153,7 @@ Django's Git repository:
   review."
 
 * For commits to a branch, prefix the commit message with the branch name.
-  For example: "[1.4.x] Fixed #NNNNN -- Added support for mind reading."
+  For example: "[1.4.x] Fixed #xxxxx -- Added support for mind reading."
 
 * Limit commits to the most granular change that makes sense. This means,
   use frequent small commits rather than infrequent large commits. For
@@ -165,14 +167,14 @@ Django's Git repository:
   <backwards-compatibility-policy>`.
 
 * If your commit closes a ticket in the Django `ticket tracker`_, begin
-  your commit message with the text "Fixed #NNNNN", where "NNNNN" is the
+  your commit message with the text "Fixed #xxxxx", where "xxxxx" is the
   number of the ticket your commit fixes. Example: "Fixed #123 -- Added
   whizbang feature.". We've rigged Trac so that any commit message in that
   format will automatically close the referenced ticket and post a comment
   to it with the full commit message.
 
   If your commit closes a ticket and is in a branch, use the branch name
-  first, then the "Fixed #NNNNN." For example:
+  first, then the "Fixed #xxxxx." For example:
   "[1.4.x] Fixed #123 -- Added whizbang feature."
 
   For the curious, we're using a `Trac plugin`_ for this.
@@ -180,7 +182,7 @@ Django's Git repository:
   .. _Trac plugin: https://github.com/aaugustin/trac-github
 
 * If your commit references a ticket in the Django `ticket tracker`_ but
-  does *not* close the ticket, include the phrase "Refs #NNNNN", where "NNNNN"
+  does *not* close the ticket, include the phrase "Refs #xxxxx", where "xxxxx"
   is the number of the ticket your commit references. This will automatically
   post a comment to the appropriate ticket.
 
@@ -199,13 +201,14 @@ Django's Git repository:
 Reverting commits
 -----------------
 
-Nobody's perfect; mistakes will be committed. When a mistaken commit is
-discovered, please follow these guidelines:
+Nobody's perfect; mistakes will be committed.
 
-* Try very hard to ensure that mistakes don't happen. Just because we
-  have a reversion policy doesn't relax your responsibility to aim for
-  the highest quality possible. Really: double-check your work, or have
-  it checked by another committer, before you commit it in the first place!
+But try very hard to ensure that mistakes don't happen. Just because we have a
+reversion policy doesn't relax your responsibility to aim for the highest
+quality possible. Really: double-check your work, or have it checked by
+another committer, **before** you commit it in the first place!
+
+When a mistaken commit is discovered, please follow these guidelines:
 
 * If possible, have the original author revert his/her own commit.
 

@@ -198,15 +198,15 @@ and an rc complete with string freeze two weeks before the end of the schedule.
 Bug-fix releases
 ----------------
 
-After a minor release (e.g. 1.1), the previous release will go into bug-fix
+After a minor release (e.g. 1.1), the previous release will go into bugfix
 mode.
 
 A branch will be created of the form ``branches/releases/1.0.X`` to track
-bug-fixes to the previous release. Critical bugs fixed on trunk must
-*also* be fixed on the bug-fix branch; this means that commits need to cleanly
+bugfixes to the previous release. Critical bugs fixed on trunk must
+*also* be fixed on the bugfix branch; this means that commits need to cleanly
 separate bug fixes from feature additions. The developer who commits a fix to
-trunk will be responsible for also applying the fix to the current bug-fix
-branch.  Each bug-fix branch will have a maintainer who will work with the
+trunk will be responsible for also applying the fix to the current bugfix
+branch.  Each bugfix branch will have a maintainer who will work with the
 committers to keep them honest on backporting bug fixes.
 
 How this all fits together
