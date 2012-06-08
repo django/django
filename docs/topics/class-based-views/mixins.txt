@@ -19,7 +19,7 @@ more discrete functionality. Template rendering, for instance, is
 encapsulated in the
 :class:`~django.views.generic.base.TemplateResponseMixin`. The Django
 reference documentation contains :doc:`full documentation of all the
-mixins <../ref/class-based-view-mixins>`.
+mixins</ref/class-based-view-mixins>`.
 
 Context and template responses
 ==============================
@@ -81,9 +81,9 @@ There are also mixins involved in the generic edit views
 views :class:`~django.views.generic.edit.CreateView`,
 :class:`~django.views.generic.edit.UpdateView` and
 :class:`~django.views.generic.edit.DeleteView`), and in the
-:doc:`date-based generic views<date-based-generic-views>`. These are
+:doc:`date-based generic views<generic-date-based>`. These are
 covered in the :doc:`mixin reference
-documentation<../ref/class-based-view-mixins>`.
+documentation</ref/class-based-view-mixins>`.
 
 DetailView: working with a single Django object
 -----------------------------------------------
@@ -114,12 +114,13 @@ which extends
 :class:`~django.views.generic.base.TemplateResponseMixin`, overriding
 :meth:`get_template_names()` as discussed above. It actually provides
 a fairly sophisticated set of options, but the main one that most
-people are going to use is ``<app_label>/<object_name>_detail.html``. The
-``_detail`` part can be changed by setting
+people are going to use is
+``<app_label>/<object_name>_detail.html``. The ``_detail`` part can be
+changed by setting
 :attr:`~django.views.generic.detail.SingleObjectTemplateResponseMixin.template_name_suffix`
 on a subclass to something else. (For instance, the :doc:`generic edit
-views<form-handling-class-based-views>` use ``_form`` for create and
-update views, and ``_confirm_delete`` for delete views.)
+views<generic-editing>` use ``_form`` for create and update views, and
+``_confirm_delete`` for delete views.)
 
 ListView: working with many Django objects
 ------------------------------------------
@@ -155,17 +156,17 @@ it.
 To make a :class:`TemplateResponse`, :class:`ListView` then uses
 :class:`~django.views.generic.list.MultipleObjectTemplateResponseMixin`;
 as with :class:`SingleObjectTemplateResponseMixin` above, this
-overrides
-:meth:`get_template_names()`
-to provide :meth:`a range of options
+overrides :meth:`get_template_names()` to provide :meth:`a range of
+options
 <~django.views.generic.list.MultipleObjectTempalteResponseMixin>`,
-with the most commonly-used being ``<app_label>/<object_name>_list.html``, with
-the ``_list`` part again being taken from the
+with the most commonly-used being
+``<app_label>/<object_name>_list.html``, with the ``_list`` part again
+being taken from the
 :attr:`~django.views.generic.list.MultipleObjectTemplateResponseMixin.template_name_suffix`
-attribute. (The :doc:`date based generic
-views<date-based-generic-views>` use suffixes such as ``_archive``,
-``_archive_year`` and so on to use different templates for the various
-specialised date-based list views.)
+attribute. (The :doc:`date based generic views<generic-date-based>`
+use suffixes such as ``_archive``, ``_archive_year`` and so on to use
+different templates for the various specialised date-based list
+views.)
 
 Using Django's class based view mixins
 ======================================
@@ -188,8 +189,8 @@ the box.
     versions of the methods will be called in what order.
 
     The reference documentation for Django's :doc:`class based
-    views<../ref/class-based-views>` and :doc:`class based view
-    mixins<../ref/class-based-view-mixins>` will help you in
+    views</ref/class-based-views/index>` and :doc:`class based view
+    mixins</ref/class-based-view-mixins>` will help you in
     understanding which attributes and methods are likely to cause
     conflict between different classes and mixins.
 
@@ -218,7 +219,7 @@ we'll want the functionality provided by
 
 We'll demonstrate this with the publisher modelling we used in the
 :doc:`generic class based views
-introduction<generic-class-based-views>`.
+introduction<generic-display>`.
 
 .. code-block:: python
 
