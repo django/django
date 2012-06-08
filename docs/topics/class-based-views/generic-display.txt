@@ -235,6 +235,8 @@ more::
     want to be sure to override all parents. If you're having trouble, review
     the method resolution order of your view.
 
+.. _generic-views-list-subsets:
+
 Viewing subsets of objects
 --------------------------
 
@@ -362,6 +364,8 @@ use it in the template::
             context['publisher'] = self.publisher
             return context
 
+.. _generic-views-extra-work:
+
 Performing extra work
 ---------------------
 
@@ -393,7 +397,11 @@ custom view:
 
     urlpatterns = patterns('',
         #...
-        **(r'^authors/(?P<pk>\\d+)/$', AuthorDetailView.as_view()),**
+        **url(
+            r'^authors/(?P<pk>\\d+)/$',
+            AuthorDetailView.as_view(),
+            name='author-detail'
+        ),**
     )
 
 Then we'd write our new view -- ``get_object`` is the method that retrieves the

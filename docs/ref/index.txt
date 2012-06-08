@@ -6,6 +6,7 @@ API Reference
    :maxdepth: 1
 
    authbackends
+   class-based-views/index   
    clickjacking
    contrib/index
    databases
@@ -13,8 +14,6 @@ API Reference
    exceptions
    files/index
    forms/index
-   class-based-views/index
-   class-based-view-mixins
    middleware
    models/index
    request-response

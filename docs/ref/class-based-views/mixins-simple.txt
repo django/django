@@ -1,0 +1,80 @@
+==============
+Simple mixins
+==============
+
+.. currentmodule:: django.views.generic.base
+
+ContextMixin
+~~~~~~~~~~~~~~~~~~~~~
+.. class:: ContextMixin()
+
+    **classpath**
+    
+    ``django.views.generic.base.ContextMixin``
+    
+    **Methods**
+
+    .. method:: get_context_data(**kwargs)
+
+        Returns a dictionary representing the template context. The
+        keyword arguments provided will make up the returned context.
+
+TemplateResponseMixin
+~~~~~~~~~~~~~~~~~~~~~
+.. autoclass:: django.views.generic.base.TemplateResponseMixin
+    :members:
+    :undoc-members:
+    :inherited-members:
+
+    Provides a mechanism to construct a
+    :class:`~django.template.response.TemplateResponse`, given
+    suitable context. The template to use is configurable and can be
+    further customized by subclasses.
+
+    **classpath**
+    
+    ``django.views.generic.base.TemplateResponseMixin``
+    
+    **Methods and Attributes**
+
+    .. attribute:: response_class
+
+        The response class to be returned by ``render_to_response`` method.
+        Default is
+        :class:`TemplateResponse <django.template.response.TemplateResponse>`.
+        The template and context of ``TemplateResponse`` instances can be
+        altered later (e.g. in
+        :ref:`template response middleware <template-response-middleware>`).
+
+        If you need custom template loading or custom context object
+        instantiation, create a ``TemplateResponse`` subclass and assign it to
+        ``response_class``.
+
+    .. method:: render_to_response(context, **response_kwargs)
+
+        Returns a ``self.response_class`` instance.
+
+        If any keyword arguments are provided, they will be
+        passed to the constructor of the response class.
+
+        Calls :meth:`~TemplateResponseMixin.get_template_names()` to obtain the
+        list of template names that will be searched looking for an existent
+        template.
+
+    .. method:: get_template_names()
+
+        Returns a list of template names to search for when rendering the
+        template.
+
+        If :attr:`TemplateResponseMixin.template_name` is specified, the
+        default implementation will return a list containing
+        :attr:`TemplateResponseMixin.template_name` (if it is specified).
+        
+    **Autodoc**        
+    
+    .. note:: 
+    
+        Documentation on Class Based Views is a work in progress. The
+        following descriptions of methods and attributes are a work in progress
+        and will eventually subsume the **Methods and Attributes** described
+        above.

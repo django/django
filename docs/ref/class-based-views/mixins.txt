@@ -1,0 +1,14 @@
+===============================
+Class Based Views mixins
+===============================
+
+Class Based Views API reference. For introductory material, see :doc:`/topics/class-based-views/mixins`.
+
+.. toctree::
+   :maxdepth: 1
+
+   mixins-simple
+   mixins-single-object
+   mixins-multiple-object
+   mixins-editing
+   mixins-date-based

@@ -2,7 +2,7 @@
 Class Based Views
 ==================
 
-Class Based Views API reference. For introductory material, see :doc:`/topics/class-based-views`.
+Class Based Views API reference. For introductory material, see :doc:`/topics/class-based-views/index`.
 
 .. toctree::
    :maxdepth: 1
@@ -11,6 +11,7 @@ Class Based Views API reference. For introductory material, see :doc:`/topics/cl
    generic-display
    generic-editing
    generic-date-based
+   mixins
 
 Specification
 -------------

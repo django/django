@@ -19,7 +19,7 @@ DetailView
     
     **Classpath**
     
-    `django.views.generic.detail.DetailView`
+    ``django.views.generic.detail.DetailView``
     
     **Ancestors (MRO)**
     
@@ -94,9 +94,13 @@ ListView
     objects (usually, but not necessarily a queryset) that the view is
     operating upon.
 
+    **Classpath**
+
+    ``django.views.generic.list.ListVieww``
+
     **Mixins**
 
-    * :class:`django.views.generic.list.MultipleObjectMixin`
+    * :class:`django.views.generic.list.ListView`
     * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
     * :class:`django.views.generic.base.TemplateResponseMixin`
     * :class:`django.views.generic.list.BaseListView`

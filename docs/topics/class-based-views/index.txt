@@ -4,21 +4,31 @@ Class-based views
 
 .. versionadded:: 1.3
 
-A view is a callable which takes a request and returns a response. This can be
-more than just a function, and Django provides an example of some classes which
-can be used as views. These allow you to structure your views and reuse code by
-harnessing inheritance and mixins. There are also some generic views for simple
-tasks which we'll get to later, but you may want to deisgn your own structure
-of reusable views which suits your use case.
+.. toctree::
+   :maxdepth: 1
+
+   generic-display
+   generic-editing
+   mixins
+
+A view is a callable which takes a request and returns a
+response. This can be more than just a function, and Django provides
+an example of some classes which can be used as views. These allow you
+to structure your views and reuse code by harnessing inheritance and
+mixins. There are also some generic views for simple tasks which we'll
+get to later, but you may want to deisgn your own structure of
+reusable views which suits your use case. For full details, see the
+:doc:`class based views reference
+documentation</ref/class-based-views/index>`.
 
 Basic examples
 ==============
 
 Django provides base view classes which will suit a wide range of applications.
-All views inherit from the `~django.views.generic.base.View` class, which
+All views inherit from the :class:`~django.views.generic.base.View` class, which
 handles linking the view in to the URLs, HTTP method dispatching and other
-simple features. `~django.views.generic.base.RedirectView` is for a simple HTTP
-redirect, and `~django.views.generic.base.TemplateView` extends the base class
+simple features. :class:`~django.views.generic.base.RedirectView` is for a simple HTTP
+redirect, and :class:`~django.views.generic.base.TemplateView` extends the base class
 to make it also render a template.
 
 

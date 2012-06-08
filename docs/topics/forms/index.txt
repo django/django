@@ -82,6 +82,8 @@ If your form is going to be used to directly add or edit a Django model, you can
 use a :doc:`ModelForm </topics/forms/modelforms>` to avoid duplicating your model
 description.
 
+.. _using-a-form-in-a-view:
+
 Using a form in a view
 ----------------------
 
