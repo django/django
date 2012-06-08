@@ -12,6 +12,10 @@ FormMixin
     :inherited-members:
 
     A mixin class that provides facilities for creating and displaying forms.
+    
+    **Classpath**
+    
+    ``django.views.generic.edit.FormMixin``
 
     **Methods and Attributes**
 
@@ -109,6 +113,10 @@ ModelFormMixin
     ``self.object``, the instance being manipulated. If the instance is being
     created, ``self.object`` will be ``None``.
 
+    **Classpath**
+
+    ``django.views.generic.edit.ModelFormMixin``
+
     **Mixins**
 
     * :class:`django.views.generic.edit.FormMixin`
@@ -171,6 +179,19 @@ ProcessFormView
     :inherited-members:
 
     A mixin that provides basic HTTP GET and POST workflow.
+    
+    .. note:: 
+    
+        This is named 'ProcessFormView' and inherits directly from :class:`django.views.generic.base.View`,
+        but breaks if used independently. Therefore is actually a mixin.
+
+    **Classpath**
+
+    ``django.views.generic.edit.ProcessFormView``
+    
+    **Extends**
+
+    * :class:`django.views.generic.base.View`
 
     **Methods and Attributes**
 
@@ -203,6 +224,10 @@ DeletionMixin
     :inherited-members:
 
     Enables handling of the ``DELETE`` http action.
+
+    **Classpath**
+
+    ``django.views.generic.edit.DeletionMixin``
 
     **Methods and Attributes**
 
