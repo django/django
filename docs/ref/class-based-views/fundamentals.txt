@@ -97,6 +97,7 @@ TemplateView
 
     **Ancestors (MRO)**
 
+    * :class:`django.views.generic.base.TemplateView`
     * :class:`django.views.generic.base.TemplateResponseMixin`
     * :class:`django.views.generic.base.View`
     
