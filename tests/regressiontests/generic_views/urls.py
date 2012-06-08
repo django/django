@@ -53,6 +53,8 @@ urlpatterns = patterns('',
         views.AuthorDetail.as_view()),
     (r'^detail/author/invalid/qs/$',
         views.AuthorDetail.as_view(queryset=None)),
+    (r'^detail/nonmodel/1/$',
+        views.NonModelDetail.as_view()),
 
     # Create/UpdateView
     (r'^edit/artists/create/$',

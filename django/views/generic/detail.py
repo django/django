@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
+from django.db import models
 from django.http import Http404
 from django.utils.translation import ugettext as _
 from django.views.generic.base import TemplateResponseMixin, ContextMixin, View
@@ -81,7 +82,7 @@ class SingleObjectMixin(ContextMixin):
         """
         if self.context_object_name:
             return self.context_object_name
-        elif hasattr(obj, '_meta'):
+        elif isinstance(obj, models.Model):
             return obj._meta.object_name.lower()
         else:
             return None
@@ -128,13 +129,13 @@ class SingleObjectTemplateResponseMixin(TemplateResponseMixin):
 
         # The least-specific option is the default <app>/<model>_detail.html;
         # only use this if the object in question is a model.
-        if hasattr(self.object, '_meta'):
+        if isinstance(self.object, models.Model):
             names.append("%s/%s%s.html" % (
                 self.object._meta.app_label,
                 self.object._meta.object_name.lower(),
                 self.template_name_suffix
             ))
-        elif hasattr(self, 'model') and hasattr(self.model, '_meta'):
+        elif hasattr(self, 'model') and self.model is not None and issubclass(self.model, models.Model):
             names.append("%s/%s%s.html" % (
                 self.model._meta.app_label,
                 self.model._meta.object_name.lower(),
