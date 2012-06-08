@@ -95,10 +95,13 @@ class CustomArticle(models.Model):
 
 
 class ModelWithStringPrimaryKey(models.Model):
-    id = models.CharField(max_length=255, primary_key=True)
+    string_pk = models.CharField(max_length=255, primary_key=True)
 
     def __unicode__(self):
-        return self.id
+        return self.string_pk
+
+    def get_absolute_url(self):
+        return u'/dummy/%s/' % self.string_pk
 
 
 class Color(models.Model):
