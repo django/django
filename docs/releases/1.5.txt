@@ -154,6 +154,16 @@ Unicode parameters (``password``, ``salt`` or ``encoded``). If any of the
 hashing methods need byte strings, you can use the
 :func:`~django.utils.encoding.smart_str` utility to encode the strings.
 
+Validation of previous_page_number and next_page_number
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When using :doc:`object pagination </topics/pagination>`,
+the ``previous_page_number()`` and ``next_page_number()`` methods of the
+:class:`~django.core.paginator.Page` object did not check if the returned
+number was inside the existing page range.
+It does check it now and raises an :exc:`InvalidPage` exception when the number
+is either too low or too high.
+
 Features deprecated in 1.5
 ==========================
 

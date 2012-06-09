@@ -253,13 +253,19 @@ Methods
 
 .. method:: Page.next_page_number()
 
-    Returns the next page number. Note that this is "dumb" and will return the
-    next page number regardless of whether a subsequent page exists.
+    Returns the next page number.
+
+    .. versionchanged:: 1.5
+
+    Raises :exc:`InvalidPage` if next page doesn't exist.
 
 .. method:: Page.previous_page_number()
 
-    Returns the previous page number. Note that this is "dumb" and will return
-    the previous page number regardless of whether a previous page exists.
+    Returns the previous page number.
+
+    .. versionchanged:: 1.5
+
+    Raises :exc:`InvalidPage` if previous page doesn't exist.
 
 .. method:: Page.start_index()
 
