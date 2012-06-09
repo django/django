@@ -204,28 +204,6 @@ class CustomTestRunnerOptionsTests(AdminScriptTestCase):
         self.assertOutput(out, 'bar:foo:31337')
 
 
-class Ticket16885RegressionTests(unittest.TestCase):
-    def test_ticket_16885(self):
-        """Features are also confirmed on mirrored databases."""
-        old_db_connections = db.connections
-        try:
-            db.connections = db.ConnectionHandler({
-                'default': {
-                    'ENGINE': 'django.db.backends.sqlite3',
-                },
-                'slave': {
-                    'ENGINE': 'django.db.backends.sqlite3',
-                    'TEST_MIRROR': 'default',
-                },
-            })
-            slave = db.connections['slave']
-            self.assertEqual(slave.features.supports_transactions, None)
-            DjangoTestSuiteRunner(verbosity=0).setup_databases()
-            self.assertNotEqual(slave.features.supports_transactions, None)
-        finally:
-            db.connections = old_db_connections
-
-
 class Ticket17477RegressionTests(AdminScriptTestCase):
     def setUp(self):
         self.write_settings('settings.py')
