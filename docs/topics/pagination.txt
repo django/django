@@ -43,7 +43,9 @@ page::
     >>> page2.has_other_pages()
     True
     >>> page2.next_page_number()
-    3
+    Traceback (most recent call last):
+    ...
+    EmptyPage: That page contains no results
     >>> page2.previous_page_number()
     1
     >>> page2.start_index() # The 1-based index of the first item on this page
