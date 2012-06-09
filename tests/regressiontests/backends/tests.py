@@ -403,8 +403,7 @@ class BackendTestCase(TestCase):
         self.assertTrue(hasattr(connection.ops, 'connection'))
         self.assertEqual(connection, connection.ops.connection)
 
-    def test_supports_needed_confirm(self):
-        connection.features.confirm()
+    def test_cached_db_features(self):
         self.assertIn(connection.features.supports_transactions, (True, False))
         self.assertIn(connection.features.supports_stddev, (True, False))
         self.assertIn(connection.features.can_introspect_foreign_keys, (True, False))

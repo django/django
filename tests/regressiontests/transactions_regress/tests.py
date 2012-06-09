@@ -208,7 +208,7 @@ class SavepointTest(TransactionTestCase):
         work()
 
     @skipIf(connection.vendor == 'mysql' and \
-            connection.features._mysql_storage_engine() == 'MyISAM',
+            connection.features._mysql_storage_engine == 'MyISAM',
             "MyISAM MySQL storage engine doesn't support savepoints")
     @skipUnlessDBFeature('uses_savepoints')
     def test_savepoint_rollback(self):

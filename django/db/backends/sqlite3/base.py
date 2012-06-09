@@ -19,6 +19,7 @@ from django.db.backends.sqlite3.client import DatabaseClient
 from django.db.backends.sqlite3.creation import DatabaseCreation
 from django.db.backends.sqlite3.introspection import DatabaseIntrospection
 from django.utils.dateparse import parse_date, parse_datetime, parse_time
+from django.utils.functional import cached_property
 from django.utils.safestring import SafeString
 from django.utils import timezone
 
@@ -86,7 +87,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     has_bulk_insert = True
     can_combine_inserts_with_and_without_auto_increment_pk = True
 
-    def _supports_stddev(self):
+    @cached_property
+    def supports_stddev(self):
         """Confirm support for STDDEV and related stats functions
 
         SQLite supports STDDEV as an extension package; so

@@ -31,9 +31,6 @@ class SpatiaLiteCreation(DatabaseCreation):
         self.connection.close()
         self.connection.settings_dict["NAME"] = test_database_name
 
-        # Confirm the feature set of the test database
-        self.connection.features.confirm()
-
         # Need to load the SpatiaLite initialization SQL before running `syncdb`.
         self.load_spatialite_sql()
 

@@ -37,6 +37,7 @@ from django.db.backends.mysql.client import DatabaseClient
 from django.db.backends.mysql.creation import DatabaseCreation
 from django.db.backends.mysql.introspection import DatabaseIntrospection
 from django.db.backends.mysql.validation import DatabaseValidation
+from django.utils.functional import cached_property
 from django.utils.safestring import SafeString, SafeUnicode
 from django.utils import timezone
 
@@ -170,26 +171,25 @@ class DatabaseFeatures(BaseDatabaseFeatures):
 
     def __init__(self, connection):
         super(DatabaseFeatures, self).__init__(connection)
-        self._storage_engine = None
 
+    @cached_property
     def _mysql_storage_engine(self):
         "Internal method used in Django tests. Don't rely on this from your code"
-        if self._storage_engine is None:
-            cursor = self.connection.cursor()
-            cursor.execute('CREATE TABLE INTROSPECT_TEST (X INT)')
-            # This command is MySQL specific; the second column
-            # will tell you the default table type of the created
-            # table. Since all Django's test tables will have the same
-            # table type, that's enough to evaluate the feature.
-            cursor.execute("SHOW TABLE STATUS WHERE Name='INTROSPECT_TEST'")
-            result = cursor.fetchone()
-            cursor.execute('DROP TABLE INTROSPECT_TEST')
-            self._storage_engine = result[1]
-        return self._storage_engine
+        cursor = self.connection.cursor()
+        cursor.execute('CREATE TABLE INTROSPECT_TEST (X INT)')
+        # This command is MySQL specific; the second column
+        # will tell you the default table type of the created
+        # table. Since all Django's test tables will have the same
+        # table type, that's enough to evaluate the feature.
+        cursor.execute("SHOW TABLE STATUS WHERE Name='INTROSPECT_TEST'")
+        result = cursor.fetchone()
+        cursor.execute('DROP TABLE INTROSPECT_TEST')
+        return result[1]
 
-    def _can_introspect_foreign_keys(self):
+    @cached_property
+    def can_introspect_foreign_keys(self):
         "Confirm support for introspected foreign keys"
-        return self._mysql_storage_engine() != 'MyISAM'
+        return self._mysql_storage_engine != 'MyISAM'
 
 class DatabaseOperations(BaseDatabaseOperations):
     compiler_module = "django.db.backends.mysql.compiler"
