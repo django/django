@@ -10,10 +10,11 @@ from io import BytesIO
 from django.utils.encoding import force_unicode
 from django.utils.functional import allow_lazy, SimpleLazyObject
 from django.utils.translation import ugettext_lazy, ugettext as _, pgettext
+from django.utils.py3 import text_type
 
 # Capitalizes the first letter of a string.
 capfirst = lambda x: x and force_unicode(x)[0].upper() + force_unicode(x)[1:]
-capfirst = allow_lazy(capfirst, unicode)
+capfirst = allow_lazy(capfirst, text_type)
 
 # Set up regular expressions
 re_words = re.compile(r'&.*?;|<.*?>|(\w[\w-]*)', re.U|re.S)
@@ -46,7 +47,7 @@ def wrap(text, width):
                     pos = len(lines[-1])
             yield word
     return ''.join(_generator())
-wrap = allow_lazy(wrap, unicode)
+wrap = allow_lazy(wrap, text_type)
 
 
 class Truncator(SimpleLazyObject):
@@ -207,14 +208,14 @@ def truncate_words(s, num, end_text='...'):
         'in django.utils.text instead.', category=DeprecationWarning)
     truncate = end_text and ' %s' % end_text or ''
     return Truncator(s).words(num, truncate=truncate)
-truncate_words = allow_lazy(truncate_words, unicode)
+truncate_words = allow_lazy(truncate_words, text_type)
 
 def truncate_html_words(s, num, end_text='...'):
     warnings.warn('This function has been deprecated. Use the Truncator class '
         'in django.utils.text instead.', category=DeprecationWarning)
     truncate = end_text and ' %s' % end_text or ''
     return Truncator(s).words(num, truncate=truncate, html=True)
-truncate_html_words = allow_lazy(truncate_html_words, unicode)
+truncate_html_words = allow_lazy(truncate_html_words, text_type)
 
 def get_valid_filename(s):
     """
@@ -227,7 +228,7 @@ def get_valid_filename(s):
     """
     s = force_unicode(s).strip().replace(' ', '_')
     return re.sub(r'(?u)[^-\w.]', '', s)
-get_valid_filename = allow_lazy(get_valid_filename, unicode)
+get_valid_filename = allow_lazy(get_valid_filename, text_type)
 
 def get_text_list(list_, last_word=ugettext_lazy('or')):
     """
@@ -248,11 +249,11 @@ def get_text_list(list_, last_word=ugettext_lazy('or')):
         # Translators: This string is used as a separator between list elements
         _(', ').join([force_unicode(i) for i in list_][:-1]),
         force_unicode(last_word), force_unicode(list_[-1]))
-get_text_list = allow_lazy(get_text_list, unicode)
+get_text_list = allow_lazy(get_text_list, text_type)
 
 def normalize_newlines(text):
     return force_unicode(re.sub(r'\r\n|\r|\n', '\n', text))
-normalize_newlines = allow_lazy(normalize_newlines, unicode)
+normalize_newlines = allow_lazy(normalize_newlines, text_type)
 
 def recapitalize(text):
     "Recapitalizes text, placing caps after end-of-sentence punctuation."
@@ -288,9 +289,9 @@ def javascript_quote(s, quote_double_quotes=False):
     def fix(match):
         return b"\u%04x" % ord(match.group(1))
 
-    if type(s) == str:
+    if type(s) == bytes:
         s = s.decode('utf-8')
-    elif type(s) != unicode:
+    elif type(s) != text_type:
         raise TypeError(s)
     s = s.replace('\\', '\\\\')
     s = s.replace('\r', '\\r')
@@ -300,7 +301,7 @@ def javascript_quote(s, quote_double_quotes=False):
     if quote_double_quotes:
         s = s.replace('"', '&quot;')
     return str(ustring_re.sub(fix, s))
-javascript_quote = allow_lazy(javascript_quote, unicode)
+javascript_quote = allow_lazy(javascript_quote, text_type)
 
 # Expression to match some_token and some_token="with spaces" (and similarly
 # for single-quoted strings).
@@ -332,7 +333,7 @@ def smart_split(text):
     text = force_unicode(text)
     for bit in smart_split_re.finditer(text):
         yield bit.group(0)
-smart_split = allow_lazy(smart_split, unicode)
+smart_split = allow_lazy(smart_split, text_type)
 
 def _replace_entity(match):
     text = match.group(1)
@@ -356,7 +357,7 @@ _entity_re = re.compile(r"&(#?[xX]?(?:[0-9a-fA-F]+|\w{1,8}));")
 
 def unescape_entities(text):
     return _entity_re.sub(_replace_entity, text)
-unescape_entities = allow_lazy(unescape_entities, unicode)
+unescape_entities = allow_lazy(unescape_entities, text_type)
 
 def unescape_string_literal(s):
     r"""

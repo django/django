@@ -10,6 +10,7 @@ from django.db.models.related import RelatedObject
 from django.forms.forms import pretty_name
 from django.utils import formats
 from django.utils.html import escape
+from django.utils.py3 import integer_types, string_types, text_type
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
 from django.utils import timezone
@@ -52,7 +53,7 @@ def quote(s):
     quoting is slightly different so that it doesn't get automatically
     unquoted by the Web browser.
     """
-    if not isinstance(s, basestring):
+    if not isinstance(s, string_types):
         return s
     res = list(s)
     for i in range(len(res)):
@@ -275,7 +276,7 @@ def label_for_field(name, model, model_admin=None, return_attr=False):
     except models.FieldDoesNotExist:
         if name == "__unicode__":
             label = force_unicode(model._meta.verbose_name)
-            attr = unicode
+            attr = text_type
         elif name == "__str__":
             label = smart_str(model._meta.verbose_name)
             attr = str
@@ -350,7 +351,7 @@ def display_for_value(value, boolean=False):
         return formats.localize(timezone.template_localtime(value))
     elif isinstance(value, (datetime.date, datetime.time)):
         return formats.localize(value)
-    elif isinstance(value, (decimal.Decimal, float, int, long)):
+    elif isinstance(value, (decimal.Decimal, float) + integer_types):
         return formats.number_format(value)
     else:
         return smart_unicode(value)

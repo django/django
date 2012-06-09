@@ -6,6 +6,7 @@ from django.contrib.gis.gdal.geometries import OGRGeometry, OGRGeomType
 
 # ctypes function prototypes
 from django.contrib.gis.gdal.prototypes import ds as capi, geom as geom_api
+from django.utils.py3 import string_types
 
 # For more information, see the OGR C API source code:
 #  http://www.gdal.org/ogr/ogr__api_8h.html
@@ -33,7 +34,7 @@ class Feature(GDALBase):
         is not the field's _value_ -- use the `get` method instead to 
         retrieve the value (e.g. an integer) instead of a Field instance.
         """
-        if isinstance(index, basestring):
+        if isinstance(index, string_types):
             i = self.index(index)
         else:
             if index < 0 or index > self.num_fields:

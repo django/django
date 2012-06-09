@@ -2,6 +2,7 @@ import random
 import string
 
 from django.db import models
+from django.utils.py3 import text_type
 
 
 class MyWrapper(object):
@@ -44,12 +45,12 @@ class MyAutoField(models.CharField):
         if not value:
             return
         if isinstance(value, MyWrapper):
-            return unicode(value)
+            return text_type(value)
         return value
 
     def get_db_prep_value(self, value, connection, prepared=False):
         if not value:
             return
         if isinstance(value, MyWrapper):
-            return unicode(value)
+            return text_type(value)
         return value

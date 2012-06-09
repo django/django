@@ -15,6 +15,7 @@ from django.utils.datastructures import MultiValueDict, MergeDict
 from django.utils.html import escape, conditional_escape
 from django.utils.translation import ugettext, ugettext_lazy
 from django.utils.encoding import StrAndUnicode, force_unicode
+from django.utils.py3 import string_types
 from django.utils.safestring import mark_safe
 from django.utils import datetime_safe, formats
 
@@ -521,7 +522,7 @@ class CheckboxInput(Widget):
         value = data.get(name)
         # Translate true and false strings to boolean values.
         values =  {'true': True, 'false': False}
-        if isinstance(value, basestring):
+        if isinstance(value, string_types):
             value = values.get(value.lower(), value)
         return value
 

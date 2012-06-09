@@ -6,6 +6,7 @@ import pickle
 from django.test.utils import str_prefix
 from django.utils.unittest import TestCase
 from django.utils.functional import SimpleLazyObject, empty
+from django.utils.py3 import text_type
 
 
 class _ComplexObject(object):
@@ -22,7 +23,7 @@ class _ComplexObject(object):
         return "I am _ComplexObject(%r)" % self.name
 
     def __unicode__(self):
-        return unicode(self.name)
+        return text_type(self.name)
 
     def __repr__(self):
         return "_ComplexObject(%r)" % self.name
@@ -58,7 +59,7 @@ class TestUtilsSimpleLazyObject(TestCase):
             str(SimpleLazyObject(complex_object)))
 
     def test_unicode(self):
-        self.assertEqual("joe", unicode(SimpleLazyObject(complex_object)))
+        self.assertEqual("joe", text_type(SimpleLazyObject(complex_object)))
 
     def test_class(self):
         # This is important for classes that use __class__ in things like
@@ -108,5 +109,5 @@ class TestUtilsSimpleLazyObject(TestCase):
         pickled = pickle.dumps(x)
         unpickled = pickle.loads(pickled)
         self.assertEqual(unpickled, x)
-        self.assertEqual(unicode(unpickled), unicode(x))
+        self.assertEqual(text_type(unpickled), text_type(x))
         self.assertEqual(unpickled.name, x.name)

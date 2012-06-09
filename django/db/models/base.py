@@ -24,6 +24,7 @@ from django.db.models.loading import register_models, get_model
 from django.utils.translation import ugettext_lazy as _
 from django.utils.functional import curry
 from django.utils.encoding import smart_str, force_unicode
+from django.utils.py3 import text_type
 from django.utils.text import get_text_list, capfirst
 
 
@@ -372,7 +373,7 @@ class Model(object):
 
     def __repr__(self):
         try:
-            u = unicode(self)
+            u = text_type(self)
         except (UnicodeEncodeError, UnicodeDecodeError):
             u = '[Bad Unicode data]'
         return smart_str('<%s: %s>' % (self.__class__.__name__, u))
@@ -789,8 +790,8 @@ class Model(object):
     def date_error_message(self, lookup_type, field, unique_for):
         opts = self._meta
         return _("%(field_name)s must be unique for %(date_field)s %(lookup)s.") % {
-            'field_name': unicode(capfirst(opts.get_field(field).verbose_name)),
-            'date_field': unicode(capfirst(opts.get_field(unique_for).verbose_name)),
+            'field_name': text_type(capfirst(opts.get_field(field).verbose_name)),
+            'date_field': text_type(capfirst(opts.get_field(unique_for).verbose_name)),
             'lookup': lookup_type,
         }
 
@@ -805,16 +806,16 @@ class Model(object):
             field_label = capfirst(field.verbose_name)
             # Insert the error into the error dict, very sneaky
             return field.error_messages['unique'] %  {
-                'model_name': unicode(model_name),
-                'field_label': unicode(field_label)
+                'model_name': text_type(model_name),
+                'field_label': text_type(field_label)
             }
         # unique_together
         else:
             field_labels = map(lambda f: capfirst(opts.get_field(f).verbose_name), unique_check)
             field_labels = get_text_list(field_labels, _('and'))
             return _("%(model_name)s with this %(field_label)s already exists.") %  {
-                'model_name': unicode(model_name),
-                'field_label': unicode(field_labels)
+                'model_name': text_type(model_name),
+                'field_label': text_type(field_labels)
             }
 
     def full_clean(self, exclude=None):

@@ -12,6 +12,7 @@ from django.db.models.deletion import CASCADE
 from django.utils.encoding import smart_unicode
 from django.utils.translation import ugettext_lazy as _, string_concat
 from django.utils.functional import curry, cached_property
+from django.utils.py3 import string_types
 from django.core import exceptions
 from django import forms
 
@@ -104,7 +105,7 @@ class RelatedField(object):
                 }
 
         other = self.rel.to
-        if isinstance(other, basestring) or other._meta.pk is None:
+        if isinstance(other, string_types) or other._meta.pk is None:
             def resolve_related_class(field, model, cls):
                 field.rel.to = model
                 field.do_related_class(model, cls)
@@ -865,7 +866,7 @@ class ManyToOneRel(object):
         try:
             to._meta
         except AttributeError: # to._meta doesn't exist, so it must be RECURSIVE_RELATIONSHIP_CONSTANT
-            assert isinstance(to, basestring), "'to' must be either a model, a model name or the string %r" % RECURSIVE_RELATIONSHIP_CONSTANT
+            assert isinstance(to, string_types), "'to' must be either a model, a model name or the string %r" % RECURSIVE_RELATIONSHIP_CONSTANT
         self.to, self.field_name = to, field_name
         self.related_name = related_name
         if limit_choices_to is None:
@@ -933,7 +934,7 @@ class ForeignKey(RelatedField, Field):
         try:
             to_name = to._meta.object_name.lower()
         except AttributeError: # to._meta doesn't exist, so it must be RECURSIVE_RELATIONSHIP_CONSTANT
-            assert isinstance(to, basestring), "%s(%r) is invalid. First parameter to ForeignKey must be either a model, a model name, or the string %r" % (self.__class__.__name__, to, RECURSIVE_RELATIONSHIP_CONSTANT)
+            assert isinstance(to, string_types), "%s(%r) is invalid. First parameter to ForeignKey must be either a model, a model name, or the string %r" % (self.__class__.__name__, to, RECURSIVE_RELATIONSHIP_CONSTANT)
         else:
             assert not to._meta.abstract, "%s cannot define a relation with abstract class %s" % (self.__class__.__name__, to._meta.object_name)
             # For backwards compatibility purposes, we need to *try* and set
@@ -1004,7 +1005,7 @@ class ForeignKey(RelatedField, Field):
     def contribute_to_class(self, cls, name):
         super(ForeignKey, self).contribute_to_class(cls, name)
         setattr(cls, self.name, ReverseSingleRelatedObjectDescriptor(self))
-        if isinstance(self.rel.to, basestring):
+        if isinstance(self.rel.to, string_types):
             target = self.rel.to
         else:
             target = self.rel.to._meta.db_table
@@ -1022,7 +1023,7 @@ class ForeignKey(RelatedField, Field):
 
     def formfield(self, **kwargs):
         db = kwargs.pop('using', None)
-        if isinstance(self.rel.to, basestring):
+        if isinstance(self.rel.to, string_types):
             raise ValueError("Cannot create form field for %r yet, because "
                              "its related model %r has not been loaded yet" %
                              (self.name, self.rel.to))
@@ -1079,13 +1080,13 @@ class OneToOneField(ForeignKey):
 def create_many_to_many_intermediary_model(field, klass):
     from django.db import models
     managed = True
-    if isinstance(field.rel.to, basestring) and field.rel.to != RECURSIVE_RELATIONSHIP_CONSTANT:
+    if isinstance(field.rel.to, string_types) and field.rel.to != RECURSIVE_RELATIONSHIP_CONSTANT:
         to_model = field.rel.to
         to = to_model.split('.')[-1]
         def set_managed(field, model, cls):
             field.rel.through._meta.managed = model._meta.managed or cls._meta.managed
         add_lazy_relation(klass, field, to_model, set_managed)
-    elif isinstance(field.rel.to, basestring):
+    elif isinstance(field.rel.to, string_types):
         to = klass._meta.object_name
         to_model = klass
         managed = klass._meta.managed
@@ -1124,7 +1125,7 @@ class ManyToManyField(RelatedField, Field):
         try:
             assert not to._meta.abstract, "%s cannot define a relation with abstract class %s" % (self.__class__.__name__, to._meta.object_name)
         except AttributeError: # to._meta doesn't exist, so it must be RECURSIVE_RELATIONSHIP_CONSTANT
-            assert isinstance(to, basestring), "%s(%r) is invalid. First parameter to ManyToManyField must be either a model, a model name, or the string %r" % (self.__class__.__name__, to, RECURSIVE_RELATIONSHIP_CONSTANT)
+            assert isinstance(to, string_types), "%s(%r) is invalid. First parameter to ManyToManyField must be either a model, a model name, or the string %r" % (self.__class__.__name__, to, RECURSIVE_RELATIONSHIP_CONSTANT)
             # Python 2.6 and earlier require dictionary keys to be of str type,
             # not unicode and class names must be ASCII (in Python 2.x), so we
             # forcibly coerce it here (breaks early if there's a problem).
@@ -1232,12 +1233,12 @@ class ManyToManyField(RelatedField, Field):
 
         # Populate some necessary rel arguments so that cross-app relations
         # work correctly.
-        if isinstance(self.rel.through, basestring):
+        if isinstance(self.rel.through, string_types):
             def resolve_through_model(field, model, cls):
                 field.rel.through = model
             add_lazy_relation(cls, self, self.rel.through, resolve_through_model)
 
-        if isinstance(self.rel.to, basestring):
+        if isinstance(self.rel.to, string_types):
             target = self.rel.to
         else:
             target = self.rel.to._meta.db_table

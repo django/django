@@ -1,6 +1,7 @@
 import binascii
 import unittest
 from django.contrib.gis.geos import GEOSGeometry, WKTReader, WKTWriter, WKBReader, WKBWriter, geos_version_info
+from django.utils.py3 import text_type
 
 class GEOSIOTest(unittest.TestCase):
 
@@ -12,7 +13,7 @@ class GEOSIOTest(unittest.TestCase):
         # read() should return a GEOSGeometry
         ref = GEOSGeometry(wkt)
         g1 = wkt_r.read(wkt)
-        g2 = wkt_r.read(unicode(wkt))
+        g2 = wkt_r.read(text_type(wkt))
 
         for geom in (g1, g2):
             self.assertEqual(ref, geom)

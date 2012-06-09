@@ -1,5 +1,6 @@
 from django.db.models.fields import Field
 from django.db.models.sql.expressions import SQLEvaluator
+from django.utils.py3 import string_types
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.gis import forms
 from django.contrib.gis.db.models.proxy import GeometryProxy
@@ -159,7 +160,7 @@ class GeometryField(Field):
         # from the given string input.
         if isinstance(geom, Geometry):
             pass
-        elif isinstance(geom, basestring) or hasattr(geom, '__geo_interface__'):
+        elif isinstance(geom, string_types) or hasattr(geom, '__geo_interface__'):
             try:
                 geom = Geometry(geom)
             except GeometryException:

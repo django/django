@@ -11,6 +11,7 @@ from django.utils import datetime_safe
 from django.utils.dates import MONTHS
 from django.utils.safestring import mark_safe
 from django.utils.formats import get_format
+from django.utils.py3 import string_types
 from django.conf import settings
 
 __all__ = ('SelectDateWidget',)
@@ -64,7 +65,7 @@ class SelectDateWidget(Widget):
             year_val, month_val, day_val = value.year, value.month, value.day
         except AttributeError:
             year_val = month_val = day_val = None
-            if isinstance(value, basestring):
+            if isinstance(value, string_types):
                 if settings.USE_L10N:
                     try:
                         input_format = get_format('DATE_INPUT_FORMATS')[0]

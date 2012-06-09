@@ -45,6 +45,8 @@ from django.contrib.gis.gdal.layer import Layer
 # Getting the ctypes prototypes for the DataSource.
 from django.contrib.gis.gdal.prototypes import ds as capi
 
+from django.utils.py3 import string_types
+
 # For more information, see the OGR C API source code:
 #  http://www.gdal.org/ogr/ogr__api_8h.html
 #
@@ -65,7 +67,7 @@ class DataSource(GDALBase):
         if not capi.get_driver_count():
             capi.register_all()
 
-        if isinstance(ds_input, basestring):
+        if isinstance(ds_input, string_types):
             # The data source driver is a void pointer.
             ds_driver = Driver.ptr_type()
             try:
@@ -98,7 +100,7 @@ class DataSource(GDALBase):
 
     def __getitem__(self, index):
         "Allows use of the index [] operator to get a layer at the index."
-        if isinstance(index, basestring):
+        if isinstance(index, string_types):
             l = capi.get_layer_by_name(self.ptr, index)
             if not l: raise OGRIndexError('invalid OGR Layer name given: "%s"' % index)
         elif isinstance(index, int):

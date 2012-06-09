@@ -73,7 +73,7 @@ class ServerHandler(simple_server.ServerHandler, object):
     def write(self, data):
         """'write()' callable as specified by PEP 333"""
 
-        assert isinstance(data, str), "write() argument must be string"
+        assert isinstance(data, bytes), "write() argument must be bytestring"
 
         if not self.status:
             raise AssertionError("write() before start_response()")

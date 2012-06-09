@@ -6,6 +6,7 @@ import os
 
 from django.core.files.uploadedfile import UploadedFile
 from django.http import HttpResponse, HttpResponseServerError
+from django.utils.py3 import text_type
 
 from .models import FileModel, UPLOAD_TO
 from .tests import UNICODE_FILENAME
@@ -19,7 +20,7 @@ def file_upload_view(request):
     """
     form_data = request.POST.copy()
     form_data.update(request.FILES)
-    if isinstance(form_data.get('file_field'), UploadedFile) and isinstance(form_data['name'], unicode):
+    if isinstance(form_data.get('file_field'), UploadedFile) and isinstance(form_data['name'], text_type):
         # If a file is posted, the dummy client should only post the file name,
         # not the full path.
         if os.path.dirname(form_data['file_field'].name) != '':

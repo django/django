@@ -18,6 +18,7 @@ from django.utils.formats import (get_format, date_format, time_format,
     number_format)
 from django.utils.importlib import import_module
 from django.utils.numberformat import format as nformat
+from django.utils.py3 import text_type, long_type
 from django.utils.safestring import mark_safe, SafeString, SafeUnicode
 from django.utils.translation import (ugettext, ugettext_lazy, activate,
     deactivate, gettext_lazy, pgettext, npgettext, to_locale,
@@ -80,9 +81,9 @@ class TranslationTests(TestCase):
 
     def test_lazy_pickle(self):
         s1 = ugettext_lazy("test")
-        self.assertEqual(unicode(s1), "test")
+        self.assertEqual(text_type(s1), "test")
         s2 = pickle.loads(pickle.dumps(s1))
-        self.assertEqual(unicode(s2), "test")
+        self.assertEqual(text_type(s2), "test")
 
     def test_pgettext(self):
         # Reset translation catalog to include other/locale/de
@@ -221,10 +222,10 @@ class TranslationTests(TestCase):
 
     def test_string_concat(self):
         """
-        unicode(string_concat(...)) should not raise a TypeError - #4796
+        text_type(string_concat(...)) should not raise a TypeError - #4796
         """
         import django.utils.translation
-        self.assertEqual('django', unicode(django.utils.translation.string_concat("dja", "ngo")))
+        self.assertEqual('django', text_type(django.utils.translation.string_concat("dja", "ngo")))
 
     def test_safe_status(self):
         """
@@ -309,7 +310,7 @@ class FormattingTests(TestCase):
         self.d = datetime.date(2009, 12, 31)
         self.dt = datetime.datetime(2009, 12, 31, 20, 50)
         self.t = datetime.time(10, 15, 48)
-        self.l = 10000L
+        self.l = long_type(10000)
         self.ctxt = Context({
             'n': self.n,
             't': self.t,

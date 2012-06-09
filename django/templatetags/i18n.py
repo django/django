@@ -6,6 +6,7 @@ from django.template import (Node, Variable, TemplateSyntaxError,
 from django.template.base import _render_value_in_context
 from django.template.defaulttags import token_kwargs
 from django.utils import translation
+from django.utils.py3 import string_types
 
 
 register = Library()
@@ -76,7 +77,7 @@ class TranslateNode(Node):
         self.asvar = asvar
         self.message_context = message_context
         self.filter_expression = filter_expression
-        if isinstance(self.filter_expression.var, basestring):
+        if isinstance(self.filter_expression.var, string_types):
             self.filter_expression.var = Variable("'%s'" %
                                                   self.filter_expression.var)
 

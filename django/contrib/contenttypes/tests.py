@@ -9,6 +9,7 @@ from django.contrib.sites.models import Site
 from django.http import HttpRequest, Http404
 from django.test import TestCase
 from django.utils.encoding import smart_str
+from django.utils.py3 import text_type
 
 
 class ConcreteModel(models.Model):
@@ -271,4 +272,4 @@ class ContentTypesTests(TestCase):
             app_label = 'contenttypes',
             model = 'OldModel',
         )
-        self.assertEqual(unicode(ct), 'Old model')
+        self.assertEqual(text_type(ct), 'Old model')

@@ -12,6 +12,7 @@ from django.db import models
 from django.core.serializers.base import DeserializationError
 from django.core.serializers.python import Serializer as PythonSerializer
 from django.core.serializers.python import Deserializer as PythonDeserializer
+from django.utils.py3 import string_types
 
 class DjangoSafeDumper(yaml.SafeDumper):
     def represent_decimal(self, data):
@@ -48,7 +49,7 @@ def Deserializer(stream_or_string, **options):
     """
     Deserialize a stream or string of YAML data.
     """
-    if isinstance(stream_or_string, basestring):
+    if isinstance(stream_or_string, string_types):
         stream = BytesIO(stream_or_string)
     else:
         stream = stream_or_string

@@ -5,6 +5,8 @@ corresponding to geographic model fields.
 
 Thanks to Robert Coup for providing this functionality (see #4322).
 """
+from django.utils.py3 import string_types
+
 
 class GeometryProxy(object):
     def __init__(self, klass, field):
@@ -53,7 +55,7 @@ class GeometryProxy(object):
         if isinstance(value, self._klass) and (str(value.geom_type).upper() == gtype or gtype == 'GEOMETRY'):
             # Assigning the SRID to the geometry.
             if value.srid is None: value.srid = self._field.srid
-        elif value is None or isinstance(value, (basestring, buffer)):
+        elif value is None or isinstance(value, (string_types[0], buffer)):
             # Set with None, WKT, HEX, or WKB
             pass
         else:

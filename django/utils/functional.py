@@ -3,6 +3,8 @@ import operator
 from functools import wraps, update_wrapper
 import sys
 
+from django.utils.py3 import text_type
+
 
 # You can't trivially replace this `functools.partial` because this binds to
 # classes and returns bound instances, whereas functools.partial (on CPython)
@@ -92,8 +94,8 @@ def lazy(func, *resultclasses):
                         if hasattr(cls, k):
                             continue
                         setattr(cls, k, meth)
-            cls._delegate_str = str in resultclasses
-            cls._delegate_unicode = unicode in resultclasses
+            cls._delegate_str = bytes in resultclasses
+            cls._delegate_unicode = text_type in resultclasses
             assert not (cls._delegate_str and cls._delegate_unicode), "Cannot call lazy() with both str and unicode return types."
             if cls._delegate_unicode:
                 cls.__unicode__ = cls.__unicode_cast
@@ -147,7 +149,7 @@ def lazy(func, *resultclasses):
             if self._delegate_str:
                 return str(self) % rhs
             elif self._delegate_unicode:
-                return unicode(self) % rhs
+                return text_type(self) % rhs
             else:
                 raise AssertionError('__mod__ not supported for non-string types')
 
@@ -256,7 +258,7 @@ class SimpleLazyObject(LazyObject):
         self._wrapped = self._setupfunc()
 
     __str__ = new_method_proxy(str)
-    __unicode__ = new_method_proxy(unicode)
+    __unicode__ = new_method_proxy(text_type)
 
     def __deepcopy__(self, memo):
         if self._wrapped is empty:

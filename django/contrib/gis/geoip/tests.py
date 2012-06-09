@@ -5,6 +5,7 @@ from django.conf import settings
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.geoip import GeoIP, GeoIPException
 from django.utils import unittest
+from django.utils.py3 import string_types
 
 # Note: Requires use of both the GeoIP country and city datasets.
 # The GEOIP_DATA path should be the only setting set (the directory
@@ -35,7 +36,7 @@ class GeoIPTest(unittest.TestCase):
         bad_params = (23, 'foo', 15.23)
         for bad in bad_params:
             self.assertRaises(GeoIPException, GeoIP, cache=bad)
-            if isinstance(bad, basestring):
+            if isinstance(bad, string_types):
                 e = GeoIPException
             else:
                 e = TypeError

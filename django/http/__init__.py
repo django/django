@@ -11,6 +11,7 @@ from io import BytesIO
 from pprint import pformat
 from urllib import urlencode, quote
 from urlparse import urljoin, parse_qsl
+from django.utils.py3 import string_types, text_type
 
 import Cookie
 # Some versions of Python 2.7 and later won't need this encoding bug fix:
@@ -135,10 +136,10 @@ def build_request_repr(request, path_override=None, GET_override=None,
     return smart_str('<%s\npath:%s,\nGET:%s,\nPOST:%s,\nCOOKIES:%s,\nMETA:%s>' %
                      (request.__class__.__name__,
                       path,
-                      unicode(get),
-                      unicode(post),
-                      unicode(cookies),
-                      unicode(meta)))
+                      text_type(get),
+                      text_type(post),
+                      text_type(cookies),
+                      text_type(meta)))
 
 class UnreadablePostError(IOError):
     pass
@@ -552,7 +553,7 @@ class HttpResponse(object):
     def _convert_to_ascii(self, *values):
         """Converts all values to ascii strings."""
         for value in values:
-            if isinstance(value, unicode):
+            if isinstance(value, text_type):
                 try:
                     value = value.encode('us-ascii')
                 except UnicodeError as e:
@@ -671,7 +672,7 @@ class HttpResponse(object):
 
     def next(self):
         chunk = next(self._iterator)
-        if isinstance(chunk, unicode):
+        if isinstance(chunk, text_type):
             chunk = chunk.encode(self._charset)
         return str(chunk)
 
@@ -749,7 +750,7 @@ def str_to_unicode(s, encoding):
     Returns any non-basestring objects without change.
     """
     if isinstance(s, str):
-        return unicode(s, encoding, 'replace')
+        return text_type(s, encoding, 'replace')
     else:
         return s
 

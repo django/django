@@ -1,4 +1,6 @@
 from django.contrib.gis.geos.geometry import GEOSGeometry, wkt_regex, hex_regex
+from django.utils.py3 import string_types
+
 
 def fromfile(file_h):
     """
@@ -6,7 +8,7 @@ def fromfile(file_h):
     WKT, or HEX.
     """
     # If given a file name, get a real handle.
-    if isinstance(file_h, basestring): 
+    if isinstance(file_h, string_types):
         with open(file_h, 'rb') as file_h:
             buf = file_h.read()
     else:

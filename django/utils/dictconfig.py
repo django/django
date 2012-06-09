@@ -23,6 +23,8 @@ import re
 import sys
 import types
 
+from django.utils.py3 import string_types
+
 IDENTIFIER = re.compile('^[a-z_][a-z0-9_]*$', re.I)
 
 def valid_ident(s):
@@ -231,7 +233,7 @@ class BaseConfigurator(object):
                  isinstance(value, tuple):
             value = ConvertingTuple(value)
             value.configurator = self
-        elif isinstance(value, basestring): # str for py3k
+        elif isinstance(value, string_types):
             m = self.CONVERT_PATTERN.match(value)
             if m:
                 d = m.groupdict()

@@ -37,6 +37,7 @@ from django.db.backends.mysql.client import DatabaseClient
 from django.db.backends.mysql.creation import DatabaseCreation
 from django.db.backends.mysql.introspection import DatabaseIntrospection
 from django.db.backends.mysql.validation import DatabaseValidation
+from django.utils.py3 import long_type, text_type
 from django.utils.safestring import SafeString, SafeUnicode
 from django.utils import timezone
 
@@ -242,7 +243,7 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def no_limit_value(self):
         # 2**64 - 1, as recommended by the MySQL documentation
-        return 18446744073709551615L
+        return long_type(18446744073709551615)
 
     def quote_name(self, name):
         if name.startswith("`") and name.endswith("`"):
@@ -296,7 +297,7 @@ class DatabaseOperations(BaseDatabaseOperations):
                 raise ValueError("MySQL backend does not support timezone-aware datetimes when USE_TZ is False.")
 
         # MySQL doesn't support microseconds
-        return unicode(value.replace(microsecond=0))
+        return text_type(value.replace(microsecond=0))
 
     def value_to_db_time(self, value):
         if value is None:
@@ -307,7 +308,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             raise ValueError("MySQL backend does not support timezone-aware times.")
 
         # MySQL doesn't support microseconds
-        return unicode(value.replace(microsecond=0))
+        return text_type(value.replace(microsecond=0))
 
     def year_lookup_bounds(self, value):
         # Again, no microseconds
@@ -398,7 +399,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             kwargs['client_flag'] = CLIENT.FOUND_ROWS
             kwargs.update(settings_dict['OPTIONS'])
             self.connection = Database.connect(**kwargs)
-            self.connection.encoders[SafeUnicode] = self.connection.encoders[unicode]
+            self.connection.encoders[SafeUnicode] = self.connection.encoders[text_type]
             self.connection.encoders[SafeString] = self.connection.encoders[str]
             connection_created.send(sender=self.__class__, connection=self)
         cursor = self.connection.cursor()

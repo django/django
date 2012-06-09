@@ -13,6 +13,7 @@ from django.forms.widgets import Media, media_property, TextInput, Textarea
 from django.utils.datastructures import SortedDict
 from django.utils.html import conditional_escape
 from django.utils.encoding import StrAndUnicode, smart_unicode, force_unicode
+from django.utils.py3 import text_type
 from django.utils.safestring import mark_safe
 
 
@@ -150,7 +151,7 @@ class BaseForm(StrAndUnicode):
             if bf.is_hidden:
                 if bf_errors:
                     top_errors.extend(['(Hidden field %s) %s' % (name, force_unicode(e)) for e in bf_errors])
-                hidden_fields.append(unicode(bf))
+                hidden_fields.append(text_type(bf))
             else:
                 # Create a 'class="..."' atribute if the row should have any
                 # CSS classes applied.
@@ -180,7 +181,7 @@ class BaseForm(StrAndUnicode):
                 output.append(normal_row % {
                     'errors': force_unicode(bf_errors),
                     'label': force_unicode(label),
-                    'field': unicode(bf),
+                    'field': text_type(bf),
                     'help_text': help_text,
                     'html_class_attr': html_class_attr
                 })
@@ -508,7 +509,7 @@ class BoundField(StrAndUnicode):
         id_ = widget.attrs.get('id') or self.auto_id
         if id_:
             attrs = attrs and flatatt(attrs) or ''
-            contents = '<label for="%s"%s>%s</label>' % (widget.id_for_label(id_), attrs, unicode(contents))
+            contents = '<label for="%s"%s>%s</label>' % (widget.id_for_label(id_), attrs, text_type(contents))
         return mark_safe(contents)
 
     def css_classes(self, extra_classes=None):

@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import datetime
 
 from django.db import models
+from django.utils.py3 import text_type
 
 
 class Author(models.Model):
@@ -149,7 +150,7 @@ class Revision(models.Model):
         unique_together = (("repository", "revision"),)
 
     def __unicode__(self):
-        return "%s (%s)" % (self.revision, unicode(self.repository))
+        return "%s (%s)" % (self.revision, text_type(self.repository))
 
 # models for testing callable defaults (see bug #7975). If you define a model
 # with a callable default value, you cannot rely on the initial value in a

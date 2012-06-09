@@ -11,6 +11,7 @@ from django.db import DEFAULT_DB_ALIAS
 from django.db.backends import util
 from django.db.transaction import TransactionManagementError
 from django.utils.importlib import import_module
+from django.utils.py3 import text_type
 from django.utils.timezone import is_aware
 
 
@@ -790,7 +791,7 @@ class BaseDatabaseOperations(object):
         """
         if value is None:
             return None
-        return unicode(value)
+        return text_type(value)
 
     def value_to_db_datetime(self, value):
         """
@@ -799,7 +800,7 @@ class BaseDatabaseOperations(object):
         """
         if value is None:
             return None
-        return unicode(value)
+        return text_type(value)
 
     def value_to_db_time(self, value):
         """
@@ -810,7 +811,7 @@ class BaseDatabaseOperations(object):
             return None
         if is_aware(value):
             raise ValueError("Django does not support timezone-aware times.")
-        return unicode(value)
+        return text_type(value)
 
     def value_to_db_decimal(self, value, max_digits, decimal_places):
         """

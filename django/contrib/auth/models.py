@@ -8,6 +8,7 @@ from django.db import models
 from django.db.models.manager import EmptyManager
 from django.utils.crypto import get_random_string
 from django.utils.encoding import smart_str
+from django.utils.py3 import text_type
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 
@@ -79,9 +80,9 @@ class Permission(models.Model):
 
     def __unicode__(self):
         return "%s | %s | %s" % (
-            unicode(self.content_type.app_label),
-            unicode(self.content_type),
-            unicode(self.name))
+            text_type(self.content_type.app_label),
+            text_type(self.content_type),
+            text_type(self.name))
 
     def natural_key(self):
         return (self.codename,) + self.content_type.natural_key()
@@ -421,7 +422,7 @@ class AnonymousUser(object):
         return 'AnonymousUser'
 
     def __str__(self):
-        return unicode(self).encode('utf-8')
+        return text_type(self).encode('utf-8')
 
     def __eq__(self, other):
         return isinstance(other, self.__class__)

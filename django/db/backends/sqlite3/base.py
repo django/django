@@ -19,6 +19,7 @@ from django.db.backends.sqlite3.client import DatabaseClient
 from django.db.backends.sqlite3.creation import DatabaseCreation
 from django.db.backends.sqlite3.introspection import DatabaseIntrospection
 from django.utils.dateparse import parse_date, parse_datetime, parse_time
+from django.utils.py3 import text_type
 from django.utils.safestring import SafeString
 from django.utils import timezone
 
@@ -167,7 +168,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             else:
                 raise ValueError("SQLite backend does not support timezone-aware datetimes when USE_TZ is False.")
 
-        return unicode(value)
+        return text_type(value)
 
     def value_to_db_time(self, value):
         if value is None:
@@ -177,7 +178,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         if timezone.is_aware(value):
             raise ValueError("SQLite backend does not support timezone-aware times.")
 
-        return unicode(value)
+        return text_type(value)
 
     def year_lookup_bounds(self, value):
         first = '%s-01-01'
