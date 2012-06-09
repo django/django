@@ -2,11 +2,8 @@
 Date-based mixins
 =================
 
-.. currentmodule:: django.views.generic.dates
 
-YearMixin
-~~~~~~~~~
-.. class:: YearMixin()
+.. class:: django.views.generic.dates.YearMixin
 
     A mixin that can be used to retrieve and provide parsing information for a
     year component of a date.
@@ -39,9 +36,7 @@ YearMixin
 
         Raises a 404 if no valid year specification can be found.
 
-MonthMixin
-~~~~~~~~~~
-.. class:: MonthMixin()
+.. class:: django.views.generic.dates.MonthMixin
 
     A mixin that can be used to retrieve and provide parsing information for a
     month component of a date.
@@ -87,9 +82,7 @@ MonthMixin
         date provided. If ``allow_empty = False``, returns the previous month
         that contained data.
 
-DayMixin
-~~~~~~~~~
-.. class:: DayMixin()
+.. class:: django.views.generic.dates.DayMixin
 
     A mixin that can be used to retrieve and provide parsing information for a
     day component of a date.
@@ -134,9 +127,7 @@ DayMixin
         Returns a date object containing the previous day. If
         ``allow_empty = False``, returns the previous day that contained data.
 
-WeekMixin
-~~~~~~~~~
-.. class:: WeekMixin()
+.. class:: django.views.generic.dates.WeekMixin
 
     A mixin that can be used to retrieve and provide parsing information for a
     week component of a date.
@@ -170,9 +161,7 @@ WeekMixin
         Raises a 404 if no valid week specification can be found.
 
 
-DateMixin
-~~~~~~~~~
-.. class:: DateMixin()
+.. class:: django.views.generic.dates.DateMixin
 
     A mixin class providing common behavior for all date-based views.
 
@@ -215,9 +204,7 @@ DateMixin
         is greater than the current date/time. Returns
         :attr:`DateMixin.allow_future` by default.
 
-BaseDateListView
-~~~~~~~~~~~~~~~~
-.. class:: BaseDateListView()
+.. class:: django.views.generic.dates.BaseDateListView
 
     A base class that provides common behavior for all date-based views. There
     won't normally be a reason to instantiate

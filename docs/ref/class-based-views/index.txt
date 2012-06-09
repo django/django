@@ -1,5 +1,5 @@
 ==================
-class-based views
+Class-based views
 ==================
 
 Class-based views API reference. For introductory material, see

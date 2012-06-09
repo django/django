@@ -2,15 +2,7 @@
 Multiple object mixins
 =======================
 
-
-.. currentmodule:: django.views.generic.list
-
-MultipleObjectMixin
-~~~~~~~~~~~~~~~~~~~
-.. autoclass:: django.views.generic.list.MultipleObjectMixin
-    :members:
-    :undoc-members:
-    :inherited-members:
+.. class:: django.views.generic.list.MultipleObjectMixin
 
     A mixin that can be used to display a list of objects.
 
@@ -43,10 +35,6 @@ MultipleObjectMixin
 
     Note that ``page`` *must* be either a valid page number or the value
     ``last``; any other value for ``page`` will result in a 404 error.
-
-    **Classpath**
-
-    ``django.views.generic.list.MultipleObjectMixin``
 
     **Extends**
 
@@ -159,31 +147,14 @@ MultipleObjectMixin
       :class:`django.core.paginator.Page`. If the page is not paginated,
       this context variable will be ``None``.
 
-    **Autodoc**
 
-    .. note:: 
-    
-        Documentation on class-based views is a work in progress. The
-        following descriptions of methods and attributes are a work in progress
-        and will eventually subsume the **Methods and Attributes** described
-        above.
-
-MultipleObjectTemplateResponseMixin
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.. autoclass:: django.views.generic.list.MultipleObjectTemplateResponseMixin
-    :members:
-    :undoc-members:
-    :inherited-members:
+.. class:: django.views.generic.list.MultipleObjectTemplateResponseMixin
 
     A mixin class that performs template-based response rendering for views
     that operate upon a list of object instances. Requires that the view it is
     mixed with provides ``self.object_list``, the list of object instances that
     the view is operating on. ``self.object_list`` may be, but is not required
     to be, a :class:`~django.db.models.query.QuerySet`.
-
-    **Classpath**
-
-    ``django.views.generic.list.MultipleObjectTemplateResponseMixin``
 
     **Extends**
 
@@ -202,12 +173,3 @@ MultipleObjectTemplateResponseMixin
 
         * the value of ``template_name`` on the view (if provided)
         * ``<app_label>/<object_name><template_name_suffix>.html``
-        
-    **Autodoc**
-
-    .. note:: 
-    
-        Documentation on class-based views is a work in progress. The
-        following descriptions of methods and attributes are a work in progress
-        and will eventually subsume the **Methods and Attributes** described
-        above.

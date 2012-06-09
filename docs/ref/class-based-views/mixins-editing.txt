@@ -2,20 +2,9 @@
 Editing mixins
 =================
 
-.. currentmodule:: django.views.generic.edit
-
-FormMixin
-~~~~~~~~~
-.. autoclass:: django.views.generic.edit.FormMixin
-    :members:
-    :undoc-members:
-    :inherited-members:
+.. class:: django.views.generic.edit.FormMixin
 
     A mixin class that provides facilities for creating and displaying forms.
-    
-    **Classpath**
-    
-    ``django.views.generic.edit.FormMixin``
 
     **Methods and Attributes**
 
@@ -34,12 +23,13 @@ FormMixin
     .. method:: get_initial()
 
         Retrieve initial data for the form. By default, returns a copy of
-        :attr:`.initial`.
+        :attr:`~django.views.generic.edit.FormMixin.initial`.
 
     .. admonition:: Changed in 1.4
 
-        In Django 1.3, this method was returning the :attr:`initial` class
-        variable itself.
+        In Django 1.3, this method was returning the
+        :attr:`~django.views.generic.edit.FormMixin.initial` class variable
+        itself.
 
     .. method:: get_form_class()
 
@@ -49,7 +39,7 @@ FormMixin
     .. method:: get_form(form_class)
 
         Instantiate an instance of ``form_class`` using
-        :meth:`.get_form_kwargs`.
+        :meth:`~django.views.generic.edit.FormMixin.get_form_kwargs`.
 
     .. method:: get_form_kwargs()
 
@@ -62,11 +52,13 @@ FormMixin
     .. method:: get_success_url()
 
         Determine the URL to redirect to when the form is successfully
-        validated. Returns :attr:`.success_url` by default.
+        validated. Returns
+        :attr:`~django.views.generic.edit.FormMixin.success_url` by default.
 
     .. method:: form_valid(form)
 
-        Redirects to :meth:`.get_success_url`.
+        Redirects to
+        :meth:`~django.views.generic.edit.FormMixin.get_success_url`.
 
     .. method:: form_invalid(form)
 
@@ -82,26 +74,12 @@ FormMixin
 
     .. note::
 
-        Views mixing :class:`FormMixin` must
-        provide an implementation of :meth:`.form_valid` and
-        :meth:`.form_invalid`.
-
-    **Autodoc**
-    
-    .. note:: 
-    
-        Documentation on class-based views is a work in progress. The
-        following descriptions of methods and attributes are a work in progress
-        and will eventually subsume the **Methods and Attributes** described
-        above.
+        Views mixing :class:`FormMixin` must provide an implementation of
+        :meth:`~django.views.generic.FormMixin.form_valid` and
+        :meth:`~django.views.generic.FormMixin.form_invalid`.
 
 
-ModelFormMixin
-~~~~~~~~~~~~~~
-.. autoclass:: django.views.generic.edit.ModelFormMixin
-    :members:
-    :undoc-members:
-    :inherited-members:
+.. class:: django.views.generic.edit.ModelFormMixin
 
     A form mixin that works on ModelForms, rather than a standalone form.
 
@@ -112,10 +90,6 @@ ModelFormMixin
     object that the ModelForm is manipulating. The view also provides
     ``self.object``, the instance being manipulated. If the instance is being
     created, ``self.object`` will be ``None``.
-
-    **Classpath**
-
-    ``django.views.generic.edit.ModelFormMixin``
 
     **Mixins**
 
@@ -150,45 +124,28 @@ ModelFormMixin
     .. method:: get_success_url()
 
         Determine the URL to redirect to when the form is successfully
-        validated. Returns :attr:`FormMixin.success_url` if it is provided;
+        validated. Returns :attr:`ModelFormMixin.success_url` if it is provided;
         otherwise, attempts to use the ``get_absolute_url()`` of the object.
 
     .. method:: form_valid(form)
 
         Saves the form instance, sets the current object for the view, and
-        redirects to :meth:`.get_success_url`.
+        redirects to
+        :meth:`~django.views.generic.edit.FormMixin.get_success_url`.
 
     .. method:: form_invalid()
 
         Renders a response, providing the invalid form as context.
-        
-    **Autodoc**
-
-    .. note:: 
-    
-        Documentation on class-based views is a work in progress. The
-        following descriptions of methods and attributes are a work in progress
-        and will eventually subsume the **Methods and Attributes** described
-        above.
-
-ProcessFormView
-~~~~~~~~~~~~~~~
-.. autoclass:: django.views.generic.edit.ProcessFormView
-    :members:
-    :undoc-members:
-    :inherited-members:
+            
+.. class:: django.views.generic.edit.ProcessFormView
 
     A mixin that provides basic HTTP GET and POST workflow.
-    
+
     .. note:: 
-    
+
         This is named 'ProcessFormView' and inherits directly from :class:`django.views.generic.base.View`,
         but breaks if used independently. Therefore is actually a mixin.
 
-    **Classpath**
-
-    ``django.views.generic.edit.ProcessFormView``
-    
     **Extends**
 
     * :class:`django.views.generic.base.View`
@@ -207,27 +164,9 @@ ProcessFormView
 
     The PUT action is also handled, as an analog of POST.
 
-    **Autodoc**
-
-    .. note:: 
-    
-        Documentation on class-based views is a work in progress. The
-        following descriptions of methods and attributes are a work in progress
-        and will eventually subsume the **Methods and Attributes** described
-        above.
-
-DeletionMixin
-~~~~~~~~~~~~~
-.. autoclass:: django.views.generic.edit.DeletionMixin
-    :members:
-    :undoc-members:
-    :inherited-members:
+.. class:: django.views.generic.edit.DeletionMixin
 
     Enables handling of the ``DELETE`` http action.
-
-    **Classpath**
-
-    ``django.views.generic.edit.DeletionMixin``
 
     **Methods and Attributes**
 
@@ -242,12 +181,3 @@ DeletionMixin
         successfully deleted. Returns
         :attr:`~django.views.generic.edit.DeletionMixin.success_url` by
         default.
-
-    **Autodoc**
-
-    .. note:: 
-    
-        Documentation on class-based views is a work in progress. The
-        following descriptions of methods and attributes are a work in progress
-        and will eventually subsume the **Methods and Attributes** described
-        above.

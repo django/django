@@ -7,23 +7,12 @@ Django views. You may think of them as *base* views, which can be used by
 themselves or inherited from.  They may not provide all the capabilities required
 for projects, in which case there are Mixins and Generic class-based views.
 
-.. currentmodule:: django.views.generic.base
 
-
-View
-~~~~
-.. autoclass:: django.views.generic.base.View
-    :members:
-    :undoc-members:
-    :inherited-members:
+.. class:: django.views.generic.base.View
 
     The master class-based base view. All other class-based views inherit from
     this base class.
-    
-    **Classpath**
 
-    ``django.views.generic.base.View``
-    
     **Method Flowchart**
 
         1. dispatch()
@@ -41,7 +30,7 @@ View
                 return HttpResponse('Hello, World!')
 
     **Example urls.py**::
-    
+
         from django.conf.urls import patterns, url
         
         from myapp.views import MyView
@@ -77,37 +66,25 @@ View
         method is called instead.
 
         The default implementation returns ``HttpResponseNotAllowed`` with list
-        of allowed methods in plain text.   
+        of allowed methods in plain text.
         
-    **Autoclass methods**
-
     .. note:: 
-    
-        Documentation on class-based views is a work in progress. The
-        following descriptions of methods and attributes are a work in progress
-        and will eventually subsume the **Methods and Attributes** described
-        above.    
 
-TemplateView
-~~~~~~~~~~~~
-.. autoclass:: django.views.generic.base.TemplateView
-    :members:
-    :undoc-members:
-    :inherited-members:
+        Documentation on class-based views is a work in progress. As yet, only the
+        methods defined directly on the class are documented here, not methods
+        defined on superclasses.
+
+.. class:: django.views.generic.base.TemplateView
 
     Renders a given template, passing it a ``{{ params }}`` template variable,
     which is a dictionary of the parameters captured in the URL.
-    
-    **Classpath**
-    
-    ``django.views.generic.base.TemplateView``    
 
     **Ancestors (MRO)**
 
     * :class:`django.views.generic.base.TemplateView`
     * :class:`django.views.generic.base.TemplateResponseMixin`
     * :class:`django.views.generic.base.View`
-    
+
     **Method Flowchart**
 
         1. dispatch()
@@ -160,22 +137,13 @@ TemplateView
     * ``params``: The dictionary of keyword arguments captured from the URL
       pattern that served the view.
 
-    **Autoclass methods**
-
-
     .. note:: 
-    
-        Documentation on class-based views is a work in progress. The
-        following descriptions of methods and attributes are a work in progress
-        and will eventually subsume the **Methods and Attributes** described
-        above.
 
-RedirectView
-~~~~~~~~~~~~
-.. autoclass:: django.views.generic.base.RedirectView
-    :members:
-    :undoc-members:
-    :inherited-members:
+        Documentation on class-based views is a work in progress. As yet, only the
+        methods defined directly on the class are documented here, not methods
+        defined on superclasses.
+
+.. class:: django.views.generic.base.RedirectView
 
     Redirects to a given URL.
 
@@ -187,15 +155,11 @@ RedirectView
 
     If the given URL is ``None``, Django will return an ``HttpResponseGone``
     (410).
-    
-    **Classpath**
-    
-    ``django.views.generic.base.RedirectView``
-    
+
     **Ancestors (MRO)**
-    
+
     * :class:`django.views.generic.base.View`
-    
+
     **Method Flowchart**
 
         1. dispatch()
@@ -275,11 +239,8 @@ RedirectView
         behavior they wish, as long as the method returns a redirect-ready URL
         string.        
 
-    **Autoclass methods**
-
     .. note:: 
-    
-        Documentation on class-based views is a work in progress. The
-        following descriptions of methods and attributes are a work in progress
-        and will eventually subsume the **Methods and Attributes** described
-        above.
+
+        Documentation on class-based views is a work in progress. As yet, only the
+        methods defined directly on the class are documented here, not methods
+        defined on superclasses.

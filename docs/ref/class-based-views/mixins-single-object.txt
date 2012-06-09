@@ -2,21 +2,10 @@
 Single object mixins
 =====================
 
-.. currentmodule:: django.views.generic.detail
-
-SingleObjectMixin
-~~~~~~~~~~~~~~~~~
-.. autoclass:: django.views.generic.detail.SingleObjectMixin
-    :members:
-    :undoc-members:
-    :inherited-members:
+.. class:: django.views.generic.detail.SingleObjectMixin
 
     Provides a mechanism for looking up an object associated with the
     current HTTP request.
-
-    **Classpath**
-
-    ``django.views.generic.detail.SingleObjectMixin``
 
     **Methods and Attributes**
 
@@ -97,22 +86,7 @@ SingleObjectMixin
       ``context_object_name`` is specified, that variable will also be
       set in the context, with the same value as ``object``.
 
-    **Autodoc**
-
-    .. note:: 
-
-        Documentation on class-based views is a work in progress. The
-        following descriptions of methods and attributes are a work in progress
-        and will eventually subsume the **Methods and Attributes** described
-        above.
-
-SingleObjectTemplateResponseMixin
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. autoclass:: django.views.generic.detail.SingleObjectTemplateResponseMixin
-    :members:
-    :undoc-members:
-    :inherited-members:
+.. class:: django.views.generic.detail.SingleObjectTemplateResponseMixin
 
     A mixin class that performs template-based response rendering for views
     that operate upon a single object instance. Requires that the view it is
@@ -120,10 +94,6 @@ SingleObjectTemplateResponseMixin
     operating on. ``self.object`` will usually be, but is not required to be,
     an instance of a Django model. It may be ``None`` if the view is in the
     process of constructing a new instance.
-    
-    **Classpath**
-    
-    ``django.views.generic.detail.SingleObjectTemplateResponseMixin``
 
     **Extends**
 
@@ -152,12 +122,3 @@ SingleObjectTemplateResponseMixin
         * the contents of the ``template_name_field`` field on the
           object instance that the view is operating upon (if available)
         * ``<app_label>/<object_name><template_name_suffix>.html``
-
-    **Autodoc**
-
-    .. note:: 
-
-        Documentation on class-based views is a work in progress. The
-        following descriptions of methods and attributes are a work in progress
-        and will eventually subsume the **Methods and Attributes** described
-        above.

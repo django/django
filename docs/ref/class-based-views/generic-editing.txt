@@ -5,14 +5,7 @@ Generic editing class-based views
 The views described here provide a foundation for editing content.
 
 
-.. currentmodule:: django.views.generic.edit
-
-FormView
-~~~~~~~~
-.. autoclass:: django.views.generic.edit.FormView
-    :members:
-    :undoc-members:
-    :inherited-members:
+.. class:: django.views.generic.edit.FormView
 
     A view that displays a form. On error, redisplays the form with validation
     errors; on success, redirects to a new URL.
@@ -25,15 +18,8 @@ FormView
     * :class:`django.views.generic.edit.FormMixin`
     * :class:`django.views.generic.edit.ProcessFormView`
     * :class:`django.views.generic.base.View`
-    
-    **Methods and Attributes**
 
-CreateView
-~~~~~~~~~~
-.. autoclass:: django.views.generic.edit.CreateView
-    :members:
-    :undoc-members:
-    :inherited-members:
+.. class:: django.views.generic.edit.CreateView
 
     A view that displays a form for creating an object, redisplaying the form
     with validation errors (if there are any) and saving the object.
@@ -49,15 +35,8 @@ CreateView
     * :class:`django.views.generic.detail.SingleObjectMixin`
     * :class:`django.views.generic.edit.ProcessFormView`
     * :class:`django.views.generic.base.View`
-    
-    **Methods and Attributes**
 
-UpdateView
-~~~~~~~~~~
-.. autoclass:: django.views.generic.edit.UpdateView
-    :members:
-    :undoc-members:
-    :inherited-members:
+.. class:: django.views.generic.edit.UpdateView
 
     A view that displays a form for editing an existing object, redisplaying
     the form with validation errors (if there are any) and saving changes to
@@ -75,15 +54,8 @@ UpdateView
     * :class:`django.views.generic.detail.SingleObjectMixin`
     * :class:`django.views.generic.edit.ProcessFormView`
     * :class:`django.views.generic.base.View`
-    
-    **Methods and Attributes**
 
-DeleteView
-~~~~~~~~~~
-.. autoclass:: django.views.generic.edit.DeleteView
-    :members:
-    :undoc-members:
-    :inherited-members:
+.. class:: django.views.generic.edit.DeleteView
 
     A view that displays a confirmation page and deletes an existing object.
     The given object will only be deleted if the request method is ``POST``. If
@@ -105,5 +77,3 @@ DeleteView
 
     * The delete confirmation page displayed to a GET request uses a
       ``template_name_suffix`` of ``'_confirm_delete'``.
-      
-    **Methods and Attributes**

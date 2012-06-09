@@ -2,16 +2,14 @@
 Simple mixins
 ==============
 
-.. currentmodule:: django.views.generic.base
+.. class:: django.views.generic.base.ContextMixin
 
-ContextMixin
-~~~~~~~~~~~~~~~~~~~~~
-.. class:: ContextMixin()
+    .. versionadded:: 1.5
 
     **classpath**
-    
+
     ``django.views.generic.base.ContextMixin``
-    
+
     **Methods**
 
     .. method:: get_context_data(**kwargs)
@@ -19,22 +17,13 @@ ContextMixin
         Returns a dictionary representing the template context. The
         keyword arguments provided will make up the returned context.
 
-TemplateResponseMixin
-~~~~~~~~~~~~~~~~~~~~~
-.. autoclass:: django.views.generic.base.TemplateResponseMixin
-    :members:
-    :undoc-members:
-    :inherited-members:
+.. class:: django.views.generic.base.TemplateResponseMixin
 
     Provides a mechanism to construct a
     :class:`~django.template.response.TemplateResponse`, given
     suitable context. The template to use is configurable and can be
     further customized by subclasses.
 
-    **classpath**
-    
-    ``django.views.generic.base.TemplateResponseMixin``
-    
     **Methods and Attributes**
 
     .. attribute:: response_class
@@ -69,12 +58,3 @@ TemplateResponseMixin
         If :attr:`TemplateResponseMixin.template_name` is specified, the
         default implementation will return a list containing
         :attr:`TemplateResponseMixin.template_name` (if it is specified).
-        
-    **Autodoc**        
-    
-    .. note:: 
-    
-        Documentation on class-based views is a work in progress. The
-        following descriptions of methods and attributes are a work in progress
-        and will eventually subsume the **Methods and Attributes** described
-        above.
