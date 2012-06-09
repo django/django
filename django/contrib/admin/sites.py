@@ -334,6 +334,10 @@ class AdminSite(object):
         app_dict = {}
         user = request.user
         for model, model_admin in self._registry.items():
+            # skip models that do not wish to be shown on the index page
+            if model_admin.no_index:
+                continue
+
             app_label = model._meta.app_label
             has_module_perms = user.has_module_perms(app_label)
 
@@ -391,6 +395,10 @@ class AdminSite(object):
         app_dict = {}
         for model, model_admin in self._registry.items():
             if app_label == model._meta.app_label:
+                # ignore this model from the app's index if no_index
+                if model_admin.no_index:
+                    continue
+
                 if has_module_perms:
                     perms = model_admin.get_model_perms(request)
 

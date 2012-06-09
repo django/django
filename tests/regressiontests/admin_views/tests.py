@@ -2847,6 +2847,38 @@ class AdminInlineTests(TestCase):
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+class NoIndexTests(TestCase):
+    urls = "regressiontests.admin_views.urls"
+    fixtures = ['admin-views-users.xml']
+
+    def setUp(self):
+        self.client.login(username='super', password='secret')
+
+    def tearDown(self):
+        self.client.logout()
+
+    def test_admin_index_no_index(self):
+        "no_index=True on model admin should exclude itself from the index"
+        response = self.client.get('/test_admin/admin/')
+        # a link to the stuff admin should not be present
+        self.assertContains(response, '<a href="/test_admin/admin/admin_views/stuffbox/">Stuff boxs</a>', html=True)
+        self.assertNotContains(response, '<a href="/test_admin/admin/admin_views/stuff/">Stuffs</a>', html=True)
+
+    def test_admin_app_index_no_index(self):
+        "no_index=True on model admin should exclude itself from its app index"
+        response = self.client.get('/test_admin/admin/admin_views/')
+        # a link to the stuff admin should not present
+        self.assertContains(response, '<a href="/test_admin/admin/admin_views/stuffbox/">Stuff boxs</a>', html=True)
+        self.assertNotContains(response, '<a href="/test_admin/admin/admin_views/stuff/">Stuffs</a>', html=True)
+
+    def test_admin_no_index_inline_available(self):
+        "no_index=True should allow inline editing capability"
+        response = self.client.get('/test_admin/admin/admin_views/stuffbox/add/')
+        # an add button should be next to the `stuff` field for the StuffBox form
+        self.assertContains(response, 'id="add_id_stuff"')
+
+
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class NeverCacheTests(TestCase):
     urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml', 'admin-views-colors.xml', 'admin-views-fabrics.xml']
