@@ -14,6 +14,9 @@ from django.views.generic.detail import BaseDetailView, SingleObjectTemplateResp
 from django.views.generic.list import MultipleObjectMixin, MultipleObjectTemplateResponseMixin
 
 class YearMixin(object):
+    """
+    Mixin for views manipulating year-based data.
+    """
     year_format = '%Y'
     year = None
 
@@ -67,6 +70,9 @@ class YearMixin(object):
 
 
 class MonthMixin(object):
+    """
+    Mixin for views manipulating month-based data.
+    """
     month_format = '%b'
     month = None
 
@@ -123,6 +129,9 @@ class MonthMixin(object):
 
 
 class DayMixin(object):
+    """
+    Mixin for views manipulating day-based data.
+    """
     day_format = '%d'
     day = None
 
@@ -176,6 +185,9 @@ class DayMixin(object):
 
 
 class WeekMixin(object):
+    """
+    Mixin for views manipulating week-based data.
+    """
     week_format = '%U'
     week = None
 
@@ -312,7 +324,7 @@ class DateMixin(object):
 
 class BaseDateListView(MultipleObjectMixin, DateMixin, View):
     """
-    Abstract base class for date-based views display a list of objects.
+    Abstract base class for date-based views displaying a list of objects.
     """
     allow_empty = False
 
