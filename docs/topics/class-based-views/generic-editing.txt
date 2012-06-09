@@ -98,18 +98,16 @@ class:
         name = models.CharField(max_length=200)
 
         def get_absolute_url(self):
-            return reverse(
-                'author-detail',
-                kwargs = { 'pk': self.pk', },
-            )
+            return reverse('author-detail', kwargs={'pk': self.pk})
 
 Then we can use :class:`CreateView` and friends to do the actual
 work. Notice how we're just configuring the generic class-based views
 here; we don't have to write any logic ourselves::
    
     # views.py
-    from myapp.models import Author
     from django.views.generic.edit import CreateView, UpdateView, DeleteView
+    from django.core.urlresolvers import reverse_lazy
+    from myapp.models import Author
 
     class AuthorCreate(CreateView):
         model = Author
@@ -119,7 +117,11 @@ here; we don't have to write any logic ourselves::
 
     class AuthorDelete(DeleteView):
         model = Author
-        success_url = '/authors/'
+        success_url = reverse_lazy('author-list')
+
+.. note::
+    We have to use ``reverse_lazy`` here, not just ``reverse`` as the urls are
+    not loaded when the file is imported.
 
 Finally, we hook these new views into the URLconf::
 

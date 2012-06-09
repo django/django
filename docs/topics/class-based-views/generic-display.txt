@@ -386,19 +386,17 @@ field, but once again we could easily write a custom view to keep that field
 updated.
 
 First, we'd need to add an author detail bit in the URLconf to point to a
-custom view:
-
-.. parsed-literal::
+custom view::
 
     from books.views import AuthorDetailView
 
     urlpatterns = patterns('',
         #...
-        **url(
+        url(
             r'^authors/(?P<pk>\\d+)/$',
             AuthorDetailView.as_view(),
             name='author-detail'
-        ),**
+        ),
     )
 
 Then we'd write our new view -- ``get_object`` is the method that retrieves the
@@ -430,4 +428,4 @@ object -- so we simply override it and wrap the call::
 
     If you want to call the group something else, you can set ``pk_url_kwarg``
     on the view. More details can be found in the reference for
-    ``~django.views.generic.detail.DetailView``
+    :class:`~django.views.generic.detail.DetailView`
