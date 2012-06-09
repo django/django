@@ -557,6 +557,9 @@ to a faster hashing algorithm::
         'django.contrib.auth.hashers.MD5PasswordHasher',
     )
 
+Don't forget to also include in :setting:`PASSWORD_HASHERS` any hashing
+algorithm used in fixtures, if any.
+
 Testing tools
 =============
 
