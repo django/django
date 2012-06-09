@@ -1,8 +1,8 @@
 ====================================
-Generic Display Class Based Views
+Generic display class-based views
 ====================================
 
-The two following generic class based views are designed to display data. On
+The two following generic class-based views are designed to display data. On
 many projects they are typically the most commonly used views.
 
 .. currentmodule:: django.views.generic.detail
@@ -61,7 +61,7 @@ DetailView
 
     **Example urls.py**::
     
-        from django.conf.urls.defaults import patterns, url
+        from django.conf.urls import patterns, url
     
         from article.views import ArticleDetailView
 

@@ -1,5 +1,5 @@
 ====================================
-Generic Editing Class Based Views
+Generic editing class-based views
 ====================================
 
 The views described here provide a foundation for editing content.

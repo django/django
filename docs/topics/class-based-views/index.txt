@@ -18,7 +18,7 @@ to structure your views and reuse code by harnessing inheritance and
 mixins. There are also some generic views for simple tasks which we'll
 get to later, but you may want to deisgn your own structure of
 reusable views which suits your use case. For full details, see the
-:doc:`class based views reference
+:doc:`class-based views reference
 documentation</ref/class-based-views/index>`.
 
 Basic examples

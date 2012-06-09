@@ -1,5 +1,5 @@
 ====================================
-Generic Date Class Based Views
+Generic date class-based views
 ====================================
 
 Date-based generic views (in the module :mod:`django.views.generic.dates`)

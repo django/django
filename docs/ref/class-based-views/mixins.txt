@@ -1,8 +1,8 @@
 ===============================
-Class Based Views mixins
+Class-based views mixins
 ===============================
 
-Class Based Views API reference. For introductory material, see :doc:`/topics/class-based-views/mixins`.
+Class-based views API reference. For introductory material, see :doc:`/topics/class-based-views/mixins`.
 
 .. toctree::
    :maxdepth: 1

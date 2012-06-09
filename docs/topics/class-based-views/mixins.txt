@@ -1,5 +1,5 @@
 ===================================
-Using Mixins with class based views
+Using mixins with class-based views
 ===================================
 
 .. versionadded:: 1.3
@@ -7,10 +7,10 @@ Using Mixins with class based views
 .. caution::
 
     This is an advanced topic. A working knowledge of :doc:`Django's
-    class based views<index>` is advised before exploring these
+    class-based views<index>` is advised before exploring these
     techniques.
 
-Django's built-in class based views provide a lot of functionality,
+Django's built-in class-based views provide a lot of functionality,
 but some of it you may want to use separately. For instance, you may
 want to write a view that renders a template to make the HTTP
 response, but you can't use
@@ -31,7 +31,7 @@ Context and template responses
 ==============================
 
 Two central mixins are provided that help in providing a consistent
-interface to working with templates in class based views.
+interface to working with templates in class-based views.
 
 :class:`~django.views.generic.base.TemplateResponseMixin`
     Everywhere that needs to make a
@@ -51,14 +51,14 @@ interface to working with templates in class based views.
     :meth:`~django.views.generic.base.TemplateResponseMixin.get_template_names`,
     which by default will just look up
     :attr:`~django.views.generic.base.TemplateResponseMixin.template_name`
-    on the class based view; two other mixins
+    on the class-based view; two other mixins
     (:class:`~django.views.generic.detail.SingleObjectTemplateResponseMixin`
     and
     :class:`~django.views.generic.list.MultipleObjectTemplateResponseMixin`)
     override this to provide more flexible defaults when dealing with
     actual objects.
 
-.. versionadded:: 1.4
+.. versionadded:: 1.5
 
 :class:`~django.views.generic.base.ContextMixin`
     Everywhere that needs context data, such as for rendering a
@@ -69,10 +69,10 @@ interface to working with templates in class based views.
     :class:`ContextMixin` it simply returns its keyword arguments, but it
     is common to override this to add more members to the dictionary.
 
-Building up Django's generic class based views
+Building up Django's generic class-based views
 ===============================================
 
-Let's look at how two of Django's generic class based views are built
+Let's look at how two of Django's generic class-based views are built
 out of mixins providing discrete functionality. We'll consider
 :class:`~django.views.generic.detail.DetailView`, which renders a
 "detail" view of an object, and
@@ -111,7 +111,7 @@ on the view, or the
 :attr:`~django.views.generic.detail.SingleObjectMixin.queryset`
 attribute if that's provided). :class:`SingleObjectMixin` also overrides
 :meth:`~django.views.generic.base.ContextMixin.get_context_data`,
-which is used across all Django's built in class based views to supply
+which is used across all Django's built in class-based views to supply
 context data for template renders.
 
 To then make a :class:`TemplateResponse`, :class:`DetailView` uses
@@ -174,13 +174,13 @@ use suffixes such as ``_archive``, ``_archive_year`` and so on to use
 different templates for the various specialised date-based list
 views.)
 
-Using Django's class based view mixins
+Using Django's class-based view mixins
 ======================================
 
-Now we've seen how Django's generic class based views use the provided
+Now we've seen how Django's generic class-based views use the provided
 mixins, let's look at other ways we can combine them. Of course we're
-still going to be combining them with either built-in class based
-views, or other generic class based views, but there are a range of
+still going to be combining them with either built-in class-based
+views, or other generic class-based views, but there are a range of
 rarer problems you can solve than are provided for by Django out of
 the box.
 
@@ -194,8 +194,8 @@ the box.
     you're using, and how `method resolution order`_ will affect which
     versions of the methods will be called in what order.
 
-    The reference documentation for Django's :doc:`class based
-    views</ref/class-based-views/index>` and :doc:`class based view
+    The reference documentation for Django's :doc:`class-based
+    views</ref/class-based-views/index>` and :doc:`class-based view
     mixins</ref/class-based-views/mixins>` will help you in
     understanding which attributes and methods are likely to cause
     conflict between different classes and mixins.
@@ -216,7 +216,7 @@ the box.
 Using SingleObjectMixin with View
 ---------------------------------
 
-If we want to write a simple class based view that responds only to
+If we want to write a simple class-based view that responds only to
 ``POST``, we'll subclass :class:`~django.views.generic.base.View` and
 write a ``post()`` method in the subclass. However if we want our
 processing to work on a particular object, identified from the URL,
@@ -224,7 +224,7 @@ we'll want the functionality provided by
 :class:`~django.views.generic.detail.SingleObjectMixin`.
 
 We'll demonstrate this with the publisher modelling we used in the
-:doc:`generic class based views
+:doc:`generic class-based views
 introduction<generic-display>`.
 
 .. code-block:: python
@@ -391,7 +391,7 @@ increasingly complex as you try to do so, and a good rule of thumb is:
 .. hint::
 
     Each of your views should use only mixins or views from one of the
-    groups of generic class based views: :doc:`detail,
+    groups of generic class-based views: :doc:`detail,
     list<generic-display>`, :doc:`editing<generic-editing>` and
     :doc:`date<generic-date-based>`. For example it's fine to combine
     :class:`TemplateView` (built in view) with
@@ -445,7 +445,7 @@ Our new :class:`AuthorDetail` looks like this:
 
     # CAUTION: you almost certainly do not want to do this.
     # It is provided as part of a discussion of problems you can
-    # run into when combining different generic class based view
+    # run into when combining different generic class-based view
     # functionality that is not designed to be used together.
 
     from django import forms
@@ -581,7 +581,7 @@ template as :class:`AuthorDisplay` is using on ``GET``.
             return super(AuthorInterest, self).form_valid(form)
 
 Finally we bring this together in a new :class:`AuthorDetail` view. We
-already know that calling :meth:`as_view()` on a class based view
+already know that calling :meth:`as_view()` on a class-based view
 gives us something that behaves exactly like a function based view, so
 we can do that at the point we choose between the two subviews.
 
@@ -604,7 +604,7 @@ using a different template.
             view = AuthorInterest.as_view()
             return view(request, *args, **kwargs)
 
-This approach can also be used with any other generic class based
-views or your own class based views inheriting directly from
+This approach can also be used with any other generic class-based
+views or your own class-based views inheriting directly from
 :class:`View` or :class:`TemplateView`, as it keeps the different
 views as separate as possible.
