@@ -25,8 +25,8 @@ A class-based view is deployed into a URL pattern using the
 :meth:`~View.as_view()` classmethod::
 
     urlpatterns = patterns('',
-            (r'^view/$', MyView.as_view(size=42)),
-        )
+        (r'^view/$', MyView.as_view(size=42)),
+    )
 
 .. admonition:: Thread safety with view arguments
 
@@ -38,16 +38,15 @@ A class-based view is deployed into a URL pattern using the
 
 Any argument passed into :meth:`~View.as_view()` will be assigned onto the
 instance that is used to service a request. Using the previous example,
-this means that every request on ``MyView`` is able to interrogate
-``self.size``.
+this means that every request on ``MyView`` is able to use ``self.size``.
 
 Fundamental vs Generic class-based views
 -----------------------------------------
 
 Fundamental class-based views can be thought of as *base* views, which can be
-used by themselves or inherited from.  They may not provide all the
-capabilities required for projects, in which case there are Mixins which extend
-what Fundamental views can do.
+used by themselves or inherited from. They may not provide all the capabilities
+required for projects, in which case there are Mixins which extend what
+fundamental views can do.
 
 Django’s generic views are built off of the fundamental class-based views, and
 were developed as a shortcut for common usage patterns such as displaying the

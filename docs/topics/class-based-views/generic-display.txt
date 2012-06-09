@@ -130,7 +130,11 @@ inferred template will be ``"books/publisher_list.html"`` -- the "books" part
 comes from the name of the app that defines the model, while the "publisher"
 bit is just the lowercased version of the model's name.
 
-.. note:: Thus, when (for example) the :class:`django.template.loaders.app_directories.Loader` template loader is enabled in :setting:`TEMPLATE_LOADERS`, a template location could be: /path/to/project/books/templates/books/publisher_list.html
+.. note::
+    Thus, when (for example) the
+    :class:`django.template.loaders.app_directories.Loader` template loader is
+    enabled in :setting:`TEMPLATE_LOADERS`, a template location could be:
+    /path/to/project/books/templates/books/publisher_list.html
 
 .. highlightlang:: html+django
 
@@ -222,15 +226,15 @@ more::
 
 .. note::
 
-    Generally, get_context_data will merge the context data of all parent classes
-    with those of the current class.  To preserve this behavior in your own classes
-    where you want to alter the context, you should be sure to call
-    get_context_data on the super class. When no two classes try to define the same
-    key, this will give the expected results. However if any class attempts to
-    override a key after parent classes have set it (after the call to super), any
-    children of that class will also need to explictly set it after super if they
-    want to be sure to override all parents. If you're having trouble, review
-    the method resolution order of your view.
+    Generally, get_context_data will merge the context data of all parent
+    classes with those of the current class. To preserve this behavior in your
+    own classes where you want to alter the context, you should be sure to call
+    get_context_data on the super class. When no two classes try to define the
+    same key, this will give the expected results. However if any class
+    attempts to override a key after parent classes have set it (after the call
+    to super), any children of that class will also need to explictly set it
+    after super if they want to be sure to override all parents. If you're
+    having trouble, review the method resolution order of your view.
 
 .. _generic-views-list-subsets:
 
@@ -392,11 +396,7 @@ custom view::
 
     urlpatterns = patterns('',
         #...
-        url(
-            r'^authors/(?P<pk>\\d+)/$',
-            AuthorDetailView.as_view(),
-            name='author-detail'
-        ),
+        url(r'^authors/(?P<pk>\\d+)/$', AuthorDetailView.as_view(), name='author-detail'),
     )
 
 Then we'd write our new view -- ``get_object`` is the method that retrieves the

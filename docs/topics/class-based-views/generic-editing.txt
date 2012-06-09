@@ -83,7 +83,6 @@ extra validation) simply set
 .. note::
     When specifying a custom form class, you must still specify the model,
     even though the :attr:`form_class` may be a :class:`ModelForm`.
-    (See https://code.djangoproject.com/ticket/15125)
 
 First we need to add :meth:`get_absolute_url()` to our :class:`Author`
 class:
@@ -120,8 +119,8 @@ here; we don't have to write any logic ourselves::
         success_url = reverse_lazy('author-list')
 
 .. note::
-    We have to use ``reverse_lazy`` here, not just ``reverse`` as the urls are
-    not loaded when the file is imported.
+    We have to use :func:`~django.core.urlresolvers.reverse_lazy` here, not
+    just ``reverse`` as the urls are not loaded when the file is imported.
 
 Finally, we hook these new views into the URLconf::
 

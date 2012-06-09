@@ -4,8 +4,9 @@ Fundamental class-based views
 
 The following three classes provide much of the functionality needed to create
 Django views. You may think of them as *base* views, which can be used by
-themselves or inherited from.  They may not provide all the capabilities required
-for projects, in which case there are Mixins and Generic class-based views.
+themselves or inherited from. They may not provide all the capabilities
+required for projects, in which case there are Mixins and Generic class-based
+views.
 
 
 .. class:: django.views.generic.base.View
@@ -35,13 +36,8 @@ for projects, in which case there are Mixins and Generic class-based views.
         
         from myapp.views import MyView
         
-        urlpatterns = patterns("",
-
-            url(
-                regex   = r"^mine/$",
-                view    = MyView.as_view(),
-                name    = "my_view",
-            ),
+        urlpatterns = patterns('',
+            url(r'^mine/$', MyView.as_view(), name='my-view'),
         )
         
     **Methods**
@@ -112,13 +108,8 @@ for projects, in which case there are Mixins and Generic class-based views.
 
         from myapp.views import HomePageView
 
-        urlpatterns = patterns("",
-
-            url(
-                regex   = r"^$",
-                view    = HomePageView.as_view(),
-                name    = "home",
-            ),
+        urlpatterns = patterns('',
+            url(r'^$', HomePageView.as_view(), name='home'),
         )
 
     **Methods and Attributes**
@@ -175,14 +166,13 @@ for projects, in which case there are Mixins and Generic class-based views.
 
         class ArticleCounterRedirectView(RedirectView):
 
-            permanent = True
+            permanent = False
             query_string = True
 
             def get_redirect_url(self, pk):
                 article = get_object_or_404(Article, pk=pk)
-                article.count += 1
-                article.save()
-                return reverse('product_detail', args=(pk, ))
+                article.update_counter()
+                return reverse('product_detail', args=(pk,))
 
     **Example urls.py**::
 
@@ -191,20 +181,10 @@ for projects, in which case there are Mixins and Generic class-based views.
         
         from article.views import ArticleCounterRedirectView
 
-        urlpatterns = patterns("",
+        urlpatterns = patterns('',
 
-            url(
-                regex   = r"r^(?P<pk>\d+)/$",
-                view    = ArticleCounterRedirectView.as_view(),
-                name    = "article_counter"
-            ),
-            url(
-                regex   = r"^go-to-django/$",
-                view    = RedirectView.as_view(
-                    url = "http://djangoproject.com"
-                ),
-                name = "go_to_django",
-            ),
+            url(r'r^(?P<pk>\d+)/$', ArticleCounterRedirectView.as_view(), name='article-counter'),
+            url(r'^go-to-django/$', RedirectView.as_view(url='http://djangoproject.com'), name='go-to-django'),
         )
 
     **Methods and Attributes**

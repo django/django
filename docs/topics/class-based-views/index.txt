@@ -83,7 +83,7 @@ A similar overriding pattern can be used for the ``url`` attribute on
 More than just HTML
 -------------------
 
-Where class based view shine is when you want to do the same thing many times.
+Where class based views shine is when you want to do the same thing many times.
 Suppose you're writing an API, and every view should return JSON instead of
 rendered HTML.
 

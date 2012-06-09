@@ -104,10 +104,10 @@ Single object mixins
     .. attribute:: template_name_field
 
         The field on the current object instance that can be used to determine
-        the name of a candidate template. If either ``template_name_field`` or
-        the value of the ``template_name_field`` on the current object instance
-        is ``None``, the object will not be interrogated for a candidate
-        template name.
+        the name of a candidate template. If either ``template_name_field``
+        itself or the value of the ``template_name_field`` on the current
+        object instance is ``None``, the object will not be used for a
+        candidate template name.
 
     .. attribute:: template_name_suffix
 

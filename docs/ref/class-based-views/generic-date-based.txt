@@ -5,11 +5,8 @@ Generic date class-based views
 Date-based generic views (in the module :mod:`django.views.generic.dates`)
 are views for displaying drilldown pages for date-based data.
 
-.. currentmodule:: django.views.generic.dates
 
-ArchiveIndexView
-~~~~~~~~~~~~~~~~
-.. class:: ArchiveIndexView()
+.. class:: django.views.generic.dates.ArchiveIndexView
 
     A top-level index page showing the "latest" objects, by date. Objects with
     a date in the *future* are not included unless you set ``allow_future`` to
@@ -31,9 +28,7 @@ ArchiveIndexView
     * Uses a default ``context_object_name`` of ``latest``.
     * Uses a default ``template_name_suffix`` of ``_archive``.
 
-YearArchiveView
-~~~~~~~~~~~~~~~
-.. class:: YearArchiveView()
+.. class:: django.views.generic.dates.YearArchiveView
 
     A yearly archive page showing all available months in a given year. Objects
     with a date in the *future* are not displayed unless you set
@@ -70,9 +65,11 @@ YearArchiveView
     :class:`django.views.generic.dates.BaseDateListView`), the template's
     context will be:
 
-    * ``date_list``: A ``DateQuerySet`` object containing all months that
-      have objects available according to ``queryset``, represented as
-      ``datetime.datetime`` objects, in ascending order.
+    * ``date_list``: A
+      :meth:`DateQuerySet<django.db.models.query.QuerySet.dates>` object
+      object containing all months that have objects available according to
+      ``queryset``, represented as ``datetime.datetime`` objects, in ascending
+      order.
 
     * ``year``: A ``datetime.date`` object representing the given year.
 
@@ -88,9 +85,7 @@ YearArchiveView
 
     * Uses a default ``template_name_suffix`` of ``_archive_year``.
 
-MonthArchiveView
-~~~~~~~~~~~~~~~~
-.. class:: MonthArchiveView()
+.. class:: django.views.generic.dates.MonthArchiveView
 
     A monthly archive page showing all objects in a given month. Objects with a
     date in the *future* are not displayed unless you set ``allow_future`` to
@@ -116,9 +111,11 @@ MonthArchiveView
     :class:`~django.views.generic.dates.BaseDateListView`), the template's
     context will be:
 
-    * ``date_list``: A ``DateQuerySet`` object containing all days that
-      have objects available in the given month, according to ``queryset``,
-      represented as ``datetime.datetime`` objects, in ascending order.
+    * ``date_list``: A
+      :meth:`DateQuerySet<django.db.models.query.QuerySet.dates>` object
+      containing all days that have objects available in the given month,
+      according to ``queryset``, represented as ``datetime.datetime`` objects,
+      in ascending order.
 
     * ``month``: A ``datetime.date`` object representing the given month.
 
@@ -134,9 +131,7 @@ MonthArchiveView
 
     * Uses a default ``template_name_suffix`` of ``_archive_month``.
 
-WeekArchiveView
-~~~~~~~~~~~~~~~
-.. class:: WeekArchiveView()
+.. class:: django.views.generic.dates.WeekArchiveView
 
     A weekly archive page showing all objects in a given week. Objects with a
     date in the *future* are not displayed unless you set ``allow_future`` to
@@ -177,9 +172,7 @@ WeekArchiveView
 
     * Uses a default ``template_name_suffix`` of ``_archive_week``.
 
-DayArchiveView
-~~~~~~~~~~~~~~
-.. class:: DayArchiveView()
+.. class:: django.views.generic.dates.DayArchiveView
 
     A day archive page showing all objects in a given day. Days in the future
     throw a 404 error, regardless of whether any objects exist for future days,
@@ -226,9 +219,7 @@ DayArchiveView
 
     * Uses a default ``template_name_suffix`` of ``_archive_day``.
 
-TodayArchiveView
-~~~~~~~~~~~~~~~~
-.. class:: TodayArchiveView()
+.. class:: django.views.generic.dates.TodayArchiveView
 
     A day archive page showing all objects for *today*. This is exactly the
     same as :class:`django.views.generic.dates.DayArchiveView`, except today's
@@ -249,9 +240,7 @@ TodayArchiveView
     * :class:`django.views.generic.dates.DateMixin`
     * :class:`django.views.generic.base.View`
 
-DateDetailView
-~~~~~~~~~~~~~~
-.. class:: DateDetailView()
+.. class:: django.views.generic.dates.DateDetailView
 
     A page representing an individual object. If the object has a date value in
     the future, the view will throw a 404 error by default, unless you set

@@ -120,7 +120,7 @@ class ModelFormMixin(FormMixin, SingleObjectMixin):
 
     def form_valid(self, form):
         """
-        If the form is valid, save is associated model.
+        If the form is valid, save the associated model.
         """
         self.object = form.save()
         return super(ModelFormMixin, self).form_valid(form)
@@ -142,11 +142,11 @@ class ModelFormMixin(FormMixin, SingleObjectMixin):
 
 class ProcessFormView(View):
     """
-    A mixin that processes a form on POST.
+    A mixin that renders a form on GET and processes it on POST.
     """
     def get(self, request, *args, **kwargs):
         """
-        Handles the GET HTTP verb and instantiates a blank version of the form.
+        Handles GET requests and instantiates a blank version of the form.
         """
         form_class = self.get_form_class()
         form = self.get_form(form_class)
@@ -154,9 +154,8 @@ class ProcessFormView(View):
 
     def post(self, request, *args, **kwargs):
         """
-        Handles the POST HTTP verb, instantiating an instance of the class
-        that is passed the contents of the POST request dict and then checked
-        for validity.
+        Handles POST requests, instantiating a form instance with the passed
+        POST variables and then checked for validity.
         """
         form_class = self.get_form_class()
         form = self.get_form(form_class)

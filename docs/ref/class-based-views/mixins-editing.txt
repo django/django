@@ -25,11 +25,10 @@ Editing mixins
         Retrieve initial data for the form. By default, returns a copy of
         :attr:`~django.views.generic.edit.FormMixin.initial`.
 
-    .. admonition:: Changed in 1.4
-
-        In Django 1.3, this method was returning the
-        :attr:`~django.views.generic.edit.FormMixin.initial` class variable
-        itself.
+        .. versionchanged:: 1.4
+            In Django 1.3, this method was returning the
+            :attr:`~django.views.generic.edit.FormMixin.initial` class variable
+            itself.
 
     .. method:: get_form_class()
 
@@ -143,8 +142,9 @@ Editing mixins
 
     .. note:: 
 
-        This is named 'ProcessFormView' and inherits directly from :class:`django.views.generic.base.View`,
-        but breaks if used independently. Therefore is actually a mixin.
+        This is named 'ProcessFormView' and inherits directly from
+        :class:`django.views.generic.base.View`, but breaks if used
+        independently, so it is more of a mixin.
 
     **Extends**
 

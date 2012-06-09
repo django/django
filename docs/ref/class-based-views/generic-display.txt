@@ -34,9 +34,8 @@ many projects they are typically the most commonly used views.
 
     **Example views.py**::
 
-        from datetime import datetime
-
         from django.views.generic.detail import DetailView
+        from django.utils import timezone
 
         from articles.models import Article
 
@@ -46,7 +45,7 @@ many projects they are typically the most commonly used views.
 
             def get_context_data(self, **kwargs):
                 context = super(ArticleDetailView, self).get_context_data(**kwargs)
-                context['now'] = datetime.now()
+                context['now'] = timezone.now()
                 return context
 
     **Example urls.py**::
@@ -55,13 +54,8 @@ many projects they are typically the most commonly used views.
 
         from article.views import ArticleDetailView
 
-        urlpatterns = patterns("",
-
-            url(
-                regex   = r"r^(?P<slug>[-_\w]+)/$",
-                view    = ArticleDetailView.as_view(),
-                name    = "article_detail"
-            ),
+        urlpatterns = patterns('',
+            url(r'^(?P<slug>[-_\w]+)/$', ArticleDetailView.as_view(), 'article-detail'),
         )    
 
 .. class:: django.views.generic.list.ListView

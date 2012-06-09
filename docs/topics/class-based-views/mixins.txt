@@ -34,40 +34,39 @@ Two central mixins are provided that help in providing a consistent
 interface to working with templates in class-based views.
 
 :class:`~django.views.generic.base.TemplateResponseMixin`
-    Everywhere that needs to make a
+    Every built in view which returns a
     :class:`~django.template.response.TemplateResponse` will call the
     :meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`
-    method that :class:`TemplateResponseMixin` provides.  Most of the time
-    this will be called for you (for instance, it is called by the
-    ``get()`` method implemented by both
-    :class:`~django.views.generic.base.TemplateView` and
-    :class:`~django.views.generic.base.DetailView`); similarly, it's
-    unlikely that you'll need to override it, although if you want
-    your response to return something not rendered via a Django
-    template then you'll want to do it. For an example of this, see
-    the :ref:`JSONResponseMixin example <jsonresponsemixin-example>`.
+    method that :class:`TemplateResponseMixin` provides. Most of the time this
+    will be called for you (for instance, it is called by the ``get()`` method
+    implemented by both :class:`~django.views.generic.base.TemplateView` and
+    :class:`~django.views.generic.base.DetailView`); similarly, it's unlikely
+    that you'll need to override it, although if you want your response to
+    return something not rendered via a Django template then you'll want to do
+    it. For an example of this, see the :ref:`JSONResponseMixin example
+    <jsonresponsemixin-example>`.
 
     ``render_to_response`` itself calls
     :meth:`~django.views.generic.base.TemplateResponseMixin.get_template_names`,
     which by default will just look up
-    :attr:`~django.views.generic.base.TemplateResponseMixin.template_name`
-    on the class-based view; two other mixins
+    :attr:`~django.views.generic.base.TemplateResponseMixin.template_name` on
+    the class-based view; two other mixins
     (:class:`~django.views.generic.detail.SingleObjectTemplateResponseMixin`
     and
     :class:`~django.views.generic.list.MultipleObjectTemplateResponseMixin`)
-    override this to provide more flexible defaults when dealing with
-    actual objects.
+    override this to provide more flexible defaults when dealing with actual
+    objects.
 
 .. versionadded:: 1.5
 
 :class:`~django.views.generic.base.ContextMixin`
-    Everywhere that needs context data, such as for rendering a
+    Every built in view which needs context data, such as for rendering a
     template (including :class:`TemplateResponseMixin` above), should call
-    :meth:`~django.views.generic.base.ContextMixin.get_context_data`
-    passing any data they want to ensure is in there as keyword
-    arguments. ``get_context_data`` returns a dictionary; in
-    :class:`ContextMixin` it simply returns its keyword arguments, but it
-    is common to override this to add more members to the dictionary.
+    :meth:`~django.views.generic.base.ContextMixin.get_context_data` passing
+    any data they want to ensure is in there as keyword arguments.
+    ``get_context_data`` returns a dictionary; in :class:`ContextMixin` it
+    simply returns its keyword arguments, but it is common to override this to
+    add more members to the dictionary.
 
 Building up Django's generic class-based views
 ===============================================
@@ -247,12 +246,7 @@ introduction<generic-display>`.
             self.object = self.get_object()
             # Actually record interest somehow here!
 
-            return HttpResponseRedirect(
-                reverse(
-                    'author-detail',
-                    kwargs={ 'pk': self.object.pk },
-                )
-            )
+            return HttpResponseRedirect(reverse('author-detail', kwargs={'pk': self.object.pk}))
 
 In practice you'd probably want to record the interest in a key-value
 store rather than in a relational database, so we've left that bit
@@ -271,11 +265,7 @@ We can hook this into our URLs easily enough:
 
     urlpatterns = patterns('',
         #...
-        **url(
-            r'^author/(?P<pk>\d+)/interest/$',
-            RecordInterest.as_view(),
-            name='author-interest',
-        ),**
+        url(r'^author/(?P<pk>\d+)/interest/$', RecordInterest.as_view(), name='author-interest'),
     )
 
 Note the ``pk`` named group, which
