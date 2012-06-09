@@ -251,11 +251,10 @@ class Sqlite3InMemoryTestDbs(unittest.TestCase):
                     },
                 })
                 other = db.connections['other']
-                self.assertIsNone(other.features.supports_transactions)
                 DjangoTestSuiteRunner(verbosity=0).setup_databases()
                 msg = "DATABASES setting '%s' option set to sqlite3's ':memory:' value shouldn't interfere with transaction support detection." % option
                 # Transaction support should be properly initialised for the 'other' DB
-                self.assertIsNotNone(other.features.supports_transactions, msg)
+                self.assertTrue(other.features.supports_transactions, msg)
                 # And all the DBs should report that they support transactions
                 self.assertTrue(connections_support_transactions(), msg)
             finally:
