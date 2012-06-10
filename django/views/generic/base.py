@@ -90,6 +90,9 @@ class View(object):
         return http.HttpResponseNotAllowed(self._allowed_methods())
 
     def options(self, request, *args, **kwargs):
+        """
+        Handles responding to requests for the OPTIONS HTTP verb.
+        """
         response = http.HttpResponse()
         response['Allow'] = ', '.join(self._allowed_methods())
         response['Content-Length'] = 0
