@@ -16,9 +16,8 @@ views.
 
     **Method Flowchart**
 
-        1. dispatch()
-        2. http_method_not_allowed()
-
+    1. dispatch()
+    2. http_method_not_allowed()
 
     **Example views.py**::
 
@@ -83,9 +82,9 @@ views.
 
     **Method Flowchart**
 
-        1. dispatch()
-        2. http_method_not_allowed()
-        3. get_context_data()
+    1. dispatch()
+    2. http_method_not_allowed()
+    3. get_context_data()
       
     **Example views.py**::
 
@@ -153,9 +152,9 @@ views.
 
     **Method Flowchart**
 
-        1. dispatch()
-        2. http_method_not_allowed()
-        3. get_redirect_url()
+    1. dispatch()
+    2. http_method_not_allowed()
+    3. get_redirect_url()
 
     **Example views.py**::
 

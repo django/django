@@ -136,10 +136,9 @@ Finally, we hook these new views into the URLconf::
     )
         
 .. note::
-    These views inherit
-    :class:`~django.views.generic.detail.SingleObjectTemplateResponseMixin`
-    which uses
-    :attr:`~django.views.generic.detail.SingleObjectTemplateResponseMixin.template_name_prefix`
+
+    These views inherit :class:`~django.views.generic.detail.SingleObjectTemplateResponseMixin`
+    which uses :attr:`~django.views.generic.detail.SingleObjectTemplateResponseMixin.template_name_prefix`
     to construct the
     :attr:`~django.views.generic.base.TemplateResponseMixin.template_name`
     based on the model.
