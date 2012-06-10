@@ -66,20 +66,22 @@ are views for displaying drilldown pages for date-based data.
     context will be:
 
     * ``date_list``: A
-      :meth:`DateQuerySet<django.db.models.query.QuerySet.dates>` object
-      object containing all months that have objects available according to
-      ``queryset``, represented as ``datetime.datetime`` objects, in ascending
-      order.
+      :meth:`DateQuerySet<django.db.models.query.QuerySet.dates>` object object
+      containing all months that have objects available according to
+      ``queryset``, represented as
+      :class:`datetime.datetime<python:datetime.datetime>` objects, in
+      ascending order.
 
-    * ``year``: A ``datetime.date`` object representing the given year.
+    * ``year``: A :class:`datetime.date<python:datetime.date>` object
+      representing the given year.
 
-    * ``next_year``: A ``datetime.date`` object representing the first day
-      of the next year. If the next year is in the future, this will be
-      ``None``.
+    * ``next_year``: A :class:`datetime.date<python:datetime.date>` object
+      representing the first day of the next year. If the next year is in the
+      future, this will be ``None``.
 
-    * ``previous_year``: A ``datetime.date`` object representing the first
-      day of the previous year. Unlike ``next_year``, this will never be
-      ``None``.
+    * ``previous_year``: A :class:`datetime.date<python:datetime.date>` object
+      representing the first day of the previous year. Unlike ``next_year``,
+      this will never be ``None``.
 
     **Notes**
 
@@ -114,18 +116,20 @@ are views for displaying drilldown pages for date-based data.
     * ``date_list``: A
       :meth:`DateQuerySet<django.db.models.query.QuerySet.dates>` object
       containing all days that have objects available in the given month,
-      according to ``queryset``, represented as ``datetime.datetime`` objects,
-      in ascending order.
+      according to ``queryset``, represented as
+      :class:`datetime.datetime<python:datetime.datetime>` objects, in
+      ascending order.
 
-    * ``month``: A ``datetime.date`` object representing the given month.
+    * ``month``: A :class:`datetime.date<python:datetime.date>` object
+      representing the given month.
 
-    * ``next_month``: A ``datetime.date`` object representing the first day
-      of the next month. If the next month is in the future, this will be
-      ``None``.
+    * ``next_month``: A :class:`datetime.date<python:datetime.date>` object
+      representing the first day of the next month. If the next month is in the
+      future, this will be ``None``.
 
-    * ``previous_month``: A ``datetime.date`` object representing the first
-      day of the previous month. Unlike ``next_month``, this will never be
-      ``None``.
+    * ``previous_month``: A :class:`datetime.date<python:datetime.date>` object
+      representing the first day of the previous month. Unlike ``next_month``,
+      this will never be ``None``.
 
     **Notes**
 
@@ -157,16 +161,16 @@ are views for displaying drilldown pages for date-based data.
     :class:`~django.views.generic.dates.BaseDateListView`), the template's
     context will be:
 
-    * ``week``: A ``datetime.date`` object representing the first day of
-      the given week.
+    * ``week``: A :class:`datetime.date<python:datetime.date>` object
+      representing the first day of the given week.
 
-    * ``next_week``: A ``datetime.date`` object representing the first day
-      of the next week. If the next week is in the future, this will be
-      ``None``.
+    * ``next_week``: A :class:`datetime.date<python:datetime.date>` object
+      representing the first day of the next week. If the next week is in the
+      future, this will be ``None``.
 
-    * ``previous_week``: A ``datetime.date`` object representing the first
-      day of the previous week. Unlike ``next_week``, this will never be
-      ``None``.
+    * ``previous_week``: A :class:`datetime.date<python:datetime.date>` object
+      representing the first day of the previous week. Unlike ``next_week``,
+      this will never be ``None``.
 
     **Notes**
 
@@ -199,21 +203,24 @@ are views for displaying drilldown pages for date-based data.
     :class:`~django.views.generic.dates.BaseDateListView`), the template's
     context will be:
 
-    * ``day``: A ``datetime.date`` object representing the given day.
+    * ``day``: A :class:`datetime.date<python:datetime.date>` object
+      representing the given day.
 
-    * ``next_day``: A ``datetime.date`` object representing the next day.
-      If the next day is in the future, this will be ``None``.
-
-    * ``previous_day``: A ``datetime.date`` object representing the
-      previous day. Unlike ``next_day``, this will never be ``None``.
-
-    * ``next_month``: A ``datetime.date`` object representing the first day
-      of the next month. If the next month is in the future, this will be
+    * ``next_day``: A :class:`datetime.date<python:datetime.date>` object
+      representing the next day. If the next day is in the future, this will be
       ``None``.
 
-    * ``previous_month``: A ``datetime.date`` object representing the first
-      day of the previous month. Unlike ``next_month``, this will never be
+    * ``previous_day``: A :class:`datetime.date<python:datetime.date>` object
+      representing the previous day. Unlike ``next_day``, this will never be
       ``None``.
+
+    * ``next_month``: A :class:`datetime.date<python:datetime.date>` object
+      representing the first day of the next month. If the next month is in the
+      future, this will be ``None``.
+
+    * ``previous_month``: A :class:`datetime.date<python:datetime.date>` object
+      representing the first day of the previous month. Unlike ``next_month``,
+      this will never be ``None``.
 
     **Notes**
 
@@ -260,5 +267,8 @@ are views for displaying drilldown pages for date-based data.
     * :class:`django.views.generic.detail.SingleObjectMixin`
     * :class:`django.views.generic.base.View`
 
-.. note:: All of the generic views listed above have matching Base* views that only
-    differ in that the they do not include the :class:`~django.views.generic.detail.SingleObjectTemplateResponseMixin`.
+.. note::
+
+    All of the generic views listed above have matching Base* views that only
+    differ in that the they do not include the
+    :class:`~django.views.generic.detail.SingleObjectTemplateResponseMixin`.
