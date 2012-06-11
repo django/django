@@ -48,6 +48,7 @@ class SingleObjectMixin(ContextMixin):
                                  % self.__class__.__name__)
 
         try:
+            # Get the single item from the filtered queryset
             obj = queryset.get()
         except ObjectDoesNotExist:
             raise Http404(_("No %(verbose_name)s found matching the query") %
@@ -88,6 +89,9 @@ class SingleObjectMixin(ContextMixin):
             return None
 
     def get_context_data(self, **kwargs):
+        """
+        Insert the single object into the context dict.
+        """
         context = {}
         context_object_name = self.get_context_object_name(self.object)
         if context_object_name:
@@ -97,6 +101,9 @@ class SingleObjectMixin(ContextMixin):
 
 
 class BaseDetailView(SingleObjectMixin, View):
+    """
+    A base view for displaying a single object
+    """
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
         context = self.get_context_data(object=self.object)
@@ -109,8 +116,13 @@ class SingleObjectTemplateResponseMixin(TemplateResponseMixin):
 
     def get_template_names(self):
         """
-        Return a list of template names to be used for the request. Must return
-        a list. May not be called if render_to_response is overridden.
+        Return a list of template names to be used for the request. May not be
+        called if render_to_response is overridden. Returns the following list:
+
+        * the value of ``template_name`` on the view (if provided)
+        * the contents of the ``template_name_field`` field on the
+          object instance that the view is operating upon (if available)
+        * ``<app_label>/<object_name><template_name_suffix>.html``        
         """
         try:
             names = super(SingleObjectTemplateResponseMixin, self).get_template_names()
