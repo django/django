@@ -10,17 +10,17 @@ import re
 from django.conf import settings
 from django.core.urlresolvers import get_callable
 from django.utils.cache import patch_vary_headers
-from django.utils.http import same_origin
+from django.utils.http import domain_permitted
 from django.utils.log import getLogger
 from django.utils.crypto import constant_time_compare, get_random_string
 
 logger = getLogger('django.request')
 
 REASON_NO_REFERER = "Referer checking failed - no Referer."
-REASON_BAD_REFERER = "Referer checking failed - %s does not match %s."
+REASON_BAD_REFERER = "Referer checking failed - %s is not permitted."
 REASON_NO_CSRF_COOKIE = "CSRF cookie not set."
 REASON_BAD_TOKEN = "CSRF token missing or incorrect."
-REASON_BAD_ORIGIN = "Origin checking failed - %s does not match %s."
+REASON_BAD_ORIGIN = "Origin checking failed - %s is not permitted."
 
 CSRF_KEY_LENGTH = 32
 
@@ -117,15 +117,15 @@ class CsrfViewMiddleware(object):
             # Note that host includes the port.
             host = request.META.get('HTTP_HOST', '')
             origin = request.META.get('HTTP_ORIGIN')
-            good_origin = 'http%s://%s/' % ('s' if request.is_secure() else '', host)
+            permitted_domains = getattr(settings, 'PERMITTED_DOMAINS', [host])
 
             # If origin header exists, use it to check for csrf attacks.
             # Origin header is being compared to None here as we need to reject
             # requests with origin header as '' too, which otherwise is treated
             # as null.
             if origin is not None:
-                if not same_origin(origin, good_origin):
-                    reason = REASON_BAD_ORIGIN % (origin, good_origin)
+                if not domain_permitted(origin, permitted_domains):
+                    reason = REASON_BAD_ORIGIN % (origin)
                     logger.warning('Forbidden (%s): %s',
                                    reason, request.path,
                         extra={
@@ -163,10 +163,8 @@ class CsrfViewMiddleware(object):
 
                 return self._reject(request, REASON_NO_REFERER)
 
-            good_referer = good_origin
-
-            if not same_origin(referer, good_referer):
-                reason = REASON_BAD_REFERER % (referer, good_referer)
+            if not domain_permitted(referer, permitted_domains):
+                reason = REASON_BAD_REFERER % (referer)
                 logger.warning('Forbidden (%s): %s', reason, request.path,
                     extra={
                         'status_code': 403,

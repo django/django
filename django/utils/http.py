@@ -10,6 +10,8 @@ from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import smart_str, force_unicode
 from django.utils.functional import allow_lazy
 
+from fnmatch import fnmatch
+
 ETAG_MATCH = re.compile(r'(?:W/)?"((?:\\.|[^"])*)"')
 
 MONTHS = 'jan feb mar apr may jun jul aug sep oct nov dec'.split()
@@ -213,3 +215,16 @@ def same_origin(url1, url2):
     """
     p1, p2 = urlparse.urlparse(url1), urlparse.urlparse(url2)
     return (p1.scheme, p1.hostname, p1.port) == (p2.scheme, p2.hostname, p2.port)
+
+def domain_permitted(url, permitted_domains):
+    """
+    Check if the url submitted is from a permitted domain
+    """
+    domain = urlparse.urlparse(url).hostname
+
+    for permitted_domain in permitted_domains:
+        # This uses the unix glob filename pattern matching, documented here:
+        # http://docs.python.org/library/fnmatch.html
+        if fnmatch(domain, permitted_domain):
+            return True
+    return False

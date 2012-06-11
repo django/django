@@ -344,7 +344,7 @@ class CsrfViewMiddlewareTest(TestCase):
         self.assertTrue(resp2.cookies.get(settings.CSRF_COOKIE_NAME, False))
         self.assertTrue('Cookie' in resp2.get('Vary',''))
 
-    @override_settings(CSRF_COOKIE_DOMAIN='www.example.com')
+    @override_settings(PERMITTED_DOMAINS=['www.example.com'])
     def test_good_origin_header(self):
         """
         Test if a good origin header is accepted for across subdomain settings.
@@ -355,7 +355,7 @@ class CsrfViewMiddlewareTest(TestCase):
         req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
         self.assertEqual(None, req2)
 
-    @override_settings(CSRF_COOKIE_DOMAIN='example.com')
+    @override_settings(PERMITTED_DOMAINS=['example.com'])
     def test_good_origin_header_3(self):
         """
         Test if a good origin header is accepted for a no subdomain.
@@ -387,7 +387,7 @@ class CsrfViewMiddlewareTest(TestCase):
         req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
         self.assertEqual(403, req2.status_code)
 
-    @override_settings(CSRF_COOKIE_DOMAIN='example.com')
+    @override_settings(PERMITTED_DOMAINS=['example.com'])
     def test_bad_origin_header_2(self):
         """
         Test if a bad origin header is rejected for subdomains.
