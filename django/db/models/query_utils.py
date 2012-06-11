@@ -5,6 +5,7 @@ Factored out from django.db.models.query to avoid making the main module very
 large and/or so that they can be used by other modules without getting into
 circular import difficulties.
 """
+from __future__ import unicode_literals
 
 from django.db.backends import util
 from django.utils import tree
@@ -177,7 +178,7 @@ def deferred_class_factory(model, attrs):
     overrides["Meta"] = Meta
     overrides["__module__"] = model.__module__
     overrides["_deferred"] = True
-    return type(name, (model,), overrides)
+    return type(str(name), (model,), overrides)
 
 # The above function is also used to unpickle model instances with deferred
 # fields.

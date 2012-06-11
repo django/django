@@ -174,3 +174,10 @@ class DeferRegressionTest(TestCase):
         qs = ResolveThis.objects.defer('num')
         self.assertEqual(1, qs.count())
         self.assertEqual('Foobar', qs[0].name)
+
+    def test_deferred_class_factory(self):
+        from django.db.models.query_utils import deferred_class_factory
+        new_class = deferred_class_factory(Item,
+            ('this_is_some_very_long_attribute_name_so_modelname_truncation_is_triggered',))
+        self.assertEqual(new_class.__name__,
+            'Item_Deferred_this_is_some_very_long_attribute_nac34b1f495507dad6b02e2cb235c875e')
