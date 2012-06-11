@@ -134,7 +134,7 @@ these changes.
 
 * The function-based generic view modules will be removed in favor of their
   class-based equivalents, outlined :doc:`here
-  </topics/class-based-views>`:
+  </topics/class-based-views/index>`:
 
 * The :class:`~django.core.servers.basehttp.AdminMediaHandler` will be
   removed.  In its place use
@@ -221,7 +221,7 @@ these changes.
   the 1.4 release. They will be removed.
 
 * The :doc:`form wizard </ref/contrib/formtools/form-wizard>` has been
-  refactored to use class based views with pluggable backends in 1.4.
+  refactored to use class-based views with pluggable backends in 1.4.
   The previous implementation will be removed.
 
 * Legacy ways of calling

@@ -105,9 +105,10 @@ The view layer
   :doc:`Managing files <topics/files>` |
   :doc:`Custom storage <howto/custom-file-storage>`
 
-* **Generic views:**
-  :doc:`Overview<topics/class-based-views>` |
-  :doc:`Built-in generic views<ref/class-based-views>`
+* **Class-based views:**
+  :doc:`Overview<topics/class-based-views/index>` |
+  :doc:`Built-in class-based views<ref/class-based-views/index>` |
+  :doc:`Built-in view mixins<ref/class-based-views/mixins>`
 
 * **Advanced:**
   :doc:`Generating CSV <howto/outputting-csv>` |

@@ -1,0 +1,79 @@
+====================================
+Generic editing class-based views
+====================================
+
+The views described here provide a foundation for editing content.
+
+
+.. class:: django.views.generic.edit.FormView
+
+    A view that displays a form. On error, redisplays the form with validation
+    errors; on success, redirects to a new URL.
+
+    **Ancestors (MRO)**
+
+    * :class:`django.views.generic.edit.FormView`
+    * :class:`django.views.generic.base.TemplateResponseMixin`
+    * :class:`django.views.generic.edit.BaseFormView`
+    * :class:`django.views.generic.edit.FormMixin`
+    * :class:`django.views.generic.edit.ProcessFormView`
+    * :class:`django.views.generic.base.View`
+
+.. class:: django.views.generic.edit.CreateView
+
+    A view that displays a form for creating an object, redisplaying the form
+    with validation errors (if there are any) and saving the object.
+
+    **Ancestors (MRO)**
+
+    * :class:`django.views.generic.edit.CreateView`
+    * :class:`django.views.generic.detail.SingleObjectTemplateResponseMixin`
+    * :class:`django.views.generic.base.TemplateResponseMixin`
+    * :class:`django.views.generic.edit.BaseCreateView`
+    * :class:`django.views.generic.edit.ModelFormMixin`
+    * :class:`django.views.generic.edit.FormMixin`
+    * :class:`django.views.generic.detail.SingleObjectMixin`
+    * :class:`django.views.generic.edit.ProcessFormView`
+    * :class:`django.views.generic.base.View`
+
+.. class:: django.views.generic.edit.UpdateView
+
+    A view that displays a form for editing an existing object, redisplaying
+    the form with validation errors (if there are any) and saving changes to
+    the object. This uses a form automatically generated from the object's
+    model class (unless a form class is manually specified).
+
+    **Ancestors (MRO)**
+
+    * :class:`django.views.generic.edit.UpdateView`
+    * :class:`django.views.generic.detail.SingleObjectTemplateResponseMixin`
+    * :class:`django.views.generic.base.TemplateResponseMixin`
+    * :class:`django.views.generic.edit.BaseUpdateView`
+    * :class:`django.views.generic.edit.ModelFormMixin`
+    * :class:`django.views.generic.edit.FormMixin`
+    * :class:`django.views.generic.detail.SingleObjectMixin`
+    * :class:`django.views.generic.edit.ProcessFormView`
+    * :class:`django.views.generic.base.View`
+
+.. class:: django.views.generic.edit.DeleteView
+
+    A view that displays a confirmation page and deletes an existing object.
+    The given object will only be deleted if the request method is ``POST``. If
+    this view is fetched via ``GET``, it will display a confirmation page that
+    should contain a form that POSTs to the same URL.
+
+    **Ancestors (MRO)**
+
+    * :class:`django.views.generic.edit.DeleteView`
+    * :class:`django.views.generic.detail.SingleObjectTemplateResponseMixin`
+    * :class:`django.views.generic.base.TemplateResponseMixin`
+    * :class:`django.views.generic.edit.BaseDeleteView`
+    * :class:`django.views.generic.edit.DeletionMixin`
+    * :class:`django.views.generic.detail.BaseDetailView`
+    * :class:`django.views.generic.detail.SingleObjectMixin`
+    * :class:`django.views.generic.base.View`
+
+    **Notes**
+
+    * The delete confirmation page displayed to a GET request uses a
+      ``template_name_suffix`` of ``'_confirm_delete'``.

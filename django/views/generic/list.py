@@ -8,6 +8,9 @@ from django.views.generic.base import TemplateResponseMixin, ContextMixin, View
 
 
 class MultipleObjectMixin(ContextMixin):
+    """
+    A mixin for views manipulating multiple objects.
+    """
     allow_empty = True
     queryset = None
     model = None
@@ -111,6 +114,9 @@ class MultipleObjectMixin(ContextMixin):
 
 
 class BaseListView(MultipleObjectMixin, View):
+    """
+    A base view for displaying a list of objects.
+    """
     def get(self, request, *args, **kwargs):
         self.object_list = self.get_queryset()
         allow_empty = self.get_allow_empty()
@@ -132,6 +138,9 @@ class BaseListView(MultipleObjectMixin, View):
 
 
 class MultipleObjectTemplateResponseMixin(TemplateResponseMixin):
+    """
+    Mixin for responding with a template and list of objects.
+    """
     template_name_suffix = '_list'
 
     def get_template_names(self):
