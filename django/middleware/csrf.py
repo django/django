@@ -114,26 +114,17 @@ class CsrfViewMiddleware(object):
                 # branches that call reject().
                 return self._accept(request)
 
+            # Note that host includes the port.
             host = request.META.get('HTTP_HOST', '')
             origin = request.META.get('HTTP_ORIGIN')
-            good_origin = settings.CSRF_COOKIE_DOMAIN or host
+            good_origin = 'http%s://%s/' % ('s' if request.is_secure() else '', host)
 
             # If origin header exists, use it to check for csrf attacks.
             # Origin header is being compared to None here as we need to reject
             # requests with origin header as '' too, which otherwise is treated
             # as null.
             if origin is not None:
-
-                # If the good origin starts with a dot (.), it means the cookie
-                # is supposed to work across all the subdomains, i.e.  an
-                # endswith test and a count of dots should be fine here.
-                # In case case the actual and the good origin are the same, then
-                # too it passes.
-                if  not ((good_origin.startswith('.')
-                          and good_origin.count('.') is origin.count('.')
-                          and origin.endswith(good_origin))
-                         or origin[origin.find('://')+3:] == good_origin):
-
+                if not same_origin(origin, good_origin):
                     reason = REASON_BAD_ORIGIN % (origin, good_origin)
                     logger.warning('Forbidden (%s): %s',
                                    reason, request.path,
@@ -142,46 +133,47 @@ class CsrfViewMiddleware(object):
                             'request': request,
                         }
                     )
+
                     return self._reject(request, reason)
 
-            if request.is_secure():
-                # Suppose user visits http://example.com/
-                # An active network attacker (man-in-the-middle, MITM) sends a
-                # POST form that targets https://example.com/detonate-bomb/ and
-                # submits it via JavaScript.
-                #
-                # The attacker will need to provide a CSRF cookie and token, but
-                # that's no problem for a MITM and the session-independent
-                # nonce we're using. So the MITM can circumvent the CSRF
-                # protection. This is true for any HTTP connection, but anyone
-                # using HTTPS expects better! For this reason, for
-                # https://example.com/ we need additional protection that treats
-                # http://example.com/ as completely untrusted. Under HTTPS,
-                # Barth et al. found that the Referer header is missing for
-                # same-domain requests in only about 0.2% of cases or less, so
-                # we can use strict Referer checking.
-                referer = request.META.get('HTTP_REFERER')
-                if referer is None:
-                    logger.warning('Forbidden (%s): %s',
-                                   REASON_NO_REFERER, request.path,
-                        extra={
-                            'status_code': 403,
-                            'request': request,
-                        }
-                    )
-                    return self._reject(request, REASON_NO_REFERER)
+            # Suppose user visits http://example.com/
+            # An active network attacker (man-in-the-middle, MITM) sends a
+            # POST form that targets https://example.com/detonate-bomb/ and
+            # submits it via JavaScript.
+            #
+            # The attacker will need to provide a CSRF cookie and token, but
+            # that's no problem for a MITM and the session-independent
+            # nonce we're using. So the MITM can circumvent the CSRF
+            # protection. This is true for any HTTP connection, but anyone
+            # using HTTPS expects better! For this reason, for
+            # https://example.com/ we need additional protection that treats
+            # http://example.com/ as completely untrusted. Under HTTPS,
+            # Barth et al. found that the Referer header is missing for
+            # same-domain requests in only about 0.2% of cases or less, so
+            # we can use strict Referer checking.
+            referer = request.META.get('HTTP_REFERER')
+            if referer is None:
+                logger.warning('Forbidden (%s): %s',
+                               REASON_NO_REFERER, request.path,
+                    extra={
+                        'status_code': 403,
+                        'request': request,
+                    }
+                )
 
-                # Note that request.get_host() includes the port.
-                good_referer = 'https://%s/' % host
-                if not same_origin(referer, good_referer):
-                    reason = REASON_BAD_REFERER % (referer, good_referer)
-                    logger.warning('Forbidden (%s): %s', reason, request.path,
-                        extra={
-                            'status_code': 403,
-                            'request': request,
-                        }
-                    )
-                    return self._reject(request, reason)
+                return self._reject(request, REASON_NO_REFERER)
+
+            good_referer = good_origin
+
+            if not same_origin(referer, good_referer):
+                reason = REASON_BAD_REFERER % (referer, good_referer)
+                logger.warning('Forbidden (%s): %s', reason, request.path,
+                    extra={
+                        'status_code': 403,
+                        'request': request,
+                    }
+                )
+                return self._reject(request, reason)
 
             if csrf_token is None:
                 # No CSRF cookie. For POST requests, we insist on a CSRF cookie,
@@ -214,6 +206,7 @@ class CsrfViewMiddleware(object):
                         'request': request,
                     }
                 )
+
                 return self._reject(request, REASON_BAD_TOKEN)
 
         return self._accept(request)
