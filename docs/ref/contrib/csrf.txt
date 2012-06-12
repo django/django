@@ -544,7 +544,7 @@ CSRF_COOKIE_HTTPONLY
 
 .. versionadded:: 1.5
 
-Default: ``True``
+Default: ``False``
 
 Whether to use HttpOnly flag on the CSRF cookie. If this is set to
 ``True``, client-side JavaScript will not to be able to access the
