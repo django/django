@@ -482,9 +482,13 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             # Set oracle date to ansi date format.  This only needs to execute
             # once when we create a new connection. We also set the Territory
             # to 'AMERICA' which forces Sunday to evaluate to a '1' in TO_CHAR().
+            cursor.execute("ALTER SESSION SET NLS_TERRITORY = 'AMERICA'")
+            # We set the territory first, which overrides NLS_DATE_FORMAT and
+            # NLS_TIMESTAMP_FORMAT to the territory default, and then set
+            # the formats for predictable behaviour.
+            # see http://docs.oracle.com/cd/E11882_01/server.112/e10729/ch3globenv.htm#autoId14
             cursor.execute("ALTER SESSION SET NLS_DATE_FORMAT = 'YYYY-MM-DD HH24:MI:SS'"
                            " NLS_TIMESTAMP_FORMAT = 'YYYY-MM-DD HH24:MI:SS.FF'"
-                           " NLS_TERRITORY = 'AMERICA'"
                            + (" TIME_ZONE = 'UTC'" if settings.USE_TZ else ''))
 
             if 'operators' not in self.__dict__:
