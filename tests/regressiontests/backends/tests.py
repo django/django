@@ -66,6 +66,18 @@ class OracleChecks(unittest.TestCase):
         self.assertEqual(connection.connection.encoding, "UTF-8")
         self.assertEqual(connection.connection.nencoding, "UTF-8")
 
+    @unittest.skipUnless(connection.vendor == 'oracle',
+                         "No need to check Oracle connection semantics")
+    def test_order_of_nls_parameters(self):
+        # an 'almost right' datetime should work with configured
+        # NLS parameters as per #18465.
+        c = connection.cursor()
+        query = "select 1 from dual where '1936-12-29 00:00' < sysdate"
+        # Test that the query succeeds without errors - pre #18465 this
+        # wasn't the case.
+        c.execute(query)
+        self.assertEqual(c.fetchone()[0], 1)
+
 class MySQLTests(TestCase):
     @unittest.skipUnless(connection.vendor == 'mysql',
                         "Test valid only for MySQL")
