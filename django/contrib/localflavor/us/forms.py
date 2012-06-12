@@ -93,7 +93,7 @@ class USStateField(Field):
     }
 
     def clean(self, value):
-        from django.contrib.localflavor.us.us_states import STATES_NORMALIZED
+        from .us_states import STATES_NORMALIZED
         super(USStateField, self).clean(value)
         if value in EMPTY_VALUES:
             return ''
@@ -103,7 +103,7 @@ class USStateField(Field):
             pass
         else:
             try:
-                return STATES_NORMALIZED[value.strip().lower()].decode('ascii')
+                return STATES_NORMALIZED[value.strip().lower()]
             except KeyError:
                 pass
         raise ValidationError(self.error_messages['invalid'])
@@ -113,7 +113,7 @@ class USStateSelect(Select):
     A Select widget that uses a list of U.S. states/territories as its choices.
     """
     def __init__(self, attrs=None):
-        from django.contrib.localflavor.us.us_states import STATE_CHOICES
+        from .us_states import STATE_CHOICES
         super(USStateSelect, self).__init__(attrs, choices=STATE_CHOICES)
 
 class USPSSelect(Select):
@@ -122,5 +122,5 @@ class USPSSelect(Select):
     choices.
     """
     def __init__(self, attrs=None):
-        from django.contrib.localflavor.us.us_states import USPS_CHOICES
+        from .us_states import USPS_CHOICES
         super(USPSSelect, self).__init__(attrs, choices=USPS_CHOICES)

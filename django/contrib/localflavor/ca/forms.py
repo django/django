@@ -79,9 +79,9 @@ class CAProvinceField(Field):
             pass
         else:
             # Load data in memory only when it is required, see also #17275
-            from django.contrib.localflavor.ca.ca_provinces import PROVINCES_NORMALIZED
+            from .ca_provinces import PROVINCES_NORMALIZED
             try:
-                return PROVINCES_NORMALIZED[value.strip().lower()].decode('ascii')
+                return PROVINCES_NORMALIZED[value.strip().lower()]
             except KeyError:
                 pass
         raise ValidationError(self.error_messages['invalid'])
@@ -93,7 +93,7 @@ class CAProvinceSelect(Select):
     """
     def __init__(self, attrs=None):
         # Load data in memory only when it is required, see also #17275
-        from django.contrib.localflavor.ca.ca_provinces import PROVINCE_CHOICES
+        from .ca_provinces import PROVINCE_CHOICES
         super(CAProvinceSelect, self).__init__(attrs, choices=PROVINCE_CHOICES)
 
 class CASocialInsuranceNumberField(Field):
