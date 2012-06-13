@@ -212,7 +212,7 @@ WHEN (new.%(col_name)s IS NULL)
     def last_executed_query(self, cursor, sql, params):
         # http://cx-oracle.sourceforge.net/html/cursor.html#Cursor.statement
         # The DB API definition does not define this attribute.
-        return cursor.statement
+        return cursor.statement.decode("utf-8")
 
     def last_insert_id(self, cursor, table_name, pk_name):
         sq_name = self._get_sequence_name(table_name)

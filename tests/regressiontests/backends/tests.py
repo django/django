@@ -154,7 +154,7 @@ class LastExecutedQueryTest(TestCase):
         """
         Test that last_executed_query() returns an Unicode string
         """
-        tags = models.Tag.objects.filter(name="й", object_id=12).extra(select={'föö':1})
+        tags = models.Tag.objects.extra(select={'föö':1})
         sql, params = tags.query.sql_with_params()
         cursor = tags.query.get_compiler('default').execute_sql(None)
         last_sql = cursor.db.ops.last_executed_query(cursor, sql, params)
