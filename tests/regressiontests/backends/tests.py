@@ -125,20 +125,14 @@ class DateQuotingTest(TestCase):
         classes = models.SchoolClass.objects.filter(last_updated__day=20)
         self.assertEqual(len(classes), 1)
 
+
 class LastExecutedQueryTest(TestCase):
-
-    def setUp(self):
-        # connection.queries will not be filled in without this
-        settings.DEBUG = True
-
-    def tearDown(self):
-        settings.DEBUG = False
-
-    # There are no tests for the sqlite backend because it does not
+    # There are no escaping tests for the sqlite backend because it does not
     # implement paramater escaping. See #14091.
 
     @unittest.skipUnless(connection.vendor in ('oracle', 'postgresql'),
                          "These backends use the standard parameter escaping rules")
+    @override_settings(DEBUG=True)
     def test_parameter_escaping(self):
         # check that both numbers and string are properly quoted
         list(models.Tag.objects.filter(name="special:\\\"':", object_id=12))
@@ -148,12 +142,24 @@ class LastExecutedQueryTest(TestCase):
 
     @unittest.skipUnless(connection.vendor == 'mysql',
                          "MySQL uses backslashes to escape parameters.")
+    @override_settings(DEBUG=True)
     def test_parameter_escaping(self):
         list(models.Tag.objects.filter(name="special:\\\"':", object_id=12))
         sql = connection.queries[-1]['sql']
         # only this line is different from the test above
         self.assertTrue("= 'special:\\\\\\\"\\':' " in sql)
         self.assertTrue("= 12 " in sql)
+
+    def test_query_encoding(self):
+        """
+        Test that last_executed_query() returns an Unicode string
+        """
+        tags = models.Tag.objects.filter(name="й", object_id=12).extra(select={'föö':1})
+        sql, params = tags.query.sql_with_params()
+        cursor = tags.query.get_compiler('default').execute_sql(None)
+        last_sql = cursor.db.ops.last_executed_query(cursor, sql, params)
+        self.assertTrue(isinstance(last_sql, unicode))
+
 
 class ParameterHandlingTest(TestCase):
     def test_bad_parameter_count(self):
