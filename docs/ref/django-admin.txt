@@ -110,6 +110,10 @@ If not provided, all locales are processed.
 Example usage::
 
     django-admin.py compilemessages --locale=pt_BR --locale=fr
+    
+.. versionchanged:: 1.5
+
+Added the option to specify multiple locales.
 
 createcachetable
 ----------------
@@ -431,7 +435,10 @@ Example usage::
 You can also use commas to separate multiple locales::
 
     django-admin.py makemessages --locale=de,fr,pt_BR
+    
+.. versionchanged:: 1.5
 
+Added the option to specify multiple locales.
 
 .. django-admin-option:: --domain
 
