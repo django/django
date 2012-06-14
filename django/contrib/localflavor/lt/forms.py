@@ -1,4 +1,5 @@
 from __future__ import unicode_literals
+from datetime import date
 
 from django.contrib.localflavor.lt.lt_choices import COUNTY_CHOICES, \
                                                      MUNICIPALITY_CHOICES
@@ -28,10 +29,12 @@ class LTIDCodeField(RegexField):
     Checks:
         * Made of exactly 11 decimal numbers.
         * Checksum is correct.
+        * ID contains valid date.
     """
     default_error_messages = {
         'invalid': _('ID Code consists of exactly 11 decimal digits.'),
-        'checksum': _('Wrong ID Code checksum.')
+        'checksum': _('Wrong ID Code checksum.'),
+        'date': _('ID Code contains invalid date.')
     }
 
     def __init__(self, *args, **kwargs):
@@ -42,6 +45,9 @@ class LTIDCodeField(RegexField):
 
         if value in EMPTY_VALUES:
             return ''
+
+        if not self.valid_date(value):
+            raise ValidationError(self.error_messages['date'])
 
         if not self.valid_checksum(value):
             raise ValidationError(self.error_messages['checksum'])
@@ -57,9 +63,19 @@ class LTIDCodeField(RegexField):
 
         k = first_sum % 11
         if k == 10:
-            print(value)
             k = second_sum % 11
             k = 0 if k == 10 else k
 
         return True if k == int(value[-1]) else False
 
+    def valid_date(self, value):
+        """Check if date in ID code is valid.
+        We won't check for dates in future as it would become too restrictive.
+        """
+        try:
+            year = {'1': 1800, '2': 1800, '3': 1900, '4': 1900, '5': 2000,
+                    '6': 2000}[value[0]] + int(value[1:3])
+            date(year, int(value[3:5]), int(value[5:7]))
+            return True
+        except (ValueError, KeyError):
+            return False

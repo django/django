@@ -12,6 +12,7 @@ class LTLocalFlavorTests(SimpleTestCase):
     def test_LTIDCodeField(self):
         error_len = ['ID Code consists of exactly 11 decimal digits.']
         error_check = ['Wrong ID Code checksum.']
+        error_date = ['ID Code contains invalid date.']
 
         valid = {
             '33309240064': '33309240064',
@@ -27,7 +28,10 @@ class LTLocalFlavorTests(SimpleTestCase):
             'hello': error_len,
             '134535443i2': error_len,
             '48504140956': error_check,
-            '48504140953': error_check
+            '48504140953': error_check,
+            '50520150003': error_date,
+            '50501009554': error_date,
+            '80101017318': error_date,
         }
 
         self.assertFieldOutput(LTIDCodeField, valid, invalid)
