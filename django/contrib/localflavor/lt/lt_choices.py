@@ -7,7 +7,6 @@ from __future__ import unicode_literals
 from django.utils.translation import ugettext_lazy as _
 
 COUNTY_CHOICES = (
-    """The largest administrative unit in Lithuania."""
     ('alytus', _('Alytus')),
     ('kaunas', _('Kaunas')),
     ('klaipeda', _('Klaipėda')),
@@ -21,7 +20,6 @@ COUNTY_CHOICES = (
 )
 
 MUNICIPALITY_CHOICES = (
-    """Level 2 administrative unit in Lithuania."""
     ('akmene', _('Akmenė district')),
     ('alytus_c', _('Alytus city')),
     ('alytus', _('Alytus district')),
