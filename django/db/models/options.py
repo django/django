@@ -62,6 +62,10 @@ class Options(object):
         # List of all lookups defined in ForeignKey 'limit_choices_to' options
         # from *other* models. Needed for some admin checks. Internal use only.
         self.related_fkey_lookups = []
+        # An internal flag used to keep track of which models to load into the
+        # app-cache. Sometimes (for example db caching) we want to use
+        # Django's models, but not make them part of the app-models.
+        self._skip_app_cache = False
 
     def contribute_to_class(self, cls, name):
         from django.db import connection
@@ -82,6 +86,8 @@ class Options(object):
                 # NOTE: We can't modify a dictionary's contents while looping
                 # over it, so we loop over the *original* dictionary instead.
                 if name.startswith('_'):
+                    if name == '_skip_app_cache':
+                        self._skip_app_cache = meta_attrs[name]
                     del meta_attrs[name]
             for attr_name in DEFAULT_NAMES:
                 if attr_name in meta_attrs:

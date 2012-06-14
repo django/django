@@ -2,7 +2,8 @@ from optparse import make_option
 
 from django.core.cache.backends.db import BaseDatabaseCache
 from django.core.management.base import LabelCommand, CommandError
-from django.db import connections, router, transaction, models, DEFAULT_DB_ALIAS
+from django.core.management.color import no_style
+from django.db import connections, router, transaction, DEFAULT_DB_ALIAS
 from django.db.utils import DatabaseError
 from django.utils.encoding import force_unicode
 
@@ -27,35 +28,16 @@ class Command(LabelCommand):
         if not router.allow_syncdb(db, cache.cache_model_class):
             return
         connection = connections[db]
-        fields = (
-            # "key" is a reserved word in MySQL, so use "cache_key" instead.
-            models.CharField(name='cache_key', max_length=255, unique=True, primary_key=True),
-            models.TextField(name='value'),
-            models.DateTimeField(name='expires', db_index=True),
-        )
-        table_output = []
-        index_output = []
-        qn = connection.ops.quote_name
-        for f in fields:
-            field_output = [qn(f.name), f.db_type(connection=connection)]
-            field_output.append("%sNULL" % (not f.null and "NOT " or ""))
-            if f.primary_key:
-                field_output.append("PRIMARY KEY")
-            elif f.unique:
-                field_output.append("UNIQUE")
-            if f.db_index:
-                unique = f.unique and "UNIQUE " or ""
-                index_output.append("CREATE %sINDEX %s ON %s (%s);" % \
-                    (unique, qn('%s_%s' % (tablename, f.name)), qn(tablename),
-                    qn(f.name)))
-            table_output.append(" ".join(field_output))
-        full_statement = ["CREATE TABLE %s (" % qn(tablename)]
-        for i, line in enumerate(table_output):
-            full_statement.append('    %s%s' % (line, i < len(table_output)-1 and ',' or ''))
-        full_statement.append(');')
+        creation = connection.creation
+        style = no_style()
+        tbl_output, _ = creation.sql_create_model(cache.cache_model_class,
+                                           style)
+        index_output = creation.sql_indexes_for_model(cache.cache_model_class,
+                                                      style)
         curs = connection.cursor()
         try:
-            curs.execute("\n".join(full_statement))
+            for statement in tbl_output:
+                curs.execute(statement)
         except DatabaseError as e:
             transaction.rollback_unless_managed(using=db)
             raise CommandError(
