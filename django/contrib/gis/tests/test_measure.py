@@ -93,6 +93,8 @@ class DistanceTest(unittest.TestCase):
         self.assertEqual(d4.m, 50)
         d4 /= 5
         self.assertEqual(d4.m, 10)
+        d5 = d1 / D(m=2)
+        self.assertEqual(d5, 50)
 
         a5 = d1 * D(m=10)
         self.assertTrue(isinstance(a5, Area))
@@ -101,10 +103,6 @@ class DistanceTest(unittest.TestCase):
         with self.assertRaises(TypeError):
             d1 *= D(m=1)
             self.fail('Distance *= Distance should raise TypeError')
-
-        with self.assertRaises(TypeError):
-            d5 = d1 / D(m=1)
-            self.fail('Distance / Distance should raise TypeError')
 
         with self.assertRaises(TypeError):
             d1 /= D(m=1)
