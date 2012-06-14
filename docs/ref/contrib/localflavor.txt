@@ -60,6 +60,7 @@ Countries currently supported by :mod:`~django.contrib.localflavor` are:
 * Italy_
 * Japan_
 * Kuwait_
+* Lithuania_
 * Macedonia_
 * Mexico_
 * `The Netherlands`_
@@ -119,6 +120,7 @@ Here's an example of how to use them::
 .. _Italy: `Italy (it)`_
 .. _Japan: `Japan (jp)`_
 .. _Kuwait: `Kuwait (kw)`_
+.. _Lithuania: `Lithuania (lt)`_
 .. _Macedonia: `Macedonia (mk)`_
 .. _Mexico: `Mexico (mx)`_
 .. _Norway: `Norway (no)`_
@@ -755,6 +757,29 @@ Kuwait (``kw``)
     * The number consist of 12 digits.
     * The birthdate of the person is a valid date.
     * The calculated checksum equals to the last digit of the Civil ID.
+
+Lithuania (``lt``)
+==================
+
+.. versionadded:: 1.5
+
+.. class:: lt.forms.LTIDCodeField
+
+    A form field that validated input as a Lithuanian identity code.
+    Following checks are made:
+
+    * The number consists of 11 digits.
+    * The birthdate is a valid date.
+    * The calculated checksum is correct.
+
+.. class:: lt.forms.LTCountySelect
+
+    A form ``Select`` widget that uses a list of Lithuanian counties as choices.
+
+.. class:: lt.forms.LTMunicipalitySelect
+
+    A form ``Select`` widget that uses a list of Lithuanian municipalities as
+    choices.
 
 Macedonia (``mk``)
 ===================
