@@ -71,7 +71,7 @@ def urlencode(query, doseq=0):
         query = query.items()
     return urllib.urlencode(
         [(smart_str(k),
-         isinstance(v, (list,tuple)) and [smart_str(i) for i in v] or smart_str(v))
+         [smart_str(i) for i in v] if isinstance(v, (list,tuple)) else smart_str(v))
             for k, v in query],
         doseq)
 
