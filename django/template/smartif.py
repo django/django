@@ -165,7 +165,7 @@ class IfParser(object):
 
         self.tokens = mapped_tokens
         self.pos = 0
-        self.current_token = next(self)
+        self.current_token = self.next()
 
     def translate_token(self, token):
         try:
@@ -193,11 +193,11 @@ class IfParser(object):
 
     def expression(self, rbp=0):
         t = self.current_token
-        self.current_token = next(self)
+        self.current_token = self.next()
         left = t.nud(self)
         while rbp < self.current_token.lbp:
             t = self.current_token
-            self.current_token = next(self)
+            self.current_token = self.next()
             left = t.led(left, self)
         return left
 
