@@ -2,9 +2,11 @@ from __future__ import unicode_literals
 
 from django.contrib.localflavor.lt.lt_choices import COUNTY_CHOICES, \
                                                      MUNICIPALITY_CHOICES
+from django.core.validators import EMPTY_VALUES
 from django.forms import ValidationError
 from django.forms.fields import Select, RegexField
 from django.utils.translation import ugettext_lazy as _
+
 
 class LTCountySelect(Select):
 
@@ -33,10 +35,13 @@ class LTIDCodeField(RegexField):
     }
 
     def __init__(self, *args, **kwargs):
-        super(LTIdentityCodeField, self).__init__(r'^\d{11}$', *args, **kwargs)
+        super(LTIDCodeField, self).__init__(r'^\d{11}$', *args, **kwargs)
 
     def clean(self, value):
-        super(LTIdentityCodeField, self).clean(value)
+        super(LTIDCodeField, self).clean(value)
+
+        if value in EMPTY_VALUES:
+            return ''
 
         if not self.valid_checksum(value):
             raise ValidationError(self.error_messages['checksum'])
@@ -52,6 +57,7 @@ class LTIDCodeField(RegexField):
 
         k = first_sum % 11
         if k == 10:
+            print(value)
             k = second_sum % 11
             k = 0 if k == 10 else k
 

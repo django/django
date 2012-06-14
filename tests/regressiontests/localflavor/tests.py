@@ -28,6 +28,7 @@ from .is_.tests import ISLocalFlavorTests
 from .it.tests import ITLocalFlavorTests
 from .jp.tests import JPLocalFlavorTests
 from .kw.tests import KWLocalFlavorTests
+from .lt.tests import LTLocalFlavorTests
 from .mk.tests import MKLocalFlavorTests
 from .mx.tests import MXLocalFlavorTests
 from .nl.tests import NLLocalFlavorTests
@@ -43,3 +44,4 @@ from .tr.tests import TRLocalFlavorTests
 from .us.tests import USLocalFlavorTests
 from .uy.tests import UYLocalFlavorTests
 from .za.tests import ZALocalFlavorTests
+
