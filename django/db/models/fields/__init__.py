@@ -83,7 +83,7 @@ class Field(object):
             serialize=True, unique_for_date=None, unique_for_month=None,
             unique_for_year=None, choices=None, help_text='', db_column=None,
             db_tablespace=None, auto_created=False, validators=[],
-            error_messages=None):
+            localize=True, error_messages=None):
         self.name = name
         self.verbose_name = verbose_name
         self.primary_key = primary_key
@@ -115,7 +115,7 @@ class Field(object):
             Field.creation_counter += 1
 
         self.validators = self.default_validators + validators
-
+        self.localize = localize
         messages = {}
         for c in reversed(self.__class__.__mro__):
             messages.update(getattr(c, 'default_error_messages', {}))
@@ -466,6 +466,7 @@ class Field(object):
         """
         defaults = {'required': not self.blank,
                     'label': capfirst(self.verbose_name),
+                    'localize': self.localize,
                     'help_text': self.help_text}
         if self.has_default():
             if callable(self.default):
