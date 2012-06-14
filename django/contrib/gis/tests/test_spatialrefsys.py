@@ -28,14 +28,18 @@ test_srs = ({'srid' : 4326,
              },
             )
 
+HAS_SPATIALREFSYS = True
 if oracle:
     from django.contrib.gis.db.backends.oracle.models import SpatialRefSys
 elif postgis:
     from django.contrib.gis.db.backends.postgis.models import SpatialRefSys
 elif spatialite:
     from django.contrib.gis.db.backends.spatialite.models import SpatialRefSys
+else:
+    HAS_SPATIALREFSYS = False
 
-@unittest.skipUnless(HAS_GDAL, "SpatialRefSysTest needs gdal support")
+@unittest.skipUnless(HAS_GDAL and HAS_SPATIALREFSYS,
+    "SpatialRefSysTest needs gdal support and a spatial database")
 class SpatialRefSysTest(unittest.TestCase):
 
     @no_mysql
