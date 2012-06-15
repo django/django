@@ -8,7 +8,6 @@ from __future__ import absolute_import
 import datetime
 import decimal
 import json
-from io import BytesIO
 
 from django.core.serializers.base import DeserializationError
 from django.core.serializers.python import Serializer as PythonSerializer
@@ -63,13 +62,13 @@ def Deserializer(stream_or_string, **options):
     Deserialize a stream or string of JSON data.
     """
     if isinstance(stream_or_string, bytes):
-        stream = BytesIO(stream_or_string)
-    elif isinstance(stream_or_string, unicode):
-        stream = BytesIO(smart_str(stream_or_string))
-    else:
-        stream = stream_or_string
+        stream_or_string = stream_or_string.decode('utf-8')
     try:
-        for obj in PythonDeserializer(json.load(stream), **options):
+        if isinstance(stream_or_string, basestring):
+            objects = json.loads(stream_or_string)
+        else:
+            objects = json.load(stream_or_string)
+        for obj in PythonDeserializer(objects, **options):
             yield obj
     except GeneratorExit:
         raise

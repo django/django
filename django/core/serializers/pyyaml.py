@@ -6,7 +6,7 @@ Requires PyYaml (http://pyyaml.org/), but that's checked for in __init__.
 
 import decimal
 import yaml
-from io import BytesIO
+from io import StringIO
 
 from django.db import models
 from django.core.serializers.base import DeserializationError
@@ -51,9 +51,9 @@ def Deserializer(stream_or_string, **options):
     Deserialize a stream or string of YAML data.
     """
     if isinstance(stream_or_string, bytes):
-        stream = BytesIO(stream_or_string)
-    if isinstance(stream_or_string, unicode):
-        stream = BytesIO(smart_str(stream_or_string))
+        stream_or_string = stream_or_string.decode('utf-8')
+    if isinstance(stream_or_string, basestring):
+        stream = StringIO(stream_or_string)
     else:
         stream = stream_or_string
     try:
