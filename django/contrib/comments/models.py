@@ -117,7 +117,7 @@ class Comment(BaseCommentAbstractModel):
     userinfo = property(_get_userinfo, doc=_get_userinfo.__doc__)
 
     def _get_name(self):
-        return self.userinfo["name"]
+        return self.userinfo["name"] if self.userinfo["name"] else _("Comment")
 
     def _set_name(self, val):
         if self.user_id:
