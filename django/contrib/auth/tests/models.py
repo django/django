@@ -5,29 +5,12 @@ from django.contrib.auth.models import (Group, User,
     SiteProfileNotAvailable, UserManager)
 
 
-@override_settings(USE_TZ=False)
+@override_settings(USE_TZ=False, AUTH_PROFILE_MODULE=None)
 class ProfileTestCase(TestCase):
     fixtures = ['authtestdata.json']
 
-    def setUp(self):
-        """Backs up the AUTH_PROFILE_MODULE"""
-        self.old_AUTH_PROFILE_MODULE = getattr(settings,
-                                               'AUTH_PROFILE_MODULE', None)
-
-    def tearDown(self):
-        """Restores the AUTH_PROFILE_MODULE -- if it was not set it is deleted,
-        otherwise the old value is restored"""
-        if self.old_AUTH_PROFILE_MODULE is None and \
-                hasattr(settings, 'AUTH_PROFILE_MODULE'):
-            del settings.AUTH_PROFILE_MODULE
-
-        if self.old_AUTH_PROFILE_MODULE is not None:
-            settings.AUTH_PROFILE_MODULE = self.old_AUTH_PROFILE_MODULE
-
     def test_site_profile_not_available(self):
         # calling get_profile without AUTH_PROFILE_MODULE set
-        if hasattr(settings, 'AUTH_PROFILE_MODULE'):
-            del settings.AUTH_PROFILE_MODULE
         user = User.objects.get(username='testclient')
         self.assertRaises(SiteProfileNotAvailable, user.get_profile)
 
