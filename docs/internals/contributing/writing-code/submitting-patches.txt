@@ -170,7 +170,7 @@ Compressing JavaScript
 
 To simplify the process of providing optimized javascript code, Django
 includes a handy script which should be used to create a "minified" version.
-This script is located at ``django/contrib/admin/static/js/compress.py``.
+This script is located at ``django/contrib/admin/static/admin/js/compress.py``.
 
 Behind the scenes, ``compress.py`` is a front-end for Google's
 `Closure Compiler`_ which is written in Java. However, the Closure Compiler
