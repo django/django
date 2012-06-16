@@ -44,7 +44,7 @@
 			if ($(this).attr("tagName") == "TR") {
 				// If forms are laid out as table rows, insert the
 				// "add" button in a new table row:
-				var numCols = this.eq(0).children().length;
+				var numCols = this.eq(-1).children().length;
 				$(this).parent().append('<tr class="' + options.addCssClass + '"><td colspan="' + numCols + '"><a href="javascript:void(0)">' + options.addText + "</a></tr>");
 				addButton = $(this).parent().find("tr:last a");
 			} else {
