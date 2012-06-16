@@ -1,5 +1,5 @@
 from django.db import connection
-from django.contrib.gis.gdal import HAS_GDAL
+from django.contrib.gis.gdal import HAS_GDAL, HAS_SPATIALREFSYS, SpatialRefSys
 from django.contrib.gis.tests.utils import no_mysql, oracle, postgis, spatialite
 from django.utils import unittest
 
@@ -27,16 +27,6 @@ test_srs = ({'srid' : 4326,
              'eprec' : (1, 5, 10),
              },
             )
-
-HAS_SPATIALREFSYS = True
-if oracle:
-    from django.contrib.gis.db.backends.oracle.models import SpatialRefSys
-elif postgis:
-    from django.contrib.gis.db.backends.postgis.models import SpatialRefSys
-elif spatialite:
-    from django.contrib.gis.db.backends.spatialite.models import SpatialRefSys
-else:
-    HAS_SPATIALREFSYS = False
 
 @unittest.skipUnless(HAS_GDAL and HAS_SPATIALREFSYS,
     "SpatialRefSysTest needs gdal support and a spatial database")

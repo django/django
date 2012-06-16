@@ -6,7 +6,7 @@
   reference system to another.
 
  Driver: Wraps an OGR data source driver.
-  
+
  DataSource: Wrapper for the OGR data source object, supports
   OGR-supported data sources.
 
@@ -20,15 +20,15 @@
 
  SpatialReference: Represents OSR Spatial Reference objects.
 
- The GDAL library will be imported from the system path using the default  
+ The GDAL library will be imported from the system path using the default
  library name for the current OS. The default library path may be overridden
- by setting `GDAL_LIBRARY_PATH` in your settings with the path to the GDAL C 
- library on your system.  
+ by setting `GDAL_LIBRARY_PATH` in your settings with the path to the GDAL C
+ library on your system.
 
- GDAL links to a large number of external libraries that consume RAM when 
+ GDAL links to a large number of external libraries that consume RAM when
  loaded.  Thus, it may desirable to disable GDAL on systems with limited
  RAM resources -- this may be accomplished by setting `GDAL_LIBRARY_PATH`
- to a non-existant file location (e.g., `GDAL_LIBRARY_PATH='/null/path'`; 
+ to a non-existant file location (e.g., `GDAL_LIBRARY_PATH='/null/path'`;
  setting to None/False/'' will not work as a string must be given).
 """
 # Attempting to import objects that depend on the GDAL library.  The
@@ -43,6 +43,18 @@ try:
     HAS_GDAL = True
 except:
     HAS_GDAL, GEOJSON = False, False
+
+from django.contrib.gis.tests.utils import no_mysql, oracle, postgis, spatialite
+HAS_SPATIALREFSYS = True
+if oracle:
+    from django.contrib.gis.db.backends.oracle.models import SpatialRefSys
+elif postgis:
+    from django.contrib.gis.db.backends.postgis.models import SpatialRefSys
+elif spatialite:
+    from django.contrib.gis.db.backends.spatialite.models import SpatialRefSys
+else:
+    HAS_SPATIALREFSYS = False
+    SpatialRefSys = None
 
 try:
     from django.contrib.gis.gdal.envelope import Envelope
