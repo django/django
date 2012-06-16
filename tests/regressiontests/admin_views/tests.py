@@ -90,6 +90,16 @@ class AdminViewBasicTest(TestCase):
         self.assertIsInstance(response, TemplateResponse)
         self.assertEqual(response.status_code, 200)
 
+    def testAppModelNameInClassForBodyTag(self):
+        """
+        Ticket #13629 - Admin Changelist: add app-model_name class to <body> tag
+        """
+        response = self.client.get('/test_admin/%s/admin_views/section/add/' % self.urlbit)
+        self.assertEqual(response.status_code, 200)   
+        self.assertContains(response, '<body class="admin_views-section change-form">',
+            msg_prefix="Couldn't find app model name in class for the body tag"
+        )     
+
     def testAddWithGETArgs(self):
         response = self.client.get('/test_admin/%s/admin_views/section/add/' % self.urlbit, {'name': 'My Section'})
         self.assertEqual(response.status_code, 200)

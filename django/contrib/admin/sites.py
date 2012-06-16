@@ -431,6 +431,7 @@ class AdminSite(object):
         context = {
             'title': _('%s administration') % capfirst(app_label),
             'app_list': [app_dict],
+            'app_label': app_label,
         }
         context.update(extra_context or {})
 
