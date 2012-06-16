@@ -1,6 +1,7 @@
 import HTMLParser as _HTMLParser
 import re
 
+tagfind = re.compile('([a-zA-Z][-.a-zA-Z0-9:_]*)(?:\s|/(?!>))*')
 
 class HTMLParser(_HTMLParser.HTMLParser):
     """
@@ -33,10 +34,10 @@ class HTMLParser(_HTMLParser.HTMLParser):
 
         # Now parse the data between i+1 and j into a tag and attrs
         attrs = []
-        match = _HTMLParser.tagfind.match(rawdata, i + 1)
+        match = tagfind.match(rawdata, i + 1)
         assert match, 'unexpected call to parse_starttag()'
         k = match.end()
-        self.lasttag = tag = rawdata[i + 1:k].lower()
+        self.lasttag = tag = match.group(1).lower()
 
         while k < endpos:
             m = _HTMLParser.attrfind.match(rawdata, k)
@@ -48,6 +49,7 @@ class HTMLParser(_HTMLParser.HTMLParser):
             elif attrvalue[:1] == '\'' == attrvalue[-1:] or \
                  attrvalue[:1] == '"' == attrvalue[-1:]:
                 attrvalue = attrvalue[1:-1]
+            if attrvalue:
                 attrvalue = self.unescape(attrvalue)
             attrs.append((attrname.lower(), attrvalue))
             k = m.end()
