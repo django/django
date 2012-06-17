@@ -65,7 +65,7 @@
 
 {% block submit_buttons_bottom %}{% submit_row %}{% endblock %}
 
-{% if adminform and add %}
+{% if adminform.first_field and add %}
    <script type="text/javascript">document.getElementById("{{ adminform.first_field.id_for_label }}").focus();</script>
 {% endif %}
 
