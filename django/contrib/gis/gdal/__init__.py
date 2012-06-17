@@ -44,18 +44,6 @@ try:
 except:
     HAS_GDAL, GEOJSON = False, False
 
-from django.contrib.gis.tests.utils import no_mysql, oracle, postgis, spatialite
-HAS_SPATIALREFSYS = True
-if oracle:
-    from django.contrib.gis.db.backends.oracle.models import SpatialRefSys
-elif postgis:
-    from django.contrib.gis.db.backends.postgis.models import SpatialRefSys
-elif spatialite:
-    from django.contrib.gis.db.backends.spatialite.models import SpatialRefSys
-else:
-    HAS_SPATIALREFSYS = False
-    SpatialRefSys = None
-
 try:
     from django.contrib.gis.gdal.envelope import Envelope
 except ImportError:
