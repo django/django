@@ -1,6 +1,7 @@
 from django.db import connection
-from django.contrib.gis.gdal import HAS_GDAL, HAS_SPATIALREFSYS, SpatialRefSys
-from django.contrib.gis.tests.utils import no_mysql, oracle, postgis, spatialite
+from django.contrib.gis.gdal import HAS_GDAL
+from django.contrib.gis.tests.utils import (no_mysql, oracle, postgis,
+    spatialite, HAS_SPATIALREFSYS, SpatialRefSys)
 from django.utils import unittest
 
 

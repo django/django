@@ -1,5 +1,6 @@
 from django.forms import ValidationError
-from django.contrib.gis.gdal import HAS_GDAL, HAS_SPATIALREFSYS
+from django.contrib.gis.gdal import HAS_GDAL
+from django.contrib.gis.tests.utils import HAS_SPATIALREFSYS
 from django.utils import unittest
 
 
