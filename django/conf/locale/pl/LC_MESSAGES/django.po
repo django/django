@@ -8,6 +8,7 @@
 # konryd <konryd@gmail.com>, 2011.
 # Łukasz Rekucki <lrekucki@gmail.com>, 2011.
 # Roman Barczyński <rombar@gmail.com>, 2012.
+# Cezary K. Wagner <Cezary.Wagner@gmail.com>, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
@@ -937,15 +938,15 @@ msgstr "sty"
 
 #: utils/dates.py:23
 msgid "feb"
-msgstr "luty"
+msgstr "lut"
 
 #: utils/dates.py:23
 msgid "mar"
-msgstr "marz"
+msgstr "mar"
 
 #: utils/dates.py:23
 msgid "apr"
-msgstr "kwie"
+msgstr "kwi"
 
 #: utils/dates.py:23
 msgid "may"
@@ -953,7 +954,7 @@ msgstr "maj"
 
 #: utils/dates.py:23
 msgid "jun"
-msgstr "czerw"
+msgstr "cze"
 
 #: utils/dates.py:24
 msgid "jul"
@@ -961,11 +962,11 @@ msgstr "lip"
 
 #: utils/dates.py:24
 msgid "aug"
-msgstr "sier"
+msgstr "sie"
 
 #: utils/dates.py:24
 msgid "sep"
-msgstr "wrze"
+msgstr "wrz"
 
 #: utils/dates.py:24
 msgid "oct"
@@ -973,7 +974,7 @@ msgstr "paź"
 
 #: utils/dates.py:24
 msgid "nov"
-msgstr "list"
+msgstr "lis"
 
 #: utils/dates.py:24
 msgid "dec"
