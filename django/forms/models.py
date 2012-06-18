@@ -414,6 +414,7 @@ class BaseModelFormSet(BaseFormSet):
     A ``FormSet`` for editing a queryset and/or adding new objects to it.
     """
     model = None
+    _deleted_object_pks = []
 
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
                  queryset=None, **kwargs):
@@ -599,6 +600,11 @@ class BaseModelFormSet(BaseFormSet):
             pk_name = self._pk_field.name
             raw_pk_value = form._raw_value(pk_name)
 
+            # check if this object was deleted already,
+            # skip this form if it was deleted. See #17988
+            if raw_pk_value in self._deleted_object_pks:
+                continue
+
             # clean() for different types of PK fields can sometimes return
             # the model instance, and sometimes the PK. Handle either.
             pk_value = form.fields[pk_name].clean(raw_pk_value)
@@ -607,6 +613,7 @@ class BaseModelFormSet(BaseFormSet):
             obj = self._existing_object(pk_value)
             if self.can_delete and self._should_delete_form(form):
                 self.deleted_objects.append(obj)
+                self._deleted_object_pks.append(unicode(obj.pk))
                 obj.delete()
                 continue
             if form.has_changed():
