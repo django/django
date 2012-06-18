@@ -108,6 +108,40 @@ class DeletionTests(TestCase):
             obj.save()
         self.assertEqual(school.child_set.count(), 1)
 
+    def test_deletion_with_commit_false(self):
+        """
+        Make sure inlineformsets respect commit=False when deleting (#17988).
+        """
+        ChildFormSet = inlineformset_factory(School, Child, exclude=['father', 'mother'])
+        school = School.objects.create(name='test')
+        mother = Parent.objects.create(name='mother')
+        father = Parent.objects.create(name='father')
+        child = school.child_set.create(name='child0', mother=mother, father=father)
+
+        data = {
+            'child_set-TOTAL_FORMS': '2',
+            'child_set-INITIAL_FORMS': '1',
+            'child_set-MAX_NUM_FORMS': '0',
+            'child_set-0-id': unicode(child.pk),
+            'child_set-0-DELETE': 'on',
+            'child_set-0-name': child.name,
+            'child_set-1-name': 'child1',
+        }
+        formset = ChildFormSet(data, instance=school)
+        self.assertTrue(formset.is_valid())
+
+        objects = formset.save(commit=False)
+        self.assertEqual(len(formset.deleted_objects), 1)
+        self.assertEqual(school.child_set.count(), 0)
+
+        for obj in objects:
+            obj.mother = mother
+            obj.father = father
+
+        objects = formset.save()
+        self.assertEqual(len(formset.deleted_objects), 0)
+        self.assertEqual(school.child_set.count(), 1)
+
 
 class InlineFormsetFactoryTest(TestCase):
     def test_inline_formset_factory(self):
