@@ -312,6 +312,11 @@ class BaseDatabaseWrapper(object):
     def make_debug_cursor(self, cursor):
         return util.CursorDebugWrapper(cursor, self)
 
+    def schema_editor(self):
+        "Returns a new instance of this backend's SchemaEditor"
+        raise NotImplementedError()
+
+
 class BaseDatabaseFeatures(object):
     allows_group_by_pk = False
     # True if django.db.backend.utils.typecast_timestamp is used on values
@@ -410,6 +415,9 @@ class BaseDatabaseFeatures(object):
 
     # Support for the DISTINCT ON clause
     can_distinct_on_fields = False
+
+    # Can we roll back DDL in a transaction?
+    can_rollback_ddl = False
 
     def __init__(self, connection):
         self.connection = connection

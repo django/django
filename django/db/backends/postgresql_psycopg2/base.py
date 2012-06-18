@@ -13,6 +13,7 @@ from django.db.backends.postgresql_psycopg2.client import DatabaseClient
 from django.db.backends.postgresql_psycopg2.creation import DatabaseCreation
 from django.db.backends.postgresql_psycopg2.version import get_version
 from django.db.backends.postgresql_psycopg2.introspection import DatabaseIntrospection
+from django.db.backends.postgresql_psycopg2.schema import DatabaseSchemaEditor
 from django.utils.log import getLogger
 from django.utils.safestring import SafeUnicode, SafeString
 from django.utils.timezone import utc
@@ -83,6 +84,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     has_bulk_insert = True
     supports_tablespaces = True
     can_distinct_on_fields = True
+    can_rollback_ddl = True
 
 class DatabaseWrapper(BaseDatabaseWrapper):
     vendor = 'postgresql'
@@ -235,3 +237,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 return self.connection.commit()
             except Database.IntegrityError as e:
                 raise utils.IntegrityError, utils.IntegrityError(*tuple(e)), sys.exc_info()[2]
+
+    def schema_editor(self):
+        "Returns a new instance of this backend's SchemaEditor"
+        return DatabaseSchemaEditor(self)
