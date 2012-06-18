@@ -1047,12 +1047,12 @@ Django's syntax. For example::
         {{if dying}}Still alive.{{/if}}
     {% endverbatim %}
 
-You can also specify an alternate closing tag::
+You can also designate a specific closing tag, allowing the use of
+``{% endverbatim %}`` as part of the unrendered contents::
 
-    {% verbatim finished %}
-        The verbatim tag looks like this:
-        {% verbatim %}{% endverbatim %}
-    {% finished %}
+    {% verbatim myblock %}
+        Avoid template rendering via the {% verbatim %}{% endverbatim %} block.
+    {% endverbatim myblock %}
 
 .. templatetag:: widthratio
 

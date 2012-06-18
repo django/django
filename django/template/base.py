@@ -216,13 +216,8 @@ class Lexer(object):
             if token_string.startswith(VARIABLE_TAG_START):
                 token = Token(TOKEN_VAR, token_string[2:-2].strip())
             elif token_string.startswith(BLOCK_TAG_START):
-                if block_content.startswith('verbatim'):
-                    bits = block_content.split(' ', 1)
-                    if bits[0] == 'verbatim':
-                        if len(bits) > 1:
-                            self.verbatim = bits[1]
-                        else:
-                            self.verbatim = 'endverbatim'
+                if block_content[:9] in ('verbatim', 'verbatim '):
+                    self.verbatim = 'end%s' % block_content
                 token = Token(TOKEN_BLOCK, block_content)
             elif token_string.startswith(COMMENT_TAG_START):
                 content = ''

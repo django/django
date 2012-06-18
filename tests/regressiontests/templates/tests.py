@@ -1623,7 +1623,7 @@ class Templates(unittest.TestCase):
             'verbatim-tag03': ("{% verbatim %}It's the {% verbatim %} tag{% endverbatim %}", {}, "It's the {% verbatim %} tag"),
             'verbatim-tag04': ('{% verbatim %}{% verbatim %}{% endverbatim %}{% endverbatim %}', {}, template.TemplateSyntaxError),
             'verbatim-tag05': ('{% verbatim %}{% endverbatim %}{% verbatim %}{% endverbatim %}', {}, ''),
-            'verbatim-tag06': ("{% verbatim -- %}Don't {% endverbatim %} just yet{% -- %}", {}, "Don't {% endverbatim %} just yet"),
+            'verbatim-tag06': ("{% verbatim special %}Don't {% endverbatim %} just yet{% endverbatim special %}", {}, "Don't {% endverbatim %} just yet"),
         }
         return tests
 

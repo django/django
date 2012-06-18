@@ -1291,18 +1291,14 @@ def verbatim(parser, token):
             {% don't process this %}
         {% endverbatim %}
 
-    You can also specify an alternate closing tag::
+    You can also designate a specific closing tag block (allowing the
+    unrendered use of ``{% endverbatim %}``)::
 
-        {% verbatim -- %}
+        {% verbatim myblock %}
             ...
-        {% -- %}
+        {% endverbatim myblock %}
     """
-    bits = token.contents.split(' ', 1)
-    if len(bits) > 1:
-        closing_tag = bits[1]
-    else:
-        closing_tag = 'endverbatim'
-    nodelist = parser.parse((closing_tag,))
+    nodelist = parser.parse(('endverbatim',))
     parser.delete_first_token()
     return VerbatimNode(nodelist.render(Context()))
 
