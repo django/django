@@ -890,7 +890,7 @@ prepend the current active language code to all url patterns defined within
 
     urlpatterns += i18n_patterns('',
         url(r'^about/$', 'about.view', name='about'),
-        url(r'^news/$', include(news_patterns, namespace='news')),
+        url(r'^news/', include(news_patterns, namespace='news')),
     )
 
 
@@ -945,7 +945,7 @@ URL patterns can also be marked translatable using the
 
     urlpatterns += i18n_patterns('',
         url(_(r'^about/$'), 'about.view', name='about'),
-        url(_(r'^news/$'), include(news_patterns, namespace='news')),
+        url(_(r'^news/'), include(news_patterns, namespace='news')),
     )
 
 
