@@ -40,7 +40,7 @@ class TestNoInitialDataLoading(TransactionTestCase):
         # Test presence of fixture (flush called by TransactionTestCase)
         self.assertQuerysetEqual(
             Book.objects.all(), [
-                u'Achieving self-awareness of Python programs'
+                'Achieving self-awareness of Python programs'
             ],
             lambda a: a.name
         )

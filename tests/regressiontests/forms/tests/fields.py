@@ -486,7 +486,7 @@ class FieldsTests(SimpleTestCase):
         Refs #.
         """
         f = RegexField('^\w+$')
-        self.assertEqual(u'éèøçÎÎ你好', f.clean(u'éèøçÎÎ你好'))
+        self.assertEqual('éèøçÎÎ你好', f.clean('éèøçÎÎ你好'))
 
     def test_change_regex_after_init(self):
         f = RegexField('^[a-z]+$')

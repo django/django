@@ -101,7 +101,7 @@ class ModelWithStringPrimaryKey(models.Model):
         return self.string_pk
 
     def get_absolute_url(self):
-        return u'/dummy/%s/' % self.string_pk
+        return '/dummy/%s/' % self.string_pk
 
 
 class Color(models.Model):
