@@ -65,6 +65,27 @@ class OracleChecks(unittest.TestCase):
         connection.cursor()  # Ensure the connection is initialized.
         self.assertEqual(connection.connection.encoding, "UTF-8")
         self.assertEqual(connection.connection.nencoding, "UTF-8")
+    
+    @unittest.skipUnless(connection.vendor == 'oracle',
+                         "No need to check Oracle connection semantics")
+    def test_order_of_nls_parameters(self):
+        # an 'almost right' datetime should work with configured
+        # NLS parameters as per #18465.
+        c = connection.cursor()
+        query = "select 1 from dual where '1936-12-29 00:00' < sysdate"
+        c.execute(query)
+        try:
+            # should change the NLS_DATE_FORMAT and NLS_TIMESTAMP_FORMAT
+            c.execute("ALTER SESSION SET NLS_TERRITORY = 'AMERICA'")
+            with self.assertRaises(DatabaseError):
+                c.execute(query)
+        finally:
+            try:
+                c.execute("ALTER SESSION SET NLS_DATE_FORMAT = 'YYYY-MM-DD HH24:MI:SS'"
+                          " NLS_TIMESTAMP_FORMAT = 'YYYY-MM-DD HH24:MI:SS.FF'"
+                          + (" TIME_ZONE = 'UTC'" if settings.USE_TZ else ''))
+            except:
+                pass
 
 class MySQLTests(TestCase):
     @unittest.skipUnless(connection.vendor == 'mysql',
