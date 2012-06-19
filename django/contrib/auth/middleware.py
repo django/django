@@ -50,6 +50,8 @@ class RemoteUserMiddleware(object):
             # If specified header doesn't exist then return (leaving
             # request.user set to AnonymousUser by the
             # AuthenticationMiddleware).
+            if request.user.is_authenticated(): 
+                auth.logout(request) 
             return
         # If the user is already authenticated and that user is the user we are
         # getting passed in the headers, then the correct user is already

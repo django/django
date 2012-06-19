@@ -102,6 +102,9 @@ Django 1.5 also includes several smaller improvements worth noting:
 * In the localflavor for Canada, "pq" was added to the acceptable codes for
   Quebec. It's an old abbreviation.
 
+* RemoteUserMiddleware now forces logout when the REMOTE_USER header
+  disappears during a same browser session.
+
 Backwards incompatible changes in 1.5
 =====================================
 
