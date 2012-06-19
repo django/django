@@ -85,6 +85,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_tablespaces = True
     can_distinct_on_fields = True
     can_rollback_ddl = True
+    supports_combined_alters = True
 
 class DatabaseWrapper(BaseDatabaseWrapper):
     vendor = 'postgresql'

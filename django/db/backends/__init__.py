@@ -419,6 +419,9 @@ class BaseDatabaseFeatures(object):
     # Can we roll back DDL in a transaction?
     can_rollback_ddl = False
 
+    # Can we issue more than one ALTER COLUMN clause in an ALTER TABLE?
+    supports_combined_alters = False
+
     def __init__(self, connection):
         self.connection = connection
 
