@@ -41,7 +41,7 @@
 		});
 		if ($(this).length && showAddButton) {
 			var addButton;
-			if ($(this).attr("tagName") == "TR") {
+			if ($(this).is("tr")) {
 				// If forms are laid out as table rows, insert the
 				// "add" button in a new table row:
 				var numCols = this.eq(-1).children().length;
