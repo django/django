@@ -15,7 +15,7 @@ introduce controlled coupling for convenience's sake.
 ``render``
 ==========
 
-.. function:: render(request, template[, dictionary][, context_instance][, content_type][, status][, current_app])
+.. function:: render(request, template_name[, dictionary][, context_instance][, content_type][, status][, current_app])
 
    .. versionadded:: 1.3
 
@@ -32,7 +32,7 @@ Required arguments
 ``request``
     The request object used to generate this response.
 
-``template``
+``template_name``
     The full name of a template to use or sequence of template names.
 
 Optional arguments
