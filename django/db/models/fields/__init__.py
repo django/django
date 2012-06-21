@@ -83,7 +83,7 @@ class Field(object):
             serialize=True, unique_for_date=None, unique_for_month=None,
             unique_for_year=None, choices=None, help_text='', db_column=None,
             db_tablespace=None, auto_created=False, validators=[],
-            localize=True, error_messages=None):
+            localize=False, error_messages=None):
         self.name = name
         self.verbose_name = verbose_name
         self.primary_key = primary_key
