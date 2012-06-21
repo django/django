@@ -102,6 +102,12 @@ Django 1.5 also includes several smaller improvements worth noting:
 * In the localflavor for Canada, "pq" was added to the acceptable codes for
   Quebec. It's an old abbreviation.
 
+* :class:`~django.contrib.gis.geos.LineString` and
+  :class:`~django.contrib.gis.geos.MultiLineString` GEOS objects now support the
+  :meth:`~django.contrib.gis.geos.GEOSGeometry.interpolate()` and
+  :meth:`~django.contrib.gis.geos.GEOSGeometry.project()` methods
+  (so-called linear referencing).
+
 Backwards incompatible changes in 1.5
 =====================================
 
