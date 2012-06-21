@@ -42,18 +42,15 @@ Yes. See :doc:`Integrating with a legacy database </howto/legacy-databases>`.
 If I make changes to a model, how do I update the database?
 -----------------------------------------------------------
 
-If you don't mind clearing data, your project's ``manage.py`` utility has an
-option to reset the SQL for a particular application::
-
-    manage.py reset appname
-
-This drops any tables associated with ``appname`` and recreates them.
+If you don't mind clearing data, your project's ``manage.py`` utility has a
+:djadmin:`flush` option to reset the database to the state it was in
+immediately after :djadmin:`syncdb` was executed.
 
 If you do care about deleting data, you'll have to execute the ``ALTER TABLE``
 statements manually in your database.
 
 There are `external projects which handle schema updates
-<http://djangopackages.com/grids/g/database-migration/>`_, of which the current
+<http://www.djangopackages.com/grids/g/database-migration/>`_, of which the current
 defacto standard is `south <http://south.aeracode.org/>`_.
 
 Do Django models support multiple-column primary keys?

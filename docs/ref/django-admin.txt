@@ -232,8 +232,8 @@ flush
 
 .. django-admin:: flush
 
-Returns the database to the state it was in immediately after syncdb was
-executed. This means that all data will be removed from the database, any
+Returns the database to the state it was in immediately after :djadmin:`syncdb`
+was executed. This means that all data will be removed from the database, any
 post-synchronization handlers will be re-executed, and the ``initial_data``
 fixture will be re-installed.
 
