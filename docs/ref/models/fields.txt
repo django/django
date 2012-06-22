@@ -235,6 +235,17 @@ desire. For example::
 Alternatively you can use plain text and
 ``django.utils.html.escape()`` to escape any HTML special characters.
 
+``localize``
+-------------
+
+.. attribute:: Field.localize
+
+The ``localize`` argument enables the localization of form data, input as well
+as the rendered output.
+
+See the :ref:`format localization <format-localization>` documentation for
+more information.
+
 ``primary_key``
 ---------------
 
