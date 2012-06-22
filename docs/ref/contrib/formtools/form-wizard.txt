@@ -554,9 +554,8 @@ How to work with ModelForm and ModelFormSet
 WizardView supports :doc:`ModelForms </topics/forms/modelforms>` and
 :ref:`ModelFormSets <model-formsets>`. Additionally to
 :attr:`~WizardView.initial_dict`, the :meth:`~WizardView.as_view` method takes
-an ``instance_dict`` argument that should contain instances of ``ModelForm`` and
-``ModelFormSet``.  Similarly to :attr:`~WizardView.initial_dict`, these
-dictionary key values should be equal to the step number in the form list.
+an ``instance_dict`` argument that should contain model instances for steps
+based on ``ModelForm`` and querysets for steps based on ``ModelFormSet``.
 
 Usage of ``NamedUrlWizardView``
 ===============================
