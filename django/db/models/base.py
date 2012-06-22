@@ -61,12 +61,14 @@ class ModelBase(type):
         if not abstract:
             new_class.add_to_class('DoesNotExist', subclass_exception(b'DoesNotExist',
                     tuple(x.DoesNotExist
-                            for x in parents if hasattr(x, '_meta') and not x._meta.abstract)
-                                    or (ObjectDoesNotExist,), module))
+                          for x in parents if hasattr(x, '_meta') and not x._meta.abstract)
+                    or (ObjectDoesNotExist,),
+                    module, attached_to=new_class))
             new_class.add_to_class('MultipleObjectsReturned', subclass_exception(b'MultipleObjectsReturned',
                     tuple(x.MultipleObjectsReturned
-                            for x in parents if hasattr(x, '_meta') and not x._meta.abstract)
-                                    or (MultipleObjectsReturned,), module))
+                          for x in parents if hasattr(x, '_meta') and not x._meta.abstract)
+                    or (MultipleObjectsReturned,),
+                    module, attached_to=new_class))
             if base_meta and not base_meta.abstract:
                 # Non-abstract child classes inherit some attributes from their
                 # non-abstract parent (unless an ABC comes before it in the
@@ -934,5 +936,30 @@ def model_unpickle(model, attrs, factory):
     return cls.__new__(cls)
 model_unpickle.__safe_for_unpickle__ = True
 
-def subclass_exception(name, parents, module):
-    return type(name, parents, {'__module__': module})
+def subclass_exception(name, parents, module, attached_to=None):
+    """
+    Create exception subclass.
+
+    If 'attached_to' is supplied, the exception will be created in a way that
+    allows it to be pickled, assuming the returned exception class will be added
+    as an attribute to the 'attached_to' class.
+    """
+    class_dict = {'__module__': module}
+    if attached_to is not None:
+        def __reduce__(self):
+            # Exceptions are special - they've got state that isn't
+            # in self.__dict__. We assume it is all in self.args.
+            return (unpickle_inner_exception, (attached_to, name), self.args)
+
+        def __setstate__(self, args):
+            self.args = args
+
+        class_dict['__reduce__'] = __reduce__
+        class_dict['__setstate__'] = __setstate__
+
+    return type(name, parents, class_dict)
+
+def unpickle_inner_exception(klass, exception_name):
+    # Get the exception class from the class it is attached to:
+    exception = getattr(klass, exception_name)
+    return exception.__new__(exception)
