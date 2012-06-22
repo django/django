@@ -1,5 +1,5 @@
 from django.contrib.sessions.backends.base import SessionBase, CreateError
-from django.core.cache import cache
+from django.core.cache import get_cache, InvalidCacheBackendError, cache
 
 KEY_PREFIX = "django.contrib.sessions.cache"
 
@@ -10,6 +10,11 @@ class SessionStore(SessionBase):
     """
     def __init__(self, session_key=None):
         self._cache = cache
+        try:
+            self._cache = get_cache('sessions')
+        except InvalidCacheBackendError:
+            # Use the default backend
+            self._cache = cache
         super(SessionStore, self).__init__(session_key)
 
     @property
