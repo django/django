@@ -27,8 +27,9 @@ Django 1.4 until you can upgrade your Python version. Per :doc:`our support poli
 </internals/release-process>`, Django 1.4 will continue to receive security
 support until the release of Django 1.6.
 
-Django 1.5 does not run on Jython, because Jython doesn't currently offer any
-version compatible with Python 2.6.
+Django 1.5 does not run on a Jython final release, because Jython's latest release
+doesn't currently support Python 2.6. However, Jython currently does offer an alpha
+release featuring 2.7 support.
 
 What's new in Django 1.5
 ========================
