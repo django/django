@@ -45,6 +45,8 @@ If you want to use a database-backed session, you need to add
 Once you have configured your installation, run ``manage.py syncdb``
 to install the single database table that stores session data.
 
+.. _cached-sessions-backend:
+
 Using cached sessions
 ---------------------
 
@@ -76,6 +78,11 @@ the cache:
   write-through cache -- every write to the cache will also be written to
   the database. Session reads only use the database if the data is not
   already in the cache.
+
+.. versionchanged:: 1.5
+    Cached sessions use the ``'sessions'`` entry in the :setting:`CACHES`
+    setting, but will fall back to the ``'default'`` cache backend if this
+    doesn't exist.
 
 Both session stores are quite fast, but the simple cache is faster because it
 disregards persistence. In most cases, the ``cached_db`` backend will be fast

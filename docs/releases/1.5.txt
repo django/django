@@ -103,6 +103,10 @@ Django 1.5 also includes several smaller improvements worth noting:
 * In the localflavor for Canada, "pq" was added to the acceptable codes for
   Quebec. It's an old abbreviation.
 
+* :ref:`Cached-based sessions <cached-sessions-backend>` can now use a custom
+  cache backend. Add a ``'sessions'`` entry to the :setting:`CACHES` setting to
+  use a different backend instead of the ``'default'`` backend.
+
 Backwards incompatible changes in 1.5
 =====================================
 
