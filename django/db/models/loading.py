@@ -54,8 +54,7 @@ class AppCache(object):
         """
         if self.loaded:
             return
-        self.write_lock.acquire()
-        try:
+        with self.write_lock:
             if self.loaded:
                 return
             for app_name in settings.INSTALLED_APPS:
@@ -66,8 +65,6 @@ class AppCache(object):
                 for app_name in self.postponed:
                     self.load_app(app_name)
                 self.loaded = True
-        finally:
-            self.write_lock.release()
 
     def _label_for(self, app_mod):
         """
@@ -138,8 +135,7 @@ class AppCache(object):
         the app has no models in it and 'emptyOK' is True, returns None.
         """
         self._populate()
-        self.write_lock.acquire()
-        try:
+        with self.write_lock:
             for app_name in settings.INSTALLED_APPS:
                 if app_label == app_name.split('.')[-1]:
                     mod = self.load_app(app_name, False)
@@ -150,8 +146,6 @@ class AppCache(object):
                     else:
                         return mod
             raise ImproperlyConfigured("App with label %s could not be found" % app_label)
-        finally:
-            self.write_lock.release()
 
     def get_app_errors(self):
         "Returns the map of known problems with the INSTALLED_APPS."

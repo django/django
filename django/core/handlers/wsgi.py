@@ -210,8 +210,7 @@ class WSGIHandler(base.BaseHandler):
         # Set up middleware if needed. We couldn't do this earlier, because
         # settings weren't available.
         if self._request_middleware is None:
-            self.initLock.acquire()
-            try:
+            with self.initLock:
                 try:
                     # Check that middleware is still uninitialised.
                     if self._request_middleware is None:
@@ -220,8 +219,6 @@ class WSGIHandler(base.BaseHandler):
                     # Unload whatever middleware we got
                     self._request_middleware = None
                     raise
-            finally:
-                self.initLock.release()
 
         set_script_prefix(base.get_script_name(environ))
         signals.request_started.send(sender=self.__class__)

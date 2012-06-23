@@ -99,15 +99,12 @@ class Signal(object):
         if weak:
             receiver = saferef.safeRef(receiver, onDelete=self._remove_receiver)
 
-        self.lock.acquire()
-        try:
+        with self.lock:
             for r_key, _ in self.receivers:
                 if r_key == lookup_key:
                     break
             else:
                 self.receivers.append((lookup_key, receiver))
-        finally:
-            self.lock.release()
 
     def disconnect(self, receiver=None, sender=None, weak=True, dispatch_uid=None):
         """
@@ -135,16 +132,13 @@ class Signal(object):
             lookup_key = (dispatch_uid, _make_id(sender))
         else:
             lookup_key = (_make_id(receiver), _make_id(sender))
-        
-        self.lock.acquire()
-        try:
+
+        with self.lock:
             for index in xrange(len(self.receivers)):
                 (r_key, _) = self.receivers[index]
                 if r_key == lookup_key:
                     del self.receivers[index]
                     break
-        finally:
-            self.lock.release()
 
     def send(self, sender, **named):
         """
@@ -237,8 +231,7 @@ class Signal(object):
         Remove dead receivers from connections.
         """
 
-        self.lock.acquire()
-        try:
+        with self.lock:
             to_remove = []
             for key, connected_receiver in self.receivers:
                 if connected_receiver == receiver:
@@ -250,8 +243,6 @@ class Signal(object):
                 for idx, (r_key, _) in enumerate(reversed(self.receivers)):
                     if r_key == key:
                         del self.receivers[last_idx-idx]
-        finally:
-            self.lock.release()
 
 
 def receiver(signal, **kwargs):
