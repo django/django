@@ -93,13 +93,13 @@ conversion to JSON once.
 For example, a simple JSON mixin might look something like this::
 
     import json
-    from django import http
+    from django.http import HttpResponse
 
     class JSONResponseMixin(object):
         """
         A mixin that can be used to render a JSON response.
         """
-        reponse_class = HTTPResponse
+        response_class = HttpResponse
 
         def render_to_response(self, context, **response_kwargs):
             """
