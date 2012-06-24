@@ -150,11 +150,11 @@ def sort_dependencies(app_list):
             for field in model._meta.fields:
                 if hasattr(field.rel, 'to'):
                     rel_model = field.rel.to
-                    if hasattr(rel_model, 'natural_key'):
+                    if hasattr(rel_model, 'natural_key') and rel_model != model:
                         deps.append(rel_model)
             for field in model._meta.many_to_many:
                 rel_model = field.rel.to
-                if hasattr(rel_model, 'natural_key'):
+                if hasattr(rel_model, 'natural_key') and rel_model != model:
                     deps.append(rel_model)
             model_dependencies.append((model, deps))
 

@@ -91,6 +91,7 @@ class TestManager(models.Manager):
 class Store(models.Model):
     objects = TestManager()
     name = models.CharField(max_length=255)
+    main = models.ForeignKey('self', null=True)
 
     class Meta:
         ordering = ('name',)
