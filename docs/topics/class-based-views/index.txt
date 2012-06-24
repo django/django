@@ -99,7 +99,7 @@ For example, a simple JSON mixin might look something like this::
         """
         A mixin that can be used to render a JSON response.
         """
-        reponse_class = HTTPResponse
+        response_class = http.HttpResponse
 
         def render_to_response(self, context, **response_kwargs):
             """
