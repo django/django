@@ -474,6 +474,15 @@ This storage will temporarily store the uploaded files for the wizard. The
 :attr:`file_storage` attribute should be a
 :class:`~django.core.files.storage.Storage` subclass.
 
+Django provides a builtin storage class (see :ref:`the built-in
+filesystem storage class <builtin-fs-storage>`)::
+
+    from django.conf import settings
+    from django.core.files.storage import FileSystemStorage
+    class CustomWizardView(WizardView):
+        ...
+        file_storage = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, 'photos'))
+
 .. warning::
 
     Please remember to take care of removing old files as the
