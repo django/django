@@ -278,6 +278,9 @@ class ReverseShortcutTests(TestCase):
 class NamespaceTests(TestCase):
     urls = 'regressiontests.urlpatterns_reverse.namespace_urls'
 
+    def test_function_reference(self):
+        self.assertEqual(reverse(views.namespaced_view_class_instance), '/ns-only-included/deeper/view_class/')
+
     def test_ambiguous_object(self):
         "Names deployed via dynamic URL objects that require namespaces can't be resolved"
         self.assertRaises(NoReverseMatch, reverse, 'urlobject-view')

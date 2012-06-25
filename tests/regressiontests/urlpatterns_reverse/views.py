@@ -26,6 +26,7 @@ class ViewClass(object):
         return HttpResponse('')
 
 view_class_instance = ViewClass()
+namespaced_view_class_instance = ViewClass()
 
 class LazyRedirectView(RedirectView):
     url = reverse_lazy('named-lazy-url-redirected-to')
