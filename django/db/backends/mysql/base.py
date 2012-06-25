@@ -320,12 +320,10 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def distinct_sql(self, fields):
         """MySQL DISTINCT for several fields.
+        No need to output the DISTINCT keyword without having to.
         For more details see mysql.compiler.get_distinct()
         """
-        if isinstance(fields, (list, tuple)):
-            return ''
-        else:
-            return 'DISTINCT'
+        return '' if isinstance(fields, (list, tuple)) else 'DISTINCT'
 
     def bulk_insert_sql(self, fields, num_values):
         items_sql = "(%s)" % ", ".join(["%s"] * len(fields))

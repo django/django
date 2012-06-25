@@ -1,5 +1,5 @@
 from django.db.models.sql import compiler
-from django.db.models.sql.constants import LOOKUP_SEP
+
 
 class SQLCompiler(compiler.SQLCompiler):
     def resolve_columns(self, row, fields=()):
@@ -14,31 +14,20 @@ class SQLCompiler(compiler.SQLCompiler):
 
     def get_distinct(self):
         """MySQL DISTINCT for several fields.
-
         Implementation in MySQL:
-        SELECT `field1`, `field2`, ..., `fieldN` FROM `table` GROUP BY `field1`, `field2`, ..., `fieldN` ORDER BY NULL;
-
+        > SELECT `field1`, `field2`, ..., `fieldN` FROM `table` GROUP BY `field1`, `field2` ORDER BY NULL;
         For a similar statement in PostgreSQL:
-        SELECT DISTINCT ON(`field1`, `field2`, ..., `fieldN`) `field1`, `field2`, ..., `fieldN` FROM `table`;
+        > SELECT DISTINCT ON(`field1`, `field2`) `field1`, `field2`, ..., `fieldN` FROM `table`;
         """
-
-        qn = self.quote_name_unless_alias
-        qn2 = self.connection.ops.quote_name
-        result = []
-        opts = self.query.model._meta
-
+        distinct_fields = super(SQLCompiler, self).get_distinct()
         self.query.group_by = self.query.group_by or []
-        for name in self.query.distinct_fields:
-            parts = name.split(LOOKUP_SEP)
-            field, col, alias, _, _ = self._setup_joins(parts, opts, None)
-            col, alias = self._final_join_removal(col, alias)
-            self.query.group_by.append((qn(alias), qn2(col)))  # self.query.model._meta.db_table, field[0].column
+
+        for field in distinct_fields:
+            # self.query.group_by.append(tuple(field.split('.')))
+            self.query.group_by.append(field)
 
         # Suppression: NotImplementedError("annotate() + distinct(fields) not implemented.")
-        if self.query.distinct_fields:
-            return []
-        else:
-            return None
+        return [] if self.query.distinct_fields else None
 
 class SQLInsertCompiler(compiler.SQLInsertCompiler, SQLCompiler):
     pass
