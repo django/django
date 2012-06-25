@@ -120,9 +120,9 @@ class CsrfViewMiddleware(object):
             permitted_domains = getattr(settings, 'PERMITTED_DOMAINS', [host])
 
             # If origin header exists, use it to check for csrf attacks.
-            # Origin header is being compared to None here as we need to reject
-            # requests with origin header as '' too, which otherwise is treated
-            # as null.
+            # Origin header is being compared to None here because we need to
+            # reject requests with origin header as '' too, which otherwise is
+            # treated as null.
             if origin is not None:
                 if not domain_permitted(origin, permitted_domains):
                     reason = REASON_BAD_ORIGIN % (origin)
@@ -136,21 +136,10 @@ class CsrfViewMiddleware(object):
 
                     return self._reject(request, reason)
 
-            # Suppose user visits http://example.com/
-            # An active network attacker (man-in-the-middle, MITM) sends a
-            # POST form that targets https://example.com/detonate-bomb/ and
-            # submits it via JavaScript.
-            #
-            # The attacker will need to provide a CSRF cookie and token, but
-            # that's no problem for a MITM and the session-independent
-            # nonce we're using. So the MITM can circumvent the CSRF
-            # protection. This is true for any HTTP connection, but anyone
-            # using HTTPS expects better! For this reason, for
-            # https://example.com/ we need additional protection that treats
-            # http://example.com/ as completely untrusted. Under HTTPS,
-            # Barth et al. found that the Referer header is missing for
-            # same-domain requests in only about 0.2% of cases or less, so
-            # we can use strict Referer checking.
+
+            # Do a strict referer check in case an origin check succeds.
+            # As far as CSRF is concerned, attackers who are in a position to
+            # perform CSRF attack are not in a position to fake referer headers.
             referer = request.META.get('HTTP_REFERER')
             if referer is None:
                 logger.warning('Forbidden (%s): %s',
@@ -163,6 +152,8 @@ class CsrfViewMiddleware(object):
 
                 return self._reject(request, REASON_NO_REFERER)
 
+            # Make sure that the http referer matches the permitted domains
+            # pattern.
             if not domain_permitted(referer, permitted_domains):
                 reason = REASON_BAD_REFERER % (referer)
                 logger.warning('Forbidden (%s): %s', reason, request.path,
@@ -173,6 +164,10 @@ class CsrfViewMiddleware(object):
                 )
                 return self._reject(request, reason)
 
+            # Legacy token checking method.
+            # TODO: Handle this with permitted domains. Cookies won't work
+            # there, invalidating the whole point of permitted domains
+            # functionality.
             if csrf_token is None:
                 # No CSRF cookie. For POST requests, we insist on a CSRF cookie,
                 # and in this way we can avoid all CSRF attacks, including login
