@@ -1081,11 +1081,13 @@ to ``defer()``::
     # Load all fields immediately.
     my_queryset.defer(None)
 
+.. versionchanged:: 1.5
+
 Some fields in a model won't be deferred, even if you ask for them. You can
 never defer the loading of the primary key. If you are using
 :meth:`select_related()` to retrieve related models, you shouldn't defer the
-loading of the field that connects from the primary model to the related one
-(at the moment, that doesn't raise an error, but it will eventually).
+loading of the field that connects from the primary model to the related
+one, doing so will result in an error.
 
 .. note::
 
@@ -1145,9 +1147,12 @@ logically::
     # existing set of fields).
     Entry.objects.defer("body").only("headline", "body")
 
+.. versionchanged:: 1.5
+
 All of the cautions in the note for the :meth:`defer` documentation apply to
 ``only()`` as well. Use it cautiously and only after exhausting your other
-options.
+options. Also note that using :meth:`only` and omitting a field requested
+using :meth:`select_related` is an error as well.
 
 using
 ~~~~~
