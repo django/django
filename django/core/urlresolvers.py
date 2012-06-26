@@ -295,11 +295,15 @@ class RegexURLResolver(LocaleRegexProvider):
                 # are correct.
                 parent = normalize(pattern.regex.pattern)
                 for name in include_lookups:
+                    new_lookups = []
                     for matches, pat, defaults in pattern.reverse_dict.getlist(name):
                         new_matches = []
                         for piece, p_args in parent:
                             new_matches.extend([(piece + suffix, p_args + args) for (suffix, args) in matches])
-                        lookups.appendlist(name, (new_matches, p_pattern + pat, dict(defaults, **pattern.default_kwargs)))
+                        new_lookups.append((new_matches, p_pattern + pat, dict(defaults, **pattern.default_kwargs)))
+                    # prepend lookups as we're doing reverse pattern traversal
+                    lookups.setlist(name, new_lookups + lookups.getlist(name))
+
             else:
                 bits = normalize(p_pattern)
                 lookups.appendlist(pattern.callback, (bits, p_pattern, pattern.default_args))
