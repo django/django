@@ -287,9 +287,10 @@ class RegexURLResolver(LocaleRegexProvider):
                         namespaces[namespace] = (p_pattern + prefix, sub_pattern)
                     for app_name, namespace_list in pattern.app_dict.items():
                         apps.setdefault(app_name, []).extend(namespace_list)
-                    # When no namespace is provided, *all* the patterns in the
-                    # included resolver should be available in this resolver.
-                    include_lookups = iter(pattern.reverse_dict)
+                    # When no namespace is provided, *all* the callable
+                    # patterns in the included resolver should be available in
+                    # this resolver.
+                    include_lookups = ifilter(callable, pattern.reverse_dict)
                 # Add each of the child lookups to this resolver, being careful
                 # to add appropriate URL and regex prefixes so reversing results
                 # are correct.
