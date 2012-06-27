@@ -28,6 +28,12 @@ class SQLCompiler(compiler.SQLCompiler):
         # Suppression: NotImplementedError("annotate() + distinct(fields) not implemented.")
         return [] if self.query.distinct_fields else None
 
+    def get_grouping(self):
+        grouping, gb_params = super(SQLCompiler, self).get_grouping()
+        if self.distinct_via_group_by:
+            grouping = self.distinct_via_group_by + grouping
+        return grouping, gb_params
+
 class SQLInsertCompiler(compiler.SQLInsertCompiler, SQLCompiler):
     pass
 
