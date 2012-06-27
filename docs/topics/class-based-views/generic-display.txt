@@ -397,7 +397,7 @@ custom view::
 
     urlpatterns = patterns('',
         #...
-        url(r'^authors/(?P<pk>\\d+)/$', AuthorDetailView.as_view(), name='author-detail'),
+        url(r'^authors/(?P<pk>\d+)/$', AuthorDetailView.as_view(), name='author-detail'),
     )
 
 Then we'd write our new view -- ``get_object`` is the method that retrieves the
