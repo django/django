@@ -103,6 +103,8 @@ class SQLCompiler(object):
             params.extend(w_params)
 
         grouping, gb_params = self.get_grouping()
+        if getattr(self, 'distinct_via_group_by'):
+            grouping = self.distinct_via_group_by + grouping
         if grouping:
             if distinct_fields:
                 raise NotImplementedError(

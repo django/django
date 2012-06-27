@@ -2,6 +2,8 @@ from django.db.models.sql import compiler
 
 
 class SQLCompiler(compiler.SQLCompiler):
+    distinct_via_group_by = []
+
     def resolve_columns(self, row, fields=()):
         values = []
         index_extra_select = len(self.query.extra_select.keys())
@@ -20,12 +22,9 @@ class SQLCompiler(compiler.SQLCompiler):
         > SELECT DISTINCT ON(`field1`, `field2`) `field1`, `field2`, ..., `fieldN` FROM `table`;
         """
         distinct_fields = super(SQLCompiler, self).get_distinct()
-        self.query.group_by = self.query.group_by or []
-
+        self.distinct_via_group_by = []
         for field in distinct_fields:
-            # self.query.group_by.append(tuple(field.split('.')))
-            self.query.group_by.append(field)
-
+            self.distinct_via_group_by.append(field)
         # Suppression: NotImplementedError("annotate() + distinct(fields) not implemented.")
         return [] if self.query.distinct_fields else None
 
