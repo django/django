@@ -685,7 +685,7 @@ Methods
       risk of client side script accessing the protected cookie
       data.
 
-    .. _HTTPOnly: http://www.owasp.org/index.php/HTTPOnly
+    .. _HTTPOnly: https://www.owasp.org/index.php/HTTPOnly
 
 .. method:: HttpResponse.set_signed_cookie(key, value='', salt='', max_age=None, expires=None, path='/', domain=None, secure=None, httponly=True)
 

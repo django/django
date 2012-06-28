@@ -1034,7 +1034,7 @@ Keyword Argument       Description
                        representation -- the default value is 8.
 =====================  =====================================================
 
-__ http://code.google.com/apis/kml/documentation/
+__ https://developers.google.com/kml/documentation/
 
 ``svg``
 ~~~~~~~
@@ -1195,7 +1195,7 @@ Keyword Argument       Description
                        details.
 =====================  =====================================================
 
-__ http://download.oracle.com/docs/html/B14255_01/sdo_intro.htm#sthref150
+__ http://docs.oracle.com/html/B14255_01/sdo_intro.htm#sthref150
 
 Aggregate Functions
 -------------------
@@ -1244,6 +1244,6 @@ Returns the same as the :meth:`GeoQuerySet.union` aggregate method.
 
 .. rubric:: Footnotes
 .. [#fnde9im] *See* `OpenGIS Simple Feature Specification For SQL <http://www.opengis.org/docs/99-049.pdf>`_, at Ch. 2.1.13.2, p. 2-13 (The Dimensionally Extended Nine-Intersection Model).
-.. [#fnsdorelate] *See* `SDO_RELATE documentation <http://download.oracle.com/docs/cd/B19306_01/appdev.102/b14255/sdo_operat.htm#sthref845>`_, from Ch. 11 of the Oracle Spatial User's Guide and Manual.
+.. [#fnsdorelate] *See* `SDO_RELATE documentation <http://docs.oracle.com/cd/B19306_01/appdev.102/b14255/sdo_operat.htm#sthref845>`_, from Ch. 11 of the Oracle Spatial User's Guide and Manual.
 .. [#fncovers] For an explanation of this routine, read `Quirks of the "Contains" Spatial Predicate <http://lin-ear-th-inking.blogspot.com/2007/06/subtleties-of-ogc-covers-spatial.html>`_ by Martin Davis (a PostGIS developer).
 .. [#fncontainsproperly] Refer to the PostGIS ``ST_ContainsProperly`` `documentation <http://postgis.refractions.net/documentation/manual-1.4/ST_ContainsProperly.html>`_ for more details.

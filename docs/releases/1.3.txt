@@ -329,7 +329,7 @@ requests. These include:
 * Support for combining :ref:`F() expressions <query-expressions>`
   with timedelta values when retrieving or updating database values.
 
-.. _HTTPOnly: http://www.owasp.org/index.php/HTTPOnly
+.. _HTTPOnly: https://www.owasp.org/index.php/HTTPOnly
 
 .. _backwards-incompatible-changes-1.3:
 

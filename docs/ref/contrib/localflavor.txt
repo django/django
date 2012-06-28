@@ -92,7 +92,7 @@ Here's an example of how to use them::
     class MyForm(forms.Form):
         my_date_field = generic.forms.DateField()
 
-.. _ISO 3166 country codes: http://www.iso.org/iso/country_codes/iso_3166_code_lists/english_country_names_and_code_elements.htm
+.. _ISO 3166 country codes: http://www.iso.org/iso/country_codes.htm
 .. _Argentina: `Argentina (ar)`_
 .. _Australia: `Australia (au)`_
 .. _Austria: `Austria (at)`_
@@ -156,7 +156,7 @@ any code you'd like to contribute. One thing we ask is that you please use
 Unicode objects (``u'mystring'``) for strings, rather than setting the encoding
 in the file. See any of the existing flavors for examples.
 
-.. _create a ticket: https://code.djangoproject.com/simpleticket
+.. _create a ticket: https://code.djangoproject.com/newticket
 
 Localflavor and backwards compatibility
 =======================================
@@ -703,7 +703,7 @@ Italy (``it``)
     A form field that validates input as an Italian social security number
     (`codice fiscale`_).
 
-.. _codice fiscale: http://www.agenziaentrate.it/ilwwcm/connect/Nsi/Servizi/Codice+fiscale+-+tessera+sanitaria/NSI+Informazioni+sulla+codificazione+delle+persone+fisiche
+.. _codice fiscale: http://www.agenziaentrate.gov.it/wps/content/Nsilib/Nsi/Home/CosaDeviFare/Richiedere/Codice+fiscale+e+tessera+sanitaria/Richiesta+TS_CF/SchedaI/Informazioni+codificazione+pf/
 
 .. class:: it.forms.ITVatNumberField
 
