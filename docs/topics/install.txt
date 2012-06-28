@@ -70,7 +70,7 @@ server platforms. See the `server-arrangements wiki page`_ for specific
 installation instructions for each platform.
 
 .. _Apache: http://httpd.apache.org/
-.. _nginx: http://nginx.net/
+.. _nginx: http://nginx.org/
 .. _mod_wsgi: http://code.google.com/p/modwsgi/
 .. _server-arrangements wiki page: https://code.djangoproject.com/wiki/ServerArrangements
 

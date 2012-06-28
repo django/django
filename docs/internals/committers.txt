@@ -146,7 +146,7 @@ Joseph Kocherhans
 
     Brian lives in Denver, Colorado, USA.
 
-.. _brian rosner: http://oebfare.com/
+.. _brian rosner: http://brosner.com/
 .. _eldarion: http://eldarion.com/
 .. _django dose: http://djangodose.com/
 
@@ -162,7 +162,7 @@ Joseph Kocherhans
 
     Gary lives in Austin, Texas, USA.
 
-.. _Gary Wilson: http://gdub.wordpress.com/
+.. _Gary Wilson: http://thegarywilson.com/
 .. _The University of Texas: http://www.utexas.edu/
 
 Justin Bronn
