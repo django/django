@@ -44,7 +44,8 @@ class Serializer(PythonSerializer):
         yaml.dump(self.objects, self.stream, Dumper=DjangoSafeDumper, **self.options)
 
     def getvalue(self):
-        return self.stream.getvalue()
+        # Grand-parent super
+        return super(PythonSerializer, self).getvalue()
 
 def Deserializer(stream_or_string, **options):
     """
