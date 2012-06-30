@@ -84,7 +84,7 @@ def return_json_file(request):
                                 cls=DjangoJSONEncoder,
                                 ensure_ascii=False)
     response = HttpResponse(obj_json.encode(charset), status=200,
-                            mimetype='application/json; charset=%s' % charset)
+                            content_type='application/json; charset=%s' % charset)
     response['Content-Disposition'] = 'attachment; filename=testfile.json'
     return response
 
