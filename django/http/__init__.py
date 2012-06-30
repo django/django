@@ -524,14 +524,16 @@ class HttpResponse(object):
 
     status_code = 200
 
-    def __init__(self, content='', mimetype=None, status=None,
-            content_type=None):
+    def __init__(self, content='', content_type=None, status=None,
+            mimetype=None):
         # _headers is a mapping of the lower-case name to the original case of
         # the header (required for working with legacy systems) and the header
         # value. Both the name of the header and its value are ASCII strings.
         self._headers = {}
         self._charset = settings.DEFAULT_CHARSET
-        if mimetype: # For backwards compatibility.
+        if mimetype:
+            warnings.warn("Using mimetype keyword argument is deprecated, use"
+                          " content_type instead", PendingDeprecationWarning)
             content_type = mimetype
         if not content_type:
             content_type = "%s; charset=%s" % (settings.DEFAULT_CONTENT_TYPE,
