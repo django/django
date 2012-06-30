@@ -322,8 +322,11 @@ the ``ChoiceInline`` declaration to read::
 With that ``TabularInline`` (instead of ``StackedInline``), the
 related objects are displayed in a more compact, table-based format:
 
-.. image:: _images/admin12.png
+.. image:: _images/admin12t.png
    :alt: Add poll page now has more compact choices
+
+Note that there is an extra "Delete?" column that allows removing rows added
+using the "Add Another Choice" button and rows that have already been saved.
 
 Customize the admin change list
 ===============================
