@@ -72,6 +72,37 @@ def conditional_escape(text):
     else:
         return escape(text)
 
+def format_html(format_string, *args, **kwargs):
+    """
+    Similar to str.format, but passes all arguments through conditional_escape,
+    and calls 'mark_safe' on the result. This function should be used instead
+    of str.format or % interpolation to build up small HTML fragments.
+    """
+    args_safe = map(conditional_escape, args)
+    kwargs_safe = dict([(k, conditional_escape(v)) for (k, v) in
+                        kwargs.iteritems()])
+    return mark_safe(format_string.format(*args_safe, **kwargs_safe))
+
+def format_html_join(sep, format_string, args_generator):
+    """
+    A wrapper format_html, for the common case of a group of arguments that need
+    to be formatted using the same format string, and then joined using
+    'sep'. 'sep' is also passed through conditional_escape.
+
+    'args_generator' should be an iterator that returns the sequence of 'args'
+    that will be passed to format_html.
+
+    Example:
+
+      format_html_join('\n', "<li>{0} {1}</li>", ((u.first_name, u.last_name)
+                                                  for u in users))
+
+    """
+    return mark_safe(conditional_escape(sep).join(
+            format_html(format_string, *tuple(args))
+            for args in args_generator))
+
+
 def linebreaks(value, autoescape=False):
     """Converts newlines into <p> and <br />s."""
     value = normalize_newlines(value)
