@@ -103,6 +103,9 @@ class Settings(BaseSettings):
                 setting_value = getattr(mod, setting)
                 if setting in tuple_settings and \
                         isinstance(setting_value, basestring):
+                    warnings.warn("The %s setting must be a tuple. Please fix your "
+                                  "settings, as auto-correction is now deprecated." % setting,
+                        PendingDeprecationWarning)
                     setting_value = (setting_value,) # In case the user forgot the comma.
                 setattr(self, setting, setting_value)
 
