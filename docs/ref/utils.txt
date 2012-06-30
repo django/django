@@ -387,6 +387,28 @@ Atom1Feed
     input is a proper string, then add support for lazy translation objects at the
     end.
 
+``django.utils.html``
+=====================
+
+.. module:: django.utils.html
+   :synopsis: HTML helper functions
+
+Usually you should build up HTML using Django's templates to make use of its
+autoescape mechanism, using the utilities in :mod:`django.utils.safestring`
+where appropriate. This module provides some additional low level utilitiesfor
+escaping HTML.
+
+.. function:: escape(text)
+
+    Returns the given text with ampersands, quotes and angle brackets encoded
+    for use in HTML. The input is first passed through
+    :func:`~django.utils.encoding.force_unicode` and the output has
+    :func:`~django.utils.safestring.mark_safe` applied.
+
+.. function:: conditional_escape(text)
+
+    Similar to ``escape()``, except that it doesn't operate on pre-escaped strings,
+    so it will not double escape.
 
 ``django.utils.http``
 =====================

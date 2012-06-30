@@ -31,11 +31,11 @@ hard_coded_bullets_re = re.compile(r'((?:<p>(?:%s).*?[a-zA-Z].*?</p>\s*)+)' % '|
 trailing_empty_content_re = re.compile(r'(?:<p>(?:&nbsp;|\s|<br \/>)*?</p>\s*)+\Z')
 del x # Temporary variable
 
-def escape(html):
+def escape(text):
     """
-    Returns the given HTML with ampersands, quotes and angle brackets encoded.
+    Returns the given text with ampersands, quotes and angle brackets encoded for use in HTML.
     """
-    return mark_safe(force_unicode(html).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;'))
+    return mark_safe(force_unicode(text).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;'))
 escape = allow_lazy(escape, unicode)
 
 _base_js_escapes = (
@@ -63,14 +63,14 @@ def escapejs(value):
     return value
 escapejs = allow_lazy(escapejs, unicode)
 
-def conditional_escape(html):
+def conditional_escape(text):
     """
     Similar to escape(), except that it doesn't operate on pre-escaped strings.
     """
-    if isinstance(html, SafeData):
-        return html
+    if isinstance(text, SafeData):
+        return text
     else:
-        return escape(html)
+        return escape(text)
 
 def linebreaks(value, autoescape=False):
     """Converts newlines into <p> and <br />s."""
