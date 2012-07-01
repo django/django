@@ -2091,7 +2091,7 @@ class WhereNodeTest(TestCase):
         w = WhereNode(children=[NothingNode(), self.DummyNode()], connector='OR')
         self.assertEquals(w.as_sql(qn, connection), ('dummy', []))
         w.negate()
-        self.assertEquals(w.as_sql(qn, connection), ('NOT dummy', []))
+        self.assertEquals(w.as_sql(qn, connection), ('NOT (dummy)', []))
 
     def test_empty_nodes(self):
         qn = connection.ops.quote_name
