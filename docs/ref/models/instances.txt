@@ -25,6 +25,41 @@ The keyword arguments are simply the names of the fields you've defined on your
 model. Note that instantiating a model in no way touches your database; for
 that, you need to :meth:`~Model.save()`.
 
+.. note::
+
+    You may be tempted to customize the model by overriding the ``__init__``
+    method. If you do so, however, take care not to change the calling
+    signature as any change may prevent the model instance from being saved.
+    Rather than overriding ``__init__``, try using one of these approaches:
+
+    1. Add a classmethod on the model class::
+
+        class Book(models.Model):
+            title = models.CharField(max_length=100)
+
+            @classmethod
+            def create(cls, title):
+                book = cls(title=title)
+                # do something with the book
+                return book
+
+        book = Book.create("Pride and Prejudice")
+
+    2. Add a method on a custom manager (usually preferred)::
+
+        class BookManager(models.Manager):
+            def create_book(title):
+                book = self.create(title=title)
+                # do something with the book
+                return book
+
+        class Book(models.Model):
+            title = models.CharField(max_length=100)
+
+            objects = BookManager()
+
+        book = Book.objects.create_book("Pride and Prejudice")
+
 .. _validating-objects:
 
 Validating objects
@@ -590,4 +625,3 @@ described in :ref:`Field lookups <field-lookups>`.
 Note that in the case of identical date values, these methods will use the
 primary key as a tie-breaker. This guarantees that no records are skipped or
 duplicated. That also means you cannot use those methods on unsaved objects.
-
