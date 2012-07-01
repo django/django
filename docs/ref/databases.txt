@@ -335,7 +335,9 @@ storage engine, you have a couple of options.
       }
 
   This sets the default storage engine upon connecting to the database.
-  After your tables have been created, you should remove this option.
+  After your tables have been created, you should remove this option as it
+  adds a query that is only needed during table creation to each database
+  connection.
 
 * Another method for changing the storage engine is described in
   AlterModelOnSyncDB_.
