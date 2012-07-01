@@ -10,6 +10,8 @@ from django.core.exceptions import FieldError
 from django.db import DatabaseError, connection, connections, DEFAULT_DB_ALIAS
 from django.db.models import Count
 from django.db.models.query import Q, ITER_CHUNK_SIZE, EmptyQuerySet
+from django.db.models.sql.where import WhereNode, EverythingNode, NothingNode
+from django.db.models.sql.datastructures import EmptyResultSet
 from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import str_prefix
 from django.utils import unittest
@@ -1316,8 +1318,21 @@ class Queries5Tests(TestCase):
         )
 
     def test_ticket5261(self):
+        # Test different empty excludes.
         self.assertQuerysetEqual(
             Note.objects.exclude(Q()),
+            ['<Note: n1>', '<Note: n2>']
+        )
+        self.assertQuerysetEqual(
+            Note.objects.filter(~Q()),
+            ['<Note: n1>', '<Note: n2>']
+        )
+        self.assertQuerysetEqual(
+            Note.objects.filter(~Q()|~Q()),
+            ['<Note: n1>', '<Note: n2>']
+        )
+        self.assertQuerysetEqual(
+            Note.objects.exclude(~Q()&~Q()),
             ['<Note: n1>', '<Note: n2>']
         )
 
@@ -2020,3 +2035,74 @@ class ProxyQueryCleanupTest(TestCase):
         self.assertEqual(qs.count(), 1)
         str(qs.query)
         self.assertEqual(qs.count(), 1)
+
+class WhereNodeTest(TestCase):
+    class DummyNode(object):
+        def as_sql(self, qn, connection):
+            return 'dummy', []
+
+    def test_empty_full_handling_conjunction(self):
+        qn = connection.ops.quote_name
+        w = WhereNode(children=[EverythingNode()])
+        self.assertEquals(w.as_sql(qn, connection), ('', []))
+        w.negate()
+        self.assertRaises(EmptyResultSet, w.as_sql, qn, connection)
+        w = WhereNode(children=[NothingNode()])
+        self.assertRaises(EmptyResultSet, w.as_sql, qn, connection)
+        w.negate()
+        self.assertEquals(w.as_sql(qn, connection), ('', []))
+        w = WhereNode(children=[EverythingNode(), EverythingNode()])
+        self.assertEquals(w.as_sql(qn, connection), ('', []))
+        w.negate()
+        self.assertRaises(EmptyResultSet, w.as_sql, qn, connection)
+        w = WhereNode(children=[EverythingNode(), self.DummyNode()])
+        self.assertEquals(w.as_sql(qn, connection), ('dummy', []))
+        w = WhereNode(children=[self.DummyNode(), self.DummyNode()])
+        self.assertEquals(w.as_sql(qn, connection), ('(dummy AND dummy)', []))
+        w.negate()
+        self.assertEquals(w.as_sql(qn, connection), ('NOT (dummy AND dummy)', []))
+        w = WhereNode(children=[NothingNode(), self.DummyNode()])
+        self.assertRaises(EmptyResultSet, w.as_sql, qn, connection)
+        w.negate()
+        self.assertEquals(w.as_sql(qn, connection), ('', []))
+
+    def test_empty_full_handling_disjunction(self):
+        qn = connection.ops.quote_name
+        w = WhereNode(children=[EverythingNode()], connector='OR')
+        self.assertEquals(w.as_sql(qn, connection), ('', []))
+        w.negate()
+        self.assertRaises(EmptyResultSet, w.as_sql, qn, connection)
+        w = WhereNode(children=[NothingNode()], connector='OR')
+        self.assertRaises(EmptyResultSet, w.as_sql, qn, connection)
+        w.negate()
+        self.assertEquals(w.as_sql(qn, connection), ('', []))
+        w = WhereNode(children=[EverythingNode(), EverythingNode()], connector='OR')
+        self.assertEquals(w.as_sql(qn, connection), ('', []))
+        w.negate()
+        self.assertRaises(EmptyResultSet, w.as_sql, qn, connection)
+        w = WhereNode(children=[EverythingNode(), self.DummyNode()], connector='OR')
+        self.assertEquals(w.as_sql(qn, connection), ('', []))
+        w.negate()
+        self.assertRaises(EmptyResultSet, w.as_sql, qn, connection)
+        w = WhereNode(children=[self.DummyNode(), self.DummyNode()], connector='OR')
+        self.assertEquals(w.as_sql(qn, connection), ('(dummy OR dummy)', []))
+        w.negate()
+        self.assertEquals(w.as_sql(qn, connection), ('NOT (dummy OR dummy)', []))
+        w = WhereNode(children=[NothingNode(), self.DummyNode()], connector='OR')
+        self.assertEquals(w.as_sql(qn, connection), ('dummy', []))
+        w.negate()
+        self.assertEquals(w.as_sql(qn, connection), ('NOT (dummy)', []))
+
+    def test_empty_nodes(self):
+        qn = connection.ops.quote_name
+        empty_w = WhereNode()
+        w = WhereNode(children=[empty_w, empty_w])
+        self.assertEquals(w.as_sql(qn, connection), (None, []))
+        w.negate()
+        self.assertEquals(w.as_sql(qn, connection), (None, []))
+        w.connector = 'OR'
+        self.assertEquals(w.as_sql(qn, connection), (None, []))
+        w.negate()
+        self.assertEquals(w.as_sql(qn, connection), (None, []))
+        w = WhereNode(children=[empty_w, NothingNode()], connector='OR')
+        self.assertRaises(EmptyResultSet, w.as_sql, qn, connection)
