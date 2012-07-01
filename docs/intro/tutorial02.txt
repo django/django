@@ -445,6 +445,19 @@ above, then copy ``django/contrib/admin/templates/admin/base_site.html`` to
 ``/home/my_username/mytemplates/admin/base_site.html``. Don't forget that
 ``admin`` subdirectory.
 
+.. admonition:: Where are the Django source files?
+
+    If you have difficulty finding where the Django source files are located
+    on your system, run the following command:
+
+    .. code-block:: bash
+
+        python -c "
+        import sys
+        sys.path = sys.path[1:]
+        import django
+        print(django.__path__)"
+
 Then, just edit the file and replace the generic Django text with your own
 site's name as you see fit.
 
