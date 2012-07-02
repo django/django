@@ -440,7 +440,7 @@ database, so we need to be able to process strings and ``Hand`` instances in
 
 Notice that we always return a ``Hand`` instance from this method. That's the
 Python object type we want to store in the model's attribute. If anything is
-going wrong during value conversion, you should return a
+going wrong during value conversion, you should raise a
 :exc:`~django.core.exceptions.ValidationError` exception.
 
 **Remember:** If your custom field needs the :meth:`to_python` method to be
