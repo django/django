@@ -1344,15 +1344,20 @@ class AdminViewStringPrimaryKeyTest(TestCase):
     def setUp(self):
         self.client.login(username='super', password='secret')
         content_type_pk = ContentType.objects.get_for_model(ModelWithStringPrimaryKey).pk
-        LogEntry.objects.log_action(100, content_type_pk, self.pk, self.pk, 2, change_message='')
+        LogEntry.objects.log_action(100, content_type_pk, self.pk, self.pk, 2, change_message='Changed something')
 
     def tearDown(self):
         self.client.logout()
 
     def test_get_history_view(self):
-        "Retrieving the history for the object using urlencoded form of primary key should work"
+        """
+        Retrieving the history for an object using urlencoded form of primary
+        key should work.
+        Refs #12349, #18550.
+        """
         response = self.client.get('/test_admin/admin/admin_views/modelwithstringprimarykey/%s/history/' % quote(self.pk))
         self.assertContains(response, escape(self.pk))
+        self.assertContains(response, 'Changed something')
         self.assertEqual(response.status_code, 200)
 
     def test_get_change_view(self):
