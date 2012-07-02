@@ -479,6 +479,7 @@ filesystem storage class <builtin-fs-storage>`)::
 
     from django.conf import settings
     from django.core.files.storage import FileSystemStorage
+
     class CustomWizardView(WizardView):
         ...
         file_storage = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, 'photos'))
