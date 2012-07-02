@@ -8,7 +8,6 @@ from django.shortcuts import render_to_response
 from django.utils.html import format_html, format_html_join
 from django.utils.text import capfirst
 from django.utils.encoding import force_unicode
-from django.utils.safestring import mark_safe
 from django.views.generic import dates
 from django.utils import datetime_safe
 
@@ -72,12 +71,12 @@ class CalendarPlugin(DatabrowsePlugin):
     def urls(self, plugin_name, easy_instance_field):
         if isinstance(easy_instance_field.field, models.DateField):
             d = easy_instance_field.raw_value
-            return [mark_safe('%s%s/%s/%s/%s/%s/' % (
+            return ['%s%s/%s/%s/%s/%s/' % (
                 easy_instance_field.model.url(),
                 plugin_name, easy_instance_field.field.name,
                 str(d.year),
                 datetime_safe.new_date(d).strftime('%b').lower(),
-                d.day))]
+                d.day)]
 
     def model_view(self, request, model_databrowse, url):
         self.model, self.site = model_databrowse.model, model_databrowse.site

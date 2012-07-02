@@ -11,7 +11,7 @@ class GoogleMapException(Exception):
 
 # The default Google Maps URL (for the API javascript)
 # TODO: Internationalize for Japan, UK, etc.
-GOOGLE_MAPS_URL='http://maps.google.com/maps?file=api&amp;v=%s&amp;key='
+GOOGLE_MAPS_URL='http://maps.google.com/maps?file=api&v=%s&key='
 
 
 class GoogleMap(object):
@@ -49,7 +49,7 @@ class GoogleMap(object):
 
         # Can specify the API URL in the `api_url` keyword.
         if not api_url:
-            self.api_url = mark_safe(getattr(settings, 'GOOGLE_MAPS_URL', GOOGLE_MAPS_URL) % self.version)
+            self.api_url = getattr(settings, 'GOOGLE_MAPS_URL', GOOGLE_MAPS_URL) % self.version
         else:
             self.api_url = api_url
 
