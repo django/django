@@ -175,6 +175,8 @@ class TestTransactionClosing(TransactionTestCase):
         self.test_failing_query_transaction_closed()
 
 
+@skipUnless(connection.vendor == 'postgresql',
+            "This test only valid for PostgreSQL")
 class TestPostgresAutocommit(TransactionTestCase):
     """
     Tests to make sure psycopg2's autocommit mode is restored after entering
@@ -195,6 +197,9 @@ class TestPostgresAutocommit(TransactionTestCase):
         settings['OPTIONS'] = opts
         new_backend = self._old_backend.__class__(settings, DEFAULT_DB_ALIAS)
         connections[DEFAULT_DB_ALIAS] = new_backend
+
+    def tearDown(self):
+        connections[DEFAULT_DB_ALIAS] = self._old_backend
 
     def test_initial_autocommit_state(self):
         self.assertTrue(connection.features.uses_autocommit)
@@ -221,14 +226,6 @@ class TestPostgresAutocommit(TransactionTestCase):
 
         transaction.leave_transaction_management()
         self.assertEqual(connection.isolation_level, self._autocommit)
-
-    def tearDown(self):
-        connections[DEFAULT_DB_ALIAS] = self._old_backend
-
-TestPostgresAutocommit = skipUnless(connection.vendor == 'postgresql',
-    "This test only valid for PostgreSQL")(TestPostgresAutocommit)
-TestPostgresAutoCommit = skipUnlessDBFeature('supports_transactions')(
-    TestPostgresAutocommit)
 
 
 class TestManyToManyAddTransaction(TransactionTestCase):
