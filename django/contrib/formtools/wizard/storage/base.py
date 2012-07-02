@@ -70,7 +70,7 @@ class BaseStorage(object):
 
         if wizard_files and not self.file_storage:
             raise NoFileStorageConfigured(
-                    "You need to define 'file_storage' in your " \
+                    "You need to define 'file_storage' in your "
                     "wizard view in order to handle file uploads.")
 
         files = {}
@@ -85,7 +85,7 @@ class BaseStorage(object):
     def set_step_files(self, step, files):
         if files and not self.file_storage:
             raise NoFileStorageConfigured(
-                    "You need to define 'file_storage' in your " \
+                    "You need to define 'file_storage' in your "
                     "wizard view in order to handle file uploads.")
 
         if step not in self.data[self.step_files_key]:
