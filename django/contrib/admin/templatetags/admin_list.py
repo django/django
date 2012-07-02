@@ -10,7 +10,7 @@ from django.contrib.admin.templatetags.admin_static import static
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.utils import formats
-from django.utils.html import escape, conditional_escape
+from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
 from django.utils.translation import ugettext as _
@@ -31,9 +31,12 @@ def paginator_number(cl,i):
     if i == DOT:
         return '... '
     elif i == cl.page_num:
-        return mark_safe('<span class="this-page">%d</span> ' % (i+1))
+        return format_html('<span class="this-page">{}</span> ', i+1)
     else:
-        return mark_safe('<a href="%s"%s>%d</a> ' % (escape(cl.get_query_string({PAGE_VAR: i})), (i == cl.paginator.num_pages-1 and ' class="end"' or ''), i+1))
+        return format_html('<a href="{0}"{1}>{2}</a> ',
+                           cl.get_query_string({PAGE_VAR: i}),
+                           mark_safe(' class="end"' if i == cl.paginator.num_pages-1 else ''),
+                           i+1)
 
 @register.inclusion_tag('admin/pagination.html')
 def pagination(cl):
@@ -159,13 +162,14 @@ def result_headers(cl):
             "url_primary": cl.get_query_string({ORDER_VAR: '.'.join(o_list_primary)}),
             "url_remove": cl.get_query_string({ORDER_VAR: '.'.join(o_list_remove)}),
             "url_toggle": cl.get_query_string({ORDER_VAR: '.'.join(o_list_toggle)}),
-            "class_attrib": mark_safe(th_classes and ' class="%s"' % ' '.join(th_classes) or '')
+            "class_attrib": format_html(' class="{}"', ' '.join(th_classes))
+                            if th_classes else '',
         }
 
 def _boolean_icon(field_val):
     icon_url = static('admin/img/icon-%s.gif' %
                       {True: 'yes', False: 'no', None: 'unknown'}[field_val])
-    return mark_safe('<img src="%s" alt="%s" />' % (icon_url, field_val))
+    return format_html('<img src="{0}" alt="{1}" />', icon_url, field_val)
 
 def items_for_result(cl, result, form):
     """
@@ -182,7 +186,7 @@ def items_for_result(cl, result, form):
         else:
             if f is None:
                 if field_name == 'action_checkbox':
-                    row_class = ' class="action-checkbox"'
+                    row_class = mark_safe(' class="action-checkbox"')
                 allow_tags = getattr(attr, 'allow_tags', False)
                 boolean = getattr(attr, 'boolean', False)
                 if boolean:
@@ -190,23 +194,21 @@ def items_for_result(cl, result, form):
                 result_repr = display_for_value(value, boolean)
                 # Strip HTML tags in the resulting text, except if the
                 # function has an "allow_tags" attribute set to True.
-                if not allow_tags:
-                    result_repr = escape(result_repr)
-                else:
+                if allow_tags:
                     result_repr = mark_safe(result_repr)
                 if isinstance(value, (datetime.date, datetime.time)):
-                    row_class = ' class="nowrap"'
+                    row_class = mark_safe(' class="nowrap"')
             else:
                 if isinstance(f.rel, models.ManyToOneRel):
                     field_val = getattr(result, f.name)
                     if field_val is None:
                         result_repr = EMPTY_CHANGELIST_VALUE
                     else:
-                        result_repr = escape(field_val)
+                        result_repr = field_val
                 else:
                     result_repr = display_for_field(value, f)
                 if isinstance(f, (models.DateField, models.TimeField, models.ForeignKey)):
-                    row_class = ' class="nowrap"'
+                    row_class = mark_safe(' class="nowrap"')
         if force_unicode(result_repr) == '':
             result_repr = mark_safe('&nbsp;')
         # If list_display_links not defined, add the link tag to the first field
@@ -222,8 +224,14 @@ def items_for_result(cl, result, form):
                 attr = pk
             value = result.serializable_value(attr)
             result_id = repr(force_unicode(value))[1:]
-            yield mark_safe('<%s%s><a href="%s"%s>%s</a></%s>' % \
-                (table_tag, row_class, url, (cl.is_popup and ' onclick="opener.dismissRelatedLookupPopup(window, %s); return false;"' % result_id or ''), conditional_escape(result_repr), table_tag))
+            yield format_html('<{0}{1}><a href="{2}"{3}>{4}</a></{5}>',
+                              table_tag,
+                              row_class,
+                              url,
+                              format_html(' onclick="opener.dismissRelatedLookupPopup(window, {0}); return false;"', result_id)
+                                if cl.is_popup else '',
+                              result_repr,
+                              table_tag)
         else:
             # By default the fields come from ModelAdmin.list_editable, but if we pull
             # the fields out of the form instead of list_editable custom admins
@@ -233,11 +241,9 @@ def items_for_result(cl, result, form):
                         form[cl.model._meta.pk.name].is_hidden)):
                 bf = form[field_name]
                 result_repr = mark_safe(force_unicode(bf.errors) + force_unicode(bf))
-            else:
-                result_repr = conditional_escape(result_repr)
-            yield mark_safe('<td%s>%s</td>' % (row_class, result_repr))
+            yield format_html('<td{0}>{1}</td>', row_class, result_repr)
     if form and not form[cl.model._meta.pk.name].is_hidden:
-        yield mark_safe('<td>%s</td>' % force_unicode(form[cl.model._meta.pk.name]))
+        yield format_html('<td>{0}</td>', force_unicode(form[cl.model._meta.pk.name]))
 
 class ResultList(list):
     # Wrapper class used to return items in a list_editable

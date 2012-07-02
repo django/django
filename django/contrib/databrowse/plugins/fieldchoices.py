@@ -5,6 +5,7 @@ from django.db import models
 from django.contrib.databrowse.datastructures import EasyModel
 from django.contrib.databrowse.sites import DatabrowsePlugin
 from django.shortcuts import render_to_response
+from django.utils.html import format_html, format_html_join
 from django.utils.text import capfirst
 from django.utils.encoding import smart_str, force_unicode
 from django.utils.safestring import mark_safe
@@ -32,8 +33,9 @@ class FieldChoicePlugin(DatabrowsePlugin):
         fields = self.field_dict(model)
         if not fields:
             return ''
-        return mark_safe('<p class="filter"><strong>View by:</strong> %s</p>' % \
-            ', '.join(['<a href="fields/%s/">%s</a>' % (f.name, force_unicode(capfirst(f.verbose_name))) for f in fields.values()]))
+        return format_html('<p class="filter"><strong>View by:</strong> {0}</p>',
+                           format_html_join(', ', '<a href="fields/{0}/">{1}</a>',
+                                            ((f.name, force_unicode(capfirst(f.verbose_name))) for f in fields.values())))
 
     def urls(self, plugin_name, easy_instance_field):
         if easy_instance_field.field in self.field_dict(easy_instance_field.model.model).values():

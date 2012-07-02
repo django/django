@@ -16,6 +16,7 @@ from django.template.smartif import IfParser, Literal
 from django.template.defaultfilters import date
 from django.utils.encoding import smart_unicode
 from django.utils.safestring import mark_safe
+from django.utils.html import format_html
 from django.utils import timezone
 
 register = Library()
@@ -44,9 +45,9 @@ class CsrfTokenNode(Node):
         csrf_token = context.get('csrf_token', None)
         if csrf_token:
             if csrf_token == 'NOTPROVIDED':
-                return mark_safe("")
+                return format_html("")
             else:
-                return mark_safe("<div style='display:none'><input type='hidden' name='csrfmiddlewaretoken' value='%s' /></div>" % csrf_token)
+                return format_html("<div style='display:none'><input type='hidden' name='csrfmiddlewaretoken' value='{}' /></div>", csrf_token)
         else:
             # It's very probable that the token is missing because of
             # misconfiguration, so we raise a warning
