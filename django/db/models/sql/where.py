@@ -136,9 +136,9 @@ class WhereNode(tree.Node):
         sql_string = conn.join(result)
         if sql_string:
             if self.negated:
-                # Note that some backends (Oracle at least) need the
-                # parentheses even around single experssion in the
-                # negated case.
+                # Some backends (Oracle at least) need parentheses
+                # around the inner SQL in the negated case, even if the
+                # inner SQL contains just a single expression.
                 sql_string = 'NOT (%s)' % sql_string
             elif len(result) > 1:
                 sql_string = '(%s)' % sql_string
