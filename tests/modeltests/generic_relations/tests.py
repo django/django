@@ -231,7 +231,7 @@ class GenericRelationsTests(TestCase):
         tag = TaggedItem.objects.create(content_object=tailless, tag="lizard")
         self.assertEqual(tag.content_object, tailless)
 
-class CustomWidget(forms.CharField):
+class CustomWidget(forms.TextInput):
     pass
 
 class TaggedItemForm(forms.ModelForm):
