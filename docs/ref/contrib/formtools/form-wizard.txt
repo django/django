@@ -433,6 +433,20 @@ Advanced ``WizardView`` methods
             context = self.get_context_data(form=form, **kwargs)
             return self.render_to_response(context)
 
+.. method:: WizardView.get_cleaned_data_for_step(step)
+
+    This method returns the cleaned data for a given ``step``. Before returning
+    the cleaned data, the stored values are being revalidated through the
+    form. If the data doesn't validate, ``None`` will be returned.
+
+.. method:: WizardView.get_all_cleaned_data()
+
+    This method returns a merged dictionary of all form steps' ``cleaned_data``
+    dictionaries. If a step contains a ``FormSet``, the key will be prefixed
+    with ``formset-`` and contain a list of the formset's ``cleaned_data``
+    dictionaries.
+
+
 Providing initial data for the forms
 ====================================
 
