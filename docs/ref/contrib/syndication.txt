@@ -22,10 +22,6 @@ lower-level way.
 The high-level framework
 ========================
 
-.. versionchanged:: 1.2
-   The high-level feeds framework was refactored in Django 1.2. The
-   pre-1.2 interface has been removed in Django 1.4.
-
 Overview
 --------
 
@@ -175,9 +171,6 @@ These can be matched with a :doc:`URLconf </topics/http/urls>` line such as::
 
 Like a view, the arguments in the URL are passed to the ``get_object()``
 method along with the request object.
-
-.. versionchanged:: 1.2
-   Prior to version 1.2, ``get_object()`` only accepted a ``bits`` argument.
 
 Here's the code for these beat-specific feeds::
 
@@ -897,7 +890,7 @@ For example, to create an Atom 1.0 feed and print it to standard output::
     ...
     </feed>
 
-.. _django/utils/feedgenerator.py: https://code.djangoproject.com/browser/django/trunk/django/utils/feedgenerator.py
+.. _django/utils/feedgenerator.py: https://github.com/django/django/blob/master/django/utils/feedgenerator.py
 
 .. currentmodule:: django.contrib.syndication
 

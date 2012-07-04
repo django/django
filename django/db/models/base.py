@@ -1,7 +1,9 @@
+from __future__ import unicode_literals
+
 import copy
 import sys
 from functools import update_wrapper
-from itertools import izip
+from future_builtins import zip
 
 import django.db.models.manager     # Imported to register signal handler.
 from django.conf import settings
@@ -11,7 +13,7 @@ from django.core import validators
 from django.db.models.fields import AutoField, FieldDoesNotExist
 from django.db.models.fields.related import (ManyToOneRel,
     OneToOneField, add_lazy_relation)
-from django.db import (connections, router, transaction, DatabaseError,
+from django.db import (router, transaction, DatabaseError,
     DEFAULT_DB_ALIAS)
 from django.db.models.query import Q
 from django.db.models.query_utils import DeferredAttribute
@@ -57,14 +59,16 @@ class ModelBase(type):
 
         new_class.add_to_class('_meta', Options(meta, **kwargs))
         if not abstract:
-            new_class.add_to_class('DoesNotExist', subclass_exception('DoesNotExist',
+            new_class.add_to_class('DoesNotExist', subclass_exception(b'DoesNotExist',
                     tuple(x.DoesNotExist
-                            for x in parents if hasattr(x, '_meta') and not x._meta.abstract)
-                                    or (ObjectDoesNotExist,), module))
-            new_class.add_to_class('MultipleObjectsReturned', subclass_exception('MultipleObjectsReturned',
+                          for x in parents if hasattr(x, '_meta') and not x._meta.abstract)
+                    or (ObjectDoesNotExist,),
+                    module, attached_to=new_class))
+            new_class.add_to_class('MultipleObjectsReturned', subclass_exception(b'MultipleObjectsReturned',
                     tuple(x.MultipleObjectsReturned
-                            for x in parents if hasattr(x, '_meta') and not x._meta.abstract)
-                                    or (MultipleObjectsReturned,), module))
+                          for x in parents if hasattr(x, '_meta') and not x._meta.abstract)
+                    or (MultipleObjectsReturned,),
+                    module, attached_to=new_class))
             if base_meta and not base_meta.abstract:
                 # Non-abstract child classes inherit some attributes from their
                 # non-abstract parent (unless an ABC comes before it in the
@@ -292,15 +296,15 @@ class Model(object):
 
         fields_iter = iter(self._meta.fields)
         if not kwargs:
-            # The ordering of the izip calls matter - izip throws StopIteration
+            # The ordering of the zip calls matter - zip throws StopIteration
             # when an iter throws it. So if the first iter throws it, the second
             # is *not* consumed. We rely on this, so don't change the order
             # without changing the logic.
-            for val, field in izip(args, fields_iter):
+            for val, field in zip(args, fields_iter):
                 setattr(self, field.attname, val)
         else:
             # Slower, kwargs-ready version.
-            for val, field in izip(args, fields_iter):
+            for val, field in zip(args, fields_iter):
                 setattr(self, field.attname, val)
                 kwargs.pop(field.name, None)
                 # Maintain compatibility with existing calls.
@@ -373,7 +377,7 @@ class Model(object):
             u = unicode(self)
         except (UnicodeEncodeError, UnicodeDecodeError):
             u = '[Bad Unicode data]'
-        return smart_str(u'<%s: %s>' % (self.__class__.__name__, u))
+        return smart_str('<%s: %s>' % (self.__class__.__name__, u))
 
     def __str__(self):
         if hasattr(self, '__unicode__'):
@@ -404,7 +408,6 @@ class Model(object):
         # and as a result, the super call will cause an infinite recursion.
         # See #10547 and #12121.
         defers = []
-        pk_val = None
         if self._deferred:
             from django.db.models.query_utils import deferred_class_factory
             factory = deferred_class_factory
@@ -412,12 +415,7 @@ class Model(object):
                 if isinstance(self.__class__.__dict__.get(field.attname),
                         DeferredAttribute):
                     defers.append(field.attname)
-                    if pk_val is None:
-                        # The pk_val and model values are the same for all
-                        # DeferredAttribute classes, so we only need to do this
-                        # once.
-                        obj = self.__class__.__dict__[field.attname]
-                        model = obj.model_ref()
+            model = self._meta.proxy_for_model
         else:
             factory = simple_class_factory
         return (model_unpickle, (model, defers, factory), data)
@@ -449,7 +447,8 @@ class Model(object):
             return getattr(self, field_name)
         return getattr(self, field.attname)
 
-    def save(self, force_insert=False, force_update=False, using=None):
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
         """
         Saves the current instance. Override this in a subclass if you want to
         control the saving process.
@@ -458,14 +457,32 @@ class Model(object):
         that the "save" must be an SQL insert or update (or equivalent for
         non-SQL backends), respectively. Normally, they should not be set.
         """
-        if force_insert and force_update:
+        if force_insert and (force_update or update_fields):
             raise ValueError("Cannot force both insert and updating in model saving.")
-        self.save_base(using=using, force_insert=force_insert, force_update=force_update)
 
+        if update_fields is not None:
+            # If update_fields is empty, skip the save. We do also check for
+            # no-op saves later on for inheritance cases. This bailout is
+            # still needed for skipping signal sending.
+            if len(update_fields) == 0:
+                return
+
+            update_fields = frozenset(update_fields)
+            field_names = set([field.name for field in self._meta.fields
+                               if not field.primary_key])
+            non_model_fields = update_fields.difference(field_names)
+
+            if non_model_fields:
+                raise ValueError("The following fields do not exist in this "
+                                 "model or are m2m fields: %s"
+                                 % ', '.join(non_model_fields))
+
+        self.save_base(using=using, force_insert=force_insert,
+                       force_update=force_update, update_fields=update_fields)
     save.alters_data = True
 
     def save_base(self, raw=False, cls=None, origin=None, force_insert=False,
-            force_update=False, using=None):
+                  force_update=False, using=None, update_fields=None):
         """
         Does the heavy-lifting involved in saving. Subclasses shouldn't need to
         override this method. It's separate from save() in order to hide the
@@ -473,7 +490,8 @@ class Model(object):
         ('raw', 'cls', and 'origin').
         """
         using = using or router.db_for_write(self.__class__, instance=self)
-        assert not (force_insert and force_update)
+        assert not (force_insert and (force_update or update_fields))
+        assert update_fields is None or len(update_fields) > 0
         if cls is None:
             cls = self.__class__
             meta = cls._meta
@@ -483,7 +501,8 @@ class Model(object):
             meta = cls._meta
 
         if origin and not meta.auto_created:
-            signals.pre_save.send(sender=origin, instance=self, raw=raw, using=using)
+            signals.pre_save.send(sender=origin, instance=self, raw=raw, using=using,
+                                  update_fields=update_fields)
 
         # If we are in a raw save, save the object exactly as presented.
         # That means that we don't try to be smart about saving attributes
@@ -503,7 +522,8 @@ class Model(object):
                 if field and getattr(self, parent._meta.pk.attname) is None and getattr(self, field.attname) is not None:
                     setattr(self, parent._meta.pk.attname, getattr(self, field.attname))
 
-                self.save_base(cls=parent, origin=org, using=using)
+                self.save_base(cls=parent, origin=org, using=using,
+                               update_fields=update_fields)
 
                 if field:
                     setattr(self, field.attname, self._get_pk_val(parent._meta))
@@ -513,22 +533,27 @@ class Model(object):
         if not meta.proxy:
             non_pks = [f for f in meta.local_fields if not f.primary_key]
 
+            if update_fields:
+                non_pks = [f for f in non_pks if f.name in update_fields]
+
             # First, try an UPDATE. If that doesn't update anything, do an INSERT.
             pk_val = self._get_pk_val(meta)
             pk_set = pk_val is not None
             record_exists = True
             manager = cls._base_manager
             if pk_set:
-                # Determine whether a record with the primary key already exists.
-                if (force_update or (not force_insert and
+                # Determine if we should do an update (pk already exists, forced update,
+                # no force_insert)
+                if ((force_update or update_fields) or (not force_insert and
                         manager.using(using).filter(pk=pk_val).exists())):
-                    # It does already exist, so do an UPDATE.
                     if force_update or non_pks:
                         values = [(f, None, (raw and getattr(self, f.attname) or f.pre_save(self, False))) for f in non_pks]
                         if values:
                             rows = manager.using(using).filter(pk=pk_val)._update(values)
                             if force_update and not rows:
                                 raise DatabaseError("Forced update did not affect any rows.")
+                            if update_fields and not rows:
+                                raise DatabaseError("Save with update_fields did not affect any rows.")
                 else:
                     record_exists = False
             if not pk_set or not record_exists:
@@ -541,7 +566,7 @@ class Model(object):
 
                 fields = meta.local_fields
                 if not pk_set:
-                    if force_update:
+                    if force_update or update_fields:
                         raise ValueError("Cannot force an update in save() with no primary key.")
                     fields = [f for f in fields if not isinstance(f, AutoField)]
 
@@ -561,8 +586,8 @@ class Model(object):
 
         # Signal that the save is complete
         if origin and not meta.auto_created:
-            signals.post_save.send(sender=origin, instance=self,
-                created=(not record_exists), raw=raw, using=using)
+            signals.post_save.send(sender=origin, instance=self, created=(not record_exists),
+                                   update_fields=update_fields, raw=raw, using=using)
 
 
     save_base.alters_data = True
@@ -765,7 +790,7 @@ class Model(object):
 
     def date_error_message(self, lookup_type, field, unique_for):
         opts = self._meta
-        return _(u"%(field_name)s must be unique for %(date_field)s %(lookup)s.") % {
+        return _("%(field_name)s must be unique for %(date_field)s %(lookup)s.") % {
             'field_name': unicode(capfirst(opts.get_field(field).verbose_name)),
             'date_field': unicode(capfirst(opts.get_field(unique_for).verbose_name)),
             'lookup': lookup_type,
@@ -789,7 +814,7 @@ class Model(object):
         else:
             field_labels = map(lambda f: capfirst(opts.get_field(f).verbose_name), unique_check)
             field_labels = get_text_list(field_labels, _('and'))
-            return _(u"%(model_name)s with this %(field_label)s already exists.") %  {
+            return _("%(model_name)s with this %(field_label)s already exists.") %  {
                 'model_name': unicode(model_name),
                 'field_label': unicode(field_labels)
             }
@@ -911,5 +936,30 @@ def model_unpickle(model, attrs, factory):
     return cls.__new__(cls)
 model_unpickle.__safe_for_unpickle__ = True
 
-def subclass_exception(name, parents, module):
-    return type(name, parents, {'__module__': module})
+def subclass_exception(name, parents, module, attached_to=None):
+    """
+    Create exception subclass.
+
+    If 'attached_to' is supplied, the exception will be created in a way that
+    allows it to be pickled, assuming the returned exception class will be added
+    as an attribute to the 'attached_to' class.
+    """
+    class_dict = {'__module__': module}
+    if attached_to is not None:
+        def __reduce__(self):
+            # Exceptions are special - they've got state that isn't
+            # in self.__dict__. We assume it is all in self.args.
+            return (unpickle_inner_exception, (attached_to, name), self.args)
+
+        def __setstate__(self, args):
+            self.args = args
+
+        class_dict['__reduce__'] = __reduce__
+        class_dict['__setstate__'] = __setstate__
+
+    return type(name, parents, class_dict)
+
+def unpickle_inner_exception(klass, exception_name):
+    # Get the exception class from the class it is attached to:
+    exception = getattr(klass, exception_name)
+    return exception.__new__(exception)

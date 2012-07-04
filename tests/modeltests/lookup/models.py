@@ -4,6 +4,8 @@
 This demonstrates features of the database API.
 """
 
+from __future__ import unicode_literals
+
 from django.db import models
 
 
@@ -41,7 +43,7 @@ class Game(models.Model):
     away = models.CharField(max_length=100)
 
     def __unicode__(self):
-        return u"%s at %s" % (self.away, self.home)
+        return "%s at %s" % (self.away, self.home)
 
 class Player(models.Model):
     name = models.CharField(max_length=100)

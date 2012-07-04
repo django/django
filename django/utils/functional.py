@@ -1,6 +1,7 @@
 import copy
 import operator
 from functools import wraps, update_wrapper
+import sys
 
 
 # You can't trivially replace this `functools.partial` because this binds to
@@ -57,6 +58,7 @@ def lazy(func, *resultclasses):
     function is evaluated on every access.
     """
 
+    @total_ordering
     class __proxy__(Promise):
         """
         Encapsulate a function call and act as a proxy for methods that are
@@ -123,17 +125,23 @@ def lazy(func, *resultclasses):
         def __str_cast(self):
             return str(func(*self.__args, **self.__kw))
 
-        def __cmp__(self, rhs):
+        def __cast(self):
             if self._delegate_str:
-                s = str(func(*self.__args, **self.__kw))
+                return self.__str_cast()
             elif self._delegate_unicode:
-                s = unicode(func(*self.__args, **self.__kw))
+                return self.__unicode_cast()
             else:
-                s = func(*self.__args, **self.__kw)
-            if isinstance(rhs, Promise):
-                return -cmp(rhs, s)
-            else:
-                return cmp(s, rhs)
+                return func(*self.__args, **self.__kw)
+
+        def __eq__(self, other):
+            if isinstance(other, Promise):
+                other = other.__cast()
+            return self.__cast() == other
+
+        def __lt__(self, other):
+            if isinstance(other, Promise):
+                other = other.__cast()
+            return self.__cast() < other
 
         def __mod__(self, rhs):
             if self._delegate_str:
@@ -310,3 +318,37 @@ def partition(predicate, values):
     for item in values:
         results[predicate(item)].append(item)
     return results
+
+if sys.version_info >= (2,7,2):
+    from functools import total_ordering
+else:
+    # For Python < 2.7.2. Python 2.6 does not have total_ordering, and
+    # total_ordering in 2.7 versions prior to 2.7.2 is buggy. See
+    # http://bugs.python.org/issue10042 for details. For these versions use
+    # code borrowed from Python 2.7.3.
+    def total_ordering(cls):
+        """Class decorator that fills in missing ordering methods"""
+        convert = {
+            '__lt__': [('__gt__', lambda self, other: not (self < other or self == other)),
+                       ('__le__', lambda self, other: self < other or self == other),
+                       ('__ge__', lambda self, other: not self < other)],
+            '__le__': [('__ge__', lambda self, other: not self <= other or self == other),
+                       ('__lt__', lambda self, other: self <= other and not self == other),
+                       ('__gt__', lambda self, other: not self <= other)],
+            '__gt__': [('__lt__', lambda self, other: not (self > other or self == other)),
+                       ('__ge__', lambda self, other: self > other or self == other),
+                       ('__le__', lambda self, other: not self > other)],
+            '__ge__': [('__le__', lambda self, other: (not self >= other) or self == other),
+                       ('__gt__', lambda self, other: self >= other and not self == other),
+                       ('__lt__', lambda self, other: not self >= other)]
+        }
+        roots = set(dir(cls)) & set(convert)
+        if not roots:
+            raise ValueError('must define at least one ordering operation: < > <= >=')
+        root = max(roots)       # prefer __lt__ to __le__ to __gt__ to __ge__
+        for opname, opfunc in convert[root]:
+            if opname not in roots:
+                opfunc.__name__ = opname
+                opfunc.__doc__ = getattr(int, opname).__doc__
+                setattr(cls, opname, opfunc)
+        return cls

@@ -1,0 +1,205 @@
+Form handling with class-based views
+====================================
+
+Form processing generally has 3 paths:
+
+* Initial GET (blank or prepopulated form)
+* POST with invalid data (typically redisplay form with errors)
+* POST with valid data (process the data and typically redirect)
+
+Implementing this yourself often results in a lot of repeated
+boilerplate code (see :ref:`Using a form in a
+view<using-a-form-in-a-view>`). To help avoid this, Django provides a
+collection of generic class-based views for form processing.
+
+Basic Forms
+-----------
+
+Given a simple contact form::
+
+    # forms.py
+    from django import forms
+
+    class ContactForm(forms.Form):
+        name = forms.CharField()
+        message = forms.CharField(widget=forms.Textarea)
+
+        def send_email(self):
+            # send email using the self.cleaned_data dictionary
+            pass
+
+The view can be constructed using a FormView::
+
+    # views.py
+    from myapp.forms import ContactForm
+    from django.views.generic.edit import FormView
+
+    class ContactView(FormView):
+        template_name = 'contact.html'
+        form_class = ContactForm
+        success_url = '/thanks/'
+
+        def form_valid(self, form):
+            # This method is called when valid form data has been POSTed.
+            # It should return an HttpResponse.
+            form.send_email()
+            return super(ContactView, self).form_valid(form)
+
+Notes:
+
+* FormView inherits
+  :class:`~django.views.generic.base.TemplateResponseMixin` so
+  :attr:`~django.views.generic.base.TemplateResponseMixin.template_name`
+  can be used here
+* The default implementation for
+  :meth:`~django.views.generic.edit.FormView.form_valid` simply
+  redirects to the :attr:`success_url`
+
+Model Forms
+-----------
+
+Generic views really shine when working with models.  These generic
+views will automatically create a :class:`ModelForm`, so long as they
+can work out which model class to use:
+
+* If the :attr:`model` attribute is given, that model class will be used
+* If :meth:`get_object()` returns an object, the class of that object
+  will be used
+* If a :attr:`queryset` is given, the model for that queryset will be used
+
+Model form views provide a :meth:`form_valid()` implementation that
+saves the model automatically.  You can override this if you have any
+special requirements; see below for examples.
+
+You don't even need to provide a attr:`success_url` for
+:class:`~django.views.generic.edit.CreateView` or
+:class:`~django.views.generic.edit.UpdateView` - they will use
+:meth:`get_absolute_url()` on the model object if available.
+
+If you want to use a custom :class:`ModelForm` (for instance to add
+extra validation) simply set
+:attr:`~django.views.generic.edit.FormMixin.form_class` on your view.
+
+.. note::
+    When specifying a custom form class, you must still specify the model,
+    even though the :attr:`form_class` may be a :class:`ModelForm`.
+
+First we need to add :meth:`get_absolute_url()` to our :class:`Author`
+class:
+
+.. code-block:: python
+
+    # models.py
+    from django import models
+    from django.core.urlresolvers import reverse
+
+    class Author(models.Model):
+        name = models.CharField(max_length=200)
+
+        def get_absolute_url(self):
+            return reverse('author-detail', kwargs={'pk': self.pk})
+
+Then we can use :class:`CreateView` and friends to do the actual
+work. Notice how we're just configuring the generic class-based views
+here; we don't have to write any logic ourselves::
+   
+    # views.py
+    from django.views.generic.edit import CreateView, UpdateView, DeleteView
+    from django.core.urlresolvers import reverse_lazy
+    from myapp.models import Author
+
+    class AuthorCreate(CreateView):
+        model = Author
+
+    class AuthorUpdate(UpdateView):
+        model = Author
+
+    class AuthorDelete(DeleteView):
+        model = Author
+        success_url = reverse_lazy('author-list')
+
+.. note::
+    We have to use :func:`~django.core.urlresolvers.reverse_lazy` here, not
+    just ``reverse`` as the urls are not loaded when the file is imported.
+
+Finally, we hook these new views into the URLconf::
+
+    # urls.py
+    from django.conf.urls import patterns, url
+    from myapp.views import AuthorCreate, AuthorUpdate, AuthorDelete
+
+    urlpatterns = patterns('',
+        # ...
+        url(r'author/add/$', AuthorCreate.as_view(), name='author_add'),
+        url(r'author/(?P<pk>\d+)/$', AuthorUpdate.as_view(), name='author_update'),
+        url(r'author/(?P<pk>\d+)/delete/$', AuthorDelete.as_view(), name='author_delete'),
+    )
+        
+.. note::
+
+    These views inherit :class:`~django.views.generic.detail.SingleObjectTemplateResponseMixin`
+    which uses :attr:`~django.views.generic.detail.SingleObjectTemplateResponseMixin.template_name_prefix`
+    to construct the
+    :attr:`~django.views.generic.base.TemplateResponseMixin.template_name`
+    based on the model.
+
+    In this example:
+
+    * :class:`CreateView` and :class:`UpdateView` use ``myapp/author_form.html``
+    * :class:`DeleteView` uses ``myapp/author_confirm_delete.html``
+
+    If you wish to have separate templates for :class:`CreateView` and
+    :class:1UpdateView`, you can set either :attr:`template_name` or
+    :attr:`template_name_suffix` on your view class.
+
+Models and request.user
+-----------------------
+
+To track the user that created an object using a :class:`CreateView`,
+you can use a custom :class:`ModelForm` to do this. First, add the
+foreign key relation to the model::
+
+    # models.py
+    from django import models
+    from django.contrib.auth import User
+
+    class Author(models.Model):
+        name = models.CharField(max_length=200)
+        created_by = models.ForeignKey(User)
+
+        # ...
+
+Create a custom :class:`ModelForm` in order to exclude the
+``created_by`` field and prevent the user from editing it:
+
+.. code-block:: python
+
+    # forms.py
+    from django import forms
+    from myapp.models import Author
+    
+    class AuthorForm(forms.ModelForm):
+        class Meta:
+            model = Author
+            exclude = ('created_by',)
+
+In the view, use the custom :attr:`form_class` and override
+:meth:`form_valid()` to add the user::
+
+    # views.py
+    from django.views.generic.edit import CreateView
+    from myapp.models import Author
+    from myapp.forms import AuthorForm
+    
+    class AuthorCreate(CreateView):
+        form_class = AuthorForm
+        model = Author
+
+        def form_valid(self, form):
+            form.instance.created_by = self.request.user
+            return super(AuthorCreate, self).form_valid(form)
+
+Note that you'll need to :ref:`decorate this
+view<decorating-class-based-views>` using
+:func:`~django.contrib.auth.decorators.login_required`, or
+alternatively handle unauthorised users in the :meth:`form_valid()`.

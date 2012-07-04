@@ -55,8 +55,11 @@ class Polygon(GEOSGeometry):
     def from_bbox(cls, bbox):
         "Constructs a Polygon from a bounding box (4-tuple)."
         x0, y0, x1, y1 = bbox
-        return GEOSGeometry( 'POLYGON((%s %s, %s %s, %s %s, %s %s, %s %s))' %  (
-                x0, y0, x0, y1, x1, y1, x1, y0, x0, y0) )
+        for z in bbox:
+            if not isinstance(z, (int, long, float)):
+                return GEOSGeometry('POLYGON((%s %s, %s %s, %s %s, %s %s, %s %s))' %
+                                    (x0, y0, x0, y1, x1, y1, x1, y0, x0, y0))
+        return Polygon(((x0, y0), (x0, y1), (x1, y1), (x1, y0), (x0, y0)))
 
     ### These routines are needed for list-like operation w/ListMixin ###
     def _create_polygon(self, length, items):

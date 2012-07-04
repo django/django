@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django.conf import settings
 from django.contrib.flatpages.forms import FlatpageForm
 from django.contrib.flatpages.models import FlatPage
@@ -5,7 +7,10 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils import translation
 
+@override_settings(SITE_ID=1)
 class FlatpageAdminFormTests(TestCase):
+    fixtures = ['example_site']
+
     def setUp(self):
         self.form_data = {
             'title': "A test page",
@@ -57,7 +62,7 @@ class FlatpageAdminFormTests(TestCase):
 
         self.assertEqual(
             f.errors,
-            {'__all__': [u'Flatpage with url /myflatpage1/ already exists for site example.com']})
+            {'__all__': ['Flatpage with url /myflatpage1/ already exists for site example.com']})
 
     def test_flatpage_admin_form_edit(self):
         """
@@ -89,5 +94,5 @@ class FlatpageAdminFormTests(TestCase):
 
         self.assertEqual(
             f.errors,
-            {'sites': [u'This field is required.']})
+            {'sites': [translation.ugettext('This field is required.')]})
 

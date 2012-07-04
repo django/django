@@ -1,12 +1,10 @@
 import json
-import warnings
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.exceptions import SuspiciousOperation
 from django.shortcuts import render_to_response
-from django.utils.encoding import smart_str
 from django.core.serializers.json import DjangoJSONEncoder
 from django.test.client import CONTENT_TYPE_RE
 from django.template import RequestContext
@@ -85,8 +83,8 @@ def return_json_file(request):
     obj_json = json.dumps(obj_dict, encoding=charset,
                                 cls=DjangoJSONEncoder,
                                 ensure_ascii=False)
-    response = HttpResponse(smart_str(obj_json, encoding=charset), status=200,
-                            mimetype='application/json; charset=' + charset)
+    response = HttpResponse(obj_json.encode(charset), status=200,
+                            content_type='application/json; charset=%s' % charset)
     response['Content-Disposition'] = 'attachment; filename=testfile.json'
     return response
 

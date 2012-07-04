@@ -10,7 +10,7 @@ from django import contrib
 
 # databrowse is deprecated, but we still want to run its tests
 warnings.filterwarnings('ignore', "The Databrowse contrib app is deprecated",
-                        PendingDeprecationWarning, 'django.contrib.databrowse')
+                        DeprecationWarning, 'django.contrib.databrowse')
 
 CONTRIB_DIR_NAME = 'django.contrib'
 MODEL_TESTS_DIR_NAME = 'modeltests'
@@ -61,6 +61,8 @@ def get_test_modules():
         for f in os.listdir(dirpath):
             if (f.startswith('__init__') or
                 f.startswith('.') or
+                # Python 3 byte code dirs (PEP 3147)
+                f == '__pycache__' or
                 f.startswith('sql') or
                 os.path.basename(f) in REGRESSION_SUBDIRS_TO_SKIP):
                 continue

@@ -110,8 +110,6 @@ default templates.
 Advanced ``FormPreview`` methods
 ================================
 
-.. versionadded:: 1.2
-
 .. method:: FormPreview.process_preview
 
     Given a validated form, performs any extra processing before displaying the

@@ -31,6 +31,7 @@ class TestUtilsHttp(unittest.TestCase):
         # 2-tuples (the norm)
         result = http.urlencode((('a', 1), ('b', 2), ('c', 3)))
         self.assertEqual(result, 'a=1&b=2&c=3')
+
         # A dictionary
         result = http.urlencode({ 'a': 1, 'b': 2, 'c': 3})
         acceptable_results = [
@@ -44,6 +45,13 @@ class TestUtilsHttp(unittest.TestCase):
             'c=3&b=2&a=1'
         ]
         self.assertTrue(result in acceptable_results)
+        result = http.urlencode({'a': [1, 2]}, doseq=False)
+        self.assertEqual(result, 'a=%5B%271%27%2C+%272%27%5D')
+        result = http.urlencode({'a': [1, 2]}, doseq=True)
+        self.assertEqual(result, 'a=1&a=2')
+        result = http.urlencode({'a': []}, doseq=True)
+        self.assertEqual(result, '')
+
         # A MultiValueDict
         result = http.urlencode(MultiValueDict({
             'name': ['Adrian', 'Simon'],

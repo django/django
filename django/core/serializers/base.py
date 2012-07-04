@@ -2,7 +2,7 @@
 Module for abstract serializer/unserializer base classes.
 """
 
-from StringIO import StringIO
+from io import BytesIO
 
 from django.db import models
 from django.utils.encoding import smart_unicode
@@ -34,11 +34,12 @@ class Serializer(object):
         """
         self.options = options
 
-        self.stream = options.pop("stream", StringIO())
+        self.stream = options.pop("stream", BytesIO())
         self.selected_fields = options.pop("fields", None)
         self.use_natural_keys = options.pop("use_natural_keys", False)
 
         self.start_serialization()
+        self.first = True
         for obj in queryset:
             self.start_object(obj)
             # Use the concrete parent class' _meta instead of the object's _meta
@@ -57,6 +58,8 @@ class Serializer(object):
                     if self.selected_fields is None or field.attname in self.selected_fields:
                         self.handle_m2m_field(obj, field)
             self.end_object(obj)
+            if self.first:
+                self.first = False
         self.end_serialization()
         return self.getvalue()
 
@@ -121,7 +124,7 @@ class Deserializer(object):
         """
         self.options = options
         if isinstance(stream_or_string, basestring):
-            self.stream = StringIO(stream_or_string)
+            self.stream = BytesIO(stream_or_string)
         else:
             self.stream = stream_or_string
         # hack to make sure that the models have all been loaded before

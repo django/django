@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django.contrib.localflavor.es.forms import (ESPostalCodeField, ESPhoneNumberField,
     ESIdentityCardNumberField, ESCCCField, ESRegionSelect, ESProvinceSelect)
 
@@ -7,7 +9,7 @@ from django.test import SimpleTestCase
 class ESLocalFlavorTests(SimpleTestCase):
     def test_ESRegionSelect(self):
         f = ESRegionSelect()
-        out = u'''<select name="regions">
+        out = '''<select name="regions">
 <option value="AN">Andalusia</option>
 <option value="AR">Aragon</option>
 <option value="O">Principality of Asturias</option>
@@ -30,8 +32,8 @@ class ESLocalFlavorTests(SimpleTestCase):
 
     def test_ESProvinceSelect(self):
         f = ESProvinceSelect()
-        out = u'''<select name="provinces">
-<option value="01">Arava</option>
+        out = '''<select name="provinces">
+<option value="01">Araba</option>
 <option value="02">Albacete</option>
 <option value="03">Alacant</option>
 <option value="04">Almeria</option>
@@ -87,7 +89,7 @@ class ESLocalFlavorTests(SimpleTestCase):
         self.assertHTMLEqual(f.render('provinces', '08'), out)
 
     def test_ESPostalCodeField(self):
-        error_invalid = [u'Enter a valid postal code in the range and format 01XXX - 52XXX.']
+        error_invalid = ['Enter a valid postal code in the range and format 01XXX - 52XXX.']
         valid = {
             '08028': '08028',
             '28080': '28080',
@@ -103,7 +105,7 @@ class ESLocalFlavorTests(SimpleTestCase):
         self.assertFieldOutput(ESPostalCodeField, valid, invalid)
 
     def test_ESPhoneNumberField(self):
-        error_invalid = [u'Enter a valid phone number in one of the formats 6XXXXXXXX, 8XXXXXXXX or 9XXXXXXXX.']
+        error_invalid = ['Enter a valid phone number in one of the formats 6XXXXXXXX, 8XXXXXXXX or 9XXXXXXXX.']
         valid = {
             '650010101': '650010101',
             '931234567': '931234567',
@@ -119,10 +121,10 @@ class ESLocalFlavorTests(SimpleTestCase):
         self.assertFieldOutput(ESPhoneNumberField, valid, invalid)
 
     def test_ESIdentityCardNumberField(self):
-        error_invalid = [u'Please enter a valid NIF, NIE, or CIF.']
-        error_checksum_nif = [u'Invalid checksum for NIF.']
-        error_checksum_nie = [u'Invalid checksum for NIE.']
-        error_checksum_cif = [u'Invalid checksum for CIF.']
+        error_invalid = ['Please enter a valid NIF, NIE, or CIF.']
+        error_checksum_nif = ['Invalid checksum for NIF.']
+        error_checksum_nie = ['Invalid checksum for NIE.']
+        error_checksum_cif = ['Invalid checksum for CIF.']
         valid = {
             '78699688J': '78699688J',
             '78699688-J': '78699688J',
@@ -155,8 +157,8 @@ class ESLocalFlavorTests(SimpleTestCase):
         self.assertFieldOutput(ESIdentityCardNumberField, valid, invalid)
 
     def test_ESCCCField(self):
-        error_invalid = [u'Please enter a valid bank account number in format XXXX-XXXX-XX-XXXXXXXXXX.']
-        error_checksum = [u'Invalid checksum for bank account number.']
+        error_invalid = ['Please enter a valid bank account number in format XXXX-XXXX-XX-XXXXXXXXXX.']
+        error_checksum = ['Invalid checksum for bank account number.']
         valid = {
             '20770338793100254321': '20770338793100254321',
             '2077 0338 79 3100254321': '2077 0338 79 3100254321',

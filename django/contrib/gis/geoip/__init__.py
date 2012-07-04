@@ -11,8 +11,10 @@
  Grab GeoIP.dat.gz and GeoLiteCity.dat.gz, and unzip them in the directory
  corresponding to settings.GEOIP_PATH.
 """
+from __future__ import absolute_import
+
 try:
-    from django.contrib.gis.geoip.base import GeoIP, GeoIPException
+    from .base import GeoIP, GeoIPException
     HAS_GEOIP = True
 except:
     HAS_GEOIP = False

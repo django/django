@@ -11,5 +11,5 @@ def admin_media_prefix():
     """
     warnings.warn(
         "The admin_media_prefix template tag is deprecated. "
-        "Use the static template tag instead.", PendingDeprecationWarning)
+        "Use the static template tag instead.", DeprecationWarning)
     return PrefixNode.handle_simple("ADMIN_MEDIA_PREFIX")

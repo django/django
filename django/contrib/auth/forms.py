@@ -1,14 +1,14 @@
 from django import forms
 from django.forms.util import flatatt
 from django.template import loader
-from django.utils.encoding import smart_str
+from django.utils.html import format_html, format_html_join
 from django.utils.http import int_to_base36
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext, ugettext_lazy as _
 
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
-from django.contrib.auth.hashers import UNUSABLE_PASSWORD, is_password_usable, get_hasher
+from django.contrib.auth.hashers import UNUSABLE_PASSWORD, is_password_usable, identify_hasher
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.models import get_current_site
 
@@ -26,23 +26,18 @@ class ReadOnlyPasswordHashWidget(forms.Widget):
 
         final_attrs = self.build_attrs(attrs)
 
-        encoded = smart_str(encoded)
-
-        if len(encoded) == 32 and '$' not in encoded:
-            algorithm = 'unsalted_md5'
-        else:
-            algorithm = encoded.split('$', 1)[0]
-
         try:
-            hasher = get_hasher(algorithm)
+            hasher = identify_hasher(encoded)
         except ValueError:
-            summary = "<strong>Invalid password format or unknown hashing algorithm.</strong>"
+            summary = mark_safe("<strong>Invalid password format or unknown hashing algorithm.</strong>")
         else:
-            summary = ""
-            for key, value in hasher.safe_summary(encoded).iteritems():
-                summary += "<strong>%(key)s</strong>: %(value)s " % {"key": ugettext(key), "value": value}
+            summary = format_html_join('',
+                                       "<strong>{0}</strong>: {1} ",
+                                       ((ugettext(key), value)
+                                        for key, value in hasher.safe_summary(encoded).items())
+                                       )
 
-        return mark_safe("<div%(attrs)s>%(summary)s</div>" % {"attrs": flatatt(final_attrs), "summary": summary})
+        return format_html("<div{0}>{1}</div>", flatatt(final_attrs), summary)
 
 
 class ReadOnlyPasswordHashField(forms.Field):

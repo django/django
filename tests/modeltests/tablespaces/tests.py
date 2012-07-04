@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 import copy
 
 from django.conf import settings
@@ -7,7 +9,7 @@ from django.db.models.loading import cache
 from django.core.management.color import no_style 
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
-from models import Article, ArticleRef, Authors, Reviewers, Scientist, ScientistRef
+from .models import Article, ArticleRef, Authors, Reviewers, Scientist, ScientistRef
 
 # We can't test the DEFAULT_TABLESPACE and DEFAULT_INDEX_TABLESPACE settings
 # because they're evaluated when the model class is defined. As a consequence,

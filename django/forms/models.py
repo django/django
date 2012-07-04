@@ -3,7 +3,7 @@ Helper functions for creating Form classes from Django models
 and database field objects.
 """
 
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 from django.core.exceptions import ValidationError, NON_FIELD_ERRORS, FieldError
 from django.core.validators import EMPTY_VALUES
@@ -388,10 +388,10 @@ def modelform_factory(model, form=ModelForm, fields=None, exclude=None,
     parent = (object,)
     if hasattr(form, 'Meta'):
         parent = (form.Meta, object)
-    Meta = type('Meta', parent, attrs)
+    Meta = type(b'Meta', parent, attrs)
 
     # Give this new form class a reasonable name.
-    class_name = model.__name__ + 'Form'
+    class_name = model.__name__ + b'Form'
 
     # Class attributes for the new form class.
     form_class_attrs = {
@@ -846,7 +846,7 @@ class InlineForeignKeyField(Field):
     given parent instance in an inline.
     """
     default_error_messages = {
-        'invalid_choice': _(u'The inline foreign key did not match the parent instance primary key.'),
+        'invalid_choice': _('The inline foreign key did not match the parent instance primary key.'),
     }
 
     def __init__(self, parent_instance, *args, **kwargs):
@@ -884,7 +884,7 @@ class ModelChoiceIterator(object):
 
     def __iter__(self):
         if self.field.empty_label is not None:
-            yield (u"", self.field.empty_label)
+            yield ("", self.field.empty_label)
         if self.field.cache_choices:
             if self.field.choice_cache is None:
                 self.field.choice_cache = [
@@ -907,11 +907,11 @@ class ModelChoiceField(ChoiceField):
     # This class is a subclass of ChoiceField for purity, but it doesn't
     # actually use any of ChoiceField's implementation.
     default_error_messages = {
-        'invalid_choice': _(u'Select a valid choice. That choice is not one of'
-                            u' the available choices.'),
+        'invalid_choice': _('Select a valid choice. That choice is not one of'
+                            ' the available choices.'),
     }
 
-    def __init__(self, queryset, empty_label=u"---------", cache_choices=False,
+    def __init__(self, queryset, empty_label="---------", cache_choices=False,
                  required=True, widget=None, label=None, initial=None,
                  help_text=None, to_field_name=None, *args, **kwargs):
         if required and (initial is not None):
@@ -996,10 +996,10 @@ class ModelMultipleChoiceField(ModelChoiceField):
     widget = SelectMultiple
     hidden_widget = MultipleHiddenInput
     default_error_messages = {
-        'list': _(u'Enter a list of values.'),
-        'invalid_choice': _(u'Select a valid choice. %s is not one of the'
-                            u' available choices.'),
-        'invalid_pk_value': _(u'"%s" is not a valid value for a primary key.')
+        'list': _('Enter a list of values.'),
+        'invalid_choice': _('Select a valid choice. %s is not one of the'
+                            ' available choices.'),
+        'invalid_pk_value': _('"%s" is not a valid value for a primary key.')
     }
 
     def __init__(self, queryset, cache_choices=False, required=True,

@@ -61,7 +61,7 @@ look like this:
                 poll.opened = False
                 poll.save()
 
-                self.stdout.write('Successfully closed poll "%s"\n' % poll_id)
+                self.stdout.write('Successfully closed poll "%s"' % poll_id)
 
 .. note::
     When you are using management commands and wish to provide console
@@ -317,8 +317,12 @@ Exception class indicating a problem while executing a management
 command.
 
 If this exception is raised during the execution of a management
-command, it will be caught and turned into a nicely-printed error
-message to the appropriate output stream (i.e., stderr); as a
-result, raising this exception (with a sensible description of the
+command from a command line console, it will be caught and turned into a
+nicely-printed error message to the appropriate output stream (i.e., stderr);
+as a result, raising this exception (with a sensible description of the
 error) is the preferred way to indicate that something has gone
 wrong in the execution of a command.
+
+If a management command is called from code through
+:ref:`call_command <call-command>`, it's up to you to catch the exception
+when needed.

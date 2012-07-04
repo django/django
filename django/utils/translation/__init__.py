@@ -1,6 +1,8 @@
 """
 Internationalization support.
 """
+from __future__ import unicode_literals
+
 from django.utils.encoding import force_unicode
 from django.utils.functional import lazy
 
@@ -136,7 +138,7 @@ def _string_concat(*strings):
     Lazy variant of string concatenation, needed for translations that are
     constructed from multiple parts.
     """
-    return u''.join([force_unicode(s) for s in strings])
+    return ''.join([force_unicode(s) for s in strings])
 string_concat = lazy(_string_concat, unicode)
 
 def get_language_info(lang_code):

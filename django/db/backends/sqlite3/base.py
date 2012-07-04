@@ -4,6 +4,7 @@ SQLite3 backend for django.
 Works with either the pysqlite2 module or the sqlite3 module in the
 standard library.
 """
+from __future__ import unicode_literals
 
 import datetime
 import decimal
@@ -18,6 +19,7 @@ from django.db.backends.sqlite3.client import DatabaseClient
 from django.db.backends.sqlite3.creation import DatabaseCreation
 from django.db.backends.sqlite3.introspection import DatabaseIntrospection
 from django.utils.dateparse import parse_date, parse_datetime, parse_time
+from django.utils.functional import cached_property
 from django.utils.safestring import SafeString
 from django.utils import timezone
 
@@ -45,21 +47,21 @@ def adapt_datetime_with_timezone_support(value):
     # Equivalent to DateTimeField.get_db_prep_value. Used only by raw SQL.
     if settings.USE_TZ:
         if timezone.is_naive(value):
-            warnings.warn(u"SQLite received a naive datetime (%s)"
-                          u" while time zone support is active." % value,
+            warnings.warn("SQLite received a naive datetime (%s)"
+                          " while time zone support is active." % value,
                           RuntimeWarning)
             default_timezone = timezone.get_default_timezone()
             value = timezone.make_aware(value, default_timezone)
         value = value.astimezone(timezone.utc).replace(tzinfo=None)
-    return value.isoformat(" ")
+    return value.isoformat(b" ")
 
-Database.register_converter("bool", lambda s: str(s) == '1')
-Database.register_converter("time", parse_time)
-Database.register_converter("date", parse_date)
-Database.register_converter("datetime", parse_datetime_with_timezone_support)
-Database.register_converter("timestamp", parse_datetime_with_timezone_support)
-Database.register_converter("TIMESTAMP", parse_datetime_with_timezone_support)
-Database.register_converter("decimal", util.typecast_decimal)
+Database.register_converter(b"bool", lambda s: str(s) == '1')
+Database.register_converter(b"time", parse_time)
+Database.register_converter(b"date", parse_date)
+Database.register_converter(b"datetime", parse_datetime_with_timezone_support)
+Database.register_converter(b"timestamp", parse_datetime_with_timezone_support)
+Database.register_converter(b"TIMESTAMP", parse_datetime_with_timezone_support)
+Database.register_converter(b"decimal", util.typecast_decimal)
 Database.register_adapter(datetime.datetime, adapt_datetime_with_timezone_support)
 Database.register_adapter(decimal.Decimal, util.rev_typecast_decimal)
 if Database.version_info >= (2, 4, 1):
@@ -85,7 +87,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     has_bulk_insert = True
     can_combine_inserts_with_and_without_auto_increment_pk = True
 
-    def _supports_stddev(self):
+    @cached_property
+    def supports_stddev(self):
         """Confirm support for STDDEV and related stats functions
 
         SQLite supports STDDEV as an extension package; so
@@ -118,7 +121,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         # values differently. So instead we register our own function that
         # formats the datetime combined with the delta in a manner suitable
         # for comparisons.
-        return  u'django_format_dtdelta(%s, "%s", "%d", "%d", "%d")' % (sql,
+        return  'django_format_dtdelta(%s, "%s", "%d", "%d", "%d")' % (sql,
             connector, timedelta.days, timedelta.seconds, timedelta.microseconds)
 
     def date_trunc_sql(self, lookup_type, field_name):

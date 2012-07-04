@@ -2,12 +2,11 @@
 
 # Unit tests for cache framework
 # Uses whatever cache backend is set in the test settings file.
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import hashlib
 import os
 import re
-import StringIO
 import tempfile
 import time
 import warnings
@@ -140,10 +139,10 @@ class DummyCacheTests(unittest.TestCase):
     def test_unicode(self):
         "Unicode values are ignored by the dummy cache"
         stuff = {
-            u'ascii': u'ascii_value',
-            u'unicode_ascii': u'Iñtërnâtiônàlizætiøn1',
-            u'Iñtërnâtiônàlizætiøn': u'Iñtërnâtiônàlizætiøn2',
-            u'ascii2': {u'x' : 1 }
+            'ascii': 'ascii_value',
+            'unicode_ascii': 'Iñtërnâtiônàlizætiøn1',
+            'Iñtërnâtiônàlizætiøn': 'Iñtërnâtiônàlizætiøn2',
+            'ascii2': {'x' : 1 }
             }
         for (key, value) in stuff.items():
             self.cache.set(key, value)
@@ -338,10 +337,10 @@ class BaseCacheTests(object):
     def test_unicode(self):
         # Unicode values can be cached
         stuff = {
-            u'ascii': u'ascii_value',
-            u'unicode_ascii': u'Iñtërnâtiônàlizætiøn1',
-            u'Iñtërnâtiônàlizætiøn': u'Iñtërnâtiônàlizætiøn2',
-            u'ascii2': {u'x' : 1 }
+            'ascii': 'ascii_value',
+            'unicode_ascii': 'Iñtërnâtiônàlizætiøn1',
+            'Iñtërnâtiônàlizætiøn': 'Iñtërnâtiônàlizætiøn2',
+            'ascii2': {'x' : 1 }
             }
         # Test `set`
         for (key, value) in stuff.items():
@@ -466,20 +465,21 @@ class BaseCacheTests(object):
 
         old_func = self.cache.key_func
         self.cache.key_func = func
-        # On Python 2.6+ we could use the catch_warnings context
-        # manager to test this warning nicely. Since we can't do that
-        # yet, the cleanest option is to temporarily ask for
-        # CacheKeyWarning to be raised as an exception.
-        _warnings_state = get_warnings_state()
-        warnings.simplefilter("error", CacheKeyWarning)
 
         try:
-            # memcached does not allow whitespace or control characters in keys
-            self.assertRaises(CacheKeyWarning, self.cache.set, 'key with spaces', 'value')
-            # memcached limits key length to 250
-            self.assertRaises(CacheKeyWarning, self.cache.set, 'a' * 251, 'value')
+            with warnings.catch_warnings(record=True) as w:
+                warnings.simplefilter("always")
+                # memcached does not allow whitespace or control characters in keys
+                self.cache.set('key with spaces', 'value')
+                self.assertEqual(len(w), 2)
+                self.assertTrue(isinstance(w[0].message, CacheKeyWarning))
+            with warnings.catch_warnings(record=True) as w:
+                warnings.simplefilter("always")
+                # memcached limits key length to 250
+                self.cache.set('a' * 251, 'value')
+                self.assertEqual(len(w), 1)
+                self.assertTrue(isinstance(w[0].message, CacheKeyWarning))
         finally:
-            restore_warnings_state(_warnings_state)
             self.cache.key_func = old_func
 
     def test_cache_versioning_get_set(self):
@@ -819,9 +819,14 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
         self.perform_cull_test(50, 18)
 
     def test_second_call_doesnt_crash(self):
-        err = StringIO.StringIO()
-        management.call_command('createcachetable', self._table_name, verbosity=0, interactive=False, stderr=err)
-        self.assertTrue("Cache table 'test cache table' could not be created" in err.getvalue())
+        with self.assertRaisesRegexp(management.CommandError,
+                "Cache table 'test cache table' could not be created"):
+            management.call_command(
+               'createcachetable',
+                self._table_name,
+                verbosity=0,
+                interactive=False
+            )
 
 
 @override_settings(USE_TZ=True)
@@ -1332,12 +1337,12 @@ class CacheI18nTest(TestCase):
         request = self._get_request()
         response = HttpResponse()
         with timezone.override(CustomTzName()):
-            CustomTzName.name = 'Hora estándar de Argentina'    # UTF-8 string
+            CustomTzName.name = 'Hora estándar de Argentina'.encode('UTF-8') # UTF-8 string
             sanitized_name = 'Hora_estndar_de_Argentina'
             self.assertIn(sanitized_name, learn_cache_key(request, response),
                     "Cache keys should include the time zone name when time zones are active")
 
-            CustomTzName.name = u'Hora estándar de Argentina'    # unicode
+            CustomTzName.name = 'Hora estándar de Argentina'    # unicode
             sanitized_name = 'Hora_estndar_de_Argentina'
             self.assertIn(sanitized_name, learn_cache_key(request, response),
                     "Cache keys should include the time zone name when time zones are active")
@@ -1442,12 +1447,19 @@ def hello_world_view(request, value):
 )
 class CacheMiddlewareTest(TestCase):
 
+    # The following tests will need to be modified in Django 1.6 to not use
+    # deprecated ways of using the cache_page decorator that will be removed in
+    # such version
     def setUp(self):
         self.factory = RequestFactory()
         self.default_cache = get_cache('default')
         self.other_cache = get_cache('other')
+        self.save_warnings_state()
+        warnings.filterwarnings('ignore', category=DeprecationWarning,
+            module='django.views.decorators.cache')
 
     def tearDown(self):
+        self.restore_warnings_state()
         self.default_cache.clear()
         self.other_cache.clear()
 

@@ -10,14 +10,6 @@ from django.utils import timezone
 from .models import Book, BookSigning
 
 
-import warnings
-warnings.filterwarnings(
-        'error', r"DateTimeField received a naive datetime",
-        RuntimeWarning, r'django\.db\.models\.fields')
-
-
-
-
 class ArchiveIndexViewTests(TestCase):
     fixtures = ['generic-views-test-data.json']
     urls = 'regressiontests.generic_views.urls'
@@ -94,9 +86,14 @@ class ArchiveIndexViewTests(TestCase):
         # 1 query for years list + 1 query for books
         with self.assertNumQueries(2):
             self.client.get('/dates/books/')
-        # same as above + 1 query to test if books exist
-        with self.assertNumQueries(3):
+        # same as above + 1 query to test if books exist + 1 query to count them
+        with self.assertNumQueries(4):
             self.client.get('/dates/books/paginated/')
+
+    def test_no_duplicate_query(self):
+        # Regression test for #18354
+        with self.assertNumQueries(2):
+            self.client.get('/dates/books/reverse/')
 
     def test_datetime_archive_view(self):
         BookSigning.objects.create(event_date=datetime.datetime(2008, 4, 2, 12, 0))
@@ -118,8 +115,12 @@ class YearArchiveViewTests(TestCase):
         res = self.client.get('/dates/books/2008/')
         self.assertEqual(res.status_code, 200)
         self.assertEqual(list(res.context['date_list']), [datetime.datetime(2008, 10, 1)])
-        self.assertEqual(res.context['year'], '2008')
+        self.assertEqual(res.context['year'], datetime.date(2008, 1, 1))
         self.assertTemplateUsed(res, 'generic_views/book_archive_year.html')
+
+        # Since allow_empty=False, next/prev years must be valid (#7164)
+        self.assertEqual(res.context['next_year'], None)
+        self.assertEqual(res.context['previous_year'], datetime.date(2006, 1, 1))
 
     def test_year_view_make_object_list(self):
         res = self.client.get('/dates/books/2006/make_object_list/')
@@ -136,6 +137,10 @@ class YearArchiveViewTests(TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(list(res.context['date_list']), [])
         self.assertEqual(list(res.context['book_list']), [])
+
+        # Since allow_empty=True, next/prev are allowed to be empty years (#7164)
+        self.assertEqual(res.context['next_year'], datetime.date(2000, 1, 1))
+        self.assertEqual(res.context['previous_year'], datetime.date(1998, 1, 1))
 
     def test_year_view_allow_future(self):
         # Create a new book in the future
@@ -162,6 +167,11 @@ class YearArchiveViewTests(TestCase):
     def test_year_view_invalid_pattern(self):
         res = self.client.get('/dates/books/no_year/')
         self.assertEqual(res.status_code, 404)
+
+    def test_no_duplicate_query(self):
+        # Regression test for #18354
+        with self.assertNumQueries(4):
+            self.client.get('/dates/books/2008/reverse/')
 
     def test_datetime_year_view(self):
         BookSigning.objects.create(event_date=datetime.datetime(2008, 4, 2, 12, 0))
@@ -204,7 +214,7 @@ class MonthArchiveViewTests(TestCase):
         self.assertEqual(list(res.context['book_list']), [])
         self.assertEqual(res.context['month'], datetime.date(2000, 1, 1))
 
-        # Since it's allow empty, next/prev are allowed to be empty months (#7164)
+        # Since allow_empty=True, next/prev are allowed to be empty months (#7164)
         self.assertEqual(res.context['next_month'], datetime.date(2000, 2, 1))
         self.assertEqual(res.context['previous_month'], datetime.date(1999, 12, 1))
 
@@ -230,7 +240,7 @@ class MonthArchiveViewTests(TestCase):
         self.assertEqual(list(res.context['book_list']), [b])
         self.assertEqual(res.context['month'], future)
 
-        # Since it's allow_future but not allow_empty, next/prev are not
+        # Since allow_future = True but not allow_empty, next/prev are not
         # allowed to be empty months (#7164)
         self.assertEqual(res.context['next_month'], None)
         self.assertEqual(res.context['previous_month'], datetime.date(2008, 10, 1))
@@ -306,17 +316,35 @@ class WeekArchiveViewTests(TestCase):
         self.assertEqual(res.context['book_list'][0], Book.objects.get(pubdate=datetime.date(2008, 10, 1)))
         self.assertEqual(res.context['week'], datetime.date(2008, 9, 28))
 
+        # Since allow_empty=False, next/prev weeks must be valid
+        self.assertEqual(res.context['next_week'], None)
+        self.assertEqual(res.context['previous_week'], datetime.date(2006, 4, 30))
+
     def test_week_view_allow_empty(self):
+        # allow_empty = False, empty week
         res = self.client.get('/dates/books/2008/week/12/')
         self.assertEqual(res.status_code, 404)
 
+        # allow_empty = True, empty month
         res = self.client.get('/dates/books/2008/week/12/allow_empty/')
         self.assertEqual(res.status_code, 200)
         self.assertEqual(list(res.context['book_list']), [])
+        self.assertEqual(res.context['week'], datetime.date(2008, 3, 23))
+
+        # Since allow_empty=True, next/prev are allowed to be empty weeks
+        self.assertEqual(res.context['next_week'], datetime.date(2008, 3, 30))
+        self.assertEqual(res.context['previous_week'], datetime.date(2008, 3, 16))
+
+        # allow_empty but not allow_future: next_week should be empty
+        url = datetime.date.today().strftime('/dates/books/%Y/week/%U/allow_empty/').lower()
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.context['next_week'], None)
 
     def test_week_view_allow_future(self):
         # January 7th always falls in week 1, given Python's definition of week numbers
         future = datetime.date(datetime.date.today().year + 1, 1, 7)
+        future_sunday = future - datetime.timedelta(days=(future.weekday() + 1) % 7)
         b = Book.objects.create(name="The New New Testement", pages=600, pubdate=future)
 
         res = self.client.get('/dates/books/%s/week/1/' % future.year)
@@ -325,6 +353,19 @@ class WeekArchiveViewTests(TestCase):
         res = self.client.get('/dates/books/%s/week/1/allow_future/' % future.year)
         self.assertEqual(res.status_code, 200)
         self.assertEqual(list(res.context['book_list']), [b])
+        self.assertEqual(res.context['week'], future_sunday)
+
+        # Since allow_future = True but not allow_empty, next/prev are not
+        # allowed to be empty weeks
+        self.assertEqual(res.context['next_week'], None)
+        self.assertEqual(res.context['previous_week'], datetime.date(2008, 9, 28))
+
+        # allow_future, but not allow_empty, with a current week. So next
+        # should be in the future
+        res = self.client.get('/dates/books/2008/week/39/allow_future/')
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.context['next_week'], future_sunday)
+        self.assertEqual(res.context['previous_week'], datetime.date(2006, 4, 30))
 
     def test_week_view_paginated(self):
         week_start = datetime.date(2008, 9, 28)
@@ -422,6 +463,13 @@ class DayArchiveViewTests(TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.context['next_day'], future)
         self.assertEqual(res.context['previous_day'], datetime.date(2006, 5, 1))
+
+        # allow_future for yesterday, next_day is today (#17192)
+        today = datetime.date.today()
+        yesterday = today - datetime.timedelta(days=1)
+        res = self.client.get('/dates/books/%s/allow_empty_and_future/'
+                              % yesterday.strftime('%Y/%b/%d').lower())
+        self.assertEqual(res.context['next_day'], today)
 
     def test_day_view_paginated(self):
         res = self.client.get('/dates/books/2008/oct/1/')

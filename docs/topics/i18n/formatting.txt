@@ -4,8 +4,6 @@
 Format localization
 ===================
 
-.. versionadded:: 1.2
-
 Overview
 ========
 

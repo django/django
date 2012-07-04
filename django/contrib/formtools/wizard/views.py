@@ -133,8 +133,9 @@ class WizardView(TemplateView):
           The key should be equal to the `step_name` in the `form_list` (or
           the str of the zero based counter - if no step_names added in the
           `form_list`)
-        * `instance_dict` - contains a dictionary of instance objects. This
-          is only used when `ModelForm`s are used. The key should be equal to
+        * `instance_dict` - contains a dictionary whose values are model
+          instances if the step is based on a ``ModelForm`` and querysets if
+          the step is based on a ``ModelFormSet``. The key should be equal to
           the `step_name` in the `form_list`. Same rules as for `initial_dict`
           apply.
         * `condition_dict` - contains a dictionary of boolean values or

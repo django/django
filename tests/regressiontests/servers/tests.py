@@ -103,7 +103,7 @@ class LiveServerViews(LiveServerBase):
         try:
             self.urlopen('/')
         except urllib2.HTTPError as err:
-            self.assertEquals(err.code, 404, 'Expected 404 response')
+            self.assertEqual(err.code, 404, 'Expected 404 response')
         else:
             self.fail('Expected 404 response')
 
@@ -113,7 +113,7 @@ class LiveServerViews(LiveServerBase):
         Refs #2879.
         """
         f = self.urlopen('/example_view/')
-        self.assertEquals(f.read(), 'example view')
+        self.assertEqual(f.read(), b'example view')
 
     def test_static_files(self):
         """
@@ -121,7 +121,7 @@ class LiveServerViews(LiveServerBase):
         Refs #2879.
         """
         f = self.urlopen('/static/example_static_file.txt')
-        self.assertEquals(f.read(), 'example static file\n')
+        self.assertEqual(f.read().rstrip(b'\r\n'), b'example static file')
 
     def test_media_files(self):
         """
@@ -129,7 +129,7 @@ class LiveServerViews(LiveServerBase):
         Refs #2879.
         """
         f = self.urlopen('/media/example_media_file.txt')
-        self.assertEquals(f.read(), 'example media file\n')
+        self.assertEqual(f.read().rstrip(b'\r\n'), b'example media file')
 
 
 class LiveServerDatabase(LiveServerBase):
@@ -141,7 +141,7 @@ class LiveServerDatabase(LiveServerBase):
         Refs #2879.
         """
         f = self.urlopen('/model_view/')
-        self.assertEquals(f.read().splitlines(), ['jane', 'robert'])
+        self.assertEqual(f.read().splitlines(), ['jane', 'robert'])
 
     def test_database_writes(self):
         """

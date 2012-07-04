@@ -1,5 +1,7 @@
+from __future__ import unicode_literals
+
 from django.conf import settings
-from django.utils.html import conditional_escape
+from django.utils.html import format_html, format_html_join
 from django.utils.encoding import StrAndUnicode, force_unicode
 from django.utils.safestring import mark_safe
 from django.utils import timezone
@@ -15,8 +17,10 @@ def flatatt(attrs):
     The returned string will contain a leading space followed by key="value",
     XML-style pairs.  It is assumed that the keys do not need to be XML-escaped.
     If the passed dictionary is empty, then return an empty string.
+
+    The result is passed through 'mark_safe'.
     """
-    return u''.join([u' %s="%s"' % (k, conditional_escape(v)) for k, v in attrs.items()])
+    return format_html_join('', ' {}="{}"', attrs.items())
 
 class ErrorDict(dict, StrAndUnicode):
     """
@@ -28,13 +32,15 @@ class ErrorDict(dict, StrAndUnicode):
         return self.as_ul()
 
     def as_ul(self):
-        if not self: return u''
-        return mark_safe(u'<ul class="errorlist">%s</ul>'
-                % ''.join([u'<li>%s%s</li>' % (k, conditional_escape(force_unicode(v)))
-                    for k, v in self.items()]))
+        if not self: return ''
+        return format_html('<ul class="errorlist">{}</ul>',
+                           format_html_join('', '<li>{0}{1}</li>',
+                                            ((k, force_unicode(v))
+                                             for k, v in self.items())
+                           ))
 
     def as_text(self):
-        return u'\n'.join([u'* %s\n%s' % (k, u'\n'.join([u'  * %s' % force_unicode(i) for i in v])) for k, v in self.items()])
+        return '\n'.join(['* %s\n%s' % (k, '\n'.join(['  * %s' % force_unicode(i) for i in v])) for k, v in self.items()])
 
 class ErrorList(list, StrAndUnicode):
     """
@@ -44,13 +50,16 @@ class ErrorList(list, StrAndUnicode):
         return self.as_ul()
 
     def as_ul(self):
-        if not self: return u''
-        return mark_safe(u'<ul class="errorlist">%s</ul>'
-                % ''.join([u'<li>%s</li>' % conditional_escape(force_unicode(e)) for e in self]))
+        if not self: return ''
+        return format_html('<ul class="errorlist">{}</ul>',
+                           format_html_join('', '<li>{}</li>',
+                                            ((force_unicode(e),) for e in self)
+                                            )
+                           )
 
     def as_text(self):
-        if not self: return u''
-        return u'\n'.join([u'* %s' % force_unicode(e) for e in self])
+        if not self: return ''
+        return '\n'.join(['* %s' % force_unicode(e) for e in self])
 
     def __repr__(self):
         return repr([force_unicode(e) for e in self])

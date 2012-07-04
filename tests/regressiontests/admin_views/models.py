@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 import datetime
 import tempfile
 import os
@@ -40,14 +42,14 @@ class Book(models.Model):
     """
     A simple book that has chapters.
     """
-    name = models.CharField(max_length=100, verbose_name=u'¿Name?')
+    name = models.CharField(max_length=100, verbose_name='¿Name?')
 
     def __unicode__(self):
         return self.name
 
 
 class Promo(models.Model):
-    name = models.CharField(max_length=100, verbose_name=u'¿Name?')
+    name = models.CharField(max_length=100, verbose_name='¿Name?')
     book = models.ForeignKey(Book)
 
     def __unicode__(self):
@@ -55,7 +57,7 @@ class Promo(models.Model):
 
 
 class Chapter(models.Model):
-    title = models.CharField(max_length=100, verbose_name=u'¿Title?')
+    title = models.CharField(max_length=100, verbose_name='¿Title?')
     content = models.TextField()
     book = models.ForeignKey(Book)
 
@@ -68,19 +70,19 @@ class Chapter(models.Model):
 
 
 class ChapterXtra1(models.Model):
-    chap = models.OneToOneField(Chapter, verbose_name=u'¿Chap?')
-    xtra = models.CharField(max_length=100, verbose_name=u'¿Xtra?')
+    chap = models.OneToOneField(Chapter, verbose_name='¿Chap?')
+    xtra = models.CharField(max_length=100, verbose_name='¿Xtra?')
 
     def __unicode__(self):
-        return u'¿Xtra1: %s' % self.xtra
+        return '¿Xtra1: %s' % self.xtra
 
 
 class ChapterXtra2(models.Model):
-    chap = models.OneToOneField(Chapter, verbose_name=u'¿Chap?')
-    xtra = models.CharField(max_length=100, verbose_name=u'¿Xtra?')
+    chap = models.OneToOneField(Chapter, verbose_name='¿Chap?')
+    xtra = models.CharField(max_length=100, verbose_name='¿Xtra?')
 
     def __unicode__(self):
-        return u'¿Xtra2: %s' % self.xtra
+        return '¿Xtra2: %s' % self.xtra
 
 
 class RowLevelChangePermissionModel(models.Model):
@@ -93,10 +95,13 @@ class CustomArticle(models.Model):
 
 
 class ModelWithStringPrimaryKey(models.Model):
-    id = models.CharField(max_length=255, primary_key=True)
+    string_pk = models.CharField(max_length=255, primary_key=True)
 
     def __unicode__(self):
-        return self.id
+        return self.string_pk
+
+    def get_absolute_url(self):
+        return '/dummy/%s/' % self.string_pk
 
 
 class Color(models.Model):
@@ -130,7 +135,7 @@ class Inquisition(models.Model):
     country = models.CharField(max_length=20)
 
     def __unicode__(self):
-        return u"by %s from %s" % (self.leader, self.country)
+        return "by %s from %s" % (self.leader, self.country)
 
 
 class Sketch(models.Model):
@@ -187,7 +192,7 @@ class Account(models.Model):
     """
     username = models.CharField(blank=False,  max_length=80)
     persona = models.ForeignKey(Persona, related_name="accounts")
-    servicename = u'generic service'
+    servicename = 'generic service'
 
     def __unicode__(self):
         return "%s: %s" % (self.servicename, self.username)
@@ -195,12 +200,12 @@ class Account(models.Model):
 
 class FooAccount(Account):
     """A service-specific account of type Foo."""
-    servicename = u'foo'
+    servicename = 'foo'
 
 
 class BarAccount(Account):
     """A service-specific account of type Bar."""
-    servicename = u'bar'
+    servicename = 'bar'
 
 
 class Subscriber(models.Model):
@@ -335,7 +340,7 @@ class Category(models.Model):
         ordering = ('order',)
 
     def __unicode__(self):
-        return u'%s:o%s' % (self.id, self.order)
+        return '%s:o%s' % (self.id, self.order)
 
 
 class Link(models.Model):
@@ -493,14 +498,14 @@ class Reservation(models.Model):
 
 
 DRIVER_CHOICES = (
-    (u'bill', 'Bill G'),
-    (u'steve', 'Steve J'),
+    ('bill', 'Bill G'),
+    ('steve', 'Steve J'),
 )
 
 RESTAURANT_CHOICES = (
-    (u'indian', u'A Taste of India'),
-    (u'thai', u'Thai Pography'),
-    (u'pizza', u'Pizza Mama'),
+    ('indian', 'A Taste of India'),
+    ('thai', 'Thai Pography'),
+    ('pizza', 'Pizza Mama'),
 )
 
 

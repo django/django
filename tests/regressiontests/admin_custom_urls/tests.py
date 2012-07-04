@@ -1,12 +1,14 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 from django.core.urlresolvers import reverse
 from django.template.response import TemplateResponse
 from django.test import TestCase
+from django.test.utils import override_settings
 
 from .models import Action
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminCustomUrlsTest(TestCase):
     fixtures = ['users.json', 'actions.json']
 
@@ -37,9 +39,9 @@ class AdminCustomUrlsTest(TestCase):
         A smoke test to ensure POST on add_view works.
         """
         post_data = {
-            '_popup': u'1',
-            "name": u'Action added through a popup',
-            "description": u"Description of added action",
+            '_popup': '1',
+            "name": 'Action added through a popup',
+            "description": "Description of added action",
         }
         response = self.client.post('/custom_urls/admin/admin_custom_urls/action/!add/', post_data)
         self.assertEqual(response.status_code, 200)

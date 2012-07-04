@@ -1,4 +1,4 @@
-from itertools import izip
+from future_builtins import zip
 
 from django.core.exceptions import FieldError
 from django.db import transaction
@@ -261,12 +261,12 @@ class SQLCompiler(object):
         result = []
         if opts is None:
             opts = self.query.model._meta
+        # Skip all proxy to the root proxied model
+        opts = opts.concrete_model._meta
         qn = self.quote_name_unless_alias
         qn2 = self.connection.ops.quote_name
         aliases = set()
         only_load = self.deferred_to_columns()
-        # Skip all proxy to the root proxied model
-        proxied_model = opts.concrete_model
 
         if start_alias:
             seen = {None: start_alias}
@@ -277,12 +277,9 @@ class SQLCompiler(object):
                 try:
                     alias = seen[model]
                 except KeyError:
-                    if model is proxied_model:
-                        alias = start_alias
-                    else:
-                        link_field = opts.get_ancestor_link(model)
-                        alias = self.query.join((start_alias, model._meta.db_table,
-                                link_field.column, model._meta.pk.column))
+                    link_field = opts.get_ancestor_link(model)
+                    alias = self.query.join((start_alias, model._meta.db_table,
+                            link_field.column, model._meta.pk.column))
                     seen[model] = alias
             else:
                 # If we're starting from the base model of the queryset, the
@@ -458,6 +455,9 @@ class SQLCompiler(object):
             alias = self.query.get_initial_alias()
         field, target, opts, joins, _, _ = self.query.setup_joins(pieces,
                 opts, alias, False)
+        # We will later on need to promote those joins that were added to the
+        # query afresh above.
+        joins_to_promote = [j for j in joins if self.query.alias_refcount[j] < 2]
         alias = joins[-1]
         col = target.column
         if not field.rel:
@@ -469,8 +469,9 @@ class SQLCompiler(object):
         # Must use left outer joins for nullable fields and their relations.
         # Ordering or distinct must not affect the returned set, and INNER
         # JOINS for nullable fields could do this.
-        self.query.promote_alias_chain(joins,
-            self.query.alias_map[joins[0]].join_type == self.query.LOUTER)
+        if joins_to_promote:
+            self.query.promote_alias_chain(joins_to_promote,
+                self.query.alias_map[joins_to_promote[0]].join_type == self.query.LOUTER)
         return field, col, alias, joins, opts
 
     def _final_join_removal(self, col, alias):
@@ -595,6 +596,7 @@ class SQLCompiler(object):
         if avoid_set is None:
             avoid_set = set()
         orig_dupe_set = dupe_set
+        only_load = self.query.get_loaded_field_names()
 
         # Setup for the case when only particular related fields should be
         # included in the related selection.
@@ -606,7 +608,8 @@ class SQLCompiler(object):
                 restricted = False
 
         for f, model in opts.get_fields_with_model():
-            if not select_related_descend(f, restricted, requested):
+            if not select_related_descend(f, restricted, requested,
+                                          only_load.get(model or self.query.model)):
                 continue
             # The "avoid" set is aliases we want to avoid just for this
             # particular branch of the recursion. They aren't permanently
@@ -679,7 +682,8 @@ class SQLCompiler(object):
                 if o.field.unique
             ]
             for f, model in related_fields:
-                if not select_related_descend(f, restricted, requested, reverse=True):
+                if not select_related_descend(f, restricted, requested,
+                                              only_load.get(model), reverse=True):
                     continue
                 # The "avoid" set is aliases we want to avoid just for this
                 # particular branch of the recursion. They aren't permanently
@@ -882,7 +886,7 @@ class SQLInsertCompiler(SQLCompiler):
             placeholders = [["%s"] * len(fields)]
         else:
             placeholders = [
-                [self.placeholder(field, v) for field, v in izip(fields, val)]
+                [self.placeholder(field, v) for field, v in zip(fields, val)]
                 for val in values
             ]
         if self.return_id and self.connection.features.can_return_id_from_insert:
@@ -899,7 +903,7 @@ class SQLInsertCompiler(SQLCompiler):
         else:
             return [
                 (" ".join(result + ["VALUES (%s)" % ", ".join(p)]), vals)
-                for p, vals in izip(placeholders, params)
+                for p, vals in zip(placeholders, params)
             ]
 
     def execute_sql(self, return_id=False):
@@ -1018,6 +1022,12 @@ class SQLUpdateCompiler(SQLCompiler):
         query.extra = {}
         query.select = []
         query.add_fields([query.model._meta.pk.name])
+        # Recheck the count - it is possible that fiddling with the select
+        # fields above removes tables from the query. Refs #18304.
+        count = query.count_active_tables()
+        if not self.query.related_updates and count == 1:
+            return
+
         must_pre_select = count > 1 and not self.connection.features.update_can_self_select
 
         # Now we adjust the current query: reset the where clause and get rid
@@ -1085,7 +1095,7 @@ def empty_iter():
     """
     Returns an iterator containing no results.
     """
-    yield iter([]).next()
+    yield next(iter([]))
 
 
 def order_modified_iter(cursor, trim, sentinel):

@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import hashlib
 import json
@@ -67,7 +67,7 @@ def file_upload_unicode_name(request):
     # through file save.
     uni_named_file = request.FILES['file_unicode']
     obj = FileModel.objects.create(testfile=uni_named_file)
-    full_name = u'%s/%s' % (UPLOAD_TO, uni_named_file.name)
+    full_name = '%s/%s' % (UPLOAD_TO, uni_named_file.name)
     if not os.path.exists(full_name):
         response = HttpResponseServerError()
 

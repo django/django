@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import urllib
 
 from django.core.exceptions import ImproperlyConfigured
@@ -76,7 +78,7 @@ class Permission(models.Model):
                     'codename')
 
     def __unicode__(self):
-        return u"%s | %s | %s" % (
+        return "%s | %s | %s" % (
             unicode(self.content_type.app_label),
             unicode(self.content_type),
             unicode(self.name))
@@ -285,7 +287,7 @@ class User(models.Model):
         """
         Returns the first_name plus the last_name, with a space in between.
         """
-        full_name = u'%s %s' % (self.first_name, self.last_name)
+        full_name = '%s %s' % (self.first_name, self.last_name)
         return full_name.strip()
 
     def set_password(self, raw_password):
@@ -404,6 +406,7 @@ class User(models.Model):
 
 class AnonymousUser(object):
     id = None
+    pk = None
     username = ''
     is_staff = False
     is_active = False

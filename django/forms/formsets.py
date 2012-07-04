@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 from django.core.exceptions import ValidationError
 from django.forms import Form
@@ -314,11 +314,11 @@ class BaseFormSet(StrAndUnicode):
         if self.can_order:
             # Only pre-fill the ordering field for initial forms.
             if index is not None and index < self.initial_form_count():
-                form.fields[ORDERING_FIELD_NAME] = IntegerField(label=_(u'Order'), initial=index+1, required=False)
+                form.fields[ORDERING_FIELD_NAME] = IntegerField(label=_('Order'), initial=index+1, required=False)
             else:
-                form.fields[ORDERING_FIELD_NAME] = IntegerField(label=_(u'Order'), required=False)
+                form.fields[ORDERING_FIELD_NAME] = IntegerField(label=_('Order'), required=False)
         if self.can_delete:
-            form.fields[DELETION_FIELD_NAME] = BooleanField(label=_(u'Delete'), required=False)
+            form.fields[DELETION_FIELD_NAME] = BooleanField(label=_('Delete'), required=False)
 
     def add_prefix(self, index):
         return '%s-%s' % (self.prefix, index)
@@ -344,18 +344,18 @@ class BaseFormSet(StrAndUnicode):
         # XXX: there is no semantic division between forms here, there
         # probably should be. It might make sense to render each form as a
         # table row with each field as a td.
-        forms = u' '.join([form.as_table() for form in self])
-        return mark_safe(u'\n'.join([unicode(self.management_form), forms]))
+        forms = ' '.join([form.as_table() for form in self])
+        return mark_safe('\n'.join([unicode(self.management_form), forms]))
 
     def as_p(self):
         "Returns this formset rendered as HTML <p>s."
-        forms = u' '.join([form.as_p() for form in self])
-        return mark_safe(u'\n'.join([unicode(self.management_form), forms]))
+        forms = ' '.join([form.as_p() for form in self])
+        return mark_safe('\n'.join([unicode(self.management_form), forms]))
 
     def as_ul(self):
         "Returns this formset rendered as HTML <li>s."
-        forms = u' '.join([form.as_ul() for form in self])
-        return mark_safe(u'\n'.join([unicode(self.management_form), forms]))
+        forms = ' '.join([form.as_ul() for form in self])
+        return mark_safe('\n'.join([unicode(self.management_form), forms]))
 
 def formset_factory(form, formset=BaseFormSet, extra=1, can_order=False,
                     can_delete=False, max_num=None):
@@ -363,7 +363,7 @@ def formset_factory(form, formset=BaseFormSet, extra=1, can_order=False,
     attrs = {'form': form, 'extra': extra,
              'can_order': can_order, 'can_delete': can_delete,
              'max_num': max_num}
-    return type(form.__name__ + 'FormSet', (formset,), attrs)
+    return type(form.__name__ + b'FormSet', (formset,), attrs)
 
 def all_valid(formsets):
     """Returns true if every formset in formsets is valid."""

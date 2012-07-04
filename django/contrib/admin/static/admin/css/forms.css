@@ -226,6 +226,10 @@ body.popup .submit-row {
     width: 5em;
 }
 
+.vBigIntegerField {
+    width: 10em;
+}
+
 .vForeignKeyRawIdAdminField {
     width: 5em;
 }
@@ -268,6 +272,7 @@ body.popup .submit-row {
     margin: 0;
     background: #fff;
     border: none;
+    width: 100%;
 }
 
 .inline-related fieldset.module h3 {

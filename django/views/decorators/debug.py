@@ -26,13 +26,13 @@ def sensitive_variables(*variables):
     """
     def decorator(func):
         @functools.wraps(func)
-        def wrapper(*args, **kwargs):
+        def sensitive_variables_wrapper(*args, **kwargs):
             if variables:
-                wrapper.sensitive_variables = variables
+                sensitive_variables_wrapper.sensitive_variables = variables
             else:
-                wrapper.sensitive_variables = '__ALL__'
+                sensitive_variables_wrapper.sensitive_variables = '__ALL__'
             return func(*args, **kwargs)
-        return wrapper
+        return sensitive_variables_wrapper
     return decorator
 
 
@@ -61,11 +61,11 @@ def sensitive_post_parameters(*parameters):
     """
     def decorator(view):
         @functools.wraps(view)
-        def wrapper(request, *args, **kwargs):
+        def sensitive_post_parameters_wrapper(request, *args, **kwargs):
             if parameters:
                 request.sensitive_post_parameters = parameters
             else:
                 request.sensitive_post_parameters = '__ALL__'
             return view(request, *args, **kwargs)
-        return wrapper
+        return sensitive_post_parameters_wrapper
     return decorator

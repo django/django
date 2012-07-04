@@ -57,7 +57,7 @@ there.
 In fact, new documentation is one of our favorite features of Django 1.0, so we
 might as well start there. First, there's a new documentation site:
 
-* http://docs.djangoproject.com/
+* https://docs.djangoproject.com/
 
 The documentation has been greatly improved, cleaned up, and generally made
 awesome. There's now dedicated search, indexes, and more.

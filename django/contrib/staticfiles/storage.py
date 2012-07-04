@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 import hashlib
 import os
 import posixpath
@@ -46,8 +47,8 @@ class StaticFilesStorage(FileSystemStorage):
 class CachedFilesMixin(object):
     patterns = (
         ("*.css", (
-            r"""(url\(['"]{0,1}\s*(.*?)["']{0,1}\))""",
-            r"""(@import\s*["']\s*(.*?)["'])""",
+            br"""(url\(['"]{0,1}\s*(.*?)["']{0,1}\))""",
+            br"""(@import\s*["']\s*(.*?)["'])""",
         )),
     )
 
@@ -64,6 +65,17 @@ class CachedFilesMixin(object):
                 compiled = re.compile(pattern)
                 self._patterns.setdefault(extension, []).append(compiled)
 
+    def file_hash(self, name, content=None):
+        """
+        Retuns a hash of the file with the given name and optional content.
+        """
+        if content is None:
+            return None
+        md5 = hashlib.md5()
+        for chunk in content.chunks():
+            md5.update(chunk)
+        return md5.hexdigest()[:12]
+
     def hashed_name(self, name, content=None):
         parsed_name = urlsplit(unquote(name))
         clean_name = parsed_name.path.strip()
@@ -78,13 +90,11 @@ class CachedFilesMixin(object):
                 return name
         path, filename = os.path.split(clean_name)
         root, ext = os.path.splitext(filename)
-        # Get the MD5 hash of the file
-        md5 = hashlib.md5()
-        for chunk in content.chunks():
-            md5.update(chunk)
-        md5sum = md5.hexdigest()[:12]
-        hashed_name = os.path.join(path, u"%s.%s%s" %
-                                   (root, md5sum, ext))
+        file_hash = self.file_hash(clean_name, content)
+        if file_hash is not None:
+            file_hash = ".%s" % file_hash
+        hashed_name = os.path.join(path, "%s%s%s" %
+                                   (root, file_hash, ext))
         unparsed_name = list(parsed_name)
         unparsed_name[2] = hashed_name
         # Special casing for a @font-face hack, like url(myfont.eot?#iefix")
@@ -94,7 +104,7 @@ class CachedFilesMixin(object):
         return urlunsplit(unparsed_name)
 
     def cache_key(self, name):
-        return u'staticfiles:%s' % hashlib.md5(smart_str(name)).hexdigest()
+        return 'staticfiles:%s' % hashlib.md5(smart_str(name)).hexdigest()
 
     def url(self, name, force=False):
         """
@@ -189,8 +199,8 @@ class CachedFilesMixin(object):
         if dry_run:
             return
 
-        # delete cache of all handled paths
-        self.cache.delete_many([self.cache_key(path) for path in paths])
+        # where to store the new paths
+        hashed_paths = {}
 
         # build a list of adjustable files
         matches = lambda path: matches_patterns(path, self._patterns.keys())
@@ -239,8 +249,11 @@ class CachedFilesMixin(object):
                         hashed_name = force_unicode(saved_name.replace('\\', '/'))
 
                 # and then set the cache accordingly
-                self.cache.set(self.cache_key(name), hashed_name)
+                hashed_paths[self.cache_key(name)] = hashed_name
                 yield name, hashed_name, processed
+
+        # Finally set the cache
+        self.cache.set_many(hashed_paths)
 
 
 class CachedStaticFilesStorage(CachedFilesMixin, StaticFilesStorage):

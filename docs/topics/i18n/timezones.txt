@@ -656,7 +656,7 @@ Usage
        >>> from django.utils.dateparse import parse_datetime
        >>> naive = parse_datetime("2012-02-21 10:28:45")
        >>> import pytz
-       >>> pytz.timezone("Europe/Helsinki").localize(naive)
+       >>> pytz.timezone("Europe/Helsinki").localize(naive, is_dst=None)
        datetime.datetime(2012, 2, 21, 10, 28, 45, tzinfo=<DstTzInfo 'Europe/Helsinki' EET+2:00:00 STD>)
 
    Note that ``localize`` is a pytz extension to the :class:`~datetime.tzinfo`
@@ -664,7 +664,7 @@ Usage
    documentation of pytz contains `more examples`_. You should review it
    before attempting to manipulate aware datetimes.
 
-2. **How can I obtain the current time in the local time zone?**
+2. **How can I obtain the local time in the current time zone?**
 
    Well, the first question is, do you really need to?
 
@@ -678,15 +678,14 @@ Usage
    the datetime in UTC returned by :func:`django.utils.timezone.now` will be
    sufficient.
 
-   For the sake of completeness, though, if you really wanted the current time
-   in the local time zone, here's how you would obtain it::
+   For the sake of completeness, though, if you really want the local time
+   in the current time zone, here's how you can obtain it::
 
-       >>> import datetime
        >>> from django.utils import timezone
-       >>> datetime.datetime.now(tz=timezone.get_default_timezone())
+       >>> timezone.localtime(timezone.now())
        datetime.datetime(2012, 3, 3, 20, 10, 53, 873365, tzinfo=<DstTzInfo 'Europe/Paris' CET+1:00:00 STD>)
 
-   In this example, pytz_ is installed and :setting:`TIME_ZONE` is
+   In this example, pytz_ is installed and the current time zone is
    ``"Europe/Paris"``.
 
 3. **How can I see all available time zones?**

@@ -18,33 +18,18 @@ def process_file(fn, lines):
     lines.insert(0, '\n')
     lines.insert(0, '.. %s:\n' % target_name(fn))
     try:
-        f = open(fn, 'w')
+        with open(fn, 'w') as fp:
+            fp.writelines(lines)
     except IOError:
         print("Can't open %s for writing. Not touching it." % fn)
-        return
-    try:
-        f.writelines(lines)
-    except IOError:
-        print("Can't write to %s. Not touching it." % fn)
-    finally:
-        f.close()
 
 def has_target(fn):
     try:
-        f = open(fn, 'r')
+        with open(fn, 'r') as fp:
+            lines = fp.readlines()
     except IOError:
-        print("Can't open %s. Not touching it." % fn)
+        print("Can't open or read %s. Not touching it." % fn)
         return (True, None)
-    readok = True
-    try:
-        lines = f.readlines()
-    except IOError:
-        print("Can't read %s. Not touching it." % fn)
-        readok = False
-    finally:
-        f.close()
-        if not readok:
-            return (True, None)
 
     #print fn, len(lines)
     if len(lines) < 1:
@@ -82,7 +67,7 @@ def main(argv=None):
                 print("Adding xref to %s" % fn)
                 process_file(fn, lines)
         else:
-            print "Skipping %s: already has a xref" % fn
+            print("Skipping %s: already has a xref" % fn)
 
 if __name__ == '__main__':
     sys.exit(main())

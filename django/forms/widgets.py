@@ -2,7 +2,7 @@
 HTML Widget classes
 """
 
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import copy
 import datetime
@@ -12,7 +12,7 @@ from urlparse import urljoin
 from django.conf import settings
 from django.forms.util import flatatt, to_current_timezone
 from django.utils.datastructures import MultiValueDict, MergeDict
-from django.utils.html import escape, conditional_escape
+from django.utils.html import conditional_escape, format_html, format_html_join
 from django.utils.translation import ugettext, ugettext_lazy
 from django.utils.encoding import StrAndUnicode, force_unicode
 from django.utils.safestring import mark_safe
@@ -50,10 +50,10 @@ class Media(StrAndUnicode):
         return self.render()
 
     def render(self):
-        return mark_safe(u'\n'.join(chain(*[getattr(self, 'render_' + name)() for name in MEDIA_TYPES])))
+        return mark_safe('\n'.join(chain(*[getattr(self, 'render_' + name)() for name in MEDIA_TYPES])))
 
     def render_js(self):
-        return [u'<script type="text/javascript" src="%s"></script>' % self.absolute_path(path) for path in self._js]
+        return [format_html('<script type="text/javascript" src="{0}"></script>', self.absolute_path(path)) for path in self._js]
 
     def render_css(self):
         # To keep rendering order consistent, we can't just iterate over items().
@@ -61,12 +61,12 @@ class Media(StrAndUnicode):
         media = self._css.keys()
         media.sort()
         return chain(*[
-            [u'<link href="%s" type="text/css" media="%s" rel="stylesheet" />' % (self.absolute_path(path), medium)
+                [format_html('<link href="{0}" type="text/css" media="{1}" rel="stylesheet" />', self.absolute_path(path), medium)
                     for path in self._css[medium]]
                 for medium in media])
 
     def absolute_path(self, path, prefix=None):
-        if path.startswith(u'http://') or path.startswith(u'https://') or path.startswith(u'/'):
+        if path.startswith(('http://', 'https://', '/')):
             return path
         if prefix is None:
             if settings.STATIC_URL is None:
@@ -210,13 +210,13 @@ class Widget(object):
         """
         # For purposes of seeing whether something has changed, None is
         # the same as an empty string, if the data or inital value we get
-        # is None, replace it w/ u''.
+        # is None, replace it w/ ''.
         if data is None:
-            data_value = u''
+            data_value = ''
         else:
             data_value = data
         if initial is None:
-            initial_value = u''
+            initial_value = ''
         else:
             initial_value = initial
         if force_unicode(initial_value) != force_unicode(data_value):
@@ -254,7 +254,7 @@ class Input(Widget):
         if value != '':
             # Only add the 'value' attribute if a value is non-empty.
             final_attrs['value'] = force_unicode(self._format_value(value))
-        return mark_safe(u'<input%s />' % flatatt(final_attrs))
+        return format_html('<input{} />', flatatt(final_attrs))
 
 class TextInput(Input):
     input_type = 'text'
@@ -295,8 +295,8 @@ class MultipleHiddenInput(HiddenInput):
                 # An ID attribute was given. Add a numeric index as a suffix
                 # so that the inputs don't all have the same ID attribute.
                 input_attrs['id'] = '%s_%s' % (id_, i)
-            inputs.append(u'<input%s />' % flatatt(input_attrs))
-        return mark_safe(u'\n'.join(inputs))
+            inputs.append(format_html('<input{} />', flatatt(input_attrs)))
+        return mark_safe('\n'.join(inputs))
 
     def value_from_datadict(self, data, files, name):
         if isinstance(data, (MultiValueDict, MergeDict)):
@@ -326,9 +326,9 @@ class ClearableFileInput(FileInput):
     input_text = ugettext_lazy('Change')
     clear_checkbox_label = ugettext_lazy('Clear')
 
-    template_with_initial = u'%(initial_text)s: %(initial)s %(clear_template)s<br />%(input_text)s: %(input)s'
+    template_with_initial = '%(initial_text)s: %(initial)s %(clear_template)s<br />%(input_text)s: %(input)s'
 
-    template_with_clear = u'%(clear)s <label for="%(clear_checkbox_id)s">%(clear_checkbox_label)s</label>'
+    template_with_clear = '%(clear)s <label for="%(clear_checkbox_id)s">%(clear_checkbox_label)s</label>'
 
     def clear_checkbox_name(self, name):
         """
@@ -350,14 +350,14 @@ class ClearableFileInput(FileInput):
             'clear_template': '',
             'clear_checkbox_label': self.clear_checkbox_label,
         }
-        template = u'%(input)s'
+        template = '%(input)s'
         substitutions['input'] = super(ClearableFileInput, self).render(name, value, attrs)
 
         if value and hasattr(value, "url"):
             template = self.template_with_initial
-            substitutions['initial'] = (u'<a href="%s">%s</a>'
-                                        % (escape(value.url),
-                                           escape(force_unicode(value))))
+            substitutions['initial'] = format_html('<a href="{0}">{1}</a>',
+                                                   value.url,
+                                                   force_unicode(value))
             if not self.is_required:
                 checkbox_name = self.clear_checkbox_name(name)
                 checkbox_id = self.clear_checkbox_id(checkbox_name)
@@ -392,8 +392,9 @@ class Textarea(Widget):
     def render(self, name, value, attrs=None):
         if value is None: value = ''
         final_attrs = self.build_attrs(attrs, name=name)
-        return mark_safe(u'<textarea%s>%s</textarea>' % (flatatt(final_attrs),
-                conditional_escape(force_unicode(value))))
+        return format_html('<textarea{0}>{1}</textarea>',
+                           flatatt(final_attrs),
+                           force_unicode(value))
 
 class DateInput(Input):
     input_type = 'text'
@@ -511,7 +512,7 @@ class CheckboxInput(Widget):
         if not (value is True or value is False or value is None or value == ''):
             # Only add the 'value' attribute if a value is non-empty.
             final_attrs['value'] = force_unicode(value)
-        return mark_safe(u'<input%s />' % flatatt(final_attrs))
+        return format_html('<input{} />', flatatt(final_attrs))
 
     def value_from_datadict(self, data, files, name):
         if name not in data:
@@ -526,7 +527,7 @@ class CheckboxInput(Widget):
         return value
 
     def _has_changed(self, initial, data):
-        # Sometimes data or initial could be None or u'' which should be the
+        # Sometimes data or initial could be None or '' which should be the
         # same thing as False.
         return bool(initial) != bool(data)
 
@@ -543,25 +544,26 @@ class Select(Widget):
     def render(self, name, value, attrs=None, choices=()):
         if value is None: value = ''
         final_attrs = self.build_attrs(attrs, name=name)
-        output = [u'<select%s>' % flatatt(final_attrs)]
+        output = [format_html('<select{}>', flatatt(final_attrs))]
         options = self.render_options(choices, [value])
         if options:
             output.append(options)
-        output.append(u'</select>')
-        return mark_safe(u'\n'.join(output))
+        output.append('</select>')
+        return mark_safe('\n'.join(output))
 
     def render_option(self, selected_choices, option_value, option_label):
         option_value = force_unicode(option_value)
         if option_value in selected_choices:
-            selected_html = u' selected="selected"'
+            selected_html = mark_safe(' selected="selected"')
             if not self.allow_multiple_selected:
                 # Only allow for a single selection.
                 selected_choices.remove(option_value)
         else:
             selected_html = ''
-        return u'<option value="%s"%s>%s</option>' % (
-            escape(option_value), selected_html,
-            conditional_escape(force_unicode(option_label)))
+        return format_html('<option value="{0}"{1}>{2}</option>',
+                           option_value,
+                           selected_html,
+                           force_unicode(option_label))
 
     def render_options(self, choices, selected_choices):
         # Normalize to strings.
@@ -569,37 +571,37 @@ class Select(Widget):
         output = []
         for option_value, option_label in chain(self.choices, choices):
             if isinstance(option_label, (list, tuple)):
-                output.append(u'<optgroup label="%s">' % escape(force_unicode(option_value)))
+                output.append(format_html('<optgroup label="{0}">', force_unicode(option_value)))
                 for option in option_label:
                     output.append(self.render_option(selected_choices, *option))
-                output.append(u'</optgroup>')
+                output.append('</optgroup>')
             else:
                 output.append(self.render_option(selected_choices, option_value, option_label))
-        return u'\n'.join(output)
+        return '\n'.join(output)
 
 class NullBooleanSelect(Select):
     """
     A Select Widget intended to be used with NullBooleanField.
     """
     def __init__(self, attrs=None):
-        choices = ((u'1', ugettext_lazy('Unknown')),
-                   (u'2', ugettext_lazy('Yes')),
-                   (u'3', ugettext_lazy('No')))
+        choices = (('1', ugettext_lazy('Unknown')),
+                   ('2', ugettext_lazy('Yes')),
+                   ('3', ugettext_lazy('No')))
         super(NullBooleanSelect, self).__init__(attrs, choices)
 
     def render(self, name, value, attrs=None, choices=()):
         try:
-            value = {True: u'2', False: u'3', u'2': u'2', u'3': u'3'}[value]
+            value = {True: '2', False: '3', '2': '2', '3': '3'}[value]
         except KeyError:
-            value = u'1'
+            value = '1'
         return super(NullBooleanSelect, self).render(name, value, attrs, choices)
 
     def value_from_datadict(self, data, files, name):
         value = data.get(name, None)
-        return {u'2': True,
+        return {'2': True,
                 True: True,
                 'True': True,
-                u'3': False,
+                '3': False,
                 'False': False,
                 False: False}.get(value, None)
 
@@ -618,12 +620,12 @@ class SelectMultiple(Select):
     def render(self, name, value, attrs=None, choices=()):
         if value is None: value = []
         final_attrs = self.build_attrs(attrs, name=name)
-        output = [u'<select multiple="multiple"%s>' % flatatt(final_attrs)]
+        output = [format_html('<select multiple="multiple"{}>', flatatt(final_attrs))]
         options = self.render_options(choices, value)
         if options:
             output.append(options)
         output.append('</select>')
-        return mark_safe(u'\n'.join(output))
+        return mark_safe('\n'.join(output))
 
     def value_from_datadict(self, data, files, name):
         if isinstance(data, (MultiValueDict, MergeDict)):
@@ -662,11 +664,11 @@ class RadioInput(SubWidget):
         value = value or self.value
         attrs = attrs or self.attrs
         if 'id' in self.attrs:
-            label_for = ' for="%s_%s"' % (self.attrs['id'], self.index)
+            label_for = format_html(' for="{0}_{1}"', self.attrs['id'], self.index)
         else:
             label_for = ''
-        choice_label = conditional_escape(force_unicode(self.choice_label))
-        return mark_safe(u'<label%s>%s %s</label>' % (label_for, self.tag(), choice_label))
+        choice_label = force_unicode(self.choice_label)
+        return format_html('<label{0}>{1} {2}</label>', label_for, self.tag(), choice_label)
 
     def is_checked(self):
         return self.value == self.choice_value
@@ -677,7 +679,7 @@ class RadioInput(SubWidget):
         final_attrs = dict(self.attrs, type='radio', name=self.name, value=self.choice_value)
         if self.is_checked():
             final_attrs['checked'] = 'checked'
-        return mark_safe(u'<input%s />' % flatatt(final_attrs))
+        return format_html('<input{} />', flatatt(final_attrs))
 
 class RadioFieldRenderer(StrAndUnicode):
     """
@@ -701,8 +703,10 @@ class RadioFieldRenderer(StrAndUnicode):
 
     def render(self):
         """Outputs a <ul> for this set of radio fields."""
-        return mark_safe(u'<ul>\n%s\n</ul>' % u'\n'.join([u'<li>%s</li>'
-                % force_unicode(w) for w in self]))
+        return format_html('<ul>\n{0}\n</ul>',
+                           format_html_join('\n', '<li>{0}</li>',
+                                            [(force_unicode(w),) for w in self]
+                                            ))
 
 class RadioSelect(Select):
     renderer = RadioFieldRenderer
@@ -743,7 +747,7 @@ class CheckboxSelectMultiple(SelectMultiple):
         if value is None: value = []
         has_id = attrs and 'id' in attrs
         final_attrs = self.build_attrs(attrs, name=name)
-        output = [u'<ul>']
+        output = ['<ul>']
         # Normalize to strings
         str_values = set([force_unicode(v) for v in value])
         for i, (option_value, option_label) in enumerate(chain(self.choices, choices)):
@@ -751,17 +755,18 @@ class CheckboxSelectMultiple(SelectMultiple):
             # so that the checkboxes don't all have the same ID attribute.
             if has_id:
                 final_attrs = dict(final_attrs, id='%s_%s' % (attrs['id'], i))
-                label_for = u' for="%s"' % final_attrs['id']
+                label_for = format_html(' for="{0}"', final_attrs['id'])
             else:
                 label_for = ''
 
             cb = CheckboxInput(final_attrs, check_test=lambda value: value in str_values)
             option_value = force_unicode(option_value)
             rendered_cb = cb.render(name, option_value)
-            option_label = conditional_escape(force_unicode(option_label))
-            output.append(u'<li><label%s>%s %s</label></li>' % (label_for, rendered_cb, option_label))
-        output.append(u'</ul>')
-        return mark_safe(u'\n'.join(output))
+            option_label = force_unicode(option_label)
+            output.append(format_html('<li><label{0}>{1} {2}</label></li>',
+                                      label_for, rendered_cb, option_label))
+        output.append('</ul>')
+        return mark_safe('\n'.join(output))
 
     def id_for_label(self, id_):
         # See the comment for RadioSelect.id_for_label()
@@ -832,7 +837,7 @@ class MultiWidget(Widget):
 
     def _has_changed(self, initial, data):
         if initial is None:
-            initial = [u'' for x in range(0, len(data))]
+            initial = ['' for x in range(0, len(data))]
         else:
             if not isinstance(initial, list):
                 initial = self.decompress(initial)
@@ -849,7 +854,7 @@ class MultiWidget(Widget):
         This hook allows you to format the HTML design of the widgets, if
         needed.
         """
-        return u''.join(rendered_widgets)
+        return ''.join(rendered_widgets)
 
     def decompress(self, value):
         """

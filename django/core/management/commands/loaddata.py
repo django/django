@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import sys
 import os
 import gzip
@@ -7,11 +9,12 @@ import traceback
 
 from django.conf import settings
 from django.core import serializers
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 from django.core.management.color import no_style
 from django.db import (connections, router, transaction, DEFAULT_DB_ALIAS,
       IntegrityError, DatabaseError)
 from django.db.models import get_apps
+from django.utils.encoding import force_unicode
 from itertools import product
 
 try:
@@ -34,13 +37,12 @@ class Command(BaseCommand):
         using = options.get('database')
 
         connection = connections[using]
-        self.style = no_style()
 
         if not len(fixture_labels):
-            self.stderr.write(
-                self.style.ERROR("No database fixture specified. Please provide the path of at least one fixture in the command line.\n")
+            raise CommandError(
+                "No database fixture specified. Please provide the path of at "
+                "least one fixture in the command line."
             )
-            return
 
         verbosity = int(options.get('verbosity'))
         show_traceback = options.get('traceback')
@@ -124,15 +126,11 @@ class Command(BaseCommand):
 
                     if formats:
                         if verbosity >= 2:
-                            self.stdout.write("Loading '%s' fixtures...\n" % fixture_name)
+                            self.stdout.write("Loading '%s' fixtures..." % fixture_name)
                     else:
-                        self.stderr.write(
-                            self.style.ERROR("Problem installing fixture '%s': %s is not a known serialization format.\n" %
-                                (fixture_name, format)))
-                        if commit:
-                            transaction.rollback(using=using)
-                            transaction.leave_transaction_management(using=using)
-                        return
+                        raise CommandError(
+                            "Problem installing fixture '%s': %s is not a known serialization format." %
+                                (fixture_name, format))
 
                     if os.path.isabs(fixture_name):
                         fixture_dirs = [fixture_name]
@@ -141,7 +139,7 @@ class Command(BaseCommand):
 
                     for fixture_dir in fixture_dirs:
                         if verbosity >= 2:
-                            self.stdout.write("Checking %s for fixtures...\n" % humanize(fixture_dir))
+                            self.stdout.write("Checking %s for fixtures..." % humanize(fixture_dir))
 
                         label_found = False
                         for combo in product([using, None], formats, compression_formats):
@@ -154,7 +152,7 @@ class Command(BaseCommand):
                             )
 
                             if verbosity >= 3:
-                                self.stdout.write("Trying %s for %s fixture '%s'...\n" % \
+                                self.stdout.write("Trying %s for %s fixture '%s'..." % \
                                     (humanize(fixture_dir), file_name, fixture_name))
                             full_path = os.path.join(fixture_dir, file_name)
                             open_method = compression_types[compression_format]
@@ -162,23 +160,19 @@ class Command(BaseCommand):
                                 fixture = open_method(full_path, 'r')
                             except IOError:
                                 if verbosity >= 2:
-                                    self.stdout.write("No %s fixture '%s' in %s.\n" % \
+                                    self.stdout.write("No %s fixture '%s' in %s." % \
                                         (format, fixture_name, humanize(fixture_dir)))
                             else:
                                 try:
                                     if label_found:
-                                        self.stderr.write(self.style.ERROR("Multiple fixtures named '%s' in %s. Aborting.\n" %
-                                            (fixture_name, humanize(fixture_dir))))
-                                        if commit:
-                                            transaction.rollback(using=using)
-                                            transaction.leave_transaction_management(using=using)
-                                        return
+                                        raise CommandError("Multiple fixtures named '%s' in %s. Aborting." %
+                                            (fixture_name, humanize(fixture_dir)))
 
                                     fixture_count += 1
                                     objects_in_fixture = 0
                                     loaded_objects_in_fixture = 0
                                     if verbosity >= 2:
-                                        self.stdout.write("Installing %s fixture '%s' from %s.\n" % \
+                                        self.stdout.write("Installing %s fixture '%s' from %s." % \
                                             (format, fixture_name, humanize(fixture_dir)))
 
                                     objects = serializers.deserialize(format, fixture, using=using)
@@ -191,13 +185,13 @@ class Command(BaseCommand):
                                             try:
                                                 obj.save(using=using)
                                             except (DatabaseError, IntegrityError) as e:
-                                                msg = "Could not load %(app_label)s.%(object_name)s(pk=%(pk)s): %(error_msg)s" % {
+                                                e.args = ("Could not load %(app_label)s.%(object_name)s(pk=%(pk)s): %(error_msg)s" % {
                                                         'app_label': obj.object._meta.app_label,
                                                         'object_name': obj.object._meta.object_name,
                                                         'pk': obj.object.pk,
-                                                        'error_msg': e
-                                                    }
-                                                raise e.__class__, e.__class__(msg), sys.exc_info()[2]
+                                                        'error_msg': force_unicode(e)
+                                                    },)
+                                                raise
 
                                     loaded_object_count += loaded_objects_in_fixture
                                     fixture_object_count += objects_in_fixture
@@ -208,13 +202,9 @@ class Command(BaseCommand):
                                 # If the fixture we loaded contains 0 objects, assume that an
                                 # error was encountered during fixture loading.
                                 if objects_in_fixture == 0:
-                                    self.stderr.write(
-                                        self.style.ERROR("No fixture data found for '%s'. (File format may be invalid.)\n" %
-                                            (fixture_name)))
-                                    if commit:
-                                        transaction.rollback(using=using)
-                                        transaction.leave_transaction_management(using=using)
-                                    return
+                                    raise CommandError(
+                                        "No fixture data found for '%s'. (File format may be invalid.)" %
+                                            (fixture_name))
 
             # Since we disabled constraint checks, we must manually check for
             # any invalid keys that might have been added
@@ -223,24 +213,18 @@ class Command(BaseCommand):
 
         except (SystemExit, KeyboardInterrupt):
             raise
-        except Exception:
+        except Exception as e:
             if commit:
                 transaction.rollback(using=using)
                 transaction.leave_transaction_management(using=using)
-            if show_traceback:
-                traceback.print_exc()
-            else:
-                self.stderr.write(
-                    self.style.ERROR("Problem installing fixture '%s': %s\n" %
-                         (full_path, ''.join(traceback.format_exception(sys.exc_type,
-                             sys.exc_value, sys.exc_traceback)))))
-            return
-
+            if not isinstance(e, CommandError):
+                e.args = ("Problem installing fixture '%s': %s" % (full_path, e),)
+            raise
 
         # If we found even one object in a fixture, we need to reset the
         # database sequences.
         if loaded_object_count > 0:
-            sequence_sql = connection.ops.sequence_reset_sql(self.style, models)
+            sequence_sql = connection.ops.sequence_reset_sql(no_style(), models)
             if sequence_sql:
                 if verbosity >= 2:
                     self.stdout.write("Resetting sequences\n")
@@ -253,10 +237,10 @@ class Command(BaseCommand):
 
         if verbosity >= 1:
             if fixture_object_count == loaded_object_count:
-                self.stdout.write("Installed %d object(s) from %d fixture(s)\n" % (
+                self.stdout.write("Installed %d object(s) from %d fixture(s)" % (
                     loaded_object_count, fixture_count))
             else:
-                self.stdout.write("Installed %d object(s) (of %d) from %d fixture(s)\n" % (
+                self.stdout.write("Installed %d object(s) (of %d) from %d fixture(s)" % (
                     loaded_object_count, fixture_object_count, fixture_count))
 
         # Close the DB connection. This is required as a workaround for an

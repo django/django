@@ -1,6 +1,10 @@
+from __future__ import unicode_literals
+
 import hashlib
 
+from django.dispatch import receiver
 from django.conf import settings
+from django.test.signals import setting_changed
 from django.utils import importlib
 from django.utils.datastructures import SortedDict
 from django.utils.encoding import smart_str
@@ -13,6 +17,13 @@ from django.utils.translation import ugettext_noop as _
 UNUSABLE_PASSWORD = '!'  # This will never be a valid encoded hash
 HASHERS = None  # lazily loaded from PASSWORD_HASHERS
 PREFERRED_HASHER = None  # defaults to first item in PASSWORD_HASHERS
+
+@receiver(setting_changed)
+def reset_hashers(**kwargs):
+    if kwargs['setting'] == 'PASSWORD_HASHERS':
+        global HASHERS, PREFERRED_HASHER
+        HASHERS = None
+        PREFERRED_HASHER = None
 
 
 def is_password_usable(encoded):
@@ -31,20 +42,12 @@ def check_password(password, encoded, setter=None, preferred='default'):
         return False
 
     preferred = get_hasher(preferred)
-    raw_password = password
-    password = smart_str(password)
-    encoded = smart_str(encoded)
-
-    if len(encoded) == 32 and '$' not in encoded:
-        hasher = get_hasher('unsalted_md5')
-    else:
-        algorithm = encoded.split('$', 1)[0]
-        hasher = get_hasher(algorithm)
+    hasher = identify_hasher(encoded)
 
     must_update = hasher.algorithm != preferred.algorithm
     is_correct = hasher.verify(password, encoded)
     if setter and is_correct and must_update:
-        setter(raw_password)
+        setter(password)
     return is_correct
 
 
@@ -60,11 +63,9 @@ def make_password(password, salt=None, hasher='default'):
         return UNUSABLE_PASSWORD
 
     hasher = get_hasher(hasher)
-    password = smart_str(password)
 
     if not salt:
         salt = hasher.salt()
-    salt = smart_str(salt)
 
     return hasher.encode(password, salt)
 
@@ -114,6 +115,21 @@ def get_hasher(algorithm='default'):
                              "Did you specify it in the PASSWORD_HASHERS "
                              "setting?" % algorithm)
         return HASHERS[algorithm]
+
+
+def identify_hasher(encoded):
+    """
+    Returns an instance of a loaded password hasher.
+
+    Identifies hasher algorithm by examining encoded hash, and calls
+    get_hasher() to return hasher. Raises ValueError if
+    algorithm cannot be identified, or if hasher is not loaded.
+    """
+    if len(encoded) == 32 and '$' not in encoded:
+        algorithm = 'unsalted_md5'
+    else:
+        algorithm = encoded.split('$', 1)[0]
+    return get_hasher(algorithm)
 
 
 def mask_hash(hash, show=6, char="*"):
@@ -282,7 +298,7 @@ class SHA1PasswordHasher(BasePasswordHasher):
     def encode(self, password, salt):
         assert password
         assert salt and '$' not in salt
-        hash = hashlib.sha1(salt + password).hexdigest()
+        hash = hashlib.sha1(smart_str(salt + password)).hexdigest()
         return "%s$%s$%s" % (self.algorithm, salt, hash)
 
     def verify(self, password, encoded):
@@ -310,7 +326,7 @@ class MD5PasswordHasher(BasePasswordHasher):
     def encode(self, password, salt):
         assert password
         assert salt and '$' not in salt
-        hash = hashlib.md5(salt + password).hexdigest()
+        hash = hashlib.md5(smart_str(salt + password)).hexdigest()
         return "%s$%s$%s" % (self.algorithm, salt, hash)
 
     def verify(self, password, encoded):
@@ -344,7 +360,7 @@ class UnsaltedMD5PasswordHasher(BasePasswordHasher):
         return ''
 
     def encode(self, password, salt):
-        return hashlib.md5(password).hexdigest()
+        return hashlib.md5(smart_str(password)).hexdigest()
 
     def verify(self, password, encoded):
         encoded_2 = self.encode(password, '')

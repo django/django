@@ -9,10 +9,9 @@ Cookbook, licensed under the Python Software License.
 Example Usage::
 
     >>> from django.core.files import locks
-    >>> f = open('./file', 'wb')
-    >>> locks.lock(f, locks.LOCK_EX)
-    >>> f.write('Django')
-    >>> f.close()
+    >>> with open('./file', 'wb') as f:
+    ...     locks.lock(f, locks.LOCK_EX)
+    ...     f.write('Django')
 """
 
 __all__ = ('LOCK_EX','LOCK_SH','LOCK_NB','lock','unlock')

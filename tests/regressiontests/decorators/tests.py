@@ -5,7 +5,6 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from django.http import HttpResponse, HttpRequest, HttpResponseNotAllowed
 from django.middleware.clickjacking import XFrameOptionsMiddleware
-from django.test.utils import get_warnings_state, restore_warnings_state
 from django.utils.decorators import method_decorator
 from django.utils.functional import allow_lazy, lazy, memoize
 from django.utils.unittest import TestCase
@@ -68,14 +67,6 @@ fully_decorated = full_decorator(fully_decorated)
 
 class DecoratorsTest(TestCase):
 
-    def setUp(self):
-        self.warning_state = get_warnings_state()
-        warnings.filterwarnings('ignore', category=PendingDeprecationWarning,
-                                module='django.views.decorators.cache')
-
-    def tearDown(self):
-        restore_warnings_state(self.warning_state)
-
     def test_attributes(self):
         """
         Tests that django decorators set certain attributes of the wrapped
@@ -131,14 +122,15 @@ class DecoratorsTest(TestCase):
         """
         def my_view(request):
             return "response"
-        my_view_cached = cache_page(my_view, 123)
-        self.assertEqual(my_view_cached(HttpRequest()), "response")
-        my_view_cached2 = cache_page(my_view, 123, key_prefix="test")
-        self.assertEqual(my_view_cached2(HttpRequest()), "response")
-        my_view_cached3 = cache_page(my_view)
-        self.assertEqual(my_view_cached3(HttpRequest()), "response")
-        my_view_cached4 = cache_page()(my_view)
-        self.assertEqual(my_view_cached4(HttpRequest()), "response")
+        with warnings.catch_warnings(record=True):
+            my_view_cached = cache_page(my_view, 123)
+            self.assertEqual(my_view_cached(HttpRequest()), "response")
+            my_view_cached2 = cache_page(my_view, 123, key_prefix="test")
+            self.assertEqual(my_view_cached2(HttpRequest()), "response")
+            my_view_cached3 = cache_page(my_view)
+            self.assertEqual(my_view_cached3(HttpRequest()), "response")
+            my_view_cached4 = cache_page()(my_view)
+            self.assertEqual(my_view_cached4(HttpRequest()), "response")
 
     def test_require_safe_accepts_only_safe_methods(self):
         """
@@ -228,7 +220,7 @@ class MethodDecoratorTests(TestCase):
         self.assertEqual(getattr(Test.method, 'myattr2', False), True)
 
         self.assertEqual(Test.method.__doc__, 'A method')
-        self.assertEqual(Test.method.im_func.__name__, 'method')
+        self.assertEqual(Test.method.__func__.__name__, 'method')
 
 
 class XFrameOptionsDecoratorsTests(TestCase):

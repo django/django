@@ -52,6 +52,7 @@ class BasicTestCase(TestCase):
     def test_anonymous_user(self):
         "Check the properties of the anonymous user"
         a = AnonymousUser()
+        self.assertEqual(a.pk, None)
         self.assertFalse(a.is_authenticated())
         self.assertFalse(a.is_staff)
         self.assertFalse(a.is_active)

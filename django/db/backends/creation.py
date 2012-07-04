@@ -264,9 +264,6 @@ class BaseDatabaseCreation(object):
         self.connection.close()
         self.connection.settings_dict["NAME"] = test_database_name
 
-        # Confirm the feature set of the test database
-        self.connection.features.confirm()
-
         # Report syncdb messages at one level lower than that requested.
         # This ensures we don't get flooded with messages during testing
         # (unless you really ask to be flooded)

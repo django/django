@@ -122,22 +122,19 @@ transferred between client and server, and in some cases -- **active** network
 attackers -- to alter data that is sent in either direction.
 
 If you want the protection that HTTPS provides, and have enabled it on your
-server, there are some additional steps to consider to ensure that sensitive
-information is not leaked:
+server, there are some additional steps you may need:
+
+* If necessary, set :setting:`SECURE_PROXY_SSL_HEADER`, ensuring that you have
+  understood the warnings there thoroughly. Failure to do this can result
+  in CSRF vulnerabilities, and failure to do it correctly can also be
+  dangerous!
 
 * Set up redirection so that requests over HTTP are redirected to HTTPS.
 
-  It is possible to do this with a piece of Django middleware. However, this has
-  problems for the common case of a Django app running behind a reverse
-  proxy. Often, reverse proxies are configured to set the ``X-Forwarded-SSL``
-  header (or equivalent) if the incoming connection was HTTPS, and the absence
-  of this header could be used to detect a request that was not HTTPS. However,
-  this method usually cannot be relied on, as a client, or a malicious active
-  network attacker, could also set this header.
-
-  So, for the case of a reverse proxy, it is recommended that the main Web
-  server should be configured to do the redirect to HTTPS, or configured to send
-  HTTP requests to an app that unconditionally redirects to HTTPS.
+  This could be done using a custom middleware. Please note the caveats under
+  :setting:`SECURE_PROXY_SSL_HEADER`. For the case of a reverse proxy, it may be
+  easier or more secure to configure the main Web server to do the redirect to
+  HTTPS.
 
 * Use 'secure' cookies.
 

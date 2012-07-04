@@ -348,6 +348,15 @@ CachedStaticFilesStorage
     :setting:`CACHES` setting named ``'staticfiles'``. It falls back to using
     the ``'default'`` cache backend.
 
+    .. method:: file_hash(name, content=None)
+
+    .. versionadded:: 1.5
+
+    The method that is used when creating the hashed name of a file.
+    Needs to return a hash for the given file name and content.
+    By default it calculates a MD5 hash from the content's chunks as
+    mentioned above.
+
 .. _`far future Expires headers`: http://developer.yahoo.com/performance/rules.html#expires
 .. _`@import`: http://www.w3.org/TR/CSS2/cascade.html#at-import
 .. _`url()`: http://www.w3.org/TR/CSS2/syndata.html#uri
@@ -371,10 +380,10 @@ full URL for the given relative path, e.g.:
 .. code-block:: html+django
 
     {% load static from staticfiles %}
-    <img src="{% static "css/base.css" %}" />
+    <img src="{% static "images/hi.jpg" %}" alt="Hi!" />
 
 The previous example is equal to calling the ``url`` method of an instance of
-:setting:`STATICFILES_STORAGE` with ``"css/base.css"``. This is especially
+:setting:`STATICFILES_STORAGE` with ``"images/hi.jpg"``. This is especially
 useful when using a non-local storage backend to deploy files as documented
 in :ref:`staticfiles-from-cdn`.
 

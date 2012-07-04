@@ -16,7 +16,6 @@ from os import path
 import django
 from django.template import Template, Context
 from django.utils import archive
-from django.utils.encoding import smart_str
 from django.utils._os import rmtree_errorhandler
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.commands.makemessages import handle_extensions
@@ -166,11 +165,10 @@ class TemplateCommand(BaseCommand):
                     shutil.copymode(old_path, new_path)
                     self.make_writeable(new_path)
                 except OSError:
-                    notice = self.style.NOTICE(
+                    self.stderr.write(
                         "Notice: Couldn't set permission bits on %s. You're "
                         "probably using an uncommon filesystem setup. No "
-                        "problem.\n" % new_path)
-                    sys.stderr.write(smart_str(notice))
+                        "problem." % new_path, self.style.NOTICE)
 
         if self.paths_to_remove:
             if self.verbosity >= 2:

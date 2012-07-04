@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 from django.db import transaction, IntegrityError
 from django.test import TestCase, skipIfDBFeature
@@ -140,7 +140,7 @@ class CustomPKTests(TestCase):
 
     def test_unicode_pk(self):
         # Primary key may be unicode string
-        bus = Business.objects.create(name=u'jaźń')
+        bus = Business.objects.create(name='jaźń')
 
     def test_unique_pk(self):
         # The primary key must also obviously be unique, so trying to create a

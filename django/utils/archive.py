@@ -1,7 +1,7 @@
 """
 Based on "python-archive" -- http://pypi.python.org/pypi/python-archive/
 
-Copyright (c) 2010 Gary Wilson Jr. <gary.wilson@gmail.com> and contributers.
+Copyright (c) 2010 Gary Wilson Jr. <gary.wilson@gmail.com> and contributors.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

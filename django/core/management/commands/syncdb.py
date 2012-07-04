@@ -2,6 +2,7 @@ from optparse import make_option
 import traceback
 
 from django.conf import settings
+from django.core.management import call_command
 from django.core.management.base import NoArgsCommand
 from django.core.management.color import no_style
 from django.core.management.sql import custom_sql_for_model, emit_post_sync_signal
@@ -14,6 +15,8 @@ class Command(NoArgsCommand):
     option_list = NoArgsCommand.option_list + (
         make_option('--noinput', action='store_false', dest='interactive', default=True,
             help='Tells Django to NOT prompt the user for input of any kind.'),
+        make_option('--no-initial-data', action='store_false', dest='load_initial_data', default=True,
+            help='Tells Django not to load any initial data after database synchronization.'),
         make_option('--database', action='store', dest='database',
             default=DEFAULT_DB_ALIAS, help='Nominates a database to synchronize. '
                 'Defaults to the "default" database.'),
@@ -25,10 +28,7 @@ class Command(NoArgsCommand):
         verbosity = int(options.get('verbosity'))
         interactive = options.get('interactive')
         show_traceback = options.get('traceback')
-
-        # Stealth option -- 'load_initial_data' is used by the testing setup
-        # process to disable initial fixture loading.
-        load_initial_data = options.get('load_initial_data', True)
+        load_initial_data = options.get('load_initial_data')
 
         self.style = no_style()
 
@@ -159,6 +159,5 @@ class Command(NoArgsCommand):
 
         # Load initial_data fixtures (unless that has been disabled)
         if load_initial_data:
-            from django.core.management import call_command
             call_command('loaddata', 'initial_data', verbosity=verbosity,
                          database=db, skip_validation=True)

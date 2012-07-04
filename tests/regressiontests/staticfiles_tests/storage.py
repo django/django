@@ -1,5 +1,6 @@
 from datetime import datetime
 from django.core.files import storage
+from django.contrib.staticfiles.storage import CachedStaticFilesStorage
 
 class DummyStorage(storage.Storage):
     """
@@ -17,3 +18,9 @@ class DummyStorage(storage.Storage):
 
     def modified_time(self, name):
         return datetime.date(1970, 1, 1)
+
+
+class SimpleCachedStaticFilesStorage(CachedStaticFilesStorage):
+
+    def file_hash(self, name, content=None):
+        return 'deploy12345'

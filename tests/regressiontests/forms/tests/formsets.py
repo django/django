@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 from django.forms import Form, CharField, IntegerField, ValidationError, DateField
 from django.forms.formsets import formset_factory, BaseFormSet
 from django.test import TestCase
@@ -71,7 +73,7 @@ class FormsFormsetTestCase(TestCase):
 
         formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
         self.assertTrue(formset.is_valid())
-        self.assertEqual([form.cleaned_data for form in formset.forms], [{'votes': 100, 'choice': u'Calexico'}])
+        self.assertEqual([form.cleaned_data for form in formset.forms], [{'votes': 100, 'choice': 'Calexico'}])
 
         # If a FormSet was not passed any data, its is_valid and has_changed
         # methods should return False.
@@ -93,7 +95,7 @@ class FormsFormsetTestCase(TestCase):
 
         formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
         self.assertFalse(formset.is_valid())
-        self.assertEqual(formset.errors, [{'votes': [u'This field is required.']}])
+        self.assertEqual(formset.errors, [{'votes': ['This field is required.']}])
 
     def test_formset_has_changed(self):
         # FormSet instances has_changed method will be True if any data is
@@ -125,7 +127,7 @@ class FormsFormsetTestCase(TestCase):
         # argument to the constructor. ``initial`` should be a list of dicts. By default,
         # an extra blank form is included.
 
-        initial = [{'choice': u'Calexico', 'votes': 100}]
+        initial = [{'choice': 'Calexico', 'votes': 100}]
         formset = ChoiceFormSet(initial=initial, auto_id=False, prefix='choices')
         form_output = []
 
@@ -151,7 +153,7 @@ class FormsFormsetTestCase(TestCase):
 
         formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
         self.assertTrue(formset.is_valid())
-        self.assertEqual([form.cleaned_data for form in formset.forms], [{'votes': 100, 'choice': u'Calexico'}, {}])
+        self.assertEqual([form.cleaned_data for form in formset.forms], [{'votes': 100, 'choice': 'Calexico'}, {}])
 
     def test_second_form_partially_filled(self):
         # But the second form was blank! Shouldn't we get some errors? No. If we display
@@ -172,7 +174,7 @@ class FormsFormsetTestCase(TestCase):
 
         formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
         self.assertFalse(formset.is_valid())
-        self.assertEqual(formset.errors, [{}, {'votes': [u'This field is required.']}])
+        self.assertEqual(formset.errors, [{}, {'votes': ['This field is required.']}])
 
     def test_delete_prefilled_data(self):
         # If we delete data that was pre-filled, we should get an error. Simply removing
@@ -191,7 +193,7 @@ class FormsFormsetTestCase(TestCase):
 
         formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
         self.assertFalse(formset.is_valid())
-        self.assertEqual(formset.errors, [{'votes': [u'This field is required.'], 'choice': [u'This field is required.']}, {}])
+        self.assertEqual(formset.errors, [{'votes': ['This field is required.'], 'choice': ['This field is required.']}, {}])
 
     def test_displaying_more_than_one_blank_form(self):
         # Displaying more than 1 blank form ###########################################
@@ -250,7 +252,7 @@ class FormsFormsetTestCase(TestCase):
         ChoiceFormSet = formset_factory(Choice, extra=3)
         formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
         self.assertTrue(formset.is_valid())
-        self.assertEqual([form.cleaned_data for form in formset.forms], [{'votes': 100, 'choice': u'Calexico'}, {}, {}])
+        self.assertEqual([form.cleaned_data for form in formset.forms], [{'votes': 100, 'choice': 'Calexico'}, {}, {}])
 
     def test_second_form_partially_filled_2(self):
         # And once again, if we try to partially complete a form, validation will fail.
@@ -270,7 +272,7 @@ class FormsFormsetTestCase(TestCase):
         ChoiceFormSet = formset_factory(Choice, extra=3)
         formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
         self.assertFalse(formset.is_valid())
-        self.assertEqual(formset.errors, [{}, {'votes': [u'This field is required.']}, {}])
+        self.assertEqual(formset.errors, [{}, {'votes': ['This field is required.']}, {}])
 
     def test_more_initial_data(self):
         # The extra argument also works when the formset is pre-filled with initial
@@ -288,7 +290,7 @@ class FormsFormsetTestCase(TestCase):
             'choices-2-votes': '',
         }
 
-        initial = [{'choice': u'Calexico', 'votes': 100}]
+        initial = [{'choice': 'Calexico', 'votes': 100}]
         ChoiceFormSet = formset_factory(Choice, extra=3)
         formset = ChoiceFormSet(initial=initial, auto_id=False, prefix='choices')
         form_output = []
@@ -319,7 +321,7 @@ class FormsFormsetTestCase(TestCase):
 
         ChoiceFormSet = formset_factory(Choice, can_delete=True)
 
-        initial = [{'choice': u'Calexico', 'votes': 100}, {'choice': u'Fergie', 'votes': 900}]
+        initial = [{'choice': 'Calexico', 'votes': 100}, {'choice': 'Fergie', 'votes': 900}]
         formset = ChoiceFormSet(initial=initial, auto_id=False, prefix='choices')
         form_output = []
 
@@ -356,8 +358,8 @@ class FormsFormsetTestCase(TestCase):
 
         formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
         self.assertTrue(formset.is_valid())
-        self.assertEqual([form.cleaned_data for form in formset.forms], [{'votes': 100, 'DELETE': False, 'choice': u'Calexico'}, {'votes': 900, 'DELETE': True, 'choice': u'Fergie'}, {}])
-        self.assertEqual([form.cleaned_data for form in formset.deleted_forms], [{'votes': 900, 'DELETE': True, 'choice': u'Fergie'}])
+        self.assertEqual([form.cleaned_data for form in formset.forms], [{'votes': 100, 'DELETE': False, 'choice': 'Calexico'}, {'votes': 900, 'DELETE': True, 'choice': 'Fergie'}, {}])
+        self.assertEqual([form.cleaned_data for form in formset.deleted_forms], [{'votes': 900, 'DELETE': True, 'choice': 'Fergie'}])
 
         # If we fill a form with something and then we check the can_delete checkbox for
         # that form, that form's errors should not make the entire formset invalid since
@@ -397,7 +399,7 @@ class FormsFormsetTestCase(TestCase):
             can_delete=True)
 
         p = PeopleForm(
-            {'form-0-name': u'', 'form-0-DELETE': u'on', # no name!
+            {'form-0-name': '', 'form-0-DELETE': 'on', # no name!
              'form-TOTAL_FORMS': 1, 'form-INITIAL_FORMS': 1,
              'form-MAX_NUM_FORMS': 1})
 
@@ -416,7 +418,7 @@ class FormsFormsetTestCase(TestCase):
 
         ChoiceFormSet = formset_factory(Choice, can_order=True)
 
-        initial = [{'choice': u'Calexico', 'votes': 100}, {'choice': u'Fergie', 'votes': 900}]
+        initial = [{'choice': 'Calexico', 'votes': 100}, {'choice': 'Fergie', 'votes': 900}]
         formset = ChoiceFormSet(initial=initial, auto_id=False, prefix='choices')
         form_output = []
 
@@ -456,9 +458,9 @@ class FormsFormsetTestCase(TestCase):
             form_output.append(form.cleaned_data)
 
         self.assertEqual(form_output, [
-            {'votes': 500, 'ORDER': 0, 'choice': u'The Decemberists'},
-            {'votes': 100, 'ORDER': 1, 'choice': u'Calexico'},
-            {'votes': 900, 'ORDER': 2, 'choice': u'Fergie'},
+            {'votes': 500, 'ORDER': 0, 'choice': 'The Decemberists'},
+            {'votes': 100, 'ORDER': 1, 'choice': 'Calexico'},
+            {'votes': 900, 'ORDER': 2, 'choice': 'Fergie'},
         ])
 
     def test_empty_ordered_fields(self):
@@ -492,10 +494,10 @@ class FormsFormsetTestCase(TestCase):
             form_output.append(form.cleaned_data)
 
         self.assertEqual(form_output, [
-            {'votes': 100, 'ORDER': 1, 'choice': u'Calexico'},
-            {'votes': 900, 'ORDER': 2, 'choice': u'Fergie'},
-            {'votes': 500, 'ORDER': None, 'choice': u'The Decemberists'},
-            {'votes': 50, 'ORDER': None, 'choice': u'Basia Bulat'},
+            {'votes': 100, 'ORDER': 1, 'choice': 'Calexico'},
+            {'votes': 900, 'ORDER': 2, 'choice': 'Fergie'},
+            {'votes': 500, 'ORDER': None, 'choice': 'The Decemberists'},
+            {'votes': 50, 'ORDER': None, 'choice': 'Basia Bulat'},
         ])
 
     def test_ordering_blank_fieldsets(self):
@@ -524,9 +526,9 @@ class FormsFormsetTestCase(TestCase):
         ChoiceFormSet = formset_factory(Choice, can_order=True, can_delete=True)
 
         initial = [
-            {'choice': u'Calexico', 'votes': 100},
-            {'choice': u'Fergie', 'votes': 900},
-            {'choice': u'The Decemberists', 'votes': 500},
+            {'choice': 'Calexico', 'votes': 100},
+            {'choice': 'Fergie', 'votes': 900},
+            {'choice': 'The Decemberists', 'votes': 500},
         ]
         formset = ChoiceFormSet(initial=initial, auto_id=False, prefix='choices')
         form_output = []
@@ -583,10 +585,10 @@ class FormsFormsetTestCase(TestCase):
             form_output.append(form.cleaned_data)
 
         self.assertEqual(form_output, [
-            {'votes': 500, 'DELETE': False, 'ORDER': 0, 'choice': u'The Decemberists'},
-            {'votes': 100, 'DELETE': False, 'ORDER': 1, 'choice': u'Calexico'},
+            {'votes': 500, 'DELETE': False, 'ORDER': 0, 'choice': 'The Decemberists'},
+            {'votes': 100, 'DELETE': False, 'ORDER': 1, 'choice': 'Calexico'},
         ])
-        self.assertEqual([form.cleaned_data for form in formset.deleted_forms], [{'votes': 900, 'DELETE': True, 'ORDER': 2, 'choice': u'Fergie'}])
+        self.assertEqual([form.cleaned_data for form in formset.deleted_forms], [{'votes': 900, 'DELETE': True, 'ORDER': 2, 'choice': 'Fergie'}])
 
     def test_invalid_deleted_form_with_ordering(self):
         # Should be able to get ordered forms from a valid formset even if a
@@ -598,8 +600,8 @@ class FormsFormsetTestCase(TestCase):
         PeopleForm = formset_factory(form=Person, can_delete=True, can_order=True)
 
         p = PeopleForm({
-            'form-0-name': u'',
-            'form-0-DELETE': u'on', # no name!
+            'form-0-name': '',
+            'form-0-DELETE': 'on', # no name!
             'form-TOTAL_FORMS': 1,
             'form-INITIAL_FORMS': 1,
             'form-MAX_NUM_FORMS': 1
@@ -797,7 +799,7 @@ class FormsFormsetTestCase(TestCase):
 
         formset = FavoriteDrinksFormSet(data, prefix='drinks')
         self.assertFalse(formset.is_valid())
-        self.assertEqual(formset.non_form_errors(), [u'You may only specify a drink once.'])
+        self.assertEqual(formset.non_form_errors(), ['You may only specify a drink once.'])
 
     def test_formset_iteration(self):
         # Regression tests for #16455 -- formset instances are iterable
@@ -892,8 +894,8 @@ class TestIsBoundBehavior(TestCase):
 
     def test_with_management_data_attrs_work_fine(self):
         data = {
-            'form-TOTAL_FORMS': u'1',
-            'form-INITIAL_FORMS': u'0',
+            'form-TOTAL_FORMS': '1',
+            'form-INITIAL_FORMS': '0',
         }
         formset = ArticleFormSet(data)
         self.assertEqual(0, formset.initial_form_count())
@@ -907,23 +909,23 @@ class TestIsBoundBehavior(TestCase):
 
     def test_form_errors_are_cought_by_formset(self):
         data = {
-            'form-TOTAL_FORMS': u'2',
-            'form-INITIAL_FORMS': u'0',
-            'form-0-title': u'Test',
-            'form-0-pub_date': u'1904-06-16',
-            'form-1-title': u'Test',
-            'form-1-pub_date': u'', # <-- this date is missing but required
+            'form-TOTAL_FORMS': '2',
+            'form-INITIAL_FORMS': '0',
+            'form-0-title': 'Test',
+            'form-0-pub_date': '1904-06-16',
+            'form-1-title': 'Test',
+            'form-1-pub_date': '', # <-- this date is missing but required
         }
         formset = ArticleFormSet(data)
         self.assertFalse(formset.is_valid())
-        self.assertEqual([{}, {'pub_date': [u'This field is required.']}], formset.errors)
+        self.assertEqual([{}, {'pub_date': ['This field is required.']}], formset.errors)
 
     def test_empty_forms_are_unbound(self):
         data = {
-            'form-TOTAL_FORMS': u'1',
-            'form-INITIAL_FORMS': u'0',
-            'form-0-title': u'Test',
-            'form-0-pub_date': u'1904-06-16',
+            'form-TOTAL_FORMS': '1',
+            'form-INITIAL_FORMS': '0',
+            'form-0-title': 'Test',
+            'form-0-pub_date': '1904-06-16',
         }
         unbound_formset = ArticleFormSet()
         bound_formset = ArticleFormSet(data)

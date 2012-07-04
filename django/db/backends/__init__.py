@@ -10,6 +10,7 @@ from django.conf import settings
 from django.db import DEFAULT_DB_ALIAS
 from django.db.backends import util
 from django.db.transaction import TransactionManagementError
+from django.utils.functional import cached_property
 from django.utils.importlib import import_module
 from django.utils.timezone import is_aware
 
@@ -108,16 +109,18 @@ class BaseDatabaseWrapper(object):
         over to the surrounding block, as a commit will commit all changes, even
         those from outside. (Commits are on connection level.)
         """
-        self._leave_transaction_management(self.is_managed())
         if self.transaction_state:
             del self.transaction_state[-1]
         else:
-            raise TransactionManagementError("This code isn't under transaction "
-                "management")
+            raise TransactionManagementError(
+                "This code isn't under transaction management")
+        # We will pass the next status (after leaving the previous state
+        # behind) to subclass hook.
+        self._leave_transaction_management(self.is_managed())
         if self._dirty:
             self.rollback()
-            raise TransactionManagementError("Transaction managed block ended with "
-                "pending COMMIT/ROLLBACK")
+            raise TransactionManagementError(
+                "Transaction managed block ended with pending COMMIT/ROLLBACK")
         self._dirty = False
 
     def validate_thread_sharing(self):
@@ -175,6 +178,8 @@ class BaseDatabaseWrapper(object):
         """
         if self.transaction_state:
             return self.transaction_state[-1]
+        # Note that this setting isn't documented, and is only used here, and
+        # in enter_transaction_management()
         return settings.TRANSACTIONS_MANAGED
 
     def managed(self, flag=True):
@@ -399,12 +404,13 @@ class BaseDatabaseFeatures(object):
     # in the SQL standard.
     supports_tablespaces = False
 
-    # Features that need to be confirmed at runtime
-    # Cache whether the confirmation has been performed.
-    _confirmed = False
-    supports_transactions = None
-    supports_stddev = None
-    can_introspect_foreign_keys = None
+    # Does the backend reset sequences between tests?
+    supports_sequence_reset = True
+
+    # Confirm support for introspected foreign keys
+    # Every database can do this reliably, except MySQL,
+    # which can't do it for MyISAM tables
+    can_introspect_foreign_keys = True
 
     # Support for the DISTINCT ON clause
     can_distinct_on_fields = False
@@ -412,41 +418,40 @@ class BaseDatabaseFeatures(object):
     def __init__(self, connection):
         self.connection = connection
 
-    def confirm(self):
-        "Perform manual checks of any database features that might vary between installs"
-        self._confirmed = True
-        self.supports_transactions = self._supports_transactions()
-        self.supports_stddev = self._supports_stddev()
-        self.can_introspect_foreign_keys = self._can_introspect_foreign_keys()
-
-    def _supports_transactions(self):
+    @cached_property
+    def supports_transactions(self):
         "Confirm support for transactions"
-        cursor = self.connection.cursor()
-        cursor.execute('CREATE TABLE ROLLBACK_TEST (X INT)')
-        self.connection._commit()
-        cursor.execute('INSERT INTO ROLLBACK_TEST (X) VALUES (8)')
-        self.connection._rollback()
-        cursor.execute('SELECT COUNT(X) FROM ROLLBACK_TEST')
-        count, = cursor.fetchone()
-        cursor.execute('DROP TABLE ROLLBACK_TEST')
-        self.connection._commit()
+        try:
+            # Make sure to run inside a managed transaction block,
+            # otherwise autocommit will cause the confimation to
+            # fail.
+            self.connection.enter_transaction_management()
+            self.connection.managed(True)
+            cursor = self.connection.cursor()
+            cursor.execute('CREATE TABLE ROLLBACK_TEST (X INT)')
+            self.connection._commit()
+            cursor.execute('INSERT INTO ROLLBACK_TEST (X) VALUES (8)')
+            self.connection._rollback()
+            cursor.execute('SELECT COUNT(X) FROM ROLLBACK_TEST')
+            count, = cursor.fetchone()
+            cursor.execute('DROP TABLE ROLLBACK_TEST')
+            self.connection._commit()
+            self.connection._dirty = False
+        finally:
+            self.connection.leave_transaction_management()
         return count == 0
 
-    def _supports_stddev(self):
+    @cached_property
+    def supports_stddev(self):
         "Confirm support for STDDEV and related stats functions"
         class StdDevPop(object):
             sql_function = 'STDDEV_POP'
 
         try:
             self.connection.ops.check_aggregate_support(StdDevPop())
+            return True
         except NotImplementedError:
-            self.supports_stddev = False
-
-    def _can_introspect_foreign_keys(self):
-        "Confirm support for introspected foreign keys"
-        # Every database can do this reliably, except MySQL,
-        # which can't do it for MyISAM tables
-        return True
+            return False
 
 
 class BaseDatabaseOperations(object):

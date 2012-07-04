@@ -8,11 +8,6 @@ Source: http://www.canada.gc.ca/othergov/prov_e.html
 This exists in this standalone file so that it's only imported into memory 
 when explicitly needed. 
 """ 
-import warnings
-warnings.warn(
-    'There have been recent changes to the CA localflavor. See the release notes for details',
-    RuntimeWarning
-)
 
 PROVINCE_CHOICES = ( 
     ('AB', 'Alberta'), 
@@ -56,6 +51,7 @@ PROVINCES_NORMALIZED = {
     'pei': 'PE',
     'p.e.i.': 'PE',
     'prince edward island': 'PE',
+    'pq' : 'QC',
     'qc': 'QC',
     'quebec': 'QC',
     'sk': 'SK',

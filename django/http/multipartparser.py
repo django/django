@@ -4,6 +4,7 @@ Multi-part parsing for file uploads.
 Exposes one class, ``MultiPartParser``, which feeds chunks of uploaded data to
 file upload handlers for processing.
 """
+from __future__ import unicode_literals
 
 import cgi
 from django.conf import settings
@@ -59,7 +60,7 @@ class MultiPartParser(object):
             raise MultiPartParserError('Invalid Content-Type: %s' % content_type)
 
         # Parse the header to get the boundary to split the parts.
-        ctypes, opts = parse_header(content_type)
+        ctypes, opts = parse_header(content_type.encode('ascii'))
         boundary = opts.get('boundary')
         if not boundary or not cgi.valid_boundary(boundary):
             raise MultiPartParserError('Invalid boundary in multipart: %s' % boundary)
@@ -76,6 +77,8 @@ class MultiPartParser(object):
             # This means we shouldn't continue...raise an error.
             raise MultiPartParserError("Invalid content length: %r" % content_length)
 
+        if isinstance(boundary, unicode):
+            boundary = boundary.encode('ascii')
         self._boundary = boundary
         self._input_data = input_data
 
@@ -268,7 +271,7 @@ class LazyStream(object):
         """
         self._producer = producer
         self._empty = False
-        self._leftover = ''
+        self._leftover = b''
         self.length = length
         self.position = 0
         self._remaining = length
@@ -282,7 +285,7 @@ class LazyStream(object):
             remaining = (size is not None and [size] or [self._remaining])[0]
             # do the whole thing in one shot if no limit was provided.
             if remaining is None:
-                yield ''.join(self)
+                yield b''.join(self)
                 return
 
             # otherwise do some bookkeeping to return exactly enough
@@ -291,14 +294,14 @@ class LazyStream(object):
             while remaining != 0:
                 assert remaining > 0, 'remaining bytes to read should never go negative'
 
-                chunk = self.next()
+                chunk = next(self)
 
                 emitting = chunk[:remaining]
                 self.unget(chunk[remaining:])
                 remaining -= len(emitting)
                 yield emitting
 
-        out = ''.join(parts())
+        out = b''.join(parts())
         return out
 
     def next(self):
@@ -311,9 +314,9 @@ class LazyStream(object):
         """
         if self._leftover:
             output = self._leftover
-            self._leftover = ''
+            self._leftover = b''
         else:
-            output = self._producer.next()
+            output = next(self._producer)
             self._unget_history = []
         self.position += len(output)
         return output
@@ -341,7 +344,7 @@ class LazyStream(object):
             return
         self._update_unget_history(len(bytes))
         self.position -= len(bytes)
-        self._leftover = ''.join([bytes, self._leftover])
+        self._leftover = b''.join([bytes, self._leftover])
 
     def _update_unget_history(self, num_bytes):
         """
@@ -410,7 +413,7 @@ class BoundaryIter(object):
     before the boundary, throw away the boundary bytes themselves, and push the
     post-boundary bytes back on the stream.
 
-    The future calls to .next() after locating the boundary will raise a
+    The future calls to next() after locating the boundary will raise a
     StopIteration exception.
     """
 
@@ -459,7 +462,7 @@ class BoundaryIter(object):
         if not chunks:
             raise StopIteration()
 
-        chunk = ''.join(chunks)
+        chunk = b''.join(chunks)
         boundary = self._find_boundary(chunk, len(chunk) < self._rollback)
 
         if boundary:
@@ -495,9 +498,9 @@ class BoundaryIter(object):
             end = index
             next = index + len(self._boundary)
             # backup over CRLF
-            if data[max(0,end-1)] == '\n':
+            if data[max(0,end-1)] == b'\n':
                 end -= 1
-            if data[max(0,end-1)] == '\r':
+            if data[max(0,end-1)] == b'\r':
                 end -= 1
             return end, next
 
@@ -531,7 +534,7 @@ def parse_boundary_stream(stream, max_header_size):
     # 'find' returns the top of these four bytes, so we'll
     # need to munch them later to prevent them from polluting
     # the payload.
-    header_end = chunk.find('\r\n\r\n')
+    header_end = chunk.find(b'\r\n\r\n')
 
     def _parse_header(line):
         main_value_pair, params = parse_header(line)
@@ -557,7 +560,7 @@ def parse_boundary_stream(stream, max_header_size):
     outdict = {}
 
     # Eliminate blank lines
-    for line in header.split('\r\n'):
+    for line in header.split(b'\r\n'):
         # This terminology ("main value" and "dictionary of
         # parameters") is from the Python docs.
         try:
@@ -580,7 +583,7 @@ def parse_boundary_stream(stream, max_header_size):
 class Parser(object):
     def __init__(self, stream, boundary):
         self._stream = stream
-        self._separator = '--' + boundary
+        self._separator = b'--' + boundary
 
     def __iter__(self):
         boundarystream = InterBoundaryIter(self._stream, self._separator)
@@ -589,28 +592,31 @@ class Parser(object):
             yield parse_boundary_stream(sub_stream, 1024)
 
 def parse_header(line):
-    """ Parse the header into a key-value. """
-    plist = _parse_header_params(';' + line)
-    key = plist.pop(0).lower()
+    """ Parse the header into a key-value.
+        Input (line): bytes, output: unicode for key/name, bytes for value which
+        will be decoded later
+    """
+    plist = _parse_header_params(b';' + line)
+    key = plist.pop(0).lower().decode('ascii')
     pdict = {}
     for p in plist:
-        i = p.find('=')
+        i = p.find(b'=')
         if i >= 0:
-            name = p[:i].strip().lower()
+            name = p[:i].strip().lower().decode('ascii')
             value = p[i+1:].strip()
-            if len(value) >= 2 and value[0] == value[-1] == '"':
+            if len(value) >= 2 and value[0] == value[-1] == b'"':
                 value = value[1:-1]
-                value = value.replace('\\\\', '\\').replace('\\"', '"')
+                value = value.replace(b'\\\\', b'\\').replace(b'\\"', b'"')
             pdict[name] = value
     return key, pdict
 
 def _parse_header_params(s):
     plist = []
-    while s[:1] == ';':
+    while s[:1] == b';':
         s = s[1:]
-        end = s.find(';')
-        while end > 0 and s.count('"', 0, end) % 2:
-            end = s.find(';', end + 1)
+        end = s.find(b';')
+        while end > 0 and s.count(b'"', 0, end) % 2:
+            end = s.find(b';', end + 1)
         if end < 0:
             end = len(s)
         f = s[:end]

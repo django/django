@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import urllib
 
 from django.db import models
@@ -8,6 +10,13 @@ from django.http import HttpRequest, Http404
 from django.test import TestCase
 from django.utils.encoding import smart_str
 
+
+class ConcreteModel(models.Model):
+    name = models.CharField(max_length=10)
+
+class ProxyModel(ConcreteModel):
+    class Meta:
+        proxy = True
 
 class FooWithoutUrl(models.Model):
     """
@@ -112,6 +121,87 @@ class ContentTypesTests(TestCase):
             FooWithUrl: ContentType.objects.get_for_model(FooWithUrl),
         })
 
+    def test_get_for_concrete_model(self):
+        """
+        Make sure the `for_concrete_model` kwarg correctly works
+        with concrete, proxy and deferred models
+        """
+        concrete_model_ct = ContentType.objects.get_for_model(ConcreteModel)
+
+        self.assertEqual(concrete_model_ct,
+            ContentType.objects.get_for_model(ProxyModel))
+
+        self.assertEqual(concrete_model_ct,
+            ContentType.objects.get_for_model(ConcreteModel,
+                                              for_concrete_model=False))
+
+        proxy_model_ct = ContentType.objects.get_for_model(ProxyModel,
+                                                           for_concrete_model=False)
+
+        self.assertNotEqual(concrete_model_ct, proxy_model_ct)
+
+        # Make sure deferred model are correctly handled
+        ConcreteModel.objects.create(name="Concrete")
+        DeferredConcreteModel = ConcreteModel.objects.only('pk').get().__class__
+        DeferredProxyModel = ProxyModel.objects.only('pk').get().__class__
+
+        self.assertEqual(concrete_model_ct,
+            ContentType.objects.get_for_model(DeferredConcreteModel))
+
+        self.assertEqual(concrete_model_ct,
+            ContentType.objects.get_for_model(DeferredConcreteModel,
+                                              for_concrete_model=False))
+
+        self.assertEqual(concrete_model_ct,
+            ContentType.objects.get_for_model(DeferredProxyModel))
+
+        self.assertEqual(proxy_model_ct,
+            ContentType.objects.get_for_model(DeferredProxyModel,
+                                              for_concrete_model=False))
+
+    def test_get_for_concrete_models(self):
+        """
+        Make sure the `for_concrete_models` kwarg correctly works
+        with concrete, proxy and deferred models.
+        """
+        concrete_model_ct = ContentType.objects.get_for_model(ConcreteModel)
+
+        cts = ContentType.objects.get_for_models(ConcreteModel, ProxyModel)
+        self.assertEqual(cts, {
+            ConcreteModel: concrete_model_ct,
+            ProxyModel: concrete_model_ct,
+        })
+
+        proxy_model_ct = ContentType.objects.get_for_model(ProxyModel,
+                                                           for_concrete_model=False)
+        cts = ContentType.objects.get_for_models(ConcreteModel, ProxyModel,
+                                                 for_concrete_models=False)
+        self.assertEqual(cts, {
+            ConcreteModel: concrete_model_ct,
+            ProxyModel: proxy_model_ct,
+        })
+
+        # Make sure deferred model are correctly handled
+        ConcreteModel.objects.create(name="Concrete")
+        DeferredConcreteModel = ConcreteModel.objects.only('pk').get().__class__
+        DeferredProxyModel = ProxyModel.objects.only('pk').get().__class__
+
+        cts = ContentType.objects.get_for_models(DeferredConcreteModel,
+                                                 DeferredProxyModel)
+        self.assertEqual(cts, {
+            DeferredConcreteModel: concrete_model_ct,
+            DeferredProxyModel: concrete_model_ct,
+        })
+
+        cts = ContentType.objects.get_for_models(DeferredConcreteModel,
+                                                 DeferredProxyModel,
+                                                 for_concrete_models=False)
+        self.assertEqual(cts, {
+            DeferredConcreteModel: concrete_model_ct,
+            DeferredProxyModel: proxy_model_ct,
+        })
+
+
     def test_shortcut_view(self):
         """
         Check that the shortcut view (used for the admin "view on site"
@@ -181,4 +271,4 @@ class ContentTypesTests(TestCase):
             app_label = 'contenttypes',
             model = 'OldModel',
         )
-        self.assertEqual(unicode(ct), u'Old model')
+        self.assertEqual(unicode(ct), 'Old model')

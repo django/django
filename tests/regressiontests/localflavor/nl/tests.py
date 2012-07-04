@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django.contrib.localflavor.nl.forms import (NLPhoneNumberField,
     NLZipCodeField, NLSoFiNumberField, NLProvinceSelect)
 
@@ -7,7 +9,7 @@ from django.test import SimpleTestCase
 class NLLocalFlavorTests(SimpleTestCase):
     def test_NLProvinceSelect(self):
         f = NLProvinceSelect()
-        out = u'''<select name="provinces">
+        out = '''<select name="provinces">
 <option value="DR">Drenthe</option>
 <option value="FL">Flevoland</option>
 <option value="FR">Friesland</option>
@@ -24,7 +26,7 @@ class NLLocalFlavorTests(SimpleTestCase):
         self.assertHTMLEqual(f.render('provinces', 'OV'), out)
 
     def test_NLPhoneNumberField(self):
-        error_invalid = [u'Enter a valid phone number']
+        error_invalid = ['Enter a valid phone number']
         valid = {
                 '012-3456789': '012-3456789',
                 '0123456789': '0123456789',
@@ -37,7 +39,7 @@ class NLLocalFlavorTests(SimpleTestCase):
         self.assertFieldOutput(NLPhoneNumberField, valid, invalid)
 
     def test_NLZipCodeField(self):
-        error_invalid = [u'Enter a valid postal code']
+        error_invalid = ['Enter a valid postal code']
         valid = {
             '1234ab': '1234 AB',
             '1234 ab': '1234 AB',
@@ -50,7 +52,7 @@ class NLLocalFlavorTests(SimpleTestCase):
         self.assertFieldOutput(NLZipCodeField, valid, invalid)
 
     def test_NLSoFiNumberField(self):
-        error_invalid = [u'Enter a valid SoFi number']
+        error_invalid = ['Enter a valid SoFi number']
         valid = {
             '123456782': '123456782',
         }

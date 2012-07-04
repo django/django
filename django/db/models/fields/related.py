@@ -237,13 +237,18 @@ class SingleRelatedObjectDescriptor(object):
         return self.related.model._base_manager.using(db)
 
     def get_prefetch_query_set(self, instances):
-        vals = set(instance._get_pk_val() for instance in instances)
-        params = {'%s__pk__in' % self.related.field.name: vals}
-        return (self.get_query_set(instance=instances[0]).filter(**params),
-                attrgetter(self.related.field.attname),
-                lambda obj: obj._get_pk_val(),
-                True,
-                self.cache_name)
+        rel_obj_attr = attrgetter(self.related.field.attname)
+        instance_attr = lambda obj: obj._get_pk_val()
+        instances_dict = dict((instance_attr(inst), inst) for inst in instances)
+        params = {'%s__pk__in' % self.related.field.name: instances_dict.keys()}
+        qs = self.get_query_set(instance=instances[0]).filter(**params)
+        # Since we're going to assign directly in the cache,
+        # we must manage the reverse relation cache manually.
+        rel_obj_cache_name = self.related.field.get_cache_name()
+        for rel_obj in qs:
+            instance = instances_dict[rel_obj_attr(rel_obj)]
+            setattr(rel_obj, rel_obj_cache_name, instance)
+        return qs, rel_obj_attr, instance_attr, True, self.cache_name
 
     def __get__(self, instance, instance_type=None):
         if instance is None:
@@ -324,17 +329,23 @@ class ReverseSingleRelatedObjectDescriptor(object):
             return QuerySet(self.field.rel.to).using(db)
 
     def get_prefetch_query_set(self, instances):
-        vals = set(getattr(instance, self.field.attname) for instance in instances)
         other_field = self.field.rel.get_related_field()
+        rel_obj_attr = attrgetter(other_field.attname)
+        instance_attr = attrgetter(self.field.attname)
+        instances_dict = dict((instance_attr(inst), inst) for inst in instances)
         if other_field.rel:
-            params = {'%s__pk__in' % self.field.rel.field_name: vals}
+            params = {'%s__pk__in' % self.field.rel.field_name: instances_dict.keys()}
         else:
-            params = {'%s__in' % self.field.rel.field_name: vals}
-        return (self.get_query_set(instance=instances[0]).filter(**params),
-                attrgetter(self.field.rel.field_name),
-                attrgetter(self.field.attname),
-                True,
-                self.cache_name)
+            params = {'%s__in' % self.field.rel.field_name: instances_dict.keys()}
+        qs = self.get_query_set(instance=instances[0]).filter(**params)
+        # Since we're going to assign directly in the cache,
+        # we must manage the reverse relation cache manually.
+        if not self.field.rel.multiple:
+            rel_obj_cache_name = self.field.related.get_cache_name()
+            for rel_obj in qs:
+                instance = instances_dict[rel_obj_attr(rel_obj)]
+                setattr(rel_obj, rel_obj_cache_name, instance)
+        return qs, rel_obj_attr, instance_attr, True, self.cache_name
 
     def __get__(self, instance, instance_type=None):
         if instance is None:
@@ -348,7 +359,7 @@ class ReverseSingleRelatedObjectDescriptor(object):
             else:
                 other_field = self.field.rel.get_related_field()
                 if other_field.rel:
-                    params = {'%s__pk' % self.field.rel.field_name: val}
+                    params = {'%s__%s' % (self.field.rel.field_name, other_field.rel.field_name): val}
                 else:
                     params = {'%s__exact' % self.field.rel.field_name: val}
                 qs = self.get_query_set(instance=instance)
@@ -467,18 +478,24 @@ class ForeignRelatedObjectsDescriptor(object):
                     return self.instance._prefetched_objects_cache[rel_field.related_query_name()]
                 except (AttributeError, KeyError):
                     db = self._db or router.db_for_read(self.model, instance=self.instance)
-                    return super(RelatedManager, self).get_query_set().using(db).filter(**self.core_filters)
+                    qs = super(RelatedManager, self).get_query_set().using(db).filter(**self.core_filters)
+                    qs._known_related_object = (rel_field.name, self.instance)
+                    return qs
 
             def get_prefetch_query_set(self, instances):
+                rel_obj_attr = attrgetter(rel_field.attname)
+                instance_attr = attrgetter(attname)
+                instances_dict = dict((instance_attr(inst), inst) for inst in instances)
                 db = self._db or router.db_for_read(self.model, instance=instances[0])
-                query = {'%s__%s__in' % (rel_field.name, attname):
-                             set(getattr(obj, attname) for obj in instances)}
+                query = {'%s__%s__in' % (rel_field.name, attname): instances_dict.keys()}
                 qs = super(RelatedManager, self).get_query_set().using(db).filter(**query)
-                return (qs,
-                        attrgetter(rel_field.get_attname()),
-                        attrgetter(attname),
-                        False,
-                        rel_field.related_query_name())
+                # Since we just bypassed this class' get_query_set(), we must manage
+                # the reverse relation manually.
+                for rel_obj in qs:
+                    instance = instances_dict[rel_obj_attr(rel_obj)]
+                    setattr(rel_obj, rel_field.name, instance)
+                cache_name = rel_field.related_query_name()
+                return qs, rel_obj_attr, instance_attr, False, cache_name
 
             def add(self, *objs):
                 for obj in objs:

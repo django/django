@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import datetime
 import os
 import re
@@ -16,7 +18,7 @@ from django.utils.encoding import smart_unicode, smart_str
 
 HIDDEN_SETTINGS = re.compile('API|TOKEN|KEY|SECRET|PASS|PROFANITIES_LIST|SIGNATURE')
 
-CLEANSED_SUBSTITUTE = u'********************'
+CLEANSED_SUBSTITUTE = '********************'
 
 def linebreak_iter(template_source):
     yield 0
@@ -61,10 +63,10 @@ def technical_500_response(request, exc_type, exc_value, tb):
     reporter = ExceptionReporter(request, exc_type, exc_value, tb)
     if request.is_ajax():
         text = reporter.get_traceback_text()
-        return HttpResponseServerError(text, mimetype='text/plain')
+        return HttpResponseServerError(text, content_type='text/plain')
     else:
         html = reporter.get_traceback_html()
-        return HttpResponseServerError(html, mimetype='text/html')
+        return HttpResponseServerError(html, content_type='text/html')
 
 # Cache for the default exception reporter filter instance.
 default_exception_reporter_filter = None
@@ -155,9 +157,20 @@ class SafeExceptionReporterFilter(ExceptionReporterFilter):
         Replaces the values of variables marked as sensitive with
         stars (*********).
         """
-        func_name = tb_frame.f_code.co_name
-        func = tb_frame.f_globals.get(func_name)
-        sensitive_variables = getattr(func, 'sensitive_variables', [])
+        # Loop through the frame's callers to see if the sensitive_variables
+        # decorator was used.
+        current_frame = tb_frame.f_back
+        sensitive_variables = None
+        while current_frame is not None:
+            if (current_frame.f_code.co_name == 'sensitive_variables_wrapper'
+                and 'sensitive_variables_wrapper' in current_frame.f_locals):
+                # The sensitive_variables decorator was used, so we take note
+                # of the sensitive variables' names.
+                wrapper = current_frame.f_locals['sensitive_variables_wrapper']
+                sensitive_variables = getattr(wrapper, 'sensitive_variables', None)
+                break
+            current_frame = current_frame.f_back
+
         cleansed = []
         if self.is_active(request) and sensitive_variables:
             if sensitive_variables == '__ALL__':
@@ -333,11 +346,8 @@ class ExceptionReporter(object):
                 source = source.splitlines()
         if source is None:
             try:
-                f = open(filename)
-                try:
-                    source = f.readlines()
-                finally:
-                    f.close()
+                with open(filename, 'rb') as fp:
+                    source = fp.readlines()
             except (OSError, IOError):
                 pass
         if source is None:
@@ -347,7 +357,7 @@ class ExceptionReporter(object):
         for line in source[:2]:
             # File coding may be specified. Match pattern from PEP-263
             # (http://www.python.org/dev/peps/pep-0263/)
-            match = re.search(r'coding[:=]\s*([-\w.]+)', line)
+            match = re.search(br'coding[:=]\s*([-\w.]+)', line)
             if match:
                 encoding = match.group(1)
                 break
@@ -433,7 +443,7 @@ def technical_404_response(request, exception):
         'request': request,
         'settings': get_safe_settings(),
     })
-    return HttpResponseNotFound(t.render(c), mimetype='text/html')
+    return HttpResponseNotFound(t.render(c), content_type='text/html')
 
 def empty_urlconf(request):
     "Create an empty URLconf 404 error response."
@@ -441,7 +451,7 @@ def empty_urlconf(request):
     c = Context({
         'project_name': settings.SETTINGS_MODULE.split('.')[0]
     })
-    return HttpResponse(t.render(c), mimetype='text/html')
+    return HttpResponse(t.render(c), content_type='text/html')
 
 #
 # Templates are embedded in the file so that we know the error handler will

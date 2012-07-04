@@ -1,8 +1,10 @@
 """
 GEOS Testing module.
 """
+from __future__ import absolute_import
+
 from django.utils.unittest import TestSuite, TextTestRunner
-import test_geos, test_io, test_geos_mutation, test_mutable_list
+from . import test_geos, test_io, test_geos_mutation, test_mutable_list
 
 test_suites = [
     test_geos.suite(),

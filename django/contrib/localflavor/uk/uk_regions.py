@@ -6,7 +6,7 @@ from django.contrib.localflavor.gb.gb_regions import (
 import warnings
 warnings.warn(
     'The "UK" prefix for United Kingdom has been deprecated in favour of the '
-    'GB code. Please use the new GB-prefixed names.', PendingDeprecationWarning)
+    'GB code. Please use the new GB-prefixed names.', DeprecationWarning)
 
 UK_NATIONS_CHOICES = GB_NATIONS_CHOICES
 UK_REGION_CHOICES  = GB_REGION_CHOICES

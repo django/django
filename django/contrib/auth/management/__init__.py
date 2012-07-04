@@ -1,6 +1,8 @@
 """
 Creates permissions for all installed apps that need permissions.
 """
+from __future__ import unicode_literals
+
 import getpass
 import locale
 import unicodedata
@@ -10,14 +12,14 @@ from django.contrib.auth.models import User
 
 
 def _get_permission_codename(action, opts):
-    return u'%s_%s' % (action, opts.object_name.lower())
+    return '%s_%s' % (action, opts.object_name.lower())
 
 
 def _get_all_permissions(opts):
     "Returns (codename, name) for all permissions in the given opts."
     perms = []
     for action in ('add', 'change', 'delete'):
-        perms.append((_get_permission_codename(action, opts), u'Can %s %s' % (action, opts.verbose_name_raw)))
+        perms.append((_get_permission_codename(action, opts), 'Can %s %s' % (action, opts.verbose_name_raw)))
     return perms + list(opts.permissions)
 
 
@@ -88,7 +90,7 @@ def get_system_username():
         # if there is no corresponding entry in the /etc/passwd file
         # (a very restricted chroot environment, for example).
         # UnicodeDecodeError - preventive treatment for non-latin Windows.
-        return u''
+        return ''
 
 
 def get_default_username(check_db=True):

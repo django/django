@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import os
 import re
 import warnings
@@ -12,9 +14,6 @@ from django.utils import unittest
 
 from django.contrib.formtools.tests.wizard import *
 from django.contrib.formtools.tests.forms import *
-
-warnings.filterwarnings('ignore', category=PendingDeprecationWarning,
-                        module='django.contrib.formtools.wizard')
 
 success_string = "Done was called!"
 
@@ -44,7 +43,7 @@ class PreviewTests(TestCase):
         self.preview = preview.FormPreview(TestForm)
         input_template = '<input type="hidden" name="%s" value="%s" />'
         self.input = input_template % (self.preview.unused_name('stage'), "%d")
-        self.test_data = {'field1':u'foo', 'field1_':u'asdf'}
+        self.test_data = {'field1': 'foo', 'field1_': 'asdf'}
 
     def test_unused_name(self):
         """
@@ -120,9 +119,10 @@ class PreviewTests(TestCase):
         """
         self.test_data.update({'stage':2})
         hash = self.preview.security_hash(None, TestForm(self.test_data))
-        self.test_data.update({'hash':hash, 'bool1':u'False'})
-        response = self.client.post('/preview/', self.test_data)
-        self.assertEqual(response.content, success_string)
+        self.test_data.update({'hash': hash, 'bool1': 'False'})
+        with warnings.catch_warnings(record=True):
+            response = self.client.post('/preview/', self.test_data)
+            self.assertEqual(response.content, success_string)
 
     def test_form_submit_good_hash(self):
         """
@@ -158,9 +158,6 @@ class PreviewTests(TestCase):
 
 
 class FormHmacTests(unittest.TestCase):
-    """
-    Same as SecurityHashTests, but with form_hmac
-    """
 
     def test_textfield_hash(self):
         """
@@ -232,6 +229,16 @@ class WizardTests(TestCase):
         }
     )
 
+    def setUp(self):
+        super(WizardTests, self).setUp()
+        self.save_warnings_state()
+        warnings.filterwarnings('ignore', category=DeprecationWarning,
+                                module='django.contrib.formtools.wizard')
+
+    def tearDown(self):
+        super(WizardTests, self).tearDown()
+        self.restore_warnings_state()
+
     def test_step_starts_at_zero(self):
         """
         step should be zero for the first form
@@ -263,7 +270,7 @@ class WizardTests(TestCase):
         """
         data = {"0-field": "test",
                 "1-field": "test2",
-                "hash_0": "7e9cea465f6a10a6fb47fcea65cb9a76350c9a5c",
+                "hash_0": "cd13b1db3e8f55174bc5745a1b1a53408d4fd1ca",
                 "wizard_step": "1"}
         response = self.client.post('/wizard1/', data)
         self.assertEqual(2, response.context['step0'])
@@ -288,15 +295,15 @@ class WizardTests(TestCase):
         wizard = WizardWithProcessStep([WizardPageOneForm])
         data = {"0-field": "test",
                 "1-field": "test2",
-                "hash_0": "7e9cea465f6a10a6fb47fcea65cb9a76350c9a5c",
+                "hash_0": "cd13b1db3e8f55174bc5745a1b1a53408d4fd1ca",
                 "wizard_step": "1"}
         wizard(DummyRequest(POST=data))
         self.assertTrue(reached[0])
 
         data = {"0-field": "test",
                 "1-field": "test2",
-                "hash_0": "7e9cea465f6a10a6fb47fcea65cb9a76350c9a5c",
-                "hash_1": "d5b434e3934cc92fee4bd2964c4ebc06f81d362d",
+                "hash_0": "cd13b1db3e8f55174bc5745a1b1a53408d4fd1ca",
+                "hash_1": "1e6f6315da42e62f33a30640ec7e007ad3fbf1a1",
                 "wizard_step": "2"}
         self.assertRaises(http.Http404, wizard, DummyRequest(POST=data))
 
@@ -318,7 +325,7 @@ class WizardTests(TestCase):
                                         WizardPageThreeForm])
         data = {"0-field": "test",
                 "1-field": "test2",
-                "hash_0": "7e9cea465f6a10a6fb47fcea65cb9a76350c9a5c",
+                "hash_0": "cd13b1db3e8f55174bc5745a1b1a53408d4fd1ca",
                 "wizard_step": "1"}
         wizard(DummyRequest(POST=data))
         self.assertTrue(reached[0])
@@ -342,7 +349,7 @@ class WizardTests(TestCase):
 
         data = {"0-field": "test",
                 "1-field": "test2",
-                "hash_0": "7e9cea465f6a10a6fb47fcea65cb9a76350c9a5c",
+                "hash_0": "cd13b1db3e8f55174bc5745a1b1a53408d4fd1ca",
                 "wizard_step": "1"}
         wizard(DummyRequest(POST=data))
         self.assertTrue(reached[0])
@@ -368,7 +375,7 @@ class WizardTests(TestCase):
                                         WizardPageThreeForm])
         data = {"0-field": "test",
                 "1-field": "test2",
-                "hash_0": "7e9cea465f6a10a6fb47fcea65cb9a76350c9a5c",
+                "hash_0": "cd13b1db3e8f55174bc5745a1b1a53408d4fd1ca",
                 "wizard_step": "1"}
         wizard(DummyRequest(POST=data))
         self.assertTrue(reached[0])

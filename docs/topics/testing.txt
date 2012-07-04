@@ -291,9 +291,6 @@ label::
 
     $ ./manage.py test animals.AnimalTestCase.test_animals_can_speak
 
-.. versionadded:: 1.2
-   The ability to select individual doctests was added.
-
 You can use the same rules if you're using doctests. Django will use the
 test label as a path to the test method or class that you want to run.
 If your ``models.py`` or ``tests.py`` has a function with a doctest, or
@@ -310,9 +307,6 @@ name of the method to the label::
 If you're using a ``__test__`` dictionary to specify doctests for a
 module, Django will use the label as a key in the ``__test__`` dictionary
 for defined in ``models.py`` and ``tests.py``.
-
-.. versionadded:: 1.2
-   You can now trigger a graceful exit from a test run by pressing ``Ctrl-C``.
 
 If you press ``Ctrl-C`` while the tests are running, the test runner will
 wait for the currently running test to complete and then exit gracefully.
@@ -391,8 +385,6 @@ advanced settings.
 
 Testing master/slave configurations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. versionadded:: 1.2
 
 If you're testing a multiple database configuration with master/slave
 replication, this strategy of creating test databases poses a problem.
@@ -553,6 +545,21 @@ failed and erroneous tests. If all the tests pass, the return code is 0. This
 feature is useful if you're using the test-runner script in a shell script and
 need to test for success or failure at that level.
 
+Speeding up the tests
+---------------------
+
+In recent versions of Django, the default password hasher is rather slow by
+design. If during your tests you are authenticating many users, you may want
+to use a custom settings file and set the :setting:`PASSWORD_HASHERS` setting
+to a faster hashing algorithm::
+
+    PASSWORD_HASHERS = (
+        'django.contrib.auth.hashers.MD5PasswordHasher',
+    )
+
+Don't forget to also include in :setting:`PASSWORD_HASHERS` any hashing
+algorithm used in fixtures, if any.
+
 Testing tools
 =============
 
@@ -650,8 +657,6 @@ Note a few important things about how the test client works:
 * By default, the test client will disable any CSRF checks
   performed by your site.
 
-  .. versionadded:: 1.2.2
-
   If, for some reason, you *want* the test client to perform CSRF
   checks, you can create an instance of the test client that
   enforces CSRF checks. To do this, pass in the
@@ -664,10 +669,23 @@ Note a few important things about how the test client works:
 Making requests
 ~~~~~~~~~~~~~~~
 
-Use the ``django.test.client.Client`` class to make requests. It requires no
-arguments at time of construction:
+Use the ``django.test.client.Client`` class to make requests.
 
-.. class:: Client()
+.. class:: Client(enforce_csrf_checks=False, **defaults)
+
+    It requires no arguments at time of construction. However, you can use
+    keywords arguments to specify some default headers. For example, this will
+    send a ``User-Agent`` HTTP header in each request::
+
+        >>> c = Client(HTTP_USER_AGENT='Mozilla/5.0')
+
+    The values from the ``extra`` keywords arguments passed to
+    :meth:`~django.test.client.Client.get()`,
+    :meth:`~django.test.client.Client.post()`, etc. have precedence over
+    the defaults passed to the class constructor.
+
+    The ``enforce_csrf_checks`` argument can be used to test CSRF
+    protection (see above).
 
     Once you have a ``Client`` instance, you can call any of the following
     methods:
@@ -770,9 +788,8 @@ arguments at time of construction:
         wish to upload as a value. For example::
 
             >>> c = Client()
-            >>> f = open('wishlist.doc')
-            >>> c.post('/customers/wishes/', {'name': 'fred', 'attachment': f})
-            >>> f.close()
+            >>> with open('wishlist.doc') as fp:
+            ...     c.post('/customers/wishes/', {'name': 'fred', 'attachment': fp})
 
         (The name ``attachment`` here is not relevant; use whatever name your
         file-processing code expects.)
@@ -806,45 +823,56 @@ arguments at time of construction:
 
     .. method:: Client.head(path, data={}, follow=False, **extra)
 
-        Makes a HEAD request on the provided ``path`` and returns a ``Response``
-        object. Useful for testing RESTful interfaces. Acts just like
-        :meth:`Client.get` except it does not return a message body.
+        Makes a HEAD request on the provided ``path`` and returns a
+        ``Response`` object. This method works just like :meth:`Client.get`,
+        including the ``follow`` and ``extra`` arguments, except it does not
+        return a message body.
 
-        If you set ``follow`` to ``True`` the client will follow any redirects
-        and a ``redirect_chain`` attribute will be set in the response object
-        containing tuples of the intermediate urls and status codes.
-
-    .. method:: Client.options(path, data={}, follow=False, **extra)
+    .. method:: Client.options(path, data='', content_type='application/octet-stream', follow=False, **extra)
 
         Makes an OPTIONS request on the provided ``path`` and returns a
         ``Response`` object. Useful for testing RESTful interfaces.
 
-        If you set ``follow`` to ``True`` the client will follow any redirects
-        and a ``redirect_chain`` attribute will be set in the response object
-        containing tuples of the intermediate urls and status codes.
+        When ``data`` is provided, it is used as the request body, and
+        a ``Content-Type`` header is set to ``content_type``.
 
-        The ``extra`` argument acts the same as for :meth:`Client.get`.
+        .. versionchanged:: 1.5
+            :meth:`Client.options` used to process ``data`` like
+            :meth:`Client.get`.
 
-    .. method:: Client.put(path, data={}, content_type=MULTIPART_CONTENT, follow=False, **extra)
+        The ``follow`` and ``extra`` arguments act the same as for
+        :meth:`Client.get`.
+
+    .. method:: Client.put(path, data='', content_type='application/octet-stream', follow=False, **extra)
 
         Makes a PUT request on the provided ``path`` and returns a
-        ``Response`` object. Useful for testing RESTful interfaces. Acts just
-        like :meth:`Client.post` except with the PUT request method.
+        ``Response`` object. Useful for testing RESTful interfaces.
 
-        If you set ``follow`` to ``True`` the client will follow any redirects
-        and a ``redirect_chain`` attribute will be set in the response object
-        containing tuples of the intermediate urls and status codes.
+        When ``data`` is provided, it is used as the request body, and
+        a ``Content-Type`` header is set to ``content_type``.
 
-    .. method:: Client.delete(path, follow=False, **extra)
+        .. versionchanged:: 1.5
+            :meth:`Client.put` used to process ``data`` like
+            :meth:`Client.post`.
+
+        The ``follow`` and ``extra`` arguments act the same as for
+        :meth:`Client.get`.
+
+    .. method:: Client.delete(path, data='', content_type='application/octet-stream', follow=False, **extra)
 
         Makes an DELETE request on the provided ``path`` and returns a
         ``Response`` object. Useful for testing RESTful interfaces.
 
-        If you set ``follow`` to ``True`` the client will follow any redirects
-        and a ``redirect_chain`` attribute will be set in the response object
-        containing tuples of the intermediate urls and status codes.
+        When ``data`` is provided, it is used as the request body, and
+        a ``Content-Type`` header is set to ``content_type``.
 
-        The ``extra`` argument acts the same as for :meth:`Client.get`.
+        .. versionchanged:: 1.5
+            :meth:`Client.delete` used to process ``data`` like
+            :meth:`Client.get`.
+
+        The ``follow`` and ``extra`` arguments act the same as for
+        :meth:`Client.get`.
+
 
     .. method:: Client.login(**credentials)
 
@@ -1366,8 +1394,6 @@ Multi-database support
 
 .. attribute:: TestCase.multi_db
 
-.. versionadded:: 1.2
-
 Django sets up a test database corresponding to every database that is
 defined in the :setting:`DATABASES` definition in your settings
 file. However, a big part of the time taken to run a Django TestCase
@@ -1490,9 +1516,6 @@ Assertions
 ~~~~~~~~~~
 
 .. currentmodule:: django.test
-
-.. versionchanged:: 1.2
-    Added ``msg_prefix`` argument.
 
 As Python's normal :class:`unittest.TestCase` class implements assertion methods
 such as :meth:`~unittest.TestCase.assertTrue` and
@@ -1917,7 +1940,7 @@ out the `full reference`_ for more details.
 
 .. _Selenium: http://seleniumhq.org/
 .. _selenium package: http://pypi.python.org/pypi/selenium
-.. _full reference: http://readthedocs.org/docs/selenium-python/en/latest/api.html
+.. _full reference: http://selenium-python.readthedocs.org/en/latest/api.html
 .. _Firefox: http://www.mozilla.com/firefox/
 
 .. note::
@@ -2000,9 +2023,6 @@ process to satisfy whatever testing requirements you may have.
 
 Defining a test runner
 ----------------------
-
-.. versionchanged:: 1.2
-   Prior to 1.2, test runners were a single function, not a class.
 
 .. currentmodule:: django.test.simple
 

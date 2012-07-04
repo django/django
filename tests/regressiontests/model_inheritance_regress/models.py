@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import datetime
 
 from django.db import models
@@ -10,20 +12,20 @@ class Place(models.Model):
         ordering = ('name',)
 
     def __unicode__(self):
-        return u"%s the place" % self.name
+        return "%s the place" % self.name
 
 class Restaurant(Place):
     serves_hot_dogs = models.BooleanField()
     serves_pizza = models.BooleanField()
 
     def __unicode__(self):
-        return u"%s the restaurant" % self.name
+        return "%s the restaurant" % self.name
 
 class ItalianRestaurant(Restaurant):
     serves_gnocchi = models.BooleanField()
 
     def __unicode__(self):
-        return u"%s the italian restaurant" % self.name
+        return "%s the italian restaurant" % self.name
 
 class ParkingLot(Place):
     # An explicit link to the parent (we can control the attribute name).
@@ -31,7 +33,7 @@ class ParkingLot(Place):
     capacity = models.IntegerField()
 
     def __unicode__(self):
-        return u"%s the parking lot" % self.name
+        return "%s the parking lot" % self.name
 
 class ParkingLot2(Place):
     # In lieu of any other connector, an existing OneToOneField will be
@@ -108,7 +110,7 @@ class AuditBase(models.Model):
 
     class Meta:
         abstract = True
-        verbose_name_plural = u'Audits'
+        verbose_name_plural = 'Audits'
 
 class CertificationAudit(AuditBase):
     class Meta(AuditBase.Meta):

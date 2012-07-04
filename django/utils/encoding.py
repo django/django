@@ -1,4 +1,5 @@
-import types
+from __future__ import unicode_literals
+
 import urllib
 import locale
 import datetime
@@ -45,7 +46,7 @@ def is_protected_type(obj):
     force_unicode(strings_only=True).
     """
     return isinstance(obj, (
-        types.NoneType,
+        type(None),
         int, long,
         datetime.datetime, datetime.date, datetime.time,
         float, Decimal)
@@ -81,7 +82,7 @@ def force_unicode(s, encoding='utf-8', strings_only=False, errors='strict'):
                     # without raising a further exception. We do an
                     # approximation to what the Exception's standard str()
                     # output should be.
-                    s = u' '.join([force_unicode(arg, encoding, strings_only,
+                    s = ' '.join([force_unicode(arg, encoding, strings_only,
                             errors) for arg in s])
         elif not isinstance(s, unicode):
             # Note: We use .decode() here, instead of unicode(s, encoding,
@@ -97,7 +98,7 @@ def force_unicode(s, encoding='utf-8', strings_only=False, errors='strict'):
             # working unicode method. Try to handle this without raising a
             # further exception by individually forcing the exception args
             # to unicode.
-            s = u' '.join([force_unicode(arg, encoding, strings_only,
+            s = ' '.join([force_unicode(arg, encoding, strings_only,
                     errors) for arg in s])
     return s
 
@@ -107,7 +108,7 @@ def smart_str(s, encoding='utf-8', strings_only=False, errors='strict'):
 
     If strings_only is True, don't convert (some) non-string-like objects.
     """
-    if strings_only and isinstance(s, (types.NoneType, int)):
+    if strings_only and (s is None or isinstance(s, int)):
         return s
     if isinstance(s, Promise):
         return unicode(s).encode(encoding, errors)
@@ -154,7 +155,7 @@ def iri_to_uri(iri):
     # converted.
     if iri is None:
         return iri
-    return urllib.quote(smart_str(iri), safe="/#%[]=:;$&()+,!?*@'~")
+    return urllib.quote(smart_str(iri), safe=b"/#%[]=:;$&()+,!?*@'~")
 
 def filepath_to_uri(path):
     """Convert an file system path to a URI portion that is suitable for
@@ -173,7 +174,7 @@ def filepath_to_uri(path):
         return path
     # I know about `os.sep` and `os.altsep` but I want to leave
     # some flexibility for hardcoding separators.
-    return urllib.quote(smart_str(path).replace("\\", "/"), safe="/~!*()'")
+    return urllib.quote(smart_str(path).replace("\\", "/"), safe=b"/~!*()'")
 
 # The encoding of the default system locale but falls back to the
 # given fallback encoding if the encoding is unsupported by python or could

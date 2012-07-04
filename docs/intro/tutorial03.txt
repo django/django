@@ -332,8 +332,9 @@ provides a shortcut. Here's the ``detail()`` view, rewritten::
 
 The :func:`~django.shortcuts.get_object_or_404` function takes a Django model
 as its first argument and an arbitrary number of keyword arguments, which it
-passes to the module's :meth:`~django.db.models.query.QuerySet.get` function.
-It raises :exc:`~django.http.Http404` if the object doesn't exist.
+passes to the :meth:`~django.db.models.query.QuerySet.get` function of the
+model's manager. It raises :exc:`~django.http.Http404` if the object doesn't
+exist.
 
 .. admonition:: Philosophy
 
@@ -399,7 +400,7 @@ like:
     <h1>{{ poll.question }}</h1>
     <ul>
     {% for choice in poll.choice_set.all %}
-        <li>{{ choice.choice }}</li>
+        <li>{{ choice.choice_text }}</li>
     {% endfor %}
     </ul>
 
@@ -411,7 +412,7 @@ list-index lookup.
 
 Method-calling happens in the :ttag:`{% for %}<for>` loop:
 ``poll.choice_set.all`` is interpreted as the Python code
-``poll.choice_set.all()``, which returns an iterable of Choice objects and is
+``poll.choice_set.all()``, which returns an iterable of ``Choice`` objects and is
 suitable for use in the :ttag:`{% for %}<for>` tag.
 
 See the :doc:`template guide </topics/templates>` for more about templates.

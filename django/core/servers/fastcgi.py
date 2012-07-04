@@ -176,9 +176,8 @@ def runfastcgi(argset=[], **kwargs):
         become_daemon(our_home_dir=options["workdir"], **daemon_kwargs)
 
     if options["pidfile"]:
-        fp = open(options["pidfile"], "w")
-        fp.write("%d\n" % os.getpid())
-        fp.close()
+        with open(options["pidfile"], "w") as fp:
+            fp.write("%d\n" % os.getpid())
 
     WSGIServer(get_internal_wsgi_application(), **wsgi_opts).run()
 

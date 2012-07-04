@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import mimetypes
 import os
 import random
@@ -9,15 +11,12 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email.header import Header
 from email.utils import formatdate, getaddresses, formataddr, parseaddr
+from io import BytesIO
 
 from django.conf import settings
 from django.core.mail.utils import DNS_NAME
 from django.utils.encoding import smart_str, force_unicode
 
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from StringIO import StringIO
 
 # Don't BASE64-encode UTF-8 messages so that we avoid unwanted attention from
 # some spam filters.
@@ -93,7 +92,7 @@ def forbid_multi_line_headers(name, val, encoding):
     else:
         if name.lower() == 'subject':
             val = Header(val)
-    return name, val
+    return smart_str(name), val
 
 
 def sanitize_address(addr, encoding):
@@ -104,8 +103,8 @@ def sanitize_address(addr, encoding):
     try:
         addr = addr.encode('ascii')
     except UnicodeEncodeError:  # IDN
-        if u'@' in addr:
-            localpart, domain = addr.split(u'@', 1)
+        if '@' in addr:
+            localpart, domain = addr.split('@', 1)
             localpart = str(Header(localpart, encoding))
             domain = domain.encode('idna')
             addr = '@'.join([localpart, domain])
@@ -132,7 +131,7 @@ class SafeMIMEText(MIMEText):
         This overrides the default as_string() implementation to not mangle
         lines that begin with 'From '. See bug #13433 for details.
         """
-        fp = StringIO()
+        fp = BytesIO()
         g = Generator(fp, mangle_from_ = False)
         g.flatten(self, unixfrom=unixfrom)
         return fp.getvalue()
@@ -156,7 +155,7 @@ class SafeMIMEMultipart(MIMEMultipart):
         This overrides the default as_string() implementation to not mangle
         lines that begin with 'From '. See bug #13433 for details.
         """
-        fp = StringIO()
+        fp = BytesIO()
         g = Generator(fp, mangle_from_ = False)
         g.flatten(self, unixfrom=unixfrom)
         return fp.getvalue()
@@ -265,7 +264,8 @@ class EmailMessage(object):
     def attach_file(self, path, mimetype=None):
         """Attaches a file from the filesystem."""
         filename = os.path.basename(path)
-        content = open(path, 'rb').read()
+        with open(path, 'rb') as f:
+            content = f.read()
         self.attach(filename, content, mimetype)
 
     def _create_message(self, msg):

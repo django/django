@@ -1,8 +1,7 @@
+from __future__ import unicode_literals
+
 import os
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from StringIO import StringIO
+from io import BytesIO
 
 from django.utils.encoding import smart_str, smart_unicode
 from django.core.files.utils import FileProxyMixin
@@ -15,13 +14,14 @@ class File(FileProxyMixin):
         if name is None:
             name = getattr(file, 'name', None)
         self.name = name
-        self.mode = getattr(file, 'mode', None)
+        if hasattr(file, 'mode'):
+            self.mode = file.mode
 
     def __str__(self):
         return smart_str(self.name or '')
 
     def __unicode__(self):
-        return smart_unicode(self.name or u'')
+        return smart_unicode(self.name or '')
 
     def __repr__(self):
         return "<%s: %s>" % (self.__class__.__name__, self or "None")
@@ -89,7 +89,7 @@ class File(FileProxyMixin):
         # Iterate over this file-like object by newlines
         buffer_ = None
         for chunk in self.chunks():
-            chunk_buffer = StringIO(chunk)
+            chunk_buffer = BytesIO(chunk)
 
             for line in chunk_buffer:
                 if buffer_:
@@ -128,8 +128,8 @@ class ContentFile(File):
     A File-like object that takes just raw content, rather than an actual file.
     """
     def __init__(self, content, name=None):
-        content = content or ''
-        super(ContentFile, self).__init__(StringIO(content), name=name)
+        content = content or b''
+        super(ContentFile, self).__init__(BytesIO(content), name=name)
         self.size = len(content)
 
     def __str__(self):

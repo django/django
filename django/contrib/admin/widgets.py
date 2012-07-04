@@ -1,14 +1,16 @@
 """
 Form Widget classes specific to the Django admin site.
 """
+from __future__ import unicode_literals
 
 import copy
+
 from django import forms
 from django.contrib.admin.templatetags.admin_static import static
 from django.core.urlresolvers import reverse
 from django.forms.widgets import RadioFieldRenderer
 from django.forms.util import flatatt
-from django.utils.html import escape
+from django.utils.html import escape, format_html, format_html_join
 from django.utils.text import Truncator
 from django.utils.translation import ugettext as _
 from django.utils.safestring import mark_safe
@@ -39,12 +41,12 @@ class FilteredSelectMultiple(forms.SelectMultiple):
         if self.is_stacked:
             attrs['class'] += 'stacked'
         output = [super(FilteredSelectMultiple, self).render(name, value, attrs, choices)]
-        output.append(u'<script type="text/javascript">addEvent(window, "load", function(e) {')
+        output.append('<script type="text/javascript">addEvent(window, "load", function(e) {')
         # TODO: "id_" is hard-coded here. This should instead use the correct
         # API to determine the ID dynamically.
-        output.append(u'SelectFilter.init("id_%s", "%s", %s, "%s"); });</script>\n'
+        output.append('SelectFilter.init("id_%s", "%s", %s, "%s"); });</script>\n'
             % (name, self.verbose_name.replace('"', '\\"'), int(self.is_stacked), static('admin/')))
-        return mark_safe(u''.join(output))
+        return mark_safe(''.join(output))
 
 
 class AdminDateWidget(forms.DateInput):
@@ -86,17 +88,18 @@ class AdminSplitDateTime(forms.SplitDateTimeWidget):
         forms.MultiWidget.__init__(self, widgets, attrs)
 
     def format_output(self, rendered_widgets):
-        return mark_safe(u'<p class="datetime">%s %s<br />%s %s</p>' % \
-            (_('Date:'), rendered_widgets[0], _('Time:'), rendered_widgets[1]))
+        return format_html('<p class="datetime">{0} {1}<br />{2} {3}</p>',
+                           _('Date:'), rendered_widgets[0],
+                           _('Time:'), rendered_widgets[1])
 
 
 class AdminRadioFieldRenderer(RadioFieldRenderer):
     def render(self):
         """Outputs a <ul> for this set of radio fields."""
-        return mark_safe(u'<ul%s>\n%s\n</ul>' % (
-            flatatt(self.attrs),
-            u'\n'.join([u'<li>%s</li>' % force_unicode(w) for w in self]))
-        )
+        return format_html('<ul{0}>\n{1}\n</ul>',
+                           flatatt(self.attrs),
+                           format_html_join('\n', '<li>{0}</li>',
+                                            ((force_unicode(w),) for w in self)))
 
 
 class AdminRadioSelect(forms.RadioSelect):
@@ -104,9 +107,9 @@ class AdminRadioSelect(forms.RadioSelect):
 
 
 class AdminFileWidget(forms.ClearableFileInput):
-    template_with_initial = (u'<p class="file-upload">%s</p>'
+    template_with_initial = ('<p class="file-upload">%s</p>'
                             % forms.ClearableFileInput.template_with_initial)
-    template_with_clear = (u'<span class="clearable-file-input">%s</span>'
+    template_with_clear = ('<span class="clearable-file-input">%s</span>'
                            % forms.ClearableFileInput.template_with_clear)
 
 
@@ -120,7 +123,7 @@ def url_params_from_lookup_dict(lookups):
         items = []
         for k, v in lookups.items():
             if isinstance(v, (tuple, list)):
-                v = u','.join([str(x) for x in v])
+                v = ','.join([str(x) for x in v])
             elif isinstance(v, bool):
                 # See django.db.fields.BooleanField.get_prep_lookup
                 v = ('0', '1')[v]
@@ -156,21 +159,21 @@ class ForeignKeyRawIdWidget(forms.TextInput):
 
             params = self.url_parameters()
             if params:
-                url = u'?' + u'&amp;'.join([u'%s=%s' % (k, v) for k, v in params.items()])
+                url = '?' + '&amp;'.join(['%s=%s' % (k, v) for k, v in params.items()])
             else:
-                url = u''
+                url = ''
             if "class" not in attrs:
                 attrs['class'] = 'vForeignKeyRawIdAdminField'  # The JavaScript code looks for this hook.
             # TODO: "lookup_id_" is hard-coded here. This should instead use
             # the correct API to determine the ID dynamically.
-            extra.append(u'<a href="%s%s" class="related-lookup" id="lookup_id_%s" onclick="return showRelatedObjectLookupPopup(this);"> '
+            extra.append('<a href="%s%s" class="related-lookup" id="lookup_id_%s" onclick="return showRelatedObjectLookupPopup(this);"> '
                             % (related_url, url, name))
-            extra.append(u'<img src="%s" width="16" height="16" alt="%s" /></a>'
+            extra.append('<img src="%s" width="16" height="16" alt="%s" /></a>'
                             % (static('admin/img/selector-search.gif'), _('Lookup')))
         output = [super(ForeignKeyRawIdWidget, self).render(name, value, attrs)] + extra
         if value:
             output.append(self.label_for_value(value))
-        return mark_safe(u''.join(output))
+        return mark_safe(''.join(output))
 
     def base_url_parameters(self):
         return url_params_from_lookup_dict(self.rel.limit_choices_to)
@@ -271,11 +274,11 @@ class RelatedFieldWidgetWrapper(forms.Widget):
             related_url = reverse('admin:%s_%s_add' % info, current_app=self.admin_site.name)
             # TODO: "add_id_" is hard-coded here. This should instead use the
             # correct API to determine the ID dynamically.
-            output.append(u'<a href="%s" class="add-another" id="add_id_%s" onclick="return showAddAnotherPopup(this);"> '
+            output.append('<a href="%s" class="add-another" id="add_id_%s" onclick="return showAddAnotherPopup(this);"> '
                           % (related_url, name))
-            output.append(u'<img src="%s" width="10" height="10" alt="%s"/></a>'
+            output.append('<img src="%s" width="10" height="10" alt="%s"/></a>'
                           % (static('admin/img/icon_addlink.gif'), _('Add Another')))
-        return mark_safe(u''.join(output))
+        return mark_safe(''.join(output))
 
     def build_attrs(self, extra_attrs=None, **kwargs):
         "Helper function for building an attribute dictionary."
@@ -327,11 +330,17 @@ class AdminURLFieldWidget(forms.TextInput):
 
 
 class AdminIntegerFieldWidget(forms.TextInput):
+    class_name = 'vIntegerField'
+
     def __init__(self, attrs=None):
-        final_attrs = {'class': 'vIntegerField'}
+        final_attrs = {'class': self.class_name}
         if attrs is not None:
             final_attrs.update(attrs)
         super(AdminIntegerFieldWidget, self).__init__(attrs=final_attrs)
+
+
+class AdminBigIntegerFieldWidget(AdminIntegerFieldWidget):
+    class_name = 'vBigIntegerField'
 
 
 class AdminCommaSeparatedIntegerFieldWidget(forms.TextInput):

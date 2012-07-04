@@ -28,7 +28,7 @@ class MultiDBChangepasswordManagementCommandTestCase(TestCase):
         command.execute("joe", database='other', stdout=self.stdout)
         command_output = self.stdout.getvalue().strip()
 
-        self.assertEquals(command_output, "Changing password for user 'joe'\nPassword changed successfully for user 'joe'")
+        self.assertEqual(command_output, "Changing password for user 'joe'\nPassword changed successfully for user 'joe'")
         self.assertTrue(models.User.objects.using('other').get(username="joe").check_password("not qwerty"))
 
 

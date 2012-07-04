@@ -49,7 +49,7 @@ FORMFIELD_FOR_DBFIELD_DEFAULTS = {
     models.TextField:       {'widget': widgets.AdminTextareaWidget},
     models.URLField:        {'widget': widgets.AdminURLFieldWidget},
     models.IntegerField:    {'widget': widgets.AdminIntegerFieldWidget},
-    models.BigIntegerField: {'widget': widgets.AdminIntegerFieldWidget},
+    models.BigIntegerField: {'widget': widgets.AdminBigIntegerFieldWidget},
     models.CharField:       {'widget': widgets.AdminTextInputWidget},
     models.ImageField:      {'widget': widgets.AdminFileWidget},
     models.FileField:       {'widget': widgets.AdminFileWidget},
@@ -745,7 +745,7 @@ class ModelAdmin(BaseModelAdmin):
             'has_file_field': True, # FIXME - this should check if form or formsets have a FileField,
             'has_absolute_url': hasattr(self.model, 'get_absolute_url'),
             'ordered_objects': ordered_objects,
-            'form_url': mark_safe(form_url),
+            'form_url': form_url,
             'opts': opts,
             'content_type_id': ContentType.objects.get_for_model(self.model).id,
             'save_as': self.save_as,
@@ -1321,7 +1321,7 @@ class ModelAdmin(BaseModelAdmin):
         opts = model._meta
         app_label = opts.app_label
         action_list = LogEntry.objects.filter(
-            object_id = object_id,
+            object_id = unquote(object_id),
             content_type__id__exact = ContentType.objects.get_for_model(model).id
         ).select_related().order_by('action_time')
         # If no history was found, see whether this object even exists.

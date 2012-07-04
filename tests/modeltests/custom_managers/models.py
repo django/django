@@ -9,6 +9,8 @@ There are two reasons you might want to customize a ``Manager``: to add extra
 returns.
 """
 
+from __future__ import unicode_literals
+
 from django.db import models
 
 # An example of a custom manager called "objects".
@@ -24,7 +26,7 @@ class Person(models.Model):
     objects = PersonManager()
 
     def __unicode__(self):
-        return u"%s %s" % (self.first_name, self.last_name)
+        return "%s %s" % (self.first_name, self.last_name)
 
 # An example of a custom manager that sets get_query_set().
 

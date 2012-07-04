@@ -1,16 +1,13 @@
 """Translation helper functions."""
+from __future__ import unicode_literals
 
 import locale
 import os
 import re
 import sys
 import gettext as gettext_module
+from io import StringIO
 from threading import local
-
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from StringIO import StringIO
 
 from django.utils.importlib import import_module
 from django.utils.safestring import mark_safe, SafeData
@@ -29,7 +26,7 @@ _default = None
 _accepted = {}
 
 # magic gettext number to separate context from message
-CONTEXT_SEPARATOR = u"\x04"
+CONTEXT_SEPARATOR = "\x04"
 
 # Format of Accept-Language header values. From RFC 2616, section 14.4 and 3.9.
 accept_language_re = re.compile(r'''
@@ -267,7 +264,7 @@ def ugettext(message):
 
 def pgettext(context, message):
     result = do_translate(
-        u"%s%s%s" % (context, CONTEXT_SEPARATOR, message), 'ugettext')
+        "%s%s%s" % (context, CONTEXT_SEPARATOR, message), 'ugettext')
     if CONTEXT_SEPARATOR in result:
         # Translation not found
         result = message
@@ -308,8 +305,8 @@ def ungettext(singular, plural, number):
     return do_ntranslate(singular, plural, number, 'ungettext')
 
 def npgettext(context, singular, plural, number):
-    result = do_ntranslate(u"%s%s%s" % (context, CONTEXT_SEPARATOR, singular),
-                           u"%s%s%s" % (context, CONTEXT_SEPARATOR, plural),
+    result = do_ntranslate("%s%s%s" % (context, CONTEXT_SEPARATOR, singular),
+                           "%s%s%s" % (context, CONTEXT_SEPARATOR, plural),
                            number, 'ungettext')
     if CONTEXT_SEPARATOR in result:
         # Translation not found
@@ -440,8 +437,10 @@ def templatize(src, origin=None):
     does so by translating the Django translation tags into standard gettext
     function invocations.
     """
+    from django.conf import settings
     from django.template import (Lexer, TOKEN_TEXT, TOKEN_VAR, TOKEN_BLOCK,
             TOKEN_COMMENT, TRANSLATOR_COMMENT_MARK)
+    src = src.decode(settings.FILE_CHARSET)
     out = StringIO()
     message_context = None
     intrans = False
@@ -571,7 +570,7 @@ def templatize(src, origin=None):
                 out.write(' # %s' % t.contents)
             else:
                 out.write(blankout(t.contents, 'X'))
-    return out.getvalue()
+    return out.getvalue().encode('utf-8')
 
 def parse_accept_lang_header(lang_string):
     """

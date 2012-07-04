@@ -2,7 +2,7 @@
 Australian-specific Form helpers
 """
 
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import re
 
@@ -34,7 +34,7 @@ class AUPostCodeField(RegexField):
 class AUPhoneNumberField(Field):
     """Australian phone number field."""
     default_error_messages = {
-        'invalid': u'Phone numbers must contain 10 digits.',
+        'invalid': 'Phone numbers must contain 10 digits.',
     }
 
     def clean(self, value):
@@ -43,11 +43,11 @@ class AUPhoneNumberField(Field):
         """
         super(AUPhoneNumberField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
         value = re.sub('(\(|\)|\s+|-)', '', smart_unicode(value))
         phone_match = PHONE_DIGITS_RE.search(value)
         if phone_match:
-            return u'%s' % phone_match.group(1)
+            return '%s' % phone_match.group(1)
         raise ValidationError(self.error_messages['invalid'])
 
 

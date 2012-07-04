@@ -2,12 +2,12 @@
 These classes are light wrappers around Django's database API that provide
 convenience functionality and permalink functions for the databrowse app.
 """
+from __future__ import unicode_literals
 
 from django.db import models
 from django.utils import formats
 from django.utils.text import capfirst
 from django.utils.encoding import smart_unicode, smart_str, iri_to_uri
-from django.utils.safestring import mark_safe
 from django.db.models.query import QuerySet
 
 EMPTY_VALUE = '(None)'
@@ -29,7 +29,7 @@ class EasyModel(object):
         return self.site.registry[self.model]
 
     def url(self):
-        return mark_safe('%s%s/%s/' % (self.site.root_url, self.model._meta.app_label, self.model._meta.module_name))
+        return '%s%s/%s/' % (self.site.root_url, self.model._meta.app_label, self.model._meta.module_name)
 
     def objects(self, **kwargs):
         return self.get_query_set().filter(**kwargs)
@@ -61,7 +61,7 @@ class EasyField(object):
         self.model, self.field = easy_model, field
 
     def __repr__(self):
-        return smart_str(u'<EasyField for %s.%s>' % (self.model.model._meta.object_name, self.field.name))
+        return smart_str('<EasyField for %s.%s>' % (self.model.model._meta.object_name, self.field.name))
 
     def choices(self):
         for value, label in self.field.choices:
@@ -69,9 +69,9 @@ class EasyField(object):
 
     def url(self):
         if self.field.choices:
-            return mark_safe('%s%s/%s/%s/' % (self.model.site.root_url, self.model.model._meta.app_label, self.model.model._meta.module_name, self.field.name))
+            return '%s%s/%s/%s/' % (self.model.site.root_url, self.model.model._meta.app_label, self.model.model._meta.module_name, self.field.name)
         elif self.field.rel:
-            return mark_safe('%s%s/%s/' % (self.model.site.root_url, self.model.model._meta.app_label, self.model.model._meta.module_name))
+            return '%s%s/%s/' % (self.model.site.root_url, self.model.model._meta.app_label, self.model.model._meta.module_name)
 
 class EasyChoice(object):
     def __init__(self, easy_model, field, value, label):
@@ -79,22 +79,22 @@ class EasyChoice(object):
         self.value, self.label = value, label
 
     def __repr__(self):
-        return smart_str(u'<EasyChoice for %s.%s>' % (self.model.model._meta.object_name, self.field.name))
+        return smart_str('<EasyChoice for %s.%s>' % (self.model.model._meta.object_name, self.field.name))
 
     def url(self):
-        return mark_safe('%s%s/%s/%s/%s/' % (self.model.site.root_url, self.model.model._meta.app_label, self.model.model._meta.module_name, self.field.field.name, iri_to_uri(self.value)))
+        return '%s%s/%s/%s/%s/' % (self.model.site.root_url, self.model.model._meta.app_label, self.model.model._meta.module_name, self.field.field.name, iri_to_uri(self.value))
 
 class EasyInstance(object):
     def __init__(self, easy_model, instance):
         self.model, self.instance = easy_model, instance
 
     def __repr__(self):
-        return smart_str(u'<EasyInstance for %s (%s)>' % (self.model.model._meta.object_name, self.instance._get_pk_val()))
+        return smart_str('<EasyInstance for %s (%s)>' % (self.model.model._meta.object_name, self.instance._get_pk_val()))
 
     def __unicode__(self):
         val = smart_unicode(self.instance)
         if len(val) > DISPLAY_SIZE:
-            return val[:DISPLAY_SIZE] + u'...'
+            return val[:DISPLAY_SIZE] + '...'
         return val
 
     def __str__(self):
@@ -104,7 +104,7 @@ class EasyInstance(object):
         return self.instance._get_pk_val()
 
     def url(self):
-        return mark_safe('%s%s/%s/objects/%s/' % (self.model.site.root_url, self.model.model._meta.app_label, self.model.model._meta.module_name, iri_to_uri(self.pk())))
+        return '%s%s/%s/objects/%s/' % (self.model.site.root_url, self.model.model._meta.app_label, self.model.model._meta.module_name, iri_to_uri(self.pk()))
 
     def fields(self):
         """
@@ -136,7 +136,7 @@ class EasyInstanceField(object):
         self.raw_value = getattr(instance.instance, field.name)
 
     def __repr__(self):
-        return smart_str(u'<EasyInstanceField for %s.%s>' % (self.model.model._meta.object_name, self.field.name))
+        return smart_str('<EasyInstanceField for %s.%s>' % (self.model.model._meta.object_name, self.field.name))
 
     def values(self):
         """
@@ -186,14 +186,14 @@ class EasyInstanceField(object):
                 for value in self.values():
                     if value is None:
                         continue
-                    url = mark_safe('%s%s/%s/objects/%s/' % (self.model.site.root_url, m.model._meta.app_label, m.model._meta.module_name, iri_to_uri(value._get_pk_val())))
+                    url = '%s%s/%s/objects/%s/' % (self.model.site.root_url, m.model._meta.app_label, m.model._meta.module_name, iri_to_uri(value._get_pk_val()))
                     lst.append((smart_unicode(value), url))
             else:
                 lst = [(value, None) for value in self.values()]
         elif self.field.choices:
             lst = []
             for value in self.values():
-                url = mark_safe('%s%s/%s/fields/%s/%s/' % (self.model.site.root_url, self.model.model._meta.app_label, self.model.model._meta.module_name, self.field.name, iri_to_uri(self.raw_value)))
+                url = '%s%s/%s/fields/%s/%s/' % (self.model.site.root_url, self.model.model._meta.app_label, self.model.model._meta.module_name, self.field.name, iri_to_uri(self.raw_value))
                 lst.append((value, url))
         elif isinstance(self.field, models.URLField):
             val = self.values()[0]

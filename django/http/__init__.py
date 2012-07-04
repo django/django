@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import datetime
 import os
@@ -7,13 +7,10 @@ import sys
 import time
 import warnings
 
+from io import BytesIO
 from pprint import pformat
 from urllib import urlencode, quote
 from urlparse import urljoin, parse_qsl
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from StringIO import StringIO
 
 import Cookie
 # Some versions of Python 2.7 and later won't need this encoding bug fix:
@@ -21,7 +18,7 @@ _cookie_encodes_correctly = Cookie.SimpleCookie().value_encode(';') == (';', '"\
 # See ticket #13007, http://bugs.python.org/issue2193 and http://trac.edgewall.org/ticket/2256
 _tc = Cookie.SimpleCookie()
 try:
-    _tc.load('foo:bar=1')
+    _tc.load(b'foo:bar=1')
     _cookie_allows_colon_in_names = True
 except Cookie.CookieError:
     _cookie_allows_colon_in_names = False
@@ -60,13 +57,14 @@ else:
         if not _cookie_allows_colon_in_names:
             def load(self, rawdata):
                 self.bad_cookies = set()
-                super(SimpleCookie, self).load(rawdata)
+                super(SimpleCookie, self).load(smart_str(rawdata))
                 for key in self.bad_cookies:
                     del self[key]
 
             # override private __set() method:
             # (needed for using our Morsel, and for laxness with CookieError
             def _BaseCookie__set(self, key, real_value, coded_value):
+                key = smart_str(key)
                 try:
                     M = self.get(key, Morsel())
                     M.set(key, real_value, coded_value)
@@ -134,7 +132,7 @@ def build_request_repr(request, path_override=None, GET_override=None,
     except:
         meta = '<could not parse>'
     path = path_override if path_override is not None else request.path
-    return smart_str(u'<%s\npath:%s,\nGET:%s,\nPOST:%s,\nCOOKIES:%s,\nMETA:%s>' %
+    return smart_str('<%s\npath:%s,\nGET:%s,\nPOST:%s,\nCOOKIES:%s,\nMETA:%s>' %
                      (request.__class__.__name__,
                       path,
                       unicode(get),
@@ -292,12 +290,12 @@ class HttpRequest(object):
                 self._body = self.read()
             except IOError as e:
                 raise UnreadablePostError, e, sys.exc_traceback
-            self._stream = StringIO(self._body)
+            self._stream = BytesIO(self._body)
         return self._body
 
     @property
     def raw_post_data(self):
-        warnings.warn('HttpRequest.raw_post_data has been deprecated. Use HttpRequest.body instead.', PendingDeprecationWarning)
+        warnings.warn('HttpRequest.raw_post_data has been deprecated. Use HttpRequest.body instead.', DeprecationWarning)
         return self.body
 
     def _mark_post_parse_error(self):
@@ -317,7 +315,7 @@ class HttpRequest(object):
         if self.META.get('CONTENT_TYPE', '').startswith('multipart'):
             if hasattr(self, '_body'):
                 # Use already read data
-                data = StringIO(self._body)
+                data = BytesIO(self._body)
             else:
                 data = self
             try:
@@ -340,7 +338,7 @@ class HttpRequest(object):
     ## Expects self._stream to be set to an appropriate source of bytes by
     ## a corresponding request subclass (e.g. WSGIRequest).
     ## Also when request data has already been read by request.POST or
-    ## request.body, self._stream points to a StringIO instance
+    ## request.body, self._stream points to a BytesIO instance
     ## containing that data.
 
     def read(self, *args, **kwargs):
@@ -491,6 +489,7 @@ class QueryDict(MultiValueDict):
         """
         output = []
         if safe:
+            safe = smart_str(safe, self.encoding)
             encode = lambda k, v: '%s=%s' % ((quote(k, safe), quote(v, safe)))
         else:
             encode = lambda k, v: urlencode({k: v})
@@ -525,14 +524,16 @@ class HttpResponse(object):
 
     status_code = 200
 
-    def __init__(self, content='', mimetype=None, status=None,
-            content_type=None):
+    def __init__(self, content='', content_type=None, status=None,
+            mimetype=None):
         # _headers is a mapping of the lower-case name to the original case of
         # the header (required for working with legacy systems) and the header
         # value. Both the name of the header and its value are ASCII strings.
         self._headers = {}
         self._charset = settings.DEFAULT_CHARSET
-        if mimetype: # For backwards compatibility.
+        if mimetype:
+            warnings.warn("Using mimetype keyword argument is deprecated, use"
+                          " content_type instead", PendingDeprecationWarning)
             content_type = mimetype
         if not content_type:
             content_type = "%s; charset=%s" % (settings.DEFAULT_CONTENT_TYPE,
@@ -653,8 +654,8 @@ class HttpResponse(object):
 
     def _get_content(self):
         if self.has_header('Content-Encoding'):
-            return ''.join([str(e) for e in self._container])
-        return ''.join([smart_str(e, self._charset) for e in self._container])
+            return b''.join([str(e) for e in self._container])
+        return b''.join([smart_str(e, self._charset) for e in self._container])
 
     def _set_content(self, value):
         if hasattr(value, '__iter__'):
@@ -671,7 +672,7 @@ class HttpResponse(object):
         return self
 
     def next(self):
-        chunk = self._iterator.next()
+        chunk = next(self._iterator)
         if isinstance(chunk, unicode):
             chunk = chunk.encode(self._charset)
         return str(chunk)

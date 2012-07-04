@@ -12,11 +12,7 @@ GeoDjango Database API
 Spatial Backends
 ================
 
-.. versionadded:: 1.2
-
-In Django 1.2, support for :doc:`multiple databases </topics/db/multi-db>` was
-introduced.  In order to support multiple databases, GeoDjango has segregated
-its functionality into full-fledged spatial database backends:
+GeoDjango currently provides the following spatial database backends:
 
 * :mod:`django.contrib.gis.db.backends.postgis`
 * :mod:`django.contrib.gis.db.backends.mysql`
@@ -215,7 +211,7 @@ Then distance queries may be performed as follows::
     >>> qs = SouthTexasCity.objects.filter(point__distance_gte=(pnt, D(mi=20)))
     >>> qs = SouthTexasCity.objects.filter(point__distance_gte=(pnt, D(chain=100)))
 
-__ https://code.djangoproject.com/browser/django/trunk/django/contrib/gis/tests/distapp/models.py
+__ https://github.com/django/django/blob/master/django/contrib/gis/tests/distapp/models.py
 
 .. _compatibility-table:
 

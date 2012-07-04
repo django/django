@@ -1,5 +1,5 @@
 # -*- encoding: utf-8 -*-
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import datetime
 import decimal
@@ -62,11 +62,11 @@ class TranslationTests(TestCase):
         """
         s = ugettext_lazy('Add %(name)s')
         d = {'name': 'Ringo'}
-        self.assertEqual(u'Add Ringo', s % d)
+        self.assertEqual('Add Ringo', s % d)
         with translation.override('de', deactivate=True):
-            self.assertEqual(u'Ringo hinzuf\xfcgen', s % d)
+            self.assertEqual('Ringo hinzuf\xfcgen', s % d)
             with translation.override('pl'):
-                self.assertEqual(u'Dodaj Ringo', s % d)
+                self.assertEqual('Dodaj Ringo', s % d)
 
         # It should be possible to compare *_lazy objects.
         s1 = ugettext_lazy('Add %(name)s')
@@ -94,10 +94,10 @@ class TranslationTests(TestCase):
             trans_real._active = local()
             trans_real._translations = {}
             with translation.override('de'):
-                self.assertEqual(pgettext("unexisting", "May"), u"May")
-                self.assertEqual(pgettext("month name", "May"), u"Mai")
-                self.assertEqual(pgettext("verb", "May"), u"Kann")
-                self.assertEqual(npgettext("search", "%d result", "%d results", 4) % 4, u"4 Resultate")
+                self.assertEqual(pgettext("unexisting", "May"), "May")
+                self.assertEqual(pgettext("month name", "May"), "Mai")
+                self.assertEqual(pgettext("verb", "May"), "Kann")
+                self.assertEqual(npgettext("search", "%d result", "%d results", 4) % 4, "4 Resultate")
 
     def test_template_tags_pgettext(self):
         """
@@ -224,13 +224,13 @@ class TranslationTests(TestCase):
         unicode(string_concat(...)) should not raise a TypeError - #4796
         """
         import django.utils.translation
-        self.assertEqual(u'django', unicode(django.utils.translation.string_concat("dja", "ngo")))
+        self.assertEqual('django', unicode(django.utils.translation.string_concat("dja", "ngo")))
 
     def test_safe_status(self):
         """
         Translating a string requiring no auto-escaping shouldn't change the "safe" status.
         """
-        s = mark_safe('Password')
+        s = mark_safe(b'Password')
         self.assertEqual(SafeString, type(s))
         with translation.override('de', deactivate=True):
             self.assertEqual(SafeUnicode, type(ugettext(s)))
@@ -247,11 +247,11 @@ class TranslationTests(TestCase):
         """
         from django.utils.translation.trans_real import translation as Trans
         ca_translation = Trans('ca')
-        ca_translation._catalog[u'Mac\nEOF\n'] = u'Catalan Mac\nEOF\n'
-        ca_translation._catalog[u'Win\nEOF\n'] = u'Catalan Win\nEOF\n'
+        ca_translation._catalog['Mac\nEOF\n'] = 'Catalan Mac\nEOF\n'
+        ca_translation._catalog['Win\nEOF\n'] = 'Catalan Win\nEOF\n'
         with translation.override('ca', deactivate=True):
-            self.assertEqual(u'Catalan Mac\nEOF\n', ugettext(u'Mac\rEOF\r'))
-            self.assertEqual(u'Catalan Win\nEOF\n', ugettext(u'Win\r\nEOF\r\n'))
+            self.assertEqual('Catalan Mac\nEOF\n', ugettext('Mac\rEOF\r'))
+            self.assertEqual('Catalan Win\nEOF\n', ugettext('Win\r\nEOF\r\n'))
 
     def test_to_locale(self):
         """
@@ -270,16 +270,30 @@ class TranslationTests(TestCase):
         self.assertEqual(to_language('sr_Lat'), 'sr-lat')
 
     @override_settings(LOCALE_PATHS=(os.path.join(here, 'other', 'locale'),))
-    def test_bad_placeholder(self):
+    def test_bad_placeholder_1(self):
         """
         Error in translation file should not crash template rendering
         (%(person)s is translated as %(personne)s in fr.po)
+        Refs #16516.
         """
         from django.template import Template, Context
         with translation.override('fr'):
             t = Template('{% load i18n %}{% blocktrans %}My name is {{ person }}.{% endblocktrans %}')
             rendered = t.render(Context({'person': 'James'}))
             self.assertEqual(rendered, 'My name is James.')
+
+    @override_settings(LOCALE_PATHS=(os.path.join(here, 'other', 'locale'),))
+    def test_bad_placeholder_2(self):
+        """
+        Error in translation file should not crash template rendering
+        (%(person) misses a 's' in fr.po, causing the string formatting to fail)
+        Refs #18393.
+        """
+        from django.template import Template, Context
+        with translation.override('fr'):
+            t = Template('{% load i18n %}{% blocktrans %}My other name is {{ person }}.{% endblocktrans %}')
+            rendered = t.render(Context({'person': 'James'}))
+            self.assertEqual(rendered, 'My other name is James.')
 
 
 class FormattingTests(TestCase):
@@ -318,22 +332,22 @@ class FormattingTests(TestCase):
         Localization of numbers
         """
         with self.settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=False):
-            self.assertEqual(u'66666.66', nformat(self.n, decimal_sep='.', decimal_pos=2, grouping=3, thousand_sep=','))
-            self.assertEqual(u'66666A6', nformat(self.n, decimal_sep='A', decimal_pos=1, grouping=1, thousand_sep='B'))
-            self.assertEqual(u'66666', nformat(self.n, decimal_sep='X', decimal_pos=0, grouping=1, thousand_sep='Y'))
+            self.assertEqual('66666.66', nformat(self.n, decimal_sep='.', decimal_pos=2, grouping=3, thousand_sep=','))
+            self.assertEqual('66666A6', nformat(self.n, decimal_sep='A', decimal_pos=1, grouping=1, thousand_sep='B'))
+            self.assertEqual('66666', nformat(self.n, decimal_sep='X', decimal_pos=0, grouping=1, thousand_sep='Y'))
 
         with self.settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=True):
-            self.assertEqual(u'66,666.66', nformat(self.n, decimal_sep='.', decimal_pos=2, grouping=3, thousand_sep=','))
-            self.assertEqual(u'6B6B6B6B6A6', nformat(self.n, decimal_sep='A', decimal_pos=1, grouping=1, thousand_sep='B'))
-            self.assertEqual(u'-66666.6', nformat(-66666.666, decimal_sep='.', decimal_pos=1))
-            self.assertEqual(u'-66666.0', nformat(int('-66666'), decimal_sep='.', decimal_pos=1))
-            self.assertEqual(u'10000.0', nformat(self.l, decimal_sep='.', decimal_pos=1))
+            self.assertEqual('66,666.66', nformat(self.n, decimal_sep='.', decimal_pos=2, grouping=3, thousand_sep=','))
+            self.assertEqual('6B6B6B6B6A6', nformat(self.n, decimal_sep='A', decimal_pos=1, grouping=1, thousand_sep='B'))
+            self.assertEqual('-66666.6', nformat(-66666.666, decimal_sep='.', decimal_pos=1))
+            self.assertEqual('-66666.0', nformat(int('-66666'), decimal_sep='.', decimal_pos=1))
+            self.assertEqual('10000.0', nformat(self.l, decimal_sep='.', decimal_pos=1))
             # This unusual grouping/force_grouping combination may be triggered by the intcomma filter (#17414)
-            self.assertEqual(u'10000', nformat(self.l, decimal_sep='.', decimal_pos=0, grouping=0, force_grouping=True))
+            self.assertEqual('10000', nformat(self.l, decimal_sep='.', decimal_pos=0, grouping=0, force_grouping=True))
 
             # date filter
-            self.assertEqual(u'31.12.2009 в 20:50', Template('{{ dt|date:"d.m.Y в H:i" }}').render(self.ctxt))
-            self.assertEqual(u'⌚ 10:15', Template('{{ t|time:"⌚ H:i" }}').render(self.ctxt))
+            self.assertEqual('31.12.2009 в 20:50', Template('{{ dt|date:"d.m.Y в H:i" }}').render(self.ctxt))
+            self.assertEqual('⌚ 10:15', Template('{{ t|time:"⌚ H:i" }}').render(self.ctxt))
 
     def test_l10n_disabled(self):
         """
@@ -342,53 +356,53 @@ class FormattingTests(TestCase):
         """
         settings.USE_L10N = False
         with translation.override('ca', deactivate=True):
-            self.assertEqual(u'N j, Y', get_format('DATE_FORMAT'))
+            self.assertEqual('N j, Y', get_format('DATE_FORMAT'))
             self.assertEqual(0, get_format('FIRST_DAY_OF_WEEK'))
-            self.assertEqual(u'.', get_format('DECIMAL_SEPARATOR'))
-            self.assertEqual(u'10:15 a.m.', time_format(self.t))
-            self.assertEqual(u'des. 31, 2009', date_format(self.d))
-            self.assertEqual(u'desembre 2009', date_format(self.d, 'YEAR_MONTH_FORMAT'))
-            self.assertEqual(u'12/31/2009 8:50 p.m.', date_format(self.dt, 'SHORT_DATETIME_FORMAT'))
-            self.assertEqual(u'No localizable', localize('No localizable'))
-            self.assertEqual(u'66666.666', localize(self.n))
-            self.assertEqual(u'99999.999', localize(self.f))
-            self.assertEqual(u'10000', localize(self.l))
-            self.assertEqual(u'des. 31, 2009', localize(self.d))
-            self.assertEqual(u'des. 31, 2009, 8:50 p.m.', localize(self.dt))
-            self.assertEqual(u'66666.666', Template('{{ n }}').render(self.ctxt))
-            self.assertEqual(u'99999.999', Template('{{ f }}').render(self.ctxt))
-            self.assertEqual(u'des. 31, 2009', Template('{{ d }}').render(self.ctxt))
-            self.assertEqual(u'des. 31, 2009, 8:50 p.m.', Template('{{ dt }}').render(self.ctxt))
-            self.assertEqual(u'66666.67', Template('{{ n|floatformat:2 }}').render(self.ctxt))
-            self.assertEqual(u'100000.0', Template('{{ f|floatformat }}').render(self.ctxt))
-            self.assertEqual(u'10:15 a.m.', Template('{{ t|time:"TIME_FORMAT" }}').render(self.ctxt))
-            self.assertEqual(u'12/31/2009', Template('{{ d|date:"SHORT_DATE_FORMAT" }}').render(self.ctxt))
-            self.assertEqual(u'12/31/2009 8:50 p.m.', Template('{{ dt|date:"SHORT_DATETIME_FORMAT" }}').render(self.ctxt))
+            self.assertEqual('.', get_format('DECIMAL_SEPARATOR'))
+            self.assertEqual('10:15 a.m.', time_format(self.t))
+            self.assertEqual('des. 31, 2009', date_format(self.d))
+            self.assertEqual('desembre 2009', date_format(self.d, 'YEAR_MONTH_FORMAT'))
+            self.assertEqual('12/31/2009 8:50 p.m.', date_format(self.dt, 'SHORT_DATETIME_FORMAT'))
+            self.assertEqual('No localizable', localize('No localizable'))
+            self.assertEqual('66666.666', localize(self.n))
+            self.assertEqual('99999.999', localize(self.f))
+            self.assertEqual('10000', localize(self.l))
+            self.assertEqual('des. 31, 2009', localize(self.d))
+            self.assertEqual('des. 31, 2009, 8:50 p.m.', localize(self.dt))
+            self.assertEqual('66666.666', Template('{{ n }}').render(self.ctxt))
+            self.assertEqual('99999.999', Template('{{ f }}').render(self.ctxt))
+            self.assertEqual('des. 31, 2009', Template('{{ d }}').render(self.ctxt))
+            self.assertEqual('des. 31, 2009, 8:50 p.m.', Template('{{ dt }}').render(self.ctxt))
+            self.assertEqual('66666.67', Template('{{ n|floatformat:2 }}').render(self.ctxt))
+            self.assertEqual('100000.0', Template('{{ f|floatformat }}').render(self.ctxt))
+            self.assertEqual('10:15 a.m.', Template('{{ t|time:"TIME_FORMAT" }}').render(self.ctxt))
+            self.assertEqual('12/31/2009', Template('{{ d|date:"SHORT_DATE_FORMAT" }}').render(self.ctxt))
+            self.assertEqual('12/31/2009 8:50 p.m.', Template('{{ dt|date:"SHORT_DATETIME_FORMAT" }}').render(self.ctxt))
 
             form = I18nForm({
-                'decimal_field': u'66666,666',
-                'float_field': u'99999,999',
-                'date_field': u'31/12/2009',
-                'datetime_field': u'31/12/2009 20:50',
-                'time_field': u'20:50',
-                'integer_field': u'1.234',
+                'decimal_field': '66666,666',
+                'float_field': '99999,999',
+                'date_field': '31/12/2009',
+                'datetime_field': '31/12/2009 20:50',
+                'time_field': '20:50',
+                'integer_field': '1.234',
             })
             self.assertEqual(False, form.is_valid())
-            self.assertEqual([u'Introdu\xefu un n\xfamero.'], form.errors['float_field'])
-            self.assertEqual([u'Introdu\xefu un n\xfamero.'], form.errors['decimal_field'])
-            self.assertEqual([u'Introdu\xefu una data v\xe0lida.'], form.errors['date_field'])
-            self.assertEqual([u'Introdu\xefu una data/hora v\xe0lides.'], form.errors['datetime_field'])
-            self.assertEqual([u'Introdu\xefu un n\xfamero sencer.'], form.errors['integer_field'])
+            self.assertEqual(['Introdu\xefu un n\xfamero.'], form.errors['float_field'])
+            self.assertEqual(['Introdu\xefu un n\xfamero.'], form.errors['decimal_field'])
+            self.assertEqual(['Introdu\xefu una data v\xe0lida.'], form.errors['date_field'])
+            self.assertEqual(['Introdu\xefu una data/hora v\xe0lides.'], form.errors['datetime_field'])
+            self.assertEqual(['Introdu\xefu un n\xfamero sencer.'], form.errors['integer_field'])
 
             form2 = SelectDateForm({
-                'date_field_month': u'12',
-                'date_field_day': u'31',
-                'date_field_year': u'2009'
+                'date_field_month': '12',
+                'date_field_day': '31',
+                'date_field_year': '2009'
             })
             self.assertEqual(True, form2.is_valid())
             self.assertEqual(datetime.date(2009, 12, 31), form2.cleaned_data['date_field'])
             self.assertHTMLEqual(
-                u'<select name="mydate_month" id="id_mydate_month">\n<option value="1">gener</option>\n<option value="2">febrer</option>\n<option value="3">mar\xe7</option>\n<option value="4">abril</option>\n<option value="5">maig</option>\n<option value="6">juny</option>\n<option value="7">juliol</option>\n<option value="8">agost</option>\n<option value="9">setembre</option>\n<option value="10">octubre</option>\n<option value="11">novembre</option>\n<option value="12" selected="selected">desembre</option>\n</select>\n<select name="mydate_day" id="id_mydate_day">\n<option value="1">1</option>\n<option value="2">2</option>\n<option value="3">3</option>\n<option value="4">4</option>\n<option value="5">5</option>\n<option value="6">6</option>\n<option value="7">7</option>\n<option value="8">8</option>\n<option value="9">9</option>\n<option value="10">10</option>\n<option value="11">11</option>\n<option value="12">12</option>\n<option value="13">13</option>\n<option value="14">14</option>\n<option value="15">15</option>\n<option value="16">16</option>\n<option value="17">17</option>\n<option value="18">18</option>\n<option value="19">19</option>\n<option value="20">20</option>\n<option value="21">21</option>\n<option value="22">22</option>\n<option value="23">23</option>\n<option value="24">24</option>\n<option value="25">25</option>\n<option value="26">26</option>\n<option value="27">27</option>\n<option value="28">28</option>\n<option value="29">29</option>\n<option value="30">30</option>\n<option value="31" selected="selected">31</option>\n</select>\n<select name="mydate_year" id="id_mydate_year">\n<option value="2009" selected="selected">2009</option>\n<option value="2010">2010</option>\n<option value="2011">2011</option>\n<option value="2012">2012</option>\n<option value="2013">2013</option>\n<option value="2014">2014</option>\n<option value="2015">2015</option>\n<option value="2016">2016</option>\n<option value="2017">2017</option>\n<option value="2018">2018</option>\n</select>',
+                '<select name="mydate_month" id="id_mydate_month">\n<option value="1">gener</option>\n<option value="2">febrer</option>\n<option value="3">mar\xe7</option>\n<option value="4">abril</option>\n<option value="5">maig</option>\n<option value="6">juny</option>\n<option value="7">juliol</option>\n<option value="8">agost</option>\n<option value="9">setembre</option>\n<option value="10">octubre</option>\n<option value="11">novembre</option>\n<option value="12" selected="selected">desembre</option>\n</select>\n<select name="mydate_day" id="id_mydate_day">\n<option value="1">1</option>\n<option value="2">2</option>\n<option value="3">3</option>\n<option value="4">4</option>\n<option value="5">5</option>\n<option value="6">6</option>\n<option value="7">7</option>\n<option value="8">8</option>\n<option value="9">9</option>\n<option value="10">10</option>\n<option value="11">11</option>\n<option value="12">12</option>\n<option value="13">13</option>\n<option value="14">14</option>\n<option value="15">15</option>\n<option value="16">16</option>\n<option value="17">17</option>\n<option value="18">18</option>\n<option value="19">19</option>\n<option value="20">20</option>\n<option value="21">21</option>\n<option value="22">22</option>\n<option value="23">23</option>\n<option value="24">24</option>\n<option value="25">25</option>\n<option value="26">26</option>\n<option value="27">27</option>\n<option value="28">28</option>\n<option value="29">29</option>\n<option value="30">30</option>\n<option value="31" selected="selected">31</option>\n</select>\n<select name="mydate_year" id="id_mydate_year">\n<option value="2009" selected="selected">2009</option>\n<option value="2010">2010</option>\n<option value="2011">2011</option>\n<option value="2012">2012</option>\n<option value="2013">2013</option>\n<option value="2014">2014</option>\n<option value="2015">2015</option>\n<option value="2016">2016</option>\n<option value="2017">2017</option>\n<option value="2018">2018</option>\n</select>',
                 SelectDateWidget(years=range(2009, 2019)).render('mydate', datetime.date(2009, 12, 31))
             )
 
@@ -398,8 +412,8 @@ class FormattingTests(TestCase):
             # THOUSAND_SEPARATOR settings are specified
             with self.settings(USE_THOUSAND_SEPARATOR=True,
                     NUMBER_GROUPING=1, THOUSAND_SEPARATOR='!'):
-                self.assertEqual(u'66666.67', Template('{{ n|floatformat:2 }}').render(self.ctxt))
-                self.assertEqual(u'100000.0', Template('{{ f|floatformat }}').render(self.ctxt))
+                self.assertEqual('66666.67', Template('{{ n|floatformat:2 }}').render(self.ctxt))
+                self.assertEqual('100000.0', Template('{{ f|floatformat }}').render(self.ctxt))
 
     def test_false_like_locale_formats(self):
         """
@@ -441,37 +455,37 @@ class FormattingTests(TestCase):
             self.assertEqual('j \d\e F \d\e Y', get_format('DATE_FORMAT'))
             self.assertEqual(1, get_format('FIRST_DAY_OF_WEEK'))
             self.assertEqual(',', get_format('DECIMAL_SEPARATOR'))
-            self.assertEqual(u'10:15:48', time_format(self.t))
-            self.assertEqual(u'31 de desembre de 2009', date_format(self.d))
-            self.assertEqual(u'desembre del 2009', date_format(self.d, 'YEAR_MONTH_FORMAT'))
-            self.assertEqual(u'31/12/2009 20:50', date_format(self.dt, 'SHORT_DATETIME_FORMAT'))
+            self.assertEqual('10:15:48', time_format(self.t))
+            self.assertEqual('31 de desembre de 2009', date_format(self.d))
+            self.assertEqual('desembre del 2009', date_format(self.d, 'YEAR_MONTH_FORMAT'))
+            self.assertEqual('31/12/2009 20:50', date_format(self.dt, 'SHORT_DATETIME_FORMAT'))
             self.assertEqual('No localizable', localize('No localizable'))
 
             settings.USE_THOUSAND_SEPARATOR = True
-            self.assertEqual(u'66.666,666', localize(self.n))
-            self.assertEqual(u'99.999,999', localize(self.f))
-            self.assertEqual(u'10.000', localize(self.l))
-            self.assertEqual(u'True', localize(True))
+            self.assertEqual('66.666,666', localize(self.n))
+            self.assertEqual('99.999,999', localize(self.f))
+            self.assertEqual('10.000', localize(self.l))
+            self.assertEqual('True', localize(True))
 
             settings.USE_THOUSAND_SEPARATOR = False
-            self.assertEqual(u'66666,666', localize(self.n))
-            self.assertEqual(u'99999,999', localize(self.f))
-            self.assertEqual(u'10000', localize(self.l))
-            self.assertEqual(u'31 de desembre de 2009', localize(self.d))
-            self.assertEqual(u'31 de desembre de 2009 a les 20:50', localize(self.dt))
+            self.assertEqual('66666,666', localize(self.n))
+            self.assertEqual('99999,999', localize(self.f))
+            self.assertEqual('10000', localize(self.l))
+            self.assertEqual('31 de desembre de 2009', localize(self.d))
+            self.assertEqual('31 de desembre de 2009 a les 20:50', localize(self.dt))
 
             settings.USE_THOUSAND_SEPARATOR = True
-            self.assertEqual(u'66.666,666', Template('{{ n }}').render(self.ctxt))
-            self.assertEqual(u'99.999,999', Template('{{ f }}').render(self.ctxt))
-            self.assertEqual(u'10.000', Template('{{ l }}').render(self.ctxt))
+            self.assertEqual('66.666,666', Template('{{ n }}').render(self.ctxt))
+            self.assertEqual('99.999,999', Template('{{ f }}').render(self.ctxt))
+            self.assertEqual('10.000', Template('{{ l }}').render(self.ctxt))
 
             form3 = I18nForm({
-                'decimal_field': u'66.666,666',
-                'float_field': u'99.999,999',
-                'date_field': u'31/12/2009',
-                'datetime_field': u'31/12/2009 20:50',
-                'time_field': u'20:50',
-                'integer_field': u'1.234',
+                'decimal_field': '66.666,666',
+                'float_field': '99.999,999',
+                'date_field': '31/12/2009',
+                'datetime_field': '31/12/2009 20:50',
+                'time_field': '20:50',
+                'integer_field': '1.234',
             })
             self.assertEqual(True, form3.is_valid())
             self.assertEqual(decimal.Decimal('66666.666'), form3.cleaned_data['decimal_field'])
@@ -482,24 +496,24 @@ class FormattingTests(TestCase):
             self.assertEqual(1234, form3.cleaned_data['integer_field'])
 
             settings.USE_THOUSAND_SEPARATOR = False
-            self.assertEqual(u'66666,666', Template('{{ n }}').render(self.ctxt))
-            self.assertEqual(u'99999,999', Template('{{ f }}').render(self.ctxt))
-            self.assertEqual(u'31 de desembre de 2009', Template('{{ d }}').render(self.ctxt))
-            self.assertEqual(u'31 de desembre de 2009 a les 20:50', Template('{{ dt }}').render(self.ctxt))
-            self.assertEqual(u'66666,67', Template('{{ n|floatformat:2 }}').render(self.ctxt))
-            self.assertEqual(u'100000,0', Template('{{ f|floatformat }}').render(self.ctxt))
-            self.assertEqual(u'10:15:48', Template('{{ t|time:"TIME_FORMAT" }}').render(self.ctxt))
-            self.assertEqual(u'31/12/2009', Template('{{ d|date:"SHORT_DATE_FORMAT" }}').render(self.ctxt))
-            self.assertEqual(u'31/12/2009 20:50', Template('{{ dt|date:"SHORT_DATETIME_FORMAT" }}').render(self.ctxt))
+            self.assertEqual('66666,666', Template('{{ n }}').render(self.ctxt))
+            self.assertEqual('99999,999', Template('{{ f }}').render(self.ctxt))
+            self.assertEqual('31 de desembre de 2009', Template('{{ d }}').render(self.ctxt))
+            self.assertEqual('31 de desembre de 2009 a les 20:50', Template('{{ dt }}').render(self.ctxt))
+            self.assertEqual('66666,67', Template('{{ n|floatformat:2 }}').render(self.ctxt))
+            self.assertEqual('100000,0', Template('{{ f|floatformat }}').render(self.ctxt))
+            self.assertEqual('10:15:48', Template('{{ t|time:"TIME_FORMAT" }}').render(self.ctxt))
+            self.assertEqual('31/12/2009', Template('{{ d|date:"SHORT_DATE_FORMAT" }}').render(self.ctxt))
+            self.assertEqual('31/12/2009 20:50', Template('{{ dt|date:"SHORT_DATETIME_FORMAT" }}').render(self.ctxt))
             self.assertEqual(date_format(datetime.datetime.now(), "DATE_FORMAT"), Template('{% now "DATE_FORMAT" %}').render(self.ctxt))
 
             form4 = I18nForm({
-                'decimal_field': u'66666,666',
-                'float_field': u'99999,999',
-                'date_field': u'31/12/2009',
-                'datetime_field': u'31/12/2009 20:50',
-                'time_field': u'20:50',
-                'integer_field': u'1234',
+                'decimal_field': '66666,666',
+                'float_field': '99999,999',
+                'date_field': '31/12/2009',
+                'datetime_field': '31/12/2009 20:50',
+                'time_field': '20:50',
+                'integer_field': '1234',
             })
             self.assertEqual(True, form4.is_valid())
             self.assertEqual(decimal.Decimal('66666.666'), form4.cleaned_data['decimal_field'])
@@ -510,21 +524,21 @@ class FormattingTests(TestCase):
             self.assertEqual(1234, form4.cleaned_data['integer_field'])
 
             form5 = SelectDateForm({
-                'date_field_month': u'12',
-                'date_field_day': u'31',
-                'date_field_year': u'2009'
+                'date_field_month': '12',
+                'date_field_day': '31',
+                'date_field_year': '2009'
             })
             self.assertEqual(True, form5.is_valid())
             self.assertEqual(datetime.date(2009, 12, 31), form5.cleaned_data['date_field'])
             self.assertHTMLEqual(
-                u'<select name="mydate_day" id="id_mydate_day">\n<option value="1">1</option>\n<option value="2">2</option>\n<option value="3">3</option>\n<option value="4">4</option>\n<option value="5">5</option>\n<option value="6">6</option>\n<option value="7">7</option>\n<option value="8">8</option>\n<option value="9">9</option>\n<option value="10">10</option>\n<option value="11">11</option>\n<option value="12">12</option>\n<option value="13">13</option>\n<option value="14">14</option>\n<option value="15">15</option>\n<option value="16">16</option>\n<option value="17">17</option>\n<option value="18">18</option>\n<option value="19">19</option>\n<option value="20">20</option>\n<option value="21">21</option>\n<option value="22">22</option>\n<option value="23">23</option>\n<option value="24">24</option>\n<option value="25">25</option>\n<option value="26">26</option>\n<option value="27">27</option>\n<option value="28">28</option>\n<option value="29">29</option>\n<option value="30">30</option>\n<option value="31" selected="selected">31</option>\n</select>\n<select name="mydate_month" id="id_mydate_month">\n<option value="1">gener</option>\n<option value="2">febrer</option>\n<option value="3">mar\xe7</option>\n<option value="4">abril</option>\n<option value="5">maig</option>\n<option value="6">juny</option>\n<option value="7">juliol</option>\n<option value="8">agost</option>\n<option value="9">setembre</option>\n<option value="10">octubre</option>\n<option value="11">novembre</option>\n<option value="12" selected="selected">desembre</option>\n</select>\n<select name="mydate_year" id="id_mydate_year">\n<option value="2009" selected="selected">2009</option>\n<option value="2010">2010</option>\n<option value="2011">2011</option>\n<option value="2012">2012</option>\n<option value="2013">2013</option>\n<option value="2014">2014</option>\n<option value="2015">2015</option>\n<option value="2016">2016</option>\n<option value="2017">2017</option>\n<option value="2018">2018</option>\n</select>',
+                '<select name="mydate_day" id="id_mydate_day">\n<option value="1">1</option>\n<option value="2">2</option>\n<option value="3">3</option>\n<option value="4">4</option>\n<option value="5">5</option>\n<option value="6">6</option>\n<option value="7">7</option>\n<option value="8">8</option>\n<option value="9">9</option>\n<option value="10">10</option>\n<option value="11">11</option>\n<option value="12">12</option>\n<option value="13">13</option>\n<option value="14">14</option>\n<option value="15">15</option>\n<option value="16">16</option>\n<option value="17">17</option>\n<option value="18">18</option>\n<option value="19">19</option>\n<option value="20">20</option>\n<option value="21">21</option>\n<option value="22">22</option>\n<option value="23">23</option>\n<option value="24">24</option>\n<option value="25">25</option>\n<option value="26">26</option>\n<option value="27">27</option>\n<option value="28">28</option>\n<option value="29">29</option>\n<option value="30">30</option>\n<option value="31" selected="selected">31</option>\n</select>\n<select name="mydate_month" id="id_mydate_month">\n<option value="1">gener</option>\n<option value="2">febrer</option>\n<option value="3">mar\xe7</option>\n<option value="4">abril</option>\n<option value="5">maig</option>\n<option value="6">juny</option>\n<option value="7">juliol</option>\n<option value="8">agost</option>\n<option value="9">setembre</option>\n<option value="10">octubre</option>\n<option value="11">novembre</option>\n<option value="12" selected="selected">desembre</option>\n</select>\n<select name="mydate_year" id="id_mydate_year">\n<option value="2009" selected="selected">2009</option>\n<option value="2010">2010</option>\n<option value="2011">2011</option>\n<option value="2012">2012</option>\n<option value="2013">2013</option>\n<option value="2014">2014</option>\n<option value="2015">2015</option>\n<option value="2016">2016</option>\n<option value="2017">2017</option>\n<option value="2018">2018</option>\n</select>',
                 SelectDateWidget(years=range(2009, 2019)).render('mydate', datetime.date(2009, 12, 31))
             )
 
         # Russian locale (with E as month)
         with translation.override('ru', deactivate=True):
             self.assertHTMLEqual(
-                    u'<select name="mydate_day" id="id_mydate_day">\n<option value="1">1</option>\n<option value="2">2</option>\n<option value="3">3</option>\n<option value="4">4</option>\n<option value="5">5</option>\n<option value="6">6</option>\n<option value="7">7</option>\n<option value="8">8</option>\n<option value="9">9</option>\n<option value="10">10</option>\n<option value="11">11</option>\n<option value="12">12</option>\n<option value="13">13</option>\n<option value="14">14</option>\n<option value="15">15</option>\n<option value="16">16</option>\n<option value="17">17</option>\n<option value="18">18</option>\n<option value="19">19</option>\n<option value="20">20</option>\n<option value="21">21</option>\n<option value="22">22</option>\n<option value="23">23</option>\n<option value="24">24</option>\n<option value="25">25</option>\n<option value="26">26</option>\n<option value="27">27</option>\n<option value="28">28</option>\n<option value="29">29</option>\n<option value="30">30</option>\n<option value="31" selected="selected">31</option>\n</select>\n<select name="mydate_month" id="id_mydate_month">\n<option value="1">\u042f\u043d\u0432\u0430\u0440\u044c</option>\n<option value="2">\u0424\u0435\u0432\u0440\u0430\u043b\u044c</option>\n<option value="3">\u041c\u0430\u0440\u0442</option>\n<option value="4">\u0410\u043f\u0440\u0435\u043b\u044c</option>\n<option value="5">\u041c\u0430\u0439</option>\n<option value="6">\u0418\u044e\u043d\u044c</option>\n<option value="7">\u0418\u044e\u043b\u044c</option>\n<option value="8">\u0410\u0432\u0433\u0443\u0441\u0442</option>\n<option value="9">\u0421\u0435\u043d\u0442\u044f\u0431\u0440\u044c</option>\n<option value="10">\u041e\u043a\u0442\u044f\u0431\u0440\u044c</option>\n<option value="11">\u041d\u043e\u044f\u0431\u0440\u044c</option>\n<option value="12" selected="selected">\u0414\u0435\u043a\u0430\u0431\u0440\u044c</option>\n</select>\n<select name="mydate_year" id="id_mydate_year">\n<option value="2009" selected="selected">2009</option>\n<option value="2010">2010</option>\n<option value="2011">2011</option>\n<option value="2012">2012</option>\n<option value="2013">2013</option>\n<option value="2014">2014</option>\n<option value="2015">2015</option>\n<option value="2016">2016</option>\n<option value="2017">2017</option>\n<option value="2018">2018</option>\n</select>',
+                    '<select name="mydate_day" id="id_mydate_day">\n<option value="1">1</option>\n<option value="2">2</option>\n<option value="3">3</option>\n<option value="4">4</option>\n<option value="5">5</option>\n<option value="6">6</option>\n<option value="7">7</option>\n<option value="8">8</option>\n<option value="9">9</option>\n<option value="10">10</option>\n<option value="11">11</option>\n<option value="12">12</option>\n<option value="13">13</option>\n<option value="14">14</option>\n<option value="15">15</option>\n<option value="16">16</option>\n<option value="17">17</option>\n<option value="18">18</option>\n<option value="19">19</option>\n<option value="20">20</option>\n<option value="21">21</option>\n<option value="22">22</option>\n<option value="23">23</option>\n<option value="24">24</option>\n<option value="25">25</option>\n<option value="26">26</option>\n<option value="27">27</option>\n<option value="28">28</option>\n<option value="29">29</option>\n<option value="30">30</option>\n<option value="31" selected="selected">31</option>\n</select>\n<select name="mydate_month" id="id_mydate_month">\n<option value="1">\u042f\u043d\u0432\u0430\u0440\u044c</option>\n<option value="2">\u0424\u0435\u0432\u0440\u0430\u043b\u044c</option>\n<option value="3">\u041c\u0430\u0440\u0442</option>\n<option value="4">\u0410\u043f\u0440\u0435\u043b\u044c</option>\n<option value="5">\u041c\u0430\u0439</option>\n<option value="6">\u0418\u044e\u043d\u044c</option>\n<option value="7">\u0418\u044e\u043b\u044c</option>\n<option value="8">\u0410\u0432\u0433\u0443\u0441\u0442</option>\n<option value="9">\u0421\u0435\u043d\u0442\u044f\u0431\u0440\u044c</option>\n<option value="10">\u041e\u043a\u0442\u044f\u0431\u0440\u044c</option>\n<option value="11">\u041d\u043e\u044f\u0431\u0440\u044c</option>\n<option value="12" selected="selected">\u0414\u0435\u043a\u0430\u0431\u0440\u044c</option>\n</select>\n<select name="mydate_year" id="id_mydate_year">\n<option value="2009" selected="selected">2009</option>\n<option value="2010">2010</option>\n<option value="2011">2011</option>\n<option value="2012">2012</option>\n<option value="2013">2013</option>\n<option value="2014">2014</option>\n<option value="2015">2015</option>\n<option value="2016">2016</option>\n<option value="2017">2017</option>\n<option value="2018">2018</option>\n</select>',
                     SelectDateWidget(years=range(2009, 2019)).render('mydate', datetime.date(2009, 12, 31))
             )
 
@@ -533,45 +547,45 @@ class FormattingTests(TestCase):
             self.assertEqual('N j, Y', get_format('DATE_FORMAT'))
             self.assertEqual(0, get_format('FIRST_DAY_OF_WEEK'))
             self.assertEqual('.', get_format('DECIMAL_SEPARATOR'))
-            self.assertEqual(u'Dec. 31, 2009', date_format(self.d))
-            self.assertEqual(u'December 2009', date_format(self.d, 'YEAR_MONTH_FORMAT'))
-            self.assertEqual(u'12/31/2009 8:50 p.m.', date_format(self.dt, 'SHORT_DATETIME_FORMAT'))
-            self.assertEqual(u'No localizable', localize('No localizable'))
+            self.assertEqual('Dec. 31, 2009', date_format(self.d))
+            self.assertEqual('December 2009', date_format(self.d, 'YEAR_MONTH_FORMAT'))
+            self.assertEqual('12/31/2009 8:50 p.m.', date_format(self.dt, 'SHORT_DATETIME_FORMAT'))
+            self.assertEqual('No localizable', localize('No localizable'))
 
             settings.USE_THOUSAND_SEPARATOR = True
-            self.assertEqual(u'66,666.666', localize(self.n))
-            self.assertEqual(u'99,999.999', localize(self.f))
-            self.assertEqual(u'10,000', localize(self.l))
+            self.assertEqual('66,666.666', localize(self.n))
+            self.assertEqual('99,999.999', localize(self.f))
+            self.assertEqual('10,000', localize(self.l))
 
             settings.USE_THOUSAND_SEPARATOR = False
-            self.assertEqual(u'66666.666', localize(self.n))
-            self.assertEqual(u'99999.999', localize(self.f))
-            self.assertEqual(u'10000', localize(self.l))
-            self.assertEqual(u'Dec. 31, 2009', localize(self.d))
-            self.assertEqual(u'Dec. 31, 2009, 8:50 p.m.', localize(self.dt))
+            self.assertEqual('66666.666', localize(self.n))
+            self.assertEqual('99999.999', localize(self.f))
+            self.assertEqual('10000', localize(self.l))
+            self.assertEqual('Dec. 31, 2009', localize(self.d))
+            self.assertEqual('Dec. 31, 2009, 8:50 p.m.', localize(self.dt))
 
             settings.USE_THOUSAND_SEPARATOR = True
-            self.assertEqual(u'66,666.666', Template('{{ n }}').render(self.ctxt))
-            self.assertEqual(u'99,999.999', Template('{{ f }}').render(self.ctxt))
-            self.assertEqual(u'10,000', Template('{{ l }}').render(self.ctxt))
+            self.assertEqual('66,666.666', Template('{{ n }}').render(self.ctxt))
+            self.assertEqual('99,999.999', Template('{{ f }}').render(self.ctxt))
+            self.assertEqual('10,000', Template('{{ l }}').render(self.ctxt))
 
             settings.USE_THOUSAND_SEPARATOR = False
-            self.assertEqual(u'66666.666', Template('{{ n }}').render(self.ctxt))
-            self.assertEqual(u'99999.999', Template('{{ f }}').render(self.ctxt))
-            self.assertEqual(u'Dec. 31, 2009', Template('{{ d }}').render(self.ctxt))
-            self.assertEqual(u'Dec. 31, 2009, 8:50 p.m.', Template('{{ dt }}').render(self.ctxt))
-            self.assertEqual(u'66666.67', Template('{{ n|floatformat:2 }}').render(self.ctxt))
-            self.assertEqual(u'100000.0', Template('{{ f|floatformat }}').render(self.ctxt))
-            self.assertEqual(u'12/31/2009', Template('{{ d|date:"SHORT_DATE_FORMAT" }}').render(self.ctxt))
-            self.assertEqual(u'12/31/2009 8:50 p.m.', Template('{{ dt|date:"SHORT_DATETIME_FORMAT" }}').render(self.ctxt))
+            self.assertEqual('66666.666', Template('{{ n }}').render(self.ctxt))
+            self.assertEqual('99999.999', Template('{{ f }}').render(self.ctxt))
+            self.assertEqual('Dec. 31, 2009', Template('{{ d }}').render(self.ctxt))
+            self.assertEqual('Dec. 31, 2009, 8:50 p.m.', Template('{{ dt }}').render(self.ctxt))
+            self.assertEqual('66666.67', Template('{{ n|floatformat:2 }}').render(self.ctxt))
+            self.assertEqual('100000.0', Template('{{ f|floatformat }}').render(self.ctxt))
+            self.assertEqual('12/31/2009', Template('{{ d|date:"SHORT_DATE_FORMAT" }}').render(self.ctxt))
+            self.assertEqual('12/31/2009 8:50 p.m.', Template('{{ dt|date:"SHORT_DATETIME_FORMAT" }}').render(self.ctxt))
 
             form5 = I18nForm({
-                'decimal_field': u'66666.666',
-                'float_field': u'99999.999',
-                'date_field': u'12/31/2009',
-                'datetime_field': u'12/31/2009 20:50',
-                'time_field': u'20:50',
-                'integer_field': u'1234',
+                'decimal_field': '66666.666',
+                'float_field': '99999.999',
+                'date_field': '12/31/2009',
+                'datetime_field': '12/31/2009 20:50',
+                'time_field': '20:50',
+                'integer_field': '1234',
             })
             self.assertEqual(True, form5.is_valid())
             self.assertEqual(decimal.Decimal('66666.666'), form5.cleaned_data['decimal_field'])
@@ -582,14 +596,14 @@ class FormattingTests(TestCase):
             self.assertEqual(1234, form5.cleaned_data['integer_field'])
 
             form6 = SelectDateForm({
-                'date_field_month': u'12',
-                'date_field_day': u'31',
-                'date_field_year': u'2009'
+                'date_field_month': '12',
+                'date_field_day': '31',
+                'date_field_year': '2009'
             })
             self.assertEqual(True, form6.is_valid())
             self.assertEqual(datetime.date(2009, 12, 31), form6.cleaned_data['date_field'])
             self.assertHTMLEqual(
-                u'<select name="mydate_month" id="id_mydate_month">\n<option value="1">January</option>\n<option value="2">February</option>\n<option value="3">March</option>\n<option value="4">April</option>\n<option value="5">May</option>\n<option value="6">June</option>\n<option value="7">July</option>\n<option value="8">August</option>\n<option value="9">September</option>\n<option value="10">October</option>\n<option value="11">November</option>\n<option value="12" selected="selected">December</option>\n</select>\n<select name="mydate_day" id="id_mydate_day">\n<option value="1">1</option>\n<option value="2">2</option>\n<option value="3">3</option>\n<option value="4">4</option>\n<option value="5">5</option>\n<option value="6">6</option>\n<option value="7">7</option>\n<option value="8">8</option>\n<option value="9">9</option>\n<option value="10">10</option>\n<option value="11">11</option>\n<option value="12">12</option>\n<option value="13">13</option>\n<option value="14">14</option>\n<option value="15">15</option>\n<option value="16">16</option>\n<option value="17">17</option>\n<option value="18">18</option>\n<option value="19">19</option>\n<option value="20">20</option>\n<option value="21">21</option>\n<option value="22">22</option>\n<option value="23">23</option>\n<option value="24">24</option>\n<option value="25">25</option>\n<option value="26">26</option>\n<option value="27">27</option>\n<option value="28">28</option>\n<option value="29">29</option>\n<option value="30">30</option>\n<option value="31" selected="selected">31</option>\n</select>\n<select name="mydate_year" id="id_mydate_year">\n<option value="2009" selected="selected">2009</option>\n<option value="2010">2010</option>\n<option value="2011">2011</option>\n<option value="2012">2012</option>\n<option value="2013">2013</option>\n<option value="2014">2014</option>\n<option value="2015">2015</option>\n<option value="2016">2016</option>\n<option value="2017">2017</option>\n<option value="2018">2018</option>\n</select>',
+                '<select name="mydate_month" id="id_mydate_month">\n<option value="1">January</option>\n<option value="2">February</option>\n<option value="3">March</option>\n<option value="4">April</option>\n<option value="5">May</option>\n<option value="6">June</option>\n<option value="7">July</option>\n<option value="8">August</option>\n<option value="9">September</option>\n<option value="10">October</option>\n<option value="11">November</option>\n<option value="12" selected="selected">December</option>\n</select>\n<select name="mydate_day" id="id_mydate_day">\n<option value="1">1</option>\n<option value="2">2</option>\n<option value="3">3</option>\n<option value="4">4</option>\n<option value="5">5</option>\n<option value="6">6</option>\n<option value="7">7</option>\n<option value="8">8</option>\n<option value="9">9</option>\n<option value="10">10</option>\n<option value="11">11</option>\n<option value="12">12</option>\n<option value="13">13</option>\n<option value="14">14</option>\n<option value="15">15</option>\n<option value="16">16</option>\n<option value="17">17</option>\n<option value="18">18</option>\n<option value="19">19</option>\n<option value="20">20</option>\n<option value="21">21</option>\n<option value="22">22</option>\n<option value="23">23</option>\n<option value="24">24</option>\n<option value="25">25</option>\n<option value="26">26</option>\n<option value="27">27</option>\n<option value="28">28</option>\n<option value="29">29</option>\n<option value="30">30</option>\n<option value="31" selected="selected">31</option>\n</select>\n<select name="mydate_year" id="id_mydate_year">\n<option value="2009" selected="selected">2009</option>\n<option value="2010">2010</option>\n<option value="2011">2011</option>\n<option value="2012">2012</option>\n<option value="2013">2013</option>\n<option value="2014">2014</option>\n<option value="2015">2015</option>\n<option value="2016">2016</option>\n<option value="2017">2017</option>\n<option value="2018">2018</option>\n</select>',
                 SelectDateWidget(years=range(2009, 2019)).render('mydate', datetime.date(2009, 12, 31))
             )
 
@@ -599,9 +613,9 @@ class FormattingTests(TestCase):
         """
         with self.settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=True):
             with translation.override('de-at', deactivate=True):
-                self.assertEqual(u'66.666,666', Template('{{ n }}').render(self.ctxt))
+                self.assertEqual('66.666,666', Template('{{ n }}').render(self.ctxt))
             with translation.override('es-us', deactivate=True):
-                self.assertEqual(u'31 de diciembre de 2009', date_format(self.d))
+                self.assertEqual('31 de diciembre de 2009', date_format(self.d))
 
     def test_localized_input(self):
         """
@@ -610,7 +624,7 @@ class FormattingTests(TestCase):
         settings.USE_L10N = True
         with translation.override('de-at', deactivate=True):
             form6 = CompanyForm({
-                'name': u'acme',
+                'name': 'acme',
                 'date_added': datetime.datetime(2009, 12, 31, 6, 0, 0),
                 'cents_paid': decimal.Decimal('59.47'),
                 'products_delivered': 12000,
@@ -618,13 +632,13 @@ class FormattingTests(TestCase):
             self.assertEqual(True, form6.is_valid())
             self.assertHTMLEqual(
                 form6.as_ul(),
-                u'<li><label for="id_name">Name:</label> <input id="id_name" type="text" name="name" value="acme" maxlength="50" /></li>\n<li><label for="id_date_added">Date added:</label> <input type="text" name="date_added" value="31.12.2009 06:00:00" id="id_date_added" /></li>\n<li><label for="id_cents_paid">Cents paid:</label> <input type="text" name="cents_paid" value="59,47" id="id_cents_paid" /></li>\n<li><label for="id_products_delivered">Products delivered:</label> <input type="text" name="products_delivered" value="12000" id="id_products_delivered" /></li>'
+                '<li><label for="id_name">Name:</label> <input id="id_name" type="text" name="name" value="acme" maxlength="50" /></li>\n<li><label for="id_date_added">Date added:</label> <input type="text" name="date_added" value="31.12.2009 06:00:00" id="id_date_added" /></li>\n<li><label for="id_cents_paid">Cents paid:</label> <input type="text" name="cents_paid" value="59,47" id="id_cents_paid" /></li>\n<li><label for="id_products_delivered">Products delivered:</label> <input type="text" name="products_delivered" value="12000" id="id_products_delivered" /></li>'
             )
             self.assertEqual(localize_input(datetime.datetime(2009, 12, 31, 6, 0, 0)), '31.12.2009 06:00:00')
             self.assertEqual(datetime.datetime(2009, 12, 31, 6, 0, 0), form6.cleaned_data['date_added'])
             with self.settings(USE_THOUSAND_SEPARATOR=True):
                 # Checking for the localized "products_delivered" field
-                self.assertTrue(u'<input type="text" name="products_delivered" value="12.000" id="id_products_delivered" />' in form6.as_ul())
+                self.assertTrue('<input type="text" name="products_delivered" value="12.000" id="id_products_delivered" />' in form6.as_ul())
 
     def test_iter_format_modules(self):
         """
@@ -812,9 +826,9 @@ class MiscTests(TestCase):
             t_sing = Template("{% load i18n %}{% blocktrans %}The result was {{ percent }}%{% endblocktrans %}")
             t_plur = Template("{% load i18n %}{% blocktrans count num as number %}{{ percent }}% represents {{ num }} object{% plural %}{{ percent }}% represents {{ num }} objects{% endblocktrans %}")
             with translation.override('de'):
-                self.assertEqual(t_sing.render(Context({'percent': 42})), u'Das Ergebnis war 42%')
-                self.assertEqual(t_plur.render(Context({'percent': 42, 'num': 1})), u'42% stellt 1 Objekt dar')
-                self.assertEqual(t_plur.render(Context({'percent': 42, 'num': 4})), u'42% stellt 4 Objekte dar')
+                self.assertEqual(t_sing.render(Context({'percent': 42})), 'Das Ergebnis war 42%')
+                self.assertEqual(t_plur.render(Context({'percent': 42, 'num': 1})), '42% stellt 1 Objekt dar')
+                self.assertEqual(t_plur.render(Context({'percent': 42, 'num': 4})), '42% stellt 4 Objekte dar')
 
 
 class ResolutionOrderI18NTests(TestCase):
@@ -881,9 +895,9 @@ class TestModels(TestCase):
 
     def test_safestr(self):
         c = Company(cents_paid=12, products_delivered=1)
-        c.name = SafeUnicode(u'Iñtërnâtiônàlizætiøn1')
+        c.name = SafeUnicode('Iñtërnâtiônàlizætiøn1')
         c.save()
-        c.name = SafeString(u'Iñtërnâtiônàlizætiøn1'.encode('utf-8'))
+        c.name = SafeString('Iñtërnâtiônàlizætiøn1'.encode('utf-8'))
         c.save()
 
 
@@ -891,7 +905,7 @@ class TestLanguageInfo(TestCase):
     def test_localized_language_info(self):
         li = get_language_info('de')
         self.assertEqual(li['code'], 'de')
-        self.assertEqual(li['name_local'], u'Deutsch')
+        self.assertEqual(li['name_local'], 'Deutsch')
         self.assertEqual(li['name'], 'German')
         self.assertEqual(li['bidi'], False)
 

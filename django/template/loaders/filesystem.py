@@ -34,11 +34,8 @@ class Loader(BaseLoader):
         tried = []
         for filepath in self.get_template_sources(template_name, template_dirs):
             try:
-                file = open(filepath)
-                try:
-                    return (file.read().decode(settings.FILE_CHARSET), filepath)
-                finally:
-                    file.close()
+                with open(filepath, 'rb') as fp:
+                    return (fp.read().decode(settings.FILE_CHARSET), filepath)
             except IOError:
                 tried.append(filepath)
         if tried:

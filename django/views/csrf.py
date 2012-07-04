@@ -101,4 +101,4 @@ def csrf_failure(request, reason=""):
                  'reason': reason,
                  'no_referer': reason == REASON_NO_REFERER
                  })
-    return HttpResponseForbidden(t.render(c), mimetype='text/html')
+    return HttpResponseForbidden(t.render(c), content_type='text/html')

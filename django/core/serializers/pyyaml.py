@@ -4,14 +4,16 @@ YAML serializer.
 Requires PyYaml (http://pyyaml.org/), but that's checked for in __init__.
 """
 
-from StringIO import StringIO
 import decimal
 import yaml
+from io import StringIO
 
 from django.db import models
 from django.core.serializers.base import DeserializationError
 from django.core.serializers.python import Serializer as PythonSerializer
 from django.core.serializers.python import Deserializer as PythonDeserializer
+from django.utils.encoding import smart_str
+
 
 class DjangoSafeDumper(yaml.SafeDumper):
     def represent_decimal(self, data):
@@ -42,12 +44,15 @@ class Serializer(PythonSerializer):
         yaml.dump(self.objects, self.stream, Dumper=DjangoSafeDumper, **self.options)
 
     def getvalue(self):
-        return self.stream.getvalue()
+        # Grand-parent super
+        return super(PythonSerializer, self).getvalue()
 
 def Deserializer(stream_or_string, **options):
     """
     Deserialize a stream or string of YAML data.
     """
+    if isinstance(stream_or_string, bytes):
+        stream_or_string = stream_or_string.decode('utf-8')
     if isinstance(stream_or_string, basestring):
         stream = StringIO(stream_or_string)
     else:

@@ -12,4 +12,4 @@ chances to be included in Django core:
    coding-style
    unit-tests
    submitting-patches
-   branch-policy
+   working-with-git

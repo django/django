@@ -2,7 +2,7 @@
 Slovak-specific form helpers
 """
 
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 from django.contrib.localflavor.sk.sk_districts import DISTRICT_CHOICES
 from django.contrib.localflavor.sk.sk_regions import REGION_CHOICES
@@ -30,7 +30,7 @@ class SKPostalCodeField(RegexField):
     Valid form is XXXXX or XXX XX, where X represents integer.
     """
     default_error_messages = {
-        'invalid': _(u'Enter a postal code in the format XXXXX or XXX XX.'),
+        'invalid': _('Enter a postal code in the format XXXXX or XXX XX.'),
     }
 
     def __init__(self, max_length=None, min_length=None, *args, **kwargs):

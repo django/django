@@ -1,5 +1,7 @@
 """HTML utilities suitable for global use."""
 
+from __future__ import unicode_literals
+
 import re
 import string
 import urllib
@@ -15,7 +17,7 @@ TRAILING_PUNCTUATION = ['.', ',', ':', ';']
 WRAPPING_PUNCTUATION = [('(', ')'), ('<', '>'), ('&lt;', '&gt;')]
 
 # List of possible strings used for bullets in bulleted lists.
-DOTS = [u'&middot;', u'*', u'\u2022', u'&#149;', u'&bull;', u'&#8226;']
+DOTS = ['&middot;', '*', '\u2022', '&#149;', '&bull;', '&#8226;']
 
 unencoded_ampersands_re = re.compile(r'&(?!(\w+|#\d+);)')
 unquoted_percents_re = re.compile(r'%(?![0-9A-Fa-f]{2})')
@@ -29,25 +31,25 @@ hard_coded_bullets_re = re.compile(r'((?:<p>(?:%s).*?[a-zA-Z].*?</p>\s*)+)' % '|
 trailing_empty_content_re = re.compile(r'(?:<p>(?:&nbsp;|\s|<br \/>)*?</p>\s*)+\Z')
 del x # Temporary variable
 
-def escape(html):
+def escape(text):
     """
-    Returns the given HTML with ampersands, quotes and angle brackets encoded.
+    Returns the given text with ampersands, quotes and angle brackets encoded for use in HTML.
     """
-    return mark_safe(force_unicode(html).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;'))
+    return mark_safe(force_unicode(text).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;'))
 escape = allow_lazy(escape, unicode)
 
 _base_js_escapes = (
-    ('\\', r'\u005C'),
-    ('\'', r'\u0027'),
-    ('"', r'\u0022'),
-    ('>', r'\u003E'),
-    ('<', r'\u003C'),
-    ('&', r'\u0026'),
-    ('=', r'\u003D'),
-    ('-', r'\u002D'),
-    (';', r'\u003B'),
-    (u'\u2028', r'\u2028'),
-    (u'\u2029', r'\u2029')
+    ('\\', '\\u005C'),
+    ('\'', '\\u0027'),
+    ('"', '\\u0022'),
+    ('>', '\\u003E'),
+    ('<', '\\u003C'),
+    ('&', '\\u0026'),
+    ('=', '\\u003D'),
+    ('-', '\\u002D'),
+    (';', '\\u003B'),
+    ('\u2028', '\\u2028'),
+    ('\u2029', '\\u2029')
 )
 
 # Escape every ASCII character with a value less than 32.
@@ -61,24 +63,55 @@ def escapejs(value):
     return value
 escapejs = allow_lazy(escapejs, unicode)
 
-def conditional_escape(html):
+def conditional_escape(text):
     """
     Similar to escape(), except that it doesn't operate on pre-escaped strings.
     """
-    if isinstance(html, SafeData):
-        return html
+    if isinstance(text, SafeData):
+        return text
     else:
-        return escape(html)
+        return escape(text)
+
+def format_html(format_string, *args, **kwargs):
+    """
+    Similar to str.format, but passes all arguments through conditional_escape,
+    and calls 'mark_safe' on the result. This function should be used instead
+    of str.format or % interpolation to build up small HTML fragments.
+    """
+    args_safe = map(conditional_escape, args)
+    kwargs_safe = dict([(k, conditional_escape(v)) for (k, v) in
+                        kwargs.iteritems()])
+    return mark_safe(format_string.format(*args_safe, **kwargs_safe))
+
+def format_html_join(sep, format_string, args_generator):
+    """
+    A wrapper format_html, for the common case of a group of arguments that need
+    to be formatted using the same format string, and then joined using
+    'sep'. 'sep' is also passed through conditional_escape.
+
+    'args_generator' should be an iterator that returns the sequence of 'args'
+    that will be passed to format_html.
+
+    Example:
+
+      format_html_join('\n', "<li>{0} {1}</li>", ((u.first_name, u.last_name)
+                                                  for u in users))
+
+    """
+    return mark_safe(conditional_escape(sep).join(
+            format_html(format_string, *tuple(args))
+            for args in args_generator))
+
 
 def linebreaks(value, autoescape=False):
     """Converts newlines into <p> and <br />s."""
     value = normalize_newlines(value)
     paras = re.split('\n{2,}', value)
     if autoescape:
-        paras = [u'<p>%s</p>' % escape(p).replace('\n', '<br />') for p in paras]
+        paras = ['<p>%s</p>' % escape(p).replace('\n', '<br />') for p in paras]
     else:
-        paras = [u'<p>%s</p>' % p.replace('\n', '<br />') for p in paras]
-    return u'\n\n'.join(paras)
+        paras = ['<p>%s</p>' % p.replace('\n', '<br />') for p in paras]
+    return '\n\n'.join(paras)
 linebreaks = allow_lazy(linebreaks, unicode)
 
 def strip_tags(value):
@@ -116,7 +149,7 @@ def smart_urlquote(url):
     # contains a % not followed by two hexadecimal digits. See #9655.
     if '%' not in url or unquoted_percents_re.search(url):
         # See http://bugs.python.org/issue2637
-        url = urllib.quote(smart_str(url), safe='!*\'();:@&=+$,/?#[]~')
+        url = urllib.quote(smart_str(url), safe=b'!*\'();:@&=+$,/?#[]~')
 
     return force_unicode(url)
 
@@ -192,7 +225,7 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
             words[i] = mark_safe(word)
         elif autoescape:
             words[i] = escape(word)
-    return u''.join(words)
+    return ''.join(words)
 urlize = allow_lazy(urlize, unicode)
 
 def clean_html(text):
@@ -218,13 +251,13 @@ def clean_html(text):
     text = html_gunk_re.sub('', text)
     # Convert hard-coded bullets into HTML unordered lists.
     def replace_p_tags(match):
-        s = match.group().replace(u'</p>', u'</li>')
+        s = match.group().replace('</p>', '</li>')
         for d in DOTS:
-            s = s.replace(u'<p>%s' % d, u'<li>')
-        return u'<ul>\n%s\n</ul>' % s
+            s = s.replace('<p>%s' % d, '<li>')
+        return '<ul>\n%s\n</ul>' % s
     text = hard_coded_bullets_re.sub(replace_p_tags, text)
     # Remove stuff like "<p>&nbsp;&nbsp;</p>", but only if it's at the bottom
     # of the text.
-    text = trailing_empty_content_re.sub(u'', text)
+    text = trailing_empty_content_re.sub('', text)
     return text
 clean_html = allow_lazy(clean_html, unicode)

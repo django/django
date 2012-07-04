@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 from django.test import TestCase, RequestFactory
 from django.contrib.admin.options import ModelAdmin
@@ -42,7 +42,7 @@ class TestAdminOrdering(TestCase):
         """
         ma = ModelAdmin(Band, None)
         names = [b.name for b in ma.queryset(request)]
-        self.assertEqual([u'Aerosmith', u'Radiohead', u'Van Halen'], names)
+        self.assertEqual(['Aerosmith', 'Radiohead', 'Van Halen'], names)
 
     def test_specified_ordering(self):
         """
@@ -53,7 +53,7 @@ class TestAdminOrdering(TestCase):
             ordering = ('rank',) # default ordering is ('name',)
         ma = BandAdmin(Band, None)
         names = [b.name for b in ma.queryset(request)]
-        self.assertEqual([u'Radiohead', u'Van Halen', u'Aerosmith'], names)
+        self.assertEqual(['Radiohead', 'Van Halen', 'Aerosmith'], names)
 
     def test_dynamic_ordering(self):
         """
@@ -65,10 +65,10 @@ class TestAdminOrdering(TestCase):
         request.user = super_user
         ma = DynOrderingBandAdmin(Band, None)
         names = [b.name for b in ma.queryset(request)]
-        self.assertEqual([u'Radiohead', u'Van Halen', u'Aerosmith'], names)
+        self.assertEqual(['Radiohead', 'Van Halen', 'Aerosmith'], names)
         request.user = other_user
         names = [b.name for b in ma.queryset(request)]
-        self.assertEqual([u'Aerosmith', u'Radiohead', u'Van Halen'], names)
+        self.assertEqual(['Aerosmith', 'Radiohead', 'Van Halen'], names)
 
 
 class TestInlineModelAdminOrdering(TestCase):
@@ -95,7 +95,7 @@ class TestInlineModelAdminOrdering(TestCase):
         """
         inline = SongInlineDefaultOrdering(self.b, None)
         names = [s.name for s in inline.queryset(request)]
-        self.assertEqual([u'Dude (Looks Like a Lady)', u'Jaded', u'Pink'], names)
+        self.assertEqual(['Dude (Looks Like a Lady)', 'Jaded', 'Pink'], names)
 
     def test_specified_ordering(self):
         """
@@ -103,4 +103,4 @@ class TestInlineModelAdminOrdering(TestCase):
         """
         inline = SongInlineNewOrdering(self.b, None)
         names = [s.name for s in inline.queryset(request)]
-        self.assertEqual([u'Jaded', u'Pink', u'Dude (Looks Like a Lady)'], names)
+        self.assertEqual(['Jaded', 'Pink', 'Dude (Looks Like a Lady)'], names)

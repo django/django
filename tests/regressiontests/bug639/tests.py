@@ -24,7 +24,8 @@ class Bug639Test(unittest.TestCase):
         """
         # Grab an image for testing.
         filename = os.path.join(os.path.dirname(__file__), "test.jpg")
-        img = open(filename, "rb").read()
+        with open(filename, "rb") as fp:
+            img = fp.read()
 
         # Fake a POST QueryDict and FILES MultiValueDict.
         data = {'title': 'Testing'}

@@ -113,8 +113,8 @@ Just one thing to do: We need to tell the admin that ``Poll``
 objects have an admin interface. To do this, create a file called
 ``admin.py`` in your ``polls`` directory, and edit it to look like this::
 
-    from polls.models import Poll
     from django.contrib import admin
+    from polls.models import Poll
 
     admin.site.register(Poll)
 
@@ -276,12 +276,15 @@ in that window and click "Save," Django will save the poll to the database and
 dynamically add it as the selected choice on the "Add choice" form you're
 looking at.
 
-But, really, this is an inefficient way of adding Choice objects to the system.
+But, really, this is an inefficient way of adding ``Choice`` objects to the system.
 It'd be better if you could add a bunch of Choices directly when you create the
-Poll object. Let's make that happen.
+``Poll`` object. Let's make that happen.
 
-Remove the ``register()`` call for the Choice model. Then, edit the ``Poll``
+Remove the ``register()`` call for the ``Choice`` model. Then, edit the ``Poll``
 registration code to read::
+
+    from django.contrib import admin
+    from polls.models import Poll
 
     class ChoiceInline(admin.StackedInline):
         model = Choice
@@ -296,7 +299,7 @@ registration code to read::
 
     admin.site.register(Poll, PollAdmin)
 
-This tells Django: "Choice objects are edited on the Poll admin page. By
+This tells Django: "``Choice`` objects are edited on the ``Poll`` admin page. By
 default, provide enough fields for 3 choices."
 
 Load the "Add poll" page to see how that looks, you may need to restart your development server:
@@ -309,7 +312,7 @@ by ``extra`` -- and each time you come back to the "Change" page for an
 already-created object, you get another three extra slots.
 
 One small problem, though. It takes a lot of screen space to display all the
-fields for entering related Choice objects. For that reason, Django offers a
+fields for entering related ``Choice`` objects. For that reason, Django offers a
 tabular way of displaying inline related objects; you just need to change
 the ``ChoiceInline`` declaration to read::
 
@@ -319,8 +322,11 @@ the ``ChoiceInline`` declaration to read::
 With that ``TabularInline`` (instead of ``StackedInline``), the
 related objects are displayed in a more compact, table-based format:
 
-.. image:: _images/admin12.png
+.. image:: _images/admin12t.png
    :alt: Add poll page now has more compact choices
+
+Note that there is an extra "Delete?" column that allows removing rows added
+using the "Add Another Choice" button and rows that have already been saved.
 
 Customize the admin change list
 ===============================
@@ -397,7 +403,7 @@ search terms, Django will search the ``question`` field. You can use as many
 fields as you'd like -- although because it uses a ``LIKE`` query behind the
 scenes, keep it reasonable, to keep your database happy.
 
-Finally, because Poll objects have dates, it'd be convenient to be able to
+Finally, because ``Poll`` objects have dates, it'd be convenient to be able to
 drill down by date. Add this line::
 
     date_hierarchy = 'pub_date'
@@ -441,6 +447,19 @@ your :setting:`TEMPLATE_DIRS` includes ``'/home/my_username/mytemplates'``, as
 above, then copy ``django/contrib/admin/templates/admin/base_site.html`` to
 ``/home/my_username/mytemplates/admin/base_site.html``. Don't forget that
 ``admin`` subdirectory.
+
+.. admonition:: Where are the Django source files?
+
+    If you have difficulty finding where the Django source files are located
+    on your system, run the following command:
+
+    .. code-block:: bash
+
+        python -c "
+        import sys
+        sys.path = sys.path[1:]
+        import django
+        print(django.__path__)"
 
 Then, just edit the file and replace the generic Django text with your own
 site's name as you see fit.

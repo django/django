@@ -35,4 +35,11 @@ class Command(BaseCommand):
         # a strange error -- it causes this handle() method to be called
         # multiple times.
         shutdown_message = '\nServer stopped.\nNote that the test database, %r, has not been deleted. You can explore it on your own.' % db_name
-        call_command('runserver', addrport=addrport, shutdown_message=shutdown_message, use_reloader=False, use_ipv6=options['use_ipv6'])
+        use_threading = connection.features.test_db_allows_multiple_connections
+        call_command('runserver',
+            addrport=addrport,
+            shutdown_message=shutdown_message,
+            use_reloader=False,
+            use_ipv6=options['use_ipv6'],
+            use_threading=use_threading
+        )

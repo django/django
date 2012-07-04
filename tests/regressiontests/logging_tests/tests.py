@@ -1,4 +1,7 @@
+from __future__ import unicode_literals
+
 import copy
+import warnings
 
 from django.conf import compat_patch_logging_config
 from django.core import mail
@@ -40,7 +43,11 @@ class PatchLoggingConfigTest(TestCase):
 
         """
         config = copy.deepcopy(OLD_LOGGING)
-        compat_patch_logging_config(config)
+
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            compat_patch_logging_config(config)
+            self.assertEqual(len(w), 1)
 
         self.assertEqual(
             config["handlers"]["mail_admins"]["filters"],
@@ -53,7 +60,8 @@ class PatchLoggingConfigTest(TestCase):
 
         """
         config = copy.deepcopy(OLD_LOGGING)
-        compat_patch_logging_config(config)
+        with warnings.catch_warnings(record=True):
+            compat_patch_logging_config(config)
 
         flt = config["filters"]["require_debug_false"]
         self.assertEqual(flt["()"], "django.utils.log.RequireDebugFalse")
@@ -209,8 +217,8 @@ class AdminEmailHandlerTest(TestCase):
         AdminErrorHandler to fail.
         Refs #17281.
         """
-        message = u'Message \r\n with newlines'
-        expected_subject = u'ERROR: Message \\r\\n with newlines'
+        message = 'Message \r\n with newlines'
+        expected_subject = 'ERROR: Message \\r\\n with newlines'
 
         self.assertEqual(len(mail.outbox), 0)
 

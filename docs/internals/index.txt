@@ -20,4 +20,4 @@ the hood".
    committers
    release-process
    deprecation
-   svn
+   git

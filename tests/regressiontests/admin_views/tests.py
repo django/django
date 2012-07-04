@@ -1,5 +1,5 @@
 # coding: utf-8
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import os
 import re
@@ -47,6 +47,7 @@ from .models import (Article, BarAccount, CustomArticle, EmptyModel, FooAccount,
 ERROR_MESSAGE = "Please enter the correct username and password \
 for a staff account. Note that both fields are case-sensitive."
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminViewBasicTest(TestCase):
     fixtures = ['admin-views-users.xml', 'admin-views-colors.xml',
                 'admin-views-fabrics.xml', 'admin-views-books.xml']
@@ -118,11 +119,11 @@ class AdminViewBasicTest(TestCase):
         A smoke test to ensure POST on add_view works.
         """
         post_data = {
-            "name": u"Another Section",
+            "name": "Another Section",
             # inline data
-            "article_set-TOTAL_FORMS": u"3",
-            "article_set-INITIAL_FORMS": u"0",
-            "article_set-MAX_NUM_FORMS": u"0",
+            "article_set-TOTAL_FORMS": "3",
+            "article_set-INITIAL_FORMS": "0",
+            "article_set-MAX_NUM_FORMS": "0",
         }
         response = self.client.post('/test_admin/%s/admin_views/section/add/' % self.urlbit, post_data)
         self.assertEqual(response.status_code, 302) # redirect somewhere
@@ -132,56 +133,56 @@ class AdminViewBasicTest(TestCase):
         Ensure http response from a popup is properly escaped.
         """
         post_data = {
-            '_popup': u'1',
-            'title': u'title with a new\nline',
-            'content': u'some content',
-            'date_0': u'2010-09-10',
-            'date_1': u'14:55:39',
+            '_popup': '1',
+            'title': 'title with a new\nline',
+            'content': 'some content',
+            'date_0': '2010-09-10',
+            'date_1': '14:55:39',
         }
         response = self.client.post('/test_admin/%s/admin_views/article/add/' % self.urlbit, post_data)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'dismissAddAnotherPopup')
-        self.assertContains(response, 'title with a new\u000Aline')
+        self.assertContains(response, 'title with a new\\u000Aline')
 
     # Post data for edit inline
     inline_post_data = {
-        "name": u"Test section",
+        "name": "Test section",
         # inline data
-        "article_set-TOTAL_FORMS": u"6",
-        "article_set-INITIAL_FORMS": u"3",
-        "article_set-MAX_NUM_FORMS": u"0",
-        "article_set-0-id": u"1",
+        "article_set-TOTAL_FORMS": "6",
+        "article_set-INITIAL_FORMS": "3",
+        "article_set-MAX_NUM_FORMS": "0",
+        "article_set-0-id": "1",
         # there is no title in database, give one here or formset will fail.
-        "article_set-0-title": u"Norske bostaver æøå skaper problemer",
-        "article_set-0-content": u"&lt;p&gt;Middle content&lt;/p&gt;",
-        "article_set-0-date_0": u"2008-03-18",
-        "article_set-0-date_1": u"11:54:58",
-        "article_set-0-section": u"1",
-        "article_set-1-id": u"2",
-        "article_set-1-title": u"Need a title.",
-        "article_set-1-content": u"&lt;p&gt;Oldest content&lt;/p&gt;",
-        "article_set-1-date_0": u"2000-03-18",
-        "article_set-1-date_1": u"11:54:58",
-        "article_set-2-id": u"3",
-        "article_set-2-title": u"Need a title.",
-        "article_set-2-content": u"&lt;p&gt;Newest content&lt;/p&gt;",
-        "article_set-2-date_0": u"2009-03-18",
-        "article_set-2-date_1": u"11:54:58",
-        "article_set-3-id": u"",
-        "article_set-3-title": u"",
-        "article_set-3-content": u"",
-        "article_set-3-date_0": u"",
-        "article_set-3-date_1": u"",
-        "article_set-4-id": u"",
-        "article_set-4-title": u"",
-        "article_set-4-content": u"",
-        "article_set-4-date_0": u"",
-        "article_set-4-date_1": u"",
-        "article_set-5-id": u"",
-        "article_set-5-title": u"",
-        "article_set-5-content": u"",
-        "article_set-5-date_0": u"",
-        "article_set-5-date_1": u"",
+        "article_set-0-title": "Norske bostaver æøå skaper problemer",
+        "article_set-0-content": "&lt;p&gt;Middle content&lt;/p&gt;",
+        "article_set-0-date_0": "2008-03-18",
+        "article_set-0-date_1": "11:54:58",
+        "article_set-0-section": "1",
+        "article_set-1-id": "2",
+        "article_set-1-title": "Need a title.",
+        "article_set-1-content": "&lt;p&gt;Oldest content&lt;/p&gt;",
+        "article_set-1-date_0": "2000-03-18",
+        "article_set-1-date_1": "11:54:58",
+        "article_set-2-id": "3",
+        "article_set-2-title": "Need a title.",
+        "article_set-2-content": "&lt;p&gt;Newest content&lt;/p&gt;",
+        "article_set-2-date_0": "2009-03-18",
+        "article_set-2-date_1": "11:54:58",
+        "article_set-3-id": "",
+        "article_set-3-title": "",
+        "article_set-3-content": "",
+        "article_set-3-date_0": "",
+        "article_set-3-date_1": "",
+        "article_set-4-id": "",
+        "article_set-4-title": "",
+        "article_set-4-content": "",
+        "article_set-4-date_0": "",
+        "article_set-4-date_1": "",
+        "article_set-5-id": "",
+        "article_set-5-title": "",
+        "article_set-5-content": "",
+        "article_set-5-date_0": "",
+        "article_set-5-date_1": "",
     }
 
     def testBasicEditPost(self):
@@ -197,12 +198,12 @@ class AdminViewBasicTest(TestCase):
         """
         post_data = self.inline_post_data.copy()
         post_data.update({
-            '_saveasnew': u'Save+as+new',
-            "article_set-1-section": u"1",
-            "article_set-2-section": u"1",
-            "article_set-3-section": u"1",
-            "article_set-4-section": u"1",
-            "article_set-5-section": u"1",
+            '_saveasnew': 'Save+as+new',
+            "article_set-1-section": "1",
+            "article_set-2-section": "1",
+            "article_set-3-section": "1",
+            "article_set-4-section": "1",
+            "article_set-5-section": "1",
         })
         response = self.client.post('/test_admin/%s/admin_views/section/1/' % self.urlbit, post_data)
         self.assertEqual(response.status_code, 302) # redirect somewhere
@@ -588,6 +589,7 @@ class AdminViewBasicTest(TestCase):
             msg='The "change password" link should not be displayed if a user does not have a usable password.')
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminViewFormUrlTest(TestCase):
     urls = "regressiontests.admin_views.urls"
     fixtures = ["admin-views-users.xml"]
@@ -619,6 +621,7 @@ class AdminViewFormUrlTest(TestCase):
             self.assertTrue('custom_filter_template.html' in [t.name for t in response.templates])
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminJavaScriptTest(TestCase):
     fixtures = ['admin-views-users.xml']
 
@@ -686,6 +689,7 @@ class AdminJavaScriptTest(TestCase):
             self.assertNotContains(response, 'inlines.min.js')
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class SaveAsTests(TestCase):
     urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml','admin-views-person.xml']
@@ -775,6 +779,7 @@ def get_perm(Model, perm):
     ct = ContentType.objects.get_for_model(Model)
     return Permission.objects.get(content_type=ct, codename=perm)
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminViewPermissionsTest(TestCase):
     """Tests for Admin Views Permissions."""
 
@@ -1024,14 +1029,13 @@ class AdminViewPermissionsTest(TestCase):
         # one error in form should produce singular error message, multiple errors plural
         change_dict['title'] = ''
         post = self.client.post('/test_admin/admin/admin_views/article/1/', change_dict)
-        self.assertEqual(request.status_code, 200)
-        self.assertTrue('Please correct the error below.' in post.content,
-                        'Singular error message not found in response to post with one error.')
+        self.assertContains(post, 'Please correct the error below.',
+            msg_prefix='Singular error message not found in response to post with one error')
+
         change_dict['content'] = ''
         post = self.client.post('/test_admin/admin/admin_views/article/1/', change_dict)
-        self.assertEqual(request.status_code, 200)
-        self.assertTrue('Please correct the errors below.' in post.content,
-                        'Plural error message not found in response to post with multiple errors.')
+        self.assertContains(post, 'Please correct the errors below.',
+            msg_prefix='Plural error message not found in response to post with multiple errors')
         self.client.get('/test_admin/admin/logout/')
 
         # Test redirection when using row-level change permissions. Refs #11513.
@@ -1162,7 +1166,7 @@ class AdminViewPermissionsTest(TestCase):
         self.assertEqual(mail.outbox[0].subject, 'Greetings from a deleted object')
         article_ct = ContentType.objects.get_for_model(Article)
         logged = LogEntry.objects.get(content_type=article_ct, action_flag=DELETION)
-        self.assertEqual(logged.object_id, u'1')
+        self.assertEqual(logged.object_id, '1')
         self.client.get('/test_admin/admin/logout/')
 
     def testDisabledPermissionsWhenLoggedIn(self):
@@ -1179,6 +1183,7 @@ class AdminViewPermissionsTest(TestCase):
         self.assertContains(response, 'id="login-form"')
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminViewsNoUrlTest(TestCase):
     """Regression test for #17333"""
 
@@ -1210,6 +1215,7 @@ class AdminViewsNoUrlTest(TestCase):
         self.client.get('/test_admin/admin/logout/')
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminViewDeletedObjectsTest(TestCase):
     urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml', 'deleted-objects.xml']
@@ -1326,6 +1332,7 @@ class AdminViewDeletedObjectsTest(TestCase):
         response = self.client.get('/test_admin/admin/admin_views/plot/%s/delete/' % quote(3))
         self.assertContains(response, should_contain)
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminViewStringPrimaryKeyTest(TestCase):
     urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml', 'string-primary-key.xml']
@@ -1337,15 +1344,20 @@ class AdminViewStringPrimaryKeyTest(TestCase):
     def setUp(self):
         self.client.login(username='super', password='secret')
         content_type_pk = ContentType.objects.get_for_model(ModelWithStringPrimaryKey).pk
-        LogEntry.objects.log_action(100, content_type_pk, self.pk, self.pk, 2, change_message='')
+        LogEntry.objects.log_action(100, content_type_pk, self.pk, self.pk, 2, change_message='Changed something')
 
     def tearDown(self):
         self.client.logout()
 
     def test_get_history_view(self):
-        "Retrieving the history for the object using urlencoded form of primary key should work"
+        """
+        Retrieving the history for an object using urlencoded form of primary
+        key should work.
+        Refs #12349, #18550.
+        """
         response = self.client.get('/test_admin/admin/admin_views/modelwithstringprimarykey/%s/history/' % quote(self.pk))
         self.assertContains(response, escape(self.pk))
+        self.assertContains(response, 'Changed something')
         self.assertEqual(response.status_code, 200)
 
     def test_get_change_view(self):
@@ -1357,19 +1369,19 @@ class AdminViewStringPrimaryKeyTest(TestCase):
     def test_changelist_to_changeform_link(self):
         "The link from the changelist referring to the changeform of the object should be quoted"
         response = self.client.get('/test_admin/admin/admin_views/modelwithstringprimarykey/')
-        should_contain = """<th><a href="%s/">%s</a></th></tr>""" % (quote(self.pk), escape(self.pk))
+        should_contain = """<th><a href="%s/">%s</a></th></tr>""" % (escape(quote(self.pk)), escape(self.pk))
         self.assertContains(response, should_contain)
 
     def test_recentactions_link(self):
         "The link from the recent actions list referring to the changeform of the object should be quoted"
         response = self.client.get('/test_admin/admin/')
-        should_contain = """<a href="admin_views/modelwithstringprimarykey/%s/">%s</a>""" % (quote(self.pk), escape(self.pk))
+        should_contain = """<a href="admin_views/modelwithstringprimarykey/%s/">%s</a>""" % (escape(quote(self.pk)), escape(self.pk))
         self.assertContains(response, should_contain)
 
     def test_recentactions_without_content_type(self):
         "If a LogEntry is missing content_type it will not display it in span tag under the hyperlink."
         response = self.client.get('/test_admin/admin/')
-        should_contain = """<a href="admin_views/modelwithstringprimarykey/%s/">%s</a>""" % (quote(self.pk), escape(self.pk))
+        should_contain = """<a href="admin_views/modelwithstringprimarykey/%s/">%s</a>""" % (escape(quote(self.pk)), escape(self.pk))
         self.assertContains(response, should_contain)
         should_contain = "Model with string primary key" # capitalized in Recent Actions
         self.assertContains(response, should_contain)
@@ -1390,12 +1402,12 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         "The link from the delete confirmation page referring back to the changeform of the object should be quoted"
         response = self.client.get('/test_admin/admin/admin_views/modelwithstringprimarykey/%s/delete/' % quote(self.pk))
         # this URL now comes through reverse(), thus iri_to_uri encoding
-        should_contain = """/%s/">%s</a>""" % (iri_to_uri(quote(self.pk)), escape(self.pk))
+        should_contain = """/%s/">%s</a>""" % (escape(iri_to_uri(quote(self.pk))), escape(self.pk))
         self.assertContains(response, should_contain)
 
     def test_url_conflicts_with_add(self):
         "A model with a primary key that ends with add should be visible"
-        add_model = ModelWithStringPrimaryKey(id="i have something to add")
+        add_model = ModelWithStringPrimaryKey(pk="i have something to add")
         add_model.save()
         response = self.client.get('/test_admin/admin/admin_views/modelwithstringprimarykey/%s/' % quote(add_model.pk))
         should_contain = """<h1>Change model with string primary key</h1>"""
@@ -1403,7 +1415,7 @@ class AdminViewStringPrimaryKeyTest(TestCase):
 
     def test_url_conflicts_with_delete(self):
         "A model with a primary key that ends with delete should be visible"
-        delete_model = ModelWithStringPrimaryKey(id="delete")
+        delete_model = ModelWithStringPrimaryKey(pk="delete")
         delete_model.save()
         response = self.client.get('/test_admin/admin/admin_views/modelwithstringprimarykey/%s/' % quote(delete_model.pk))
         should_contain = """<h1>Change model with string primary key</h1>"""
@@ -1411,13 +1423,22 @@ class AdminViewStringPrimaryKeyTest(TestCase):
 
     def test_url_conflicts_with_history(self):
         "A model with a primary key that ends with history should be visible"
-        history_model = ModelWithStringPrimaryKey(id="history")
+        history_model = ModelWithStringPrimaryKey(pk="history")
         history_model.save()
         response = self.client.get('/test_admin/admin/admin_views/modelwithstringprimarykey/%s/' % quote(history_model.pk))
         should_contain = """<h1>Change model with string primary key</h1>"""
         self.assertContains(response, should_contain)
 
+    def test_shortcut_view_with_escaping(self):
+        "'View on site should' work properly with char fields"
+        model = ModelWithStringPrimaryKey(pk='abc_123')
+        model.save()
+        response = self.client.get('/test_admin/admin/admin_views/modelwithstringprimarykey/%s/' % quote(model.pk))
+        should_contain = '/%s/" class="viewsitelink">' % model.pk
+        self.assertContains(response, should_contain)
 
+
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class SecureViewTests(TestCase):
     urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml']
@@ -1576,6 +1597,7 @@ class SecureViewTests(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['Location'], 'http://example.com/users/super/')
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminViewUnicodeTest(TestCase):
     urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-unicode.xml']
@@ -1591,29 +1613,29 @@ class AdminViewUnicodeTest(TestCase):
         A test to ensure that POST on edit_view handles non-ascii characters.
         """
         post_data = {
-            "name": u"Test lærdommer",
+            "name": "Test lærdommer",
             # inline data
-            "chapter_set-TOTAL_FORMS": u"6",
-            "chapter_set-INITIAL_FORMS": u"3",
-            "chapter_set-MAX_NUM_FORMS": u"0",
-            "chapter_set-0-id": u"1",
-            "chapter_set-0-title": u"Norske bostaver æøå skaper problemer",
-            "chapter_set-0-content": u"&lt;p&gt;Svært frustrerende med UnicodeDecodeError&lt;/p&gt;",
-            "chapter_set-1-id": u"2",
-            "chapter_set-1-title": u"Kjærlighet.",
-            "chapter_set-1-content": u"&lt;p&gt;La kjærligheten til de lidende seire.&lt;/p&gt;",
-            "chapter_set-2-id": u"3",
-            "chapter_set-2-title": u"Need a title.",
-            "chapter_set-2-content": u"&lt;p&gt;Newest content&lt;/p&gt;",
-            "chapter_set-3-id": u"",
-            "chapter_set-3-title": u"",
-            "chapter_set-3-content": u"",
-            "chapter_set-4-id": u"",
-            "chapter_set-4-title": u"",
-            "chapter_set-4-content": u"",
-            "chapter_set-5-id": u"",
-            "chapter_set-5-title": u"",
-            "chapter_set-5-content": u"",
+            "chapter_set-TOTAL_FORMS": "6",
+            "chapter_set-INITIAL_FORMS": "3",
+            "chapter_set-MAX_NUM_FORMS": "0",
+            "chapter_set-0-id": "1",
+            "chapter_set-0-title": "Norske bostaver æøå skaper problemer",
+            "chapter_set-0-content": "&lt;p&gt;Svært frustrerende med UnicodeDecodeError&lt;/p&gt;",
+            "chapter_set-1-id": "2",
+            "chapter_set-1-title": "Kjærlighet.",
+            "chapter_set-1-content": "&lt;p&gt;La kjærligheten til de lidende seire.&lt;/p&gt;",
+            "chapter_set-2-id": "3",
+            "chapter_set-2-title": "Need a title.",
+            "chapter_set-2-content": "&lt;p&gt;Newest content&lt;/p&gt;",
+            "chapter_set-3-id": "",
+            "chapter_set-3-title": "",
+            "chapter_set-3-content": "",
+            "chapter_set-4-id": "",
+            "chapter_set-4-title": "",
+            "chapter_set-4-content": "",
+            "chapter_set-5-id": "",
+            "chapter_set-5-title": "",
+            "chapter_set-5-content": "",
         }
 
         response = self.client.post('/test_admin/admin/admin_views/book/1/', post_data)
@@ -1630,6 +1652,7 @@ class AdminViewUnicodeTest(TestCase):
         self.assertRedirects(response, '/test_admin/admin/admin_views/book/')
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminViewListEditable(TestCase):
     urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml', 'admin-views-person.xml']
@@ -1929,8 +1952,8 @@ class AdminViewListEditable(TestCase):
             "form-2-id": "3",
 
             "index": "0",
-            "_selected_action": [u'3'],
-            "action": [u'', u'delete_selected'],
+            "_selected_action": ['3'],
+            "action": ['', 'delete_selected'],
         }
         self.client.post('/test_admin/admin/admin_views/person/', data)
 
@@ -1956,8 +1979,8 @@ class AdminViewListEditable(TestCase):
             "form-2-id": "3",
 
             "_save": "Save",
-            "_selected_action": [u'1'],
-            "action": [u'', u'delete_selected'],
+            "_selected_action": ['1'],
+            "action": ['', 'delete_selected'],
         }
         self.client.post('/test_admin/admin/admin_views/person/', data)
 
@@ -2004,6 +2027,7 @@ class AdminViewListEditable(TestCase):
         self.assertContains(response, '<th><a href="%d/">%d</a></th>' % (story2.id, story2.id), 1)
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminSearchTest(TestCase):
     urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users', 'multiple-child-classes',
@@ -2051,6 +2075,7 @@ class AdminSearchTest(TestCase):
         self.assertNotContains(response, "Guido")
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminInheritedInlinesTest(TestCase):
     urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml',]
@@ -2064,8 +2089,8 @@ class AdminInheritedInlinesTest(TestCase):
     def testInline(self):
         "Ensure that inline models which inherit from a common parent are correctly handled by admin."
 
-        foo_user = u"foo username"
-        bar_user = u"bar username"
+        foo_user = "foo username"
+        bar_user = "bar username"
 
         name_re = re.compile('name="(.*?)"')
 
@@ -2077,15 +2102,15 @@ class AdminInheritedInlinesTest(TestCase):
 
         # test the add case
         post_data = {
-            "name": u"Test Name",
+            "name": "Test Name",
             # inline data
-            "accounts-TOTAL_FORMS": u"1",
-            "accounts-INITIAL_FORMS": u"0",
-            "accounts-MAX_NUM_FORMS": u"0",
+            "accounts-TOTAL_FORMS": "1",
+            "accounts-INITIAL_FORMS": "0",
+            "accounts-MAX_NUM_FORMS": "0",
             "accounts-0-username": foo_user,
-            "accounts-2-TOTAL_FORMS": u"1",
-            "accounts-2-INITIAL_FORMS": u"0",
-            "accounts-2-MAX_NUM_FORMS": u"0",
+            "accounts-2-TOTAL_FORMS": "1",
+            "accounts-2-INITIAL_FORMS": "0",
+            "accounts-2-MAX_NUM_FORMS": "0",
             "accounts-2-0-username": bar_user,
         }
 
@@ -2110,19 +2135,19 @@ class AdminInheritedInlinesTest(TestCase):
         self.assertEqual(len(names), len(set(names)))
 
         post_data = {
-            "name": u"Test Name",
+            "name": "Test Name",
 
             "accounts-TOTAL_FORMS": "2",
-            "accounts-INITIAL_FORMS": u"1",
-            "accounts-MAX_NUM_FORMS": u"0",
+            "accounts-INITIAL_FORMS": "1",
+            "accounts-MAX_NUM_FORMS": "0",
 
             "accounts-0-username": "%s-1" % foo_user,
             "accounts-0-account_ptr": str(foo_id),
             "accounts-0-persona": str(persona_id),
 
-            "accounts-2-TOTAL_FORMS": u"2",
-            "accounts-2-INITIAL_FORMS": u"1",
-            "accounts-2-MAX_NUM_FORMS": u"0",
+            "accounts-2-TOTAL_FORMS": "2",
+            "accounts-2-INITIAL_FORMS": "1",
+            "accounts-2-MAX_NUM_FORMS": "0",
 
             "accounts-2-0-username": "%s-1" % bar_user,
             "accounts-2-0-account_ptr": str(bar_id),
@@ -2137,6 +2162,7 @@ class AdminInheritedInlinesTest(TestCase):
         self.assertEqual(BarAccount.objects.all()[0].username, "%s-1" % bar_user)
         self.assertEqual(Persona.objects.all()[0].accounts.count(), 2)
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminActionsTest(TestCase):
     urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml', 'admin-views-actions.xml']
@@ -2355,6 +2381,7 @@ class AdminActionsTest(TestCase):
         self.assertEqual(response.context["action_form"], None)
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class TestCustomChangeList(TestCase):
     urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml']
@@ -2372,7 +2399,7 @@ class TestCustomChangeList(TestCase):
         Validate that a custom ChangeList class can be used (#9749)
         """
         # Insert some data
-        post_data = {"name": u"First Gadget"}
+        post_data = {"name": "First Gadget"}
         response = self.client.post('/test_admin/%s/admin_views/gadget/add/' % self.urlbit, post_data)
         self.assertEqual(response.status_code, 302) # redirect somewhere
         # Hit the page once to get messages out of the queue message list
@@ -2383,6 +2410,7 @@ class TestCustomChangeList(TestCase):
         self.assertNotContains(response, 'First Gadget')
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class TestInlineNotEditable(TestCase):
     urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml']
@@ -2401,6 +2429,7 @@ class TestInlineNotEditable(TestCase):
         response = self.client.get('/test_admin/admin/admin_views/parent/add/')
         self.assertEqual(response.status_code, 200)
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminCustomQuerysetTest(TestCase):
     urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml']
@@ -2427,12 +2456,12 @@ class AdminCustomQuerysetTest(TestCase):
 
     def test_add_model_modeladmin_only_qs(self):
         # only() is used in ModelAdmin.queryset()
-        p = Paper.objects.create(title=u"My Paper Title")
+        p = Paper.objects.create(title="My Paper Title")
         self.assertEqual(Paper.objects.count(), 1)
         response = self.client.get('/test_admin/admin/admin_views/paper/%s/' % p.pk)
         self.assertEqual(response.status_code, 200)
         post_data = {
-            "title": u"My Modified Paper Title",
+            "title": "My Modified Paper Title",
             "_save": "Save",
         }
         response = self.client.post('/test_admin/admin/admin_views/paper/%s/' % p.pk,
@@ -2442,12 +2471,12 @@ class AdminCustomQuerysetTest(TestCase):
         self.assertContains(response, '<li class="info">The paper &quot;Paper_Deferred_author object&quot; was changed successfully.</li>', html=True)
 
         # defer() is used in ModelAdmin.queryset()
-        cl = CoverLetter.objects.create(author=u"John Doe")
+        cl = CoverLetter.objects.create(author="John Doe")
         self.assertEqual(CoverLetter.objects.count(), 1)
         response = self.client.get('/test_admin/admin/admin_views/coverletter/%s/' % cl.pk)
         self.assertEqual(response.status_code, 200)
         post_data = {
-            "author": u"John Doe II",
+            "author": "John Doe II",
             "_save": "Save",
         }
         response = self.client.post('/test_admin/admin/admin_views/coverletter/%s/' % cl.pk,
@@ -2456,6 +2485,7 @@ class AdminCustomQuerysetTest(TestCase):
         # Message should contain non-ugly model name. Instance representation is set by model's __unicode__()
         self.assertContains(response, '<li class="info">The cover letter &quot;John Doe II&quot; was changed successfully.</li>', html=True)
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminInlineFileUploadTest(TestCase):
     urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml', 'admin-views-actions.xml']
@@ -2485,10 +2515,10 @@ class AdminInlineFileUploadTest(TestCase):
         Test that inline file uploads correctly display prior data (#10002).
         """
         post_data = {
-            "name": u"Test Gallery",
-            "pictures-TOTAL_FORMS": u"2",
-            "pictures-INITIAL_FORMS": u"1",
-            "pictures-MAX_NUM_FORMS": u"0",
+            "name": "Test Gallery",
+            "pictures-TOTAL_FORMS": "2",
+            "pictures-INITIAL_FORMS": "1",
+            "pictures-MAX_NUM_FORMS": "0",
             "pictures-0-id": unicode(self.picture.id),
             "pictures-0-gallery": unicode(self.gallery.id),
             "pictures-0-name": "Test Picture",
@@ -2502,17 +2532,18 @@ class AdminInlineFileUploadTest(TestCase):
         self.assertTrue(response._container[0].find("Currently:") > -1)
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminInlineTests(TestCase):
     urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml']
 
     def setUp(self):
         self.post_data = {
-            "name": u"Test Name",
+            "name": "Test Name",
 
             "widget_set-TOTAL_FORMS": "3",
-            "widget_set-INITIAL_FORMS": u"0",
-            "widget_set-MAX_NUM_FORMS": u"0",
+            "widget_set-INITIAL_FORMS": "0",
+            "widget_set-MAX_NUM_FORMS": "0",
             "widget_set-0-id": "",
             "widget_set-0-owner": "1",
             "widget_set-0-name": "",
@@ -2524,8 +2555,8 @@ class AdminInlineTests(TestCase):
             "widget_set-2-name": "",
 
             "doohickey_set-TOTAL_FORMS": "3",
-            "doohickey_set-INITIAL_FORMS": u"0",
-            "doohickey_set-MAX_NUM_FORMS": u"0",
+            "doohickey_set-INITIAL_FORMS": "0",
+            "doohickey_set-MAX_NUM_FORMS": "0",
             "doohickey_set-0-owner": "1",
             "doohickey_set-0-code": "",
             "doohickey_set-0-name": "",
@@ -2537,8 +2568,8 @@ class AdminInlineTests(TestCase):
             "doohickey_set-2-name": "",
 
             "grommet_set-TOTAL_FORMS": "3",
-            "grommet_set-INITIAL_FORMS": u"0",
-            "grommet_set-MAX_NUM_FORMS": u"0",
+            "grommet_set-INITIAL_FORMS": "0",
+            "grommet_set-MAX_NUM_FORMS": "0",
             "grommet_set-0-code": "",
             "grommet_set-0-owner": "1",
             "grommet_set-0-name": "",
@@ -2550,8 +2581,8 @@ class AdminInlineTests(TestCase):
             "grommet_set-2-name": "",
 
             "whatsit_set-TOTAL_FORMS": "3",
-            "whatsit_set-INITIAL_FORMS": u"0",
-            "whatsit_set-MAX_NUM_FORMS": u"0",
+            "whatsit_set-INITIAL_FORMS": "0",
+            "whatsit_set-MAX_NUM_FORMS": "0",
             "whatsit_set-0-owner": "1",
             "whatsit_set-0-index": "",
             "whatsit_set-0-name": "",
@@ -2563,8 +2594,8 @@ class AdminInlineTests(TestCase):
             "whatsit_set-2-name": "",
 
             "fancydoodad_set-TOTAL_FORMS": "3",
-            "fancydoodad_set-INITIAL_FORMS": u"0",
-            "fancydoodad_set-MAX_NUM_FORMS": u"0",
+            "fancydoodad_set-INITIAL_FORMS": "0",
+            "fancydoodad_set-MAX_NUM_FORMS": "0",
             "fancydoodad_set-0-doodad_ptr": "",
             "fancydoodad_set-0-owner": "1",
             "fancydoodad_set-0-name": "",
@@ -2820,6 +2851,7 @@ class AdminInlineTests(TestCase):
         self.assertEqual(Category.objects.get(id=4).order, 0)
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class NeverCacheTests(TestCase):
     urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml', 'admin-views-colors.xml', 'admin-views-fabrics.xml']
@@ -2893,6 +2925,7 @@ class NeverCacheTests(TestCase):
         self.assertEqual(get_max_age(response), None)
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class PrePopulatedTest(TestCase):
     urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml']
@@ -2928,6 +2961,7 @@ class PrePopulatedTest(TestCase):
         self.assertContains(response, "maxLength: 1000") # instead of 1,000
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class SeleniumPrePopulatedFirefoxTests(AdminSeleniumWebDriverTestCase):
     webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
     urls = "regressiontests.admin_views.urls"
@@ -2947,7 +2981,7 @@ class SeleniumPrePopulatedFirefoxTests(AdminSeleniumWebDriverTestCase):
         # Main form ----------------------------------------------------------
         self.selenium.find_element_by_css_selector('#id_pubdate').send_keys('2012-02-18')
         self.get_select_option('#id_status', 'option two').click()
-        self.selenium.find_element_by_css_selector('#id_name').send_keys(u' this is the mAin nÀMë and it\'s awεšome')
+        self.selenium.find_element_by_css_selector('#id_name').send_keys(' this is the mAin nÀMë and it\'s awεšome')
         slug1 = self.selenium.find_element_by_css_selector('#id_slug1').get_attribute('value')
         slug2 = self.selenium.find_element_by_css_selector('#id_slug2').get_attribute('value')
         self.assertEqual(slug1, 'main-name-and-its-awesome-2012-02-18')
@@ -2957,7 +2991,7 @@ class SeleniumPrePopulatedFirefoxTests(AdminSeleniumWebDriverTestCase):
         # Initial inline
         self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-0-pubdate').send_keys('2011-12-17')
         self.get_select_option('#id_relatedprepopulated_set-0-status', 'option one').click()
-        self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-0-name').send_keys(u' here is a sŤāÇkeð   inline !  ')
+        self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-0-name').send_keys(' here is a sŤāÇkeð   inline !  ')
         slug1 = self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-0-slug1').get_attribute('value')
         slug2 = self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-0-slug2').get_attribute('value')
         self.assertEqual(slug1, 'here-stacked-inline-2011-12-17')
@@ -2967,7 +3001,7 @@ class SeleniumPrePopulatedFirefoxTests(AdminSeleniumWebDriverTestCase):
         self.selenium.find_elements_by_link_text('Add another Related Prepopulated')[0].click()
         self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-1-pubdate').send_keys('1999-01-25')
         self.get_select_option('#id_relatedprepopulated_set-1-status', 'option two').click()
-        self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-1-name').send_keys(u' now you haVe anöther   sŤāÇkeð  inline with a very ... loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooog text... ')
+        self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-1-name').send_keys(' now you haVe anöther   sŤāÇkeð  inline with a very ... loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooog text... ')
         slug1 = self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-1-slug1').get_attribute('value')
         slug2 = self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-1-slug2').get_attribute('value')
         self.assertEqual(slug1, 'now-you-have-another-stacked-inline-very-loooooooo') # 50 characters maximum for slug1 field
@@ -2977,7 +3011,7 @@ class SeleniumPrePopulatedFirefoxTests(AdminSeleniumWebDriverTestCase):
         # Initial inline
         self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-2-0-pubdate').send_keys('1234-12-07')
         self.get_select_option('#id_relatedprepopulated_set-2-0-status', 'option two').click()
-        self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-2-0-name').send_keys(u'And now, with a tÃbűlaŘ inline !!!')
+        self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-2-0-name').send_keys('And now, with a tÃbűlaŘ inline !!!')
         slug1 = self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-2-0-slug1').get_attribute('value')
         slug2 = self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-2-0-slug2').get_attribute('value')
         self.assertEqual(slug1, 'and-now-tabular-inline-1234-12-07')
@@ -2987,7 +3021,7 @@ class SeleniumPrePopulatedFirefoxTests(AdminSeleniumWebDriverTestCase):
         self.selenium.find_elements_by_link_text('Add another Related Prepopulated')[1].click()
         self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-2-1-pubdate').send_keys('1981-08-22')
         self.get_select_option('#id_relatedprepopulated_set-2-1-status', 'option one').click()
-        self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-2-1-name').send_keys(u'a tÃbűlaŘ inline with ignored ;"&*^\%$#@-/`~ characters')
+        self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-2-1-name').send_keys('a tÃbűlaŘ inline with ignored ;"&*^\%$#@-/`~ characters')
         slug1 = self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-2-1-slug1').get_attribute('value')
         slug2 = self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-2-1-slug2').get_attribute('value')
         self.assertEqual(slug1, 'tabular-inline-ignored-characters-1981-08-22')
@@ -3007,7 +3041,7 @@ class SeleniumPrePopulatedFirefoxTests(AdminSeleniumWebDriverTestCase):
 
         self.assertEqual(MainPrepopulated.objects.all().count(), 1)
         MainPrepopulated.objects.get(
-            name=u' this is the mAin nÀMë and it\'s awεšome',
+            name=' this is the mAin nÀMë and it\'s awεšome',
             pubdate='2012-02-18',
             status='option two',
             slug1='main-name-and-its-awesome-2012-02-18',
@@ -3015,28 +3049,28 @@ class SeleniumPrePopulatedFirefoxTests(AdminSeleniumWebDriverTestCase):
         )
         self.assertEqual(RelatedPrepopulated.objects.all().count(), 4)
         RelatedPrepopulated.objects.get(
-            name=u' here is a sŤāÇkeð   inline !  ',
+            name=' here is a sŤāÇkeð   inline !  ',
             pubdate='2011-12-17',
             status='option one',
             slug1='here-stacked-inline-2011-12-17',
             slug2='option-one-here-stacked-inline',
         )
         RelatedPrepopulated.objects.get(
-            name=u' now you haVe anöther   sŤāÇkeð  inline with a very ... loooooooooooooooooo', # 75 characters in name field
+            name=' now you haVe anöther   sŤāÇkeð  inline with a very ... loooooooooooooooooo', # 75 characters in name field
             pubdate='1999-01-25',
             status='option two',
             slug1='now-you-have-another-stacked-inline-very-loooooooo',
             slug2='option-two-now-you-have-another-stacked-inline-very-looooooo',
         )
         RelatedPrepopulated.objects.get(
-            name=u'And now, with a tÃbűlaŘ inline !!!',
+            name='And now, with a tÃbűlaŘ inline !!!',
             pubdate='1234-12-07',
             status='option two',
             slug1='and-now-tabular-inline-1234-12-07',
             slug2='option-two-and-now-tabular-inline',
         )
         RelatedPrepopulated.objects.get(
-            name=u'a tÃbűlaŘ inline with ignored ;"&*^\%$#@-/`~ characters',
+            name='a tÃbűlaŘ inline with ignored ;"&*^\%$#@-/`~ characters',
             pubdate='1981-08-22',
             status='option one',
             slug1='tabular-inline-ignored-characters-1981-08-22',
@@ -3051,6 +3085,7 @@ class SeleniumPrePopulatedIETests(SeleniumPrePopulatedFirefoxTests):
     webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class ReadonlyTest(TestCase):
     urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml']
@@ -3121,9 +3156,10 @@ class ReadonlyTest(TestCase):
     def test_user_password_change_limited_queryset(self):
         su = User.objects.filter(is_superuser=True)[0]
         response = self.client.get('/test_admin/admin2/auth/user/%s/password/' % su.pk)
-        self.assertEquals(response.status_code, 404)
+        self.assertEqual(response.status_code, 404)
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class RawIdFieldsTest(TestCase):
     urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml']
@@ -3157,6 +3193,7 @@ class RawIdFieldsTest(TestCase):
         self.assertContains(response2, "Spain")
         self.assertNotContains(response2, "England")
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class UserAdminTest(TestCase):
     """
     Tests user CRUD functionality.
@@ -3205,7 +3242,7 @@ class UserAdminTest(TestCase):
         adminform = response.context['adminform']
         self.assertTrue('password' not in adminform.form.errors)
         self.assertEqual(adminform.form.errors['password2'],
-                          [u"The two password fields didn't match."])
+                          ["The two password fields didn't match."])
 
     def test_user_fk_popup(self):
         """Quick user addition in a FK popup shouldn't invoke view for further user customization"""
@@ -3257,6 +3294,7 @@ class UserAdminTest(TestCase):
         self.assertEqual(response.context['form_url'], 'pony')
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class GroupAdminTest(TestCase):
     """
     Tests group CRUD functionality.
@@ -3288,6 +3326,7 @@ class GroupAdminTest(TestCase):
             self.assertEqual(response.status_code, 200)
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class CSSTest(TestCase):
     urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml']
@@ -3321,6 +3360,7 @@ except ImportError:
     docutils = None
 
 @unittest.skipUnless(docutils, "no docutils installed.")
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminDocsTest(TestCase):
     urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml']
@@ -3363,6 +3403,7 @@ class AdminDocsTest(TestCase):
         self.assertContains(response, '<li><a href="#built_in-add">add</a></li>', html=True)
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class ValidXHTMLTests(TestCase):
     urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml']
@@ -3386,6 +3427,7 @@ class ValidXHTMLTests(TestCase):
         self.assertNotContains(response, ' xml:lang=""')
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class DateHierarchyTests(TestCase):
     urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml']
@@ -3512,6 +3554,7 @@ class DateHierarchyTests(TestCase):
             self.assert_non_localized_year(response, 2003)
             self.assert_non_localized_year(response, 2005)
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminCustomSaveRelatedTests(TestCase):
     """
     Ensure that one can easily customize the way related objects are saved.
@@ -3538,7 +3581,7 @@ class AdminCustomSaveRelatedTests(TestCase):
         children_names = list(Child.objects.order_by('name').values_list('name', flat=True))
 
         self.assertEqual('Josh Stone', Parent.objects.latest('id').name)
-        self.assertEqual([u'Catherine Stone', u'Paul Stone'], children_names)
+        self.assertEqual(['Catherine Stone', 'Paul Stone'], children_names)
 
     def test_should_be_able_to_edit_related_objects_on_change_view(self):
         parent = Parent.objects.create(name='Josh Stone')
@@ -3558,7 +3601,7 @@ class AdminCustomSaveRelatedTests(TestCase):
         children_names = list(Child.objects.order_by('name').values_list('name', flat=True))
 
         self.assertEqual('Josh Stone', Parent.objects.latest('id').name)
-        self.assertEqual([u'Catherine Stone', u'Paul Stone'], children_names)
+        self.assertEqual(['Catherine Stone', 'Paul Stone'], children_names)
 
     def test_should_be_able_to_edit_related_objects_on_changelist_view(self):
         parent = Parent.objects.create(name='Josh Rock')
@@ -3577,9 +3620,10 @@ class AdminCustomSaveRelatedTests(TestCase):
         children_names = list(Child.objects.order_by('name').values_list('name', flat=True))
 
         self.assertEqual('Josh Stone', Parent.objects.latest('id').name)
-        self.assertEqual([u'Catherine Stone', u'Paul Stone'], children_names)
+        self.assertEqual(['Catherine Stone', 'Paul Stone'], children_names)
 
 
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminViewLogoutTest(TestCase):
     urls = "regressiontests.admin_views.urls"
     fixtures = ['admin-views-users.xml']

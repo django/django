@@ -6,6 +6,7 @@ tests to use ``ModelForm``. As such, the text may not make sense in all cases,
 and the examples are probably a poor fit for the ``ModelForm`` syntax. In other
 words, most of these tests should be rewritten.
 """
+from __future__ import unicode_literals
 
 import os
 import tempfile
@@ -161,7 +162,7 @@ class Price(models.Model):
     quantity = models.PositiveIntegerField()
 
     def __unicode__(self):
-        return u"%s for %s" % (self.quantity, self.price)
+        return "%s for %s" % (self.quantity, self.price)
 
     class Meta:
         unique_together = (('price', 'quantity'),)

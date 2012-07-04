@@ -1,9 +1,6 @@
 from __future__ import absolute_import
 
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from StringIO import StringIO
+from io import BytesIO
 from xml.dom import minidom
 import zipfile
 
@@ -37,7 +34,7 @@ class GeoSitemapTest(TestCase):
         # Getting the geo index.
         doc = minidom.parseString(self.client.get('/sitemap.xml').content)
         index = doc.firstChild
-        self.assertEqual(index.getAttribute(u'xmlns'), u'http://www.sitemaps.org/schemas/sitemap/0.9')
+        self.assertEqual(index.getAttribute('xmlns'), 'http://www.sitemaps.org/schemas/sitemap/0.9')
         self.assertEqual(3, len(index.getElementsByTagName('sitemap')))
 
     def test_geositemap_kml(self):
@@ -47,8 +44,8 @@ class GeoSitemapTest(TestCase):
 
             # Ensuring the right sitemaps namespaces are present.
             urlset = doc.firstChild
-            self.assertEqual(urlset.getAttribute(u'xmlns'), u'http://www.sitemaps.org/schemas/sitemap/0.9')
-            self.assertEqual(urlset.getAttribute(u'xmlns:geo'), u'http://www.google.com/geo/schemas/sitemap/1.0')
+            self.assertEqual(urlset.getAttribute('xmlns'), 'http://www.sitemaps.org/schemas/sitemap/0.9')
+            self.assertEqual(urlset.getAttribute('xmlns:geo'), 'http://www.google.com/geo/schemas/sitemap/1.0')
 
             urls = urlset.getElementsByTagName('url')
             self.assertEqual(2, len(urls)) # Should only be 2 sitemaps.
@@ -66,7 +63,7 @@ class GeoSitemapTest(TestCase):
                     kml_doc = minidom.parseString(self.client.get(kml_url).content)
                 elif kml_type == 'kmz':
                     # Have to decompress KMZ before parsing.
-                    buf = StringIO(self.client.get(kml_url).content)
+                    buf = BytesIO(self.client.get(kml_url).content)
                     zf = zipfile.ZipFile(buf)
                     self.assertEqual(1, len(zf.filelist))
                     self.assertEqual('doc.kml', zf.filelist[0].filename)
@@ -87,8 +84,8 @@ class GeoSitemapTest(TestCase):
 
         # Ensuring the right sitemaps namespaces are present.
         urlset = doc.firstChild
-        self.assertEqual(urlset.getAttribute(u'xmlns'), u'http://www.sitemaps.org/schemas/sitemap/0.9')
-        self.assertEqual(urlset.getAttribute(u'xmlns:geo'), u'http://www.google.com/geo/schemas/sitemap/1.0')
+        self.assertEqual(urlset.getAttribute('xmlns'), 'http://www.sitemaps.org/schemas/sitemap/0.9')
+        self.assertEqual(urlset.getAttribute('xmlns:geo'), 'http://www.google.com/geo/schemas/sitemap/1.0')
 
         # Making sure the correct number of feed URLs were included.
         urls = urlset.getElementsByTagName('url')

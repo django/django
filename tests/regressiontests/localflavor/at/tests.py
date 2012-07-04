@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django.contrib.localflavor.at.forms import (ATZipCodeField, ATStateSelect,
     ATSocialSecurityNumberField)
 
@@ -7,7 +9,7 @@ from django.test import SimpleTestCase
 class ATLocalFlavorTests(SimpleTestCase):
     def test_ATStateSelect(self):
         f = ATStateSelect()
-        out = u'''<select name="bundesland">
+        out = '''<select name="bundesland">
 <option value="BL">Burgenland</option>
 <option value="KA">Carinthia</option>
 <option value="NO">Lower Austria</option>
@@ -21,7 +23,7 @@ class ATLocalFlavorTests(SimpleTestCase):
         self.assertHTMLEqual(f.render('bundesland', 'WI'), out)
 
     def test_ATZipCodeField(self):
-        error_format = [u'Enter a zip code in the format XXXX.']
+        error_format = ['Enter a zip code in the format XXXX.']
         valid = {
             '1150': '1150',
             '4020': '4020',
@@ -36,7 +38,7 @@ class ATLocalFlavorTests(SimpleTestCase):
         self.assertFieldOutput(ATZipCodeField, valid, invalid)
 
     def test_ATSocialSecurityNumberField(self):
-        error_format = [u'Enter a valid Austrian Social Security Number in XXXX XXXXXX format.']
+        error_format = ['Enter a valid Austrian Social Security Number in XXXX XXXXXX format.']
         valid = {
             '1237 010180': '1237 010180',
         }

@@ -377,8 +377,6 @@ a form object, and each rendering method returns a Unicode object.
 Styling required or erroneous form rows
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. versionadded:: 1.2
-
 It's pretty common to style form rows and fields that are required or have
 errors. For example, you might want to present required form rows in bold and
 highlight errors in red.
@@ -637,8 +635,6 @@ For a field's list of errors, access the field's ``errors`` attribute.
 	    ''
 
 .. method:: BoundField.css_classes()
-
-   .. versionadded:: 1.2
 
 When you use Django's rendering shortcuts, CSS classes are used to
 indicate required form fields or fields that contain errors. If you're

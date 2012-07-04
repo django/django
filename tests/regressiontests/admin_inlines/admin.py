@@ -1,7 +1,9 @@
+from __future__ import absolute_import
+
 from django.contrib import admin
 from django import forms
 
-from models import *
+from .models import *
 
 site = admin.AdminSite(name="admin")
 
@@ -113,6 +115,16 @@ class ProfileInline(admin.TabularInline):
     model = Profile
     extra = 1
 
+
+# admin for #18433
+class ChildModel1Inline(admin.TabularInline):
+    model = ChildModel1
+
+
+class ChildModel2Inline(admin.StackedInline):
+    model = ChildModel2
+
+
 site.register(TitleCollection, inlines=[TitleInline])
 # Test bug #12561 and #12778
 # only ModelAdmin media
@@ -129,3 +141,4 @@ site.register(Holder4, Holder4Admin)
 site.register(Author, AuthorAdmin)
 site.register(CapoFamiglia, inlines=[ConsigliereInline, SottoCapoInline])
 site.register(ProfileCollection, inlines=[ProfileInline])
+site.register(ParentModelWithCustomPk, inlines=[ChildModel1Inline, ChildModel2Inline])

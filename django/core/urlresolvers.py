@@ -6,6 +6,7 @@ a string) and returns a tuple in this format:
 
     (view_function, function_args, function_kwargs)
 """
+from __future__ import unicode_literals
 
 import re
 from threading import local
@@ -182,7 +183,7 @@ class RegexURLPattern(LocaleRegexProvider):
         self.name = name
 
     def __repr__(self):
-        return smart_str(u'<%s %s %s>' % (self.__class__.__name__, self.name, self.regex.pattern))
+        return smart_str('<%s %s %s>' % (self.__class__.__name__, self.name, self.regex.pattern))
 
     def add_prefix(self, prefix):
         """
@@ -232,7 +233,7 @@ class RegexURLResolver(LocaleRegexProvider):
         self._app_dict = {}
 
     def __repr__(self):
-        return smart_str(u'<%s %s (%s:%s) %s>' % (self.__class__.__name__, self.urlconf_name, self.app_name, self.namespace, self.regex.pattern))
+        return smart_str('<%s %s (%s:%s) %s>' % (self.__class__.__name__, self.urlconf_name, self.app_name, self.namespace, self.regex.pattern))
 
     def _populate(self):
         lookups = MultiValueDict()
@@ -306,10 +307,8 @@ class RegexURLResolver(LocaleRegexProvider):
                         tried.append([pattern])
                 else:
                     if sub_match:
-                        sub_match_dict = dict([(smart_str(k), v) for k, v in match.groupdict().items()])
-                        sub_match_dict.update(self.default_kwargs)
-                        for k, v in sub_match.kwargs.iteritems():
-                            sub_match_dict[smart_str(k)] = v
+                        sub_match_dict = dict(match.groupdict(), **self.default_kwargs)
+                        sub_match_dict.update(sub_match.kwargs)
                         return ResolverMatch(sub_match.func, sub_match.args, sub_match_dict, sub_match.url_name, self.app_name or sub_match.app_name, [self.namespace] + sub_match.namespaces)
                     tried.append([pattern])
             raise Resolver404({'tried': tried, 'path': new_path})
@@ -381,7 +380,7 @@ class RegexURLResolver(LocaleRegexProvider):
                         continue
                     unicode_kwargs = dict([(k, force_unicode(v)) for (k, v) in kwargs.items()])
                     candidate = (prefix_norm + result) % unicode_kwargs
-                if re.search(u'^%s%s' % (_prefix, pattern), candidate, re.UNICODE):
+                if re.search('^%s%s' % (_prefix, pattern), candidate, re.UNICODE):
                     return candidate
         # lookup_view can be URL label, or dotted path, or callable, Any of
         # these can be passed in at the top, but callables are not friendly in
@@ -499,7 +498,7 @@ def get_script_prefix():
     wishes to construct their own URLs manually (although accessing the request
     instance is normally going to be a lot cleaner).
     """
-    return getattr(_prefixes, "value", u'/')
+    return getattr(_prefixes, "value", '/')
 
 def set_urlconf(urlconf_name):
     """

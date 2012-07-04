@@ -1,11 +1,7 @@
 import os
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from StringIO import StringIO
+from io import BytesIO
 
-from django.core.management import CommandError
-from django.core.management.commands.compilemessages import compile_messages
+from django.core.management import call_command, CommandError
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils import translation
@@ -28,11 +24,9 @@ class PoFileTests(MessageCompilationTests):
 
     def test_bom_rejection(self):
         os.chdir(test_dir)
-        # We don't use the django.core.management infrastructure (call_command()
-        # et al) because CommandError's cause exit(1) there. We test the
-        # underlying compile_messages function instead
-        out = StringIO()
-        self.assertRaises(CommandError, compile_messages, out, locale=self.LOCALE)
+        with self.assertRaisesRegexp(CommandError,
+                "file has a BOM \(Byte Order Mark\)"):
+            call_command('compilemessages', locale=self.LOCALE, stderr=BytesIO())
         self.assertFalse(os.path.exists(self.MO_FILE))
 
 
@@ -48,11 +42,7 @@ class PoFileContentsTests(MessageCompilationTests):
 
     def test_percent_symbol_in_po_file(self):
         os.chdir(test_dir)
-        # We don't use the django.core.management infrastructure (call_command()
-        # et al) because CommandError's cause exit(1) there. We test the
-        # underlying compile_messages function instead
-        out = StringIO()
-        compile_messages(out, locale=self.LOCALE)
+        call_command('compilemessages', locale=self.LOCALE, stderr=BytesIO())
         self.assertTrue(os.path.exists(self.MO_FILE))
 
 
@@ -67,11 +57,7 @@ class PercentRenderingTests(MessageCompilationTests):
     def test_percent_symbol_escaping(self):
         from django.template import Template, Context
         os.chdir(test_dir)
-        # We don't use the django.core.management infrastructure (call_command()
-        # et al) because CommandError's cause exit(1) there. We test the
-        # underlying compile_messages function instead
-        out = StringIO()
-        compile_messages(out, locale=self.LOCALE)
+        call_command('compilemessages', locale=self.LOCALE, stderr=BytesIO())
         with translation.override(self.LOCALE):
             t = Template('{% load i18n %}{% trans "Looks like a str fmt spec %% o but shouldn\'t be interpreted as such" %}')
             rendered = t.render(Context({}))

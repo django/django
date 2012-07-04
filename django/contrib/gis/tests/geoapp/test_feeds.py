@@ -44,7 +44,7 @@ class GeoFeedTest(TestCase):
         # Incrementing through the feeds.
         for feed in [feed1, feed2]:
             # Ensuring the georss namespace was added to the <rss> element.
-            self.assertEqual(feed.getAttribute(u'xmlns:georss'),  u'http://www.georss.org/georss')
+            self.assertEqual(feed.getAttribute('xmlns:georss'),  'http://www.georss.org/georss')
             chan = feed.getElementsByTagName('channel')[0]
             items = chan.getElementsByTagName('item')
             self.assertEqual(len(items), City.objects.count())
@@ -64,7 +64,7 @@ class GeoFeedTest(TestCase):
 
         for feed in [feed1, feed2]:
             # Ensuring the georsss namespace was added to the <feed> element.
-            self.assertEqual(feed.getAttribute(u'xmlns:georss'),  u'http://www.georss.org/georss')
+            self.assertEqual(feed.getAttribute('xmlns:georss'),  'http://www.georss.org/georss')
             entries = feed.getElementsByTagName('entry')
             self.assertEqual(len(entries), City.objects.count())
 
@@ -77,7 +77,7 @@ class GeoFeedTest(TestCase):
         doc = minidom.parseString(self.client.get('/feeds/w3cgeo1/').content)
         feed = doc.firstChild
         # Ensuring the geo namespace was added to the <feed> element.
-        self.assertEqual(feed.getAttribute(u'xmlns:geo'), u'http://www.w3.org/2003/01/geo/wgs84_pos#')
+        self.assertEqual(feed.getAttribute('xmlns:geo'), 'http://www.w3.org/2003/01/geo/wgs84_pos#')
         chan = feed.getElementsByTagName('channel')[0]
         items = chan.getElementsByTagName('item')
         self.assertEqual(len(items), City.objects.count())

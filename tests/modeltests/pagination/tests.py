@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 from datetime import datetime
 
@@ -32,7 +32,7 @@ class PaginationTests(TestCase):
     def test_first_page(self):
         paginator = Paginator(Article.objects.all(), 5)
         p = paginator.page(1)
-        self.assertEqual(u"<Page 1 of 2>", unicode(p))
+        self.assertEqual("<Page 1 of 2>", unicode(p))
         self.assertQuerysetEqual(p.object_list, [
                 "<Article: Article 1>",
                 "<Article: Article 2>",
@@ -45,14 +45,14 @@ class PaginationTests(TestCase):
         self.assertFalse(p.has_previous())
         self.assertTrue(p.has_other_pages())
         self.assertEqual(2, p.next_page_number())
-        self.assertEqual(0, p.previous_page_number())
+        self.assertRaises(InvalidPage, p.previous_page_number)
         self.assertEqual(1, p.start_index())
         self.assertEqual(5, p.end_index())
 
     def test_last_page(self):
         paginator = Paginator(Article.objects.all(), 5)
         p = paginator.page(2)
-        self.assertEqual(u"<Page 2 of 2>", unicode(p))
+        self.assertEqual("<Page 2 of 2>", unicode(p))
         self.assertQuerysetEqual(p.object_list, [
                 "<Article: Article 6>",
                 "<Article: Article 7>",
@@ -63,7 +63,7 @@ class PaginationTests(TestCase):
         self.assertFalse(p.has_next())
         self.assertTrue(p.has_previous())
         self.assertTrue(p.has_other_pages())
-        self.assertEqual(3, p.next_page_number())
+        self.assertRaises(InvalidPage, p.next_page_number)
         self.assertEqual(1, p.previous_page_number())
         self.assertEqual(6, p.start_index())
         self.assertEqual(9, p.end_index())
@@ -104,20 +104,20 @@ class PaginationTests(TestCase):
 
     def test_paginate_list(self):
         # Paginators work with regular lists/tuples, too -- not just with QuerySets.
-        paginator = Paginator([1, 2, 3, 4, 5, 6, 7, 8, 9], 5)
+        paginator = Paginator([1, 2, 3, 4, 5, 6, 7, 8, 9], 3)
         self.assertEqual(9, paginator.count)
-        self.assertEqual(2, paginator.num_pages)
-        self.assertEqual([1, 2], paginator.page_range)
-        p = paginator.page(1)
-        self.assertEqual(u"<Page 1 of 2>", unicode(p))
-        self.assertEqual([1, 2, 3, 4, 5], p.object_list)
+        self.assertEqual(3, paginator.num_pages)
+        self.assertEqual([1, 2, 3], paginator.page_range)
+        p = paginator.page(2)
+        self.assertEqual("<Page 2 of 3>", unicode(p))
+        self.assertEqual([4, 5, 6], p.object_list)
         self.assertTrue(p.has_next())
-        self.assertFalse(p.has_previous())
+        self.assertTrue(p.has_previous())
         self.assertTrue(p.has_other_pages())
-        self.assertEqual(2, p.next_page_number())
-        self.assertEqual(0, p.previous_page_number())
-        self.assertEqual(1, p.start_index())
-        self.assertEqual(5, p.end_index())
+        self.assertEqual(3, p.next_page_number())
+        self.assertEqual(1, p.previous_page_number())
+        self.assertEqual(4, p.start_index())
+        self.assertEqual(6, p.end_index())
 
     def test_paginate_misc_classes(self):
         # Paginator can be passed other objects with a count() method.

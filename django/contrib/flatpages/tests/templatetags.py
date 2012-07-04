@@ -18,6 +18,7 @@ from django.test.utils import override_settings
     TEMPLATE_DIRS=(
         os.path.join(os.path.dirname(__file__), 'templates'),
     ),
+    SITE_ID=1,
 )
 class FlatpageTemplateTagTests(TestCase):
     fixtures = ['sample_flatpages']

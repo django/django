@@ -1,4 +1,4 @@
-from django.utils.encoding import smart_str, smart_unicode
+from django.utils.encoding import smart_unicode
 
 def ssn_check_digit(value):
     "Calculate Italian social security number check digit."
@@ -34,7 +34,7 @@ def ssn_check_digit(value):
 
 def vat_number_check_digit(vat_number):
     "Calculate Italian VAT number check digit."
-    normalized_vat_number = smart_str(vat_number).zfill(10)
+    normalized_vat_number = smart_unicode(vat_number).zfill(10)
     total = 0
     for i in range(0, 10, 2):
         total += int(normalized_vat_number[i])

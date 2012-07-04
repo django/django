@@ -2,7 +2,7 @@
 Canada-specific Form helpers
 """
 
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import re
 
@@ -26,7 +26,7 @@ class CAPostalCodeField(CharField):
     http://www.canadapost.ca/tools/pg/manual/PGaddress-e.asp#1402170
     """
     default_error_messages = {
-        'invalid': _(u'Enter a postal code in the format XXX XXX.'),
+        'invalid': _('Enter a postal code in the format XXX XXX.'),
     }
 
     postcode_regex = re.compile(r'^([ABCEGHJKLMNPRSTVXY]\d[ABCEGHJKLMNPRSTVWXYZ]) *(\d[ABCEGHJKLMNPRSTVWXYZ]\d)$')
@@ -34,7 +34,7 @@ class CAPostalCodeField(CharField):
     def clean(self, value):
         value = super(CAPostalCodeField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
         postcode = value.upper().strip()
         m = self.postcode_regex.match(postcode)
         if not m:
@@ -44,7 +44,7 @@ class CAPostalCodeField(CharField):
 class CAPhoneNumberField(Field):
     """Canadian phone number field."""
     default_error_messages = {
-        'invalid': u'Phone numbers must be in XXX-XXX-XXXX format.',
+        'invalid': _('Phone numbers must be in XXX-XXX-XXXX format.'),
     }
 
     def clean(self, value):
@@ -52,11 +52,11 @@ class CAPhoneNumberField(Field):
         """
         super(CAPhoneNumberField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
         value = re.sub('(\(|\)|\s+)', '', smart_unicode(value))
         m = phone_digits_re.search(value)
         if m:
-            return u'%s-%s-%s' % (m.group(1), m.group(2), m.group(3))
+            return '%s-%s-%s' % (m.group(1), m.group(2), m.group(3))
         raise ValidationError(self.error_messages['invalid'])
 
 class CAProvinceField(Field):
@@ -66,22 +66,22 @@ class CAProvinceField(Field):
     abbreviation for the given province.
     """
     default_error_messages = {
-        'invalid': u'Enter a Canadian province or territory.',
+        'invalid': _('Enter a Canadian province or territory.'),
     }
 
     def clean(self, value):
         super(CAProvinceField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
         try:
             value = value.strip().lower()
         except AttributeError:
             pass
         else:
             # Load data in memory only when it is required, see also #17275
-            from django.contrib.localflavor.ca.ca_provinces import PROVINCES_NORMALIZED
+            from .ca_provinces import PROVINCES_NORMALIZED
             try:
-                return PROVINCES_NORMALIZED[value.strip().lower()].decode('ascii')
+                return PROVINCES_NORMALIZED[value.strip().lower()]
             except KeyError:
                 pass
         raise ValidationError(self.error_messages['invalid'])
@@ -93,7 +93,7 @@ class CAProvinceSelect(Select):
     """
     def __init__(self, attrs=None):
         # Load data in memory only when it is required, see also #17275
-        from django.contrib.localflavor.ca.ca_provinces import PROVINCE_CHOICES
+        from .ca_provinces import PROVINCE_CHOICES
         super(CAProvinceSelect, self).__init__(attrs, choices=PROVINCE_CHOICES)
 
 class CASocialInsuranceNumberField(Field):
@@ -113,14 +113,14 @@ class CASocialInsuranceNumberField(Field):
     def clean(self, value):
         super(CASocialInsuranceNumberField, self).clean(value)
         if value in EMPTY_VALUES:
-            return u''
+            return ''
 
         match = re.match(sin_re, value)
         if not match:
             raise ValidationError(self.error_messages['invalid'])
 
-        number = u'%s-%s-%s' % (match.group(1), match.group(2), match.group(3))
-        check_number = u'%s%s%s' % (match.group(1), match.group(2), match.group(3))
+        number = '%s-%s-%s' % (match.group(1), match.group(2), match.group(3))
+        check_number = '%s%s%s' % (match.group(1), match.group(2), match.group(3))
         if not self.luhn_checksum_is_valid(check_number):
             raise ValidationError(self.error_messages['invalid'])
         return number

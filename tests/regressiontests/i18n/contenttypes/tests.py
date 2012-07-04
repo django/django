@@ -1,4 +1,5 @@
 # coding: utf-8
+from __future__ import unicode_literals
 
 import os
 
@@ -23,9 +24,9 @@ class ContentTypeTests(TestCase):
     def test_verbose_name(self):
         company_type = ContentType.objects.get(app_label='i18n', model='company')
         with translation.override('en'):
-            self.assertEqual(unicode(company_type), u'Company')
+            self.assertEqual(unicode(company_type), 'Company')
         with translation.override('fr'):
-            self.assertEqual(unicode(company_type), u'Société')
+            self.assertEqual(unicode(company_type), 'Société')
 
     def test_field_override(self):
         company_type = ContentType.objects.get(app_label='i18n', model='company')

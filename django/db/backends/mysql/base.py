@@ -3,6 +3,7 @@ MySQL database backend for Django.
 
 Requires MySQLdb: http://sourceforge.net/projects/mysql-python
 """
+from __future__ import unicode_literals
 
 import datetime
 import re
@@ -36,6 +37,7 @@ from django.db.backends.mysql.client import DatabaseClient
 from django.db.backends.mysql.creation import DatabaseCreation
 from django.db.backends.mysql.introspection import DatabaseIntrospection
 from django.db.backends.mysql.validation import DatabaseValidation
+from django.utils.functional import cached_property
 from django.utils.safestring import SafeString, SafeUnicode
 from django.utils import timezone
 
@@ -61,8 +63,8 @@ def adapt_datetime_with_timezone_support(value, conv):
     # Equivalent to DateTimeField.get_db_prep_value. Used only by raw SQL.
     if settings.USE_TZ:
         if timezone.is_naive(value):
-            warnings.warn(u"SQLite received a naive datetime (%s)"
-                          u" while time zone support is active." % value,
+            warnings.warn("SQLite received a naive datetime (%s)"
+                          " while time zone support is active." % value,
                           RuntimeWarning)
             default_timezone = timezone.get_default_timezone()
             value = timezone.make_aware(value, default_timezone)
@@ -169,26 +171,25 @@ class DatabaseFeatures(BaseDatabaseFeatures):
 
     def __init__(self, connection):
         super(DatabaseFeatures, self).__init__(connection)
-        self._storage_engine = None
 
+    @cached_property
     def _mysql_storage_engine(self):
         "Internal method used in Django tests. Don't rely on this from your code"
-        if self._storage_engine is None:
-            cursor = self.connection.cursor()
-            cursor.execute('CREATE TABLE INTROSPECT_TEST (X INT)')
-            # This command is MySQL specific; the second column
-            # will tell you the default table type of the created
-            # table. Since all Django's test tables will have the same
-            # table type, that's enough to evaluate the feature.
-            cursor.execute("SHOW TABLE STATUS WHERE Name='INTROSPECT_TEST'")
-            result = cursor.fetchone()
-            cursor.execute('DROP TABLE INTROSPECT_TEST')
-            self._storage_engine = result[1]
-        return self._storage_engine
+        cursor = self.connection.cursor()
+        cursor.execute('CREATE TABLE INTROSPECT_TEST (X INT)')
+        # This command is MySQL specific; the second column
+        # will tell you the default table type of the created
+        # table. Since all Django's test tables will have the same
+        # table type, that's enough to evaluate the feature.
+        cursor.execute("SHOW TABLE STATUS WHERE Name='INTROSPECT_TEST'")
+        result = cursor.fetchone()
+        cursor.execute('DROP TABLE INTROSPECT_TEST')
+        return result[1]
 
-    def _can_introspect_foreign_keys(self):
+    @cached_property
+    def can_introspect_foreign_keys(self):
         "Confirm support for introspected foreign keys"
-        return self._mysql_storage_engine() != 'MyISAM'
+        return self._mysql_storage_engine != 'MyISAM'
 
 class DatabaseOperations(BaseDatabaseOperations):
     compiler_module = "django.db.backends.mysql.compiler"
@@ -237,7 +238,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         # With MySQLdb, cursor objects have an (undocumented) "_last_executed"
         # attribute where the exact query sent to the database is saved.
         # See MySQLdb/cursors.py in the source distribution.
-        return cursor._last_executed
+        return cursor._last_executed.decode('utf-8')
 
     def no_limit_value(self):
         # 2**64 - 1, as recommended by the MySQL documentation
@@ -418,11 +419,20 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     @cached_property
     def mysql_version(self):
         if not self.server_version:
+            new_connection = False
             if not self._valid_connection():
+                # Ensure we have a connection with the DB by using a temporary
+                # cursor
+                new_connection = True
                 self.cursor().close()
-            m = server_version_re.match(self.connection.get_server_info())
+            server_info = self.connection.get_server_info()
+            if new_connection:
+                # Make sure we close the connection
+                self.connection.close()
+                self.connection = None
+            m = server_version_re.match(server_info)
             if not m:
-                raise Exception('Unable to determine MySQL version from version string %r' % self.connection.get_server_info())
+                raise Exception('Unable to determine MySQL version from version string %r' % server_info)
             self.server_version = tuple([int(x) for x in m.groups()])
         return self.server_version
 

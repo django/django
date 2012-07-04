@@ -31,11 +31,11 @@
 			}
 		};
 		var totalForms = $("#id_" + options.prefix + "-TOTAL_FORMS").attr("autocomplete", "off");
-		var nextIndex = parseInt(totalForms.val());
+		var nextIndex = parseInt(totalForms.val(), 10);
 		var maxForms = $("#id_" + options.prefix + "-MAX_NUM_FORMS").attr("autocomplete", "off");
 		// only show the add button if we are allowed to add more items,
         // note that max_num = None translates to a blank string.
-		var showAddButton = maxForms.val() == '' || (maxForms.val()-totalForms.val()) > 0;
+		var showAddButton = maxForms.val() === '' || (maxForms.val()-totalForms.val()) > 0;
 		$(this).each(function(i) {
 			$(this).not("." + options.emptyCssClass).addClass(options.formCssClass);
 		});
@@ -44,7 +44,7 @@
 			if ($(this).attr("tagName") == "TR") {
 				// If forms are laid out as table rows, insert the
 				// "add" button in a new table row:
-				var numCols = this.eq(0).children().length;
+				var numCols = this.eq(-1).children().length;
 				$(this).parent().append('<tr class="' + options.addCssClass + '"><td colspan="' + numCols + '"><a href="javascript:void(0)">' + options.addText + "</a></tr>");
 				addButton = $(this).parent().find("tr:last a");
 			} else {
@@ -52,13 +52,14 @@
 				$(this).filter(":last").after('<div class="' + options.addCssClass + '"><a href="javascript:void(0)">' + options.addText + "</a></div>");
 				addButton = $(this).filter(":last").next().find("a");
 			}
-			addButton.click(function() {
+			addButton.click(function(e) {
+				e.preventDefault();
 				var totalForms = $("#id_" + options.prefix + "-TOTAL_FORMS");
 				var template = $("#" + options.prefix + "-empty");
 				var row = template.clone(true);
 				row.removeClass(options.emptyCssClass)
-				    .addClass(options.formCssClass)
-				    .attr("id", options.prefix + "-" + nextIndex);
+					.addClass(options.formCssClass)
+					.attr("id", options.prefix + "-" + nextIndex);
 				if (row.is("tr")) {
 					// If the forms are laid out in table rows, insert
 					// the remove button into the last table cell:
@@ -78,14 +79,15 @@
 				// Insert the new form when it has been fully edited
 				row.insertBefore($(template));
 				// Update number of total forms
-				$(totalForms).val(parseInt(totalForms.val()) + 1);
+				$(totalForms).val(parseInt(totalForms.val(), 10) + 1);
 				nextIndex += 1;
 				// Hide add button in case we've hit the max, except we want to add infinitely
-				if ((maxForms.val() != '') && (maxForms.val()-totalForms.val()) <= 0) {
+				if ((maxForms.val() !== '') && (maxForms.val()-totalForms.val()) <= 0) {
 					addButton.parent().hide();
 				}
 				// The delete button of each row triggers a bunch of other things
-				row.find("a." + options.deleteCssClass).click(function() {
+				row.find("a." + options.deleteCssClass).click(function(e) {
+					e.preventDefault();
 					// Remove the parent form containing this button:
 					var row = $(this).parents("." + options.formCssClass);
 					row.remove();
@@ -98,7 +100,7 @@
 					var forms = $("." + options.formCssClass);
 					$("#id_" + options.prefix + "-TOTAL_FORMS").val(forms.length);
 					// Show add button again once we drop below max
-					if ((maxForms.val() == '') || (maxForms.val()-forms.length) > 0) {
+					if ((maxForms.val() === '') || (maxForms.val()-forms.length) > 0) {
 						addButton.parent().show();
 					}
 					// Also, update names and ids for all remaining form controls
@@ -110,17 +112,15 @@
 							updateElementIndex(this, options.prefix, i);
 						});
 					}
-					return false;
 				});
 				// If a post-add callback was supplied, call it with the added form:
 				if (options.added) {
 					options.added(row);
 				}
-				return false;
 			});
 		}
 		return this;
-	}
+	};
 	/* Setup plugin defaults */
 	$.fn.formset.defaults = {
 		prefix: "form",					// The form prefix for your django formset
@@ -132,5 +132,5 @@
 		formCssClass: "dynamic-form",	// CSS class applied to each form in a formset
 		added: null,					// Function called each time a new form is added
 		removed: null					// Function called each time a form is deleted
-	}
+	};
 })(django.jQuery);

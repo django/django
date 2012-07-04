@@ -103,6 +103,9 @@ class Settings(BaseSettings):
                 setting_value = getattr(mod, setting)
                 if setting in tuple_settings and \
                         isinstance(setting_value, basestring):
+                    warnings.warn("The %s setting must be a tuple. Please fix your "
+                                  "settings, as auto-correction is now deprecated." % setting,
+                        PendingDeprecationWarning)
                     setting_value = (setting_value,) # In case the user forgot the comma.
                 setattr(self, setting, setting_value)
 
@@ -181,7 +184,7 @@ def compat_patch_logging_config(logging_config):
             "handler: adding implicit debug-false-only filter. "
             "See http://docs.djangoproject.com/en/dev/releases/1.4/"
             "#request-exceptions-are-now-always-logged",
-            PendingDeprecationWarning)
+            DeprecationWarning)
 
         filter_name = "require_debug_false"
 
