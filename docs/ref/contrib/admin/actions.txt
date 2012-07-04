@@ -214,7 +214,7 @@ objects as JSON::
     from django.core import serializers
 
     def export_as_json(modeladmin, request, queryset):
-        response = HttpResponse(mimetype="text/javascript")
+        response = HttpResponse(mimetype="application/json")
         serializers.serialize("json", queryset, stream=response)
         return response
 
