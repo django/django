@@ -649,11 +649,23 @@ class. Here are the template loaders that come with Django:
 
         INSTALLED_APPS = ('myproject.polls', 'myproject.music')
 
-    ...then ``get_template('foo.html')`` will look for templates in these
+    ...then ``get_template('foo.html')`` will look for ``foo.html`` in these
     directories, in this order:
 
-    * ``/path/to/myproject/polls/templates/foo.html``
-    * ``/path/to/myproject/music/templates/foo.html``
+    * ``/path/to/myproject/polls/templates/``
+    * ``/path/to/myproject/music/templates/``
+
+	... and will use the one it finds first.
+
+	**This ordering is significant.**
+
+	For example, if you want to customize the Django admin, you might choose to
+	override the standard ``admin/base_site.html`` template, from
+	``django/contrib/admin/templates``, with your own `admin/base_site.html``
+	in ``myproject.polls``. You must then make sure that your ``myproject.polls``
+	comes *before* ``django.contrib.admin`` in :setting:`INSTALLED_APPS`, 
+	otherwise ``django.contrib.admin``'s will be loaded first and yours will be
+	ignored.
 
     Note that the loader performs an optimization when it is first imported: It
     caches a list of which :setting:`INSTALLED_APPS` packages have a
