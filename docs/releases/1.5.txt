@@ -177,6 +177,12 @@ autocommit behavior was never restored. This bug is now fixed in 1.5. While
 this is only a bug fix, it is worth checking your applications behavior if
 you are using PostgreSQL together with the autocommit option.
 
+Session not saved on 500 responses
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django's session middleware will skip saving the session data if the
+response's status code is 500.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 
