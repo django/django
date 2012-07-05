@@ -468,8 +468,15 @@ class Model(object):
                 return
 
             update_fields = frozenset(update_fields)
-            field_names = set([field.name for field in self._meta.fields
-                               if not field.primary_key])
+            field_names = set()
+
+            for field in self._meta.fields:
+                if not field.primary_key:
+                    field_names.add(field.name)
+
+                    if field.name != field.attname:
+                        field_names.add(field.attname)
+
             non_model_fields = update_fields.difference(field_names)
 
             if non_model_fields:
@@ -534,7 +541,7 @@ class Model(object):
             non_pks = [f for f in meta.local_fields if not f.primary_key]
 
             if update_fields:
-                non_pks = [f for f in non_pks if f.name in update_fields]
+                non_pks = [f for f in non_pks if f.name in update_fields or f.attname in update_fields]
 
             # First, try an UPDATE. If that doesn't update anything, do an INSERT.
             pk_val = self._get_pk_val(meta)
