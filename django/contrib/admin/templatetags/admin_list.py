@@ -31,7 +31,7 @@ def paginator_number(cl,i):
     if i == DOT:
         return '... '
     elif i == cl.page_num:
-        return format_html('<span class="this-page">{}</span> ', i+1)
+        return format_html('<span class="this-page">{0}</span> ', i+1)
     else:
         return format_html('<a href="{0}"{1}>{2}</a> ',
                            cl.get_query_string({PAGE_VAR: i}),
@@ -162,7 +162,7 @@ def result_headers(cl):
             "url_primary": cl.get_query_string({ORDER_VAR: '.'.join(o_list_primary)}),
             "url_remove": cl.get_query_string({ORDER_VAR: '.'.join(o_list_remove)}),
             "url_toggle": cl.get_query_string({ORDER_VAR: '.'.join(o_list_toggle)}),
-            "class_attrib": format_html(' class="{}"', ' '.join(th_classes))
+            "class_attrib": format_html(' class="{0}"', ' '.join(th_classes))
                             if th_classes else '',
         }
 

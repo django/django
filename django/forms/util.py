@@ -20,7 +20,7 @@ def flatatt(attrs):
 
     The result is passed through 'mark_safe'.
     """
-    return format_html_join('', ' {}="{}"', attrs.items())
+    return format_html_join('', ' {0}="{1}"', attrs.items())
 
 class ErrorDict(dict, StrAndUnicode):
     """
@@ -33,7 +33,7 @@ class ErrorDict(dict, StrAndUnicode):
 
     def as_ul(self):
         if not self: return ''
-        return format_html('<ul class="errorlist">{}</ul>',
+        return format_html('<ul class="errorlist">{0}</ul>',
                            format_html_join('', '<li>{0}{1}</li>',
                                             ((k, force_unicode(v))
                                              for k, v in self.items())
@@ -51,8 +51,8 @@ class ErrorList(list, StrAndUnicode):
 
     def as_ul(self):
         if not self: return ''
-        return format_html('<ul class="errorlist">{}</ul>',
-                           format_html_join('', '<li>{}</li>',
+        return format_html('<ul class="errorlist">{0}</ul>',
+                           format_html_join('', '<li>{0}</li>',
                                             ((force_unicode(e),) for e in self)
                                             )
                            )

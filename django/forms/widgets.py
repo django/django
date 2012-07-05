@@ -254,7 +254,7 @@ class Input(Widget):
         if value != '':
             # Only add the 'value' attribute if a value is non-empty.
             final_attrs['value'] = force_unicode(self._format_value(value))
-        return format_html('<input{} />', flatatt(final_attrs))
+        return format_html('<input{0} />', flatatt(final_attrs))
 
 class TextInput(Input):
     input_type = 'text'
@@ -295,7 +295,7 @@ class MultipleHiddenInput(HiddenInput):
                 # An ID attribute was given. Add a numeric index as a suffix
                 # so that the inputs don't all have the same ID attribute.
                 input_attrs['id'] = '%s_%s' % (id_, i)
-            inputs.append(format_html('<input{} />', flatatt(input_attrs)))
+            inputs.append(format_html('<input{0} />', flatatt(input_attrs)))
         return mark_safe('\n'.join(inputs))
 
     def value_from_datadict(self, data, files, name):
@@ -512,7 +512,7 @@ class CheckboxInput(Widget):
         if not (value is True or value is False or value is None or value == ''):
             # Only add the 'value' attribute if a value is non-empty.
             final_attrs['value'] = force_unicode(value)
-        return format_html('<input{} />', flatatt(final_attrs))
+        return format_html('<input{0} />', flatatt(final_attrs))
 
     def value_from_datadict(self, data, files, name):
         if name not in data:
@@ -544,7 +544,7 @@ class Select(Widget):
     def render(self, name, value, attrs=None, choices=()):
         if value is None: value = ''
         final_attrs = self.build_attrs(attrs, name=name)
-        output = [format_html('<select{}>', flatatt(final_attrs))]
+        output = [format_html('<select{0}>', flatatt(final_attrs))]
         options = self.render_options(choices, [value])
         if options:
             output.append(options)
@@ -620,7 +620,7 @@ class SelectMultiple(Select):
     def render(self, name, value, attrs=None, choices=()):
         if value is None: value = []
         final_attrs = self.build_attrs(attrs, name=name)
-        output = [format_html('<select multiple="multiple"{}>', flatatt(final_attrs))]
+        output = [format_html('<select multiple="multiple"{0}>', flatatt(final_attrs))]
         options = self.render_options(choices, value)
         if options:
             output.append(options)
@@ -679,7 +679,7 @@ class RadioInput(SubWidget):
         final_attrs = dict(self.attrs, type='radio', name=self.name, value=self.choice_value)
         if self.is_checked():
             final_attrs['checked'] = 'checked'
-        return format_html('<input{} />', flatatt(final_attrs))
+        return format_html('<input{0} />', flatatt(final_attrs))
 
 class RadioFieldRenderer(StrAndUnicode):
     """

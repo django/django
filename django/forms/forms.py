@@ -167,7 +167,7 @@ class BaseForm(StrAndUnicode):
                     # punctuation.
                     if self.label_suffix:
                         if label[-1] not in ':?.!':
-                            label = format_html('{}{}', label, self.label_suffix)
+                            label = format_html('{0}{1}', label, self.label_suffix)
                     label = bf.label_tag(label) or ''
                 else:
                     label = ''
