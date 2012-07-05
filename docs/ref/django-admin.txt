@@ -668,6 +668,7 @@ Example usage::
 
 .. versionadded:: 1.4
 
+Since version 1.4, the development server is multithreaded by default.
 Use the ``--nothreading`` option to disable the use of threading in the
 development server.
 
