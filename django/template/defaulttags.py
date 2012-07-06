@@ -47,7 +47,7 @@ class CsrfTokenNode(Node):
             if csrf_token == 'NOTPROVIDED':
                 return format_html("")
             else:
-                return format_html("<div style='display:none'><input type='hidden' name='csrfmiddlewaretoken' value='{0}' /></div>", csrf_token)
+                return format_html("<div><input type='hidden' name='csrfmiddlewaretoken' value='{0}' /></div>", csrf_token)
         else:
             # It's very probable that the token is missing because of
             # misconfiguration, so we raise a warning
