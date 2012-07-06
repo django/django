@@ -13,12 +13,10 @@ from django.utils import unittest
 from .models import (Foo, Bar, Whiz, BigD, BigS, Image, BigInt, Post,
     NullBooleanModel, BooleanModel, Document, RenamedField)
 
-# If PIL available, do these tests.
-if Image:
-    from .imagefield import (ImageFieldTests, ImageFieldTwoDimensionsTests,
-        TwoImageFieldTests, ImageFieldNoDimensionsTests,
-        ImageFieldOneDimensionTests, ImageFieldDimensionsFirstTests,
-        ImageFieldUsingFileTests)
+from .imagefield import (ImageFieldTests, ImageFieldTwoDimensionsTests,
+    TwoImageFieldTests, ImageFieldNoDimensionsTests,
+    ImageFieldOneDimensionTests, ImageFieldDimensionsFirstTests,
+    ImageFieldUsingFileTests)
 
 
 class BasicFieldTests(test.TestCase):
