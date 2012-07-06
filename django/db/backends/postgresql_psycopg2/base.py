@@ -114,7 +114,16 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         if autocommit:
             level = psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT
         else:
-            level = psycopg2.extensions.ISOLATION_LEVEL_READ_COMMITTED
+            level = self.settings_dict["OPTIONS"].get("isolation_level",
+                psycopg2.extensions.ISOLATION_LEVEL_READ_COMMITTED)
+
+            # checks wrong isolation_level values.
+            if level != psycopg2.extensions.ISOLATION_LEVEL_READ_COMMITTED:
+                assert level in (psycopg2.extensions.ISOLATION_LEVEL_REPEATABLE_READ,
+                                 psycopg2.extensions.ISOLATION_LEVEL_SERIALIZABLE), (
+                                "Only can set isolation level to: 'READ_COMMITTED',"
+                                " 'REPEATABLE_READ' or 'SERIALIZABLE'")
+
         self._set_isolation_level(level)
         self.ops = DatabaseOperations(self)
         self.client = DatabaseClient(self)
@@ -169,6 +178,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         conn_params.update(settings_dict['OPTIONS'])
         if 'autocommit' in conn_params:
             del conn_params['autocommit']
+        if 'isolation_level' in conn_params:
+            del conn_params['isolation_level']
         if settings_dict['USER']:
             conn_params['user'] = settings_dict['USER']
         if settings_dict['PASSWORD']:
