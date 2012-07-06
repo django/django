@@ -284,7 +284,7 @@ Remove the ``register()`` call for the ``Choice`` model. Then, edit the ``Poll``
 registration code to read::
 
     from django.contrib import admin
-    from polls.models import Poll
+    from polls.models import Choice, Poll
 
     class ChoiceInline(admin.StackedInline):
         model = Choice
