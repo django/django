@@ -120,7 +120,7 @@ default options such as :djadminopt:`--verbosity` and :djadminopt:`--traceback`.
 
         class Command(BaseCommand):
             ...
-            self.can_import_settings = True
+            can_import_settings = True
 
             def handle(self, *args, **options):
 
