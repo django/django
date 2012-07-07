@@ -46,7 +46,10 @@ GeoDjango's admin site
 
    Link to the URL of the OpenLayers JavaScript.  Defaults to
    ``'http://openlayers.org/api/2.8/OpenLayers.js'``.
+   
+   .. attribute:: point_zoom
 
+   The zoom level to use when the geometry type is a point.  Defaults to the number of zoom levels minus 6.
 
    .. attribute:: modifiable
 
