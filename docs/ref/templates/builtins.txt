@@ -2354,6 +2354,16 @@ It is also able to consume standard context variables, e.g. assuming a
     {% load static %}
     <link rel="stylesheet" href="{% static user_stylesheet %}" type="text/css" media="screen" />
 
+
+If you'd like to retrieve a static url without displaying it, you can use a slightly
+different call::
+
+.. code-block:: html+django
+    
+    {% load static %}
+    {% static "images/hi.jpg" as myphoto %}
+    <img src="{{ myphoto }}"></img>
+
 .. note::
 
     The :mod:`staticfiles<django.contrib.staticfiles>` contrib app also ships

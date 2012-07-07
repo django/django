@@ -1616,6 +1616,10 @@ class Templates(unittest.TestCase):
             'static-prefixtag04': ('{% load static %}{% get_media_prefix as media_prefix %}{{ media_prefix }}', {}, settings.MEDIA_URL),
             'static-statictag01': ('{% load static %}{% static "admin/base.css" %}', {}, urljoin(settings.STATIC_URL, 'admin/base.css')),
             'static-statictag02': ('{% load static %}{% static base_css %}', {'base_css': 'admin/base.css'}, urljoin(settings.STATIC_URL, 'admin/base.css')),
+            'static-statictag03': ('{% load static %}{% static "admin/base.css" as foo %}{{ foo }}', {},
+                urljoin(settings.STATIC_URL, 'admin/base.css')),
+            'static-statictag04': ('{% load static %}{% static base_css as foo %}{{ foo }}', {'base_css': 'admin/base.css'},
+                urljoin(settings.STATIC_URL, 'admin/base.css')),
 
             # Verbatim template tag outputs contents without rendering.
             'verbatim-tag01': ('{% verbatim %}{{bare   }}{% endverbatim %}', {}, '{{bare   }}'),
