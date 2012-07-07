@@ -48,6 +48,7 @@ class FilteredSelectMultiple(forms.SelectMultiple):
             % (name, self.verbose_name.replace('"', '\\"'), int(self.is_stacked), static('admin/')))
         return mark_safe(''.join(output))
 
+
 class AdminDateWidget(forms.DateInput):
 
     @property
@@ -61,6 +62,7 @@ class AdminDateWidget(forms.DateInput):
             final_attrs.update(attrs)
         super(AdminDateWidget, self).__init__(attrs=final_attrs, format=format)
 
+
 class AdminTimeWidget(forms.TimeInput):
 
     @property
@@ -73,6 +75,7 @@ class AdminTimeWidget(forms.TimeInput):
         if attrs is not None:
             final_attrs.update(attrs)
         super(AdminTimeWidget, self).__init__(attrs=final_attrs, format=format)
+
 
 class AdminSplitDateTime(forms.SplitDateTimeWidget):
     """
@@ -89,6 +92,7 @@ class AdminSplitDateTime(forms.SplitDateTimeWidget):
                            _('Date:'), rendered_widgets[0],
                            _('Time:'), rendered_widgets[1])
 
+
 class AdminRadioFieldRenderer(RadioFieldRenderer):
     def render(self):
         """Outputs a <ul> for this set of radio fields."""
@@ -97,14 +101,17 @@ class AdminRadioFieldRenderer(RadioFieldRenderer):
                            format_html_join('\n', '<li>{0}</li>',
                                             ((force_unicode(w),) for w in self)))
 
+
 class AdminRadioSelect(forms.RadioSelect):
     renderer = AdminRadioFieldRenderer
+
 
 class AdminFileWidget(forms.ClearableFileInput):
     template_with_initial = ('<p class="file-upload">%s</p>'
                             % forms.ClearableFileInput.template_with_initial)
     template_with_clear = ('<span class="clearable-file-input">%s</span>'
                            % forms.ClearableFileInput.template_with_clear)
+
 
 def url_params_from_lookup_dict(lookups):
     """
@@ -125,6 +132,7 @@ def url_params_from_lookup_dict(lookups):
             items.append((k, v))
         params.update(dict(items))
     return params
+
 
 class ForeignKeyRawIdWidget(forms.TextInput):
     """
@@ -155,7 +163,7 @@ class ForeignKeyRawIdWidget(forms.TextInput):
             else:
                 url = ''
             if "class" not in attrs:
-                attrs['class'] = 'vForeignKeyRawIdAdminField' # The JavaScript code looks for this hook.
+                attrs['class'] = 'vForeignKeyRawIdAdminField'  # The JavaScript code looks for this hook.
             # TODO: "lookup_id_" is hard-coded here. This should instead use
             # the correct API to determine the ID dynamically.
             extra.append('<a href="%s%s" class="related-lookup" id="lookup_id_%s" onclick="return showRelatedObjectLookupPopup(this);"> '
@@ -183,6 +191,7 @@ class ForeignKeyRawIdWidget(forms.TextInput):
             return '&nbsp;<strong>%s</strong>' % escape(Truncator(obj).words(14, truncate='...'))
         except (ValueError, self.rel.to.DoesNotExist):
             return ''
+
 
 class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
     """
@@ -223,6 +232,7 @@ class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
             if force_unicode(pk1) != force_unicode(pk2):
                 return True
         return False
+
 
 class RelatedFieldWidgetWrapper(forms.Widget):
     """
@@ -284,12 +294,14 @@ class RelatedFieldWidgetWrapper(forms.Widget):
     def id_for_label(self, id_):
         return self.widget.id_for_label(id_)
 
+
 class AdminTextareaWidget(forms.Textarea):
     def __init__(self, attrs=None):
         final_attrs = {'class': 'vLargeTextField'}
         if attrs is not None:
             final_attrs.update(attrs)
         super(AdminTextareaWidget, self).__init__(attrs=final_attrs)
+
 
 class AdminTextInputWidget(forms.TextInput):
     def __init__(self, attrs=None):
@@ -298,12 +310,24 @@ class AdminTextInputWidget(forms.TextInput):
             final_attrs.update(attrs)
         super(AdminTextInputWidget, self).__init__(attrs=final_attrs)
 
+
 class AdminURLFieldWidget(forms.TextInput):
     def __init__(self, attrs=None):
         final_attrs = {'class': 'vURLField'}
         if attrs is not None:
             final_attrs.update(attrs)
         super(AdminURLFieldWidget, self).__init__(attrs=final_attrs)
+
+    def render(self, name, value, attrs=None):
+        output = super(AdminURLFieldWidget, self).render(name, value, attrs=attrs)
+
+        if value is not None:
+            output += ' <a class="openlink" href="%(href)s" target="_blank">%(name)s</a>' % {
+                'href': escape(value),
+                'name': _('Open link'),
+            }
+        return mark_safe(output)
+
 
 class AdminIntegerFieldWidget(forms.TextInput):
     class_name = 'vIntegerField'
@@ -314,8 +338,10 @@ class AdminIntegerFieldWidget(forms.TextInput):
             final_attrs.update(attrs)
         super(AdminIntegerFieldWidget, self).__init__(attrs=final_attrs)
 
+
 class AdminBigIntegerFieldWidget(AdminIntegerFieldWidget):
     class_name = 'vBigIntegerField'
+
 
 class AdminCommaSeparatedIntegerFieldWidget(forms.TextInput):
     def __init__(self, attrs=None):
