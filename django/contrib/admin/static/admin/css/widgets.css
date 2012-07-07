@@ -225,6 +225,21 @@ table p.datetime {
     padding-left: 0;
 }
 
+/* URL */
+
+p.url {
+    line-height: 20px;
+    margin: 0;
+    padding: 0;
+    color: #666;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.url a {
+    font-weight: normal;
+}
+
 /* FILE UPLOADS */
 
 p.file-upload {
