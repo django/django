@@ -498,8 +498,9 @@ class TestCollectionCachedStorage(BaseCollectionTestCase,
         collectstatic_cmd = CollectstaticCommand()
         collectstatic_cmd.set_options(**collectstatic_args)
         stats = collectstatic_cmd.collect()
-        self.assertTrue(os.path.join('cached', 'css', 'window.css') in stats['post_processed'])
-        self.assertTrue(os.path.join('cached', 'css', 'img', 'window.png') in stats['unmodified'])
+        self.assertIn(os.path.join('cached', 'css', 'window.css'), stats['post_processed'])
+        self.assertIn(os.path.join('cached', 'css', 'img', 'window.png'), stats['unmodified'])
+        self.assertIn(os.path.join('test', 'nonascii.css'), stats['post_processed'])
 
     def test_cache_key_memcache_validation(self):
         """

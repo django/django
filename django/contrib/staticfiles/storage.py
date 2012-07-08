@@ -228,7 +228,7 @@ class CachedFilesMixin(object):
 
                 # ..to apply each replacement pattern to the content
                 if name in adjustable_paths:
-                    content = original_file.read()
+                    content = original_file.read().decode(settings.FILE_CHARSET)
                     converter = self.url_converter(name)
                     for patterns in self._patterns.values():
                         for pattern in patterns:
