@@ -387,6 +387,17 @@ class TestCollectionCachedStorage(BaseCollectionTestCase,
             self.assertNotIn(b"cached/other.css", content)
             self.assertIn(b"other.d41d8cd98f00.css", content)
 
+    def test_path_ignored_completely(self):
+        relpath = self.cached_file_path("cached/css/ignored.css")
+        self.assertEqual(relpath, "cached/css/ignored.6c77f2643390.css")
+        with storage.staticfiles_storage.open(relpath) as relfile:
+            content = relfile.read()
+            self.assertIn(b'#foobar', content)
+            self.assertIn(b'http:foobar', content)
+            self.assertIn(b'https:foobar', content)
+            self.assertIn(b'data:foobar', content)
+            self.assertIn(b'//foobar', content)
+
     def test_path_with_querystring(self):
         relpath = self.cached_file_path("cached/styles.css?spam=eggs")
         self.assertEqual(relpath,
