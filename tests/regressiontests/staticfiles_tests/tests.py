@@ -446,6 +446,13 @@ class TestCollectionCachedStorage(BaseCollectionTestCase,
             self.assertIn(b'url("img/relative.acae32e4532b.png")', content)
             self.assertIn(b"../cached/styles.93b1147e8552.css", content)
 
+    def test_import_replacement(self):
+        "See #18050"
+        relpath = self.cached_file_path("cached/import.css")
+        self.assertEqual(relpath, "cached/import.2b1d40b0bbd4.css")
+        with storage.staticfiles_storage.open(relpath) as relfile:
+            self.assertIn(b"""import url("styles.93b1147e8552.css")""", relfile.read())
+
     def test_template_tag_deep_relative(self):
         relpath = self.cached_file_path("cached/css/window.css")
         self.assertEqual(relpath, "cached/css/window.9db38d5169f3.css")
