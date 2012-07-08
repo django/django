@@ -114,8 +114,12 @@ class CsrfViewMiddleware(object):
                 # branches that call reject().
                 return self._accept(request)
 
-            # Note that host includes the port.
             host = request.META.get('HTTP_HOST', '')
+            # Note that host includes the port, so we split that out.
+            # If the host has port specified (checked with ':') then, grab the
+            # host domain from the string before the last ':'.
+            host = host.split(':')[-2] if ':' in host else host
+
             origin = request.META.get('HTTP_ORIGIN')
             permitted_domains = getattr(settings, 'CSRF_PERMITTED_DOMAINS', [host])
 
