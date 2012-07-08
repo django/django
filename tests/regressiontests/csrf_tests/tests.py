@@ -407,3 +407,42 @@ class CsrfViewMiddlewareTest(TestCase):
         req.META['HTTP_ORIGIN'] = 'http://www.evil.com'
         req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
         self.assertEqual(403, req2.status_code)
+
+    @override_settings(PERMITTED_DOMAINS=['crossdomain.com'])
+    def test_permitted_domains_cross(self):
+        '''
+        Test if permitted cross domains requests work
+        '''
+        req = self._get_POST_request_with_token()
+        req.META['HTTP_HOST'] = 'example.com'
+        req.META['HTTP_ORIGIN'] = 'http://crossdomain.com'
+        req.META['HTTP_REFERER'] = 'http://crossdomain.com'
+
+        req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+        self.assertEqual(None, req2)
+
+    @override_settings(PERMITTED_DOMAINS=['example.com', '*.crossdomain.com'])
+    def test_permitted_domains_cross_glob(self):
+        '''
+        Test if permitted cross domains specified in glob foramt work
+        '''
+        req = self._get_POST_request_with_token()
+        req.META['HTTP_HOST'] = 'example.com'
+        req.META['HTTP_ORIGIN'] = 'http://test.crossdomain.com'
+        req.META['HTTP_REFERER'] = 'http://test.crossdomain.com'
+
+        req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+        self.assertEqual(None, req2)
+
+    @override_settings(PERMITTED_DOMAINS=['example.com', 'valid.crossdomain.com'])
+    def test_permitted_domains_cross_invalid(self):
+        '''
+        Test if permitted cross domains invalid check works
+        '''
+        req = self._get_POST_request_with_token()
+        req.META['HTTP_HOST'] = 'example.com'
+        req.META['HTTP_ORIGIN'] = 'http://invalid.crossdomain.com'
+        req.META['HTTP_REFERER'] = 'http://invalid.crossdomain.com'
+
+        req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+        self.assertEqual(403, req2.status_code)
