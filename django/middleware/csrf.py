@@ -117,7 +117,7 @@ class CsrfViewMiddleware(object):
             # Note that host includes the port.
             host = request.META.get('HTTP_HOST', '')
             origin = request.META.get('HTTP_ORIGIN')
-            permitted_domains = getattr(settings, 'PERMITTED_DOMAINS', [host])
+            permitted_domains = getattr(settings, 'CSRF_PERMITTED_DOMAINS', [host])
 
             # If origin header exists, use it to check for csrf attacks.
             # Origin header is being compared to None here because we need to
