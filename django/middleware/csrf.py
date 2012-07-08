@@ -135,34 +135,35 @@ class CsrfViewMiddleware(object):
                     )
 
                     return self._reject(request, reason)
+            else:
+                # Do a strict referer check in case an origin check succeds.
+                # As far as CSRF is concerned, attackers who are in a position
+                # to perform CSRF attack are not in a position to fake referer
+                # headers.
 
+                referer = request.META.get('HTTP_REFERER')
+                if referer is None:
+                    logger.warning('Forbidden (%s): %s',
+                                   REASON_NO_REFERER, request.path,
+                        extra={
+                            'status_code': 403,
+                            'request': request,
+                        }
+                    )
 
-            # Do a strict referer check in case an origin check succeds.
-            # As far as CSRF is concerned, attackers who are in a position to
-            # perform CSRF attack are not in a position to fake referer headers.
-            referer = request.META.get('HTTP_REFERER')
-            if referer is None:
-                logger.warning('Forbidden (%s): %s',
-                               REASON_NO_REFERER, request.path,
-                    extra={
-                        'status_code': 403,
-                        'request': request,
-                    }
-                )
+                    return self._reject(request, REASON_NO_REFERER)
 
-                return self._reject(request, REASON_NO_REFERER)
-
-            # Make sure that the http referer matches the permitted domains
-            # pattern.
-            if not domain_permitted(referer, permitted_domains):
-                reason = REASON_BAD_REFERER % (referer)
-                logger.warning('Forbidden (%s): %s', reason, request.path,
-                    extra={
-                        'status_code': 403,
-                        'request': request,
-                    }
-                )
-                return self._reject(request, reason)
+                # Make sure that the http referer matches the permitted domains
+                # pattern.
+                if not domain_permitted(referer, permitted_domains):
+                    reason = REASON_BAD_REFERER % (referer)
+                    logger.warning('Forbidden (%s): %s', reason, request.path,
+                        extra={
+                            'status_code': 403,
+                            'request': request,
+                        }
+                    )
+                    return self._reject(request, reason)
 
             # Legacy token checking method.
             # TODO: Handle this with permitted domains. Cookies won't work
