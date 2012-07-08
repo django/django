@@ -838,17 +838,6 @@ your ``.profile`` to be able to run the package programs from the command-line::
 __ http://www.kyngchaos.com/software/frameworks
 __ http://www.kyngchaos.com/software/postgres
 
-.. note::
-
-    Use of these binaries requires Django 1.0.3 and above.  If you are
-    using a previous version of Django (like 1.0.2), then you will have
-    to add the following in your settings:
-
-    .. code-block:: python
-
-        GEOS_LIBRARY_PATH='/Library/Frameworks/GEOS.framework/GEOS'
-        GDAL_LIBRARY_PATH='/Library/Frameworks/GDAL.framework/GDAL'
-
 .. _psycopg2_kyngchaos:
 
 psycopg2
