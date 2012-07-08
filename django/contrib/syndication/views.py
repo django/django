@@ -10,6 +10,7 @@ from django.utils.encoding import force_unicode, iri_to_uri, smart_unicode
 from django.utils.html import escape
 from django.utils.timezone import is_naive
 
+
 def add_domain(domain, url, secure=False):
     protocol = 'https' if secure else 'http'
     if url.startswith('//'):
@@ -18,8 +19,6 @@ def add_domain(domain, url, secure=False):
     elif not (url.startswith('http://')
             or url.startswith('https://')
             or url.startswith('mailto:')):
-        # 'url' must already be ASCII and URL-quoted, so no need for encoding
-        # conversions here.
         url = iri_to_uri('%s://%s%s' % (protocol, domain, url))
     return url
 

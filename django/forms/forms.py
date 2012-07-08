@@ -11,7 +11,7 @@ from django.forms.fields import Field, FileField
 from django.forms.util import flatatt, ErrorDict, ErrorList
 from django.forms.widgets import Media, media_property, TextInput, Textarea
 from django.utils.datastructures import SortedDict
-from django.utils.html import conditional_escape
+from django.utils.html import conditional_escape, format_html
 from django.utils.encoding import StrAndUnicode, smart_unicode, force_unicode
 from django.utils.safestring import mark_safe
 
@@ -167,7 +167,7 @@ class BaseForm(StrAndUnicode):
                     # punctuation.
                     if self.label_suffix:
                         if label[-1] not in ':?.!':
-                            label += self.label_suffix
+                            label = format_html('{0}{1}', label, self.label_suffix)
                     label = bf.label_tag(label) or ''
                 else:
                     label = ''
@@ -498,8 +498,8 @@ class BoundField(StrAndUnicode):
     def label_tag(self, contents=None, attrs=None):
         """
         Wraps the given contents in a <label>, if the field has an ID attribute.
-        Does not HTML-escape the contents. If contents aren't given, uses the
-        field's HTML-escaped label.
+        contents should be 'mark_safe'd to avoid HTML escaping. If contents
+        aren't given, uses the field's HTML-escaped label.
 
         If attrs are given, they're used as HTML attributes on the <label> tag.
         """
@@ -508,7 +508,9 @@ class BoundField(StrAndUnicode):
         id_ = widget.attrs.get('id') or self.auto_id
         if id_:
             attrs = attrs and flatatt(attrs) or ''
-            contents = '<label for="%s"%s>%s</label>' % (widget.id_for_label(id_), attrs, unicode(contents))
+            contents = format_html('<label for="{0}"{1}>{2}</label>',
+                                   widget.id_for_label(id_), attrs, contents
+                                   )
         return mark_safe(contents)
 
     def css_classes(self, extra_classes=None):

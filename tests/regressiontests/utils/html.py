@@ -34,6 +34,17 @@ class TestUtilsHtml(unittest.TestCase):
         # Verify it doesn't double replace &.
         self.check_output(f, '<&', '&lt;&amp;')
 
+    def test_format_html(self):
+        self.assertEqual(
+            html.format_html(u"{0} {1} {third} {fourth}",
+                             u"< Dangerous >",
+                             html.mark_safe(u"<b>safe</b>"),
+                             third="< dangerous again",
+                             fourth=html.mark_safe(u"<i>safe again</i>")
+                             ),
+            u"&lt; Dangerous &gt; <b>safe</b> &lt; dangerous again <i>safe again</i>"
+            )
+
     def test_linebreaks(self):
         f = html.linebreaks
         items = (

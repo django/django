@@ -134,7 +134,7 @@ class UserAdmin(admin.ModelAdmin):
         context = {
             'title': _('Change password: %s') % escape(user.username),
             'adminForm': adminForm,
-            'form_url': mark_safe(form_url),
+            'form_url': form_url,
             'form': form,
             'is_popup': '_popup' in request.REQUEST,
             'add': True,

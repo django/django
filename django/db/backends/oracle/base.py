@@ -118,6 +118,13 @@ WHEN (new.%(col_name)s IS NULL)
 /""" % locals()
         return sequence_sql, trigger_sql
 
+    def cache_key_culling_sql(self):
+        return """
+            SELECT cache_key
+              FROM (SELECT cache_key, rank() OVER (ORDER BY cache_key) AS rank FROM %s)
+             WHERE rank = %%s + 1
+        """
+
     def date_extract_sql(self, lookup_type, field_name):
         # http://download-east.oracle.com/docs/cd/B10501_01/server.920/a96540/functions42a.htm#1017163
         if lookup_type == 'week_day':
