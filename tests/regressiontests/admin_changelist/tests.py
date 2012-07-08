@@ -15,7 +15,7 @@ from .admin import (ChildAdmin, QuartetAdmin, BandAdmin, ChordsBandAdmin,
     GroupAdmin, ParentAdmin, DynamicListDisplayChildAdmin,
     DynamicListDisplayLinksChildAdmin, CustomPaginationAdmin,
     FilteredChildAdmin, CustomPaginator, site as custom_site,
-    SwallowAdmin)
+    SwallowAdmin, BrokenChildAdmin)
 from .models import (Event, Child, Parent, Genre, Band, Musician, Group,
     Quartet, Membership, ChordsMusician, ChordsBand, Invitation, Swallow,
     UnorderedObject, OrderedObject)
@@ -47,12 +47,12 @@ class ChangeListTests(TestCase):
                 m.list_select_related, m.list_per_page, m.list_max_show_all, m.list_editable, m)
         self.assertEqual(cl.query_set.query.select_related, {'parent': {'name': {}}})
 
-    def _render_child_result_list(self):
+    def _render_child_result_list(self, model_admin=ChildAdmin):
         """
         Helper to render the Child model admin's result_list.
         """
         request = self.factory.get('/child/')
-        m = ChildAdmin(Child, admin.site)
+        m = model_admin(Child, admin.site)
         list_display = m.get_list_display(request)
         list_display_links = m.get_list_display_links(request, list_display)
         cl = ChangeList(request, Child, list_display, list_display_links,
@@ -85,6 +85,15 @@ class ChangeListTests(TestCase):
         row_html = '<tbody><tr class="row1"><th><a href="%d/">name</a></th><td class="nowrap">Parent object</td></tr></tbody>' % new_child.id
         self.assertFalse(table_output.find(row_html) == -1,
             'Failed to find expected row element: %s' % table_output)
+
+    def test_result_list_errors_propagate(self):
+        """
+        Regression test for #18593: user AttributeErrors from callable
+        display fields should not be swallowed.
+        """
+        new_child = Child.objects.create(name='name', parent=None)
+        self.assertRaises(AttributeError, lambda:
+                self._render_child_result_list(BrokenChildAdmin))
 
     def test_result_list_editable_html(self):
         """
