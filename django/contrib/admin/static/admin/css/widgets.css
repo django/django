@@ -41,7 +41,8 @@
     text-align: left;
 }
 
-.selector .selector-filter label {
+.selector .selector-filter label,
+.inline-group .aligned .selector .selector-filter label {
     width: 16px;
     padding: 2px;
 }

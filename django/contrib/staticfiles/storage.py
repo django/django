@@ -45,10 +45,11 @@ class StaticFilesStorage(FileSystemStorage):
 
 
 class CachedFilesMixin(object):
+    default_template = """url("%s")"""
     patterns = (
         ("*.css", (
             br"""(url\(['"]{0,1}\s*(.*?)["']{0,1}\))""",
-            br"""(@import\s*["']\s*(.*?)["'])""",
+            (br"""(@import\s*["']\s*(.*?)["'])""", """@import url("%s")"""),
         )),
     )
 
@@ -62,8 +63,12 @@ class CachedFilesMixin(object):
         self._patterns = SortedDict()
         for extension, patterns in self.patterns:
             for pattern in patterns:
+                if isinstance(pattern, (tuple, list)):
+                    pattern, template = pattern
+                else:
+                    template = self.default_template
                 compiled = re.compile(pattern)
-                self._patterns.setdefault(extension, []).append(compiled)
+                self._patterns.setdefault(extension, []).append((compiled, template))
 
     def file_hash(self, name, content=None):
         """
@@ -140,10 +145,13 @@ class CachedFilesMixin(object):
 
         return unquote(final_url)
 
-    def url_converter(self, name):
+    def url_converter(self, name, template=None):
         """
         Returns the custom URL converter for the given file name.
         """
+        if template is None:
+            template = self.default_template
+
         def converter(matchobj):
             """
             Converts the matched URL depending on the parent level (`..`)
@@ -153,7 +161,7 @@ class CachedFilesMixin(object):
             matched, url = matchobj.groups()
             # Completely ignore http(s) prefixed URLs,
             # fragments and data-uri URLs
-            if url.startswith(('#', 'http:', 'https:', 'data:')):
+            if url.startswith(('#', 'http:', 'https:', 'data:', '//')):
                 return matched
             name_parts = name.split(os.sep)
             # Using posix normpath here to remove duplicates
@@ -178,7 +186,8 @@ class CachedFilesMixin(object):
             relative_url = '/'.join(url.split('/')[:-1] + file_name)
 
             # Return the hashed version to the file
-            return 'url("%s")' % unquote(relative_url)
+            return template % unquote(relative_url)
+
         return converter
 
     def post_process(self, paths, dry_run=False, **options):
@@ -228,10 +237,10 @@ class CachedFilesMixin(object):
 
                 # ..to apply each replacement pattern to the content
                 if name in adjustable_paths:
-                    content = original_file.read()
-                    converter = self.url_converter(name)
+                    content = original_file.read().decode(settings.FILE_CHARSET)
                     for patterns in self._patterns.values():
-                        for pattern in patterns:
+                        for pattern, template in patterns:
+                            converter = self.url_converter(name, template)
                             content = pattern.sub(converter, content)
                     if hashed_file_exists:
                         self.delete(hashed_name)

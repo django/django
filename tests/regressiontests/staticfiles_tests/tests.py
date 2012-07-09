@@ -387,6 +387,17 @@ class TestCollectionCachedStorage(BaseCollectionTestCase,
             self.assertNotIn(b"cached/other.css", content)
             self.assertIn(b"other.d41d8cd98f00.css", content)
 
+    def test_path_ignored_completely(self):
+        relpath = self.cached_file_path("cached/css/ignored.css")
+        self.assertEqual(relpath, "cached/css/ignored.6c77f2643390.css")
+        with storage.staticfiles_storage.open(relpath) as relfile:
+            content = relfile.read()
+            self.assertIn(b'#foobar', content)
+            self.assertIn(b'http:foobar', content)
+            self.assertIn(b'https:foobar', content)
+            self.assertIn(b'data:foobar', content)
+            self.assertIn(b'//foobar', content)
+
     def test_path_with_querystring(self):
         relpath = self.cached_file_path("cached/styles.css?spam=eggs")
         self.assertEqual(relpath,
@@ -446,6 +457,13 @@ class TestCollectionCachedStorage(BaseCollectionTestCase,
             self.assertIn(b'url("img/relative.acae32e4532b.png")', content)
             self.assertIn(b"../cached/styles.93b1147e8552.css", content)
 
+    def test_import_replacement(self):
+        "See #18050"
+        relpath = self.cached_file_path("cached/import.css")
+        self.assertEqual(relpath, "cached/import.2b1d40b0bbd4.css")
+        with storage.staticfiles_storage.open(relpath) as relfile:
+            self.assertIn(b"""import url("styles.93b1147e8552.css")""", relfile.read())
+
     def test_template_tag_deep_relative(self):
         relpath = self.cached_file_path("cached/css/window.css")
         self.assertEqual(relpath, "cached/css/window.9db38d5169f3.css")
@@ -498,8 +516,9 @@ class TestCollectionCachedStorage(BaseCollectionTestCase,
         collectstatic_cmd = CollectstaticCommand()
         collectstatic_cmd.set_options(**collectstatic_args)
         stats = collectstatic_cmd.collect()
-        self.assertTrue(os.path.join('cached', 'css', 'window.css') in stats['post_processed'])
-        self.assertTrue(os.path.join('cached', 'css', 'img', 'window.png') in stats['unmodified'])
+        self.assertIn(os.path.join('cached', 'css', 'window.css'), stats['post_processed'])
+        self.assertIn(os.path.join('cached', 'css', 'img', 'window.png'), stats['unmodified'])
+        self.assertIn(os.path.join('test', 'nonascii.css'), stats['post_processed'])
 
     def test_cache_key_memcache_validation(self):
         """

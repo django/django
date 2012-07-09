@@ -1,0 +1,8 @@
+body {
+    background: url("#foobar");
+    background: url("http:foobar");
+    background: url("https:foobar");
+    background: url("data:foobar");
+    background: url("//foobar");
+}
+
