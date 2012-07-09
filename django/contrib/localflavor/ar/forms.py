@@ -105,9 +105,16 @@ class ARCUITField(RegexField):
         return cuit[:-1], cuit[-1]
 
     def _calc_cd(self, cuit):
+        # Calculation code based on:
+        # http://es.wikipedia.org/wiki/C%C3%B3digo_%C3%9Anico_de_Identificaci%C3%B3n_Tributaria
         mults = (5, 4, 3, 2, 7, 6, 5, 4, 3, 2)
         tmp = sum([m * int(cuit[idx]) for idx, m in enumerate(mults)])
-        return str(11 - tmp % 11)
+        result = 11 - (tmp % 11)
+        if result == 11:
+            result = 0
+        elif result == 10:
+            result = 9
+        return str(result)
 
     def _format(self, cuit, check_digit=None):
         if check_digit == None:
