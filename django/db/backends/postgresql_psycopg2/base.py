@@ -157,9 +157,11 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def _cursor(self):
         settings_dict = self.settings_dict
         if self.connection is None:
-            if settings_dict['NAME'] == '':
+            if not settings_dict['NAME']:
                 from django.core.exceptions import ImproperlyConfigured
-                raise ImproperlyConfigured("You need to specify NAME in your Django settings file.")
+                raise ImproperlyConfigured(
+                    "settings.DATABASES is improperly configured. "
+                    "Please supply the NAME value.")
             conn_params = {
                 'database': settings_dict['NAME'],
             }
