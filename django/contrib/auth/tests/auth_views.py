@@ -40,7 +40,7 @@ class TitleContentTitleTests(TestCase):
         
         #password_reset_confirm invalid token
         response = password_reset_confirm(request, uidb36='Bad', token='Bad', post_reset_redirect='dummy/')
-        self.assertContains(response, '<title>Password reset</title>')
+        self.assertContains(response, '<title>Password reset unsuccessful</title>')
         self.assertContains(response, '<h1>Password reset unsuccessful</h1>')
         
         #password_reset_confirm valid token
@@ -48,7 +48,7 @@ class TitleContentTitleTests(TestCase):
         token = default_token_generator.make_token(user)
         uidb36 = int_to_base36(user.id)
         response = password_reset_confirm(request, uidb36, token, post_reset_redirect='dummy/')
-        self.assertContains(response, '<title>Password reset</title>')
+        self.assertContains(response, '<title>Enter new password</title>')
         self.assertContains(response, '<h1>Enter new password</h1>')
         
         #password_reset_complete
@@ -61,7 +61,7 @@ class TitleContentTitleTests(TestCase):
         request = self.create_dummy_request()
         request.user = user        
         response = password_change(request, post_change_redirect='dummy/')
-        self.assertContains(response, '<title>Password change</title>')
+        self.assertContains(response, '<title>Password change successful</title>')
         self.assertContains(response, '<h1>Password change successful</h1>')
         
         

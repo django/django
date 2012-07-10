@@ -164,7 +164,6 @@ def password_reset(request, is_admin_site=False,
     context = {
         'form': form,
         'title': _('Password reset'),
-        'content_title': _('Password reset'),
     }
     if extra_context is not None:
         context.update(extra_context)
@@ -176,7 +175,6 @@ def password_reset_done(request,
                         current_app=None, extra_context=None):
     context = {
                'title': _('Password reset successful'),
-               'content_title': _('Password reset successful'),
                }
     if extra_context is not None:
         context.update(extra_context)
@@ -221,8 +219,7 @@ def password_reset_confirm(request, uidb36=None, token=None,
         content_title = _('Password reset unsuccessful')
     context = {
         'form': form,
-        'title': _('Password reset'),
-        'content_title': content_title,
+        'title': content_title,
         'validlink': validlink,
     }
     if extra_context is not None:
@@ -235,7 +232,6 @@ def password_reset_complete(request,
                             current_app=None, extra_context=None):
     context = {
         'login_url': settings.LOGIN_URL,
-        'content_title': _('Password reset complete'),
         'title': _('Password reset complete'),
     }
     if extra_context is not None:
@@ -262,8 +258,7 @@ def password_change(request,
         form = password_change_form(user=request.user)
     context = {
         'form': form,
-        'title': _('Password change'),
-        'content_title': _('Password change successful'),
+        'title': _('Password change successful'),
     }
     if extra_context is not None:
         context.update(extra_context)
@@ -276,7 +271,6 @@ def password_change_done(request,
                          current_app=None, extra_context=None):
     context = {
                'title': _('Password change successful'),
-               'content_title': _('Password change successful'),
                }
     if extra_context is not None:
         context.update(extra_context)
