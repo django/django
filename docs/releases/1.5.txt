@@ -16,7 +16,7 @@ features`_.
 Python compatibility
 ====================
 
-Django 1.5 has dropped support for Python 2.5. Python 2.6 is now the minimum
+Django 1.5 has dropped support for Python 2.5. Python 2.6.5 is now the minimum
 required Python version. Django is tested and supported on Python 2.6 and
 2.7.
 
