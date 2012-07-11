@@ -181,7 +181,7 @@ xrange                          range                                   xrange
 =============================== ======================================  ======================
 
 
-Ouptut encoding now Unicode
+Output encoding now Unicode
 ===========================
 
 If you want to catch stdout/stderr output, the output content is UTF-8 encoded
