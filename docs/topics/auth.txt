@@ -876,13 +876,15 @@ The auth framework uses two :doc:`signals </topics/signals>` that can be used
 for notification when a user logs in or out.
 
 .. data:: django.contrib.auth.signals.user_logged_in
+   :module:
+.. versionadded:: 1.3
 
 Sent when a user logs in successfully.
 
 Arguments sent with this signal:
 
 ``sender``
-    As above: the class of the user that just logged in.
+    The class of the user that just logged in.
 
 ``request``
     The current :class:`~django.http.HttpRequest` instance.
@@ -891,6 +893,8 @@ Arguments sent with this signal:
     The user instance that just logged in.
 
 .. data:: django.contrib.auth.signals.user_logged_out
+   :module:
+.. versionadded:: 1.3
 
 Sent when the logout method is called.
 
@@ -904,6 +908,21 @@ Sent when the logout method is called.
 ``user``
     The user instance that just logged out or ``None`` if the
     user was not authenticated.
+
+.. data:: django.contrib.auth.signals.user_login_failed
+   :module:
+.. versionadded:: 1.5
+
+Sent when the user failed to login successfully
+
+``sender``
+    The name of the module used for authentication.
+
+``credentials``
+    A dictonary of keyword arguments containing the user credentials that were
+    passed to :func:`~django.contrib.auth.authenticate()` or your own custom
+    authentication backend. Credentials matching a set of 'sensitive' patterns,
+    (including password) will not be sent in the clear as part of the signal.
 
 Limiting access to logged-in users
 ----------------------------------

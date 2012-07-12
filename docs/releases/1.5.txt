@@ -191,6 +191,10 @@ Django 1.5 also includes several smaller improvements worth noting:
   recommended as good practice to provide those templates in order to present
   pretty error pages to the user.
 
+* :mod:`django.contrib.auth` provides a new signal that is emitted
+  whenever a user fails to login successfully. See
+  :data:`~django.contrib.auth.signals.user_login_failed`
+
 Backwards incompatible changes in 1.5
 =====================================
 

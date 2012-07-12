@@ -1,6 +1,8 @@
+import re
+
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.importlib import import_module
-from django.contrib.auth.signals import user_logged_in, user_logged_out
+from django.contrib.auth.signals import user_logged_in, user_logged_out, user_login_failed
 
 SESSION_KEY = '_auth_user_id'
 BACKEND_SESSION_KEY = '_auth_user_backend'
@@ -33,6 +35,21 @@ def get_backends():
     return backends
 
 
+def _clean_credentials(credentials):
+    """
+    Cleans a dictionary of credentials of potentially sensitive info before
+    sending to less secure functions.
+
+    Not comprehensive - intended for user_login_failed signal
+    """
+    SENSITIVE_CREDENTIALS = re.compile('api|token|key|secret|password|signature', re.I)
+    CLEANSED_SUBSTITUTE = '********************'
+    for key in credentials:
+        if SENSITIVE_CREDENTIALS.search(key):
+            credentials[key] = CLEANSED_SUBSTITUTE
+    return credentials
+
+
 def authenticate(**credentials):
     """
     If the given credentials are valid, return a User object.
@@ -48,6 +65,10 @@ def authenticate(**credentials):
         # Annotate the user object with the path of the backend.
         user.backend = "%s.%s" % (backend.__module__, backend.__class__.__name__)
         return user
+
+    # The credentials supplied are invalid to all backends, fire signal
+    user_login_failed.send(sender=__name__,
+            credentials=_clean_credentials(credentials))
 
 
 def login(request, user):
