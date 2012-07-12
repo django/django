@@ -1,6 +1,6 @@
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.importlib import import_module
-from django.contrib.auth.signals import user_logged_in, user_logged_out
+from django.contrib.auth.signals import user_logged_in, user_logged_out, user_login_fail
 
 SESSION_KEY = '_auth_user_id'
 BACKEND_SESSION_KEY = '_auth_user_backend'
@@ -45,6 +45,9 @@ def authenticate(**credentials):
         # Annotate the user object with the path of the backend.
         user.backend = "%s.%s" % (backend.__module__, backend.__class__.__name__)
         return user
+        
+    # The credentials supplied are invalid to all backends, fire signal
+    user_login_fail.send(sender=__name__, credentials=credentials)
 
 def login(request, user):
     """
