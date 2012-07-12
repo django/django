@@ -1034,60 +1034,10 @@ Optional packages to consider:
     do not plan on doing any database transformation of geometries to the
     Google projection (900913).
 
-.. _heron:
-
-8.04 and lower
-~~~~~~~~~~~~~~
-
-The 8.04 (and lower) versions of Ubuntu use GEOS v2.2.3 in their binary packages,
-which is incompatible with GeoDjango.  Thus, do *not* use the binary packages
-for GEOS or PostGIS and build some prerequisites from source, per the instructions
-in this document; however, it is okay to use the PostgreSQL binary packages.
-
-For more details, please see the Debian instructions for :ref:`etch` below.
-
 .. _debian:
 
 Debian
 ------
-
-.. _etch:
-
-4.0 (Etch)
-^^^^^^^^^^
-
-The situation here is the same as that of Ubuntu :ref:`heron` -- in other words,
-some packages must be built from source to work properly with GeoDjango.
-
-Binary packages
-~~~~~~~~~~~~~~~
-The following command will install acceptable binary packages, as well as
-the development tools necessary to build the rest of the requirements:
-
-.. code-block:: bash
-
-    $ sudo apt-get install binutils bzip2 gcc g++ flex make postgresql-8.1 \
-        postgresql-server-dev-8.1 python-ctypes python-psycopg2 python-setuptools
-
-Required package information:
-
-* ``binutils``: for ctypes to find libraries
-* ``bzip2``: for decompressing the source packages
-* ``gcc``, ``g++``, ``make``: GNU developer tools used to compile the libraries
-* ``flex``: required to build PostGIS
-* ``postgresql-8.1``
-* ``postgresql-server-dev-8.1``: for ``pg_config``
-* ``python-psycopg2``
-
-Optional packages:
-
-* ``libgeoip``: for :ref:`GeoIP <ref-geoip>` support
-
-Source packages
-~~~~~~~~~~~~~~~
-You will still have to install :ref:`geosbuild`, :ref:`proj4`,
-:ref:`postgis`, and :ref:`gdalbuild` from source.  Please follow the
-directions carefully.
 
 .. _lenny:
 
