@@ -51,7 +51,7 @@ def base62_encode(num, alphabet=ALPHABET):
 
 
 class Token():
-    def __init__(self, value=None, random=False):
+    def __init__(self, value='', random=False):
         if random:
             self._hash = hashlib.md5(random.getrandbits(256))
         else:
