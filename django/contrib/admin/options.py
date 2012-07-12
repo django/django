@@ -343,14 +343,14 @@ class ModelAdmin(BaseModelAdmin):
         self.admin_site = admin_site
         super(ModelAdmin, self).__init__()
 
-    def get_inline_instances(self, request):
+    def get_inline_instances(self, request, obj=None):
         inline_instances = []
         for inline_class in self.inlines:
             inline = inline_class(self.model, self.admin_site)
             if request:
                 if not (inline.has_add_permission(request) or
-                        inline.has_change_permission(request) or
-                        inline.has_delete_permission(request)):
+                        inline.has_change_permission(request, obj) or
+                        inline.has_delete_permission(request, obj)):
                     continue
                 if not inline.has_add_permission(request):
                     inline.max_num = 0
@@ -503,7 +503,7 @@ class ModelAdmin(BaseModelAdmin):
             fields=self.list_editable, **defaults)
 
     def get_formsets(self, request, obj=None):
-        for inline in self.get_inline_instances(request):
+        for inline in self.get_inline_instances(request, obj):
             yield inline.get_formset(request, obj)
 
     def get_paginator(self, request, queryset, per_page, orphans=0, allow_empty_first_page=True):
@@ -1029,7 +1029,7 @@ class ModelAdmin(BaseModelAdmin):
 
         ModelForm = self.get_form(request, obj)
         formsets = []
-        inline_instances = self.get_inline_instances(request)
+        inline_instances = self.get_inline_instances(request, obj)
         if request.method == 'POST':
             form = ModelForm(request.POST, request.FILES, instance=obj)
             if form.is_valid():
