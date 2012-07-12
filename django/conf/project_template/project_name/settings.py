@@ -109,6 +109,8 @@ TEMPLATE_DIRS = (
 )
 
 INSTALLED_APPS = (
+    # If other applications have templates intended to override the ones provided in Django's
+    # applications, ensure that they are listed here *before* Django's
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
