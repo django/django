@@ -1,6 +1,6 @@
 "File-based cache backend"
 
-# import hashlib
+import hashlib
 import os
 import shutil
 import time

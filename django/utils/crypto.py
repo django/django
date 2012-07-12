@@ -29,12 +29,6 @@ from django.utils.encoding import smart_str
 _trans_5c = b"".join([chr(x ^ 0x5C) for x in xrange(256)])
 _trans_36 = b"".join([chr(x ^ 0x36) for x in xrange(256)])
 
-try:
-    random = random.SystemRandom()
-except NotImplementedError:
-    random = random.random()
-
-
 ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 
