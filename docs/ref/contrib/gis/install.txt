@@ -762,13 +762,13 @@ Python
 ^^^^^^
 
 Although OS X comes with Python installed, users can use framework
-installers (`2.5`__ and `2.6`__ are available) provided by
+installers (`2.6`__ and `2.7`__ are available) provided by
 the Python Software Foundation.  An advantage to using the installer is
 that OS X's Python will remain "pristine" for internal operating system
 use.
 
-__ http://python.org/ftp/python/2.5.4/python-2.5.4-macosx.dmg
-__ http://python.org/ftp/python/2.6.2/python-2.6.2-macosx2009-04-16.dmg
+__ http://python.org/ftp/python/2.6.6/python-2.6.6-macosx10.3.dmg
+__ http://python.org/ftp/python/2.7.3/
 
 .. note::
 
