@@ -1,5 +1,7 @@
 import copy
+import warning
 from types import GeneratorType
+
 
 class MergeDict(object):
     """
@@ -191,10 +193,17 @@ class SortedDict(dict):
 
     def value_for_index(self, index):
         """Returns the value of the item at the given zero-based index."""
+        # This, and insert() are deprecated because they cannot be implemented
+        # using collections.OrderedDict (Python 2.7 and up), which we'll
+        # eventually switch to
+        warning.warn(PendingDeprecationWarning,
+            "SortedDict.value_for_index is deprecated", stacklevel=2)
         return self[self.keyOrder[index]]
 
     def insert(self, index, key, value):
         """Inserts the key, value pair before the item with the given index."""
+        warning.warn(PendingDeprecationWarning,
+            "SortedDict.insert is deprecated", stacklevel=2)
         if key in self.keyOrder:
             n = self.keyOrder.index(key)
             del self.keyOrder[n]
