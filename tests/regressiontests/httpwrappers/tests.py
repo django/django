@@ -189,7 +189,7 @@ class QueryDictTests(unittest.TestCase):
         self.assertEqual(q == q1, True)
         q = QueryDict('a=b&c=d&a=1')
         q1 = pickle.loads(pickle.dumps(q, 2))
-        self.assertEqual(q == q1 , True)
+        self.assertEqual(q == q1, True)
 
     def test_update_from_querydict(self):
         """Regression test for #8278: QueryDict.update(QueryDict)"""
