@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 from django import forms
 from django.forms.util import flatatt
 from django.template import loader
+from django.utils.datastructures import SortedDict
 from django.utils.html import format_html, format_html_join
 from django.utils.http import int_to_base36
 from django.utils.safestring import mark_safe
@@ -13,6 +14,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.hashers import UNUSABLE_PASSWORD, is_password_usable, identify_hasher
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.models import get_current_site
+
 
 UNMASKED_DIGITS_TO_SHOW = 6
 
@@ -293,8 +295,11 @@ class PasswordChangeForm(SetPasswordForm):
             raise forms.ValidationError(
                 self.error_messages['password_incorrect'])
         return old_password
-PasswordChangeForm.base_fields.keyOrder = ['old_password', 'new_password1',
-                                           'new_password2']
+
+PasswordChangeForm.base_fields = SortedDict([
+    (k, PasswordChangeForm.base_fields[k])
+    for k in ['old_password', 'new_password1', 'new_password2']
+])
 
 
 class AdminPasswordChangeForm(forms.Form):
