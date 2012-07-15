@@ -67,12 +67,12 @@ And here's that same fixture as YAML:
 
 You'll store this data in a ``fixtures`` directory inside your app.
 
-Loading data is easy: just call :djadmin:`manage.py loaddata <fixturename>
-<loaddata>`, where ``<fixturename>`` is the name of the fixture file you've
-created. Each time you run :djadmin:`loaddata`, the data will be read from the
-fixture and re-loaded into the database. Note this means that if you change one
-of the rows created by a fixture and then run :djadmin:`loaddata` again, you'll
-wipe out any changes you've made.
+Loading data is easy: just call :djadmin:`manage.py loaddata <loaddata>`
+``<fixturename>``, where ``<fixturename>`` is the name of the fixture file
+you've created. Each time you run :djadmin:`loaddata`, the data will be read
+from the fixture and re-loaded into the database. Note this means that if you
+change one of the rows created by a fixture and then run :djadmin:`loaddata`
+again, you'll wipe out any changes you've made.
 
 Automatically loading initial data fixtures
 -------------------------------------------
