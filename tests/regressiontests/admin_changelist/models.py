@@ -1,7 +1,8 @@
 from django.db import models
 
 class Event(models.Model):
-    date = models.DateField()
+    # Oracle can have problems with a column named "date"
+    date = models.DateField(db_column="event_date")
 
 class Parent(models.Model):
     name = models.CharField(max_length=128)
