@@ -16,7 +16,7 @@ from .decorators import DecoratorFromMiddlewareTests
 from .functional import FunctionalTestCase
 from .timesince import TimesinceTests
 from .datastructures import (MultiValueDictTests, SortedDictTests,
-    DictWrapperTests, ImmutableListTests, DotExpandedDictTests, MergeDictTests)
+    DictWrapperTests, ImmutableListTests, MergeDictTests)
 from .tzinfo import TzinfoTests
 from .datetime_safe import DatetimeTests
 from .baseconv import TestBaseConv
