@@ -71,7 +71,6 @@ class GeometryFieldTest(unittest.TestCase):
         for wkt in ('POINT(5 23)', 'MULTIPOLYGON(((0 0, 0 1, 1 1, 1 0, 0 0)))', 'LINESTRING(0 0, 1 1)'):
             self.assertEqual(GEOSGeometry(wkt), fld.to_python(wkt))
         # but raises a ValidationError for any other string
-        import pdb; pdb.set_trace()
         for wkt in ('POINT(5)', 'MULTI   POLYGON(((0 0, 0 1, 1 1, 1 0, 0 0)))', 'BLAH(0 0, 1 1)'):
             self.assertRaises(forms.ValidationError, fld.to_python, wkt)
 
