@@ -48,7 +48,7 @@ from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.envelope import Envelope, OGREnvelope
 from django.contrib.gis.gdal.error import OGRException, OGRIndexError, SRSException
 from django.contrib.gis.gdal.geomtype import OGRGeomType
-from django.contrib.gis.gdal.libgdal import GEOJSON, GDAL_VERSION
+from django.contrib.gis.gdal.libgdal import GDAL_VERSION
 from django.contrib.gis.gdal.srs import SpatialReference, CoordTransform
 
 # Getting the ctypes prototype functions that interface w/the GDAL C library.
@@ -97,10 +97,7 @@ class OGRGeometry(GDALBase):
                 else:
                     g = capi.from_wkt(byref(c_char_p(wkt_m.group('wkt'))), None, byref(c_void_p()))
             elif json_m:
-                if GEOJSON:
-                    g = capi.from_json(geom_input)
-                else:
-                    raise NotImplementedError('GeoJSON input only supported on GDAL 1.5+.')
+                g = capi.from_json(geom_input)
             else:
                 # Seeing if the input is a valid short-hand string
                 # (e.g., 'Point', 'POLYGON').
@@ -328,22 +325,15 @@ class OGRGeometry(GDALBase):
     @property
     def json(self):
         """
-        Returns the GeoJSON representation of this Geometry (requires
-        GDAL 1.5+).
+        Returns the GeoJSON representation of this Geometry.
         """
-        if GEOJSON:
-            return capi.to_json(self.ptr)
-        else:
-            raise NotImplementedError('GeoJSON output only supported on GDAL 1.5+.')
+        return capi.to_json(self.ptr)
     geojson = json
 
     @property
     def kml(self):
         "Returns the KML representation of the Geometry."
-        if GEOJSON:
-            return capi.to_kml(self.ptr, None)
-        else:
-            raise NotImplementedError('KML output only supported on GDAL 1.5+.')
+        return capi.to_kml(self.ptr, None)
 
     @property
     def wkb_size(self):

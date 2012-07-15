@@ -10,7 +10,6 @@ except ImportError:
     # A 'dummy' gdal module.
     class GDALInfo(object):
         HAS_GDAL = False
-        GEOJSON = False
     gdal = GDALInfo()
 
 # NumPy supported?
