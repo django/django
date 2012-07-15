@@ -15,7 +15,7 @@ class DatabaseWrapper(SQLiteDatabaseWrapper):
     def __init__(self, *args, **kwargs):
         # Before we get too far, make sure pysqlite 2.5+ is installed.
         if Database.version_info < (2, 5, 0):
-            raise ImproperlyConfigured('Only versions of pysqlite 2.5+ are '
+            raise ImproperlyConfigured('Only versions of pyspatialite 2.6+ or pysqlite 2.5+ are '
                                        'compatible with SpatiaLite and GeoDjango.')
 
         # Trying to find the location of the SpatiaLite library.
@@ -47,7 +47,7 @@ class DatabaseWrapper(SQLiteDatabaseWrapper):
                 self.connection.enable_load_extension(True)
             except AttributeError:
                 raise ImproperlyConfigured('The pysqlite library does not support C extension loading. '
-                                           'Both SQLite and pysqlite must be configured to allow '
+                                           'Install pyspatialite or configure SQLite and pysqlite to allow '
                                            'the loading of extensions to use SpatiaLite.'
                                            )
 

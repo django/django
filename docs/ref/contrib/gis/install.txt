@@ -60,14 +60,14 @@ The geospatial libraries required for a GeoDjango installation depends
 on the spatial database used.  The following lists the library requirements,
 supported versions, and any notes for each of the supported database backends:
 
-==================  ==============================  ==================  ==========================================================
+==================  ==============================  ==================  ============================================================
 Database            Library Requirements            Supported Versions  Notes
-==================  ==============================  ==================  ==========================================================
+==================  ==============================  ==================  ============================================================
 PostgreSQL          GEOS, PROJ.4, PostGIS           8.1+                Requires PostGIS.
 MySQL               GEOS                            5.x                 Not OGC-compliant; limited functionality.
 Oracle              GEOS                            10.2, 11            XE not supported; not tested with 9.
-SQLite              GEOS, GDAL, PROJ.4, SpatiaLite  3.6.+               Requires SpatiaLite 2.3+, pysqlite2 2.5+, and Django 1.1.
-==================  ==============================  ==================  ==========================================================
+SQLite              GEOS, GDAL, PROJ.4, SpatiaLite  3.6.+               Requires SpatiaLite 2.3+, pyspatialite2.6+ OR pysqlite2 2.5+
+==================  ==============================  ==================  ============================================================
 
 .. _geospatial_libs:
 
@@ -461,8 +461,29 @@ __ http://www.gaia-gis.it/gaia-sins/libspatialite-sources/
 
 .. _pysqlite2:
 
+
+pyspatialite
+^^^^^^^^^^^^
+
+Based almost entirely on pysqlite, this module primarily does one thing different: it build's it's own copy
+of sqlite with spatialite built in. The simplest way to install is to use python package installer PIP:
+
+    $ pip install pyspatialite
+    
+note::
+
+	The installation might fail during compiling if GEOS, GDAL, PROJ.4 development header files are missing. 
+	Use your systems package installer to install these; on a Debian/Ubuntu run following command::
+	
+		$  aptitude install libgeos-dev
+	
+		 
+
+
 pysqlite2
 ^^^^^^^^^
+
+NOTE: Skip this step if you have already installed pyspatialite.
 
 Because SpatiaLite must be loaded as an external extension, it requires the
 ``enable_load_extension`` method, which is only available in versions 2.5+.
@@ -1093,6 +1114,18 @@ Debian 5.0 . Thus when :ref:`spatialdb_template` either:
 * Or use the :download:`create_template_postgis-debian.sh` to create the spatial database.
 
 .. _windows:
+
+6.0 (Squeeze)
+^^^^^^^^^^^^^
+
+GeoDjango + SQlite (SpatiaLite) Database
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To install GEOS, GDAL, PROJ.4, SpatiaLite execute following command - you may want to adjust for newer versions::
+
+	$ aptitude install libgeos-3.2.2 libgeos-dev proj libgdal1-1.6.0 
+	$ pip install pyspatialite
+
 
 Windows
 -------
