@@ -865,3 +865,16 @@ class AggregationTests(TestCase):
             ['Peter Norvig'],
             lambda b: b.name
         )
+
+    def test_type_conversion_for_CharField_aggregations(self):
+        # regression test for #13844
+        # the database backend convert_values function should not case
+        # CharFields to float.
+        from django.db.models import CharField
+        from django.db import connection
+        testData = u'not_a_float_value'
+        testField = CharField()
+        self.assertEqual(
+            connection.ops.convert_values(testData, testField),
+            testData
+        )
