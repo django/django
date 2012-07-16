@@ -12,7 +12,7 @@ editing content:
 
 .. note:: Some of the examples on this page assume that a model titled 'authors'
     has been defined. For these cases we assume the following has been defined 
-    in `myapps.models.py`::
+    in `myapp/models.py`::
 
         from django import models
         from django.core.urlresolvers import reverse
