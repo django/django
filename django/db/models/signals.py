@@ -2,6 +2,8 @@ from django.dispatch import Signal
 
 class_prepared = Signal(providing_args=["class"])
 
+installed_apps_loaded = Signal(providing_args=[])
+
 pre_init = Signal(providing_args=["instance", "args", "kwargs"])
 post_init = Signal(providing_args=["instance"])
 

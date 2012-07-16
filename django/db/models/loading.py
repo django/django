@@ -5,6 +5,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.utils.datastructures import SortedDict
 from django.utils.importlib import import_module
 from django.utils.module_loading import module_has_submodule
+from django.db.models.signals import installed_apps_loaded
 
 import sys
 import os
@@ -68,6 +69,7 @@ class AppCache(object):
                 self.loaded = True
         finally:
             self.write_lock.release()
+            installed_apps_loaded.send(self)
 
     def _label_for(self, app_mod):
         """
