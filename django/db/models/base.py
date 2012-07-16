@@ -270,7 +270,6 @@ class ModelState(object):
     """
     def __init__(self, db=None):
         self.db = db
-        self.deferred_fields = None
         # If true, uniqueness validation checks will consider this a new, as-yet-unsaved object.
         # Necessary for correct validation of new instances of objects with explicit (non-auto) PKs.
         # This impacts validation only; it has no effect on the actual save.
@@ -482,13 +481,14 @@ class Model(object):
         elif not force_insert and self._deferred and using == self._state.db:
             field_names = set([])
             for field in self._meta.fields:
-                if not field.primary_key:
-                    field_names.add(field.name)
+                if not field.primary_key and not hasattr(field, 'through'):
+                    field_names.add(field.attname)
+            deferred_fields = [
+                f.attname for f in self._meta.fields
+                if f.attname not in self.__dict__ and
+                isinstance(self.__class__.__dict__[f.attname], DeferredAttribute)]
 
-                    if field.name != field.attname:
-                        field_names.add(field.attname)
-
-            loaded_fields = field_names.difference(self._state.deferred_fields)
+            loaded_fields = field_names.difference(deferred_fields)
             if loaded_fields:
                 update_fields = frozenset(loaded_fields)
 

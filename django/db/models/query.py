@@ -271,17 +271,15 @@ class QuerySet(object):
         aggregate_start = index_start + len(load_fields or self.model._meta.fields)
 
         skip = None
-        skip_update = None
 
         if load_fields and not fill_cache:
             # Some fields have been deferred, so we have to initialise
             # via keyword arguments.
-            skip, skip_update = set(), set()
+            skip = set()
             init_list = []
             for field in fields:
                 if field.name not in load_fields:
                     skip.add(field.attname)
-                    skip_update.update([field.name, field.attname])
                 else:
                     init_list.append(field.attname)
             model_cls = deferred_class_factory(self.model, skip)
@@ -303,7 +301,6 @@ class QuerySet(object):
                 row_data = row[index_start:aggregate_start]
                 if skip:
                     obj = model_cls(**dict(zip(init_list, row_data)))
-                    obj._state.deferred_fields = skip_update
                 else:
                     obj = model(*row_data)
 

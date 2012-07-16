@@ -1110,12 +1110,13 @@ one, doing so will result in an error.
     reader, is slightly faster and consumes a little less memory in the Python
     process.
 
-.. versionadded:: 1.5
+.. versionchanged:: 1.5
 
 .. note::
 
-    When calling :meth:`~Model.save()` in model instances with deferred fields,
-    by default only saves not defered fields.
+    When calling :meth:`~Model.save()` for instances with deferred fields,
+    only the loaded fields will be saved. See :meth:`~Model.save()` for more
+    details.
 
 
 only
@@ -1161,12 +1162,13 @@ All of the cautions in the note for the :meth:`defer` documentation apply to
 options. Also note that using :meth:`only` and omitting a field requested
 using :meth:`select_related` is an error as well.
 
-.. versionadded:: 1.5
+.. versionchanged:: 1.5
 
 .. note::
 
-    When calling :meth:`~Model.save()` in model instances with deferred fields,
-    by default only saves not defered fields.
+    When calling :meth:`~Model.save()` for instances with deferred fields,
+    only the loaded fields will be saved. See :meth:`~Model.save()` for more
+    details.
 
 using
 ~~~~~

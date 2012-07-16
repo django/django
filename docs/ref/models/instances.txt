@@ -386,12 +386,11 @@ perform an update on all fields.
 
 Specifying ``update_fields`` will force an update.
 
-When saving a model fetched through deferred model loading :meth:`~Model.only()`
-or :meth:`~Model.defer()` and then saving these models, ``update_fields``
-this automatically populated with not defered fields.
-
-Also, if you assign or change any difered field value, this will be managed
-properly (automatically added to the parameter update_fields).
+When saving a model fetched through deferred model loading 
+(:meth:`~Model.only()` or :meth:`~Model.defer()`) only the fields loaded from
+the DB will get updated. In effect there is an automatic ``update_fields`` in
+this case. If you assign or change any deferred field value, these fields will
+be added to the updated fields.
 
 Deleting objects
 ================
