@@ -227,8 +227,10 @@ class Lexer(object):
         else:
             token = Token(TOKEN_TEXT, token_string)
         token.lineno = self.lineno
+        token.source = self.origin, (-1, -1) 
         self.lineno += token_string.count('\n')
         return token
+
 
 class Parser(object):
     def __init__(self, tokens):
@@ -304,6 +306,7 @@ class Parser(object):
                                           "in the template." % node)
         if isinstance(nodelist, NodeList) and not isinstance(node, TextNode):
             nodelist.contains_nontext = True
+        node.source = token.source
         nodelist.append(node)
 
     def enter_command(self, command, token):
