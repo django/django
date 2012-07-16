@@ -202,7 +202,6 @@ def select_template(template_name_list):
     not_found = []
     for template_name in template_name_list:
         try:
-            import ipdb; ipdb.set_trace()
             return get_template(template_name)
         except TemplateDoesNotExist as e:
             if e.args[0] not in not_found:
