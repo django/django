@@ -115,7 +115,7 @@ class TemplateCommand(BaseCommand):
         context = Context(dict(options, **{
             base_name: name,
             base_directory: top_dir,
-        }))
+        }), autoescape=False)
 
         # Setup a stub settings environment for template rendering
         from django.conf import settings
