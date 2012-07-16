@@ -51,6 +51,8 @@ def file_move_safe(old_file_name, new_file_name, chunk_size = 1024*64, allow_ove
         return
 
     try:
+        if not allow_overwrite and os.path.exists(new_file_name):
+            raise IOError('Destination file already exists: \'{0}\''.format(new_file_name))
         os.rename(old_file_name, new_file_name)
         return
     except OSError:
