@@ -291,7 +291,10 @@ def make_messages(locale=None, domain='django', verbosity=1, all=False,
         raise CommandError(message)
 
     # We require gettext version 0.15 or newer.
-    output = _popen('xgettext --version')[0]
+    output, errors = _popen('xgettext --version')
+    if errors:
+        raise CommandError("Error running xgettext. Note that Django "
+                    "internationalization requires GNU gettext 0.15 or newer.")
     match = re.search(r'(?P<major>\d+)\.(?P<minor>\d+)', output)
     if match:
         xversion = (int(match.group('major')), int(match.group('minor')))
