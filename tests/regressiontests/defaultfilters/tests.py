@@ -297,6 +297,10 @@ class DefaultFiltersTests(TestCase):
         self.assertEqual(urlize('HTTPS://github.com/'),
             '<a href="https://github.com/" rel="nofollow">HTTPS://github.com/</a>')
 
+        # Check urlize trims trailing period when followed by parenthesis - see #18644
+        self.assertEqual(urlize('(Go to http://www.example.com/foo.)'),
+                         '(Go to <a href="http://www.example.com/foo" rel="nofollow">http://www.example.com/foo</a>.)')
+
     def test_wordcount(self):
         self.assertEqual(wordcount(''), 0)
         self.assertEqual(wordcount('oneword'), 1)

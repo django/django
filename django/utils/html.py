@@ -13,7 +13,7 @@ from django.utils.functional import allow_lazy
 from django.utils.text import normalize_newlines
 
 # Configuration for urlize() function.
-TRAILING_PUNCTUATION = ['.', ',', ':', ';']
+TRAILING_PUNCTUATION = ['.', ',', ':', ';', '.)']
 WRAPPING_PUNCTUATION = [('(', ')'), ('<', '>'), ('&lt;', '&gt;')]
 
 # List of possible strings used for bullets in bulleted lists.
