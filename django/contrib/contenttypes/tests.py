@@ -8,6 +8,7 @@ from django.contrib.contenttypes.views import shortcut
 from django.contrib.sites.models import Site
 from django.http import HttpRequest, Http404
 from django.test import TestCase
+from django.utils import unittest
 from django.utils.encoding import smart_str
 
 
@@ -44,6 +45,13 @@ class FooWithBrokenAbsoluteUrl(FooWithoutUrl):
 
     def get_absolute_url(self):
         return "/users/%s/" % self.unknown_field
+
+if Site._meta.installed:
+    class FooWithSiteM2MAndUrl(FooWithUrl):
+        """
+        Fake model containing a `Site` many-to-many relationship.
+        """
+        sites = models.ManyToManyField(Site)
 
 class ContentTypesTests(TestCase):
 
@@ -259,6 +267,40 @@ class ContentTypesTests(TestCase):
         obj = FooWithBrokenAbsoluteUrl.objects.create(name="john")
 
         self.assertRaises(AttributeError, shortcut, request, user_ct.id, obj.id)
+
+    @unittest.skipIf(not Site._meta.installed,
+                     "this tests against relationship behavior with the Sites framework")
+    def test_shortcut_view_m2m(self):
+        """
+        Check that the shortcut view (used for the admin "view on site"
+        functionality) returns a complete URL regardless of whether the sites
+        framework is installed
+        """
+        # Tests ticket #18620; prefer current_site rather than allowing
+        # M2M to select first domain via ABC order.
+        current_site = Site.objects.get_current()  # example.com
+        other_site = Site(domain="a.example.com", name="a.example.com")
+        other_site.save()
+
+        # Build an object that belongs to both sites.
+        obj = FooWithSiteM2MAndUrl(name="john")
+        obj.save()  # need saved object to set M2M relationship
+        obj.sites = [other_site, current_site]
+
+        # Check that shortcut view returns absolute URI for `current_site`
+        # and not `other_site`.
+        request = HttpRequest()
+        request.META = {
+            "SERVER_NAME": "Example.com",
+            "SERVER_PORT": "80",
+        }
+        user_ct = ContentType.objects.get_for_model(FooWithSiteM2MAndUrl)
+        response = shortcut(request, user_ct.id, obj.id)
+        self.assertEqual("http://%s/users/john/" % current_site.domain,
+                         response._headers.get("location")[1])
+
+        obj.delete()
+        other_site.delete()
 
     def test_missing_model(self):
         """

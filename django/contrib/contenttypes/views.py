@@ -38,6 +38,15 @@ def shortcut(request, content_type_id, object_id):
     # Otherwise, we need to introspect the object's relationships for a
     # relation to the Site object
     object_domain = None
+    current_domain = None
+
+    # Get current site (if possible): this decides the preferred domain
+    # if this object has an M2M site field and provides a fallback if this
+    # object does not have a site FK or M2M field.
+    try:
+        current_domain = get_current_site(request).domain
+    except Site.DoesNotExist:
+        pass
 
     if Site._meta.installed:
         opts = obj._meta
@@ -45,10 +54,21 @@ def shortcut(request, content_type_id, object_id):
         # First, look for an many-to-many relationship to Site.
         for field in opts.many_to_many:
             if field.rel.to is Site:
+                site_qs = getattr(obj, field.name).all()
                 try:
-                    # Caveat: In the case of multiple related Sites, this just
-                    # selects the *first* one, which is arbitrary.
-                    object_domain = getattr(obj, field.name).all()[0].domain
+                    # If one of the sites this object belongs to is the current
+                    # site, use it.
+                    object_domain = site_qs.get(domain=current_domain).domain
+                except Site.DoesNotExist:
+                    pass
+                if object_domain is not None:
+                    break
+                try:
+                    # Current site was not in the M2M relationship for this
+                    # object. Caveat: This just selects the *first* one, which
+                    # is arbitrary. (Generally based on Site model ordering,
+                    # which is alphabetical by domain.)
+                    object_domain = site_qs[0].domain
                 except IndexError:
                     pass
                 if object_domain is not None:
@@ -65,12 +85,9 @@ def shortcut(request, content_type_id, object_id):
                     if object_domain is not None:
                         break
 
-    # Fall back to the current site (if possible).
+    # Fall back to the current site (if possible) or None (which is fine).
     if object_domain is None:
-        try:
-            object_domain = get_current_site(request).domain
-        except Site.DoesNotExist:
-            pass
+        object_domain = current_domain
 
     # If all that malarkey found an object domain, use it. Otherwise, fall back
     # to whatever get_absolute_url() returned.
