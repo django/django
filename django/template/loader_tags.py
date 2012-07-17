@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.template.base import TemplateSyntaxError, Library, Node, TextNode,\
     token_kwargs, Variable
-from django.template.loader import find_template, get_template
+from django.template.loader import get_template
 from django.utils.safestring import mark_safe
 
 register = Library()
@@ -99,13 +99,6 @@ class ExtendsNode(Node):
         return get_template(parent, skip_template=origin.name)
 
     def render(self, context):
-        origin, source = self.source
-        if origin and origin.loadname == self.parent_name:
-            template = find_template(self.parent_name, skip_template=origin.name)
-            template_source = template[0]
-            extends_tags = template_source.nodelist[0]
-            parent_origin, parent_source = extends_tags.source
-            self.parent_name = getattr(parent_origin, 'name', None)
         compiled_parent = self.get_parent(context)
 
         if BLOCK_CONTEXT_KEY not in context.render_context:
