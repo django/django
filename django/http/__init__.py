@@ -683,7 +683,7 @@ class HttpResponse(object):
     def tell(self):
         if self._base_content_is_iter:
             raise Exception("This %s instance cannot tell its position" % self.__class__)
-        return sum([len(str(chunk)) for chunk in self._container])
+        return sum([len(chunk) for chunk in self])
 
 class HttpResponseRedirect(HttpResponse):
     status_code = 302

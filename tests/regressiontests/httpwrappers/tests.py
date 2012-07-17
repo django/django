@@ -1,3 +1,4 @@
+# -*- encoding: utf-8 -*-
 from __future__ import unicode_literals
 
 import copy
@@ -297,6 +298,17 @@ class HttpResponseTests(unittest.TestCase):
         r.content = [unichr(1950),]
         self.assertRaises(UnicodeEncodeError,
                           getattr, r, 'content')
+
+    def test_file_interface(self):
+        r = HttpResponse()
+        r.write(b"hello")
+        self.assertEqual(r.tell(), 5)
+        r.write("привет")
+        self.assertEqual(r.tell(), 17)
+
+        r = HttpResponse(['abc'])
+        self.assertRaises(Exception, r.write, 'def')
+
 
 class CookieTests(unittest.TestCase):
     def test_encode(self):
