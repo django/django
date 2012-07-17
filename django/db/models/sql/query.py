@@ -1655,7 +1655,7 @@ class Query(object):
         except MultiJoin:
             raise FieldError("Invalid field name: '%s'" % name)
         except FieldError:
-            if name.find(LOOKUP_SEP) != -1:
+            if LOOKUP_SEP in name:
                 # For lookups spanning over relationships, show the error
                 # from the model on which the lookup failed.
                 raise
