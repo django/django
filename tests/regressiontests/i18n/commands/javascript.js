@@ -45,3 +45,10 @@ gettext("quz");
 "?";
 gettext("foobar");
 
+// from ticket 18479
+// markup with unterminated string literal, gettext warning should be ignored
+<div class="mytemplate">
+  <h2><%= gettext('Hello js') %></h2>
+  <img src="../images/icon.png" width="100" />
+</div>
+

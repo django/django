@@ -171,6 +171,7 @@ class JavascriptExtractorTests(ExtractorTests):
             self.assertMsgId("baz", po_contents)
             self.assertMsgId("quz", po_contents)
             self.assertMsgId("foobar", po_contents)
+            self.assertMsgId("Hello js", po_contents)
 
 class IgnoredExtractorTests(ExtractorTests):
 
