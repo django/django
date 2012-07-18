@@ -117,6 +117,11 @@ def find_template_loader(loader):
         raise ImproperlyConfigured('Loader does not define a "load_template" callable template source loader')
 
 def find_template(name, dirs=None, skip_template=None):
+    """
+    Returns a tuple with a compiled Template object for the given template name,
+    and a origin object. Skipping the current template (skip_template),
+    this param contain the absolute path of the template.
+    """
     # Calculate template_source_loaders the first time the function is executed
     # because putting this logic in the module-level namespace may cause
     # circular import errors. See Django ticket #1292.
