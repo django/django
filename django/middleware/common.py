@@ -6,7 +6,7 @@ from django.core.mail import mail_managers
 from django.utils.http import urlquote
 from django.core import urlresolvers
 from django.utils.log import getLogger
-from django.utils.token import HashToken
+from django.utils.tokens import HashToken
 
 logger = getLogger('django.request')
 

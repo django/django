@@ -3,7 +3,7 @@
 import os
 import shutil
 import time
-from django.utils.token import HashToken
+from django.utils.tokens import HashToken
 
 try:
     import cPickle as pickle

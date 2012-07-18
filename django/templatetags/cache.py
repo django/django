@@ -4,7 +4,7 @@ from django.template import Library, Node, TemplateSyntaxError, Variable, Variab
 from django.template import resolve_variable
 from django.core.cache import cache
 from django.utils.http import urlquote
-from django.utils.token import HashToken
+from django.utils.tokens import HashToken
 
 register = Library()
 

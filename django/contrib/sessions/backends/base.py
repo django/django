@@ -1,6 +1,7 @@
 import base64
 import os
 import random
+
 import time
 from datetime import datetime, timedelta
 try:
@@ -12,7 +13,7 @@ from django.conf import settings
 from django.core.exceptions import SuspiciousOperation
 from django.utils import timezone
 from django.utils.crypto import constant_time_compare, salted_hmac
-from django.utils.token import HashToken
+from django.utils.tokens import HashToken
 
 # Use the system (hardware-based) random number generator if it exists.
 if hasattr(random, 'SystemRandom'):

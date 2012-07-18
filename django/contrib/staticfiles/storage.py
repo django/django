@@ -17,7 +17,7 @@ from django.utils.datastructures import SortedDict
 from django.utils.encoding import force_unicode, smart_str
 from django.utils.functional import LazyObject
 from django.utils.importlib import import_module
-from django.utils.token import HashToken
+from django.utils.tokens import HashToken
 
 from django.contrib.staticfiles.utils import check_settings, matches_patterns
 
