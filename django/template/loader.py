@@ -85,10 +85,12 @@ class LoaderOriginLite(object):
         self.loader, self.loadname, self.dirs = loader, name, dirs
 
 def make_origin(display_name, loader, name, dirs):
-    if settings.TEMPLATE_DEBUG and display_name:
-        return LoaderOrigin(display_name, loader, name, dirs)
-    else:
-        return LoaderOriginLite(display_name, loader, name, dirs) 
+    if display_name:
+        if settings.TEMPLATE_DEBUG:
+            return LoaderOrigin(display_name, loader, name, dirs)
+        else:
+            return LoaderOrigin(display_name, loader, name, dirs) 
+    return None
 
 def find_template_loader(loader):
     if isinstance(loader, (tuple, list)):
