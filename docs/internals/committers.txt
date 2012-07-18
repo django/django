@@ -365,6 +365,16 @@ Anssi Kääriäinen
     all related features. He's also a fan of benckmarking and he tries keep
     Django as fast as possible.
 
+Florian Apolloner
+    Florian is currently studying Physics at the `Graz University of Technology`_.
+    Soon after he started using Django he joined the `Ubuntuusers webteam`_ to
+    work on *Inyoka*, the software powering the whole Ubuntusers site.
+
+    For the time beeing he lives in Graz, Austria (not Australia ;)).
+
+.. _Graz University of Technology: http://tugraz.at/
+.. _Ubuntuusers webteam: http://wiki.ubuntuusers.de/ubuntuusers/Webteam
+
 Specialists
 -----------
 
