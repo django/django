@@ -43,7 +43,8 @@ def _popen(cmd):
     Friendly wrapper around Popen for Windows
     """
     p = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE, close_fds=os.name != 'nt', universal_newlines=True)
-    return p.communicate()
+    msgs, errors = p.communicate()
+    return (p.returncode, msgs, errors)
 
 def walk(root, topdown=True, onerror=None, followlinks=False,
          ignore_patterns=None, verbosity=0, stdout=sys.stdout):
@@ -198,8 +199,9 @@ def process_file(file, dirpath, potfile, domain, verbosity,
             (domain, wrap, location, work_file))
     else:
         return
-    msgs, errors = _popen(cmd)
-    if errors:
+    returncode, msgs, errors = _popen(cmd)
+
+    if returncode != 0:
         if is_templatized:
             os.unlink(work_file)
         if os.path.exists(potfile):
@@ -220,17 +222,18 @@ def write_po_file(pofile, potfile, domain, locale, verbosity, stdout,
 
     Uses mguniq, msgmerge, and msgattrib GNU gettext utilities.
     """
-    msgs, errors = _popen('msguniq %s %s --to-code=utf-8 "%s"' %
+    returncode, msgs, errors = _popen('msguniq %s %s --to-code=utf-8 "%s"' %
                             (wrap, location, potfile))
-    if errors:
+
+    if returncode != 0:
         os.unlink(potfile)
         raise CommandError("errors happened while running msguniq\n%s" % errors)
     if os.path.exists(pofile):
         with open(potfile, 'w') as fp:
             fp.write(msgs)
-        msgs, errors = _popen('msgmerge %s %s -q "%s" "%s"' %
+        returncode, msgs, errors = _popen('msgmerge %s %s -q "%s" "%s"' %
                                 (wrap, location, pofile, potfile))
-        if errors:
+        if returncode != 0:
             os.unlink(potfile)
             raise CommandError(
                 "errors happened while running msgmerge\n%s" % errors)
@@ -291,8 +294,8 @@ def make_messages(locale=None, domain='django', verbosity=1, all=False,
         raise CommandError(message)
 
     # We require gettext version 0.15 or newer.
-    output, errors = _popen('xgettext --version')
-    if errors:
+    returncode, output, errors = _popen('xgettext --version')
+    if returncode != 0:
         raise CommandError("Error running xgettext. Note that Django "
                     "internationalization requires GNU gettext 0.15 or newer.")
     match = re.search(r'(?P<major>\d+)\.(?P<minor>\d+)', output)
