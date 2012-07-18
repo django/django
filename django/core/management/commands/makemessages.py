@@ -13,6 +13,7 @@ from django.utils.text import get_text_list
 from django.utils.jslex import prepare_js_for_gettext
 
 plural_forms_re = re.compile(r'^(?P<value>"Plural-Forms.+?\\n")\s*$', re.MULTILINE | re.DOTALL)
+STATUS_OK = 0
 
 def handle_extensions(extensions=('html',), ignored=('py',)):
     """
@@ -43,7 +44,8 @@ def _popen(cmd):
     Friendly wrapper around Popen for Windows
     """
     p = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE, close_fds=os.name != 'nt', universal_newlines=True)
-    return p.communicate()
+    output, errors = p.communicate()
+    return output, errors, p.returncode
 
 def walk(root, topdown=True, onerror=None, followlinks=False,
          ignore_patterns=None, verbosity=0, stdout=sys.stdout):
@@ -198,15 +200,19 @@ def process_file(file, dirpath, potfile, domain, verbosity,
             (domain, wrap, location, work_file))
     else:
         return
-    msgs, errors = _popen(cmd)
+    msgs, errors, status = _popen(cmd)
     if errors:
-        if is_templatized:
-            os.unlink(work_file)
-        if os.path.exists(potfile):
-            os.unlink(potfile)
-        raise CommandError(
-            "errors happened while running xgettext on %s\n%s" %
-            (file, errors))
+        if status != STATUS_OK:
+            if is_templatized:
+                os.unlink(work_file)
+            if os.path.exists(potfile):
+                os.unlink(potfile)
+            raise CommandError(
+                "errors happened while running xgettext on %s\n%s" %
+                (file, errors))
+        elif verbosity > 0:
+            # Print warnings
+            stdout.write(errors)
     if msgs:
         write_pot_file(potfile, msgs, orig_file, work_file, is_templatized)
     if is_templatized:
@@ -220,20 +226,28 @@ def write_po_file(pofile, potfile, domain, locale, verbosity, stdout,
 
     Uses mguniq, msgmerge, and msgattrib GNU gettext utilities.
     """
-    msgs, errors = _popen('msguniq %s %s --to-code=utf-8 "%s"' %
-                            (wrap, location, potfile))
+    msgs, errors, status = _popen('msguniq %s %s --to-code=utf-8 "%s"' %
+                                    (wrap, location, potfile))
     if errors:
-        os.unlink(potfile)
-        raise CommandError("errors happened while running msguniq\n%s" % errors)
+        if status != STATUS_OK:
+            os.unlink(potfile)
+            raise CommandError(
+                "errors happened while running msguniq\n%s" % errors)
+        elif verbosity > 0:
+            stdout.write(errors)
+
     if os.path.exists(pofile):
         with open(potfile, 'w') as fp:
             fp.write(msgs)
-        msgs, errors = _popen('msgmerge %s %s -q "%s" "%s"' %
-                                (wrap, location, pofile, potfile))
+        msgs, errors, status = _popen('msgmerge %s %s -q "%s" "%s"' %
+                                        (wrap, location, pofile, potfile))
         if errors:
-            os.unlink(potfile)
-            raise CommandError(
-                "errors happened while running msgmerge\n%s" % errors)
+            if status != STATUS_OK:
+                os.unlink(potfile)
+                raise CommandError(
+                    "errors happened while running msgmerge\n%s" % errors)
+            elif verbosity > 0:
+                stdout.write(errors)
     elif copy_pforms:
         msgs = copy_plural_forms(msgs, locale, domain, verbosity, stdout)
     msgs = msgs.replace(
@@ -242,11 +256,15 @@ def write_po_file(pofile, potfile, domain, locale, verbosity, stdout,
         fp.write(msgs)
     os.unlink(potfile)
     if no_obsolete:
-        msgs, errors = _popen('msgattrib %s %s -o "%s" --no-obsolete "%s"' %
-                                (wrap, location, pofile, pofile))
+        msgs, errors, status = _popen(
+            'msgattrib %s %s -o "%s" --no-obsolete "%s"' %
+            (wrap, location, pofile, pofile))
         if errors:
-            raise CommandError(
-                "errors happened while running msgattrib\n%s" % errors)
+            if status != STATUS_OK:
+                raise CommandError(
+                    "errors happened while running msgattrib\n%s" % errors)
+            elif verbosity > 0:
+                stdout.write(errors)
 
 def make_messages(locale=None, domain='django', verbosity=1, all=False,
         extensions=None, symlinks=False, ignore_patterns=None, no_wrap=False,
@@ -291,8 +309,8 @@ def make_messages(locale=None, domain='django', verbosity=1, all=False,
         raise CommandError(message)
 
     # We require gettext version 0.15 or newer.
-    output, errors = _popen('xgettext --version')
-    if errors:
+    output, errors, status = _popen('xgettext --version')
+    if status != STATUS_OK:
         raise CommandError("Error running xgettext. Note that Django "
                     "internationalization requires GNU gettext 0.15 or newer.")
     match = re.search(r'(?P<major>\d+)\.(?P<minor>\d+)', output)
